@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This class implements functionality related to table structure.
  * Intended in particular for addons to change it to suit their needs.
@@ -157,6 +157,11 @@ class DbTable_PostgreSQL extends DbTable
 		$index_queries = array();
 		foreach ($indexes as $index)
 		{
+			// MySQL supports a length argument, postgre no
+			foreach ($index['columns'] as $id => $col)
+				if (strpos($col, '(') !== false)
+					$index['columns'][$id] = substr($col, 0, strpos($col, '('));
+
 			$columns = implode(',', $index['columns']);
 
 			// Primary goes in the table...
@@ -540,6 +545,12 @@ class DbTable_PostgreSQL extends DbTable
 		// No columns = no index.
 		if (empty($index_info['columns']))
 			return false;
+
+		// MySQL supports a length argument, postgre no
+		foreach ($index['columns'] as $id => $col)
+			if (strpos($col, '(') !== false)
+				$index['columns'][$id] = substr($col, 0, strpos($col, '('));
+
 		$columns = implode(',', $index_info['columns']);
 
 		// No name - make it up!

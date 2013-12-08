@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * Moderation helper functions.
  *
@@ -1332,4 +1332,35 @@ function moderatorNotice($id_notice)
 	$notice_body = parse_bbc($notice_body, false);
 
 	return array($notice_body, $notice_subject);
+}
+
+/**
+ * Make sure the "current user" (uses $user_info) cannot go outside of the limit for the day.
+ *
+ * @param int The member we are going to issue the warning to
+ */
+function warningDailyLimit($member)
+{
+	global $user_info;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT SUM(counter)
+		FROM {db_prefix}log_comments
+		WHERE id_recipient = {int:selected_member}
+			AND id_member = {int:current_member}
+			AND comment_type = {string:warning}
+			AND log_time > {int:day_time_period}',
+		array(
+			'current_member' => $user_info['id'],
+			'selected_member' => $member,
+			'day_time_period' => time() - 86400,
+			'warning' => 'warning',
+		)
+	);
+	list ($current_applied) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $current_applied;
 }

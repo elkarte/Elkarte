@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -53,7 +53,7 @@ function template_maintenance()
 
 	echo '
 	<div id="manage_attachments">
-		<h3 class="category_header">', $txt['attachment_stats'], '</h3>
+		<h3 class="category_header hdicon cat_img_stats_info">', $txt['attachment_stats'], '</h3>
 		<div class="windowbg">
 			<div class="content">
 				<dl class="settings">
@@ -73,9 +73,7 @@ function template_maintenance()
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=manageattachments;sa=repair;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
 					<p>', $txt['attachment_integrity_check_desc'], '</p>
-					<hr />
 					<input type="submit" name="repair" value="', $txt['attachment_check_now'], '" class="right_submit" />
-					<br class="clear_right" />
 				</form>
 			</div>
 		</div>
@@ -117,14 +115,13 @@ function template_maintenance()
 
 	if (!empty($context['results']))
 		echo '
-		<div class="noticebox">', $context['results'], '</div>';
+		<div class="successbox">', $context['results'], '</div>';
 
 	echo '
 		<div class="windowbg">
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=manageattachments;sa=transfer" method="post" accept-charset="UTF-8">
-					<p>', $txt['attachment_transfer_desc'], '</p>
-					<hr />
+					<p class="infobox">', $txt['attachment_transfer_desc'], '</p>
 					<dl class="settings">
 						<dt>', $txt['attachment_transfer_from'], '</dt>
 						<dd>
@@ -174,7 +171,6 @@ function template_maintenance()
 						<dd><input type="checkbox" name="empty_it"', $context['checked'] ? ' checked="checked"' : '', ' /></dd>';
 	echo '
 					</dl>
-					<hr />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="submit" onclick="start_progress()" name="transfer" value="', $txt['attachment_transfer_now'], '" class="right_submit" />
 					<div id="progress_msg"></div>
@@ -182,7 +178,7 @@ function template_maintenance()
 				</form>
 				<script><!-- // --><![CDATA[
 					function start_progress() {
-						setTimeout(\'show_msg()\', 1000);
+						setTimeout(function() {show_msg();}, 1000);
 					}
 
 					function show_msg() {
@@ -192,7 +188,7 @@ function template_maintenance()
 
 					function show_progress() {
 						$(\'#show_progress\').load("progress.php");
-						setTimeout(\'show_progress()\', 1500);
+						setTimeout(function() {show_progress();}, 1500);
 					}
 
 				// ]]></script>

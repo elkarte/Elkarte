@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file is mainly concerned with minor tasks relating to boards, such as
  * marking them read, collapsing categories, or quick moderation.
@@ -1031,10 +1031,10 @@ function getBoardList($boardListOptions = array(), $simple = false)
 
 			// Do we want access informations?
 			if (!empty($boardListOptions['access']))
-				$return_value[$row['id_board']] += array(
-					'allow' => !(empty($row['can_access']) || $row['can_access'] == 'f'),
-					'deny' => !(empty($row['cannot_access']) || $row['cannot_access'] == 'f'),
-				);
+			{
+				$return_value[$row['id_board']]['allow'] = !(empty($row['can_access']) || $row['can_access'] == 'f');
+				$return_value[$row['id_board']]['deny'] = !(empty($row['cannot_access']) || $row['cannot_access'] == 'f');
+			}
 
 			// Do we want moderation information?
 			if (!empty($boardListOptions['moderator']))
@@ -1065,7 +1065,10 @@ function getBoardList($boardListOptions = array(), $simple = false)
 					'boards' => array(),
 				);
 
-			$return_value['categories'][$row['id_cat']]['boards'][$row['id_board']] = array(
+			// Shortcuts are useful to keep things simple
+			$this_cat = &$return_value['categories'][$row['id_cat']];
+
+			$this_cat['boards'][$row['id_board']] = array(
 				'id' => $row['id_board'],
 				'name' => $row['board_name'],
 				'child_level' => $row['child_level'],
@@ -1073,28 +1076,28 @@ function getBoardList($boardListOptions = array(), $simple = false)
 				'deny' => false,
 				'selected' => isset($boardListOptions['selected_board']) && $boardListOptions['selected_board'] == $row['id_board'],
 			);
-
 			// Do we want access informations?
+
 			if (!empty($boardListOptions['access']))
-				$return_value['categories'][$row['id_cat']]['boards'][$row['id_board']] += array(
-					'allow' => !(empty($row['can_access']) || $row['can_access'] == 'f'),
-					'deny' => !(empty($row['cannot_access']) || $row['cannot_access'] == 'f'),
-				);
+			{
+				$this_cat['boards'][$row['id_board']]['allow'] = !(empty($row['can_access']) || $row['can_access'] == 'f');
+				$this_cat['boards'][$row['id_board']]['deny'] = !(empty($row['cannot_access']) || $row['cannot_access'] == 'f');
+			}
 
 			// If is_ignored is set, it means we could have to deselect a board
 			if (isset($row['is_ignored']))
 			{
-				$return_value['categories'][$row['id_cat']]['boards'][$row['id_board']]['selected'] = $row['is_ignored'];
+				$this_cat['boards'][$row['id_board']]['selected'] = $row['is_ignored'];
 
 				// If a board wasn't checked that probably should have been ensure the board selection is selected, yo!
-				if (!empty($return_value['categories'][$row['id_cat']]['boards'][$row['id_board']]['selected']) && (empty($modSettings['recycle_enable']) || $row['id_board'] != $modSettings['recycle_board']))
+				if (!empty($this_cat['boards'][$row['id_board']]['selected']) && (empty($modSettings['recycle_enable']) || $row['id_board'] != $modSettings['recycle_board']))
 					$return_value['boards_check_all'] = false;
 			}
 
 			// Do we want moderation information?
 			if (!empty($boardListOptions['moderator']))
 			{
-				$return_value['categories'][$row['id_cat']]['boards'][$row['id_board']] += array(
+				$this_cat['boards'][$row['id_board']] += array(
 					'id_profile' => $row['id_profile'],
 					'member_groups' => $row['member_groups'],
 					'is_mod' => $row['is_mod'],

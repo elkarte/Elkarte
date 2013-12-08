@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file has the hefty job of loading information for the forum.
  *
@@ -341,7 +341,7 @@ function loadUserSettings()
 		), determineAvatar($user_settings)),
 		'smiley_set' => isset($user_settings['smiley_set']) ? $user_settings['smiley_set'] : '',
 		'messages' => empty($user_settings['personal_messages']) ? 0 : $user_settings['personal_messages'],
-		'notifications' => empty($user_settings['notifications']) ? 0 : $user_settings['notifications'],
+		'mentions' => empty($user_settings['mentions']) ? 0 : $user_settings['mentions'],
 		'unread_messages' => empty($user_settings['unread_messages']) ? 0 : $user_settings['unread_messages'],
 		'total_time_logged_in' => empty($user_settings['total_time_logged_in']) ? 0 : $user_settings['total_time_logged_in'],
 		'buddies' => !empty($modSettings['enable_buddylist']) && !empty($user_settings['buddy_list']) ? explode(',', $user_settings['buddy_list']) : array(),
@@ -981,7 +981,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 		'name' => $profile['real_name'],
 		'id' => $profile['id_member'],
 		'href' => $scripturl . '?action=profile;u=' . $profile['id_member'],
-		'link' => '<a href="' . $scripturl . '?action=profile;u=' . $profile['id_member'] . '" title="' . $txt['profile_of'] . ' ' . $profile['real_name'] . '">' . $profile['real_name'] . '</a>',
+		'link' => '<a href="' . $scripturl . '?action=profile;u=' . $profile['id_member'] . '" title="' . $txt['profile_of'] . ' ' . trim($profile['real_name']) . '">' . $profile['real_name'] . '</a>',
 		'email' => $profile['email_address'],
 		'show_email' => showEmailAddress(!empty($profile['hide_email']), $profile['id_member']),
 		'registered' => empty($profile['date_registered']) ? $txt['not_applicable'] : standardTime($profile['date_registered']),
@@ -1390,7 +1390,6 @@ function loadTheme($id_theme = 0, $initialize = true)
 	$context['session_id'] = $_SESSION['session_value'];
 	$context['forum_name'] = $mbname;
 	$context['forum_name_html_safe'] = Util::htmlspecialchars($context['forum_name']);
-	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? '' : Util::htmlspecialchars($settings['header_logo_url']);
 	$context['current_action'] = isset($_REQUEST['action']) ? $_REQUEST['action'] : null;
 	$context['current_subaction'] = isset($_REQUEST['sa']) ? $_REQUEST['sa'] : null;
 	$context['can_register'] = empty($modSettings['registration_method']) || $modSettings['registration_method'] != 3;
@@ -1506,6 +1505,9 @@ function loadTheme($id_theme = 0, $initialize = true)
 			loadCSSFile('index' . $context['theme_variant'] . '.css');
 	}
 
+	// A bit lonely maybe, though I think it should be set up *after* teh theme variants detection
+	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? $settings['images_url'] . (!empty($context['theme_variant']) ? '/' . $context['theme_variant'] : '') .  '/logo_elk.png' : Util::htmlspecialchars($settings['header_logo_url']);
+
 	// Allow overriding the board wide time/number formats.
 	if (empty($user_settings['time_format']) && !empty($txt['time_format']))
 		$user_info['time_format'] = $txt['time_format'];
@@ -1543,7 +1545,6 @@ function loadTheme($id_theme = 0, $initialize = true)
 		'elk_images_url' => '"' . $settings['images_url'] . '"',
 		'elk_smiley_url' => '"' . $modSettings['smileys_url'] . '"',
 		'elk_scripturl' => '"' . $scripturl . '"',
-		'elk_default_theme_url' => '"' . $settings['default_theme_url'] . '"',
 		'elk_iso_case_folding' => $context['server']['iso_case_folding'] ? 'true' : 'false',
 		'elk_charset' => '"UTF-8"',
 		'elk_session_id' => '"' . $context['session_id'] . '"',
@@ -1592,7 +1593,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		updateRelativeTime();', true);
 
 	// Queue our Javascript
-	loadJavascriptFile(array('elk_jquery_plugins.js', 'script.js', 'theme.js'));
+	loadJavascriptFile(array('elk_jquery_plugins.js', 'script.js', 'script_elk.js', 'theme.js'));
 
 	// If we think we have mail to send, let's offer up some possibilities... robots get pain (Now with scheduled task support!)
 	if ((!empty($modSettings['mail_next_send']) && $modSettings['mail_next_send'] < time() && empty($modSettings['mail_queue_use_cron'])) || empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time())
@@ -1742,10 +1743,6 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 
 	if ($loaded)
 	{
-		// For compatibility reasons, if this is the index template without new functions, include compatible stuff.
-		if (substr($template_name, 0, 5) == 'index' && !function_exists('template_button_strip'))
-			loadTemplate('Compat');
-
 		if ($db_show_debug === true)
 			$context['debug']['templates'][] = $template_name . ' (' . basename($template_dir) . ')';
 
@@ -1762,10 +1759,8 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 		if (!empty($context['user']['is_admin']) && !isset($_GET['th']))
 		{
 			loadLanguage('Errors');
-			echo '
-<div class="alert errorbox">
-	<a href="', $scripturl . '?action=admin;area=theme;sa=list;th=1;' . $context['session_var'] . '=' . $context['session_id'], '" class="alert">', $txt['theme_dir_wrong'], '</a>
-</div>';
+			$context['security_controls']['files']['theme_dir'] = '<a href="' . $scripturl . '?action=admin;area=theme;sa=list;th=1;' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['theme_dir_wrong'] . '</a>';
+			;
 		}
 
 		loadTemplate($template_name);
@@ -1800,6 +1795,7 @@ function loadSubTemplate($sub_template_name, $fatal = false)
 
 	// Figure out what the template function is named.
 	$theme_function = 'template_' . $sub_template_name;
+
 	if (function_exists($theme_function))
 		$theme_function();
 	elseif ($fatal === false)
@@ -1838,7 +1834,7 @@ function loadCSSFile($filenames, $params = array(), $id = '')
 		$filenames = array($filenames);
 
 	// static values for all these settings
-	$params['stale'] = (!isset($params['stale']) || $params['stale'] === true) ? '?alph21' : (is_string($params['stale']) ? ($params['stale'] = $params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']) : '');
+	$params['stale'] = (!isset($params['stale']) || $params['stale'] === true) ? '?beta10' : (is_string($params['stale']) ? ($params['stale'] = $params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']) : '');
 	$params['fallback'] = (!empty($params['fallback']) && ($params['fallback'] === false)) ? false : true;
 
 	// Whoa ... we've done this before yes?
@@ -1924,7 +1920,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 		$filenames = array($filenames);
 
 	// static values for all these files
-	$params['stale'] = (!isset($params['stale']) || $params['stale'] === true) ? '?alph21' : (is_string($params['stale']) ? ($params['stale'] = $params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']) : '');
+	$params['stale'] = (!isset($params['stale']) || $params['stale'] === true) ? '?beta10' : (is_string($params['stale']) ? ($params['stale'] = $params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']) : '');
 	$params['fallback'] = (!empty($params['fallback']) && ($params['fallback'] === false)) ? false : true;
 
 	// dejvu?
@@ -1950,6 +1946,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 			{
 				$params['local'] = true;
 				$params['dir'] = $settings['theme_dir'] . '/scripts/';
+				$params['url'] = $settings['theme_url'];
 
 				// Fallback if we are not already in the default theme
 				if ($params['fallback'] && ($settings['theme_dir'] !== $settings['default_theme_dir']) && !file_exists($settings['theme_dir'] . '/scripts/' . $filename))
@@ -1959,6 +1956,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 					{
 						$filename = $settings['default_theme_url'] . '/scripts/' . $filename . ($has_cache_staler ? '' : $params['stale']);
 						$params['dir'] = $settings['default_theme_dir'] . '/scripts/';
+						$params['url'] = $settings['default_theme_url'];
 					}
 					else
 						$filename = false;
@@ -1973,7 +1971,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 				$context['javascript_files'][$this_id] = array('filename' => $filename, 'options' => $params);
 
 				if ($db_show_debug === true)
-					$context['debug']['javascript'][] = $params['basename'] . '(' . basename($params['dir']) . ')';
+					$context['debug']['javascript'][] = $params['basename'] . '(' . (!empty($params['url']) ? basename($params['url']) : basename($params['dir'])) . ')';
 			}
 		}
 
@@ -2085,7 +2083,17 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 		$found = false;
 		foreach ($attempts as $k => $file)
 		{
-			if (file_exists($file[0] . '/languages/' . $file[1] . '.' . $file[2] . '.php'))
+			if (file_exists($file[0] . '/languages/' . $lang . '/' . $file[1] . '.' . $file[2] . '.php'))
+			{
+				// Include it!
+				template_include($file[0] . '/languages/' . $lang . '/' . $file[1] . '.' . $file[2] . '.php');
+
+				// Note that we found it.
+				$found = true;
+
+				break;
+			}
+			elseif (file_exists($file[0] . '/languages/' . $file[1] . '.' . $file[2] . '.php'))
 			{
 				// Include it!
 				template_include($file[0] . '/languages/' . $file[1] . '.' . $file[2] . '.php');
@@ -2226,16 +2234,26 @@ function getLanguages($use_cache = true)
 			$dir = dir($language_dir);
 			while ($entry = $dir->read())
 			{
-				// Look for the index language file....
-				if (!preg_match('~^index\.(.+)\.php$~', $entry, $matches))
+				// Only directories are intereting
+				if ($entry == '..' || !is_dir($dir->path . '/' . $entry))
 					continue;
 
-				$languages[$matches[1]] = array(
-					'name' => Util::ucwords(strtr($matches[1], array('_' => ' '))),
-					'selected' => false,
-					'filename' => $matches[1],
-					'location' => $language_dir . '/index.' . $matches[1] . '.php',
-				);
+				// @todo at some point we may want to simplify that stuff (I mean scanning all the files just for index)
+				$file_dir = dir($dir->path . '/' . $entry);
+				while ($file_entry = $file_dir->read())
+				{
+					// Look for the index language file....
+					if (!preg_match('~^index\.(.+)\.php$~', $file_entry, $matches))
+						continue;
+
+					$languages[$matches[1]] = array(
+						'name' => Util::ucwords(strtr($matches[1], array('_' => ' '))),
+						'selected' => false,
+						'filename' => $matches[1],
+						'location' => $language_dir . '/' . $entry . '/index.' . $matches[1] . '.php',
+					);
+				}
+				$file_dir->close();
 			}
 			$dir->close();
 		}

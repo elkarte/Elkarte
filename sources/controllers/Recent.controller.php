@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * Find and retrieve information about recently posted topics, messages, and the like.
  *
@@ -47,6 +47,7 @@ class Recent_Controller extends Action_Controller
 
 		loadTemplate('Recent');
 		$context['page_title'] = $txt['recent_posts'];
+		$context['sub_template'] = 'recent';
 
 		require_once(SUBSDIR . '/Recent.subs.php');
 

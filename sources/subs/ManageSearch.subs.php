@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  */
 
@@ -253,7 +253,7 @@ function alterFullTextIndex($table, $indexes, $add = false)
 		foreach ($indexes as $index)
 			$db->query('', '
 				ALTER TABLE ' . $table . '
-				ADD FULLTEXT {string:name} ({string:name})',
+				ADD FULLTEXT {raw:name} ({raw:name})',
 				array(
 					'name' => $index
 				)

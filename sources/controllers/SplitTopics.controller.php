@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * Handle splitting of topics
  *
@@ -122,6 +122,8 @@ class SplitTopics_Controller extends Action_Controller
 			$this->_new_topic_subject = $messageInfo['subject'];
 			return $this->action_splitSelectTopics();
 		}
+
+		//
 
 		// Basic template information....
 		$context['message'] = array(
@@ -301,6 +303,10 @@ class SplitTopics_Controller extends Action_Controller
 
 		// Using the "select" sub template.
 		$context['sub_template'] = isset($_REQUEST['xml']) ? 'split' : 'select';
+
+		// All of the js for topic split selection is needed
+		if (!isset($_REQUEST['xml']))
+			loadJavascriptFile('topic.js');
 
 		// Are we using a custom messages per page?
 		$context['messages_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];

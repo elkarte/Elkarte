@@ -8,7 +8,7 @@
 CREATE SEQUENCE {$db_prefix}member_logins_seq;
 ---#
 
----# Creating login history table.
+---# Adding login history...
 CREATE TABLE IF NOT EXISTS {$db_prefix}member_logins (
 	id_login int NOT NULL default nextval('{$db_prefix}member_logins_seq'),
 	id_member int NOT NULL,
@@ -98,24 +98,13 @@ while (!$is_done)
 
 	while ($row = $db->fetch_assoc($request))
 	{
-		// The current folder.
+		// The current folder and name
 		$current_folder = !empty($modSettings['currentAttachmentUploadDir']) ? $modSettings['attachmentUploadDir'][$row['id_folder']] : $modSettings['attachmentUploadDir'];
+		$current_name = $current_folder . '/' . $row['id_attach'] . '_' . $file_hash;
 
-		// The old location of the file.
-		$old_location = getLegacyAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder']);
-
-		// The new file name.
-		$file_hash = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], true);
-
-		// And we try to move it.
-		rename($old_location, $current_folder . '/' . $row['id_attach'] . '_' . $file_hash . '.elk');
-
-		// Only update thif if it was successful.
-		if (file_exists($current_folder . '/' . $row['id_attach'] . '_' . $file_hash . '.elk') && !file_exists($old_location))
-			upgrade_query("
-				UPDATE {$db_prefix}attachments
-				SET file_hash = '$file_hash'
-				WHERE id_attach = $row[id_attach]");
+		// And we try to rename it.
+		if (substr($current_name, -4) != '.elk')
+			@rename($current_name, $current_name . '.elk');
 	}
 	$db->free_result($request);
 
@@ -297,14 +286,28 @@ SET unwatched = 0;
 ---#
 
 /******************************************************************************/
---- Adding support for custom profile fields on memberlist
+--- Adding support for custom profile fields on the memberlist and ordering
 /******************************************************************************/
 ---# Adding new columns to boards...
----{
 ALTER TABLE {$db_prefix}custom_fields
 ADD COLUMN show_memberlist smallint NOT NULL DEFAULT '0',
 ADD COLUMN vieworder smallint NOT NULL default '0';
----}
+---#
+
+/******************************************************************************/
+--- Fixing mail queue for long messages
+/******************************************************************************/
+---# Altering mil_queue table...
+ALTER TABLE {$db_prefix}mail_queue
+CHANGE body body mediumtext NOT NULL;
+---#
+
+/******************************************************************************/
+--- Fixing floodcontrol for long types
+/******************************************************************************/
+---# Altering the floodcontrol table...
+ALTER TABLE {$db_prefix}log_floodcontrol
+CHANGE `log_type` `log_type` varchar(10) NOT NULL DEFAULT 'post';
 ---#
 
 /******************************************************************************/
@@ -319,22 +322,13 @@ upgrade_query("
 ---#
 
 /******************************************************************************/
---- PM_Prefs changes
-/******************************************************************************/
----# Altering the defalut pm layout to conversation
-upgrade_query("
-	ALTER TABLE {$db_prefix}members
-	CHANGE `pm_prefs` `pm_prefs` int NOT NULL default '2'");
----#
-
-/******************************************************************************/
 --- Adding support for drafts
 /******************************************************************************/
 ---# Creating sequence for user_drafts.
 CREATE SEQUENCE {$db_prefix}user_drafts_seq;
 ---#
 
----# Creating drafts table.
+---# Creating draft table
 CREATE TABLE IF NOT EXISTS {$db_prefix}user_drafts (
 	id_draft int default nextval('{$db_prefix}user_drafts_seq'),
 	id_topic int NOT NULL default '0',
@@ -357,18 +351,19 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}user_drafts (
 ---# Adding draft permissions...
 ---{
 // We cannot do this twice
+// @todo this won't work when you upgrade from smf
 if (@$modSettings['elkVersion'] < '1.0')
 {
 	// Anyone who can currently post unapproved topics we assume can create drafts as well ...
 	$request = upgrade_query("
-		SELECT id_group, id_board, add_deny, permission
+		SELECT id_group, id_profile, add_deny, permission
 		FROM {$db_prefix}board_permissions
 		WHERE permission = 'post_unapproved_topics'");
 	$inserts = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		$inserts[] = "($row[id_group], $row[id_board], 'post_draft', $row[add_deny])";
-		$inserts[] = "($row[id_group], $row[id_board], 'post_autosave_draft', $row[add_deny])";
+		$inserts[] = "($row[id_group], $row[id_profile], 'post_draft', $row[add_deny])";
+		$inserts[] = "($row[id_group], $row[id_profile], 'post_autosave_draft', $row[add_deny])";
 	}
 	$db->free_result($request);
 
@@ -623,72 +618,6 @@ if ($db->num_rows($request) != 0)
 ---#
 
 /******************************************************************************/
---- Messenger fields
-/******************************************************************************/
----# Insert new fields
-INSERT INTO {$db_prefix}custom_fields
-	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
-VALUES
-	('cust_aim', 'AOL Instant Messenger', 'This is your AOL Instant Messenger nickname.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="aim" href="aim:goim?screenname={INPUT}&message=Hello!+Are+you+there?" target="_blank" title="AIM - {INPUT}"><img src="{IMAGES_URL}/aim.png" alt="AIM - {INPUT}"></a>', 1);
-INSERT INTO {$db_prefix}custom_fields
-	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
-VALUES
-	('cust_icq', 'ICQ', 'This is your ICQ number.', 'text', 12, '', 'regex~[1-9][0-9]{4,9}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="icq" href="http://www.icq.com/whitepages/about_me.php?uin={INPUT}" target="_blank" title="ICQ - {INPUT}"><img src="http://status.icq.com/online.gif?img=5&icq={INPUT}" alt="ICQ - {INPUT}" width="18" height="18"></a>', 1);
-INSERT INTO {$db_prefix}custom_fields
-	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
-VALUES
-	('cust_msn', 'MSN/Live', 'Your Live Messenger email address', 'text', 50, '', 'email', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="msn" href="http://members.msn.com/{INPUT}" target="_blank" title="Live - {INPUT}"><img src="{IMAGES_URL}/msntalk.png" alt="Live - {INPUT}"></a>', 1)
-INSERT INTO {$db_prefix}custom_fields
-	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
-VALUES
-	('cust_yim', 'Yahoo! Messenger', 'This is your Yahoo! Instant Messenger nickname.', 'text', 50, '', 'email', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="yim" href="http://edit.yahoo.com/config/send_webmesg?.target={INPUT}" target="_blank" title="Yahoo! Messenger - {INPUT}"><img src="http://opi.yahoo.com/online?m=g&t=0&u={INPUT}" alt="Yahoo! Messenger - {INPUT}"></a>', 1);
----#
-
----# Move existing values...
----{
-// We cannot do this twice
-// @todo this won't work when you upgrade from smf
-if (@$modSettings['ourVersion'] < '1.0')
-{
-	$request = upgrade_query("
-		SELECT id_member, aim, icq, msn, yim
-		FROM {$db_prefix}members");
-	$inserts = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		if (!empty($row[aim]))
-			$inserts[] = "($row[id_member], -1, 'cust_aim', $row[aim])";
-
-		if (!empty($row[icq]))
-			$inserts[] = "($row[id_member], -1, 'cust_icq', $row[icq])";
-
-		if (!empty($row[msn]))
-			$inserts[] = "($row[id_member], -1, 'cust_msn', $row[msn])";
-
-		if (!empty($row[yim]))
-			$inserts[] = "($row[id_member], -1, 'cust_yim', $row[yim])";
-	}
-	$db->free_result($request);
-
-	if (!empty($inserts))
-		upgrade_query("
-			INSERT INTO {$db_prefix}themes
-				(id_member, id_theme, variable, value)
-			VALUES
-				" . implode(',', $inserts));
-}
----}
----#
-
----# Drop the old cols
-ALTER TABLE `{$db_prefix}members`
-	DROP `icq`,
-	DROP `aim`,
-	DROP `yim`,
-	DROP `msn`;
----#
-
-/******************************************************************************/
 --- Adding support for Maillist
 /******************************************************************************/
 ---# Creating postby_emails table
@@ -742,7 +671,7 @@ ADD COLUMN filter_order int NOT NULL default '0';
 
 ---# Set the default values so the order is set / maintained
 ---{
-$request = upgrade_query("
+upgrade_query("
 	UPDATE {$db_prefix}postby_emails_filters
 	SET filter_order = id_filter");
 ---}
@@ -817,33 +746,33 @@ CHANGE pm_receive_from receive_from tinyint NOT NULL default '1';
 ---#
 
 /******************************************************************************/
---- Adding notifications support.
+--- Adding mentions support.
 /******************************************************************************/
 
----# Creating notifications log index ...
-CREATE SEQUENCE {$db_prefix}log_notifications_id_notification_seq;
+---# Creating mentions log index ...
+CREATE SEQUENCE {$db_prefix}log_mentions_id_mention_seq;
 ---#
 
----# Creating notifications log table...
-CREATE TABLE IF NOT EXISTS {$db_prefix}log_notifications (
-	id_notification int default nextval('{$db_prefix}log_notifications_id_notification_seq'),
+---# Creating mentions log table...
+CREATE TABLE IF NOT EXISTS {$db_prefix}log_mentions (
+	id_mention int default nextval('{$db_prefix}log_mentions_id_mention_seq'),
 	id_member int NOT NULL DEFAULT '0',
 	id_msg int NOT NULL DEFAULT '0',
 	status int NOT NULL DEFAULT '0',
 	id_member_from int NOT NULL DEFAULT '0',
 	log_time int NOT NULL DEFAULT '0',
 	notif_type varchar(5) NOT NULL DEFAULT '',
-	PRIMARY KEY (id_notification)
+	PRIMARY KEY (id_mention)
 );
 ---#
 
----# Creating notifications log index ...
-CREATE INDEX {$db_prefix}log_notifications_id_member ON {$db_prefix}log_notifications (id_member, status);
+---# Creating mentions log index ...
+CREATE INDEX {$db_prefix}log_mentions_id_member ON {$db_prefix}log_mentions (id_member, status);
 ---#
 
 ---# Adding new columns to members...
 ALTER TABLE {$db_prefix}members
-ADD COLUMN notifications smallint NOT NULL default '0';
+ADD COLUMN mentions smallint NOT NULL default '0';
 ---#
 
 --- Fixing personal messages column name

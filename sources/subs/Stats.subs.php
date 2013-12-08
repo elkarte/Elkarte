@@ -5,7 +5,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file is holds low-level database work used by the Stats.
  * Some functions/queries (or all :P) might be duplicate, along Elk.
@@ -249,6 +249,7 @@ function topBoards($limit = null, $read_status = false)
 			'recycle_board' => $modSettings['recycle_board'],
 			'blank_redirect' => '',
 			'limit_boards' => $limit,
+			'current_member' => $user_info['id'],
 		)
 	);
 	$top_boards = array();
@@ -263,6 +264,8 @@ function topBoards($limit = null, $read_status = false)
 			'href' => $scripturl . '?board=' . $row_board['id_board'] . '.0',
 			'link' => '<a href="' . $scripturl . '?board=' . $row_board['id_board'] . '.0">' . $row_board['name'] . '</a>'
 		);
+		if ($read_status)
+			$top_boards[$row_board['id_board']]['is_read'] = !empty($row_board['is_read']);
 
 		if ($max_num_posts < $row_board['num_posts'])
 			$max_num_posts = $row_board['num_posts'];

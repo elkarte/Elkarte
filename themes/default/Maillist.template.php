@@ -5,7 +5,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * Templates for the PBE maillist function
  */
@@ -22,7 +22,7 @@ function template_show_email()
 		<h3 class="category_header">', $context['notice_subject'], '</h3>
 		<h3 class="category_header">', $context['notice_from'], '</h3>
 		<h3 class="category_header">', $context['to'], '</h3>
-		<div class="noticebox">', $txt['email_failure'], ': ', $context['error_code'], '</div>
+		<div class="warningbox">', $txt['email_failure'], ': ', $context['error_code'], '</div>
 		<div class="content">
 			<dl>
 				<dt>
@@ -43,7 +43,7 @@ function template_show_email()
  */
 function template_bounce_email()
 {
-	global $txt, $settings, $context, $scripturl;
+	global $txt, $context, $scripturl;
 
 	// Build the "it bounced" javascript ....
 	echo '
@@ -81,14 +81,14 @@ function template_bounce_email()
 
 	echo '
 	<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=maillist;sa=bounce" method="post" class="flow_hidden" accept-charset="UTF-8">
-		<h3 class="category_header">
-			<img src="', $settings['images_url'], '/icons/mail_hd.png" alt="" class="icon" />', $txt['show_notice'], '
+		<h3 class="category_header hdicon cat_img_mail">
+			', $txt['show_notice'], '
 		</h3>';
 
 	// Any special messages?
 	if (!empty($context['settings_message']))
 		echo '
-			<div class="infobox">', $context['settings_message'], '</div>';
+			<div class="successbox">', $context['settings_message'], '</div>';
 
 	// The main body
 	echo '
@@ -336,7 +336,7 @@ function template_bounce_template()
 					$("#errors").css({display:"none"});
 					$("#error_list").html(\'\');
 				}
-				
+
 				return false;
 			});
 

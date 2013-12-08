@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -23,8 +23,8 @@ function template_main()
 
 	echo '
 				<form action="', $scripturl, '?action=search2" method="post" accept-charset="UTF-8" name="searchform" id="searchform" class="standard_category">
-					<h2 class="category_header">
-							', !empty($settings['use_buttons']) ? '<img src="' . $settings['images_url'] . '/icons/search_hd.png" alt="" class="icon" />' : ' ', $txt['set_parameters'], '
+					<h2 class="category_header', !empty($settings['use_buttons']) ? ' hdicon cat_img_search' : '', '">
+						', $txt['set_parameters'], '
 					</h2>';
 
 	if (!empty($context['search_errors']))
@@ -39,7 +39,7 @@ function template_main()
 						<div id="search_term_input">
 							<strong>', $txt['search_for'], ':</strong>
 							<input type="text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' maxlength="', $context['search_string_limit'], '" size="40" class="input_text" placeholder="' . $txt['search'] . '" required="required" autofocus="autofocus" />
-							', $context['require_verification'] ? '' : '&nbsp;<input type="submit" name="s_search" value="' . $txt['search'] . '" class="right_submit" />', '
+							', $context['require_verification'] ? '' : '&nbsp;<input type="submit" name="s_search" value="' . $txt['search'] . '" class="button_submit" />', '
 						</div>';
 
 		if (empty($modSettings['search_simple_fulltext']))
@@ -47,12 +47,15 @@ function template_main()
 						<p class="smalltext">', $txt['search_example'], '</p>';
 
 		if ($context['require_verification'])
-			echo '
+		{
+			template_control_verification($context['visual_verification_id'], '
 						<div class="verification">
-							<strong>', $txt['search_visual_verification_label'], ':</strong>
-							<br />', template_control_verification($context['visual_verification_id'], 'all'), '<br />
-							<input id="submit" type="submit" name="s_search" value="' . $txt['search'] . '" class="right_submit"/>
+							<strong>' . $txt['search_visual_verification_label'] . ':</strong>
+							<br />', '<br />');
+			echo '
+							<input id="submit" type="submit" name="s_search" value="' . $txt['search'] . '" class="button_submit"/>
 						</div>';
+		}
 
 		// Show the button to enable advanced search
 		echo '
@@ -139,11 +142,11 @@ function template_main()
 		// Require an image to be typed to save spamming?
 		if ($context['require_verification'])
 		{
-			echo '
+			template_control_verification($context['visual_verification_id'], '
 						<p>
-							<strong>', $txt['verification'], ':</strong>
-							', template_control_verification($context['visual_verification_id'], 'all'), '
-						</p>';
+							<strong>' . $txt['verification'] . ':</strong>
+							', '
+						</p>');
 		}
 
 		// If $context['search_params']['topic'] is set, that means we're searching just one topic.
@@ -219,7 +222,7 @@ function template_main()
 		}
 
 		echo '
-					<script src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
+					<script src="', $settings['default_theme_url'], '/scripts/suggest.js?beta10"></script>
 					<script><!-- // --><![CDATA[
 						createEventListener(window);
 						window.addEventListener("load", initSearch, false);
@@ -278,6 +281,15 @@ function template_results()
 {
 	global $context, $settings, $options, $txt, $scripturl, $message;
 
+	if (!empty($context['search_ignored']))
+		echo '
+			<div id="search_results">
+				<h3 class="category_header">
+					', $txt['generic_warning'], '
+				</h3>
+				<p class="warningbox">', $txt['search_warning_ignored_word' . (count($context['search_ignored']) == 1 ? '' : 's')], ': ', implode(', ', $context['search_ignored']), '</p>
+			</div>';
+
 	if (isset($context['did_you_mean']) || empty($context['topics']))
 	{
 		echo '
@@ -330,7 +342,7 @@ function template_results()
 				<form action="', $scripturl, '?action=quickmod" method="post" accept-charset="UTF-8" name="topicForm" id="topicForm">';
 
 		echo '
-					<h3 class="category_header">
+					<h3 class="category_header hdicon cat_img_search">
 						<span class="floatright">';
 
 		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
@@ -339,7 +351,7 @@ function template_results()
 
 		echo '
 						</span>
-						<img src="' . $settings['images_url'] . '/icons/search_hd.png" alt="?" class="centericon" />&nbsp;', $txt['mlist_search_results'],':&nbsp;',$context['search_params']['search'],'
+						', $txt['mlist_search_results'],':&nbsp;',$context['search_params']['search'], '
 					</h3>';
 
 		// was anything even found?
@@ -473,7 +485,6 @@ function template_results()
 					</div>';
 		}
 
-
 		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
 			echo '
 					<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
@@ -482,8 +493,8 @@ function template_results()
 	else
 	{
 		echo '
-				<h3 class="category_header">
-						<img class="centericon" src="' . $settings['images_url'] . '/icons/search_hd.png" alt="?" />&nbsp;', $txt['mlist_search_results'],':&nbsp;',$context['search_params']['search'],'
+				<h3 class="category_header hdicon cat_img_search">
+					', $txt['mlist_search_results'],':&nbsp;',$context['search_params']['search'], '
 				</h3>';
 		template_pagesection();
 
@@ -553,9 +564,9 @@ function template_results()
 							sClassName: "qaction",
 							sJumpToTemplate: "%dropdown_list%",
 							sCurBoardName: "', $context['jump_to']['board_name'], '",
-							sBoardChildLevelIndicator: "==",
-							sBoardPrefix: "=> ",
-							sCatSeparator: "-----------------------------",
+							sBoardChildLevelIndicator: "&#10134;",
+							sBoardPrefix: "&#10148; ",
+							sCatClass: "jump_to_header",
 							sCatPrefix: "",
 							bNoRedirect: true,
 							bDisabled: true,
@@ -570,9 +581,9 @@ function template_results()
 							iCurBoardId: 0,
 							iCurBoardChildLevel: 0,
 							sCurBoardName: "', $context['jump_to']['board_name'], '",
-							sBoardChildLevelIndicator: "==",
-							sBoardPrefix: "=> ",
-							sCatSeparator: "-----------------------------",
+							sBoardChildLevelIndicator: "&#10134;",
+							sBoardPrefix: "&#10148; ",
+							sCatClass: "jump_to_header",
 							sCatPrefix: "",
 							sGoButtonLabel: "', $txt['quick_mod_go'], '"
 						});

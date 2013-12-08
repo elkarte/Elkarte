@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file currently just shows group info, and allows certain priviledged members to add/remove members.
  *
@@ -30,8 +30,24 @@ class Groups_Controller extends Action_Controller
 	 */
 	function action_index()
 	{
-		// Default to listing the groups
-		$this->action_list();
+		global $context;
+
+		require_once(SUBSDIR . '/Action.class.php');
+
+		// Little short on the list here
+		$subActions = array(
+			'list' => array($this, 'action_list', 'permission' => 'view_mlist'),
+			'members' => array($this, 'action_members', 'permission' => 'view_mlist'),
+			'requests' => array($this, 'action_requests'),
+		);
+
+		// I don't think we know what to do... throw dies?
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'list';
+		$context['sub_action'] = $subAction;
+
+		$action = new Action();
+		$action->initialize($subActions, 'list');
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -76,9 +92,13 @@ class Groups_Controller extends Action_Controller
 		global $txt, $context, $scripturl, $user_info;
 
 		$context['page_title'] = $txt['viewing_groups'];
-		$context[$context['moderation_menu_name']]['tab_data'] = array(
-			'title' => $txt['mc_group_requests'],
-		);
+		$current_area = isset($context['admin_menu_name']) ? $context['admin_menu_name'] : (isset($context['moderation_menu_name']) ? $context['moderation_menu_name'] : '');
+		if (!empty($current_area))
+			$context[$current_area]['tab_data'] = array(
+				'title' => $txt['mc_group_requests'],
+			);
+
+		$base_url = $scripturl . (isset($context['admin_menu_name']) ? '?action=admin;area=membergroups;sa=members' : (isset($context['moderation_menu_name']) ? '?action=moderate;area=viewgroups;sa=members' : '?action=groups;sa=members'));
 
 		// Making a list is not hard with this beauty.
 		require_once(SUBSDIR . '/List.class.php');
@@ -86,7 +106,7 @@ class Groups_Controller extends Action_Controller
 		// Use the standard templates for showing this.
 		$listOptions = array(
 			'id' => 'group_lists',
-			'base_href' => $scripturl . '?action=moderate;area=viewgroups;sa=view',
+			'base_href' => $base_url,
 			'default_sort_col' => 'group',
 			'get_items' => array(
 				'file' => SUBSDIR . '/Membergroups.subs.php',
@@ -112,8 +132,7 @@ class Groups_Controller extends Action_Controller
 								$group_name = $rowData[\'group_name\'];
 							else
 							{
-								$color_style = empty($rowData[\'online_color\']) ? \'\' : sprintf(\' style="color: %1$s;"\', $rowData[\'online_color\']);
-								$group_name = sprintf(\'<a href="%1$s?action=admin;area=membergroups;sa=members;group=%2$d"%3$s>%4$s</a>\', $scripturl, $rowData[\'id_group\'], $color_style, $rowData[\'group_name\']);
+								$group_name = sprintf(\'<a href="%1$s;group=%2$d">%3$s</a>\', \'' . $base_url . '\', $rowData[\'id_group\'], $rowData[\'group_name_color\']);
 							}
 
 							// Add a help option for moderator and administrator.
@@ -215,10 +234,6 @@ class Groups_Controller extends Action_Controller
 
 		// Load up the group details.
 		$context['group'] = membergroupById($current_group, true, true);
-
-		// Doesn't exist?
-		if (!allowedTo('admin_forum') && $context['group']['group_type'] == 1)
-			fatal_lang_error('membergroup_does_not_exist', false);
 
 		// @todo should we change id => id_group and name => name_group?
 		$context['group']['id'] = $context['group']['id_group'];

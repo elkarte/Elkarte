@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file contains functions regarding manipulation of and information about membergroups.
  *
@@ -664,6 +664,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 			-1 => array(
 				'id_group' => -1,
 				'group_name' => $txt['membergroups_guests'],
+				'group_name_color' => $txt['membergroups_guests'],
 				'min_posts' => 0,
 				'desc' => '',
 				'num_members' => $txt['membergroups_guests_na'],
@@ -677,6 +678,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 			0 => array(
 				'id_group' => 0,
 				'group_name' => $txt['membergroups_members'],
+				'group_name_color' => $txt['membergroups_members'],
 				'min_posts' => 0,
 				'desc' => '',
 				'num_members' => $num_members,
@@ -709,6 +711,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 		$groups[$row['id_group']] = array(
 			'id_group' => $row['id_group'],
 			'group_name' => $row['group_name'],
+			'group_name_color' => empty($row['online_color']) ? $row['group_name'] : '<span style="color: ' . $row['online_color'] . '">' . $row['group_name'] . '</span>',
 			'min_posts' => $row['min_posts'],
 			'desc' => $row['description'],
 			'online_color' => $row['online_color'],
@@ -1668,11 +1671,33 @@ function getInheritableGroups($id_group = false)
  */
 function prepareMembergroupPermissions()
 {
-	global $modSettings;
+	global $modSettings, $txt;
 
 	$db = database();
 
-	$profile_groups = array();
+	// Start this with the guests/members.
+	$profile_groups = array(
+		-1 => array(
+			'id' => -1,
+			'name' => $txt['membergroups_guests'],
+			'color' => '',
+			'new_topic' => 'disallow',
+			'replies_own' => 'disallow',
+			'replies_any' => 'disallow',
+			'attachment' => 'disallow',
+			'children' => array(),
+		),
+		0 => array(
+			'id' => 0,
+			'name' => $txt['membergroups_members'],
+			'color' => '',
+			'new_topic' => 'disallow',
+			'replies_own' => 'disallow',
+			'replies_any' => 'disallow',
+			'attachment' => 'disallow',
+			'children' => array(),
+		),
+	);
 
 	$request = $db->query('', '
 		SELECT id_group, group_name, online_color, id_parent
@@ -1939,8 +1964,6 @@ function updatePostGroupStats($members = null, $parameter2 = null)
 		$lastMin = $min_posts;
 	}
 
-	$members = is_array($members) ? $members : array($members);
-
 	// A big fat CASE WHEN... END is faster than a zillion UPDATE's ;).
 	$db->query('', '
 		UPDATE {db_prefix}members
@@ -1949,7 +1972,7 @@ function updatePostGroupStats($members = null, $parameter2 = null)
 			END' . ($members !== null ? '
 		WHERE id_member IN ({array_int:members})' : ''),
 		array(
-			'members' => $members,
+			'members' => is_array($members) ? $members : array($members),
 		)
 	);
 }

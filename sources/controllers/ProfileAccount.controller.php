@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  */
 
@@ -39,10 +39,7 @@ class ProfileAccount_Controller extends Action_Controller
 	 */
 	public function action_issuewarning()
 	{
-		global $txt, $scripturl, $modSettings, $user_info, $mbname;
-		global $context, $cur_profile;
-
-		$db = database();
+		global $txt, $scripturl, $modSettings, $mbname, $context, $cur_profile;
 
 		$memID = currentMemberID();
 
@@ -52,6 +49,7 @@ class ProfileAccount_Controller extends Action_Controller
 
 		// We need this because of template_load_warning_variables
 		loadTemplate('Profile');
+		loadJavascriptFile('profile.js');
 
 		// Get all the actual settings.
 		list ($modSettings['warning_enable'], $modSettings['user_limit']) = explode(',', $modSettings['warning_settings']);
@@ -81,23 +79,8 @@ class ProfileAccount_Controller extends Action_Controller
 		$context['max_allowed'] = 100;
 		if ($context['warning_limit'] > 0)
 		{
-			// Make sure we cannot go outside of our limit for the day.
-			$request = $db->query('', '
-				SELECT SUM(counter)
-				FROM {db_prefix}log_comments
-				WHERE id_recipient = {int:selected_member}
-					AND id_member = {int:current_member}
-					AND comment_type = {string:warning}
-					AND log_time > {int:day_time_period}',
-				array(
-					'current_member' => $user_info['id'],
-					'selected_member' => $memID,
-					'day_time_period' => time() - 86400,
-					'warning' => 'warning',
-				)
-			);
-			list ($current_applied) = $db->fetch_row($request);
-			$db->free_result($request);
+			require_once(SUBSDIR . '/Moderation.subs.php');
+			$current_applied = warningDailyLimit($memID);
 
 			$context['min_allowed'] = max(0, $cur_profile['warning'] - $current_applied - $context['warning_limit']);
 			$context['max_allowed'] = min(100, $cur_profile['warning'] - $current_applied + $context['warning_limit']);
@@ -342,6 +325,9 @@ class ProfileAccount_Controller extends Action_Controller
 		// Create the list for viewing.
 		createList($listOptions);
 
+		$warning_for_message = isset($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : false;
+		$warned_message_subject = '';
+
 		// Are they warning because of a message?
 		if (isset($_REQUEST['msg']) && 0 < (int) $_REQUEST['msg'])
 		{
@@ -349,58 +335,47 @@ class ProfileAccount_Controller extends Action_Controller
 			$message = basicMessageInfo((int) $_REQUEST['msg']);
 
 			if (!empty($message))
-			{
-				$context['warning_for_message'] = (int) $_REQUEST['msg'];
-				$context['warned_message_subject'] = $message['subject'];
-			}
+				$warned_message_subject = $message['subject'];
 		}
 
-		// Didn't find the message?
-		if (empty($context['warning_for_message']))
-		{
-			$context['warning_for_message'] = 0;
-			$context['warned_message_subject'] = '';
-		}
+		require_once(SUBSDIR . '/Maillist.subs.php');
 
 		// Any custom templates?
 		$context['notification_templates'] = array();
+		$notification_templates = maillist_templates('warntpl');
 
-		$request = $db->query('', '
-			SELECT recipient_name AS template_title, body
-			FROM {db_prefix}log_comments
-			WHERE comment_type = {string:warntpl}
-				AND (id_recipient = {int:generic} OR id_recipient = {int:current_member})',
-			array(
-				'warntpl' => 'warntpl',
-				'generic' => 0,
-				'current_member' => $user_info['id'],
-			)
-		);
-		while ($row = $db->fetch_assoc($request))
+		foreach ($notification_templates as $row)
 		{
 			// If we're not warning for a message skip any that are.
-			if (!$context['warning_for_message'] && strpos($row['body'], '{MESSAGE}') !== false)
+			if (!$warning_for_message && strpos($row['body'], '{MESSAGE}') !== false)
 				continue;
 
 			$context['notification_templates'][] = array(
-				'title' => $row['template_title'],
+				'title' => $row['title'],
 				'body' => $row['body'],
 			);
 		}
-		$db->free_result($request);
 
 		// Setup the "default" templates.
 		foreach (array('spamming', 'offence', 'insulting') as $type)
 		{
 			$context['notification_templates'][] = array(
 				'title' => $txt['profile_warning_notify_title_' . $type],
-				'body' => sprintf($txt['profile_warning_notify_template_outline' . (!empty($context['warning_for_message']) ? '_post' : '')], $txt['profile_warning_notify_for_' . $type]),
+				'body' => sprintf($txt['profile_warning_notify_template_outline' . (!empty($warning_for_message) ? '_post' : '')], $txt['profile_warning_notify_for_' . $type]),
 			);
 		}
 
 		// Replace all the common variables in the templates.
 		foreach ($context['notification_templates'] as $k => $name)
-			$context['notification_templates'][$k]['body'] = strtr($name['body'], array('{MEMBER}' => un_htmlspecialchars($context['member']['name']), '{MESSAGE}' => '[url=' . $scripturl . '?msg=' . $context['warning_for_message'] . ']' . un_htmlspecialchars($context['warned_message_subject']) . '[/url]', '{SCRIPTURL}' => $scripturl, '{FORUMNAME}' => $mbname, '{REGARDS}' => $txt['regards_team']));
+			$context['notification_templates'][$k]['body'] = strtr($name['body'],
+				array(
+					'{MEMBER}' => un_htmlspecialchars($context['member']['name']),
+					'{MESSAGE}' => '[url=' . $scripturl . '?msg=' . $warning_for_message . ']' . un_htmlspecialchars($warned_message_subject) . '[/url]',
+					'{SCRIPTURL}' => $scripturl,
+					'{FORUMNAME}' => $mbname,
+					'{REGARDS}' => $txt['regards_team']
+				)
+			);
 	}
 
 	/**
@@ -433,8 +408,6 @@ class ProfileAccount_Controller extends Action_Controller
 	function action_deleteaccount2()
 	{
 		global $user_info, $context, $cur_profile, $user_profile, $modSettings;
-
-		$db = database();
 
 		// Try get more time...
 		@set_time_limit(600);
@@ -495,25 +468,7 @@ class ProfileAccount_Controller extends Action_Controller
 				}
 
 				// Now delete the remaining messages.
-				$request = $db->query('', '
-					SELECT m.id_msg
-					FROM {db_prefix}messages AS m
-						INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic
-							AND t.id_first_msg != m.id_msg)
-					WHERE m.id_member = {int:selected_member}',
-					array(
-						'selected_member' => $memID,
-					)
-				);
-				// This could take a while... but ya know it's gonna be worth it in the end.
-				while ($row = $db->fetch_assoc($request))
-				{
-					if (function_exists('apache_reset_timeout'))
-						@apache_reset_timeout();
-
-					removeMessage($row['id_msg']);
-				}
-				$db->free_result($request);
+				removeNonTopicMessages($memID);
 			}
 
 			// Only delete this poor member's account if they are actually being booted out of camp.

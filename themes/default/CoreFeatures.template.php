@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -90,7 +90,7 @@ function template_core_features()
 							"alt": new_state ? feature_on_text : feature_off_text
 						});
 						$("#feature_link_" + cf).fadeOut().fadeIn();
-						$(ajax_infobar).attr(\'class\', \'infobox\');
+						$(ajax_infobar).attr(\'class\', \'successbox\');
 						var message = new_state ? ' . JavaScriptEscape($txt['core_settings_activation_message']) . ' : ' . JavaScriptEscape($txt['core_settings_deactivation_message']) . ';
 						$(ajax_infobar).html(message.replace(\'{core_feature}\', $(request).find("corefeatures").find("corefeature").text())).slideDown(\'fast\');
 						setTimeout(function() {

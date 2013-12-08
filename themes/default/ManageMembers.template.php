@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -248,7 +248,7 @@ function template_admin_browse()
 	template_show_list('approve_list');
 
 	// If we have lots of outstanding members try and make the admin's life easier.
-	if ($context['approve_list']['total_num_items'] > 20)
+	if ($context['approve_list']['total_num_items'] > 10)
 	{
 		echo '
 		<br />
@@ -257,15 +257,15 @@ function template_admin_browse()
 			<script><!-- // --><![CDATA[
 				function onOutstandingSubmit()
 				{
-					if (document.forms.postFormOutstanding.todo.value == "")
+					if (document.forms.postFormOutstanding.todo.value === "")
 						return;
 
 					var message = "";
-					if (document.forms.postFormOutstanding.todo.value.indexOf("delete") != -1)
+					if (document.forms.postFormOutstanding.todo.value.indexOf("delete") !== -1)
 						message = "', $txt['admin_browse_w_delete'], '";
-					else if (document.forms.postFormOutstanding.todo.value.indexOf("reject") != -1)
+					else if (document.forms.postFormOutstanding.todo.value.indexOf("reject") !== -1)
 						message = "', $txt['admin_browse_w_reject'], '";
-					else if (document.forms.postFormOutstanding.todo.value == "remind")
+					else if (document.forms.postFormOutstanding.todo.value === "remind")
 						message = "', $txt['admin_browse_w_remind'], '";
 					else
 						message = "', $context['browse_type'] == 'approve' ? $txt['admin_browse_w_approve'] : $txt['admin_browse_w_activate'], '";

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  */
 
@@ -127,9 +127,12 @@ class ManageAttachments_Controller extends Action_Controller
 		call_integration_hook('integrate_modify_attachment_settings');
 
 		// These are very likely to come in handy! (i.e. without them we're doomed!)
+		// @todo do we really need all this?
 		require_once(ADMINDIR . '/ManagePermissions.controller.php');
 		require_once(ADMINDIR . '/ManageServer.controller.php');
 		require_once(SUBSDIR . '/Settings.class.php');
+		// @todo Just to stay on the safe side, though I'm not sure it's needed
+		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// Saving settings?
 		if (isset($_GET['save']))
@@ -1059,13 +1062,10 @@ class ManageAttachments_Controller extends Action_Controller
 
 	/**
 	 * This function lists and allows updating of multiple attachments paths.
-	 * @todo Move db queries to ManageAttachments.subs.php
 	 */
 	public function action_attachpaths()
 	{
 		global $modSettings, $scripturl, $context, $txt;
-
-		$db = database();
 
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
@@ -1260,15 +1260,7 @@ class ManageAttachments_Controller extends Action_Controller
 				foreach ($new_dirs as $id => $dir)
 				{
 					if ($id != 1)
-						$db->query('', '
-							UPDATE {db_prefix}attachments
-							SET id_folder = {int:default_folder}
-							WHERE id_folder = {int:current_folder}',
-							array(
-								'default_folder' => 1,
-								'current_folder' => $id,
-							)
-						);
+						updateAttachmentIdFolder($id, 1);
 
 					$update = array(
 						'currentAttachmentUploadDir' => 1,
@@ -1424,7 +1416,7 @@ class ManageAttachments_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							return \'<input type="hidden" name="dirs[\' . $rowData[\'id\'] . \']" value="\' . $rowData[\'path\'] . \'" /><input type="text" size="40" name="dirs[\' . $rowData[\'id\'] . \']" value="\' . $rowData[\'path\'] . \'"\' . (!empty($rowData[\'disable_base_dir\']) ? \' disabled="disabled"\' : \'\') . \' class="input_text" style="width: 100%" />\';
+							return \'<input type="hidden" name="dirs[\' . $rowData[\'id\'] . \']" value="\' . $rowData[\'path\'] . \'" /><input type="text" size="40" name="dirs[\' . $rowData[\'id\'] . \']" value="\' . $rowData[\'path\'] . \'"\' . (!empty($rowData[\'disable_base_dir\']) ? \' disabled="disabled"\' : \'\') . \' class="input_text"/>\';
 						'),
 						'style' => 'width: 40%;',
 					),
@@ -1479,7 +1471,7 @@ class ManageAttachments_Controller extends Action_Controller
 					'position' => 'top_of_list',
 					'value' => $txt['attach_dir_save_problem'] . '<br />' . implode('<br />', $errors['dir']),
 					'style' => 'padding-left: 35px;',
-					'class' => 'noticebox',
+					'class' => 'warningbox',
 				),
 			),
 		);
@@ -1557,7 +1549,7 @@ class ManageAttachments_Controller extends Action_Controller
 						'position' => 'top_of_list',
 						'value' => $txt['attach_dir_save_problem'] . '<br />' . implode('<br />', $errors['base']),
 						'style' => 'padding-left: 35px',
-						'class' => 'noticebox',
+						'class' => 'warningbox',
 					),
 				),
 			);
@@ -1578,8 +1570,10 @@ class ManageAttachments_Controller extends Action_Controller
 		global $modSettings, $txt;
 
 		$db = database();
-
+	
 		checkSession();
+
+		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
 		if (!empty($modSettings['attachment_basedirectories']))
@@ -1608,18 +1602,7 @@ class ManageAttachments_Controller extends Action_Controller
 		if (empty($results))
 		{
 			// Get the total file count for the progress bar.
-			$request = $db->query('', '
-				SELECT COUNT(*)
-				FROM {db_prefix}attachments
-				WHERE id_folder = {int:folder_id}
-					AND attachment_type != {int:attachment_type}',
-				array(
-					'folder_id' => $_POST['from'],
-					'attachment_type' => 1,
-				)
-			);
-			list ($total_progress) = $db->fetch_row($request);
-			$db->free_result($request);
+			$total_progress = getFolderAttachmentCount($_POST['from']);
 			$total_progress -= $start;
 
 			if ($total_progress < 1)
@@ -1631,8 +1614,6 @@ class ManageAttachments_Controller extends Action_Controller
 			// Where are they going?
 			if (!empty($_POST['auto']))
 			{
-				require_once(SUBSDIR . '/Attachments.subs.php');
-
 				$modSettings['automanage_attachments'] = 1;
 				$modSettings['use_subdirectories_for_attachments'] = $_POST['auto'] == -1 ? 0 : 1;
 				$modSettings['basedirectory_for_attachments'] = $_POST['auto'] > 0 ? $modSettings['attachmentUploadDir'][$_POST['auto']] : $modSettings['basedirectory_for_attachments'];
@@ -1654,20 +1635,7 @@ class ManageAttachments_Controller extends Action_Controller
 
 				// If limts are set, get the file count and size for the destination folder
 				if ($dir_files <= 0 && (!empty($modSettings['attachmentDirSizeLimit']) || !empty($modSettings['attachmentDirFileLimit'])))
-				{
-					$request = $db->query('', '
-						SELECT COUNT(*), SUM(size)
-						FROM {db_prefix}attachments
-						WHERE id_folder = {int:folder_id}
-							AND attachment_type != {int:attachment_type}',
-						array(
-							'folder_id' => $new_dir,
-							'attachment_type' => 1,
-						)
-					);
-					list ($dir_files, $dir_size) = $db->fetch_row($request);
-					$db->free_result($request);
-				}
+					list ($dir_files, $dir_size) = attachDirProperties($new_dir);
 
 				// Find some attachments to move
 				$request = $db->query('', '

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -156,7 +156,7 @@ function template_email_members()
 			}
 		});
 	// ]]></script>
-	<script src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
+	<script src="', $settings['default_theme_url'], '/scripts/suggest.js?beta10"></script>
 	<script><!-- // --><![CDATA[
 		var oMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oMemberSuggest\',
@@ -194,7 +194,7 @@ function template_email_members()
  */
 function template_email_members_compose()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
 		<div id="preview_section"', isset($context['preview_message']) ? '' : ' style="display: none;"', '>
@@ -214,13 +214,13 @@ function template_email_members_compose()
 	<div id="admincenter">
 		<form name="newsmodify" action="', $scripturl, '?action=admin;area=news;sa=mailingsend" method="post" accept-charset="UTF-8">
 			<h3 class="category_header">
-				<a href="', $scripturl, '?action=quickhelp;help=email_members" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/icons/helptopics_hd.png" alt="', $txt['help'], '" class="icon" /></a> ', $txt['admin_newsletters'], '
+				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=email_members" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['admin_newsletters'], '
 			</h3>
 			<div class="information">
 				', $txt['email_variables'], '
 			</div>
 			<div class="windowbg">
-				<div class="', empty($context['error_type']) || $context['error_type'] != 'serious' ? 'noticebox' : 'errorbox', '"', empty($context['post_error']['messages']) ? ' style="display: none"' : '', ' id="errors">
+				<div class="', empty($context['error_type']) || $context['error_type'] != 'serious' ? 'warningbox' : 'errorbox', '"', empty($context['post_error']['messages']) ? ' style="display: none"' : '', ' id="errors">
 					<dl>
 						<dt>
 							<strong id="error_serious">', $txt['error_while_submitting'], '</strong>
@@ -274,22 +274,23 @@ function template_email_members_compose()
 	// The functions used to preview a posts without loading a new page.
 	echo '
 		<script><!-- // --><![CDATA[
-			var post_box_name = "', $context['post_box_name'], '";
-			var form_name = "newsmodify";
-			var preview_area = "news";
-			var txt_preview_title = "', $txt['preview_title'], '";
-			var txt_preview_fetch = "', $txt['preview_fetch'], '";
+			var form_name = "newsmodify",
+				preview_area = "news",
+				txt_preview_title = "', $txt['preview_title'], '",
+				txt_preview_fetch = "', $txt['preview_fetch'], '";
 
 			function checkboxes_status (item)
 			{
 				if (item.id == \'send_html\')
 					document.getElementById(\'parse_html\').disabled = !document.getElementById(\'parse_html\').disabled;
+
 				if (item.id == \'send_pm\')
 				{
 					if (!document.getElementById(\'send_html\').checked)
 						document.getElementById(\'parse_html\').disabled = true;
 					else
 						document.getElementById(\'parse_html\').disabled = false;
+
 					document.getElementById(\'send_html\').disabled = !document.getElementById(\'send_html\').disabled;
 				}
 			}
@@ -303,13 +304,13 @@ function template_email_members_compose()
  */
 function template_email_members_send()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
 	<div id="admincenter">
 		<form action="', $scripturl, '?action=admin;area=news;sa=mailingsend" method="post" accept-charset="UTF-8" name="autoSubmit" id="autoSubmit">
 			<h3 class="category_header">
-				<a href="', $scripturl, '?action=quickhelp;help=email_members" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/icons/helptopics_hd.png" alt="', $txt['help'], '" /></a> ', $txt['admin_newsletters'], '
+				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=email_members" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['admin_newsletters'], '
 			</h3>
 			<div class="windowbg">
 				<div class="content">
@@ -341,8 +342,9 @@ function template_email_members_send()
 	</div>
 
 	<script><!-- // --><![CDATA[
-		var countdown = 2;
-		var message = "', $txt['email_continue'], '";
+		var countdown = 2,
+			message = "', $txt['email_continue'], '";
+				
 		doAutoSubmit();
 	// ]]></script>';
 }

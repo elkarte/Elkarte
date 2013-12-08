@@ -5,7 +5,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  */
 
@@ -54,7 +54,6 @@ class Draft_Controller extends Action_Controller
 
 		// Safe is safe.
 		if ($memID != $user_info['id'])
-			// empty($modSettings['enable_drafts']) || empty($modSettings['enable_post_drafts'])
 			fatal_lang_error('no_access', false);
 
 		require_once(SUBSDIR . '/Drafts.subs.php');
@@ -79,7 +78,8 @@ class Draft_Controller extends Action_Controller
 
 		// Get things started
 		$user_drafts = array();
-		$msgCount = draftsCount($memID, 0, false);
+		$msgCount = draftsCount($memID, 0);
+
 		$maxIndex = (int) $modSettings['defaultMaxMessages'];
 
 		// Make sure the starting place makes sense and construct our friend the page index.
@@ -151,7 +151,7 @@ class Draft_Controller extends Action_Controller
 		// Menu tab
 		$context[$context['profile_menu_name']]['tab_data'] = array(
 			'title' => $txt['drafts_show'],
-			'icon' => 'inbox_hd.png',
+			'class' => 'talk',
 			'description' => $txt['drafts_show_desc'],
 		);
 
@@ -206,7 +206,7 @@ class Draft_Controller extends Action_Controller
 			$_REQUEST['viewscount'] = 10;
 
 		// Get the count of applicable drafts
-		$msgCount = draftsCount($memID, 1, false);
+		$msgCount = draftsCount($memID, 1);
 
 		// Make sure the starting place makes sense and construct our friend the page index.
 		$context['page_index'] = constructPageIndex($scripturl . '?action=pm;sa=showpmdrafts', $context['start'], $msgCount, $maxIndex);

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file takes care of actions on topics:
  * lock/unlock a topic, sticky/unsticky it
@@ -176,157 +176,49 @@ class Topic_Controller extends Action_Controller
 			fatal_lang_error('feature_disabled', false);
 		}
 
-		// Whatever happens don't index this.
-		$context['robot_no_index'] = true;
+		require_once(SUBSDIR . '/Topic.subs.php');
 
 		// Get the topic starter information.
-		require_once(SUBSDIR . '/Poll.subs.php');
-		$row = pollStarters($topic);
+		$topicinfo = getTopicInfo($topic, 'starter');
+
+		$context['user']['started'] = $user_info['id'] == $topicinfo['id_member'] && !$user_info['is_guest'];
+
+		// Whatever happens don't index this.
+		$context['robot_no_index'] = true;
+		$is_poll = $topicinfo['id_poll'] > 0 && $modSettings['pollMode'] == '1' && allowedTo('poll_view');
 
 		// Redirect to the boardindex if no valid topic id is provided.
-		if (empty($row))
+		if (empty($topicinfo))
 			redirectexit();
 
-		if (!empty($row['id_poll']))
+		// @todo this code is almost the same as the one in Display.controller.php
+		if ($is_poll)
 		{
 			loadLanguage('Post');
+			require_once(SUBSDIR . '/Poll.subs.php');
 
-			// Get the question and if it's locked.
-			$pollinfo = pollInfo($row['id_poll']);
-
-			// Get all the options, and calculate the total votes.
-			$pollOptions = pollOptionsForMember();
-			$realtotal = 0;
-			$pollinfo['has_voted'] = false;
-			foreach ($pollOptions as $row)
-			{
-				$realtotal += $row['votes'];
-				$pollinfo['has_voted'] |= $row['voted_this'] != -1;
-			}
-
-			// If this is a guest we need to do our best to work out if they have voted, and what they voted for.
-			if ($user_info['is_guest'] && $pollinfo['guest_vote'] && allowedTo('poll_vote'))
-			{
-				if (!empty($_COOKIE['guest_poll_vote']) && preg_match('~^[0-9,;]+$~', $_COOKIE['guest_poll_vote']) && strpos($_COOKIE['guest_poll_vote'], ';' . $row['id_poll'] . ',') !== false)
-				{
-					// ;id,timestamp,[vote,vote...]; etc
-					$guestinfo = explode(';', $_COOKIE['guest_poll_vote']);
-
-					// Find the poll we're after.
-					foreach ($guestinfo as $i => $guestvoted)
-					{
-						$guestvoted = explode(',', $guestvoted);
-						if ($guestvoted[0] == $row['id_poll'])
-							break;
-					}
-
-					// Has the poll been reset since guest voted?
-					if ($pollinfo['reset_poll'] > $guestvoted[1])
-					{
-						// Remove the poll info from the cookie to allow guest to vote again
-						unset($guestinfo[$i]);
-						if (!empty($guestinfo))
-							$_COOKIE['guest_poll_vote'] = ';' . implode(';', $guestinfo);
-						else
-							unset($_COOKIE['guest_poll_vote']);
-					}
-					else
-					{
-						// What did they vote for?
-						unset($guestvoted[0], $guestvoted[1]);
-						foreach ($pollOptions as $choice => $details)
-						{
-							$pollOptions[$choice]['voted_this'] = in_array($choice, $guestvoted) ? 1 : -1;
-							$pollinfo['has_voted'] |= $pollOptions[$choice]['voted_this'] != -1;
-						}
-						unset($choice, $details, $guestvoted);
-					}
-					unset($guestinfo, $guestvoted, $i);
-				}
-			}
-
-			$context['user']['started'] = $user_info['id'] == $row['id_member'] && !$user_info['is_guest'];
-
-			// Set up the basic poll information.
-			$context['poll'] = array(
-				'id' => $row['id_poll'],
-				'image' => 'normal_' . (empty($pollinfo['voting_locked']) ? 'poll' : 'locked_poll'),
-				'question' => parse_bbc($pollinfo['question']),
-				'total_votes' => $pollinfo['total'],
-				'change_vote' => !empty($pollinfo['change_vote']),
-				'is_locked' => !empty($pollinfo['voting_locked']),
-				'options' => array(),
-				'lock' => allowedTo('poll_lock_any') || ($context['user']['started'] && allowedTo('poll_lock_own')),
-				'edit' => allowedTo('poll_edit_any') || ($context['user']['started'] && allowedTo('poll_edit_own')),
-				'allowed_warning' => $pollinfo['max_votes'] > 1 ? sprintf($txt['poll_options6'], min(count($pollOptions), $pollinfo['max_votes'])) : '',
-				'is_expired' => !empty($pollinfo['expire_time']) && $pollinfo['expire_time'] < time(),
-				'expire_time' => !empty($pollinfo['expire_time']) ? standardTime($pollinfo['expire_time']) : 0,
-				'has_voted' => !empty($pollinfo['has_voted']),
-				'starter' => array(
-					'id' => $pollinfo['id_member'],
-					'name' => $row['poster_name'],
-					'href' => $pollinfo['id_member'] == 0 ? '' : $scripturl . '?action=profile;u=' . $pollinfo['id_member'],
-					'link' => $pollinfo['id_member'] == 0 ? $row['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $pollinfo['id_member'] . '">' . $row['poster_name'] . '</a>'
-				)
-			);
-
-			// Make the lock and edit permissions defined above more directly accessible.
-			$context['allow_lock_poll'] = $context['poll']['lock'];
-			$context['allow_edit_poll'] = $context['poll']['edit'];
-
-			// You're allowed to view the results if:
-			// 1. you're just a super-nice-guy, or
-			// 2. anyone can see them (hide_results == 0), or
-			// 3. you can see them after you voted (hide_results == 1), or
-			// 4. you've waited long enough for the poll to expire. (whether hide_results is 1 or 2.)
-			$context['allow_poll_view'] = allowedTo('moderate_board') || $pollinfo['hide_results'] == 0 || ($pollinfo['hide_results'] == 1 && $context['poll']['has_voted']) || $context['poll']['is_expired'];
-
-			// Calculate the percentages and bar lengths...
-			$divisor = $realtotal == 0 ? 1 : $realtotal;
-
-			// Determine if a decimal point is needed in order for the options to add to 100%.
-			$precision = $realtotal == 100 ? 0 : 1;
-
-			// Now look through each option, and...
-			foreach ($pollOptions as $i => $option)
-			{
-				// First calculate the percentage, and then the width of the bar...
-				$bar = round(($option['votes'] * 100) / $divisor, $precision);
-				$barWide = $bar == 0 ? 1 : floor(($bar * 8) / 3);
-
-				// Now add it to the poll's contextual theme data.
-				$context['poll']['options'][$i] = array(
-					'id' => 'options-' . $i,
-					'percent' => $bar,
-					'votes' => $option['votes'],
-					'voted_this' => $option['voted_this'] != -1,
-					'bar' => '<span style="white-space: nowrap;"><img src="' . $settings['images_url'] . '/poll_' . ($context['right_to_left'] ? 'right' : 'left') . '.png" alt="" /><img src="' . $settings['images_url'] . '/poll_middle.png" style="width:' . $barWide . 'px; height: 12px" alt="-" /><img src="' . $settings['images_url'] . '/poll_' . ($context['right_to_left'] ? 'left' : 'right') . '.png" alt="" /></span>',
-					// Note: IE < 8 requires us to set a width on the container, too.
-					'bar_ndt' => $bar > 0 ? '<div class="bar" style="width: ' . ($bar * 3.5 + 4) . 'px;"><div style="width: ' . $bar * 3.5 . 'px;"></div></div>' : '<div class="bar"></div>',
-					'bar_width' => $barWide,
-					'option' => parse_bbc($option['label']),
-					'vote_button' => '<input type="' . ($pollinfo['max_votes'] > 1 ? 'checkbox' : 'radio') . '" name="options[]" id="options-' . $i . '" value="' . $i . '" class="input_' . ($pollinfo['max_votes'] > 1 ? 'check' : 'radio') . '" />'
-				);
-			}
+			loadPollContext($topicinfo['id_poll']);
 		}
 
 		// Lets "output" all that info.
 		loadTemplate('Printpage');
-		Template_Layers::getInstance()->removeAll();
-		Template_Layers::getInstance()->add('print');
+		$template_layers = Template_Layers::getInstance();
+		$template_layers->removeAll();
+		$template_layers->add('print');
 		$context['board_name'] = $board_info['name'];
 		$context['category_name'] = $board_info['cat']['name'];
-		$context['poster_name'] = $row['poster_name'];
-		$context['post_time'] = relativeTime($row['poster_time'], false);
+		$context['poster_name'] = $topicinfo['poster_name'];
+		$context['post_time'] = relativeTime($topicinfo['poster_time'], false);
 		$context['parent_boards'] = array();
 		foreach ($board_info['parent_boards'] as $parent)
 			$context['parent_boards'][] = $parent['name'];
 
 		// Split the topics up so we can print them.
 		$context['posts'] = topicMessages($topic);
+		$posts_id = array_keys($context['posts']);
 
 		if (!isset($context['topic_subject']))
-			$context['topic_subject'] = $context['posts'][count($context['posts']) - 1]['subject'];
+			$context['topic_subject'] = $context['posts'][min($posts_id)]['subject'];
 
 		// Fetch attachments so we can print them if asked, enabled and allowed
 		if (isset($_REQUEST['images']) && !empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))

@@ -67,9 +67,27 @@ body {
 	background-image: linear-gradient(to right, #333 0%, #888 50%, #333 100%);
 	color: #666;
 }
-
-
-
+fieldset {
+	border: none;
+	background: transparent;
+	border: 1px solid #ccc;
+	padding: 6px;
+	box-shadow: none;
+	box-shadow: inset -1px -1px 3px #fff;
+	border-radius: 5px;
+	margin: 5px 0;
+}
+legend {
+	background: url(../images/selected_open.png) no-repeat scroll left center transparent;
+	cursor: pointer;
+	padding-left: 20px;
+	color: #333;
+	font-size: 1.2em;
+	margin-left: 15px;
+}
+.collapsed legend {
+	background:  url(../images/selected.png) no-repeat scroll left center transparent;
+}
 
 /* @todo - Quite a lot more code to be split. */
 
@@ -143,6 +161,9 @@ body {
 div.bbc_footnotes {
 	border-top: 1px solid #bfbfbf;
 }
+.bbc_footnotes .target:target {
+	background-color: #d8ffdf;
+}
 sup.bbc_footnotes, sup.bbc_footnotes a {
 	color: #50aa3a;
 	font-weight: 700;
@@ -208,7 +229,6 @@ div.bbc_footnotes .meaction{
 }
 /* News section. */
 #news {
-	padding: 0 1em 1em 1em;
 	font-size: 0.929em;
 }
 #news>h2 {
@@ -251,7 +271,6 @@ div.bbc_footnotes .meaction{
 /* The footer with copyright links etc. */
 #footer_section {
 	color: #bbb;
-	border-top: 4px solid #aaa;
 	background: #222;
 	border-top: 6px solid #3d6e32;
 	box-shadow: 0 -1px 0 #777, 0 1px 0 #0e0e0e inset;
@@ -323,13 +342,18 @@ div.bbc_footnotes .meaction{
 	background-image: linear-gradient(to bottom, #fff, #e4e4e4);
 	box-shadow: 1px 1px 2px #e5e5e5;
 	color: #566e4b;
-    display: block;
-    line-height: 2em;
-    margin: 3px 1.5em;
-    position: relative;
+	display: block;
+	line-height: 2em;
+	margin: 3px 1.5em;
+	position: relative;
 }
 .poster li.poster_online .nolink img {
 	vertical-align: middle;
+}
+.poster li.subsections.listlevel1:hover .linklevel1 {
+	background: transparent;
+	border: none;
+	box-shadow: none;
 }
 /* Level 1 active buttons. */
 .linklevel1.active, .listlevel1:hover .active,
@@ -342,6 +366,7 @@ div.bbc_footnotes .meaction{
 	color: #fff;
 	font-weight: 600;
 	box-shadow: 1px 1px 2px #bbb;
+	padding: 0 5px;
 }
 /* Hover effects for those buttons. */
 .linklevel1.active:hover,.listlevel1:hover .linklevel1.active,
@@ -911,7 +936,6 @@ div.bbc_footnotes .meaction{
 /* Smartphones (portrait & landscape) drop the stats (views/replys) and last post from the screen */
 @media screen and (min-width: 320px) and (max-width: 480px) {
 	.board_latest {
-		border-left: 0px;
+		border-left: 0;
 	}
 }
-

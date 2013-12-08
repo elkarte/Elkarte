@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This class handles admin settings.
  *
@@ -210,6 +210,7 @@ class Settings_Form
 					'var_message' => !empty($config_var['message']) && isset($txt[$config_var['message']]) ? $txt[$config_var['message']] : '',
 					'preinput' => isset($config_var['preinput']) ? $config_var['preinput'] : '',
 					'postinput' => isset($config_var['postinput']) ? $config_var['postinput'] : '',
+					'icon' => isset($config_var['icon']) ? $config_var['icon'] : '',
 				);
 
 				// If this is a select box handle any data.

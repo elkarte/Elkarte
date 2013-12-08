@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file contains a standard way of displaying side/drop down menus.
  *
@@ -21,192 +21,20 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * A collection of menu entries that can be (easily?) positioned
- */
-class Menu_Entries extends Positioning_Items
-{
-	/**
-	 * Add a new item to the pile
-	 *
-	 * @param string $key index of a item
-	 * @param array $item depending on the sub-level of the menu can be different things
-	 * @param int $priority an integer defining the priority of the item.
-	 */
-	public function add($key, $item = null, $priority = null)
-	{
-		if (is_array($key))
-		{
-			$this->_reset = false;
-			foreach ($key as $k => $v)
-				$this->add($k, $v);
-			$this->_reset = true;
-		}
-		else
-		{
-			if (!isset($this->_items[$key]))
-			{
-				// If we know what to do, let's do it
-				if ($this->_position !== null && in_array($this->_position, $this->_known_positions))
-				{
-					$add = $this->_position;
-
-					// after and before are special because the array doesn't need a priority level
-					if ($this->_position === 'after' || $this->_position === 'before')
-						$this->{'_all_' . $add}[$key] = $this->_relative;
-					// Instead end and begin are "normal" and the order is defined by the priority
-					else
-						$this->{'_all_' . $add}[$key] = $priority === null ? $this->{'_' . $add . '_highest_priority'} : (int) $priority;
-				}
-				elseif ($this->_position === 'child')
-				{
-					if (!isset($this->_children[$this->_relative]))
-						$this->_children[$this->_relative] = new Menu_Entries();
-
-					// Always return the valid children of the "current" position
-					return $this->_children[$this->_relative];
-				}
-				else
-				{
-					$add = 'general';
-					$this->_all_general[$key] = $priority === null ? $this->_general_highest_priority : (int) $priority;
-				}
-			}
-
-			// If it already exists, update the existing
-			if (isset($this->_items[$key]))
-				$this->_items[$key] = array_merge($this->_items[$key], $item);
-			// Otherwise let's add it (the most important part)
-			else
-			{
-				$this->_items[$key] = $item;
-
-				// If there is a max priority level, then increase it
-				if (isset($this->{'_' . $add . '_highest_priority'}))
-					$this->{'_' . $add . '_highest_priority'} = max($this->{'_all_' . $add}) + 100;
-			}
-		}
-
-		if ($this->_reset)
-			$this->_position = null;
-	}
-}
-
-/**
- * Singleton class: it allows to access to all the menus of a page
- */
-class Standard_Menu extends Menu_Entries
-{
-	/**
-	 * This array holds all the menus
-	 *
-	 * @var array of Menu_Entries
-	 */
-	private $_instances = null;
-
-	/**
-	 * Return a "top level" menu, if it doesn't exists, it creates one
-	 *
-	 * @param string a menu identifier
-	 */
-	public function get($id)
-	{
-		if (!isset($this->_instances[$id]))
-			$this->_instances[$id] = new Menu_Entries();
-
-		return $this->_instances[$id];
-	}
-
-	/**
-	 * For the moment mostly a wrapper for the function createMenu (see below)
-	 * that will replace when backward compatibility will not be important any more.
-	 *
-	 * At the moment it prepares the $menuData array to be passed to createMenu
-	 *
-	 * @param string $id a menu identifier
-	 * @param array an array of options that can be used to override some default behaviours.
-	 *   It can accept the following indexes:
-	 *    - action                    => overrides the default action
-	 *    - current_area              => overrides the current area
-	 *    - extra_url_parameters      => an array or pairs or parameters to be added to the url
-	 *    - disable_url_session_check => (boolean) if true the session var/id are omitted from the url
-	 *    - base_url                  => an alternative base url
-	 *    - menu_type                 => alternative menu types?
-	 *    - can_toggle_drop_down      => (boolean) if the menu can "toggle"
-	 *    - template_name             => an alternative template to load (instead of Generic)
-	 *    - layer_name                => alternative layer name for the menu
-	 */
-	public function createMenu($id, $menuOptions = array())
-	{
-		// Allow extend *any* menu with a single hook
-		call_integration_hook('integrate_' . strtolower($id), array(&$menuOptions));
-
-		$menu = $this->_instances[$id];
-		$menuData = array();
-
-		foreach ($menu->prepareContext() as $act => $button)
-		{
-			if (!empty($button))
-			{
-				$button['areas'] = array();
-				// Go through the sub buttons if there are any.
-				if (isset($button['children']))
-				{
-					foreach ($button['children']->prepareContext() as $key => $subbutton)
-					{
-						$button['areas'][$key] = $subbutton;
-
-						// 2nd level sub buttons next...
-						if (isset($subbutton['children']))
-						{
-							foreach ($subbutton['children']->prepareContext() as $key2 => $subbutton2)
-							{
-								$button['areas'][$key]['subsections'][$key2] = $subbutton2;
-							}
-						}
-					}
-				}
-
-				$menuData[$act] = $button;
-			}
-		}
-
-		return createMenu($menuData, $menuOptions);
-	}
-
-	/**
-	 * Destroy a menu instance (i.e. unset)
-	 *
-	 * @param string $id, and existing menu identifier
-	 */
-	public function destroy($id)
-	{
-		if (isset($this->_instances[$id]))
-			unset($this->_instances[$id]);
-	}
-
-	/**
-	 * Find and return Standard_Menu instance if it exists,
-	 * or create a new instance for $id if it didn't already exist.
-	 *
-	 * @return an instance of the class
-	 */
-	public static function context()
-	{
-		static $instance = null;
-
-		// this is a singleton
-		if ($instance === null)
-			$instance = new Standard_Menu();
-
-		return $instance;
-	}
-}
-
-/**
  * Create a menu.
  *
- * @param array $menuData
- * @param array $menuOptions = array()
+ * @param string $menuData the menu array
+ * @param array $menuOptions an array of options that can be used to override some default behaviours.
+ *   It can accept the following indexes:
+ *    - action                    => overrides the default action
+ *    - current_area              => overrides the current area
+ *    - extra_url_parameters      => an array or pairs or parameters to be added to the url
+ *    - disable_url_session_check => (boolean) if true the session var/id are omitted from the url
+ *    - base_url                  => an alternative base url
+ *    - menu_type                 => alternative menu types?
+ *    - can_toggle_drop_down      => (boolean) if the menu can "toggle"
+ *    - template_name             => an alternative template to load (instead of Generic)
+ *    - layer_name                => alternative layer name for the menu
  * @return boolean|array
  */
 function createMenu($menuData, $menuOptions = array())
@@ -273,16 +101,41 @@ function createMenu($menuData, $menuOptions = array())
 	// Now setup the context correctly.
 	foreach ($menuData as $section_id => $section)
 	{
-		// Is this enabled - or has as permission check - which fails?
-		if ((isset($section['enabled']) && $section['enabled'] == false) || (isset($section['permission']) && !allowedTo($section['permission'])))
+		// Is this enabled?
+		if ((isset($section['enabled']) && $section['enabled'] == false))
 			continue;
+		// Has permission check?
+		if (isset($section['permission']))
+		{
+			// The profile menu has slightly different permissions
+			if (is_array($section['permission']) && isset($section['permission']['own'], $section['permission']['any']))
+			{
+				if (empty($area['permission'][$context['user']['is_owner'] ? 'own' : 'any']) || !allowedTo($section['permission'][$context['user']['is_owner'] ? 'own' : 'any']))
+					continue;
+			}
+			elseif (!allowedTo($section['permission']))
+				continue;
+		}
 
 		// Now we cycle through the sections to pick the right area.
 		foreach ($section['areas'] as $area_id => $area)
 		{
 			// Can we do this?
-			if ((!isset($area['enabled']) || $area['enabled'] != false) && (empty($area['permission']) || allowedTo($area['permission'])))
+			if (!isset($area['enabled']) || $area['enabled'] != false)
 			{
+				// Has permission check?
+				if (!empty($area['permission']))
+				{
+					// The profile menu has slightly different permissions
+					if (is_array($area['permission']) && isset($area['permission']['own'], $area['permission']['any']))
+					{
+						if (empty($area['permission'][$context['user']['is_owner'] ? 'own' : 'any']) || !allowedTo($area['permission'][$context['user']['is_owner'] ? 'own' : 'any']))
+							continue;
+					}
+					elseif (!allowedTo($area['permission']))
+						continue;
+				}
+
 				// Add it to the context... if it has some form of name!
 				if (isset($area['label']) || (isset($txt[$area_id]) && !isset($area['select'])))
 				{
@@ -298,9 +151,16 @@ function createMenu($menuData, $menuOptions = array())
 					{
 						// First time this section?
 						if (!isset($menu_context['sections'][$section_id]))
+						{
+							if (isset($menuOptions['counters'], $section['counter']) && !empty($menuOptions['counters'][$section['counter']]))
+								$section['title'] .= sprintf($settings['menu_numeric_notice'][0], $menuOptions['counters'][$section['counter']]);
+
 							$menu_context['sections'][$section_id]['title'] = $section['title'];
+						}
 
 						$menu_context['sections'][$section_id]['areas'][$area_id] = array('label' => isset($area['label']) ? $area['label'] : $txt[$area_id]);
+						if (isset($menuOptions['counters'], $area['counter']) && !empty($menuOptions['counters'][$area['counter']]))
+							$menu_context['sections'][$section_id]['areas'][$area_id]['label'] .= sprintf($settings['menu_numeric_notice'][1], $menuOptions['counters'][$area['counter']]);
 
 						// We'll need the ID as well...
 						$menu_context['sections'][$section_id]['id'] = $section_id;
@@ -328,6 +188,9 @@ function createMenu($menuData, $menuOptions = array())
 										$first_sa = $sa;
 
 									$menu_context['sections'][$section_id]['areas'][$area_id]['subsections'][$sa] = array('label' => $sub[0]);
+									if (isset($menuOptions['counters'], $sub['counter']) && !empty($menuOptions['counters'][$sub['counter']]))
+										$menu_context['sections'][$section_id]['areas'][$area_id]['subsections'][$sa]['label'] .= sprintf($settings['menu_numeric_notice'][2], $menuOptions['counters'][$sub['counter']]);
+
 									// Custom URL?
 									if (isset($sub['url']))
 										$menu_context['sections'][$section_id]['areas'][$area_id]['subsections'][$sa]['url'] = $sub['url'];

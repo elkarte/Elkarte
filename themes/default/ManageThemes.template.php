@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -19,12 +19,12 @@
  */
 function template_main()
 {
-	global $context, $settings, $scripturl, $txt, $modSettings;
+	global $context, $scripturl, $txt, $modSettings;
 
 	echo '
 	<div id="admincenter">
 		<h2 class="category_header">
-			<a href="', $scripturl, '?action=quickhelp;help=themes" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/icons/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a>
+			<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=themes" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a>
 			', $txt['themeadmin_title'], '
 		</h2>
 		<div class="information">
@@ -108,7 +108,7 @@ function template_main()
 
 	echo '
 			<h3 class="category_header">
-				<a href="', $scripturl, '?action=quickhelp;help=theme_install" onclick="return reqOverlayDiv(this.href);" class="help" id="theme_install"><img src="', $settings['images_url'], '/icons/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['theme_install'], '
+				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=theme_install" onclick="return reqOverlayDiv(this.href);" id="theme_install" title="', $txt['help'], '"></a> ', $txt['theme_install'], '
 			</h3>
 			<form action="', $scripturl, '?action=admin;area=theme;sa=install" method="post" accept-charset="UTF-8" enctype="multipart/form-data" onsubmit="return confirm(\'', $txt['theme_install_new_confirm'], '\');">
 				<div class="windowbg">
@@ -233,9 +233,9 @@ function template_list_themes()
 						event.preventDefault();
 						var theme_id = $(this).data("theme_id"),
 							base_url = $(this).attr("href"),
-							pattern = new RegExp(elk_session_var + "=" + elk_session_id + ";(.*)$");
-						var tokens = pattern.exec(base_url)[1].split("=");
-						var token = tokens[1],
+							pattern = new RegExp(elk_session_var + "=" + elk_session_id + ";(.*)$"),
+							tokens = pattern.exec(base_url)[1].split("="),
+							token = tokens[1],
 							token_var = tokens[0];
 
 						if (confirm(\'', $txt['theme_remove_confirm'], '\'))
@@ -246,16 +246,16 @@ function template_list_themes()
 								beforeSend: ajax_indicator(true)
 							})
 							.done(function(request) {
-								if ($(request).find("error").length == 0)
+								if ($(request).find("error").length === 0)
 								{
 									var new_token = $(request).find("token").text(),
 										new_token_var = $(request).find("token_var").text();
+
 									$(".theme_" + theme_id).slideToggle("slow", function () {
 										$(this).remove();
 									});
 
 									$(".delete_theme").each(function () {
-										var a1 = $(this).attr("href");
 										$(this).attr("href", $(this).attr("href").replace(token_var + "=" + token, new_token_var + "=" + new_token));
 									});
 								}
@@ -437,21 +437,21 @@ function template_set_options()
  */
 function template_set_settings()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	echo '
 	<div id="admin_form_wrapper">
 		<form action="', $scripturl, '?action=admin;area=theme;sa=list;th=', $context['theme_settings']['theme_id'], '" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">
-				<a href="', $scripturl, '?action=quickhelp;help=theme_settings" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/icons/helptopics_hd.png" alt="', $txt['help'], '" class="icon" /></a> ', $txt['theme_settings'], ' - ', $context['theme_settings']['name'], '
+				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=theme_settings" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['theme_settings'], ' - ', $context['theme_settings']['name'], '
 			</h2>
 			<br />';
 
 	// @todo Why can't I edit the default theme popup.
 	if ($context['theme_settings']['theme_id'] != 1)
 		echo '
-			<h3 class="category_header">
-				<img src="', $settings['images_url'], '/icons/config_hd.png" alt="" class="icon" /> ', $txt['theme_edit'], '
+			<h3 class="category_header hdicon cat_img_config">
+				', $txt['theme_edit'], '
 			</h3>
 			<div class="windowbg">
 				<div class="content">
@@ -467,8 +467,8 @@ function template_set_settings()
 			</div>';
 
 	echo '
-			<h3 class="category_header">
-				<img src="', $settings['images_url'], '/icons/config_hd.png" alt="" class="icon" /> ', $txt['theme_url_config'], '
+			<h3 class="category_header hdicon cat_img_config">
+				', $txt['theme_url_config'], '
 			</h3>
 			<div class="windowbg2">
 				<div class="content">
@@ -505,8 +505,8 @@ function template_set_settings()
 	if (!empty($context['theme_variants']))
 	{
 		echo '
-			<h3 class="category_header">
-				<img class="icon" src="', $settings['images_url'], '/icons/config_hd.png" alt="" /> ', $txt['theme_variants'], '
+			<h3 class="category_header hdicon cat_img_config">
+				', $txt['theme_variants'], '
 			</h3>
 			<div class="windowbg2">
 				<div class="content">
@@ -538,8 +538,8 @@ function template_set_settings()
 	}
 
 	echo '
-			<h3 class="category_header">
-				<img src="', $settings['images_url'], '/icons/config_hd.png" alt="" class="icon" /> ', $txt['theme_options'], '
+			<h3 class="category_header hdicon cat_img_config">
+				', $txt['theme_options'], '
 			</h3>
 			<div class="windowbg">
 				<div class="content">
@@ -642,7 +642,7 @@ function template_set_settings()
 		}
 
 		echo '
-		}
+		};
 		// ]]></script>';
 	}
 }
@@ -710,9 +710,9 @@ function template_pick()
 		{
 			echo '
 			<script><!-- // --><![CDATA[
-			var sBaseUseUrl', $theme['id'], ' = elk_prepareScriptUrl(elk_scripturl) + \'action=theme;sa=pick;u=', $context['current_member'], ';th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], '\';
-			var sBasePreviewUrl', $theme['id'], ' = elk_prepareScriptUrl(elk_scripturl) + \'action=theme;sa=pick;u=', $context['current_member'], ';theme=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], '\';
-			var oThumbnails', $theme['id'], ' = {';
+			var sBaseUseUrl', $theme['id'], ' = elk_prepareScriptUrl(elk_scripturl) + \'action=theme;sa=pick;u=', $context['current_member'], ';th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], '\',
+				sBasePreviewUrl', $theme['id'], ' = elk_prepareScriptUrl(elk_scripturl) + \'action=theme;sa=pick;u=', $context['current_member'], ';theme=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], '\',
+				oThumbnails', $theme['id'], ' = {';
 
 			// All the variant thumbnails.
 			$count = 1;
@@ -724,7 +724,7 @@ function template_pick()
 			}
 
 			echo '
-			}
+			};
 
 			function changeVariant', $theme['id'], '(sVariant)
 			{
@@ -914,9 +914,9 @@ function template_edit_style()
 	echo '
 	<div id="admincenter">
 		<script><!-- // --><![CDATA[
-			var previewData = "";
-			var previewTimeout;
-			var editFilename = ', JavaScriptEscape($context['edit_filename']), ';
+			var previewData = "",
+				previewTimeout,
+				editFilename = ', JavaScriptEscape($context['edit_filename']), ';
 
 			// Load up a page, but apply our stylesheet.
 			function navigatePreview(url)
@@ -924,10 +924,10 @@ function template_edit_style()
 				var myDoc = new XMLHttpRequest();
 				myDoc.onreadystatechange = function ()
 				{
-					if (myDoc.readyState != 4)
+					if (myDoc.readyState !== 4)
 						return;
 
-					if (myDoc.responseText != null && myDoc.status == 200)
+					if (myDoc.responseText !== null && myDoc.status === 200)
 					{
 						previewData = myDoc.responseText;
 						document.getElementById("css_preview_box").style.display = "";
@@ -942,13 +942,13 @@ function template_edit_style()
 				};
 
 				var anchor = "";
-				if (url.indexOf("#") != -1)
+				if (url.indexOf("#") !== -1)
 				{
 					anchor = url.substr(url.indexOf("#"));
 					url = url.substr(0, url.indexOf("#"));
 				}
 
-				myDoc.open("GET", url + (url.indexOf("?") == -1 ? "?" : ";") + "theme=', $context['theme_id'], '" + anchor, true);
+				myDoc.open("GET", url + (url.indexOf("?") === -1 ? "?" : ";") + "theme=', $context['theme_id'], '" + anchor, true);
 				myDoc.send(null);
 			}
 			navigatePreview(elk_scripturl);
@@ -961,7 +961,9 @@ function template_edit_style()
 				// Don\'t reflow the whole thing if nothing changed!!
 				if (check && identical)
 					return;
+
 				refreshPreviewCache = document.forms.stylesheetForm.entire_file.value;
+
 				// Replace the paths for images.
 				refreshPreviewCache = refreshPreviewCache.replace(/url\(\.\.\/images/gi, "url(" + elk_images_url);
 
@@ -981,7 +983,7 @@ function template_edit_style()
 						}';
 	else
 		echo '
-						setInnerHTML(frames["css_preview_box"].document.getElementById("css_preview_sheet"), document.forms.stylesheetForm.entire_file.value);';
+						frames["css_preview_box"].document.getElementById("css_preview_sheet").innerHTML = document.forms.stylesheetForm.entire_file.value;';
 	echo '
 					}
 					catch (e)
@@ -993,26 +995,28 @@ function template_edit_style()
 				// This will work most of the time... could be done with an after-apply, maybe.
 				if (!identical)
 				{
-					var data = previewData + "";
-					var preview_sheet = document.forms.stylesheetForm.entire_file.value;
-					var stylesheetMatch = new RegExp(\'<link rel="stylesheet"[^>]+href="[^"]+\' + editFilename + \'[^>]*>\');
+					var data = previewData,
+						preview_sheet = document.forms.stylesheetForm.entire_file.value,
+						stylesheetMatch = new RegExp(\'<link rel="stylesheet"[^>]+href="[^"]+\' + editFilename + \'[^>]*>\');
 
 					// Replace the paths for images.
 					preview_sheet = preview_sheet.replace(/url\(\.\.\/images/gi, "url(" + elk_images_url);
 					data = data.replace(stylesheetMatch, "<style type=\"text/css\" id=\"css_preview_sheet\">" + preview_sheet + "<" + "/style>");
 
-					frames["css_preview_box"].document.open();
-					frames["css_preview_box"].document.write(data);
-					frames["css_preview_box"].document.close();
+					iframe = document.getElementById("css_preview_box");
+					iframe.contentWindow.document.open()
+					iframe.contentWindow.document.write(data);
+					iframe.contentWindow.document.close();
 
 					// Next, fix all its links so we can handle them and reapply the new css!
-					frames["css_preview_box"].onload = function ()
+					iframe.onload = function ()
 					{
 						var fixLinks = frames["css_preview_box"].document.getElementsByTagName("a");
 						for (var i = 0; i < fixLinks.length; i++)
 						{
 							if (fixLinks[i].onclick)
 								continue;
+
 							fixLinks[i].onclick = function ()
 							{
 								window.parent.navigatePreview(this.href);

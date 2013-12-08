@@ -7,24 +7,25 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file contains javascript associated with the posting and previewing
  */
 
+/**
+ * A q&d wrapper function to call the correct preview function
+ * @todo could make this a class to be cleaner
+ */
 // These are variables the xml response is going to need
 var bPost;
-
-// A q&d wrapper function to call the correct preview function
-// @todo could make this a class to be cleaner
 function previewControl()
 {
 	if (is_ff)
 	{
 		// Firefox doesn't render <marquee> that have been put it using javascript
-		if (document.forms[form_name].elements[post_box_name].value.indexOf('[move]') != -1)
+		if (document.forms[form_name].elements[post_box_name].value.indexOf('[move]') !== -1)
 			return submitThisOnce(document.forms[form_name]);
 	}
 
@@ -53,7 +54,9 @@ function previewControl()
 		return submitThisOnce(document.forms[form_name]);
 }
 
-// Used to preview a post
+/**
+ * Used to preview a post
+ */
 function previewPost()
 {
 	// @todo Currently not sending poll options and option checkboxes.
@@ -70,19 +73,21 @@ function previewPost()
 	];
 
 	// Get the values from the form
-	var x = new Array();
+	var x = [];
 	x = getFields(textFields, numericFields, checkboxFields, form_name);
 
 	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=post2' + (current_board ? ';board=' + current_board : '') + (make_poll ? ';poll' : '') + ';preview;' + elk_session_var + '=' + elk_session_id + ';xml', x.join('&'), onDocSent);
 
 	document.getElementById('preview_section').style.display = '';
-	setInnerHTML(document.getElementById('preview_subject'), txt_preview_title);
-	setInnerHTML(document.getElementById('preview_body'), txt_preview_fetch);
+	document.getElementById('preview_subject').innerHTML = txt_preview_title;
+	document.getElementById('preview_body').innerHTML = txt_preview_fetch;
 
 	return false;
 }
 
-// Used to preview a PM
+/**
+ * Used to preview a PM
+ */
 function previewPM()
 {
 	// define what we want to get from the form
@@ -97,7 +102,7 @@ function previewPM()
 	];
 
 	// And go get them
-	var x = new Array();
+	var x = [];
 	x = getFields(textFields, numericFields, checkboxFields, form_name);
 
 	// Send in document for previewing
@@ -105,13 +110,15 @@ function previewPM()
 
 	// Update the preview section with our results
 	document.getElementById('preview_section').style.display = '';
-	setInnerHTML(document.getElementById('preview_subject'), txt_preview_title);
-	setInnerHTML(document.getElementById('preview_body'), txt_preview_fetch);
+	document.getElementById('preview_subject').innerHTML = txt_preview_title;
+	document.getElementById('preview_body').innerHTML = txt_preview_fetch;
 
 	return false;
 }
 
-// Used to preview a News item
+/**
+ * Used to preview a News item
+ */
 function previewNews()
 {
 	// define what we want to get from the form
@@ -125,7 +132,7 @@ function previewNews()
 	];
 
 	// And go get them
-	var x = new Array();
+	var x = [];
 	x = getFields(textFields, numericFields, checkboxFields, form_name);
 	x[x.length] = 'item=newsletterpreview';
 
@@ -134,24 +141,33 @@ function previewNews()
 
 	// Update the preview section with our results
 	document.getElementById('preview_section').style.display = '';
-	setInnerHTML(document.getElementById('preview_subject'), txt_preview_title);
-	setInnerHTML(document.getElementById('preview_body'), txt_preview_fetch);
+	document.getElementById('preview_subject').innerHTML = txt_preview_title;
+	document.getElementById('preview_body').innerHTML = txt_preview_fetch;
 
 	return false;
 }
 
-// Gets the form data for the selected fields so they can be posted via ajax
+/**
+ * Gets the form data for the selected fields so they can be posted via ajax
+ *
+ * @param {array} textFields
+ * @param {array} numericFields
+ * @param {array} checkboxFields
+ * @param {string} form_name
+ */
 function getFields(textFields, numericFields, checkboxFields, form_name)
 {
-	var fields = new Array();
+	var fields = [],
+		i = 0,
+		n = 0;
 
 	// Get all of the text fields
-	for (var i = 0, n = textFields.length; i < n; i++)
+	for (i = 0, n = textFields.length; i < n; i++)
 	{
 		if (textFields[i] in document.forms[form_name])
 		{
 			// Handle the editor.
-			if (textFields[i] == post_box_name && $('#' + post_box_name).data('sceditor') != undefined)
+			if (textFields[i] == post_box_name && $('#' + post_box_name).data('sceditor') !== undefined)
 			{
 				fields[fields.length] = textFields[i] + '=' + $('#' + post_box_name).data('sceditor').getText().replace(/&#/g, '&#38;#').php_to8bit().php_urlencode();
 				fields[fields.length] = 'message_mode=' + $("#message").data("sceditor").inSourceMode();
@@ -162,7 +178,7 @@ function getFields(textFields, numericFields, checkboxFields, form_name)
 	}
 
 	// All of the numeric fields
-	for (var i = 0, n = numericFields.length; i < n; i++)
+	for (i = 0, n = numericFields.length; i < n; i++)
 	{
 		if (numericFields[i] in document.forms[form_name])
 		{
@@ -177,7 +193,7 @@ function getFields(textFields, numericFields, checkboxFields, form_name)
 	}
 
 	// And the checkboxes
-	for (var i = 0, n = checkboxFields.length; i < n; i++)
+	for (i = 0, n = checkboxFields.length; i < n; i++)
 	{
 		if (checkboxFields[i] in document.forms[form_name] && document.forms[form_name].elements[checkboxFields[i]].checked)
 			fields[fields.length] = checkboxFields[i] + '=' + document.forms[form_name].elements[checkboxFields[i]].value;
@@ -189,35 +205,44 @@ function getFields(textFields, numericFields, checkboxFields, form_name)
 	return fields;
 }
 
-// Callback function of the XMLhttp request
+/**
+ * Callback function of the XMLhttp request
+ *
+ * @param {object} XMLDoc
+ */
 function onDocSent(XMLDoc)
 {
+	var i = 0,
+		n = 0,
+		numErrors = 0,
+		numCaptions = 0;
+
 	if (!XMLDoc || !XMLDoc.getElementsByTagName('elk')[0])
 	{
-		document.forms[form_name].preview.onclick = new function () {return true;};
+		document.forms[form_name].preview.onclick = function() {return true;};
 		document.forms[form_name].preview.click();
 		return true;
 	}
 
 	// Show the preview section.
 	var preview = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('preview')[0];
-	setInnerHTML(document.getElementById('preview_subject'), preview.getElementsByTagName('subject')[0].firstChild.nodeValue);
+	document.getElementById('preview_subject').innerHTML = preview.getElementsByTagName('subject')[0].firstChild.nodeValue;
 
 	var bodyText = '';
-	for (var i = 0, n = preview.getElementsByTagName('body')[0].childNodes.length; i < n; i++)
+	for (i = 0, n = preview.getElementsByTagName('body')[0].childNodes.length; i < n; i++)
 		bodyText += preview.getElementsByTagName('body')[0].childNodes[i].nodeValue;
 
-	setInnerHTML(document.getElementById('preview_body'), bodyText);
+	document.getElementById('preview_body').innerHTML = bodyText;
 	document.getElementById('preview_body').className = 'post';
 
 	// Show a list of errors (if any).
-	var errors = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('errors')[0];
-	var errorList = '';
-	var errorCode = '';
+	var errors = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('errors')[0],
+		errorList = '',
+		errorCode = '';
 
 	// @todo: this should stay together with the rest of the error handling or
 	// should use errorbox_handler (at the moment it cannot be used because is not enough generic)
-	for (var i = 0, numErrors = errors.getElementsByTagName('error').length; i < numErrors; i++)
+	for (i = 0, numErrors = errors.getElementsByTagName('error').length; i < numErrors; i++)
 	{
 		errorCode = errors.getElementsByTagName('error')[i].attributes.getNamedItem("code").value;
 		errorList += '<li id="post_error_' + errorCode + '" class="error">' + errors.getElementsByTagName('error')[i].firstChild.nodeValue + '</li>';
@@ -228,25 +253,25 @@ function onDocSent(XMLDoc)
 		oError_box.append("<ul id='post_error_list'></ul>");
 
 	// Add the error it and show it
-	setInnerHTML(document.getElementById('post_error_list'), numErrors == 0 ? '' : errorList);
+	document.getElementById('post_error_list').innerHTML = numErrors === 0 ? '' : errorList;
 	if (numErrors === 0)
 		oError_box.css("display", "none");
 
 	// Show a warning if the topic has been locked.
 	if (bPost)
-		document.getElementById('lock_warning').style.display = errors.getAttribute('topic_locked') == 1 ? '' : 'none';
+		document.getElementById('lock_warning').style.display = errors.getAttribute('topic_locked') === 1 ? '' : 'none';
 
 	// Adjust the color of captions if the given data is erroneous.
 	var captions = errors.getElementsByTagName('caption');
-	for (var i = 0, numCaptions = errors.getElementsByTagName('caption').length; i < numCaptions; i++)
+	for (i = 0, numCaptions = errors.getElementsByTagName('caption').length; i < numCaptions; i++)
 	{
 		if (document.getElementById('caption_' + captions[i].getAttribute('name')))
 			document.getElementById('caption_' + captions[i].getAttribute('name')).className = captions[i].getAttribute('class');
 	}
 
-	if (errors.getElementsByTagName('post_error').length == 1)
+	if (errors.getElementsByTagName('post_error').length === 1)
 		document.forms[form_name][post_box_name].style.border = '1px solid red';
-	else if (document.forms[form_name][post_box_name].style.borderColor == 'red' || document.forms[form_name][post_box_name].style.borderColor == 'red red red red')
+	else if (document.forms[form_name][post_box_name].style.borderColor === 'red' || document.forms[form_name][post_box_name].style.borderColor === 'red red red red')
 	{
 		if ('runtimeStyle' in document.forms[form_name][post_box_name])
 			document.forms[form_name][post_box_name].style.borderColor = '';
@@ -264,9 +289,9 @@ function onDocSent(XMLDoc)
 		// Remove the new image from old-new replies!
 		for (i = 0; i < new_replies.length; i++)
 			document.getElementById('image_new_' + new_replies[i]).style.display = 'none';
-		new_replies = new Array();
+		new_replies = [];
 
-		var ignored_replies = new Array(),
+		var ignored_replies = [],
 			ignoring = null,
 			newPosts = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('new_posts')[0] ? XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('new_posts')[0].getElementsByTagName('post') : {length: 0},
 			numNewPosts = newPosts.length;
@@ -274,15 +299,15 @@ function onDocSent(XMLDoc)
 		if (numNewPosts !== 0)
 		{
 			var newPostsHTML = '<span id="new_replies"><' + '/span>';
-			for (var i = 0; i < numNewPosts; i++)
+			for (i = 0; i < numNewPosts; i++)
 			{
 				new_replies[new_replies.length] = newPosts[i].getAttribute("id");
 
 				ignoring = false;
-				if (newPosts[i].getElementsByTagName("is_ignored")[0].firstChild.nodeValue != 0)
+				if (newPosts[i].getElementsByTagName("is_ignored")[0].firstChild.nodeValue !== 0)
 					ignored_replies[ignored_replies.length] = ignoring = newPosts[i].getAttribute("id");
 
-				newPostsHTML += '<div class="windowbg' + (++reply_counter % 2 == 0 ? '2' : '') + ' core_posts"><div class="content" id="msg' + newPosts[i].getAttribute("id") + '"><div class="floatleft"><h5>' + txt_posted_by + ': ' + newPosts[i].getElementsByTagName("poster")[0].firstChild.nodeValue + '</h5><span class="smalltext">&#171;&nbsp;<strong>' + txt_on + ':</strong> ' + newPosts[i].getElementsByTagName("time")[0].firstChild.nodeValue + '&nbsp;&#187;</span> <span class="new_posts" id="image_new_' + newPosts[i].getAttribute("id") + '">' + txt_new + '</span></div>';
+				newPostsHTML += '<div class="windowbg' + (++reply_counter % 2 === 0 ? '2' : '') + ' core_posts"><div class="content" id="msg' + newPosts[i].getAttribute("id") + '"><div class="floatleft"><h5>' + txt_posted_by + ': ' + newPosts[i].getElementsByTagName("poster")[0].firstChild.nodeValue + '</h5><span class="smalltext">&#171;&nbsp;<strong>' + txt_on + ':</strong> ' + newPosts[i].getElementsByTagName("time")[0].firstChild.nodeValue + '&nbsp;&#187;</span> <span class="new_posts" id="image_new_' + newPosts[i].getAttribute("id") + '">' + txt_new + '</span></div>';
 
 				if (can_quote)
 					newPostsHTML += '<ul class="quickbuttons" id="msg_' + newPosts[i].getAttribute('id') + '_quote"><li class="listlevel1"><a href="#postmodify" onclick="return insertQuoteFast(' + newPosts[i].getAttribute('id') + ');" class="linklevel1 quote_button">' + txt_bbc_quote + '</a></li></ul>';
@@ -298,16 +323,16 @@ function onDocSent(XMLDoc)
 		}
 
 		var numIgnoredReplies = ignored_replies.length;
-		if (numIgnoredReplies != 0)
+		if (numIgnoredReplies !== 0)
 		{
-			for (var i = 0; i < numIgnoredReplies; i++)
+			for (i = 0; i < numIgnoredReplies; i++)
 			{
 				aIgnoreToggles[ignored_replies[i]] = new elk_Toggle({
 					bToggleEnabled: true,
 					bCurrentlyCollapsed: true,
 					aSwappableContainers: [
 						'msg_' + ignored_replies[i] + '_body',
-						'msg_' + ignored_replies[i] + '_quote',
+						'msg_' + ignored_replies[i] + '_quote'
 					],
 					aSwapLinks: [
 						{
@@ -327,13 +352,15 @@ function onDocSent(XMLDoc)
 	if ($.isFunction($.fn.linkifyvideo))
 		$().linkifyvideo(oEmbedtext, 'preview_body');
 
-	// Preview spoilers
+	// Spoilers, Sweetie
 	$('.spoilerheader').click(function(){
 		$(this).next().children().slideToggle("fast");
 	});
 }
 
-// Add additional poll option fields
+/**
+ * Add additional poll option fields
+ */
 function addPollOption()
 {
 	if (pollOptionNum === 0)
@@ -345,13 +372,16 @@ function addPollOption()
 				pollTabIndex = document.forms[form_name].elements[i].tabIndex;
 			}
 	}
+
 	pollOptionNum++;
 	pollOptionId++;
 	pollTabIndex++;
 	setOuterHTML(document.getElementById('pollMoreOptions'), '<li><label for="options-' + pollOptionId + '">' + txt_option + ' ' + pollOptionNum + '</label>: <input type="text" name="options[' + pollOptionId + ']" id="options-' + pollOptionId + '" value="" size="80" maxlength="255" tabindex="' + pollTabIndex + '" class="input_text" /></li><li id="pollMoreOptions"></li>');
 }
 
-// Add additional attachment selection boxes
+/**
+ * Add additional attachment selection boxes
+ */
 function addAttachment()
 {
 	allowed_attachments = allowed_attachments - 1;
@@ -364,7 +394,28 @@ function addAttachment()
 	return true;
 }
 
-// Insert a quote to the editor via ajax
+/**
+ * A function used to clear the attachments on post page.  For security reasons
+ * browsers don't let you set the value of a file input, even to an empty string
+ * so this work around lets the user clear a choice.
+ *
+ * @param {type} idElement
+ * @returns {undefined}
+ */
+function cleanFileInput(idElement)
+{
+	var oElement = $('#' + idElement);
+
+	// Wrap the element in its own form, then reset the wrapper form
+	oElement.wrap('<form>').closest('form').get(0).reset();
+    oElement.unwrap();
+}
+
+/**
+ * Insert a quote to the editor via ajax
+ *
+ * @param {string} messageid
+ */
 function insertQuoteFast(messageid)
 {
 	if (window.XMLHttpRequest)
@@ -375,7 +426,11 @@ function insertQuoteFast(messageid)
 	return true;
 }
 
-// callback for the quotefast function
+/**
+ * callback for the quotefast function
+ *
+ * @param {object} XMLDoc
+ */
 function onDocReceived(XMLDoc)
 {
 	var text = '';
@@ -388,8 +443,29 @@ function onDocReceived(XMLDoc)
 	ajax_indicator(false);
 }
 
-// insert text in to the editor
+/**
+ * Insert text in to the editor
+ *
+ * @param {string} text
+ */
 function onReceiveOpener(text)
 {
 	$('#' + post_box_name).data("sceditor").insert(text);
+}
+
+/**
+ * The actual message icon selector, shows the chosen icon on the post screen
+ */
+function showimage()
+{
+	document.images.icons.src = icon_urls[document.forms.postmodify.icon.options[document.forms.postmodify.icon.selectedIndex].value];
+}
+
+/**
+ * When using Go Back due to fatal_error, allows the form to be re-submitted with change
+ * Done as a pageshow event listener for FF only
+ */
+function reActivate()
+{
+	document.forms.postmodify.message.readOnly = false;
 }

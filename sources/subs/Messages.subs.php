@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file contains functions for dealing with messages.
  * Low-level functions, i.e. database operations needed to perform.
@@ -192,6 +192,38 @@ function prepareMessageContext($message)
 	// Show an "approve" box if the user can approve it, and the message isn't approved.
 	if (! $message['message']['approved'] && !$context['show_approval'])
 		$context['show_approval'] = allowedTo('approve_posts');
+}
+
+
+/**
+ * This function removes all the messages of a certain user that are *not*
+ * first messages of a topic
+ *
+ * @param int The member id
+ */
+function removeNonTopicMessages($memID)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT m.id_msg
+		FROM {db_prefix}messages AS m
+			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic
+				AND t.id_first_msg != m.id_msg)
+		WHERE m.id_member = {int:selected_member}',
+		array(
+			'selected_member' => $memID,
+		)
+	);
+	// This could take a while... but ya know it's gonna be worth it in the end.
+	while ($row = $db->fetch_assoc($request))
+	{
+		if (function_exists('apache_reset_timeout'))
+			@apache_reset_timeout();
+
+		removeMessage($row['id_msg']);
+	}
+	$db->free_result($request);
 }
 
 /**
@@ -576,9 +608,9 @@ function removeMessage($message, $decreasePostCount = true)
 			)
 		);
 
-		// Remove the notifications!
+		// Remove the mentions!
 		$db->query('', '
-			DELETE FROM {db_prefix}log_notifications
+			DELETE FROM {db_prefix}log_mentions
 			WHERE id_msg = {int:id_msg}',
 			array(
 				'id_msg' => $message,

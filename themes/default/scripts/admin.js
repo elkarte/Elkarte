@@ -7,37 +7,41 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * Handle the JavaScript surrounding the admin and moderation center.
  */
 
-/*
-	elk_AdminIndex(oOptions)
-	{
-		public init()
-		public loadAdminIndex()
-		public setAnnouncements()
-		public showCurrentVersion()
-		public checkUpdateAvailable()
-	}
-*/
+/**
+ * 	Admin index class with the following methods
+ * 	elk_AdminIndex(oOptions)
+ * 	{
+ * 		public init()
+ * 		public loadAdminIndex()
+ * 		public setAnnouncements()
+ * 		public showCurrentVersion()
+ * 		public checkUpdateAvailable()
+ * 	}
+ *
+ * @param {object} oOptions
+ */
 function elk_AdminIndex(oOptions)
 {
 	this.opt = oOptions;
 	this.init();
 }
 
+// Initialize the admin index to handle annoucment, currentversion and updates
 elk_AdminIndex.prototype.init = function ()
 {
 	window.adminIndexInstanceRef = this;
 	var fHandlePageLoaded = function () {
 		window.adminIndexInstanceRef.loadAdminIndex();
-	}
+	};
 	addLoadEvent(fHandlePageLoaded);
-}
+};
 
 elk_AdminIndex.prototype.loadAdminIndex = function ()
 {
@@ -52,8 +56,9 @@ elk_AdminIndex.prototype.loadAdminIndex = function ()
 	// Load the text box that sais there's a new version available.
 	if (this.opt.bLoadUpdateNotification)
 		this.checkUpdateAvailable();
-}
+};
 
+// Update the announcement container with news
 elk_AdminIndex.prototype.setAnnouncements = function ()
 {
 	if (!('ourAnnouncements' in window) || !('length' in window.ourAnnouncements))
@@ -63,24 +68,25 @@ elk_AdminIndex.prototype.setAnnouncements = function ()
 	for (var i = 0; i < window.ourAnnouncements.length; i++)
 		sMessages += this.opt.sAnnouncementMessageTemplate.replace('%href%', window.ourAnnouncements[i].href).replace('%subject%', window.ourAnnouncements[i].subject).replace('%time%', window.ourAnnouncements[i].time).replace('%message%', window.ourAnnouncements[i].message);
 
-	setInnerHTML(document.getElementById(this.opt.sAnnouncementContainerId), this.opt.sAnnouncementTemplate.replace('%content%', sMessages));
-}
+	document.getElementById(this.opt.sAnnouncementContainerId).innerHTML = this.opt.sAnnouncementTemplate.replace('%content%', sMessages);
+};
 
+// Updates the current version container with the current version found in current-version.js
 elk_AdminIndex.prototype.showCurrentVersion = function ()
 {
 	if (!('elkVersion' in window))
 		return;
 
-	var oElkVersionContainer = document.getElementById(this.opt.sOurVersionContainerId);
-	var oYourVersionContainer = document.getElementById(this.opt.sYourVersionContainerId);
+	var oElkVersionContainer = document.getElementById(this.opt.sOurVersionContainerId),
+		oYourVersionContainer = document.getElementById(this.opt.sYourVersionContainerId),
+		sCurrentVersion = oYourVersionContainer.innerHTML;
 
-	setInnerHTML(oElkVersionContainer, window.elkVersion);
-
-	var sCurrentVersion = getInnerHTML(oYourVersionContainer);
+	oElkVersionContainer.innerHTML = window.elkVersion;
 	if (sCurrentVersion !== window.elkVersion)
-		setInnerHTML(oYourVersionContainer, this.opt.sVersionOutdatedTemplate.replace('%currentVersion%', sCurrentVersion));
-}
+		oYourVersionContainer.innerHTML = this.opt.sVersionOutdatedTemplate.replace('%currentVersion%', sCurrentVersion);
+};
 
+// Checks if a new version of ElkArte is available and if so updates the admin info box
 elk_AdminIndex.prototype.checkUpdateAvailable = function ()
 {
 	if (!('ourUpdatePackage' in window))
@@ -89,10 +95,10 @@ elk_AdminIndex.prototype.checkUpdateAvailable = function ()
 	var oContainer = document.getElementById(this.opt.sUpdateNotificationContainerId);
 
 	// Are we setting a custom title and message?
-	var sTitle = 'ourUpdateTitle' in window ? window.ourUpdateTitle : this.opt.sUpdateNotificationDefaultTitle;
-	var sMessage = 'ourUpdateNotice' in window ? window.ourUpdateNotice : this.opt.sUpdateNotificationDefaultMessage;
+	var sTitle = 'ourUpdateTitle' in window ? window.ourUpdateTitle : this.opt.sUpdateNotificationDefaultTitle,
+		sMessage = 'ourUpdateNotice' in window ? window.ourUpdateNotice : this.opt.sUpdateNotificationDefaultMessage;
 
-	setInnerHTML(oContainer, this.opt.sUpdateNotificationTemplate.replace('%title%', sTitle).replace('%message%', sMessage));
+	oContainer.innerHTML = this.opt.sUpdateNotificationTemplate.replace('%title%', sTitle).replace('%message%', sMessage);
 
 	// Parse in the package download URL if it exists in the string.
 	document.getElementById('update-link').href = this.opt.sUpdateNotificationLink.replace('%package%', window.ourUpdatePackage);
@@ -105,7 +111,7 @@ elk_AdminIndex.prototype.checkUpdateAvailable = function ()
 		document.getElementById('update_message').style.backgroundColor = '#eebbbb';
 		document.getElementById('update_message').style.color = 'black';
 	}
-}
+};
 
 /*
 	elk_ViewVersions(oOptions)
@@ -124,20 +130,22 @@ function elk_ViewVersions (oOptions)
 	this.init();
 }
 
+// initialize the version checker
 elk_ViewVersions.prototype.init = function ()
 {
 	// Load this on loading of the page.
 	window.viewVersionsInstanceRef = this;
 	var fHandlePageLoaded = function () {
 		window.viewVersionsInstanceRef.loadViewVersions();
-	}
+	};
 	addLoadEvent(fHandlePageLoaded);
-}
+};
 
+// Load all the file versions
 elk_ViewVersions.prototype.loadViewVersions = function ()
 {
 	this.determineVersions();
-}
+};
 
 elk_ViewVersions.prototype.swapOption = function (oSendingElement, sName)
 {
@@ -150,13 +158,16 @@ elk_ViewVersions.prototype.swapOption = function (oSendingElement, sName)
 
 	// Unselect the link and return false.
 	oSendingElement.blur();
-	return false;
-}
 
+	return false;
+};
+
+// compare a current and target version to determine if one is newer/older
 elk_ViewVersions.prototype.compareVersions = function (sCurrent, sTarget)
 {
-	var aVersions = aParts = new Array();
-	var aCompare = new Array(sCurrent, sTarget);
+	var aVersions = [],
+		aParts = [],
+		aCompare = new Array(sCurrent, sTarget);
 
 	for (var i = 0; i < 2; i++)
 	{
@@ -200,8 +211,9 @@ elk_ViewVersions.prototype.compareVersions = function (sCurrent, sTarget)
 
 	// They are the same!
 	return false;
-}
+};
 
+// For each area of ElkArte, determine the current and installed versions
 elk_ViewVersions.prototype.determineVersions = function ()
 {
 	var oHighYour = {
@@ -275,8 +287,8 @@ elk_ViewVersions.prototype.determineVersions = function ()
 		if (!document.getElementById('our' + sFilename))
 			continue;
 
-		var sYourVersion = getInnerHTML(document.getElementById('your' + sFilename));
-		var sCurVersionType;
+		var sYourVersion = document.getElementById('your' + sFilename).innerHTML,
+			sCurVersionType;
 
 		for (var sVersionType in oLowVersion)
 			if (sFilename.substr(0, sVersionType.length) === sVersionType)
@@ -303,8 +315,8 @@ elk_ViewVersions.prototype.determineVersions = function ()
 		else if (this.compareVersions(sYourVersion, ourVersions[sFilename]))
 			oLowVersion[sCurVersionType] = sYourVersion;
 
-		setInnerHTML(document.getElementById('our' + sFilename), ourVersions[sFilename]);
-		setInnerHTML(document.getElementById('your' + sFilename), sYourVersion);
+		document.getElementById('our' + sFilename).innerHTML = ourVersions[sFilename];
+		document.getElementById('your' + sFilename).innerHTML = sYourVersion;
 	}
 
 	if (!('ourLanguageVersions' in window))
@@ -312,15 +324,15 @@ elk_ViewVersions.prototype.determineVersions = function ()
 
 	for (sFilename in window.ourLanguageVersions)
 	{
-		for (var i = 0; i < this.opt.aKnownLanguages.length; i++)
+		for (i = 0; i < this.opt.aKnownLanguages.length; i++)
 		{
 			if (!document.getElementById('our' + sFilename + this.opt.aKnownLanguages[i]))
 				continue;
 
-			setInnerHTML(document.getElementById('our' + sFilename + this.opt.aKnownLanguages[i]), ourLanguageVersions[sFilename]);
+			document.getElementById('our' + sFilename + this.opt.aKnownLanguages[i]).innerHTML = ourLanguageVersions[sFilename];
 
-			sYourVersion = getInnerHTML(document.getElementById('your' + sFilename + this.opt.aKnownLanguages[i]));
-			setInnerHTML(document.getElementById('your' + sFilename + this.opt.aKnownLanguages[i]), sYourVersion);
+			sYourVersion = document.getElementById('your' + sFilename + this.opt.aKnownLanguages[i]).innerHTML;
+			document.getElementById('your' + sFilename + this.opt.aKnownLanguages[i]).innerHTML = sYourVersion;
 
 			if ((this.compareVersions(oHighYour.Languages, sYourVersion) || oHighYour.Languages === '??') && !oLowVersion.Languages)
 				oHighYour.Languages = sYourVersion;
@@ -337,57 +349,66 @@ elk_ViewVersions.prototype.determineVersions = function ()
 	}
 
 	// Set the column titles based on the files each contain
-	setInnerHTML(document.getElementById('yoursources'), oLowVersion.sources ? oLowVersion.sources : oHighYour.sources);
-	setInnerHTML(document.getElementById('oursources'), oHighCurrent.sources);
+	document.getElementById('yoursources').innerHTML = oLowVersion.sources ? oLowVersion.sources : oHighYour.sources;
+	document.getElementById('oursources').innerHTML = oHighCurrent.sources;
 	if (oLowVersion.sources)
 		document.getElementById('yoursources').style.color = 'red';
 
-	setInnerHTML(document.getElementById('youradmin'), oLowVersion.sources ? oLowVersion.sources : oHighYour.sources);
-	setInnerHTML(document.getElementById('ouradmin'), oHighCurrent.sources);
+	document.getElementById('youradmin').innerHTML = oLowVersion.sources ? oLowVersion.sources : oHighYour.sources;
+	document.getElementById('ouradmin').innerHTML = oHighCurrent.sources;
 	if (oLowVersion.sources)
 		document.getElementById('youradmin').style.color = 'red';
 
-	setInnerHTML(document.getElementById('yourcontrollers'), oLowVersion.sources ? oLowVersion.sources : oHighYour.sources);
-	setInnerHTML(document.getElementById('ourcontrollers'), oHighCurrent.sources);
+	document.getElementById('yourcontrollers').innerHTML = oLowVersion.sources ? oLowVersion.sources : oHighYour.sources;
+	document.getElementById('ourcontrollers').innerHTML = oHighCurrent.sources;
 	if (oLowVersion.sources)
 		document.getElementById('yourcontrollers').style.color = 'red';
 
-	setInnerHTML(document.getElementById('yourdatabase'), oLowVersion.sources ? oLowVersion.sources : oHighYour.sources);
-	setInnerHTML(document.getElementById('ourdatabase'), oHighCurrent.sources);
+	document.getElementById('yourdatabase').innerHTML = oLowVersion.sources ? oLowVersion.sources : oHighYour.sources;
+	document.getElementById('ourdatabase').innerHTML = oHighCurrent.sources;
 	if (oLowVersion.sources)
 		document.getElementById('yourdatabase').style.color = 'red';
 
-	setInnerHTML(document.getElementById('yoursubs'), oLowVersion.sources ? oLowVersion.sources : oHighYour.sources);
-	setInnerHTML(document.getElementById('oursubs'), oHighCurrent.sources);
+	document.getElementById('yoursubs').innerHTML = oLowVersion.sources ? oLowVersion.sources : oHighYour.sources;
+	document.getElementById('oursubs').innerHTML = oHighCurrent.sources;
 	if (oLowVersion.sources)
 		document.getElementById('yoursubs').style.color = 'red';
 
-	setInnerHTML(document.getElementById('yourdefault'), oLowVersion.defaults ? oLowVersion.defaults : oHighYour.defaults);
-	setInnerHTML(document.getElementById('ourdefault'), oHighCurrent.defaults);
+	document.getElementById('yourdefault').innerHTML = oLowVersion.defaults ? oLowVersion.defaults : oHighYour.defaults;
+	document.getElementById('ourdefault').innerHTML = oHighCurrent.defaults;
 	if (oLowVersion.defaults)
 		document.getElementById('yourdefaults').style.color = 'red';
 
 	// Custom theme in use?
 	if (document.getElementById('Templates'))
 	{
-		setInnerHTML(document.getElementById('yourTemplates'), oLowVersion.Templates ? oLowVersion.Templates : oHighYour.Templates);
-		setInnerHTML(document.getElementById('ourTemplates'), oHighCurrent.Templates);
+		document.getElementById('yourTemplates').innerHTML = oLowVersion.Templates ? oLowVersion.Templates : oHighYour.Templates;
+		document.getElementById('ourTemplates').innerHTML = oHighCurrent.Templates;
 
 		if (oLowVersion.Templates)
 			document.getElementById('yourTemplates').style.color = 'red';
 	}
 
-	setInnerHTML(document.getElementById('yourLanguages'), oLowVersion.Languages ? oLowVersion.Languages : oHighYour.Languages);
-	setInnerHTML(document.getElementById('ourLanguages'), oHighCurrent.Languages);
+	document.getElementById('yourLanguages').innerHTML = oLowVersion.Languages ? oLowVersion.Languages : oHighYour.Languages;
+	document.getElementById('ourLanguages').innerHTML = oHighCurrent.Languages;
 	if (oLowVersion.Languages)
 		document.getElementById('yourLanguages').style.color = 'red';
-}
+};
 
+/**
+ * Adds a new word container to the censored word list
+ */
 function addNewWord()
 {
-	setOuterHTML(document.getElementById('moreCensoredWords'), '<div style="margin-top: 1ex;"><input type="text" name="censor_vulgar[]" size="30" class="input_text" /> => <input type="text" name="censor_proper[]" size="30" class="input_text" /><' + '/div><div id="moreCensoredWords"><' + '/div>');
+	setOuterHTML(document.getElementById('moreCensoredWords'), '<div class="censorWords"><input type="text" name="censor_vulgar[]" size="30" class="input_text" /> => <input type="text" name="censor_proper[]" size="30" class="input_text" /><' + '/div><div id="moreCensoredWords"><' + '/div>');
 }
 
+/**
+ * Will enable/disable checkboxes, according to if the BBC globally set or not.
+ *
+ * @param {string} section id of the container
+ * @param {string} disable true or false
+ */
 function toggleBBCDisabled(section, disable)
 {
 	elems = document.getElementById(section).getElementsByTagName('*');
@@ -401,6 +422,10 @@ function toggleBBCDisabled(section, disable)
 	document.getElementById("bbc_" + section + "_select_all").disabled = disable;
 }
 
+/**
+ * Keeps the input boxes display options appropriate for the options selected
+ * when adding custom profile fields
+ */
 function updateInputBoxes()
 {
 	curType = document.getElementById("field_type").value;
@@ -430,12 +455,18 @@ function updateInputBoxes()
 	}
 }
 
+/**
+ * Used to add additional radio button options when editing a custom profile field
+ */
 function addOption()
 {
 	setOuterHTML(document.getElementById("addopt"), '<br /><input type="radio" name="default_select" value="' + startOptID + '" id="' + startOptID + '" class="input_radio" /><input type="text" name="select_option[' + startOptID + ']" value="" class="input_text" /><span id="addopt"></span>');
 	startOptID++;
 }
 
+/**
+ * Adds another question to the registration page
+ */
 function addAnotherQuestion()
 {
 	var placeHolder = document.getElementById('add_more_question_placeholder');
@@ -448,6 +479,12 @@ function addAnotherQuestion()
 	question_last_blank++;
 }
 
+/**
+ * Every question should have an answer, even if its a lie
+ *
+ * @param {string} elem
+ * @param {string} question_name
+ */
 function addAnotherAnswer(elem, question_name)
 {
 	setOuterHTML(elem, add_answer_template.easyReplace({
@@ -456,6 +493,13 @@ function addAnotherAnswer(elem, question_name)
 	}));
 }
 
+/**
+ * Used to add new search engines to the known list
+ *
+ * @param {string} txt_name
+ * @param {string} txt_url
+ * @param {string} txt_word_sep
+ */
 function addAnotherSearch(txt_name, txt_url, txt_word_sep)
 {
 	var placeHolder = document.getElementById('add_more_searches'),
@@ -508,80 +552,6 @@ function addAnotherSearch(txt_name, txt_url, txt_word_sep)
 }
 
 /**
- * Add a new dt/dd pair above a parent selector
- * Called most often as a callback option in config options
- * If oData is supplied, will create a select list, populated with that data
- * otherwise a standard input box.
- *
- * @param {string} parent id of the parent "add more button: we will place this before
- * @param {object} oDtName object of dt element options (type, class, size)
- * @param {object} oDdName object of the dd element options (type, clase size)
- * @param {object} oData optional select box object, 1:{id:value,name:display name}, ...
- */
-function addAnotherOption(parent, oDtName, oDdName, oData)
-{
-	// Some defaults to use if none are passed
-	oDtName['type'] = oDtName['type'] || 'text';
-	oDtName['class'] = oDtName['class'] || 'input_text';
-	oDtName['size'] = oDtName['size'] || '20';
-
-	oDdName['type'] = oDdName['type'] || 'text';
-	oDdName['class'] = oDdName['class'] || 'input_text';
-	oDdName['size'] = oDdName['size'] || '20';
-	oData = oData || '';
-
-	// Our new <dt> element
-	var newDT = document.createElement('dt'),
-		newInput = document.createElement('input');
-
-	newInput.name = oDtName['name'];
-	newInput.type = oDtName['type'];
-	newInput.setAttribute('class', oDtName['class']);
-	newInput.size = oDtName['size'];
-	newDT.appendChild(newInput);
-
-	// And its matching <dd>
-	var newDD = document.createElement('dd');
-
-	// If we have data for this field make it a select
-	if (oData === '')
-		newInput = document.createElement('input');
-	else
-		newInput = document.createElement('select');
-
-	newInput.name = oDdName['name'];
-	newInput.type = oDdName['type'];
-	newInput.size = oDdName['size'];
-	newInput.setAttribute('class', oDdName['class']);
-	newDD.appendChild(newInput);
-
-	// If its a select box we add in the options
-	if (oData !== '')
-	{
-		// The options are childen of the newInput select box
-		var opt = null,
-			key = null,
-			obj = {};
-
-		for (key in oData)
-		{
-			obj = oData[key];
-			opt = document.createElement("option");
-			opt.name = "option";
-			opt.value = obj.id;
-			opt.innerHTML = obj.name;
-			newInput.appendChild(opt);
-		}
-	}
-
-	// Place the new dt/dd pair before our parent
-	var placeHolder = document.getElementById(parent);
-
-	placeHolder.parentNode.insertBefore(newDT, placeHolder);
-	placeHolder.parentNode.insertBefore(newDD, placeHolder);
-}
-
-/**
  * News admin page
  */
 function addAnotherNews()
@@ -599,9 +569,15 @@ function addAnotherNews()
 	make_preview_btn(last_preview);
 }
 
+/**
+ * Makes the preview button when in manage news
+ *
+ * @param {string} preview_id
+ */
 function make_preview_btn (preview_id)
 {
 	var $id = $("#preview_" + preview_id);
+
 	$id.text(txt_preview).click(function () {
 		$.ajax({
 			type: "POST",
@@ -610,22 +586,32 @@ function make_preview_btn (preview_id)
 			context: document.body
 		})
 		.done(function(request) {
-			if ($(request).find("error").text() == '')
+			if ($(request).find("error").text() === '')
 				$(document).find("#box_preview_" + preview_id).html($(request).text());
 			else
 				$(document).find("#box_preview_" + preview_id).text(txt_news_error_no_news);
 		});
 	});
+
 	if (!$id.parent().hasClass('linkbutton_right'))
 		$id.wrap('<a class="linkbutton_right" href="javascript:void(0);"></a>');
 }
 
+/**
+ * Used by manage themes to show the thumbnail of the theme variant chosen
+ *
+ * @param {string} sVariant
+ */
 function changeVariant(sVariant)
 {
 	document.getElementById('variant_preview').src = oThumbnails[sVariant];
 }
 
-// The idea here is simple: don't refresh the preview on every keypress, but do refresh after they type.
+/**
+ * The idea here is simple: don't refresh the preview on every keypress, but do refresh after they type.
+ *
+ * @returns {undefined}
+ */
 function setPreviewTimeout()
 {
 	if (previewTimeout)
@@ -634,51 +620,24 @@ function setPreviewTimeout()
 		previewTimeout = null;
 	}
 
-	previewTimeout = window.setTimeout("refreshPreview(true); previewTimeout = null;", 500);
+	previewTimeout = window.setTimeout(function() {refreshPreview(true); previewTimeout = null;}, 500);
 }
 
+/**
+ * Used in manage paid subscriptions to show the fixed duration panel or
+ * the variable duration panel, based on which radio button is selected
+ *
+ * @param {type} toChange
+ */
 function toggleDuration(toChange)
 {
-	if (toChange === 'fixed')
-	{
-		document.getElementById("fixed_area").style.display = "inline";
-		document.getElementById("flexible_area").style.display = "none";
-	}
-	else
-	{
-		document.getElementById("fixed_area").style.display = "none";
-		document.getElementById("flexible_area").style.display = "inline";
-	}
+	$("#fixed_area").slideToggle(300);
+	$("#flexible_area").slideToggle(300);
 }
 
-function toggleBreakdown(id_group, forcedisplayType)
-{
-	displayType = document.getElementById("group_hr_div_" + id_group).style.display === "none" ? "" : "none";
-	if (typeof(forcedisplayType) !== "undefined")
-		displayType = forcedisplayType;
-
-	// swap the image
-	document.getElementById("group_toggle_img_" + id_group).src = elk_images_url + "/" + (displayType === "none" ? "selected" : "selected_open") + ".png";
-
-	// show or hide the elements
-	var aContainer = new Array();
-	for (i = 0; i < groupPermissions[id_group].length; i++)
-	{
-		var oContainerTemp = document.getElementById("perm_div_" + id_group + "_" + groupPermissions[id_group][i]);
-		if (typeof(oContainerTemp) === 'object' && oContainerTemp !== null)
-			aContainer[i] = oContainerTemp;
-	}
-	if (displayType === "none")
-		$(aContainer).fadeOut();
-	else
-		$(aContainer).show();
-
-	// remove or add the separators
-	document.getElementById("group_hr_div_" + id_group).style.display = displayType;
-
-	return false;
-}
-
+/**
+ * Used when editing the search weights for results, calculates the overall total weight
+ */
 function calculateNewValues()
 {
 	var total = 0;
@@ -686,37 +645,55 @@ function calculateNewValues()
 	{
 		total += parseInt(document.getElementById('weight' + i + '_val').value);
 	}
-	setInnerHTML(document.getElementById('weighttotal'), total);
-	for (var i = 1; i <= 6; i++)
+
+	document.getElementById('weighttotal').innerHTML = total;
+	for (i = 1; i <= 6; i++)
 	{
-		setInnerHTML(document.getElementById('weight' + i), (Math.round(1000 * parseInt(document.getElementById('weight' + i + '_val').value) / total) / 10) + '%');
+		document.getElementById('weight' + i).innerHTML = (Math.round(1000 * parseInt(document.getElementById('weight' + i + '_val').value) / total) / 10) + '%';
 	}
 }
 
+/**
+ * Toggle visibility of add smile image source options
+ */
 function switchType()
 {
 	document.getElementById("ul_settings").style.display = document.getElementById("method-existing").checked ? "none" : "";
 	document.getElementById("ex_settings").style.display = document.getElementById("method-upload").checked ? "none" : "";
 }
 
+/**
+ * Toggle visibility of smiley set should the user want differnt images in a set (add smiley)
+ */
 function swapUploads()
 {
 	document.getElementById("uploadMore").style.display = document.getElementById("uploadSmiley").disabled ? "none" : "";
 	document.getElementById("uploadSmiley").disabled = !document.getElementById("uploadSmiley").disabled;
 }
 
+/**
+ * Close the options that should not be visible for adding a smiley
+ *
+ * @param {string} element
+ */
 function selectMethod(element)
 {
 	document.getElementById("method-existing").checked = element !== "upload";
 	document.getElementById("method-upload").checked = element === "upload";
 }
 
+/**
+ * Updates the smiley preview to show the current one chosen
+ */
 function updatePreview()
 {
 	var currentImage = document.getElementById("preview");
 	currentImage.src = elk_smiley_url + "/" + document.forms.smileyForm.set.value + "/" + document.forms.smileyForm.smiley_filename.value;
 }
 
+/**
+ * Used in package manager to swap the visibility of database changes
+ */
 function swap_database_changes()
 {
 	db_vis = !db_vis;
@@ -724,6 +701,9 @@ function swap_database_changes()
 	return false;
 }
 
+/**
+ * Test the given form credentials to test if an FTP connection can be made
+ */
 function testFTP()
 {
 	ajax_indicator(true);
@@ -745,6 +725,75 @@ function testFTP()
 	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=packages;sa=ftptest;xml;' + elk_session_var + '=' + elk_session_id, sPostData, testFTPResults);
 }
 
+/**
+ * Generate a "test ftp" button.
+ */
+function generateFTPTest()
+{
+	// Don't ever call this twice!
+	if (generatedButton)
+		return false;
+
+	generatedButton = true;
+
+	// No XML?
+	if (!window.XMLHttpRequest || (!document.getElementById("test_ftp_placeholder") && !document.getElementById("test_ftp_placeholder_full")))
+		return false;
+
+	// create our test button to call testFTP on click
+	var ftpTest = document.createElement("input");
+	ftpTest.type = "button";
+	ftpTest.className = "right_submit";
+	ftpTest.onclick = testFTP;
+
+	// Set the button value based on which form we are on
+	if (document.getElementById("test_ftp_placeholder"))
+	{
+		ftpTest.value = package_ftp_test;
+		document.getElementById("test_ftp_placeholder").appendChild(ftpTest);
+	}
+	else
+	{
+		ftpTest.value = package_ftp_test_connection;
+		document.getElementById("test_ftp_placeholder_full").appendChild(ftpTest);
+	}
+}
+
+/**
+ * Callback function of the testFTP function
+ *
+ * @param {type} oXMLDoc
+ */
+function testFTPResults(oXMLDoc)
+{
+	ajax_indicator(false);
+
+	// This assumes it went wrong!
+	var wasSuccess = false,
+		message = package_ftp_test_failed,
+		results = oXMLDoc.getElementsByTagName('results')[0].getElementsByTagName('result');
+
+	// Results show we were a success
+	if (results.length > 0)
+	{
+		if (results[0].getAttribute('success') === 1)
+			wasSuccess = true;
+		message = results[0].firstChild.nodeValue;
+	}
+
+	// place the informative box on screen so the user knows if things went well or poorly
+	document.getElementById("ftp_error_div").style.display = "";
+	document.getElementById("ftp_error_div").className = wasSuccess ? "successbox" : "errorbox";
+	document.getElementById("ftp_error_message").innerHTML = message;
+}
+
+/**
+ * Part of package manager, expands a folders contents to show permission levels of files it contains
+ * Will use an ajax call to get any permissions it has not loaded
+ *
+ * @param {type} folderIdent
+ * @param {type} folderReal
+ */
 function expandFolder(folderIdent, folderReal)
 {
 	// See if it already exists.
@@ -778,6 +827,9 @@ function expandFolder(folderIdent, folderReal)
 	return false;
 }
 
+/**
+ * Wrapper function to call expandFolder
+ */
 function dynamicExpandFolder()
 {
 	expandFolder(this.ident, this.path);
@@ -785,14 +837,13 @@ function dynamicExpandFolder()
 	return false;
 }
 
-function repeatString(sString, iTime)
-{
-	if (iTime < 1)
-		return '';
-	else
-		return sString + repeatString(sString, iTime - 1);
-}
-
+/**
+ * Used when edit the boards and groups access to them
+ *
+ * @param {type} cat_id
+ * @param {type} elem
+ * @param {type} brd_list
+ */
 function select_in_category(cat_id, elem, brd_list)
 {
 	for (var brd in brd_list)
@@ -801,9 +852,10 @@ function select_in_category(cat_id, elem, brd_list)
 	elem.selectedIndex = 0;
 }
 
-/*
-* Server Settings > Caching
-*/
+/**
+ * Server Settings > Caching, toggles input fields on/off as appropriate for
+ * a given cache engine selection
+ */
 function toggleCache ()
 {
 	var memcache = document.getElementById('cache_memcached'),
@@ -854,7 +906,7 @@ function toggleCache ()
 	}
 }
 
-/*
+/**
  * Attachments Settings
  */
 function toggleSubDir ()
@@ -883,11 +935,14 @@ function toggleSubDir ()
 		toggleBaseDir();
 }
 
+/**
+ * Called by toggleSubDir as part of manage attachments
+ */
 function toggleBaseDir ()
 {
-	var auto_attach = document.getElementById('automanage_attachments');
-	var sub_dir = document.getElementById('use_subdirectories_for_attachments');
-	var dir_elem = document.getElementById('basedirectory_for_attachments');
+	var auto_attach = document.getElementById('automanage_attachments'),
+		sub_dir = document.getElementById('use_subdirectories_for_attachments'),
+		dir_elem = document.getElementById('basedirectory_for_attachments');
 
 	if (auto_attach.selectedIndex === 0)
 	{
@@ -897,227 +952,94 @@ function toggleBaseDir ()
 		dir_elem.disabled = !sub_dir.checked;
 }
 
-// Drag and drop to reorder ID's via UI Sortable
-(function($) {
-	'use strict';
-	$.fn.elkSortable = function(oInstanceSettings) {
-		$.fn.elkSortable.oDefaultsSettings = {
-			opacity: 0.7,
-			cursor: 'move',
-			axis: 'y',
-			scroll: true,
-			containment: 'parent',
-			delay: 150,
-			href: '', // If an error occurs redirect here
-			tolerance: 'intersect', // mode to use for testing whether the item is hovering over another item.
-			setorder: 'serialize', // how to return the data, really only supports serialize and inorder
-			placeholder: '', // css class used to style the landing zone
-			preprocess: '', // This function is called at the start of the update event (when the item is dropped) must in in global space
-			tag: '#table_grid_sortable', // ID(s) of the container to work with, single or comma separated
-			connect: '', // Use to group all related containers with a common CSS class
-			sa: '', // Subaction that the xmlcontroller should know about
-			title: '', // Title of the error box
-			error: '', // What to say when we don't know what happened, like connection error
-			token: '' // Security token if needed
-		};
-
-		// Account for any user options
-		var oSettings = $.extend({}, $.fn.elkSortable.oDefaultsSettings, oInstanceSettings || {});
-
-		// Divs to hold our responses
-		var	ajax_infobar = document.createElement('div'),
-			ajax_errorbox = document.createElement('div');
-
-		// Prepare the infobar and errorbox divs to confirm valid responses or show an error
-		$(ajax_infobar).css({'position': 'fixed', 'top': '0', 'left': '0', 'width': '100%'});
-		$("body").append(ajax_infobar);
-		$(ajax_infobar).slideUp();
-		$(ajax_errorbox).css({'display': 'none'});
-		$("body").append(ajax_errorbox).attr('id', 'errorContainer');
-
-		// Find all oSettings.tag and attach the UI sortable action
-		$(oSettings.tag).sortable({
-			opacity: oSettings.opacity,
-			cursor: oSettings.cursor,
-			axis: oSettings.axis,
-			containment: oSettings.containment,
-			connectWith: oSettings.connect,
-			placeholder: oSettings.placeholder,
-			tolerance: oSettings.tolerance,
-			delay: oSettings.delay,
-			scroll: oSettings.scroll,
-			helper: function(e, ui) {
-				// Create a clone of the element being dragged, add it to the body, and hide it
-				$('body').append('<div id="clone" class="' + oSettings.placeholder + '">' + ui.html() + '</div>');
-				$('#clone').hide();
-
-				// Now append the clone element to the container we are working in and show it
-				setTimeout(function() {
-					$('#clone').appendTo(ui.parent());
-					$("#clone").show();
-				}, 1);
-
-				// This process allows page scrolls to work
-				return $("#clone");
-			},
-			update: function(e, ui) {
-				// Called when an element is dropped in a new location
-				var postdata = '',
-					moved = ui.item.attr('id'),
-					order = [],
-					receiver = ui.item.parent().attr('id');
-
-				// Calling a pre processing function?
-				if (oSettings.preprocess !== '')
-					window[oSettings.preprocess]();
-
-				// How to post the sorted data
-				if (oSettings.setorder === 'inorder')
-				{
-					// This will get the order in 1-n as shown on the screen
-					$(oSettings.tag).find('li').each(function() {
-						var aid = $(this).attr('id').split('_');
-						order.push({name: aid[0] + '[]', value: aid[1]});
-					});
-					postdata = $.param(order);
-				}
-				else
-				// Get all id's in all the sortable containers
-				{
-					$(oSettings.tag).each(function() {
-						// Serialize will be 1-n of each nesting / connector
-						if (postdata === "")
-						   postdata += $(this).sortable(oSettings.setorder);
-						else
-						   postdata += "&" + $(this).sortable(oSettings.setorder);
-					});
-				}
-
-				// Add in our security tags and additional options
-				postdata += '&' + elk_session_var + '=' + elk_session_id;
-				postdata += '&order=reorder';
-				postdata += '&moved=' + moved;
-				postdata += '&received=' + receiver;
-
-				if (oSettings.token !== '')
-					postdata += '&' + oSettings.token['token_var'] + '=' + oSettings.token['token_id'];
-
-				// And with the post data prepared, lets make the ajax request
-				$.ajax({
-					type: "POST",
-					url: elk_scripturl + "?action=xmlhttp;sa=" + oSettings.sa + ";xml",
-					dataType: "xml",
-					data: postdata
-				})
-				.fail(function(jqXHR, textStatus, errorThrown) {
-					$(ajax_infobar).attr('class', 'errorbox');
-					$(ajax_infobar).html(textStatus).slideDown('fast');
-					setTimeout(function() {
-						$(ajax_infobar).slideUp();
-					}, 3500);
-					// Reset the interface?
-					if (oSettings.href !== '')
-						setTimeout(function() {
-							window.location.href = elk_scripturl + oSettings.href;
-						}, 1000);
-				})
-				.done(function(data, textStatus, jqXHR) {
-					if ($(data).find("error").length !== 0)
-					{
-						// Errors get a modal dialog box and redirect on close
-						$('#errorContainer').append('<p id="errorContent"></p>');
-						$('#errorContent').html($(data).find("error").text());
-						$('#errorContent').dialog({
-							autoOpen: true,
-							title: oSettings.title,
-							modal: true,
-							close: function(event, ui) {
-								// Redirecting due to the error, thats a good idea
-								if (oSettings.href !== '')
-									window.location.href = elk_scripturl + oSettings.href;
-							}
-						});
-					}
-					else if ($(data).find("elk").length !== 0)
-					{
-						// Valid responses get the unobtrusive slider
-						$(ajax_infobar).attr('class', 'infobox');
-						$(ajax_infobar).html($(data).find('elk > orders > order').text()).slideDown('fast');
-						setTimeout(function() {
-							$(ajax_infobar).slideUp();
-						}, 3500);
-					}
-					else
-					{
-						// Something "other" happened ...
-						$('#errorContainer').append('<p id="errorContent"></p>');
-						$('#errorContent').html(oSettings.error + ' : ' + textStatus);
-						$('#errorContent').dialog({autoOpen: true, title: oSettings.title, modal: true});
-					}
-				})
-				.always(function(data, textStatus, jqXHR) {
-					if (textStatus === 'success' && $(data).find("elk > tokens > token").length !== 0)
-					{
-						// Reset the token
-						oSettings.token['token_id'] = $(data).find("tokens").find('[type="token"]').text();
-						oSettings.token['token_var'] = $(data).find("tokens").find('[type="token_var"]').text();
-					}
-				});
-			}
-		});
-	};
-})(jQuery);
 
 /**
- * Helper function used in the preprocess call for drag/drop boards
- * Sets the id of all 'li' elements to cat#,board#,childof# for use in the
- * $_POST back to the xmlcontroller
+ * Called from purgeinactive users maintance task, used to show or hide
+ * the membergroup list.  If collapsed will select all the member groups if expanded
+ * unslect them so the user can choose.
  */
-function setBoardIds() {
-	// For each category of board
-	$("[id^=category_]").each(function() {
-		var cat = $(this).attr('id').split('category_'),
-			uls = $(this).find("ul");
+function swapMembers()
+{
+	var membersForm = document.getElementById('membersForm');
 
-		// First up add drop zones so we can drag and drop to each level
-		if (uls.length === 1)
-		{
-			// A single empty ul in a category, this can happen when a cat is dragged empty
-			if ($(uls).find("li").length === 0)
-				$(uls).append('<li id="cbp_' + cat + ',-1,-1"></li>');
-			// Otherwise the li's need a child ul so we have a "child-of" drop zone
-			else
-				$(uls).find("li:not(:has(ul))").append('<ul class="nolist"></ul>');
-		}
-		// All others normally
-		else
-			$(uls).find("li:not(:has(ul))").append('<ul class="nolist"></ul>');
+	// Make it close smoothly
+	$("#membersPanel").slideToggle(300);
 
-		// Next make find all the ul's in this category that have children, update the
-		// id's with information that indicates the 1-n and parent/child info
-		$(this).find('ul:parent').each(function(i, ul) {
+	membersSwap = !membersSwap;
+	document.getElementById("membersIcon").src = elk_images_url + (membersSwap ? "/selected_open.png" : "/selected.png");
+	document.getElementById("membersText").innerHTML = membersSwap ? maintain_members_choose : maintain_members_all;
 
-			// Get the (li) parent of this ul
-			var parentList = $(this).parent('li').attr('id'),
-				pli = 0;
+	// Check or uncheck them all based on if we are expanding or collasping the area
+	for (var i = 0; i < membersForm.length; i++)
+	{
+		if (membersForm.elements[i].type.toLowerCase() === "checkbox")
+			membersForm.elements[i].checked = !membersSwap;
+	}
+}
 
-			// No parent, then its a base node 0, else its a child-of this node
-			if (typeof(parentList) !== "undefined")
-			{
-				pli = parentList.split(",");
-				pli = pli[1];
-			}
+/**
+ * Called from reattribute member posts to build the confirm message for the action
+ * Keeps the action button (reattribute) disabled until all necessary fields have been filled
+ */
+function checkAttributeValidity()
+{
+	origText = reattribute_confirm;
+	valid = true;
 
-			// Now for each li in this ul
-			$(this).find('li').each(function(i, el) {
-				var currentList =  $(el).attr('id');
-				var myid = currentList.split(",");
+	// Do all the fields!
+	if (!document.getElementById('to').value)
+		valid = false;
 
-				// Remove the old id, insert the newly computed cat,brd,childof
-				$(el).removeAttr("id");
-				myid = "cbp_" + cat[1] + "," + myid[1] + "," + pli;
-				$(el).attr('id', myid);
-			});
-		});
-	});
+	warningMessage = origText.replace(/%member_to%/, document.getElementById('to').value);
+
+	// Using email address to find the member
+	if (document.getElementById('type_email').checked)
+	{
+		if (!document.getElementById('from_email').value)
+			valid = false;
+
+		warningMessage = warningMessage.replace(/%type%/, '', reattribute_confirm_email).replace(/%find%/, document.getElementById('from_email').value);
+	}
+	// Or the user name
+	else
+	{
+		if (!document.getElementById('from_name').value)
+			valid = false;
+
+		warningMessage = warningMessage.replace(/%type%/, '', reattribute_confirm_username).replace(/%find%/, document.getElementById('from_name').value);
+	}
+
+	document.getElementById('do_attribute').disabled = valid ? false : true;
+
+	// Keep checking for a valid form so we can activate the submit button
+	setTimeout(function() {checkAttributeValidity();}, 500);
+
+	return valid;
+}
+
+/**
+ * Function for showing which boards to prune in an otherwise hidden list.
+ * Used by topic maintenance task, will select all boards when collapsed or allow
+ * specific boards to be chosen when expanded
+ */
+function swapRot()
+{
+	rotSwap = !rotSwap;
+
+	// Toggle icon
+	document.getElementById("rotIcon").src = elk_images_url + (rotSwap ? "/selected_open.png" : "/selected.png");
+	document.getElementById("rotText").innerHTML = rotSwap ? maintain_old_choose : maintain_old_all;
+
+	// Toggle panel
+	$("#rotPanel").slideToggle(300);
+
+	// Toggle checkboxes
+	var rotPanel = document.getElementById("rotPanel"),
+		oBoardCheckBoxes = rotPanel.getElementsByTagName("input");
+
+	for (var i = 0; i < oBoardCheckBoxes.length; i++)
+	{
+		if (oBoardCheckBoxes[i].type.toLowerCase() === "checkbox")
+			oBoardCheckBoxes[i].checked = !rotSwap;
+	}
 }

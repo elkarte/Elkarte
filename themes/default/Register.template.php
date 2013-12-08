@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -85,7 +85,7 @@ function template_registration_form()
 		<script><!-- // --><![CDATA[
 			function verifyAgree()
 			{
-				if (currentAuthMethod == \'passwd\' && document.forms.registration.elk_autov_pwmain.value != document.forms.registration.elk_autov_pwverify.value)
+				if (currentAuthMethod === \'passwd\' && document.forms.registration.elk_autov_pwmain.value !== document.forms.registration.elk_autov_pwverify.value)
 				{
 					alert("', $txt['register_passwords_differ_js'], '");
 					return false;
@@ -148,7 +148,7 @@ function template_registration_form()
 					<dl class="register_form" id="authentication_group">
 						<dt>
 							<strong>', $txt['authenticate_label'], ':</strong>
-							<a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="help">(?)</a>
+							<a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="help"><img class="icon" src="' . $settings['images_url'] . '/helptopics.png" alt="(?)" /></a>
 						</dt>
 						<dd>
 							<label for="auth_pass" id="option_auth_pass">
@@ -346,13 +346,13 @@ function template_registration_form()
 
 	if ($context['visual_verification'])
 	{
-		echo '
-			<h3 class="category_header">', $txt['verification'], '</h3>
+		template_control_verification($context['visual_verification_id'], '
+			<h3 class="category_header">' . $txt['verification'] . '</h3>
 			<div class="windowbg2">
 				<fieldset class="content centertext">
-					', template_control_verification($context['visual_verification_id'], 'all'), '
+					', '
 				</fieldset>
-			</div>';
+			</div>');
 	}
 
 	echo '
@@ -390,6 +390,7 @@ function template_registration_form()
 				"password_valid": "', $txt['registration_password_valid'], '"
 			};
 			var verificationHandle = new elkRegister("registration", ', empty($modSettings['password_strength']) ? 0 : $modSettings['password_strength'], ', regTextStrings);
+
 			// Update the authentication status.
 			updateAuthMethod();
 		// ]]></script>';
@@ -510,15 +511,17 @@ function template_verification_sound()
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<title>', $txt['visual_verification_sound'], '</title>
 		<meta name="robots" content="noindex" />
-		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?alp21" />
-		<style>';
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index.css?beta10" />
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?beta10" />';
 
 	// Just show the help text and a "close window" link.
 	echo '
-		</style>
 	</head>
 	<body style="margin: 1ex;">
-		<div class="windowbg description centertext">';
+		<div class="windowbg description centertext">
+			<a href="', $context['verification_sound_href'], ';sound" rel="nofollow">
+				<span style="font-size: 4em;">&#128266;</span>
+			</a><br />';
 
 	if (isBrowser('is_ie'))
 		echo '
@@ -528,15 +531,13 @@ function template_verification_sound()
 			</object>';
 	else
 		echo '
-			<object type="audio/x-wav" data="', $context['verification_sound_href'], '">
-				<a href="', $context['verification_sound_href'], '" rel="nofollow">', $context['verification_sound_href'], '</a>
-			</object>';
+			<object type="audio/x-wav" data="', $context['verification_sound_href'], '"></object>';
 
 	echo '
-		<br />
-		<a href="', $context['verification_sound_href'], ';sound" rel="nofollow">', $txt['visual_verification_sound_again'], '</a><br />
-		<a href="', $context['verification_sound_href'], '" rel="nofollow">', $txt['visual_verification_sound_direct'], '</a><br /><br />
-		<a href="javascript:self.close();">', $txt['visual_verification_sound_close'], '</a><br />
+			<br />
+			<a href="', $context['verification_sound_href'], ';sound" rel="nofollow">', $txt['visual_verification_sound_again'], '</a><br />
+			<a href="', $context['verification_sound_href'], '" rel="nofollow">', $txt['visual_verification_sound_direct'], '</a><br /><br />
+			<a href="javascript:self.close();">', $txt['visual_verification_sound_close'], '</a><br />
 		</div>
 	</body>
 </html>';
@@ -558,7 +559,7 @@ function template_admin_register()
 
 	if (!empty($context['registration_done']))
 		echo '
-					<div class="infobox">
+					<div class="successbox">
 						', $context['registration_done'], '
 					</div>';
 
@@ -782,13 +783,13 @@ function template_contact_form()
 
 	if ($context['require_verification'])
 	{
-			echo '
+			template_control_verification($context['visual_verification_id'], '
 					<dt>
-							', $txt['verification'], ':
+							' . $txt['verification'] . ':
 					</dt>
 					<dd>
-							', template_control_verification($context['visual_verification_id'], 'all'), '
-					</dd>';
+							', '
+					</dd>');
 	}
 
 	echo '

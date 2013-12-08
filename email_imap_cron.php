@@ -5,7 +5,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * Should be run from a cron job to fetch messages from an imap mailbox
  * Can be called from scheduled tasks (fake-cron) if needed

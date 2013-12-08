@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -133,7 +133,7 @@ function template_select_search_method()
 
 	echo '
 					</dl>
-					', $context['double_index'] ? '<div class="noticebox">
+					', $context['double_index'] ? '<div class="warningbox">
 					' . $txt['search_double_index'] . '</div>' : '', '
 					<fieldset class="search_settings">
 						<legend>', $txt['search_index'], '</legend>
@@ -294,8 +294,9 @@ function template_create_index_progress()
 		</form>
 	</div>
 	<script><!-- // --><![CDATA[
-		var countdown = 10;
-		var txt_message = "', $txt['search_create_index_continue'], '";
+		var countdown = 10,
+			txt_message = "', $txt['search_create_index_continue'], '";
+				
 		doAutoSubmit();
 	// ]]></script>';
 }
@@ -448,7 +449,7 @@ function template_manage_sphinx()
 	if (!empty($context['settings_message']))
 	{
 		echo '
-			<div class="', (empty($context['error_type']) ? 'infobox' : ($context['error_type'] !== 'serious' ? 'noticebox' : 'errorbox')), '" id="errors">
+			<div class="', (empty($context['error_type']) ? 'successbox' : ($context['error_type'] !== 'serious' ? 'warningbox' : 'errorbox')), '" id="errors">
 				<ul>
 					<li>', implode('</li><li>', $context['settings_message']), '</li>
 				</ul>
@@ -457,7 +458,7 @@ function template_manage_sphinx()
 
 	echo '
 			<div class="information">
-				<div class="infobox">',
+				<div class="successbox">',
 					$context['page_description'], '
 				</div>
 			</div>

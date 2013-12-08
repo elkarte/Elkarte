@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  */
 
@@ -46,7 +46,7 @@ class Display_Controller
 	{
 		global $scripturl, $txt, $modSettings, $context, $settings;
 		global $options, $user_info, $board_info, $topic, $board;
-		global $attachments, $messages_request, $topicinfo, $language;
+		global $attachments, $messages_request, $language;
 
 		// What are you gonna display if these are empty?!
 		if (empty($topic))
@@ -54,6 +54,7 @@ class Display_Controller
 
 		// Load the template
 		loadTemplate('Display');
+		$context['sub_template'] = 'messages';
 
 		// And the topic functions
 		require_once(SUBSDIR . '/Topic.subs.php');
@@ -69,6 +70,7 @@ class Display_Controller
 		// How much are we sticking on each page?
 		$context['messages_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
 		$template_layers = Template_Layers::getInstance();
+		$template_layers->addEnd('messages_informations');
 
 		// Let's do some work on what to search index.
 		if (count($_GET) > 2)
@@ -106,17 +108,12 @@ class Display_Controller
 			$_SESSION['last_read_topic'] = $topic;
 		}
 
-		$topic_parameters = array(
-			'member' => $user_info['id'],
-			'topic' => $topic,
-			'board' => $board,
-		);
 		$topic_selects = array();
 		$topic_tables = array();
 		call_integration_hook('integrate_display_topic', array(&$topic_selects, &$topic_tables, &$topic_parameters));
 
 		// Load the topic details
-		$topicinfo = getTopicInfo($topic_parameters, 'all', $topic_selects, $topic_tables);
+		$topicinfo = getTopicInfo($topic, 'all', $topic_selects, $topic_tables);
 		if (empty($topicinfo))
 			fatal_lang_error('not_a_topic', false);
 
@@ -221,17 +218,17 @@ class Display_Controller
 			}
 		}
 
-		// Mark the notification as read if requested
-		if (isset($_REQUEST['notifread']) && !empty($virtual_msg))
+		// Mark the mention as read if requested
+		if (isset($_REQUEST['mentionread']) && !empty($virtual_msg))
 		{
-			require_once(CONTROLLERDIR . '/Notification.controller.php');
+			require_once(CONTROLLERDIR . '/Mentions.controller.php');
 
-			$notify = new Notification_Controller();
-			$notify->setData(array(
-				'id_notification' => $_REQUEST['item'],
+			$mentions = new Mentions_Controller();
+			$mentions->setData(array(
+				'id_mention' => $_REQUEST['item'],
 				'mark' => $_REQUEST['mark'],
 			));
-			$notify->action_markread();
+			$mentions->action_markread();
 		}
 
 		// Create a previous next string if the selected theme has it as a selected option.
@@ -250,7 +247,7 @@ class Display_Controller
 		$context['require_verification'] = !$user_info['is_mod'] && !$user_info['is_admin'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1));
 		if ($context['require_verification'])
 		{
-			require_once(SUBSDIR . '/Editor.subs.php');
+			require_once(SUBSDIR . '/VerificationControls.class.php');
 			$verificationOptions = array(
 				'id' => 'post',
 			);
@@ -427,149 +424,9 @@ class Display_Controller
 		if ($context['is_poll'])
 		{
 			$template_layers->add('display_poll');
-
-			// Get information on the poll
 			require_once(SUBSDIR . '/Poll.subs.php');
-			$pollinfo = pollInfo($topicinfo['id_poll']);
 
-			// Get the poll options
-			$pollOptions = pollOptionsForMember($topicinfo['id_poll'], $user_info['id']);
-
-			// Compute total votes.
-			$realtotal = 0;
-			$pollinfo['has_voted'] = false;
-			foreach ($pollOptions as $choice)
-			{
-				$realtotal += $choice['votes'];
-				$pollinfo['has_voted'] |= $choice['voted_this'] != -1;
-			}
-
-			// If this is a guest we need to do our best to work out if they have voted, and what they voted for.
-			if ($user_info['is_guest'] && $pollinfo['guest_vote'] && allowedTo('poll_vote'))
-			{
-				if (!empty($_COOKIE['guest_poll_vote']) && preg_match('~^[0-9,;]+$~', $_COOKIE['guest_poll_vote']) && strpos($_COOKIE['guest_poll_vote'], ';' . $topicinfo['id_poll'] . ',') !== false)
-				{
-					// ;id,timestamp,[vote,vote...]; etc
-					$guestinfo = explode(';', $_COOKIE['guest_poll_vote']);
-
-					// Find the poll we're after.
-					foreach ($guestinfo as $i => $guestvoted)
-					{
-						$guestvoted = explode(',', $guestvoted);
-						if ($guestvoted[0] == $topicinfo['id_poll'])
-							break;
-					}
-
-					// Has the poll been reset since guest voted?
-					if ($pollinfo['reset_poll'] > $guestvoted[1])
-					{
-						// Remove the poll info from the cookie to allow guest to vote again
-						unset($guestinfo[$i]);
-						if (!empty($guestinfo))
-							$_COOKIE['guest_poll_vote'] = ';' . implode(';', $guestinfo);
-						else
-							unset($_COOKIE['guest_poll_vote']);
-					}
-					else
-					{
-						// What did they vote for?
-						unset($guestvoted[0], $guestvoted[1]);
-						foreach ($pollOptions as $choice => $details)
-						{
-							$pollOptions[$choice]['voted_this'] = in_array($choice, $guestvoted) ? 1 : -1;
-							$pollinfo['has_voted'] |= $pollOptions[$choice]['voted_this'] != -1;
-						}
-						unset($choice, $details, $guestvoted);
-					}
-					unset($guestinfo, $guestvoted, $i);
-				}
-			}
-
-			// Set up the basic poll information.
-			$context['poll'] = array(
-				'id' => $topicinfo['id_poll'],
-				'image' => 'normal_' . (empty($pollinfo['voting_locked']) ? 'poll' : 'locked_poll'),
-				'question' => parse_bbc($pollinfo['question']),
-				'total_votes' => $pollinfo['total'],
-				'change_vote' => !empty($pollinfo['change_vote']),
-				'is_locked' => !empty($pollinfo['voting_locked']),
-				'options' => array(),
-				'lock' => allowedTo('poll_lock_any') || ($context['user']['started'] && allowedTo('poll_lock_own')),
-				'edit' => allowedTo('poll_edit_any') || ($context['user']['started'] && allowedTo('poll_edit_own')),
-				'allowed_warning' => $pollinfo['max_votes'] > 1 ? sprintf($txt['poll_options6'], min(count($pollOptions), $pollinfo['max_votes'])) : '',
-				'is_expired' => !empty($pollinfo['expire_time']) && $pollinfo['expire_time'] < time(),
-				'expire_time' => !empty($pollinfo['expire_time']) ? standardTime($pollinfo['expire_time']) : 0,
-				'has_voted' => !empty($pollinfo['has_voted']),
-				'starter' => array(
-					'id' => $pollinfo['id_member'],
-					'name' => $pollinfo['poster_name'],
-					'href' => $pollinfo['id_member'] == 0 ? '' : $scripturl . '?action=profile;u=' . $pollinfo['id_member'],
-					'link' => $pollinfo['id_member'] == 0 ? $pollinfo['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $pollinfo['id_member'] . '">' . $pollinfo['poster_name'] . '</a>'
-				)
-			);
-
-			// Make the lock and edit permissions defined above more directly accessible.
-			$context['allow_lock_poll'] = $context['poll']['lock'];
-			$context['allow_edit_poll'] = $context['poll']['edit'];
-
-			// You're allowed to vote if:
-			// 1. the poll did not expire, and
-			// 2. you're either not a guest OR guest voting is enabled... and
-			// 3. you're not trying to view the results, and
-			// 4. the poll is not locked, and
-			// 5. you have the proper permissions, and
-			// 6. you haven't already voted before.
-			$context['allow_vote'] = !$context['poll']['is_expired'] && (!$user_info['is_guest'] || ($pollinfo['guest_vote'] && allowedTo('poll_vote'))) && empty($pollinfo['voting_locked']) && allowedTo('poll_vote') && !$context['poll']['has_voted'];
-
-			// You're allowed to view the results if:
-			// 1. you're just a super-nice-guy, or
-			// 2. anyone can see them (hide_results == 0), or
-			// 3. you can see them after you voted (hide_results == 1), or
-			// 4. you've waited long enough for the poll to expire. (whether hide_results is 1 or 2.)
-			$context['allow_poll_view'] = allowedTo('moderate_board') || $pollinfo['hide_results'] == 0 || ($pollinfo['hide_results'] == 1 && $context['poll']['has_voted']) || $context['poll']['is_expired'];
-			$context['poll']['show_results'] = $context['allow_poll_view'] && (isset($_REQUEST['viewresults']) || isset($_REQUEST['viewResults']));
-
-			// You're allowed to change your vote if:
-			// 1. the poll did not expire, and
-			// 2. you're not a guest... and
-			// 3. the poll is not locked, and
-			// 4. you have the proper permissions, and
-			// 5. you have already voted, and
-			// 6. the poll creator has said you can!
-			$context['allow_change_vote'] = !$context['poll']['is_expired'] && !$user_info['is_guest'] && empty($pollinfo['voting_locked']) && allowedTo('poll_vote') && $context['poll']['has_voted'] && $context['poll']['change_vote'];
-
-			// You're allowed to return to voting options if:
-			// 1. you are (still) allowed to vote.
-			// 2. you are currently seeing the results.
-			$context['allow_return_vote'] = $context['allow_vote'] && $context['poll']['show_results'];
-
-			// Calculate the percentages and bar lengths...
-			$divisor = $realtotal == 0 ? 1 : $realtotal;
-
-			// Determine if a decimal point is needed in order for the options to add to 100%.
-			$precision = $realtotal == 100 ? 0 : 1;
-
-			// Now look through each option, and...
-			foreach ($pollOptions as $i => $option)
-			{
-				// First calculate the percentage, and then the width of the bar...
-				$bar = round(($option['votes'] * 100) / $divisor, $precision);
-				$barWide = $bar == 0 ? 1 : floor(($bar * 8) / 3);
-
-				// Now add it to the poll's contextual theme data.
-				$context['poll']['options'][$i] = array(
-					'id' => 'options-' . $i,
-					'percent' => $bar,
-					'votes' => $option['votes'],
-					'voted_this' => $option['voted_this'] != -1,
-					'bar' => '<span style="white-space: nowrap;"><img src="' . $settings['images_url'] . '/poll_' . ($context['right_to_left'] ? 'right' : 'left') . '.png" alt="" /><img src="' . $settings['images_url'] . '/poll_middle.png" style="width:' . $barWide . 'px; height:12px" alt="-" /><img src="' . $settings['images_url'] . '/poll_' . ($context['right_to_left'] ? 'left' : 'right') . '.png" alt="" /></span>',
-					// Note: IE < 8 requires us to set a width on the container, too.
-					'bar_ndt' => $bar > 0 ? '<div class="bar" style="width: ' . ($bar * 3.5 + 4) . 'px;"><div style="width: ' . $bar * 3.5 . 'px;"></div></div>' : '<div class="bar"></div>',
-					'bar_width' => $barWide,
-					'option' => parse_bbc($option['label']),
-					'vote_button' => '<input type="' . ($pollinfo['max_votes'] > 1 ? 'checkbox' : 'radio') . '" name="options[]" id="options-' . $i . '" value="' . $i . '" class="input_' . ($pollinfo['max_votes'] > 1 ? 'check' : 'radio') . '" />'
-				);
-			}
+			loadPollContext($topicinfo['id_poll']);
 
 			// Build the poll moderation button array.
 			$context['poll_buttons'] = array(
@@ -786,14 +643,25 @@ class Display_Controller
 		$context['drafts_autosave'] = !empty($context['drafts_save']) && !empty($modSettings['drafts_autosave_enabled']) && allowedTo('post_autosave_draft');
 		if (!empty($context['drafts_save']))
 			loadLanguage('Drafts');
-		if (!empty($context['drafts_autosave']))
+
+		if (!empty($context['drafts_autosave']) && empty($options['use_editor_quick_reply']))
 			loadJavascriptFile('drafts.js');
 
-		if (!empty($modSettings['notifications_enabled']))
+		if (!empty($modSettings['mentions_enabled']))
 		{
-			$context['notifications_enabled'] = true;
-			loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.js'));
+			$context['mentions_enabled'] = true;
+
+			// Just using the plain text quick reply and not the editor
+			if (empty($options['use_editor_quick_reply']))
+				loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.js', 'mentioning.js'));
+
 			loadCSSFile('jquery.atwho.css');
+
+			addInlineJavascript('
+			$(document).ready(function () {
+				for (var i = 0, count = all_elk_mentions.length; i < count; i++)
+					all_elk_mentions[i].oMention = new elk_mentions(all_elk_mentions[i].oOptions);
+			});');
 		}
 
 		// Load up the Quick ModifyTopic and Quick Reply scripts
@@ -835,9 +703,6 @@ class Display_Controller
 				);
 				create_control_richedit($editorOptions);
 
-				// Store the ID.
-				$context['post_box_name'] = $editorOptions['id'];
-
 				$context['attached'] = '';
 				$context['make_poll'] = isset($_REQUEST['poll']);
 
@@ -867,7 +732,7 @@ class Display_Controller
 			'notify' => array( 'test' => 'can_mark_notify', 'text' => $context['is_marked_notify'] ? 'unnotify' : 'notify', 'image' => ($context['is_marked_notify'] ? 'un' : '') . 'notify.png', 'lang' => true, 'custom' => 'onclick="return notifyButton(this);"', 'url' => $scripturl . '?action=notify;sa=' . ($context['is_marked_notify'] ? 'off' : 'on') . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
 			'mark_unread' => array('test' => 'can_mark_unread', 'text' => 'mark_unread', 'image' => 'markunread.png', 'lang' => true, 'url' => $scripturl . '?action=markasread;sa=topic;t=' . $context['mark_unread_time'] . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
 			'unwatch' => array('test' => 'can_unwatch', 'text' => ($context['topic_unwatched'] ? '' : 'un') . 'watch', 'image' => ($context['topic_unwatched'] ? '' : 'un') . 'watched.png', 'lang' => true, 'custom' => 'onclick="return unwatchButton(this);"', 'url' => $scripturl . '?action=unwatchtopic;topic=' . $context['current_topic'] . '.' . $context['start'] . ';sa=' . ($context['topic_unwatched'] ? 'off' : 'on') . ';' . $context['session_var'] . '=' . $context['session_id']),
-			'send' => array('test' => 'can_send_topic', 'text' => 'send_topic', 'image' => 'sendtopic.png', 'lang' => true, 'url' => $scripturl . '?action=emailuser;sa=sendtopic;topic=' . $context['current_topic'] . '.0', 'custom' => 'onclick="return sendtopicOverlayDiv(this.href);"'),
+			'send' => array('test' => 'can_send_topic', 'text' => 'send_topic', 'image' => 'sendtopic.png', 'lang' => true, 'url' => $scripturl . '?action=emailuser;sa=sendtopic;topic=' . $context['current_topic'] . '.0', 'custom' => 'onclick="return sendtopicOverlayDiv(this.href, \'' . $txt['send_topic'] . '\', \'\');"'),
 			'print' => array('test' => 'can_print', 'text' => 'print', 'image' => 'print.png', 'lang' => true, 'custom' => 'rel="nofollow"', 'class' => 'new_win', 'url' => $scripturl . '?action=topic;sa=printpage;topic=' . $context['current_topic'] . '.0'),
 		);
 
@@ -1085,6 +950,7 @@ class Display_Controller
 			'approved' => $message['approved'],
 			'first_new' => isset($context['start_from']) && $context['start_from'] == $counter,
 			'is_ignored' => !empty($modSettings['enable_buddylist']) && in_array($message['id_member'], $context['user']['ignoreusers']),
+			'is_message_author' => $message['id_member'] == $user_info['id'],
 			'can_approve' => !$message['approved'] && $context['can_approve'],
 			'can_unapprove' => !empty($modSettings['postmod_active']) && $context['can_approve'] && $message['approved'],
 			'can_modify' => (!$context['is_locked'] || allowedTo('moderate_board')) && (allowedTo('modify_any') || (allowedTo('modify_replies') && $context['user']['started']) || (allowedTo('modify_own') && $message['id_member'] == $user_info['id'] && (empty($modSettings['edit_disable_time']) || !$message['approved'] || $message['poster_time'] + $modSettings['edit_disable_time'] * 60 > time()))),
@@ -1096,10 +962,16 @@ class Display_Controller
 			'likes_enabled' => !empty($modSettings['likes_enabled']) && ($message['use_likes'] || ($message['like_count'] != 0)),
 		);
 
-		// Is this user the message author?
-		$output['is_message_author'] = $message['id_member'] == $user_info['id'];
 		if (!empty($output['modified']['name']))
 			$output['modified']['last_edit_text'] = sprintf($txt['last_edit_by'], $output['modified']['time'], $output['modified']['name'], standardTime($output['modified']['timestamp']));
+
+		if (!empty($output['member']['karma']['allow']))
+		{
+			$output['member']['karma'] += array(
+				'applaud_url' => $scripturl . '?action=karma;sa=applaud;uid=' . $output['member']['id'] . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';m=' . $output['id'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+				'smite_url' => $scripturl . '?action=karma;sa=smite;uid=' . $output['member']['id'] . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';m=' . $output['id'] . ';' . $context['session_var'] . '=' . $context['session_id']
+			);
+		}
 
 		call_integration_hook('integrate_prepare_display_context', array(&$output, &$message));
 

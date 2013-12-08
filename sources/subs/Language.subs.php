@@ -5,7 +5,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  */
 
@@ -73,7 +73,7 @@ function list_getLanguages()
 	foreach ($all_languages as $lang)
 	{
 		// Load the file to get the character set.
-		require($settings['default_theme_dir'] . '/languages/index.' . $lang['filename'] . '.php');
+		require($lang['location']);
 
 		$languages[$lang['filename']] = array(
 			'id' => $lang['filename'],

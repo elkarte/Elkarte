@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -195,7 +195,7 @@ function template_ban_edit()
 	// Auto suggest only needed for adding new bans, not editing
 	if ($context['ban']['is_new'] && empty($_REQUEST['u']))
 		echo '
-			var oAddMemberSuggest = new smc_AutoSuggest({
+		var oAddMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oAddMemberSuggest\',
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,
@@ -211,12 +211,13 @@ function template_ban_edit()
 			document.getElementById(\'user_check\').checked = true;
 			return true;
 		}
+
 		oAddMemberSuggest.registerCallback(\'onBeforeUpdate\', \'onUpdateName\');';
 
 	echo '
 		function confirmBan(aForm)
 		{
-			if (aForm.ban_name.value == \'\')
+			if (aForm.ban_name.value === \'\')
 			{
 				alert(\'', $txt['ban_name_empty'], '\');
 				return false;
@@ -227,7 +228,8 @@ function template_ban_edit()
 				alert(\'', $txt['ban_restriction_empty'], '\');
 				return false;
 			}
-		}// ]]></script>';
+		}
+	// ]]></script>';
 }
 
 /**
@@ -260,13 +262,13 @@ function template_ban_edit_trigger()
 
 	if (empty($modSettings['disableHostnameLookup']))
 		echo '
-								<dt>
-									<input type="checkbox" name="ban_suggestions[]" id="hostname_check" value="hostname" class="input_check" ', $context['ban_trigger']['hostname']['selected'] ? 'checked="checked" ' : '', '/>
-									<label for="hostname_check">', $txt['ban_on_hostname'], '</label>
-								</dt>
-								<dd>
-									<input type="text" name="hostname" value="', $context['ban_trigger']['hostname']['value'], '" size="44" onfocus="document.getElementById(\'hostname_check\').checked = true;" class="input_text" />
-								</dd>';
+							<dt>
+								<input type="checkbox" name="ban_suggestions[]" id="hostname_check" value="hostname" class="input_check" ', $context['ban_trigger']['hostname']['selected'] ? 'checked="checked" ' : '', '/>
+								<label for="hostname_check">', $txt['ban_on_hostname'], '</label>
+							</dt>
+							<dd>
+								<input type="text" name="hostname" value="', $context['ban_trigger']['hostname']['value'], '" size="44" onfocus="document.getElementById(\'hostname_check\').checked = true;" class="input_text" />
+							</dd>';
 
 	echo '
 							<dt>
@@ -297,7 +299,7 @@ function template_ban_edit_trigger()
 		</form>
 	</div>
 
-	<script src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
+	<script src="', $settings['default_theme_url'], '/scripts/suggest.js?beta10"></script>
 	<script><!-- // --><![CDATA[
 		var oAddMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oAddMemberSuggest\',
@@ -315,6 +317,7 @@ function template_ban_edit_trigger()
 			document.getElementById(\'user_check\').checked = true;
 			return true;
 		}
+
 		oAddMemberSuggest.registerCallback(\'onBeforeUpdate\', \'onUpdateName\');
 	// ]]></script>';
 }

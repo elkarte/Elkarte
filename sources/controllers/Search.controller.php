@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * Handle all of the searching from here.
  *
@@ -22,7 +22,7 @@ if (!defined('ELK'))
 // This defines two version types for checking the API's are compatible with this version of the software.
 $GLOBALS['search_versions'] = array(
 	// This is the forum version but is repeated due to some people rewriting $forum_version.
-	'forum_version' => 'ElkArte 1.0 Alpha',
+	'forum_version' => 'ElkArte 1.0 Beta',
 	// This is the minimum version of ElkArte that an API could have been written for to work. (strtr to stop accidentally updating version on release)
 	'search_version' => strtr('ElkArte 1+0=Alpha', array('+' => '.', '=' => ' ')),
 );
@@ -78,7 +78,7 @@ class Search_Controller extends Action_Controller
 		$context['require_verification'] = $user_info['is_guest'] && !empty($modSettings['search_enable_captcha']) && empty($_SESSION['ss_vv_passed']);
 		if ($context['require_verification'])
 		{
-			require_once(SUBSDIR . '/Editor.subs.php');
+			require_once(SUBSDIR . '/VerificationControls.class.php');
 			$verificationOptions = array(
 				'id' => 'search',
 			);
@@ -614,6 +614,9 @@ class Search_Controller extends Action_Controller
 		// The remaining words and phrases are all included.
 		$searchArray = array_merge($phraseArray, $wordArray);
 
+		// This is used to remember words that will be ignored (because too short usually)
+		$context['search_ignored'] = array();
+
 		// Trim everything and make sure there are no words that are the same.
 		foreach ($searchArray as $index => $value)
 		{
@@ -629,7 +632,7 @@ class Search_Controller extends Action_Controller
 			// Don't allow very, very short words.
 			elseif (Util::strlen($value) < 2)
 			{
-				$context['search_errors']['search_string_small_words'] = true;
+				$context['search_ignored'][] = $value;
 				unset($searchArray[$index]);
 			}
 			else
@@ -648,7 +651,12 @@ class Search_Controller extends Action_Controller
 
 		// Make sure at least one word is being searched for.
 		if (empty($searchArray))
-			$context['search_errors']['invalid_search_string' . (!empty($foundBlackListedWords) ? '_blacklist' : '')] = true;
+		{
+			if (!empty($context['search_ignored']))
+				$context['search_errors']['search_string_small_words'] = true;
+			else
+				$context['search_errors']['invalid_search_string' . (!empty($foundBlackListedWords) ? '_blacklist' : '')] = true;
+		}
 		// All words/sentences must match.
 		elseif (empty($search_params['searchtype']))
 			$orParts[0] = $searchArray;
@@ -839,7 +847,7 @@ class Search_Controller extends Action_Controller
 				$context['search_errors']['need_verification_code'] = true;
 			else
 			{
-				require_once(SUBSDIR . '/Editor.subs.php');
+				require_once(SUBSDIR . '/VerificationControls.class.php');
 				$verificationOptions = array(
 					'id' => 'search',
 				);

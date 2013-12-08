@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -182,17 +182,19 @@ function template_permission_index()
 
 		function checkSubmit()
 		{
-			if ((document.forms.permissionForm.predefined.value != "" && (document.forms.permissionForm.copy_from.value != "empty" || document.forms.permissionForm.permissions.value != "")) || (document.forms.permissionForm.copy_from.value != "empty" && document.forms.permissionForm.permissions.value != ""))
+			if ((document.forms.permissionForm.predefined.value !== "" && (document.forms.permissionForm.copy_from.value !== "empty" || document.forms.permissionForm.permissions.value !== "")) || (document.forms.permissionForm.copy_from.value !== "empty" && document.forms.permissionForm.permissions.value !== ""))
 			{
 				alert("', $txt['permissions_only_one_option'], '");
 				return false;
 			}
-			if (document.forms.permissionForm.predefined.value == "" && document.forms.permissionForm.copy_from.value == "" && document.forms.permissionForm.permissions.value == "")
+
+			if (document.forms.permissionForm.predefined.value === "" && document.forms.permissionForm.copy_from.value === "" && document.forms.permissionForm.permissions.value === "")
 			{
 				alert("', $txt['permissions_no_action'], '");
 				return false;
 			}
-			if (document.forms.permissionForm.permissions.value != "" && document.forms.permissionForm.add_remove.value == "deny")
+
+			if (document.forms.permissionForm.permissions.value !== "" && document.forms.permissionForm.add_remove.value === "deny")
 				return confirm("', $txt['permissions_deny_dangerous'], '");
 
 			return true;

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * Manage and maintain the boards and categories of the forum.
  *
@@ -794,6 +794,8 @@ class ManageBoards_Controller extends Action_Controller
 				array('check', 'deny_boards_access'),
 		);
 
+		call_integration_hook('integrate_boards_settings', array(&$subActions));
+
 		return $this->_boardSettings->settings($config_vars);
 	}
 
@@ -828,6 +830,8 @@ class ManageBoards_Controller extends Action_Controller
 				array('check', 'allow_ignore_boards'),
 				array('check', 'deny_boards_access'),
 		);
+
+		call_integration_hook('integrate_boards_settings', array(&$subActions));
 
 		return $config_vars;
 	}

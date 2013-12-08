@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file has the primary job of showing and editing people's profiles.
  * It also allows the user to change some of their or another's preferences,
@@ -36,10 +36,6 @@ class Profile_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $user_info, $context, $user_profile, $cur_profile;
 		global $modSettings, $memberContext, $profile_vars, $post_errors, $user_settings;
-
-		// Lets check on guests up front
-		if ($user_info['is_guest'] && !allowedTo('profile_view_any'))
-			validateSession();
 
 		// Don't reload this as we may have processed error strings.
 		if (empty($post_errors))
@@ -79,259 +75,313 @@ class Profile_Controller extends Action_Controller
 					array $subsections:	Array of subsections, in order of appearance.
 					array $permission:	Array of permissions to determine who can access this area. Should contain arrays $own and $any.
 		*/
-		$allMenus = Standard_Menu::context();
-		$profile_menu = $allMenus->get('Profile_Menu');
-		$profile_menu->addBulk(
-			array(
-				'info' => array(
-					'title' => $txt['profileInfo'],
-				),
-				'edit_profile' => array(
-					'title' => $txt['profileEdit'],
-				),
-				'profile_action' => array(
-					'title' => $txt['profileAction'],
-				)
-			)
-		);
-
-		$profile_menu->childOf('info')->add('info_areas')->addBulk(
-			array(
-				'summary' => array(
-					'label' => $txt['summary'],
-					'file' => '/controllers/ProfileInfo.controller.php',
-					'controller' => 'ProfileInfo_Controller',
-					'function' => 'action_summary',
-					// From the summary it's possible to activate an account, so we need the token
-					'token' => 'profile-aa%u',
-					'token_type' => 'get',
-					'permission' => $context['user']['is_owner'] ? array('profile_view_own') : array('profile_view_any'),
-				),
-				'statistics' => array(
-					'label' => $txt['statPanel'],
-					'file' => '/controllers/ProfileInfo.controller.php',
-					'controller' => 'ProfileInfo_Controller',
-					'function' => 'action_statPanel',
-					'permission' => $context['user']['is_owner'] ? array('profile_view_own') : array('profile_view_any'),
-				),
-				'showposts' => array(
-					'label' => $txt['showPosts'],
-					'file' => '/controllers/ProfileInfo.controller.php',
-					'controller' => 'ProfileInfo_Controller',
-					'function' => 'action_showPosts',
-					'subsections' => array(
-						'messages' => array($txt['showMessages'], array('profile_view_own', 'profile_view_any')),
-						'topics' => array($txt['showTopics'], array('profile_view_own', 'profile_view_any')),
-						'unwatchedtopics' => array($txt['showUnwatched'], array('profile_view_own', 'profile_view_any'), 'enabled' => $modSettings['enable_unwatch'] && $context['user']['is_owner']),
-						'attach' => array($txt['showAttachments'], array('profile_view_own', 'profile_view_any')),
+		$profile_areas = array(
+			'info' => array(
+				'title' => $txt['profileInfo'],
+				'areas' => array(
+					'summary' => array(
+						'label' => $txt['summary'],
+						'file' => '/controllers/ProfileInfo.controller.php',
+						'controller' => 'ProfileInfo_Controller',
+						'function' => 'action_summary',
+						// From the summary it's possible to activate an account, so we need the token
+						'token' => 'profile-aa%u',
+						'token_type' => 'get',
+						'permission' => array(
+							'own' => 'profile_view_own',
+							'any' => 'profile_view_any',
+						),
 					),
-					'permission' => $context['user']['is_owner'] ? array('profile_view_own') : array('profile_view_any'),
-				),
-				'showdrafts' => array(
-					'label' => $txt['drafts_show'],
-					'file' => '/controllers/Draft.controller.php',
-					'controller' => 'Draft_Controller',
-					'function' => 'action_showProfileDrafts',
-					'enabled' => !empty($modSettings['drafts_enabled']) && $context['user']['is_owner'],
-					'permission' => $context['user']['is_owner'] ? array('profile_view_own') : array(),
-				),
-				'showlikes' => array(
-					'label' => $txt['likes_show'],
-					'file' => '/controllers/Likes.controller.php',
-					'controller' => 'Likes_Controller',
-					'function' => 'action_showProfileLikes',
-					'enabled' => !empty($modSettings['likes_enabled']) && $context['user']['is_owner'],
-					'subsections' => array(
-						'given' => array($txt['likes_given'], array('profile_view_own')),
-						'received' => array($txt['likes_received'], array('profile_view_own')),
+					'statistics' => array(
+						'label' => $txt['statPanel'],
+						'file' => '/controllers/ProfileInfo.controller.php',
+						'controller' => 'ProfileInfo_Controller',
+						'function' => 'action_statPanel',
+						'permission' => array(
+							'own' => 'profile_view_own',
+							'any' => 'profile_view_any',
+						),
 					),
-					'permission' => $context['user']['is_owner'] ? array('profile_view_own') : array(),
-				),
-				'permissions' => array(
-					'label' => $txt['showPermissions'],
-					'file' => '/controllers/ProfileInfo.controller.php',
-					'controller' => 'ProfileInfo_Controller',
-					'function' => 'action_showPermissions',
-					'permission' => $context['user']['is_owner'] ? array('manage_permissions') : array('manage_permissions'),
-				),
-				'history' => array(
-					'label' => $txt['history'],
-					'file' => '/controllers/ProfileHistory.controller.php',
-					'controller' => 'ProfileHistory_Controller',
-					'function' => 'action_index',
-					'subsections' => array(
-						'activity' => array($txt['trackActivity'], 'moderate_forum'),
-						'ip' => array($txt['trackIP'], 'moderate_forum'),
-						'edits' => array($txt['trackEdits'], 'moderate_forum'),
-						'logins' => array($txt['trackLogins'], array('profile_view_own', 'moderate_forum')),
+					'showposts' => array(
+						'label' => $txt['showPosts'],
+						'file' => '/controllers/ProfileInfo.controller.php',
+						'controller' => 'ProfileInfo_Controller',
+						'function' => 'action_showPosts',
+						'subsections' => array(
+							'messages' => array($txt['showMessages'], array('profile_view_own', 'profile_view_any')),
+							'topics' => array($txt['showTopics'], array('profile_view_own', 'profile_view_any')),
+							'unwatchedtopics' => array($txt['showUnwatched'], array('profile_view_own', 'profile_view_any'), 'enabled' => $modSettings['enable_unwatch'] && $context['user']['is_owner']),
+							'attach' => array($txt['showAttachments'], array('profile_view_own', 'profile_view_any')),
+						),
+						'permission' => array(
+							'own' => 'profile_view_own',
+							'any' => 'profile_view_any',
+						),
 					),
-					'permission' => $context['user']['is_owner'] ? array('moderate_forum') : array('moderate_forum'),
-				),
-				'viewwarning' => array(
-					'label' => $txt['profile_view_warnings'],
-					'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && $cur_profile['warning'] && (!empty($modSettings['warning_show']) && ($context['user']['is_owner'] || $modSettings['warning_show'] == 2)),
-					'file' => '/controllers/ProfileInfo.controller.php',
-					'controller' => 'ProfileInfo_Controller',
-					'function' => 'action_viewWarning',
-					'permission' => $context['user']['is_owner'] ? array('profile_view_own') : array('issue_warning'),
-				),
-			)
-		);
-
-		$profile_menu->childOf('edit_profile')->add('edit_profile_areas')->addBulk(
-			array(
-				'account' => array(
-					'label' => $txt['account'],
-					'file' => '/controllers/ProfileOptions.controller.php',
-					'controller' => 'ProfileOptions_Controller',
-					'function' => 'action_account',
-					'enabled' => $context['user']['is_admin'] || ($cur_profile['id_group'] != 1 && !in_array(1, explode(',', $cur_profile['additional_groups']))),
-					'sc' => 'post',
-					'token' => 'profile-ac%u',
-					'password' => true,
-					'permission' => $context['user']['is_owner'] ? array('profile_identity_any', 'profile_identity_own', 'manage_membergroups') : array('profile_identity_any', 'manage_membergroups'),
-				),
-				'forumprofile' => array(
-					'label' => $txt['forumprofile'],
-					'file' => '/controllers/ProfileOptions.controller.php',
-					'controller' => 'ProfileOptions_Controller',
-					'function' => 'action_forumProfile',
-					'sc' => 'post',
-					'token' => 'profile-fp%u',
-					'permission' => $context['user']['is_owner'] ? array('profile_extra_any', 'profile_extra_own', 'profile_title_own', 'profile_title_any') : array('profile_extra_any', 'profile_title_any'),
-				),
-				'theme' => array(
-					'label' => $txt['theme'],
-					'file' => '/controllers/ProfileOptions.controller.php',
-					'controller' => 'ProfileOptions_Controller',
-					'function' => 'action_themepick',
-					'sc' => 'post',
-					'token' => 'profile-th%u',
-					'permission' => $context['user']['is_owner'] ? array('profile_extra_any', 'profile_extra_own') : array('profile_extra_any'),
-				),
-				'authentication' => array(
-					'label' => $txt['authentication'],
-					'file' => '/controllers/ProfileOptions.controller.php',
-					'controller' => 'ProfileOptions_Controller',
-					'function' => 'action_authentication',
-					'enabled' => !empty($modSettings['enableOpenID']) || !empty($cur_profile['openid_uri']),
-					'sc' => 'post',
-					'token' => 'profile-au%u',
-					'hidden' => empty($modSettings['enableOpenID']) && empty($cur_profile['openid_uri']),
-					'password' => true,
-					'permission' => $context['user']['is_owner'] ? array('profile_identity_any', 'profile_identity_own') : array('profile_identity_any'),
-				),
-				'notification' => array(
-					'label' => $txt['notification'],
-					'file' => '/controllers/ProfileOptions.controller.php',
-					'controller' => 'ProfileOptions_Controller',
-					'function' => 'action_notification',
-					'sc' => 'post',
-					'token' => 'profile-nt%u',
-					'permission' => $context['user']['is_owner'] ? array('profile_extra_any', 'profile_extra_own') : array('profile_extra_any'),
-				),
-				// Without profile_extra_own, settings are accessible from the PM section.
-				'contactprefs' => array(
-					'label' => $txt['contactprefs'],
-					'file' => '/controllers/ProfileOptions.controller.php',
-					'controller' => 'ProfileOptions_Controller',
-					'function' => 'action_pmprefs',
-					'enabled' => allowedTo(array('profile_extra_own', 'profile_extra_any')),
-					'sc' => 'post',
-					'token' => 'profile-pm%u',
-					'permission' => $context['user']['is_owner'] ? array('pm_read') : array('profile_extra_any'),
-				),
-				'ignoreboards' => array(
-					'label' => $txt['ignoreboards'],
-					'file' => '/controllers/ProfileOptions.controller.php',
-					'controller' => 'ProfileOptions_Controller',
-					'function' => 'action_ignoreboards',
-					'enabled' => !empty($modSettings['allow_ignore_boards']),
-					'sc' => 'post',
-					'token' => 'profile-ib%u',
-					'permission' => $context['user']['is_owner'] ? array('profile_extra_any', 'profile_extra_own') : array('profile_extra_any'),
-				),
-				'lists' => array(
-					'label' => $txt['editBuddyIgnoreLists'],
-					'file' => '/controllers/ProfileOptions.controller.php',
-					'controller' => 'ProfileOptions_Controller',
-					'function' => 'action_editBuddyIgnoreLists',
-					'enabled' => !empty($modSettings['enable_buddylist']) && $context['user']['is_owner'],
-					'sc' => 'post',
-					'token' => 'profile-bl%u',
-					'subsections' => array(
-						'buddies' => array($txt['editBuddies']),
-						'ignore' => array($txt['editIgnoreList']),
+					'showdrafts' => array(
+						'label' => $txt['drafts_show'],
+						'file' => '/controllers/Draft.controller.php',
+						'controller' => 'Draft_Controller',
+						'function' => 'action_showProfileDrafts',
+						'enabled' => !empty($modSettings['drafts_enabled']) && $context['user']['is_owner'],
+						'permission' => array(
+							'own' => 'profile_view_own',
+							'any' =>  array(),
+						),
 					),
-					'permission' => $context['user']['is_owner'] ? array('profile_extra_any', 'profile_extra_own') : array(),
+					'showlikes' => array(
+						'label' => $txt['likes_show'],
+						'file' => '/controllers/Likes.controller.php',
+						'controller' => 'Likes_Controller',
+						'function' => 'action_showProfileLikes',
+						'enabled' => !empty($modSettings['likes_enabled']) && $context['user']['is_owner'],
+						'subsections' => array(
+							'given' => array($txt['likes_given'], array('profile_view_own')),
+							'received' => array($txt['likes_received'], array('profile_view_own')),
+						),
+						'permission' => array(
+							'own' => 'profile_view_own',
+							'any' =>  array(),
+						),
+					),
+					'permissions' => array(
+						'label' => $txt['showPermissions'],
+						'file' => '/controllers/ProfileInfo.controller.php',
+						'controller' => 'ProfileInfo_Controller',
+						'function' => 'action_showPermissions',
+						'permission' => array(
+							'own' => 'manage_permissions',
+							'any' => 'manage_permissions',
+						),
+					),
+					'history' => array(
+						'label' => $txt['history'],
+						'file' => '/controllers/ProfileHistory.controller.php',
+						'controller' => 'ProfileHistory_Controller',
+						'function' => 'action_index',
+						'subsections' => array(
+							'activity' => array($txt['trackActivity'], 'moderate_forum'),
+							'ip' => array($txt['trackIP'], 'moderate_forum'),
+							'edits' => array($txt['trackEdits'], 'moderate_forum'),
+							'logins' => array($txt['trackLogins'], array('profile_view_own', 'moderate_forum')),
+						),
+						'permission' => array(
+							'own' => 'moderate_forum',
+							'any' => 'moderate_forum',
+						),
+					),
+					'viewwarning' => array(
+						'label' => $txt['profile_view_warnings'],
+						'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && $cur_profile['warning'] && (!empty($modSettings['warning_show']) && ($context['user']['is_owner'] || $modSettings['warning_show'] == 2)),
+						'file' => '/controllers/ProfileInfo.controller.php',
+						'controller' => 'ProfileInfo_Controller',
+						'function' => 'action_viewWarning',
+						'permission' => array(
+							'own' => 'profile_view_own',
+							'any' => 'issue_warning',
+						),
+					),
 				),
-				'groupmembership' => array(
-					'label' => $txt['groupmembership'],
-					'file' => '/controllers/ProfileOptions.controller.php',
-					'controller' => 'ProfileOptions_Controller',
-					'function' => 'action_groupMembership',
-					'enabled' => !empty($modSettings['show_group_membership']) && $context['user']['is_owner'],
-					'sc' => 'request',
-					'token' => 'profile-gm%u',
-					'token_type' => 'request',
-					'permission' => $context['user']['is_owner'] ? array('profile_view_own') : array('manage_membergroups'),
+			),
+			'edit_profile' => array(
+				'title' => $txt['profileEdit'],
+				'areas' => array(
+					'account' => array(
+						'label' => $txt['account'],
+						'file' => '/controllers/ProfileOptions.controller.php',
+						'controller' => 'ProfileOptions_Controller',
+						'function' => 'action_account',
+						'enabled' => $context['user']['is_admin'] || ($cur_profile['id_group'] != 1 && !in_array(1, explode(',', $cur_profile['additional_groups']))),
+						'sc' => 'post',
+						'token' => 'profile-ac%u',
+						'password' => true,
+						'permission' => array(
+							'own' => array('profile_identity_any', 'profile_identity_own', 'manage_membergroups'),
+							'any' => array('profile_identity_any', 'manage_membergroups'),
+						),
+					),
+					'forumprofile' => array(
+						'label' => $txt['forumprofile'],
+						'file' => '/controllers/ProfileOptions.controller.php',
+						'controller' => 'ProfileOptions_Controller',
+						'function' => 'action_forumProfile',
+						'sc' => 'post',
+						'token' => 'profile-fp%u',
+						'permission' => array(
+							'own' => array('profile_extra_any', 'profile_extra_own', 'profile_title_own', 'profile_title_any'),
+							'any' => array('profile_extra_any', 'profile_title_any'),
+						),
+					),
+					'theme' => array(
+						'label' => $txt['theme'],
+						'file' => '/controllers/ProfileOptions.controller.php',
+						'controller' => 'ProfileOptions_Controller',
+						'function' => 'action_themepick',
+						'sc' => 'post',
+						'token' => 'profile-th%u',
+						'permission' => array(
+							'own' => array('profile_extra_any', 'profile_extra_own'),
+							'any' => array('profile_extra_any'),
+						),
+					),
+					'authentication' => array(
+						'label' => $txt['authentication'],
+						'file' => '/controllers/ProfileOptions.controller.php',
+						'controller' => 'ProfileOptions_Controller',
+						'function' => 'action_authentication',
+						'enabled' => !empty($modSettings['enableOpenID']) || !empty($cur_profile['openid_uri']),
+						'sc' => 'post',
+						'token' => 'profile-au%u',
+						'hidden' => empty($modSettings['enableOpenID']) && empty($cur_profile['openid_uri']),
+						'password' => true,
+						'permission' => array(
+							'own' => array('profile_identity_any', 'profile_identity_own'),
+							'any' => array('profile_identity_any'),
+						),
+					),
+					'notification' => array(
+						'label' => $txt['notifications'],
+						'file' => '/controllers/ProfileOptions.controller.php',
+						'controller' => 'ProfileOptions_Controller',
+						'function' => 'action_notification',
+						'sc' => 'post',
+						'token' => 'profile-nt%u',
+						'permission' => array(
+							'own' => array('profile_extra_any', 'profile_extra_own'),
+							'any' => array('profile_extra_any'),
+						),
+					),
+					// Without profile_extra_own, settings are accessible from the PM section.
+					// @todo at some point decouple it from PMs
+					'contactprefs' => array(
+						'label' => $txt['contactprefs'],
+						'file' => '/controllers/ProfileOptions.controller.php',
+						'controller' => 'ProfileOptions_Controller',
+						'function' => 'action_pmprefs',
+						'enabled' => allowedTo(array('profile_extra_own', 'profile_extra_any')),
+						'sc' => 'post',
+						'token' => 'profile-pm%u',
+						'permission' => array(
+							'own' => array('pm_read'),
+							'any' => array('profile_extra_any'),
+						),
+					),
+					'ignoreboards' => array(
+						'label' => $txt['ignoreboards'],
+						'file' => '/controllers/ProfileOptions.controller.php',
+						'controller' => 'ProfileOptions_Controller',
+						'function' => 'action_ignoreboards',
+						'enabled' => !empty($modSettings['allow_ignore_boards']),
+						'sc' => 'post',
+						'token' => 'profile-ib%u',
+						'permission' => array(
+							'own' => array('profile_extra_any', 'profile_extra_own'),
+							'any' => array('profile_extra_any'),
+						),
+					),
+					'lists' => array(
+						'label' => $txt['editBuddyIgnoreLists'],
+						'file' => '/controllers/ProfileOptions.controller.php',
+						'controller' => 'ProfileOptions_Controller',
+						'function' => 'action_editBuddyIgnoreLists',
+						'enabled' => !empty($modSettings['enable_buddylist']) && $context['user']['is_owner'],
+						'sc' => 'post',
+						'token' => 'profile-bl%u',
+						'subsections' => array(
+							'buddies' => array($txt['editBuddies']),
+							'ignore' => array($txt['editIgnoreList']),
+						),
+						'permission' => array(
+							'own' => array('profile_extra_any', 'profile_extra_own'),
+							'any' => array(),
+						),
+					),
+					'groupmembership' => array(
+						'label' => $txt['groupmembership'],
+						'file' => '/controllers/ProfileOptions.controller.php',
+						'controller' => 'ProfileOptions_Controller',
+						'function' => 'action_groupMembership',
+						'enabled' => !empty($modSettings['show_group_membership']) && $context['user']['is_owner'],
+						'sc' => 'request',
+						'token' => 'profile-gm%u',
+						'token_type' => 'request',
+						'permission' => array(
+							'own' => array('profile_view_own'),
+							'any' => array('manage_membergroups'),
+						),
+					),
 				),
-			)
+			),
+			'profile_action' => array(
+				'title' => $txt['profileAction'],
+				'areas' => array(
+					'sendpm' => array(
+						'label' => $txt['profileSendIm'],
+						'custom_url' => $scripturl . '?action=pm;sa=send',
+						'permission' => array(
+							'own' => array(),
+							'any' => array('pm_send'),
+						),
+					),
+					'issuewarning' => array(
+						'label' => $txt['profile_issue_warning'],
+						'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && (!$context['user']['is_owner'] || $context['user']['is_admin']),
+						'file' => '/controllers/ProfileAccount.controller.php',
+						'controller' => 'ProfileAccount_Controller',
+						'function' => 'action_issuewarning',
+						'token' => 'profile-iw%u',
+						'permission' => array(
+							'own' => array(),
+							'any' => array('issue_warning'),
+						),
+					),
+					'banuser' => array(
+						'label' => $txt['profileBanUser'],
+						'custom_url' => $scripturl . '?action=admin;area=ban;sa=add',
+						'enabled' => $cur_profile['id_group'] != 1 && !in_array(1, explode(',', $cur_profile['additional_groups'])),
+						'permission' => array(
+							'own' => array(),
+							'any' => array('manage_bans'),
+						),
+					),
+					'subscriptions' => array(
+						'label' => $txt['subscriptions'],
+						'file' => '/controllers/ProfileSubscriptions.controller.php',
+						'controller' => 'ProfileSubscriptions_Controller',
+						'function' => 'action_subscriptions',
+						'enabled' => !empty($modSettings['paid_enabled']),
+						'permission' => array(
+							'own' => array('profile_view_own'),
+							'any' => array('moderate_forum'),
+						),
+					),
+					'deleteaccount' => array(
+						'label' => $txt['deleteAccount'],
+						'file' => '/controllers/ProfileAccount.controller.php',
+						'controller' => 'ProfileAccount_Controller',
+						'function' => 'action_deleteaccount',
+						'sc' => 'post',
+						'token' => 'profile-da%u',
+						'password' => true,
+						'permission' => array(
+							'own' => array('profile_remove_any', 'profile_remove_own'),
+							'any' => array('profile_remove_any'),
+						),
+					),
+					'activateaccount' => array(
+						'file' => '/controllers/ProfileAccount.controller.php',
+						'controller' => 'ProfileAccount_Controller',
+						'function' => 'action_activateaccount',
+						'sc' => 'get',
+						'token' => 'profile-aa%u',
+						'permission' => array(
+							'own' => array(),
+							'any' => array('moderate_forum'),
+						),
+					),
+				),
+			),
 		);
-
-		$profile_menu->childOf('profile_action')->add('profile_action_areas')->addBulk(
-			array(
-				'sendpm' => array(
-					'label' => $txt['profileSendIm'],
-					'custom_url' => $scripturl . '?action=pm;sa=send',
-					'permission' => $context['user']['is_owner'] ? array() : array('pm_send'),
-				),
-				'issuewarning' => array(
-					'label' => $txt['profile_issue_warning'],
-					'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && (!$context['user']['is_owner'] || $context['user']['is_admin']),
-					'file' => '/controllers/ProfileAccount.controller.php',
-					'controller' => 'ProfileAccount_Controller',
-					'function' => 'action_issuewarning',
-					'token' => 'profile-iw%u',
-					'permission' => $context['user']['is_owner'] ? array() : array('issue_warning'),
-				),
-				'banuser' => array(
-					'label' => $txt['profileBanUser'],
-					'custom_url' => $scripturl . '?action=admin;area=ban;sa=add',
-					'enabled' => $cur_profile['id_group'] != 1 && !in_array(1, explode(',', $cur_profile['additional_groups'])),
-					'permission' => $context['user']['is_owner'] ? array() : array('manage_bans'),
-				),
-				'subscriptions' => array(
-					'label' => $txt['subscriptions'],
-					'file' => '/controllers/ProfileSubscriptions.controller.php',
-					'controller' => 'ProfileSubscriptions_Controller',
-					'function' => 'action_subscriptions',
-					'enabled' => !empty($modSettings['paid_enabled']),
-					'permission' => $context['user']['is_owner'] ? array('profile_view_own') : array('moderate_forum'),
-				),
-				'deleteaccount' => array(
-					'label' => $txt['deleteAccount'],
-					'file' => '/controllers/ProfileAccount.controller.php',
-					'controller' => 'ProfileAccount_Controller',
-					'function' => 'action_deleteaccount',
-					'sc' => 'post',
-					'token' => 'profile-da%u',
-					'password' => true,
-					'permission' => $context['user']['is_owner'] ? array('profile_remove_any', 'profile_remove_own') : array('profile_remove_any'),
-				),
-				'activateaccount' => array(
-					'file' => '/controllers/ProfileAccount.controller.php',
-					'controller' => 'ProfileAccount_Controller',
-					'function' => 'action_activateaccount',
-					'sc' => 'get',
-					'token' => 'profile-aa%u',
-					'token_type' => 'get',
-					'permission' => $context['user']['is_owner'] ? array() : array('moderate_forum'),
-				),
-			)
-		);
-
-		// @note integrate_profile_areas is now integrate_profile_menu
 
 		// Is there an updated message to show?
 		if (isset($_GET['updated']))
@@ -345,16 +395,23 @@ class Profile_Controller extends Action_Controller
 			),
 		);
 
+		// Let them modify profile areas easily.
+		call_integration_hook('integrate_profile_areas', array(&$profile_areas, &$menuOptions));
+
 		// Actually create the menu!
-		$profile_include_data = $allMenus->createMenu('Profile_Menu', $menuOptions);
-		$allMenus->destroy('Profile_Menu');
+		$profile_include_data = createMenu($profile_areas, $menuOptions);
+		unset($profile_areas);
 
 		// If it said no permissions that meant it wasn't valid!
-		if (empty($profile_include_data['permission']))
+		if ($profile_include_data && empty($profile_include_data['permission']))
 			$profile_include_data['enabled'] = false;
 
+		// No menu and guest? A warm welcome to register
+		if (!$profile_include_data && $user_info['is_guest'])
+			is_not_guest();
+
 		// No menu means no access.
-		if (!$profile_include_data && !$user_info['is_guest'] || (isset($profile_include_data['enabled']) && $profile_include_data['enabled'] === false))
+		if (!$profile_include_data || (isset($profile_include_data['enabled']) && $profile_include_data['enabled'] === false))
 			fatal_lang_error('no_access', false);
 
 		// Make a note of the Unique ID for this menu.

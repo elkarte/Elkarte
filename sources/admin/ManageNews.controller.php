@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  */
 
@@ -179,11 +179,11 @@ class ManageNews_Controller extends Action_Controller
 					'data' => array(
 						'function' => create_function('$news', '
 
-							return \'<textarea id="data_\' . $news[\'id\'] . \'" rows="3" name="news[]" style="width 100%;margin 0 5em;">\' . $news[\'unparsed\'] . \'</textarea>
+							return \'<textarea class="" id="data_\' . $news[\'id\'] . \'" rows="3" name="news[]">\' . $news[\'unparsed\'] . \'</textarea>
 								<br />
 								<div id="preview_\' . $news[\'id\'] . \'"></div>\';
 						'),
-						'style' => 'width: 50%;',
+						'class' => 'newsarea',
 					),
 				),
 				'preview' => array(
@@ -193,9 +193,9 @@ class ManageNews_Controller extends Action_Controller
 					'data' => array(
 						'function' => create_function('$news', '
 
-							return \'<div id="box_preview_\' . $news[\'id\'] . \'" style="overflow: auto; width: 100%; height: 10ex;">\' . $news[\'parsed\'] . \'</div>\';
+							return \'<div id="box_preview_\' . $news[\'id\'] . \'">\' . $news[\'parsed\'] . \'</div>\';
 						'),
-						'style' => 'width: 45%;',
+						'class' => 'newspreview',
 					),
 				),
 				'check' => array(
@@ -348,9 +348,6 @@ class ManageNews_Controller extends Action_Controller
 			'preview_type' => 2,
 		);
 		create_control_richedit($editorOptions);
-
-		// Store the ID for old compatibility.
-		$context['post_box_name'] = $editorOptions['id'];
 
 		if (isset($context['preview']))
 		{

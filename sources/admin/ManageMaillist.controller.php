@@ -5,7 +5,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version   1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file contains maillist functions that are specifically done by administrators
  * and those with approve email permission
@@ -234,15 +234,15 @@ class ManageMaillist_Controller extends Action_Controller
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="?action=admin;area=maillist;sa=approve;item=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . ';' . $context['admin-ml_token_var'] . '=' . $context['admin-ml_token'] . '"><img style="width:16px;height:16px" title="' . $txt['approve'] . '" src="' . $settings['images_url'] . '/icons/field_valid.png" alt="*" /></a>&nbsp;
-						<a href="?action=admin;area=maillist;sa=delete;item=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . ';' . $context['admin-ml_token_var'] . '=' . $context['admin-ml_token'] . '" onclick="return confirm(' . JavaScriptEscape($txt['delete_warning']) . ') && submitThisOnce(this);" accesskey="d"><img style="width:16px;height:16px" title="' . $txt['delete'] . '" src="' . $settings['images_url'] . '/icons/quick_remove.png" alt="*" /></a><br />
-						<a href="?action=admin;area=maillist;sa=bounce;item=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . ';' . $context['admin-ml_token_var'] . '=' . $context['admin-ml_token'] . '"><img style="width:16px;height:16px" title="' . $txt['bounce'] . '" src="' . $settings['images_url'] . '/icons/pm_replied.png" alt="*" /></a>&nbsp;
-						<a href="?action=admin;area=maillist;sa=view;item=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . ';' . $context['admin-ml_token_var'] . '=' . $context['admin-ml_token'] . '"><img style="width:16px;height:16px" title="' . $txt['view'] . '" src="' . $settings['images_url'] . '/icons/pm_read.png" alt="*" /></a>',
+							'format' => '<a href="?action=admin;area=maillist;sa=approve;item=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . ';' . $context['admin-ml_token_var'] . '=' . $context['admin-ml_token'] . '"><img title="' . $txt['approve'] . '" src="' . $settings['images_url'] . '/icons/field_valid.png" alt="*" /></a>&nbsp;
+						<a href="?action=admin;area=maillist;sa=delete;item=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . ';' . $context['admin-ml_token_var'] . '=' . $context['admin-ml_token'] . '" onclick="return confirm(' . JavaScriptEscape($txt['delete_warning']) . ') && submitThisOnce(this);" accesskey="d"><img title="' . $txt['delete'] . '" src="' . $settings['images_url'] . '/icons/quick_remove.png" alt="*" /></a><br />
+						<a href="?action=admin;area=maillist;sa=bounce;item=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . ';' . $context['admin-ml_token_var'] . '=' . $context['admin-ml_token'] . '"><img title="' . $txt['bounce'] . '" src="' . $settings['images_url'] . '/icons/pm_replied.png" alt="*" /></a>&nbsp;
+						<a href="?action=admin;area=maillist;sa=view;item=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . ';' . $context['admin-ml_token_var'] . '=' . $context['admin-ml_token'] . '"><img title="' . $txt['view'] . '" src="' . $settings['images_url'] . '/icons/pm_read.png" alt="*" /></a>',
 							'params' => array(
 								'id_email' => true,
 							),
 						),
-						'class' => 'centertext',
+						'class' => 'listaction',
 					),
 				),
 			),
@@ -254,7 +254,7 @@ class ManageMaillist_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'top_of_list',
-					'value' => isset($_SESSION['email_error']) ? '<div class="' . (isset($_SESSION['email_error_type']) ? 'infobox' : 'errorbox') . '">' . $_SESSION['email_error'] . '</div>' : $txt['heading'],
+					'value' => isset($_SESSION['email_error']) ? '<div class="' . (isset($_SESSION['email_error_type']) ? 'successbox' : 'errorbox') . '">' . $_SESSION['email_error'] . '</div>' : $txt['heading'],
 					'class' => 'windowbg2',
 				),
 			),
@@ -465,7 +465,7 @@ class ManageMaillist_Controller extends Action_Controller
 				}
 
 				// And now any custom ones available for this moderator
-				$context['bounce_templates'] += array_merge($context['bounce_templates'], maillist_templates());
+				$context['bounce_templates'] += array_merge($context['bounce_templates'], maillist_templates('bnctpl', $txt['ml_bounce_template_subject_default']));
 
 				// Replace all the variables in the templates
 				foreach ($context['bounce_templates'] as $k => $name)
@@ -643,7 +643,7 @@ class ManageMaillist_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => isset($_GET['saved']) ? 'top_of_list' : 'after_title',
-					'value' => isset($_GET['saved']) ? '<div class="infobox">' . $txt['saved'] . '</div>' : $txt['filters_title'],
+					'value' => isset($_GET['saved']) ? '<div class="successbox">' . $txt['saved'] . '</div>' : $txt['filters_title'],
 					'class' => 'windowbg2',
 				),
 				array(
@@ -762,7 +762,7 @@ class ManageMaillist_Controller extends Action_Controller
 					containment: "#sort_email_fp",
 					error: "' . $txt['admin_order_error'] . '",
 					title: "' . $txt['admin_order_title'] . '",
-					href: "?action=admin;;area=maillist;sa=sortfilters",
+					href: "?action=admin;area=maillist;sa=sortfilters",
 					token: {token_var: "' . $token['admin-sort_token_var'] . '", token_id: "' . $token['admin-sort_token'] . '"}
 				});
 			',
@@ -1068,7 +1068,7 @@ class ManageMaillist_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => isset($_GET['saved']) ? 'top_of_list' : 'after_title',
-					'value' => isset($_GET['saved']) ? '<div class="infobox">' . $txt['saved'] . '</div>' : $txt['parsers_title'],
+					'value' => isset($_GET['saved']) ? '<div class="successbox">' . $txt['saved'] . '</div>' : $txt['parsers_title'],
 					'class' => 'windowbg2',
 				),
 				array(

@@ -11,8 +11,16 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
+
+/**
+ * Loads the template of the poster area
+ */
+function template_PersonalMessage_init()
+{
+	loadTemplate('GenericMessages');
+}
 
 /**
  * This is the main sidebar for the personal messages section.
@@ -22,7 +30,14 @@ function template_pm_above()
 {
 	global $context, $txt;
 
+	// The every helpful javascript!
 	echo '
+					<script><!-- // --><![CDATA[
+						var allLabels = {},
+							currentLabels = {},
+							txt_pm_msg_label_remove = "', $txt['pm_msg_label_remove'], '",
+							txt_pm_msg_label_apply = "', $txt['pm_msg_label_apply'], '";
+					// ]]></script>
 					<div id="personal_messages">';
 
 	// Show the capacity bar, if available. @todo - This needs work.
@@ -39,9 +54,13 @@ function template_pm_above()
 	// Message sent? Show a small indication.
 	if (isset($context['pm_sent']))
 		echo '
-						<div class="infobox">
+						<div class="successbox">
 							', $txt['pm_sent'], '
 						</div>';
+
+	if (!empty($context['pm_form_url']))
+		echo '
+						<form action="', $context['pm_form_url'], '" method="post" accept-charset="UTF-8" name="pmFolder">';
 }
 
 /**
@@ -49,7 +68,11 @@ function template_pm_above()
  */
 function template_pm_below()
 {
+	global $context;
+
 	echo '
+							<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />', !empty($context['pm_form_url']) ? '
+						</form>' : '', '
 					</div>';
 }
 
@@ -60,36 +83,9 @@ function template_folder()
 {
 	global $context, $scripturl, $options, $txt;
 
-	// The every helpful javascript!
-	echo '
-				<script><!-- // --><![CDATA[
-					var allLabels = {};
-					var currentLabels = {};
-					var txt_pm_msg_label_remove = "', $txt['pm_msg_label_remove'], '";
-					var txt_pm_msg_label_apply = "', $txt['pm_msg_label_apply'], '";
-				// ]]></script>';
-
-	echo '
-				<form action="', $scripturl, '?action=pm;sa=pmactions;', $context['display_mode'] == 2 ? 'conversation;' : '', 'f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', '" method="post" accept-charset="UTF-8" name="pmFolder">';
-
-	// If we are not in single display mode show the subjects on the top! @todo - Horrible markup here.
-	if ($context['display_mode'] != 1)
-	{
-		template_subject_list();
-		echo '
-					<hr class="clear" />';
-	}
-
 	// Got some messages to display?
 	if ($context['get_pmessage']('message', true))
 	{
-
-		// Show a few buttons if we are in conversation mode and outputting the first message.
-		if ($context['display_mode'] == 2)
-			template_pagesection('conversation_buttons', 'right', array('page_index' => false));
-		else
-			template_pagesection();
-
 		echo '
 					<div class="forumposts">';
 
@@ -110,12 +106,12 @@ function template_folder()
 			// Showing the sidebar posting area?
 			if (empty($options['hide_poster_area']))
 				echo '
-							<ul class="poster">', template_build_pmposter_div($message), '</ul>';
+							<ul class="poster">', template_build_poster_div($message), '</ul>';
 
 			echo '
 							<div class="postarea', empty($options['hide_poster_area']) ? '' : '2', '">
 								<div class="keyinfo">
-									', (!empty($options['hide_poster_area']) ? '<ul class="poster poster2">' . template_build_pmposter_div($message) . '</ul>' : ''), '
+									', (!empty($options['hide_poster_area']) ? '<ul class="poster poster2">' . template_build_poster_div($message) . '</ul>' : ''), '
 									<span id="post_subject_', $message['id'], '" class="post_subject">', $message['subject'], '</span>
 									<h5 id="info_', $message['id'], '">';
 
@@ -160,6 +156,24 @@ function template_folder()
 				echo '
 									<li class="listlevel1 quickmod_check"><input type="checkbox" name="pms[]" id="deletedisplay', $message['id'], '" value="', $message['id'], '" onclick="document.getElementById(\'deletelisting', $message['id'], '\').checked = this.checked;" class="input_check" /></li>';
 
+			// Maybe there is something...more :P (this is the more button)
+			if (!empty($context['additional_pm_drop_buttons']))
+			{
+				echo '
+									<li class="listlevel1 subsections" aria-haspopup="true"><a class="linklevel1 post_options">', $txt['post_options'], '</a>
+										<ul class="menulevel2">';
+
+				// Anything else added by mods for example?
+				if (!empty($context['additional_pm_drop_buttons']))
+					foreach ($context['additional_pm_drop_buttons'] as $key => $button)
+						echo '
+											<li class="listlevel2"><a href="' . $button['href'] . '" class="linklevel2 ', $key, '">' . $button['text'] . '</a></li>';
+
+				echo '
+										</ul>
+									</li>';
+			}
+
 			// Remove is always an option
 			echo '
 									<li class="listlevel1"><a href="', $scripturl, '?action=pm;sa=pmactions;pm_actions%5B', $message['id'], '%5D=delete;f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', addslashes($txt['remove_message']), '?\');" class="linklevel1 remove_button">', $txt['delete'], '</a></li>';
@@ -185,6 +199,12 @@ function template_folder()
 									<li class="listlevel1"><a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote" class="linklevel1 quote_button">', $txt['reply_quote'], '</a></li>';
 			}
 
+			// Anything else added by mods for example?
+			if (!empty($context['additional_quick_pm_buttons']))
+				foreach ($context['additional_quick_pm_buttons'] as $key => $button)
+					echo '
+									<li class="listlevel1"><a href="' . $button['href'] . '" class="linklevel1 ', $key, '">' . $button['text'] . '</a></li>';
+
 			echo '
 								</ul>';
 
@@ -192,7 +212,7 @@ function template_folder()
 			if ($context['folder'] !== 'sent' && !empty($context['currently_using_labels']) && $context['display_mode'] != 2)
 			{
 				echo '
-								<div class="labels floatright">';
+								<div class="labels">';
 
 				// Add the label drop down box. @todo: Why inline styles for select?
 				if (!empty($context['currently_using_labels']))
@@ -278,13 +298,57 @@ function template_folder()
 
 		echo '
 					</div>';
+	}
+}
+
+/**
+ * Used to display items above the page, like page navigation
+ */
+function template_pm_pages_and_buttons_above()
+{
+	global $context;
+
+		// Show a few buttons if we are in conversation mode and outputting the first message.
+		if ($context['display_mode'] == 2)
+			template_pagesection('conversation_buttons', 'right', array('page_index' => false));
+		else
+			template_pagesection();
+}
+
+/**
+ * Used to display items below the page, like page navigation
+ */
+function template_pm_pages_and_buttons_below()
+{
+	global $context, $txt;
 
 		if (empty($context['display_mode']))
 			template_pagesection(false, false, array('extra' => '<input type="submit" name="del_selected" value="' . $txt['quickmod_delete_selected'] . '" style="font-weight: normal;" onclick="if (!confirm(\'' . $txt['delete_selected_confirm'] . '\')) return false;" class="right_submit" />'));
 		// Show a few buttons if we are in conversation mode and outputting the first message.
 		elseif ($context['display_mode'] == 2 && isset($context['conversation_buttons']))
 			template_pagesection('conversation_buttons', 'right', array('page_index' => false));
+}
+
+/**
+ * Just list all the personal message subjects - to make templates easier.
+ * Unfortunately a bit ugly at the moment
+ */
+function template_subject_list_above()
+{
+	global $context;
+
+	// If we are not in single display mode show the subjects on the top! @todo - Horrible markup here.
+	if ($context['display_mode'] != 1)
+	{
+		template_subject_list();
+
+		echo '
+					<hr class="clear" />';
 	}
+}
+function template_subject_list_below()
+{
+	global $context;
 
 	// Individual messages = button list!
 	if ($context['display_mode'] == 1)
@@ -294,248 +358,7 @@ function template_folder()
 
 		template_subject_list();
 	}
-
-	echo '
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				</form>';
 }
-
-/**
- * Builds the poster area, avatar, group icons, pulldown information menu, etc
- *
- * @param type $message
- */
-function template_build_pmposter_div($message)
-{
-	global $context, $settings, $options, $txt, $scripturl, $modSettings;
-
-	$poster_div = '';
-
-	// Show information about the poster of this message.
-	$poster_div .= '
-							<li class="listlevel1 subsections" aria-haspopup="true">';
-
-	// Show a link to the member's profile.
-	$poster_div .= '
-									<a class="linklevel1 name" href="' . $scripturl . '?action=profile;u=' . $message['member']['id'] . '">
-									' . $message['member']['name'] . '
-									</a>';
-
-	// The new member info dropdown starts here. Note that conditionals have not been fully checked yet.
-	$poster_div .= '
-								<ul class="menulevel2" id="msg_' . $message['id'] . '_extra_info">';
-
-	// Don't show these things for guests.
-	if (!$message['member']['is_guest'])
-	{
-		// Show the post group if and only if they have no other group or the option is on, and they are in a post group.
-		if ((empty($settings['hide_post_group']) || $message['member']['group'] == '') && $message['member']['post_group'] != '')
-			$poster_div .= '
-									<li class="listlevel2 postgroup">' . $message['member']['post_group'] . '</li>';
-
-		// Show how many posts they have made.
-		if (!isset($context['disabled_fields']['posts']))
-			$poster_div .= '
-									<li class="listlevel2 postcount">' . $txt['member_postcount'] . ': ' . $message['member']['posts'] . '</li>';
-
-		// Is karma display enabled?  Total or +/-?
-		if ($modSettings['karmaMode'] == '1')
-			$poster_div .= '
-									<li class="listlevel2 karma">' . $modSettings['karmaLabel'] . ' ' . $message['member']['karma']['good'] - $message['member']['karma']['bad'] . '</li>';
-		elseif ($modSettings['karmaMode'] == '2')
-			$poster_div .= '
-									<li class="listlevel2 karma">' . $modSettings['karmaLabel'] . ' +' . $message['member']['karma']['good'] . '/-' . $message['member']['karma']['bad'] . '</li>';
-
-		// Is this user allowed to modify this member's karma?
-		if ($message['member']['karma']['allow'])
-			$poster_div .= '
-									<li class="listlevel2 karma_allow">
-										<a class="linklevel2" href="' . $scripturl . '?action=karma;sa=applaud;uid=' . $message['member']['id'] . ';f=' . $context['folder'] . ';start=' . $context['start'] . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '') . ';pm=' . $message['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $modSettings['karmaApplaudLabel'] . '</a>
-										<a class="linklevel2" href="' . $scripturl . '?action=karma;sa=smite;uid=' . $message['member']['id'] . ';f=' . $context['folder'] . ';start=' . $context['start'] . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '') . ';pm=' . $message['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $modSettings['karmaSmiteLabel'] . '</a>
-									</li>';
-
-		// Show the member's gender icon?
-		if (!empty($settings['show_gender']) && $message['member']['gender']['image'] != '' && !isset($context['disabled_fields']['gender']))
-			$poster_div .= '
-									<li class="listlevel2 gender">' . $txt['gender'] . ': ' . $message['member']['gender']['image'] . '</li>';
-
-		// Show their personal text?
-		if (!empty($settings['show_blurb']) && $message['member']['blurb'] != '')
-			$poster_div .= '
-									<li class="listlevel2 blurb">' . $message['member']['blurb'] . '</li>';
-
-		// Any custom fields to show as icons?
-		if (!empty($message['member']['custom_fields']))
-		{
-			$shown = false;
-			foreach ($message['member']['custom_fields'] as $custom)
-			{
-				if ($custom['placement'] != 1 || empty($custom['value']))
-					continue;
-
-				if (empty($shown))
-				{
-					$shown = true;
-					$poster_div .= '
-									<li class="listlevel2 cf_icons">
-										<ol>';
-				}
-
-				$poster_div .= '
-											<li>' . $custom['value'] . '</li>';
-			}
-
-			if ($shown)
-				$poster_div .= '
-										</ol>
-									</li>';
-		}
-
-		// Show the website and email address buttons.
-		if ($message['member']['show_profile_buttons'])
-		{
-			$poster_div .= '
-									<li class="listlevel2 profile">
-										<ol>';
-
-			// Don't show an icon if they haven't specified a website.
-			if ($message['member']['website']['url'] != '' && !isset($context['disabled_fields']['website']))
-				$poster_div .= '
-											<li><a href="' . $message['member']['website']['url'] . '" title="' . $message['member']['website']['title'] . '" target="_blank" class="new_win">' . ($settings['use_image_buttons'] ? '<img src="' . $settings['images_url'] . '/profile/www_sm.png" alt="' . $message['member']['website']['title'] . '" />' : $txt['www']) . '</a></li>';
-
-			// Don't show the email address if they want it hidden.
-			if (in_array($message['member']['show_email'], array('yes', 'yes_permission_override', 'no_through_forum')) && $context['can_send_email'])
-				$poster_div .= '
-											<li><a href="' . $scripturl . '?action=emailuser;sa=email;msg=' . $message['id'] . '" rel="nofollow">' . ($settings['use_image_buttons'] ? '<img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . '" />' : $txt['email']) . '</a></li>';
-
-			// Want to send them a PM, can you?
-			if ($context['can_send_pm'] && !$message['is_message_author'] && !empty($modSettings['onlineEnable']))
-				$poster_div .= '
-											<li><a href="' . $scripturl . '?action=pm;sa=send;u=' . $message['member']['id'] . '" title="' . $message['member']['online']['member_online_text'] . '"><img src="' . $message['member']['online']['image_href'] . '" alt="" /></a></li>';
-
-			$poster_div .= '
-										</ol>
-									</li>';
-		}
-
-		// Any custom fields for standard placement?
-		if (!empty($message['member']['custom_fields']))
-		{
-			foreach ($message['member']['custom_fields'] as $custom)
-			{
-				if (empty($custom['placement']) || empty($custom['value']))
-					$poster_div .= '
-									<li class="listlevel2 custom">' . $custom['title'] . ': ' . $custom['value'] . '</li>';
-			}
-		}
-	}
-	// Otherwise, show the guest's email.
-	elseif (!empty($message['member']['email']) && in_array($message['member']['show_email'], array('yes', 'yes_permission_override', 'no_through_forum')) && $context['can_send_email'])
-		$poster_div .= '
-									<li class="listlevel2 email"><a class="linklevel2"  href="' . $scripturl . '?action=emailuser;sa=email;msg=' . $message['id'] . '" rel="nofollow">' . ($settings['use_image_buttons'] ? '<img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . '" />' : $txt['email']) . '</a></li>';
-
-	// Stuff for the staff to wallop them with.
-	$poster_div .= '
-									<li class="listlevel2 report_seperator"></li>';
-
-	// Can we issue a warning because of this post?  Remember, we can't give guests warnings.
-	if ($context['can_issue_warning'] && !$message['is_message_author'] && !$message['member']['is_guest'])
-	{
-		$poster_div .= '
-									<li class="listlevel2 warning">
-										<a class="linklevel2" href="' . $scripturl . '?action=profile;area=issuewarning;u=' . $message['member']['id'] . ';msg=' . $message['id'] . '"><img src="' . $settings['images_url'] . '/profile/warn.png" alt="' . $txt['issue_warning_post'] . '" title="' . $txt['issue_warning_post'] . '" />' . $txt['warning_issue'] . '</a>';
-
-		// Do they have a warning in place?
-		if ($message['member']['can_see_warning'] && !empty($options['hide_poster_area']))
-			$poster_div .= '
-										<a class="linklevel2" href="' . $scripturl . '?action=profile;area=issuewarning;u=' . $message['member']['id'] . '"><img src="' . $settings['images_url'] . '/profile/warning_' . $message['member']['warning_status'] . '.png" alt="' . $txt['user_warn_' . $message['member']['warning_status']] . '" /><span class="warn_' . $message['member']['warning_status'] . '">' . $txt['warn_' . $message['member']['warning_status']] . '</span></a>';
-
-		$poster_div .= '
-									</li>';
-	}
-
-	// Show the IP to this user for this post - because you can moderate?
-	if (!empty($context['can_moderate_forum']) && !empty($message['member']['ip']))
-		$poster_div .= '
-									<li class="listlevel2 poster_ip"><a class="linklevel2 help" href="' . $scripturl . '?action=' . (!empty($message['member']['is_guest']) ? 'trackip' : 'profile;area=history;sa=ip;u=' . $message['member']['id'] . ';searchip=' . $message['member']['ip']) . '"><img src="' . $settings['images_url'] . '/ip.png" alt="" /> ' . $message['member']['ip'] . '</a><a href="' . $scripturl . '?action=quickhelp;help=see_admin_ip" onclick="return reqOverlayDiv(this.href);"><img src="' . $settings['images_url'] . '/helptopics.png" alt="(?)" /></a></li>';
-	// Or, should we show it because this is you?
-	elseif ($message['can_see_ip'] && !empty($message['member']['ip']))
-		$poster_div .= '
-									<li class="listlevel2 poster_ip"><a class="linklevel2 help" href="' . $scripturl . '?action=quickhelp;help=see_member_ip" onclick="return reqOverlayDiv(this.href);"><img src="' . $settings['images_url'] . '/ip.png" alt="" /> ' . $message['member']['ip'] . '</a></li>';
-	// Okay, are you at least logged in?  Then we can show something about why IPs are logged...
-	elseif (!$context['user']['is_guest'])
-		$poster_div .= '
-									<li class="listlevel2 poster_ip"><a class="linklevel2 help" href="' . $scripturl . '?action=quickhelp;help=see_member_ip" onclick="return reqOverlayDiv(this.href);">' . $txt['logged'] . '</a></li>';
-	// Otherwise, you see NOTHING!
-	else
-		$poster_div .= '
-									<li class="listlevel2 poster_ip">' . $txt['logged'] . '</li>';
-
-	// Done with the detail information about the poster.
-	$poster_div .= '
-								</ul>
-							</li>';
-
-	// Show avatars, images, etc.?
-	if (empty($options['hide_poster_area']))
-	{
-		if (!empty($settings['show_user_images']) && empty($options['show_no_avatars']) && !empty($message['member']['avatar']['image']))
-			$poster_div .= '
-							<li class="listlevel1 avatar">
-								<a class="linklevel1" href="' . $scripturl . '?action=profile;u=' . $message['member']['id'] . '">
-									' . $message['member']['avatar']['image'] . '
-								</a>
-							</li>';
-
-		// Show the post group icons, but not for guests.
-		if (!$message['member']['is_guest'])
-			$poster_div .= '
-								<li class="listlevel1 icons">' . $message['member']['group_icons'] . '</li>';
-
-		// Show the member's primary group (like 'Administrator') if they have one.
-		if (!empty($message['member']['group']))
-			$poster_div .= '
-								<li class="listlevel1 membergroup">' . $message['member']['group'] . '</li>';
-
-		// Show the member's custom title, if they have one.
-		if (!empty($message['member']['title']))
-			$poster_div .= '
-								<li class="listlevel1 title">' . $message['member']['title'] . '</li>';
-
-		// Show online and offline buttons? PHP could do with a little bit of cleaning up here for brevity, but it works.
-		// The plan is to make these buttons act sensibly, and link to your own inbox in your own posts (with new PM notification).
-		// Still has a little bit of hard-coded text. This may be a place where translators should be able to write inclusive strings,
-		// instead of dealing with $txt['by'] etc in the markup. Must be brief to work, anyway. Cannot ramble on at all.
-		if ($context['can_send_pm'] && $message['is_message_author'])
-		{
-			$poster_div .= '
-								<li class="listlevel1 poster_online"><a class="linklevel1" href="' . $scripturl . '?action=pm">' . $txt['pm_short'] . ' ' . ($context['user']['unread_messages'] > 0 ? '[<strong>' . $context['user']['unread_messages'] . '</strong>]' : '') . '</a></li>';
-		}
-		elseif ($context['can_send_pm'] && !$message['is_message_author'] && !$message['member']['is_guest'])
-		{
-			if (!empty($modSettings['onlineEnable']))
-				$poster_div .= '
-								<li class="listlevel1 poster_online"><a class="linklevel1" href="' . $scripturl . '?action=pm;sa=send;u=' . $message['member']['id'] . '" title="' . $message['member']['online']['member_online_text'] . '">' . $txt['send_message'] . ' <img src="' . $message['member']['online']['image_href'] . '" alt="" /></a></li>';
-			else
-				$poster_div .= '
-								<li class="listlevel1 poster_online"><a class="linklevel1" href="' . $scripturl . '?action=pm;sa=send;u=' . $message['member']['id'] . '">' . $txt['send_message'] . ' </a></li>';
-		}
-		elseif (!$context['can_send_pm'] && !empty($modSettings['onlineEnable']))
-			$poster_div .= '
-								<li class="listlevel1 poster_online">' . ($message['member']['online']['is_online'] ? $txt['online'] : $txt['offline']) . ' <img src="' . $message['member']['online']['image_href'] . '" alt="" /></li>';
-
-		// Are we showing the warning status?
-		if (!$message['member']['is_guest'] && $message['member']['can_see_warning'])
-			$poster_div .= '
-								<li class="listlevel1 warning">' . ($context['can_issue_warning'] ? '<a class="linklevel1" href="' . $scripturl . '?action=profile;area=issuewarning;u=' . $message['member']['id'] . '">' : '') . '<img src="' . $settings['images_url'] . '/profile/warning_' . $message['member']['warning_status'] . '.png" alt="' . $txt['user_warn_' . $message['member']['warning_status']] . '" />' . ($context['can_issue_warning'] ? '</a>' : '') . '<span class="warn_' . $message['member']['warning_status'] . '">' . $txt['warn_' . $message['member']['warning_status']] . '</span></li>';
-	}
-
-	return $poster_div;
-}
-
-/**
- * Just list all the personal message subjects - to make templates easier.
- */
 function template_subject_list()
 {
 	global $context, $settings, $txt, $scripturl;
@@ -609,49 +432,51 @@ function template_subject_list()
 					</table>';
 
 	$extra = '
-					<div class="floatright">';
+					<ul class="label_pms">';
 
 	if ($context['show_delete'])
 	{
 		if (!empty($context['currently_using_labels']) && $context['folder'] != 'sent')
 		{
 			$extra .= '
-						<select name="pm_action" onchange="if (this.options[this.selectedIndex].value) this.form.submit();" onfocus="loadLabelChoices();">
-							<option value="">' . $txt['pm_sel_label_title'] . ':</option>
-							<option value="" disabled="disabled">---------------</option>';
+						<li>
+							<select name="pm_action" onchange="if (this.options[this.selectedIndex].value) this.form.submit();" onfocus="loadLabelChoices();">
+								<option value="">' . $txt['pm_sel_label_title'] . ':</option>
+								<option value="" disabled="disabled">---------------</option>';
 
 			$extra .= '
-							<option value="" disabled="disabled">' . $txt['pm_msg_label_apply'] . ':</option>';
+								<option value="" disabled="disabled">' . $txt['pm_msg_label_apply'] . ':</option>';
 
 			foreach ($context['labels'] as $label)
 			{
 				if ($label['id'] != $context['current_label_id'])
 					$extra .= '
-							<option value="add_' . $label['id'] . '">&nbsp;' . $label['name'] . '</option>';
+								<option value="add_' . $label['id'] . '">&#10148;&nbsp;' . $label['name'] . '</option>';
 			}
 
 			$extra .= '
-							<option value="" disabled="disabled">' . $txt['pm_msg_label_remove'] . ':</option>';
+								<option value="" disabled="disabled">' . $txt['pm_msg_label_remove'] . ':</option>';
 
 			foreach ($context['labels'] as $label)
 			{
 				$extra .= '
-							<option value="rem_' . $label['id'] . '">&nbsp;' . $label['name'] . '</option>';
+								<option value="rem_' . $label['id'] . '">&#10148;&nbsp;' . $label['name'] . '</option>';
 			}
 
 			$extra .= '
-						</select>
-						<noscript>
-							<input type="submit" value="' . $txt['pm_apply'] . '" class="right_submit" />
-						</noscript>';
+							</select>
+							<noscript>
+								<input type="submit" value="' . $txt['pm_apply'] . '" class="right_submit" />
+							</noscript>
+						</li>';
 		}
 
 		$extra .= '
-						<input type="submit" name="del_selected" value="' . $txt['quickmod_delete_selected'] . '" onclick="if (!confirm(\'' . $txt['delete_selected_confirm'] . '\')) return false;" class="right_submit" />';
+						<li><input type="submit" name="del_selected" value="' . $txt['quickmod_delete_selected'] . '" onclick="if (!confirm(\'' . $txt['delete_selected_confirm'] . '\')) return false;" class="right_submit" /></li>';
 	}
 
 	$extra .= '
-					</div>';
+					</ul>';
 
 	template_pagesection(false, false, array('extra' => $extra));
 }
@@ -947,7 +772,7 @@ function template_search_results()
 
 function template_send()
 {
-	global $context, $settings, $scripturl, $modSettings, $txt;
+	global $context, $scripturl, $modSettings, $settings, $txt;
 
 	// Show which messages were sent successfully and which failed.
 	if (!empty($context['send_log']))
@@ -986,10 +811,10 @@ function template_send()
 
 	// Main message editing box.
 	echo '
-	<form action="', $scripturl, '?action=pm;sa=send2" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" class="flow_hidden" onsubmit="submitonce(this);smc_saveEntities(\'postmodify\', [\'subject\', \'message\']);">
+	<form action="', $scripturl, '?action=pm;sa=send2" method="post" accept-charset="UTF-8" name="pmFolder" id="pmFolder" class="flow_hidden" onsubmit="submitonce(this);smc_saveEntities(\'pmFolder\', [\'subject\', \'message\']);">
 		<div class="forumposts">
-			<h3 class="category_header">
-					<img src="', $settings['images_url'], '/icons/inbox_hd.png" class="icon" alt="', $txt['new_message'], '" title="', $txt['new_message'], '" />&nbsp;', $txt['new_message'], '
+			<h3 class="category_header hdicon cat_img_write">
+				', $txt['new_message'], '
 			</h3>';
 
 	echo '
@@ -1001,7 +826,7 @@ function template_send()
 
 	if (!empty($modSettings['drafts_pm_enabled']))
 		echo '
-					<div id="draft_section" class="infobox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>',
+					<div id="draft_section" class="successbox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>',
 		sprintf($txt['draft_pm_saved'], $scripturl . '?action=pm;sa=showpmdrafts'), '
 					</div>';
 
@@ -1066,11 +891,11 @@ function template_send()
 
 	// Require an image to be typed to save spamming?
 	if ($context['require_verification'])
-		echo '
+		template_control_verification($context['visual_verification_id'], '
 					<div class="post_verification">
-						<strong>', $txt['pm_visual_verification_label'], ':</strong>
-						', template_control_verification($context['visual_verification_id'], 'all'), '
-					</div>';
+						<strong>' . $txt['pm_visual_verification_label'] . ':</strong>
+						', '
+					</div>');
 
 	// Send, Preview, spellchecker buttons.
 	echo '
@@ -1118,11 +943,10 @@ function template_send()
 	// The vars used to preview a personal message without loading a new page.
 	echo '
 		<script><!-- // --><![CDATA[
-			var post_box_name = "', $context['post_box_name'], '";
-			var form_name = "postmodify";
-			var preview_area = "pm";
-			var txt_preview_title = "', $txt['preview_title'], '";
-			var txt_preview_fetch = "', $txt['preview_fetch'], '";';
+			var form_name = "pmFolder",
+				preview_area = "pm",
+				txt_preview_title = "', $txt['preview_title'], '",
+				txt_preview_fetch = "', $txt['preview_fetch'], '";';
 
 	// Code for showing and hiding drafts
 	if (!empty($context['drafts']))
@@ -1216,7 +1040,7 @@ function template_send()
 				sBccLinkContainerId: \'bcc_link_container\',
 				bBccShowByDefault: ', empty($context['recipients']['bcc']) && empty($context['bcc_value']) ? 'false' : 'true', ',
 				sShowBccLinkTemplate: ', JavaScriptEscape('
-					<a href="#" id="bcc_link">' . $txt['make_bcc'] . '</a> <a href="' . $scripturl . '?action=quickhelp;help=pm_bcc" onclick="return reqOverlayDiv(this.href);">(?)</a>'
+					<a href="#" id="bcc_link">' . $txt['make_bcc'] . '</a> <a href="' . $scripturl . '?action=quickhelp;help=pm_bcc" onclick="return reqOverlayDiv(this.href);"><img class="icon" src="' . $settings['images_url'] . '/helptopics.png" alt="(?)" /></a>'
 	), '
 			});
 		';
@@ -1489,7 +1313,7 @@ function template_rules()
 
 	if (!empty($context['rules']))
 		echo '
-			[<a href="', $scripturl, '?action=pm;sa=manrules;apply;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['pm_js_apply_rules_confirm'], '\');">', $txt['pm_apply_rules'], '</a>]';
+			<a class="linkbutton" href="', $scripturl, '?action=pm;sa=manrules;apply;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['pm_js_apply_rules_confirm'], '\');">', $txt['pm_apply_rules'], '</a>';
 
 	if (!empty($context['rules']))
 		echo '
@@ -1509,39 +1333,7 @@ function template_add_rule()
 	global $context, $txt, $scripturl;
 
 	echo '
-	<script><!-- // --><![CDATA[
-		var criteriaNum = 0;
-		var actionNum = 0;
-		var groups = new Array()
-		var labels = new Array()
-
-		var txt_pm_readable_and = "', $txt['pm_readable_and'], '";
-		var txt_pm_readable_or = "', $txt['pm_readable_or'], '";
-		var txt_pm_readable_member = "', $txt['pm_readable_member'], '";
-		var txt_pm_readable_group = "', $txt['pm_readable_group'], '";
-		var txt_pm_readable_subject  = "', $txt['pm_readable_subject'], '";
-		var txt_pm_readable_body = "', $txt['pm_readable_body'], '";
-		var txt_pm_readable_buddy = "', $txt['pm_readable_buddy'], '";
-		var txt_pm_readable_label = "', $txt['pm_readable_label'], '";
-		var txt_pm_readable_delete = "', $txt['pm_readable_delete'], '";
-		var txt_pm_readable_start = "', $txt['pm_readable_start'], '";
-		var txt_pm_readable_end = "', $txt['pm_readable_end'], '";
-		var txt_pm_readable_then = "', $txt['pm_readable_then'], '";
-
-		var txt_pm_rule_not_defined = "', $txt['pm_rule_not_defined'], '";
-		var txt_pm_rule_bud = "', $txt['pm_rule_bud'], '";
-		var txt_pm_rule_sub = "', $txt['pm_rule_sub'], '";
-		var txt_pm_rule_msg = "', $txt['pm_rule_msg'], '";
-		var txt_pm_rule_criteria_pick = "', $txt['pm_rule_criteria_pick'], '";
-		var txt_pm_rule_mid = "', $txt['pm_rule_mid'], '";
-		var txt_pm_rule_gid = "', $txt['pm_rule_gid'], '";
-		var txt_pm_rule_sel_group = "', $txt['pm_rule_sel_group'], '";
-
-		var txt_pm_rule_sel_action = "', $txt['pm_rule_sel_action'], '";
-		var txt_pm_rule_label = "', $txt['pm_rule_label'], '";
-		var txt_pm_rule_delete = "', $txt['pm_rule_delete'], '";
-		var txt_pm_rule_sel_label = "', $txt['pm_rule_sel_label'], '";
-		';
+	<script><!-- // --><![CDATA[';
 
 	// All of the groups
 	foreach ($context['groups'] as $id => $title)
@@ -1619,7 +1411,7 @@ function template_add_rule()
 
 	echo '
 					<span id="criteriaAddHere"></span><br />
-					<a href="#" onclick="addCriteriaOption(); return false;" id="addonjs1" style="display: none;">(', $txt['pm_rule_criteria_add'], ')</a>
+					<a id="addonjs1" class="linkbutton" href="#" onclick="addCriteriaOption(); return false;"  style="display: none;">', $txt['pm_rule_criteria_add'], '</a>
 					<br /><br />
 					', $txt['pm_rule_logic'], ':
 					<select name="rule_logic" id="logic" onchange="rebuildRuleDesc();">
@@ -1670,7 +1462,7 @@ function template_add_rule()
 
 	echo '
 					<span id="actionAddHere"></span><br />
-					<a href="#" onclick="addActionOption(); return false;" id="addonjs2" style="display: none;">(', $txt['pm_rule_add_action'], ')</a>
+					<a href="#" id="addonjs2" class="linkbutton" onclick="addActionOption(); return false;" style="display: none;">', $txt['pm_rule_add_action'], '</a>
 				</fieldset>
 			</div>
 			<h3 class="category_header">', $txt['pm_rule_description'], '</h3>
@@ -1718,12 +1510,11 @@ function template_add_rule()
  */
 function template_showPMDrafts()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	echo '
-		<h2 class="category_header">
-			<img src="', $settings['images_url'], '/message_sm.png" alt="" class="icon" />
-				', $txt['drafts_show'], '
+		<h2 class="category_header hdicon cat_img_talk">
+			', $txt['drafts_show'], '
 		</h2>';
 	template_pagesection();
 

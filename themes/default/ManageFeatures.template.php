@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -22,13 +22,17 @@ function template_show_custom_profile()
 	// Standard fields.
 	template_show_list('standard_profile_fields');
 
+	// disable the show on registration box if the profile field is not active
 	echo '
 	<script><!-- // --><![CDATA[
 		var iNumChecks = document.forms.standardProfileFields.length;
+
 		for (var i = 0; i < iNumChecks; i++)
-			if (document.forms.standardProfileFields[i].id.indexOf(\'reg_\') == 0)
+		{
+			if (document.forms.standardProfileFields[i].id.indexOf(\'reg_\') === 0)
 				document.forms.standardProfileFields[i].disabled = document.forms.standardProfileFields[i].disabled || !document.getElementById(\'active_\' + document.forms.standardProfileFields[i].id.substr(4)).checked;
-	// ]]></script><br />';
+		}
+	// ]]></script>';
 
 	// Custom fields.
 	template_show_list('custom_profile_fields');
@@ -259,7 +263,7 @@ function template_edit_profile_field()
 
 	// Get the javascript bits right!
 	echo '
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script><!-- // --><![CDATA[
 		updateInputBoxes();
 	// ]]></script>';
 }

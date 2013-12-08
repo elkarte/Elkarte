@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -37,7 +37,7 @@ function template_admin()
 							<div id="admin_search_box">', $txt['try_searching'], template_admin_quick_search(), '</div>
 							<div id="live_news" class="floatleft">
 								<h3 class="category_header">
-									<a href="', $scripturl, '?action=quickhelp;help=live_news" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/icons/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['live'], '
+									<a href="', $scripturl, '?action=quickhelp;help=live_news" onclick="return reqOverlayDiv(this.href);" class="hdicon cat_img_helptopics help"></a>', $txt['live'], '
 								</h3>
 								<div class="windowbg">
 									<div class="content">
@@ -50,16 +50,16 @@ function template_admin()
 	echo '
 							<div id="supportVersionsTable" class="floatright">
 								<h3 class="category_header">
-									<a href="', $scripturl, '?action=admin;area=credits">', $txt['support_title'], '</a>
+									<a class="hdicon cat_img_plus" href="', $scripturl, '?action=admin;area=credits">', $txt['support_title'], '</a>
 								</h3>
 								<div class="windowbg">
 									<div class="content">
 										<div id="version_details">
 											<strong>', $txt['support_versions'], ':</strong><br />
 											', $txt['support_versions_forum'], ':
-											<em id="yourVersion" style="white-space: nowrap;">', $context['forum_version'], '</em><br />
+											<em id="yourVersion">', $context['forum_version'], '</em><br />
 											', $txt['support_versions_current'], ':
-											<em id="ourVersion" style="white-space: nowrap;">??</em><br />
+											<em id="ourVersion">??</em><br />
 											', $context['can_admin'] ? '<a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />';
 
 	// Display all the members who can administrate the forum.
@@ -107,7 +107,7 @@ function template_admin()
 
 	// This sets the announcements and current versions themselves ;).
 	echo '
-					<script src="', $settings['default_theme_url'], '/scripts/admin.js?alp21"></script>
+					<script src="', $settings['default_theme_url'], '/scripts/admin.js?beta10"></script>
 					<script><!-- // --><![CDATA[
 						var oAdminIndex = new elk_AdminIndex({
 							sSelf: \'oAdminCenter\',
@@ -173,9 +173,9 @@ function template_credits()
 								<div class="content">
 									<strong>', $txt['support_versions'], ':</strong><br />
 										', $txt['support_versions_forum'], ':
-									<em id="yourVersion" style="white-space: nowrap;">', $context['forum_version'], '</em>', $context['can_admin'] ? ' <a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />
+									<em id="yourVersion">', $context['forum_version'], '</em>', $context['can_admin'] ? ' <a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />
 										', $txt['support_versions_current'], ':
-									<em id="ourVersion" style="white-space: nowrap;">??</em><br />';
+									<em id="ourVersion">??</em><br />';
 
 	// Display all the variables we have server information for.
 	foreach ($context['current_versions'] as $version)
@@ -214,7 +214,7 @@ function template_credits()
 	// Display latest support questions from ElkArte
 	echo '
 							<h3 class="category_header">
-								<a href="', $scripturl, '?action=quickhelp;help=latest_support" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/icons/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['support_latest'], '
+								<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=latest_support" onclick="return reqOverlayDiv(this.href);"></a>', $txt['support_latest'], '
 							</h3>
 							<div class="windowbg">
 								<div class="content">
@@ -291,7 +291,8 @@ function template_credits()
 					<script><!-- // --><![CDATA[
 						function ourCurrentVersion()
 						{
-							var ourVer, yourVer;
+							var ourVer,
+								yourVer;
 
 							if (!window.elkVersion)
 								return;
@@ -299,11 +300,11 @@ function template_credits()
 							ourVer = document.getElementById("ourVersion");
 							yourVer = document.getElementById("yourVersion");
 
-							setInnerHTML(ourVer, window.elkVersion);
+							ourVer.innerHTML = window.elkVersion;
 
-							var currentVersion = getInnerHTML(yourVer);
+							var currentVersion = yourVer;
 							if (currentVersion != window.ourVersion)
-								setInnerHTML(yourVer, "<span class=\"alert\">" + currentVersion + "</span>");
+								yourVer.innerHTML = "<span class=\"alert\">" + currentVersion + "</span>";
 						}
 						addLoadEvent(ourCurrentVersion)
 					// ]]></script>';
@@ -318,22 +319,20 @@ function template_view_versions()
 
 	echo '
 					<div id="admincenter">
-						<div id="section_header">
-							<h3 class="category_header">
-								', $txt['admin_version_check'], '
-							</h3>
-						</div>
+						<h3 class="category_header">
+							', $txt['admin_version_check'], '
+						</h3>
 						<div class="information">', $txt['version_check_desc'], '</div>
 							<table class="table_grid">
 								<thead>
 									<tr class="table_head lefttext">
-										<th scope="col" style="width:50%">
+										<th scope="col" class="versionFile">
 											<strong>', $txt['admin_elkfile'], '</strong>
 										</th>
-										<th scope="col" style="width:25%">
+										<th scope="col" class="versionNumber">
 											<strong>', $txt['dvc_your'], '</strong>
 										</th>
-										<th scope="col" style="width:25%">
+										<th scope="col" class="versionNumber">
 											<strong>', $txt['dvc_current'], '</strong>
 										</th>
 									</tr>
@@ -377,13 +376,13 @@ function template_view_versions()
 	foreach ($context['file_versions'] as $filename => $version)
 		echo '
 								<tr>
-									<td class="windowbg2" style="width:50%;padding-left: 3ex;">
+									<td class="windowbg2 versionFilePad">
 										', $filename, '
 									</td>
-									<td class="windowbg2" style="width:25%">
+									<td class="windowbg2 versionNumber">
 										<em id="yoursources', $filename, '">', $version, '</em>
 									</td>
-									<td class="windowbg2" style="width:25%">
+									<td class="windowbg2 versionNumber">
 										<em id="oursources', $filename, '">??</em>
 									</td>
 								</tr>';
@@ -398,13 +397,13 @@ function template_view_versions()
 							<table class="table_grid">
 								<tbody>
 									<tr>
-										<td class="windowbg" style="width:50%">
+										<td class="windowbg versionFile">
 											<a href="#" id="admin-link">', $txt['dvc_admin'], '</a>
 										</td>
-										<td class="windowbg" style="width:25%">
+										<td class="windowbg versionNumber>
 											<em id="youradmin">??</em>
 										</td>
-										<td class="windowbg" style="width:25%">
+										<td class="windowbg versionNumber">
 											<em id="ouradmin">??</em>
 										</td>
 									</tr>
@@ -418,13 +417,13 @@ function template_view_versions()
 	foreach ($context['file_versions_admin'] as $filename => $version)
 		echo '
 								<tr>
-									<td class="windowbg2" style="width:50%;padding-left: 3ex;">
+									<td class="windowbg2 versionFilePad">
 										', $filename, '
 									</td>
-									<td class="windowbg2" style="width:25%">
+									<td class="windowbg2 versionNumber">
 										<em id="youradmin', $filename, '">', $version, '</em>
 									</td>
-									<td class="windowbg2" style="width:25%">
+									<td class="windowbg2 versionNumber">
 										<em id="ouradmin', $filename, '">??</em>
 									</td>
 								</tr>';
@@ -439,13 +438,13 @@ function template_view_versions()
 							<table class="table_grid">
 								<tbody>
 									<tr>
-										<td class="windowbg" style="width:50%">
+										<td class="windowbg versionFile">
 											<a href="#" id="controllers-link">', $txt['dvc_controllers'], '</a>
 										</td>
-										<td class="windowbg" style="width:25%">
+										<td class="windowbg versionNumber">
 											<em id="yourcontrollers">??</em>
 										</td>
-										<td class="windowbg" style="width:25%">
+										<td class="windowbg versionNumber">
 											<em id="ourcontrollers">??</em>
 										</td>
 									</tr>
@@ -459,13 +458,13 @@ function template_view_versions()
 	foreach ($context['file_versions_controllers'] as $filename => $version)
 		echo '
 								<tr>
-									<td class="windowbg2" style="width:50%;padding-left: 3ex;">
+									<td class="windowbg2 versionFilePad">
 										', $filename, '
 									</td>
-									<td class="windowbg2" style="width:25%">
+									<td class="windowbg2 versionNumber">
 										<em id="yourcontrollers', $filename, '">', $version, '</em>
 									</td>
-									<td class="windowbg2" style="width:25%">
+									<td class="windowbg2 versionNumber">
 										<em id="ourcontrollers', $filename, '">??</em>
 									</td>
 								</tr>';
@@ -480,13 +479,13 @@ function template_view_versions()
 							<table class="table_grid">
 								<tbody>
 									<tr>
-										<td class="windowbg" style="width:50%">
+										<td class="windowbg versionFile">
 											<a href="#" id="database-link">', $txt['dvc_database'], '</a>
 										</td>
-										<td class="windowbg" style="width:25%">
+										<td class="windowbg versionNumber">
 											<em id="yourdatabase">??</em>
 										</td>
-										<td class="windowbg" style="width:25%">
+										<td class="windowbg versionNumber">
 											<em id="ourdatabase">??</em>
 										</td>
 									</tr>
@@ -500,13 +499,13 @@ function template_view_versions()
 	foreach ($context['file_versions_database'] as $filename => $version)
 		echo '
 								<tr>
-									<td class="windowbg2" style="width:50%;padding-left: 3ex;">
+									<td class="windowbg2 versionFilePad">
 										', $filename, '
 									</td>
-									<td class="windowbg2" style="width:25%">
+									<td class="windowbg2 versionNumber">
 										<em id="yourdatabase', $filename, '">', $version, '</em>
 									</td>
-									<td class="windowbg2" style="width:25%">
+									<td class="windowbg2 versionNumber">
 										<em id="ourdatabase', $filename, '">??</em>
 									</td>
 								</tr>';
@@ -521,13 +520,13 @@ function template_view_versions()
 							<table class="table_grid">
 								<tbody>
 									<tr>
-										<td class="windowbg" style="width:50%">
+										<td class="windowbg versionFile">
 											<a href="#" id="subs-link">', $txt['dvc_subs'], '</a>
 										</td>
-										<td class="windowbg" style="width:25%">
+										<td class="windowbg versionNumber">
 											<em id="yoursubs">??</em>
 										</td>
-										<td class="windowbg" style="width:25%">
+										<td class="windowbg versionNumber">
 											<em id="oursubs">??</em>
 										</td>
 									</tr>
@@ -541,13 +540,13 @@ function template_view_versions()
 	foreach ($context['file_versions_subs'] as $filename => $version)
 		echo '
 								<tr>
-									<td class="windowbg2" style="width:50%;padding-left: 3ex;">
+									<td class="windowbg2 versionFilePad">
 										', $filename, '
 									</td>
-									<td class="windowbg2" style="width:25%">
+									<td class="windowbg2 versionNumber">
 										<em id="yoursubs', $filename, '">', $version, '</em>
 									</td>
-									<td class="windowbg2" style="width:25%">
+									<td class="windowbg2 versionNumber">
 										<em id="oursubs', $filename, '">??</em>
 									</td>
 								</tr>';
@@ -562,13 +561,13 @@ function template_view_versions()
 							<table class="table_grid">
 								<tbody>
 									<tr>
-										<td class="windowbg" style="width:50%">
+										<td class="windowbg versionFile">
 											<a href="#" id="default-link">', $txt['dvc_default'], '</a>
 										</td>
-										<td class="windowbg" style="width:25%">
+										<td class="windowbg versionNumber">
 											<em id="yourdefault">??</em>
 										</td>
-										<td class="windowbg" style="width:25%">
+										<td class="windowbg versionNumber">
 											<em id="ourdefault">??</em>
 										</td>
 									</tr>
@@ -581,13 +580,13 @@ function template_view_versions()
 	foreach ($context['default_template_versions'] as $filename => $version)
 		echo '
 									<tr>
-										<td class="windowbg2" style="width:50%;padding-left: 3ex;">
+										<td class="windowbg2 versionFilePad">
 											', $filename, '
 										</td>
-										<td class="windowbg2" style="width:25%">
+										<td class="windowbg2 versionNumber">
 											<em id="yourdefault', $filename, '">', $version, '</em>
 										</td>
-										<td class="windowbg2" style="width:25%">
+										<td class="windowbg2 versionNumber">
 											<em id="ourdefault', $filename, '">??</em>
 										</td>
 									</tr>';
@@ -600,13 +599,13 @@ function template_view_versions()
 							<table class="table_grid">
 								<tbody>
 									<tr>
-										<td class="windowbg" style="width:50%">
+										<td class="windowbg versionFile">
 											<a href="#" id="Languages-link">', $txt['dvc_languages'], '</a>
 										</td>
-										<td class="windowbg" style="width:25%">
+										<td class="windowbg versionNumber">
 											<em id="yourLanguages">??</em>
 										</td>
-										<td class="windowbg" style="width:25%">
+										<td class="windowbg versionNumber">
 											<em id="ourLanguages">??</em>
 										</td>
 									</tr>
@@ -621,13 +620,13 @@ function template_view_versions()
 		foreach ($files as $filename => $version)
 			echo '
 									<tr>
-										<td class="windowbg2" style="width:50%;padding-left: 3ex;">
+										<td class="windowbg2 versionFilePad">
 											', $filename, '.<em>', $language, '</em>.php
 										</td>
-										<td class="windowbg2" style="width:25%">
+										<td class="windowbg2 versionNumber">
 											<em id="your', $filename, '.', $language, '">', $version, '</em>
 										</td>
-										<td class="windowbg2" style="width:25%">
+										<td class="windowbg2 versionNumber">
 											<em id="our', $filename, '.', $language, '">??</em>
 										</td>
 									</tr>';
@@ -644,13 +643,13 @@ function template_view_versions()
 							<table class="table_grid">
 								<tbody>
 									<tr>
-										<td class="windowbg" style="width:50%">
+										<td class="windowbg versionFile">
 											<a href="#" id="Templates-link">', $txt['dvc_templates'], '</a>
 										</td>
-										<td class="windowbg" style="width:25%">
+										<td class="windowbg versionNumber">
 											<em id="yourTemplates">??</em>
 										</td>
-										<td class="windowbg" style="width:25%">
+										<td class="windowbg versionNumber">
 											<em id="ourTemplates">??</em>
 										</td>
 									</tr>
@@ -663,13 +662,13 @@ function template_view_versions()
 		foreach ($context['template_versions'] as $filename => $version)
 			echo '
 									<tr>
-										<td class="windowbg2" style="width:50%;padding-left: 3ex;">
+										<td class="windowbg2 versionFilePad">
 											', $filename, '
 										</td>
-										<td class="windowbg2" style="width:25%">
+										<td class="windowbg2 versionNumber">
 											<em id="yourTemplates', $filename, '">', $version, '</em>
 										</td>
-										<td class="windowbg2" style="width:25%">
+										<td class="windowbg2 versionNumber">
 											<em id="ourTemplates', $filename, '">??</em>
 										</td>
 									</tr>';
@@ -719,11 +718,9 @@ function template_edit_censored()
 	echo '
 	<div id="admincenter">
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=postsettings;sa=censor" method="post" accept-charset="UTF-8">
-			<div id="section_header">
-				<h3 class="category_header">
-					', $txt['admin_censored_words'], '
-				</h3>
-			</div>
+			<h3 class="category_header">
+				', $txt['admin_censored_words'], '
+			</h3>
 			<div class="windowbg2">
 				<div class="content">
 					<p>', $txt['admin_censored_where'], '</p>';
@@ -731,16 +728,16 @@ function template_edit_censored()
 	// Show text boxes for censoring [bad   ] => [good  ].
 	foreach ($context['censored_words'] as $vulgar => $proper)
 		echo '
-					<div style="margin-top: 1ex;">
+					<div class="censorWords">
 						<input type="text" name="censor_vulgar[]" value="', $vulgar, '" size="30" /> => <input type="text" name="censor_proper[]" value="', $proper, '" size="30" />
 					</div>';
 
 	// Now provide a way to censor more words.
 	echo '
-					<div style="margin-top: 1ex;">
+					<div class="censorWords">
 						<input type="text" name="censor_vulgar[]" size="30" class="input_text" /> => <input type="text" name="censor_proper[]" size="30" class="input_text" />
 					</div>
-					<div id="moreCensoredWords"></div><div style="margin-top: 1ex; display: none;" id="moreCensoredWords_link">
+					<div id="moreCensoredWords"></div><div class="censorWords" style="display: none;" id="moreCensoredWords_link">
 						<a class="linkbutton_left" href="#;" onclick="addNewWord(); return false;">', $txt['censor_clickadd'], '</a><br />
 					</div>
 					<script><!-- // --><![CDATA[
@@ -795,9 +792,7 @@ function template_not_done()
 
 	echo '
 	<div id="admincenter">
-		<div id="section_header">
-			<h3 class="category_header">', $txt['not_done_title'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt['not_done_title'], '</h3>
 		<div class="windowbg">
 			<div class="content">
 				', $txt['not_done_reason'];
@@ -825,8 +820,8 @@ function template_not_done()
 		</div>
 	</div>
 	<script><!-- // --><![CDATA[
-		var countdown = ', $context['continue_countdown'], ';
-		var txt_message = "', $txt['not_done_continue'], '";
+		var countdown = ', $context['continue_countdown'], ',
+			txt_message = "', $txt['not_done_continue'], '";
 		doAutoSubmit();
 	// ]]></script>';
 }
@@ -849,10 +844,12 @@ function template_show_settings()
 	<div id="admincenter">
 		<form id="admin_form_wrapper" action="', $context['post_url'], '" method="post" accept-charset="UTF-8"', !empty($context['force_form_onsubmit']) ? ' onsubmit="' . $context['force_form_onsubmit'] . '"' : '', '>';
 
-	// Is there a custom title?
+	// Is there a custom title, maybe even with an icon?
 	if (isset($context['settings_title']))
+	{
 		echo '
-			<h3 class="category_header">', $context['settings_title'], '</h3>';
+			<h3 class="category_header', !empty($context['settings_icon']) ? ' hdicon cat_img_' . $context['settings_icon'] : '', '">', $context['settings_title'], '</h3>';
+	}
 
 	// any messages or errors to show?
 	if (!empty($context['settings_message']))
@@ -861,7 +858,7 @@ function template_show_settings()
 			$context['settings_message'] = array($context['settings_message']);
 
 		echo '
-			<div class="', (empty($context['error_type']) ? 'infobox' : ($context['error_type'] !== 'serious' ? 'noticebox' : 'errorbox')), '" id="errors">
+			<div class="', (empty($context['error_type']) ? 'infobox' : ($context['error_type'] !== 'serious' ? 'warningbox' : 'errorbox')), '" id="errors">
 				<ul>
 					<li>', implode('</li><li>', $context['settings_message']), '</li>
 				</ul>
@@ -885,12 +882,12 @@ function template_show_settings()
 			</div>';
 			}
 
-			// A title?
+			// A title, maybe even with an icon or a help icon?
 			if ($config_var['type'] == 'title')
 			{
 				echo '
 					<h3 class="', !empty($config_var['class']) ? $config_var['class'] : 'category_header', '"', !empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '"' : '', '>
-						', ($config_var['help'] ? '<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['help'] . '" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/icons/helptopics_hd.png" class="icon" alt="' . $txt['help'] . '" /></a>' : ''), '
+						', ($config_var['help'] ? (empty($config_var['class']) ? '<span class="hdicon cat_img_helptopics help"></span>' : '<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['help'] . '" onclick="return reqOverlayDiv(this.href);" class="' . $config_var['class'] . ' help"><img src="' . $settings['images_url'] . '/icons/helptopics_hd.png" class="icon" alt="' . $txt['help'] . '" /></a>') : ($config_var['icon'] ? '<span class="hdicon cat_img_' . $config_var['icon'] . '"></span>' : '')), '
 						', $config_var['label'], '
 					</h3>';
 			}
@@ -1093,7 +1090,7 @@ function template_admin_search_results()
 	global $context, $txt, $settings, $scripturl;
 
 	echo '
-					<div id="section_header">
+					<div>
 						<h3 class="category_header">
 							<object id="quick_search">
 								<form action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="UTF-8" class="floatright">
@@ -1266,11 +1263,9 @@ function template_repair_boards()
 
 	echo '
 	<div id="admincenter">
-		<div id="section_header">
-			<h3 class="category_header">',
-				$context['error_search'] ? $txt['errors_list'] : $txt['errors_fixing'], '
-			</h3>
-		</div>
+		<h3 class="category_header">',
+			$context['error_search'] ? $txt['errors_list'] : $txt['errors_fixing'], '
+		</h3>
 		<div class="windowbg">
 			<div class="content">';
 
@@ -1354,10 +1349,7 @@ function template_php_info()
 
 	echo '
 	<div id="admin_form_wrapper">
-		<div id="section_header">
-			<h3 class="category_header">', $txt['phpinfo_settings'], '</h3>
-		</div>
-		<br />';
+		<h3 class="category_header">', $txt['phpinfo_settings'], '</h3>';
 
 	// for each php info area
 	foreach ($context['pinfo'] as $area => $php_area)
@@ -1443,12 +1435,12 @@ function template_clean_cache_button_below()
 	global $txt, $scripturl, $context;
 
 	echo '
-	<h3 class="category_header">', $txt['maintain_cache'], '</h3>
-	<div class="windowbg">
+	<div class="generic_list_wrapper">
+		<h3 class="category_header">', $txt['maintain_cache'], '</h3>
 		<div class="content">
 			<form action="', $scripturl, '?action=admin;area=maintain;sa=routine;activity=cleancache" method="post" accept-charset="UTF-8">
 				<p>', $txt['maintain_cache_info'], '</p>
-				<span><input type="submit" value="', $txt['maintain_run_now'], '" class="right_submit" /></span>
+				<input type="submit" value="', $txt['maintain_run_now'], '" class="right_submit" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<input type="hidden" name="', $context['admin-maint_token_var'], '" value="', $context['admin-maint_token'], '" />
 			</form>

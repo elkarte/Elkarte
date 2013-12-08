@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This template is, perhaps, the most important template in the theme. It
  * contains the main template layer that displays the header and footer of
@@ -71,9 +71,12 @@ function template_init()
 	// This is used in the main menus to create a number next to the title of the menu to indicate the number of unread messages,
 	// moderation reports, etc. You can style each menu level indicator as desired.
 	$settings['menu_numeric_notice'] = array(
+		// Top level menu entries
 		0 => ' <span class="pm_indicator">%1$s</span>',
-		1 => ' <span class="pm_indicator">%1$s</span>',
-		2 => ' <span>[%1$s]</span>',
+		// First dropdown
+		1 => ' <span>[<strong>%1$s</strong>]</span>',
+		// Second level dropdown
+		2 => ' <span>[<strong>%1$s</strong>]</span>',
 	);
 
 	// This slightly more complex array, instead, will deal with page indexes as frequently requested by Ant :P
@@ -90,7 +93,7 @@ function template_init()
 	);
 
 	// @todo find a better place if we are going to create a notifications template
-	$settings['notifications']['notifier_template'] = '<a href="{mem_url}" class="notifavatar">{avatar_img}{mem_name}</a>';
+	$settings['mentions']['mentioner_template'] = '<a href="{mem_url}" class="mentionavatar">{avatar_img}{mem_name}</a>';
 }
 
 /**
@@ -235,7 +238,7 @@ function template_body_above()
 					<input type="hidden" name="hash_passwrd" value="" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />';
-				
+
 		if (!empty($modSettings['enableOpenID']))
 			echo '
 					<a class="button_submit top_button" href="', $scripturl, '?action=login;openid"><img src="' . $settings['images_url'] . '/openid.png" title="' . $txt['openid'] . '" /></a>';
@@ -301,12 +304,15 @@ function template_body_above()
 	echo '
 		</div>
 		<div id="header" class="wrapper"', empty($context['minmax_preferences']['upshrink']) ? '' : ' style="display: none;" aria-hidden="true"', '>
-			<h1 class="forumtitle">
-				<a href="', $scripturl, '">', empty($context['header_logo_url_html_safe']) ? $context['forum_name'] : '<img src="' . $context['header_logo_url_html_safe'] . '" alt="' . $context['forum_name'] . '" />', '</a>
+			<h1 id="forumtitle', !empty($settings['header_layout']) ? ($settings['header_layout'] == 1 ? 'none' : 'right') : '', '">
+				<a href="', $scripturl, '">', $context['forum_name'], '</a>
 			</h1>';
 
 	echo '
-			', empty($settings['site_slogan']) ? '<img id="logo" src="' . $settings['images_url'] . (!empty($context['theme_variant']) ? '/' . $context['theme_variant'] . '/logo_elk.png' : '/logo_elk.png' ) . '" alt="ElkArte Community" title="ElkArte Community" />' : '<div id="siteslogan" class="floatright">' . $settings['site_slogan'] . '</div>', '';
+			<div id="logobox', !empty($settings['header_layout']) ? ($settings['header_layout'] == 1 ? 'center' : 'left') : '', '">
+				<img id="logo" src="', $context['header_logo_url_html_safe'], '" alt="', $context['forum_name'], '" title="', $context['forum_name'], '" />', empty($settings['site_slogan']) ? '' : '
+				<div id="siteslogan">' . $settings['site_slogan'] . '</div>', '
+			</div>';
 
 	// Show the menu here, according to the menu sub template.
 	echo '
@@ -340,11 +346,11 @@ function template_body_above()
 	// Are there any members waiting for approval?
 	if (!empty($context['unapproved_members']))
 		echo '
-		<div class="modtask noticebox">', $context['unapproved_members_text'], '</div>';
+		<div class="modtask warningbox">', $context['unapproved_members_text'], '</div>';
 
 	if (!empty($context['open_mod_reports']) && $context['show_open_reports'])
 		echo '
-		<div class="modtask noticebox"><a href="', $scripturl, '?action=moderate;area=reports">', sprintf($txt['mod_reports_waiting'], $context['open_mod_reports']), '</a></div>';
+		<div class="modtask warningbox"><a href="', $scripturl, '?action=moderate;area=reports">', sprintf($txt['mod_reports_waiting'], $context['open_mod_reports']), '</a></div>';
 
 	// The main content should go here. @todo - Skip nav link.
 	echo '
@@ -375,7 +381,7 @@ function template_body_below()
 					<a id="button_xhtml" href="http://validator.w3.org/check?uri=referer" target="_blank" class="new_win" title="', $txt['valid_html'], '"><span>', $txt['html'], '</span></a>
 				</li>',
 				!empty($modSettings['xmlnews_enable']) && (!empty($modSettings['allow_guestAccess']) || $context['user']['is_logged']) ? '<li><a id="button_rss" href="' . $scripturl . '?action=.xml;type=rss;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5) . '" class="new_win"><span>' . $txt['rss'] . '</span></a></li>' : '',
-				(!empty($modSettings['badbehavior_enabled']) && !empty($modSettings['badbehavior_display_stats'])) ? '<li class="copyright">' . bb2_insert_stats() . '</li>' : '', '
+				(!empty($modSettings['badbehavior_enabled']) && !empty($modSettings['badbehavior_display_stats']) && function_exists('bb2_insert_stats')) ? '<li class="copyright">' . bb2_insert_stats() . '</li>' : '', '
 			</ul>';
 
 	// Show the load time?
@@ -393,8 +399,14 @@ function template_body_below()
  */
 function template_html_below()
 {
+	global $context;
+
 	// load in any javascript that could be deferred to the end of the page
 	template_javascript(true);
+
+	// Anything special to put out?
+	if (!empty($context['insert_after_template']) && !isset($_REQUEST['xml']))
+		echo $context['insert_after_template'];
 
 	echo '
 </body>
@@ -407,7 +419,7 @@ function template_html_below()
  */
 function theme_linktree($force_show = false)
 {
-	global $context, $settings, $shown_linktree;
+	global $context, $settings;
 
 	// If linktree is empty, just return - also allow an override.
 	if (empty($context['linktree']) || (!empty($context['dont_default_linktree']) && !$force_show))
@@ -442,8 +454,6 @@ function theme_linktree($force_show = false)
 
 	echo '
 				</ul>';
-
-	$shown_linktree = true;
 }
 
 /**
@@ -602,7 +612,7 @@ function template_show_error($error_id)
 	$error = $context[$error_id];
 
 	echo '
-					<div class="', (!isset($error['type']) ? 'infobox' : ($error['type'] !== 'serious' ? 'noticebox' : 'errorbox')), '" ', empty($error['errors']) ? ' style="display: none"' : '', ' id="', $error_id, '">';
+					<div class="', (!isset($error['type']) ? 'successbox' : ($error['type'] !== 'serious' ? 'warningbox' : 'errorbox')), '" ', empty($error['errors']) ? ' style="display: none"' : '', ' id="', $error_id, '">';
 
 	// Optional title for our results
 	if (!empty($error['title']))
@@ -650,15 +660,16 @@ function template_pagesection($button_strip = false, $strip_direction = '', $opt
 {
 	global $context;
 
-	if (!empty($options['page_index_markup']))
+
 	// Hmmm. I'm a tad wary of having floatleft here but anyway............
 	// @todo - Try using table-cell display here. Should do auto rtl support. Less markup, less css. :)
-		$pages = '<ul class="pagelinks floatleft" role="menubar">' . $options['page_index_markup'] . '</ul>';
+	if (!empty($options['page_index_markup']))
+		$pages = '<ul ' . (isset($options['page_index_id']) ? 'id="' . $options['page_index_id'] . '" ' : '') . 'class="pagelinks floatleft" role="menubar">' . $options['page_index_markup'] . '</ul>';
 	else
 	{
 		if (!isset($options['page_index']))
 			$options['page_index'] = 'page_index';
-		$pages = empty($context[$options['page_index']]) ? '' : '<ul class="pagelinks floatleft" role="menubar">' . $context[$options['page_index']] . '</ul>';
+		$pages = empty($context[$options['page_index']]) ? '' : '<ul ' . (isset($options['page_index_id']) ? 'id="' . $options['page_index_id'] . '" ' : '') . 'class="pagelinks floatleft" role="menubar">' . $context[$options['page_index']] . '</ul>';
 	}
 
 	if (!isset($options['extra']))

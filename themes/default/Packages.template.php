@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -386,8 +386,9 @@ function template_view_package()
 	if ($context['uninstalling'] && !empty($context['database_changes']))
 		echo '
 	<script><!-- // --><![CDATA[
-		var database_changes_area = document.getElementById(\'db_changes_div\');
-		var db_vis = false;
+		var database_changes_area = document.getElementById(\'db_changes_div\'),
+			db_vis = false;
+
 		database_changes_area.style.display = "none";
 	// ]]></script>';
 }
@@ -403,7 +404,7 @@ function template_extract_package()
 	{
 		echo '
 	<script><!-- // --><![CDATA[
-		setTimeout("doRedirect();", ', empty($context['redirect_timeout']) ? '5000' : $context['redirect_timeout'], ');
+		setTimeout(function() {doRedirect();}, ', empty($context['redirect_timeout']) ? 5000 : $context['redirect_timeout'], ');
 
 		function doRedirect()
 		{
@@ -544,34 +545,30 @@ function template_browse()
 
 	// the advanced (emulation) box, collapsed by default
 	echo '
-		<form action="', $scripturl, '?action=admin;area=packages;sa=', $context['sub_action'], '" method="get">
-			<div id="advanced_box" >
-				<h3 class="category_header">
-					<span id="category_toggle">&nbsp;
-						<span id="upshrink_ic" class="', empty($context['admin_preferences']['pkg']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
-					</span>
-					<a href="#" id="advanced_panel_link">', $txt['package_advanced_button'], '</a>
-				</h3>
-				<div id="advanced_panel_div" class="windowbg"', !empty($context['admin_preferences']['pkg']) ? ' style="display: none;"' : '', '>
-					<div class="content">
-						<p>
-							', $txt['package_emulate_desc'], '
-						</p>
-						<dl class="settings">
-							<dt>
-								<strong>', $txt['package_emulate'], ':</strong><br />
-								<span class="smalltext">
-									<a href="#" onclick="document.getElementById(\'ve\').value = \'', $forum_version, '\';document.getElementsByName(\'version_emulate\')[0].value = \'', $forum_version, '\';return false">', $txt['package_emulate_revert'], '</a>
-								</span>
-							</dt>
-							<dd>
-								<input type="text" name="version_emulate" id="ve" value="', $context['forum_version'], '" size="25" class="input_text" />
-							</dd>
-						</dl>
-						<div class="submitbutton">
-							<input type="submit" value="', $txt['package_apply'], '" class="button_submit" />
-						</div>
-					</div>
+		<form class="generic_list_wrapper" action="', $scripturl, '?action=admin;area=packages;sa=', $context['sub_action'], '" method="get">
+			<h3 class="category_header">
+				<span id="category_toggle">&nbsp;
+					<span id="upshrink_ic" class="', empty($context['admin_preferences']['pkg']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
+				</span>
+				<a href="#" id="advanced_panel_link">', $txt['package_advanced_button'], '</a>
+			</h3>
+			<div id="advanced_panel_div" class="windowbg"', !empty($context['admin_preferences']['pkg']) ? ' style="display: none;"' : '', '>
+				<div class="content">
+					<p>
+						', $txt['package_emulate_desc'], '
+					</p>
+					<dl class="settings">
+						<dt>
+							<strong>', $txt['package_emulate'], ':</strong><br />
+							<span class="smalltext">
+								<a href="#" onclick="document.getElementById(\'ve\').value = \'', $forum_version, '\';document.getElementsByName(\'version_emulate\')[0].value = \'', $forum_version, '\';return false">', $txt['package_emulate_revert'], '</a>
+							</span>
+						</dt>
+						<dd>
+							<input type="text" name="version_emulate" id="ve" value="', $context['forum_version'], '" size="25" class="input_text" />
+						</dd>
+					</dl>
+					<input type="submit" value="', $txt['package_apply'], '" class="right_submit" />
 				</div>
 			</div>
 			<input type="hidden" name="action" value="admin" />
@@ -721,19 +718,19 @@ function template_control_chmod()
 							<label for="ftp_username">', $txt['package_ftp_username'], ':</label>
 						</dt>
 						<dd>
-							<input type="text" size="50" name="ftp_username" id="ftp_username" value="', $context['package_ftp']['username'], '" style="width: 98%;" class="input_text" />
+							<input type="text" size="50" name="ftp_username" id="ftp_username" value="', $context['package_ftp']['username'], '" class="input_text" />
 						</dd>
 						<dt>
 							<label for="ftp_password">', $txt['package_ftp_password'], ':</label>
 						</dt>
 						<dd>
-							<input type="password" size="50" name="ftp_password" id="ftp_password" style="width: 98%;" class="input_password" />
+							<input type="password" size="50" name="ftp_password" id="ftp_password" class="input_password" />
 						</dd>
 						<dt>
 							<label for="ftp_path">', $txt['package_ftp_path'], ':</label>
 						</dt>
 						<dd>
-							<input type="text" size="50" name="ftp_path" id="ftp_path" value="', $context['package_ftp']['path'], '" style="width: 98%;" class="input_text" />
+							<input type="text" size="50" name="ftp_path" id="ftp_path" value="', $context['package_ftp']['path'], '" class="input_text" />
 						</dd>
 					</dl>
 					</fieldset>';
@@ -757,60 +754,13 @@ function template_control_chmod()
 			document.getElementById(\'need_writable_list\').style.display = \'none\';
 		// ]]></script>';
 
-	// Quick generate the test button.
+	// Set up to generate the FTP test button.
 	echo '
 	<script><!-- // --><![CDATA[
-		// Generate a "test ftp" button.
-		var generatedButton = false;
-		function generateFTPTest()
-		{
-			// Don\'t ever call this twice!
-			if (generatedButton)
-				return false;
-			generatedButton = true;
-
-			// No XML?
-			if (!window.XMLHttpRequest || (!document.getElementById("test_ftp_placeholder") && !document.getElementById("test_ftp_placeholder_full")))
-				return false;
-
-			var ftpTest = document.createElement("input");
-			ftpTest.type = "button";
-			ftpTest.className = "right_submit";
-			ftpTest.onclick = testFTP;
-
-			if (document.getElementById("test_ftp_placeholder"))
-			{
-				ftpTest.value = "', $txt['package_ftp_test'], '";
-				document.getElementById("test_ftp_placeholder").appendChild(ftpTest);
-			}
-			else
-			{
-				ftpTest.value = "', $txt['package_ftp_test_connection'], '";
-				document.getElementById("test_ftp_placeholder_full").appendChild(ftpTest);
-			}
-		}
-
-		function testFTPResults(oXMLDoc)
-		{
-			ajax_indicator(false);
-
-			// This assumes it went wrong!
-			var wasSuccess = false;
-			var message = "', addcslashes($txt['package_ftp_test_failed'], "'"), '";
-
-			var results = oXMLDoc.getElementsByTagName(\'results\')[0].getElementsByTagName(\'result\');
-			if (results.length > 0)
-			{
-				if (results[0].getAttribute(\'success\') == 1)
-					wasSuccess = true;
-				message = results[0].firstChild.nodeValue;
-			}
-
-			document.getElementById("ftp_error_div").style.display = "";
-			document.getElementById("ftp_error_div").className = wasSuccess ? "infobox" : "errorbox";
-
-			setInnerHTML(document.getElementById("ftp_error_message"), message);
-		}
+		var generatedButton = false,
+			package_ftp_test = "', $txt['package_ftp_test'], '",
+			package_ftp_test_connection = "', $txt['package_ftp_test_connection'], '",
+			package_ftp_test_failed = "', addcslashes($txt['package_ftp_test_failed'], "'"), '";
 	// ]]></script>';
 
 	// Make sure the button gets generated last.
@@ -850,10 +800,10 @@ function template_view_operations()
 	<head>
 		<title>', $txt['operation_title'], '</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?alp21" />
-		<link rel="stylesheet" href="', $settings['theme_url'], '/css/admin.css?alp21" />
-		<script src="', $settings['default_theme_url'], '/scripts/script.js?alp21"></script>
-		<script src="', $settings['default_theme_url'], '/scripts/theme.js?alp21"></script>
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?beta10" />
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/admin.css?beta10" />
+		<script src="', $settings['default_theme_url'], '/scripts/script.js?beta10"></script>
+		<script src="', $settings['default_theme_url'], '/scripts/theme.js?beta10"></script>
 	</head>
 	<body>
 		<div class="windowbg">
@@ -889,6 +839,7 @@ function template_file_permissions()
 			3: "custom",
 			4: "no_change"
 		}
+
 		function dynamicAddMore()
 		{
 			ajax_indicator(true);
@@ -920,11 +871,11 @@ function template_file_permissions()
 				}
 				return false;
 			}
-			var tableHandle = false;
-			var isMore = false;
-			var ident = "";
-			var my_ident = "";
-			var curLevel = 0;
+			var tableHandle = false,
+				isMore = false,
+				ident = "",
+				my_ident = "",
+				curLevel = 0;
 
 			for (var i = 0; i < fileItems.length; i++)
 			{
@@ -948,6 +899,7 @@ function template_file_permissions()
 					curRow.className = "windowbg";
 					curRow.id = "content_" + my_ident;
 					curRow.style.display = "";
+
 					var curCol = document.createElement("td");
 					curCol.className = "smalltext";
 					curCol.width = "40%";
@@ -956,7 +908,7 @@ function template_file_permissions()
 					var fileName = document.createTextNode(fileItems[i].firstChild.nodeValue);
 
 					// Start by wacking in the spaces.
-					setInnerHTML(curCol, repeatString("&nbsp;", curLevel));
+					curCol.innerHTML = php_str_repeat("&nbsp;", curLevel);
 
 					// Create the actual text.
 					if (fileItems[i].getAttribute(\'folder\') == 1)
@@ -987,7 +939,7 @@ function template_file_permissions()
 
 					var writeSpan = document.createElement("span");
 					writeSpan.style.color = fileItems[i].getAttribute(\'writable\') ? "green" : "red";
-					setInnerHTML(writeSpan, fileItems[i].getAttribute(\'writable\') ? \'', $txt['package_file_perms_writable'], '\' : \'', $txt['package_file_perms_not_writable'], '\');
+					writeSpan.innerHTML = fileItems[i].getAttribute(\'writable\') ? \'', $txt['package_file_perms_writable'], '\' : \'', $txt['package_file_perms_not_writable'], '\';
 					curCol.appendChild(writeSpan);
 
 					if (fileItems[i].getAttribute(\'permissions\'))
@@ -1005,9 +957,10 @@ function template_file_permissions()
 						curCol.style.backgroundColor = oRadioColors[j];
 						curCol.align = "center";
 
-						var curInput = createNamedElement("input", "permStatus[" + curPath + "/" + fileItems[i].firstChild.nodeValue + "]", j == 4 ? \'checked="checked"\' : "");
+						var curInput = document.createElement("input");
+						curInput.name = "permStatus[" + curPath + "/" + fileItems[i].firstChild.nodeValue + "]";
 						curInput.type = "radio";
-						curInput.checked = "checked";
+						curInput.checked = (j == 4 ? "checked" : "");
 						curInput.value = oRadioValues[j];
 
 						curCol.appendChild(curInput);
@@ -1024,6 +977,7 @@ function template_file_permissions()
 						newRow.id = "insert_div_loc_" + my_ident;
 						newRow.style.display = "none";
 						tableHandle.parentNode.insertBefore(newRow, tableHandle);
+
 						var newCol = document.createElement("td");
 						newCol.colspan = 2;
 						newRow.appendChild(newCol);
@@ -1057,7 +1011,7 @@ function template_file_permissions()
 				curCol.className = "smalltext";
 				curCol.width = "40%";
 
-				setInnerHTML(curCol, repeatString("&nbsp;", curLevel));
+				curCol.innerHTML = php_str_repeat("&nbsp;", curLevel);
 				curCol.appendChild(document.createTextNode(\'\\u00ab \'));
 				curCol.appendChild(linkData);
 				curCol.appendChild(document.createTextNode(\' \\u00bb\'));
@@ -1069,7 +1023,8 @@ function template_file_permissions()
 			}
 
 			// Keep track of it.
-			var curInput = createNamedElement("input", "back_look[]");
+			var curInput = document.createElement("input");
+			curInput.name = "back_look[]";
 			curInput.type = "hidden";
 			curInput.value = curPath;
 
@@ -1078,7 +1033,7 @@ function template_file_permissions()
 	// ]]></script>';
 
 		echo '
-	<div class="noticebox">
+	<div class="warningbox">
 		<div>
 			<strong>', $txt['package_file_perms_warning'], ':</strong><br>
 				', $txt['package_file_perms_warning_desc'], '
@@ -1362,8 +1317,9 @@ function template_pause_action_permissions()
 	// Just the countdown stuff
 	echo '
 	<script><!-- // --><![CDATA[
-		var countdown = ', $countDown, ';
-		var txt_message = "', $txt['not_done_continue'], '";
+		var countdown = ', $countDown, ',
+			txt_message = "', $txt['not_done_continue'], '";
+
 		doAutoSubmit();
 	// ]]></script>';
 

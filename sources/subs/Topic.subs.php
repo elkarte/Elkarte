@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file contains functions for dealing with topics. Low-level functions,
  * i.e. database operations needed to perform.
@@ -314,9 +314,9 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		)
 	);
 
-	// Remove all notifications now that the topic is gone
+	// Remove all mentions now that the topic is gone
 	$db->query('', '
-		DELETE FROM {db_prefix}log_notifications
+		DELETE FROM {db_prefix}log_mentions
 		WHERE id_msg IN ({array_int:messages})',
 		array(
 			'messages' => $messages,
@@ -1089,6 +1089,7 @@ function setTopicWatch($id_member, $topic, $on = false)
  * @param string $full defines the values returned by the function:
  *             - if empty returns only the data from {db_prefix}topics
  *             - if 'message' returns also informations about the message (subject, body, etc.)
+ *             - if 'starter' returns also informations about the topic starter (id_member and poster_name)
  *             - if 'all' returns additional infos about the read/unwatched status
  * @param array $selects (optional from integation)
  * @param array $tables (optional from integation)
@@ -1111,7 +1112,8 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 			'board' => (int) $board,
 		);
 
-	$messages_table = $full === 'message' || $full === 'all';
+	$messages_table = $full === 'message' || $full === 'all' || $full === 'starter';
+	$members_table = $full === 'starter';
 	$follow_ups_table = !empty($modSettings['enableFollowup']) && $full === 'follow_up' || $full === 'all';
 	$logs_table = $full === 'all';
 
@@ -1122,7 +1124,8 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 			t.id_member_started, t.id_member_updated, t.id_poll,
 			t.num_replies, t.num_views, t.num_likes, t.locked, t.redirect_expires,
 			t.id_redirect_topic, t.unapproved_posts, t.approved' . ($messages_table ? ',
-			ms.subject, ms.body, ms.id_member, ms.poster_time, ms.approved as msg_approved' : '') . ($follow_ups_table ? ',
+			ms.subject, ms.body, ms.id_member, ms.poster_time, ms.approved as msg_approved' : '') . ($members_table ? ',
+			IFNULL(mem.real_name, ms.poster_name) AS poster_name' : '') . ($follow_ups_table ? ',
 			fu.derived_from' : '') .
 			($logs_table ? ',
 			' . ($user_info['is_guest'] ? 't.id_last_msg + 1' : 'IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1') . ' AS new_from
@@ -1130,9 +1133,9 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 			' . (!$user_info['is_guest'] ? ', IFNULL(lt.unwatched, 0) as unwatched' : '') : '') .
 			(!empty($selects) ? ', ' . implode(', ', $selects) : '') . '
 		FROM {db_prefix}topics AS t' . ($messages_table ? '
-			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)' : '') . ($follow_ups_table ? '
-			LEFT JOIN {db_prefix}follow_ups AS fu ON (fu.follow_up = t.id_topic)' : '') .
-			($logs_table && !$user_info['is_guest'] ? '
+			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)' : '') . ($members_table ? '
+			LEFT JOIN {db_prefix}members as mem ON (mem.id_member = ms.id_member)' : '') . ($follow_ups_table ? '
+			LEFT JOIN {db_prefix}follow_ups AS fu ON (fu.follow_up = t.id_topic)' : '') . ($logs_table && !$user_info['is_guest'] ? '
 			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = {int:topic} AND lt.id_member = {int:member})
 			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = {int:board} AND lmr.id_member = {int:member})' : '') .
 			(!empty($tables) ? implode("\n\t\t\t", $tables) : '') . '

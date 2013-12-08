@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /*
@@ -33,12 +33,10 @@ function template_show_list($list_id = null)
 		echo '
 		<div class="generic_list_wrapper">';
 
-	// Show the title of the table (if any).
+	// Show the title of the table (if any), with an icon (if defined)
 	if (!empty($cur_list['title']))
 		echo '
-			<h3 class="category_header">
-				', $cur_list['title'], '
-			</h3>';
+			<h3 class="category_header', !empty($cur_list['icon']) ? ' hdicon cat_img_' . $cur_list['icon'] : '', '">', $cur_list['title'], '</h3>';
 
 	// Show any data right after the title
 	if (isset($cur_list['additional_rows']['after_title']))

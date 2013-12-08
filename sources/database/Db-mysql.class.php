@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file has all the main functions in it that relate to the database.
  *
@@ -508,7 +508,8 @@ class Database_MySQL implements Database
 		// Decide which connection to use
 		$connection = $connection === null ? $this->_connection : $connection;
 
-		return mysqli_error($connection);
+		if (is_object($connection))
+			return mysqli_error($connection);
 	}
 
 	/**

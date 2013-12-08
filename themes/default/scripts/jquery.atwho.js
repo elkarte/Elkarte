@@ -24,12 +24,13 @@
       function App(inputor) {
         this.current_flag = null;
         this.controllers = {};
+		this.alias_maps = {};
         this.$inputor = $(inputor);
         this.listen();
       }
 
       App.prototype.controller = function(at) {
-        return this.controllers[at || this.current_flag];
+       return this.controllers[this.alias_maps[at] || at || this.current_flag];
       };
 
       App.prototype.set_context_for = function(at) {
@@ -41,7 +42,7 @@
         var controller, _base;
         controller = (_base = this.controllers)[flag] || (_base[flag] = new Controller(this, flag));
         if (setting.alias) {
-          this.controllers[setting.alias] = controller;
+          this.alias_maps[setting.alias] = flag;
         }
         controller.init(setting);
         return this;
@@ -218,7 +219,7 @@
 
       Controller.prototype.rect = function() {
         var c, scale_bottom;
-        if (!(c = this.$inputor.caret('offset', this.pos - 1))) {
+        if (!(c = this.$inputor.caret('offset', this.setting.cWindow, this.pos - 1))) {
           return;
         }
         if (this.$inputor.attr('contentEditable') === 'true') {
@@ -249,7 +250,7 @@
       Controller.prototype.get_range = function() {
         var thisWin = this.setting.cWindow;
 
-        return this.range || (thisWin.getSelection ? thisWin.getSelection().getRangeAt(0) : void 0);
+        return thisWin.getSelection ? thisWin.getSelection().getRangeAt(0) : (this.range || void 0);
       };
 
       Controller.prototype.get_ie_range = function() {
@@ -273,6 +274,7 @@
       Controller.prototype.insert = function(content, $li) {
         var $inputor, $insert_node, class_name, content_node, insert_node, pos, range, sel, source, start_str, text, thisWin;
         $inputor = this.$inputor;
+
         if ($inputor.attr('contentEditable') === 'true') {
           class_name = "atwho-view-flag atwho-view-flag-" + (this.get_opt('alias') || this.at);
           content_node = "" + content + "<span contenteditable='false'>&nbsp;<span>";
@@ -337,13 +339,11 @@
 
     })();
     Model = (function() {
-      var _storage;
-
-      _storage = {};
 
       function Model(context) {
         this.context = context;
         this.at = this.context.at;
+		this.storage = this.context.$inputor;
       }
 
       Model.prototype.saved = function() {
@@ -351,21 +351,24 @@
       };
 
       Model.prototype.query = function(query, callback) {
-        var data, search_key, _ref;
+       var data, search_key, _remote_filter;
         data = this.fetch();
         search_key = this.context.get_opt("search_key");
-        callback(data = this.context.callbacks('filter').call(this.context, query, data, search_key));
-        if (!(data && data.length > 0)) {
-          return (_ref = this.context.callbacks('remote_filter')) != null ? _ref.call(this.context, query, callback) : void 0;
-        }
+        data = this.context.callbacks('filter').call(this.context, query, data, search_key) || [];
+        _remote_filter = this.context.callbacks('remote_filter');
+        if (data.length > 0 || (!_remote_filter && data.length === 0)) {
+          return callback(data);
+        } else {
+          return _remote_filter.call(this.context, query, callback);
+		}
       };
 
       Model.prototype.fetch = function() {
-        return _storage[this.at] || [];
+        return this.storage.data(this.at) || [];
       };
 
       Model.prototype.save = function(data) {
-        return _storage[this.at] = this.context.callbacks("before_save").call(this.context, data || []);
+        return this.storage.data(this.at, this.context.callbacks("before_save").call(this.context, data || []));
       };
 
       Model.prototype.load = function(data) {
@@ -446,6 +449,7 @@
       View.prototype.reposition = function(rect) {
         var offset, thisWin;
         thisWin = this.context.setting.cWindow;
+
         if (rect.bottom + this.$el.height() - $(thisWin).scrollTop() > $(thisWin).height()) {
           rect.bottom = rect.top - this.$el.height();
         }
@@ -453,6 +457,7 @@
           left: rect.left,
           top: rect.bottom
         };
+
         this.$el.offset(offset);
         return this.context.trigger("reposition", [offset]);
       };
@@ -482,9 +487,9 @@
         if (!this.visible()) {
           this.$el.show();
         }
-        if (rect = this.context.rect()) {
+       if (rect = this.context.rect()) {
           return this.reposition(rect);
-        }
+       }
       };
 
       View.prototype.hide = function(time) {
@@ -504,7 +509,7 @@
 
       View.prototype.render = function(list) {
         var $li, $ul, item, li, tpl, _i, _len;
-        if (!$.isArray(list || list.length <= 0)) {
+        if (!($.isArray(list) && list.length > 0)) {
           this.hide();
           return;
         }

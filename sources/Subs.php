@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file has all the main functions in it that relate to, well, everything.
  *
@@ -115,7 +115,7 @@ function updateMemberData($members, $data)
 
 	// Everything is assumed to be a string unless it's in the below.
 	$knownInts = array(
-		'date_registered', 'posts', 'id_group', 'last_login', 'personal_messages', 'unread_messages',
+		'date_registered', 'posts', 'id_group', 'last_login', 'personal_messages', 'unread_messages', 'mentions',
 		'new_pm', 'pm_prefs', 'gender', 'hide_email', 'show_online', 'pm_email_notify', 'receive_from', 'karma_good', 'karma_bad',
 		'notify_announcements', 'notify_send_body', 'notify_regularity', 'notify_types',
 		'id_theme', 'is_activated', 'id_msg_last_visit', 'id_post_group', 'total_time_logged_in', 'warning', 'likes_given', 'likes_received',
@@ -616,10 +616,10 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
  */
 function relativeTime($timestamp, $show_today = true, $offset_type = false)
 {
-	global $modSettings, $txt;
+	global $txt;
 
 	// We don't want relative times? Bypass to standardTime();
-	if ($modSettings['todayMod'] < 3)
+	// if ($modSettings['todayMod'] < 3)
 		return standardTime($timestamp, $show_today, $offset_type);
 
 	// No use in doing calculations if there's nothing to work with.
@@ -1432,6 +1432,9 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'test' => '([1-9][\d]?p[xt]|small(?:er)?|large[r]?|x[x]?-(?:small|large)|medium|(0\.[1-9]|[1-9](\.[\d][\d]?)?)?em)\]',
 				'before' => '<span style="font-size: $1;" class="bbc_size">',
 				'after' => '</span>',
+				'disallow_parents' => array('size'),
+				'disallow_before' => '<span>',
+				'disallow_after' => '</span>',
 			),
 			array(
 				'tag' => 'size',
@@ -1443,6 +1446,9 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 					$sizes = array(1 => 0.7, 2 => 1.0, 3 => 1.35, 4 => 1.45, 5 => 2.0, 6 => 2.65, 7 => 3.95);
 					$data = $sizes[$data] . \'em\';'
 				),
+				'disallow_parents' => array('size'),
+				'disallow_before' => '<span>',
+				'disallow_after' => '</span>',
 			),
 			array(
 				'tag' => 'spoiler',
@@ -1939,7 +1945,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			// Not allowed in this parent, replace the tags or show it like regular text
 			elseif (isset($possible['disallow_parents']) && ($inside !== null && in_array($inside['tag'], $possible['disallow_parents'])))
 			{
-				if (!isset($possible['disabled_before'], $possible['disabled_after']))
+				if (!isset($possible['disallow_before'], $possible['disallow_after']))
 					continue;
 				$possible['before'] = isset($possible['disallow_before']) ? $tag['disallow_before'] : $possible['before'];
 				$possible['after'] = isset($possible['disallow_after']) ? $tag['disallow_after'] : $possible['after'];
@@ -2352,7 +2358,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 	$message = strtr($message, array('  ' => ' &nbsp;', "\r" => '', "\n" => '<br />', '<br /> ' => '<br />&nbsp;', '&#13;' => "\n"));
 
 	// Finish footnotes if we have any.
-	if (strpos($message, '<sup class="bbc_footnotes">'))
+	if (strpos($message, '<sup class="bbc_footnotes">') !== false)
 	{
 		global $fn_num, $fn_content, $fn_count;
 		static $fn_total;
@@ -2369,14 +2375,14 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			global $fn_num, $fn_content, $fn_count;
 
 			$fn_num++;
-			$fn_content[] = "<sup id=\"fn$fn_num" . "_" . "$fn_count\">$fn_num&nbsp;</sup>$m[2]<a class=\"footnote_return\" href=\"#ref$fn_num" . "_" . "$fn_count\">&crarr;</a>";
-			return "<a href=\"#fn$fn_num" . "_" . "$fn_count\" id=\"ref$fn_num" . "_" . "$fn_count\">[$fn_num]</a>";'), $message);
+			$fn_content[] = "<div class=\"target\" id=\"fn$fn_num" . "_" . "$fn_count\"><sup>$fn_num&nbsp;</sup>$m[2]<a class=\"footnote_return\" href=\"#ref$fn_num" . "_" . "$fn_count\">&crarr;</a></div>";
+			return "<a class=\"target\" href=\"#fn$fn_num" . "_" . "$fn_count\" id=\"ref$fn_num" . "_" . "$fn_count\">[$fn_num]</a>";'), $message);
 
 		$fn_total += $fn_num;
 
 		// If we have footnotes, add them in at the end of the message
 		if (!empty($fn_num))
-			$message .= '<div class="bbc_footnotes">' . implode('<br>', $fn_content) . '</div>';
+			$message .= '<div class="bbc_footnotes">' . implode('', $fn_content) . '</div>';
 	}
 
 	// Allow addons access to what parse_bbc created
@@ -2659,10 +2665,6 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 		// Show the footer.
 		loadSubTemplate(isset($context['sub_template']) ? $context['sub_template'] : 'main');
 
-		// Anything special to put out?
-		if (!empty($context['insert_after_template']) && !isset($_REQUEST['xml']))
-			echo $context['insert_after_template'];
-
 		// Just so we don't get caught in an endless loop of errors from the footer...
 		if (!$footer_done)
 		{
@@ -2717,6 +2719,7 @@ function determineTopicClass(&$topic_context)
 		$topic_context['class'] .= '_sticky';
 
 	// This is so old themes will still work.
+	// @deprecated will be removed from 1.1 do not rely on it
 	$topic_context['extended_class'] = &$topic_context['class'];
 }
 
@@ -2759,7 +2762,7 @@ function setupThemeContext($forceload = false)
 	{
 		$context['user']['messages'] = &$user_info['messages'];
 		$context['user']['unread_messages'] = &$user_info['unread_messages'];
-		$context['user']['notifications'] = &$user_info['notifications'];
+		$context['user']['mentions'] = &$user_info['mentions'];
 
 		// Personal message popup...
 		if ($user_info['unread_messages'] > (isset($_SESSION['unread_messages']) ? $_SESSION['unread_messages'] : 0))
@@ -2815,7 +2818,7 @@ function setupThemeContext($forceload = false)
 	{
 		$context['user']['messages'] = 0;
 		$context['user']['unread_messages'] = 0;
-		$context['user']['notifications'] = 0;
+		$context['user']['mentions'] = 0;
 		$context['user']['avatar'] = array();
 		$context['user']['total_time_logged_in'] = array('days' => 0, 'hours' => 0, 'minutes' => 0);
 		$context['user']['popup_messages'] = false;
@@ -3057,13 +3060,10 @@ function template_footer()
  *
  * @param bool $do_defered = false
  *
- * @todo - Note that type="text/javascript" and type="text/css" are deprecated in HTML5.
- * @todo - There are several occurrences in this function, and the next one.
- * @todo - Full directory search for any strays should be done, then hit the lot of them.
  */
 function template_javascript($do_defered = false)
 {
-	global $context, $modSettings, $settings;
+	global $context, $modSettings, $settings, $boardurl;
 
 	// First up, load jquery
 	if (isset($modSettings['jquery_source']) && !$do_defered)
@@ -3072,23 +3072,23 @@ function template_javascript($do_defered = false)
 		{
 			case 'cdn':
 				echo '
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" id="jquery"></script>',
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" id="jquery"></script>',
 	(!empty($modSettings['jquery_include_ui']) ? '
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js" id="jqueryui"></script>' : '');
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js" id="jqueryui"></script>' : '');
 				break;
 			case 'local':
 				echo '
-	<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/jquery-1.10.2.min.js" id="jquery"></script>',
+	<script src="', $settings['default_theme_url'], '/scripts/jquery-1.10.2.min.js" id="jquery"></script>',
 	(!empty($modSettings['jquery_include_ui']) ? '
-	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/jqueryui-1.10.3.min.js" id="jqueryui"></script>' : '');
+	<script src="' . $settings['default_theme_url'] . '/scripts/jqueryui-1.10.3.min.js" id="jqueryui"></script>' : '');
 				break;
 			case 'auto':
 				echo '
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" id="jquery"></script>',
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" id="jquery"></script>',
 	(!empty($modSettings['jquery_include_ui']) ? '
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js" id="jqueryui"></script>' : '');
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js" id="jqueryui"></script>' : '');
 				echo '
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script><!-- // --><![CDATA[
 		window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-1.10.2.min.js"><\/script>\');',
 		(!empty($modSettings['jquery_include_ui']) ? '
 		window.jQuery.ui || document.write(\'<script src="' . $settings['default_theme_url'] . '/scripts/jqueryui-1.10.3.min.js"><\/script>\')' : ''), '
@@ -3106,13 +3106,13 @@ function template_javascript($do_defered = false)
 		if (!empty($modSettings['minify_css_js']))
 		{
 			require_once(SOURCEDIR . '/Combine.class.php');
-			$combiner = new Site_Combiner;
+			$combiner = new Site_Combiner(CACHEDIR, $boardurl . '/cache');
 			$combine_name = $combiner->site_js_combine($context['javascript_files'], $do_defered);
-
-			if (!empty($combine_name))
-				echo '
-	<script type="text/javascript" src="', $combine_name, '" id="jscombined', $do_defered ? 'bottom' : 'top', '"></script>';
 		}
+
+		if (!empty($combine_name))
+			echo '
+	<script src="', $combine_name, '" id="jscombined', $do_defered ? 'bottom' : 'top', '"></script>';
 		else
 		{
 			// While we have Javascript files to place in the template
@@ -3120,7 +3120,7 @@ function template_javascript($do_defered = false)
 			{
 				if ((!$do_defered && empty($js_file['options']['defer'])) || ($do_defered && !empty($js_file['options']['defer'])))
 					echo '
-	<script type="text/javascript" src="', $js_file['filename'], '" id="', $id, '"', !empty($js_file['options']['async']) ? ' async="async"' : '', '></script>';
+	<script src="', $js_file['filename'], '" id="', $id, '"', !empty($js_file['options']['async']) ? ' async="async"' : '', '></script>';
 			}
 		}
 	}
@@ -3129,7 +3129,7 @@ function template_javascript($do_defered = false)
 	if (!empty($context['javascript_vars']) && !$do_defered)
 	{
 		echo '
-	<script type="text/javascript"><!-- // --><![CDATA[';
+	<script><!-- // --><![CDATA[';
 
 		$output = array();
 		foreach ($context['javascript_vars'] as $key => $value)
@@ -3148,7 +3148,7 @@ function template_javascript($do_defered = false)
 		if (!empty($context['javascript_inline']['defer']) && $do_defered)
 		{
 			echo '
-	<script type="text/javascript"><!-- // --><![CDATA[';
+	<script><!-- // --><![CDATA[';
 
 			foreach ($context['javascript_inline']['defer'] as $js_code)
 				echo $js_code;
@@ -3160,7 +3160,7 @@ function template_javascript($do_defered = false)
 		if (!empty($context['javascript_inline']['standard']) && !$do_defered)
 		{
 			echo '
-	<script type="text/javascript"><!-- // --><![CDATA[';
+	<script><!-- // --><![CDATA[';
 
 			foreach ($context['javascript_inline']['standard'] as $js_code)
 				echo $js_code;
@@ -3177,7 +3177,7 @@ function template_javascript($do_defered = false)
  */
 function template_css()
 {
-	global $context, $modSettings;
+	global $context, $modSettings, $boardurl;
 
 	// Use this hook to work with CSS files pre output
 	call_integration_hook('pre_css_output');
@@ -3188,17 +3188,18 @@ function template_css()
 		if (!empty($modSettings['minify_css_js']))
 		{
 			require_once(SOURCEDIR . '/Combine.class.php');
-			$combiner = new Site_Combiner;
+			$combiner = new Site_Combiner(CACHEDIR, $boardurl . '/cache');
 			$combine_name = $combiner->site_css_combine($context['css_files']);
-			if (!empty($combine_name))
-				echo '
-	<link rel="stylesheet" type="text/css" href="', $combine_name, '" id="csscombined" />';
 		}
+
+		if (!empty($combine_name))
+			echo '
+	<link rel="stylesheet" href="', $combine_name, '" id="csscombined" />';
 		else
 		{
 			foreach ($context['css_files'] as $id => $file)
 				echo '
-	<link rel="stylesheet" type="text/css" href="', $file['filename'], '" id="', $id,'" />';
+	<link rel="stylesheet" href="', $file['filename'], '" id="', $id,'" />';
 		}
 	}
 }
@@ -3207,7 +3208,7 @@ function template_css()
  * I know this is becoming annoying, though this template
  * *shall* be present for security reasons, so better it stays here
  *
- * @todo rework it and merge into some other kind of general warning-box (i.e. modtask at index.template)
+ * @todo rework it and merge into some other kind of general warning-box (e.g. modtask at index.template)
  */
 function template_admin_warning_above()
 {
@@ -3244,13 +3245,16 @@ function template_admin_warning_above()
 			foreach ($context['security_controls']['files']['to_remove'] as $securityFile)
 			{
 				echo '
-			', $txt['not_removed'], '<strong>', $securityFile, '</strong>!<br />';
+			', sprintf($txt['not_removed'], '<strong>' . $securityFile . '</strong>'), '!<br />';
 
 				if ($securityFile == 'Settings.php~' || $securityFile == 'Settings_bak.php~')
 					echo '
 			', sprintf($txt['not_removed_extra'], $securityFile, substr($securityFile, 0, -1)), '<br />';
 			}
 		}
+
+		if (!empty($context['security_controls']['files']['theme_dir']))
+			echo $context['security_controls']['files']['theme_dir'] . '<br />';
 
 		if (!empty($context['security_controls']['files']['cache']))
 			echo '
@@ -3269,7 +3273,7 @@ function template_admin_warning_above()
 	if (!empty($context['security_controls']['admin_session']) || !empty($context['security_controls']['maintenance']))
 	{
 		echo '
-			<div class="noticebox">';
+			<div class="warningbox">';
 
 		if (!empty($context['security_controls']['admin_session']))
 			echo
@@ -3287,7 +3291,7 @@ function template_admin_warning_above()
 	if (isset($_SESSION['ban']['cannot_post']))
 	{
 		echo '
-			<div class="windowbg alert" style="margin: 2ex; padding: 2ex; border: 2px dashed red;">
+			<div class="windowbg ban_cannot_post">
 				', sprintf($txt['you_are_post_banned'], $user_info['is_guest'] ? $txt['guest_title'] : $user_info['name']);
 
 		if (!empty($_SESSION['ban']['cannot_post']['reason']))
@@ -3566,255 +3570,261 @@ function setupMenuContext()
 	}
 
 	$menu_count['unread_messages'] = $context['user']['unread_messages'];
-	$menu_count['notifications'] = $context['user']['notifications'];
+	$menu_count['mentions'] = $context['user']['mentions'];
 
 	// All the buttons we can possible want and then some, try pulling the final list of buttons from cache first.
 	if (($menu_buttons = cache_get_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $cacheTime)) === null || time() - $cacheTime <= $modSettings['settings_updated'])
 	{
 		// Start things up: this is what we know by default
 		require_once(SUBSDIR . '/Menu.subs.php');
-		$allMenus = Standard_Menu::context();
-		$menu = $allMenus->get('Main_Menu');
-
-		// The main menu
-		$menu->addBulk(
-			array(
-				'home' => array(
-					'title' => $txt['community'],
-					'href' => $scripturl,
-					'show' => true,
-				),
-
-				'admin' => array(
-					'title' => $txt['admin'],
-					'counter' => 'grand_total',
-					'href' => $scripturl . '?action=admin',
-					'show' => $context['allow_admin'],
-				),
-
-				'moderate' => array(
-					'title' => $txt['moderate'],
-					'counter' => 'grand_total',
-					'href' => $scripturl . '?action=moderate',
-					'show' => !$context['allow_admin'] && $context['allow_moderation_center'],
-				),
-
-				'profile' => array(
-					'title' => (!empty($user_info['avatar']['image']) ? $user_info['avatar']['image'] . ' ' : '') . (!empty($modSettings['displayMemberNames']) ? $user_info['name'] : $txt['account_short']),
-					'href' => $scripturl . '?action=profile',
-					'show' => $context['allow_edit_profile'],
-				),
-
-				// Language string needs agreement here. Anything but bloody username, please. :P
-				// @todo - Will look at doing something here, to provide instant access to inbox when using click menus.
-				// @todo - A small pop-up anchor seems like the obvious way to handle it. ;)
-				'pm' => array(
-					'title' => $txt['pm_short'],
-					'counter' => 'unread_messages',
-					'href' => $scripturl . '?action=pm',
-					'show' => $context['allow_pm'],
-				),
-
-				'notification' => array(
-					'title' => $txt['notifications'],
-					'counter' => 'notifications',
-					'href' => $scripturl . '?action=notification',
-					'show' => !$user_info['is_guest'] && !empty($modSettings['notifications_enabled']),
-				),
-
-				// The old language string made no sense, and was too long.
-				// "New posts" is better, because there are probably a pile
-				// of old unread posts, and they wont be reached from this button.
-				'unread' => array(
-					'title' => $txt['view_unread_category'],
-					'href' => $scripturl . '?action=unread',
-					'show' => !$user_info['is_guest'],
-				),
-
-				// The old language string made no sense, and was too long.
-				// "New replies" is better, because there are "updated topics"
-				// that the user has never posted in and doesn't care about.
-				'unreadreplies' => array(
-					'title' => $txt['view_replies_category'],
-					'href' => $scripturl . '?action=unreadreplies',
-					'show' => !$user_info['is_guest'],
-				),
-
-				// "Log out" would be better here.
-				// "Login" is not a word, and sort of runs together into a bleh.
-				'login' => array(
-					'title' => $txt['login'],
-					'href' => $scripturl . '?action=login',
-					'show' => $user_info['is_guest'],
-				),
-
-				'register' => array(
-					'title' => $txt['register'],
-					'href' => $scripturl . '?action=register',
-					'show' => $user_info['is_guest'] && $context['can_register'],
+		$buttons = array(
+			'home' => array(
+				'title' => $txt['community'],
+				'href' => $scripturl,
+				'show' => true,
+				'sub_buttons' => array(
+					'help' => array(
+						'title' => $txt['help'],
+						'href' => $scripturl . '?action=help',
+						'show' => true,
+					),
+					'search' => array(
+						'title' => $txt['search'],
+						'href' => $scripturl . '?action=search',
+						'show' => $context['allow_search'],
+					),
+					'calendar' => array(
+						'title' => $txt['calendar'],
+						'href' => $scripturl . '?action=calendar',
+						'show' => $context['allow_calendar'],
+					),
+					'memberlist' => array(
+						'title' => $txt['members_title'],
+						'href' => $scripturl . '?action=memberlist',
+						'show' => $context['allow_memberlist'],
+					),
+					'recent' => array(
+						'title' => $txt['recent_posts'],
+						'href' => $scripturl . '?action=recent',
+						'show' => true,
+					),
 				),
 			)
 		);
 
-		// All the submenus of "something"
-		// Home button
-		$menu->childOf('home')->add('home_sub_buttons')->addBulk(
-			array(
-				'help' => array(
-					'title' => $txt['help'],
-					'href' => $scripturl . '?action=help',
-					'show' => true,
-				),
-				'search' => array(
-					'title' => $txt['search'],
-					'href' => $scripturl . '?action=search',
-					'show' => $context['allow_search'],
-				),
-				'calendar' => array(
-					'title' => $txt['calendar'],
-					'href' => $scripturl . '?action=calendar',
-					'show' => $context['allow_calendar'],
-				),
-				'memberlist' => array(
-					'title' => $txt['members_title'],
-					'href' => $scripturl . '?action=memberlist',
-					'show' => $context['allow_memberlist'],
-				),
-				'recent' => array(
-					'title' => $txt['recent_posts'],
-					'href' => $scripturl . '?action=recent',
-					'show' => true,
-				),
-			)
-		);
-
-		// Admin button
-		$admin_sub_buttons = $menu->childOf('admin')->add('admin_sub_buttons');
-		$admin_sub_buttons->addBulk(
-			array(
-				'admin_center' => array(
-					'title' => $txt['admin_center'],
-					'href' => $scripturl . '?action=admin',
-					'show' => $context['allow_admin'],
-				),
-				'featuresettings' => array(
-					'title' => $txt['modSettings_title'],
-					'href' => $scripturl . '?action=admin;area=featuresettings',
-					'show' => allowedTo('admin_forum'),
-				),
-				'packages' => array(
-					'title' => $txt['package'],
-					'href' => $scripturl . '?action=admin;area=packages',
-					'show' => allowedTo('admin_forum'),
-				),
-				'permissions' => array(
-					'title' => $txt['edit_permissions'],
-					'href' => $scripturl . '?action=admin;area=permissions',
-					'show' => allowedTo('manage_permissions'),
-				),
-				'errorlog' => array(
-					'title' => $txt['errlog'],
-					'href' => $scripturl . '?action=admin;area=logs;sa=errorlog;desc',
-					'show' => allowedTo('admin_forum') && !empty($modSettings['enableErrorLogging']),
-				),
-				'moderate' => array(
-					'title' => $txt['moderate'],
-					'counter' => $context['allow_admin'] ? '' : 'grand_total',
-					'href' => $scripturl . '?action=moderate',
-					'show' => $context['allow_admin'],
-				),
-			)
-		);
-
-		// Personal messages
-		$menu->childOf('pm')->add('pm_sub_buttons')->addBulk(
-			array(
-				'pm_read' => array(
-					'title' => $txt['pm_menu_read'],
-					'href' => $scripturl . '?action=pm',
-					'show' => allowedTo('pm_read'),
-				),
-				'pm_send' => array(
-					'title' => $txt['pm_menu_send'],
-					'href' => $scripturl . '?action=pm;sa=send',
-					'show' => allowedTo('pm_send'),
-				),
-			)
-		);
-
-		// Moderation (different position depending on admin and mods)
+			// Will change title correctly if user is either a mod or an admin.
+			// Button highlighting works properly too (see current action stuffz).
 		if ($context['allow_admin'])
-			$modmenu = $admin_sub_buttons;
+		{
+			$buttons['admin'] = array(
+				'title' => $context['current_action'] !== 'moderate' ? $txt['admin'] : $txt['moderate'],
+				'counter' => 'grand_total',
+				'href' => $scripturl . '?action=admin',
+				'show' => true,
+				'sub_buttons' => array(
+					'admin_center' => array(
+						'title' => $txt['admin_center'],
+						'href' => $scripturl . '?action=admin',
+						'show' => $context['allow_admin'],
+					),
+					'featuresettings' => array(
+						'title' => $txt['modSettings_title'],
+						'href' => $scripturl . '?action=admin;area=featuresettings',
+						'show' => allowedTo('admin_forum'),
+					),
+					'packages' => array(
+						'title' => $txt['package'],
+						'href' => $scripturl . '?action=admin;area=packages',
+						'show' => allowedTo('admin_forum'),
+					),
+					'permissions' => array(
+						'title' => $txt['edit_permissions'],
+						'href' => $scripturl . '?action=admin;area=permissions',
+						'show' => allowedTo('manage_permissions'),
+					),
+					'errorlog' => array(
+						'title' => $txt['errlog'],
+						'href' => $scripturl . '?action=admin;area=logs;sa=errorlog;desc',
+						'show' => allowedTo('admin_forum') && !empty($modSettings['enableErrorLogging']),
+					),
+					'moderate_sub' => array(
+						'title' => $txt['moderate'],
+						'counter' => 'grand_total',
+						'href' => $scripturl . '?action=moderate',
+						'show' => $context['allow_moderation_center'],
+						'sub_buttons' => array(
+							'reports' => array(
+								'title' => $txt['mc_reported_posts'],
+								'counter' => 'reports',
+								'href' => $scripturl . '?action=moderate;area=reports',
+								'show' => !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
+							),
+							'modlog' => array(
+								'title' => $txt['modlog_view'],
+								'href' => $scripturl . '?action=moderate;area=modlog',
+								'show' => !empty($modSettings['modlog_enabled']) && !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
+							),
+							'attachments' => array(
+								'title' => $txt['mc_unapproved_attachments'],
+								'counter' => 'attachments',
+								'href' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
+								'show' => $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
+							),
+							'poststopics' => array(
+								'title' => $txt['mc_unapproved_poststopics'],
+								'counter' => 'postmod',
+								'href' => $scripturl . '?action=moderate;area=postmod;sa=posts',
+								'show' => $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
+							),
+							'postbyemail' => array(
+								'title' => $txt['mc_emailerror'],
+								'counter' => 'emailmod',
+								'href' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
+								'show' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
+							),
+						),
+					),
+				),
+			);
+		}
 		else
-			$modmenu = $menu;
+		{
+			$buttons['admin'] = array(
+				'title' => $txt['moderate'],
+				'counter' => 'grand_total',
+				'href' => $scripturl . '?action=moderate',
+				'show' => $context['allow_moderation_center'],
+				'sub_buttons' => array(
+					'reports' => array(
+						'title' => $txt['mc_reported_posts'],
+						'counter' => 'reports',
+						'href' => $scripturl . '?action=moderate;area=reports',
+						'show' => !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
+					),
+					'modlog' => array(
+						'title' => $txt['modlog_view'],
+						'href' => $scripturl . '?action=moderate;area=modlog',
+						'show' => !empty($modSettings['modlog_enabled']) && !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
+					),
+					'attachments' => array(
+						'title' => $txt['mc_unapproved_attachments'],
+						'counter' => 'attachments',
+						'href' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
+						'show' => $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
+					),
+					'poststopics' => array(
+						'title' => $txt['mc_unapproved_poststopics'],
+						'counter' => 'postmod',
+						'href' => $scripturl . '?action=moderate;area=postmod;sa=posts',
+						'show' => $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
+					),
+					'postbyemail' => array(
+						'title' => $txt['mc_emailerror'],
+						'counter' => 'emailmod',
+						'href' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
+						'show' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
+					),
+				),
+			);
+		}
 
-		$modmenu->childOf('moderate')->add('moderate_sub_buttons')->addBulk(
-			array(
-				'reports' => array(
-					'title' => $txt['mc_reported_posts'],
-					'counter' => 'reports',
-					'href' => $scripturl . '?action=moderate;area=reports',
-					'show' => !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
+		$buttons += array(
+			'profile' => array(
+				'title' => (!empty($user_info['avatar']['image']) ? $user_info['avatar']['image'] . ' ' : '') . (!empty($modSettings['displayMemberNames']) ? $user_info['name'] : $txt['account_short']),
+				'href' => $scripturl . '?action=profile',
+				'show' => $context['allow_edit_profile'],
+				'sub_buttons' => array(
+					'account' => array(
+						'title' => $txt['account'],
+						'href' => $scripturl . '?action=profile;area=account',
+						'show' => allowedTo(array('profile_identity_any', 'profile_identity_own', 'manage_membergroups')),
+					),
+					'profile' => array(
+						'title' => $txt['forumprofile'],
+						'href' => $scripturl . '?action=profile;area=forumprofile',
+						'show' => allowedTo(array('profile_extra_any', 'profile_extra_own')),
+					),
+					'theme' => array(
+						'title' => $txt['theme'],
+						'href' => $scripturl . '?action=profile;area=theme',
+						'show' => allowedTo(array('profile_extra_any', 'profile_extra_own', 'profile_extra_any')),
+					),
+					// The old "logout" is meh. Not a real word. "Log out" is better.
+					'logout' => array(
+						'title' => $txt['logout'],
+						'href' => $scripturl . '?action=logout;' . $context['session_var'] . '=' . $context['session_id'],
+						'show' => !$user_info['is_guest'],
+					),
 				),
-				'modlog' => array(
-					'title' => $txt['modlog_view'],
-					'href' => $scripturl . '?action=moderate;area=modlog',
-					'show' => !empty($modSettings['modlog_enabled']) && !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
+			),
+			// @todo - Will look at doing something here, to provide instant access to inbox when using click menus.
+			// @todo - A small pop-up anchor seems like the obvious way to handle it. ;)
+			'pm' => array(
+				'title' => $txt['pm_short'],
+				'counter' => 'unread_messages',
+				'href' => $scripturl . '?action=pm',
+				'show' => $context['allow_pm'],
+				'sub_buttons' => array(
+					'pm_read' => array(
+						'title' => $txt['pm_menu_read'],
+						'href' => $scripturl . '?action=pm',
+						'show' => allowedTo('pm_read'),
+					),
+					'pm_send' => array(
+						'title' => $txt['pm_menu_send'],
+						'href' => $scripturl . '?action=pm;sa=send',
+						'show' => allowedTo('pm_send'),
+					),
 				),
-				'attachments' => array(
-					'title' => $txt['mc_unapproved_attachments'],
-					'counter' => 'attachments',
-					'href' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
-					'show' => $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
-				),
-				'poststopics' => array(
-					'title' => $txt['mc_unapproved_poststopics'],
-					'counter' => 'postmod',
-					'href' => $scripturl . '?action=moderate;area=postmod;sa=posts',
-					'show' => $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
-				),
-				'postbyemail' => array(
-					'title' => $txt['mc_emailerror'],
-					'counter' => 'emailmod',
-					'href' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
-					'show' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
-				),
-			)
-		);
+			),
 
-		// Profile
-		$menu->childOf('profile')->add('profile_sub_buttons')->addBulk(
-			array(
-				'account' => array(
-					'title' => $txt['account'],
-					'href' => $scripturl . '?action=profile;area=account',
-					'show' => allowedTo(array('profile_identity_any', 'profile_identity_own', 'manage_membergroups')),
-				),
-				'forum_profile' => array(
-					'title' => $txt['forumprofile'],
-					'href' => $scripturl . '?action=profile;area=forumprofile',
-					'show' => allowedTo(array('profile_extra_any', 'profile_extra_own')),
-				),
-				'theme' => array(
-					'title' => $txt['theme'],
-					'href' => $scripturl . '?action=profile;area=theme',
-					'show' => allowedTo(array('profile_extra_any', 'profile_extra_own', 'profile_extra_any')),
-				),
-				// The old "logout" is meh. Not a real word. "Log out" is better.
-				'logout' => array(
-					'title' => $txt['logout'],
-					'href' => $scripturl . '?action=logout;' . $context['session_var'] . '=' . $context['session_id'],
-					'show' => !$user_info['is_guest'],
-				),
-			)
+			'mention' => array(
+				'title' => $txt['mention'],
+				'counter' => 'mentions',
+				'href' => $scripturl . '?action=mentions',
+				'show' => !$user_info['is_guest'] && !empty($modSettings['mentions_enabled']),
+			),
+
+			// The old language string made no sense, and was too long.
+			// "New posts" is better, because there are probably a pile
+			// of old unread posts, and they wont be reached from this button.
+			'unread' => array(
+				'title' => $txt['view_unread_category'],
+				'href' => $scripturl . '?action=unread',
+				'show' => !$user_info['is_guest'],
+			),
+
+			// The old language string made no sense, and was too long.
+			// "New replies" is better, because there are "updated topics"
+			// that the user has never posted in and doesn't care about.
+			'unreadreplies' => array(
+				'title' => $txt['view_replies_category'],
+				'href' => $scripturl . '?action=unreadreplies',
+				'show' => !$user_info['is_guest'],
+			),
+
+			// "Log out" would be better here.
+			// "Login" is not a word, and sort of runs together into a bleh.
+			'login' => array(
+				'title' => $txt['login'],
+				'href' => $scripturl . '?action=login',
+				'show' => $user_info['is_guest'],
+			),
+
+			'register' => array(
+				'title' => $txt['register'],
+				'href' => $scripturl . '?action=register',
+				'show' => $user_info['is_guest'] && $context['can_register'],
+			),
 		);
 
 		// Allow editing menu buttons easily.
-		call_integration_hook('integrate_menu_buttons', array(&$menu_count));
+		call_integration_hook('integrate_menu_buttons', array(&$buttons, &$menu_count));
 
 		// Now we put the buttons in the context so the theme can use them.
 		$menu_buttons = array();
-		foreach ($menu->prepareContext() as $act => $button)
+		foreach ($buttons as $act => $button)
+		{
 			if (!empty($button['show']))
 			{
 				$button['active_button'] = false;
@@ -3831,9 +3841,9 @@ function setupMenuContext()
 				}
 
 				// Go through the sub buttons if there are any.
-				if (isset($button['children']))
+				if (isset($button['sub_buttons']))
 				{
-					foreach ($button['children']->prepareContext() as $key => $subbutton)
+					foreach ($button['sub_buttons'] as $key => $subbutton)
 					{
 						$button['sub_buttons'][$key] = $subbutton;
 						if (empty($subbutton['show']))
@@ -3846,9 +3856,9 @@ function setupMenuContext()
 						}
 
 						// 2nd level sub buttons next...
-						if (isset($subbutton['children']))
+						if (isset($subbutton['sub_buttons']))
 						{
-							foreach ($subbutton['children']->prepareContext() as $key2 => $subbutton2)
+							foreach ($subbutton['sub_buttons'] as $key2 => $subbutton2)
 							{
 								$button['sub_buttons'][$key]['sub_buttons'][$key2] = $subbutton2;
 								if (empty($subbutton2['show']))
@@ -3867,13 +3877,13 @@ function setupMenuContext()
 
 				$menu_buttons[$act] = $button;
 			}
+		}
 
 		if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
 			cache_put_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $menu_buttons, $cacheTime);
 	}
 
 	$context['menu_buttons'] = $menu_buttons;
-	$allMenus->destroy('Main_Menu');
 
 	// Figure out which action we are doing so we can set the active tab.
 	// Default to home.
@@ -4361,4 +4371,37 @@ function pregReplaceCurry($func, $arity)
 			return call_user_func_array(\'$func\', \$a);
 		');
 	");
+}
+
+/**
+ * Helper function to insert a menu in an existing menu array
+ * Intended for addon use to allow adding in a new menu item in an existing menu array via integration hooks
+ *
+ * @param array $input the menu array we will insert to
+ * @param string $key the key in the array that we are looking to insert before or after
+ * @param array $insert the data to insert before or after the above key
+ * @param string $where adding before or after
+ * @param bool $strict search for identical elements, this means it will also check the types of the needle.
+ */
+function elk_array_insert($input, $key, $insert, $where = 'before', $strict = false)
+{
+	$position = array_search($key, array_keys($input), $strict);
+
+	// If the key is not found, just insert it at the end
+	if ($position === false)
+	{
+		$input = array_merge($input, $insert);
+		return;
+	}
+
+	if ($where === 'after')
+		$position += 1;
+
+	// Insert as first
+	if ($position === 0)
+		$input = array_merge($insert, $input);
+	else
+		$input = array_merge(array_slice($input, 0, $position), $insert, array_slice($input, $position));
+
+	return $input;
 }

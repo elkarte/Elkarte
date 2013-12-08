@@ -5,7 +5,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file contains functions for dealing with topics. Low-level functions,
  * i.e. database operations needed to perform.
@@ -586,7 +586,7 @@ function countConfiguredMemberOptions()
  *               - 'all' => any record
  * @param mixed $old_settings can be a string or an array of strings. If empty deletes all settings.
  */
-function removeThemeOptions($theme, $membergroups, $old_settings = array())
+function removeThemeOptions($theme, $membergroups, $old_settings = '')
 {
 	$db = database();
 

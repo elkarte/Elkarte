@@ -169,9 +169,9 @@ CREATE INDEX {$db_prefix}admin_info_files_filename ON {$db_prefix}admin_info_fil
 # Dumping data for table `admin_info_files`
 #
 
-INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, data, filetype) VALUES (1, 'current-version.js', '/site/', 'version=%3$s', '', 'text/javascript');
-INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, data, filetype) VALUES (2, 'detailed-version.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript');
-INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, data, filetype) VALUES (3, 'latest-news.js', '/site/', 'language=%1$s&format=%2$s', '', 'text/javascript');
+INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, data, filetype) VALUES (1, 'current-version.js', 'http://elkarte.github.io/Elkarte/site/', 'version=%3$s', '', 'text/javascript');
+INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, data, filetype) VALUES (2, 'detailed-version.js', 'http://elkarte.github.io/Elkarte/site/', 'language=%1$s&version=%3$s', '', 'text/javascript');
+INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, data, filetype) VALUES (3, 'latest-news.js', 'http://elkarte.github.io/Elkarte/site/', 'language=%1$s&format=%2$s', '', 'text/javascript');
 # --------------------------------------------------------
 
 #
@@ -1360,31 +1360,31 @@ CREATE TABLE {$db_prefix}log_member_notices (
 );
 
 #
-# Sequence for table `log_notifications`
+# Sequence for table `log_mentions`
 #
 
-CREATE SEQUENCE {$db_prefix}log_notifications_id_notification_seq;
+CREATE SEQUENCE {$db_prefix}log_mentions_id_mention_seq;
 
 #
-# Table structure for table `log_notifications`
+# Table structure for table `log_mentions`
 #
 
-CREATE TABLE IF NOT EXISTS {$db_prefix}log_notifications (
-  id_notification int default nextval('{$db_prefix}log_notifications_id_notification_seq'),
+CREATE TABLE IF NOT EXISTS {$db_prefix}log_mentions (
+  id_mention int default nextval('{$db_prefix}log_mentions_id_mention_seq'),
   id_member int NOT NULL DEFAULT '0',
   id_msg int NOT NULL DEFAULT '0',
   status int NOT NULL DEFAULT '0',
   id_member_from int NOT NULL DEFAULT '0',
   log_time int NOT NULL DEFAULT '0',
-  notif_type varchar(5) NOT NULL DEFAULT '',
-  PRIMARY KEY (id_notification)
+  mention_type varchar(5) NOT NULL DEFAULT '',
+  PRIMARY KEY (id_mention)
 );
 
 #
-# Indexes for table `log_notifications`
+# Indexes for table `log_mentions`
 #
 
-CREATE INDEX {$db_prefix}log_notifications_id_member ON {$db_prefix}log_notifications (id_member, status);
+CREATE INDEX {$db_prefix}log_mentions_id_member ON {$db_prefix}log_mentions (id_member, status);
 
 #
 # Table structure for table `log_notify`
@@ -1769,8 +1769,8 @@ CREATE INDEX {$db_prefix}membergroups_min_posts ON {$db_prefix}membergroups (min
 # Dumping data for table `membergroups`
 #
 
-INSERT INTO {$db_prefix}membergroups (id_group, group_name, description, online_color, min_posts, icons, group_type) VALUES (1, '{$default_administrator_group}', '', '#FF0000', -1, '5#iconadmin.png', 1);
-INSERT INTO {$db_prefix}membergroups (id_group, group_name, description, online_color, min_posts, icons) VALUES (2, '{$default_global_moderator_group}', '', '#0000FF', -1, '5#icongmod.png');
+INSERT INTO {$db_prefix}membergroups (id_group, group_name, description, online_color, min_posts, icons, group_type) VALUES (1, '{$default_administrator_group}', '', '#CD0000', -1, '5#iconadmin.png', 1);
+INSERT INTO {$db_prefix}membergroups (id_group, group_name, description, online_color, min_posts, icons) VALUES (2, '{$default_global_moderator_group}', '', '#0066FF', -1, '5#icongmod.png');
 INSERT INTO {$db_prefix}membergroups (id_group, group_name, description, online_color, min_posts, icons) VALUES (3, '{$default_moderator_group}', '', '', -1, '5#iconmod.png');
 INSERT INTO {$db_prefix}membergroups (id_group, group_name, description, online_color, min_posts, icons) VALUES (4, '{$default_newbie_group}', '', '', 0, '1#icon.png');
 INSERT INTO {$db_prefix}membergroups (id_group, group_name, description, online_color, min_posts, icons) VALUES (5, '{$default_junior_group}', '', '', 50, '2#icon.png');
@@ -1799,7 +1799,7 @@ CREATE TABLE {$db_prefix}members (
   last_login int NOT NULL default '0',
   real_name varchar(255) NOT NULL,
   personal_messages smallint NOT NULL default '0',
-  notifications smallint NOT NULL default '0',
+  mentions smallint NOT NULL default '0',
   unread_messages smallint NOT NULL default '0',
   new_pm smallint NOT NULL default '0',
   buddy_list text NOT NULL,
@@ -2581,8 +2581,8 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_enabled'
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_logging', '0');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_ip_wl', 'a:3:{i:2;s:10:"10.0.0.0/8";i:5;s:13:"172.16.0.0/12";i:6;s:14:"192.168.0.0/16";}');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_ip_wl_desc', 'a:3:{i:2;s:18:"RFC 1918 addresses";i:5;s:18:"RFC 1918 addresses";i:6;s:18:"RFC 1918 addresses";}');
-INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_url_wl', 'a:1:{i:0;s:19:"/subscriptions.php";}');
-INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_url_wl_desc', 'a:1:{i:0;s:21:"Payment Gateway";}');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_url_wl', 'a:1:{i:0;s:18:"/subscriptions.php";}');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_url_wl_desc', 'a:1:{i:0;s:15:"Payment Gateway";}');
 # --------------------------------------------------------
 
 #

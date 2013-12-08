@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  */
 
@@ -587,7 +587,7 @@ function loadProfileFields($force_reload = false)
 			'subtext' => allowedTo('admin_forum') && !isset($_GET['changeusername']) ? '[<a href="' . $scripturl . '?action=profile;u=' . $context['id_member'] . ';area=account;changeusername" style="font-style: italic;">' . $txt['username_change'] . '</a>]' : '',
 			'log_change' => true,
 			'permission' => 'profile_identity',
-			'prehtml' => allowedTo('admin_forum') && isset($_GET['changeusername']) ? '<div class="alert">' . $txt['username_warning'] . '</div>' : '',
+			'prehtml' => allowedTo('admin_forum') && isset($_GET['changeusername']) ? '<div class="warningbox">' . $txt['username_warning'] . '</div>' : '',
 			'input_validate' => create_function('&$value', '
 				global $context, $user_info, $cur_profile;
 
@@ -2026,6 +2026,7 @@ function profileSaveAvatarData(&$value)
 	$downloadedExternalAvatar = false;
 	if ($value == 'external' && allowedTo('profile_remote_avatar') && stripos($_POST['userpicpersonal'], 'http://') === 0 && strlen($_POST['userpicpersonal']) > 7 && !empty($modSettings['avatar_download_external']))
 	{
+		loadLanguage('Post');
 		if (!is_writable($uploadDir))
 			fatal_lang_error('attachments_no_write', 'critical');
 
@@ -3007,4 +3008,143 @@ function getMemberBoardPermissions($memID, $curGroups, $board = '')
 	$db->free_result($request);
 
 	return $board_permission;
+}
+
+/**
+ * Retrieves (most of) the IPs used by a certain member in his messages and errors
+ *
+ * @param int the id of the member
+ */
+function getMembersIPs($memID)
+{
+	global $modSettings, $user_profile;
+
+	$db = database();
+
+	// @todo cache this
+	// If this is a big forum, or a large posting user, let's limit the search.
+	if ($modSettings['totalMessages'] > 50000 && $user_profile[$memID]['posts'] > 500)
+	{
+		$request = $db->query('', '
+			SELECT MAX(id_msg)
+			FROM {db_prefix}messages AS m
+			WHERE m.id_member = {int:current_member}',
+			array(
+				'current_member' => $memID,
+			)
+		);
+		list ($max_msg_member) = $db->fetch_row($request);
+		$db->free_result($request);
+
+		// There's no point worrying ourselves with messages made yonks ago, just get recent ones!
+		$min_msg_member = max(0, $max_msg_member - $user_profile[$memID]['posts'] * 3);
+	}
+
+	// Default to at least the ones we know about.
+	$ips = array(
+		$user_profile[$memID]['member_ip'],
+		$user_profile[$memID]['member_ip2'],
+	);
+
+	// @todo cache this
+	// Get all IP addresses this user has used for his messages.
+	$request = $db->query('', '
+		SELECT poster_ip
+		FROM {db_prefix}messages
+		WHERE id_member = {int:current_member} ' . (isset($min_msg_member) ? '
+			AND id_msg >= {int:min_msg_member} AND id_msg <= {int:max_msg_member}' : '') . '
+		GROUP BY poster_ip',
+		array(
+			'current_member' => $memID,
+			'min_msg_member' => !empty($min_msg_member) ? $min_msg_member : 0,
+			'max_msg_member' => !empty($max_msg_member) ? $max_msg_member : 0,
+		)
+	);
+
+	while ($row = $db->fetch_assoc($request))
+		$ips[] = $row['poster_ip'];
+
+	$db->free_result($request);
+
+	// Now also get the IP addresses from the error messages.
+	$request = $db->query('', '
+		SELECT COUNT(*) AS error_count, ip
+		FROM {db_prefix}log_errors
+		WHERE id_member = {int:current_member}
+		GROUP BY ip',
+		array(
+			'current_member' => $memID,
+		)
+	);
+
+	$error_ips = array();
+
+	while ($row = $db->fetch_assoc($request))
+		$error_ips[] = $row['ip'];
+
+	$db->free_result($request);
+
+	return array('message_ips' => array_unique($ips), 'error_ips' => array_unique($error_ips));
+}
+
+/**
+ * Return the details of the members using a certain range of IPs
+ * except the current one
+ *
+ * @param array a list of IP addresses
+ * @param int the id of the "current" member (maybe it could be retrieved with currentMemberID)
+ */
+function getMembersInRange($ips, $memID)
+{
+	$db = database();
+
+	$message_members = array();
+	$members_in_range = array();
+
+	// Get member ID's which are in messages...
+	$request = $db->query('', '
+		SELECT mem.id_member
+		FROM {db_prefix}messages AS m
+			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
+		WHERE m.poster_ip IN ({array_string:ip_list})
+		GROUP BY mem.id_member
+		HAVING mem.id_member != {int:current_member}',
+		array(
+			'current_member' => $memID,
+			'ip_list' => $ips,
+		)
+	);
+
+	while ($row = $db->fetch_assoc($request))
+		$message_members[] = $row['id_member'];
+	$db->free_result($request);
+
+	// And then get the member ID's belong to other users
+	$request = $db->query('', '
+		SELECT id_member
+		FROM {db_prefix}members
+		WHERE id_member != {int:current_member}
+			AND member_ip IN ({array_string:ip_list})',
+		array(
+			'current_member' => $memID,
+			'ip_list' => $ips,
+		)
+	);
+	while ($row = $db->fetch_assoc($request))
+		$message_members[] = $row['id_member'];
+	$db->free_result($request);
+
+	// Once the IDs are all combined, let's clean them up
+	$message_members = array_unique($message_members);
+
+	// And finally, fetch their names, cause of the GROUP BY doesn't like giving us that normally.
+	if (!empty($message_members))
+	{
+		require_once(SUBSDIR . '/Members.subs.php');
+
+		// Get the latest activated member's display name.
+		$members_in_range = getBasicMemberData($message_members);
+	}
+
+	return $members_in_range;
 }

@@ -11,8 +11,16 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
+
+/**
+ * Loads the template used to display boards
+ */
+function template_MessageIndex_init()
+{
+	loadTemplate('GenericBoards');
+}
 
 /**
  * Used to display child boards.
@@ -25,112 +33,11 @@ function template_display_child_boards_above()
 	<div id="board_', $context['current_board'], '_childboards" class="forum_category">
 		<h2 class="category_header">
 			', $txt['parent_boards'], '
-		</h2>
-		<ul class="category_boards" id="board_', $context['current_board'], '_children">';
+		</h2>';
 
-	foreach ($context['boards'] as $board)
-	{
-		echo '
-			<li class="board_row ', (!empty($board['children'])) ? 'parent_board' : '', '" id="board_', $board['id'], '">
-				<div class="board_info">
-					<a class="icon_anchor" href="', ($board['is_redirect'] || $context['user']['is_guest'] ? $board['href'] : $scripturl . '?action=unread;board=' . $board['id'] . '.0;children'), '">';
-
-		// If the board or children is new, show an indicator.
-		if ($board['new'] || $board['children_new'])
-			echo '
-						<img class="board_icon" src="', $settings['images_url'], '/', $context['theme_variant_url'], 'on', $board['new'] ? '' : '2', '.png" alt="', $txt['new_posts'], '" title="', $txt['new_posts'], '" />';
-		// Is it a redirection board?
-		elseif ($board['is_redirect'])
-			echo '
-						<img class="board_icon" src="', $settings['images_url'], '/', $context['theme_variant_url'], 'redirect.png" alt="*" title="*" />';
-		// No new posts at all! The agony!!
-		else
-			echo '
-						<img class="board_icon" src="', $settings['images_url'], '/', $context['theme_variant_url'], 'off.png" alt="', $txt['old_posts'], '" title="', $txt['old_posts'], '" />';
-
-		echo '
-					</a>
-					<h3 class="board_name">
-						<a href="', $board['href'], '" id="b', $board['id'], '">', $board['name'], '</a>';
-
-		// Has it outstanding posts for approval?
-		if ($board['can_approve_posts'] && ($board['unapproved_posts'] || $board['unapproved_topics']))
-			echo '
-						<a href="', $scripturl, '?action=moderate;area=postmod;sa=', ($board['unapproved_topics'] > 0 ? 'topics' : 'posts'), ';brd=', $board['id'], ';', $context['session_var'], '=', $context['session_id'], '" title="', sprintf($txt['unapproved_posts'], $board['unapproved_topics'], $board['unapproved_posts']), '" class="moderation_link">(!)</a>';
-
-		echo '
-					</h3>
-					<p class="board_description">', $board['description'], '</p>';
-
-		// Show the "Moderators: ". Each has name, href, link, and id. (but we're gonna use link_moderators.)
-		if (!empty($board['moderators']))
-			echo '
-					<p class="moderators">', count($board['moderators']) === 1 ? $txt['moderator'] : $txt['moderators'], ': ', implode(', ', $board['link_moderators']), '</p>';
-
-		// Show some basic information about the number of posts, etc.
-		echo '
-				</div>
-				<div class="board_latest">
-					<p class="board_stats">
-						', comma_format($board['posts']), ' ', $board['is_redirect'] ? $txt['redirects'] : $txt['posts'], '
-						', $board['is_redirect'] ? '' : '<br /> ' . comma_format($board['topics']) . ' ' . $txt['board_topics'], '
-					</p>';
-
-		// @todo - Last post message still needs some work. Probably split the language string into three chunks.
-		// Example:
-		// <chunk>Re: Nunc aliquam justo e...</chunk>  <chunk>by Whoever</chunk> <chunk>Last post: Today at 08:00:37 am</chunk>
-		// That should still allow sufficient scope for any language, if done sensibly.
-		if (!empty($board['last_post']['id']))
-			echo '
-					<p class="board_lastpost">
-						', $board['last_post']['last_post_message'], '
-					</p>';
-
-		echo '
-				</div>
-			</li>';
-
-		// Show the "Child Boards: ". (there's a link_children but we're going to bold the new ones...)
-		if (!empty($board['children']))
-		{
-			// Sort the links into an array with new boards bold so it can be imploded.
-			$children = array();
-
-			// Each child in each board's children has:
-			// id, name, description, new (is it new?), topics (#), posts (#), href, link, and last_post.
-			foreach ($board['children'] as $child)
-			{
-				if (!$child['is_redirect'])
-					$child['link'] = '<a href="' . $child['href'] . '" ' . ($child['new'] ? 'class="board_new_posts" ' : '') . 'title="' . ($child['new'] ? $txt['new_posts'] : $txt['old_posts']) . ' (' . $txt['board_topics'] . ': ' . comma_format($child['topics']) . ', ' . $txt['posts'] . ': ' . comma_format($child['posts']) . ')">' . $child['name'] . ($child['new'] ? '</a> <a  ' . ($child['new'] ? 'class="new_posts" ' : '') . 'href="' . $scripturl . '?action=unread;board=' . $child['id'] . '" title="' . $txt['new_posts'] . ' (' . $txt['board_topics'] . ': ' . comma_format($child['topics']) . ', ' . $txt['posts'] . ': ' . comma_format($child['posts']) . ')"><span class="new_posts">' . $txt['new'] . '</span>' : '') . '</a>';
-				else
-					$child['link'] = '<a href="' . $child['href'] . '" title="' . comma_format($child['posts']) . ' ' . $txt['redirects'] . '">' . $child['name'] . '</a>';
-
-				// Has it posts awaiting approval?
-				if ($child['can_approve_posts'] && ($child['unapproved_posts'] | $child['unapproved_topics']))
-					$child['link'] .= ' <a href="' . $scripturl . '?action=moderate;area=postmod;sa=' . ($child['unapproved_topics'] > 0 ? 'topics' : 'posts') . ';brd=' . $child['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" title="' . sprintf($txt['unapproved_posts'], $child['unapproved_topics'], $child['unapproved_posts']) . '" class="moderation_link">(!)</a>';
-
-				$children[] = $child['link'];
-			}
-
-			// New <li> for child boards (if any). Can be styled to look like part of previous <li>.
-			// Use h4 tag here for better a11y. Use <ul> for list of child boards.
-			// Having child board links in <li>'s will allow "tidy child boards" via easy CSS tweaks. ;)
-			echo '
-			<li class="childboard_row" id="board_', $board['id'], '_children">
-				<ul class="childboards">
-					<li>
-						<h4>', $txt['parent_boards'], ':</h4>
-					</li>
-					<li>
-						', implode('</li><li> - ', $children), '
-					</li>
-				</ul>
-			</li>';
-		}
-	}
+	template_list_boards($context['boards'], 'board_', $context['current_board'], '_children');
 
 	echo '
-		</ul>
 	</div>';
 }
 
@@ -172,7 +79,7 @@ function template_pages_and_buttons_above()
 		if (!empty($settings['display_who_viewing']))
 		{
 			echo '
-				<span id="whoisviewing">';
+				<br /><span id="whoisviewing">';
 
 			if ($settings['display_who_viewing'] == 1)
 				echo count($context['view_members']), ' ', count($context['view_members']) === 1 ? $txt['who_member'] : $txt['members'];
@@ -252,7 +159,7 @@ function template_main()
 		{
 			echo '
 			<li class="basic_row">
-				<div class="noticebox" style="margin-bottom:0">! ', $context['unapproved_posts_message'], '</div>
+				<div class="warningbox" style="margin-bottom:0">! ', $context['unapproved_posts_message'], '</div>
 			</li>';
 		}
 
@@ -290,7 +197,7 @@ function template_main()
 
 			echo '
 						<h4>
-							', $topic['is_sticky'] ? '<strong>' : '', '<span class="preview" title="', $topic[(!empty($settings['message_index_preview']) && $settings['message_index_preview_first'] == 2 ? 'last_post' : 'first_post')]['preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], ($context['can_approve_posts'] && !$topic['approved'] ? '&nbsp;&nbsp;<em><img src="' . $settings['images_url'] . '/admin/post_moderation_moderate.png" style="width:16px" alt="' . $txt['awaiting_approval'] . '" title="' . $txt['awaiting_approval'] . '" />(' . $txt['awaiting_approval'] . ')</em>' : ''), '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
+							', $topic['is_sticky'] ? '<strong>' : '', '<span class="preview" title="', $topic[(!empty($settings['message_index_preview']) && $settings['message_index_preview'] == 2 ? 'last_post' : 'first_post')]['preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], ($context['can_approve_posts'] && !$topic['approved'] ? '&nbsp;&nbsp;<em><img src="' . $settings['images_url'] . '/admin/post_moderation_moderate.png" style="width:16px" alt="' . $txt['awaiting_approval'] . '" title="' . $txt['awaiting_approval'] . '" />(' . $txt['awaiting_approval'] . ')</em>' : ''), '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
 						</h4>
 					</div>
 					<div class="topic_starter">
@@ -433,9 +340,9 @@ function template_pages_and_buttons_below()
 						iCurBoardId: ', $context['current_board'], ',
 						iCurBoardChildLevel: ', $context['jump_to']['child_level'], ',
 						sCurBoardName: "', $context['jump_to']['board_name'], '",
-						sBoardChildLevelIndicator: "==",
-						sBoardPrefix: "=> ",
-						sCatSeparator: "-----------------------------",
+						sBoardChildLevelIndicator: "&#10134;",
+						sBoardPrefix: "&#10148; ",
+						sCatClass: "jump_to_header",
 						sCatPrefix: "",
 						bNoRedirect: true,
 						bDisabled: true,
@@ -450,10 +357,10 @@ function template_pages_and_buttons_below()
 						iCurBoardId: ', $context['current_board'], ',
 						iCurBoardChildLevel: ', $context['jump_to']['child_level'], ',
 						sCurBoardName: "', $context['jump_to']['board_name'], '",
-						sBoardChildLevelIndicator: "==",
-						sBoardPrefix: "=> ",
-						sCatSeparator: "-----------------------------",
+						sBoardChildLevelIndicator: "&#10134;",
+						sBoardPrefix: "&#10148; ",
 						sCatPrefix: "",
+						sCatClass: "jump_to_header",
 						sGoButtonLabel: "', $txt['quick_mod_go'], '"
 					});
 			// ]]></script>

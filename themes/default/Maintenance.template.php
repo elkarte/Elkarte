@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 function template_Maintenance_init()
@@ -29,7 +29,7 @@ function template_maintain_database()
 	// If maintenance has finished tell the user.
 	if (!empty($context['maintenance_finished']))
 		echo '
-			<div class="infobox">
+			<div class="successbox">
 				', sprintf($txt['maintain_done'], $context['maintenance_finished']), '
 			</div>';
 
@@ -61,7 +61,7 @@ function template_maintain_database()
 				<div class="errorbox">', $txt['safe_mode_enabled'], '</div>';
 	else
 		echo '
-					<div class="', $context['suggested_method'] == 'use_external_tool' || $context['use_maintenance'] != 0 ? 'errorbox' : 'noticebox', '">
+					<div class="', $context['suggested_method'] == 'use_external_tool' || $context['use_maintenance'] != 0 ? 'errorbox' : 'warningbox', '">
 					', $txt[$context['suggested_method']],
 		$context['use_maintenance'] != 0 ? '<br />' . $txt['enable_maintenance' . $context['use_maintenance']] : '',
 		'</div>';
@@ -91,7 +91,7 @@ function template_maintain_database()
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=database;activity=convertmsgbody" method="post" accept-charset="UTF-8">
 					<p>', $txt['mediumtext_introduction'], '</p>',
-					$context['convert_to_suggest'] ? '<p class="infobox">' . $txt['convert_to_suggest_text'] . '</p>' : '', '
+					$context['convert_to_suggest'] ? '<p class="successbox">' . $txt['convert_to_suggest_text'] . '</p>' : '', '
 					<div class="submitbutton">
 						<input type="submit" name="evaluate_conversion" value="', $txt['maintain_run_now'], '" class="button_submit" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -119,7 +119,7 @@ function template_maintain_routine()
 	// If maintenance has finished tell the user.
 	if (!empty($context['maintenance_finished']))
 		echo '
-			<div class="infobox">
+			<div class="successbox">
 				', sprintf($txt['maintain_done'], $context['maintenance_finished']), '
 			</div>';
 
@@ -159,55 +159,15 @@ function template_maintain_members()
 
 	echo '
 	<script><!-- // --><![CDATA[
-		var warningMessage = \'\';
-		var membersSwap = false;
+		var maintain_members_choose = \'' , $txt['maintain_members_choose'], '\',
+			maintain_members_all = \'', $txt['maintain_members_all'], '\',
+			reattribute_confirm = \'', addcslashes($txt['reattribute_confirm'], "'"), '\',
+			reattribute_confirm_email = \'', addcslashes($txt['reattribute_confirm_email'], "'"), '\',
+			reattribute_confirm_username = \'', addcslashes($txt['reattribute_confirm_username'], "'"), '\',
+			warningMessage = \'\',
+			membersSwap = false;
 
-		function swapMembers()
-		{
-			membersSwap = !membersSwap;
-			var membersForm = document.getElementById(\'membersForm\');
-
-			$("#membersPanel").slideToggle(300);
-
-			document.getElementById("membersIcon").src = elk_images_url + (membersSwap ? "/selected_open.png" : "/selected.png");
-			setInnerHTML(document.getElementById("membersText"), membersSwap ? "', $txt['maintain_members_choose'], '" : "', $txt['maintain_members_all'], '");
-
-			for (var i = 0; i < membersForm.length; i++)
-			{
-				if (membersForm.elements[i].type.toLowerCase() == "checkbox")
-					membersForm.elements[i].checked = !membersSwap;
-			}
-		}
-
-		function checkAttributeValidity()
-		{
-			origText = \'', $txt['reattribute_confirm'], '\';
-			valid = true;
-
-			// Do all the fields!
-			if (!document.getElementById(\'to\').value)
-				valid = false;
-			warningMessage = origText.replace(/%member_to%/, document.getElementById(\'to\').value);
-
-			if (document.getElementById(\'type_email\').checked)
-			{
-				if (!document.getElementById(\'from_email\').value)
-					valid = false;
-				warningMessage = warningMessage.replace(/%type%/, \'', addcslashes($txt['reattribute_confirm_email'], "'"), '\').replace(/%find%/, document.getElementById(\'from_email\').value);
-			}
-			else
-			{
-				if (!document.getElementById(\'from_name\').value)
-					valid = false;
-				warningMessage = warningMessage.replace(/%type%/, \'', addcslashes($txt['reattribute_confirm_username'], "'"), '\').replace(/%find%/, document.getElementById(\'from_name\').value);
-			}
-
-			document.getElementById(\'do_attribute\').disabled = valid ? \'\' : \'disabled\';
-
-			setTimeout("checkAttributeValidity();", 500);
-			return valid;
-		}
-		setTimeout("checkAttributeValidity();", 500);
+		setTimeout(function() {checkAttributeValidity();}, 500);
 	// ]]></script>
 	<div id="manage_maintenance">';
 
@@ -255,7 +215,7 @@ function template_maintain_members()
 			</div>
 		</div>
 		<h3 class="category_header">
-			<a href="', $scripturl, '?action=quickhelp;help=maintenance_members" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['maintain_members'], '
+			<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=maintenance_members" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['maintain_members'], '
 		</h3>
 		<div class="windowbg">
 			<div class="content">
@@ -299,7 +259,7 @@ function template_maintain_members()
 		</div>
 	</div>
 
-	<script src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
+	<script src="', $settings['default_theme_url'], '/scripts/suggest.js?beta10"></script>
 	<script><!-- // --><![CDATA[
 		var oAttributeMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oAttributeMemberSuggest\',
@@ -324,35 +284,17 @@ function template_maintain_topics()
 	// If maintenance has finished tell the user.
 	if (!empty($context['maintenance_finished']))
 		echo '
-			<div class="infobox">
-				', sprintf($txt['maintain_done'], $context['maintenance_finished']), '
-			</div>';
+	<div class="successbox">
+		', sprintf($txt['maintain_done'], $context['maintenance_finished']), '
+	</div>';
 
 	// Bit of javascript for showing which boards to prune in an otherwise hidden list.
 	echo '
-		<script><!-- // --><![CDATA[
-			var rotSwap = false;
-			function swapRot()
-			{
-				rotSwap = !rotSwap;
-
-				// Toggle icon
-				document.getElementById("rotIcon").src = elk_images_url + (rotSwap ? "/selected_open.png" : "/selected.png");
-				setInnerHTML(document.getElementById("rotText"), rotSwap ? ', JavaScriptEscape($txt['maintain_old_choose']), ' : ', JavaScriptEscape($txt['maintain_old_all']), ');
-
-				// Toggle panel
-				$("#rotPanel").slideToggle(300);
-
-				// Toggle checkboxes
-				var rotPanel = document.getElementById(\'rotPanel\');
-				var oBoardCheckBoxes = rotPanel.getElementsByTagName(\'input\');
-				for (var i = 0; i < oBoardCheckBoxes.length; i++)
-				{
-					if (oBoardCheckBoxes[i].type.toLowerCase() == "checkbox")
-						oBoardCheckBoxes[i].checked = !rotSwap;
-				}
-			}
-		// ]]></script>';
+	<script><!-- // --><![CDATA[
+		var rotSwap = false;
+			maintain_old_choose = ', JavaScriptEscape($txt['maintain_old_choose']), ',
+			maintain_old_all = ', JavaScriptEscape($txt['maintain_old_all']), ';
+	// ]]></script>';
 
 	echo '
 	<div id="manage_maintenance">
@@ -443,7 +385,6 @@ function template_maintain_topics()
 					<p>';
 
 	template_select_boards('id_board_from', $txt['move_topics_from']);
-
 	template_select_boards('id_board_to', $txt['move_topics_to']);
 
 	echo '
@@ -508,7 +449,7 @@ function template_convert_msgbody()
 	if (!empty($context['exceeding_messages']))
 	{
 		echo '
-				<p class="noticebox">', $txt['exceeding_messages'], '
+				<p class="warningbox">', $txt['exceeding_messages'], '
 				<ul>
 					<li>
 					', implode('</li><li>', $context['exceeding_messages']), '
@@ -521,7 +462,7 @@ function template_convert_msgbody()
 	}
 	else
 		echo '
-				<p class="infobox">', $txt['convert_to_text'], '</p>';
+				<p class="successbox">', $txt['convert_to_text'], '</p>';
 
 	echo '
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=database;activity=convertmsgbody" method="post" accept-charset="UTF-8">

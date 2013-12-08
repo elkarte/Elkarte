@@ -5,7 +5,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -189,7 +189,8 @@ function load_draft($id_draft, $uid, $type = 0, $drafts_keep_days = 0, $check = 
 
 	// Load in a draft from the DB
 	$request = $db->query('', '
-		SELECT *
+		SELECT id_draft, id_topic, id_board, id_reply, type, poster_time, id_member, subject,
+			smileys_enabled, body, icon, locked, is_sticky, to_list
 		FROM {db_prefix}user_drafts
 		WHERE id_draft = {int:id_draft}' . ($check ? '
 			AND id_member = {int:id_member}' : '') . '
@@ -228,7 +229,6 @@ function load_draft($id_draft, $uid, $type = 0, $drafts_keep_days = 0, $check = 
  * @param int $topic - if set, load drafts for that specific topic / pm
  * @param string $order - optional parameter to order the results
  * @param string $limit - optional parameter to limit the number returned 0,15
- * @return array
  */
 function load_user_drafts($member_id, $draft_type = 0, $topic = false, $order = '', $limit = '')
 {
@@ -275,7 +275,6 @@ function load_user_drafts($member_id, $draft_type = 0, $topic = false, $order = 
  * @param int $id_draft
  * @param int $member_id
  * @param bool $check
- * @return boolean
  */
 function deleteDrafts($id_draft, $member_id = -1, $check = true)
 {
@@ -303,13 +302,12 @@ function deleteDrafts($id_draft, $member_id = -1, $check = true)
 /**
  * Retrieve how many drafts the given user has.
  * This function checks for expired lifetime on drafts (they would be removed
- *  by a scheduled task), and doesn't count those.
+ * by a scheduled task), and doesn't count those.
  *
  * @param int $member_id
  * @param int $draft_type
- * @param int $topic
  */
-function draftsCount($member_id, $draft_type = 0, $topic = false)
+function draftsCount($member_id, $draft_type = 0)
 {
 	global $modSettings;
 
@@ -318,14 +316,11 @@ function draftsCount($member_id, $draft_type = 0, $topic = false)
 	$request = $db->query('', '
 		SELECT COUNT(id_draft)
 		FROM {db_prefix}user_drafts
-		WHERE id_member = {int:id_member}' . ($draft_type === 0 ? '
-			AND id_topic = {int:id_topic}' : (!empty($topic) ? '
-			AND id_reply = {int:id_topic}' : '')) . '
+		WHERE id_member = {int:id_member}
 			AND type={int:draft_type}' . (!empty($modSettings['drafts_keep_days']) ? '
 			AND poster_time > {int:time}' : ''),
 		array(
 			'id_member' => $member_id,
-			'id_topic' => (int) $topic,
 			'draft_type' => $draft_type,
 			'time' => !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0,
 		)
@@ -368,8 +363,8 @@ function draftsRecipients($allRecipients, $recipient_ids)
 
 /**
  * Get all drafts older than x days
+ *
  * @param int $days
- * @return array
  */
 function getOldDrafts($days)
 {
@@ -398,8 +393,6 @@ function getOldDrafts($days)
  * Saves a post draft in the user_drafts table
  * The core draft feature must be enabled, as well as the post draft option
  * Determines if this is a new or an existing draft
- *
- * @return boolean
  */
 function saveDraft()
 {
@@ -442,7 +435,7 @@ function saveDraft()
 	$draft['topic_id'] = empty($_REQUEST['topic']) ? 0 : (int) $_REQUEST['topic'];
 	$draft['board'] = $board;
 	$draft['icon'] = empty($_POST['icon']) ? 'xx' : preg_replace('~[\./\\\\*:"\'<>]~', '', $_POST['icon']);
-	$draft['smileys_enabled'] = isset($_POST['ns']) ? (int) $_POST['ns'] : 0;
+	$draft['smileys_enabled'] = isset($_POST['ns']) ? 0 : 1;
 	$draft['locked'] = isset($_POST['lock']) ? (int) $_POST['lock'] : 0;
 	$draft['sticky'] = isset($_POST['sticky']) && !empty($modSettings['enableStickyTopics']) ? (int) $_POST['sticky'] : 0;
 	$draft['subject'] = strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
@@ -455,11 +448,11 @@ function saveDraft()
 		$draft['subject'] = Util::substr($draft['subject'], 0, 100);
 
 	// Modifying an existing draft, like hitting the save draft button or autosave enabled?
-	if (!empty($id_draft) && !empty($draft_info) && $draft_info['id_member'] == $user_info['id'])
+	if (!empty($id_draft) && !empty($draft_info))
 	{
 		modify_post_draft($draft);
 
-		// some items to return to the form
+		// Some items to return to the form
 		$context['draft_saved'] = true;
 		$context['id_draft'] = $id_draft;
 	}
@@ -500,7 +493,6 @@ function saveDraft()
  * Determines if this is a new or and update to an existing pm draft
  *
  * @param array $recipientList
- * @return boolean
  */
 function savePMDraft($recipientList)
 {
@@ -557,7 +549,7 @@ function savePMDraft($recipientList)
 		$draft['subject'] = Util::substr($draft['subject'], 0, 100);
 
 	// Modifying an existing PM draft?
-	if (!empty($id_pm_draft) && !empty($draft_info) && $draft_info['id_member'] == $user_info['id'])
+	if (!empty($id_pm_draft) && !empty($draft_info))
 	{
 		modify_pm_draft($draft, $recipientList);
 
@@ -603,7 +595,6 @@ function savePMDraft($recipientList)
  * @param int $type - type of draft
  * @param bool $check - validate the user
  * @param bool $load - load it for use in a form
- * @return boolean
  */
 function loadDraft($id_draft, $type = 0, $check = true, $load = false)
 {

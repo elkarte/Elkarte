@@ -5,7 +5,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  */
 
@@ -43,7 +43,7 @@ class AddonSettings_Controller extends Action_Controller
 
 		$subActions = array(
 			'general' => array($this, 'action_addonSettings_display', 'permission' => 'admin_forum'),
-			'hooks' => array($this, 'action_hooks', 'permission' => 'admin_forum'),
+			// @deprecated: do not rely on this line, use the appropriate hook and tools provided
 			// Mod authors, once again, if you have a whole section to add do it AFTER this line, and keep a comma at the end.
 			// And SET the permission level
 		);
@@ -68,8 +68,6 @@ class AddonSettings_Controller extends Action_Controller
 			'description' => $txt['modification_settings_desc'],
 			'tabs' => array(
 				'general' => array(
-				),
-				'hooks' => array(
 				),
 			),
 		);
@@ -154,194 +152,6 @@ class AddonSettings_Controller extends Action_Controller
 	}
 
 	/**
-	 * Generates a list of integration hooks for display
-	 * Accessed through ?action=admin;area=addonsettings;sa=hooks;
-	 * Allows for removal or disabing of selected hooks
-	 */
-	public function action_hooks()
-	{
-		global $scripturl, $context, $txt, $modSettings, $settings;
-
-		require_once(SUBSDIR . '/AddonSettings.subs.php');
-
-		$context['filter_url'] = '';
-		$context['current_filter'] = '';
-		$currentHooks = get_integration_hooks();
-		if (isset($_GET['filter']) && in_array($_GET['filter'], array_keys($currentHooks)))
-		{
-			$context['filter_url'] = ';filter=' . $_GET['filter'];
-			$context['current_filter'] = $_GET['filter'];
-		}
-
-		if (!empty($modSettings['handlinghooks_enabled']))
-		{
-			if (!empty($_REQUEST['do']) && isset($_REQUEST['hook']) && isset($_REQUEST['function']))
-			{
-				checkSession('request');
-				validateToken('admin-hook', 'request');
-
-				if ($_REQUEST['do'] == 'remove')
-					remove_integration_function($_REQUEST['hook'], urldecode($_REQUEST['function']));
-				else
-				{
-					if ($_REQUEST['do'] == 'disable')
-					{
-						// It's a hack I know...but I'm way too lazy!!!
-						$function_remove = $_REQUEST['function'];
-						$function_add = $_REQUEST['function'] . ']';
-					}
-					else
-					{
-						$function_remove = $_REQUEST['function'] . ']';
-						$function_add = $_REQUEST['function'];
-					}
-					$file = !empty($_REQUEST['includedfile']) ? urldecode($_REQUEST['includedfile']) : '';
-
-					remove_integration_function($_REQUEST['hook'], $function_remove, $file);
-					add_integration_function($_REQUEST['hook'], $function_add, $file);
-
-					// clean the cache.
-					require_once(SUBSDIR . '/Cache.subs.php');
-					clean_cache();
-
-					redirectexit('action=admin;area=addonsettings;sa=hooks' . $context['filter_url']);
-				}
-			}
-		}
-
-		$list_options = array(
-			'id' => 'list_integration_hooks',
-			'title' => $txt['hooks_title_list'],
-			'items_per_page' => 20,
-			'base_href' => $scripturl . '?action=admin;area=addonsettings;sa=hooks' . $context['filter_url'] . ';' . $context['session_var'] . '=' . $context['session_id'],
-			'default_sort_col' => 'hook_name',
-			'get_items' => array(
-				'function' => array($this, 'list_getIntegrationHooks'),
-			),
-			'get_count' => array(
-				'function' => array($this, 'list_getIntegrationHooksCount'),
-			),
-			'no_items_label' => $txt['hooks_no_hooks'],
-			'columns' => array(
-				'hook_name' => array(
-					'header' => array(
-						'value' => $txt['hooks_field_hook_name'],
-					),
-					'data' => array(
-						'db' => 'hook_name',
-					),
-					'sort' =>  array(
-						'default' => 'hook_name',
-						'reverse' => 'hook_name DESC',
-					),
-				),
-				'function_name' => array(
-					'header' => array(
-						'value' => $txt['hooks_field_function_name'],
-					),
-					'data' => array(
-						'function' => create_function('$data', '
-							global $txt;
-
-							if (!empty($data[\'included_file\']))
-								return $txt[\'hooks_field_function\'] . \': \' . $data[\'real_function\'] . \'<br />\' . $txt[\'hooks_field_included_file\'] . \': \' . $data[\'included_file\'];
-							else
-								return $data[\'real_function\'];
-						'),
-					),
-					'sort' =>  array(
-						'default' => 'function_name',
-						'reverse' => 'function_name DESC',
-					),
-				),
-				'file_name' => array(
-					'header' => array(
-						'value' => $txt['hooks_field_file_name'],
-					),
-					'data' => array(
-						'db' => 'file_name',
-					),
-					'sort' =>  array(
-						'default' => 'file_name',
-						'reverse' => 'file_name DESC',
-					),
-				),
-				'status' => array(
-					'header' => array(
-						'value' => $txt['hooks_field_hook_exists'],
-						'style' => 'width:3%;',
-					),
-					'data' => array(
-						'function' => create_function('$data', '
-							global $txt, $settings, $scripturl, $context;
-
-							$change_status = array(\'before\' => \'\', \'after\' => \'\');
-							if ($data[\'can_be_disabled\'] && $data[\'status\'] != \'deny\')
-							{
-								$change_status[\'before\'] = \'<a href="\' . $scripturl . \'?action=admin;area=addonsettings;sa=hooks;do=\' . ($data[\'enabled\'] ? \'disable\' : \'enable\') . \';hook=\' . $data[\'hook_name\'] . \';function=\' . $data[\'real_function\'] . (!empty($data[\'included_file\']) ? \';includedfile=\' . urlencode($data[\'included_file\']) : \'\') . $context[\'filter_url\'] . \';\' . $context[\'admin-hook_token_var\'] . \'=\' . $context[\'admin-hook_token\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'" onclick="return confirm(\' . javaScriptEscape($txt[\'quickmod_confirm\']) . \');">\';
-								$change_status[\'after\'] = \'</a>\';
-							}
-							return $change_status[\'before\'] . \'<img src="\' . $settings[\'images_url\'] . \'/admin/post_moderation_\' . $data[\'status\'] . \'.png" alt="\' . $data[\'img_text\'] . \'" title="\' . $data[\'img_text\'] . \'" />\' . $change_status[\'after\'];
-						'),
-						'class' => 'centertext',
-					),
-					'sort' =>  array(
-						'default' => 'status',
-						'reverse' => 'status DESC',
-					),
-				),
-			),
-			'additional_rows' => array(
-				array(
-					'position' => 'after_title',
-					'value' => $txt['hooks_disable_instructions'] . '<br />
-						' . $txt['hooks_disable_legend'] . ':
-										<ul style="list-style: none;">
-						<li><img src="' . $settings['images_url'] . '/admin/post_moderation_allow.png" alt="' . $txt['hooks_active'] . '" title="' . $txt['hooks_active'] . '" /> ' . $txt['hooks_disable_legend_exists'] . '</li>
-						<li><img src="' . $settings['images_url'] . '/admin/post_moderation_moderate.png" alt="' . $txt['hooks_disabled'] . '" title="' . $txt['hooks_disabled'] . '" /> ' . $txt['hooks_disable_legend_disabled'] . '</li>
-						<li><img src="' . $settings['images_url'] . '/admin/post_moderation_deny.png" alt="' . $txt['hooks_missing'] . '" title="' . $txt['hooks_missing'] . '" /> ' . $txt['hooks_disable_legend_missing'] . '</li>
-					</ul>'
-				),
-			),
-		);
-
-		if (!empty($modSettings['handlinghooks_enabled']))
-		{
-			createToken('admin-hook', 'request');
-
-			$list_options['columns']['remove'] = array(
-				'header' => array(
-					'value' => $txt['hooks_button_remove'],
-					'style' => 'width:3%',
-				),
-				'data' => array(
-					'function' => create_function('$data', '
-						global $txt, $settings, $scripturl, $context;
-
-						if (!$data[\'hook_exists\'])
-							return \'
-							<a href="\' . $scripturl . \'?action=admin;area=addonsettings;sa=hooks;do=remove;hook=\' . $data[\'hook_name\'] . \';function=\' . urlencode($data[\'function_name\']) . $context[\'filter_url\'] . \';\' . $context[\'admin-hook_token_var\'] . \'=\' . $context[\'admin-hook_token\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'" onclick="return confirm(\' . javaScriptEscape($txt[\'quickmod_confirm\']) . \');">
-								<img src="\' . $settings[\'images_url\'] . \'/icons/quick_remove.png" alt="\' . $txt[\'hooks_button_remove\'] . \'" title="\' . $txt[\'hooks_button_remove\'] . \'" />
-							</a>\';
-					'),
-					'class' => 'centertext',
-				),
-			);
-			$list_options['form'] = array(
-				'href' => $scripturl . '?action=admin;area=addonsettings;sa=hooks' . $context['filter_url'] . ';' . $context['session_var'] . '=' . $context['session_id'],
-				'name' => 'list_integration_hooks',
-			);
-		}
-
-		require_once(SUBSDIR . '/List.class.php');
-		createList($list_options);
-
-		$context['page_title'] = $txt['hooks_title_list'];
-		$context['sub_template'] = 'show_list';
-		$context['default_list'] = 'list_integration_hooks';
-	}
-
-	/**
 	 * This function makes sure the requested subaction does exist,
 	 *  if it doesn't, it sets a default action or.
 	 *
@@ -363,32 +173,5 @@ class AddonSettings_Controller extends Action_Controller
 		// By default do the basic settings.
 		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (!empty($defaultAction) ? $defaultAction : array_pop($temp = array_keys($subActions)));
 		$context['sub_action'] = $_REQUEST['sa'];
-	}
-
-	/**
-	 * Simply returns the total count of integration hooks
-	 * Callback for createList().
-	 *
-	 * @return int
-	 */
-	function list_getIntegrationHooksCount()
-	{
-		global $context;
-
-		$context['filter'] = false;
-		if (isset($_GET['filter']))
-			$context['filter'] = $_GET['filter'];
-
-		return integration_hooks_count($context['filter']);
-	}
-
-	/**
-	 * Callback for createList().
-	 *
-	 * @return array
-	 */
-	function list_getIntegrationHooks($start, $per_page, $sort)
-	{
-		return list_integration_hooks_data($start, $per_page, $sort);
 	}
 }

@@ -57,6 +57,7 @@ $_GET['a'] = isset($_GET['a']) ? (int) $_GET['a'] : 0;
 $step_progress['name'] = 'Converting legacy attachments';
 $step_progress['current'] = $_GET['a'];
 
+// We may be using multiple attachment directories.
 if (!empty($modSettings['currentAttachmentUploadDir']) && !is_array($modSettings['attachmentUploadDir']))
 	$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
 
@@ -82,7 +83,8 @@ while (!$is_done)
 		$current_name = $current_folder . '/' . $row['id_attach'] . '_' . $file_hash;
 
 		// And we try to rename it.
-		@rename($current_name, $current_name . '.elk');
+		if (substr($current_name, -4) != '.elk')
+			@rename($current_name, $current_name . '.elk');
 	}
 	$db->free_result($request);
 
@@ -96,7 +98,7 @@ unset($_GET['a']);
 
 /******************************************************************************/
 --- Adding new indexes to attachments table.
-/*****************************************************************************/
+/******************************************************************************/
 ---# Adding index on id_thumb...
 ALTER TABLE {$db_prefix}attachments
 ADD INDEX id_thumb (id_thumb);
@@ -240,17 +242,6 @@ CHANGE `stars` `icons` varchar(255) NOT NULL DEFAULT '';
 ---#
 
 /******************************************************************************/
---- PM_Prefs changes
-/******************************************************************************/
----# Altering the defalut pm layout to conversation
-ALTER TABLE {$db_prefix}members
-CHANGE `pm_prefs` `pm_prefs` mediumint(8) NOT NULL default '2';
----#
-
-ALTER TABLE {$db_prefix}smileys
-CHANGE COLUMN smileyOrder smileyOrder smallint(5) unsigned NOT NULL default '0';
-
-/******************************************************************************/
 --- Adding support for drafts
 /******************************************************************************/
 ---# Creating draft table
@@ -346,6 +337,7 @@ $request = upgrade_query("
 	WHERE SUBSTRING(variable, 1, 5) = 'cust_'");
 
 // remove the moved rows from themes
+// @TODO this is broken because upgrade_query returns only true or false
 if ($db->num_rows($request) != 0)
 {
 	upgrade_query("
@@ -553,10 +545,8 @@ ADD COLUMN filter_order int(10) NOT NULL default '0';
 ---#
 
 ---# Set the default values so the order is set / maintained
----{
 UPDATE {$db_prefix}postby_emails_filters
 SET filter_order = 'id_filter');
----}
 ---#
 
 ---# Adding new columns to log_activity...
@@ -623,26 +613,26 @@ CHANGE pm_receive_from receive_from tinyint(4) unsigned NOT NULL default '1';
 ---#
 
 /******************************************************************************/
---- Adding notifications support.
+--- Adding mentions support.
 /******************************************************************************/
 
----# Creating notifications log table...
-CREATE TABLE IF NOT EXISTS {$db_prefix}log_notifications (
-	id_notification int(10) NOT NULL auto_increment,
+---# Creating mentions log table...
+CREATE TABLE IF NOT EXISTS {$db_prefix}log_mentions (
+	id_mention int(10) NOT NULL auto_increment,
 	id_member mediumint(8) unsigned NOT NULL DEFAULT '0',
 	id_msg int(10) unsigned NOT NULL DEFAULT '0',
 	status tinyint(1) NOT NULL DEFAULT '0',
 	id_member_from mediumint(8) unsigned NOT NULL DEFAULT '0',
 	log_time int(10) unsigned NOT NULL DEFAULT '0',
 	notif_type varchar(5) NOT NULL DEFAULT '',
-	PRIMARY KEY (id_notification),
+	PRIMARY KEY (id_mention),
 	KEY id_member (id_member,status)
 ) ENGINE=MyISAM;
 ---#
 
 ---# Adding new columns to members...
 ALTER TABLE {$db_prefix}members
-ADD COLUMN notifications smallint(5) NOT NULL default '0';
+ADD COLUMN mentions smallint(5) NOT NULL default '0';
 ---#
 
 --- Fixing personal messages column name

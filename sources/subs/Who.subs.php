@@ -5,7 +5,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file contains nosy functions.
  *
@@ -428,9 +428,9 @@ function prepareCreditsData()
 			'title' => $txt['credits_contributors'],
 			'groups' => array(
 				array(
-					'title' => $txt['credits_groups_dev'],
+					'title' => $txt['credits_groups_contrib'],
 					'members' => array(
-						'Add this at some point',
+						$txt['credits_contrib_list'],
 					),
 				),
 			),

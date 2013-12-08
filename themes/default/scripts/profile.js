@@ -7,20 +7,27 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file contains javascript associated with the user profile
  */
 
+/**
+ * Function to detect the time offset and populate the offset box
+ *
+ * @param {string} currentTime
+ */
 var localTime = new Date();
 function autoDetectTimeOffset(currentTime)
 {
+	var serverTime;
+
 	if (typeof(currentTime) !== 'string')
-		var serverTime = currentTime;
+		serverTime = currentTime;
 	else
-		var serverTime = new Date(currentTime);
+		serverTime = new Date(currentTime);
 
 	// Something wrong?
 	if (!localTime.getTime() || !serverTime.getTime())
@@ -35,14 +42,18 @@ function autoDetectTimeOffset(currentTime)
 	return diff;
 }
 
-// Prevent Chrome from auto completing fields when viewing/editing other members profiles
+/**
+ * Prevent Chrome from auto completing fields when viewing/editing other members profiles
+ */
 function disableAutoComplete()
 {
-	if (is_chrome && document.addEventListener)
+	if (document.addEventListener)
 		document.addEventListener("DOMContentLoaded", disableAutoCompleteNow, false);
 }
 
-// Once DOMContentLoaded is triggered, call the function
+/**
+ * Once DOMContentLoaded is triggered, call the function
+ */
 function disableAutoCompleteNow()
 {
 	for (var i = 0, n = document.forms.length; i < n; i++)
@@ -55,10 +66,15 @@ function disableAutoCompleteNow()
 	}
 }
 
+/**
+ * Calculates the number of available characters remaining when filling in the
+ * signature box
+ */
 function calcCharLeft()
 {
-	var oldSignature = "", currentSignature = document.forms.creator.signature.value;
-	var currentChars = 0;
+	var oldSignature = "",
+		currentSignature = document.forms.creator.signature.value,
+		currentChars = 0;
 
 	if (!document.getElementById("signatureLeft"))
 		return;
@@ -67,10 +83,9 @@ function calcCharLeft()
 	{
 		oldSignature = currentSignature;
 
-		var currentChars = currentSignature.replace(/\r/, "").length;
+		currentChars = currentSignature.replace(/\r/, "").length;
 		if (is_opera)
 			currentChars = currentSignature.replace(/\r/g, "").length;
-
 
 		if (currentChars > maxLength)
 			document.getElementById("signatureLeft").className = "error";
@@ -86,10 +101,15 @@ function calcCharLeft()
 		}
 	}
 
-	setInnerHTML(document.getElementById("signatureLeft"), maxLength - currentChars);
+	document.getElementById("signatureLeft").innerHTML = maxLength - currentChars;
 }
 
-function ajax_getSignaturePreview (showPreview)
+/**
+ * Gets the signature preview via ajax and populates the preview box
+ *
+ * @param {boolean} showPreview
+ */
+function ajax_getSignaturePreview(showPreview)
 {
 	showPreview = (typeof showPreview === 'undefined') ? false : showPreview;
 	$.ajax({
@@ -99,10 +119,11 @@ function ajax_getSignaturePreview (showPreview)
 		context: document.body
 	})
 	.done(function(request) {
+		var i = 0;
 		if (showPreview)
 		{
 			var signatures = new Array("current", "preview");
-			for (var i = 0; i < signatures.length; i++)
+			for (i = 0; i < signatures.length; i++)
 			{
 				$("#" + signatures[i] + "_signature").css({display:""});
 				$("#" + signatures[i] + "_signature_display").css({display:""}).html($(request).find('[type="' + signatures[i] + '"]').text() + '<hr />');
@@ -113,10 +134,11 @@ function ajax_getSignaturePreview (showPreview)
 		{
 			if (!$("#profile_error").is(":visible"))
 				$("#profile_error").css({display: "", position: "fixed", top: 0, left: 0, width: "100%"});
-			var errors = $(request).find('[type="error"]');
-			var errors_html = '<span>' + $(request).find('[type="errors_occurred"]').text() + '</span><ul>';
 
-			for (var i = 0; i < errors.length; i++)
+			var errors = $(request).find('[type="error"]'),
+				errors_html = '<span>' + $(request).find('[type="errors_occurred"]').text() + '</span><ul>';
+
+			for (i = 0; i < errors.length; i++)
 				errors_html += '<li>' + $(errors).text() + '</li>';
 
 			errors_html += '</ul>';
@@ -129,9 +151,15 @@ function ajax_getSignaturePreview (showPreview)
 		}
 		return false;
 	});
+
 	return false;
 }
 
+/**
+ * Allows previewing of server stored avatars stored.
+ *
+ * @param {type} selected
+ */
 function changeSel(selected)
 {
 	if (cat.selectedIndex === -1)
@@ -139,8 +167,8 @@ function changeSel(selected)
 
 	if (cat.options[cat.selectedIndex].value.indexOf("/") > 0)
 	{
-		var i;
-		var count = 0;
+		var i,
+			count = 0;
 
 		file.style.display = "inline";
 		file.disabled = false;
@@ -183,6 +211,9 @@ function changeSel(selected)
 	}
 }
 
+/**
+ * Updates the avatar img preview with the selected one
+ */
 function showAvatar()
 {
 	if (file.selectedIndex === -1)
@@ -197,6 +228,12 @@ function showAvatar()
 	oAvatar.style.height = "";
 }
 
+/**
+ * Allows for the previewing of an externally stored avatar
+ *
+ * @param {string} src
+ * @param {string} sid
+ */
 function previewExternalAvatar(src, sid)
 {
 	sid = (typeof(sid) === 'undefined') ? "avatar" : sid;
@@ -218,4 +255,145 @@ function previewExternalAvatar(src, sid)
 		document.getElementById(sid).style.height = maxHeight + "px";
 	}
 	document.getElementById(sid).src = src;
+}
+
+/**
+ * Sets the warning bar based on user +/- button click
+ * Also responds to mousedown/move/click events inside the warning bar to set the level
+ * Determines the right color for the bar and sets it
+ * Sets the warning level notification text
+ *
+ * @param {object} curEvent
+ * @param {boolean} isMove
+ * @param {int} changeAmount
+ */
+function setWarningBarPos(curEvent, isMove, changeAmount)
+{
+	// Are we passing the amount to change it by?
+	if (changeAmount)
+	{
+		if (document.getElementById('warning_level').value === 'SAME')
+			percent = currentLevel + changeAmount;
+		else
+			percent = parseInt(document.getElementById('warning_level').value) + changeAmount;
+	}
+	// If not then it's a mouse thing.
+	else
+	{
+		if (!curEvent)
+			curEvent = window.event;
+
+		// If it's a movement check the button state first!
+		if (isMove)
+		{
+			if (!curEvent.button || curEvent.button !== 1)
+				return false;
+		}
+
+		// Get the position of the container.
+		contain = document.getElementById('warning_progress');
+		position = 0;
+		while (contain !== null)
+		{
+			position += contain.offsetLeft;
+			contain = contain.offsetParent;
+		}
+
+		// Where is the mouse?
+		if (curEvent.pageX)
+		{
+			mouse = curEvent.pageX;
+		}
+		else
+		{
+			mouse = curEvent.clientX;
+			mouse += document.documentElement.scrollLeft !== "undefined" ? document.documentElement.scrollLeft : document.body.scrollLeft;
+		}
+
+		// Is this within bounds?
+		if (mouse < position || mouse > position + barWidth)
+			return;
+
+		percent = Math.round(((mouse - position) / barWidth) * 100);
+
+		// Round percent to the nearest 5 - by kinda cheating!
+		percent = Math.round(percent / 5) * 5;
+	}
+
+	// What are the limits?
+	percent = Math.max(percent, minLimit);
+	percent = Math.min(percent, maxLimit);
+
+	// Set up the warning progress bar
+	size = barWidth * (percent / 100);
+	document.getElementById('warning_text').innerHTML = percent + "%";
+	document.getElementById('warning_level').value = percent;
+	document.getElementById('warning_progress').style.width = size + "px";
+
+	// Get the right color.
+	var key;
+	for (key in colors)
+	{
+		if (percent >= key)
+			color = colors[key];
+	}
+
+	document.getElementById('warning_progress').style.backgroundColor = color;
+	document.getElementById('warning_progress').style.backgroundImage = "none";
+
+	// Set the right text so its clear what the level will restrict
+	for (key in effectTexts)
+	{
+		if (percent >= key)
+			effectText = effectTexts[key];
+	}
+
+	document.getElementById('cur_level_div').innerHTML = effectText;
+}
+
+/**
+ * Disable notification boxes as required.  This is in response to slecting the
+ * notify user checkbox in the issue a warning screen
+ */
+function modifyWarnNotify()
+{
+	disable = !document.getElementById('warn_notify').checked;
+	document.getElementById('warn_sub').disabled = disable;
+	document.getElementById('warn_body').disabled = disable;
+	document.getElementById('warn_temp').disabled = disable;
+	document.getElementById('new_template_link').style.display = disable ? 'none' : '';
+	document.getElementById('preview_button').style.display = disable ? 'none' : '';
+}
+
+/**
+ * onclick function, triggerd in response to slecting + or - in the warning screen
+ * Increases the warning level by a defined amount
+ *
+ * @param {int} amount
+ */
+function changeWarnLevel(amount)
+{
+	setWarningBarPos(false, false, amount);
+}
+
+/**
+ * Fills the warning template box based on the one chosen by the user
+ */
+function populateNotifyTemplate()
+{
+	// no selection means no template
+	index = document.getElementById('warn_temp').value;
+	if (index === -1)
+		return false;
+
+	// Otherwise see what we can do...
+	for (var key in templates)
+	{
+		// Found the template, load it and stop
+		if (index === key)
+		{
+			document.getElementById('warn_body').value = templates[key];
+			break;
+		}
+	}
 }

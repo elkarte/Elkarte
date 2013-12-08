@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -28,8 +28,8 @@ function template_main()
 		</h2>
 		<ul class="statistics">
 			<li class="flow_hidden" id="top_row">
-				<h3 class="category_header">
-					<img src="', $settings['images_url'], '/stats_info.png" class="icon" alt="" /> ', $txt['general_stats'], '
+				<h3 class="category_header hdicon cat_img_stats_info">
+					', $txt['general_stats'], '
 				</h3>
 				<dl class="stats floatleft">
 					<dt>', $txt['total_members'], ':</dt>
@@ -79,8 +79,8 @@ function template_main()
 				</dl>
 			</li>
 			<li class="flow_hidden">
-				<h3 class="category_header floatleft">
-					<img src="', $settings['images_url'], '/stats_posters.png" class="icon" alt="" /> ', $txt['top_posters'], '
+				<h3 class="category_header floatleft hdicon cat_img_star">
+					', $txt['top_posters'], '
 				</h3>
 				<dl class="stats floatleft">';
 
@@ -98,8 +98,8 @@ function template_main()
 
 	echo '
 				</dl>
-				<h3 class="category_header">
-					<img src="', $settings['images_url'], '/stats_board.png" class="icon" alt="" /> ', $txt['top_boards'], '
+				<h3 class="category_header hdicon cat_img_topics">
+					', $txt['top_boards'], '
 				</h3>
 				<dl class="stats">';
 
@@ -119,8 +119,8 @@ function template_main()
 				</dl>
 			</li>
 			<li class="flow_hidden">
-				<h3 class="category_header floatleft">
-					<img src="', $settings['images_url'], '/stats_replies.png" class="icon" alt="" /> ', $txt['top_topics_replies'], '
+				<h3 class="category_header floatleft hdicon cat_img_talk">
+					', $txt['top_topics_replies'], '
 				</h3>
 				<dl class="stats floatleft">';
 
@@ -138,8 +138,8 @@ function template_main()
 
 	echo '
 				</dl>
-				<h3 class="category_header">
-					<img src="', $settings['images_url'], '/stats_views.png" class="icon" alt="" /> ', $txt['top_topics_views'], '
+				<h3 class="category_header hdicon cat_img_eye">
+					', $txt['top_topics_views'], '
 				</h3>
 				<dl class="stats">';
 
@@ -157,8 +157,8 @@ function template_main()
 				</dl>
 			</li>
 			<li class="flow_hidden">
-				<h3 class="category_header floatleft">
-					<img src="', $settings['images_url'], '/stats_replies.png" class="icon" alt="" /> ', $txt['top_starters'], '
+				<h3 class="category_header floatleft hdicon cat_img_write">
+					', $txt['top_starters'], '
 				</h3>
 				<dl class="stats floatleft">';
 
@@ -176,8 +176,8 @@ function template_main()
 
 	echo '
 				</dl>
-				<h3 class="category_header">
-					<img src="', $settings['images_url'], '/stats_views.png" class="icon" alt="" /> ', $txt['most_time_online'], '
+				<h3 class="category_header hdicon cat_img_clock">
+					', $txt['most_time_online'], '
 				</h3>
 				<dl class="stats">';
 
@@ -199,8 +199,8 @@ function template_main()
 		</ul>
 	</div>
 	<div id="forum_history" class="forum_category">
-		<h2 class="category_header">
-			<img src="', $settings['images_url'], '/stats_history.png" class="icon" alt="" /> ', $txt['forum_history'], '
+		<h2 class="category_header hdicon cat_img_clock">
+			', $txt['forum_history'], '
 		</h2>
 		<div class="flow_hidden">';
 

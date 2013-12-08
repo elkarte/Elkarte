@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file handles tasks related to personal messages. It performs all
  * the necessary (database updates, statistics updates) to add, delete, mark
@@ -1237,9 +1237,11 @@ function loadPMLimits($id_group = false)
 	$request = $db->query('', '
 		SELECT id_group, group_name, max_messages
 		FROM {db_prefix}membergroups' . ($id_group ? '
-		WHERE id_group = {int:id_group}' : ''),
+		WHERE id_group = {int:id_group}' : '
+		ORDER BY min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name'),
 		array(
 			'id_group' => $id_group,
+			'newbie_group' => 4,
 		)
 	);
 

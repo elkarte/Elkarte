@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 function template_Post_init()
@@ -24,12 +24,13 @@ function template_Post_init()
  */
 function template_main()
 {
-	global $context, $settings, $options, $txt, $modSettings;
+	global $context, $txt;
 
 	// Show the actual posting area...
 	echo '
 					', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
 
+	// A placeholder for our mention box if needed
 	if (!empty($context['member_ids']))
 	{
 		echo '
@@ -50,6 +51,27 @@ function template_main()
 						', $context['last_modified_text'], '
 					</div>';
 
+	// Show our submit buttons before any more options
+	echo '
+						<div id="post_confirm_buttons" class="submitbutton">
+							', template_control_richedit_buttons($context['post_box_name']);
+
+	// Option to delete an event if user is editing one.
+	if ($context['make_event'] && !$context['event']['new'])
+		echo '
+							<input type="submit" name="deleteevent" value="', $txt['event_delete'], '" onclick="return confirm(\'', $txt['event_delete_confirm'], '\');" class="button_submit" />';
+
+	echo '
+						</div>';
+}
+
+/**
+ * Show the additonal options section, allowing locking, sticky, adding of attachments, etc
+ */
+function template_additional_options_below()
+{
+	global $context, $settings, $options, $txt, $modSettings;
+
 	// If the admin has enabled the hiding of the additional options - show a link and image for it.
 	if (!empty($settings['additional_options_collapsible']))
 		echo '
@@ -61,21 +83,6 @@ function template_main()
 					</h3>';
 	echo '
 					<div id="postAdditionalOptions"', empty($settings['additional_options_collapsible']) || empty($context['minmax_preferences']['post']) ? '' : ' style="display: none;"', '>';
-
-	// Display the check boxes for all the standard options - if they are available to the user!
-	echo '
-						<div id="postMoreOptions" class="smalltext">
-							<ul class="post_options">
-								', $context['can_notify'] ? '<li><input type="hidden" name="notify" value="0" /><label for="check_notify"><input type="checkbox" name="notify" id="check_notify"' . ($context['notify'] || !empty($options['auto_notify']) ? ' checked="checked"' : '') . ' value="1" class="input_check" /> ' . $txt['notify_replies'] . '</label></li>' : '', '
-								', $context['can_lock'] ? '<li><input type="hidden" name="lock" value="0" /><label for="check_lock"><input type="checkbox" name="lock" id="check_lock"' . ($context['locked'] ? ' checked="checked"' : '') . ' value="1" class="input_check" /> ' . $txt['lock_topic'] . '</label></li>' : '', '
-								<li><label for="check_back"><input type="checkbox" name="goback" id="check_back"' . ($context['back_to_topic'] || !empty($options['return_to_post']) ? ' checked="checked"' : '') . ' value="1" class="input_check" /> ' . $txt['back_to_topic'] . '</label></li>
-								', $context['can_sticky'] ? '<li><input type="hidden" name="sticky" value="0" /><label for="check_sticky"><input type="checkbox" name="sticky" id="check_sticky"' . ($context['sticky'] ? ' checked="checked"' : '') . ' value="1" class="input_check" /> ' . $txt['sticky_after'] . '</label></li>' : '', '
-								<li><label for="check_smileys"><input type="checkbox" name="ns" id="check_smileys"', $context['use_smileys'] ? '' : ' checked="checked"', ' value="NS" class="input_check" /> ', $txt['dont_use_smileys'], '</label></li>', '
-								', $context['can_move'] ? '<li><input type="hidden" name="move" value="0" /><label for="check_move"><input type="checkbox" name="move" id="check_move" value="1" class="input_check" ' . (!empty($context['move']) ? 'checked="checked" ' : '') . '/> ' . $txt['move_after2'] . '</label></li>' : '', '
-								', $context['can_announce'] && $context['is_first_post'] ? '<li><label for="check_announce"><input type="checkbox" name="announce_topic" id="check_announce" value="1" class="input_check" ' . (!empty($context['announce']) ? 'checked="checked" ' : '') . '/> ' . $txt['announce_topic'] . '</label></li>' : '', '
-								', $context['show_approval'] ? '<li><label for="approve"><input type="checkbox" name="approve" id="approve" value="2" class="input_check" ' . ($context['show_approval'] === 2 ? 'checked="checked"' : '') . ' /> ' . $txt['approve_this_post'] . '</label></li>' : '', '
-							</ul>
-						</div>';
 
 	// If this post already has attachments on it - give information about them.
 	if (!empty($context['current_attachments']))
@@ -126,11 +133,11 @@ function template_main()
 			if ($context['num_allowed_attachments'] > 1)
 				echo '
 								<script><!-- // --><![CDATA[
-									var allowed_attachments = ', $context['num_allowed_attachments'], ';
-									var current_attachment = 1;
-									var txt_more_attachments_error = "', $txt['more_attachments_error'], '";
-									var txt_more_attachments = "', $txt['more_attachments'], '";
-									var txt_clean_attach = "', $txt['clean_attach'], '";
+									var allowed_attachments = ', $context['num_allowed_attachments'], ',
+										current_attachment = 1,
+										txt_more_attachments_error = "', $txt['more_attachments_error'], '",
+										txt_more_attachments = "', $txt['more_attachments'], '",
+										txt_clean_attach = "', $txt['clean_attach'], '";
 								// ]]></script>
 							</dd>
 							<dd class="smalltext" id="moreAttachments"><a href="#" onclick="addAttachment(); return false;">(', $txt['more_attachments'], ')</a></dd>';
@@ -166,6 +173,21 @@ function template_main()
 							</dd>
 						</dl>';
 	}
+
+	// Display the check boxes for all the standard options - if they are available to the user!
+	echo '
+						<div id="postMoreOptions" class="smalltext">
+							<ul class="post_options">
+								', $context['can_notify'] ? '<li><input type="hidden" name="notify" value="0" /><label for="check_notify"><input type="checkbox" name="notify" id="check_notify"' . ($context['notify'] || !empty($options['auto_notify']) ? ' checked="checked"' : '') . ' value="1" class="input_check" /> ' . $txt['notify_replies'] . '</label></li>' : '', '
+								', $context['can_lock'] ? '<li><input type="hidden" name="lock" value="0" /><label for="check_lock"><input type="checkbox" name="lock" id="check_lock"' . ($context['locked'] ? ' checked="checked"' : '') . ' value="1" class="input_check" /> ' . $txt['lock_topic'] . '</label></li>' : '', '
+								<li><label for="check_back"><input type="checkbox" name="goback" id="check_back"' . ($context['back_to_topic'] || !empty($options['return_to_post']) ? ' checked="checked"' : '') . ' value="1" class="input_check" /> ' . $txt['back_to_topic'] . '</label></li>
+								', $context['can_sticky'] ? '<li><input type="hidden" name="sticky" value="0" /><label for="check_sticky"><input type="checkbox" name="sticky" id="check_sticky"' . ($context['sticky'] ? ' checked="checked"' : '') . ' value="1" class="input_check" /> ' . $txt['sticky_after'] . '</label></li>' : '', '
+								<li><label for="check_smileys"><input type="checkbox" name="ns" id="check_smileys"', $context['use_smileys'] ? '' : ' checked="checked"', ' value="NS" class="input_check" /> ', $txt['dont_use_smileys'], '</label></li>', '
+								', $context['can_move'] ? '<li><input type="hidden" name="move" value="0" /><label for="check_move"><input type="checkbox" name="move" id="check_move" value="1" class="input_check" ' . (!empty($context['move']) ? 'checked="checked" ' : '') . '/> ' . $txt['move_after2'] . '</label></li>' : '', '
+								', $context['can_announce'] && $context['is_first_post'] ? '<li><label for="check_announce"><input type="checkbox" name="announce_topic" id="check_announce" value="1" class="input_check" ' . (!empty($context['announce']) ? 'checked="checked" ' : '') . '/> ' . $txt['announce_topic'] . '</label></li>' : '', '
+								', $context['show_approval'] ? '<li><label for="approve"><input type="checkbox" name="approve" id="approve" value="2" class="input_check" ' . ($context['show_approval'] === 2 ? 'checked="checked"' : '') . ' /> ' . $txt['approve_this_post'] . '</label></li>' : '', '
+							</ul>
+						</div>';
 
 	echo '
 					</div>';
@@ -381,7 +403,7 @@ function template_postarea_above()
 	if (!$context['becomes_approved'])
 	{
 		echo '
-						<div class="infobox">
+						<div class="successbox">
 							', $txt['wait_for_approval'], '
 							<input type="hidden" name="not_approved" value="1" />
 						</div>';
@@ -396,7 +418,7 @@ function template_postarea_above()
 
 	if (!empty($context['drafts_autosave']))
 		echo '
-						<div id="draft_section" class="infobox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>',
+						<div id="draft_section" class="successbox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>',
 							sprintf($txt['draft_saved'], $scripturl . '?action=profile;u=' . $context['user']['id'] . ';area=showdrafts'), '
 						</div>';
 
@@ -473,27 +495,16 @@ function template_postarea_below()
 	// Is visual verification enabled?
 	if ($context['require_verification'])
 	{
-		echo '
+		template_control_verification($context['visual_verification_id'], '
 						<div class="post_verification">
-							<span', !empty($context['post_error']['need_qr_verification']) ? ' class="error"' : '', '>
-								<strong>', $txt['verification'], ':</strong>
+							<span' . (!empty($context['post_error']['need_qr_verification']) ? ' class="error"' : '') . '>
+								<strong>' . $txt['verification'] . ':</strong>
 							</span>
-							', template_control_verification($context['visual_verification_id'], 'all'), '
-						</div>';
+							', '
+						</div>');
 	}
 
-	// Finally, the submit buttons.
 	echo '
-						<div id="post_confirm_buttons" class="submitbutton">
-							', template_control_richedit_buttons($context['post_box_name']);
-
-	// Option to delete an event if user is editing one.
-	if ($context['make_event'] && !$context['event']['new'])
-		echo '
-							<input type="submit" name="deleteevent" value="', $txt['event_delete'], '" onclick="return confirm(\'', $txt['event_delete_confirm'], '\');" class="button_submit" />';
-
-	echo '
-						</div>
 					</div>
 				</div>
 			</div>';
@@ -517,8 +528,7 @@ function template_postarea_below()
 	// The variables used to preview a post without loading a new page.
 	echo '
 		<script><!-- // --><![CDATA[
-			var post_box_name = "', $context['post_box_name'], '",
-				form_name = "postmodify",
+			var form_name = "postmodify",
 				preview_area = "post",
 				current_board = ', empty($context['current_board']) ? 'null' : $context['current_board'], ',
 				txt_preview_title = "', $txt['preview_title'], '",
@@ -702,7 +712,7 @@ function template_spellcheck()
 	<head>
 		<title>', $txt['spell_check'], '</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?alp21" />
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?beta10" />
 		<style>
 			body, td {
 				font-size: small;
@@ -729,9 +739,9 @@ function template_spellcheck()
 	// As you may expect - we need a lot of javascript for this... load it from the separate files.
 	echo '
 		<script><!-- // --><![CDATA[
-			var spell_formname = window.opener.spell_formname;
-			var spell_fieldname = window.opener.spell_fieldname;
-			var spell_full = window.opener.spell_full;
+			var spell_formname = window.opener.spell_formname,
+				spell_fieldname = window.opener.spell_fieldname,
+				spell_full = window.opener.spell_full;
 		// ]]></script>
 		<script src="', $settings['default_theme_url'], '/scripts/spellcheck.js"></script>
 		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
@@ -790,29 +800,27 @@ function template_quotefast()
 			window.close();';
 	else
 	{
-		// Lucky for us, Internet Explorer has an "innerText" feature which basically converts entities <--> text. Use it if possible ;).
+		// Internet Explorer < 9 does not have DOMParser api so we use the "innerText" feature which
+		// basically converts entities <--> text.  DOMParser works (correctly) with opera 11+
 		echo '
-			var quote = \'', $context['quote']['text'], '\';
-			var stage = \'createElement\' in document ? document.createElement("DIV") : document.getElementById("temporary_posting_area");
+			var quote = \'', $context['quote']['text'], '\',
+				stage = \'createElement\' in document ? document.createElement("div") : document.getElementById("temporary_posting_area");
 
-			if (\'DOMParser\' in window && !(\'opera\' in window))
+			if (\'DOMParser\' in window)
 			{
 				var xmldoc = new DOMParser().parseFromString("<temp>" + \'', $context['quote']['mozilla'], '\'.replace(/\n/g, "_ELK-BREAK_").replace(/\t/g, "_ELK-TAB_") + "</temp>", "text/xml");
 				quote = xmldoc.childNodes[0].textContent.replace(/_ELK-BREAK_/g, "\n").replace(/_ELK-TAB_/g, "\t");
 			}
 			else if (\'innerText\' in stage)
 			{
-				setInnerHTML(stage, quote.replace(/\n/g, "_ELK-BREAK_").replace(/\t/g, "_ELK-TAB_").replace(/</g, "&lt;").replace(/>/g, "&gt;"));
+				stage.innerHTML = quote.replace(/\n/g, "_ELK-BREAK_").replace(/\t/g, "_ELK-TAB_").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 				quote = stage.innerText.replace(/_ELK-BREAK_/g, "\n").replace(/_ELK-TAB_/g, "\t");
 			}
-
-			if (\'opera\' in window)
-				quote = quote.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, \'"\').replace(/&amp;/g, "&");
 
 			window.opener.onReceiveOpener(quote);
 
 			window.focus();
-			setTimeout("window.close();", 400);';
+			setTimeout(function() {window.close();}, 400);';
 	}
 	echo '
 		// ]]></script>

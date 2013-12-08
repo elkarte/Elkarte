@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -152,7 +152,7 @@ function template_main()
 
 	echo '
 	</div>
-	<script type="text/javascript">
+	<script>
 		// Start by creating proper ids and ul childs for use
 		setBoardIds();
 
@@ -165,6 +165,7 @@ function template_main()
 			tag: "' . implode(' ul,', $sortables) . ' ul",
 			connect: ".nolist",
 			containment: "document",
+			href: "?action=admin;area=manageboards",
 			placeholder: "ui-state-highlight",
 			preprocess: "setBoardIds",
 			axis: "",
@@ -506,14 +507,17 @@ function template_modify_board()
 							<div id="moderator_container"></div>
 						</dd>
 					</dl>
+					<hr />';
+
+	// Add a select all box for the allowed groups section
+	echo '
 					<script><!-- // --><![CDATA[
 						$(document).ready(function () {
 							$(".select_all_box").each(function () {
 								$(this).removeClass(\'select_all_box\');
 							});
 						});
-					// ]]></script>
-					<hr />';
+					// ]]></script>';
 
 	if (empty($context['board']['is_recycle']) && empty($context['board']['topics']))
 		echo '
@@ -529,11 +533,11 @@ function template_modify_board()
 
 	if (!empty($context['board']['is_recycle']))
 		echo '
-					<div class="infobox">', $txt['mboards_redirect_disabled_recycle'], '</div>';
+					<div class="successbox">', $txt['mboards_redirect_disabled_recycle'], '</div>';
 
 	if (empty($context['board']['is_recycle']) && !empty($context['board']['topics']))
 		echo '
-					<div class="infobox">
+					<div class="successbox">
 						<strong>', $txt['mboards_redirect'], '</strong><br />
 						', $txt['mboards_redirect_disabled'], '
 					</div>';
@@ -648,7 +652,7 @@ function template_modify_board()
 		</form>
 	</div>
 
-<script src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
+<script src="', $settings['default_theme_url'], '/scripts/suggest.js?beta10"></script>
 <script><!-- // --><![CDATA[
 	var oModeratorSuggest = new smc_AutoSuggest({
 		sSelf: \'oModeratorSuggest\',
@@ -681,9 +685,9 @@ function template_modify_board()
 	<script><!-- // --><![CDATA[
 		function refreshOptions()
 		{
-			var redirect = document.getElementById("redirect_enable");
-			var redirectEnabled = redirect ? redirect.checked : false;
-			var nonDefaultTheme = document.getElementById("boardtheme").value == 0 ? false : true;
+			var redirect = document.getElementById("redirect_enable"),
+				redirectEnabled = redirect ? redirect.checked : false,
+				nonDefaultTheme = document.getElementById("boardtheme").value == 0 ? false : true;
 
 			// What to show?
 			document.getElementById("override_theme_div").style.display = redirectEnabled || !nonDefaultTheme ? "none" : "";
@@ -702,6 +706,7 @@ function template_modify_board()
 
 	echo '
 		}
+
 		refreshOptions();
 	// ]]></script>';
 }

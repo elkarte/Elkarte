@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -25,7 +25,7 @@ function template_profile_above()
 	<script src="', $settings['default_theme_url'], '/scripts/profile.js"></script>';
 
 	// Prevent Chrome from auto completing fields when viewing/editing other members profiles
-	if (isBrowser('is_chrome') && !$context['user']['is_owner'])
+	if (isBrowser('is_webkit') && !$context['user']['is_owner'])
 		echo '
 	<script><!-- // --><![CDATA[
 		disableAutoComplete();
@@ -38,7 +38,7 @@ function template_profile_above()
 	// If the profile was update successfully, let the user know this.
 	if (!empty($context['profile_updated']))
 		echo '
-					<div class="infobox">
+					<div class="successbox">
 						', $context['profile_updated'], '
 					</div>';
 }

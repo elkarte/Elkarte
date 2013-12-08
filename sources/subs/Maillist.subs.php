@@ -5,7 +5,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * All of the helper functions for use by the maillist controller
  */
@@ -64,7 +64,7 @@ function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
 			'id' => $id,
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+ 	while ($row = $db->fetch_assoc($request))
 	{
 		$postemail[$i] = array(
 			'id_email' => $row['id_email'],
@@ -354,11 +354,14 @@ function enable_maillist_imap_cron($switch)
 }
 
 /**
- * Load in the custom (public an this users private) bounce email templates
+ * Load in the custom (public and this users private) email templates
+ *
+ * @param string $template_type - the type of template (e.g. 'bounce', 'warntpl', etc.)
+ * @param string $subject - A subject for the template
  */
-function maillist_templates()
+function maillist_templates($template_type, $subject = null)
 {
-	global $user_info, $txt;
+	global $user_info;
 
 	$db = database();
 
@@ -370,18 +373,22 @@ function maillist_templates()
 		WHERE comment_type = {string:tpltype}
 			AND (id_recipient = {int:generic} OR id_recipient = {int:current_member})',
 		array(
-			'tpltype' => 'bnctpl',
+			'tpltype' => $template_type,
 			'generic' => 0,
 			'current_member' => $user_info['id'],
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
 	{
-		$notification_templates[] = array(
+		$template = array(
 			'title' => $row['template_title'],
 			'body' => $row['body'],
-			'subject' => $txt['ml_bounce_template_subject_default'],
 		);
+
+		if ($subject !== null)
+			$template['subject'] = $subject;
+
+		$notification_templates[] = $template;
 	}
 	$db->free_result($request);
 

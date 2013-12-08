@@ -11,16 +11,14 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  */
 
 // Version information...
-define('CURRENT_VERSION', '1.0 Alpha');
+define('CURRENT_VERSION', '1.0 Beta');
 define('CURRENT_LANG_VERSION', '1.0');
-
-$GLOBALS['required_php_version'] = '5.1.0';
-$GLOBALS['required_mysql_version'] = '4.1.13';
+define('REQUIRED_PHP_VERSION', '5.1.0');
 
 $databases = array(
 	'mysql' => array(
@@ -244,8 +242,8 @@ if (isset($_GET['data']))
 	$support_js = $upcontext['upgrade_status']['js'];
 
 	// Load the language.
-	if (file_exists($modSettings['theme_dir'] . '/languages/Install.' . $upcontext['language'] . '.php'))
-		require_once($modSettings['theme_dir'] . '/languages/Install.' . $upcontext['language'] . '.php');
+	if (file_exists($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php'))
+		require_once($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php');
 }
 // Set the defaults.
 else
@@ -254,6 +252,7 @@ else
 	$upcontext['rid'] = mt_rand(0, 5000);
 	$upcontext['upgrade_status'] = array(
 		'curstep' => 0,
+		// memo: .lng files were used by YaBB SE
 		'lang' => isset($_GET['lang']) ? $_GET['lang'] : basename($language, '.lng'),
 		'rid' => $upcontext['rid'],
 		'pass' => 0,
@@ -518,14 +517,6 @@ function initialize_inputs()
 	if (isset($_GET['delete']))
 		deleteUpgrader();
 
-	// Are we calling the backup css file?
-	if (isset($_GET['infile_css']))
-	{
-		header('Content-Type: text/css');
-		template_css();
-		exit;
-	}
-
 	// Something is causing this to happen, and it's annoying.  Stop it.
 	$temp = 'upgrade_php?step';
 	while (strlen($temp) > 4)
@@ -580,7 +571,7 @@ function action_welcomeLogin()
 		return throw_error('The upgrader was unable to find some crucial files.<br /><br />Please make sure you uploaded all of the files included in the package, including the themes, sources, and other directories.');
 
 	// Do they meet the install requirements?
-	if (!php_version_check())
+	if (version_compare(REQUIRED_PHP_VERSION, PHP_VERSION, '>='))
 		return throw_error('Warning!  You do not appear to have a version of PHP installed on your webserver that meets ElkArte\'s minimum installations requirements.<br /><br />Please ask your host to upgrade.');
 
 	if (!db_version_check())
@@ -610,11 +601,11 @@ function action_welcomeLogin()
 	if (!file_exists($CACHEDIR_temp))
 		return throw_error('The cache directory could not be found.<br /><br />Please make sure you have a directory called &quot;cache&quot; in your forum directory before continuing.');
 
-	if (!file_exists($modSettings['theme_dir'] . '/languages/index.' . $upcontext['language'] . '.php') && !isset($modSettings['elkVersion']) && !isset($_GET['lang']))
+	if (!file_exists($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/index.' . $upcontext['language'] . '.php') && !isset($modSettings['elkVersion']) && !isset($_GET['lang']))
 		return throw_error('The upgrader was unable to find language files for the language specified in Settings.php.<br />ElkArte will not work without the primary language files installed.<br /><br />Please either install them, or <a href="' . $upgradeurl . '?step=0;lang=english">use english instead</a>.');
 	elseif (!isset($_GET['skiplang']))
 	{
-		$temp = substr(@implode('', @file($modSettings['theme_dir'] . '/languages/index.' . $upcontext['language'] . '.php')), 0, 4096);
+		$temp = substr(@implode('', @file($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/index.' . $upcontext['language'] . '.php')), 0, 4096);
 		preg_match('~(?://|/\*)\s*Version:\s+(.+?);\s*index(?:[\s]{2}|\*/)~i', $temp, $match);
 
 		if (empty($match[1]) || $match[1] != CURRENT_LANG_VERSION)
@@ -622,10 +613,10 @@ function action_welcomeLogin()
 	}
 
 	// This needs to exist!
-	if (!file_exists($modSettings['theme_dir'] . '/languages/Install.' . $upcontext['language'] . '.php'))
+	if (!file_exists($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php'))
 		return throw_error('The upgrader could not find the &quot;Install&quot; language file for the forum default language, ' . $upcontext['language'] . '.<br /><br />Please make certain you uploaded all the files included in the package, even the theme and language files for the default theme.<br />&nbsp;&nbsp;&nbsp;[<a href="' . $upgradeurl . '?lang=english">Try English</a>]');
 	else
-		require_once($modSettings['theme_dir'] . '/languages/Install.' . $upcontext['language'] . '.php');
+		require_once($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php');
 
 	if (!makeFilesWritable($writable_files))
 		return false;
@@ -821,15 +812,15 @@ function checkLogin()
 			$upcontext['upgrade_status']['pass'] = $upcontext['user']['pass'];
 
 			// Set the language to that of the user?
-			if (isset($user_language) && $user_language != $upcontext['language'] && file_exists($modSettings['theme_dir'] . '/languages/index.' . basename($user_language, '.lng') . '.php'))
+			if (isset($user_language) && $user_language != $upcontext['language'] && file_exists($modSettings['theme_dir'] . '/languages/' . basename($user_language, '.lng') . '/index.' . basename($user_language, '.lng') . '.php'))
 			{
 				$user_language = basename($user_language, '.lng');
-				$temp = substr(@implode('', @file($modSettings['theme_dir'] . '/languages/index.' . $user_language . '.php')), 0, 4096);
+				$temp = substr(@implode('', @file($modSettings['theme_dir'] . '/languages/' . $user_language . '/index.' . $user_language . '.php')), 0, 4096);
 				preg_match('~(?://|/\*)\s*Version:\s+(.+?);\s*index(?:[\s]{2}|\*/)~i', $temp, $match);
 
 				if (empty($match[1]) || $match[1] != CURRENT_LANG_VERSION)
 					$upcontext['upgrade_options_warning'] = 'The language files for your selected language, ' . $user_language . ', have not been updated to the latest version. Upgrade will continue with the forum default, ' . $upcontext['language'] . '.';
-				elseif (!file_exists($modSettings['theme_dir'] . '/languages/Install.' . basename($user_language, '.lng') . '.php'))
+				elseif (!file_exists($modSettings['theme_dir'] . '/languages/' . $user_language . '/Install.' . $user_language . '.php'))
 					$upcontext['upgrade_options_warning'] = 'The language files for your selected language, ' . $user_language . ', have not been uploaded/updated as the &quot;Install&quot; language file is missing. Upgrade will continue with the forum default, ' . $upcontext['language'] . '.';
 				else
 				{
@@ -838,7 +829,7 @@ function checkLogin()
 					$upcontext['upgrade_status']['lang'] = $upcontext['language'];
 
 					// Include the file.
-					require_once($modSettings['theme_dir'] . '/languages/Install.' . $user_language . '.php');
+					require_once($modSettings['theme_dir'] . '/languages/' . $user_language . '/Install.' . $user_language . '.php');
 				}
 			}
 
@@ -905,7 +896,7 @@ function action_upgradeOptions()
 	$changes = array();
 
 	// If we're overriding the language follow it through.
-	if (isset($_GET['lang']) && file_exists($modSettings['theme_dir'] . '/languages/index.' . $_GET['lang'] . '.php'))
+	if (isset($_GET['lang']) && file_exists($modSettings['theme_dir'] . '/languages/' . $_GET['lang'] . '/index.' . $_GET['lang'] . '.php'))
 		$changes['language'] = '\'' . $_GET['lang'] . '\'';
 
 	if (!empty($_POST['maint']))
@@ -1536,17 +1527,6 @@ function updateLastError()
 {
 	// Clear out the db_last_error file
 	file_put_contents(dirname(__FILE__) . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = 0;');
-}
-
-/**
- * Checks the servers php version against our requirements
- */
-function php_version_check()
-{
-	$minver = explode('.', $GLOBALS['required_php_version']);
-	$curver = explode('.', PHP_VERSION);
-
-	return !(($curver[0] <= $minver[0]) && ($curver[1] <= $minver[1]) && ($curver[1] <= $minver[1]) && ($curver[2][0] < $minver[2][0]));
 }
 
 /**
@@ -2430,7 +2410,7 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 		}
 	}
 
-	if (!php_version_check())
+	if (version_compare(REQUIRED_PHP_VERSION, PHP_VERSION, '>='))
 		print_error('Error: PHP ' . PHP_VERSION . ' does not match version requirements.', true);
 	if (!db_version_check())
 		print_error('Error: ' . $databases[$db_type]['name'] . ' ' . $databases[$db_type]['version'] . ' does not match minimum requirements.', true);
@@ -2491,20 +2471,20 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 	if (!is_writable($CACHEDIR_temp))
 		print_error('Error: Unable to obtain write access to "cache".', true);
 
-	if (!file_exists($modSettings['theme_dir'] . '/languages/index.' . $upcontext['language'] . '.php') && !isset($modSettings['elkVersion']) && !isset($_GET['lang']))
+	if (!file_exists($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/index.' . $upcontext['language'] . '.php') && !isset($modSettings['elkVersion']) && !isset($_GET['lang']))
 		print_error('Error: Unable to find language files!', true);
 	else
 	{
-		$temp = substr(@implode('', @file($modSettings['theme_dir'] . '/languages/index.' . $upcontext['language'] . '.php')), 0, 4096);
+		$temp = substr(@implode('', @file($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/index.' . $upcontext['language'] . '.php')), 0, 4096);
 		preg_match('~(?://|/\*)\s*Version:\s+(.+?);\s*index(?:[\s]{2}|\*/)~i', $temp, $match);
 
 		if (empty($match[1]) || $match[1] != CURRENT_LANG_VERSION)
 			print_error('Error: Language files out of date.', true);
-		if (!file_exists($modSettings['theme_dir'] . '/languages/Install.' . $upcontext['language'] . '.php'))
+		if (!file_exists($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php'))
 			print_error('Error: Install language is missing for selected language.', true);
 
 		// Otherwise include it!
-		require_once($modSettings['theme_dir'] . '/languages/Install.' . $upcontext['language'] . '.php');
+		require_once($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php');
 	}
 
 	// Make sure we skip the HTML for login.
@@ -3360,14 +3340,14 @@ function template_chmod()
 		<div class="panel">
 			<h2>Your FTP connection information</h2>
 			<h3>The upgrader can fix any issues with file permissions to make upgrading as simple as possible. Simply enter your connection information below or alternatively click <a href="#" onclick="warning_popup();">here</a> for a list of files which need to be changed.</h3>
-			<script type="text/javascript"><!-- // --><![CDATA[
+			<script><!-- // --><![CDATA[
 				function warning_popup()
 				{
 					popup = window.open(\'\',\'popup\',\'height=150,width=400,scrollbars=yes\');
 					var content = popup.document;
 					content.write(\'<!DOCTYPE html>\n\');
 					content.write(\'<html ', $upcontext['right_to_left'] ? 'dir="rtl"' : '', '>\n\t<head>\n\t\t<meta name="robots" content="noindex" />\n\t\t\');
-					content.write(\'<title>Warning</title>\n\t\t<link rel="stylesheet" type="text/css" href="', $settings['default_theme_url'], '/css/index.css" />\n\t</head>\n\t<body id="popup">\n\t\t\');
+					content.write(\'<title>Warning</title>\n\t\t<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css" />\n\t</head>\n\t<body id="popup">\n\t\t\');
 					content.write(\'<div class="windowbg description">\n\t\t\t<h4>The following files needs to be made writable to continue:</h4>\n\t\t\t\');
 					content.write(\'<p>', implode('<br />\n\t\t\t', $upcontext['chmod']['files']), '</p>\n\t\t\t\');
 					content.write(\'<a href="javascript:self.close();">close</a>\n\t\t</div>\n\t</body>\n</html>\');
@@ -3441,11 +3421,11 @@ function template_upgrade_above()
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="robots" content="noindex" />
 		<title>', $txt['upgrade_upgrade_utility'], '</title>
-		<link rel="stylesheet" type="text/css" href="', $settings['default_theme_url'], '/css/index.css?alp10" />
-		<link rel="stylesheet" type="text/css" href="', $settings['default_theme_url'], '/css/index_light.css?alp10" />
-		<link rel="stylesheet" type="text/css" href="', $settings['default_theme_url'], '/css/install.css?alp10" />
-		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/script.js"></script>
-		<script type="text/javascript"><!-- // --><![CDATA[
+		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css?beta10" />
+		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index_light.css?beta10" />
+		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/install.css?beta10" />
+		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
+		<script><!-- // --><![CDATA[
 			var elk_scripturl = \'', $upgradeurl, '\';
 			var elk_charset = \'UTF-8\';
 			var startPercent = ', $upcontext['overall_percent'], ';
@@ -3458,14 +3438,14 @@ function template_upgrade_above()
 				if (document.getElementById(\'step__progress\'))
 				{
 					document.getElementById(\'step__progress\').style.width = width + "%";
-					setInnerHTML(document.getElementById(\'step__text\'), width + "%");
+					document.getElementById(\'step__text\').innerHTML = width + "%";
 				}
 
 				if (overall_weight && document.getElementById(\'overall__progress\'))
 				{
 					overall_width = parseInt(startPercent + width * (overall_weight / 100));
 					document.getElementById(\'overall__progress\').style.width = overall_width + "%";
-					setInnerHTML(document.getElementById(\'overall__text\'), overall_width + "%");
+					document.getElementById(\'overall__text\').innerHTML = overall_width + "%";
 				}
 			}
 		// ]]></script>
@@ -3572,7 +3552,7 @@ function template_upgrade_below()
 
 	if (!empty($upcontext['custom_warning']))
 		echo '
-								<div class="noticebox">
+								<div class="warningbox">
 									<strong style="text-decoration: underline;">', $txt['upgrade_note'], '</strong><br />
 									<div>', $upcontext['custom_warning'], '</div>
 								</div>';
@@ -3596,7 +3576,7 @@ function template_upgrade_below()
 		</div>
 	</div></div>
 	<div id="footer_section"><div class="frame" style="height: 40px;">
-		<div class="smalltext"><a href="http://www.elkarte.net/" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy;2011, ElkArte</a></div>
+		<div class="smalltext"><a href="http://www.elkarte.net/" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy;2013, ElkArte</a></div>
 	</div></div>
 	</body>
 </html>';
@@ -3605,7 +3585,7 @@ function template_upgrade_below()
 	if (!empty($upcontext['pause']))
 	{
 		echo '
-		<script type="text/javascript"><!-- // --><![CDATA[
+		<script><!-- // --><![CDATA[
 			window.onload = doAutoSubmit;
 			var countdown = 3;
 			var dontSubmit = false;
@@ -3674,7 +3654,7 @@ function template_welcome_message()
 	global $upcontext, $disable_security, $settings, $txt;
 
 	echo '
-		<script src="http://www.elkarte.net/site/current-version.js?version=' . CURRENT_VERSION . '"></script>
+		<script src="http://elkarte.github.io/Elkarte/site/current-version.js?version=' . CURRENT_VERSION . '"></script>
 		<script src="', $settings['default_theme_url'], '/scripts/sha1.js"></script>
 		<h3>', sprintf($txt['upgrade_ready_proceed'], CURRENT_VERSION), '</h3>
 		<form id="upform" action="', $upcontext['form_url'], '" method="post" accept-charset="UTF-8" name="upform"', empty($upcontext['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $upcontext['rid'] . '\', \'' . (!empty($upcontext['login_token']) ? $upcontext['login_token'] : '') . '\');"' : '', '>
@@ -3692,7 +3672,7 @@ function template_welcome_message()
 	// For large, SMF pre-1.1 RC2 forums give them a warning about the possible impact of this upgrade!
 	if ($upcontext['is_large_forum'])
 		echo '
-		<div class="noticebox">
+		<div class="warningbox">
 			<strong style="text-decoration: underline;">', $txt['upgrade_warning'], '</strong><br />
 			<div>
 				', $txt['upgrade_warning_lots_data'], '
@@ -3702,7 +3682,7 @@ function template_welcome_message()
 	// A warning message?
 	if (!empty($upcontext['warning']))
 		echo '
-		<div class="noticebox">
+		<div class="warningbox">
 			<strong style="text-decoration: underline;">', $txt['upgrade_warning'], '</strong><br />
 			<div>
 				', $upcontext['warning'], '
@@ -3738,7 +3718,7 @@ function template_welcome_message()
 			$updated = (int) ($active / 3600) . ' hours';
 
 		echo '
-		<div class="noticebox">
+		<div class="warningbox">
 			<strong style="text-decoration: underline;">', $txt['upgrade_warning'], '</strong>
 			<br />
 			<div>
@@ -3814,7 +3794,7 @@ function template_welcome_message()
 
 	// This defines whether javascript is going to work elsewhere :D
 	echo '
-		<script type="text/javascript"><!-- // --><![CDATA[
+		<script><!-- // --><![CDATA[
 			if (\'XMLHttpRequest\' in window && document.getElementById(\'js_works\'))
 				document.getElementById(\'js_works\').value = 1;
 
@@ -3831,9 +3811,9 @@ function template_welcome_message()
 				ourVer = document.getElementById(\'elkVersion\');
 				yourVer = document.getElementById(\'yourVersion\');
 
-				setInnerHTML(ourVer, window.elkVersion);
+				ourVer.innerHTML = window.elkVersion;
 
-				var currentVersion = getInnerHTML(yourVer);
+				var currentVersion = yourVer.innerHTML;
 				if (currentVersion < window.elkVersion)
 					document.getElementById(\'version_warning\').style.display = \'\';
 			}
@@ -3948,7 +3928,7 @@ function template_backup_database()
 	if ($support_js)
 	{
 		echo '
-		<script type="text/javascript"><!-- // --><![CDATA[
+		<script><!-- // --><![CDATA[
 			var lastTable = ', $upcontext['cur_table_num'], ';
 			function getNextTables()
 			{
@@ -3960,14 +3940,14 @@ function template_backup_database()
 			{
 				var sCurrentTableName = "";
 				var iTableNum = 0;
-				var sCompletedTableName = getInnerHTML(document.getElementById(\'current_table\'));
+				var sCompletedTableName = document.getElementById(\'current_table\').innerHTML;
 				for (var i = 0; i < oXMLDoc.getElementsByTagName("table")[0].childNodes.length; i++)
 					sCurrentTableName += oXMLDoc.getElementsByTagName("table")[0].childNodes[i].nodeValue;
 				iTableNum = oXMLDoc.getElementsByTagName("table")[0].getAttribute("num");
 
 				// Update the page.
-				setInnerHTML(document.getElementById(\'tab_done\'), iTableNum);
-				setInnerHTML(document.getElementById(\'current_table\'), sCurrentTableName);
+				document.getElementById(\'tab_done\').innerHTML = iTableNum;
+				document.getElementById(\'current_table\').innerHTML = sCurrentTableName;
 				lastTable = iTableNum;
 				updateStepProgress(iTableNum, ', $upcontext['table_count'], ', ', $upcontext['step_weight'] * ((100 - $upcontext['step_progress']) / 100), ');';
 
@@ -4066,7 +4046,7 @@ function template_database_changes()
 	if ($support_js)
 	{
 		echo '
-		<script type="text/javascript"><!-- // --><![CDATA[
+		<script><!-- // --><![CDATA[
 			var lastItem = ', $upcontext['current_debug_item_num'], ';
 			var sLastString = "', strtr($upcontext['current_debug_item_name'], array('"' => '&quot;')), '";
 			var iLastSubStepProgress = -1;
@@ -4113,7 +4093,7 @@ function template_database_changes()
 					if (retryCount > 15)
 					{
 						document.getElementById("error_block").style.display = "";
-						setInnerHTML(document.getElementById("error_message"), "Error retrieving information on step: " + (sDebugName == "" ? sLastString : sDebugName));';
+						document.getElementById("error_message").innerHTML = "Error retrieving information on step: " + (sDebugName == "" ? sLastString : sDebugName);';
 
 	if ($is_debug)
 		echo '
@@ -4136,7 +4116,7 @@ function template_database_changes()
 					if (retryCount > 10)
 					{
 						document.getElementById("error_block").style.display = "";
-						setInnerHTML(document.getElementById("error_message"), "Upgrade script appears to be going into a loop - step: " + sDebugName);';
+						document.getElementById("error_message").innerHTML = "Upgrade script appears to be going into a loop - step: " + sDebugName;';
 
 	if ($is_debug)
 		echo '
@@ -4180,8 +4160,8 @@ function template_database_changes()
 					document.getElementById("substep_bar_div").style.display = "";
 					document.getElementById("substep_bar_div2").style.display = "";
 					document.getElementById("substep_progress").style.width = iSubStepProgress + "%";
-					setInnerHTML(document.getElementById("substep_text"), iSubStepProgress + "%");
-					setInnerHTML(document.getElementById("substep_bar_div"), sDebugName.replace(/\./g, "") + ":");
+					document.getElementById("substep_text").innerHTML = iSubStepProgress + "%";
+					document.getElementById("substep_bar_div").innerHTML = sDebugName.replace(/\./g, "") + ":";
 				}
 				else
 				{
@@ -4257,14 +4237,14 @@ function template_database_changes()
 
 		echo '
 				// Update the page.
-				setInnerHTML(document.getElementById(\'item_num\'), iItemNum);
-				setInnerHTML(document.getElementById(\'cur_item_name\'), sItemName);';
+				document.getElementById(\'item_num\').innerHTML = iItemNum;
+				document.getElementById(\'cur_item_name\').innerHTML = sItemName;';
 
 		if ($upcontext['file_count'] > 1)
 		{
 			echo '
-				setInnerHTML(document.getElementById(\'file_done\'), curFile);
-				setInnerHTML(document.getElementById(\'item_count\'), totalItems);';
+				document.getElementById(\'file_done\').innerHTML = curFile;
+				document.getElementById(\'item_count\').innerHTML = totalItems;';
 		}
 
 		echo '
@@ -4275,7 +4255,7 @@ function template_database_changes()
 					for (var i = 0; i < oXMLDoc.getElementsByTagName("error")[0].childNodes.length; i++)
 						sErrorMsg += oXMLDoc.getElementsByTagName("error")[0].childNodes[i].nodeValue;
 					document.getElementById("error_block").style.display = "";
-					setInnerHTML(document.getElementById("error_message"), sErrorMsg);
+					document.getElementById("error_message").innerHTML = sErrorMsg;
 					return false;
 				}
 
@@ -4290,8 +4270,8 @@ function template_database_changes()
 				iElapsed = (curTime.getTime() / 1000 - ', $upcontext['started'], ');
 				mins = parseInt(iElapsed / 60);
 				secs = parseInt(iElapsed - mins * 60);
-				setInnerHTML(document.getElementById("mins_elapsed"), mins);
-				setInnerHTML(document.getElementById("secs_elapsed"), secs);
+				document.getElementById("mins_elapsed").innerHTML = mins;
+				document.getElementById("secs_elapsed").innerHTML = secs;
 
 				getNextItem();
 				return true;
@@ -4304,7 +4284,7 @@ function template_database_changes()
 				if (!attemptAgain)
 				{
 					document.getElementById("error_block").style.display = "";
-					setInnerHTML(document.getElementById("error_message"), "Server has not responded for ', ($timeLimitThreshold * 10), ' seconds. It may be worth waiting a little longer or otherwise please click <a href=\"#\" onclick=\"retTimeout(true); return false;\">here<" + "/a> to try this step again");
+					document.getElementById("error_message").innerHTML = "Server has not responded for ', ($timeLimitThreshold * 10), ' seconds. It may be worth waiting a little longer or otherwise please click <a href=\"#\" onclick=\"retTimeout(true); return false;\">here<" + "/a> to try this step again";
 				}
 				else
 				{
@@ -4355,7 +4335,7 @@ function template_upgrade_complete()
 	if (!empty($upcontext['can_delete_script']))
 		echo '
 			<label for="delete_self"><input type="checkbox" id="delete_self" onclick="doTheDelete(this);" class="input_check" /> Delete this upgrade.php and its data files now.</label> <em>(doesn\'t work on all servers.)</em>
-			<script type="text/javascript"><!-- // --><![CDATA[
+			<script><!-- // --><![CDATA[
 				function doTheDelete(theCheck)
 				{
 					var theImage = document.getElementById ? document.getElementById("delete_upgrader") : document.all.delete_upgrader;

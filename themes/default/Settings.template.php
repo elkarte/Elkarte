@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -163,6 +163,17 @@ function template_settings()
 			'label' => $txt['site_slogan'],
 			'description' => $txt['site_slogan_desc'],
 			'type' => 'text',
+		),
+		array(
+			'id' => 'header_layout',
+			'label' => $txt['header_layout'],
+			'options' => array(
+				0 => $txt['header_layout_default'],
+				1 => $txt['header_layout_logo_only'],
+				2 => $txt['header_layout_inverted'],
+			),
+			'description' => $txt['header_layout_desc'],
+			'type' => 'select',
 		),
 		array(
 			'id' => 'smiley_sets_default',
