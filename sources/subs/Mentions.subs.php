@@ -18,7 +18,7 @@ if (!defined('ELK'))
  *
  * @param bool $all : if true counts all the mentions, otherwise only the unread
  * @param string $type : the type of the mention
- * @param int $id_member : the id of the member the counts are for, defaults to user_info['id']
+ * @param string $id_member : the id of the member the counts are for, defaults to user_info['id']
  */
 function countUserMentions($all = false, $type = '', $id_member = null)
 {
@@ -30,23 +30,12 @@ function countUserMentions($all = false, $type = '', $id_member = null)
 	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_mentions as mtn
-<<<<<<< HEAD
-			LEFT JOIN {db_prefix}messages AS m ON (mtn.id_msg = m.id_msg)
-			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
-		WHERE ({query_see_board} OR mtn.id_msg = 0)
-			AND mtn.id_member = {int:current_user}' . ($all ? '
-			AND mtn.status != {int:is_not_deleted}
-			AND mtn.status != {int:unapproved}' : '
-			AND mtn.status = {int:is_not_read}') . (empty($type) ? '' : '
-			AND mtn.mention_type = {string:current_type}'),
-=======
 		WHERE mtn.id_member = {int:current_user}
 			AND mtn.status != {int:unapproved}' . ($all ? '
 			AND mtn.status != {int:is_not_deleted}' : '
 			AND mtn.status = {int:is_not_read}') . (empty($type) ? '' : (is_array($type) ? '
 			AND mtn.mention_type IN ({array_string:current_type})' : '
 			AND mtn.mention_type = {string:current_type}')),
->>>>>>> Things were going out of control. Let's retrieve everything and just tell the user he can't see the mention... it sucks, but any other thing would be a mess
 		array(
 			'current_user' => $id_member,
 			'current_type' => $type,
@@ -120,12 +109,6 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 	return $mentions;
 }
 
-/**
- * Callback used to prepare the mention message for mentions, likes, removed likes and buddies
- *
- * @param array $mentions : Mentions retrieved from the database by getUserMentions
- * @param string $type : the type of the mention
- */
 function prepareMentionMessage($mentions, $type)
 {
 	global $txt, $scripturl, $context;
