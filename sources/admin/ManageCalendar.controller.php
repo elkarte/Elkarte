@@ -304,6 +304,21 @@ class ManageCalendar_Controller extends Action_Controller
 
 		// instantiate the form
 		$this->_calendarSettings = new Settings_Form();
+		$config_vars = $this->_settings();
+
+		// Some important context stuff
+		$context['page_title'] = $txt['calendar_settings'];
+		$context['sub_template'] = 'show_settings';
+
+		return $this->_calendarSettings->settings($config_vars);
+	}
+
+	/**
+	 * Retrieve and return all admin settings for the calendar.
+	 */
+	private function _settings()
+	{
+		global $txt;
 
 		// Load the boards list.
 		require_once(SUBSDIR . '/Boards.subs.php');
@@ -343,57 +358,14 @@ class ManageCalendar_Controller extends Action_Controller
 			array('int', 'cal_maxspan', 6, 'postinput' => $txt['days_word']),
 		);
 
-		// Some important context stuff
-		$context['page_title'] = $txt['calendar_settings'];
-		$context['sub_template'] = 'show_settings';
-
-		return $this->_calendarSettings->settings($config_vars);
+		return $config_vars;
 	}
 
 	/**
-	 * Retrieve and return all admin settings for the calendar.
+	 * Return the form settings for use in admin search
 	 */
-	public function settings()
+	public function settings_search()
 	{
-		global $txt;
-
-		// Load the boards list.
-		require_once(SUBSDIR . '/Boards.subs.php');
-		$boards_list = getBoardList(array('not_redirection' => true), true);
-		$boards = array('');
-		foreach ($boards_list as $board)
-			$boards[$board['id_board']] = $board['cat_name'] . ' - ' . $board['board_name'];
-
-		// Look, all the calendar settings - of which there are many!
-		$config_vars = array(
-			// All the permissions:
-			array('permissions', 'calendar_view', 'help' => 'cal_enabled'),
-			array('permissions', 'calendar_post'),
-			array('permissions', 'calendar_edit_own'),
-			array('permissions', 'calendar_edit_any'),
-			'',
-			// How many days to show on board index, and where to display events etc?
-			array('int', 'cal_days_for_index', 6, 'postinput' => $txt['days_word']),
-			array('select', 'cal_showholidays', array(0 => $txt['setting_cal_show_never'], 1 => $txt['setting_cal_show_cal'], 3 => $txt['setting_cal_show_index'], 2 => $txt['setting_cal_show_all'])),
-			array('select', 'cal_showbdays', array(0 => $txt['setting_cal_show_never'], 1 => $txt['setting_cal_show_cal'], 3 => $txt['setting_cal_show_index'], 2 => $txt['setting_cal_show_all'])),
-			array('select', 'cal_showevents', array(0 => $txt['setting_cal_show_never'], 1 => $txt['setting_cal_show_cal'], 3 => $txt['setting_cal_show_index'], 2 => $txt['setting_cal_show_all'])),
-			array('check', 'cal_export'),
-			'',
-			// Linking events etc...
-			array('select', 'cal_defaultboard', $boards),
-			array('check', 'cal_daysaslink'),
-			array('check', 'cal_allow_unlinked'),
-			array('check', 'cal_showInTopic'),
-			'',
-			// Dates of calendar...
-			array('int', 'cal_minyear'),
-			array('int', 'cal_maxyear'),
-			'',
-			// Calendar spanning...
-			array('check', 'cal_allowspan'),
-			array('int', 'cal_maxspan', 6, 'postinput' => $txt['days_word']),
-		);
-
-		return $config_vars;
+		return $this->_settings();
 	}
 }

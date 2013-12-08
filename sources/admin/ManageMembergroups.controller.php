@@ -799,11 +799,7 @@ class ManageMembergroups_Controller extends Action_Controller
 	{
 		// instantiate the form
 		$this->_groupSettings = new Settings_Form();
-
-		// Only one thing here!
-		$config_vars = array(
-				array('permissions', 'manage_membergroups'),
-		);
+		$config_vars = $this->_settings();
 
 		return $this->_groupSettings->settings($config_vars);
 	}
@@ -811,13 +807,21 @@ class ManageMembergroups_Controller extends Action_Controller
 	/**
 	 * Return the configuration settings for membergroups management.
 	 */
-	public function settings()
+	private function _settings()
 	{
 		// Only one thing here!
 		$config_vars = array(
-				array('permissions', 'manage_membergroups'),
+			array('permissions', 'manage_membergroups'),
 		);
 
 		return $config_vars;
+	}
+
+	/**
+	 * Return the form settings for use in admin search
+	 */
+	public function settings_search()
+	{
+		return $this->_settings();
 	}
 }

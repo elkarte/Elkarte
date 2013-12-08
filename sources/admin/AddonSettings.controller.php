@@ -119,10 +119,7 @@ class AddonSettings_Controller extends Action_Controller
 		$this->_addonSettings = new Settings_Form();
 
 		// initialize it with our existing settings. If any.
-		$config_vars = array();
-
-		// Add new settings with a nice hook.
-		call_integration_hook('integrate_general_mod_settings', array(&$config_vars));
+		$config_vars = $this->_settings();
 
 		if (empty($config_vars))
 		{
@@ -139,9 +136,8 @@ class AddonSettings_Controller extends Action_Controller
 	/**
 	 * Retrieve any custom admin settings for or from addons.
 	 * This method is used by admin search.
-	 * @deprecated
 	 */
-	public function settings()
+	private function _settings()
 	{
 		$config_vars = array();
 
@@ -149,6 +145,14 @@ class AddonSettings_Controller extends Action_Controller
 		call_integration_hook('integrate_general_mod_settings', array(&$config_vars));
 
 		return $config_vars;
+	}
+
+	/**
+	 * Public method to return avatar settings for search
+	 */
+	public function settings_search()
+	{
+		return $this->_settings();
 	}
 
 	/**

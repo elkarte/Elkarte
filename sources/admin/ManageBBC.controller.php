@@ -126,36 +126,33 @@ class ManageBBC_Controller extends Action_Controller
 		$this->_bbcSettings = new Settings_Form();
 
 		// initialize it with our settings
-		$config_vars = array(
-				array('check', 'enableBBC'),
-				array('check', 'enableBBC', 0, 'onchange' => 'toggleBBCDisabled(\'disabledBBC\', !this.checked);'),
-				array('check', 'enablePostHTML'),
-				array('check', 'autoLinkUrls'),
-			'',
-				array('bbc', 'disabledBBC'),
-		);
+		$config_vars = $this->_settings();
 
 		return $this->_bbcSettings->settings($config_vars);
 	}
 
 	/**
 	 * Return the BBC settings of the forum.
-	 * Used by admin search.
-	 * @deprecated
-	 *
-	 * @return array
 	 */
-	function settings()
+	private function _settings()
 	{
 		$config_vars = array(
-				array('check', 'enableBBC'),
-				array('check', 'enableBBC', 0, 'onchange' => 'toggleBBCDisabled(\'disabledBBC\', !this.checked);'),
-				array('check', 'enablePostHTML'),
-				array('check', 'autoLinkUrls'),
-			'',
-				array('bbc', 'disabledBBC'),
+			array('check', 'enableBBC'),
+			array('check', 'enableBBC', 0, 'onchange' => 'toggleBBCDisabled(\'disabledBBC\', !this.checked);'),
+			array('check', 'enablePostHTML'),
+			array('check', 'autoLinkUrls'),
+		'',
+			array('bbc', 'disabledBBC'),
 		);
 
 		return $config_vars;
+	}
+
+	/**
+	 * Return the form settings for use in admin search
+	 */
+	public function settings_search()
+	{
+		return $this->_settings();
 	}
 }

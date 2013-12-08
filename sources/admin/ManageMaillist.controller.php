@@ -1492,13 +1492,22 @@ class ManageMaillist_Controller extends Action_Controller
 	 */
 	private function _initMaillistSettingsForm()
 	{
-		global $txt;
-
 		// We need some settings! ..ok, some work with our settings :P
 		require_once(SUBSDIR . '/Settings.class.php');
 
 		// instantiate the form
 		$this->_maillistSettings = new Settings_Form();
+		$config_vars = $this->_settings();
+
+		return $this->_maillistSettings->settings($config_vars);
+	}
+
+	/**
+	 * Load up teh config var array for settings display etc.
+	 */
+	private function _settings()
+	{
+		global $txt;
 
 		// Define the menu
 		$config_vars = array(
@@ -1561,7 +1570,15 @@ class ManageMaillist_Controller extends Action_Controller
 				)
 			);
 
-		return $this->_maillistSettings->settings($config_vars);
+		return $config_vars;
+	}
+
+	/**
+	 * Return the form settings for use in admin search
+	 */
+	public function settings_search()
+	{
+		return $this->_settings();
 	}
 
 	/**

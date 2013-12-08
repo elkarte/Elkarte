@@ -765,36 +765,9 @@ class ManageBoards_Controller extends Action_Controller
 	 */
 	private function _initBoardSettingsForm()
 	{
-		global $txt;
-
 		// instantiate the form
 		$this->_boardSettings = new Settings_Form();
-
-		// We need to borrow a string from here
-		loadLanguage('ManagePermissions');
-
-		// Load the boards list - for the recycle bin!
-		require_once(SUBSDIR . '/Boards.subs.php');
-		$boards = getBoardList(array('not_redirection' => true), true);
-		$recycle_boards = array('');
-		foreach ($boards as $board)
-			$recycle_boards[$board['id_board']] = $board['cat_name'] . ' - ' . $board['board_name'];
-
-		// Here and the board settings...
-		$config_vars = array(
-			array('title', 'settings'),
-				// Inline permissions.
-				array('permissions', 'manage_boards', 'helptext' => $txt['permissionhelp_manage_boards']),
-			'',
-				// Other board settings.
-				array('check', 'countChildPosts'),
-				array('check', 'recycle_enable', 'onclick' => 'document.getElementById(\'recycle_board\').disabled = !this.checked;'),
-				array('select', 'recycle_board', $recycle_boards),
-				array('check', 'allow_ignore_boards'),
-				array('check', 'deny_boards_access'),
-		);
-
-		call_integration_hook('integrate_boards_settings', array(&$subActions));
+		$config_vars = $this->_settings();
 
 		return $this->_boardSettings->settings($config_vars);
 	}
@@ -802,7 +775,7 @@ class ManageBoards_Controller extends Action_Controller
 	/**
 	 * Retrieve and return all admin settings for boards management.
 	 */
-	public function settings()
+	private function _settings()
 	{
 		global $txt;
 
@@ -813,7 +786,6 @@ class ManageBoards_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Boards.subs.php');
 		$boards = getBoardList(array('not_redirection' => true), true);
 		$recycle_boards = array('');
-
 		foreach ($boards as $board)
 			$recycle_boards[$board['id_board']] = $board['cat_name'] . ' - ' . $board['board_name'];
 
@@ -834,5 +806,13 @@ class ManageBoards_Controller extends Action_Controller
 		call_integration_hook('integrate_boards_settings', array(&$subActions));
 
 		return $config_vars;
+	}
+
+	/**
+	 * Return the form settings for use in admin search
+	 */
+	public function settings_search()
+	{
+		return $this->_settings();
 	}
 }
