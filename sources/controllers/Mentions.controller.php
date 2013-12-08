@@ -342,12 +342,12 @@ class Mentions_Controller extends Action_Controller
 
 		// With only one type is enough to just call that (if it exists)
 		if (!empty($type) && isset($this->_callbacks[$type]))
-			return $this->_callbacks[$type]($mentions, $type);
+			return call_user_func_array($this->_callbacks[$type], array($mentions, $type));
 
 		// Otherwise we have to test all we know...
 		// @todo find a way to call only what is actually needed 
 		foreach ($this->_callbacks as $type => $callback)
-			$mentions = $callback($mentions, $type);
+			$mentions = call_user_func_array($callback, array($mentions, $type));
 
 		return $mentions;
 	}
