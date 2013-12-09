@@ -855,7 +855,6 @@ div.windowbg, div.windowbg2 {
 	/* @todo - See me grumblez in Issue #552. ;) */
 }
 #top_section_notice .toggle_login {
-	padding-top: 2px;
 	display: inline;
 	cursor: pointer;
 }
@@ -864,7 +863,7 @@ div.windowbg, div.windowbg2 {
 	width: 100%;
 }
 .top_button {
-	line-height: 1.9em;
+	line-height: 1.3em;
 	padding: 2px;
 	margin-left: 1px;
 }
@@ -873,6 +872,7 @@ div.windowbg, div.windowbg2 {
 }
 #password_login {
 	display: inline-block;
+	vertical-align: middle;
 }
 #search_form {
 	padding: 12px 0 4px 8px;
