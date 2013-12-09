@@ -228,29 +228,12 @@ class ManagePaid_Controller extends Action_Controller
 	 */
 	private function _init_paidSettingsForm()
 	{
-		global $modSettings, $txt;
-
 		// We're working with them settings here.
 		require_once(SUBSDIR . '/Settings.class.php');
 
 		// Instantiate the form
 		$this->_paidSettings = new Settings_Form();
-
-		// If the currency is set to something different then we need to set it to other for this to work and set it back shortly.
-		$modSettings['paid_currency'] = !empty($modSettings['paid_currency_code']) ? $modSettings['paid_currency_code'] : '';
-		if (!empty($modSettings['paid_currency_code']) && !in_array($modSettings['paid_currency_code'], array('usd', 'eur', 'gbp')))
-			$modSettings['paid_currency'] = 'other';
-
-		// These are all the default settings.
-		$config_vars = array(
-				array('select', 'paid_email', array(0 => $txt['paid_email_no'], 1 => $txt['paid_email_error'], 2 => $txt['paid_email_all']), 'subtext' => $txt['paid_email_desc']),
-				array('text', 'paid_email_to', 'subtext' => $txt['paid_email_to_desc'], 'size' => 60),
-			'',
-				'dummy_currency' => array('select', 'paid_currency', array('usd' => $txt['usd'], 'eur' => $txt['eur'], 'gbp' => $txt['gbp'], 'other' => $txt['other']), 'javascript' => 'onchange="toggleOther();"'),
-				array('text', 'paid_currency_code', 'subtext' => $txt['paid_currency_code_desc'], 'size' => 5, 'force_div_id' => 'custom_currency_code_div'),
-				array('text', 'paid_currency_symbol', 'subtext' => $txt['paid_currency_symbol_desc'], 'size' => 8, 'force_div_id' => 'custom_currency_symbol_div'),
-				array('check', 'paidsubs_test', 'subtext' => $txt['paidsubs_test_desc'], 'onclick' => 'return document.getElementById(\'paidsubs_test\').checked ? confirm(\'' . $txt['paidsubs_test_confirm'] . '\') : true;'),
-		);
+		$config_vars = $this->_settings();
 
 		return $this->_paidSettings->settings($config_vars);
 	}
@@ -258,7 +241,7 @@ class ManagePaid_Controller extends Action_Controller
 	/**
 	 * Retrieve subscriptions settings.
 	 */
-	public function settings()
+	private function _settings()
 	{
 		global $modSettings, $txt;
 
@@ -279,6 +262,14 @@ class ManagePaid_Controller extends Action_Controller
 		);
 
 		return $config_vars;
+	}
+
+	/**
+	 * Return the paid sub settings for use in admin search
+	 */
+	public function settings_search()
+	{
+		return $this->_settings();
 	}
 
 	/**

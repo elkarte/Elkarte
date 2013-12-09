@@ -902,31 +902,17 @@ class ManagePermissions_Controller extends Action_Controller
 	 */
 	private function _initPermSettingsForm()
 	{
-		global $txt;
-
 		// Instantiate the form
 		$this->_permSettings = new Settings_Form();
-
-		// All the setting variables
-		$config_vars = array(
-			array('title', 'settings'),
-				// Inline permissions.
-				array('permissions', 'manage_permissions'),
-			'',
-				// A few useful settings
-				array('check', 'permission_enable_deny', 0, $txt['permission_settings_enable_deny'], 'help' => 'permissions_deny'),
-				array('check', 'permission_enable_postgroups', 0, $txt['permission_settings_enable_postgroups'], 'help' => 'permissions_postgroups'),
-		);
+		$config_vars = $this->_settings();
 
 		return $this->_permSettings->settings($config_vars);
 	}
 
 	/**
 	 * Simple function to return settings in config_vars format.
-	 * Used by admin search.
-	 * @deprecated
 	 */
-	public function settings()
+	private function _settings()
 	{
 		global $txt;
 
@@ -942,6 +928,14 @@ class ManagePermissions_Controller extends Action_Controller
 		);
 
 		return $config_vars;
+	}
+
+	/**
+	 * Return the permission settings for use in admin search
+	 */
+	public function settings_search()
+	{
+		return $this->_settings();
 	}
 
 	/**

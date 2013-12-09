@@ -43,7 +43,7 @@ class ManageSearch_Controller extends Action_Controller
 	 *
 	 * @see Action_Controller::action_index()
 	 */
-	function action_index()
+	public function action_index()
 	{
 		global $context, $txt;
 
@@ -100,7 +100,7 @@ class ManageSearch_Controller extends Action_Controller
 	 *
 	 * @uses ManageSearch template, 'modify_settings' sub-template.
 	 */
-	function action_searchSettings_display()
+	public function action_searchSettings_display()
 	{
 		global $txt, $context, $scripturl, $modSettings;
 
@@ -178,44 +178,24 @@ class ManageSearch_Controller extends Action_Controller
 	/**
 	 * Initialize admin searchSettings form with the existing forum settings
 	 * for search.
-	 *
-	 * @return array
 	 */
-	function _initSearchSettingsForm()
+	private function _initSearchSettingsForm()
 	{
-		global $txt;
 
 		// This is really quite wanting.
 		require_once(SUBSDIR . '/Settings.class.php');
 
 		// Instantiate the form
 		$this->_searchSettings = new Settings_Form();
-
-		// What are we editing anyway?
-		$config_vars = array(
-				// Permission...
-				array('permissions', 'search_posts'),
-				// Some simple settings.
-				array('check', 'simpleSearch'),
-				array('check', 'search_dropdown'),
-				array('int', 'search_results_per_page'),
-				array('int', 'search_max_results', 'subtext' => $txt['search_max_results_disable']),
-			'',
-				// Some limitations.
-				array('int', 'search_floodcontrol_time', 'subtext' => $txt['search_floodcontrol_time_desc'], 6, 'postinput' => $txt['seconds']),
-				array('title', 'additional_search_engines'),
-				array('callback', 'external_search_engines'),
-		);
+		$config_vars = $this->_settings();
 
 		return $this->_searchSettings->settings($config_vars);
 	}
 
 	/**
 	 * Retrieve admin search settings
-	 *
-	 * @return array
 	 */
-	function settings()
+	private function _settings()
 	{
 		global $txt;
 
@@ -239,13 +219,21 @@ class ManageSearch_Controller extends Action_Controller
 	}
 
 	/**
+	 * Return the search settings for use in admin search
+	 */
+	public function settings_search()
+	{
+		return $this->_settings();
+	}
+
+	/**
 	 * Edit the relative weight of the search factors.
 	 * Called by ?action=admin;area=managesearch;sa=weights.
 	 * Requires the admin_forum permission.
 	 *
 	 * @uses ManageSearch template, 'modify_weights' sub-template.
 	 */
-	function action_weight()
+	public function action_weight()
 	{
 		global $txt, $context, $modSettings;
 
@@ -297,7 +285,7 @@ class ManageSearch_Controller extends Action_Controller
 	 *
 	 * @uses ManageSearch template, 'select_search_method' sub-template.
 	 */
-	function action_edit()
+	public function action_edit()
 	{
 		global $txt, $context, $modSettings;
 
@@ -311,7 +299,7 @@ class ManageSearch_Controller extends Action_Controller
 		$context['supports_fulltext'] = $db_search->search_support('fulltext');
 
 		// Load any apis.
-		$context['search_apis'] = loadSearchAPIs();
+		$context['search_apis'] = $this->loadSearchAPIs();
 
 		// Detect whether a fulltext index is set.
 		if ($context['supports_fulltext'])
@@ -417,7 +405,7 @@ class ManageSearch_Controller extends Action_Controller
 	 * @uses ManageSearch template, 'create_index', 'create_index_progress', and 'create_index_done'
 	 *  sub-templates.
 	 */
-	function action_create()
+	public function action_create()
 	{
 		global $modSettings, $context, $txt;
 
@@ -513,7 +501,7 @@ class ManageSearch_Controller extends Action_Controller
 	 * Edit settings related to the sphinx or sphinxQL search function.
 	 * Called by ?action=admin;area=managesearch;sa=sphinx.
 	 */
-	function action_managesphinx()
+	public function action_managesphinx()
 	{
 		global $txt, $context, $modSettings;
 
@@ -611,55 +599,57 @@ class ManageSearch_Controller extends Action_Controller
 		$context['sub_template'] = 'manage_sphinx';
 		createToken('admin-mssphinx');
 	}
-}
 
-/**
- * Get the installed Search API implementations.
- * This function checks for patterns in comments on top of the Search-API files!
- * In addition to filenames pattern.
- * It loads the search API classes if identified.
- * This function is used by action_edit to list all installed API implementations.
- */
-function loadSearchAPIs()
-{
-	global $txt;
 
-	$apis = array();
-	if ($dh = opendir(SUBSDIR))
+	/**
+	 * Get the installed Search API implementations.
+	 * This function checks for patterns in comments on top of the Search-API files!
+	 * In addition to filenames pattern.
+	 * It loads the search API classes if identified.
+	 * This function is used by action_edit to list all installed API implementations.
+	 */
+	private function loadSearchAPIs()
 	{
-		while (($file = readdir($dh)) !== false)
+		global $txt;
+
+		$apis = array();
+		$dh = opendir(SUBSDIR);
+		if ($dh)
 		{
-			if (is_file(SUBSDIR . '/' . $file) && preg_match('~^SearchAPI-([A-Za-z\d_]+)\.class\.php$~', $file, $matches))
+			while (($file = readdir($dh)) !== false)
 			{
-				// Check that this is definitely a valid API!
-				$fp = fopen(SUBSDIR . '/' . $file, 'rb');
-				$header = fread($fp, 4096);
-				fclose($fp);
-
-				if (strpos($header, '* SearchAPI-' . $matches[1] . '.class.php') !== false)
+				if (is_file(SUBSDIR . '/' . $file) && preg_match('~^SearchAPI-([A-Za-z\d_]+)\.class\.php$~', $file, $matches))
 				{
-					require_once(SUBSDIR . '/' . $file);
+					// Check that this is definitely a valid API!
+					$fp = fopen(SUBSDIR . '/' . $file, 'rb');
+					$header = fread($fp, 4096);
+					fclose($fp);
 
-					$index_name = strtolower($matches[1]);
-					$search_class_name = $index_name . '_search';
-					$searchAPI = new $search_class_name();
+					if (strpos($header, '* SearchAPI-' . $matches[1] . '.class.php') !== false)
+					{
+						require_once(SUBSDIR . '/' . $file);
 
-					// No Support?  NEXT!
-					if (!$searchAPI->is_supported)
-						continue;
+						$index_name = strtolower($matches[1]);
+						$search_class_name = $index_name . '_search';
+						$searchAPI = new $search_class_name();
 
-					$apis[$index_name] = array(
-						'filename' => $file,
-						'setting_index' => $index_name,
-						'has_template' => in_array($index_name, array('custom', 'fulltext', 'standard')),
-						'label' => $index_name && isset($txt['search_index_' . $index_name]) ? $txt['search_index_' . $index_name] : '',
-						'desc' => $index_name && isset($txt['search_index_' . $index_name . '_desc']) ? $txt['search_index_' . $index_name . '_desc'] : '',
-					);
+						// No Support?  NEXT!
+						if (!$searchAPI->is_supported)
+							continue;
+
+						$apis[$index_name] = array(
+							'filename' => $file,
+							'setting_index' => $index_name,
+							'has_template' => in_array($index_name, array('custom', 'fulltext', 'standard')),
+							'label' => $index_name && isset($txt['search_index_' . $index_name]) ? $txt['search_index_' . $index_name] : '',
+							'desc' => $index_name && isset($txt['search_index_' . $index_name . '_desc']) ? $txt['search_index_' . $index_name . '_desc'] : '',
+						);
+					}
 				}
 			}
 		}
-	}
-	closedir($dh);
+		closedir($dh);
 
-	return $apis;
+		return $apis;
+	}
 }

@@ -213,17 +213,15 @@ class AdminLog_Controller extends Action_Controller
 		$this->_pruningSettings = new Settings_Form();
 
 		// initialize settings
-		$config_vars = $this->settings();
+		$config_vars = $this->_settings();
 
 		return $this->_pruningSettings->settings($config_vars);
 	}
 
 	/**
 	 * Returns the configuration settings for pruning logs.
-	 *
-	 * @return array in the format of config_vars expected by admin search
 	 */
-	public function settings()
+	private function _settings()
 	{
 		global $txt;
 
@@ -244,5 +242,13 @@ class AdminLog_Controller extends Action_Controller
 		);
 
 		return $config_vars;
+	}
+
+	/**
+	 * Return the search engine settings for use in admin search
+	 */
+	public function settings_search()
+	{
+		return $this->_settings();
 	}
 }
