@@ -25,7 +25,7 @@ class TestManageBoardsSettings extends UnitTestCase
 		global $txt;
 
 		$controller = new ManageBoards_Controller();
-		$settings = $controller->settings();
+		$settings = $controller->settings_search();
 
 		// Lets see some hardcoded setting for boards management...
 		$this->assertNotNull($settings);
