@@ -3384,6 +3384,20 @@ dl.merge_topic dd {
 #personal_messages .reportlinks {
 	padding: 6px 1.3em;
 }
+.pm_icon, .pm_quickmod {
+	width: 4%;
+}
+.pm_date {
+	width: 22%;
+	text-align: left;
+}
+.pm_subject {
+	width: 46%;
+	text-align: left;
+}
+.pm_from {
+	text-align: left;
+}
 #searchLabelsExpand li {
 	padding: 4px 6px;
 }
