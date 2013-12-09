@@ -904,6 +904,8 @@ class ManagePermissions_Controller extends Action_Controller
 	{
 		// Instantiate the form
 		$this->_permSettings = new Settings_Form();
+
+		// Initialize it with our settings
 		$config_vars = $this->_settings();
 
 		return $this->_permSettings->settings($config_vars);

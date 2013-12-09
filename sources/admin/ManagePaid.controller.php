@@ -233,6 +233,8 @@ class ManagePaid_Controller extends Action_Controller
 
 		// Instantiate the form
 		$this->_paidSettings = new Settings_Form();
+
+		// Initialize it with our settings
 		$config_vars = $this->_settings();
 
 		return $this->_paidSettings->settings($config_vars);

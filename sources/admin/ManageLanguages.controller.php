@@ -1047,6 +1047,8 @@ class ManageLanguages_Controller extends Action_Controller
 
 		// Make it happen!
 		$this->_languageSettings = new Settings_Form();
+
+		// Initialize it with our settings
 		$config_vars = $this->_settings();
 
 		// Initialize the little form

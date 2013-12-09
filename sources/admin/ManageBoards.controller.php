@@ -765,8 +765,10 @@ class ManageBoards_Controller extends Action_Controller
 	 */
 	private function _initBoardSettingsForm()
 	{
-		// instantiate the form
+		// Instantiate the form
 		$this->_boardSettings = new Settings_Form();
+
+		// Initialize it with our settings
 		$config_vars = $this->_settings();
 
 		return $this->_boardSettings->settings($config_vars);

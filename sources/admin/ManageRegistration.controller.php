@@ -354,19 +354,18 @@ class ManageRegistration_Controller extends Action_Controller
 	}
 
 	/**
-	 * Initialize settings form with the configuration settings
-	 *  for new members registration.
-	 *
-	 * @return array;
+	 * Initialize settings form with the configuration settings for new members registration.
 	 */
 	private function _init_registerSettingsForm()
 	{
 		// This is really quite wanting.
 		require_once(SUBSDIR . '/Settings.class.php');
-		$config_vars = $this->_settings();
 
 		// Instantiate the form
 		$this->_registerSettings = new Settings_Form();
+
+		// Initialize it with our settings
+		$config_vars = $this->_settings();
 
 		return $this->_registerSettings->settings($config_vars);
 	}

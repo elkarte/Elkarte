@@ -122,10 +122,10 @@ class ManageBBC_Controller extends Action_Controller
 	 */
 	private function _initBBCSettingsForm()
 	{
-		// instantiate the form
+		// Instantiate the form
 		$this->_bbcSettings = new Settings_Form();
 
-		// initialize it with our settings
+		// Initialize it with our settings
 		$config_vars = $this->_settings();
 
 		return $this->_bbcSettings->settings($config_vars);
@@ -137,12 +137,12 @@ class ManageBBC_Controller extends Action_Controller
 	private function _settings()
 	{
 		$config_vars = array(
-			array('check', 'enableBBC'),
-			array('check', 'enableBBC', 0, 'onchange' => 'toggleBBCDisabled(\'disabledBBC\', !this.checked);'),
-			array('check', 'enablePostHTML'),
-			array('check', 'autoLinkUrls'),
-		'',
-			array('bbc', 'disabledBBC'),
+				array('check', 'enableBBC'),
+				array('check', 'enableBBC', 0, 'onchange' => 'toggleBBCDisabled(\'disabledBBC\', !this.checked);'),
+				array('check', 'enablePostHTML'),
+				array('check', 'autoLinkUrls'),
+			'',
+				array('bbc', 'disabledBBC'),
 		);
 
 		return $config_vars;

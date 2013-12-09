@@ -83,9 +83,10 @@ class AddonSettings_Controller extends Action_Controller
 	 */
 	public function action_addonSettings_display()
 	{
-		// initialize the form
+		// Initialize the form
 		$this->_initAddonSettingsForm();
 
+		// Initialize settings
 		$config_vars = $this->_addonSettings->settings();
 
 		// Saving?

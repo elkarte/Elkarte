@@ -302,8 +302,10 @@ class ManageCalendar_Controller extends Action_Controller
 	{
 		global $txt, $context;
 
-		// instantiate the form
+		// Instantiate the form
 		$this->_calendarSettings = new Settings_Form();
+
+		// Initialize it with our settings
 		$config_vars = $this->_settings();
 
 		// Some important context stuff
@@ -330,32 +332,32 @@ class ManageCalendar_Controller extends Action_Controller
 		// Look, all the calendar settings - of which there are many!
 		$config_vars = array(
 			array('title', 'calendar_settings'),
-			// All the permissions:
-			array('permissions', 'calendar_view'),
-			array('permissions', 'calendar_post'),
-			array('permissions', 'calendar_edit_own'),
-			array('permissions', 'calendar_edit_any'),
+				// All the permissions:
+				array('permissions', 'calendar_view'),
+				array('permissions', 'calendar_post'),
+				array('permissions', 'calendar_edit_own'),
+				array('permissions', 'calendar_edit_any'),
 			'',
-			// How many days to show on board index, and where to display events etc?
-			array('int', 'cal_days_for_index', 6, 'postinput' => $txt['days_word']),
-			array('select', 'cal_showholidays', array(0 => $txt['setting_cal_show_never'], 1 => $txt['setting_cal_show_cal'], 3 => $txt['setting_cal_show_index'], 2 => $txt['setting_cal_show_all'])),
-			array('select', 'cal_showbdays', array(0 => $txt['setting_cal_show_never'], 1 => $txt['setting_cal_show_cal'], 3 => $txt['setting_cal_show_index'], 2 => $txt['setting_cal_show_all'])),
-			array('select', 'cal_showevents', array(0 => $txt['setting_cal_show_never'], 1 => $txt['setting_cal_show_cal'], 3 => $txt['setting_cal_show_index'], 2 => $txt['setting_cal_show_all'])),
-			array('check', 'cal_export'),
+				// How many days to show on board index, and where to display events etc?
+				array('int', 'cal_days_for_index', 6, 'postinput' => $txt['days_word']),
+				array('select', 'cal_showholidays', array(0 => $txt['setting_cal_show_never'], 1 => $txt['setting_cal_show_cal'], 3 => $txt['setting_cal_show_index'], 2 => $txt['setting_cal_show_all'])),
+				array('select', 'cal_showbdays', array(0 => $txt['setting_cal_show_never'], 1 => $txt['setting_cal_show_cal'], 3 => $txt['setting_cal_show_index'], 2 => $txt['setting_cal_show_all'])),
+				array('select', 'cal_showevents', array(0 => $txt['setting_cal_show_never'], 1 => $txt['setting_cal_show_cal'], 3 => $txt['setting_cal_show_index'], 2 => $txt['setting_cal_show_all'])),
+				array('check', 'cal_export'),
 			'',
-			// Linking events etc...
-			array('select', 'cal_defaultboard', $boards),
-			array('check', 'cal_daysaslink'),
-			array('check', 'cal_allow_unlinked'),
-			array('check', 'cal_showInTopic'),
+				// Linking events etc...
+				array('select', 'cal_defaultboard', $boards),
+				array('check', 'cal_daysaslink'),
+				array('check', 'cal_allow_unlinked'),
+				array('check', 'cal_showInTopic'),
 			'',
-			// Dates of calendar...
-			array('int', 'cal_minyear'),
-			array('int', 'cal_maxyear'),
+				// Dates of calendar...
+				array('int', 'cal_minyear'),
+				array('int', 'cal_maxyear'),
 			'',
-			// Calendar spanning...
-			array('check', 'cal_allowspan'),
-			array('int', 'cal_maxspan', 6, 'postinput' => $txt['days_word']),
+				// Calendar spanning...
+				array('check', 'cal_allowspan'),
+				array('int', 'cal_maxspan', 6, 'postinput' => $txt['days_word']),
 		);
 
 		return $config_vars;

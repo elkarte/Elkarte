@@ -857,6 +857,8 @@ class ManageNews_Controller extends Action_Controller
 
 		// instantiate the form
 		$this->_newsSettings = new Settings_Form();
+
+		// Initialize it with our settings
 		$config_vars = $this->_settings();
 
 		return $this->_newsSettings->settings($config_vars);

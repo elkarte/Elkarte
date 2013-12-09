@@ -148,6 +148,8 @@ class ManageSecurity_Controller extends Action_Controller
 
 		// instantiate the form
 		$this->_securitySettings = new Settings_Form();
+
+		// Initialize it with our settings
 		$config_vars = $this->_securitySettings();
 
 		return $this->_securitySettings->settings($config_vars);
@@ -156,7 +158,6 @@ class ManageSecurity_Controller extends Action_Controller
 	/**
 	 * Allows to display and eventually change the moderation settings of the forum.
 	 * Uses the moderation settings form.
-	 *
 	 */
 	public function action_moderationSettings_display()
 	{
@@ -222,11 +223,13 @@ class ManageSecurity_Controller extends Action_Controller
 	 */
 	private function _initModerationSettingsForm()
 	{
-		// we're working with them settings.
+		// We're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
 
-		// instantiate the form
+		// Instantiate the form
 		$this->_moderationSettings = new Settings_Form();
+
+		// Initialize it with our settings
 		$config_vars = $this->_moderationSettings();
 
 		return $this->_moderationSettings->settings($config_vars);
@@ -240,11 +243,10 @@ class ManageSecurity_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context, $modSettings;
 
-		// Let's try keep the spam to a minimum ah Thantos?
-		// initialize the form
+		// Initialize the form
 		$this->_initSpamSettingsForm();
 
-		// retrieve the current config settings
+		// Retrieve the current config settings
 		$config_vars = $this->_spamSettings->settings();
 
 		// Saving?
@@ -299,6 +301,8 @@ class ManageSecurity_Controller extends Action_Controller
 
 		// instantiate the form
 		$this->_spamSettings = new Settings_Form();
+
+		// Initialize it with our settings
 		$config_vars = $this->_spamSettings();
 
 		return $this->_spamSettings->settings($config_vars);
@@ -402,6 +406,8 @@ class ManageSecurity_Controller extends Action_Controller
 
 		// instantiate the form
 		$this->_bbSettings = new Settings_Form();
+
+		// Initialize it with our settings
 		$config_vars = $this->_bbSettings();
 
 		return $this->_bbSettings->settings($config_vars);
@@ -472,7 +478,7 @@ class ManageSecurity_Controller extends Action_Controller
 	{
 		global $txt;
 
-		// initialize it with our settings
+		// Set up the config array for use
 		$config_vars = array(
 				array('check', 'make_email_viewable'),
 			'',
@@ -582,11 +588,11 @@ class ManageSecurity_Controller extends Action_Controller
 				array('check', 'badbehavior_offsite_forms', 'postinput' => $txt['badbehavior_default_off']),
 				array('check', 'badbehavior_eucookie', 'postinput' => $txt['badbehavior_default_off']),
 				array('check', 'badbehavior_display_stats', 'postinput' => $txt['badbehavior_default_off']),
-				'',
+			'',
 				array('check', 'badbehavior_reverse_proxy', 'postinput' => $txt['badbehavior_default_off']),
 				array('text', 'badbehavior_reverse_proxy_header', 30, 'postinput' => $txt['badbehavior_reverse_proxy_header_desc']),
 				array('text', 'badbehavior_reverse_proxy_addresses', 30),
-				'',
+			'',
 				array('text', 'badbehavior_httpbl_key', 12, 'invalid' => $context['invalid_badbehavior_httpbl_key']),
 				array('int', 'badbehavior_httpbl_threat', 'postinput' => $txt['badbehavior_httpbl_threat_desc']),
 				array('int', 'badbehavior_httpbl_maxage', 'postinput' => $txt['badbehavior_httpbl_maxage_desc']),

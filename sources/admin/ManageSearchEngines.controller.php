@@ -164,6 +164,8 @@ class ManageSearchEngines_Controller extends Action_Controller
 
 		// Instantiate the form
 		$this->_engineSettings = new Settings_Form();
+
+		// Initialize it with our settings
 		$config_vars = $this->_settings();
 
 		return $this->_engineSettings->settings($config_vars);

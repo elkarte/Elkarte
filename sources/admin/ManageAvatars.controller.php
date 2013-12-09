@@ -104,6 +104,8 @@ class ManageAvatars_Controller extends Action_Controller
 	{
 		// Instantiate the form
 		$this->_avatarSettings = new Settings_Form();
+
+		// Initialize settings
 		$config_vars = $this->_settings();
 
 		return $this->_avatarSettings->settings($config_vars);

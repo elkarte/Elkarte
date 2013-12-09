@@ -205,7 +205,10 @@ class ManageServer_Controller extends Action_Controller
 	 */
 	private function _initGeneralSettingsForm()
 	{
+		// Start the form
 		$this->_generalSettingsForm = new Settings_Form();
+
+		// Initialize it with our settings
 		$config_vars = $this->_generalSettings();
 
 		// Set them vars for our settings form
@@ -217,7 +220,10 @@ class ManageServer_Controller extends Action_Controller
 	 */
 	private function _initCookieSettingsForm()
 	{
+		// Start a new form
 		$this->_cookieSettingsForm = new Settings_Form();
+
+		// Initialize it with our settings
 		$config_vars = $this->_cookieSettings();
 
 		// Set them vars for our settings form
@@ -229,7 +235,10 @@ class ManageServer_Controller extends Action_Controller
 	 */
 	private function _initCacheSettingsForm()
 	{
+		// We need a setting form
 		$this->_cacheSettingsForm = new Settings_Form();
+
+		// Initialize it with our settings
 		$config_vars = $this->_cacheSettings();
 
 		// Set them vars for our settings form
@@ -241,7 +250,10 @@ class ManageServer_Controller extends Action_Controller
 	 */
 	private function _initBalancingSettingsForm()
 	{
+		// Forms, we need them
 		$this->_balancingSettingsForm = new Settings_Form();
+
+		// Initialize it with our settings
 		$config_vars = $this->_balancingSettings();
 
 		// Set them vars for our settings form
@@ -265,7 +277,7 @@ class ManageServer_Controller extends Action_Controller
 	{
 		global $scripturl, $context, $txt;
 
-		// initialize the form
+		// Initialize the form
 		$this->_initGeneralSettingsForm();
 
 		call_integration_hook('integrate_general_settings');
@@ -304,7 +316,7 @@ class ManageServer_Controller extends Action_Controller
 	{
 		global $scripturl, $context, $txt;
 
-		// initialize the form
+		// Initialize the form
 		$this->_initDatabaseSettingsForm();
 
 		call_integration_hook('integrate_database_settings');
@@ -336,7 +348,7 @@ class ManageServer_Controller extends Action_Controller
 	{
 		global $context, $scripturl, $txt, $modSettings, $cookiename, $user_settings, $boardurl;
 
-		// initialize the form
+		// Initialize the form
 		$this->_initCookieSettingsForm();
 
 		call_integration_hook('integrate_cookie_settings');
@@ -481,6 +493,7 @@ class ManageServer_Controller extends Action_Controller
 		// Initialize the form
 		$this->_initBalancingSettingsForm();
 
+		// Initialize it with our settings
 		$config_vars = $this->_balancingSettingsForm->settings();
 
 		call_integration_hook('integrate_loadavg_settings');
@@ -526,6 +539,7 @@ class ManageServer_Controller extends Action_Controller
 		// Initialize the form
 		$this->_initBalancingSettingsForm();
 
+		// Initialize it with our settings
 		$config_vars = $this->_balancingSettingsForm->settings();
 
 		// Double-check ourselves, we are about to save
@@ -683,19 +697,19 @@ class ManageServer_Controller extends Action_Controller
 
 		// Define the variables we want to edit or show in the cookie form.
 		$config_vars = array(
-			// Cookies...
-			array('cookiename', $txt['cookie_name'], 'file', 'text', 20),
-			array('cookieTime', $txt['cookieTime'], 'db', 'int', 'postinput' => $txt['minutes']),
-			array('localCookies', $txt['localCookies'], 'subtext' => $txt['localCookies_note'], 'db', 'check', false, 'localCookies'),
-			array('globalCookies', $txt['globalCookies'], 'subtext' => $txt['globalCookies_note'], 'db', 'check', false, 'globalCookies'),
-			array('globalCookiesDomain', $txt['globalCookiesDomain'], 'subtext' => $txt['globalCookiesDomain_note'], 'db', 'text', false, 'globalCookiesDomain'),
-			array('secureCookies', $txt['secureCookies'], 'subtext' => $txt['secureCookies_note'], 'db', 'check', false, 'secureCookies', 'disabled' => !isset($_SERVER['HTTPS']) || !(strtolower($_SERVER['HTTPS']) == 'on' || strtolower($_SERVER['HTTPS']) == '1')),
-			array('httponlyCookies', $txt['httponlyCookies'], 'subtext' => $txt['httponlyCookies_note'], 'db', 'check', false, 'httponlyCookies'),
+				// Cookies...
+				array('cookiename', $txt['cookie_name'], 'file', 'text', 20),
+				array('cookieTime', $txt['cookieTime'], 'db', 'int', 'postinput' => $txt['minutes']),
+				array('localCookies', $txt['localCookies'], 'subtext' => $txt['localCookies_note'], 'db', 'check', false, 'localCookies'),
+				array('globalCookies', $txt['globalCookies'], 'subtext' => $txt['globalCookies_note'], 'db', 'check', false, 'globalCookies'),
+				array('globalCookiesDomain', $txt['globalCookiesDomain'], 'subtext' => $txt['globalCookiesDomain_note'], 'db', 'text', false, 'globalCookiesDomain'),
+				array('secureCookies', $txt['secureCookies'], 'subtext' => $txt['secureCookies_note'], 'db', 'check', false, 'secureCookies', 'disabled' => !isset($_SERVER['HTTPS']) || !(strtolower($_SERVER['HTTPS']) == 'on' || strtolower($_SERVER['HTTPS']) == '1')),
+				array('httponlyCookies', $txt['httponlyCookies'], 'subtext' => $txt['httponlyCookies_note'], 'db', 'check', false, 'httponlyCookies'),
 			'',
-			// Sessions
-			array('databaseSession_enable', $txt['databaseSession_enable'], 'db', 'check', false, 'databaseSession_enable'),
-			array('databaseSession_loose', $txt['databaseSession_loose'], 'db', 'check', false, 'databaseSession_loose'),
-			array('databaseSession_lifetime', $txt['databaseSession_lifetime'], 'db', 'int', false, 'databaseSession_lifetime', 'postinput' => $txt['seconds']),
+				// Sessions
+				array('databaseSession_enable', $txt['databaseSession_enable'], 'db', 'check', false, 'databaseSession_enable'),
+				array('databaseSession_loose', $txt['databaseSession_loose'], 'db', 'check', false, 'databaseSession_loose'),
+				array('databaseSession_lifetime', $txt['databaseSession_lifetime'], 'db', 'int', false, 'databaseSession_lifetime', 'postinput' => $txt['seconds']),
 		);
 
 		// Set them vars for our settings form

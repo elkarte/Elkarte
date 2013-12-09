@@ -215,6 +215,8 @@ class ManageFeatures_Controller extends Action_Controller
 
 		// Instantiate the form
 		$this->_basicSettings = new Settings_Form();
+
+		// Initialize it with our settings
 		$config_vars = $this->_basicSettings();
 
 		return $this->_basicSettings->settings($config_vars);
@@ -263,6 +265,8 @@ class ManageFeatures_Controller extends Action_Controller
 
 		// Instantiate the form
 		$this->_layoutSettings = new Settings_Form();
+
+		// Initialize it with our settings
 		$config_vars = $this->_layoutSettings();
 
 		return $this->_layoutSettings->settings($config_vars);
@@ -308,8 +312,10 @@ class ManageFeatures_Controller extends Action_Controller
 		// We're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
 
-		// instantiate the form
+		// Instantiate the form
 		$this->_karmaSettings = new Settings_Form();
+
+		// Initialize it with our settings
 		$config_vars = $this->_karmaSettings();
 
 		return $this->_karmaSettings->settings($config_vars);
@@ -354,8 +360,10 @@ class ManageFeatures_Controller extends Action_Controller
 		// We're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
 
-		// instantiate the form
+		// Instantiate the form
 		$this->_likesSettings = new Settings_Form();
+
+		// Initialize it with our settings
 		$config_vars = $this->_likesSettings();
 
 		return $this->_likesSettings->settings($config_vars);
@@ -368,8 +376,10 @@ class ManageFeatures_Controller extends Action_Controller
 	{
 		global $context, $scripturl;
 
-		// initialize the form
+		// Initialize the form
 		$this->_initMentionSettingsForm();
+
+		// Initialize it with our settings
 		$config_vars = $this->_mentionSettings->settings();
 
 		// Saving the settings?
@@ -397,8 +407,10 @@ class ManageFeatures_Controller extends Action_Controller
 
 		loadLanguage('Mentions');
 
-		// instantiate the form
+		// Instantiate the form
 		$this->_mentionSettings = new Settings_Form();
+
+		// Initialize it with our settings
 		$config_vars = $this->_mentionSettings();
 
 		// Some context stuff
@@ -737,6 +749,8 @@ class ManageFeatures_Controller extends Action_Controller
 
 		// Instantiate the form
 		$this->_signatureSettings = new Settings_Form();
+
+		// Initialize it with our settings
 		$config_vars = $this->_signatureSettings();
 
 		return $this->_signatureSettings->settings($config_vars);
@@ -1284,10 +1298,10 @@ class ManageFeatures_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context;
 
-		// initialize the form
+		// Initialize the form
 		$this->_initPMSettingsForm();
 
-		// retrieve the current config settings
+		// Retrieve the current config settings
 		$config_vars = $this->_PMSettings->settings();
 
 		require_once(SUBSDIR . '/PersonalMessage.subs.php');
@@ -1334,8 +1348,10 @@ class ManageFeatures_Controller extends Action_Controller
 
 		$context['permissions_excluded'] = array(-1);
 
-		// instantiate the form
+		// Instantiate the form
 		$this->_PMSettings = new Settings_Form();
+
+		// Initialize it with our settings
 		$config_vars = $this->_pmSettings();
 
 		return $this->_PMSettings->settings($config_vars);
@@ -1539,9 +1555,9 @@ class ManageFeatures_Controller extends Action_Controller
 		// The mentions settings
 		$config_vars = array(
 			array('title', 'mentions_settings'),
-			array('check', 'mentions_enabled'),
-			array('check', 'mentions_buddy'),
-			array('check', 'mentions_dont_notify_rlike'),
+				array('check', 'mentions_enabled'),
+				array('check', 'mentions_buddy'),
+				array('check', 'mentions_dont_notify_rlike'),
 		);
 
 		call_integration_hook('integrate_mention_settings', array(&$config_vars));

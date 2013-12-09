@@ -179,6 +179,8 @@ class ManageSmileys_Controller extends Action_Controller
 
 		// Instantiate the form
 		$this->_smileySettings = new Settings_Form();
+
+		// Initialize it with our settings
 		$config_vars = $this->_settings();
 
 		return $this->_smileySettings->settings($config_vars);

@@ -102,11 +102,13 @@ class ManageTopics_Controller extends Action_Controller
 	 */
 	private function _initTopicSettingsForm()
 	{
-		// we're working with them settings.
+		// We're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
 
-		// instantiate the form
+		// Instantiate the form
 		$this->_topicSettings = new Settings_Form();
+
+		// Initialize it with our settings
 		$config_vars = $this->_settings();
 
 		return $this->_topicSettings->settings($config_vars);

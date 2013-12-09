@@ -212,7 +212,7 @@ class AdminLog_Controller extends Action_Controller
 		// instantiate the form
 		$this->_pruningSettings = new Settings_Form();
 
-		// initialize settings
+		// Initialize settings
 		$config_vars = $this->_settings();
 
 		return $this->_pruningSettings->settings($config_vars);
