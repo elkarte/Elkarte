@@ -295,7 +295,7 @@ class ManageSecurity_Controller extends Action_Controller
 	 */
 	private function _initSpamSettingsForm()
 	{
-		// we're working with them settings.
+		// We're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
 		require_once(SUBSDIR . '/VerificationControls.class.php');
 
