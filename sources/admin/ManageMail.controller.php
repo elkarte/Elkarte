@@ -291,45 +291,11 @@ class ManageMail_Controller extends Action_Controller
 	 */
 	private function _initMailSettingsForm()
 	{
-		global $txt, $modSettings, $txtBirthdayEmails;
-
-		// instantiate the form
+		// Instantiate the form
 		$this->_mailSettings = new Settings_Form();
 
-		// we need $txtBirthdayEmails
-		loadLanguage('EmailTemplates');
-
-		$body = $txtBirthdayEmails[(empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']) . '_body'];
-		$subject = $txtBirthdayEmails[(empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']) . '_subject'];
-
-		$emails = array();
-		$processedBirthdayEmails = array();
-		foreach ($txtBirthdayEmails as $key => $value)
-		{
-			$index = substr($key, 0, strrpos($key, '_'));
-			$element = substr($key, strrpos($key, '_') + 1);
-			$processedBirthdayEmails[$index][$element] = $value;
-		}
-		foreach ($processedBirthdayEmails as $index => $dummy)
-			$emails[$index] = $index;
-
-		$config_vars = array(
-				// Mail queue stuff, this rocks ;)
-				array('check', 'mail_queue'),
-				array('int', 'mail_limit'),
-				array('int', 'mail_quantity'),
-			'',
-				// SMTP stuff.
-				array('select', 'mail_type', array($txt['mail_type_default'], 'SMTP')),
-				array('text', 'smtp_host'),
-				array('text', 'smtp_port'),
-				array('text', 'smtp_username'),
-				array('password', 'smtp_password'),
-			'',
-				array('select', 'birthday_email', $emails, 'value' => array('subject' => $subject, 'body' => $body), 'javascript' => 'onchange="fetch_birthday_preview()"'),
-				'birthday_subject' => array('var_message', 'birthday_subject', 'var_message' => $processedBirthdayEmails[empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']]['subject'], 'disabled' => true, 'size' => strlen($subject) + 3),
-				'birthday_body' => array('var_message', 'birthday_body', 'var_message' => nl2br($body), 'disabled' => true, 'size' => ceil(strlen($body) / 25)),
-		);
+		// Initialize it with our settings
+		$config_vars = $this->_settings();
 
 		return $this->_mailSettings->settings($config_vars);
 	}
@@ -337,7 +303,7 @@ class ManageMail_Controller extends Action_Controller
 	/**
 	 * Retrieve and return mail administration settings.
 	 */
-	public function settings()
+	private function _settings()
 	{
 		global $txt, $modSettings, $txtBirthdayEmails;
 
@@ -377,6 +343,14 @@ class ManageMail_Controller extends Action_Controller
 		);
 
 		return $config_vars;
+	}
+
+	/**
+	 * Return the form settings for use in admin search
+	 */
+	public function settings_search()
+	{
+		return $this->_settings();
 	}
 
 	/**

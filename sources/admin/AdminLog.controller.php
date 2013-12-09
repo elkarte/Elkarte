@@ -205,12 +205,23 @@ class AdminLog_Controller extends Action_Controller
 	}
 
 	/**
-	 * Returns the configuration settings for pruning logs.
-	 *
-	 * @return array in the format of config_vars expected by admin search
-	 * @deprecated
+	 * Initializes the _pruningSettings form.
 	 */
-	public function settings()
+	private function _initPruningSettingsForm()
+	{
+		// instantiate the form
+		$this->_pruningSettings = new Settings_Form();
+
+		// Initialize settings
+		$config_vars = $this->_settings();
+
+		return $this->_pruningSettings->settings($config_vars);
+	}
+
+	/**
+	 * Returns the configuration settings for pruning logs.
+	 */
+	private function _settings()
 	{
 		global $txt;
 
@@ -234,33 +245,10 @@ class AdminLog_Controller extends Action_Controller
 	}
 
 	/**
-	 * Initializes the _pruningSettings form.
+	 * Return the search engine settings for use in admin search
 	 */
-	private function _initPruningSettingsForm()
+	public function settings_search()
 	{
-		global $txt;
-
-		// instantiate the form
-		$this->_pruningSettings = new Settings_Form();
-
-		// initialize settings
-
-		$config_vars = array(
-			// Even do the pruning?
-			// The array indexes are there so we can remove/change them before saving.
-			'pruningOptions' => array('check', 'pruningOptions'),
-		'',
-			// Various logs that could be pruned.
-			array('int', 'pruneErrorLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Error log.
-			array('int', 'pruneModLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Moderation log.
-			array('int', 'pruneBanLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Ban hit log.
-			array('int', 'pruneReportLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Report to moderator log.
-			array('int', 'pruneScheduledTaskLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Log of the scheduled tasks and how long they ran.
-			array('int', 'pruneBadbehaviorLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Bad Behavior log.
-			array('int', 'pruneSpiderHitLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Log of the scheduled tasks and how long they ran.
-			// If you add any additional logs make sure to add them after this point.  Additionally, make sure you add them to the weekly scheduled task.
-		);
-
-		return $this->_pruningSettings->settings($config_vars);
+		return $this->_settings();
 	}
 }

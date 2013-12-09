@@ -174,33 +174,14 @@ class ManageSmileys_Controller extends Action_Controller
 	 */
 	private function _initSmileySettingsForm()
 	{
-		global $txt, $modSettings;
-
 		// This is really quite wanting.
 		require_once(SUBSDIR . '/Settings.class.php');
 
 		// Instantiate the form
 		$this->_smileySettings = new Settings_Form();
 
-		// The directories...
-		$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? BOARDDIR . '/smileys' : $modSettings['smileys_dir'];
-		$context['smileys_dir_found'] = is_dir($context['smileys_dir']);
-
-		// All the settings for the page...
-		$config_vars = array(
-			array('title', 'settings'),
-				// Inline permissions.
-				array('permissions', 'manage_smileys'),
-			'',
-				array('select', 'smiley_sets_default', $this->_smiley_context),
-				array('check', 'smiley_sets_enable'),
-				array('check', 'smiley_enable', 'subtext' => $txt['smileys_enable_note']),
-				array('text', 'smileys_url', 40),
-				array('text', 'smileys_dir', 'invalid' => !$context['smileys_dir_found'], 40),
-			'',
-				// Message icons.
-				array('check', 'messageIcons_enable', 'subtext' => $txt['setting_messageIcons_enable_note']),
-		);
+		// Initialize it with our settings
+		$config_vars = $this->_settings();
 
 		return $this->_smileySettings->settings($config_vars);
 	}
@@ -208,7 +189,7 @@ class ManageSmileys_Controller extends Action_Controller
 	/**
 	 * Retrieve and return smileys administration settings.
 	 */
-	public function settings()
+	private function _settings()
 	{
 		global $txt, $modSettings;
 
@@ -233,6 +214,14 @@ class ManageSmileys_Controller extends Action_Controller
 		);
 
 		return $config_vars;
+	}
+
+	/**
+	 * Return the smiley settings for use in admin search
+	 */
+	public function settings_search()
+	{
+		return $this->_settings();
 	}
 
 	/**

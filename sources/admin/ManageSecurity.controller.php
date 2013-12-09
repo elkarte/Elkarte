@@ -143,41 +143,14 @@ class ManageSecurity_Controller extends Action_Controller
 	 */
 	private function _initSecuritySettingsForm()
 	{
-		global $txt;
-
 		// We're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
 
 		// instantiate the form
 		$this->_securitySettings = new Settings_Form();
 
-		// initialize it with our settings
-		$config_vars = array(
-				array('check', 'make_email_viewable'),
-			'',
-				array('int', 'failed_login_threshold'),
-				array('int', 'loginHistoryDays'),
-			'',
-				array('check', 'enableErrorLogging'),
-				array('check', 'enableErrorQueryLogging'),
-			'',
-				array('int', 'admin_session_lifetime'),
-				array('check', 'auto_admin_session'),
-				array('check', 'securityDisable'),
-				array('check', 'securityDisable_moderate'),
-			'',
-				// Reactive on email, and approve on delete
-				array('check', 'send_validation_onChange'),
-				array('check', 'approveAccountDeletion'),
-			'',
-				// Password strength.
-				array('select', 'password_strength', array($txt['setting_password_strength_low'], $txt['setting_password_strength_medium'], $txt['setting_password_strength_high'])),
-				array('check', 'enable_password_conversion'),
-			'',
-				array('select', 'frame_security', array('SAMEORIGIN' => $txt['setting_frame_security_SAMEORIGIN'], 'DENY' => $txt['setting_frame_security_DENY'], 'DISABLE' => $txt['setting_frame_security_DISABLE'])),
-		);
-
-		call_integration_hook('integrate_general_security_settings', array(&$config_vars));
+		// Initialize it with our settings
+		$config_vars = $this->_securitySettings();
 
 		return $this->_securitySettings->settings($config_vars);
 	}
@@ -185,7 +158,6 @@ class ManageSecurity_Controller extends Action_Controller
 	/**
 	 * Allows to display and eventually change the moderation settings of the forum.
 	 * Uses the moderation settings form.
-	 *
 	 */
 	public function action_moderationSettings_display()
 	{
@@ -251,25 +223,14 @@ class ManageSecurity_Controller extends Action_Controller
 	 */
 	private function _initModerationSettingsForm()
 	{
-		global $txt;
-
-		// we're working with them settings.
+		// We're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
 
-		// instantiate the form
+		// Instantiate the form
 		$this->_moderationSettings = new Settings_Form();
 
-		$config_vars = array(
-			// Warning system?
-			array('int', 'warning_watch', 'subtext' => $txt['setting_warning_watch_note'], 'help' => 'warning_enable'),
-			'moderate' => array('int', 'warning_moderate', 'subtext' => $txt['setting_warning_moderate_note']),
-			array('int', 'warning_mute', 'subtext' => $txt['setting_warning_mute_note']),
-			'rem1' => array('int', 'user_limit', 'subtext' => $txt['setting_user_limit_note']),
-			'rem2' => array('int', 'warning_decrement', 'subtext' => $txt['setting_warning_decrement_note']),
-			array('select', 'warning_show', 'subtext' => $txt['setting_warning_show_note'], array($txt['setting_warning_show_mods'], $txt['setting_warning_show_user'], $txt['setting_warning_show_all'])),
-		);
-
-		call_integration_hook('integrate_moderation_settings', array(&$config_vars));
+		// Initialize it with our settings
+		$config_vars = $this->_moderationSettings();
 
 		return $this->_moderationSettings->settings($config_vars);
 	}
@@ -282,11 +243,10 @@ class ManageSecurity_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context, $modSettings;
 
-		// Let's try keep the spam to a minimum ah Thantos?
-		// initialize the form
+		// Initialize the form
 		$this->_initSpamSettingsForm();
 
-		// retrieve the current config settings
+		// Retrieve the current config settings
 		$config_vars = $this->_spamSettings->settings();
 
 		// Saving?
@@ -335,45 +295,15 @@ class ManageSecurity_Controller extends Action_Controller
 	 */
 	private function _initSpamSettingsForm()
 	{
-		global $txt;
-
-		// we're working with them settings.
+		// We're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
 		require_once(SUBSDIR . '/VerificationControls.class.php');
 
 		// instantiate the form
 		$this->_spamSettings = new Settings_Form();
 
-		// Build up our options array
-		$config_vars = array(
-			array('check', 'reg_verification'),
-			array('check', 'search_enable_captcha'),
-			// This, my friend, is a cheat :p
-			'guest_verify' => array('check', 'guests_require_captcha', 'postinput' => $txt['setting_guests_require_captcha_desc']),
-			array('int', 'posts_require_captcha', 'postinput' => $txt['posts_require_captcha_desc'], 'onchange' => 'if (this.value > 0){ document.getElementById(\'guests_require_captcha\').checked = true; document.getElementById(\'guests_require_captcha\').disabled = true;} else {document.getElementById(\'guests_require_captcha\').disabled = false;}'),
-			array('check', 'guests_report_require_captcha'),
-			// PM Settings
-			array('title', 'antispam_PM'),
-				'pm1' => array('int', 'max_pm_recipients', 'postinput' => $txt['max_pm_recipients_note']),
-				'pm2' => array('int', 'pm_posts_verification', 'postinput' => $txt['pm_posts_verification_note']),
-				'pm3' => array('int', 'pm_posts_per_hour', 'postinput' => $txt['pm_posts_per_hour_note']),
-		);
-
-		$known_verifications = loadVerificationControls();
-
-		foreach ($known_verifications as $verification)
-		{
-			$class_name = 'Control_Verification_' . ucfirst($verification);
-			$current_instance = new $class_name();
-
-			$new_settings = $current_instance->settings();
-			if (!empty($new_settings) && is_array($new_settings))
-				foreach ($new_settings as $new_setting)
-				$config_vars[] = $new_setting;
-		}
-
-		// @todo: it may be removed, it may stay, the two hooks may have different functions
-		call_integration_hook('integrate_spam_settings', array(&$config_vars));
+		// Initialize it with our settings
+		$config_vars = $this->_spamSettings();
 
 		return $this->_spamSettings->settings($config_vars);
 	}
@@ -471,42 +401,14 @@ class ManageSecurity_Controller extends Action_Controller
 	 */
 	private function _initBBSettingsForm()
 	{
-		global $txt, $context, $modSettings;
-
 		// We're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
 
 		// instantiate the form
 		$this->_bbSettings = new Settings_Form();
 
-		// See if they supplied a valid looking http:BL API Key
-		$context['invalid_badbehavior_httpbl_key'] = (!empty($modSettings['badbehavior_httpbl_key']) && (strlen($modSettings['badbehavior_httpbl_key']) !== 12 || !ctype_lower($modSettings['badbehavior_httpbl_key'])));
-
-		// Build up our options array
-		$config_vars = array(
-			array('title', 'badbehavior_title'),
-				array('check', 'badbehavior_enabled', 'postinput' => $txt['badbehavior_enabled_desc']),
-				array('check', 'badbehavior_logging', 'postinput' => $txt['badbehavior_default_on']),
-				array('check', 'badbehavior_verbose', 'postinput' => $txt['badbehavior_default_off']),
-				array('check', 'badbehavior_strict', 'postinput' => $txt['badbehavior_default_off']),
-				array('check', 'badbehavior_offsite_forms', 'postinput' => $txt['badbehavior_default_off']),
-				array('check', 'badbehavior_eucookie', 'postinput' => $txt['badbehavior_default_off']),
-				array('check', 'badbehavior_display_stats', 'postinput' => $txt['badbehavior_default_off']),
-				'',
-				array('check', 'badbehavior_reverse_proxy', 'postinput' => $txt['badbehavior_default_off']),
-				array('text', 'badbehavior_reverse_proxy_header', 30, 'postinput' => $txt['badbehavior_reverse_proxy_header_desc']),
-				array('text', 'badbehavior_reverse_proxy_addresses', 30),
-				'',
-				array('text', 'badbehavior_httpbl_key', 12, 'invalid' => $context['invalid_badbehavior_httpbl_key']),
-				array('int', 'badbehavior_httpbl_threat', 'postinput' => $txt['badbehavior_httpbl_threat_desc']),
-				array('int', 'badbehavior_httpbl_maxage', 'postinput' => $txt['badbehavior_httpbl_maxage_desc']),
-			array('title', 'badbehavior_whitelist_title'),
-				array('desc', 'badbehavior_wl_desc'),
-				array('int', 'badbehavior_postcount_wl', 'postinput' => $txt['badbehavior_postcount_wl_desc']),
-				array('callback', 'badbehavior_add_ip'),
-				array('callback', 'badbehavior_add_url'),
-				array('callback', 'badbehavior_add_useragent'),
-		);
+		// Initialize it with our settings
+		$config_vars = $this->_bbSettings();
 
 		return $this->_bbSettings->settings($config_vars);
 	}
@@ -541,9 +443,8 @@ class ManageSecurity_Controller extends Action_Controller
 
 	/**
 	 * Moderation settings.
-	 * Used in admin panel search.
 	 */
-	public function moderationSettings()
+	private function _moderationSettings()
 	{
 		global $txt;
 
@@ -563,14 +464,21 @@ class ManageSecurity_Controller extends Action_Controller
 	}
 
 	/**
-	 * Security settings.
-	 * Used in admin panel search.
+	 * Public method to return moderation settings, used for admin search
 	 */
-	public function securitySettings()
+	public function moderationSettings_search()
+	{
+		return $this->_moderationSettings();
+	}
+
+	/**
+	 * Security settings.
+	 */
+	private function _securitySettings()
 	{
 		global $txt;
 
-		// initialize it with our settings
+		// Set up the config array for use
 		$config_vars = array(
 				array('check', 'make_email_viewable'),
 			'',
@@ -580,6 +488,8 @@ class ManageSecurity_Controller extends Action_Controller
 				array('check', 'enableErrorLogging'),
 				array('check', 'enableErrorQueryLogging'),
 			'',
+				array('int', 'admin_session_lifetime'),
+				array('check', 'auto_admin_session'),
 				array('check', 'securityDisable'),
 				array('check', 'securityDisable_moderate'),
 			'',
@@ -600,10 +510,17 @@ class ManageSecurity_Controller extends Action_Controller
 	}
 
 	/**
-	 * Spam settings.
-	 * Used in admin panel search.
+	 * Public method to return security form settings, used in admin search
 	 */
-	public function spamSettings()
+	public function securitySettings_search()
+	{
+		return $this->_securitySettings();
+	}
+
+	/**
+	 * Spam settings.
+	 */
+	private function _spamSettings()
 	{
 		global $txt;
 
@@ -611,13 +528,12 @@ class ManageSecurity_Controller extends Action_Controller
 
 		// Build up our options array
 		$config_vars = array(
-			array('title', 'antispam_Settings'),
-				array('check', 'reg_verification'),
-				array('check', 'search_enable_captcha'),
-				// This, my friend, is a cheat :p
-				'guest_verify' => array('check', 'guests_require_captcha', 'postinput' => $txt['setting_guests_require_captcha_desc']),
-				array('int', 'posts_require_captcha', 'postinput' => $txt['posts_require_captcha_desc'], 'onchange' => 'if (this.value > 0){ document.getElementById(\'guests_require_captcha\').checked = true; document.getElementById(\'guests_require_captcha\').disabled = true;} else {document.getElementById(\'guests_require_captcha\').disabled = false;}'),
-				array('check', 'guests_report_require_captcha'),
+			array('check', 'reg_verification'),
+			array('check', 'search_enable_captcha'),
+			// This, my friend, is a cheat :p
+			'guest_verify' => array('check', 'guests_require_captcha', 'postinput' => $txt['setting_guests_require_captcha_desc']),
+			array('int', 'posts_require_captcha', 'postinput' => $txt['posts_require_captcha_desc'], 'onchange' => 'if (this.value > 0){ document.getElementById(\'guests_require_captcha\').checked = true; document.getElementById(\'guests_require_captcha\').disabled = true;} else {document.getElementById(\'guests_require_captcha\').disabled = false;}'),
+			array('check', 'guests_report_require_captcha'),
 			// PM Settings
 			array('title', 'antispam_PM'),
 				'pm1' => array('int', 'max_pm_recipients', 'postinput' => $txt['max_pm_recipients_note']),
@@ -645,10 +561,17 @@ class ManageSecurity_Controller extends Action_Controller
 	}
 
 	/**
-	 * Bad Behavior settings.
-	 * Used in admin panel search.
+	 * Public method to return spam settings, used in admin search
 	 */
-	public function bbSettings()
+	public function spamSettings_search()
+	{
+		return $this->_spamSettings();
+	}
+
+	/**
+	 * Bad Behavior settings.
+	 */
+	private function _bbSettings()
 	{
 		global $txt, $context, $modSettings;
 
@@ -658,7 +581,6 @@ class ManageSecurity_Controller extends Action_Controller
 		// Build up our options array
 		$config_vars = array(
 			array('title', 'badbehavior_title'),
-				array('desc', 'badbehavior_desc'),
 				array('check', 'badbehavior_enabled', 'postinput' => $txt['badbehavior_enabled_desc']),
 				array('check', 'badbehavior_logging', 'postinput' => $txt['badbehavior_default_on']),
 				array('check', 'badbehavior_verbose', 'postinput' => $txt['badbehavior_default_off']),
@@ -666,11 +588,11 @@ class ManageSecurity_Controller extends Action_Controller
 				array('check', 'badbehavior_offsite_forms', 'postinput' => $txt['badbehavior_default_off']),
 				array('check', 'badbehavior_eucookie', 'postinput' => $txt['badbehavior_default_off']),
 				array('check', 'badbehavior_display_stats', 'postinput' => $txt['badbehavior_default_off']),
-				'',
+			'',
 				array('check', 'badbehavior_reverse_proxy', 'postinput' => $txt['badbehavior_default_off']),
 				array('text', 'badbehavior_reverse_proxy_header', 30, 'postinput' => $txt['badbehavior_reverse_proxy_header_desc']),
 				array('text', 'badbehavior_reverse_proxy_addresses', 30),
-				'',
+			'',
 				array('text', 'badbehavior_httpbl_key', 12, 'invalid' => $context['invalid_badbehavior_httpbl_key']),
 				array('int', 'badbehavior_httpbl_threat', 'postinput' => $txt['badbehavior_httpbl_threat_desc']),
 				array('int', 'badbehavior_httpbl_maxage', 'postinput' => $txt['badbehavior_httpbl_maxage_desc']),
@@ -683,5 +605,13 @@ class ManageSecurity_Controller extends Action_Controller
 		);
 
 		return $config_vars;
+	}
+
+	/**
+	 * Public method to return bb settings, used in admin search
+	 */
+	public function bbSettings_search()
+	{
+		return $this->_bbSettings();
 	}
 }

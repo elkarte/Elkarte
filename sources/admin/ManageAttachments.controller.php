@@ -127,11 +127,7 @@ class ManageAttachments_Controller extends Action_Controller
 		call_integration_hook('integrate_modify_attachment_settings');
 
 		// These are very likely to come in handy! (i.e. without them we're doomed!)
-		// @todo do we really need all this?
-		require_once(ADMINDIR . '/ManagePermissions.controller.php');
-		require_once(ADMINDIR . '/ManageServer.controller.php');
 		require_once(SUBSDIR . '/Settings.class.php');
-		// @todo Just to stay on the safe side, though I'm not sure it's needed
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// Saving settings?
@@ -203,111 +199,19 @@ class ManageAttachments_Controller extends Action_Controller
 	 */
 	private function _initAttachSettingsForm()
 	{
-		global $modSettings, $txt, $scripturl;
-
 		// instantiate the form
 		$this->_attachSettingsForm = new Settings_Form();
 
 		// initialize settings
-		require_once(SUBSDIR . '/Attachments.subs.php');
-
-		// Get the current attachment directory.
-		$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
-		$context['attachmentUploadDir'] = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
-
-		// First time here?
-		if (empty($modSettings['attachment_basedirectories']) && $modSettings['currentAttachmentUploadDir'] == 1 && count($modSettings['attachmentUploadDir']) == 1)
-			$modSettings['attachmentUploadDir'] = $modSettings['attachmentUploadDir'][1];
-
-		// If not set, show a default path for the base directory
-		if (!isset($_GET['save']) && empty($modSettings['basedirectory_for_attachments']))
-			if (is_dir($modSettings['attachmentUploadDir'][1]))
-				$modSettings['basedirectory_for_attachments'] = $modSettings['attachmentUploadDir'][1];
-			else
-				$modSettings['basedirectory_for_attachments'] = $context['attachmentUploadDir'];
-
-		$context['valid_upload_dir'] = is_dir($context['attachmentUploadDir']) && is_writable($context['attachmentUploadDir']);
-
-		if (!empty($modSettings['automanage_attachments']))
-			$context['valid_basedirectory'] = !empty($modSettings['basedirectory_for_attachments']) && is_writable($modSettings['basedirectory_for_attachments']);
-		else
-			$context['valid_basedirectory'] = true;
-
-		// A bit of razzle dazzle with the $txt strings. :)
-		$txt['attachment_path'] = $context['attachmentUploadDir'];
-		$txt['basedirectory_for_attachments_path'] = isset($modSettings['basedirectory_for_attachments']) ? $modSettings['basedirectory_for_attachments'] : '';
-		$txt['use_subdirectories_for_attachments_note'] = empty($modSettings['attachment_basedirectories']) || empty($modSettings['use_subdirectories_for_attachments']) ? $txt['use_subdirectories_for_attachments_note'] : '';
-		$txt['attachmentUploadDir_multiple_configure'] = '<a href="' . $scripturl . '?action=admin;area=manageattachments;sa=attachpaths">[' . $txt['attachmentUploadDir_multiple_configure'] . ']</a>';
-		$txt['attach_current_dir'] = empty($modSettings['automanage_attachments']) ? $txt['attach_current_dir'] : $txt['attach_last_dir'];
-		$txt['attach_current_dir_warning'] = $txt['attach_current_dir'] . $txt['attach_current_dir_warning'];
-		$txt['basedirectory_for_attachments_warning'] = $txt['basedirectory_for_attachments_current'] . $txt['basedirectory_for_attachments_warning'];
-
-		// Perform a test to see if the GD module or ImageMagick are installed.
-		$testImg = get_extension_funcs('gd') || class_exists('Imagick');
-
-		// See if we can find if the server is set up to support the attacment limits
-		$post_max_size = ini_get('post_max_size');
-		$upload_max_filesize = ini_get('upload_max_filesize');
-		$testPM = !empty($post_max_size) ? (memoryReturnBytes($post_max_size) >= (isset($modSettings['attachmentPostLimit']) ? $modSettings['attachmentPostLimit'] * 1024 : 0)) : true;
-		$testUM = !empty($upload_max_filesize) ? (memoryReturnBytes($upload_max_filesize) >= (isset($modSettings['attachmentSizeLimit']) ? $modSettings['attachmentSizeLimit'] * 1024 : 0)) : true;
-
-		$config_vars = array(
-			array('title', 'attachment_manager_settings'),
-				// Are attachments enabled?
-				array('select', 'attachmentEnable', array($txt['attachmentEnable_deactivate'], $txt['attachmentEnable_enable_all'], $txt['attachmentEnable_disable_new'])),
-			'',
-				// Extension checks etc.
-				array('check', 'attachmentRecodeLineEndings'),
-			'',
-				// Directory and size limits.
-				array('select', 'automanage_attachments', array(0 => $txt['attachments_normal'], 1 => $txt['attachments_auto_space'], 2 => $txt['attachments_auto_years'], 3 => $txt['attachments_auto_months'], 4 => $txt['attachments_auto_16'])),
-				array('check', 'use_subdirectories_for_attachments', 'subtext' => $txt['use_subdirectories_for_attachments_note']),
-				(empty($modSettings['attachment_basedirectories']) ? array('text', 'basedirectory_for_attachments', 40,) : array('var_message', 'basedirectory_for_attachments', 'message' => 'basedirectory_for_attachments_path', 'invalid' => empty($context['valid_basedirectory']), 'text_label' => (!empty($context['valid_basedirectory']) ? $txt['basedirectory_for_attachments_current'] : $txt['basedirectory_for_attachments_warning']))),
-				empty($modSettings['attachment_basedirectories']) && $modSettings['currentAttachmentUploadDir'] == 1 && count($modSettings['attachmentUploadDir']) == 1	? array('text', 'attachmentUploadDir', 'subtext' => $txt['attachmentUploadDir_multiple_configure'], 40, 'invalid' => !$context['valid_upload_dir']) : array('var_message', 'attach_current_directory', 'subtext' => $txt['attachmentUploadDir_multiple_configure'], 'message' => 'attachment_path', 'invalid' => empty($context['valid_upload_dir']), 'text_label' => (!empty($context['valid_upload_dir']) ? $txt['attach_current_dir'] : $txt['attach_current_dir_warning'])),
-				array('int', 'attachmentDirFileLimit', 'subtext' => $txt['zero_for_no_limit'], 6),
-				array('int', 'attachmentDirSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
-			'',
-				// Posting limits
-				array('warning', empty($testPM) ? 'attachment_postsize_warning' : ''),
-				array('int', 'attachmentPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
-				array('warning', empty($testUM) ? 'attachment_filesize_warning' : ''),
-				array('int', 'attachmentSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
-				array('int', 'attachmentNumPerPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6),
-				// Security Items
-			array('title', 'attachment_security_settings'),
-				// Extension checks etc.
-				array('check', 'attachmentCheckExtensions'),
-				array('text', 'attachmentExtensions', 40),
-			'',
-				// Image checks.
-				array('warning', empty($testImg) ? 'attachment_img_enc_warning' : ''),
-				array('check', 'attachment_image_reencode'),
-			'',
-				array('warning', 'attachment_image_paranoid_warning'),
-				array('check', 'attachment_image_paranoid'),
-				// Thumbnail settings.
-			array('title', 'attachment_thumbnail_settings'),
-				array('check', 'attachmentShowImages'),
-				array('check', 'attachmentThumbnails'),
-				array('check', 'attachment_thumb_png'),
-				array('check', 'attachment_thumb_memory', 'subtext' => $txt['attachment_thumb_memory_note1'], 'postinput' => $txt['attachment_thumb_memory_note2']),
-				array('warning', 'attachment_thumb_memory_note'),
-				array('text', 'attachmentThumbWidth', 6),
-				array('text', 'attachmentThumbHeight', 6),
-			'',
-				array('int', 'max_image_width', 'subtext' => $txt['zero_for_no_limit']),
-				array('int', 'max_image_height', 'subtext' => $txt['zero_for_no_limit']),
-		);
+		$config_vars = $this->_settings();
 
 		return $this->_attachSettingsForm->settings($config_vars);
 	}
 
 	/**
-	 * Retrieve and return the administration settings
-	 *  for attachments.
-	 *  @deprecated
+	 * Retrieve and return the administration settings for attachments.
 	 */
-	public function settings()
+	private function _settings()
 	{
 		global $modSettings, $txt, $scripturl;
 
@@ -370,12 +274,12 @@ class ManageAttachments_Controller extends Action_Controller
 				array('int', 'attachmentDirSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
 			'',
 				// Posting limits
-				array('int', 'attachmentPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
 				array('warning', empty($testPM) ? 'attachment_postsize_warning' : ''),
-				array('int', 'attachmentSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
+				array('int', 'attachmentPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
 				array('warning', empty($testUM) ? 'attachment_filesize_warning' : ''),
+				array('int', 'attachmentSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
 				array('int', 'attachmentNumPerPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6),
-				// Security Items
+			// Security Items
 			array('title', 'attachment_security_settings'),
 				// Extension checks etc.
 				array('check', 'attachmentCheckExtensions'),
@@ -387,7 +291,7 @@ class ManageAttachments_Controller extends Action_Controller
 			'',
 				array('warning', 'attachment_image_paranoid_warning'),
 				array('check', 'attachment_image_paranoid'),
-				// Thumbnail settings.
+			// Thumbnail settings.
 			array('title', 'attachment_thumbnail_settings'),
 				array('check', 'attachmentShowImages'),
 				array('check', 'attachmentThumbnails'),
@@ -402,6 +306,14 @@ class ManageAttachments_Controller extends Action_Controller
 		);
 
 		return $config_vars;
+	}
+
+	/**
+	 * Public method to return the config settings, used for admin search
+	 */
+	public function settings_search()
+	{
+		return $this->_settings();
 	}
 
 	/**
@@ -1570,7 +1482,7 @@ class ManageAttachments_Controller extends Action_Controller
 		global $modSettings, $txt;
 
 		$db = database();
-	
+
 		checkSession();
 
 		require_once(SUBSDIR . '/Attachments.subs.php');

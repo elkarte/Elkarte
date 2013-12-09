@@ -102,77 +102,19 @@ class ManageAvatars_Controller extends Action_Controller
 	 */
 	private function _initAvatarSettingsForm()
 	{
-		global $txt, $context, $modSettings;
-
 		// Instantiate the form
 		$this->_avatarSettings = new Settings_Form();
 
-		// Check for GD and ImageMagick. It will set up a warning for the admin otherwise.
-		$testImg = get_extension_funcs('gd') || class_exists('Imagick');
-
-		$context['valid_avatar_dir'] = is_dir($modSettings['avatar_directory']);
-		$context['valid_custom_avatar_dir'] = empty($modSettings['custom_avatar_enabled']) || (!empty($modSettings['custom_avatar_dir']) && is_dir($modSettings['custom_avatar_dir']) && is_writable($modSettings['custom_avatar_dir']));
-
-		$config_vars = array(
-			array('title', 'avatar_settings'),
-				array('check', 'avatar_default'),
-			// Server stored avatars!
-			array('title', 'avatar_server_stored'),
-				array('warning', empty($testImg) ? 'avatar_img_enc_warning' : ''),
-				array('permissions', 'profile_server_avatar', 0, $txt['avatar_server_stored_groups']),
-				array('text', 'avatar_directory', 40, 'invalid' => !$context['valid_avatar_dir']),
-				array('text', 'avatar_url', 40),
-			// External avatars?
-			array('title', 'avatar_external'),
-				array('permissions', 'profile_remote_avatar', 0, $txt['avatar_external_url_groups']),
-				array('check', 'avatar_download_external', 0, 'onchange' => 'fUpdateStatus();'),
-				array('text', 'avatar_max_width_external', 'subtext' => $txt['zero_for_no_limit'], 6),
-				array('text', 'avatar_max_height_external', 'subtext' => $txt['zero_for_no_limit'], 6),
-				array('select', 'avatar_action_too_large',
-					array(
-						'option_refuse' => $txt['option_refuse'],
-						'option_html_resize' => $txt['option_html_resize'],
-						'option_js_resize' => $txt['option_js_resize'],
-						'option_download_and_resize' => $txt['option_download_and_resize'],
-					),
-				),
-			array('title','gravatar'),
-				array('permissions', 'profile_gvatar', 0, $txt['gravatar_groups']),
-				array('select', 'gravatar_rating',
-					array(
-						'g' => 'g',
-						'pg' => 'pg',
-						'r' => 'r',
-						'x' => 'x',
-					),
-				),
-			// Uploadable avatars?
-			array('title', 'avatar_upload'),
-				array('permissions', 'profile_upload_avatar', 0, $txt['avatar_upload_groups']),
-				array('text', 'avatar_max_width_upload', 'subtext' => $txt['zero_for_no_limit'], 6),
-				array('text', 'avatar_max_height_upload', 'subtext' => $txt['zero_for_no_limit'], 6),
-				array('check', 'avatar_resize_upload', 'subtext' => $txt['avatar_resize_upload_note']),
-				array('check', 'avatar_reencode'),
-			'',
-				array('warning', 'avatar_paranoid_warning'),
-				array('check', 'avatar_paranoid'),
-			'',
-				array('check', 'avatar_download_png'),
-				array('select', 'custom_avatar_enabled', array($txt['option_attachment_dir'], $txt['option_specified_dir']), 'onchange' => 'fUpdateStatus();'),
-				array('text', 'custom_avatar_dir', 40, 'subtext' => $txt['custom_avatar_dir_desc'], 'invalid' => !$context['valid_custom_avatar_dir']),
-				array('text', 'custom_avatar_url', 40),
-		);
+		// Initialize settings
+		$config_vars = $this->_settings();
 
 		return $this->_avatarSettings->settings($config_vars);
 	}
 
 	/**
-	 * This method retrieves and returns avatar settings.
-	 * It also returns avatar-related permissions profile_server_avatar,
-	 * profile_upload_avatar, profile_remote_avatar, profile_gvatar.
-	 * @deprecated
+	 * This method retrieves and returns the settings.
 	 */
-	public function settings()
+	private function _settings()
 	{
 		global $txt, $context, $modSettings;
 
@@ -231,6 +173,15 @@ class ManageAvatars_Controller extends Action_Controller
 				array('text', 'custom_avatar_dir', 40, 'subtext' => $txt['custom_avatar_dir_desc'], 'invalid' => !$context['valid_custom_avatar_dir']),
 				array('text', 'custom_avatar_url', 40),
 		);
+
 		return $config_vars;
+	}
+
+	/**
+	 * Public method to return avatar settings for search
+	 */
+	public function settings_search()
+	{
+		return $this->_settings();
 	}
 }

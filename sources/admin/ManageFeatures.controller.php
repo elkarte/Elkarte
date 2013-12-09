@@ -210,78 +210,16 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	private function _initBasicSettingsForm()
 	{
-		global $txt, $modSettings;
-
-		// We need to know if personal text is enabled, and if it's in the registration fields option.
-		// If admins have set it up as an on-registration thing, they can't set a default value (because it'll never be used)
-		$disabled_fields = isset($modSettings['disabled_profile_fields']) ? explode(',', $modSettings['disabled_profile_fields']) : array();
-		$reg_fields = isset($modSettings['registration_fields']) ? explode(',', $modSettings['registration_fields']) : array();
-		$can_personal_text = !in_array('personal_text', $disabled_fields) && !in_array('personal_text', $reg_fields);
-
 		// We need some settings! ..ok, some work with our settings :P
 		require_once(SUBSDIR . '/Settings.class.php');
 
-		// instantiate the form
+		// Instantiate the form
 		$this->_basicSettings = new Settings_Form();
 
-		$config_vars = array(
-				// Big Options... polls, sticky, bbc....
-				array('select', 'pollMode', array($txt['disable_polls'], $txt['enable_polls'], $txt['polls_as_topics'])),
-			'',
-				// Basic stuff, titles, flash, permissions...
-				array('check', 'allow_guestAccess'),
-				array('check', 'enable_buddylist'),
-				array('check', 'enable_unwatch'),
-				array('check', 'allow_editDisplayName'),
-				array('check', 'allow_hideOnline'),
-				array('check', 'titlesEnable'),
-				array('text', 'default_personal_text', 'subtext' => $txt['default_personal_text_note'], 'disabled' => !$can_personal_text),
-			'',
-				// Javascript and CSS options
-				array('select', 'jquery_source', array('auto' => $txt['jquery_auto'], 'local' => $txt['jquery_local'], 'cdn' => $txt['jquery_cdn'])),
-				array('check', 'minify_css_js'),
-			'',
-				// SEO stuff
-				array('check', 'queryless_urls', 'subtext' => '<strong>' . $txt['queryless_urls_note'] . '</strong>'),
-				array('text', 'meta_keywords', 'subtext' => $txt['meta_keywords_note'], 'size' => 50),
-			'',
-				// Number formatting, timezones.
-				array('text', 'time_format'),
-				array('float', 'time_offset', 'subtext' => $txt['setting_time_offset_note'], 6, 'postinput' => $txt['hours']),
-				'default_timezone' => array('select', 'default_timezone', array()),
-			'',
-				// Who's online?
-				array('check', 'who_enabled'),
-				array('int', 'lastActive', 6, 'postinput' => $txt['minutes']),
-			'',
-				// Statistics.
-				array('check', 'trackStats'),
-				array('check', 'hitStats'),
-			'',
-				// Option-ish things... miscellaneous sorta.
-				array('check', 'allow_disableAnnounce'),
-				array('check', 'disallow_sendBody'),
-				array('select', 'enable_contactform', array('disabled' => $txt['contact_form_disabled'], 'registration' => $txt['contact_form_registration'], 'menu' => $txt['contact_form_menu'])),
-		);
-
-		// Get all the time zones.
-		if (function_exists('timezone_identifiers_list') && function_exists('date_default_timezone_set'))
-		{
-			$all_zones = timezone_identifiers_list();
-			// Make sure we set the value to the same as the printed value.
-			foreach ($all_zones as $zone)
-				$config_vars['default_timezone'][2][$zone] = $zone;
-		}
-		else
-		{
-			// we don't know this, huh?
-			unset($config_vars['default_timezone']);
-		}
-
-		call_integration_hook('integrate_modify_basic_settings', array(&$config_vars));
+		// Initialize it with our settings
+		$config_vars = $this->_basicSettings();
 
 		return $this->_basicSettings->settings($config_vars);
-
 	}
 
 	/**
@@ -292,10 +230,10 @@ class ManageFeatures_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context;
 
-		// initialize the form
+		// Initialize the form
 		$this->_initLayoutSettingsForm();
 
-		// retrieve the current config settings
+		// Retrieve the current config settings
 		$config_vars = $this->_layoutSettings->settings();
 
 		// Saving?
@@ -322,36 +260,14 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	private function _initLayoutSettingsForm()
 	{
-		global $txt;
-
 		// We're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
 
-		// instantiate the form
+		// Instantiate the form
 		$this->_layoutSettings = new Settings_Form();
 
-		$config_vars = array(
-				// Pagination stuff.
-				array('check', 'compactTopicPagesEnable'),
-				array('int', 'compactTopicPagesContiguous', null, $txt['contiguous_page_display'] . '<div class="smalltext">' . str_replace(' ', '&nbsp;', '"3" ' . $txt['to_display'] . ': <strong>1 ... 4 [5] 6 ... 9</strong>') . '<br />' . str_replace(' ', '&nbsp;', '"5" ' . $txt['to_display'] . ': <strong>1 ... 3 4 [5] 6 7 ... 9</strong>') . '</div>'),
-				array('int', 'defaultMaxMembers'),
-				array('check', 'displayMemberNames'),
-			'',
-				// Stuff that just is everywhere - today, search, online, etc.
-				array('select', 'todayMod', array($txt['today_disabled'], $txt['today_only'], $txt['yesterday_today'], $txt['relative_time'])),
-				array('check', 'topbottomEnable'),
-				array('check', 'onlineEnable'),
-				array('check', 'enableVBStyleLogin'),
-			'',
-				// Automagic image resizing.
-				array('int', 'max_image_width', 'subtext' => $txt['zero_for_no_limit']),
-				array('int', 'max_image_height', 'subtext' => $txt['zero_for_no_limit']),
-			'',
-				// This is like debugging sorta.
-				array('check', 'timeLoadPageEnable'),
-		);
-
-		call_integration_hook('integrate_layout_settings', array(&$config_vars));
+		// Initialize it with our settings
+		$config_vars = $this->_layoutSettings();
 
 		return $this->_layoutSettings->settings($config_vars);
 	}
@@ -393,30 +309,14 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	private function _initKarmaSettingsForm()
 	{
-		global $txt;
-
 		// We're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
 
-		// instantiate the form
+		// Instantiate the form
 		$this->_karmaSettings = new Settings_Form();
 
-		$config_vars = array(
-				// Karma - On or off?
-				array('select', 'karmaMode', explode('|', $txt['karma_options'])),
-			'',
-				// Who can do it.... and who is restricted by time limits?
-				array('int', 'karmaMinPosts', 6, 'postinput' => strtolower($txt['posts'])),
-				array('float', 'karmaWaitTime', 6, 'postinput' => $txt['hours']),
-				array('check', 'karmaTimeRestrictAdmins'),
-			'',
-				// What does it look like?  [smite]?
-				array('text', 'karmaLabel'),
-				array('text', 'karmaApplaudLabel'),
-				array('text', 'karmaSmiteLabel'),
-		);
-
-		call_integration_hook('integrate_karma_settings', array(&$config_vars));
+		// Initialize it with our settings
+		$config_vars = $this->_karmaSettings();
 
 		return $this->_karmaSettings->settings($config_vars);
 	}
@@ -424,7 +324,6 @@ class ManageFeatures_Controller extends Action_Controller
 	/**
 	 * Display configuration settings page for likes settings.
 	 * Accessed  from ?action=admin;area=featuresettings;sa=likes;
-	 *
 	 */
 	public function action_likesSettings_display()
 	{
@@ -458,29 +357,14 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	private function _initLikesSettingsForm()
 	{
-		global $txt;
-
 		// We're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
 
-		// instantiate the form
+		// Instantiate the form
 		$this->_likesSettings = new Settings_Form();
 
-		$config_vars = array(
-				// Likes - On or off?
-				array('check', 'likes_enabled'),
-			'',
-				// Who can do it.... and who is restricted by count limits?
-				array('int', 'likeMinPosts', 6, 'postinput' => strtolower($txt['posts'])),
-				array('int', 'likeWaitTime', 6, 'postinput' => $txt['minutes']),
-				array('int', 'likeWaitCount', 6),
-				array('check', 'likeRestrictAdmins'),
-				array('check', 'likeAllowSelf'),
-			'',
-				array('int', 'likeDisplayLimit', 6)
-		);
-
-		call_integration_hook('integrate_likes_settings', array(&$config_vars));
+		// Initialize it with our settings
+		$config_vars = $this->_likesSettings();
 
 		return $this->_likesSettings->settings($config_vars);
 	}
@@ -492,8 +376,10 @@ class ManageFeatures_Controller extends Action_Controller
 	{
 		global $context, $scripturl;
 
-		// initialize the form
+		// Initialize the form
 		$this->_initMentionSettingsForm();
+
+		// Initialize it with our settings
 		$config_vars = $this->_mentionSettings->settings();
 
 		// Saving the settings?
@@ -521,18 +407,11 @@ class ManageFeatures_Controller extends Action_Controller
 
 		loadLanguage('Mentions');
 
-		// instantiate the form
+		// Instantiate the form
 		$this->_mentionSettings = new Settings_Form();
 
-		// The mentions settings
-		$config_vars = array(
-			array('title', 'mentions_settings'),
-			array('check', 'mentions_enabled'),
-			array('check', 'mentions_buddy'),
-			array('check', 'mentions_dont_notify_rlike'),
-		);
-
-		call_integration_hook('integrate_mention_settings', array(&$config_vars));
+		// Initialize it with our settings
+		$config_vars = $this->_mentionSettings();
 
 		// Some context stuff
 		$context['page_title'] = $txt['mentions_settings'];
@@ -543,7 +422,6 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * Display configuration settings for signatures on forum.
-	 *
 	 */
 	public function action_signatureSettings_display()
 	{
@@ -581,7 +459,6 @@ class ManageFeatures_Controller extends Action_Controller
 			// This is horrid - but I suppose some people will want the option to do it.
 			$applied_sigs = isset($_GET['step']) ? (int) $_GET['step'] : 0;
 			$done = false;
-
 			$context['max_member'] = maxMemberID();
 
 			while (!$done)
@@ -600,6 +477,7 @@ class ManageFeatures_Controller extends Action_Controller
 					// Max characters...
 					if (!empty($sig_limits[1]))
 						$sig = Util::substr($sig, 0, $sig_limits[1]);
+
 					// Max lines...
 					if (!empty($sig_limits[2]))
 					{
@@ -621,6 +499,7 @@ class ManageFeatures_Controller extends Action_Controller
 						foreach ($matches[1] as $ind => $size)
 						{
 							$limit_broke = 0;
+
 							// Attempt to allow all sizes of abuse, so to speak.
 							if ($matches[2][$ind] == 'px' && $size > $sig_limits[7])
 								$limit_broke = $sig_limits[7] . 'px';
@@ -641,10 +520,13 @@ class ManageFeatures_Controller extends Action_Controller
 					{
 						$replaces = array();
 						$img_count = 0;
+
 						// Get all BBC tags...
 						preg_match_all('~\[img(\s+width=([\d]+))?(\s+height=([\d]+))?(\s+width=([\d]+))?\s*\](?:<br />)*([^<">]+?)(?:<br />)*\[/img\]~i', $sig, $matches);
+
 						// ... and all HTML ones.
 						preg_match_all('~&lt;img\s+src=(?:&quot;)?((?:http://|ftp://|https://|ftps://).+?)(?:&quot;)?(?:\s+alt=(?:&quot;)?(.*?)(?:&quot;)?)?(?:\s?/)?&gt;~i', $sig, $matches2, PREG_PATTERN_ORDER);
+
 						// And stick the HTML in the BBC.
 						if (!empty($matches2))
 						{
@@ -660,6 +542,7 @@ class ManageFeatures_Controller extends Action_Controller
 								$matches[7][] = $matches2[1][$ind];
 							}
 						}
+
 						// Try to find all the images!
 						if (!empty($matches))
 						{
@@ -668,6 +551,7 @@ class ManageFeatures_Controller extends Action_Controller
 							{
 								$width = -1; $height = -1;
 								$img_count++;
+
 								// Too many images?
 								if (!empty($sig_limits[3]) && $img_count > $sig_limits[3])
 								{
@@ -684,6 +568,7 @@ class ManageFeatures_Controller extends Action_Controller
 											{
 												// Only replace the excess.
 												$sig = substr($sig, 0, $img_offset) . str_replace($image, '', substr($sig, $img_offset));
+
 												// Stop looping.
 												$img_offset = false;
 											}
@@ -698,6 +583,7 @@ class ManageFeatures_Controller extends Action_Controller
 								// Does it have predefined restraints? Width first.
 								if ($matches[6][$key])
 									$matches[2][$key] = $matches[6][$key];
+
 								if ($matches[2][$key] && $sig_limits[5] && $matches[2][$key] > $sig_limits[5])
 								{
 									$width = $sig_limits[5];
@@ -705,6 +591,7 @@ class ManageFeatures_Controller extends Action_Controller
 								}
 								elseif ($matches[2][$key])
 									$width = $matches[2][$key];
+
 								// ... and height.
 								if ($matches[4][$key] && $sig_limits[6] && $matches[4][$key] > $sig_limits[6])
 								{
@@ -730,6 +617,7 @@ class ManageFeatures_Controller extends Action_Controller
 											$width = $sig_limits[5];
 											$sizes[1] = $sizes[1] * ($width / $sizes[0]);
 										}
+
 										// Too high?
 										if ($sizes[1] > $sig_limits[6] && $sig_limits[6])
 										{
@@ -745,17 +633,17 @@ class ManageFeatures_Controller extends Action_Controller
 
 								// Did we come up with some changes? If so remake the string.
 								if ($width != -1 || $height != -1)
-								{
 									$replaces[$image] = '[img' . ($width != -1 ? ' width=' . round($width) : '') . ($height != -1 ? ' height=' . round($height) : '') . ']' . $matches[7][$key] . '[/img]';
-								}
 
 								// Record that we got one.
 								$image_count_holder[$image] = isset($image_count_holder[$image]) ? $image_count_holder[$image] + 1 : 1;
 							}
+
 							if (!empty($replaces))
 								$sig = str_replace(array_keys($replaces), array_values($replaces), $sig);
 						}
 					}
+
 					// Try to fix disabled tags.
 					if (!empty($disabledTags))
 					{
@@ -780,6 +668,7 @@ class ManageFeatures_Controller extends Action_Controller
 				if (!$done)
 					pauseSignatureApplySettings($applied_sigs);
 			}
+
 			$settings_applied = true;
 		}
 
@@ -845,7 +734,6 @@ class ManageFeatures_Controller extends Action_Controller
 
 		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=sig';
 		$context['settings_title'] = $txt['signature_settings'];
-
 		$context['settings_message'] = !empty($settings_applied) ? $txt['signature_settings_applied'] : sprintf($txt['signature_settings_warning'], $context['session_id'], $context['session_var']);
 
 		Settings_Form::prepare_db($config_vars);
@@ -856,34 +744,14 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	private function _initSignatureSettingsForm()
 	{
-		global $txt;
-
-		// we're working with them settings.
+		// We're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
 
-		// instantiate the form
+		// Instantiate the form
 		$this->_signatureSettings = new Settings_Form();
 
-		$config_vars = array(
-				// Are signatures even enabled?
-				array('check', 'signature_enable'),
-			'',
-				// Tweaking settings!
-				array('int', 'signature_max_length', 'subtext' => $txt['zero_for_no_limit']),
-				array('int', 'signature_max_lines', 'subtext' => $txt['zero_for_no_limit']),
-				array('int', 'signature_max_font_size', 'subtext' => $txt['zero_for_no_limit']),
-				array('check', 'signature_allow_smileys', 'onclick' => 'document.getElementById(\'signature_max_smileys\').disabled = !this.checked;'),
-				array('int', 'signature_max_smileys', 'subtext' => $txt['zero_for_no_limit']),
-			'',
-				// Image settings.
-				array('int', 'signature_max_images', 'subtext' => $txt['signature_max_images_note']),
-				array('int', 'signature_max_image_width', 'subtext' => $txt['zero_for_no_limit']),
-				array('int', 'signature_max_image_height', 'subtext' => $txt['zero_for_no_limit']),
-			'',
-				array('bbc', 'signature_bbc'),
-		);
-
-		call_integration_hook('integrate_signature_settings', array(&$config_vars));
+		// Initialize it with our settings
+		$config_vars = $this->_signatureSettings();
 
 		return $this->_signatureSettings->settings($config_vars);
 	}
@@ -1430,10 +1298,10 @@ class ManageFeatures_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context;
 
-		// initialize the form
+		// Initialize the form
 		$this->_initPMSettingsForm();
 
-		// retrieve the current config settings
+		// Retrieve the current config settings
 		$config_vars = $this->_PMSettings->settings();
 
 		require_once(SUBSDIR . '/PersonalMessage.subs.php');
@@ -1461,6 +1329,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=pmsettings';
 		$context['settings_title'] = $txt['personal_messages'];
+
 		// We need this for the in-line permissions
 		createToken('admin-mp');
 
@@ -1472,43 +1341,34 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	private function _initPMSettingsForm()
 	{
-		global $txt, $context;
+		global $context;
 
 		// We're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
 
 		$context['permissions_excluded'] = array(-1);
 
-		// instantiate the form
+		// Instantiate the form
 		$this->_PMSettings = new Settings_Form();
 
-		$config_vars = array(
-			// Reporting of personal messages?
-			array('check', 'enableReportPM'),
-			// Inline permissions.
-			array('permissions', 'pm_send'),
-			// PM Settings
-			array('title', 'antispam_PM'),
-				'pm1' => array('int', 'max_pm_recipients', 'postinput' => $txt['max_pm_recipients_note']),
-				'pm2' => array('int', 'pm_posts_verification', 'postinput' => $txt['pm_posts_verification_note']),
-				'pm3' => array('int', 'pm_posts_per_hour', 'postinput' => $txt['pm_posts_per_hour_note']),
-			array('title', 'membergroups_max_messages'),
-				array('desc', 'membergroups_max_messages_desc'),
-				array('callback', 'pm_limits'),
-		);
-
-		call_integration_hook('integrate_pmsettings_settings', array(&$config_vars));
+		// Initialize it with our settings
+		$config_vars = $this->_pmSettings();
 
 		return $this->_PMSettings->settings($config_vars);
 	}
 
 	/**
 	 * Return basic feature settings.
-	 * Used in admin center search.
 	 */
-	public function basicSettings()
+	private function _basicSettings()
 	{
-		global $txt;
+		global $txt, $modSettings;
+
+		// We need to know if personal text is enabled, and if it's in the registration fields option.
+		// If admins have set it up as an on-registration thing, they can't set a default value (because it'll never be used)
+		$disabled_fields = isset($modSettings['disabled_profile_fields']) ? explode(',', $modSettings['disabled_profile_fields']) : array();
+		$reg_fields = isset($modSettings['registration_fields']) ? explode(',', $modSettings['registration_fields']) : array();
+		$can_personal_text = !in_array('personal_text', $disabled_fields) && !in_array('personal_text', $reg_fields);
 
 		$config_vars = array(
 				// Big Options... polls, sticky, bbc....
@@ -1521,7 +1381,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('check', 'allow_editDisplayName'),
 				array('check', 'allow_hideOnline'),
 				array('check', 'titlesEnable'),
-				array('text', 'default_personal_text', 'subtext' => $txt['default_personal_text_note']),
+				array('text', 'default_personal_text', 'subtext' => $txt['default_personal_text_note'], 'disabled' => !$can_personal_text),
 			'',
 				// Javascript and CSS options
 				array('select', 'jquery_source', array('auto' => $txt['jquery_auto'], 'local' => $txt['jquery_local'], 'cdn' => $txt['jquery_cdn'])),
@@ -1570,10 +1430,17 @@ class ManageFeatures_Controller extends Action_Controller
 	}
 
 	/**
-	 * Return layout settings.
-	 * Used in admin center search.
+	 * Public method to return the basic settings, used for admin search
 	 */
-	public function layoutSettings()
+	public function basicSettings_search()
+	{
+		return $this->_basicSettings();
+	}
+
+	/**
+	 * Return layout settings.
+	 */
+	private function _layoutSettings()
 	{
 		global $txt;
 
@@ -1582,6 +1449,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('check', 'compactTopicPagesEnable'),
 				array('int', 'compactTopicPagesContiguous', null, $txt['contiguous_page_display'] . '<div class="smalltext">' . str_replace(' ', '&nbsp;', '"3" ' . $txt['to_display'] . ': <strong>1 ... 4 [5] 6 ... 9</strong>') . '<br />' . str_replace(' ', '&nbsp;', '"5" ' . $txt['to_display'] . ': <strong>1 ... 3 4 [5] 6 7 ... 9</strong>') . '</div>'),
 				array('int', 'defaultMaxMembers'),
+				array('check', 'displayMemberNames'),
 			'',
 				// Stuff that just is everywhere - today, search, online, etc.
 				array('select', 'todayMod', array($txt['today_disabled'], $txt['today_only'], $txt['yesterday_today'], $txt['relative_time'])),
@@ -1603,10 +1471,17 @@ class ManageFeatures_Controller extends Action_Controller
 	}
 
 	/**
-	 * Return karma settings.
-	 * Used in admin center search.
+	 * Public method to return the layout settings, used for admin search
 	 */
-	public function karmaSettings()
+	public function layoutSettings_search()
+	{
+		return $this->_layoutSettings();
+	}
+
+	/**
+	 * Return karma settings.
+	 */
+	private function _karmaSettings()
 	{
 		global $txt;
 
@@ -1631,10 +1506,17 @@ class ManageFeatures_Controller extends Action_Controller
 	}
 
 	/**
-	 * Return likes settings.
-	 * Used in admin center search.
+	 * Public method to return the karma settings, used for admin search
 	 */
-	public function likesSettings()
+	public function karmaSettings_search()
+	{
+		return $this->_karmaSettings();
+	}
+
+	/**
+	 * Return likes settings.
+	 */
+	private function _likesSettings()
 	{
 		global $txt;
 
@@ -1658,26 +1540,44 @@ class ManageFeatures_Controller extends Action_Controller
 	}
 
 	/**
-	 * Return mentions settings.
-	 * Used in admin center search.
+	 * Public method to return the likes settings, used for admin search
 	 */
-	public function mentionSettings()
+	public function likesSettings_search()
 	{
+		return $this->_likesSettings();
+	}
+
+	/**
+	 * Return mentions settings.
+	 */
+	private function _mentionSettings()
+	{
+		// The mentions settings
 		$config_vars = array(
 			array('title', 'mentions_settings'),
-			array('check', 'mentions_enabled'),
-			array('check', 'mentions_buddy'),
-			array('check', 'mentions_dont_notify_rlike'),
+				array('check', 'mentions_enabled'),
+				array('check', 'mentions_buddy'),
+				array('check', 'mentions_dont_notify_rlike'),
 		);
+
+		call_integration_hook('integrate_mention_settings', array(&$config_vars));
 
 		return $config_vars;
 	}
 
 	/**
-	 * Return signature settings.
-	 * Used in admin center search.
+	 * Public method to return the mention settings, used for admin search
 	 */
-	public function signatureSettings()
+	public function mentionSettings_search()
+	{
+		return $this->_mentionSettings();
+	}
+
+	/**
+	 * Return signature settings.
+	 * Used in admin center search and settings form
+	 */
+	private function _signatureSettings()
 	{
 		global $txt;
 
@@ -1701,6 +1601,42 @@ class ManageFeatures_Controller extends Action_Controller
 		);
 
 		call_integration_hook('integrate_signature_settings', array(&$config_vars));
+
+		return $config_vars;
+	}
+
+	/**
+	 * Public method to return the signature settings, used for admin search
+	 */
+	public function signatureSettings_search()
+	{
+		return $this->_signatureSettings();
+	}
+
+	/**
+	 * Return pm settings.
+	 * Used in admin center search and settings form
+	 */
+	private function _pmSettings()
+	{
+		global $txt;
+
+		$config_vars = array(
+			// Reporting of personal messages?
+			array('check', 'enableReportPM'),
+			// Inline permissions.
+			array('permissions', 'pm_send'),
+			// PM Settings
+			array('title', 'antispam_PM'),
+				'pm1' => array('int', 'max_pm_recipients', 'postinput' => $txt['max_pm_recipients_note']),
+				'pm2' => array('int', 'pm_posts_verification', 'postinput' => $txt['pm_posts_verification_note']),
+				'pm3' => array('int', 'pm_posts_per_hour', 'postinput' => $txt['pm_posts_per_hour_note']),
+			array('title', 'membergroups_max_messages'),
+				array('desc', 'membergroups_max_messages_desc'),
+				array('callback', 'pm_limits'),
+		);
+
+		call_integration_hook('integrate_pmsettings_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

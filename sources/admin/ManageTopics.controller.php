@@ -102,13 +102,24 @@ class ManageTopics_Controller extends Action_Controller
 	 */
 	private function _initTopicSettingsForm()
 	{
-		global $txt;
-
-		// we're working with them settings.
+		// We're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
 
-		// instantiate the form
+		// Instantiate the form
 		$this->_topicSettings = new Settings_Form();
+
+		// Initialize it with our settings
+		$config_vars = $this->_settings();
+
+		return $this->_topicSettings->settings($config_vars);
+	}
+
+	/**
+	 * Return configuration settings for topics.
+	 */
+	private function _settings()
+	{
+		global $txt;
 
 		// initialize it with our settings
 		$config_vars = array(
@@ -132,43 +143,16 @@ class ManageTopics_Controller extends Action_Controller
 				array('int', 'enableAllMessages', 'postinput' => $txt['manageposts_posts'], 'subtext' => $txt['enableAllMessages_zero']),
 				array('check', 'disableCustomPerPage'),
 				array('check', 'enablePreviousNext'),
-
-		);
-
-		return $this->_topicSettings->settings($config_vars);
-	}
-
-	/**
-	 * Return configuration settings for topics.
-	 */
-	public function settings()
-	{
-		global $txt;
-
-		// Here are all the topic settings.
-		$config_vars = array(
-				// Some simple bools...
-				array('check', 'enableStickyTopics'),
-				array('check', 'enableParticipation'),
-				array('check', 'enableFollowup'),
-			'',
-				// Pagination etc...
-				array('int', 'oldTopicDays', 'postinput' => $txt['manageposts_days'], 'subtext' => $txt['oldTopicDays_zero']),
-				array('int', 'defaultMaxTopics', 'postinput' => $txt['manageposts_topics']),
-				array('int', 'defaultMaxMessages', 'postinput' => $txt['manageposts_posts']),
-				array('check', 'disable_print_topic'),
-			'',
-				// Hot topics (etc)...
-				array('int', 'hotTopicPosts', 'postinput' => $txt['manageposts_posts']),
-				array('int', 'hotTopicVeryPosts', 'postinput' => $txt['manageposts_posts']),
-			'',
-				// All, next/prev...
-				array('int', 'enableAllMessages', 'postinput' => $txt['manageposts_posts'], 'subtext' => $txt['enableAllMessages_zero']),
-				array('check', 'disableCustomPerPage'),
-				array('check', 'enablePreviousNext'),
-
 		);
 
 		return $config_vars;
+	}
+
+	/**
+	 * Return the topic settings for use in admin search
+	 */
+	public function settings_search()
+	{
+		return $this->_settings();
 	}
 }

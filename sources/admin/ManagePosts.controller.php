@@ -257,15 +257,25 @@ class ManagePosts_Controller extends Action_Controller
 
 	/**
 	 * Initialize postSettings form with admin configuration settings for posts.
-	 *
-	 * @return array
 	 */
 	private function _initPostSettingsForm()
 	{
-		global $txt;
 
-		// instantiate the form
+		// Instantiate the form
 		$this->_postSettings = new Settings_Form();
+
+		// Initialize it with our settings
+		$config_vars = $this->_settings();
+
+		return $this->_postSettings->settings($config_vars);
+	}
+
+	/**
+	 * Return admin configuration settings for posts.
+	 */
+	private function _settings()
+	{
+		global $txt;
 
 		// initialize it with our settings
 		$config_vars = array(
@@ -290,40 +300,14 @@ class ManagePosts_Controller extends Action_Controller
 				array('int', 'preview_characters', 'subtext' => $txt['preview_characters_zero'], 'postinput' => $txt['preview_characters_units']),
 		);
 
-		return $this->_postSettings->settings($config_vars);
+		return $config_vars;
 	}
 
 	/**
-	 * Return admin configuration settings for posts.
-	 *
-	 * @return array
+	 * Return the post settings for use in admin search
 	 */
-	public function settings()
+	public function settings_search()
 	{
-		global $txt;
-
-		// All the settings...
-		$config_vars = array(
-				// Simple post options...
-				array('check', 'removeNestedQuotes'),
-				array('check', 'enableEmbeddedFlash', 'subtext' => $txt['enableEmbeddedFlash_warning']),
-				// Note show the warning as read if pspell not installed!
-				array('check', 'enableSpellChecking', 'subtext' => (function_exists('pspell_new') ? $txt['enableSpellChecking_warning'] : '<span class="error">' . $txt['enableSpellChecking_error'] . '</span>')),
-				array('check', 'disable_wysiwyg'),
-			'',
-				// Posting limits...
-				array('int', 'max_messageLength', 'subtext' => $txt['max_messageLength_zero'], 'postinput' => $txt['manageposts_characters']),
-				array('int', 'topicSummaryPosts', 'postinput' => $txt['manageposts_posts']),
-			'',
-				// Posting time limits...
-				array('int', 'spamWaitTime', 'postinput' => $txt['manageposts_seconds']),
-				array('int', 'edit_wait_time', 'postinput' => $txt['manageposts_seconds']),
-				array('int', 'edit_disable_time', 'subtext' => $txt['edit_disable_time_zero'], 'postinput' => $txt['manageposts_minutes']),
-			'',
-				// First & Last message preview lengths
-				array('int', 'preview_characters', 'subtext' => $txt['preview_characters_zero'], 'postinput' => $txt['preview_characters_units']),
-		);
-
-		return $config_vars;
+		return $this->_settings();
 	}
 }
