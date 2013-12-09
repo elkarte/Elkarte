@@ -911,7 +911,7 @@ div.bbc_footnotes .meaction{
 	color: #555;
 }
 /* Basic cells. */
-.table_grid td {
+.table_grid td, .letterspacing {
 	border-bottom: 1px solid #ccc;
 }
 .table_grid .alternate_row {

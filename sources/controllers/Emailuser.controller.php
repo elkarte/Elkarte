@@ -83,6 +83,7 @@ class Emailuser_Controller extends Action_Controller
 		{
 			$context['page_title'] = sprintf($txt['sendtopic_title'], $row['subject']);
 			$context['start'] = $_REQUEST['start'];
+			$context['sub_template'] = 'send_topic';
 
 			return;
 		}

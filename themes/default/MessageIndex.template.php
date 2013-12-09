@@ -44,7 +44,7 @@ function template_display_child_boards_above()
 /**
  * Header bar and extra details above topic listing.
  */
-function template_pages_and_buttons_above()
+function template_topic_listing_above()
 {
 	global $context, $settings, $txt, $options;
 
@@ -131,7 +131,7 @@ function template_pages_and_buttons_above()
 /**
  * The actual topic listing.
  */
-function template_main()
+function template_topic_listing()
 {
 	global $context, $settings, $options, $scripturl, $txt, $modSettings;
 
@@ -300,7 +300,7 @@ function template_main()
 /**
  * The lower icons and jump to.
  */
-function template_pages_and_buttons_below()
+function template_topic_listing_below()
 {
 	global $modSettings, $context, $txt, $options, $settings;
 

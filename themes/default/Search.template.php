@@ -17,7 +17,7 @@
 /**
  * Main search page. Allows the user to search the forum according to criteria.
  */
-function template_main()
+function template_searchform()
 {
 	global $context, $settings, $txt, $scripturl, $modSettings;
 

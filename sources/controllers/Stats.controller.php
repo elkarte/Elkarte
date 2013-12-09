@@ -102,42 +102,34 @@ class Stats_Controller extends Action_Controller
 			'name' => $txt['stats_center']
 		);
 		$context['page_title'] = $context['forum_name'] . ' - ' . $txt['stats_center'];
+		$context['sub_template'] = 'statistics';
 
-		$context['show_member_list'] = allowedTo('view_mlist');
+		// These are the templates that will be used to render the statistics
+		$context['statistics_callbacks'] = array(
+			'general_statistics',
+			'top_statistics',
+		);
+
+		$this->loadGeneralStatistics();
+		$this->loadTopStatistics();
+		$this->loadMontlyActivity();
+
+		// Custom stats (just add a template_layer or another callback to add it to the page!)
+		call_integration_hook('integrate_forum_stats');
+	}
+
+	/**
+	 * Load some general statistics of the forum
+	 */
+	public function loadGeneralStatistics()
+	{
+		global $txt, $scripturl, $modSettings, $context;
 
 		// Get averages...
 		$averages = getAverages();
 		// This would be the amount of time the forum has been up... in days...
 		$total_days_up = ceil((time() - strtotime($averages['date'])) / (60 * 60 * 24));
-
-		$context['average_posts'] = comma_format(round($averages['posts'] / $total_days_up, 2));
-		$context['average_topics'] = comma_format(round($averages['topics'] / $total_days_up, 2));
-		$context['average_members'] = comma_format(round($averages['registers'] / $total_days_up, 2));
-		$context['average_online'] = comma_format(round($averages['most_on'] / $total_days_up, 2));
-		$context['average_hits'] = comma_format(round($averages['hits'] / $total_days_up, 2));
-
-		$context['num_hits'] = comma_format($averages['hits'], 0);
-
-		// How many users are online now.
-		$context['users_online'] = onlineCount();
-
-		// Statistics such as number of boards, categories, etc.
-		$context['num_boards'] = numBoards();
-		$context['num_categories'] = numCategories();
-
-		// Format the numbers nicely.
-		$context['users_online'] = comma_format($context['users_online']);
-		$context['num_boards'] = comma_format($context['num_boards']);
-		$context['num_categories'] = comma_format($context['num_categories']);
-
-		$context['num_members'] = comma_format($modSettings['totalMembers']);
-		$context['num_posts'] = comma_format($modSettings['totalMessages']);
-		$context['num_topics'] = comma_format($modSettings['totalTopics']);
-		$context['most_members_online'] = array(
-			'number' => comma_format($modSettings['mostOnline']),
-			'date' => relativeTime($modSettings['mostDate'])
-		);
-		$context['latest_member'] = &$context['common_stats']['latest_member'];
+		$date = strftime('%Y-%m-%d', forum_time(false));
 
 		// Male vs. female ratio - let's calculate this only every four minutes.
 		if (($context['gender'] = cache_get_data('stats_gender', 240)) == null)
@@ -165,29 +157,75 @@ class Stats_Controller extends Action_Controller
 			cache_put_data('stats_gender', $context['gender'], 240);
 		}
 
-		$date = strftime('%Y-%m-%d', forum_time(false));
+		$context['general_statistics']['left'] = array(
+			'total_members' => allowedTo('view_mlist') ? '<a href="' . $scripturl . '?action=memberlist">' . comma_format($modSettings['totalMembers']) . '</a>' : comma_format($modSettings['totalMembers']),
+			'total_posts' => comma_format($modSettings['totalMessages']),
+			'total_topics' => comma_format($modSettings['totalTopics']),
+			'total_cats' => comma_format(numCategories()),
+			// How many users are online now.
+			'users_online' => comma_format(onlineCount()),
+			'most_online' => array(
+				'number' => comma_format($modSettings['mostOnline']),
+				'date' => relativeTime($modSettings['mostDate'])
+			),
+			// Members online so far today.
+			'users_online_today' => comma_format(mostOnline($date)),
+		);
 
-		// Members online so far today.
-		$context['online_today'] = mostOnline($date);
-		$context['online_today'] = comma_format((int) $context['online_today']);
+		if (!empty($modSettings['hitStats']))
+			$context['general_statistics']['left'] += array(
+				'num_hits' => comma_format($averages['hits'], 0)
+			);
+
+		$context['general_statistics']['right'] = array(
+			'average_members' => comma_format(round($averages['registers'] / $total_days_up, 2)),
+			'average_posts' => comma_format(round($averages['posts'] / $total_days_up, 2)),
+			'average_topics' => comma_format(round($averages['topics'] / $total_days_up, 2)),
+			// Statistics such as number of boards, categories, etc.
+			'total_boards' => comma_format(numBoards()),
+			'latest_member' => &$context['common_stats']['latest_member'],
+			'average_online' => comma_format(round($averages['most_on'] / $total_days_up, 2)),
+			'gender_ratio' => $context['gender']['ratio'],
+		);
+
+		if (!empty($modSettings['hitStats']))
+			$context['general_statistics']['right'] += array(
+				'average_hits' => comma_format(round($averages['hits'] / $total_days_up, 2)),
+			);
+	}
+
+	/**
+	 * Top posters, boards, replies, etc.
+	 */
+	public function loadTopStatistics()
+	{
+		global $context;
 
 		// Poster top 10.
-		$context['top_posters'] = topPosters();
+		$context['top']['posters'] = topPosters();
 
 		// Board top 10.
-		$context['top_boards'] = topBoards();
+		$context['top']['boards'] = topBoards();
 
 		// Topic replies top 10.
-		$context['top_topics_replies'] = topTopicReplies();
+		$context['top']['topics_replies'] = topTopicReplies();
 
 		// Topic views top 10.
-		$context['top_topics_views'] = topTopicViews();
+		$context['top']['topics_views'] = topTopicViews();
 
 		// Topic poster top 10.
-		$context['top_starters'] = topTopicStarter();
+		$context['top']['starters'] = topTopicStarter();
 
 		// Time online top 10.
-		$context['top_time_online'] = topTimeOnline();
+		$context['top']['time_online'] = topTimeOnline();
+	}
+
+	/**
+	 * Load the huge table of activity by month
+	 */
+	public function loadMontlyActivity()
+	{
+		global $context;
 
 		// Activity by month.
 		monthlyActivity();
@@ -227,8 +265,5 @@ class Stats_Controller extends Action_Controller
 			return;
 
 		getDailyStats(implode(' OR ', $condition_text), $condition_params);
-
-		// Custom stats (just add a template_layer to add it to the template!)
-		call_integration_hook('integrate_forum_stats');
 	}
 }

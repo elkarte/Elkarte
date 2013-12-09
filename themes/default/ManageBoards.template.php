@@ -17,7 +17,7 @@
 /**
  * Template for listing all the current categories and boards.
  */
-function template_main()
+function template_manage_boards()
 {
 	global $context, $settings, $scripturl, $txt, $modSettings;
 

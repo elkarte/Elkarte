@@ -17,7 +17,7 @@
 /**
  * Interface to allow notification enable/disable.
  */
-function template_main()
+function template_notification_settings()
 {
 	global $context, $settings, $txt, $scripturl;
 

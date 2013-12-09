@@ -1448,10 +1448,10 @@ function getAttachmentPath()
  */
 function attachmentPaths()
 {
-	global $modSettings, $boarddir;
+	global $modSettings;
 
 	if (empty($modSettings['attachmentUploadDir']))
-		return array($boarddir . '/attachments');
+		return array(BOARDDIR . '/attachments');
 	elseif (!empty($modSettings['currentAttachmentUploadDir']))
 	{
 		// we have more directories

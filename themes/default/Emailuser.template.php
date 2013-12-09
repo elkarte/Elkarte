@@ -31,7 +31,7 @@
  *  send: this just needs to be set, as by the submit button.
  *  sc: the session id, or $context['session_id'].
  */
-function template_main()
+function template_send_topic()
 {
 	global $context, $settings, $txt, $scripturl;
 

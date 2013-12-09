@@ -1446,7 +1446,8 @@ div.windowbg, div.windowbg2 {
 	width: 20%;
 }
 /* Basic cells. */
-.table_grid td {
+.table_grid td, .letterspacing{
+	padding: 5px 8px;
 	border-bottom: 1px solid #ccc;
 }
 /* Subtle zebra striping for rows. */

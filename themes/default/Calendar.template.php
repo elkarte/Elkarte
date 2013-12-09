@@ -22,7 +22,7 @@ function template_Calendar_init()
 /**
  * The main calendar - January, for example.
  */
-function template_main()
+function template_show_calendar()
 {
 	global $context, $txt, $scripturl, $modSettings;
 

@@ -205,6 +205,7 @@ class Topic_Controller extends Action_Controller
 		$template_layers = Template_Layers::getInstance();
 		$template_layers->removeAll();
 		$template_layers->add('print');
+		$context['sub_template'] = 'print_page';
 		$context['board_name'] = $board_info['name'];
 		$context['category_name'] = $board_info['cat']['name'];
 		$context['poster_name'] = $topicinfo['poster_name'];

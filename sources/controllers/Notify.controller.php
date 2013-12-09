@@ -75,6 +75,7 @@ class Notify_Controller extends Action_Controller
 			$context['topic_href'] = $scripturl . '?topic=' . $topic . '.' . $_REQUEST['start'];
 			$context['start'] = $_REQUEST['start'];
 			$context['page_title'] = $txt['notification'];
+			$context['sub_template'] = 'notification_settings';
 
 			return;
 		}

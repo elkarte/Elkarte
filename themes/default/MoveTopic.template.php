@@ -22,7 +22,7 @@ function template_MoveTopic_init()
 /**
  * Show an interface for selecting which board to move a post to.
  */
-function template_main()
+function template_move_topic()
 {
 	global $context, $txt, $scripturl;
 

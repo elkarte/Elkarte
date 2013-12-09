@@ -17,7 +17,7 @@
 /**
  * The main sub template - for theme administration.
  */
-function template_main()
+function template_manage_themes()
 {
 	global $context, $scripturl, $txt, $modSettings;
 
