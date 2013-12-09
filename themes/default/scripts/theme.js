@@ -131,3 +131,60 @@ function elk_addButton(sButtonStripId, bUseImage, oOptions)
 
 	oButtonStripList.appendChild(oNewButton);
 }
+
+function loadAddNewPoll(button, id_board, form_name)
+{
+	if (typeof id_board == 'undefined')
+		return true;
+
+	// Retrieve the poll area
+	$.ajax({
+		url: elk_scripturl + '?action=poll;sa=interface;xml;board=' + id_board,
+		type: "GET",
+		dataType: "html",
+		beforeSend: ajax_indicator(true)
+	})
+	.done(function (data, textStatus, xhr) {
+		// Find the highest tabindex already present
+		var max_tabIndex = 0;
+		for (var i = 0, n = document.forms[form_name].elements.length; i < n; i++)
+			max_tabIndex = Math.max(max_tabIndex, document.forms[form_name].elements[i].tabIndex);
+
+		// Inject the html
+		$('#post_header').after(data);
+
+		// Hide the "Add poll" button
+		$(button).hide();
+
+		// We usually like to have the poll icon associated to polls,
+		// but only if the currently selected is the default one
+		if ($('#icon').val() == 'xx')
+			$('#icon').val('poll').change();
+
+		// Find the form and add poll to the url
+		$form = $('#post_header').closest("form");
+		$form.attr('action', $form.attr('action') + ';poll');
+
+		$('#poll_main input, #poll_options input').each(function () {
+			$(this).attr('tabindex', ++max_tabIndex);
+		});
+
+		// Repeated collapse/expand of fieldsets as above
+		$('#poll_main legend, #poll_options legend').click(function(){
+			$(this).siblings().slideToggle("fast");
+			$(this).parent().toggleClass("collapsed");
+		}).each(function () {
+			if ($(this).data('collapsed'))
+			{
+				$(this).siblings().css({display: "none"});
+				$(this).parent().toggleClass("collapsed");
+			}
+		});
+	})
+	.always(function() {
+		// turn off the indicator
+		ajax_indicator(false);
+	});
+
+	return false;
+}

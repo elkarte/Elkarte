@@ -312,6 +312,11 @@ function template_post_page()
 		echo '
 							<input type="submit" name="deleteevent" value="', $txt['event_delete'], '" onclick="return confirm(\'', $txt['event_delete_confirm'], '\');" class="button_submit" />';
 
+	// Option to add a poll (javascript if enabled, otherwise preview with poll)
+	if (!$context['make_poll'] && $context['can_add_poll'])
+		echo '
+							<input type="submit" name="poll" value="', $txt['add_poll'], '" onclick="return loadAddNewPoll(this, ', empty($context['current_board']) ? '' : $context['current_board'],', \'postmodify\');" class="button_submit" />';
+
 	echo '
 						</div>';
 }

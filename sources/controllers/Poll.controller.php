@@ -714,4 +714,47 @@ class Poll_Controller extends Action_Controller
 		// Take the moderator back to the topic.
 		redirectexit('topic=' . $topic . '.' . $_REQUEST['start']);
 	}
+
+	/**
+	 * The only reason of this function is to build the poll UI and send it back in an XML form
+	 */
+	public function action_interface()
+	{
+		global $context, $board, $db_show_debug;
+
+		loadTemplate('Poll');
+		loadLanguage('Post');
+		Template_Layers::getInstance()->removeAll();
+
+		if (isset($db_show_debug))
+			$db_show_debug = false;
+
+		$context['sub_template'] = 'poll_edit';
+
+		require_once(SUBSDIR . '/Members.subs.php');
+		$allowedVoteGroups = groupsAllowedTo('poll_vote', $board);
+
+		// Set up the poll options.
+		$context['poll'] = array(
+			'max_votes' => 1,
+			'hide_results' => 0,
+			'expiration' => '',
+			'change_vote' => false,
+			'guest_vote' => false,
+			'guest_vote_allowed' => in_array(-1, $allowedVoteGroups['allowed']),
+		);
+
+		$context['can_moderate_poll'] = true;
+
+		// Make all five poll choices empty.
+		$context['choices'] = array(
+			array('id' => 0, 'number' => 1, 'label' => '', 'is_last' => false),
+			array('id' => 1, 'number' => 2, 'label' => '', 'is_last' => false),
+			array('id' => 2, 'number' => 3, 'label' => '', 'is_last' => false),
+			array('id' => 3, 'number' => 4, 'label' => '', 'is_last' => false),
+			array('id' => 4, 'number' => 5, 'label' => '', 'is_last' => true)
+		);
+		$context['last_choice_id'] = 4;
+		
+	}
 }

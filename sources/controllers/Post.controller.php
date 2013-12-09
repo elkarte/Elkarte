@@ -172,6 +172,7 @@ class Post_Controller extends Action_Controller
 
 			$context['notify'] = !empty($context['notify']);
 			$context['sticky'] = isset($_REQUEST['sticky']) ? !empty($_REQUEST['sticky']) : $sticky;
+			$context['can_add_poll'] = (allowedTo('poll_add_any') || (!empty($_REQUEST['msg']) && $id_first_msg == $_REQUEST['msg'] && allowedTo('poll_add_own'))) && $modSettings['pollMode'] == '1' && $pollID <= 0;
 		}
 		else
 		{
@@ -192,6 +193,7 @@ class Post_Controller extends Action_Controller
 
 			$context['notify'] = !empty($context['notify']);
 			$context['sticky'] = !empty($_REQUEST['sticky']);
+			$context['can_add_poll'] = (allowedTo('poll_add_any') || allowedTo('poll_add_own')) && $modSettings['pollMode'] == '1';
 		}
 
 		// @todo These won't work if you're posting an event!
