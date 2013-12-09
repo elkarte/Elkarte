@@ -54,5 +54,6 @@ class AllTests extends TestSuite
 		$this->addFile(TESTDIR . 'sources/subs/TestBoards.subs.php');
 		$this->addFile(TESTDIR . 'sources/subs/TestPoll.subs.php');
 		$this->addFile(TESTDIR . 'sources/subs/TestBBC.subs.php');
+		$this->addFile(TESTDIR . 'sources/subs/TestHTML2BBC.subs.php');
 	}
 }
