@@ -4,8 +4,8 @@
 $txt['my_mentions'] = 'Meine Benachrichtigungen';
 $txt['my_unread_mentions'] = 'Meine ungelesenen Benachrichtungen';
 $txt['my_mentions_pages'] = 'Seite %1$d';
-$txt['no_mentions_yet'] = 'Keine Benachrichtigungen';
-$txt['no_new_mentions'] = 'Keine neuen Benachrichtigungen';
+$txt['no_mentions_yet'] = 'Keine Erwähnungen';
+$txt['no_new_mentions'] = 'Keine neuen Erwähnungen';
 
 $txt['mentions_from'] = 'Benutzer';
 $txt['mentions_when'] = 'Wann';
@@ -27,8 +27,10 @@ $txt['mention_like'] = 'Gefällt Ihre Nachricht {msg_link}';
 $txt['mention_rlike'] = 'Gefällt Ihre Nachricht {msg_link} nicht mehr';
 $txt['mention_buddy'] = 'Hat Sie zu seiner Freundesliste hinzugefügt.';
 
-$txt['mentions_type_all'] = 'Alle Benachrichtigungen';
+$txt['mentions_type_all'] = 'Alle Erwähnungen';
 $txt['mentions_type_men'] = 'Erwähnungen';
 $txt['mentions_type_like'] = 'Gefällt mir';
 $txt['mentions_type_rlike'] = 'Gefällt mir nicht mehr';
 $txt['mentions_type_buddy'] = 'Freund';
+
+$txt['mention_not_accessible'] = 'Pardon, Sie wurden an einem unzugänglichen Ort erwähnt...';
