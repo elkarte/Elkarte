@@ -794,7 +794,7 @@ class Admin_Controller extends Action_Controller
 		// Load a lot of language files.
 		$language_files = array(
 			'Help', 'ManageMail', 'ManageSettings', 'ManageCalendar', 'ManageBoards', 'ManagePaid', 'ManagePermissions', 'Search',
-			'Login', 'ManageSmileys',
+			'Login', 'ManageSmileys', 'Maillist',
 		);
 
 		// All the files we need to include.
@@ -806,46 +806,50 @@ class Admin_Controller extends Action_Controller
 			'ManageNews.controller', 'ManagePaid.controller', 'ManagePermissions.controller',
 			'ManagePosts.controller', 'ManageRegistration.controller', 'ManageSearch.controller',
 			'ManageSearchEngines.controller', 'ManageSecurity.controller', 'ManageServer.controller',
-			'ManageSmileys.controller', 'ManageTopics.controller',
+			'ManageSmileys.controller', 'ManageTopics.controller', 'ManageMaillist.controller',
+			'ManageMembergroups.controller',
 		);
 
 		// This is a special array of functions that contain setting data
 		// - we query all these to simply pull all setting bits!
 		$settings_search = array(
+			array('settings_search', 'area=logs;sa=pruning', 'AdminLog_Controller'),
 			array('config_vars', 'area=corefeatures', 'CoreFeatures_Controller'),
-			array('basicSettings', 'area=featuresettings;sa=basic', 'ManageFeatures_Controller'),
-			array('layoutSettings', 'area=featuresettings;sa=layout', 'ManageFeatures_Controller'),
-			array('karmaSettings', 'area=featuresettings;sa=karma', 'ManageFeatures_Controller'),
-			array('likesSettings', 'area=featuresettings;sa=likes', 'ManageFeatures_Controller'),
-			array('mentionSettings', 'area=featuresettings;sa=mention', 'ManageFeatures_Controller'),
-			array('signatureSettings', 'area=featuresettings;sa=sig', 'ManageFeatures_Controller'),
-			array('securitySettings', 'area=securitysettings;sa=general', 'ManageSecurity_Controller'),
-			array('spamSettings', 'area=securitysettings;sa=spam', 'ManageSecurity_Controller'),
-			array('moderationSettings', 'area=securitysettings;sa=moderation', 'ManageSecurity_Controller'),
-			array('settings', 'area=addonsettings;sa=general', 'AddonSettings_Controller'),
-			array('settings', 'area=manageattachments;sa=attachments', 'ManageAttachments_Controller'),
-			array('settings', 'area=manageattachments;sa=avatars', 'ManageAvatars_Controller'),
-			array('settings', 'area=managecalendar;sa=settings', 'ManageCalendar_Controller'),
-			array('settings', 'area=manageboards;sa=settings', 'ManageBoards_Controller'),
-			array('settings', 'area=mailqueue;sa=settings', 'ManageMail_Controller'),
-			array('settings', 'area=news;sa=settings', 'ManageNews_Controller'),
-			array('settings', 'area=permissions;sa=settings', 'ManagePermissions_Controller'),
-			array('settings', 'area=postsettings;sa=posts', 'ManagePosts_Controller'),
-			array('settings', 'area=postsettings;sa=bbc', 'ManageBBC_Controller'),
-			array('settings', 'area=postsettings;sa=topics', 'ManageTopics_Controller'),
-			array('settings', 'area=managesearch;sa=settings', 'ManageSearch_Controller'),
-			array('settings', 'area=smileys;sa=settings', 'ManageSmileys_Controller'),
-			array('generalSettings', 'area=serversettings;sa=general', 'ManageServer_Controller'),
-			array('databaseSettings', 'area=serversettings;sa=database', 'ManageServer_Controller'),
-			array('cookieSettings', 'area=serversettings;sa=cookie', 'ManageServer_Controller'),
-			array('cacheSettings', 'area=serversettings;sa=cache', 'ManageServer_Controller'),
-			array('settings', 'area=languages;sa=settings', 'ManageLanguages_Controller'),
-			array('settings', 'area=regcenter;sa=settings', 'ManageRegistration_Controller'),
-			array('settings', 'area=sengines;sa=settings', 'ManageSearchEngines_Controller'),
-			array('settings', 'area=paidsubscribe;sa=settings', 'ManagePaid_Controller'),
-			array('settings', 'area=logs;sa=pruning', 'AdminLog_Controller'),
-			array('settings', 'area=managedrafts', 'ManageDrafts_Controller'),
-			array('bbSettings', 'area=securitysettings;sa=badbehavior', 'ManageSecurity_Controller'),
+			array('basicSettings_search', 'area=featuresettings;sa=basic', 'ManageFeatures_Controller'),
+			array('layoutSettings_search', 'area=featuresettings;sa=layout', 'ManageFeatures_Controller'),
+			array('karmaSettings_search', 'area=featuresettings;sa=karma', 'ManageFeatures_Controller'),
+			array('likesSettings_search', 'area=featuresettings;sa=likes', 'ManageFeatures_Controller'),
+			array('mentionSettings_search', 'area=featuresettings;sa=mention', 'ManageFeatures_Controller'),
+			array('signatureSettings_search', 'area=featuresettings;sa=sig', 'ManageFeatures_Controller'),
+			array('settings_search', 'area=addonsettings;sa=general', 'AddonSettings_Controller'),
+			array('settings_search', 'area=manageattachments;sa=attachments', 'ManageAttachments_Controller'),
+			array('settings_search', 'area=manageattachments;sa=avatars', 'ManageAvatars_Controller'),
+			array('settings_search', 'area=postsettings;sa=bbc', 'ManageBBC_Controller'),
+			array('settings_search', 'area=manageboards;sa=settings', 'ManageBoards_Controller'),
+			array('settings_search', 'area=managecalendar;sa=settings', 'ManageCalendar_Controller'),
+			array('settings_search', 'area=managedrafts', 'ManageDrafts_Controller'),
+			array('settings_search', 'area=languages;sa=settings', 'ManageLanguages_Controller'),
+			array('settings_search', 'area=mailqueue;sa=settings', 'ManageMail_Controller'),
+			array('settings_search', 'area=maillist;sa=emailsettings', 'ManageMaillist_Controller'),
+			array('settings_search', 'area=membergroups;sa=settings', 'ManageMembergroups_Controller'),
+			array('settings_search', 'area=news;sa=settings', 'ManageNews_Controller'),
+			array('settings_search', 'area=paidsubscribe;sa=settings', 'ManagePaid_Controller'),
+			array('settings_search', 'area=permissions;sa=settings', 'ManagePermissions_Controller'),
+			array('settings_search', 'area=postsettings;sa=posts', 'ManagePosts_Controller'),
+			array('settings_search', 'area=regcenter;sa=settings', 'ManageRegistration_Controller'),
+			array('settings_search', 'area=managesearch;sa=settings', 'ManageSearch_Controller'),
+			array('settings_search', 'area=sengines;sa=settings', 'ManageSearchEngines_Controller'),
+			array('securitySettings_search', 'area=securitysettings;sa=general', 'ManageSecurity_Controller'),
+			array('spamSettings_search', 'area=securitysettings;sa=spam', 'ManageSecurity_Controller'),
+			array('moderationSettings_search', 'area=securitysettings;sa=moderation', 'ManageSecurity_Controller'),
+			array('bbSettings_search', 'area=securitysettings;sa=badbehavior', 'ManageSecurity_Controller'),
+			array('generalSettings_search', 'area=serversettings;sa=general', 'ManageServer_Controller'),
+			array('databaseSettings_search', 'area=serversettings;sa=database', 'ManageServer_Controller'),
+			array('cookieSettings_search', 'area=serversettings;sa=cookie', 'ManageServer_Controller'),
+			array('cacheSettings_search', 'area=serversettings;sa=cache', 'ManageServer_Controller'),
+			array('balancingSettings_search', 'area=serversettings;sa=loads', 'ManageServer_Controller'),
+			array('settings_search', 'area=smileys;sa=settings', 'ManageSmileys_Controller'),
+			array('settings_search', 'area=postsettings;sa=topics', 'ManageTopics_Controller'),
 		);
 
 		call_integration_hook('integrate_admin_search', array(&$language_files, &$include_files, &$settings_search));
@@ -902,7 +906,7 @@ class Admin_Controller extends Action_Controller
 			}
 
 			foreach ($config_vars as $var)
-				if (!empty($var[1]) && !in_array($var[0], array('permissions', 'switch')))
+				if (!empty($var[1]) && !in_array($var[0], array('permissions', 'switch', 'warning')))
 					$search_data['settings'][] = array($var[(isset($var[2]) && in_array($var[2], array('file', 'db'))) ? 0 : 1], $setting_area[1]);
 		}
 
@@ -933,12 +937,13 @@ class Admin_Controller extends Action_Controller
 					$name = isset($txt[$found]) ? $txt[$found] : (isset($txt['setting_' . $found]) ? $txt['setting_' . $found] : $found);
 					$name = preg_replace('~<(?:div|span)\sclass="smalltext">.+?</(?:div|span)>~', '', $name);
 
-					$context['search_results'][] = array(
-						'url' => (substr($item[1], 0, 4) == 'area' ? $scripturl . '?action=admin;' . $item[1] : $item[1]) . ';' . $context['session_var'] . '=' . $context['session_id'] . ((substr($item[1], 0, 4) == 'area' && $section == 'settings' ? '#' . $item[0][0] : '')),
-						'name' => $name,
-						'type' => $section,
-						'help' => shorten_text(isset($item[2]) ? strip_tags($helptxt[$item[2]]) : (isset($helptxt[$found]) ? strip_tags($helptxt[$found]) : ''), 255),
-					);
+					if (!empty($name))
+						$context['search_results'][] = array(
+							'url' => (substr($item[1], 0, 4) == 'area' ? $scripturl . '?action=admin;' . $item[1] : $item[1]) . ';' . $context['session_var'] . '=' . $context['session_id'] . ((substr($item[1], 0, 4) == 'area' && $section == 'settings' ? '#' . $item[0][0] : '')),
+							'name' => $name,
+							'type' => $section,
+							'help' => shorten_text(isset($item[2]) ? strip_tags($helptxt[$item[2]]) : (isset($helptxt[$found]) ? strip_tags($helptxt[$found]) : ''), 255),
+						);
 				}
 			}
 		}

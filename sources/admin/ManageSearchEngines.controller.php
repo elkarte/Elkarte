@@ -38,7 +38,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 	*
 	* @see Action_Controller::action_index()
 	*/
-	function action_index()
+	public function action_index()
 	{
 		global $context, $txt;
 
@@ -77,7 +77,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 	/**
 	 * This is the admin settings page for search engines.
 	 */
-	function action_engineSettings_display()
+	public function action_engineSettings_display()
 	{
 		global $context, $txt, $scripturl;
 
@@ -154,38 +154,27 @@ class ManageSearchEngines_Controller extends Action_Controller
 		Settings_Form::prepare_db($config_vars);
 	}
 
-/**
-	* Initialize the form with configuration settings for search engines
-	*
-	* @return array
-	*/
-	function _initEngineSettingsForm()
+	/**
+	 * Initialize the form with configuration settings for search engines
+	 */
+	private function _initEngineSettingsForm()
 	{
-		global $txt;
-
 		// This is really quite wanting.
 		require_once(SUBSDIR . '/Settings.class.php');
 
 		// Instantiate the form
 		$this->_engineSettings = new Settings_Form();
 
-		$config_vars = array(
-			// How much detail?
-			array('select', 'spider_mode', 'subtext' => $txt['spider_mode_note'], array($txt['spider_mode_off'], $txt['spider_mode_standard'], $txt['spider_mode_high'], $txt['spider_mode_vhigh']), 'onchange' => 'disableFields();'),
-			'spider_group' => array('select', 'spider_group', 'subtext' => $txt['spider_group_note'], array($txt['spider_group_none'], $txt['membergroups_members'])),
-			array('select', 'show_spider_online', array($txt['show_spider_online_no'], $txt['show_spider_online_summary'], $txt['show_spider_online_detail'], $txt['show_spider_online_detail_admin'])),
-		);
+		// Initialize it with our settings
+		$config_vars = $this->_settings();
 
 		return $this->_engineSettings->settings($config_vars);
 	}
 
 	/**
 	 * Return configuration settings for search engines
-	 * Used by admin search.
-	 *
-	 * @return array
 	 */
-	function settings()
+	private function _settings()
 	{
 		global $txt;
 
@@ -200,9 +189,17 @@ class ManageSearchEngines_Controller extends Action_Controller
 	}
 
 	/**
+	 * Return the search engine settings for use in admin search
+	 */
+	public function settings_search()
+	{
+		return $this->_settings();
+	}
+
+	/**
 	 * View a list of all the spiders we know about.
 	 */
-	function action_spiders()
+	public function action_spiders()
 	{
 		global $context, $txt, $scripturl;
 
@@ -347,7 +344,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 	/**
 	 * Here we can add, and edit, spider info!
 	 */
-	function action_editspiders()
+	public function action_editspiders()
 	{
 		global $context, $txt;
 
@@ -404,7 +401,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 	/**
 	 * See what spiders have been up to.
 	 */
-	function action_logs()
+	public function action_logs()
 	{
 		global $context, $txt, $scripturl, $modSettings;
 
@@ -527,7 +524,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 	/**
 	 * Show the spider statistics.
 	 */
-	function action_stats()
+	public function action_stats()
 	{
 		global $context, $txt, $scripturl;
 

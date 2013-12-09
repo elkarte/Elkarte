@@ -317,7 +317,7 @@ CHANGE `log_type` `log_type` varchar(10) NOT NULL DEFAULT 'post';
 ---{
 upgrade_query("
 	ALTER TABLE {$db_prefix}membergroups
-	CHANGE `stars` `icons` varchar(255) NOT NULL DEFAULT ''");
+	CHANGE COLUMN stars icons varchar(255) NOT NULL DEFAULT ''");
 ---}
 ---#
 

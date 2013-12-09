@@ -354,33 +354,18 @@ class ManageRegistration_Controller extends Action_Controller
 	}
 
 	/**
-	 * Initialize settings form with the configuration settings
-	 *  for new members registration.
-	 *
-	 * @return array;
+	 * Initialize settings form with the configuration settings for new members registration.
 	 */
 	private function _init_registerSettingsForm()
 	{
-		global $txt;
-
 		// This is really quite wanting.
 		require_once(SUBSDIR . '/Settings.class.php');
 
 		// Instantiate the form
 		$this->_registerSettings = new Settings_Form();
 
-		$config_vars = array(
-				array('select', 'registration_method', array($txt['setting_registration_standard'], $txt['setting_registration_activate'], $txt['setting_registration_approval'], $txt['setting_registration_disabled'])),
-				array('check', 'enableOpenID'),
-				array('check', 'notify_new_registration'),
-				array('check', 'send_welcomeEmail'),
-			'',
-				array('int', 'coppaAge', 'subtext' => $txt['setting_coppaAge_desc'], 'onchange' => 'checkCoppa();', 'onkeyup' => 'checkCoppa();'),
-				array('select', 'coppaType', array($txt['setting_coppaType_reject'], $txt['setting_coppaType_approval']), 'onchange' => 'checkCoppa();'),
-				array('large_text', 'coppaPost', 'subtext' => $txt['setting_coppaPost_desc']),
-				array('text', 'coppaFax'),
-				array('text', 'coppaPhone'),
-		);
+		// Initialize it with our settings
+		$config_vars = $this->_settings();
 
 		return $this->_registerSettings->settings($config_vars);
 	}
@@ -390,7 +375,7 @@ class ManageRegistration_Controller extends Action_Controller
 	 *
 	 * @return array;
 	 */
-	public function settings()
+	private function _settings()
 	{
 		global $txt;
 
@@ -408,5 +393,13 @@ class ManageRegistration_Controller extends Action_Controller
 		);
 
 		return $config_vars;
+	}
+
+	/**
+	 * Return the registration settings for use in admin search
+	 */
+	public function settings_search()
+	{
+		return $this->_settings();
 	}
 }

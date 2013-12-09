@@ -15,13 +15,6 @@
  */
 
 /**
- * Umm, its the main template
- */
-function template_main()
-{
-}
-
-/**
  * Shows the screen for the package install / uninstall
  * Displays license, readme, and test results
  */
@@ -419,16 +412,15 @@ function template_extract_package()
 	if (empty($context['redirect_url']))
 	{
 		echo '
-			<h3 class="category_header">', $context['uninstalling'] ? $txt['uninstall'] : $txt['extracting'], '</h3>
-			<div class="information">', $txt['package_installed_extract'], '</div>';
+			<h3 class="category_header">', ($context['uninstalling'] ? $txt['uninstall'] : $txt['extracting']), '</h3>',  ($context['uninstalling'] ? '' : '<div class="information">' . $txt['package_installed_extract'] . '</div>');
 	}
 	else
 		echo '
 			<h3 class="category_header">', $txt['package_installed_redirecting'], '</h3>';
 
 	echo '
-		<div class="windowbg">
-			<div class="content">';
+		<div class="generic_list_wrapper">
+			<div class="windowbg">';
 
 	// If we are going to redirect we have a slightly different agenda.
 	if (!empty($context['redirect_url']))

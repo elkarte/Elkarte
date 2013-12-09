@@ -17,7 +17,7 @@
 /**
  * Stats page.
  */
-function template_main()
+function template_statistics()
 {
 	global $context, $settings, $txt, $scripturl, $modSettings;
 
@@ -26,65 +26,94 @@ function template_main()
 		<h2 class="category_header">
 			', $context['page_title'], '
 		</h2>
-		<ul class="statistics">
+		<ul class="statistics">';
+	foreach ($context['statistics_callbacks'] as $callback)
+	{
+		$function = 'template_' . $callback;
+		$function();
+	}
+	echo '
+		</ul>
+	</div>';
+
+	template_forum_history();
+}
+
+function template_general_statistics()
+{
+	global $context, $settings, $txt, $scripturl, $modSettings;
+
+	// These two are special formatting strings for special elements of the statistics:
+	// The most_online value is an array composed of two elements: number and date,
+	// they will be replaced in the foreach below with the corresponding values.
+	// If you want to change the way to present the field, change this string,
+	// for example if you want to show it as: "123 members on the 20/01/2010" you could use:
+	// $settings['most_online'] = 'number members on the date';
+	$settings['most_online'] = 'number - date';
+	// Similarly to the previous one, this is a "template" for the latest_member stats
+	// The elements available to style this entry are: id, name, href, link.
+	// So, if you want to change it to the plain username you could use:
+	// $settings['latest_member'] = 'name';
+	$settings['latest_member'] = 'link';
+
+	echo '
 			<li class="flow_hidden" id="top_row">
 				<h3 class="category_header hdicon cat_img_stats_info">
 					', $txt['general_stats'], '
 				</h3>
-				<dl class="stats floatleft">
-					<dt>', $txt['total_members'], ':</dt>
-					<dd>', $context['show_member_list'] ? '<a href="' . $scripturl . '?action=memberlist">' . $context['num_members'] . '</a>' : $context['num_members'], '</dd>
-					<dt>', $txt['total_posts'], ':</dt>
-					<dd>', $context['num_posts'], '</dd>
-					<dt>', $txt['total_topics'], ':</dt>
-					<dd>', $context['num_topics'], '</dd>
-					<dt>', $txt['total_cats'], ':</dt>
-					<dd>', $context['num_categories'], '</dd>
-					<dt>', $txt['users_online'], ':</dt>
-					<dd>', $context['users_online'], '</dd>
-					<dt>', $txt['most_online'], ':</dt>
-					<dd>', $context['most_members_online']['number'], ' - ', $context['most_members_online']['date'], '</dd>
-					<dt>', $txt['users_online_today'], ':</dt>
-					<dd>', $context['online_today'], '</dd>';
+				<dl class="stats floatleft">';
 
-	if (!empty($modSettings['hitStats']))
+	foreach ($context['general_statistics']['left'] as $key => $value)
+	{
+		if (is_array($value))
+		{
+			if (isset($settings[$key]))
+				$value = strtr($settings[$key], $value);
+			else
+				continue;
+		}
+
 		echo '
-					<dt>', $txt['num_hits'], ':</dt>
-					<dd>', $context['num_hits'], '</dd>';
+					<dt>', $txt[$key], ':</dt>
+					<dd>', $value, '</dd>';
+	}
 
 	echo '
 				</dl>
-				<dl class="stats">
-					<dt>', $txt['average_members'], ':</dt>
-					<dd>', $context['average_members'], '</dd>
-					<dt>', $txt['average_posts'], ':</dt>
-					<dd>', $context['average_posts'], '</dd>
-					<dt>', $txt['average_topics'], ':</dt>
-					<dd>', $context['average_topics'], '</dd>
-					<dt>', $txt['total_boards'], ':</dt>
-					<dd>', $context['num_boards'], '</dd>
-					<dt>', $txt['latest_member'], ':</dt>
-					<dd>', $context['common_stats']['latest_member']['link'], '</dd>
-					<dt>', $txt['average_online'], ':</dt>
-					<dd>', $context['average_online'], '</dd>
-					<dt>', $txt['gender_ratio'], ':</dt>
-					<dd>', $context['gender']['ratio'], '</dd>';
+				<dl class="stats">';
 
-	if (!empty($modSettings['hitStats']))
+	foreach ($context['general_statistics']['right'] as $key => $value)
+	{
+		if (is_array($value))
+		{
+			if (isset($settings[$key]))
+				$value = strtr($settings[$key], $value);
+			else
+				continue;
+		}
+
 		echo '
-					<dt>', $txt['average_hits'], ':</dt>
-					<dd>', $context['average_hits'], '</dd>';
+					<dt>', $txt[$key], ':</dt>
+					<dd>', $value, '</dd>';
+	}
 
 	echo '
 				</dl>
-			</li>
+			</li>';
+}
+
+function template_top_statistics()
+{
+	global $context, $settings, $txt, $scripturl, $modSettings;
+
+	echo '
 			<li class="flow_hidden">
 				<h3 class="category_header floatleft hdicon cat_img_star">
 					', $txt['top_posters'], '
 				</h3>
 				<dl class="stats floatleft">';
 
-	foreach ($context['top_posters'] as $poster)
+	foreach ($context['top']['posters'] as $poster)
 	{
 		echo '
 					<dt>
@@ -103,7 +132,7 @@ function template_main()
 				</h3>
 				<dl class="stats">';
 
-	foreach ($context['top_boards'] as $board)
+	foreach ($context['top']['boards'] as $board)
 	{
 		echo '
 					<dt>
@@ -124,7 +153,7 @@ function template_main()
 				</h3>
 				<dl class="stats floatleft">';
 
-	foreach ($context['top_topics_replies'] as $topic)
+	foreach ($context['top']['topics_replies'] as $topic)
 	{
 		echo '
 					<dt>
@@ -143,7 +172,7 @@ function template_main()
 				</h3>
 				<dl class="stats">';
 
-	foreach ($context['top_topics_views'] as $topic)
+	foreach ($context['top']['topics_views'] as $topic)
 	{
 		echo '
 					<dt>', $topic['link'], '</dt>
@@ -162,7 +191,7 @@ function template_main()
 				</h3>
 				<dl class="stats floatleft">';
 
-	foreach ($context['top_starters'] as $poster)
+	foreach ($context['top']['starters'] as $poster)
 	{
 		echo '
 					<dt>
@@ -181,7 +210,7 @@ function template_main()
 				</h3>
 				<dl class="stats">';
 
-	foreach ($context['top_time_online'] as $poster)
+	foreach ($context['top']['time_online'] as $poster)
 	{
 		echo '
 					<dt>
@@ -195,9 +224,14 @@ function template_main()
 
 	echo '
 				</dl>
-			</li>
-		</ul>
-	</div>
+			</li>';
+}
+
+function template_forum_history()
+{
+	global $context, $settings, $txt, $scripturl, $modSettings;
+
+	echo '
 	<div id="forum_history" class="forum_category">
 		<h2 class="category_header hdicon cat_img_clock">
 			', $txt['forum_history'], '

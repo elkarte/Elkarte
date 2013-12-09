@@ -102,33 +102,19 @@ class ManageDrafts_Controller extends Action_Controller
 	 */
 	private function _initDraftSettingsForm()
 	{
-		global $txt;
-
-		// instantiate the form
+		// Instantiate the form
 		$this->_draftSettings = new Settings_Form();
 
-		loadLanguage('Drafts');
-
-		// Here are all the draft settings, a bit lite for now, but we can add more :P
-		$config_vars = array(
-			// Draft settings ...
-			array('check', 'drafts_post_enabled'),
-			array('check', 'drafts_pm_enabled'),
-			array('int', 'drafts_keep_days', 'postinput' => $txt['days_word'], 'subtext' => $txt['drafts_keep_days_subnote']),
-			'',
-			array('check', 'drafts_autosave_enabled', 'subtext' => $txt['drafts_autosave_enabled_subnote']),
-			array('int', 'drafts_autosave_frequency', 'postinput' => $txt['manageposts_seconds'], 'subtext' => $txt['drafts_autosave_frequency_subnote']),
-		);
+		// Initialize it with our settings
+		$config_vars = $this->_settings();
 
 		return $this->_draftSettings->settings($config_vars);
 	}
 
 	/**
 	 * Returns all admin drafts settings in config_vars format.
-	 * Used by admin search.
-	 * @deprecated
 	 */
-	public function settings()
+	private function _settings()
 	{
 		global $txt;
 
@@ -136,15 +122,23 @@ class ManageDrafts_Controller extends Action_Controller
 
 		// Here are all the draft settings, a bit lite for now, but we can add more :P
 		$config_vars = array(
-			// Draft settings ...
-			array('check', 'drafts_post_enabled'),
-			array('check', 'drafts_pm_enabled'),
-			array('int', 'drafts_keep_days', 'postinput' => $txt['days_word'], 'subtext' => $txt['drafts_keep_days_subnote']),
+				// Draft settings ...
+				array('check', 'drafts_post_enabled'),
+				array('check', 'drafts_pm_enabled'),
+				array('int', 'drafts_keep_days', 'postinput' => $txt['days_word'], 'subtext' => $txt['drafts_keep_days_subnote']),
 			'',
-			array('check', 'drafts_autosave_enabled', 'subtext' => $txt['drafts_autosave_enabled_subnote']),
-			array('int', 'drafts_autosave_frequency', 'postinput' => $txt['manageposts_seconds'], 'subtext' => $txt['drafts_autosave_frequency_subnote']),
+				array('check', 'drafts_autosave_enabled', 'subtext' => $txt['drafts_autosave_enabled_subnote']),
+				array('int', 'drafts_autosave_frequency', 'postinput' => $txt['manageposts_seconds'], 'subtext' => $txt['drafts_autosave_frequency_subnote']),
 		);
 
 		return $config_vars;
+	}
+
+	/**
+	 * Return the form settings for use in admin search
+	 */
+	public function settings_search()
+	{
+		return $this->_settings();
 	}
 }

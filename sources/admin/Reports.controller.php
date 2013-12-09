@@ -93,6 +93,7 @@ class Reports_Controller extends Action_Controller
 			return;
 		}
 		$context['report_type'] = $_REQUEST['rt'];
+		$context['sub_template'] = 'generate_report';
 
 		// What are valid templates for showing reports?
 		$reportTemplates = array(

@@ -86,7 +86,7 @@ function template_ask()
 /**
  * Split topics main page.
  */
-function template_main()
+function template_split_successful()
 {
 	global $context, $txt, $scripturl;
 

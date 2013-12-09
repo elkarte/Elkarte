@@ -129,7 +129,7 @@ function template_print_above()
 /**
  * Interface for print page central view.
  */
-function template_main()
+function template_print_page()
 {
 	global $context, $txt, $scripturl, $topic;
 

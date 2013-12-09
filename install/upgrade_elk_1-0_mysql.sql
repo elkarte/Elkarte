@@ -238,7 +238,7 @@ CHANGE `log_type` `log_type` varchar(10) NOT NULL DEFAULT 'post';
 /******************************************************************************/
 ---# Altering the membergroup stars to icons
 ALTER TABLE {$db_prefix}membergroups
-CHANGE `stars` `icons` varchar(255) NOT NULL DEFAULT '';
+CHANGE stars icons varchar(255) NOT NULL DEFAULT '';
 ---#
 
 /******************************************************************************/

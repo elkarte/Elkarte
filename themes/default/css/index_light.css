@@ -91,8 +91,205 @@ legend {
 
 /* @todo - Quite a lot more code to be split. */
 
+input, button, select, textarea, .editor {
+	border: 1px solid #ccc;
+	border-radius: 2px;
+	background: #fff;
+	color: #666;
+}
 
+input:hover, textarea:hover, button:hover, select:hover {
+	border: 1px solid #999;
+}
+textarea:hover, .editor:hover {
+	background: #fbfbfb;
+}
+input:focus, textarea:focus, button:focus, select:focus, .editor:focus {
+	border: 1px solid #999;
+}
+/* Give disabled text input elements a different background color. */
+input[disabled].input_text {
+	background: #eee;
+}
 
+/* The OpenID login form */
+.openid_login {
+	padding-left: 20px;
+	background: white url(../images/openid.png) no-repeat;
+	background-position: 2% 50%;
+}
+
+/* Common button styling. */
+/* It is being replaced with three classes: */
+/*    .button_submit is not floated    */
+/*    .right_submit is right floated   */
+/*    .left_submit is left floated     */
+/* The button_reset class may need attention too. */
+.button_submit, .right_submit, .left_submit, .button_reset,
+/* Anchors styled to look like buttons. */
+/* These have standard body text size. Can be chained with smalltext class. */
+.linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
+.linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
+	border-radius: 2px;
+	border: 1px solid #afafaf;
+	border-top: 1px solid #cfcfcf;
+	border-left: 1px solid #bfbfbf;
+	background: #f4f4f4;
+	background-image: linear-gradient(to bottom, #fff, #e4e4e4);
+	color: #555;
+	box-shadow: 1px 1px 2px #e5e5e5;
+}
+
+/* Hover effects. */
+.button_submit:hover, .right_submit:hover, .left_submit:hover,
+.button_reset:hover,
+.linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover {
+	border: 1px solid #ccc;
+	border-top: 1px solid #afafaf;
+	border-left: 1px solid #afafaf;
+	background: #f0f0f0;
+	box-shadow: 2px 1px 1px rgba(0,0,0,0.07) inset;
+	color: #555;
+	text-decoration: none;
+}
+
+/* the new "button" */
+a.new_posts, span.new_posts {
+	border-radius: 2px;
+	background: #5aa05e;
+	color: #fff;
+}
+
+/* Standard horizontal rule.. ([hr], etc.) */
+hr {
+	border-top: 1px solid #bbb;
+	background: #eee;
+	background-color: #eee;
+}
+
+/* Define strong as font-weight: 600; - defaults to bold */
+/* for fonts which do not support numerical font-weight) */
+strong {
+	font-weight: 600;
+}
+
+/* @todo - Test this everywhere. */
+.standard_category {
+	border-radius: 4px 4px 0 0;
+	background: #e4e4e4;
+	box-shadow: 1px 2px 4px #eee;
+}
+/* @todo - Test this everywhere. */
+.standard_category>.content {
+	border: 1px solid #ddd;
+	background: #fff;
+}
+
+/* Styles for main headers. */
+.category_header, .forum_category .category_header {
+	border: 1px solid #ccc;
+	border-top: 1px solid #ddd;
+	border-bottom: 1px solid #bbb;
+	border-radius: 3px 3px 0 0;
+	background: #ebebeb;
+	background-image: linear-gradient(to bottom, #fafafa, #eaeaea);
+	color: #566450;
+	text-shadow: 1px 1px 0 #ebebeb;
+}
+/* Single ones a bit darker than board index ones. */
+.forumposts .category_header, .content_category .category_header {
+	border-top: 1px solid #cfcfcf;
+	border-bottom: 1px solid #b7b7b7;
+	background: #e9e9e9;
+	background-image: linear-gradient(to bottom, #f6f6f6, #e4e4e4);
+}
+/* Styles for subsection headers. @todo */
+.secondary_header {
+	border: 1px solid #ccc;
+	border-top: 1px solid #dfdfdf;
+	background: #fafafa;
+	background-image: linear-gradient(to bottom, #fafafa, #ebebeb);
+	text-shadow: 1px 1px 0 #fff;
+}
+
+.category_header a:link {
+	color: #777;
+}
+
+/* Upshrink image in the general category headers */
+#category_toggle, #category_toggle_more, #upshrink_header {
+	border-radius: 2px;
+}
+
+/* Upshrink image in the page top for the header collapse */
+#collapse_button .linklevel1 {
+	border-radius: 2px;
+}
+
+/* Custom highlighted text style for modern browsers. */
+/* Nicer than default blue. Needs two separate rules. */
+::-moz-selection {
+	background: #d8ffdf;
+	color: #444;
+}
+::selection {
+	background: #d8ffdf;
+	color: #444;
+}
+
+/* Other highlighted text, such as search results. */
+.highlight {
+	color: #ff7200;
+}
+/* Legacy highlight color, for selected membergroups etc. */
+/* Used by JS to show a selected item. @todo - deprecate? */
+.highlight2 {
+	background: #d1e1ef;
+	color: #555;
+}
+
+/* Used for sections that need somewhat larger corners */
+/* @todo - Daft name. Other stuffz. :P */
+.roundframe {
+	overflow: hidden;
+	margin: 2px 0 0 0;
+	padding: 9px;
+}
+
+/* The generic wrapper thingy.  */
+.generic_list_wrapper {
+	border: 1px solid #ccc;
+	border-radius: 7px;
+	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
+}
+.generic_list_wrapper .additional_row {
+	border-radius: 0;
+}
+.generic_list_wrapper .title_bar {
+	border-bottom: 1px solid #fff;
+	border-radius: 0;
+	background: none;
+}
+.generic_list_wrapper .information {
+	border-bottom: 1px solid #fff;
+	background: none;
+}
+
+/* Styles used by the auto suggest control. */
+.auto_suggest_div {
+	border: 1px solid #bbb;
+	border-radius: 3px;
+}
+.auto_suggest_div:focus {
+	border: 1px solid #bbb;
+}
+.auto_suggest_item {
+	background: #ddd;
+}
+.auto_suggest_item_hover {
+	background: #888;
+	color: #eee;
+}
 
 /*	$BBC		*/
 /* ------------------------------------------------------- */
@@ -633,7 +830,100 @@ div.bbc_footnotes .meaction{
 }
 
 
+/*	$PAGELINKS	*/
+/* ------------------------------------------------------- */
+.selectbox, .pagelinks {
+	color: #555;
+}
+.pagelinks .navPages {
+	border: 1px solid #afafaf;
+	border-top: 1px solid #bbb;
+	background-image: linear-gradient(to bottom, #fcfcfc 0%, #e5e5e5 100%);
+	color: #555;
+}
+.pagelinks .navPages:hover, .pagelinks .current_page  {
+	border: 1px solid #ccc;
+	border-top: 1px solid #afafaf;
+	border-left: 1px solid #afafaf;
+	background: #f0f0f0;
+	box-shadow: 2px 1px 1px rgba(0,0,0,0.07) inset;
+	/* @todo - Simplify. */
+	color: #555;
+	text-decoration: none;
+}
+.pagelinks  :first-child {
+	border-radius: 2px 0 0 2px;
+}
+.pagelinks :last-child {
+	border-radius: 0 2px 2px 0;
+}
+/* our buddies &laquo; &raquo; */
+.small_pagelinks:before {
+	content: '\00AB';
+	float: left;
+	font-size: 1.3em;
+}
+.small_pagelinks:after {
+	content: '\00BB';
+	float: left;
+	font-size: 1.3em;
+}
 
+/* Globally accessible top/bottom links. */
+#gotop, #gobottom {
+	border: 1px solid #222;
+	border-bottom: none;
+	border-radius: 20px 0 0 0;
+	background: #eee;
+	color: #eee;
+	opacity: 0.2;
+}
+#gobottom {
+	border-top: none;
+	border-radius: 0 0 0 20px;
+}
+#gotop:hover, #gobottom:hover {
+	color: #444;
+	text-decoration: none;
+	opacity: 1;
+}
+/* Skip navigation link. */
+#top {
+	border: 4px solid #5ba048;
+	border-radius: 0 0 6px 6px;
+	background: #fff;
+}
+
+
+/*	$TABLES		*/
+/* ------------------------------------------------------- */
+
+/* @todo */
+/* A general table class. */
+.table_grid {
+	border: 1px solid #ddd;
+	border-top: none;
+}
+.table_head>th {
+	border-top: 2px solid #ddd;
+	border-bottom: 2px solid #ddd;
+	background: #fff;
+	color: #555;
+}
+/* Basic cells. */
+.table_grid td, .letterspacing {
+	border-bottom: 1px solid #ccc;
+}
+.table_grid .alternate_row {
+	background: #fafafa;
+}
+
+/* For Errors.template.php. */
+/* ------------------------------------------------------- */
+#errorfile_table .current {
+	border: 1px solid #444;
+	background: #fff5cd;
+}
 
 /*	$BOARDS		*/
 /* ------------------------------------------------------- */
@@ -699,7 +989,70 @@ div.bbc_footnotes .meaction{
 .recentpost>strong>a, .inline>strong>a {
 	color: #46823c;
 }
-
+#expanded_pages_container a {
+	background: #fff;
+}
+/* The board description and who-is-viewing stuff. */
+#description_board {
+	background: #e4e4e4;
+	border-radius: 4px 4px 0 0;
+	box-shadow: 1px 2px 4px #eee;
+}
+#description_board .generalinfo, #forumposts .generalinfo {
+	background: #fff;
+	border: 1px solid #ddd;
+	border-bottom: 1px solid #ccc;
+}
+.topic_listing {
+	background: #e4e4e4;
+	box-shadow: 1px 2px 4px #eee;
+}
+.topic_listing>li {
+	border: 1px solid #ddd;
+	border-bottom: 1px solid #ccc;
+}
+.topic_sorting_row, .basic_row {
+	background: #fff;
+}
+.sort_by_container {
+	border: 1px solid #ccc;
+	border-radius: 2px;
+}
+.topic_name h4 a {
+	color: #4b863c;
+}
+.sticky_row .topic_name h4 a, .locked_row.sticky_row .topic_name h4 a {
+	color: #555;
+}
+.locked_row .topic_name h4 a {
+	color: #777;
+}
+.topic_stats {
+	color: #777;
+}
+.qaction_row {
+	background: #fff;
+}
+.approvetopic_row, .approve_row {
+	background: #fff5cd;
+}
+.sticky_row, .locked_row.sticky_row {
+	background: #ffffe0;
+}
+#topic_icons {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+}
+.jump_to_header {
+	background: #ebebeb;
+	background-image: linear-gradient(to bottom, #fafafa, #eaeaea);
+	color: #566450;
+	box-shadow: 2px 1px rgba(1,1,1,0.07) inset;
+}
+.jump_to_header:hover {
+	background: #f0f0f0;
+	color: #555;
+}
 /* --------------------------------------------------------------------- */
 /* The following are alternative layout orders for the board index rows. */
 /* They are basic demonstrations only. Extra custom styling can be done.
@@ -789,6 +1142,25 @@ div.bbc_footnotes .meaction{
 /* ------------------------------------------------ */
 /* End alternative layouts. Back to standard stuff. */
 /* ------------------------------------------------ */
+
+/*	$TOPICS		*/
+/* ------------------------------------------------------- */
+
+/* The display template (topic view).
+/* Poll vote options */
+/* @todo - Slow selectors for the next few declarations here. Change? */
+#poll_options ul.options {
+
+	border-top: 1px solid #9999aa;
+}
+
+/* Poll results */
+#poll_options dl.options {
+	border: solid #9999aa;
+	border-width: 1px 0;
+}
+
+
 
 /* $PROFILE	*/
 /* ------------------------------------------------------- */

@@ -852,39 +852,26 @@ class ManageNews_Controller extends Action_Controller
 	 */
 	private function _initNewsSettingsForm()
 	{
-		global $txt;
-
 		// We're working with them settings here.
 		require_once(SUBSDIR . '/Settings.class.php');
 
 		// instantiate the form
 		$this->_newsSettings = new Settings_Form();
 
-		$config_vars = array(
-			array('title', 'settings'),
-				// Inline permissions.
-				array('permissions', 'edit_news', 'help' => ''),
-				array('permissions', 'send_mail'),
-			'',
-				// Just the remaining settings.
-				array('check', 'xmlnews_enable', 'onclick' => 'document.getElementById(\'xmlnews_maxlen\').disabled = !this.checked;document.getElementById(\'xmlnews_limit\').disabled = !this.checked;'),
-				array('text', 'xmlnews_maxlen', 'subtext' => $txt['xmlnews_maxlen_note'], 10),
-				array('text', 'xmlnews_limit', 'subtext' => $txt['xmlnews_limit_note'], 10),
-		);
+		// Initialize it with our settings
+		$config_vars = $this->_settings();
 
 		return $this->_newsSettings->settings($config_vars);
 	}
 
 	/**
 	 * Get the settings of the forum related to news.
-	 *
-	 * @return array
 	 */
-	public function settings()
+	private function _settings()
 	{
 		global $txt;
 
-		$config_vars = array(
+		$config_vars = 	array(
 			array('title', 'settings'),
 				// Inline permissions.
 				array('permissions', 'edit_news', 'help' => ''),
@@ -897,5 +884,13 @@ class ManageNews_Controller extends Action_Controller
 		);
 
 		return $config_vars;
+	}
+
+	/**
+	 * Return the form settings for use in admin search
+	 */
+	public function settings_search()
+	{
+		return $this->_settings();
 	}
 }

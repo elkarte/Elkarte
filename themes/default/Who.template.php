@@ -14,12 +14,9 @@
  * @version 1.0 Beta
  */
 
-/**
- * Who's online page.
- */
-function template_main()
+function template_whos_selection_above()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	// Display the table header and linktree.
 	echo '
@@ -42,6 +39,14 @@ function template_main()
 				</div>';
 
 	template_pagesection(false, false, array('extra' => $extra));
+}
+
+/**
+ * Who's online page.
+ */
+function template_whos_online()
+{
+	global $context, $settings, $scripturl, $txt;
 
 	echo '
 			<div class="topic_table" id="mlist">
@@ -101,6 +106,11 @@ function template_main()
 					</tbody>
 				</table>
 			</div>';
+}
+
+function template_whos_selection_below()
+{
+	global $context, $txt;
 
 	$extra_bottom = '
 			<div class="selectbox floatright">' . $txt['who_show1'] . '

@@ -95,6 +95,7 @@ class MoveTopic_Controller extends Action_Controller
 		$context['redirect_expires'] = isset($_SESSION['move_to_topic']['redirect_expires']) ? (int) $_SESSION['move_to_topic']['redirect_expires'] : 0;
 
 		$context['page_title'] = $txt['move_topic'];
+		$context['sub_template'] = 'move_topic';
 
 		$context['linktree'][] = array(
 			'url' => $scripturl . '?topic=' . $topic . '.0',

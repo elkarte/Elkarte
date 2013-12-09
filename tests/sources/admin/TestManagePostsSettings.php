@@ -26,7 +26,7 @@ class TestManagePostsSettings extends UnitTestCase
 		loadLanguage('Admin');
 
 		$controller = new ManagePosts_Controller();
-		$settings = $controller->settings();
+		$settings = $controller->settings_search();
 
 		// Lets see some hardcoded setting for posts management...
 		$this->assertNotNull($settings);

@@ -17,7 +17,7 @@
 /**
  * Show the main page with the reminder form.
  */
-function template_main()
+function template_reminder()
 {
 	global $context, $txt, $scripturl;
 

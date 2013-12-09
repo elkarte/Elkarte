@@ -1042,13 +1042,25 @@ class ManageLanguages_Controller extends Action_Controller
 	 */
 	private function _initLanguageSettingsForm()
 	{
-		global $txt;
-
 		// We'll want to use them someday. That is, right now.
 		require_once(SUBSDIR . '/Settings.class.php');
 
 		// Make it happen!
 		$this->_languageSettings = new Settings_Form();
+
+		// Initialize it with our settings
+		$config_vars = $this->_settings();
+
+		// Initialize the little form
+		return $this->_languageSettings->settings($config_vars);
+	}
+
+	/**
+	 * Load up all of the lanaguage settings
+	 */
+	private function _settings()
+	{
+		global $txt;
 
 		// Warn the user if the backup of Settings.php failed.
 		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
@@ -1065,29 +1077,14 @@ class ManageLanguages_Controller extends Action_Controller
 		foreach ($languages as $lang)
 			$config_vars['language'][4][$lang['filename']] = array($lang['filename'], strtr($lang['name'], array('-utf8' => ' (UTF-8)')));
 
-		// Initialize the little form
-		return $this->_languageSettings->settings($config_vars);
+		return $config_vars;
 	}
 
-	public function settings()
+	/**
+	 * Return the form settings for use in admin search
+	 */
+	public function settings_search()
 	{
-		global $txt;
-
-		// Warn the user if the backup of Settings.php failed.
-		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
-
-		$config_vars = array(
-			'language' => array('language', $txt['default_language'], 'file', 'select', array(), null, 'disabled' => $settings_not_writable),
-			array('userLanguage', $txt['userLanguage'], 'db', 'check', null, 'userLanguage'),
-		);
-
-		call_integration_hook('integrate_language_settings', array(&$config_vars));
-
-		// Get all languages we speak.
-		$languages = getLanguages(false);
-		foreach ($languages as $lang)
-			$config_vars['language'][4][$lang['filename']] = array($lang['filename'], strtr($lang['name'], array('-utf8' => ' (UTF-8)')));
-
-		return $config_vars;
+		return $this->_settings();
 	}
 }

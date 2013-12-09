@@ -88,9 +88,6 @@ class ManageBoards_Controller extends Action_Controller
 
 		call_integration_hook('integrate_manage_boards', array(&$subActions));
 
-		// Default to sub-action 'main' or 'settings' depending on permissions.
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('manage_boards') ? 'main' : 'settings');
-
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['boards_and_cats'],
@@ -106,11 +103,13 @@ class ManageBoards_Controller extends Action_Controller
 				),
 			),
 		);
-		$context['sub_action'] = $subAction;
 
 		// You way will end here if you don't have permission.
-		$action = new Action();
-		$action->initialize($subActions, 'settings');
+		$action = new Action('manage_boards');
+		// Default to sub-action 'main' or 'settings' depending on permissions.
+		$subAction = $action->initialize($subActions, allowedTo('manage_boards') ? 'main' : 'settings');
+		$context['sub_action'] = $subAction;
+
 		$action->dispatch($subAction);
 	}
 
@@ -245,6 +244,7 @@ class ManageBoards_Controller extends Action_Controller
 		call_integration_hook('integrate_boards_main');
 
 		$context['page_title'] = $txt['boards_and_cats'];
+		$context['sub_template'] = 'manage_boards';
 		$context['can_manage_permissions'] = allowedTo('manage_permissions');
 	}
 
@@ -765,36 +765,11 @@ class ManageBoards_Controller extends Action_Controller
 	 */
 	private function _initBoardSettingsForm()
 	{
-		global $txt;
-
-		// instantiate the form
+		// Instantiate the form
 		$this->_boardSettings = new Settings_Form();
 
-		// We need to borrow a string from here
-		loadLanguage('ManagePermissions');
-
-		// Load the boards list - for the recycle bin!
-		require_once(SUBSDIR . '/Boards.subs.php');
-		$boards = getBoardList(array('not_redirection' => true), true);
-		$recycle_boards = array('');
-		foreach ($boards as $board)
-			$recycle_boards[$board['id_board']] = $board['cat_name'] . ' - ' . $board['board_name'];
-
-		// Here and the board settings...
-		$config_vars = array(
-			array('title', 'settings'),
-				// Inline permissions.
-				array('permissions', 'manage_boards', 'helptext' => $txt['permissionhelp_manage_boards']),
-			'',
-				// Other board settings.
-				array('check', 'countChildPosts'),
-				array('check', 'recycle_enable', 'onclick' => 'document.getElementById(\'recycle_board\').disabled = !this.checked;'),
-				array('select', 'recycle_board', $recycle_boards),
-				array('check', 'allow_ignore_boards'),
-				array('check', 'deny_boards_access'),
-		);
-
-		call_integration_hook('integrate_boards_settings', array(&$subActions));
+		// Initialize it with our settings
+		$config_vars = $this->_settings();
 
 		return $this->_boardSettings->settings($config_vars);
 	}
@@ -802,7 +777,7 @@ class ManageBoards_Controller extends Action_Controller
 	/**
 	 * Retrieve and return all admin settings for boards management.
 	 */
-	public function settings()
+	private function _settings()
 	{
 		global $txt;
 
@@ -813,7 +788,6 @@ class ManageBoards_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Boards.subs.php');
 		$boards = getBoardList(array('not_redirection' => true), true);
 		$recycle_boards = array('');
-
 		foreach ($boards as $board)
 			$recycle_boards[$board['id_board']] = $board['cat_name'] . ' - ' . $board['board_name'];
 
@@ -834,5 +808,13 @@ class ManageBoards_Controller extends Action_Controller
 		call_integration_hook('integrate_boards_settings', array(&$subActions));
 
 		return $config_vars;
+	}
+
+	/**
+	 * Return the form settings for use in admin search
+	 */
+	public function settings_search()
+	{
+		return $this->_settings();
 	}
 }

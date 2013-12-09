@@ -129,7 +129,7 @@ function mostOnline($date)
 	list ($online) = $db->fetch_row($result);
 	$db->free_result($result);
 
-	return $online;
+	return (int) $online;
 }
 
 /**

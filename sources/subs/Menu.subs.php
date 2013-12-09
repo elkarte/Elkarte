@@ -59,6 +59,8 @@ function createMenu($menuData, $menuOptions = array())
 				string $file:		Name of source file required for this area.
 				string $function:	Function to call when area is selected.
 				string $custom_url:	URL to use for this menu item.
+				string $icon:		File name of an icon to use on the menu, if using the sprite class, set as transparent.png
+	 			string $class:		Class name to apply to the icon img, used to apply a sprite icon
 				bool $enabled:		Should this area even be accessible?
 				bool $hidden:		Should this area be visible?
 				string $select:		If set this item will not be displayed - instead the item indexed here shall be.
@@ -97,6 +99,8 @@ function createMenu($menuData, $menuOptions = array())
 		$menu_context['extra_parameters'] .= ';' . $context['session_var'] . '=' . $context['session_id'];
 
 	$include_data = array();
+	// This is necessary only in profile (at least for the core), but we do it always because it's easier
+	$permission_set = !empty($context['user']['is_owner']) ? 'own' : 'any';
 
 	// Now setup the context correctly.
 	foreach ($menuData as $section_id => $section)
@@ -110,7 +114,7 @@ function createMenu($menuData, $menuOptions = array())
 			// The profile menu has slightly different permissions
 			if (is_array($section['permission']) && isset($section['permission']['own'], $section['permission']['any']))
 			{
-				if (empty($area['permission'][$context['user']['is_owner'] ? 'own' : 'any']) || !allowedTo($section['permission'][$context['user']['is_owner'] ? 'own' : 'any']))
+				if (empty($area['permission'][$permission_set]) || !allowedTo($section['permission'][$permission_set]))
 					continue;
 			}
 			elseif (!allowedTo($section['permission']))
@@ -129,7 +133,7 @@ function createMenu($menuData, $menuOptions = array())
 					// The profile menu has slightly different permissions
 					if (is_array($area['permission']) && isset($area['permission']['own'], $area['permission']['any']))
 					{
-						if (empty($area['permission'][$context['user']['is_owner'] ? 'own' : 'any']) || !allowedTo($area['permission'][$context['user']['is_owner'] ? 'own' : 'any']))
+						if (empty($area['permission'][$permission_set]) || !allowedTo($area['permission'][$permission_set]))
 							continue;
 					}
 					elseif (!allowedTo($area['permission']))
@@ -171,7 +175,7 @@ function createMenu($menuData, $menuOptions = array())
 
 						// Does this area have its own icon?
 						if (isset($area['icon']))
-							$menu_context['sections'][$section_id]['areas'][$area_id]['icon'] = '<img ' . (isset($area['class']) ? 'class="' . $area['class'] . '" ' : '') . 'src="' . $context['menu_image_path'] . '/' . $area['icon'] . '" alt="" />&nbsp;&nbsp;';
+							$menu_context['sections'][$section_id]['areas'][$area_id]['icon'] = '<img ' . (isset($area['class']) ? 'class="' . $area['class'] . '" ' : 'style="background: none"') . 'src="' . $context['menu_image_path'] . '/' . $area['icon'] . '" alt="" />&nbsp;&nbsp;';
 						else
 							$menu_context['sections'][$section_id]['areas'][$area_id]['icon'] = '';
 

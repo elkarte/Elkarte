@@ -14,12 +14,9 @@
  * @version 1.0 Beta
  */
 
-/**
- * Displays a sortable listing of all members registered on the forum.
- */
-function template_main()
+function template_mlsearch_above()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	$extra = '
 	<form id="mlsearch" action="' . $scripturl . '?action=memberlist;sa=search" method="post" accept-charset="UTF-8">
@@ -61,7 +58,17 @@ function template_main()
 			$(\'body\').off(\'click\', mlsearch_opt_hide);
 			$(\'#mlsearch_options\').slideToggle(\'fast\');
 		}
-	// ]]></script>
+	// ]]></script>';
+
+}
+/**
+ * Displays a sortable listing of all members registered on the forum.
+ */
+function template_memberlist()
+{
+	global $context, $settings, $scripturl, $txt;
+
+	echo '
 	<div id="memberlist">
 		<h2 class="category_header">
 				<span class="floatleft">', $txt['members_list'], '</span>';
@@ -76,9 +83,12 @@ function template_main()
 			<thead>
 				<tr class="table_head">';
 
+	$table_span = 0;
+
 	// Display each of the column headers of the table.
 	foreach ($context['columns'] as $key => $column)
 	{
+		$table_span += isset($column['colspan']) ? $column['colspan'] : 1;
 		// This is a selected column, so underline it or some such.
 		if ($column['selected'])
 			echo '
@@ -104,8 +114,17 @@ function template_main()
 	{
 		foreach ($context['members'] as $member)
 		{
+			if (!empty($member['sort_letter']))
+			{
+				echo '
+				<tr class="standard_row" id="letter', $member['sort_letter'], '">
+					<th class="letterspacing" colspan="', $table_span, '">', $member['sort_letter'], '</th>
+				</tr>';
+
+				$alternate = true;
+			}
 			echo '
-				<tr class="', $alternate ? 'alternate_' : 'standard_', 'row"', empty($member['sort_letter']) ? '' : ' id="letter' . $member['sort_letter'] . '"', '>';
+				<tr class="', $alternate ? 'alternate_' : 'standard_', 'row">';
 
 			foreach ($context['columns'] as $column => $values)
 			{
@@ -153,6 +172,11 @@ function template_main()
 	echo '
 			</tbody>
 		</table>';
+}
+
+function template_mlsearch_below()
+{
+	global $context, $scripturl, $txt;
 
 	// If it is displaying the result of a search show a "search again" link to edit their criteria.
 	if (isset($context['old_search']))

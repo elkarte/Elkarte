@@ -968,7 +968,10 @@ class Post_Controller extends Action_Controller
 
 		// Finally, load the template.
 		if (!isset($_REQUEST['xml']))
+		{
 			loadTemplate('Post');
+			$context['sub_template'] = 'post_page';
+		}
 	}
 
 	/**

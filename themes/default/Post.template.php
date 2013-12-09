@@ -22,7 +22,7 @@ function template_Post_init()
 /**
  * The main template for the post page.
  */
-function template_main()
+function template_post_page()
 {
 	global $context, $txt;
 
@@ -81,8 +81,9 @@ function template_additional_options_below()
 						</span>
 						<a href="#" id="postMoreExpandLink">', $context['can_post_attachment'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt'], '</a>
 					</h3>';
+
 	echo '
-					<div id="postAdditionalOptions"', empty($settings['additional_options_collapsible']) || empty($context['minmax_preferences']['post']) ? '' : ' style="display: none;"', '>';
+					<div id="', empty($settings['additional_options_collapsible']) ? 'postAdditionalOptionsNC"' : 'postAdditionalOptions"', empty($settings['additional_options_collapsible']) || empty($context['minmax_preferences']['post']) ? '' : ' style="display: none;"', '>';
 
 	// If this post already has attachments on it - give information about them.
 	if (!empty($context['current_attachments']))

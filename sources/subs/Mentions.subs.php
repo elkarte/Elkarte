@@ -17,7 +17,7 @@ if (!defined('ELK'))
  * callback for createList in action_list of Mentions_Controller
  *
  * @param bool $all : if true counts all the mentions, otherwise only the unread
- * @param string $type : the type of the mention
+ * @param mixed $type : the type of the mention can be a string or an array of strings.
  * @param string $id_member : the id of the member the counts are for, defaults to user_info['id']
  */
 function countUserMentions($all = false, $type = '', $id_member = null)
@@ -30,14 +30,12 @@ function countUserMentions($all = false, $type = '', $id_member = null)
 	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_mentions as mtn
-			LEFT JOIN {db_prefix}messages AS m ON (mtn.id_msg = m.id_msg)
-			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
-		WHERE ({query_see_board} OR mtn.id_msg = 0)
-			AND mtn.id_member = {int:current_user}' . ($all ? '
-			AND mtn.status != {int:is_not_deleted}
-			AND mtn.status != {int:unapproved}' : '
-			AND mtn.status = {int:is_not_read}') . (empty($type) ? '' : '
-			AND mtn.mention_type = {string:current_type}'),
+		WHERE mtn.id_member = {int:current_user}' . ($all ? '
+			AND mtn.status != {int:unapproved}
+			AND mtn.status != {int:is_not_deleted}' : '
+			AND mtn.status = {int:is_not_read}') . (empty($type) ? '' : (is_array($type) ? '
+			AND mtn.mention_type IN ({array_string:current_type})' : '
+			AND mtn.mention_type = {string:current_type}')),
 		array(
 			'current_user' => $id_member,
 			'current_type' => $type,
@@ -64,7 +62,7 @@ function countUserMentions($all = false, $type = '', $id_member = null)
  * @param int $limit Number of mentions returned
  * @param string $sort Sorting
  * @param bool $all if show all mentions or only unread ones
- * @param string $type : the type of the mention
+ * @param mixed $type : the type of the mention can be a string or an array of strings.
  */
 function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 {
@@ -79,15 +77,14 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
 		FROM {db_prefix}log_mentions AS mtn
 			LEFT JOIN {db_prefix}messages AS m ON (mtn.id_msg = m.id_msg)
-			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 			LEFT JOIN {db_prefix}members AS mem ON (mtn.id_member_from = mem.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member)
-		WHERE ({query_see_board} OR mtn.id_msg = 0)
-			AND mtn.id_member = {int:current_user}' . ($all ? '
+		WHERE mtn.id_member = {int:current_user}' . ($all ? '
 			AND mtn.status != {int:unapproved}
 			AND mtn.status != {int:is_not_deleted}' : '
-			AND mtn.status = {int:is_not_read}') . (empty($type) ? '' : '
-			AND mtn.mention_type = {string:current_type}') . '
+			AND mtn.status = {int:is_not_read}') . (empty($type) ? '' : (is_array($type) ? '
+			AND mtn.mention_type IN ({array_string:current_type})' : '
+			AND mtn.mention_type = {string:current_type}')) . '
 		ORDER BY {raw:sort}
 		LIMIT {int:start}, {int:limit}',
 		array(
@@ -111,6 +108,7 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 
 	return $mentions;
 }
+
 
 /**
  * Inserts a new mention
