@@ -136,18 +136,16 @@ class TestRequest extends UnitTestCase
 
 	/**
 	 * action should be present and string
-	 * Apparently php 5.3 and lower don't warn on array to string conversion
 	 */
 	function testActionAsArray()
 	{
-		$_GET['action'] = array('test1', 'test2');
+		$_GET['action'] = 10;
 
-		if (version_compare(PHP_VERSION, '5.4') >= 0)
-			$this->expectError('Array to string conversion');
 		$this->request->parseRequest();
+		$is_string = $_GET['action'] === '10';
 
+		$this->assertTrue($is_string);
 		// we expect 'action' as string
 		$this->assertIsA($_GET['action'], 'string');
-		$this->assertEqual($_GET['action'], 'Array'); // hmm
 	}
 }
