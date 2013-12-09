@@ -68,21 +68,12 @@ function getXMLDocument(sUrl, funcCallback)
 				return;
 
 			if (oMyDoc.responseXML !== null && oMyDoc.status === 200)
-			{
-				if (funcCallback.call)
-				{
-					funcCallback.call(oCaller, oMyDoc.responseXML);
-				}
-				// A primitive substitute for the call method to support IE 5.0.
-				else
-				{
-					oCaller.tmpMethod = funcCallback;
-					oCaller.tmpMethod(oMyDoc.responseXML);
-					delete oCaller.tmpMethod;
-				}
-			}
+				funcCallback.call(oCaller, oMyDoc.responseXML);
+			else
+				funcCallback.call(oCaller, false);
 		};
 	}
+
 	oMyDoc.open('GET', sUrl, bAsync);
 	oMyDoc.send(null);
 
@@ -397,14 +388,17 @@ function replaceText(text, oTextHandle)
 	{
 		var begin = oTextHandle.value.substr(0, oTextHandle.selectionStart),
 			end = oTextHandle.value.substr(oTextHandle.selectionEnd),
-			scrollPos = oTextHandle.scrollTop;
+			scrollPos = oTextHandle.scrollTop,
+			goForward = 0;
 
 		oTextHandle.value = begin + text + end;
-
 		if (oTextHandle.setSelectionRange)
 		{
 			oTextHandle.focus();
-			var goForward = is_opera ? text.match(/\n/g).length : 0;
+
+			if (is_opera && text.match(/\n/g) !== null)
+				goForward = text.match(/\n/g).length;
+
 			oTextHandle.setSelectionRange(begin.length + text.length + goForward, begin.length + text.length + goForward);
 		}
 		oTextHandle.scrollTop = scrollPos;

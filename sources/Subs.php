@@ -4374,18 +4374,24 @@ function pregReplaceCurry($func, $arity)
 }
 
 /**
- * Helper function to insert a menu in an existing menu array
- * Intended for addon use to allow adding in a new menu item in an existing menu array via integration hooks
+ * Helper function to insert an array in to an existing array
+ * Intended for addon use to allow such things as
+ *  - adding in a new menu item to an existing menu array
  *
- * @param array $input the menu array we will insert to
- * @param string $key the key in the array that we are looking to insert before or after
- * @param array $insert the data to insert before or after the above key
+ * @param array $input the array we will insert to
+ * @param string $key the key in the array that we are looking to find for the insert action
+ * @param array $insert the actual data to insert before or after the key
  * @param string $where adding before or after
+ * @param bool $assoc if the array is a assoc array with named keys or a basic index array
  * @param bool $strict search for identical elements, this means it will also check the types of the needle.
  */
-function elk_array_insert($input, $key, $insert, $where = 'before', $strict = false)
+function elk_array_insert($input, $key, $insert, $where = 'before', $assoc = true, $strict = false)
 {
-	$position = array_search($key, array_keys($input), $strict);
+	// Search for key names or values
+	if ($assoc)
+		$position = array_search($key, array_keys($input), $strict);
+	else
+		$position = array_search($key, $input, $strict);
 
 	// If the key is not found, just insert it at the end
 	if ($position === false)

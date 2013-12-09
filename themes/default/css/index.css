@@ -476,7 +476,6 @@ em {
 	background-image: url(../images/icons/header.png);
 	background-repeat: no-repeat;
     content: "";
-	float: left;
     height: 24px;
     margin-top: 0.25em;
     padding-left: 30px;
@@ -2662,6 +2661,13 @@ ul.post_options li {
 	background: #fdfdfd;
 	border-top: none;
 }
+#postAdditionalOptionsNC {
+	margin: 0 0 1em 0;
+	overflow: auto;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	background: #fdfdfd;
+}
 #postMoreOptions, #postAttachment, #postAttachment2 {
 	margin: -1px 0 0 0;
 	padding: 10px;
@@ -3551,7 +3557,8 @@ div.labels {
 .statistics .category_header {
 	width: 49%;
 	margin: 0 0.5% 0 50.5%;
-	font-size: 1.143em;
+	padding-top: 1px;
+	font-size: 1.214em;
 }
 #top_row .category_header {
 	width: 99%;
@@ -3561,7 +3568,7 @@ div.labels {
 	margin: 0 0.5%;
 }
 .statistics .flow_hidden, #forum_history .flow_hidden {
-	margin: 4px 0 0 0;
+	margin: 2px 0 0 0;
 }
 .stats {
 	overflow: hidden;
