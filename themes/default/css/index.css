@@ -4493,6 +4493,9 @@ a.help .icon {
 	.pm_icon, .pm_quickmod, .label_pms {
 		display: none;
 	}
+	.popup_window {
+		width: 95%;
+	}
 	/*	$MODERATE	*/
 	/* ------------------------------------------------------- */
 	.split_topics, .move_topic {
