@@ -457,7 +457,7 @@ class Profile_Controller extends Action_Controller
 
 		// Permissions for good measure.
 		if (!empty($profile_include_data['permission']))
-			isAllowedTo($profile_include_data['permission']);
+			isAllowedTo($profile_include_data['permission'][$context['user']['is_owner'] ? 'own' : 'any']);
 
 		// Create a token if needed.
 		if (!empty($profile_include_data['token']))

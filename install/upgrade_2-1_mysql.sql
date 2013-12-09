@@ -208,7 +208,7 @@ CHANGE body body mediumtext NOT NULL;
 /******************************************************************************/
 ---# Altering the membergroup stars to icons
 ALTER TABLE {$db_prefix}membergroups
-CHANGE `stars` `icons` varchar(255) NOT NULL DEFAULT '';
+CHANGE stars icons varchar(255) NOT NULL DEFAULT '';
 ---#
 
 /******************************************************************************/
