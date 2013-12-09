@@ -4481,6 +4481,9 @@ a.help .icon {
 		float: none;
 		display: block;
 	}
+	.pm_icon, .pm_quickmod, .label_pms {
+		display: none;
+	}
 	/*	$MODERATE	*/
 	/* ------------------------------------------------------- */
 	.split_topics, .move_topic {
