@@ -748,7 +748,6 @@ div.windowbg, div.windowbg2 {
 	/* @todo - See me grumblez in Issue #552. ;) */
 }
 #top_section_notice .toggle_login {
-	padding-top: 2px;
 	display: inline;
 	cursor: pointer;
 }
@@ -757,7 +756,7 @@ div.windowbg, div.windowbg2 {
 	width: 100%;
 }
 .top_button {
-	line-height: 1.9em;
+	line-height: 1.3em;
 	padding: 2px;
 	margin-left: 1px;
 }
@@ -766,6 +765,7 @@ div.windowbg, div.windowbg2 {
 }
 #password_login {
 	display: inline-block;
+	vertical-align: middle;
 }
 #search_form {
 	padding: 12px 0 4px 8px;
@@ -3148,6 +3148,20 @@ dl.merge_topic dd {
 #personal_messages .reportlinks {
 	padding: 6px 1.3em;
 }
+.pm_icon, .pm_quickmod {
+	width: 4%;
+}
+.pm_date {
+	width: 22%;
+	text-align: left;
+}
+.pm_subject {
+	width: 46%;
+	text-align: left;
+}
+.pm_from {
+	text-align: left;
+}
 #searchLabelsExpand li {
 	padding: 4px 6px;
 }
@@ -4060,6 +4074,7 @@ a.help .icon {
 	}
 	.board_info h3 a {
 		font-size: 1.3em;
+		word-wrap: break-word;
 	}
 	.board_latest {
 		padding: 0 8px;
@@ -4128,6 +4143,15 @@ a.help .icon {
 	.menulevel3 {
 		margin: -2em 0 0 4em;
 		max-width: 15em;
+	}
+	#main_menu li ul li, .admin_menu li ul li{
+		float: left;
+		display: block;
+		width: 100%;
+	}
+	.menulevel2, .menulevel2:hover {
+		width: 100%;
+		font-size: 1em;
 	}
 	.generalinfo {
 		overflow: auto;
@@ -4230,6 +4254,12 @@ a.help .icon {
 	.pagesection div.floatright {
 		float: none;
 		display: block;
+	}
+	.pm_icon, .pm_quickmod, .label_pms {
+		display: none;
+	}
+	.popup_window {
+		width: 95%;
 	}
 	/*	$MODERATE	*/
 	/* ------------------------------------------------------- */
