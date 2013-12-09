@@ -4379,6 +4379,15 @@ a.help .icon {
 		margin: -2em 0 0 4em;
 		max-width: 15em;
 	}
+	#main_menu li ul li, .admin_menu li ul li{
+		float: left;
+		display: block;
+		width: 100%;
+	}
+	.menulevel2, .menulevel2:hover {
+		width: 100%;
+		font-size: 1em;
+	}
 	.generalinfo {
 		overflow: auto;
 	}
