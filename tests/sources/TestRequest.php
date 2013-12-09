@@ -139,12 +139,13 @@ class TestRequest extends UnitTestCase
 	 */
 	function testActionAsArray()
 	{
-		$_GET['action'] = array('test1', 'test2');
-		$this->expectError('Array to string conversion');
-		$this->request->parseRequest();
+		$_GET['action'] = 10;
 
+		$this->request->parseRequest();
+		$is_string = $_GET['action'] === '10';
+
+		$this->assertTrue($is_string);
 		// we expect 'action' as string
 		$this->assertIsA($_GET['action'], 'string');
-		$this->assertEqual($_GET['action'], 'Array'); // hmm
 	}
 }
