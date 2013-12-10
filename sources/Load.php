@@ -1531,6 +1531,9 @@ function loadTheme($id_theme = 0, $initialize = true)
 	if ($context['right_to_left'])
 		loadCSSFile('rtl.css');
 
+	if (!empty($context['theme_variant']) && $context['right_to_left'])
+		loadCSSFile($context['theme_variant'] . '/rtl' . $context['theme_variant'] . '.css');
+
 	// Compatibility.
 	if (!isset($settings['theme_version']))
 		$modSettings['memberCount'] = $modSettings['totalMembers'];
