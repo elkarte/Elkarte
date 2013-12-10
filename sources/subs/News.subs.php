@@ -183,3 +183,169 @@ function getNewsletterRecipients($sendQuery, $sendParams, $start, $increment, $c
 
 	return $recipients;
 }
+
+
+/**
+ * Find the latest posts that:
+ * - are the first post in their topic.
+ * - are on an any board OR in a specified board.
+ * - can be seen by this user.
+ * - are actually the latest posts.
+ *
+ * @param string $query_this_board passed to query, assumed raw and instered as such
+ * @param int $board
+ * @param int $limit
+ */
+function getXMLNews($query_this_board, $board, $limit)
+{
+	global $modSettings, $board, $context;
+
+	$db = database();
+
+	$done = false;
+	$loops = 0;
+	while (!$done)
+	{
+		$optimize_msg = implode(' AND ', $context['optimize_msg']);
+		$request = $db->query('', '
+			SELECT
+				m.smileys_enabled, m.poster_time, m.id_msg, m.subject, m.body, m.modified_time,
+				m.icon, t.id_topic, t.id_board, t.num_replies,
+				b.name AS bname,
+				mem.hide_email, IFNULL(mem.id_member, 0) AS id_member,
+				IFNULL(mem.email_address, m.poster_email) AS poster_email,
+				IFNULL(mem.real_name, m.poster_name) AS poster_name
+			FROM {db_prefix}topics AS t
+				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
+				INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
+				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
+			WHERE ' .  $query_this_board . (empty($optimize_msg) ? '' : '
+				AND {raw:optimize_msg}') . (empty($board) ? '' : '
+				AND t.id_board = {int:current_board}') . ($modSettings['postmod_active'] ? '
+				AND t.approved = {int:is_approved}' : '') . '
+			ORDER BY t.id_first_msg DESC
+			LIMIT {int:limit}',
+			array(
+				'current_board' => $board,
+				'is_approved' => 1,
+				'limit' => $limit,
+				'optimize_msg' => $optimize_msg,
+			)
+		);
+		// If we don't have $limit results, we try again with an unoptimized version covering all rows.
+		if ($loops < 2 && $db->num_rows($request) < $limit)
+		{
+			$db->free_result($request);
+
+			if (empty($_REQUEST['boards']) && empty($board))
+				unset($context['optimize_msg']['lowest']);
+			else
+				$context['optimize_msg']['lowest'] = 'm.id_msg >= t.id_first_msg';
+
+			$context['optimize_msg']['highest'] = 'm.id_msg <= t.id_last_msg';
+			$loops++;
+		}
+		else
+			$done = true;
+	}
+	$data = array();
+	while ($row = $db->fetch_assoc($request))
+		$data[] = $row;
+
+	$db->free_result($request);
+
+	return $data;
+}
+
+/**
+ * Get the recent topics to display.
+ *
+ * @param string $query_this_board passed to query, assumed raw and instered as such
+ * @param int $board
+ * @param int $limit
+ */
+function getXMLRecent($query_this_board, $board, $limit)
+{
+	global $modSettings, $board, $context;
+
+	$db = database();
+
+	$done = false;
+	$loops = 0;
+	while (!$done)
+	{
+		$optimize_msg = implode(' AND ', $context['optimize_msg']);
+		$request = $db->query('', '
+			SELECT m.id_msg
+			FROM {db_prefix}messages AS m
+				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
+				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
+			WHERE ' . $query_this_board . (empty($optimize_msg) ? '' : '
+				AND {raw:optimize_msg}') . (empty($board) ? '' : '
+				AND m.id_board = {int:current_board}') . ($modSettings['postmod_active'] ? '
+				AND m.approved = {int:is_approved}' : '') . '
+			ORDER BY m.id_msg DESC
+			LIMIT {int:limit}',
+			array(
+				'limit' => $limit,
+				'current_board' => $board,
+				'is_approved' => 1,
+				'optimize_msg' => $optimize_msg,
+			)
+		);
+		// If we don't have $limit results, try again with an unoptimized version covering all rows.
+		if ($loops < 2 && $db->num_rows($request) < $limit)
+		{
+			$db->free_result($request);
+
+			if (empty($_REQUEST['boards']) && empty($board))
+				unset($context['optimize_msg']['lowest']);
+			else
+				$context['optimize_msg']['lowest'] = $loops ? 'm.id_msg >= t.id_first_msg' : 'm.id_msg >= (t.id_last_msg - t.id_first_msg) / 2';
+
+			$loops++;
+		}
+		else
+			$done = true;
+	}
+	$messages = array();
+	while ($row = $db->fetch_assoc($request))
+		$messages[] = $row['id_msg'];
+	$db->free_result($request);
+
+	// No messages found, then return nothing
+	if (empty($messages))
+		return array();
+
+	// Find the most recent posts from our message list that this user can see.
+	$request = $db->query('', '
+		SELECT
+			m.smileys_enabled, m.poster_time, m.id_msg, m.subject, m.body, m.id_topic, t.id_board,
+			b.name AS bname, t.num_replies, m.id_member, m.icon, mf.id_member AS id_first_member,
+			IFNULL(mem.real_name, m.poster_name) AS poster_name, mf.subject AS first_subject,
+			IFNULL(memf.real_name, mf.poster_name) AS first_poster_name, mem.hide_email,
+			IFNULL(mem.email_address, m.poster_email) AS poster_email, m.modified_time
+		FROM {db_prefix}messages AS m
+			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
+			INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
+			LEFT JOIN {db_prefix}members AS memf ON (memf.id_member = mf.id_member)
+		WHERE m.id_msg IN ({array_int:message_list})
+			' . (empty($board) ? '' : 'AND t.id_board = {int:current_board}') . '
+		ORDER BY m.id_msg DESC
+		LIMIT {int:limit}',
+		array(
+			'limit' => $limit,
+			'current_board' => $board,
+			'message_list' => $messages,
+		)
+	);
+	$data = array();
+	while ($row = $db->fetch_assoc($request))
+		$data[] = $row;
+
+	$db->free_result($request);
+
+	return $data;
+}

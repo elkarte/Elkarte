@@ -67,7 +67,7 @@ class News_Controller extends Action_Controller
 
 		// Default to latest 5.  No more than whats defined in the ACP or 255
 		$limit = empty($modSettings['xmlnews_limit']) ? 5 : min($modSettings['xmlnews_limit'], 255);
-		$_GET['limit'] = empty($_GET['limit']) || (int) $_GET['limit'] < 1 ? $limit : min((int) $_GET['limit'], $limit);
+		$this->limit = empty($_GET['limit']) || (int) $_GET['limit'] < 1 ? $limit : min((int) $_GET['limit'], $limit);
 
 		// Handle the cases where a board, boards, or category is asked for.
 		$this->_query_this_board = '1=1';
@@ -96,7 +96,7 @@ class News_Controller extends Action_Controller
 
 			// Try to limit the number of messages we look through.
 			if ($total_cat_posts > 100 && $total_cat_posts > $modSettings['totalMessages'] / 15)
-				$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 400 - $_GET['limit'] * 5);
+				$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 400 - $this->limit * 5);
 		}
 		elseif (!empty($_REQUEST['boards']))
 		{
@@ -124,7 +124,7 @@ class News_Controller extends Action_Controller
 
 			// The more boards, the more we're going to look through...
 			if ($total_posts > 100 && $total_posts > $modSettings['totalMessages'] / 12)
-				$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 500 - $_GET['limit'] * 5);
+				$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 500 - $this->limit * 5);
 		}
 		elseif (!empty($board))
 		{
@@ -137,27 +137,24 @@ class News_Controller extends Action_Controller
 
 			// Try to look through just a few messages, if at all possible.
 			if ($boards_data['num_posts'] > 80 && $boards_data['num_posts'] > $modSettings['totalMessages'] / 10)
-				$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 600 - $_GET['limit'] * 5);
+				$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 600 - $this->limit * 5);
 		}
 		else
 		{
 			$this->_query_this_board = '{query_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 				AND b.id_board != ' . $modSettings['recycle_board'] : '');
-			$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 100 - $_GET['limit'] * 5);
+			$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 100 - $this->limit * 5);
 		}
 
 		// If format isn't set, rss2 is default
 		$xml_format = isset($_GET['type']) && in_array($_GET['type'], array('rss', 'rss2', 'atom', 'rdf', 'webslice')) ? $_GET['type'] : 'rss2';
 
-		// @todo Birthdays?
-
 		// List all the different types of data they can pull.
-		// @todo what are the the [1] values used for in this array?
 		$subActions = array(
-			'recent' => array('action_xmlrecent', 'recent-post'),
-			'news' => array('action_xmlnews', 'article'),
-			'members' => array('action_xmlmembers', 'member'),
-			'profile' => array('action_xmlprofile', null),
+			'recent' => array('action_xmlrecent'),
+			'news' => array('action_xmlnews'),
+			'members' => array('action_xmlmembers'),
+			'profile' => array('action_xmlprofile'),
 		);
 
 		// Easy adding of sub actions
@@ -165,7 +162,7 @@ class News_Controller extends Action_Controller
 
 		$subAction = isset($_GET['sa']) && isset($subActions[$_GET['sa']]) ? $_GET['sa'] : 'recent';
 
-		// @todo Temp - webslices doesn't do everything yet. (only recent posts)
+		// Webslices doesn't do everything (yet? ever?) so for now only recent posts is allowed in that format
 		if ($xml_format == 'webslice' && $subAction != 'recent')
 			$xml_format = 'rss2';
 		// If this is webslices we kinda cheat - we allow a template that we call direct for the HTML, and we override the CDATA.
@@ -177,10 +174,12 @@ class News_Controller extends Action_Controller
 		}
 
 		// We only want some information, not all of it.
-		$cachekey = array($xml_format, $_GET['action'], $_GET['limit'], $subAction);
+		$cachekey = array($xml_format, $_GET['action'], $this->limit, $subAction);
 		foreach (array('board', 'boards', 'c') as $var)
+		{
 			if (isset($_REQUEST[$var]))
 				$cachekey[] = $_REQUEST[$var];
+		}
 		$cachekey = md5(serialize($cachekey) . (!empty($this->_query_this_board) ? $this->_query_this_board : ''));
 		$cache_t = microtime(true);
 
@@ -333,7 +332,6 @@ class News_Controller extends Action_Controller
 	/**
 	 * Retrieve the list of members from database.
 	 * The array will be generated to match the format.
-	 * @todo get the list of members from subs/Members.subs.php.
 	 *
 	 * @param string $xml_format
 	 * @return array
@@ -347,7 +345,7 @@ class News_Controller extends Action_Controller
 
 		// Find the most recent members.
 		require_once(SUBSDIR . '/Members.subs.php');
-		$members = recentMembers((int) $_GET['limit']);
+		$members = recentMembers((int) $this->limit);
 
 		$data = array();
 		foreach ($members as $member)
@@ -391,7 +389,6 @@ class News_Controller extends Action_Controller
 	 * Get the latest topics information from a specific board,
 	 * to display later.
 	 * The returned array will be generated to match the xmf_format.
-	 * @todo does not belong here
 	 *
 	 * @param $xml_format
 	 * @return array, array of topics
@@ -399,69 +396,22 @@ class News_Controller extends Action_Controller
 	public function action_xmlnews($xml_format)
 	{
 		global $scripturl, $modSettings, $board;
-		global $context;
 
-		$db = database();
+		// Get the latest topics from a board
+		require_once(SUBSDIR . '/News.subs.php');
+		$results = getXMLNews($this->_query_this_board, $board, $this->limit);
 
-		/* Find the latest posts that:
-			- are the first post in their topic.
-			- are on an any board OR in a specified board.
-			- can be seen by this user.
-			- are actually the latest posts. */
-
-		$done = false;
-		$loops = 0;
-		while (!$done)
-		{
-			$optimize_msg = implode(' AND ', $context['optimize_msg']);
-			$request = $db->query('', '
-				SELECT
-					m.smileys_enabled, m.poster_time, m.id_msg, m.subject, m.body, m.modified_time,
-					m.icon, t.id_topic, t.id_board, t.num_replies,
-					b.name AS bname,
-					mem.hide_email, IFNULL(mem.id_member, 0) AS id_member,
-					IFNULL(mem.email_address, m.poster_email) AS poster_email,
-					IFNULL(mem.real_name, m.poster_name) AS poster_name
-				FROM {db_prefix}topics AS t
-					INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
-					INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
-					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-				WHERE ' . $this->_query_this_board . (empty($optimize_msg) ? '' : '
-					AND {raw:optimize_msg}') . (empty($board) ? '' : '
-					AND t.id_board = {int:current_board}') . ($modSettings['postmod_active'] ? '
-					AND t.approved = {int:is_approved}' : '') . '
-				ORDER BY t.id_first_msg DESC
-				LIMIT {int:limit}',
-				array(
-					'current_board' => $board,
-					'is_approved' => 1,
-					'limit' => $_GET['limit'],
-					'optimize_msg' => $optimize_msg,
-				)
-			);
-			// If we don't have $_GET['limit'] results, try again with an unoptimized version covering all rows.
-			if ($loops < 2 && $db->num_rows($request) < $_GET['limit'])
-			{
-				$db->free_result($request);
-				if (empty($_REQUEST['boards']) && empty($board))
-					unset($context['optimize_msg']['lowest']);
-				else
-					$context['optimize_msg']['lowest'] = 'm.id_msg >= t.id_first_msg';
-				$context['optimize_msg']['highest'] = 'm.id_msg <= t.id_last_msg';
-				$loops++;
-			}
-			else
-				$done = true;
-		}
+		// Prepare it for the feed in the format chosen (rss, atom, etc)
 		$data = array();
-		while ($row = $db->fetch_assoc($request))
+		foreach ($results as $row)
 		{
 			// Limit the length of the message, if the option is set.
 			if (!empty($modSettings['xmlnews_maxlen']) && Util::strlen(str_replace('<br />', "\n", $row['body'])) > $modSettings['xmlnews_maxlen'])
-				$row['body'] = strtr(Util::substr(str_replace('<br />', "\n", $row['body']), 0, $modSettings['xmlnews_maxlen'] - 3), array("\n" => '<br />')) . '...';
+				$row['body'] = strtr(shorten_text(str_replace('<br />', "\n", $row['body']), $modSettings['xmlnews_maxlen'], true), array("\n" => '<br />'));
 
 			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
 
+			// Dirty mouth?
 			censorText($row['body']);
 			censorText($row['subject']);
 
@@ -483,6 +433,7 @@ class News_Controller extends Action_Controller
 				if ($xml_format == 'rss2')
 					$data[sizeof($data) - 1]['dc:creator'] = $row['poster_name'];
 			}
+			// RDF Format anyone
 			elseif ($xml_format == 'rdf')
 			{
 				$data[] = array(
@@ -491,6 +442,7 @@ class News_Controller extends Action_Controller
 					'description' => cdata_parse($row['body']),
 				);
 			}
+			// Atom feed
 			elseif ($xml_format == 'atom')
 			{
 				$data[] = array(
@@ -531,7 +483,6 @@ class News_Controller extends Action_Controller
 				);
 			}
 		}
-		$db->free_result($request);
 
 		return $data;
 	}
@@ -539,94 +490,29 @@ class News_Controller extends Action_Controller
 	/**
 	 * Get the recent topics to display.
 	 * The returned array will be generated to match the xml_format.
-	 * @todo does not belong here.
 	 *
 	 * @param $xml_format
 	 * @return array, of recent posts
 	 */
 	public function action_xmlrecent($xml_format)
 	{
-		global $scripturl, $modSettings, $board, $context;
+		global $scripturl, $modSettings, $board;
 
-		$db = database();
+		// Get the latest news
+		require_once(SUBSDIR . '/News.subs.php');
+		$results = getXMLRecent($this->_query_this_board, $board, $this->limit);
 
-		$done = false;
-		$loops = 0;
-		while (!$done)
-		{
-			$optimize_msg = implode(' AND ', $context['optimize_msg']);
-			$request = $db->query('', '
-				SELECT m.id_msg
-				FROM {db_prefix}messages AS m
-					INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
-					INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
-				WHERE ' . $this->_query_this_board . (empty($optimize_msg) ? '' : '
-					AND {raw:optimize_msg}') . (empty($board) ? '' : '
-					AND m.id_board = {int:current_board}') . ($modSettings['postmod_active'] ? '
-					AND m.approved = {int:is_approved}' : '') . '
-				ORDER BY m.id_msg DESC
-				LIMIT {int:limit}',
-				array(
-					'limit' => $_GET['limit'],
-					'current_board' => $board,
-					'is_approved' => 1,
-					'optimize_msg' => $optimize_msg,
-				)
-			);
-			// If we don't have $_GET['limit'] results, try again with an unoptimized version covering all rows.
-			if ($loops < 2 && $db->num_rows($request) < $_GET['limit'])
-			{
-				$db->free_result($request);
-				if (empty($_REQUEST['boards']) && empty($board))
-					unset($context['optimize_msg']['lowest']);
-				else
-					$context['optimize_msg']['lowest'] = $loops ? 'm.id_msg >= t.id_first_msg' : 'm.id_msg >= (t.id_last_msg - t.id_first_msg) / 2';
-				$loops++;
-			}
-			else
-				$done = true;
-		}
-		$messages = array();
-		while ($row = $db->fetch_assoc($request))
-			$messages[] = $row['id_msg'];
-		$db->free_result($request);
-
-		if (empty($messages))
-			return array();
-
-		// Find the most recent posts this user can see.
-		$request = $db->query('', '
-			SELECT
-				m.smileys_enabled, m.poster_time, m.id_msg, m.subject, m.body, m.id_topic, t.id_board,
-				b.name AS bname, t.num_replies, m.id_member, m.icon, mf.id_member AS id_first_member,
-				IFNULL(mem.real_name, m.poster_name) AS poster_name, mf.subject AS first_subject,
-				IFNULL(memf.real_name, mf.poster_name) AS first_poster_name, mem.hide_email,
-				IFNULL(mem.email_address, m.poster_email) AS poster_email, m.modified_time
-			FROM {db_prefix}messages AS m
-				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
-				INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
-				INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
-				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-				LEFT JOIN {db_prefix}members AS memf ON (memf.id_member = mf.id_member)
-			WHERE m.id_msg IN ({array_int:message_list})
-				' . (empty($board) ? '' : 'AND t.id_board = {int:current_board}') . '
-			ORDER BY m.id_msg DESC
-			LIMIT {int:limit}',
-			array(
-				'limit' => $_GET['limit'],
-				'current_board' => $board,
-				'message_list' => $messages,
-			)
-		);
+		// Loop on the results and prepare them in the format requested
 		$data = array();
-		while ($row = $db->fetch_assoc($request))
+		foreach ($results as $row)
 		{
 			// Limit the length of the message, if the option is set.
 			if (!empty($modSettings['xmlnews_maxlen']) && Util::strlen(str_replace('<br />', "\n", $row['body'])) > $modSettings['xmlnews_maxlen'])
-				$row['body'] = strtr(Util::substr(str_replace('<br />', "\n", $row['body']), 0, $modSettings['xmlnews_maxlen'] - 3), array("\n" => '<br />')) . '...';
+				$row['body'] = strtr(shorten_text(str_replace('<br />', "\n", $row['body']), $modSettings['xmlnews_maxlen'], true), array("\n" => '<br />'));
 
 			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
 
+			// You can't say that
 			censorText($row['body']);
 			censorText($row['subject']);
 
@@ -705,7 +591,6 @@ class News_Controller extends Action_Controller
 				);
 			}
 		}
-		$db->free_result($request);
 
 		return $data;
 	}
@@ -713,7 +598,6 @@ class News_Controller extends Action_Controller
 	/**
 	 * Get the profile information for member into an array,
 	 * which will be generated to match the xml_format.
-	 * @todo refactor.
 	 *
 	 * @param $xml_format
 	 * @return array, of profile data.
@@ -727,14 +611,13 @@ class News_Controller extends Action_Controller
 			return array();
 
 		// Make sure the id is a number and not "I like trying to hack the database".
-		$_GET['u'] = (int) $_GET['u'];
+		$uid = (int) $_GET['u'];
 
 		// Load the member's contextual information!
-		if (!loadMemberContext($_GET['u']) || !allowedTo('profile_view_any'))
+		if (!loadMemberContext($uid) || !allowedTo('profile_view_any'))
 			return array();
 
-		// Okay, I admit it, I'm lazy.  Stupid $_GET['u'] is long and hard to type.
-		$profile = &$memberContext[$_GET['u']];
+		$profile = &$memberContext[$uid];
 
 		if ($xml_format == 'rss' || $xml_format == 'rss2')
 			$data = array(array(
@@ -829,7 +712,7 @@ class News_Controller extends Action_Controller
 		}
 
 		// Save some memory.
-		unset($profile, $memberContext[$_GET['u']]);
+		unset($profile, $memberContext[$uid]);
 
 		return $data;
 	}
@@ -837,7 +720,7 @@ class News_Controller extends Action_Controller
 
 /**
  * Called from dumpTags to convert data to xml
- * Finds urls for local sitte and santizes them
+ * Finds urls for local site and santizes them
  *
  * @param string $val
  * @return type
