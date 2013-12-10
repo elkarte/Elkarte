@@ -1299,6 +1299,43 @@ div.bbc_footnotes .meaction{
 .split_messages .post {
 	border-top: 1px solid #fff;
 }
+
+/* Styles for the $TABS	*/
+/* We can't control what jqueryui pollutes the DOM with, so deal with it */
+/* Styles for the profile summary tabs, or any jquery ui tabs */
+/* ---------------------------------------------------------- */
+
+.ui-tabs .ui-tabs-nav li {
+	border: 1px #ccc solid;
+	border-radius: 2px 2px 0 0;
+	color: #fff;
+}
+.ui-tabs .ui-tabs-nav li a {
+	background: #f0f0f0;
+	border-bottom-color: #ccc;
+	outline: none;
+	border-radius: 2px 2px 0 0;
+}
+
+.ui-tabs .ui-tabs-nav .ui-state-default a {
+	background: #f0f0f0;
+	background: linear-gradient(to bottom, #fff, #e4e4e4) repeat scroll 0 0 #f4f4f4;
+}
+.ui-tabs .ui-tabs-nav .ui-state-active a, .ui-tabs .ui-tabs-nav .ui-state-active {
+	background: #437837;
+	background: linear-gradient(to bottom, #5ba048, #3d6e32) repeat scroll 0 0 #4b863c;
+	color: #fff;
+	border-radius: 2px 2px 0 0;
+}
+.ui-tabs .ui-state-hover {
+	border: 1px solid #ccc;
+	border-top: 1px solid #afafaf;
+	border-left: 1px solid #afafaf;
+	background: #f0f0f0;
+	color: #555;
+	text-decoration: none;
+}
+
 /* $PROFILE	*/
 /* ------------------------------------------------------- */
 /* Profile colors */
