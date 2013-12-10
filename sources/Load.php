@@ -1502,7 +1502,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 		// The most efficient way of writing multi themes is to use a master index.css plus variant.css files.
 		if (!empty($context['theme_variant']))
-			loadCSSFile('index' . $context['theme_variant'] . '.css');
+			loadCSSFile($context['theme_variant'] . '/index' . $context['theme_variant'] . '.css');
 	}
 
 	// A bit lonely maybe, though I think it should be set up *after* teh theme variants detection
