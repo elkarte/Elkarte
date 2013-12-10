@@ -251,9 +251,9 @@ strong {
 /* Used for sections that need somewhat larger corners */
 /* @todo - Daft name. Other stuffz. :P */
 .roundframe {
-	overflow: hidden;
-	margin: 2px 0 0 0;
-	padding: 9px;
+	border: 1px solid #c5c5c5;
+	border-radius: 7px;
+	background: #f5f5f5;
 }
 
 /* The generic wrapper thingy.  */
