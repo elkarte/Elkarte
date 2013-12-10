@@ -120,9 +120,7 @@ class News_Controller extends Action_Controller
 				$total_posts += $row['num_posts'];
 			}
 
-			// @todo: when $boards is empty? If it is empty there is the fatal_lang_error. No?
-			if (!empty($boards))
-				$this->_query_this_board = 'b.id_board IN (' . implode(', ', $boards) . ')';
+			$this->_query_this_board = 'b.id_board IN (' . implode(', ', $boards) . ')';
 
 			// The more boards, the more we're going to look through...
 			if ($total_posts > 100 && $total_posts > $modSettings['totalMessages'] / 12)
