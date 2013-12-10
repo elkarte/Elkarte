@@ -1525,6 +1525,29 @@ div.bbc_footnotes .meaction{
 	box-shadow: 0 -2px 3px rgba(0,0,0,0.15);
 }
 
+/*	$SEARCH		*/
+/* ------------------------------------------------------- */
+
+#mlsearch_options {
+	background: #fafafa;
+	border: 1px solid #ddd;
+	border-radius: 5px;
+}
+
+/*	$LOGIN		*/
+/* ------------------------------------------------------- */
+
+.coppa_contact {
+	border: 1px solid #555;
+	background: #fff;
+	color: #555;
+}
+.valid_input {
+	background: #f5fff0;
+}
+.invalid_input {
+	background: #fff0f0;
+}
 /* $STATISTICS	*/
 /* ------------------------------------------------------- */
 .statistics .category_header {

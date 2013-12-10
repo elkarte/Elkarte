@@ -3356,7 +3356,6 @@ a.help .icon {
 	max-height: 22em;
 }
 
-
 /*	$SEARCH		*/
 /* ------------------------------------------------------- */
 
@@ -3442,10 +3441,7 @@ a.help .icon {
 #mlsearch_options {
 	position: absolute;
 	display: none;
-	background: #FAFAFA;
 	padding: 0.5em;
-	border: 1px solid #DDDDDD;
-	border-radius: 5px;
 }
 #mlsearch_options .mlsearch_option .input_check {
 	margin-left: 0.5em;
@@ -3515,15 +3511,6 @@ a.help .icon {
 	margin-left: 5ex;
 	padding: 4px;
 	width: 32ex;
-	border: 1px solid #555;
-	background: #fff;
-	color: #555;
-}
-.valid_input {
-	background: #f5fff0;
-}
-.invalid_input {
-	background: #fff0f0;
 }
 
 /* Styles for maintenance mode. */
@@ -3537,7 +3524,7 @@ a.help .icon {
 }
 
 /* Common for all admin sections. */
-/* @todo - Why is admin stuff in index.css? */
+/* The admin logon form */
 #admin_content {
 	clear: both;
 	padding-top: 8px;
@@ -3555,8 +3542,6 @@ a.help .icon {
 #admin_login .centertext a.help img {
 	vertical-align: middle;
 }
-
-
 
 
 /*	$ERRORS		*/
