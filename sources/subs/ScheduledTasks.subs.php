@@ -223,14 +223,26 @@ function updateTaskStatus($enablers)
  * @param int $interval
  * @param string $unit
  */
-function updateTask($id_task, $disabled, $offset, $interval, $unit)
+function updateTask($id_task, $disabled = null, $offset = null, $interval = null, $unit = null)
 {
 	$db = database();
 
+	$sets = array(
+		'disabled' => 'disabled = {int:disabled}',
+		'offset' => 'time_offset = {int:time_offset}',
+		'interval' => 'time_regularity = {int:time_regularity}',
+		'unit' => 'time_unit = {string:time_unit}',
+	);
+
+	$updates = array();
+	foreach ($sets as $key => $set)
+		if (isset($$key))
+			$updates[] = $set;
+
 	$db->query('', '
 		UPDATE {db_prefix}scheduled_tasks
-		SET disabled = {int:disabled}, time_offset = {int:time_offset}, time_unit = {string:time_unit},
-			time_regularity = {int:time_regularity}
+		SET ' . (implode(',
+			', $updates)) . '
 		WHERE id_task = {int:id_task}',
 		array(
 			'disabled' => $disabled,
