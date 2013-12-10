@@ -1723,10 +1723,13 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 	// Any specific template style sheets to load?
 	if (!empty($style_sheets))
 	{
-		foreach ($style_sheets as &$sheet)
-			$sheet = stripos('.css', $sheet) !== false ? $sheet : $sheet . '.css';
-
-		loadCSSFile($style_sheets);
+		foreach ($style_sheets as $sheet)
+		{
+			$sheets[] = stripos('.css', $sheet) !== false ? $sheet : $sheet . '.css';
+			if ($sheet == 'admin' && !empty($context['theme_variant']))
+				$sheets[] = $context['theme_variant'] . '/admin' . $context['theme_variant'] . '.css';
+		}
+		loadCSSFile($sheets);
 	}
 
 	// No template to load?
