@@ -4414,3 +4414,54 @@ function elk_array_insert($input, $key, $insert, $where = 'before', $assoc = tru
 
 	return $input;
 }
+
+/**
+ * From time to time it may be necessary to fire a scheduled tast ASAP
+ * this function set the scheduled task to be called before any other one
+ *
+ * @param string the name of a scheduled task
+ */
+function setFasttrack($task)
+{
+	global $modSettings;
+
+	if (!isset($modSettings['fasttrack']))
+		$fasttrack = array();
+	else
+		$fasttrack = unserialize($modSettings['fasttrack']);
+
+	$fasttrack[$task] = 0;
+	updateSettings(array('fasttrack' => serialize($fasttrack)));
+
+	require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+	calculateNextTrigger($task);
+}
+
+/**
+ * For diligent people: remove fasttrack when done, otherwise
+ * a maximum of 10 executions is allowed
+ *
+ * @param string the name of a scheduled task
+ * @param bool if recalculate the next task to execute
+ */
+function removeFasttrack($task, $calculateNextTrigger = true)
+{
+	global $modSettings;
+
+	if (!isset($modSettings['fasttrack']))
+		return;
+	else
+		$fasttrack = unserialize($modSettings['fasttrack']);
+
+	if (isset($fasttrack[$task]))
+	{
+		unset($fasttrack[$task]);
+		updateSettings(array('fasttrack' => serialize($fasttrack)));
+
+		if ($calculateNextTrigger)
+		{
+			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+			calculateNextTrigger($task);
+		}
+	}
+}

@@ -40,7 +40,7 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 
 	// Get the critical info for the tasks.
 	$request = $db->query('', '
-		SELECT id_task, next_time, time_offset, time_regularity, time_unit
+		SELECT id_task, next_time, time_offset, time_regularity, time_unit, task
 		FROM {db_prefix}scheduled_tasks
 		WHERE disabled = {int:no_disabled}
 			' . $task_query,
@@ -52,7 +52,12 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 	$tasks = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		$next_time = next_time($row['time_regularity'], $row['time_unit'], $row['time_offset']);
+		// Fasttrack is a way to speed up scheduled tasts and fire them as fast as possible
+		$fasttrack = @unserialize($modSettings['fasttrack']);
+		if (!empty($fasttrack) && isset($fasttrack[$row['task']]))
+			$next_time = next_time(1, 'm', rand(0, 60));
+		else
+			$next_time = next_time($row['time_regularity'], $row['time_unit'], $row['time_offset']);
 
 		// Only bother moving the task if it's out of place or we're forcing it!
 		if ($forceUpdate || $next_time < $row['next_time'] || $row['next_time'] < time())
@@ -423,7 +428,7 @@ function emptyTaskLog()
  */
 function processNextTasks($ts = 0)
 {
-	global $time_start;
+	global $time_start, $modSettings;
 
 	$db = database();
 
@@ -525,6 +530,17 @@ function processNextTasks($ts = 0)
 			// Log that we did it ;)
 			if ($completed)
 			{
+				// Taking care of fasttrack having a maximum of 10 "fast" executions
+				$fasttrack = @unserialize($modSettings['fasttrack']);
+				if (!empty($fasttrack) && isset($fasttrack[$row['task']]))
+				{
+					$fasttrack[$row['task']]++;
+					if ($fasttrack[$row['task']] > 9)
+						removeFasttrack($row['task'], false);
+					else
+						updateSettings(array('fasttrack' => serialize($fasttrack)));
+				}
+
 				$total_time = round(microtime(true) - $time_start, 3);
 				logTask($row['id_task'], $total_time);
 			}
