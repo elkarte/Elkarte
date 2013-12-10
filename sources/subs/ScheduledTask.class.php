@@ -20,7 +20,7 @@ if (!defined('ELK'))
 
 /**
  * This class handles known scheduled tasks.
- * Each method implements a task, and it''s called automatically for the task to run.
+ * Each method implements a task, and it's called automatically for the task to run.
  */
 class ScheduledTask
 {
@@ -1435,5 +1435,105 @@ class ScheduledTask
 		removeFollowUpsByMessage($remove);
 
 		return true;
+	}
+
+	function user_access_mentions()
+	{
+		global $modSettings;
+
+		$db = database();
+		$mentions_check_users = explode(',', $modSettings['mentions_check_users']);
+
+		// This should be set only because of a fasttrack, so higher priority
+		if (!empty($mentions_check_users))
+		{
+			foreach ($mentions_check_users as $key => $member)
+			{
+				// Just to stay on the safe side...
+				if (empty($member))
+					continue;
+
+				$request = $db->query('', '
+					SELECT id_group, additional_groups, id_post_group
+					FROM {db_prefix}members
+					WHERE id_member = {int:current_member}',
+					array(
+						'current_member' => $member,
+					)
+				);
+				list($group, $additional_groups, $posts_group) = $db->fetch_row($request);
+				$db->free_result($request);
+
+				$groups = array_merge(array($group, $posts_group), explode(',', $additional_groups));
+				foreach ($groups as $k => $v)
+					$groups[$k] = (int) $v;
+				$groups = array_unique($groups);
+
+				// If you are admin how the heck did you end up here?
+				if (in_array(1, $groups))
+				{
+					// Drop it
+					unset($mentions_check_users[$key]);
+					// And save everything for the next run
+					updateSettings(array('mentions_check_users' => implode(',', $mentions_check_users)));
+				}
+				// Here you are someone that may or may not be able to access a certain board
+				else
+				{
+					// Try to rebuild 'query_see_board'
+					require_once(SUBSDIR . '/Boards.subs.php');
+					require_once(SUBSDIR . '/Mentions.subs.php');
+
+					$boards_mod = boardsModerated($member);
+					$mod_query = empty($boards_mod) ? '' : ' OR b.id_board IN (' . implode(',', $boards_mod) . ')';
+
+					$user_see_board = '((FIND_IN_SET(' . implode(', b.member_groups) != 0 OR FIND_IN_SET(', $groups) . ', b.member_groups) != 0)' . (!empty($modSettings['deny_boards_access']) ? ' AND (FIND_IN_SET(' . implode(', b.deny_member_groups) = 0 AND FIND_IN_SET(', $groups) . ', b.deny_member_groups) = 0)' : '') . $mod_query . ')';
+
+					foreach (array('can', 'cannot') as $can)
+					{
+						// Find all the mentions that this user can or cannot see
+						$request = $db->query('', '
+							SELECT mnt.id_mention
+							FROM {db_prefix}log_mentions as mnt
+								LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = mnt.id_msg)
+								LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
+							WHERE mnt.id_member = {int:current_member}
+								AND {raw:user_see_board}',
+							array(
+								'current_member' => $member,
+								'user_see_board' => ($can == 'can' ? '' : 'NOT ') . $user_see_board,
+							)
+						);
+						$mentions = array();
+						while ($row = $db->fetch_assoc($request))
+						{
+							$mentions[] = $row['id_mention'];
+							if (count($mentions) == 100)
+							{
+								toggleMentionsAccessibility($mentions, $can == 'can');
+								$mentions = array();
+							}
+						}
+						$db->free_result($request);
+
+						if (!empty($mentions))
+							toggleMentionsAccessibility($mentions, $can == 'can');
+					}
+
+					// Drop it
+					unset($mentions_check_users[$key]);
+					// And save everything for the next run
+					updateSettings(array('mentions_check_users' => implode(',', $mentions_check_users)));
+				}
+			}
+
+			// If there is no more users, fasttrack can be stopped
+			if (empty($mentions_check_users))
+				removeFasttrack('mentions_check_users', false);
+
+			return true;
+		}
+// 		else
+		
 	}
 }

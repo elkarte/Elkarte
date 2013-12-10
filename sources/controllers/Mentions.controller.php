@@ -68,14 +68,6 @@ class Mentions_Controller extends Action_Controller
 	protected $_all = false;
 
 	/**
-	 * Complementary to $_type, used in case something is disabled to show only
-	 * what is enabled.
-	 *
-	 * @var array
-	 */
-	protected $_included_types = array();
-
-	/**
 	 * Start things up, what else does a contructor do
 	 */
 	public function __construct()
@@ -317,10 +309,7 @@ class Mentions_Controller extends Action_Controller
 	 */
 	public function list_getMentionCount($all, $type)
 	{
-		if (!empty($this->_included_types))
-			return countUserMentions($all, $this->_included_types);
-		else
-			return countUserMentions($all, $type);
+		return countUserMentions($all, $type);
 	}
 
 	/**
@@ -335,19 +324,26 @@ class Mentions_Controller extends Action_Controller
 	 */
 	public function list_loadMentions($start, $limit, $sort, $all, $type)
 	{
-		if (!empty($this->_included_types))
-			$mentions = getUserMentions($start, $limit, $sort, $all, $this->_included_types);
-		else
-			$mentions = getUserMentions($start, $limit, $sort, $all, $type);
+		global $modSettings, $user_info;
+
+		$mentions = getUserMentions($start, $limit, $sort, $all, $type);
 
 		// With only one type is enough to just call that (if it exists)
 		if (!empty($type) && isset($this->_callbacks[$type]))
-			return call_user_func_array($this->_callbacks[$type], array($mentions, $type));
-
+			$removed = call_user_func_array($this->_callbacks[$type], array(&$mentions, $type));
 		// Otherwise we have to test all we know...
-		// @todo find a way to call only what is actually needed 
-		foreach ($this->_callbacks as $type => $callback)
-			$mentions = call_user_func_array($callback, array($mentions, $type));
+		else
+		{
+			$removed = false;
+			// @todo find a way to call only what is actually needed 
+			foreach ($this->_callbacks as $type => $callback)
+				$removed = $removed || call_user_func_array($callback, array(&$mentions, $type));
+		}
+
+		if ($removed)
+		{
+			// @todo later
+		}
 
 		return $mentions;
 	}
@@ -360,9 +356,10 @@ class Mentions_Controller extends Action_Controller
 	 */
 	function prepareMentionMessage($mentions, $type)
 	{
-		global $txt, $scripturl, $context;
+		global $txt, $scripturl, $context, $modSettings, $user_info;
 
 		$boards = array();
+		$removed = false;
 
 		foreach ($mentions as $key => $row)
 		{
@@ -396,11 +393,26 @@ class Mentions_Controller extends Action_Controller
 			foreach ($boards as $key => $board)
 			{
 				if (!in_array($board, $accessibleBoards))
+				{
+					$removed = true;
 					$mentions[$key]['message'] = $txt['mention_not_accessible'];
+				}
 			}
 		}
 
-		return $mentions;
+		if ($removed)
+		{
+			if (!empty($modSettings['mentions_check_users']))
+				$modSettings['mentions_check_users'] = explode(',', $modSettings['mentions_check_users']);
+			else
+				$modSettings['mentions_check_users'] = array();
+
+			$modSettings['mentions_check_users'][] = $user_info['id'];
+			updateSettings(array('mentions_check_users' => implode(',', array_unique($modSettings['mentions_check_users']))));
+			setFasttrack('mentions_check_users');
+		}
+
+		return $removed;
 	}
 
 	/**
@@ -532,13 +544,6 @@ class Mentions_Controller extends Action_Controller
 		$this->_type = isset($_REQUEST['type']) && isset($this->_known_mentions[$_REQUEST['type']]) ? $_REQUEST['type'] : '';
 		$this->_page = isset($_REQUEST['start']) ? $_REQUEST['start'] : '';
 
-		// If we are showing all the mentions, we are not showing what is disabled
-		if (empty($this->_type))
-		{
-			foreach ($this->_known_mentions as $key => $mention)
-				if (empty($mention['enabled']) || !empty($modSettings[$mention['enabled']]))
-					$this->_included_types[] = $key;
-		}
 		$this->_url_param = ($this->_all ? ';all' : '') . (!empty($this->_type) ? ';type=' . $this->_type : '') . (isset($_REQUEST['start']) ? ';start=' . $_REQUEST['start'] : '');
 	}
 

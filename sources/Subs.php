@@ -4434,6 +4434,11 @@ function setFasttrack($task)
 	updateSettings(array('fasttrack' => serialize($fasttrack)));
 
 	require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+
+	// Ensure the task is on
+	toggleTaskStatusByName($task, true);
+
+	// Before trying to run it **NOW** :P
 	calculateNextTrigger($task);
 }
 

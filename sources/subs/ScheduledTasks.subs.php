@@ -202,7 +202,7 @@ function logTask($task_id, $total_time)
 }
 
 /**
- * Sets the tasks status to enabled / disabled
+ * Sets the tasks status to enabled / disabled by task ID
  *
  * @param array $enablers
  */
@@ -215,6 +215,27 @@ function updateTaskStatus($enablers)
 		SET disabled = CASE WHEN id_task IN ({array_int:id_task_enable}) THEN 0 ELSE 1 END',
 		array(
 			'id_task_enable' => $enablers,
+		)
+	);
+}
+
+/**
+ * Sets the task status to enabled / disabled by task name (i.e. function)
+ *
+ * @param string $enabler the name (the function) of a task
+ * @param bool is the tasks should be enabled or disabled
+ */
+function toggleTaskStatusByName($enabler, $enable = true)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}scheduled_tasks
+		SET disabled = {int:status}
+		WHERE task = {string:task_enable}',
+		array(
+			'task_enable' => $enabler,
+			'status' => $enable ? 0 : 1,
 		)
 	);
 }
@@ -535,6 +556,7 @@ function processNextTasks($ts = 0)
 				if (!empty($fasttrack) && isset($fasttrack[$row['task']]))
 				{
 					$fasttrack[$row['task']]++;
+
 					if ($fasttrack[$row['task']] > 9)
 						removeFasttrack($row['task'], false);
 					else
