@@ -128,16 +128,6 @@ a img {
 	border: 0;
 }
 
-
-
-/* -------------------------------------------- */
-/* @todo - Code after this point has NOT been split into layout code (index.css) and eye candy (_variant.css) */
-/* Code splitting will continue as time and bugz and whatever allow. */
-/* -------------------------------------------- */
-
-
-
-
 /* Style the different types of inputs to be uniform for all browsers. */
 
 /* NOTE: This does require some browser-specific code to get good results. */
@@ -308,9 +298,6 @@ em {
 }
 
 
-
-
-
 /*	$COMMON		*/
 /* ------------------------------------------------------- */
 
@@ -394,7 +381,6 @@ em {
 	line-height: 1.8em;
 }
 
-
 .category_header .icon {
 	margin: 0 5px 0 0;
 	vertical-align: text-top;
@@ -472,7 +458,6 @@ h2 a.collapse {
 .expand {
 	background-position: -116px -25px;
 }
-
 
 /* Alternating backgrounds for posts, and several other sections of the forum. */
 .windowbg, #preview_body, .windowbg2 {}
@@ -615,14 +600,6 @@ div.windowbg, div.windowbg2 {
 }
 
 
-/* -------------------------------------------- */
-/* @todo - Code before this point has NOT been split into layout code (index.css) and eye candy (_variant.css) */
-/* Code splitting will continue as time and bugz and whatever allow. */
-/* -------------------------------------------- */
-
-
-
-
 /*	$BBC		*/
 /* ------------------------------------------------------- */
 /* The "Quote:" and "Code:" header parts... */
@@ -691,7 +668,6 @@ div.windowbg, div.windowbg2 {
 }
 .bbc_list {
 	padding: 0 0 0 35px;
-	list-style-type: inherit;
 	text-align: left;
 }
 /* Everything is same except HTML5 valid */
@@ -707,9 +683,6 @@ div.windowbg, div.windowbg2 {
 .footnote_return {
 	font-size: 1.35em;
 }
-
-
-
 
 /*	$AJAX		*/
 /* ------------------------------------------------------- */
@@ -728,9 +701,6 @@ div.windowbg, div.windowbg2 {
 	color: orange;
 	text-decoration: underline;
 }
-
-
-
 
 /*	$MAIN.		*/
 /* ------------------------------------------------------- */
@@ -846,11 +816,9 @@ div.windowbg, div.windowbg2 {
 	font-size: 1.083em;
 	margin: 0 0 8px 0;
 }
-
 .modtask {
 	margin: 1em 0 0 0;
 }
-
 .modtask a {
 	font-weight: bold;
 }
@@ -1294,8 +1262,6 @@ div.windowbg, div.windowbg2 {
 }
 
 
-
-
 /*	$PAGELINKS	*/
 /* ------------------------------------------------------- */
 
@@ -1409,8 +1375,6 @@ div.windowbg, div.windowbg2 {
 }
 
 
-
-
 /*	$TABLES		*/
 /* ------------------------------------------------------- */
 
@@ -1479,8 +1443,6 @@ div.windowbg, div.windowbg2 {
 }
 
 
-
-
 /* $SETTINGS	*/
 /* ------------------------------------------------------- */
 
@@ -1534,6 +1496,7 @@ dl.settings dt a img {
 dl.settings textarea {
 	width: 85%;
 }
+
 
 /*	$BOARDS		*/
 /* ------------------------------------------------------- */
@@ -2490,6 +2453,7 @@ ul.post_options li {
 	margin-left: 0;
 }
 
+
 /*	$MODERATE	*/
 /* ------------------------------------------------------- */
 
@@ -2554,6 +2518,7 @@ dl.merge_topic dd {
 .custom_subject {
 	margin: 6px 0;
 }
+
 
 /* Styles for the $TABS	*/
 /* We can't control what jqueryui pollutes the DOM with, so deal with it */
@@ -2974,6 +2939,7 @@ dl.merge_topic dd {
 	font-weight: 600;
 }
 
+
 /* $PERSONAL	*/
 /* ------------------------------------------------------- */
 
@@ -3039,6 +3005,7 @@ div.labels {
 	vertical-align: top;
 	margin-left: 0.5em;
 }
+
 
 /* $CALENDAR	*/
 /* ------------------------------------------------------- */
@@ -3246,6 +3213,7 @@ div.labels {
 	padding: 4px 8px 4px 60px;
 }
 
+
 /*	$HELP		*/
 /* ------------------------------------------------------- */
 
@@ -3356,6 +3324,7 @@ a.help .icon {
 	max-height: 22em;
 }
 
+
 /*	$SEARCH		*/
 /* ------------------------------------------------------- */
 
@@ -3434,7 +3403,6 @@ a.help .icon {
 	overflow: hidden;
 	width: 100%;
 }
-
 #mlsearch {
 	padding-top: 2px;
 }
@@ -3449,6 +3417,7 @@ a.help .icon {
 #mlsearch_options .mlsearch_option {
 	padding: 0.2em 0;
 }
+
 
 /*	$LOGIN		*/
 /* ------------------------------------------------------- */
@@ -3851,8 +3820,6 @@ a.help .icon {
 		padding-top: 6px;
 	}
 	.topic_listing>li {
-		border: 1px solid #aaa;
-		box-shadow: 3px 3px 6px #e5e5e5;
 		margin-bottom: 5px;
 	}
 	.topic_name h4 {
