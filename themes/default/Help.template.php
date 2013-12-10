@@ -28,6 +28,7 @@ function template_popup()
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="robots" content="noindex" />
 		<title>', $context['page_title'], '</title>
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index.css?beta10" />
 		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?beta10" />
 		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 	</head>

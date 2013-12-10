@@ -234,8 +234,6 @@ class Groups_Controller extends Action_Controller
 
 		// Load up the group details.
 		$context['group'] = membergroupById($current_group, true, true);
-
-		// @todo should we change id => id_group and name => name_group?
 		$context['group']['id'] = $context['group']['id_group'];
 		$context['group']['name'] = $context['group']['group_name'];
 

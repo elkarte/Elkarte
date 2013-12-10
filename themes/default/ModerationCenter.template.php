@@ -583,7 +583,7 @@ function template_moderation_settings()
 }
 
 /**
- * Show a notice sent to a user.
+ * Show a notice sent to a user in a new window
  */
 function template_show_notice()
 {
@@ -595,12 +595,13 @@ function template_show_notice()
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<title>', $context['page_title'], '</title>
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index.css?beta10" />
 		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?beta10" />
 	</head>
 	<body>
 		<h2 class="category_header">', $txt['show_notice'], '</h2>
 		<h3 class="category_header">', $txt['show_notice_subject'], ': ', $context['notice_subject'], '</h3>
-		<div class="windowbg">
+		<div class="windowbg roundframe">
 			<div class="content">
 				<dl>
 					<dt>

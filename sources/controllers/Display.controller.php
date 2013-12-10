@@ -857,7 +857,6 @@ class Display_Controller
 			$counter = empty($options['view_newest_first']) ? $context['start'] : $context['total_visible_posts'] - $context['start'];
 
 		// Start from the beginning...
-		// @todo this isn't ever called? does it even work, since it returns the query result?
 		if ($reset)
 			return currentContext($messages_request, $reset);
 
