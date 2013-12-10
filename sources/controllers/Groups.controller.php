@@ -336,11 +336,9 @@ class Groups_Controller extends Action_Controller
 
 			$members = membersBy($member_query, $member_parameters);
 
-			// @todo Add $_POST['additional'] to templates!
-
 			// Do the updates...
 			if (!empty($members))
-				addMembersToGroup($members, $current_group, isset($_POST['additional']) || $context['group']['hidden'] ? 'only_additional' : 'auto', true);
+				addMembersToGroup($members, $current_group, $context['group']['hidden'] ? 'only_additional' : 'auto', true);
 		}
 
 		// Sort out the sorting!
