@@ -403,12 +403,12 @@ class Mentions_Controller extends Action_Controller
 		if ($removed)
 		{
 			if (!empty($modSettings['mentions_check_users']))
-				$modSettings['mentions_check_users'] = explode(',', $modSettings['mentions_check_users']);
+				$modSettings['mentions_check_users'] = @unserialize($modSettings['mentions_check_users']);
 			else
 				$modSettings['mentions_check_users'] = array();
 
-			$modSettings['mentions_check_users'][] = $user_info['id'];
-			updateSettings(array('mentions_check_users' => implode(',', array_unique($modSettings['mentions_check_users']))));
+			$modSettings['mentions_check_users'][$user_info['id']] = 0;
+			updateSettings(array('mentions_check_users' => serialize($modSettings['mentions_check_users'])));
 			setFasttrack('mentions_check_users');
 		}
 
