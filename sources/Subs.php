@@ -239,8 +239,8 @@ function updateMemberData($members, $data)
  * - all of changeArray's indexes and values are assumed to have escaped apostrophes (')!
  * - if a variable is already set to what you want to change it to, that
  *   variable will be skipped over; it would be unnecessary to reset.
- * - When use_update is true, UPDATEs will be used instead of REPLACE.
- * - when use_update is true, the value can be true or false to increment
+ * - When update is true, UPDATEs will be used instead of REPLACE.
+ * - when update is true, the value can be true or false to increment
  *  or decrement it, respectively.
  *
  * @param array $changeArray
@@ -312,9 +312,9 @@ function updateSettings($changeArray, $update = false, $debug = false)
 /**
  * Deletes one setting from the settings table and takes care of $modSettings as well
  *
- * @param string the setting
+ * @param mixed the setting or the settings to be removed
  */
-function removeSetting($toRemove)
+function removeSettings($toRemove)
 {
 	global $modSettings;
 
@@ -323,16 +323,19 @@ function removeSetting($toRemove)
 	if (empty($toRemove))
 		return;
 
+	$toRemove = is_array($toRemove) ? $toRemove : array($toRemove);
+
 	$db->query('', '
 		DELETE FROM {db_prefix}settings
-		WHERE variable = {string:setting_name}',
+		WHERE variable IN ({array_string:setting_name})',
 		array(
 			'setting_name' => $toRemove,
 		)
 	);
 
-	if (isset($modSettings[$toRemove]))
-		unset($modSettings[$toRemove]);
+	foreach ($toRemove as $setting)
+		if (isset($modSettings[$setting]))
+			unset($modSettings[$setting]);
 
 	// Kill the cache - it needs redoing now, but we won't bother ourselves with that here.
 	cache_put_data('modSettings', null, 90);
