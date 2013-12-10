@@ -3426,7 +3426,7 @@ a.help .icon {
 /* @todo - Width would be better in em. */
 .login {
 	margin: 0 auto;
-	width: 540px;
+	max-width: 540px;
 }
 .login dl {
 	clear: right;
@@ -3842,7 +3842,7 @@ a.help .icon {
 		float: none;
 		width: 100%;
 	}
-	select, .input_text {
+	select, .input_text, .input_password {
 		max-width: 12em;
 	}
 	.login {
@@ -3929,6 +3929,9 @@ a.help .icon {
 	}
 	.linktree .board_moderators, .linktree_last .board_moderators {
 		display: none;
+	}
+	.statsbar .bar {
+		max-width: 12em;
 	}
 	.signature {
 		display: none;
