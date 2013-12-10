@@ -1405,6 +1405,29 @@ div.bbc_footnotes .meaction{
 	border-bottom: 1px solid #ccc;
 }
 
+
+/* $PERSONAL	*/
+/* ------------------------------------------------------- */
+
+#personal_messages .capacity_bar {
+
+	border: 1px solid #adadad;
+}
+#personal_messages .capacity_bar span {
+	border-right: 1px solid #adadad;
+}
+#personal_messages .capacity_bar .empty {
+	background: #a6d69d;
+}
+#personal_messages .capacity_bar .filled {
+	background: #eea800;
+}
+#personal_messages .capacity_bar .full {
+	background: #f10909;
+}
+.addrules dt.floatleft {
+	color: #555;
+}
 /* $CALENDAR	*/
 /* ------------------------------------------------------- */
 /* Calendar colors for birthdays, events and holidays */

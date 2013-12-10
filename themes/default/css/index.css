@@ -2988,21 +2988,10 @@ dl.merge_topic dd {
 	margin: 6px 0 0 12px;
 	width: 10em;
 	height: 12px;
-	border: 1px solid #adadad;
 }
 #personal_messages .capacity_bar span {
 	display: block;
 	height: 12px;
-	border-right: 1px solid #adadad;
-}
-#personal_messages .capacity_bar .empty {
-	background: #a6d69d;
-}
-#personal_messages .capacity_bar .filled {
-	background: #eea800;
-}
-#personal_messages .capacity_bar .full {
-	background: #f10909;
 }
 #personal_messages .reportlinks {
 	padding: 6px 1.3em;
@@ -3030,7 +3019,6 @@ dl.merge_topic dd {
 .addrules dt.floatleft {
 	padding: 0 15px 6px 15px;
 	width: 15em;
-	color: #555;
 }
 #addrule fieldset {
 	clear: both;
@@ -3047,19 +3035,10 @@ div.labels {
 	float: right;
 }
 .label_pms li {
-		display: inline-block;
-		vertical-align: top;
-		margin-left: 0.5em;
+	display: inline-block;
+	vertical-align: top;
+	margin-left: 0.5em;
 }
-
-
-/* -------------------------------------------- */
-/* @todo - Code before this point has NOT been split into layout code (index.css) and eye candy (_variant.css) */
-/* Code splitting will continue as time and bugz and whatever allow. */
-/* -------------------------------------------- */
-
-
-
 
 /* $CALENDAR	*/
 /* ------------------------------------------------------- */
