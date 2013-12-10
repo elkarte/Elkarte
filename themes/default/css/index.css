@@ -3246,19 +3246,7 @@ div.labels {
 	padding: 4px 8px 4px 60px;
 }
 
-
-
-
-/* -------------------------------------------- */
-/* @todo - Code past this point has NOT been split into layout code (index.css) and eye candy (_variant.css) */
-/* Code splitting will continue as time and bugz and whatever allow. */
-/* -------------------------------------------- */
-
-
-
-
 /*	$HELP		*/
-/* @todo - Some code needs splitting to _variant.css.*/
 /* ------------------------------------------------------- */
 
 /* Styles for the help section. */
@@ -3271,9 +3259,6 @@ div.labels {
 	overflow: auto;
 	margin: 12px 0 0 0;
 	padding: 8px 20px 12px 20px;
-	border: 1px solid #ccc;
-	border-radius: 7px;
-	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
 }
 #helpmain p {
 	margin: 10px 0;
@@ -3290,7 +3275,6 @@ div.labels {
 }
 
 /* Generally, those [?] icons. This makes your cursor a help icon. */
-/* @todo - Hmmm. */
 .help {
 	cursor: help;
 }
@@ -3318,10 +3302,6 @@ a.help .icon {
 	z-index: 999;
 	padding: 6px 9px;
 	max-width: 350px;
-	border: 1px solid #aaa;
-	border-radius: 4px;
-	background: #fff;
-	box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
 	word-wrap: break-word;
 }
 
@@ -3331,8 +3311,7 @@ a.help .icon {
 }
 
 /* The darkened background for help pop-ups. */
-.popup_container
-{
+.popup_container {
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -3340,25 +3319,16 @@ a.help .icon {
 	display: none;
 	width: 100%;
 	height: 100%;
-	/* Flat colour fallback will be bad (visually), ie8 only though. */
-	background: rgb(0,0,0);
-	background: rgba(0,0,0,0.4);
 }
 
 /* The actual pop-up wrapper. */
-.popup_window
-{
+.popup_window {
 	margin: 12% auto;
 	width: 480px;
-	border: 1px solid #777;
-	border-radius: 7px 7px 3px 3px;
-	background-color: #fafafa;
-	box-shadow: 0 4px 6px rgba(0,0,0,0.6);
 }
 
 /* What it says. ;) */
-.popup_heading
-{
+.popup_heading {
 	padding: 0 0 6px 0;
 	font-weight: 600;
 	font-size: 1.1em;
@@ -3366,8 +3336,7 @@ a.help .icon {
 }
 
 /* The hide icon (red cross). */
-.popup_heading .hide_popup
-{
+.popup_heading .hide_popup {
 	float: right;
 	width: 16px;
 	height: 2em;
@@ -3376,24 +3345,16 @@ a.help .icon {
 
 /* Just a font-size reset. */
 /* @todo - Remove description class? */
-.popup_window.description
-{
+.popup_window.description {
 	font-size: 1em;
 }
 
 /* The text content, hopefully helpful. */
-.popup_content
-{
+.popup_content {
 	overflow: auto;
 	padding: 10px;
 	max-height: 22em;
-	border: 1px solid #bbb;
-	border-bottom: 1px solid #ccc;
-	border-radius: 6px 6px 2px 2px;
-	background: #f5f5f5;
-	box-shadow: 0 -2px 3px rgba(0,0,0,0.15);
 }
-
 
 
 /*	$SEARCH		*/
