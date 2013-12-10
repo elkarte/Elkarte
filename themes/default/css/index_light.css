@@ -1548,6 +1548,41 @@ div.bbc_footnotes .meaction{
 .invalid_input {
 	background: #fff0f0;
 }
+
+/*	$ERRORS		*/
+/* ------------------------------------------------------- */
+
+.errorbox {
+	border-top: 2px solid #c34;
+	border-bottom: 2px solid #c34;
+	background: #fee url(../images/profile/warning_mute.png) 10px 50% no-repeat;
+}
+
+
+/*	$PROGRESS	*/
+/* ------------------------------------------------------- */
+/* Styles for the progress bar */
+/* @todo - Height in pt? WTF? */
+.progress_bar {
+	border: 1px solid black;
+	border-radius: 5px;
+	background: white;
+	box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+}
+.progress_bar .full_bar {
+	border-radius: 3px;
+	color: black;
+	text-align: center;
+}
+.progress_bar .green_percent {
+	z-index: 1;
+	height: 15pt;
+}
+.progress_bar .blue_percent {
+	z-index: 1;
+	height: 15pt;
+}
+
 /* $STATISTICS	*/
 /* ------------------------------------------------------- */
 .statistics .category_header {
@@ -1618,8 +1653,48 @@ div.bbc_footnotes .meaction{
 /* Of course, having comments to map em to px for each query is a good idea too.
 
 /* Smartphones (portrait & landscape) drop the stats (views/replys) and last post from the screen */
-@media screen and (min-width: 320px) and (max-width: 480px) {
+
+/* This one does 800 screens at default font size. */
+@media screen and (max-width: 50em) {
+	#menu_sidebar {
+		border: 1px solid #aaa;
+		border-radius: 4px;
+		background: #fff;
+		box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
+	}
+}
+/* This one does up to 480 screens. */
+@media screen and (max-width: 30em) {
 	.board_latest {
 		border-left: 0;
+	}
+	.frame {
+		border-radius: 0;
+	}
+	.topic_listing>li {
+		border: 1px solid #aaa;
+		box-shadow: 3px 3px 6px #e5e5e5;
+	}
+	.poster:after, .posterarea:before {
+		border-bottom: 1px solid #bfbfbf;
+	}
+	.forumposts .windowbg2 {
+		background-color: #fafafa;
+	}
+		.forumposts .windowbg, .forumposts .windowbg2 {
+		border: 1px solid #ccc;
+		box-shadow: 3px 3px 6px #e5e5e5;
+	}
+	.navigate_section, .linktree, .linktree:before, .linktree:after, .linktree_last,
+	.linktree_last:before, .linktree_last:after {
+		border: none !important;
+		background: none !important;
+	}
+	.linktree:after {
+		content: ">";
+	}
+	.linktree:hover, .linktree>a:hover, .linktree_last, .linktree_last>a,
+	.linktree_last>a:hover, .linktree_last strong {
+		color: #666 !important;
 	}
 }

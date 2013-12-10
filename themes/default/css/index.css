@@ -3556,9 +3556,6 @@ a.help .icon {
 .errorbox {
 	margin-bottom: 12px;
 	padding: 7px 10px 7px 35px;
-	border-top: 2px solid #c34;
-	border-bottom: 2px solid #c34;
-	background: #fee url(../images/profile/warning_mute.png) 10px 50% no-repeat;
 	text-align: left;
 }
 .errorbox h3 {
@@ -3588,7 +3585,6 @@ a.help .icon {
 }
 
 
-
 /*	$PROGRESS	*/
 /* ------------------------------------------------------- */
 /* Styles for the progress bar */
@@ -3599,37 +3595,23 @@ a.help .icon {
 	padding: 3px;
 	width: 80%;
 	height: 15pt;
-	border: 1px solid black;
-	border-radius: 5px;
-	background: white;
-	box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
 }
 .progress_bar .full_bar {
 	position: absolute;
 	z-index: 2;
 	padding-top: 1pt;
 	width: 100%;
-	border-radius: 3px;
-	color: black;
 	text-align: center;
 	font-weight: bold;
 }
 .progress_bar .green_percent {
 	z-index: 1;
 	height: 15pt;
-	border-radius: 3px;
-	background-color: #c1ffc1;
-	background-image: linear-gradient(to bottom, #c1ffc1 0%, green 100%);
 }
 .progress_bar .blue_percent {
 	z-index: 1;
 	height: 15pt;
-	border-radius: 3px;
-	background-color: #98b8f4;
-	background-image: linear-gradient(to bottom , #98b8f4 0%, blue 100%);
 }
-
-
 
 
 /*	$MEDIA		*/
@@ -3717,10 +3699,6 @@ a.help .icon {
 		left: -0.8em;
 		width: 6px;
 		min-height: 500px;
-		border: 1px solid #aaa;
-		border-radius: 4px;
-		background: #fff;
-		box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
 		z-index: 90;
 	}
 	#menu_sidebar ul, #menu_sidebar .category_header {
@@ -3761,7 +3739,6 @@ a.help .icon {
 	}
 	.frame {
 		min-width: 100%;
-		border-radius: 0;
 	}
 	.board_lastpost {
 		display: none;
@@ -3978,7 +3955,6 @@ a.help .icon {
 		display: block;
 		clear: both;
 		content:"";
-		border-bottom: 1px solid #BFBFBF;
 		padding-bottom: 3px;
 	}
 	.postarea, .forumtitle {
@@ -3990,25 +3966,8 @@ a.help .icon {
 	.signature {
 		display: none;
 	}
-	.forumposts .windowbg2 {
-		background-color: #fafafa;
-	}
 	.forumposts .windowbg, .forumposts .windowbg2 {
 		margin-bottom: 6px;
-		border: 1px solid #ccc;
-		box-shadow: 3px 3px 6px #e5e5e5;
-	}
-	.navigate_section, .linktree, .linktree:before, .linktree:after, .linktree_last,
-	.linktree_last:before, .linktree_last:after {
-		border: none !important;
-		background: none !important;
-	}
-	.linktree:after {
-		content: ">";
-	}
-	.linktree:hover, .linktree>a:hover, .linktree_last, .linktree_last>a,
-	.linktree_last>a:hover, .linktree_last strong {
-		color: #666 !important;
 	}
 	#button_admin, #button_home, #moderationbuttons,  a.linklevel1.button_strip_notify,
 	a.linklevel1.button_strip_print, a.linklevel1.button_strip_send, .inline_mod_check,
@@ -4044,10 +4003,5 @@ a.help .icon {
 	}
 	.popup_window {
 		width: 95%;
-	}
-	/*	$MODERATE	*/
-	/* ------------------------------------------------------- */
-	.split_topics, .move_topic {
-
 	}
 }
