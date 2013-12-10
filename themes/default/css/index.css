@@ -1535,17 +1535,6 @@ dl.settings textarea {
 	width: 85%;
 }
 
-
-
-
-/* -------------------------------------------- */
-/* @todo - Code before this point has NOT been split into layout code (index.css) and eye candy (_variant.css) */
-/* Code splitting will continue as time and bugz and whatever allow. */
-/* -------------------------------------------- */
-
-
-
-
 /*	$BOARDS		*/
 /* ------------------------------------------------------- */
 /* The small stats, under upper linktree. */
@@ -1970,9 +1959,6 @@ img.new_posts {
 	min-height: 1.4em;
 	max-width: 45em;
 	width: 60%;
-	border: 1px solid #aaa;
-	border-radius: 2px;
-	background: #fff;
 }
 /* Absolute positioning stops these breaking the bars on narrow screens. */
 #poll_options dl.options .percentage {
@@ -1984,7 +1970,6 @@ img.new_posts {
 	float: right;
 	margin: 0 0 0 0;
 	padding: 0 2px;
-	background: #fff;
 	white-space: pre;
 }
 
@@ -2003,9 +1988,6 @@ img.new_posts {
 .forumposts {
 	clear: both;
 	margin: 8px 0 0 0;
-	border-radius: 4px 4px 0 0;
-	background: #e2e2e2;
-	box-shadow: 1px 2px 4px #eee;
 }
 /* Topic information */
 .views_text, .nextlinks {
@@ -2026,14 +2008,6 @@ img.new_posts {
 .forumposts .approvebg, .forumposts .approvebg2, .core_posts {
 	overflow: visible;
 	margin: 4px 0 0 0;
-	border: 1px solid #ddd;
-	border-bottom: 1px solid #ccc;
-	background: #fff;
-}
-
-/* Colors for background of posts requiring approval */
-.forumposts .approvebg, .forumposts .approvebg2 {
-	background: #fff5cd;
 }
 
 /* Poster details and list of items */
@@ -2063,7 +2037,6 @@ img.new_posts {
 	overflow: hidden;
 	margin-top: -0.4em;
 	padding: 6px;
-	color: #46823c;
 	text-align: center;
 	font-weight: 600;
 	font-size: 1.333em;
@@ -2080,7 +2053,6 @@ img.new_posts {
 	left: 0;
 	padding: 6px 1em 4px 1em;
 	width: 16em;
-	background: #fff;
 	text-align: left;
 }
 .poster .listlevel2 {
@@ -2104,8 +2076,6 @@ img.new_posts {
 .report_seperator {
 	margin: 6px 0 0 0;
 	height: 1px;
-	background: #bbb;
-	border-bottom: 1px solid #eee;
 }
 /* Icon tweaks for several areas. */
 .poster .icons>img, .poster .linklevel1>img, .poster .linklevel2>img {
@@ -2129,22 +2099,7 @@ img.new_posts {
 	position: relative;
 	display: block;
 	margin: 3px 1.5em;
-	border: 1px solid #afafaf;
-	border-top: 1px solid #cfcfcf;
-	border-left: 1px solid #bfbfbf;
-	border-radius: 2px;
-	background: #f4f4f4;
-	background-image: linear-gradient(to bottom, #fcfcfc 0%, #e5e5e5 100%);
-	box-shadow: 1px 1px 2px #eee;
 	line-height: 2em;
-}
-.poster_online .linklevel1:hover {
-	border: 1px solid #ccc;
-	border-top: 1px solid #aaa;
-	border-left: 1px solid #bbb;
-	background: #f0f0f0;
-	box-shadow: 1px 1px 1px rgba(0,0,0,0.07) inset;
-	text-decoration: none;
 }
 /* End nifty new flyout. */
 
@@ -2175,7 +2130,6 @@ img.new_posts {
 	float: right;
 	overflow: hidden;
 	max-width: 15em;
-	color: #777;
 	text-overflow: ellipsis;
 	white-space: pre;
 }
@@ -2208,14 +2162,12 @@ img.new_posts {
 }
 /* @todo - Move strong tag outside anchor. Will save css. */
 .keyinfo h5 a, .keyinfo h5 a strong {
-	color: #46823c;
 	font-weight: 600;
 }
 .inner {
 	margin: 0;
 	padding: 7px 8px 2px 2px;
 	min-height: 70px;
-	border-top: 1px solid #bfbfbf;
 	word-wrap: break-word;
 	hyphens: auto;
 }
@@ -2229,7 +2181,6 @@ img.new_posts {
 .signature, .attachments, .custom_fields_above_signature {
 	overflow: auto;
 	padding: 8px 0;
-	border-top: 1px solid #bfbfbf;
 	font-size: 0.857em;
 }
 .attachments {
@@ -2256,8 +2207,6 @@ img.new_posts {
 	width: 640px;
 	height: auto;
 	max-height: 480px;
-	border: #27a348 1px solid;
-	border-top: 0;
 }
 .elk_video a img, .elk_video embed {
 	margin: 0 auto;
@@ -2267,7 +2216,6 @@ img.new_posts {
 	padding: 0 4px 0 6px;
 	width: 630px;
 	max-width: 98%;
-	border: #27a348 1px solid;
 }
 .elk_previewvideo {
 	max-width: 640px;
@@ -2323,28 +2271,17 @@ dl.send_mail dd {
 	width: 64%;
 }
 .requiredfield:before {
-	content: ' ';
 	height: 0;
 	position: absolute;
 	width: 0;
-
-	border: 10px solid transparent;
-	border-bottom-color: #437837;
-
 	bottom: 90%;
 	left: 5%;
 }
 .requiredfield {
-	color: #FFFFFF;
 	position: absolute;
 	top: 20px;
 	left: 5%;
 	font-size: 90%;
-	background: #437837;
-	border-bottom: 1px solid #5AA049;
-	border-left: 1px solid #2D5024;
-	border-right: 1px solid #5AA049;
-	border-top: 1px solid #2D5024;
 	line-height: 1.1em;
 	display: none;
 }
