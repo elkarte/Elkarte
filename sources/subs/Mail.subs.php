@@ -15,8 +15,6 @@
  *
  * This file handles tasks related to mail.
  * The functions in this file do NOT check permissions.
- * @todo should not check permissions.
- *
  */
 
 if (!defined('ELK'))
@@ -41,8 +39,7 @@ if (!defined('ELK'))
  */
 function sendmail($to, $subject, $message, $from = null, $message_id = null, $send_html = false, $priority = 3, $hotmail_fix = null, $is_private = false, $from_wrapper = null, $reference = null)
 {
-	global $webmaster_email, $context, $modSettings, $txt, $scripturl;
-	global $boardurl;
+	global $webmaster_email, $context, $modSettings, $txt, $scripturl, $boardurl;
 
 	$db = database();
 
