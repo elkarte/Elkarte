@@ -1260,6 +1260,45 @@ div.bbc_footnotes .meaction{
 	border-right: 1px solid #5AA049;
 	border-top: 1px solid #2D5024;
 }
+
+/*	$EDITOR		*/
+/* ------------------------------------------------------- */
+
+/* The main post editor section. */
+#preview_body {
+	border: 1px solid #ddd;
+	border-bottom: 1px solid #ccc;
+	background: #fff;
+}
+
+#postAdditionalOptionsHeader, #postDraftOptionsHeader {
+	background: #fafafa;
+	background-image: linear-gradient(to bottom, #fafafa 0%, #ebebeb 100%);
+}
+#postAdditionalOptions, #postDraftOptions {
+	border: 1px solid #ccc;
+	border-radius: 0 0 4px 4px;
+	background: #fdfdfd;
+	border-top: none;
+}
+#postAdditionalOptionsNC {
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	background: #fdfdfd;
+}
+#postMoreOptions, #postAttachment, #postAttachment2 {
+	border-top: 1px solid #ccc;
+}
+
+#postDraftOptions .settings dd, #postDraftOptions .settings dt{
+	border-top: 1px solid #e4e4e4;
+}
+/*	$MODERATE	*/
+/* ------------------------------------------------------- */
+
+.split_messages .post {
+	border-top: 1px solid #fff;
+}
 /* $PROFILE	*/
 /* ------------------------------------------------------- */
 /* Profile colors */

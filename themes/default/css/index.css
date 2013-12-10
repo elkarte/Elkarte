@@ -2303,9 +2303,6 @@ dl.send_mail dd {
 	padding: 0.5em 1em;
 	overflow: auto;
 	margin: 2px 0 0;
-	border: 1px solid #ddd;
-	border-bottom: 1px solid #ccc;
-	background: #fff;
 }
 #postmodify #message{
 	width: 100%;
@@ -2345,28 +2342,18 @@ ul.post_options li {
 }
 #postAdditionalOptionsHeader, #postDraftOptionsHeader {
 	margin: 1em 0 0 0;
-	background: #fafafa;
-	background-image: linear-gradient(to bottom, #fafafa 0%, #ebebeb 100%);
 }
 #postAdditionalOptions, #postDraftOptions {
 	margin: 0 0 1em 0;
 	overflow: auto;
-	border: 1px solid #ccc;
-	border-radius: 0 0 4px 4px;
-	background: #fdfdfd;
-	border-top: none;
 }
 #postAdditionalOptionsNC {
 	margin: 0 0 1em 0;
 	overflow: auto;
-	border: 1px solid #ccc;
-	border-radius: 4px;
-	background: #fdfdfd;
 }
 #postMoreOptions, #postAttachment, #postAttachment2 {
 	margin: -1px 0 0 0;
 	padding: 10px;
-	border-top: 1px solid #ccc;
 }
 #postAttachment, #postAttachment2 {
 	overflow: hidden;
@@ -2385,7 +2372,6 @@ ul.post_options li {
 	margin: 0;
 	padding: 5px 10px;
 	width: 60%;
-	border-top: 1px solid #e4e4e4;
 	font-size: 0.857em;
 }
 #postDraftOptions .settings dd{
@@ -2504,9 +2490,6 @@ ul.post_options li {
 	margin-left: 0;
 }
 
-
-
-
 /*	$MODERATE	*/
 /* ------------------------------------------------------- */
 
@@ -2556,7 +2539,6 @@ ul.post_options li {
 }
 .split_messages .post {
 	padding: 12px 0 0 0;
-	border-top: 1px solid #fff;
 }
 
 /* The merge topic section. */
