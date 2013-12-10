@@ -2597,30 +2597,20 @@ dl.merge_topic dd {
 /* ------------------------------------------------------- */
 .ui-tabs .ui-tabs-panel {
 	clear: both;
-	background: none repeat scroll 0 0 #fff;
-	border: 1px solid #ddd;
-	border-top: 1px #ccc solid;
 	padding-top: 8px;
 }
 #profilecenter {
-	background: #efefef;
 	margin: 12px 0 0 0;
 	padding: 8px 8px 16px 8px;
-	border: 1px solid #ccc;
-	border-radius: 7px;
-	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
 	overflow: auto;
 }
 #profilecenter .windowbg, #profilecenter .windowbg2 {
 	overflow: visible;
-	border: none;
-	background: #fff;
 	padding: 0 0 4px;
 }
 .profileblock {
 	padding: 4px 8px;
 	margin-top: 4px;
-	background: none repeat scroll 0 0 #fff;
 }
 .profile_content {
 	overflow: auto;
@@ -2644,9 +2634,7 @@ dl.merge_topic dd {
 	float: left;
 	margin-right: 5px;
 }
-.profileblock ul li:not(:first-child):before {
-	content: "\20\7C\20";
-}
+
 .profile_attachments {
 	border: 0;
 	border-spacing: 1em;
@@ -2727,7 +2715,6 @@ dl.merge_topic dd {
 	margin: 0 0 3px 0;
 	padding: 0;
 	width: 35%;
-	color: #555;
 	font-weight: bold;
 }
 #detailedinfo dd, #tracking dd, .profileblock dd {
@@ -2736,7 +2723,6 @@ dl.merge_topic dd {
 	padding: 0;
 	width: 65%;
 }
-
 
 #personal_picture {
 	display: block;
@@ -2802,11 +2788,6 @@ dl.merge_topic dd {
 }
 .activity_stats li span {
 	display: block;
-	border: solid #555;
-	border-width: 1px 1px 1px 1px;
-	border-right: none;
-	border-left: none;
-	background: #eee;
 	text-align: center;
 }
 .activity_stats .last span {
@@ -2815,13 +2796,6 @@ dl.merge_topic dd {
 .activity_stats li .bar {
 	margin: 0 auto;
 	width: 15px;
-	border: 1px solid #ccc;
-	border-bottom: none;
-	background: #fff;
-}
-.activity_stats li .bar div {
-	background: #47b263;
-	background-image: linear-gradient(to bottom, #60bc78 0%, #27a348 100%);
 }
 .activity_stats li .bar span {
 	position: absolute;
@@ -2885,15 +2859,12 @@ dl.merge_topic dd {
 }
 .topic_details {
 	padding: 0 4px 4px 4px;
-	border-bottom: 1px solid #999;
 }
 .list_posts {
 	overflow: auto;
 	clear: both;
 	margin: 0;
 	padding-top: 12px;
-	border-top: 1px solid #ccc;
-	box-shadow: 0 1px 0 #fff inset;
 	word-wrap: break-word;
 	hyphens: auto;
 }
@@ -2942,12 +2913,7 @@ dl.merge_topic dd {
 }
 .ignoreboards a {
 	padding: 1px 0;
-	border-bottom: 1px solid #c4c4c4;
 	font-weight: bold;
-}
-.ignoreboards a:hover {
-	border-bottom: 1px solid #555;
-	text-decoration: none;
 }
 .ignoreboards ul {
 	margin: 0;
@@ -3007,9 +2973,6 @@ dl.merge_topic dd {
 	width: 100%;
 	font-weight: 600;
 }
-
-
-
 
 /* $PERSONAL	*/
 /* ------------------------------------------------------- */
