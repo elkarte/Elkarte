@@ -763,7 +763,6 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	}
 
 	// Creating is modifying...in a way.
-	// @todo Why not set id_msg_modified on the insert?
 	$db->query('', '
 		UPDATE {db_prefix}messages
 		SET id_msg_modified = {int:id_msg}
@@ -1260,8 +1259,7 @@ function approvePosts($msgs, $approve = true)
 
 /**
  * Takes an array of board IDs and updates their last messages.
- * If the board has a parent, that parent board is also automatically
- * updated.
+ * If the board has a parent, that parent board is also automatically updated.
  * The columns updated are id_last_msg and last_updated.
  * Note that id_last_msg should always be updated using this function,
  * and is not automatically updated upon other changes.
@@ -1310,8 +1308,10 @@ function updateLastMessages($setboards, $id_msg = 0)
 	}
 
 	$parent_boards = array();
+
 	// Keep track of last modified dates.
 	$lastModified = $lastMsg;
+
 	// Get all the child boards for the parents, if they have some...
 	foreach ($setboards as $id_board)
 	{
@@ -1327,7 +1327,6 @@ function updateLastMessages($setboards, $id_msg = 0)
 			$parents = getBoardParents($id_board);
 
 		// Ignore any parents on the top child level.
-		// @todo Why?
 		foreach ($parents as $id => $parent)
 		{
 			if ($parent['level'] != 0)
@@ -1343,9 +1342,9 @@ function updateLastMessages($setboards, $id_msg = 0)
 
 	// Note to help understand what is happening here. For parents we update the timestamp of the last message for determining
 	// whether there are child boards which have not been read. For the boards themselves we update both this and id_last_msg.
-
 	$board_updates = array();
 	$parent_updates = array();
+
 	// Finally, to save on queries make the changes...
 	foreach ($parent_boards as $id => $msg)
 	{
