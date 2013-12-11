@@ -1572,15 +1572,12 @@ div.bbc_footnotes .meaction{
 .progress_bar .full_bar {
 	border-radius: 3px;
 	color: black;
-	text-align: center;
 }
 .progress_bar .green_percent {
-	z-index: 1;
-	height: 15pt;
+	background-color: green;
 }
 .progress_bar .blue_percent {
-	z-index: 1;
-	height: 15pt;
+	background-color: blue;
 }
 
 /* $STATISTICS	*/
