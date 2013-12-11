@@ -78,7 +78,7 @@ fieldset {
 	margin: 5px 0;
 }
 legend {
-	background: url(../images/selected_open.png) no-repeat scroll left center transparent;
+	background: url(../../images/selected_open.png) no-repeat scroll left center transparent;
 	cursor: pointer;
 	padding-left: 20px;
 	color: #333;
@@ -86,7 +86,7 @@ legend {
 	margin-left: 15px;
 }
 .collapsed legend {
-	background:  url(../images/selected.png) no-repeat scroll left center transparent;
+	background:  url(../../images/selected.png) no-repeat scroll left center transparent;
 }
 
 /* @todo - Quite a lot more code to be split. */
@@ -115,7 +115,7 @@ input[disabled].input_text {
 /* The OpenID login form */
 .openid_login {
 	padding-left: 20px;
-	background: white url(../images/openid.png) no-repeat;
+	background: white url(../../images/openid.png) no-repeat;
 	background-position: 2% 50%;
 }
 
@@ -707,7 +707,7 @@ div.bbc_footnotes .meaction{
 }
 .category_boards a span, .board_key:before {
 	background-repeat: no-repeat;
-	background-image: url(../images/_light/board_icons.png);
+	background-image: url(../../images/_light/board_icons.png);
 }
 .on_board {
 	background-position: 0 0;
@@ -1555,7 +1555,7 @@ div.bbc_footnotes .meaction{
 .errorbox {
 	border-top: 2px solid #c34;
 	border-bottom: 2px solid #c34;
-	background: #fee url(../images/profile/warning_mute.png) 10px 50% no-repeat;
+	background: #fee url(../../images/profile/warning_mute.png) 10px 50% no-repeat;
 }
 
 
