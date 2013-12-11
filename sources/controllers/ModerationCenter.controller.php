@@ -374,26 +374,28 @@ class ModerationCenter_Controller extends Action_Controller
 	}
 
 	/**
-	 * Show a notice sent to a user.
+	 * Show a warning notice sent to a user.
 	 */
 	public function action_showNotice()
 	{
 		global $txt, $context;
 
+		// What notice have they asked to view
+		$id_notice = isset($_GET['nid']) ? (int) $_GET['nid'] : 0;
+		$notice = moderatorNotice($id_notice);
+
+		// legit?
+		if (empty($notice) || !$context['can_moderate_boards'])
+			fatal_lang_error('no_access', false);
+
+		list ($context['notice_body'], $context['notice_subject']) = $notice;
+
+		$context['notice_body'] = parse_bbc($context['notice_body'], false);
 		$context['page_title'] = $txt['show_notice'];
 		$context['sub_template'] = 'show_notice';
 		Template_Layers::getInstance()->removeAll();
 
 		loadTemplate('ModerationCenter');
-
-		// @todo Assumes nothing needs permission more than accessing moderation center!
-		$id_notice = (int) $_GET['nid'];
-		$notice = moderatorNotice($id_notice);
-		if (empty($notice))
-			fatal_lang_error('no_access', false);
-		list ($context['notice_body'], $context['notice_subject']) = $notice;
-
-		$context['notice_body'] = parse_bbc($context['notice_body'], false);
 	}
 
 	/**
@@ -1240,7 +1242,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 							if (!empty($warning[\'id_notice\']))
 								$output .= \'
-									<a href="\' . $scripturl . \'?action=moderate;area=notice;nid=\' . $warning[\'id_notice\'] . \'" onclick="window.open(this.href, \\\'\\\', \\\'scrollbars=yes,resizable=yes,width=400,height=250\\\');return false;" target="_blank" class="new_win" title="\' . $txt[\'profile_warning_previous_notice\'] . \'"><img src="\' . $settings[\'default_images_url\'] . \'/filter.png" alt="\' . $txt[\'profile_warning_previous_notice\'] . \'" /></a>\';
+									<a href="\' . $scripturl . \'?action=moderate;area=notice;nid=\' . $warning[\'id_notice\'] . \'" onclick="window.open(this.href, \\\'\\\', \\\'scrollbars=yes,resizable=yes,width=480,height=320\\\');return false;" target="_blank" class="new_win" title="\' . $txt[\'profile_warning_previous_notice\'] . \'"><img src="\' . $settings[\'default_images_url\'] . \'/filter.png" alt="\' . $txt[\'profile_warning_previous_notice\'] . \'" /></a>\';
 							return $output;
 						'),
 					),

@@ -128,7 +128,6 @@ function cleanRequest()
 		else
 			$request = $_SERVER['REQUEST_URI'];
 
-		// @todo smflib.
 		// Replace 'index.php/a,b,c/d/e,f' with 'a=b,c&d=&e=f' and parse it into $_GET.
 		if (strpos($request, basename($scripturl) . '/') !== false)
 		{

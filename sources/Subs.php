@@ -4316,6 +4316,9 @@ function prepareSearchEngines()
  * It is used by the controller callbacks from the template, such as
  * posts in topic display page, posts search results page, or personal
  * messages.
+ *
+ * @param object $messages_request holds a query result
+ * @param bool $reset
  */
 function currentContext($messages_request, $reset = false)
 {
