@@ -128,8 +128,8 @@ function loadForumTests()
 					)
 				);
 
-				$memberStartedID = (int) getMsgMemberID($row[\'myid_first_msg\']);
-				$memberUpdatedID = (int) getMsgMemberID($row[\'myid_last_msg\']);
+				$memberStartedID = getMsgMemberID($row[\'myid_first_msg\']);
+				$memberUpdatedID = getMsgMemberID($row[\'myid_last_msg\']);
 
 				$db->insert(\'\',
 					\'{db_prefix}topics\',
@@ -346,8 +346,8 @@ function loadForumTests()
 				if ($row[\'myid_first_msg\'] == $row[\'myid_first_msg\'] && $row[\'myid_first_msg\'] == $row[\'myid_first_msg\'] && $row[\'approved\'] == $row[\'firstmsg_approved\'])
 					return false;
 
-				$memberStartedID = (int) getMsgMemberID($row[\'myid_first_msg\']);
-				$memberUpdatedID = (int) getMsgMemberID($row[\'myid_last_msg\']);
+				$memberStartedID = getMsgMemberID($row[\'myid_first_msg\']);
+				$memberUpdatedID = getMsgMemberID($row[\'myid_last_msg\']);
 
 				$db->query(\'\', \'
 					UPDATE {db_prefix}topics
