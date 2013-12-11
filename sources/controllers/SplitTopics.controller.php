@@ -83,7 +83,7 @@ class SplitTopics_Controller extends Action_Controller
 	 */
 	public function action_splitIndex()
 	{
-		global $txt, $topic, $context, $modSettings;
+		global $txt, $context, $modSettings;
 
 		// Validate "at".
 		if (empty($_GET['at']))
@@ -91,24 +91,24 @@ class SplitTopics_Controller extends Action_Controller
 		$splitAt = (int) $_GET['at'];
 
 		// We deal with topics here.
-		require_once(SUBSDIR . '/Topic.subs.php');
 		require_once(SUBSDIR . '/Boards.subs.php');
+		require_once(SUBSDIR . '/Messages.subs.php');
 
 		// Let's load up the boards in case they are useful.
 		$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true));
 
 		// Retrieve message info for the message at the split point.
-		$messageInfo = messageTopicDetails($topic, $splitAt, true);
-		if (empty($messageInfo))
+		$messageInfo = basicMessageInfo($splitAt, false, true);
+		if ($messageInfo === false)
 			fatal_lang_error('cant_find_messages');
 
-		// If not approved validate they can see it.
-		if ($modSettings['postmod_active'] && !$messageInfo['approved'])
+		// If not approved validate they can approve it.
+		if ($modSettings['postmod_active'] && !$messageInfo['topic_approved'])
 			isAllowedTo('approve_posts');
 
 		// If this topic has unapproved posts, we need to count them too...
 		if ($modSettings['postmod_active'] && allowedTo('approve_posts'))
-			$messageInfo['num_replies'] += $messageInfo['unapproved_posts'] - ($messageInfo['approved'] ? 0 : 1);
+			$messageInfo['num_replies'] += $messageInfo['unapproved_posts'] - ($messageInfo['topic_approved'] ? 0 : 1);
 
 		$context['can_move'] = allowedTo('move_any') || allowedTo('move_own');
 
@@ -122,8 +122,6 @@ class SplitTopics_Controller extends Action_Controller
 			$this->_new_topic_subject = $messageInfo['subject'];
 			return $this->action_splitSelectTopics();
 		}
-
-		//
 
 		// Basic template information....
 		$context['message'] = array(
