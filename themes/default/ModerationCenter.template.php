@@ -484,24 +484,24 @@ function template_user_watch_post_callback($post)
 {
 	global $scripturl, $context, $txt, $delete_button;
 
-	// We'll have a delete please bob.
-	if (empty($delete_button))
-		$delete_button = create_button('delete.png', 'remove_message', 'remove', 'class="centericon"');
-
 	$output_html = '
 					<div>
 						<div class="floatleft">
 							<strong><a href="' . $scripturl . '?topic=' . $post['id_topic'] . '.' . $post['id'] . '#msg' . $post['id'] . '">' . $post['subject'] . '</a></strong> ' . $txt['mc_reportedp_by'] . ' <strong>' . $post['author_link'] . '</strong>
 						</div>
-						<div class="floatright">';
+						<ul class="floatright quickbuttons">';
 
 	if ($post['can_delete'])
 		$output_html .= '
-							<a href="' . $scripturl . '?action=moderate;area=userwatch;sa=post;delete=' . $post['id'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['mc_watched_users_delete_post'] . '\');">' . $delete_button . '</a>
-							<input type="checkbox" name="delete[]" value="' . $post['id'] . '" class="input_check" />';
+							<li class="listlevel1">
+								<a class="linklevel1 remove_button" href="' . $scripturl . '?action=moderate;area=userwatch;sa=post;delete=' . $post['id'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['mc_watched_users_delete_post'] . '\');">' . $txt['remove'] . '</a>
+							</li>
+							<li class="listlevel1">
+								<input type="checkbox" name="delete[]" value="' . $post['id'] . '" class="input_check" />
+							</li>';
 
 	$output_html .= '
-						</div>
+						</ul>
 					</div><br />
 					<div class="smalltext">
 						&#171; ' . $txt['mc_watched_users_posted'] . ': ' . $post['poster_time'] . ' &#187;
