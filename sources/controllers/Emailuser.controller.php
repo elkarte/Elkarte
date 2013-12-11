@@ -439,15 +439,13 @@ class Emailuser_Controller extends Action_Controller
 			$this->action_reporttm2();
 
 		// We need a message ID to check!
-		if (empty($_REQUEST['msg']) && empty($_REQUEST['mid']))
+		if (empty($_REQUEST['msg']))
 			fatal_lang_error('no_access', false);
 
-		// For compatibility, accept mid, but we should be using msg. (not the flavor kind!)
-		$message_id = empty($_REQUEST['msg']) ? (int) $_REQUEST['mid'] : (int) $_REQUEST['msg'];
-
-		// Check the message's ID - don't want anyone reporting a post they can't even see!
+		// Check the message's ID - don't want anyone reporting a post that does not exist
 		require_once(SUBSDIR . '/Messages.subs.php');
-		$message_info = basicMessageInfo($message_id, false, true);
+		$message_id = (int) $_REQUEST['msg'];
+		$message_info = basicMessageInfo($message_id, true, true);
 		if ($message_info === false)
 			fatal_lang_error('no_board', false);
 
