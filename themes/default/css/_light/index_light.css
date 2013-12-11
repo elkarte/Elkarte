@@ -1562,7 +1562,6 @@ div.bbc_footnotes .meaction{
 /*	$PROGRESS	*/
 /* ------------------------------------------------------- */
 /* Styles for the progress bar */
-/* @todo - Height in pt? WTF? */
 .progress_bar {
 	border: 1px solid black;
 	border-radius: 5px;
