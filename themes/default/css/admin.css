@@ -9,9 +9,6 @@
 .action_admin .generic_list_wrapper .information {
 	margin: 8px 0;
 	padding: 4px 12px 2px 12px;
-	border: 1px solid #ccc;
-	border-radius: 2px;
-	box-shadow: 0 2px 2px rgba(0,0,0,0.1);
 }
 .action_admin .generic_list_wrapper .information div {
 	background: none;
@@ -38,12 +35,8 @@
 #core_features, #generate_reports_type,
 #groupForm, #mailqueue_stats, #manage_maintenance,
 #new_group, #view_group, #admin_form_wrapper, .action_admin .generic_list_wrapper{
-	background: #efefef;
 	margin: 12px 0 0 0;
 	padding: 8px 8px 16px 8px;
-	border: 1px solid #ccc;
-	border-radius: 7px;
-	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
 	overflow: auto;
 }
 div.quick_tasks {
@@ -86,16 +79,9 @@ div.quick_tasks {
 #admin_newsletters .information {
 	margin: 8px 0;
 	padding: 8px 12px 6px 12px;
-	border: 1px solid #ccc;
-	border-radius: 2px;
-	box-shadow: 0 2px 2px rgba(0,0,0,0.1);
 }
 #advanced_panel_header {
 	margin-bottom: 8px;
-	background: #fff;
-	box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-	border: 1px solid #ccc;
-	border-radius: 2px;
 }
 
 #news_lists .newsarea {
@@ -179,9 +165,6 @@ fieldset dl {
 	overflow: visible;
 }
 #welcome {
-	border: 1px solid #ddd;
-	border-top: none;
-	border-radius: 0 0 7px 7px;
 	font-size: 0.9em;
 	padding: 12px 9px 8px 9px;
 }
@@ -199,10 +182,6 @@ fieldset dl {
 	padding: 5px 0;
 	overflow: auto;
 	line-height: 1.7em;
-	border-bottom: double #ccc;
-}
-.search_results li a strong {
-	color: #346;
 }
 .search_results li p {
 	padding: 0 20px;
@@ -230,8 +209,6 @@ fieldset dl {
 #admin_main_section {
 	margin: 12px 0 0 0;
 	padding: 8px 12px 4px 12px;
-	border-radius: 7px 7px 0 0;
-	border-bottom: none;
 }
 #live_news, #supportVersionsTable {
 	width: 70%;
@@ -243,12 +220,6 @@ fieldset dl {
 }
 #admin_main_section .windowbg {
 	padding: 6px 0;
-	border: 1px solid #ccc;
-	border-top: 1px solid #bbb;
-	border-bottom: 1px solid #ddd;
-	border-radius: 0;
-	background: #fff;
-	box-shadow:  0 2px 2px rgba(255,255,255,0.5), 0 -1px 2px rgba(0,0,0,0.1);
 	height: 12em;
 	overflow: auto;
 }
@@ -264,21 +235,17 @@ fieldset dl {
 }
 #live_news div.content dl {
 	padding: 0;
-	color: #111;
 }
 #ourAnnouncements dt {
 	padding: 4px 6px 2px 6px;
-	border-top: 1px solid #bf6900;
 }
 #ourAnnouncements dt a {
-	color: #bf6900;
 	font-weight: bold;
 	display: block;
 }
 #ourAnnouncements dd {
 	margin: 0;
 	padding: 6px 12px;
-	border-top: double #ddd;
 }
 
 /* The update warning. */
@@ -300,15 +267,9 @@ div.quick_tasks {
 	box-shadow: none;
 	padding: 0 0 16px 0;
 }
-#quick_tasks {
-	border-top: 1px solid #bbb;
-	border-bottom: 1px solid #fff;
-}
 #quick_tasks li {
 	list-style: none;
 	padding: 10px 6px 10px 6px;
-	border-top: 1px solid #fff;
-	border-bottom: 1px solid #bbb;
 	float: left;
 	width: 50%;
 	height: 7em;
@@ -431,7 +392,6 @@ div.quick_tasks {
 	list-style-type: none;
 }
 #package_list li {
-	border: 1px solid #cacdd3;
 	padding: 0.2em;
 	margin: 1px;
 }
@@ -445,9 +405,7 @@ div.quick_tasks {
 	overflow: auto;
 	padding-bottom: .5em;
 }
-.package_section {
-	border: 1px solid #cacdd3;
-}
+
 .packages {
 	border: none !important;
 	list-style: none;
@@ -456,9 +414,6 @@ div.quick_tasks {
 	display: block;
 	font-family: "dejavu sans mono", "monaco", "lucida console", "courier new", monospace;
 	font-size: 0.9em;
-	background: #eef;
-	border-top: 2px solid #999;
-	border-bottom: 2px solid #999;
 	margin: 1px 0 6px 0;
 	padding: 3px 12px;
 	overflow: auto;
@@ -538,21 +493,14 @@ dl.settings dd.questions input {
 /* Styles for the manage boards section.
 ------------------------------------------------- */
 
-#manage_boards .category_header {
-	border-bottom: 1px solid #bbb;
-}
 #manage_boards .windowbg {
 	margin: 0;
 	padding: 0;
 }
 #manage_boards .content, #manage_attachments .content {
-	background: #efefef;
 	margin: -6px 0 12px 0;
 	padding: 6px 8px 16px 8px;
-	border: 1px solid #ccc;
-	border-top: 0px solid;
 	overflow: auto;
-	border-radius: 0 0 7px 7px;
 }
 #manage_attachments .content {
 	margin: -10px 0 0;
@@ -570,9 +518,7 @@ dl.settings dd.questions input {
 	margin: 0 0 -12px;
 }
 .ui-state-highlight {
-	background-color: #efe;
 	height: 25px;
-	border: 1px dashed green;
 	cursor: move;
 }
 #manage_boards li, #manage_boards li.windowbg, #manage_boards li.windowbg2 {
@@ -598,9 +544,6 @@ dl.settings dd.questions input {
 	float: left;
 	margin-top: -1px;
 }
-#manage_boards .recycle_board {
-	background-color: #dee;
-}
 .move_links {
 	padding: 0 13px 0 0;
 }
@@ -608,19 +551,12 @@ dl.settings dd.questions input {
 	padding: 0 0.5em;
 }
 #manage_boards span.modify_boards a {
-	background: #fff;
-	border: 1px solid #aaa;
 	border-radius: 3px;
-	box-shadow: 1px 1px 2px rgba(0,0,0,0.1);
 	padding: 3px 6px;
-	color: #222;
 	font-size: 1em;
 }
 #manage_boards span.modify_boards a:hover {
-	background: #fff;
 	text-decoration: none;
-	color: #444;
-	box-shadow: -1px -1px 1px rgba(0,0,0,0.1);
 }
 #manage_boards dl {
 	padding: 8px 6px 0 6px;
@@ -629,11 +565,10 @@ dl.settings dd.questions input {
 	margin: 0 0 8px 0;
 }
 #manage_boards .post_group, #manage_boards .regular_members {
-	border-bottom: 1px dotted #000;
 	cursor: help;
 }
 .select_all_box {
-	display:none;
+	display: none;
 }
 
 /* Styles for the manage smiley section.
@@ -656,11 +591,8 @@ padding: 7px 10px;
 /* Styles for the manage maintenance section.
 ------------------------------------------------- */
 #manage_maintenance div.windowbg, #manage_maintenance div.windowbg2 {
-	background: none;
 	padding: 0;
 	margin:  0 0 4px 0;
-	border-bottom: 1px solid #ccc;
-	box-shadow: 0 1px 0 #fff;
 }
 #manage_maintenance .button_submit{
 	margin: 4px 10px 10px 10px;
@@ -757,12 +689,8 @@ ul.pending_payments {
 	margin: 0 0 0.6em 0;
 }
 .perm_boards li {
-	border: 1px solid #cacdd3;
 	padding: 0.2em;
 	margin: 1px;
-}
-.perm_groups {
-	background-color: #fff;
 }
 .perm_classic {
 	margin: 0.2em;
@@ -828,16 +756,10 @@ dl.themes_list dd {
 #modcenter {
 	display: block;
 	width: 100%;
-	background: none repeat scroll 0 0 #DEEDDA;
-	border-radius: 5px 5px 0 0;
-	box-shadow: 1px 2px 3px #EEEEEE;
 }
 #modcenter .windowbg, #modcenter .windowbg2, #modcenter .generic_list_wrapper  {
 	overflow: visible;
 	margin: 4px 0 0 0;
-	border: 1px solid #ddd;
-	border-bottom: 1px solid #ccc;
-	background: #fff;
 }
 #modcenter .content {
 	padding: 12px;
@@ -848,12 +770,6 @@ dl.themes_list dd {
 }
 #mod_main_section .windowbg {
 	padding: 6px 0;
-	border: 1px solid #ccc;
-	border-top: 1px solid #bbb;
-	border-bottom: 1px solid #ddd;
-	border-radius: 0;
-	background: #fff;
-	box-shadow:  0 2px 2px rgba(255,255,255,0.5), 0 -1px 2px rgba(0,0,0,0.1);
 	height: 14em;
 	overflow: auto;
 }
@@ -904,7 +820,6 @@ ul.moderation_notes li {
 }
 #error_log {
 	width: 100%;
-	border-top: 1px solid #ddd;
 }
 #error_log tr.windowbg td, #error_log tr.windowbg2 td {
 	padding: 8px;
@@ -928,7 +843,6 @@ ul.moderation_notes li {
 	width: 100%;
 	padding: 4px 0;
 	line-height: 1.6em;
-	border-top: 1px solid #e3e3e3;
 }
 .error_where .scope {
 	display: table-cell;
@@ -945,19 +859,12 @@ ul.moderation_notes li {
 	vertical-align: middle;
 	margin: 0 8px 0 0;
 }
-#errorfile_table {
-	background-color: #FFF;
-}
 
 /* Styles for the Report generation
 ------------------------------------------------- */
 #report_buttons {
 	min-height: 2.4em;
 	padding: 3px 0;
-}
-.report_results th {
-	border-left: 1px solid #ddd;
-	border-right: 1px solid #ddd;
 }
 
 /* Admin menu icons as sprites @todo - Can clean this up some more. */
@@ -1207,10 +1114,6 @@ ul.moderation_notes li {
 .ui-dialog {
 	padding: 0;
 	z-index: 100;
-	border: 1px solid #999;
-	box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.3);
-	background-color: #f5f5f5;
-	border-radius: 4px 4px 0 0;
 }
 .ui-dialog .ui-dialog-title {
 	float: left;
@@ -1222,10 +1125,8 @@ ul.moderation_notes li {
 }
 .ui-dialog .ui-dialog-titlebar {
 	padding: 0 1em;
-	background-color: #fafafa;
 	font-weight: 600;
 	font-size: 1.1em;
-	border-radius: 4px 4px 0 0;
 }
 .ui-dialog .ui-dialog-content {
 	padding: 4px;
@@ -1244,9 +1145,6 @@ ul.moderation_notes li {
 }
 .ui-widget-overlay {
 	z-index: 100;
-	background-color: #000;
-	opacity: 0.3;
-	position: fixed;
 	top: 0;
 	left: 0;
 	width: 100%;

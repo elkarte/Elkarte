@@ -1502,7 +1502,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 		// The most efficient way of writing multi themes is to use a master index.css plus variant.css files.
 		if (!empty($context['theme_variant']))
-			loadCSSFile('index' . $context['theme_variant'] . '.css');
+			loadCSSFile($context['theme_variant'] . '/index' . $context['theme_variant'] . '.css');
 	}
 
 	// A bit lonely maybe, though I think it should be set up *after* teh theme variants detection
@@ -1530,6 +1530,9 @@ function loadTheme($id_theme = 0, $initialize = true)
 	// RTL languages require an additional stylesheet.
 	if ($context['right_to_left'])
 		loadCSSFile('rtl.css');
+
+	if (!empty($context['theme_variant']) && $context['right_to_left'])
+		loadCSSFile($context['theme_variant'] . '/rtl' . $context['theme_variant'] . '.css');
 
 	// Compatibility.
 	if (!isset($settings['theme_version']))
@@ -1720,10 +1723,13 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 	// Any specific template style sheets to load?
 	if (!empty($style_sheets))
 	{
-		foreach ($style_sheets as &$sheet)
-			$sheet = stripos('.css', $sheet) !== false ? $sheet : $sheet . '.css';
-
-		loadCSSFile($style_sheets);
+		foreach ($style_sheets as $sheet)
+		{
+			$sheets[] = stripos('.css', $sheet) !== false ? $sheet : $sheet . '.css';
+			if ($sheet == 'admin' && !empty($context['theme_variant']))
+				$sheets[] = $context['theme_variant'] . '/admin' . $context['theme_variant'] . '.css';
+		}
+		loadCSSFile($sheets);
 	}
 
 	// No template to load?
