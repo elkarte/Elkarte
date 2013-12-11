@@ -418,7 +418,7 @@ class Emailuser_Controller extends Action_Controller
 	 */
 	public function action_reporttm()
 	{
-		global $txt, $topic, $modSettings, $user_info, $context;
+		global $txt, $modSettings, $user_info, $context;
 
 		$context['robot_no_index'] = true;
 
@@ -446,9 +446,9 @@ class Emailuser_Controller extends Action_Controller
 		$message_id = empty($_REQUEST['msg']) ? (int) $_REQUEST['mid'] : (int) $_REQUEST['msg'];
 
 		// Check the message's ID - don't want anyone reporting a post they can't even see!
-		require_once(SUBSDIR . '/Topic.subs.php');
-		$message_info = messageTopicDetails($topic, $message_id);
-		if (empty($message_info ))
+		require_once(SUBSDIR . '/Messages.subs.php');
+		$message_info = basicMessageInfo($message_id, false, true);
+		if ($message_info === false)
 			fatal_lang_error('no_board', false);
 
 		// Do we need to show the visual verification image?
