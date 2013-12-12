@@ -366,7 +366,9 @@ em {
 .double_height {
 	line-height: 2em;
 }
-
+.nowrap {
+	white-space: nowrap;
+}
 /* Styles for main headers. */
 .category_header, .forum_category .category_header {
 	padding: 4px 10px 2px 10px;

@@ -76,7 +76,7 @@ function template_event_post()
 
 	// Start the javascript for drop down boxes...
 	echo '
-		<form action="', $scripturl, '?action=calendar;sa=post" method="post" name="postevent" accept-charset="UTF-8" onsubmit="submitonce(this);smc_saveEntities(\'postevent\', [\'evtitle\']);" style="margin: 0;">';
+		<form action="', $scripturl, '?action=calendar;sa=post" method="post" name="postevent" accept-charset="UTF-8" onsubmit="submitonce(this);smc_saveEntities(\'postevent\', [\'evtitle\']);">';
 
 	if (!empty($context['event']['new']))
 		echo '
@@ -107,7 +107,7 @@ function template_event_post()
 				<fieldset id="event_main">
 					<legend><span', isset($context['post_error']['no_event']) ? ' class="error"' : '', '>', $txt['calendar_event_title'], '</span></legend>
 					<input type="text" name="evtitle" maxlength="255" size="70" value="', $context['event']['title'], '" class="input_text" />
-					<div class="smalltext" style="white-space: nowrap;">
+					<div class="smalltext nowrap">
 						<input type="hidden" name="calendar" value="1" />', $txt['calendar_year'], '
 						<select name="year" id="year" onchange="generateDays();">';
 
@@ -171,7 +171,7 @@ function template_event_post()
 		echo '
 							<li>
 								', $txt['calendar_link_event'], '
-								<input type="checkbox" style="vertical-align: middle;" class="input_check" name="link_to_board" checked="checked" onclick="toggleLinked(this.form);" />
+								<input type="checkbox" class="input_check" name="link_to_board" checked="checked" onclick="toggleLinked(this.form);" />
 							</li>
 							<li>
 								', template_select_boards('board', $txt['calendar_post_in'], 'onchange="this.form.submit();"'), '
