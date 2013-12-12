@@ -597,6 +597,12 @@ padding: 7px 10px;
 #manage_maintenance .button_submit{
 	margin: 4px 10px 10px 10px;
 }
+#membersText, #rotText {
+	font-weight: bold;
+}
+#membersPanel {
+	padding: 3px;
+}
 /* Styles for the badbehaviour section.
 ------------------------------------------------- */
 .bbfilter {
