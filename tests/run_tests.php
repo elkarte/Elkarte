@@ -41,6 +41,9 @@ class AllTests extends TestSuite
 		// controllers (web tests)
 		$this->addFile(TESTDIR . 'sources/controllers/TestAuth.php');
 
+		// install
+		$this->addFile(TESTDIR . 'install/TestDatabase.php');
+
 		// admin controllers (web tests)
 		$this->addFile(TESTDIR . 'sources/admin/TestManageBoardsSettings.php');
 		$this->addFile(TESTDIR . 'sources/admin/TestManagePostsSettings.php');
@@ -53,5 +56,9 @@ class AllTests extends TestSuite
 		// subs APIs
 		$this->addFile(TESTDIR . 'sources/subs/TestBoards.subs.php');
 		$this->addFile(TESTDIR . 'sources/subs/TestPoll.subs.php');
+		$this->addFile(TESTDIR . 'sources/subs/TestBBC.subs.php');
+		$this->addFile(TESTDIR . 'sources/subs/TestHTML2BBC.subs.php');
+		$this->addFile(TESTDIR . 'sources/subs/TestValidator.subs.php');
+		$this->addFile(TESTDIR . 'sources/subs/TestLike.subs.php');
 	}
 }

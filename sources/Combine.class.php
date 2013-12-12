@@ -251,7 +251,7 @@ class Site_Combiner
 
 			// CSS needs relative locations converted for the moved hive to work
 			if ($type === 'css')
-				$tempfile = str_replace('../images', $file['url'] . '/images', $tempfile);
+				$tempfile = str_replace(array('../../images', '../images'), $file['url'] . '/images', $tempfile);
 
 			$this->_cache .= (($i == true) ? "\n" : '') . $tempfile;
 			$i = true;

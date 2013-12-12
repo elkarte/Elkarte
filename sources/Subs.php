@@ -3522,7 +3522,7 @@ function text2words($text, $max_chars = 20, $encrypt = false)
  * @param boolean $force_use = false
  * @return string
  *
- * @todo move to template?
+ * @deprecated: this will be removed at some point, do not rely on this function
  */
 function create_button($name, $alt, $label = '', $custom = '', $force_use = false)
 {
@@ -4316,6 +4316,9 @@ function prepareSearchEngines()
  * It is used by the controller callbacks from the template, such as
  * posts in topic display page, posts search results page, or personal
  * messages.
+ *
+ * @param object $messages_request holds a query result
+ * @param bool $reset
  */
 function currentContext($messages_request, $reset = false)
 {

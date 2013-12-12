@@ -1,0 +1,206 @@
+/* Common admin center classes.
+------------------------------------------------------- */
+
+.action_admin .generic_list_wrapper .information {
+	border: 1px solid #ccc;
+	border-radius: 2px;
+	box-shadow: 0 2px 2px rgba(0,0,0,0.1);
+}
+
+#admin_main_section, div.quick_tasks, #mod_main_section,
+#support_credits, #admin_newsletters,
+#core_features, #generate_reports_type,
+#groupForm, #mailqueue_stats, #manage_maintenance,
+#new_group, #view_group, #admin_form_wrapper, .action_admin .generic_list_wrapper{
+	background: #efefef;
+	border: 1px solid #ccc;
+	border-radius: 7px;
+	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
+}
+
+/* News and newsletters screen.
+---------------------------------------------*/
+#admin_newsletters .information {
+	border: 1px solid #ccc;
+	border-radius: 2px;
+	box-shadow: 0 2px 2px rgba(0,0,0,0.1);
+}
+#advanced_panel_header {
+	background: #fff;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+	border: 1px solid #ccc;
+	border-radius: 2px;
+}
+
+#welcome {
+	border: 1px solid #ddd;
+	border-top: none;
+	border-radius: 0 0 7px 7px;
+}
+.search_results li {
+	border-bottom: double #ccc;
+}
+.search_results li a strong {
+	color: #346;
+}
+#admin_main_section {
+	border-radius: 7px 7px 0 0;
+	border-bottom: none;
+}
+#admin_main_section .windowbg {
+	border: 1px solid #ccc;
+	border-top: 1px solid #bbb;
+	border-bottom: 1px solid #ddd;
+	border-radius: 0;
+	background: #fff;
+	box-shadow:  0 2px 2px rgba(255,255,255,0.5), 0 -1px 2px rgba(0,0,0,0.1);
+}
+
+#live_news div.content dl {
+	color: #111;
+}
+#ourAnnouncements dt {
+	border-top: 1px solid #bf6900;
+}
+#ourAnnouncements dt a {
+	color: #bf6900;
+}
+#ourAnnouncements dd {
+	border-top: double #ddd;
+}
+
+#quick_tasks {
+	border-top: 1px solid #bbb;
+	border-bottom: 1px solid #fff;
+}
+#quick_tasks li {
+	border-top: 1px solid #fff;
+	border-bottom: 1px solid #bbb;
+}
+
+/* Styles for the package manager.
+------------------------------------------------- */
+#package_list li {
+	border: 1px solid #cacdd3;
+}
+.package_section {
+	border: 1px solid #cacdd3;
+}
+#find_code, #replace_code {
+	background: #eef;
+	border-top: 2px solid #999;
+	border-bottom: 2px solid #999;
+}
+
+/* Styles for the manage boards section.
+------------------------------------------------- */
+
+#manage_boards .category_header {
+	border-bottom: 1px solid #bbb;
+}
+#manage_boards .content, #manage_attachments .content {
+	background: #efefef;
+	border: 1px solid #ccc;
+	border-top: 0px solid;
+	border-radius: 0 0 7px 7px;
+}
+.ui-state-highlight {
+	background-color: #efe;
+	border: 1px dashed green;
+}
+#manage_boards .recycle_board {
+	background-color: #dee;
+}
+#manage_boards span.modify_boards a {
+	background: #fff;
+	border: 1px solid #aaa;
+	border-radius: 3px;
+	box-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+	color: #222;
+}
+#manage_boards span.modify_boards a:hover {
+	background: #fff;
+	color: #444;
+	box-shadow: -1px -1px 1px rgba(0,0,0,0.1);
+}
+#manage_boards .post_group, #manage_boards .regular_members {
+	border-bottom: 1px dotted #000;
+}
+
+/* Styles for the manage maintenance section.
+------------------------------------------------- */
+#manage_maintenance div.windowbg, #manage_maintenance div.windowbg2 {
+	background: none;
+	border-bottom: 1px solid #ccc;
+	box-shadow: 0 1px 0 #fff;
+}
+
+/* Styles for the manage permissions section.
+------------------------------------------------- */
+.perm_boards li {
+	border: 1px solid #cacdd3;
+}
+.perm_groups {
+	background-color: #fff;
+}
+
+/* Styles for the moderation center.
+------------------------------------------------- */
+#modcenter {
+	background: none repeat scroll 0 0 #deedda;
+	border-radius: 5px 5px 0 0;
+	box-shadow: 1px 2px 3px #eee;
+}
+#modcenter .windowbg, #modcenter .windowbg2, #modcenter .generic_list_wrapper  {
+	border: 1px solid #ddd;
+	border-bottom: 1px solid #ccc;
+	background: #fff;
+}
+#mod_main_section .windowbg {
+	border: 1px solid #ccc;
+	border-top: 1px solid #bbb;
+	border-bottom: 1px solid #ddd;
+	border-radius: 0;
+	background: #fff;
+	box-shadow:  0 2px 2px rgba(255,255,255,0.5), 0 -1px 2px rgba(0,0,0,0.1);
+}
+ul.moderation_notes li {
+	border-bottom: 1px solid #ccc;
+}
+
+/* Styles for the error log.
+------------------------------------------------- */
+
+#error_log {
+	border-top: 1px solid #ddd;
+}
+#error_log .error_where {
+	border-top: 1px solid #e3e3e3;
+}
+
+#errorfile_table {
+	background-color: #fff;
+}
+
+/* Styles for the Report generation
+------------------------------------------------- */
+.report_results th {
+	border-left: 1px solid #ddd;
+	border-right: 1px solid #ddd;
+}
+
+/* jQuery Dialog */
+.ui-dialog {
+	border: 1px solid #999;
+	box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.3);
+	background-color: #f5f5f5;
+	border-radius: 4px 4px 0 0;
+}
+.ui-dialog .ui-dialog-titlebar {
+	background-color: #fafafa;
+	border-radius: 4px 4px 0 0;
+}
+.ui-widget-overlay {
+	background-color: #000;
+	opacity: 0.3;
+}

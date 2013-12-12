@@ -154,8 +154,7 @@ class PersonalMessage_Controller extends Action_Controller
 	 * This is the main function of personal messages, called before the action handler.
 	 * PersonalMessages is a menu-based controller.
 	 * It sets up the menu.
-	 * @todo and call from the menu the appropriate method/function
-	 * for the current area.
+	 * Calls from the menu the appropriate method/function for the current area.
 	 *
 	 * @see Action_Controller::action_index()
 	 */
@@ -167,20 +166,20 @@ class PersonalMessage_Controller extends Action_Controller
 
 		// Finally all the things we know how to do
 		$subActions = array(
-			'manlabels' => array($this, 'action_manlabels', 'permissions' => 'pm_read'),
-			'manrules' => array($this, 'action_manrules', 'permissions' => 'pm_read'),
-			'pmactions' => array($this, 'action_pmactions', 'permissions' => 'pm_read'),
-			'prune' => array($this, 'action_prune', 'permissions' => 'pm_read'),
-			'removeall' => array($this, 'action_removeall', 'permissions' => 'pm_read'),
-			'removeall2' => array($this, 'action_removeall2', 'permissions' => 'pm_read'),
-			'report' => array($this, 'action_report', 'permissions' => 'pm_read'),
-			'search' => array($this, 'action_search', 'permissions' => 'pm_read'),
-			'search2' => array($this, 'action_search2', 'permissions' => 'pm_read'),
-			'send' => array($this, 'action_send', 'permissions' => 'pm_read'),
-			'send2' => array($this, 'action_send2', 'permissions' => 'pm_read'),
-			'settings' => array($this, 'action_settings', 'permissions' => 'pm_read'),
-			'showpmdrafts' => array($this, 'action_showpmdrafts', 'permissions' => 'pm_read'),
-			'inbox' => array($this, 'action_folder', 'permissions' => 'pm_read'),
+			'manlabels' => array($this, 'action_manlabels', 'permission' => 'pm_read'),
+			'manrules' => array($this, 'action_manrules', 'permission' => 'pm_read'),
+			'pmactions' => array($this, 'action_pmactions', 'permission' => 'pm_read'),
+			'prune' => array($this, 'action_prune', 'permission' => 'pm_read'),
+			'removeall' => array($this, 'action_removeall', 'permission' => 'pm_read'),
+			'removeall2' => array($this, 'action_removeall2', 'permission' => 'pm_read'),
+			'report' => array($this, 'action_report', 'permission' => 'pm_read'),
+			'search' => array($this, 'action_search', 'permission' => 'pm_read'),
+			'search2' => array($this, 'action_search2', 'permission' => 'pm_read'),
+			'send' => array($this, 'action_send', 'permission' => 'pm_read'),
+			'send2' => array($this, 'action_send2', 'permission' => 'pm_read'),
+			'settings' => array($this, 'action_settings', 'permission' => 'pm_read'),
+			'showpmdrafts' => array('dir' => CONTROLLERDIR, 'file' => 'Draft.controller.php', 'controller' => 'Draft_Controller', 'function' => 'action_showPMDrafts', 'permission' => 'pm_read'),
+			'inbox' => array($this, 'action_folder', 'permission' => 'pm_read'),
 		);
 
 		// Known action, go to it, otherwise the inbox for you
@@ -192,19 +191,12 @@ class PersonalMessage_Controller extends Action_Controller
 
 		// Known action, go to it, otherwise the inbox for you
 		if ($subAction === 'inbox')
-		{
-			// Set the index bar
 			messageIndexBar($context['current_label_id'] == -1 ? $context['folder'] : 'label' . $context['current_label_id']);
-			$action->dispatch($subAction);
-		}
-		else
-		{
-			if (!isset($_REQUEST['xml']))
-				messageIndexBar($_REQUEST['sa']);
+		elseif (!isset($_REQUEST['xml']))
+			messageIndexBar($subAction);
 
-			// So it was set - let's go to that action.
-			$action->dispatch($subAction);
-		}
+		// So it was set - let's go to that action.
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -834,18 +826,6 @@ class PersonalMessage_Controller extends Action_Controller
 	}
 
 	/**
-	 * This function allows the user to view their PM drafts
-	 * Accessed by ?action=pm;sa=showpmdrafts
-	 */
-	function action_showpmdrafts()
-	{
-		// @todo the file/method to pass control to should be listed in the menu
-		require_once(CONTROLLERDIR . '/Draft.controller.php');
-		$controller = new Draft_Controller();
-		$controller->action_showPMDrafts();
-	}
-
-	/**
 	 * Send a personal message.
 	 */
 	function action_send2()
@@ -1193,7 +1173,6 @@ class PersonalMessage_Controller extends Action_Controller
 			$updateErrors = changePMLabels($to_label, $label_type, $user_info['id']);
 
 			// Any errors?
-			// @todo Separate the sprintf?
 			if (!empty($updateErrors))
 				fatal_lang_error('labels_too_many', true, array($updateErrors));
 		}
