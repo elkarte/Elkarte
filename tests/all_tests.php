@@ -47,6 +47,7 @@ class AllTests extends TestSuite
 
 		// install
 		$this->addFile(TESTDIR . 'install/TestInstall.php');
+		$this->addFile(TESTDIR . 'install/TestDatabase.php');
 
 		// core sources
 		$this->addFile(TESTDIR . 'sources/TestLogging.php');

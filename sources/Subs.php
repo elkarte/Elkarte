@@ -3522,7 +3522,7 @@ function text2words($text, $max_chars = 20, $encrypt = false)
  * @param boolean $force_use = false
  * @return string
  *
- * @todo move to template?
+ * @deprecated: this will be removed at some point, do not rely on this function
  */
 function create_button($name, $alt, $label = '', $custom = '', $force_use = false)
 {

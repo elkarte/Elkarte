@@ -41,6 +41,9 @@ class AllTests extends TestSuite
 		// controllers (web tests)
 		$this->addFile(TESTDIR . 'sources/controllers/TestAuth.php');
 
+		// install
+		$this->addFile(TESTDIR . 'install/TestDatabase.php');
+
 		// admin controllers (web tests)
 		$this->addFile(TESTDIR . 'sources/admin/TestManageBoardsSettings.php');
 		$this->addFile(TESTDIR . 'sources/admin/TestManagePostsSettings.php');
