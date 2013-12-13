@@ -3843,13 +3843,15 @@ a.help .icon {
 		width: 100%;
 		display: block;
 	}
-	.board_info span {
-		width: 30px;
-		height: 30px;
+	.board_row {
+		padding: 10px 0px;
 	}
 	.board_info h3 a {
 		font-size: 1.3em;
 		word-wrap: break-word;
+	}
+	.board_name {
+		padding-top: 15px;
 	}
 	.board_latest {
 		padding: 0 8px;
