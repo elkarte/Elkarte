@@ -3100,7 +3100,7 @@ function template_javascript($do_defered = false)
 	// Use this hook to work with Javascript files and vars pre output
 	call_integration_hook('pre_javascript_output');
 
-	// Combine and minify javascript to save bandwidth and requests?
+	// Combine and minify javascript source files to save bandwidth and requests
 	if (!empty($context['javascript_files']))
 	{
 		if (!empty($modSettings['minify_css_js']))
@@ -3125,47 +3125,45 @@ function template_javascript($do_defered = false)
 		}
 	}
 
-	// Output the declared Javascript variables.
+	// Build the declared Javascript variables script
+	$js_vars = array();
 	if (!empty($context['javascript_vars']) && !$do_defered)
 	{
-		echo '
-	<script><!-- // --><![CDATA[';
+		foreach ($context['javascript_vars'] as $var => $value)
+			$js_vars[] = $var . ' = ' . $value;
 
-		$output = array();
-		foreach ($context['javascript_vars'] as $key => $value)
-			$output[] = $key . ' = ' . $value;
-
-		echo '
-		var ' . implode(",\n\t\t\t", $output) . ';';
-
-		echo '
-	// ]]></script>';
+		// nNewlines and tabs are here to make it look nice in the page source view, stripped if minimized though
+		$js_vars = 'var ' . implode(",\n\t\t\t", $js_vars) . ";\n";
 	}
 
 	// Inline JavaScript - Actually useful some times!
-	if (!empty($context['javascript_inline']))
+	if (!empty($context['javascript_inline']) || !empyt($js_vars))
 	{
+		// Defered output waits until we are defering !
 		if (!empty($context['javascript_inline']['defer']) && $do_defered)
 		{
-			echo '
-	<script><!-- // --><![CDATA[';
+			// Combine them all in to one output
+			$context['javascript_inline']['defer'] = array_map('trim', $context['javascript_inline']['defer']);
+			$inline_defered_code = implode("\n\t\t", $context['javascript_inline']['defer']);
 
-			foreach ($context['javascript_inline']['defer'] as $js_code)
-				echo $js_code;
-
+			// Output the defered script
 			echo '
+	<script><!-- // --><![CDATA[
+		', $inline_defered_code, '
 	// ]]></script>';
 		}
 
+		// Standard output, and our javascript vars, get output when we are not on a defered call
 		if (!empty($context['javascript_inline']['standard']) && !$do_defered)
 		{
-			echo '
-	<script><!-- // --><![CDATA[';
+			$inline_standard_code = !empty($js_vars) ? $js_vars : '';
+			$context['javascript_inline']['standard'] = array_map('trim', $context['javascript_inline']['standard']);
+			$inline_standard_code .= "\t\t" . implode("\n\t\t", $context['javascript_inline']['standard']);
 
-			foreach ($context['javascript_inline']['standard'] as $js_code)
-				echo $js_code;
-
+			// And output the js vars and standard scripts to the page
 			echo '
+	<script><!-- // --><![CDATA[
+		', $inline_standard_code, '
 	// ]]></script>';
 		}
 	}
