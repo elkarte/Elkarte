@@ -476,7 +476,7 @@ class ManageNews_Controller extends Action_Controller
 		if (isset($_POST['preview']))
 		{
 			$context['preview'] = true;
-			return action_mailingcompose();
+			return $this->action_mailingcompose();
 		}
 
 		// How many to send at once? Quantity depends on whether we are queueing or not.
@@ -610,7 +610,7 @@ class ManageNews_Controller extends Action_Controller
 		if (empty($base_message) || empty($base_subject))
 		{
 			$context['preview'] = true;
-			return action_mailingcompose();
+			return $this->action_mailingcompose();
 		}
 
 		// Use the default time format.
