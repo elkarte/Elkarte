@@ -18,6 +18,9 @@
 	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
 }
 
+.disabled {
+	color: #777;
+}
 /* News and newsletters screen.
 ---------------------------------------------*/
 #admin_newsletters .information {

@@ -597,6 +597,24 @@ padding: 7px 10px;
 #manage_maintenance .button_submit{
 	margin: 4px 10px 10px 10px;
 }
+#membersText, #rotText {
+	font-weight: bold;
+}
+#membersPanel {
+	padding: 3px;
+}
+/* Styles for the badbehaviour section.
+------------------------------------------------- */
+.bbfilter {
+	display: table-cell;
+	padding: 4px 0;
+	width: 20px; 
+	vertical-align: top;
+}
+.bbrequest_uri {
+	display: table-cell;
+}
+
 /* Stop the submit buttons running away on wide screens.*/
 #manage_maintenance form {
 	max-width: 75em;
