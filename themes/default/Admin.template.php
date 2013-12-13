@@ -941,7 +941,7 @@ function template_show_settings()
 				// Some quick helpers...
 				$javascript = $config_var['javascript'];
 				$disabled = !empty($config_var['disabled']) ? ' disabled="disabled"' : '';
-				$subtext = !empty($config_var['subtext']) ? '<br /><span class="smalltext"> ' . $config_var['subtext'] . '</span>' : '';
+				$subtext = !empty($config_var['subtext']) ? '<br /><span class="smalldescription"> ' . $config_var['subtext'] . '</span>' : '';
 
 				// Show the [?] button.
 				if ($config_var['help'])

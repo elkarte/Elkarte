@@ -366,7 +366,7 @@ em {
 /* normal (14px default), and large (16px default).
 /* Since these are purely presentational classes, they should be used sparingly. */
 /* @todo - th shouldn't be required. */
-.smalltext, .smalltext th {
+.smalldescription, .smalldescription th, .smalltext, .smalltext th {
 	font-size: 0.857em;
 }
 .largetext {

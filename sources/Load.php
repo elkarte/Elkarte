@@ -1581,6 +1581,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	if (!empty($modSettings['todayMod']) && $modSettings['todayMod'] > 2)
 		addInlineJavascript('
 		var oRttime = ({
+			currentTime : ' . JavaScriptEscape(forum_time()) . ',
 			now : ' . JavaScriptEscape($txt['rt_now']) . ',
 			minute : ' . JavaScriptEscape($txt['rt_minute']) . ',
 			minutes : ' . JavaScriptEscape($txt['rt_minutes']) . ',

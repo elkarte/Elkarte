@@ -297,7 +297,12 @@ function updateRelativeTime()
 function relativeTime(sFrom, sTo)
 {
 	if (typeof sTo === 'undefined')
-		this.dateTo = new Date();
+	{
+		if (typeof oRttime.currentTime === 'undefined')
+			this.dateTo = new Date();
+		else
+			this.dateTo = new Date(oRttime.currentTime * 1000);
+	}
 	else
 		this.dateTo = new Date(sTo);
 
