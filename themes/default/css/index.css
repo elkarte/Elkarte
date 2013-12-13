@@ -3716,10 +3716,10 @@ a.help .icon {
 	select, .input_text, .input_password {
 		max-width: 12em;
 	}
-	dt, dd, dd label {
+	dt, dd, dd label, .login dt {
 		display: block;
 		width: 90% !important;
-		text-align: left !important;
+		text-align: left;
 	}
 	dd {
 		padding-left: 8% !important;
