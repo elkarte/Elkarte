@@ -467,8 +467,7 @@ function template_edit_options()
 		<form name="spell_form" id="spell_form" method="post" accept-charset="UTF-8" target="spellWindow" action="', $scripturl, '?action=spellcheck">
 			<input type="hidden" name="spellstring" value="" />
 			<input type="hidden" name="fulleditor" value="" />
-		</form>
-		<script src="' . $settings['default_theme_url'] . '/scripts/spellcheck.js"></script>';
+		</form>';
 }
 
 /**

@@ -242,6 +242,8 @@ class Display_Controller
 
 		// Check if spellchecking is both enabled and actually working. (for quick reply.)
 		$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && function_exists('pspell_new');
+		if ($context['show_spellchecking'])
+			loadJavascriptFile('spellcheck.js', array('defer' => true));
 
 		// Do we need to show the visual verification image?
 		$context['require_verification'] = !$user_info['is_mod'] && !$user_info['is_admin'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1));
