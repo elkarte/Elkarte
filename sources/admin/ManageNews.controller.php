@@ -583,31 +583,31 @@ class ManageNews_Controller extends Action_Controller
 			require_once(SUBSDIR . '/PersonalMessage.subs.php');
 
 		// We are relying too much on writing to superglobals...
-		$_POST['subject'] = !empty($_POST['subject']) ? $_POST['subject'] : '';
-		$_POST['message'] = !empty($_POST['message']) ? $_POST['message'] : '';
+		$base_subject = !empty($_POST['subject']) ? $_POST['subject'] : '';
+		$base_message = !empty($_POST['message']) ? $_POST['message'] : '';
 
 		// Save the message and its subject in $context
-		$context['subject'] = htmlspecialchars($_POST['subject'], ENT_COMPAT, 'UTF-8');
-		$context['message'] = htmlspecialchars($_POST['message'], ENT_COMPAT, 'UTF-8');
+		$context['subject'] = htmlspecialchars($base_subject, ENT_COMPAT, 'UTF-8');
+		$context['message'] = htmlspecialchars($base_message, ENT_COMPAT, 'UTF-8');
 
 		// Prepare the message for sending it as HTML
 		if (!$context['send_pm'] && !empty($_POST['send_html']))
 		{
 			// Prepare the message for HTML.
 			if (!empty($_POST['parse_html']))
-				$_POST['message'] = str_replace(array("\n", '  '), array('<br />' . "\n", '&nbsp; '), $_POST['message']);
+				$base_message = str_replace(array("\n", '  '), array('<br />' . "\n", '&nbsp; '), $base_message);
 
 			// This is here to prevent spam filters from tagging this as spam.
-			if (preg_match('~\<html~i', $_POST['message']) == 0)
+			if (preg_match('~\<html~i', $base_message) == 0)
 			{
-				if (preg_match('~\<body~i', $_POST['message']) == 0)
-					$_POST['message'] = '<html><head><title>' . $_POST['subject'] . '</title></head>' . "\n" . '<body>' . $_POST['message'] . '</body></html>';
+				if (preg_match('~\<body~i', $base_message) == 0)
+					$base_message = '<html><head><title>' . $base_subject . '</title></head>' . "\n" . '<body>' . $base_message . '</body></html>';
 				else
-					$_POST['message'] = '<html>' . $_POST['message'] . '</html>';
+					$base_message = '<html>' . $base_message . '</html>';
 			}
 		}
 
-		if (empty($_POST['message']) || empty($_POST['subject']))
+		if (empty($base_message) || empty($base_subject))
 		{
 			$context['preview'] = true;
 			return action_mailingcompose();
@@ -628,23 +628,23 @@ class ManageNews_Controller extends Action_Controller
 		$cleanLatestMember = empty($_POST['send_html']) || $context['send_pm'] ? un_htmlspecialchars($modSettings['latestRealName']) : $modSettings['latestRealName'];
 
 		// Replace in all the standard things.
-		$_POST['message'] = str_replace($variables,
+		$base_message = str_replace($variables,
 			array(
 				!empty($_POST['send_html']) ? '<a href="' . $scripturl . '">' . $scripturl . '</a>' : $scripturl,
 				standardTime(forum_time(), false),
 				!empty($_POST['send_html']) ? '<a href="' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . '">' . $cleanLatestMember . '</a>' : ($context['send_pm'] ? '[url=' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . ']' . $cleanLatestMember . '[/url]' : $cleanLatestMember),
 				$modSettings['latestMember'],
 				$cleanLatestMember
-			), $_POST['message']);
+			), $base_message);
 
-		$_POST['subject'] = str_replace($variables,
+		$base_subject = str_replace($variables,
 			array(
 				$scripturl,
 				standardTime(forum_time(), false),
 				$modSettings['latestRealName'],
 				$modSettings['latestMember'],
 				$modSettings['latestRealName']
-			), $_POST['subject']);
+			), $base_subject);
 
 		$from_member = array(
 			'{$member.email}',
@@ -675,7 +675,7 @@ class ManageNews_Controller extends Action_Controller
 				$email
 			);
 
-			sendmail($email, str_replace($from_member, $to_member, $_POST['subject']), str_replace($from_member, $to_member, $_POST['message']), null, null, !empty($_POST['send_html']), 5);
+			sendmail($email, str_replace($from_member, $to_member, $base_subject), str_replace($from_member, $to_member, $base_message), null, null, !empty($_POST['send_html']), 5);
 
 			// Done another...
 			$i++;
@@ -763,7 +763,7 @@ class ManageNews_Controller extends Action_Controller
 						!empty($_POST['send_html']) ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $cleanMemberName . '</a>' : ($context['send_pm'] ? '[url=' . $scripturl . '?action=profile;u=' . $row['id_member'] . ']' . $cleanMemberName . '[/url]' : $cleanMemberName),
 						$row['id_member'],
 						$cleanMemberName,
-					), $_POST['message']);
+					), $base_message);
 
 				$subject = str_replace($from_member,
 					array(
@@ -771,7 +771,7 @@ class ManageNews_Controller extends Action_Controller
 						$row['real_name'],
 						$row['id_member'],
 						$row['real_name'],
-					), $_POST['subject']);
+					), $base_subject);
 
 				// Send the actual email - or a PM!
 				if (!$context['send_pm'])
