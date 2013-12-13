@@ -289,6 +289,8 @@ class Maintenance_Controller extends Action_Controller
 		if (isset($_GET['done']) && $_GET['done'] == 'recountposts')
 			$context['maintenance_finished'] = $txt['maintain_recountposts'];
 
+		loadJavascriptFile('suggest.js', array('defer' => true));
+
 		// set up the sub-template
 		$context['sub_template'] = 'maintain_members';
 	}
