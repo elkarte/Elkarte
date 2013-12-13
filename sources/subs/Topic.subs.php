@@ -1362,45 +1362,6 @@ function countMessagesBefore($id_topic, $id_msg, $include_current = false, $only
 }
 
 /**
- * Retrieve a few data on a particular message.
- * Slightly different from basicMessageInfo, this one inner joins {db_prefix}topics
- * and doesn't use {query_see_board}
- *
- * @param int $topic topic ID
- * @param int $message message ID
- * @param bool $topic_approved if true it will return the topic approval status, otherwise the message one (default false)
- */
-function messageTopicDetails($topic, $message, $topic_approved = false)
-{
-	global $modSettings;
-
-	$db = database();
-
-	// @todo isn't this a duplicate?
-
-	// Retrieve a few info on the specific message.
-	$request = $db->query('', '
-		SELECT m.id_member, m.subject,' . ($topic_approved ? ' t.approved,' : 'm.approved,') . '
-			t.num_replies, t.unapproved_posts, t.id_first_msg, t.id_member_started
-		FROM {db_prefix}messages AS m
-			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = {int:current_topic})
-		WHERE m.id_msg = {int:message_id}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
-			AND m.approved = 1') . '
-			AND m.id_topic = {int:current_topic}
-		LIMIT 1',
-		array(
-			'current_topic' => $topic,
-			'message_id' => $message,
-		)
-	);
-
-	$messageInfo = $db->fetch_assoc($request);
-	$db->free_result($request);
-
-	return $messageInfo;
-}
-
-/**
  * Select a part of the messages in a topic.
  *
  * @param int $topic
