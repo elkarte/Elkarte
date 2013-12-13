@@ -3713,6 +3713,29 @@ a.help .icon {
 }
 /* This one does 480 screens at default font size. */
 @media screen and (max-width: 30em) {
+	select, .input_text, .input_password {
+		max-width: 12em;
+	}
+	dt, dd {
+		display: block;
+		width: 90% !important;
+		text-align: left !important;
+	}
+	dd {
+		padding-left: 8% !important;
+	}
+	dd input, dd select, dd textarea, dd label {
+		display: block !important;
+		width: 100% !important;
+		max-width: 100% !important;
+	}
+	dd .input_check {
+		display: inline !important;
+		width: auto !important;
+	}
+	#search_options {
+		width: 100%;
+	}
 	#posting_icons, .table_list .stats, .table_list .lastpost, .table_grid .lastpost {
 		display: none;
 	}
@@ -3864,9 +3887,6 @@ a.help .icon {
 	#basicinfo, #detailedinfo {
 		float: none;
 		width: 100%;
-	}
-	select, .input_text, .input_password {
-		max-width: 12em;
 	}
 	.login {
 		width: 100%;
