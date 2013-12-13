@@ -733,6 +733,7 @@ class ManageNews_Controller extends Action_Controller
 			if (empty($context['email_force']))
 				$sendQuery .= ' AND mem.notify_announcements = {int:notify_announcements}';
 
+			require_once(SUBSDIR . '/News.subs.php');
 			// Get the smelly people - note we respect the id_member range as it gives us a quicker query.
 			$recipients = getNewsletterRecipients($sendQuery, $sendParams, $context['start'], $num_at_once, $i);
 			foreach ($recipients as $row)
