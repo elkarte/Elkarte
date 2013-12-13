@@ -472,6 +472,13 @@ class ManageNews_Controller extends Action_Controller
 	{
 		global $txt, $context, $scripturl, $modSettings, $user_info;
 
+		// A nice successful screen if you did it
+		if (isset($_REQUEST['success']))
+		{
+			$context['sub_template'] = 'email_members_succeeded';
+			loadTemplate('ManageNews');
+			return;
+		}
 		// If just previewing we prepare a message and return it for viewing
 		if (isset($_POST['preview']))
 		{
@@ -792,7 +799,7 @@ class ManageNews_Controller extends Action_Controller
 		{
 			// Log this into the admin log.
 			logAction('newsletter', array(), 'admin');
-			redirectexit('action=admin');
+			redirectexit('action=admin;area=news;sa=mailingsend;success');
 		}
 
 		$context['start'] = $last_id_member;

@@ -4,6 +4,7 @@
 global $settings, $scripturl;
 
 $txt['admin_boards'] = 'Boards';
+$txt['admin_back_to'] = 'Back to admin panel';
 $txt['admin_users'] = 'Members';
 $txt['admin_newsletters'] = 'Newsletters';
 $txt['include_these'] = 'Members to include';
@@ -153,6 +154,7 @@ $txt['email_force'] = 'Send this to members even if they have chosen not to rece
 $txt['email_as_pms'] = 'Send this to these groups using personal messages.';
 $txt['email_continue'] = 'Continue';
 $txt['email_done'] = 'done.';
+$txt['email_members_succeeded'] = 'You have successfully sent your newsletter!';
 
 $txt['ban_title'] = 'Ban List';
 $txt['ban_ip'] = 'IP banning: (e.g. 192.168.12.213 or 128.0.*.*) - one entry per line';

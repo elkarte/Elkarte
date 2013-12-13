@@ -350,3 +350,27 @@ function template_email_members_send()
 		doAutoSubmit();
 	// ]]></script>';
 }
+
+/**
+ * Template for informing the user the sending succeeded
+ */
+function template_email_members_succeeded()
+{
+	global $context, $txt, $scripturl;
+
+	echo '
+	<div id="admincenter">
+		<h3 class="category_header">
+			<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=email_members" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['admin_newsletters'], '
+		</h3>
+		<div class="windowbg">
+			<div class="content">
+				<div class="successbox">
+					', $txt['email_members_succeeded'], '
+				</div>
+				<hr />
+				<a href="', $scripturl, '?action=admin" class="linkbutton right_submit">', $txt['admin_back_to'], '</a>
+			</div>
+		</div>
+	</div>';
+}
