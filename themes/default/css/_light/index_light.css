@@ -1699,4 +1699,7 @@ div.bbc_footnotes .meaction{
 		background: #fff;
 		border: none;
 	}
+	.listlevel2.subsections .linklevel2::after {
+		content: '';
+	}
 }

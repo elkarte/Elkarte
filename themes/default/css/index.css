@@ -3913,8 +3913,7 @@ a.help .icon {
 		width: 14em;
 	}
 	.menulevel3 {
-		margin: -2em 0 0 4em;
-		max-width: 15em;
+		display: none !important;
 	}
 	#main_menu li ul li, .admin_menu li ul li{
 		float: left;
@@ -3983,7 +3982,7 @@ a.help .icon {
 	.forumposts .windowbg, .forumposts .windowbg2 {
 		margin-bottom: 6px;
 	}
-	#button_admin, #moderationbuttons,  a.linklevel1.button_strip_notify,
+	#button_home, #moderationbuttons,  a.linklevel1.button_strip_notify,
 	a.linklevel1.button_strip_print, a.linklevel1.button_strip_send, .inline_mod_check,
 	a.linklevel1.quotetonew_button, a.linklevel1.button_strip_post_poll,
 	a.linklevel1.post_options, .keyinfo .post_subject, li.listlevel1.quickmod_select_all,
