@@ -3136,11 +3136,11 @@ function template_javascript($do_defered = false)
 			$js_vars[] = $var . ' = ' . $value;
 
 		// nNewlines and tabs are here to make it look nice in the page source view, stripped if minimized though
-		$js_vars = 'var ' . implode(",\n\t\t\t", $js_vars) . ";\n";
+		$context['javascript_inline']['standard'][] = "\n\t\t" . 'var ' . implode(",\n\t\t\t", $js_vars) . ";\n";
 	}
 
 	// Inline JavaScript - Actually useful some times!
-	if (!empty($context['javascript_inline']) || !empyt($js_vars))
+	if (!empty($context['javascript_inline']))
 	{
 		// Defered output waits until we are defering !
 		if (!empty($context['javascript_inline']['defer']) && $do_defered)
@@ -3157,20 +3157,14 @@ function template_javascript($do_defered = false)
 		}
 
 		// Standard output, and our javascript vars, get output when we are not on a defered call
-		if ((!empty($context['javascript_inline']['standard']) || !empty($js_vars)) && !$do_defered)
+		if (!empty($context['javascript_inline']['standard']) && !$do_defered)
 		{
-			$inline_standard_code = !empty($js_vars) ? $js_vars : '';
-
-			if (!empty($context['javascript_inline']['standard']))
-			{
-				$context['javascript_inline']['standard'] = array_map('trim', $context['javascript_inline']['standard']);
-				$inline_standard_code .= "\t\t" . implode("\n\t\t", $context['javascript_inline']['standard']);
-			}
+			$context['javascript_inline']['standard'] = array_map('trim', $context['javascript_inline']['standard']);
 
 			// And output the js vars and standard scripts to the page
 			echo '
 	<script><!-- // --><![CDATA[
-		', $inline_standard_code, '
+		', implode("\n\t\t", $context['javascript_inline']['standard']), '
 	// ]]></script>';
 		}
 	}
