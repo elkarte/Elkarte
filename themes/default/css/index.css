@@ -3716,7 +3716,7 @@ a.help .icon {
 	select, .input_text, .input_password {
 		max-width: 12em;
 	}
-	dt, dd {
+	dt, dd, dd label {
 		display: block;
 		width: 90% !important;
 		text-align: left !important;
@@ -3724,10 +3724,9 @@ a.help .icon {
 	dd {
 		padding-left: 8% !important;
 	}
-	dd input, dd select, dd textarea, dd label {
-		display: block !important;
-		width: 100% !important;
-		max-width: 100% !important;
+	dd input, dd select, dd textarea {
+		width: 90% !important;
+		max-width: 90% !important;
 	}
 	dd .input_check {
 		display: inline !important;
