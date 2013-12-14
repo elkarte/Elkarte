@@ -3711,6 +3711,12 @@ a.help .icon {
 	#password_login select {
 		display: none;
 	}
+	.poster {
+		min-width: 10em;
+	}
+	.postarea {
+		margin: 0 0 0 8em;
+	}
 }
 /* This one does 480 screens at default font size. */
 @media screen and (max-width: 30em) {
