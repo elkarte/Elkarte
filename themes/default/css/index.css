@@ -3760,7 +3760,7 @@ a.help .icon {
 		width: 90% !important;
 		max-width: 90% !important;
 	}
-	dd .input_check {
+	dd .input_check, dd .input_radio {
 		display: inline !important;
 		width: auto !important;
 	}
