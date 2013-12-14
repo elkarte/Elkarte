@@ -658,7 +658,6 @@ function loadBoard()
 
 /**
  * Load this user's permissions.
- *
  */
 function loadPermissions()
 {
@@ -677,6 +676,7 @@ function loadPermissions()
 		$cache_groups = $user_info['groups'];
 		asort($cache_groups);
 		$cache_groups = implode(',', $cache_groups);
+
 		// If it's a spider then cache it different.
 		if ($user_info['possibly_robot'])
 			$cache_groups .= '-spider';
@@ -949,6 +949,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 	// We can't load guests or members not loaded by loadMemberData()!
 	if ($user == 0)
 		return false;
+
 	if (!isset($user_profile[$user]))
 	{
 		trigger_error('loadMemberContext(): member id ' . $user . ' not previously loaded by loadMemberData()', E_USER_WARNING);
@@ -968,9 +969,9 @@ function loadMemberContext($user, $display_custom_fields = false)
 	$gendertxt = $profile['gender'] == 2 ? $txt['female'] : ($profile['gender'] == 1 ? $txt['male'] : '');
 	$profile['signature'] = str_replace(array("\n", "\r"), array('<br />', ''), $profile['signature']);
 	$profile['signature'] = parse_bbc($profile['signature'], true, 'sig' . $profile['id_member']);
-
 	$profile['is_online'] = (!empty($profile['show_online']) || allowedTo('moderate_forum')) && $profile['is_online'] > 0;
 	$profile['icons'] = empty($profile['icons']) ? array('', '') : explode('#', $profile['icons']);
+
 	// Setup the buddy status here (One whole in_array call saved :P)
 	$profile['buddy'] = in_array($profile['id_member'], $user_info['buddies']);
 	$buddy_list = !empty($profile['buddy_list']) ? explode(',', $profile['buddy_list']) : array();
@@ -1098,7 +1099,6 @@ function loadMemberContext($user, $display_custom_fields = false)
 /**
  * Loads information about what browser the user is viewing with and places it in $context
  *  - uses the class from BrowserDetect.class.php
- *
  */
 function detectBrowser()
 {
@@ -1431,6 +1431,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	if (isset($_REQUEST['xml']))
 	{
 		loadLanguage('index+Modifications');
+
 		// @todo added because some $settings in template_init are necessary even in xml mode. Maybe move template_init to a settings file?
 		loadTemplate('index');
 		loadTemplate('Xml');
@@ -1463,6 +1464,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 			$layers = explode(',', $settings['theme_layers']);
 		else
 			$layers = array('html', 'body');
+
 		$template_layers = Template_Layers::getInstance(true);
 		foreach ($layers as $layer)
 			$template_layers->addBegin($layer);
@@ -1571,9 +1573,9 @@ function loadTheme($id_theme = 0, $initialize = true)
 			youtube : ' . JavaScriptEscape($txt['youtube']) . ',
 			vimeo : ' . JavaScriptEscape($txt['vimeo']) . ',
 			dailymotion : ' . JavaScriptEscape($txt['dailymotion']) . '
-		});');
+		});', true);
 
-		loadJavascriptFile('elk_jquery_embed.js');
+		loadJavascriptFile('elk_jquery_embed.js', array('defer' => true));
 	}
 
 	if (!empty($modSettings['todayMod']) && $modSettings['todayMod'] > 2)
@@ -1619,12 +1621,12 @@ function loadTheme($id_theme = 0, $initialize = true)
 			$ts = $type == 'mailq' ? $modSettings['mail_next_send'] : $modSettings['next_task_time'];
 
 			addInlineJavascript('
-		function elkAutoTask()
-		{
-			var tempImage = new Image();
-			tempImage.src = elk_scripturl + "?scheduled=' . $type . ';ts=' . $ts . '";
-		}
-		window.setTimeout("elkAutoTask();", 1);');
+			function elkAutoTask()
+			{
+				var tempImage = new Image();
+				tempImage.src = elk_scripturl + "?scheduled=' . $type . ';ts=' . $ts . '";
+			}
+			window.setTimeout("elkAutoTask();", 1);', true);
 		}
 	}
 
