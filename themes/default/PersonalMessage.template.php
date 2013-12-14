@@ -359,6 +359,7 @@ function template_subject_list_above()
 					<hr class="clear" />';
 	}
 }
+
 function template_subject_list_below()
 {
 	global $context;
@@ -372,6 +373,7 @@ function template_subject_list_below()
 		template_subject_list();
 	}
 }
+
 function template_subject_list()
 {
 	global $context, $settings, $txt, $scripturl;
@@ -784,6 +786,10 @@ function template_search_results()
 	template_pagesection();
 }
 
+/**
+ * Show the send a new pm form, including the editor, preview section and load
+ * drafts if enabled.
+ */
 function template_send()
 {
 	global $context, $scripturl, $modSettings, $settings, $txt;
@@ -808,8 +814,7 @@ function template_send()
 		echo '
 					</div>
 				</div>
-			</div>
-			<br />';
+			</div>';
 	}
 
 	// Show the preview of the personal message.
@@ -887,7 +892,7 @@ function template_send()
 						<dd id="pm_subject">
 							<input type="text" name="subject" value="', $context['subject'], '" tabindex="', $context['tabindex']++, '" size="80" maxlength="80"', isset($context['post_error']['no_subject']) ? ' class="error"' : ' class="input_text"', ' placeholder="', $txt['subject'], '" required="required" />
 						</dd>
-					</dl><hr class="clear" />';
+					</dl>';
 
 	// Showing BBC?
 	if ($context['show_bbc'])
@@ -1015,7 +1020,7 @@ function template_send()
 				', $context['quoted_message']['body'], '
 			</div>
 		</div>
-	</div><br class="clear" />';
+	</div>';
 
 	echo '
 		<script><!-- // --><![CDATA[
