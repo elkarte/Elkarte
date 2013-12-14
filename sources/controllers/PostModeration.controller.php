@@ -508,11 +508,11 @@ class PostModeration_Controller extends Action_Controller
 		$current_msg = (int) $_REQUEST['msg'];
 
 		require_once(SUBSDIR . '/Post.subs.php');
-		require_once(SUBSDIR . '/Topic.subs.php');
+		require_once(SUBSDIR . '/Messages.subs.php');
 
 		isAllowedTo('approve_posts');
 
-		$message_info = messageTopicDetails($topic, $current_msg);
+		$message_info = basicMessageInfo($current_msg, false, true);
 
 		// If it's the first in a topic then the whole topic gets approved!
 		if ($message_info['id_first_msg'] == $current_msg)

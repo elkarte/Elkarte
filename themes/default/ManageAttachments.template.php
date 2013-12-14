@@ -80,7 +80,7 @@ function template_maintenance()
 		<h3 class="category_header">', $txt['attachment_pruning'], '</h3>
 		<div class="windowbg">
 			<div class="content">
-				<form action="', $scripturl, '?action=admin;area=manageattachments" method="post" accept-charset="UTF-8" onsubmit="return confirm(\'', $txt['attachment_pruning_warning'], '\');" style="margin: 0 0 2ex 0;">
+				<form action="', $scripturl, '?action=admin;area=manageattachments" method="post" accept-charset="UTF-8" onsubmit="return confirm(\'', $txt['attachment_pruning_warning'], '\');">
 					', $txt['attachment_remove_old'], ' <input type="text" name="age" value="25" size="4" class="input_text" /> ', $txt['days_word'], '<br />
 					', $txt['attachment_pruning_message'], ': <input type="text" name="notice" value="', $txt['attachment_delete_admin'], '" size="40" class="input_text" /><br />
 					<input type="submit" name="remove" value="', $txt['remove'], '" class="right_submit" />
@@ -90,7 +90,7 @@ function template_maintenance()
 					<br class="clear_right" />
 				</form>
 				<hr />
-				<form action="', $scripturl, '?action=admin;area=manageattachments" method="post" accept-charset="UTF-8" onsubmit="return confirm(\'', $txt['attachment_pruning_warning'], '\');" style="margin: 0 0 2ex 0;">
+				<form action="', $scripturl, '?action=admin;area=manageattachments" method="post" accept-charset="UTF-8" onsubmit="return confirm(\'', $txt['attachment_pruning_warning'], '\');">
 					', $txt['attachment_remove_size'], ' <input type="text" name="size" id="size" value="100" size="4" class="input_text" /> ', $txt['kilobyte'], '<br />
 					', $txt['attachment_pruning_message'], ': <input type="text" name="notice" value="', $txt['attachment_delete_admin'], '" size="40" class="input_text" /><br />
 					<input type="submit" name="remove" value="', $txt['remove'], '" class="right_submit" />
@@ -100,7 +100,7 @@ function template_maintenance()
 					<br class="clear_right" />
 				</form>
 				<hr />
-				<form action="', $scripturl, '?action=admin;area=manageattachments" method="post" accept-charset="UTF-8" onsubmit="return confirm(\'', $txt['attachment_pruning_warning'], '\');" style="margin: 0 0 2ex 0;">
+				<form action="', $scripturl, '?action=admin;area=manageattachments" method="post" accept-charset="UTF-8" onsubmit="return confirm(\'', $txt['attachment_pruning_warning'], '\');">
 					', $txt['attachment_manager_avatars_older'], ' <input type="text" name="age" value="45" size="4" class="input_text" /> ', $txt['days_word'], '<br />
 					<input type="submit" name="remove" value="', $txt['remove'], '" class="right_submit" />
 					<input type="hidden" name="type" value="avatars" />
@@ -182,7 +182,7 @@ function template_maintenance()
 					}
 
 					function show_msg() {
-						$(\'#progress_msg\').html(\'<div><img src="', $settings['actual_images_url'], '/loading.gif" alt="loading.gif" style="width:35px; height:35px" />&nbsp; ', $txt['attachment_transfer_progress'], '<\/div>\');
+						$(\'#progress_msg\').html(\'<div><img  class="loading" src="', $settings['actual_images_url'], '/loading.gif" alt="loading.gif" />&nbsp; ', $txt['attachment_transfer_progress'], '<\/div>\');
 						show_progress();
 					}
 

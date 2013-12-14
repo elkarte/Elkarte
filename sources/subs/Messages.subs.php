@@ -96,6 +96,8 @@ function messageDetails($id_msg, $id_topic = 0, $attachment_type = 0)
  */
 function basicMessageInfo($id_msg, $override_permissions = false, $topic_basics = false)
 {
+	global $modSettings;
+
 	$db = database();
 
 	if (empty($id_msg))
@@ -103,24 +105,24 @@ function basicMessageInfo($id_msg, $override_permissions = false, $topic_basics 
 
 	$request = $db->query('', '
 		SELECT
-			m.id_member, m.id_topic, m.id_board, m.id_msg,
-			m.body, m.subject,
-			m.poster_name, m.poster_email, m.poster_time,
-			m.approved' .  ($topic_basics === false ? '' : ', t.id_first_msg') . '
+			m.id_member, m.id_topic, m.id_board, m.id_msg, m.body, m.subject,
+			m.poster_name, m.poster_email, m.poster_time, m.approved' . ($topic_basics === false ? '' : ',
+			t.id_first_msg, t.num_replies, t.unapproved_posts, t.id_first_msg, t.id_member_started, t.approved AS topic_approved') . '
 		FROM {db_prefix}messages AS m' . ($override_permissions === true ? '' : '
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})') . ($topic_basics === false ? '' : '
 			LEFT JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)') . '
-		WHERE id_msg = {int:message}
+		WHERE id_msg = {int:message}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
+			AND m.approved = 1') . '
 		LIMIT 1',
 		array(
 			'message' => $id_msg,
 		)
 	);
 
-	$row = $db->fetch_assoc($request);
+	$messageInfo = $db->fetch_assoc($request);
 	$db->free_result($request);
 
-	return empty($row) ? false : $row;
+	return empty($messageInfo) ? false : $messageInfo;
 }
 
 /**

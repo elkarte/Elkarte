@@ -1942,6 +1942,7 @@ function profileValidateSignature(&$value)
 					// If the dimensions are still not fixed - we need to check the actual image.
 					if (($width == -1 && $sig_limits[5]) || ($height == -1 && $sig_limits[6]))
 					{
+						require_once(SUBSDIR . '/Attachments.subs.php');
 						$sizes = url_image_size($matches[7][$key]);
 						if (is_array($sizes))
 						{
