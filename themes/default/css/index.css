@@ -1686,9 +1686,6 @@ dl.settings textarea {
 #expanded_pages_container, #expanded_pages {
 	overflow: hidden;
 }
-#boarddescription {
-	display: inline-block;
-}
 
 /* For the who is template. */
 /* Sort of a stray - ?action=who;sa=credits */
@@ -1986,7 +1983,6 @@ img.new_posts {
 	font-size: 0.857em;
 	padding: 4px 0;
 	display: inline-block;
-
 }
 /* Poster and postarea + moderation area underneath */
 .forumposts .windowbg, .forumposts .windowbg2,
@@ -3716,6 +3712,19 @@ a.help .icon {
 	}
 	.postarea {
 		margin: 0 0 0 8em;
+	}
+	.quickbuttons .modified {
+		display: block;
+		width: 90%;
+		text-align: left;
+	}
+	#forumposts .views_text {
+		display: none;
+	}
+	#forumposts .nextlinks {
+		width: 100%;
+		text-align: right;
+		white-space: normal;
 	}
 }
 /* This one does 480 screens at default font size. */
