@@ -1734,6 +1734,7 @@ img.new_posts {
 	display: table;
 	width: 100%;
 	box-sizing: border-box;
+	-moz-box-sizing: border-box;
 }
 .topic_listing {
 	padding: 1px 0 0 0;
