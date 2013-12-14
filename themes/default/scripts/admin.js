@@ -1043,3 +1043,34 @@ function swapRot()
 			oBoardCheckBoxes[i].checked = !rotSwap;
 	}
 }
+
+/**
+ * Used in manageMembergroups to enabel disable form elements based on allowable choices
+ * If post based group is selected, it will disable moderation selection, visability, group description
+ * and enable post count input box
+ *
+ * @param {boolean} isChecked
+ */
+function swapPostGroup(isChecked)
+{
+	var min_posts_text = document.getElementById('min_posts_text'),
+		group_desc_text = document.getElementById('group_desc_text'),
+		group_hidden_text = document.getElementById('group_hidden_text'),
+		group_moderators_text = document.getElementById('group_moderators_text');
+
+	document.forms.groupForm.min_posts.disabled = !isChecked;
+	min_posts_text.style.color = isChecked ? "" : "#888";
+
+	document.forms.groupForm.group_desc_input.disabled = isChecked;
+	group_desc_text.style.color = !isChecked ? "" : "#888";
+
+	document.forms.groupForm.group_hidden_input.disabled = isChecked;
+	group_hidden_text.style.color = !isChecked ? "" : "#888";
+
+	document.forms.groupForm.group_moderators.disabled = isChecked;
+	group_moderators_text.style.color = !isChecked ? "" : "#888";
+
+	// Disable the moderator autosuggest box as well
+	if (typeof(oModeratorSuggest) !== 'undefined')
+		oModeratorSuggest.oTextHandle.disabled = isChecked ? true : false;
+}

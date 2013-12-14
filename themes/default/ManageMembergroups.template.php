@@ -333,9 +333,10 @@ function template_edit_group()
 					<input type="hidden" name="', $context['admin-mmg_token_var'], '" value="', $context['admin-mmg_token'], '" />
 				</div>
 			</div>
-		</div>
-	</form>
-	<script><!-- // --><![CDATA[
+		</form>
+	</div>';
+
+	addInlineJavascript('
 		aIconLists[aIconLists.length] = new IconList({
 			sBackReference: "aIconLists[" + aIconLists.length + "]",
 			sIconIdPrefix: "msg_icon_",
@@ -343,27 +344,24 @@ function template_edit_group()
 			bShowModify: false,
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,
-			sAction: "groupicons" ,
-			sLabelIconList: "', $txt['membergroups_icons'], '",
+			sAction: "groupicons",
+			sLabelIconList: "' . $txt['membergroups_icons'] . '",
 			sLabelIconBox: "icon_image_input",
 			sBoxBackground: "transparent",
 			sBoxBackgroundHover: "#FFF",
 			iBoxBorderWidthHover: 1,
-			sBoxBorderColorHover: "#ADADAD" ,
-			sContainerBackground: "#FFF",
-			sContainerBorder: "1px solid #ADADAD",
-			sItemBorder: "1px solid #FFF",
+			sBoxBorderColorHover: "#adadad",
+			sContainerBackground: "#fff",
+			sContainerBorder: "1px solid #adadad",
+			sItemBorder: "1px solid #fff",
 			sItemBorderHover: "1px dotted gray",
 			sItemBackground: "transparent",
-			sItemBackgroundHover: "#E0E0F0"
-		});
-	// ]]></script>';
+			sItemBackgroundHover: "#e0e0f0"
+		});', true);
 
 	if ($context['group']['id'] != 3 && $context['group']['id'] != 4)
 	{
-		echo '
-	<script src="', $settings['default_theme_url'], '/scripts/suggest.js?beta10"></script>
-	<script><!-- // --><![CDATA[
+		$js = '
 		var oModeratorSuggest = new smc_AutoSuggest({
 			sSelf: \'oModeratorSuggest\',
 			sSessionId: elk_session_id,
@@ -374,52 +372,26 @@ function template_edit_group()
 			bItemList: true,
 			sPostName: \'moderator_list\',
 			sURLMask: \'action=profile;u=%item_id%\',
-			sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
+			sTextDeleteItem: \'' . $txt['autosuggest_delete_item'] . '\',
 			sItemListContainerId: \'moderator_container\',
 			aListItems: [';
 
 		foreach ($context['group']['moderators'] as $id_member => $member_name)
-			echo '
+			$js .= '
 						{
-							sItemId: ', JavaScriptEscape($id_member), ',
-							sItemName: ', JavaScriptEscape($member_name), '
-						}', $id_member == $context['group']['last_moderator_id'] ? '' : ',';
+							sItemId: ' . JavaScriptEscape($id_member) . ',
+							sItemName: ' . JavaScriptEscape($member_name) . '
+						}' . $id_member == $context['group']['last_moderator_id'] ? '' : ',';
 
-		echo '
+		$js .= '
 			]
-		});
-	// ]]></script>';
+		});';
+		addInlineJavascript($js, true);
 	}
 
+	// If post based is selected, disable moderation selection, visability, group description and enable post count,
 	if ($context['group']['allow_post_group'])
-		// If post based is selected, disable moderation selection, visability, group description and enable post count,
-		echo '
-		<script><!-- // --><![CDATA[
-			function swapPostGroup(isChecked)
-			{
-				var min_posts_text = document.getElementById(\'min_posts_text\'),
-					group_desc_text = document.getElementById(\'group_desc_text\'),
-					group_hidden_text = document.getElementById(\'group_hidden_text\'),
-					group_moderators_text = document.getElementById(\'group_moderators_text\');
-
-				document.forms.groupForm.min_posts.disabled = !isChecked;
-				min_posts_text.style.color = isChecked ? "" : "#888";
-
-				document.forms.groupForm.group_desc_input.disabled = isChecked;
-				group_desc_text.style.color = !isChecked ? "" : "#888";
-
-				document.forms.groupForm.group_hidden_input.disabled = isChecked;
-				group_hidden_text.style.color = !isChecked ? "" : "#888";
-
-				document.forms.groupForm.group_moderators.disabled = isChecked;
-				group_moderators_text.style.color = !isChecked ? "" : "#888";
-
-				// Disable the moderator autosuggest box as well
-				oModeratorSuggest.oTextHandle.disabled = isChecked ? true : false;
-			}
-
-			swapPostGroup(', $context['group']['is_post_group'] ? 'true' : 'false', ');
-		// ]]></script>';
+		addInlineJavascript('swapPostGroup(' . ($context['group']['is_post_group'] ? 'true' : 'false') . ');', true);
 }
 
 /**
@@ -576,9 +548,7 @@ function template_group_members()
 					</dl>
 				</div>
 			</div>
-			<br />
 			<h3 class="category_header">', $txt['membergroups_members_group_members'], '</h3>
-			<br />
 			', template_pagesection(), '
 			<table class="table_grid">
 				<thead>
@@ -660,33 +630,44 @@ function template_group_members()
 
 	echo '
 				</tbody>
-			</table>';
-
-	if (!empty($context['group']['assignable']))
-		echo '
-			<input type="submit" name="remove" value="', $txt['membergroups_members_remove'], '" class="right_submit " />';
+			</table>
+			<div class="flow_auto">
+				<div class="floatleft">';
 
 	template_pagesection();
 
 	echo '
-			<br />';
+				</div>
+				<div class="additional_row floatright">';
+
+	if (!empty($context['group']['assignable']))
+		echo '
+					<input type="submit" name="remove" value="', $txt['membergroups_members_remove'], '" class="button_submit " />';
+
+
+
+	echo '
+				</div>
+			</div>';
 
 	if (!empty($context['group']['assignable']))
 	{
 		echo '
-			<h3 class="category_header">', $txt['membergroups_members_add_title'], '</h3>
-			<div class="windowbg">
-				<div class="content">
-					<dl class="settings">
-						<dt>
-							<strong><label for="toAdd">', $txt['membergroups_members_add_desc'], ':</label></strong>
-						</dt>
-						<dd>
-							<input type="text" name="toAdd" id="toAdd" value="" class="input_text" />
-							<div id="toAddItemContainer"></div>
-						</dd>
-					</dl>
-					<input type="submit" name="add" value="', $txt['membergroups_members_add'], '" class="right_submit" />
+			<div class="additional_row">
+				<h3 class="category_header">', $txt['membergroups_members_add_title'], '</h3>
+				<div class="windowbg">
+					<div class="content">
+						<dl class="settings">
+							<dt>
+								<strong><label for="toAdd">', $txt['membergroups_members_add_desc'], ':</label></strong>
+							</dt>
+							<dd>
+								<input type="text" name="toAdd" id="toAdd" value="" class="input_text" />
+								<div id="toAddItemContainer"></div>
+							</dd>
+						</dl>
+						<input type="submit" name="add" value="', $txt['membergroups_members_add'], '" class="right_submit" />
+					</div>
 				</div>
 			</div>';
 	}
@@ -698,23 +679,20 @@ function template_group_members()
 	</div>';
 
 	if (!empty($context['group']['assignable']))
-		echo '
-		<script src="', $settings['default_theme_url'], '/scripts/suggest.js?beta10"></script>
-		<script><!-- // --><![CDATA[
-			var oAddMemberSuggest = new smc_AutoSuggest({
-				sSelf: \'oAddMemberSuggest\',
-				sSessionId: elk_session_id,
-				sSessionVar: elk_session_var,
-				sSuggestId: \'to_suggest\',
-				sControlId: \'toAdd\',
-				sSearchType: \'member\',
-				sPostName: \'member_add\',
-				sURLMask: \'action=profile;u=%item_id%\',
-				sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
-				bItemList: true,
-				sItemListContainerId: \'toAddItemContainer\'
-			});
-		// ]]></script>';
+		addInlineJavascript('
+		var oAddMemberSuggest = new smc_AutoSuggest({
+			sSelf: \'oAddMemberSuggest\',
+			sSessionId: elk_session_id,
+			sSessionVar: elk_session_var,
+			sSuggestId: \'to_suggest\',
+			sControlId: \'toAdd\',
+			sSearchType: \'member\',
+			sPostName: \'member_add\',
+			sURLMask: \'action=profile;u=%item_id%\',
+			sTextDeleteItem: \'' . $txt['autosuggest_delete_item'] . '\',
+			bItemList: true,
+			sItemListContainerId: \'toAddItemContainer\'
+		});', true);
 }
 
 /**
