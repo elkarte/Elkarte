@@ -201,6 +201,12 @@ class Post_Controller extends Action_Controller
 		$context['can_move'] = allowedTo('move_any');
 		$context['move'] = !empty($_REQUEST['move']);
 		$context['announce'] = !empty($_REQUEST['announce']);
+		if ($context['can_add_poll'])
+		{
+			addJavascriptVar(array(
+				'poll_remove' => $txt['poll_remove'],
+				'poll_add' => $txt['add_poll']), true);
+		}
 
 		// You can only announce topics that will get approved...
 		$context['can_announce'] = allowedTo('announce_topic') && $context['becomes_approved'];
