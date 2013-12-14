@@ -3154,7 +3154,7 @@ function template_javascript($do_defered = false)
 		}
 
 		// Standard output, and our javascript vars, get output when we are not on a defered call
-		if (!empty($context['javascript_inline']['standard']) && !$do_defered)
+		if ((!empty($context['javascript_inline']['standard']) || !empty($js_vars)) && !$do_defered)
 		{
 			$inline_standard_code = !empty($js_vars) ? $js_vars : '';
 			$context['javascript_inline']['standard'] = array_map('trim', $context['javascript_inline']['standard']);
