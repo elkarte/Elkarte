@@ -718,6 +718,7 @@ div.windowbg, div.windowbg2 {
 	width: 100%;
 	text-align: center;
 	font-size: 1.6em;
+	z-index: 100;
 }
 #ajax_in_progress a {
 	color: orange;
