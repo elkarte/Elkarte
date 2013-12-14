@@ -207,6 +207,7 @@ select option {
 	vertical-align: middle;
 	font-size: .857em;
 	line-height: 17px;
+	display: inline-block;
 }
 .left_submit, .linkbutton_left {
 	float: left;
