@@ -3661,6 +3661,11 @@ a.help .icon {
 	.wrapper {
 		min-width: 98%;
 	}
+	.linktree, .linktree_last {
+		max-width: 95%;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
 	.board_latest {
 		min-width: 12em;
 	}
