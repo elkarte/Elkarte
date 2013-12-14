@@ -485,7 +485,6 @@ class PersonalMessage_Controller extends Action_Controller
 
 		// Set up some items for the template
 		$context['page_title'] = $txt['send_message'];
-		$context['pm_form_url'] =  $scripturl . '?action=pm;sa=send2';
 		$context['reply'] = isset($_REQUEST['pmsg']) || isset($_REQUEST['quote']);
 
 		// Check whether we've gone over the limit of messages we can send per hour.
