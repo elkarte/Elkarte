@@ -3136,7 +3136,7 @@ function template_javascript($do_defered = false)
 			$js_vars[] = $var . ' = ' . $value;
 
 		// nNewlines and tabs are here to make it look nice in the page source view, stripped if minimized though
-		$context['javascript_inline']['standard'][] = "\n\t\t" . 'var ' . implode(",\n\t\t\t", $js_vars) . ";\n";
+		$context['javascript_inline']['standard'][] = 'var ' . implode(",\n\t\t\t", $js_vars) . ';';
 	}
 
 	// Inline JavaScript - Actually useful some times!
