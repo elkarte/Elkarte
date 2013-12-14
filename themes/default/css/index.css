@@ -1764,7 +1764,7 @@ img.new_posts {
 .topic_info {
 	display: table-cell;
 	vertical-align: top;
-	width: 80%;
+	width: 70%;
 	padding: 7px 8px 6px 12px;
 }
 .topic_icons {
@@ -3647,7 +3647,8 @@ a.help .icon {
 		min-width: 27em;
 	}
 	.topic_latest {
-		min-width: 17em;
+		width: 30%;
+		min-width: 30%;
 	}
 	.board_stats, .topic_stats {
 		display: none;
