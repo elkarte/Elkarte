@@ -154,7 +154,7 @@ input[disabled].input_text {
 }
 
 /* the new "button" */
-.new_posts, .new_posts:visited {
+.new_posts, .new_posts:visited, .new_posts:link {
 	border-radius: 2px;
 	background: #5aa05e;
 	color: #fff;

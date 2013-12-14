@@ -99,8 +99,8 @@ class MarkRead_Controller extends Action_Controller
 
 		$this->_dispatch();
 
-		// For the time being this is a special case
-		if (isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'all')
+		// For the time being this is a special case, but in BoardIndex no, we don't want it
+		if (isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'all' && !isset($_REQUEST['bi']))
 		{
 			$context['xml_data'] = array(
 				'text' => $txt['unread_topics_visit_none'],
