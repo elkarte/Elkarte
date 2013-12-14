@@ -181,7 +181,7 @@ function markboardreadButton(btn)
 
 	// Remove all the "new" icons next to the topics subjects
 	$('.new_posts').each(function() {
-		$(this).parent().remove();
+		$(this).remove();
 	});
 
 	return false;
@@ -198,7 +198,7 @@ function markallreadButton(btn)
 
 	// Remove all the "new" icons next to the topics subjects
 	$('.new_posts').each(function() {
-		$(this).parent().remove();
+		$(this).remove();
 	});
 
 	// Turn the board icon class to off
