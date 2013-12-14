@@ -3733,13 +3733,22 @@ a.help .icon {
 		text-align: right;
 		white-space: normal;
 	}
+	#search_options {
+		width: 100%;
+	}
+	.ignoreboards {
+		width: 100%;
+	}
+	.ignoreboards.floatright {
+		float: none;
+	}
 }
 /* This one does 480 screens at default font size. */
 @media screen and (max-width: 30em) {
 	select, .input_text, .input_password {
 		max-width: 12em;
 	}
-	dt, dd, dd label, .login dt {
+	dt, dd, dd label, .login dt, #advanced_search dt {
 		display: block;
 		width: 90% !important;
 		text-align: left;
