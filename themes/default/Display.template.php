@@ -500,7 +500,8 @@ function template_quickreply_below()
 				sClassExpanded: "expand",
 				sTitleExpanded: ', JavaScriptEscape($txt['hide']), ',
 				sJumpAnchor: "quickreply",
-				bIsFull: ', !empty($options['use_editor_quick_reply']) ? 'true' : 'false', '
+				bIsFull: ', !empty($options['use_editor_quick_reply']) ? 'true,
+				sEditorId: ' . $options['use_editor_quick_reply'] : 'false', '
 			});
 		// ]]></script>';
 
