@@ -2328,3 +2328,33 @@ function updateMemberStats($id_member = null, $real_name = null)
 
 	updateSettings($changes);
 }
+
+/**
+ * Builds the 'query_see_board' element for a certain member
+ *
+ * @param integer a valid member id
+ */
+function memberQuerySeeBoard($id_member)
+{
+	global $modSettings;
+
+	$member = getBasicMemberData($id_member);
+
+	$groups = array_merge(array($member['id_group'], $member['id_post_group']), explode(',', $member['additional_groups']));
+
+	foreach ($groups as $k => $v)
+		$groups[$k] = (int) $v;
+	$groups = array_unique($groups);
+
+	if (in_array(1, $groups))
+		return '1=1';
+	else
+	{
+		require_once(SUBSDIR . '/Boards.subs.php');
+
+		$boards_mod = boardsModerated($id_member);
+		$mod_query = empty($boards_mod) ? '' : ' OR b.id_board IN (' . implode(',', $boards_mod) . ')';
+
+		return '((FIND_IN_SET(' . implode(', b.member_groups) != 0 OR FIND_IN_SET(', $groups) . ', b.member_groups) != 0)' . (!empty($modSettings['deny_boards_access']) ? ' AND (FIND_IN_SET(' . implode(', b.deny_member_groups) = 0 AND FIND_IN_SET(', $groups) . ', b.deny_member_groups) = 0)' : '') . $mod_query . ')';
+	}
+}

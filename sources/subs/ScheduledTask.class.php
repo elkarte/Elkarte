@@ -1454,24 +1454,11 @@ class ScheduledTask
 				if (empty($member))
 					continue;
 
-				$request = $db->query('', '
-					SELECT id_group, additional_groups, id_post_group
-					FROM {db_prefix}members
-					WHERE id_member = {int:current_member}',
-					array(
-						'current_member' => $member,
-					)
-				);
-				list($group, $additional_groups, $posts_group) = $db->fetch_row($request);
-				$db->free_result($request);
-
-				$groups = array_merge(array($group, $posts_group), explode(',', $additional_groups));
-				foreach ($groups as $k => $v)
-					$groups[$k] = (int) $v;
-				$groups = array_unique($groups);
+				require_once(SUBSDIR . '/Boards.subs.php');
+				$user_see_board = memberQuerySeeBoard($member);
 
 				// If you are admin how the heck did you end up here?
-				if (in_array(1, $groups))
+				if ($user_see_board == '1=1')
 				{
 					// Drop it
 					unset($mentions_check_users[$member]);
@@ -1483,14 +1470,7 @@ class ScheduledTask
 				{
 					$limit = 100;
 
-					// Try to rebuild 'query_see_board'
-					require_once(SUBSDIR . '/Boards.subs.php');
 					require_once(SUBSDIR . '/Mentions.subs.php');
-
-					$boards_mod = boardsModerated($member);
-					$mod_query = empty($boards_mod) ? '' : ' OR b.id_board IN (' . implode(',', $boards_mod) . ')';
-
-					$user_see_board = '((FIND_IN_SET(' . implode(', b.member_groups) != 0 OR FIND_IN_SET(', $groups) . ', b.member_groups) != 0)' . (!empty($modSettings['deny_boards_access']) ? ' AND (FIND_IN_SET(' . implode(', b.deny_member_groups) = 0 AND FIND_IN_SET(', $groups) . ', b.deny_member_groups) = 0)' : '') . $mod_query . ')';
 
 					// We need to repeat this twice: one to find the boards the user can access, one for those he cannot access
 					foreach (array('can', 'cannot') as $can)
@@ -1554,7 +1534,7 @@ class ScheduledTask
 			// @todo <= I know you like it Spuds! :P It may be necessary to set it to something higher.
 			$limit = 10;
 
-			require_once(SUBSDIR . '/Boards.subs.php');
+			require_once(SUBSDIR . '/Members.subs.php');
 			require_once(SUBSDIR . '/Mentions.subs.php');
 
 			// Grab users with mentions
@@ -1574,30 +1554,8 @@ class ScheduledTask
 
 			while ($row = $db->fetch_assoc($request))
 			{
-				// Try to rebuilt 'query_see_board', a lot of code duplication... :(
-				$request = $db->query('', '
-					SELECT id_group, additional_groups, id_post_group
-					FROM {db_prefix}members
-					WHERE id_member = {int:current_member}',
-					array(
-						'current_member' => $row['id_member'],
-					)
-				);
-				list($group, $additional_groups, $posts_group) = $db->fetch_row($request);
-				$db->free_result($request);
-
-				// First the groups, so that we can find boards access
-				$groups = array_merge(array($group, $posts_group), explode(',', $additional_groups));
-				foreach ($groups as $k => $v)
-					$groups[$k] = (int) $v;
-				$groups = array_unique($groups);
-
-				// And the boards he can moderate
-				$boards_mod = boardsModerated($row['id_member']);
-				$mod_query = empty($boards_mod) ? '' : ' OR b.id_board IN (' . implode(',', $boards_mod) . ')';
-
-				// Put everything together and we have it!
-				$user_see_board = '((FIND_IN_SET(' . implode(', b.member_groups) != 0 OR FIND_IN_SET(', $groups) . ', b.member_groups) != 0)' . (!empty($modSettings['deny_boards_access']) ? ' AND (FIND_IN_SET(' . implode(', b.deny_member_groups) = 0 AND FIND_IN_SET(', $groups) . ', b.deny_member_groups) = 0)' : '') . $mod_query . ')';
+				// Rebuild 'query_see_board', a lot of code duplication... :(
+				$user_see_board = memberQuerySeeBoard($row['id_member']);
 
 				// Find out if this user cannot see something that was supposed to be able to see
 				$request = $db->query('', '
