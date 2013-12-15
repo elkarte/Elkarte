@@ -1621,12 +1621,12 @@ function loadTheme($id_theme = 0, $initialize = true)
 			$ts = $type == 'mailq' ? $modSettings['mail_next_send'] : $modSettings['next_task_time'];
 
 			addInlineJavascript('
-			function elkAutoTask()
-			{
-				var tempImage = new Image();
-				tempImage.src = elk_scripturl + "?scheduled=' . $type . ';ts=' . $ts . '";
-			}
-			window.setTimeout("elkAutoTask();", 1);', true);
+		function elkAutoTask()
+		{
+			var tempImage = new Image();
+			tempImage.src = elk_scripturl + "?scheduled=' . $type . ';ts=' . $ts . '";
+		}
+		window.setTimeout("elkAutoTask();", 1);', true);
 		}
 	}
 
