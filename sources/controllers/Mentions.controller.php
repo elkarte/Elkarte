@@ -72,26 +72,28 @@ class Mentions_Controller extends Action_Controller
 	 */
 	public function __construct()
 	{
+		global $modSettings;
+
 		$this->_known_mentions = array(
 			// mentions
 			'men' => array(
 				'callback' => array($this, 'prepareMentionMessage'),
-				'enabled' => 'mentions_enabled',
+				'enabled' => !empty($modSettings['mentions_enabled']),
 			),
 			// liked messages
 			'like' => array(
 				'callback' => array($this, 'prepareMentionMessage'),
-				'enabled' => 'likes_enabled',
+				'enabled' => !empty($modSettings['likes_enabled']),
 			),
 			// likes removed
 			'rlike' => array(
 				'callback' => array($this, 'prepareMentionMessage'),
-				'enabled' => 'likes_enabled',
+				'enabled' => !empty($modSettings['likes_enabled']) && empty($modSettings['mentions_dont_notify_rlike']),
 			),
 			// added as buddy
 			'buddy' => array(
 				'callback' => array($this, 'prepareMentionMessage'),
-				'enabled' => 'mentions_buddy',
+				'enabled' => !empty($modSettings['mentions_buddy']),
 			),
 		);
 
@@ -271,7 +273,7 @@ class Mentions_Controller extends Action_Controller
 
 		foreach ($this->_known_mentions as $key => $mention)
 		{
-			if (!empty($mention['enabled']) && !empty($modSettings[$mention['enabled']]))
+			if (!empty($mention['enabled']))
 			{
 				$list_options['list_menu']['links'][] = array(
 					'href' => $scripturl . '?action=mentions;type=' . $key . (!empty($this->_all) ? ';all' : ''),
