@@ -272,19 +272,23 @@ class ManageNews_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 		require_once(SUBSDIR . '/News.subs.php');
 
+		// Setup the template
 		$context['page_title'] = $txt['admin_newsletters'];
 		$context['sub_template'] = 'email_members';
+		loadJavascriptFile('suggest.js', array('defer' => true));
 
+		// We need group data, including which groups we have and who is in them
 		$allgroups = getBasicMembergroupData(array('all'), array(), null, true);
 		$groups = $allgroups['groups'];
 
+		// All of the members in post based and member based groups
 		foreach ($allgroups['postgroups'] as $postgroup)
 			$pg[] = $postgroup['id'];
 		foreach ($allgroups['membergroups'] as $membergroup)
 			$mg[] = $membergroup['id'];
 
+		// How many are in each group
 		$mem_groups = membersInGroups($pg, $mg, true, true);
-
 		foreach ($mem_groups as $id_group => $member_count)
 		{
 			if (isset($groups[$id_group]['member_count']))
@@ -293,6 +297,7 @@ class ManageNews_Controller extends Action_Controller
 				$groups[$id_group]['member_count'] = $member_count;
 		}
 
+		// Generate the include and exclude group select lists for the template
 		foreach ($groups as $group)
 		{
 			$groups[$group['id']]['status'] = 'on';
@@ -312,6 +317,7 @@ class ManageNews_Controller extends Action_Controller
 			'member_groups' => $groups,
 		);
 
+		// Needed if for the PM option in the mail to all
 		$context['can_send_pm'] = allowedTo('pm_send');
 	}
 
@@ -466,6 +472,7 @@ class ManageNews_Controller extends Action_Controller
 	{
 		global $txt, $context, $scripturl, $modSettings, $user_info;
 
+		// If just previewing we prepare a message and return it for viewing
 		if (isset($_POST['preview']))
 		{
 			$context['preview'] = true;
@@ -697,7 +704,7 @@ class ManageNews_Controller extends Action_Controller
 				}
 
 				if (!empty($queryBuild))
-				$sendQuery .= implode(' OR ', $queryBuild);
+					$sendQuery .= implode(' OR ', $queryBuild);
 			}
 
 			if (!empty($context['recipients']['members']))
