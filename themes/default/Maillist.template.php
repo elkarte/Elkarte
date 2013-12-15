@@ -237,7 +237,7 @@ function template_bounce_template()
 
 	echo '
 	<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=maillist;sa=emailtemplates;tid=', $context['id_template'], '" method="post" accept-charset="UTF-8">
-		<div id="box_preview" class="forumposts"', isset($context['template_preview']) ? '' : ' style="display: none;"', '>
+		<div id="preview_section" class="forumposts"', isset($context['template_preview']) ? '' : ' style="display: none;"', '>
 			<h3 class="category_header">
 				<span id="preview_subject">', $txt['preview'], '</span>
 			</h3>
@@ -319,21 +319,32 @@ function template_bounce_template()
 				context: document.body
 			})
 			.done(function(request) {
-				$("#box_preview").css({display:""});
+				// Show the preivew section, populated with the resonse
+				$("#preview_section").css({display: ""});
 				$("#template_preview").html($(request).find(\'body\').text());
+				$("#preview_subject").html($(request).find(\'subject\').text());
+
+				// Any error we need to let them know about?
 				if ($(request).find("error").text() !== \'\')
 				{
-					$("#errors").css({display:""});
 					var errors_html = \'\';
-					var errors = $(request).find(\'error\').each(function() {
+
+					// Build the error string
+					errors = $(request).find(\'error\').each(function() {
 						errors_html += $(this).text() + \'<br />\';
 					});
 
+					// Add it to the error div, set the class level, and show it
 					$(document).find("#error_list").html(errors_html);
+					$("#errors").css({display: ""});
+					$("#errors").attr(\'class\', parseInt($(request).find(\'errors\').attr(\'serious\')) === 0 ? \'warningbox\' : \'errorbox\');
+
+					// Navigate to the preview
+					location.hash = \'#\' + \'preview_section\';
 				}
 				else
 				{
-					$("#errors").css({display:"none"});
+					$("#errors").css({display: "none"});
 					$("#error_list").html(\'\');
 				}
 
