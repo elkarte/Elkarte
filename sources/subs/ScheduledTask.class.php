@@ -1484,10 +1484,12 @@ class ScheduledTask
 									LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = mnt.id_msg)
 									LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 								WHERE mnt.id_member = {int:current_member}
+									AND mnt.mention_type IN ({array_string:mention_types})
 									AND {raw:user_see_board}
 								LIMIT {int:start}, {int:limit}',
 								array(
 									'current_member' => $member,
+									'mention_types' => array('men', 'like', 'rlike'),
 									'user_see_board' => ($can == 'can' ? '' : 'NOT ') . $user_see_board,
 									'start' => $start,
 									'limit' => $limit,
@@ -1539,12 +1541,36 @@ class ScheduledTask
 
 			// Grab users with mentions
 			$request = $db->query('', '
+				SELECT COUNT(DISTINCT(id_member))
+				FROM {db_prefix}log_mentions
+				WHERE id_member > {int:last_id_member}
+					AND mnt.mention_type IN ({array_string:mention_types})
+				LIMIT {int:start}, {int:limit}',
+				array(
+					'last_id_member' => !empty($modSettings['mentions_member_check']) ? $modSettings['mentions_member_check'] : 0,
+					'mention_types' => array('men', 'like', 'rlike'),
+					'start' => $start,
+					'limit' => $limit,
+				)
+			);
+
+			list ($remaining) = $db->fetch_row($request);
+			$db->free_result($request);
+
+			if ($remaining == 0)
+				$modSettings['mentions_member_check'] = 0;
+
+			// Grab users with mentions
+			$request = $db->query('', '
 				SELECT DISTINCT(id_member) as id_member
 				FROM {db_prefix}log_mentions
 				WHERE id_member > {int:last_id_member}
-				LIMIT {int:limit}',
+					AND mnt.mention_type IN ({array_string:mention_types})
+				LIMIT {int:start}, {int:limit}',
 				array(
 					'last_id_member' => !empty($modSettings['mentions_member_check']) ? $modSettings['mentions_member_check'] : 0,
+					'mention_types' => array('men', 'like', 'rlike'),
+					'start' => $start,
 					'limit' => $limit,
 				)
 			);
@@ -1564,11 +1590,13 @@ class ScheduledTask
 						LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = mnt.id_msg)
 						LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 					WHERE mnt.id_member = {int:current_member}
+						AND mnt.mention_type IN ({array_string:mention_types})
 						AND {raw:user_see_board}
 						AND status < 0
 					LIMIT 1',
 					array(
 						'current_member' => $row['id_member'],
+						'mention_types' => array('men', 'like', 'rlike'),
 						'user_see_board' => 'NOT ' . $user_see_board,
 					)
 				);
