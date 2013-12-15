@@ -2718,7 +2718,7 @@ function messagePostError($named_recipients, $recipient_ids = array())
 	if (!isset($_REQUEST['xml']))
 		$context['sub_template'] = 'send';
 	elseif (isset($_REQUEST['xml']))
-		$context['sub_template'] = 'pm';
+		$context['sub_template'] = 'generic_preview';
 
 	$context['page_title'] = $txt['send_message'];
 	$error_types = Error_Context::context('pm', 1);
