@@ -4439,7 +4439,7 @@ function scheduleTaskImmediate($task)
 	toggleTaskStatusByName($task, true);
 
 	// Before trying to run it **NOW** :P
-	calculateNextTrigger($task);
+	calculateNextTrigger($task, true);
 }
 
 /**

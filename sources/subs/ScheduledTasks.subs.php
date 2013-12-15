@@ -55,7 +55,7 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 		// scheduleTaskImmediate is a way to speed up scheduled tasts and fire them as fast as possible
 		$scheduleTaskImmediate = @unserialize($modSettings['scheduleTaskImmediate']);
 		if (!empty($scheduleTaskImmediate) && isset($scheduleTaskImmediate[$row['task']]))
-			$next_time = next_time(1, 'm', rand(0, 60));
+			$next_time = next_time(1, '', rand(0, 60), true);
 		else
 			$next_time = next_time($row['time_regularity'], $row['time_unit'], $row['time_offset']);
 
@@ -96,7 +96,7 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
  * @param int $offset
  * @return int
  */
-function next_time($regularity, $unit, $offset)
+function next_time($regularity, $unit, $offset, $immediate = false)
 {
 	// Just in case!
 	if ($regularity == 0)
@@ -105,8 +105,13 @@ function next_time($regularity, $unit, $offset)
 	$curMin = date('i', time());
 	$next_time = 9999999999;
 
+	// If we have scheduleTaskImmediate running, then it's 10 seconds
+	if (empty($unit) && $immediate)
+	{
+		$next_time = time() + 10;
+	}
 	// If the unit is minutes only check regularity in minutes.
-	if ($unit == 'm')
+	elseif ($unit == 'm')
 	{
 		$off = date('i', $offset);
 
