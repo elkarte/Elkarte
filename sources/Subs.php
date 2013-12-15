@@ -4421,17 +4421,17 @@ function elk_array_insert($input, $key, $insert, $where = 'before', $assoc = tru
  *
  * @param string the name of a scheduled task
  */
-function setFasttrack($task)
+function scheduleTaskImmediate($task)
 {
 	global $modSettings;
 
-	if (!isset($modSettings['fasttrack']))
-		$fasttrack = array();
+	if (!isset($modSettings['scheduleTaskImmediate']))
+		$scheduleTaskImmediate = array();
 	else
-		$fasttrack = unserialize($modSettings['fasttrack']);
+		$scheduleTaskImmediate = unserialize($modSettings['scheduleTaskImmediate']);
 
-	$fasttrack[$task] = 0;
-	updateSettings(array('fasttrack' => serialize($fasttrack)));
+	$scheduleTaskImmediate[$task] = 0;
+	updateSettings(array('scheduleTaskImmediate' => serialize($scheduleTaskImmediate)));
 
 	require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
@@ -4443,25 +4443,25 @@ function setFasttrack($task)
 }
 
 /**
- * For diligent people: remove fasttrack when done, otherwise
+ * For diligent people: remove scheduleTaskImmediate when done, otherwise
  * a maximum of 10 executions is allowed
  *
  * @param string the name of a scheduled task
  * @param bool if recalculate the next task to execute
  */
-function removeFasttrack($task, $calculateNextTrigger = true)
+function removeScheduleTaskImmediate($task, $calculateNextTrigger = true)
 {
 	global $modSettings;
 
-	if (!isset($modSettings['fasttrack']))
+	if (!isset($modSettings['scheduleTaskImmediate']))
 		return;
 	else
-		$fasttrack = unserialize($modSettings['fasttrack']);
+		$scheduleTaskImmediate = unserialize($modSettings['scheduleTaskImmediate']);
 
-	if (isset($fasttrack[$task]))
+	if (isset($scheduleTaskImmediate[$task]))
 	{
-		unset($fasttrack[$task]);
-		updateSettings(array('fasttrack' => serialize($fasttrack)));
+		unset($scheduleTaskImmediate[$task]);
+		updateSettings(array('scheduleTaskImmediate' => serialize($scheduleTaskImmediate)));
 
 		if ($calculateNextTrigger)
 		{

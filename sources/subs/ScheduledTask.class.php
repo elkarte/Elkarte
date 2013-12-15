@@ -1443,9 +1443,9 @@ class ScheduledTask
 
 		$db = database();
 		$mentions_check_users = @unserialize($modSettings['mentions_check_users']);
-		$fasttrack = @unserialize($modSettings['fasttrack']);
+		$scheduleTaskImmediate = @unserialize($modSettings['scheduleTaskImmediate']);
 
-		// This should be set only because of a fasttrack, so higher priority
+		// This should be set only because of an immediate scheduled task, so higher priority
 		if (!empty($mentions_check_users))
 		{
 			foreach ($mentions_check_users as $member => $start)
@@ -1542,9 +1542,9 @@ class ScheduledTask
 				}
 			}
 
-			// If there is no more users, fasttrack can be stopped
+			// If there is no more users, scheduleTaskImmediate can be stopped
 			if (empty($mentions_check_users))
-				removeFasttrack('mentions_check_users', false);
+				removeScheduleTaskImmediate('mentions_check_users', false);
 
 			return true;
 		}
@@ -1614,7 +1614,7 @@ class ScheduledTask
 						'user_see_board' => 'NOT ' . $user_see_board,
 					)
 				);
-				// One row of results is enough: fasttrack!
+				// One row of results is enough: scheduleTaskImmediate!
 				if ($db->num_rows($request) == 1)
 				{
 					if (!empty($modSettings['mentions_check_users']))
@@ -1627,7 +1627,7 @@ class ScheduledTask
 					{
 						$modSettings['mentions_check_users'][$row['id_member']] = 0;
 						updateSettings(array('mentions_check_users' => serialize(array_unique($modSettings['mentions_check_users']))));
-						setFasttrack('mentions_check_users');
+						scheduleTaskImmediate('mentions_check_users');
 					}
 				}
 			}

@@ -52,9 +52,9 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 	$tasks = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		// Fasttrack is a way to speed up scheduled tasts and fire them as fast as possible
-		$fasttrack = @unserialize($modSettings['fasttrack']);
-		if (!empty($fasttrack) && isset($fasttrack[$row['task']]))
+		// scheduleTaskImmediate is a way to speed up scheduled tasts and fire them as fast as possible
+		$scheduleTaskImmediate = @unserialize($modSettings['scheduleTaskImmediate']);
+		if (!empty($scheduleTaskImmediate) && isset($scheduleTaskImmediate[$row['task']]))
 			$next_time = next_time(1, 'm', rand(0, 60));
 		else
 			$next_time = next_time($row['time_regularity'], $row['time_unit'], $row['time_offset']);
@@ -551,16 +551,16 @@ function processNextTasks($ts = 0)
 			// Log that we did it ;)
 			if ($completed)
 			{
-				// Taking care of fasttrack having a maximum of 10 "fast" executions
-				$fasttrack = @unserialize($modSettings['fasttrack']);
-				if (!empty($fasttrack) && isset($fasttrack[$row['task']]))
+				// Taking care of scheduleTaskImmediate having a maximum of 10 "fast" executions
+				$scheduleTaskImmediate = @unserialize($modSettings['scheduleTaskImmediate']);
+				if (!empty($scheduleTaskImmediate) && isset($scheduleTaskImmediate[$row['task']]))
 				{
-					$fasttrack[$row['task']]++;
+					$scheduleTaskImmediate[$row['task']]++;
 
-					if ($fasttrack[$row['task']] > 9)
-						removeFasttrack($row['task'], false);
+					if ($scheduleTaskImmediate[$row['task']] > 9)
+						removeScheduleTaskImmediate($row['task'], false);
 					else
-						updateSettings(array('fasttrack' => serialize($fasttrack)));
+						updateSettings(array('scheduleTaskImmediate' => serialize($scheduleTaskImmediate)));
 				}
 
 				$total_time = round(microtime(true) - $time_start, 3);
