@@ -375,6 +375,9 @@ div.quick_tasks {
 	padding: 0;
 	min-height: 56px;
 }
+#private {
+	width: 100%;
+}
 
 /* Styles for the package manager.
 /* Haven't got here yet. :P
