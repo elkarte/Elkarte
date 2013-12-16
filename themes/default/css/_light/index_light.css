@@ -154,7 +154,7 @@ input[disabled].input_text {
 }
 
 /* the new "button" */
-a.new_posts, span.new_posts {
+.new_posts, .new_posts:visited, .new_posts:link {
 	border-radius: 2px;
 	background: #5aa05e;
 	color: #fff;
@@ -705,7 +705,7 @@ div.bbc_footnotes .meaction{
 	width: 26px;
 	content: "";
 }
-.category_boards a span, .board_key:before {
+.category_boards .board_icon, .board_key:before {
 	background-repeat: no-repeat;
 	background-image: url(../../images/_light/board_icons.png);
 }
@@ -1698,5 +1698,8 @@ div.bbc_footnotes .meaction{
 	.forum_category, .forumposts, .content_category {
 		background: #fff;
 		border: none;
+	}
+	.listlevel2.subsections .linklevel2::after {
+		content: '';
 	}
 }

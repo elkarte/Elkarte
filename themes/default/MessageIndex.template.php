@@ -69,29 +69,7 @@ function template_topic_listing_above()
 		echo '
 			<div class="generalinfo">';
 
-		if (!empty($context['description']))
-			echo '
-				<div id="boarddescription">
-					', $context['description'], '
-				</div>';
-
-		// @todo - Thought the who is stuff was better here. Presentation still WIP.
-		if (!empty($settings['display_who_viewing']))
-		{
-			echo '
-				<br /><span id="whoisviewing">';
-
-			if ($settings['display_who_viewing'] == 1)
-				echo count($context['view_members']), ' ', count($context['view_members']) === 1 ? $txt['who_member'] : $txt['members'];
-			else
-				echo empty($context['view_members_list']) ? '0 ' . $txt['members'] : implode(', ', $context['view_members_list']) . (empty($context['view_num_hidden']) || $context['can_moderate_forum'] ? '' : ' (+ ' . $context['view_num_hidden'] . ' ' . $txt['hidden'] . ')');
-
-			echo $txt['who_and'], $context['view_num_guests'], ' ', $context['view_num_guests'] == 1 ? $txt['guest'] : $txt['guests'], $txt['who_viewing_board'];
-
-			echo '
-				</span>';
-		}
-
+		// Sort topics mumbo-jumbo
 		echo '
 				<ul id="sort_by" class="topic_sorting">';
 		if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1)
@@ -115,10 +93,32 @@ function template_topic_listing_above()
 		echo '
 						</ul>';
 
-			// Show a "select all" box for quick moderation?
 		echo '
 					</li>
 				</ul>';
+
+		if (!empty($context['description']))
+			echo '
+				<div id="boarddescription">
+					', $context['description'], '
+				</div>';
+
+		// @todo - Thought the who is stuff was better here. Presentation still WIP.
+		if (!empty($settings['display_who_viewing']))
+		{
+			echo '
+				<div id="whoisviewing">';
+
+			if ($settings['display_who_viewing'] == 1)
+				echo count($context['view_members']), ' ', count($context['view_members']) === 1 ? $txt['who_member'] : $txt['members'];
+			else
+				echo empty($context['view_members_list']) ? '0 ' . $txt['members'] : implode(', ', $context['view_members_list']) . (empty($context['view_num_hidden']) || $context['can_moderate_forum'] ? '' : ' (+ ' . $context['view_num_hidden'] . ' ' . $txt['hidden'] . ')');
+
+			echo $txt['who_and'], $context['view_num_guests'], ' ', $context['view_num_guests'] == 1 ? $txt['guest'] : $txt['guests'], $txt['who_viewing_board'];
+
+			echo '
+				</div>';
+		}
 
 		echo '
 			</div>';
@@ -193,7 +193,7 @@ function template_topic_listing()
 			// Is this topic new? (assuming they are logged in!)
 			if ($topic['new'] && $context['user']['is_logged'])
 				echo '
-						<a href="', $topic['new_href'], '" id="newicon' . $topic['first_post']['id'] . '"><span class="new_posts">' . $txt['new'] . '</span></a>';
+						<a class="new_posts" href="', $topic['new_href'], '" id="newicon' . $topic['first_post']['id'] . '">' . $txt['new'] . '</a>';
 
 			echo '
 						<h4>

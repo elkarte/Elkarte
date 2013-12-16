@@ -1786,7 +1786,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 		SELECT id_board
 		FROM {db_prefix}boards
 		WHERE ' . ($board === null ? '' : 'id_board = {int:current_board}
-			AND ') . 'FIND_IN_SET(-1, member_groups)
+			AND ') . 'FIND_IN_SET(-1, member_groups) != 0
 		LIMIT 1',
 		array(
 			'current_board' => $board,

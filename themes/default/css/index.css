@@ -207,6 +207,7 @@ select option {
 	vertical-align: middle;
 	font-size: .857em;
 	line-height: 17px;
+	display: inline-block;
 }
 .left_submit, .linkbutton_left {
 	float: left;
@@ -258,17 +259,17 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 /* the new "button" */
 /* @todo - Might add extra fallbacks. Possibly monospace. */
 /* @todo - Also, look at deprecating spans here. */
-a.new_posts, span.new_posts {
+.new_posts {
 	font-weight: bold;
 	line-height: 1.12px;
 }
-span.new_posts {
+.new_posts {
 	display: inline;
 	padding: 1px 4px 2px 4px;
 	font-size: 9px;
 	font-family: verdana, sans-serif;
 }
-a span.new_posts:hover {
+.new_posts:hover {
 	text-decoration: underline;
 }
 
@@ -366,7 +367,7 @@ em {
 /* normal (14px default), and large (16px default).
 /* Since these are purely presentational classes, they should be used sparingly. */
 /* @todo - th shouldn't be required. */
-.smalltext, .smalltext th {
+.smalldescription, .smalldescription th, .smalltext, .smalltext th {
 	font-size: 0.857em;
 }
 .largetext {
@@ -717,6 +718,7 @@ div.windowbg, div.windowbg2 {
 	width: 100%;
 	text-align: center;
 	font-size: 1.6em;
+	z-index: 100;
 }
 #ajax_in_progress a {
 	color: orange;
@@ -1686,9 +1688,6 @@ dl.settings textarea {
 #expanded_pages_container, #expanded_pages {
 	overflow: hidden;
 }
-#boarddescription {
-	display: inline-block;
-}
 
 /* For the who is template. */
 /* Sort of a stray - ?action=who;sa=credits */
@@ -1734,6 +1733,7 @@ img.new_posts {
 	display: table;
 	width: 100%;
 	box-sizing: border-box;
+	-moz-box-sizing: border-box;
 }
 .topic_listing {
 	padding: 1px 0 0 0;
@@ -1766,7 +1766,7 @@ img.new_posts {
 .topic_info {
 	display: table-cell;
 	vertical-align: top;
-	width: 80%;
+	width: 70%;
 	padding: 7px 8px 6px 12px;
 }
 .topic_icons {
@@ -1985,7 +1985,6 @@ img.new_posts {
 	font-size: 0.857em;
 	padding: 4px 0;
 	display: inline-block;
-
 }
 /* Poster and postarea + moderation area underneath */
 .forumposts .windowbg, .forumposts .windowbg2,
@@ -2097,7 +2096,7 @@ img.new_posts {
 }
 .postarea {
 	display: block;
-	margin: 0 0 0 180px;
+	margin: 0 0 0 13em;
 	padding: 0 1em 0 1.5em;
 	max-width: 100%;
 }
@@ -3650,7 +3649,8 @@ a.help .icon {
 		min-width: 27em;
 	}
 	.topic_latest {
-		min-width: 17em;
+		width: 30%;
+		min-width: 30%;
 	}
 	.board_stats, .topic_stats {
 		display: none;
@@ -3664,8 +3664,13 @@ a.help .icon {
 	.wrapper {
 		min-width: 98%;
 	}
+	.linktree, .linktree_last {
+		max-width: 95%;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
 	.board_latest {
-		min-width: 20em;
+		min-width: 12em;
 	}
 	.board_name {
 		margin: 0 0 0 56px;
@@ -3710,9 +3715,59 @@ a.help .icon {
 	#password_login select {
 		display: none;
 	}
+	.poster {
+		min-width: 10em;
+	}
+	.postarea {
+		margin: 0 0 0 8em;
+	}
+	.quickbuttons .modified {
+		display: block;
+		width: 90%;
+		text-align: left;
+	}
+	#forumposts .views_text {
+		display: none;
+	}
+	#forumposts .nextlinks {
+		width: 100%;
+		text-align: right;
+		white-space: normal;
+	}
+	#search_options {
+		width: 100%;
+	}
+	.ignoreboards {
+		width: 100%;
+	}
+	.ignoreboards.floatright {
+		float: none;
+	}
 }
 /* This one does 480 screens at default font size. */
 @media screen and (max-width: 30em) {
+	select, .input_text, .input_password {
+		max-width: 12em;
+	}
+	dt, dd, dd label, .login dt, #advanced_search dt {
+		display: block;
+		width: 90% !important;
+		text-align: left;
+	}
+	dd {
+		padding-left: 8% !important;
+	}
+	dd input, dd select, dd textarea {
+		width: 90% !important;
+		max-width: 90% !important;
+	}
+	dd .input_check, dd .input_radio {
+		display: inline !important;
+		width: auto !important;
+	}
+	#search_options {
+		width: 100%;
+	}
 	#posting_icons, .table_list .stats, .table_list .lastpost, .table_grid .lastpost {
 		display: none;
 	}
@@ -3821,13 +3876,15 @@ a.help .icon {
 		width: 100%;
 		display: block;
 	}
-	.board_info span {
-		width: 30px;
-		height: 30px;
+	.board_row {
+		padding: 10px 0px;
 	}
 	.board_info h3 a {
 		font-size: 1.3em;
 		word-wrap: break-word;
+	}
+	.board_name {
+		padding-top: 15px;
 	}
 	.board_latest {
 		padding: 0 8px;
@@ -3865,9 +3922,6 @@ a.help .icon {
 		float: none;
 		width: 100%;
 	}
-	select, .input_text, .input_password {
-		max-width: 12em;
-	}
 	.login {
 		width: 100%;
 	}
@@ -3877,7 +3931,7 @@ a.help .icon {
 	#top, #gotop, #gobottom {
 		display: none;
 	}
-	#main_menu li, .admin_menu li{
+	#main_menu li, .admin_menu li {
 		float: left;
 		display: block;
 		width: 48%;
@@ -3892,8 +3946,7 @@ a.help .icon {
 		width: 14em;
 	}
 	.menulevel3 {
-		margin: -2em 0 0 4em;
-		max-width: 15em;
+		display: none !important;
 	}
 	#main_menu li ul li, .admin_menu li ul li{
 		float: left;
