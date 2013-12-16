@@ -705,7 +705,7 @@ div.bbc_footnotes .meaction{
 	width: 26px;
 	content: "";
 }
-.category_boards a span, .board_key:before {
+.category_boards .board_icon, .board_key:before {
 	background-repeat: no-repeat;
 	background-image: url(../../images/_light/board_icons.png);
 }
