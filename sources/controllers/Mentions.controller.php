@@ -328,23 +328,41 @@ class Mentions_Controller extends Action_Controller
 	{
 		global $modSettings, $user_info;
 
-		$mentions = getUserMentions($start, $limit, $sort, $all, $type);
+		$totalMentions = countUserMentions($all, $type);
+		$mentions = array();
+		$round = 0;
 
-		// With only one type is enough to just call that (if it exists)
-		if (!empty($type) && isset($this->_callbacks[$type]))
-			$removed = call_user_func_array($this->_callbacks[$type], array(&$mentions, $type));
-		// Otherwise we have to test all we know...
-		else
+		while ($round < 2)
 		{
-			$removed = false;
-			// @todo find a way to call only what is actually needed 
-			foreach ($this->_callbacks as $type => $callback)
-				$removed = $removed || call_user_func_array($callback, array(&$mentions, $type));
-		}
+			$possible_mentions = getUserMentions($start, $limit, $sort, $all, $type);
 
-		if ($removed)
-		{
-			// @todo later
+			// With only one type is enough to just call that (if it exists)
+			if (!empty($type) && isset($this->_callbacks[$type]))
+				$removed = call_user_func_array($this->_callbacks[$type], array(&$possible_mentions, $type));
+			// Otherwise we have to test all we know...
+			else
+			{
+				$removed = false;
+				// @todo find a way to call only what is actually needed 
+				foreach ($this->_callbacks as $type => $callback)
+					$removed = $removed || call_user_func_array($callback, array(&$possible_mentions, $type));
+			}
+
+			foreach ($possible_mentions as $mention)
+			{
+				if (count($mentions) < $limit)
+					$mentions[] = $mention;
+				else
+					break;
+			}
+			$round++;
+
+			// If nothing has been removed OR there are not enough
+			if (!$removed || count($mentions) == $limit || ($totalMentions - $start < $limit))
+				break;
+
+			// Let's start a bit further into the list
+			$start += $limit;
 		}
 
 		return $mentions;
@@ -397,7 +415,7 @@ class Mentions_Controller extends Action_Controller
 				if (!in_array($board, $accessibleBoards))
 				{
 					$removed = true;
-					$mentions[$key]['message'] = $txt['mention_not_accessible'];
+					unset($mentions[$key]);
 				}
 			}
 		}

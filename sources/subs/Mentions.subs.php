@@ -23,9 +23,13 @@ if (!defined('ELK'))
 function countUserMentions($all = false, $type = '', $id_member = null)
 {
 	global $user_info;
+	static $counts;
 
 	$db = database();
 	$id_member = $id_member === null ? $user_info['id'] : (int) $id_member;
+
+	if (isset($counts[$id_member]))
+		return $counts[$id_member];
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
@@ -40,14 +44,14 @@ function countUserMentions($all = false, $type = '', $id_member = null)
 			'status' => $all ? array(0, 1) : array(0),
 		)
 	);
-	list ($count) = $db->fetch_row($request);
+	list ($counts[$id_member]) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	// Counts as maintenance! :P
 	if ($all === false && empty($type))
-		updateMemberdata($id_member, array('mentions' => $count));
+		updateMemberdata($id_member, array('mentions' => $counts[$id_member]));
 
-	return $count;
+	return $counts[$id_member];
 }
 
 /**
