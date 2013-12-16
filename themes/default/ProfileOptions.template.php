@@ -262,6 +262,7 @@ function template_edit_options()
 		echo '
 					<div>', $context['profile_prehtml'], '</div>';
 
+
 	if (!empty($context['profile_fields']))
 		echo '
 					<dl>';
@@ -480,10 +481,10 @@ function template_profile_pm_settings()
 
 	echo '
 							<dt>
-								<label for="pm_prefs">', $txt['pm_display_mode'], ':</label>
+								<label for="pm_settings">', $txt['pm_display_mode'], ':</label>
 							</dt>
 							<dd>
-								<select name="pm_prefs" id="pm_prefs">
+								<select name="pm_settings" id="pm_settings">
 									<option value="0"', $context['display_mode'] == 0 ? ' selected="selected"' : '', '>', $txt['pm_display_mode_all'], '</option>
 									<option value="1"', $context['display_mode'] == 1 ? ' selected="selected"' : '', '>', $txt['pm_display_mode_one'], '</option>
 									<option value="2"', $context['display_mode'] == 2 ? ' selected="selected"' : '', '>', $txt['pm_display_mode_linked'], '</option>

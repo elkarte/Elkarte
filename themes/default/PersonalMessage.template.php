@@ -196,14 +196,27 @@ function template_folder()
 				// This is for "forwarding" - even if the member is gone.
 				else
 					echo '
-									<li class="listlevel1"><a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote" class="linklevel1 quote_button">', $txt['reply_quote'], '</a></li>';
+									<li class="listlevel1">
+										<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote" class="linklevel1 quote_button">', $txt['reply_quote'], '</a>
+									</li>';
 			}
 
 			// Anything else added by mods for example?
 			if (!empty($context['additional_quick_pm_buttons']))
+			{
 				foreach ($context['additional_quick_pm_buttons'] as $key => $button)
 					echo '
-									<li class="listlevel1"><a href="' . $button['href'] . '" class="linklevel1 ', $key, '">' . $button['text'] . '</a></li>';
+									<li class="listlevel1">
+										<a href="' . $button['href'] . '" class="linklevel1 ', $key, '">' . $button['text'] . '</a>
+									</li>';
+			}
+
+			// Can this PM be reported?
+			if ($message['can_report'] && $context['folder'] != 'sent')
+				echo '
+									<li class="listlevel1">
+										<a class="linklevel1 warn_button" href="', $scripturl, '?action=pm;sa=report;l=', $context['current_label_id'], ';pmsg=', $message['id'], '">', $txt['pm_report_to_admin'], '</a>
+									</li>';
 
 			echo '
 								</ul>';
@@ -346,6 +359,7 @@ function template_subject_list_above()
 					<hr class="clear" />';
 	}
 }
+
 function template_subject_list_below()
 {
 	global $context;
@@ -359,6 +373,7 @@ function template_subject_list_below()
 		template_subject_list();
 	}
 }
+
 function template_subject_list()
 {
 	global $context, $settings, $txt, $scripturl;
@@ -504,7 +519,7 @@ function template_search()
 	if ($context['simple_search'] && (empty($context['minmax_preferences']['pmsearch']) || isset($_GET['basic'])))
 	{
 		echo '
-		<fieldset id="simple_search">
+		<fieldset id="simple_search" class="content">
 			<div id="search_term_input">
 				<label for="search"><strong>', $txt['pm_search_text'], ':</strong>
 				<input type="text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' size="40" class="input_text" placeholder="', $txt['search'], '" required="required" autofocus="autofocus" /></label>
@@ -518,7 +533,7 @@ function template_search()
 	else
 	{
 		echo '
-		<fieldset id="advanced_search">
+		<fieldset id="advanced_search" class="content">
 			<dl class="settings" id="search_options">
 				<dt>
 					<label for="search"><strong>', $txt['pm_search_text'], ':</strong></label>
@@ -585,11 +600,12 @@ function template_search()
 		if ($context['currently_using_labels'])
 		{
 			echo '
-		<fieldset class="labels">
-			<h3 class="category_header">
+		<fieldset class="content">
+			<h3 class="secondary_header">
 				<span id="category_toggle">&nbsp;
 					<span id="advanced_panel_toggle" class="', empty($context['minmax_preferences']['pm']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
 				</span>
+				<a href="#" id="advanced_panel_link">', $txt['pm_search_choose_label'], '</a>
 			</h3>
 			<div id="advanced_panel_div"', empty($context['minmax_preferences']['pm']) ? '' : ' style="display: none;"', '>
 				<ul id="searchLabelsExpand">';
@@ -604,7 +620,7 @@ function template_search()
 			echo '
 				</ul>
 			</div>
-			<div class="submitbuttons">
+			<div class="submitbuttons content">
 				<input type="checkbox" name="all" id="check_all" value="" ', $context['check_all'] ? 'checked="checked"' : '', ' onclick="invertAll(this, this.form, \'searchlabel\');" class="input_check" /><em> <label for="check_all">', $txt['check_all'], '</label></em>
 				<input type="submit" name="pm_search" value="', $txt['pm_search_go'], '" class="right_submit" />
 			</div>
@@ -770,6 +786,10 @@ function template_search_results()
 	template_pagesection();
 }
 
+/**
+ * Show the send a new pm form, including the editor, preview section and load
+ * drafts if enabled.
+ */
 function template_send()
 {
 	global $context, $scripturl, $modSettings, $settings, $txt;
@@ -794,8 +814,7 @@ function template_send()
 		echo '
 					</div>
 				</div>
-			</div>
-			<br />';
+			</div>';
 	}
 
 	// Show the preview of the personal message.
@@ -873,7 +892,7 @@ function template_send()
 						<dd id="pm_subject">
 							<input type="text" name="subject" value="', $context['subject'], '" tabindex="', $context['tabindex']++, '" size="80" maxlength="80"', isset($context['post_error']['no_subject']) ? ' class="error"' : ' class="input_text"', ' placeholder="', $txt['subject'], '" required="required" />
 						</dd>
-					</dl><hr class="clear" />';
+					</dl>';
 
 	// Showing BBC?
 	if ($context['show_bbc'])
@@ -1001,7 +1020,7 @@ function template_send()
 				', $context['quoted_message']['body'], '
 			</div>
 		</div>
-	</div><br class="clear" />';
+	</div>';
 
 	echo '
 		<script><!-- // --><![CDATA[
@@ -1189,7 +1208,6 @@ function template_report_message()
 
 	echo '
 	<form action="', $scripturl, '?action=pm;sa=report;l=', $context['current_label_id'], '" method="post" accept-charset="UTF-8">
-		<input type="hidden" name="pmsg" value="', $context['pm_id'], '" />
 		<h2 class="category_header">', $txt['pm_report_title'], '</h2>
 		<div class="description">
 			', $txt['pm_report_desc'], '
@@ -1198,21 +1216,20 @@ function template_report_message()
 			<div class="content">
 				<dl class="settings">';
 
-	// If there is more than one admin on the forum, allow the user to choose the one they want to direct to.
-	// @todo Why?
+	// If there is more than one admin on the forum (like language based), allow the user to choose the one they want to direct to.
 	if ($context['admin_count'] > 1)
 	{
 		echo '
 					<dt>
-						<strong>', $txt['pm_report_admins'], ':</strong>
+						', $txt['pm_report_admins'], ':
 					</dt>
 					<dd>
 						<select name="id_admin">
 							<option value="0">', $txt['pm_report_all_admins'], '</option>';
 
-		foreach ($context['admins'] as $id => $name)
+		foreach ($context['admins'] as $id => $details)
 			echo '
-							<option value="', $id, '">', $name, '</option>';
+							<option value="', $id, '">', $details[0], !empty($details[1]) ? ' (' . $details[1] . ')' : '' . '</option>';
 
 		echo '
 						</select>
@@ -1221,10 +1238,10 @@ function template_report_message()
 
 	echo '
 					<dt>
-						<strong>', $txt['pm_report_reason'], ':</strong>
+						', $txt['pm_report_reason'], ':
 					</dt>
 					<dd>
-						<textarea name="reason" rows="4" cols="70" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 80%; min-width: 80%' : 'width: 80%') . ';"></textarea>
+						<textarea id="reason" name="reason" rows="4" cols="70" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 95%; min-width: 95%' : 'width: 95%') . ';"></textarea>
 					</dd>
 				</dl>
 				<div class="submitbutton">
@@ -1233,22 +1250,23 @@ function template_report_message()
 			</div>
 		</div>
 		<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+		<input type="hidden" name="pmsg" value="', $context['pm_id'], '" />
 	</form>';
 }
 
 /**
- * Little template just to say "Yep, it's been submitted".
+ * Little template just to say "Yep, it's been reported".
  */
 function template_report_message_complete()
 {
 	global $context, $txt, $scripturl;
 
 	echo '
-		<h2 class="category_header">', $txt['pm_report_title'], '</h2>
-		<div class="windowbg">
+		<h2 class="category_header hdicon cat_img_moderation">', $txt['pm_report_title'], '</h2>
+		<div class="windowbg roundframe">
 			<div class="content">
 				<p>', $txt['pm_report_done'], '</p>
-				<a href="', $scripturl, '?action=pm;l=', $context['current_label_id'], '">', $txt['pm_report_return'], '</a>
+				<a class="linkbutton_right" href="', $scripturl, '?action=pm;l=', $context['current_label_id'], '">', $txt['pm_report_return'], '</a>
 			</div>
 		</div>';
 }

@@ -712,6 +712,7 @@ function loadProfileFields($force_reload = false)
 			'type' => 'callback',
 			'callback_func' => 'pm_settings',
 			'permission' => 'pm_read',
+			'save_key' => 'pm_prefs',
 			'preload' => create_function('', '
 				global $context, $cur_profile;
 

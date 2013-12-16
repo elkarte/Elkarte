@@ -392,7 +392,6 @@ class ProfileOptions_Controller extends Action_Controller
 
 	/**
 	 * Allow the edit of *someone elses* personal message settings.
-	 *
 	 */
 	public function action_pmprefs()
 	{
@@ -407,6 +406,7 @@ class ProfileOptions_Controller extends Action_Controller
 		$context['sub_template'] = 'edit_options';
 		$context['page_desc'] = $txt['pm_settings_desc'];
 
+		// Setup the profile context and call the 'integrate_pmprefs_profile_fields' hook
 		setupProfileContext(
 			array(
 				'receive_from',
