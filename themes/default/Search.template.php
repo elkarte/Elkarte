@@ -221,53 +221,50 @@ function template_searchform()
 					</fieldset>';
 		}
 
-		echo '
-					<script src="', $settings['default_theme_url'], '/scripts/suggest.js?beta10"></script>
-					<script><!-- // --><![CDATA[
-						createEventListener(window);
-						window.addEventListener("load", initSearch, false);
+		addInlineJavascript('
+		createEventListener(window);
+		window.addEventListener("load", initSearch, false);
 
-						var oAddMemberSuggest = new smc_AutoSuggest({
-							sSelf: \'oAddMemberSuggest\',
-							sSessionId: elk_session_id,
-							sSessionVar: elk_session_var,
-							sControlId: \'userspec\',
-							sSearchType: \'member\',
-							bItemList: false
-						});
+		var oAddMemberSuggest = new smc_AutoSuggest({
+			sSelf: \'oAddMemberSuggest\',
+			sSessionId: elk_session_id,
+			sSessionVar: elk_session_var,
+			sControlId: \'userspec\',
+			sSearchType: \'member\',
+			bItemList: false
+		});
 
-						// Some javascript for the advanced toggling
-						var oAdvancedPanelToggle = new elk_Toggle({
-							bToggleEnabled: true,
-							bCurrentlyCollapsed: ', empty($context['minmax_preferences']['search']) ? 'false' : 'true', ',
-							aSwappableContainers: [
-								\'advanced_panel_div\'
-							],
-							aSwapClasses: [
-								{
-									sId: \'advanced_panel_toggle\',
-									classExpanded: \'collapse\',
-									titleExpanded: ', JavaScriptEscape($txt['hide']), ',
-									classCollapsed: \'expand\',
-									titleCollapsed: ', JavaScriptEscape($txt['show']), '
-								}
-							],
-							aSwapLinks: [
-								{
-									sId: \'advanced_panel_link\',
-									msgExpanded: ', JavaScriptEscape($txt['choose_board']), ',
-									msgCollapsed: ', JavaScriptEscape($txt['choose_board']), '
-								}
-							],
-							oThemeOptions: {
-								bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
-								sOptionName: \'minmax_preferences\',
-								sSessionId: elk_session_id,
-								sSessionVar: elk_session_var,
-								sAdditionalVars: \';minmax_key=search\'
-							},
-						});
-					// ]]></script>';
+		// Some javascript for the advanced toggling
+		var oAdvancedPanelToggle = new elk_Toggle({
+			bToggleEnabled: true,
+			bCurrentlyCollapsed: ' . (empty($context['minmax_preferences']['search']) ? 'false' : 'true') . ',
+			aSwappableContainers: [
+				\'advanced_panel_div\'
+			],
+			aSwapClasses: [
+				{
+					sId: \'advanced_panel_toggle\',
+					classExpanded: \'collapse\',
+					titleExpanded: ' . JavaScriptEscape($txt['hide']) . ',
+					classCollapsed: \'expand\',
+					titleCollapsed: ' . JavaScriptEscape($txt['show']) . '
+				}
+			],
+			aSwapLinks: [
+				{
+					sId: \'advanced_panel_link\',
+					msgExpanded: ' . JavaScriptEscape($txt['choose_board']) . ',
+					msgCollapsed: ' . JavaScriptEscape($txt['choose_board']) . '
+				}
+			],
+			oThemeOptions: {
+				bUseThemeSettings: ' . ($context['user']['is_guest'] ? 'false' : 'true') . ',
+				sOptionName: \'minmax_preferences\',
+				sSessionId: elk_session_id,
+				sSessionVar: elk_session_var,
+				sAdditionalVars: \';minmax_key=search\'
+			},
+		});', true);
 	}
 
 	echo '
@@ -553,39 +550,37 @@ function template_results()
 
 	// Show a jump to box for easy navigation.
 	echo '
-				<div class="floatright" id="search_jump_to">&nbsp;</div>
-				<script><!-- // --><![CDATA[';
+				<div class="floatright" id="search_jump_to">&nbsp;</div>';
 
 	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && !empty($context['topics']) && $context['can_move'])
-		echo '
-					if (typeof(window.XMLHttpRequest) != "undefined")
-						aJumpTo[aJumpTo.length] = new JumpTo({
-							sContainerId: "quick_mod_jump_to",
-							sClassName: "qaction",
-							sJumpToTemplate: "%dropdown_list%",
-							sCurBoardName: "', $context['jump_to']['board_name'], '",
-							sBoardChildLevelIndicator: "&#10134;",
-							sBoardPrefix: "&#10148; ",
-							sCatClass: "jump_to_header",
-							sCatPrefix: "",
-							bNoRedirect: true,
-							bDisabled: true,
-							sCustomName: "move_to"
-						});';
+		addInlineJavascript('
+		if (typeof(window.XMLHttpRequest) != "undefined")
+			aJumpTo[aJumpTo.length] = new JumpTo({
+				sContainerId: "quick_mod_jump_to",
+				sClassName: "qaction",
+				sJumpToTemplate: "%dropdown_list%",
+				sCurBoardName: "' . $context['jump_to']['board_name'] . '",
+				sBoardChildLevelIndicator: "&#10134;",
+				sBoardPrefix: "&#10148; ",
+				sCatClass: "jump_to_header",
+				sCatPrefix: "",
+				bNoRedirect: true,
+				bDisabled: true,
+				sCustomName: "move_to"
+			});', true);
 
-	echo '
-					if (typeof(window.XMLHttpRequest) != "undefined")
-						aJumpTo[aJumpTo.length] = new JumpTo({
-							sContainerId: "search_jump_to",
-							sJumpToTemplate: "<label class=\"smalltext\" for=\"%select_id%\">', $context['jump_to']['label'], ':<" + "/label> %dropdown_list%",
-							iCurBoardId: 0,
-							iCurBoardChildLevel: 0,
-							sCurBoardName: "', $context['jump_to']['board_name'], '",
-							sBoardChildLevelIndicator: "&#10134;",
-							sBoardPrefix: "&#10148; ",
-							sCatClass: "jump_to_header",
-							sCatPrefix: "",
-							sGoButtonLabel: "', $txt['quick_mod_go'], '"
-						});
-				// ]]></script>';
+	addInlineJavascript('
+		if (typeof(window.XMLHttpRequest) != "undefined")
+			aJumpTo[aJumpTo.length] = new JumpTo({
+				sContainerId: "search_jump_to",
+				sJumpToTemplate: "<label class=\"smalltext\" for=\"%select_id%\">' . $context['jump_to']['label'] . ':<" + "/label> %dropdown_list%",
+				iCurBoardId: 0,
+				iCurBoardChildLevel: 0,
+				sCurBoardName: "' . $context['jump_to']['board_name'] . '",
+				sBoardChildLevelIndicator: "&#10134;",
+				sBoardPrefix: "&#10148; ",
+				sCatClass: "jump_to_header",
+				sCatPrefix: "",
+				sGoButtonLabel: "' . $txt['quick_mod_go'] . '"
+			});', true);
 }
