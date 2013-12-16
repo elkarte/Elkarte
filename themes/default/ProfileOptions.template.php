@@ -113,9 +113,10 @@ function template_editBuddies()
 
 			</div>
 		</div>
-	</form>
-	<script src="', $settings['default_theme_url'], '/scripts/suggest.js?beta10"></script>
-	<script><!-- // --><![CDATA[
+	</form>';
+
+	// Initialize the autosuggest object
+	addInlineJavascript('
 		var oAddBuddySuggest = new smc_AutoSuggest({
 			sSelf: \'oAddBuddySuggest\',
 			sSessionId: elk_session_id,
@@ -123,10 +124,9 @@ function template_editBuddies()
 			sSuggestId: \'new_buddy\',
 			sControlId: \'new_buddy\',
 			sSearchType: \'member\',
-			sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
+			sTextDeleteItem: \'' . $txt['autosuggest_delete_item'] . '\',
 			bItemList: false
-		});
-	// ]]></script>';
+		});', true);
 }
 
 /**
@@ -209,9 +209,9 @@ function template_editIgnoreList()
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 			</div>
 		</div>
-	</form>
-	<script src="', $settings['default_theme_url'], '/scripts/suggest.js?beta10"></script>
-	<script><!-- // --><![CDATA[
+	</form>',
+
+	addInlineJavascript('
 		var oAddIgnoreSuggest = new smc_AutoSuggest({
 			sSelf: \'oAddIgnoreSuggest\',
 			sSessionId: elk_session_id,
@@ -219,10 +219,9 @@ function template_editIgnoreList()
 			sSuggestId: \'new_ignore\',
 			sControlId: \'new_ignore\',
 			sSearchType: \'member\',
-			sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
+			sTextDeleteItem: \'' . $txt['autosuggest_delete_item'].  '\',
 			bItemList: false
-		});
-	// ]]></script>';
+		});', true);
 }
 
 /**
@@ -230,7 +229,7 @@ function template_editIgnoreList()
  */
 function template_edit_options()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	// The main header!
 	echo '
@@ -468,8 +467,7 @@ function template_edit_options()
 		<form name="spell_form" id="spell_form" method="post" accept-charset="UTF-8" target="spellWindow" action="', $scripturl, '?action=spellcheck">
 			<input type="hidden" name="spellstring" value="" />
 			<input type="hidden" name="fulleditor" value="" />
-		</form>
-		<script src="' . $settings['default_theme_url'] . '/scripts/spellcheck.js"></script>';
+		</form>';
 }
 
 /**
@@ -1441,7 +1439,6 @@ function template_authentication_method()
 
 	// The main header!
 	echo '
-		<script src="', $settings['default_theme_url'], '/scripts/register.js"></script>
 		<form action="', $scripturl, '?action=profile;area=authentication;save" method="post" accept-charset="UTF-8" name="creator" id="creator" enctype="multipart/form-data">
 			<h3 class="category_header hdicon cat_img_profile">
 				', $txt['authentication'], '
@@ -1455,7 +1452,7 @@ function template_authentication_method()
 							<input type="radio" onclick="updateAuthMethod();" name="authenticate" value="passwd" id="auth_pass"', $context['auth_method'] == 'password' ? ' checked="checked"' : '', ' class="input_radio" /><label for="auth_pass"><strong>', $txt['authenticate_password'], '</strong></label>
 						</dt>
 						<dd>
-							<dl id="openid_group"">
+							<dl id="openid_group">
 								<dt>
 									<em>', $txt['authenticate_openid_url'], ':</em>
 								</dt>

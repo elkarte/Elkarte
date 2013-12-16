@@ -558,6 +558,7 @@ class ManageBoards_Controller extends Action_Controller
 		{
 			$context['sub_template'] = 'modify_board';
 			$context['page_title'] = $txt['boardsEdit'];
+			loadJavascriptFile('suggest.js', array('defer' => true));
 		}
 		else
 		{

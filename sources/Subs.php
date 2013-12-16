@@ -2755,8 +2755,12 @@ function setupThemeContext($forceload = false)
 		// Clean it up for presentation ;).
 		$context['news_lines'][$i] = parse_bbc(stripslashes(trim($context['news_lines'][$i])), true, 'news' . $i);
 	}
+
 	if (!empty($context['news_lines']))
 		$context['random_news_line'] = $context['news_lines'][mt_rand(0, count($context['news_lines']) - 1)];
+
+	if (!empty($settings['enable_news']) && !empty($context['random_news_line']))
+		loadJavascriptFile ('fader.js');
 
 	if (!$user_info['is_guest'])
 	{
@@ -2854,18 +2858,17 @@ function setupThemeContext($forceload = false)
 				content: ' . JavaScriptEscape(sprintf($txt['show_personal_messages'], $context['user']['unread_messages'], $scripturl . '?action=pm')) . ',
 				icon: elk_images_url + \'/im_sm_newmsg.png\'
 			});
-		});');
+		});', true);
 
 	// Resize avatars the fancy, but non-GD requiring way.
 	if ($modSettings['avatar_action_too_large'] == 'option_js_resize' && (!empty($modSettings['avatar_max_width_external']) || !empty($modSettings['avatar_max_height_external'])))
 	{
 		// @todo Move this over to script.js?
 		addInlineJavascript('
-		var elk_avatarMaxWidth = ' . (int) $modSettings['avatar_max_width_external'] . ';
-		var elk_avatarMaxHeight = ' . (int) $modSettings['avatar_max_height_external'] . ';' . (!isBrowser('ie') ? '
+		var elk_avatarMaxWidth = ' . (int) $modSettings['avatar_max_width_external'] . ',
+			elk_avatarMaxHeight = ' . (int) $modSettings['avatar_max_height_external'] . ';' . (!isBrowser('is_ie8') ? '
 		window.addEventListener("load", elk_avatarResize, false);' : '
-		var window_oldAvatarOnload = window.onload;
-		window.onload = elk_avatarResize;'));
+		window.attachEvent("load", elk_avatarResize);'), true);
 	}
 
 	// This looks weird, but it's because BoardIndex.controller.php references the variable.
@@ -3154,11 +3157,15 @@ function template_javascript($do_defered = false)
 		}
 
 		// Standard output, and our javascript vars, get output when we are not on a defered call
-		if (!empty($context['javascript_inline']['standard']) && !$do_defered)
+		if ((!empty($context['javascript_inline']['standard']) || !empty($js_vars)) && !$do_defered)
 		{
 			$inline_standard_code = !empty($js_vars) ? $js_vars : '';
-			$context['javascript_inline']['standard'] = array_map('trim', $context['javascript_inline']['standard']);
-			$inline_standard_code .= "\t\t" . implode("\n\t\t", $context['javascript_inline']['standard']);
+
+			if (!empty($context['javascript_inline']['standard']))
+			{
+				$context['javascript_inline']['standard'] = array_map('trim', $context['javascript_inline']['standard']);
+				$inline_standard_code .= "\t\t" . implode("\n\t\t", $context['javascript_inline']['standard']);
+			}
 
 			// And output the js vars and standard scripts to the page
 			echo '

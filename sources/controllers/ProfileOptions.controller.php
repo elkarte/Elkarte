@@ -95,6 +95,7 @@ class ProfileOptions_Controller extends Action_Controller
 
 		// We want to view what we're doing :P
 		$context['sub_template'] = 'editBuddies';
+		loadJavascriptFile('suggest.js', array('defer' => true));
 
 		// For making changes!
 		$buddiesArray = explode(',', $user_profile[$memID]['buddy_list']);
@@ -231,6 +232,7 @@ class ProfileOptions_Controller extends Action_Controller
 
 		// We want to view what we're doing :P
 		$context['sub_template'] = 'editIgnoreList';
+		loadJavascriptFile('suggest.js', array('defer' => true));
 
 		// For making changes!
 		$ignoreArray = explode(',', $user_profile[$memID]['pm_ignore_list']);
@@ -537,6 +539,7 @@ class ProfileOptions_Controller extends Action_Controller
 		$context['member']['openid_uri'] = $cur_profile['openid_uri'];
 		$context['auth_method'] = empty($cur_profile['openid_uri']) ? 'password' : 'openid';
 		$context['sub_template'] = 'authentication_method';
+		loadJavascriptFile('register.js');
 	}
 
 	/**

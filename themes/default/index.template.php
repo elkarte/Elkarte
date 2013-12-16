@@ -696,7 +696,6 @@ function template_news_fader()
 				', $settings['enable_news'] == 2 ? implode('</li><li>', $context['news_lines']) : $context['random_news_line'], '
 			</li>
 		</ul>
-	<script src="', $settings['default_theme_url'], '/scripts/fader.js"></script>
 	<script><!-- // --><![CDATA[
 		var newsFaderStarted = false;
 
@@ -713,6 +712,7 @@ function template_news_fader()
 			});
 			newsFaderStarted = true;
 		}';
+	
 	if ($settings['enable_news'] == 2 && empty($context['minmax_preferences']['upshrink']))
 		echo '
 		startNewsFader();';

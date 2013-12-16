@@ -227,7 +227,7 @@ function template_delete_subscription()
  */
 function template_modify_user_subscription()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	echo '
 	<div id="admincenter">
@@ -243,7 +243,6 @@ function template_modify_user_subscription()
 	// Do we need a username?
 	if ($context['action_type'] == 'add')
 		echo '
-
 						<dt>
 							<strong>', $txt['paid_username'], ':</strong><br />
 							<span class="smalltext">', $txt['one_username'], '</span>
@@ -268,7 +267,7 @@ function template_modify_user_subscription()
 						<select name="year" id="year" onchange="generateDays(\'\');">';
 
 	// Show a list of all the years we allow...
-	for ($year = 2005; $year <= 2030; $year++)
+	for ($year = 2010; $year <= 2030; $year++)
 		echo '
 							<option value="', $year, '"', $year == $context['sub']['start']['year'] ? ' selected="selected"' : '', '>', $year, '</option>';
 
@@ -335,9 +334,9 @@ function template_modify_user_subscription()
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				</div>
 			</div>
-		</form>
-		<script src="', $settings['default_theme_url'], '/scripts/suggest.js?beta10"></script>
-		<script><!-- // --><![CDATA[
+		</form>';
+
+	addInlineJavascript('
 		var oAddMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oAddMemberSuggest\',
 			sSessionId: elk_session_id,
@@ -345,10 +344,9 @@ function template_modify_user_subscription()
 			sSuggestId: \'name_subscriber\',
 			sControlId: \'name_control\',
 			sSearchType: \'member\',
-			sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
+			sTextDeleteItem: \'' . $txt['autosuggest_delete_item'] . '\',
 			bItemList: false
-			});
-		// ]]></script>';
+			});', true);
 
 	if (!empty($context['pending_payments']))
 	{
@@ -558,22 +556,16 @@ function template_choose_payment()
 		<h3 class="category_header">', $gateway['title'], '</h3>
 		<div class="windowbg">
 			<div class="content">
-				', $gateway['desc'], '<br />
-					<form action="', $gateway['form'], '" method="post">';
-
-		if (!empty($gateway['javascript']))
-			echo '
-						<script><!-- // --><![CDATA[
-							', $gateway['javascript'], '
-						// ]]></script>';
+				', $gateway['desc'], '
+				<form id="', $gateway['id'], '" action="', $gateway['form'], '" method="post">';
 
 		foreach ($gateway['hidden'] as $name => $value)
 			echo '
-						<input type="hidden" id="', $gateway['id'], '_', $name, '" name="', $name, '" value="', $value, '" />';
+					<input type="hidden" id="', $gateway['id'], '_', $name, '" name="', $name, '" value="', $value, '" />';
 
 		echo '
-						<br /><input type="submit" value="', $gateway['submit'], '" class="right_submit" />
-					</form>
+					<br><input type="submit" value="', $gateway['submit'], '" class="right_submit" />
+				</form>
 			</div>
 		</div>';
 	}

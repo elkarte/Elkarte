@@ -114,6 +114,7 @@ class Register_Controller extends Action_Controller
 		// Show the user the right form.
 		$context['sub_template'] = $current_step == 1 ? 'registration_agreement' : 'registration_form';
 		$context['page_title'] = $current_step == 1 ? $txt['registration_agreement'] : $txt['registration_form'];
+		loadJavascriptFile('register.js');
 
 		// Add the register chain to the link tree.
 		$context['linktree'][] = array(

@@ -741,6 +741,10 @@ class ManageMembergroups_Controller extends Action_Controller
 		$context['sub_template'] = 'edit_group';
 		$context['page_title'] = $txt['membergroups_edit_group'];
 
+		// Use the autosuggest script when needed
+		if ($context['group']['id'] != 3 && $context['group']['id'] != 4)
+			loadJavascriptFile('suggest.js', array('defer' => true));
+
 		createToken('admin-mmg');
 	}
 

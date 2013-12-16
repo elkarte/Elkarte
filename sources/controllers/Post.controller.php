@@ -2198,7 +2198,7 @@ class Post_Controller extends Action_Controller
 		global $txt, $context;
 
 		// A list of "words" we know about but pspell doesn't.
-		$known_words = array('elkarte', 'php', 'mysql', 'www', 'gif', 'jpeg', 'png', 'http', 'grandia', 'terranigma', 'rpgs');
+		$known_words = array('elkarte', 'php', 'mysql', 'www', 'gif', 'jpeg', 'png', 'http');
 
 		loadLanguage('Post');
 		loadTemplate('Post');
@@ -2225,9 +2225,9 @@ class Post_Controller extends Action_Controller
 
 		// Construct a bit of Javascript code.
 		$context['spell_js'] = '
-			var txt = {"done": "' . $txt['spellcheck_done'] . '"};
-			var mispstr = ' . ($_POST['fulleditor'] === 'true' ? 'window.opener.spellCheckGetText(spell_fieldname)' : 'window.opener.document.forms[spell_formname][spell_fieldname].value') . ';
-			var misps = Array(';
+			var txt = {"done": "' . $txt['spellcheck_done'] . '"},
+				mispstr = ' . ($_POST['fulleditor'] === 'true' ? 'window.opener.spellCheckGetText(spell_fieldname)' : 'window.opener.document.forms[spell_formname][spell_fieldname].value') . ',
+				misps = Array(';
 
 		// Get all the words (Javascript already separated them).
 		$alphas = explode("\n", strtr($_POST['spellstring'], array("\r" => '')));

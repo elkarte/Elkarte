@@ -33,7 +33,6 @@ class ProfileSubscriptions_Controller extends Action_Controller
 
 	/**
 	 * Method for doing all the paid subscription stuff - kinda.
-	 *
 	 */
 	public function action_subscriptions()
 	{
@@ -200,6 +199,7 @@ class ProfileSubscriptions_Controller extends Action_Controller
 				// Real cost...
 				$context['value'] = $context['sub']['costs'][$_POST['cur'][$ID_SUB]];
 				$context['cost'] = sprintf($modSettings['paid_currency_symbol'], $context['value']) . '/' . $txt[$_POST['cur'][$ID_SUB]];
+
 				// The period value for paypal.
 				$context['paypal_period'] = strtoupper(substr($_POST['cur'][$ID_SUB], 0, 1));
 			}
@@ -221,7 +221,13 @@ class ProfileSubscriptions_Controller extends Action_Controller
 			{
 				$fields = $gateways[$id]->fetchGatewayFields($context['sub']['id'] . '+' . $memID, $context['sub'], $context['value'], $period, $scripturl . '?action=profile;u=' . $memID . ';area=subscriptions;sub_id=' . $context['sub']['id'] . ';done');
 				if (!empty($fields['form']))
+				{
 					$context['gateways'][] = $fields;
+
+					// Does this gateway have any javascript?
+					if (!empty($fields['javascript']))
+						addInlineJavascript($fields['javascript'], true);
+				}
 			}
 
 			// Bugger?!

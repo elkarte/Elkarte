@@ -28,7 +28,7 @@ function template_ManageNews_init()
  */
 function template_email_members()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
 	<div id="admincenter">
@@ -122,11 +122,10 @@ function template_email_members()
 	</div>';
 
 	// This is some javascript for the simple/advanced toggling and member suggest
-	echo '
-	<script><!-- // --><![CDATA[
+	addInlineJavascript('
 		var oAdvancedPanelToggle = new elk_Toggle({
 			bToggleEnabled: true,
-			bCurrentlyCollapsed: ', empty($context['admin_preferences']['apn']) ? 'false' : 'true', ',
+			bCurrentlyCollapsed: ' . (empty($context['admin_preferences']['apn']) ? 'false' : 'true') . ',
 			aSwappableContainers: [
 				\'exclude_panel_div\'
 			],
@@ -134,20 +133,20 @@ function template_email_members()
 				{
 					sId: \'upshrink_ic\',
 					classExpanded: \'collapse\',
-					titleExpanded: ', JavaScriptEscape($txt['hide']), ',
+					titleExpanded: ' . JavaScriptEscape($txt['hide']) . ',
 					classCollapsed: \'expand\',
-					titleCollapsed: ', JavaScriptEscape($txt['show']), '
+					titleCollapsed: ' . JavaScriptEscape($txt['show']) . '
 				}
 			],
 			aSwapLinks: [
 				{
 					sId: \'exclude_panel_link\',
-					msgExpanded: ', JavaScriptEscape($txt['exclude_these']), ',
-					msgCollapsed: ', JavaScriptEscape($txt['exclude_these']), '
+					msgExpanded: ' . JavaScriptEscape($txt['exclude_these']) . ',
+					msgCollapsed: ' . JavaScriptEscape($txt['exclude_these']) . '
 				}
 			],
 			oThemeOptions: {
-				bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
+				bUseThemeSettings: ' . ($context['user']['is_guest'] ? 'false' : 'true') .  ',
 				sOptionName: \'admin_preferences\',
 				sSessionVar: elk_session_var,
 				sSessionId: elk_session_id,
@@ -155,9 +154,7 @@ function template_email_members()
 				sAdditionalVars: \';admin_key=apn\'
 			}
 		});
-	// ]]></script>
-	<script src="', $settings['default_theme_url'], '/scripts/suggest.js?beta10"></script>
-	<script><!-- // --><![CDATA[
+
 		var oMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oMemberSuggest\',
 			sSessionId: elk_session_id,
@@ -168,10 +165,11 @@ function template_email_members()
 			bItemList: true,
 			sPostName: \'member_list\',
 			sURLMask: \'action=profile;u=%item_id%\',
-			sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
+			sTextDeleteItem: \'' . $txt['autosuggest_delete_item'] . '\',
 			sItemListContainerId: \'members_container\',
 			aListItems: []
 		});
+
 		var oExcludeMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oExcludeMemberSuggest\',
 			sSessionId: elk_session_id,
@@ -182,11 +180,10 @@ function template_email_members()
 			bItemList: true,
 			sPostName: \'exclude_member_list\',
 			sURLMask: \'action=profile;u=%item_id%\',
-			sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
+			sTextDeleteItem: \'' . $txt['autosuggest_delete_item'] . '\',
 			sItemListContainerId: \'exclude_members_container\',
 			aListItems: []
-		});
-	// ]]></script>';
+		});', true);
 }
 
 /**
@@ -197,20 +194,6 @@ function template_email_members_compose()
 	global $context, $txt, $scripturl;
 
 	echo '
-		<div id="preview_section"', isset($context['preview_message']) ? '' : ' style="display: none;"', '>
-			<h3 class="category_header">
-				<span id="preview_subject">', empty($context['preview_subject']) ? '' : $context['preview_subject'], '</span>
-			</h3>
-			<div class="windowbg">
-				<div class="content">
-					<div class="post" id="preview_body">
-						', empty($context['preview_message']) ? '<br />' : $context['preview_message'], '
-					</div>
-				</div>
-			</div>
-		</div>';
-
-	echo '
 	<div id="admincenter">
 		<form name="newsmodify" action="', $scripturl, '?action=admin;area=news;sa=mailingsend" method="post" accept-charset="UTF-8">
 			<h3 class="category_header">
@@ -218,37 +201,56 @@ function template_email_members_compose()
 			</h3>
 			<div class="information">
 				', $txt['email_variables'], '
-			</div>
+			</div>';
+
+	// The preview section
+	echo '
+			<div id="preview_section" class="forumposts"', isset($context['preview_message']) ? '' : ' style="display: none;"', '>
+				<h3 class="category_header">
+					<span id="preview_subject">', empty($context['preview_subject']) ? '' : $context['preview_subject'], '</span>
+				</h3>
+				<div class="post" id="preview_body">
+					', empty($context['preview_message']) ? '<br />' : $context['preview_message'], '
+				</div>
+			</div>';
+
+	// Any errors to speak of?
+	echo '
 			<div class="windowbg">
-				<div class="', empty($context['error_type']) || $context['error_type'] != 'serious' ? 'warningbox' : 'errorbox', '"', empty($context['post_error']['messages']) ? ' style="display: none"' : '', ' id="errors">
+				<div id="post_error" class="', empty($context['error_type']) || $context['error_type'] != 'serious' ? 'warningbox' : 'errorbox', '"', empty($context['post_error']['messages']) ? ' style="display: none"' : '', '>
 					<dl>
 						<dt>
 							<strong id="error_serious">', $txt['error_while_submitting'], '</strong>
 						</dt>
-						<dd class="error" id="error_list">
-							', empty($context['post_error']['messages']) ? '' : implode('<br />', $context['post_error']['messages']), '
+						<dd>
+							<ul class="error" id="post_error_list">
+								', empty($context['post_error']['messages']) ? '' : '<li>' . implode('</li><li>', $context['post_error']['messages']) . '</li>', '
+							</ul>
 						</dd>
 					</dl>
-				</div>
-				<dl id="post_header">
-					<dt class="clear_left">
-						<span', (isset($context['post_error']['no_subject']) ? ' class="error"' : ''), ' id="caption_subject">', $txt['subject'], ':</span>
-					</dt>
-					<dd id="pm_subject">
-						<input type="text" name="subject" value="', $context['subject'], '" tabindex="', $context['tabindex']++, '" size="60" maxlength="60"', isset($context['post_error']['no_subject']) ? ' class="error"' : ' class="input_text"', '/>
-					</dd>
-				</dl>
-				<hr class="clear" />
-				<div id="bbcBox_message"></div>';
+				</div>';
+
+	// Show the editor area
+	echo'
+				<div class="editor_wrapper">
+					<dl id="post_header">
+						<dt class="clear_left">
+							<span', (isset($context['post_error']['no_subject']) ? ' class="error"' : ''), ' id="caption_subject">', $txt['subject'], ':</span>
+						</dt>
+						<dd id="pm_subject">
+							<input type="text" name="subject" value="', $context['subject'], '" tabindex="', $context['tabindex']++, '" size="60" maxlength="60"', isset($context['post_error']['no_subject']) ? ' class="error"' : ' class="input_text"', '/>
+						</dd>
+					</dl>
+					<hr class="clear" />
+					<div id="bbcBox_message"></div>';
 
 	// What about smileys?
 	if (!empty($context['smileys']['postform']) || !empty($context['smileys']['popup']))
 		echo '
-				<div id="smileyBox_message"></div>';
+					<div id="smileyBox_message"></div>';
 
 	// Show BBC buttons, smileys and textbox.
 	echo '
-				<div class="editor_wrapper">
 					', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
 
 	echo '
@@ -271,30 +273,30 @@ function template_email_members_compose()
 		echo '
 			<input type="hidden" name="', $key, '" value="', implode(($key == 'emails' ? ';' : ','), $values), '" />';
 
-	// The functions used to preview a posts without loading a new page.
-	echo '
-		<script><!-- // --><![CDATA[
-			var form_name = "newsmodify",
-				preview_area = "news",
-				txt_preview_title = "', $txt['preview_title'], '",
-				txt_preview_fetch = "', $txt['preview_fetch'], '";
+	// The vars used to preview a newsletter without loading a new page, used by post.js previewControl()
+	addInlineJavascript('
+		var form_name = "newsmodify",
+			preview_area = "news",
+			txt_preview_title = "' . $txt['preview_title'] . '",
+			txt_preview_fetch = "' . $txt['preview_fetch'] . '";
 
-			function checkboxes_status (item)
+		function checkboxes_status (item)
+		{
+			if (item.id == \'send_html\')
+				document.getElementById(\'parse_html\').disabled = !document.getElementById(\'parse_html\').disabled;
+
+			if (item.id == \'send_pm\')
 			{
-				if (item.id == \'send_html\')
-					document.getElementById(\'parse_html\').disabled = !document.getElementById(\'parse_html\').disabled;
+				if (!document.getElementById(\'send_html\').checked)
+					document.getElementById(\'parse_html\').disabled = true;
+				else
+					document.getElementById(\'parse_html\').disabled = false;
 
-				if (item.id == \'send_pm\')
-				{
-					if (!document.getElementById(\'send_html\').checked)
-						document.getElementById(\'parse_html\').disabled = true;
-					else
-						document.getElementById(\'parse_html\').disabled = false;
-
-					document.getElementById(\'send_html\').disabled = !document.getElementById(\'send_html\').disabled;
-				}
+				document.getElementById(\'send_html\').disabled = !document.getElementById(\'send_html\').disabled;
 			}
-		// ]]></script>
+		}', true);
+
+	echo '
 		</form>
 	</div>';
 }
@@ -344,7 +346,7 @@ function template_email_members_send()
 	<script><!-- // --><![CDATA[
 		var countdown = 2,
 			message = "', $txt['email_continue'], '";
-				
+
 		doAutoSubmit();
 	// ]]></script>';
 }

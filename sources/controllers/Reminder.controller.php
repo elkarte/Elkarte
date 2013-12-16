@@ -172,6 +172,9 @@ class Reminder_Controller extends Action_Controller
 			'memID' => (int) $_REQUEST['u']
 		);
 
+		// Some extra js is needed
+		loadJavascriptFile('register.js');
+
 		// Tokens!
 		createToken('remind-sp');
 	}
@@ -351,7 +354,9 @@ function secretAnswerInput()
 	$context['remind_user'] = $member['id_member'];
 	$context['remind_type'] = '';
 	$context['secret_question'] = $member['secret_question'];
-
 	$context['sub_template'] = 'ask';
+
+	loadJavascriptFile('register.js');
+
 	createToken('remind-sai');
 }

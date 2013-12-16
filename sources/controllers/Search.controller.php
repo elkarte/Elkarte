@@ -64,6 +64,7 @@ class Search_Controller extends Action_Controller
 		{
 			loadTemplate('Search');
 			$context['sub_template'] = 'searchform';
+			loadJavascriptFile('suggest.js', array('defer' => true));
 		}
 
 		// Check the user's permissions.

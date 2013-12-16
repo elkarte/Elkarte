@@ -96,7 +96,6 @@ function template_set_password()
 	global $context, $settings, $txt, $scripturl, $modSettings;
 
 	echo '
-	<script src="', $settings['default_theme_url'], '/scripts/register.js"></script>
 	<br />
 	<form action="', $scripturl, '?action=reminder;sa=setpassword2" name="reminder_form" id="reminder_form" method="post" accept-charset="UTF-8">
 		<div class="login">
@@ -148,7 +147,6 @@ function template_ask()
 	global $context, $settings, $txt, $scripturl, $modSettings;
 
 	echo '
-	<script src="', $settings['default_theme_url'], '/scripts/register.js"></script>
 	<br />
 	<form action="', $scripturl, '?action=reminder;sa=secret2" method="post" accept-charset="UTF-8" name="creator" id="creator">
 		<div class="login">
@@ -202,5 +200,4 @@ function template_ask()
 	};
 	var verificationHandle = new elkRegister("creator", ', empty($modSettings['password_strength']) ? 0 : $modSettings['password_strength'], ', regTextStrings);
 // ]]></script>';
-
 }
