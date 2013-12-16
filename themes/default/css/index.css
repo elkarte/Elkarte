@@ -3931,7 +3931,7 @@ a.help .icon {
 	#top, #gotop, #gobottom {
 		display: none;
 	}
-	#main_menu li, .admin_menu li, .listlevel1#button_profile {
+	#main_menu li, .admin_menu li {
 		float: left;
 		display: block;
 		width: 48%;
@@ -4015,11 +4015,11 @@ a.help .icon {
 	.forumposts .windowbg, .forumposts .windowbg2 {
 		margin-bottom: 6px;
 	}
-	#button_home, #moderationbuttons,  a.linklevel1.button_strip_notify,
+	#button_admin, #button_home, #moderationbuttons,  a.linklevel1.button_strip_notify,
 	a.linklevel1.button_strip_print, a.linklevel1.button_strip_send, .inline_mod_check,
 	a.linklevel1.quotetonew_button, a.linklevel1.button_strip_post_poll,
 	a.linklevel1.post_options, .keyinfo .post_subject, li.listlevel1.quickmod_select_all,
-	#collapse_button, p.inline.membergroups {
+	#button_profile, #collapse_button, p.inline.membergroups {
 		display: none !important;
 	}
 	.quickbuttons {
