@@ -61,7 +61,7 @@ function getBoardIndex($boardIndexOptions)
 			c.can_collapse, IFNULL(cc.id_member, 0) AS is_collapsed,' : '')) . '
 			IFNULL(mem.id_member, 0) AS id_member, mem.avatar, m.id_msg,
 			IFNULL(mods_mem.id_member, 0) AS id_moderator, mods_mem.real_name AS mod_real_name' . (!empty($settings['avatars_on_indexes']) ? ',
-			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type' : '') . '
+			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type, mem.email_address' : '') . '
 		FROM {db_prefix}boards AS b' . ($boardIndexOptions['include_categories'] ? '
 			LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)' : '') . '
 			LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = b.id_last_msg)
@@ -237,24 +237,6 @@ function getBoardIndex($boardIndexOptions)
 		else
 			continue;
 
-		if (!empty($settings['avatars_on_indexes']))
-		{
-			// Allow themers to show the latest poster's avatar along with the board
-			if (!empty($row_board['avatar']))
-			{
-				if ($modSettings['avatar_action_too_large'] == 'option_html_resize' || $modSettings['avatar_action_too_large'] == 'option_js_resize')
-				{
-					$avatar_width = !empty($modSettings['avatar_max_width_external']) ? ' width:' . $modSettings['avatar_max_width_external'] . 'px;' : '';
-					$avatar_height = !empty($modSettings['avatar_max_height_external']) ? ' height:' . $modSettings['avatar_max_height_external'] . 'px;' : '';
-				}
-				else
-				{
-					$avatar_width = '';
-					$avatar_height = '';
-				}
-			}
-		}
-
 		// Prepare the subject, and make sure it's not too long.
 		censorText($row_board['subject']);
 		$row_board['short_subject'] = shorten_text($row_board['subject'], !empty($modSettings['subject_length']) ? $modSettings['subject_length'] : 24);
@@ -275,12 +257,7 @@ function getBoardIndex($boardIndexOptions)
 		);
 
 		if (!empty($settings['avatars_on_indexes']))
-			$this_last_post['member']['avatar'] = array(
-				'name' => $row_board['avatar'],
-				'image' => $row_board['avatar'] == '' ? ($row_board['id_attach'] > 0 ? '<img class="avatar" src="' . (empty($row_board['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row_board['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row_board['filename']) . '" alt="" />' : '') : (stristr($row_board['avatar'], 'http://') ? '<img class="avatar" src="' . $row_board['avatar'] . '" style="' . $avatar_width . $avatar_height . '" alt="" />' : '<img class="avatar" src="' . $modSettings['avatar_url'] . '/' . htmlspecialchars($row_board['avatar'], ENT_COMPAT, 'UTF-8') . '" alt="" />'),
-				'href' => $row_board['avatar'] == '' ? ($row_board['id_attach'] > 0 ? (empty($row_board['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row_board['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row_board['filename']) : '') : (stristr($row_board['avatar'], 'http://') ? $row_board['avatar'] : $modSettings['avatar_url'] . '/' . $row_board['avatar']),
-				'url' => $row_board['avatar'] == '' ? '' : (stristr($row_board['avatar'], 'http://') ? $row_board['avatar'] : $modSettings['avatar_url'] . '/' . $row_board['avatar'])
-			);
+			$this_last_post['member']['avatar'] = determineAvatar($row_board);
 
 		// Provide the href and link.
 		if ($row_board['subject'] != '')
