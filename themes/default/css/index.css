@@ -4071,4 +4071,7 @@ a.help .icon {
 	.stats dt {
 		font-weight: bold;
 	}
+	 .poster .menulevel2 {
+		 display: none !important;
+	}
 }

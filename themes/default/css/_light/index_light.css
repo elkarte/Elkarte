@@ -1718,4 +1718,7 @@ div.bbc_footnotes .meaction{
 	.stats.floatleft {
 		border: none;
 	}
+	.subsections:hover .linklevel1:after {
+		content:"";
+	}	
 }
