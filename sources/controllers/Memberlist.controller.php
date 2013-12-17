@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * This file contains the functions for displaying and searching in the
+ * members list.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,14 +12,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file contains the functions for displaying and searching in the
- * members list.
- * Accessed by ?action_memberlist.
- * The default action is to list all registered members.
  *
  */
 
@@ -31,7 +29,7 @@ class Memberlist_Controller extends Action_Controller
 	/**
 	 * Sets up the context for showing a listing of registered members.
 	 * For the handlers in this file, it requires the view_mlist permission.
-	 *
+	 * Accessed by ?action_memberlist.
 	 * @uses Memberlist template, main sub-template.
 	 *
 	 * @see Action_Controller::action_index()

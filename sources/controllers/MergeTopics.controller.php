@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Handle merging of topics
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,18 +11,20 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
  *
- * Handle merging of topics
- *
  * Original module by Mach8 - We'll never forget you.
+ * ETA: Sorry, we did.
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * MergeTopics_Controller class.  Merges two or more topics into a single topic.
+ */
 class MergeTopics_Controller extends Action_Controller
 {
 	/**
@@ -60,8 +64,7 @@ class MergeTopics_Controller extends Action_Controller
 	 */
 	public function action_mergeIndex()
 	{
-		global $txt, $board, $context;
-		global $scripturl, $user_info, $modSettings;
+		global $txt, $board, $context, $scripturl, $user_info, $modSettings;
 
 		if (!isset($_GET['from']))
 			fatal_lang_error('no_access', false);
@@ -111,10 +114,12 @@ class MergeTopics_Controller extends Action_Controller
 			'use_permissions' => true,
 			'not_redirection' => true
 		);
+
 		if (!in_array(0, $merge_boards))
 			$boardListOptions['included_boards'] = $merge_boards;
 		$boards_list = getBoardList($boardListOptions, true);
 		$context['boards'] = array();
+		
 		foreach ($boards_list as $board)
 		{
 			$context['boards'][] = array(
