@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Show a list of members or a selection of members.
+
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,8 +14,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * Show a list of members or a selection of members.
  *
  */
 
@@ -728,6 +728,7 @@ class ManageMembers_Controller extends Action_Controller
 		$allowed_actions = '
 				<option selected="selected" value="">' . $txt['admin_browse_with_selected'] . ':</option>
 				<option value="" disabled="disabled">-----------------------------</option>';
+
 		foreach ($context['allowed_actions'] as $key => $desc)
 			$allowed_actions .= '
 				<option value="' . $key . '">' . $desc . '</option>';
@@ -994,7 +995,6 @@ class ManageMembers_Controller extends Action_Controller
 		loadLanguage('Login');
 
 		// Sort out where we are going...
-		// @todo is this way for lazyness and a bit of readability, feel free to change it if you don't like it
 		$current_filter = $conditions['activated_status'] = (int) $_REQUEST['orig_filter'];
 
 		// If we are applying a filter do just that - then redirect.
