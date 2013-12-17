@@ -131,28 +131,28 @@ function template_core_features()
 
 	echo '
 			<form id="core_features" action="', $scripturl, '?action=admin;area=corefeatures" method="post" accept-charset="UTF-8">
-			<div style="display:none" id="activation_message" class="errorbox"></div>';
+				<div style="display:none" id="activation_message" class="errorbox"></div>';
 
 	// Loop through all the shiny features.
 	foreach ($context['features'] as $id => $feature)
 		echo '
-			<div class="content features">
-				<img class="features_image" src="', $feature['image'], '" alt="', $feature['title'], '" />
-				<div class="features_switch" id="js_feature_', $id, '">
-					<label class="core_features_hide" for="feature_', $id, '">', $txt['core_settings_enabled'], '<input class="core_features_status_box" type="checkbox" name="feature_', $id, '" id="feature_', $id, '"', $feature['enabled'] ? ' checked="checked"' : '', ' /></label>
-					<img class="core_features_img ', $feature['state'], '" src="', $settings['images_url'], '/admin/switch_', $feature['state'], '.png" alt="', $feature['state'], '" id="switch_', $id, '" style="display:none" />
-				</div>
-				<h3 id="feature_link_' . $id . '">', ($feature['enabled'] && $feature['url'] ? '<a href="' . $feature['url'] . '">' . $feature['title'] . '</a>' : $feature['title']), '</h3>
-				<p>', $feature['desc'], '</p>
-				<hr />
-			</div>';
+				<div class="content features">
+					<img class="features_image" src="', $feature['image'], '" alt="', $feature['title'], '" />
+					<div class="features_switch" id="js_feature_', $id, '">
+						<label class="core_features_hide" for="feature_', $id, '">', $txt['core_settings_enabled'], '<input class="core_features_status_box" type="checkbox" name="feature_', $id, '" id="feature_', $id, '"', $feature['enabled'] ? ' checked="checked"' : '', ' /></label>
+						<img class="core_features_img ', $feature['state'], '" src="', $settings['images_url'], '/admin/switch_', $feature['state'], '.png" alt="', $feature['state'], '" id="switch_', $id, '" style="display:none" />
+					</div>
+					<h3 id="feature_link_' . $id . '">', ($feature['enabled'] && $feature['url'] ? '<a href="' . $feature['url'] . '">' . $feature['title'] . '</a>' : $feature['title']), '</h3>
+					<p>', $feature['desc'], '</p>
+					<hr />
+				</div>';
 
 	echo '
-			<div class="righttext">
-				<input id="core_features_session" type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				<input id="core_features_token" type="hidden" name="', $context['admin-core_token_var'], '" value="', $context['admin-core_token'], '" />
-				<input id="core_features_submit" type="submit" value="', $txt['save'], '" name="save" class="right_submit" />
-			</div>
-		</form>
-	</div>';
+				<div class="righttext">
+					<input id="core_features_session" type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					<input id="core_features_token" type="hidden" name="', $context['admin-core_token_var'], '" value="', $context['admin-core_token'], '" />
+					<input id="core_features_submit" type="submit" value="', $txt['save'], '" name="save" class="right_submit" />
+				</div>
+			</form>
+		</div>';
 }
