@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This file has all the main functions in it that relate to, well, everything.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,11 +11,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file has all the main functions in it that relate to, well, everything.
  *
  */
 
@@ -312,7 +312,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
 /**
  * Deletes one setting from the settings table and takes care of $modSettings as well
  *
- * @param mixed the setting or the settings to be removed
+ * @param mixed $toRemove the setting or the settings to be removed
  */
 function removeSettings($toRemove)
 {
@@ -362,7 +362,7 @@ function removeSettings($toRemove)
  * @param int $max_value
  * @param int $num_per_page
  * @param bool $flexible_start = false
- * @param bool $show_prevnext = true
+ * @param array $show
  */
 function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flexible_start = false, $show = array())
 {
@@ -612,7 +612,7 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
  * This function is based on ideas from user "Eye" at
  * http://stackoverflow.com/questions/2690504/php-producing-relative-date-time-from-timestamps
  *
- * @param int $date
+ * @param int $timestamp
  * @param bool $show_today = true
  * @param string $offset_type = false
  * @return string
@@ -2419,7 +2419,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
  * Caches the smileys from the database or array in memory.
  * Doesn't return anything, but rather modifies message directly.
  *
- * @param string &$message
+ * @param string $message
  */
 function parsesmileys(&$message)
 {
@@ -2701,7 +2701,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 /**
  * Sets the class of the current topic based on is_very_hot, veryhot, hot, etc
  *
- * @param array &$topic_context
+ * @param array $topic_context
  */
 function determineTopicClass(&$topic_context)
 {
@@ -4421,7 +4421,7 @@ function elk_array_insert($input, $key, $insert, $where = 'before', $assoc = tru
  * From time to time it may be necessary to fire a scheduled tast ASAP
  * this function set the scheduled task to be called before any other one
  *
- * @param string the name of a scheduled task
+ * @param string $task the name of a scheduled task
  */
 function scheduleTaskImmediate($task)
 {
@@ -4448,8 +4448,8 @@ function scheduleTaskImmediate($task)
  * For diligent people: remove scheduleTaskImmediate when done, otherwise
  * a maximum of 10 executions is allowed
  *
- * @param string the name of a scheduled task
- * @param bool if recalculate the next task to execute
+ * @param string $task the name of a scheduled task
+ * @param bool $calculateNextTrigger if recalculate the next task to execute
  */
 function removeScheduleTaskImmediate($task, $calculateNextTrigger = true)
 {
