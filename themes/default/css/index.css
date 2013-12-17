@@ -3723,7 +3723,7 @@ a.help .icon {
 	}
 	.quickbuttons .modified {
 		display: block;
-		width: 90%;
+		width: 100%;
 		text-align: left;
 	}
 	#forumposts .views_text {
@@ -4057,5 +4057,18 @@ a.help .icon {
 	}
 	.popup_window {
 		width: 95%;
+	}
+	.statistics .category_header {
+		width: 100%;
+		box-sizing: border-box;
+	}
+	.stats {
+		width: 100%;
+		box-sizing: border-box;
+		float: none;
+		margin: 0;
+	}
+	.stats dt {
+		font-weight: bold;
 	}
 }
