@@ -3795,7 +3795,7 @@ a.help .icon {
 	}
 	.topic_info {
 		display: block;
-		width: 90%;
+		width: 95%;
 		padding: 8px;
 	}
 	.topic_icons {
@@ -3875,6 +3875,8 @@ a.help .icon {
 	.board_info, .board_latest {
 		width: 100%;
 		display: block;
+		box-sizing: border-box;
+		margin-bottom: 2px;
 	}
 	.board_row {
 		padding: 10px 0px;
