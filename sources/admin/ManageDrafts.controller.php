@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Allows for the modifing of the forum drafts settings.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -25,6 +27,9 @@ class ManageDrafts_Controller extends Action_Controller
 
 	/**
 	 * Default method.
+	 * Requires admin_forum permissions
+	 *
+	 * @uses Drafts language file
 	 */
 	public function action_index()
 	{
@@ -51,7 +56,7 @@ class ManageDrafts_Controller extends Action_Controller
 		isAllowedTo('admin_forum');
 		loadLanguage('Drafts');
 
-		// initialize the form
+		// Initialize the form
 		$this->_initDraftSettingsForm();
 
 		$config_vars = $this->_draftSettings->settings();
@@ -76,16 +81,18 @@ class ManageDrafts_Controller extends Action_Controller
 			redirectexit('action=admin;area=managedrafts');
 		}
 
-		// some javascript to enable / disable the frequency input box
+		// Some javascript to enable / disable the frequency input box
 		addInlineJavascript('
 			var autosave = document.getElementById(\'drafts_autosave_enabled\');
-			createEventListener(autosave)
+
+			createEventListener(autosave);
 			autosave.addEventListener(\'change\', toggle);
 			toggle();
 
 			function toggle()
 			{
 				var select_elem = document.getElementById(\'drafts_autosave_frequency\');
+				
 				select_elem.disabled = !autosave.checked;
 			}', true);
 

@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Manage features and options administration page.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -22,7 +24,6 @@ if (!defined('ELK'))
  * Manage features and options administration page.
  * This controller handles the pages which allow the admin
  * to see and change the basic feature settings of their site.
- *
  */
 class ManageFeatures_Controller extends Action_Controller
 {
@@ -65,6 +66,9 @@ class ManageFeatures_Controller extends Action_Controller
 	/**
 	 * This function passes control through to the relevant tab.
 	 * @see Action_Controller::action_index()
+	 *
+	 * @uses Help, ManageSettings languages
+	 * @uses sub_template show_settings
 	 */
 	public function action_index()
 	{
@@ -176,10 +180,10 @@ class ManageFeatures_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context;
 
-		// initialize the form
+		// Initialize the form
 		$this->_initBasicSettingsForm();
 
-		// retrieve the current config settings
+		// Retrieve the current config settings
 		$config_vars = $this->_basicSettings->settings();
 
 		// Saving?
@@ -274,17 +278,16 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * Display configuration settings page for karma settings.
-	 * Accessed  from ?action=admin;area=featuresettings;sa=karma;
-	 *
+	 * Accessed from ?action=admin;area=featuresettings;sa=karma;
 	 */
 	public function action_karmaSettings_display()
 	{
 		global $txt, $scripturl, $context;
 
-		// initialize the form
+		// Initialize the form
 		$this->_initKarmaSettingsForm();
 
-		// retrieve the current config settings
+		// Retrieve the current config settings
 		$config_vars = $this->_karmaSettings->settings();
 
 		// Saving?
@@ -323,13 +326,13 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * Display configuration settings page for likes settings.
-	 * Accessed  from ?action=admin;area=featuresettings;sa=likes;
+	 * Accessed from ?action=admin;area=featuresettings;sa=likes;
 	 */
 	public function action_likesSettings_display()
 	{
 		global $txt, $scripturl, $context;
 
-		// initialize the form
+		// Initialize the form
 		$this->_initLikesSettingsForm();
 
 		// retrieve the current config settings
@@ -371,6 +374,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * Initializes the mentions settings admin page.
+	 * Accessed from ?action=admin;area=featuresettings;sa=mentions;
 	 */
 	public function action_mentionSettings_display()
 	{
@@ -422,15 +426,16 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * Display configuration settings for signatures on forum.
+	 * Accessed from ?action=admin;area=featuresettings;sa=sig;
 	 */
 	public function action_signatureSettings_display()
 	{
 		global $context, $txt, $modSettings, $sig_start, $scripturl;
 
-		// initialize the form
+		// Initialize the form
 		$this->_initSignatureSettingsForm();
 
-		// retrieve the current config settings
+		// Retrieve the current config settings
 		$config_vars = $this->_signatureSettings->settings();
 
 		// Setup the template.
@@ -758,6 +763,11 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * Show all the custom profile fields available to the user.
+	 * Allows for drag/drop sorting of custom profile fields
+	 *
+	 * Accessed with ?action=admin;area=featuresettings;sa=profile
+	 *
+	 * @uses sub template show_custom_profile
 	 */
 	public function action_profile()
 	{
@@ -1021,6 +1031,9 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * Edit some profile fields?
+	 * Accessed with ?action=admin;area=featuresettings;sa=profileedit
+	 *
+	 * @uses sub template edit_profile_field
 	 */
 	public function action_profileedit()
 	{
@@ -1144,6 +1157,7 @@ class ManageFeatures_Controller extends Action_Controller
 					if (isset($_POST['default_select']) && $_POST['default_select'] == $k)
 						$default = $v;
 				}
+
 				$field_options = substr($field_options, 0, -1);
 			}
 
@@ -1293,6 +1307,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * Editing personal messages settings
+	 * Accessed with ?action=admin;area=featuresettings;sa=pmsettings
 	 */
 	public function action_pmsettings()
 	{

@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Controls execution for admin actions in the bans area
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -49,6 +51,7 @@ class ManageBans_Controller extends Action_Controller
 		// Default the sub-action to 'view ban list'.
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'list';
 
+		// Prepare some items for the template
 		$context['page_title'] = $txt['ban_title'];
 		$context['sub_action'] = $subAction;
 
@@ -102,6 +105,7 @@ class ManageBans_Controller extends Action_Controller
 		global $txt, $context, $scripturl, $user_info;
 
 		require_once(SUBSDIR . '/Bans.subs.php');
+
 		// User pressed the 'remove selection button'.
 		if (!empty($_POST['removeBans']) && !empty($_POST['remove']) && is_array($_POST['remove']))
 		{
@@ -127,6 +131,7 @@ class ManageBans_Controller extends Action_Controller
 		else
 			$context['ban_time_format'] = $matches[0];
 
+		// Lets build a nice create list to show them the bans
 		$listOptions = array(
 			'id' => 'ban_list',
 			'title' => $txt['ban_title'],
@@ -283,6 +288,7 @@ class ManageBans_Controller extends Action_Controller
 	 * Adding new bans:
 	 *  - is accesssed by ?action=admin;area=ban;sa=add.
 	 *  - uses the ban_edit sub template of the ManageBans template.
+	 *
 	 * Modifying existing bans:
 	 *  - is accesssed by ?action=admin;area=ban;sa=edit;bg=x
 	 *  - uses the ban_edit sub template of the ManageBans template.
@@ -293,6 +299,7 @@ class ManageBans_Controller extends Action_Controller
 		global $txt, $modSettings, $context, $scripturl;
 
 		require_once(SUBSDIR . '/Bans.subs.php');
+
 		$ban_errors = Error_Context::context('ban', 1);
 
 		if ((isset($_POST['add_ban']) || isset($_POST['modify_ban']) || isset($_POST['remove_selection'])) && !$ban_errors->hasErrors())
@@ -321,6 +328,7 @@ class ManageBans_Controller extends Action_Controller
 				// We're going to want this for making our list.
 				require_once(SUBSDIR . '/List.class.php');
 
+				// Setup for a createlist
 				$listOptions = array(
 					'id' => 'ban_items',
 					'base_href' => $scripturl . '?action=admin;area=ban;sa=edit;bg=' . $ban_group_id,
@@ -460,6 +468,7 @@ class ManageBans_Controller extends Action_Controller
 
 						// Default the ban name to the name of the banned member.
 						$context['ban']['name'] = $context['ban_suggestions']['member']['name'];
+
 						// @todo: there should be a better solution...used to lock the "Ban on Username" input when banning from profile
 						$context['ban']['from_user'] = true;
 
@@ -484,6 +493,7 @@ class ManageBans_Controller extends Action_Controller
 	 * This handles the listing of ban log entries, and allows their deletion.
 	 * Shows a list of logged access attempts by banned users.
 	 * It is accessed by ?action=admin;area=ban;sa=log.
+	 *
 	 * How it works:
 	 *  - allows sorting of several columns.
 	 *  - also handles deletion of (a selection of) log entries.
@@ -511,6 +521,7 @@ class ManageBans_Controller extends Action_Controller
 			}
 		}
 
+		// Build a nice log list for viewing
 		$listOptions = array(
 			'id' => 'ban_log',
 			'title' => $txt['ban_log'],
@@ -620,6 +631,7 @@ class ManageBans_Controller extends Action_Controller
 
 		createToken('admin-bl');
 
+		// Build the list
 		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
@@ -684,6 +696,7 @@ class ManageBans_Controller extends Action_Controller
 			$saved_triggers = saveTriggers($_POST['ban_suggestions'], $ban_info['id'], isset($_REQUEST['u']) ? (int) $_REQUEST['u'] : 0, isset($_REQUEST['bi']) ? (int) $_REQUEST['bi'] : 0);
 			$context['ban_suggestions']['saved_triggers'] = $saved_triggers;
 		}
+
 		// Something went wrong somewhere... Oh well, let's go back.
 		if ($ban_errors->hasErrors())
 		{
@@ -717,9 +730,11 @@ class ManageBans_Controller extends Action_Controller
 	/**
 	 * This function handles the ins and outs of the screen for adding new ban
 	 * triggers or modifying existing ones.
+	 *
 	 * Adding new ban triggers:
 	 *  - is accessed by ?action=admin;area=ban;sa=edittrigger;bg=x
 	 *  - uses the ban_edit_trigger sub template of ManageBans.
+	 *
 	 * Editing existing ban triggers:
 	 *  - is accessed by ?action=admin;area=ban;sa=edittrigger;bg=x;bi=y
 	 *  - uses the ban_edit_trigger sub template of ManageBans.
@@ -759,6 +774,7 @@ class ManageBans_Controller extends Action_Controller
 			redirectexit('action=admin;area=ban;sa=edit' . (!empty($ban_group) ? ';bg=' . $ban_group : ''));
 		}
 
+		// The template uses the autosuggest functions
 		loadJavascriptFile('suggest.js', array('default_theme' => true, 'defer' => true), 'suggest.js');
 
 		if (empty($ban_id))
