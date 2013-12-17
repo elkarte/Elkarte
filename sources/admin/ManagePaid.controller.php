@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * This file contains all the administration functions for subscriptions.
+ * (and some more than that :P)
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,9 +15,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file contains all the administration functions for subscriptions.
- * (and some more than that :P)
  *
  */
 
@@ -533,6 +533,7 @@ class ManagePaid_Controller extends Action_Controller
 
 				updateSubscription($update, $ignore_active);
 			}
+
 			call_integration_hook('integrate_save_subscription', array(($context['action_type'] == 'add' ? $sub_id : $context['sub_id']), $_POST['name'], $_POST['desc'], $isActive, $span, $cost, $_POST['prim_group'], $addgroups, $isRepeatable, $allowpartial, $emailComplete, $reminder));
 
 			redirectexit('action=admin;area=paidsubscribe;view');
@@ -785,6 +786,7 @@ class ManagePaid_Controller extends Action_Controller
 
 		if (!isset($context['subscriptions'][$context['sub_id']]))
 			fatal_lang_error('no_access', false);
+		
 		$context['current_subscription'] = $context['subscriptions'][$context['sub_id']];
 
 		// Searching?
@@ -908,7 +910,7 @@ class ManagePaid_Controller extends Action_Controller
 			if (isset($_GET['uid']))
 			{
 				require_once(SUBSDIR . '/Members.subs.php');
-				
+
 				// Get the latest activated member's display name.
 				$result = getBasicMemberData((int) $_GET['uid']);
 				$context['sub']['username'] = $result['real_name'];

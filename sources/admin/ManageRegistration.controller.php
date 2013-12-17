@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * This file helps the administrator setting registration settings and policy
+ * as well as allow the administrator to register new members themselves.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,9 +15,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file helps the administrator setting registration settings and policy
- * as well as allow the administrator to register new members themselves.
  *
  */
 
@@ -184,6 +184,7 @@ class ManageRegistration_Controller extends Action_Controller
 		}
 		else
 			$context['member_groups'] = array();
+
 		// Basic stuff.
 		$context['sub_template'] = 'admin_register';
 		$context['page_title'] = $txt['registration_center'];
@@ -301,7 +302,7 @@ class ManageRegistration_Controller extends Action_Controller
 	{
 		global $txt, $context, $scripturl, $modSettings;
 
-		// initialize the form
+		// Initialize the form
 		$this->_init_registerSettingsForm();
 
 		$config_vars = $this->_registerSettings->settings();
@@ -372,8 +373,6 @@ class ManageRegistration_Controller extends Action_Controller
 
 	/**
 	 * Return configuration settings for new members registration.
-	 *
-	 * @return array;
 	 */
 	private function _settings()
 	{

@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * This file concerns itself almost completely with theme administration.
+ * Its tasks include changing theme settings, installing and removing
+ * themes, choosing the current theme, and editing themes.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -13,14 +17,11 @@
  *
  * @version 1.0 Beta
  *
- * This file concerns itself almost completely with theme administration.
- * Its tasks include changing theme settings, installing and removing
- * themes, choosing the current theme, and editing themes.
  *
  * @todo Update this for the new package manager?
  *
  * Creating and distributing theme packages:
- *  There isn't that much required to package and distribute your own themes...
+ * There isn't that much required to package and distribute your own themes...
  * just do the following:
  *  - create a theme_info.xml file, with the root element theme-info.
  *  - its name should go in a name element, just like description.
@@ -31,7 +32,6 @@
  *  - any extra rows for themes should go in extra, serialized. (as in array(variable => value).)
  *  - tar and gzip the directory - and you're done!
  *  - please include any special license in a license.txt file.
- *
  */
 
 if (!defined('ELK'))
@@ -122,12 +122,18 @@ class ManageThemes_Controller extends Action_Controller
 		$action->dispatch($subAction);
 	}
 
+	/**
+	 * Responds to an ajax button request, currently only for remove
+	 *
+	 * @uses generic_xml_buttons sub template
+	 */
 	public function action_index_api()
 	{
 		global $txt, $context, $user_info;
 
 		loadTemplate('Xml');
 
+		// Remove any template layers that may have been created, this is XML!
 		Template_Layers::getInstance()->removeAll();
 		$context['sub_template'] = 'generic_xml_buttons';
 
@@ -139,6 +145,7 @@ class ManageThemes_Controller extends Action_Controller
 				'error' => 1,
 				'text' => $txt['not_guests']
 			);
+
 			return;
 		}
 
@@ -460,6 +467,7 @@ class ManageThemes_Controller extends Action_Controller
 		loadTheme($_GET['th'], false);
 
 		loadLanguage('Profile');
+
 		// @todo Should we just move these options so they are no longer theme dependant?
 		loadLanguage('PersonalMessage');
 
@@ -737,12 +745,20 @@ class ManageThemes_Controller extends Action_Controller
 		redirectexit('action=admin;area=theme;sa=list;' . $context['session_var'] . '=' . $context['session_id']);
 	}
 
+	/**
+	 * Remove a theme from the database in response to an ajax api request
+	 *
+	 * - removes an installed theme.
+	 * - requires an administrator.
+	 * - accessed with ?action=admin;area=theme;sa=remove;api
+	 */
 	public function action_remove_api()
 	{
 		global $modSettings, $context, $txt;
 
 		require_once(SUBSDIR . '/Themes.subs.php');
 
+		// Validate what was sent
 		if (checkSession('get', '', false))
 		{
 			loadLanguage('Errors');
@@ -753,6 +769,7 @@ class ManageThemes_Controller extends Action_Controller
 			return;
 		}
 
+		// Not just any John Smith can send in a api request
 		if (!allowedTo('admin_forum'))
 		{
 			loadLanguage('Errors');
@@ -763,6 +780,7 @@ class ManageThemes_Controller extends Action_Controller
 			return;
 		}
 
+		// Even if you are John Smith, you still neeed a ticket
 		if (!validateToken('admin-tr', 'request', true, false))
 		{
 			loadLanguage('Errors');
@@ -770,6 +788,7 @@ class ManageThemes_Controller extends Action_Controller
 				'error' => 1,
 				'text' => $txt['token_verify_fail'],
 			);
+
 			return;
 		}
 
@@ -787,6 +806,7 @@ class ManageThemes_Controller extends Action_Controller
 			return;
 		}
 
+		// It is a theme we know about?
 		$known = explode(',', $modSettings['knownThemes']);
 		for ($i = 0, $n = count($known); $i < $n; $i++)
 		{
@@ -794,6 +814,7 @@ class ManageThemes_Controller extends Action_Controller
 				unset($known[$i]);
 		}
 
+		// Finally, remove it
 		deleteTheme($_GET['th']);
 
 		$known = strtr(implode(',', $known), array(',,' => ','));
@@ -804,6 +825,7 @@ class ManageThemes_Controller extends Action_Controller
 		else
 			updateSettings(array('knownThemes' => $known));
 
+		// Let them know it worked, all without a page refresh
 		createToken('admin-tr', 'request');
 		$context['xml_data'] = array(
 			'success' => 1,
@@ -818,6 +840,8 @@ class ManageThemes_Controller extends Action_Controller
 	 * - can edit everyone's (u = 0), guests' (u = -1), or a specific user's.
 	 * - uses the Themes template. (pick sub template.)
 	 * - accessed with ?action=admin;area=theme;sa=pick.
+	 * @uses Profile language text
+	 * @uses ManageThemes template
 	 * @todo thought so... Might be better to split this file in ManageThemes and Themes,
 	 * with centralized admin permissions on ManageThemes.
 	 */
@@ -981,6 +1005,7 @@ class ManageThemes_Controller extends Action_Controller
 	 * - puts themes in $boardurl/Themes.
 	 * - assumes the gzip has a root directory in it. (ie default.)
 	 * Requires admin_forum.
+	 * @uses ManageThemes template
 	 * Accessed with ?action=admin;area=theme;sa=install.
 	 */
 	public function action_install()

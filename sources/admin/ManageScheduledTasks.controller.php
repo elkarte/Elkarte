@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This file concerns itself with scheduled tasks management.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -13,13 +15,15 @@
  *
  * @version 1.0 Beta
  *
- * This file concerns itself with scheduled tasks management.
- *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * ManageScheduledTasks admin Controller: handles the administration pages
+ * which allow to see and edit and run the systems scheduled tasks
+ */
 class ManageScheduledTasks_Controller extends Action_Controller
 {
 	/**
@@ -157,6 +161,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 			redirectexit('action=admin;area=scheduledtasks;done');
 		}
 
+		// Build the list so we can see the tasks
 		$listOptions = array(
 			'id' => 'scheduled_tasks',
 			'title' => $txt['maintain_tasks'],

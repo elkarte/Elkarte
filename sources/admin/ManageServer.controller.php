@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * Contains all the functionality required to be able to edit the core server settings.
+ * This includes anything from which an error may result in the forum destroying itself in a firey fury.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -13,10 +16,9 @@
  *
  * @version 1.0 Beta
  *
- * Contains all the functionality required to be able to edit the core server settings.
- * This includes anything from which an error may result in the forum destroying itself in a firey fury.
  *
- * Adding options to one of the setting screens isn't hard. Call prepareDBSettingsContext;
+ * Adding options to one of the setting screens isn't hard.
+ * Call prepareDBSettingsContext;
  * The basic format for a checkbox is:
  *     array('check', 'nameInModSettingsAndSQL'),
  * And for a text box:
@@ -24,7 +26,7 @@
  * (NOTE: You have to add an entry for this at the bottom!)
  *
  * In these cases, it will look for $txt['nameInModSettingsAndSQL'] as the description,
- * and $helptxt['nameInModSettingsAndSQL'] as the help popup description.
+ * and $helptxt['nameInModSettingsAndSQL'] as the (?) help popup description.
  *
  * Here's a quick explanation of how to add a new item:
  *
@@ -50,27 +52,22 @@
  *
  * For each option:
  *  - type (see above), variable name, size/possible values.
- *    OR make type '' for an empty string for a horizontal rule.
+ *		OR make type '' for an empty string for a horizontal rule.
  *  - SET preinput - to put some HTML prior to the input box.
  *  - SET postinput - to put some HTML following the input box.
  *  - SET invalid - to mark the data as invalid.
  *  - PLUS you can override label and help parameters by forcing their keys in the array, for example:
  *    array('text', 'invalidlabel', 3, 'label' => 'Actual Label')
- *
  */
 
 if (!defined('ELK'))
 	die('No access...');
-
-// We're working with them settings here.
-require_once(SUBSDIR . '/Settings.class.php');
 
 /**
  * ManageServer administration pages controller.
  * This handles several screens, with low-level essential settings such as
  * database settings, cache, general forum settings, and others.
  * It sends the data for display, and it allows the admin to change it.
- *
  */
 class ManageServer_Controller extends Action_Controller
 {
@@ -118,6 +115,9 @@ class ManageServer_Controller extends Action_Controller
 	public function action_index()
 	{
 		global $context, $txt;
+
+		// We're working with them settings here.
+		require_once(SUBSDIR . '/Settings.class.php');
 
 		// The settings are in here, I swear!
 		loadLanguage('ManageSettings');
@@ -188,79 +188,6 @@ class ManageServer_Controller extends Action_Controller
 	}
 
 	/**
-	 * Initialize _databaseSettings form.
-	 */
-	private function _initDatabaseSettingsForm()
-	{
-		// instantiate the form
-		$this->_databaseSettingsForm = new Settings_Form();
-		$config_vars = $this->_databaseSettings();
-
-		// Set them vars for our settings form
-		return $this->_databaseSettingsForm->settings($config_vars);
-	}
-
-	/**
-	 * Initialize _generalSettings form.
-	 */
-	private function _initGeneralSettingsForm()
-	{
-		// Start the form
-		$this->_generalSettingsForm = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_generalSettings();
-
-		// Set them vars for our settings form
-		return $this->_generalSettingsForm->settings($config_vars);
-	}
-
-	/**
-	 * Initialize _cookieSettings form.
-	 */
-	private function _initCookieSettingsForm()
-	{
-		// Start a new form
-		$this->_cookieSettingsForm = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_cookieSettings();
-
-		// Set them vars for our settings form
-		return $this->_cookieSettingsForm->settings($config_vars);
-	}
-
-	/**
-	 * Initialize _cacheSettings form.
-	 */
-	private function _initCacheSettingsForm()
-	{
-		// We need a setting form
-		$this->_cacheSettingsForm = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_cacheSettings();
-
-		// Set them vars for our settings form
-		return $this->_cacheSettingsForm->settings($config_vars);
-	}
-
-	/**
-	 * Initialize balancingSettings form.
-	 */
-	private function _initBalancingSettingsForm()
-	{
-		// Forms, we need them
-		$this->_balancingSettingsForm = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_balancingSettings();
-
-		// Set them vars for our settings form
-		return $this->_balancingSettingsForm->settings($config_vars);
-	}
-
-	/**
 	 * General forum settings - forum name, maintenance mode, etc.
 	 * Practically, this shows an interface for the settings in Settings.php to be changed.
 	 *
@@ -297,6 +224,21 @@ class ManageServer_Controller extends Action_Controller
 
 		// Fill the config array for the template and all that.
 		$this->_generalSettingsForm->prepare_file();
+	}
+
+	/**
+	 * Initialize _generalSettings form.
+	 */
+	private function _initGeneralSettingsForm()
+	{
+		// Start the form
+		$this->_generalSettingsForm = new Settings_Form();
+
+		// Initialize it with our settings
+		$config_vars = $this->_generalSettings();
+
+		// Set them vars for our settings form
+		return $this->_generalSettingsForm->settings($config_vars);
 	}
 
 	/**
@@ -337,6 +279,19 @@ class ManageServer_Controller extends Action_Controller
 
 		// Fill the config array for the template.
 		$this->_databaseSettingsForm->prepare_file();
+	}
+
+	/**
+	 * Initialize _databaseSettings form.
+	 */
+	private function _initDatabaseSettingsForm()
+	{
+		// instantiate the form
+		$this->_databaseSettingsForm = new Settings_Form();
+		$config_vars = $this->_databaseSettings();
+
+		// Set them vars for our settings form
+		return $this->_databaseSettingsForm->settings($config_vars);
 	}
 
 	/**
@@ -430,6 +385,21 @@ class ManageServer_Controller extends Action_Controller
 	}
 
 	/**
+	 * Initialize _cookieSettings form.
+	 */
+	private function _initCookieSettingsForm()
+	{
+		// Start a new form
+		$this->_cookieSettingsForm = new Settings_Form();
+
+		// Initialize it with our settings
+		$config_vars = $this->_cookieSettings();
+
+		// Set them vars for our settings form
+		return $this->_cookieSettingsForm->settings($config_vars);
+	}
+
+	/**
 	 * Cache settings editing and submission.
 	 * This method handles the display, allows to edit, and saves the result
 	 * for _cacheSettings form.
@@ -481,6 +451,21 @@ class ManageServer_Controller extends Action_Controller
 	}
 
 	/**
+	 * Initialize _cacheSettings form.
+	 */
+	private function _initCacheSettingsForm()
+	{
+		// We need a setting form
+		$this->_cacheSettingsForm = new Settings_Form();
+
+		// Initialize it with our settings
+		$config_vars = $this->_cacheSettings();
+
+		// Set them vars for our settings form
+		return $this->_cacheSettingsForm->settings($config_vars);
+	}
+
+	/**
 	 * Allows to edit load balancing settings.
 	 *
 	 * This method handles the display, allows to edit, and saves the result
@@ -526,6 +511,21 @@ class ManageServer_Controller extends Action_Controller
 		createToken('admin-ssc');
 		createToken('admin-dbsc');
 		$this->_balancingSettingsForm->prepare_db($config_vars);
+	}
+
+	/**
+	 * Initialize balancingSettings form.
+	 */
+	private function _initBalancingSettingsForm()
+	{
+		// Forms, we need them
+		$this->_balancingSettingsForm = new Settings_Form();
+
+		// Initialize it with our settings
+		$config_vars = $this->_balancingSettings();
+
+		// Set them vars for our settings form
+		return $this->_balancingSettingsForm->settings($config_vars);
 	}
 
 	/**
@@ -748,7 +748,7 @@ class ManageServer_Controller extends Action_Controller
 		if (function_exists('file_put_contents'))
 			$detected['filebased'] = $txt['default_cache'];
 
-		// set our values to show what, if anything, we found
+		// Set our values to show what, if anything, we found
 		if (empty($detected))
 		{
 			$txt['cache_settings_message'] = $txt['detected_no_caching'];
@@ -791,8 +791,7 @@ class ManageServer_Controller extends Action_Controller
 	{
 		global $txt, $modSettings, $context;
 
-		// initialize settings for the form to show
-		// disabled by default.
+		// Initialize settings for the form to show, disabled by default.
 		$disabled = true;
 		$context['settings_message'] = $txt['loadavg_disabled_conf'];
 

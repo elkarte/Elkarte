@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This file contains all the screens that relate to search engines.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,8 +14,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file contains all the screens that relate to search engines.
  *
  */
 
@@ -81,7 +81,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 	{
 		global $context, $txt, $scripturl;
 
-		// initialize the form
+		// Initialize the form
 		$this->_initEngineSettingsForm();
 
 		$config_vars = $this->_engineSettings->settings();
@@ -89,23 +89,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 		// Set up a message.
 		$context['settings_message'] = sprintf($txt['spider_settings_desc'], $scripturl . '?action=admin;area=logs;sa=pruning;' . $context['session_var'] . '=' . $context['session_id']);
 
-		// Do some javascript.
-		$javascript_function = '
-			function disableFields()
-			{
-				disabledState = document.getElementById(\'spider_mode\').value == 0;';
-
-		foreach ($config_vars as $variable)
-			if ($variable[1] != 'spider_mode')
-				$javascript_function .= '
-				if (document.getElementById(\'' . $variable[1] . '\'))
-					document.getElementById(\'' . $variable[1] . '\').disabled = disabledState;';
-
-		$javascript_function .= '
-			}
-			disableFields();';
-
-		// notify the integration that we're preparing to mess up with search engine settings...
+		// Notify the integration that we're preparing to mess up with search engine settings...
 		call_integration_hook('integrate_modify_search_engine_settings', array(&$config_vars));
 
 		require_once(SUBSDIR . '/SearchEngines.subs.php');
@@ -148,6 +132,24 @@ class ManageSearchEngines_Controller extends Action_Controller
 		// Set up some details for the template.
 		$context['post_url'] = $scripturl . '?action=admin;area=sengines;save;sa=settings';
 		$context['settings_title'] = $txt['settings'];
+
+		// Do some javascript.
+		$javascript_function = '
+			function disableFields()
+			{
+				disabledState = document.getElementById(\'spider_mode\').value == 0;';
+
+		foreach ($config_vars as $variable)
+		{
+			if ($variable[1] != 'spider_mode')
+				$javascript_function .= '
+				if (document.getElementById(\'' . $variable[1] . '\'))
+					document.getElementById(\'' . $variable[1] . '\').disabled = disabledState;';
+		}
+
+		$javascript_function .= '
+			}
+			disableFields();';
 		addInlineJavascript($javascript_function, true);
 
 		// Prepare the settings...
@@ -234,7 +236,10 @@ class ManageSearchEngines_Controller extends Action_Controller
 		// Get the last seens.
 		$context['spider_last_seen'] = spidersLastSeen();
 
+		// Token for the ride
 		createToken('admin-ser');
+
+		// Build the list
 		$listOptions = array(
 			'id' => 'spider_list',
 			'title' => $txt['spiders'],
@@ -359,8 +364,8 @@ class ManageSearchEngines_Controller extends Action_Controller
 			checkSession();
 			validateToken('admin-ses');
 
-			$ips = array();
 			// Check the IP range is valid.
+			$ips = array();
 			$ip_sets = explode(',', $_POST['spider_ip']);
 			foreach ($ip_sets as $set)
 			{
@@ -422,6 +427,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 			removeSpiderOldLogs($deleteTime);
 		}
 
+		// Build out the spider log list
 		$listOptions = array(
 			'id' => 'spider_logs',
 			'items_per_page' => 20,
@@ -512,9 +518,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 			require_once(SUBSDIR . '/Who.subs.php');
 			$urls = determineActions($urls, 'whospider_');
 			foreach ($urls as $k => $new_url)
-			{
 				$context['spider_logs']['rows'][$k]['viewing']['value'] = $new_url;
-			}
 		}
 
 		$context['page_title'] = $txt['spider_logs'];

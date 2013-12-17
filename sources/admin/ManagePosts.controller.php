@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Handles all the administration settings for topics and posts.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -207,7 +209,7 @@ class ManagePosts_Controller extends Action_Controller
 	{
 		global $context, $txt, $modSettings, $scripturl, $db_type;
 
-		// initialize the form
+		// Initialize the form
 		$this->_initPostSettingsForm();
 
 		$config_vars = $this->_postSettings->settings();
@@ -260,7 +262,6 @@ class ManagePosts_Controller extends Action_Controller
 	 */
 	private function _initPostSettingsForm()
 	{
-
 		// Instantiate the form
 		$this->_postSettings = new Settings_Form();
 
@@ -277,7 +278,7 @@ class ManagePosts_Controller extends Action_Controller
 	{
 		global $txt;
 
-		// initialize it with our settings
+		// Initialize it with our settings
 		$config_vars = array(
 				// Simple post options...
 				array('check', 'removeNestedQuotes'),

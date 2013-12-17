@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * The moderation log is this file's only job. It views it, and that's about all it does.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,9 +14,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * The moderation log is this file's only job.
- * It views it, and that's about all it does.
  *
  */
 
@@ -35,7 +34,7 @@ class Modlog_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		// we haz nothing to do. :P
+		// We haz nothing to do. :P
 		$this->action_log();
 	}
 
@@ -53,8 +52,10 @@ class Modlog_Controller extends Action_Controller
 		global $txt, $context, $scripturl;
 
 		require_once(SUBSDIR . '/Modlog.subs.php');
+
 		// Are we looking at the moderation log or the administration log.
 		$context['log_type'] = isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'adminlog' ? 3 : 1;
+
 		if ($context['log_type'] == 3)
 			isAllowedTo('admin_forum');
 
@@ -72,6 +73,7 @@ class Modlog_Controller extends Action_Controller
 
 		// The number of entries to show per page of log file.
 		$context['displaypage'] = 30;
+		
 		// Amount of hours that must pass before allowed to delete file.
 		$context['hoursdisable'] = 24;
 
