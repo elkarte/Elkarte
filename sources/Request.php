@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This parses PHP server variables, and initializes its own checking variables for use
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,6 +11,11 @@
  *
  */
 
+/**
+ * Class to parse $_REQUEST for always necessary data, such as 'action', 'board', 'topic', 'start'.
+ * Sanitizes the necessary data
+ * Determines the origin of $_REQUEST for use in security checks
+ */
 class Request
 {
 	/**
@@ -127,7 +134,7 @@ class Request
 		else
 			$this->_client_ip = $_SERVER['REMOTE_ADDR'];
 
-		// second IP, guesswork it is, try to get the best IP we can, when using proxies or such
+		// Second IP, guesswork it is, try to get the best IP we can, when using proxies or such
 		$this->_ban_ip = $this->_client_ip;
 
 		// Forwarded, maybe?
@@ -139,6 +146,7 @@ class Request
 			else
 				$this->_ban_ip = $_SERVER['HTTP_CLIENT_IP'];
 		}
+
 		if (!empty($_SERVER['HTTP_CLIENT_IP']) && (preg_match('~^((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown|::1|fe80::|fc00::)~', $_SERVER['HTTP_CLIENT_IP']) == 0 || preg_match('~^((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown|::1|fe80::|fc00::)~', $this->_client_ip) != 0))
 		{
 			// Since they are in different blocks, it's probably reversed.
@@ -174,24 +182,24 @@ class Request
 		// Some final checking.
 		if (preg_match('~^((([1]?\d)?\d|2[0-4]\d|25[0-5])\.){3}(([1]?\d)?\d|2[0-4]\d|25[0-5])$~', $this->_ban_ip) === 0 || !isValidIPv6($this->_ban_ip))
 			$this->_ban_ip = '';
+
 		if ($this->_client_ip == 'unknown')
 			$this->_client_ip = '';
 
-		// keep compatibility with the uses of $_SERVER['REMOTE_ADDR']...
+		// Keep compatibility with the uses of $_SERVER['REMOTE_ADDR']...
 		$_SERVER['REMOTE_ADDR'] = $this->_client_ip;
 
-		// set the scheme, for later use
+		// Set the scheme, for later use
 		$this->_scheme = (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on') ? 'https' : 'http';
 
-		// make sure we know everything about you... HTTP_USER_AGENT!
+		// Make sure we know everything about you... HTTP_USER_AGENT!
 		$this->_user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? htmlspecialchars($_SERVER['HTTP_USER_AGENT'], ENT_QUOTES, 'UTF-8') : '';
 
-		// keep compatibility with the uses of $_SERVER['HTTP_USER_AGENT']...
+		// Keep compatibility with the uses of $_SERVER['HTTP_USER_AGENT']...
 		$_SERVER['HTTP_USER_AGENT'] = $this->_user_agent;
 
-		// we want to know who we are, too :P
+		// We want to know who we are, too :P
 		$this->_server_software = isset($_SERVER['SERVER_SOFTWARE']) ? $_SERVER['SERVER_SOFTWARE'] : '';
-
 	}
 
 	/**
@@ -202,19 +210,19 @@ class Request
 	{
 		global $board, $topic;
 
-		// parse the request for our dear globals, I know
+		// Parse the request for our dear globals, I know
 		// they're in there somewhere...
 
-		// look for $board first
+		// Look for $board first
 		if (isset($_REQUEST['board']))
 		{
 			// Make sure it's a string (not an array, say)
 			$_REQUEST['board'] = (string) $_REQUEST['board'];
 
-			// if we have ?board=3/10, that's... board=3, start=10! (old, compatible links.)
+			// If we have ?board=3/10, that's... board=3, start=10! (old, compatible links.)
 			if (strpos($_REQUEST['board'], '/') !== false)
 				list ($_REQUEST['board'], $_REQUEST['start']) = explode('/', $_REQUEST['board']);
-			// or perhaps we have... ?board=1.0...
+			// Or perhaps we have... ?board=1.0...
 			elseif (strpos($_REQUEST['board'], '.') !== false)
 				list ($_REQUEST['board'], $_REQUEST['start']) = explode('.', $_REQUEST['board']);
 
@@ -233,16 +241,16 @@ class Request
 		if (isset($_REQUEST['threadid']) && !isset($_REQUEST['topic']))
 			$_REQUEST['topic'] = $_REQUEST['threadid'];
 
-		// look for $topic
+		// Look for $topic
 		if (isset($_REQUEST['topic']))
 		{
 			// Make sure it's a string (not an array, say)
 			$_REQUEST['topic'] = (string) $_REQUEST['topic'];
 
-			// it might come as ?topic=1/15, from an old, SMF beta style link
+			// It might come as ?topic=1/15, from an old, SMF beta style link
 			if (strpos($_REQUEST['topic'], '/') !== false)
 				list ($_REQUEST['topic'], $_REQUEST['start']) = explode('/', $_REQUEST['topic']);
-			// or it might come as ?topic=1.15.
+			// Or it might come as ?topic=1.15.
 			elseif (strpos($_REQUEST['topic'], '.') !== false)
 				list ($_REQUEST['topic'], $_REQUEST['start']) = explode('.', $_REQUEST['topic']);
 
@@ -265,11 +273,11 @@ class Request
 		// The action needs to be a string, too.
 		if (isset($_REQUEST['action']))
 			$_REQUEST['action'] = (string) $_REQUEST['action'];
+
 		if (isset($_GET['action']))
 			$_GET['action'] = (string) $_GET['action'];
 
 		$this->_xml = (isset($_SERVER['X_REQUESTED_WITH']) && $_SERVER['X_REQUESTED_WITH'] == 'XMLHttpRequest') || isset($_REQUEST['xml']);
-
 	}
 
 	/**

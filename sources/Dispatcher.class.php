@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * Primary site dispatch controller, sends the request to the function or method
+ * registered to handle it.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -29,22 +32,26 @@ if (!defined('ELK'))
 class Site_Dispatcher
 {
 	/**
-	 * file name to load
+	 * File name to load
+	 * @var string
 	 */
 	private $_file_name;
 
 	/**
-	 * function or method to call
+	 * Function or method to call
+	 * @var string
 	 */
 	private $_function_name;
 
 	/**
-	 * class name, for object oriented controllers
+	 * Class name, for object oriented controllers
+	 * @var string
 	 */
 	private $_controller_name;
 
 	/**
-	 * name of pre_dispatch function, for procedural controllers
+	 * Name of pre_dispatch function, for procedural controllers
+	 * @var string
 	 */
 	private $_pre_dispatch_func;
 
@@ -56,8 +63,8 @@ class Site_Dispatcher
 	{
 		global $board, $topic, $modSettings, $settings, $user_info, $maintenance;
 
-		// default action of the forum: board index
-		// everytime we don't know what to do, we'll do this :P
+		// Default action of the forum: board index
+		// Everytime we don't know what to do, we'll do this :P
 		$default_action = array(
 			'file' => CONTROLLERDIR . '/BoardIndex.controller.php',
 			'controller' => 'BoardIndex_Controller',
@@ -91,13 +98,13 @@ class Site_Dispatcher
 		}
 		elseif (empty($_GET['action']))
 		{
-			// home page: board index
+			// Home page: board index
 			if (empty($board) && empty($topic))
 			{
 				// Reminder: hooks need to account for multiple addons setting this hook.
 				call_integration_hook('integrate_frontpage', array(&$default_action));
 
-				// was it, wasn't it....
+				// Was it, wasn't it....
 				if (empty($this->_function_name))
 				{
 					$this->_file_name = $default_action['file'];
@@ -122,7 +129,7 @@ class Site_Dispatcher
 			}
 		}
 
-		// now this return won't be cool, but lets do it
+		// Now this return won't be cool, but lets do it
 		if (!empty($this->_file_name) && !empty($this->_function_name))
 			return;
 
@@ -205,53 +212,53 @@ class Site_Dispatcher
 		// Is it in core legacy actions?
 		if (isset($actionArray[$_GET['action']]))
 		{
-			// admin files have their own place
+			// Admin files have their own place
 			$path = in_array($_GET['action'], $adminActions) ? ADMINDIR : CONTROLLERDIR;
 
-			// is it an object oriented controller?
+			// Is it an object oriented controller?
 			if (isset($actionArray[$_GET['action']][2]))
 			{
 				$this->_file_name = $path . '/' . $actionArray[$_GET['action']][0];
 				$this->_controller_name = $actionArray[$_GET['action']][1];
 
-				// if the method is coded in, use it
+				// If the method is coded in, use it
 				if (!empty($actionArray[$_GET['action']][2]))
 					$this->_function_name = $actionArray[$_GET['action']][2];
-				// otherwise fall back to naming patterns
+				// Otherwise fall back to naming patterns
 				elseif (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
 					$this->_function_name = 'action_' . $_GET['sa'];
 				else
 					$this->_function_name = 'action_index';
 			}
-			// then it's one of our legacy functions
+			// Then it's one of our legacy functions
 			else
 			{
 				$this->_file_name = $path . '/' . $actionArray[$_GET['action']][0];
 				$this->_function_name = $actionArray[$_GET['action']][1];
 			}
 		}
-		// fall back to naming patterns.
+		// Fall back to naming patterns.
 		// addons can use any of them, and it should Just Work (tm).
 		elseif (preg_match('~^[a-zA-Z_\\-]+$~', $_GET['action']))
 		{
 			// action=drafts => Drafts.php
 			// sa=save, sa=load, or sa=savepm => action_save(), action_load()
-			// ... if it ain't there yet, no problem.
+			// ... if it's not there yet, no problem.
 			if (file_exists(CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.php'))
 			{
 				$this->_file_name = CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.php';
 
-				// procedural controller... we might need to pre dispatch to its main function
+				// Procedural controller... we might need to pre dispatch to its main function
 				// i.e. for action=mergetopics it was MergeTopics(), now it's mergetopics()
 				$this->_pre_dispatch_func = 'pre_' . $_GET['action'];
 
-				// then, figure out the function for the subaction
+				// Then, figure out the function for the subaction
 				if (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
 					$this->_function_name = 'action_' . $_GET['sa'];
 				else
 					$this->_function_name = 'action_' . $_GET['action'];
 			}
-			// or... an addon can do just this!
+			// Or... an addon can do just this!
 			// action=gallery => Gallery.controller.php
 			// sa=upload => action_upload()
 			elseif (file_exists(CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.controller.php'))
@@ -265,7 +272,7 @@ class Site_Dispatcher
 			}
 		}
 
-		// the file and function weren't found yet?
+		// The file and function weren't found yet?
 		if (empty($this->_file_name) || empty($this->_function_name))
 		{
 			// Catch the action with the theme?
@@ -277,7 +284,7 @@ class Site_Dispatcher
 			}
 			else
 			{
-				// we still haven't found what we're looking for...
+				// We still haven't found what we're looking for...
 				$this->_file_name = $default_action['file'];
 				if (isset($default_action['controller']))
 					$this->_controller_name = $default_action['controller'];
@@ -300,7 +307,7 @@ class Site_Dispatcher
 		{
 			$controller = new $this->_controller_name();
 
-			// pre-dispatch (load templates and stuff)
+			// Pre-dispatch (load templates and stuff)
 			if (method_exists($controller, 'pre_dispatch'))
 				$controller->pre_dispatch();
 
@@ -312,14 +319,14 @@ class Site_Dispatcher
 				$controller->{$this->_function_name}();
 			elseif (method_exists($controller, 'action_index'))
 				$controller->action_index();
-			// fall back
+			// Fall back
 			elseif (function_exists($this->_function_name))
 			{
 				call_user_func($this->_function_name);
 			}
 			else
 			{
-				// things went pretty bad, huh?
+				// Things went pretty bad, huh?
 				// board index :P
 				require_once(CONTROLLERDIR . '/BoardIndex.controller.php');
 				call_integration_hook('integrate_action_boardindex_before');
@@ -332,11 +339,11 @@ class Site_Dispatcher
 		else
 		{
 			// pre-dispatch (load templates and stuff)
-			// for procedural controllers, we know this name (instance var)
+			// For procedural controllers, we know this name (instance var)
 			if (!empty($this->_pre_dispatch_func) && function_exists($this->_pre_dispatch_func))
 				call_user_func($this->_pre_dispatch_func);
 
-			// it must be a good ole' function
+			// It must be a good ole' function
 			call_user_func($this->_function_name);
 		}
 	}

@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This file concerns itself with logging, whether in the database or files.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,11 +11,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file concerns itself with logging, whether in the database or files.
  *
  */
 
@@ -36,6 +36,7 @@ function writeLog($force = false)
 	{
 		// Take the opposite approach!
 		$force = true;
+
 		// Don't update for every page - this isn't wholly accurate but who cares.
 		if ($topic)
 		{
@@ -174,7 +175,7 @@ function logLastDatabaseError()
 	// Make a note of the last modified time in case someone does this before us
 	$last_db_error_change = @filemtime(BOARDDIR . '/db_last_error.php');
 
-	// save the old file before we do anything
+	// Save the old file before we do anything
 	$file = BOARDDIR . '/db_last_error.php';
 	$dberror_backup_fail = !@is_writable(BOARDDIR . '/db_last_error_bak.php') || !@copy($file, BOARDDIR . '/db_last_error_bak.php');
 	$dberror_backup_fail = !$dberror_backup_fail ? (!file_exists(BOARDDIR . '/db_last_error_bak.php') || filesize(BOARDDIR . '/db_last_error_bak.php') === 0) : $dberror_backup_fail;
@@ -186,7 +187,7 @@ function logLastDatabaseError()
 		$write_db_change = '<' . '?' . "php\n" . '$db_last_error = ' . time() . ';';
 		$written_bytes = file_put_contents(BOARDDIR . '/db_last_error.php', $write_db_change, LOCK_EX);
 
-		// survey says ...
+		// Survey says ...
 		if ($written_bytes !== strlen($write_db_change) && !$dberror_backup_fail)
 		{
 			// Oops. maybe we have no more disk space left, or some other troubles, troubles...
@@ -292,6 +293,7 @@ function displayDebug()
 		foreach ($db_cache as $q => $qq)
 		{
 			$is_select = strpos(trim($qq['q']), 'SELECT') === 0 || preg_match('~^INSERT(?: IGNORE)? INTO \w+(?:\s+\([^)]+\))?\s+SELECT .+$~s', trim($qq['q'])) != 0;
+
 			// Temporary tables created in earlier queries are not explainable.
 			if ($is_select)
 			{
@@ -510,6 +512,7 @@ function logActions($logs)
 		{
 			if (!is_numeric($log['extra']['board_to']))
 				trigger_error('logActions(): data\'s board_to is not a number', E_USER_NOTICE);
+
 			if (empty($board_id))
 			{
 				$board_id = empty($log['extra']['board_to']) ? 0 : (int) $log['extra']['board_to'];

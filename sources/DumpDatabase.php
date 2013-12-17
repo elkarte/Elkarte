@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This file has a single job - database backup.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,11 +11,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file has a single job - database backup.
  *
  */
 
@@ -30,8 +30,7 @@ if (!defined('ELK'))
  */
 function DumpDatabase2()
 {
-	global $db_name, $scripturl, $modSettings;
-	global $db_prefix, $db_show_debug;
+	global $db_name, $scripturl, $modSettings, $db_prefix, $db_show_debug;
 
 	// We'll need a db to dump :P
 	$database = database();
@@ -215,8 +214,7 @@ function DumpDatabase2()
 /**
  * Dummy/helper function, it simply returns the string passed as argument
  *
- * @param $string, string to uncompress
- * @return the string passed
+ * @param string $string, string to uncompress
  */
 function un_compressed($string = '')
 {
