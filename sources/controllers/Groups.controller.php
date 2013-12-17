@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * This file currently just shows group info, and allows certain priviledged
+ * members to add/remove members.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,17 +12,18 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file currently just shows group info, and allows certain priviledged members to add/remove members.
  *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Groups_Controller class, shows group access and allows for add/remove group members
+ */
 class Groups_Controller extends Action_Controller
 {
 	/**
@@ -404,7 +408,7 @@ class Groups_Controller extends Action_Controller
 
 		if (!empty($context['group']['assignable']))
 			loadJavascriptFile('suggest.js', array('defer' => true));
-		
+
 		// Select the template.
 		$context['sub_template'] = 'group_members';
 		$context['page_title'] = $txt['membergroups_members_title'] . ': ' . $context['group']['name'];
