@@ -481,7 +481,9 @@ class ManageSearch_Controller extends Action_Controller
 				$context['step'] = 3;
 			else
 			{
-				list ($context['start'], $context['step']) = removeCommonWordsFromIndex($context['start'], $index_properties[$context['index_settings']['bytes_per_word']]['step_size']);
+				list ($context['start'], $complete) = removeCommonWordsFromIndex($context['start'], $index_properties[$context['index_settings']['bytes_per_word']]['step_size']);
+				if ($complete)
+					$context['step'] = 3;
 
 				$context['sub_template'] = 'create_index_progress';
 
@@ -489,13 +491,13 @@ class ManageSearch_Controller extends Action_Controller
 			}
 		}
 
-		// Step 3: remove words not distinctive enough.
+		// Step 3: everything done.
 		if ($context['step'] === 3)
 		{
 			$context['sub_template'] = 'create_index_done';
 
 			updateSettings(array('search_index' => 'custom', 'search_custom_index_config' => serialize($context['index_settings'])));
-			removeSetting('search_custom_index_resume');
+			removeSettings('search_custom_index_resume');
 		}
 	}
 

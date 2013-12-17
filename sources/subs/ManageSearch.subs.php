@@ -383,6 +383,7 @@ function removeCommonWordsFromIndex($start, $column_definition)
 	$stop_words = $start === 0 || empty($modSettings['search_stopwords']) ? array() : explode(',', $modSettings['search_stopwords']);
 	$stop = time() + 3;
 	$max_messages = ceil(60 * $modSettings['totalMessages'] / 100);
+	$complete = false;
 
 	while (time() < $stop)
 	{
@@ -416,12 +417,12 @@ function removeCommonWordsFromIndex($start, $column_definition)
 		$start += $column_definition['step_size'];
 		if ($start > $column_definition['max_size'])
 		{
-			$step = 3;
+			$complete = true;
 			break;
 		}
 	}
 
-	return array($start, $step);
+	return array($start, $complete);
 }
 
 function drop_log_search_words()

@@ -258,6 +258,10 @@ INSERT INTO {$db_prefix}scheduled_tasks
 	(next_time, time_offset, time_regularity, time_unit, disabled, task)
 VALUES
 	(0, 360, 10, 'm', 0, 'maillist_fetch_IMAP');
+INSERT INTO {$db_prefix}scheduled_tasks
+	(next_time, time_offset, time_regularity, time_unit, disabled, task)
+VALUES
+	(0, 30, 1, 'h', 0, 'user_access_mentions');
 ---#
 
 /******************************************************************************/

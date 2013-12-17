@@ -20,7 +20,7 @@ if (!defined('ELK'))
 
 /**
  * This class handles known scheduled tasks.
- * Each method implements a task, and it''s called automatically for the task to run.
+ * Each method implements a task, and it's called automatically for the task to run.
  */
 class ScheduledTask
 {
@@ -1435,5 +1435,188 @@ class ScheduledTask
 		removeFollowUpsByMessage($remove);
 
 		return true;
+	}
+
+	function user_access_mentions()
+	{
+		global $modSettings;
+
+		$db = database();
+		$mentions_check_users = @unserialize($modSettings['mentions_check_users']);
+		$scheduleTaskImmediate = @unserialize($modSettings['scheduleTaskImmediate']);
+
+		// This should be set only because of an immediate scheduled task, so higher priority
+		if (!empty($mentions_check_users))
+		{
+			foreach ($mentions_check_users as $member => $start)
+			{
+				// Just to stay on the safe side...
+				if (empty($member))
+					continue;
+
+				require_once(SUBSDIR . '/Boards.subs.php');
+				$user_see_board = memberQuerySeeBoard($member);
+
+				// If you are admin how the heck did you end up here?
+				if ($user_see_board == '1=1')
+				{
+					// Drop it
+					unset($mentions_check_users[$member]);
+					// And save everything for the next run
+					updateSettings(array('mentions_check_users' => serialize($mentions_check_users)));
+				}
+				// Here you are someone that may or may not be able to access a certain board
+				else
+				{
+					$limit = 100;
+
+					require_once(SUBSDIR . '/Mentions.subs.php');
+
+					// We need to repeat this twice: one to find the boards the user can access, one for those he cannot access
+					foreach (array('can', 'cannot') as $can)
+					{
+						while (true)
+						{
+							// Find all the mentions that this user can or cannot see
+							$request = $db->query('', '
+								SELECT mnt.id_mention
+								FROM {db_prefix}log_mentions as mnt
+									LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = mnt.id_msg)
+									LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
+								WHERE mnt.id_member = {int:current_member}
+									AND mnt.mention_type IN ({array_string:mention_types})
+									AND {raw:user_see_board}
+								LIMIT {int:start}, {int:limit}',
+								array(
+									'current_member' => $member,
+									'mention_types' => array('men', 'like', 'rlike'),
+									'user_see_board' => ($can == 'can' ? '' : 'NOT ') . $user_see_board,
+									'start' => $start,
+									'limit' => $limit,
+								)
+							);
+							$mentions = array();
+							while ($row = $db->fetch_assoc($request))
+								$mentions[] = $row['id_mention'];
+							$db->free_result($request);
+
+							// If we found something toggle them and increment the start for the next round
+							if (!empty($mentions))
+							{
+								toggleMentionsAccessibility($mentions, $can == 'can');
+								$mentions_check_users[$member] += $limit;
+							}
+							else
+								unset($mentions_check_users[$member]);
+
+							updateSettings(array('mentions_check_users' => serialize($mentions_check_users)));
+						}
+					}
+
+					// Drop the member
+					unset($mentions_check_users[$member]);
+
+					// And save everything for the next run
+					updateSettings(array('mentions_check_users' => serialize($mentions_check_users)));
+
+					// Run this only once for each user, it may be quite heavy, let's split up the load
+					break;
+				}
+			}
+
+			// If there is no more users, scheduleTaskImmediate can be stopped
+			if (empty($mentions_check_users))
+				removeScheduleTaskImmediate('mentions_check_users', false);
+
+			return true;
+		}
+		else
+		{
+			// Checks 10 users at a time, the scheduled task is set to run once per hour, so 240 users a day
+			// @todo <= I know you like it Spuds! :P It may be necessary to set it to something higher.
+			$limit = 10;
+
+			require_once(SUBSDIR . '/Members.subs.php');
+			require_once(SUBSDIR . '/Mentions.subs.php');
+
+			// Grab users with mentions
+			$request = $db->query('', '
+				SELECT COUNT(DISTINCT(id_member))
+				FROM {db_prefix}log_mentions
+				WHERE id_member > {int:last_id_member}
+					AND mnt.mention_type IN ({array_string:mention_types})
+				LIMIT {int:start}, {int:limit}',
+				array(
+					'last_id_member' => !empty($modSettings['mentions_member_check']) ? $modSettings['mentions_member_check'] : 0,
+					'mention_types' => array('men', 'like', 'rlike'),
+					'start' => $start,
+					'limit' => $limit,
+				)
+			);
+
+			list ($remaining) = $db->fetch_row($request);
+			$db->free_result($request);
+
+			if ($remaining == 0)
+				$modSettings['mentions_member_check'] = 0;
+
+			// Grab users with mentions
+			$request = $db->query('', '
+				SELECT DISTINCT(id_member) as id_member
+				FROM {db_prefix}log_mentions
+				WHERE id_member > {int:last_id_member}
+					AND mnt.mention_type IN ({array_string:mention_types})
+				LIMIT {int:start}, {int:limit}',
+				array(
+					'last_id_member' => !empty($modSettings['mentions_member_check']) ? $modSettings['mentions_member_check'] : 0,
+					'mention_types' => array('men', 'like', 'rlike'),
+					'start' => $start,
+					'limit' => $limit,
+				)
+			);
+
+			// Remember where we are
+			updateSettings(array('mentions_member_check' => $modSettings['mentions_member_check'] + $limit));
+
+			while ($row = $db->fetch_assoc($request))
+			{
+				// Rebuild 'query_see_board', a lot of code duplication... :(
+				$user_see_board = memberQuerySeeBoard($row['id_member']);
+
+				// Find out if this user cannot see something that was supposed to be able to see
+				$request = $db->query('', '
+					SELECT mnt.id_mention
+					FROM {db_prefix}log_mentions as mnt
+						LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = mnt.id_msg)
+						LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
+					WHERE mnt.id_member = {int:current_member}
+						AND mnt.mention_type IN ({array_string:mention_types})
+						AND {raw:user_see_board}
+						AND status < 0
+					LIMIT 1',
+					array(
+						'current_member' => $row['id_member'],
+						'mention_types' => array('men', 'like', 'rlike'),
+						'user_see_board' => 'NOT ' . $user_see_board,
+					)
+				);
+				// One row of results is enough: scheduleTaskImmediate!
+				if ($db->num_rows($request) == 1)
+				{
+					if (!empty($modSettings['mentions_check_users']))
+						$modSettings['mentions_check_users'] = @unserialize($modSettings['mentions_check_users']);
+					else
+						$modSettings['mentions_check_users'] = array();
+
+					// But if the member is already on the list, let's skip it
+					if (!isset($modSettings['mentions_check_users'][$row['id_member']]))
+					{
+						$modSettings['mentions_check_users'][$row['id_member']] = 0;
+						updateSettings(array('mentions_check_users' => serialize(array_unique($modSettings['mentions_check_users']))));
+						scheduleTaskImmediate('mentions_check_users');
+					}
+				}
+			}
+		}
 	}
 }

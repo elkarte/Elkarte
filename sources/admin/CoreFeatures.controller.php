@@ -226,6 +226,13 @@ class CoreFeatures_Controller extends Action_Controller
 				'settings' => array(
 					'likes_enabled' => 1,
 				),
+				'setting_callback' => create_function('$value', '
+					require_once(SUBSDIR . \'/Mentions.subs.php\');
+
+					// Makes all the like/rlike mentions invisible (or visible)
+					toggleMentionsVisibility(\'like\', !empty($value));
+					toggleMentionsVisibility(\'rlike\', !empty($value));
+				'),
 			),
 			// ml = moderation log.
 			'ml' => array(
