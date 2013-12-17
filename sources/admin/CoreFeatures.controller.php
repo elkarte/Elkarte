@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This controller allows to choose the features activated and disactivate them.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,8 +14,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This controller allows to choose the features activated and disactivate them.
  *
  */
 

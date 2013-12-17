@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Forum maintenance. Important stuff.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -13,13 +15,15 @@
  *
  * @version 1.0 Beta
  *
- * Forum maintenance. Important stuff.
- *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Entry point class for all of the maintance ,routine, members, database,
+ * attachments, topics and hooks
+ */
 class Maintenance_Controller extends Action_Controller
 {
 	/**
@@ -1326,9 +1330,11 @@ class Maintenance_Controller extends Action_Controller
 	}
 
 	/**
-	 * Callback for createList().
+	 * Callback for createList(). Called by action_hooks
 	 *
-	 * @return array
+	 * @param int $start
+	 * @param int $per_page
+	 * @param string $sort
 	 */
 	function list_getIntegrationHooks($start, $per_page, $sort)
 	{

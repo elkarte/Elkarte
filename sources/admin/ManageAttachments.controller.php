@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Handles the job of attachment and avatar maintenance /management.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -41,7 +43,6 @@ class ManageAttachments_Controller extends Action_Controller
 	 * @uses template layer 'manage_files' for showing the tab bar.
 	 *
 	 * @see Action_Controller::action_index()
-	 *
 	 */
 	public function action_index()
 	{
