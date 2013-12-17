@@ -47,8 +47,8 @@
 	color: #346;
 }
 #admin_main_section {
-	border-radius: 7px 7px 0 0;
-	border-bottom: none;
+	margin-bottom: 20px;
+	overflow: auto;
 }
 #admin_main_section .windowbg {
 	border: 1px solid #ccc;
@@ -72,13 +72,15 @@
 	border-top: double #ddd;
 }
 
-#quick_tasks {
-	border-top: 1px solid #bbb;
-	border-bottom: 1px solid #fff;
-}
 #quick_tasks li {
 	border-top: 1px solid #fff;
 	border-bottom: 1px solid #bbb;
+}
+#quick_tasks li:first-child, #quick_tasks li:nth-child(2) {
+	border-top: none;
+}
+#quick_tasks li:last-child,  #quick_tasks li:nth-child(7){
+	border-bottom: none;
 }
 
 /* Styles for the package manager.
