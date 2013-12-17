@@ -1702,4 +1702,7 @@ div.bbc_footnotes .meaction{
 	.listlevel2.subsections .linklevel2::after {
 		content: '';
 	}
+	.stats.floatleft {
+		border: none;
+	}
 }
