@@ -1674,6 +1674,19 @@ div.bbc_footnotes .meaction{
 	.poster:after, .posterarea:before {
 		border-bottom: 1px solid #bfbfbf;
 	}
+	.board_icon {
+		width: 20px;
+		height: 20px;
+	}
+	.on_board, .on2_board {
+		background-position: -300px -14px;
+	}
+	.off_board {
+		background-position: -372px -14px;
+	}
+	.redirect_board {
+		background-position: -444px -14px;
+	 }
 	.forumposts .windowbg2 {
 		background-color: #fafafa;
 	}
