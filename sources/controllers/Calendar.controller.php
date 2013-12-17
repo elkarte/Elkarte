@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * This file has only one real task, showing the calendar.
+ * Original module by Aaron O'Neil - aaron@mud-master.com
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,17 +12,19 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
  *
- * This file has only one real task, showing the calendar.
- * Original module by Aaron O'Neil - aaron@mud-master.com
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Calendar_Controller class, displays the calendar for the site and
+ * provides for its navigation
+ */
 class Calendar_Controller extends Action_Controller
 {
 	/**
@@ -180,8 +185,7 @@ class Calendar_Controller extends Action_Controller
 	 */
 	public function action_post()
 	{
-		global $context, $txt, $user_info, $scripturl;
-		global $modSettings, $topic;
+		global $context, $txt, $user_info, $scripturl, $modSettings, $topic;
 
 		// You need to view what you're doing :P
 		isAllowedTo('calendar_view');

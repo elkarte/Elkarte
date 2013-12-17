@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Handles all announce topic functionality
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,7 +11,7 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
  *
@@ -19,7 +21,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Class to handles announce topic functionality.
+ * Class to handle announce topic functionality.
  */
 class Announce_Controller extends Action_Controller
 {
@@ -30,7 +32,7 @@ class Announce_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		// default for action=announce: action_selectgroup() function.
+		// Default for action=announce: action_selectgroup() function.
 		$this->action_selectgroup();
 	}
 

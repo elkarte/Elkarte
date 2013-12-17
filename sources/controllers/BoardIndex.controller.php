@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * The single function this file contains is used to display the main board index.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,17 +11,18 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * The single function this file contains is used to display the main board index.
  *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * BoardIndex_Controller class, displays the main board index
+ */
 class BoardIndex_Controller extends Action_Controller
 {
 	/**
@@ -29,7 +32,7 @@ class BoardIndex_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		// what to do... boardindex, 'course!
+		// What to do... boardindex, 'course!
 		$this->action_boardindex();
 	}
 
@@ -131,10 +134,13 @@ class BoardIndex_Controller extends Action_Controller
 		$context['info_center_callbacks'] = array();
 		if (!empty($settings['number_recent_posts']) && (!empty($context['latest_posts']) || !empty($context['latest_post'])))
 			$context['info_center_callbacks'][] = 'recent_posts';
+
 		if ($show_calendar)
 			$context['info_center_callbacks'][] = 'show_events';
+
 		if (!empty($settings['show_stats_index']))
 			$context['info_center_callbacks'][] = 'show_stats';
+
 		$context['info_center_callbacks'][] = 'show_users';
 
 		// Allow mods to add additional buttons here
