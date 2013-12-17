@@ -81,7 +81,7 @@ class MoveTopic_Controller extends Action_Controller
 			fatal_lang_error('moveto_noboards', false);
 
 		// Already used the function, let's set the selected board back to the last
-		$last_moved_to = isset($_SESSION['move_to_topic']['move_to']) ? (int) $_SESSION['move_to_topic']['move_to'] : 0;
+		$last_moved_to = isset($_SESSION['move_to_topic']['move_to']) && $_SESSION['move_to_topic']['move_to'] != $context['current_board'] ? (int) $_SESSION['move_to_topic']['move_to'] : 0;
 		if (!empty($last_moved_to))
 		{
 			foreach ($context['categories'] as $id => $values)
