@@ -40,7 +40,7 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 
 	// Get the critical info for the tasks.
 	$request = $db->query('', '
-		SELECT id_task, next_time, time_offset, time_regularity, time_unit
+		SELECT id_task, next_time, time_offset, time_regularity, time_unit, task
 		FROM {db_prefix}scheduled_tasks
 		WHERE disabled = {int:no_disabled}
 			' . $task_query,
@@ -52,7 +52,12 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 	$tasks = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		$next_time = next_time($row['time_regularity'], $row['time_unit'], $row['time_offset']);
+		// scheduleTaskImmediate is a way to speed up scheduled tasts and fire them as fast as possible
+		$scheduleTaskImmediate = @unserialize($modSettings['scheduleTaskImmediate']);
+		if (!empty($scheduleTaskImmediate) && isset($scheduleTaskImmediate[$row['task']]))
+			$next_time = next_time(1, '', rand(0, 60), true);
+		else
+			$next_time = next_time($row['time_regularity'], $row['time_unit'], $row['time_offset']);
 
 		// Only bother moving the task if it's out of place or we're forcing it!
 		if ($forceUpdate || $next_time < $row['next_time'] || $row['next_time'] < time())
@@ -91,7 +96,7 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
  * @param int $offset
  * @return int
  */
-function next_time($regularity, $unit, $offset)
+function next_time($regularity, $unit, $offset, $immediate = false)
 {
 	// Just in case!
 	if ($regularity == 0)
@@ -100,8 +105,13 @@ function next_time($regularity, $unit, $offset)
 	$curMin = date('i', time());
 	$next_time = 9999999999;
 
+	// If we have scheduleTaskImmediate running, then it's 10 seconds
+	if (empty($unit) && $immediate)
+	{
+		$next_time = time() + 10;
+	}
 	// If the unit is minutes only check regularity in minutes.
-	if ($unit == 'm')
+	elseif ($unit == 'm')
 	{
 		$off = date('i', $offset);
 
@@ -197,7 +207,7 @@ function logTask($task_id, $total_time)
 }
 
 /**
- * Sets the tasks status to enabled / disabled
+ * Sets the tasks status to enabled / disabled by task ID
  *
  * @param array $enablers
  */
@@ -215,6 +225,27 @@ function updateTaskStatus($enablers)
 }
 
 /**
+ * Sets the task status to enabled / disabled by task name (i.e. function)
+ *
+ * @param string $enabler the name (the function) of a task
+ * @param bool is the tasks should be enabled or disabled
+ */
+function toggleTaskStatusByName($enabler, $enable = true)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}scheduled_tasks
+		SET disabled = {int:status}
+		WHERE task = {string:task_enable}',
+		array(
+			'task_enable' => $enabler,
+			'status' => $enable ? 0 : 1,
+		)
+	);
+}
+
+/**
  * Update the properties of a scheduled task.
  *
  * @param int $id_task
@@ -223,14 +254,26 @@ function updateTaskStatus($enablers)
  * @param int $interval
  * @param string $unit
  */
-function updateTask($id_task, $disabled, $offset, $interval, $unit)
+function updateTask($id_task, $disabled = null, $offset = null, $interval = null, $unit = null)
 {
 	$db = database();
 
+	$sets = array(
+		'disabled' => 'disabled = {int:disabled}',
+		'offset' => 'time_offset = {int:time_offset}',
+		'interval' => 'time_regularity = {int:time_regularity}',
+		'unit' => 'time_unit = {string:time_unit}',
+	);
+
+	$updates = array();
+	foreach ($sets as $key => $set)
+		if (isset($$key))
+			$updates[] = $set;
+
 	$db->query('', '
 		UPDATE {db_prefix}scheduled_tasks
-		SET disabled = {int:disabled}, time_offset = {int:time_offset}, time_unit = {string:time_unit},
-			time_regularity = {int:time_regularity}
+		SET ' . (implode(',
+			', $updates)) . '
 		WHERE id_task = {int:id_task}',
 		array(
 			'disabled' => $disabled,
@@ -411,7 +454,7 @@ function emptyTaskLog()
  */
 function processNextTasks($ts = 0)
 {
-	global $time_start;
+	global $time_start, $modSettings;
 
 	$db = database();
 
@@ -513,6 +556,18 @@ function processNextTasks($ts = 0)
 			// Log that we did it ;)
 			if ($completed)
 			{
+				// Taking care of scheduleTaskImmediate having a maximum of 10 "fast" executions
+				$scheduleTaskImmediate = @unserialize($modSettings['scheduleTaskImmediate']);
+				if (!empty($scheduleTaskImmediate) && isset($scheduleTaskImmediate[$row['task']]))
+				{
+					$scheduleTaskImmediate[$row['task']]++;
+
+					if ($scheduleTaskImmediate[$row['task']] > 9)
+						removeScheduleTaskImmediate($row['task'], false);
+					else
+						updateSettings(array('scheduleTaskImmediate' => serialize($scheduleTaskImmediate)));
+				}
+
 				$total_time = round(microtime(true) - $time_start, 3);
 				logTask($row['id_task'], $total_time);
 			}

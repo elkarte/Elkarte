@@ -85,6 +85,7 @@ class SimpleTagBuilder {
                 'text' => 'SimpleTextTag',
                 'hidden' => 'SimpleTextTag',
                 'password' => 'SimpleTextTag',
+                'email' => 'SimpleTextTag',
                 'file' => 'SimpleUploadTag');
         if (array_key_exists($type, $map)) {
             $tag_class = $map[$type];

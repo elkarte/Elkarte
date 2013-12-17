@@ -606,13 +606,13 @@ function template_show_error($error_id)
 {
 	global $context;
 
-	if (empty($error_id) || empty($context[$error_id]))
+	if (empty($error_id))
 		return;
 
-	$error = $context[$error_id];
+	$error = isset($context[$error_id]) ? $context[$error_id] : array();
 
 	echo '
-					<div class="', (!isset($error['type']) ? 'successbox' : ($error['type'] !== 'serious' ? 'warningbox' : 'errorbox')), '" ', empty($error['errors']) ? ' style="display: none"' : '', ' id="', $error_id, '">';
+					<div id="', $error_id, '" class="', (!isset($error['type']) ? 'successbox' : ($error['type'] !== 'serious' ? 'warningbox' : 'errorbox')), '" ', empty($error['errors']) ? ' style="display: none"' : '', '>';
 
 	// Optional title for our results
 	if (!empty($error['title']))
@@ -623,7 +623,7 @@ function template_show_error($error_id)
 							</dt>
 							<dd>';
 
-	// Everythign that went wrong, or correctly :)
+	// Everything that went wrong, or correctly :)
 	if (!empty($error['errors']))
 	{
 		echo '

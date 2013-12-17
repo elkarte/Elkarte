@@ -378,7 +378,7 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	public function action_mentionSettings_display()
 	{
-		global $context, $scripturl;
+		global $context, $scripturl, $modSettings;
 
 		// Initialize the form
 		$this->_initMentionSettingsForm();
@@ -390,6 +390,17 @@ class ManageFeatures_Controller extends Action_Controller
 		if (isset($_GET['save']))
 		{
 			checkSession();
+
+			if ((!isset($_POST['mentions_buddy']) && !empty($modSettings['mentions_buddy'])) || (isset($_POST['mentions_buddy']) && $_POST['mentions_buddy'] != $modSettings['mentions_buddy']))
+			{
+				require_once(SUBSDIR . '/Mentions.subs.php');
+				toggleMentionsVisibility('buddy', !empty($_POST['mentions_buddy']));
+			}
+
+			// If mentions are enabled, the related task should be enabled as well, otherwise should be disabled.
+			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+			toggleTaskStatusByName('mentions_check_users', !empty($_POST['mentions_enabled']));
+
 			Settings_Form::save_db($config_vars);
 			redirectexit('action=admin;area=featuresettings;sa=mention');
 		}
