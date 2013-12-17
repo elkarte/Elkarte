@@ -46,10 +46,6 @@
 .search_results li a strong {
 	color: #346;
 }
-#admin_main_section {
-	margin-bottom: 20px;
-	overflow: auto;
-}
 #admin_main_section .windowbg {
 	border: 1px solid #ccc;
 	border-top: 1px solid #bbb;
