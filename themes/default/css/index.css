@@ -3658,6 +3658,7 @@ a.help .icon {
 	#password_login select {
 		display: none;
 	}
+
 }
 /* This one does 800 screens at default font size. */
 @media screen and (max-width: 50em) {
@@ -3742,6 +3743,12 @@ a.help .icon {
 	}
 	.ignoreboards.floatright {
 		float: none;
+	}
+	.bbc_img, .elk_video {
+		max-width: 30em;
+	}
+	.elk_previewvideo {
+		max-width: 30em;
 	}
 }
 /* This one does 480 screens at default font size. */
