@@ -78,6 +78,7 @@ function previewPost()
 
 	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=post2' + (current_board ? ';board=' + current_board : '') + (make_poll ? ';poll' : '') + ';preview;' + elk_session_var + '=' + elk_session_id + ';xml', x.join('&'), onDocSent);
 
+	// Show the preview section and load it with "pending results" text, onDocSent will finish things off
 	document.getElementById('preview_section').style.display = '';
 	document.getElementById('preview_subject').innerHTML = txt_preview_title;
 	document.getElementById('preview_body').innerHTML = txt_preview_fetch;
@@ -108,7 +109,7 @@ function previewPM()
 	// Send in document for previewing
 	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=pm;sa=send2;preview;xml', x.join('&'), onDocSent);
 
-	// Update the preview section with our results
+	// Show the preview section and load it with "pending results" text, onDocSent will finish things off
 	document.getElementById('preview_section').style.display = '';
 	document.getElementById('preview_subject').innerHTML = txt_preview_title;
 	document.getElementById('preview_body').innerHTML = txt_preview_fetch;
@@ -139,7 +140,7 @@ function previewNews()
 	// Send in document for previewing
 	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=xmlpreview;xml', x.join('&'), onDocSent);
 
-	// Update the preview section with our results
+	// Show the preview section and load it with "pending results" text, onDocSent will finish things off
 	document.getElementById('preview_section').style.display = '';
 	document.getElementById('preview_subject').innerHTML = txt_preview_title;
 	document.getElementById('preview_body').innerHTML = txt_preview_fetch;
@@ -224,10 +225,13 @@ function onDocSent(XMLDoc)
 		return true;
 	}
 
-	// Show the preview section.
+	// Read the preview section data from the xml response
 	var preview = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('preview')[0];
+
+	// Load in the subject
 	document.getElementById('preview_subject').innerHTML = preview.getElementsByTagName('subject')[0].firstChild.nodeValue;
 
+	// Load in the body
 	var bodyText = '';
 	for (i = 0, n = preview.getElementsByTagName('body')[0].childNodes.length; i < n; i++)
 		bodyText += preview.getElementsByTagName('body')[0].childNodes[i].nodeValue;
@@ -238,24 +242,31 @@ function onDocSent(XMLDoc)
 	// Show a list of errors (if any).
 	var errors = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('errors')[0],
 		errorList = '',
-		errorCode = '';
+		errorCode = '',
+		error_area = 'post_error',
+		error_list = error_area + '_list';
 
 	// @todo: this should stay together with the rest of the error handling or
 	// should use errorbox_handler (at the moment it cannot be used because is not enough generic)
 	for (i = 0, numErrors = errors.getElementsByTagName('error').length; i < numErrors; i++)
 	{
 		errorCode = errors.getElementsByTagName('error')[i].attributes.getNamedItem("code").value;
-		errorList += '<li id="post_error_' + errorCode + '" class="error">' + errors.getElementsByTagName('error')[i].firstChild.nodeValue + '</li>';
+		errorList += '<li id="' + error_area + '_' + errorCode + '" class="error">' + errors.getElementsByTagName('error')[i].firstChild.nodeValue + '</li>';
 	}
 
-	oError_box = $(document.getElementById('post_error'));
-	if ($.trim(oError_box.children("#post_error_list").html()) === '')
-		oError_box.append("<ul id='post_error_list'></ul>");
+	oError_box = $(document.getElementById(error_area));
+	if ($.trim(oError_box.children(error_list).html()) === '')
+		oError_box.append("<ul id='" + error_list + "'></ul>");
 
 	// Add the error it and show it
-	document.getElementById('post_error_list').innerHTML = numErrors === 0 ? '' : errorList;
 	if (numErrors === 0)
 		oError_box.css("display", "none");
+	else
+	{
+		document.getElementById(error_list).innerHTML = errorList;
+		oError_box.css("display", "");
+		oError_box.attr('class', parseInt(errors.getAttribute('serious')) === 0 ? 'warningbox' : 'errorbox');
+	}
 
 	// Show a warning if the topic has been locked.
 	if (bPost)
@@ -279,7 +290,7 @@ function onDocSent(XMLDoc)
 			document.forms[form_name][post_box_name].style.border = null;
 	}
 
-	// if this is a post, then we have some extra work to do
+	// If this is a post preview, then we have some extra work to do
 	if (bPost)
 	{
 		// Set the new last message id.

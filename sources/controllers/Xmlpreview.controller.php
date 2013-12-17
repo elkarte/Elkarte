@@ -94,19 +94,19 @@ class XmlPreview_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Mail.subs.php');
 		loadLanguage('Errors');
 
-		$context['post_error']['messages'] = array();
+		$context['post_error']['errors'] = array();
 		$context['send_pm'] = !empty($_POST['send_pm']) ? 1 : 0;
 		$context['send_html'] = !empty($_POST['send_html']) ? 1 : 0;
 
 		// Let them know about any mistakes
 		if (empty($_POST['subject']))
-			$context['post_error']['messages'][] = $txt['error_no_subject'];
+			$context['post_error']['errors'][] = $txt['error_no_subject'];
 		if (empty($_POST['message']))
-			$context['post_error']['messages'][] = $txt['error_no_message'];
+			$context['post_error']['errors'][] = $txt['error_no_message'];
 
 		prepareMailingForPreview();
 
-		$context['sub_template'] = 'pm';
+		$context['sub_template'] = 'generic_preview';
 	}
 
 	/**
@@ -131,6 +131,7 @@ class XmlPreview_Controller extends Action_Controller
 		if (!empty($user) && $can_change)
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
+
 			// Get the current signature
 			$member = getBasicMemberData($user, array('preferences' => true));
 
@@ -202,7 +203,7 @@ class XmlPreview_Controller extends Action_Controller
 		loadLanguage('Errors');
 		loadLanguage('ModerationCenter');
 
-		$context['post_error']['messages'] = array();
+		$context['post_error']['errors'] = array();
 
 		// If you can't issue the warning, what are you doing here?
 		if (allowedTo('issue_warning'))
@@ -212,14 +213,14 @@ class XmlPreview_Controller extends Action_Controller
 			if (isset($_POST['issuing']))
 			{
 				if (empty($_POST['title']) || empty($_POST['body']))
-					$context['post_error']['messages'][] = $txt['warning_notify_blank'];
+					$context['post_error']['errors'][] = $txt['warning_notify_blank'];
 			}
 			else
 			{
 				if (empty($_POST['title']))
-					$context['post_error']['messages'][] = $txt['mc_warning_template_error_no_title'];
+					$context['post_error']['errors'][] = $txt['mc_warning_template_error_no_title'];
 				if (empty($_POST['body']))
-					$context['post_error']['messages'][] = $txt['mc_warning_template_error_no_body'];
+					$context['post_error']['errors'][] = $txt['mc_warning_template_error_no_body'];
 				// Add in few replacements.
 				/**
 				 * These are the defaults:
@@ -253,9 +254,9 @@ class XmlPreview_Controller extends Action_Controller
 			$context['preview_message'] = $warning_body;
 		}
 		else
-			$context['post_error']['messages'][] = array('value' => $txt['cannot_issue_warning'], 'attributes' => array('type' => 'error'));
+			$context['post_error']['errors'][] = array('value' => $txt['cannot_issue_warning'], 'attributes' => array('type' => 'error'));
 
-		$context['sub_template'] = 'pm';
+		$context['sub_template'] = 'generic_preview';
 	}
 
 	/**
@@ -269,7 +270,7 @@ class XmlPreview_Controller extends Action_Controller
 		loadLanguage('Errors');
 		loadLanguage('ModerationCenter');
 
-		$context['post_error']['messages'] = array();
+		$context['post_error']['errors'] = array();
 
 		// If you can't approve emails, what are you doing here?
 		if (allowedTo('approve_emails'))
@@ -280,15 +281,15 @@ class XmlPreview_Controller extends Action_Controller
 			if (isset($_POST['issuing']))
 			{
 				if (empty($_POST['title']) || empty($_POST['body']))
-					$context['post_error']['messages'][] = $txt['warning_notify_blank'];
+					$context['post_error']['errors'][] = $txt['warning_notify_blank'];
 			}
 			else
 			{
 				if (empty($_POST['title']))
-					$context['post_error']['messages'][] = $txt['mc_warning_template_error_no_title'];
+					$context['post_error']['errors'][] = $txt['mc_warning_template_error_no_title'];
 
 				if (empty($_POST['body']))
-					$context['post_error']['messages'][] = $txt['mc_warning_template_error_no_body'];
+					$context['post_error']['errors'][] = $txt['mc_warning_template_error_no_body'];
 				// Add in few replacements.
 				/**
 				 * These are the defaults:
@@ -326,6 +327,6 @@ class XmlPreview_Controller extends Action_Controller
 			$context['preview_message'] = $body;
 		}
 
-		$context['sub_template'] = 'pm';
+		$context['sub_template'] = 'generic_preview';
 	}
 }
