@@ -4005,8 +4005,11 @@ a.help .icon {
 	.postarea, .forumtitle {
 		padding: 2px;
 	}
-	.bbc_img {
-		max-width: 24em;
+	.bbc_img, .elk_video {
+		max-width: 30em;
+	}
+	.elk_previewvideo {
+		max-width: 30em;
 	}
 	.linktree .board_moderators, .linktree_last .board_moderators {
 		display: none;
