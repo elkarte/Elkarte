@@ -1904,6 +1904,12 @@ img.new_posts {
 #poll {
 	overflow: hidden;
 }
+#poll_main ul {
+	margin-top: 8px;
+}
+#poll_main li {
+	margin-top: 3px;
+}
 #poll .content {
 	padding: 0 12px;
 }
