@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * The Xml_Array class is an xml parser.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,8 +14,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * The Xml_Array class is an xml parser.
  *
  */
 
@@ -54,10 +54,10 @@ class Ftp_Connection
 	/**
 	 * Create a new FTP connection...
 	 *
-	 * @param type $ftp_server
-	 * @param type $ftp_port
-	 * @param type $ftp_user
-	 * @param type $ftp_pass
+	 * @param string $ftp_server
+	 * @param int $ftp_port
+	 * @param string $ftp_user
+	 * @param string $ftp_pass
 	 */
 	public function __construct($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@yourdomain.org')
 	{
@@ -73,11 +73,10 @@ class Ftp_Connection
 	/**
 	 * Connects to a server
 	 *
-	 * @param type $ftp_server
-	 * @param type $ftp_port
-	 * @param type $ftp_user
-	 * @param type $ftp_pass
-	 * @return type
+	 * @param string $ftp_server
+	 * @param int $ftp_port
+	 * @param string $ftp_user
+	 * @param string $ftp_pass
 	 */
 	public function connect($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@yourdomain.org')
 	{
@@ -124,7 +123,7 @@ class Ftp_Connection
 	/**
 	 * Changes to a directory (chdir) via the ftp connection
 	 *
-	 * @param type $ftp_path
+	 * @param string $ftp_path
 	 * @return boolean
 	 */
 	public function chdir($ftp_path)
@@ -150,7 +149,7 @@ class Ftp_Connection
 	 * Changes a files atrributes (chmod)
 	 *
 	 * @param string $ftp_file
-	 * @param type $chmod
+	 * @param int $chmod
 	 * @return boolean
 	 */
 	public function chmod($ftp_file, $chmod)
@@ -175,7 +174,7 @@ class Ftp_Connection
 	/**
 	 * Deletes a file
 	 *
-	 * @param type $ftp_file
+	 * @param string $ftp_file
 	 * @return boolean
 	 */
 	public function unlink($ftp_file)
@@ -204,7 +203,7 @@ class Ftp_Connection
 	/**
 	 * Reads the response to the command from the server
 	 *
-	 * @param type $desired
+	 * @param mixed $desired string or array of acceptable return values
 	 * @return type
 	 */
 	public function check_response($desired)
@@ -260,7 +259,7 @@ class Ftp_Connection
 	/**
 	 * Creates a new file on the server
 	 *
-	 * @param type $ftp_file
+	 * @param string $ftp_file
 	 * @return boolean
 	 */
 	public function create_file($ftp_file)
@@ -299,8 +298,8 @@ class Ftp_Connection
 	/**
 	 * Generates a direcotry listing for the current directory
 	 *
-	 * @param type $ftp_path
-	 * @param type $search
+	 * @param string $ftp_path
+	 * @param string $search
 	 * @return boolean
 	 */
 	public function list_dir($ftp_path = '', $search = false)
@@ -344,8 +343,8 @@ class Ftp_Connection
 	/**
 	 * Determins the current dirctory we are in
 	 *
-	 * @param type $file
-	 * @param type $listing
+	 * @param string $file
+	 * @param array $listing
 	 * @return string|boolean
 	 */
 	public function locate($file, $listing = null)
@@ -391,7 +390,7 @@ class Ftp_Connection
 	/**
 	 * Creates a new directory on the server
 	 *
-	 * @param type $ftp_dir
+	 * @param string $ftp_dir
 	 * @return boolean
 	 */
 	public function create_dir($ftp_dir)
@@ -414,8 +413,8 @@ class Ftp_Connection
 	/**
 	 * Detects the current path
 	 *
-	 * @param type $filesystem_path
-	 * @param type $lookup_file
+	 * @param string $filesystem_path
+	 * @param string $lookup_file
 	 * @return type
 	 */
 	public function detect_path($filesystem_path, $lookup_file = null)
