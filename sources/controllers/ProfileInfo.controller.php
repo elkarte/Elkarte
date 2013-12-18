@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * Handles the retreving and display of a users posts, attachments, stats, permissions
+ * warnings and the like
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,7 +12,7 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
  *
@@ -18,6 +21,11 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * ProfileInfo_Controller class, access all profile summary areas for a user
+ * incuding overall summary, post listing, attachment listing, user statistics
+ * user permisssions, user warnings
+ */
 class ProfileInfo_Controller extends Action_Controller
 {
 	/**
@@ -31,6 +39,7 @@ class ProfileInfo_Controller extends Action_Controller
 
 	/**
 	 * View the user profile summary.
+	 * @uses ProfileInfo template
 	 */
 	public function action_summary()
 	{

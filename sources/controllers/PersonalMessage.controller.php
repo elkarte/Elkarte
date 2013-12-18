@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * This file is mainly meant for controlling the actions related to personal
+ * messages. It allows viewing, sending, deleting, and marking personal
+ * messages. For compatibility reasons, they are often called "instant messages".
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,13 +13,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file is mainly meant for controlling the actions related to personal
- * messages. It allows viewing, sending, deleting, and marking personal
- * messages. For compatibility reasons, they are often called "instant messages".
  *
  */
 
@@ -23,7 +23,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Personal Message Controller
+ * Personal Message Controller, It allows viewing, sending, deleting, and
+ * marking personal messages
  */
 class PersonalMessage_Controller extends Action_Controller
 {

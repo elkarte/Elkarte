@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This file contains the files necessary to display news as an XML feed.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,11 +11,10 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
  *
- * This file contains the files necessary to display news as an XML feed.
  *
  */
 
@@ -25,7 +26,6 @@ if (!defined('ELK'))
  */
 class News_Controller extends Action_Controller
 {
-
 	private $_query_this_board = null;
 
 	/**
@@ -180,6 +180,7 @@ class News_Controller extends Action_Controller
 			if (isset($_REQUEST[$var]))
 				$cachekey[] = $_REQUEST[$var];
 		}
+
 		$cachekey = md5(serialize($cachekey) . (!empty($this->_query_this_board) ? $this->_query_this_board : ''));
 		$cache_t = microtime(true);
 
@@ -723,7 +724,6 @@ class News_Controller extends Action_Controller
  * Finds urls for local site and santizes them
  *
  * @param string $val
- * @return type
  */
 function fix_possible_url($val)
 {
@@ -747,7 +747,6 @@ function fix_possible_url($val)
  *
  * @param string $data
  * @param string $ns
- * @return type
  */
 function cdata_parse($data, $ns = '')
 {

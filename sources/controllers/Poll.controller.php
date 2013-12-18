@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This receives requests for voting, locking, removing editing polls
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,7 +11,7 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
  *
@@ -95,6 +97,7 @@ class Poll_Controller extends Action_Controller
 				}
 				else
 					fatal_lang_error('poll_error', false);
+
 				unset($guestinfo, $guestvoted, $i);
 			}
 		}
@@ -120,6 +123,7 @@ class Poll_Controller extends Action_Controller
 			{
 				// Update the poll totals.
 				decreaseVoteCounter($row['id_poll'], $pollOptions);
+
 				// Delete off the log.
 				removeVote($user_info['id'], $row['id_poll']);
 			}
@@ -755,6 +759,6 @@ class Poll_Controller extends Action_Controller
 			array('id' => 4, 'number' => 5, 'label' => '', 'is_last' => true)
 		);
 		$context['last_choice_id'] = 4;
-		
+
 	}
 }

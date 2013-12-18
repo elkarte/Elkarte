@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Handles paid subscriptions on a user's profile.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,7 +11,7 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
  *
@@ -19,7 +21,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * This class handles subscriptions on a user's profile.
+ * This class handles the paid subscriptions on a user's profile.
  */
 class ProfileSubscriptions_Controller extends Action_Controller
 {
