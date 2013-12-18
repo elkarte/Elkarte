@@ -128,7 +128,7 @@ class ManageBoards_Controller extends Action_Controller
 	 */
 	public function action_main()
 	{
-		global $txt, $context, $cat_tree, $boards, $boardList, $scripturl, $txt;
+		global $txt, $context, $cat_tree, $boards, $boardList, $scripturl;
 
 		loadTemplate('ManageBoards');
 

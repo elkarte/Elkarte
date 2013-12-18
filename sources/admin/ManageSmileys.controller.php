@@ -750,7 +750,7 @@ class ManageSmileys_Controller extends Action_Controller
 	 */
 	public function action_editsmiley()
 	{
-		global $modSettings, $context, $txt, $scripturl, $modSettings;
+		global $modSettings, $context, $txt, $scripturl;
 
 		require_once(SUBSDIR . '/Smileys.subs.php');
 

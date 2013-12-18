@@ -120,7 +120,7 @@ class PackageServers_Controller extends Action_Controller
 	 */
 	public function action_browse()
 	{
-		global $txt, $context, $scripturl, $forum_version, $context;
+		global $txt, $scripturl, $forum_version, $context;
 
 		// Load our subs worker.
 		require_once(SUBSDIR . '/PackageServers.subs.php');
