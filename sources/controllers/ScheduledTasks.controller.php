@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This handles the execution of scheduled tasks, mail queue scheduling included.
+ * 
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause

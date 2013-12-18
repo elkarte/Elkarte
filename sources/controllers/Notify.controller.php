@@ -49,7 +49,7 @@ class Notify_Controller extends Action_Controller
 	 */
 	public function action_notify()
 	{
-		global $topic, $scripturl, $txt, $topic, $user_info, $context;
+		global $topic, $scripturl, $txt, $user_info, $context;
 
 		// Make sure they aren't a guest or something - guests can't really receive notifications!
 		is_not_guest();
