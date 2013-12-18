@@ -1469,10 +1469,9 @@ class Post_Controller extends Action_Controller
 
 		if (!empty($modSettings['mentions_enabled']) && !empty($_REQUEST['uid']))
 		{
-			$query = array('and' => array('member_ids'));
 			$query_params['member_ids'] = array_unique(array_map('intval', $_REQUEST['uid']));
 			require_once(SUBSDIR . '/Members.subs.php');
-			$mentioned_members = membersBy($query, $query_params, true);
+			$mentioned_members = membersBy('member_ids', $query_params, true);
 			$replacements = 0;
 			$actually_mentioned = array();
 			foreach ($mentioned_members as $member)
