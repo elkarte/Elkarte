@@ -793,12 +793,13 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
  *
  * @param array $postGroups an array of post-based groups id.
  * @param array $normalGroups = array() an array of normal groups id.
- * @param bool $include_hidden = false if true, it includes hidden groups in the count (default false).
- * @param bool $include_moderators = false if true, it includes board moderators too (default false).
+ * @param bool $include_hidden if true, includes hidden groups in the count (default false).
+ * @param bool $include_moderators if true, includes board moderators too (default false).
+ * @param bool $include_non_active if true, includes non active members (default false).
  *
  * @return array
  */
-function membersInGroups($postGroups, $normalGroups = array(), $include_hidden = false, $include_moderators = false)
+function membersInGroups($postGroups, $normalGroups = array(), $include_hidden = false, $include_moderators = false, $include_non_active = false)
 {
 	$db = database();
 
@@ -810,10 +811,12 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
 		$query = $db->query('', '
 			SELECT id_post_group AS id_group, COUNT(*) AS member_count
 			FROM {db_prefix}members
-			WHERE id_post_group IN ({array_int:post_group_list})
+			WHERE id_post_group IN ({array_int:post_group_list})' . ($include_non_active ? '' : '
+				AND is_activated = {int:active_members}') . '
 			GROUP BY id_post_group',
 			array(
 				'post_group_list' => $postGroups,
+				'active_members' => 1,
 			)
 		);
 		while ($row = $db->fetch_assoc($query))
@@ -827,10 +830,12 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
 		$query = $db->query('', '
 			SELECT id_group, COUNT(*) AS member_count
 			FROM {db_prefix}members
-			WHERE id_group IN ({array_int:normal_group_list})
+			WHERE id_group IN ({array_int:normal_group_list})' . ($include_non_active ? '' : '
+				AND is_activated = {int:active_members}') . '
 			GROUP BY id_group',
 			array(
 				'normal_group_list' => $normalGroups,
+				'active_members' => 1,
 			)
 		);
 		while ($row = $db->fetch_assoc($query))
@@ -847,10 +852,12 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
 					INNER JOIN {db_prefix}members AS mem ON (mem.additional_groups != {string:blank_string}
 						AND mem.id_group != mg.id_group
 						AND FIND_IN_SET(mg.id_group, mem.additional_groups) != 0)
-				WHERE mg.id_group IN ({array_int:normal_group_list})
+				WHERE mg.id_group IN ({array_int:normal_group_list})' . ($include_non_active ? '' : '
+					AND mem.is_activated = {int:active_members}') . '
 				GROUP BY mg.id_group',
 				array(
 					'normal_group_list' => $normalGroups,
+					'active_members' => 1,
 					'blank_string' => '',
 				)
 			);
