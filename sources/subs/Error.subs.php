@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Functions to assist in viewing and maintaining the error logs
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -17,6 +19,10 @@ if (!defined('ELK'))
  * This should only be called by ManageErrors.controller::action_log().
  * It attempts to TRUNCATE the table to reset the auto_increment.
  * Redirects back to the error log when done.
+ *
+ * @param type $type action
+ * @param array $filter db query of the view filter being used
+ * @param array $error_list int list of error ID's to work on
  */
 function deleteErrors($type, $filter = null, $error_list = null)
 {
@@ -52,7 +58,7 @@ function deleteErrors($type, $filter = null, $error_list = null)
 /**
  * Counts error log entries
  *
- * @return int
+ * @param array $filter db query of the filter being used
  */
 function numErrors($filter = array())
 {
@@ -80,7 +86,6 @@ function numErrors($filter = array())
  * @param int $start
  * @param string $sort_direction
  * @param array $filter
- * @return array
  */
 function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 {
@@ -159,7 +164,6 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
  *
  * @param bool $sort
  * @param int $filter
- * @return array
  */
 function fetchErrorsByType($filter = null, $sort = null)
 {
