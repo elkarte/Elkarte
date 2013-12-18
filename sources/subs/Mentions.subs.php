@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Functions that deal with the database work involved with mentions
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -254,7 +256,7 @@ function changeMentionStatus($id_mention, $status = 1)
  * This is used to turn mentions on when a message is approved
  *
  * @param array $msgs array of messages that you want to toggle
- * @param type $approved direction of the toggle read / unread
+ * @param bool $approved direction of the toggle read / unread
  */
 function toggleMentionsApproval($msgs, $approved)
 {
@@ -326,8 +328,8 @@ function toggleMentionsVisibility($type, $enable)
 /**
  * Toggles a bunch of mentions accessibility on/off
  *
- * @param array an array of mention id
- * @param bool if true make the mentions accessible (if visible and other things), otherwise marks them as inaccessible
+ * @param array $mentions an array of mention id
+ * @param bool $access if true make the mentions accessible (if visible and other things), otherwise marks them as inaccessible
  */
 function toggleMentionsAccessibility($mentions, $access)
 {
@@ -346,8 +348,12 @@ function toggleMentionsAccessibility($mentions, $access)
 }
 
 /**
- * To validate access to read/unread/delete mentions we need
+ * To validate access to read/unread/delete mentions
  * Called from the validation class
+ *
+ * @param string $field
+ * @param array $input
+ * @param array $validation_parameters
  */
 function validate_ownmention($field, $input, $validation_parameters = null)
 {
@@ -399,8 +405,8 @@ function findMemberMention($id_mention, $id_member)
 /**
  * Updates the mention count as a result of an action, read, new, delete, etc
  *
- * @param type $status
- * @param type $member_id
+ * @param int $status
+ * @param int $member_id
  */
 function updateMentionMenuCount($status, $member_id)
 {

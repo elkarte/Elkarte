@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Moderation helper functions.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,8 +14,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * Moderation helper functions.
  *
  */
 
@@ -147,6 +147,8 @@ function recountFailedEmails($approve_query = null)
 
 /**
  * How many entries are we viewing?
+ *
+ * @param int $status
  */
 function totalReports($status = 0)
 {
@@ -172,9 +174,9 @@ function totalReports($status = 0)
 /**
  * Changes a property of all the reports passed (and the user can see)
  *
- * @param array an array of report IDs
- * @param string the property to update ('close' or 'ignore')
- * @param int the status of the property (mainly: 0 or 1)
+ * @param array $reports_id an array of report IDs
+ * @param string $property the property to update ('close' or 'ignore')
+ * @param int $status the status of the property (mainly: 0 or 1)
  */
 function updateReportsStatus($reports_id, $property = 'close', $status = 0)
 {
@@ -382,6 +384,9 @@ function logWarning($memberID, $real_name, $id_notice, $level_change, $warn_reas
  * Removes a custom moderation center template from log_comments
  *  - Logs the template removal action for each warning affected
  *  - Removes the details for all warnings that used the template being removed
+ *
+ * @param int $id_tpl id of the template to remove
+ * @param string $template_type type of template, defaults to warntpl
  */
 function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
 {
@@ -426,10 +431,10 @@ function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
  * Returns all the templates of a type from the system.
  * (used by createList() callbacks)
  *
- * @param $start
- * @param $items_per_page
- * @param $sort
- * @param $template_type type of template to load
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param string $template_type type of template to load
  */
 function warningTemplates($start, $items_per_page, $sort, $template_type = 'warntpl')
 {
@@ -475,7 +480,7 @@ function warningTemplates($start, $items_per_page, $sort, $template_type = 'warn
  *  - Loads warning templates by default
  *  (used by createList() callbacks)
  *
- * @param type $template_type
+ * @param string $template_type
  */
 function warningTemplateCount($template_type = 'warntpl')
 {
@@ -570,7 +575,8 @@ function warningCount()
 /**
  * Loads a moderation template in to context for use in editing a template
  *
- * @param type $id_template
+ * @param int $id_template
+ * @param string $template_type
  */
 function modLoadTemplate($id_template, $template_type = 'warntpl')
 {
@@ -611,6 +617,7 @@ function modLoadTemplate($id_template, $template_type = 'warntpl')
  * @param string $template_body
  * @param int $id_template
  * @param bool $edit true to update, false to insert a new row
+ * @param string $type
  */
 function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $id_template, $edit = true, $type = 'warntpl')
 {
@@ -660,6 +667,8 @@ function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $i
 /**
  * Get the report details, need this so we can limit access to a particular board
  *  - returns false if they are requesting a report they can not see or does not exist
+ *
+ * @param int $id_report
  */
 function modReportDetails($id_report)
 {
@@ -695,9 +704,9 @@ function modReportDetails($id_report)
 /**
  * Get the details for a bunch of open/closed reports
  *
- * @param int 0 => show open reports, 1 => closed reports
- * @param int starting point
- * @param int the number of reports
+ * @param int $status 0 => show open reports, 1 => closed reports
+ * @param int $start starting point
+ * @param int $limit the number of reports
  *
  * @todo move to createList?
  */
@@ -735,7 +744,7 @@ function getModReports($status = 0, $start = 0, $limit = 10)
 /**
  * Grabs all the comments made by the reporters to a set of reports
  *
- * @param array an array of report ids
+ * @param array $id_reports an array of report ids
  */
 function getReportsUserComments($id_reports)
 {
@@ -766,7 +775,7 @@ function getReportsUserComments($id_reports)
 /**
  * Retrieve all the comments made by the moderators to a certain report
  *
- * @param int the id of a report
+ * @param int $id_report the id of a report
  */
 function getReportModeratorsComments($id_report)
 {
@@ -1194,6 +1203,8 @@ function reportedPosts()
 
 /**
  * Remove a moderator note.
+ *
+ * @param int $id_note
  */
 function removeModeratorNote($id_note)
 {
@@ -1240,6 +1251,13 @@ function countModeratorNotes()
 	return $moderator_notes_total;
 }
 
+/**
+ * Adds a moderation note to the moderation center "shoutbox"
+ *
+ * @param int $id_poster who is posting the add
+ * @param string $poster_name a name to show
+ * @param string $contents what they are posting
+ */
 function addModeratorNote($id_poster, $poster_name, $contents)
 {
 	$db = database();
@@ -1258,6 +1276,13 @@ function addModeratorNote($id_poster, $poster_name, $contents)
 	);
 }
 
+/**
+ * Add a moderation comment to an actual moderation report
+ *
+ * @global int $user_info
+ * @param int $report
+ * @param string $newComment
+ */
 function addReportComment($report, $newComment)
 {
 	global $user_info;
@@ -1279,6 +1304,11 @@ function addReportComment($report, $newComment)
 	);
 }
 
+/**
+ * Get the list of current notes in the moderation center "shoutbox"
+ *
+ * @param int $offset
+ */
 function moderatorNotes($offset)
 {
 	$db = database();
@@ -1312,10 +1342,16 @@ function moderatorNotes($offset)
 	return $moderator_notes;
 }
 
+/**
+ * Gets a warning notice by id that was sent to a user.
+ *
+ * @param int $id_notice
+ */
 function moderatorNotice($id_notice)
 {
 	$db = database();
 
+	// Get the body and subject of this notice
 	$request = $db->query('', '
 		SELECT body, subject
 		FROM {db_prefix}log_member_notices
@@ -1329,6 +1365,7 @@ function moderatorNotice($id_notice)
 	list ($notice_body, $notice_subject) = $db->fetch_row($request);
 	$db->free_result($request);
 
+	// Make it look nice
 	$notice_body = parse_bbc($notice_body, false);
 
 	return array($notice_body, $notice_subject);

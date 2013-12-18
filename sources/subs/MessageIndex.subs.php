@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * DB and general functions for working with the message index
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,6 +14,18 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Builds the message index with the supplied parameters
+ * creates all you ever wanted on message index, returns the data in array
+ *
+ * @param int $id_board board to build the topic listing for
+ * @param int $id_member who we are building it for so we don't show unapproved topics
+ * @param int $start where to start from
+ * @param int $per_page how many to return
+ * @param string $sort_by how to sort the results asc/desc
+ * @param string $sort_column which value we sort by
+ * @param array $indexOptions
+ */
 function messageIndexTopics($id_board, $id_member, $start, $per_page, $sort_by, $sort_column, $indexOptions)
 {
 	global $settings;
@@ -98,6 +112,7 @@ function messageIndexTopics($id_board, $id_member, $start, $per_page, $sort_by, 
 
 		$db->free_result($request);
 	}
+
 	return $topics;
 }
 

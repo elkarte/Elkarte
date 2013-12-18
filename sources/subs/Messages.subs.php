@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * This file contains functions for dealing with messages.
+ * Low-level functions, i.e. database operations needed to perform.
+ * These functions (probably) do NOT make permissions checks. (they assume
+ * those were already made).
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,11 +17,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file contains functions for dealing with messages.
- * Low-level functions, i.e. database operations needed to perform.
- * These functions (probably) do NOT make permissions checks. (they assume
- * those were already made).
  *
  */
 
@@ -201,7 +201,7 @@ function prepareMessageContext($message)
  * This function removes all the messages of a certain user that are *not*
  * first messages of a topic
  *
- * @param int The member id
+ * @param int $memID The member id
  */
 function removeNonTopicMessages($memID)
 {
@@ -830,7 +830,7 @@ function nextMessage($id_msg, $id_topic)
  *
  * @param int $start the offset of the message/s
  * @param int $id_topic the id of the topic
- * @param array (optional) $params an array of params, includes:
+ * @param array $params an (optional) array of params, includes:
  *      - 'not_in' => array - of messages to exclude
  *      - 'include' => array - of messages to explicitely include
  *      - 'only_approved' => true/false - include or exclude the unapproved messages
@@ -842,16 +842,16 @@ function messageAt($start, $id_topic, $params = array())
 	$db = database();
 
 	$params = array_merge(
-		// defaults
+		// Defaults
 		array(
 			'not_in' => false,
 			'include' => false,
 			'only_approved' => false,
 			'limit' => 1,
 		),
-		// passed arguments
+		// Passed arguments
 		$params,
-		// others
+		// Others
 		array(
 			'current_topic' => $id_topic,
 			'start' => $start,
@@ -1067,6 +1067,13 @@ function determineRemovableMessages($topic, $messages, $allowed_all)
 	return $messages_list;
 }
 
+/**
+ * Returns the number of messages that are being split to a new topic
+ *
+ * @param int $topic
+ * @param bool $include_unapproved
+ * @param array $selection
+ */
 function countSplitMessages($topic, $include_unapproved, $selection = array())
 {
 	$db = database();
