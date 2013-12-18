@@ -675,6 +675,7 @@ div.windowbg, div.windowbg2 {
 }
 .bbc_img {
 	border: 0;
+	max-width: 100%;
 }
 .bbc_table {
 	color: inherit;
@@ -1903,6 +1904,12 @@ img.new_posts {
 /* Poll question */
 #poll {
 	overflow: hidden;
+}
+#poll_main ul {
+	margin-top: 8px;
+}
+#poll_main li {
+	margin-top: 3px;
 }
 #poll .content {
 	padding: 0 12px;
@@ -3658,6 +3665,7 @@ a.help .icon {
 	#password_login select {
 		display: none;
 	}
+
 }
 /* This one does 800 screens at default font size. */
 @media screen and (max-width: 50em) {
@@ -3723,7 +3731,7 @@ a.help .icon {
 	}
 	.quickbuttons .modified {
 		display: block;
-		width: 90%;
+		width: 100%;
 		text-align: left;
 	}
 	#forumposts .views_text {
@@ -3742,6 +3750,12 @@ a.help .icon {
 	}
 	.ignoreboards.floatright {
 		float: none;
+	}
+	.bbc_img, .elk_video {
+		max-width: 30em;
+	}
+	.elk_previewvideo {
+		max-width: 30em;
 	}
 }
 /* This one does 480 screens at default font size. */
@@ -3795,7 +3809,7 @@ a.help .icon {
 	}
 	.topic_info {
 		display: block;
-		width: 90%;
+		width: 95%;
 		padding: 8px;
 	}
 	.topic_icons {
@@ -3875,16 +3889,18 @@ a.help .icon {
 	.board_info, .board_latest {
 		width: 100%;
 		display: block;
+		box-sizing: border-box;
+		margin-bottom: 2px;
 	}
 	.board_row {
-		padding: 10px 0px;
+		padding: 15px 0px;
 	}
 	.board_info h3 a {
 		font-size: 1.3em;
 		word-wrap: break-word;
 	}
 	.board_name {
-		padding-top: 15px;
+		margin: 0 0 0 35px;
 	}
 	.board_latest {
 		padding: 0 8px;
@@ -4003,6 +4019,12 @@ a.help .icon {
 	.postarea, .forumtitle {
 		padding: 2px;
 	}
+	.bbc_img, .elk_video {
+		max-width: 30em;
+	}
+	.elk_previewvideo {
+		max-width: 30em;
+	}
 	.linktree .board_moderators, .linktree_last .board_moderators {
 		display: none;
 	}
@@ -4049,5 +4071,21 @@ a.help .icon {
 	}
 	.popup_window {
 		width: 95%;
+	}
+	.statistics .category_header {
+		width: 100%;
+		box-sizing: border-box;
+	}
+	.stats {
+		width: 100%;
+		box-sizing: border-box;
+		float: none;
+		margin: 0;
+	}
+	.stats dt {
+		font-weight: bold;
+	}
+	 .poster .menulevel2 {
+		 display: none !important;
 	}
 }

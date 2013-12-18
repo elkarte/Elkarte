@@ -205,9 +205,9 @@ fieldset dl {
 }
 /* Cleaned this up a bit for less clutter.
 /* Admin and moderation could generally do with a clean up everywhere.
-/* Live news from smf.org and support information. */
+/* Live news from elkarte.net and support information. */
 #admin_main_section {
-	margin: 12px 0 0 0;
+	margin: 12px 0 20px 0;
 	padding: 8px 12px 4px 12px;
 }
 #live_news, #supportVersionsTable {
@@ -374,6 +374,9 @@ div.quick_tasks {
 	margin: 0 105px;
 	padding: 0;
 	min-height: 56px;
+}
+#private {
+	width: 100%;
 }
 
 /* Styles for the package manager.
@@ -781,10 +784,6 @@ dl.themes_list dd {
 }
 #modcenter .content {
 	padding: 12px;
-}
-#admin_main_section {
-	margin: 12px 0 0 0;
-	padding: 8px 12px 4px 12px;
 }
 #mod_main_section .windowbg {
 	padding: 6px 0;
