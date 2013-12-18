@@ -1,13 +1,13 @@
 <?php
 
 /**
+ * This file contains the database work for karma.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Beta
- *
- * This file contains the database work for karma.
  *
  */
 
@@ -33,7 +33,7 @@ function clearKarma($karmaWaitTime)
 
 /**
  * Last action this user has done
-
+ *
  * @param int $id_executor
  * @param int $id_target
  */

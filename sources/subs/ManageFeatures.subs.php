@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * This file provides utility functions and db function for the profile functions,
+ * notably, but not exclusivly, deals with custom profile fields
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -13,10 +16,6 @@
  *
  * @version 1.0 Beta
  *
- * This file provides compatibility functions such as the sha1() function,
- * missing extensions, etc
- * It is only included for when the respective extension or function cannot be found.
- *
  */
 
 if (!defined('ELK'))
@@ -26,7 +25,7 @@ if (!defined('ELK'))
  * Loads the signature from 50 members per request
  * Used in ManageFeatures to apply signature settings to all members
  *
- * @param type $start_member
+ * @param int $start_member
  * @return array
  */
 function getSignatureFromMembers($start_member)
@@ -76,12 +75,13 @@ function updateSignature($id_member, $signature)
 }
 
 /**
- * Callback for createList().
+ * Callback for createList() in displaying profile fields
+ * Can be used to load standard or custom fields by setting the $standardFields flag
  *
- * @param $start
- * @param $items_per_page
- * @param $sort
- * @param $standardFields
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param boolean $standardFields
  */
 function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 {
@@ -152,7 +152,7 @@ function list_getProfileFieldSize()
 /**
  * Loads the profile field properties from a given field id
  *
- * @param type $id_field
+ * @param int $id_field
  * @return array $field
  */
 function getProfileField($id_field)
@@ -294,7 +294,7 @@ function updateRenamedProfileStatus($enabled)
 /**
  * Update the profile field
  *
- * @param type $field_data
+ * @param array $field_data
  */
 function updateProfileField($field_data)
 {
@@ -339,7 +339,7 @@ function updateProfileField($field_data)
  * Updates the viewing order for profile fields
  * Done as a CASE WHEN one two three ELSE 0 END in place of many updates
  *
- * @param string replace constucted as WHEN fieldname=value THEN new viewvalue WHEN .....
+ * @param string $replace constucted as WHEN fieldname=value THEN new viewvalue WHEN .....
  */
 function updateProfileFieldOrder($replace)
 {
@@ -355,8 +355,8 @@ function updateProfileFieldOrder($replace)
 /**
  * Deletes selected values from old profile field selects
  *
- * @param type $newOptions
- * @param type $fieldname
+ * @param array $newOptions
+ * @param string $fieldname
  */
 function deleteOldProfileFieldSelects($newOptions, $fieldname)
 {

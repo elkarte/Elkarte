@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Handle memberlist functions
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -13,9 +15,8 @@
  *
  * @version 1.0 Beta
  *
- * Handle online users
- *
  */
+
 if (!defined('ELK'))
 	die('No access...');
 
@@ -25,7 +26,6 @@ if (!defined('ELK'))
  *  - Loads the fields in to $context['custom_profile_fields']
  *  - Defines the sort querys for the custom columns
  *  - Defines additional query parameters and joins needed to the memberlist
- *
  */
 function ml_CustomProfile()
 {
@@ -219,9 +219,9 @@ function ml_selectMembers($query_parameters, $where = '', $limit = 0, $sort = ''
  *  - Uses printMemberListRows to load the query results in to context
  *
  * @param array $query_parameters
+ * @param string $customJoin
  * @param string $where
  * @param int $limit
- * @param string $sort
  */
 function ml_searchMembers($query_parameters, $customJoin = '', $where = '', $limit = 0)
 {
