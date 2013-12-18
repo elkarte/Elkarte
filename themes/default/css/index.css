@@ -675,6 +675,7 @@ div.windowbg, div.windowbg2 {
 }
 .bbc_img {
 	border: 0;
+	max-width: 100%;
 }
 .bbc_table {
 	color: inherit;
