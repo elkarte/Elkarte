@@ -13,7 +13,7 @@
  */
 function template_list_groups_collapsible($group = 'default_groups_list')
 {
-	global $context;
+	global $context, $txt;
 
 	$current_group_list = $context[$group];
 	$all_selected = true;
@@ -38,6 +38,10 @@ function template_list_groups_collapsible($group = 'default_groups_list')
 	}
 
 	echo '
+				<li class="check_all">
+					<input type="checkbox" id="check_all" ', $all_selected ? 'checked="checked" ' : '', 'onclick="invertAll(this, this.form, \'groups\');" class="input_check" />
+					<label for="check_all">', $txt['check_all'], '</label>
+				</li>
 			</ul>
 		</fieldset>';
 }
