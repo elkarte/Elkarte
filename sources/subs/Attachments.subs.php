@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * This file handles the uploading and creation of attachments
+ * as well as the auto management of the attachment directories.
+ * Note to enhance documentation later:
+ * attachment_type = 3 is a thumbnail, etc.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,11 +17,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file handles the uploading and creation of attachments
- * as well as the auto management of the attachment directories.
- * Note to enhance documentation later:
- * attachment_type = 3 is a thumbnail, etc.
  *
  */
 
@@ -134,7 +134,7 @@ function automanage_attachments_check_directory()
  * Attempts to make the directory writable
  * Places an .htaccess in new directories for security
  *
- * @param type $updir
+ * @param string $updir
  */
 function automanage_attachments_create_directory($updir)
 {
@@ -270,7 +270,7 @@ function automanage_attachments_by_space()
 /**
  * Finds the current directory tree for the supplied base directory
  *
- * @param type $directory
+ * @param string $directory
  * @return boolean on fail else array of directory names
  */
 function get_directory_tree_elements($directory)
@@ -1515,6 +1515,8 @@ function getAvatarPathID()
  *
  * @param array $messages array of messages ids
  * @param bool $includeUnapproved = false
+ * @param string $filter name of a callback function
+ * @param array $all_posters
  */
 function getAttachments($messages, $includeUnapproved = false, $filter = null, $all_posters = array())
 {
@@ -1588,7 +1590,7 @@ function getAttachmentCount()
 /**
  * How many attachments we have in a certain folder.
  *
- * @return int
+ * @param string $folder
  */
 function getFolderAttachmentCount($folder)
 {
@@ -2325,7 +2327,7 @@ function validateAttachments($attachments, $approve_query)
 /**
  * Finds an attachments parent topic/message and returns the values in an array
  *
- * @param array $attachments
+ * @param array $attachment
  */
 function attachmentBelongsTo($attachment)
 {
@@ -2800,6 +2802,7 @@ function currentAttachDirProperties()
 
 /**
  * Get files and size from the current attachments dir
+ * @param string $dir
  */
 function attachDirProperties($dir)
 {
@@ -3047,7 +3050,7 @@ function attachmentsOfMessage($id_msg, $unapproved = false)
  * It attempts to keep the "aspect ratio" of the posted image in line, even if it has to be resized by
  * the max_image_width and max_image_height settings.
  *
- * @param type $id_msg message number to load attachments for
+ * @param int $id_msg message number to load attachments for
  * @return array of attachments
  */
 function loadAttachmentContext($id_msg)
@@ -3150,8 +3153,8 @@ function loadAttachmentContext($id_msg)
 
 /**
  * A sort function for putting unapproved attachments first.
- * @param $a
- * @param $b
+ * @param array $a
+ * @param array $b
  * @return int, -1, 0, 1
  */
 function approved_attach_sort($a, $b)

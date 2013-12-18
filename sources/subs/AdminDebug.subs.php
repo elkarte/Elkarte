@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Functions to support debug controller
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
