@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Utility functions for search functionality.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -13,8 +15,6 @@
  *
  * @version 1.0 Beta
  *
- * Utility functions for search functionality.
- *
  */
 
 if (!defined('ELK'))
@@ -24,13 +24,14 @@ if (!defined('ELK'))
 $GLOBALS['search_versions'] = array(
 	// This is the forum version but is repeated due to some people rewriting $forum_version.
 	'forum_version' => 'ElkArte 1.0 Beta',
-	// This is the minimum version of ElkArte that an API could have been written for to work. (strtr to stop accidentally updating version on release)
-	'search_version' => strtr('ElkArte 1+0=Alpha', array('+' => '.', '=' => ' ')),
+
+	// This is the minimum version of ElkArte that an API could have been written for to work.
+	// (strtr to stop accidentally updating version on release)
+	'search_version' => strtr('ElkArte 1+0=Beta', array('+' => '.', '=' => ' ')),
 );
 
 /**
  * Creates a search API and returns the object.
- *
  */
 function findSearchAPI()
 {
@@ -42,6 +43,7 @@ function findSearchAPI()
 	$modSettings['search_index'] = empty($modSettings['search_index']) ? 'standard' : $modSettings['search_index'];
 	if (!file_exists(SUBSDIR . '/SearchAPI-' . ucwords($modSettings['search_index']) . '.class.php'))
 		fatal_lang_error('search_api_missing');
+
 	require_once(SUBSDIR . '/SearchAPI-' . ucwords($modSettings['search_index']) . '.class.php');
 
 	// Create an instance of the search API and check it is valid for this version of the software.

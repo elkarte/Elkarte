@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This file/class handles known scheduled tasks
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -84,7 +86,6 @@ class ScheduledTask
 			return true;
 
 		// Now we need to think about finding out *who* can approve - this is hard!
-
 		// First off, get all the groups with this permission and sort by board.
 		$request = $db->query('', '
 			SELECT id_group, id_profile, add_deny
@@ -119,6 +120,7 @@ class ScheduledTask
 		{
 			require_once(SUBSDIR . '/Boards.subs.php');
 			$all_mods = allBoardModerators(true);
+
 			// Make sure they get included in the big loop.
 			$members = array_keys($all_mods);
 			foreach ($all_mods as $row)
@@ -167,6 +169,7 @@ class ScheduledTask
 		loadEssentialThemeData();
 
 		$current_language = '';
+
 		// Finally, loop through each member, work out what they can do, and send it.
 		foreach ($members as $id => $member)
 		{
@@ -1315,7 +1318,7 @@ class ScheduledTask
 	{
 		$db = database();
 
-		// init
+		// Init
 		$topics = array();
 
 		// We will need this for lanaguage files
@@ -1437,13 +1440,17 @@ class ScheduledTask
 		return true;
 	}
 
+	/**
+	 * Re-syncs if a user can access a mention, for example if they loose or gain access
+	 * to a board, this will correct the viewing of the mention table.  Since this can be
+	 * a large job it is run as a scheduled immediate task
+	 */
 	function user_access_mentions()
 	{
 		global $modSettings;
 
 		$db = database();
 		$mentions_check_users = @unserialize($modSettings['mentions_check_users']);
-		$scheduleTaskImmediate = @unserialize($modSettings['scheduleTaskImmediate']);
 
 		// This should be set only because of an immediate scheduled task, so higher priority
 		if (!empty($mentions_check_users))
@@ -1462,6 +1469,7 @@ class ScheduledTask
 				{
 					// Drop it
 					unset($mentions_check_users[$member]);
+
 					// And save everything for the next run
 					updateSettings(array('mentions_check_users' => serialize($mentions_check_users)));
 				}
@@ -1472,7 +1480,8 @@ class ScheduledTask
 
 					require_once(SUBSDIR . '/Mentions.subs.php');
 
-					// We need to repeat this twice: one to find the boards the user can access, one for those he cannot access
+					// We need to repeat this twice: once to find the boards the user can access,
+					// once for those he cannot access
 					foreach (array('can', 'cannot') as $can)
 					{
 						while (true)

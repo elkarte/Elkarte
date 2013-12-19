@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Standard non full index, non custom index search
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -25,17 +27,15 @@ class Standard_Search
 {
 	/**
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
-	 *
 	 * @var type
 	 */
 	public $version_compatible = 'ElkArte 1.0 Beta';
 
 	/**
 	 * This won't work with versions of ElkArte less than this.
-	 *
 	 * @var type
 	 */
-	public $min_elk_version = 'ElkArte 1.0 Alpha';
+	public $min_elk_version = 'ElkArte 1.0 Beta';
 
 	/**
 	 * Standard search is supported by default.
@@ -46,8 +46,8 @@ class Standard_Search
 	/**
 	 * Method to check whether the method can be performed by the API.
 	 *
-	 * @param type $methodName
-	 * @param type $query_params
+	 * @param string $methodName
+	 * @param mixed $query_params
 	 * @return boolean
 	 */
 	public function supportsMethod($methodName, $query_params = null)
