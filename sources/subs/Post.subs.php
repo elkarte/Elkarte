@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * This file contains those functions pertaining to posting, and other such
+ * operations, including sending emails, ims, blocking spam, preparsing posts,
+ * spell checking, and the post box.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,10 +16,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file contains those functions pertaining to posting, and other such
- * operations, including sending emails, ims, blocking spam, preparsing posts,
- * spell checking, and the post box.
  *
  */
 
@@ -459,6 +459,12 @@ function fixTag(&$message, $myTag, $protocols, $embeddedUrl = false, $hasEqualSi
 		$message = strtr($message, $replaces);
 }
 
+/**
+ * Updates BBC img tags in a message so that the width / height respect the forum settings.
+ * Will add the width/height attrib if needed, or update existing ones if they break the rules
+ *
+ * @param string $message
+ */
 function resizeBBCImages(&$message)
 {
 	global $modSettings;
@@ -873,9 +879,9 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 /**
  * Modifying a post...
  *
- * @param array &$msgOptions
- * @param array &$topicOptions
- * @param array &$posterOptions
+ * @param array $msgOptions
+ * @param array $topicOptions
+ * @param array $posterOptions
  */
 function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 {
@@ -1449,6 +1455,15 @@ function lastPost()
 	);
 }
 
+/**
+ * Prepares a post subject for the post form
+ * Will add the approriate Re: to the post subject if its a reply to an existing post
+ * If quoting a post, or editing a post, this function also prepares the message body
+ *
+ * @param boolean $editing
+ * @param int $topic
+ * @param string $first_subject
+ */
 function getFormMsgSubject($editing, $topic, $first_subject = '')
 {
 	global $modSettings, $context;
@@ -1458,8 +1473,10 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 	if ($editing)
 	{
 		require_once(SUBSDIR . '/Messages.subs.php');
+
 		// Get the existing message.
 		$message = messageDetails((int) $_REQUEST['msg'], $topic);
+
 		// The message they were trying to edit was most likely deleted.
 		if ($message === false)
 			fatal_lang_error('no_message', false);
@@ -1547,6 +1564,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 			$form_subject = isset($_GET['subject']) ? $_GET['subject'] : '';
 			$form_message = '';
 		}
+
 		return array($form_subject, $form_message);
 	}
 }
