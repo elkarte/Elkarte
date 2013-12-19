@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * Functions to seach for a member by real name or member name, invoked
+ * via xml form requests
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause

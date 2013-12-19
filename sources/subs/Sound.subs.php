@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * Handles sound processing. In order to make sure the visual
+ * verification is still accessible for all users, a sound clip is being addded
+ * that reads the letters that are being shown.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,10 +16,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * Handles sound processing. In order to make sure the visual
- * verification is still accessible for all users, a sound clip is being addded
- * that reads the letters that are being shown.
  *
  */
 

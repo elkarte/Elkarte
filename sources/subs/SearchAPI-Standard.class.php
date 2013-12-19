@@ -27,19 +27,19 @@ class Standard_Search
 {
 	/**
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
-	 * @var type
+	 * @var string
 	 */
 	public $version_compatible = 'ElkArte 1.0 Beta';
 
 	/**
 	 * This won't work with versions of ElkArte less than this.
-	 * @var type
+	 * @var string
 	 */
 	public $min_elk_version = 'ElkArte 1.0 Beta';
 
 	/**
 	 * Standard search is supported by default.
-	 * @var type
+	 * @var boolean
 	 */
 	public $is_supported = true;
 

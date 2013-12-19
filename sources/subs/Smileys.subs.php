@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Database and support functions for adding, moving, saving smileys
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -76,8 +78,7 @@ function validateDuplicateSmiley($code, $current = null)
 /**
  * Request the next location for a new smiley
  *
- * @param type $location
- * @return type
+ * @param string $location
  */
 function nextSmileyLocation($location)
 {
@@ -306,8 +307,8 @@ function updateSmileyRow($id, $row, $location)
 /**
  * Set an new order for the given smiley.
  *
- * @param type $id
- * @param type $order
+ * @param int $id
+ * @param int $order
  */
 function updateSmileyOrder($id, $order)
 {
@@ -326,8 +327,6 @@ function updateSmileyOrder($id, $order)
 
 /**
  * Get a list of all visible smileys.
- *
- * @return type
  */
 function getSmileys()
 {
@@ -371,7 +370,7 @@ function getSmileys()
 /**
  * Validates, if a smiley set was properly installed.
  *
- * @param type $set
+ * @param string $set name of smiley set to check
  * @return boolean
  */
 function isSmileySetInstalled($set)
@@ -390,7 +389,6 @@ function isSmileySetInstalled($set)
 			'current_package' => $set,
 		)
 	);
-
 	if ($db->num_rows($request) > 0)
 		return false;
 
@@ -426,8 +424,6 @@ function logPackageInstall($param)
 
 /**
  * Get the last smiley_order from the first smileys row.
- *
- * @return type
  */
 function getMaxSmileyOrder()
 {
@@ -487,9 +483,9 @@ function sortSmileyTable()
  * Callback function for createList().
  * Lists all smiley sets.
  *
- * @param $start
- * @param $items_per_page
- * @param $sort
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
  */
 function list_getSmileySets($start, $items_per_page, $sort)
 {
@@ -497,12 +493,14 @@ function list_getSmileySets($start, $items_per_page, $sort)
 
 	$known_sets = explode(',', $modSettings['smiley_sets_known']);
 	$set_names = explode("\n", $modSettings['smiley_sets_names']);
+
 	$cols = array(
 		'id' => array(),
 		'selected' => array(),
 		'path' => array(),
 		'name' => array(),
 	);
+
 	foreach ($known_sets as $i => $set)
 	{
 		$cols['id'][] = $i;
@@ -510,7 +508,9 @@ function list_getSmileySets($start, $items_per_page, $sort)
 		$cols['path'][] = $set;
 		$cols['name'][] = $set_names[$i];
 	}
+
 	$sort_flag = strpos($sort, 'DESC') === false ? SORT_ASC : SORT_DESC;
+	
 	if (substr($sort, 0, 4) === 'name')
 		array_multisort($cols['name'], $sort_flag, SORT_REGULAR, $cols['path'], $cols['selected'], $cols['id']);
 	elseif (substr($sort, 0, 4) === 'path')

@@ -1,19 +1,20 @@
 <?php
 
 /**
- * @name      ElkArte Forum
- * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
- *
- * @version 1.0 Beta
- *
  * This file is holds low-level database work used by the Stats.
  * Some functions/queries (or all :P) might be duplicate, along Elk.
  * They'll be here to avoid including many files in action_stats, and
  * perhaps for use of addons in a similar way they were using some
  * SSI functions.
+ *
  * The purpose of this file is experimental and might be deprecated in
  * favor of a better solution.
+ *
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0 Beta
  *
  */
 
@@ -21,7 +22,6 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- *
  * Return the number of currently online members.
  */
 function onlineCount()
@@ -149,7 +149,6 @@ function genderRatio()
 		array(
 		)
 	);
-
 	while ($row = $db->fetch_assoc($result))
 	{
 		// Assuming we're telling... male or female?
@@ -164,6 +163,7 @@ function genderRatio()
 /**
  * Loads a list of top x posters, x is configurable via $modSettings['stats_limit'].
  *
+ * @param int $limit
  * @return array
  */
 function topPosters($limit = null)
@@ -192,7 +192,6 @@ function topPosters($limit = null)
 			'limit_posts' => $limit,
 		)
 	);
-
 	$max_num_posts = 1;
 	while ($row_members = $db->fetch_assoc($members_result))
 	{
@@ -220,6 +219,8 @@ function topPosters($limit = null)
 /**
  * Loads a list of top x boards, x is configurable via $modSettings['stats_limit'].
  *
+ * @param int $limit if not supplied, defaults to 10
+ * @param boolean $read_status
  * @return array
  */
 function topBoards($limit = null, $read_status = false)
@@ -284,6 +285,7 @@ function topBoards($limit = null, $read_status = false)
 /**
  * Loads a list of top x topic replies, x is configurable via $modSettings['stats_limit'].
  *
+ * @param int $limit if not supplied, defaults to 10
  * @return array
  */
 function topTopicReplies($limit = null)
@@ -376,6 +378,7 @@ function topTopicReplies($limit = null)
 /**
  * Loads a list of top x topic views, x is configurable via $modSettings['stats_limit'].
  *
+ * @param int $limit if not supplied, defaults to 10
  * @return array
  */
 function topTopicViews($limit = null)
@@ -580,8 +583,10 @@ function topTimeOnline()
 		$timelogged = '';
 		if ($timeDays > 0)
 			$timelogged .= $timeDays . $txt['totalTimeLogged5'];
+
 		if ($timeHours > 0)
 			$timelogged .= $timeHours . $txt['totalTimeLogged6'];
+
 		$timelogged .= floor(($row_members['total_time_logged_in'] % 3600) / 60) . $txt['totalTimeLogged7'];
 
 		$top_time_online[] = array(
@@ -624,10 +629,9 @@ function monthlyActivity()
 		GROUP BY stats_year, stats_month',
 		array()
 	);
-
 	while ($row_months = $db->fetch_assoc($months_result))
 	{
-		$ID_MONTH = $row_months['stats_year'] . sprintf('%02d', $row_months['stats_month']);
+		$id_month = $row_months['stats_year'] . sprintf('%02d', $row_months['stats_month']);
 		$expanded = !empty($_SESSION['expanded_stats'][$row_months['stats_year']]) && in_array($row_months['stats_month'], $_SESSION['expanded_stats'][$row_months['stats_year']]);
 
 		if (!isset($context['yearly'][$row_months['stats_year']]))
@@ -645,13 +649,13 @@ function monthlyActivity()
 			);
 
 		$context['yearly'][$row_months['stats_year']]['months'][(int) $row_months['stats_month']] = array(
-			'id' => $ID_MONTH,
+			'id' => $id_month,
 			'date' => array(
 				'month' => sprintf('%02d', $row_months['stats_month']),
 				'year' => $row_months['stats_year']
 			),
-			'href' => $scripturl . '?action=stats;' . ($expanded ? 'collapse' : 'expand') . '=' . $ID_MONTH . '#m' . $ID_MONTH,
-			'link' => '<a href="' . $scripturl . '?action=stats;' . ($expanded ? 'collapse' : 'expand') . '=' . $ID_MONTH . '#m' . $ID_MONTH . '">' . $txt['months'][(int) $row_months['stats_month']] . ' ' . $row_months['stats_year'] . '</a>',
+			'href' => $scripturl . '?action=stats;' . ($expanded ? 'collapse' : 'expand') . '=' . $id_month . '#m' . $id_month,
+			'link' => '<a href="' . $scripturl . '?action=stats;' . ($expanded ? 'collapse' : 'expand') . '=' . $id_month . '#m' . $id_month . '">' . $txt['months'][(int) $row_months['stats_month']] . ' ' . $row_months['stats_year'] . '</a>',
 			'month' => $txt['months'][(int) $row_months['stats_month']],
 			'year' => $row_months['stats_year'],
 			'new_topics' => comma_format($row_months['topics']),
@@ -680,6 +684,7 @@ function monthlyActivity()
 /**
  * Loads the statistics on a daily basis in $context.
  * called by action_stats().
+ * 
  * @param string $condition_string
  * @param array $condition_parameters = array()
  */
