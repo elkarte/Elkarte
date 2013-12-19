@@ -1169,7 +1169,6 @@ function grabJumpToContent(elem)
  * sCurBoardName: name of the currently active board
  * sBoardChildLevelIndicator: text/characters used to indent
  * sBoardPrefix: arrow head
- * sCatSeparator: hr to use to separate areas
  * sCatPrefix: Prefix to use in from of the categories
  * bNoRedirect: boolean for redirect
  * bDisabled: boolean for disabled
@@ -1201,16 +1200,6 @@ JumpTo.prototype.showSelect = function ()
 // Fill the jump to box with entries. Method of the JumpTo class.
 JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 {
-	// Create an category seperator option that'll be above and below the category.
-	if (this.opt.sCatSeparator)
-	{
-		var oDashOption = document.createElement('option');
-
-		oDashOption.appendChild(document.createTextNode(this.opt.sCatSeparator));
-		oDashOption.disabled = 'disabled';
-		oDashOption.value = '';
-	}
-
 	if ('onbeforeactivate' in document)
 		this.dropdownList.onbeforeactivate = null;
 	else
@@ -1220,7 +1209,8 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 		this.dropdownList.options[0].disabled = 'disabled';
 
 	// Create a document fragment that'll allowing inserting big parts at once.
-	var oListFragment = document.createDocumentFragment();
+	var oListFragment = document.createDocumentFragment(),
+		oOptgroupFragment = document.createElement('optgroup');
 
 	// Loop through all items to be added.
 	for (var i = 0, n = aBoardsAndCategories.length; i < n; i++)
@@ -1233,15 +1223,16 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 		// If we've reached the currently selected board add all items so far.
 		if (!aBoardsAndCategories[i].isCategory && aBoardsAndCategories[i].id === this.opt.iCurBoardId)
 		{
-				this.dropdownList.insertBefore(oListFragment, this.dropdownList.options[0]);
-				oListFragment = document.createDocumentFragment();
+				this.dropdownList.insertBefore(oOptgroupFragment, this.dropdownList.options[0]);
 				continue;
 		}
 
 		if (aBoardsAndCategories[i].isCategory)
 		{
-			if (this.opt.sCatSeparator)
-				oListFragment.appendChild(oDashOption.cloneNode(true));
+			oOptgroupFragment = document.createElement('optgroup');
+			oOptgroupFragment.label = aBoardsAndCategories[i].name;
+			oListFragment.appendChild(oOptgroupFragment);
+			continue;
 		}
 		else
 		{
@@ -1271,11 +1262,7 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 				oOption.value = aBoardsAndCategories[i].id;
 		}
 
-		oListFragment.appendChild(oOption);
-
-		// Using a non-selectable text seperator?
-		if (aBoardsAndCategories[i].isCategory && this.opt.sCatSeparator)
-			oListFragment.appendChild(oDashOption.cloneNode(true));
+		oOptgroupFragment.appendChild(oOption);
 	}
 
 	// Add the remaining items after the currently selected item.
