@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * This file contains functions for dealing with topics. Low-level functions,
+ * i.e. database operations needed to perform.
+ * These functions do NOT make permissions checks. (they assume those were
+ * already made).
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,11 +17,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file contains functions for dealing with topics. Low-level functions,
- * i.e. database operations needed to perform.
- * These functions do NOT make permissions checks. (they assume those were
- * already made).
  *
  */
 
@@ -753,7 +753,7 @@ function moveTopicConcurrence()
 /**
  * Increase the number of views of this topic.
  *
- * @param int $id_topic, the topic being viewed or whatnot.
+ * @param int $id_topic the topic being viewed or whatnot.
  */
 function increaseViewCounter($id_topic)
 {
@@ -849,6 +849,7 @@ function updateReadNotificationsFor($id_topic, $id_board)
 /**
  * How many topics are still unread since (last visit)
  *
+ * @param int $id_board
  * @param int $id_msg_last_visit
  * @return int
  */
@@ -1087,10 +1088,10 @@ function setTopicWatch($id_member, $topic, $on = false)
  *
  * @param array $topic_parameters can also accept a int value for a topic
  * @param string $full defines the values returned by the function:
- *             - if empty returns only the data from {db_prefix}topics
- *             - if 'message' returns also informations about the message (subject, body, etc.)
- *             - if 'starter' returns also informations about the topic starter (id_member and poster_name)
- *             - if 'all' returns additional infos about the read/unwatched status
+ *		- if empty returns only the data from {db_prefix}topics
+ *		- if 'message' returns also informations about the message (subject, body, etc.)
+ *		- if 'starter' returns also informations about the topic starter (id_member and poster_name)
+ *		- if 'all' returns additional infos about the read/unwatched status
  * @param array $selects (optional from integation)
  * @param array $tables (optional from integation)
  */
@@ -1288,10 +1289,10 @@ function messagesSince($id_topic, $id_msg, $include_current = false, $only_appro
 
 /**
  * This function returns the number of messages in a topic,
- * posted after $last_msg.
+ * posted after $id_msg.
  *
  * @param int $id_topic
- * @param int $last_msg
+ * @param int $id_msg
  * @param bool $include_current = false
  * @param bool $only_approved = false
  *
@@ -1468,6 +1469,13 @@ function topicMessages($topic)
 	return $posts;
 }
 
+/**
+ * Load message image attachments for use in the print page function
+ * Returns array of file attachment name along with width/height properties
+ * Will only return approved attachments
+ *
+ * @param type $id_messages
+ */
 function messagesAttachments($id_messages)
 {
 	global $modSettings;
@@ -1486,7 +1494,6 @@ function messagesAttachments($id_messages)
 			'is_approved' => 1,
 		)
 	);
-
 	$temp = array();
 	$printattach = array();
 	while ($row = $db->fetch_assoc($request))
@@ -1498,7 +1505,7 @@ function messagesAttachments($id_messages)
 	$db->free_result($request);
 	ksort($temp);
 
-	// load them into $context so the template can use them
+	// Load them into $context so the template can use them
 	foreach ($temp as $row)
 	{
 		if (!empty($row['width']) && !empty($row['height']))
@@ -1714,6 +1721,7 @@ function setTopicAttribute($topic, $attributes)
 /**
  * Retrieve the locked or sticky status of a topic.
  *
+ * @param int $id_topic topic to get the status for
  * @param string $attribute 'locked' or 'sticky'
  */
 function topicAttribute($id_topic, $attribute)
@@ -2022,9 +2030,10 @@ function approveTopics($topics, $approve = true)
 /**
  * Post a message at the end of the original topic
  *
- * @param string $reason, the text that will become the message body
- * @param string $subject, the text that will become the message subject
- * @param string $board_info, some board informations (at least id, name, if posts are counted)
+ * @param string $reason the text that will become the message body
+ * @param string $subject the text that will become the message subject
+ * @param array $board_info some board informations (at least id, name, if posts are counted)
+ * @param string $new_topic used to buld the url for moving to a new topic
  */
 function postSplitRedirect($reason, $subject, $board_info, $new_topic)
 {
@@ -2072,6 +2081,7 @@ function postSplitRedirect($reason, $subject, $board_info, $new_topic)
  * updates the statistics to reflect a newly created topic.
  * logs the action in the moderation log.
  * a notification is sent to all users monitoring this topic.
+ *
  * @param int $split1_ID_TOPIC
  * @param array $splitMessages
  * @param string $new_subject
@@ -2282,6 +2292,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	), $id_board);
 
 	require_once(SUBSDIR . '/FollowUps.subs.php');
+
 	// Let's see if we can create a stronger bridge between the two topics
 	// @todo not sure what message from the oldest topic I should link to the new one, so I'll go with the first
 	linkMessages($split1_first_msg, $split2_ID_TOPIC);
@@ -2541,12 +2552,14 @@ function topicNotifications($start, $items_per_page, $sort, $memID)
 /**
  * Get a list of posters in this topic, and their posts counts in the topic.
  * Used to update users posts counts when topics are moved or are deleted.
+ *
+ * @param int $id_topic topic id to work with
  */
 function postersCount($id_topic)
 {
 	$db = database();
 
-	// we only care about approved topics, the rest don't count.
+	// We only care about approved topics, the rest don't count.
 	$request = $db->query('', '
 		SELECT id_member
 		FROM {db_prefix}messages
@@ -2658,7 +2671,7 @@ function mergeableTopics($id_board, $id_topic, $approved, $offset)
 /**
  * Determines all messages from a given array of topics.
  *
- * @param array int $topics
+ * @param array $topics integer array of topics to work with
  * @return array
  */
 function messagesInTopics($topics)

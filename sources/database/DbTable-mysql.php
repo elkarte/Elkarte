@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * This class implements functionality related to table structure.
+ * Intended in particular for addons to change it to suit their needs.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -11,16 +14,22 @@
  *
  * @version 1.0 Beta
  *
- * This class implements functionality related to table structure.
- * Intended in particular for addons to change it to suit their needs.
- *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Adds MySQL table level functionality,
+ * Table creation / droping, column adding / removing
+ * Most often used during install and Upgrades of the forum and addons
+ */
 class DbTable_MySQL extends DbTable
 {
+	/**
+	 * Holds this instance of the table interface
+	 * @var instance
+	 */
 	private static $_tbl = null;
 
 	/**
@@ -37,6 +46,9 @@ class DbTable_MySQL extends DbTable
 	 */
 	private $_package_log = null;
 
+	/**
+	 * DbTable_MySQL::construct
+	 */
 	private function __construct()
 	{
 		global $db_prefix;
@@ -52,6 +64,7 @@ class DbTable_MySQL extends DbTable
 			'messages', 'moderators', 'package_servers', 'permission_profiles', 'permissions', 'personal_messages',
 			'pm_recipients', 'poll_choices', 'polls', 'scheduled_tasks', 'sessions', 'settings', 'smileys',
 			'themes', 'topics');
+
 		foreach ($this->_reservedTables as $k => $table_name)
 			$this->_reservedTables[$k] = strtolower($db_prefix . $table_name);
 
@@ -420,7 +433,7 @@ class DbTable_MySQL extends DbTable
 	 *
 	 * @param string $table_name
 	 * @param string $index_name
-	 * @param array$parameters default array()
+	 * @param array $parameters default array()
 	 * @param string $error default 'fatal'
 	 */
 	function db_remove_index($table_name, $index_name, $parameters = array(), $error = 'fatal')
@@ -640,7 +653,6 @@ class DbTable_MySQL extends DbTable
 	 * Creates a query for a column
 	 *
 	 * @param array $column
-	 * @return type
 	 */
 	private function _db_create_query_column($column)
 	{
@@ -671,11 +683,17 @@ class DbTable_MySQL extends DbTable
 		return '`' .$column['name'] . '` ' . $type . ' ' . (!empty($unsigned) ? $unsigned : '') . (!empty($column['null']) ? '' : 'NOT NULL') . ' ' . $default;
 	}
 
+	/**
+	 * Return a copy of this instance package log
+	 */
 	function package_log()
 	{
 		return $this->_package_log;
 	}
 
+	/**
+	 * Static method that allows to retrieve or create an instance of this class.
+	 */
 	public static function db_table()
 	{
 		if (is_null(self::$_tbl))

@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * The Xml_Array class is an xml parser.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,8 +14,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * The Xml_Array class is an xml parser.
  *
  */
 
@@ -546,8 +546,7 @@ class Xml_Array
 	/**
 	 * Return an element as an array
 	 *
-	 * @param type $array
-	 * @return type
+	 * @param array $array
 	 */
 	protected function _array($array)
 	{

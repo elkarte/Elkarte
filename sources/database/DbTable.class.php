@@ -1,22 +1,26 @@
 <?php
 
 /**
+ * This is the base class for DbTable functionality.
+ * It contains abstract methods to be implemented for the specific database system,
+ * related to a table structure.
+ * Add-ons will need this, to change the database for their needs.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Beta
  *
- * This is the base class for DbTable functionality.
- * It contains abstract methods to be implemented for the specific database system,
- * related to a table structure.
- * Add-ons will need this, to change the database for their needs.
- *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * This is used to create a table without worrying about schema compatabilities
+ * across supported database systems.
+ */
 abstract class DbTable
 {
 	/**
@@ -109,7 +113,7 @@ abstract class DbTable
 	 *
 	 * @param string $table_name
 	 * @param string $index_name
-	 * @param array$parameters default array()
+	 * @param array $parameters default array()
 	 * @param string $error default 'fatal'
 	 */
 	abstract function db_remove_index($table_name, $index_name, $parameters = array(), $error = 'fatal');

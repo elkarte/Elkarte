@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Legacy utility functions, such as to handle multi byte strings
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -40,12 +42,25 @@ class Util
 		);
 	}
 
+	/**
+	 * Converts invalid / disallowed / out of range entities to nulls
+	 *
+	 * @param string $string
+	 */
 	static function entity_fix($string)
 	{
 		$num = $string[0] === 'x' ? hexdec(substr($string, 1)) : (int) $string;
 		return $num < 0x20 || $num > 0x10FFFF || ($num >= 0xD800 && $num <= 0xDFFF) || $num === 0x202E || $num === 0x202D ? '' : '&#' . $num . ';';
 	}
 
+	/**
+	 * Performs an htmlspecialchars on a string, using UTF-8 characterset
+	 * Optionally performs an entity_fix to null any invalid character entities from the string
+	 *
+	 * @param string $string
+	 * @param string $quote_style
+	 * @param string $charset only UTF-8 allowed
+	 */
 	static function htmlspecialchars($string, $quote_style = ENT_COMPAT, $charset = 'UTF-8')
 	{
 		global $modSettings;
@@ -58,6 +73,13 @@ class Util
 		return $check;
 	}
 
+	/**
+	 * Trims tabs, newlines, carriage returns, spaces, vertical tabs and null bytes
+	 * and any number of space characters from the start and end of a string
+	 * Optionally performs an entity_fix to null any invalid character entities from the string
+	 *
+	 * @param string $string
+	 */
 	static function htmltrim($string)
 	{
 		global $modSettings;
@@ -73,17 +95,22 @@ class Util
 		return $check;
 	}
 
+	/**
+	 * Perform a strpos search on a multi-byte string
+	 * Optionally performs an entity_fix to null any invalid character entities from the string before the search
+	 *
+	 * @param string $haystack what to search in
+	 * @param string $needle what is being looked for
+	 * @param int $offset where to start, assumed 0
+	 */
 	static function strpos($haystack, $needle, $offset = 0)
 	{
 		global $modSettings;
 
-		// @todo not used
-		$ent_check = empty($modSettings['disableEntityCheck']) ? array('preg_replace_callback(\'~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~\', \'entity_fix__callback\', ', ')') : array('', '');
-
 		$haystack_check = empty($modSettings['disableEntityCheck']) ? preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', $haystack) : $haystack;
 		$haystack_arr = preg_split('~(&#' . (empty($modSettings['disableEntityCheck']) ? '\d{1,7}' : '021') . ';|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u', $haystack_check, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-		// @todo not used
-		$haystack_size = count($haystack_arr);
+
+		// Single character search, lets go
 		if (strlen($needle) === 1)
 		{
 			$result = array_search($needle, array_slice($haystack_arr, $offset));
@@ -101,12 +128,22 @@ class Util
 				$offset += $result;
 				if (array_slice($haystack_arr, $offset, $needle_size) === $needle_arr)
 					return $offset;
+
 				$result = array_search($needle_arr[0], array_slice($haystack_arr, ++$offset));
 			}
+
 			return false;
 		}
 	}
 
+	/**
+	 * Perform a substr operation on multi-byte strings
+	 * Optionally performs an entity_fix to null any invalid character entities from the string before the operation
+	 *
+	 * @param string $string
+	 * @param string $start
+	 * @param int $length
+	 */
 	static function substr($string, $start, $length = null)
 	{
 		global $modSettings;
@@ -119,6 +156,12 @@ class Util
 		return $length === null ? implode('', array_slice($ent_arr, $start)) : implode('', array_slice($ent_arr, $start, $length));
 	}
 
+	/**
+	 * Converts a multi-byte string to lowercase
+	 * prefers to use mb_ functions if available, otherwise will use charset substitution tables
+	 *
+	 * @param string $string
+	 */
 	static function strtolower($string)
 	{
 		if (function_exists('mb_strtolower'))
@@ -130,6 +173,12 @@ class Util
 		}
 	}
 
+	/**
+	 * Converts a multi-byte string to uppercase
+	 * prefers to use mb_ functions if available, otherwise will use charset substitution tables
+	 *
+	 * @param string $string
+	 */
 	static function strtoupper($string)
 	{
 		if (function_exists('mb_strtoupper'))
@@ -141,6 +190,12 @@ class Util
 		}
 	}
 
+	/**
+	 * Cuts off a multi-byte string at a certain length
+	 * Optionally performs an entity_fix to null any invalid character entities from the string prior to the length check
+	 *
+	 * @param string $string
+	 */
 	static function truncate($string, $length)
 	{
 		global $modSettings;
@@ -157,14 +212,25 @@ class Util
 			while (strlen($string) > $length)
 				$string = preg_replace('~(?:' . $ent_list . '|.)$~u', '', $string);
 		}
+
 		return $string;
 	}
 
+	/**
+	 * Converts the first character of a multi-byte string to uppercase
+	 *
+	 * @param string $string
+	 */
 	static function ucfirst($string)
 	{
 		return Util::strtoupper(Util::substr($string, 0, 1)) . Util::substr($string, 1);
 	}
 
+	/**
+	 * Converts the first character of each work in a multi-byte string to uppercase
+	 *
+	 * @param string $string
+	 */
 	static function ucwords($string)
 	{
 		$words = preg_split('~([\s\r\n\t]+)~', $string, -1, PREG_SPLIT_DELIM_CAPTURE);
@@ -173,6 +239,11 @@ class Util
 		return implode('', $words);
 	}
 
+	/**
+	 * Returns the length of multi-byte string
+	 *
+	 * @param string $string
+	 */
 	static function strlen($string)
 	{
 		global $modSettings;
