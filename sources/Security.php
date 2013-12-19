@@ -1468,6 +1468,10 @@ function validatePasswordFlood($id_member, $password_flood_value = false, $was_c
 		fatal_lang_error('no_access', false);
 	}
 
+	// Let's just initialize to something (and 0 is better than nothing)
+	$time_stamp = 0;
+	$number_tries = 0;
+
 	// Right, have we got a flood value?
 	if ($password_flood_value !== false)
 		@list ($time_stamp, $number_tries) = explode('|', $password_flood_value);
