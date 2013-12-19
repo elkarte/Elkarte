@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * This file contains those functions pertaining to polls, including removing
+ * resetting votes, editing, adding, and more
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -20,7 +23,6 @@
  *
  * @param int $topicID the ID of the topic
  * @param int $pollID = null the ID of the poll, if any. If null is passed, it retrieves the current ID.
- *
  */
 function associatedPoll($topicID, $pollID = null)
 {
@@ -115,6 +117,7 @@ function resetVotes($pollID)
 			'time' => time(),
 		)
 	);
+
 	$db->query('', '
 		UPDATE {db_prefix}poll_choices
 		SET votes = {int:no_votes}
@@ -124,6 +127,7 @@ function resetVotes($pollID)
 			'id_poll' => $pollID,
 		)
 	);
+
 	$db->query('', '
 		DELETE FROM {db_prefix}log_polls
 		WHERE id_poll = {int:id_poll}',
@@ -273,9 +277,7 @@ function pollOptions($id_poll)
 			'id_poll' => $id_poll,
 		)
 	);
-
 	$pollOptions = array();
-
 	while ($row = $db->fetch_assoc($request))
 	{
 		censorText($row['label']);
@@ -363,6 +365,7 @@ function modifyPoll($id_poll, $question, $max_votes = 1, $hide_results = 1, $exp
 			'expire_time_zero' => 0,
 		)
 	);
+
 	call_integration_hook('integrate_poll_add_edit', array($id_poll, true));
 }
 
@@ -374,13 +377,12 @@ function modifyPoll($id_poll, $question, $max_votes = 1, $hide_results = 1, $exp
  */
 function addPollOptions($id_poll, array $options)
 {
+	$db = database();
+
 	$pollOptions = array();
 	foreach ($options as $i => $option)
-	{
 		$pollOptions[] = array($id_poll, $i, $option);
-	}
 
-	$db = database();
 	$db->insert('insert',
 		'{db_prefix}poll_choices',
 		array('id_poll' => 'int', 'id_choice' => 'int', 'label' => 'string-255'),
@@ -406,7 +408,6 @@ function insertPollOptions($options)
 		$options,
 		array()
 	);
-
 }
 
 /**
@@ -467,7 +468,7 @@ function deletePollOptions($id_poll, $id_options)
  * Retrieves the topic and, if different, poll starter
  * for the poll associated with the $id_topic.
  *
- * @param $id_topic
+ * @param int $id_topic
  */
 function pollStarters($id_topic)
 {
@@ -498,7 +499,6 @@ function pollStarters($id_topic)
  * Check if they have already voted, or voting is locked.
  *
  * @param int $topic
- * @return type
  */
 function checkVote($topic)
 {
@@ -574,6 +574,7 @@ function decreaseVoteCounter($id_poll, $options)
 
 /**
  * Increase the vote counter for the given poll.
+ *
  * @param int $id_poll
  * @param array $options
  */
@@ -671,16 +672,16 @@ function pollStatus($id_topic)
 	$poll = array();
 
 	$request = $db->query('', '
-			SELECT t.id_member_started, t.id_poll, p.voting_locked
-			FROM {db_prefix}topics AS t
-				INNER JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
-			WHERE t.id_topic = {int:current_topic}
-			LIMIT 1',
-			array(
-				'current_topic' => $id_topic,
-			)
-		);
-		list ($poll['id_member'], $poll['id_poll'], $poll['locked']) = $db->fetch_row($request);
+		SELECT t.id_member_started, t.id_poll, p.voting_locked
+		FROM {db_prefix}topics AS t
+			INNER JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
+		WHERE t.id_topic = {int:current_topic}
+		LIMIT 1',
+		array(
+			'current_topic' => $id_topic,
+		)
+	);
+	list ($poll['id_member'], $poll['id_poll'], $poll['locked']) = $db->fetch_row($request);
 
 		return $poll;
 }
@@ -774,7 +775,7 @@ function getPollStarter($id_topic)
 /**
  * Loads in $context whatever is needed to show a poll
  *
- * @param int simply a poll id...
+ * @param int $poll_id simply a poll id...
  */
 function loadPollContext($poll_id)
 {
@@ -921,5 +922,4 @@ function loadPollContext($poll_id)
 			'vote_button' => '<input type="' . ($pollinfo['max_votes'] > 1 ? 'checkbox' : 'radio') . '" name="options[]" id="options-' . $i . '" value="' . $i . '" class="input_' . ($pollinfo['max_votes'] > 1 ? 'check' : 'radio') . '" />'
 		);
 	}
-
 }
