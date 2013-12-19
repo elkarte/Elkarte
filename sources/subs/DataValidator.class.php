@@ -506,7 +506,7 @@ class Data_Validator
 	/**
 	 * Process any errors and return the error strings
 	 *
-	 * @params array $keys
+	 * @param array $keys
 	 */
 	private function _get_error_messages($keys)
 	{
