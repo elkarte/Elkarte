@@ -195,6 +195,7 @@ class Util
 	 * Optionally performs an entity_fix to null any invalid character entities from the string prior to the length check
 	 *
 	 * @param string $string
+	 * @param int $length
 	 */
 	static function truncate($string, $length)
 	{

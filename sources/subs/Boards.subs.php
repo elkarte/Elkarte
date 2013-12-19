@@ -1308,8 +1308,8 @@ function getBoardNotificationsCount($memID)
  * If $id_parents is given, return only the child boards of those boards.
  * If $id_boards is given, filters the boards to only those accessible
  *
- * @param array id_parents array of ints representing board ids
- * @param $id_boards
+ * @param array $id_parents array of ints representing board ids
+ * @param array $id_boards
  */
 function accessibleBoards($id_parents = null, $id_boards = null)
 {

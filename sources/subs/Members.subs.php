@@ -1715,7 +1715,7 @@ function getMemberByName($name, $flexible = false)
  * Optionaly will only search/find the member in a buddy list
  *
  * @param string $search string to search real_name for like finds
- * @param type $buddies
+ * @param array $buddies
  */
 function getMember($search, $buddies = array())
 {

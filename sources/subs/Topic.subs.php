@@ -1474,7 +1474,7 @@ function topicMessages($topic)
  * Returns array of file attachment name along with width/height properties
  * Will only return approved attachments
  *
- * @param type $id_messages
+ * @param array $id_messages
  */
 function messagesAttachments($id_messages)
 {

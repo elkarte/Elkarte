@@ -204,7 +204,6 @@ class Ftp_Connection
 	 * Reads the response to the command from the server
 	 *
 	 * @param mixed $desired string or array of acceptable return values
-	 * @return type
 	 */
 	public function check_response($desired)
 	{
@@ -415,7 +414,6 @@ class Ftp_Connection
 	 *
 	 * @param string $filesystem_path
 	 * @param string $lookup_file
-	 * @return type
 	 */
 	public function detect_path($filesystem_path, $lookup_file = null)
 	{

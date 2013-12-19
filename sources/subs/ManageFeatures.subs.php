@@ -56,8 +56,8 @@ function getSignatureFromMembers($start_member)
 /**
  * Updates the signature from a given member
  *
- * @param type $id_member
- * @param type $signature
+ * @param int $id_member
+ * @param string $signature
  */
 function updateSignature($id_member, $signature)
 {

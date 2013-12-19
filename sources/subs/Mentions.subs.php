@@ -292,7 +292,7 @@ function toggleMentionsApproval($msgs, $approved)
  * if on is switched to unvisible) for all the users
  *
  * @param string $type type of the mention that you want to toggle
- * @param bool if true enables the mentions, otherwise disables them
+ * @param bool $enable if true enables the mentions, otherwise disables them
  */
 function toggleMentionsVisibility($type, $enable)
 {

@@ -24,6 +24,7 @@ if (!defined('ELK'))
 
 /**
  * Define the old SMF sha1 function.
+ *
  * @param $str the string
  */
 function sha1_smf($str)
@@ -46,6 +47,7 @@ function sha1_smf($str)
 
 /**
  * This is the core SHA-1 calculation routine, used by sha1().
+ *
  * @param array $x
  * @param int $len
  */
@@ -96,11 +98,11 @@ function sha1_core($x, $len)
 
 /**
  * Helper function for the core SHA-1 calculation
+ *
  * @param int $t
  * @param int $b
  * @param int $c
  * @param int $d
- * @return type
  */
 function sha1_ft($t, $b, $c, $d)
 {
@@ -116,6 +118,7 @@ function sha1_ft($t, $b, $c, $d)
 
 /**
  * Helper function for the core SHA-1 calculation
+ *
  * @param int $t
  */
 function sha1_kt($t)
@@ -125,6 +128,7 @@ function sha1_kt($t)
 
 /**
  * Helper function for the core SHA-1 calculation
+ *
  * @param int $num
  * @param int $cnt
  */
@@ -147,8 +151,8 @@ if (!function_exists('crc32_compat'))
 	/**
 	 * crc32 doesn't work as expected on 64-bit functions - make our own.
 	 * http://www.php.net/crc32#79567
-	 * @param type $number
-	 * @return type
+	 *
+	 * @param int $number
 	 */
 	function crc32_compat($number)
 	{

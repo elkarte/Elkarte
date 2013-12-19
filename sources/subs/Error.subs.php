@@ -20,7 +20,7 @@ if (!defined('ELK'))
  * It attempts to TRUNCATE the table to reset the auto_increment.
  * Redirects back to the error log when done.
  *
- * @param type $type action
+ * @param string $type action
  * @param array $filter db query of the view filter being used
  * @param array $error_list int list of error ID's to work on
  */

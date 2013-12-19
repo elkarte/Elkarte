@@ -103,8 +103,9 @@ function give_karma($id_executor, $id_target, $action, $dir)
 }
 
 /**
- * Makes sure that a user can perform the karma action,
- * @param type $id_target
+ * Makes sure that a user can perform the karma action
+ *
+ * @param int $id_target
  */
 function prepare_karma($id_target)
 {

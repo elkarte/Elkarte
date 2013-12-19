@@ -25,6 +25,11 @@ if (!defined('ELK'))
  */
 class ModerationCenter_Controller extends Action_Controller
 {
+	/**
+	 * Holds function array to pass to callMenu to call the right moderation area
+	 * 
+	 * @var array
+	 */
 	private $_mod_include_data;
 
 	/**

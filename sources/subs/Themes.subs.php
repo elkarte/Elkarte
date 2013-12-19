@@ -576,12 +576,12 @@ function countConfiguredMemberOptions()
 /**
  * Deletes all outdated options from the themes table
  *
- * @param mixed $theme: if int to remove option from a specific theme,
+ * @param mixed $theme : if int to remove option from a specific theme,
  *              if string it can be:
  *               - 'default' => to remove from the default theme
  *               - 'custom' => to remove from all the custom themes
  *               - 'all' => to remove from both default and custom
- * @param mixed $membergroups: if int a specific member
+ * @param mixed $membergroups : if int a specific member
  *              if string a "group" of members and it can assume the following values:
  *               - 'guests' => obviously guests,
  *               - 'members' => all members with custom settings (i.e. id_member > 0)

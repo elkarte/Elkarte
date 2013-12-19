@@ -1104,7 +1104,7 @@ function countSplitMessages($topic, $include_unapproved, $selection = array())
  *
  * @todo very similar to posterDetails
  *
- * @param int $id_msg, the id of a message
+ * @param int $id_msg the id of a message
  * @return array
  */
 function mailFromMesasge($id_msg)

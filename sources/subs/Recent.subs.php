@@ -123,8 +123,8 @@ function cache_getLastPosts($latestPostOptions)
  * 	  or 'any' array.  Reminder The controller needs to check permissions
  *  - Returns two arrays, one of the posts one of any/own
  *
- * @param type $messages
- * @param type $start
+ * @param array $messages
+ * @param int $start
  */
 function getRecentPosts($messages, $start)
 {

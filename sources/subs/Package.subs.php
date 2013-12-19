@@ -70,8 +70,8 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
  * returns an array of the files extracted.
  * if files_to_extract is not equal to null only extracts file within this array.
  *
- * @param string $data,
- * @param string $destination,
+ * @param string $data
+ * @param string $destination
  * @param bool $single_file = false,
  * @param bool $overwrite = false,
  * @param array $files_to_extract = null
@@ -376,7 +376,8 @@ function read_zip_data($data, $destination, $single_file = false, $overwrite = f
 /**
  * Checks the existence of a remote file since file_exists() does not do remote.
  * will return false if the file is "moved permanently" or similar.
- * @param string url
+ *
+ * @param string $url
  * @return boolean true if the remote url exists.
  */
 function url_exists($url)
@@ -1043,7 +1044,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
  * - previous_version should be set to the previous installed version of this package, if any.
  * - does not handle failure terribly well; testing first is always better.
  *
- * @param Xml_Array $package
+ * @param Xml_Array $packageXML
  * @param bool $testing_only = true
  * @param string $method = 'install' ('install', 'upgrade', or 'uninstall')
  * @param string $previous_version = ''

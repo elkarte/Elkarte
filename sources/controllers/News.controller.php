@@ -26,6 +26,10 @@ if (!defined('ELK'))
  */
 class News_Controller extends Action_Controller
 {
+	/**
+	 * Holds news specific version board query for news feeds
+	 * @var string
+	 */
 	private $_query_this_board = null;
 
 	/**

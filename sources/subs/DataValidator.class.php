@@ -505,6 +505,8 @@ class Data_Validator
 
 	/**
 	 * Process any errors and return the error strings
+	 *
+	 * @params array $keys
 	 */
 	private function _get_error_messages($keys)
 	{
@@ -1192,6 +1194,7 @@ class Data_Validator
 	 * - auser@gmail.com, a.user@gmail.com, auser+big@gmail.com and a.user+gigantic@googlemail.com are same email address.
 	 *
 	 * @param string $input
+	 * @param mixed $sanitation_parameters
 	 */
 	protected function _sanitation_gmail_normalize($input, $sanitation_parameters = null)
 	{

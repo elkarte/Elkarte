@@ -1374,7 +1374,7 @@ function moderatorNotice($id_notice)
 /**
  * Make sure the "current user" (uses $user_info) cannot go outside of the limit for the day.
  *
- * @param int The member we are going to issue the warning to
+ * @param int $member The member we are going to issue the warning to
  */
 function warningDailyLimit($member)
 {

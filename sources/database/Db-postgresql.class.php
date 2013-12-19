@@ -18,6 +18,9 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * PostgreSQL database class, implements database class to control mysql functions
+ */
 class Database_PostgreSQL implements Database
 {
 	/**
@@ -1266,6 +1269,7 @@ class Database_PostgreSQL implements Database
 	/**
 	 * Return server info.
 	 *
+	 * @param resource $connection
 	 * @return string
 	 */
 	function db_server_info($connection = null)

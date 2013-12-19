@@ -473,6 +473,8 @@ class Database_MySQL implements Database
 
 	/**
 	 * Get the number of fields in the resultset.
+	 *
+	 * @param resource $request
 	 */
 	function num_fields($request)
 	{

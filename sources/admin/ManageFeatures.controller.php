@@ -1670,10 +1670,13 @@ class ManageFeatures_Controller extends Action_Controller
 
 /**
  * Just pause the signature applying thing.
+ *
  * @todo Move to subs file
  * @todo Merge with other pause functions?
  *    pausePermsSave(), pausAttachmentMaintenance()
  *    pauseRepairProcess()
+ *
+ * @param int $applied_sigs
  */
 function pauseSignatureApplySettings($applied_sigs)
 {

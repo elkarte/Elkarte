@@ -37,6 +37,11 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class to deal with theme administration.
+ * Its tasks include changing theme settings, installing and removing
+ * themes, choosing the current theme, and editing themes.
+ */
 class ManageThemes_Controller extends Action_Controller
 {
 	/**

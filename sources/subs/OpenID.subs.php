@@ -464,8 +464,8 @@ function sha1_hmac($data, $key)
  * Given a binary string, returns the binary string converted to a
  * long number.
  *
- * @param type $str
- * @return type
+ * @param string $str
+ * @return string
  */
 function binary_to_long($str)
 {
@@ -487,7 +487,7 @@ function binary_to_long($str)
  * string. This function accepts long integer values of arbitrary
  * magnitude.
  *
- * @param type $value
+ * @param string $value
  * @return string
  */
 function long_to_binary($value)

@@ -1751,6 +1751,7 @@ function ssi_todaysCalendar($output_method = 'echo')
  * @param int $limit
  * @param int $start
  * @param int $length
+ * @param string $preview
  * @param string $output_method = 'echo'
  */
 function ssi_boardNews($board = null, $limit = null, $start = null, $length = null, $preview = 'first', $output_method = 'echo')

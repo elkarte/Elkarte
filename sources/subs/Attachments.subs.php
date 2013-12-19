@@ -3170,6 +3170,9 @@ function approved_attach_sort($a, $b)
  * This function returns false when:
  *  - the attachment is unapproved, and
  *  - the viewer is not the poster of the message where the attachment is
+ *
+ * @param array $attachment_info
+ * @param array $all_posters
  */
 function filter_accessible_attachment($attachment_info, $all_posters)
 {

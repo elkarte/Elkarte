@@ -1109,8 +1109,8 @@ class ProfileInfo_Controller extends Action_Controller
 	/**
 	 * Callback for createList()
 	 *
-	 * @param type $boardsAllowed
-	 * @param type $memID
+	 * @param array $boardsAllowed
+	 * @param int $memID
 	 */
 	public function list_getNumAttachments($boardsAllowed, $memID)
 	{

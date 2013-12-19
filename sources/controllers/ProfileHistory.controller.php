@@ -25,6 +25,11 @@ if (!defined('ELK'))
  */
 class ProfileHistory_Controller extends Action_Controller
 {
+	/**
+	 * Member id for the history being viewed
+	 * @todo should be changed to _memID
+	 * @var int
+	 */
 	private $memID = 0;
 
 	/**

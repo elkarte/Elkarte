@@ -26,6 +26,7 @@ if (!defined('ELK'))
 class ProfileSubscriptions_Controller extends Action_Controller
 {
 	/**
+	 * Default action for the controller
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
