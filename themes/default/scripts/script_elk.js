@@ -298,9 +298,13 @@ function relativeTime(sFrom, sTo)
 			this.dateTo = new Date(oRttime.currentTime * 1000);
 	}
 	else
-		this.dateTo = new Date(sTo);
+	{
+		sToSplit = sTo.split(/\D/);
+		this.dateTo = new Date(sToSplit[0], sToSplit[1], sToSplit[2], sToSplit[3], sToSplit[4]);
+	}
 
-	this.dateFrom = new Date(sFrom);
+	sFromSplit = sFrom.split(/\D/);
+	this.dateFrom = new Date(sFromSplit[0], --sFromSplit[1], sFromSplit[2], sFromSplit[3], sFromSplit[4]);
 
 	this.time_text = '';
 	this.past_time = (this.dateTo - this.dateFrom) / 1000;
