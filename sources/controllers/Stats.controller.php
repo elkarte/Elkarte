@@ -103,6 +103,7 @@ class Stats_Controller extends Action_Controller
 		);
 		$context['page_title'] = $context['forum_name'] . ' - ' . $txt['stats_center'];
 		$context['sub_template'] = 'statistics';
+		loadJavascriptFile('stats.js');
 
 		// These are the templates that will be used to render the statistics
 		$context['statistics_callbacks'] = array(

@@ -42,6 +42,8 @@ $txt['scheduled_task_remove_old_followups'] = 'Remove Old Follow-ups';
 $txt['scheduled_task_desc_remove_old_followups'] = 'Deletes follow-up entries still present in the database, but pointing to non-existent topics.';
 $txt['scheduled_task_maillist_fetch_IMAP'] = 'Fetch Emails from IMAP';
 $txt['scheduled_task_desc_maillist_fetch_IMAP'] = 'Fetches emails for the mailing list feature from an IMAP box and processes them.';
+$txt['scheduled_task_user_access_mentions'] = 'Users Mentions Access';
+$txt['scheduled_task_desc_user_access_mentions'] = 'Verify users access to each board and set accessibility to related mentions accordingly.';
 
 $txt['scheduled_task_reg_starting'] = 'Starting at %1$s';
 $txt['scheduled_task_reg_repeating'] = 'repeating every %1$d %2$s';

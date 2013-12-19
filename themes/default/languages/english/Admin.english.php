@@ -4,6 +4,7 @@
 global $settings, $scripturl;
 
 $txt['admin_boards'] = 'Boards';
+$txt['admin_back_to'] = 'Back to admin panel';
 $txt['admin_users'] = 'Members';
 $txt['admin_newsletters'] = 'Newsletters';
 $txt['include_these'] = 'Members to include';
@@ -153,6 +154,7 @@ $txt['email_force'] = 'Send this to members even if they have chosen not to rece
 $txt['email_as_pms'] = 'Send this to these groups using personal messages.';
 $txt['email_continue'] = 'Continue';
 $txt['email_done'] = 'done.';
+$txt['email_members_succeeded'] = 'You have successfully sent your newsletter!';
 
 $txt['ban_title'] = 'Ban List';
 $txt['ban_ip'] = 'IP banning: (e.g. 192.168.12.213 or 128.0.*.*) - one entry per line';
@@ -656,7 +658,7 @@ $txt['admin_news_select_excluded_members_desc'] = 'Members who should not receiv
 $txt['admin_news_select_excluded_groups'] = 'Excluded Groups';
 $txt['admin_news_select_excluded_groups_desc'] = 'Select groups who should definitely not receive the newsletter.';
 $txt['admin_news_select_email'] = 'Email Addresses';
-$txt['admin_news_select_email_desc'] = 'A semi-colon separated list of email addresses which should be sent this newsletter. (i.e. address1; address2)';
+$txt['admin_news_select_email_desc'] = 'A semi-colon separated list of email addresses to send the newsletter to. (i.e. address1; address2)';
 $txt['admin_news_select_override_notify'] = 'Override notification settings';
 // Use entities in below.
 $txt['admin_news_cannot_pm_emails_js'] = 'You cannot send a personal message to an email address. If you continue all entered email addresses will be ignored.\\n\\nAre you sure you wish to do this?';

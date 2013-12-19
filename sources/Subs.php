@@ -239,8 +239,8 @@ function updateMemberData($members, $data)
  * - all of changeArray's indexes and values are assumed to have escaped apostrophes (')!
  * - if a variable is already set to what you want to change it to, that
  *   variable will be skipped over; it would be unnecessary to reset.
- * - When use_update is true, UPDATEs will be used instead of REPLACE.
- * - when use_update is true, the value can be true or false to increment
+ * - When update is true, UPDATEs will be used instead of REPLACE.
+ * - when update is true, the value can be true or false to increment
  *  or decrement it, respectively.
  *
  * @param array $changeArray
@@ -312,9 +312,9 @@ function updateSettings($changeArray, $update = false, $debug = false)
 /**
  * Deletes one setting from the settings table and takes care of $modSettings as well
  *
- * @param string the setting
+ * @param mixed the setting or the settings to be removed
  */
-function removeSetting($toRemove)
+function removeSettings($toRemove)
 {
 	global $modSettings;
 
@@ -323,16 +323,19 @@ function removeSetting($toRemove)
 	if (empty($toRemove))
 		return;
 
+	$toRemove = is_array($toRemove) ? $toRemove : array($toRemove);
+
 	$db->query('', '
 		DELETE FROM {db_prefix}settings
-		WHERE variable = {string:setting_name}',
+		WHERE variable IN ({array_string:setting_name})',
 		array(
 			'setting_name' => $toRemove,
 		)
 	);
 
-	if (isset($modSettings[$toRemove]))
-		unset($modSettings[$toRemove]);
+	foreach ($toRemove as $setting)
+		if (isset($modSettings[$setting]))
+			unset($modSettings[$setting]);
 
 	// Kill the cache - it needs redoing now, but we won't bother ourselves with that here.
 	cache_put_data('modSettings', null, 90);
@@ -2755,8 +2758,12 @@ function setupThemeContext($forceload = false)
 		// Clean it up for presentation ;).
 		$context['news_lines'][$i] = parse_bbc(stripslashes(trim($context['news_lines'][$i])), true, 'news' . $i);
 	}
+
 	if (!empty($context['news_lines']))
 		$context['random_news_line'] = $context['news_lines'][mt_rand(0, count($context['news_lines']) - 1)];
+
+	if (!empty($settings['enable_news']) && !empty($context['random_news_line']))
+		loadJavascriptFile ('fader.js');
 
 	if (!$user_info['is_guest'])
 	{
@@ -2854,18 +2861,17 @@ function setupThemeContext($forceload = false)
 				content: ' . JavaScriptEscape(sprintf($txt['show_personal_messages'], $context['user']['unread_messages'], $scripturl . '?action=pm')) . ',
 				icon: elk_images_url + \'/im_sm_newmsg.png\'
 			});
-		});');
+		});', true);
 
 	// Resize avatars the fancy, but non-GD requiring way.
 	if ($modSettings['avatar_action_too_large'] == 'option_js_resize' && (!empty($modSettings['avatar_max_width_external']) || !empty($modSettings['avatar_max_height_external'])))
 	{
 		// @todo Move this over to script.js?
 		addInlineJavascript('
-		var elk_avatarMaxWidth = ' . (int) $modSettings['avatar_max_width_external'] . ';
-		var elk_avatarMaxHeight = ' . (int) $modSettings['avatar_max_height_external'] . ';' . (!isBrowser('ie') ? '
+		var elk_avatarMaxWidth = ' . (int) $modSettings['avatar_max_width_external'] . ',
+			elk_avatarMaxHeight = ' . (int) $modSettings['avatar_max_height_external'] . ';' . (!isBrowser('is_ie8') ? '
 		window.addEventListener("load", elk_avatarResize, false);' : '
-		var window_oldAvatarOnload = window.onload;
-		window.onload = elk_avatarResize;'));
+		window.attachEvent("load", elk_avatarResize);'), true);
 	}
 
 	// This looks weird, but it's because BoardIndex.controller.php references the variable.
@@ -3133,11 +3139,11 @@ function template_javascript($do_defered = false)
 			$js_vars[] = $var . ' = ' . $value;
 
 		// nNewlines and tabs are here to make it look nice in the page source view, stripped if minimized though
-		$js_vars = 'var ' . implode(",\n\t\t\t", $js_vars) . ";\n";
+		$context['javascript_inline']['standard'][] = 'var ' . implode(",\n\t\t\t", $js_vars) . ';';
 	}
 
 	// Inline JavaScript - Actually useful some times!
-	if (!empty($context['javascript_inline']) || !empyt($js_vars))
+	if (!empty($context['javascript_inline']))
 	{
 		// Defered output waits until we are defering !
 		if (!empty($context['javascript_inline']['defer']) && $do_defered)
@@ -3156,14 +3162,12 @@ function template_javascript($do_defered = false)
 		// Standard output, and our javascript vars, get output when we are not on a defered call
 		if (!empty($context['javascript_inline']['standard']) && !$do_defered)
 		{
-			$inline_standard_code = !empty($js_vars) ? $js_vars : '';
 			$context['javascript_inline']['standard'] = array_map('trim', $context['javascript_inline']['standard']);
-			$inline_standard_code .= "\t\t" . implode("\n\t\t", $context['javascript_inline']['standard']);
 
 			// And output the js vars and standard scripts to the page
 			echo '
 	<script><!-- // --><![CDATA[
-		', $inline_standard_code, '
+		', implode("\n\t\t", $context['javascript_inline']['standard']), '
 	// ]]></script>';
 		}
 	}
@@ -4411,4 +4415,60 @@ function elk_array_insert($input, $key, $insert, $where = 'before', $assoc = tru
 		$input = array_merge(array_slice($input, 0, $position), $insert, array_slice($input, $position));
 
 	return $input;
+}
+
+/**
+ * From time to time it may be necessary to fire a scheduled tast ASAP
+ * this function set the scheduled task to be called before any other one
+ *
+ * @param string the name of a scheduled task
+ */
+function scheduleTaskImmediate($task)
+{
+	global $modSettings;
+
+	if (!isset($modSettings['scheduleTaskImmediate']))
+		$scheduleTaskImmediate = array();
+	else
+		$scheduleTaskImmediate = unserialize($modSettings['scheduleTaskImmediate']);
+
+	$scheduleTaskImmediate[$task] = 0;
+	updateSettings(array('scheduleTaskImmediate' => serialize($scheduleTaskImmediate)));
+
+	require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+
+	// Ensure the task is on
+	toggleTaskStatusByName($task, true);
+
+	// Before trying to run it **NOW** :P
+	calculateNextTrigger($task, true);
+}
+
+/**
+ * For diligent people: remove scheduleTaskImmediate when done, otherwise
+ * a maximum of 10 executions is allowed
+ *
+ * @param string the name of a scheduled task
+ * @param bool if recalculate the next task to execute
+ */
+function removeScheduleTaskImmediate($task, $calculateNextTrigger = true)
+{
+	global $modSettings;
+
+	if (!isset($modSettings['scheduleTaskImmediate']))
+		return;
+	else
+		$scheduleTaskImmediate = unserialize($modSettings['scheduleTaskImmediate']);
+
+	if (isset($scheduleTaskImmediate[$task]))
+	{
+		unset($scheduleTaskImmediate[$task]);
+		updateSettings(array('scheduleTaskImmediate' => serialize($scheduleTaskImmediate)));
+
+		if ($calculateNextTrigger)
+		{
+			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+			calculateNextTrigger($task);
+		}
+	}
 }

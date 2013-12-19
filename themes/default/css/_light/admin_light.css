@@ -46,10 +46,6 @@
 .search_results li a strong {
 	color: #346;
 }
-#admin_main_section {
-	border-radius: 7px 7px 0 0;
-	border-bottom: none;
-}
 #admin_main_section .windowbg {
 	border: 1px solid #ccc;
 	border-top: 1px solid #bbb;
@@ -63,22 +59,24 @@
 	color: #111;
 }
 #ourAnnouncements dt {
-	border-top: 1px solid #bf6900;
+	border-top: 1px solid #377828;
 }
 #ourAnnouncements dt a {
-	color: #bf6900;
+	color: #377828;
 }
 #ourAnnouncements dd {
 	border-top: double #ddd;
 }
 
-#quick_tasks {
-	border-top: 1px solid #bbb;
-	border-bottom: 1px solid #fff;
-}
 #quick_tasks li {
 	border-top: 1px solid #fff;
 	border-bottom: 1px solid #bbb;
+}
+#quick_tasks li:first-child, #quick_tasks li:nth-child(2) {
+	border-top: none;
+}
+#quick_tasks li:last-child,  #quick_tasks li:nth-child(7){
+	border-bottom: none;
 }
 
 /* Styles for the package manager.

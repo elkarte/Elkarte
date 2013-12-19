@@ -40,6 +40,7 @@ class AllTests extends TestSuite
 
 		// controllers (web tests)
 		$this->addFile(TESTDIR . 'sources/controllers/TestAuth.php');
+		$this->addFile(TESTDIR . 'sources/controllers/TestRegister.php');
 
 		// install
 		$this->addFile(TESTDIR . 'install/TestDatabase.php');

@@ -272,19 +272,23 @@ class ManageNews_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 		require_once(SUBSDIR . '/News.subs.php');
 
+		// Setup the template
 		$context['page_title'] = $txt['admin_newsletters'];
 		$context['sub_template'] = 'email_members';
+		loadJavascriptFile('suggest.js', array('defer' => true));
 
+		// We need group data, including which groups we have and who is in them
 		$allgroups = getBasicMembergroupData(array('all'), array(), null, true);
 		$groups = $allgroups['groups'];
 
+		// All of the members in post based and member based groups
 		foreach ($allgroups['postgroups'] as $postgroup)
 			$pg[] = $postgroup['id'];
 		foreach ($allgroups['membergroups'] as $membergroup)
 			$mg[] = $membergroup['id'];
 
+		// How many are in each group
 		$mem_groups = membersInGroups($pg, $mg, true, true);
-
 		foreach ($mem_groups as $id_group => $member_count)
 		{
 			if (isset($groups[$id_group]['member_count']))
@@ -293,6 +297,7 @@ class ManageNews_Controller extends Action_Controller
 				$groups[$id_group]['member_count'] = $member_count;
 		}
 
+		// Generate the include and exclude group select lists for the template
 		foreach ($groups as $group)
 		{
 			$groups[$group['id']]['status'] = 'on';
@@ -312,6 +317,7 @@ class ManageNews_Controller extends Action_Controller
 			'member_groups' => $groups,
 		);
 
+		// Needed if for the PM option in the mail to all
 		$context['can_send_pm'] = allowedTo('pm_send');
 	}
 
@@ -466,10 +472,18 @@ class ManageNews_Controller extends Action_Controller
 	{
 		global $txt, $context, $scripturl, $modSettings, $user_info;
 
+		// A nice successful screen if you did it
+		if (isset($_REQUEST['success']))
+		{
+			$context['sub_template'] = 'email_members_succeeded';
+			loadTemplate('ManageNews');
+			return;
+		}
+		// If just previewing we prepare a message and return it for viewing
 		if (isset($_POST['preview']))
 		{
 			$context['preview'] = true;
-			return action_mailingcompose();
+			return $this->action_mailingcompose();
 		}
 
 		// How many to send at once? Quantity depends on whether we are queueing or not.
@@ -576,34 +590,34 @@ class ManageNews_Controller extends Action_Controller
 			require_once(SUBSDIR . '/PersonalMessage.subs.php');
 
 		// We are relying too much on writing to superglobals...
-		$_POST['subject'] = !empty($_POST['subject']) ? $_POST['subject'] : '';
-		$_POST['message'] = !empty($_POST['message']) ? $_POST['message'] : '';
+		$base_subject = !empty($_POST['subject']) ? $_POST['subject'] : '';
+		$base_message = !empty($_POST['message']) ? $_POST['message'] : '';
 
 		// Save the message and its subject in $context
-		$context['subject'] = htmlspecialchars($_POST['subject'], ENT_COMPAT, 'UTF-8');
-		$context['message'] = htmlspecialchars($_POST['message'], ENT_COMPAT, 'UTF-8');
+		$context['subject'] = htmlspecialchars($base_subject, ENT_COMPAT, 'UTF-8');
+		$context['message'] = htmlspecialchars($base_message, ENT_COMPAT, 'UTF-8');
 
 		// Prepare the message for sending it as HTML
 		if (!$context['send_pm'] && !empty($_POST['send_html']))
 		{
 			// Prepare the message for HTML.
 			if (!empty($_POST['parse_html']))
-				$_POST['message'] = str_replace(array("\n", '  '), array('<br />' . "\n", '&nbsp; '), $_POST['message']);
+				$base_message = str_replace(array("\n", '  '), array('<br />' . "\n", '&nbsp; '), $base_message);
 
 			// This is here to prevent spam filters from tagging this as spam.
-			if (preg_match('~\<html~i', $_POST['message']) == 0)
+			if (preg_match('~\<html~i', $base_message) == 0)
 			{
-				if (preg_match('~\<body~i', $_POST['message']) == 0)
-					$_POST['message'] = '<html><head><title>' . $_POST['subject'] . '</title></head>' . "\n" . '<body>' . $_POST['message'] . '</body></html>';
+				if (preg_match('~\<body~i', $base_message) == 0)
+					$base_message = '<html><head><title>' . $base_subject . '</title></head>' . "\n" . '<body>' . $base_message . '</body></html>';
 				else
-					$_POST['message'] = '<html>' . $_POST['message'] . '</html>';
+					$base_message = '<html>' . $base_message . '</html>';
 			}
 		}
 
-		if (empty($_POST['message']) || empty($_POST['subject']))
+		if (empty($base_message) || empty($base_subject))
 		{
 			$context['preview'] = true;
-			return action_mailingcompose();
+			return $this->action_mailingcompose();
 		}
 
 		// Use the default time format.
@@ -621,23 +635,23 @@ class ManageNews_Controller extends Action_Controller
 		$cleanLatestMember = empty($_POST['send_html']) || $context['send_pm'] ? un_htmlspecialchars($modSettings['latestRealName']) : $modSettings['latestRealName'];
 
 		// Replace in all the standard things.
-		$_POST['message'] = str_replace($variables,
+		$base_message = str_replace($variables,
 			array(
 				!empty($_POST['send_html']) ? '<a href="' . $scripturl . '">' . $scripturl . '</a>' : $scripturl,
 				standardTime(forum_time(), false),
 				!empty($_POST['send_html']) ? '<a href="' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . '">' . $cleanLatestMember . '</a>' : ($context['send_pm'] ? '[url=' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . ']' . $cleanLatestMember . '[/url]' : $cleanLatestMember),
 				$modSettings['latestMember'],
 				$cleanLatestMember
-			), $_POST['message']);
+			), $base_message);
 
-		$_POST['subject'] = str_replace($variables,
+		$base_subject = str_replace($variables,
 			array(
 				$scripturl,
 				standardTime(forum_time(), false),
 				$modSettings['latestRealName'],
 				$modSettings['latestMember'],
 				$modSettings['latestRealName']
-			), $_POST['subject']);
+			), $base_subject);
 
 		$from_member = array(
 			'{$member.email}',
@@ -668,7 +682,7 @@ class ManageNews_Controller extends Action_Controller
 				$email
 			);
 
-			sendmail($email, str_replace($from_member, $to_member, $_POST['subject']), str_replace($from_member, $to_member, $_POST['message']), null, null, !empty($_POST['send_html']), 5);
+			sendmail($email, str_replace($from_member, $to_member, $base_subject), str_replace($from_member, $to_member, $base_message), null, null, !empty($_POST['send_html']), 5);
 
 			// Done another...
 			$i++;
@@ -697,7 +711,7 @@ class ManageNews_Controller extends Action_Controller
 				}
 
 				if (!empty($queryBuild))
-				$sendQuery .= implode(' OR ', $queryBuild);
+					$sendQuery .= implode(' OR ', $queryBuild);
 			}
 
 			if (!empty($context['recipients']['members']))
@@ -726,6 +740,7 @@ class ManageNews_Controller extends Action_Controller
 			if (empty($context['email_force']))
 				$sendQuery .= ' AND mem.notify_announcements = {int:notify_announcements}';
 
+			require_once(SUBSDIR . '/News.subs.php');
 			// Get the smelly people - note we respect the id_member range as it gives us a quicker query.
 			$recipients = getNewsletterRecipients($sendQuery, $sendParams, $context['start'], $num_at_once, $i);
 			foreach ($recipients as $row)
@@ -755,7 +770,7 @@ class ManageNews_Controller extends Action_Controller
 						!empty($_POST['send_html']) ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $cleanMemberName . '</a>' : ($context['send_pm'] ? '[url=' . $scripturl . '?action=profile;u=' . $row['id_member'] . ']' . $cleanMemberName . '[/url]' : $cleanMemberName),
 						$row['id_member'],
 						$cleanMemberName,
-					), $_POST['message']);
+					), $base_message);
 
 				$subject = str_replace($from_member,
 					array(
@@ -763,7 +778,7 @@ class ManageNews_Controller extends Action_Controller
 						$row['real_name'],
 						$row['id_member'],
 						$row['real_name'],
-					), $_POST['subject']);
+					), $base_subject);
 
 				// Send the actual email - or a PM!
 				if (!$context['send_pm'])
@@ -784,7 +799,7 @@ class ManageNews_Controller extends Action_Controller
 		{
 			// Log this into the admin log.
 			logAction('newsletter', array(), 'admin');
-			redirectexit('action=admin');
+			redirectexit('action=admin;area=news;sa=mailingsend;success');
 		}
 
 		$context['start'] = $last_id_member;

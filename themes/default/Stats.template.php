@@ -19,7 +19,7 @@
  */
 function template_statistics()
 {
-	global $context, $settings, $txt, $scripturl, $modSettings;
+	global $context;
 
 	echo '
 	<div id="statistics" class="forum_category">
@@ -27,6 +27,7 @@ function template_statistics()
 			', $context['page_title'], '
 		</h2>
 		<ul class="statistics">';
+
 	foreach ($context['statistics_callbacks'] as $callback)
 	{
 		$function = 'template_' . $callback;
@@ -39,9 +40,12 @@ function template_statistics()
 	template_forum_history();
 }
 
+/**
+ * Used to show the general statistics blocks
+ */
 function template_general_statistics()
 {
-	global $context, $settings, $txt, $scripturl, $modSettings;
+	global $context, $settings, $txt;
 
 	// These two are special formatting strings for special elements of the statistics:
 	// The most_online value is an array composed of two elements: number and date,
@@ -50,6 +54,7 @@ function template_general_statistics()
 	// for example if you want to show it as: "123 members on the 20/01/2010" you could use:
 	// $settings['most_online'] = 'number members on the date';
 	$settings['most_online'] = 'number - date';
+
 	// Similarly to the previous one, this is a "template" for the latest_member stats
 	// The elements available to style this entry are: id, name, href, link.
 	// So, if you want to change it to the plain username you could use:
@@ -102,9 +107,12 @@ function template_general_statistics()
 			</li>';
 }
 
+/**
+ * Shows "top" statistics, like top posters, top boards, top replies, etc
+ */
 function template_top_statistics()
 {
-	global $context, $settings, $txt, $scripturl, $modSettings;
+	global $context, $txt;
 
 	echo '
 			<li class="flow_hidden">
@@ -227,9 +235,12 @@ function template_top_statistics()
 			</li>';
 }
 
+/**
+ * Shows the forum history, year/month breakdown of activity such as topics, posts, members, etc
+ */
 function template_forum_history()
 {
-	global $context, $settings, $txt, $scripturl, $modSettings;
+	global $context, $settings, $txt, $modSettings;
 
 	echo '
 	<div id="forum_history" class="forum_category">
@@ -325,7 +336,6 @@ function template_forum_history()
 			</table>
 		</div>
 	</div>
-	<script src="', $settings['default_theme_url'], '/scripts/stats.js"></script>
 	<script><!-- // --><![CDATA[
 		var oStatsCenter = new elk_StatsCenter({
 			sTableId: \'stats\',

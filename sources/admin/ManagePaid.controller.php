@@ -143,35 +143,35 @@ class ManagePaid_Controller extends Action_Controller
 
 		// We want javascript for our currency options.
 		addInlineJavascript('
-				function toggleOther()
+		function toggleOther()
+		{
+			var otherOn = document.getElementById("paid_currency").value == \'other\';
+			var currencydd = document.getElementById("custom_currency_code_div_dd");
+
+			if (otherOn)
+			{
+				document.getElementById("custom_currency_code_div").style.display = "";
+				document.getElementById("custom_currency_symbol_div").style.display = "";
+
+				if (currencydd)
 				{
-					var otherOn = document.getElementById("paid_currency").value == \'other\';
-					var currencydd = document.getElementById("custom_currency_code_div_dd");
-
-					if (otherOn)
-					{
-						document.getElementById("custom_currency_code_div").style.display = "";
-						document.getElementById("custom_currency_symbol_div").style.display = "";
-
-						if (currencydd)
-						{
-							document.getElementById("custom_currency_code_div_dd").style.display = "";
-							document.getElementById("custom_currency_symbol_div_dd").style.display = "";
-						}
-					}
-					else
-					{
-						document.getElementById("custom_currency_code_div").style.display = "none";
-						document.getElementById("custom_currency_symbol_div").style.display = "none";
-
-						if (currencydd)
-						{
-							document.getElementById("custom_currency_symbol_div_dd").style.display = "none";
-							document.getElementById("custom_currency_code_div_dd").style.display = "none";
-						}
-					}
+					document.getElementById("custom_currency_code_div_dd").style.display = "";
+					document.getElementById("custom_currency_symbol_div_dd").style.display = "";
 				}
-				toggleOther();', true);
+			}
+			else
+			{
+				document.getElementById("custom_currency_code_div").style.display = "none";
+				document.getElementById("custom_currency_symbol_div").style.display = "none";
+
+				if (currencydd)
+				{
+					document.getElementById("custom_currency_symbol_div_dd").style.display = "none";
+					document.getElementById("custom_currency_code_div_dd").style.display = "none";
+				}
+			}
+		}
+		toggleOther();', true);
 
 		// Saving the settings?
 		if (isset($_GET['save']))
@@ -596,6 +596,7 @@ class ManagePaid_Controller extends Action_Controller
 
 		// ID of the subscription.
 		$context['sub_id'] = (int) $_REQUEST['sid'];
+
 		// Load the subscription information.
 		$context['subscription'] = getSubscription($context['sub_id']);
 
@@ -767,7 +768,6 @@ class ManagePaid_Controller extends Action_Controller
 		global $context, $txt, $modSettings;
 
 		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
-
 		loadSubscriptions();
 
 		$context['log_id'] = isset($_REQUEST['lid']) ? (int) $_REQUEST['lid'] : 0;
@@ -777,6 +777,7 @@ class ManagePaid_Controller extends Action_Controller
 		// Setup the template.
 		$context['sub_template'] = 'modify_user_subscription';
 		$context['page_title'] = $txt[$context['action_type'] . '_subscriber'];
+		loadJavascriptFile('suggest.js', array('defer' => true));
 
 		// If we haven't been passed the subscription ID get it.
 		if ($context['log_id'] && !$context['sub_id'])
@@ -788,9 +789,7 @@ class ManagePaid_Controller extends Action_Controller
 
 		// Searching?
 		if (isset($_POST['ssearch']))
-		{
 			return $this->action_viewsub();
-		}
 		// Saving?
 		elseif (isset($_REQUEST['save_sub']))
 		{
@@ -809,6 +808,7 @@ class ManagePaid_Controller extends Action_Controller
 				// Find the user...
 				require_once(SUBSDIR . '/Members.subs.php');
 				$member = getMemberByName($_POST['name']);
+
 				if (empty($member))
 					fatal_lang_error('error_member_not_found');
 
@@ -908,6 +908,7 @@ class ManagePaid_Controller extends Action_Controller
 			if (isset($_GET['uid']))
 			{
 				require_once(SUBSDIR . '/Members.subs.php');
+				
 				// Get the latest activated member's display name.
 				$result = getBasicMemberData((int) $_GET['uid']);
 				$context['sub']['username'] = $result['real_name'];

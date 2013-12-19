@@ -15,21 +15,15 @@
  */
 
 /**
- * Template for the profile side bar - goes before any other profile template.
+ * Template for the profile header - goes before any other profile template.
  */
 function template_profile_above()
 {
-	global $context, $settings;
-
-	echo '
-	<script src="', $settings['default_theme_url'], '/scripts/profile.js"></script>';
+	global $context;
 
 	// Prevent Chrome from auto completing fields when viewing/editing other members profiles
 	if (isBrowser('is_webkit') && !$context['user']['is_owner'])
-		echo '
-	<script><!-- // --><![CDATA[
-		disableAutoComplete();
-	// ]]></script>';
+		addInlineJavascript ('disableAutoComplete();', true);
 
 	// If an error occurred while trying to save previously, give the user a clue!
 	echo '

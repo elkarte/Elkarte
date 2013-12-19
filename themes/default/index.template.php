@@ -606,13 +606,13 @@ function template_show_error($error_id)
 {
 	global $context;
 
-	if (empty($error_id) || empty($context[$error_id]))
+	if (empty($error_id))
 		return;
 
-	$error = $context[$error_id];
+	$error = isset($context[$error_id]) ? $context[$error_id] : array();
 
 	echo '
-					<div class="', (!isset($error['type']) ? 'successbox' : ($error['type'] !== 'serious' ? 'warningbox' : 'errorbox')), '" ', empty($error['errors']) ? ' style="display: none"' : '', ' id="', $error_id, '">';
+					<div id="', $error_id, '" class="', (!isset($error['type']) ? 'successbox' : ($error['type'] !== 'serious' ? 'warningbox' : 'errorbox')), '" ', empty($error['errors']) ? ' style="display: none"' : '', '>';
 
 	// Optional title for our results
 	if (!empty($error['title']))
@@ -623,7 +623,7 @@ function template_show_error($error_id)
 							</dt>
 							<dd>';
 
-	// Everythign that went wrong, or correctly :)
+	// Everything that went wrong, or correctly :)
 	if (!empty($error['errors']))
 	{
 		echo '
@@ -696,7 +696,6 @@ function template_news_fader()
 				', $settings['enable_news'] == 2 ? implode('</li><li>', $context['news_lines']) : $context['random_news_line'], '
 			</li>
 		</ul>
-	<script src="', $settings['default_theme_url'], '/scripts/fader.js"></script>
 	<script><!-- // --><![CDATA[
 		var newsFaderStarted = false;
 
@@ -713,6 +712,7 @@ function template_news_fader()
 			});
 			newsFaderStarted = true;
 		}';
+	
 	if ($settings['enable_news'] == 2 && empty($context['minmax_preferences']['upshrink']))
 		echo '
 		startNewsFader();';

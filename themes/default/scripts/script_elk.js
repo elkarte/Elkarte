@@ -180,9 +180,7 @@ function markboardreadButton(btn)
 	toggleButtonAJAX(btn);
 
 	// Remove all the "new" icons next to the topics subjects
-	$('.new_posts').each(function() {
-		$(this).parent().remove();
-	});
+	$('.new_posts').remove();
 
 	return false;
 }
@@ -197,18 +195,14 @@ function markallreadButton(btn)
 	toggleButtonAJAX(btn);
 
 	// Remove all the "new" icons next to the topics subjects
-	$('.new_posts').each(function() {
-		$(this).parent().remove();
-	});
+	$('.new_posts').remove();
 
 	// Turn the board icon class to off
-    $('.board_icon').each(function() {
-        $(this).removeClass('on_board on2_board').addClass('off_board');
-    });
-
-	$('.board_new_posts').each(function() {
-		$(this).removeClass('board_new_posts');
+	$('.board_icon').each(function() {
+		$(this).removeClass('on_board on2_board').addClass('off_board');
 	});
+
+	$('.board_new_posts').removeClass('board_new_posts');
 
 	return false;
 }
@@ -297,7 +291,12 @@ function updateRelativeTime()
 function relativeTime(sFrom, sTo)
 {
 	if (typeof sTo === 'undefined')
-		this.dateTo = new Date();
+	{
+		if (typeof oRttime.currentTime === 'undefined')
+			this.dateTo = new Date();
+		else
+			this.dateTo = new Date(oRttime.currentTime * 1000);
+	}
 	else
 		this.dateTo = new Date(sTo);
 

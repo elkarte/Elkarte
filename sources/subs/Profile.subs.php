@@ -712,6 +712,7 @@ function loadProfileFields($force_reload = false)
 			'type' => 'callback',
 			'callback_func' => 'pm_settings',
 			'permission' => 'pm_read',
+			'save_key' => 'pm_prefs',
 			'preload' => create_function('', '
 				global $context, $cur_profile;
 
@@ -1613,6 +1614,8 @@ function profileLoadSignatureData()
 		$context['signature_warning'] = sprintf($txt['profile_error_signature_max_image_' . ($context['signature_limits']['max_image_width'] ? 'width' : 'height')], $context['signature_limits'][$context['signature_limits']['max_image_width'] ? 'max_image_width' : 'max_image_height']);
 
 	$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && function_exists('pspell_new');
+	if ($context['show_spellchecking'])
+		loadJavascriptFile('spellcheck.js', array('defer' => true));
 
 	if (empty($context['do_preview']))
 		$context['member']['signature'] = empty($cur_profile['signature']) ? '' : str_replace(array('<br />', '<', '>', '"', '\''), array("\n", '&lt;', '&gt;', '&quot;', '&#039;'), $cur_profile['signature']);

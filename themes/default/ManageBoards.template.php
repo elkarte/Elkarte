@@ -650,35 +650,34 @@ function template_modify_board()
 				</div>
 			</div>
 		</form>
-	</div>
+	</div>';
 
-<script src="', $settings['default_theme_url'], '/scripts/suggest.js?beta10"></script>
-<script><!-- // --><![CDATA[
-	var oModeratorSuggest = new smc_AutoSuggest({
-		sSelf: \'oModeratorSuggest\',
-		sSessionId: elk_session_id,
-		sSessionVar: elk_session_var,
-		sSuggestId: \'moderators\',
-		sControlId: \'moderators\',
-		sSearchType: \'member\',
-		bItemList: true,
-		sPostName: \'moderator_list\',
-		sURLMask: \'action=profile;u=%item_id%\',
-		sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
-		sItemListContainerId: \'moderator_container\',
-		aListItems: [';
+	$js = '
+		var oModeratorSuggest = new smc_AutoSuggest({
+			sSelf: \'oModeratorSuggest\',
+			sSessionId: elk_session_id,
+			sSessionVar: elk_session_var,
+			sSuggestId: \'moderators\',
+			sControlId: \'moderators\',
+			sSearchType: \'member\',
+			bItemList: true,
+			sPostName: \'moderator_list\',
+			sURLMask: \'action=profile;u=%item_id%\',
+			sTextDeleteItem: \'' . $txt['autosuggest_delete_item'] . '\',
+			sItemListContainerId: \'moderator_container\',
+			aListItems: [';
 
 	foreach ($context['board']['moderators'] as $id_member => $member_name)
-		echo '
+		$js .= '
 					{
-						sItemId: ', JavaScriptEscape($id_member), ',
-						sItemName: ', JavaScriptEscape($member_name), '
-					}', $id_member == $context['board']['last_moderator_id'] ? '' : ',';
+						sItemId: ' . JavaScriptEscape($id_member) . ',
+						sItemName: ' . JavaScriptEscape($member_name) . '
+					}' . $id_member == $context['board']['last_moderator_id'] ? '' : ',';
 
-	echo '
-		]
-	});
-// ]]></script>';
+	$js .= '
+			]
+		});';
+	addInlineJavascript($js, true);
 
 	// Javascript for deciding what to show.
 	echo '

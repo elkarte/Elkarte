@@ -759,7 +759,7 @@ class ManageBans_Controller extends Action_Controller
 			redirectexit('action=admin;area=ban;sa=edit' . (!empty($ban_group) ? ';bg=' . $ban_group : ''));
 		}
 
-		loadJavascriptFile('suggest.js', array('default_theme' => true), 'suggest.js');
+		loadJavascriptFile('suggest.js', array('default_theme' => true, 'defer' => true), 'suggest.js');
 
 		if (empty($ban_id))
 		{

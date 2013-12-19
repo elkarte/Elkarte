@@ -402,6 +402,9 @@ class Groups_Controller extends Action_Controller
 			);
 		}
 
+		if (!empty($context['group']['assignable']))
+			loadJavascriptFile('suggest.js', array('defer' => true));
+		
 		// Select the template.
 		$context['sub_template'] = 'group_members';
 		$context['page_title'] = $txt['membergroups_members_title'] . ': ' . $context['group']['name'];

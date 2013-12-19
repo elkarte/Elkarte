@@ -154,7 +154,7 @@ input[disabled].input_text {
 }
 
 /* the new "button" */
-a.new_posts, span.new_posts {
+.new_posts, .new_posts:visited, .new_posts:link {
 	border-radius: 2px;
 	background: #5aa05e;
 	color: #fff;
@@ -705,7 +705,7 @@ div.bbc_footnotes .meaction{
 	width: 26px;
 	content: "";
 }
-.category_boards a span, .board_key:before {
+.category_boards .board_icon, .board_key:before {
 	background-repeat: no-repeat;
 	background-image: url(../../images/_light/board_icons.png);
 }
@@ -1674,6 +1674,19 @@ div.bbc_footnotes .meaction{
 	.poster:after, .posterarea:before {
 		border-bottom: 1px solid #bfbfbf;
 	}
+	.board_icon {
+		width: 20px;
+		height: 20px;
+	}
+	.on_board, .on2_board {
+		background-position: -300px -14px;
+	}
+	.off_board {
+		background-position: -372px -14px;
+	}
+	.redirect_board {
+		background-position: -444px -14px;
+	 }
 	.forumposts .windowbg2 {
 		background-color: #fafafa;
 	}
@@ -1699,4 +1712,13 @@ div.bbc_footnotes .meaction{
 		background: #fff;
 		border: none;
 	}
+	.listlevel2.subsections .linklevel2::after {
+		content: '';
+	}
+	.stats.floatleft {
+		border: none;
+	}
+	.subsections:hover .linklevel1:after {
+		content:"";
+	}	
 }

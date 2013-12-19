@@ -80,22 +80,19 @@ function template_registration_form()
 {
 	global $context, $settings, $scripturl, $txt, $modSettings;
 
-	echo '
-		<script src="', $settings['default_theme_url'], '/scripts/register.js"></script>
-		<script><!-- // --><![CDATA[
-			function verifyAgree()
+	addInlineJavascript('
+		function verifyAgree()
+		{
+			if (currentAuthMethod === \'passwd\' && document.forms.registration.elk_autov_pwmain.value !== document.forms.registration.elk_autov_pwverify.value)
 			{
-				if (currentAuthMethod === \'passwd\' && document.forms.registration.elk_autov_pwmain.value !== document.forms.registration.elk_autov_pwverify.value)
-				{
-					alert("', $txt['register_passwords_differ_js'], '");
-					return false;
-				}
-
-				return true;
+				alert("' . $txt['register_passwords_differ_js'] . '");
+				return false;
 			}
 
-			var currentAuthMethod = \'passwd\';
-		// ]]></script>';
+			return true;
+		}
+
+		var currentAuthMethod = \'passwd\';', true);
 
 	// Any errors?
 	if (!empty($context['registration_errors']))

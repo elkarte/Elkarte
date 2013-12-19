@@ -23,35 +23,35 @@ if (!defined('ELK'))
 function countUserMentions($all = false, $type = '', $id_member = null)
 {
 	global $user_info;
+	static $counts;
 
 	$db = database();
 	$id_member = $id_member === null ? $user_info['id'] : (int) $id_member;
 
+	if (isset($counts[$id_member]))
+		return $counts[$id_member];
+
 	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_mentions as mtn
-		WHERE mtn.id_member = {int:current_user}' . ($all ? '
-			AND mtn.status != {int:unapproved}
-			AND mtn.status != {int:is_not_deleted}' : '
-			AND mtn.status = {int:is_not_read}') . (empty($type) ? '' : (is_array($type) ? '
+		WHERE mtn.id_member = {int:current_user}
+			AND mtn.status IN ({array_int:status})' . (empty($type) ? '' : (is_array($type) ? '
 			AND mtn.mention_type IN ({array_string:current_type})' : '
 			AND mtn.mention_type = {string:current_type}')),
 		array(
 			'current_user' => $id_member,
 			'current_type' => $type,
-			'is_not_read' => 0,
-			'is_not_deleted' => 2,
-			'unapproved' => 3,
+			'status' => $all ? array(0, 1) : array(0),
 		)
 	);
-	list ($count) = $db->fetch_row($request);
+	list ($counts[$id_member]) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	// Counts as maintenance! :P
 	if ($all === false && empty($type))
-		updateMemberdata($id_member, array('mentions' => $count));
+		updateMemberdata($id_member, array('mentions' => $counts[$id_member]));
 
-	return $count;
+	return $counts[$id_member];
 }
 
 /**
@@ -79,10 +79,8 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 			LEFT JOIN {db_prefix}messages AS m ON (mtn.id_msg = m.id_msg)
 			LEFT JOIN {db_prefix}members AS mem ON (mtn.id_member_from = mem.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member)
-		WHERE mtn.id_member = {int:current_user}' . ($all ? '
-			AND mtn.status != {int:unapproved}
-			AND mtn.status != {int:is_not_deleted}' : '
-			AND mtn.status = {int:is_not_read}') . (empty($type) ? '' : (is_array($type) ? '
+		WHERE mtn.id_member = {int:current_user}
+			AND mtn.status IN ({array_int:status})' . (empty($type) ? '' : (is_array($type) ? '
 			AND mtn.mention_type IN ({array_string:current_type})' : '
 			AND mtn.mention_type = {string:current_type}')) . '
 		ORDER BY {raw:sort}
@@ -90,9 +88,7 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 		array(
 			'current_user' => $user_info['id'],
 			'current_type' => $type,
-			'is_not_read' => 0,
-			'is_not_deleted' => 2,
-			'unapproved' => 3,
+			'status' => $all ? array(0, 1) : array(0),
 			'start' => $start,
 			'limit' => $limit,
 			'sort' => $sort,
@@ -287,6 +283,66 @@ function toggleMentionsApproval($msgs, $approved)
 	while ($row = $db->fetch_row($request))
 		updateMentionMenuCount($status, $row['id_member']);
 	$db->free_result($request);
+}
+
+/**
+ * Toggles a mention visibility on/off (if off is restored to visible,
+ * if on is switched to unvisible) for all the users
+ *
+ * @param string $type type of the mention that you want to toggle
+ * @param bool if true enables the mentions, otherwise disables them
+ */
+function toggleMentionsVisibility($type, $enable)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}log_mentions
+		SET
+			status = status ' . ($enable ? '-' : '+') . ' {int:toggle}
+		WHERE mention_type = {string:type}
+			AND status ' . ($enable ? '>=' : '<') . ' {int:toggle}
+			AND status >= 0',
+		array(
+			'type' => $type,
+			'toggle' => 10,
+		)
+	);
+
+	$db->query('', '
+		UPDATE {db_prefix}log_mentions
+		SET
+			status = status ' . ($enable ? '-' : '+') . ' {int:toggle}
+		WHERE mention_type = {string:type}
+			AND status ' . ($enable ? '>=' : '<') . ' {int:toggle}
+			AND status < 0',
+		array(
+			'type' => $type,
+			'toggle' => -10,
+		)
+	);
+}
+
+/**
+ * Toggles a bunch of mentions accessibility on/off
+ *
+ * @param array an array of mention id
+ * @param bool if true make the mentions accessible (if visible and other things), otherwise marks them as inaccessible
+ */
+function toggleMentionsAccessibility($mentions, $access)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}log_mentions
+		SET
+			status = -(status + 1)
+		WHERE id_mention IN ({array_int:mentions})
+			AND status ' . ($access ? '<' : '>=') . ' 0',
+		array(
+			'mentions' => $mentions,
+		)
+	);
 }
 
 /**

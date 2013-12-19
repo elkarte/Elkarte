@@ -381,3 +381,24 @@ function spellCheckSetText(text, editorID)
 	if (!$("#" + editorID).data("sceditor").inSourceMode)
 		$("#" + editorID).data("sceditor").toggleSourceMode();
 }
+
+/**
+ * Used to enable the spellcheck on the editor box, switch to text mode so the
+ * spellcheck works
+ *
+ * @param {type} fieldName
+ */
+function spellCheckStart(fieldName)
+{
+	if (!spellCheck)
+		return false;
+
+	$("#" + post_box_name).data("sceditor").storeLastState();
+
+	// If we're in HTML mode we need to get the non-HTML text.
+	$("#" + post_box_name).data("sceditor").setTextMode();
+
+	spellCheck(false, post_box_name);
+
+	return true;
+}

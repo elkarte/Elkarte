@@ -137,6 +137,53 @@ function loadAddNewPoll(button, id_board, form_name)
 	if (typeof id_board == 'undefined')
 		return true;
 
+	// Find the form and add poll to the url
+	var $form = $('#post_header').closest("form");
+
+	// change the label
+	if ($(button).val() == poll_add)
+	{
+		$(button).val(poll_remove);
+
+		// We usually like to have the poll icon associated to polls,
+		// but only if the currently selected is the default one
+		if ($('#icon').val() == 'xx')
+			$('#icon').val('poll').change();
+
+		// Add poll to the form action
+		$form.attr('action', $form.attr('action') + ';poll');
+
+		// If the form already exists...just show it back and go out
+		if ($('#poll_main').length > 0)
+		{
+			$('#poll_main, #poll_options').find('input').each(function() {
+				if ($(this).data('required') == 'required')
+					$(this).attr('required', 'required');
+			});
+
+			$('#poll_main, #poll_options').toggle();
+			return false;
+		}
+	}
+	else
+	{
+		if ($('#icon').val() == 'poll')
+			$('#icon').val('xx').change();
+
+		// Remove poll to the form action
+		$form.attr('action', $form.attr('action').replace(';poll', ''));
+
+		$('#poll_main, #poll_options').hide().find('input').each(function() {
+			if ($(this).attr('required') == 'required')
+			{
+				$(this).data('required', 'required')
+				$(this).removeAttr('required');
+			}
+		});
+		$(button).val(poll_add);
+		return false;
+	}
+
 	// Retrieve the poll area
 	$.ajax({
 		url: elk_scripturl + '?action=poll;sa=interface;xml;board=' + id_board,
@@ -152,18 +199,6 @@ function loadAddNewPoll(button, id_board, form_name)
 
 		// Inject the html
 		$('#post_header').after(data);
-
-		// Hide the "Add poll" button
-		$(button).hide();
-
-		// We usually like to have the poll icon associated to polls,
-		// but only if the currently selected is the default one
-		if ($('#icon').val() == 'xx')
-			$('#icon').val('poll').change();
-
-		// Find the form and add poll to the url
-		$form = $('#post_header').closest("form");
-		$form.attr('action', $form.attr('action') + ';poll');
 
 		$('#poll_main input, #poll_options input').each(function () {
 			$(this).attr('tabindex', ++max_tabIndex);

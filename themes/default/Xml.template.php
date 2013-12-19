@@ -157,31 +157,32 @@ function template_post()
 }
 
 /**
- * Returns the PM preview
+ * Returns a preview, used by personal messages, newsletters, bounce templates, etc
  */
-function template_pm()
+function template_generic_preview()
 {
-	global $context;
+	global $context, $txt;
 
-	// @todo something could be removed...otherwise it can be merged again with template_post
 	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
 <elk>
 	<preview>
-		<subject><![CDATA[', $context['preview_subject'], ']]></subject>
+		<subject><![CDATA[', empty($context['preview_subject']) ? $txt['not_applicable'] : $context['preview_subject'], ']]></subject>
 		<body><![CDATA[', $context['preview_message'], ']]></body>
 	</preview>
 	<errors serious="', empty($context['error_type']) || $context['error_type'] != 'serious' ? '0' : '1', '">';
-	if (!empty($context['post_error']['messages']))
-		foreach ($context['post_error']['messages'] as $message)
+	
+	if (!empty($context['post_error']['errors']))
+		foreach ($context['post_error']['errors'] as $key => $message)
 			echo '
-		<error><![CDATA[', cleanXml($message), ']]></error>';
+		<error code="', cleanXml($key), '"><![CDATA[', cleanXml($message), ']]></error>';
 
+	// This is the not so generic section, mainly used by PM preview, can be used by others as well
 	echo '
 		<caption name="to" class="', isset($context['post_error']['no_to']) ? 'error' : '', '" />
 		<caption name="bbc" class="', isset($context['post_error']['no_bbc']) ? 'error' : '', '" />
 		<caption name="subject" class="', isset($context['post_error']['no_subject']) ? 'error' : '', '" />
-		<caption name="question" class="', isset($context['post_error']['no_question']) ? 'error' : '', '" />', isset($context['post_error']['no_message']) || isset($context['post_error']['long_message']) ? '
-		<post_error />' : '', '
+		<caption name="question" class="', isset($context['post_error']['no_question']) ? 'error' : '', '" />',
+		isset($context['post_error']['no_message']) || isset($context['post_error']['long_message']) ? '<post_error />' : '', '
 	</errors>';
 
 	echo '

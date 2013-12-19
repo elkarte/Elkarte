@@ -121,16 +121,16 @@ function template_core_features()
 	if ($context['is_new_install'])
 	{
 		echo '
-			<h2 id="section_header" class="category_header">
-				', $txt['core_settings_welcome_msg'], '
-			</h2>
-			<div class="information">
-				', $txt['core_settings_welcome_msg_desc'], '
-			</div>';
+		<h2 id="section_header" class="category_header">
+			', $txt['core_settings_welcome_msg'], '
+		</h2>
+		<div class="information">
+			', $txt['core_settings_welcome_msg_desc'], '
+		</div>';
 	}
 
 	echo '
-			<form id="core_features" action="', $scripturl, '?action=admin;area=corefeatures" method="post" accept-charset="UTF-8">
+		<form id="core_features" action="', $scripturl, '?action=admin;area=corefeatures" method="post" accept-charset="UTF-8">
 			<div style="display:none" id="activation_message" class="errorbox"></div>';
 
 	// Loop through all the shiny features.
