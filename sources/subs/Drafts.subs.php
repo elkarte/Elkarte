@@ -1,11 +1,14 @@
 <?php
 
 /**
+ * Support functions for the drafts controller
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -338,6 +341,9 @@ function draftsCount($member_id, $draft_type = 0)
  *
  * @todo this is the same as whats in PersonalMessage.controller, when that gets refractored
  *       this should go away and use the refractored PM subs
+ *
+ * @param array $allRecipients
+ * @param array $recipient_ids
  */
 function draftsRecipients($allRecipients, $recipient_ids)
 {

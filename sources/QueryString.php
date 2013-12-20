@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * This file does a lot of important stuff.  Mainly, this means it handles
+ * the query string, request variables, and session management.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -8,12 +11,9 @@
  * This file contains code also covered by:
  *
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file does a lot of important stuff.  Mainly, this means it handles
- * the query string, request variables, and session management.
  *
  */
 
@@ -44,6 +44,7 @@ function cleanRequest()
 	// Reject magic_quotes_sybase='on'.
 	if (ini_get('magic_quotes_sybase') || strtolower(ini_get('magic_quotes_sybase')) == 'on')
 		die('magic_quotes_sybase=on was detected: your host is using an unsecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.');
+
 	if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc() != 0)
 		die('magic_quotes_gpc=on was detected: your host is using an unsecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.');
 
@@ -85,7 +86,8 @@ function cleanRequest()
 		// Was this redirected? If so, get the REDIRECT_QUERY_STRING.
 		// Do not urldecode() the querystring, unless you so much wish to break OpenID implementation. :)
 		$_SERVER['QUERY_STRING'] = substr($_SERVER['QUERY_STRING'], 0, 5) === 'url=/' ? $_SERVER['REDIRECT_QUERY_STRING'] : $_SERVER['QUERY_STRING'];
-		// some german webmailers need a decoded string, so let's decode the string for action=activate and action=reminder
+
+		// Some german webmailers need a decoded string, so let's decode the string for action=activate and action=reminder
 		if (strpos($_SERVER['QUERY_STRING'], 'activate') !== false || strpos($_SERVER['QUERY_STRING'], 'reminder') !== false)
 			$_SERVER['QUERY_STRING'] = urldecode($_SERVER['QUERY_STRING']);
 
@@ -202,8 +204,8 @@ function convertIPv6toInts($ip)
 /**
  * Expands a IPv6 address to its full form.
  *
- * @param type $addr
- * @param type $strict_check checks lenght to expaned address for compliance
+ * @param string $addr ipv6 address string
+ * @param boolean $strict_check checks lenght to expaned address for compliance
  * @return boolean/string expanded ipv6 address.
  */
 function expandIPv6($addr, $strict_check = true)

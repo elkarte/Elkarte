@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Functions to support the bad behavior controller
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -18,9 +20,10 @@ if (!defined('ELK'))
  * It attempts to TRUNCATE the table to reset the auto_increment.
  * Redirects back to the badbehavior log when done.
  *
+ * @param string $type
  * @param array $filter
  */
-function deleteBadBehavior($type ,$filter)
+function deleteBadBehavior($type, $filter)
 {
 	$db = database();
 

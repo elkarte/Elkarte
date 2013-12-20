@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This file contains the database work for languages.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause

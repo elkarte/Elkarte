@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Functions to support addon settings controller
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -20,7 +22,7 @@ if (!defined('ELK'))
 /**
  * Gets all of the files in a directory and its chidren directories
  *
- * @param type $dir_path
+ * @param string $dir_path
  * @return array
  */
 function get_files_recursive($dir_path)
@@ -50,9 +52,9 @@ function get_files_recursive($dir_path)
  * Gets all of the hooks in the system and their status
  * Would be better documented if Ema was not lazy
  *
- * @param type $start
- * @param type $per_page
- * @param type $sort
+ * @param int $start
+ * @param int $per_page
+ * @param string $sort
  * @return array
  */
 function list_integration_hooks_data($start, $per_page, $sort)
@@ -232,7 +234,7 @@ function list_integration_hooks_data($start, $per_page, $sort)
  * Simply returns the total count of integration hooks
  * (used by createList() callbacks)
  *
- * @return int
+ * @param boolean $filter
  */
 function integration_hooks_count($filter = false)
 {

@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Functions to support the permissions controller
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -202,6 +204,9 @@ function updateChildPermissions($parents, $profile = null)
 	}
 }
 
+/**
+ * Class to initialize inline permissions sub-form and save its settings
+ */
 class InlinePermissions_Form
 {
 	/**

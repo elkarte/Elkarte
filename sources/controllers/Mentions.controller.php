@@ -1,19 +1,23 @@
 <?php
 
 /**
+ * Handles all the mentions actions so members are notified of mentionalbe actions
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Beta
  *
- * Mention members.
- *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Mentions_Controller Class:  Add mention notificaions for various actions such
+ * as liking a post, adding a buddy, @ calling a member in a post
+ */
 class Mentions_Controller extends Action_Controller
 {
 	/**
@@ -145,7 +149,7 @@ class Mentions_Controller extends Action_Controller
 	 */
 	public function action_list()
 	{
-		global $context, $txt, $scripturl, $modSettings;
+		global $context, $txt, $scripturl;
 
 		// Only registered members can be mentioned
 		is_not_guest();
@@ -319,15 +323,13 @@ class Mentions_Controller extends Action_Controller
 	 * Returns the mentions of a give type (like/mention) & (unread or all)
 	 *
 	 * @param int $start start list number
-	 * @param int $items_per_page how many to show on a page
+	 * @param int $limit how many to show on a page
 	 * @param string $sort which direction are we showing this
 	 * @param bool $all : if true load all the mentions or type, otherwise only the unread
 	 * @param string $type : the type of mention
 	 */
 	public function list_loadMentions($start, $limit, $sort, $all, $type)
 	{
-		global $modSettings, $user_info;
-
 		$totalMentions = countUserMentions($all, $type);
 		$mentions = array();
 		$round = 0;
@@ -343,7 +345,7 @@ class Mentions_Controller extends Action_Controller
 			else
 			{
 				$removed = false;
-				// @todo find a way to call only what is actually needed 
+				// @todo find a way to call only what is actually needed
 				foreach ($this->_callbacks as $type => $callback)
 					$removed = $removed || call_user_func_array($callback, array(&$possible_mentions, $type));
 			}
@@ -558,8 +560,6 @@ class Mentions_Controller extends Action_Controller
 	 */
 	protected function _buildUrl()
 	{
-		global $modSettings;
-
 		$this->_all = isset($_REQUEST['all']);
 		$this->_type = isset($_REQUEST['type']) && isset($this->_known_mentions[$_REQUEST['type']]) ? $_REQUEST['type'] : '';
 		$this->_page = isset($_REQUEST['start']) ? $_REQUEST['start'] : '';

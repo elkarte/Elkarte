@@ -1,11 +1,14 @@
 <?php
 
 /**
+ * Abstract base class for controllers. Holds action_index and pre_dispatch
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Beta
+ *
  */
 
 if (!defined('ELK'))

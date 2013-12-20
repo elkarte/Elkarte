@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * Specialized version of saveDBSettings to save config_vars in a table and not
+ * an external file.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -15,20 +18,23 @@ if (!defined('ELK'))
 
 /**
  * Similar in construction to saveDBSettings,
- * - Saves the config_vars to a specified table
- * - Var names are considered the col names,
+ * - Saves the config_vars to a specified table instead of a file
+ * - Var names are considered the table col names,
  * - Values are cast per config vars
  * - If editing a row, the primary col index and existing index value must be
- *   supplied, otherwise a new row will be added
- *
- * @param array $config_vars the key names of the vars are the table cols
- * @param string $tablename name of the table the values will be saved in
- * @param array $index for compatability
- * @param integer $editid -1 add a row, otherwise edit a row with the supplied key value
- * @param string $editname used when editing a row, needs to be the name of the col to find $editid key value
+ *   supplied (editid and editname), otherwise a new row will be added
  */
 class MaillistSettingsClass extends Settings_Form
 {
+	/**
+	 * static function saveTableSettings, now part of the Settings Form class
+	 *
+	 * @param array $config_vars the key names of the vars are the table cols
+	 * @param string $tablename name of the table the values will be saved in
+	 * @param array $index for compatability
+	 * @param integer $editid -1 add a row, otherwise edit a row with the supplied key value
+	 * @param string $editname used when editing a row, needs to be the name of the col to find $editid key value
+	 */
 	static function saveTableSettings($config_vars, $tablename, $index = array(), $editid = -1, $editname = '')
 	{
 		$db = database();

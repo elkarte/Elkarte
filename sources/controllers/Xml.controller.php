@@ -1,11 +1,14 @@
 <?php
 
 /**
+ * Handles xml requests
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Beta
+ *
  */
 
 if (!defined('ELK'))
@@ -65,7 +68,6 @@ class Xml_Controller extends Action_Controller
 		// Find the boards/categories they can see.
 		require_once(SUBSDIR . '/Boards.subs.php');
 		$boardListOptions = array(
-			'use_permissions' => true,
 			'selected_board' => isset($context['current_board']) ? $context['current_board'] : 0,
 		);
 		$context += getBoardList($boardListOptions);

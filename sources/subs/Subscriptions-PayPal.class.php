@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Payment Gateway: paypal
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -11,7 +13,6 @@
  *
  * @version 1.0 Beta
  *
- * Payment Gateway: paypal
  */
 
 if (!defined('ELK'))
@@ -24,6 +25,7 @@ class paypal_display
 {
 	/**
 	 * Name of this payment gateway
+	 * @var string
 	 */
 	public $title = 'PayPal';
 
@@ -64,11 +66,11 @@ class paypal_display
 	 * Called from Profile-Actions.php to return a unique set of fields for the given gateway
 	 * plus all the standard ones for the subscription form
 	 *
-	 * @param type $unique_id
-	 * @param type $sub_data
-	 * @param type $value
-	 * @param type $period
-	 * @param type $return_url
+	 * @param int $unique_id for the transaction
+	 * @param array $sub_data subscription data array, name, reocurring, etc
+	 * @param int $value amount of the transaction
+	 * @param string $period length of the transaction
+	 * @param string $return_url
 	 * @return string
 	 */
 	public function fetchGatewayFields($unique_id, $sub_data, $value, $period, $return_url)
@@ -153,15 +155,18 @@ class paypal_payment
 		// Has the user set up an email address?
 		if (empty($modSettings['paypal_email']))
 			return false;
+
 		// Check the correct transaction types are even here.
 		if ((!isset($_POST['txn_type']) && !isset($_POST['payment_status'])) || (!isset($_POST['business']) && !isset($_POST['receiver_email'])))
 			return false;
+
 		// Correct email address?
 		if (!isset($_POST['business']))
 			$_POST['business'] = $_POST['receiver_email'];
 
 		if ($modSettings['paypal_email'] !== $_POST['business'] && (empty($modSettings['paypal_additional_emails']) || !in_array($_POST['business'], explode(',', $modSettings['paypal_additional_emails']))))
 			return false;
+
 		return true;
 	}
 

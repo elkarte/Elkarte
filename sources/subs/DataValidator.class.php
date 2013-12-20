@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Used to validate and transform user supplied data from forms etc
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -105,7 +107,7 @@ class Data_Validator
 	/**
 	 * Allow reading otherwise inaccessible data values
 	 *
-	 * @param type $property key name of array value to return
+	 * @param string $property key name of array value to return
 	 */
 	public function __get($property)
 	{
@@ -179,6 +181,7 @@ class Data_Validator
 
 	/**
 	 * Field Name Replacements
+	 * @param array $replacements
 	 */
 	public function text_replacements($replacements = array())
 	{
@@ -240,6 +243,7 @@ class Data_Validator
 
 	/**
 	 * Return the validation data, all or a specific key
+	 * @param mixed $key int or string
 	 */
 	public function validation_data($key = null)
 	{
@@ -502,8 +506,7 @@ class Data_Validator
 	/**
 	 * Process any errors and return the error strings
 	 *
-	 * @return array
-	 * @return string
+	 * @param array $keys
 	 */
 	private function _get_error_messages($keys)
 	{
@@ -550,7 +553,7 @@ class Data_Validator
 	 *
 	 * @param string $field
 	 * @param array $input
-	 * @param array or null $validation_parameters
+	 * @param mixed $validation_parameters array or null
 	 */
 	protected function _validate_contains($field, $input, $validation_parameters = null)
 	{
@@ -576,7 +579,7 @@ class Data_Validator
 	 *
 	 * @param string $field
 	 * @param array $input
-	 * @param array or null $validation_parameters
+	 * @param mixed $validation_parameters array or null
 	 */
 	protected function _validate_notequal($field, $input, $validation_parameters = null)
 	{
@@ -602,7 +605,7 @@ class Data_Validator
 	 *
 	 * @param string $field
 	 * @param array $input
-	 * @param array or null $validation_parameters
+	 * @param mixed $validation_parameters array or null
 	 */
 	protected function _validate_without($field, $input, $validation_parameters = null)
 	{
@@ -631,7 +634,7 @@ class Data_Validator
 	 *
 	 * @param string $field
 	 * @param array $input
-	 * @param array or null $validation_parameters
+	 * @param mixed $validation_parameters array or null
 	 */
 	protected function _validate_required($field, $input, $validation_parameters = null)
 	{
@@ -653,7 +656,7 @@ class Data_Validator
 	 *
 	 * @param string $field
 	 * @param array $input
-	 * @param array or null $validation_parameters
+	 * @param mixed $validation_parameters array or null
 	 */
 	protected function _validate_valid_email($field, $input, $validation_parameters = null)
 	{
@@ -732,7 +735,7 @@ class Data_Validator
 	 *
 	 * @param string $field
 	 * @param array $input
-	 * @param array or null $validation_parameters
+	 * @param mixed $validation_parameters array or null
 	 */
 	protected function _validate_max_length($field, $input, $validation_parameters = null)
 	{
@@ -757,7 +760,7 @@ class Data_Validator
 	 *
 	 * @param string $field
 	 * @param array $input
-	 * @param array or null $validation_parameters
+	 * @param mixed $validation_parameters array or null
 	 */
 	protected function _validate_min_length($field, $input, $validation_parameters = null)
 	{
@@ -782,7 +785,7 @@ class Data_Validator
 	 *
 	 * @param string $field
 	 * @param array $input
-	 * @param array or null $validation_parameters
+	 * @param mixed $validation_parameters array or null
 	 */
 	protected function _validate_length($field, $input, $validation_parameters = null)
 	{
@@ -807,7 +810,7 @@ class Data_Validator
 	 *
 	 * @param string $field
 	 * @param array $input
-	 * @param array or null $validation_parameters
+	 * @param mixed $validation_parameters array or null
 	 */
 	protected function _validate_alpha($field, $input, $validation_parameters = null)
 	{
@@ -833,7 +836,7 @@ class Data_Validator
 	 *
 	 * @param string $field
 	 * @param array $input
-	 * @param array or null $validation_parameters
+	 * @param mixed $validation_parameters array or null
 	 */
 	protected function _validate_alpha_numeric($field, $input, $validation_parameters = null)
 	{
@@ -859,7 +862,7 @@ class Data_Validator
 	 *
 	 * @param string $field
 	 * @param array $input
-	 * @param array or null $validation_parameters
+	 * @param mixed $validation_parameters array or null
 	 */
 	protected function _validate_alpha_dash($field, $input, $validation_parameters = null)
 	{
@@ -884,7 +887,7 @@ class Data_Validator
 	 *
 	 * @param string $field
 	 * @param array $input
-	 * @param array or null $validation_parameters
+	 * @param mixed $validation_parameters array or null
 	 */
 	protected function _validate_isarray($field, $input, $validation_parameters = null)
 	{
@@ -910,7 +913,7 @@ class Data_Validator
 	 *
 	 * @param string $field
 	 * @param array $input
-	 * @param array or null $validation_parameters
+	 * @param mixed $validation_parameters array or null
 	 */
 	protected function _validate_numeric($field, $input, $validation_parameters = null)
 	{
@@ -935,7 +938,7 @@ class Data_Validator
 	 *
 	 * @param string $field
 	 * @param array $input
-	 * @param array or null $validation_parameters
+	 * @param mixed $validation_parameters array or null
 	 */
 	protected function _validate_integer($field, $input, $validation_parameters = null)
 	{
@@ -960,7 +963,7 @@ class Data_Validator
 	 *
 	 * @param string $field
 	 * @param array $input
-	 * @param array or null $validation_parameters
+	 * @param mixed $validation_parameters array or null
 	 */
 	protected function _validate_boolean($field, $input, $validation_parameters = null)
 	{
@@ -985,7 +988,7 @@ class Data_Validator
 	 *
 	 * @param string $field
 	 * @param array $input
-	 * @param array or null $validation_parameters
+	 * @param mixed $validation_parameters array or null
 	 */
 	protected function _validate_float($field, $input, $validation_parameters = null)
 	{
@@ -1010,7 +1013,7 @@ class Data_Validator
 	 *
 	 * @param string $field
 	 * @param array $input
-	 * @param array or null $validation_parameters
+	 * @param mixed $validation_parameters array or null
 	 */
 	protected function _validate_valid_url($field, $input, $validation_parameters = null)
 	{
@@ -1035,7 +1038,7 @@ class Data_Validator
 	 *
 	 * @param string $field
 	 * @param array $input
-	 * @param array or null $validation_parameters
+	 * @param mixed $validation_parameters array or null
 	 */
 	protected function _validate_valid_ipv6($field, $input, $validation_parameters = null)
 	{
@@ -1060,7 +1063,7 @@ class Data_Validator
 	 *
 	 * @param string $field
 	 * @param array $input
-	 * @param array or null $validation_parameters
+	 * @param mixed $validation_parameters array or null
 	 */
 	protected function _validate_valid_ip($field, $input, $validation_parameters = null)
 	{
@@ -1087,7 +1090,7 @@ class Data_Validator
 	 *
 	 * @param string $field
 	 * @param array $input
-	 * @param array or null $validation_parameters
+	 * @param mixed $validation_parameters array or null
 	 */
 	protected function _validate_php_syntax($field, $input, $validation_parameters = null)
 	{
@@ -1143,7 +1146,7 @@ class Data_Validator
 	 *
 	 * @param string $field
 	 * @param array $input
-	 * @param array or null $validation_parameters
+	 * @param mixed $validation_parameters array or null
 	 */
 	protected function _validate_valid_color($field, $input, $validation_parameters = null)
 	{
@@ -1191,6 +1194,7 @@ class Data_Validator
 	 * - auser@gmail.com, a.user@gmail.com, auser+big@gmail.com and a.user+gigantic@googlemail.com are same email address.
 	 *
 	 * @param string $input
+	 * @param mixed $sanitation_parameters
 	 */
 	protected function _sanitation_gmail_normalize($input, $sanitation_parameters = null)
 	{

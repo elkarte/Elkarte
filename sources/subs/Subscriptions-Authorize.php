@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Payment Gateway: authorize
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -10,8 +12,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * Payment Gateway: authorize
  *
  */
 
@@ -23,10 +23,14 @@ if (!defined('ELK'))
  */
 class authorize_display
 {
+	/**
+	 * Title of this payment gateway
+	 * @var string
+	 */
 	public $title = 'Authorize.net | Credit Card';
 
 	/**
-	 * Settings for the gateway.
+	 * Admin settings for the gateway.
 	 */
 	public function getGatewaySettings()
 	{
@@ -54,6 +58,7 @@ class authorize_display
 
 	/**
 	 * Returns the fields needed for the transaction.
+	 * Called from Profile-Actions.php to return a unique set of fields for the given gateway
 	 *
 	 * @param int $unique_id
 	 * @param array $sub_data
@@ -98,7 +103,12 @@ class authorize_display
 		return $return_data;
 	}
 
-	// Generates the hash needed
+	/**
+	 * Generates the hash needed
+	 *
+	 * @param int $key
+	 * @param string $data
+	 */
 	private function _md5_hmac($key, $data)
 	{
 		$key = str_pad(strlen($key) <= 64 ? $key : pack('H*', md5($key)), 64, chr(0x00));
@@ -106,10 +116,23 @@ class authorize_display
 	}
 }
 
+/**
+ * Class of functions to validate a authorize_payment response and provide details of the payment
+ */
 class authorize_payment
 {
+	/**
+	 * Holds our return results
+	 * @var array
+	 */
 	private $return_data;
 
+	/**
+	 * Validates that we have valid data to work with
+	 * Returns true/false for whether this gateway thinks the data is intended for it.
+	 *
+	 * @return boolean
+	 */
 	public function isValid()
 	{
 		global $modSettings;
@@ -117,19 +140,25 @@ class authorize_payment
 		// Is it even on?
 		if (empty($modSettings['authorize_id']) || empty($modSettings['authorize_transid']))
 			return false;
+
 		// We got a hash?
 		if (empty($_POST['x_MD5_Hash']))
 			return false;
+
 		// Do we have an invoice number?
 		if (empty($_POST['x_invoice_num']))
 			return false;
+
+		// And a response?
 		if (empty($_POST['x_response_code']))
 			return false;
+
 		return true;
 	}
 
 	/**
 	 * Validate this is valid for this transaction type.
+	 * If valid returns the subscription and member IDs we are going to process.
 	 */
 	public function precheck()
 	{

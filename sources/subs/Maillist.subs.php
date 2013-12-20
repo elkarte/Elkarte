@@ -1,13 +1,14 @@
 <?php
 
 /**
+ * All of the helper functions for use by the maillist controller
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Beta
  *
- * All of the helper functions for use by the maillist controller
  */
 
 if (!defined('ELK'))
@@ -101,7 +102,6 @@ function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
 
 /**
  * Counts the number of errors (the user can see) for pagination
- *
  */
 function list_maillist_count_unapproved()
 {
@@ -142,7 +142,7 @@ function list_maillist_count_unapproved()
 /**
  * Removes an single entry from the postby_emails_error table
  *
- * @param type $id
+ * @param int $id
  */
 function maillist_delete_error_entry($id)
 {
@@ -163,12 +163,11 @@ function maillist_delete_error_entry($id)
  *  - If an ID is supplied, it will load that specific filter/parser
  *  - Style defines if it will load parsers or filters
  *
- * @param int type $start
+ * @param int $start
  * @param int $chunk_size
  * @param string $sort
  * @param int $id
  * @param string $style
- * @return type
  */
 function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style = 'filter')
 {
@@ -250,8 +249,8 @@ function list_count_filter_parser($id, $style)
  * Loads a specific filter/parser from the database for display
  * It will load only that filter/parser
  *
- * @param type $id
- * @param type $style
+ * @param int $id
+ * @param string $style parser or filter
  * @return array of filters/parsers
  */
 function maillist_load_filter_parser($id, $style)
@@ -285,7 +284,7 @@ function maillist_load_filter_parser($id, $style)
 /**
  * Removes a specific filter or parser from the system
  *
- * @param type $id ID of the filter/parser
+ * @param int $id ID of the filter/parser
  */
 function maillist_delete_filter_parser($id)
 {
@@ -306,8 +305,6 @@ function maillist_delete_filter_parser($id)
 /**
  * Creates a select list of boards for the admin
  *  - Sets the first one as a blank for use in a template select element
- *
- * @return type
  */
 function maillist_board_list()
 {
@@ -334,7 +331,7 @@ function maillist_board_list()
 /**
  * Turns on or off the "fake" cron job for imap email retrieval
  *
- * @param type $switch
+ * @param boolean $switch 
  */
 function enable_maillist_imap_cron($switch)
 {

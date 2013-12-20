@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Handles the job of attachment and avatar maintenance /management.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,7 +11,7 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
  *
@@ -41,7 +43,6 @@ class ManageAttachments_Controller extends Action_Controller
 	 * @uses template layer 'manage_files' for showing the tab bar.
 	 *
 	 * @see Action_Controller::action_index()
-	 *
 	 */
 	public function action_index()
 	{
@@ -227,10 +228,7 @@ class ManageAttachments_Controller extends Action_Controller
 
 		// If not set, show a default path for the base directory
 		if (!isset($_GET['save']) && empty($modSettings['basedirectory_for_attachments']))
-			if (is_dir($modSettings['attachmentUploadDir'][1]))
-				$modSettings['basedirectory_for_attachments'] = $modSettings['attachmentUploadDir'][1];
-			else
-				$modSettings['basedirectory_for_attachments'] = $context['attachmentUploadDir'];
+			$modSettings['basedirectory_for_attachments'] = $context['attachmentUploadDir'];
 
 		$context['valid_upload_dir'] = is_dir($context['attachmentUploadDir']) && is_writable($context['attachmentUploadDir']);
 
@@ -793,6 +791,7 @@ class ManageAttachments_Controller extends Action_Controller
 			'attachment_no_msg' => 0,
 			'avatar_no_member' => 0,
 			'wrong_folder' => 0,
+			'missing_extension' => 0,
 			'files_without_attachment' => 0,
 		);
 
@@ -848,6 +847,7 @@ class ManageAttachments_Controller extends Action_Controller
 			{
 				$to_remove = array();
 				$repair_errors = repairAttachmentData($_GET['substep'], $fix_errors, $to_fix);
+
 				foreach($repair_errors as $key => $value)
 					$context['repair_errors'][$key] += $value;
 
@@ -969,7 +969,12 @@ class ManageAttachments_Controller extends Action_Controller
 
 		// What stage are we at?
 		$context['completed'] = $fix_errors ? true : false;
-		$context['errors_found'] = !empty($to_fix) ? true : false;
+		foreach ($context['repair_errors'] as $number)
+			if (!empty($number))
+			{
+				$context['errors_found'] = true;
+				break;
+			}
 	}
 
 	/**
@@ -999,12 +1004,24 @@ class ManageAttachments_Controller extends Action_Controller
 
 			$_POST['current_dir'] = isset($_POST['current_dir']) ? (int) $_POST['current_dir'] : 0;
 			$new_dirs = array();
+
+			require_once(SUBSDIR . '/Themes.subs.php');
+			$themes = installedThemes();
+			$reserved_dirs = array(BOARDDIR, SOURCEDIR, SUBSDIR, CONTROLLERDIR, CACHEDIR, EXTDIR, LANGUAGEDIR, ADMINDIR);
+			foreach ($themes as $theme)
+				$reserved_dirs[] = $theme['theme_dir'];
+
 			foreach ($_POST['dirs'] as $id => $path)
 			{
 				$error = '';
 				$id = (int) $id;
 				if ($id < 1)
 					continue;
+
+				$real_path = rtrim(trim($path), DIRECTORY_SEPARATOR);
+				// If it doesn't look like a directory, probably is not a directory
+				if (preg_match('~[/\\\\]~', $real_path) !== 1)
+					$real_path = realpath(BOARDDIR . DIRECTORY_SEPARATOR . ltrim($real_path, DIRECTORY_SEPARATOR));
 
 				// Hmm, a new path maybe?
 				if (!array_key_exists($id, $modSettings['attachmentUploadDir']))
@@ -1016,6 +1033,13 @@ class ManageAttachments_Controller extends Action_Controller
 						continue;
 					}
 
+					// or is it a system dir?
+					if (in_array($real_path, $reserved_dirs))
+					{
+						$errors[] = $real_path . ': ' . $txt['attach_dir_reserved'];
+						continue;
+					}
+
 					// OK, so let's try to create it then.
 					if (automanage_attachments_create_directory($path))
 						$_POST['current_dir'] = $modSettings['currentAttachmentUploadDir'];
@@ -1024,28 +1048,28 @@ class ManageAttachments_Controller extends Action_Controller
 				}
 
 				// Changing a directory name?
-				if (!empty($modSettings['attachmentUploadDir'][$id]) && !empty($path) && $path != $modSettings['attachmentUploadDir'][$id])
+				if (!empty($modSettings['attachmentUploadDir'][$id]) && !empty($path) && $real_path != $modSettings['attachmentUploadDir'][$id])
 				{
-					if ($path != $modSettings['attachmentUploadDir'][$id] && !is_dir($path))
+					if ($real_path != $modSettings['attachmentUploadDir'][$id] && !is_dir($real_path))
 					{
-						if (!@rename($modSettings['attachmentUploadDir'][$id], $path))
+						if (!@rename($modSettings['attachmentUploadDir'][$id], $real_path))
 						{
-							$errors[] = $path . ': ' . $txt['attach_dir_no_rename'];
-							$path = $modSettings['attachmentUploadDir'][$id];
+							$errors[] = $real_path . ': ' . $txt['attach_dir_no_rename'];
+							$real_path = $modSettings['attachmentUploadDir'][$id];
 						}
 					}
 					else
 					{
-						$errors[] = $path . ': ' . $txt['attach_dir_exists_msg'];
-						$path = $modSettings['attachmentUploadDir'][$id];
+						$errors[] = $real_path . ': ' . $txt['attach_dir_exists_msg'];
+						$real_path = $modSettings['attachmentUploadDir'][$id];
 					}
 
 					// Update the base directory path
 					if (!empty($modSettings['attachment_basedirectories']) && array_key_exists($id, $modSettings['attachment_basedirectories']))
 					{
-						$base = $modSettings['basedirectory_for_attachments'] == $modSettings['attachmentUploadDir'][$id] ? $path : $modSettings['basedirectory_for_attachments'];
+						$base = $modSettings['basedirectory_for_attachments'] == $modSettings['attachmentUploadDir'][$id] ? $real_path : $modSettings['basedirectory_for_attachments'];
 
-						$modSettings['attachment_basedirectories'][$id] = $path;
+						$modSettings['attachment_basedirectories'][$id] = $real_path;
 						updateSettings(array(
 							'attachment_basedirectories' => serialize($modSettings['attachment_basedirectories']),
 							'basedirectory_for_attachments' => $base,
@@ -1056,14 +1080,14 @@ class ManageAttachments_Controller extends Action_Controller
 
 				if (empty($path))
 				{
-					$path = $modSettings['attachmentUploadDir'][$id];
+					$real_path = $modSettings['attachmentUploadDir'][$id];
 
 					// It's not a good idea to delete the current directory.
 					if ($id == (!empty($_POST['current_dir']) ? $_POST['current_dir'] : $modSettings['currentAttachmentUploadDir']))
-						$errors[] = $path . ': ' . $txt['attach_dir_is_current'];
+						$errors[] = $real_path . ': ' . $txt['attach_dir_is_current'];
 					// Or the current base directory
 					elseif (!empty($modSettings['basedirectory_for_attachments']) && $modSettings['basedirectory_for_attachments'] == $modSettings['attachmentUploadDir'][$id])
-						$errors[] = $path . ': ' . $txt['attach_dir_is_current_bd'];
+						$errors[] = $real_path . ': ' . $txt['attach_dir_is_current_bd'];
 					else
 					{
 						// Let's not try to delete a path with files in it.
@@ -1074,27 +1098,27 @@ class ManageAttachments_Controller extends Action_Controller
 						{
 							// Count any sub-folders.
 							foreach ($modSettings['attachmentUploadDir'] as $sub)
-								if (strpos($sub, $path . DIRECTORY_SEPARATOR) !== false)
+								if (strpos($sub, $real_path . DIRECTORY_SEPARATOR) !== false)
 									$num_attach++;
 						}
 
 						// It's safe to delete. So try to delete the folder also
 						if ($num_attach == 0)
 						{
-							if (is_dir($path))
+							if (is_dir($real_path))
 								$doit = true;
-							elseif (is_dir(BOARDDIR . DIRECTORY_SEPARATOR . $path))
+							elseif (is_dir(BOARDDIR . DIRECTORY_SEPARATOR . $real_path))
 							{
 								$doit = true;
-								$path = BOARDDIR . DIRECTORY_SEPARATOR . $path;
+								$real_path = BOARDDIR . DIRECTORY_SEPARATOR . $real_path;
 							}
 
 							if (isset($doit))
 							{
-								unlink($path . '/.htaccess');
-								unlink($path . '/index.php');
-								if (!@rmdir($path))
-									$error = $path . ': ' . $txt['attach_dir_no_delete'];
+								unlink($real_path . '/.htaccess');
+								unlink($real_path . '/index.php');
+								if (!@rmdir($real_path))
+									$error = $real_path . ': ' . $txt['attach_dir_no_delete'];
 							}
 
 							// Remove it from the base directory list.
@@ -1106,7 +1130,7 @@ class ManageAttachments_Controller extends Action_Controller
 							}
 						}
 						else
-							$error = $path . ': ' . $txt['attach_dir_no_remove'];
+							$error = $real_path . ': ' . $txt['attach_dir_no_remove'];
 
 						if (empty($error))
 							continue;
@@ -1115,7 +1139,7 @@ class ManageAttachments_Controller extends Action_Controller
 					}
 				}
 
-				$new_dirs[$id] = $path;
+				$new_dirs[$id] = $real_path;
 			}
 
 			// We need to make sure the current directory is right.

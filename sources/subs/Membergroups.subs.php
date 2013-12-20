@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This file contains functions regarding manipulation of and information about membergroups.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,8 +14,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file contains functions regarding manipulation of and information about membergroups.
  *
  */
 
@@ -537,7 +537,7 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
  * Gets the members of a supplied membergroup.
  * Returns them as a link for display.
  *
- * @param array &$members
+ * @param array $members
  * @param int $membergroup
  * @param int $limit = null
  *
@@ -575,10 +575,6 @@ function listMembergroupMembers_Href(&$members, $membergroup, $limit = null)
 
 /**
  * Retrieve a list of (visible) membergroups used by the cache.
- *
- * @global type $scripturl
- *
- * @return type
  */
 function cache_getMembergroupList()
 {
@@ -616,13 +612,16 @@ function cache_getMembergroupList()
 /**
  * Helper function to generate a list of membergroups for display.
  *
- * @param int $start
- * @param int $items_per_page
+ * @param int $start not used
+ * @param int $items_per_page not used
  * @param string $sort
  * @param string $membergroup_type
  * @param int $user_id
  * @param bool $include_hidden
  * @param bool $include_all
+ * @param bool $aggregate
+ * @param bool $count_permissions
+ * @param int $pid - profile id
  */
 function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type, $user_id, $include_hidden, $include_all = false, $aggregate = false, $count_permissions = false, $pid = null)
 {
@@ -776,6 +775,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 		if (empty($pid))
 		{
 			$groups = countPermissions($groups, $context['hidden_permissions']);
+
 			// Get the "default" profile permissions too.
 			$groups = countBoardPermissions($groups, $context['hidden_permissions'], 1);
 		}
@@ -793,12 +793,13 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
  *
  * @param array $postGroups an array of post-based groups id.
  * @param array $normalGroups = array() an array of normal groups id.
- * @param bool $include_hidden = false if true, it includes hidden groups in the count (default false).
- * @param bool $include_moderators = false if true, it includes board moderators too (default false).
+ * @param bool $include_hidden if true, includes hidden groups in the count (default false).
+ * @param bool $include_moderators if true, includes board moderators too (default false).
+ * @param bool $include_non_active if true, includes non active members (default false).
  *
  * @return array
  */
-function membersInGroups($postGroups, $normalGroups = array(), $include_hidden = false, $include_moderators = false)
+function membersInGroups($postGroups, $normalGroups = array(), $include_hidden = false, $include_moderators = false, $include_non_active = false)
 {
 	$db = database();
 
@@ -810,10 +811,12 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
 		$query = $db->query('', '
 			SELECT id_post_group AS id_group, COUNT(*) AS member_count
 			FROM {db_prefix}members
-			WHERE id_post_group IN ({array_int:post_group_list})
+			WHERE id_post_group IN ({array_int:post_group_list})' . ($include_non_active ? '' : '
+				AND is_activated = {int:active_members}') . '
 			GROUP BY id_post_group',
 			array(
 				'post_group_list' => $postGroups,
+				'active_members' => 1,
 			)
 		);
 		while ($row = $db->fetch_assoc($query))
@@ -827,10 +830,12 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
 		$query = $db->query('', '
 			SELECT id_group, COUNT(*) AS member_count
 			FROM {db_prefix}members
-			WHERE id_group IN ({array_int:normal_group_list})
+			WHERE id_group IN ({array_int:normal_group_list})' . ($include_non_active ? '' : '
+				AND is_activated = {int:active_members}') . '
 			GROUP BY id_group',
 			array(
 				'normal_group_list' => $normalGroups,
+				'active_members' => 1,
 			)
 		);
 		while ($row = $db->fetch_assoc($query))
@@ -847,10 +852,12 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
 					INNER JOIN {db_prefix}members AS mem ON (mem.additional_groups != {string:blank_string}
 						AND mem.id_group != mg.id_group
 						AND FIND_IN_SET(mg.id_group, mem.additional_groups) != 0)
-				WHERE mg.id_group IN ({array_int:normal_group_list})
+				WHERE mg.id_group IN ({array_int:normal_group_list})' . ($include_non_active ? '' : '
+					AND mem.is_activated = {int:active_members}') . '
 				GROUP BY mg.id_group',
 				array(
 					'normal_group_list' => $normalGroups,
+					'active_members' => 1,
 					'blank_string' => '',
 				)
 			);
@@ -930,7 +937,11 @@ function membergroupsById($group_ids, $limit = 1, $detailed = false, $assignable
 }
 
 /**
- * Uses membergroupsById to return the group informations of only 1 group
+ * Uses membergroupsById to return the group information of a single group
+ *
+ * @param int $group_id
+ * @param bool $detailed
+ * @param bool $assignable
  */
 function membergroupById($group_id, $detailed = false, $assignable = false)
 {
@@ -965,7 +976,7 @@ function membergroupById($group_id, $detailed = false, $assignable = false)
  * @param array $includes
  * @param array $excludes
  * @param string $sort_order
- * @param bool $split, splits postgroups and membergroups
+ * @param bool $split splits postgroups and membergroups
  *
  * @return array
  */
@@ -1185,7 +1196,7 @@ function addMembergroup($id_group, $groupname, $minposts, $type)
  * Copies permissions from a given membergroup.
  *
  * @param int $id_group
- * @param int $copy_id
+ * @param int $copy_from
  * @param array $illegal_permissions
  * @todo another function with the same name in ManagePermissions.subs.php
  */
@@ -1224,8 +1235,7 @@ function copyPermissions($id_group, $copy_from, $illegal_permissions)
  * Copies the board permissions from a given membergroup.
  *
  * @param int $id_group
- * @param int $copy_id
- * @param array $illegal_permissions
+ * @param int $copy_from
  */
 function copyBoardPermissions($id_group, $copy_from)
 {
@@ -1289,7 +1299,7 @@ function updateCopiedGroup($id_group, $copy_from)
  * Updates the properties of a inherited membergroup.
  *
  * @param int $id_group
- * @param int $copy_from
+ * @param int $copy_id
  */
 function updateInheritedGroup($id_group, $copy_id)
 {
@@ -1737,9 +1747,9 @@ function prepareMembergroupPermissions()
  * Returns the groups that a user could see.
  * Ask and it will give you.
  *
- * @param int the id of a member
- * @param bool true if hidden groups (that the user can moderate) should be loaded (default false)
- * @param int minimum number of posts for the group (-1 for non-post based groups)
+ * @param int $id_member the id of a member
+ * @param bool $show_hidden true if hidden groups (that the user can moderate) should be loaded (default false)
+ * @param int $min_posts minimum number of posts for the group (-1 for non-post based groups)
  *
  * @return array
  */

@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Handle all of the searching from here.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,13 +11,12 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
  *
- * Handle all of the searching from here.
- *
  */
+
 if (!defined('ELK'))
 	die('No access...');
 
@@ -27,6 +28,9 @@ $GLOBALS['search_versions'] = array(
 	'search_version' => strtr('ElkArte 1+0=Alpha', array('+' => '.', '=' => ' ')),
 );
 
+/**
+ * Search_Controller class, it handle all of the searching
+ */
 class Search_Controller extends Action_Controller
 {
 	/**
@@ -48,6 +52,9 @@ class Search_Controller extends Action_Controller
 	 * - requires the search_posts permission.
 	 * - decodes and loads search parameters given in the URL (if any).
 	 * - the form redirects to index.php?action=search2.
+	 *
+	 * @uses Search language file and Errors language when needed
+	 * @uses Search template, searchform sub template
 	 */
 	public function action_plushsearch1()
 	{
@@ -145,7 +152,7 @@ class Search_Controller extends Action_Controller
 		}
 
 		require_once(SUBSDIR . '/Boards.subs.php');
-		$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true));
+		$context += getBoardList(array('not_redirection' => true));
 		foreach ($context['categories'] as &$category)
 		{
 			$category['child_ids'] = array_keys($category['boards']);

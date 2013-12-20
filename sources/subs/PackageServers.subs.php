@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Functions to support adding/removing/listing package servers
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -33,7 +35,6 @@ function fetchPackageServers($server = null)
 			'current_server' => $server,
 		)
 	);
-
 	while ($row = $db->fetch_assoc($request))
 	{
 		$servers[] = array(

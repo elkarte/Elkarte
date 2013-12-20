@@ -1,21 +1,28 @@
 <?php
 
 /**
+ * This class handles database search. (PostgreSQL)
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Beta
  *
- * This class handles database search. (PostgreSQL)
- *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * PostgreSQL implementation of DbSearch
+ */
 class DbSearch_PostgreSQL implements DbSearch
 {
+	/**
+	 * This instance of the search
+	 * @var instance
+	 */
 	private static $_search = null;
 
 	/**

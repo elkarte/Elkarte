@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * Search class used when a custom index is used.  Handles its creation as well
+ * as maintaining it as posts are added / removed
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -33,7 +36,7 @@ class Custom_Search
 	 *This won't work with versions of ElkArte less than this.
 	 * @var string
 	 */
-	public $min_elk_version = 'ElkArte 1.0 Alpha';
+	public $min_elk_version = 'ElkArte 1.0 Beta';
 
 	/**
 	 * Is it supported?
@@ -66,9 +69,7 @@ class Custom_Search
 	protected $supported_databases = array('mysql', 'postgresql');
 
 	/**
-	 * constructor function
-	 *
-	 * @return type
+	 * Custom_Search::__construct()
 	 */
 	public function __construct()
 	{
@@ -93,8 +94,8 @@ class Custom_Search
 	/**
 	 * Check whether the search can be performed by this API.
 	 *
-	 * @param type $methodName
-	 * @param type $query_params
+	 * @param string $methodName
+	 * @param string $query_params
 	 * @return boolean
 	 */
 	public function supportsMethod($methodName, $query_params = null)
@@ -113,14 +114,12 @@ class Custom_Search
 			// All other methods, too bad dunno you.
 			default:
 				return false;
-			return;
+			break;
 		}
 	}
 
 	/**
 	 * If the settings don't exist we can't continue.
-	 *
-	 * @return type
 	 */
 	public function isValid()
 	{
@@ -133,6 +132,7 @@ class Custom_Search
 	 * callback function for usort used to sort the fulltext results.
 	 * the order of sorting is: large words, small words, large words that
 	 * are excluded from the search, small words that are excluded.
+	 *
 	 * @param string $a Word A
 	 * @param string $b Word B
 	 * @return int
@@ -166,7 +166,7 @@ class Custom_Search
 
 		// Excluded phrases don't benefit from being split into subwords.
 		if (count($subwords) > 1 && $isExcluded)
-			continue;
+			return;
 		else
 		{
 			foreach ($subwords as $subword)
@@ -186,7 +186,6 @@ class Custom_Search
 	 *
 	 * @param array $words
 	 * @param array $search_data
-	 * @return type
 	 */
 	public function indexedWordQuery($words, $search_data)
 	{
@@ -194,7 +193,7 @@ class Custom_Search
 
 		$db = database();
 
-		// we can't do anything without this
+		// We can't do anything without this
 		$db_search = db_search();
 
 		$query_select = array(
@@ -219,7 +218,6 @@ class Custom_Search
 			$query_where[] = '{raw:user_query}';
 		if ($query_params['board_query'])
 			$query_where[] = 'm.id_board {raw:board_query}';
-
 		if ($query_params['topic'])
 			$query_where[] = 'm.id_topic = {int:topic}';
 		if ($query_params['min_msg_id'])
@@ -279,7 +277,7 @@ class Custom_Search
 	}
 
 	/**
-	 *  After a post is made, we update the search index database
+	 * After a post is made, we update the search index database
 	 *
 	 * @param array $msgOptions
 	 * @param array $topicOptions
@@ -325,7 +323,7 @@ class Custom_Search
 			$stopwords = empty($modSettings['search_stopwords']) ? array() : explode(',', $modSettings['search_stopwords']);
 			$old_body = isset($msgOptions['old_body']) ? $msgOptions['old_body'] : '';
 
-			// create thew new and old index
+			// Create thew new and old index
 			$old_index = text2words($old_body, $customIndexSettings['bytes_per_word'], true);
 			$new_index = text2words($msgOptions['body'], $customIndexSettings['bytes_per_word'], true);
 

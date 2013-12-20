@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * This file contains those functions specific to the editing box and is
+ * generally used for WYSIWYG type functionality.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -13,16 +16,13 @@
  *
  * @version 1.0 Beta
  *
- * This file contains those functions specific to the editing box and is
- * generally used for WYSIWYG type functionality.
- *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Very simple function that loads and return the verification controls known to Elk
+ * Very simple function that loads and returns the verification controls known to Elk
  */
 function loadVerificationControls()
 {
@@ -38,7 +38,8 @@ function loadVerificationControls()
 
 /**
  * Create a anti-bot verification control?
- * @param array &$verificationOptions
+ *
+ * @param array $verificationOptions
  * @param bool $do_test = false
  */
 function create_control_verification(&$verificationOptions, $do_test = false)
@@ -590,11 +591,11 @@ class Control_Verification_Questions implements Control_Verifications
 	}
 
 	/**
-	* Loads all the available antispam questions, or a subset based on a filter
-	* @param array $filter, if specified it myst be an array with two indexes:
-	*              - 'type' => a valid filter, it can be 'language' or 'id_question'
-	*              - 'value' => the value of the filter (i.e. the language)
-	*/
+	 * Loads all the available antispam questions, or a subset based on a filter
+	 * @param array $filter, if specified it myst be an array with two indexes:
+	 *              - 'type' => a valid filter, it can be 'language' or 'id_question'
+	 *              - 'value' => the value of the filter (i.e. the language)
+	 */
 	private function _loadAntispamQuestions($filter = null)
 	{
 		$db = database();

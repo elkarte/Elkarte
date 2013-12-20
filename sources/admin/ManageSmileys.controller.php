@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This file takes care of all administration of smileys.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,11 +11,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file takes care of all administration of smileys.
  *
  */
 
@@ -40,6 +40,8 @@ class ManageSmileys_Controller extends Action_Controller
 	/**
 	 * This is the dispatcher of smileys administration.
 	 *
+	 * @uses ManageSmileys language
+	 * @uses ManageSmileys template
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
@@ -121,6 +123,7 @@ class ManageSmileys_Controller extends Action_Controller
 
 	/**
 	 * Displays and allows to modify smileys settings.
+	 * @uses show_settings sub template
 	 */
 	public function action_smileySettings_display()
 	{
@@ -747,7 +750,7 @@ class ManageSmileys_Controller extends Action_Controller
 	 */
 	public function action_editsmiley()
 	{
-		global $modSettings, $context, $txt, $scripturl, $modSettings;
+		global $modSettings, $context, $txt, $scripturl;
 
 		require_once(SUBSDIR . '/Smileys.subs.php');
 
@@ -1319,7 +1322,6 @@ class ManageSmileys_Controller extends Action_Controller
 
 			// Get a list of boards needed for assigning this icon to a specific board.
 			$boardListOptions = array(
-				'use_permissions' => true,
 				'selected_board' => isset($context['icon']['board_id']) ? $context['icon']['board_id'] : 0,
 			);
 			require_once(SUBSDIR . '/Boards.subs.php');

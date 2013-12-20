@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * This file handles the package servers and packages download, in Package Servers
+ * area of admininstration panel.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,12 +12,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file handles the package servers and packages download, in Package Servers
- * area of admininstration panel.
  *
  */
 
@@ -86,7 +86,7 @@ class PackageServers_Controller extends Action_Controller
 			),
 		);
 
-		// lets just do it!
+		// Lets just do it!
 		$action->dispatch($subAction);
 	}
 
@@ -120,7 +120,7 @@ class PackageServers_Controller extends Action_Controller
 	 */
 	public function action_browse()
 	{
-		global $txt, $context, $scripturl, $forum_version, $context;
+		global $txt, $scripturl, $forum_version, $context;
 
 		// Load our subs worker.
 		require_once(SUBSDIR . '/PackageServers.subs.php');

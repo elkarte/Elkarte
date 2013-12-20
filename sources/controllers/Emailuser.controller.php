@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * The functions in this file deal with sending topics to a friend or reports to
+ * a moderator.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,18 +12,18 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * The functions in this file deal with sending topics to a friend or moderator,
- * and email to a user.
  *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Emailuser_Controller class, allows for sending topics via email
+ */
 class Emailuser_Controller extends Action_Controller
 {
 	/**
@@ -100,6 +103,10 @@ class Emailuser_Controller extends Action_Controller
 		redirectexit('topic=' . $topic . '.0');
 	}
 
+	/**
+	 * Like action_sendtopic, but done via ajax from an API request
+	 * @uses Xml Template generic_xml_buttons sub template
+	 */
 	public function action_sendtopic_api()
 	{
 		global $topic, $modSettings, $txt, $context, $scripturl;
@@ -186,6 +193,12 @@ class Emailuser_Controller extends Action_Controller
 		);
 	}
 
+	/**
+	 * Prepares the form data and database data for sending in an email format\
+	 * Does the actual sending of the email if everthing checks out as OK
+	 *
+	 * @param array $row
+	 */
 	private function _sendTopic($row)
 	{
 		global $scripturl, $topic, $txt;

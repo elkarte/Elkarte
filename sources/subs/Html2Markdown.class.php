@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Converts HTML to Markdown text
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -50,7 +52,7 @@ class Convert_Md
 	/**
 	 * Gets everything started using the built in or external parser
 	 *
-	 * @param type $html
+	 * @param string $html string of html to convert to MD text
 	 */
 	public function __construct($html)
 	{
@@ -143,6 +145,7 @@ class Convert_Md
 	 *  - Prevents converting anything that's inside a code block
 	 *
 	 * @param object $node
+	 * @param boolean $parser flag for internal or external parser
 	 */
 	private static function _has_parent_code($node, $parser)
 	{
@@ -167,7 +170,8 @@ class Convert_Md
 	/**
 	 * Get the nesting level when inside a list
 	 *
-	 * @param type $node
+	 * @param object $node
+	 * @param boolean $parser flag for internal or external parser
 	 */
 	private static function _has_parent_list($node, $parser)
 	{
@@ -345,7 +349,7 @@ class Convert_Md
 	 * html: <abbr title="Hyper Text Markup Language">HTML</abbr>
 	 * md:	*[HTML]: Hyper Text Markup Language
 	 *
-	 * @param type $node
+	 * @param object $node
 	 */
 	private function _convert_abbr($node)
 	{

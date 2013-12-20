@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Allow for the saving, retrieving, deleting and settings for the drafts
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -36,7 +38,7 @@ class Draft_Controller extends Action_Controller
 	 */
 	public function pre_dispatch()
 	{
-		// language and helper functions
+		// Language and helper functions
 		loadLanguage('Drafts');
 		require_once(SUBSDIR . '/Drafts.subs.php');
 	}

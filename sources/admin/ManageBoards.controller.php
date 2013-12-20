@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Manage and maintain the boards and categories of the forum.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,17 +11,19 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * Manage and maintain the boards and categories of the forum.
  *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * This class controls execution for actions in the manage boards area
+ * of the admin panel.
+ */
 class ManageBoards_Controller extends Action_Controller
 {
 	/**
@@ -34,7 +38,7 @@ class ManageBoards_Controller extends Action_Controller
 	 * Called by ?action=admin;area=manageboards.
 	 * It checks the permissions, based on the sub-action, and calls a function based on the sub-action.
 	 *
-	 * uses ManageBoards language file.
+	 * @uses ManageBoards language file.
 	 */
 	public function action_index()
 	{
@@ -106,6 +110,7 @@ class ManageBoards_Controller extends Action_Controller
 
 		// You way will end here if you don't have permission.
 		$action = new Action('manage_boards');
+
 		// Default to sub-action 'main' or 'settings' depending on permissions.
 		$subAction = $action->initialize($subActions, allowedTo('manage_boards') ? 'main' : 'settings');
 		$context['sub_action'] = $subAction;
@@ -123,29 +128,34 @@ class ManageBoards_Controller extends Action_Controller
 	 */
 	public function action_main()
 	{
-		global $txt, $context, $cat_tree, $boards, $boardList, $scripturl, $txt;
+		global $txt, $context, $cat_tree, $boards, $boardList, $scripturl;
 
 		loadTemplate('ManageBoards');
 
 		require_once(SUBSDIR . '/Boards.subs.php');
 
+		// Moving a board, child of, before, after, top
 		if (isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'move' && in_array($_REQUEST['move_to'], array('child', 'before', 'after', 'top')))
 		{
 			checkSession('get');
 			validateToken('admin-bm-' . (int) $_REQUEST['src_board'], 'request');
 
+			// Top is special, its the top!
 			if ($_REQUEST['move_to'] === 'top')
 				$boardOptions = array(
 					'move_to' => $_REQUEST['move_to'],
 					'target_category' => (int) $_REQUEST['target_cat'],
 					'move_first_child' => true,
 				);
+			// Moving it after another board
 			else
 				$boardOptions = array(
 					'move_to' => $_REQUEST['move_to'],
 					'target_board' => (int) $_REQUEST['target_board'],
 					'move_first_child' => true,
 				);
+
+			// Use modifyBoard to perform the action
 			modifyBoard((int) $_REQUEST['src_board'], $boardOptions);
 		}
 
@@ -186,6 +196,7 @@ class ManageBoards_Controller extends Action_Controller
 				$prev_child_level = 0;
 				$prev_board = 0;
 				$stack = array();
+
 				// Just a shortcut, this is the same for all the urls
 				$security = $context['session_var'] . '=' . $context['session_id'] . ';' . $context['admin-bm-' . $context['move_board'] . '_token_var'] . '=' . $context['admin-bm-' . $context['move_board'] . '_token'];
 				foreach ($boardList[$catid] as $boardid)
@@ -218,6 +229,7 @@ class ManageBoards_Controller extends Action_Controller
 					{
 						if (empty($context['categories'][$catid]['boards'][$prev_board]['move_links']))
 							$context['categories'][$catid]['boards'][$prev_board]['move_links'] = array();
+
 						for ($i = 0; $i < -$difference; $i++)
 							if (($temp = array_pop($stack)) != null)
 								array_unshift($context['categories'][$catid]['boards'][$prev_board]['move_links'], $temp);
@@ -227,6 +239,7 @@ class ManageBoards_Controller extends Action_Controller
 					$prev_child_level = $boards[$boardid]['level'];
 
 				}
+
 				if (!empty($stack) && !empty($context['categories'][$catid]['boards'][$prev_board]['move_links']))
 					$context['categories'][$catid]['boards'][$prev_board]['move_links'] = array_merge($stack, $context['categories'][$catid]['boards'][$prev_board]['move_links']);
 				elseif (!empty($stack))
@@ -321,6 +334,7 @@ class ManageBoards_Controller extends Action_Controller
 					'selected' => false,
 					'true_name' => $tree['node']['name']
 				);
+
 			$prevCat = $catid;
 		}
 		if (!isset($_REQUEST['delete']))
@@ -407,10 +421,12 @@ class ManageBoards_Controller extends Action_Controller
 	 * Modify a specific board...
 	 * screen for editing and repositioning a board.
 	 * called by ?action=admin;area=manageboards;sa=board
-	 * uses the modify_board sub-template of the ManageBoards template.
-	 * requires manage_boards permission.
 	 * also used to show the confirm deletion of category screen (sub-template confirm_board_delete).
-
+	 *
+	 * requires manage_boards permission.
+	 *
+	 * @uses the modify_board sub-template of the ManageBoards template.
+	 * @uses ManagePermissions language
 	 */
 	public function action_board()
 	{
@@ -633,7 +649,6 @@ class ManageBoards_Controller extends Action_Controller
 			// Change '1 & 2' to '1 &amp; 2', but not '&amp;' to '&amp;amp;'...
 			$boardOptions['board_name'] = preg_replace('~[&]([^;]{8}|[^;]{0,8}$)~', '&amp;$1', $_POST['board_name']);
 			$boardOptions['board_description'] = preg_replace('~[&]([^;]{8}|[^;]{0,8}$)~', '&amp;$1', $_POST['desc']);
-
 			$boardOptions['moderator_string'] = $_POST['moderators'];
 
 			if (isset($_POST['moderator_list']) && is_array($_POST['moderator_list']))
@@ -679,7 +694,6 @@ class ManageBoards_Controller extends Action_Controller
 
 				createBoard($boardOptions);
 			}
-
 			// ...or update an existing board.
 			else
 				modifyBoard($_POST['boardid'], $boardOptions);
@@ -718,10 +732,10 @@ class ManageBoards_Controller extends Action_Controller
 	{
 		global $context, $txt, $scripturl;
 
-		// initialize the form
+		// Initialize the form
 		$this->_initBoardSettingsForm();
 
-		// get all settings
+		// Get all settings
 		$config_vars = $this->_boardSettings->settings();
 
 		call_integration_hook('integrate_modify_board_settings');
@@ -730,9 +744,9 @@ class ManageBoards_Controller extends Action_Controller
 		$context['post_url'] = $scripturl . '?action=admin;area=manageboards;save;sa=settings';
 		$context['permissions_excluded'] = array(-1);
 
-		$context['page_title'] = $txt['boards_and_cats'] . ' - ' . $txt['settings'];
-
+		// Get the needed template bits
 		loadTemplate('ManageBoards');
+		$context['page_title'] = $txt['boards_and_cats'] . ' - ' . $txt['settings'];
 		$context['sub_template'] = 'show_settings';
 
 		// Add some javascript stuff for the recycle box.
@@ -787,7 +801,7 @@ class ManageBoards_Controller extends Action_Controller
 
 		// Load the boards list - for the recycle bin!
 		require_once(SUBSDIR . '/Boards.subs.php');
-		$boards = getBoardList(array('not_redirection' => true), true);
+		$boards = getBoardList(array('override_permissions' => true, 'not_redirection' => true), true);
 		$recycle_boards = array('');
 		foreach ($boards as $board)
 			$recycle_boards[$board['id_board']] = $board['cat_name'] . ' - ' . $board['board_name'];

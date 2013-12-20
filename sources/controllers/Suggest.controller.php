@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Handles the tracking of all registered handling functions for auto suggests
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,7 +11,7 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
  *
@@ -35,8 +37,9 @@ class Suggest_Controller extends Action_Controller
 
 	/**
 	 * This keeps track of all registered handling functions for auto suggest
-	 *  functionality and passes execution to them.
+	 * functionality and passes execution to them.
 	 * Accessed by action=suggest.
+	 * @uses Xml template
 	 */
 	public function action_suggest()
 	{
@@ -72,6 +75,7 @@ class Suggest_Controller extends Action_Controller
 			if (!empty($currentSearch['class']) && class_exists($currentSearch['class']))
 			{
 				$suggest = new $currentSearch['class'];
+
 				// Okay, let's at least assume the method exists... *rolleyes*
 				$context['xml_data'] = $suggest->$currentSearch['function']();
 			}

@@ -1,16 +1,17 @@
 <?php
 
 /**
+ * This file contains functions for dealing with topics. Low-level functions,
+ * i.e. database operations needed to perform.
+ * These functions do NOT make permissions checks. (they assume those were
+ * already made).
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Beta
  *
- * This file contains functions for dealing with topics. Low-level functions,
- * i.e. database operations needed to perform.
- * These functions do NOT make permissions checks. (they assume those were
- * already made).
  */
 
 if (!defined('ELK'))
@@ -108,11 +109,10 @@ function themeUrl($id_theme)
 }
 
 /**
- * validates a theme name
+ * Validates a theme name
  *
  * @param string $indexes
  * @param array $value_data
- * @return type
  */
 function validateThemeName($indexes, $value_data)
 {
@@ -177,6 +177,7 @@ function getBasicThemeInfos($themes)
 
 /**
  * Gets a list of all themes from the database
+ *
  * @return array $themes
  */
 function getCustomThemes()
@@ -198,7 +199,6 @@ function getCustomThemes()
 			'theme_dir' => 'theme_dir',
 		)
 	);
-
 	// Manually add in the default
 	$themes = array(
 		1 => array(
@@ -289,9 +289,8 @@ function loadThemes($knownThemes)
 /**
  * Generates a file listing for a given directory
  *
- * @param type $path
- * @param type $relative
- * @return type
+ * @param string $path
+ * @param string $relative
  */
 function get_file_listing($path, $relative)
 {
@@ -382,7 +381,9 @@ function countConfiguredGuestOptions()
 
 /**
  * Counts the theme options configured for guests
- * @return array
+ *
+ * @param int $current_theme
+ * @param int $current_member
  */
 function availableThemes($current_theme, $current_member)
 {
@@ -531,6 +532,7 @@ function availableThemes($current_theme, $current_member)
 						$available_themes[$id_theme]['selected_variant'] = $settings['theme_variants'][0];
 
 					$available_themes[$id_theme]['thumbnail_href'] = $available_themes[$id_theme]['variants'][$available_themes[$id_theme]['selected_variant']]['thumbnail'];
+
 					// Allow themes to override the text.
 					$available_themes[$id_theme]['pick_label'] = isset($txt['variant_pick']) ? $txt['variant_pick'] : $txt['theme_pick_variant'];
 				}
@@ -544,6 +546,7 @@ function availableThemes($current_theme, $current_member)
 
 	return array($available_themes, $guest_theme);
 }
+
 /**
  * Counts the theme options configured for members
  * @return array
@@ -573,12 +576,12 @@ function countConfiguredMemberOptions()
 /**
  * Deletes all outdated options from the themes table
  *
- * @param mixed $theme: if int to remove option from a specific theme,
+ * @param mixed $theme : if int to remove option from a specific theme,
  *              if string it can be:
  *               - 'default' => to remove from the default theme
  *               - 'custom' => to remove from all the custom themes
  *               - 'all' => to remove from both default and custom
- * @param mixed $membergroups: if int a specific member
+ * @param mixed $membergroups : if int a specific member
  *              if string a "group" of members and it can assume the following values:
  *               - 'guests' => obviously guests,
  *               - 'members' => all members with custom settings (i.e. id_member > 0)
@@ -643,7 +646,7 @@ function removeThemeOptions($theme, $membergroups, $old_settings = '')
 /**
  * Update the default options for our users.
  *
- * @param  array $setValues in the order: id_theme, id_member, variable name, value
+ * @param array $setValues in the order: id_theme, id_member, variable name, value
  */
 function updateThemeOptions($setValues)
 {
@@ -816,6 +819,15 @@ function deleteVariants($id)
 	);
 }
 
+/**
+ * Loads all of the them variable/value pairs for a member or group of members
+ * If supplied a variable array it will only load / return those values
+ *
+ * @param int $theme
+ * @param int $memID
+ * @param array $options
+ * @param array $variables
+ */
 function loadThemeOptionsInto($theme, $memID = null, $options = array(), $variables = array())
 {
 	$db = database();
@@ -840,7 +852,6 @@ function loadThemeOptionsInto($theme, $memID = null, $options = array(), $variab
 			'variables' => $variables,
 		)
 	);
-
 	while ($row = $db->fetch_assoc($request))
 		$options[$row['variable']] = $row['value'];
 	$db->free_result($request);
@@ -849,8 +860,12 @@ function loadThemeOptionsInto($theme, $memID = null, $options = array(), $variab
 }
 
 /**
- * @todo needs documentation
+ * Used when installing a theme that is based off an existing theme (an therefore is dependant on)
+ * Returns based-on theme directory values needed by the install function in ManageThemes.controller
+ *
  * @todo may be merged with something else?
+ * @param string $based_on name of theme this is based on, will do a LIKE search
+ * @param boolean $explicit_images Don't worry its not like it sounds !
  */
 function loadBasedOnTheme($based_on, $explicit_images = false)
 {
@@ -884,10 +899,19 @@ function loadBasedOnTheme($based_on, $explicit_images = false)
 	return $temp;
 }
 
+/**
+ * Builds a theme-info.xml file for use when a new theme is installed by copying
+ * an existing theme
+ *
+ * @param string $name
+ * @param string $version
+ * @param string $theme_dir
+ * @param array $theme_values
+ */
 function write_theme_info($name, $version, $theme_dir, $theme_values)
 {
 	$xml_info = '<' . '?xml version="1.0"?' . '>
-	<theme-info xmlns="http://www.simplemachines.org/xml/theme-info" xmlns:elk="http://www.simplemachines.org/">
+	<theme-info xmlns="http://www.elkarte.net/xml/theme-info" xmlns:elk="http://www.elkarte.net/">
 		<!-- For the id, always use something unique - put your name, a colon, and then the package name. -->
 		<id>elk:' . Util::strtolower(str_replace(array(' '), '_', $name)) . '</id>
 		<version>' . $version . '</version>
@@ -906,12 +930,7 @@ function write_theme_info($name, $version, $theme_dir, $theme_values)
 	</theme-info>';
 
 	// Now write it.
-	$fp = @fopen($theme_dir . '/theme_info.xml', 'w+');
-	if ($fp)
-	{
-		fwrite($fp, $xml_info);
-		fclose($fp);
-	}
+	file_put_contents($theme_dir . '/theme_info.xml', $xml_info);
 }
 
 /**

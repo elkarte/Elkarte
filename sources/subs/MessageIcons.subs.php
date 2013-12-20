@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Functions for working with message icons
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -20,8 +22,6 @@ if (!defined('ELK'))
 
 /**
  * Gets a list of all available message icons.
- *
- * @return type
  */
 function getMessageIcons()
 {
@@ -64,7 +64,7 @@ function getMessageIcons()
 /**
  * Delete a message icon.
  *
- * @param type $icons
+ * @param array $icons
  */
 function deleteMessageIcon($icons)
 {
@@ -83,7 +83,7 @@ function deleteMessageIcon($icons)
 /**
  * Updates a message icon.
  *
- * @param type $icon
+ * @param array $icon array of values to use in the $db->insert
  */
 function updateMessageIcon($icon)
 {
@@ -100,7 +100,7 @@ function updateMessageIcon($icon)
 /**
  * Adds a new message icon.
  *
- * @param type $icon
+ * @param array $icon
  */
 function addMessageIcon($icon)
 {

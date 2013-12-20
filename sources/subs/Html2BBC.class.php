@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Converts a string of HTML to BBC
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -72,7 +74,8 @@ class Convert_BBC
 	/**
 	 * Gets everything started using the built in or external parser
 	 *
-	 * @param type $html
+	 * @param string $html string of html to convert
+	 * @param boolean $strip flag to strip unconverted tags, true by default
 	 */
 	public function __construct($html, $strip = true)
 	{
@@ -172,7 +175,8 @@ class Convert_BBC
 	 * For a given node, checks if it is anywhere nested inside of a code block
 	 * - Prevents converting anything that's inside a code block
 	 *
-	 * @param type $node
+	 * @param object $node current dom node being worked on
+	 * @param boolean $parser internal or external parser
 	 */
 	private static function _has_parent_code($node, $parser)
 	{
@@ -398,7 +402,7 @@ class Convert_BBC
 	 * html: <abbr title="Hyper Text Markup Language">HTML</abbr>
 	 * bbc:	[abbr=Hyper Text Markup Language]HTML[/abbr]
 	 *
-	 * @param type $node
+	 * @param object $node
 	 */
 	private function _convert_abbr($node)
 	{
@@ -546,7 +550,7 @@ class Convert_BBC
 	 * html: <font size="3" color="red">This is some text!</font>
 	 * bbc: [color=red][size=12pt]This is some text![/size][/color]
 	 *
-	 * @param type $node
+	 * @param object $node
 	 */
 	private function _convert_font($node)
 	{
@@ -557,7 +561,7 @@ class Convert_BBC
 
 		if (!empty($size))
 		{
-			// all this for a depreciated tag attribute :P
+			// All this for a depreciated tag attribute :P
 			$size = (int) $size;
 			$size = $this->sizes_equivalence[$size];
 			$bbc = '[size=' . $size . ']' . $bbc . '[/size]';
@@ -622,7 +626,7 @@ class Convert_BBC
 		{
 			$styles = $this->_get_style_values($style);
 
-			// image size defined in the tag
+			// Image size defined in the tag
 			if (isset($styles['width']))
 			{
 				preg_match('~^[0-9]*~', $styles['width'], $width);
@@ -698,7 +702,7 @@ class Convert_BBC
 							$bbc = '[s]' . $bbc . '[/s]';
 						break;
 					case 'font-size':
-						// account for formatting issues, decimal in the wrong spot
+						// Account for formatting issues, decimal in the wrong spot
 						if (preg_match('~(\d+)\.\d+(p[xt])~i', $value, $dec_matches) === 1)
 							$value = $dec_matches[1] . $dec_matches[2];
 						$bbc = '[size=' . $value . ']' . $bbc . '[/size]';

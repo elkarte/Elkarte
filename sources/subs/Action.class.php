@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Defines an action with its associated sub-actions
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -48,6 +50,10 @@ class Action
 	 *    'function' => 'method name',
 	 *    'enabled' => true/false,
 	 *    'permission' => area)
+	 */
+
+	/**
+	 * All the subactions we understand
 	 * @var array
 	 */
 	protected $_subActions;
@@ -64,6 +70,11 @@ class Action
 	 */
 	protected $_name;
 
+	/**
+	 * Constructor!
+	 *
+	 * @param string $name
+	 */
 	public function __construct($name = null)
 	{
 		$this->_name = $name;
@@ -74,7 +85,8 @@ class Action
 	 * Sub-actions have to be in the format expected for Action::_subActions array,
 	 * indexed by sa.
 	 *
-	 * @param array $subactions
+	 * @param array $subactions array of know subactions
+	 * @param string $default default action if unknown sa is requested
 	 */
 	public function initialize($subactions, $default = '')
 	{

@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Find and retrieve information about recently posted topics, messages, and the like.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,11 +11,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * Find and retrieve information about recently posted topics, messages, and the like.
  *
  */
 
@@ -21,7 +21,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Recent Post Controller
+ * Recent Post Controller, retrieve information about recent posts
  */
 class Recent_Controller extends Action_Controller
 {
@@ -32,7 +32,7 @@ class Recent_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		// figure out what action to do
+		// Figure out what action to do
 	}
 
 	/**
@@ -195,6 +195,7 @@ class Recent_Controller extends Action_Controller
 			while ($row = $db->fetch_assoc($request))
 				$messages[] = $row['id_msg'];
 			$db->free_result($request);
+
 			if (!empty($cache_results))
 				cache_put_data($key, $messages, 120);
 		}
@@ -406,7 +407,9 @@ class Recent_Controller extends Action_Controller
 
 			$context['querystring_sort_limits'] = ';sort=' . $context['sort_by'] . ($ascending ? '' : ';desc');
 		}
+
 		$context['sort_direction'] = $ascending ? 'up' : 'down';
+
 		// Trick
 		$txt['starter'] = $txt['started_by'];
 
@@ -464,7 +467,6 @@ class Recent_Controller extends Action_Controller
 			$earliest_msg = earliest_msg();
 
 		// @todo Add modified_time in for log_time check?
-
 		if ($modSettings['totalMessages'] > 100000 && $context['showing_all_topics'])
 		{
 			$db->query('', '

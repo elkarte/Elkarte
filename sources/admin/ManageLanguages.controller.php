@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This file handles the administration of languages tasks.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,11 +11,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file handles the administration of languages tasks.
  *
  */
 
@@ -342,6 +342,7 @@ class ManageLanguages_Controller extends Action_Controller
 			{
 				// @todo retrieve the language pack per naming pattern from our sites
 				$archive_content = read_tgz_file('http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr($forum_version, array('ElkArte ' => ''))) . ';fetch=' . urlencode($_GET['did']), BOARDDIR, false, true, $install_files);
+
 				// Make sure the files aren't stuck in the cache.
 				package_flush_cache();
 				$context['install_complete'] = sprintf($txt['languages_download_complete_desc'], $scripturl . '?action=admin;area=languages');
@@ -498,8 +499,8 @@ class ManageLanguages_Controller extends Action_Controller
 
 			$themes = validateThemeName($indexes, $value_data);
 
+			// Now we have the id_theme we can get the pretty description.
 			if (!empty($themes))
-				// Now we have the id_theme we can get the pretty description.
 				$context['themes'] = getBasicThemeInfos($themes);
 		}
 
@@ -697,7 +698,7 @@ class ManageLanguages_Controller extends Action_Controller
 			checkSession();
 			validateToken('admin-mlang');
 
-			// @todo Todo: FTP Controls?
+			// @todo FTP Controls?
 			require_once(SUBSDIR . '/Package.subs.php');
 
 			// First, Make a backup?
@@ -756,6 +757,7 @@ class ManageLanguages_Controller extends Action_Controller
 
 			// Read in the current file.
 			$current_data = implode('', file($settings['default_theme_dir'] . '/languages/' . $context['lang_id'] . '/index.' . $context['lang_id'] . '.php'));
+
 			// These are the replacements. old => new
 			$replace_array = array(
 				'~\$txt\[\'lang_character_set\'\]\s=\s(\'|")[^\r\n]+~' => '$txt[\'lang_character_set\'] = \'' . addslashes($_POST['character_set']) . '\';',
@@ -776,6 +778,7 @@ class ManageLanguages_Controller extends Action_Controller
 		$old_txt = $txt;
 		require($settings['default_theme_dir'] . '/languages/' . $context['lang_id'] . '/index.' . $context['lang_id'] . '.php');
 		$context['lang_file_not_writable_message'] = is_writable($settings['default_theme_dir'] . '/languages/' . $context['lang_id'] . '/index.' . $context['lang_id'] . '.php') ? '' : sprintf($txt['lang_file_not_writable'], $settings['default_theme_dir'] . '/languages/' . $context['lang_id'] . '/index.' . $context['lang_id'] . '.php');
+
 		// Setup the primary settings context.
 		$context['primary_settings'] = array(
 			'name' => Util::ucwords(strtr($context['lang_id'], array('_' => ' ', '-utf8' => ''))),
@@ -811,6 +814,7 @@ class ManageLanguages_Controller extends Action_Controller
 			$context['entries_not_writable_message'] = is_writable($current_file) ? '' : sprintf($txt['lang_entries_not_writable'], $current_file);
 
 			$entries = array();
+
 			// We can't just require it I'm afraid - otherwise we pass in all kinds of variables!
 			$multiline_cache = '';
 			foreach (file($current_file) as $line)
@@ -831,6 +835,7 @@ class ManageLanguages_Controller extends Action_Controller
 				}
 				$multiline_cache .= $line;
 			}
+
 			// Last entry to add?
 			if ($multiline_cache)
 			{
@@ -916,6 +921,7 @@ class ManageLanguages_Controller extends Action_Controller
 
 							$cur_index++;
 						}
+
 						// Now create the string!
 						$final_saves[$entryKey] = array(
 							'find' => $entryValue['full'],
@@ -934,6 +940,7 @@ class ManageLanguages_Controller extends Action_Controller
 
 						// Set the new value.
 						$entryValue['entry'] = $save_strings[$entryKey];
+
 						// And we know what to save now!
 						$final_saves[$entryKey] = array(
 							'find' => $entryValue['full'],
@@ -981,6 +988,8 @@ class ManageLanguages_Controller extends Action_Controller
 	/**
 	 * Edit language related settings.
 	 *
+	 * Accessed by ?action=admin;area=languages;sa=settings
+	 *
 	 * This method handles the display, allows to edit, and saves the result
 	 * for the _languageSettings form.
 	 */
@@ -988,7 +997,7 @@ class ManageLanguages_Controller extends Action_Controller
 	{
 		global $scripturl, $context, $txt;
 
-		// initialize the form
+		// Initialize the form
 		$this->_initLanguageSettingsForm();
 
 		// Warn the user if the backup of Settings.php failed.

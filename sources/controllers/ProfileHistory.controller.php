@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Handles the access and viewing of a users history
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,7 +11,7 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
  *
@@ -18,8 +20,16 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * ProfileHistory Controller, show a users login, profile edits, IP history
+ */
 class ProfileHistory_Controller extends Action_Controller
 {
+	/**
+	 * Member id for the history being viewed
+	 * @todo should be changed to _memID
+	 * @var int
+	 */
 	private $memID = 0;
 
 	/**
@@ -80,7 +90,6 @@ class ProfileHistory_Controller extends Action_Controller
 	{
 		global $scripturl, $txt, $modSettings, $user_profile, $context;
 
-		$db = database();
 		$memID = $this->memID;
 
 		// Verify if the user has sufficient permissions.

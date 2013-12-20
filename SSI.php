@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * Provides ways to add information to your website by linking to and capturing output
+ * from ElkArte
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,9 +12,10 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 // Don't do anything if ElkArte is already loaded.
@@ -1747,6 +1751,7 @@ function ssi_todaysCalendar($output_method = 'echo')
  * @param int $limit
  * @param int $start
  * @param int $length
+ * @param string $preview
  * @param string $output_method = 'echo'
  */
 function ssi_boardNews($board = null, $limit = null, $start = null, $length = null, $preview = 'first', $output_method = 'echo')

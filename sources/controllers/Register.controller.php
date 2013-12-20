@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * This file has two main jobs, but they really are one.  It registers new
+ * members, and it helps the administrator moderate member registrations.
+ * Similarly, it handles account activation as well.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,13 +13,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file has two main jobs, but they really are one.  It registers new
- * members, and it helps the administrator moderate member registrations.
- * Similarly, it handles account activation as well.
  *
  */
 
@@ -23,7 +23,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Register Controller
+ * Register Controller Class, It registers new members, and it alows
+ * the administrator moderate member registration
  */
 class Register_Controller extends Action_Controller
 {
@@ -40,15 +41,16 @@ class Register_Controller extends Action_Controller
 	}
 
 	/**
-	* Begin the registration process.
-	* Accessed by ?action=register
-	*
-	* @param array $reg_errors = array()
-	*/
+	 * Begin the registration process.
+	 * Accessed by ?action=register
+	 *
+	 * @uses Register template, registration_agreement or registration_form sub template
+	 * @uses Login language file
+	 * @param array $reg_errors = array()
+	 */
 	function action_register()
 	{
-		global $txt, $context, $modSettings, $user_info;
-		global $language, $scripturl, $cur_profile;
+		global $txt, $context, $modSettings, $user_info, $language, $scripturl, $cur_profile;
 
 		// Is this an incoming AJAX check?
 		if (isset($_GET['sa']) && $_GET['sa'] == 'usernamecheck')

@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * The purpose of this file is... errors. (hard to guess, I guess?)  It takes
+ * care of logging, error messages, error handling, database errors, and
+ * error log administration.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,13 +13,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * The purpose of this file is... errors. (hard to guess, I guess?)  It takes
- * care of logging, error messages, error handling, database errors, and
- * error log administration.
  *
  */
 
@@ -25,6 +25,7 @@ if (!defined('ELK'))
 /**
  * Log an error, if the error logging is enabled.
  * filename and line should be __FILE__ and __LINE__, respectively.
+ *
  * Example use:
  *  die(log_error($msg));
  *
@@ -32,8 +33,6 @@ if (!defined('ELK'))
  * @param string $error_type = 'general'
  * @param string $file = null
  * @param int $line = null
- *
- * @return string, the error message
  */
 function log_error($error_message, $error_type = 'general', $file = null, $line = null)
 {
@@ -98,6 +97,7 @@ function log_error($error_message, $error_type = 'general', $file = null, $line 
 		call_integration_hook('integrate_error_types', array(&$other_error_types));
 		$known_error_types += $other_error_types;
 	}
+
 	// Make sure the category that was specified is a valid one
 	$error_type = in_array($error_type, $known_error_types) && $error_type !== true ? $error_type : 'general';
 
@@ -149,9 +149,9 @@ function fatal_error($error, $log = 'general')
  *  - uses Errors language file and applies the $sprintf information if specified.
  *  - the information is logged if log is specified.
  *
- * @param $error
- * @param $log = 'general'
- * @param $sprintf = array()
+ * @param string $error
+ * @param string $log defaults to 'general'
+ * @param array $sprintf defaults to empty array()
  */
 function fatal_lang_error($error, $log = 'general', $sprintf = array())
 {
@@ -173,6 +173,7 @@ function fatal_lang_error($error, $log = 'general', $sprintf = array())
 		Template_Layers::getInstance()->isError();
 
 	$reload_lang_file = true;
+
 	// Log the error in the forum's language, but don't waste the time if we aren't logging
 	if ($log || (!empty($modSettings['enableErrorLogging']) && $modSettings['enableErrorLogging'] == 2))
 	{
@@ -276,7 +277,7 @@ function error_handler($error_level, $error_string, $file, $line)
  * @uses Errors template, fatal_error sub template, or Wireless template, error sub template.
  *
  * @param string $error_message
- * @param type $error_code
+ * @param mixed $error_code string or int code
  */
 function setup_fatal_error_context($error_message, $error_code)
 {
@@ -423,7 +424,6 @@ function display_db_error()
 function display_loadavg_error()
 {
 	// If this is a load average problem, display an appropriate message (but we still don't have language files!)
-
 	set_fatal_error_headers();
 
 	echo '<!DOCTYPE html>

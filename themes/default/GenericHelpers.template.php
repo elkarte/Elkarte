@@ -13,7 +13,7 @@
  */
 function template_list_groups_collapsible($group = 'default_groups_list')
 {
-	global $context;
+	global $context, $txt;
 
 	$current_group_list = $context[$group];
 	$all_selected = true;
@@ -38,6 +38,10 @@ function template_list_groups_collapsible($group = 'default_groups_list')
 	}
 
 	echo '
+				<li class="check_all">
+					<input type="checkbox" id="check_all" ', $all_selected ? 'checked="checked" ' : '', 'onclick="invertAll(this, this.form, \'groups\');" class="input_check" />
+					<label for="check_all">', $txt['check_all'], '</label>
+				</li>
 			</ul>
 		</fieldset>';
 }
@@ -66,7 +70,7 @@ function template_select_boards($name, $label = '', $extra = '', $all = false)
 
 		foreach ($category['boards'] as $board)
 			echo '
-			<option value="', $board['id'], '"', !empty($board['selected']) ? ' selected="selected"' : '', !empty($context['current_board']) && $board['id'] == $context['current_board'] && $context['boards_current_disabled'] ? ' disabled="disabled"' : '', '>', $board['child_level'] > 0 ? str_repeat('==', $board['child_level'] - 1) . '=&gt; ' : '', $board['name'], '</option>';
+			<option value="', $board['id'], '"', !empty($board['selected']) ? ' selected="selected"' : '', !empty($context['current_board']) && $board['id'] == $context['current_board'] && $context['boards_current_disabled'] ? ' disabled="disabled"' : '', '>', $board['child_level'] > 0 ? str_repeat('&#10134;', $board['child_level'] - 1) . '&#10134;&#10148; ' : '', $board['name'], '</option>';
 		echo '
 		</optgroup>';
 	}

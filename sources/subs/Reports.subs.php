@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This file is used by Reports.controller.php mainly to retrieve data from the database
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -13,7 +15,6 @@
  *
  * @version 1.0 Beta
  *
- * This file is used by Reports.controller.php mainly to retrieve data from the database
  */
 
 if (!defined('ELK'))
@@ -51,6 +52,7 @@ function reportsBoardsList()
 
 /**
  * Fetch membergroups names and ids
+ *
  * @param string $group_clause a string used as WHERE cluase in the query
  * @param array $query_groups an array of group ids
  */
@@ -89,6 +91,7 @@ function allMembergroups($group_clause, $query_groups = array())
 
 /**
  * Boards profiles and related permissions
+ *
  * @param array $profiles a list of board profile ids
  * @param string $group_clause a string used as WHERE cluase in the query
  * @param array $query_groups an array of group ids
@@ -173,6 +176,7 @@ function allMembergroupsBoardAccess()
 
 /**
  * Boards profiles and related permissions based on groups
+ * 
  * @param string $group_clause a string used as WHERE cluase in the query
  * @param array $query_groups an array of group ids
  */

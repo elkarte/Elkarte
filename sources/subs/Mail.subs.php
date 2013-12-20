@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * This file handles tasks related to mail.
+ * The functions in this file do NOT check permissions.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -13,8 +16,6 @@
  *
  * @version 1.0 Beta
  *
- * This file handles tasks related to mail.
- * The functions in this file do NOT check permissions.
  */
 
 if (!defined('ELK'))
@@ -284,6 +285,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
  * @param bool $send_html = false
  * @param int $priority = 3
  * @param $is_private
+ * @param $message_id
  * @return boolean
  */
 function AddMailQueue($flush = false, $to_array = array(), $subject = '', $message = '', $headers = '', $send_html = false, $priority = 3, $is_private = false, $message_id = '')
@@ -839,7 +841,7 @@ function prepareMailingForPreview()
  * Callback function for load email template on subject and body
  * Uses capture group 1 in array
  *
- * @param type $matches
+ * @param array $matches
  * @return string
  */
 function user_info_callback($matches)

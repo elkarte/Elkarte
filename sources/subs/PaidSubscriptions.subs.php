@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This file contains all the functions for paid subscriptions.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,9 +14,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file contains all the administration functions for subscriptions.
- * (and some more than that :P)
  *
  */
 
@@ -543,6 +542,11 @@ function loadSubscriptions()
 	$db->free_result($request);
 }
 
+/**
+ * Removes a subscription
+ *
+ * @param int $id
+ */
 function deleteSubscription($id)
 {
 	$db = database();
@@ -614,7 +618,7 @@ function countActiveSubscriptions($sub_id)
  * Updates a changed subscription.
  *
  * @param array $update
- * @param int $ignore_active, used to ignore already active subscriptions.
+ * @param int $ignore_active - used to ignore already active subscriptions.
  */
 function updateSubscription($update, $ignore_active)
 {
@@ -669,7 +673,7 @@ function updateNonrecurrent($subscription_info)
 /**
  * Get the details from a given subscription.
  *
- * @param type $sub_id
+ * @param int $sub_id
  * @return array
  */
 function getSubscriptionDetails($sub_id)
@@ -872,6 +876,14 @@ function updateSubscriptionItem($item)
 	);
 }
 
+/**
+ * When a refund is processed, this either removes it or sets a new end time to
+ * reflect its no longer re-occuring
+ *
+ * @param array $subscription_info the susbscription information array
+ * @param int $member_id
+ * @param int $time
+ */
 function handleRefund($subscription_info, $member_id, $time)
 {
 	$db = database();
@@ -963,7 +975,7 @@ function getPendingSubscriptions($log_id)
 /**
  * Somebody paid the first time? Let's log ...
  *
- * @param type $details
+ * @param array $details
  */
 function logSubscription($details)
 {

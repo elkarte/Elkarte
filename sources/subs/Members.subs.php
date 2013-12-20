@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This file contains some useful functions for members and membergroups.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,8 +14,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file contains some useful functions for members and membergroups.
  *
  */
 
@@ -447,6 +447,7 @@ function deleteMembers($users, $check_not_admin = false)
  * If an error is detected will fatal error on all errors unless return_errors is true.
  *
  * @param array $regOptions
+ * @param string $error_context
  * @return int, the ID of the newly created member
  */
 function registerMember(&$regOptions, $error_context = 'register')
@@ -1383,54 +1384,78 @@ function isAnotherAdmin($memberID)
 /**
  * This function retrieves a list of member ids based on some conditions
  *
- * @param mixed $query_conditions can be an array of "type" of conditions,
+ * @param mixed $query can be an array of "type" of conditions,
  *              or a string used as raw query
  * @param array $query_params is an array containing the parameters to be passed
  *              to the query
  * @param bool $details if true returns additional member details (name, email, ip, etc.)
  */
-function membersBy($query, $query_params, $details = false)
+function membersBy($query, $query_params, $details = false, $only_active = true)
 {
 	$allowed_conditions = array(
-		'member_ids' => array('id_member IN ({array_int:member_ids})'),
-		'member_names' => array(
-			'LOWER(member_name) IN ({array_string:member_names})',
-			'LOWER(real_name) IN ({array_string:member_names})',
-		),
-		'not_in_group' => array(
-			'id_group != {int:not_in_group}',
-			'FIND_IN_SET({int:not_in_group}, additional_groups) = 0',
-		),
-		'in_group' => array(
-			'id_group = {int:in_group}',
-			'FIND_IN_SET({int:in_group}, additional_groups) != 0',
-		),
-		'in_group_primary' => array('id_group = {int:in_group_primary}',),
-		'in_post_group' => array('id_post_group = {int:in_post_group}'),
-		'in_group_no_add' => array(
-			'(id_group = {int:in_group_no_add} AND FIND_IN_SET({int:in_group_no_add}, additional_groups) = 0)'
-		),
+		'member_ids'       => 'id_member IN ({array_int:member_ids})',
+		'member_names'     => create_function('&$members', '
+			$mem_query = array();
+
+			foreach ($members[\'member_names\'] as $key => $param)
+			{
+				$mem_query[] = \'LOWER(real_name) LIKE {string:member_names_\' . $key . \'}\';
+				$members[\'member_names_\' . $key] = $param;
+			}
+			return implode("\n\t\t\tOR ", $mem_query);
+		'),
+		'not_in_group'     => '(id_group != {int:not_in_group} AND FIND_IN_SET({int:not_in_group}, additional_groups) = 0)',
+		'in_group'         => '(id_group = {int:in_group} OR FIND_IN_SET({int:in_group}, additional_groups) != 0)',
+		'in_group_primary' => 'id_group = {int:in_group_primary}',
+		'in_post_group'    => 'id_post_group = {int:in_post_group}',
+		'in_group_no_add'  => '(id_group = {int:in_group_no_add} AND FIND_IN_SET({int:in_group_no_add}, additional_groups) = 0)',
 	);
 
 	if (is_array($query))
 	{
 		$query_parts = array('or' => array(), 'and' => array());
 		foreach ($query as $type => $query_conditions)
-			if (!empty($query_conditions))
-				foreach ($query_conditions as $query_cond)
-					if (isset($allowed_conditions[$query_cond]))
-						$query_parts[$type] = array_merge($query_parts[$type], $allowed_conditions[$query_cond]);
+		{
+			if (is_array($query_conditions))
+			{
+				foreach ($query_conditions as $condition => $query_condition)
+				{
+					if ($query_condition == 'member_names')
+						$query_parts[$condition === 'or' ? 'or' : 'and'] = $allowed_conditions[$query_condition]($query_params);
+					else
+						$query_parts[$condition === 'or' ? 'or' : 'and'] = isset($allowed_conditions[$query_condition]) ? $allowed_conditions[$query_condition] : $query_condition;
+				}
+			}
+			elseif ($query == 'member_names')
+				$query_parts[$condition === 'or' ? 'or' : 'and'] = $allowed_conditions[$query]($query_params);
+			else
+				$query_parts['and'] = isset($allowed_conditions[$query]) ? $allowed_conditions[$query] : $query;
+		}
+
 		if (!empty($query_parts['or']))
-			$query_parts['and'][] = implode('
-			OR ', $query_parts['or']);
-		$query_where = implode('
-			AND ', $query_parts['and']);
+			$query_parts['and'][] = implode("\n\t\t\tOR ", $query_parts['or']);
+
+		$query_where = implode("\n\t\t\tAND ", $query_parts['and']);
+	}
+	elseif (isset($allowed_conditions[$query]))
+	{
+		if ($query == 'member_names')
+			$query_where = $allowed_conditions[$query]($query_params);
+		else
+			$query_where = $allowed_conditions[$query];
 	}
 	else
 		$query_where = $query;
 
 	if (empty($query_where))
 		return false;
+
+	if ($only_active)
+	{
+		$query_where .= '
+			AND is_activated = {int:is_activated}';
+		$query_params['is_activated'] = 1;
+	}
 
 	$db = database();
 
@@ -1463,53 +1488,77 @@ function membersBy($query, $query_params, $details = false)
 /**
  * Counts the number of members based on conditions
  *
- * @param mixed $query_conditions can be an array of "type" of conditions,
+ * @param mixed $query can be an array of "type" of conditions,
  *              or a string used as raw query
  * @param array $query_params is an array containing the parameters to be passed
  *              to the query
  */
-function countMembersBy($query, $query_params)
+function countMembersBy($query, $query_params, $only_active = true)
 {
 	$allowed_conditions = array(
-		'member_ids' => array('id_member IN ({array_int:member_ids})'),
-		'member_names' => array(
-			'LOWER(member_name) IN ({array_string:member_names})',
-			'LOWER(real_name) IN ({array_string:member_names})',
-		),
-		'not_in_group' => array(
-			'id_group != {int:not_in_group}',
-			'FIND_IN_SET({int:not_in_group}, additional_groups) = 0',
-		),
-		'in_group' => array(
-			'id_group = {int:in_group}',
-			'FIND_IN_SET({int:in_group}, additional_groups) != 0',
-		),
-		'in_group_primary' => array('id_group = {int:in_group_primary}',),
-		'in_post_group' => array('id_post_group = {int:in_post_group}'),
-		'in_group_no_add' => array(
-			'(id_group = {int:in_group_no_add} AND FIND_IN_SET({int:in_group_no_add}, additional_groups) = 0)'
-		),
+		'member_ids'       => 'id_member IN ({array_int:member_ids})',
+		'member_names'     => create_function('&$members', '
+			$mem_query = array();
+
+			foreach ($members[\'member_names\'] as $key => $param)
+			{
+				$mem_query[] = \'LOWER(real_name) LIKE {string:member_names_\' . $key . \'}\';
+				$members[\'member_names_\' . $key] = $param;
+			}
+			return implode("\n\t\t\tOR ", $mem_query);
+		'),
+		'not_in_group'     => '(id_group != {int:not_in_group} AND FIND_IN_SET({int:not_in_group}, additional_groups) = 0)',
+		'in_group'         => '(id_group = {int:in_group} OR FIND_IN_SET({int:in_group}, additional_groups) != 0)',
+		'in_group_primary' => 'id_group = {int:in_group_primary}',
+		'in_post_group'    => 'id_post_group = {int:in_post_group}',
+		'in_group_no_add'  => '(id_group = {int:in_group_no_add} AND FIND_IN_SET({int:in_group_no_add}, additional_groups) = 0)',
 	);
 
 	if (is_array($query))
 	{
 		$query_parts = array('or' => array(), 'and' => array());
 		foreach ($query as $type => $query_conditions)
-			if (!empty($query_conditions))
-				foreach ($query_conditions as $query_cond)
-					if (isset($allowed_conditions[$query_cond]))
-						$query_parts[$type] = array_merge($query_parts[$type], $allowed_conditions[$query_cond]);
+		{
+			if (is_array($query_conditions))
+			{
+				foreach ($query_conditions as $condition => $query_condition)
+				{
+					if ($query_condition == 'member_names')
+						$query_parts[$condition === 'or' ? 'or' : 'and'] = $allowed_conditions[$query_condition]($query_params);
+					else
+						$query_parts[$condition === 'or' ? 'or' : 'and'] = isset($allowed_conditions[$query_condition]) ? $allowed_conditions[$query_condition] : $query_condition;
+				}
+			}
+			elseif ($query == 'member_names')
+				$query_parts[$condition === 'or' ? 'or' : 'and'] = $allowed_conditions[$query]($query_params);
+			else
+				$query_parts['and'] = isset($allowed_conditions[$query]) ? $allowed_conditions[$query] : $query;
+		}
+
 		if (!empty($query_parts['or']))
-			$query_parts['and'][] = implode('
-			OR ', $query_parts['or']);
-		$query_where = implode('
-			AND ', $query_parts['and']);
+			$query_parts['and'][] = implode("\n\t\t\tOR ", $query_parts['or']);
+
+		$query_where = implode("\n\t\t\tAND ", $query_parts['and']);
+	}
+	elseif (isset($allowed_conditions[$query]))
+	{
+		if ($query == 'member_names')
+			$query_where = $allowed_conditions[$query]($query_params);
+		else
+			$query_where = $allowed_conditions[$query];
 	}
 	else
 		$query_where = $query;
 
-	if (empty($query_parts))
+	if (empty($query_where))
 		return false;
+
+	if ($only_active)
+	{
+		$query_where .= '
+			AND is_activated = {int:is_activated}';
+		$query_params['is_activated'] = 1;
+	}
 
 	$db = database();
 
@@ -1709,6 +1758,13 @@ function getMemberByName($name, $flexible = false)
 	return $member;
 }
 
+/**
+ * Finds a member from the database using supplied string as real_name
+ * Optionaly will only search/find the member in a buddy list
+ *
+ * @param string $search string to search real_name for like finds
+ * @param array $buddies
+ */
 function getMember($search, $buddies = array())
 {
 	$db = database();
@@ -2050,7 +2106,7 @@ function onlineMembers($conditions, $sort_method, $sort_direction, $start)
 /**
  * Check if the OpenID URI is already registered for an existing member
  *
- * @param string $uri
+ * @param string $url
  * @return array
  */
 function memberExists($url)
@@ -2210,7 +2266,7 @@ function getConcernedMembers($groups, $where)
 /**
  * Determine if the current user ($user_info) can contact another user ($who)
  *
- * @param int The id of the user to contact
+ * @param int $who The id of the user to contact
  */
 function canContact($who)
 {
@@ -2269,7 +2325,7 @@ function canContact($who)
  *
  * Used by updateStats('member').
  *
- * @param int $member = null If not an integer reload from the database
+ * @param int $id_member = null If not an integer reload from the database
  * @param string $real_name = null
  */
 function updateMemberStats($id_member = null, $real_name = null)
@@ -2332,7 +2388,7 @@ function updateMemberStats($id_member = null, $real_name = null)
 /**
  * Builds the 'query_see_board' element for a certain member
  *
- * @param integer a valid member id
+ * @param integer $id_member a valid member id
  */
 function memberQuerySeeBoard($id_member)
 {

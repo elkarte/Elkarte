@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Handles all news and newsletter functions for the site
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,7 +11,7 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
  *
@@ -110,7 +112,6 @@ class ManageNews_Controller extends Action_Controller
 	 * Called by ?action=admin;area=news.
 	 * Requires the edit_news permission.
 	 * Can be accessed with ?action=admin;sa=editnews.
-	 *
 	 */
 	public function action_editnews()
 	{
@@ -465,8 +466,8 @@ class ManageNews_Controller extends Action_Controller
 	 * Redirects to itself when more batches need to be sent.
 	 * Redirects to ?action=admin after everything has been sent.
 	 *
-	 * @param bool $clean_only = false; if set, it will only clean the variables, put them in context, then return.
 	 * @uses the ManageNews template and email_members_send sub template.
+	 * @param bool $clean_only = false; if set, it will only clean the variables, put them in context, then return.
 	 */
 	public function action_mailingsend($clean_only = false)
 	{
@@ -479,6 +480,7 @@ class ManageNews_Controller extends Action_Controller
 			loadTemplate('ManageNews');
 			return;
 		}
+
 		// If just previewing we prepare a message and return it for viewing
 		if (isset($_POST['preview']))
 		{
@@ -544,7 +546,7 @@ class ManageNews_Controller extends Action_Controller
 				foreach ($_POST['groups'] as $group => $dummy)
 					$context['recipients']['groups'][] = (int) $group;
 			}
-			else
+			elseif (trim($_POST['groups']) != '')
 			{
 				$groups = explode(',', $_POST['groups']);
 				foreach ($groups as $group)
@@ -560,7 +562,7 @@ class ManageNews_Controller extends Action_Controller
 				foreach ($_POST['exclude_groups'] as $group => $dummy)
 					$context['recipients']['exclude_groups'][] = (int) $group;
 			}
-			else
+			elseif (trim($_POST['exclude_groups']) != '')
 			{
 				$groups = explode(',', $_POST['exclude_groups']);
 				foreach ($groups as $group)
@@ -741,8 +743,10 @@ class ManageNews_Controller extends Action_Controller
 				$sendQuery .= ' AND mem.notify_announcements = {int:notify_announcements}';
 
 			require_once(SUBSDIR . '/News.subs.php');
+
 			// Get the smelly people - note we respect the id_member range as it gives us a quicker query.
 			$recipients = getNewsletterRecipients($sendQuery, $sendParams, $context['start'], $num_at_once, $i);
+
 			foreach ($recipients as $row)
 			{
 				$last_id_member = $row['id_member'];
@@ -824,7 +828,7 @@ class ManageNews_Controller extends Action_Controller
 	{
 		global $context, $txt, $scripturl;
 
-		// initialize the form
+		// Initialize the form
 		$this->_initNewsSettingsForm();
 
 		$config_vars = $this->_newsSettings->settings();
@@ -862,15 +866,13 @@ class ManageNews_Controller extends Action_Controller
 
 	/**
 	 * Initialize the news settings screen in admin area for the forum.
-	 *
-	 * @return array
 	 */
 	private function _initNewsSettingsForm()
 	{
 		// We're working with them settings here.
 		require_once(SUBSDIR . '/Settings.class.php');
 
-		// instantiate the form
+		// Instantiate the form
 		$this->_newsSettings = new Settings_Form();
 
 		// Initialize it with our settings

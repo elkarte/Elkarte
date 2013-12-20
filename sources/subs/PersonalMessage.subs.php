@@ -1,6 +1,12 @@
 <?php
 
 /**
+ * This file handles tasks related to personal messages. It performs all
+ * the necessary (database updates, statistics updates) to add, delete, mark
+ * etc personal messages.
+ *
+ * The functions in this file do NOT check permissions.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,12 +18,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file handles tasks related to personal messages. It performs all
- * the necessary (database updates, statistics updates) to add, delete, mark
- * etc personal messages.
- *
- * The functions in this file do NOT check permissions.
  *
  */
 
@@ -1227,7 +1227,7 @@ function toggleNewPM($id_member, $new = false)
 /**
  * Load the PM limits for each group or for a specified group
  *
- * @param int (optional) the id of a membergroup
+ * @param int $id_group (optional) the id of a membergroup
  */
 function loadPMLimits($id_group = false)
 {
@@ -1256,6 +1256,8 @@ function loadPMLimits($id_group = false)
 
 /**
  * Retrieve the discussion one or more PMs belong to
+ *
+ * @param int $id_pms
  */
 function getDiscussions($id_pms)
 {
@@ -1279,6 +1281,8 @@ function getDiscussions($id_pms)
 
 /**
  * Return all the PMs belonging to one or more discussions
+ *
+ * @param array $pm_heads array of pm id head nodes
  */
 function getPmsFromDiscussion($pm_heads)
 {
@@ -1627,7 +1631,7 @@ function setPMRepliedStatus($id_member, $replied_to)
  * Given the head PM, loads all other PM's that share the same head node
  * Used to load the conversation view of a PM
  *
- * @param type $head id of the head pm of the conversation
+ * @param int $head id of the head pm of the conversation
  * @param array $recipients
  * @param string $folder the current folder we are working in
  */
@@ -1685,7 +1689,7 @@ function loadConversationList($head, &$recipients, $folder = '')
  * @param array $all_pms
  * @param array $recipients
  * @param string $folder
- * @param boolean search
+ * @param boolean $search
  */
 function loadPMRecipients($all_pms, &$recipients, $folder = '', $search = false)
 {
@@ -1743,8 +1747,8 @@ function loadPMRecipients($all_pms, &$recipients, $folder = '', $search = false)
  * This is used by preparePMContext_callback.  That function uses these
  * query results and handles the free_result action as well.
  *
- * @param type $pms array of PM ids to fetch
- * @param type $orderBy raw query defining how to order the results
+ * @param array $pms array of PM ids to fetch
+ * @param string $orderBy raw query defining how to order the results
  */
 function loadPMSubjectRequest($pms, $orderBy)
 {
@@ -1872,8 +1876,8 @@ function loadPMQuote($pmsg, $isReceived)
  * For a given PM ID, loads all "other" recipients, (excludes the current member)
  * Will optional count the number of bcc recipients and return that count
  *
- * @param type $pmsg
- * @param type $pmsg
+ * @param int $pmsg
+ * @param boolean $bcc_count
  */
 function loadPMRecipientsAll($pmsg, $bcc_count = false)
 {
