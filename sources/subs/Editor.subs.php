@@ -178,7 +178,7 @@ function create_control_richedit($editorOptions)
 		loadTemplate('GenericControls', 'jquery.sceditor');
 
 		// JS makes the editor go round
-		loadJavascriptFile(array('jquery.sceditor.js', 'jquery.sceditor.bbcode.js', 'jquery.sceditor.elkarte.js', 'post.js'));
+		loadJavascriptFile(array('jquery.sceditor.js', 'jquery.sceditor.bbcode.js', 'jquery.sceditor.elkarte.js', 'post.js', 'splittag.plugin.js'));
 		addJavascriptVar(array(
 			'post_box_name' => '"' . $editorOptions['id'] . '"',
 			'elk_smileys_url' => '"' . $settings['smileys_url'] . '"',
