@@ -928,7 +928,7 @@ class ProfileInfo_Controller extends Action_Controller
 
 		// Load a list of boards for the jump box - except the defaults.
 		require_once(SUBSDIR . '/Boards.subs.php');
-		$board_list = getBoardList(array('moderator' => $memID, 'use_permissions' => true), true);
+		$board_list = getBoardList(array('moderator' => $memID), true);
 
 		$context['boards'] = array();
 		$context['no_access_boards'] = array();

@@ -338,7 +338,6 @@ class Post_Controller extends Action_Controller
 				$boardListOptions = array(
 					'included_boards' => in_array(0, $boards) ? null : $boards,
 					'not_redirection' => true,
-					'use_permissions' => true,
 					'selected_board' => empty($context['current_board']) ? $modSettings['cal_defaultboard'] : $context['current_board'],
 				);
 				$context += getBoardList($boardListOptions);
@@ -597,7 +596,7 @@ class Post_Controller extends Action_Controller
 			$context['original_post'] = isset($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'];
 			$context['show_boards_dropdown'] = true;
 			require_once(SUBSDIR . '/Boards.subs.php');
-			$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true, 'allowed_to' => 'post_new'));
+			$context += getBoardList(array('not_redirection' => true, 'allowed_to' => 'post_new'));
 			$context['boards_current_disabled'] = false;
 			if (!empty($board))
 			{

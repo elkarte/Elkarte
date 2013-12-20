@@ -291,7 +291,6 @@ class Calendar_Controller extends Action_Controller
 			$boardListOptions = array(
 				'included_boards' => in_array(0, $boards) ? null : $boards,
 				'not_redirection' => true,
-				'use_permissions' => true,
 				'selected_board' => $modSettings['cal_defaultboard'],
 			);
 			$context += getBoardList($boardListOptions);

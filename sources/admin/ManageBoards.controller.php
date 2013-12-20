@@ -787,7 +787,7 @@ class ManageBoards_Controller extends Action_Controller
 
 		// Load the boards list - for the recycle bin!
 		require_once(SUBSDIR . '/Boards.subs.php');
-		$boards = getBoardList(array('not_redirection' => true), true);
+		$boards = getBoardList(array('override_permissions' => true, 'not_redirection' => true), true);
 		$recycle_boards = array('');
 		foreach ($boards as $board)
 			$recycle_boards[$board['id_board']] = $board['cat_name'] . ' - ' . $board['board_name'];

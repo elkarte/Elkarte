@@ -74,7 +74,7 @@ class MoveTopic_Controller extends Action_Controller
 
 		// Get a list of boards this moderator can move to.
 		require_once(SUBSDIR . '/Boards.subs.php');
-		$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true));
+		$context += getBoardList(array('not_redirection' => true));
 
 		// No boards?
 		if (empty($context['categories']) || $context['num_boards'] == 1)

@@ -108,7 +108,6 @@ class MergeTopics_Controller extends Action_Controller
 		// Get a list of boards they can navigate to to merge.
 		require_once(SUBSDIR . '/Boards.subs.php');
 		$boardListOptions = array(
-			'use_permissions' => true,
 			'not_redirection' => true
 		);
 		if (!in_array(0, $merge_boards))

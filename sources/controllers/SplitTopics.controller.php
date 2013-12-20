@@ -95,7 +95,7 @@ class SplitTopics_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Messages.subs.php');
 
 		// Let's load up the boards in case they are useful.
-		$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true));
+		$context += getBoardList(array('not_redirection' => true));
 
 		// Retrieve message info for the message at the split point.
 		$messageInfo = basicMessageInfo($splitAt, false, true);
