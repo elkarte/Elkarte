@@ -140,10 +140,10 @@ $txt['end_date'] = 'End Date';
 $txt['start_date_and_time'] = 'Start Date and Time';
 $txt['end_date_and_time'] = 'End Date and Time';
 $txt['edit'] = 'EDIT';
-$txt['one_username'] = 'Please enter one username only.';
+$txt['one_username'] = 'Please enter one user name only.';
 $txt['minute'] = 'Minute';
 $txt['error_member_not_found'] = 'The member entered could not be found';
-$txt['member_already_subscribed'] = 'This member is already subscribed to this subscription. Please edit their existing subscription.';
+$txt['member_already_subscribed'] = 'This member is already subscribed to this subscription. Please edit their existing subscription instead.';
 $txt['search_sub'] = 'Find User';
 
 // Make payment.
@@ -196,7 +196,7 @@ $txt['paid_subs_none'] = 'There are currently no paid subscriptions available.';
 
 $txt['paid_current'] = 'Existing Subscriptions';
 $txt['pending_payments'] = 'Pending Payments';
-$txt['pending_payments_desc'] = 'This member has attempted to make the following payments for this subscription but the confirmation has not been received by the forum. If you are sure the payment has been received click &quot;accept&quot; to action to subscription. Alternatively you can click &quot;Remove&quot; to remove all reference to the payment.';
+$txt['pending_payments_desc'] = 'This member has attempted to make the following payments for this subscription but the confirmation has not been received by the forum. If you are sure the payment has been received click &quot;accept&quot; to accept the subscription. Alternatively you can click &quot;Remove&quot; to remove all reference to the payment.';
 $txt['pending_payments_value'] = 'Value';
 $txt['pending_payments_accept'] = 'Accept';
 $txt['pending_payments_remove'] = 'Remove';
