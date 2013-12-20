@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * The main purpose of this file is to show a list of all badbehavior entries
+ * and allow filtering and deleting them.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,6 +15,9 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class to show a list of all badbehavior log entries
+ */
 class BadBehavior_Controller extends Action_Controller
 {
 	/**

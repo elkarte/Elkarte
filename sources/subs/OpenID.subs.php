@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Handle all of the OpenID interfacing and communications.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -13,13 +15,14 @@
  *
  * @version 1.0 Beta
  *
- * Handle all of the OpenID interfacing and communications.
- *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * OpenID class, controls interfacing and communications for openid auth
+ */
 class OpenID
 {
 	/**
@@ -48,11 +51,12 @@ class OpenID
 		if (($assoc = $this->getAssociation($response_data['provider'])) == null)
 			$assoc = $this->makeAssociation($response_data['provider']);
 
-		// include file for member existence
+		// Include file for member existence
 		require_once(SUBSDIR . '/Members.subs.php');
 
 		// Before we go wherever it is we are going, store the GET and POST data, because it might be useful when we get back.
 		$request_time = time();
+
 		// Just in case they are doing something else at this time.
 		while (isset($_SESSION['openid']['saved_data'][$request_time]))
 			$request_time = md5($request_time);
@@ -383,7 +387,6 @@ class OpenID
 	}
 
 	/**
-	 *
 	 * Retrieve server information.
 	 *
 	 * @param string $openid_url
@@ -400,6 +403,7 @@ class OpenID
 			return false;
 
 		$response_data = array();
+
 		// dirty, but .. Yadis response? Let's get the <URI>
 		preg_match('~<URI.*?>(.*)</URI>~', $webdata, $uri);
 		if ($uri)
@@ -408,6 +412,7 @@ class OpenID
 			$response_data['server'] = $uri[1];
 			return $response_data;
 		}
+
 		// Some OpenID servers have strange but still valid HTML which makes our job hard.
 		if (preg_match_all('~<link([\s\S]*?)/?>~i', $webdata, $link_matches) == 0)
 			fatal_lang_error('openid_server_bad_response');
@@ -433,13 +438,15 @@ class OpenID
 }
 
 /**
+ * keyed-hash function that provides message authentication using the HMAC
+ * algorithm and the SHA-1 hash function.
+ *
  * @param string $data
  * @param string $key
  * @return string
  */
 function sha1_hmac($data, $key)
 {
-
 	if (strlen($key) > 64)
 		$key = sha1($key, true);
 
@@ -449,9 +456,17 @@ function sha1_hmac($data, $key)
 	$opad = str_repeat(chr(0x5c), 64);
 	$hash1 = sha1(($key ^ $ipad) . $data, true);
 	$hmac = sha1(($key ^ $opad) . $hash1, true);
+
 	return $hmac;
 }
 
+/**
+ * Given a binary string, returns the binary string converted to a
+ * long number.
+ *
+ * @param string $str
+ * @return string
+ */
 function binary_to_long($str)
 {
 	$bytes = array_merge(unpack('C*', $str));
@@ -467,6 +482,14 @@ function binary_to_long($str)
 	return $n;
 }
 
+/**
+ * Given a long integer, returns the number converted to a binary
+ * string. This function accepts long integer values of arbitrary
+ * magnitude.
+ *
+ * @param string $value
+ * @return string
+ */
 function long_to_binary($value)
 {
 	$cmp = bccomp($value, 0);
@@ -495,6 +518,12 @@ function long_to_binary($value)
 }
 
 /**
+ * Performs an exclusive or (^ bitwise operator) character for character on
+ * two stings.  The result of the biwise operator is 1 if and only if
+ * both bits differ.
+ *
+ * Returns a binary string representing the per character positon comparison results.
+ *
  * @param int $num1
  * @param int $num2
  */
@@ -511,6 +540,7 @@ function binary_xor($num1, $num2)
 
 /**
  * Retrieve a member settings based on the claimed id
+ *
  * @param string $claimed_id the claimed id
  *
  * @return array the member settings

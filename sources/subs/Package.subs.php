@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * This contains functions for handling tar.gz and zip
+ * files, as well as a simple xml parser to handle the xml package.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,11 +15,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file's central purpose of existence is that of making the package
- * manager work nicely.  It contains functions for handling tar.gz and zip
- * files, as well as a simple xml parser to handle the xml package stuff.
- * Not to mention a few functions to make file handling easier.
  *
  */
 
@@ -72,11 +70,11 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
  * returns an array of the files extracted.
  * if files_to_extract is not equal to null only extracts file within this array.
  *
- * @param string data,
- * @param string destination,
- * @param bool single_file = false,
- * @param bool overwrite = false,
- * @param array files_to_extract = null
+ * @param string $data
+ * @param string $destination
+ * @param bool $single_file = false,
+ * @param bool $overwrite = false,
+ * @param array $files_to_extract = null
  */
 function read_tgz_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
@@ -100,10 +98,10 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
 	$header['filename'] = '';
 	$header['comment'] = '';
 
-	// the IDentification number, gzip must be 1f8b
+	// The IDentification number, gzip must be 1f8b
 	if (strtolower($header['a'] . $header['b']) != '1f8b')
 	{
-		// Okay, this ain't no tar.gz, but maybe it's a zip file.
+		// Okay, this is not a tar.gz, but maybe it's a zip file.
 		if (substr($data, 0, 2) == 'PK')
 			return read_zip_data($data, $destination, $single_file, $overwrite, $files_to_extract);
 		else
@@ -258,11 +256,11 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
 /**
  * Extract zip data.  If destination is null, return a listing.
  *
- * @param type $data
- * @param type $destination
- * @param type $single_file
- * @param type $overwrite
- * @param type $files_to_extract
+ * @param string $data
+ * @param string $destination
+ * @param bool $single_file
+ * @param bool $overwrite
+ * @param array $files_to_extract
  */
 function read_zip_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
@@ -288,11 +286,11 @@ function read_zip_data($data, $destination, $single_file = false, $overwrite = f
 	$file_sections = explode("\x50\x4b\x03\x04", $file_sections[0]);
 	array_shift($file_sections);
 
-	// sections and count from the signature must match or the zip file is bad
+	// Sections and count from the signature must match or the zip file is bad
 	if (count($file_sections) != $zip_info['files'])
 		return false;
 
-	// go though each file in the archive
+	// Go though each file in the archive
 	foreach ($file_sections as $data)
 	{
 		// Get all the important file information.
@@ -378,7 +376,8 @@ function read_zip_data($data, $destination, $single_file = false, $overwrite = f
 /**
  * Checks the existence of a remote file since file_exists() does not do remote.
  * will return false if the file is "moved permanently" or similar.
- * @param string url
+ *
+ * @param string $url
  * @return boolean true if the remote url exists.
  */
 function url_exists($url)
@@ -524,9 +523,9 @@ function getPackageInfo($gzfilename)
 /**
  * Create a chmod control for chmoding files.
  *
- * @param type $chmodFiles
- * @param type $chmodOptions
- * @param type $restore_write_status
+ * @param array $chmodFiles
+ * @param array $chmodOptions
+ * @param boolean $restore_write_status
  * @return boolean
  */
 function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $restore_write_status = false)
@@ -539,11 +538,10 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 		/**
 		 * Get a listing of files that will need to be set back to the original state
 		 *
-		 * @param type $dummy1
-		 * @param type $dummy2
-		 * @param type $dummy3
-		 * @param type $do_change
-		 * @return type
+		 * @param string $dummy1
+		 * @param string $dummy2
+		 * @param string $dummy3
+		 * @param boolean $do_change
 		 */
 		function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
 		{
@@ -1046,7 +1044,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
  * - previous_version should be set to the previous installed version of this package, if any.
  * - does not handle failure terribly well; testing first is always better.
  *
- * @param Xml_Array &$package
+ * @param Xml_Array $packageXML
  * @param bool $testing_only = true
  * @param string $method = 'install' ('install', 'upgrade', or 'uninstall')
  * @param string $previous_version = ''
@@ -1494,7 +1492,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
  *
  * @param string $versions
  * @param boolean $reset
- * @param type $the_version
+ * @param string $the_version
  * @return highest install value string or false
  */
 function matchHighestPackageVersion($versions, $reset = false, $the_version)
@@ -1582,8 +1580,8 @@ function matchPackageVersion($version, $versions)
  * - (0) if version1 is equal to version2
  * - (1) if version1 is higher than version2
  *
- * @param string version1
- * @param string version2
+ * @param string $version1
+ * @param string $version2
  * @return int (-1, 0, 1)
  */
 function compareVersions($version1, $version2)
@@ -2611,7 +2609,7 @@ function parseBoardMod($file, $testing = true, $undo = false, $theme_paths = arr
 /**
  * Get the physical contents of a packages file
  *
- * @param type $filename
+ * @param string $filename
  * @return boolean
  */
 function package_get_contents($filename)
@@ -2643,7 +2641,7 @@ function package_get_contents($filename)
  *
  * @param string $filename
  * @param string $data
- * @param bool testing
+ * @param bool $testing
  * @return int
  */
 function package_put_contents($filename, $data, $testing = false)
@@ -2702,8 +2700,7 @@ function package_put_contents($filename, $data, $testing = false)
 /**
  * Clears (removes the files) the current package cache (temp directory)
  *
- * @param type $trash
- * @return type
+ * @param boolean $trash
  */
 function package_flush_cache($trash = false)
 {
@@ -2913,7 +2910,9 @@ function package_crypt($pass)
 }
 
 /**
- * @todo Document this
+ * Creates a site backup before installing a package just in case things don't go
+ * as planned.
+ *
  * @param string $id
  */
 function package_create_backup($id = 'backup')
@@ -2922,7 +2921,8 @@ function package_create_backup($id = 'backup')
 
 	$files = array();
 
-	$base_files = array('index.php', 'SSI.php', 'agreement.txt', 'ssi_examples.php', 'ssi_examples.shtml', 'subscriptions.php');
+	// The files that reside outside of sources, in the base, we add manually
+	$base_files = array('index.php', 'SSI.php', 'agreement.txt', 'ssi_examples.php', 'ssi_examples.shtml', 'subscriptions.php', 'email_imap_cron.php', 'emailpost.php', 'emailtopic.php');
 	foreach ($base_files as $file)
 	{
 		if (file_exists(BOARDDIR . '/' . $file))
@@ -2932,10 +2932,12 @@ function package_create_backup($id = 'backup')
 			);
 	}
 
+	// Root directory where most of our files reside
 	$dirs = array(
 		SOURCEDIR => empty($_REQUEST['use_full_paths']) ? 'sources/' : strtr(SOURCEDIR . '/', '\\', '/')
 	);
 
+	// Find all installed theme directories
 	$request = $db->query('', '
 		SELECT value
 		FROM {db_prefix}themes
@@ -2950,11 +2952,13 @@ function package_create_backup($id = 'backup')
 		$dirs[$row['value']] = empty($_REQUEST['use_full_paths']) ? 'themes/' . basename($row['value']) . '/' : strtr($row['value'] . '/', '\\', '/');
 	$db->free_result($request);
 
+	// While we have directorys to check
 	while (!empty($dirs))
 	{
 		list ($dir, $dest) = each($dirs);
 		unset($dirs[$dir]);
 
+		// Get the file listing for this directory
 		$listing = @dir($dir);
 		if (!$listing)
 			continue;
@@ -2968,6 +2972,8 @@ function package_create_backup($id = 'backup')
 				continue;
 
 			$stat = stat($dir . '/' . $entry);
+
+			// If this is a directory, add it to the dir stack for processing
 			if ($stat['mode'] & 040000)
 			{
 				$files[$filepath] = array($dest . $entry . '/', $stat);
@@ -2976,15 +2982,18 @@ function package_create_backup($id = 'backup')
 			else
 				$files[$filepath] = array($dest . $entry, $stat);
 		}
+
 		$listing->close();
 	}
 
+	// Make sure we have a backup directory and its writable
 	if (!file_exists(BOARDDIR . '/packages/backups'))
 		mktree(BOARDDIR . '/packages/backups', 0777);
 
 	if (!is_writable(BOARDDIR . '/packages/backups'))
 		package_chmod(BOARDDIR . '/packages/backups');
 
+	// Name the output file, yyyy-mm-dd_before_package_name.tar.gz
 	$output_file = BOARDDIR . '/packages/backups/' . strftime('%Y-%m-%d_') . preg_replace('~[$\\\\/:<>|?*"\']~', '', $id);
 	$output_ext = '.tar' . (function_exists('gzopen') ? '.gz' : '');
 
@@ -2998,10 +3007,12 @@ function package_create_backup($id = 'backup')
 	else
 		$output_file .= $output_ext;
 
+	// Buy some more time so we have enough to create this archive
 	@set_time_limit(300);
 	if (function_exists('apache_reset_timeout'))
 		@apache_reset_timeout();
 
+	// Set up the file output handle, try gzip first to save space
 	if (function_exists('gzopen'))
 	{
 		$fwrite = 'gzwrite';
@@ -3015,30 +3026,57 @@ function package_create_backup($id = 'backup')
 		$output = fopen($output_file, 'wb');
 	}
 
+	// For each file we found in the directory, we add them to a TAR archive
 	foreach ($files as $real_file => $file)
 	{
 		if (!file_exists($real_file))
 			continue;
 
+		// Check if its a directory
 		$stat = $file[1];
 		if (substr($file[0], -1) == '/')
 			$stat['size'] = 0;
 
-		$current = pack('a100a8a8a8a12a12a8a1a100a6a2a32a32a8a8a155a12', $file[0], decoct($stat['mode']), sprintf('%06d', decoct($stat['uid'])), sprintf('%06d', decoct($stat['gid'])), decoct($stat['size']), decoct($stat['mtime']), '', 0, '', '', '', '', '', '', '', '', '');
+		// Create a tar file header, pack the details in to the fields
+		$current = pack('a100a8a8a8a12a12a8a1a100a6a2a32a32a8a8a155a12',
+			$file[0], // name of file
+			decoct($stat['mode']), // file mode
+			sprintf('%06d', decoct($stat['uid'])), // owner user ID
+			sprintf('%06d', decoct($stat['gid'])), // owner group ID
+			decoct($stat['size']), // length of file in bytes
+			decoct($stat['mtime']), // modify time of file
+			'', // checksum for header
+			0, // type of file
+			'', // name of linked file
+			'', // USTAR indicator
+			'', // USTAR version
+			'', // owner user name
+			'', // owner group name
+			'', // device major number
+			'', // device minor number
+			'', // prefix for file name
+			''
+		);
+
+		// Create the header checksum
 		$checksum = 256;
 		for ($i = 0; $i < 512; $i++)
-			$checksum += ord($current{$i});
+			$checksum += ord($current[$i]);
 
+		// Write out the file header (insert the checksum we just computed)
 		$fwrite($output, substr($current, 0, 148) . pack('a8', decoct($checksum)) . substr($current, 156, 511));
 
+		// If this is a directory entry all thats needed is the header
 		if ($stat['size'] == 0)
 			continue;
 
+		// Write the actual file contents to the backup file
 		$fp = fopen($real_file, 'rb');
 		while (!feof($fp))
 			$fwrite($output, fread($fp, 16384));
 		fclose($fp);
 
+		// Pad the output so its on 512 boundarys
 		$fwrite($output, pack('a' . (512 - $stat['size'] % 512), ''));
 	}
 
@@ -3390,16 +3428,20 @@ function setPackagesAsUninstalled()
 	);
 }
 
+/**
+ * Validates that the remote url is one of our known package servers
+ *
+ * @param string $remote_url
+ */
 function isAuthorizedServer($remote_url)
 {
 	global $modSettings;
 
-	// Check that the theme is from simplemachines.org, for now... maybe add mirroring later.
+	// Know addon servers
 	$servers = @unserialize($modSettings['authorized_package_servers']);
 	if (empty($servers))
 		return false;
 
-	$valid_server = false;
 	foreach ($servers as $server)
 		if (preg_match('~^' . preg_quote($server) . '~', $remote_url) == 0)
 			return true;

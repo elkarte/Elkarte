@@ -1,14 +1,15 @@
 <?php
 
 /**
+ * Should be run from a cron job to fetch messages from an imap mailbox
+ * Can be called from scheduled tasks (fake-cron) if needed
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Beta
  *
- * Should be run from a cron job to fetch messages from an imap mailbox
- * Can be called from scheduled tasks (fake-cron) if needed
  */
 
 // Any output here is not good
@@ -107,6 +108,7 @@ function postbyemail_imap()
 
 /**
  * Sets port and connection flags based on the chosen protocol
+ * @param string $type type of imap connection, defaults to pop3
  */
 function port_type($type)
 {

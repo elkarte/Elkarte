@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Functions used to manage template layers
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -121,7 +123,7 @@ class Template_Layers
 	 * Add a layer to the pile after another existing layer
 	 *
 	 * @param string $layer the name of a layer
-	 * @param string $following the name of the layer after which $layer must be added
+	 * @param string $previous the name of the layer after which $layer must be added
 	 */
 	public function addAfter($layer, $previous)
 	{
@@ -327,6 +329,7 @@ class Template_Layers
 	 * Find and return Template_Layers instance if it exists,
 	 * or create a new instance if it didn't already exist.
 	 *
+	 * @param boolean $error_safe if error mode is on or off
 	 * @return an instance of the class
 	 */
 	public static function getInstance($error_safe = false)

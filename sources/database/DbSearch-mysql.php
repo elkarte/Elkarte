@@ -1,21 +1,28 @@
 <?php
 
 /**
+ * This class handles database search. (MySQL)
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Beta
  *
- * This class handles database search. (MySQL)
- *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * MySQL implementation of DbSearch
+ */
 class DbSearch_MySQL implements DbSearch
 {
+	/**
+	 * This instance of the search
+	 * @var instance
+	 */
 	private static $_search = null;
 
 	/**
@@ -157,6 +164,7 @@ class DbSearch_MySQL implements DbSearch
 		{
 			self::$_search = new self();
 		}
+
 		return self::$_search;
 	}
 }

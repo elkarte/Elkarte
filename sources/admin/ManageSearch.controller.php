@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * The admin screen to change the search settings.  Aloows for the creation \
+ * of seach indexes and search weights
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,11 +12,10 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
  *
- * The admin screen to change the search settings.
  */
 
 if (!defined('ELK'))
@@ -104,7 +106,7 @@ class ManageSearch_Controller extends Action_Controller
 	{
 		global $txt, $context, $scripturl, $modSettings;
 
-		// initialize the form
+		// Initialize the form
 		$this->_initSearchSettingsForm();
 
 		$config_vars = $this->_searchSettings->settings();
@@ -181,7 +183,6 @@ class ManageSearch_Controller extends Action_Controller
 	 */
 	private function _initSearchSettingsForm()
 	{
-
 		// This is really quite wanting.
 		require_once(SUBSDIR . '/Settings.class.php');
 
@@ -291,7 +292,7 @@ class ManageSearch_Controller extends Action_Controller
 	{
 		global $txt, $context, $modSettings;
 
-		// need to work with some db search stuffs
+		// Need to work with some db search stuffs
 		$db_search = db_search();
 		require_once(SUBSDIR . '/ManageSearch.subs.php');
 
@@ -509,7 +510,7 @@ class ManageSearch_Controller extends Action_Controller
 	{
 		global $txt, $context, $modSettings;
 
-		// saving the settings
+		// Saving the settings
 		if (isset($_POST['save']))
 		{
 			checkSession();
@@ -526,7 +527,7 @@ class ManageSearch_Controller extends Action_Controller
 				'sphinx_max_results' => (int) $_POST['sphinx_max_results'],
 			));
 		}
-		// checking if we can connect?
+		// Checking if we can connect?
 		elseif (isset($_POST['checkconnect']))
 		{
 			checkSession();
@@ -539,7 +540,7 @@ class ManageSearch_Controller extends Action_Controller
 				$context['error_type'] = 'notice';
 			}
 
-			// try to connect via Sphinx API?
+			// Try to connect via Sphinx API?
 			if ($modSettings['search_index'] === 'sphinx' || empty($modSettings['search_index']))
 			{
 				if (@file_exists(SOURCEDIR . '/sphinxapi.php'))
@@ -567,7 +568,7 @@ class ManageSearch_Controller extends Action_Controller
 				}
 			}
 
-			// try to connect via SphinxQL
+			// Try to connect via SphinxQL
 			if ($modSettings['search_index'] === 'sphinxql' || empty($modSettings['search_index']))
 			{
 				if (!empty($modSettings['sphinx_searchd_server']) && !empty($modSettings['sphinxql_searchd_port']))

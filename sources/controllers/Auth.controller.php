@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * This file is concerned pretty entirely, as you see from its name, with
+ * logging in and out members, and the validation of that.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,21 +12,21 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file is concerned pretty entirely, as you see from its name, with
- * logging in and out members, and the validation of that.
  *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Auth_Controller class, deals with logging in and out members,
+ * and the validation of them
+ */
 class Auth_Controller extends Action_Controller
 {
-
 	/**
 	 * Entry point in Auth controller
 	 * (well no, not really. We route directly to the rest.)
@@ -83,10 +86,11 @@ class Auth_Controller extends Action_Controller
 	 * What it does:
 	 * - checks credentials and checks that login was successful.
 	 * - it employs protection against a specific IP or user trying to brute force
-	 *  a login to an account.
+	 *   a login to an account.
 	 * - upgrades password encryption on login, if necessary.
 	 * - after successful login, redirects you to $_SESSION['login_url'].
 	 * - accessed from ?action=login2, by forms.
+	 *
 	 * On error, uses the same templates action_login() uses.
 	 */
 	public function action_login2()
@@ -496,7 +500,7 @@ class Auth_Controller extends Action_Controller
 	{
 		global $user_info, $user_settings, $context, $cookiename;
 
-		// we deal only with logged in folks in here!
+		// We deal only with logged in folks in here!
 		if (!$user_info['is_guest'])
 		{
 			if (isset($_COOKIE[$cookiename]) && preg_match('~^a:[34]:\{i:0;i:\d{1,8};i:1;s:(0|40):"([a-fA-F0-9]{40})?";i:2;[id]:\d{1,14};(i:3;i:\d;)?\}$~', $_COOKIE[$cookiename]) === 1)

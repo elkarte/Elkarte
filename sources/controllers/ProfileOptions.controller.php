@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * This file has the primary job of showing and editing people's profiles.
+ * It also allows the user to change some of their or another's preferences,
+ * and such things
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,19 +13,20 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file has the primary job of showing and editing people's profiles.
- * It also allows the user to change some of their or another's preferences,
- * and such things
  *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * ProfileOptions_Controller class. Does the job of showing and editing people's profiles.
+ * Interface to buddy list, ignore list, notifications, authenitcation options, forum profile
+ * account settings, etc
+ */
 class ProfileOptions_Controller extends Action_Controller
 {
 	/**

@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * The job of this file is to handle everything related to posting replies,
+ * new topics, quotes, and modifications to existing posts.  It also handles
+ * quoting posts by way of javascript.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,13 +13,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * The job of this file is to handle everything related to posting replies,
- * new topics, quotes, and modifications to existing posts.  It also handles
- * quoting posts by way of javascript.
  *
  */
 
@@ -34,7 +34,7 @@ class Post_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		// figure out the right action to do.
+		// Figure out the right action to do.
 		// hint: I'm post controller. :P
 		$this->action_post();
 	}
@@ -53,8 +53,7 @@ class Post_Controller extends Action_Controller
 	 */
 	function action_post()
 	{
-		global $txt, $scripturl, $topic, $modSettings, $board;
-		global $user_info, $context, $options, $language;
+		global $txt, $scripturl, $topic, $modSettings, $board, $user_info, $context, $options, $language;
 
 		$db = database();
 
@@ -169,7 +168,6 @@ class Post_Controller extends Action_Controller
 
 			$context['can_lock'] = allowedTo('lock_any') || ($user_info['id'] == $id_member_poster && allowedTo('lock_own'));
 			$context['can_sticky'] = allowedTo('make_sticky') && !empty($modSettings['enableStickyTopics']);
-
 			$context['notify'] = !empty($context['notify']);
 			$context['sticky'] = isset($_REQUEST['sticky']) ? !empty($_REQUEST['sticky']) : $sticky;
 			$context['can_add_poll'] = (allowedTo('poll_add_any') || (!empty($_REQUEST['msg']) && $id_first_msg == $_REQUEST['msg'] && allowedTo('poll_add_own'))) && $modSettings['pollMode'] == '1' && $pollID <= 0;
@@ -201,6 +199,7 @@ class Post_Controller extends Action_Controller
 		$context['can_move'] = allowedTo('move_any');
 		$context['move'] = !empty($_REQUEST['move']);
 		$context['announce'] = !empty($_REQUEST['announce']);
+
 		if ($context['can_add_poll'])
 		{
 			addJavascriptVar(array(
@@ -385,6 +384,7 @@ class Post_Controller extends Action_Controller
 				$context['response_prefix'] = $txt['response_prefix'];
 				loadLanguage('index');
 			}
+
 			cache_put_data('response_prefix', $context['response_prefix'], 600);
 		}
 
@@ -464,6 +464,7 @@ class Post_Controller extends Action_Controller
 						'is_last' => false
 					);
 				}
+
 				$context['last_choice_id'] = $choice_id;
 				$context['choices'][count($context['choices']) - 1]['is_last'] = true;
 			}
@@ -512,7 +513,6 @@ class Post_Controller extends Action_Controller
 			// Set up the checkboxes.
 			$context['notify'] = !empty($_REQUEST['notify']);
 			$context['use_smileys'] = !isset($_REQUEST['ns']);
-
 			$context['icon'] = isset($_REQUEST['icon']) ? preg_replace('~[\./\\\\*\':"<>]~', '', $_REQUEST['icon']) : 'xx';
 
 			// Set the destination action for submission.

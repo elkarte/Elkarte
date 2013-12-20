@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * Handles all possible permission items, permissions by membergroup
+ * permissions by board, adding, modifying, etc
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,7 +12,7 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
  *
@@ -739,6 +742,7 @@ class ManagePermissions_Controller extends Action_Controller
 					{
 						// Create a shortcut for the current permission.
 						$curPerm = &$context['permissions'][$permissionType]['columns'][$position][$permissionGroup]['permissions'][$perm['id']];
+
 						if ($perm['has_own_any'])
 						{
 							$curPerm['any']['select'] = in_array($perm['id'] . '_any', $permissions[$permissionType]['allowed']) ? 'on' : (in_array($perm['id'] . '_any', $permissions[$permissionType]['denied']) ? 'denied' : 'off');
@@ -766,7 +770,7 @@ class ManagePermissions_Controller extends Action_Controller
 		checkSession();
 		validateToken('admin-mp');
 
-		// we'll need to init illegal permissions, update child permissions, etc.
+		// We'll need to init illegal permissions, update child permissions, etc.
 		require_once(SUBSDIR . '/Permission.subs.php');
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 
@@ -852,14 +856,14 @@ class ManagePermissions_Controller extends Action_Controller
 
 	/**
 	 * A screen to set some general settings for permissions.
-	 *
 	 */
 	public function action_permSettings_display()
 	{
 		global $context, $modSettings, $txt, $scripturl;
 
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
-		// initialize the form
+		
+		// Initialize the form
 		$this->_initPermSettingsForm();
 
 		$config_vars = $this->_permSettings->settings();

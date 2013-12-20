@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Moderation Center, provides at a glance view of moderation items to the team
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,11 +11,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * Moderation Center.
  *
  */
 
@@ -25,6 +25,11 @@ if (!defined('ELK'))
  */
 class ModerationCenter_Controller extends Action_Controller
 {
+	/**
+	 * Holds function array to pass to callMenu to call the right moderation area
+	 * 
+	 * @var array
+	 */
 	private $_mod_include_data;
 
 	/**
@@ -98,6 +103,7 @@ class ModerationCenter_Controller extends Action_Controller
 				),
 			)
 		);
+
 		$moderation_areas = array(
 			'main' => array(
 				'title' => $txt['mc_main'],
@@ -266,8 +272,8 @@ class ModerationCenter_Controller extends Action_Controller
 			'disable_url_session_check' => true,
 		);
 
-	// Let them modify PM areas easily.
-	call_integration_hook('integrate_moderation_areas', array(&$moderation_areas, &$menuOptions));
+		// Let them modify PM areas easily.
+		call_integration_hook('integrate_moderation_areas', array(&$moderation_areas, &$menuOptions));
 
 		$mod_include_data = createMenu($moderation_areas, $menuOptions);
 		unset($moderation_areas);
@@ -744,7 +750,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 */
 	public function action_modReport()
 	{
-		global $user_info, $context, $scripturl, $txt;
+		global $context, $scripturl, $txt;
 
 		// Have to at least give us something
 		if (empty($_REQUEST['report']))
@@ -1423,7 +1429,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 	/**
 	 * Callback for createList().
-	 *
+	 * @todo $approve_query is not used
 	 * @param string $approve_query
 	 */
 	public function list_getWatchedUserCount($approve_query)
@@ -1444,7 +1450,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 */
 	public function list_getWatchedUsers($start, $items_per_page, $sort, $approve_query, $dummy)
 	{
-		// find all our watched users
+		// Find all our watched users
 		return watchedUsers($start, $items_per_page, $sort, $approve_query, $dummy);
 	}
 
@@ -1471,7 +1477,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 */
 	public function list_getWatchedUserPosts($start, $items_per_page, $sort, $approve_query, $delete_boards)
 	{
-		// watched users posts
+		// Watched users posts
 		return watchedUserPosts($start, $items_per_page, $sort, $approve_query, $delete_boards);
 	}
 

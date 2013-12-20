@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Support functions for setting up the search features and creating search indexs
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -231,6 +233,10 @@ searchd
 
 /**
  * Drop one or more indexes from a table and adds them back if specified
+ *
+ * @param string $table
+ * @param mixed $indexes
+ * @param boolean $add
  */
 function alterFullTextIndex($table, $indexes, $add = false)
 {
@@ -262,7 +268,12 @@ function alterFullTextIndex($table, $indexes, $add = false)
 }
 
 /**
+ * Creates a custom search index
  *
+ * @param int $start
+ * @param int $messages_per_batch
+ * @param array $column_definition
+ * @param array $index_settings array containing specifics of what to create e.g. bytes per word
  */
 function createSearchIndex($start, $messages_per_batch, $column_definition, $index_settings)
 {
@@ -374,6 +385,12 @@ function createSearchIndex($start, $messages_per_batch, $column_definition, $ind
 	return array($start, $step, $percentage);
 }
 
+/**
+ * Removes common stop words from the index as they inhibit search performance
+ *
+ * @param int $start
+ * @param array $column_definition
+ */
 function removeCommonWordsFromIndex($start, $column_definition)
 {
 	global $modSettings;
@@ -425,6 +442,9 @@ function removeCommonWordsFromIndex($start, $column_definition)
 	return array($start, $complete);
 }
 
+/**
+ * Drops the log search words table(s)
+ */
 function drop_log_search_words()
 {
 	global $db_prefix;

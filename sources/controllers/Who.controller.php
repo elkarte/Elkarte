@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * This file is mainly concerned with the Who's Online list.
+ * Although, it also handles credits. :P
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,12 +12,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file is mainly concerned with the Who's Online list.
- * Although, it also handles credits. :P
  *
  */
 
@@ -28,11 +28,11 @@ class Who_Controller extends Action_Controller
 {
 	/**
 	 * Default action of this class.
-	 * ?action=who
+	 * Accessed with ?action=who
 	 */
 	public function action_index()
 	{
-		// we know how to... peek at who's online
+		// We know how to... peek at who's online
 		$this->action_who();
 	}
 
@@ -237,13 +237,15 @@ class Who_Controller extends Action_Controller
 		$context['can_send_pm'] = allowedTo('pm_send');
 		$context['can_send_email'] = allowedTo('send_email_to_members');
 
-		// any profile fields disabled?
+		// Any profile fields disabled?
 		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
 	}
 
 	/**
 	 * It prepares credit and copyright information for the credits page or the admin page.
 	 * Accessed by ?action=who;sa=credits
+	 * @uses Who language file
+	 * @uses Who template, credits sub template
 	 */
 	public function action_credits()
 	{

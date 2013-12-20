@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Displays and allows the changing of avatar settings
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -14,19 +16,33 @@ if (!defined('ELK'))
 
 /**
  * This is the avatars administration controller class.
- * It is doing the job of maintenance and allow display and change of admin settings.
+ * It is doing the job of maintenance and allow display and change of avatar settings.
  */
 class ManageAvatars_Controller extends Action_Controller
 {
 	/**
 	 * Avatars settings form
+	 *
 	 * @var Settings_Form
 	 */
 	protected $_avatarSettings;
 
+	/**
+	 * The Avatars admin area
+	 * This method is the entry point for index.php?action=admin;area=manageattachments;sa=avatars
+	 * and it calls a function based on the sub-action.
+	 *
+	 * Is called from ManageAttachments.controller.php
+	 * requires manage_attachments permissions
+	 *
+	 * @see Action_Controller::action_index()
+	 */
 	public function action_index()
 	{
 		global $context, $txt;
+
+		// You have to be able to moderate the forum to do this.
+		isAllowedTo('manage_attachments');
 
 		// We're working with them settings here.
 		require_once(SUBSDIR . '/Settings.class.php');
@@ -124,6 +140,7 @@ class ManageAvatars_Controller extends Action_Controller
 		$context['valid_avatar_dir'] = is_dir($modSettings['avatar_directory']);
 		$context['valid_custom_avatar_dir'] = empty($modSettings['custom_avatar_enabled']) || (!empty($modSettings['custom_avatar_dir']) && is_dir($modSettings['custom_avatar_dir']) && is_writable($modSettings['custom_avatar_dir']));
 
+		// Load the configuration vars for the form
 		$config_vars = array(
 			array('title', 'avatar_settings'),
 				array('check', 'avatar_default'),

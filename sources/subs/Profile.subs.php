@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Functions to support the profile controller
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -1141,8 +1143,7 @@ function profileValidateEmail($email, $memID = 0)
 /**
  * Save the profile changes
  *
- * @param array &$profile_variables
- * @param array &$post_errors
+ * @param array $profile_vars
  * @param int $memID id_member
  */
 function saveProfileChanges(&$profile_vars, $memID)
@@ -1816,7 +1817,7 @@ function profileReloadUser()
 /**
  * Validate the signature
  *
- * @param mixed &$value
+ * @param mixed $value
  */
 function profileValidateSignature(&$value)
 {
@@ -2009,7 +2010,7 @@ function profileValidateSignature(&$value)
  * The avatar is incredibly complicated, what with the options... and what not.
  * @todo argh, the avatar here. Take this out of here!
  *
- * @param array &$value
+ * @param array $value
  * @return mixed
  */
 function profileSaveAvatarData(&$value)
@@ -2273,7 +2274,7 @@ function profileSaveAvatarData(&$value)
 /**
  * Save a members group.
  *
- * @param int &$value
+ * @param int $value
  */
 function profileSaveGroups(&$value)
 {
@@ -2527,8 +2528,8 @@ function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, 
  * Gets the total number of attachments for the user
  * (used by createList() callbacks)
  *
- * @param type $boardsAllowed
- * @param type $memID
+ * @param array $boardsAllowed
+ * @param int $memID
  */
 function getNumAttachments($boardsAllowed, $memID)
 {
@@ -2728,8 +2729,8 @@ function count_user_topics($memID, $board = '')
  * Can limit the results to a particular board
  * Used to help limit queries by proving start/stop points
  *
- * @param type $memID
- * @param type $board
+ * @param int $memID
+ * @param int $board
  */
 function findMinMaxUserMessage($memID, $board = '')
 {
@@ -2886,7 +2887,7 @@ function load_user_topics($memID, $start, $count, $range_limit = '', $reverse = 
 /**
  * Loads the permissions that are given to a member group or set of groups
  *
- * @param type $curGroups
+ * @param array $curGroups
  */
 function getMemberGeneralPermissions($curGroups)
 {
@@ -3017,7 +3018,7 @@ function getMemberBoardPermissions($memID, $curGroups, $board = '')
 /**
  * Retrieves (most of) the IPs used by a certain member in his messages and errors
  *
- * @param int the id of the member
+ * @param int $memID the id of the member
  */
 function getMembersIPs($memID)
 {
@@ -3095,8 +3096,8 @@ function getMembersIPs($memID)
  * Return the details of the members using a certain range of IPs
  * except the current one
  *
- * @param array a list of IP addresses
- * @param int the id of the "current" member (maybe it could be retrieved with currentMemberID)
+ * @param array $ips a list of IP addresses
+ * @param int $memID the id of the "current" member (maybe it could be retrieved with currentMemberID)
  */
 function getMembersInRange($ips, $memID)
 {

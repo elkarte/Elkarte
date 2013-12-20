@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Used to allow users to like or unlike a post or an entire topic
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -117,7 +119,7 @@ class Likes_Controller extends Action_Controller
 						'type' => 'rlike',
 						'id_msg' => $id_liked,
 					));
-					
+
 					if (!empty($modSettings['mentions_dont_notify_rlike']))
 						$mentions->action_rlike();
 					else
@@ -135,9 +137,6 @@ class Likes_Controller extends Action_Controller
 
 	/**
 	 * Checks that few things are in order (in addition to permissions) for likes.
-	 *
-	 * @param type $id_liked
-	 * @return type
 	 */
 	private function prepare_like()
 	{

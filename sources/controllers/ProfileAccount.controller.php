@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Handles actions made against a user's profile.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,7 +11,7 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
  *
@@ -36,6 +38,8 @@ class ProfileAccount_Controller extends Action_Controller
 
 	/**
 	 * Issue/manage an user's warning status.
+	 * @uses ProfileAccount template issueWarning sub template
+	 * @uses Profile template
 	 */
 	public function action_issuewarning()
 	{
@@ -180,6 +184,7 @@ class ProfileAccount_Controller extends Action_Controller
 			$context['member']['warning'] = $_POST['warning_level'];
 		}
 
+		// Taking a look first, good idea that one.
 		if (isset($_POST['preview']))
 		{
 			$warning_body = !empty($_POST['warn_body']) ? trim(censorText($_POST['warn_body'])) : '';
@@ -235,6 +240,7 @@ class ProfileAccount_Controller extends Action_Controller
 				$context['current_level'] = $limit;
 		}
 
+		// Build a list to view the warnings
 		$listOptions = array(
 			'id' => 'issued_warnings',
 			'title' => $txt['profile_viewwarning_previous_warnings'],

@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This file takes care of actions on topics lock/unlock a topic, sticky/unsticky it
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,12 +11,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file takes care of actions on topics:
- * lock/unlock a topic, sticky/unsticky it
  *
  */
 
@@ -162,8 +161,7 @@ class Topic_Controller extends Action_Controller
 	 */
 	public function action_printpage()
 	{
-		global $topic, $txt, $scripturl, $context, $user_info;
-		global $board_info, $modSettings, $settings;
+		global $topic, $scripturl, $context, $user_info, $board_info, $modSettings;
 
 		// Redirect to the boardindex if no valid topic id is provided.
 		if (empty($topic))
@@ -211,6 +209,7 @@ class Topic_Controller extends Action_Controller
 		$context['poster_name'] = $topicinfo['poster_name'];
 		$context['post_time'] = relativeTime($topicinfo['poster_time'], false);
 		$context['parent_boards'] = array();
+
 		foreach ($board_info['parent_boards'] as $parent)
 			$context['parent_boards'][] = $parent['name'];
 

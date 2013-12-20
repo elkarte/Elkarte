@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Handles mail configuration, displays the queue and allows for the removal of specific items
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,7 +11,7 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
  *
@@ -21,7 +23,6 @@ if (!defined('ELK'))
 /**
  * This class is the administration mailing controller.
  * It handles mail configuration, it displays and allows to remove items from the mail queue.
- *
  */
 class ManageMail_Controller extends Action_Controller
 {
@@ -33,9 +34,9 @@ class ManageMail_Controller extends Action_Controller
 
 	/**
 	 * Main dispatcher.
-	 * This function checks permissions and passes control
-	 *  through to the relevant section.
+	 * This function checks permissions and passes control through to the relevant section.
 	 * @see Action_Controller::action_index()
+	 * @uses Help and MangeMail language files
 	 */
 	public function action_index()
 	{
@@ -76,6 +77,7 @@ class ManageMail_Controller extends Action_Controller
 
 	/**
 	 * Display the mail queue...
+	 * @uses ManageMail template
 	 */
 	public function action_browse()
 	{
@@ -91,11 +93,13 @@ class ManageMail_Controller extends Action_Controller
 			deleteMailQueueItems($_REQUEST['delete']);
 		}
 
+		// Fetch the number of items in the current queue
 		$status = list_MailQueueStatus();
 
 		$context['oldest_mail'] = empty($status['mailOldest']) ? $txt['mailqueue_oldest_not_available'] : $this->_time_since(time() - $status['mailOldest']);
 		$context['mail_queue_size'] = comma_format($status['mailQueueSize']);
 
+		// Build our display list
 		$listOptions = array(
 			'id' => 'mail_queue',
 			'title' => $txt['mailqueue_browse'],
@@ -214,6 +218,7 @@ class ManageMail_Controller extends Action_Controller
 
 	/**
 	 * Allows to view and modify the mail settings.
+	 * @uses show_settings sub template
 	 */
 	public function action_mailSettings_display()
 	{
@@ -223,10 +228,10 @@ class ManageMail_Controller extends Action_Controller
 		$context['page_title'] = $txt['calendar_settings'];
 		$context['sub_template'] = 'show_settings';
 
-		// initialize the form
+		// Initialize the form
 		$this->_initMailSettingsForm();
 
-		// piece of redundant code, for the javascript
+		// Piece of redundant code, for the javascript
 		$processedBirthdayEmails = array();
 		foreach ($txtBirthdayEmails as $key => $value)
 		{
@@ -261,8 +266,10 @@ class ManageMail_Controller extends Action_Controller
 		$context['post_url'] = $scripturl . '?action=admin;area=mailqueue;save;sa=settings';
 		$context['settings_title'] = $txt['mailqueue_settings'];
 
+		// Prepare the config form
 		Settings_Form::prepare_db($config_vars);
 
+		// Build a litte JS so the birthday mail can be seen
 		$javascript = '
 			var bDay = {';
 
@@ -276,14 +283,16 @@ class ManageMail_Controller extends Action_Controller
 				body: ' . JavaScriptEscape(nl2br($email['body'])) . '
 			}' . (!$is_last ? ',' : '');
 		}
+
 		addInlineJavascript($javascript . '
-	};
-	function fetch_birthday_preview()
-	{
-		var index = document.getElementById(\'birthday_email\').value;
-		document.getElementById(\'birthday_subject\').innerHTML = bDay[index].subject;
-		document.getElementById(\'birthday_body\').innerHTML = bDay[index].body;
-	}', true);
+		};
+		function fetch_birthday_preview()
+		{
+			var index = document.getElementById(\'birthday_email\').value;
+
+			document.getElementById(\'birthday_subject\').innerHTML = bDay[index].subject;
+			document.getElementById(\'birthday_body\').innerHTML = bDay[index].body;
+		}', true);
 	}
 
 	/**

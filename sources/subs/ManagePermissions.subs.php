@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Support functions and db interface functions for permissions
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -1012,7 +1014,6 @@ function fetchPermissions($id_group)
  * @param int $id_group
  * @param string $permission_type
  * @param int $profile_id
- * @return type
  */
 function fetchBoardPermissions($id_group, $permission_type, $profile_id)
 {

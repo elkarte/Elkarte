@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * Handles the Security and Moderation pages in the admin panel.  This includes
+ * bad behavior, anti spam, security and moderation settings
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,7 +12,7 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
  *
@@ -69,9 +72,6 @@ class ManageSecurity_Controller extends Action_Controller
 
 		call_integration_hook('integrate_modify_security', array(&$subActions));
 
-		// @FIXME
-		// loadGeneralSettingParameters($subActions, 'general');
-
 		// By default do the basic settings.
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'general';
 
@@ -107,16 +107,15 @@ class ManageSecurity_Controller extends Action_Controller
 	/**
 	 * Handle settings regarding general security of the site.
 	 * Uses a settings form for security options.
-	 *
 	 */
 	public function action_securitySettings_display()
 	{
 		global $txt, $scripturl, $context;
 
-		// initialize the form
+		// Initialize the form
 		$this->_initSecuritySettingsForm();
 
-		// retrieve the current config settings
+		// Retrieve the current config settings
 		$config_vars = $this->_securitySettings->settings();
 
 		// Saving?
@@ -146,7 +145,7 @@ class ManageSecurity_Controller extends Action_Controller
 		// We're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
 
-		// instantiate the form
+		// Instantiate the form
 		$this->_securitySettings = new Settings_Form();
 
 		// Initialize it with our settings
@@ -163,10 +162,10 @@ class ManageSecurity_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context, $modSettings;
 
-		// initialize the form
+		// Initialize the form
 		$this->_initModerationSettingsForm();
 
-		// retrieve the current config settings
+		// Retrieve the current config settings
 		$config_vars = $this->_moderationSettings->settings();
 
 		// Cannot use moderation if post moderation is not enabled.
@@ -257,7 +256,7 @@ class ManageSecurity_Controller extends Action_Controller
 			// Fix PM settings.
 			$_POST['pm_spam_settings'] = (int) $_POST['max_pm_recipients'] . ',' . (int) $_POST['pm_posts_verification'] . ',' . (int) $_POST['pm_posts_per_hour'];
 
-			// Hack in guest requiring verification!
+			// Guest requiring verification!
 			if (empty($_POST['posts_require_captcha']) && !empty($_POST['guests_require_captcha']))
 				$_POST['posts_require_captcha'] = -1;
 
@@ -274,10 +273,10 @@ class ManageSecurity_Controller extends Action_Controller
 			redirectexit('action=admin;area=securitysettings;sa=spam');
 		}
 
-		// Hack for PM spam settings.
+		// Add in PM spam settings on the fly
 		list ($modSettings['max_pm_recipients'], $modSettings['pm_posts_verification'], $modSettings['pm_posts_per_hour']) = explode(',', $modSettings['pm_spam_settings']);
 
-		// Hack for guests requiring verification.
+		// And the same for guests requiring verification.
 		$modSettings['guests_require_captcha'] = !empty($modSettings['posts_require_captcha']);
 		$modSettings['posts_require_captcha'] = !isset($modSettings['posts_require_captcha']) || $modSettings['posts_require_captcha'] == -1 ? 0 : $modSettings['posts_require_captcha'];
 
@@ -299,7 +298,7 @@ class ManageSecurity_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Settings.class.php');
 		require_once(SUBSDIR . '/VerificationControls.class.php');
 
-		// instantiate the form
+		// Instantiate the form
 		$this->_spamSettings = new Settings_Form();
 
 		// Initialize it with our settings
@@ -315,7 +314,7 @@ class ManageSecurity_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context, $modSettings, $boardurl;
 
-		// initialize the form
+		// Initialize the form
 		$this->_initBBSettingsForm();
 
 		// Our callback templates are here
@@ -366,7 +365,7 @@ class ManageSecurity_Controller extends Action_Controller
 
 				if (isset($_POST[$list]))
 				{
-					// clear blanks from the data field, only grab the comments that don't have blank data value
+					// Clear blanks from the data field, only grab the comments that don't have blank data value
 					$this_list = array_map('trim', array_filter($_POST[$list]));
 					$this_desc = array_intersect_key($_POST[$list . '_desc'], $this_list);
 				}
@@ -404,41 +403,13 @@ class ManageSecurity_Controller extends Action_Controller
 		// We're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
 
-		// instantiate the form
+		// Instantiate the form
 		$this->_bbSettings = new Settings_Form();
 
 		// Initialize it with our settings
 		$config_vars = $this->_bbSettings();
 
 		return $this->_bbSettings->settings($config_vars);
-	}
-
-	/**
-	 * This function makes sure the requested subaction does exist,
-	 *  if it doesn't, it sets a default action or.
-	 * @deprecated
-	 *
-	 * @param array $subActions = array() An array containing all possible subactions.
-	 * @param string $defaultAction = '' the default action to be called if no valid subaction was found.
-	 */
-	public function loadGeneralSettingParameters($subActions = array(), $defaultAction = '')
-	{
-		global $context;
-
-		// You need to be an admin to edit settings!
-		isAllowedTo('admin_forum');
-
-		loadLanguage('Help');
-		loadLanguage('ManageSettings');
-
-		// Will need the utility functions from here.
-		require_once(SUBSDIR . '/Settings.class.php');
-
-		$context['sub_template'] = 'show_settings';
-
-		// By default do the basic settings.
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (!empty($defaultAction) ? $defaultAction : array_pop($temp = array_keys($subActions)));
-		$context['sub_action'] = $_REQUEST['sa'];
 	}
 
 	/**

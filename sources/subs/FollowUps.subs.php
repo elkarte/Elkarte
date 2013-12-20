@@ -1,14 +1,14 @@
 <?php
 
 /**
+ * This file is mainly concerned with tasks relating to follow-ups, such as
+ * link messages and topics, delete follow-ups, etc.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Beta
- *
- * This file is mainly concerned with minor tasks relating to follow-ups, such as
- * link messages and topics, delete follow-ups, etc.
  *
  */
 
@@ -17,6 +17,9 @@ if (!defined('ELK'))
 
 /**
  * Retrieves all the follow-up topic for a certain message
+ *
+ * @param array $messages int array of message ids to work on
+ * @param boolean $include_approved
  */
 function followupTopics($messages, $include_approved = false)
 {
@@ -45,6 +48,9 @@ function followupTopics($messages, $include_approved = false)
 
 /**
  * Retrieves the message from which the topic started
+ *
+ * @param int $topic id of the original topic the threads were started from
+ * @param boolean $include_approved
  */
 function topicStartedHere($topic, $include_approved = false)
 {
@@ -73,6 +79,9 @@ function topicStartedHere($topic, $include_approved = false)
 
 /**
  * Simple function used to create a "followup" relation between a message and a topic
+ *
+ * @param int $msg message id
+ * @param int $topic topic id
  */
 function linkMessages($msg, $topic)
 {
@@ -89,7 +98,10 @@ function linkMessages($msg, $topic)
 /**
  * Used to break a "followup" relation between a message and a topic
  * Actually the function is not used at all...
+ *
  * @todo remove?
+ * @param int $msg message id
+ * @param int $topic topic id
  */
 function unlinkMessages($msg, $topic)
 {
@@ -109,6 +121,8 @@ function unlinkMessages($msg, $topic)
 
 /**
  * Removes all the follow-ups from the db by topics
+ *
+ * @param int $topics topic id
  */
 function removeFollowUpsByTopic($topics)
 {
@@ -125,6 +139,8 @@ function removeFollowUpsByTopic($topics)
 
 /**
  * Removes all the follow-ups from the db by message id
+ *
+ * @param mixed $msgs int or array of ints for the message id's to work on
  */
 function removeFollowUpsByMessage($msgs)
 {

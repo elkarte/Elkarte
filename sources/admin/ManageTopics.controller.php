@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Handles all the administration settings for topics and posts
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -62,10 +64,10 @@ class ManageTopics_Controller extends Action_Controller
 	{
 		global $context, $txt, $scripturl;
 
-		// initialize the form
+		// Initialize the form
 		$this->_initTopicSettingsForm();
 
-		// retrieve the current config settings
+		// Retrieve the current config settings
 		$config_vars = $this->_topicSettings->settings();
 
 		call_integration_hook('integrate_modify_topic_settings');

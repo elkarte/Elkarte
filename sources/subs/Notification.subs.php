@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Functions to support the sending of notifications (new posts, replys, topics)
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -25,6 +27,7 @@ if (!defined('ELK'))
  * @param array $exclude = array() - members in the exclude array will not be
  *                                   processed for the topic with the same key.
  * @param array $members_only = array() - are the only ones that will be sent the notification if they have it on.
+ * @param array $pbe = array() - array containing user_info if this is being run as a result of an email posting
  * @uses Post language file
  */
 function sendNotifications($topics, $type, $exclude = array(), $members_only = array(), $pbe = array())
@@ -398,7 +401,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
  * only sends notifications to those who can *currently* see the topic (it doesn't matter if they could when they requested notification.)
  * loads the Post language file multiple times for each language if the userLanguage setting is set.
  *
- * @param array &$topicData
+ * @param array $topicData
  */
 function sendBoardNotifications(&$topicData)
 {

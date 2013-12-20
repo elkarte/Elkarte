@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * Used when an Sphinx search daemon is running and access is via the Sphinx
+ * native search API (SphinxAPI)
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -38,7 +41,6 @@ class Sphinx_Search
 
 	/**
 	 * Is it supported?
-	 *
 	 * @var boolean
 	 */
 	public $is_supported = true;
@@ -81,9 +83,8 @@ class Sphinx_Search
 	/**
 	 * Check whether the method can be performed by this API.
 	 *
-	 * @param mixed $methodName
+	 * @param string $methodName
 	 * @param mixed $query_params
-	 * @return
 	 */
 	public function supportsMethod($methodName, $query_params = null)
 	{
@@ -101,14 +102,11 @@ class Sphinx_Search
 			default:
 				// All other methods, too bad dunno you.
 				return false;
-			return;
 		}
 	}
 
 	/**
 	 * If the settings don't exist we can't continue.
-	 *
-	 * @return type
 	 */
 	public function isValid()
 	{
@@ -139,11 +137,10 @@ class Sphinx_Search
 	/**
 	 * Do we have to do some work with the words we are searching for to prepare them?
 	 *
-	 * @param mixed $word
-	 * @param mixed $wordsSearch
-	 * @param mixed $wordsExclude
-	 * @param mixed $isExcluded
-	 * @return
+	 * @param array $word
+	 * @param array $wordsSearch
+	 * @param array $wordsExclude
+	 * @param array $isExcluded
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
 	{
@@ -157,6 +154,12 @@ class Sphinx_Search
 
 	/**
 	 * This has it's own custom search.
+	 *
+	 * @param array $search_params
+	 * @param array $search_words
+	 * @param array $excluded_words
+	 * @param array $participants
+	 * @param array $search_results
 	 */
 	public function searchQuery($search_params, $search_words, $excluded_words, &$participants, &$search_results)
 	{
@@ -165,9 +168,6 @@ class Sphinx_Search
 		// Only request the results if they haven't been cached yet.
 		if (($cached_results = cache_get_data('search_results_' . md5($user_info['query_see_board'] . '_' . $context['params']))) === null)
 		{
-			// @todo Should this not be in here?
-			// Seems to depend on Sphinx version, some need it in order to work and some don't work with it
-			//
 			// The API communicating with the search daemon.
 			require_once(SOURCEDIR . '/sphinxapi.php');
 

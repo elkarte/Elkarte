@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Handles all mark as read options, boards, topics, replies
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -42,24 +44,34 @@ class MarkRead_Controller extends Action_Controller
 	 */
 	private function _dispatch()
 	{
-		// sa=all action_markboards()
-		if (isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'all')
-			$sa = 'action_markboards';
-		elseif (isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'unreadreplies')
-			// mark topics from unread
-			$sa = 'action_markreplies';
-		elseif (isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'topic')
-			// mark a single topic as read
-			$sa = 'action_marktopic';
-		else
-			// the rest, for now...
-			$sa = 'action_markasread';
+		$subAction = isset($_REQUEST['sa']) ? $_REQUEST['sa'] : 'action_markasread';
 
-		return $this->{$sa}();
+		switch ($subAction)
+		{
+			// sa=all action_markboards()
+			case 'all':
+				$subAction = 'action_markboards';
+				break;
+			case 'unreadreplies':
+				// mark topics from unread
+				$subAction = 'action_markreplies';
+				break;
+			case 'topic':
+				// mark a single topic as read
+				$subAction = 'action_marktopic';
+				break;
+			default:
+				// the rest, for now...
+				$subAction = 'action_markasread';
+				break;
+		}
+
+		return $this->{$subAction}();
 	}
 
 	/**
 	 * This is the main method for markasread controller when using APIs.
+	 * @uses Xml template generic_xml_buttons sub template
 	 */
 	public function action_index_api()
 	{
@@ -91,6 +103,7 @@ class MarkRead_Controller extends Action_Controller
 					'error' => 1,
 					'url' => $scripturl . '?action=markasread;sa=all;' . $context['session_var'] . '=' . $context['session_id'],
 				);
+
 				return;
 			}
 			else
@@ -106,8 +119,8 @@ class MarkRead_Controller extends Action_Controller
 				'text' => $txt['unread_topics_visit_none'],
 			);
 		}
+		// No need to do anything, just die
 		else
-			// No need to do anything, just die
 			obExit(false);
 	}
 
@@ -124,8 +137,8 @@ class MarkRead_Controller extends Action_Controller
 		// Find all the boards this user can see.
 		$boards = accessibleBoards();
 
+		// Mark boards as read
 		if (!empty($boards))
-			// Mark boards as read
 			markBoardsRead($boards, isset($_REQUEST['unread']), true);
 
 		$_SESSION['id_msg_last_visit'] = $modSettings['maxMsgID'];

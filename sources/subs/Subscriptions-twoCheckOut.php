@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Payment Gateway: twocheckout
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -11,8 +13,6 @@
  *
  * @version 1.0 Beta
  *
- * Payment Gateway: twocheckout
- *
  */
 
 /**
@@ -20,8 +20,17 @@
  */
 class twocheckout_display
 {
+	/**
+	 * Name of this payment gateway
+	 * @var string
+	 */
 	public $title = 'twoCheckOut | 2co';
 
+	/**
+	 * Return the admin settings for this gateway
+	 *
+	 * @return array
+	 */
 	public function getGatewaySettings()
 	{
 		global $txt;
@@ -44,6 +53,19 @@ class twocheckout_display
 		return !empty($modSettings['2co_id']) && !empty($modSettings['2co_password']);
 	}
 
+	/**
+	 * What do we want?
+	 *
+	 * Called from Profile-Actions.php to return a unique set of fields for the given gateway
+	 * plus all the standard ones for the subscription form
+	 *
+	 * @param int $unique_id for the transaction
+	 * @param array $sub_data subscription data array, name, reocurring, etc
+	 * @param int $value amount of the transaction
+	 * @param string $period length of the transaction
+	 * @param string $return_url
+	 * @return string
+	 */
 	public function fetchGatewayFields($unique_id, $sub_data, $value, $period, $return_url)
 	{
 		global $modSettings, $txt, $context;
@@ -71,10 +93,23 @@ class twocheckout_display
 	}
 }
 
+/**
+ * Class of functions to validate a twocheckout payment response and provide details of the payment
+ */
 class twocheckout_payment
 {
+	/**
+	 * Holds our return results
+	 * @var array
+	 */
 	private $return_data;
 
+	/**
+	 * Validates that we have valid data to work with
+	 * Returns true/false for whether this gateway thinks the data is intended for it.
+	 *
+	 * @return boolean
+	 */
 	public function isValid()
 	{
 		global $modSettings;
@@ -82,9 +117,11 @@ class twocheckout_payment
 		// Is it even on?
 		if (empty($modSettings['2co_id']) || empty($modSettings['2co_password']))
 			return false;
+
 		// Is it a 2co hash?
 		if (empty($_POST['x_MD5_Hash']))
 			return false;
+
 		// Do we have an invoice number?
 		if (empty($_POST['x_invoice_num']))
 			return false;
@@ -92,6 +129,10 @@ class twocheckout_payment
 		return true;
 	}
 
+	/**
+	 * Validate this is valid for this transaction type.
+	 * If valid returns the subscription and member IDs we are going to process.
+	 */
 	public function precheck()
 	{
 		global $modSettings, $txt;

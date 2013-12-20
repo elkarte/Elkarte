@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Attachment display.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,14 +11,16 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
  *
- * Attachment display.
- *
  */
 
+/**
+ * Attachment_Controller class.  It downloads an attachment or avatar, and
+ * increments the download count where applicable.
+ */
 class Attachment_Controller extends Action_Controller
 {
 	/**
@@ -25,7 +29,7 @@ class Attachment_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		// default action to execute
+		// Default action to execute, guess which one
 		$this->action_dlattach();
 	}
 

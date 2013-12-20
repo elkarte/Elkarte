@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * This file is mainly concerned with minor tasks relating to boards, such as
+ * marking them read, collapsing categories, or quick moderation.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -13,9 +16,6 @@
  *
  * @version 1.0 Beta
  *
- * This file is mainly concerned with minor tasks relating to boards, such as
- * marking them read, collapsing categories, or quick moderation.
- *
  */
 
 if (!defined('ELK'))
@@ -26,6 +26,7 @@ if (!defined('ELK'))
  *
  * @param array $boards
  * @param bool $unread = false
+ * @param bool $resetTopics = false
  */
 function markBoardsRead($boards, $unread = false, $resetTopics = false)
 {
@@ -194,7 +195,7 @@ function getMsgMemberID($messageID)
  * Used by ManageBoards.controller.php to change the settings of a board.
  *
  * @param int $board_id
- * @param array &$boardOptions
+ * @param array $boardOptions
  */
 function modifyBoard($board_id, &$boardOptions)
 {
@@ -1115,8 +1116,8 @@ function getBoardList($boardListOptions = array(), $simple = false)
  * Recursively get a list of boards.
  * Used by getBoardTree
  *
- * @param array &$_boardList
- * @param array &$_tree
+ * @param array $_boardList
+ * @param array $_tree
  */
 function recursiveBoards(&$_boardList, &$_tree)
 {
@@ -1307,8 +1308,8 @@ function getBoardNotificationsCount($memID)
  * If $id_parents is given, return only the child boards of those boards.
  * If $id_boards is given, filters the boards to only those accessible
  *
- * @param @id_parents
- * @param $id_boards
+ * @param array $id_parents array of ints representing board ids
+ * @param array $id_boards
  */
 function accessibleBoards($id_parents = null, $id_boards = null)
 {
@@ -1363,7 +1364,7 @@ function accessibleBoards($id_parents = null, $id_boards = null)
 /**
  * Returns the boards the current user wants to see.
  *
- * @param string $see_board: one beteen 'query_see_board' and 'query_wanna_see_board'
+ * @param string $see_board either 'query_see_board' or 'query_wanna_see_board'
  * @param bool $hide_recycle is tru the recycle bin is not returned
  */
 function wantedBoards($see_board, $hide_recycle = true)
@@ -1399,8 +1400,8 @@ function wantedBoards($see_board, $hide_recycle = true)
  *  - if supplied a topic id will also return the message subject
  *  - honors query_see_board to ensure a user can see the information
  *
- * @param type $board_id
- * @param type $topic_id
+ * @param int $board_id
+ * @param int $topic_id
  */
 function boardInfo($board_id, $topic_id = null)
 {
@@ -1834,7 +1835,7 @@ function addChildBoards(&$boards)
 /**
  * Increment a board stat field, for example num_posts.
  *
- * @param int $board
+ * @param int $id_board
  * @param mixed $values an array of index => value of a string representing the index to increment
  */
 function incrementBoard($id_board, $values)
@@ -1877,7 +1878,7 @@ function incrementBoard($id_board, $values)
 /**
  * Decrement a board stat field, for example num_posts.
  *
- * @param int $board
+ * @param int $id_board
  * @param mixed $values an array of index => value of a string representing the index to decrement
  */
 function decrementBoard($id_board, $values)

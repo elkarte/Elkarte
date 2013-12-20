@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * This file contains just the functions that turn on and off notifications
+ * to topics or boards.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,12 +12,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file contains just the functions that turn on and off notifications
- * to topics or boards.
  *
  */
 
@@ -49,7 +49,7 @@ class Notify_Controller extends Action_Controller
 	 */
 	public function action_notify()
 	{
-		global $topic, $scripturl, $txt, $topic, $user_info, $context;
+		global $topic, $scripturl, $txt, $user_info, $context;
 
 		// Make sure they aren't a guest or something - guests can't really receive notifications!
 		is_not_guest();

@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Handles administration options for BBC tags.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -19,10 +21,20 @@ class ManageBBC_Controller extends Action_Controller
 {
 	/**
 	 * BBC settings form
+	 *
 	 * @var Settings_Form
 	 */
 	protected $_bbcSettings;
 
+	/**
+	 * The BBC admin area
+	 * This method is the entry point for index.php?action=admin;area=postsettings;sa=bbc
+	 * and it calls a function based on the sub-action, here only display.
+	 *
+	 * requires admin_forum permissions
+	 *
+	 * @see Action_Controller::action_index()
+	 */
 	public function action_index()
 	{
 		global $context, $txt;
@@ -52,16 +64,13 @@ class ManageBBC_Controller extends Action_Controller
 	 * Administration page in Posts and Topics > BBC.
 	 * This method handles displaying and changing which BBC tags are enabled on the forum.
 	 *
-	 * requires the admin_forum permission.
-	 * Accessed from ?action=admin;area=postsettings;sa=bbc.
-	 *
 	 * @uses Admin template, edit_bbc_settings sub-template.
 	 */
 	public function action_bbcSettings_display()
 	{
 		global $context, $txt, $modSettings, $scripturl;
 
-		// initialize the form
+		// Initialize the form
 		$this->_initBBCSettingsForm();
 
 		$config_vars = $this->_bbcSettings->settings();
@@ -92,23 +101,23 @@ class ManageBBC_Controller extends Action_Controller
 				$_POST['disabledBBC_enabledTags'] = array();
 			elseif (!is_array($_POST['disabledBBC_enabledTags']))
 				$_POST['disabledBBC_enabledTags'] = array($_POST['disabledBBC_enabledTags']);
+
 			// Work out what is actually disabled!
 			$_POST['disabledBBC'] = implode(',', array_diff($bbcTags, $_POST['disabledBBC_enabledTags']));
 
-			// notify addons and integrations
+			// Notify addons and integrations
 			call_integration_hook('integrate_save_bbc_settings', array($bbcTags));
 
-			// save the result
+			// Save the result
 			Settings_Form::save_db($config_vars);
 
-			// and we're out of here!
+			// And we're out of here!
 			redirectexit('action=admin;area=postsettings;sa=bbc');
 		}
 
 		// Make sure the template stuff is ready now...
 		$context['sub_template'] = 'show_settings';
 		$context['page_title'] = $txt['manageposts_bbc_settings_title'];
-
 		$context['post_url'] = $scripturl . '?action=admin;area=postsettings;save;sa=bbc';
 		$context['settings_title'] = $txt['manageposts_bbc_settings_title'];
 
@@ -117,8 +126,6 @@ class ManageBBC_Controller extends Action_Controller
 
 	/**
 	 * Initializes the form with the current BBC settings of the forum.
-	 *
-	 * @return array
 	 */
 	private function _initBBCSettingsForm()
 	{

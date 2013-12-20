@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * The main purpose of this file is to show a list of all errors that were
+ * logged on the forum, and allow filtering and deleting them.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,12 +12,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * The main purpose of this file is to show a list of all errors that were
- * logged on the forum, and allow filtering and deleting them.
  *
  */
 
@@ -43,10 +43,10 @@ class ManageErrors_Controller extends Action_Controller
 
 		// Some code redundancy... and we only take this!
 		if (isset($activity) && $activity == 'file')
-			// view the file with the error
+			// View the file with the error
 			$this->action_viewfile();
 		else
-			// view error log
+			// View error log
 			$this->action_log();
 	}
 
@@ -62,7 +62,7 @@ class ManageErrors_Controller extends Action_Controller
 	{
 		global $scripturl, $txt, $context, $modSettings, $user_profile, $filter;
 
-		// we'll escape some strings...
+		// We'll escape some strings...
 		$db = database();
 
 		require_once(SUBSDIR . '/Error.subs.php');
@@ -108,13 +108,14 @@ class ManageErrors_Controller extends Action_Controller
 
 			deleteErrors($type, $filter, $error_list);
 
-			// // Go back to where we were.
+			// Go back to where we were.
 			if ($type == 'delete')
 				redirectexit('action=admin;area=logs;sa=errorlog' . (isset($_REQUEST['desc']) ? ';desc' : '') . ';start=' . $_GET['start'] . (isset($filter) ? ';filter=' . $_GET['filter'] . ';value=' . $_GET['value'] : ''));// Go back to where we were.
 
 			redirectexit('action=admin;area=logs;sa=errorlog' . (isset($_REQUEST['desc']) ? ';desc' : ''));
 
 		}
+
 		$num_errors = numErrors($filter);
 
 		// If this filter is empty...
@@ -197,6 +198,7 @@ class ManageErrors_Controller extends Action_Controller
 			'url' => $scripturl . '?action=admin;area=logs;sa=errorlog' . ($context['sort_direction'] == 'down' ? ';desc' : ''),
 			'is_selected' => empty($filter),
 		);
+
 		// Update the all errors tab with the total number of errors
 		$context['error_types']['all']['label'] .= ' (' . $sum . ')';
 
@@ -216,9 +218,11 @@ class ManageErrors_Controller extends Action_Controller
 
 	/**
 	 * View a file specified in $_REQUEST['file'], with php highlighting on it
+	 *
 	 * Preconditions:
 	 *  - file must be readable,
 	 *  - full file path must be base64 encoded,
+	 *
 	 * The line number number is specified by $_REQUEST['line']...
 	 * The function will try to get the 20 lines before and after the specified line.
 	 */
@@ -247,7 +251,7 @@ class ManageErrors_Controller extends Action_Controller
 		if ($ext !== '.php' || (strpos($file, $real_board) === false && strpos($file, $real_source) === false) || strpos($file, $real_cache) !== false || in_array($basename, $excluded) || !is_readable($file))
 			fatal_lang_error('error_bad_file', true, array(htmlspecialchars($filename, ENT_COMPAT, 'UTF-8')));
 
-		// get the min and max lines
+		// Get the min and max lines
 		$min = $line - 16 <= 0 ? 1 : $line - 16;
 		$max = $line + 21; // One additional line to make everything work out correctly
 

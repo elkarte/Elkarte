@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This file allows you to manage the calendar.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,17 +11,19 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file allows you to manage the calendar.
  *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * This class controls execution for actions in the manage calendar area
+ * of the admin panel.
+ */
 class ManageCalendar_Controller extends Action_Controller
 {
 	/**
@@ -32,7 +36,7 @@ class ManageCalendar_Controller extends Action_Controller
 	 * The main controlling function doesn't have much to do... yet.
 	 * Just check permissions and delegate to the rest.
 	 *
-	 * uses ManageCalendar language file.
+	 * @uses ManageCalendar language file.
 	 */
 	public function action_index()
 	{
@@ -192,6 +196,8 @@ class ManageCalendar_Controller extends Action_Controller
 
 	/**
 	 * This function is used for adding/editing a specific holiday
+	 *
+	 * @uses ManageCalendar template, edit_holiday sub template
 	 */
 	public function action_editholiday()
 	{
@@ -260,7 +266,7 @@ class ManageCalendar_Controller extends Action_Controller
 	{
 		global $context, $scripturl;
 
-		// initialize the form
+		// Initialize the form
 		$this->_initCalendarSettingsForm();
 
 		$config_vars = $this->_calendarSettings->settings();

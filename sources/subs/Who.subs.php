@@ -1,13 +1,13 @@
 <?php
 
 /**
+ * This file contains nosey functions so show where a user is active
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Beta
- *
- * This file contains nosy functions.
  *
  */
 

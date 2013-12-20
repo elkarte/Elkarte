@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Used to combine css and js files in to a single compressed file
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -77,10 +79,13 @@ class Site_Combiner
 
 	/**
 	 * Nothing much to do but start
+	 *
+	 * @param string $cachedir
+	 * @param string $cacheurl
 	 */
 	public function __construct($cachedir, $cacheurl)
 	{
-		// init
+		// Init
 		$this->_archive_dir = $cachedir;
 		$this->_archive_url = $cacheurl;
 	}
@@ -234,6 +239,7 @@ class Site_Combiner
 
 	/**
 	 * Combines files into a single compilation
+	 * @param string $type one of css or js
 	 */
 	private function _combineFiles($type = null)
 	{

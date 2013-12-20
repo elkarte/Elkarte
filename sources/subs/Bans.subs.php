@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This file contains functions that are specifically done by administrators.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,8 +14,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file contains functions that are specifically done by administrators.
  *
  */
 
@@ -77,6 +77,7 @@ function saveTriggers($suggestions, $ban_group, $member = 0, $ban_id = 0)
  * Doesn't clean the inputs
  *
  * @param array $items_ids
+ * @param boolean $group_id
  * @return bool
  */
 function removeBanTriggers($items_ids = array(), $group_id = false)
@@ -152,7 +153,7 @@ function removeBanGroups($group_ids)
  * Removes logs - by default truncate the table
  * Doesn't clean the inputs
  *
- * @param array (optional) $ids
+ * @param array $ids (optional)
  * @return bool
  */
 function removeBanLogs($ids = array())
@@ -933,10 +934,18 @@ function updateBanMembers()
 	updateStats('member');
 }
 
+/**
+ * Returns member data for a given member id in a suggestion format used by bans
+ * @uses getBasicMemberData
+ *
+ * @param int $id
+ */
 function getMemberData($id)
 {
 	$suggestions = array();
+
 	require_once(SUBSDIR . '/Members.subs.php');
+
 	$result = getBasicMemberData($id, array('moderation' => true));
 	if (!empty($result))
 		$suggestions = array(
@@ -1431,9 +1440,8 @@ function banLoadAdditionalIPs($member_id)
 /**
  * Fetches ban details
  *
- * @param type $ban_id
- * @param type $ban_group
- * @return type
+ * @param int $ban_id
+ * @param int $ban_group
  */
 function banDetails($ban_id, $ban_group)
 {

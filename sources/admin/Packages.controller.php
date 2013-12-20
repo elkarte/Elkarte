@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This file is the main Package Manager.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,11 +11,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file is the main Package Manager.
  *
  */
 
@@ -22,7 +22,7 @@ if (!defined('ELK'))
 
 /**
  * This class is the administration package manager controller.
- * Its main job is to install/uninstall, allow to browse, packages and package servers.
+ * Its main job is to install/uninstall, allow to browse, packages.
  * In fact, just about everything related to addon packages, including FTP connections when necessary.
  */
 class Packages_Controller extends Action_Controller
@@ -90,7 +90,7 @@ class Packages_Controller extends Action_Controller
 			),
 		);
 
-		// lets just do it!
+		// Lets just do it!
 		$action->dispatch($subAction);
 	}
 
@@ -272,7 +272,7 @@ class Packages_Controller extends Action_Controller
 		$context['has_failure'] = false;
 		$chmod_files = array();
 
-		// no actions found, return so we can display an error
+		// No actions found, return so we can display an error
 		if (empty($actions))
 			return;
 
@@ -517,7 +517,7 @@ class Packages_Controller extends Action_Controller
 				$installed_version = false;
 				$version_check = true;
 
-				// package missing required values?
+				// Package missing required values?
 				if (!isset($action['id']))
 					$context['has_failure'] = true;
 				else
@@ -769,11 +769,13 @@ class Packages_Controller extends Action_Controller
 			if (!file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
 			{
 				foreach ($context['extracted_files'] as $file)
+				{
 					if (basename($file['filename']) == 'package-info.xml')
 					{
 						$context['base_path'] = dirname($file['filename']) . '/';
 						break;
 					}
+				}
 			}
 
 			if (!isset($context['base_path']))
@@ -1024,9 +1026,8 @@ class Packages_Controller extends Action_Controller
 					/**
 					 * Table sorting function used in usort
 					 *
-					 * @param type $a
-					 * @param type $b
-					 * @return int
+					 * @param array $a
+					 * @param array $b
 					 */
 					function sort_table_first($a, $b)
 					{
@@ -1061,6 +1062,7 @@ class Packages_Controller extends Action_Controller
 				// Add to the log packages
 				addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $package_installed['db_changes'], $is_upgrade, $credits_tag);
 			}
+
 			$context['install_finished'] = true;
 		}
 
@@ -1367,6 +1369,7 @@ class Packages_Controller extends Action_Controller
 
 	/**
 	 * Test an FTP connection.
+	 * @uses Xml Template, generic_xml sub template
 	 */
 	public function action_ftptest()
 	{
@@ -1933,8 +1936,7 @@ class Packages_Controller extends Action_Controller
 				/**
 				 * Counts all the directorys under a given path
 				 *
-				 * @param type $dir
-				 * @return integer
+				 * @param string $dir
 				 */
 				function count_directories__recursive($dir)
 				{
@@ -1955,6 +1957,7 @@ class Packages_Controller extends Action_Controller
 
 					return $count;
 				}
+
 				foreach ($context['file_tree'] as $path => $data)
 				{
 					if (is_dir($path))
@@ -1974,8 +1977,8 @@ class Packages_Controller extends Action_Controller
 				/**
 				 * Builds a list of special files recursively for a given path
 				 *
-				 * @param type $path
-				 * @param type $data
+				 * @param string $path
+				 * @param array $data
 				 */
 				function build_special_files__recursive($path, &$data)
 				{
@@ -2064,7 +2067,6 @@ class Packages_Controller extends Action_Controller
 	 * @param string $sort
 	 * @param array $params
 	 * @param bool $installed
-	 * @return type
 	 */
 	function list_packages($start, $items_per_page, $sort, $params, $installed)
 	{
@@ -2336,7 +2338,6 @@ class Packages_Controller extends Action_Controller
  * @param string $path
  * @param array $data
  * @param int $level
- * @return type
  */
 function fetchPerms__recursive($path, &$data, $level)
 {
