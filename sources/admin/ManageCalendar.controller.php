@@ -330,7 +330,7 @@ class ManageCalendar_Controller extends Action_Controller
 
 		// Load the boards list.
 		require_once(SUBSDIR . '/Boards.subs.php');
-		$boards_list = getBoardList(array('not_redirection' => true), true);
+		$boards_list = getBoardList(array('override_permissions' => true, 'not_redirection' => true), true);
 		$boards = array('');
 		foreach ($boards_list as $board)
 			$boards[$board['id_board']] = $board['cat_name'] . ' - ' . $board['board_name'];

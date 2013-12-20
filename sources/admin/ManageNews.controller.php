@@ -546,7 +546,7 @@ class ManageNews_Controller extends Action_Controller
 				foreach ($_POST['groups'] as $group => $dummy)
 					$context['recipients']['groups'][] = (int) $group;
 			}
-			else
+			elseif (trim($_POST['groups']) != '')
 			{
 				$groups = explode(',', $_POST['groups']);
 				foreach ($groups as $group)
@@ -562,7 +562,7 @@ class ManageNews_Controller extends Action_Controller
 				foreach ($_POST['exclude_groups'] as $group => $dummy)
 					$context['recipients']['exclude_groups'][] = (int) $group;
 			}
-			else
+			elseif (trim($_POST['exclude_groups']) != '')
 			{
 				$groups = explode(',', $_POST['exclude_groups']);
 				foreach ($groups as $group)
@@ -746,6 +746,7 @@ class ManageNews_Controller extends Action_Controller
 
 			// Get the smelly people - note we respect the id_member range as it gives us a quicker query.
 			$recipients = getNewsletterRecipients($sendQuery, $sendParams, $context['start'], $num_at_once, $i);
+
 			foreach ($recipients as $row)
 			{
 				$last_id_member = $row['id_member'];

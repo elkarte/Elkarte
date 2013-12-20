@@ -298,7 +298,7 @@ class Groups_Controller extends Action_Controller
 			checkSession();
 			validateToken('mod-mgm');
 
-			$member_query = array('and' => array('not_in_group'), 'or' => array());
+			$member_query = array(array('and' => 'not_in_group'));
 			$member_parameters = array('not_in_group' => $current_group);
 
 			// Get all the members to be added... taking into account names can be quoted ;)
@@ -328,13 +328,13 @@ class Groups_Controller extends Action_Controller
 			// Construct the query pelements.
 			if (!empty($member_ids))
 			{
-				$member_query['or'][] = 'member_ids';
+				$member_query[] = array('or' => 'member_ids');
 				$member_parameters['member_ids'] = $member_ids;
 			}
 
 			if (!empty($member_names))
 			{
-				$member_query['or'][] = 'member_names';
+				$member_query[] = array('or' => 'member_names');
 				$member_parameters['member_names'] = $member_names;
 			}
 
@@ -376,7 +376,7 @@ class Groups_Controller extends Action_Controller
 			$where = $context['group']['is_post_group'] ? 'in_post_group' : 'in_group_no_add';
 
 		// Count members of the group.
-		$context['total_members'] = countMembersBy(array('or' => array($where)), array($where => $current_group));
+		$context['total_members'] = countMembersBy($where, array($where => $current_group));
 		$context['total_members'] = comma_format($context['total_members']);
 
 		// Create the page index.
@@ -384,7 +384,7 @@ class Groups_Controller extends Action_Controller
 		$context['start'] = $_REQUEST['start'];
 		$context['can_moderate_forum'] = allowedTo('moderate_forum');
 
-		$context['members'] = membersBy(array('or' => array($where)), array($where => $current_group), true);
+		$context['members'] = membersBy($where, array($where => $current_group), true);
 		foreach ($context['members'] as $id => $row)
 		{
 			$last_online = empty($row['last_login']) ? $txt['never'] : standardTime($row['last_login']);

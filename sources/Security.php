@@ -1469,6 +1469,10 @@ function validatePasswordFlood($id_member, $password_flood_value = false, $was_c
 		fatal_lang_error('no_access', false);
 	}
 
+	// Let's just initialize to something (and 0 is better than nothing)
+	$time_stamp = 0;
+	$number_tries = 0;
+
 	// Right, have we got a flood value?
 	if ($password_flood_value !== false)
 		@list ($time_stamp, $number_tries) = explode('|', $password_flood_value);
@@ -1477,7 +1481,7 @@ function validatePasswordFlood($id_member, $password_flood_value = false, $was_c
 	if (empty($number_tries) || $time_stamp < (time() - 10))
 	{
 		// If it wasn't *that* long ago, don't give them another five goes.
-		$number_tries = !empty($number_tries) && $time_stamp < (time() - 20) ? 2 : 0;
+		$number_tries = !empty($number_tries) && $time_stamp < (time() - 20) ? 2 : $number_tries;
 		$time_stamp = time();
 	}
 

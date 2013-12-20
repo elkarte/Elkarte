@@ -381,7 +381,7 @@ function determineActions($urls, $preferred_prefix = false)
 	{
 		require_once(SUBSDIR . '/Boards.subs.php');
 
-		$boards_list = getBoardList(array('use_permissions' => true, 'included_boards' => array_keys($board_ids)), true);
+		$boards_list = getBoardList(array('included_boards' => array_keys($board_ids)), true);
 		foreach ($boards_list as $board)
 		{
 			// Put the board name into the string for each member...

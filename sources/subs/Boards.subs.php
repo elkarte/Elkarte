@@ -994,10 +994,10 @@ function getBoardList($boardListOptions = array(), $simple = false)
 		$where_parameters['current_member'] = $boardListOptions['moderator'];
 	}
 
-	if (!empty($boardListOptions['ignore_boards']))
+	if (!empty($boardListOptions['ignore_boards']) && empty($boardListOptions['override_permissions']))
 		$where[] = '{query_wanna_see_board}';
 
-	elseif (!empty($boardListOptions['use_permissions']))
+	elseif (empty($boardListOptions['override_permissions']))
 		$where[] = '{query_see_board}';
 
 	if (!empty($boardListOptions['not_redirection']))
@@ -1372,6 +1372,7 @@ function wantedBoards($see_board, $hide_recycle = true)
 	global $modSettings, $user_info;
 
 	$db = database();
+	$boards = array();
 	$allowed_see = array(
 		'query_see_board',
 		'query_wanna_see_board'

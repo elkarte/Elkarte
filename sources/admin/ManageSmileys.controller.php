@@ -1322,7 +1322,6 @@ class ManageSmileys_Controller extends Action_Controller
 
 			// Get a list of boards needed for assigning this icon to a specific board.
 			$boardListOptions = array(
-				'use_permissions' => true,
 				'selected_board' => isset($context['icon']['board_id']) ? $context['icon']['board_id'] : 0,
 			);
 			require_once(SUBSDIR . '/Boards.subs.php');

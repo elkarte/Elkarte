@@ -152,7 +152,7 @@ class Search_Controller extends Action_Controller
 		}
 
 		require_once(SUBSDIR . '/Boards.subs.php');
-		$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true));
+		$context += getBoardList(array('not_redirection' => true));
 		foreach ($context['categories'] as &$category)
 		{
 			$category['child_ids'] = array_keys($category['boards']);

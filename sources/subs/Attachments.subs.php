@@ -2037,6 +2037,7 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
 
 	$repair_errors = array(
 		'wrong_folder' => 0,
+		'missing_extension' => 0,
 		'file_missing_on_disk' => 0,
 		'file_size_of_zero' => 0,
 		'file_wrong_size' => 0
@@ -2065,8 +2066,8 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
 			// If we're lucky it might just be in a different folder.
 			if (!empty($modSettings['currentAttachmentUploadDir']))
 			{
-				// Get the attachment name with out the folder.
-				$attachment_name = !empty($row['file_hash']) ? $row['id_attach'] . '_' . $row['file_hash'] : getLegacyAttachmentFilename($row['filename'], $row['id_attach'], null, true);
+				// Get the attachment name without the folder.
+				$attachment_name = !empty($row['file_hash']) ? $row['id_attach'] . '_' . $row['file_hash'] . '.elk' : getLegacyAttachmentFilename($row['filename'], $row['id_attach'], null, true);
 
 				if (!is_array($modSettings['attachmentUploadDir']))
 					$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
@@ -2084,6 +2085,34 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
 
 						// Found it, on to the next attachment
 						continue 2;
+					}
+				}
+
+				if (!empty($row['file_hash']))
+				{
+					// It may be without the elk extension (something wrong during upgrade/conversion)
+					$attachment_name =  $row['id_attach'] . '_' . $row['file_hash'];
+
+					if (!is_array($modSettings['attachmentUploadDir']))
+						$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
+
+					// Loop through the other folders looking for this file
+					foreach ($modSettings['attachmentUploadDir'] as $id => $dir)
+					{
+						if (file_exists($dir . '/' . $attachment_name))
+						{
+							$repair_errors['missing_extension']++;
+
+							// Are we going to fix this now?
+							if ($fix_errors && in_array('missing_extension', $to_fix))
+							{
+								rename($dir . '/' . $attachment_name, $dir . '/' . $attachment_name . '.elk');
+								attachment_folder($row['id_attach'], $id);
+							}
+
+							// Found it, on to the next attachment
+							continue 2;
+						}
 					}
 				}
 			}

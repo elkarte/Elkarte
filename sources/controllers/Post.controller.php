@@ -337,7 +337,6 @@ class Post_Controller extends Action_Controller
 				$boardListOptions = array(
 					'included_boards' => in_array(0, $boards) ? null : $boards,
 					'not_redirection' => true,
-					'use_permissions' => true,
 					'selected_board' => empty($context['current_board']) ? $modSettings['cal_defaultboard'] : $context['current_board'],
 				);
 				$context += getBoardList($boardListOptions);
@@ -597,7 +596,7 @@ class Post_Controller extends Action_Controller
 			$context['original_post'] = isset($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'];
 			$context['show_boards_dropdown'] = true;
 			require_once(SUBSDIR . '/Boards.subs.php');
-			$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true, 'allowed_to' => 'post_new'));
+			$context += getBoardList(array('not_redirection' => true, 'allowed_to' => 'post_new'));
 			$context['boards_current_disabled'] = false;
 			if (!empty($board))
 			{
@@ -1469,10 +1468,9 @@ class Post_Controller extends Action_Controller
 
 		if (!empty($modSettings['mentions_enabled']) && !empty($_REQUEST['uid']))
 		{
-			$query = array('and' => array('member_ids'));
 			$query_params['member_ids'] = array_unique(array_map('intval', $_REQUEST['uid']));
 			require_once(SUBSDIR . '/Members.subs.php');
-			$mentioned_members = membersBy($query, $query_params, true);
+			$mentioned_members = membersBy('member_ids', $query_params, true);
 			$replacements = 0;
 			$actually_mentioned = array();
 			foreach ($mentioned_members as $member)

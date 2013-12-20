@@ -76,14 +76,14 @@ class MoveTopic_Controller extends Action_Controller
 
 		// Get a list of boards this moderator can move to.
 		require_once(SUBSDIR . '/Boards.subs.php');
-		$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true));
+		$context += getBoardList(array('not_redirection' => true));
 
 		// No boards?
 		if (empty($context['categories']) || $context['num_boards'] == 1)
 			fatal_lang_error('moveto_noboards', false);
 
 		// Already used the function, let's set the selected board back to the last
-		$last_moved_to = isset($_SESSION['move_to_topic']['move_to']) ? (int) $_SESSION['move_to_topic']['move_to'] : 0;
+		$last_moved_to = isset($_SESSION['move_to_topic']['move_to']) && $_SESSION['move_to_topic']['move_to'] != $context['current_board'] ? (int) $_SESSION['move_to_topic']['move_to'] : 0;
 		if (!empty($last_moved_to))
 		{
 			foreach ($context['categories'] as $id => $values)

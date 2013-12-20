@@ -454,7 +454,7 @@ class ManageMembergroups_Controller extends Action_Controller
 		$context['groups'] = getBasicMembergroupData(array('globalmod'), array(), 'min_posts, id_group != {int:global_mod_group}, group_name');
 
 		require_once(SUBSDIR . '/Boards.subs.php');
-		$context += getBoardList(array('use_permissions' => true));
+		$context += getBoardList();
 
 		// Include a list of boards per category for easy toggling.
 		foreach ($context['categories'] as $category)
@@ -728,7 +728,7 @@ class ManageMembergroups_Controller extends Action_Controller
 		if ($row['id_group'] == 2 || $row['id_group'] > 3)
 		{
 			require_once(SUBSDIR . '/Boards.subs.php');
-			$context += getBoardList(array('access' => $row['id_group'], 'not_redirection' => true));
+			$context += getBoardList(array('override_permissions' => true, 'access' => $row['id_group'], 'not_redirection' => true));
 
 			// Include a list of boards per category for easy toggling.
 			foreach ($context['categories'] as $category)

@@ -308,7 +308,7 @@ class Maintenance_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Boards.subs.php');
 		// Let's load up the boards in case they are useful.
-		$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true));
+		$context += getBoardList(array('not_redirection' => true));
 
 		if (isset($_GET['done']) && $_GET['done'] == 'purgeold')
 			$context['maintenance_finished'] = $txt['maintain_old'];
