@@ -1371,6 +1371,7 @@ function wantedBoards($see_board, $hide_recycle = true)
 	global $modSettings, $user_info;
 
 	$db = database();
+	$boards = array();
 	$allowed_see = array(
 		'query_see_board',
 		'query_wanna_see_board'
