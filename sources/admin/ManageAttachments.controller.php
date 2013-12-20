@@ -845,6 +845,7 @@ class ManageAttachments_Controller extends Action_Controller
 			{
 				$to_remove = array();
 				$repair_errors = repairAttachmentData($_GET['substep'], $fix_errors, $to_fix);
+
 				foreach($repair_errors as $key => $value)
 					$context['repair_errors'][$key] += $value;
 
@@ -966,7 +967,12 @@ class ManageAttachments_Controller extends Action_Controller
 
 		// What stage are we at?
 		$context['completed'] = $fix_errors ? true : false;
-		$context['errors_found'] = !empty($to_fix) ? true : false;
+		foreach ($context['repair_errors'] as $number)
+			if (!empty($number))
+			{
+				$context['errors_found'] = true;
+				break;
+			}
 	}
 
 	/**
