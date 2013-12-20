@@ -790,6 +790,7 @@ class ManageAttachments_Controller extends Action_Controller
 			'attachment_no_msg' => 0,
 			'avatar_no_member' => 0,
 			'wrong_folder' => 0,
+			'missing_extension' => 0,
 			'files_without_attachment' => 0,
 		);
 

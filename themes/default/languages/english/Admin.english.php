@@ -526,6 +526,7 @@ $txt['attach_repair_file_size_of_zero'] = '%1$d attachments/avatars have a size 
 $txt['attach_repair_attachment_no_msg'] = '%1$d attachments no longer have a message associated with them';
 $txt['attach_repair_avatar_no_member'] = '%1$d avatars no longer have a member associated with them';
 $txt['attach_repair_wrong_folder'] = '%1$d attachments are in the wrong directory';
+$txt['attach_repair_missing_extension'] = '%1$d attachments do not have the proper extension and may be in the wrong directory';
 $txt['attach_repair_files_without_attachment'] = '%1$d files do not have a corresponding entry in the database. (These will be deleted)';
 
 $txt['news_title'] = 'News and Newsletters';
