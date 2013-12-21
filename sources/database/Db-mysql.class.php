@@ -954,7 +954,7 @@ class Database_MySQL implements Database
 					$field_list[] = '\'' . $this->escape_string($item) . '\'';
 			}
 
-			$data .= '(' . implode(', ', $field_list) . ')' . ',' . $crlf . "\t";
+			$data .= '(' . implode(', ', $field_list) . '),' . $crlf . "\t";
 		}
 
 		$this->free_result($result);
