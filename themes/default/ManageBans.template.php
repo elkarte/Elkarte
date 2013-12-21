@@ -237,7 +237,7 @@ function template_ban_edit()
  */
 function template_ban_edit_trigger()
 {
-	global $context, $settings, $txt, $modSettings;
+	global $context, $txt, $modSettings;
 
 	echo '
 	<div id="manage_bans">

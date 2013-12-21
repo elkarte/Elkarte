@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Forum maintenance. Important stuff.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,17 +11,19 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * Forum maintenance. Important stuff.
  *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Entry point class for all of the maintance ,routine, members, database,
+ * attachments, topics and hooks
+ */
 class Maintenance_Controller extends Action_Controller
 {
 	/**
@@ -304,7 +308,7 @@ class Maintenance_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Boards.subs.php');
 		// Let's load up the boards in case they are useful.
-		$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true));
+		$context += getBoardList(array('not_redirection' => true));
 
 		if (isset($_GET['done']) && $_GET['done'] == 'purgeold')
 			$context['maintenance_finished'] = $txt['maintain_old'];
@@ -1326,9 +1330,11 @@ class Maintenance_Controller extends Action_Controller
 	}
 
 	/**
-	 * Callback for createList().
+	 * Callback for createList(). Called by action_hooks
 	 *
-	 * @return array
+	 * @param int $start
+	 * @param int $per_page
+	 * @param string $sort
 	 */
 	function list_getIntegrationHooks($start, $per_page, $sort)
 	{

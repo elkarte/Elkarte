@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * This, as you have probably guessed, is the crux for all functions.
+ * Everything should start here, so all the setup and security is done
+ * properly.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,13 +13,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This, as you have probably guessed, is the crux for all functions.
- * Everything should start here, so all the setup and security is done
- * properly.
  *
  */
 

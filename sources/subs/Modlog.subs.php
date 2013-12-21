@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Moderation log helper functions.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,8 +14,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * Moderation helper functions.
  *
  */
 
@@ -352,7 +352,7 @@ function list_getModLogEntriesCallback($entries, $key, $matches)
 /**
  * Delete logged actions.
  *
- * @param int $type
+ * @param int $id_log
  * @param int $time
  * @param array $delete
  */

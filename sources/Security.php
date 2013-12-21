@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * This file has the very important job of ensuring forum security.
+ * This task includes banning and permissions, namely.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,12 +12,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file has the very important job of ensuring forum security.
- * This task includes banning and permissions, namely.
  *
  */
 
@@ -136,6 +136,7 @@ function validateSession($type = 'admin')
  * Message is what to tell them when asking them to login.
  *
  * @param string $message = ''
+ * @param bollean $is_fatal = true
  */
 function is_not_guest($message = '', $is_fatal = true)
 {
@@ -873,6 +874,7 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
  * if $complete = true will remove all tokens
  *
  * @param bool $complete = false
+ * @param string $suffix = false
  */
 function cleanTokens($complete = false, $suffix = '')
 {
@@ -903,7 +905,6 @@ function cleanTokens($complete = false, $suffix = '')
  *
  * @param string $action
  * @param bool $is_fatal = true
- * @return boolean
  */
 function checkSubmitOnce($action, $is_fatal = true)
 {
@@ -1224,7 +1225,7 @@ function showEmailAddress($userProfile_hideEmail, $userProfile_id)
  * The time taken depends on error_type - generally uses the modSetting.
  *
  * @param string $error_type used also as a $txt index. (not an actual string.)
- * @return boolean
+ * @param boolean $fatal is the spam check a fatal error on failure
  */
 function spamProtection($error_type, $fatal = true)
 {
@@ -1468,6 +1469,10 @@ function validatePasswordFlood($id_member, $password_flood_value = false, $was_c
 		fatal_lang_error('no_access', false);
 	}
 
+	// Let's just initialize to something (and 0 is better than nothing)
+	$time_stamp = 0;
+	$number_tries = 0;
+
 	// Right, have we got a flood value?
 	if ($password_flood_value !== false)
 		@list ($time_stamp, $number_tries) = explode('|', $password_flood_value);
@@ -1476,7 +1481,7 @@ function validatePasswordFlood($id_member, $password_flood_value = false, $was_c
 	if (empty($number_tries) || $time_stamp < (time() - 10))
 	{
 		// If it wasn't *that* long ago, don't give them another five goes.
-		$number_tries = !empty($number_tries) && $time_stamp < (time() - 20) ? 2 : 0;
+		$number_tries = !empty($number_tries) && $time_stamp < (time() - 20) ? 2 : $number_tries;
 		$time_stamp = time();
 	}
 
@@ -1494,14 +1499,14 @@ function validatePasswordFlood($id_member, $password_flood_value = false, $was_c
 /**
  * This sets the X-Frame-Options header.
  *
- * @param string $option the frame option, defaults to deny.
- * @return void.
+ * @param string $override the frame option, defaults to deny.
  */
 function frameOptionsHeader($override = null)
 {
 	global $modSettings;
 
 	$option = 'SAMEORIGIN';
+
 	if (is_null($override) && !empty($modSettings['frame_security']))
 		$option = $modSettings['frame_security'];
 	elseif (in_array($override, array('SAMEORIGIN', 'DENY', 'SAMEORIGIN')))
@@ -1516,15 +1521,17 @@ function frameOptionsHeader($override = null)
 }
 
 /**
- * This adds additonal security headers that may prevent browsers from doing something they should not
+ * This adds additional security headers that may prevent browsers from doing something they should not
  *
  * X-XSS-Protection header - This header enables the Cross-site scripting (XSS) filter
  * built into most recent web browsers. It's usually enabled by default, so the role of this
  * header is to re-enable the filter for this particular website if it was disabled by the user.
  *
  * X-Content-Type-Options header - It prevents the browser from doing MIME-type sniffing,
- * only IE and Chrome are honoring this header. This reduces exposure to drive-by download attacks
+ * only IE and Chrome are honouring this header. This reduces exposure to drive-by download attacks
  * and sites serving user uploaded content that could be treated as executable or dynamic HTML files.
+ *
+ * @param boolean $override
  */
 function securityOptionsHeader($override = null)
 {

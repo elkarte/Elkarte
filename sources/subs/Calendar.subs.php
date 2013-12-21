@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This file contains several functions for retrieving and manipulating calendar events, birthdays and holidays.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,8 +14,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file contains several functions for retrieving and manipulating calendar events, birthdays and holidays.
  *
  */
 
@@ -97,6 +97,7 @@ function getBirthdayRange($low_date, $high_date)
  * @param string $low_date
  * @param string $high_date
  * @param bool $use_permissions = true
+ * @param int $limit
  * @return array contextual information if use_permissions is true, and an array of the data needed to build that otherwise
  */
 function getEventRange($low_date, $high_date, $use_permissions = true, $limit = null)
@@ -1044,6 +1045,11 @@ function getEventProperties($event_id, $calendar_only = false)
 	return $return_value;
 }
 
+/**
+ * Fetch and event that may be linked to a topic
+ *
+ * @param int $id_topic
+ */
 function eventInfoForTopic($id_topic)
 {
 	$db = database();
@@ -1063,9 +1069,7 @@ function eventInfoForTopic($id_topic)
 	);
 
 	while ($row = $db->fetch_assoc($request))
-	{
 		$events[] = $row;
-	}
 	$db->free_result($request);
 
 	return $events;
@@ -1174,7 +1178,7 @@ function editHoliday($holiday, $date, $title)
  * Insert a new holiday
  *
  * @param int $date
- * @param type $title
+ * @param string $title
  */
 function insert_holiday($date, $title)
 {

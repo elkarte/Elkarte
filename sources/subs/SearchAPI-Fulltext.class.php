@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This search class is used when a fulltext index is used (mysql only)
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -33,11 +35,10 @@ class Fulltext_Search
 	 * This won't work with versions of ElkArte less than this.
 	 * @var string
 	 */
-	public $min_elk_version = 'ElkArte 1.0 Alpha';
+	public $min_elk_version = 'ElkArte 1.0 Beta';
 
 	/**
 	 * Is it supported?
-	 *
 	 * @var boolean
 	 */
 	public $is_supported = true;
@@ -62,7 +63,6 @@ class Fulltext_Search
 
 	/**
 	 * Fulltext_Search::__construct()
-	 *
 	 */
 	public function __construct()
 	{
@@ -84,7 +84,7 @@ class Fulltext_Search
 	 *
 	 * Check whether the method can be performed by this API.
 	 *
-	 * @param mixed $methodName
+	 * @param string $methodName
 	 * @param mixed $query_params
 	 * @return
 	 */
@@ -109,14 +109,12 @@ class Fulltext_Search
 	 * Fulltext_Search::_getMinWordLength()
 	 *
 	 * What is the minimum word length full text supports?
-	 *
-	 * @return
 	 */
 	protected function _getMinWordLength()
 	{
 		$db = database();
 
-		// need some search specific database tricks
+		// Need some search specific database tricks
 		$db_search = db_search();
 
 		// Try to determine the minimum number of letters for a fulltext search.
@@ -163,11 +161,10 @@ class Fulltext_Search
 	 *
 	 * Do we have to do some work with the words we are searching for to prepare them?
 	 *
-	 * @param mixed $word
-	 * @param mixed $wordsSearch
-	 * @param mixed $wordsExclude
-	 * @param mixed $isExcluded
-	 * @return
+	 * @param string $word
+	 * @param array $wordsSearch
+	 * @param array $wordsExclude
+	 * @param array $isExcluded
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
 	{
@@ -181,7 +178,8 @@ class Fulltext_Search
 			// this is harder on the server so we are restrictive here
 			if (count($subwords) > 1 && preg_match('~[.:@$]~', $word))
 			{
-				// using special characters that a full index would ignore and the remaining words are short which would also be ignored
+				// Using special characters that a full index would ignore and the remaining words are
+				// short which would also be ignored
 				if ((Util::strlen(current($subwords)) < $this->min_word_length) && (Util::strlen(next($subwords)) < $this->min_word_length))
 				{
 					$wordsSearch['words'][] = trim($word, "/*- ");
@@ -190,7 +188,7 @@ class Fulltext_Search
 			}
 			elseif (Util::strlen(trim($word, "/*- ")) < $this->min_word_length)
 			{
-				// short words have feelings too
+				// Short words have feelings too
 				$wordsSearch['words'][] = trim($word, "/*- ");
 				$wordsSearch['complex_words'][] = count($subwords) === 1 ? $word : '"' . $word . '"';
 			}
@@ -207,8 +205,8 @@ class Fulltext_Search
 	 *
 	 * Search for indexed words.
 	 *
-	 * @param mixed $words
-	 * @param mixed $search_data
+	 * @param array $words
+	 * @param array $search_data
 	 * @return
 	 */
 	public function indexedWordQuery($words, $search_data)
@@ -240,7 +238,6 @@ class Fulltext_Search
 			$query_where[] = '{raw:user_query}';
 		if ($query_params['board_query'])
 			$query_where[] = 'm.id_board {raw:board_query}';
-
 		if ($query_params['topic'])
 			$query_where[] = 'm.id_topic = {int:topic}';
 		if ($query_params['min_msg_id'])
@@ -272,14 +269,14 @@ class Fulltext_Search
 		{
 			$query_params['boolean_match'] = '';
 
-			// remove any indexed words that are used in the complex body search terms
+			// Remove any indexed words that are used in the complex body search terms
 			$words['indexed_words'] = array_diff($words['indexed_words'], $words['complex_words']);
 
 			foreach ($words['indexed_words'] as $fulltextWord)
 				$query_params['boolean_match'] .= (in_array($fulltextWord, $query_params['excluded_index_words']) ? '-' : '+') . $fulltextWord . ' ';
 			$query_params['boolean_match'] = substr($query_params['boolean_match'], 0, -1);
 
-			// if we have bool terms to search, add them in
+			// If we have bool terms to search, add them in
 			if ($query_params['boolean_match'])
 				$query_where[] = 'MATCH (body) AGAINST ({string:boolean_match} IN BOOLEAN MODE)';
 		}

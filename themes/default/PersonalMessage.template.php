@@ -1229,7 +1229,7 @@ function template_report_message()
 
 		foreach ($context['admins'] as $id => $details)
 			echo '
-							<option value="', $id, '">', $details[0], !empty($details[1]) ? ' (' . $details[1] . ')' : '' . '</option>';
+							<option value="', $id, '">', $details[0], !empty($details[1]) ? ' (' . $details[1] . ')' : '', '</option>';
 
 		echo '
 						</select>

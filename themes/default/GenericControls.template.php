@@ -39,7 +39,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					locale: \'' . $editor_context['locale'] . '\',' : '', '
 					colors: "black,red,yellow,pink,green,orange,purple,blue,beige,brown,teal,navy,maroon,limegreen,white",
 					enablePasteFiltering: true,
-					plugins: "bbcode', !empty($context['mentions_enabled']) ? ', mention' : '', (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']) ? ', draft",
+					plugins: "bbcode, splittag', !empty($context['mentions_enabled']) ? ', mention' : '', (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']) ? ', draft",
 					draftOptions: {
 						sLastNote: \'draft_lastautosave\',
 						sSceditorID: \'' . $editor_id . '\',

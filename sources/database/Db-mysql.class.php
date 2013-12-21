@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This file has all the main functions in it that relate to the mysql database.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -11,22 +13,33 @@
  *
  * @version 1.0 Beta
  *
- * This file has all the main functions in it that relate to the database.
- *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * SQL database class, implements database class to control mysql functions
+ */
 class Database_MySQL implements Database
 {
+	/**
+	 * Holds current instance of the class
+	 * @var instance
+	 */
 	private static $_db = null;
 
+	/**
+	 * Current connetcion to the database
+	 * @var resource
+	 */
 	private $_connection = null;
 
+	/**
+	 * Private constructor.
+	 */
 	private function __construct()
 	{
-		// Private constructor.
 		// Objects should be created through initiate().
 	}
 
@@ -87,7 +100,7 @@ class Database_MySQL implements Database
 	/**
 	 * Fix up the prefix so it doesn't require the database to be selected.
 	 *
-	 * @param string &db_prefix
+	 * @param string $db_prefix
 	 * @param string $db_name
 	 *
 	 * @return string
@@ -95,6 +108,7 @@ class Database_MySQL implements Database
 	function fix_prefix($db_prefix, $db_name)
 	{
 		$db_prefix = is_numeric(substr($db_prefix, 0, 1)) ? $db_name . '.' . $db_prefix : '`' . $db_name . '`.' . $db_prefix;
+
 		return $db_prefix;
 	}
 
@@ -427,7 +441,7 @@ class Database_MySQL implements Database
 	 * MySQL implementation doesn't use $counter parameter.
 	 *
 	 * @param resource $result
-	 * @param $counter = false
+	 * @param boolean $counter = false
 	 */
 	function fetch_row($result, $counter = false)
 	{
@@ -459,6 +473,8 @@ class Database_MySQL implements Database
 
 	/**
 	 * Get the number of fields in the resultset.
+	 *
+	 * @param resource $request
 	 */
 	function num_fields($request)
 	{
@@ -938,7 +954,7 @@ class Database_MySQL implements Database
 					$field_list[] = '\'' . $this->escape_string($item) . '\'';
 			}
 
-			$data .= '(' . implode(', ', $field_list) . ')' . ',' . $crlf . "\t";
+			$data .= '(' . implode(', ', $field_list) . '),' . $crlf . "\t";
 		}
 
 		$this->free_result($result);
@@ -1326,7 +1342,7 @@ class Database_MySQL implements Database
 	 * It ignores $counter parameter.
 	 *
 	 * @param resource $request
-	 * @param mixed counter = false
+	 * @param mixed $counter = false
 	 */
 	function fetch_assoc($request, $counter = false)
 	{
@@ -1336,6 +1352,7 @@ class Database_MySQL implements Database
 	/**
 	 * Return server info.
 	 *
+	 * @param resource $connection
 	 * @return string
 	 */
 	function db_server_info($connection = null)

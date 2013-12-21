@@ -1169,7 +1169,6 @@ function grabJumpToContent(elem)
  * sCurBoardName: name of the currently active board
  * sBoardChildLevelIndicator: text/characters used to indent
  * sBoardPrefix: arrow head
- * sCatSeparator: hr to use to separate areas
  * sCatPrefix: Prefix to use in from of the categories
  * bNoRedirect: boolean for redirect
  * bDisabled: boolean for disabled
@@ -1194,23 +1193,16 @@ JumpTo.prototype.showSelect = function ()
 
 	for (var i = this.opt.iCurBoardChildLevel; i > 0; i--)
 		sChildLevelPrefix += this.opt.sBoardChildLevelIndicator;
-	document.getElementById(this.opt.sContainerId).innerHTML = this.opt.sJumpToTemplate.replace(/%select_id%/, this.opt.sContainerId + '_select').replace(/%dropdown_list%/, '<select ' + (this.opt.bDisabled === true ? 'disabled="disabled" ' : 0) + (this.opt.sClassName !== undefined ? 'class="' + this.opt.sClassName + '" ' : '') + 'name="' + (this.opt.sCustomName !== undefined ? this.opt.sCustomName : this.opt.sContainerId + '_select') + '" id="' + this.opt.sContainerId + '_select" ' + ('implementation' in document ? '' : 'onmouseover="grabJumpToContent(this);" ') + ('onbeforeactivate' in document ? 'onbeforeactivate' : 'onfocus') + '="grabJumpToContent(this);"><option value="' + (this.opt.bNoRedirect !== undefined && this.opt.bNoRedirect === true ? this.opt.iCurBoardId : '?board=' + this.opt.iCurBoardId + '.0') + '">' + sChildLevelPrefix + this.opt.sBoardPrefix + this.opt.sCurBoardName.removeEntities() + '</option></select>&nbsp;' + (this.opt.sGoButtonLabel !== undefined ? '<input type="button" class="button_submit" value="' + this.opt.sGoButtonLabel + '" onclick="window.location.href = \'' + elk_prepareScriptUrl(elk_scripturl) + 'board=' + this.opt.iCurBoardId + '.0\';" />' : ''));
+	if (sChildLevelPrefix != '')
+		sChildLevelPrefix = sChildLevelPrefix + this.opt.sBoardPrefix;
+
+	document.getElementById(this.opt.sContainerId).innerHTML = this.opt.sJumpToTemplate.replace(/%select_id%/, this.opt.sContainerId + '_select').replace(/%dropdown_list%/, '<select ' + (this.opt.bDisabled === true ? 'disabled="disabled" ' : 0) + (this.opt.sClassName !== undefined ? 'class="' + this.opt.sClassName + '" ' : '') + 'name="' + (this.opt.sCustomName !== undefined ? this.opt.sCustomName : this.opt.sContainerId + '_select') + '" id="' + this.opt.sContainerId + '_select" ' + ('implementation' in document ? '' : 'onmouseover="grabJumpToContent(this);" ') + ('onbeforeactivate' in document ? 'onbeforeactivate' : 'onfocus') + '="grabJumpToContent(this);"><option value="' + (this.opt.bNoRedirect !== undefined && this.opt.bNoRedirect === true ? this.opt.iCurBoardId : '?board=' + this.opt.iCurBoardId + '.0') + '">' + sChildLevelPrefix + this.opt.sCurBoardName.removeEntities() + '</option></select>&nbsp;' + (this.opt.sGoButtonLabel !== undefined ? '<input type="button" class="button_submit" value="' + this.opt.sGoButtonLabel + '" onclick="window.location.href = \'' + elk_prepareScriptUrl(elk_scripturl) + 'board=' + this.opt.iCurBoardId + '.0\';" />' : ''));
 	this.dropdownList = document.getElementById(this.opt.sContainerId + '_select');
 };
 
 // Fill the jump to box with entries. Method of the JumpTo class.
 JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 {
-	// Create an category seperator option that'll be above and below the category.
-	if (this.opt.sCatSeparator)
-	{
-		var oDashOption = document.createElement('option');
-
-		oDashOption.appendChild(document.createTextNode(this.opt.sCatSeparator));
-		oDashOption.disabled = 'disabled';
-		oDashOption.value = '';
-	}
-
 	if ('onbeforeactivate' in document)
 		this.dropdownList.onbeforeactivate = null;
 	else
@@ -1220,38 +1212,42 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 		this.dropdownList.options[0].disabled = 'disabled';
 
 	// Create a document fragment that'll allowing inserting big parts at once.
-	var oListFragment = document.createDocumentFragment();
+	var oListFragment = document.createDocumentFragment(),
+		oOptgroupFragment = document.createElement('optgroup');
 
 	// Loop through all items to be added.
 	for (var i = 0, n = aBoardsAndCategories.length; i < n; i++)
 	{
 		var j,
-			sChildLevelPrefix,
+			sChildLevelPrefix = '',
 			oOption,
 			oText;
 
 		// If we've reached the currently selected board add all items so far.
 		if (!aBoardsAndCategories[i].isCategory && aBoardsAndCategories[i].id === this.opt.iCurBoardId)
 		{
-				this.dropdownList.insertBefore(oListFragment, this.dropdownList.options[0]);
-				oListFragment = document.createDocumentFragment();
+				this.dropdownList.insertBefore(oOptgroupFragment, this.dropdownList.options[0]);
 				continue;
 		}
 
 		if (aBoardsAndCategories[i].isCategory)
 		{
-			if (this.opt.sCatSeparator)
-				oListFragment.appendChild(oDashOption.cloneNode(true));
+			oOptgroupFragment = document.createElement('optgroup');
+			oOptgroupFragment.label = aBoardsAndCategories[i].name;
+			oListFragment.appendChild(oOptgroupFragment);
+			continue;
 		}
 		else
 		{
 			for (j = aBoardsAndCategories[i].childLevel, sChildLevelPrefix = ''; j > 0; j--)
 				sChildLevelPrefix += this.opt.sBoardChildLevelIndicator;
+			if (sChildLevelPrefix != '')
+				sChildLevelPrefix = sChildLevelPrefix + this.opt.sBoardPrefix
 		}
 
 		oOption = document.createElement('option');
 		oText = document.createElement('span');
-		oText.innerHTML = (aBoardsAndCategories[i].isCategory ? this.opt.sCatPrefix : sChildLevelPrefix + this.opt.sBoardPrefix) + aBoardsAndCategories[i].name;
+		oText.innerHTML = (aBoardsAndCategories[i].isCategory ? this.opt.sCatPrefix : sChildLevelPrefix) + aBoardsAndCategories[i].name;
 
 		// Applying a category class to this option?
 		if (aBoardsAndCategories[i].isCategory && this.opt.sCatClass)
@@ -1271,11 +1267,7 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 				oOption.value = aBoardsAndCategories[i].id;
 		}
 
-		oListFragment.appendChild(oOption);
-
-		// Using a non-selectable text seperator?
-		if (aBoardsAndCategories[i].isCategory && this.opt.sCatSeparator)
-			oListFragment.appendChild(oDashOption.cloneNode(true));
+		oOptgroupFragment.appendChild(oOption);
 	}
 
 	// Add the remaining items after the currently selected item.

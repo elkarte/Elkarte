@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Handles the moving of topics from board to board
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,7 +11,7 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
  *
@@ -74,14 +76,14 @@ class MoveTopic_Controller extends Action_Controller
 
 		// Get a list of boards this moderator can move to.
 		require_once(SUBSDIR . '/Boards.subs.php');
-		$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true));
+		$context += getBoardList(array('not_redirection' => true));
 
 		// No boards?
 		if (empty($context['categories']) || $context['num_boards'] == 1)
 			fatal_lang_error('moveto_noboards', false);
 
 		// Already used the function, let's set the selected board back to the last
-		$last_moved_to = isset($_SESSION['move_to_topic']['move_to']) ? (int) $_SESSION['move_to_topic']['move_to'] : 0;
+		$last_moved_to = isset($_SESSION['move_to_topic']['move_to']) && $_SESSION['move_to_topic']['move_to'] != $context['current_board'] ? (int) $_SESSION['move_to_topic']['move_to'] : 0;
 		if (!empty($last_moved_to))
 		{
 			foreach ($context['categories'] as $id => $values)
@@ -91,12 +93,14 @@ class MoveTopic_Controller extends Action_Controller
 					break;
 				}
 		}
+
+		// Set up for the template
 		$context['redirect_topic'] = isset($_SESSION['move_to_topic']['redirect_topic']) ? (int) $_SESSION['move_to_topic']['redirect_topic'] : 0;
 		$context['redirect_expires'] = isset($_SESSION['move_to_topic']['redirect_expires']) ? (int) $_SESSION['move_to_topic']['redirect_expires'] : 0;
-
 		$context['page_title'] = $txt['move_topic'];
 		$context['sub_template'] = 'move_topic';
 
+		// Breadcrumbs
 		$context['linktree'][] = array(
 			'url' => $scripturl . '?topic=' . $topic . '.0',
 			'name' => $context['subject'],
@@ -137,8 +141,7 @@ class MoveTopic_Controller extends Action_Controller
 	 */
 	public function action_movetopic2()
 	{
-		global $txt, $board, $topic, $scripturl, $modSettings, $context;
-		global $board, $language, $user_info;
+		global $txt, $board, $topic, $scripturl, $modSettings, $context, $language, $user_info;
 
 		if (empty($topic))
 			fatal_lang_error('no_access', false);
@@ -261,10 +264,10 @@ class MoveTopic_Controller extends Action_Controller
 				$txt['movetopic_auto_topic'] => '[iurl]' . $scripturl . '?topic=' . $topic . '.0[/iurl]'
 			));
 
-			// auto remove this MOVED redirection topic in the future?
+			// Auto remove this MOVED redirection topic in the future?
 			$redirect_expires = !empty($_POST['redirect_expires']) ? ((int) ($_POST['redirect_expires'] * 60) + time()) : 0;
 
-			// redirect to the MOVED topic from topic list?
+			// Redirect to the MOVED topic from topic list?
 			$redirect_topic = isset($_POST['redirect_topic']) ? $topic : 0;
 
 			// And remember the last expiry period too.

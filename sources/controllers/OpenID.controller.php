@@ -1,13 +1,15 @@
 <?php
 
 /**
+ * Handles openID verification
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This file contains code by:
  * copyright:	2012 Simple Machines Forum contributors (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
  *
@@ -28,7 +30,7 @@ class OpenID_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		// we only know one thing and know it well :P
+		// We only know one thing and know it well :P
 		$this->action_openidreturn();
 	}
 
@@ -76,16 +78,12 @@ class OpenID_Controller extends Action_Controller
 		$signed = explode(',', $_GET['openid_signed']);
 		$verify_str = '';
 		foreach ($signed as $sign)
-		{
 			$verify_str .= $sign . ':' . strtr($_GET['openid_' . str_replace('.', '_', $sign)], array('&amp;' => '&')) . "\n";
-		}
 
 		$verify_str = base64_encode(sha1_hmac($verify_str, $secret));
 
 		if ($verify_str != $_GET['openid_sig'])
-		{
 			fatal_lang_error('openid_sig_invalid', 'critical');
-		}
 
 		if (!isset($_SESSION['openid']['saved_data'][$_GET['t']]))
 			fatal_lang_error('openid_load_data');
@@ -178,6 +176,9 @@ class OpenID_Controller extends Action_Controller
 		}
 	}
 
+	/**
+	 * Generate the XRDS data for an OpenID 2.0, YADIS discovery
+	 */
 	public function action_xrds()
 	{
 		global $scripturl, $modSettings, $context;

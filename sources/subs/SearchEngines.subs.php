@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This file contains all the screens that relate to search engines.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,8 +14,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file contains all the screens that relate to search engines.
  *
  */
 
@@ -33,6 +33,7 @@ function spiderCheck()
 
 	if (isset($_SESSION['id_robot']))
 		unset($_SESSION['id_robot']);
+
 	$_SESSION['robot_check'] = time();
 
 	// We cache the spider data for five minutes if we can.
@@ -127,7 +128,6 @@ function logSpider()
 				'current_spider' => $_SESSION['id_robot'],
 			)
 		);
-
 		// Nothing updated?
 		if ($db->affected_rows() == 0)
 		{
@@ -293,7 +293,7 @@ function sortSpiderTable()
  *
  * @param int $start
  * @param int $items_per_page
- * @param string sort
+ * @param string $sort
  */
 function getSpiders($start, $items_per_page, $sort)
 {
@@ -321,7 +321,7 @@ function getSpiders($start, $items_per_page, $sort)
 /**
  * Return details of one spider from its ID
  *
- * @param int id of a spider
+ * @param int $spider_id id of a spider
  */
 function getSpiderDetails($spider_id)
 {
@@ -421,9 +421,9 @@ function getNumSpiderLogs()
  * limits.
  * (used by createList() callbacks)
  *
- * @param type $start
- * @param type $items_per_page
- * @param type $sort
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
  * @return array
  */
 function getSpiderStats($start, $items_per_page, $sort)
@@ -451,7 +451,7 @@ function getSpiderStats($start, $items_per_page, $sort)
  * Get the number of spider stat rows from the log spider stats table
  * (used by createList() callbacks)
  *
- * @param date (optional) if specified counts only the entries before that date
+ * @param int $time (optional) if specified counts only the entries before that date
  * @return int
  */
 function getNumSpiderStats($time = null)
@@ -475,7 +475,7 @@ function getNumSpiderStats($time = null)
 /**
  * Remove spider logs older than the passed time
  *
- * @param int a time value
+ * @param int $time a time value
  */
 function removeSpiderOldLogs($time)
 {
@@ -494,7 +494,7 @@ function removeSpiderOldLogs($time)
 /**
  * Remove spider logs older than the passed time
  *
- * @param int a time value
+ * @param int $time a time value
  */
 function removeSpiderOldStats($time)
 {
@@ -513,7 +513,7 @@ function removeSpiderOldStats($time)
 /**
  * Remove all the entries connected to a certain spider (description, entries, stats)
  *
- * @param array an array of spider ids
+ * @param array $spiders_id an array of spider ids
  */
 function removeSpiders($spiders_id)
 {
@@ -609,6 +609,11 @@ function spidersStatsDates()
 
 /**
  * Update an existing or inserts a new spider entry
+ *
+ * @param int $id
+ * @param string $name spider name
+ * @param string $agent ua of the spider
+ * @param string $info_ip
  */
 function updateSpider($id = 0, $name = '', $agent = '', $info_ip = '')
 {

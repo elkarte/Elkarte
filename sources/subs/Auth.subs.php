@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This file has functions in it to do with authentication, user handling, and the like.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,8 +14,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file has functions in it to do with authentication, user handling, and the like.
  *
  */
 
@@ -239,8 +239,7 @@ function adminLogin_outputPostVars($k, $v)
 /**
  * Properly urlencodes a string to be used in a query
  *
- * @global type $scripturl
- * @param type $get
+ * @param array $get
  * @return our query string
  */
 function construct_query_string($get)
@@ -765,8 +764,6 @@ function userByEmail($email)
 
 /**
  * Generate a random validation code.
- *
- * @return type
  */
 function generateValidationCode()
 {

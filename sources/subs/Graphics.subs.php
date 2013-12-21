@@ -1,6 +1,12 @@
 <?php
 
 /**
+ * This file deals with low-level graphics operations performed on images,
+ * specially as needed for avatars (uploaded avatars), attachments, or
+ * visual verification images.
+ *
+ * TrueType fonts supplied by www.LarabieFonts.com
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,12 +18,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file deals with low-level graphics operations performed on images,
- * specially as needed for avatars (uploaded avatars), attachments, or
- * visual verification images.
- *
- * TrueType fonts supplied by www.LarabieFonts.com
  *
  */
 

@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * This file is mainly meant for controlling the actions related to personal
+ * messages. It allows viewing, sending, deleting, and marking personal
+ * messages. For compatibility reasons, they are often called "instant messages".
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,13 +13,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file is mainly meant for controlling the actions related to personal
- * messages. It allows viewing, sending, deleting, and marking personal
- * messages. For compatibility reasons, they are often called "instant messages".
  *
  */
 
@@ -23,7 +23,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Personal Message Controller
+ * Personal Message Controller, It allows viewing, sending, deleting, and
+ * marking personal messages
  */
 class PersonalMessage_Controller extends Action_Controller
 {
@@ -1808,20 +1809,13 @@ class PersonalMessage_Controller extends Action_Controller
 			preg_match_all('~"([^"]+)"~', $userString, $matches);
 			$possible_users = array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $userString)));
 
-			for ($k = 0, $n = count($possible_users); $k < $n; $k++)
-			{
-				$possible_users[$k] = addcslashes(trim($possible_users[$k]), '\\\'');
-
-				if (strlen($possible_users[$k]) == 0)
-					unset($possible_users[$k]);
-				else
-					$possible_users[$k] = $db->quote('{string:name}', array('name' => $possible_users[$k]));
-			}
-
 			require_once(SUBSDIR . '/Members.subs.php');
 
 			// Who matches those criteria?
-			$members = membersBy('real_name LIKE {raw:real_name_implode}', array('real_name_implode' => implode(" OR real_name LIKE ", $possible_users), 'real_name' => defined('DB_CASE_SENSITIVE') ? 'LOWER(real_name)' : 'real_name'));
+			$members = membersBy('member_names', array('member_names' => $possible_users));
+
+			foreach ($possible_users as $key => $possible_user)
+				$searchq_parameters['guest_user_name_implode_' . $key] = $possible_user;
 
 			// Simply do nothing if there are too many members matching the criteria.
 			if (count($members) > $maxMembersToSearch)
@@ -1830,13 +1824,15 @@ class PersonalMessage_Controller extends Action_Controller
 			{
 				if ($context['folder'] === 'inbox')
 				{
-					$userQuery = 'AND pm.id_member_from = 0 AND ({raw:pm_from_name} LIKE {raw:guest_user_name_implode})';
+					$uq = array();
+					$name = defined('DB_CASE_SENSITIVE') ? 'LOWER(pm.from_name)' : 'pm.from_name';
+					foreach (array_keys($possible_users) as $key)
+						$uq[] = 'AND pm.id_member_from = 0 AND (' . $name . ' LIKE {string:guest_user_name_implode_' . $key . '})';
+					$userQuery = implode(' ', $uq);
 					$searchq_parameters['pm_from_name'] = defined('DB_CASE_SENSITIVE') ? 'LOWER(pm.from_name)' : 'pm.from_name';
 				}
 				else
 					$userQuery = '';
-
-				$searchq_parameters['guest_user_name_implode'] = implode('\' OR ' . (defined('DB_CASE_SENSITIVE') ? 'LOWER(pm.from_name)' : 'pm.from_name') . ' LIKE ', $possible_users);
 			}
 			else
 			{
@@ -1846,11 +1842,16 @@ class PersonalMessage_Controller extends Action_Controller
 
 				// Use the name as as sent from or sent to
 				if ($context['folder'] === 'inbox')
-					$userQuery = 'AND (pm.id_member_from IN ({array_int:member_list}) OR (pm.id_member_from = 0 AND ({raw:pm_from_name} LIKE {raw:guest_user_name_implode})))';
+				{
+					$uq = array();
+					$name = defined('DB_CASE_SENSITIVE') ? 'LOWER(pm.from_name)' : 'pm.from_name';
+					foreach (array_keys($possible_users) as $key)
+						$uq[] = 'AND (pm.id_member_from IN ({array_int:member_list}) OR (pm.id_member_from = 0 AND (' . $name . ' LIKE {string:guest_user_name_implode_' . $key . '})))';
+					$userQuery = implode(' ', $uq);
+				}
 				else
 					$userQuery = 'AND (pmr.id_member IN ({array_int:member_list}))';
 
-				$searchq_parameters['guest_user_name_implode'] = implode('\' OR ' . (defined('DB_CASE_SENSITIVE') ? 'LOWER(pm.from_name)' : 'pm.from_name') . ' LIKE ', $possible_users);
 				$searchq_parameters['pm_from_name'] = defined('DB_CASE_SENSITIVE') ? 'LOWER(pm.from_name)' : 'pm.from_name';
 				$searchq_parameters['member_list'] = $memberlist;
 			}

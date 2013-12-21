@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Handles sending out of password reminders, as well as the answer / question
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,7 +11,7 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
  *
@@ -41,6 +43,7 @@ class Reminder_Controller extends Action_Controller
 
 	/**
 	 * Default action for reminder.
+	 * @uses reminder sub template
 	 */
 	public function action_index()
 	{
@@ -48,13 +51,13 @@ class Reminder_Controller extends Action_Controller
 
 		$context['sub_template'] = 'reminder';
 
-		// nothing to do, the template will ask for an action to pick
+		// Nothing to do, the template will ask for an action to pick
 		createToken('remind');
 	}
 
 	/**
 	 * Pick a reminder type.
-	 * sa=picktype
+	 * Accessed by sa=picktype
 	 */
 	public function action_picktype()
 	{
@@ -250,7 +253,7 @@ class Reminder_Controller extends Action_Controller
 
 	/**
 	 * Verify the answer to the secret question.
-	 * sa=secret2
+	 * Accessed with sa=secret2
 	 */
 	public function action_secret2()
 	{

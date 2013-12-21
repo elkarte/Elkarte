@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Functions to support schedules tasks
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -25,6 +27,7 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 	$db = database();
 
 	$task_query = '';
+
 	if (!is_array($tasks))
 		$tasks = array($tasks);
 
@@ -36,6 +39,7 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 		else
 			$task_query = ' AND task IN ({array_string:tasks})';
 	}
+
 	$nextTaskTime = empty($tasks) ? time() + 86400 : $modSettings['next_task_time'];
 
 	// Get the critical info for the tasks.
@@ -94,6 +98,7 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
  * @param int $regularity
  * @param string $unit
  * @param int $offset
+ * @param boolean $immediate
  * @return int
  */
 function next_time($regularity, $unit, $offset, $immediate = false)
@@ -107,9 +112,7 @@ function next_time($regularity, $unit, $offset, $immediate = false)
 
 	// If we have scheduleTaskImmediate running, then it's 10 seconds
 	if (empty($unit) && $immediate)
-	{
 		$next_time = time() + 10;
-	}
 	// If the unit is minutes only check regularity in minutes.
 	elseif ($unit == 'm')
 	{
@@ -137,15 +140,15 @@ function next_time($regularity, $unit, $offset, $immediate = false)
 
 		// Make the time offset in the past!
 		if ($next_time > time())
-		{
 			$next_time -= 86400;
-		}
 
 		// Default we'll jump in hours.
 		$applyOffset = 3600;
+
 		// 24 hours = 1 day.
 		if ($unit == 'd')
 			$applyOffset = 86400;
+
 		// Otherwise a week.
 		if ($unit == 'w')
 			$applyOffset = 604800;
@@ -154,9 +157,7 @@ function next_time($regularity, $unit, $offset, $immediate = false)
 
 		// Just add on the offset.
 		while ($next_time <= time())
-		{
 			$next_time += $applyOffset;
-		}
 	}
 
 	return $next_time;
@@ -228,7 +229,7 @@ function updateTaskStatus($enablers)
  * Sets the task status to enabled / disabled by task name (i.e. function)
  *
  * @param string $enabler the name (the function) of a task
- * @param bool is the tasks should be enabled or disabled
+ * @param bool $enable is if the tasks should be enabled or disabled
  */
 function toggleTaskStatusByName($enabler, $enable = true)
 {
@@ -307,11 +308,9 @@ function loadTaskDetails($id_task)
 			'id_task' => $id_task,
 		)
 	);
-
 	// Should never, ever, happen!
 	if ($db->num_rows($request) == 0)
 		fatal_lang_error('no_access', false);
-
 	while ($row = $db->fetch_assoc($request))
 	{
 		$task = array(

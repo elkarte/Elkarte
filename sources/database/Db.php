@@ -1,25 +1,28 @@
 <?php
 
 /**
+ * This class is the base class for database drivers implementations.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Beta
  *
- * This class is the base class for database drivers implementations.
- *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Database driver interface
+ */
 interface Database
 {
 	/**
 	 * Fix up the prefix so it doesn't require the database to be selected.
 	 *
-	 * @param string &db_prefix
+	 * @param string $db_prefix
 	 * @param string $db_name
 	 *
 	 * @return string
@@ -60,7 +63,7 @@ interface Database
 	 * Fetch next result as association.
 	 *
 	 * @param resource $request
-	 * @param mixed counter = false
+	 * @param mixed $counter = false
 	 */
 	function fetch_assoc($request, $counter = false);
 
@@ -88,6 +91,8 @@ interface Database
 
 	/**
 	 * Get the number of fields in the resultset.
+	 *
+	 * @param resource $request
 	 */
 	function num_fields($request);
 
@@ -207,7 +212,7 @@ interface Database
 	 * It goes in 250 row segments.
 	 *
 	 * @param string $tableName - the table to create the inserts for.
-	 * @param bool new_table
+	 * @param bool $new_table
 	 * @return string the query to insert the data back in, or an empty string if the table was empty.
 	 */
 	function insert_sql($tableName, $new_table = false);

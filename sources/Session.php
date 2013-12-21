@@ -1,21 +1,21 @@
 <?php
 
 /**
+ * Implementation of PHP's session API.
+ * What it does:
+ *  - it handles the session data in the database (more scalable.)
+ *  - it uses the databaseSession_lifetime setting for garbage collection.
+ *  - the custom session handler is set by loadSession().
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * Implementation of PHP's session API.
- * What it does:
- *  - it handles the session data in the database (more scalable.)
- *  - it uses the databaseSession_lifetime setting for garbage collection.
- *  - the custom session handler is set by loadSession().
  *
  */
 
@@ -96,6 +96,7 @@ function loadSession()
 		$_SESSION['session_value'] = md5(session_id() . mt_rand());
 		$_SESSION['session_var'] = substr(preg_replace('~^\d+~', '', sha1(mt_rand() . session_id() . mt_rand())), 0, rand(7, 12));
 	}
+
 	$sc = $_SESSION['session_value'];
 }
 

@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * This file is what shows the listing of topics in a board.
+ * It's just one or two functions, but don't underestimate it ;).
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,12 +12,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file is what shows the listing of topics in a board.
- * It's just one or two functions, but don't underestimate it ;).
  *
  */
 
@@ -33,12 +33,13 @@ class MessageIndex_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		// forward to message index, it's not like we know much more :P
+		// Forward to message index, it's not like we know much more :P
 		$this->action_messageindex();
 	}
 
 	/**
 	 * Show the list of topics in this board, along with any child boards.
+	 * @uses MessageIndex template topic_listing sub template
 	 */
 	public function action_messageindex()
 	{
@@ -229,6 +230,7 @@ class MessageIndex_Controller extends Action_Controller
 		}
 
 		$context['sort_direction'] = $ascending ? 'up' : 'down';
+
 		// Trick
 		$txt['starter'] = $txt['started_by'];
 
@@ -447,8 +449,10 @@ class MessageIndex_Controller extends Action_Controller
 			$context['can_move'] = allowedTo('move_any');
 			$context['can_remove'] = allowedTo('remove_any');
 			$context['can_merge'] = allowedTo('merge_any');
+
 			// Ignore approving own topics as it's unlikely to come up...
 			$context['can_approve'] = $modSettings['postmod_active'] && allowedTo('approve_posts') && !empty($board_info['unapproved_topics']);
+
 			// Can we restore topics?
 			$context['can_restore'] = allowedTo('move_any') && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board;
 
@@ -535,12 +539,14 @@ class MessageIndex_Controller extends Action_Controller
 
 		// Remember the last board they moved things to.
 		if (isset($_REQUEST['move_to']))
+		{
 			$_SESSION['move_to_topic'] = array(
 				'move_to' => $_REQUEST['move_to'],
 				// And remember the last expiry period too.
 				'redirect_topic' => (int) $_REQUEST['redirect_topic'],
 				'redirect_expires' => (int) $_REQUEST['redirect_expires'],
 			);
+		}
 
 		// Only a few possible actions.
 		$possibleActions = array();
@@ -564,7 +570,6 @@ class MessageIndex_Controller extends Action_Controller
 		else
 		{
 			$boards_can = boardsAllowedTo(array('make_sticky', 'move_any', 'move_own', 'remove_any', 'remove_own', 'lock_any', 'lock_own', 'merge_any', 'approve_posts'), true, false);
-
 			$redirect_url = isset($_POST['redirect_url']) ? $_POST['redirect_url'] : (isset($_SESSION['old_url']) ? $_SESSION['old_url'] : '');
 		}
 

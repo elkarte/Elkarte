@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This is here for the "repair any errors" feature in the admin center.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,11 +11,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This is here for the "repair any errors" feature in the admin center.
  *
  */
 
@@ -53,6 +53,7 @@ class RepairBoards_Controller extends Action_Controller
 		isAllowedTo('admin_forum');
 
 		require_once(SUBSDIR . '/RepairBoards.subs.php');
+
 		// Try secure more memory.
 		setMemoryLimit('128M');
 

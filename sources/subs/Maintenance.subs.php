@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Forum maintenance support functions. Important stuff.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,8 +14,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * Forum maintenance. Important stuff.
  *
  */
 if (!defined('ELK'))
@@ -120,9 +120,8 @@ function resizeMessageTableBody($type)
 /**
  * Detects messages, which exceed the max message size
  *
- * @param type $start
- * @param type $increment
- * @return type
+ * @param int $start
+ * @param int $increment
  */
 function detectExceedingMessages($start, $increment)
 {
@@ -150,7 +149,7 @@ function detectExceedingMessages($start, $increment)
 /**
  * loads messages, which exceed the lenght
  *
- * @param type $msg
+ * @param int $msg
  * @return array
  */
 function getExceedingMessages($msg)
@@ -638,8 +637,7 @@ function countTopicsFromBoard($id_board)
 /**
  * Gets a list of topics which should be moved to a different board.
  *
- * @param type $id_board
- * @return type
+ * @param int $id_board
  */
 function getTopicsToMove($id_board)
 {
@@ -695,8 +693,8 @@ function countContributors()
 /**
  * Recount the members posts.
  *
- * @param type $start
- * @param type $increment
+ * @param int $start
+ * @param int $increment
  * @return int
  */
 function updateMembersPostCount($start, $increment)

@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Deals with the giving and taking of a users karma
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,7 +11,7 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
  *
@@ -18,6 +20,9 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Karma_Controller class, can give good or bad karma so watch out!
+ */
 class Karma_Controller extends Action_Controller
 {
 	/**
@@ -48,8 +53,8 @@ class Karma_Controller extends Action_Controller
 		// Start off with no change in karma.
 		$action = prepare_karma($id_target);
 
+		// Applaud (if you can) and return
 		give_karma($user_info['id'], $id_target, $action, 1);
-
 		redirect_karma();
 	}
 
@@ -66,12 +71,20 @@ class Karma_Controller extends Action_Controller
 		// Start off with no change in karma.
 		$action = prepare_karma($id_target);
 
+		// Give em a wack and run away
 		give_karma($user_info['id'], $_REQUEST['uid'], $action, -1);
-
 		redirect_karma();
 	}
 }
 
+/**
+ * Function to move the karma needle up or down for a given user
+ *
+ * @param int $id_executor who is performing the action
+ * @param int $id_target who is getting the action
+ * @param int $action applaud or smite
+ * @param int $dir
+ */
 function give_karma($id_executor, $id_target, $action, $dir)
 {
 	global $modSettings, $txt;
@@ -89,6 +102,11 @@ function give_karma($id_executor, $id_target, $action, $dir)
 	}
 }
 
+/**
+ * Makes sure that a user can perform the karma action
+ *
+ * @param int $id_target
+ */
 function prepare_karma($id_target)
 {
 	global $modSettings, $user_info;
@@ -103,7 +121,7 @@ function prepare_karma($id_target)
 
 	checkSession('get');
 
-	// we hold karma here.
+	// We hold karma here.
 	require_once(SUBSDIR . '/Karma.subs.php');
 
 	// If you don't have enough posts, tough luck.
@@ -116,6 +134,7 @@ function prepare_karma($id_target)
 	if (empty($id_target) || $id_target == $user_info['id'])
 		fatal_lang_error('cant_change_own_karma', false);
 
+	// Delete any older items from the log so we can get the go ahead or not
 	clearKarma($modSettings['karmaWaitTime']);
 
 	// Not an administrator... or one who is restricted as well.
@@ -129,6 +148,10 @@ function prepare_karma($id_target)
 	return $action;
 }
 
+/**
+ * Done with the action, return to where we need to be, or make it up if we
+ * can't figure it out.
+ */
 function redirect_karma()
 {
 	global $context, $topic;

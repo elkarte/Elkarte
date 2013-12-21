@@ -1,6 +1,12 @@
 <?php
 
 /**
+ * This file is exclusively for generating reports to help assist forum
+ * administrators keep track of their forum configuration and state. The
+ * core report generation is done in two areas. Firstly, a report "generator"
+ * will fill context with relevant data. Secondly, the choice of sub-template
+ * will determine how this data is shown to the user
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,39 +15,34 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file is exclusively for generating reports to help assist forum
- * administrators keep track of their forum configuration and state. The
- * core report generation is done in two areas. Firstly, a report "generator"
- * will fill context with relevant data. Secondly, the choice of sub-template
- * will determine how this data is shown to the user
- *
- * Functions ending with "Report" are responsible for generating data for reporting.
- * They are all called from action_index.
- * Never access the context directly, but use the data handling functions to do so.
  *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * "Report" Functions are responsible for generating data for reporting.
+ * They are all called from action_index.
+ * Never access the context directly, but use the data handling functions to do so.
+ */
 class Reports_Controller extends Action_Controller
 {
 	/**
 	 * Handling function for generating reports.
-	 * Requires the admin_forum permission.
-	 * Loads the Reports template and language files.
-	 * Decides which type of report to generate, if this isn't passed
-	 * through the querystring it will set the report_type sub-template to
-	 * force the user to choose which type.
-	 * When generating a report chooses which sub_template to use.
-	 * Depends on the cal_enabled setting, and many of the other cal_
-	 * settings.
-	 * Will call the relevant report generation function.
-	 * If generating report will call finishTables before returning.
+	 *  - Requires the admin_forum permission.
+	 *  - Loads the Reports template and language files.
+	 *  - Decides which type of report to generate, if this isn't passed
+	 *    through the querystring it will set the report_type sub-template to
+	 *    force the user to choose which type.
+	 * - When generating a report chooses which sub_template to use.
+	 * - Depends on the cal_enabled setting, and many of the other cal_ settings.
+	 * - Will call the relevant report generation function.
+	 * - If generating report will call finishTables before returning.
+	 *
 	 * Accessed through ?action=admin;area=reports.
 	 *
 	 * @see Action_Controller::action_index()
@@ -388,11 +389,9 @@ class Reports_Controller extends Action_Controller
 
 	/**
 	 * Show what the membergroups are made of.
-	 * functions ending with "Report" are responsible for generating data
-	 * for reporting.
+	 * functions ending with "Report" are responsible for generating data for reporting.
 	 * they are all called from action_index.
-	 * never access the context directly, but use the data handling
-	 * functions to do so.
+	 * never access the context directly, but use the data handling functions to do so.
 	 */
 	public function action_member_groups()
 	{

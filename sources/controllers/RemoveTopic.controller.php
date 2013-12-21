@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * The contents of this file handle the deletion of topics, posts, and related
+ * paraphernalia.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,12 +12,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * The contents of this file handle the deletion of topics, posts, and related
- * paraphernalia.
  *
  */
 
@@ -35,10 +35,11 @@ class RemoveTopic_Controller extends Action_Controller
 	{
 		// call the right method
 	}
+
 	/**
 	 * Completely remove an entire topic.
 	 * Redirects to the board when completed.
-	 * Called for ?action=removetopic2
+	 * Accessed by ?action=removetopic2
 	 */
 	function action_removetopic2()
 	{
@@ -92,7 +93,7 @@ class RemoveTopic_Controller extends Action_Controller
 	/**
 	 * Remove just a single post.
 	 * On completion redirect to the topic or to the board.
-	 * Called for ?action=deletemsg
+	 * Accessed by ?action=deletemsg
 	 */
 	function action_deletemsg()
 	{
@@ -162,7 +163,7 @@ class RemoveTopic_Controller extends Action_Controller
 	/**
 	 * Move back a topic or post from the recycle board to its original board.
 	 * Merges back the posts to the original as necessary.
-	 * Called for ?action=restoretopic
+	 * Accessed by ?action=restoretopic
 	 */
 	function action_restoretopic()
 	{
@@ -410,7 +411,7 @@ function mergePosts($msgs, $from_topic, $target_topic)
 
 	$db = database();
 
-	//!!! This really needs to be rewritten to take a load of messages from ANY topic, it's also inefficient.
+	// @todo This really needs to be rewritten to take a load of messages from ANY topic, it's also inefficient.
 
 	// Is it an array?
 	if (!is_array($msgs))
@@ -547,6 +548,7 @@ function mergePosts($msgs, $from_topic, $target_topic)
 			'unapproved_posts' => 0,
 			'id_first_msg' => 9999999999,
 		);
+
 		$request = $db->query('', '
 			SELECT MIN(id_msg) AS id_first_msg, MAX(id_msg) AS id_last_msg, COUNT(*) AS message_count, approved, subject
 			FROM {db_prefix}messages

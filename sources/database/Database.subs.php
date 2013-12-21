@@ -1,14 +1,14 @@
 <?php
 
 /**
+ * This file has all the main functions in it that set up the database connection
+ * and initializes the appropriate adapters.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Beta
- *
- * This file has all the main functions in it that set up the database connection
- * and initializes the appropriate adapters.
  *
  */
 
@@ -21,6 +21,7 @@
  * @param string $db_passwd
  * @param string $db_prefix
  * @param array $db_options
+ * @param string $db_type
  * @return null
  */
 function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array(), $db_type = 'mysql')

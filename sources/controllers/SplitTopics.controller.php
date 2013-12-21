@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Handle splitting of topics
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,11 +11,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * Handle splitting of topics
  *
  * Original module by Mach8 - We'll never forget you.
  */
@@ -21,9 +21,20 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * SplitTopics Controller.  Allows to take a topic and split at a point or select
+ * individual messages to split to a new topic.
+ * requires the split_any permission
+ */
 class SplitTopics_Controller extends Action_Controller
 {
+	/**
+	 * Holds the new subject for the split toic
+	 *
+	 * @var string
+	 */
 	private $_new_topic_subject = null;
+
 	/**
 	 * Intended entry point for this class.
 	 *
@@ -88,6 +99,8 @@ class SplitTopics_Controller extends Action_Controller
 		// Validate "at".
 		if (empty($_GET['at']))
 			fatal_lang_error('numbers_one_to_nine', false);
+
+		// Split at a specific topic
 		$splitAt = (int) $_GET['at'];
 
 		// We deal with topics here.
@@ -95,7 +108,7 @@ class SplitTopics_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Messages.subs.php');
 
 		// Let's load up the boards in case they are useful.
-		$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true));
+		$context += getBoardList(array('not_redirection' => true));
 
 		// Retrieve message info for the message at the split point.
 		$messageInfo = basicMessageInfo($splitAt, false, true);
@@ -152,6 +165,7 @@ class SplitTopics_Controller extends Action_Controller
 		// Clean up the subject.
 		if (isset($_POST['subname']))
 			$this->_new_topic_subject = trim(Util::htmlspecialchars($_POST['subname']));
+
 		if (empty($this->_new_topic_subject))
 			$this->_new_topic_subject = $txt['new_topic'];
 

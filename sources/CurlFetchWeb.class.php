@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Provides a cURL interface for fetching files and submitting requests to sites
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -55,7 +57,7 @@ class Curl_Fetch_Webdata
 	);
 
 	/**
-	 * Start the curl object
+	 * Start the cURL object
 	 * - allow for user override values
 	 *
 	 * @param array $options cURL options as an array
@@ -86,7 +88,7 @@ class Curl_Fetch_Webdata
 		elseif (!empty($post_data))
 			$this->post_data = trim($post_data);
 
-		// set the options and get it
+		// Set the options and get it
 		$this->_setOptions();
 		$this->_curlRequest(str_replace(' ', '%20', $url));
 
@@ -100,17 +102,16 @@ class Curl_Fetch_Webdata
 	 *
 	 * @param string $url site to fetch
 	 * @param bool $redirect flag to indicate if this was a redirect request or not
-	 * @return boolean
 	*/
 	private function _curlRequest($url, $redirect = false)
 	{
-		// we do have a url I hope
+		// We do have a url I hope
 		if ($url == '')
 			return false;
 		else
 			$this->options[CURLOPT_URL] = $url;
 
-		// if we have not already been redirected, set it up so we can
+		// If we have not already been redirected, set it up so we can
 		if (!$redirect)
 		{
 			$this->current_redirect = 1;
@@ -130,10 +131,10 @@ class Curl_Fetch_Webdata
 		$body = (!curl_error($cr)) ? substr($curl_content, $curl_info['header_size']) : false;
 		$error = (curl_error($cr)) ? curl_error($cr) : false;
 
-		// close this request
+		// Close this request
 		curl_close($cr);
 
-		// store this 'loops' data, someone may want all of these :O
+		// Store this 'loops' data, someone may want all of these :O
 		$this->response[] = array(
 			'url' => $url,
 			'code' => $http_code,
@@ -153,10 +154,10 @@ class Curl_Fetch_Webdata
 
 	/**
 	 * Used if being redirected to ensure we have a fully qualified address
+	 * returns the new url location for the redirect
 	 *
 	 * @param string $last_url where we went to
 	 * @param string $new_url where we were redirected to
-	 * @return new url location
 	 */
 	private function _getRedirectURL($last_url = '', $new_url = '')
 	{
@@ -164,7 +165,7 @@ class Curl_Fetch_Webdata
 		$last_url_parse = parse_url($last_url);
 		$new_url_parse  = parse_url($new_url);
 
-		// redirect headers are often incomplete / relative so we need to make sure they are fully qualified
+		// Redirect headers are often incomplete / relative so we need to make sure they are fully qualified
 		$new_url_parse['scheme'] = isset($new_url_parse['scheme']) ? $new_url_parse['scheme'] : $last_url_parse['scheme'];
 		$new_url_parse['host'] = isset($new_url_parse['host']) ? $new_url_parse['host'] : $last_url_parse['host'];
 		$new_url_parse['path'] = isset($new_url_parse['path']) ? $new_url_parse['path'] : $last_url_parse['path'];
@@ -180,7 +181,6 @@ class Curl_Fetch_Webdata
 	 *  - called as ->result('body') to just return the page source of the result
 	 *
 	 * @param string $area used to return an area such as body, header, error
-	 * @return string
 	 */
 	public function result($area = '')
 	{
@@ -199,7 +199,6 @@ class Curl_Fetch_Webdata
 	 *  - Call as ->result_raw() for everything.
 	 *
 	 * @param int $response_number
-	 * @return int
 	 */
 	public function result_raw($response_number = '')
 	{
@@ -218,7 +217,6 @@ class Curl_Fetch_Webdata
 	 *  - drops vars with @ since we don't support sending files (uploading)
 	 *
 	 * @param array $post_data
-	 * @return string
 	*/
 	private function _buildPostData($post_data)
 	{
@@ -226,7 +224,7 @@ class Curl_Fetch_Webdata
 		{
 			$postvars = array();
 
-			// build the post data, drop ones with leading @'s since those can be used to send files, we don't support that.
+			// Build the post data, drop ones with leading @'s since those can be used to send files, we don't support that.
 			foreach ($post_data as $name => $value)
 				$postvars[] = $name . '=' . urlencode($value[0] == '@' ? '' : $value);
 
@@ -274,7 +272,7 @@ class Curl_Fetch_Webdata
 	 */
 	private function _redirect($target_url, $referer_url)
 	{
-		// no no I last saw that over there ... really, 301, 302, 307
+		// No no I last saw that over there ... really, 301, 302, 307
 		$this->_setOptions();
 		$this->options[CURLOPT_REFERER] = $referer_url;
 		$this->_curlRequest($target_url, true);
@@ -284,9 +282,8 @@ class Curl_Fetch_Webdata
 	 * Callback function to parse returned headers
 	 *  - lowercases everything to make it consistent
 	 *
-	 * @param type $cr
+	 * @param object $cr
 	 * @param string $header
-	 * @return string
 	 */
 	private function _headerCallback($cr, $header)
 	{

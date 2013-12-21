@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This file contains a couple of functions for the latests posts on forum.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,8 +14,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file contains a couple of functions for the latests posts on forum.
  *
  */
 
@@ -116,6 +116,16 @@ function cache_getLastPosts($latestPostOptions)
 	);
 }
 
+/**
+ * For a supplied list of message id's, loads the posting details for each.
+ *  - Intended to get all the most recent posts.
+ *  - Tracks the posts made by this user (from the supplied message list) and loads the id's in to the 'own'
+ * 	  or 'any' array.  Reminder The controller needs to check permissions
+ *  - Returns two arrays, one of the posts one of any/own
+ *
+ * @param array $messages
+ * @param int $start
+ */
 function getRecentPosts($messages, $start)
 {
 	global $user_info, $scripturl, $modSettings;

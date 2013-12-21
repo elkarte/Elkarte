@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * This file contains functions specific to the editing box and is
+ * generally used for WYSIWYG type functionality.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -12,9 +15,6 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file contains those functions specific to the editing box and is
- * generally used for WYSIWYG type functionality.
  *
  */
 
@@ -178,7 +178,7 @@ function create_control_richedit($editorOptions)
 		loadTemplate('GenericControls', 'jquery.sceditor');
 
 		// JS makes the editor go round
-		loadJavascriptFile(array('jquery.sceditor.js', 'jquery.sceditor.bbcode.js', 'jquery.sceditor.elkarte.js', 'post.js'));
+		loadJavascriptFile(array('jquery.sceditor.js', 'jquery.sceditor.bbcode.js', 'jquery.sceditor.elkarte.js', 'post.js', 'splittag.plugin.js'));
 		addJavascriptVar(array(
 			'post_box_name' => '"' . $editorOptions['id'] . '"',
 			'elk_smileys_url' => '"' . $settings['smileys_url'] . '"',

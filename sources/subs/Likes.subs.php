@@ -1,13 +1,13 @@
 <?php
 
 /**
+ * This file contains the database work for likes.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Beta
- *
- * This file contains the database work for likes.
  *
  */
 
@@ -17,7 +17,7 @@
  *
  * @param int $id_liker - user_id of the liker/disliker
  * @param array $liked_message - message array that is being worked on
- * @param type $direction - + for like - for unlike a previous liked one
+ * @param char $direction - + for like - for unlike a previous liked one
  */
 function likePost($id_liker, $liked_message, $direction)
 {
@@ -40,7 +40,7 @@ function likePost($id_liker, $liked_message, $direction)
  * If prepare is true, will also prep the array for template use
  *
  * @param array $messages
- * @param bool prepare
+ * @param bool $prepare
  */
 function loadLikes($messages, $prepare = true)
 {
@@ -83,7 +83,7 @@ function loadLikes($messages, $prepare = true)
  * Replaces the current member id with 'You' if they like a post and makes it first
  * Truncates the like list at a given number and adds in +x others
  *
- * @param type $likes
+ * @param array $likes array of like ids to process
  * @return array
  */
 function prepareLikes($likes)
@@ -126,7 +126,7 @@ function prepareLikes($likes)
 /**
  * Clear the likes log of older actions ... used to prevent a like love fest
  *
- * @param type $likeWaitTime
+ * @param int $likeWaitTime
  */
 function clearLikes($likeWaitTime)
 {
@@ -254,8 +254,8 @@ function updateLike($id_liker, $liked_message, $direction)
 /**
  * Increase the number of likes for this topic.
  *
- * @param int $id_topic, the topic
- * @param int $direction +/- liking or unliking
+ * @param int $id_topic - the topic
+ * @param char $direction +/- liking or unliking
  */
 function increaseTopicLikes($id_topic, $direction)
 {

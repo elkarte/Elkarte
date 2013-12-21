@@ -1,19 +1,22 @@
 <?php
 
 /**
+ * This interface is meant to be implemented by classes which offer database search extra-facilities.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Beta
  *
- * This interface is meant to be implemented by classes which offer database search extra-facilities.
- *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Interface methods for database searches
+ */
 interface DbSearch
 {
 	/**

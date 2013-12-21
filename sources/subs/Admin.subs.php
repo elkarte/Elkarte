@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Functions to support admin controller
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -174,7 +176,7 @@ function getQuickAdminTasks()
  * - returns an array containing information on source files, templates and
  *   language files found in the default theme directory (grouped by language).
  *
- * @param array &$versionOptions
+ * @param array $versionOptions
  *
  * @return array
  */
@@ -326,7 +328,7 @@ function getFileVersions(&$versionOptions)
  *   which can occur during a db error
  * - If it fails Settings.php will assume 0
  *
- * @param type $time
+ * @param int $time
  */
 function updateDbLastError($time)
 {

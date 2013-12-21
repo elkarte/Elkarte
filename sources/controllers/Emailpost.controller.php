@@ -1,13 +1,14 @@
 <?php
 
 /**
+ * All the functions that validate and then save an email as a post or pm
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Beta
  *
- * All the functions that validate and then save an email as a post or pm
  */
 
 if (!defined('ELK'))
@@ -272,7 +273,7 @@ class Emailpost_Controller extends Action_Controller
 	 *  - Calls pbe_load_text to prepare text for the preview
 	 *  - Returns an array of values for use in the template
 	 *
-	 * @param type $data
+	 * @param string $data raw email string, including headers
 	 * @return boolean
 	 */
 	function action_pbe_preview($data = null)
@@ -336,9 +337,9 @@ class Emailpost_Controller extends Action_Controller
  *  - Calls pbe_load_text to prepare text for the post
  *  - returns true if successful or false for any number of failures
  *
- * @param type $pbe
- * @param type $email_message
- * @param type $topic_info
+ * @param array $pbe array of all pbe user_info values
+ * @param string $email_message
+ * @param array $topic_info
  */
 function pbe_create_post($pbe, $email_message, $topic_info)
 {
@@ -434,8 +435,8 @@ function pbe_create_post($pbe, $email_message, $topic_info)
  *  - Uses sendpm to do the actual "sending"
  *  - Returns true if successful or false for any number of failures
  *
- * @param type $pbe
- * @param type $email_message
+ * @param array $pbe array of pbe 'user_info' values
+ * @param string $email_message
 */
 function pbe_create_pm($pbe, $email_message)
 {
@@ -486,9 +487,9 @@ function pbe_create_pm($pbe, $email_message)
  *  - Calls query_update_member_stats to show they did something
  * Requires pbe and email_message to be populated.
  *
- * @param type $pbe
- * @param type $email_message
- * @param type $board_info
+ * @param array $pbe array of pbe 'user_info' values
+ * @param string $email_message
+ * @param array $board_info
  */
 function pbe_create_topic($pbe, $email_message, $board_info)
 {

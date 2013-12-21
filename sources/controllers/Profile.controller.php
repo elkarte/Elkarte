@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * This file has the primary job of showing and editing people's profiles.
+ * It also allows the user to change some of their or another's preferences,
+ * and such things.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,21 +13,24 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file has the primary job of showing and editing people's profiles.
- * It also allows the user to change some of their or another's preferences,
- * and such things.
  *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Profile_Controller class has the job of showing and editing people's profiles.
+ */
 class Profile_Controller extends Action_Controller
 {
+	/**
+	 * If the save was sucessful or not
+	 * @var boolean
+	 */
 	private $_completed_save = false;
 
 	/**

@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * This file provides compatibility functions such as the sha1() function,
+ * missing extensions, etc
+ * It is only included for when the respective extension or function cannot be found.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -13,10 +17,6 @@
  *
  * @version 1.0 Beta
  *
- * This file provides compatibility functions such as the sha1() function,
- * missing extensions, etc
- * It is only included for when the respective extension or function cannot be found.
- *
  */
 
 if (!defined('ELK'))
@@ -24,6 +24,7 @@ if (!defined('ELK'))
 
 /**
  * Define the old SMF sha1 function.
+ *
  * @param $str the string
  */
 function sha1_smf($str)
@@ -46,6 +47,9 @@ function sha1_smf($str)
 
 /**
  * This is the core SHA-1 calculation routine, used by sha1().
+ *
+ * @param array $x
+ * @param int $len
  */
 function sha1_core($x, $len)
 {
@@ -92,8 +96,13 @@ function sha1_core($x, $len)
 	return sprintf('%08x%08x%08x%08x%08x', $a, $b, $c, $d, $e);
 }
 
-/*
+/**
  * Helper function for the core SHA-1 calculation
+ *
+ * @param int $t
+ * @param int $b
+ * @param int $c
+ * @param int $d
  */
 function sha1_ft($t, $b, $c, $d)
 {
@@ -107,16 +116,21 @@ function sha1_ft($t, $b, $c, $d)
 	return $b ^ $c ^ $d;
 }
 
-/*
+/**
  * Helper function for the core SHA-1 calculation
+ *
+ * @param int $t
  */
 function sha1_kt($t)
 {
 	return $t < 20 ? 1518500249 : ($t < 40 ? 1859775393 : ($t < 60 ? -1894007588 : -899497514));
 }
 
-/*
+/**
  * Helper function for the core SHA-1 calculation
+ *
+ * @param int $num
+ * @param int $cnt
  */
 function sha1_rol($num, $cnt)
 {
@@ -131,12 +145,15 @@ function sha1_rol($num, $cnt)
 
 /**
  * Compatibility function.
- * crc32 doesn't work as expected on 64-bit functions - make our own.
- * http://www.php.net/crc32#79567
- * @param $number
  */
 if (!function_exists('crc32_compat'))
 {
+	/**
+	 * crc32 doesn't work as expected on 64-bit functions - make our own.
+	 * http://www.php.net/crc32#79567
+	 *
+	 * @param int $number
+	 */
 	function crc32_compat($number)
 	{
 		$crc = crc32($number);

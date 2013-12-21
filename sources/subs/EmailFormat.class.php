@@ -1,5 +1,7 @@
 <?php
 /**
+ * class that will reflow/format an email message to make it look like a post again
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -35,37 +37,37 @@ if (!defined('ELK'))
 class Email_Format
 {
 	/**
-	 * the full message section we will return
+	 * The full message section we will return
 	 */
 	private $_body = null;
 
 	/**
-	 * the full message section broken in to parts
+	 * The full message section broken in to parts
 	 */
 	private $_body_array = array();
 
 	/**
-	 * holds the current quote level we are in
+	 * Holds the current quote level we are in
 	 */
 	private $_in_quote = 0;
 
 	/**
-	 * holds the current code block level we are in
+	 * Holds the current code block level we are in
 	 */
 	private $_in_code = 0;
 
 	/**
-	 * holds the level of bbc list we are in
+	 * Holds the level of bbc list we are in
 	 */
 	private $_in_bbclist = 0;
 
 	/**
-	 * holds the level of plain list we are in
+	 * Holds the level of plain list we are in
 	 */
 	private $_in_plainlist = 0;
 
 	/**
-	 * holds if we are in a plain text list
+	 * Holds if we are in a plain text list
 	 */
 	private $_in_list = 0;
 
@@ -112,8 +114,9 @@ class Email_Format
 	 * Returns a formated string
 	 *
 	 * @param string $data
-	 * @param string $real_name
 	 * @param boolean $html
+	 * @param string $real_name
+	 * @param string $charset
 	 */
 	public function reflow($data, $html = false, $real_name = '', $charset = 'UTF-8')
 	{
@@ -153,7 +156,7 @@ class Email_Format
 			$this->_body_array[$i]['content'] = $temp[$i];
 			$this->_body_array[$i]['length'] = Util::strlen($temp[$i]);
 
-			// text lists a) 1. etc
+			// Text lists a) 1. etc
 			$this->_body_array[$i]['list_item'] = $this->_in_plainlist($temp[$i]);
 
 			// [quote]
@@ -169,7 +172,7 @@ class Email_Format
 			$this->_body_array[$i]['in_bbclist'] = $this->_in_bbclist;
 		}
 
-		// reset our index values
+		// Reset our index values
 		$this->_in_bbclist = 0;
 		$this->_in_code = 0;
 		$this->_in_quote = 0;
@@ -285,6 +288,8 @@ class Email_Format
 	/**
 	 * Repairs common problems either caused by the reflow or just things found
 	 * in emails.
+	 *
+	 * @param string $charset
 	 */
 	private function _clean_up($charset)
 	{
@@ -353,7 +358,7 @@ class Email_Format
 		// In a quote?
 		if (preg_match('~\[quote( author=.*)?\]?~', $var))
 		{
-			// make sure it is not a single line quote
+			// Make sure it is not a single line quote
 			if (!preg_match('~\[/quote\]?~', $var))
 				$this->_in_quote++;
 		}
@@ -364,7 +369,7 @@ class Email_Format
 	/**
 	 * Checks if a string is the potentially the start of a signature line
 	 *
-	 * @param string $var
+	 * @param int $i
 	 */
 	private function _in_sig($i)
 	{
@@ -386,10 +391,10 @@ class Email_Format
 	 */
 	private function _in_code($var)
 	{
-		// in a code block?
+		// In a code block?
 		if (preg_match('~\[code\]?~', $var))
 		{
-			// make sure it is not a single line code
+			// Make sure it is not a single line code
 			if (!preg_match('~\[/code\]?~', $var))
 				$this->_in_code++;
 		}

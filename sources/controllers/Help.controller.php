@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This file has the job of taking care of help messages and the help center.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,11 +11,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file has the important job of taking care of help messages and the help center.
  *
  */
 
@@ -82,6 +82,7 @@ class Help_Controller extends Action_Controller
 	 * Data: $_GET['help'] parameter, it holds what string to display
 	 * and where to get the string from. ($helptxt or $txt)
 	 * It is accessed via ?action=quickhelp;help=?.
+	 *
 	 * @uses ManagePermissions language file, if the help starts with permissionhelp.
 	 * @uses Help template, 'popup' sub-template.
 	 */

@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This file has the hefty job of loading information for the forum.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,11 +11,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This file has the hefty job of loading information for the forum.
  *
  */
 
@@ -1111,7 +1111,7 @@ function detectBrowser()
  * Are we using this browser?
  *
  * Wrapper function for detectBrowser
- * @param $browser: browser we are checking for.
+ * @param string $browser  the browser we are checking for.
 */
 function isBrowser($browser)
 {
@@ -1769,7 +1769,6 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 		{
 			loadLanguage('Errors');
 			$context['security_controls']['files']['theme_dir'] = '<a href="' . $scripturl . '?action=admin;area=theme;sa=list;th=1;' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['theme_dir_wrong'] . '</a>';
-			;
 		}
 
 		loadTemplate($template_name);
@@ -1823,14 +1822,14 @@ function loadSubTemplate($sub_template_name, $fatal = false)
 /**
  * Add a CSS file for output later
  *
- * @param string $filename
+ * @param mixed $filenames string or array of filenames to work on
  * @param array $params = array()
- * Keys are the following:
- *  - ['local'] (true/false): define if the file is local
- *  - ['fallback'] (true/false): if false  will attempt to load the file from the default theme if not found in the current theme
- *  - ['stale'] (true/false/string): if true or null, use cache stale, false do not, or used a supplied string
- *
- * @param string $id = ''
+ *		Keys are the following:
+ *			- ['local'] (true/false): define if the file is local
+ *			- ['fallback'] (true/false): if false  will attempt to load the file from the default theme
+ *				if not found in the current theme
+ *			- ['stale'] (true/false/string): if true or null, use cache stale, false do not, or used a supplied string
+ * @param string $id optional id to use in html id=""
  */
 function loadCSSFile($filenames, $params = array(), $id = '')
 {
@@ -1842,7 +1841,7 @@ function loadCSSFile($filenames, $params = array(), $id = '')
 	if (!is_array($filenames))
 		$filenames = array($filenames);
 
-	// static values for all these settings
+	// Static values for all these settings
 	$params['stale'] = (!isset($params['stale']) || $params['stale'] === true) ? '?beta10' : (is_string($params['stale']) ? ($params['stale'] = $params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']) : '');
 	$params['fallback'] = (!empty($params['fallback']) && ($params['fallback'] === false)) ? false : true;
 
@@ -1859,7 +1858,7 @@ function loadCSSFile($filenames, $params = array(), $id = '')
 		// All the files in this group use the parameters as defined above
 		foreach ($filenames as $filename)
 		{
-			// account for shorthand like admin.css?xyz11 filenames
+			// Account for shorthand like admin.css?xyz11 filenames
 			$has_cache_staler = strpos($filename, '.css?');
 			$params['basename'] = $has_cache_staler ? substr($filename, 0, $has_cache_staler + 4) : $filename;
 			$this_id = empty($id) ? strtr(basename($filename), '?', '_') : $id;
@@ -1907,16 +1906,15 @@ function loadCSSFile($filenames, $params = array(), $id = '')
  * Can be passed an array of filenames, all which will have the same parameters applied, if you
  * need specific parameters on a per file basis, call it multiple times
  *
- * @param array $filenames
+ * @param mixed $filenames string or array of filenames to work on
  * @param array $params = array()
- * Keys are the following:
- *  - ['local'] (true/false): define if the file is local
- *  - ['defer'] (true/false): define if the file should load in <head> or before the closing <html> tag
- *  - ['fallback'] (true/false): if true will attempt to load the file from the default theme if not found in the current
- *  - ['async'] (true/false): if the script should be loaded asynchronously (HTML5)
- *  - ['stale'] (true/false/string): if true or null, use cache stale, false do not, or used a supplied string
- *
- * @param string $id = ''
+ *		Keys are the following:
+ *			- ['local'] (true/false): define if the file is local
+ *			- ['defer'] (true/false): define if the file should load in <head> or before the closing <html> tag
+ *			- ['fallback'] (true/false): if true will attempt to load the file from the default theme if not found in the current
+ *			- ['async'] (true/false): if the script should be loaded asynchronously (HTML5)
+ *			- ['stale'] (true/false/string): if true or null, use cache stale, false do not, or used a supplied string
+ * @param string $id = '' optional id to use in html id=""
  */
 function loadJavascriptFile($filenames, $params = array(), $id = '')
 {
@@ -1928,11 +1926,11 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 	if (!is_array($filenames))
 		$filenames = array($filenames);
 
-	// static values for all these files
+	// Static values for all these files
 	$params['stale'] = (!isset($params['stale']) || $params['stale'] === true) ? '?beta10' : (is_string($params['stale']) ? ($params['stale'] = $params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']) : '');
 	$params['fallback'] = (!empty($params['fallback']) && ($params['fallback'] === false)) ? false : true;
 
-	// dejvu?
+	// Dejvu?
 	$cache_name = 'load_js_' . md5($settings['theme_dir'] . implode('_', $filenames));
 	if (($temp = cache_get_data($cache_name, 600)) !== null)
 	{
@@ -1945,7 +1943,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 		// All the files in this group use the above parameters
 		foreach ($filenames as $filename)
 		{
-			// account for shorthand like admin.js?xyz11 filenames
+			// Account for shorthand like admin.js?xyz11 filenames
 			$has_cache_staler = strpos($filename, '.js?');
 			$params['basename'] = $has_cache_staler ? substr($filename, 0, $has_cache_staler + 3) : $filename;
 			$this_id = empty($id) ? strtr(basename($filename), '?', '_') : $id;
@@ -1960,7 +1958,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 				// Fallback if we are not already in the default theme
 				if ($params['fallback'] && ($settings['theme_dir'] !== $settings['default_theme_dir']) && !file_exists($settings['theme_dir'] . '/scripts/' . $filename))
 				{
-					// can't find it in this theme, how about the default?
+					// Can't find it in this theme, how about the default?
 					if (file_exists($settings['default_theme_dir'] . '/scripts/' . $filename))
 					{
 						$filename = $settings['default_theme_url'] . '/scripts/' . $filename . ($has_cache_staler ? '' : $params['stale']);
@@ -1991,10 +1989,8 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 
 /**
  * Add a Javascript variable for output later (for feeding text strings and similar to JS)
- * Cleaner and easier (for modders) than to use the function below.
  *
- * @param string $key
- * @param string $value
+ * @param array $vars array of vars to include in the output done as 'varname' => 'var value'
  * @param bool $escape = false, whether or not to escape the value
  */
 function addJavascriptVar($vars, $escape = false)
@@ -2138,8 +2134,9 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
  * It finds all the parents of id_parent, and that board itself.
  * Additionally, it detects the moderators of said boards.
  *
+ * Returns an array of information about the boards found.
+ *
  * @param int $id_parent
- * @return an array of information about the boards found.
  */
 function getBoardParents($id_parent)
 {
@@ -2208,7 +2205,6 @@ function getBoardParents($id_parent)
  * Attempt to reload our known languages.
  *
  * @param bool $use_cache = true
- * @return array
  */
 function getLanguages($use_cache = true)
 {
@@ -2283,9 +2279,10 @@ function getLanguages($use_cache = true)
  *    show_no_censored is enabled, does not censor, unless force is also set.
  *  - it caches the list of censored words to reduce parsing.
  *
- * @param string &$text
+ * Returns the censored text
+ *
+ * @param string $text
  * @param bool $force = false
- * @return string The censored text
  */
 function censorText(&$text, $force = false)
 {

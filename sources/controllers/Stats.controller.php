@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Provide a display for forum statistics
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,11 +11,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * Provide a display for forum statistics
  *
  */
 
@@ -44,6 +44,9 @@ class Stats_Controller extends Action_Controller
 	 * uses the Stats template and language file. (and main sub template.)
 	 * requires the view_stats permission.
 	 * accessed from ?action=stats.
+	 *
+	 * @uses Stats language file
+	 * @uses Stats template, statistics sub template
 	 */
 	public function action_stats()
 	{
@@ -90,6 +93,7 @@ class Stats_Controller extends Action_Controller
 				'month' => sprintf('%02d', $month),
 				'year' => $year,
 			);
+
 			return;
 		}
 
@@ -124,7 +128,7 @@ class Stats_Controller extends Action_Controller
 	 */
 	public function loadGeneralStatistics()
 	{
-		global $txt, $scripturl, $modSettings, $context;
+		global $scripturl, $modSettings, $context;
 
 		// Get averages...
 		$averages = getAverages();

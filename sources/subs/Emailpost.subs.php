@@ -1,13 +1,15 @@
 <?php
 
 /**
+ * All the vital helper functions for use in email posting, formatting and conversion
+ * and boy are there a bunch !
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Beta
  *
- * All the vital helper functions for use in email posting, formatting and conversion
  */
 
 if (!defined('ELK'))
@@ -104,7 +106,7 @@ function pbe_email_to_bbc($text, $html)
  *
  * @param string $body
  * @param boolean $html
- * @param string $member_real_name
+ * @param string $real_name
  * @param string $charset character set of the text
  */
 function pbe_fix_email_body($body, $html = false, $real_name = '', $charset = 'UTF-8')
@@ -712,7 +714,7 @@ function pbe_emailError($error, $email_message)
  *  - adds valid ones to attachmentOptions
  *  - calls createAttachment to store them
  *
- * @param array pbe
+ * @param array $pbe
  * @param object $email_message
  */
 function pbe_email_attachments($pbe, $email_message)
@@ -1034,6 +1036,7 @@ function query_load_user_info($email)
  *
  * @param string $type board to load board permissions, otherwise general permissions
  * @param array $pbe
+ * @param array $topic_info
  */
 function query_load_permissions($type, &$pbe, $topic_info = array())
 {
@@ -1354,6 +1357,7 @@ function query_load_board($message_id)
  * Loads the basic board information for a given board id
  *
  * @param int $board_id
+ * @param array $pbe
  */
 function query_load_board_details($board_id, $pbe)
 {
@@ -1435,6 +1439,7 @@ function query_get_theme($id_member, $id_theme, $board_info)
  * @param int $id_board
  * @param int $id_topic
  * @param boolean $auto_notify
+ * @param array $permissions
  */
 function query_notifications($id_member, $id_board, $id_topic, $auto_notify, $permissions)
 {
@@ -1489,6 +1494,7 @@ function query_notifications($id_member, $id_board, $id_topic, $auto_notify, $pe
  *  - Marks the PM replied to as replied to
  *  - Updates the number of unread to reflect this
  *
+ * @param object $email_message
  * @param array $pbe
  */
 function query_mark_pms($email_message, $pbe)

@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This file has all the main functions in it that relate to the Postgre database.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -11,19 +13,32 @@
  *
  * @version 1.0 Beta
  *
- * This file has all the main functions in it that relate to the database.
- *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * PostgreSQL database class, implements database class to control mysql functions
+ */
 class Database_PostgreSQL implements Database
 {
+	/**
+	 * Holds current instance of the class
+	 * @var instance
+	 */
 	private static $_db = null;
 
+	/**
+	 * Current connetcion to the database
+	 * @var resource
+	 */
 	private $_connection = null;
 
+	/**
+	 * Holds last query result
+	 * @var string
+	 */
 	private $_db_last_result = null;
 
 	/**
@@ -37,9 +52,11 @@ class Database_PostgreSQL implements Database
 	 */
 	private $_in_transaction = false;
 
+	/**
+	 * Private constructor.
+	 */
 	private function __construct()
 	{
-		// Private constructor.
 		// Objects should be created through initiate().
 	}
 
@@ -47,12 +64,12 @@ class Database_PostgreSQL implements Database
 	 * Initializes a database connection.
 	 * It returns the connection, if successful.
 	 *
-	 * @param type $db_server
-	 * @param type $db_name
-	 * @param type $db_user
-	 * @param type $db_passwd
-	 * @param type $db_prefix
-	 * @param type $db_options
+	 * @param string $db_server
+	 * @param string $db_name
+	 * @param string $db_user
+	 * @param string $db_passwd
+	 * @param string $db_prefix
+	 * @param array $db_options
 	 *
 	 * @return resource
 	 */
@@ -94,8 +111,8 @@ class Database_PostgreSQL implements Database
 	 * Fix the database prefix if necessary.
 	 * Do nothing on postgreSQL
 	 *
-	 * @param type $db_prefix
-	 * @param type $db_name
+	 * @param string $db_prefix
+	 * @param string $db_name
 	 *
 	 * @return string
 	 */
@@ -229,8 +246,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @param string $db_string
 	 * @param string $db_values
-	 * @param type $connection
-	 * @return type
+	 * @param resource $connection
 	 */
 	function quote($db_string, $db_values, $connection = null)
 	{
@@ -260,7 +276,7 @@ class Database_PostgreSQL implements Database
 	 * @param string $identifier
 	 * @param string $db_string
 	 * @param string $db_values
-	 * @param type $connection
+	 * @param resource $connection
 	 * @return boolean
 	 */
 	function query($identifier, $db_string, $db_values = array(), $connection = null)
@@ -494,7 +510,7 @@ class Database_PostgreSQL implements Database
 	/**
 	 * Affected rows from previous operation.
 	 *
-	 * @param result resource $result
+	 * @param resource $result
 	 */
 	function affected_rows($result = null)
 	{
@@ -581,6 +597,8 @@ class Database_PostgreSQL implements Database
 
 	/**
 	 * Get the number of fields in the resultset.
+	 *
+	 * @param resource $request
 	 */
 	function num_fields($request)
 	{
@@ -881,7 +899,7 @@ class Database_PostgreSQL implements Database
 	/**
 	 * Unescape an escaped string!
 	 *
-	 * @param $string
+	 * @param string $string
 	 */
 	function unescape_string($string)
 	{
@@ -903,7 +921,7 @@ class Database_PostgreSQL implements Database
 	 * It goes in 250 row segments.
 	 *
 	 * @param string $tableName - the table to create the inserts for.
-	 * @param bool new_table
+	 * @param bool $new_table
 	 * @return string the query to insert the data back in, or an empty string if the table was empty.
 	 */
 	function insert_sql($tableName, $new_table = false)
@@ -1230,8 +1248,8 @@ class Database_PostgreSQL implements Database
 	/**
 	 * Get an associative array
 	 *
-	 * @param $request
-	 * @param $counter
+	 * @param resource $request
+	 * @param mixed $counter
 	 */
 	function fetch_assoc($request, $counter = false)
 	{
@@ -1251,6 +1269,7 @@ class Database_PostgreSQL implements Database
 	/**
 	 * Return server info.
 	 *
+	 * @param resource $connection
 	 * @return string
 	 */
 	function db_server_info($connection = null)

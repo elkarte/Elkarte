@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * This controller allows to choose the features activated and disactivate them.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -9,11 +11,9 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- *
- * This controller allows to choose the features activated and disactivate them.
  *
  */
 
@@ -336,20 +336,21 @@ class CoreFeatures_Controller extends Action_Controller
 	/**
 	 * Return the array of core features in the format expected by search.
 	 * Callback for admin internal search.
-	 * @todo quick method to return config in admin search format, during refactoring timez :P
-	 * (might fix this method to be consistent with the rest of config_vars for search)
 	 *
-	 * @return array
+	 * @return array in a config_var format
 	 */
 	public function config_vars()
 	{
 		global $txt;
 
+		$return_data = array();
+
 		$core_features = $this->settings();
 
-		$return_data = array();
+		// Convert this to a format that admin search will understand
 		foreach ($core_features as $id => $data)
 			$return_data[] = array('switch', isset($data['title']) ? $data['title'] : $txt['core_settings_item_' . $id]);
+
 		return $return_data;
 	}
 
