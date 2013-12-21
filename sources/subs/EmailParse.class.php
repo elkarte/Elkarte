@@ -527,7 +527,7 @@ class Email_Parse
 				}
 				break;
 			default:
-				// deal with all the rest (e.g. image/xxx) the standard way
+				// deal with all the rest (e.g. image/xyx) the standard way
 				$this->body = $this->_decode_string($this->body, $this->headers['content-transfer-encoding'], $this->headers['x-parameters']['content-type']['charset']);
 				break;
 		}
