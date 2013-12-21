@@ -318,7 +318,7 @@ function template_edit_group()
 					</dt>
 					<dd>';
 
-		template_add_edit_group_boards_list('groupForm', true ,false);
+		template_add_edit_group_boards_list('groupForm', true, false);
 
 		echo '
 					</dd>';
