@@ -486,7 +486,6 @@ class ManageBans_Controller extends Action_Controller
 		loadLanguage('Errors');
 		$context['sub_template'] = 'ban_edit';
 		loadJavascriptFile('suggest.js', array('default_theme' => true), 'suggest.js');
-
 	}
 
 	/**
@@ -692,7 +691,6 @@ class ManageBans_Controller extends Action_Controller
 
 		if (isset($_POST['ban_suggestions']))
 		{
-			// @TODO: is $_REQUEST['bi'] ever set?
 			$saved_triggers = saveTriggers($_POST['ban_suggestions'], $ban_info['id'], isset($_REQUEST['u']) ? (int) $_REQUEST['u'] : 0, isset($_REQUEST['bi']) ? (int) $_REQUEST['bi'] : 0);
 			$context['ban_suggestions']['saved_triggers'] = $saved_triggers;
 		}
@@ -761,7 +759,8 @@ class ManageBans_Controller extends Action_Controller
 		}
 		elseif (isset($_POST['edit_trigger']) && !empty($_POST['ban_suggestions']))
 		{
-			// The first replaces the old one, the others are added new (simplification, otherwise it would require another query and some work...)
+			// The first replaces the old one, the others are added new
+			// (simplification, otherwise it would require another query and some work...)
 			saveTriggers(array_shift($_POST['ban_suggestions']), $ban_group, 0, $ban_id);
 			if (!empty($_POST['ban_suggestions']))
 				saveTriggers($_POST['ban_suggestions'], $ban_group);
