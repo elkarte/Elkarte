@@ -820,7 +820,7 @@ class ManageBoards_Controller extends Action_Controller
 				array('check', 'deny_boards_access'),
 		);
 
-		call_integration_hook('integrate_boards_settings', array(&$subActions));
+		call_integration_hook('integrate_boards_settings', array(&$config_vars));
 
 		return $config_vars;
 	}
