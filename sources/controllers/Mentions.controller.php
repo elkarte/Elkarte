@@ -72,7 +72,7 @@ class Mentions_Controller extends Action_Controller
 	protected $_all = false;
 
 	/**
-	 * Start things up, what else does a contructor do
+	 * Start things up, what else does a constructor do
 	 */
 	public function __construct()
 	{
@@ -376,7 +376,7 @@ class Mentions_Controller extends Action_Controller
 	 * @param array $mentions : Mentions retrieved from the database by getUserMentions
 	 * @param string $type : the type of the mention
 	 */
-	function prepareMentionMessage($mentions, $type)
+	function prepareMentionMessage(&$mentions, $type)
 	{
 		global $txt, $scripturl, $context, $modSettings, $user_info;
 
@@ -393,7 +393,8 @@ class Mentions_Controller extends Action_Controller
 			if (in_array($row['mention_type'], array('men', 'like', 'rlike')))
 				$boards[$key] = $row['id_board'];
 
-			$mentions[$key]['message'] = str_replace(array(
+			$mentions[$key]['message'] = str_replace(
+				array(
 					'{msg_link}',
 					'{msg_url}',
 					'{subject}',
@@ -402,7 +403,8 @@ class Mentions_Controller extends Action_Controller
 					'<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . ';mentionread;mark=read;' . $context['session_var'] . '=' . $context['session_id'] . ';item=' . $row['id_mention'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
 					$scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . ';mentionread;' . $context['session_var'] . '=' . $context['session_id'] . 'item=' . $row['id_mention'] . '#msg' . $row['id_msg'],
 					$row['subject'],
-				), $txt['mention_' . $row['mention_type']]);
+				),
+				$txt['mention_' . $row['mention_type']]);
 		}
 
 		// Do the permissions checks and replace inappropriate messages
@@ -414,6 +416,7 @@ class Mentions_Controller extends Action_Controller
 
 			foreach ($boards as $key => $board)
 			{
+				// You can't see the board where this mention is, so we drop it from the results
 				if (!in_array($board, $accessibleBoards))
 				{
 					$removed = true;
@@ -422,6 +425,7 @@ class Mentions_Controller extends Action_Controller
 			}
 		}
 
+		// If some of these mentions are no longer visable, we need to do some maintenance
 		if ($removed)
 		{
 			if (!empty($modSettings['mentions_check_users']))

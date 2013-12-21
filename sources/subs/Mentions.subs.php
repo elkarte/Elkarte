@@ -73,7 +73,8 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT mtn.id_mention, mtn.id_msg, mtn.id_member_from, mtn.log_time, mtn.mention_type, mtn.status,
+		SELECT
+			mtn.id_mention, mtn.id_msg, mtn.id_member_from, mtn.log_time, mtn.mention_type, mtn.status,
 			m.subject, m.id_topic, m.id_board,
 			IFNULL(mem.real_name, m.poster_name) as mentioner, mem.avatar, mem.email_address,
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
