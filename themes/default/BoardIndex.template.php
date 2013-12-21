@@ -27,7 +27,7 @@ function template_BoardIndex_init()
  */
 function template_boards_list()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt;
 
 	// Each category in categories is made up of:
 	// id, href, link, name, is_collapsed (is it collapsed?), can_collapse (is it okay if it is?),
@@ -40,7 +40,6 @@ function template_boards_list()
 			continue;
 
 		// @todo - Invent nifty class name for boardindex header bars.
-		// @todo - Note these are now h2, not the old h3.
 		echo '
 		<div class="forum_category" id="category_', $category['id'], '">
 			<h2 class="category_header">';
@@ -179,7 +178,9 @@ function template_info_center()
 	// ]]></script>';
 }
 
-// This is the "Recent Posts" bar.
+/**
+ * This is the "Recent Posts" bar.
+ */
 function template_ic_recent_posts()
 {
 	global $context, $txt, $scripturl, $settings;
@@ -236,7 +237,9 @@ function template_ic_recent_posts()
 			</li>';
 }
 
-// Show information about events, birthdays, and holidays on the calendar.
+/**
+ * Show information about events, birthdays, and holidays on the calendar in the info center
+ */
 function template_ic_show_events()
 {
 	global $context, $txt, $scripturl, $settings;
@@ -289,7 +292,9 @@ function template_ic_show_events()
 			</li>';
 }
 
-// Show statistical style information...
+/**
+ * Show statistical style information in the info center
+ */
 function template_ic_show_stats()
 {
 	global $txt, $scripturl, $context, $settings, $modSettings;
@@ -297,7 +302,8 @@ function template_ic_show_stats()
 	echo '
 			<li class="board_row">
 				<h3 class="ic_section_header">
-					<a href="', $scripturl, '?action=stats" title="', $txt['more_stats'], '"><img class="icon" src="', $settings['images_url'], '/icons/info.png" alt="" />', $txt['forum_stats'], '</a>
+					<img class="icon" src="', $settings['images_url'], '/icons/info.png" alt="" />
+					', $context['show_stats'] ? '<a href="' . $scripturl . '?action=stats" title="' . $txt['more_stats'] . '">' . $txt['forum_stats'] . '</a>' : $txt['forum_stats'], '
 				</h3>
 				<p class="inline">
 					', $context['common_stats']['boardindex_total_posts'], '', !empty($settings['show_latest_member']) ? ' - ' . $txt['latest_member'] . ': <strong> ' . $context['common_stats']['latest_member']['link'] . '</strong>' : '', ' - ', $txt['most_online_today'], ': ', comma_format($modSettings['mostOnlineToday']), '<br />
@@ -306,6 +312,9 @@ function template_ic_show_stats()
 			</li>';
 }
 
+/**
+ * Show the online users in the info center
+ */
 function template_ic_show_users()
 {
 	global $context, $txt, $scripturl, $settings, $modSettings;
