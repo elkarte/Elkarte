@@ -554,33 +554,31 @@ function template_results()
 
 	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && !empty($context['topics']) && $context['can_move'])
 		addInlineJavascript('
-		if (typeof(window.XMLHttpRequest) != "undefined")
-			aJumpTo[aJumpTo.length] = new JumpTo({
-				sContainerId: "quick_mod_jump_to",
-				sClassName: "qaction",
-				sJumpToTemplate: "%dropdown_list%",
-				sCurBoardName: "' . $context['jump_to']['board_name'] . '",
-				sBoardChildLevelIndicator: "&#10134;",
-				sBoardPrefix: "&#10148; ",
-				sCatClass: "jump_to_header",
-				sCatPrefix: "",
-				bNoRedirect: true,
-				bDisabled: true,
-				sCustomName: "move_to"
-			});', true);
+		aJumpTo[aJumpTo.length] = new JumpTo({
+			sContainerId: "quick_mod_jump_to",
+			sClassName: "qaction",
+			sJumpToTemplate: "%dropdown_list%",
+			sCurBoardName: "' . $context['jump_to']['board_name'] . '",
+			sBoardChildLevelIndicator: "&#10134;",
+			sBoardPrefix: "&#10148; ",
+			sCatClass: "jump_to_header",
+			sCatPrefix: "",
+			bNoRedirect: true,
+			bDisabled: true,
+			sCustomName: "move_to"
+		});', true);
 
 	addInlineJavascript('
-		if (typeof(window.XMLHttpRequest) != "undefined")
-			aJumpTo[aJumpTo.length] = new JumpTo({
-				sContainerId: "search_jump_to",
-				sJumpToTemplate: "<label class=\"smalltext\" for=\"%select_id%\">' . $context['jump_to']['label'] . ':<" + "/label> %dropdown_list%",
-				iCurBoardId: 0,
-				iCurBoardChildLevel: 0,
-				sCurBoardName: "' . $context['jump_to']['board_name'] . '",
-				sBoardChildLevelIndicator: "&#10134;",
-				sBoardPrefix: "&#10148; ",
-				sCatClass: "jump_to_header",
-				sCatPrefix: "",
-				sGoButtonLabel: "' . $txt['quick_mod_go'] . '"
-			});', true);
+		aJumpTo[aJumpTo.length] = new JumpTo({
+			sContainerId: "search_jump_to",
+			sJumpToTemplate: "<label class=\"smalltext\" for=\"%select_id%\">' . $context['jump_to']['label'] . ':<" + "/label> %dropdown_list%",
+			iCurBoardId: 0,
+			iCurBoardChildLevel: 0,
+			sCurBoardName: "' . $context['jump_to']['board_name'] . '",
+			sBoardChildLevelIndicator: "&#10134;",
+			sBoardPrefix: "&#10148; ",
+			sCatClass: "jump_to_header",
+			sCatPrefix: "",
+			sGoButtonLabel: "' . $txt['quick_mod_go'] . '"
+		});', true);
 }

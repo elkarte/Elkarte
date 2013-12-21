@@ -33,18 +33,8 @@ function QuickModifyTopic(oOptions)
 	this.oTopicModHandle = document;
 	this.bInEditMode = false;
 	this.bMouseOnDiv = false;
-	this.bXmlHttpCapable = this.isXmlHttpCapable();
 	this.init();
 }
-
-// Ajax supported?
-QuickModifyTopic.prototype.isXmlHttpCapable = function ()
-{
-	if (typeof(window.XMLHttpRequest) === 'undefined')
-		return false;
-
-	return true;
-};
 
 // Used to initialise the object event handlers
 QuickModifyTopic.prototype.init = function ()
@@ -271,18 +261,11 @@ QuickReply.prototype.quote = function (iMessageId, xDeprecated)
 	}
 	else
 	{
-		// Doing it the XMLhttp way?
-		if (window.XMLHttpRequest)
-		{
-			ajax_indicator(true);
-			if (this.bIsFull)
-				insertQuoteFast(iMessageId);
-			else
-				getXMLDocument(elk_prepareScriptUrl(this.opt.sScriptUrl) + 'action=quotefast;quote=' + iMessageId + ';xml', this.onQuoteReceived);
-		}
-		// Or with a smart popup!
+		ajax_indicator(true);
+		if (this.bIsFull)
+			insertQuoteFast(iMessageId);
 		else
-			reqWin(elk_prepareScriptUrl(this.opt.sScriptUrl) + 'action=quotefast;quote=' + iMessageId, 240, 90);
+			getXMLDocument(elk_prepareScriptUrl(this.opt.sScriptUrl) + 'action=quotefast;quote=' + iMessageId + ';xml', this.onQuoteReceived);
 
 		// Move the view to the quick reply box.
 		if (navigator.appName === 'Microsoft Internet Explorer')
@@ -345,33 +328,17 @@ function QuickModify(oOptions)
 	this.sMessageBuffer = '';
 	this.sSubjectBuffer = '';
 	this.sInfoBuffer = '';
-	this.bXmlHttpCapable = this.isXmlHttpCapable();
 	this.aAccessKeys = [];
 
 	// Show the edit buttons
-	if (this.bXmlHttpCapable)
-	{
-		var aShowQuickModify = document.getElementsByClassName(this.opt.sClassName);
-		for (var i = 0, length = aShowQuickModify.length; i < length; i++)
-			aShowQuickModify[i].style.display = "inline";
-	}
+	var aShowQuickModify = document.getElementsByClassName(this.opt.sClassName);
+	for (var i = 0, length = aShowQuickModify.length; i < length; i++)
+		aShowQuickModify[i].style.display = "inline";
 }
-
-// Determine whether the quick modify can actually be used.
-QuickModify.prototype.isXmlHttpCapable = function ()
-{
-	if (typeof(window.XMLHttpRequest) === 'undefined')
-		return false;
-
-	return true;
-};
 
 // Function called when a user presses the edit button.
 QuickModify.prototype.modifyMsg = function (iMessageId)
 {
-	if (!this.bXmlHttpCapable)
-		return;
-
 	// Add backwards compatibility with old themes.
 	if (typeof(sSessionVar) === 'undefined')
 		sSessionVar = 'sesc';
@@ -1102,13 +1069,8 @@ function sendtopicForm(oPopup_body, url, oContainer)
  */
 function topicSplitselect(direction, msg_id)
 {
-	if (window.XMLHttpRequest)
-	{
-		getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + "action=splittopics;sa=selectTopics;subname=" + topic_subject + ";topic=" + topic_id + "." + start[0] + ";start2=" + start[1] + ";move=" + direction + ";msg=" + msg_id + ";xml", onTopicSplitReceived);
-		return false;
-	}
-	else
-		return true;
+	getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + "action=splittopics;sa=selectTopics;subname=" + topic_subject + ";topic=" + topic_id + "." + start[0] + ";start2=" + start[1] + ";move=" + direction + ";msg=" + msg_id + ";xml", onTopicSplitReceived);
+	return false;
 }
 
 /**

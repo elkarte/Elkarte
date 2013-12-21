@@ -27,12 +27,6 @@ var ua = navigator.userAgent.toLowerCase(),
 	is_ie = /*@cc_on!@*/false || !!document.documentMode, // IE6+
 	is_webkit = ua.indexOf('applewebkit') !== -1;
 
-// Define XMLHttpRequest for IE
-if (!('XMLHttpRequest' in window) && 'ActiveXObject' in window)
-	window.XMLHttpRequest = function () {
-		return new ActiveXObject('MSXML2.XMLHTTP');
-	};
-
 // Some older versions of Mozilla don't have this, for some reason.
 if (!('forms' in document))
 	document.forms = document.getElementsByTagName('form');
@@ -54,9 +48,6 @@ if (!('getElementsByClassName' in document))
  */
 function getXMLDocument(sUrl, funcCallback)
 {
-	if (!window.XMLHttpRequest)
-		return null;
-
 	var oMyDoc = new XMLHttpRequest(),
 		bAsync = typeof(funcCallback) !== 'undefined',
 		oCaller = this;
@@ -89,9 +80,6 @@ function getXMLDocument(sUrl, funcCallback)
  */
 function sendXMLDocument(sUrl, sContent, funcCallback)
 {
-	if (!window.XMLHttpRequest)
-		return false;
-
 	var oSendDoc = new window.XMLHttpRequest(),
 		oCaller = this;
 
@@ -1318,9 +1306,6 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 var aIconLists = [];
 function IconList(oOptions)
 {
-	if (!window.XMLHttpRequest)
-		return;
-
 	this.opt = oOptions;
 	this.bListLoaded = false;
 	this.oContainerDiv = null;
