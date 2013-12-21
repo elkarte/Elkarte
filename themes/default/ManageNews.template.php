@@ -356,7 +356,7 @@ function template_email_members_send()
  */
 function template_email_members_succeeded()
 {
-	global $context, $txt, $scripturl;
+	global $txt, $scripturl;
 
 	echo '
 	<div id="admincenter">

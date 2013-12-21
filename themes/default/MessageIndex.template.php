@@ -27,7 +27,7 @@ function template_MessageIndex_init()
  */
 function template_display_child_boards_above()
 {
-	global $context, $txt, $scripturl, $settings;
+	global $context, $txt;
 
 	echo '
 	<div id="board_', $context['current_board'], '_childboards" class="forum_category">

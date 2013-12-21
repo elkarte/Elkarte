@@ -493,7 +493,7 @@ template_ssi_below();
 
 function template_ssi_above()
 {
-	global $settings, $context, $scripturl, $modSettings;
+	global $settings, $context, $scripturl;
 
 	echo '<!DOCTYPE html>
 <html>
