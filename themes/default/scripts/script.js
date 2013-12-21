@@ -27,10 +27,6 @@ var ua = navigator.userAgent.toLowerCase(),
 	is_ie = /*@cc_on!@*/false || !!document.documentMode, // IE6+
 	is_webkit = ua.indexOf('applewebkit') !== -1;
 
-// Some older versions of Mozilla don't have this, for some reason.
-if (!('forms' in document))
-	document.forms = document.getElementsByTagName('form');
-
 // Versions of ie < 9 do not have this built in
 if (!('getElementsByClassName' in document))
 {
