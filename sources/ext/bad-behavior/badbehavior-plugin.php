@@ -295,7 +295,7 @@ function bb2_insert_stats($force = false)
 		if (($bb2_blocked = cache_get_data('bb2_blocked', 900)) === null)
 		{
 			$bb2_blocked = bb2_db_query('SELECT COUNT(*) FROM {db_prefix}log_badbehavior WHERE `valid` NOT LIKE \'00000000\'');
-			cache_put_data('bb2_blocked', $bb2_blocked , 900);
+			cache_put_data('bb2_blocked', $bb2_blocked, 900);
 		}
 
 		if ($bb2_blocked !== false)

@@ -65,7 +65,7 @@ function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
 			'id' => $id,
 		)
 	);
- 	while ($row = $db->fetch_assoc($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$postemail[$i] = array(
 			'id_email' => $row['id_email'],
@@ -331,7 +331,7 @@ function maillist_board_list()
 /**
  * Turns on or off the "fake" cron job for imap email retrieval
  *
- * @param boolean $switch 
+ * @param boolean $switch
  */
 function enable_maillist_imap_cron($switch)
 {

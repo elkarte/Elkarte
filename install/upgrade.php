@@ -806,7 +806,7 @@ function checkLogin()
 				$upcontext['user']['name'] = 'Administrator';
 			}
 
-			$upcontext['user']['pass'] = mt_rand(0,60000);
+			$upcontext['user']['pass'] = mt_rand(0, 60000);
 
 			// This basically is used to match the GET variables to Settings.php.
 			$upcontext['upgrade_status']['pass'] = $upcontext['user']['pass'];
