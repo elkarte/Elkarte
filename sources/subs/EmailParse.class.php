@@ -155,7 +155,7 @@ class Email_Parse
 			// Read in the file from the failed log table
 			if (isset($_POST['item']))
 				$this->raw_message = $this->_query_load_email($_POST['item']);
-			// @todo debugging file used for testing
+			// Debugging file used for testing
 			elseif (file_exists($location . '/elk-test.eml') && isAllowedTo('admin_forum'))
 				$this->raw_message = file_get_contents($location . '/elk-test.eml');
 		}
