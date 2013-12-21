@@ -855,7 +855,7 @@ function showCodeImage($code)
 				$new_index = $last_index;
 				while ($last_index == $new_index)
 					$new_index = mt_rand(0, count($colors) - 1);
- 				$char_fg_color = $colors[$new_index];
+				$char_fg_color = $colors[$new_index];
 				$last_index = $new_index;
 			}
 			elseif ($fontColorType == 'random')
