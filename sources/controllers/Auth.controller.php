@@ -432,7 +432,7 @@ class Auth_Controller extends Action_Controller
 		{
 			if (empty($_SESSION['logout_url']))
 				redirectexit('', $context['server']['needs_login_fix']);
-			elseif (!empty($_SESSION['logout_url']) && (strpos('http://', $_SESSION['logout_url']) === false && strpos('https://', $_SESSION['logout_url']) === false))
+			elseif (!empty($_SESSION['logout_url']) && (substr($_SESSION['logout_url'], 0, 7) !== 'http://' && substr($_SESSION['logout_url'], 0, 8) !== 'https://'))
 			{
 				unset($_SESSION['logout_url']);
 				redirectexit();
@@ -546,7 +546,7 @@ class Auth_Controller extends Action_Controller
 			// Some whitelisting for login_url...
 			if (empty($_SESSION['login_url']))
 				redirectexit();
-			elseif (!empty($_SESSION['login_url']) && (strpos('http://', $_SESSION['login_url']) === false && strpos('https://', $_SESSION['login_url']) === false))
+			elseif (!empty($_SESSION['login_url']) && (substr($_SESSION['login_url'], 0, 7) !== 'http://' && substr($_SESSION['login_url'], 0, 8) !== 'https://'))
 			{
 				unset($_SESSION['login_url']);
 				redirectexit();
