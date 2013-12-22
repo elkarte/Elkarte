@@ -280,11 +280,11 @@ class OpenID
 	{
 		// @todo Add in discovery.
 
-		if (strpos($uri, 'http://') !== 0 && strpos($uri, 'https://') !== 0)
-			$uri = 'http://' . $uri;
-
-		if (strpos(substr($uri, strpos($uri, '://') + 3), '/') === false)
+		if (substr($uri, -1) !== '/')
 			$uri .= '/';
+
+		if (substr($uri, 0, 7) !== 'http://' && substr($uri, 0, 8) !== 'https://')
+			$uri = 'http://' . $uri;
 
 		return $uri;
 	}
