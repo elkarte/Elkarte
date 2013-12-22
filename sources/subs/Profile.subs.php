@@ -1655,10 +1655,12 @@ function profileLoadAvatarData()
 
 	$context['avatar_url'] = $modSettings['avatar_url'];
 
+	$valid_protocol = substr($cur_profile['avatar'], 0, 7) === 'http://' || substr($cur_profile['avatar'], 0, 8) === 'https://';
+
 	// Default context.
 	$context['member']['avatar'] += array(
-		'custom' => stristr($cur_profile['avatar'], 'http://') ? $cur_profile['avatar'] : 'http://',
-		'selection' => $cur_profile['avatar'] == '' || stristr($cur_profile['avatar'], 'http://') ? '' : $cur_profile['avatar'],
+		'custom' => $valid_protocol ? $cur_profile['avatar'] : 'http://',
+		'selection' => $valid_protocol ? $cur_profile['avatar'] : '' ,
 		'id_attach' => $cur_profile['id_attach'],
 		'filename' => $cur_profile['filename'],
 		'allow_server_stored' => allowedTo('profile_server_avatar') || (!$context['user']['is_owner'] && allowedTo('profile_extra_any')),
@@ -1676,7 +1678,7 @@ function profileLoadAvatarData()
 		);
 		$context['member']['avatar']['href'] = empty($cur_profile['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $cur_profile['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $cur_profile['filename'];
 	}
-	elseif (stristr($cur_profile['avatar'], 'http://') && $context['member']['avatar']['allow_external'])
+	elseif ($valid_protocol && $context['member']['avatar']['allow_external'])
 		$context['member']['avatar'] += array(
 			'choice' => 'external',
 			'server_pic' => 'blank.png',
@@ -2029,7 +2031,9 @@ function profileSaveAvatarData(&$value)
 	$id_folder = getAvatarPathID();
 
 	$downloadedExternalAvatar = false;
-	if ($value == 'external' && allowedTo('profile_remote_avatar') && stripos($_POST['userpicpersonal'], 'http://') === 0 && strlen($_POST['userpicpersonal']) > 7 && !empty($modSettings['avatar_download_external']))
+	$valid_http = substr($_POST['userpicpersonal'], 0, 7) === 'http://' && strlen($_POST['userpicpersonal']) > 7;
+	$valid_https = substr($_POST['userpicpersonal'], 0, 8) === 'https://' && strlen($_POST['userpicpersonal']) > 8;
+	if ($value == 'external' && allowedTo('profile_remote_avatar') && ($valid_http || $valid_https) && !empty($modSettings['avatar_download_external']))
 	{
 		loadLanguage('Post');
 		if (!is_writable($uploadDir))
@@ -2038,7 +2042,7 @@ function profileSaveAvatarData(&$value)
 		require_once(SUBSDIR . '/Package.subs.php');
 
 		$url = parse_url($_POST['userpicpersonal']);
-		$contents = fetch_web_data('http://' . $url['host'] . (empty($url['port']) ? '' : ':' . $url['port']) . str_replace(' ', '%20', trim($url['path'])));
+		$contents = fetch_web_data((empty($url['scheme']) ? 'http://' : $url['scheme'] . '://') . $url['host'] . (empty($url['port']) ? '' : ':' . $url['port']) . str_replace(' ', '%20', trim($url['path'])));
 
 		if ($contents != false)
 		{
@@ -2087,7 +2091,7 @@ function profileSaveAvatarData(&$value)
 
 		removeAttachments(array('id_member' => $memID));
 	}
-	elseif ($value == 'external' && allowedTo('profile_remote_avatar') && stripos($_POST['userpicpersonal'], 'http://') === 0 && empty($modSettings['avatar_download_external']))
+	elseif ($value == 'external' && allowedTo('profile_remote_avatar') && ($valid_http || $valid_https) && empty($modSettings['avatar_download_external']))
 	{
 		// We need these clean...
 		$cur_profile['id_attach'] = 0;
@@ -2102,7 +2106,7 @@ function profileSaveAvatarData(&$value)
 		if ($profile_vars['avatar'] == 'http://' || $profile_vars['avatar'] == 'http:///')
 			$profile_vars['avatar'] = '';
 		// Trying to make us do something we'll regret?
-		elseif (substr($profile_vars['avatar'], 0, 7) != 'http://')
+		elseif (!$valid_http && !$valid_https)
 			return 'bad_avatar';
 		// Should we check dimensions?
 		elseif (!empty($modSettings['avatar_max_height_external']) || !empty($modSettings['avatar_max_width_external']))

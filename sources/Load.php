@@ -2583,6 +2583,8 @@ function determineAvatar($profile)
 		$max_avatar_height = '';
 	}
 
+	$avatar_protocol = substr(strtolower($profile['avatar']), 0, 7);
+
 	// uploaded avatar?
 	if ($profile['id_attach'] > 0 && empty($profile['avatar']))
 	{
@@ -2597,7 +2599,7 @@ function determineAvatar($profile)
 		);
 	}
 	// remote avatar?
-	elseif (stristr($profile['avatar'], 'http://'))
+	elseif ($avatar_protocol === 'http://' || $avatar_protocol === 'https:/')
 	{
 		$avatar = array(
 			'name' => $profile['avatar'],
@@ -2620,7 +2622,7 @@ function determineAvatar($profile)
 		);
 	}
 	// an avatar from the gallery?
-	elseif (!empty($profile['avatar']) && !stristr($profile['avatar'], 'http://'))
+	elseif (!empty($profile['avatar']) && !($avatar_protocol === 'http://' || $avatar_protocol === 'https:/'))
 	{
 		$avatar = array(
 			'name' => $profile['avatar'],
