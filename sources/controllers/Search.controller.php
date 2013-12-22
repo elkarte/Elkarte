@@ -61,7 +61,7 @@ class Search_Controller extends Action_Controller
 		global $txt, $scripturl, $modSettings, $user_info, $context;
 
 		// Is the load average too high to allow searching just now?
-		if (!empty($context['load_average']) && !empty($modSettings['loadavg_search']) && $context['load_average'] >= $modSettings['loadavg_search'])
+		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
 			fatal_lang_error('loadavg_search_disabled', false);
 
 		loadLanguage('Search');
@@ -223,7 +223,7 @@ class Search_Controller extends Action_Controller
 		if (isset($_REQUEST['search_selection']) && $_REQUEST['search_selection'] === 'members')
 			redirectexit($scripturl . '?action=memberlist;sa=search;fields=name,email;search=' . urlencode($_REQUEST['search']));
 
-		if (!empty($context['load_average']) && !empty($modSettings['loadavg_search']) && $context['load_average'] >= $modSettings['loadavg_search'])
+		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
 			fatal_lang_error('loadavg_search_disabled', false);
 
 		// No, no, no... this is a bit hard on the server, so don't you go prefetching it!

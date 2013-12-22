@@ -1745,7 +1745,7 @@ class PersonalMessage_Controller extends Action_Controller
 		$db = database();
 
 		// Make sure the server is able to do this right now
-		if (!empty($context['load_average']) && !empty($modSettings['loadavg_search']) && $context['load_average'] >= $modSettings['loadavg_search'])
+		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
 			fatal_lang_error('loadavg_search_disabled', false);
 
 		// Some useful general permissions.
