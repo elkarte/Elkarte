@@ -116,7 +116,7 @@ elkRegister.prototype.autoSetup = function(formID)
 			curType = 0;
 
 			// Username can only be done with XML.
-			if (curElement.id.indexOf('username') !== -1 && window.XMLHttpRequest)
+			if (curElement.id.indexOf('username') !== -1)
 				curType = 'username';
 			else if (curElement.id.indexOf('pwmain') !== -1)
 				curType = 'pwmain';

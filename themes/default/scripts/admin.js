@@ -737,7 +737,7 @@ function generateFTPTest()
 	generatedButton = true;
 
 	// No XML?
-	if (!window.XMLHttpRequest || (!document.getElementById("test_ftp_placeholder") && !document.getElementById("test_ftp_placeholder_full")))
+	if (!document.getElementById("test_ftp_placeholder") && !document.getElementById("test_ftp_placeholder_full"))
 		return false;
 
 	// create our test button to call testFTP on click
@@ -815,14 +815,11 @@ function expandFolder(folderIdent, folderReal)
 		return false;
 	}
 	// Otherwise we need to get the wicked thing.
-	else if (window.XMLHttpRequest)
+	else
 	{
 		ajax_indicator(true);
 		getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=packages;onlyfind=' + escape(folderReal) + ';sa=perms;xml;' + elk_session_var + '=' + elk_session_id, onNewFolderReceived);
 	}
-	// Otherwise reload.
-	else
-		return true;
 
 	return false;
 }

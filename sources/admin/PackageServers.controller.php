@@ -270,7 +270,7 @@ class PackageServers_Controller extends Action_Controller
 				{
 					$remote_type = $thisPackage->exists('@type') ? $thisPackage->fetch('@type') : 'relative';
 
-					if ($remote_type == 'relative' && substr($thisPackage->fetch('@href'), 0, 7) != 'http://')
+					if ($remote_type == 'relative' && (substr($thisPackage->fetch('@href'), 0, 7) !== 'http://' || substr($thisPackage->fetch('@href'), 0, 8) !== 'https://'))
 					{
 						if (isset($_GET['absolute']))
 							$current_url = $_GET['absolute'] . '/';
@@ -683,7 +683,7 @@ class PackageServers_Controller extends Action_Controller
 		$serverurl = trim(Util::htmlspecialchars($_POST['serverurl']));
 
 		// Make sure the URL has the correct prefix.
-		if (strpos($serverurl, 'http://') !== 0 && strpos($serverurl, 'https://') !== 0)
+		if (substr($serverurl, 0, 7) !== 'http://' && substr($serverurl, 0, 8) !== 'https://')
 			$serverurl = 'http://' . $serverurl;
 
 		// Add it to the list of package servers.
