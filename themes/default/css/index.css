@@ -1789,6 +1789,7 @@ img.new_posts {
 .topic_name h4 {
 	line-height: 1.429em;
 	display: inline-block;
+	padding-right: 30px;
 }
 .topic_name h4 a {
 	font-weight: 600;
