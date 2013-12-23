@@ -70,8 +70,8 @@ div.quick_tasks {
 }
 /* @todo could it be a sprite? */
 .listaction img {
-	width:16px;
-	height:16px
+	width: 16px;
+	height: 16px;
 }
 
 /* News and newsletters screen.
@@ -611,7 +611,7 @@ padding: 7px 10px;
 .bbfilter {
 	display: table-cell;
 	padding: 4px 0;
-	width: 20px; 
+	width: 20px;
 	vertical-align: top;
 }
 .bbrequest_uri {
@@ -1178,5 +1178,5 @@ ul.moderation_notes li {
 	top: 0;
 	left: 0;
 	width: 100%;
-	height: 100%
+	height: 100%;
 }

@@ -105,12 +105,12 @@ p, fieldset, form, input, button, select, textarea, .editor {
 .attachments_bot:after, .editor_wrapper:after {
 	display: block;
 	clear: both;
-	content:"";
+	content: "";
 }
 .quickbuttons:after {
 	display: block;
 	clear: both;
-	content:"";
+	content: "";
 }
 /* @todo */
 .statistics>.flow_hidden>.category_header:after {
@@ -412,10 +412,10 @@ em {
 .hdicon:before {
 	background-image: url(../images/icons/header.png);
 	background-repeat: no-repeat;
-    content: "";
-    height: 24px;
-    margin-top: 0.25em;
-    padding-left: 30px;
+	content: "";
+	height: 24px;
+	margin-top: 0.25em;
+	padding-left: 30px;
 }
 /* broke formatting for compactness */
 .cat_img_attachments:before {background-position: 0 0;}
@@ -452,7 +452,7 @@ h2 a.collapse {
 /* Upshrink image in the general category headers */
 #category_toggle, #category_toggle_more, #upshrink_header {
 	display: block;
-	float:right;
+	float: right;
 	padding: 0 16px;
 	overflow: hidden;
 	position: relative;
@@ -738,7 +738,7 @@ div.windowbg, div.windowbg2 {
 	margin: 0;
 	padding: 14px 8px 0 8px;
 	line-height: 1.3em;
-	min-width:38%;
+	min-width: 38%;
 	/* @todo - See me grumblez in Issue #552. ;) */
 }
 #top_section_notice .toggle_login {
@@ -1066,7 +1066,7 @@ div.windowbg, div.windowbg2 {
 }
 /* Nifty indicators. */
 .linktree:before, .linktree:after, .linktree_last:before, .linktree_last:after {
-	content:"";
+	content: "";
 	position: absolute;
 	display: block;
 	left: 100%;
@@ -1166,7 +1166,7 @@ div.windowbg, div.windowbg2 {
 	left: 3px;
 	top: 50%;
 	margin-top: -12px;
-	content:"";
+	content: "";
 }
 .quickmod_check {
 	left: 3px;
@@ -1704,7 +1704,7 @@ img.new_posts {
 }
 /* @todo - Not required, or not in this file. */
 .fix_rtl_names {
-	display:inline-block;
+	display: inline-block;
 }
 
 
@@ -1728,7 +1728,7 @@ img.new_posts {
 	padding: 4px 4px 4px 12px;
 }
 #description_board .generalinfo .listlevel2 {
-	white-space:nowrap;
+	white-space: nowrap;
 }
 #description_board .generalinfo {
 	display: table;
@@ -2631,7 +2631,7 @@ dl.merge_topic dd {
 	border: 0;
 	border-spacing: 1em;
 	width: 95%;
-	table-layout:fixed;
+	table-layout: fixed;
 	font-size: 0.857em;
 	margin: 0 auto;
 }
@@ -3017,8 +3017,8 @@ dl.merge_topic dd {
 	clear: both;
 }
 #to_item_list_container div, #bcc_item_list_container div {
-	float:left;
-	margin-right:10px;
+	float: left;
+	margin-right: 10px;
 }
 div.labels {
 	display: block;
@@ -3689,7 +3689,7 @@ a.help .icon {
 	.board_name:after {
 		display: block;
 		clear: both;
-		content:"";
+		content: "";
 	}
 	.board_description, .moderators, .childboards {
 		margin: 0 0 0 8px;
@@ -3830,7 +3830,7 @@ a.help .icon {
 	ul.buttonlist:before {
 		display: block;
 		clear: both;
-		content:"";
+		content: "";
 	}
 	.pagelinks {
 		height: 30px;
@@ -3910,7 +3910,7 @@ a.help .icon {
 	.board_info:after {
 		display: block;
 		clear: both;
-		content:"";
+		content: "";
 	}
 	.board_lastpost {
 		padding-top: 6px;
@@ -4013,7 +4013,7 @@ a.help .icon {
 	.poster:after, .posterarea:before {
 		display: block;
 		clear: both;
-		content:"";
+		content: "";
 		padding-bottom: 3px;
 	}
 	.postarea, .forumtitle {
