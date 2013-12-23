@@ -2358,6 +2358,9 @@ ul.post_options li {
 #postAttachment dt, #postAttachment2 dt {
 	font-weight: bold;
 }
+.attachmenterrors {
+	padding: 0 1em;
+}
 #postDraftOptions .settings dd, #postDraftOptions .settings dt{
 	margin: 0;
 	padding: 5px 10px;
