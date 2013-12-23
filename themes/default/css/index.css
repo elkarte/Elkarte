@@ -2361,6 +2361,14 @@ ul.post_options li {
 .attachmenterrors {
 	padding: 0 1em;
 }
+.draftautosave {
+	display: block;
+	text-align: right;
+}
+.draftautosave #draft_lastautosave {
+	display: block;
+	min-height: 1em;
+}
 #postDraftOptions .settings dd, #postDraftOptions .settings dt{
 	margin: 0;
 	padding: 5px 10px;
