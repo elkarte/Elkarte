@@ -3362,6 +3362,13 @@ a.help .icon {
 	max-height: 22em;
 }
 
+/* Some styles used in help entries (language strings) */
+.enablePostHTML {
+	margin-bottom: 0;
+}
+.custom_mask {
+	 margin: 0 2em;
+}
 
 /*	$SEARCH		*/
 /* ------------------------------------------------------- */

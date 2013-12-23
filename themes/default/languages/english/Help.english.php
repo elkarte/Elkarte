@@ -356,7 +356,7 @@ $helptxt['default_timezone'] = 'The server timezone tells PHP where your server 
 $helptxt['spamWaitTime'] = 'Here you can select the amount of time that must pass between postings. This can be used to stop people from "spamming" your forum by limiting how often they can post.';
 
 $helptxt['enablePostHTML'] = 'This will allow the posting of some basic HTML tags:
-	<ul class="normallist" style="margin-bottom: 0;">
+	<ul class="normallist enablePostHTML">
 		<li>&lt;b&gt;, &lt;u&gt;, &lt;i&gt;, &lt;s&gt;, &lt;em&gt;, &lt;ins&gt;, &lt;del&gt;</li>
 		<li>&lt;a href=&quot;&quot;&gt;</li>
 		<li>&lt;img src=&quot;&quot; alt=&quot;&quot; /&gt;</li>
@@ -617,7 +617,7 @@ $helptxt['field_show_enclosed'] = 'Encloses the user input between some text or 
 		</ul>';
 
 $helptxt['custom_mask'] = 'The input mask is important for your forum\'s security. Validating the input from a user can help ensure that data is not used in a way you do not expect. We have provided some simple regular expressions as hints.<br /><br />
-	<div class="smalltext" style="margin: 0 2em">
+	<div class="smalltext custom_mask">
 		&quot;~[A-Za-z]+~&quot; - Match all upper and lower case alphabet characters.<br />
 		&quot;~[0-9]+~&quot; - Match all numeric characters.<br />
 		&quot;~[A-Za-z0-9]{7}~&quot; - Match all upper and lower case alphabet and numeric characters seven times.<br />
@@ -625,7 +625,7 @@ $helptxt['custom_mask'] = 'The input mask is important for your forum\'s securit
 		&quot;~^([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$~&quot; - Only allow 3 or 6 character hexcodes.<br />
 	</div><br /><br />
 	Additionally, special metacharacters ?+*^$ and {xx} can be defined.
-	<div class="smalltext" style="margin: 0 2em">
+	<div class="smalltext custom_mask">
 		? - None or one match of previous expression.<br />
 		+ - One or more of previous expression.<br />
 		* - None or more of previous expression.<br />
