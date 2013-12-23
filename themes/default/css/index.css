@@ -1801,7 +1801,7 @@ img.new_posts {
 	display: table-cell;
 	vertical-align: top;
 	width: 20%;
-	min-width: 34em;
+	min-width: 28em;
 	padding: 7px 4px 6px 4px;
 	font-size: 0.929em;
 }
