@@ -573,6 +573,23 @@ function template_set_settings()
 							<input type="checkbox" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="', $setting['id'], '"', !empty($setting['value']) ? ' checked="checked"' : '', ' value="1" class="input_check" />
 						</dd>';
 		}
+		// A textarea?
+		elseif ($setting['type'] == 'textarea')
+		{
+			echo '
+						<dt id="dt_', $setting['id'], '">
+							<label for="', $setting['id'], '">', $setting['label'], '</label>:';
+
+			if (isset($setting['description']))
+				echo '<br />
+							<span class="smalltext">', $setting['description'], '</span>';
+
+			echo '
+						</dt>
+						<dd id="dd_', $setting['id'], '">
+							<textarea name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="', $setting['id'], '"class="input_textarea">', $setting['value'], '</textarea>
+						</dd>';
+		}
 		// A list with options?
 		elseif ($setting['type'] == 'list')
 		{
