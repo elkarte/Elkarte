@@ -431,7 +431,7 @@ $txt['search_api_not_compatible'] = 'The selected search API the forum is using 
 $txt['cannot_restore_first_post'] = 'You cannot restore the first post in a topic.';
 $txt['parent_topic_missing'] = 'The parent topic of the post you are trying to restore has been deleted.';
 $txt['restored_disabled'] = 'The restoration of topics has been disabled.';
-$txt['restore_not_found'] = 'The following messages could not be restored; the original topic may have been removed:<ul style="margin-top: 0px;">%1$s</ul>You will need to move these manually.';
+$txt['restore_not_found'] = 'The following messages could not be restored; the original topic may have been removed: %1$s You will need to move these manually.';
 
 $txt['error_invalid_dir'] = 'The directory you entered is invalid.';
 
