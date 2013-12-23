@@ -371,7 +371,7 @@ class PersonalMessage_Controller extends Action_Controller
 			// This is a list of the pm's that are used for "show all" display.
 			if ($context['display_mode'] == 0)
 				$display_pms = $pms;
-			// Just use the last pm the user received one to start things off
+			// Just use the last pm the user received to start things off
 			else
 				$display_pms = array($lastData['id']);
 
@@ -2466,7 +2466,7 @@ function preparePMContext_callback($type = 'subject', $reset = false)
 	);
 
 	$context['additional_pm_drop_buttons'] = array();
-	
+
 	// Can they report this message
 	if (!empty($output['can_report']) && $context['folder'] !== 'sent' && $output['member']['id'] != $user_info['id'])
 		$context['additional_pm_drop_buttons']['warn_button'] = array(

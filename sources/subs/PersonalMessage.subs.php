@@ -1013,7 +1013,7 @@ function loadPMs($pm_options, $id_member)
 			);
 		}
 	}
-	// If not in conversation view, then This is kinda simple!
+	// If not in conversation view, then this is kinda simple!
 	else
 	{
 		// @todo SLOW This query uses a filesort. (inbox only.)
