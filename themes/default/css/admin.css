@@ -730,6 +730,19 @@ ul.pending_payments {
 	display: inline-block;
 	text-align: center;
 }
+.edit_board {
+	float: left;
+	padding: 8px;
+	background-image: url(../images/icons/modify_small.png);
+	margin-top: 3px;
+	margin-left: 3px;
+}
+.edit_board.nochanges {
+	background-image: url(../images/icons/field_valid.png);
+}
+.edit_board.changed {
+	background-image: url(../images/icons/field_invalid.png);
+}
 
 /* Styles for the themes section.
 ------------------------------------------------- */

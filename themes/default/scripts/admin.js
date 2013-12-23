@@ -1074,3 +1074,50 @@ function swapPostGroup(isChecked)
 	if (typeof(oModeratorSuggest) !== 'undefined')
 		oModeratorSuggest.oTextHandle.disabled = isChecked ? true : false;
 }
+
+/**
+ * Sets up all the js events for edit and save board-specific permission
+ * profiles
+ */
+function initEditProfileBoards()
+{
+	$('.edit_all_board_profiles').click(function(e) {
+		e.preventDefault();
+
+		$('.edit_board').click();
+	});
+	$('.edit_board').show().click(function(e) {
+		var $icon = $(this),
+			board_id = $icon.data('boardid'),
+			board_profile = $icon.data('boardprofile'),
+			$target = $('#edit_board_' + board_id),
+			$select = $('<select />')
+				.attr('name', 'boardprofile[' + board_id + ']')
+				.change(function() {
+					$(this).find('option:selected').each(function() {
+						if ($(this).attr('value') == board_profile)
+							$icon.addClass('nochanges').removeClass('changed');
+						else
+							$icon.addClass('changed').removeClass('nochanges');
+					})
+				});
+
+		e.preventDefault();
+		$(permission_profiles).each(function(key, value) {   
+			var $opt = $('<option />').attr('value', value.id).text(value.name);
+
+			if (value.id == board_profile)
+				$opt.attr('selected', 'selected');
+
+			$select.append($opt);
+		});
+
+		$target.replaceWith($select);
+		$select.change();
+
+		$('.edit_all_board_profiles').replaceWith($('<input type="submit" class="right_submit" />')
+			.attr('name', 'save_changes')
+			.attr('value', txt_save)
+		);
+	});
+}
