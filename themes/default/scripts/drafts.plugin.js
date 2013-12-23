@@ -15,7 +15,7 @@
 	function elk_Drafts(options) {
 		// All the passed options and defaults are loaded to the opts object
 		this.opts = $.extend({}, this.defaults, options);
-	};
+	}
 
 	/**
 	 * Make the call to save this draft in the background
@@ -177,6 +177,8 @@
 	 * - closes the draft last saved info box from a "manual" save draft click
 	 * - hides the ajax saving icon
 	 * - turns off _bInDraftMode so another save request can fire
+	 *
+	 * @param {xml object} XMLDoc
 	 */
 	elk_Drafts.prototype.onDraftDone = function (XMLDoc) {
 		// If it is not valid then clean up

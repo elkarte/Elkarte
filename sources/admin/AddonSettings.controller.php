@@ -2,7 +2,7 @@
 
 /**
  * Handles administration settings added in the common area for all addons.
- * 
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -178,7 +178,16 @@ class AddonSettings_Controller extends Action_Controller
 		$context['sub_template'] = 'show_settings';
 
 		// By default do the basic settings.
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (!empty($defaultAction) ? $defaultAction : array_pop($temp = array_keys($subActions)));
+		if (isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]))
+			$_REQUEST['sa'] = $_REQUEST['sa'];
+		elseif (!empty($defaultAction))
+			$_REQUEST['sa'] = $defaultAction;
+		else
+		{
+			$keys = array_keys($subActions);
+			$_REQUEST['sa'] = array_pop($keys);
+		}
+
 		$context['sub_action'] = $_REQUEST['sa'];
 	}
 }

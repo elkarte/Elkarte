@@ -231,7 +231,7 @@ class Emailuser_Controller extends Action_Controller
 		{
 			$errors = $validator->validation_errors();
 
-			return $context['sendtopic_error'] = array(
+			return array(
 				'errors' => $errors,
 				'type' => 'minor',
 				'title' => $txt['validation_failure'],
