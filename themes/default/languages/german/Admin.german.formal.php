@@ -157,7 +157,7 @@ $txt['email_done'] = 'erledigt.';
 $txt['ban_title'] = 'Sperrliste';
 $txt['ban_ip'] = 'IP-Adressen sperren: (z. B. 192.168.12.213 oder 128.0.*.*) - ein Eintrag pro Zeile';
 $txt['ban_email'] = 'E-Mail-Adressen sperren: (z. B. boesewicht@irgendwo.de) - ein Eintrag pro Zeile';
-$txt['ban_user name'] = 'Benutzernamen sperren: (z. B. l33tuser) - ein Eintrag pro Zeile';
+$txt['ban_username'] = 'Benutzernamen sperren: (z. B. l33tuser) - ein Eintrag pro Zeile';
 
 $txt['ban_errors_detected'] = 'Folgende Fehler sind beim Speichern oder Ändern der Sperrgruppe oder des Auslösers aufgetreten';
 $txt['ban_description'] = 'Hier können Sie problematische Benutzer per IP-Adresse, Hostname, Benutzername oder E-Mail-Adresse aussperren.';
@@ -166,7 +166,7 @@ $txt['ban_banned_entity'] = 'Gesperrte Einheit';
 $txt['ban_on_ip'] = 'Sperre auf IP (z. B. 192.168.10-20.*)';
 $txt['ban_on_hostname'] = 'Sperre auf den Hostnamen (z. B. *.mil)';
 $txt['ban_on_email'] = 'Sperre auf E-Mail-Adresse (z. B. *@boeseseite.de)';
-$txt['ban_on_user name'] = 'Sperre auf den Benutzernamen';
+$txt['ban_on_username'] = 'Sperre auf den Benutzernamen';
 $txt['ban_notes'] = 'Hinweise';
 $txt['ban_restriction'] = 'Beschränkung';
 $txt['ban_full_ban'] = 'Vollständige Sperre';

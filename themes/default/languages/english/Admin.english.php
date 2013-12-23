@@ -159,7 +159,7 @@ $txt['email_members_succeeded'] = 'You have successfully sent your newsletter!';
 $txt['ban_title'] = 'Ban List';
 $txt['ban_ip'] = 'IP banning: (e.g. 192.168.12.213 or 128.0.*.*) - one entry per line';
 $txt['ban_email'] = 'Email banning: (e.g. badguy@somewhere.com) - one entry per line';
-$txt['ban_user name'] = 'User name banning: (e.g. l33tuser) - one entry per line';
+$txt['ban_username'] = 'User name banning: (e.g. l33tuser) - one entry per line';
 
 $txt['ban_errors_detected'] = 'The following error or errors occurred while saving or editing the ban group or trigger';
 $txt['ban_description'] = 'Here you can ban troublesome people either by IP, hostname, user name, or email.';
@@ -168,7 +168,7 @@ $txt['ban_banned_entity'] = 'Banned entity';
 $txt['ban_on_ip'] = 'Ban on IP (e.g. 192.168.10-20.*)';
 $txt['ban_on_hostname'] = 'Ban on Hostname (e.g. *.mil)';
 $txt['ban_on_email'] = 'Ban on Email Address (e.g. *@badsite.com)';
-$txt['ban_on_user name'] = 'Ban on User Name';
+$txt['ban_on_username'] = 'Ban on User Name';
 $txt['ban_notes'] = 'Notes';
 $txt['ban_restriction'] = 'Restriction';
 $txt['ban_full_ban'] = 'Full ban';
@@ -306,8 +306,8 @@ $txt['additional'] = 'Additional';
 $txt['wild_cards_allowed'] = 'wildcard characters * and ? are allowed';
 $txt['search_for'] = 'Search for';
 $txt['search_match'] = 'Match';
-$txt['member_part_of_these_member groups'] = 'Member is part of these member groups';
-$txt['member groups'] = 'Member groups';
+$txt['member_part_of_these_membergroups'] = 'Member is part of these member groups';
+$txt['membergroups'] = 'Member groups';
 $txt['confirm_delete_members'] = 'Are you sure you want to delete the selected members?';
 
 $txt['support_credits_title'] = 'Support &amp; Credits'; // consistent naming, see above
@@ -329,10 +329,10 @@ $txt['support_latest'] = 'Common support &amp; issues';
 $txt['support_latest_fetch'] = 'Retrieving support information...';
 
 $txt['edit_permissions_info'] = 'Change restrictions and available features, globally or in specific boards.';
-$txt['member groups_members'] = 'Regular Members';
-$txt['member groups_guests'] = 'Guests';
-$txt['member groups_add_group'] = 'Add group';
-$txt['member groups_permissions'] = 'Permissions';
+$txt['membergroups_members'] = 'Regular Members';
+$txt['membergroups_guests'] = 'Guests';
+$txt['membergroups_add_group'] = 'Add group';
+$txt['membergroups_permissions'] = 'Permissions';
 
 $txt['permitgroups_restrict'] = 'Restrictive';
 $txt['permitgroups_standard'] = 'Standard';
@@ -715,8 +715,8 @@ $txt['smileys_edit'] = 'Edit Smileys';
 $txt['smileys_set_order'] = 'Set Smiley order';
 $txt['icons_edit_message_icons'] = 'Edit message icons';
 
-$txt['member groups_new_group'] = 'Add Member Group';
-$txt['member groups_edit_groups'] = 'Edit Member Groups';
+$txt['membergroups_new_group'] = 'Add Member Group';
+$txt['membergroups_edit_groups'] = 'Edit Member Groups';
 $txt['permissions_groups'] = 'General Permissions';
 $txt['permissions_boards'] = 'Board Permissions';
 $txt['permissions_profiles'] = 'Edit Profiles';
