@@ -294,12 +294,15 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
  */
 function markMessages($personal_messages = null, $label = null, $owner = null)
 {
-	global $user_info, $context;
+	global $user_info;
 
 	$db = database();
 
 	if ($owner === null)
 		$owner = $user_info['id'];
+
+	if (!is_null($personal_messages) && !is_array($personal_messages))
+		$personal_messages = array($personal_messages);
 
 	$db->query('', '
 		UPDATE {db_prefix}pm_recipients
@@ -317,47 +320,97 @@ function markMessages($personal_messages = null, $label = null, $owner = null)
 
 	// If something wasn't marked as read, get the number of unread messages remaining.
 	if ($db->affected_rows() > 0)
+		updatePMMenuCounts($owner);
+}
+
+/**
+ * Mark the specified personal messages as unread.
+ *
+ * @param array $personal_messages = array of pm ids to mark unread
+ */
+function markMessagesUnread($personal_messages)
+{
+	global $user_info;
+
+	$db = database();
+
+	if (empty($personal_messages))
+		return;
+
+	if (!is_array($personal_messages))
+		$personal_messages = array($personal_messages);
+
+	$owner = $user_info['id'];
+
+	// Flip the "read" bit on this
+	$db->query('', '
+		UPDATE {db_prefix}pm_recipients
+		SET is_read = is_read & 2
+		WHERE id_member = {int:id_member}
+			AND (is_read & 1 >= 1)
+			AND id_pm IN ({array_int:personal_messages})',
+		array(
+			'personal_messages' => $personal_messages,
+			'id_member' => $owner,
+		)
+	);
+
+	// If something was marked unread, update the number of unread messages remaining.
+	if ($db->affected_rows() > 0)
+		updatePMMenuCounts($owner);
+}
+
+/**
+ * Updates the number of unread messages for a user
+ * Updates the  per label totals as well as the overall total
+ *
+ * @param int $owner
+ */
+function updatePMMenuCounts($owner)
+{
+	global $user_info, $context;
+
+	$db = database();
+
+	if ($owner == $user_info['id'])
 	{
-		if ($owner == $user_info['id'])
-		{
-			foreach ($context['labels'] as $label)
-				$context['labels'][(int) $label['id']]['unread_messages'] = 0;
-		}
-
-		$result = $db->query('', '
-			SELECT labels, COUNT(*) AS num
-			FROM {db_prefix}pm_recipients
-			WHERE id_member = {int:id_member}
-				AND NOT (is_read & 1 >= 1)
-				AND deleted = {int:is_not_deleted}
-			GROUP BY labels',
-			array(
-				'id_member' => $owner,
-				'is_not_deleted' => 0,
-			)
-		);
-		$total_unread = 0;
-		while ($row = $db->fetch_assoc($result))
-		{
-			$total_unread += $row['num'];
-
-			if ($owner != $user_info['id'])
-				continue;
-
-			$this_labels = explode(',', $row['labels']);
-			foreach ($this_labels as $this_label)
-				$context['labels'][(int) $this_label]['unread_messages'] += $row['num'];
-		}
-		$db->free_result($result);
-
-		// Need to store all this.
-		cache_put_data('labelCounts:' . $owner, $context['labels'], 720);
-		updateMemberData($owner, array('unread_messages' => $total_unread));
-
-		// If it was for the current member, reflect this in the $user_info array too.
-		if ($owner == $user_info['id'])
-			$user_info['unread_messages'] = $total_unread;
+		foreach ($context['labels'] as $label)
+			$context['labels'][(int) $label['id']]['unread_messages'] = 0;
 	}
+
+	$result = $db->query('', '
+		SELECT labels, COUNT(*) AS num
+		FROM {db_prefix}pm_recipients
+		WHERE id_member = {int:id_member}
+			AND NOT (is_read & 1 >= 1)
+			AND deleted = {int:is_not_deleted}
+		GROUP BY labels',
+		array(
+			'id_member' => $owner,
+			'is_not_deleted' => 0,
+		)
+	);
+	$total_unread = 0;
+	while ($row = $db->fetch_assoc($result))
+	{
+		$total_unread += $row['num'];
+
+		if ($owner != $user_info['id'])
+			continue;
+
+		$this_labels = explode(',', $row['labels']);
+		foreach ($this_labels as $this_label)
+			$context['labels'][(int) $this_label]['unread_messages'] += $row['num'];
+	}
+	$db->free_result($result);
+
+	// Need to store all this.
+	cache_put_data('labelCounts:' . $owner, $context['labels'], 720);
+	updateMemberData($owner, array('unread_messages' => $total_unread));
+
+	// If it was for the current member, reflect this in the $user_info array too.
+	if ($owner == $user_info['id'])
+		$user_info['unread_messages'] = $total_unread;
 }
 
 /**
@@ -387,13 +440,11 @@ function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
 			'not_deleted' => 0,
 		)
 	);
-
 	if ($db->num_rows($request) === 0)
 	{
 		$db->free_result($request);
 		return false;
 	}
-
 	$validationResult = $db->fetch_assoc($request);
 	$db->free_result($request);
 
@@ -401,19 +452,16 @@ function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
 	{
 		case 'inbox':
 			return !empty($validationResult['valid_for_inbox']);
-		break;
-
+			break;
 		case 'outbox':
 			return !empty($validationResult['valid_for_outbox']);
-		break;
-
+			break;
 		case 'in_or_outbox':
 			return !empty($validationResult['valid_for_inbox']) || !empty($validationResult['valid_for_outbox']);
-		break;
-
+			break;
 		default:
 			trigger_error('Undefined validation type given', E_USER_ERROR);
-		break;
+			break;
 	}
 }
 
@@ -882,9 +930,9 @@ function loadPMs($pm_options, $id_member)
 
 	// First work out what messages we need to see - if grouped is a little trickier...
 	// Conversation mode
-	if ($pm_options['display_mode'] === 2)
+	if ($pm_options['display_mode'] == 2)
 	{
-		// On a non-default sort due to PostgreSQL we have to do a harder sort.
+		// On a non-default sort, when using PostgreSQL we have to do a harder sort.
 		if ($db->db_title() == 'PostgreSQL' && $pm_options['sort_by_query'] != 'pm.id_pm')
 		{
 			$sub_request = $db->query('', '
@@ -913,9 +961,9 @@ function loadPMs($pm_options, $id_member)
 			$sub_pms = array();
 			while ($row = $db->fetch_assoc($sub_request))
 				$sub_pms[$row['id_pm_head']] = $row['sort_param'];
-
 			$db->free_result($sub_request);
 
+			// Now we use those results in the next query
 			$request = $db->query('', '
 				SELECT pm.id_pm AS id_pm, pm.id_pm_head
 				FROM {db_prefix}personal_messages AS pm' . ($pm_options['folder'] == 'sent' ? ($pm_options['sort_by'] == 'name' ? '
@@ -937,6 +985,7 @@ function loadPMs($pm_options, $id_member)
 				)
 			);
 		}
+		// Otherwise we can just use the the pm_conversation_list option
 		else
 		{
 			$request = $db->query('pm_conversation_list', '
@@ -964,7 +1013,7 @@ function loadPMs($pm_options, $id_member)
 			);
 		}
 	}
-	// This is kinda simple!
+	// If not in conversation view, then This is kinda simple!
 	else
 	{
 		// @todo SLOW This query uses a filesort. (inbox only.)
@@ -996,14 +1045,15 @@ function loadPMs($pm_options, $id_member)
 	$lastData = array();
 	$posters = $pm_options['folder'] == 'sent' ? array($id_member) : array();
 	$recipients = array();
-
 	while ($row = $db->fetch_assoc($request))
 	{
 		if (!isset($recipients[$row['id_pm']]))
 		{
 			if (isset($row['id_member_from']))
 				$posters[$row['id_pm']] = $row['id_member_from'];
+
 			$pms[$row['id_pm']] = $row['id_pm'];
+
 			$recipients[$row['id_pm']] = array(
 				'to' => array(),
 				'bcc' => array()
@@ -1680,6 +1730,69 @@ function loadConversationList($head, &$recipients, $folder = '')
 }
 
 /**
+ * Used to determine if any message in a conversation thread is unread
+ * Returns array of keys with the head id and value details of the the newest
+ * unread message.
+ *
+ * @param array $head array of head ids to search
+ */
+function loadConversationUnreadStatus($pms)
+{
+	global $user_info;
+
+	$db = database();
+
+	// Make it an array if its not
+	if (!is_array($pms))
+		$pms = array($pms);
+
+	// Find the heads for this group of PM's
+	$request = $db->query('', '
+		SELECT
+			id_pm_head, id_pm
+		FROM {db_prefix}personal_messages
+		WHERE id_pm IN ({array_int:id_pm})',
+		array(
+			'id_pm' => $pms,
+		)
+	);
+	$head_pms = array();
+	while ($row = $db->fetch_assoc($request))
+		$head_pms[$row['id_pm_head']] = $row['id_pm'];
+	$db->free_result($request);
+
+	// Find any unread PM's under these head pm id's
+	$request = $db->query('', '
+		SELECT
+			MAX(pm.id_pm) AS id_pm, pm.id_member_from, pm.deleted_by_sender, pm.id_pm_head,
+			pmr.id_member, pmr.deleted, pmr.is_read
+		FROM {db_prefix}personal_messages AS pm
+			INNER JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)
+		WHERE pm.id_pm_head IN ({array_int:id_pm_head})
+			AND ((pm.id_member_from = {int:current_member} AND pm.deleted_by_sender = {int:not_deleted})
+				OR (pmr.id_member = {int:current_member} AND pmr.deleted = {int:not_deleted}))
+			AND (pmr.is_read & 1 = 0)
+		GROUP BY pm.id_pm_head',
+		array(
+			'current_member' => $user_info['id'],
+			'id_pm_head' => array_keys($head_pms),
+			'not_deleted' => 0,
+		)
+	);
+	$unread_pms = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		// Return the results under the original index since thats what we are
+		// displaying in the subject list
+		$index = $head_pms[$row['id_pm_head']];
+		$unread_pms[$index] = $row;
+	}
+	$db->free_result($request);
+
+	return $unread_pms;
+}
+
+/**
  * Get all recipients for a given group of PM's, loads some basic member information for each
  * Will not include bcc-recipients for an inbox
  * Keeps track if a message has been replied / read
@@ -1691,7 +1804,7 @@ function loadConversationList($head, &$recipients, $folder = '')
  * @param string $folder
  * @param boolean $search
  */
-function loadPMRecipients($all_pms, &$recipients, $folder = '', $search = false)
+function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = false)
 {
 	global $txt, $user_info, $scripturl;
 
