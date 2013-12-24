@@ -296,7 +296,7 @@ class Recent_Controller extends Action_Controller
 		else
 			$context['page_title'] = $txt['unread_replies'];
 
-		if ($context['showing_all_topics'] && && !empty($modSettings['loadavg_allunread']) && $modSettings['current_load'] >= $modSettings['loadavg_allunread'])
+		if ($context['showing_all_topics'] && !empty($modSettings['loadavg_allunread']) && $modSettings['current_load'] >= $modSettings['loadavg_allunread'])
 			fatal_lang_error('loadavg_allunread_disabled', false);
 		elseif ($_REQUEST['action'] != 'unread' && !empty($modSettings['loadavg_unreadreplies']) && $modSettings['current_load'] >= $modSettings['loadavg_unreadreplies'])
 			fatal_lang_error('loadavg_unreadreplies_disabled', false);
