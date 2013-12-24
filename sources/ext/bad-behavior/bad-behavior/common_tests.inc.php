@@ -22,8 +22,11 @@ function bb2_protocol($settings, $package)
 function bb2_cookies($settings, $package)
 {
 	// Enforce RFC 2965 sec 3.3.5 and 9.1
-	// Bots wanting new-style cookies should send Cookie2
-	// FIXME: Amazon Kindle is broken; Amazon has been notified 9/24/08
+	// The only valid value for $Version is 1 and when present,
+	// the user agent MUST send a Cookie2 header.
+	// First-gen Amazon Kindle is broken; Amazon has been notified 9/24/08
+	// NOTE: RFC 2965 is obsoleted by RFC 6265. Current software MUST NOT
+	// use Cookie2 or $Version in Cookie.
 	if (@strpos($package['headers_mixed']['Cookie'], '$Version=0') !== FALSE && !array_key_exists('Cookie2', $package['headers_mixed']) && strpos($package['headers_mixed']['User-Agent'], "Kindle/") === FALSE) {
 		return '6c502ff1';
 	}
