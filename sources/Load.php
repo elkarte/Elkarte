@@ -1577,6 +1577,9 @@ function loadTheme($id_theme = 0, $initialize = true)
 		loadJavascriptFile('elk_jquery_embed.js', array('defer' => true));
 	}
 
+	if (!empty($modSettings['enableCodePrettify']))
+		loadJavascriptFile($settings['default_theme_url'] . '/prettify/run_prettify.js', array('defer' => true));
+
 	if (!empty($modSettings['todayMod']) && $modSettings['todayMod'] > 2)
 		addInlineJavascript('
 		var oRttime = ({
