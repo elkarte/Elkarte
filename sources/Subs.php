@@ -832,7 +832,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 	$message = sanitizeMSCutPaste($message);
 
 	// If the load average is too high, don't parse the BBC.
-	if (!empty($context['load_average']) && !empty($modSettings['bbc']) && $context['load_average'] >= $modSettings['bbc'])
+	if (!empty($modSettings['bbc']) && $modSettings['current_load'] >= $modSettings['bbc'])
 	{
 		$context['disabled_parse_bbc'] = true;
 		return $message;

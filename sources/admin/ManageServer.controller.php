@@ -800,15 +800,9 @@ class ManageServer_Controller extends Action_Controller
 			$context['settings_message'] = $txt['loadavg_disabled_windows'];
 		else
 		{
-			$modSettings['load_average'] = @file_get_contents('/proc/loadavg');
-			if (!empty($modSettings['load_average']) && preg_match('~^([^ ]+?) ([^ ]+?) ([^ ]+)~', $modSettings['load_average'], $matches) !== 0)
-				$modSettings['load_average'] = (float) $matches[1];
-			elseif (($modSettings['load_average'] = @`uptime`) !== null && preg_match('~load averages?: (\d+\.\d+), (\d+\.\d+), (\d+\.\d+)~i', $modSettings['load_average'], $matches) !== 0)
-				$modSettings['load_average'] = (float) $matches[1];
-			else
-				unset($modSettings['load_average']);
+			$modSettings['load_average'] = detectServerLoad();
 
-			if (!empty($modSettings['load_average']))
+			if ($modSettings['load_average'] !== false)
 			{
 				$disabled = false;
 				$context['settings_message'] = sprintf($txt['loadavg_warning'], $modSettings['load_average']);

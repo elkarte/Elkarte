@@ -79,24 +79,25 @@ function reloadSettings()
 	{
 		if (($modSettings['load_average'] = cache_get_data('loadavg', 90)) == null)
 		{
-			$modSettings['load_average'] = @file_get_contents('/proc/loadavg');
-			if (!empty($modSettings['load_average']) && preg_match('~^([^ ]+?) ([^ ]+?) ([^ ]+)~', $modSettings['load_average'], $matches) != 0)
-				$modSettings['load_average'] = (float) $matches[1];
-			elseif (($modSettings['load_average'] = @`uptime`) != null && preg_match('~load average[s]?: (\d+\.\d+), (\d+\.\d+), (\d+\.\d+)~i', $modSettings['load_average'], $matches) != 0)
-				$modSettings['load_average'] = (float) $matches[1];
-			else
-				unset($modSettings['load_average']);
+			$modSettings['load_average'] = detectServerLoad();
 
-			if (!empty($modSettings['load_average']))
-				cache_put_data('loadavg', $modSettings['load_average'], 90);
+			cache_put_data('loadavg', $modSettings['load_average'], 90);
 		}
 
-		if (!empty($modSettings['load_average']))
+		if ($modSettings['load_average'] !== false)
 			call_integration_hook('integrate_load_average', array($modSettings['load_average']));
 
-		if (!empty($modSettings['loadavg_forum']) && !empty($modSettings['load_average']) && $modSettings['load_average'] >= $modSettings['loadavg_forum'])
+		// Let's have at least a zero
+		if (empty($modSettings['loadavg_forum']) || $modSettings['load_average'] === false)
+			$modSettings['current_load'] = 0;
+		else
+			$modSettings['current_load'] = $modSettings['load_average'];
+
+		if (!empty($modSettings['loadavg_forum']) && $modSettings['current_load'] >= $modSettings['loadavg_forum'])
 			display_loadavg_error();
 	}
+	else
+		$modSettings['current_load'] = 0;
 
 	// Is post moderation alive and well?
 	$modSettings['postmod_active'] = isset($modSettings['admin_features']) ? in_array('pm', explode(',', $modSettings['admin_features'])) : true;
@@ -1393,8 +1394,6 @@ function loadTheme($id_theme = 0, $initialize = true)
 	$context['current_action'] = isset($_REQUEST['action']) ? $_REQUEST['action'] : null;
 	$context['current_subaction'] = isset($_REQUEST['sa']) ? $_REQUEST['sa'] : null;
 	$context['can_register'] = empty($modSettings['registration_method']) || $modSettings['registration_method'] != 3;
-	if (isset($modSettings['load_average']))
-		$context['load_average'] = $modSettings['load_average'];
 
 	// Set some permission related settings.
 	$context['show_login_bar'] = $user_info['is_guest'] && !empty($modSettings['enableVBStyleLogin']);
@@ -2742,4 +2741,15 @@ function doSecurityChecks()
 	// Finally, let's show the layer.
 	if (!empty($context['security_controls']))
 		Template_Layers::getInstance()->addAfter('admin_warning', 'body');
+}
+
+function detectServerLoad()
+{
+	$load_average = @file_get_contents('/proc/loadavg');
+	if (!empty($modSettings['load_average']) && preg_match('~^([^ ]+?) ([^ ]+?) ([^ ]+)~', $modSettings['load_average'], $matches) != 0)
+		return (float) $matches[1];
+	elseif (($modSettings['load_average'] = @`uptime`) != null && preg_match('~load average[s]?: (\d+\.\d+), (\d+\.\d+), (\d+\.\d+)~i', $modSettings['load_average'], $matches) != 0)
+		return (float) $matches[1];
+
+	return false;
 }
