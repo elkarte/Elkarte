@@ -489,6 +489,17 @@ class ManagePermissions_Controller extends Action_Controller
 		// Load all permission profiles.
 		loadPermissionProfiles();
 
+		if (!$context['edit_all'])
+		{
+			$js = 'new Array(';
+			foreach ($context['profiles'] as $id => $profile)
+				$js .= '{name: ' . JavaScriptEscape($profile['name']) . ', id: ' . $id . '},';
+			addJavascriptVar(array(
+				'permission_profiles' => substr($js, 0, -1) . ')',
+				'txt_save' => JavaScriptEscape($txt['save']),
+			));
+		}
+
 		// Get the board tree.
 		require_once(SUBSDIR . '/Boards.subs.php');
 

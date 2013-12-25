@@ -155,6 +155,14 @@ function template_control_richedit_buttons($editor_id)
 
 	$editor_context = &$context['controls']['richedit'][$editor_id];
 
+	// Create an area to show the draft last saved on
+	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
+		echo '
+		<span class="draftautosave">
+			<span id="throbber" style="display:none"><img src="' . $settings['images_url'] . '/loading_sm.gif" alt="" class="centericon" />&nbsp;</span>
+			<span id="draft_lastautosave" ></span>
+		</span>';
+
 	echo '
 		<span class="smalltext floatleft">
 			', $context['shortcuts_text'], '
@@ -175,15 +183,6 @@ function template_control_richedit_buttons($editor_id)
 		echo '
 		<input type="submit" name="save_draft" value="', $txt['draft_save'], '" tabindex="', $context['tabindex']++, '" onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d" class="button_submit" />
 		<input type="hidden" id="id_draft" name="id_draft" value="', empty($context['id_draft']) ? 0 : $context['id_draft'], '" />';
-
-		// Create an area to show the draft last saved on
-		if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
-			echo '
-		<br />
-		<span class="righttext" style="display: block">
-			<span id="throbber" style="display:none"><img src="' . $settings['images_url'] . '/loading_sm.gif" alt="" class="centericon" />&nbsp;</span>
-			<span id="draft_lastautosave" ></span>
-		</span>';
 	}
 
 	if (!empty($context['drafts_pm_save']))
@@ -192,13 +191,5 @@ function template_control_richedit_buttons($editor_id)
 		echo '
 		<input type="submit" name="save_draft" value="', $txt['draft_save'], '" tabindex="', $context['tabindex']++, '" onclick="submitThisOnce(this);" accesskey="d" class="button_submit" />
 		<input type="hidden" id="id_pm_draft" name="id_pm_draft" value="', empty($context['id_pm_draft']) ? 0 : $context['id_pm_draft'], '" />';
-
-		// Load in the PM autosaver if its enabled and the user wants to use it
-		if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
-			echo '
-		<span class="righttext" style="display: block">
-			<span id="throbber" style="display:none"><img src="' . $settings['images_url'] . '/loading_sm.gif" alt="" class="centericon" />&nbsp;</span>
-			<span id="draft_lastautosave" ></span>
-		</span>';
 	}
 }

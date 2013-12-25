@@ -391,7 +391,7 @@ class RemoveTopic_Controller extends Action_Controller
 
 		// Didn't find some things?
 		if (!empty($unfound_messages))
-			fatal_lang_error('restore_not_found', false, array(implode('<br />', $unfound_messages)));
+			fatal_lang_error('restore_not_found', false, array('<ul style="margin-top: 0px;"><li>' . implode('</li><li>', $unfound_messages) . '</li></ul>'));
 
 		// Just send them to the index if they get here.
 		redirectexit();

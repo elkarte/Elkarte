@@ -706,7 +706,7 @@ class Post_Controller extends Action_Controller
 
 					if ($attachID == 'initial_error')
 					{
-						$txt['error_attach_initial_error'] = $txt['attach_no_upload'] . '<div style="padding: 0 1em;">' . (is_array($attachment) ? vsprintf($txt[$attachment[0]], $attachment[1]) : $txt[$attachment]) . '</div>';
+						$txt['error_attach_initial_error'] = $txt['attach_no_upload'] . '<div class="attachmenterrors">' . (is_array($attachment) ? vsprintf($txt[$attachment[0]], $attachment[1]) : $txt[$attachment]) . '</div>';
 						$attach_errors->addError('attach_initial_error');
 						unset($_SESSION['temp_attachments']);
 						break;
@@ -716,7 +716,7 @@ class Post_Controller extends Action_Controller
 					if (!empty($attachment['errors']))
 					{
 						$txt['error_attach_errors'] = empty($txt['error_attach_errors']) ? '<br />' : '';
-						$txt['error_attach_errors'] .= vsprintf($txt['attach_warning'], $attachment['name']) . '<div style="padding: 0 1em;">';
+						$txt['error_attach_errors'] .= vsprintf($txt['attach_warning'], $attachment['name']) . '<div class="attachmenterrors">';
 						foreach ($attachment['errors'] as $error)
 							$txt['error_attach_errors'] .= (is_array($error) ? vsprintf($txt[$error[0]], $error[1]) : $txt[$error]) . '<br  />';
 						$txt['error_attach_errors'] .= '</div>';

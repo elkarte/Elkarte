@@ -309,7 +309,7 @@ $helptxt['compactTopicPagesEnable'] = 'This will just show a selection of the nu
 $helptxt['timeLoadPageEnable'] = 'This will show the time in seconds taken to create that page at the bottom of the board.';
 $helptxt['removeNestedQuotes'] = 'This will strip nested quotes from a post when citing the post in question via a quote link.';
 $helptxt['simpleSearch'] = 'This will show a simple search form and a link to a more advanced form.';
-$helptxt['search_dropdown'] = 'This will show a search selection dropdown next to the quick search box.  From this you can choose to search the current site, current board (if in a board_, current topic (if in a topic) or search for members.';
+$helptxt['search_dropdown'] = 'This will show a search selection dropdown next to the quick search box.  From this you can choose to search the current site, current board (if in a board), current topic (if in a topic) or search for members.';
 $helptxt['max_image_width'] = 'This allows you to set a maximum size for posted pictures. Pictures smaller than the maximum will not be affected. This also determines how attached images are displayed when a thumbnail is clicked on.';
 $helptxt['mail_type'] = 'This setting allows you to choose either PHP\'s default settings, or to override those settings with SMTP.  PHP doesn\'t support using authentication with SMTP (which many hosts require, now) so if you want that you should select SMTP.  Please note that SMTP can be slower, and some servers will not take usernames and passwords.<br /><br />You don\'t need to fill in the SMTP settings if this is set to PHP\'s default.';
 
@@ -356,7 +356,7 @@ $helptxt['default_timezone'] = 'The server timezone tells PHP where your server 
 $helptxt['spamWaitTime'] = 'Here you can select the amount of time that must pass between postings. This can be used to stop people from "spamming" your forum by limiting how often they can post.';
 
 $helptxt['enablePostHTML'] = 'This will allow the posting of some basic HTML tags:
-	<ul class="normallist" style="margin-bottom: 0;">
+	<ul class="normallist enablePostHTML">
 		<li>&lt;b&gt;, &lt;u&gt;, &lt;i&gt;, &lt;s&gt;, &lt;em&gt;, &lt;ins&gt;, &lt;del&gt;</li>
 		<li>&lt;a href=&quot;&quot;&gt;</li>
 		<li>&lt;img src=&quot;&quot; alt=&quot;&quot; /&gt;</li>
@@ -617,7 +617,7 @@ $helptxt['field_show_enclosed'] = 'Encloses the user input between some text or 
 		</ul>';
 
 $helptxt['custom_mask'] = 'The input mask is important for your forum\'s security. Validating the input from a user can help ensure that data is not used in a way you do not expect. We have provided some simple regular expressions as hints.<br /><br />
-	<div class="smalltext" style="margin: 0 2em">
+	<div class="smalltext custom_mask">
 		&quot;~[A-Za-z]+~&quot; - Match all upper and lower case alphabet characters.<br />
 		&quot;~[0-9]+~&quot; - Match all numeric characters.<br />
 		&quot;~[A-Za-z0-9]{7}~&quot; - Match all upper and lower case alphabet and numeric characters seven times.<br />
@@ -625,7 +625,7 @@ $helptxt['custom_mask'] = 'The input mask is important for your forum\'s securit
 		&quot;~^([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$~&quot; - Only allow 3 or 6 character hexcodes.<br />
 	</div><br /><br />
 	Additionally, special metacharacters ?+*^$ and {xx} can be defined.
-	<div class="smalltext" style="margin: 0 2em">
+	<div class="smalltext custom_mask">
 		? - None or one match of previous expression.<br />
 		+ - One or more of previous expression.<br />
 		* - None or more of previous expression.<br />
