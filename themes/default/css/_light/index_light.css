@@ -1024,8 +1024,12 @@ div.bbc_footnotes .meaction{
 .sticky_row .topic_name h4 a, .locked_row.sticky_row .topic_name h4 a {
 	color: #555;
 }
+
 .locked_row .topic_name h4 a {
 	color: #777;
+}
+.sticky_row .topic_name h4 a.new_posts, .locked_row.sticky_row .topic_name h4 a.new_posts, .locked_row .topic_name h4 a.new_posts {
+	color: #fff;
 }
 .topic_stats {
 	color: #777;
@@ -1720,5 +1724,5 @@ div.bbc_footnotes .meaction{
 	}
 	.subsections:hover .linklevel1:after {
 		content: "";
-	}	
+	}
 }
