@@ -47,8 +47,12 @@ class AllTests extends TestSuite
 		$this->addFile(TESTDIR . 'sources/admin/TestManagePostsSettings.php');
 
 		// install
-		$this->addFile(TESTDIR . 'install/TestInstall.php');
+		if (!defined('SKIPINSTALL'))
+			$this->addFile(TESTDIR . 'install/TestInstall.php');
 		$this->addFile(TESTDIR . 'install/TestDatabase.php');
+
+		// data integrity
+		$this->addFile(TESTDIR . 'sources/TestLanguageStrings.php');
 
 		// core sources
 		$this->addFile(TESTDIR . 'sources/TestLogging.php');
