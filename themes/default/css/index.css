@@ -2443,6 +2443,9 @@ ul.post_options li {
 #post_event ul.event_options li .input_check {
 	margin: 0 12px 0 0;
 }
+#datepicker {
+	white-space: nowrap;
+}
 
 /* The poll editor section. */
 #edit_poll {
