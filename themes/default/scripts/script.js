@@ -32,7 +32,7 @@ if (!('getElementsByClassName' in document))
 {
 	document.getElementsByClassName = function(className)
 	{
-		return $('".' + className + '"');
+		return $('.' + className);
 	};
 }
 
