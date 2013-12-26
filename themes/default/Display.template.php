@@ -471,7 +471,7 @@ function template_quickreply_below()
 					sLastNote: \'draft_lastautosave\',
 					sLastID: \'id_draft\',
 					iBoard: ', (empty($context['current_board']) ? 0 : $context['current_board']), ',
-					iFreq: ', isset($context['drafts_autosave_frequency']) ? $context['drafts_autosave_frequency'] : 30000, ',
+					iFreq: ', isset($context['drafts_autosave_frequency']) ? $context['drafts_autosave_frequency'] : 30000, '
 				});';
 
 			// Mentions enabled
