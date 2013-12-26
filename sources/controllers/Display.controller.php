@@ -303,13 +303,10 @@ class Display_Controller
 			'num_pages' => floor(($context['total_visible_posts'] - 1) / $context['messages_per_page']) + 1,
 		);
 
-		// Figure out all the link to the next/prev/first/last/etc. for wireless mainly.
+		// Figure out all the link to the next/prev
 		$context['links'] += array(
-			'first' => $_REQUEST['start'] >= $context['messages_per_page'] ? $scripturl . '?topic=' . $topic . '.0' : '',
 			'prev' => $_REQUEST['start'] >= $context['messages_per_page'] ? $scripturl . '?topic=' . $topic . '.' . ($_REQUEST['start'] - $context['messages_per_page']) : '',
 			'next' => $_REQUEST['start'] + $context['messages_per_page'] < $context['total_visible_posts'] ? $scripturl . '?topic=' . $topic. '.' . ($_REQUEST['start'] + $context['messages_per_page']) : '',
-			'last' => $_REQUEST['start'] + $context['messages_per_page'] < $context['total_visible_posts'] ? $scripturl . '?topic=' . $topic. '.' . (floor($context['total_visible_posts'] / $context['messages_per_page']) * $context['messages_per_page']) : '',
-			'up' => $scripturl . '?board=' . $board . '.0'
 		);
 
 		// If they are viewing all the posts, show all the posts, otherwise limit the number.

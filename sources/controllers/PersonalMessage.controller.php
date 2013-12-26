@@ -335,11 +335,8 @@ class PersonalMessage_Controller extends Action_Controller
 
 		// Determine the navigation context
 		$context['links'] += array(
-			'first' => $start >= $modSettings['defaultMaxMessages'] ? $scripturl . '?action=pm;start=0' : '',
 			'prev' => $start >= $modSettings['defaultMaxMessages'] ? $scripturl . '?action=pm;start=' . ($start - $modSettings['defaultMaxMessages']) : '',
 			'next' => $start + $modSettings['defaultMaxMessages'] < $max_messages ? $scripturl . '?action=pm;start=' . ($start + $modSettings['defaultMaxMessages']) : '',
-			'last' => $start + $modSettings['defaultMaxMessages'] < $max_messages ? $scripturl . '?action=pm;start=' . (floor(($max_messages - 1) / $modSettings['defaultMaxMessages']) * $modSettings['defaultMaxMessages']) : '',
-			'up' => $scripturl,
 		);
 		$context['page_info'] = array(
 			'current_page' => $start / $modSettings['defaultMaxMessages'] + 1,
