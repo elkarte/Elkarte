@@ -917,35 +917,42 @@ function modifyEvent($event_id, &$eventOptions)
 		$eventOptions['end_date'] = strftime('%Y-%m-%d', mktime(0, 0, 0, $month, $day, $year) + $eventOptions['span'] * 86400);
 
 	$event_columns = array(
-		'start_date' => '{date:start_date}',
-		'end_date' => '{date:end_date}',
-		'title' => 'SUBSTRING({string:title}, 1, 60)',
-		'id_board' => '{int:id_board}',
-		'id_topic' => '{int:id_topic}'
+		'start_date' => 'start_date = {date:start_date}',
+		'end_date' => 'end_date = {date:end_date}',
+		'title' => 'title = SUBSTRING({string:title}, 1, 60)',
+		'id_board' => 'id_board = {int:id_board}',
+		'id_topic' => 'id_topic = {int:id_topic}'
 	);
 	$event_parameters = array(
 		'start_date' => $eventOptions['start_date'],
 		'end_date' => $eventOptions['end_date'],
 		'title' => $eventOptions['title'],
-		'id_board' => isset($eventOptions['board']) ? (int) $eventOptions['board'] : 0,
-		'id_topic' => isset($eventOptions['topic']) ? (int) $eventOptions['topic'] : 0,
 	);
 
-	// This is to prevent hooks to modify the id of the event
-	$real_event_id = $event_id;
+	if (isset($eventOptions['board']))
+		$event_parameters['id_board'] = (int) $eventOptions['board'];
+
+	if (isset($eventOptions['topic']))
+		$event_parameters['id_topic'] = (int) $eventOptions['topic'];
+
 	call_integration_hook('integrate_modify_event', array($event_id, &$eventOptions, &$event_columns, &$event_parameters));
+
+	$event_parameters['id_event'] = $event_id;
+
+	$to_update = array();
+	foreach ($event_parameters as $key => $value)
+		if (isset($event_columns[$key]))
+			$to_update[] = $event_columns[$key];
+
+	if (empty($to_update))
+		return;
 
 	$db->query('', '
 		UPDATE {db_prefix}calendar
 		SET
-			' . implode(', ', $event_columns) . '
+			' . implode(', ', $to_update) . '
 		WHERE id_event = {int:id_event}',
-		array_merge(
-			$event_parameters,
-			array(
-				'id_event' => $real_event_id
-			)
-		)
+		$event_parameters
 	);
 
 	updateSettings(array(
