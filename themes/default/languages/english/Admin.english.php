@@ -144,7 +144,7 @@ $txt['ip_address'] = 'IP address';
 $txt['member_id'] = 'ID';
 
 $txt['unknown'] = 'unknown';
-$txt['security_wrong'] = 'Administration login attempt!' . "\n" . 'Referrer: %1$s' . "\n" . 'User agent: %2$s' . "\n" . 'IP: %3$s';
+$txt['security_wrong'] = 'Administration login attempt!' . "\n" . 'Referer: %1$s' . "\n" . 'User agent: %2$s' . "\n" . 'IP: %3$s';
 
 $txt['email_preview_warning'] = 'The preview is not 100% accurate. In order to preserve the functionality of the page only the basic html tags are represented';
 $txt['email_as_html'] = 'Send in HTML format.  (with this you can put normal HTML in the email.)';
@@ -159,7 +159,7 @@ $txt['email_members_succeeded'] = 'You have successfully sent your newsletter!';
 $txt['ban_title'] = 'Ban List';
 $txt['ban_ip'] = 'IP banning: (e.g. 192.168.12.213 or 128.0.*.*) - one entry per line';
 $txt['ban_email'] = 'Email banning: (e.g. badguy@somewhere.com) - one entry per line';
-$txt['ban_user name'] = 'User name banning: (e.g. l33tuser) - one entry per line';
+$txt['ban_username'] = 'User name banning: (e.g. l33tuser) - one entry per line';
 
 $txt['ban_errors_detected'] = 'The following error or errors occurred while saving or editing the ban group or trigger';
 $txt['ban_description'] = 'Here you can ban troublesome people either by IP, hostname, user name, or email.';
@@ -168,7 +168,7 @@ $txt['ban_banned_entity'] = 'Banned entity';
 $txt['ban_on_ip'] = 'Ban on IP (e.g. 192.168.10-20.*)';
 $txt['ban_on_hostname'] = 'Ban on Hostname (e.g. *.mil)';
 $txt['ban_on_email'] = 'Ban on Email Address (e.g. *@badsite.com)';
-$txt['ban_on_user name'] = 'Ban on User Name';
+$txt['ban_on_username'] = 'Ban on User Name';
 $txt['ban_notes'] = 'Notes';
 $txt['ban_restriction'] = 'Restriction';
 $txt['ban_full_ban'] = 'Full ban';
@@ -310,7 +310,7 @@ $txt['member_part_of_these_member groups'] = 'Member is part of these member gro
 $txt['membergroups'] = 'Member groups';
 $txt['confirm_delete_members'] = 'Are you sure you want to delete the selected members?';
 
-$txt['support_credits_title'] = 'Support &amp; Credits'; // consistent naming, see above
+$txt['support_credits_title'] = 'Support &amp; Credits';
 $txt['support_credits_info'] = 'Links to support for common issues, and version information to give if you have problems.';
 $txt['support_title'] = 'Support Information';
 $txt['support_versions_current'] = 'Current version';
@@ -606,7 +606,7 @@ $txt['preview_characters_zero'] = '0 to disable';
 $txt['enableBBC'] = 'Enable bulletin board code (BBC)';
 $txt['enablePostHTML'] = 'Enable <em>basic</em> HTML in posts';
 $txt['autoLinkUrls'] = 'Automatically link posted URLs';
-$txt['disabledBBC'] = 'Enabled BBC tags'; // << ?!
+$txt['disabledBBC'] = 'Enabled BBC tags';
 $txt['bbcTagsToUse'] = 'Enabled BBC tags';
 $txt['bbcTagsToUse_select'] = 'Select the tags allowed to be used';
 $txt['bbcTagsToUse_select_all'] = 'Select all tags';
