@@ -47,6 +47,11 @@ class TestFiles extends UnitTestCase
 			foreach ($files as $file)
 			{
 				$file_content = file_get_contents($file);
+
+				// This is likely to be one of the two files emailpost.php or emailtopic.php
+				if ($file_content[0] == '#')
+					$file_content = trim(substr($file_content, strpos($file_content, "\n")));
+
 				// Check the validity of the syntax.
 				ob_start();
 				$errorReporting = error_reporting(0);
