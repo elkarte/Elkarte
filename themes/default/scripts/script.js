@@ -360,16 +360,8 @@ smc_Popup.prototype.hide = function ()
  */
 function replaceText(text, oTextHandle)
 {
-	// Attempt to create a text range (IE).
-	if ('caretPos' in oTextHandle && 'createTextRange' in oTextHandle)
-	{
-		var caretPos = oTextHandle.caretPos;
-
-		caretPos.text = caretPos.text.charAt(caretPos.text.length - 1) === ' ' ? text + ' ' : text;
-		caretPos.select();
-	}
-	// Mozilla text range replace.
-	else if ('selectionStart' in oTextHandle)
+	// Standards compliant text range replace.
+	if ('selectionStart' in oTextHandle)
 	{
 		var begin = oTextHandle.value.substr(0, oTextHandle.selectionStart),
 			end = oTextHandle.value.substr(oTextHandle.selectionEnd),
