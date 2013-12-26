@@ -852,22 +852,22 @@ function insertEvent(&$eventOptions)
 
 	// Make sure the start date is in ISO order.
 	if (($num_results = sscanf($eventOptions['start_date'], '%d-%d-%d', $year, $month, $day)) !== 3)
-		trigger_error('modifyEvent(): invalid start date format given', E_USER_ERROR);
+		trigger_error('insertEvent(): invalid start date format given', E_USER_ERROR);
 
 	// Set the end date (if not yet given)
 	if (!isset($eventOptions['end_date']))
 		$eventOptions['end_date'] = strftime('%Y-%m-%d', mktime(0, 0, 0, $month, $day, $year) + $eventOptions['span'] * 86400);
 
 	// If no topic and board are given, they are not linked to a topic.
-	$eventOptions['board'] = isset($eventOptions['board']) ? (int) $eventOptions['board'] : 0;
-	$eventOptions['topic'] = isset($eventOptions['topic']) ? (int) $eventOptions['topic'] : 0;
+	$eventOptions['id_board'] = isset($eventOptions['id_board']) ? (int) $eventOptions['id_board'] : 0;
+	$eventOptions['id_topic'] = isset($eventOptions['id_topic']) ? (int) $eventOptions['id_topic'] : 0;
 
 	$event_columns = array(
 		'id_board' => 'int', 'id_topic' => 'int', 'title' => 'string-60', 'id_member' => 'int',
 		'start_date' => 'date', 'end_date' => 'date',
 	);
 	$event_parameters = array(
-		$eventOptions['board'], $eventOptions['topic'], $eventOptions['title'], $eventOptions['member'],
+		$eventOptions['id_board'], $eventOptions['id_topic'], $eventOptions['title'], $eventOptions['member'],
 		$eventOptions['start_date'], $eventOptions['end_date'],
 	);
 
@@ -923,26 +923,15 @@ function modifyEvent($event_id, &$eventOptions)
 		'id_board' => 'id_board = {int:id_board}',
 		'id_topic' => 'id_topic = {int:id_topic}'
 	);
-	$event_parameters = array(
-		'start_date' => $eventOptions['start_date'],
-		'end_date' => $eventOptions['end_date'],
-		'title' => $eventOptions['title'],
-	);
 
-	if (isset($eventOptions['board']))
-		$event_parameters['id_board'] = (int) $eventOptions['board'];
+	call_integration_hook('integrate_modify_event', array($event_id, &$eventOptions, &$event_columns));
 
-	if (isset($eventOptions['topic']))
-		$event_parameters['id_topic'] = (int) $eventOptions['topic'];
-
-	call_integration_hook('integrate_modify_event', array($event_id, &$eventOptions, &$event_columns, &$event_parameters));
-
-	$event_parameters['id_event'] = $event_id;
+	$eventOptions['id_event'] = $event_id;
 
 	$to_update = array();
-	foreach ($event_parameters as $key => $value)
-		if (isset($event_columns[$key]))
-			$to_update[] = $event_columns[$key];
+	foreach ($event_columns as $key => $value)
+		if (isset($eventOptions[$key]))
+			$to_update[] = $value;
 
 	if (empty($to_update))
 		return;
@@ -952,7 +941,7 @@ function modifyEvent($event_id, &$eventOptions)
 		SET
 			' . implode(', ', $to_update) . '
 		WHERE id_event = {int:id_event}',
-		$event_parameters
+		$eventOptions
 	);
 
 	updateSettings(array(
