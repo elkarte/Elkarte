@@ -82,9 +82,9 @@ $txt['permissionhelp_who_view'] = 'Who\'s online shows all members that are curr
 $txt['permissionname_search_posts'] = 'Search for posts and topics';
 $txt['permissionhelp_search_posts'] = 'The Search permission allows the user to search all boards he or she is allowed to access. When the search permission is enabled, a \'Search\' button will be added to the forum button bar.';
 $txt['permissionname_karma_edit'] = 'Change other people\'s karma';
-$txt['permissionhelp_karma_edit'] = 'Karma is a feature that shows the popularity of a member. In order to use this feature, you need to have it enabled in \'Features and Options\'. This permission will allow a membergroup to cast a vote. This permission has no effect on guests.';
-$txt['permissionname_like_posts'] = 'Like other users posts';
-$txt['permissionhelp_like_posts'] = 'Likes is a feature that shows the popularity of a post. In order to use this feature, you need to have it enabled in \'Features and Options\'. This permission will allow a membergroup to like a post or unlike one they previosly liked.  This permission has no effect on guests.';
+$txt['permissionhelp_karma_edit'] = 'Karma is a feature that shows the popularity of a member. In order to use this feature, you need to have it enabled in \'Features and Options\'. This permission will allow a member group to cast a vote. This permission has no effect on guests.';
+$txt['permissionname_like_posts'] = 'Like other users\' posts';
+$txt['permissionhelp_like_posts'] = 'Likes is a feature that shows the popularity of a post. In order to use this feature, you need to have it enabled in \'Features and Options\'. This permission will allow a member group to like a post or unlike one they previously liked.  This permission has no effect on guests.';
 $txt['permissionname_disable_censor'] = 'Disable word censor';
 $txt['permissionhelp_disable_censor'] = 'Allows members the option to disable the word censor.';
 
@@ -309,6 +309,6 @@ $txt['permissions_post_moderation_moderate'] = 'Can create but requires approval
 $txt['permissions_post_moderation_disallow'] = 'Cannot create';
 $txt['permissions_post_moderation_group'] = 'Group';
 
-$txt['auto_approve_topics'] = 'Post new topics, without requiring approval';
-$txt['auto_approve_replies'] = 'Post replies to topics, without requiring approval';
-$txt['auto_approve_attachments'] = 'Post attachments, without requiring approval';
+$txt['auto_approve_topics'] = 'Post new topics without requiring approval';
+$txt['auto_approve_replies'] = 'Post replies to topics without requiring approval';
+$txt['auto_approve_attachments'] = 'Post attachments without requiring approval';
