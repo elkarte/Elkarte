@@ -52,6 +52,7 @@ class AllTests extends TestSuite
 		$this->addFile(TESTDIR . 'install/TestDatabase.php');
 
 		// data integrity
+		$this->addFile(TESTDIR . 'sources/TestFiles.php');
 		$this->addFile(TESTDIR . 'sources/TestLanguageStrings.php');
 
 		// core sources

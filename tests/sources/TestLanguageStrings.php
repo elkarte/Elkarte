@@ -4,8 +4,7 @@ require_once(TESTDIR . 'simpletest/autorun.php');
 require_once(TESTDIR . '../SSI.php');
 
 /**
- * TestCase class for request parsing etc.
- * Without SSI: test Request methods as self-containing.
+ * TestCase class for language files integrity
  */
 class TestLanguageStrings extends UnitTestCase
 {
@@ -26,44 +25,9 @@ class TestLanguageStrings extends UnitTestCase
 	}
 
 	/**
-	 * Test that there are no syntax errors
-	 */
-	function testSyntaxErrors()
-	{
-		$files = glob(LANGUAGEDIR . '/english/*.php');
-		foreach ($files as $file)
-		{
-			$file_content = file_get_contents($file);
-			// Check the validity of the syntax.
-			ob_start();
-			$errorReporting = error_reporting(0);
-			$result = @eval('
-				if (false)
-				{
-					' . preg_replace('~^(?:\s*<\\?(?:php)?|\\?>\s*$)~', '', $file_content) . '
-				}
-			');
-			error_reporting($errorReporting);
-			ob_end_clean();
-
-			$syntax_valid = $result !== false;
-			if (!$syntax_valid)
-			{
-				$error = error_get_last();
-				$error_message = $error['message'] . ' at [' . $file . ' line ' . ($error['line'] - 3) . ']' . "\n";
-				print_r($error);
-			}
-			else
-				$error_message = '';
-
-			$this->assertTrue($syntax_valid, $error_message);
-		}
-	}
-
-	/**
 	 * Verify that all Elk $txt indexes contain only letters and numbers and underscores
 	 */
-	function testParseRequestNumeric()
+	function testLanguageIndexes()
 	{
 		$files = glob(LANGUAGEDIR . '/english/*.php');
 		foreach ($files as $file)
