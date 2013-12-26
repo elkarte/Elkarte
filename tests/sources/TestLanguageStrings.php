@@ -78,7 +78,7 @@ class TestLanguageStrings extends UnitTestCase
 					{
 						$m = preg_replace('~([^\w:])~', '-->$1<--', $match[1]);
 
-						$this->assertTrue($m === $match[1], 'The index of the string ' . $match[1] . ' contains invalid characters: ' . $m);
+						$this->assertTrue($m === $match[1], 'The index of the string \'' . $match[1] . '\' contains invalid characters: \'' . $m . '\'');
 					}
 				}
 			}

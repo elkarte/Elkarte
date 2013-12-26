@@ -306,7 +306,7 @@ $txt['additional'] = 'Additional';
 $txt['wild_cards_allowed'] = 'wildcard characters * and ? are allowed';
 $txt['search_for'] = 'Search for';
 $txt['search_match'] = 'Match';
-$txt['member_part_of_these_member groups'] = 'Member is part of these member groups';
+$txt['member_part_of_these_membergroups'] = 'Member is part of these member groups';
 $txt['membergroups'] = 'Member groups';
 $txt['confirm_delete_members'] = 'Are you sure you want to delete the selected members?';
 
