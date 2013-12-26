@@ -1148,6 +1148,10 @@ div.windowbg, div.windowbg2 {
 	line-height: 2em;
 	cursor: pointer;
 }
+/* @todo remove this when we drop ie8 */
+#ie8 .quickbuttons .linklevel1 {
+	float: none;
+}
 /* @todo - Check with js disabled after sorting most of the other crud. */
 /* Note: The next declarations are for keyboard access with js disabled. */
 /*.quickbuttons .linklevel1:focus {
