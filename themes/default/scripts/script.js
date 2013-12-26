@@ -1788,24 +1788,6 @@ function updateRuleDef(optNum)
 }
 
 /**
- * Maintains the personal message rule action options to conform with the action choice
- * so that the form only makes available the proper choice
- *
- * @param {string} optNum
- */
-function updateActionDef(optNum)
-{
-	if (document.getElementById("acttype" + optNum).value === "lab")
-	{
-		document.getElementById("labdiv" + optNum).style.display = "";
-	}
-	else
-	{
-		document.getElementById("labdiv" + optNum).style.display = "none";
-	}
-}
-
-/**
  * Highlight a selection box by changing its class name
  * @todo depreciated?
  *
