@@ -24,7 +24,7 @@ var ua = navigator.userAgent.toLowerCase(),
 	is_ff = typeof InstallTrigger !== 'undefined' || ((ua.indexOf('iceweasel') !== -1 || ua.indexOf('icecat') !== -1 || ua.indexOf('shiretoko') !== -1 || ua.indexOf('minefield') !== -1) && !is_opera),
 	is_safari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0, // Safari 3+
 	is_chrome = !!window.chrome, // Chrome 1+, Opera 15+
-	is_ie = /*@cc_on!@*/false || !!document.documentMode, // IE6+
+	is_ie = !!document.documentMode, // IE8+
 	is_webkit = ua.indexOf('applewebkit') !== -1;
 
 // Versions of ie < 9 do not have this built in
@@ -32,7 +32,7 @@ if (!('getElementsByClassName' in document))
 {
 	document.getElementsByClassName = function(className)
 	{
-		return $('".' + className + '"');
+		return $('.' + className);
 	};
 }
 
@@ -311,6 +311,7 @@ function smc_Popup(oOptions)
 	this.show();
 }
 
+// Show the popup div & prepare the close events
 smc_Popup.prototype.show = function ()
 {
 	popup_class = 'popup_window ' + (this.opt.custom_class ? this.opt.custom_class : 'description');
@@ -359,16 +360,8 @@ smc_Popup.prototype.hide = function ()
  */
 function replaceText(text, oTextHandle)
 {
-	// Attempt to create a text range (IE).
-	if ('caretPos' in oTextHandle && 'createTextRange' in oTextHandle)
-	{
-		var caretPos = oTextHandle.caretPos;
-
-		caretPos.text = caretPos.text.charAt(caretPos.text.length - 1) === ' ' ? text + ' ' : text;
-		caretPos.select();
-	}
-	// Mozilla text range replace.
-	else if ('selectionStart' in oTextHandle)
+	// Standards compliant text range replace.
+	if ('selectionStart' in oTextHandle)
 	{
 		var begin = oTextHandle.value.substr(0, oTextHandle.selectionStart),
 			end = oTextHandle.value.substr(oTextHandle.selectionEnd),
