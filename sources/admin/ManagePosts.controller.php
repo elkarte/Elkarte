@@ -284,6 +284,7 @@ class ManagePosts_Controller extends Action_Controller
 				array('check', 'removeNestedQuotes'),
 				array('check', 'enableEmbeddedFlash', 'subtext' => $txt['enableEmbeddedFlash_warning']),
 				array('check', 'enableVideoEmbeding'),
+				array('check', 'enableCodePrettify'),
 				// Note show the warning as read if pspell not installed!
 				array('check', 'enableSpellChecking', 'subtext' => (function_exists('pspell_new') ? $txt['enableSpellChecking_warning'] : '<span class="error">' . $txt['enableSpellChecking_error'] . '</span>')),
 				array('check', 'disable_wysiwyg'),
