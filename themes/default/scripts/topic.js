@@ -29,6 +29,8 @@ function QuickModifyTopic(oOptions)
 	this.iCurTopicId = 0;
 	this.sCurMessageId = '';
 	this.sBuffSubject = '';
+	this.oSavetipElem = false;
+	this.sSavetipText = '';
 	this.oCurSubjectDiv = null;
 	this.oTopicModHandle = document;
 	this.bInEditMode = false;
@@ -89,6 +91,14 @@ QuickModifyTopic.prototype.onDocReceived_modify_topic = function (XMLDoc)
 	this.oCurSubjectDiv = document.getElementById('msg_' + this.sCurMessageId.substr(4));
 	this.sBuffSubject = this.oCurSubjectDiv.innerHTML;
 
+	// Hide the tooltip text, don't want them for this element during the edit
+	if ($.isFunction($.fn.SiteTooltip))
+	{
+		this.oSavetipElem = this.oCurSubjectDiv.nextSibling;
+		this.sSavetip = this.oSavetipElem.innerHTML;
+		this.oSavetipElem.innerHTML = '';
+	}
+
 	// Here we hide any other things they want hidden on edit.
 	this.set_hidden_topic_areas('none');
 
@@ -103,6 +113,10 @@ QuickModifyTopic.prototype.modify_topic_cancel = function ()
 	this.oCurSubjectDiv.innerHTML = this.sBuffSubject;
 	this.set_hidden_topic_areas('');
 	this.bInEditMode = false;
+
+	// Put back the hover text
+	if (this.oSavetipElem !== false)
+		this.oSavetipElem.innerHTML = this.sSavetip;
 
 	return false;
 };
@@ -121,9 +135,9 @@ QuickModifyTopic.prototype.set_hidden_topic_areas = function (set_style)
 QuickModifyTopic.prototype.modify_topic_show_edit = function (subject)
 {
 	// Just template the subject.
-	this.oCurSubjectDiv.innerHTML = '<input type="text" name="subject" value="' + subject + '" size="60" style="width: 95%;" maxlength="80" class="input_text" /><input type="hidden" name="topic" value="' + this.iCurTopicId + '" /><input type="hidden" name="msg" value="' + this.sCurMessageId.substr(4) + '" />';
+	this.oCurSubjectDiv.innerHTML = '<input type="text" name="subject" value="' + subject + '" size="60" style="width: 95%;" maxlength="80" class="input_text" autocomplete="off" /><input type="hidden" name="topic" value="' + this.iCurTopicId + '" /><input type="hidden" name="msg" value="' + this.sCurMessageId.substr(4) + '" />';
 
-	// attach mouse over and out events to this new div
+	// Attach mouse over and out events to this new div
 	this.oCurSubjectDiv.instanceRef = this;
 	this.oCurSubjectDiv.onmouseout = function (oEvent) {return this.instanceRef.modify_topic_mouseout(oEvent);};
 	this.oCurSubjectDiv.onmouseover = function (oEvent) {return this.instanceRef.modify_topic_mouseover(oEvent);};
@@ -179,7 +193,10 @@ QuickModifyTopic.prototype.modify_topic_done = function (XMLDoc)
 
 	// Redo tooltips if they are on since we just pulled the rug out on this one
 	if ($.isFunction($.fn.SiteTooltip))
+	{
+		this.oSavetipElem.innerHTML = this.sSavetip;
 		$('.preview').SiteTooltip();
+	}
 
 	return false;
 };
@@ -232,6 +249,7 @@ QuickModifyTopic.prototype.modify_topic_mouseout = function (oEvent)
 QuickModifyTopic.prototype.modify_topic_mouseover = function (oEvent)
 {
 	this.bMouseOnDiv = true;
+	oEvent.preventDefault();
 };
 
 /**
