@@ -305,15 +305,7 @@ class ScheduledTask
 				// Have some members to change?
 				if (!empty($member_changes))
 					foreach ($member_changes as $change)
-						$db->query('', '
-							UPDATE {db_prefix}members
-							SET warning = {int:warning}
-							WHERE id_member = {int:id_member}',
-							array(
-								'warning' => $change['warning'],
-								'id_member' => $change['id'],
-							)
-						);
+						updateMemberData($change['id'], array('warning' => $change['warning']));
 			}
 		}
 
