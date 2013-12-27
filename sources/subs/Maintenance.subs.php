@@ -723,17 +723,7 @@ function updateMembersPostCount($start, $increment)
 
 	// Update the post count for this group
 	while ($row = $db->fetch_assoc($request))
-	{
-		$db->query('', '
-			UPDATE {db_prefix}members
-			SET posts = {int:posts}
-			WHERE id_member = {int:row}',
-			array(
-				'row' => $row['id_member'],
-				'posts' => $row['posts'],
-			)
-		);
-	}
+		updateMemberData($row['id_member'], array('posts' => $row['posts']));
 	$db->free_result($request);
 
 	return $total_rows;
@@ -785,19 +775,12 @@ function updateZeroPostMembers()
 			);
 
 			// set the post count to zero for any delinquents we may have found
+			$members = array();
 			while ($row = $db->fetch_assoc($request))
-			{
-				$db->query('', '
-					UPDATE {db_prefix}members
-					SET posts = {int:zero}
-					WHERE id_member = {int:row}',
-					array(
-						'row' => $row['id_member'],
-						'zero' => 0,
-					)
-				);
-			}
+				$members[] = $row['id_member'];
 			$db->free_result($request);
+			if (!empty($members))
+				updateMemberData($members, array('posts' => 0));
 		}
 }
 

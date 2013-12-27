@@ -333,3 +333,21 @@ function addActionOption()
 
 	setOuterHTML(document.getElementById("actionAddHere"), '<br /><select name="acttype[' + actionNum + ']" id="acttype' + actionNum + '" onchange="updateActionDef(' + actionNum + ');rebuildRuleDesc();"><option value="">' + txt_pm_rule_sel_action + ':</option><option value="lab">' + txt_pm_rule_label + '</option><option value="del">' + txt_pm_rule_delete + '</option></select>&nbsp;<span id="labdiv' + actionNum + '" style="display: none;"><select name="labdef[' + actionNum + ']" id="labdef' + actionNum + '" onchange="rebuildRuleDesc();"><option value="">' + txt_pm_rule_sel_label + '</option>' + label_option + '</select></span><span id="actionAddHere"></span>');
 }
+
+/**
+ * Maintains the personal message rule action options to conform with the action choice
+ * so that the form only makes available the proper choice
+ *
+ * @param {string} optNum
+ */
+function updateActionDef(optNum)
+{
+	if (document.getElementById("acttype" + optNum).value === "lab")
+	{
+		document.getElementById("labdiv" + optNum).style.display = "";
+	}
+	else
+	{
+		document.getElementById("labdiv" + optNum).style.display = "none";
+	}
+}

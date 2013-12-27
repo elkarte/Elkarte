@@ -158,22 +158,12 @@ function reapplySubscriptions($users)
 	foreach ($groups as $id => $group)
 	{
 		$group['additional'] = array_unique($group['additional']);
+		$addgroups = array();
 		foreach ($group['additional'] as $key => $value)
-			if (empty($value))
-				unset($group['additional'][$key]);
-		$addgroups = implode(',', $group['additional']);
+			if (!empty($value))
+				$addgroups[] = $value;
 
-		$db->query('', '
-			UPDATE {db_prefix}members
-			SET id_group = {int:primary_group}, additional_groups = {string:additional_groups}
-			WHERE id_member = {int:current_member}
-			LIMIT 1',
-			array(
-				'primary_group' => $group['primary'],
-				'current_member' => $id,
-				'additional_groups' => $addgroups,
-			)
-		);
+		assignGroupsToMember($id, $group['primary'], $addgroups);
 	}
 }
 
@@ -258,12 +248,13 @@ function addSubscription($id_subscribe, $id_member, $renewal = 0, $forceStartTim
 		// As everything else should be good, just update!
 		$db->query('', '
 			UPDATE {db_prefix}log_subscribed
-			SET end_time = {int:end_time}, start_time = {int:start_time}
+			SET end_time = {int:end_time}, start_time = {int:start_time}, reminder_sent = {int:no_reminder}
 			WHERE id_sublog = {int:current_subscription_item}',
 			array(
 				'end_time' => $endtime,
 				'start_time' => $starttime,
 				'current_subscription_item' => $id_sublog,
+				'no_reminder' => 0,
 			)
 		);
 
@@ -301,16 +292,7 @@ function addSubscription($id_subscribe, $id_member, $renewal = 0, $forceStartTim
 	$newAddGroups = implode(',', $newAddGroups);
 
 	// Store the new settings.
-	$db->query('', '
-		UPDATE {db_prefix}members
-		SET id_group = {int:primary_group}, additional_groups = {string:additional_groups}
-		WHERE id_member = {int:current_member}',
-		array(
-			'primary_group' => $id_group,
-			'current_member' => $id_member,
-			'additional_groups' => $newAddGroups,
-		)
-	);
+	updateMemberData($id_member, array('id_group' => $id_group, 'additional_groups' => $newAddGroups));
 
 	// Now log the subscription - maybe we have a dorment subscription we can restore?
 	$request = $db->query('', '
@@ -1122,19 +1104,9 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 
 	// Crazy stuff, we seem to have our groups fixed, just make them unique
 	$existingGroups = array_unique($existingGroups);
-	$existingGroups = implode(',', $existingGroups);
 
 	// Update the member
-	$db->query('', '
-		UPDATE {db_prefix}members
-		SET id_group = {int:primary_group}, additional_groups = {string:existing_groups}
-		WHERE id_member = {int:current_member}',
-		array(
-			'primary_group' => $member_info['id_group'],
-			'current_member' => $id_member,
-			'existing_groups' => $existingGroups,
-		)
-	);
+	assignGroupsToMember($id_member, $member_info['id_group'], $existingGroups);
 
 	// Disable the subscription.
 	if (!$delete)

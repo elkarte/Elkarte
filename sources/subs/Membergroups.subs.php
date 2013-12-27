@@ -383,15 +383,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 	$db->free_result($request);
 
 	foreach ($updates as $additional_groups => $memberArray)
-		$db->query('', '
-			UPDATE {db_prefix}members
-			SET additional_groups = {string:additional_groups}
-			WHERE id_member IN ({array_int:member_list})',
-			array(
-				'member_list' => $memberArray,
-				'additional_groups' => implode(',', array_diff(explode(',', $additional_groups), $groups)),
-			)
-		);
+		updateMemberData($memberArray, array('additional_groups' => array_diff(explode(',', $additional_groups), $groups)));
 
 	// Their post groups may have changed now...
 	updatePostgroupStats($members);

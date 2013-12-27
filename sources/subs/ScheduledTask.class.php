@@ -305,15 +305,7 @@ class ScheduledTask
 				// Have some members to change?
 				if (!empty($member_changes))
 					foreach ($member_changes as $change)
-						$db->query('', '
-							UPDATE {db_prefix}members
-							SET warning = {int:warning}
-							WHERE id_member = {int:id_member}',
-							array(
-								'warning' => $change['warning'],
-								'id_member' => $change['id'],
-							)
-						);
+						updateMemberData($change['id'], array('warning' => $change['warning']));
 			}
 		}
 
@@ -1092,12 +1084,16 @@ class ScheduledTask
 
 				// This one is more complex then the other logs.  First we need to figure out which reports are too old.
 				$reports = array();
-				$result = $db->query('', '
+				$result = $smcFunc['db_query']('', '
 					SELECT id_report
 					FROM {db_prefix}log_reported
-					WHERE time_started < {int:time_started}',
+					WHERE time_started < {int:time_started}
+						AND closed = {int:not_closed}
+						AND ignore_all = {int:not_ignored}',
 					array(
 						'time_started' => $t,
+						'not_closed' => 0,
+						'not_ignored' => 0,
 					)
 				);
 

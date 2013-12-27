@@ -1690,8 +1690,8 @@ class Post_Controller extends Action_Controller
 
 			// Insert the event.
 			$eventOptions = array(
-				'board' => $board,
-				'topic' => $topic,
+				'id_board' => $board,
+				'id_topic' => $topic,
 				'title' => $_POST['evtitle'],
 				'member' => $user_info['id'],
 				'start_date' => sprintf('%04d-%02d-%02d', $_POST['year'], $_POST['month'], $_POST['day']),
