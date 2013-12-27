@@ -158,22 +158,12 @@ function reapplySubscriptions($users)
 	foreach ($groups as $id => $group)
 	{
 		$group['additional'] = array_unique($group['additional']);
+		$addgroups = array();
 		foreach ($group['additional'] as $key => $value)
-			if (empty($value))
-				unset($group['additional'][$key]);
-		$addgroups = implode(',', $group['additional']);
+			if (!empty($value))
+				$addgroups[] = $value;
 
-		$db->query('', '
-			UPDATE {db_prefix}members
-			SET id_group = {int:primary_group}, additional_groups = {string:additional_groups}
-			WHERE id_member = {int:current_member}
-			LIMIT 1',
-			array(
-				'primary_group' => $group['primary'],
-				'current_member' => $id,
-				'additional_groups' => $addgroups,
-			)
-		);
+		assignGroupsToMember($id, $group['primary'], $addgroups);
 	}
 }
 
@@ -1114,19 +1104,9 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 
 	// Crazy stuff, we seem to have our groups fixed, just make them unique
 	$existingGroups = array_unique($existingGroups);
-	$existingGroups = implode(',', $existingGroups);
 
 	// Update the member
-	$db->query('', '
-		UPDATE {db_prefix}members
-		SET id_group = {int:primary_group}, additional_groups = {string:existing_groups}
-		WHERE id_member = {int:current_member}',
-		array(
-			'primary_group' => $member_info['id_group'],
-			'current_member' => $id_member,
-			'existing_groups' => $existingGroups,
-		)
-	);
+	assignGroupsToMember($id_member, $member_info['id_group'], $existingGroups);
 
 	// Disable the subscription.
 	if (!$delete)
