@@ -101,7 +101,7 @@ function template_folder()
 			$window_class = $message['alternate'] === 0 ? 'windowbg' : 'windowbg2';
 
 			echo '
-						<div class="', $window_class, '">';
+						<div id="msg_', $message['id'], '" class="', $window_class, '">';
 
 			// Showing the sidebar posting area?
 			if (empty($options['hide_poster_area']))
@@ -145,7 +145,7 @@ function template_folder()
 
 			// Done with the information about the poster... on to the post itself.
 			echo '
-								<div class="inner" id="msg_', $message['id'], '"', '>', $message['body'], '</div>';
+								<div class="inner">', $message['body'], '</div>';
 
 			// Show our quick buttons like quote and reply
 			echo '
@@ -163,11 +163,11 @@ function template_folder()
 									<li class="listlevel1 subsections" aria-haspopup="true"><a class="linklevel1 post_options">', $txt['post_options'], '</a>
 										<ul class="menulevel2">';
 
-				// Anything else added by mods for example?
-				if (!empty($context['additional_pm_drop_buttons']))
-					foreach ($context['additional_pm_drop_buttons'] as $key => $button)
-						echo '
-											<li class="listlevel2"><a href="' . $button['href'] . '" class="linklevel2 ', $key, '">' . $button['text'] . '</a></li>';
+				foreach ($context['additional_pm_drop_buttons'] as $key => $button)
+					echo '
+											<li class="listlevel2">
+												<a href="' . $button['href'] . '" class="linklevel2 ', $key, '">' . $button['text'] . '</a>
+											</li>';
 
 				echo '
 										</ul>
@@ -176,7 +176,9 @@ function template_folder()
 
 			// Remove is always an option
 			echo '
-									<li class="listlevel1"><a href="', $scripturl, '?action=pm;sa=pmactions;pm_actions%5B', $message['id'], '%5D=delete;f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', addslashes($txt['remove_message']), '?\');" class="linklevel1 remove_button">', $txt['delete'], '</a></li>';
+									<li class="listlevel1">
+										<a href="', $scripturl, '?action=pm;sa=pmactions;pm_actions%5B', $message['id'], '%5D=delete;f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', addslashes($txt['remove_message']), '?\');" class="linklevel1 remove_button">', $txt['delete'], '</a>
+									</li>';
 
 			// Show reply buttons if you have the permission to send PMs.
 			if ($context['can_send_pm'])
@@ -187,11 +189,16 @@ function template_folder()
 					// Is there than more than one recipient you can reply to?
 					if ($message['number_recipients'] > 1)
 						echo '
-									<li class="listlevel1"><a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote;u=all" class="linklevel1 reply_all_button">', $txt['reply_to_all'], '</a></li>';
+									<li class="listlevel1">
+										<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote;u=all" class="linklevel1 reply_all_button">', $txt['reply_to_all'], '</a></li>';
 
 					echo '
-									<li class="listlevel1"><a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';u=', $message['member']['id'], '" class="linklevel1 reply_button">', $txt['reply'], '</a></li>
-									<li class="listlevel1"><a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote', $context['folder'] == 'sent' ? '' : ';u=' . $message['member']['id'], '" class="linklevel1 quote_button">', $txt['quote'], '</a></li>';
+									<li class="listlevel1">
+										<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';u=', $message['member']['id'], '" class="linklevel1 reply_button">', $txt['reply'], '</a>
+									</li>
+									<li class="listlevel1">
+										<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote', $context['folder'] == 'sent' ? '' : ';u=' . $message['member']['id'], '" class="linklevel1 quote_button">', $txt['quote'], '</a>
+									</li>';
 				}
 				// This is for "forwarding" - even if the member is gone.
 				else
@@ -211,13 +218,6 @@ function template_folder()
 									</li>';
 			}
 
-			// Can this PM be reported?
-			if ($message['can_report'] && $context['folder'] != 'sent')
-				echo '
-									<li class="listlevel1">
-										<a class="linklevel1 warn_button" href="', $scripturl, '?action=pm;sa=report;l=', $context['current_label_id'], ';pmsg=', $message['id'], '">', $txt['pm_report_to_admin'], '</a>
-									</li>';
-
 			echo '
 								</ul>';
 
@@ -227,13 +227,13 @@ function template_folder()
 				echo '
 								<div class="labels">';
 
-				// Add the label drop down box. @todo: Why inline styles for select?
+				// Add the label drop down box.
 				if (!empty($context['currently_using_labels']))
 				{
 					echo '
-									<select style="padding:3px 2px;margin-right:10px" name="pm_actions[', $message['id'], ']" onchange="if (this.options[this.selectedIndex].value) form.submit();">
+									<select name="pm_actions[', $message['id'], ']" onchange="if (this.options[this.selectedIndex].value) form.submit();">
 										<option value="">', $txt['pm_msg_label_title'], ':</option>
-										<option value="" disabled="disabled">---------------</option>';
+										<option value="" disabled="disabled">' . str_repeat('&#8212;', strlen($txt['pm_msg_label_title'])) . '</option>';
 
 					// Are there any labels which can be added to this?
 					if (!$message['fully_labeled'])
@@ -360,6 +360,9 @@ function template_subject_list_above()
 	}
 }
 
+/**
+ * Template layer to show items below the subject list
+ */
 function template_subject_list_below()
 {
 	global $context;
@@ -374,6 +377,9 @@ function template_subject_list_below()
 	}
 }
 
+/**
+ * Template layer to show the PM subject listing
+ */
 function template_subject_list()
 {
 	global $context, $settings, $txt, $scripturl;
@@ -409,6 +415,7 @@ function template_subject_list()
 							</tr>';
 	$next_alternate = false;
 
+	// Use the query callback to get the subject list
 	while ($message = $context['get_pmessage']('subject'))
 	{
 		echo '
@@ -431,10 +438,17 @@ function template_subject_list()
 		echo '
 										};
 									// ]]></script>
-									', $message['is_replied_to'] ? '<img src="' . $settings['images_url'] . '/icons/pm_replied.png" style="margin-right: 4px;" alt="' . $txt['pm_replied'] . '" />' : '<img src="' . $settings['images_url'] . '/icons/pm_read.png" style="margin-right: 4px;" alt="' . $txt['pm_read'] . '" />', '</td>
+									', $message['is_replied_to'] ? '<img src="' . $settings['images_url'] . '/icons/pm_replied.png" alt="' . $txt['pm_replied'] . '" />' : '<img src="' . $settings['images_url'] . '/icons/pm_read.png" alt="' . $txt['pm_read'] . '" />', '</td>
 								<td class="pm_date">', $message['time'], '</td>
-								<td class="pm_subject">', ($context['display_mode'] != 0 && $context['current_pm'] == $message['id'] ? '<img src="' . $settings['images_url'] . '/selected.png" alt="*" />' : ''), '<a href="', ($context['display_mode'] == 0 || $context['current_pm'] == $message['id'] ? '' : ($scripturl . '?action=pm;pmid=' . $message['id'] . ';kstart;f=' . $context['folder'] . ';start=' . $context['start'] . ';sort=' . $context['sort_by'] . ($context['sort_direction'] == 'up' ? ';' : ';desc') . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''))), '#msg_', $message['id'], '">', $message['subject'], $message['is_unread'] ? '&nbsp;<span class="new_posts">' . $txt['new'] . '</span>' : '', '</a></td>
-								<td class="pm_from">', ($context['from_or_to'] == 'from' ? $message['member']['link'] : (empty($message['recipients']['to']) ? '' : implode(', ', $message['recipients']['to']))), '</td>
+								<td class="pm_subject">',
+									($context['display_mode'] != 0 && $context['current_pm'] == $message['id'] ? '<img src="' . $settings['images_url'] . '/selected.png" alt="*" />' : ''),
+									'<a href="', ($context['display_mode'] == 0 || $context['current_pm'] == $message['id'] ? '' : ($scripturl . '?action=pm;pmid=' . $message['id'] . ';kstart;f=' . $context['folder'] . ';start=' . $context['start'] . ';sort=' . $context['sort_by'] . ($context['sort_direction'] == 'up' ? ';' : ';desc') . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''))), '#msg_', $message['id'], '">',
+										$message['subject'], $message['is_unread'] ? '&nbsp;<span class="new_posts">' . $txt['new'] . '</span>' : '', '
+									</a>
+								</td>
+								<td class="pm_from">',
+									($context['from_or_to'] == 'from' ? $message['member']['link'] : (empty($message['recipients']['to']) ? '' : implode(', ', $message['recipients']['to']))), '
+								</td>
 								<td class="pm_qiuckmod">
 									<input type="checkbox" name="pms[]" id="deletelisting', $message['id'], '" value="', $message['id'], '"', $message['is_selected'] ? ' checked="checked"' : '', ' onclick="if (document.getElementById(\'deletedisplay', $message['id'], '\')) document.getElementById(\'deletedisplay', $message['id'], '\').checked = this.checked;" class="input_check" />
 								</td>
@@ -457,7 +471,7 @@ function template_subject_list()
 						<li>
 							<select name="pm_action" onchange="if (this.options[this.selectedIndex].value) this.form.submit();" onfocus="loadLabelChoices();">
 								<option value="">' . $txt['pm_sel_label_title'] . ':</option>
-								<option value="" disabled="disabled">---------------</option>';
+								<option value="" disabled="disabled">' . str_repeat('&#8212;', strlen($txt['pm_sel_label_title'])) . '</option>';
 
 			$extra .= '
 								<option value="" disabled="disabled">' . $txt['pm_msg_label_apply'] . ':</option>';

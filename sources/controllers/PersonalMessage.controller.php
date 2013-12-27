@@ -34,7 +34,7 @@ class PersonalMessage_Controller extends Action_Controller
 	 * It sets the context, load templates and language file(s), as necessary
 	 * for the function that will be called.
 	 */
-	function pre_dispatch()
+	public function pre_dispatch()
 	{
 		global $txt, $scripturl, $context, $user_info, $user_settings, $modSettings;
 
@@ -97,6 +97,8 @@ class PersonalMessage_Controller extends Action_Controller
 
 			applyRules();
 			updateMemberData($user_info['id'], array('new_pm' => 0));
+
+			// Turn the new PM's status off since they have entered the PM area
 			toggleNewPM($user_info['id']);
 		}
 
@@ -158,7 +160,7 @@ class PersonalMessage_Controller extends Action_Controller
 	 *
 	 * @see Action_Controller::action_index()
 	 */
-	function action_index()
+	public function action_index()
 	{
 		global $context;
 
@@ -168,6 +170,7 @@ class PersonalMessage_Controller extends Action_Controller
 		$subActions = array(
 			'manlabels' => array($this, 'action_manlabels', 'permission' => 'pm_read'),
 			'manrules' => array($this, 'action_manrules', 'permission' => 'pm_read'),
+			'markunread' => array($this, 'action_markunread', 'permission' => 'pm_read'),
 			'pmactions' => array($this, 'action_pmactions', 'permission' => 'pm_read'),
 			'prune' => array($this, 'action_prune', 'permission' => 'pm_read'),
 			'removeall' => array($this, 'action_removeall', 'permission' => 'pm_read'),
@@ -200,9 +203,12 @@ class PersonalMessage_Controller extends Action_Controller
 	}
 
 	/**
-	 * A folder, ie. inbox/sent etc.
+	 * Display a folder, ie. inbox/sent etc.
+	 *
+	 * @uses folder sub template
+	 * @uses subject_list, pm template layers
 	 */
-	function action_folder()
+	public function action_folder()
 	{
 		global $txt, $scripturl, $modSettings, $context, $subjects_request;
 		global $messages_request, $user_info, $recipients, $options, $user_settings;
@@ -222,16 +228,6 @@ class PersonalMessage_Controller extends Action_Controller
 			$start = 0;
 		else
 			$start = 'new';
-
-		// Auto video embeding enabled, someone may have a link in a PM
-		if (!empty($modSettings['enableVideoEmbeding']))
-		{
-			addInlineJavascript('
-		$(document).ready(function() {
-			$().linkifyvideo(oEmbedtext);
-		});'
-			);
-		}
 
 		// Set up some basic theme stuff.
 		$context['from_or_to'] = $context['folder'] !== 'sent' ? 'from' : 'to';
@@ -319,7 +315,8 @@ class PersonalMessage_Controller extends Action_Controller
 			{
 				$start = getPMCount($descending, $pmID, $labelQuery);
 
-				// To stop the page index's being abnormal, start the page on the page the message would normally be located on...
+				// To stop the page index's being abnormal, start the page on the page the message
+				// would normally be located on...
 				$start = $modSettings['defaultMaxMessages'] * (int) ($start / $modSettings['defaultMaxMessages']);
 			}
 		}
@@ -357,33 +354,41 @@ class PersonalMessage_Controller extends Action_Controller
 			'pmid' => isset($pmID) ? $pmID : 0,
 		), $user_info['id']);
 
-		// Make sure that we have been given a correct head pm id!
-		if ($context['display_mode'] === 2 && !empty($pmID) && $pmID != $lastData['id'])
+		// Make sure that we have been given a correct head pm id if we are in converstation mode
+		if ($context['display_mode'] == 2 && !empty($pmID) && $pmID != $lastData['id'])
 			fatal_lang_error('no_access', false);
 
+		// If loadPMs returned results, lets show the pm subject list
 		if (!empty($pms))
 		{
-			// Select the correct current message.
+			// Tell the template if no pm has specifically been selected
 			if (empty($pmID))
-				$context['current_pm'] = $lastData['id'];
+				$context['current_pm'] = 0;
 
-			// This is a list of the pm's that are used for "full" display.
+			// This is a list of the pm's that are used for "show all" display.
 			if ($context['display_mode'] == 0)
 				$display_pms = $pms;
+			// Just use the last pm the user received to start things off
 			else
-				$display_pms = array($context['current_pm']);
-
-			// At this point we know the main id_pm's. But - if we are looking at conversations we need the others!
-			if ($context['display_mode'] == 2)
-				list($display_pms, $posters) = loadConversationList($lastData['head'], $recipients, $context['folder']);
+				$display_pms = array($lastData['id']);
 
 			// This is pretty much EVERY pm!
 			$all_pms = array_unique(array_merge($pms, $display_pms));
 
-			// Get recipients (don't include bcc-recipients for your inbox, you're not supposed to know :P).
-			list($context['message_labels'], $context['message_replied'], $context['message_unread']) = loadPMRecipients($all_pms, $recipients, $context['folder']);
+			// At this point we know the main id_pm's. But if we are looking at conversations we need
+			// the PMs that make up the conversation
+			if ($context['display_mode'] == 2)
+			{
+				list($display_pms, $posters) = loadConversationList($lastData['head'], $recipients, $context['folder']);
 
-			// Make sure we don't load unnecessary data.
+				// See if any of these 'listing' PM's are in a conversation thread that has unread entries
+				$context['conversation_unread'] = loadConversationUnreadStatus($all_pms);
+			}
+
+			// Get recipients (don't include bcc-recipients for your inbox, you're not supposed to know :P).
+			list($context['message_labels'], $context['message_replied'], $context['message_unread']) = loadPMRecipientInfo($all_pms, $recipients, $context['folder']);
+
+			// Make sure we don't load any unnecessary data for one at a time mode
 			if ($context['display_mode'] == 1)
 			{
 				foreach ($posters as $pm_key => $sender)
@@ -410,8 +415,12 @@ class PersonalMessage_Controller extends Action_Controller
 				$subjects_request = loadPMSubjectRequest($pms, $orderBy);
 			}
 
-			// Execute the query and let preparePMContext_callback use the results
-			$messages_request = loadPMMessageRequest($display_pms, $sort_by_query, $sort_by, $descending, $context['display_mode'], $context['folder']);
+			// Execute the load message query if a message has been chosen and let
+			// preparePMContext_callback fetch the results.  Otherwise just show the pm selection list
+			if (empty($pmsg) && empty($pmID))
+				$messages_request = false;
+			else
+				$messages_request = loadPMMessageRequest($display_pms, $sort_by_query, $sort_by, $descending, $context['display_mode'], $context['folder']);
 		}
 		else
 			$messages_request = false;
@@ -423,6 +432,16 @@ class PersonalMessage_Controller extends Action_Controller
 		$context['page_title'] = $txt['pm_inbox'];
 		$context['sort_direction'] = $descending ? 'down' : 'up';
 		$context['sort_by'] = $sort_by;
+
+		// Auto video embeding enabled, someone may have a link in a PM
+		if (!empty($messages_request) && !empty($modSettings['enableVideoEmbeding']))
+		{
+			addInlineJavascript('
+		$(document).ready(function() {
+			$().linkifyvideo(oEmbedtext);
+		});', true
+			);
+		}
 
 		if (!empty($messages_request) && !empty($context['show_delete']))
 			Template_Layers::getInstance()->addEnd('pm_pages_and_buttons');
@@ -439,7 +458,7 @@ class PersonalMessage_Controller extends Action_Controller
 			// If the display mode is "old sk00l" do them all...
 			if ($context['display_mode'] == 0)
 				markMessages(null, $context['current_label_id']);
-			// Otherwise do just the current one!
+			// Otherwise do just the currently displayed ones!
 			elseif (!empty($context['current_pm']))
 				markMessages($display_pms, $context['current_label_id']);
 		}
@@ -463,13 +482,11 @@ class PersonalMessage_Controller extends Action_Controller
 	}
 
 	/**
-	 * Send a new message?
+	 * Send a new personal message?
 	 */
-	function action_send()
+	public function action_send()
 	{
 		global $txt, $scripturl, $modSettings, $context, $language, $user_info;
-
-		isAllowedTo('pm_send');
 
 		// Load in some text and template dependencies
 		loadLanguage('PersonalMessage');
@@ -688,11 +705,10 @@ class PersonalMessage_Controller extends Action_Controller
 	/**
 	 * Send a personal message.
 	 */
-	function action_send2()
+	public function action_send2()
 	{
 		global $txt, $context, $user_info, $modSettings;
 
-		isAllowedTo('pm_send');
 		require_once(SUBSDIR . '/Auth.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
 
@@ -964,7 +980,7 @@ class PersonalMessage_Controller extends Action_Controller
 	 * This function performs all additional actions
 	 * including the deleting of PM's
 	 */
-	function action_pmactions()
+	public function action_pmactions()
 	{
 		global $context, $user_info;
 
@@ -1047,7 +1063,7 @@ class PersonalMessage_Controller extends Action_Controller
 	/**
 	 * Are you sure you want to PERMANENTLY (mostly) delete ALL your messages?
 	 */
-	function action_removeall()
+	public function action_removeall()
 	{
 		global $txt, $context;
 
@@ -1063,7 +1079,7 @@ class PersonalMessage_Controller extends Action_Controller
 	/**
 	 * Delete ALL the messages!
 	 */
-	function action_removeall2()
+	public function action_removeall2()
 	{
 		global $context;
 
@@ -1083,7 +1099,7 @@ class PersonalMessage_Controller extends Action_Controller
 	/**
 	 * This function allows the user to prune (delete) all messages older than a supplied duration.
 	 */
-	function action_prune()
+	public function action_prune()
 	{
 		global $txt, $context, $user_info, $scripturl;
 
@@ -1117,7 +1133,7 @@ class PersonalMessage_Controller extends Action_Controller
 	/**
 	 * This function handles adding, deleting and editing labels on messages.
 	 */
-	function action_manlabels()
+	public function action_manlabels()
 	{
 		global $txt, $context, $user_info, $scripturl;
 
@@ -1280,7 +1296,7 @@ class PersonalMessage_Controller extends Action_Controller
 	 * @uses Profile template.
 	 * @uses Profile language file.
 	 */
-	function action_settings()
+	public function action_settings()
 	{
 		global $txt, $user_info, $context, $scripturl, $profile_vars, $cur_profile, $user_profile;
 
@@ -1346,7 +1362,7 @@ class PersonalMessage_Controller extends Action_Controller
 	 *
 	 * @uses report_message sub-template.
 	 */
-	function action_report()
+	public function action_report()
 	{
 		global $txt, $context, $user_info, $language, $modSettings;
 
@@ -1453,7 +1469,7 @@ class PersonalMessage_Controller extends Action_Controller
 	/**
 	 * List all rules, and allow adding/entering etc...
 	 */
-	function action_manrules()
+	public function action_manrules()
 	{
 		global $txt, $context, $user_info, $scripturl;
 
@@ -2059,7 +2075,7 @@ class PersonalMessage_Controller extends Action_Controller
 		if (!empty($foundMessages))
 		{
 			$recipients = array();
-			list($context['message_labels'], $context['message_replied'], $context['message_unread'], $context['first_label']) = loadPMRecipients($foundMessages, $recipients, $context['folder'], true);
+			list($context['message_labels'], $context['message_replied'], $context['message_unread'], $context['first_label']) = loadPMRecipientInfo($foundMessages, $recipients, $context['folder'], true);
 
 			// Prepare for the callback!
 			$search_results = loadPMSearchResults($foundMessages, $search_params);
@@ -2128,6 +2144,33 @@ class PersonalMessage_Controller extends Action_Controller
 			'url' => $scripturl . '?action=pm;sa=search',
 			'name' => $txt['pm_search_bar_title'],
 		);
+	}
+
+	/**
+	 * Allows the user to mark a personal message as unread so they remember to come back to it
+	 */
+	public function action_markunread()
+	{
+		global $context;
+
+		checkSession('request');
+
+		$pmsg = !empty($_REQUEST['pmsg']) ? (int) $_REQUEST['pmsg'] : null;
+
+		// Marking a message as unread, we need a message that was sent to them
+		// Can't mark your own reply as unread, that would be weird
+		if (!is_null($pmsg) && checkPMReceived($pmsg))
+		{
+			// Make sure this is accessible, should be of course
+			if (!isAccessiblePM($pmsg, 'inbox'))
+				fatal_lang_error('no_access', false);
+
+			// Well then, you get to hear about it all over again
+			markMessagesUnread($pmsg);
+		}
+
+		// Back to the folder.
+		redirectexit($context['current_label_redirect']);
 	}
 }
 
@@ -2282,10 +2325,12 @@ function messageIndexBar($area)
 }
 
 /**
- * Get a personal message for the theme.  (used to save memory.)
+ * Get a personal message for the theme. (used to save memory.)
+ * This is a callback function that will fetch the actual results, as needed, of a previously run
+ * subject (loadPMSubjectRequest) or message (loadPMMessageRequest) query.
  *
- * @param $type
- * @param $reset
+ * @param string $type
+ * @param boolean $reset
  */
 function preparePMContext_callback($type = 'subject', $reset = false)
 {
@@ -2337,6 +2382,11 @@ function preparePMContext_callback($type = 'subject', $reset = false)
 			'is_unread' => &$context['message_unread'][$subject['id_pm']],
 			'is_selected' => !empty($temp_pm_selected) && in_array($subject['id_pm'], $temp_pm_selected),
 		);
+
+		// In conversation view we need to indicate on the subject listing if any message inside of
+		// that conversation is unread, not just if the latest is unread.
+		if ($context['display_mode'] == 2 && isset($context['conversation_unread'][$output['id']]))
+			$output['is_unread'] = true;
 
 		return $output;
 	}
@@ -2412,6 +2462,23 @@ function preparePMContext_callback($type = 'subject', $reset = false)
 		'can_see_ip' => allowedTo('moderate_forum') || ($message['id_member_from'] == $user_info['id'] && !empty($user_info['id'])),
 	);
 
+	$context['additional_pm_drop_buttons'] = array();
+
+	// Can they report this message
+	if (!empty($output['can_report']) && $context['folder'] !== 'sent' && $output['member']['id'] != $user_info['id'])
+		$context['additional_pm_drop_buttons']['warn_button'] = array(
+			'href' => $scripturl . '?action=pm;sa=report;l=' . $context['current_label_id'] . ';pmsg=' . $output['id'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+			'text' => $txt['pm_report_to_admin']
+		);
+
+	// Or mark it as unread
+	if (empty($output['is_unread']) && $context['folder'] !== 'sent' && $output['member']['id'] != $user_info['id'])
+		$context['additional_pm_drop_buttons']['restore_button'] = array(
+			'href' => $scripturl . '?action=pm;sa=markunread;l=' . $context['current_label_id'] . ';pmsg=' . $output['id'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+			'text' => $txt['pm_mark_unread']
+		);
+
+	// Or give take karma for a PM
 	if (!empty($output['member']['karma']['allow']))
 	{
 		$output['member']['karma'] += array(
@@ -2428,8 +2495,8 @@ function preparePMContext_callback($type = 'subject', $reset = false)
 /**
  * An error in the message...
  *
- * @param $named_recipients
- * @param $recipient_ids
+ * @param array $named_recipients
+ * @param array $recipient_ids
  */
 function messagePostError($named_recipients, $recipient_ids = array())
 {

@@ -41,6 +41,7 @@ $txt['pm_too_many_recipients'] = 'You may not send personal messages to more tha
 
 $txt['pm_read'] = 'Read';
 $txt['pm_replied'] = 'Replied To';
+$txt['pm_mark_unread'] = 'Mark as Unread';
 
 // Message Pruning.
 $txt['pm_prune'] = 'Prune messages';
