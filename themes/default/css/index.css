@@ -777,32 +777,32 @@ div.windowbg, div.windowbg2 {
 	padding: 2px 2px 0 2px;
 }
 /* The main title. */
-#forumtitle, #forumtitleright {
+#forumtitle, .rightheader #forumtitle {
 	float: left;
 	padding: 10px 10px 6px 8px;
 	font-size: 2.357em;
 	line-height: 1.455em;
 }
-#forumtitlenone {
+.centerheader #forumtitle {
 	display: none;
 }
-#forumtitleright {
+.rightheader #forumtitle {
 	float: right;
 }
 /* Float these items to the right. @todo - Simplify. */
-#logobox, #logoboxleft {
+#logobox, .rightheader #logobox {
 	float: right;
 	padding: 0.95em 12px 0 12px;
 	max-width: 40%;
 }
-#logoboxcenter {
+.centerheader #logobox {
 	width: 100%;
 }
-#logoboxleft, #logoboxleft #logo {
+.rightheader #logobox, .rightheader #logo {
 	float: left;
 	padding-bottom: 7px;
 }
-#logoboxcenter, #logoboxcenter #logo, #logoboxcenter #siteslogan {
+.centerheader #logobox, .centerheader #logo, .centerheader #siteslogan {
 	float: none;
 	display: block;
 	margin: 0 auto;
@@ -817,7 +817,7 @@ div.windowbg, div.windowbg2 {
 	padding: 0;
 	float: right;
 }
-#logoboxleft #logo {
+.rightheader #logo {
 	margin: 0 0 0 8px;
 }
 /* Main forum area. */
@@ -3858,7 +3858,7 @@ a.help .icon {
 		display: block;
 		float: none;
 	}
-	#news, #logobox, #logoboxleft, #top_section_notice {
+	#news, #logobox, .rightheader #logobox, #top_section_notice {
 		display: none;
 	}
 	.avatar>.linklevel1>.avatar {
