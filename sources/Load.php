@@ -1577,9 +1577,19 @@ function loadTheme($id_theme = 0, $initialize = true)
 		loadJavascriptFile('elk_jquery_embed.js', array('defer' => true));
 	}
 
+	// Prettify code tags? Load the needed JS and CSS.
 	if (!empty($modSettings['enableCodePrettify']))
-		loadJavascriptFile($settings['default_theme_url'] . '/prettify/run_prettify.js', array('defer' => true));
+	{
+		loadCSSFile('prettify.css');
+		loadJavascriptFile('prettify.js', array('defer' => true));
 
+		addInlineJavascript('
+		$(document).ready(function(){
+			prettyPrint();
+		});', true);
+	}
+
+	// Relative times?
 	if (!empty($modSettings['todayMod']) && $modSettings['todayMod'] > 2)
 		addInlineJavascript('
 		var oRttime = ({
