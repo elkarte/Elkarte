@@ -302,16 +302,7 @@ function addSubscription($id_subscribe, $id_member, $renewal = 0, $forceStartTim
 	$newAddGroups = implode(',', $newAddGroups);
 
 	// Store the new settings.
-	$db->query('', '
-		UPDATE {db_prefix}members
-		SET id_group = {int:primary_group}, additional_groups = {string:additional_groups}
-		WHERE id_member = {int:current_member}',
-		array(
-			'primary_group' => $id_group,
-			'current_member' => $id_member,
-			'additional_groups' => $newAddGroups,
-		)
-	);
+	updateMemberData($id_member, array('id_group' => $id_group, 'additional_groups' => $newAddGroups));
 
 	// Now log the subscription - maybe we have a dorment subscription we can restore?
 	$request = $db->query('', '
