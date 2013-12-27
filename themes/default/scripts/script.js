@@ -24,25 +24,15 @@ var ua = navigator.userAgent.toLowerCase(),
 	is_ff = typeof InstallTrigger !== 'undefined' || ((ua.indexOf('iceweasel') !== -1 || ua.indexOf('icecat') !== -1 || ua.indexOf('shiretoko') !== -1 || ua.indexOf('minefield') !== -1) && !is_opera),
 	is_safari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0, // Safari 3+
 	is_chrome = !!window.chrome, // Chrome 1+, Opera 15+
-	is_ie = /*@cc_on!@*/false || !!document.documentMode, // IE6+
+	is_ie = !!document.documentMode, // IE8+
 	is_webkit = ua.indexOf('applewebkit') !== -1;
-
-// Define XMLHttpRequest for IE
-if (!('XMLHttpRequest' in window) && 'ActiveXObject' in window)
-	window.XMLHttpRequest = function () {
-		return new ActiveXObject('MSXML2.XMLHTTP');
-	};
-
-// Some older versions of Mozilla don't have this, for some reason.
-if (!('forms' in document))
-	document.forms = document.getElementsByTagName('form');
 
 // Versions of ie < 9 do not have this built in
 if (!('getElementsByClassName' in document))
 {
 	document.getElementsByClassName = function(className)
 	{
-		return $('".' + className + '"');
+		return $('.' + className);
 	};
 }
 
@@ -54,9 +44,6 @@ if (!('getElementsByClassName' in document))
  */
 function getXMLDocument(sUrl, funcCallback)
 {
-	if (!window.XMLHttpRequest)
-		return null;
-
 	var oMyDoc = new XMLHttpRequest(),
 		bAsync = typeof(funcCallback) !== 'undefined',
 		oCaller = this;
@@ -89,9 +76,6 @@ function getXMLDocument(sUrl, funcCallback)
  */
 function sendXMLDocument(sUrl, sContent, funcCallback)
 {
-	if (!window.XMLHttpRequest)
-		return false;
-
 	var oSendDoc = new window.XMLHttpRequest(),
 		oCaller = this;
 
@@ -327,6 +311,7 @@ function smc_Popup(oOptions)
 	this.show();
 }
 
+// Show the popup div & prepare the close events
 smc_Popup.prototype.show = function ()
 {
 	popup_class = 'popup_window ' + (this.opt.custom_class ? this.opt.custom_class : 'description');
@@ -375,16 +360,8 @@ smc_Popup.prototype.hide = function ()
  */
 function replaceText(text, oTextHandle)
 {
-	// Attempt to create a text range (IE).
-	if ('caretPos' in oTextHandle && 'createTextRange' in oTextHandle)
-	{
-		var caretPos = oTextHandle.caretPos;
-
-		caretPos.text = caretPos.text.charAt(caretPos.text.length - 1) === ' ' ? text + ' ' : text;
-		caretPos.select();
-	}
-	// Mozilla text range replace.
-	else if ('selectionStart' in oTextHandle)
+	// Standards compliant text range replace.
+	if ('selectionStart' in oTextHandle)
 	{
 		var begin = oTextHandle.value.substr(0, oTextHandle.selectionStart),
 			end = oTextHandle.value.substr(oTextHandle.selectionEnd),
@@ -1318,9 +1295,6 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 var aIconLists = [];
 function IconList(oOptions)
 {
-	if (!window.XMLHttpRequest)
-		return;
-
 	this.opt = oOptions;
 	this.bListLoaded = false;
 	this.oContainerDiv = null;
@@ -1784,24 +1758,6 @@ function updateRuleDef(optNum)
 	{
 		document.getElementById("defdiv" + optNum).style.display = "";
 		document.getElementById("defseldiv" + optNum).style.display = "none";
-	}
-}
-
-/**
- * Maintains the personal message rule action options to conform with the action choice
- * so that the form only makes available the proper choice
- *
- * @param {string} optNum
- */
-function updateActionDef(optNum)
-{
-	if (document.getElementById("acttype" + optNum).value === "lab")
-	{
-		document.getElementById("labdiv" + optNum).style.display = "";
-	}
-	else
-	{
-		document.getElementById("labdiv" + optNum).style.display = "none";
 	}
 }
 

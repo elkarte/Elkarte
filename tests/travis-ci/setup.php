@@ -87,6 +87,7 @@ Class Elk_Testing_Setup
 		if (strpos($file, 'if (file_exist') !== false)
 			$file = substr($file, 0, strpos($file, 'if (file_exist'));
 		$file .= "\n" . '$test_enabled = 1;';
+		$file .= "\n" . 'DEFINE(\'SKIPINSTALL\', 1);';
 
 		file_put_contents(BOARDDIR . '/Settings.php', $file);
 	}

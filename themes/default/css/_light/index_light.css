@@ -429,7 +429,7 @@ div.bbc_footnotes .meaction{
 	font-size: 0.929em;
 }
 #news>h2 {
-	float:left;
+	float: left;
 	color: #4b863c;
 	font-size: 1.25em;
 	line-height: 1.2em;
@@ -438,7 +438,7 @@ div.bbc_footnotes .meaction{
 	margin: 7px -4em 0 12px;
 }
 #news>h2:after {
-	content:"\2026";
+	content: "\2026";
 }
 #news_line, #elkFadeScroller {
 	padding: 6px 12px;
@@ -579,7 +579,7 @@ div.bbc_footnotes .meaction{
 .subsections:hover .linklevel1:after {
 	position: absolute;
 	right: 0.4em;
-	content:" \25bc";
+	content: " \25bc";
 }
 #main_menu .subsections:hover .linklevel1:after {
 	top: 88%;
@@ -1024,8 +1024,12 @@ div.bbc_footnotes .meaction{
 .sticky_row .topic_name h4 a, .locked_row.sticky_row .topic_name h4 a {
 	color: #555;
 }
+
 .locked_row .topic_name h4 a {
 	color: #777;
+}
+.sticky_row .topic_name h4 a.new_posts, .locked_row.sticky_row .topic_name h4 a.new_posts, .locked_row .topic_name h4 a.new_posts {
+	color: #fff;
 }
 .topic_stats {
 	color: #777;
@@ -1719,6 +1723,6 @@ div.bbc_footnotes .meaction{
 		border: none;
 	}
 	.subsections:hover .linklevel1:after {
-		content:"";
-	}	
+		content: "";
+	}
 }

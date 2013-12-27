@@ -310,7 +310,7 @@ $txt['member_part_of_these_membergroups'] = 'Member is part of these member grou
 $txt['membergroups'] = 'Member groups';
 $txt['confirm_delete_members'] = 'Are you sure you want to delete the selected members?';
 
-$txt['support_credits_title'] = 'Support &amp; Credits'; // consistent naming, see above
+$txt['support_credits_title'] = 'Support &amp; Credits';
 $txt['support_credits_info'] = 'Links to support for common issues, and version information to give if you have problems.';
 $txt['support_title'] = 'Support Information';
 $txt['support_versions_current'] = 'Current version';
@@ -660,7 +660,7 @@ $txt['admin_news_select_excluded_members_desc'] = 'Members who should not receiv
 $txt['admin_news_select_excluded_groups'] = 'Excluded Groups';
 $txt['admin_news_select_excluded_groups_desc'] = 'Select groups who should definitely not receive the newsletter.';
 $txt['admin_news_select_email'] = 'Email Addresses';
-$txt['admin_news_select_email_desc'] = 'A semi-colon separated list of email addresses to send the newsletter to. (i.e. address1; address2)';
+$txt['admin_news_select_email_desc'] = 'A semi-colon separated list of email addresses which should be sent this newsletter. (i.e. address1; address2)';
 $txt['admin_news_select_override_notify'] = 'Override notification settings';
 // Use entities in below.
 $txt['admin_news_cannot_pm_emails_js'] = 'You cannot send a personal message to an email address. If you continue all entered email addresses will be ignored.\\n\\nAre you sure you wish to do this?';

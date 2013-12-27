@@ -1483,7 +1483,7 @@ class ManageSmileys_Controller extends Action_Controller
 
 		$extracted = read_tgz_file($destination, BOARDDIR . '/packages/temp');
 		if (!$extracted) // @todo needs to change the URL in the next line ;)
-			fatal_lang_error('packageget_unable', false, array('http://custom.simplemachines.org/mods/index.php?action=search;type=12;basic_search=' . $name));
+			fatal_lang_error('packageget_unable', false, array('http://custom.elkarte.net/index.php?action=search;type=12;basic_search=' . $name));
 		if ($extracted && !file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
 			foreach ($extracted as $file)
 				if (basename($file['filename']) == 'package-info.xml')

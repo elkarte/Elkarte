@@ -239,7 +239,7 @@ function template_by_board()
 
 	if (!$context['edit_all'])
 		echo '
-				<a class="floatright" href="', $scripturl, '?action=admin;area=permissions;sa=board;edit;', $context['session_var'], '=', $context['session_id'], '">', $txt['permissions_board_all'], '</a>';
+				<a class="edit_all_board_profiles floatright" href="', $scripturl, '?action=admin;area=permissions;sa=board;edit;', $context['session_var'], '=', $context['session_id'], '">', $txt['permissions_board_all'], '</a>';
 
 	echo '
 			</h3>';
@@ -255,14 +255,10 @@ function template_by_board()
 				<div class="content">
 					<ul class="perm_boards flow_hidden">';
 
-		$alternate = false;
-
 		foreach ($category['boards'] as $board)
 		{
-			$alternate = !$alternate;
-
 			echo '
-						<li class="flow_hidden', ' windowbg', $alternate ? '' : '2', '">
+						<li class="flow_hidden windowbg">
 							<span class="perm_board floatleft">
 								<a href="', $scripturl, '?action=admin;area=manageboards;sa=board;boardid=', $board['id'], ';rid=permissions;', $context['session_var'], '=', $context['session_id'], '">', str_repeat('-', $board['child_level']), ' ', $board['name'], '</a>
 							</span>
@@ -278,14 +274,16 @@ function template_by_board()
 									<option value="', $id, '" ', $id == $board['profile'] ? 'selected="selected"' : '', '>', $profile['name'], '</option>';
 
 				echo '
-								</select>';
+								</select>
+							</span>';
 			}
 			else
 				echo '
-								<a href="', $scripturl, '?action=admin;area=permissions;sa=index;pid=', $board['profile'], ';', $context['session_var'], '=', $context['session_id'], '"> [', $board['profile_name'], ']</a>';
+								<a id="edit_board_', $board['id'], '" href="', $scripturl, '?action=admin;area=permissions;sa=index;pid=', $board['profile'], ';', $context['session_var'], '=', $context['session_id'], '"> [', $board['profile_name'], ']</a>
+							</span>
+							<a class="edit_board" style="display: none" data-boardid="', $board['id'], '" data-boardprofile="', $board['profile'], '" href="', $scripturl, '?action=admin;area=permissions;sa=board;edit;', $context['session_var'], '=', $context['session_id'], '"></a>';
 
 			echo '
-							</span>
 						</li>';
 		}
 
@@ -304,7 +302,10 @@ function template_by_board()
 				<input type="submit" name="save_changes" value="', $txt['save'], '" class="right_submit" />';
 	else
 		echo '
-				<a class="linkbutton_right" href="', $scripturl, '?action=admin;area=permissions;sa=board;edit;', $context['session_var'], '=', $context['session_id'], '">', $txt['permissions_board_all'], '</a>';
+				<a class="edit_all_board_profiles linkbutton_right" href="', $scripturl, '?action=admin;area=permissions;sa=board;edit;', $context['session_var'], '=', $context['session_id'], '">', $txt['permissions_board_all'], '</a>
+				<script><!-- // --><![CDATA[
+					initEditProfileBoards();
+				// ]]></script>';
 
 	echo '
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

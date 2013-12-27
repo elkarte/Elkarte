@@ -224,8 +224,8 @@ class Calendar_Controller extends Action_Controller
 			elseif ($event_id == -1)
 			{
 				$eventOptions = array(
-					'board' => 0,
-					'topic' => 0,
+					'id_board' => 0,
+					'id_topic' => 0,
 					'title' => Util::substr($_REQUEST['evtitle'], 0, 100),
 					'member' => $user_info['id'],
 					'start_date' => sprintf('%04d-%02d-%02d', $_POST['year'], $_POST['month'], $_POST['day']),
@@ -247,8 +247,8 @@ class Calendar_Controller extends Action_Controller
 					'title' => Util::substr($_REQUEST['evtitle'], 0, 100),
 					'span' => empty($modSettings['cal_allowspan']) || empty($_POST['span']) || $_POST['span'] == 1 || empty($modSettings['cal_maxspan']) || $_POST['span'] > $modSettings['cal_maxspan'] ? 0 : min((int) $modSettings['cal_maxspan'], (int) $_POST['span'] - 1),
 					'start_date' => strftime('%Y-%m-%d', mktime(0, 0, 0, (int) $_REQUEST['month'], (int) $_REQUEST['day'], (int) $_REQUEST['year'])),
-					'board' => isset($eventProperties['id_board']) ? (int) $eventProperties['id_board'] : 0,
-					'topic' => isset($eventProperties['id_topic']) ? (int) $eventProperties['id_topic'] : 0,
+					'id_board' => isset($eventProperties['id_board']) ? (int) $eventProperties['id_board'] : 0,
+					'id_topic' => isset($eventProperties['id_topic']) ? (int) $eventProperties['id_topic'] : 0,
 				);
 
 				modifyEvent($event_id, $eventOptions);

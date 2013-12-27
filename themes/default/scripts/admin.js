@@ -737,7 +737,7 @@ function generateFTPTest()
 	generatedButton = true;
 
 	// No XML?
-	if (!window.XMLHttpRequest || (!document.getElementById("test_ftp_placeholder") && !document.getElementById("test_ftp_placeholder_full")))
+	if (!document.getElementById("test_ftp_placeholder") && !document.getElementById("test_ftp_placeholder_full"))
 		return false;
 
 	// create our test button to call testFTP on click
@@ -815,14 +815,11 @@ function expandFolder(folderIdent, folderReal)
 		return false;
 	}
 	// Otherwise we need to get the wicked thing.
-	else if (window.XMLHttpRequest)
+	else
 	{
 		ajax_indicator(true);
 		getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=packages;onlyfind=' + escape(folderReal) + ';sa=perms;xml;' + elk_session_var + '=' + elk_session_id, onNewFolderReceived);
 	}
-	// Otherwise reload.
-	else
-		return true;
 
 	return false;
 }
@@ -1073,4 +1070,51 @@ function swapPostGroup(isChecked)
 	// Disable the moderator autosuggest box as well
 	if (typeof(oModeratorSuggest) !== 'undefined')
 		oModeratorSuggest.oTextHandle.disabled = isChecked ? true : false;
+}
+
+/**
+ * Sets up all the js events for edit and save board-specific permission
+ * profiles
+ */
+function initEditProfileBoards()
+{
+	$('.edit_all_board_profiles').click(function(e) {
+		e.preventDefault();
+
+		$('.edit_board').click();
+	});
+	$('.edit_board').show().click(function(e) {
+		var $icon = $(this),
+			board_id = $icon.data('boardid'),
+			board_profile = $icon.data('boardprofile'),
+			$target = $('#edit_board_' + board_id),
+			$select = $('<select />')
+				.attr('name', 'boardprofile[' + board_id + ']')
+				.change(function() {
+					$(this).find('option:selected').each(function() {
+						if ($(this).attr('value') == board_profile)
+							$icon.addClass('nochanges').removeClass('changed');
+						else
+							$icon.addClass('changed').removeClass('nochanges');
+					})
+				});
+
+		e.preventDefault();
+		$(permission_profiles).each(function(key, value) {   
+			var $opt = $('<option />').attr('value', value.id).text(value.name);
+
+			if (value.id == board_profile)
+				$opt.attr('selected', 'selected');
+
+			$select.append($opt);
+		});
+
+		$target.replaceWith($select);
+		$select.change();
+
+		$('.edit_all_board_profiles').replaceWith($('<input type="submit" class="right_submit" />')
+			.attr('name', 'save_changes')
+			.attr('value', txt_save)
+		);
+	});
 }

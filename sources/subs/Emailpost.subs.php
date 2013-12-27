@@ -1618,18 +1618,7 @@ function query_update_member_stats($pbe, $email_message, $topic_info = array())
 	}
 
 	// Update the members total time logged in data
-	$db->query('', '
-		UPDATE {db_prefix}members
-		SET total_time_logged_in = {int:total_time_logged_in},
-			last_login = {int:last_login}
-		WHERE id_member = {int:member}
-		LIMIT 1',
-		array(
-			'member' => $pbe['profile']['id_member'],
-			'last_login' => $last_login,
-			'total_time_logged_in' => $total_time_logged_in
-		)
-	);
+	updateMemberData($pbe['profile']['id_member'], array('total_time_logged_in' => $total_time_logged_in, 'last_login' => $last_login));
 
 	// Show they are active in the who's online list and what they have done
 	if ($email_message->message_type === 'm' || $email_message->message_type === 't')

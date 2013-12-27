@@ -188,15 +188,15 @@ function template_topic_listing()
 						<img src="', $topic['first_post']['icon_url'], '" alt="" />
 						', $topic['is_posted_in'] ? '<img src="' . $settings['images_url'] . '/icons/profile_sm.png" alt="" class="fred" />' : '', '
 					</p>
-					<div class="topic_name" ', (!empty($topic['quick_mod']['modify']) ? 'id="topic_' . $topic['first_post']['id'] . '"  ondblclick="oQuickModifyTopic.modify_topic(\'' . $topic['id'] . '\', \'' . $topic['first_post']['id'] . '\');"' : ''), '>';
+					<div class="topic_name" ', (!empty($topic['quick_mod']['modify']) ? 'id="topic_' . $topic['first_post']['id'] . '"  ondblclick="oQuickModifyTopic.modify_topic(\'' . $topic['id'] . '\', \'' . $topic['first_post']['id'] . '\');"' : ''), '>
+						<h4>';
 
 			// Is this topic new? (assuming they are logged in!)
 			if ($topic['new'] && $context['user']['is_logged'])
 				echo '
-						<a class="new_posts" href="', $topic['new_href'], '" id="newicon' . $topic['first_post']['id'] . '">' . $txt['new'] . '</a>';
+							<a class="new_posts" href="', $topic['new_href'], '" id="newicon' . $topic['first_post']['id'] . '">' . $txt['new'] . '</a>';
 
 			echo '
-						<h4>
 							', $topic['is_sticky'] ? '<strong>' : '', '<span class="preview" title="', $topic[(!empty($settings['message_index_preview']) && $settings['message_index_preview'] == 2 ? 'last_post' : 'first_post')]['preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], ($context['can_approve_posts'] && !$topic['approved'] ? '&nbsp;&nbsp;<em><img src="' . $settings['images_url'] . '/admin/post_moderation_moderate.png" style="width:16px" alt="' . $txt['awaiting_approval'] . '" title="' . $txt['awaiting_approval'] . '" />(' . $txt['awaiting_approval'] . ')</em>' : ''), '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
 						</h4>
 					</div>
@@ -332,37 +332,35 @@ function template_topic_listing_below()
 
 	if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1 && !empty($context['topics']) && $context['can_move'])
 		echo '
-				if (typeof(window.XMLHttpRequest) != "undefined")
-					aJumpTo[aJumpTo.length] = new JumpTo({
-						sContainerId: "quick_mod_jump_to",
-						sClassName: "qaction",
-						sJumpToTemplate: "%dropdown_list%",
-						iCurBoardId: ', $context['current_board'], ',
-						iCurBoardChildLevel: ', $context['jump_to']['child_level'], ',
-						sCurBoardName: "', $context['jump_to']['board_name'], '",
-						sBoardChildLevelIndicator: "&#10134;",
-						sBoardPrefix: "&#10148; ",
-						sCatClass: "jump_to_header",
-						sCatPrefix: "",
-						bNoRedirect: true,
-						bDisabled: true,
-						sCustomName: "move_to"
-					});';
+				aJumpTo[aJumpTo.length] = new JumpTo({
+					sContainerId: "quick_mod_jump_to",
+					sClassName: "qaction",
+					sJumpToTemplate: "%dropdown_list%",
+					iCurBoardId: ', $context['current_board'], ',
+					iCurBoardChildLevel: ', $context['jump_to']['child_level'], ',
+					sCurBoardName: "', $context['jump_to']['board_name'], '",
+					sBoardChildLevelIndicator: "&#10134;",
+					sBoardPrefix: "&#10148; ",
+					sCatClass: "jump_to_header",
+					sCatPrefix: "",
+					bNoRedirect: true,
+					bDisabled: true,
+					sCustomName: "move_to"
+				});';
 
 	echo '
-				if (typeof(window.XMLHttpRequest) != "undefined")
-					aJumpTo[aJumpTo.length] = new JumpTo({
-						sContainerId: "message_index_jump_to",
-						sJumpToTemplate: "<label class=\"smalltext\" for=\"%select_id%\">', $context['jump_to']['label'], ':<" + "/label> %dropdown_list%",
-						iCurBoardId: ', $context['current_board'], ',
-						iCurBoardChildLevel: ', $context['jump_to']['child_level'], ',
-						sCurBoardName: "', $context['jump_to']['board_name'], '",
-						sBoardChildLevelIndicator: "&#10134;",
-						sBoardPrefix: "&#10148; ",
-						sCatPrefix: "",
-						sCatClass: "jump_to_header",
-						sGoButtonLabel: "', $txt['quick_mod_go'], '"
-					});
+				aJumpTo[aJumpTo.length] = new JumpTo({
+					sContainerId: "message_index_jump_to",
+					sJumpToTemplate: "<label class=\"smalltext\" for=\"%select_id%\">', $context['jump_to']['label'], ':<" + "/label> %dropdown_list%",
+					iCurBoardId: ', $context['current_board'], ',
+					iCurBoardChildLevel: ', $context['jump_to']['child_level'], ',
+					sCurBoardName: "', $context['jump_to']['board_name'], '",
+					sBoardChildLevelIndicator: "&#10134;",
+					sBoardPrefix: "&#10148; ",
+					sCatPrefix: "",
+					sCatClass: "jump_to_header",
+					sGoButtonLabel: "', $txt['quick_mod_go'], '"
+				});
 			// ]]></script>
 	</div>';
 

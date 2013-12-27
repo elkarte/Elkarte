@@ -188,7 +188,7 @@ function template_make_event_above()
 						<fieldset id="event_main">
 							<legend><span', isset($context['post_error']['no_event']) ? ' class="error"' : '', ' id="caption_evtitle">', $txt['calendar_event_title'], '</span></legend>
 							<input type="text" name="evtitle" maxlength="255" size="55" value="', $context['event']['title'], '" tabindex="', $context['tabindex']++, '" class="input_text" />
-							<div class="smalltext" style="white-space: nowrap;">
+							<div class="smalltext" id="datepicker">
 								<input type="hidden" name="calendar" value="1" />', $txt['calendar_year'], '
 								<select name="year" id="year" tabindex="', $context['tabindex']++, '" onchange="generateDays();">';
 
@@ -778,58 +778,6 @@ function template_spellcheck()
 				<input type="button" name="ignoreall" value="', $txt['spellcheck_ignore_all'], '" onclick="nextWord(true);" class="button_submit" />
 			</div>
 		</form>
-	</body>
-</html>';
-}
-
-/**
- * Interface to allow quote.
- */
-function template_quotefast()
-{
-	global $context, $settings, $txt;
-
-	echo '<!DOCTYPE html>
-<html ', $context['right_to_left'] ? 'dir="rtl"' : '', '>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<title>', $txt['retrieving_quote'], '</title>
-		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
-	</head>
-	<body>
-		', $txt['retrieving_quote'], '
-		<div id="temporary_posting_area" style="display: none;"></div>
-		<script><!-- // --><![CDATA[';
-
-	if ($context['close_window'])
-		echo '
-			window.close();';
-	else
-	{
-		// Internet Explorer < 9 does not have DOMParser api so we use the "innerText" feature which
-		// basically converts entities <--> text.  DOMParser works (correctly) with opera 11+
-		echo '
-			var quote = \'', $context['quote']['text'], '\',
-				stage = \'createElement\' in document ? document.createElement("div") : document.getElementById("temporary_posting_area");
-
-			if (\'DOMParser\' in window)
-			{
-				var xmldoc = new DOMParser().parseFromString("<temp>" + \'', $context['quote']['mozilla'], '\'.replace(/\n/g, "_ELK-BREAK_").replace(/\t/g, "_ELK-TAB_") + "</temp>", "text/xml");
-				quote = xmldoc.childNodes[0].textContent.replace(/_ELK-BREAK_/g, "\n").replace(/_ELK-TAB_/g, "\t");
-			}
-			else if (\'innerText\' in stage)
-			{
-				stage.innerHTML = quote.replace(/\n/g, "_ELK-BREAK_").replace(/\t/g, "_ELK-TAB_").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-				quote = stage.innerText.replace(/_ELK-BREAK_/g, "\n").replace(/_ELK-TAB_/g, "\t");
-			}
-
-			window.opener.onReceiveOpener(quote);
-
-			window.focus();
-			setTimeout(function() {window.close();}, 400);';
-	}
-	echo '
-		// ]]></script>
 	</body>
 </html>';
 }

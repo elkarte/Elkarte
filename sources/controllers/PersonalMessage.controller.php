@@ -335,11 +335,8 @@ class PersonalMessage_Controller extends Action_Controller
 
 		// Determine the navigation context
 		$context['links'] += array(
-			'first' => $start >= $modSettings['defaultMaxMessages'] ? $scripturl . '?action=pm;start=0' : '',
 			'prev' => $start >= $modSettings['defaultMaxMessages'] ? $scripturl . '?action=pm;start=' . ($start - $modSettings['defaultMaxMessages']) : '',
 			'next' => $start + $modSettings['defaultMaxMessages'] < $max_messages ? $scripturl . '?action=pm;start=' . ($start + $modSettings['defaultMaxMessages']) : '',
-			'last' => $start + $modSettings['defaultMaxMessages'] < $max_messages ? $scripturl . '?action=pm;start=' . (floor(($max_messages - 1) / $modSettings['defaultMaxMessages']) * $modSettings['defaultMaxMessages']) : '',
-			'up' => $scripturl,
 		);
 		$context['page_info'] = array(
 			'current_page' => $start / $modSettings['defaultMaxMessages'] + 1,
@@ -1745,7 +1742,7 @@ class PersonalMessage_Controller extends Action_Controller
 		$db = database();
 
 		// Make sure the server is able to do this right now
-		if (!empty($context['load_average']) && !empty($modSettings['loadavg_search']) && $context['load_average'] >= $modSettings['loadavg_search'])
+		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
 			fatal_lang_error('loadavg_search_disabled', false);
 
 		// Some useful general permissions.

@@ -284,12 +284,9 @@ class Mentions_Controller extends Action_Controller
 					'is_selected' => $this->_type === $key,
 					'label' => $txt['mentions_type_' . $key]
 				);
-				$this->_callbacks[] = $mention['callback'];
+				$this->_callbacks[$key] = $mention['callback'];
 			}
 		}
-
-		if (!empty($this->_callbacks))
-			$this->_callbacks = array_unique($this->_callbacks);
 
 		createList($list_options);
 

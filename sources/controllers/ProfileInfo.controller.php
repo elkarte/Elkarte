@@ -271,7 +271,7 @@ class ProfileInfo_Controller extends Action_Controller
 		if (in_array('posts', $summary_areas))
 		{
 			// Is the load average too high just now, then let them know
-			if (!empty($context['load_average']) && !empty($modSettings['loadavg_show_posts']) && $context['load_average'] >= $modSettings['loadavg_show_posts'])
+			if (!empty($modSettings['loadavg_show_posts']) && $modSettings['current_load'] >= $modSettings['loadavg_show_posts'])
 				$context['loadaverage'] = true;
 			else
 			{
@@ -325,7 +325,7 @@ class ProfileInfo_Controller extends Action_Controller
 		if (in_array('topics', $summary_areas))
 		{
 			// Is the load average still too high?
-			if (!empty($context['load_average']) && !empty($modSettings['loadavg_show_posts']) && $context['load_average'] >= $modSettings['loadavg_show_posts'])
+			if (!empty($modSettings['loadavg_show_posts']) && $modSettings['current_load'] >= $modSettings['loadavg_show_posts'])
 				$context['loadaverage'] = true;
 			else
 			{
@@ -418,7 +418,7 @@ class ProfileInfo_Controller extends Action_Controller
 		$context['page_title'] = $txt['showPosts'] . ' - ' . $user_profile[$memID]['real_name'];
 
 		// Is the load average too high to allow searching just now?
-		if (!empty($context['load_average']) && !empty($modSettings['loadavg_show_posts']) && $context['load_average'] >= $modSettings['loadavg_show_posts'])
+		if (!empty($modSettings['loadavg_show_posts']) && $modSettings['current_load'] >= $modSettings['loadavg_show_posts'])
 			fatal_lang_error('loadavg_show_posts_disabled', false);
 
 		// If we're specifically dealing with attachments use that function!
@@ -854,7 +854,7 @@ class ProfileInfo_Controller extends Action_Controller
 		$context['page_title'] = $txt['statPanel_showStats'] . ' ' . $user_profile[$memID]['real_name'];
 
 		// Is the load average too high to allow searching just now?
-		if (!empty($context['load_average']) && !empty($modSettings['loadavg_userstats']) && $context['load_average'] >= $modSettings['loadavg_userstats'])
+		if (!empty($modSettings['loadavg_userstats']) && $modSettings['current_load'] >= $modSettings['loadavg_userstats'])
 			fatal_lang_error('loadavg_userstats_disabled', false);
 
 		loadTemplate('ProfileInfo');

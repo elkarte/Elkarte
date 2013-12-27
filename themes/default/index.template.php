@@ -303,13 +303,13 @@ function template_body_above()
 
 	echo '
 		</div>
-		<div id="header" class="wrapper"', empty($context['minmax_preferences']['upshrink']) ? '' : ' style="display: none;" aria-hidden="true"', '>
-			<h1 id="forumtitle', !empty($settings['header_layout']) ? ($settings['header_layout'] == 1 ? 'none' : 'right') : '', '">
+		<div id="header" class="wrapper', !empty($settings['header_layout']) ? ($settings['header_layout'] == 1 ? ' centerheader' : ' rightheader') : '', '"', empty($context['minmax_preferences']['upshrink']) ? '' : ' style="display: none;" aria-hidden="true"', '>
+			<h1 id="forumtitle">
 				<a href="', $scripturl, '">', $context['forum_name'], '</a>
 			</h1>';
 
 	echo '
-			<div id="logobox', !empty($settings['header_layout']) ? ($settings['header_layout'] == 1 ? 'center' : 'left') : '', '">
+			<div id="logobox">
 				<img id="logo" src="', $context['header_logo_url_html_safe'], '" alt="', $context['forum_name'], '" title="', $context['forum_name'], '" />', empty($settings['site_slogan']) ? '' : '
 				<div id="siteslogan">' . $settings['site_slogan'] . '</div>', '
 			</div>';

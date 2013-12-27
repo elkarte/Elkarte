@@ -349,8 +349,6 @@ class Post_Controller extends Action_Controller
 		}
 
 		// See if any new replies have come along.
-		// Huh, $_REQUEST['msg'] is set upon submit, so this doesn't get executed at submit
-		// only at preview
 		if (empty($_REQUEST['msg']) && !empty($topic))
 		{
 			if (empty($options['no_new_reply_warning']) && isset($_REQUEST['last_msg']) && $context['topic_last_message'] > $_REQUEST['last_msg'])
@@ -706,7 +704,7 @@ class Post_Controller extends Action_Controller
 
 					if ($attachID == 'initial_error')
 					{
-						$txt['error_attach_initial_error'] = $txt['attach_no_upload'] . '<div style="padding: 0 1em;">' . (is_array($attachment) ? vsprintf($txt[$attachment[0]], $attachment[1]) : $txt[$attachment]) . '</div>';
+						$txt['error_attach_initial_error'] = $txt['attach_no_upload'] . '<div class="attachmenterrors">' . (is_array($attachment) ? vsprintf($txt[$attachment[0]], $attachment[1]) : $txt[$attachment]) . '</div>';
 						$attach_errors->addError('attach_initial_error');
 						unset($_SESSION['temp_attachments']);
 						break;
@@ -716,7 +714,7 @@ class Post_Controller extends Action_Controller
 					if (!empty($attachment['errors']))
 					{
 						$txt['error_attach_errors'] = empty($txt['error_attach_errors']) ? '<br />' : '';
-						$txt['error_attach_errors'] .= vsprintf($txt['attach_warning'], $attachment['name']) . '<div style="padding: 0 1em;">';
+						$txt['error_attach_errors'] .= vsprintf($txt['attach_warning'], $attachment['name']) . '<div class="attachmenterrors">';
 						foreach ($attachment['errors'] as $error)
 							$txt['error_attach_errors'] .= (is_array($error) ? vsprintf($txt[$error[0]], $error[1]) : $txt[$error]) . '<br  />';
 						$txt['error_attach_errors'] .= '</div>';
@@ -1692,8 +1690,8 @@ class Post_Controller extends Action_Controller
 
 			// Insert the event.
 			$eventOptions = array(
-				'board' => $board,
-				'topic' => $topic,
+				'id_board' => $board,
+				'id_topic' => $topic,
 				'title' => $_POST['evtitle'],
 				'member' => $user_info['id'],
 				'start_date' => sprintf('%04d-%02d-%02d', $_POST['year'], $_POST['month'], $_POST['day']),
@@ -1828,9 +1826,12 @@ class Post_Controller extends Action_Controller
 
 	/**
 	 * Loads a post an inserts it into the current editing text box.
+	 * Used to quick edit a post as well as to quote a post and place it in the quick reply box
+	 * Can be used to quick edit just the subject from the topic listing
+	 *
 	 * uses the Post language file.
 	 * uses special (sadly browser dependent) javascript to parse entities for internationalization reasons.
-	 * accessed with ?action=quotefast.
+	 * accessed with ?action=quotefast and ?action=quotefast;modify
 	 */
 	function action_quotefast()
 	{
@@ -1839,11 +1840,6 @@ class Post_Controller extends Action_Controller
 		$db = database();
 
 		loadLanguage('Post');
-		if (!isset($_REQUEST['xml']))
-		{
-			loadTemplate('Post');
-			loadJavascriptFile('post.js', array(), 'post_scripts');
-		}
 
 		require_once(SUBSDIR . '/Post.subs.php');
 
@@ -1869,14 +1865,13 @@ class Post_Controller extends Action_Controller
 				'not_locked' => 0,
 			)
 		);
-		$context['close_window'] = $db->num_rows($request) == 0;
 		$row = $db->fetch_assoc($request);
 		$db->free_result($request);
 
 		$context['sub_template'] = 'quotefast';
 		if (!empty($row))
 			$can_view_post = $row['approved'] || ($row['id_member'] != 0 && $row['id_member'] == $user_info['id']) || allowedTo('approve_posts', $row['id_board']);
-
+		
 		if (!empty($can_view_post))
 		{
 			// Remove special formatting we don't want anymore.

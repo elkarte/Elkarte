@@ -410,18 +410,10 @@ function deleteMembers($users, $check_not_admin = false)
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
-		$db->query('', '
-			UPDATE {db_prefix}members
-			SET
-				pm_ignore_list = {string:pm_ignore_list},
-				buddy_list = {string:buddy_list}
-			WHERE id_member = {int:id_member}',
-			array(
-				'id_member' => $row['id_member'],
-				'pm_ignore_list' => implode(',', array_diff(explode(',', $row['pm_ignore_list']), $users)),
-				'buddy_list' => implode(',', array_diff(explode(',', $row['buddy_list']), $users)),
-			)
-		);
+		updateMemberData($row['id_member'], array(
+			'pm_ignore_list' => implode(',', array_diff(explode(',', $row['pm_ignore_list']), $users)),
+			'buddy_list' => implode(',', array_diff(explode(',', $row['buddy_list']), $users))
+		));
 	$db->free_result($request);
 
 	// Make sure no member's birthday is still sticking in the calendar...
@@ -2165,18 +2157,7 @@ function recentMembers($limit)
  */
 function assignGroupsToMember($member, $primary_group, $additional_groups)
 {
-	$db = database();
-
-	$db->query('', '
-		UPDATE {db_prefix}members
-		SET id_group = {int:primary_group}, additional_groups = {string:additional_groups}
-		WHERE id_member = {int:selected_member}',
-		array(
-			'primary_group' => $primary_group,
-			'selected_member' => $member,
-			'additional_groups' => implode(',', $additional_groups),
-		)
-	);
+	updateMemberData($member, array('id_group' => $primary_group, 'additional_groups' => implode(',', $additional_groups)));
 }
 
 /**

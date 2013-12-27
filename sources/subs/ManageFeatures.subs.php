@@ -61,17 +61,7 @@ function getSignatureFromMembers($start_member)
  */
 function updateSignature($id_member, $signature)
 {
-	$db = database();
-
-	$db->query('', '
-		UPDATE {db_prefix}members
-		SET signature = {string:signature}
-		WHERE id_member = {int:id_member}',
-		array(
-			'id_member' => $id_member,
-			'signature' => $signature,
-		)
-	);
+	updateMemberData($id_member, array('signature' => $signature));
 }
 
 /**

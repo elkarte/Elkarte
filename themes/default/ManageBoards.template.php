@@ -672,7 +672,7 @@ function template_modify_board()
 					{
 						sItemId: ' . JavaScriptEscape($id_member) . ',
 						sItemName: ' . JavaScriptEscape($member_name) . '
-					}' . $id_member == $context['board']['last_moderator_id'] ? '' : ',';
+					}' . ($id_member == $context['board']['last_moderator_id'] ? '' : ',');
 
 	$js .= '
 			]

@@ -64,9 +64,6 @@ function smc_AutoSuggest(oOptions)
 // Initialize our autosuggest object, adds events and containers to the element we monitor
 smc_AutoSuggest.prototype.init = function()
 {
-	if (!window.XMLHttpRequest)
-		return false;
-
 	// Create a div that'll contain the results later on.
 	this.oSuggestDivHandle = document.createElement('div');
 	this.oSuggestDivHandle.className = 'auto_suggest_div';

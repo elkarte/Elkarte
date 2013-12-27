@@ -29,22 +29,14 @@ function QuickModifyTopic(oOptions)
 	this.iCurTopicId = 0;
 	this.sCurMessageId = '';
 	this.sBuffSubject = '';
+	this.oSavetipElem = false;
+	this.sSavetipText = '';
 	this.oCurSubjectDiv = null;
 	this.oTopicModHandle = document;
 	this.bInEditMode = false;
 	this.bMouseOnDiv = false;
-	this.bXmlHttpCapable = this.isXmlHttpCapable();
 	this.init();
 }
-
-// Ajax supported?
-QuickModifyTopic.prototype.isXmlHttpCapable = function ()
-{
-	if (typeof(window.XMLHttpRequest) === 'undefined')
-		return false;
-
-	return true;
-};
 
 // Used to initialise the object event handlers
 QuickModifyTopic.prototype.init = function ()
@@ -99,6 +91,14 @@ QuickModifyTopic.prototype.onDocReceived_modify_topic = function (XMLDoc)
 	this.oCurSubjectDiv = document.getElementById('msg_' + this.sCurMessageId.substr(4));
 	this.sBuffSubject = this.oCurSubjectDiv.innerHTML;
 
+	// Hide the tooltip text, don't want them for this element during the edit
+	if ($.isFunction($.fn.SiteTooltip))
+	{
+		this.oSavetipElem = this.oCurSubjectDiv.nextSibling;
+		this.sSavetip = this.oSavetipElem.innerHTML;
+		this.oSavetipElem.innerHTML = '';
+	}
+
 	// Here we hide any other things they want hidden on edit.
 	this.set_hidden_topic_areas('none');
 
@@ -113,6 +113,10 @@ QuickModifyTopic.prototype.modify_topic_cancel = function ()
 	this.oCurSubjectDiv.innerHTML = this.sBuffSubject;
 	this.set_hidden_topic_areas('');
 	this.bInEditMode = false;
+
+	// Put back the hover text
+	if (this.oSavetipElem !== false)
+		this.oSavetipElem.innerHTML = this.sSavetip;
 
 	return false;
 };
@@ -131,9 +135,9 @@ QuickModifyTopic.prototype.set_hidden_topic_areas = function (set_style)
 QuickModifyTopic.prototype.modify_topic_show_edit = function (subject)
 {
 	// Just template the subject.
-	this.oCurSubjectDiv.innerHTML = '<input type="text" name="subject" value="' + subject + '" size="60" style="width: 95%;" maxlength="80" class="input_text" /><input type="hidden" name="topic" value="' + this.iCurTopicId + '" /><input type="hidden" name="msg" value="' + this.sCurMessageId.substr(4) + '" />';
+	this.oCurSubjectDiv.innerHTML = '<input type="text" name="subject" value="' + subject + '" size="60" style="width: 95%;" maxlength="80" class="input_text" autocomplete="off" /><input type="hidden" name="topic" value="' + this.iCurTopicId + '" /><input type="hidden" name="msg" value="' + this.sCurMessageId.substr(4) + '" />';
 
-	// attach mouse over and out events to this new div
+	// Attach mouse over and out events to this new div
 	this.oCurSubjectDiv.instanceRef = this;
 	this.oCurSubjectDiv.onmouseout = function (oEvent) {return this.instanceRef.modify_topic_mouseout(oEvent);};
 	this.oCurSubjectDiv.onmouseover = function (oEvent) {return this.instanceRef.modify_topic_mouseover(oEvent);};
@@ -189,7 +193,10 @@ QuickModifyTopic.prototype.modify_topic_done = function (XMLDoc)
 
 	// Redo tooltips if they are on since we just pulled the rug out on this one
 	if ($.isFunction($.fn.SiteTooltip))
+	{
+		this.oSavetipElem.innerHTML = this.sSavetip;
 		$('.preview').SiteTooltip();
+	}
 
 	return false;
 };
@@ -242,6 +249,7 @@ QuickModifyTopic.prototype.modify_topic_mouseout = function (oEvent)
 QuickModifyTopic.prototype.modify_topic_mouseover = function (oEvent)
 {
 	this.bMouseOnDiv = true;
+	oEvent.preventDefault();
 };
 
 /**
@@ -271,18 +279,11 @@ QuickReply.prototype.quote = function (iMessageId, xDeprecated)
 	}
 	else
 	{
-		// Doing it the XMLhttp way?
-		if (window.XMLHttpRequest)
-		{
-			ajax_indicator(true);
-			if (this.bIsFull)
-				insertQuoteFast(iMessageId);
-			else
-				getXMLDocument(elk_prepareScriptUrl(this.opt.sScriptUrl) + 'action=quotefast;quote=' + iMessageId + ';xml', this.onQuoteReceived);
-		}
-		// Or with a smart popup!
+		ajax_indicator(true);
+		if (this.bIsFull)
+			insertQuoteFast(iMessageId);
 		else
-			reqWin(elk_prepareScriptUrl(this.opt.sScriptUrl) + 'action=quotefast;quote=' + iMessageId, 240, 90);
+			getXMLDocument(elk_prepareScriptUrl(this.opt.sScriptUrl) + 'action=quotefast;quote=' + iMessageId + ';xml', this.onQuoteReceived);
 
 		// Move the view to the quick reply box.
 		if (navigator.appName === 'Microsoft Internet Explorer')
@@ -345,33 +346,17 @@ function QuickModify(oOptions)
 	this.sMessageBuffer = '';
 	this.sSubjectBuffer = '';
 	this.sInfoBuffer = '';
-	this.bXmlHttpCapable = this.isXmlHttpCapable();
 	this.aAccessKeys = [];
 
 	// Show the edit buttons
-	if (this.bXmlHttpCapable)
-	{
-		var aShowQuickModify = document.getElementsByClassName(this.opt.sClassName);
-		for (var i = 0, length = aShowQuickModify.length; i < length; i++)
-			aShowQuickModify[i].style.display = "inline";
-	}
+	var aShowQuickModify = document.getElementsByClassName(this.opt.sClassName);
+	for (var i = 0, length = aShowQuickModify.length; i < length; i++)
+		aShowQuickModify[i].style.display = "inline";
 }
-
-// Determine whether the quick modify can actually be used.
-QuickModify.prototype.isXmlHttpCapable = function ()
-{
-	if (typeof(window.XMLHttpRequest) === 'undefined')
-		return false;
-
-	return true;
-};
 
 // Function called when a user presses the edit button.
 QuickModify.prototype.modifyMsg = function (iMessageId)
 {
-	if (!this.bXmlHttpCapable)
-		return;
-
 	// Add backwards compatibility with old themes.
 	if (typeof(sSessionVar) === 'undefined')
 		sSessionVar = 'sesc';
@@ -1102,13 +1087,8 @@ function sendtopicForm(oPopup_body, url, oContainer)
  */
 function topicSplitselect(direction, msg_id)
 {
-	if (window.XMLHttpRequest)
-	{
-		getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + "action=splittopics;sa=selectTopics;subname=" + topic_subject + ";topic=" + topic_id + "." + start[0] + ";start2=" + start[1] + ";move=" + direction + ";msg=" + msg_id + ";xml", onTopicSplitReceived);
-		return false;
-	}
-	else
-		return true;
+	getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + "action=splittopics;sa=selectTopics;subname=" + topic_subject + ";topic=" + topic_id + "." + start[0] + ";start2=" + start[1] + ";move=" + direction + ";msg=" + msg_id + ";xml", onTopicSplitReceived);
+	return false;
 }
 
 /**

@@ -30,28 +30,23 @@ function previewControl()
 	}
 
 	// Lets make a background preview request
-	if (window.XMLHttpRequest)
-	{
-		bPost = false;
+	bPost = false;
 
-		// call the needed preview function
-		switch(preview_area)
-		{
-			case 'pm':
-				previewPM();
-				break;
-			case 'news':
-				previewNews();
-				break;
-			case 'post':
-				bPost = true;
-				previewPost();
-				break;
-		}
-		return false;
+	// call the needed preview function
+	switch(preview_area)
+	{
+		case 'pm':
+			previewPM();
+			break;
+		case 'news':
+			previewNews();
+			break;
+		case 'post':
+			bPost = true;
+			previewPost();
+			break;
 	}
-	else
-		return submitThisOnce(document.forms[form_name]);
+	return false;
 }
 
 /**
@@ -429,10 +424,7 @@ function cleanFileInput(idElement)
  */
 function insertQuoteFast(messageid)
 {
-	if (window.XMLHttpRequest)
-		getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=quotefast;quote=' + messageid + ';xml;pb=' + post_box_name + ';mode=0', onDocReceived);
-	else
-		reqWin(elk_prepareScriptUrl(elk_scripturl) + 'action=quotefast;quote=' + messageid + ';pb=' + post_box_name + ';mode=0', 240, 90);
+	getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=quotefast;quote=' + messageid + ';xml;pb=' + post_box_name + ';mode=0', onDocReceived);
 
 	return true;
 }

@@ -70,8 +70,8 @@ div.quick_tasks {
 }
 /* @todo could it be a sprite? */
 .listaction img {
-	width:16px;
-	height:16px
+	width: 16px;
+	height: 16px;
 }
 
 /* News and newsletters screen.
@@ -611,7 +611,7 @@ padding: 7px 10px;
 .bbfilter {
 	display: table-cell;
 	padding: 4px 0;
-	width: 20px; 
+	width: 20px;
 	vertical-align: top;
 }
 .bbrequest_uri {
@@ -729,6 +729,19 @@ ul.pending_payments {
 	width: 20px;
 	display: inline-block;
 	text-align: center;
+}
+.edit_board {
+	float: left;
+	padding: 8px;
+	background-image: url(../images/icons/modify_small.png);
+	margin-top: 3px;
+	margin-left: 3px;
+}
+.edit_board.nochanges {
+	background-image: url(../images/icons/field_valid.png);
+}
+.edit_board.changed {
+	background-image: url(../images/icons/field_invalid.png);
 }
 
 /* Styles for the themes section.
@@ -1165,5 +1178,5 @@ ul.moderation_notes li {
 	top: 0;
 	left: 0;
 	width: 100%;
-	height: 100%
+	height: 100%;
 }

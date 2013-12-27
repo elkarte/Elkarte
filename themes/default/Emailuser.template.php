@@ -251,7 +251,7 @@ function template_report()
 	echo '
 						</dl>
 						<div class="submitbutton">
-							<input type="submit" name="save" value="', $txt['rtm10'], '" style="margin-left: 1ex;" class="button_submit" />
+							<input type="submit" name="save" value="', $txt['rtm10'], '" class="button_submit" />
 							<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						</div>
 					</div>
