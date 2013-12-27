@@ -258,12 +258,13 @@ function addSubscription($id_subscribe, $id_member, $renewal = 0, $forceStartTim
 		// As everything else should be good, just update!
 		$db->query('', '
 			UPDATE {db_prefix}log_subscribed
-			SET end_time = {int:end_time}, start_time = {int:start_time}
+			SET end_time = {int:end_time}, start_time = {int:start_time}, reminder_sent = {int:no_reminder}
 			WHERE id_sublog = {int:current_subscription_item}',
 			array(
 				'end_time' => $endtime,
 				'start_time' => $starttime,
 				'current_subscription_item' => $id_sublog,
+				'no_reminder' => 0,
 			)
 		);
 
