@@ -198,10 +198,10 @@ $txt['permissionhelp_modify_replies'] = 'This permission allows a user that star
 $txt['permissionname_delete_replies'] = 'Delete replies to own topics';
 $txt['permissionhelp_delete_replies'] = 'This permission allows a user that started a topic to remove all replies to their topic.';
 $txt['permissionname_announce_topic'] = 'Announce topic';
-$txt['permissionhelp_announce_topic'] = 'This allows a user to send an announcement email about a topic to all members or to a few membergroups.';
+$txt['permissionhelp_announce_topic'] = 'This allows a user to send an announcement email about a topic to all members or to a few member groups.';
 
 $txt['permissionname_approve_emails'] = 'Moderate Post by Email Failures';
-$txt['permissionhelp_approve_emails'] = 'Allow Moderators to access the Post by Email failure log to perform actions including approve, delete, view and bounce.  Note, since the system may not allways know what board a post goes to, this permission should be only be given to members with full board access';
+$txt['permissionhelp_approve_emails'] = 'Allow moderators to access the Post by Email failure log to perform actions including approve, delete, view and bounce.  Note, since the system may not always know what board a post goes to, this permission should be only be given to members with full board access';
 $txt['permissionname_postby_email'] = 'Post by Email';
 $txt['permissionhelp_postby_email'] = 'This permission allows users to start new topics as well as reply to topic and PM notifications by email.';
 
@@ -249,8 +249,8 @@ $txt['permissionname_post_autosave_draft'] = 'Automatically save drafts of new p
 $txt['permissionname_simple_post_autosave_draft'] = 'Automatically save drafts of new posts';
 $txt['permissionhelp_post_autosave_draft'] = 'This permission allows users to have their posts autosaved as drafts so they can avoid loosing their work in the event of a timeout, disconnection or other error.  The autosave schedule is defined in the admin panel';
 $txt['permissionhelp_simple_post_autosave_draft'] = 'This permission allows users to have their posts autosaved as drafts so they can avoid loosing their work in the event of a timeout, disconnection or other error.  The autosave schedule is defined in the admin panel';
-$txt['permissionname_pm_autosave_draft'] = 'Automatically save drafts of new PM\'s';
-$txt['permissionname_simple_pm_autosave_draft'] = 'Automatically save drafts of new PM\'s';
+$txt['permissionname_pm_autosave_draft'] = 'Automatically save drafts of new PMs';
+$txt['permissionname_simple_pm_autosave_draft'] = 'Automatically save drafts of new PMs';
 $txt['permissionhelp_pm_autosave_draft'] = 'This permission allows users to have their posts autosaved as drafts so they can avoid loosing their work in the event of a timeout, disconnection or other error.  The autosave schedule is defined in the admin panel';
 $txt['permissionhelp_simple_post_autosave_draft'] = 'This permission allows users to have their posts autosaved as drafts so they can avoid loosing their work in the event of a timeout, disconnection or other error.  The autosave schedule is defined in the admin panel';
 $txt['permissionname_pm_draft'] = 'Save drafts of personal messages';
@@ -285,8 +285,7 @@ $txt['permissionhelp_post_attachment'] = 'Attachments are files that are attache
 $txt['permissionicon'] = '';
 
 $txt['permission_settings_title'] = 'Permission Settings';
-$txt['groups_manage_permissions'] = 'Membergroups allowed to manage permissions';
-$txt['permission_settings_submit'] = 'Save';
+$txt['groups_manage_permissions'] = 'Member groups allowed to manage permissions';
 $txt['permission_settings_enable_deny'] = 'Enable the option to deny permissions';
 // Escape any single quotes in here twice.. 'it\'s' -> 'it\\\'s'.
 $txt['permission_disable_deny_warning'] = 'Turning off this option will update \\\'Deny\\\'-permissions to \\\'Disallow\\\'.';
