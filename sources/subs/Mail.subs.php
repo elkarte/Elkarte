@@ -1132,7 +1132,7 @@ function emailsInfo($number)
 }
 
 /**
- * Send a group of emails from the mail queue.
+ * Sends a group of emails from the mail queue.
  * Allows a batch of emails to be released every 5 to 10 seconds (based on per period limits)
  * If batch size is not set, will determine a size such that it sends in 1/2 the period (buffer)
  *
@@ -1158,13 +1158,13 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 		// No per period setting or batch size, set to send 5 every 5 seconds, or 60 per minute
 		elseif (empty($modSettings['mail_period_limit']))
 			$batch_size = 5;
-		// A per period limit but no defined batch size, set a batch size to be done in 50% of the time
+		// A per period limit but no defined batch size, set a batch size
 		else
 		{
-			// Based on the number of times we will be called each minute, set a batch size allowing for missed cycles
+			// Based on the number of times we will potentially be called each minute
 			$delay = !empty($modSettings['mail_queue_delay']) ? $modSettings['mail_queue_delay'] : (!empty($modSettings['mail_period_limit']) && $modSettings['mail_period_limit'] <= 5 ? 10 : 5);
-			$loops_per = ceil(30 / $delay);
-			$batch_size = ceil($modSettings['mail_period_limit'] / $loops_per);
+			$batch_size = ceil($modSettings['mail_period_limit'] / ceil(60 / $delay));
+			$batch_size = ($batch_size == 1 && $modSettings['mail_period_limit'] > 1) ? 2 : $batch_size;
 		}
 	}
 
@@ -1199,8 +1199,17 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 			$mail_number = $batch_size;
 		}
 		// Otherwise we may still have quota to send a few more?
-		elseif ($mail_number + $batch_size <= $modSettings['mail_period_limit'])
+		elseif ($mail_number < $modSettings['mail_period_limit'])
+		{
+			// If this is likely one of the last cycles for this period, then send any remaining quota
+			if (($mail_time - (time() - 60)) < $delay * 2)
+				$batch_size = $modSettings['mail_period_limit'] - $mail_number;
+			// Some batch sizes may need to be adusted to fit as we approach the end
+			elseif ($mail_number + $batch_size > $modSettings['mail_period_limit'])
+				$batch_size = $modSettings['mail_period_limit'] - $mail_number;
+
 			$mail_number += $batch_size;
+		}
 		// No more I'm afraid, return!
 		else
 			return false;
