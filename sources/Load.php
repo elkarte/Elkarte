@@ -1592,11 +1592,9 @@ function loadTheme($id_theme = 0, $initialize = true)
 	// Relative times?
 	if (!empty($modSettings['todayMod']) && $modSettings['todayMod'] > 2)
 	{
-		// Not sure why the 1 hour offset is needed, but that way it works...
-		$delta = strtotime(date("M d Y h:i:s A")) - strtotime(gmdate("M d Y h:i:s A")) - 3600;
 		addInlineJavascript('
 		var oRttime = ({
-			currentTime : ' . JavaScriptEscape(forum_time() + $delta) . ',
+			currentTime : ' . JavaScriptEscape(forum_time()) . ',
 			now : ' . JavaScriptEscape($txt['rt_now']) . ',
 			minute : ' . JavaScriptEscape($txt['rt_minute']) . ',
 			minutes : ' . JavaScriptEscape($txt['rt_minutes']) . ',

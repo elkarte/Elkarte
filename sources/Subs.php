@@ -688,7 +688,7 @@ function htmlTime($timestamp)
 	$time = date('Y-m-d H:i', forum_time(true, $timestamp));
 
 	// @todo maybe htmlspecialchars on the title attribute?
-	return '<time title="' . standardTime($timestamp) . '" datetime="' . $time . '">' . relativeTime($timestamp) . '</time>';
+	return '<time title="' . standardTime($timestamp) . '" datetime="' . $time . '" data-timestamp="' . $timestamp . '">' . relativeTime($timestamp) . '</time>';
 }
 
 /**
