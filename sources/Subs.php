@@ -682,9 +682,34 @@ function htmlTime($timestamp)
 {
 	global $modSettings, $user_info;
 
-	$time = date('Y-m-d H:i', $timestamp + ($user_info['time_offset'] + $modSettings['time_offset']) * 3600);
+	if (empty($timestamp))
+		return '';
 
+	$time = date('Y-m-d H:i', forum_time(true, $timestamp));
+
+	// @todo maybe htmlspecialchars on the title attribute?
 	return '<time title="' . standardTime($timestamp) . '" datetime="' . $time . '">' . relativeTime($timestamp) . '</time>';
+}
+
+/**
+ * Gets the current time with offset.
+ *
+ * - always applies the offset in the time_offset setting.
+ *
+ * @param bool $use_user_offset = true if use_user_offset is true, applies the user's offset as well
+ * @param int $timestamp = null
+ * @return int seconds since the unix epoch
+ */
+function forum_time($use_user_offset = true, $timestamp = null)
+{
+	global $user_info, $modSettings;
+
+	if ($timestamp === null)
+		$timestamp = time();
+	elseif ($timestamp == 0)
+		return 0;
+
+	return $timestamp + ($modSettings['time_offset'] + ($use_user_offset ? $user_info['time_offset'] : 0)) * 3600;
 }
 
 /**
@@ -745,27 +770,6 @@ function shorten_text($text, $len = 384, $cutword = false, $buffer = 12)
 	}
 
 	return $text;
-}
-
-/**
- * Gets the current time with offset.
- *
- * - always applies the offset in the time_offset setting.
- *
- * @param bool $use_user_offset = true if use_user_offset is true, applies the user's offset as well
- * @param int $timestamp = null
- * @return int seconds since the unix epoch
- */
-function forum_time($use_user_offset = true, $timestamp = null)
-{
-	global $user_info, $modSettings;
-
-	if ($timestamp === null)
-		$timestamp = time();
-	elseif ($timestamp == 0)
-		return 0;
-
-	return $timestamp + ($modSettings['time_offset'] + ($use_user_offset ? $user_info['time_offset'] : 0)) * 3600;
 }
 
 /**
