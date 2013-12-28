@@ -52,10 +52,10 @@ $txt['mc_reportedp_none_found'] = 'No Reports Found';
 $txt['mc_reportedp_details'] = 'Details';
 $txt['mc_reportedp_close'] = 'Close';
 $txt['mc_reportedp_open'] = 'Open';
-$txt['mc_reportedp_ignore'] = 'Ignore';
-$txt['mc_reportedp_unignore'] = 'Un-Ignore';
+$txt['mc_reportedp_ignore'] = 'Dismiss';
+$txt['mc_reportedp_unignore'] = 'Reopen';
 // Do not use numeric entries in the below string.
-$txt['mc_reportedp_ignore_confirm'] = 'Are you sure you wish to ignore further reports about this message?\\n\\nThis will turn off further reports for all moderators of the forum.';
+$txt['mc_reportedp_ignore_confirm'] = 'Are you sure you wish to dismiss and ignore further reports about this message?\\n\\nThis will turn off further reports for all moderators of the forum.';
 $txt['mc_reportedp_close_selected'] = 'Close Selected';
 
 $txt['mc_groupr_group'] = 'Membergroups';
