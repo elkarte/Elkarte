@@ -505,7 +505,7 @@ class ModerationCenter_Controller extends Action_Controller
 				'closed' => $row['closed'],
 				'ignore' => $row['ignore_all']
 			);
-			$report_boards_ids[] = $row['board'];
+			$report_boards_ids[] = $row['id_board'];
 		}
 
 		// Get the names of boards these topics are in.
