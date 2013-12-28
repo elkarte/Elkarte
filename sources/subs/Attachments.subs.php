@@ -2457,6 +2457,8 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
 			'filename' => $row['filename'],
 			'size' => round($row['size'] / 1024, 2),
 			'time' => standardTime($row['poster_time']),
+			'html_time' => htmlTime($row['poster_time']),
+			'timestamp' => forum_time(true, $row['poster_time']),
 			'poster' => array(
 				'id' => $row['id_member'],
 				'name' => $row['poster_name'],
@@ -2468,6 +2470,8 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
 				'subject' => $row['subject'],
 				'body' => parse_bbc($row['body']),
 				'time' => standardTime($row['poster_time']),
+				'html_time' => htmlTime($row['poster_time']),
+				'timestamp' => forum_time(true, $row['poster_time']),
 				'href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
 			),
 			'topic' => array(

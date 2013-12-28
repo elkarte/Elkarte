@@ -266,6 +266,8 @@ class PostModeration_Controller extends Action_Controller
 				'subject' => $row['subject'],
 				'body' => parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']),
 				'time' => standardTime($row['poster_time']),
+				'html_time' => htmlTime($row['poster_time']),
+				'timestamp' => forum_time(true, $row['poster_time']),
 				'poster' => array(
 					'id' => $row['id_member'],
 					'name' => $row['poster_name'],

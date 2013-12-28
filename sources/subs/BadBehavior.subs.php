@@ -153,7 +153,7 @@ function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')
 			),
 			'time' => standardTime($row['date']),
 			'html_time' => htmlTime($row['date']),
-			'timestamp' => $row['date'],
+			'timestamp' => forum_time(true, $row['date']),
 			'request_uri' => array(
 				'html' => htmlspecialchars((substr($row['request_uri'], 0, 1) === '?' ? $scripturl : '') . $row['request_uri'], ENT_COMPAT, 'UTF-8'),
 				'href' => base64_encode($db->escape_wildcard_string($row['request_uri']))

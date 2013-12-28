@@ -877,6 +877,8 @@ class ProfileHistory_Controller extends Action_Controller
 		while ($row = $db->fetch_assoc($request))
 			$logins[] = array(
 				'time' => relativeTime($row['time']),
+				'html_time' => htmlTime($row['time']),
+				'timestamp' => forum_time(true, $row['time']),
 				'ip' => $row['ip'],
 				'ip2' => $row['ip2'],
 			);
@@ -972,6 +974,8 @@ class ProfileHistory_Controller extends Action_Controller
 				'before' => !empty($extra['previous']) ? ($parse_bbc ? parse_bbc($extra['previous']) : $extra['previous']) : '',
 				'after' => !empty($extra['new']) ? ($parse_bbc ? parse_bbc($extra['new']) : $extra['new']) : '',
 				'time' => standardTime($row['log_time']),
+				'html_time' => htmlTime($row['log_time']),
+				'timestamp' => forum_time(true, $row['log_time']),
 			);
 		}
 		$db->free_result($request);
