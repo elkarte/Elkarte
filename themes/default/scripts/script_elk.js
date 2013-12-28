@@ -229,10 +229,7 @@ function updateRelativeTime()
 
 	$('time').each(function() {
 		var oRelativeTime = new relativeTime($(this).attr('datetime')),
-			postdate = new Date($(this).attr('datetime')),
-			today = new Date(),
-			time_text = '',
-			past_time = (today - postdate) / 1000;
+			time_text = '';
 
 		if (oRelativeTime.seconds())
 		{
@@ -300,7 +297,7 @@ function relativeTime(sFrom, sTo)
 	else
 	{
 		sToSplit = sTo.split(/\D/);
-		this.dateTo = new Date(sToSplit[0], sToSplit[1], sToSplit[2], sToSplit[3], sToSplit[4]);
+		this.dateTo = new Date(sToSplit[0], --sToSplit[1], sToSplit[2], sToSplit[3], sToSplit[4]);
 	}
 
 	sFromSplit = sFrom.split(/\D/);
