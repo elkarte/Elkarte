@@ -684,7 +684,7 @@ function htmlTime($timestamp)
 
 	$time = date('Y-m-d H:i', $timestamp + ($user_info['time_offset'] + $modSettings['time_offset']) * 3600);
 
-	return $time;
+	return '<time title="' . standardTime($timestamp) . '" datetime="' . $time . '">' . relativeTime($timestamp) . '</time>';
 }
 
 /**

@@ -740,6 +740,7 @@ class ProfileHistory_Controller extends Action_Controller
 				'message' => strtr($row['message'], array('&lt;span class=&quot;remove&quot;&gt;' => '', '&lt;/span&gt;' => '')),
 				'url' => $row['url'],
 				'time' => relativeTime($row['log_time']),
+				'html_time' => htmlTime($row['log_time']),
 				'timestamp' => forum_time(true, $row['log_time']),
 			);
 		$db->free_result($request);
@@ -815,6 +816,7 @@ class ProfileHistory_Controller extends Action_Controller
 				'id' => $row['id_msg'],
 				'subject' => $row['subject'],
 				'time' => relativeTime($row['poster_time']),
+				'html_time' => htmlTime($row['poster_time']),
 				'timestamp' => forum_time(true, $row['poster_time'])
 			);
 		$db->free_result($request);

@@ -2142,6 +2142,7 @@ class Post_Controller extends Action_Controller
 					'id' => $row['id_msg'],
 					'modified' => array(
 						'time' => isset($msgOptions['modify_time']) ? relativeTime($msgOptions['modify_time']) : '',
+						'html_time' => isset($msgOptions['modify_time']) ? htmlTime($msgOptions['modify_time']) : '',
 						'timestamp' => isset($msgOptions['modify_time']) ? forum_time(true, $msgOptions['modify_time']) : 0,
 						'name' => isset($msgOptions['modify_time']) ? $msgOptions['modify_name'] : '',
 					),
@@ -2163,6 +2164,7 @@ class Post_Controller extends Action_Controller
 					'id' => $row['id_msg'],
 					'modified' => array(
 						'time' => isset($msgOptions['modify_time']) ? relativeTime($msgOptions['modify_time']) : '',
+						'html_time' => isset($msgOptions['modify_time']) ? htmlTime($msgOptions['modify_time']) : '',
 						'timestamp' => isset($msgOptions['modify_time']) ? forum_time(true, $msgOptions['modify_time']) : 0,
 						'name' => isset($msgOptions['modify_time']) ? $msgOptions['modify_name'] : '',
 					),

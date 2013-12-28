@@ -1936,6 +1936,7 @@ class Search_Controller extends Action_Controller
 			'first_post' => array(
 				'id' => $message['first_msg'],
 				'time' => relativeTime($message['first_poster_time']),
+				'html_time' => htmlTime($message['first_poster_time']),
 				'timestamp' => forum_time(true, $message['first_poster_time']),
 				'subject' => $message['first_subject'],
 				'href' => $scripturl . '?topic=' . $message['id_topic'] . '.0',
@@ -1952,6 +1953,7 @@ class Search_Controller extends Action_Controller
 			'last_post' => array(
 				'id' => $message['last_msg'],
 				'time' => relativeTime($message['last_poster_time']),
+				'html_time' => htmlTime($message['last_poster_time']),
 				'timestamp' => forum_time(true, $message['last_poster_time']),
 				'subject' => $message['last_subject'],
 				'href' => $scripturl . '?topic=' . $message['id_topic'] . ($message['num_replies'] == 0 ? '.0' : '.msg' . $message['last_msg']) . '#msg' . $message['last_msg'],
@@ -2030,10 +2032,12 @@ class Search_Controller extends Action_Controller
 			'subject' => $message['subject'],
 			'subject_highlighted' => $subject_highlighted,
 			'time' => relativeTime($message['poster_time']),
+			'html_time' => htmlTime($message['poster_time']),
 			'timestamp' => forum_time(true, $message['poster_time']),
 			'counter' => $counter,
 			'modified' => array(
 				'time' => relativeTime($message['modified_time']),
+				'html_time' => htmlTime($message['modified_time']),
 				'timestamp' => forum_time(true, $message['modified_time']),
 				'name' => $message['modified_name']
 			),

@@ -219,7 +219,7 @@ function template_topic_listing()
 					</p>
 					<p class="topic_lastpost">
 						<a href="', $topic['last_post']['href'], '"><img src="', $settings['images_url'], '/icons/last_post.png" alt="', $txt['last_post'], '" title="', $txt['last_post'], '" /></a>
-						<time datetime="', htmlTime($topic['last_post']['timestamp']), '">', $topic['last_post']['time'], '</time><br />
+						', $topic['last_post']['html_time'], '<br />
 						', $txt['by'], ' ', $topic['last_post']['member']['link'], '
 					</p>
 				</div>';

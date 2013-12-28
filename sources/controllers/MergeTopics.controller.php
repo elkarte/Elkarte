@@ -242,13 +242,15 @@ class MergeTopics_Controller extends Action_Controller
 				'num_views' => $row['num_views'],
 				'subject' => $row['subject'],
 				'started' => array(
-				'time' => standardTime($row['time_started']),
+					'time' => relativeTime($row['time_started']),
+					'html_time' => htmlTime($row['time_started']),
 					'timestamp' => forum_time(true, $row['time_started']),
 					'href' => empty($row['id_member_started']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member_started'],
 					'link' => empty($row['id_member_started']) ? $row['name_started'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member_started'] . '">' . $row['name_started'] . '</a>'
 				),
 				'updated' => array(
-				'time' => standardTime($row['time_updated']),
+					'time' => relativeTime($row['time_updated']),
+					'html_time' => htmlTime($row['time_updated']),
 					'timestamp' => forum_time(true, $row['time_updated']),
 					'href' => empty($row['id_member_updated']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member_updated'],
 					'link' => empty($row['id_member_updated']) ? $row['name_updated'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member_updated'] . '">' . $row['name_updated'] . '</a>'

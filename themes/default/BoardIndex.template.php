@@ -203,7 +203,7 @@ function template_ic_recent_posts()
 			// latest_post has link, href, time, subject, short_subject (shortened with...), and topic. (its id.)
 			echo '
 				<p id="infocenter_onepost" class="inline">
-					<a href="', $scripturl, '?action=recent">', $txt['recent_view'], '</a>&nbsp;&quot;', sprintf($txt['is_recent_updated'], '&quot;' . $context['latest_post']['link'], '&quot;'), ' (<time datetime="', htmlTime($context['latest_post']['timestamp']), '">', $context['latest_post']['time'], '</time>)
+					<a href="', $scripturl, '?action=recent">', $txt['recent_view'], '</a>&nbsp;&quot;', sprintf($txt['is_recent_updated'], '&quot;' . $context['latest_post']['link'], '&quot;'), ' (', $context['latest_post']['html_time'], ')
 				</p>';
 	}
 	// Show lots of posts. @todo - Although data here is actually tabular, perhaps use faux table for greater responsiveness.
@@ -227,7 +227,7 @@ function template_ic_recent_posts()
 						<td class="recentpost"><strong>', $post['link'], '</strong></td>
 						<td class="recentposter">', $post['poster']['link'], '</td>
 						<td class="recentboard">', $post['board']['link'], '</td>
-						<td class="recenttime"><time datetime="', htmlTime($post['raw_timestamp']), '">', $post['time'], '</time></td>
+						<td class="recenttime">', $post['html_time'], '</td>
 					</tr>';
 
 		echo '
