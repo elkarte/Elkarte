@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ * 
  */
 
 /**
@@ -45,7 +46,7 @@ function template_login()
 	echo '
 				<dl>
 					<dt>', $txt['username'], ':</dt>
-					<dd><input type="text" name="user" size="20" value="', $context['default_username'], '" class="input_text" ', !isset($_GET['openid'])? 'autofocus="autofocus" ' : '', 'placeholder="', $txt['username'], '" /></dd>
+					<dd><input type="text" name="user" size="20" value="', $context['default_username'], '" class="input_text" ', !isset($_GET['openid']) ? 'autofocus="autofocus" ' : '', 'placeholder="', $txt['username'], '" /></dd>
 					<dt>', $txt['password'], ':</dt>
 					<dd><input type="password" name="passwrd" value="', $context['default_password'], '" size="20" class="input_password" placeholder="', $txt['password'], '" /></dd>
 				</dl>';
@@ -54,7 +55,7 @@ function template_login()
 		echo '<p><strong>&mdash;', $txt['or'], '&mdash;</strong></p>
 				<dl>
 					<dt>', $txt['openid'], ':</dt>
-					<dd><input type="text" id="openid_identifier" name="openid_identifier" class="input_text openid_login" size="17"', isset($_GET['openid'])? ' autofocus="autofocus" ' : '', ' />&nbsp;<a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" /></a></dd>
+					<dd><input type="text" id="openid_identifier" name="openid_identifier" class="input_text openid_login" size="17"', isset($_GET['openid']) ? ' autofocus="autofocus" ' : '', ' />&nbsp;<a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" /></a></dd>
 				</dl>
 				<hr />';
 
@@ -110,7 +111,6 @@ function template_kick_guest()
 
 	if ($context['can_register'])
 		echo sprintf($txt['login_below_or_register'], $scripturl . '?action=register', $context['forum_name_html_safe']);
-
 	else
 		echo $txt['login_below'];
 
@@ -271,7 +271,7 @@ function template_retry_activate()
 }
 
 /**
- * Activate your account manually?
+ * Resend the activation information?
  */
 function template_resend()
 {
