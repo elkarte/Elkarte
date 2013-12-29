@@ -19,17 +19,13 @@
  */
 function template_recent()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	template_pagesection();
 
 	echo '
-		<div id="recentposts" class="forumposts">';
-
-	echo '
-			<h3 class="category_header">
-				<img src="', $settings['images_url'], '/post/xx.png" alt="" class="icon" />', $txt['recent_posts'], '
-			</h3>';
+		<div id="recentposts" class="forumposts">
+			<h3 class="category_header hdicon cat_img_posts">', $txt['recent_posts'], '</h3>';
 
 	// @todo - I'm sure markup could be cleaned up a bit more here. CSS needs a bit of a tweak too.
 	foreach ($context['posts'] as $post)
