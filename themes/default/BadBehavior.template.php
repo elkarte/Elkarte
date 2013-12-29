@@ -1,13 +1,14 @@
 <?php
 
 /**
+ * This template file contains only the sub template badbehavior_log.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Beta
  *
- * This template file contains only the sub template badbehavior_log.
  */
 
 /**
@@ -137,10 +138,10 @@ function template_callback_badbehavior_add_ip()
 		<a href="' . $scripturl . '?action=quickhelp;help=badbehavior_ip_wl" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" class="icon" alt="' . $txt['help'] . '" /></a>', $txt['badbehavior_ip_wl'], '
 		<dl class="settings">
 			<dt>',
-	$txt['badbehavior_wl_comment'], '
+				$txt['badbehavior_wl_comment'], '
 			</dt>
 			<dd>',
-	$txt['badbehavior_ip_wl_desc'], '
+				$txt['badbehavior_ip_wl_desc'], '
 			</dd>';
 
 	// Show any existing IP's that are on the whitelist
