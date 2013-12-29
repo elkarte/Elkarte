@@ -12,8 +12,12 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
+/**
+ * Have the generic templates available
+ */
 function template_MoveTopic_init()
 {
 	loadTemplate('GenericHelpers');

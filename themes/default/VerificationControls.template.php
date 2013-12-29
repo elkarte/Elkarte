@@ -12,10 +12,15 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
  * What's this, verification?!
+ *
+ * @param int $verify_id
+ * @param string $before
+ * @param string $after
  */
 function template_control_verification($verify_id, $before = '', $after = '')
 {
@@ -51,6 +56,9 @@ function template_control_verification($verify_id, $before = '', $after = '')
 
 /**
  * Used to show a verification question
+ *
+ * @param int $verify_id
+ * @param array $verify_context
  */
 function template_control_verification_questions($verify_id, $verify_context)
 {
@@ -66,6 +74,9 @@ function template_control_verification_questions($verify_id, $verify_context)
 
 /**
  * Used to show one of those easy for robot, hard for human captcha's
+ *
+ * @param int $verify_id
+ * @param array $verify_context
  */
 function template_control_verification_captcha($verify_id, $verify_context)
 {
@@ -93,6 +104,9 @@ function template_control_verification_captcha($verify_id, $verify_context)
 
 /**
  * Display the empty field verificaiton
+ *
+ * @param int $verify_id
+ * @param array $verify_context
  */
 function template_control_verification_emptyfield($verify_id, $verify_context)
 {

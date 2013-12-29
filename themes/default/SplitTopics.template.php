@@ -12,8 +12,12 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
+/**
+ * Generic reuse templates is where its at
+ */
 function template_SplitTopics_init()
 {
 	loadTemplate('GenericHelpers');
