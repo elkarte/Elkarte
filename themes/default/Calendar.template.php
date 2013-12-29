@@ -12,8 +12,12 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ * 
  */
 
+/**
+ * Start the calendar
+ */
 function template_Calendar_init()
 {
 	loadTemplate('GenericHelpers');
