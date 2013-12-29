@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -182,7 +183,7 @@ function template_credits()
 										', $version['title'], ':
 									<em>', $version['version'], '</em>';
 
-		// more details for this item, show them a link
+		// More details for this item, show them a link
 		if ($context['can_admin'] && isset($version['more']))
 			echo
 			' <a href="', $scripturl, $version['more'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['version_check_more'], '</a>';
@@ -844,10 +845,8 @@ function template_show_settings()
 
 	// Is there a custom title, maybe even with an icon?
 	if (isset($context['settings_title']))
-	{
 		echo '
 			<h3 class="category_header', !empty($context['settings_icon']) ? ' hdicon cat_img_' . $context['settings_icon'] : '', '">', $context['settings_title'], '</h3>';
-	}
 
 	// any messages or errors to show?
 	if (!empty($context['settings_message']))
@@ -1144,6 +1143,7 @@ function template_admin_search_results()
 								</li>';
 			}
 		}
+
 		echo '
 							</ol>';
 	}
@@ -1190,6 +1190,7 @@ function template_callback_question_answer_list()
 		echo '
 			</dt>
 			<dd class="questions">';
+
 		$count = count($data['answer']) - 1;
 		foreach ($data['answer'] as $id => $answer)
 			echo '
@@ -1262,9 +1263,7 @@ function template_repair_boards()
 
 	echo '
 	<div id="admincenter">
-		<h3 class="category_header">',
-			$context['error_search'] ? $txt['errors_list'] : $txt['errors_fixing'], '
-		</h3>
+		<h3 class="category_header">', $context['error_search'] ? $txt['errors_list'] : $txt['errors_fixing'], '</h3>
 		<div class="windowbg">
 			<div class="content">';
 
@@ -1331,9 +1330,10 @@ function template_repair_boards()
 	{
 		echo '
 	<script><!-- // --><![CDATA[
-		var countdown = 5;
-		var txt_message = "', $txt['errors_recount_now'], '";
-		var formName = "recount_form";
+		var countdown = 5,
+			txt_message = "', $txt['errors_recount_now'], '",
+			formName = "recount_form";
+
 		doAutoSubmit();
 	// ]]></script>';
 	}
@@ -1449,7 +1449,6 @@ function template_clean_cache_button_below()
 
 /**
  * Admin quick search box.
- * @todo - See comments under https://github.com/elkarte/Elkarte/issues/617#issuecomment-20564476
  */
 function template_admin_quick_search()
 {
@@ -1488,10 +1487,12 @@ function template_callback_external_search_engines()
 			</dd>';
 
 	echo '
-		<dt id="add_more_searches" style="display: none;"></dt><dd></dd>
+		<dt id="add_more_searches" style="display: none;"></dt>
+		<dd></dd>
 		<dt id="add_more_link_div" style="display: none;">
 			<a href="#" onclick="addAnotherSearch(', JavaScriptEscape($txt['name']), ', ', JavaScriptEscape($txt['url']), ', ', JavaScriptEscape($txt['words_sep']), '); return false;">&#171; ', $txt['setup_search_engine_add_more'], ' &#187;</a>
-		</dt><dd></dd>';
+		</dt>
+		<dd></dd>';
 
 	addInlineJavascript('
 				document.getElementById(\'add_more_link_div\').style.display = \'\';', true);
