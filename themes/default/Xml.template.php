@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ * 
  */
 
 /**
@@ -170,7 +171,7 @@ function template_generic_preview()
 		<body><![CDATA[', $context['preview_message'], ']]></body>
 	</preview>
 	<errors serious="', empty($context['error_type']) || $context['error_type'] != 'serious' ? '0' : '1', '">';
-	
+
 	if (!empty($context['post_error']['errors']))
 		foreach ($context['post_error']['errors'] as $key => $message)
 			echo '

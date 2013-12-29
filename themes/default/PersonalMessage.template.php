@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -321,11 +322,11 @@ function template_pm_pages_and_buttons_above()
 {
 	global $context;
 
-		// Show a few buttons if we are in conversation mode and outputting the first message.
-		if ($context['display_mode'] == 2)
-			template_pagesection('conversation_buttons', 'right', array('page_index' => false));
-		else
-			template_pagesection();
+	// Show a few buttons if we are in conversation mode and outputting the first message.
+	if ($context['display_mode'] == 2)
+		template_pagesection('conversation_buttons', 'right', array('page_index' => false));
+	else
+		template_pagesection();
 }
 
 /**
@@ -335,11 +336,11 @@ function template_pm_pages_and_buttons_below()
 {
 	global $context, $txt;
 
-		if (empty($context['display_mode']))
-			template_pagesection(false, false, array('extra' => '<input type="submit" name="del_selected" value="' . $txt['quickmod_delete_selected'] . '" style="font-weight: normal;" onclick="if (!confirm(\'' . $txt['delete_selected_confirm'] . '\')) return false;" class="right_submit" />'));
-		// Show a few buttons if we are in conversation mode and outputting the first message.
-		elseif ($context['display_mode'] == 2 && isset($context['conversation_buttons']))
-			template_pagesection('conversation_buttons', 'right', array('page_index' => false));
+	if (empty($context['display_mode']))
+		template_pagesection(false, false, array('extra' => '<input type="submit" name="del_selected" value="' . $txt['quickmod_delete_selected'] . '" style="font-weight: normal;" onclick="if (!confirm(\'' . $txt['delete_selected_confirm'] . '\')) return false;" class="right_submit" />'));
+	// Show a few buttons if we are in conversation mode and outputting the first message.
+	elseif ($context['display_mode'] == 2 && isset($context['conversation_buttons']))
+		template_pagesection('conversation_buttons', 'right', array('page_index' => false));
 }
 
 /**
@@ -442,17 +443,18 @@ function template_subject_list()
 								<td class="pm_date">', $message['time'], '</td>
 								<td class="pm_subject">',
 									($context['display_mode'] != 0 && $context['current_pm'] == $message['id'] ? '<img src="' . $settings['images_url'] . '/selected.png" alt="*" />' : ''),
-									'<a href="', ($context['display_mode'] == 0 || $context['current_pm'] == $message['id'] ? '' : ($scripturl . '?action=pm;pmid=' . $message['id'] . ';kstart;f=' . $context['folder'] . ';start=' . $context['start'] . ';sort=' . $context['sort_by'] . ($context['sort_direction'] == 'up' ? ';' : ';desc') . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''))), '#msg_', $message['id'], '">',
-										$message['subject'], $message['is_unread'] ? '&nbsp;<span class="new_posts">' . $txt['new'] . '</span>' : '', '
+									'<a href="', ($context['display_mode'] == 0 || $context['current_pm'] == $message['id'] ? '' : ($scripturl . '?action=pm;pmid=' . $message['id'] . ';kstart;f=' . $context['folder'] . ';start=' . $context['start'] . ';sort=' . $context['sort_by'] . ($context['sort_direction'] == 'up' ? ';' : ';desc') . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''))), '#msg_', $message['id'], '">
+										', $message['subject'], $message['is_unread'] ? '&nbsp;<span class="new_posts">' . $txt['new'] . '</span>' : '', '
 									</a>
 								</td>
-								<td class="pm_from">',
-									($context['from_or_to'] == 'from' ? $message['member']['link'] : (empty($message['recipients']['to']) ? '' : implode(', ', $message['recipients']['to']))), '
+								<td class="pm_from">
+									', ($context['from_or_to'] == 'from' ? $message['member']['link'] : (empty($message['recipients']['to']) ? '' : implode(', ', $message['recipients']['to']))), '
 								</td>
 								<td class="pm_qiuckmod">
 									<input type="checkbox" name="pms[]" id="deletelisting', $message['id'], '" value="', $message['id'], '"', $message['is_selected'] ? ' checked="checked"' : '', ' onclick="if (document.getElementById(\'deletedisplay', $message['id'], '\')) document.getElementById(\'deletedisplay', $message['id'], '\').checked = this.checked;" class="input_check" />
 								</td>
 							</tr>';
+
 		$next_alternate = !$next_alternate;
 	}
 
@@ -575,8 +577,8 @@ function template_search()
 						<option value="id_pm|asc">', $txt['pm_search_orderby_old_first'], '</option>
 					</select>
 				</dd>
-				<dt class="options">',
-					$txt['pm_search_options'], ':
+				<dt class="options">
+					', $txt['pm_search_options'], ':
 				</dt>
 				<dd class="options">
 					<label for="show_complete">
@@ -589,8 +591,8 @@ function template_search()
 						<input type="checkbox" name="sent_only" id="sent_only" value="1"', !empty($context['search_params']['sent_only']) ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['pm_search_sent_only'], '
 					</label>
 				</dd>
-				<dt class="between">',
-					$txt['pm_search_post_age'], ':
+				<dt class="between">
+					', $txt['pm_search_post_age'], ':
 				</dt>
 				<dd>
 					<label for="minage">', $txt['pm_search_between'], ' <input type="text" id="minage" name="minage" value="', empty($context['search_params']['minage']) ? '0' : $context['search_params']['minage'], '" size="5" maxlength="5" class="input_text" /></label>&nbsp;<label for="maxage">', $txt['pm_search_between_and'], '&nbsp;<input type="text" name="maxage" id="maxage" value="', empty($context['search_params']['maxage']) ? '9999' : $context['search_params']['maxage'], '" size="5" maxlength="5" class="input_text" /></label> ', $txt['pm_search_between_days'], '

@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -37,12 +38,14 @@ function template_view_scheduled_tasks()
 	<div id="errors" class="errorbox">
 		', $txt['scheduled_tasks_were_run_errors'], '<br>';
 
-		foreach ($context['scheduled_errors'] as $task => $errors)
-		{
-			echo
+			foreach ($context['scheduled_errors'] as $task => $errors)
+			{
+				echo
 				isset($txt['scheduled_task_' . $task]) ? $txt['scheduled_task_' . $task] : $task, '
-				<ul><li>', implode('</li><li>', $errors), '</li></ul>';
-		}
+				<ul>
+					<li>', implode('</li><li>', $errors), '</li>
+				</ul>';
+			}
 
 			echo '
 	</div>';
