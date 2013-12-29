@@ -589,6 +589,7 @@ $txt['enableSpellChecking'] = 'Rechtschreibprüfung aktivieren';
 $txt['enableSpellChecking_warning'] = 'dies funktioniert nicht auf allen Servern.';
 $txt['enableSpellChecking_error'] = 'dies funktioniert auf Ihrem Server nicht.';
 $txt['enableVideoEmbeding'] = 'Automatische Einbettung von Videolinks aktivieren.';
+$txt['enableCodePrettify'] = 'Verschönerung von Code-Tags aktivieren';
 $txt['disable_wysiwyg'] = 'WYSIWYG-Editor deaktivieren';
 $txt['max_messageLength'] = 'Maximal erlaubte Beitragsgröße';
 $txt['max_messageLength_zero'] = '0 für keine Begrenzung';

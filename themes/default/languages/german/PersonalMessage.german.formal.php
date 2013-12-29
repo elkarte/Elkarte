@@ -41,6 +41,7 @@ $txt['pm_too_many_recipients'] = 'Sie können private Nachrichten nicht an mehr 
 
 $txt['pm_read'] = 'Gelesen';
 $txt['pm_replied'] = 'Beantwortet';
+$txt['pm_mark_unread'] = 'Als ungelesen markieren';
 
 // Message Pruning.
 $txt['pm_prune'] = 'Nachrichten aufräumen';
