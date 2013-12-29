@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -22,7 +23,7 @@ function template_show_custom_profile()
 	// Standard fields.
 	template_show_list('standard_profile_fields');
 
-	// disable the show on registration box if the profile field is not active
+	// Disable the show on registration box if the profile field is not active
 	echo '
 	<script><!-- // --><![CDATA[
 		var iNumChecks = document.forms.standardProfileFields.length;
