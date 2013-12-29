@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ * 
  */
 
 /**
@@ -32,7 +33,7 @@ function template_build_poster_div($message, $ignoring = false)
 							<li class="listlevel1 subsections" aria-haspopup="true">';
 
 	// Show a link to the member's profile.
-	if (!empty( $message['member']['id']))
+	if (!empty($message['member']['id']))
 		$poster_div .= '
 								<a class="linklevel1 name" href="' . $scripturl . '?action=profile;u=' . $message['member']['id'] . '">
 									' . $message['member']['name'] . '
