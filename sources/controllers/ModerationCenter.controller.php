@@ -27,7 +27,7 @@ class ModerationCenter_Controller extends Action_Controller
 {
 	/**
 	 * Holds function array to pass to callMenu to call the right moderation area
-	 * 
+	 *
 	 * @var array
 	 */
 	private $_mod_include_data;
@@ -505,7 +505,7 @@ class ModerationCenter_Controller extends Action_Controller
 				'closed' => $row['closed'],
 				'ignore' => $row['ignore_all']
 			);
-			$report_boards_ids[] = $row['board'];
+			$report_boards_ids[] = $row['id_board'];
 		}
 
 		// Get the names of boards these topics are in.
@@ -646,6 +646,8 @@ class ModerationCenter_Controller extends Action_Controller
 
 	/**
 	 * Edit a warning template.
+	 *
+	 * @uses sub template warn_template
 	 */
 	public function action_modifyWarningTemplate()
 	{
@@ -957,7 +959,7 @@ class ModerationCenter_Controller extends Action_Controller
 	}
 
 	/**
-	 * View watched users.
+	 * View watched users and their posts
 	 */
 	public function action_viewWatchedUsers()
 	{
