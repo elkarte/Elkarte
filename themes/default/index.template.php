@@ -13,6 +13,9 @@
  *
  * @version 1.0 Beta
  *
+ */
+
+ /**
  * This template is, perhaps, the most important template in the theme. It
  * contains the main template layer that displays the header and footer of
  * the forum, namely with main_above and main_below. It also contains the
@@ -33,7 +36,6 @@
  *
  * The menu sub template should display all the relevant buttons the user
  * wants and or needs.
- *
  */
 
 /**

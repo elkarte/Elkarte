@@ -6,6 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Beta
+ * 
  */
 
 /**
@@ -17,6 +18,7 @@ function template_list_groups_collapsible($group = 'default_groups_list')
 
 	$current_group_list = $context[$group];
 	$all_selected = true;
+
 	if (!isset($current_group_list['id']))
 		$current_group_list['id'] = $group;
 

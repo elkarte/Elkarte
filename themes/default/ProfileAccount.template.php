@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -332,6 +333,7 @@ function template_deleteAccount()
 						<input type="hidden" name="sa" value="', $context['menu_item_selected'], '" />
 					</div>';
 	}
+
 	echo '
 				</div>
 			</div>
