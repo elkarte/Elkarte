@@ -660,7 +660,6 @@ function template_pagesection($button_strip = false, $strip_direction = '', $opt
 {
 	global $context;
 
-
 	// Hmmm. I'm a tad wary of having floatleft here but anyway............
 	// @todo - Try using table-cell display here. Should do auto rtl support. Less markup, less css. :)
 	if (!empty($options['page_index_markup']))
@@ -712,7 +711,7 @@ function template_news_fader()
 			});
 			newsFaderStarted = true;
 		}';
-	
+
 	if ($settings['enable_news'] == 2 && empty($context['minmax_preferences']['upshrink']))
 		echo '
 		startNewsFader();';

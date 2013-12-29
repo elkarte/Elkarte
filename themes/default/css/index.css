@@ -2984,6 +2984,9 @@ dl.merge_topic dd {
 	width: 100%;
 	font-weight: 600;
 }
+#new_template_link a {
+	margin-bottom: 2px;
+}
 
 
 /* $PERSONAL	*/
