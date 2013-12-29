@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -146,7 +147,7 @@ function template_email_members()
 				}
 			],
 			oThemeOptions: {
-				bUseThemeSettings: ' . ($context['user']['is_guest'] ? 'false' : 'true') .  ',
+				bUseThemeSettings: ' . ($context['user']['is_guest'] ? 'false' : 'true') . ',
 				sOptionName: \'admin_preferences\',
 				sSessionVar: elk_session_var,
 				sSessionId: elk_session_id,
