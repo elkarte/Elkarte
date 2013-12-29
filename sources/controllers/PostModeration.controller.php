@@ -57,7 +57,7 @@ class PostModeration_Controller extends Action_Controller
 	}
 
 	/**
-	 * View all unapproved posts.
+	 * View all unapproved posts or topics
 	 */
 	public function action_unapproved()
 	{
@@ -67,6 +67,7 @@ class PostModeration_Controller extends Action_Controller
 
 		$context['current_view'] = isset($_GET['sa']) && $_GET['sa'] == 'topics' ? 'topics' : 'replies';
 		$context['page_title'] = $txt['mc_unapproved_posts'];
+		$context['header_title'] = $txt['mc_' . ($context['current_view'] == 'topics' ? 'topics' : 'posts')];
 
 		// Work out what boards we can work in!
 		$approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
@@ -477,9 +478,9 @@ class PostModeration_Controller extends Action_Controller
 					'value' => '
 						<select name="do" onchange="if (this.value != 0 &amp;&amp; confirm(\'' . $txt['mc_unapproved_sure'] . '\')) submit();">
 							<option value="0">' . $txt['with_selected'] . ':</option>
-							<option value="0">-------------------</option>
-							<option value="approve">&nbsp;--&nbsp;' . $txt['approve'] . '</option>
-							<option value="delete">&nbsp;--&nbsp;' . $txt['delete'] . '</option>
+							<option value="0" disabled="disabled">' . str_repeat('&#8212;', strlen($txt['approve'])) . '</option>
+							<option value="approve">&#10148;&nbsp;' . $txt['approve'] . '</option>
+							<option value="delete">&#10148;&nbsp;' . $txt['delete'] . '</option>
 						</select>
 						<noscript><input type="submit" name="ml_go" value="' . $txt['go'] . '" class="right_submit" /></noscript>',
 					'class' => 'floatright',
