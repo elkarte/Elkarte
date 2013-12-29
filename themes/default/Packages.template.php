@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -44,7 +45,7 @@ function template_view_package()
 		<div class="errorbox">
 			', sprintf($txt['package_will_fail_title'], $txt['package_' . ($context['uninstalling'] ? 'uninstall' : 'install')]), '<br />
 			', sprintf($txt['package_will_fail_warning'], $txt['package_' . ($context['uninstalling'] ? 'uninstall' : 'install')]),
-			!empty($context['failure_details']) ? '<br /><br /><strong>' . $context['failure_details'] . '</strong>' : '', '
+		!empty($context['failure_details']) ? '<br /><br /><strong>' . $context['failure_details'] . '</strong>' : '', '
 		</div>';
 	}
 
@@ -58,9 +59,11 @@ function template_view_package()
 					', $context['package_readme'], '
 					<span class="floatright">', $txt['package_available_readme_language'], '
 						<select name="readme_language" id="readme_language" onchange="if (this.options[this.selectedIndex].value) window.location.href = elk_prepareScriptUrl(elk_scripturl + \'', '?action=admin;area=packages;sa=', $context['uninstalling'] ? 'uninstall' : 'install', ';package=', $context['filename'], ';readme=\' + this.options[this.selectedIndex].value + \';license=\' + get_selected(\'license_language\'));">';
-							foreach ($context['readmes'] as $a => $b)
-								echo '<option value="', $b, '"', $a === 'selected' ? ' selected="selected"' : '', '>', $b == 'default' ? $txt['package_readme_default'] : ucfirst($b), '</option>';
-			echo '
+
+		foreach ($context['readmes'] as $a => $b)
+			echo '<option value="', $b, '"', $a === 'selected' ? ' selected="selected"' : '', '>', $b == 'default' ? $txt['package_readme_default'] : ucfirst($b), '</option>';
+
+		echo '
 						</select>
 					</span>
 				</div>
@@ -78,9 +81,9 @@ function template_view_package()
 					', $context['package_license'], '
 					<span class="floatright">', $txt['package_available_license_language'], '
 						<select name="license_language" id="license_language" onchange="if (this.options[this.selectedIndex].value) window.location.href = elk_prepareScriptUrl(elk_scripturl + \'', '?action=admin;area=packages;sa=install', ';package=', $context['filename'], ';license=\' + this.options[this.selectedIndex].value + \';readme=\' + get_selected(\'readme_language\'));">';
-							foreach ($context['licenses'] as $a => $b)
-								echo '<option value="', $b, '"', $a === 'selected' ? ' selected="selected"' : '', '>', $b == 'default' ? $txt['package_license_default'] : ucfirst($b), '</option>';
-			echo '
+		foreach ($context['licenses'] as $a => $b)
+			echo '<option value="', $b, '"', $a === 'selected' ? ' selected="selected"' : '', '>', $b == 'default' ? $txt['package_license_default'] : ucfirst($b), '</option>';
+		echo '
 						</select>
 					</span>
 				</div>
@@ -108,6 +111,7 @@ function template_view_package()
 		foreach ($context['database_changes'] as $change)
 			echo '
 							<li>', $change, '</li>';
+
 		echo '
 						</ul>
 					</div>
@@ -200,7 +204,8 @@ function template_view_package()
 			}
 			$alternate = !$alternate;
 		}
-					echo '
+
+		echo '
 			</tbody>
 			</table>
 			';
@@ -332,12 +337,12 @@ function template_view_package()
 	<script><!-- // --><![CDATA[
 		var aOperationElements = new Array();';
 
-		// Operations.
-		if (!empty($js_operations))
+	// Operations.
+	if (!empty($js_operations))
+	{
+		foreach ($js_operations as $key => $operation)
 		{
-			foreach ($js_operations as $key => $operation)
-			{
-				echo '
+			echo '
 			aOperationElements[', $key, '] = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: ', $operation ? 'false' : 'true', ',
@@ -354,8 +359,8 @@ function template_view_package()
 					}
 				]
 			});';
-			}
 		}
+	}
 
 	echo '
 	// ]]></script>';
@@ -410,10 +415,8 @@ function template_extract_package()
 	<div id="admincenter">';
 
 	if (empty($context['redirect_url']))
-	{
 		echo '
-			<h3 class="category_header">', ($context['uninstalling'] ? $txt['uninstall'] : $txt['extracting']), '</h3>',  ($context['uninstalling'] ? '' : '<div class="information">' . $txt['package_installed_extract'] . '</div>');
-	}
+			<h3 class="category_header">', ($context['uninstalling'] ? $txt['uninstall'] : $txt['extracting']), '</h3>', ($context['uninstalling'] ? '' : '<div class="information">' . $txt['package_installed_extract'] . '</div>');
 	else
 		echo '
 			<h3 class="category_header">', $txt['package_installed_redirecting'], '</h3>';
@@ -1024,7 +1027,7 @@ function template_file_permissions()
 		}
 	// ]]></script>';
 
-		echo '
+	echo '
 	<div class="warningbox">
 		<div>
 			<strong>', $txt['package_file_perms_warning'], ':</strong><br>
@@ -1056,11 +1059,11 @@ function template_file_permissions()
 				<tr class="windowbg2">
 					<td style="width:30%"><strong>';
 
-				if (!empty($dir['type']) && ($dir['type'] == 'dir' || $dir['type'] == 'dir_recursive'))
-					echo '
+		if (!empty($dir['type']) && ($dir['type'] == 'dir' || $dir['type'] == 'dir_recursive'))
+			echo '
 						<img src="', $settings['default_images_url'], '/board.png" alt="*" />';
 
-				echo '
+		echo '
 						', $name, '
 					</strong></td>
 					<td style="width:30%">
@@ -1314,5 +1317,4 @@ function template_pause_action_permissions()
 
 		doAutoSubmit();
 	// ]]></script>';
-
 }

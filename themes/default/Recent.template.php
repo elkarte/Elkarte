@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -272,7 +273,7 @@ function template_replies()
 		echo '
 										</ul>';
 
-			// Show a "select all" box for quick moderation?
+		// Show a "select all" box for quick moderation?
 		echo '
 									</li>
 								</ul>
@@ -306,7 +307,7 @@ function template_replies()
 									</p>
 									<div class="topic_name">';
 
-			// [WIP] MEthinks the orange icons look better if they aren't all over the page.
+			// The new icons look better if they aren't all over the page.
 			echo '
 										<a class="new_posts" href="', $topic['new_href'], '" id="newicon', $topic['first_post']['id'], '">' . $txt['new'] . '</a>
 										<h4>

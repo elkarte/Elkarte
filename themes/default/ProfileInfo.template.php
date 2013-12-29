@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -853,7 +854,7 @@ function template_profile_block_contact()
 	// No way to contact this member at all ... welcome home freak!
 	if ($ci_empty === true)
 		echo
-			$txt['profile_contact_no'];
+		$txt['profile_contact_no'];
 
 	echo '
 			</div>
@@ -1185,7 +1186,7 @@ function template_profile_block_attachments()
 			echo '<td></td>';
 
 			if ($i % $per_line === 0)
-			echo '
+				echo '
 				</tr>';
 		}
 	}
