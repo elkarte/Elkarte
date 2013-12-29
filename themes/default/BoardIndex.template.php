@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ * 
  */
 
 /**
@@ -200,8 +201,8 @@ function template_ic_recent_posts()
 	// Only show one post.
 	if ($settings['number_recent_posts'] == 1)
 	{
-			// latest_post has link, href, time, subject, short_subject (shortened with...), and topic. (its id.)
-			echo '
+		// latest_post has link, href, time, subject, short_subject (shortened with...), and topic. (its id.)
+		echo '
 				<p id="infocenter_onepost" class="inline">
 					<a href="', $scripturl, '?action=recent">', $txt['recent_view'], '</a>&nbsp;&quot;', sprintf($txt['is_recent_updated'], '&quot;' . $context['latest_post']['link'], '&quot;'), ' (<time datetime="', htmlTime($context['latest_post']['timestamp']), '">', $context['latest_post']['time'], '</time>)
 				</p>';
@@ -262,9 +263,9 @@ function template_ic_show_events()
 				<p class="inline">
 					<span class="birthday">', $context['calendar_only_today'] ? $txt['birthdays'] : $txt['birthdays_upcoming'], '</span>';
 
-			// Each member in calendar_birthdays has: id, name (person), age (if they have one set?), is_last. (last in list?), and is_today (birthday is today?)
-			foreach ($context['calendar_birthdays'] as $member)
-				echo '
+		// Each member in calendar_birthdays has: id, name (person), age (if they have one set?), is_last. (last in list?), and is_today (birthday is today?)
+		foreach ($context['calendar_birthdays'] as $member)
+			echo '
 					<a href="', $scripturl, '?action=profile;u=', $member['id'], '">', $member['is_today'] ? '<strong class="fix_rtl_names">' : '', $member['name'], $member['is_today'] ? '</strong>' : '', isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a>', $member['is_last'] ? '' : ', ';
 
 		echo '
@@ -278,10 +279,10 @@ function template_ic_show_events()
 				<p class="inline">
 					<span class="event">', $context['calendar_only_today'] ? $txt['events'] : $txt['events_upcoming'], '</span> ';
 
-			// Each event in calendar_events should have:
-			// title, href, is_last, can_edit (are they allowed?), modify_href, and is_today.
-			foreach ($context['calendar_events'] as $event)
-				echo '
+		// Each event in calendar_events should have:
+		// title, href, is_last, can_edit (are they allowed?), modify_href, and is_today.
+		foreach ($context['calendar_events'] as $event)
+			echo '
 					', $event['can_edit'] ? '<a href="' . $event['modify_href'] . '" title="' . $txt['calendar_edit'] . '"><img src="' . $settings['images_url'] . '/icons/calendar_modify.png" alt="*" class="centericon" /></a> ' : '', $event['href'] == '' ? '' : '<a href="' . $event['href'] . '">', $event['is_today'] ? '<strong>' . $event['title'] . '</strong>' : $event['title'], $event['href'] == '' ? '' : '</a>', $event['is_last'] ? '<br />' : ', ';
 
 		echo '
