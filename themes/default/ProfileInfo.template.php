@@ -299,7 +299,7 @@ function template_action_showPermissions()
 
 		if (!empty($context['boards']))
 			echo '
-							<option value="" disabled="disabled">---------------------------</option>';
+							<option value="" disabled="disabled">', str_repeat('&#8212;', strlen($txt['showPermissions_global'])), '</option>';
 
 		// Fill the box with any local permission boards.
 		foreach ($context['boards'] as $board)
