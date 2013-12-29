@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ * 
  */
 
 /**
@@ -62,7 +63,7 @@ function template_error_log()
 				</div>
 			</div>';
 
-			echo '
+	echo '
 			<table class="table_grid" id="error_log">
 				<tr>
 					<td colspan="3" class="windowbg">
@@ -100,7 +101,7 @@ function template_error_log()
 					<td class="centertext" colspan="2">', $txt['errlog_no_entries'], '</td>
 				</tr>';
 
-	// we have some errors, show them...
+	// We have some errors, show them...
 	foreach ($context['errors'] as $error)
 	{
 		echo '
@@ -185,7 +186,7 @@ function template_error_log()
 		</form>';
 }
 
-/*
+/**
  * Shows the subsection of a file where an error occurred
  */
 function template_show_file()
@@ -220,7 +221,7 @@ function template_show_file()
 </html>';
 }
 
-/*
+/**
  * When an attachment fails to upload, this template will show
  * all the issues to the user
  */
