@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -247,7 +248,7 @@ function template_action_required()
 		echo '
 									<li>
 										<img class="icon" src="', $settings['images_url'], ($total == 0 ? '/icons/field_valid.png"' : '/icons/field_invalid.png"'), 'alt="" />
-										<a href="', $scripturl, $context['links'][$area], '"><span class="smalltext">', $txt['mc_' . $area], ' : ', $total,  '</span></a>
+										<a href="', $scripturl, $context['links'][$area], '"><span class="smalltext">', $txt['mc_' . $area], ' : ', $total, '</span></a>
 									</li>';
 	}
 
@@ -346,8 +347,8 @@ function template_unapproved_posts()
 	echo '
 				<form action="', $scripturl, '?action=moderate;area=postmod;start=', $context['start'], ';sa=', $context['current_view'], '" method="post" accept-charset="UTF-8">
 					<div id="unapprovedposts" class="forumposts">
-						<h3 class="category_header hdicon cat_img_posts">',
-							$context['header_title'], '
+						<h3 class="category_header hdicon cat_img_posts">
+							', $context['header_title'], '
 						</h3>';
 
 	// No posts?
