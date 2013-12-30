@@ -1008,7 +1008,7 @@ function updateFailedQueue($failed_emails)
 	// Add our email back to the queue, manually.
 	$db->insert('insert',
 		'{db_prefix}mail_queue',
-		array('time_sent' => 'int', 'recipient' => 'string', 'body' => 'string', 'subject' => 'string', 'headers' => 'string', 'send_html' => 'int', 'priority' => 'int', 'message_id' => 'int'),
+		array('time_sent' => 'int', 'recipient' => 'string', 'body' => 'string', 'subject' => 'string', 'headers' => 'string', 'send_html' => 'int', 'priority' => 'int', '	private' => 'int', 'message_id' => 'int'),
 		$failed_emails,
 		array('id_mail')
 	);
@@ -1102,7 +1102,7 @@ function emailsInfo($number)
 
 	// Get the next $number emails, with all that's to know about them and one more.
 	$request = $db->query('', '
-		SELECT /*!40001 SQL_NO_CACHE */ id_mail, recipient, body, subject, headers, send_html, time_sent, priority, message_id
+		SELECT /*!40001 SQL_NO_CACHE */ id_mail, recipient, body, subject, headers, send_html, time_sent, priority, private, message_id
 		FROM {db_prefix}mail_queue
 		ORDER BY priority ASC, id_mail ASC
 		LIMIT ' . $number,
@@ -1123,6 +1123,7 @@ function emailsInfo($number)
 			'send_html' => $row['send_html'],
 			'time_sent' => $row['time_sent'],
 			'priority' => $row['priority'],
+			'private' => $row['private'],
 			'message_id' => $row['message_id'],
 		);
 	}
@@ -1291,7 +1292,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 
 		// Hopefully it sent?
 		if (!$result)
-			$failed_emails[] = array(time(), $email['to'], $email['body'], $email['subject'], $email['headers'], $email['send_html'], $email['priority'], $email['message_id']);
+			$failed_emails[] = array(time(), $email['to'], $email['body'], $email['subject'], $email['headers'], $email['send_html'], $email['priority'], $email['private'], $email['message_id']);
 	}
 
 	// Clear out the stat cache.
