@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -23,7 +24,7 @@ function template_profile_above()
 
 	// Prevent Chrome from auto completing fields when viewing/editing other members profiles
 	if (isBrowser('is_webkit') && !$context['user']['is_owner'])
-		addInlineJavascript ('disableAutoComplete();', true);
+		addInlineJavascript('disableAutoComplete();', true);
 
 	// If an error occurred while trying to save previously, give the user a clue!
 	echo '
@@ -48,7 +49,6 @@ function template_showDrafts()
 		<h3 class="category_header">
 			', $txt['drafts'], ' - ', $context['member']['name'], '
 		</h3>',
-
 	template_pagesection();
 
 	// No drafts? Just show an informative message.
