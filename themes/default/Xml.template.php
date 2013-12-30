@@ -12,7 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- * 
+ *
  */
 
 /**
@@ -405,6 +405,11 @@ function template_generic_xml()
 
 /**
  * Recursive function for displaying generic XML data.
+ *
+ * @param array $xml_data
+ * @param string $parent_ident
+ * @param string $child_ident
+ * @param int $level
  */
 function template_generic_xml_recursive($xml_data, $parent_ident, $child_ident, $level)
 {

@@ -1287,7 +1287,9 @@ function template_report_message_complete()
 		</div>';
 }
 
-// Manage rules.
+/**
+ * Manage rules.
+ */
 function template_rules()
 {
 	global $context, $txt, $scripturl;

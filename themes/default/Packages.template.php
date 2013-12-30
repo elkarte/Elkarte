@@ -1139,10 +1139,16 @@ function template_file_permissions()
 
 /**
  * @todo
+ *
+ * @param string $ident
+ * @param array $contents
+ * @param int $level
+ * @param boolean $has_more
  */
 function template_permission_show_contents($ident, $contents, $level, $has_more = false)
 {
 	global $settings, $txt, $scripturl, $context;
+
 	$js_ident = preg_replace('~[^A-Za-z0-9_\-=:]~', ':-:', $ident);
 
 	// Have we actually done something?

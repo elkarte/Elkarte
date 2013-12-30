@@ -603,6 +603,8 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 
 /**
  * Show a box with an error message.
+ *
+ * @param string $error_id
  */
 function template_show_error($error_id)
 {

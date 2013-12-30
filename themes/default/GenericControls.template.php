@@ -12,11 +12,15 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- * 
+ *
  */
 
 /**
  * This function displays all the stuff you get with a richedit box - BBC, smileys etc.
+ *
+ * @param string $editor_id
+ * @param boolean $smileyContainer show the smiley container
+ * @param boolean $bbcContainer show the bbc container
  */
 function template_control_richedit($editor_id, $smileyContainer = null, $bbcContainer = null)
 {
@@ -146,6 +150,8 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 
 /**
  * Shows the buttons that the user can see .. preview, spellchecker, drafts, etc
+ *
+ * @param string $editor_id
  */
 function template_control_richedit_buttons($editor_id)
 {

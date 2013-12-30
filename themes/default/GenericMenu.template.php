@@ -12,7 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- * 
+ *
  */
 
 /**
@@ -210,6 +210,8 @@ function template_generic_menu_dropdown_below()
 
 /**
  * Some code for showing a tabbed view.
+ *
+ * @param array $menu_context
  */
 function template_generic_menu_tabs(&$menu_context)
 {

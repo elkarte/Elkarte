@@ -504,6 +504,8 @@ function template_modify_group()
 
 /**
  * The classic way of looking at permissions.
+ *
+ * @param string $type
  */
 function template_modify_group_classic($type)
 {

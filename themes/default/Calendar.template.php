@@ -12,7 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- * 
+ *
  */
 
 /**
@@ -207,6 +207,8 @@ function template_event_post()
 
 /**
  * Display a monthly calendar grid.
+ *
+ * @param string $grid_name
  */
 function template_show_month_grid($grid_name)
 {
@@ -378,6 +380,8 @@ function template_show_month_grid($grid_name)
 
 /**
  * Or show a weekly one?
+ *
+ * @param string $grid_name
  */
 function template_show_week_grid($grid_name)
 {

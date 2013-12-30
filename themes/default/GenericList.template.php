@@ -12,11 +12,13 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- * 
+ *
  */
 
 /**
  * Template used to show a list created with createlist
+ *
+ * @param string $list_id
  */
 function template_show_list($list_id = null)
 {
@@ -200,6 +202,9 @@ function template_show_list($list_id = null)
 
 /**
  * Generic template used to show additional rows of data (above/below)
+ *
+ * @param int $row_position
+ * @param array $cur_list
  */
 function template_additional_rows($row_position, $cur_list)
 {

@@ -12,11 +12,14 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- * 
+ *
  */
 
 /**
  * Main template for displaying the list of boards
+ *
+ * @param int $boards
+ * @param string $id
  */
 function template_list_boards($boards, $id)
 {
