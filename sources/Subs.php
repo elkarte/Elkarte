@@ -619,10 +619,12 @@ function htmlTime($timestamp)
 	if (empty($timestamp))
 		return '';
 
-	$time = date('Y-m-d H:i', forum_time(true, $timestamp));
+	$timestamp = forum_time(true, $timestamp);
+	$time = date('Y-m-d H:i', $timestamp);
+	$stdtime = standardTime($timestamp);
 
 	// @todo maybe htmlspecialchars on the title attribute?
-	return '<time title="' . standardTime($timestamp) . '" datetime="' . $time . '" data-timestamp="' . $timestamp . '">' . standardTime($timestamp) . '</time>';
+	return '<time title="' . $stdtime . '" datetime="' . $time . '" data-timestamp="' . $timestamp . '">' . $stdtime . '</time>';
 }
 
 /**
