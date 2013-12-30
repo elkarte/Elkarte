@@ -739,7 +739,7 @@ class ProfileHistory_Controller extends Action_Controller
 				'member_link' => $row['id_member'] > 0 ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['display_name'] . '</a>' : $row['display_name'],
 				'message' => strtr($row['message'], array('&lt;span class=&quot;remove&quot;&gt;' => '', '&lt;/span&gt;' => '')),
 				'url' => $row['url'],
-				'time' => relativeTime($row['log_time']),
+				'time' => standardTime($row['log_time']),
 				'html_time' => htmlTime($row['log_time']),
 				'timestamp' => forum_time(true, $row['log_time']),
 			);
@@ -815,7 +815,7 @@ class ProfileHistory_Controller extends Action_Controller
 				'topic' => $row['id_topic'],
 				'id' => $row['id_msg'],
 				'subject' => $row['subject'],
-				'time' => relativeTime($row['poster_time']),
+				'time' => standardTime($row['poster_time']),
 				'html_time' => htmlTime($row['poster_time']),
 				'timestamp' => forum_time(true, $row['poster_time'])
 			);
@@ -876,7 +876,7 @@ class ProfileHistory_Controller extends Action_Controller
 		$logins = array();
 		while ($row = $db->fetch_assoc($request))
 			$logins[] = array(
-				'time' => relativeTime($row['time']),
+				'time' => standardTime($row['time']),
 				'html_time' => htmlTime($row['time']),
 				'timestamp' => forum_time(true, $row['time']),
 				'ip' => $row['ip'],

@@ -957,7 +957,7 @@ class Recent_Controller extends Action_Controller
 						'href' => $scripturl . '?action=profile;u=' . $row['id_first_member'],
 						'link' => !empty($row['id_first_member']) ? '<a class="preview" href="' . $scripturl . '?action=profile;u=' . $row['id_first_member'] . '" title="' . $txt['profile_of'] . ' ' . $row['first_poster_name'] . '">' . $row['first_poster_name'] . '</a>' : $row['first_poster_name']
 					),
-					'time' => relativeTime($row['first_poster_time']),
+					'time' => standardTime($row['first_poster_time']),
 					'html_time' => htmlTime($row['first_poster_time']),
 					'timestamp' => forum_time(true, $row['first_poster_time']),
 					'subject' => $row['first_subject'],
@@ -975,7 +975,7 @@ class Recent_Controller extends Action_Controller
 						'href' => $scripturl . '?action=profile;u=' . $row['id_last_member'],
 						'link' => !empty($row['id_last_member']) ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_last_member'] . '">' . $row['last_poster_name'] . '</a>' : $row['last_poster_name']
 					),
-					'time' => relativeTime($row['last_poster_time']),
+					'time' => standardTime($row['last_poster_time']),
 					'html_time' => htmlTime($row['last_poster_time']),
 					'timestamp' => forum_time(true, $row['last_poster_time']),
 					'subject' => $row['last_subject'],

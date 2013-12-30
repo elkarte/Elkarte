@@ -1935,7 +1935,7 @@ class Search_Controller extends Action_Controller
 			'can_mark_notify' => in_array($message['id_board'], $boards_can['mark_any_notify']) || in_array(0, $boards_can['mark_any_notify']) && !$context['user']['is_guest'],
 			'first_post' => array(
 				'id' => $message['first_msg'],
-				'time' => relativeTime($message['first_poster_time']),
+				'time' => standardTime($message['first_poster_time']),
 				'html_time' => htmlTime($message['first_poster_time']),
 				'timestamp' => forum_time(true, $message['first_poster_time']),
 				'subject' => $message['first_subject'],
@@ -1952,7 +1952,7 @@ class Search_Controller extends Action_Controller
 			),
 			'last_post' => array(
 				'id' => $message['last_msg'],
-				'time' => relativeTime($message['last_poster_time']),
+				'time' => standardTime($message['last_poster_time']),
 				'html_time' => htmlTime($message['last_poster_time']),
 				'timestamp' => forum_time(true, $message['last_poster_time']),
 				'subject' => $message['last_subject'],
@@ -2031,12 +2031,12 @@ class Search_Controller extends Action_Controller
 			'icon_url' => $settings[$context['icon_sources'][$message['icon']]] . '/post/' . $message['icon'] . '.png',
 			'subject' => $message['subject'],
 			'subject_highlighted' => $subject_highlighted,
-			'time' => relativeTime($message['poster_time']),
+			'time' => standardTime($message['poster_time']),
 			'html_time' => htmlTime($message['poster_time']),
 			'timestamp' => forum_time(true, $message['poster_time']),
 			'counter' => $counter,
 			'modified' => array(
-				'time' => relativeTime($message['modified_time']),
+				'time' => standardTime($message['modified_time']),
 				'html_time' => htmlTime($message['modified_time']),
 				'timestamp' => forum_time(true, $message['modified_time']),
 				'name' => $message['modified_name']

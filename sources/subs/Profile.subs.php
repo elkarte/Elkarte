@@ -2414,7 +2414,7 @@ function list_getUserWarnings($start, $items_per_page, $sort, $memID)
 				'id' => $row['id_member'],
 				'link' => $row['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['member_name'] . '</a>') : $row['member_name'],
 			),
-			'time' => relativeTime($row['log_time']),
+			'time' => standardTime($row['log_time']),
 			'html_time' => htmlTime($row['log_time']),
 			'timestamp' => forum_time(true, $row['log_time']),
 			'reason' => $row['body'],

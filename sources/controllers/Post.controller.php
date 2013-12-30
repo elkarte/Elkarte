@@ -2141,7 +2141,7 @@ class Post_Controller extends Action_Controller
 				$context['message'] = array(
 					'id' => $row['id_msg'],
 					'modified' => array(
-						'time' => isset($msgOptions['modify_time']) ? relativeTime($msgOptions['modify_time']) : '',
+						'time' => isset($msgOptions['modify_time']) ? standardTime($msgOptions['modify_time']) : '',
 						'html_time' => isset($msgOptions['modify_time']) ? htmlTime($msgOptions['modify_time']) : '',
 						'timestamp' => isset($msgOptions['modify_time']) ? forum_time(true, $msgOptions['modify_time']) : 0,
 						'name' => isset($msgOptions['modify_time']) ? $msgOptions['modify_name'] : '',
@@ -2163,7 +2163,7 @@ class Post_Controller extends Action_Controller
 				$context['message'] = array(
 					'id' => $row['id_msg'],
 					'modified' => array(
-						'time' => isset($msgOptions['modify_time']) ? relativeTime($msgOptions['modify_time']) : '',
+						'time' => isset($msgOptions['modify_time']) ? standardTime($msgOptions['modify_time']) : '',
 						'html_time' => isset($msgOptions['modify_time']) ? htmlTime($msgOptions['modify_time']) : '',
 						'timestamp' => isset($msgOptions['modify_time']) ? forum_time(true, $msgOptions['modify_time']) : 0,
 						'name' => isset($msgOptions['modify_time']) ? $msgOptions['modify_name'] : '',
@@ -2315,7 +2315,7 @@ class Post_Controller extends Action_Controller
 		{
 			$context['drafts'][] = array(
 				'subject' => empty($draft['subject']) ? $txt['drafts_none'] : censorText(shorten_text(stripslashes($draft['subject']), !empty($modSettings['draft_subject_length']) ? $modSettings['draft_subject_length'] : 24)),
-				'poster_time' => relativeTime($draft['poster_time']),
+				'poster_time' => standardTime($draft['poster_time']),
 					'link' => '<a href="' . $scripturl . '?action=post;board=' . $draft['id_board'] . ';' . (!empty($draft['id_topic']) ? 'topic='. $draft['id_topic'] .'.0;' : '') . 'id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
 				);
 		}
