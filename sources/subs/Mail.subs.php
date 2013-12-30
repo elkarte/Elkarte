@@ -189,7 +189,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	if (!empty($modSettings['mail_queue']) && $priority != 0)
 		return AddMailQueue(false, $to_array, $subject, $message, $headers, $send_html, $priority, $is_private, $message_id);
 	// If it's a priority mail, send it now - note though that this should NOT be used for sending many at once.
-	elseif (!empty($modSettings['mail_queue']) && !empty($modSettings['mail_limit']))
+	elseif (!empty($modSettings['mail_queue']) && !empty($modSettings['mail_period_limit']))
 	{
 		list ($last_mail_time, $mails_this_minute) = @explode('|', $modSettings['mail_recent']);
 		if (empty($mails_this_minute) || time() > $last_mail_time + 60)
@@ -592,6 +592,7 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 			return false;
 		if (!server_parse('DATA', $socket, '354'))
 			return false;
+
 		fputs($socket, 'Subject: ' . $subject . $line_break);
 		if (strlen($mail_to) > 0)
 			fputs($socket, 'To: <' . $mail_to . '>' . $line_break);
@@ -691,7 +692,7 @@ function server_parse($message, $socket, $response)
  */
 function mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break)
 {
-	// append the key to the bottom of each message section, plain, html, encoded, etc
+	// Append the key to the bottom of each message section, plain, html, encoded, etc
 	$message = preg_replace('~^(.*?)(' . $line_break . '--ELK-[a-z0-9]{32})~s', "$1{$line_break}{$line_break}[{$unq_head}]{$line_break}$2", $message);
 	$message = preg_replace('~(Content-Type: text/plain;.*?Content-Transfer-Encoding: 7bit' . $line_break . $line_break . ')(.*?)(' . $line_break . '--ELK-[a-z0-9]{32})~s', "$1$2{$line_break}{$line_break}[{$unq_head}]{$line_break}$3", $message);
 	$message = preg_replace('~(Content-Type: text/html;.*?Content-Transfer-Encoding: 7bit' . $line_break . $line_break . ')(.*?)(' . $line_break . '--ELK-[a-z0-9]{32})~s', "$1$2<br /><br />[{$unq_head}]<br />$3", $message);
@@ -847,6 +848,7 @@ function prepareMailingForPreview()
 function user_info_callback($matches)
 {
 	global $user_info;
+
 	if (empty($matches[1]))
 		return '';
 
@@ -1006,7 +1008,7 @@ function updateFailedQueue($failed_emails)
 	// Add our email back to the queue, manually.
 	$db->insert('insert',
 		'{db_prefix}mail_queue',
-		array('time_sent' => 'int', 'recipient' => 'string', 'body' => 'string', 'subject' => 'string', 'headers' => 'string', 'send_html' => 'int', 'priority' => 'int', 'message_id' => 'int'),
+		array('time_sent' => 'int', 'recipient' => 'string', 'body' => 'string', 'subject' => 'string', 'headers' => 'string', 'send_html' => 'int', 'priority' => 'int', '	private' => 'int', 'message_id' => 'int'),
 		$failed_emails,
 		array('id_mail')
 	);
@@ -1057,7 +1059,8 @@ function resetNextSendTime()
 
 /**
  * Update the next sending time for mail queue.
- * By default, move it with 10.
+ * By default, move it 10 seconds for lower per mail_period_limits and 5 seconds for larger mail_period_limits
+ * Requires an affected row
  *
  * @return bool
  */
@@ -1067,8 +1070,8 @@ function updateNextSendTime()
 
 	$db = database();
 
-	// Set our delay based on our per min limit (mail_limit)
-	$delay = !empty($modSettings['mail_queue_delay']) ? $modSettings['mail_queue_delay'] : (!empty($modSettings['mail_limit']) && $modSettings['mail_limit'] < 5 ? 10 : 5);
+	// Set a delay based on the per minute limit (mail_period_limit)
+	$delay = !empty($modSettings['mail_queue_delay']) ? $modSettings['mail_queue_delay'] : (!empty($modSettings['mail_period_limit']) && $modSettings['mail_period_limit'] <= 5 ? 10 : 5);
 
 	$db->query('', '
 		UPDATE {db_prefix}settings
@@ -1083,6 +1086,7 @@ function updateNextSendTime()
 	);
 	if ($db->affected_rows() == 0)
 		return false;
+
 	return $delay;
 }
 
@@ -1098,7 +1102,7 @@ function emailsInfo($number)
 
 	// Get the next $number emails, with all that's to know about them and one more.
 	$request = $db->query('', '
-		SELECT /*!40001 SQL_NO_CACHE */ id_mail, recipient, body, subject, headers, send_html, time_sent, priority, message_id
+		SELECT /*!40001 SQL_NO_CACHE */ id_mail, recipient, body, subject, headers, send_html, time_sent, priority, private, message_id
 		FROM {db_prefix}mail_queue
 		ORDER BY priority ASC, id_mail ASC
 		LIMIT ' . $number,
@@ -1119,6 +1123,7 @@ function emailsInfo($number)
 			'send_html' => $row['send_html'],
 			'time_sent' => $row['time_sent'],
 			'priority' => $row['priority'],
+			'private' => $row['private'],
 			'message_id' => $row['message_id'],
 		);
 	}
@@ -1128,14 +1133,16 @@ function emailsInfo($number)
 }
 
 /**
- * Send a group of emails from the mail queue.
+ * Sends a group of emails from the mail queue.
+ * Allows a batch of emails to be released every 5 to 10 seconds (based on per period limits)
+ * If batch size is not set, will determine a size such that it sends in 1/2 the period (buffer)
  *
- * @param mixed $number = false the number to send each loop through
+ * @param mixed $batch_size = false the number to send each loop
  * @param boolean $override_limit = false bypassing our limit flaf
  * @param boolean $force_send = false
  * @return boolean
  */
-function reduceMailQueue($number = false, $override_limit = false, $force_send = false)
+function reduceMailQueue($batch_size = false, $override_limit = false, $force_send = false)
 {
 	global $modSettings, $context, $webmaster_email, $scripturl;
 
@@ -1143,9 +1150,24 @@ function reduceMailQueue($number = false, $override_limit = false, $force_send =
 	if (!empty($modSettings['mail_queue_use_cron']) && empty($force_send))
 		return false;
 
-	// By default send 5 at once.
-	if (!$number)
-		$number = empty($modSettings['mail_quantity']) ? 5 : $modSettings['mail_quantity'];
+	// How many emails can we send each time we are called in a period
+	if (!$batch_size)
+	{
+		// Batch size has been set in the ACP, use it
+		if (!empty($modSettings['mail_batch_size']))
+			$batch_size = $modSettings['mail_batch_size'];
+		// No per period setting or batch size, set to send 5 every 5 seconds, or 60 per minute
+		elseif (empty($modSettings['mail_period_limit']))
+			$batch_size = 5;
+		// A per period limit but no defined batch size, set a batch size
+		else
+		{
+			// Based on the number of times we will potentially be called each minute
+			$delay = !empty($modSettings['mail_queue_delay']) ? $modSettings['mail_queue_delay'] : (!empty($modSettings['mail_period_limit']) && $modSettings['mail_period_limit'] <= 5 ? 10 : 5);
+			$batch_size = ceil($modSettings['mail_period_limit'] / ceil(60 / $delay));
+			$batch_size = ($batch_size == 1 && $modSettings['mail_period_limit'] > 1) ? 2 : $batch_size;
+		}
+	}
 
 	// If we came with a timestamp, and that doesn't match the next event, then someone else has beaten us.
 	if (isset($_GET['ts']) && $_GET['ts'] != $modSettings['mail_next_send'] && empty($force_send))
@@ -1154,32 +1176,40 @@ function reduceMailQueue($number = false, $override_limit = false, $force_send =
 	// Prepare to send each email, and log that for future proof.
 	require_once(SUBSDIR . '/Maillist.subs.php');
 
-	// By default move the next sending on by 10 seconds, and require an affected row.
+	// Set the delay for the next sending
 	if (!$override_limit)
 	{
-		// Update next send time for our mails queue, if there was something to update. Otherwise bail out :P
+		// Update next send time for our mail queue, if there was something to update. Otherwise bail out :P
 		$delay = updateNextSendTime();
-		if ($delay !== false)
+		if ($delay === false)
 			return false;
+
 		$modSettings['mail_next_send'] = time() + $delay;
 	}
 
-	// If we're not overriding how many are we allow to send?
-	if (!$override_limit && !empty($modSettings['mail_limit']))
+	// If we're not overriding, do we have quota left in this mail period limit?
+	if (!$override_limit && !empty($modSettings['mail_period_limit']))
 	{
-		// See if we have quota left to send another group this minute or if we have to wait
-		list ($mail_time, $mail_number) = @explode('|', $modSettings['mail_recent']);
+		// See if we have quota left to send another batch_size this minute or if we have to wait
+		list ($mail_time, $mail_number) = isset($modSettings['mail_recent']) ? explode('|', $modSettings['mail_recent']) : array(0, 0);
 
 		// Nothing worth noting...
 		if (empty($mail_number) || $mail_time < time() - 60)
 		{
 			$mail_time = time();
-			$mail_number = $number;
+			$mail_number = $batch_size;
 		}
-		// Otherwise we have a few more we can spend?
-		elseif ($mail_number < $modSettings['mail_limit'])
+		// Otherwise we may still have quota to send a few more?
+		elseif ($mail_number < $modSettings['mail_period_limit'])
 		{
-			$mail_number += $number;
+			// If this is likely one of the last cycles for this period, then send any remaining quota
+			if (($mail_time - (time() - 60)) < $delay * 2)
+				$batch_size = $modSettings['mail_period_limit'] - $mail_number;
+			// Some batch sizes may need to be adusted to fit as we approach the end
+			elseif ($mail_number + $batch_size > $modSettings['mail_period_limit'])
+				$batch_size = $modSettings['mail_period_limit'] - $mail_number;
+
+			$mail_number += $batch_size;
 		}
 		// No more I'm afraid, return!
 		else
@@ -1190,14 +1220,14 @@ function reduceMailQueue($number = false, $override_limit = false, $force_send =
 	}
 
 	// Now we know how many we're sending, let's send them.
-	list ($ids, $emails) = emailsInfo($number);
+	list ($ids, $emails) = emailsInfo($batch_size);
 
 	// Delete, delete, delete!!!
 	if (!empty($ids))
 		deleteMailQueueItems($ids);
 
-	// Don't believe we have any left?
-	if (count($ids) < $number)
+	// Don't believe we have any left after this batch?
+	if (count($ids) < $batch_size)
 		resetNextSendTime();
 
 	if (empty($ids))
@@ -1219,11 +1249,13 @@ function reduceMailQueue($number = false, $override_limit = false, $force_send =
 		if ($use_sendmail)
 		{
 			$email['subject'] = strtr($email['subject'], array("\r" => '', "\n" => ''));
+
 			if (!empty($modSettings['mail_strip_carriage']))
 			{
 				$email['body'] = strtr($email['body'], array("\r" => ''));
 				$email['headers'] = strtr($email['headers'], array("\r" => ''));
 			}
+
 			$need_break = substr($email['headers'], -1) === "\n" || substr($email['headers'], -1) === "\r" ? false : true;
 
 			// Create our unique reply to email header, priority 3 and below only (4 = digest, 5 = newsletter)
@@ -1242,11 +1274,11 @@ function reduceMailQueue($number = false, $override_limit = false, $force_send =
 			// No point logging a specific error here, as we have no language. PHP error is helpful anyway...
 			$result = mail(strtr($email['to'], array("\r" => '', "\n" => '')), $email['subject'], $email['body'], $email['headers'] . $unq_id);
 
-			// if it sent, keep a record so we can save it in our allowed to reply log
+			// If it sent, keep a record so we can save it in our allowed to reply log
 			if (!empty($unq_head) && $result)
 				$sent[] = array($unq_head, time(), $email['to']);
 
-			// track total emails sent
+			// Track total emails sent
 			if ($result && !empty($modSettings['trackStats']))
 				trackStats(array('email' => '+'));
 
@@ -1260,7 +1292,7 @@ function reduceMailQueue($number = false, $override_limit = false, $force_send =
 
 		// Hopefully it sent?
 		if (!$result)
-			$failed_emails[] = array(time(), $email['to'], $email['body'], $email['subject'], $email['headers'], $email['send_html'], $email['priority'], $email['message_id']);
+			$failed_emails[] = array(time(), $email['to'], $email['body'], $email['subject'], $email['headers'], $email['send_html'], $email['priority'], $email['private'], $email['message_id']);
 	}
 
 	// Clear out the stat cache.
@@ -1273,7 +1305,8 @@ function reduceMailQueue($number = false, $override_limit = false, $force_send =
 	// Any emails that didn't send?
 	if (!empty($failed_emails))
 	{
-		updateFailedEmails($failed_emails);
+		// If it failed, add it back to the queue
+		updateFailedQueue($failed_emails);
 		return false;
 	}
 	// We were able to send the email, clear our failed attempts.
@@ -1315,4 +1348,40 @@ function posterDetails($id_msg, $topic_id)
 	$db->free_result($request);
 
 	return $message;
+}
+
+/**
+ * Little utility function to calculate how long ago a time was.
+ *
+ * @param long $time_diff
+ * @return string
+ */
+function time_since($time_diff)
+{
+	global $txt;
+
+	if ($time_diff < 0)
+		$time_diff = 0;
+
+	// Just do a bit of an if fest...
+	if ($time_diff > 86400)
+	{
+		$days = round($time_diff / 86400, 1);
+		return sprintf($days == 1 ? $txt['mq_day'] : $txt['mq_days'], $time_diff / 86400);
+	}
+	// Hours?
+	elseif ($time_diff > 3600)
+	{
+		$hours = round($time_diff / 3600, 1);
+		return sprintf($hours == 1 ? $txt['mq_hour'] : $txt['mq_hours'], $hours);
+	}
+	// Minutes?
+	elseif ($time_diff > 60)
+	{
+		$minutes = (int) ($time_diff / 60);
+		return sprintf($minutes == 1 ? $txt['mq_minute'] : $txt['mq_minutes'], $minutes);
+	}
+	// Otherwise must be second
+	else
+		return sprintf($time_diff == 1 ? $txt['mq_second'] : $txt['mq_seconds'], $time_diff);
 }

@@ -96,7 +96,7 @@ class ManageMail_Controller extends Action_Controller
 		// Fetch the number of items in the current queue
 		$status = list_MailQueueStatus();
 
-		$context['oldest_mail'] = empty($status['mailOldest']) ? $txt['mailqueue_oldest_not_available'] : $this->_time_since(time() - $status['mailOldest']);
+		$context['oldest_mail'] = empty($status['mailOldest']) ? $txt['mailqueue_oldest_not_available'] : time_since(time() - $status['mailOldest']);
 		$context['mail_queue_size'] = comma_format($status['mailQueueSize']);
 
 		// Build our display list
@@ -175,7 +175,7 @@ class ManageMail_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							return $this->_time_since(time() - $rowData[\'time_sent\']);
+							return time_since(time() - $rowData[\'time_sent\']);
 						'),
 						'class' => 'smalltext',
 					),
@@ -225,7 +225,7 @@ class ManageMail_Controller extends Action_Controller
 		global $txt, $scripturl, $context, $txtBirthdayEmails;
 
 		// Some important context stuff
-		$context['page_title'] = $txt['calendar_settings'];
+		$context['page_title'] = $txt['mail_settings'];
 		$context['sub_template'] = 'show_settings';
 
 		// Initialize the form
@@ -258,6 +258,10 @@ class ManageMail_Controller extends Action_Controller
 			// We don't want to save the subject and body previews.
 			unset($config_vars['birthday_subject'], $config_vars['birthday_body']);
 			call_integration_hook('integrate_save_mail_settings');
+
+			// You can not send more per page load than you can per minute
+			if (!empty($_POST['mail_batch_size']))
+				 $_POST['mail_batch_size'] = min((int) $_POST['mail_batch_size'], (int) $_POST['mail_period_limit']);
 
 			Settings_Form::save_db($config_vars);
 			redirectexit('action=admin;area=mailqueue;sa=settings');
@@ -336,8 +340,8 @@ class ManageMail_Controller extends Action_Controller
 		$config_vars = array(
 				// Mail queue stuff, this rocks ;)
 				array('check', 'mail_queue'),
-				array('int', 'mail_limit'),
-				array('int', 'mail_quantity'),
+				array('int', 'mail_period_limit'),
+				array('int', 'mail_batch_size'),
 			'',
 				// SMTP stuff.
 				array('select', 'mail_type', array($txt['mail_type_default'], 'SMTP')),
@@ -364,13 +368,21 @@ class ManageMail_Controller extends Action_Controller
 
 	/**
 	 * This function clears the mail queue of all emails, and at the end redirects to browse.
+	 *
+	 * Note force clearing the queue may cause a site to exceed hosting mail limit quotas
+	 * Some hosts simple loose these excess emails, others queue them server side, up to a limit
 	 */
 	public function action_clear()
 	{
+		global $modSettings;
+
 		checkSession('get');
 
 		// This is certainly needed!
 		require_once(SUBSDIR . '/Mail.subs.php');
+
+		// Set a number to send each loop
+		$number_to_send = empty($modSettings['mail_period_limit']) ? 25 : $modSettings['mail_period_limit'];
 
 		// If we don't yet have the total to clear, find it.
 		$all_emails = isset($_GET['te']) ? (int) $_GET['te'] : list_getMailQueueSize();
@@ -378,11 +390,11 @@ class ManageMail_Controller extends Action_Controller
 		// If we don't know how many we sent, it must be because... we didn't send any!
 		$sent_emails = isset($_GET['sent']) ? (int) $_GET['sent'] : 0;
 
-		// Send 50 at a time, then go for a break...
-		while (reduceMailQueue(50, true, true) === true)
+		// Send this batch, then go for a short break...
+		while (reduceMailQueue($number_to_send, true, true) === true)
 		{
-			// Sent another 50.
-			$sent_emails += 50;
+			// Sent another batch
+			$sent_emails += $number_to_send;
 			$this->_pauseMailQueueClear($all_emails, $sent_emails);
 		}
 
@@ -411,7 +423,7 @@ class ManageMail_Controller extends Action_Controller
 		$context['continue_get_data'] = '?action=admin;area=mailqueue;sa=clear;te=' . $all_emails . ';sent=' . $sent_emails . ';' . $context['session_var'] . '=' . $context['session_id'];
 		$context['page_title'] = $txt['not_done_title'];
 		$context['continue_post_data'] = '';
-		$context['continue_countdown'] = '2';
+		$context['continue_countdown'] = '10';
 		$context['sub_template'] = 'not_done';
 
 		// Keep browse selected.
@@ -424,41 +436,5 @@ class ManageMail_Controller extends Action_Controller
 		$context['continue_percent'] = min($context['continue_percent'], 100);
 
 		obExit();
-	}
-
-	/**
-	* Little utility function to calculate how long ago a time was.
-	*
-	* @param long $time_diff
-	* @return string
-	*/
-	private function _time_since($time_diff)
-	{
-		global $txt;
-
-		if ($time_diff < 0)
-			$time_diff = 0;
-
-		// Just do a bit of an if fest...
-		if ($time_diff > 86400)
-		{
-			$days = round($time_diff / 86400, 1);
-			return sprintf($days == 1 ? $txt['mq_day'] : $txt['mq_days'], $time_diff / 86400);
-		}
-		// Hours?
-		elseif ($time_diff > 3600)
-		{
-			$hours = round($time_diff / 3600, 1);
-			return sprintf($hours == 1 ? $txt['mq_hour'] : $txt['mq_hours'], $hours);
-		}
-		// Minutes?
-		elseif ($time_diff > 60)
-		{
-			$minutes = (int) ($time_diff / 60);
-			return sprintf($minutes == 1 ? $txt['mq_minute'] : $txt['mq_minutes'], $minutes);
-		}
-		// Otherwise must be second
-		else
-			return sprintf($time_diff == 1 ? $txt['mq_second'] : $txt['mq_seconds'], $time_diff);
 	}
 }
