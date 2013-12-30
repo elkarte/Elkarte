@@ -4,8 +4,7 @@
 
 function bb2_screener_cookie($settings, $package, $cookie_name, $cookie_value)
 {
-	// FIXME: Set the real cookie
-    if ($settings['eu_cookie']) {
+	if ($settings['eu_cookie']) {
 		// Delete existing cookie, if any
 		setcookie($cookie_name, $cookie_value, 1, bb2_relative_path());
 	} else {
