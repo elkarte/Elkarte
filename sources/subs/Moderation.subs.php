@@ -275,7 +275,7 @@ function loadModeratorMenuCounts($brd = null)
 		// Attachments
 		if ($modSettings['postmod_active'] && !empty($approve_boards))
 		{
-			require_once(SUBSDIR . '/Attachments.subs.php');
+			require_once(SUBSDIR . '/ManageAttachments.subs.php');
 			$menu_errors[$cache_key]['attachments'] = list_getNumUnapprovedAttachments($approve_query);
 		}
 
@@ -852,7 +852,7 @@ function approveAllUnapproved()
 
 	if (!empty($attaches))
 	{
-		require_once(SUBSDIR . '/Attachments.subs.php');
+		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 		approveAttachments($attaches);
 		cache_put_data('num_menu_errors', null, 900);
 	}

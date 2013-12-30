@@ -1271,7 +1271,7 @@ class ScheduledTask
 		global $context, $txt;
 
 		// We need to know where this thing is going.
-		require_once(SUBSDIR . '/Attachments.subs.php');
+		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 		$attach_dirs = attachmentPaths();
 
 		foreach ($attach_dirs as $attach_dir)

@@ -338,7 +338,7 @@ class PostModeration_Controller extends Action_Controller
 			checkSession('request');
 
 			// This will be handy.
-			require_once(SUBSDIR . '/Attachments.subs.php');
+			require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 			// Confirm the attachments are eligible for changing!
 			$attachments = validateAttachments($attachments, $approve_query);
@@ -356,7 +356,7 @@ class PostModeration_Controller extends Action_Controller
 		}
 
 		require_once(SUBSDIR . '/List.class.php');
-		require_once(SUBSDIR . '/Attachments.subs.php');
+		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		$listOptions = array(
 			'id' => 'mc_unapproved_attach',

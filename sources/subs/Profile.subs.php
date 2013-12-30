@@ -2027,6 +2027,7 @@ function profileSaveAvatarData(&$value)
 
 	// We need to know where we're going to be putting it..
 	require_once(SUBSDIR . '/Attachments.subs.php');
+	require_once(SUBSDIR . '/ManageAttachments.subs.php');
 	$uploadDir = getAvatarPath();
 	$id_folder = getAvatarPathID();
 

@@ -256,7 +256,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	}
 
 	// Get rid of the attachment(s).
-	require_once(SUBSDIR . '/Attachments.subs.php');
+	require_once(SUBSDIR . '/ManageAttachments.subs.php');
 	$attachmentQuery = array(
 		'attachment_type' => 0,
 		'id_topic' => $topics,
