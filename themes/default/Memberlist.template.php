@@ -12,8 +12,12 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
+/**
+ * Memberlist search form
+ */
 function template_mlsearch_above()
 {
 	global $context, $scripturl, $txt;
@@ -59,8 +63,8 @@ function template_mlsearch_above()
 			$(\'#mlsearch_options\').slideToggle(\'fast\');
 		}
 	// ]]></script>';
-
 }
+
 /**
  * Displays a sortable listing of all members registered on the forum.
  */
@@ -123,6 +127,7 @@ function template_memberlist()
 
 				$alternate = true;
 			}
+
 			echo '
 				<tr class="', $alternate ? 'alternate_' : 'standard_', 'row">';
 
@@ -151,7 +156,7 @@ function template_memberlist()
 				// Any custom fields on display?
 				elseif (!empty($context['custom_profile_fields']['columns']) && isset($context['custom_profile_fields']['columns'][$column]))
 				{
-						echo '
+					echo '
 							<td>', $member['options'][substr($column, 5)], '</td>';
 				}
 			}
@@ -174,6 +179,9 @@ function template_memberlist()
 		</table>';
 }
 
+/**
+ * Shows the search again button to allow editing the parameters
+ */
 function template_mlsearch_below()
 {
 	global $context, $scripturl, $txt;

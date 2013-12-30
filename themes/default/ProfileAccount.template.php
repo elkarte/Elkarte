@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -159,17 +160,19 @@ function template_issueWarning()
 						<strong><label for="warn_temp">', $txt['profile_warning_notify_body'], ':</label></strong>
 					</dt>
 					<dd>
-						<select name="warn_temp" id="warn_temp" disabled="disabled" onchange="populateNotifyTemplate();" style="font-size: x-small;">
-							<option value="-1">', $txt['profile_warning_notify_template'], '</option>
-							<option value="-1">------------------------------</option>';
+						<div class="padding">
+							<select name="warn_temp" id="warn_temp" disabled="disabled" onchange="populateNotifyTemplate();">
+								<option value="-1">', $txt['profile_warning_notify_template'], '</option>
+								<option value="-1" disabled="disabled">', str_repeat('&#8212;', strlen($txt['profile_warning_notify_template'])), '</option>';
 
 		foreach ($context['notification_templates'] as $id_template => $template)
 			echo '
-							<option value="', $id_template, '">', $template['title'], '</option>';
+								<option value="', $id_template, '">&#10148;&nbsp;', $template['title'], '</option>';
 
 		echo '
-						</select>
-						<span class="smalltext" id="new_template_link" style="display: none;">[<a href="', $scripturl, '?action=moderate;area=warnings;sa=templateedit;tid=0" target="_blank" class="new_win">', $txt['profile_warning_new_template'], '</a>]</span><br />
+							</select>
+							<span id="new_template_link" style="display: none;"><a class="linkbutton" href="', $scripturl, '?action=moderate;area=warnings;sa=templateedit;tid=0" target="_blank" class="new_win">', $txt['profile_warning_new_template'], '</a></span>
+						</div>
 						<textarea name="warn_body" id="warn_body" cols="40" rows="8" style="min-width: 50%; max-width: 99%;">', $context['warning_data']['notify_body'], '</textarea>
 					</dd>';
 	}
@@ -330,6 +333,7 @@ function template_deleteAccount()
 						<input type="hidden" name="sa" value="', $context['menu_item_selected'], '" />
 					</div>';
 	}
+
 	echo '
 				</div>
 			</div>

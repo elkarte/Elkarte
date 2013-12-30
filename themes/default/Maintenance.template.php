@@ -14,6 +14,9 @@
  * @version 1.0 Beta
  */
 
+/**
+ * Start things off with some generic templates we can use
+ */
 function template_Maintenance_init()
 {
 	loadTemplate('GenericHelpers');

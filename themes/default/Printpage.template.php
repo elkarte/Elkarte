@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -111,7 +112,7 @@ function template_print_above()
 	<body>
 		<div class="print_options">';
 
-	// which option is set, text or text&images
+	// Which option is set, text or text&images
 	if (isset($_REQUEST['images']))
 		echo '
 			<a href="', $url_text, '">', $txt['print_page_text'], '</a> | <strong><a href="', $url_images, '">', $txt['print_page_images'], '</a></strong>';

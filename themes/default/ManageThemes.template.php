@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -56,7 +57,7 @@ function template_manage_themes()
 											<label for="options-known_themes_', $theme['id'], '"><input type="checkbox" name="options[known_themes][]" id="options-known_themes_', $theme['id'], '" value="', $theme['id'], '"', $theme['known'] ? ' checked="checked"' : '', ' class="input_check" /> ', $theme['name'], '</label>
 										</li>';
 
-		echo '
+	echo '
 									</ul>
 								</fieldset>
 							</dd>
@@ -101,7 +102,6 @@ function template_manage_themes()
 			</form>';
 
 	// Warn them if theme creation isn't possible!
-	// @todo move to a proper error box somewhere?
 	if (!$context['can_create_new'])
 		echo '
 			<div class="errorbox">', $txt['theme_install_writable'], '</div>';
@@ -116,7 +116,6 @@ function template_manage_themes()
 						<dl class="settings">';
 
 	// Here's a little box for installing a new theme.
-	// @todo Should the value="theme_gz" be there?!
 	if ($context['can_create_new'])
 		echo '
 							<dt>
@@ -181,12 +180,12 @@ function template_list_themes()
 				<h3 class="category_header">
 					', $theme['name'], '', !empty($theme['version']) ? ' <em>(' . $theme['version'] . ')</em>' : '';
 
-			// You *cannot* delete the default theme. It's important!
-			if ($theme['id'] != 1)
-				echo '
+		// You *cannot* delete the default theme. It's important!
+		if ($theme['id'] != 1)
+			echo '
 					<span class="floatright"><a class="delete_theme" data-theme_id="', $theme['id'], '" href="', $scripturl, '?action=admin;area=theme;sa=remove;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';', $context['admin-tr_token_var'], '=', $context['admin-tr_token'], '"><img src="', $settings['images_url'], '/icons/delete.png" alt="', $txt['theme_remove'], '" title="', $txt['theme_remove'], '" /></a></span>';
 
-			echo '
+		echo '
 				</h3>
 			</div>
 			<div class="theme_', $theme['id'], ' windowbg">
@@ -305,7 +304,7 @@ function template_reset_list()
 
 		echo '
 			<h3 class="secondary_header">', $theme['name'], '</h3>
-			<div class="windowbg', $alternate ? '' : '2','">
+			<div class="windowbg', $alternate ? '' : '2', '">
 				<div class="content">
 					<ul>
 						<li>
@@ -362,7 +361,7 @@ function template_set_options()
 								<option value="2">', $txt['themeadmin_reset_options_default'], '</option>
 							</select>&nbsp;</span>';
 
-		// display checkbox options
+		// Display checkbox options
 		if ($setting['type'] == 'checkbox')
 		{
 			echo '
@@ -377,7 +376,7 @@ function template_set_options()
 							<input type="hidden" name="' . (!empty($setting['default']) ? 'default_' : '') . 'options[' . $setting['id'] . ']" value="0" />
 							<input type="checkbox" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="options_', $setting['id'], '"', !empty($setting['value']) ? ' checked="checked"' : '', $context['theme_options_reset'] ? ' disabled="disabled"' : '', ' value="1" class="input_check floatleft" />';
 		}
-		// how about selection lists, we all love them
+		// How about selection lists, we all love them
 		elseif ($setting['type'] == 'list')
 		{
 			echo '
@@ -415,12 +414,12 @@ function template_set_options()
 							<input type="text" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="options_', $setting['id'], '" value="', $setting['value'], '"', $setting['type'] == 'number' ? ' size="5"' : '', $context['theme_options_reset'] ? ' disabled="disabled"' : '', ' class="input_text" />';
 		}
 
-		// end of this defintion
+		// End of this defintion
 		echo '
 						</dd>';
 	}
 
-	// close the option page up
+	// Close the option page up
 	echo '
 					</dl>
 					<input type="submit" name="submit" value="', $txt['save'], '" class="right_submit" />
@@ -727,29 +726,30 @@ function template_pick()
 		{
 			echo '
 			<script><!-- // --><![CDATA[
-			var sBaseUseUrl', $theme['id'], ' = elk_prepareScriptUrl(elk_scripturl) + \'action=theme;sa=pick;u=', $context['current_member'], ';th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], '\',
-				sBasePreviewUrl', $theme['id'], ' = elk_prepareScriptUrl(elk_scripturl) + \'action=theme;sa=pick;u=', $context['current_member'], ';theme=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], '\',
-				oThumbnails', $theme['id'], ' = {';
+				var sBaseUseUrl', $theme['id'], ' = elk_prepareScriptUrl(elk_scripturl) + \'action=theme;sa=pick;u=', $context['current_member'], ';th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], '\',
+					sBasePreviewUrl', $theme['id'], ' = elk_prepareScriptUrl(elk_scripturl) + \'action=theme;sa=pick;u=', $context['current_member'], ';theme=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], '\',
+					oThumbnails', $theme['id'], ' = {';
 
 			// All the variant thumbnails.
 			$count = 1;
 			foreach ($theme['variants'] as $key => $variant)
 			{
 				echo '
-				\'', $key, '\': \'', $variant['thumbnail'], '\'', (count($theme['variants']) == $count ? '' : ',');
+					\'', $key, '\': \'', $variant['thumbnail'], '\'', (count($theme['variants']) == $count ? '' : ',');
+
 				$count++;
 			}
 
 			echo '
-			};
+				};
 
-			function changeVariant', $theme['id'], '(sVariant)
-			{
-				document.getElementById(\'theme_thumb_', $theme['id'], '\').src = oThumbnails', $theme['id'], '[sVariant];
-				document.getElementById(\'theme_use_', $theme['id'], '\').href = sBaseUseUrl', $theme['id'] == 0 ? $context['default_theme_id'] : $theme['id'], ' + \';vrt=\' + sVariant;
-				document.getElementById(\'theme_thumb_preview_', $theme['id'], '\').href = sBasePreviewUrl', $theme['id'], ' + \';vrt=\' + sVariant + \';variant=\' + sVariant;
-				document.getElementById(\'theme_preview_', $theme['id'], '\').href = sBasePreviewUrl', $theme['id'], ' + \';vrt=\' + sVariant + \';variant=\' + sVariant;
-			}
+				function changeVariant', $theme['id'], '(sVariant)
+				{
+					document.getElementById(\'theme_thumb_', $theme['id'], '\').src = oThumbnails', $theme['id'], '[sVariant];
+					document.getElementById(\'theme_use_', $theme['id'], '\').href = sBaseUseUrl', $theme['id'] == 0 ? $context['default_theme_id'] : $theme['id'], ' + \';vrt=\' + sVariant;
+					document.getElementById(\'theme_thumb_preview_', $theme['id'], '\').href = sBasePreviewUrl', $theme['id'], ' + \';vrt=\' + sVariant + \';variant=\' + sVariant;
+					document.getElementById(\'theme_preview_', $theme['id'], '\').href = sBasePreviewUrl', $theme['id'], ' + \';vrt=\' + sVariant + \';variant=\' + sVariant;
+				}
 			// ]]></script>';
 		}
 	}
@@ -806,7 +806,7 @@ function template_themelist()
 			<a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=browse">', $theme['name'], '</a>', !empty($theme['version']) ? '
 			<em>(' . $theme['version'] . ')</em>' : '', '
 		</h3>
-		<div class="windowbg', $alternate ? '' : '2','">
+		<div class="windowbg', $alternate ? '' : '2', '">
 			<div class="content">
 				<ul>
 					<li><a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=browse">', $txt['themeadmin_edit_browse'], '</a></li>', $theme['can_edit_style'] ? '
@@ -1115,7 +1115,7 @@ function template_edit_template()
 		echo '
 					<label for="on_line', $part['line'], '">', $txt['themeadmin_edit_on_line'], ' ', $part['line'], '</label>:<br />
 					<div class="centertext">
-						<textarea id="on_line', $part['line'] ,'" name="entire_file[]" cols="80" rows="', $part['lines'] > 14 ? '14' : $part['lines'], '" class="edit_file">', $part['data'], '</textarea>
+						<textarea id="on_line', $part['line'], '" name="entire_file[]" cols="80" rows="', $part['lines'] > 14 ? '14' : $part['lines'], '" class="edit_file">', $part['data'], '</textarea>
 					</div>';
 
 	echo '
@@ -1175,7 +1175,6 @@ function template_edit_file()
 	echo '
 				</div>
 			</div>
-
 		</form>
 	</div>';
 }

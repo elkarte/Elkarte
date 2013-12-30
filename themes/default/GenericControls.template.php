@@ -12,10 +12,15 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
  * This function displays all the stuff you get with a richedit box - BBC, smileys etc.
+ *
+ * @param string $editor_id
+ * @param boolean $smileyContainer show the smiley container
+ * @param boolean $bbcContainer show the bbc container
  */
 function template_control_richedit($editor_id, $smileyContainer = null, $bbcContainer = null)
 {
@@ -28,7 +33,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 		<input type="hidden" name="', $editor_id, '_mode" id="', $editor_id, '_mode" value="0" />
 		<script><!-- // --><![CDATA[
 			$(document).ready(function(){',
-			!empty($context['bbcodes_handlers']) ? $context['bbcodes_handlers'] : '', '
+				!empty($context['bbcodes_handlers']) ? $context['bbcodes_handlers'] : '', '
 				$("#', $editor_id, '").sceditor({
 					style: "', $settings['default_theme_url'], '/css/jquery.sceditor.default.css",
 					width: "100%",
@@ -60,82 +65,79 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 						quoteType: $.sceditor.BBCodeParser.QuoteType.auto
 					}';
 
-		// Show the smileys.
-		if ((!empty($context['smileys']['postform']) || !empty($context['smileys']['popup'])) && !$editor_context['disable_smiley_box'] && $smileyContainer !== null)
-		{
-			echo ',
+	// Show the smileys.
+	if ((!empty($context['smileys']['postform']) || !empty($context['smileys']['popup'])) && !$editor_context['disable_smiley_box'] && $smileyContainer !== null)
+	{
+		echo ',
 					emoticons:
 					{';
-			$countLocations = count($context['smileys']);
-			foreach ($context['smileys'] as $location => $smileyRows)
-			{
-				$countLocations--;
-				if ($location === 'postform')
-					echo '
+		$countLocations = count($context['smileys']);
+		foreach ($context['smileys'] as $location => $smileyRows)
+		{
+			$countLocations--;
+			if ($location === 'postform')
+				echo '
 						dropdown:
 						{';
-				elseif ($location === 'popup')
-					echo '
+			elseif ($location === 'popup')
+				echo '
 						popup:
 						{';
 
-				$numRows = count($smileyRows);
+			$numRows = count($smileyRows);
 
-				// This is needed because otherwise the editor will remove all the duplicate (empty) keys and leave only 1 additional line
-				$emptyPlaceholder = 0;
-				foreach ($smileyRows as $smileyRow)
+			// This is needed because otherwise the editor will remove all the duplicate (empty) keys and leave only 1 additional line
+			$emptyPlaceholder = 0;
+			foreach ($smileyRows as $smileyRow)
+			{
+				foreach ($smileyRow['smileys'] as $smiley)
 				{
-					foreach ($smileyRow['smileys'] as $smiley)
-					{
-						echo '
+					echo '
 							', JavaScriptEscape($smiley['code']), ': {url: ', JavaScriptEscape($settings['smileys_url'] . '/' . $smiley['filename']), ', tooltip: ', JavaScriptEscape($smiley['description']), '}', empty($smiley['isLast']) ? ',' : '';
-					}
-
-					if (empty($smileyRow['isLast']) && $numRows !== 1)
-						echo ',
-						\'-', $emptyPlaceholder++, '\': \'\',';
 				}
 
-				echo '
-						}', $countLocations != 0 ? ',' : '';
+				if (empty($smileyRow['isLast']) && $numRows !== 1)
+					echo ',
+						\'-', $emptyPlaceholder++, '\': \'\',';
 			}
 
 			echo '
-					}';
+						}', $countLocations != 0 ? ',' : '';
 		}
-		else
-			echo ',
+
+		echo '
+					}';
+	}
+	else
+		echo ',
 					emoticons:
 					{}';
 
-		if ($context['show_bbc'] && $bbcContainer !== null)
-		{
-			echo ',
+	if ($context['show_bbc'] && $bbcContainer !== null)
+	{
+		echo ',
 					toolbar: "emoticon,';
-			$count_tags = count($context['bbc_tags']);
+		$count_tags = count($context['bbc_tags']);
 
-			// create the tooltag to display the buttons in the editor
-			foreach ($context['bbc_toolbar'] as $i => $buttonRow)
-			{
-				echo implode('|', $buttonRow);
-				$count_tags--;
-				if (!empty($count_tags))
-					echo '||';
-			}
-
-			echo '",';
+		// create the tooltag to display the buttons in the editor
+		foreach ($context['bbc_toolbar'] as $i => $buttonRow)
+		{
+			echo implode('|', $buttonRow);
+			$count_tags--;
+			if (!empty($count_tags))
+				echo '||';
 		}
-		else
-			echo ',
+
+		echo '",';
+	}
+	else
+		echo ',
 					toolbar: "emoticon,source",';
 
-		// @todo - Check width for editor. It overflows a little past where it should be.
-		// Should be able to fix with box-sizing or something. 100% should work for width.
-		echo '
+	echo '
 				});
 				$("#', $editor_id, '").data("sceditor").createPermanentDropDown();
-				$(".sceditor-container").width("100%").height("100%");',
-				$editor_context['rich_active'] ? '' : '
+				$(".sceditor-container").width("100%").height("100%");', $editor_context['rich_active'] ? '' : '
 				$("#' . $editor_id . '").data("sceditor").setTextMode();', '
 				if (!(is_ie || is_ff || is_opera || is_safari || is_chrome))
 					$(".sceditor-button-source").hide();
@@ -148,6 +150,8 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 
 /**
  * Shows the buttons that the user can see .. preview, spellchecker, drafts, etc
+ *
+ * @param string $editor_id
  */
 function template_control_richedit_buttons($editor_id)
 {

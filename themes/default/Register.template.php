@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -38,7 +39,7 @@ function template_registration_agreement()
 
 			foreach ($context['languages'] as $lang_key => $lang_val)
 				echo '
-					<option value="', $lang_key, '"', empty($lang_val['selected']) ? '' : ' selected="selected"', '>',  $lang_val['name'], '</option>';
+					<option value="', $lang_key, '"', empty($lang_val['selected']) ? '' : ' selected="selected"', '>', $lang_val['name'], '</option>';
 
 			echo '
 				</select>';
@@ -104,7 +105,7 @@ function template_registration_form()
 
 		// Cycle through each error and display an error message.
 		foreach ($context['registration_errors'] as $error)
-				echo '
+			echo '
 				<li>', $error, '</li>';
 
 		echo '
@@ -209,9 +210,9 @@ function template_registration_form()
 						</dt>
 						<dd>', preg_replace_callback('~<(input|select|textarea) ~', create_function('$matches', '
 							global $context;
+
 							return \'<\' . $matches[1] . \' tabindex="\' . $context[\'tabindex\']++ . \'"\';
-						')
-					, $field['input_html']), '</dd>';
+						'), $field['input_html']), '</dd>';
 
 				// Drop this one so we don't show the additonal information header unless needed
 				unset($context['custom_fields'][$key]);
@@ -780,7 +781,7 @@ function template_contact_form()
 
 	if ($context['require_verification'])
 	{
-			template_control_verification($context['visual_verification_id'], '
+		template_control_verification($context['visual_verification_id'], '
 					<dt>
 							' . $txt['verification'] . ':
 					</dt>

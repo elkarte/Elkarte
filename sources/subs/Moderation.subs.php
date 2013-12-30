@@ -1064,6 +1064,7 @@ function watchedUserPosts($start, $items_per_page, $sort, $approve_query, $delet
 			'poster_time' => standardTime($row['poster_time']),
 			'approved' => $row['approved'],
 			'can_delete' => $delete_boards == array(0) || in_array($row['id_board'], $delete_boards),
+			'counter' => ++$start,
 		);
 	}
 	$db->free_result($request);

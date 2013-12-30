@@ -727,11 +727,11 @@ class ManageMembers_Controller extends Action_Controller
 		// Create an option list for actions allowed to be done with selected members.
 		$allowed_actions = '
 				<option selected="selected" value="">' . $txt['admin_browse_with_selected'] . ':</option>
-				<option value="" disabled="disabled">-----------------------------</option>';
+				<option value="" disabled="disabled">' . str_repeat('&#8212;', strlen($txt['admin_browse_with_selected'])) . '</option>';
 
 		foreach ($context['allowed_actions'] as $key => $desc)
 			$allowed_actions .= '
-				<option value="' . $key . '">' . $desc . '</option>';
+				<option value="' . $key . '">&#10148;&nbsp;' . $desc . '</option>';
 
 		// Setup the Javascript function for selecting an action for the list.
 		$javascript = '
@@ -932,11 +932,13 @@ class ManageMembers_Controller extends Action_Controller
 				array(
 					'position' => 'below_table_data',
 					'value' => '
-						[<a href="' . $scripturl . '?action=admin;area=viewmembers;sa=browse;showdupes=' . ($context['show_duplicates'] ? 0 : 1) . ';type=' . $context['browse_type'] . (!empty($context['show_filter']) ? ';filter=' . $context['current_filter'] : '') . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . ($context['show_duplicates'] ? $txt['dont_check_for_duplicate'] : $txt['check_for_duplicate']) . '</a>]
+						<a class="linkbutton" href="' . $scripturl . '?action=admin;area=viewmembers;sa=browse;showdupes=' . ($context['show_duplicates'] ? 0 : 1) . ';type=' . $context['browse_type'] . (!empty($context['show_filter']) ? ';filter=' . $context['current_filter'] : '') . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . ($context['show_duplicates'] ? $txt['dont_check_for_duplicate'] : $txt['check_for_duplicate']) . '</a>
 						<select name="todo" onchange="onSelectChange();">
 							' . $allowed_actions . '
 						</select>
-						<noscript><input type="submit" value="' . $txt['go'] . '" class="right_submit" /><br class="clear_right" /></noscript>
+						<noscript>
+							<input type="submit" value="' . $txt['go'] . '" class="right_submit" /><br class="clear_right" />
+						</noscript>
 					',
 					'class' => 'floatright',
 				),

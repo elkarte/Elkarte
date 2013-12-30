@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -86,7 +87,7 @@ function template_manage_boards()
 			{
 				for ($i = $board['child_level']; $i < $depth; $i++)
 					echo
-						'
+					'
 								</li>
 							</ul>';
 			}
@@ -129,7 +130,7 @@ function template_manage_boards()
 			{
 				for ($i = $depth; $i > 0; $i--)
 					echo
-						'
+					'
 								</li>
 							</ul>';
 			}
@@ -318,7 +319,7 @@ function template_confirm_category_delete()
  */
 function template_modify_board()
 {
-	global $context, $settings, $scripturl, $txt, $modSettings;
+	global $context, $scripturl, $txt, $modSettings;
 
 	// The main table header.
 	echo '
@@ -677,6 +678,7 @@ function template_modify_board()
 	$js .= '
 			]
 		});';
+
 	addInlineJavascript($js, true);
 
 	// Javascript for deciding what to show.

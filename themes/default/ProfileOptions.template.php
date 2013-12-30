@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -110,7 +111,6 @@ function template_editBuddies()
 
 	echo '
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-
 			</div>
 		</div>
 	</form>';
@@ -209,7 +209,7 @@ function template_editIgnoreList()
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 			</div>
 		</div>
-	</form>',
+	</form>';
 
 	addInlineJavascript('
 		var oAddIgnoreSuggest = new smc_AutoSuggest({
@@ -219,7 +219,7 @@ function template_editIgnoreList()
 			sSuggestId: \'new_ignore\',
 			sControlId: \'new_ignore\',
 			sSearchType: \'member\',
-			sTextDeleteItem: \'' . $txt['autosuggest_delete_item'].  '\',
+			sTextDeleteItem: \'' . $txt['autosuggest_delete_item'] . '\',
 			bItemList: false
 		});', true);
 }
@@ -1512,16 +1512,16 @@ function template_authentication_method()
 	// The password stuff.
 	echo '
 	<script><!-- // --><![CDATA[
-	var regTextStrings = {
-		"password_short": "', $txt['registration_password_short'], '",
-		"password_reserved": "', $txt['registration_password_reserved'], '",
-		"password_numbercase": "', $txt['registration_password_numbercase'], '",
-		"password_no_match": "', $txt['registration_password_no_match'], '",
-		"password_valid": "', $txt['registration_password_valid'], '"
-	};
-	var verificationHandle = new elkRegister("creator", ', empty($modSettings['password_strength']) ? 0 : $modSettings['password_strength'], ', regTextStrings);
-	var currentAuthMethod = \'passwd\';
+		var regTextStrings = {
+			"password_short": "', $txt['registration_password_short'], '",
+			"password_reserved": "', $txt['registration_password_reserved'], '",
+			"password_numbercase": "', $txt['registration_password_numbercase'], '",
+			"password_no_match": "', $txt['registration_password_no_match'], '",
+			"password_valid": "', $txt['registration_password_valid'], '"
+		};
+		var verificationHandle = new elkRegister("creator", ', empty($modSettings['password_strength']) ? 0 : $modSettings['password_strength'], ', regTextStrings);
+		var currentAuthMethod = \'passwd\';
 
-	updateAuthMethod();
+		updateAuthMethod();
 	// ]]></script>';
 }

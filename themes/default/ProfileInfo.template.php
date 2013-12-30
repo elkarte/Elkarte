@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -299,7 +300,7 @@ function template_action_showPermissions()
 
 		if (!empty($context['boards']))
 			echo '
-							<option value="" disabled="disabled">---------------------------</option>';
+							<option value="" disabled="disabled">', str_repeat('&#8212;', strlen($txt['showPermissions_global'])), '</option>';
 
 		// Fill the box with any local permission boards.
 		foreach ($context['boards'] as $board)
@@ -853,7 +854,7 @@ function template_profile_block_contact()
 	// No way to contact this member at all ... welcome home freak!
 	if ($ci_empty === true)
 		echo
-			$txt['profile_contact_no'];
+		$txt['profile_contact_no'];
 
 	echo '
 			</div>
@@ -1185,7 +1186,7 @@ function template_profile_block_attachments()
 			echo '<td></td>';
 
 			if ($i % $per_line === 0)
-			echo '
+				echo '
 				</tr>';
 		}
 	}

@@ -2756,12 +2756,17 @@ function doSecurityChecks()
 		Template_Layers::getInstance()->addAfter('admin_warning', 'body');
 }
 
+/**
+ * Returns the current server load for nix systems
+ * Used to enable / disable features based on current system overhead
+ */
 function detectServerLoad()
 {
 	$load_average = @file_get_contents('/proc/loadavg');
-	if (!empty($modSettings['load_average']) && preg_match('~^([^ ]+?) ([^ ]+?) ([^ ]+)~', $modSettings['load_average'], $matches) != 0)
+
+	if (!empty($load_average) && preg_match('~^([^ ]+?) ([^ ]+?) ([^ ]+)~', $load_average, $matches) != 0)
 		return (float) $matches[1];
-	elseif (($modSettings['load_average'] = @`uptime`) != null && preg_match('~load average[s]?: (\d+\.\d+), (\d+\.\d+), (\d+\.\d+)~i', $modSettings['load_average'], $matches) != 0)
+	elseif (($load_average = @`uptime`) != null && preg_match('~load average[s]?: (\d+\.\d+), (\d+\.\d+), (\d+\.\d+)~i', $load_average, $matches) != 0)
 		return (float) $matches[1];
 
 	return false;

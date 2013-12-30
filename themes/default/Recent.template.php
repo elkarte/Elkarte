@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -19,17 +20,13 @@
  */
 function template_recent()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	template_pagesection();
 
 	echo '
-		<div id="recentposts" class="forumposts">';
-
-	echo '
-			<h3 class="category_header">
-				<img src="', $settings['images_url'], '/post/xx.png" alt="" class="icon" />', $txt['recent_posts'], '
-			</h3>';
+		<div id="recentposts" class="forumposts">
+			<h3 class="category_header hdicon cat_img_posts">', $txt['recent_posts'], '</h3>';
 
 	// @todo - I'm sure markup could be cleaned up a bit more here. CSS needs a bit of a tweak too.
 	foreach ($context['posts'] as $post)
@@ -276,7 +273,7 @@ function template_replies()
 		echo '
 										</ul>';
 
-			// Show a "select all" box for quick moderation?
+		// Show a "select all" box for quick moderation?
 		echo '
 									</li>
 								</ul>
@@ -310,7 +307,7 @@ function template_replies()
 									</p>
 									<div class="topic_name">';
 
-			// [WIP] MEthinks the orange icons look better if they aren't all over the page.
+			// The new icons look better if they aren't all over the page.
 			echo '
 										<a class="new_posts" href="', $topic['new_href'], '" id="newicon', $topic['first_post']['id'], '">' . $txt['new'] . '</a>
 										<h4>

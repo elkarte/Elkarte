@@ -1734,7 +1734,7 @@ function loadConversationList($head, &$recipients, $folder = '')
  * Returns array of keys with the head id and value details of the the newest
  * unread message.
  *
- * @param array $head array of head ids to search
+ * @param array $pms array of pm ids to search
  */
 function loadConversationUnreadStatus($pms)
 {

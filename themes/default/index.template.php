@@ -13,6 +13,9 @@
  *
  * @version 1.0 Beta
  *
+ */
+
+ /**
  * This template is, perhaps, the most important template in the theme. It
  * contains the main template layer that displays the header and footer of
  * the forum, namely with main_above and main_below. It also contains the
@@ -33,7 +36,6 @@
  *
  * The menu sub template should display all the relevant buttons the user
  * wants and or needs.
- *
  */
 
 /**
@@ -601,6 +603,8 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 
 /**
  * Show a box with an error message.
+ *
+ * @param string $error_id
  */
 function template_show_error($error_id)
 {
@@ -660,7 +664,6 @@ function template_pagesection($button_strip = false, $strip_direction = '', $opt
 {
 	global $context;
 
-
 	// Hmmm. I'm a tad wary of having floatleft here but anyway............
 	// @todo - Try using table-cell display here. Should do auto rtl support. Less markup, less css. :)
 	if (!empty($options['page_index_markup']))
@@ -712,7 +715,7 @@ function template_news_fader()
 			});
 			newsFaderStarted = true;
 		}';
-	
+
 	if ($settings['enable_news'] == 2 && empty($context['minmax_preferences']['upshrink']))
 		echo '
 		startNewsFader();';

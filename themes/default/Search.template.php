@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -81,8 +82,8 @@ function template_searchform()
 
 		echo '
 							</dd>
-							<dt class="righttext"><label for="searchtype">',
-								$txt['search_match'], ':</label>
+							<dt class="righttext"><label for="searchtype">
+								', $txt['search_match'], ':</label>
 							</dt>
 							<dd>
 								<select name="searchtype" id="searchtype">
@@ -90,14 +91,14 @@ function template_searchform()
 									<option value="2"', !empty($context['search_params']['searchtype']) ? ' selected="selected"' : '', '>', $txt['any_words'], '</option>
 								</select>
 							</dd>
-							<dt class="righttext"><label for="userspec">',
-								$txt['by_user'], ':</label>
+							<dt class="righttext"><label for="userspec">
+								', $txt['by_user'], ':</label>
 							</dt>
 							<dd>
 								<input id="userspec" type="text" name="userspec" value="', empty($context['search_params']['userspec']) ? '*' : $context['search_params']['userspec'], '" size="40" class="input_text" />
 							</dd>
-							<dt class="righttext"><label for="sort">',
-								$txt['search_order'], ':</label>
+							<dt class="righttext"><label for="sort">
+								', $txt['search_order'], ':</label>
 							</dt>
 							<dd>
 								<select id="sort" name="sort">
@@ -108,8 +109,8 @@ function template_searchform()
 									<option value="id_msg|asc">', $txt['search_orderby_old_first'], '</option>
 								</select>
 							</dd>
-							<dt class="righttext options">',
-								$txt['search_options'], ':
+							<dt class="righttext options">
+								', $txt['search_options'], ':
 							</dt>
 							<dd class="options">
 								<label for="show_complete">', $txt['search_show_complete_messages'], '
@@ -119,11 +120,11 @@ function template_searchform()
 									<input type="checkbox" name="subject_only" id="subject_only" value="1"', !empty($context['search_params']['subject_only']) ? ' checked="checked"' : '', ' class="input_check" />
 								</label>
 							</dd>
-							<dt class="righttext between">',
-								$txt['search_post_age'], ':
+							<dt class="righttext between">
+								', $txt['search_post_age'], ':
 							</dt>
-							<dd><label for="minage">',
-								$txt['search_between'], '</label><input type="text" name="minage" id="minage" value="', empty($context['search_params']['minage']) ? '0' : $context['search_params']['minage'], '" size="5" maxlength="4" class="input_text" />&nbsp;<label for="maxage">', $txt['search_and'], '&nbsp;</label><input type="text" name="maxage" id="maxage" value="', empty($context['search_params']['maxage']) ? '9999' : $context['search_params']['maxage'], '" size="5" maxlength="4" class="input_text" /> ', $txt['days_word'], '
+							<dd><label for="minage">
+								', $txt['search_between'], '</label><input type="text" name="minage" id="minage" value="', empty($context['search_params']['minage']) ? '0' : $context['search_params']['minage'], '" size="5" maxlength="4" class="input_text" />&nbsp;<label for="maxage">', $txt['search_and'], '&nbsp;</label><input type="text" name="maxage" id="maxage" value="', empty($context['search_params']['maxage']) ? '9999' : $context['search_params']['maxage'], '" size="5" maxlength="4" class="input_text" /> ', $txt['days_word'], '
 							</dd>';
 
 		// If we allow a simple form, show a link to get back to it
@@ -319,6 +320,7 @@ function template_results()
 								<input type="hidden" name="maxage" value="', !empty($context['search_params']['maxage']) ? $context['search_params']['maxage'] : '9999', '" />
 								<input type="hidden" name="sort" value="', !empty($context['search_params']['sort']) ? $context['search_params']['sort'] : 'relevance', '" />
 							</div>';
+
 		if (!empty($context['search_params']['brd']))
 			foreach ($context['search_params']['brd'] as $board_id)
 				echo '
@@ -348,17 +350,17 @@ function template_results()
 
 		echo '
 						</span>
-						', $txt['mlist_search_results'],':&nbsp;',$context['search_params']['search'], '
+						', $txt['mlist_search_results'], ':&nbsp;', $context['search_params']['search'], '
 					</h3>';
 
-		// was anything even found?
+		// Was anything even found?
 		if (!empty($context['topics']))
 			template_pagesection();
 		else
 			echo '
 					<div class="roundframe">', $txt['find_no_results'], '</div>';
 
-		// while we have results to show ...
+		// While we have results to show ...
 		$controller = $context['get_topics'][0];
 		while ($topic = $controller->{$context['get_topics'][1]}())
 		{
@@ -387,7 +389,7 @@ function template_results()
 								<div class="topic_details floatleft" style="width: 94%; border-bottom: 0px">
 									<div class="counter">', $message['counter'], '</div>
 									<h5>', $topic['board']['link'], ' / <a href="', $scripturl, '?topic=', $topic['id'], '.msg', $message['id'], '#msg', $message['id'], '">', $message['subject_highlighted'], '</a></h5>
-									<span class="smalltext">&#171;&nbsp;',$txt['by'],'&nbsp;<strong>', $message['member']['link'], '</strong>&nbsp;',$txt['on'],'&nbsp;<em>', $message['time'], '</em>&nbsp;&#187;</span>
+									<span class="smalltext">&#171;&nbsp;', $txt['by'], '&nbsp;<strong>', $message['member']['link'], '</strong>&nbsp;', $txt['on'], '&nbsp;<em>', $message['time'], '</em>&nbsp;&#187;</span>
 								</div>';
 
 				if (!empty($options['display_quick_mod']))
@@ -445,7 +447,7 @@ function template_results()
 					<div class="flow_auto">
 						<div class="floatleft">';
 
-							template_pagesection();
+			template_pagesection();
 
 			echo '
 						</div>';
@@ -456,12 +458,12 @@ function template_results()
 				echo '
 						<div class="additional_row floatright">
 							<select class="qaction" name="qaction"', $context['can_move'] ? ' onchange="this.form.move_to.disabled = (this.options[this.selectedIndex].value != \'move\');"' : '', '>
-								<option value="">--------</option>';
+								<option value="">&nbsp;</option>';
 
 				foreach ($context['qmod_actions'] as $qmod_action)
 					if ($context['can_' . $qmod_action])
 						echo '
-								<option value="' . $qmod_action . '">' . $txt['quick_mod_'  . $qmod_action] . '</option>';
+								<option value="' . $qmod_action . '">&#10148;&nbsp;' . $txt['quick_mod_' . $qmod_action] . '</option>';
 
 				echo '
 							</select>';
@@ -491,8 +493,9 @@ function template_results()
 	{
 		echo '
 				<h3 class="category_header hdicon cat_img_search">
-					', $txt['mlist_search_results'],':&nbsp;',$context['search_params']['search'], '
+					', $txt['mlist_search_results'], ':&nbsp;', $context['search_params']['search'], '
 				</h3>';
+
 		template_pagesection();
 
 		if (empty($context['topics']))

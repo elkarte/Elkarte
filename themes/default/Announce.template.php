@@ -12,10 +12,11 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ * 
  */
 
 /**
- * announce a topic
+ * Announce a topic
  */
 function template_announce()
 {
@@ -58,8 +59,7 @@ function template_announce()
 				<br class="clear_right" />
 			</div>
 		</form>
-	</div>
-	<br />';
+	</div>';
 }
 
 /**
@@ -94,10 +94,10 @@ function template_announcement_send()
 			</div>
 		</form>
 	</div>
-	<br />
 	<script><!-- // --><![CDATA[
 		var countdown = 2,
 			txt_message = "', $txt['announce_continue'], '";
+
 		doAutoSubmit();
 	// ]]></script>';
 }

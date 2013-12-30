@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -22,7 +23,7 @@ function template_servers()
 	global $context, $txt, $scripturl;
 
 	if (!empty($context['package_ftp']['error']))
-			echo '
+		echo '
 					<div class="errorbox">
 						<span class="tt">', $context['package_ftp']['error'], '</span>
 					</div>';
@@ -48,6 +49,7 @@ function template_servers()
 							<span class="package_server floatright"><a href="' . $scripturl . '?action=admin;area=packageservers;sa=remove;server=' . $server['id'] . ';', $context['session_var'], '=', $context['session_id'], '">[ ' . $txt['delete'] . ' ]</a></span>
 							<span class="package_server floatright"><a href="' . $scripturl . '?action=admin;area=packageservers;sa=browse;server=' . $server['id'] . '">[ ' . $txt['package_browse'] . ' ]</a></span>
 						</li>';
+
 	echo '
 					</ul>
 				</fieldset>
@@ -186,7 +188,7 @@ function template_package_list()
 				{
 					// 1. Some addon [ Download ].
 					echo '
-							<strong><img id="ps_img_', $i, '_pkg_', $id, '" src="', $settings['images_url'], '/selected_open.png" alt="*" style="display: none;" /> ', $package['can_install'] ? '<strong>' . $package['name'] . '</strong> <a href="' . $package['download']['href'] . '">[ ' . $txt['download'] . ' ]</a>': $package['name'];
+							<strong><img id="ps_img_', $i, '_pkg_', $id, '" src="', $settings['images_url'], '/selected_open.png" alt="*" style="display: none;" /> ', $package['can_install'] ? '<strong>' . $package['name'] . '</strong> <a href="' . $package['download']['href'] . '">[ ' . $txt['download'] . ' ]</a>' : $package['name'];
 
 					// Mark as installed and current?
 					if ($package['is_installed'] && !$package['is_newer'])
@@ -220,17 +222,19 @@ function template_package_list()
 								<li class="package_section"><div class="information">', $txt['package_description'], ':&nbsp; ', $package['description'], '</div></li>
 							</ul>';
 				}
+
 				$alt = !$alt;
 				echo '
 						</li>';
 			}
+
 			echo '
 					</', $context['list_type'], '>
 						</li>';
 		}
+
 		echo '
 				</ul>';
-
 	}
 
 	echo '
@@ -244,14 +248,14 @@ function template_package_list()
 	</div>';
 
 	// Now go through and turn off / collapse all the sections.
-		if (!empty($context['package_list']))
-		{
-			$section_count = count($context['package_list']);
-			echo '
+	if (!empty($context['package_list']))
+	{
+		$section_count = count($context['package_list']);
+		echo '
 			<script><!-- // --><![CDATA[';
-			foreach ($context['package_list'] as $section => $ps)
-			{
-				echo '
+		foreach ($context['package_list'] as $section => $ps)
+		{
+			echo '
 				var oPackageServerToggle_', $section, ' = new elk_Toggle({
 					bToggleEnabled: true,
 					bCurrentlyCollapsed: ', count($ps['items']) == 1 || $section_count == 1 ? 'false' : 'true', ',
@@ -269,10 +273,10 @@ function template_package_list()
 					]
 				});';
 
-				foreach ($ps['items'] as $id => $package)
-				{
-					if (!$package['is_text'] && !$package['is_line'] && !$package['is_remote'])
-						echo '
+			foreach ($ps['items'] as $id => $package)
+			{
+				if (!$package['is_text'] && !$package['is_line'] && !$package['is_remote'])
+					echo '
 				var oPackageToggle_', $section, '_pkg_', $id, ' = new elk_Toggle({
 					bToggleEnabled: true,
 					bCurrentlyCollapsed: true,
@@ -289,11 +293,11 @@ function template_package_list()
 						}
 					]
 				});';
-				}
 			}
-			echo '
-			// ]]></script>';
 		}
+		echo '
+			// ]]></script>';
+	}
 }
 
 /**
@@ -330,7 +334,7 @@ function template_upload()
 	global $context, $txt, $scripturl;
 
 	if (!empty($context['package_ftp']['error']))
-			echo '
+		echo '
 					<div class="errorbox">
 						<span class="tt">', $context['package_ftp']['error'], '</span>
 					</div>';

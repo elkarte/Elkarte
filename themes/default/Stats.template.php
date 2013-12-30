@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -33,6 +34,7 @@ function template_statistics()
 		$function = 'template_' . $callback;
 		$function();
 	}
+
 	echo '
 		</ul>
 	</div>';

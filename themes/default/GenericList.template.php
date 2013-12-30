@@ -12,10 +12,13 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
-/*
+/**
  * Template used to show a list created with createlist
+ *
+ * @param string $list_id
  */
 function template_show_list($list_id = null)
 {
@@ -199,6 +202,9 @@ function template_show_list($list_id = null)
 
 /**
  * Generic template used to show additional rows of data (above/below)
+ *
+ * @param int $row_position
+ * @param array $cur_list
  */
 function template_additional_rows($row_position, $cur_list)
 {
@@ -209,6 +215,7 @@ function template_additional_rows($row_position, $cur_list)
 
 /**
  * Used this if you want your generic lists to have navigation menus.
+ *
  * $cur_list['list_menu'] = array(
  *    // The position of the tabs/buttons.  Left or Right.  By default is set to left.
  *    'position' => 'left',
@@ -225,6 +232,8 @@ function template_additional_rows($row_position, $cur_list)
  *      ),
  *    ),
  * );
+ *
+ * @param array $list_menu
  */
 function template_create_list_menu($list_menu)
 {

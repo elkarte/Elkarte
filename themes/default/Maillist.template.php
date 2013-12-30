@@ -1,13 +1,14 @@
 <?php
 
 /**
+ * Templates for the PBE maillist function
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Beta
  *
- * Templates for the PBE maillist function
  */
 
 /**
@@ -120,11 +121,11 @@ function template_bounce_email()
 					<dd>
 						<select name="warn_temp" id="warn_temp" disabled="disabled" onchange="populateNotifyTemplate();">
 							<option value="-1">', $txt['bounce_notify_template'], '</option>
-							<option value="-1">------------------------------</option>';
+							<option value="-1" disabled="disabled">', str_repeat('&#8212;', strlen($txt['bounce_notify_template'])), '</option>';
 
 	foreach ($context['bounce_templates'] as $id_template => $template)
 		echo '
-							<option value="', $id_template, '">', $template['title'], '</option>';
+							<option value="', $id_template, '">&#10148;&nbsp;', $template['title'], '</option>';
 
 	echo '
 						</select>

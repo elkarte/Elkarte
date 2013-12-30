@@ -12,8 +12,12 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
+/**
+ * Template to display the who's online table header
+ */
 function template_whos_selection_above()
 {
 	global $context, $scripturl, $txt;
@@ -108,6 +112,9 @@ function template_whos_online()
 			</div>';
 }
 
+/**
+ * Close up the who's online page
+ */
 function template_whos_selection_below()
 {
 	global $context, $txt;
