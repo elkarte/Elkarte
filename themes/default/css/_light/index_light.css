@@ -1663,8 +1663,8 @@ div.bbc_footnotes .meaction{
 		box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
 	}
 }
-/* This one does up to 480 screens. */
-@media screen and (max-width: 30em) {
+/* This one does up to 540 screens. */
+@media screen and (max-width: 33.750em) {
 	.board_latest {
 		border-left: 0;
 	}
