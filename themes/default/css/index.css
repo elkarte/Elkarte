@@ -393,6 +393,7 @@ em {
 	padding: 4px 10px 2px 10px;
 	font-size: 1.214em;
 	line-height: 1.8em;
+	white-space: nowrap;
 }
 
 /* Styles for subsection headers. @todo */
