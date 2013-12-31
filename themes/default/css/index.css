@@ -393,6 +393,7 @@ em {
 	padding: 4px 10px 2px 10px;
 	font-size: 1.214em;
 	line-height: 1.8em;
+	white-space: nowrap;
 }
 
 /* Styles for subsection headers. @todo */
@@ -3787,8 +3788,8 @@ a.help .icon {
 		max-width: 30em;
 	}
 }
-/* This one does 480 screens at default font size. */
-@media screen and (max-width: 30em) {
+/* This one does 540 and smaller screens at default font size. */
+@media screen and (max-width: 33.750em) {
 	select, .input_text, .input_password {
 		max-width: 12em;
 	}
@@ -3872,6 +3873,9 @@ a.help .icon {
 	.topic_name h4 {
 		display: block;
 		font-size: 1.4em;
+	}
+	.topic_name h4 a {
+		word-wrap: break-word;
 	}
 	#wrapper {
 		padding-left: 2px;
