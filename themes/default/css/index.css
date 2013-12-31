@@ -3874,6 +3874,9 @@ a.help .icon {
 		display: block;
 		font-size: 1.4em;
 	}
+	.topic_name h4 a {
+		word-wrap: break-word;
+	}
 	#wrapper {
 		padding-left: 2px;
 		padding-right: 2px;
