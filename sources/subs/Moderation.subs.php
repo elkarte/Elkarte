@@ -275,7 +275,7 @@ function loadModeratorMenuCounts($brd = null)
 		// Attachments
 		if ($modSettings['postmod_active'] && !empty($approve_boards))
 		{
-			require_once(SUBSDIR . '/Attachments.subs.php');
+			require_once(SUBSDIR . '/ManageAttachments.subs.php');
 			$menu_errors[$cache_key]['attachments'] = list_getNumUnapprovedAttachments($approve_query);
 		}
 
@@ -465,6 +465,8 @@ function warningTemplates($start, $items_per_page, $sort, $template_type = 'warn
 			'id_comment' => $row['id_comment'],
 			'creator' => $row['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['creator_name'] . '</a>') : $row['creator_name'],
 			'time' => standardTime($row['log_time']),
+			'html_time' => htmlTime($row['log_time']),
+			'timestamp' => forum_time(true, $row['log_time']),
 			'title' => $row['template_title'],
 			'body' => Util::htmlspecialchars($row['body']),
 		);
@@ -539,6 +541,8 @@ function warnings($start, $items_per_page, $sort)
 			'issuer_link' => $row['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['member_name_col'] . '</a>') : $row['member_name_col'],
 			'recipient_link' => $row['id_recipient'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_recipient'] . '">' . $row['recipient_name'] . '</a>') : $row['recipient_name'],
 			'time' => standardTime($row['log_time']),
+			'html_time' => htmlTime($row['log_time']),
+			'timestamp' => forum_time(true, $row['log_time']),
 			'reason' => $row['body'],
 			'counter' => $row['counter'] > 0 ? '+' . $row['counter'] : $row['counter'],
 			'id_notice' => $row['id_notice'],
@@ -848,7 +852,7 @@ function approveAllUnapproved()
 
 	if (!empty($attaches))
 	{
-		require_once(SUBSDIR . '/Attachments.subs.php');
+		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 		approveAttachments($attaches);
 		cache_put_data('num_menu_errors', null, 900);
 	}

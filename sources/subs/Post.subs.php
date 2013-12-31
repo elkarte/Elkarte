@@ -1449,6 +1449,7 @@ function lastPost()
 		'short_subject' => shorten_text($row['subject'], !empty($modSettings['subject_length']) ? $modSettings['subject_length'] : 24),
 		'preview' => $row['body'],
 		'time' => standardTime($row['poster_time']),
+		'html_time' => htmlTime($row['poster_time']),
 		'timestamp' => forum_time(true, $row['poster_time']),
 		'href' => $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new',
 		'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new">' . $row['subject'] . '</a>'

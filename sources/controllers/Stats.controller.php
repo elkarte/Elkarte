@@ -171,7 +171,7 @@ class Stats_Controller extends Action_Controller
 			'users_online' => comma_format(onlineCount()),
 			'most_online' => array(
 				'number' => comma_format($modSettings['mostOnline']),
-				'date' => relativeTime($modSettings['mostDate'])
+				'date' => standardTime($modSettings['mostDate'])
 			),
 			// Members online so far today.
 			'users_online_today' => comma_format(mostOnline($date)),

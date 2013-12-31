@@ -1591,6 +1591,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	// Relative times?
 	if (!empty($modSettings['todayMod']) && $modSettings['todayMod'] > 2)
+	{
 		addInlineJavascript('
 		var oRttime = ({
 			currentTime : ' . JavaScriptEscape(forum_time()) . ',
@@ -1609,6 +1610,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 			years : ' . JavaScriptEscape($txt['rt_years']) . ',
 		});
 		updateRelativeTime();', true);
+	}
 
 	// Queue our Javascript
 	loadJavascriptFile(array('elk_jquery_plugins.js', 'script.js', 'script_elk.js', 'theme.js'));

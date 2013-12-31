@@ -256,7 +256,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	}
 
 	// Get rid of the attachment(s).
-	require_once(SUBSDIR . '/Attachments.subs.php');
+	require_once(SUBSDIR . '/ManageAttachments.subs.php');
 	$attachmentQuery = array(
 		'attachment_type' => 0,
 		'id_topic' => $topics,
@@ -1411,7 +1411,8 @@ function selectMessages($topic, $start, $per_page, $messages = array(), $only_ap
 			'id' => $row['id_msg'],
 			'alternate' => $counter % 2,
 			'subject' => $row['subject'],
-			'time' => relativeTime($row['poster_time']),
+			'time' => standardTime($row['poster_time']),
+			'html_time' => htmlTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'body' => $row['body'],
 			'poster' => $row['real_name'],
@@ -1458,7 +1459,8 @@ function topicMessages($topic)
 		$posts[$row['id_msg']] = array(
 			'subject' => $row['subject'],
 			'member' => $row['poster_name'],
-			'time' => relativeTime($row['poster_time'], false),
+			'time' => standardTime($row['poster_time'], false),
+			'html_time' => htmlTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'body' => parse_bbc($row['body'], 'print'),
 			'id_msg' => $row['id_msg'],
@@ -2538,7 +2540,7 @@ function topicNotifications($start, $items_per_page, $sort, $memID)
 			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $row['subject'] . '</a>',
 			'new' => $row['new_from'] <= $row['id_msg_modified'],
 			'new_from' => $row['new_from'],
-			'updated' => relativeTime($row['poster_time']),
+			'updated' => standardTime($row['poster_time']),
 			'new_href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['new_from'] . '#new',
 			'new_link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['new_from'] . '#new">' . $row['subject'] . '</a>',
 			'board_link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>',

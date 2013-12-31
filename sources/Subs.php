@@ -607,72 +607,6 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 }
 
 /**
- * Calculates the relative time between now and a given timestamp.
- * If relative time is disabled we can just bypass to standardTime();
- * This function is based on ideas from user "Eye" at
- * http://stackoverflow.com/questions/2690504/php-producing-relative-date-time-from-timestamps
- *
- * @param int $timestamp
- * @param bool $show_today = true
- * @param string $offset_type = false
- * @return string
- */
-function relativeTime($timestamp, $show_today = true, $offset_type = false)
-{
-	global $txt;
-
-	// We don't want relative times? Bypass to standardTime();
-	// if ($modSettings['todayMod'] < 3)
-		return standardTime($timestamp, $show_today, $offset_type);
-
-	// No use in doing calculations if there's nothing to work with.
-	if (!$timestamp)
-		return 0;
-
-	$past_time = time() - $timestamp;
-
-	// Within the first 60 seconds it is just now.
-	if ($past_time < 60)
-		return $txt['rt_now'];
-
-	// Within the first hour?
-	$past_time = round($past_time / 60);
-
-	if ($past_time < 60)
-		return sprintf($past_time > 1 ? $txt['rt_minutes'] : $txt['rt_minute'], $past_time);
-
-	// Some hours but less than a day?
-	$past_time = round($past_time / 60);
-
-	if ($past_time < 24)
-		return sprintf($past_time > 1 ? $txt['rt_hours'] : $txt['rt_hour'], $past_time);
-
-	// Some days ago but less than a week?
-	$past_time = round($past_time / 24);
-
-	if ($past_time < 7)
-		return sprintf($past_time > 1 ? $txt['rt_days'] : $txt['rt_day'], $past_time);
-
-	// Weeks ago but less than a month?
-	if ($past_time < 30)
-	{
-		$past_time = round($past_time / 7);
-		return sprintf($past_time > 1 ? $txt['rt_weeks'] : $txt['rt_week'], $past_time);
-	}
-
-	// Months ago but less than a year?
-	$past_time = round($past_time / 30);
-
-	if ($past_time < 12)
-		return sprintf($past_time > 1 ? $txt['rt_months'] : $txt['rt_month'], $past_time);
-
-	// Oha, we've passed at least a year?
-	$past_time = date('Y', time()) - date('Y', $timestamp);
-
-	return sprintf($past_time > 1 ? $txt['rt_years'] : $txt['rt_year'], $past_time);
-}
-
-/**
  * Used to render a timestamp to html5 <time> tag format.
  *
  * @param int $timestamp
@@ -682,9 +616,36 @@ function htmlTime($timestamp)
 {
 	global $modSettings, $user_info;
 
-	$time = date('Y-m-d H:i', $timestamp + ($user_info['time_offset'] + $modSettings['time_offset']) * 3600);
+	if (empty($timestamp))
+		return '';
 
-	return $time;
+	$timestamp = forum_time(true, $timestamp);
+	$time = date('Y-m-d H:i', $timestamp);
+	$stdtime = standardTime($timestamp);
+
+	// @todo maybe htmlspecialchars on the title attribute?
+	return '<time title="' . $stdtime . '" datetime="' . $time . '" data-timestamp="' . $timestamp . '">' . $stdtime . '</time>';
+}
+
+/**
+ * Gets the current time with offset.
+ *
+ * - always applies the offset in the time_offset setting.
+ *
+ * @param bool $use_user_offset = true if use_user_offset is true, applies the user's offset as well
+ * @param int $timestamp = null
+ * @return int seconds since the unix epoch
+ */
+function forum_time($use_user_offset = true, $timestamp = null)
+{
+	global $user_info, $modSettings;
+
+	if ($timestamp === null)
+		$timestamp = time();
+	elseif ($timestamp == 0)
+		return 0;
+
+	return $timestamp + ($modSettings['time_offset'] + ($use_user_offset ? $user_info['time_offset'] : 0)) * 3600;
 }
 
 /**
@@ -745,27 +706,6 @@ function shorten_text($text, $len = 384, $cutword = false, $buffer = 12)
 	}
 
 	return $text;
-}
-
-/**
- * Gets the current time with offset.
- *
- * - always applies the offset in the time_offset setting.
- *
- * @param bool $use_user_offset = true if use_user_offset is true, applies the user's offset as well
- * @param int $timestamp = null
- * @return int seconds since the unix epoch
- */
-function forum_time($use_user_offset = true, $timestamp = null)
-{
-	global $user_info, $modSettings;
-
-	if ($timestamp === null)
-		$timestamp = time();
-	elseif ($timestamp == 0)
-		return 0;
-
-	return $timestamp + ($modSettings['time_offset'] + ($use_user_offset ? $user_info['time_offset'] : 0)) * 3600;
 }
 
 /**
@@ -1334,7 +1274,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'parameters' => array(
 					'author' => array('match' => '([^<>]{1,192}?)'),
 					'link' => array('match' => '(?:board=\d+;)?((?:topic|threadid)=[\dmsg#\./]{1,40}(?:;start=[\dmsg#\./]{1,40})?|action=profile;u=\d+)'),
-					'date' => array('match' => '(\d+)', 'validate' => 'relativeTime'),
+					'date' => array('match' => '(\d+)', 'validate' => 'standardTime'),
 				),
 				'before' => '<div class="quoteheader"><a href="' . $scripturl . '?{link}">' . $txt['quote_from'] . ': {author} ' . ($modSettings['todayMod'] == 3 ? ' - ' : $txt['search_on']) . ' {date}</a></div><blockquote>',
 				'after' => '</blockquote>',

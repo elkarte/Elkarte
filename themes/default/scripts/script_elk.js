@@ -228,11 +228,8 @@ function updateRelativeTime()
 	relative_time_refresh = 3600000;
 
 	$('time').each(function() {
-		var oRelativeTime = new relativeTime($(this).attr('datetime')),
-			postdate = new Date($(this).attr('datetime')),
-			today = new Date(),
-			time_text = '',
-			past_time = (today - postdate) / 1000;
+		var oRelativeTime = new relativeTime($(this).data('timestamp')),
+			time_text = '';
 
 		if (oRelativeTime.seconds())
 		{
@@ -297,14 +294,21 @@ function relativeTime(sFrom, sTo)
 		else
 			this.dateTo = new Date(oRttime.currentTime * 1000);
 	}
-	else
+	else if (parseInt(sTo) == 'NaN')
 	{
 		sToSplit = sTo.split(/\D/);
-		this.dateTo = new Date(sToSplit[0], sToSplit[1], sToSplit[2], sToSplit[3], sToSplit[4]);
+		this.dateTo = new Date(sToSplit[0], --sToSplit[1], sToSplit[2], sToSplit[3], sToSplit[4]);
 	}
+	else
+		this.dateTo = new Date(sTo * 1000);
 
-	sFromSplit = sFrom.split(/\D/);
-	this.dateFrom = new Date(sFromSplit[0], --sFromSplit[1], sFromSplit[2], sFromSplit[3], sFromSplit[4]);
+	if (parseInt(sFrom) == 'NaN')
+	{
+		sFromSplit = sFrom.split(/\D/);
+		this.dateFrom = new Date(sFromSplit[0], --sFromSplit[1], sFromSplit[2], sFromSplit[3], sFromSplit[4]);
+	}
+	else
+		this.dateFrom = new Date(sFrom * 1000);
 
 	this.time_text = '';
 	this.past_time = (this.dateTo - this.dateFrom) / 1000;

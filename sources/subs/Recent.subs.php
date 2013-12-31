@@ -85,7 +85,8 @@ function getLastPosts($latestPostOptions)
 			'subject' => $row['subject'],
 			'short_subject' => shorten_text($row['subject'], !empty($modSettings['subject_length']) ? $modSettings['subject_length'] : 24),
 			'preview' => $row['body'],
-			'time' => '<time datetime="' . htmlTime($row['poster_time']) . '" title="' . standardTime($row['poster_time']) . '">' . relativeTime($row['poster_time']) . '</time>',
+			'time' => standardTime($row['poster_time']),
+			'html_time' => htmlTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'raw_timestamp' => $row['poster_time'],
 			'href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . ';topicseen#msg' . $row['id_msg'],
@@ -110,8 +111,11 @@ function cache_getLastPosts($latestPostOptions)
 		'post_retri_eval' => '
 			foreach ($cache_block[\'data\'] as $k => $post)
 			{
-				$cache_block[\'data\'][$k][\'time\'] = relativeTime($post[\'raw_timestamp\']);
-				$cache_block[\'data\'][$k][\'timestamp\'] = forum_time(true, $post[\'raw_timestamp\']);
+				$cache_block[\'data\'][$k] += array(
+					\'time\' => standardTime($post[\'raw_timestamp\']),
+					\'html_time\' => htmlTime($post[\'raw_timestamp\']),
+					\'timestamp\' => $post[\'raw_timestamp\'],
+				);
 			}',
 	);
 }
@@ -187,7 +191,8 @@ function getRecentPosts($messages, $start)
 			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '" rel="nofollow">' . $row['subject'] . '</a>',
 			'start' => $row['num_replies'],
 			'subject' => $row['subject'],
-			'time' => '<time datetime="' . htmlTime($row['poster_time']) . '" title="' . standardTime($row['poster_time']) . '">' . relativeTime($row['poster_time']) . '</time>',
+			'time' => standardTime($row['poster_time']),
+			'html_time' => htmlTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'first_poster' => array(
 				'id' => $row['id_first_member'],

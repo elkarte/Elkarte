@@ -267,6 +267,8 @@ class PostModeration_Controller extends Action_Controller
 				'subject' => $row['subject'],
 				'body' => parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']),
 				'time' => standardTime($row['poster_time']),
+				'html_time' => htmlTime($row['poster_time']),
+				'timestamp' => forum_time(true, $row['poster_time']),
 				'poster' => array(
 					'id' => $row['id_member'],
 					'name' => $row['poster_name'],
@@ -337,7 +339,7 @@ class PostModeration_Controller extends Action_Controller
 			checkSession('request');
 
 			// This will be handy.
-			require_once(SUBSDIR . '/Attachments.subs.php');
+			require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 			// Confirm the attachments are eligible for changing!
 			$attachments = validateAttachments($attachments, $approve_query);
@@ -355,7 +357,7 @@ class PostModeration_Controller extends Action_Controller
 		}
 
 		require_once(SUBSDIR . '/List.class.php');
-		require_once(SUBSDIR . '/Attachments.subs.php');
+		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		$listOptions = array(
 			'id' => 'mc_unapproved_attach',

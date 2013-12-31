@@ -207,7 +207,7 @@ class Topic_Controller extends Action_Controller
 		$context['board_name'] = $board_info['name'];
 		$context['category_name'] = $board_info['cat']['name'];
 		$context['poster_name'] = $topicinfo['poster_name'];
-		$context['post_time'] = relativeTime($topicinfo['poster_time'], false);
+		$context['post_time'] = standardTime($topicinfo['poster_time'], false);
 		$context['parent_boards'] = array();
 
 		foreach ($board_info['parent_boards'] as $parent)

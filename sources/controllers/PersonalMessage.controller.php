@@ -584,7 +584,8 @@ class PersonalMessage_Controller extends Action_Controller
 					'link' => !empty($row_quoted['id_member']) ? '<a href="' . $scripturl . '?action=profile;u=' . $row_quoted['id_member'] . '">' . $row_quoted['real_name'] . '</a>' : $row_quoted['real_name'],
 				),
 				'subject' => $row_quoted['subject'],
-				'time' => '<time datetime="' . htmlTime($row_quoted['msgtime']) . '" title="' . standardTime($row_quoted['msgtime']) . '">' . relativeTime($row_quoted['msgtime']) . '</time>',
+				'time' => standardTime($row_quoted['msgtime']),
+				'html_time' => htmlTime($row_quoted['msgtime']),
 				'timestamp' => forum_time(true, $row_quoted['msgtime']),
 				'body' => $row_quoted['body']
 			);
@@ -2124,7 +2125,9 @@ class PersonalMessage_Controller extends Action_Controller
 					'member' => &$memberContext[$row['id_member_from']],
 					'subject' => $subject_highlighted,
 					'body' => $body_highlighted,
-					'time' =>'<time datetime="' . htmlTime($row['msgtime']) . '" title="' . standardTime($row['msgtime']) . '">' . relativeTime($row['msgtime']) . '</time>',
+					'time' => standardTime($row['msgtime']),
+					'html_time' => htmlTime($row['msgtime']),
+					'timestamp' => forum_time(true, $row['msgtime']),
 					'recipients' => &$recipients[$row['id_pm']],
 					'labels' => &$context['message_labels'][$row['id_pm']],
 					'fully_labeled' => count($context['message_labels'][$row['id_pm']]) == count($context['labels']),
@@ -2373,7 +2376,8 @@ function preparePMContext_callback($type = 'subject', $reset = false)
 			),
 			'recipients' => &$recipients[$subject['id_pm']],
 			'subject' => $subject['subject'],
-			'time' => '<time datetime="' . htmlTime($subject['msgtime']) . '" title="' . standardTime($subject['msgtime']) . '">' . relativeTime($subject['msgtime']) . '</time>',
+			'time' => standardTime($subject['msgtime']),
+			'html_time' => htmlTime($subject['msgtime']),
 			'timestamp' => forum_time(true, $subject['msgtime']),
 			'number_recipients' => count($recipients[$subject['id_pm']]['to']),
 			'labels' => &$context['message_labels'][$subject['id_pm']],
@@ -2446,7 +2450,8 @@ function preparePMContext_callback($type = 'subject', $reset = false)
 		'id' => $message['id_pm'],
 		'member' => &$memberContext[$message['id_member_from']],
 		'subject' => $message['subject'],
-		'time' => '<time datetime="' . htmlTime($message['msgtime']) . '" title="' . standardTime($message['msgtime']) . '">' . relativeTime($message['msgtime']) . '</time>',
+		'time' => standardTime($message['msgtime']),
+		'html_time' => htmlTime($message['msgtime']),
 		'timestamp' => forum_time(true, $message['msgtime']),
 		'counter' => $counter,
 		'body' => $message['body'],
@@ -2571,7 +2576,8 @@ function messagePostError($named_recipients, $recipient_ids = array())
 					'link' => !empty($row_quoted['id_member']) ? '<a href="' . $scripturl . '?action=profile;u=' . $row_quoted['id_member'] . '">' . $row_quoted['real_name'] . '</a>' : $row_quoted['real_name'],
 				),
 				'subject' => $row_quoted['subject'],
-				'time' => '<time datetime="' . htmlTime($row_quoted['msgtime']) . '" title="' . standardTime($row_quoted['msgtime']) . '">' . relativeTime($row_quoted['msgtime']) . '</time>',
+				'time' => standardTime($row_quoted['msgtime']),
+				'html_time' => htmlTime($row_quoted['msgtime']),
 				'timestamp' => forum_time(true, $row_quoted['msgtime']),
 				'body' => parse_bbc($row_quoted['body'], true, 'pm' . $row_quoted['id_pm']),
 			);
@@ -2666,7 +2672,7 @@ function prepareDraftsContext($member_id, $id_pm = false)
 	{
 		$context['drafts'][] = array(
 			'subject' => empty($draft['subject']) ? $txt['drafts_none'] : censorText(shorten_text(stripslashes($draft['subject']), !empty($modSettings['draft_subject_length']) ? $modSettings['draft_subject_length'] : 24)),
-			'poster_time' => relativeTime($draft['poster_time']),
+			'poster_time' => standardTime($draft['poster_time']),
 				'link' => '<a href="' . $scripturl . '?action=pm;sa=send;id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
 			);
 	}

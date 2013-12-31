@@ -532,6 +532,8 @@ class ModerationCenter_Controller extends Action_Controller
 						'message' => $row['comment'],
 						'raw_time' => $row['time_sent'],
 						'time' => standardTime($row['time_sent']),
+						'html_time' => htmlTime($row['time_sent']),
+						'timestamp' => forum_time(true, $row['time_sent']),
 						'member' => array(
 							'id' => $row['id_member'],
 							'name' => empty($row['reporter']) ? $txt['guest'] : $row['reporter'],
@@ -819,6 +821,8 @@ class ModerationCenter_Controller extends Action_Controller
 				'id' => $row['id_comment'],
 				'message' => strtr($row['comment'], array("\n" => '<br />')),
 				'time' => standardTime($row['time_sent']),
+				'html_time' => htmlTime($row['time_sent']),
+				'timestamp' => forum_time(true, $row['time_sent']),
 				'member' => array(
 					'id' => $row['id_member'],
 					'name' => empty($row['reporter']) ? $txt['guest'] : $row['reporter'],
@@ -837,6 +841,8 @@ class ModerationCenter_Controller extends Action_Controller
 				'id' => $row['id_comment'],
 				'message' => parse_bbc($row['body']),
 				'time' => standardTime($row['log_time']),
+				'html_time' => htmlTime($row['log_time']),
+				'time' => forum_time(true, $row['log_time']),
 				'member' => array(
 					'id' => $row['id_member'],
 					'name' => $row['moderator'],
@@ -1677,6 +1683,8 @@ class ModerationCenter_Controller extends Action_Controller
 					'link' => $note['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $note['id_member'] . '" title="' . $txt['on'] . ' ' . strip_tags(standardTime($note['log_time'])) . '">' . $note['member_name'] . '</a>') : $note['member_name'],
 				),
 				'time' => standardTime($note['log_time']),
+				'html_time' => htmlTime($note['log_time']),
+				'timestamp' => forum_time(true, $note['log_time']),
 				'text' => parse_bbc($note['body']),
 				'delete_href' => $scripturl . '?action=moderate;area=index;notes;delete=' . $note['id_note'] . ';' . $context['session_var'] . '=' . $context['session_id'],
 			);
