@@ -89,8 +89,6 @@ legend {
 	background:  url(../../images/selected.png) no-repeat scroll left center transparent;
 }
 
-/* @todo - Quite a lot more code to be split. */
-
 input, button, select, textarea, .editor {
 	border: 1px solid #ccc;
 	border-radius: 2px;
