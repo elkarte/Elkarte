@@ -931,7 +931,7 @@ function getBoardTree()
  *                informations regarding the board (id_board, board_name, child_level, id_cat, cat_name)
  *                if false the boards are returned in an array subdivided by categories including also
  *                additional data like the number of boards
- * @return array
+ * @return array An array of boards sorted according to the normal boards order
  */
 function getBoardList($boardListOptions = array(), $simple = false)
 {
@@ -1007,12 +1007,13 @@ function getBoardList($boardListOptions = array(), $simple = false)
 	}
 
 	// Bring all the options together and make the query
-	$request = $db->query('messageindex_fetch_boards', '
+	$request = $db->query('', '
 		SELECT c.name AS cat_name, c.id_cat, b.id_board, b.name AS board_name, b.child_level' . $select . '
 		FROM {db_prefix}boards AS b
 			LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)' . (empty($join) ? '' : implode(' ', $join)) . (empty($where) ? '' : '
 		WHERE ' . implode('
-			AND ', $where)),
+			AND ', $where)) . '
+		ORDER BY board_order',
 		$where_parameters
 	);
 
@@ -1306,7 +1307,9 @@ function getBoardNotificationsCount($memID)
 /**
  * Returns all the boards accessible to the current user.
  * If $id_parents is given, return only the child boards of those boards.
- * If $id_boards is given, filters the boards to only those accessible
+ * If $id_boards is given, filters the boards to only those accessible.
+ *
+ * The function doesn't guarantee the boards are properly sorted
  *
  * @param array $id_parents array of ints representing board ids
  * @param array $id_boards

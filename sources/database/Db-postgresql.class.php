@@ -322,7 +322,6 @@ class Database_PostgreSQL implements Database
 			),
 			'boardindex_fetch_boards' => array(
 				'~IFNULL\(lb.id_msg, 0\) >= b.id_msg_updated~' => 'CASE WHEN IFNULL(lb.id_msg, 0) >= b.id_msg_updated THEN 1 ELSE 0 END',
-				'~(.)$~' => '$1 ORDER BY b.board_order',
 			),
 			'get_random_number' => array(
 				'~RAND~' => 'RANDOM',
@@ -336,9 +335,6 @@ class Database_PostgreSQL implements Database
 			'insert_log_search_results_subject' => array(
 				'~NOT RLIKE~' => '!~',
 			),
-			'messageindex_fetch_boards' => array(
-				'~(.)$~' => '$1 ORDER BY b.board_order',
-			),
 			'select_message_icons' => array(
 				'~(.)$~' => '$1 ORDER BY icon_order',
 			),
@@ -350,9 +346,6 @@ class Database_PostgreSQL implements Database
 			),
 			'top_topic_starters' => array(
 				'~ORDER BY FIND_IN_SET\(id_member,(.+?)\)~' => 'ORDER BY STRPOS(\',\' || $1 || \',\', \',\' || id_member|| \',\')',
-			),
-			'order_by_board_order' => array(
-				'~(.)$~' => '$1 ORDER BY b.board_order',
 			),
 			'spider_check' => array(
 				'~(.)$~' => '$1 ORDER BY LENGTH(user_agent) DESC',
