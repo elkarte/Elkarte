@@ -132,14 +132,14 @@ class Recent_Controller extends Action_Controller
 			$query_parameters['board'] = $board;
 
 			// If this board has a significant number of posts in it...
-			if ($board_data['num_posts'] > 80 && $board_data['num_posts'] > $modSettings['totalMessages'] / 10)
+			if ($board_data[$board]['num_posts'] > 80 && $board_data[$board]['num_posts'] > $modSettings['totalMessages'] / 10)
 			{
 				$query_this_board .= '
 						AND m.id_msg >= {int:max_id_msg}';
 				$query_parameters['max_id_msg'] = max(0, $modSettings['maxMsgID'] - 600 - $_REQUEST['start'] * 10);
 			}
 
-			$context['page_index'] = constructPageIndex($scripturl . '?action=recent;board=' . $board . '.%1$d', $_REQUEST['start'], min(100, $board_data['num_posts']), 10, true);
+			$context['page_index'] = constructPageIndex($scripturl . '?action=recent;board=' . $board . '.%1$d', $_REQUEST['start'], min(100, $board_data[$board]['num_posts']), 10, true);
 		}
 		else
 		{

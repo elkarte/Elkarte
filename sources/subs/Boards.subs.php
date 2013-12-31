@@ -555,7 +555,7 @@ function createBoard($boardOptions)
 				SET id_profile = {int:new_profile}
 				WHERE id_board = {int:current_board}',
 				array(
-					'new_profile' => $board_data['id_profile'],
+					'new_profile' => $board_data[$boards[$board_id]['parent']]['id_profile'],
 					'current_board' => $board_id,
 				)
 			);

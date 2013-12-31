@@ -996,7 +996,7 @@ function groupsAllowedTo($permission, $board_id = null)
 
 			if (empty($board_data))
 				fatal_lang_error('no_board');
-			$profile_id = $board_data['id_profile'];
+			$profile_id = $board_data[$board_id]['id_profile'];
 		}
 		else
 			$profile_id = 1;
