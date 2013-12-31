@@ -130,6 +130,8 @@ class Stats_Controller extends Action_Controller
 	{
 		global $scripturl, $modSettings, $context;
 
+		require_once(SUBSDIR . '/Boards.subs.php');
+
 		// Get averages...
 		$averages = getAverages();
 		// This would be the amount of time the forum has been up... in days...
@@ -187,7 +189,7 @@ class Stats_Controller extends Action_Controller
 			'average_posts' => comma_format(round($averages['posts'] / $total_days_up, 2)),
 			'average_topics' => comma_format(round($averages['topics'] / $total_days_up, 2)),
 			// Statistics such as number of boards, categories, etc.
-			'total_boards' => comma_format(numBoards()),
+			'total_boards' => comma_format(countBoards('all', array('include_redirects' => false))),
 			'latest_member' => &$context['common_stats']['latest_member'],
 			'average_online' => comma_format(round($averages['most_on'] / $total_days_up, 2)),
 			'gender_ratio' => $context['gender']['ratio'],
