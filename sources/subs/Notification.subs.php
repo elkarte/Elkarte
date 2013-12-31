@@ -454,19 +454,9 @@ function sendBoardNotifications(&$topicData)
 	if (empty($board_index))
 		return;
 
+	require_once(SUBSDIR . '/Boards.subs.php');
 	// Load the actual board names
-	$board_names = array();
-	$request = $db->query('', '
-		SELECT id_board, name
-		FROM {db_prefix}boards
-		WHERE id_board IN ({array_int:board_list})',
-		array(
-			'board_list' => $board_index,
-		)
-	);
-	while ($row = $db->fetch_assoc($request))
-		$board_names[$row['id_board']] = $row['name'];
-	$db->free_result($request);
+	$board_names = fetchBoardsInfo(array('boards' => $board_index, 'override_permissions' = true));
 
 	// Yea, we need to add this to the digest queue.
 	$digest_insert = array();
@@ -538,7 +528,7 @@ function sendBoardNotifications(&$topicData)
 				'MESSAGE' => $send_body ? $topicData[$key]['body'] : '',
 				'UNSUBSCRIBELINK' => $scripturl . '?action=notifyboard;board=' . $topicData[$key]['board'] . '.0',
 				'SIGNATURE' => !empty($topicData[$key]['signature']) ? $topicData[$key]['signature'] : '',
-				'BOARDNAME' => $board_names[$topicData[$key]['board']],
+				'BOARDNAME' => $board_names[$topicData[$key]['board']]['name'],
 			);
 
 			// Figure out which email to send

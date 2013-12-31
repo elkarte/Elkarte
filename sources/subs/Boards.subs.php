@@ -1702,6 +1702,7 @@ function boardsPosts($boards, $categories, $wanna_see_board = false)
  *                           Allowed values: 'name', 'posts', 'detailed', 'permissions', 'reports';
  *                           default: 'name';
  *                           see the function for detailes on the fields associated to each value
+ *              'override_permissions' => (bool) if true doesn't use neither {query_wanna_see_board} nor {query_see_board} (default false)
  *              'wanna_see_board' => (bool) if true uses {query_wanna_see_board}, otherwise {query_see_board}
  *              'include_recycle' => (bool) recycle board is included (default true)
  *              'include_redirects' => (bool) redirects are included (default true)
@@ -1715,7 +1716,7 @@ function fetchBoardsInfo($conditions = 'all', $params = array())
 	$db = database();
 
 	// Ensure default values are set
-	$params = array_merge(array('wanna_see_board' => false, 'include_recycle' => true, 'include_redirects' => true), $params);
+	$params = array_merge(array('override_permissions' => false, 'wanna_see_board' => false, 'include_recycle' => true, 'include_redirects' => true), $params);
 
 	$clauses = array();
 	$clauseParameters = array();
@@ -1772,10 +1773,15 @@ function fetchBoardsInfo($conditions = 'all', $params = array())
 			$clauseParameters['board_list'] = is_array($conditions['boards']) ? $conditions['boards'] : array($conditions['boards']);
 		}
 
+		if ($params['override_permissions'])
+			$security = '1=1';
+		else
+			$security = $params['wanna_see_board'] ? '{query_wanna_see_board}' : '{query_see_board}';
+
 		$request = $db->query('', '
 			SELECT ' . $select . '
 			FROM {db_prefix}boards AS b
-			WHERE ' . ($params['wanna_see_board'] ? '{query_wanna_see_board}' : '{query_see_board}') . (!empty($clauses) ? '
+			WHERE ' . $security . (!empty($clauses) ? '
 				AND b.' . implode(' OR b.', $clauses) : '') . ($params['include_recycle'] ? '' : '
 				AND b.id_board != {int:recycle_board}') . ($params['include_redirects'] ? '' : '
 				AND b.redirect = {string:empty_string}'),
