@@ -266,7 +266,7 @@ class MessageIndex_Controller extends Action_Controller
 		);
 
 		// Allow integration to modify / add to the $indexOptions
-		call_integration_hook('integrate_messageindex_topics', array(&$sort_column, &$$indexOptions));
+		call_integration_hook('integrate_messageindex_topics', array(&$sort_column, &$indexOptions));
 
 		$topics_info = messageIndexTopics($board, $user_info['id'], $start, $maxindex, $context['sort_by'], $sort_column, $indexOptions);
 
