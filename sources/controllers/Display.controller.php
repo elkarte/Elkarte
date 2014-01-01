@@ -112,10 +112,15 @@ class Display_Controller
 
 		$topic_selects = array();
 		$topic_tables = array();
+		$topic_parameters = array(
+			'topic' => $topic,
+			'member' => $user_info['id'],
+			'board' => (int) $board,
+		);
 		call_integration_hook('integrate_display_topic', array(&$topic_selects, &$topic_tables, &$topic_parameters));
 
 		// Load the topic details
-		$topicinfo = getTopicInfo($topic, 'all', $topic_selects, $topic_tables);
+		$topicinfo = getTopicInfo($topic_parameters, 'all', $topic_selects, $topic_tables);
 		if (empty($topicinfo))
 			fatal_lang_error('not_a_topic', false);
 
@@ -868,10 +873,8 @@ class Display_Controller
 		// $context['icon_sources'] says where each icon should come from - here we set up the ones which will always exist!
 		if (empty($context['icon_sources']))
 		{
-			$stable_icons = array('xx', 'thumbup', 'thumbdown', 'exclamation', 'question', 'lamp', 'smiley', 'angry', 'cheesy', 'grin', 'sad', 'wink', 'poll', 'moved', 'recycled', 'wireless', 'clip');
-			$context['icon_sources'] = array();
-			foreach ($stable_icons as $icon)
-				$context['icon_sources'][$icon] = 'images_url';
+			require_once(SUBSDIR . '/MessageIndex.subs.php');
+			$context['icon_sources'] = MessageTopicIcons();
 		}
 
 		// Message Icon Management... check the images exist.

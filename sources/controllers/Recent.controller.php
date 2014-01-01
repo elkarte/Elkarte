@@ -446,10 +446,8 @@ class Recent_Controller extends Action_Controller
 		$context['sub_template'] = $_REQUEST['action'] == 'unread' ? 'unread' : 'replies';
 
 		// Setup the default topic icons... for checking they exist and the like ;)
-		$stable_icons = array('xx', 'thumbup', 'thumbdown', 'exclamation', 'question', 'lamp', 'smiley', 'angry', 'cheesy', 'grin', 'sad', 'wink', 'poll', 'moved', 'recycled', 'wireless', 'clip');
-		$context['icon_sources'] = array();
-		foreach ($stable_icons as $icon)
-			$context['icon_sources'][$icon] = 'images_url';
+		require_once(SUBSDIR . '/MessageIndex.subs.php');
+		$context['icon_sources'] = MessageTopicIcons();
 
 		$is_topics = $_REQUEST['action'] == 'unread';
 

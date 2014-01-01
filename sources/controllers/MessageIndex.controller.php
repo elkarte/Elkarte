@@ -250,14 +250,12 @@ class MessageIndex_Controller extends Action_Controller
 			$fake_ascending = false;
 
 		// Setup the default topic icons...
-		$stable_icons = array('xx', 'thumbup', 'thumbdown', 'exclamation', 'question', 'lamp', 'smiley', 'angry', 'cheesy', 'grin', 'sad', 'wink', 'poll', 'moved', 'recycled', 'wireless', 'clip');
-		$context['icon_sources'] = array();
-		foreach ($stable_icons as $icon)
-			$context['icon_sources'][$icon] = 'images_url';
+		$context['icon_sources'] = MessageTopicIcons();
 
 		$topic_ids = array();
 		$context['topics'] = array();
 
+		// Set up the query options
 		$indexOptions = array(
 			'include_sticky' => !empty($modSettings['enableStickyTopics']),
 			'only_approved' => $modSettings['postmod_active'] && !allowedTo('approve_posts'),
@@ -266,6 +264,9 @@ class MessageIndex_Controller extends Action_Controller
 			'ascending' => $ascending,
 			'fake_ascending' => $fake_ascending
 		);
+
+		// Allow integration to modify / add to the $indexOptions
+		call_integration_hook('integrate_messageindex_topics', array(&$sort_column, &$$indexOptions));
 
 		$topics_info = messageIndexTopics($board, $user_info['id'], $start, $maxindex, $context['sort_by'], $sort_column, $indexOptions);
 
