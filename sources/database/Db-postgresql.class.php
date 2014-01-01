@@ -335,9 +335,6 @@ class Database_PostgreSQL implements Database
 			'top_topic_starters' => array(
 				'~ORDER BY FIND_IN_SET\(id_member,(.+?)\)~' => 'ORDER BY STRPOS(\',\' || $1 || \',\', \',\' || id_member|| \',\')',
 			),
-			'spider_check' => array(
-				'~(.)$~' => '$1 ORDER BY LENGTH(user_agent) DESC',
-			),
 			'unread_replies' => array(
 				'~SELECT\\s+DISTINCT\\s+t.id_topic~' => 'SELECT t.id_topic, {raw:sort}',
 			),
