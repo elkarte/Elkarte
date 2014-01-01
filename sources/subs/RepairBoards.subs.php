@@ -1339,7 +1339,7 @@ function createSalvageArea()
 	}
 
 	// @deprecated the ordering is done in the query, probably not needed
-	$db->query('alter_table_boards', '
+	$db->query('alter_table', '
 		ALTER TABLE {db_prefix}boards
 		ORDER BY board_order',
 		array(

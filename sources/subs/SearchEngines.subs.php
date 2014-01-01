@@ -265,7 +265,7 @@ function sortSpiderTable()
 	$db = database();
 
 	// Order the table by user_agent length.
-	$db->query('alter_table_spiders', '
+	$db->query('alter_table', '
 		ALTER TABLE {db_prefix}spiders
 		ORDER BY LENGTH(user_agent) DESC',
 		array(

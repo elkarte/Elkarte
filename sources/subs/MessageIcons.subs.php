@@ -127,7 +127,7 @@ function sortMessageIconTable()
 {
 	$db = database();
 
-	$db->query('alter_table_icons', '
+	$db->query('alter_table', '
 		ALTER TABLE {db_prefix}message_icons
 		ORDER BY icon_order',
 		array(

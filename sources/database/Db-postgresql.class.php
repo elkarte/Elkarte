@@ -288,16 +288,7 @@ class Database_PostgreSQL implements Database
 
 		// Special queries that need processing.
 		$replacements = array(
-			'alter_table_boards' => array(
-				'~(.+)~' => '',
-			),
-			'alter_table_icons' => array(
-				'~(.+)~' => '',
-			),
-			'alter_table_smileys' => array(
-				'~(.+)~' => '',
-			),
-			'alter_table_spiders' => array(
+			'alter_table' => array(
 				'~(.+)~' => '',
 			),
 			'ban_suggest_error_ips' => array(

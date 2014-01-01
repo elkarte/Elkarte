@@ -456,7 +456,7 @@ function sortSmileyTable()
 	$db = database();
 
 	// Order the table by code length.
-	$db->query('alter_table_smileys', '
+	$db->query('alter_table', '
 		ALTER TABLE {db_prefix}smileys
 		ORDER BY LENGTH(code) DESC',
 		array(
