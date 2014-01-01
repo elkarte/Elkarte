@@ -65,30 +65,31 @@ class Announce_Controller extends Action_Controller
 	 * Allow a user to chose the membergroups to send the announcement to.
 	 * Lets the user select the membergroups that will receive the topic announcement.
 	 * Accessed by action=announce;sa=selectgroup
+	 * @uses Announce template announce sub template
 	 */
 	public function action_selectgroup()
 	{
 		global $context, $topic, $board_info;
 
+		require_once(SUBSDIR . '/Membergroups.subs.php');
+		require_once(SUBSDIR . '/Topic.subs.php');
+
+		// Build a list of groups that can see this board
 		$groups = array_merge($board_info['groups'], array(1));
 		foreach ($groups as $id => $group)
 			$groups[$id] = (int) $group;
 
-		require_once(SUBSDIR . '/Membergroups.subs.php');
-		require_once(SUBSDIR . '/Topic.subs.php');
-		loadTemplate('Announce');
-
+		// Prepare for a group selection list in the template
 		$context['groups'] = getGroups($groups);
 
 		// Get the subject of the topic we're about to announce.
 		$topic_info = getTopicInfo($topic, 'message');
 		$context['topic_subject'] = $topic_info['subject'];
-
 		censorText($context['announce_topic']['subject']);
 
+		// Prepare for the template
 		$context['move'] = isset($_REQUEST['move']) ? 1 : 0;
 		$context['go_back'] = isset($_REQUEST['goback']) ? 1 : 0;
-
 		$context['sub_template'] = 'announce';
 	}
 
@@ -100,38 +101,48 @@ class Announce_Controller extends Action_Controller
 	 * does the actual sending of the topic announcements in chunks.
 	 * calculates a rough estimate of the percentage items sent.
 	 * Accessed by action=announce;sa=send
+	 * @uses announcement template announcement_send sub template
 	 */
 	public function action_send()
 	{
-		global $topic, $board, $board_info, $context, $modSettings;
-		global $language, $scripturl;
+		global $topic, $board, $board_info, $context, $modSettings, $language, $scripturl;
 
 		checkSession();
 
 		$context['start'] = empty($_REQUEST['start']) ? 0 : (int) $_REQUEST['start'];
 		$groups = array_merge($board_info['groups'], array(1));
+		$who = array();
 
+		// Load any supplied membergroups (from announcement_send template pause loop)
 		if (isset($_POST['membergroups']))
-			$who = explode(',', $_POST['membergroups']);
+			$_POST['who'] = explode(',', $_POST['membergroups']);
 
-		// Check whether at least one membergroup was selected.
-		if (empty($who))
+		// Check that at least one membergroup was selected (set from announce sub template)
+		if (empty($_POST['who']))
 			fatal_lang_error('no_membergroup_selected');
 
 		// Make sure all membergroups are integers and can access the board of the announcement.
-		foreach ($who as $id => $mg)
+		foreach ($_POST['who'] as $id => $mg)
 			$who[$id] = in_array((int) $mg, $groups) ? (int) $mg : 0;
 
+		// Get the topic details that we are going to send
 		require_once(SUBSDIR . '/Topic.subs.php');
-
-		// Get the topic subject and body and censor them.
 		$topic_info = getTopicInfo($topic, 'message');
-		$context['topic_subject'] = $topic_info['subject'];
 
-		censorText($context['topic_subject']);
-		censorText($topic_info['body']);
+		// Prepare a plain text body for email use
+		if (!empty($modSettings['maillist_enabled']) && !empty($modSettings['pbe_post_enabled']))
+		{
+			require_once(SUBSDIR . '/Emailpost.subs.php');
 
-		$topic_info['body'] = trim(un_htmlspecialchars(strip_tags(strtr(parse_bbc($topic_info['body'], false, $topic_info['id_first_msg']), array('<br />' => "\n", '</div>' => "\n", '</li>' => "\n", '&#91;' => '[', '&#93;' => ']')))));
+			// Convert to markdown markup e.g. text ;), does the censoring as well
+			pbe_prepare_text($topic_info['body'], $topic_info['subject']);
+		}
+		else
+		{
+			censorText($topic_info['subject']);
+			censorText($topic_info['body']);
+			$topic_info['body'] = trim(un_htmlspecialchars(strip_tags(strtr(parse_bbc($topic_info['body'], false, $topic_info['id_first_msg']), array('<br />' => "\n", '</div>' => "\n", '</li>' => "\n", '&#91;' => '[', '&#93;' => ']')))));
+		}
 
 		// We need this in order to be able send emails.
 		require_once(SUBSDIR . '/Mail.subs.php');
@@ -143,19 +154,21 @@ class Announce_Controller extends Action_Controller
 			'member_greater' => $context['start'],
 			'group_list' => $who,
 			'order_by' => 'id_member',
-			// @todo Might need an interface?
-			'limit' => empty($modSettings['mail_queue']) ? 50 : 500,
+			// @todo interface for this
+			'limit' => empty($modSettings['mail_queue']) ? 25 : 500,
 		);
 
+		// Have we allowed members to opt out of announcements?
 		if (!empty($modSettings['allow_disableAnnounce']))
 			$conditions['notify_announcements'] = 1;
 
 		$data = retrieveMemberData($conditions);
 
 		// All members have received a mail. Go to the next screen.
-		if (empty($data))
+		if (empty($data) || $data['member_count'] === 0)
 		{
 			logAction('announce_topic', array('topic' => $topic), 'user');
+
 			if (!empty($_REQUEST['move']) && allowedTo('move_any'))
 				redirectexit('action=movetopic;topic=' . $topic . '.0' . (empty($_REQUEST['goback']) ? '' : ';goback'));
 			elseif (!empty($_REQUEST['goback']))
@@ -164,18 +177,17 @@ class Announce_Controller extends Action_Controller
 				redirectexit('board=' . $board . '.0');
 		}
 
-		$announcements = array();
-
 		// Loop through all members that'll receive an announcement in this batch.
+		$announcements = array();
 		foreach ($data['member_info'] as $row)
 		{
-			$cur_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
+			$cur_language = empty($row['language']) || empty($modSettings['userLanguage']) ? $language : $row['language'];
 
 			// If the language wasn't defined yet, load it and compose a notification message.
 			if (!isset($announcements[$cur_language]))
 			{
 				$replacements = array(
-					'TOPICSUBJECT' => $context['topic_subject'],
+					'TOPICSUBJECT' => $topic_info['subject'],
 					'MESSAGE' => $topic_info['body'],
 					'TOPICLINK' => $scripturl . '?topic=' . $topic . '.0',
 				);
@@ -189,22 +201,28 @@ class Announce_Controller extends Action_Controller
 				);
 			}
 
-			$announcements[$cur_language]['recipients'][$row['id_member']] = $row['email_address'];
-			$context['start'] = $row['id_member'];
+			$announcements[$cur_language]['recipients'][$row['id']] = $row['email'];
+			$context['start'] = $row['id'];
 		}
 
 		// For each language send a different mail - low priority...
 		foreach ($announcements as $lang => $mail)
 			sendmail($mail['recipients'], $mail['subject'], $mail['body'], null, null, false, 5);
 
-		$context['percentage_done'] = round(100 * $context['start'] / $modSettings['latestMember'], 1);
+		// Provide an overall indication of progress, this is not strictly correct
+		if ($data['member_count'] < $conditions['limit'])
+			$context['percentage_done'] = 100;
+		else
+			$context['percentage_done'] = round(100 * $context['start'] / $modSettings['latestMember'], 1);
 
+		// Prepare for the template
 		$context['move'] = empty($_REQUEST['move']) ? 0 : 1;
 		$context['go_back'] = empty($_REQUEST['goback']) ? 0 : 1;
 		$context['membergroups'] = implode(',', $who);
+		$context['topic_subject'] = $topic_info['subject'];
 		$context['sub_template'] = 'announcement_send';
 
-		// Go back to the correct language for the user ;).
+		// Go back to the correct language for the user ;)
 		if (!empty($modSettings['userLanguage']))
 			loadLanguage('Post');
 	}

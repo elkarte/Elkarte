@@ -1,13 +1,15 @@
+
 <?php
 
 /**
+ * This template file contains only the sub template badbehavior_log.
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Beta
  *
- * This template file contains only the sub template badbehavior_log.
  */
 
 /**
@@ -62,7 +64,7 @@ function template_badbehavior_log()
 							<strong>', $entries['member']['link'], '</strong><br />
 
 							<a href="', $scripturl, '?action=admin;area=logs;sa=badbehaviorlog', $context['sort_direction'] == 'down' ? '' : ';desc', $context['has_filter'] ? $context['filter']['href'] : '', '" title="', $txt['badbehaviorlog_reverse_direction'], '"><img src="', $settings['images_url'], '/sort_', $context['sort_direction'], '.png" alt="', $txt['badbehaviorlog_reverse_direction'], '" /></a>
-							', $entries['date'], '<br />
+							', $entries['time'], '<br />
 
 							<a href="', $scripturl, '?action=admin;area=logs;sa=badbehaviorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=ip;value=', $entries['member']['ip'], '" title="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_ip'], '"><img src="', $settings['images_url'], '/filter.png" alt="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_ip'], '" /></a>
 							<strong><a href="', $scripturl, '?action=trackip;searchip=', $entries['member']['ip'], '">', $entries['member']['ip'], '</a></strong>&nbsp;&nbsp;<br />
@@ -137,10 +139,10 @@ function template_callback_badbehavior_add_ip()
 		<a href="' . $scripturl . '?action=quickhelp;help=badbehavior_ip_wl" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" class="icon" alt="' . $txt['help'] . '" /></a>', $txt['badbehavior_ip_wl'], '
 		<dl class="settings">
 			<dt>',
-	$txt['badbehavior_wl_comment'], '
+				$txt['badbehavior_wl_comment'], '
 			</dt>
 			<dd>',
-	$txt['badbehavior_ip_wl_desc'], '
+				$txt['badbehavior_ip_wl_desc'], '
 			</dd>';
 
 	// Show any existing IP's that are on the whitelist

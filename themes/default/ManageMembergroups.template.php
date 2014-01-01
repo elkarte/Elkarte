@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -386,6 +387,7 @@ function template_edit_group()
 		$js .= '
 			]
 		});';
+
 		addInlineJavascript($js, true);
 	}
 
@@ -399,6 +401,7 @@ function template_edit_group()
  *
  * @param int $form_id
  * @param bool $collapse
+ * @param bool $deny
  */
 function template_add_edit_group_boards_list($form_id, $collapse = true, $deny = true)
 {

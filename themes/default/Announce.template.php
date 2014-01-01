@@ -12,10 +12,11 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
- * announce a topic
+ * Announce a topic
  */
 function template_announce()
 {
@@ -58,12 +59,13 @@ function template_announce()
 				<br class="clear_right" />
 			</div>
 		</form>
-	</div>
-	<br />';
+	</div>';
 }
 
 /**
- * Send an announcement out
+ * Send an announcement out in increments
+ * Shows a progress bar with continue button
+ * autoSubmitted with JS
  */
 function template_announcement_send()
 {
@@ -74,14 +76,14 @@ function template_announcement_send()
 		<form action="' . $scripturl . '?action=announce;sa=send" method="post" accept-charset="UTF-8" name="autoSubmit" id="autoSubmit">
 			<div class="windowbg2">
 				<div class="content">
-					<p>', $txt['announce_sending'], ' <a href="', $scripturl, '?topic=', $context['current_topic'], '.0" target="_blank" class="new_win">', $context['topic_subject'], '</a></p>
+					<p class="infobox">', $txt['announce_sending'], ' <a href="', $scripturl, '?topic=', $context['current_topic'], '.0" target="_blank" class="new_win">: ', $context['topic_subject'], '</a></p>
 					<div class="progress_bar">
 						<div class="full_bar">', $context['percentage_done'], '% ', $txt['announce_done'], '</div>
 						<div class="green_percent" style="width: ', $context['percentage_done'], '%;">&nbsp;</div>
 					</div>
 					<hr />
 					<div id="confirm_buttons">
-						<input type="submit" name="b" value="', $txt['announce_continue'], '" class="right_submit" />
+						<input type="submit" name="cont" value="', $txt['announce_continue'], '" class="right_submit" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						<input type="hidden" name="topic" value="', $context['current_topic'], '" />
 						<input type="hidden" name="move" value="', $context['move'], '" />
@@ -90,14 +92,13 @@ function template_announcement_send()
 						<input type="hidden" name="membergroups" value="', $context['membergroups'], '" />
 					</div>
 				</div>
-				<br class="clear_right" />
 			</div>
 		</form>
 	</div>
-	<br />
 	<script><!-- // --><![CDATA[
-		var countdown = 2,
+		var countdown = 3,
 			txt_message = "', $txt['announce_continue'], '";
+
 		doAutoSubmit();
 	// ]]></script>';
 }

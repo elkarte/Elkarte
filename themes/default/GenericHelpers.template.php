@@ -6,10 +6,13 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
  * Renders a collapsible list of groups
+ *
+ * @param string $group defaults to default_groups_list
  */
 function template_list_groups_collapsible($group = 'default_groups_list')
 {
@@ -17,6 +20,7 @@ function template_list_groups_collapsible($group = 'default_groups_list')
 
 	$current_group_list = $context[$group];
 	$all_selected = true;
+
 	if (!isset($current_group_list['id']))
 		$current_group_list['id'] = $group;
 
@@ -48,6 +52,11 @@ function template_list_groups_collapsible($group = 'default_groups_list')
 
 /**
  * Dropdown usable to select a board
+ *
+ * @param string $name
+ * @param string $label
+ * @param string $extra
+ * @param boolean $all
  */
 function template_select_boards($name, $label = '', $extra = '', $all = false)
 {

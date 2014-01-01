@@ -242,7 +242,8 @@ function getBoardIndex($boardIndexOptions)
 		$row_board['short_subject'] = shorten_text($row_board['subject'], !empty($modSettings['subject_length']) ? $modSettings['subject_length'] : 24);
 		$this_last_post = array(
 			'id' => $row_board['id_msg'],
-			'time' => $row_board['poster_time'] > 0 ? ('<time datetime="' . htmlTime($row_board['poster_time']) . '" title="' . standardTime($row_board['poster_time']) . '">' . relativeTime($row_board['poster_time']) . '</time>') : $txt['not_applicable'],
+			'time' => $row_board['poster_time'] > 0 ? standardTime($row_board['poster_time']) : $txt['not_applicable'],
+			'html_time' => $row_board['poster_time'] > 0 ? htmlTime($row_board['poster_time']) : $txt['not_applicable'],
 			'timestamp' => forum_time(true, $row_board['poster_time']),
 			'subject' => $row_board['short_subject'],
 			'member' => array(
@@ -268,7 +269,7 @@ function getBoardIndex($boardIndexOptions)
 			time, timestamp (a number that represents the time.), id (of the post), topic (topic id.),
 			link, href, subject, start (where they should go for the first unread post.),
 			and member. (which has id, name, link, href, username in it.) */
-			$this_last_post['last_post_message'] = sprintf($txt['last_post_message'], $this_last_post['member']['link'], $this_last_post['link'], $this_last_post['time']);
+			$this_last_post['last_post_message'] = sprintf($txt['last_post_message'], $this_last_post['member']['link'], $this_last_post['link'], $this_last_post['html_time']);
 		}
 		else
 		{
@@ -295,7 +296,9 @@ function getBoardIndex($boardIndexOptions)
 		// Determine a global most recent topic.
 		if (!empty($boardIndexOptions['set_latest_post']) && !empty($row_board['poster_time']) && $row_board['poster_time'] > $latest_post['timestamp'] && !$ignoreThisBoard)
 			$latest_post = array(
-				'timestamp' => $row_board['poster_time'],
+				'time' => standardTime($row_board['poster_time']),
+				'html_time' => htmlTime($row_board['poster_time']),
+				'timestamp' => forum_time(true, $row_board['poster_time']),
 				'ref' => &$this_category[$isChild ? $row_board['id_parent'] : $row_board['id_board']]['last_post'],
 			);
 	}

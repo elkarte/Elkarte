@@ -328,7 +328,7 @@ class ManageAttachments_Controller extends Action_Controller
 		global $context, $txt, $scripturl, $modSettings;
 
 		// We're working with them attachments here!
-		require_once(SUBSDIR . '/Attachments.subs.php');
+		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		// Attachments or avatars?
 		$context['browse_type'] = isset($_REQUEST['avatars']) ? 'avatars' : (isset($_REQUEST['thumbs']) ? 'thumbs' : 'attachments');
@@ -543,7 +543,7 @@ class ManageAttachments_Controller extends Action_Controller
 		$context['sub_template'] = 'maintenance';
 
 		// We're working with them attachments here!
-		require_once(SUBSDIR . '/Attachments.subs.php');
+		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		// we need our attachments directories...
 		$attach_dirs = getAttachmentDirs();
@@ -600,7 +600,7 @@ class ManageAttachments_Controller extends Action_Controller
 		}
 
 		// Finally move the attachments..
-		require_once(SUBSDIR . '/Attachments.subs.php');
+		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 		moveAvatars();
 
 		redirectexit('action=admin;area=manageattachments;sa=maintenance');
@@ -621,7 +621,7 @@ class ManageAttachments_Controller extends Action_Controller
 		// @todo Ignore messages in topics that are stickied?
 
 		// someone has to do the dirty work
-		require_once(SUBSDIR . '/Attachments.subs.php');
+		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		// Deleting an attachment?
 		if ($_REQUEST['type'] != 'avatars')
@@ -653,7 +653,7 @@ class ManageAttachments_Controller extends Action_Controller
 		checkSession('post', 'admin');
 
 		// we'll need this
-		require_once(SUBSDIR . '/Attachments.subs.php');
+		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		// Find humungous attachments.
 		$messages = removeAttachments(array('attachment_type' => 0, 'size' => 1024 * $_POST['size']), 'messages', true);
@@ -679,7 +679,7 @@ class ManageAttachments_Controller extends Action_Controller
 		if (!empty($_POST['remove']))
 		{
 			// we'll need this
-			require_once(SUBSDIR . '/Attachments.subs.php');
+			require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 			$attachments = array();
 			// There must be a quicker way to pass this safety test??
@@ -718,7 +718,7 @@ class ManageAttachments_Controller extends Action_Controller
 		checkSession('get', 'admin');
 
 		// lots of work to do
-		require_once(SUBSDIR . '/Attachments.subs.php');
+		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		$messages = removeAttachments(array('attachment_type' => 0), '', true);
 
@@ -779,7 +779,7 @@ class ManageAttachments_Controller extends Action_Controller
 		}
 
 		// We will work hard with attachments.
-		require_once(SUBSDIR . '/Attachments.subs.php');
+		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		// All the valid problems are here:
 		$context['repair_errors'] = array(
@@ -985,6 +985,7 @@ class ManageAttachments_Controller extends Action_Controller
 		global $modSettings, $scripturl, $context, $txt;
 
 		require_once(SUBSDIR . '/Attachments.subs.php');
+		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		// Since this needs to be done eventually.
 		if (!is_array($modSettings['attachmentUploadDir']))
@@ -1510,6 +1511,7 @@ class ManageAttachments_Controller extends Action_Controller
 		checkSession();
 
 		require_once(SUBSDIR . '/Attachments.subs.php');
+		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
 		if (!empty($modSettings['attachment_basedirectories']))

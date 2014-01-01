@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -37,12 +38,14 @@ function template_view_scheduled_tasks()
 	<div id="errors" class="errorbox">
 		', $txt['scheduled_tasks_were_run_errors'], '<br>';
 
-		foreach ($context['scheduled_errors'] as $task => $errors)
-		{
-			echo
+			foreach ($context['scheduled_errors'] as $task => $errors)
+			{
+				echo
 				isset($txt['scheduled_task_' . $task]) ? $txt['scheduled_task_' . $task] : $task, '
-				<ul><li>', implode('</li><li>', $errors), '</li></ul>';
-		}
+				<ul>
+					<li>', implode('</li><li>', $errors), '</li>
+				</ul>';
+			}
 
 			echo '
 	</div>';
@@ -85,7 +88,7 @@ function template_edit_scheduled_tasks()
 							<input type="text" name="regularity" id="regularity" value="', empty($context['task']['regularity']) ? 1 : $context['task']['regularity'], '" onchange="if (this.value < 1) this.value = 1;" size="2" maxlength="2" class="input_text" />
 							<select name="unit">
 								<option value="0">', $txt['scheduled_task_edit_pick_unit'], '</option>
-								<option value="0">---------------------</option>
+								<option value="0" disabled="disabled">', str_repeat('&#8212;', strlen($txt['scheduled_task_edit_pick_unit'])), '</option>
 								<option value="m" ', empty($context['task']['unit']) || $context['task']['unit'] == 'm' ? 'selected="selected"' : '', '>', $txt['scheduled_task_reg_unit_m'], '</option>
 								<option value="h" ', $context['task']['unit'] == 'h' ? 'selected="selected"' : '', '>', $txt['scheduled_task_reg_unit_h'], '</option>
 								<option value="d" ', $context['task']['unit'] == 'd' ? 'selected="selected"' : '', '>', $txt['scheduled_task_reg_unit_d'], '</option>

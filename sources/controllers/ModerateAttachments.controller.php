@@ -53,7 +53,7 @@ class ModerateAttachments_Controller extends Action_Controller
 		$is_approve = !isset($_GET['sa']) || $_GET['sa'] != 'reject' ? true : false;
 
 		$attachments = array();
-		require_once(SUBSDIR . '/Attachments.subs.php');
+		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		// If we are approving all ID's in a message , get the ID's.
 		if ($_GET['sa'] == 'all' && !empty($_GET['mid']))

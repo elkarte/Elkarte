@@ -64,7 +64,7 @@ function bb2_post($settings, $package)
 	}
 
 	// Screen by cookie/JavaScript form add
-	if (isset($_COOKIE[BB2_COOKIE])) {
+	if (isset($_COOKIE[BB2_COOKIE]) && !$settings['eu_cookie']) {
 		$screener1 = explode(" ", $_COOKIE[BB2_COOKIE]);
 	} else {
 		$screener1 = array(0);

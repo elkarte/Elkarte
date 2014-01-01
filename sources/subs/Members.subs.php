@@ -362,7 +362,7 @@ function deleteMembers($users, $check_not_admin = false)
 	);
 
 	// Delete avatar.
-	require_once(SUBSDIR . '/Attachments.subs.php');
+	require_once(SUBSDIR . '/ManageAttachments.subs.php');
 	removeAttachments(array('id_member' => $users));
 
 	// It's over, no more moderation for you.
@@ -1381,6 +1381,7 @@ function isAnotherAdmin($memberID)
  * @param array $query_params is an array containing the parameters to be passed
  *              to the query
  * @param bool $details if true returns additional member details (name, email, ip, etc.)
+ * @param bool $only_active
  */
 function membersBy($query, $query_params, $details = false, $only_active = true)
 {
@@ -1484,6 +1485,7 @@ function membersBy($query, $query_params, $details = false, $only_active = true)
  *              or a string used as raw query
  * @param array $query_params is an array containing the parameters to be passed
  *              to the query
+ * @param boolean $only_active
  */
 function countMembersBy($query, $query_params, $only_active = true)
 {

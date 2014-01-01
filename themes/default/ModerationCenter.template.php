@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -247,7 +248,7 @@ function template_action_required()
 		echo '
 									<li>
 										<img class="icon" src="', $settings['images_url'], ($total == 0 ? '/icons/field_valid.png"' : '/icons/field_invalid.png"'), 'alt="" />
-										<a href="', $scripturl, $context['links'][$area], '"><span class="smalltext">', $txt['mc_' . $area], ' : ', $total,  '</span></a>
+										<a href="', $scripturl, $context['links'][$area], '"><span class="smalltext">', $txt['mc_' . $area], ' : ', $total, '</span></a>
 									</li>';
 	}
 
@@ -333,79 +334,95 @@ function template_reported_posts()
 }
 
 /**
- * Show a list of all the unapproved posts
+ * Show a list of all the unapproved posts or topics
+ * Provides links to approve to remove each
  */
 function template_unapproved_posts()
 {
 	global $options, $context, $txt, $scripturl;
 
-	// Just a big table of it all really...
+	template_pagesection();
+
+	// Just a big div of it all really...
 	echo '
-					<div id="modcenter">
-					<form action="', $scripturl, '?action=moderate;area=postmod;start=', $context['start'], ';sa=', $context['current_view'], '" method="post" accept-charset="UTF-8">
-						<h3 class="category_header">', $txt['mc_unapproved_posts'], '</h3>';
+				<form action="', $scripturl, '?action=moderate;area=postmod;start=', $context['start'], ';sa=', $context['current_view'], '" method="post" accept-charset="UTF-8">
+					<div id="unapprovedposts" class="forumposts">
+						<h3 class="category_header hdicon cat_img_posts">
+							', $context['header_title'], '
+						</h3>';
 
 	// No posts?
 	if (empty($context['unapproved_items']))
 		echo '
-						<div class="windowbg2">
+						<div class="windowbg2 core_posts">
 							<div class="content">
 								<p class="centertext">', $txt['mc_unapproved_' . $context['current_view'] . '_none_found'], '</p>
 							</div>
 						</div>';
-	else
-		template_pagesection();
 
+	// Loop through and show each unapproved post
 	foreach ($context['unapproved_items'] as $item)
 	{
 		echo '
-						<div class="topic clear">
-							<div class="', $item['alternate'] == 0 ? 'windowbg2' : 'windowbg', ' core_posts">
-								<div class="content">
-									<div class="counter">', $item['counter'], '</div>
-									<div class="topic_details">
-										<h5><strong>', $item['category']['link'], ' / ', $item['board']['link'], ' / ', $item['link'], '</strong></h5>
-										<span class="smalltext"><strong>', $txt['mc_unapproved_by'], ' ', $item['poster']['link'], ' ', $txt['on'], ':</strong> ', $item['time'], '</span>
-									</div>
-									<div class="list_posts">
-										<div class="post">', $item['body'], '</div>
-									</div>
-									<ul class="quickbuttons">';
+						<div class="', $item['alternate'] == 0 ? 'windowbg2' : 'windowbg', ' core_posts">
+							<div class="content">
+								<div class="counter">', $item['counter'], '</div>
+								<div class="topic_details">
+									<h5><strong>', $item['category']['link'], ' / ', $item['board']['link'], ' / ', $item['link'], '</strong></h5>
+									<span class="smalltext">', $txt['mc_unapproved_by'], ' <strong>', $item['poster']['link'], '</strong> ', ': ', $item['time'], '</span>
+								</div>
+								<div class="inner">', $item['body'], '</div>
+								<ul class="quickbuttons">';
 
+		// Quick moderation checkbox?
 		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
 			echo '
-										<li class="listlevel1 quickmod_check"><input type="checkbox" name="item[]" value="', $item['id'], '" class="input_check" /></li>';
+									<li class="listlevel1 quickmod_check">
+										<input type="checkbox" name="item[]" value="', $item['id'], '" class="input_check" />
+									</li>';
+
+		// Approve and remove buttons
 		echo '
-										<li class="listlevel1"><a class="linklevel1 approve_button" href="', $scripturl, '?action=moderate;area=postmod;sa=', $context['current_view'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], ';approve=', $item['id'], '">', $txt['approve'], '</a></li>';
+									<li class="listlevel1">
+										<a class="linklevel1 approve_button" href="', $scripturl, '?action=moderate;area=postmod;sa=', $context['current_view'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], ';approve=', $item['id'], '">', $txt['approve'], '</a>
+									</li>';
 
 		if ($item['can_delete'])
 			echo '
-										<li class="listlevel1"><a class="linklevel1 unapprove_button" href="', $scripturl, '?action=moderate;area=postmod;sa=', $context['current_view'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], ';delete=', $item['id'], '">', $txt['delete'], '</a></li>';
+									<li class="listlevel1">
+										<a class="linklevel1 unapprove_button" href="', $scripturl, '?action=moderate;area=postmod;sa=', $context['current_view'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], ';delete=', $item['id'], '">', $txt['remove'], '</a>
+									</li>';
+
 		echo '
-									</ul>
-								</div>
+								</ul>
 							</div>
 						</div>';
 	}
 
-	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
+	echo '
+					</div>';
+
+	// Quick moderation checkbox action selection
+	$quick_mod = '';
+	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && !empty($context['unapproved_items']))
 		$quick_mod = '
-							<div class="floatright">
-								<select name="do" onchange="if (this.value != 0 &amp;&amp; confirm(\'' . $txt['mc_unapproved_sure'] . '\')) submit();">
-									<option value="0">' . $txt['with_selected'] . ':</option>
-									<option value="0">-------------------</option>
-									<option value="approve">&nbsp;--&nbsp;' . $txt['approve'] . '</option>
-									<option value="delete">&nbsp;--&nbsp;' . $txt['delete'] . '</option>
-								</select>
-								<noscript><input type="submit" name="mc_go" value="' . $txt['go'] . '" class="button_submit submitgo" /></noscript>
-							</div>';
+					<div class="floatright">
+						<select name="do" onchange="if (this.value != 0 &amp;&amp; confirm(\'' . $txt['mc_unapproved_sure'] . '\')) submit();">
+							<option value="0">' . $txt['with_selected'] . ':</option>
+							<option value="0" disabled="disabled">' . str_repeat('&#8212;', strlen($txt['approve'])) . '</option>
+							<option value="approve">&#10148;&nbsp;' . $txt['approve'] . '</option>
+							<option value="delete">&#10148;&nbsp;' . $txt['remove'] . '</option>
+						</select>
+						<noscript>
+							<input type="submit" name="mc_go" value="' . $txt['go'] . '" class="button_submit submitgo" />
+						</noscript>
+					</div>';
 
 	template_pagesection(false, false, array('extra' => $quick_mod));
 
 	echo '
-						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					</form>
-					</div>';
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+				</form>';
 }
 
 /**
@@ -478,36 +495,34 @@ function template_viewmodreport()
 /**
  * Callback function for showing a watched users post in the table.
  *
- * @param int $post
+ * @param array $post
  */
 function template_user_watch_post_callback($post)
 {
-	global $scripturl, $context, $txt, $delete_button;
+	global $scripturl, $context, $txt;
 
 	$output_html = '
-					<div>
-						<div class="floatleft">
-							<strong><a href="' . $scripturl . '?topic=' . $post['id_topic'] . '.' . $post['id'] . '#msg' . $post['id'] . '">' . $post['subject'] . '</a></strong> ' . $txt['mc_reportedp_by'] . ' <strong>' . $post['author_link'] . '</strong>
+					<div class="content">
+						<div class="counter">' . $post['counter'] . '</div>
+						<div class="topic_details">
+							<h5><a href="' . $scripturl . '?topic=' . $post['id_topic'] . '.' . $post['id'] . '#msg' . $post['id'] . '">' . $post['subject'] . '</a> ' . $txt['mc_reportedp_by'] . ' <strong>' . $post['author_link'] . '</strong></h5>
+							<span class="smalltext">' . '&#171; ' . $txt['mc_watched_users_posted'] . ': ' . $post['poster_time'] . ' &#187;</span>
 						</div>
-						<ul class="floatright quickbuttons">';
+						<div class="inner">' . $post['body'] . '</div>';
 
 	if ($post['can_delete'])
 		$output_html .= '
+						<ul class="quickbuttons">
+							<li class="listlevel1">
+								<input type="checkbox" name="delete[]" value="' . $post['id'] . '" class="input_check" />
+							</li>
 							<li class="listlevel1">
 								<a class="linklevel1 remove_button" href="' . $scripturl . '?action=moderate;area=userwatch;sa=post;delete=' . $post['id'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['mc_watched_users_delete_post'] . '\');">' . $txt['remove'] . '</a>
 							</li>
-							<li class="listlevel1">
-								<input type="checkbox" name="delete[]" value="' . $post['id'] . '" class="input_check" />
-							</li>';
+						</ul>';
 
 	$output_html .= '
-						</ul>
-					</div><br />
-					<div class="smalltext">
-						&#171; ' . $txt['mc_watched_users_posted'] . ': ' . $post['poster_time'] . ' &#187;
-					</div>
-					<hr />
-					' . $post['body'];
+					</div>';
 
 	return $output_html;
 }
@@ -625,12 +640,12 @@ function template_warn_template()
 	global $context, $txt, $scripturl;
 
 	echo '
-	<div id="modcenter">
-		<form action="', $scripturl, '?action=moderate;area=warnings;sa=templateedit;tid=', $context['id_template'], '" method="post" accept-charset="UTF-8">
-			<h2 class="category_header">', $context['page_title'], '</h2>
-			<div class="information">
-				', $txt['mc_warning_template_desc'], '
-			</div>
+	<form action="', $scripturl, '?action=moderate;area=warnings;sa=templateedit;tid=', $context['id_template'], '" method="post" accept-charset="UTF-8">
+		<h2 class="category_header">', $context['page_title'], '</h2>
+		<div class="information">
+			', $txt['mc_warning_template_desc'], '
+		</div>
+		<div id="modcenter">
 			<div class="windowbg">
 				<div class="content">
 					<div class="errorbox"', empty($context['warning_errors']) ? ' style="display: none"' : '', ' id="errors">
@@ -689,9 +704,8 @@ function template_warn_template()
 					</div>
 				</div>
 			</div>
-
-		</form>
-	</div>
+		</div>
+	</form>
 
 	<script><!-- // --><![CDATA[
 		$(document).ready(function() {

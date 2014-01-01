@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -353,7 +354,7 @@ function template_modify_user_subscription()
 		echo '
 		<h3 class="category_header">', $txt['pending_payments'], '</h3>
 		<div class="information">
-		', $txt['pending_payments_desc'], '
+			', $txt['pending_payments_desc'], '
 		</div>
 		<h3 class="category_header">', $txt['pending_payments_value'], '</h3>
 		<div class="windowbg">

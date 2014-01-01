@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ * 
  */
 
 /**
@@ -76,6 +77,7 @@ function template_messages_informations_above()
 			echo $txt['who_and'], $context['view_num_guests'], ' ', $context['view_num_guests'] == 1 ? $txt['guest'] : $txt['guests'], $txt['who_viewing_topic'], '
 				</span>';
 		}
+
 		// Is this topic a redirect?
 		if (!empty($context['topic_redirected_from']))
 			echo '
@@ -157,7 +159,7 @@ function template_messages()
 								<img src="', $message['icon_url'] . '" alt=""', $message['can_modify'] ? ' id="msg_icon_' . $message['id'] . '"' : '', ' />
 							</span>
 							<h5 id="info_', $message['id'], '">
-								<a href="', $message['href'], '" rel="nofollow">', !empty($message['counter']) ? sprintf($txt['reply_number'], $message['counter']) : '', '</a>', !empty($message['counter']) ? ' &ndash; ' : '', $message['time'], '
+								<a href="', $message['href'], '" rel="nofollow">', !empty($message['counter']) ? sprintf($txt['reply_number'], $message['counter']) : '', '</a>', !empty($message['counter']) ? ' &ndash; ' : '', $message['html_time'], '
 							</h5>
 							<div id="msg_', $message['id'], '_quick_mod"', $ignoring ? ' style="display:none;"' : '', '></div>
 						</div>';
@@ -383,7 +385,7 @@ function template_quickreply_below()
 						$context['oldTopicError'] ? '<p class="alert smalltext">' . sprintf($txt['error_old_topic'], $modSettings['oldTopicDays']) . '</p>' : '', '
 						', $context['can_reply_approved'] ? '' : '<em>' . $txt['wait_for_approval'] . '</em>', '
 						', !$context['can_reply_approved'] && $context['require_verification'] ? '<br />' : '', '
-						<form action="', $scripturl, '?board=', $context['current_board'], ';action=post2" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" onsubmit="submitonce(this);', (!empty($modSettings['mentions_enabled']) ? 'revalidateMentions(\'postmodify\', \'' . (empty($options['use_editor_quick_reply']) ? 'message' : $context['post_box_name']) . '\');': ''), '" >
+						<form action="', $scripturl, '?board=', $context['current_board'], ';action=post2" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" onsubmit="submitonce(this);', (!empty($modSettings['mentions_enabled']) ? 'revalidateMentions(\'postmodify\', \'' . (empty($options['use_editor_quick_reply']) ? 'message' : $context['post_box_name']) . '\');' : ''), '">
 							<input type="hidden" name="topic" value="', $context['current_topic'], '" />
 							<input type="hidden" name="subject" value="', $context['response_prefix'], $context['subject'], '" />
 							<input type="hidden" name="icon" value="xx" />
@@ -399,7 +401,8 @@ function template_quickreply_below()
 		if ($context['user']['is_guest'])
 			echo '
 							<strong>', $txt['name'], ':</strong> <input type="text" name="guestname" value="', $context['name'], '" size="25" class="input_text" tabindex="', $context['tabindex']++, '" />
-							<strong>', $txt['email'], ':</strong> <input type="text" name="email" value="', $context['email'], '" size="25" class="input_text" tabindex="', $context['tabindex']++, '" /><br />';
+							<strong>', $txt['email'], ':</strong> <input type="text" name="email" value="', $context['email'], '" size="25" class="input_text" tabindex="', $context['tabindex']++, '" />
+							<br />';
 
 		// Is visual verification enabled?
 		if ($context['require_verification'])

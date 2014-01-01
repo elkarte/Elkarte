@@ -122,7 +122,8 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 				'session' => $row['session']
 			),
 			'time' => standardTime($row['log_time']),
-			'timestamp' => $row['log_time'],
+			'html_time' => htmlTime($row['log_time']),
+			'timestamp' => forum_time(true, $row['log_time']),
 			'url' => array(
 				'html' => htmlspecialchars((substr($row['url'], 0, 1) == '?' ? $scripturl : '') . $row['url'], ENT_COMPAT, 'UTF-8'),
 				'href' => base64_encode($db->escape_wildcard_string($row['url']))

@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -219,7 +220,7 @@ function template_topic_listing()
 					</p>
 					<p class="topic_lastpost">
 						<a href="', $topic['last_post']['href'], '"><img src="', $settings['images_url'], '/icons/last_post.png" alt="', $txt['last_post'], '" title="', $txt['last_post'], '" /></a>
-						<time datetime="', htmlTime($topic['last_post']['timestamp']), '">', $topic['last_post']['time'], '</time><br />
+						', $topic['last_post']['html_time'], '<br />
 						', $txt['by'], ' ', $topic['last_post']['member']['link'], '
 					</p>
 				</div>';
@@ -265,12 +266,12 @@ function template_topic_listing()
 			echo '
 			<li class="qaction_row">
 				<select class="qaction" name="qaction"', $context['can_move'] ? ' onchange="this.form.move_to.disabled = (this.options[this.selectedIndex].value != \'move\');"' : '', '>
-					<option value="">--------</option>';
+					<option value="">&nbsp;</option>';
 
 			foreach ($context['qmod_actions'] as $qmod_action)
 				if ($context['can_' . $qmod_action])
 					echo '
-					<option value="' . $qmod_action . '">' . $txt['quick_mod_' . $qmod_action] . '</option>';
+					<option value="' . $qmod_action . '">&#10148;&nbsp;' . $txt['quick_mod_' . $qmod_action] . '</option>';
 
 			echo '
 				</select>';
@@ -286,7 +287,6 @@ function template_topic_listing()
 		}
 
 		echo '
-
 		</ul>';
 
 		// Finish off the form - again.

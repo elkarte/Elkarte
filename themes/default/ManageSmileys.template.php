@@ -12,8 +12,12 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
+/**
+ * Load in the generic helpers
+ */
 function template_ManageSmileys_init()
 {
 	loadTemplate('GenericHelpers');
@@ -27,7 +31,7 @@ function template_editsets()
 	echo '
 	<div id="admincenter">';
 
-	template_show_list('smiley_set_list');
+		template_show_list('smiley_set_list');
 
 	echo '
 	</div>';
@@ -47,16 +51,16 @@ function template_modifyset()
 			', $context['current_set']['is_new'] ? $txt['smiley_set_new'] : $txt['smiley_set_modify_existing'], '
 			</h2>';
 
-		// If this is an existing set, and there are still un-added smileys - offer an import opportunity.
-		if (!empty($context['current_set']['can_import']))
-		{
-			echo '
-			<div class="information">
-				', $context['current_set']['can_import'] == 1 ? $txt['smiley_set_import_single'] : $txt['smiley_set_import_multiple'], ' <a href="', $scripturl, '?action=admin;area=smileys;sa=import;set=', $context['current_set']['id'], ';', $context['session_var'], '=', $context['session_id'], ';', $context['admin-mss_token_var'], '=' ,$context['admin-mss_token'],'">', $txt['here'], '</a> ', $context['current_set']['can_import'] == 1 ? $txt['smiley_set_to_import_single'] : $txt['smiley_set_to_import_multiple'], '
-			</div>';
-		}
-
+	// If this is an existing set, and there are still un-added smileys - offer an import opportunity.
+	if (!empty($context['current_set']['can_import']))
+	{
 		echo '
+			<div class="information">
+				', $context['current_set']['can_import'] == 1 ? $txt['smiley_set_import_single'] : $txt['smiley_set_import_multiple'], ' <a href="', $scripturl, '?action=admin;area=smileys;sa=import;set=', $context['current_set']['id'], ';', $context['session_var'], '=', $context['session_id'], ';', $context['admin-mss_token_var'], '=', $context['admin-mss_token'], '">', $txt['here'], '</a> ', $context['current_set']['can_import'] == 1 ? $txt['smiley_set_to_import_single'] : $txt['smiley_set_to_import_multiple'], '
+			</div>';
+	}
+
+	echo '
 			<div class="windowbg">
 				<div class="content">
 					<dl class="settings">
@@ -72,26 +76,26 @@ function template_modifyset()
 						<dd>
 							', $modSettings['smileys_url'], '/';
 
-		if ($context['current_set']['id'] == 'default')
-			echo '
+	if ($context['current_set']['id'] == 'default')
+		echo '
 							<strong>default</strong><input type="hidden" name="smiley_sets_path" id="smiley_sets_path" value="default" />';
-		elseif (empty($context['smiley_set_dirs']))
-			echo '
+	elseif (empty($context['smiley_set_dirs']))
+		echo '
 							<input type="text" name="smiley_sets_path" id="smiley_sets_path" value="', $context['current_set']['path'], '" class="input_text" /> ';
-		else
-		{
-			echo '
+	else
+	{
+		echo '
 							<select name="smiley_sets_path" id="smiley_sets_path">';
 
-			foreach ($context['smiley_set_dirs'] as $smiley_set_dir)
-				echo '
+		foreach ($context['smiley_set_dirs'] as $smiley_set_dir)
+			echo '
 								<option value="', $smiley_set_dir['id'], '"', $smiley_set_dir['current'] ? ' selected="selected"' : '', $smiley_set_dir['selectable'] ? '' : ' disabled="disabled"', '>', $smiley_set_dir['id'], '</option>';
 
-			echo '
-							</select> ';
-		}
-
 		echo '
+							</select> ';
+	}
+
+	echo '
 							/..
 						</dd>
 						<dt>
@@ -101,9 +105,9 @@ function template_modifyset()
 							<input type="checkbox" name="smiley_sets_default" id="smiley_sets_default" value="1"', $context['current_set']['selected'] ? ' checked="checked"' : '', ' class="input_check" />
 						</dd>';
 
-		// If this is a new smiley set they have the option to import smileys already in the directory.
-		if ($context['current_set']['is_new'] && !empty($modSettings['smiley_enable']))
-			echo '
+	// If this is a new smiley set they have the option to import smileys already in the directory.
+	if ($context['current_set']['is_new'] && !empty($modSettings['smiley_enable']))
+		echo '
 						<dt>
 							<strong><label for="smiley_sets_import">', $txt['smiley_set_import_directory'], '</label>: </strong>
 						</dt>
@@ -111,7 +115,7 @@ function template_modifyset()
 							<input type="checkbox" name="smiley_sets_import" id="smiley_sets_import" value="1" class="input_check" />
 						</dd>';
 
-		echo '
+	echo '
 					</dl>
 					<hr />
 					<input type="submit" name="smiley_save" value="', $txt['smiley_sets_save'], '" class="right_submit" />
@@ -144,11 +148,11 @@ function template_modifysmiley()
 						<dd>
 							<img src="', $modSettings['smileys_url'], '/', $modSettings['smiley_sets_default'], '/', $context['current_smiley']['filename'], '" id="preview" alt="" /> (', $txt['smiley_preview_using'], ': <select name="set" onchange="updatePreview();">';
 
-		foreach ($context['smiley_sets'] as $smiley_set)
-			echo '
+	foreach ($context['smiley_sets'] as $smiley_set)
+		echo '
 							<option value="', $smiley_set['path'], '"', $context['selected_set'] == $smiley_set['path'] ? ' selected="selected"' : '', '>', $smiley_set['name'], '</option>';
 
-		echo '
+	echo '
 							</select>)
 						</dd>
 						<dt>
@@ -162,23 +166,23 @@ function template_modifysmiley()
 						</dt>
 						<dd>';
 
-			if (empty($context['filenames']))
-				echo '
+	if (empty($context['filenames']))
+		echo '
 							<input type="text" name="smiley_filename" id="smiley_filename" value="', $context['current_smiley']['filename'], '" class="input_text" />';
-			else
-			{
-				echo '
+	else
+	{
+		echo '
 							<select name="smiley_filename" id="smiley_filename" onchange="updatePreview();">';
 
-				foreach ($context['filenames'] as $filename)
-					echo '
+		foreach ($context['filenames'] as $filename)
+			echo '
 								<option value="', $filename['id'], '"', $filename['selected'] ? ' selected="selected"' : '', '>', $filename['id'], '</option>';
 
-				echo '
+		echo '
 							</select>';
-			}
+	}
 
-			echo '
+	echo '
 						</dd>
 						<dt>
 							<strong><label for="smiley_description">', $txt['smileys_description'], '</label>: </strong>
@@ -256,11 +260,11 @@ function template_addsmiley()
 
 							';
 
-		foreach ($context['smiley_sets'] as $smiley_set)
-			echo '
+	foreach ($context['smiley_sets'] as $smiley_set)
+		echo '
 								<option value="', $smiley_set['path'], '"', $context['selected_set'] == $smiley_set['path'] ? ' selected="selected"' : '', '>', $smiley_set['name'], '</option>';
 
-		echo '
+	echo '
 								</select>
 							</dd>
 							<dt>

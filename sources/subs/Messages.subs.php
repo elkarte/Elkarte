@@ -187,7 +187,7 @@ function prepareMessageContext($message)
 	// When was it last modified?
 	if (!empty($message['message']['modified_time']))
 	{
-		$context['last_modified'] = relativeTime($message['message']['modified_time']);
+		$context['last_modified'] = standardTime($message['message']['modified_time']);
 		$context['last_modified_text'] = sprintf($txt['last_edit_by'], $context['last_modified'], $message['message']['modified_name']);
 	}
 
@@ -645,7 +645,7 @@ function removeMessage($message, $decreasePostCount = true)
 		}
 
 		// Delete attachment(s) if they exist.
-		require_once(SUBSDIR . '/Attachments.subs.php');
+		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 		$attachmentQuery = array(
 			'attachment_type' => 0,
 			'id_msg' => $message,

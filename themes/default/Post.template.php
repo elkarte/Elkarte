@@ -12,8 +12,12 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
+/**
+ * Load in the generic templates for use
+ */
 function template_Post_init()
 {
 	loadTemplate('GenericHelpers');
@@ -96,8 +100,8 @@ function template_postarea_above()
 
 	if (!empty($context['drafts_autosave']))
 		echo '
-						<div id="draft_section" class="successbox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>',
-							sprintf($txt['draft_saved'], $scripturl . '?action=profile;u=' . $context['user']['id'] . ';area=showdrafts'), '
+						<div id="draft_section" class="successbox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>
+							', sprintf($txt['draft_saved'], $scripturl . '?action=profile;u=' . $context['user']['id'] . ';area=showdrafts'), '
 						</div>';
 
 	// The post header... important stuff
@@ -169,7 +173,9 @@ function template_poll_edit_above()
 	echo '
 					<hr class="clear" />
 					<div id="edit_poll">';
+
 	template_poll_edit();
+
 	echo '
 					</div>';
 }
@@ -315,7 +321,7 @@ function template_post_page()
 	// Option to add a poll (javascript if enabled, otherwise preview with poll)
 	if (!$context['make_poll'] && $context['can_add_poll'])
 		echo '
-							<input type="submit" name="poll" value="', $txt['add_poll'], '" onclick="return loadAddNewPoll(this, ', empty($context['current_board']) ? '' : $context['current_board'],', \'postmodify\');" class="button_submit" />';
+							<input type="submit" name="poll" value="', $txt['add_poll'], '" onclick="return loadAddNewPoll(this, ', empty($context['current_board']) ? '' : $context['current_board'], ', \'postmodify\');" class="button_submit" />';
 
 	echo '
 						</div>';
@@ -450,6 +456,9 @@ function template_additional_options_below()
 					</div>';
 }
 
+/**
+ * Shows the draft selection box
+ */
 function template_load_drafts_below()
 {
 	global $context, $txt;

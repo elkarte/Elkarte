@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -296,7 +297,7 @@ function template_create_index_progress()
 	<script><!-- // --><![CDATA[
 		var countdown = 10,
 			txt_message = "', $txt['search_create_index_continue'], '";
-				
+
 		doAutoSubmit();
 	// ]]></script>';
 }
@@ -458,8 +459,8 @@ function template_manage_sphinx()
 
 	echo '
 			<div class="information">
-				<div class="successbox">',
-					$context['page_description'], '
+				<div class="successbox">
+					', $context['page_description'], '
 				</div>
 			</div>
 

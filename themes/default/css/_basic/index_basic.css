@@ -44,16 +44,293 @@
 /*		$MEDIA...............Experimental media queries.
 /* ------------------------------------------------------- */
 
+/*	$GENERAL	*/
+/* ------------------------------------------------------- */
+/* Normal, standard links. */
+a, a:link, a:visited,
+/* Links that open in a new window. */
+a.new_win:link, a.new_win:visited {
+	color: darkgreen;
+	text-decoration: none;
+}
+/* Cursor declared here.Should not be required anywhere else. */
+a:hover, a.new_win:hover {
+	text-decoration: underline;
+}
 
+/* Stop white band under footer on short pages. */
+/* This color should match $FOOTER background. */
+html {
+	background: #eee;
+}
+body {
+	background: #fff;
+	color: #666;
+}
+fieldset {
+	border: none;
+	background: transparent;
+	border: 1px solid #ccc;
+	box-shadow: none;
+	border-radius: 5px;
+}
+legend {
+	background: url(../../images/selected_open.png) no-repeat scroll left center transparent;
+	cursor: pointer;
+	padding-left: 20px;
+	color: #333;
+	font-size: 1.2em;
+	margin-left: 15px;
+}
+.collapsed legend {
+	background:  url(../../images/selected.png) no-repeat scroll left center transparent;
+}
+
+input, button, select, textarea, .editor {
+	border: 1px solid #ccc;
+	border-radius: 2px;
+	background: #fff;
+	color: #666;
+}
+
+input:hover, textarea:hover, button:hover, select:hover {
+	border: 1px solid #999;
+}
+textarea:hover, .editor:hover {
+	background: #fbfbfb;
+}
+input:focus, textarea:focus, button:focus, select:focus, .editor:focus {
+	border: 1px solid #999;
+}
+/* Give disabled text input elements a different background color. */
+input[disabled].input_text {
+	background: #eee;
+}
+
+/* The OpenID login form */
+.openid_login {
+	padding-left: 20px;
+	background: white url(../../images/openid.png) no-repeat;
+	background-position: 2% 50%;
+}
+
+/* Common button styling. */
+/* It is being replaced with three classes: */
+/*    .button_submit is not floated    */
+/*    .right_submit is right floated   */
+/*    .left_submit is left floated     */
+/* The button_reset class may need attention too. */
+.button_submit, .right_submit, .left_submit, .button_reset,
+/* Anchors styled to look like buttons. */
+/* These have standard body text size. Can be chained with smalltext class. */
+.linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
+.linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
+	border: 1px solid #afafaf;
+	background: #f4f4f4;
+	color: #555;
+}
+
+/* Hover effects. */
+.button_submit:hover, .right_submit:hover, .left_submit:hover,
+.button_reset:hover,
+.linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover {
+	border: 1px solid #ccc;
+	background: #f0f0f0;
+	color: #555;
+	text-decoration: none;
+}
+
+/* the new "button" */
+.new_posts, .new_posts:visited, .new_posts:link {
+	border-radius: 2px;
+	background: #cacaca;
+	color: #fff;
+}
+
+/* Standard horizontal rule.. ([hr], etc.) */
+hr {
+	border-top: 1px solid #bbb;
+	background: #eee;
+	background-color: #eee;
+}
+
+/* Define strong as font-weight: 600; - defaults to bold */
+/* for fonts which do not support numerical font-weight) */
+strong {
+	font-weight: 600;
+}
+
+/* @todo - Test this everywhere. */
+.standard_category {
+	border-radius: 4px 4px 0 0;
+	background: #e4e4e4;
+}
+/* @todo - Test this everywhere. */
+.standard_category>.content {
+	border: 1px solid #ddd;
+	background: #fff;
+}
+
+/* Styles for main headers. */
+.category_header, .forum_category .category_header {
+	border: 1px solid #ccc;
+	border-radius: 3px 3px 0 0;
+	background: #ebebeb;
+	color: #566450;
+	text-shadow: 1px 1px 0 #ebebeb;
+}
+/* Single ones a bit darker than board index ones. */
+.forumposts .category_header, .content_category .category_header {
+	border-top: 1px solid #cfcfcf;
+	border-bottom: 1px solid #b7b7b7;
+	background: #e9e9e9;
+}
+/* Styles for subsection headers. @todo */
+.secondary_header {
+	border: 1px solid #ccc;
+	border-top: 1px solid #dfdfdf;
+	background: #fafafa;
+	text-shadow: 1px 1px 0 #fff;
+}
+
+.category_header a:link {
+	color: #777;
+}
+
+/* Upshrink image in the general category headers */
+#category_toggle, #category_toggle_more, #upshrink_header {
+	border-radius: 2px;
+}
+
+/* Upshrink image in the page top for the header collapse */
+#collapse_button .linklevel1 {
+	border-radius: 2px;
+}
+
+/* Custom highlighted text style for modern browsers. */
+/* Nicer than default blue. Needs two separate rules. */
+::-moz-selection {
+	background: #d8ffdf;
+	color: #444;
+}
+::selection {
+	background: #d8ffdf;
+	color: #444;
+}
+
+/* Other highlighted text, such as search results. */
+.highlight {
+	color: #ff7200;
+}
+/* Legacy highlight color, for selected membergroups etc. */
+/* Used by JS to show a selected item. @todo - deprecate? */
+.highlight2 {
+	background: #d1e1ef;
+	color: #555;
+}
+
+/* Used for sections that need somewhat larger corners */
+/* @todo - Daft name. Other stuffz. :P */
+.roundframe {
+	border: 1px solid #c5c5c5;
+	border-radius: 7px;
+	background: #f5f5f5;
+}
+
+/* The generic wrapper thingy.  */
+.generic_list_wrapper {
+	border: 1px solid #ccc;
+	border-radius: 7px;
+}
+.generic_list_wrapper .additional_row {
+	border-radius: 0;
+}
+.generic_list_wrapper .title_bar {
+	border-bottom: 1px solid #fff;
+	border-radius: 0;
+	background: none;
+}
+.generic_list_wrapper .information {
+	border-bottom: 1px solid #fff;
+	background: none;
+}
+
+/* Styles used by the auto suggest control. */
+.auto_suggest_div {
+	border: 1px solid #bbb;
+	border-radius: 3px;
+}
+.auto_suggest_div:focus {
+	border: 1px solid #bbb;
+}
+.auto_suggest_item {
+	background: #ddd;
+}
+.auto_suggest_item_hover {
+	background: #888;
+	color: #eee;
+}
+
+/*	$MAIN.		*/
+/* ------------------------------------------------------- */
+/* The top bar. */
+#top_section {
+	background: #eee;
+	border-bottom: 1px solid #ccc;
+}
+/* Maintenance mode warning. */
+.notice {
+	font-weight: 700;
+	color: #a80000;
+}
+
+#search_form .button_submit {
+	font-variant: small-caps;
+	color: #333;
+}
+#search_form select {
+	padding-right: 4px;
+	border: 1px solid #bbb;
+	border-right: none;
+	opacity: 0.8;
+}
+#search_form select:focus {
+	border: 1px solid #999;
+	border-right: none;
+	opacity: 1;
+}
+/* News section. */
+#news {
+	font-size: 0.929em;
+}
+#news_line, #elkFadeScroller {
+	border: 1px solid #ccc;
+	background: #fff;
+}
+/* Main forum area. */
+/* Box-shadow only on this one. */
+#wrapper {
+	background: #fafafa;
+	border: 1px solid #ccc;
+}
+
+#debug_logging a, #debug_logging strong {
+	color: yellow;
+}
+#debug_logging {
+	color: #bbb;
+	background: #222;
+	margin: 0 auto;
+	max-width: 90em;
+	width: 90%;
+}
+#debug_logging_wrapper {
+	background: #222;
+}
 
 
 /*	$MENUS		*/
 /* ------------------------------------------------------- */
-
-/* Visible menu bar: wrapper/background. */
-#main_menu {
-	background: forestgreen;
-}
 
 /* Needed for new PM notifications. */
 .listlevel1 strong {
@@ -65,7 +342,8 @@
 /* A default transparent border stops links jumping on hover. */
 #main_menu .linklevel1, .admin_menu .linklevel1, #adm_submenus .linklevel1 {
 	border: 1px solid transparent;
-	color: white;
+	color: #222;
+	background: #eee;
 }
 
 /* Override link colour for admin/profile/etc menus. */
@@ -82,11 +360,9 @@
 
 /* For secondary admin/profile/etc menus. */
 #adm_submenus .linklevel1:hover, #adm_submenus .linklevel1:focus {
-	border: 1px solid darkgray;
+	border: 1px solid #ccc;
 	color: black;
 	text-decoration: none;
-	/* This is a pale grey. */
-	background: gainsboro;
 }
 
 /* Main menu Level 1 active button and hover need a different border. */
@@ -116,10 +392,7 @@
 }
 
 /* Top level subsection indicators. */
-/* Comment these out if you don't want them. */
-#main_menu .subsections .linklevel1, .admin_menu .subsections .linklevel1 {
-	padding: 0 0.8em 0 0.5em;
-}
+
 #main_menu .subsections .linklevel1:after,.admin_menu .subsections .linklevel1:after {
 	position: absolute;
 	top: 0.5em;
@@ -130,7 +403,7 @@
 
 /* Levels 2 and 3: drop menu wrapper. */
 .menulevel2, .menulevel3 {
-	border: 1px solid darkgray;
+	border: 1px solid grey;
 	background: white;
 }
 

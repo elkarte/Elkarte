@@ -1591,6 +1591,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	// Relative times?
 	if (!empty($modSettings['todayMod']) && $modSettings['todayMod'] > 2)
+	{
 		addInlineJavascript('
 		var oRttime = ({
 			currentTime : ' . JavaScriptEscape(forum_time()) . ',
@@ -1609,6 +1610,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 			years : ' . JavaScriptEscape($txt['rt_years']) . ',
 		});
 		updateRelativeTime();', true);
+	}
 
 	// Queue our Javascript
 	loadJavascriptFile(array('elk_jquery_plugins.js', 'script.js', 'script_elk.js', 'theme.js'));
@@ -2756,12 +2758,17 @@ function doSecurityChecks()
 		Template_Layers::getInstance()->addAfter('admin_warning', 'body');
 }
 
+/**
+ * Returns the current server load for nix systems
+ * Used to enable / disable features based on current system overhead
+ */
 function detectServerLoad()
 {
 	$load_average = @file_get_contents('/proc/loadavg');
-	if (!empty($modSettings['load_average']) && preg_match('~^([^ ]+?) ([^ ]+?) ([^ ]+)~', $modSettings['load_average'], $matches) != 0)
+
+	if (!empty($load_average) && preg_match('~^([^ ]+?) ([^ ]+?) ([^ ]+)~', $load_average, $matches) != 0)
 		return (float) $matches[1];
-	elseif (($modSettings['load_average'] = @`uptime`) != null && preg_match('~load average[s]?: (\d+\.\d+), (\d+\.\d+), (\d+\.\d+)~i', $modSettings['load_average'], $matches) != 0)
+	elseif (($load_average = @`uptime`) != null && preg_match('~load average[s]?: (\d+\.\d+), (\d+\.\d+), (\d+\.\d+)~i', $load_average, $matches) != 0)
 		return (float) $matches[1];
 
 	return false;

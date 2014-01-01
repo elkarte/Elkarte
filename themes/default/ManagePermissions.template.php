@@ -12,6 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
+ *
  */
 
 /**
@@ -81,7 +82,7 @@ function template_permission_index()
 								<select name="copy_from">
 									<option value="empty">(', $txt['permissions_select_membergroup'], ')</option>';
 		foreach ($context['groups'] as $group_id => $group_name)
-				echo '
+			echo '
 									<option value="', $group_id, '">', $group_name, '</option>';
 
 		echo '
@@ -503,6 +504,8 @@ function template_modify_group()
 
 /**
  * The classic way of looking at permissions.
+ *
+ * @param string $type
  */
 function template_modify_group_classic($type)
 {
