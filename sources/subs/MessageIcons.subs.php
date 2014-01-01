@@ -110,7 +110,7 @@ function addMessageIcon($icon)
 {
 	$db = database();
 
-	$db->insert('replace',
+	$db->insert('',
 		'{db_prefix}message_icons',
 		array('id_board' => 'int', 'title' => 'string-80', 'filename' => 'string-80', 'icon_order' => 'int'),
 		$icon,
