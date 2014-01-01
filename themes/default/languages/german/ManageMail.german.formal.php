@@ -2,6 +2,7 @@
 // Version: 1.0; ManageMail
 
 $txt['mailqueue_desc'] = 'Auf dieser Seite können Sie Ihre Maileinstellungen konfigurieren sowie die aktuelle Mailwarteschlange, falls aktiviert, ansehen und administrieren.';
+$txt['mail_settings'] = 'Maileinstellungen';
 
 $txt['mail_type'] = 'Mailtyp';
 $txt['mail_type_default'] = '(PHP-Standardwert)';
@@ -11,9 +12,9 @@ $txt['smtp_username'] = 'SMTP-Benutzername';
 $txt['smtp_password'] = 'SMTP-Passwort';
 
 $txt['mail_queue'] = 'Mailwarteschlange aktivieren';
-$txt['mail_limit'] = 'Höchstzahl an zu versendenden Mails pro Minute';
-$txt['mail_limit_desc'] = '(Auf 0 setzen zum Deaktivieren)';
-$txt['mail_quantity'] = 'Höchstzahl an zu versendenden Mails pro Seitenaufruf';
+$txt['mail_period_limit'] = 'Höchstzahl an zu versendenden Mails pro Minute';
+$txt['mail_period_limit_desc'] = '(Auf 0 setzen zum Deaktivieren)';
+$txt['mail_batch_size'] = 'Höchstzahl an zu versendenden Mails pro Seitenaufruf';
 
 $txt['mailqueue_stats'] = 'Warteschlangenstatistik';
 $txt['mailqueue_oldest'] = 'Älteste Mail';
