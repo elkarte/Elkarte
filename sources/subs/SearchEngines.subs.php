@@ -39,9 +39,10 @@ function spiderCheck()
 	// We cache the spider data for five minutes if we can.
 	if (($spider_data = cache_get_data('spider_search', 300)) === null)
 	{
-		$request = $db->query('spider_check', '
+		$request = $db->query('', '
 			SELECT id_spider, user_agent, ip_info
-			FROM {db_prefix}spiders',
+			FROM {db_prefix}spiders
+			ORDER BY LENGTH(user_agent) DESC',
 			array(
 			)
 		);
@@ -256,35 +257,21 @@ function recacheSpiderNames()
 
 /**
  * Sort the search engine table by user agent name to avoid misidentification of engine.
+ *
+ * @deprecated the ordering is done in the query, probably not needed
  */
 function sortSpiderTable()
 {
 	$db = database();
 
-	$table = db_table();
-
-	// Add a sorting column.
-	$table->db_add_column('{db_prefix}spiders', array('name' => 'temp_order', 'size' => 8, 'type' => 'mediumint', 'null' => false));
-
-	// Set the contents of this column.
-	$db->query('set_spider_order', '
-		UPDATE {db_prefix}spiders
-		SET temp_order = LENGTH(user_agent)',
-		array(
-		)
-	);
-
-	// Order the table by this column.
+	// Order the table by user_agent length.
 	$db->query('alter_table_spiders', '
 		ALTER TABLE {db_prefix}spiders
-		ORDER BY temp_order DESC',
+		ORDER BY LENGTH(user_agent) DESC',
 		array(
 			'db_error_skip' => true,
 		)
 	);
-
-	// Remove the sorting column.
-	$table->db_remove_column('{db_prefix}spiders', 'temp_order');
 }
 
 /**

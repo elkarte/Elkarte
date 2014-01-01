@@ -353,9 +353,6 @@ class Database_PostgreSQL implements Database
 			'profile_board_stats' => array(
 				'~COUNT\(\*\) \/ MAX\(b.num_posts\)~' => 'CAST(COUNT(*) AS DECIMAL) / CAST(b.num_posts AS DECIMAL)',
 			),
-			'set_smiley_order' => array(
-				'~(.+)~' => '',
-			),
 		);
 
 		if (isset($replacements[$identifier]))

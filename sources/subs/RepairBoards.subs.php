@@ -1338,6 +1338,7 @@ function createSalvageArea()
 		$salvageBoardID = $db->insert_id('{db_prefix}boards', 'id_board');
 	}
 
+	// @deprecated the ordering is done in the query, probably not needed
 	$db->query('alter_table_boards', '
 		ALTER TABLE {db_prefix}boards
 		ORDER BY board_order',
