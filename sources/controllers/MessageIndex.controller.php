@@ -420,6 +420,9 @@ class MessageIndex_Controller extends Action_Controller
 			determineTopicClass($context['topics'][$row['id_topic']]);
 		}
 
+		// Allow addons to add to the $context['topics']
+		call_integration_hook('integrate_messageindex_listing', array($topics_info));
+
 		// Fix the sequence of topics if they were retrieved in the wrong order. (for speed reasons...)
 		if ($fake_ascending)
 			$context['topics'] = array_reverse($context['topics'], true);
