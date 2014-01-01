@@ -335,9 +335,6 @@ class Database_PostgreSQL implements Database
 			'insert_log_search_results_subject' => array(
 				'~NOT RLIKE~' => '!~',
 			),
-			'select_message_icons' => array(
-				'~(.)$~' => '$1 ORDER BY icon_order',
-			),
 			'set_character_set' => array(
 				'~SET\\s+NAMES\\s([a-zA-Z0-9\\-_]+)~' => 'SET NAMES \'$1\'',
 			),
