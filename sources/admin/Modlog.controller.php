@@ -73,7 +73,7 @@ class Modlog_Controller extends Action_Controller
 
 		// The number of entries to show per page of log file.
 		$context['displaypage'] = 30;
-		
+
 		// Amount of hours that must pass before allowed to delete file.
 		$context['hoursdisable'] = 24;
 
