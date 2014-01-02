@@ -117,7 +117,9 @@ class Display_Controller
 			'member' => $user_info['id'],
 			'board' => (int) $board,
 		);
-		call_integration_hook('integrate_display_topic', array(&$topic_selects, &$topic_tables, &$topic_parameters));
+
+		// Allow addons to add additional details to the topic query
+		call_integration_hook('integrate_topic_query', array(&$topic_selects, &$topic_tables, &$topic_parameters));
 
 		// Load the topic details
 		$topicinfo = getTopicInfo($topic_parameters, 'all', $topic_selects, $topic_tables);
@@ -274,6 +276,9 @@ class Display_Controller
 
 		// Is this topic sticky, or can it even be?
 		$topicinfo['is_sticky'] = empty($modSettings['enableStickyTopics']) ? '0' : $topicinfo['is_sticky'];
+
+		// Allow addons access to the topicinfo array
+		call_integration_hook('integrate_display_topic', array($topicinfo));
 
 		// Default this topic to not marked for notifications... of course...
 		$context['is_marked_notify'] = false;
