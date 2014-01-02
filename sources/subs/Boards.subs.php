@@ -1904,7 +1904,7 @@ function decrementBoard($id_board, $values)
 
 	foreach ($values as $key => $val)
 	{
-		if (in_array($val, $knownInts))
+		if (in_array($key, $knownInts))
 		{
 			$set[] = $key . ' = CASE WHEN {int:' . $key . '} > ' . $key . ' THEN 0 ELSE ' . $key . ' - {int:' . $key . '} END';
 			$params[$key] = $val;
