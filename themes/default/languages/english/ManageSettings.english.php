@@ -170,7 +170,7 @@ $txt['loadavg_disabled_conf'] = '<span class="error">Load balancing support is d
 
 $txt['setting_password_strength'] = 'Required strength for user passwords';
 $txt['setting_password_strength_low'] = 'Low - 4 character minimum';
-$txt['setting_password_strength_medium'] = 'Medium - cannot contain username';
+$txt['setting_password_strength_medium'] = 'Medium - cannot contain user name';
 $txt['setting_password_strength_high'] = 'High - mixture of different characters';
 $txt['setting_enable_password_conversion'] = 'Allow password hash conversion';
 
@@ -214,9 +214,9 @@ $txt['badbehavior_postcount_wl_desc'] = '(0 to disable)';
 $txt['badbehavior_ip_wl'] = 'Whitelist by IP address';
 $txt['badbehavior_ip_wl_desc'] = 'IP Address (CIDR Format 127.0.0.1 or 127.0.0.0/24)';
 $txt['badbehavior_ip_wl_add'] = 'Add another IP address';
-$txt['badbehavior_useragent_wl'] = 'Whitelist by user agent string';
+$txt['badbehavior_useragent_wl'] = 'Whitelist by User Agent string';
 $txt['badbehavior_useragent_wl_desc'] = 'Example: Mozilla/4.0 (It\'s me, let me in)';
-$txt['badbehavior_useragent_wl_add'] = 'Add another Useragent string';
+$txt['badbehavior_useragent_wl_add'] = 'Add another User Agent string';
 $txt['badbehavior_url_wl'] = 'Whitelist by URL';
 $txt['badbehavior_url_wl_desc'] = 'Example: /subscriptions.php';
 $txt['badbehavior_url_wl_add'] = 'Add another URL';
