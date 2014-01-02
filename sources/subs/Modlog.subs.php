@@ -368,7 +368,7 @@ function deleteLogAction($id_log, $time, $delete = null)
 			AND log_time < {int:twenty_four_hours_wait}',
 		array(
 			'twenty_four_hours_wait' => time() - $time * 3600,
-			'delete_actions' => array_unique($delete),
+			'delete_actions' => !is_null($delete) ? array_unique($delete) : null,
 			'moderate_log' => $id_log,
 		)
 	);
