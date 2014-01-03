@@ -14,6 +14,7 @@ ul, ol {
 }
 
 table, td {
+	min-width: 1em;
 	border: 1px dotted #000;
 	empty-cells: show;
 }
@@ -46,7 +47,6 @@ code cite {
 	top: -1.6em;
 	padding-left: 3em;
 }
-
 blockquote {
 	position: relative;
 	background: #ebf4f8;
