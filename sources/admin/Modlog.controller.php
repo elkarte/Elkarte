@@ -73,7 +73,7 @@ class Modlog_Controller extends Action_Controller
 
 		// The number of entries to show per page of log file.
 		$context['displaypage'] = 30;
-		
+
 		// Amount of hours that must pass before allowed to delete file.
 		$context['hoursdisable'] = 24;
 
@@ -158,7 +158,7 @@ class Modlog_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/List.class.php');
 
-		// This is all the information required for a watched user listing.
+		// This is all the information required for a moderation/admin log listing.
 		$listOptions = array(
 			'id' => 'moderation_log_list',
 			'width' => '100%',
@@ -167,7 +167,7 @@ class Modlog_Controller extends Action_Controller
 			'base_href' => $scripturl . $context['url_start'] . (!empty($context['search_params']) ? ';params=' . $context['search_params'] : ''),
 			'default_sort_col' => 'time',
 			'get_items' => array(
-				'function' => 'list_getModLogEntries',
+				'function' => array($this, 'getModLogEntries'),
 				'params' => array(
 					(!empty($search_params['string']) ? ' INSTR({raw:sql_type}, {string:search_string})' : ''),
 					array('sql_type' => $search_params_column, 'search_string' => $search_params['string']),
@@ -175,14 +175,13 @@ class Modlog_Controller extends Action_Controller
 				),
 			),
 			'get_count' => array(
-				'function' => 'list_getModLogEntryCount',
+				'function' => array($this, 'getModLogEntryCount'),
 				'params' => array(
 					(!empty($search_params['string']) ? ' INSTR({raw:sql_type}, {string:search_string})' : ''),
 					array('sql_type' => $search_params_column, 'search_string' => $search_params['string']),
 					$context['log_type'],
 				),
 			),
-			// This assumes we are viewing by user.
 			'columns' => array(
 				'action' => array(
 					'header' => array(
@@ -294,10 +293,43 @@ class Modlog_Controller extends Action_Controller
 
 		createToken('mod-ml');
 
-		// Create the watched user list.
+		// Create the log listing
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';
 		$context['default_list'] = 'moderation_log_list';
+	}
+
+	/**
+	 * Callback for createList()
+	 * Returns a list of moderation log entries
+	 * Uses list_getModLogEntries in modlog subs
+	 *
+	 * @param int $start
+	 * @param int $items_per_page
+	 * @param string $sort
+	 * @param string $query_string
+	 * @param array $query_params
+	 * @param int $log_type
+	 */
+	public function getModLogEntries($start, $items_per_page, $sort, $query_string, $query_params, $log_type)
+	{
+		// Get all entries of $log_type
+		return list_getModLogEntries($start, $items_per_page, $sort, $query_string, $query_params, $log_type);
+	}
+
+	/**
+	 * Callback for createList()
+	 * Returns a count of moderation/admin log entries
+	 * Uses list_getModLogEntryCount in modlog subs
+	 *
+	 * @param string $query_string
+	 * @param array $query_params
+	 * @param int $log_type
+	 */
+	public function getModLogEntryCount($query_string, $query_params, $log_type)
+	{
+		// Get the count of our solved topic entries
+		return list_getModLogEntryCount($query_string, $query_params, $log_type);
 	}
 }

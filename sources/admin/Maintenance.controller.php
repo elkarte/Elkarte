@@ -1054,7 +1054,7 @@ class Maintenance_Controller extends Action_Controller
 
 	/**
 	 * Generates a list of integration hooks for display
-	 * Accessed through ?action=admin;area=addonsettings;sa=hooks;
+	 * Accessed through ?action=admin;area=maintain;sa=hooks;
 	 * Allows for removal or disabing of selected hooks
 	 */
 	public function action_hooks()
@@ -1065,6 +1065,8 @@ class Maintenance_Controller extends Action_Controller
 
 		$context['filter_url'] = '';
 		$context['current_filter'] = '';
+
+		// Get the list of the current system hooks, filter them if needed
 		$currentHooks = get_integration_hooks();
 		if (isset($_GET['filter']) && in_array($_GET['filter'], array_keys($currentHooks)))
 		{
@@ -1094,17 +1096,18 @@ class Maintenance_Controller extends Action_Controller
 						$function_remove = $_REQUEST['function'] . ']';
 						$function_add = $_REQUEST['function'];
 					}
+
 					$file = !empty($_REQUEST['includedfile']) ? urldecode($_REQUEST['includedfile']) : '';
 
 					remove_integration_function($_REQUEST['hook'], $function_remove, $file);
 					add_integration_function($_REQUEST['hook'], $function_add, $file);
 
-					// clean the cache.
+					// Clean the cache.
 					require_once(SUBSDIR . '/Cache.subs.php');
 					clean_cache();
-
-					redirectexit('action=admin;area=addonsettings;sa=hooks' . $context['filter_url']);
 				}
+
+				redirectexit('action=admin;area=maintain;sa=hooks' . $context['filter_url']);
 			}
 		}
 
@@ -1112,7 +1115,7 @@ class Maintenance_Controller extends Action_Controller
 			'id' => 'list_integration_hooks',
 			'title' => $txt['maintain_sub_hooks_list'],
 			'items_per_page' => 20,
-			'base_href' => $scripturl . '?action=admin;area=addonsettings;sa=hooks' . $context['filter_url'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+			'base_href' => $scripturl . '?action=admin;area=maintain;sa=hooks' . $context['filter_url'] . ';' . $context['session_var'] . '=' . $context['session_id'],
 			'default_sort_col' => 'hook_name',
 			'get_items' => array(
 				'function' => array($this, 'list_getIntegrationHooks'),
@@ -1177,7 +1180,7 @@ class Maintenance_Controller extends Action_Controller
 							$change_status = array(\'before\' => \'\', \'after\' => \'\');
 							if ($data[\'can_be_disabled\'] && $data[\'status\'] != \'deny\')
 							{
-								$change_status[\'before\'] = \'<a href="\' . $scripturl . \'?action=admin;area=addonsettings;sa=hooks;do=\' . ($data[\'enabled\'] ? \'disable\' : \'enable\') . \';hook=\' . $data[\'hook_name\'] . \';function=\' . $data[\'real_function\'] . (!empty($data[\'included_file\']) ? \';includedfile=\' . urlencode($data[\'included_file\']) : \'\') . $context[\'filter_url\'] . \';\' . $context[\'admin-hook_token_var\'] . \'=\' . $context[\'admin-hook_token\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'" onclick="return confirm(\' . javaScriptEscape($txt[\'quickmod_confirm\']) . \');">\';
+								$change_status[\'before\'] = \'<a href="\' . $scripturl . \'?action=admin;area=maintain;sa=hooks;do=\' . ($data[\'enabled\'] ? \'disable\' : \'enable\') . \';hook=\' . $data[\'hook_name\'] . \';function=\' . $data[\'real_function\'] . (!empty($data[\'included_file\']) ? \';includedfile=\' . urlencode($data[\'included_file\']) : \'\') . $context[\'filter_url\'] . \';\' . $context[\'admin-hook_token_var\'] . \'=\' . $context[\'admin-hook_token\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'" onclick="return confirm(\' . javaScriptEscape($txt[\'quickmod_confirm\']) . \');">\';
 								$change_status[\'after\'] = \'</a>\';
 							}
 							return $change_status[\'before\'] . \'<img src="\' . $settings[\'images_url\'] . \'/admin/post_moderation_\' . $data[\'status\'] . \'.png" alt="\' . $data[\'img_text\'] . \'" title="\' . $data[\'img_text\'] . \'" />\' . $change_status[\'after\'];
@@ -1196,9 +1199,15 @@ class Maintenance_Controller extends Action_Controller
 					'value' => $txt['hooks_disable_instructions'] . '<br />
 						' . $txt['hooks_disable_legend'] . ':
 					<ul>
-						<li><img src="' . $settings['images_url'] . '/admin/post_moderation_allow.png" alt="' . $txt['hooks_active'] . '" title="' . $txt['hooks_active'] . '" /> ' . $txt['hooks_disable_legend_exists'] . '</li>
-						<li><img src="' . $settings['images_url'] . '/admin/post_moderation_moderate.png" alt="' . $txt['hooks_disabled'] . '" title="' . $txt['hooks_disabled'] . '" /> ' . $txt['hooks_disable_legend_disabled'] . '</li>
-						<li><img src="' . $settings['images_url'] . '/admin/post_moderation_deny.png" alt="' . $txt['hooks_missing'] . '" title="' . $txt['hooks_missing'] . '" /> ' . $txt['hooks_disable_legend_missing'] . '</li>
+						<li>
+							<img src="' . $settings['images_url'] . '/admin/post_moderation_allow.png" alt="' . $txt['hooks_active'] . '" title="' . $txt['hooks_active'] . '" /> ' . $txt['hooks_disable_legend_exists'] . '
+						</li>
+						<li>
+							<img src="' . $settings['images_url'] . '/admin/post_moderation_moderate.png" alt="' . $txt['hooks_disabled'] . '" title="' . $txt['hooks_disabled'] . '" /> ' . $txt['hooks_disable_legend_disabled'] . '
+						</li>
+						<li>
+							<img src="' . $settings['images_url'] . '/admin/post_moderation_deny.png" alt="' . $txt['hooks_missing'] . '" title="' . $txt['hooks_missing'] . '" /> ' . $txt['hooks_disable_legend_missing'] . '
+						</li>
 					</ul>'
 				),
 			),
@@ -1219,15 +1228,16 @@ class Maintenance_Controller extends Action_Controller
 
 						if (!$data[\'hook_exists\'])
 							return \'
-							<a href="\' . $scripturl . \'?action=admin;area=addonsettings;sa=hooks;do=remove;hook=\' . $data[\'hook_name\'] . \';function=\' . urlencode($data[\'function_name\']) . $context[\'filter_url\'] . \';\' . $context[\'admin-hook_token_var\'] . \'=\' . $context[\'admin-hook_token\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'" onclick="return confirm(\' . javaScriptEscape($txt[\'quickmod_confirm\']) . \');">
+							<a href="\' . $scripturl . \'?action=admin;area=maintain;sa=hooks;do=remove;hook=\' . $data[\'hook_name\'] . \';function=\' . urlencode($data[\'function_name\']) . $context[\'filter_url\'] . \';\' . $context[\'admin-hook_token_var\'] . \'=\' . $context[\'admin-hook_token\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'" onclick="return confirm(\' . javaScriptEscape($txt[\'quickmod_confirm\']) . \');">
 								<img src="\' . $settings[\'images_url\'] . \'/icons/quick_remove.png" alt="\' . $txt[\'hooks_button_remove\'] . \'" title="\' . $txt[\'hooks_button_remove\'] . \'" />
 							</a>\';
 					'),
 					'class' => 'centertext',
 				),
 			);
+
 			$list_options['form'] = array(
-				'href' => $scripturl . '?action=admin;area=addonsettings;sa=hooks' . $context['filter_url'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+				'href' => $scripturl . '?action=admin;area=maintain;sa=hooks' . $context['filter_url'] . ';' . $context['session_var'] . '=' . $context['session_id'],
 				'name' => 'list_integration_hooks',
 			);
 		}

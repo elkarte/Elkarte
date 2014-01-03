@@ -80,6 +80,7 @@ function list_integration_hooks_data($start, $per_page, $sort)
 					foreach ($functions as $function_o)
 					{
 						$hook_name = str_replace(']', '', $function_o);
+
 						if (strpos($hook_name, '::') !== false)
 						{
 							$function = explode('::', $hook_name);
@@ -91,12 +92,14 @@ function list_integration_hooks_data($start, $per_page, $sort)
 							$class = '';
 							$function = $hook_name;
 						}
+
 						$function = explode(':', $function);
 						$function = $function[0];
 
 						if (substr($hook, -8) === '_include')
 						{
 							$hook_status[$hook][$function]['exists'] = file_exists(strtr(trim($function), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR, '$themedir' => $settings['theme_dir'])));
+
 							// I need to know if there is at least one function called in this file.
 							$temp_data['include'][basename($function)] = array('hook' => $hook, 'function' => $function);
 							unset($temp_hooks[$hook][$function_o]);
@@ -106,7 +109,9 @@ function list_integration_hooks_data($start, $per_page, $sort)
 						{
 							$hook_status[$hook][$hook_name]['exists'] = true;
 							$hook_status[$hook][$hook_name]['in_file'] = $file['name'];
-							// I want to remember all the functions called within this file (to check later if they are enabled or disabled and decide if the integrate_*_include of that file can be disabled too)
+
+							// I want to remember all the functions called within this file (to check later if they are
+							// enabled or disabled and decide if the integrate_*_include of that file can be disabled too)
 							$temp_data['function'][$file['name']][] = $function_o;
 							unset($temp_hooks[$hook][$function_o]);
 						}
@@ -115,7 +120,9 @@ function list_integration_hooks_data($start, $per_page, $sort)
 						{
 							$hook_status[$hook][$hook_name]['exists'] = true;
 							$hook_status[$hook][$hook_name]['in_file'] = $file['name'];
-							// I want to remember all the functions called within this file (to check later if they are enabled or disabled and decide if the integrate_*_include of that file can be disabled too)
+
+							// I want to remember all the functions called within this file (to check later if they are
+							// enabled or disabled and decide if the integrate_*_include of that file can be disabled too)
 							$temp_data['function'][$file['name']][] = $function_o;
 							unset($temp_hooks[$hook][$function_o]);
 						}
@@ -193,6 +200,7 @@ function list_integration_hooks_data($start, $per_page, $sort)
 					$function = explode('::', $function);
 					$function = $function[1];
 				}
+
 				$exploded = explode(':', $function);
 
 				$temp_data[] = array(
