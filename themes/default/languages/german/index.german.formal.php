@@ -597,7 +597,7 @@ $txt['split_this_post'] = 'Nur diesen Beitrag abtrennen.';
 $txt['split_after_and_this_post'] = 'Thema ab diesem Beitrag aufteilen.';
 $txt['select_split_posts'] = 'Beiträge zum Abtrennen auswählen.';
 
-$txt['splittopic_notification'] = 'Eine Nachricht schreiben, wenn das Thema aufgeteilt wird.';
+$txt['splittopic_notification'] = 'Eine Nachricht schreiben, wenn das Thema aufgeteilt wird';
 $txt['splittopic_default'] = 'Eine oder mehr Nachrichten in diesem Thema wurden nach ' . $txt['movetopic_auto_board'] . " verschoben.\n\n" . $txt['movetopic_auto_topic'];
 $txt['splittopic_move'] = 'Das neue Thema in ein anderes Forum verschieben';
 
