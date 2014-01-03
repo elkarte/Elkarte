@@ -17,15 +17,6 @@
 
 /**
  * Template template wraps around the simple settings page to add javascript functionality.
- * (section below)
- */
-function template_avatar_settings_above()
-{
-
-}
-
-/**
- * Template template wraps around the simple settings page to add javascript functionality.
  * (section above)
  */
 function template_avatar_settings_below()
