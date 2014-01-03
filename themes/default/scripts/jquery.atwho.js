@@ -24,13 +24,13 @@
       function App(inputor) {
         this.current_flag = null;
         this.controllers = {};
-		this.alias_maps = {};
+        this.alias_maps = {};
         this.$inputor = $(inputor);
         this.listen();
       }
 
       App.prototype.controller = function(at) {
-       return this.controllers[this.alias_maps[at] || at || this.current_flag];
+        return this.controllers[this.alias_maps[at] || at || this.current_flag];
       };
 
       App.prototype.set_context_for = function(at) {
@@ -240,7 +240,8 @@
       };
 
       Controller.prototype.mark_range = function() {
-        return this.range = this.get_range() || this.get_ie_range();
+        this.range = this.get_range();
+        return this.ie_range = this.get_ie_range();
       };
 
       Controller.prototype.clear_range = function() {
@@ -254,7 +255,7 @@
       };
 
       Controller.prototype.get_ie_range = function() {
-        return this.range || (document.selection ? document.selection.createRange() : void 0);
+        return this.ie_range || (document.selection ? document.selection.createRange() : void 0);
       };
 
       Controller.prototype.insert_content_for = function($li) {
@@ -274,7 +275,6 @@
       Controller.prototype.insert = function(content, $li) {
         var $inputor, $insert_node, class_name, content_node, insert_node, pos, range, sel, source, start_str, text, thisWin;
         $inputor = this.$inputor;
-
         if ($inputor.attr('contentEditable') === 'true') {
           class_name = "atwho-view-flag atwho-view-flag-" + (this.get_opt('alias') || this.at);
           content_node = "" + content + "<span contenteditable='false'>&nbsp;<span>";
@@ -304,7 +304,7 @@
           sel.addRange(range);
         } else if (range = this.get_ie_range()) {
           range.moveStart('character', this.query.end_pos - this.query.head_pos - this.at.length);
-          range.pasteHTML($insert_node[0]);
+          range.pasteHTML(content_node);
           range.collapse(false);
           range.select();
         }
@@ -343,7 +343,7 @@
       function Model(context) {
         this.context = context;
         this.at = this.context.at;
-		this.storage = this.context.$inputor;
+        this.storage = this.context.$inputor;
       }
 
       Model.prototype.saved = function() {
@@ -351,7 +351,7 @@
       };
 
       Model.prototype.query = function(query, callback) {
-       var data, search_key, _remote_filter;
+        var data, search_key, _remote_filter;
         data = this.fetch();
         search_key = this.context.get_opt("search_key");
         data = this.context.callbacks('filter').call(this.context, query, data, search_key) || [];
@@ -360,7 +360,7 @@
           return callback(data);
         } else {
           return _remote_filter.call(this.context, query, callback);
-		}
+        }
       };
 
       Model.prototype.fetch = function() {
@@ -457,7 +457,6 @@
           left: rect.left,
           top: rect.bottom
         };
-
         this.$el.offset(offset);
         return this.context.trigger("reposition", [offset]);
       };
@@ -487,9 +486,9 @@
         if (!this.visible()) {
           this.$el.show();
         }
-       if (rect = this.context.rect()) {
+        if (rect = this.context.rect()) {
           return this.reposition(rect);
-       }
+        }
       };
 
       View.prototype.hide = function(time) {

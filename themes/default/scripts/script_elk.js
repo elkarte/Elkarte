@@ -411,7 +411,10 @@ function revalidateMentions(sForm, sInput)
 	var cached_names,
 		cached_queries,
 		body,
-		mentions;
+		mentions,
+		pos = -1,
+		// Some random punctation marks that may appear next to a name
+		boundaries_pattern = /[ \.,;!\?'-\\\/="]/i;
 
 	for (var i = 0, count = all_elk_mentions.length; i < count; i++)
 	{
@@ -452,8 +455,7 @@ function revalidateMentions(sForm, sInput)
 				var name = $(elem).data('name'),
 					next_char,
 					prev_char,
-					index = body.indexOf(name),
-					boundaries_pattern = /[\w]/i;
+					index = body.indexOf(name);
 
 				// It is undefined coming from a preview
 				if (typeof(name) !== 'undefined')
@@ -465,9 +467,9 @@ function revalidateMentions(sForm, sInput)
 						next_char = body.charAt(index + name.length);
 						prev_char = body.charAt(index - 1);
 
-						if (next_char !== '' && next_char.search(boundaries_pattern) === 0)
+						if (next_char !== '' && next_char.search(boundaries_pattern) !== 0)
 							$(elem).remove();
-						else if (prev_char !== '' && prev_char.search(boundaries_pattern) === 0)
+						else if (prev_char !== '' && prev_char.search(boundaries_pattern) !== 0)
 							$(elem).remove();
 					}
 				}
@@ -477,8 +479,12 @@ function revalidateMentions(sForm, sInput)
 			{
 				names = cached_names[cached_queries[k]];
 				for (var l = 0, ncount = names.length; l < ncount; l++)
-					if (body.indexOf(' @' + names[l].name + ' ') !== -1)
+				{
+					pos = body.indexOf(' @' + names[l].name);
+					// If there is something like "{space}@username" AND the following char is a space or a punctation mark
+					if (pos !== -1 && body.charAt(pos + 2 + names[l].name.length + 1).search(boundaries_pattern) === 0)
 						mentions.append($('<input type="hidden" name="uid[]" />').val(names[l].id));
+				}
 			}
 		}
 	}

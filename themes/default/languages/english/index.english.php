@@ -597,7 +597,7 @@ $txt['split_this_post'] = 'Only split this post.';
 $txt['split_after_and_this_post'] = 'Split topic after and including this post.';
 $txt['select_split_posts'] = 'Select posts to split.';
 
-$txt['splittopic_notification'] = 'Post a message when the topic is split.';
+$txt['splittopic_notification'] = 'Post a message when the topic is split';
 $txt['splittopic_default'] = 'One or more of the messages of this topic have been moved to ' . $txt['movetopic_auto_board'] . ".\n\n" . $txt['movetopic_auto_topic'];
 $txt['splittopic_move'] = 'Move the new topic to another board';
 
