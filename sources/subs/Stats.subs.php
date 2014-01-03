@@ -64,29 +64,6 @@ function getAverages()
 }
 
 /**
- * Get the amount of boards.
- *
- * @return int
- */
-function numBoards()
-{
-	$db = database();
-
-	$result = $db->query('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}boards AS b
-		WHERE b.redirect = {string:blank_redirect}',
-		array(
-			'blank_redirect' => '',
-		)
-	);
-	list ($num_boards) = $db->fetch_row($result);
-	$db->free_result($result);
-
-	return $num_boards;
-}
-
-/**
  * Get the amount of categories
  *
  * @return int

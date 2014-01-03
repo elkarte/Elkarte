@@ -110,10 +110,11 @@ function getMessageIcons($board_id)
 	{
 		if (($temp = cache_get_data('posting_icons-' . $board_id, 480)) == null)
 		{
-			$request = $db->query('select_message_icons', '
+			$request = $db->query('', '
 				SELECT title, filename
 				FROM {db_prefix}message_icons
-				WHERE id_board IN (0, {int:board_id})',
+				WHERE id_board IN (0, {int:board_id})
+				ORDER BY icon_order',
 				array(
 					'board_id' => $board_id,
 				)

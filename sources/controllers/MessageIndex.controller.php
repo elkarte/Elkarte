@@ -787,7 +787,7 @@ class MessageIndex_Controller extends Action_Controller
 						if ($countPosts[$topic] != $cp)
 						{
 							// If the board being moved to does count the posts then the other one doesn't so add to their post count.
-							$topicRecounts[$topic] = $cp ? '+' : '-';
+							$topicRecounts[$topic] = $cp ? 1 : -1;
 						}
 					}
 				}
@@ -797,32 +797,17 @@ class MessageIndex_Controller extends Action_Controller
 					$members = array();
 
 					// Get all the members who have posted in the moved topics.
-					$request = $db->query('', '
-						SELECT id_member, id_topic
-						FROM {db_prefix}messages
-						WHERE id_topic IN ({array_int:moved_topic_ids})',
-						array(
-							'moved_topic_ids' => array_keys($topicRecounts),
-						)
-					);
-
-					while ($row = $db->fetch_assoc($request))
+					$posters = topicsPosters(array_keys($topicRecounts));
+					foreach ($posters as $id_member => $topics)
 					{
-						if (!isset($members[$row['id_member']]))
-							$members[$row['id_member']] = 0;
+						$post_adj = 0;
+						foreach ($topics as $id_topic)
+							$post_adj += $topicRecounts[$id_topic];
 
-						if ($topicRecounts[$row['id_topic']] === '+')
-							$members[$row['id_member']] += 1;
-						else
-							$members[$row['id_member']] -= 1;
+						// And now update that member's post counts
+						if (!empty($post_adj))
+							updateMemberData($id_member, array('posts' => 'posts + ' . $post_adj));
 					}
-
-					$db->free_result($request);
-
-					// And now update them member's post counts
-					foreach ($members as $id_member => $post_adj)
-						updateMemberData($id_member, array('posts' => 'posts + ' . $post_adj));
-
 				}
 			}
 		}

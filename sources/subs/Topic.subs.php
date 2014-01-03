@@ -2697,6 +2697,32 @@ function messagesInTopics($topics)
 }
 
 /**
+ * Retrieves the members that posted in a group of topics.
+ *
+ * @param array $topics integer array of topics to work with
+ * @return array of topics each member posted in (grouped by members)
+ */
+function topicsPosters($topics)
+{
+	$db = database();
+
+	// Obtain all the member ids
+	$members = array();
+	$request = $db->query('', '
+		SELECT id_member, id_topic
+		FROM {db_prefix}messages
+		WHERE id_topic IN ({array_int:topic_list})',
+		array(
+			'topic_list' => $topics,
+	));
+	while ($row = $db->fetch_assoc($request))
+		$members[$row['id_member']][] = $row['id_topic'];
+	$db->free_result($request);
+
+	return $members;
+}
+
+/**
  * Updates all the tables involved when two or more topics are merged
  *
  * @param int $first_msg the first message of the new topic

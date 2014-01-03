@@ -979,7 +979,7 @@ function ssi_boardStats($output_method = 'echo')
 		'members' => $modSettings['totalMembers'],
 		'posts' => $modSettings['totalMessages'],
 		'topics' => $modSettings['totalTopics'],
-		'boards' => fetchBoardsInfo('all', array('count' => true)),
+		'boards' => countBoards(),
 		'categories' => numCategories(),
 	);
 

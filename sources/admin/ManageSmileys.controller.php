@@ -1121,7 +1121,7 @@ class ManageSmileys_Controller extends Action_Controller
 		require_once(SUBSDIR . '/MessageIcons.subs.php');
 
 		// Get a list of icons.
-		$context['icons'] = getMessageIcons();
+		$context['icons'] = fetchMessageIconsDetails();
 
 		// Submitting a form?
 		if (isset($_POST['icons_save']))
@@ -1216,18 +1216,19 @@ class ManageSmileys_Controller extends Action_Controller
 			'title' => $txt['icons_edit_message_icons'],
 			'base_href' => $scripturl . '?action=admin;area=smileys;sa=editicons',
 			'get_items' => array(
-				'function' => 'list_getMessageIcons',
+				'function' => array($this, 'list_fetchMessageIconsDetails'),
 			),
 			'no_items_label' => $txt['icons_no_entries'],
 			'columns' => array(
 				'icon' => array(
 					'data' => array(
-						'function' => create_function('$rowData', '
-							global $settings;
-
-							$images_url = $settings[file_exists(sprintf(\'%1$s/images/post/%2$s.png\', $settings[\'theme_dir\'], $rowData[\'filename\'])) ? \'actual_images_url\' : \'default_images_url\'];
-							return sprintf(\'<img src="%1$s/post/%2$s.png" alt="%3$s" />\', $images_url, $rowData[\'filename\'], htmlspecialchars($rowData[\'title\'], ENT_COMPAT, \'UTF-8\'));
-						'),
+						'sprintf' => array(
+							'format' => '<img src="%1$s" alt="%2$s" />',
+							'params' => array(
+								'image_url' => false,
+								'filename' => true,
+							),
+						),
 						'class' => 'centertext',
 					),
 				),
@@ -1257,11 +1258,7 @@ class ManageSmileys_Controller extends Action_Controller
 						'value' => $txt['icons_board'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							global $txt;
-
-							return empty($rowData[\'board_name\']) ? $txt[\'icons_edit_icons_all_boards\'] : $rowData[\'board_name\'];
-						'),
+						'db' => 'board',
 					),
 				),
 				'modify' => array(
@@ -1272,7 +1269,7 @@ class ManageSmileys_Controller extends Action_Controller
 						'sprintf' => array(
 							'format' => '<a href="' . $scripturl . '?action=admin;area=smileys;sa=editicon;icon=%1$s">' . $txt['smileys_modify'] . '</a>',
 							'params' => array(
-								'id_icon' => false,
+								'id' => false,
 							),
 						),
 					),
@@ -1286,7 +1283,7 @@ class ManageSmileys_Controller extends Action_Controller
 						'sprintf' => array(
 							'format' => '<input type="checkbox" name="checked_icons[]" value="%1$d" class="input_check" />',
 							'params' => array(
-								'id_icon' => false,
+								'id' => false,
 							),
 						),
 						'class' => 'centertext',
@@ -1692,5 +1689,17 @@ class ManageSmileys_Controller extends Action_Controller
 			cache_put_data('parsing_smileys', null, 480);
 			cache_put_data('posting_smileys', null, 480);
 		}
+	}
+
+	/**
+	 * Callback function for createList().
+	 *
+	 * @param int $start
+	 * @param int $items_per_page
+	 * @param string $sort
+	 */
+	public function list_fetchMessageIconsDetails($start, $items_per_page, $sort)
+	{
+		return fetchMessageIconsDetails();
 	}
 }
