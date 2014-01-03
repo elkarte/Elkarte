@@ -203,8 +203,6 @@
           return Utils.adjustOffset(this.getIEOffset(pos), $inputor);
         } else {
           offset = $inputor.offset();
-          // @todo Elk: added to workaround a positioning problem when the content overflows
-          var height = $inputor[0].height;
           position = this.getPosition(pos);
           return offset = {
             left: offset.left + position.left,
@@ -336,7 +334,7 @@
       cWin = aWin;
       caret = Utils.contentEditable(this) ? new EditableCaret(this) : new InputCaret(this);
       if (methods[method]) {
-        return methods[method].apply(caret, Array.prototype.slice.call(arguments, method == 'pos' ? 2 : 1));
+        return methods[method].apply(caret, Array.prototype.slice.call(arguments, 2));
       } else {
         return $.error("Method " + method + " does not exist on jQuery.caret");
       }
