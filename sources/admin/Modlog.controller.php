@@ -73,7 +73,7 @@ class Modlog_Controller extends Action_Controller
 
 		// The number of entries to show per page of log file.
 		$context['displaypage'] = 30;
-		
+
 		// Amount of hours that must pass before allowed to delete file.
 		$context['hoursdisable'] = 24;
 
@@ -158,7 +158,7 @@ class Modlog_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/List.class.php');
 
-		// This is all the information required for a watched user listing.
+		// This is all the information required for a moderation/admin log listing.
 		$listOptions = array(
 			'id' => 'moderation_log_list',
 			'width' => '100%',
@@ -182,7 +182,6 @@ class Modlog_Controller extends Action_Controller
 					$context['log_type'],
 				),
 			),
-			// This assumes we are viewing by user.
 			'columns' => array(
 				'action' => array(
 					'header' => array(
@@ -294,7 +293,7 @@ class Modlog_Controller extends Action_Controller
 
 		createToken('mod-ml');
 
-		// Create the watched user list.
+		// Create the log listing
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';
