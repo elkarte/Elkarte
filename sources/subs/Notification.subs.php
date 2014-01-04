@@ -194,7 +194,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 					continue;
 
 				$email_perm = true;
-				if (validatenNotificationAccess($row, $maillist, $email_perm) === false)
+				if (validateNotificationAccess($row, $maillist, $email_perm) === false)
 					continue;
 
 				$needed_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
@@ -303,7 +303,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			continue;
 
 		$email_perm = true;
-		if (validatenNotificationAccess($row, $maillist, $email_perm) === false)
+		if (validateNotificationAccess($row, $maillist, $email_perm) === false)
 			continue;
 
 		$needed_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
@@ -498,7 +498,7 @@ function sendBoardNotifications(&$topicData)
 	while ($rowmember = $db->fetch_assoc($members))
 	{
 		$email_perm = true;
-		if (validatenNotificationAccess($rowmember, $maillist, $email_perm) === false)
+		if (validateNotificationAccess($rowmember, $maillist, $email_perm) === false)
 			continue;
 
 		$langloaded = loadLanguage('index', empty($rowmember['lngfile']) || empty($modSettings['userLanguage']) ? $language : $rowmember['lngfile'], false);
@@ -846,7 +846,7 @@ function sendAdminNotifications($type, $memberID, $member_name = null)
  * @param boolean $maillist
  * @param boolean $email_perm
  */
-function validatenNotificationAccess($row, $maillist, &$email_perm = true)
+function validateNotificationAccess($row, $maillist, &$email_perm = true)
 {
 	global $modSettings;
 
