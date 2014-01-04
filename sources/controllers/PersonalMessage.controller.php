@@ -2298,6 +2298,7 @@ function messageIndexBar($area)
 		'current_area' => $area,
 		'disable_url_session_check' => true,
 		'counters' => !empty($label_counters) ? $label_counters : 0,
+		'default_include_dir' => CONTROLLERDIR,
 	);
 
 	// Let them modify PM areas easily.
@@ -2316,8 +2317,11 @@ function messageIndexBar($area)
 	$context['pm_menu_name'] = 'menu_data_' . $context['pm_menu_id'];
 
 	// Set the selected item.
-	$current_area = $pm_include_data['current_area'];
-	$context['menu_item_selected'] = $current_area;
+	$context['menu_item_selected'] = $pm_include_data['current_area'];
+
+	// Grab the file needed for this action
+	if (isset($pm_include_data['file']))
+		require_once($pm_include_data['file']);
 
 	// Set the template for this area and add the profile layer.
 	if (!isset($_REQUEST['xml']))

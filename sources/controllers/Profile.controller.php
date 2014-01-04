@@ -400,6 +400,7 @@ class Profile_Controller extends Action_Controller
 			'extra_url_parameters' => array(
 				'u' => $context['id_member'],
 			),
+			'default_include_dir' => CONTROLLERDIR,
 		);
 
 		// Let them modify profile areas easily.
@@ -669,10 +670,7 @@ class Profile_Controller extends Action_Controller
 
 		// Let go to the right place
 		if (isset($profile_include_data['file']))
-		{
-			$dir = isset($profile_include_data['dir']) ? $profile_include_data['dir'] : (isset($profile_include_data['controller']) ? CONTROLLERDIR : SOURCEDIR);
-			require_once($dir . '/' . $profile_include_data['file']);
-		}
+			require_once($profile_include_data['file']);
 
 		callMenu($profile_include_data);
 

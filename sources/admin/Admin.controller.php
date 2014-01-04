@@ -568,13 +568,13 @@ class Admin_Controller extends Action_Controller
 		// Make sure the administrator has a valid session...
 		validateSession();
 
-		$menuOptions = array();
+		$menuOptions = array('default_include_dir' => ADMINDIR);
 
 		// Let them add Admin areas easily.
 		call_integration_hook('integrate_admin_areas', array(&$admin_areas, &$menuOptions));
 
 		// Actually create the menu!
-		$admin_include_data = createMenu($admin_areas);
+		$admin_include_data = createMenu($admin_areas, $menuOptions);
 		unset($admin_areas);
 
 		// Nothing valid?
@@ -608,10 +608,7 @@ class Admin_Controller extends Action_Controller
 
 		// Now - finally - call the right place!
 		if (isset($admin_include_data['file']))
-		{
-			$dir = isset($admin_include_data['dir']) ? $admin_include_data['dir'] : (isset($admin_include_data['controller']) ? ADMINDIR : SOURCEDIR);
-			require_once($dir . '/' . $admin_include_data['file']);
-		}
+			require_once($admin_include_data['file']);
 
 		callMenu($admin_include_data);
 	}

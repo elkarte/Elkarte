@@ -143,6 +143,10 @@ function createMenu($menuData, $menuOptions = array())
 				// Add it to the context... if it has some form of name!
 				if (isset($area['label']) || (isset($txt[$area_id]) && !isset($area['select'])))
 				{
+					// We may want to include a file, let's find out the path
+					if (!empty($area['file']))
+							$area['file'] = !empty($area['dir']) ? $area['dir'] : (!empty($menuOptions['default_include_dir']) ? $menuOptions['default_include_dir'] : CONTROLLERDIR);
+
 					// If we haven't got an area then the first valid one is our choice.
 					if (!isset($menu_context['current_area']))
 					{
