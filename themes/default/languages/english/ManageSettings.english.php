@@ -377,17 +377,15 @@ $txt['core_settings_item_ih_desc'] = 'This feature allows you to enable or disab
 $txt['core_settings_item_k'] = 'Karma';
 $txt['core_settings_item_k_desc'] = 'Karma is a feature that shows the popularity of a member. Members, if allowed, can \'applaud\' or \'smite\' other members, which is how their popularity is calculated.';
 $txt['core_settings_item_pe'] = 'Post by Email Management';
-$txt['core_settings_item_pe_desc'] = 'This will allow users of your forum to reply to emailed notifications and personal messages and have them post directly as a reply to the appropriate thread or PM.  This provides a familiar mailist feel.  Use of this functionality will require additional setup steps on your hosting provider.';
+$txt['core_settings_item_pe_desc'] = 'This will allow users of your forum to reply to emailed notifications and personal messages and have them post directly as a reply to the appropriate thread or PM.  This provides a familiar mailing list feeling.  Use of this functionality will require additional setup steps on your hosting provider.';
 $txt['core_settings_item_l'] = 'Likes';
 $txt['core_settings_item_l_desc'] = 'Likes is a feature that allows members to like a post to show their approval and popularity of the message content.';
-$txt['core_settings_item_pe'] = 'Post by Email Management';
-$txt['core_settings_item_pe_desc'] = 'This will allow users of your forum to reply to emailed notifications and personal messages and have them post directly as a reply to the appropriate thread or PM.  This provides a familiar mailist feel.  Use of this functionality will require additional setup steps on your hosting provider.';
 $txt['core_settings_item_ml'] = 'Moderation, Administration and User Logs';
 $txt['core_settings_item_ml_desc'] = 'Enable the moderation and administration logs to keep an audit trail of all the key actions taken on your forum. Also allows forum moderators to view a history of key changes a user makes to their profile.';
 $txt['core_settings_item_pm'] = 'Post Moderation';
 $txt['core_settings_item_pm_desc'] = 'Post moderation enables you to select groups and boards within which posts must be approved before they become public. Upon enabling this feature be sure to visit the permission section to set up the relevant permissions.';
 $txt['core_settings_item_ps'] = 'Paid Subscriptions';
-$txt['core_settings_item_ps_desc'] = 'Paid subscriptions allow users to pay for subscriptions to change membergroups within the forum and thus change their access rights.';
+$txt['core_settings_item_ps_desc'] = 'Paid subscriptions allow users to pay for subscriptions to change member groups within the forum and thus change their access rights.';
 $txt['core_settings_item_rg'] = 'Report Generation';
 $txt['core_settings_item_rg_desc'] = 'This administration feature allows the generation of reports (which can be printed) to present your current forum setup in an easy to view manner - particularly useful for large forums.';
 $txt['core_settings_item_sp'] = 'Search Engine Tracking';
@@ -436,9 +434,9 @@ $txt['languages_download'] = 'Download Language Pack';
 $txt['languages_download_note'] = 'This page lists all the files that are contained within the language pack and some useful information about each one. All files that have their associated check box marked will be copied.';
 $txt['languages_download_info'] = '<strong>Note:</strong>
 	<ul class="normallist">
-		<li>Files which have the status &quot;Not Writable&quot; means the system will not be able to copy this file to the directory at the present and you must make the destination writable either using an FTP client or by filling in your details at the bottom of the page.</li>
-		<li>The Version information for a file displays the last forum version which it was updated for. If it is indicated in green then this is a newer version than you have at current. If amber this indicates it\'s the same version number as at current, red indicates you have a newer version installed than contained in the pack.</li>
-		<li>Where a file already exists on your forum the &quot;Already Exists&quot; column will have one of two values. &quot;Identical&quot; indicates that the file already exists in an identical form and need not be overwritten. &quot;Different&quot; means that the contents vary in some way and overwriting is probably the optimum solution.</li>
+		<li>The file status &quot;Not Writable&quot; means the system will not be able to copy this file to the directory at the present and you must make the destination writable either using an FTP client or by filling in your details at the bottom of the page.</li>
+		<li>The Version information for a file displays the last forum version which it was updated for. If it is indicated in green then this is a newer version than you have at current, amber indicates it\'s the same version number as at current, red indicates you have a newer version installed than contained in the pack.</li>
+		<li>In case a file already exists on your forum, the &quot;Already Exists&quot; column will have one of two values: &quot;Identical&quot; indicates that the file already exists in an identical form and does not need to be overwritten. &quot;Different&quot; means that the contents vary in some way and overwriting is probably the optimum solution.</li>
 	</ul>';
 
 $txt['languages_download_main_files'] = 'Primary Files';
