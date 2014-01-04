@@ -279,7 +279,7 @@ $txt['signature_max_image_height'] = 'Maximum height of signature images (pixels
 $txt['signature_max_font_size'] = 'Maximum font size allowed in signatures (pixels)';
 $txt['signature_bbc'] = 'Enabled BBC tags';
 
-$txt['groups_pm_send'] = 'Membergroups allowed to send personal messages';
+$txt['groups_pm_send'] = 'Member groups allowed to send personal messages';
 $txt['pm_posts_verification'] = 'Post count under which users must pass verification when sending personal messages';
 $txt['pm_posts_verification_note'] = '(0 for no limit, admins are exempt)';
 $txt['pm_posts_per_hour'] = 'Number of personal messages a user may send in an hour';
@@ -317,7 +317,7 @@ $txt['custom_edit_registration_disable'] = 'No';
 $txt['custom_edit_registration_allow'] = 'Yes';
 $txt['custom_edit_registration_require'] = 'Yes, and require entry';
 $txt['custom_edit_display'] = 'Show on Topic View';
-$txt['custom_edit_memberlist'] = 'Show on Memberlist View';
+$txt['custom_edit_memberlist'] = 'Show on Member List View';
 $txt['custom_edit_picktype'] = 'Field Type';
 
 $txt['custom_edit_max_length'] = 'Maximum Length';
@@ -336,17 +336,17 @@ $txt['custom_edit_privacy'] = 'Privacy';
 $txt['custom_edit_privacy_desc'] = 'Who can see and edit this field.';
 $txt['custom_edit_privacy_all'] = 'Users can see this field; owner can edit it';
 $txt['custom_edit_privacy_see'] = 'Users can see this field; only admins can edit it';
-$txt['custom_edit_privacy_owner'] = 'Users cannot see this field; owner and admins can edit it.';
+$txt['custom_edit_privacy_owner'] = 'Users cannot see this field; owner and admins can edit it';
 $txt['custom_edit_privacy_none'] = 'This field is only visible to admins';
 $txt['custom_edit_can_search'] = 'Searchable';
-$txt['custom_edit_can_search_desc'] = 'Can this field be searched from the members list.';
+$txt['custom_edit_can_search_desc'] = 'Can this field be searched from the members list?';
 $txt['custom_edit_mask'] = 'Input Mask';
 $txt['custom_edit_mask_desc'] = 'For text fields an input mask can be selected to validate the data.';
 $txt['custom_edit_mask_email'] = 'Valid Email';
 $txt['custom_edit_mask_number'] = 'Numeric';
 $txt['custom_edit_mask_nohtml'] = 'No HTML';
 $txt['custom_edit_mask_regex'] = 'Regex (Advanced)';
-$txt['custom_edit_enclose'] = 'Show Enclosed Within Text (Optional)';
+$txt['custom_edit_enclose'] = 'Wrap user input in text (Optional)';
 $txt['custom_edit_enclose_desc'] = 'We <strong>strongly</strong> recommend to use an input mask to validate the input supplied by the user.';
 
 $txt['custom_edit_placement'] = 'Choose Placement';
@@ -359,13 +359,13 @@ $txt['custom_profile_placement_withicons'] = 'With Icons';
 $txt['custom_profile_placement_abovesignature'] = 'Above Signature';
 
 // Use numeric entities in the string below!
-$txt['custom_edit_delete_sure'] = 'Are you sure you wish to delete this field - all related user data will be lost!';
+$txt['custom_edit_delete_sure'] = 'Are you sure you wish to delete this field? All related user data will be lost!';
 
 $txt['standard_profile_title'] = 'Standard Profile Fields';
 $txt['standard_profile_field'] = 'Field';
 
 $txt['core_settings_welcome_msg'] = 'Welcome to Your New Forum';
-$txt['core_settings_welcome_msg_desc'] = 'To get you started we suggest you select which of ElkArte\'s core features you want to enable. We\'d recommend only enabling with those features you need!';
+$txt['core_settings_welcome_msg_desc'] = 'To get you started we suggest you select which of ElkArte\'s core features you want to enable. We\'d recommend only enabling those features you actually need.'; // don't scream from the beginning :P
 $txt['core_settings_item_cd'] = 'Calendar';
 $txt['core_settings_item_cd_desc'] = 'Enabling this feature will open up a selection of options to enable your users to view the calendar, add and review events, see users birthdates on a calendar and much, much more.';
 $txt['core_settings_item_dr'] = 'Drafts';

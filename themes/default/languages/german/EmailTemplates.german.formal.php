@@ -44,7 +44,7 @@ Sollten Sie Probleme mit der Aktivierung haben, verwenden Sie bitte diesen Link 
 	@description:
 */
 $txt['resend_pending_message_subject'] = 'Willkommen im Forum {FORUMNAME}';
-$txt['resend_pending_message_body'] = 'Ihre Anfrage zur Registrierung im Forum {FORUMNAME} wurde gestellt, {REALNAME}.
+$txt['resend_pending_message_body'] = 'Hallo, {REALNAME}, wir haben Ihre Anfrage zur Registrierung im Forum {FORUMNAME} erhalten.
 
 Der Benutzername mit dem Sie sich registriert haben ist {USERNAME}.
 
@@ -635,7 +635,7 @@ Sie können Ihr Profil aktualisieren, indem Sie nach dem Anmelden die folgende S
 	@description:
 */
 $txt['register_pending_subject'] = 'Willkommen im Forum {FORUMNAME}';
-$txt['register_pending_body'] = 'Ihre Registrierungsanfrage im Forum {FORUMNAME} haben wir erhalten, {REALNAME}.
+$txt['register_pending_body'] = 'Hallo, {REALNAME}, wir haben Ihre Anfrage zur Registrierung im Forum {FORUMNAME} erhalten.
 
 Ihr Benutzername, mit dem Sie sich registriert haben, lautet {USERNAME}. Wenn Sie Ihr Passwort vergessen haben, können Sie es unter folgendem Link zurücksetzen: {FORGOTPASSWORDLINK}
 
