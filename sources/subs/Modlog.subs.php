@@ -63,12 +63,12 @@ function list_getModLogEntryCount($query_string = '', $query_params = array(), $
  * Gets the moderation log entries that match the specified parameters.
  * Callback for createList() in Modlog::action_log().
  *
- * @param $start
- * @param $items_per_page
- * @param $sort
- * @param $query_string
- * @param $query_params
- * @param $log_type
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param array $query_string
+ * @param array $query_params
+ * @param int $log_type
  */
 function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '', $query_params = array(), $log_type = 1)
 {
@@ -368,7 +368,7 @@ function deleteLogAction($id_log, $time, $delete = null)
 			AND log_time < {int:twenty_four_hours_wait}',
 		array(
 			'twenty_four_hours_wait' => time() - $time * 3600,
-			'delete_actions' => array_unique($delete),
+			'delete_actions' => !is_null($delete) ? array_unique($delete) : null,
 			'moderate_log' => $id_log,
 		)
 	);
