@@ -451,14 +451,6 @@ function template_webslice_header_above()
 }
 
 /**
- * Output after webslices content
- */
-function template_webslice_header_below()
-{
-
-}
-
-/**
  * This shows a webslice of the recent posts.
  */
 function template_webslice_recent_posts()

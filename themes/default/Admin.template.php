@@ -1419,14 +1419,6 @@ function template_php_info()
 }
 
 /**
- * Hey this is blank, but you could use it to add items above the clean cache button
- */
-function template_clean_cache_button_above()
-{
-
-}
-
-/**
  * Shows the clean cache button
  */
 function template_clean_cache_button_below()
