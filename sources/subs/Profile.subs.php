@@ -300,7 +300,7 @@ function loadCustomFields($memID, $area = 'summary')
  */
 function loadProfileFields($force_reload = false)
 {
-	global $context, $profile_fields, $txt, $scripturl, $modSettings, $user_info, $cur_profile, $language;
+	global $context, $profile_fields, $txt, $scripturl, $modSettings, $user_info, $cur_profile, $language, $settings;
 
 	// Don't load this twice!
 	if (!empty($profile_fields) && !$force_reload)
@@ -492,7 +492,7 @@ function loadProfileFields($force_reload = false)
 			'type' => 'callback',
 			'callback_func' => 'theme_pick',
 			'permission' => 'profile_extra',
-			'enabled' => $modSettings['theme_allow'] || allowedTo('admin_forum'),
+			'enabled' => !$settings['disable_user_variant'] || $modSettings['theme_allow'] || allowedTo('admin_forum'),
 			'preload' => create_function('', '
 				global $context, $cur_profile, $txt;
 

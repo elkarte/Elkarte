@@ -852,9 +852,12 @@ class ManageThemes_Controller extends Action_Controller
 	 */
 	public function action_pick()
 	{
-		global $txt, $context, $modSettings, $user_info, $scripturl;
+		global $txt, $context, $modSettings, $user_info, $scripturl, $settings;
 
 		require_once(SUBSDIR . '/Themes.subs.php');
+
+		if (!$modSettings['theme_allow'] && $settings['disable_user_variant'] && !allowedTo('admin_forum'))
+			fatal_lang_error('no_access', false);
 
 		loadLanguage('Profile');
 		loadTemplate('ManageThemes');

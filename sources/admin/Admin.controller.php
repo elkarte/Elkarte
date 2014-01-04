@@ -570,7 +570,7 @@ class Admin_Controller extends Action_Controller
 
 		$menuOptions = array();
 
-		// Let them modify PM areas easily.
+		// Let them add Admin areas easily.
 		call_integration_hook('integrate_admin_areas', array(&$admin_areas, &$menuOptions));
 
 		// Actually create the menu!
@@ -608,7 +608,10 @@ class Admin_Controller extends Action_Controller
 
 		// Now - finally - call the right place!
 		if (isset($admin_include_data['file']))
-			require_once(ADMINDIR . '/' . $admin_include_data['file']);
+		{
+			$dir = isset($admin_include_data['dir']) ? $admin_include_data['dir'] : (isset($admin_include_data['controller']) ? ADMINDIR : SOURCEDIR);
+			require_once($dir . '/' . $admin_include_data['file']);
+		}
 
 		callMenu($admin_include_data);
 	}

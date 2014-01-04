@@ -543,10 +543,8 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 		$include_boards = array();
 	}
 
-	$stable_icons = array('xx', 'thumbup', 'thumbdown', 'exclamation', 'question', 'lamp', 'smiley', 'angry', 'cheesy', 'grin', 'sad', 'wink', 'poll', 'moved', 'recycled', 'wireless', 'clip');
-	$icon_sources = array();
-	foreach ($stable_icons as $icon)
-		$icon_sources[$icon] = 'images_url';
+	require_once(SUBSDIR . '/MessageIndex.subs.php');
+	$icon_sources = MessageTopicIcons();
 
 	// Find all the posts in distinct topics. Newer ones will have higher IDs.
 	$request = $db->query('', '
@@ -1810,15 +1808,18 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 	$db->free_result($request);
 
 	// Load the message icons - the usual suspects.
-	$stable_icons = array('xx', 'thumbup', 'thumbdown', 'exclamation', 'question', 'lamp', 'smiley', 'angry', 'cheesy', 'grin', 'sad', 'wink', 'poll', 'moved', 'recycled', 'wireless', 'clip');
-	$icon_sources = array();
-	foreach ($stable_icons as $icon)
-		$icon_sources[$icon] = 'images_url';
-
 	require_once(SUBSDIR . '/MessageIndex.subs.php');
+	$icon_sources = MessageTopicIcons();
 
 	// Find the posts.
-	$request = messageIndexTopics($board, 0, $start, $limit, 'first_post', 't.id_topic', array('only_approved' => true, 'include_sticky' => false, 'ascending' => false, 'include_avatars' => false, 'previews' => $length));
+	$indexOptions = array(
+		'only_approved' => true,
+		'include_sticky' => false,
+		'ascending' => false,
+		'include_avatars' => false,
+		'previews' => $length
+	);
+	$request = messageIndexTopics($board, 0, $start, $limit, 'first_post', 't.id_topic', $indexOptions);
 
 	if (empty($request))
 		return;
@@ -1836,7 +1837,6 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 		$row['smileys_enabled'] = $row[$preview . '_smileys'];
 		$row['poster_time'] = $row[$preview . '_poster_time'];
 		$row['poster_name'] = $row[$preview . '_member_name'];
-
 		$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
 
 		// Check that this message icon is there...

@@ -44,7 +44,10 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// Now call the menu action.
 		if (isset($this->_mod_include_data['file']))
-			require_once(SOURCEDIR . '/' . $this->_mod_include_data['file']);
+		{
+			$dir = isset($this->_mod_include_data['dir']) ? $this->_mod_include_data['dir'] : (isset($this->_mod_include_data['controller']) ? CONTROLLERDIR : SOURCEDIR);
+			require_once($dir . '/' . $this->_mod_include_data['file']);
+		}
 
 		callMenu($this->_mod_include_data);
 	}
@@ -145,7 +148,8 @@ class ModerationCenter_Controller extends Action_Controller
 					'modlog' => array(
 						'label' => $txt['modlog_view'],
 						'enabled' => !empty($modSettings['modlog_enabled']) && $context['can_moderate_boards'],
-						'file' => 'admin/Modlog.controller.php',
+						'file' => 'Modlog.controller.php',
+						'dir' => ADMINDIR,
 						'controller' => 'Modlog_Controller',
 						'function' => 'action_log',
 						'icon' => 'transparent.png',
@@ -172,7 +176,7 @@ class ModerationCenter_Controller extends Action_Controller
 					'postmod' => array(
 						'label' => $txt['mc_unapproved_posts'] . (!empty($mod_counts['postmod']) ? ' [' . $mod_counts['postmod'] . ']' : ''),
 						'enabled' => $context['can_moderate_approvals'],
-						'file' => 'controllers/PostModeration.controller.php',
+						'file' => 'PostModeration.controller.php',
 						'controller' => 'PostModeration_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -186,7 +190,8 @@ class ModerationCenter_Controller extends Action_Controller
 					'emailmod' => array(
 						'label' => $txt['mc_emailerror'] . (!empty($mod_counts['emailmod']) ? ' [' . $mod_counts['emailmod'] . ']' : ''),
 						'enabled' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
-						'file' => 'admin/ManageMaillist.controller.php',
+						'file' => 'ManageMaillist.controller.php',
+						'dir' => ADMINDIR,
 						'function' => 'UnapprovedEmails',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_mail',
@@ -195,7 +200,7 @@ class ModerationCenter_Controller extends Action_Controller
 					'attachmod' => array(
 						'label' => $txt['mc_unapproved_attachments'] . (!empty($mod_counts['attachments']) ? ' [' . $mod_counts['attachments'] . ']' : ''),
 						'enabled' => $context['can_moderate_approvals'],
-						'file' => 'controllers/PostModeration.controller.php',
+						'file' => 'PostModeration.controller.php',
 						'controller' => 'PostModeration_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -234,7 +239,7 @@ class ModerationCenter_Controller extends Action_Controller
 					),
 					'groups' => array(
 						'label' => $txt['mc_group_requests'] . (!empty($mod_counts['groupreq']) ? ' [' . $mod_counts['groupreq'] . ']' : ''),
-						'file' => 'controllers/Groups.controller.php',
+						'file' => 'Groups.controller.php',
 						'controller' => 'Groups_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -244,7 +249,7 @@ class ModerationCenter_Controller extends Action_Controller
 					'members' => array(
 						'enabled' => allowedTo('moderate_forum'),
 						'label' => $txt['mc_member_requests'] . (!empty($mod_counts['memberreq']) ? ' [' . $mod_counts['memberreq'] . ']' : ''),
-						'file' => 'controllers/ManageMembers.controller.php',
+						'file' => 'ManageMembers.controller.php',
 						'controller' => 'ManageMembers_Controller',
 						'function' => 'action_approve',
 						'icon' => 'transparent.png',
@@ -253,7 +258,7 @@ class ModerationCenter_Controller extends Action_Controller
 					),
 					'viewgroups' => array(
 						'label' => $txt['mc_view_groups'],
-						'file' => 'controllers/Groups.controller.php',
+						'file' => 'Groups.controller.php',
 						'controller' => 'Groups_Controller',
 						'function' => 'action_list',
 						'icon' => 'transparent.png',

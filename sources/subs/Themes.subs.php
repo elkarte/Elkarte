@@ -409,7 +409,7 @@ function availableThemes($current_theme, $current_member)
 				'theme_dir' => 'theme_dir',
 				'images_url' => 'images_url',
 				'disable_user_variant' => 'disable_user_variant',
-				'known_themes' => explode(',', $modSettings['knownThemes']),
+				'known_themes' => !empty($modSettings['theme_allow']) || allowedTo('admin_forum') ? explode(',', $modSettings['knownThemes']) : array($modSettings['theme_guests']),
 			)
 		);
 		while ($row = $db->fetch_assoc($request))

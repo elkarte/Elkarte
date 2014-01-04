@@ -25,6 +25,13 @@ if (!defined('ELK'))
  * @param string $sort_by how to sort the results asc/desc
  * @param string $sort_column which value we sort by
  * @param array $indexOptions
+ * 		'include_sticky' => if on, loads sticky topics as additonal
+ * 		'only_approved' => if on, only load approved topics
+ * 		'previews' => if on, loads in a substring of the first/last message text for use in previews
+ * 		'include_avatars' => if on loads the last message posters avatar
+ * 		'ascending' => ASC or DESC for the sort
+ * 		'fake_ascending' =>
+ *		'custom_selects' => loads additonal values from the tables used in the query, for addon use
  */
 function messageIndexTopics($id_board, $id_member, $start, $per_page, $sort_by, $sort_column, $indexOptions)
 {
@@ -73,16 +80,17 @@ function messageIndexTopics($id_board, $id_member, $start, $per_page, $sort_by, 
 			SELECT
 				t.id_topic, t.num_replies, t.locked, t.num_views, t.num_likes, t.is_sticky, t.id_poll, t.id_previous_board,
 				' . ($id_member == 0 ? '0' : 'IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1') . ' AS new_from,
-				t.id_last_msg, t.approved, t.unapproved_posts, t.id_redirect_topic, ml.poster_time AS last_poster_time,
-				ml.id_msg_modified, ml.subject AS last_subject, ml.icon AS last_icon,
-				ml.poster_name AS last_member_name, ml.id_member AS last_id_member, ' . ($indexOptions['include_avatars'] ? 'meml.avatar,' : '') . '
-				IFNULL(meml.real_name, ml.poster_name) AS last_display_name, t.id_first_msg,
+				t.id_last_msg, t.approved, t.unapproved_posts, t.id_redirect_topic, t.id_first_msg,
+				ml.poster_time AS last_poster_time, ml.id_msg_modified, ml.subject AS last_subject, ml.icon AS last_icon,
+				ml.poster_name AS last_member_name, ml.id_member AS last_id_member, ml.smileys_enabled AS last_smileys,
+				IFNULL(meml.real_name, ml.poster_name) AS last_display_name,
 				mf.poster_time AS first_poster_time, mf.subject AS first_subject, mf.icon AS first_icon,
-				mf.poster_name AS first_member_name, mf.id_member AS first_id_member,
-				IFNULL(memf.real_name, mf.poster_name) AS first_display_name, ' . (!empty($indexOptions['previews']) ? '
-				SUBSTRING(ml.body, 1, ' . ($indexOptions['previews'] + 256) . ') AS last_body,
-				SUBSTRING(mf.body, 1, ' . ($indexOptions['previews'] + 256) . ') AS first_body,' : '') . 'ml.smileys_enabled AS last_smileys, mf.smileys_enabled AS first_smileys' . (!empty($settings['avatars_on_indexes']) ? ',
-				IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type, meml.email_address' : '') . '
+				mf.poster_name AS first_member_name, mf.id_member AS first_id_member, mf.smileys_enabled AS first_smileys,
+				IFNULL(memf.real_name, mf.poster_name) AS first_display_name' .
+				(!empty($indexOptions['include_avatars']) ? ' ,meml.avatar' : '') .
+				(!empty($indexOptions['previews']) ? ' ,SUBSTRING(ml.body, 1, ' . ($indexOptions['previews'] + 256) . ') AS last_body, SUBSTRING(mf.body, 1, ' . ($indexOptions['previews'] + 256) . ') AS first_body' : '') .
+				(!empty($settings['avatars_on_indexes']) ? ' ,IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type, meml.email_address' : '') .
+				(!empty($indexOptions['custom_selects']) ? ' ,' . implode(',', $indexOptions['custom_selects']) : '') . '
 			FROM {db_prefix}topics AS t
 				INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
 				INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
@@ -106,7 +114,7 @@ function messageIndexTopics($id_board, $id_member, $start, $per_page, $sort_by, 
 			)
 		);
 
-		// lets take the results
+		// Lets take the results
 		while ($row = $db->fetch_assoc($request))
 			$topics[] = $row;
 
@@ -133,7 +141,7 @@ function messageIndexSort()
 		'last_post' => 't.id_last_msg'
 	);
 
-	// @todo add hook
+	call_integration_hook('integrate_messageindex_sort', array(&$sort_methods));
 
 	return $sort_methods;
 }
@@ -168,4 +176,40 @@ function topicsParticipation($id_member, $topic_ids)
 	$db->free_result($result);
 
 	return $topics;
+}
+
+/**
+ * This simple function returns the message topic icon array.
+ */
+function MessageTopicIcons()
+{
+	// Setup the default topic icons...
+	$stable_icons = array(
+		'xx',
+		'thumbup',
+		'thumbdown',
+		'exclamation',
+		'question',
+		'lamp',
+		'smiley',
+		'angry',
+		'cheesy',
+		'grin',
+		'sad',
+		'wink',
+		'poll',
+		'moved',
+		'recycled',
+		'wireless',
+		'clip'
+	);
+
+	// Allow addons to add to the message icon array
+	call_integration_hook('integrate_messageindex_icons', array(&$stable_icons));
+
+	$icon_sources = array();
+	foreach ($stable_icons as $icon)
+		$icon_sources[$icon] = 'images_url';
+
+	return $icon_sources;
 }
