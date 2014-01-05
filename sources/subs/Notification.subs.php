@@ -263,9 +263,10 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	// Find the members with notification on for this topic.
 	$members = $db->query('', '
 		SELECT
-			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile,
-			ln.sent, mem.id_group, mem.additional_groups, b.member_groups, mem.id_post_group, t.id_member_started, b.name,
-			ln.id_topic
+			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types,
+			mem.notify_send_body, mem.lngfile, mem.id_group, mem.additional_groups,mem.id_post_group, 
+			t.id_member_started, b.member_groups, b.name, b.id_profile,
+			ln.id_topic, ln.sent
 		FROM {db_prefix}log_notify AS ln
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = ln.id_member)
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ln.id_topic)
