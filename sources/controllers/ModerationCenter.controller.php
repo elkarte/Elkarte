@@ -44,10 +44,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// Now call the menu action.
 		if (isset($this->_mod_include_data['file']))
-		{
-			$dir = isset($this->_mod_include_data['dir']) ? $this->_mod_include_data['dir'] : (isset($this->_mod_include_data['controller']) ? CONTROLLERDIR : SOURCEDIR);
-			require_once($dir . '/' . $this->_mod_include_data['file']);
-		}
+			require_once($this->_mod_include_data['file']);
 
 		callMenu($this->_mod_include_data);
 	}
@@ -275,6 +272,7 @@ class ModerationCenter_Controller extends Action_Controller
 		$menuOptions = array(
 			'action' => 'moderate',
 			'disable_url_session_check' => true,
+			'default_include_dir' => CONTROLLERDIR,
 		);
 
 		// Let them modify PM areas easily.

@@ -194,7 +194,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 					continue;
 
 				$email_perm = true;
-				if (validatenNotificationAccess($row, $maillist, $email_perm) === false)
+				if (validateNotificationAccess($row, $maillist, $email_perm) === false)
 					continue;
 
 				$needed_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
@@ -263,9 +263,10 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	// Find the members with notification on for this topic.
 	$members = $db->query('', '
 		SELECT
-			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile,
-			ln.sent, mem.id_group, mem.additional_groups, b.member_groups, mem.id_post_group, t.id_member_started, b.name,
-			ln.id_topic
+			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types,
+			mem.notify_send_body, mem.lngfile, mem.id_group, mem.additional_groups,mem.id_post_group, 
+			t.id_member_started, b.member_groups, b.name, b.id_profile,
+			ln.id_topic, ln.sent
 		FROM {db_prefix}log_notify AS ln
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = ln.id_member)
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ln.id_topic)
@@ -303,7 +304,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			continue;
 
 		$email_perm = true;
-		if (validatenNotificationAccess($row, $maillist, $email_perm) === false)
+		if (validateNotificationAccess($row, $maillist, $email_perm) === false)
 			continue;
 
 		$needed_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
@@ -498,7 +499,7 @@ function sendBoardNotifications(&$topicData)
 	while ($rowmember = $db->fetch_assoc($members))
 	{
 		$email_perm = true;
-		if (validatenNotificationAccess($rowmember, $maillist, $email_perm) === false)
+		if (validateNotificationAccess($rowmember, $maillist, $email_perm) === false)
 			continue;
 
 		$langloaded = loadLanguage('index', empty($rowmember['lngfile']) || empty($modSettings['userLanguage']) ? $language : $rowmember['lngfile'], false);
@@ -846,7 +847,7 @@ function sendAdminNotifications($type, $memberID, $member_name = null)
  * @param boolean $maillist
  * @param boolean $email_perm
  */
-function validatenNotificationAccess($row, $maillist, &$email_perm = true)
+function validateNotificationAccess($row, $maillist, &$email_perm = true)
 {
 	global $modSettings;
 
