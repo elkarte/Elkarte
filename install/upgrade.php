@@ -503,7 +503,7 @@ function loadEssentialData()
  */
 function initialize_inputs()
 {
-	global $start_time, $upcontext, $db_type;
+	global $start_time;
 
 	$start_time = time();
 
@@ -542,8 +542,7 @@ function initialize_inputs()
  */
 function action_welcomeLogin()
 {
-	global $db_prefix, $language, $modSettings, $upgradeurl, $upcontext, $disable_security;
-	global $db_type, $databases, $txt;
+	global $modSettings, $upgradeurl, $upcontext, $db_type, $databases;
 
 	$db = database();
 
@@ -659,8 +658,7 @@ function action_welcomeLogin()
  */
 function checkLogin()
 {
-	global $db_prefix, $language, $modSettings, $upgradeurl, $upcontext, $disable_security;
-	global $db_type, $databases, $support_js, $txt;
+	global $modSettings, $upcontext, $disable_security, $db_type, $support_js;
 
 	// Login checks require hard database work :P
 	$db = database();
@@ -852,8 +850,7 @@ function checkLogin()
  */
 function action_upgradeOptions()
 {
-	global $db_prefix, $command_line, $modSettings, $is_debug;
-	global $boardurl, $maintenance, $mmessage, $upcontext, $db_type;
+	global $command_line, $modSettings, $is_debug, $maintenance, $upcontext, $db_type;
 
 	$upcontext['sub_template'] = 'upgrade_options';
 	$upcontext['page_title'] = 'Upgrade Options';
@@ -1073,8 +1070,7 @@ function backupTable($table)
  */
 function action_databaseChanges()
 {
-	global $db_prefix, $modSettings, $command_line;
-	global $language, $boardurl, $upcontext, $support_js, $db_type;
+	global $db_prefix, $modSettings, $command_line, $upcontext, $support_js, $db_type;
 
 	$db = database();
 
@@ -1300,7 +1296,7 @@ function action_deleteUpgrade()
  */
 function cli_scheduled_fetchFiles()
 {
-	global $txt, $language, $settings, $forum_version, $modSettings;
+	global $language, $forum_version, $modSettings;
 
 	$db = database();
 
@@ -1406,7 +1402,7 @@ function convertSettingsToTheme()
  */
 function convertSettingstoOptions()
 {
-	global $db_prefix, $modSettings;
+	global $modSettings;
 
 	$db = database();
 
@@ -1534,7 +1530,7 @@ function updateLastError()
  */
 function db_version_check()
 {
-	global $db_type, $databases, $db_connection;
+	global $db_type, $databases;
 
 	$curver = eval($databases[$db_type]['version_check']);
 	$curver = preg_replace('~\-.+?$~', '', $curver);
@@ -1547,7 +1543,6 @@ function db_version_check()
  */
 function getMemberGroups()
 {
-	global $db_prefix;
 	static $member_groups = array();
 
 	if (!empty($member_groups))
@@ -1604,7 +1599,7 @@ function fixRelativePath($path)
 function parse_sql($filename)
 {
 	global $db_prefix, $db_collation, $boardurl, $command_line, $file_steps, $step_progress, $custom_warning;
-	global $upcontext, $support_js, $is_debug, $db_connection, $databases, $db_type, $db_character_set;
+	global $upcontext, $support_js, $is_debug, $databases, $db_type, $db_character_set;
 
 /*
 	Failure allowed on:
@@ -2145,7 +2140,7 @@ function protected_alter($change, $substep, $is_test = false)
  */
 function textfield_alter($change, $substep)
 {
-	global $db_prefix, $databases, $db_type;
+	global $db_prefix;
 
 	$db = database();
 
@@ -2300,7 +2295,7 @@ function checkChange(&$change)
  */
 function nextSubstep($substep)
 {
-	global $start_time, $timeLimitThreshold, $command_line, $file_steps, $modSettings, $custom_warning;
+	global $start_time, $timeLimitThreshold, $command_line, $custom_warning;
 	global $step_progress, $is_debug, $upcontext;
 
 	if ($_GET['substep'] < $substep)
@@ -2369,8 +2364,7 @@ function nextSubstep($substep)
  */
 function cmdStep0()
 {
-	global $db_prefix, $language, $modSettings, $start_time, $databases, $db_type, $upcontext;
-	global $language, $is_debug, $txt;
+	global $modSettings, $start_time, $databases, $db_type, $upcontext, $is_debug;
 
 	$start_time = time();
 

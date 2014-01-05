@@ -128,8 +128,6 @@ installExit();
  */
 function initialize_inputs()
 {
-	global $databases, $incontext;
-
 	// Turn off magic quotes runtime and enable error reporting.
 	if (function_exists('set_magic_quotes_runtime'))
 		@set_magic_quotes_runtime(0);
@@ -194,7 +192,7 @@ function initialize_inputs()
  */
 function load_lang_file()
 {
-	global $txt, $incontext;
+	global $incontext;
 
 	$incontext['detected_languages'] = array();
 
@@ -266,8 +264,7 @@ function load_lang_file()
  */
 function load_database()
 {
-	global $db_prefix, $db_connection, $language;
-	global $mbname, $scripturl, $boardurl, $modSettings, $db_type, $db_name, $db_user, $db_persist;
+	global $db_prefix, $db_connection, $modSettings, $db_type, $db_name, $db_user, $db_persist;
 
 	if (!defined('SOURCEDIR'))
 		define('SOURCEDIR', dirname(__FILE__) . '/sources');
@@ -297,7 +294,7 @@ function load_database()
  */
 function installExit($fallThrough = false)
 {
-	global $incontext, $installurl, $txt;
+	global $incontext, $installurl;
 
 	// Send character set.
 	header('Content-Type: text/html; charset=UTF-8');
@@ -817,7 +814,7 @@ function action_databaseSettings()
  */
 function action_forumSettings()
 {
-	global $txt, $incontext, $databases, $db_connection, $db_type, $boardurl;
+	global $txt, $incontext, $databases, $db_type;
 
 	$incontext['sub_template'] = 'forum_settings';
 	$incontext['page_title'] = $txt['install_settings'];
@@ -1306,9 +1303,8 @@ function action_adminAccount()
  */
 function action_deleteInstall()
 {
-	global $txt, $db_prefix, $db_connection, $cookiename, $incontext;
-	global $db_character_set, $mbname, $context, $scripturl, $boardurl;
-	global $current_version, $databases, $forum_version, $modSettings, $user_info, $language, $db_type;
+	global $txt, $incontext, $db_character_set;
+	global $current_version, $databases, $forum_version, $modSettings, $user_info, $db_type;
 
 	$incontext['page_title'] = $txt['congratulations'];
 	$incontext['sub_template'] = 'delete_install';
@@ -2012,7 +2008,7 @@ function action_deleteInstaller()
 
 function template_install_above()
 {
-	global $incontext, $txt, $oursite, $installurl;
+	global $incontext, $txt, $installurl;
 
 	echo '<!DOCTYPE html>
 <html ', !empty($txt['lang_rtl']) ? 'dir="rtl"' : '', '>
@@ -2128,7 +2124,7 @@ function template_install_below()
  */
 function template_welcome_message()
 {
-	global $incontext, $installurl, $txt;
+	global $incontext, $txt;
 
 	echo '
 	<script src="http://elkarte.github.io/Elkarte/site/current-version.js?version=' . CURRENT_VERSION . '"></script>
@@ -2276,7 +2272,7 @@ function template_chmod_files()
  */
 function template_database_settings()
 {
-	global $incontext, $installurl, $txt;
+	global $incontext, $txt;
 
 	echo '
 	<form action="', $incontext['form_url'], '" method="post">
@@ -2371,7 +2367,7 @@ function template_database_settings()
  */
 function template_forum_settings()
 {
-	global $incontext, $installurl, $txt;
+	global $incontext, $txt;
 
 	echo '
 	<form action="', $incontext['form_url'], '" method="post">
@@ -2417,7 +2413,7 @@ function template_forum_settings()
  */
 function template_populate_database()
 {
-	global $incontext, $installurl, $txt;
+	global $incontext, $txt;
 
 	echo '
 	<form action="', $incontext['form_url'], '" method="post">
@@ -2460,7 +2456,7 @@ function template_populate_database()
  */
 function template_admin_account()
 {
-	global $incontext, $installurl, $txt;
+	global $incontext, $txt;
 
 	echo '
 	<form action="', $incontext['form_url'], '" method="post">
