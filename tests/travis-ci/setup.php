@@ -166,7 +166,12 @@ Class Elk_Testing_Setup
 		// For each file create a test case
 		foreach ($allTests as $key => $test)
 		{
+			$test = realpath($test);
+
 			$result = file_put_contents(BOARDDIR . '/tests/run_' . md5($test) . '.php' , '<?php
+
+$testName = \'' . $test . '\';
+
 define(\'TESTDIR\', dirname(__FILE__) . \'/\');
 require_once(\'simpletest/autorun.php\');
 require_once(TESTDIR . \'../Settings.php\');
