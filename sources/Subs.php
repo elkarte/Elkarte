@@ -614,8 +614,6 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
  */
 function htmlTime($timestamp)
 {
-	global $modSettings, $user_info;
-
 	if (empty($timestamp))
 		return '';
 
