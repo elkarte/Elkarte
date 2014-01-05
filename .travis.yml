@@ -1,14 +1,11 @@
 language: php
 php:
   - "5.5"
-  - "5.4"
-  - "5.3"
 
 env:
   - DB=mysql
-  - DB=postgres
 
-script: php /var/www/tests/all_tests.php
+script: php /var/www/tests/travis-ci_testing.php
 
 before_script:
   - cp ./install/Settings* ./
