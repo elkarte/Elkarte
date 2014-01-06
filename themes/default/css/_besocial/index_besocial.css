@@ -746,7 +746,15 @@ a.active {
 .small_pagelinks li {
 	border: none;
 }
+#expanded_pages_container {
+	background: #fff;
+	border-radius: 2px;
+	border: 1px solid #eee;
+}
 
+#pages_scroll_left, #pages_scroll_right {
+	background-color: #fff;
+}
 /* $STATISTICS	*/
 /* ------------------------------------------------------- */
 .statistics .category_header {
