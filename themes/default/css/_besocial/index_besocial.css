@@ -743,6 +743,9 @@ a.active {
 	padding: 1px  6px 1px 0;
 	float: left;
 }
+.small_pagelinks li {
+	border: none;
+}
 
 /* $STATISTICS	*/
 /* ------------------------------------------------------- */
