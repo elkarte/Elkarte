@@ -344,7 +344,7 @@ class Mentions_Controller extends Action_Controller
 				$removed = false;
 				// @todo find a way to call only what is actually needed
 				foreach ($this->_callbacks as $type => $callback)
-					$removed = $removed || call_user_func_array($callback, array(&$possible_mentions, $type));
+					$removed = call_user_func_array($callback, array(&$possible_mentions, $type)) || $removed;
 			}
 
 			foreach ($possible_mentions as $mention)
