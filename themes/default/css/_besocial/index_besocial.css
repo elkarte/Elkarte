@@ -743,6 +743,43 @@ a.active {
 	padding: 1px  6px 1px 0;
 	float: left;
 }
+
+/* $STATISTICS	*/
+/* ------------------------------------------------------- */
+.statistics .category_header {
+	background: none;
+	border: none;
+	border-bottom: 2px solid #ccc;
+	text-shadow: none;
+}
+.statistics .flow_hidden, #forum_history .flow_hidden {
+	border: 1px solid #ddd;
+	background: #fefefe;
+}
+.stats.floatleft {
+	border-right: 1px solid #ccc;
+}
+#top_row .stats dd, .statsbar {
+	border: 1px solid #eee;
+	background: #fff;
+}
+/* Methinks topic links, etc need a little more oomph next to the orange bars. */
+#top_row .stats dd {
+	border: 1px solid transparent;
+	background: none;
+}
+.statsbar {
+	border-radius: 4px;
+}
+.statsbar .bar {
+	background: #43a8da;
+	border-radius: 4px 0 0 4px;
+}
+/* Absolute positioning stops these breaking the bars on narrow screens. */
+.statsbar .righttext {
+	background: #fff;
+}
+
 /*	$MEDIA		*/
 /* Experimental media queries.
 /* ------------------------------------------------------- */
