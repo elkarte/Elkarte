@@ -214,14 +214,17 @@ strong {
 /* Custom highlighted text style for modern browsers. */
 /* Nicer than default blue. Needs two separate rules. */
 ::-moz-selection {
-	background: #d8ffdf;
+	background: red;
 	color: #444;
 }
 ::selection {
-	background: #d8ffdf;
+	background: red;
 	color: #444;
 }
-
+#top_section_notice .button_submit {
+	position: relative;
+	top: -1.5px;
+}
 /* Other highlighted text, such as search results. */
 .highlight {
 	color: #ff7200;
@@ -702,7 +705,7 @@ a.active {
 }
 .category_boards .board_icon, .board_key:before {
 	background-repeat: no-repeat;
-	background-image: url(../../images/_green/board_icons.png);
+	background-image: url(../../images/_besocial/board_icons.png);
 }
 .on_board {
 	background-position: 0 0;
