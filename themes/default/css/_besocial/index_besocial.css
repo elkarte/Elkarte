@@ -670,14 +670,16 @@ a.active {
 }
 
 .navigate_section {
-	border-bottom: 1px solid #ccc;
 	padding-left: 15px;
+	border: 1px solid #eee;
+	margin: 4px 0 0 0;
 }
 .linktree, .linktree_last {
 	padding: 0 0.5em 0 1em;
 }
-.linktree a:after {
-	content: " >";
+.linktree:after {
+	border-left: 0.7em solid #eee;
+	margin-right: 4px;
 }
 .board_name>a {
 	color: #43a8da;
@@ -870,9 +872,6 @@ a.active {
 	.linktree_last:before, .linktree_last:after {
 		border: none !important;
 		background: none !important;
-	}
-	.linktree:after {
-		content: ">";
 	}
 	.linktree:hover, .linktree>a:hover, .linktree_last, .linktree_last>a,
 	.linktree_last>a:hover, .linktree_last strong {
