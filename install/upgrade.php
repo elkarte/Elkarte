@@ -542,7 +542,7 @@ function initialize_inputs()
  */
 function action_welcomeLogin()
 {
-	global $modSettings, $upgradeurl, $upcontext, $db_type, $databases;
+	global $modSettings, $upgradeurl, $upcontext, $db_type, $databases, $txt;
 
 	$db = database();
 
@@ -1530,7 +1530,7 @@ function updateLastError()
  */
 function db_version_check()
 {
-	global $db_type, $databases;
+	global $db_type, $databases, $db_connection;
 
 	$curver = eval($databases[$db_type]['version_check']);
 	$curver = preg_replace('~\-.+?$~', '', $curver);
@@ -1599,7 +1599,7 @@ function fixRelativePath($path)
 function parse_sql($filename)
 {
 	global $db_prefix, $db_collation, $boardurl, $command_line, $file_steps, $step_progress, $custom_warning;
-	global $upcontext, $support_js, $is_debug, $databases, $db_type, $db_character_set;
+	global $upcontext, $support_js, $is_debug, $databases, $db_type, $db_character_set, $db_connection;
 
 /*
 	Failure allowed on:
@@ -2218,7 +2218,7 @@ function textfield_alter($change, $substep)
  */
 function checkChange(&$change)
 {
-	global $db_type, $databases;
+	global $db_type, $databases, $db_connection;
 	static $database_version, $where_field_support;
 
 	$db = database();
@@ -3285,7 +3285,7 @@ function loadEssentialFunctions()
  */
 function template_chmod()
 {
-	global $upcontext, $settings;
+	global $upcontext, $settings, $txt;
 
 	// Don't call me twice!
 	if (!empty($upcontext['chmod_called']))
@@ -3337,8 +3337,9 @@ function template_chmod()
 			<script><!-- // --><![CDATA[
 				function warning_popup()
 				{
-					popup = window.open(\'\',\'popup\',\'height=150,width=400,scrollbars=yes\');
-					var content = popup.document;
+					var popup = window.open(\'\',\'popup\',\'height=150,width=400,scrollbars=yes\'),
+						content = popup.document;
+
 					content.write(\'<!DOCTYPE html>\n\');
 					content.write(\'<html ', $upcontext['right_to_left'] ? 'dir="rtl"' : '', '>\n\t<head>\n\t\t<meta name="robots" content="noindex" />\n\t\t\');
 					content.write(\'<title>Warning</title>\n\t\t<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css" />\n\t</head>\n\t<body id="popup">\n\t\t\');
@@ -3416,19 +3417,20 @@ function template_upgrade_above()
 		<meta name="robots" content="noindex" />
 		<title>', $txt['upgrade_upgrade_utility'], '</title>
 		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css?beta10" />
-		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index_light.css?beta10" />
+		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/_light/index_light.css?beta10" />
 		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/install.css?beta10" />
 		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 		<script><!-- // --><![CDATA[
-			var elk_scripturl = \'', $upgradeurl, '\';
-			var elk_charset = \'UTF-8\';
-			var startPercent = ', $upcontext['overall_percent'], ';
+			var elk_scripturl = \'', $upgradeurl, '\',
+				elk_charset = \'UTF-8\',
+				startPercent = ', $upcontext['overall_percent'], ';
 
 			// This function dynamically updates the step progress bar - and overall one as required.
 			function updateStepProgress(current, max, overall_weight)
 			{
 				// What out the actual percent.
 				var width = parseInt((current / max) * 100);
+
 				if (document.getElementById(\'step__progress\'))
 				{
 					document.getElementById(\'step__progress\').style.width = width + "%";
@@ -3517,7 +3519,9 @@ function template_upgrade_above()
 	$elapsed = time() - $upcontext['started'];
 	$mins = (int) ($elapsed / 60);
 	$seconds = $elapsed - $mins * 60;
-	echo '
+
+	if (!empty($elapsed))
+		echo '
 						<div class="smalltext" style="padding: 5px; text-align: center;">', $txt['upgrade_time_elapsed'], ':
 							<span id="mins_elapsed">', $mins, '</span> ', $txt['upgrade_time_mins'], ', <span id="secs_elapsed">', $seconds, '</span> ', $txt['upgrade_time_secs'], '.
 						</div>';
@@ -3580,9 +3584,10 @@ function template_upgrade_below()
 	{
 		echo '
 		<script><!-- // --><![CDATA[
+			var countdown = 3,
+				dontSubmit = false;
+
 			window.onload = doAutoSubmit;
-			var countdown = 3;
-			var dontSubmit = false;
 
 			function doAutoSubmit()
 			{
@@ -3795,7 +3800,8 @@ function template_welcome_message()
 			// Latest version?
 			function ourCurrentVersion()
 			{
-				var ourVer, yourVer;
+				var ourVer,
+					yourVer;
 
 				if (!(\'elkVersion\' in window))
 					return;
@@ -3924,6 +3930,7 @@ function template_backup_database()
 		echo '
 		<script><!-- // --><![CDATA[
 			var lastTable = ', $upcontext['cur_table_num'], ';
+
 			function getNextTables()
 			{
 				getXMLDocument(\'', $upcontext['form_url'], '&xml&substep=\' + lastTable, onBackupUpdate);
@@ -3932,9 +3939,10 @@ function template_backup_database()
 			// Got an update!
 			function onBackupUpdate(oXMLDoc)
 			{
-				var sCurrentTableName = "";
-				var iTableNum = 0;
-				var sCompletedTableName = document.getElementById(\'current_table\').innerHTML;
+				var sCurrentTableName = "",
+					iTableNum = 0,
+					sCompletedTableName = document.getElementById(\'current_table\').innerHTML;
+
 				for (var i = 0; i < oXMLDoc.getElementsByTagName("table")[0].childNodes.length; i++)
 					sCurrentTableName += oXMLDoc.getElementsByTagName("table")[0].childNodes[i].nodeValue;
 				iTableNum = oXMLDoc.getElementsByTagName("table")[0].getAttribute("num");
@@ -4041,17 +4049,18 @@ function template_database_changes()
 	{
 		echo '
 		<script><!-- // --><![CDATA[
-			var lastItem = ', $upcontext['current_debug_item_num'], ';
-			var sLastString = "', strtr($upcontext['current_debug_item_name'], array('"' => '&quot;')), '";
-			var iLastSubStepProgress = -1;
-			var curFile = ', $upcontext['cur_file_num'], ';
-			var totalItems = 0;
-			var prevFile = 0;
-			var retryCount = 0;
-			var testvar = 0;
-			var timeOutID = 0;
-			var getData = "";
-			var debugItems = ', $upcontext['debug_items'], ';
+			var lastItem = ', $upcontext['current_debug_item_num'], ',
+				sLastString = "', strtr($upcontext['current_debug_item_name'], array('"' => '&quot;')), '",
+				iLastSubStepProgress = -1,
+				curFile = ', $upcontext['cur_file_num'], ',
+				totalItems = 0,
+				prevFile = 0,
+				retryCount = 0,
+				testvar = 0,
+				timeOutID = 0,
+				getData = "",
+				debugItems = ', $upcontext['debug_items'], ';
+
 			function getNextItem()
 			{
 				// We want to track this...
@@ -4065,13 +4074,13 @@ function template_database_changes()
 			// Got an update!
 			function onItemUpdate(oXMLDoc)
 			{
-				var sItemName = "";
-				var sDebugName = "";
-				var iItemNum = 0;
-				var iSubStepProgress = -1;
-				var iDebugNum = 0;
-				var bIsComplete = 0;
-				getData = "";
+				var sItemName = "",
+					sDebugName = "",
+					iItemNum = 0,
+					iSubStepProgress = -1,
+					iDebugNum = 0,
+					bIsComplete = 0,
+					getData = "";
 
 				// We\'ve got something - so reset the timeout!
 				if (timeOutID)
@@ -4081,7 +4090,7 @@ function template_database_changes()
 				document.getElementById("error_block").style.display = "none";
 
 				// Are we getting some duff info?
-				if (!oXMLDoc.getElementsByTagName("item")[0])
+				if (!oXMLDoc || !oXMLDoc.getElementsByTagName("item")[0])
 				{
 					// Too many errors?
 					if (retryCount > 15)
@@ -4178,7 +4187,6 @@ function template_database_changes()
 					document.getElementById(\'debug_section\').style.display = "none";';
 
 		echo '
-
 					document.getElementById(\'commess\').style.display = "";
 					document.getElementById(\'contbutt\').disabled = 0;
 					document.getElementById(\'database_done\').value = 1;';
