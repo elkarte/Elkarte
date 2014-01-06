@@ -539,9 +539,8 @@ a.active {
 .listlevel2:hover .linklevel2, /* < highlighted with cursor over level 3. */
 .linklevel2:hover, .linklevel2:focus, .linklevel2.sfhover:focus,
 .linklevel3:hover, .linklevel3:focus, .linklevel3.sfhover:focus {
-	border: 1px solid darkgray;
-	background: gainsboro;
-	color: black;
+	background: #7bb128;
+	color: #fff;
 	text-decoration: none;
 }
 
