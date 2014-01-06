@@ -961,6 +961,9 @@ div.bbc_footnotes .meaction{
 .board_stats {
 	color: #777;
 }
+.board_avatar {
+	display: none;
+}
 .lastpost_link>a {
 	color: #377828;
 }
