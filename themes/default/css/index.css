@@ -1583,6 +1583,14 @@ dl.settings textarea {
 	float: right;
 	min-width: 8.4em;
 }
+.board_avatar {
+	float: left;
+	margin-right: 5px;
+}
+.board_avatar img {
+	max-width: 40px;
+	max-height: 40px;
+}
 .lastpost_link, .board_lastposter, .board_lasttime {
 	white-space: pre;
 }
