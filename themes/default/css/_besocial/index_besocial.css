@@ -473,7 +473,7 @@ strong {
 
 /* For secondary admin/profile/etc menus. */
 #adm_submenus .linklevel1:hover, #adm_submenus .linklevel1:focus {
-	color: #fff;
+	color: #333;
 	text-decoration: none;
 }
 
