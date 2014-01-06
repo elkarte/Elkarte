@@ -734,7 +734,9 @@ a.active {
 .windowbg {
 	background-color: #f6f6f6;
 }
-
+.windowbg2 {
+	background-color: #fcfcfc;
+}
 .board_stats {
 	text-align: left;
 	padding: 1px  6px 1px 0;
