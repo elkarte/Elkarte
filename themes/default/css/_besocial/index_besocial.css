@@ -791,6 +791,48 @@ a.active {
 .statsbar .righttext {
 	background: #fff;
 }
+/* Styles for the $TABS	*/
+/* We can't control what jqueryui pollutes the DOM with, so deal with it */
+/* Styles for the profile summary tabs, or any jquery ui tabs */
+/* ---------------------------------------------------------- */
+.ui-tabs .ui-tabs-panel {
+	padding-top: 0;
+}
+.ui-tabs-panel {
+	border-top: 8px solid #f6f6f6; 
+}
+.ui-tabs .ui-tabs-nav li {
+	border-radius: 5px 5px 0 0;
+	border: 2px solid #f0f0f0;
+	border-bottom: none;
+	color: #fff;
+	box-shadow: 2px 0px 0px rgba(0,0,0,0.3);
+	margin-left: 2px;
+}
+.ui-tabs .ui-tabs-nav .ui-state-active a, .ui-tabs .ui-tabs-nav .ui-state-active {
+	font-weight: normal;
+}
+.ui-tabs .ui-tabs-nav li a {
+	background: #f0f0f0;
+	border-bottom-color: #ccc;
+	outline: none;
+	border-radius: 5px 5px 0 0;
+}
+
+.ui-tabs .ui-tabs-nav .ui-state-default a {
+	background: #fff;
+	color: #333;
+}
+.ui-tabs .ui-tabs-nav .ui-state-active a, .ui-tabs .ui-tabs-nav .ui-state-active {
+	background: #f6f6f6;
+	color: #333;
+	border-radius: 5px 5px 0 0;
+}
+.ui-tabs .ui-state-hover {
+	background: #f0f0f0;
+	color: #555;
+	text-decoration: none;
+}
 
 /*	$MEDIA		*/
 /* Experimental media queries.
