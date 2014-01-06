@@ -464,10 +464,6 @@ strong {
 	color: black;
 }
 
-/* Level 1 button hover and focus effects. */
-#main_menu .active, /* Level 1 active button shares same styling. */
-#main_menu .linklevel1:hover, #main_menu .listlevel1:hover .linklevel1, #main_menu .linklevel1:focus,
-
 /* For primary admin/profile/etc drop menus. */
 .admin_menu .linklevel1:hover, .admin_menu .linklevel1:focus,
 
