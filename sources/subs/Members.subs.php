@@ -1667,7 +1667,7 @@ function getBasicMemberData($member_ids, $options = array())
 	// Get some additional member info...
 	$request = $db->query('', '
 		SELECT id_member, member_name, real_name, email_address, hide_email, posts, id_theme' . (isset($options['moderation']) ? ',
-		member_ip, id_group, additional_groups, last_login' : '') . (isset($options['authentication']) ? ',
+		member_ip, id_group, additional_groups, last_login, id_post_group' : '') . (isset($options['authentication']) ? ',
 		secret_answer, secret_question, openid_uri, is_activated, validation_code, passwd_flood' : '') . (isset($options['preferences']) ? ',
 		lngfile, mod_prefs, notify_types, signature' : '') . '
 		FROM {db_prefix}members
@@ -2377,7 +2377,7 @@ function memberQuerySeeBoard($id_member)
 {
 	global $modSettings;
 
-	$member = getBasicMemberData($id_member);
+	$member = getBasicMemberData($id_member, array('moderation' => true));
 
 	$groups = array_merge(array($member['id_group'], $member['id_post_group']), explode(',', $member['additional_groups']));
 

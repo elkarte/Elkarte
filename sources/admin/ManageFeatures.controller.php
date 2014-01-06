@@ -399,7 +399,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 			// If mentions are enabled, the related task should be enabled as well, otherwise should be disabled.
 			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
-			toggleTaskStatusByName('mentions_check_users', !empty($_POST['mentions_enabled']));
+			toggleTaskStatusByName('user_access_mentions', !empty($_POST['mentions_enabled']));
 
 			Settings_Form::save_db($config_vars);
 			redirectexit('action=admin;area=featuresettings;sa=mention');

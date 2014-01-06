@@ -4330,16 +4330,19 @@ function scheduleTaskImmediate($task)
 	else
 		$scheduleTaskImmediate = unserialize($modSettings['scheduleTaskImmediate']);
 
-	$scheduleTaskImmediate[$task] = 0;
-	updateSettings(array('scheduleTaskImmediate' => serialize($scheduleTaskImmediate)));
+	if (!isset($scheduleTaskImmediate[$task]))
+	{
+		$scheduleTaskImmediate[$task] = 0;
+		updateSettings(array('scheduleTaskImmediate' => serialize($scheduleTaskImmediate)));
 
-	require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
-	// Ensure the task is on
-	toggleTaskStatusByName($task, true);
+		// Ensure the task is on
+		toggleTaskStatusByName($task, true);
 
-	// Before trying to run it **NOW** :P
-	calculateNextTrigger($task, true);
+		// Before trying to run it **NOW** :P
+		calculateNextTrigger($task, true);
+	}
 }
 
 /**
