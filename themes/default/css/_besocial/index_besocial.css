@@ -343,7 +343,7 @@ strong {
 	background: #f4f4f4;
 	background-image: linear-gradient(to bottom, #fff, #e4e4e4);
 	box-shadow: 1px 1px 2px #e5e5e5;
-	color: #566e4b;
+	color: #7bb128;
 }
 
 /* Level 1 button hover and focus effects. */
@@ -376,7 +376,7 @@ strong {
 	background: #f4f4f4;
 	background-image: linear-gradient(to bottom, #fff, #e4e4e4);
 	box-shadow: 1px 1px 2px #e5e5e5;
-	color: #566e4b;
+	color: #7bb128;
 	display: block;
 	line-height: 2em;
 	margin: 3px 1.5em;
@@ -483,15 +483,17 @@ strong {
 .admin_menu .active,
 /* ......and for secondary admin/profile/etc menu strip. */
 #adm_submenus .active {
-	border: 1px solid black;
-	background: forestgreen;
+	border: 1px solid #aaa;
+	background: #7bb128;
+	background-image: linear-gradient(to bottom, #9dd53a 0%,#a1d54f 21%,#80c217 63%,#7cbc0a 100%);
 	color: white;
 }
 
 /* Hover effects for those buttons. */
 .admin_menu .active:hover, .admin_menu .listlevel1:hover .active, #adm_submenus .active:hover {
-	border: 1px solid black;
-	background: darkgreen;
+	border: 1px solid #aaa;
+	background: #43a8da;
+	background-image: linear-gradient(to bottom, #6db3f2 0%,#54a3ee 30%,#3690f0 68%,#1e69de 100%);
 	color: white;
 }
 
