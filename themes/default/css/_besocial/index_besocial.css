@@ -551,8 +551,8 @@ a.active {
 .listlevel2.subsections .linklevel2:after {
 	position: absolute;
 	right: 6px;
-	color: black;
-	content: "\2192";
+	color: #ccc;
+	content: "\25b6";
 	font-size: 1.3em;
 }
 
