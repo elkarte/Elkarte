@@ -107,6 +107,10 @@ div.quick_tasks {
 h3.category_header form {
 	font-size: 80%;
 }
+/* Chrome trick to avoid multiple lines of feature names */
+.category_header>h3 {
+	white-space: nowrap;
+}
 .windowbg.nopadding {
 	margin: 4px 0 0 0;
 	padding: 0;
