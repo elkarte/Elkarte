@@ -165,10 +165,8 @@ hr {
 	background-color: #eee;
 }
 
-/* Define strong as font-weight: 600; - defaults to bold */
-/* for fonts which do not support numerical font-weight) */
 strong {
-	font-weight: 600;
+	font-weight: bold;
 }
 
 /* @todo - Test this everywhere. */
@@ -559,7 +557,7 @@ div.bbc_footnotes .meaction{
 	background: #4b863c;
 	background-image: linear-gradient(to bottom, #5ba048, #3d6e32);
 	color: #fff;
-	font-weight: 600;
+	font-weight: bold;
 	box-shadow: 1px 1px 2px #bbb;
 	padding: 0 5px;
 }
