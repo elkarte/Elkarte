@@ -87,10 +87,17 @@ function template_list_boards($boards, $id)
 		// <chunk>Re: Nunc aliquam justo e...</chunk>  <chunk>by Whoever</chunk> <chunk>Last post: Today at 08:00:37 am</chunk>
 		// That should still allow sufficient scope for any language, if done sensibly.
 		if (!empty($board['last_post']['id']))
+		{
 			echo '
-						<p class="board_lastpost">
+						<p class="board_lastpost">';
+			
+			if (!empty($settings['avatars_on_indexes']))
+				echo '
+							<span class="board_avatar"><a href="', $board['last_post']['member']['href'], '">', $board['last_post']['member']['avatar']['image'], '</a></span>';
+			echo '
 							', $board['last_post']['last_post_message'], '
 						</p>';
+		}
 
 		echo '
 					</div>

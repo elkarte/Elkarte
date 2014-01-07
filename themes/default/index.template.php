@@ -65,10 +65,10 @@ function template_init()
 	$settings['require_theme_strings'] = false;
 
 	// This is used for the color variants.
-	$settings['theme_variants'] = array('light', 'dark', 'basic');
+	$settings['theme_variants'] = array('light', 'dark', 'besocial');
 
 	// If the following variable is set to true, the avatar of the last poster will be displayed on the boardindex and message index.
-	$settings['avatars_on_indexes'] = false;
+	$settings['avatars_on_indexes'] = true;
 
 	// This is used in the main menus to create a number next to the title of the menu to indicate the number of unread messages,
 	// moderation reports, etc. You can style each menu level indicator as desired.

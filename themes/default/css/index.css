@@ -287,11 +287,9 @@ fieldset {
 	border: none;
 }
 
-/* Define strong as font-weight: 600; - defaults to bold */
-/* for fonts which do not support numerical font-weight) */
 strong {
 	color: #666;
-	font-weight: 600;
+	font-weight: bold;
 }
 /*...and em as italics */
 em {
@@ -628,7 +626,7 @@ div.windowbg, div.windowbg2 {
 .codeheader, .quoteheader {
 	margin: 6px 0 0 0;
 	padding: 4px 6px 2px 6px;
-	font-weight: 600;
+	font-weight: bold;
 	font-size: 0.857em;
 }
 /* [Select] link to copy code. */
@@ -705,6 +703,15 @@ div.windowbg, div.windowbg2 {
 }
 .footnote_return {
 	font-size: 1.35em;
+}
+/* Shorten url's inside posts. */
+a.bbc_link {
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 24em;
+    vertical-align: bottom;
 }
 
 /*	$AJAX		*/
@@ -1337,7 +1344,7 @@ div.windowbg, div.windowbg2 {
 	min-width: 1.5em;
 	text-align: center;
 	cursor: pointer;
-	font-weight: 600;
+	font-weight: bold;
 	padding: 2px 0;
 }
 .next_page, .previous_page {
@@ -1381,7 +1388,7 @@ div.windowbg, div.windowbg2 {
 	padding: 1.3em 0.1em 0 0.1em;
 	height: 1.5em;
 	font-size: 2em;
-	font-weight: 700;
+	font-weight: bold;
 }
 #gobottom {
 	top: 50%;
@@ -1396,7 +1403,7 @@ div.windowbg, div.windowbg2 {
 	top: -10em;
 	left: 10%;
 	padding: 1em 2em;
-	font-weight: 700;
+	font-weight: bold;
 }
 #top:focus {
 	top: -4px;
@@ -1417,7 +1424,7 @@ div.windowbg, div.windowbg2 {
 .table_head>th {
 	padding: 5px 8px;
 	font-size: 1em;
-	font-weight: 600;
+	font-weight: bold;
 	text-align: left;
 }
 .table_head>th.centertext {
@@ -1581,6 +1588,14 @@ dl.settings textarea {
 	padding: 1px  0 1px 6px;
 	float: right;
 	min-width: 8.4em;
+}
+.board_avatar {
+	float: left;
+	margin-right: 5px;
+}
+.board_avatar img {
+	max-width: 40px;
+	max-height: 40px;
 }
 .lastpost_link, .board_lastposter, .board_lasttime {
 	white-space: pre;
@@ -1754,7 +1769,7 @@ img.new_posts {
 	display: table-cell;
 	padding: 10px 12px 8px 12px;
 	width: 100%;
-	font-weight: 600;
+	font-weight: bold;
 	font-size: 1.071em;
 }
 .topic_sorting_row>p {
@@ -1796,7 +1811,7 @@ img.new_posts {
 	padding-right: 30px;
 }
 .topic_name h4 a {
-	font-weight: 600;
+	font-weight: bold;
 }
 .topic_starter {
 	font-size: 0.929em;
@@ -2033,7 +2048,7 @@ img.new_posts {
 	margin-top: -0.4em;
 	padding: 6px;
 	text-align: center;
-	font-weight: 600;
+	font-weight: bold;
 	font-size: 1.333em;
 }
 .poster.poster2 .name {
@@ -2157,7 +2172,7 @@ img.new_posts {
 }
 /* @todo - Move strong tag outside anchor. Will save css. */
 .keyinfo h5 a, .keyinfo h5 a strong {
-	font-weight: 600;
+	font-weight: bold;
 }
 .inner {
 	margin: 0;
@@ -2602,7 +2617,7 @@ dl.merge_topic dd {
 	display: none;
 }
 .ui-tabs .ui-tabs-nav .ui-state-active a, .ui-tabs .ui-tabs-nav .ui-state-active {
-	font-weight: 600;
+	font-weight: bold;
 }
 /*	$PROFILE	*/
 /* ------------------------------------------------------- */
@@ -2982,7 +2997,7 @@ dl.merge_topic dd {
 	z-index: 2;
 	padding-top: 1pt;
 	width: 100%;
-	font-weight: 600;
+	font-weight: bold;
 }
 #new_template_link a {
 	margin-bottom: 2px;
@@ -3347,7 +3362,7 @@ a.help .icon {
 /* What it says. ;) */
 .popup_heading {
 	padding: 0 0 6px 0;
-	font-weight: 600;
+	font-weight: bold;
 	font-size: 1.1em;
 	line-height: 2em;
 }
