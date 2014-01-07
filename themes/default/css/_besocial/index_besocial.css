@@ -278,6 +278,98 @@ strong {
 	color: #eee;
 }
 
+/*	$BBC		*/
+/* ------------------------------------------------------- */
+/* The "Quote:" and "Code:" header parts... */
+.codeheader, .quoteheader {
+	border: 1px solid #ccc;
+	border-bottom: none;
+	background: #fff;
+	color: #555;
+}
+.codeheader {
+	border-top: 3px solid #aaa;
+}
+/* [Select] link to copy code. */
+.codeoperation {
+	font-weight: normal;
+}
+/* A quote, perhaps from another post. */
+.bbc_standard_quote, .bbc_alternate_quote,
+/* A code block - maybe PHP ;) - shared styles. */
+.bbc_code {
+	border: 1px solid #ccc;
+	border-top: none;
+	background: #fff;
+}
+/* Extra quote styling */
+.bbc_standard_quote, .bbc_alternate_quote, .quoteheader {
+	box-shadow: 2px 2px 2px #ddd;
+}
+/* Extra code block styling. */
+.bbc_code {
+	border-top: 3px solid #aaa;
+	border-bottom: 3px solid #aaa;
+	background: #f8f8f8;
+}
+/* Styling for BBC tags */
+.bbc_link:link, .bbc_link:visited {
+	color: #377828;
+	box-shadow: 0 -1px 0 #cedccb inset;
+}
+.bbc_link:hover {
+	color: #377828;
+	box-shadow: 0 -1px 0 #66aa55 inset;
+	text-decoration: none;
+}
+/* /me uses this a lot. (emote, try typing /me in a post.) */
+.meaction {
+	color: #50aa3a;
+}
+.meaction:before {
+	content: "\270c";
+	font-size: 1.7em;
+	line-height: 1em;
+	vertical-align: top;
+}
+.spoilerheader {
+	font-weight: bold;
+	cursor: pointer;
+	font-size: 0.85em;
+}
+.spoiler {
+	border: 1px solid #ccc;
+	padding: 0.3em;
+	background-color: #eee;
+}
+div.bbc_footnotes {
+	border-top: 1px solid #bfbfbf;
+}
+.bbc_footnotes .target:target {
+	background-color: #d8ffdf;
+}
+sup.bbc_footnotes, sup.bbc_footnotes a {
+	color: #50aa3a;
+	font-weight: bold;
+}
+div.bbc_footnotes .meaction{
+	display: inline-block;
+}
+
+
+/*	$AJAX		*/
+/* ------------------------------------------------------- */
+/* The "Loading" bar for quick edit, etc. */
+#ajax_in_progress {
+	border-bottom: 4px solid #3d6e32;
+	background: #fff;
+	color: #306430;
+}
+#ajax_in_progress a {
+	text-decoration: underline;
+}
+
+
 /*	$MAIN.		*/
 /* ------------------------------------------------------- */
 /* The top bar. */
