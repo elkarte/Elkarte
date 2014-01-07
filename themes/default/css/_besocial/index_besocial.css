@@ -848,6 +848,27 @@ a.active {
 #pages_scroll_left, #pages_scroll_right {
 	background-color: #fff;
 }
+
+/*	$PROGRESS	*/
+/* ------------------------------------------------------- */
+/* Styles for the progress bar */
+.progress_bar {
+	border: 1px solid #999;
+	border-radius: 5px;
+	background: white;
+	box-shadow: inset 0 1px 1px rgba(0,0,0,0.05);
+}
+.progress_bar .full_bar {
+	border-radius: 3px;
+	color: black;
+}
+.progress_bar .green_percent {
+	background-color: #7bb128;
+}
+.progress_bar .blue_percent {
+	background-color: #43a8da;
+}
+
 /* $STATISTICS	*/
 /* ------------------------------------------------------- */
 .statistics .category_header {
