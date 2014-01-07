@@ -25,7 +25,7 @@ function template_editBuddies()
 	$disabled_fields = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
 
 	echo '
-	<div class="generic_list_wrapper" id="edit_buddies">
+	<div class="windowbg" id="edit_buddies">
 		<h2 class="category_header">
 			<img src="', $settings['images_url'], '/icons/online.png" alt="" class="icon" />', $txt['editBuddies'], '
 		</h2>
@@ -137,7 +137,7 @@ function template_editIgnoreList()
 	global $context, $settings, $scripturl, $txt;
 
 	echo '
-	<div class="generic_list_wrapper" id="edit_buddies">
+	<div class="windowbg" id="edit_buddies">
 		<h2 class="category_header hdicon cat_img_profile">
 			', $txt['editIgnoreList'], '
 		</h2>
