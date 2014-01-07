@@ -707,6 +707,15 @@ div.windowbg, div.windowbg2 {
 .footnote_return {
 	font-size: 1.35em;
 }
+/* Shorten url's inside posts. */
+a.bbc_link {
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 24em;
+    vertical-align: bottom;
+}
 
 /*	$AJAX		*/
 /* ------------------------------------------------------- */
