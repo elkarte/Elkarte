@@ -47,7 +47,7 @@
 		// Get the form elements that we want to save
 		var aSections = [
 			'topic=' + parseInt(document.forms.postmodify.elements['topic'].value),
-			'id_draft=' + parseInt(document.forms.postmodify.elements['id_draft'].value),
+			'id_draft=' + (('id_draft' in document.forms.postmodify.elements) ? parseInt(document.forms.postmodify.elements['id_draft'].value) : 0),
 			'subject=' + escape(document.forms.postmodify['subject'].value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
 			'message=' + escape(sPostdata.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
 			'icon=' + escape(document.forms.postmodify['icon'].value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
@@ -115,7 +115,7 @@
 		// Get the rest of the form elements that we want to save, and load them up
 		var aSections = [
 			'replied_to=' + parseInt(document.forms.pmFolder.elements['replied_to'].value),
-			'id_pm_draft=' + parseInt(document.forms.pmFolder.elements['id_pm_draft'].value),
+			'id_pm_draft=' + (('id_pm_draft' in document.forms.pmFolder.elements) ? parseInt(document.forms.pmFolder.elements['id_pm_draft'].value) : 0),
 			'subject=' + escape(document.forms.pmFolder['subject'].value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
 			'message=' + escape(sPostdata.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
 			'recipient_to=' + aTo,

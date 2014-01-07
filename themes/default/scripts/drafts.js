@@ -105,7 +105,7 @@ elk_DraftAutoSave.prototype.draftSave = function ()
 	// Get the form elements that we want to save
 	var aSections = [
 		'topic=' + parseInt(document.forms.postmodify.elements['topic'].value),
-		'id_draft=' + parseInt(document.forms.postmodify.elements['id_draft'].value),
+		'id_draft=' + (('id_draft' in document.forms.postmodify.elements) ? parseInt(document.forms.postmodify.elements['id_draft'].value) : 0),
 		'subject=' + escape(document.forms.postmodify['subject'].value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
 		'message=' + escape(sPostdata.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
 		'icon=' + escape(document.forms.postmodify['icon'].value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
