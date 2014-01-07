@@ -549,7 +549,6 @@ class ProfileOptions_Controller extends Action_Controller
 
 	/**
 	 * Display the notifications and settings for changes.
-	 *
 	 */
 	public function action_notification()
 	{
@@ -559,7 +558,7 @@ class ProfileOptions_Controller extends Action_Controller
 
 		$memID = currentMemberID();
 
-		// Gonna want this for the list.
+		// Going to need this for the list.
 		require_once(SUBSDIR . '/List.class.php');
 		require_once(SUBSDIR . '/Boards.subs.php');
 		require_once(SUBSDIR . '/Topic.subs.php');
@@ -637,7 +636,6 @@ class ProfileOptions_Controller extends Action_Controller
 				array(
 					'position' => 'after_title',
 					'value' => getBoardNotificationsCount($memID) == 0 ? $txt['notifications_boards_none'] . '<br />' . $txt['notifications_boards_howto'] : $txt['notifications_boards_current'],
-					'class' => 'windowbg2',
 				),
 			),
 		);

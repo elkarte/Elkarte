@@ -128,13 +128,13 @@ $txt['notify_send_body'] = 'When sending notification of a reply to a topic, sen
 $txt['notifications_topics'] = 'Current Topic Notifications';
 $txt['notifications_topics_list'] = 'You are being notified of replies to the following topics';
 $txt['notifications_topics_none'] = 'You are not currently receiving any notifications from topics.';
-$txt['notifications_topics_howto'] = 'To receive notifications from a specific topic, click the &quot;notify&quot; button while viewing it.';
+$txt['notifications_topics_howto'] = 'To receive notifications from a specific topic, click the &quot;Notify&quot; button while viewing it.';
 
 $txt['notifications_boards'] = 'Current Board Notifications';
 $txt['notifications_boards_list'] = 'You are being notified of new topics posted in the following boards';
 $txt['notifications_boards_none'] = 'You aren\'t receiving notifications on any boards right now.';
-$txt['notifications_boards_howto'] = 'To request notifications from a specific board, either click the &quot;notify&quot; button in the index of that board <strong>or</strong> use the checkboxes below to enable select board notifications.';
-$txt['notifications_boards_current'] = 'You are receiving notifications on the boards shown in bold.  Use the checkboxes to turn these off or add additional boards to your notification list';
+$txt['notifications_boards_howto'] = 'To request notifications from a specific board, either click the &quot;Notify&quot; button in the index of that board <strong>or</strong> use the checkboxes below to enable select board notifications.';
+$txt['notifications_boards_current'] = 'You are receiving notifications on the boards shown in <strong>BOLD</strong>.  Use the checkboxes to turn these off or add additional boards to your notification list';
 $txt['notifications_boards_update'] = 'Update';
 $txt['notifications_update'] = 'Unnotify';
 
@@ -163,8 +163,8 @@ $txt['deleteAccount_desc'] = 'From this page you can delete this user\'s account
 $txt['deleteAccount_member'] = 'Delete this member\'s account';
 $txt['deleteAccount_posts'] = 'Remove posts made by this member';
 $txt['deleteAccount_none'] = 'None';
-$txt['deleteAccount_all_posts'] = 'All Posts';
-$txt['deleteAccount_topics'] = 'Topics and Posts';
+$txt['deleteAccount_all_posts'] = 'Replies Only';
+$txt['deleteAccount_topics'] = 'Topics and Replies';
 $txt['deleteAccount_confirm'] = 'Are you completely sure you want to delete this account?';
 $txt['deleteAccount_approval'] = 'Please note that the forum moderators will have to approve this account\'s deletion before it will be removed.';
 

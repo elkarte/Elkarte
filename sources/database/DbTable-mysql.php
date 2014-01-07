@@ -168,6 +168,8 @@ class DbTable_MySQL extends DbTable
 				'security_override' => true,
 			)
 		);
+
+		return true;
 	}
 
 	/**

@@ -135,6 +135,8 @@ $helptxt['time_format'] = '<strong>Time Format</strong><br />
 	<br />
 	<em>* Does not work on Windows-based servers.</em></span>';
 
+$helptxt['deleteAccount_posts'] = 'Replies Only: This will remove just the posts this member made in reply to other posts.<br>Topics and Replies: This will do the same as above, and additionally will remove all topic threads started by this member.';
+
 $helptxt['live_news'] = '<strong>Live announcements</strong><br />
 	This box shows recently updated announcements from <a href="http://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>.
 	You should check here every now and then for updates, new releases, and important information from ElkArte.';

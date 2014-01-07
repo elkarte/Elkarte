@@ -303,6 +303,7 @@ class ProfileAccount_Controller extends Action_Controller
 								\' . $warning[\'reason\'] . \'
 							</div>\';
 
+							// If a notice was sent, provide a way to view it
 							if (!empty($warning[\'id_notice\']))
 								$ret .= \'
 							<div class="floatright">

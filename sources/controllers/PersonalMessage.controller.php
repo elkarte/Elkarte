@@ -95,10 +95,11 @@ class PersonalMessage_Controller extends Action_Controller
 				'unread_messages' => 0,
 			);
 
+			// Apply our rules to the new PM's
 			applyRules();
 			updateMemberData($user_info['id'], array('new_pm' => 0));
 
-			// Turn the new PM's status off since they have entered the PM area
+			// Turn the new PM's status off, for the popup alert, since they have entered the PM area
 			toggleNewPM($user_info['id']);
 		}
 
