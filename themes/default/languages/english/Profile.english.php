@@ -134,7 +134,7 @@ $txt['notifications_boards'] = 'Current Board Notifications';
 $txt['notifications_boards_list'] = 'You are being notified of new topics posted in the following boards';
 $txt['notifications_boards_none'] = 'You aren\'t receiving notifications on any boards right now.';
 $txt['notifications_boards_howto'] = 'To request notifications from a specific board, either click the &quot;notify&quot; button in the index of that board <strong>or</strong> use the checkboxes below to enable select board notifications.';
-$txt['notifications_boards_current'] = 'You are receiving notifications on the boards shown in bold.  Use the checkboxes to turn these off or add additional boards to your notification list';
+$txt['notifications_boards_current'] = 'You are receiving notifications on the boards shown in <strong>BOLD</strong>.  Use the checkboxes to turn these off or add additional boards to your notification list';
 $txt['notifications_boards_update'] = 'Update';
 $txt['notifications_update'] = 'Unnotify';
 
