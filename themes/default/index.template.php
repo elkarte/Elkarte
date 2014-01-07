@@ -65,7 +65,7 @@ function template_init()
 	$settings['require_theme_strings'] = false;
 
 	// This is used for the color variants.
-	$settings['theme_variants'] = array('light', 'dark', 'basic', 'besocial');
+	$settings['theme_variants'] = array('light', 'dark', 'besocial');
 
 	// If the following variable is set to true, the avatar of the last poster will be displayed on the boardindex and message index.
 	$settings['avatars_on_indexes'] = true;
