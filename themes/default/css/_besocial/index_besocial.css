@@ -694,11 +694,15 @@ a.active {
 	content: '\00AB';
 	float: left;
 	font-size: 1.3em;
+	line-height: 1.3em;
+	color: #999;
 }
 .small_pagelinks:after {
 	content: '\00BB';
 	float: left;
 	font-size: 1.3em;
+	line-height: 1.3em;
+	color: #999;
 }
 
 /* Globally accessible top/bottom links. */
