@@ -325,7 +325,7 @@ $txt['error_no_messages_in_time_frame'] = 'No messages found in selected time fr
 $txt['error_no_labels_selected'] = 'No labels were selected.';
 $txt['error_no_search_daemon'] = 'Unable to access the search daemon';
 
-$txt['profile_errors_occurred'] = 'The following errors occurred when trying to save your profile';
+$txt['profile_errors_occurred'] = 'The following errors occurred when trying to update your profile';
 $txt['profile_error_bad_offset'] = 'The time offset is out of range';
 $txt['profile_error_no_name'] = 'The name field was left blank';
 $txt['profile_error_digits_only'] = 'The \'number of posts\' box can only contain digits.';
