@@ -157,10 +157,8 @@ hr {
 	background-color: #eee;
 }
 
-/* Define strong as font-weight: 600; - defaults to bold */
-/* for fonts which do not support numerical font-weight) */
 strong {
-	font-weight: 600;
+	font-weight: bold;
 }
 
 /* @todo - Test this everywhere. */
@@ -384,7 +382,7 @@ div.bbc_footnotes .meaction{
 }
 /* Maintenance mode warning. */
 .notice {
-	font-weight: 700;
+	font-weight: bold;
 	color: #a80000;
 }
 
