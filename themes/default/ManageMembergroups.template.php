@@ -722,7 +722,7 @@ function template_group_request_reason()
 						</dt>
 						<dd>
 							<input type="hidden" name="groupr[]" value="', $request['id'], '" />
-							<textarea name="groupreason[', $request['id'], ']" rows="3" cols="40" style="' . (isBrowser('is_ie8') ? 'width: 635px; min-width: 96%; max-width: 96%' : 'min-width: 80%; max-width: 99%') . ';"></textarea>
+							<textarea id="groupreason" name="groupreason[', $request['id'], ']" rows="3" cols="40" style="' . (isBrowser('is_ie8') ? 'width: 635px; min-width: 96%; max-width: 96%' : 'min-width: 80%; max-width: 99%') . ';"></textarea>
 						</dd>';
 
 	echo '
@@ -731,6 +731,7 @@ function template_group_request_reason()
 						<input type="submit" name="go" value="', $txt['mc_groupr_submit'], '" class="button_submit" />
 						<input type="hidden" name="req_action" value="got_reason" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+						<input type="hidden" name="', $context['mod-gr_token_var'], '" value="', $context['mod-gr_token'], '" />
 					</div>
 				</div>
 			</div>

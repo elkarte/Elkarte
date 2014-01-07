@@ -443,6 +443,8 @@ class Groups_Controller extends Action_Controller
 			checkSession('post');
 			validateToken('mod-gr');
 
+			require_once(SUBSDIR . '/Membergroups.subs.php');
+
 			// Clean the values.
 			foreach ($_POST['groupr'] as $k => $request)
 				$_POST['groupr'][$k] = (int) $request;
@@ -458,6 +460,7 @@ class Groups_Controller extends Action_Controller
 				$where_parameters['request_ids'] = $_POST['groupr'];
 
 				$context['group_requests'] = list_getGroupRequests(0, $modSettings['defaultMaxMessages'], 'lgr.id_request', $where, $where_parameters);
+				createToken('mod-gr');
 
 				// Let obExit etc sort things out.
 				obExit();
@@ -470,7 +473,6 @@ class Groups_Controller extends Action_Controller
 				$concerned = getConcernedMembers($_POST['groupr'], $where);
 
 				// Cleanup old group requests..
-				require_once(SUBSDIR . '/Membergroups.subs.php');
 				deleteGroupRequests($_POST['groupr']);
 
 				// Ensure everyone who is online gets their changes right away.
