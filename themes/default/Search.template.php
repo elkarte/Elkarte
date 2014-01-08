@@ -463,7 +463,7 @@ function template_results()
 				foreach ($context['qmod_actions'] as $qmod_action)
 					if ($context['can_' . $qmod_action])
 						echo '
-								<option value="' . $qmod_action . '">&#10148;&nbsp;' . $txt['quick_mod_' . $qmod_action] . '</option>';
+								<option value="' . $qmod_action . '">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;', $txt['quick_mod_' . $qmod_action] . '</option>';
 
 				echo '
 							</select>';
@@ -562,8 +562,8 @@ function template_results()
 			sClassName: "qaction",
 			sJumpToTemplate: "%dropdown_list%",
 			sCurBoardName: "' . $context['jump_to']['board_name'] . '",
-			sBoardChildLevelIndicator: "&#10134;",
-			sBoardPrefix: "&#10148; ",
+			sBoardChildLevelIndicator: "&#8195;",
+			sBoardPrefix: "' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;",
 			sCatClass: "jump_to_header",
 			sCatPrefix: "",
 			bNoRedirect: true,
@@ -578,8 +578,8 @@ function template_results()
 			iCurBoardId: 0,
 			iCurBoardChildLevel: 0,
 			sCurBoardName: "' . $context['jump_to']['board_name'] . '",
-			sBoardChildLevelIndicator: "&#10134;",
-			sBoardPrefix: "&#10148; ",
+			sBoardChildLevelIndicator: "&#8195;",
+			sBoardPrefix: "' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;",
 			sCatClass: "jump_to_header",
 			sCatPrefix: "",
 			sGoButtonLabel: "' . $txt['quick_mod_go'] . '"

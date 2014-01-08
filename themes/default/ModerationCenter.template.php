@@ -410,8 +410,8 @@ function template_unapproved_posts()
 						<select name="do" onchange="if (this.value != 0 &amp;&amp; confirm(\'' . $txt['mc_unapproved_sure'] . '\')) submit();">
 							<option value="0">' . $txt['with_selected'] . ':</option>
 							<option value="0" disabled="disabled">' . str_repeat('&#8212;', strlen($txt['approve'])) . '</option>
-							<option value="approve">&#10148;&nbsp;' . $txt['approve'] . '</option>
-							<option value="delete">&#10148;&nbsp;' . $txt['remove'] . '</option>
+							<option value="approve">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $txt['approve'] . '</option>
+							<option value="delete">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $txt['remove'] . '</option>
 						</select>
 						<noscript>
 							<input type="submit" name="mc_go" value="' . $txt['go'] . '" class="button_submit submitgo" />
