@@ -761,6 +761,7 @@ a.active {
 #news_line, #elkFadeScroller {
 	color: #666666;
 	min-height: 20px;
+	padding: 3px;
 	overflow: auto;
 	resize: vertical;
 }
