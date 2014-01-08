@@ -1010,6 +1010,9 @@ a.active {
 		box-shadow: 1px 1px 1px #eee;
 		margin-bottom: 6px;
 	}
+	.topic_sorting_row {
+		border: none !important;
+	}
 	.topic_name h4 {
 		font-size: 1.5em;
 	}
