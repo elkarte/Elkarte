@@ -1,0 +1,1062 @@
+/* INTRODUCTION
+/* This is a very basic version of the Elkarte default theme.
+/* It is intended primarily as a "clean slate" for custom theming.
+/* This is eye candy only. All the layout code is in index.css.
+/*
+/* All theme variants depend on the layout code for stability.
+/* It is better to copy code to a variant CSS file for testing.
+/*
+/* This variant uses named colours instead of hex codes.
+/* CSS colour names at http://www.w3schools.com/cssref/css_colornames.asp
+/* ------------------------------------------------------- */
+/* $CONTENTS - still a bit WIP. @todo
+/*
+/*		$GENERAL.............Global resets, clearfixes, etc.
+/*		$COMMON..............Common classes to drive you bonkers.
+/*		$BBC.................Quotes, code blocks, BBC styles.
+/*		$AJAX................The "loading" bar (quick edit, etc).
+/*
+/*		$MAIN................Forum header, wrapper, and footer.
+/*		$MENUS...............Main and secondary menus.
+/*		$LINKTREE............The breadcrumbs.
+/*		$BUTTONS.............Most button strips.
+/*		$PAGELINKS...........Page navigation links.
+/*
+/*		$TABLES..............Generic tables (memberlist, error log, etc).
+/*		$SETTINGS............Generic lists for settings pages.
+/*		$BOARDS..............Board index, child boards, and message index.
+/*
+/*		$TOPICS..............The display template (topic view), including send.
+/*		$EDITOR..............Main editor (posts, events, polls) and topic summary.
+/*		$MODERATE............Move topic, split topic, merge topic.
+/*
+/*		$PROFILE.............The profile areas.
+/*		$PERSONAL............The personal messages (PM) areas.
+/*		$CALENDAR............Wombats (and the calendar).
+/*		$STATISTICS..........The statistics centre.
+/*
+/*		$HELP................Help pages, help icons and pop-ups, tooltips.
+/*		$SEARCH..............Search pages, including memberlist search.
+/*		$LOGIN...............Login and registration, maintenance mode.
+/*
+/*		$ERRORS..............Error messages.
+/*		$PROGRESS............Nifty progress bars.
+/*		$MEDIA...............Experimental media queries.
+/* ------------------------------------------------------- */
+@import url(http://weloveiconfonts.com/api/?family=fontawesome);
+/*	$GENERAL	*/
+/* ------------------------------------------------------- */
+/* Normal, standard links. */
+a, a:link, a:visited,
+/* Links that open in a new window. */
+a.new_win:link, a.new_win:visited {
+	color: #008299;
+	text-decoration: none;
+}
+/* Cursor declared here.Should not be required anywhere else. */
+a:hover, a.new_win:hover {
+	text-decoration: underline;
+}
+
+/* Stop white band under footer on short pages. */
+/* This color should match $FOOTER background. */
+html {
+	background: #eee;
+}
+body {
+	background: #eee;
+	color: #4d4f53;
+	padding-top: 35px;
+	font: 90%/130% Helvetica, Arial, sans-serif;
+}
+fieldset {
+	border: none;
+	background: transparent;
+	border: 1px solid #ccc;
+	box-shadow: none;
+	border-radius: 5px;
+}
+legend {
+	background: url(../../images/selected_open.png) no-repeat scroll left center transparent;
+	cursor: pointer;
+	padding-left: 20px;
+	color: #333;
+	font-size: 1.2em;
+	margin-left: 15px;
+}
+.collapsed legend {
+	background:  url(../../images/selected.png) no-repeat scroll left center transparent;
+}
+
+input, button, select, textarea, .editor {
+	border: 1px solid #ccc;
+	border-radius: 2px;
+	background: #fff;
+	color: #666;
+}
+
+input:hover, textarea:hover, button:hover, select:hover {
+	border: 1px solid #999;
+}
+textarea:hover, .editor:hover {
+	background: #fbfbfb;
+}
+input:focus, textarea:focus, button:focus, select:focus, .editor:focus {
+	border: 1px solid #999;
+}
+/* Give disabled text input elements a different background color. */
+input[disabled].input_text {
+	background: #eee;
+}
+
+/* The OpenID login form */
+.openid_login {
+	padding-left: 20px;
+	background: white url(../../images/openid.png) no-repeat;
+	background-position: 2% 50%;
+}
+
+/* Common button styling. */
+/* It is being replaced with three classes: */
+/*    .button_submit is not floated    */
+/*    .right_submit is right floated   */
+/*    .left_submit is left floated     */
+/* The button_reset class may need attention too. */
+.button_submit, .right_submit, .left_submit, .button_reset,
+/* Anchors styled to look like buttons. */
+/* These have standard body text size. Can be chained with smalltext class. */
+.linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
+.linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
+	border: 1px solid #afafaf;
+	background: #f4f4f4;
+	color: #555;
+}
+
+/* Hover effects. */
+.button_submit:hover, .right_submit:hover, .left_submit:hover,
+.button_reset:hover,
+.linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover {
+	border: 1px solid #ccc;
+	background: #f0f0f0;
+	color: #555;
+	text-decoration: none;
+}
+
+/* the new "button" */
+.new_posts, .new_posts:visited, .new_posts:link {
+	border-radius: 4px;
+/*	background: #43a8da; */
+	background: #7bb128;
+	color: #fff;
+}
+
+/* Standard horizontal rule.. ([hr], etc.) */
+hr {
+	border-top: 1px solid #bbb;
+	background: #eee;
+	background-color: #eee;
+}
+
+strong {
+	font-weight: bold;
+}
+
+/* @todo - Test this everywhere. */
+.standard_category {
+	border-radius: 4px 4px 0 0;
+	background: #e4e4e4;
+}
+/* @todo - Test this everywhere. */
+.standard_category>.content {
+	border: 1px solid #ddd;
+	background: #fff;
+}
+
+/* Styles for main headers. */
+.category_header, .forum_category .category_header {
+	border-radius: 5px;
+	background: #eee;
+	color: #666;
+	font-size: 1.6em;
+	font-weight: bolder;
+	text-shadow: 1px 1px 0 #ebebeb;
+}
+/* Single ones a bit darker than board index ones. */
+.forumposts .category_header, .content_category .category_header {
+	border-top: 1px solid #cfcfcf;
+	border-bottom: 1px solid #b7b7b7;
+	background: #e9e9e9;
+}
+/* Styles for subsection headers. @todo */
+.secondary_header {
+	border: 1px solid #ccc;
+	border-top: 1px solid #dfdfdf;
+	background: #fafafa;
+	text-shadow: 1px 1px 0 #fff;
+}
+
+.category_header a:link {
+	color: #777;
+}
+
+/* Upshrink image in the general category headers */
+#category_toggle, #category_toggle_more, #upshrink_header {
+	border-radius: 2px;
+}
+
+/* Upshrink image in the page top for the header collapse */
+#collapse_button .linklevel1 {
+	border-radius: 2px;
+}
+
+/* Custom highlighted text style for modern browsers. */
+/* Nicer than default blue. Needs two separate rules. */
+::-moz-selection {
+	background: red;
+	color: #444;
+}
+::selection {
+	background: red;
+	color: #444;
+}
+#top_section_notice .button_submit {
+	position: relative;
+	top: -1.5px;
+}
+/* Other highlighted text, such as search results. */
+.highlight {
+	color: #ff7200;
+}
+/* Legacy highlight color, for selected membergroups etc. */
+/* Used by JS to show a selected item. @todo - deprecate? */
+.highlight2 {
+	background: #d1e1ef;
+	color: #555;
+}
+
+/* Used for sections that need somewhat larger corners */
+/* @todo - Daft name. Other stuffz. :P */
+.roundframe {
+	border: 1px solid #c5c5c5;
+	border-radius: 7px;
+	background: #f5f5f5;
+}
+
+/* The generic wrapper thingy.  */
+.generic_list_wrapper {
+	border: 1px solid #ccc;
+	border-radius: 7px;
+}
+.generic_list_wrapper .additional_row {
+	border-radius: 0;
+}
+.generic_list_wrapper .title_bar {
+	border-bottom: 1px solid #fff;
+	border-radius: 0;
+	background: none;
+}
+.generic_list_wrapper .information {
+	border-bottom: 1px solid #fff;
+	background: none;
+}
+
+/* Styles used by the auto suggest control. */
+.auto_suggest_div {
+	border: 1px solid #bbb;
+	border-radius: 3px;
+}
+.auto_suggest_div:focus {
+	border: 1px solid #bbb;
+}
+.auto_suggest_item {
+	background: #ddd;
+}
+.auto_suggest_item_hover {
+	background: #888;
+	color: #eee;
+}
+
+/*	$BBC		*/
+/* ------------------------------------------------------- */
+/* The "Quote:" and "Code:" header parts... */
+.codeheader, .quoteheader {
+	border: 1px solid #ccc;
+	border-bottom: none;
+	background: #fff;
+	color: #555;
+}
+.codeheader {
+	border-top: 3px solid #aaa;
+}
+/* [Select] link to copy code. */
+.codeoperation {
+	font-weight: normal;
+}
+/* A quote, perhaps from another post. */
+.bbc_standard_quote, .bbc_alternate_quote,
+/* A code block - maybe PHP ;) - shared styles. */
+.bbc_code {
+	border: 1px solid #ccc;
+	border-top: none;
+	background: #fff;
+}
+/* Extra quote styling */
+.bbc_standard_quote, .bbc_alternate_quote, .quoteheader {
+	box-shadow: 2px 2px 2px #ddd;
+}
+/* Extra code block styling. */
+.bbc_code {
+	border-top: 3px solid #aaa;
+	border-bottom: 3px solid #aaa;
+	background: #f8f8f8;
+}
+/* Styling for BBC tags */
+.bbc_link:link, .bbc_link:visited {
+	color: #377828;
+	box-shadow: 0 -1px 0 #cedccb inset;
+}
+.bbc_link:hover {
+	color: #377828;
+	box-shadow: 0 -1px 0 #66aa55 inset;
+	text-decoration: none;
+}
+/* /me uses this a lot. (emote, try typing /me in a post.) */
+.meaction {
+	color: #50aa3a;
+}
+.meaction:before {
+	content: "\270c";
+	font-size: 1.7em;
+	line-height: 1em;
+	vertical-align: top;
+}
+.spoilerheader {
+	font-weight: bold;
+	cursor: pointer;
+	font-size: 0.85em;
+}
+.spoiler {
+	border: 1px solid #ccc;
+	padding: 0.3em;
+	background-color: #eee;
+}
+div.bbc_footnotes {
+	border-top: 1px solid #bfbfbf;
+}
+.bbc_footnotes .target:target {
+	background-color: #d8ffdf;
+}
+sup.bbc_footnotes, sup.bbc_footnotes a {
+	color: #50aa3a;
+	font-weight: bold;
+}
+div.bbc_footnotes .meaction{
+	display: inline-block;
+}
+
+
+/*	$AJAX		*/
+/* ------------------------------------------------------- */
+/* The "Loading" bar for quick edit, etc. */
+#ajax_in_progress {
+	border-bottom: 4px solid #3d6e32;
+	background: #fff;
+	color: #306430;
+}
+#ajax_in_progress a {
+	text-decoration: underline;
+}
+
+
+/*	$MAIN.		*/
+/* ------------------------------------------------------- */
+/* The top bar. */
+#top_section {
+
+}
+#top_section .wrapper {
+	background-color: white;
+	padding: 0 15px;
+	border-left: 1px solid #ccc;
+	border-right: 1px solid #ccc;
+}
+/* Maintenance mode warning. */
+.notice {
+	font-weight: bold;
+	color: #a80000;
+}
+
+#search_form .button_submit {
+	font-variant: small-caps;
+	color: #333;
+}
+#search_form select {
+	padding-right: 4px;
+	border: 1px solid #bbb;
+	border-right: none;
+	opacity: 0.8;
+}
+#search_form select:focus {
+	border: 1px solid #999;
+	border-right: none;
+	opacity: 1;
+}
+
+/* Main forum area. */
+/* Box-shadow only on this one. */
+#wrapper {
+	background: white;
+	border: 1px solid #ccc;
+	border-top: none;
+}
+
+#debug_logging a, #debug_logging strong {
+	color: yellow;
+}
+#debug_logging {
+	color: #bbb;
+	background: #222;
+	margin: 0 auto;
+	max-width: 90em;
+	width: 90%;
+}
+#debug_logging_wrapper {
+	background: #222;
+}
+
+
+/*	$MENUS		*/
+/* ------------------------------------------------------- */
+/* Level 1 Menu bar: link or button. General styling. */
+.linklevel1, .linklevel1:link, .linklevel1:visited {
+	border-radius: 2px;
+	border: 1px solid #afafaf;
+	border-top: 1px solid #cfcfcf;
+	border-left: 1px solid #bfbfbf;
+	background: #f4f4f4;
+	background-image: linear-gradient(to bottom, #fff, #e4e4e4);
+	box-shadow: 1px 1px 2px #e5e5e5;
+	color: #666;
+}
+
+/* Level 1 button hover and focus effects. */
+.linklevel1:hover, .listlevel1:hover .linklevel1,
+.linklevel2:hover, .listlevel2:hover .linklevel2,
+.linklevel3:hover, .listlevel3:hover .linklevel3,
+#menu_sidebar .linklevel1:hover, #menu_sidebar .listlevel1:hover .linklevel1,
+#menu_current_area>strong>.linklevel1 {
+	border: 1px solid #ccc;
+	border-top: 1px solid #afafaf;
+	border-left: 1px solid #afafaf;
+	background: #f0f0f0;
+	box-shadow: 2px 1px 1px rgba(0,0,0,0.07) inset;
+	color: #555;
+	text-decoration: none;
+}
+
+.poster li.poster_online:hover .linklevel1 {
+	border: 1px solid #ccc;
+	border-top: 1px solid #afafaf;
+	border-left: 1px solid #afafaf;
+	background: #f0f0f0;
+	box-shadow: 2px 1px 1px rgba(0,0,0,0.07) inset;
+	color: #555;
+}
+.poster li.poster_online .nolink {
+	border: 1px solid #afafaf;
+	border-top: 1px solid #cfcfcf;
+	border-left: 1px solid #bfbfbf;
+	background: #f4f4f4;
+	background-image: linear-gradient(to bottom, #fff, #e4e4e4);
+	box-shadow: 1px 1px 2px #e5e5e5;
+	color: #7bb128;
+	display: block;
+	line-height: 2em;
+	margin: 3px 1.5em;
+	position: relative;
+}
+.poster li.poster_online .nolink img {
+	vertical-align: middle;
+}
+.poster li.subsections.listlevel1:hover .linklevel1 {
+	background: transparent;
+	border: 1px solid transparent;
+	box-shadow: none;
+}
+
+#main_menu .linklevel1, #main_menu .linklevel1:link, #main_menu .linklevel1:visited,
+.poster li.listlevel1, .poster li.listlevel1 a, .poster li.listlevel1 a:hover {
+	border-radius: none;
+	border: 1px solid transparent;
+	background-color: transparent;
+	background-image: none;
+	box-shadow: none;
+}
+/* Common button styling. */
+/* It is being replaced with three classes: */
+/*    .button_submit is not floated    */
+/*    .right_submit is right floated   */
+/*    .left_submit is left floated     */
+/* The button_reset class may need attention too. */
+.button_submit, .right_submit, .left_submit, .button_reset,
+/* Anchors styled to look like buttons. */
+/* These have standard body text size. Can be chained with smalltext class. */
+.linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
+.linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
+	border-radius: 2px;
+	border: 1px solid #afafaf;
+	border-top: 1px solid #cfcfcf;
+	border-left: 1px solid #bfbfbf;
+	background: #f4f4f4;
+	background-image: linear-gradient(to bottom, #fff, #e4e4e4);
+	color: #555;
+	box-shadow: 1px 1px 2px #e5e5e5;
+}
+
+/* Hover effects. */
+.button_submit:hover, .right_submit:hover, .left_submit:hover,
+.button_reset:hover,
+.linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover {
+	border: 1px solid #ccc;
+	border-top: 1px solid #afafaf;
+	border-left: 1px solid #afafaf;
+	background: #f0f0f0;
+	box-shadow: 2px 1px 1px rgba(0,0,0,0.07) inset;
+	color: #555;
+	text-decoration: none;
+}
+
+/* Needed for new PM notifications. */
+.listlevel1 strong {
+	color: white;
+}
+
+/* Level 1 Menu bar: link or button. */
+/* If there will be a border on hover, have a border here. */
+/* A default transparent border stops links jumping on hover. */
+#main_menu .linklevel1, .admin_menu .linklevel1, #adm_submenus .linklevel1 {
+	border: 1px solid transparent;
+	color: #eee;
+}
+#main_menu {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 5;
+	background: linear-gradient(to bottom, #4d4f53 0%,#333 49%,#333 51%,#4d4f53 100%);
+	width: 100%;
+	color: #eee;
+	line-height: 30px;
+	min-height: 35px;
+}
+/* Override link colour for admin/profile/etc menus. */
+.admin_menu .linklevel1, #adm_submenus .linklevel1 {
+	color: black;
+}
+
+/* For primary admin/profile/etc drop menus. */
+.admin_menu .linklevel1:hover, .admin_menu .linklevel1:focus,
+
+/* For secondary admin/profile/etc menus. */
+#adm_submenus .linklevel1:hover, #adm_submenus .linklevel1:focus {
+	color: #333;
+	text-decoration: none;
+}
+
+/* Main menu Level 1 active button and hover need a different border. */
+#main_menu .active, #main_menu .linklevel1:hover, #main_menu .listlevel1:hover .linklevel1, #main_menu .linklevel1:focus {
+
+}
+
+/* Level 1 active buttons for primary admin/profile/etc drop menus... */
+.admin_menu .active,
+/* ......and for secondary admin/profile/etc menu strip. */
+#adm_submenus .active {
+	border: 1px solid #aaa;
+	background: #7bb128;
+	background-image: linear-gradient(to bottom, #9dd53a 0%,#a1d54f 21%,#80c217 63%,#7cbc0a 100%);
+	color: white;
+}
+
+/* Hover effects for those buttons. */
+.admin_menu .active:hover, .admin_menu .listlevel1:hover .active, #adm_submenus .active:hover {
+	border: 1px solid #aaa;
+	background: #43a8da;
+	background-image: linear-gradient(to bottom, #6db3f2 0%,#54a3ee 30%,#3690f0 68%,#1e69de 100%);
+	color: white;
+}
+
+/* Level 1 active buttons get a bit more weight. */
+a.active {
+	color: orange;
+}
+
+/* Top level subsection indicators. */
+/* Level 1 active buttons. */
+.pm_indicator {
+	background: #f3b200;
+	color: #fff;
+	font-weight: bold;
+	box-shadow: 1px 1px 2px #444;
+	border-radius: 4px;
+	padding: 0 5px;
+	position: relative;
+	top: -5px;
+	left: -1px;
+}
+
+/* Levels 2 and 3: drop menu wrapper. */
+.menulevel2, .menulevel3 {
+	border: 1px solid grey;
+	background: white;
+}
+
+/* Levels 2 and 3 drop menus: link or button. */
+.linklevel2, .linklevel3 {
+	border: 1px solid transparent;
+	color: black;
+	/* Applying a default transparent border stops links jumping on hover. */
+}
+
+/* Admin menu icons. */
+.linklevel2>img {
+	margin: 0 0 0 -4px;
+	vertical-align: middle;
+}
+
+/* Levels 2 and 3: hover effects. */
+.listlevel2:hover .linklevel2, /* < highlighted with cursor over level 3. */
+.linklevel2:hover, .linklevel2:focus, .linklevel2.sfhover:focus,
+.linklevel3:hover, .linklevel3:focus, .linklevel3.sfhover:focus {
+	background: #7bb128;
+	color: #fff;
+	text-decoration: none;
+}
+
+/* Level 2: subsection indicators. */
+.listlevel2.subsections .linklevel2:after {
+	position: absolute;
+	right: 6px;
+	color: #ccc;
+	content: "\25b6";
+	font-size: 1.3em;
+}
+
+/* Levels 2 and 3: highlighting of current section */
+.linklevel2.chosen, .linklevel3.chosen {
+	font-weight: bold;
+}
+
+/* Styles for sidebar menus. */
+/* Same styling for Level 1 and Level 2. */
+#menu_sidebar .linklevel1, #menu_sidebar .linklevel2 {
+	border: 1px solid transparent;
+	color: black;
+}
+
+#menu_sidebar .linklevel1:hover, #menu_sidebar .linklevel1:focus, #menu_current_area .linklevel1,
+#menu_sidebar .linklevel2:hover, #menu_sidebar .linklevel2:focus {
+	border: 1px solid darkgray;
+	background: gainsboro;
+	color: black;
+	text-decoration: none;
+}
+
+#menu_current_area .linklevel1 {
+	font-weight: bold;
+}
+
+/* Level 1: subsection indicators. */
+#menu_sidebar .listlevel1.subsections .linklevel1:after {
+	position: absolute;
+	right: 6px;
+	content: "\2192";
+}
+/*	$PAGELINKS	*/
+/* ------------------------------------------------------- */
+.selectbox, .pagelinks {
+	color: #555;
+}
+.pagelinks .navPages {
+	color: #555;
+}
+.pagelinks .navPages:hover, .pagelinks .current_page  {
+	background: #7bb128;
+	color: white;
+	border-radius: 8px;
+	text-decoration: none;
+}
+
+/* our buddies &laquo; &raquo; */
+.small_pagelinks:before {
+	content: '\00AB';
+	float: left;
+	font-size: 1.3em;
+	line-height: 1.3em;
+	color: #999;
+}
+.small_pagelinks:after {
+	content: '\00BB';
+	float: left;
+	font-size: 1.3em;
+	line-height: 1.3em;
+	color: #999;
+}
+
+/* Globally accessible top/bottom links. */
+#gotop, #gobottom {
+	border: 1px solid #222;
+	border-bottom: none;
+	border-radius: 20px 0 0 0;
+	background: #111;
+	color: #eee;
+	opacity: 0.2;
+}
+#gobottom {
+	border-top: none;
+	border-radius: 0 0 0 20px;
+}
+#gotop:hover, #gobottom:hover {
+	color: #444;
+	text-decoration: none;
+	opacity: 1;
+}
+/*End sidebar flyout coding. */
+
+/*	$MAIN.		*/
+/* ------------------------------------------------------- */
+#wrapper {
+	margin-top: 0;
+}
+#forumtitle {
+	font-weight: bolder;
+	font-size: 2.5em;
+	padding: 0;
+	margin: 0;
+	text-shadow: 1px 1px 2px #fff;
+}
+#forumtitle>a {
+	color: #43a8da;
+}
+
+/* News section. */
+#news {
+	font-size: 0.929em;
+	padding: 0;
+	background-color: #f9f9f9;
+	padding: 8px;
+}
+#news>h2 {
+	color: #7bb128;
+	font-size: 1.6em;
+	line-height: 1.2em;
+	font-weight: bold;
+}
+#news_line, #elkFadeScroller {
+	color: #666666;
+	min-height: 20px;
+	overflow: auto;
+	resize: vertical;
+}
+
+.navigate_section {
+	padding-left: 15px;
+	border: 1px solid #eee;
+	margin: 4px 0 0 0;
+}
+.linktree, .linktree_last {
+	padding: 0 0.5em 0 1em;
+}
+.linktree:after {
+	border-left: 0.7em solid #eee;
+	margin-right: 4px;
+}
+.board_name>a {
+	color: #43a8da;
+	font-weight: bold;
+	font-size: 1.2em;
+}
+.board_row {
+	border-bottom: 1px solid #eee;
+}
+
+/*	$BOARDICONS	*/
+/* ------------------------------------------------------- */
+.board_icon {
+	display: block;
+	float: left;
+	width: 48px;
+	height: 48px;
+}
+.board_key:before {
+	display: block;
+	float: left;
+	height: 24px;
+	width: 26px;
+	content: "";
+}
+.category_boards .board_icon, .board_key:before {
+	background-repeat: no-repeat;
+	background-image: url(../../images/_besocial/board_icons.png);
+}
+.on_board {
+	background-position: 0 0;
+}
+.on2_board {
+	background-position: -72px 0;
+}
+.off_board {
+	background-position: -144px 0;
+}
+.redirect_board {
+	background-position: -216px 0;
+}
+.new_some_board:before {
+	background-position: -300px -14px;
+}
+.new_none_board:before {
+	background-position: -372px -14px;
+}
+.new_redirect_board:before {
+	background-position: -444px -14px;
+}
+.topic_listing li {
+	border-bottom: 1px solid #eee;
+}
+.post_wrapper {
+	border: 1px solid #eaeaea;
+	border-radius: 10px;
+}
+.windowbg {
+	background-color: #f6f6f6;
+}
+.windowbg2 {
+	background-color: #fcfcfc;
+}
+.board_stats {
+	text-align: left;
+	padding: 1px  6px 1px 0;
+	float: left;
+}
+.small_pagelinks li {
+	border: none;
+}
+#expanded_pages_container {
+	background: #fff;
+	border-radius: 2px;
+	border: 1px solid #eee;
+}
+
+#pages_scroll_left, #pages_scroll_right {
+	background-color: #fff;
+}
+
+/*	$PROGRESS	*/
+/* ------------------------------------------------------- */
+/* Styles for the progress bar */
+.progress_bar {
+	border: 1px solid #999;
+	border-radius: 5px;
+	background: white;
+	box-shadow: inset 0 1px 1px rgba(0,0,0,0.05);
+}
+.progress_bar .full_bar {
+	border-radius: 3px;
+	color: black;
+}
+.progress_bar .green_percent {
+	background-color: #7bb128;
+}
+.progress_bar .blue_percent {
+	background-color: #43a8da;
+}
+
+/* $STATISTICS	*/
+/* ------------------------------------------------------- */
+.statistics .category_header {
+	background: none;
+	border: none;
+	border-bottom: 2px solid #ccc;
+	text-shadow: none;
+}
+.statistics .flow_hidden, #forum_history .flow_hidden {
+	border: 1px solid #ddd;
+	background: #fefefe;
+}
+.stats.floatleft {
+	border-right: 1px solid #ccc;
+}
+#top_row .stats dd, .statsbar {
+	border: 1px solid #eee;
+	background: #fff;
+}
+/* Methinks topic links, etc need a little more oomph next to the orange bars. */
+#top_row .stats dd {
+	border: 1px solid transparent;
+	background: none;
+}
+.statsbar {
+	border-radius: 4px;
+}
+.statsbar .bar {
+	background: #43a8da;
+	border-radius: 4px 0 0 4px;
+}
+/* Absolute positioning stops these breaking the bars on narrow screens. */
+.statsbar .righttext {
+	background: #fff;
+}
+/* Styles for the $TABS	*/
+/* We can't control what jqueryui pollutes the DOM with, so deal with it */
+/* Styles for the profile summary tabs, or any jquery ui tabs */
+/* ---------------------------------------------------------- */
+.ui-tabs .ui-tabs-panel {
+	padding-top: 0;
+}
+.ui-tabs-panel {
+	border-top: 8px solid #f6f6f6; 
+}
+.ui-tabs .ui-tabs-nav li {
+	border-radius: 5px 5px 0 0;
+	border: 2px solid #f0f0f0;
+	border-bottom: none;
+	color: #fff;
+	box-shadow: 2px 0px 0px rgba(0,0,0,0.3);
+	margin-left: 2px;
+}
+.ui-tabs .ui-tabs-nav .ui-state-active a, .ui-tabs .ui-tabs-nav .ui-state-active {
+	font-weight: normal;
+}
+.ui-tabs .ui-tabs-nav li a {
+	background: #f0f0f0;
+	border-bottom-color: #ccc;
+	outline: none;
+	border-radius: 5px 5px 0 0;
+}
+
+.ui-tabs .ui-tabs-nav .ui-state-default a {
+	background: #fff;
+	color: #333;
+}
+.ui-tabs .ui-tabs-nav .ui-state-active a, .ui-tabs .ui-tabs-nav .ui-state-active {
+	background: #f6f6f6;
+	color: #333;
+	border-radius: 5px 5px 0 0;
+}
+.ui-tabs .ui-state-hover {
+	background: #f0f0f0;
+	color: #555;
+	text-decoration: none;
+}
+
+/*	$MEDIA		*/
+/* Experimental media queries.
+/* ------------------------------------------------------- */
+/* NOTE:
+/* When setting break points for media queries, don't set them in pixels.
+/* Use em instead.
+/* Why? Because the point of re-stacking/dropping content is to fit it all
+/* in the available space. This is dependent not just on width in pixels,
+/* but also on the user-selected text size that is set in the browser.
+/*
+/* If, for whatever reason (eyesight, pixel pitch, workstation arrangement, etc)
+/* a user requires text 50% larger than theme default, then their screen is
+/* effectively a lot smaller than its nominal resolution would indicate.
+/* If the break points are set in em, suddenly the media queries become equally
+/* responsive for all users, without any extra code being required.
+/*
+/* Testing em break points is just as easy as testing pixels,
+/* and it will make more people happier. This is cool. :)
+/*
+/* Of course, having comments to map em to px for each query is a good idea too.
+
+/* Smartphones (portrait & landscape) drop the stats (views/replys) and last post from the screen */
+
+/* This one does 800 screens at default font size. */
+@media screen and (max-width: 50em) {
+	#menu_sidebar {
+		border: 1px solid #aaa;
+		border-radius: 4px;
+		background: #fff;
+		box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
+	}
+}
+/* This one does up to 540 screens. */
+@media screen and (max-width: 33.750em) {
+	body {
+		padding-top: 70px;
+	}
+	.board_latest {
+		border-left: 0;
+	}
+	.frame {
+		border-radius: 0;
+	}
+	.topic_listing>li {
+		border: 1px solid #aaa;
+		box-shadow: 3px 3px 6px #e5e5e5;
+	}
+	.poster:after, .posterarea:before {
+		border-bottom: 1px solid #bfbfbf;
+	}
+	.board_icon {
+		width: 20px;
+		height: 20px;
+	}
+	.on_board, .on2_board {
+		background-position: -300px -14px;
+	}
+	.off_board {
+		background-position: -372px -14px;
+	}
+	.redirect_board {
+		background-position: -444px -14px;
+	 }
+	.forumposts .windowbg2 {
+		background-color: #fafafa;
+	}
+	.forumposts .windowbg, .forumposts .windowbg2 {
+		border: 1px solid #bfbfbf;
+		box-shadow: 3px 3px 6px #e5e5e5;
+		border-radius: 3px;
+		margin-top: 8px;
+	}
+	.navigate_section, .linktree, .linktree:before, .linktree:after, .linktree_last,
+	.linktree_last:before, .linktree_last:after {
+		border: none !important;
+		background: none !important;
+	}
+	.linktree:hover, .linktree>a:hover, .linktree_last, .linktree_last>a,
+	.linktree_last>a:hover, .linktree_last strong {
+		color: #666 !important;
+	}
+	.forum_category, .forumposts, .content_category {
+		background: #fff;
+		border: none;
+	}
+	.listlevel2.subsections .linklevel2::after {
+		content: '';
+	}
+	.stats.floatleft {
+		border: none;
+	}
+	.subsections:hover .linklevel1:after {
+		content: "";
+	}
+	#top_section {
+		margin: 0;
+		width: 100%;
+	}
+	#top_section .wrapper {
+		width: 100%;
+	}
+	#main_menu .linklevel1 {
+		border-bottom: 1px solid #888;
+	}
+	#main_menu li, .admin_menu li {
+	float: left;
+	display: block;
+	width: 49%;
+	box-sizing: border-box;
+	}
+}

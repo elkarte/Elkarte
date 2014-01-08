@@ -1446,12 +1446,12 @@ class ScheduledTask
 		global $modSettings;
 
 		$db = database();
-		$mentions_check_users = @unserialize($modSettings['mentions_check_users']);
+		$user_access_mentions = @unserialize($modSettings['user_access_mentions']);
 
 		// This should be set only because of an immediate scheduled task, so higher priority
-		if (!empty($mentions_check_users))
+		if (!empty($user_access_mentions))
 		{
-			foreach ($mentions_check_users as $member => $start)
+			foreach ($user_access_mentions as $member => $begin)
 			{
 				// Just to stay on the safe side...
 				if (empty($member))
@@ -1464,10 +1464,10 @@ class ScheduledTask
 				if ($user_see_board == '1=1')
 				{
 					// Drop it
-					unset($mentions_check_users[$member]);
+					unset($user_access_mentions[$member]);
 
 					// And save everything for the next run
-					updateSettings(array('mentions_check_users' => serialize($mentions_check_users)));
+					updateSettings(array('user_access_mentions' => serialize($user_access_mentions)));
 				}
 				// Here you are someone that may or may not be able to access a certain board
 				else
@@ -1480,6 +1480,9 @@ class ScheduledTask
 					// once for those he cannot access
 					foreach (array('can', 'cannot') as $can)
 					{
+						// Let's always start from the begin
+						$start = $begin;
+
 						while (true)
 						{
 							// Find all the mentions that this user can or cannot see
@@ -1507,22 +1510,21 @@ class ScheduledTask
 
 							// If we found something toggle them and increment the start for the next round
 							if (!empty($mentions))
-							{
 								toggleMentionsAccessibility($mentions, $can == 'can');
-								$mentions_check_users[$member] += $limit;
-							}
+							// Otherwise it means we have finished with this access level for this member
 							else
-								unset($mentions_check_users[$member]);
+								break;
 
-							updateSettings(array('mentions_check_users' => serialize($mentions_check_users)));
+							// Next batch
+							$start += $limit;
 						}
 					}
 
 					// Drop the member
-					unset($mentions_check_users[$member]);
+					unset($user_access_mentions[$member]);
 
 					// And save everything for the next run
-					updateSettings(array('mentions_check_users' => serialize($mentions_check_users)));
+					updateSettings(array('user_access_mentions' => serialize($user_access_mentions)));
 
 					// Run this only once for each user, it may be quite heavy, let's split up the load
 					break;
@@ -1530,8 +1532,8 @@ class ScheduledTask
 			}
 
 			// If there is no more users, scheduleTaskImmediate can be stopped
-			if (empty($mentions_check_users))
-				removeScheduleTaskImmediate('mentions_check_users', false);
+			if (empty($user_access_mentions))
+				removeScheduleTaskImmediate('user_access_mentions', false);
 
 			return true;
 		}
@@ -1608,17 +1610,17 @@ class ScheduledTask
 				// One row of results is enough: scheduleTaskImmediate!
 				if ($db->num_rows($request) == 1)
 				{
-					if (!empty($modSettings['mentions_check_users']))
-						$modSettings['mentions_check_users'] = @unserialize($modSettings['mentions_check_users']);
+					if (!empty($modSettings['user_access_mentions']))
+						$modSettings['user_access_mentions'] = @unserialize($modSettings['user_access_mentions']);
 					else
-						$modSettings['mentions_check_users'] = array();
+						$modSettings['user_access_mentions'] = array();
 
 					// But if the member is already on the list, let's skip it
-					if (!isset($modSettings['mentions_check_users'][$row['id_member']]))
+					if (!isset($modSettings['user_access_mentions'][$row['id_member']]))
 					{
-						$modSettings['mentions_check_users'][$row['id_member']] = 0;
-						updateSettings(array('mentions_check_users' => serialize(array_unique($modSettings['mentions_check_users']))));
-						scheduleTaskImmediate('mentions_check_users');
+						$modSettings['user_access_mentions'][$row['id_member']] = 0;
+						updateSettings(array('user_access_mentions' => serialize(array_unique($modSettings['user_access_mentions']))));
+						scheduleTaskImmediate('user_access_mentions');
 					}
 				}
 			}

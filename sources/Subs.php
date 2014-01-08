@@ -3746,7 +3746,6 @@ function setupMenuContext()
 				{
 					foreach ($button['sub_buttons'] as $key => $subbutton)
 					{
-						$button['sub_buttons'][$key] = $subbutton;
 						if (empty($subbutton['show']))
 							unset($button['sub_buttons'][$key]);
 						elseif (isset($subbutton['counter']) && !empty($menu_count[$subbutton['counter']]))
@@ -3754,22 +3753,22 @@ function setupMenuContext()
 							$button['sub_buttons'][$key]['alttitle'] = $subbutton['title'] . ' [' . $menu_count[$subbutton['counter']] . ']';
 							if (!empty($settings['menu_numeric_notice'][1]))
 								$button['sub_buttons'][$key]['title'] .= sprintf($settings['menu_numeric_notice'][1], $menu_count[$subbutton['counter']]);
-						}
 
-						// 2nd level sub buttons next...
-						if (isset($subbutton['sub_buttons']))
-						{
-							foreach ($subbutton['sub_buttons'] as $key2 => $subbutton2)
+							// 2nd level sub buttons next...
+							if (isset($subbutton['sub_buttons']))
 							{
-								$button['sub_buttons'][$key]['sub_buttons'][$key2] = $subbutton2;
-								if (empty($subbutton2['show']))
-									unset($button['sub_buttons'][$key]['sub_buttons'][$key2]);
-								elseif (isset($subbutton2['counter']) && !empty($menu_count[$subbutton2['counter']]))
+								foreach ($subbutton['sub_buttons'] as $key2 => $subbutton2)
 								{
-									$button['sub_buttons'][$key]['sub_buttons'][$key2]['alttitle'] = $subbutton2['title'] . ' [' . $menu_count[$subbutton2['counter']] . ']';
-									if (!empty($settings['menu_numeric_notice'][2]))
-										$button['sub_buttons'][$key]['sub_buttons'][$key2]['title'] .= sprintf($settings['menu_numeric_notice'][2], $menu_count[$subbutton2['counter']]);
-									unset($menu_count[$subbutton2['counter']]);
+									$button['sub_buttons'][$key]['sub_buttons'][$key2] = $subbutton2;
+									if (empty($subbutton2['show']))
+										unset($button['sub_buttons'][$key]['sub_buttons'][$key2]);
+									elseif (isset($subbutton2['counter']) && !empty($menu_count[$subbutton2['counter']]))
+									{
+										$button['sub_buttons'][$key]['sub_buttons'][$key2]['alttitle'] = $subbutton2['title'] . ' [' . $menu_count[$subbutton2['counter']] . ']';
+										if (!empty($settings['menu_numeric_notice'][2]))
+											$button['sub_buttons'][$key]['sub_buttons'][$key2]['title'] .= sprintf($settings['menu_numeric_notice'][2], $menu_count[$subbutton2['counter']]);
+										unset($menu_count[$subbutton2['counter']]);
+									}
 								}
 							}
 						}
@@ -4331,16 +4330,19 @@ function scheduleTaskImmediate($task)
 	else
 		$scheduleTaskImmediate = unserialize($modSettings['scheduleTaskImmediate']);
 
-	$scheduleTaskImmediate[$task] = 0;
-	updateSettings(array('scheduleTaskImmediate' => serialize($scheduleTaskImmediate)));
+	if (!isset($scheduleTaskImmediate[$task]))
+	{
+		$scheduleTaskImmediate[$task] = 0;
+		updateSettings(array('scheduleTaskImmediate' => serialize($scheduleTaskImmediate)));
 
-	require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
-	// Ensure the task is on
-	toggleTaskStatusByName($task, true);
+		// Ensure the task is on
+		toggleTaskStatusByName($task, true);
 
-	// Before trying to run it **NOW** :P
-	calculateNextTrigger($task, true);
+		// Before trying to run it **NOW** :P
+		calculateNextTrigger($task, true);
+	}
 }
 
 /**

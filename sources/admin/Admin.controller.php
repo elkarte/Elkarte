@@ -177,33 +177,6 @@ class Admin_Controller extends Action_Controller
 							'mention' => array($txt['mention']),
 						),
 					),
-					'securitysettings' => array(
-						'label' => $txt['admin_security_moderation'],
-						'file' => 'ManageSecurity.controller.php',
-						'controller' => 'ManageSecurity_Controller',
-						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_security',
-						'subsections' => array(
-							'general' => array($txt['mods_cat_security_general']),
-							'spam' => array($txt['antispam_title']),
-							'badbehavior' => array($txt['badbehavior_title']),
-							'moderation' => array($txt['moderation_settings_short'], 'enabled' => !empty($modSettings['warning_enable'])),
-						),
-					),
-					'languages' => array(
-						'label' => $txt['language_configuration'],
-						'file' => 'ManageLanguages.controller.php',
-						'controller' => 'ManageLanguages_Controller',
-						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_languages',
-						'subsections' => array(
-							'edit' => array($txt['language_edit']),
-// 							'add' => array($txt['language_add']),
-							'settings' => array($txt['language_settings']),
-						),
-					),
 					'serversettings' => array(
 						'label' => $txt['admin_server_settings'],
 						'file' => 'ManageServer.controller.php',
@@ -220,14 +193,19 @@ class Admin_Controller extends Action_Controller
 							'phpinfo' => array($txt['phpinfo_settings']),
 						),
 					),
-					'current_theme' => array(
-						'label' => $txt['theme_current_settings'],
-						'file' => 'ManageThemes.controller.php',
-						'controller' => 'ManageThemes_Controller',
+					'securitysettings' => array(
+						'label' => $txt['admin_security_moderation'],
+						'file' => 'ManageSecurity.controller.php',
+						'controller' => 'ManageSecurity_Controller',
 						'function' => 'action_index',
-						'custom_url' => $scripturl . '?action=admin;area=theme;sa=list;th=' . $settings['theme_id'],
 						'icon' => 'transparent.png',
-						'class' => 'admin_img_current_theme',
+						'class' => 'admin_img_security',
+						'subsections' => array(
+							'general' => array($txt['mods_cat_security_general']),
+							'spam' => array($txt['antispam_title']),
+							'badbehavior' => array($txt['badbehavior_title']),
+							'moderation' => array($txt['moderation_settings_short'], 'enabled' => !empty($modSettings['warning_enable'])),
+						),
 					),
 					'theme' => array(
 						'label' => $txt['theme_admin'],
@@ -244,6 +222,28 @@ class Admin_Controller extends Action_Controller
 							'themelist' => array($txt['themeadmin_edit_title'], 'active' => array('edit', 'browse')),
 							'edit' => array($txt['themeadmin_edit_title'], 'enabled' => false),
 							'browse' => array($txt['themeadmin_edit_title'], 'enabled' => false),
+						),
+					),
+					'current_theme' => array(
+						'label' => $txt['theme_current_settings'],
+						'file' => 'ManageThemes.controller.php',
+						'controller' => 'ManageThemes_Controller',
+						'function' => 'action_index',
+						'custom_url' => $scripturl . '?action=admin;area=theme;sa=list;th=' . $settings['theme_id'],
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_current_theme',
+					),
+					'languages' => array(
+						'label' => $txt['language_configuration'],
+						'file' => 'ManageLanguages.controller.php',
+						'controller' => 'ManageLanguages_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_languages',
+						'subsections' => array(
+							'edit' => array($txt['language_edit']),
+// 							'add' => array($txt['language_add']),
+							'settings' => array($txt['language_settings']),
 						),
 					),
 					'addonsettings' => array(
@@ -296,45 +296,6 @@ class Admin_Controller extends Action_Controller
 							'topics' => array($txt['manageposts_topic_settings']),
 						),
 					),
-					'managedrafts' => array(
-						'label' => $txt['manage_drafts'],
-						'file' => 'ManageDrafts.controller.php',
-						'controller' => 'ManageDrafts_Controller',
-						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_logs',
-						'permission' => array('admin_forum'),
-						'enabled' => in_array('dr', $context['admin_features']),
-					),
-					'managecalendar' => array(
-						'label' => $txt['manage_calendar'],
-						'file' => 'ManageCalendar.controller.php',
-						'controller' => 'ManageCalendar_Controller',
-						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_calendar',
-						'permission' => array('admin_forum'),
-						'enabled' => in_array('cd', $context['admin_features']),
-						'subsections' => array(
-							'holidays' => array($txt['manage_holidays'], 'admin_forum', 'enabled' => !empty($modSettings['cal_enabled'])),
-							'settings' => array($txt['calendar_settings'], 'admin_forum'),
-						),
-					),
-					'managesearch' => array(
-						'label' => $txt['manage_search'],
-						'file' => 'ManageSearch.controller.php',
-						'controller' => 'ManageSearch_Controller',
-						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_search',
-						'permission' => array('admin_forum'),
-						'subsections' => array(
-							'weights' => array($txt['search_weights']),
-							'method' => array($txt['search_method']),
-							'managesphinx' => array($txt['search_sphinx']),
-							'settings' => array($txt['settings']),
-						),
-					),
 					'smileys' => array(
 						'label' => $txt['smileys_manage'],
 						'file' => 'ManageSmileys.controller.php',
@@ -367,6 +328,45 @@ class Admin_Controller extends Action_Controller
 							'attachpaths' => array($txt['attach_directories']),
 							'maintenance' => array($txt['attachment_manager_maintenance']),
 						),
+					),
+					'managesearch' => array(
+						'label' => $txt['manage_search'],
+						'file' => 'ManageSearch.controller.php',
+						'controller' => 'ManageSearch_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_search',
+						'permission' => array('admin_forum'),
+						'subsections' => array(
+							'weights' => array($txt['search_weights']),
+							'method' => array($txt['search_method']),
+							'managesphinx' => array($txt['search_sphinx']),
+							'settings' => array($txt['settings']),
+						),
+					),
+					'managecalendar' => array(
+						'label' => $txt['manage_calendar'],
+						'file' => 'ManageCalendar.controller.php',
+						'controller' => 'ManageCalendar_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_calendar',
+						'permission' => array('admin_forum'),
+						'enabled' => in_array('cd', $context['admin_features']),
+						'subsections' => array(
+							'holidays' => array($txt['manage_holidays'], 'admin_forum', 'enabled' => !empty($modSettings['cal_enabled'])),
+							'settings' => array($txt['calendar_settings'], 'admin_forum'),
+						),
+					),
+					'managedrafts' => array(
+						'label' => $txt['manage_drafts'],
+						'file' => 'ManageDrafts.controller.php',
+						'controller' => 'ManageDrafts_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_logs',
+						'permission' => array('admin_forum'),
+						'enabled' => in_array('dr', $context['admin_features']),
 					),
 				),
 			),
@@ -417,21 +417,6 @@ class Admin_Controller extends Action_Controller
 							'settings' => array($txt['settings'], 'admin_forum'),
 						),
 					),
-					'regcenter' => array(
-						'label' => $txt['registration_center'],
-						'file' => 'ManageRegistration.controller.php',
-						'controller' => 'ManageRegistration_Controller',
-						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_regcenter',
-						'permission' => array('admin_forum', 'moderate_forum'),
-						'subsections' => array(
-							'register' => array($txt['admin_browse_register_new'], 'moderate_forum'),
-							'agreement' => array($txt['registration_agreement'], 'admin_forum'),
-							'reservednames' => array($txt['admin_reserved_set'], 'admin_forum'),
-							'settings' => array($txt['settings'], 'admin_forum'),
-						),
-					),
 					'ban' => array(
 						'label' => $txt['ban_title'],
 						'file' => 'ManageBans.controller.php',
@@ -447,18 +432,19 @@ class Admin_Controller extends Action_Controller
 							'log' => array($txt['ban_log']),
 						),
 					),
-					'paidsubscribe' => array(
-						'label' => $txt['paid_subscriptions'],
-						'enabled' => in_array('ps', $context['admin_features']),
-						'file' => 'ManagePaid.controller.php',
-						'controller' => 'ManagePaid_Controller',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_paid',
+					'regcenter' => array(
+						'label' => $txt['registration_center'],
+						'file' => 'ManageRegistration.controller.php',
+						'controller' => 'ManageRegistration_Controller',
 						'function' => 'action_index',
-						'permission' => 'admin_forum',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_regcenter',
+						'permission' => array('admin_forum', 'moderate_forum'),
 						'subsections' => array(
-							'view' => array($txt['paid_subs_view']),
-							'settings' => array($txt['settings']),
+							'register' => array($txt['admin_browse_register_new'], 'moderate_forum'),
+							'agreement' => array($txt['registration_agreement'], 'admin_forum'),
+							'reservednames' => array($txt['admin_reserved_set'], 'admin_forum'),
+							'settings' => array($txt['settings'], 'admin_forum'),
 						),
 					),
 					'sengines' => array(
@@ -474,6 +460,20 @@ class Admin_Controller extends Action_Controller
 							'stats' => array($txt['spider_stats']),
 							'logs' => array($txt['spider_logs']),
 							'spiders' => array($txt['spiders']),
+							'settings' => array($txt['settings']),
+						),
+					),
+					'paidsubscribe' => array(
+						'label' => $txt['paid_subscriptions'],
+						'enabled' => in_array('ps', $context['admin_features']),
+						'file' => 'ManagePaid.controller.php',
+						'controller' => 'ManagePaid_Controller',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_paid',
+						'function' => 'action_index',
+						'permission' => 'admin_forum',
+						'subsections' => array(
+							'view' => array($txt['paid_subs_view']),
 							'settings' => array($txt['settings']),
 						),
 					),
@@ -497,6 +497,24 @@ class Admin_Controller extends Action_Controller
 							'topics' => array($txt['maintain_sub_topics'], 'admin_forum'),
 							'hooks' => array($txt['maintain_sub_hooks_list'], 'admin_forum'),
 							'attachments' => array($txt['maintain_sub_attachments'], 'admin_forum'),
+						),
+					),
+					'logs' => array(
+						'label' => $txt['logs'],
+						'file' => 'AdminLog.controller.php',
+						'controller' => 'AdminLog_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_logs',
+						'subsections' => array(
+							'errorlog' => array($txt['errlog'], 'admin_forum', 'enabled' => !empty($modSettings['enableErrorLogging']), 'url' => $scripturl . '?action=admin;area=logs;sa=errorlog;desc'),
+							'adminlog' => array($txt['admin_log'], 'admin_forum', 'enabled' => in_array('ml', $context['admin_features'])),
+							'modlog' => array($txt['moderation_log'], 'admin_forum', 'enabled' => in_array('ml', $context['admin_features'])),
+							'banlog' => array($txt['ban_log'], 'manage_bans'),
+							'spiderlog' => array($txt['spider_logs'], 'admin_forum', 'enabled' => in_array('sp', $context['admin_features'])),
+							'tasklog' => array($txt['scheduled_log'], 'admin_forum'),
+							'badbehaviorlog' => array($txt['badbehavior_log'], 'admin_forum', 'enabled' => !empty($modSettings['badbehavior_enabled']), 'url' => $scripturl . '?action=admin;area=logs;sa=badbehaviorlog;desc'),
+							'pruning' => array($txt['pruning_title'], 'admin_forum'),
 						),
 					),
 					'scheduledtasks' => array(
@@ -532,24 +550,6 @@ class Admin_Controller extends Action_Controller
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_reports',
 					),
-					'logs' => array(
-						'label' => $txt['logs'],
-						'file' => 'AdminLog.controller.php',
-						'controller' => 'AdminLog_Controller',
-						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_logs',
-						'subsections' => array(
-							'errorlog' => array($txt['errlog'], 'admin_forum', 'enabled' => !empty($modSettings['enableErrorLogging']), 'url' => $scripturl . '?action=admin;area=logs;sa=errorlog;desc'),
-							'adminlog' => array($txt['admin_log'], 'admin_forum', 'enabled' => in_array('ml', $context['admin_features'])),
-							'modlog' => array($txt['moderation_log'], 'admin_forum', 'enabled' => in_array('ml', $context['admin_features'])),
-							'banlog' => array($txt['ban_log'], 'manage_bans'),
-							'spiderlog' => array($txt['spider_logs'], 'admin_forum', 'enabled' => in_array('sp', $context['admin_features'])),
-							'tasklog' => array($txt['scheduled_log'], 'admin_forum'),
-							'badbehaviorlog' => array($txt['badbehavior_log'], 'admin_forum', 'enabled' => !empty($modSettings['badbehavior_enabled']), 'url' => $scripturl . '?action=admin;area=logs;sa=badbehaviorlog;desc'),
-							'pruning' => array($txt['pruning_title'], 'admin_forum'),
-						),
-					),
 					'repairboards' => array(
 						'label' => $txt['admin_repair'],
 						'file' => 'RepairBoards.controller.php',
@@ -568,13 +568,13 @@ class Admin_Controller extends Action_Controller
 		// Make sure the administrator has a valid session...
 		validateSession();
 
-		$menuOptions = array();
+		$menuOptions = array('default_include_dir' => ADMINDIR);
 
 		// Let them add Admin areas easily.
 		call_integration_hook('integrate_admin_areas', array(&$admin_areas, &$menuOptions));
 
 		// Actually create the menu!
-		$admin_include_data = createMenu($admin_areas);
+		$admin_include_data = createMenu($admin_areas, $menuOptions);
 		unset($admin_areas);
 
 		// Nothing valid?
@@ -608,10 +608,7 @@ class Admin_Controller extends Action_Controller
 
 		// Now - finally - call the right place!
 		if (isset($admin_include_data['file']))
-		{
-			$dir = isset($admin_include_data['dir']) ? $admin_include_data['dir'] : (isset($admin_include_data['controller']) ? ADMINDIR : SOURCEDIR);
-			require_once($dir . '/' . $admin_include_data['file']);
-		}
+			require_once($admin_include_data['file']);
 
 		callMenu($admin_include_data);
 	}

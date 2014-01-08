@@ -344,7 +344,7 @@ class Mentions_Controller extends Action_Controller
 				$removed = false;
 				// @todo find a way to call only what is actually needed
 				foreach ($this->_callbacks as $type => $callback)
-					$removed = $removed || call_user_func_array($callback, array(&$possible_mentions, $type));
+					$removed = call_user_func_array($callback, array(&$possible_mentions, $type)) || $removed;
 			}
 
 			foreach ($possible_mentions as $mention)
@@ -425,14 +425,14 @@ class Mentions_Controller extends Action_Controller
 		// If some of these mentions are no longer visable, we need to do some maintenance
 		if ($removed)
 		{
-			if (!empty($modSettings['mentions_check_users']))
-				$modSettings['mentions_check_users'] = @unserialize($modSettings['mentions_check_users']);
+			if (!empty($modSettings['user_access_mentions']))
+				$modSettings['user_access_mentions'] = @unserialize($modSettings['user_access_mentions']);
 			else
-				$modSettings['mentions_check_users'] = array();
+				$modSettings['user_access_mentions'] = array();
 
-			$modSettings['mentions_check_users'][$user_info['id']] = 0;
-			updateSettings(array('mentions_check_users' => serialize($modSettings['mentions_check_users'])));
-			scheduleTaskImmediate('mentions_check_users');
+			$modSettings['user_access_mentions'][$user_info['id']] = 0;
+			updateSettings(array('user_access_mentions' => serialize($modSettings['user_access_mentions'])));
+			scheduleTaskImmediate('user_access_mentions');
 		}
 
 		return $removed;

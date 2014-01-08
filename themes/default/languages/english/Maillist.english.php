@@ -239,60 +239,6 @@ $txt['digest_reply_preview'] = "\n     <*> Latest Reply Preview:\n     ";
 $txt['digest_unread_reply_link'] = "\n\n     <*> See your unread replies to this topic at the following link:\n     <*> ";
 $txt['message_attachments'] = '<*> This message has (%d) images/files associated with it.' . "\n" . '<*> To see them please follow this link: %s';
 
-// Profile Notifications Page
-$txt['notify_settings'] = 'Notification Settings:';
-$txt['notify_save'] = 'Save settings';
-$txt['notify_important_email'] = 'Receive forum newsletters, announcements and important notifications by email.';
-$txt['notify_regularity'] = 'For topics and boards I\'ve requested notification on, notify me';
-$txt['notify_regularity_instant'] = 'Instantly';
-$txt['notify_regularity_first_only'] = 'Instantly - but only for the first unread reply';
-$txt['notify_regularity_daily'] = 'Daily';
-$txt['notify_regularity_weekly'] = 'Weekly';
-$txt['auto_notify'] = 'Turn notification on when you post or reply to a topic.';
-$txt['notify_send_types'] = 'For topics and boards I\'ve requested notification on, notify me of';
-$txt['notify_send_type_everything'] = 'Replies and moderation';
-$txt['notify_send_type_everything_own'] = 'Moderation only if I started the topic';
-$txt['notify_send_type_only_replies'] = 'Only replies';
-$txt['notify_send_type_nothing'] = 'Nothing at all';
-$txt['notify_send_body'] = 'When sending notification of a reply to a topic, send the post in the email (but please don\'t reply to these emails.)';
-
-$txt['notifications_topics'] = 'Current Topic Notifications';
-$txt['notifications_topics_list'] = 'You are being notified of replies to the following topics';
-$txt['notifications_topics_none'] = 'You are not currently receiving any notifications from topics.';
-$txt['notifications_topics_howto'] = 'To receive notifications from a topic, click the &quot;notify&quot; button while viewing it.';
-$txt['notifications_boards'] = 'Current Board Notifications';
-$txt['notifications_boards_list'] = 'You are being notified of new topics posted in the following boards';
-$txt['notifications_boards_none'] = 'You aren\'t receiving notifications on any boards right now.';
-$txt['notifications_boards_howto'] = 'To request notifications from a specific board, click the &quot;notify&quot; button in the index of that board.';
-
-$txt['notify_settings'] = 'Email Notification Settings:';
-$txt['notify_save'] = 'Save settings';
-$txt['notify_important_email'] = 'Receive forum newsletters, announcements and important notifications by email.';
-$txt['notify_regularity'] = 'For topics and boards I\'ve requested notification on, notify me';
-$txt['notify_regularity_instant'] = 'Instantly for all posts';
-$txt['notify_regularity_first_only'] = 'Instantly - but only for the first (new) post in a topic.';
-$txt['notify_regularity_daily'] = 'Daily Summary';
-$txt['notify_regularity_weekly'] = 'Weekly Summary';
-$txt['auto_notify'] = 'Turn email topic notification on when you post in a topic. This is <b>not</b> recommended when you use "board" notifications.</p>';
-$txt['notify_send_types'] = 'For topics and boards I\'ve requested notification on, email me';
-$txt['notify_send_type_everything'] = 'Messages and moderation items';
-$txt['notify_send_type_everything_own'] = 'Messages and moderation items only if I started the topic';
-$txt['notify_send_type_only_replies'] = 'All messages';
-$txt['notify_send_type_nothing'] = 'Nothing at all';
-$txt['notify_send_body'] = 'When sending email notifications, send the full text of the post in the email (NOT available with Daily / Weekly summary).';
-
-$txt['notifications_topics'] = 'Current Topic Notifications';
-$txt['notifications_topics_list'] = 'You are being notified of replies to the following topics';
-$txt['notifications_topics_none'] = 'You are not currently receiving any notifications from topics.';
-$txt['notifications_topics_howto'] = 'To receive email notifications from only specific topics, click the <b>&quot;notify&quot;</b> button while viewing a topic.';
-$txt['notifications_boards'] = 'Current Board Notifications';
-$txt['notifications_boards_list'] = 'You are being notified of new topics posted in the following boards';
-$txt['notifications_boards_none'] = 'You aren\'t receiving notifications on any boards right now.';
-$txt['notifications_boards_howto'] = 'To request email notifications from a specific board, click the <b>&quot;notify&quot;</b> button from the index (topic listing) of that board.';
-$txt['notifications_boards_current'] = 'You are receiving notifications on the boards shown in bold.  Use the checkboxes to turn these off or add additional boards to your notification list';
-$txt['notifications_boards_update'] = 'Update';
-$txt['notifications_update'] = 'Unnotify';
-
 // Help
 $txt['maillist_help'] = 'For help in setting up the maillist feature, please visit the maillist section on the <a href="https://github.com/elkarte/Elkarte/wiki/Maillist-Feature">ElkArte Wiki</a>';
 

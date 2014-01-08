@@ -255,7 +255,7 @@ function template_issueWarning()
  */
 function template_deleteAccount()
 {
-	global $context, $scripturl, $txt;
+	global $context, $scripturl, $txt, $settings;
 
 	// The main containing header.
 	echo '
@@ -267,7 +267,7 @@ function template_deleteAccount()
 	// If deleting another account give them a lovely info box.
 	if (!$context['user']['is_owner'])
 		echo '
-			<p class="windowbg2 description">', $txt['deleteAccount_desc'], '</p>';
+			<p class="description">', $txt['deleteAccount_desc'], '</p>';
 
 	echo '
 			<div class="windowbg2">
@@ -276,17 +276,17 @@ function template_deleteAccount()
 	// If they are deleting their account AND the admin needs to approve it - give them another piece of info ;)
 	if ($context['needs_approval'])
 		echo '
-					<div class="errorbox">', $txt['deleteAccount_approval'], '</div>';
+					<div class="noticebox">', $txt['deleteAccount_approval'], '</div>';
 
 	// If the user is deleting their own account warn them first - and require a password!
 	if ($context['user']['is_owner'])
 	{
 		echo '
-					<div class="alert">', $txt['own_profile_confirm'], '</div>
+					<div class="errorbox">', $txt['own_profile_confirm'], '</div>
 					<div>
 						<strong', (isset($context['modify_error']['bad_password']) || isset($context['modify_error']['no_password']) ? ' class="error"' : ''), '>', $txt['current_password'], ': </strong>
 						<input type="password" name="oldpasswrd" size="20" class="input_password" />&nbsp;&nbsp;&nbsp;&nbsp;
-						<input type="submit" value="', $txt['yes'], '" class="button_submit submitgo" />';
+						<input type="submit" value="', $txt['delete'], '" class="button_submit submitgo" />';
 
 		if (!empty($context['token_check']))
 			echo '
@@ -302,41 +302,46 @@ function template_deleteAccount()
 	else
 	{
 		echo '
-					<div class="alert">', $txt['deleteAccount_warning'], '</div>';
+					<div class="errorbox">', $txt['deleteAccount_warning'], '</div>
+					<dl class="settings">';
 
 		// Only actually give these options if they are kind of important.
 		if ($context['can_delete_posts'])
 			echo '
-					<div>
-						', $txt['deleteAccount_posts'], ':
-						<select name="remove_type">
+					<dt>
+						<a href="', $scripturl, '?action=quickhelp;help=deleteAccount_posts" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" /></a>
+						<label for="remove_type">', $txt['deleteAccount_posts'], '</label>:
+					</dt>
+					<dd>
+						<select id="remove_type" name="remove_type">
 							<option value="none">', $txt['deleteAccount_none'], '</option>
 							<option value="posts">', $txt['deleteAccount_all_posts'], '</option>
 							<option value="topics">', $txt['deleteAccount_topics'], '</option>
 						</select>
-					</div>';
+					</dd>';
 
 		echo '
-					<div>
-						<label for="deleteAccount"><input type="checkbox" name="deleteAccount" id="deleteAccount" value="1" class="input_check" onclick="if (this.checked) return confirm(\'', $txt['deleteAccount_confirm'], '\');" /> ', $txt['deleteAccount_member'], '.</label>
-					</div>
-					<div>
-						<input type="submit" value="', $txt['delete'], '" class="right_submit" />';
+					<dt>
+						<label for="deleteAccount">', $txt['deleteAccount_member'], '</label>
+					</dt>
+					<dd>
+						<input type="checkbox" name="deleteAccount" id="deleteAccount" value="1" class="input_check" onclick="if (this.checked) return confirm(\'', $txt['deleteAccount_confirm'], '\');" />
+					</dd>
+				</dl>
+				<input type="submit" value="', $txt['delete'], '" class="right_submit" />';
 
 		if (!empty($context['token_check']))
 			echo '
 				<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
 
 		echo '
-						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						<input type="hidden" name="u" value="', $context['id_member'], '" />
-						<input type="hidden" name="sa" value="', $context['menu_item_selected'], '" />
-					</div>';
+				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+				<input type="hidden" name="u" value="', $context['id_member'], '" />
+				<input type="hidden" name="sa" value="', $context['menu_item_selected'], '" />';
 	}
 
 	echo '
 				</div>
 			</div>
-			<br />
 		</form>';
 }

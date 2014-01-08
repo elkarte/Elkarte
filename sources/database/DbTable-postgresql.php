@@ -209,6 +209,8 @@ class DbTable_PostgreSQL extends DbTable
 
 		// Go, go power rangers!
 		$db->db_transaction('commit');
+
+		return true;
 	}
 
 	/**

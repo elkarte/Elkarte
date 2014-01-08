@@ -157,6 +157,10 @@ class Auth_Controller extends Action_Controller
 			return;
 		}
 
+		// No one needs a username that long, plus we only support 80 chars in the db
+		if (Util::strlen($_POST['user']) > 80)
+			$_POST['user'] = Util::substr($_POST['user'], 0, 80);
+
 		// Hmm... maybe 'admin' will login with no password. Uhh... NO!
 		if ((!isset($_POST['passwrd']) || $_POST['passwrd'] == '') && (!isset($_POST['hash_passwrd']) || strlen($_POST['hash_passwrd']) != 40))
 		{
