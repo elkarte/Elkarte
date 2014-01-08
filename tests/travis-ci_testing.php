@@ -35,9 +35,34 @@ foreach ($tests as $test)
 		'exceptions' => $global_results['exceptions'] + $results['exceptions'],
 	);
 
-	echo implode("\n", $output) . "\n\n";
+	echo implode("\n", $output) . "\n";
 
 	$final_return = max($final_return, $return, $results['failures'] + $results['exceptions']);
+}
+
+require_once(dirname(__FILE__) . '/../SSI.php');
+
+$db = database();
+
+// Let's see if there is any error
+$request = $db->query('', '
+	SELECT id_error, url, message, error_type, file, line
+	FROM {db_prefix}log_errors
+	ORDER BY id_error ASC',
+	array()
+);
+
+if ($db->num_rows($request) > 0)
+	echo "\n" . 'Errors found:' . "\n";
+while ($row = $db->fetch_assoc($request))
+{
+	echo 'Error ' . $row['id_error'] . "\n";
+	echo 'url: ' . $row['url'] . "\n";
+	echo 'message: ' . $row['message'] . "\n";
+	echo 'error_type: ' . $row['error_type'] . "\n";
+	echo 'file: ' . $row['file'] . "\n";
+	echo 'line: ' . $row['line'] . "\n";
+	echo '-----------------------------' . "\n";
 }
 
 echo "\n" . 'Test cases run: ' . $global_results['tests_run'][0] . '/' . $global_results['tests_run'][1] . ', Passes: ' . $global_results['passes'] . ', Failures: ' . $global_results['failures'] . ', Exceptions: ' . $global_results['exceptions'] . "\n";
