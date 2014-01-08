@@ -538,16 +538,22 @@ div.bbc_footnotes .meaction{
 	border: 1px solid transparent;
 	color: #eee;
 }
-#main_menu {
+#menu_nav {
+	background: linear-gradient(to bottom, #4d4f53 0%,#333 49%,#333 51%,#4d4f53 100%);
 	position: fixed;
 	top: 0;
-	left: 0;
-	z-index: 5;
-	background: linear-gradient(to bottom, #4d4f53 0%,#333 49%,#333 51%,#4d4f53 100%);
+	z-index: 99;
 	width: 100%;
 	color: #eee;
 	line-height: 30px;
 	min-height: 35px;
+	padding: 0;
+}
+#main_menu {
+	background: transparent !important;
+	border: none !important;
+	padding: 0 !important;
+	margin: 0 auto;
 }
 /* Override link colour for admin/profile/etc menus. */
 .admin_menu .linklevel1, #adm_submenus .linklevel1 {

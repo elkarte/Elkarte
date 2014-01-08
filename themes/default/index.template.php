@@ -322,7 +322,7 @@ function template_body_above()
 
 	// WAI-ARIA a11y tweaks have been applied here.
 	echo '
-		<div id="menu_nav" class="wrapper" role="navigation">
+		<div id="menu_nav" role="navigation">
 			', template_menu(), '
 		</div>
 	</div>
@@ -467,7 +467,7 @@ function template_menu()
 
 	// WAI-ARIA a11y tweaks have been applied here.
 	echo '
-					<ul id="main_menu">';
+					<ul id="main_menu" class="wrapper">';
 
 	// The upshrink image, right-floated.
 	echo '
