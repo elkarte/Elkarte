@@ -4,7 +4,7 @@
 $txt['error_locked'] = 'This topic has been locked and can no longer be replied to';
 $txt['error_locked_short'] = 'Topic Locked';
 $txt['error_cant_start'] = 'Not authorized to start a new topic on the supplied board';
-$txt['error_cant_start_short'] = 'Cant Start New Topic';
+$txt['error_cant_start_short'] = 'Can\'t Start New Topic';
 $txt['error_cant_reply'] = 'Not authorized to reply';
 $txt['error_cant_reply_short'] = 'Off Limits Topic';
 $txt['error_topic_gone'] = 'The topic could not be found - it may have been deleted or merged.';

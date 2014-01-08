@@ -256,7 +256,7 @@ class CoreFeatures_Controller extends Action_Controller
 				'url' => 'action=admin;area=permissions;sa=postmod',
 				'setting_callback' => create_function('$value', '
 
-					// Cant use warning post moderation if disabled!
+					// Cannot use warning post moderation if disabled!
 					if (!$value)
 					{
 						require_once(SUBSDIR . \'/Moderation.subs.php\');
