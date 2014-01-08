@@ -212,12 +212,12 @@ strong {
 /* Custom highlighted text style for modern browsers. */
 /* Nicer than default blue. Needs two separate rules. */
 ::-moz-selection {
-	background: red;
-	color: #444;
+	background: #7bb128;
+	color: white;
 }
 ::selection {
-	background: red;
-	color: #444;
+	background: #7bb128;
+	color: white
 }
 #top_section_notice .button_submit {
 	position: relative;
