@@ -530,11 +530,6 @@ div.bbc_footnotes .meaction{
 	text-decoration: none;
 }
 
-/* Needed for new PM notifications. */
-.listlevel1 strong {
-	color: white;
-}
-
 /* Level 1 Menu bar: link or button. */
 /* If there will be a border on hover, have a border here. */
 /* A default transparent border stops links jumping on hover. */
