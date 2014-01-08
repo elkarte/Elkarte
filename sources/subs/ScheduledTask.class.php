@@ -1550,7 +1550,7 @@ class ScheduledTask
 				SELECT COUNT(DISTINCT(id_member))
 				FROM {db_prefix}log_mentions
 				WHERE id_member > {int:last_id_member}
-					AND mnt.mention_type IN ({array_string:mention_types})',
+					AND mention_type IN ({array_string:mention_types})',
 				array(
 					'last_id_member' => !empty($modSettings['mentions_member_check']) ? $modSettings['mentions_member_check'] : 0,
 					'mention_types' => array('men', 'like', 'rlike'),
@@ -1568,7 +1568,7 @@ class ScheduledTask
 				SELECT DISTINCT(id_member) as id_member
 				FROM {db_prefix}log_mentions
 				WHERE id_member > {int:last_id_member}
-					AND mnt.mention_type IN ({array_string:mention_types})
+					AND mention_type IN ({array_string:mention_types})
 				LIMIT {int:limit}',
 				array(
 					'last_id_member' => !empty($modSettings['mentions_member_check']) ? $modSettings['mentions_member_check'] : 0,
