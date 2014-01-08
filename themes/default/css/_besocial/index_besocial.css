@@ -437,6 +437,10 @@ div.bbc_footnotes .meaction{
 	background-image: linear-gradient(to bottom, #fff, #e4e4e4);
 	box-shadow: 1px 1px 2px #e5e5e5;
 	color: #666;
+	font-size: 0.9em;
+}
+.quickbuttons .listlevel1 {
+	font-size: 0.9em;
 }
 
 /* Level 1 button hover and focus effects. */
