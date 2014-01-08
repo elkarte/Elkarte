@@ -689,6 +689,7 @@ a.active {
 }
 .pagelinks .navPages {
 	color: #555;
+	margin: 0 2px;
 }
 .pagelinks .navPages:hover, .pagelinks .current_page  {
 	background: #7bb128;
