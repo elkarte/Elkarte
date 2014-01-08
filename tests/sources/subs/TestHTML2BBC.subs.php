@@ -1,7 +1,7 @@
 <?php
 
 require_once(TESTDIR . 'simpletest/autorun.php');
-require_once(SUBSDIR . '/Html2BBC.class.php');
+require_once(TESTDIR . '../sources/subs/Html2BBC.class.php');
 
 class TestHTML2BBC extends UnitTestCase
 {
