@@ -160,13 +160,25 @@ Class Elk_Testing_Setup
 
 	public function createTests()
 	{
+		// Sometimes it is necessary to exclude some tests...
+		$excluded = array(
+			// At the moment we setup the testing environment with an already
+			// installed forum, so test the installation would fail
+			'TestInstall.php'
+		);
+
 		// Get all the files
 		$allTests = $this->_testsInDir(BOARDDIR . '/tests/sources/*');
+		$allTests = array_merge($allTests, $this->_testsInDir(BOARDDIR . '/tests/install/*'));
 
 		// For each file create a test case
 		foreach ($allTests as $key => $test)
 		{
 			$test = realpath($test);
+
+			// Skip the excluded tests
+			if (in_array(basename($test), $excluded))
+				continue;
 
 			$result = file_put_contents(BOARDDIR . '/tests/run_' . md5($test) . '.php' , '<?php
 
