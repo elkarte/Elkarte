@@ -476,18 +476,12 @@ function custom_profiles_toggle_callback($value)
  */
 function drafts_toggle_callback($value)
 {
-	$db = database();
+	require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+	toggleTaskStatusByName('remove_old_drafts', $value);
 
-	// Set the correct disabled value for the scheduled task.
-	$db->query('', '
-		UPDATE {db_prefix}scheduled_tasks
-		SET disabled = {int:disabled}
-		WHERE task = {string:task}',
-		array(
-			'disabled' => $value ? 0 : 1,
-			'task' => 'remove_old_drafts',
-		)
-	);
+	// Should we calculate next trigger?
+	if ($value)
+		calculateNextTrigger('remove_old_drafts');
 }
 
 /**
@@ -498,23 +492,27 @@ function drafts_toggle_callback($value)
  */
 function subscriptions_toggle_callback($value)
 {
-	$db = database();
-
-	// Set the correct disabled value for scheduled task.
-	$db->query('', '
-		UPDATE {db_prefix}scheduled_tasks
-		SET disabled = {int:disabled}
-		WHERE task = {string:task}',
-		array(
-			'disabled' => $value ? 0 : 1,
-			'task' => 'paid_subscriptions',
-		)
-	);
+	require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+	toggleTaskStatusByName('paid_subscriptions', $value);
 
 	// Should we calculate next trigger?
 	if ($value)
-	{
-		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 		calculateNextTrigger('paid_subscriptions');
-	}
+}
+
+/**
+ * Callback used in the core features page when the post-by-email feature
+ * is enabled or disabled.
+ * @param bool $value the "new" status of the post-by-email
+ *            (true => enabled, false => disabled)
+ */
+function postbyemail_toggle_callback($value)
+{
+{
+	require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+	toggleTaskStatusByName('maillist_fetch_IMAP', $value);
+
+	// Should we calculate next trigger?
+	if ($value)
+		calculateNextTrigger('maillist_fetch_IMAP');
 }

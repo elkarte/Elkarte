@@ -244,6 +244,7 @@ class CoreFeatures_Controller extends Action_Controller
 			// pe = post email
 			'pe' => array(
 				'url' => 'action=admin;area=maillist',
+				'save_callback' => 'postbyemail_toggle_callback',
 				'settings' => array(
 					'maillist_enabled' => 1,
 					'pbe_post_enabled' => 2,
@@ -321,7 +322,6 @@ class CoreFeatures_Controller extends Action_Controller
 						return array(\'spider_group\' => 0, \'show_spider_online\' => 0);
 				'),
 				'on_save' => create_function('', '
-					global $modSettings;
 					require_once(SUBSDIR . \'/SearchEngines.subs.php\');
 				'),
 			),
