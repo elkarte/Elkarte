@@ -1,7 +1,7 @@
 <?php
 
 require_once(TESTDIR . 'simpletest/autorun.php');
-require_once(SOURCEDIR . '/Subs.php');
+require_once(TESTDIR . '../SSI.php');
 
 class TestBBC extends UnitTestCase
 {
