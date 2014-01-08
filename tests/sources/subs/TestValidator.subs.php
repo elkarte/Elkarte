@@ -1,7 +1,8 @@
 <?php
 
 require_once(TESTDIR . 'simpletest/autorun.php');
-require_once(TESTDIR . '../sources/subs/Html2BBC.class.php');
+require_once(TESTDIR . '../SSI.php');
+require_once(SUBSDIR . '/DataValidator.class.php');
 
 class TestDataValidator extends UnitTestCase
 {
