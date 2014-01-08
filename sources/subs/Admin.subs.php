@@ -508,7 +508,6 @@ function subscriptions_toggle_callback($value)
  */
 function postbyemail_toggle_callback($value)
 {
-{
 	require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 	toggleTaskStatusByName('maillist_fetch_IMAP', $value);
 
