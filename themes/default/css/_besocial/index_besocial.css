@@ -776,7 +776,7 @@ a.active {
 	font-weight: bold;
 	font-size: 1.2em;
 }
-.board_row {
+.board_row, .childboard_row {
 	border-bottom: 1px solid #eee;
 }
 
