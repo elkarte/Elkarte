@@ -167,11 +167,11 @@ function template_issueWarning()
 
 		foreach ($context['notification_templates'] as $id_template => $template)
 			echo '
-								<option value="', $id_template, '">&#10148;&nbsp;', $template['title'], '</option>';
+								<option value="', $id_template, '">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;', $template['title'], '</option>';
 
 		echo '
 							</select>
-							<span id="new_template_link" style="display: none;"><a class="linkbutton" href="', $scripturl, '?action=moderate;area=warnings;sa=templateedit;tid=0" target="_blank" class="new_win">', $txt['profile_warning_new_template'], '</a></span>
+							<span id="new_template_link" style="display: none;"><a class="linkbutton new_win" href="', $scripturl, '?action=moderate;area=warnings;sa=templateedit;tid=0" target="_blank">', $txt['profile_warning_new_template'], '</a></span>
 						</div>
 						<textarea name="warn_body" id="warn_body" cols="40" rows="8" style="min-width: 50%; max-width: 99%;">', $context['warning_data']['notify_body'], '</textarea>
 					</dd>';
@@ -193,7 +193,7 @@ function template_issueWarning()
 			</div>
 		</div>
 	</form>
-	</br />';
+	<br />';
 
 	// Previous warnings?
 	template_show_list('issued_warnings');
