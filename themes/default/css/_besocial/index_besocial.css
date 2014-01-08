@@ -980,6 +980,9 @@ a.active {
 
 /* This one does 800 screens at default font size. */
 @media screen and (max-width: 50em) {
+	body {
+		padding-top: 70px;
+	}
 	#menu_sidebar {
 		border: 1px solid #aaa;
 		border-radius: 4px;
@@ -999,8 +1002,16 @@ a.active {
 		border-radius: 0;
 	}
 	.topic_listing>li {
-		border: 1px solid #aaa;
-		box-shadow: 3px 3px 6px #e5e5e5;
+		border: 1px solid #ccc;
+		box-shadow: 1px 1px 1px #eee;
+		margin-bottom: 6px;
+	}
+	.topic_name h4 {
+		font-size: 1.5em;
+	}
+	.topic_latest:after {
+		content: '\A';
+		white-space: pre;
 	}
 	.poster:after, .posterarea:before {
 		border-bottom: 1px solid #bfbfbf;

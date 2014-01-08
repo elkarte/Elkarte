@@ -4072,6 +4072,10 @@ a.help .icon {
 	.elk_previewvideo {
 		max-width: 30em;
 	}
+	a.bbc_link {
+	    display: inline-block;
+		max-width: 16em;
+	}
 	.linktree .board_moderators, .linktree_last .board_moderators {
 		display: none;
 	}
