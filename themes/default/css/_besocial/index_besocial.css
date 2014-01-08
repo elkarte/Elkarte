@@ -1062,7 +1062,7 @@ a.active {
 	#main_menu li, .admin_menu li {
 	float: left;
 	display: block;
-	width: 49%;
+	width: 48%;
 	box-sizing: border-box;
 	}
 }
