@@ -162,4 +162,4 @@ $txt['themeadmin_themelist_link'] = 'Liste der Designs anzeigen';
 // Strings for the variants
 $txt['variant_light'] = 'ElkArte hell';
 $txt['variant_dark'] = 'ElkArte dunkel';
-$txt['variant_basic'] = 'ElkArte einfach';
+$txt['variant_baesocial'] = 'ElkArte sei sozial!';
