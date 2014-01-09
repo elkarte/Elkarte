@@ -19,7 +19,7 @@ class TestBBC extends UnitTestCase
 			),
 			array(
 				'Test abbreviation',
-				'[abbr=so have obtained random "quoted" text]shor"q"t[/abbr]',
+				'[abbr=so have obtained random &quot;quoted&quot; text]shor"q"t[/abbr]',
 				'<abbr title="so have obtained random &quot;quoted&quot; text">shor"q"t</abbr>',
 			),
 			array(
@@ -29,7 +29,7 @@ class TestBBC extends UnitTestCase
 			),
 			array(
 				'Test acronym',
-				'[abbr=so have obtained random "quoted" text]shor"q"t[/abbr]',
+				'[abbr=so have obtained random &quot;quoted&quot; text]shor"q"t[/abbr]',
 				'<abbr title="so have obtained random &quot;quoted&quot; text">shor"q"t</abbr>',
 			),
 			array(
@@ -44,12 +44,12 @@ class TestBBC extends UnitTestCase
 			),
 			array(
 				'Test bdo rtl',
-				'[bod=rtl]rtl[/bdo]',
+				'[bdo=rtl]rtl[/bdo]',
 				'<bdo dir="rtl">rtl</bdo>',
 			),
 			array(
 				'Test bdo ltr',
-				'[bod=ltr]ltr[/bdo]',
+				'[bdo=ltr]ltr[/bdo]',
 				'<bdo dir="ltr">ltr</bdo>',
 			),
 			array(
@@ -95,7 +95,7 @@ class TestBBC extends UnitTestCase
 			array(
 				'Decimal list',
 				'[list type=decimal][li]test[/li][/list]',
-				'<ol class="bbc_list"><li>test</li></ol>',
+				'<ul class="bbc_list" style="list-style-type: decimal;"><li>test</li></ul>',
 			),
 		);
 
@@ -108,7 +108,7 @@ class TestBBC extends UnitTestCase
 			),
 			array(
 				'Test bdo',
-				'[bod=something]something[/bdo]',
+				'[bdo=something]something[/bdo]',
 			),
 		);
 	}
