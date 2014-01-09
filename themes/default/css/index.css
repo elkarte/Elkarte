@@ -411,9 +411,10 @@ em {
 	background-image: url(../images/icons/header.png);
 	background-repeat: no-repeat;
 	content: "";
+	display: inline-block;
 	height: 24px;
-	margin-top: 0.25em;
-	padding-left: 30px;
+	width: 30px;
+	vertical-align: text-bottom;
 }
 /* broke formatting for compactness */
 .cat_img_attachments:before {background-position: 0 0;}
