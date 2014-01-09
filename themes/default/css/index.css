@@ -3994,7 +3994,7 @@ a.help .icon {
 	#top, #gotop, #gobottom {
 		display: none;
 	}
-	#main_menu li, .admin_menu li {
+	.admin_menu li {
 		float: left;
 		display: block;
 		width: 48%;
@@ -4015,10 +4015,6 @@ a.help .icon {
 		float: left;
 		display: block;
 		width: 100%;
-	}
-	.menulevel2, .menulevel2:hover {
-		width: 100%;
-		font-size: 1em;
 	}
 	.generalinfo {
 		overflow: auto;
@@ -4072,6 +4068,10 @@ a.help .icon {
 	.elk_previewvideo {
 		max-width: 30em;
 	}
+	a.bbc_link {
+	    display: inline-block;
+		max-width: 16em;
+	}
 	.linktree .board_moderators, .linktree_last .board_moderators {
 		display: none;
 	}
@@ -4084,11 +4084,11 @@ a.help .icon {
 	.forumposts .windowbg, .forumposts .windowbg2 {
 		margin-bottom: 6px;
 	}
-	#button_admin, #button_home, #moderationbuttons,  a.linklevel1.button_strip_notify,
+	#button_admin, #moderationbuttons,  a.linklevel1.button_strip_notify,
 	a.linklevel1.button_strip_print, a.linklevel1.button_strip_send, .inline_mod_check,
 	a.linklevel1.quotetonew_button, a.linklevel1.button_strip_post_poll,
 	a.linklevel1.post_options, .keyinfo .post_subject, li.listlevel1.quickmod_select_all,
-	#button_profile, #collapse_button, p.inline.membergroups {
+	#collapse_button, p.inline.membergroups {
 		display: none !important;
 	}
 	.quickbuttons {
