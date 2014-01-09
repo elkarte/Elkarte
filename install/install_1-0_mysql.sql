@@ -1808,7 +1808,7 @@ VALUES
 	(12, 0, 180, 1, 'd', 0, 'remove_topic_redirect'),
 	(13, 0, 240, 1, 'd', 0, 'remove_old_drafts'),
 	(14, 0, 0, 6, 'h', 0, 'remove_old_followups'),
-	(15, 0, 360, 10, 'm', 0, 'maillist_fetch_IMAP'),
+	(15, 0, 360, 10, 'm', 1, 'maillist_fetch_IMAP'),
 	(16, 0, 30, 1, 'h', 0, 'user_access_mentions');
 
 # --------------------------------------------------------

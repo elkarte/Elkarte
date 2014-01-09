@@ -2386,7 +2386,7 @@ ul.post_options li {
 	text-align: right;
 }
 .draftautosave #draft_lastautosave {
-	display: block;
+	display: inline-block;
 	min-height: 1em;
 }
 #postDraftOptions .settings dd, #postDraftOptions .settings dt{

@@ -87,7 +87,6 @@ Class Elk_Testing_Setup
 		if (strpos($file, 'if (file_exist') !== false)
 			$file = substr($file, 0, strpos($file, 'if (file_exist'));
 		$file .= "\n" . '$test_enabled = 1;';
-		$file .= "\n" . 'DEFINE(\'SKIPINSTALL\', 1);';
 
 		file_put_contents(BOARDDIR . '/Settings.php', $file);
 	}
@@ -157,5 +156,69 @@ Class Elk_Testing_Setup
 		updateStats('topic');
 		loadLanguage('Install');
 		updateStats('subject', 1, htmlspecialchars($txt['default_topic_subject']));
+	}
+
+	public function createTests()
+	{
+		// Sometimes it is necessary to exclude some tests...
+		$excluded = array(
+			// At the moment we setup the testing environment with an already
+			// installed forum, so test the installation would fail
+			'TestInstall.php'
+		);
+
+		// Get all the files
+		$allTests = $this->_testsInDir(BOARDDIR . '/tests/sources/*');
+		$allTests = array_merge($allTests, $this->_testsInDir(BOARDDIR . '/tests/install/*'));
+
+		// For each file create a test case
+		foreach ($allTests as $key => $test)
+		{
+			$test = realpath($test);
+
+			// Skip the excluded tests
+			if (in_array(basename($test), $excluded))
+				continue;
+
+			$result = file_put_contents(BOARDDIR . '/tests/run_' . md5($test) . '.php' , '<?php
+
+$testName = \'' . $test . '\';
+
+define(\'TESTDIR\', dirname(__FILE__) . \'/\');
+require_once(\'simpletest/autorun.php\');
+require_once(TESTDIR . \'../Settings.php\');
+
+class Test_' . $key . ' extends TestSuite
+{
+	function Test_' . $key . '()
+	{
+		$this->TestSuite(\'Test ' . $key . '\');
+
+		$this->addFile(\'' . $test . '\');
+	}
+}');
+		}
+	}
+
+	public function prepare()
+	{
+		$this->run_queries();
+		$this->prepare_settings();
+		$this->update();
+		$this->createTests();
+	}
+
+	private function _testsInDir($dir)
+	{
+		$entities = glob($dir);
+		$files = array();
+		foreach ($entities as $entity)
+		{
+			if (is_dir($entity))
+				$files = array_merge($files, $this->_testsInDir($entity . '/*'));
+			else
+				$files[] = $entity;
+		}
+		return $files;
 	}
 }

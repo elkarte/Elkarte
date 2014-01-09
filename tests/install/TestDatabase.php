@@ -1,6 +1,7 @@
 <?php
 
 require_once(TESTDIR . 'simpletest/autorun.php');
+require_once(TESTDIR . '../SSI.php');
 
 /**
  * TestCase class for tables present

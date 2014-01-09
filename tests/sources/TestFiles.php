@@ -58,7 +58,7 @@ class TestFiles extends UnitTestCase
 				$result = @eval('
 					if (false)
 					{
-						' . preg_replace('~^(?:\s*<\\?(?:php)?|\\?>\s*$)~', '', $file_content) . '
+						' . preg_replace('~(?:^\s*<\\?(?:php)?|\\?>\s*$)~', '', $file_content) . '
 					}
 				');
 				error_reporting($errorReporting);
