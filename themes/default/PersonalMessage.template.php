@@ -482,7 +482,7 @@ function template_subject_list()
 			{
 				if ($label['id'] != $context['current_label_id'])
 					$extra .= '
-								<option value="add_' . $label['id'] . '">&#10148;&nbsp;' . $label['name'] . '</option>';
+								<option value="add_' . $label['id'] . '">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $label['name'] . '</option>';
 			}
 
 			$extra .= '
@@ -491,7 +491,7 @@ function template_subject_list()
 			foreach ($context['labels'] as $label)
 			{
 				$extra .= '
-								<option value="rem_' . $label['id'] . '">&#10148;&nbsp;' . $label['name'] . '</option>';
+								<option value="rem_' . $label['id'] . '">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $label['name'] . '</option>';
 			}
 
 			$extra .= '
