@@ -1132,9 +1132,6 @@ a.active {
 		font-size: 10px;
 		line-height: 13px;
 	}
-	#button_profile .avatar {
-		display: none;
-	}
 	.listlevel1#button_profile .linklevel1 {
 		min-width: 0.5em;
 	}

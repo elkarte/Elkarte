@@ -4081,6 +4081,9 @@ a.help .icon {
 	#collapse_button, p.inline.membergroups {
 		display: none !important;
 	}
+	#button_profile .avatar {
+		display: none;
+	}
 	.quickbuttons {
 		margin: 8px 8px 6px 3px;
 	}
