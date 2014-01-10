@@ -1369,8 +1369,8 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			),
 			array(
 				'tag' => 'table',
-				'before' => '<table class="bbc_table">',
-				'after' => '</table>',
+				'before' => '<div class="bbc_table_container"><table class="bbc_table">',
+				'after' => '</table></div>',
 				'trim' => 'inside',
 				'require_children' => array('tr'),
 				'block_level' => true,

@@ -4128,4 +4128,8 @@ a.help .icon {
 	 .poster .menulevel2 {
 		 display: none !important;
 	}
+	.bbc_table_container {
+		max-width: 100%;
+		overflow: auto;
+	}
 }
