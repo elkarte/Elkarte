@@ -130,6 +130,7 @@ function template_html_above()
 	echo '
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="viewport" content="width=device-width" />
+	<meta name="mobile-web-app-capable" content="yes" />
 	<meta name="description" content="', $context['page_title_html_safe'], '" />', !empty($context['meta_keywords']) ? '
 	<meta name="keywords" content="' . $context['meta_keywords'] . '" />' : '';
 
@@ -150,6 +151,7 @@ function template_html_above()
 
 	// Show all the relative links, such as help, search, contents, and the like.
 	echo '
+	<link rel="shortcut icon" sizes="196x196" href="' . $settings['images_url'] . '/mobile.png" />
 	<link rel="help" href="', $scripturl, '?action=help" />
 	<link rel="contents" href="', $scripturl, '" />', ($context['allow_search'] ? '
 	<link rel="search" href="' . $scripturl . '?action=search" />' : '');
