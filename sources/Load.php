@@ -1367,6 +1367,9 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	if (!$user_info['is_guest'])
 		$context['minmax_preferences'] = !empty($options['minmax_preferences']) ? unserialize($options['minmax_preferences']) : array();
+	// Guest may have collapsed the header, check the cookie to prevent collapse jumping
+	elseif ($user_info['is_guest'] && isset($_COOKIE['upshrink']))
+		$context['minmax_preferences'] = array('upshrink' => $_COOKIE['upshrink']);
 
 	// Determine the current smiley set.
 	$user_info['smiley_set'] = (!in_array($user_info['smiley_set'], explode(',', $modSettings['smiley_sets_known'])) && $user_info['smiley_set'] != 'none') || empty($modSettings['smiley_sets_enable']) ? (!empty($settings['smiley_sets_default']) ? $settings['smiley_sets_default'] : $modSettings['smiley_sets_default']) : $user_info['smiley_set'];
