@@ -575,19 +575,20 @@ div.windowbg, div.windowbg2 {
 	padding: 6px;
 }
 
-/* The generic wrapper thingy. Hangover from SMF 2.1 Alpha. Does we wants it? */
+/* The generic wrapper thingy. Used by generic list template */
 .generic_list_wrapper {
 	overflow: auto;
 	margin: 0;
 	padding: 8px 8px 16px 8px;
 }
-
 .generic_list_wrapper .additional_row {
 	margin: 0;
 	padding: 10px 0 0;
 }
+/* The .information box is used by the after_title additonal row */
 .generic_list_wrapper .information .additional_row {
 	border: none;
+	padding: 6px 0;
 }
 .generic_list_wrapper .information {
 	margin: 0;
