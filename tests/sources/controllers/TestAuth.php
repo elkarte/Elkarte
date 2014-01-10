@@ -2,6 +2,7 @@
 
 require_once(TESTDIR . 'simpletest/autorun.php');
 require_once(TESTDIR . 'simpletest/web_tester.php');
+require_once(TESTDIR . '../SSI.php');
 
 /**
  * TestCase class for auth controller actions

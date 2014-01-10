@@ -212,12 +212,12 @@ strong {
 /* Custom highlighted text style for modern browsers. */
 /* Nicer than default blue. Needs two separate rules. */
 ::-moz-selection {
-	background: red;
-	color: #444;
+	background: #7bb128;
+	color: white;
 }
 ::selection {
-	background: red;
-	color: #444;
+	background: #7bb128;
+	color: white
 }
 #top_section_notice .button_submit {
 	position: relative;
@@ -437,6 +437,10 @@ div.bbc_footnotes .meaction{
 	background-image: linear-gradient(to bottom, #fff, #e4e4e4);
 	box-shadow: 1px 1px 2px #e5e5e5;
 	color: #666;
+	font-size: 0.9em;
+}
+.quickbuttons .listlevel1 {
+	font-size: 0.9em;
 }
 
 /* Level 1 button hover and focus effects. */
@@ -526,11 +530,6 @@ div.bbc_footnotes .meaction{
 	text-decoration: none;
 }
 
-/* Needed for new PM notifications. */
-.listlevel1 strong {
-	color: white;
-}
-
 /* Level 1 Menu bar: link or button. */
 /* If there will be a border on hover, have a border here. */
 /* A default transparent border stops links jumping on hover. */
@@ -538,16 +537,22 @@ div.bbc_footnotes .meaction{
 	border: 1px solid transparent;
 	color: #eee;
 }
-#main_menu {
+#menu_nav {
+	background: linear-gradient(to bottom, #4d4f53 0%,#333 49%,#333 51%,#4d4f53 100%);
 	position: fixed;
 	top: 0;
-	left: 0;
-	z-index: 5;
-	background: linear-gradient(to bottom, #4d4f53 0%,#333 49%,#333 51%,#4d4f53 100%);
+	z-index: 99;
 	width: 100%;
 	color: #eee;
 	line-height: 30px;
 	min-height: 35px;
+	padding: 0;
+}
+#main_menu {
+	background: transparent !important;
+	border: none !important;
+	padding: 0 !important;
+	margin: 0 auto;
 }
 /* Override link colour for admin/profile/etc menus. */
 .admin_menu .linklevel1, #adm_submenus .linklevel1 {
@@ -679,6 +684,7 @@ a.active {
 }
 .pagelinks .navPages {
 	color: #555;
+	margin: 0 2px;
 }
 .pagelinks .navPages:hover, .pagelinks .current_page  {
 	background: #7bb128;
@@ -755,6 +761,7 @@ a.active {
 #news_line, #elkFadeScroller {
 	color: #666666;
 	min-height: 20px;
+	padding: 3px;
 	overflow: auto;
 	resize: vertical;
 }
@@ -776,7 +783,7 @@ a.active {
 	font-weight: bold;
 	font-size: 1.2em;
 }
-.board_row {
+.board_row, .childboard_row {
 	border-bottom: 1px solid #eee;
 }
 
@@ -974,6 +981,9 @@ a.active {
 
 /* This one does 800 screens at default font size. */
 @media screen and (max-width: 50em) {
+	body {
+		margin-top: 35px;
+	}
 	#menu_sidebar {
 		border: 1px solid #aaa;
 		border-radius: 4px;
@@ -983,9 +993,6 @@ a.active {
 }
 /* This one does up to 540 screens. */
 @media screen and (max-width: 33.750em) {
-	body {
-		padding-top: 70px;
-	}
 	.board_latest {
 		border-left: 0;
 	}
@@ -993,8 +1000,19 @@ a.active {
 		border-radius: 0;
 	}
 	.topic_listing>li {
-		border: 1px solid #aaa;
-		box-shadow: 3px 3px 6px #e5e5e5;
+		border: 1px solid #ccc;
+		box-shadow: 1px 1px 1px #eee;
+		margin-bottom: 6px;
+	}
+	.topic_sorting_row {
+		border: none !important;
+	}
+	.topic_name h4 {
+		font-size: 1.5em;
+	}
+	.topic_latest:after {
+		content: '\A';
+		white-space: pre;
 	}
 	.poster:after, .posterarea:before {
 		border-bottom: 1px solid #bfbfbf;
@@ -1021,15 +1039,6 @@ a.active {
 		border-radius: 3px;
 		margin-top: 8px;
 	}
-	.navigate_section, .linktree, .linktree:before, .linktree:after, .linktree_last,
-	.linktree_last:before, .linktree_last:after {
-		border: none !important;
-		background: none !important;
-	}
-	.linktree:hover, .linktree>a:hover, .linktree_last, .linktree_last>a,
-	.linktree_last>a:hover, .linktree_last strong {
-		color: #666 !important;
-	}
 	.forum_category, .forumposts, .content_category {
 		background: #fff;
 		border: none;
@@ -1053,10 +1062,67 @@ a.active {
 	#main_menu .linklevel1 {
 		border-bottom: 1px solid #888;
 	}
-	#main_menu li, .admin_menu li {
-	float: left;
-	display: block;
-	width: 49%;
-	box-sizing: border-box;
+	.admin_menu li {
+		float: left;
+		display: block;
+		width: 48%;
+		box-sizing: border-box;
+	}
+		body {
+		margin-top: 15px;
+	}
+	#main_menu .linklevel1 {
+		background-image: url(../../images/_besocial/mobile_icons.png) !important;
+		background-repeat: no-repeat;
+		width: 20em;
+		color: transparent;
+		font-size: 2px;
+		height: 35px;
+	}
+	#button_home>a{
+		background-position: 0 -2px;
+	}
+	#button_profile>a{
+		background-position: 0 -212px;
+	}
+	#button_mention>a{
+		background-position: 0 -87px;
+	}
+	#button_pm>a{
+		background-position: 0 -45px;
+	}
+	#button_unread>a{
+		background-position: 0 -129px ;
+	}
+	#button_unreadreplies>a{
+		background-position: 0 -170px;
+	}
+	#button_register>a{
+		background-position: 0 -339px;
+	}
+	#button_login>a{
+		background-position: 0 -381px;
+	}
+	.listlevel1#button_profile {
+		float: left;
+	}
+	.listlevel1#button_profile:hover .menulevel2, .listlevel1#button_profile.sfhover .menulevel2 {
+		left: 0;
+		right: auto;
+	}
+	#button_pm .pm_indicator, #button_mention .pm_indicator {
+		position: relative;
+		z-index: 9999;
+		float: left;
+		left: 26px;
+		top: 2px;
+		font-size: 10px;
+		line-height: 13px;
+	}
+	.linklevel1 .avatar {
+		display: none;
+	}
+	.listlevel1#button_profile .linklevel1 {
+		min-width: 0.5em;
 	}
 }

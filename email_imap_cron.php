@@ -50,6 +50,10 @@ function postbyemail_imap()
 	$mailbox = !empty($modSettings['maillist_imap_mailbox']) ? $modSettings['maillist_imap_mailbox'] : 'INBOX';
 	$type = !empty($modSettings['maillist_imap_connection']) ? $modSettings['maillist_imap_connection'] : '';
 
+	// I suppose that without these informations we can't do anything.
+	if (empty($hostname) || empty($username) || empty($password))
+		return;
+
 	// Based on the type selected get/set the additional connection details
 	$connection = port_type($type);
 	$hostname .= (strpos($hostname, ':') === false) ? ':' . $connection['port'] : '';

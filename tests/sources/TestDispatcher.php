@@ -1,7 +1,7 @@
 <?php
 
 require_once(TESTDIR . 'simpletest/autorun.php');
-require_once(SOURCEDIR . '/Dispatcher.class.php');
+require_once(TESTDIR . '../SSI.php');
 
 /**
  * TestCase class for dispatching.

@@ -210,7 +210,7 @@ function template_additional_rows($row_position, $cur_list)
 {
 	foreach ($cur_list['additional_rows'][$row_position] as $row)
 		echo '
-				<div class="additional_row', empty($row['class']) ? '' : ' ' . $row['class'], '"', empty($row['style']) ? '' : ' style="' . $row['style'] . '"', '>', $row['value'], '</div>';
+				<div class="additional_row ', $row_position, empty($row['class']) ? '' : ' ' . $row['class'], '"', empty($row['style']) ? '' : ' style="' . $row['style'] . '"', '>', $row['value'], '</div>';
 }
 
 /**

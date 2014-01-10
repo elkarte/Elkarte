@@ -208,9 +208,10 @@ function logTask($task_id, $total_time)
 }
 
 /**
- * Sets the tasks status to enabled / disabled by task ID
+ * All the scheduled tasks associated with the id passed to
+ * the function are enabled, while the remaining are disabled
  *
- * @param array $enablers
+ * @param array $enablers array od task IDs
  */
 function updateTaskStatus($enablers)
 {

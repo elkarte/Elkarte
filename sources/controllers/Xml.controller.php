@@ -36,6 +36,7 @@ class Xml_Controller extends Action_Controller
 			'groupicons' => array('controller' => $this, 'function' => 'action_groupicons'),
 			'corefeatures' => array('controller' => $this, 'function' => 'action_corefeatures', 'permission' => 'admin_forum'),
 			'profileorder' => array('controller' => $this, 'function' => 'action_profileorder', 'permission' => 'admin_forum'),
+			'messageiconorder' => array('controller' => $this, 'function' => 'action_messageiconorder', 'permission' => 'admin_forum'),
 			'smileyorder' => array('controller' => $this, 'function' => 'action_smileyorder', 'permission' => 'admin_forum'),
 			'boardorder' => array('controller' => $this, 'function' => 'action_boardorder', 'permission' => 'manage_boards'),
 			'parserorder' => array('controller' => $this, 'function' => 'action_parserorder', 'permission' => 'admin_forum'),
@@ -561,6 +562,7 @@ class Xml_Controller extends Action_Controller
 									// Only change the first row value of the first smiley.
 									$smileys[$location]['rows'][$id][0]['row'] = $id;
 								}
+
 								// Make sure the smiley order is always sequential.
 								foreach ($smiley_row as $order_id => $smiley)
 									if ($order_id != $smiley['order'])
@@ -667,6 +669,102 @@ class Xml_Controller extends Action_Controller
 
 			$order[] = array(
 				'value' => $txt['parser_reordered'],
+			);
+
+			// New generic token for use
+			createToken('admin-sort', 'post');
+			$tokens = array(
+				array(
+					'value' => $context['admin-sort_token'],
+					'attributes' => array('type' => 'token'),
+				),
+				array(
+					'value' => $context['admin-sort_token_var'],
+					'attributes' => array('type' => 'token_var'),
+				),
+			);
+		}
+		// Failed validation, tough to be you
+		else
+		{
+			if (!empty($validation_session))
+				$errors[] = array('value' => $txt[$validation_session]);
+
+			if (empty($validation_token))
+				$errors[] = array('value' => $txt['token_verify_fail']);
+		}
+
+		// Return the response
+		$context['sub_template'] = 'generic_xml';
+		$context['xml_data'] = array(
+			'orders' => array(
+				'identifier' => 'order',
+				'children' => $order,
+			),
+			'tokens' => array(
+				'identifier' => 'token',
+				'children' => $tokens,
+			),
+			'errors' => array(
+				'identifier' => 'error',
+				'children' => $errors,
+			),
+		);
+	}
+
+	/**
+	 * Reorders the message icons from a drag/drop event
+	 */
+	public function action_messageiconorder()
+	{
+		global $context, $txt;
+
+		// Initilize
+		$context['xml_data'] = array();
+		$errors = array();
+		$order = array();
+		$tokens = array();
+
+		// Seems these will be needed
+		loadLanguage('Errors');
+		loadLanguage('ManageSmileys');
+		require_once(SUBSDIR . '/MessageIcons.subs.php');
+
+		// You have to be allowed to do this
+		$validation_token = validateToken('admin-sort', 'post', true, false);
+		$validation_session = validateSession();
+
+		if (empty($validation_session) && $validation_token === true)
+		{
+			// No questions that we are reordering
+			if (isset($_POST['order']) && $_POST['order'] == 'reorder')
+			{
+				// Get the current list of icons.
+				$message_icons = fetchMessageIconsDetails();
+
+				$view_order = 0;
+				$iconInsert = array();
+
+
+				// The field ids arrive in 1-n view order, so we simply build an update array
+				foreach ($_POST['list_message_icon_list'] as $id)
+				{
+						$iconInsert[] = array($id, $message_icons[$id]['board_id'], $message_icons[$id]['title'], $message_icons[$id]['filename'], $view_order);
+						$view_order++;
+				}
+
+ 				// With the replace set
+				if (!empty($iconInsert))
+				{
+					updateMessageIcon($iconInsert);
+					sortMessageIconTable();
+				}
+				else
+					$errors[] = array('value' => $txt['no_sortable_items']);
+			}
+
+			$order[] = array(
+				'value' => $txt['icons_reordered'],
 			);
 
 			// New generic token for use

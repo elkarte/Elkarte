@@ -1210,10 +1210,11 @@ class ManageSmileys_Controller extends Action_Controller
 		}
 
 		$context[$context['admin_menu_name']]['current_subsection'] = 'editicons';
-
+		$token = createToken('admin-sort');
 		$listOptions = array(
 			'id' => 'message_icon_list',
 			'title' => $txt['icons_edit_message_icons'],
+			'sortable' => true,
 			'base_href' => $scripturl . '?action=admin;area=smileys;sa=editicons',
 			'get_items' => array(
 				'function' => array($this, 'list_fetchMessageIconsDetails'),
@@ -1300,7 +1301,21 @@ class ManageSmileys_Controller extends Action_Controller
 						<input type="submit" name="delete" value="' . $txt['quickmod_delete_selected'] . '" class="right_submit" />
 						<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=smileys;sa=editicon">' . $txt['icons_add_new'] . '</a>',
 				),
+				array(
+					'position' => 'after_title',
+					'value' => $txt['icons_reorder_note'],
+				),
 			),
+			'javascript' => '
+				$().elkSortable({
+					sa: "messageiconorder",
+					error: "' . $txt['admin_order_error'] . '",
+					title: "' . $txt['admin_order_title'] . '",
+					placeholder: "ui-state-highlight",
+					href: "?action=admin;area=smileys;sa=editicons",
+					token: {token_var: "' . $token['admin-sort_token_var'] . '", token_id: "' . $token['admin-sort_token'] . '"}
+				});
+			',
 		);
 
 		require_once(SUBSDIR . '/List.class.php');

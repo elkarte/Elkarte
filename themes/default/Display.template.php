@@ -12,7 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- * 
+ *
  */
 
 /**
@@ -589,8 +589,8 @@ function template_quickreply_below()
 					iCurBoardId: ', $context['current_board'], ',
 					iCurBoardChildLevel: ', $context['jump_to']['child_level'], ',
 					sCurBoardName: "', $context['jump_to']['board_name'], '",
-					sBoardChildLevelIndicator: "&#10134;",
-					sBoardPrefix: "&#10148; ",
+					sBoardChildLevelIndicator: "&#8195;",
+					sBoardPrefix: "', isBrowser('ie8') ? '&#187; ' : '&#10148; ', '",
 					sCatClass: "jump_to_header",
 					sCatPrefix: "",
 					sGoButtonLabel: "', $txt['go'], '"

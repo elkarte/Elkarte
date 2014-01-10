@@ -68,7 +68,7 @@ body {
 	padding: 0 0 0 0;
 	/* Set a font-size that will look the same in all browsers. */
 	/* Start with the best Vista/W7 font, then Mac, Linux, then old fallbacks. */
-	font: 87.5%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", Arial, sans-serif;
+	font: 87.5%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", "Trebuchet MS", Arial, sans-serif;
 }
 
 /* Tables should show empty cells. */
@@ -411,9 +411,10 @@ em {
 	background-image: url(../images/icons/header.png);
 	background-repeat: no-repeat;
 	content: "";
+	display: inline-block;
 	height: 24px;
-	margin-top: 0.25em;
-	padding-left: 30px;
+	width: 30px;
+	vertical-align: text-bottom;
 }
 /* broke formatting for compactness */
 .cat_img_attachments:before {background-position: 0 0;}
@@ -574,19 +575,20 @@ div.windowbg, div.windowbg2 {
 	padding: 6px;
 }
 
-/* The generic wrapper thingy. Hangover from SMF 2.1 Alpha. Does we wants it? */
+/* The generic wrapper thingy. Used by generic list template */
 .generic_list_wrapper {
 	overflow: auto;
 	margin: 0;
 	padding: 8px 8px 16px 8px;
 }
-
 .generic_list_wrapper .additional_row {
 	margin: 0;
 	padding: 10px 0 0;
 }
+/* The .information box is used by the after_title additonal row */
 .generic_list_wrapper .information .additional_row {
 	border: none;
+	padding: 6px 0;
 }
 .generic_list_wrapper .information {
 	margin: 0;
@@ -2386,7 +2388,7 @@ ul.post_options li {
 	text-align: right;
 }
 .draftautosave #draft_lastautosave {
-	display: block;
+	display: inline-block;
 	min-height: 1em;
 }
 #postDraftOptions .settings dd, #postDraftOptions .settings dt{
@@ -3994,7 +3996,7 @@ a.help .icon {
 	#top, #gotop, #gobottom {
 		display: none;
 	}
-	#main_menu li, .admin_menu li {
+	.admin_menu li {
 		float: left;
 		display: block;
 		width: 48%;
@@ -4015,10 +4017,6 @@ a.help .icon {
 		float: left;
 		display: block;
 		width: 100%;
-	}
-	.menulevel2, .menulevel2:hover {
-		width: 100%;
-		font-size: 1em;
 	}
 	.generalinfo {
 		overflow: auto;
@@ -4072,6 +4070,10 @@ a.help .icon {
 	.elk_previewvideo {
 		max-width: 30em;
 	}
+	a.bbc_link {
+	    display: inline-block;
+		max-width: 16em;
+	}
 	.linktree .board_moderators, .linktree_last .board_moderators {
 		display: none;
 	}
@@ -4084,11 +4086,11 @@ a.help .icon {
 	.forumposts .windowbg, .forumposts .windowbg2 {
 		margin-bottom: 6px;
 	}
-	#button_admin, #button_home, #moderationbuttons,  a.linklevel1.button_strip_notify,
+	#button_admin, #moderationbuttons,  a.linklevel1.button_strip_notify,
 	a.linklevel1.button_strip_print, a.linklevel1.button_strip_send, .inline_mod_check,
 	a.linklevel1.quotetonew_button, a.linklevel1.button_strip_post_poll,
 	a.linklevel1.post_options, .keyinfo .post_subject, li.listlevel1.quickmod_select_all,
-	#button_profile, #collapse_button, p.inline.membergroups {
+	#collapse_button, p.inline.membergroups {
 		display: none !important;
 	}
 	.quickbuttons {

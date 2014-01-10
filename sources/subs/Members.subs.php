@@ -545,9 +545,9 @@ function registerMember(&$regOptions, $error_context = 'register')
 			'username' => $regOptions['username'],
 		)
 	);
-	// @todo Separate the sprintf?
+
 	if ($db->num_rows($request) != 0)
-		$reg_errors->addError(array('email_in_use', array(htmlspecialchars($regOptions['email'], ENT_COMPAT, 'UTF-8'))), 1);
+		$reg_errors->addError(array('email_in_use', array(htmlspecialchars($regOptions['email'], ENT_COMPAT, 'UTF-8'))));
 	$db->free_result($request);
 
 	// Perhaps someone else wants to check this user

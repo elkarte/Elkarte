@@ -1084,7 +1084,7 @@ class ScheduledTask
 
 				// This one is more complex then the other logs.  First we need to figure out which reports are too old.
 				$reports = array();
-				$result = $smcFunc['db_query']('', '
+				$result = $db->query('', '
 					SELECT id_report
 					FROM {db_prefix}log_reported
 					WHERE time_started < {int:time_started}
@@ -1539,6 +1539,7 @@ class ScheduledTask
 		}
 		else
 		{
+			$start = !empty($modSettings['user_access_mentions']) ? $modSettings['user_access_mentions'] : 0;
 			// Checks 10 users at a time, the scheduled task is set to run once per hour, so 240 users a day
 			// @todo <= I know you like it Spuds! :P It may be necessary to set it to something higher.
 			$limit = 10;
@@ -1551,13 +1552,10 @@ class ScheduledTask
 				SELECT COUNT(DISTINCT(id_member))
 				FROM {db_prefix}log_mentions
 				WHERE id_member > {int:last_id_member}
-					AND mnt.mention_type IN ({array_string:mention_types})
-				LIMIT {int:start}, {int:limit}',
+					AND mention_type IN ({array_string:mention_types})',
 				array(
 					'last_id_member' => !empty($modSettings['mentions_member_check']) ? $modSettings['mentions_member_check'] : 0,
 					'mention_types' => array('men', 'like', 'rlike'),
-					'start' => $start,
-					'limit' => $limit,
 				)
 			);
 
@@ -1572,12 +1570,11 @@ class ScheduledTask
 				SELECT DISTINCT(id_member) as id_member
 				FROM {db_prefix}log_mentions
 				WHERE id_member > {int:last_id_member}
-					AND mnt.mention_type IN ({array_string:mention_types})
-				LIMIT {int:start}, {int:limit}',
+					AND mention_type IN ({array_string:mention_types})
+				LIMIT {int:limit}',
 				array(
 					'last_id_member' => !empty($modSettings['mentions_member_check']) ? $modSettings['mentions_member_check'] : 0,
 					'mention_types' => array('men', 'like', 'rlike'),
-					'start' => $start,
 					'limit' => $limit,
 				)
 			);

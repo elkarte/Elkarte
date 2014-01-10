@@ -847,7 +847,7 @@ class Email_Parse
 	/**
 	 * Finds the message sending ip and returns it
 	 * - will look in various header fields where the ip may reside
-	 * - returns false if it cant find a valid IP4
+	 * - returns false if it can't find a valid IP4
 	 *
 	 * @return string or boolean on fail
 	 */
