@@ -895,6 +895,11 @@ ul.moderation_notes li {
 	margin: 0 8px 0 0;
 }
 
+/* Scheduled tasks */
+.errorbox ul {
+	margin-left: 5em;
+}
+
 /* Styles for the Report generation
 ------------------------------------------------- */
 #report_buttons {
@@ -1105,24 +1110,16 @@ ul.moderation_notes li {
 }
 
 /* Drag sort lists show the move cursor and up/down arrow content */
-#sort_email_fp td {
+#sort_email_fp td, #custom_profile_fields td:nth-child(2), #message_icon_list td:nth-child(-n+3) {
 	cursor: move;
 }
-#sort_email_fp td:nth-child(2):before {
+#sort_email_fp td:nth-child(2):before, #custom_profile_fields td:nth-child(2):before, #message_icon_list td:nth-child(1):before {
 	font-family: "Segoe UI Symbol", "DejaVu Sans", "GNU Unifont";
 	content: "\21f3";
 	padding-right: 5px;
 	font-size: 1.8em;
-	float: left;
-}
-#custom_profile_fields td:nth-child(2) {
-	cursor: move;
 }
 #custom_profile_fields td:nth-child(2):before {
-	font-family: "Segoe UI Symbol", "DejaVu Sans", "GNU Unifont";
-	content: "\21f3";
-	padding-right: 5px;
-	font-size: 1.8em;
 	float: left;
 	margin-top: 0.3em;
 }
@@ -1140,11 +1137,6 @@ ul.moderation_notes li {
 	border-collapse: collapse;
 	content: "";
 	display: table;
-}
-
-/* Scheduled tasks */
-.errorbox ul {
-	margin-left: 5em;
 }
 
 /* jQuery Dialog */
