@@ -1086,7 +1086,7 @@ function action_databaseChanges()
 	$upcontext['page_title'] = 'Database Changes';
 
 	// All possible files.
-	// Name, version, insert_on_complete.
+	// Name, less than version, insert_on_complete.
 	$files = array(
 		array('upgrade_1-0.sql', '1.1', '1.1 RC0'),
 		array('upgrade_1-1.sql', '2.0', '2.0 a'),
@@ -1124,7 +1124,7 @@ function action_databaseChanges()
 			$upcontext['cur_file_name'] = $file[0];
 
 			// @todo Do we actually need to do this still?
-			if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] < $file[1])
+			if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] < $file[1] || ($modSettings['elkVersion'] == '2.1 dev0' && $file[0] == 'upgrade_elk_1-0_' . $db_type . '.sql'))
 			{
 				$nextFile = parse_sql(dirname(__FILE__) . '/' . $file[0]);
 				if ($nextFile)
@@ -2337,7 +2337,7 @@ function nextSubstep($substep)
 	if (!empty($step_progress))
 	{
 		$upcontext['substep_progress'] = 0;
-		$upcontext['substep_progress_name'] = isset($step_progress['name']) ? $step_progress['name'] : 'N/A';
+		$upcontext['substep_progress_name'] = isset($step_progress['name']) ? $step_progress['name'] : '';
 		if ($step_progress['current'] > $step_progress['total'])
 			$upcontext['substep_progress'] = 99.9;
 		else
@@ -3524,9 +3524,9 @@ function template_upgrade_above()
 
 	echo '
 						<div id="substep_bar_div" class="smalltext" style="display: ', isset($upcontext['substep_progress']) ? '' : 'none', ';">', isset($upcontext['substep_progress_name']) ? trim(strtr($upcontext['substep_progress_name'], array('.' => ''))) : '', ':</div>
-						<div id="substep_bar_div2" style="font-size: 8pt; height: 12pt; border: 1px solid black; background: white; width: 50%; margin: 5px auto; display: ', isset($upcontext['substep_progress']) ? '' : 'none', ';">
-							<div id="substep_text" style="color: #000; position: absolute; margin-left: -5em;">', isset($upcontext['substep_progress']) ? $upcontext['substep_progress'] : '', '%</div>
-							<div id="substep_progress" style="width: ', isset($upcontext['substep_progress']) ? $upcontext['substep_progress'] : 0, '%; height: 12pt; z-index: 1; background: #eebaf4;">&nbsp;</div>
+						<div id="substep_bar_div2" class="progress_bar" style="display: ', isset($upcontext['substep_progress']) ? '' : 'none', ';">
+							<div id="substep_text" class="full_bar">', isset($upcontext['substep_progress']) ? $upcontext['substep_progress'] : '', '%</div>
+							<div id="substep_progress" class="blue_percent" style="width: ', isset($upcontext['substep_progress']) ? $upcontext['substep_progress'] : 0, '%; background-color: #eebaf4;">&nbsp;</div>
 						</div>';
 
 	// How long have we been running this?
