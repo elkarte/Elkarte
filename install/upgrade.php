@@ -214,7 +214,7 @@ if (isset($modSettings['elkVersion']))
 }
 
 // Make sure we have the theme information setup
-if (!isset($modSettings['theme_url']))
+if (!isset($modSettings['theme_url']) || !file_exists($modSettings['theme_url']))
 {
 	$modSettings['theme_dir'] = BOARDDIR . '/themes/default';
 	$modSettings['theme_url'] = 'themes/default';
@@ -493,6 +493,10 @@ function loadEssentialData()
 		require_once(SOURCEDIR . '/QueryString.php');
 		cleanRequest();
 	}
+
+	// Set a session life limit for the admin
+	if (isset($modSettings['admin_session_lifetime']))
+		$modSettings['admin_session_lifetime'] = 5;
 
 	if (!isset($_GET['substep']))
 		$_GET['substep'] = 0;
@@ -1273,6 +1277,10 @@ function action_deleteUpgrade()
 	if ($db_type == 'mysql' && in_array(substr($server_version, 0, 6), array('5.0.50', '5.0.51')))
 		updateSettings(array('db_mysql_group_by_fix' => '1'));
 
+	// Set jquery to auto if its not already set
+	if (!isset($modSettings['jquery_source']))
+		updateSettings(array('jquery_source' => 'auto'));
+
 	if ($command_line)
 	{
 		echo $endl;
@@ -1384,6 +1392,7 @@ function convertSettingsToTheme()
 
 		$themeData[] = array(0, 1, $variable, $value);
 	}
+
 	if (!empty($themeData))
 	{
 		$db = database();
@@ -1901,14 +1910,16 @@ function upgrade_query($string, $unbuffered = false)
 	// Get the query result - working around some specific security - just this once!
 	$modSettings['disableQueryCheck'] = true;
 	$db_unbuffered = $unbuffered;
-	$result = $db->query('', $string, 'security_override');
+	$result = $db->query('', $string, array('security_override' => true, 'db_error_skip' => true));
 	$db_unbuffered = false;
 
 	// Failure?!
 	if ($result !== false)
 		return $result;
 
+	// Grab the error message and see if its failure worthy
 	$db_error_message = $db->last_error($db_connection);
+
 	// If MySQL we do something more clever.
 	if ($db_type == 'mysql')
 	{
