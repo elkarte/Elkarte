@@ -1145,6 +1145,7 @@ function action_databaseChanges()
 				{
 					// Flag to move on to the next.
 					$upcontext['completed_step'] = true;
+
 					// Did we complete the whole file?
 					if ($nextFile)
 						$upcontext['current_debug_item_num'] = -1;
@@ -2275,13 +2276,15 @@ function checkChange(&$change)
 			FROM {db_prefix}{raw:table}',
 			array(
 				'table' => $change['table'],
-		));
+			)
+		);
+
 		// Mayday!
-		if ($db->num_rows() == 0)
+		if ($db->num_rows($request) == 0)
 			return;
 
 		// Oh where, oh where has my little field gone. Oh where can it be...
-		while ($row = $db->query($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			if ($row['Field'] == $temp[1] || $row['Field'] == $temp[2])
 			{
@@ -2334,7 +2337,7 @@ function nextSubstep($substep)
 	if (!empty($step_progress))
 	{
 		$upcontext['substep_progress'] = 0;
-		$upcontext['substep_progress_name'] = $step_progress['name'];
+		$upcontext['substep_progress_name'] = isset($step_progress['name']) ? $step_progress['name'] : 'N/A';
 		if ($step_progress['current'] > $step_progress['total'])
 			$upcontext['substep_progress'] = 99.9;
 		else
@@ -3755,26 +3758,26 @@ function template_welcome_message()
 			<h3>For security purposes please login with your admin account to proceed with the upgrade.</h3>
 			<table>
 				<tr style="vertical-align:top">
-					<td><strong ', $disable_security ? 'style="color: gray;"' : '', '>Username:</strong></td>
+					<td><strong ', $disable_security ? 'style="color: lightgray;"' : '', '>Username:</strong></td>
 					<td>
 						<input type="text" name="user" value="', !empty($upcontext['username']) ? $upcontext['username'] : '', '" ', $disable_security ? 'disabled="disabled"' : '', ' class="input_text" />';
 
 	if (!empty($upcontext['username_incorrect']))
 		echo '
-						<div class="smalltext" style="color: red;">Username Incorrect</div>';
+						<div class="error">Username Incorrect</div>';
 
 	echo '
 					</td>
 				</tr>
 				<tr style="vertical-align:top">
-					<td><strong ', $disable_security ? 'style="color: gray;"' : '', '>Password:</strong></td>
+					<td><strong ', $disable_security ? 'style="color: lightgray;"' : '', '>Password:</strong></td>
 					<td>
 						<input type="password" name="passwrd" value=""', $disable_security ? ' disabled="disabled"' : '', ' class="input_password" />
 						<input type="hidden" name="hash_passwrd" value="" />';
 
 	if (!empty($upcontext['password_failed']))
 		echo '
-						<div class="smalltext" style="color: red;">Password Incorrect</div>';
+						<div class="error">Password Incorrect</div>';
 
 	echo '
 					</td>
@@ -3794,7 +3797,7 @@ function template_welcome_message()
 	echo '
 			</table><br />
 			<span class="smalltext">
-				<strong>Note:</strong> If necessary the above security check can be bypassed for users who may administrate a server but not have admin rights on the forum. In order to bypass the above check simply open &quot;upgrade.php&quot; in a text editor and replace &quot;$disable_security = 0;&quot; with &quot;$disable_security = 1;&quot; and refresh this page.
+				<strong>Note:</strong> If necessary the above security check can be bypassed for users who may administrate a server but not have admin rights on the forum. In order to bypass the above check simply open &quot;upgrade.php&quot; in a text editor and replace &quot;$disable_security = false;&quot; with &quot;$disable_security = true1;&quot; and refresh this page.
 			</span>
 			<input type="hidden" name="login_attempt" id="login_attempt" value="1" />
 			<input type="hidden" name="js_works" id="js_works" value="0" />';
@@ -4038,7 +4041,7 @@ function template_database_changes()
 		if ($is_debug)
 		{
 			echo '
-			<div id="debug_section" style="height: 200px; overflow: auto;">
+			<div id="debug_section" class="roundframe" style="height: 200px; overflow: auto;">
 			<span id="debuginfo"></span>
 			</div>';
 		}
