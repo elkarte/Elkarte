@@ -571,18 +571,39 @@ function add_elk_mention(selector, oOptions)
 			delay: oSettings.delay,
 			scroll: oSettings.scroll,
 			helper: function(e, ui) {
-				// Create a clone of the element being dragged, add it to the body, and hide it
-				$('body').append('<div id="clone" class="' + oSettings.placeholder + '">' + ui.html() + '</div>');
-				$('#clone').hide();
+				// Fist create a helper container
+				var $originals = ui.children(),
+					$helper = ui.clone(),
+					$clone;
 
-				// Now append the clone element to the container we are working in and show it
+				// Replace the helper elements with spans, normally this is a <td> -> <span>
+				// Done to make this container agnostic.
+				$helper.children().each(function() {
+					$(this).replaceWith(function(){
+						return $("<span />", {html: $(this).html()});
+					});
+				});
+
+				// Set the width of each helper cell span to be the width of the original cells
+				$helper.children().each(function(index) {
+					// Set helper cell sizes to match the original sizes
+					return $(this).width($originals.eq(index).width()).css('display', 'inline-block');
+				});
+
+				// Next to overcome an issue where page scrolling does now work, we add the new agnostic helper
+				// element to the body, and hide it
+				$('body').append('<div id="clone" class="' + oSettings.placeholder + '">' + $helper.html()+ '</div>');
+				$clone = $('#clone');
+				$clone.hide();
+
+				// Append the clone element to the actual container we are working in and show it
 				setTimeout(function() {
-					$('#clone').appendTo(ui.parent());
-					$("#clone").show();
+					$clone.appendTo(ui.parent());
+					$clone.show();
 				}, 1);
 
-				// The above process allows page scrolls to work
-				return $("#clone");
+				// The above append process allows page scrolls to work while dragging the clone element
+				return $clone;
 			},
 			update: function(e, ui) {
 				// Called when an element is dropped in a new location
