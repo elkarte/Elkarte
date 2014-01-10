@@ -3996,7 +3996,10 @@ a.help .icon {
 		left: -4px;
 	}
 	.listlevel2, .listlevel3 {
-		width: 14em;
+		max-width: 14em !important;
+	}
+	.menulevel2 {
+		max-width: 11em;
 	}
 	.menulevel3 {
 		display: none !important;
