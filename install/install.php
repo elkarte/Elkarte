@@ -27,7 +27,7 @@ $GLOBALS['required_php_version'] = '5.1.0';
 $databases = array(
 	'mysql' => array(
 		'name' => 'MySQL',
-		'version' => '4.1.13',
+		'version' => '5.0.19',
 		'version_check' => 'return min(mysqli_get_server_info($db_connection), mysqli_get_client_info($db_connection));',
 		'supported' => function_exists('mysqli_connect'),
 		'default_user' => 'mysqli.default_user',
@@ -46,7 +46,7 @@ $databases = array(
 	),
 	'postgresql' => array(
 		'name' => 'PostgreSQL',
-		'version' => '8.0',
+		'version' => '8.3',
 		'function_check' => 'pg_connect',
 		'version_check' => '$request = pg_query(\'SELECT version()\'); list ($version) = pg_fetch_row($request); list ($pgl, $version) = explode(" ", $version); return $version;',
 		'supported' => function_exists('pg_connect'),

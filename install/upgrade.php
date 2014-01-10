@@ -23,7 +23,7 @@ define('REQUIRED_PHP_VERSION', '5.1.0');
 $databases = array(
 	'mysql' => array(
 		'name' => 'MySQL',
-		'version' => '4.1.13',
+		'version' => '5.0.19',
 		'version_check' => 'return min(mysqli_get_server_info($db_connection), mysqli_get_client_info($db_connection));',
 		'utf8_support' => true,
 		'utf8_version' => '4.1.0',
@@ -32,7 +32,7 @@ $databases = array(
 	),
 	'postgresql' => array(
 		'name' => 'PostgreSQL',
-		'version' => '8.0',
+		'version' => '8.3',
 		'utf8_support' => true,
 		'version_check' => '$version = pg_version(); return $version[\'client\'];',
 		'always_has_db' => true,
