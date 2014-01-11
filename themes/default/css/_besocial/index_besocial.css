@@ -1047,6 +1047,9 @@ a.active {
 	.board_latest {
 		border-left: 0;
 	}
+	#top_section .wrapper {
+		padding: 0;
+	}
 	.frame {
 		border-radius: 0;
 	}
@@ -1172,5 +1175,18 @@ a.active {
 	}
 	.listlevel1#button_profile .linklevel1 {
 		min-width: 0.5em;
+	}
+	#search_form {
+		padding: 4px 0;
+		width: 100%;
+		border-bottom: 1px solid #ccc;
+		float: none;
+
+	}
+	#search_form .input_text {
+		width: 14em;
+	}
+	#search_form * {
+		float: none;
 	}
 }

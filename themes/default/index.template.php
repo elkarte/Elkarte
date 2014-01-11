@@ -109,6 +109,8 @@ function template_html_above()
 		$settings['message_index_preview'] = 0;
 		// Force the usage of click menu instead of a hover menu.
 		$context['javascript_vars']['use_click_menu'] = true;
+		// Disable the search dropdown.
+		$modSettings['search_dropdown'] = false;
 	}
 
 	// Show right to left and the character set for ease of translating.
@@ -269,7 +271,7 @@ function template_body_above()
 			$selected = !empty($context['current_topic']) ? 'current_topic' : (!empty($context['current_board']) ? 'current_board' : 'all');
 
 			echo '
-				<select name="search_selection">
+				<select name="search_selection" id="search_selection">
 					<option value="all"', ($selected == 'all' ? ' selected="selected"' : ''), '>', $txt['search_entireforum'], ' </option>';
 
 			// Can't limit it to a specific topic if we are not in one
