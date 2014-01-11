@@ -794,6 +794,10 @@ a.active {
 .topic_name h4 a {
 	color: #43a8da;
 }
+li.modified {
+	color: #888;
+	font-size: 0.7em;
+}
 
 /*	$BOARDICONS	*/
 /* ------------------------------------------------------- */
