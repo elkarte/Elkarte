@@ -412,15 +412,17 @@ function template_html_below()
 }
 
 /**
- * Show a linktree. This is that thing that shows "My Community | General Category | General Discussion"..
- * @param bool $force_show = false
+ * Show a linktree. This is that thing that shows
+ * "My Community | General Category | General Discussion"..
+ * @param string $default a string representing the index in $context where
+ *               the linktree is stored (default value is 'linktree')
  */
-function theme_linktree($force_show = false)
+function theme_linktree($default = 'linktree')
 {
 	global $context, $settings;
 
 	// If linktree is empty, just return - also allow an override.
-	if (empty($context['linktree']) || (!empty($context['dont_default_linktree']) && !$force_show))
+	if (empty($context[$default]))
 		return;
 
 	// @todo - Look at changing markup here slightly. Need to incorporate relevant aria roles.
@@ -429,10 +431,10 @@ function theme_linktree($force_show = false)
 
 	// Each tree item has a URL and name. Some may have extra_before and extra_after.
 	// Added a linktree class to make targeting dividers easy.
-	foreach ($context['linktree'] as $link_num => $tree)
+	foreach ($context[$default] as $link_num => $tree)
 	{
 		echo '
-					<li class="linktree', ($link_num == count($context['linktree']) - 1) ? '_last' : '', '">';
+					<li class="linktree', ($link_num == count($context[$default]) - 1) ? '_last' : '', '">';
 
 		// Dividers moved to pseudo-elements in CSS. @todo- rtl.css
 		// Show something before the link?
