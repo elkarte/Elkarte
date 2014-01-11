@@ -685,6 +685,13 @@ div.windowbg, div.windowbg2 {
 	color: inherit;
 	font: inherit;
 	vertical-align: top;
+	padding: 0 1em 0 0;
+}
+.bbc_table th {
+	color: inherit;
+	font: inherit;
+	font-weight: bold;
+	padding: 0 1em 0 0;
 }
 .bbc_u {
 	text-decoration: underline;

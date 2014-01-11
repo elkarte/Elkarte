@@ -1386,6 +1386,27 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'disabled_after' => '',
 			),
 			array(
+				'tag' => 'th',
+				'before' => '<th>',
+				'after' => '</th>',
+				'require_parents' => array('tr'),
+				'trim' => 'outside',
+				'block_level' => true,
+				'disabled_before' => '',
+				'disabled_after' => '',
+			),
+			array(
+				'tag' => 'tr',
+				'before' => '<tr>',
+				'after' => '</tr>',
+				'require_parents' => array('table'),
+				'require_children' => array('td', 'th'),
+				'trim' => 'both',
+				'block_level' => true,
+				'disabled_before' => '',
+				'disabled_after' => '',
+			),
+			array(
 				'tag' => 'time',
 				'type' => 'unparsed_content',
 				'content' => '$1',
@@ -1394,17 +1415,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 						$data = standardTime($data);
 					else
 						$tag[\'content\'] = \'[time]$1[/time]\';'),
-			),
-			array(
-				'tag' => 'tr',
-				'before' => '<tr>',
-				'after' => '</tr>',
-				'require_parents' => array('table'),
-				'require_children' => array('td'),
-				'trim' => 'both',
-				'block_level' => true,
-				'disabled_before' => '',
-				'disabled_after' => '',
 			),
 			array(
 				'tag' => 'tt',
