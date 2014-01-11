@@ -814,22 +814,14 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 		);
 	}
 
-	censorText($subject);
 	$maillist = !empty($modSettings['maillist_enabled']) && !empty($modSettings['pbe_pm_enabled']);
 
 	// If they have post by email enabled, override disallow_sendBody
-	if ($maillist)
-	{
-		require_once(SUBSDIR . '/Emailpost.subs.php');
-		pbe_prepare_text($message, $subject);
-	}
-	elseif (empty($modSettings['disallow_sendBody']))
-	{
-		censorText($message);
-		$message = trim(un_htmlspecialchars(strip_tags(strtr(parse_bbc(htmlspecialchars($message, ENT_COMPAT, 'UTF-8'), false), array('<br />' => "\n", '</div>' => "\n", '</li>' => "\n", '&#91;' => '[', '&#93;' => ']')))));
-	}
-	else
+	if (!$maillist && !empty($modSettings['disallow_sendBody']))
 		$message = '';
+
+	require_once(SUBSDIR . '/Emailpost.subs.php');
+	pbe_prepare_text($message, $subject);
 
 	$to_names = array();
 	if (count($to_list) > 1)
