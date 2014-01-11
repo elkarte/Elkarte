@@ -124,13 +124,6 @@ function preparsecode(&$message, $previewing = false)
 				}
 			}
 
-			// Let's look at the time tags...
-			$parts[$i] = preg_replace_callback('~\[time(?:=(absolute))*\](.+?)\[/time\]~i', create_function('$m', 'global $modSettings, $user_info; return "[time]" . (is_numeric("$m[2]") || @strtotime("$m[2]") == 0 ? "$m[2]" : strtotime("$m[2]") - ("$m[1]" == "absolute" ? 0 : (($modSettings["time_offset"] + $user_info["time_offset"]) * 3600))) . "[/time]";'), $parts[$i]);
-
-			// Change the color specific tags to [color=the color].
-			$parts[$i] = preg_replace('~\[(black|blue|green|red|white)\]~', '[color=$1]', $parts[$i]);  // First do the opening tags.
-			$parts[$i] = preg_replace('~\[/(black|blue|green|red|white)\]~', '[/color]', $parts[$i]);   // And now do the closing tags
-
 			// Make sure all tags are lowercase.
 			$parts[$i] = preg_replace_callback('~\[([/]?)(list|li|table|tr|td)((\s[^\]]+)*)\]~i', create_function('$m', ' return "[$m[1]" . strtolower("$m[2]") . "$m[3]]";'), $parts[$i]);
 
@@ -278,9 +271,6 @@ function un_preparsecode($message)
 		if ($i % 4 == 0)
 		{
 			$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~i', create_function('$m', 'return "[html]" . strtr(htmlspecialchars("$m[1]", ENT_QUOTES, "UTF-8"), array("\\&quot;" => "&quot;", "&amp;#13;" => "<br />", "&amp;#32;" => " ", "&amp;#91;" => "[", "&amp;#93;" => "]")) . "[/html]";'), $parts[$i]);
-
-			// Attempt to un-parse the time to something less awful.
-			$parts[$i] = preg_replace_callback('~\[time\](\d{0,10})\[/time\]~i', create_function('$m', ' return "[time]" . timeformat("$m[1]", false) . "[/time]";'), $parts[$i]);
 		}
 
 		call_integration_hook('integrate_unpreparse_code', array(&$message, &$parts, &$i));
@@ -340,31 +330,10 @@ function fixTags(&$message)
 			'embeddedUrl' => true,
 			'hasEqualSign' => true,
 		),
-		// [ftp]ftp://...[/ftp]
-		array(
-			'tag' => 'ftp',
-			'protocols' => array('ftp', 'ftps'),
-			'embeddedUrl' => true,
-			'hasEqualSign' => false,
-		),
-		// [ftp=ftp://...]name[/ftp]
-		array(
-			'tag' => 'ftp',
-			'protocols' => array('ftp', 'ftps'),
-			'embeddedUrl' => true,
-			'hasEqualSign' => true,
-		),
-		// [flash]http://...[/flash]
-		array(
-			'tag' => 'flash',
-			'protocols' => array('http', 'https'),
-			'embeddedUrl' => false,
-			'hasEqualSign' => false,
-			'hasExtra' => true,
-		),
 	);
 
 	call_integration_hook('integrate_fixtags', array(&$fixArray, &$message));
+	
 	// Fix each type of tag.
 	foreach ($fixArray as $param)
 		fixTag($message, $param['tag'], $param['protocols'], $param['embeddedUrl'], $param['hasEqualSign'], !empty($param['hasExtra']));
