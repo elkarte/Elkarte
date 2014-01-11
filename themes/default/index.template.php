@@ -571,6 +571,10 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 {
 	global $context, $txt;
 
+	// Not sure if this can happen, but people can misuse functions very efficiently
+	if (empty($button_strip))
+		return;
+
 	if (!is_array($strip_options))
 		$strip_options = array();
 
