@@ -900,6 +900,14 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 
 		$codes = array(
 			array(
+				'tag' => 'abbr',
+				'type' => 'unparsed_equals',
+				'before' => '<abbr title="$1">',
+				'after' => '</abbr>',
+				'quoted' => 'optional',
+				'disabled_after' => ' ($1)',
+			),
+			array(
 				'tag' => 'anchor',
 				'type' => 'unparsed_equals',
 				'test' => '[#]?([A-Za-z][A-Za-z0-9_\-]*)\]',
