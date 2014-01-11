@@ -67,7 +67,7 @@ body {
 	background: #eee;
 	color: #4d4f53;
 	padding-top: 35px;
-	font: 90%/130% Helvetica, Arial, sans-serif;
+	font: 90%/130% Helvetica, Arial, "Nimbus Sans L", sans-serif;
 }
 fieldset {
 	border: none;
@@ -177,7 +177,7 @@ strong {
 	border-radius: 5px;
 	background: #eee;
 	color: #666;
-	font-size: 1.6em;
+	font-size: 1.5em;
 	font-weight: bolder;
 	text-shadow: 1px 1px 0 #ebebeb;
 }
@@ -754,7 +754,7 @@ a.active {
 }
 #news>h2 {
 	color: #7bb128;
-	font-size: 1.6em;
+	font-size: 1.5em;
 	line-height: 1.2em;
 	font-weight: bold;
 }
