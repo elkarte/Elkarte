@@ -808,9 +808,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				$disabled[trim($tag)] = true;
 		}
 
-		if (empty($modSettings['enableEmbeddedFlash']))
-			$disabled['flash'] = true;
-
 		/* The following bbc are formatted as an array, with keys as follows:
 
 			tag: the tag's name - should be lowercase!
@@ -903,22 +900,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 
 		$codes = array(
 			array(
-				'tag' => 'abbr',
-				'type' => 'unparsed_equals',
-				'before' => '<abbr title="$1">',
-				'after' => '</abbr>',
-				'quoted' => 'optional',
-				'disabled_after' => ' ($1)',
-			),
-			array(
-				'tag' => 'acronym',
-				'type' => 'unparsed_equals',
-				'before' => '<abbr title="$1">',
-				'after' => '</abbr>',
-				'quoted' => 'optional',
-				'disabled_after' => ' ($1)',
-			),
-			array(
 				'tag' => 'anchor',
 				'type' => 'unparsed_equals',
 				'test' => '[#]?([A-Za-z][A-Za-z0-9_\-]*)\]',
@@ -929,24 +910,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'tag' => 'b',
 				'before' => '<strong class="bbc_strong">',
 				'after' => '</strong>',
-			),
-			array(
-				'tag' => 'bdo',
-				'type' => 'unparsed_equals',
-				'before' => '<bdo dir="$1">',
-				'after' => '</bdo>',
-				'test' => '(rtl|ltr)\]',
-				'block_level' => true,
-			),
-			array(
-				'tag' => 'black',
-				'before' => '<span style="color: black;" class="bbc_color">',
-				'after' => '</span>',
-			),
-			array(
-				'tag' => 'blue',
-				'before' => '<span style="color: blue;" class="bbc_color">',
-				'after' => '</span>',
 			),
 			array(
 				'tag' => 'br',
@@ -1015,19 +978,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'disabled_after' => ' ($1)',
 			),
 			array(
-				'tag' => 'flash',
-				'type' => 'unparsed_commas_content',
-				'test' => '\d+,\d+\]',
-				'content' => (isBrowser('ie') ? '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" style="width: $2px; height: $3px;"><param name="movie" value="$1" /><param name="play" value="true" /><param name="loop" value="true" /><param name="quality" value="high" /><param name="wmode" value="transparent"><param name="AllowScriptAccess" value="never" /><embed src="$1" width="$2" height="$3" play="true" loop="true" quality="high" wmode="transparent" AllowScriptAccess="never" /><noembed><a href="$1" target="_blank" class="new_win">$1</a></noembed></object>' : '<embed type="application/x-shockwave-flash" src="$1" width="$2" height="$3" play="true" loop="true" quality="high" wmode="transparent" AllowScriptAccess="never" /><noembed><a href="$1" target="_blank" class="new_win">$1</a></noembed>'),
-				'validate' => create_function('&$tag, &$data, $disabled', '
-					if (isset($disabled[\'url\']))
-						$tag[\'content\'] = \'$1\';
-					elseif (strpos($data[0], \'http://\') !== 0 && strpos($data[0], \'https://\') !== 0)
-						$data[0] = \'http://\' . $data[0];
-				'),
-				'disabled_content' => '<a href="$1" target="_blank" class="new_win">$1</a>',
-			),
-			array(
 				'tag' => 'footnote',
 				'before' => '<sup class="bbc_footnotes">%fn%',
 				'after' => '%fn%</sup>',
@@ -1041,40 +991,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'type' => 'unparsed_equals',
 				'test' => '[A-Za-z0-9_,\-\s]+?\]',
 				'before' => '<span style="font-family: $1;" class="bbc_font">',
-				'after' => '</span>',
-			),
-			array(
-				'tag' => 'ftp',
-				'type' => 'unparsed_content',
-				'content' => '<a href="$1" class="bbc_ftp new_win" target="_blank">$1</a>',
-				'validate' => create_function('&$tag, &$data, $disabled', '
-					$data = strtr($data, array(\'<br />\' => \'\'));
-					if (strpos($data, \'ftp://\') !== 0 && strpos($data, \'ftps://\') !== 0)
-						$data = \'ftp://\' . $data;
-				'),
-			),
-			array(
-				'tag' => 'ftp',
-				'type' => 'unparsed_equals',
-				'before' => '<a href="$1" class="bbc_ftp new_win" target="_blank">',
-				'after' => '</a>',
-				'validate' => create_function('&$tag, &$data, $disabled', '
-					if (strpos($data, \'ftp://\') !== 0 && strpos($data, \'ftps://\') !== 0)
-						$data = \'ftp://\' . $data;
-				'),
-				'disallow_children' => array('email', 'ftp', 'url', 'iurl'),
-				'disabled_after' => ' ($1)',
-			),
-			array(
-				'tag' => 'glow',
-				'type' => 'unparsed_commas',
-				'test' => '[#0-9a-zA-Z\-]',
-				'before' => '<span style="text-shadow: $1 0 0 4px">',
-				'after' => '</span>',
-			),
-			array(
-				'tag' => 'green',
-				'before' => '<span style="color: green;" class="bbc_color">',
 				'after' => '</span>',
 			),
 			array(
@@ -1182,12 +1098,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'block_level' => true,
 			),
 			array(
-				'tag' => 'ltr',
-				'before' => '<div dir="ltr">',
-				'after' => '</div>',
-				'block_level' => true,
-			),
-			array(
 				'tag' => 'me',
 				'type' => 'unparsed_equals',
 				'before' => '<div class="meaction">&nbsp;$1 ',
@@ -1207,35 +1117,9 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'disabled_after' => '',
 			),
 			array(
-				'tag' => 'move',
-				'before' => '<marquee>',
-				'after' => '</marquee>',
-				'block_level' => true,
-				'disallow_children' => array('move'),
-			),
-			array(
 				'tag' => 'nobbc',
 				'type' => 'unparsed_content',
 				'content' => '$1',
-			),
-			array(
-				'tag' => 'php',
-				'type' => 'unparsed_content',
-				'content' => '<span class="phpcode">$1</span>',
-				'validate' => isset($disabled['php']) ? null : create_function('&$tag, &$data, $disabled', '
-					if (!isset($disabled[\'php\']))
-					{
-						$add_begin = substr(trim($data), 0, 5) != \'&lt;?\';
-						$data = highlight_php_code($add_begin ? \'&lt;?php \' . $data . \'?&gt;\' : $data);
-						if ($add_begin)
-							$data = preg_replace(array(\'~^(.+?)&lt;\?.{0,40}?php(?:&nbsp;|\s)~\', \'~\?&gt;((?:</(font|span)>)*)$~\'), \'$1\', $data, 2);
-
-						// Fix the PHP code stuff...
-						$data = str_replace("<pre style=\"display: inline;\">\t</pre>", "\t", $data);
-						$data = str_replace("\t", "<span style=\"white-space: pre;\">\t</span>", $data);
-					}'),
-				'block_level' => false,
-				'disabled_content' => '$1',
 			),
 			array(
 				'tag' => 'pre',
@@ -1288,19 +1172,8 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'block_level' => true,
 			),
 			array(
-				'tag' => 'red',
-				'before' => '<span style="color: red;" class="bbc_color">',
-				'after' => '</span>',
-			),
-			array(
 				'tag' => 'right',
 				'before' => '<div style="text-align: right;">',
-				'after' => '</div>',
-				'block_level' => true,
-			),
-			array(
-				'tag' => 'rtl',
-				'before' => '<div dir="rtl">',
 				'after' => '</div>',
 				'block_level' => true,
 			),
@@ -1308,24 +1181,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'tag' => 's',
 				'before' => '<del>',
 				'after' => '</del>',
-			),
-			array(
-				'tag' => 'shadow',
-				'type' => 'unparsed_commas',
-				'test' => '[#0-9a-zA-Z\-]{3,12},(left|right|top|bottom|[0123]\d{0,2})\]',
-				'before' => '<span style="text-shadow: $1 $2">',
-				'after' => '</span>',
-				'validate' => create_function('&$tag, &$data, $disabled', '
-					if ($data[1] == \'top\' || (is_numeric($data[1]) && $data[1] < 50))
-						$data[1] = \'0 -2px 1px\';
-					elseif ($data[1] == \'right\' || (is_numeric($data[1]) && $data[1] < 100))
-						$data[1] = \'2px 0 1px\';
-					elseif ($data[1] == \'bottom\' || (is_numeric($data[1]) && $data[1] < 190))
-						$data[1] = \'0 2px 1px\';
-					elseif ($data[1] == \'left\' || (is_numeric($data[1]) && $data[1] < 280))
-						$data[1] = \'-2px 0 1px\';
-					else
-						$data[1] = \'1px 1px 1px\';'),
 			),
 			array(
 				'tag' => 'size',
@@ -1386,16 +1241,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'disabled_after' => '',
 			),
 			array(
-				'tag' => 'time',
-				'type' => 'unparsed_content',
-				'content' => '$1',
-				'validate' => create_function('&$tag, &$data, $disabled', '
-					if (is_numeric($data))
-						$data = standardTime($data);
-					else
-						$tag[\'content\'] = \'[time]$1[/time]\';'),
-			),
-			array(
 				'tag' => 'tr',
 				'before' => '<tr>',
 				'after' => '</tr>',
@@ -1437,11 +1282,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'),
 				'disallow_children' => array('email', 'ftp', 'url', 'iurl'),
 				'disabled_after' => ' ($1)',
-			),
-			array(
-				'tag' => 'white',
-				'before' => '<span style="color: white;" class="bbc_color">',
-				'after' => '</span>',
 			),
 		);
 
@@ -1504,29 +1344,14 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 
 	if ($smileys === 'print')
 	{
-		// [glow], [shadow], and [move] can't really be printed.
-		$disabled['glow'] = true;
-		$disabled['shadow'] = true;
-		$disabled['move'] = true;
-
 		// Colors can't well be displayed... supposed to be black and white.
 		$disabled['color'] = true;
-		$disabled['black'] = true;
-		$disabled['blue'] = true;
-		$disabled['white'] = true;
-		$disabled['red'] = true;
-		$disabled['green'] = true;
 		$disabled['me'] = true;
 
-		// Color coding doesn't make sense.
-		$disabled['php'] = true;
-
 		// Links are useless on paper... just show the link.
-		$disabled['ftp'] = true;
 		$disabled['url'] = true;
 		$disabled['iurl'] = true;
 		$disabled['email'] = true;
-		$disabled['flash'] = true;
 
 		// @todo Change maybe?
 		if (!isset($_GET['images']))
@@ -1866,11 +1691,13 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 						$quote_alt = !$quote_alt;
 				}
 				// Add a class to the quote to style alternating blockquotes
-				// @todo - Frankly it makes little sense to allow alternate blockquote styling without also catering for alternate quoteheader styling.
-				// @todo - I do remember coding that some time back, but it seems to have gotten lost somewhere in the SMF 2.1 and/or Elk processes.
-				// @todo - Come to think of it, it may be better to append a second class rather than alter the standard one.
-				// @todo - Example: class="bbc_quote" and class="bbc_quote alt_quote".
-				// @todo - This would mean simpler CSS for themes (like default) which do not use the alternate styling, but would still allow it for themes that want it.
+				// @todo - Frankly it makes little sense to allow alternate blockquote styling without also catering
+				// for alternate quoteheader styling.
+				// I do remember coding that some time back, but it seems to have gotten lost somewhere in the Elk processes.
+				// Come to think of it, it may be better to append a second class rather than alter the standard one.
+				//	- Example: class="bbc_quote" and class="bbc_quote alt_quote".
+				// This would mean simpler CSS for themes (like default) which do not use the alternate styling,
+				// but would still allow it for themes that want it.
 				$possible['before'] = strtr($possible['before'], array('<blockquote>' => '<blockquote class="bbc_' . ($quote_alt ? 'alternate' : 'standard') . '_quote">'));
 			}
 
@@ -2032,7 +1859,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				$tag['content'] = $tag['disabled_content'];
 		}
 
-		// we use this alot
+		// We use this alot
 		$tag_strlen = strlen($tag['tag']);
 
 		// The only special case is 'html', which doesn't need to close things.
@@ -2069,7 +1896,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			$pos += strlen($tag['before']) - 1 + 2;
 		}
 		// Don't parse the content, just skip it.
-		elseif ($tag['type'] == 'unparsed_content')
+		elseif ($tag['type'] === 'unparsed_content')
 		{
 			$pos2 = stripos($message, '[/' . substr($message, $pos + 1, $tag_strlen) . ']', $pos1);
 			if ($pos2 === false)
@@ -2077,7 +1904,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 
 			$data = substr($message, $pos1, $pos2 - $pos1);
 
-			if (!empty($tag['block_level']) && substr($data, 0, 6) == '<br />')
+			if (!empty($tag['block_level']) && substr($data, 0, 6) === '<br />')
 				$data = substr($data, 6);
 
 			if (isset($tag['validate']))
@@ -2091,13 +1918,13 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 
 		}
 		// Don't parse the content, just skip it.
-		elseif ($tag['type'] == 'unparsed_equals_content')
+		elseif ($tag['type'] === 'unparsed_equals_content')
 		{
 			// The value may be quoted for some tags - check.
 			if (isset($tag['quoted']))
 			{
 				$quoted = substr($message, $pos1, 6) == '&quot;';
-				if ($tag['quoted'] != 'optional' && !$quoted)
+				if ($tag['quoted'] !== 'optional' && !$quoted)
 					continue;
 
 				if ($quoted)
@@ -2119,7 +1946,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				substr($message, $pos1, $pos2 - $pos1)
 			);
 
-			if (!empty($tag['block_level']) && substr($data[0], 0, 6) == '<br />')
+			if (!empty($tag['block_level']) && substr($data[0], 0, 6) === '<br />')
 				$data[0] = substr($data[0], 6);
 
 			// Validation for my parking, please!
@@ -2131,14 +1958,14 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			$pos += strlen($code) - 1 + 2;
 		}
 		// A closed tag, with no content or value.
-		elseif ($tag['type'] == 'closed')
+		elseif ($tag['type'] === 'closed')
 		{
 			$pos2 = strpos($message, ']', $pos);
 			$message = substr($message, 0, $pos) . "\n" . $tag['content'] . "\n" . substr($message, $pos2 + 1);
 			$pos += strlen($tag['content']) - 1 + 2;
 		}
-		// This one is sorta ugly... :/.  Unfortunately, it's needed for flash.
-		elseif ($tag['type'] == 'unparsed_commas_content')
+		// This one is sorta ugly... :/
+		elseif ($tag['type'] === 'unparsed_commas_content')
 		{
 			$pos2 = strpos($message, ']', $pos1);
 			if ($pos2 === false)
@@ -2162,7 +1989,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			$pos += strlen($code) - 1 + 2;
 		}
 		// This has parsed content, and a csv value which is unparsed.
-		elseif ($tag['type'] == 'unparsed_commas')
+		elseif ($tag['type'] === 'unparsed_commas')
 		{
 			$pos2 = strpos($message, ']', $pos1);
 			if ($pos2 === false)
@@ -2187,13 +2014,13 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			$pos += strlen($code) - 1 + 2;
 		}
 		// A tag set to a value, parsed or not.
-		elseif ($tag['type'] == 'unparsed_equals' || $tag['type'] == 'parsed_equals')
+		elseif ($tag['type'] === 'unparsed_equals' || $tag['type'] === 'parsed_equals')
 		{
 			// The value may be quoted for some tags - check.
 			if (isset($tag['quoted']))
 			{
 				$quoted = substr($message, $pos1, 6) == '&quot;';
-				if ($tag['quoted'] != 'optional' && !$quoted)
+				if ($tag['quoted'] !== 'optional' && !$quoted)
 					continue;
 
 				if ($quoted)
@@ -2213,7 +2040,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				$tag['validate']($tag, $data, $disabled);
 
 			// For parsed content, we must recurse to avoid security problems.
-			if ($tag['type'] != 'unparsed_equals')
+			if ($tag['type'] !== 'unparsed_equals')
 				$data = parse_bbc($data, !empty($tag['parsed_tags_allowed']) ? false : true, '', !empty($tag['parsed_tags_allowed']) ? $tag['parsed_tags_allowed'] : array());
 
 			$tag['after'] = strtr($tag['after'], array('$1' => $data));
@@ -2226,11 +2053,11 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 		}
 
 		// If this is block level, eat any breaks after it.
-		if (!empty($tag['block_level']) && substr($message, $pos + 1, 6) == '<br />')
+		if (!empty($tag['block_level']) && substr($message, $pos + 1, 6) === '<br />')
 			$message = substr($message, 0, $pos + 1) . substr($message, $pos + 7);
 
 		// Are we trimming outside this tag?
-		if (!empty($tag['trim']) && $tag['trim'] != 'outside' && preg_match('~(<br />|&nbsp;|\s)*~', substr($message, $pos + 1), $matches) != 0)
+		if (!empty($tag['trim']) && $tag['trim'] !== 'outside' && preg_match('~(<br />|&nbsp;|\s)*~', substr($message, $pos + 1), $matches) != 0)
 			$message = substr($message, 0, $pos + 1) . substr($message, $pos + 1 + strlen($matches[0]));
 	}
 
