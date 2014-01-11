@@ -824,6 +824,9 @@ li.modified {
 	color: #888;
 	font-size: 0.7em;
 }
+span.views_text {
+	display: none;
+}
 
 /*	$BOARDICONS	*/
 /* ------------------------------------------------------- */
