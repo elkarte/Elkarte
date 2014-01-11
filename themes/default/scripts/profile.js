@@ -397,3 +397,18 @@ function populateNotifyTemplate()
 		}
 	}
 }
+
+// Show the right avatar based on what radio button they just selected
+function swap_avatar()
+{
+	$('#avatar_choices input').each(function() {
+		var choice_id = $(this).attr('id');
+
+		if ($(this).is(':checked'))
+			$('#' + choice_id.replace('_choice', '')).css({display: ''});
+		else
+			$('#' + choice_id.replace('_choice', '')).css({display: 'none'});
+	});
+
+	return true;
+}
