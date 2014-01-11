@@ -1856,7 +1856,7 @@ function loadCSSFile($filenames, $params = array(), $id = '')
 		$filenames = array($filenames);
 
 	// Static values for all these settings
-	$params['stale'] = (!isset($params['stale']) || $params['stale'] === true) ? '?beta10' : (is_string($params['stale']) ? ($params['stale'] = $params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']) : '');
+	$params['stale'] = (!isset($params['stale']) || $params['stale'] === true) ? CACHE_STALE : (is_string($params['stale']) ? ($params['stale'] = $params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']) : '');
 	$params['fallback'] = (!empty($params['fallback']) && ($params['fallback'] === false)) ? false : true;
 
 	// Whoa ... we've done this before yes?
@@ -1941,7 +1941,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 		$filenames = array($filenames);
 
 	// Static values for all these files
-	$params['stale'] = (!isset($params['stale']) || $params['stale'] === true) ? '?beta10' : (is_string($params['stale']) ? ($params['stale'] = $params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']) : '');
+	$params['stale'] = (!isset($params['stale']) || $params['stale'] === true) ? CACHE_STALE : (is_string($params['stale']) ? ($params['stale'] = $params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']) : '');
 	$params['fallback'] = (!empty($params['fallback']) && ($params['fallback'] === false)) ? false : true;
 
 	// Dejvu?
