@@ -1470,7 +1470,8 @@ function loadTheme($id_theme = 0, $initialize = true)
 	}
 
 	// Initialize the theme.
-	loadSubTemplate('init', 'ignore');
+	if (function_exists('template_init'))
+		$settings += template_init();
 
 	// Guests may still need a name.
 	if ($context['user']['is_guest'] && empty($context['user']['name']))

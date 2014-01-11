@@ -574,9 +574,6 @@ class ManageThemes_Controller extends Action_Controller
 
 		loadTheme($_GET['th'], false);
 
-		// Sadly we really do need to init the template.
-		loadSubTemplate('init', 'ignore');
-
 		// Also load the actual themes language file - in case of special settings.
 		loadLanguage('Settings', '', true, true);
 
@@ -591,9 +588,9 @@ class ManageThemes_Controller extends Action_Controller
 		$settings['theme_variants'] = array();
 		if (file_exists($settings['theme_dir'] . '/index.template.php'))
 		{
-			$file_contents = implode('', file($settings['theme_dir'] . '/index.template.php'));
-			if (preg_match('~\$settings\[\'theme_variants\'\]\s*=(.+?);~', $file_contents, $matches))
-					eval('global $settings;' . $matches[0]);
+			$file_contents = implode("\n", file($settings['theme_dir'] . '/index.template.php'));
+			if (preg_match('~\'theme_variants\'\s*=>(.+?\)),$~sm', $file_contents, $matches))
+				eval('global $settings; $settings[\'theme_variants\'] = ' . $matches[1] . ';');
 		}
 
 		// Submitting!
@@ -697,10 +694,11 @@ class ManageThemes_Controller extends Action_Controller
 		// Restore the current theme.
 		loadTheme($old_id, false);
 
-		// Reinit just incase.
-		loadSubTemplate('init', 'ignore');
-
 		$settings = $old_settings;
+
+		// Reinit just incase.
+		if (function_exists('template_init'))
+			$settings += template_init();
 
 		loadTemplate('ManageThemes');
 
