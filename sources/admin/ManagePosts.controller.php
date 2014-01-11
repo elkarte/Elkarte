@@ -282,7 +282,6 @@ class ManagePosts_Controller extends Action_Controller
 		$config_vars = array(
 				// Simple post options...
 				array('check', 'removeNestedQuotes'),
-				array('check', 'enableEmbeddedFlash', 'subtext' => $txt['enableEmbeddedFlash_warning']),
 				array('check', 'enableVideoEmbeding'),
 				array('check', 'enableCodePrettify'),
 				// Note show the warning as read if pspell not installed!
