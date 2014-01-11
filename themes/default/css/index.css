@@ -157,7 +157,7 @@ textarea, .editor {
 	font-size: 1em;
 }
 .sceditor-container {
-	margin: 0 0 12px 0;
+	margin: 0 0 6px 0;
 }
 /* Gecko-specific reset - makes buttons consistent with other browsers. */
 /* Yes, rotten browser-specific code. It will save some dramas though. */
