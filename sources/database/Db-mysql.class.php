@@ -98,6 +98,13 @@ class Database_MySQL implements Database
 
 		self::$_db->_connection = $connection;
 
+		// Few databases still have not set UTF-8 as their default input charset
+		self::$_db->query('', '
+			SET NAMES UTF8',
+			array(
+			)
+		);
+
 		return $connection;
 	}
 
