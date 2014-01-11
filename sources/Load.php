@@ -32,13 +32,12 @@ function reloadSettings()
 	$db = database();
 
 	// Most database systems have not set UTF-8 as their default input charset.
-	// @todo is this still necessary? (I mean the if, not the query itself.)
-	if (!empty($db_character_set))
-		$db->query('set_character_set', '
-			SET NAMES ' . $db_character_set,
-			array(
-			)
-		);
+	// @todo I'm tempted to say that this should be a method of the db class
+	$db->query('set_character_set', '
+		SET NAMES ' . $db_character_set,
+		array(
+		)
+	);
 
 	// Try to load it from the cache first; it'll never get cached if the setting is off.
 	if (($modSettings = cache_get_data('modSettings', 90)) == null)
