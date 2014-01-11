@@ -43,7 +43,7 @@
 /*		$PROGRESS............Nifty progress bars.
 /*		$MEDIA...............Experimental media queries.
 /* ------------------------------------------------------- */
-@import url(http://weloveiconfonts.com/api/?family=fontawesome);
+
 /*	$GENERAL	*/
 /* ------------------------------------------------------- */
 /* Normal, standard links. */
@@ -61,7 +61,7 @@ a:hover, a.new_win:hover {
 /* Stop white band under footer on short pages. */
 /* This color should match $FOOTER background. */
 html {
-	background: #eee;
+	background: #4d4f54;
 }
 body {
 	background: #eee;
@@ -371,9 +371,7 @@ div.bbc_footnotes .meaction{
 /*	$MAIN.		*/
 /* ------------------------------------------------------- */
 /* The top bar. */
-#top_section {
 
-}
 #top_section .wrapper {
 	background-color: white;
 	padding: 0 15px;
@@ -423,7 +421,14 @@ div.bbc_footnotes .meaction{
 #debug_logging_wrapper {
 	background: #222;
 }
-
+#footer_section {
+	background-color: #4d4f54;
+	border-top: 2px solid #444;
+	text-align: center;
+}
+#footer_section a {
+	color: #fff;
+}
 
 /*	$MENUS		*/
 /* ------------------------------------------------------- */
