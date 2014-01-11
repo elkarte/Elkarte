@@ -22,13 +22,6 @@
 var bPost;
 function previewControl()
 {
-	if (is_ff)
-	{
-		// Firefox doesn't render <marquee> that have been put it using javascript
-		if (document.forms[form_name].elements[post_box_name].value.indexOf('[move]') !== -1)
-			return submitThisOnce(document.forms[form_name]);
-	}
-
 	// Lets make a background preview request
 	bPost = false;
 
