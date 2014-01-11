@@ -24,7 +24,7 @@ function template_report_type()
 
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=reports" method="post" accept-charset="', $context['character_set'], '">
+		<form action="', $scripturl, '?action=admin;area=reports" method="post" accept-charset="UTF-8">
 			<div id="generate_reports_type">
 				<h2 class="category_header">', $txt['generate_reports_type'], '</h2>
 				<div class="windowbg">

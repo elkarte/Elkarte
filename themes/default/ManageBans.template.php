@@ -24,7 +24,7 @@ function template_ban_edit()
 
 	echo '
 	<div id="manage_bans">
-		<form id="admin_form_wrapper" action="', $context['form_url'], '" method="post" accept-charset="', $context['character_set'], '" onsubmit="return confirmBan(this);">
+		<form id="admin_form_wrapper" action="', $context['form_url'], '" method="post" accept-charset="UTF-8" onsubmit="return confirmBan(this);">
 			<h2 class="category_header">
 				', $context['ban']['is_new'] ? $txt['ban_add_new'] : $txt['ban_edit'] . ' \'' . $context['ban']['name'] . '\'', '
 			</h2>';

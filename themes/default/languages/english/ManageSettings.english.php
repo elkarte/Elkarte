@@ -403,7 +403,6 @@ $txt['core_settings_disabled'] = 'Disabled';
 $txt['languages_lang_name'] = 'Language Name';
 $txt['languages_locale'] = 'Locale';
 $txt['languages_default'] = 'Default';
-$txt['languages_character_set'] = 'Character Set';
 $txt['languages_users'] = 'Users';
 $txt['language_settings_writable'] = 'Warning: Settings.php is not writable so the default language setting cannot be saved.';
 $txt['edit_languages'] = 'Edit Languages';

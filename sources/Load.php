@@ -1527,8 +1527,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	// Make a special URL for the language.
 	$settings['lang_images_url'] = $settings['images_url'] . '/' . (!empty($txt['image_lang']) ? $txt['image_lang'] : $user_info['language']);
 
-	// Set the character set from the template.
-	$context['character_set'] = 'UTF-8';
+	// Set a couple of bits for the template.
 	$context['right_to_left'] = !empty($txt['lang_rtl']);
 	$context['tabindex'] = 1;
 
