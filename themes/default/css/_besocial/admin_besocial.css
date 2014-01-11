@@ -1,3 +1,6 @@
 .description, .information {
 	margin-top: 4px;
 }
+#support_resources, #credits_sections {
+	margin: 0;
+}
