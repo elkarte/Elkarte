@@ -1711,7 +1711,10 @@ function profileLoadAvatarData()
 		$context['avatars'] = is_dir($modSettings['avatar_directory']) ? getServerStoredAvatars('', 0) : array();
 	}
 	else
+	{
+		$context['avatar_list'] = array();
 		$context['avatars'] = array();
+	}
 
 	// Second level selected avatar...
 	$context['avatar_selected'] = substr(strrchr($context['member']['avatar']['server_pic'], '/'), 1);
