@@ -8,6 +8,7 @@ $txt['message_icon'] = 'Message icon';
 $txt['post_in_board'] = 'Post in the board';
 $txt['subject_not_filled'] = 'The subject field was not filled out. It is required.';
 $txt['message_body_not_filled'] = 'The message body was not filled out. It is required.';
+
 // Use numeric entities in the below string.
 $txt['add_bbc'] = 'Add BBC tags';
 $txt['bold'] = 'Bold';
@@ -17,6 +18,7 @@ $txt['center'] = 'Centered';
 $txt['hyperlink'] = 'Insert Hyperlink';
 $txt['insert_email'] = 'Insert Email';
 $txt['bbc_code'] = 'Insert Code';
+
 // Escape any single quotes in here twice.. 'it\'s' -> 'it\\\'s'.
 $txt['bbc_quote'] = 'Insert Quote';
 $txt['bbc_spoiler'] = 'Insert Spoiler';
@@ -41,8 +43,10 @@ $txt['navy'] = 'Navy';
 $txt['maroon'] = 'Maroon';
 $txt['lime_green'] = 'Lime Green';
 $txt['white'] = 'White';
+
 $txt['disable_smileys'] = 'Disable smileys';
 $txt['dont_use_smileys'] = 'Don\'t use smileys.';
+
 // Escape any single quotes in here twice.. 'it\'s' -> 'it\\\'s'.
 $txt['posted_on'] = 'Posted on';
 $txt['standard'] = 'Standard';
@@ -53,17 +57,12 @@ $txt['question_mark'] = 'Question mark';
 $txt['icon_poll'] = 'Poll';
 $txt['lamp'] = 'Lamp';
 $txt['add_smileys'] = 'Add smileys';
-$txt['flash'] = 'Insert Flash';
-$txt['ftp'] = 'Insert FTP Link';
 $txt['image'] = 'Insert image';
 $txt['table'] = 'Insert table';
 $txt['table_td'] = 'Insert table column';
 $txt['topic_notify_no'] = 'There are no topics with notification.';
-$txt['marquee'] = 'Marquee';
 $txt['teletype'] = 'Teletype';
 $txt['strike'] = 'Strikethrough';
-$txt['glow'] = 'Glow';
-$txt['shadow'] = 'Shadow';
 $txt['preformatted'] = 'Preformatted text';
 $txt['left_align'] = 'Left align';
 $txt['right_align'] = 'Right align';
