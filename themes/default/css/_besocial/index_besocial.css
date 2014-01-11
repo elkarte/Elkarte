@@ -786,6 +786,9 @@ a.active {
 .board_row, .childboard_row {
 	border-bottom: 1px solid #eee;
 }
+.topic_name h4 a {
+	color: #43a8da;
+}
 
 /*	$BOARDICONS	*/
 /* ------------------------------------------------------- */
