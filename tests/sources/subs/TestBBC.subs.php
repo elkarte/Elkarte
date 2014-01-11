@@ -23,16 +23,6 @@ class TestBBC extends UnitTestCase
 				'<abbr title="so have obtained random &quot;quoted&quot; text">shor"q"t</abbr>',
 			),
 			array(
-				'Test acronym',
-				'[abbr=so have obtained random text]short[/abbr]',
-				'<abbr title="so have obtained random text">short</abbr>',
-			),
-			array(
-				'Test acronym',
-				'[abbr=so have obtained random &quot;quoted&quot; text]shor"q"t[/abbr]',
-				'<abbr title="so have obtained random &quot;quoted&quot; text">shor"q"t</abbr>',
-			),
-			array(
 				'Test anchor',
 				'[anchor=abc]destination[/anchor]',
 				'<span id="post_abc">destination</span>',
@@ -41,26 +31,6 @@ class TestBBC extends UnitTestCase
 				'Test bold',
 				'[b]bold[/b]',
 				'<strong class="bbc_strong">bold</strong>',
-			),
-			array(
-				'Test bdo rtl',
-				'[bdo=rtl]rtl[/bdo]',
-				'<bdo dir="rtl">rtl</bdo>',
-			),
-			array(
-				'Test bdo ltr',
-				'[bdo=ltr]ltr[/bdo]',
-				'<bdo dir="ltr">ltr</bdo>',
-			),
-			array(
-				'Test black',
-				'[black]black[/black]',
-				'<span style="color: black;" class="bbc_color">black</span>',
-			),
-			array(
-				'Test blue',
-				'[blue]blue[/blue]',
-				'<span style="color: blue;" class="bbc_color">blue</span>',
 			),
 			array(
 				'Test br',
