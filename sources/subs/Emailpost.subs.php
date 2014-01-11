@@ -251,7 +251,7 @@ function pbe_fix_email_quotes($body, $html)
 	}
 	$body_array[$i] = $quote_done;
 
-	// join the array back together while dropping null index's
+	// Join the array back together while dropping null index's
 	$body = implode("\n", array_values($body_array));
 
 	return $body;
@@ -314,7 +314,8 @@ function pbe_parse_email_message(&$body)
 
 	// Load up the parsers from the database
 	$request = $db->query('', '
-		SELECT filter_from, filter_type
+		SELECT
+			filter_from, filter_type
 		FROM {db_prefix}postby_emails_filters
 		WHERE filter_style = {string:filter_style}
 		ORDER BY filter_order ASC',
@@ -329,7 +330,7 @@ function pbe_parse_email_message(&$body)
 		if ($row['filter_type'] === 'regex')
 		{
 			// Test the regex and if good add it to the array, else skip it
-			// @todo these are tested at insertion, so this may be unnecessary
+			// @todo these are tested at insertion now, so this test is really not necessary
 			$temp = preg_replace($row['filter_from'], '', '$5#6#8%9456@^)098');
 			if ($temp != null)
 				$expressions[] = array('type' => 'regex', 'parser' => $row['filter_from']);
@@ -352,7 +353,7 @@ function pbe_parse_email_message(&$body)
 		// If an expression was matched our fine work is done
 		if (!empty($split[1]))
 		{
-			// If we had a find then we clip off the mail and return above the split
+			// If we had a hit then we clip off the mail and return whats above the split
 			$match = true;
 			$body = $split[0];
 			break;
@@ -376,7 +377,8 @@ function pbe_filter_email_message($text)
 
 	// load up the text filters from the database, regex first and ordered by the filter order ...
 	$request = $db->query('', '
-		SELECT filter_from, filter_to, filter_type
+		SELECT
+			filter_from, filter_to, filter_type
 		FROM {db_prefix}postby_emails_filters
 		WHERE filter_style = {string:filter_style}
 		ORDER BY filter_type ASC, filter_order ASC',
@@ -455,7 +457,7 @@ function pbe_clean_email_subject($text, $check = false)
 /**
  * Used if the original email could not be removed from the message (top of post)
  *  - Tries to quote the original message instead by using a loose original message search
- *  - Looks for email client oringinal message tags and converts them to bbc quotes
+ *  - Looks for email client original message tags and converts them to bbc quotes
  *
  * @param string $body
  */
@@ -469,25 +471,18 @@ function pbe_fix_client_quotes($body)
 
 	// On mon, jan 12, 2004 at 10:10 AM, John Smith wrote: [quote]
 	$regex[] = "~(?:" . $txt['email_on'] . ")?\w{3}, \w{3} \d{1,2},\s?\d{4} " . $txt['email_at'] . " \d{1,2}:\d{1,2} [AP]M,(.*)?" . $txt['email_wrote'] . ":\s?\s{1,4}\[quote\]~i";
-
 	// [quote] on: mon jan 12, 2004 John Smith wrote:
 	$regex[] = "~\[quote\]\s?" . $txt['email_on'] . ": \w{3} \w{3} \d{1,2}, \d{4} (.*)?" . $txt['email_wrote'] . ":\s~i";
-
 	// on jan 12, 2004 at 10:10 PM, John Smith wrote:   [quote]
 	$regex[] = "~" .  $txt['email_on'] . " \w{3} \d{1,2}, \d{4}, " . $txt['email_at'] . " \d{1,2}:\d{1,2} [AP]M,(.*)?" . $txt['email_wrote'] . ":\s{1,4}\[quote\]~i";
-
 	// on jan 12, 2004 at 10:10, John Smith wrote   [quote]
 	$regex[] = "~" .  $txt['email_on'] . " \w{3} \d{1,2}, \d{4}, " . $txt['email_at'] . " \d{1,2}:\d{1,2}, (.*)?" . $txt['email_wrote'] . ":\s{1,4}\[quote\]~i";
-
 	// quoting: John Smith on stuffz at 10:10:23 AM
 	$regex[] = "~" . $txt['email_quotefrom'] . ": (.*) " . $txt['email_on'] . " .* " . $txt['email_at'] . " \d{1,2}:\d{1,2}:\d{1,2} [AP]M~";
-
 	// quoting John Smith <johnsmith@tardis.com>
 	$regex[] = "~" . $txt['email_quoting'] . " (.*) (?:<|&lt;|\[email\]).*?@.*?(?:>|&gt;|\[/email\]):~i";
-
 	// --- in some group name "John Smith" <johnsmith@tardis.com> wrote:
 	$regex[] = "~---\s.*?\"(.*)\"\s+" . $txt['email_wrote'] . ":\s(\[quote\])?~i";
-
 	// --- in some@group.name John Smith wrote
 	$regex[] = "~---\s.*?\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,6}\b,\s(.*?)\s" . $txt['email_wrote'] . ":?~i";
 
@@ -501,10 +496,10 @@ function pbe_fix_client_quotes($body)
 				$quote[1] = preg_replace('~\[email\].*\[\/email\]~', '', $quote[1]);
 				$body = pbe_str_replace_once($quote[0], "\n" . '[quote author=' . trim($quote[1]) . "]\n", $body);
 
-				// look for [quote author=][/quote][quote] issues
+				// Look for [quote author=][/quote][quote] issues
 				$body = pbe_str_replace_once('[quote author=' . trim($quote[1]) . "]\n\n" . '[/quote][quote]', '[quote author=' . trim($quote[1]) . "]\n", $body);
 
-				// and [quote author=][quote] .... [/quote] issues
+				// And [quote author=][quote] .... [/quote] issues
 				$body = preg_replace('~\[quote author=' . trim($quote[1]) . '\][\n]{2,3}\[quote\]~', '[quote author=' . trim($quote[1]) . "]\n", $body);
 			}
 		}
@@ -615,7 +610,7 @@ function pbe_emailError($error, $email_message)
 		$key_owner = query_key_owner($email_message->message_key_id);
 		if (!empty($key_owner))
 		{
-			// Valid key so show who should have sent this key in, email aggravaters :P often mess this up
+			// Valid key so show who should have sent this key in? email aggravaters :P often mess this up
 			$email_message->email['from'] = $email_message->email['from'] . ' => ' . $key_owner;
 
 			// Since we have a valid key set those details as well
@@ -625,7 +620,7 @@ function pbe_emailError($error, $email_message)
 		}
 	}
 
-	// A valid key but it was not sent to this user ... but we did get the email from a valid user
+	// A valid key but it was not sent to this user ... but we did get the email from a valid site user
 	if ($error === 'error_key_sender_match')
 	{
 		$key_owner = query_key_owner($email_message->message_key_id);
@@ -695,10 +690,10 @@ function pbe_emailError($error, $email_message)
 	// Flush the moderator error number cache, if we are here it likely just changed.
 	cache_put_data('num_menu_errors', null, 900);
 
-	// if not running from the cli, then go back to the form
+	// If not running from the cli, then go back to the form
 	if (isset($_POST['item']))
 	{
-		// back to the form we go
+		// Back to the form we go
 		$_SESSION['email_error'] = $txt[$error];
 		redirectexit('action=admin;area=maillist');
 	}
@@ -807,6 +802,7 @@ function pbe_email_attachments($pbe, $email_message)
 		elseif (file_exists($attachment['tmp_name']))
 			@unlink($attachment['tmp_name']);
 	}
+
 	return $attachIDs;
 }
 
@@ -824,13 +820,13 @@ function pbe_find_board_number($email_address)
 	$valid_address = array();
 	$board_number = 0;
 
-	// load our valid email ids and the corresponding board ids
+	// Load our valid email ids and the corresponding board ids
 	$data = (!empty($modSettings['maillist_receiving_address'])) ? unserialize($modSettings['maillist_receiving_address']) : array();
 	foreach ($data as $key => $addr)
 		$valid_address[$addr[0]] = $addr[1];
 
 	// Who was this message sent to, may have been sent to multiple addresses
-	// so we check each one to see if we have a valid entry
+	// so we must check each one to see if we have a valid entry
 	foreach ($email_address->email['to'] as $to_email)
 	{
 		if (isset($valid_address[$to_email]))
@@ -968,7 +964,8 @@ function query_load_user_info($email)
 
 	// Find the user who owns this email address
 	$request = $db->query('', '
-		SELECT id_member
+		SELECT
+			id_member
 		FROM {db_prefix}members
 		WHERE email_address = {string:email}
 		AND is_activated = {int:act}
@@ -999,7 +996,7 @@ function query_load_user_info($email)
 			$pbe['user_info']['groups'] = array_merge(
 				array($pbe['profile']['id_group'], $pbe['profile']['id_post_group']),
 				explode(',', $pbe['profile']['additional_groups'])
-		);
+			);
 
 		// Clean up the groups
 		foreach ($pbe['user_info']['groups'] as $k => $v)
@@ -1048,7 +1045,8 @@ function query_load_permissions($type, &$pbe, $topic_info = array())
 
 	// Load up the users board or general site permissions.
 	$request = $db->query('', '
-		SELECT permission, add_deny
+		SELECT
+			permission, add_deny
 		FROM {db_prefix}' . ($type === 'board' ? 'board_permissions' : 'permissions') . '
 		WHERE id_group IN ' . $where_query,
 		array(
@@ -1088,7 +1086,8 @@ function query_sender_wrapper($from)
 
 	// The signature and email visibility details
 	$request = $db->query('', '
-	SELECT hide_email, email_address, signature
+		SELECT
+			hide_email, email_address, signature
 		FROM {db_prefix}members
 		WHERE id_member  = {int:uid}
 			AND is_activated = {int:act}
@@ -1123,7 +1122,8 @@ function query_user_keys($email)
 
 	// Find all keys sent to this email, sorted by date
 	$request = $db->query('', '
-		SELECT id_email
+		SELECT
+			id_email
 		FROM {db_prefix}postby_emails
 		WHERE email_to = {string:email}
 		ORDER BY time_sent DESC',
@@ -1152,7 +1152,8 @@ function query_key_owner($key)
 
 	// Check that this is a reply to an "actual" message by finding the key in the sent email table
 	$request = $db->query('', '
-		SELECT email_to
+		SELECT
+			email_to
 		FROM {db_prefix}postby_emails
 		WHERE id_email = {string:database_id}
 		LIMIT 1',
@@ -1211,7 +1212,8 @@ function query_load_subject($message_id, $message_type, $email)
 	{
 		// With PM's ... first get the member id based on the email
 		$request = $db->query('', '
-			SELECT id_member
+			SELECT
+				id_member
 			FROM {db_prefix}members
 			WHERE email_address = {string:email}
 				AND is_activated = {int:act}
@@ -1230,7 +1232,8 @@ function query_load_subject($message_id, $message_type, $email)
 
 			// Now find this PM ID and make sure it was sent to this member
 			$request = $db->query('', '
-				SELECT p.subject
+				SELECT
+					p.subject
 				FROM {db_prefix}pm_recipients AS pmr, {db_prefix}personal_messages AS p
 				WHERE pmr.id_pm = {int:id_pm}
 					AND pmr.id_member = {int:id_member}
@@ -1307,7 +1310,8 @@ function query_load_message($message_type, $message_id, $pbe)
 	{
 		// Load up the personal message...
 		$request = $db->query('', '
-			SELECT p.id_pm, p.subject, p.id_member_from, p.id_pm_head
+			SELECT
+				p.id_pm, p.subject, p.id_member_from, p.id_pm_head
 			FROM {db_prefix}pm_recipients AS pm, {db_prefix}personal_messages AS p, {db_prefix}members AS mem
 			WHERE pm.id_pm = {int:mess_id}
 				AND pm.id_member = {int:id_mem}
@@ -1339,7 +1343,8 @@ function query_load_board($message_id)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT id_board
+		SELECT
+			id_board
 		FROM {db_prefix}messages
 		WHERE id_msg = {int:message_id}',
 		array(
@@ -1367,7 +1372,8 @@ function query_load_board_details($board_id, $pbe)
 
 	// To post a NEW Topic, we need certain board details
 	$request = $db->query('', '
-		SELECT b.count_posts, b.id_profile, b.member_groups, b.id_theme, b.id_board
+		SELECT
+			b.count_posts, b.id_profile, b.member_groups, b.id_theme, b.id_board
 		FROM {db_prefix}boards AS b
 		WHERE {raw:query_see_board} AND id_board = {int:id_board}',
 		array(
@@ -1402,6 +1408,7 @@ function query_get_theme($id_member, $id_theme, $board_info)
 	elseif (!empty($modSettings['knownThemes']))
 	{
 		$themes = explode(',', $modSettings['knownThemes']);
+
 		if (!in_array($id_theme, $themes))
 			$id_theme = $modSettings['theme_guests'];
 		else
@@ -1412,7 +1419,8 @@ function query_get_theme($id_member, $id_theme, $board_info)
 
 	// With the theme and member, load the auto_notify variables
 	$result = $db->query('', '
-		SELECT variable, value
+		SELECT
+			variable, value
 		FROM {db_prefix}themes
 		WHERE id_member = {int:id_member}
 			AND id_theme = {int:id_theme}',
@@ -1449,7 +1457,8 @@ function query_notifications($id_member, $id_board, $id_topic, $auto_notify, $pe
 	// so we don't set both board and individual topic notifications
 	$board_notify = false;
 	$request = $db->query('', '
-		SELECT id_member
+		SELECT
+			id_member
 		FROM {db_prefix}log_notify
 		WHERE id_board = {int:board_list}
 			AND id_member = {int:current_member}',
@@ -1517,7 +1526,8 @@ function query_mark_pms($email_message, $pbe)
 	if ($db->affected_rows() > 0)
 	{
 		$result = $db->query('', '
-			SELECT labels, COUNT(*) AS num
+			SELECT
+				labels, COUNT(*) AS num
 			FROM {db_prefix}pm_recipients
 			WHERE id_member = {int:id_member}
 				AND NOT (is_read & 1 >= 1)
