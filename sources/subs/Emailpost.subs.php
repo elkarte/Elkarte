@@ -1591,7 +1591,7 @@ function query_key_maintenance($email_message)
 }
 
 /**
- * After a email post has been made, this updates the users information jus like
+ * After a email post has been made, this updates the users information just like
  * they are on the site to perform the given action.
  *  - Updates time on line
  *  - Updates last active
