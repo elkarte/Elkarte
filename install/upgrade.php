@@ -3416,7 +3416,7 @@ function template_upgrade_above()
 		<meta name="robots" content="noindex" />
 		<title>', $txt['upgrade_upgrade_utility'], '</title>
 		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css?beta10" />
-		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index_light.css?beta10" />
+		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/_light/index_light.css?beta10" />
 		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/install.css?beta10" />
 		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 		<script><!-- // --><![CDATA[

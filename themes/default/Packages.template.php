@@ -795,10 +795,10 @@ function template_view_operations()
 	<head>
 		<title>', $txt['operation_title'], '</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?beta10" />
-		<link rel="stylesheet" href="', $settings['theme_url'], '/css/admin.css?beta10" />
-		<script src="', $settings['default_theme_url'], '/scripts/script.js?beta10"></script>
-		<script src="', $settings['default_theme_url'], '/scripts/theme.js?beta10"></script>
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/admin.css', CACHE_STALE, '" />
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/', $context['theme_variant'], '/index', $context['theme_variant'], '.css', CACHE_STALE, '" />
+		<script src="', $settings['default_theme_url'], '/scripts/script.js', CACHE_STALE, '"></script>
+		<script src="', $settings['default_theme_url'], '/scripts/theme.js', CACHE_STALE, '"></script>
 	</head>
 	<body>
 		<div class="windowbg">
