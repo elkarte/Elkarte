@@ -932,6 +932,17 @@ span.views_text {
 	background-color: #43a8da;
 }
 
+/*	$TOPICS		*/
+/* ------------------------------------------------------- */
+
+/* All the signatures used in the forum. */
+.signature, .attachments, .custom_fields_above_signature {
+	border-top: 1px solid #e1e1e1;
+}
+
+.signature {
+	opacity: 0.9;
+}
 /*	$HELP		*/
 /* ------------------------------------------------------- */
 
