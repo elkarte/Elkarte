@@ -2279,6 +2279,8 @@ img.new_posts {
 fieldset.send_topic {
 	padding: 6px;
 	border: none;
+	margin: 0;
+	box-shadow: none;
 }
 dl.send_topic {
 	margin-bottom: 0;
