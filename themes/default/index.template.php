@@ -18,17 +18,17 @@
  /**
  * This template is, perhaps, the most important template in the theme. It
  * contains the main template layer that displays the header and footer of
- * the forum, namely with main_above and main_below. It also contains the
+ * the forum, namely with body_above and body_below. It also contains the
  * menu sub template, which appropriately displays the menu; the init sub
  * template, which is there to set the theme up; (init can be missing.) and
  * the linktree sub template, which sorts out the link tree.
  *
  * The init sub template should load any data and set any hardcoded options.
  *
- * The main_above sub template is what is shown above the main content, and
+ * The body_above sub template is what is shown above the main content, and
  * should contain anything that should be shown up there.
  *
- * The main_below sub template, conversely, is shown after the main content.
+ * The body_below sub template, conversely, is shown after the main content.
  * It should probably contain the copyright statement and some other things.
  *
  * The linktree sub template should display the link tree, using the data
