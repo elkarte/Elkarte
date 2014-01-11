@@ -858,6 +858,19 @@ a.active {
 	background-color: #fff;
 }
 
+/*	$TOPICS		*/
+/* ------------------------------------------------------- */
+/* The display template (topic view).
+
+/* Poll results */
+#poll_options .options .statsbar .bar {
+	border-radius: 4px;
+}
+#poll_options .options .percentage {
+	background: #fff;
+	border-radius: 4px;
+}
+
 /*	$PROGRESS	*/
 /* ------------------------------------------------------- */
 /* Styles for the progress bar */
