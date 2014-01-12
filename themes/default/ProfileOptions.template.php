@@ -1249,7 +1249,7 @@ function template_profile_avatar_select()
 		echo '
 								<div id="avatar_external">
 									<div class="smalltext">', $txt['avatar_by_url'], '</div>
-									<input type="text" name="userpicpersonal" value="', $context['member']['avatar']['external'], '" onchange="previewExternalAvatar(this.value, \'external\');" class="input_text" />
+									<input type="text" name="userpicpersonal" value="', $context['member']['avatar']['external'], '" onchange="previewExternalAvatar(this.value);" class="input_text" />
 									<br /><br />
 									<img id="external" src="', !empty($context['member']['avatar']['allow_external']) && $context['member']['avatar']['choice'] == 'external' ? $context['member']['avatar']['external'] : $modSettings['avatar_url'] . '/blank.png', '" alt="" ', !empty($modSettings['avatar_max_height_external']) ? 'height="' . $modSettings['avatar_max_height_external'] . '" ' : '', !empty($modSettings['avatar_max_width_external']) ? 'width="' . $modSettings['avatar_max_width_external'] . '"' : '', '/>
 								</div>';
@@ -1280,25 +1280,16 @@ function template_profile_avatar_select()
 	echo '
 								<script><!-- // --><![CDATA[
 									var files = ["' . implode('", "', $context['avatar_list']) . '"],
-										avatar = document.getElementById("avatar"),
 										cat = document.getElementById("cat"),
+										file = document.getElementById("file"),
 										selavatar = "' . $context['avatar_selected'] . '",
 										avatardir = "' . $modSettings['avatar_url'] . '/",
-										size = avatar != null ? avatar.alt.substr(3, 2) + " " + avatar.alt.substr(0, 2) + String.fromCharCode(117, 98, 116) : 0,
-										file = document.getElementById("file"),
+										refuse_too_large = ', !empty($modSettings['avatar_action_too_large']) &&  $modSettings['avatar_action_too_large'] == 'option_refuse' ? 'true' : 'false', ',
 										maxHeight = ', !empty($modSettings['avatar_max_height_external']) ? $modSettings['avatar_max_height_external'] : 0, ',
 										maxWidth = ', !empty($modSettings['avatar_max_width_external']) ? $modSettings['avatar_max_width_external'] : 0, ';
 
-									if (avatar != null)
-									{
-										if (avatar.src.indexOf("blank.png") > -1)
-											changeSel(selavatar);
-										else
-											previewExternalAvatar(avatar.src);
-									}
-
 									// Display the right avatar box based on what they are using
-									swap_avatar();
+									init_avatars();
 								// ]]></script>
 							</dd>';
 }
