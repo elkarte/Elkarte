@@ -1083,6 +1083,20 @@ span.views_text {
 /* Smartphones (portrait & landscape) drop the stats (views/replys) and last post from the screen */
 
 /* This one does 800 screens at default font size. */
+@media screen and (max-width: 64em) {
+	.board_lastpost {
+		float: none;
+	}
+	.board_info {
+		width: 90%;
+	}
+	.board_latest {
+		min-width: 16em;
+		width: 16em;
+	}
+}
+
+/* This one does 800 screens at default font size. */
 @media screen and (max-width: 50em) {
 	body {
 		margin-top: 35px;
