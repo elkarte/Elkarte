@@ -162,7 +162,7 @@ function template_control_richedit_buttons($editor_id)
 	// Create an area to show the draft last saved on
 	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
 		echo '
-		<span class="draftautosave">
+		<span class="draftautosave smalltext">
 			<span id="throbber" style="display:none"><img src="' . $settings['images_url'] . '/loading_sm.gif" alt="" class="centericon" />&nbsp;</span>
 			<span id="draft_lastautosave" ></span>
 		</span>';

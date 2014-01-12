@@ -459,11 +459,8 @@ function template_manage_sphinx()
 
 	echo '
 			<div class="information">
-				<div class="successbox">
-					', $context['page_description'], '
-				</div>
+				', $context['page_description'], '
 			</div>
-
 			<div class="windowbg">
 				<div class="content">
 					<dl class="settings">

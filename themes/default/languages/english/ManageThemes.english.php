@@ -38,6 +38,7 @@ $txt['theme_edit_style'] = 'Modify the stylesheets. (colors, fonts, etc.)';
 $txt['theme_edit_index'] = 'Modify the index template. (the main template)';
 $txt['theme_edit_no_save'] = 'This file cannot be saved because it is not writable.  Please make sure the following file is 777 or has the proper permissions';
 $txt['theme_edit_save'] = 'Save Changes';
+$txt['theme_edit_not_writable'] = 'Not Writable';
 
 $txt['theme_global_description'] = 'This is the default theme, which means your theme will change along with the administrators\' settings and the board you are viewing.';
 

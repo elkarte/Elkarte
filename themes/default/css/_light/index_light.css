@@ -959,9 +959,6 @@ div.bbc_footnotes .meaction{
 .board_stats {
 	color: #777;
 }
-.board_avatar {
-	display: none;
-}
 .lastpost_link>a {
 	color: #377828;
 }
@@ -1762,9 +1759,6 @@ div.bbc_footnotes .meaction{
 		top: -5px;
 		font-size: 10px;
 		line-height: 12px;
-	}
-	.linklevel1 .avatar {
-		display: none;
 	}
 	.listlevel1#button_profile .linklevel1 {
 		min-width: 0.5em;
