@@ -1418,25 +1418,28 @@ class ManageThemes_Controller extends Action_Controller
 	{
 		global $context;
 
-		// make sure the sub-template is set
+		// Make sure the sub-template is set
 		$context['sub_template'] = 'edit_template';
 
-		// retrieve the contents of the file
+		// Retrieve the contents of the file
 		$file_data = file($theme_dir . '/' . $_REQUEST['filename']);
 
-		// for a PHP template file, we display each function in separate boxes.
+		// For a PHP template file, we display each function in separate boxes.
 		$j = 0;
-		$context['file_parts'] = array(array('lines' => 0, 'line' => 1, 'data' => ''));
+		$context['file_parts'] = array(array('lines' => 0, 'line' => 1, 'data' => '', 'function' => ''));
 		for ($i = 0, $n = count($file_data); $i < $n; $i++)
 		{
-			if (isset($file_data[$i + 1]) && substr($file_data[$i + 1], 0, 9) == 'function ')
+			// @todo refactor this so the docblocks are in the function content window
+			if (substr($file_data[$i], 0, 9) === 'function ')
 			{
 				// Try to format the functions a little nicer...
-				$context['file_parts'][$j]['data'] = trim($context['file_parts'][$j]['data']) . "\n";
+				$context['file_parts'][$j]['data'] = trim($context['file_parts'][$j]['data']);
 
 				if (empty($context['file_parts'][$j]['lines']))
 					unset($context['file_parts'][$j]);
-				$context['file_parts'][++$j] = array('lines' => 0, 'line' => $i + 1, 'data' => '');
+
+				// Start a new function block
+				$context['file_parts'][++$j] = array('lines' => 0, 'line' => $i, 'data' => '');
 			}
 
 			$context['file_parts'][$j]['lines']++;
