@@ -1769,7 +1769,7 @@ function getMember($search, $buddies = array())
 		FROM {db_prefix}members
 		WHERE {raw:real_name} LIKE {string:search}' . (!empty($buddies) ? '
 			AND id_member IN ({array_int:buddy_list})' : '') . '
-			AND is_activated IN (1, 11)
+			AND is_activated IN (1, 12)
 		LIMIT ' . (Util::strlen($search) <= 2 ? '100' : '800'),
 		array(
 			'real_name' => defined('DB_CASE_SENSITIVE') ? 'LOWER(real_name)' : 'real_name',
