@@ -105,6 +105,17 @@ function template_html_above()
 {
 	global $context, $settings, $scripturl, $txt, $modSettings;
 
+	// Increased mobile device support.
+	if ($context['browser_body_id'] == 'mobile')
+	{
+		// Disable the preview text.
+		$settings['message_index_preview'] = 0;
+		// Force the usage of click menu instead of a hover menu.
+		$context['javascript_vars']['use_click_menu'] = true;
+		// Disable the search dropdown.
+		$modSettings['search_dropdown'] = false;
+	}
+
 	// Show right to left and the character set for ease of translating.
 	echo '<!DOCTYPE html>
 <html', $context['right_to_left'] ? ' dir="rtl"' : '', '>
@@ -130,6 +141,7 @@ function template_html_above()
 	echo '
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="viewport" content="width=device-width" />
+	<meta name="mobile-web-app-capable" content="yes" />
 	<meta name="description" content="', $context['page_title_html_safe'], '" />', !empty($context['meta_keywords']) ? '
 	<meta name="keywords" content="' . $context['meta_keywords'] . '" />' : '';
 
@@ -150,6 +162,7 @@ function template_html_above()
 
 	// Show all the relative links, such as help, search, contents, and the like.
 	echo '
+	<link rel="shortcut icon" sizes="196x196" href="' . $settings['images_url'] . '/mobile.png" />
 	<link rel="help" href="', $scripturl, '?action=help" />
 	<link rel="contents" href="', $scripturl, '" />', ($context['allow_search'] ? '
 	<link rel="search" href="' . $scripturl . '?action=search" />' : '');
@@ -261,7 +274,7 @@ function template_body_above()
 			$selected = !empty($context['current_topic']) ? 'current_topic' : (!empty($context['current_board']) ? 'current_board' : 'all');
 
 			echo '
-				<select name="search_selection">
+				<select name="search_selection" id="search_selection">
 					<option value="all"', ($selected == 'all' ? ' selected="selected"' : ''), '>', $txt['search_entireforum'], ' </option>';
 
 			// Can't limit it to a specific topic if we are not in one
