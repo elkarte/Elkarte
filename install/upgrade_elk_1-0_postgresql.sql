@@ -765,7 +765,7 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}log_mentions (
 	status int NOT NULL DEFAULT '0',
 	id_member_from int NOT NULL DEFAULT '0',
 	log_time int NOT NULL DEFAULT '0',
-	notif_type varchar(5) NOT NULL DEFAULT '',
+	mention_type varchar(5) NOT NULL DEFAULT '',
 	PRIMARY KEY (id_mention)
 );
 ---#
