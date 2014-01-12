@@ -139,7 +139,7 @@ $txt['cannot_who_view'] = 'Sorry - you don\'t have the proper permissions to vie
 $txt['no_theme'] = ' We can\'t find that theme.';
 $txt['theme_dir_wrong'] = 'The default theme\'s directory is wrong, please correct it by clicking this text.';
 $txt['registration_disabled'] = 'Sorry, registration is currently disabled.';
-$txt['registration_agreement_missing'] = 'The registration agreement file, agreement.txt, is either missing or empty.  Registrations have been disable until this is fixed';
+$txt['registration_agreement_missing'] = 'The registration agreement file, agreement.txt, is either missing or empty.  Registrations will be disabled until this is fixed';
 $txt['registration_no_secret_question'] = 'Sorry, there is no secret question set for this member.';
 $txt['poll_range_error'] = 'Sorry, the poll must run for more than 0 days.';
 $txt['delFirstPost'] = 'You are not allowed to delete the first post in a topic.<p>If you want to delete this topic, click on the Remove Topic link, or ask a moderator/administrator to do it for you.</p>';
@@ -189,14 +189,15 @@ $txt['no_bantype_selected'] = 'No ban type was selected';
 $txt['ban_not_found'] = 'Ban not found';
 $txt['ban_unknown_restriction_type'] = 'Restriction type unknown';
 $txt['ban_name_empty'] = 'The name of the ban was left empty';
-$txt['ban_id_empty'] = 'Dang, sorry. We tried to find this ban id, but it can\'t be found.';
+$txt['ban_id_empty'] = 'Dang, sorry. We tried to find this ban ID, but it can\'t be found.';
+$txt['ban_group_id_empty'] = 'A ban group needs a group ID, and this group didn\'t have any.';
 $txt['ban_no_triggers'] = 'Did you forget to select ban triggers? We need at least one, and we haven\'t got any.';
 $txt['ban_ban_item_empty'] = 'Ban trigger not found';
 $txt['impossible_insert_new_bangroup'] = 'An error occurred while inserting the new ban';
 
 $txt['like_heading_error'] = 'Error in Likes';
 $txt['like_unlike_error'] = 'Oops, there was an error while liking/unliking the post';
-$txt['cant_like_yourself'] = 'Liking your own posts ... its like laughing at your own jokes when there is no one else around  ... lol ... Wait did I just lol myself?';
+$txt['cant_like_yourself'] = 'Liking your own posts ... it\'s like laughing at your own jokes when there is no one else around  ... lol ... Wait did I just lol myself?';
 
 $txt['ban_name_exists'] = 'The name of this ban (%1$s) already exists. Please choose a different name.';
 $txt['ban_trigger_already_exists'] = 'This ban trigger (%1$s) already exists in %2$s.';
@@ -206,7 +207,7 @@ $txt['recycle_no_valid_board'] = 'No valid board selected for recycled topics';
 $txt['post_already_deleted'] = 'The topic or message has already been moved to the recycle board. Are you sure you want to delete it completely?<br />If so follow <a href="%1$s">this link</a>';
 
 $txt['login_threshold_fail'] = 'Sorry, you are out of login chances.  Please come back and try again later.';
-$txt['login_threshold_brute_fail'] = 'Sorry, but you\'ve reached your login attempts threshold.  Please wait 30 seconds and try again later.';
+$txt['login_threshold_brute_fail'] = 'Sorry, but you\'ve reached your login attempts threshold.  Please wait 30 seconds and try again.';
 
 $txt['who_off'] = 'We would love to let you peek at Who\'s Online, but unfortunately right now it\'s disabled.';
 
