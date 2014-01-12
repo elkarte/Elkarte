@@ -1941,51 +1941,39 @@ img.new_posts {
 }
 
 /* Poll vote options */
-/* @todo - Slow selectors for the next few declarations here. Change? */
-#poll_options ul.options {
+#poll_options .statsbar {
+	padding: 0;
+}
+#poll_options .options {
 	margin: 0 0 12px 0;
 	padding: 12px 30px 0 25px;
-}
-
-/* Poll results */
-#poll_options dl.options {
-	margin: 0 0 12px 0;
-	padding: 12px 0 12px 25px;
 	overflow: auto;
 }
-#poll_options dl.options dt {
-	float: left;
-	clear: left;
-	margin: 0;
-	padding: 4px 0;
-	max-width: 30em;
-	width: 30%;
+#poll_options .options li:after {
+	display: block;
+	clear: both;
+	content: "";
 }
-#poll_options dl.options .voted {
-	font-weight: bold;
+/* Poll results */
+#poll_options .results {
+	display: inline;
 }
-#poll_options dl.options dd {
+#poll_options li {
 	position: relative;
-	float: left;
-	margin: 0 0 4px 0;
-	padding: 0 4px 0 0;
-	min-height: 1.4em;
-	max-width: 45em;
-	width: 60%;
 }
 /* Absolute positioning stops these breaking the bars on narrow screens. */
-#poll_options dl.options .percentage {
+#poll_options .options .percentage {
 	position: absolute;
 	top: 0;
 	right: 0;
 	z-index: 2;
 	display: block;
 	float: right;
-	margin: 0 0 0 0;
 	padding: 0 2px;
 	white-space: pre;
+	margin: 3px;
+	line-height: 1.2em;
 }
-
 /* Poll notices */
 #poll_options p {
 	margin: 0 18px 2px 18px;

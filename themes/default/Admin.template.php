@@ -1448,7 +1448,7 @@ function template_admin_quick_search()
 
 	if ($context['user']['is_admin'])
 		echo '
-			<form action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="', $context['character_set'], '" id="quick_search" class="floatright">
+			<form action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="UTF-8" id="quick_search" class="floatright">
 				<img class="icon" src="', $settings['images_url'], '/filter.png" alt="" />
 				<input type="text" name="search_term" placeholder="', $txt['admin_search'], '" class="input_text" />
 				<select name="search_type">

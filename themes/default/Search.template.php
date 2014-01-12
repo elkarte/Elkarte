@@ -33,7 +33,7 @@ function template_searchform()
 					<p class="errorbox">', implode('<br />', $context['search_errors']['messages']), '</p>';
 
 	// Simple Search?
-	if ($context['simple_search'] && (empty($context['minmax_preferences']['asearch']) || isset($_GET['basic'])))
+	if ($context['simple_search'] && empty($context['minmax_preferences']['asearch']))
 	{
 		echo '
 					<fieldset id="simple_search" class="content">

@@ -632,9 +632,6 @@ class ScheduledTask
 		// Right - send out the silly things - this will take quite some space!
 		foreach ($members as $mid => $member)
 		{
-			// Right character set!
-			$context['character_set'] = 'UTF-8';
-
 			// Do the start stuff!
 			$email = array(
 				'subject' => $mbname . ' - ' . $langtxt[$lang]['subject'],
