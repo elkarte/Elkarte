@@ -257,18 +257,21 @@ class ManageThemes_Controller extends Action_Controller
 	/**
 	 * This function lists the available themes and provides an interface
 	 * to reset the paths of all the installed themes.
+	 *
+	 * @uses sub template list_themes, tempalte ManageThemes
 	 */
 	public function action_list()
 	{
 		global $context, $boardurl;
 
+		// Load in the helpers we need
 		require_once(SUBSDIR . '/Themes.subs.php');
-
 		loadLanguage('Admin');
 
 		if (isset($_REQUEST['th']))
 			return $this->action_setthemesettings();
 
+		// Saving?
 		if (isset($_POST['save']))
 		{
 			checkSession();
@@ -306,6 +309,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		$context['themes'] = installedThemes();
 
+		// For each theme, make sure the directory exists, and try to fetch the theme version
 		foreach ($context['themes'] as $i => $theme)
 		{
 			$context['themes'][$i]['theme_dir'] = realpath($context['themes'][$i]['theme_dir']);
@@ -325,29 +329,34 @@ class ManageThemes_Controller extends Action_Controller
 			$context['themes'][$i]['valid_path'] = file_exists($context['themes'][$i]['theme_dir']) && is_dir($context['themes'][$i]['theme_dir']);
 		}
 
+		// Off to the template we go
+		$context['sub_template'] = 'list_themes';
 		$context['reset_dir'] = realpath(BOARDDIR . '/themes');
 		$context['reset_url'] = $boardurl . '/themes';
 
-		$context['sub_template'] = 'list_themes';
 		createToken('admin-tl');
 		createToken('admin-tr', 'request');
 	}
 
 	/**
 	 * Administrative global settings.
+	 * Accessed by ?action=admin;area=theme;sa=reset;
+	 *
+	 * @uses sub template set_options, template file Settings
+	 * @uses template file ManageThemes
 	 */
 	public function action_options()
 	{
 		global $txt, $context, $settings, $modSettings;
 
 		require_once(SUBSDIR . '/Themes.subs.php');
-		$_GET['th'] = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
+		$theme = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
 
-		if (empty($_GET['th']) && empty($_GET['id']))
+		if (empty($theme) && empty($_GET['id']))
 		{
 			$context['themes'] = installedThemes();
 
-			//How many options do we have setup for guests?
+			// How many options do we have setup for guests?
 			$guestOptions = countConfiguredGuestOptions();
 			foreach ($guestOptions as $guest_option)
 				$context['themes'][$guest_option['id_theme']]['num_default_options'] = $guest_option['value'];
@@ -376,20 +385,19 @@ class ManageThemes_Controller extends Action_Controller
 
 			if (empty($_POST['options']))
 				$_POST['options'] = array();
+
 			if (empty($_POST['default_options']))
 				$_POST['default_options'] = array();
 
 			// Set up the sql query.
 			$setValues = array();
-
 			foreach ($_POST['options'] as $opt => $val)
-				$setValues[] = array($_GET['th'], -1, $opt, is_array($val) ? implode(',', $val) : $val);
+				$setValues[] = array($theme, -1, $opt, is_array($val) ? implode(',', $val) : $val);
 
 			$old_settings = array();
 			foreach ($_POST['default_options'] as $opt => $val)
 			{
 				$old_settings[] = $opt;
-
 				$setValues[] = array(1, -1, $opt, is_array($val) ? implode(',', $val) : $val);
 			}
 
@@ -403,11 +411,12 @@ class ManageThemes_Controller extends Action_Controller
 				updateThemeOptions($setValues);
 			}
 
-			cache_put_data('theme_settings-' . $_GET['th'], null, 90);
+			cache_put_data('theme_settings-' . $theme, null, 90);
 			cache_put_data('theme_settings-1', null, 90);
 
 			redirectexit('action=admin;area=theme;' . $context['session_var'] . '=' . $context['session_id'] . ';sa=reset');
 		}
+		// Changing the current options for all members using this theme
 		elseif (isset($_POST['submit']) && $_POST['who'] == 1)
 		{
 			checkSession();
@@ -446,22 +455,22 @@ class ManageThemes_Controller extends Action_Controller
 				elseif ($_POST['options_master'][$opt] == 1)
 				{
 					// Delete then insert for ease of database compatibility - again!
-					removeThemeOptions($_GET['th'], 'non_default', $opt);
-					addThemeOptions($_GET['th'], $opt, $val);
+					removeThemeOptions($theme, 'non_default', $opt);
+					addThemeOptions($theme, $opt, $val);
 				}
 				elseif ($_POST['options_master'][$opt] == 2)
-					removeThemeOptions($_GET['th'], 'all', $opt);
-
+					removeThemeOptions($theme, 'all', $opt);
 			}
 
 			redirectexit('action=admin;area=theme;' . $context['session_var'] . '=' . $context['session_id'] . ';sa=reset');
 		}
+		// Remove all members options and use the defaults
 		elseif (!empty($_GET['who']) && $_GET['who'] == 2)
 		{
 			checkSession('get');
 			validateToken('admin-stor', 'request');
 
-			removeThemeOptions($_GET['th'], 'members');
+			removeThemeOptions($theme, 'members');
 
 			redirectexit('action=admin;area=theme;' . $context['session_var'] . '=' . $context['session_id'] . ';sa=reset');
 		}
@@ -469,8 +478,7 @@ class ManageThemes_Controller extends Action_Controller
 		$old_id = $settings['theme_id'];
 		$old_settings = $settings;
 
-		loadTheme($_GET['th'], false);
-
+		loadTheme($theme, false);
 		loadLanguage('Profile');
 
 		// @todo Should we just move these options so they are no longer theme dependant?
@@ -480,16 +488,16 @@ class ManageThemes_Controller extends Action_Controller
 		loadTemplate('Settings');
 		loadSubTemplate('options');
 
+		// Set up for the template
 		$context['sub_template'] = 'set_options';
 		$context['page_title'] = $txt['theme_settings'];
-
 		$context['options'] = $context['theme_options'];
 		$context['theme_settings'] = $settings;
 
+		// Load the options for these theme
 		if (empty($_REQUEST['who']))
 		{
-			$context['theme_options'] = loadThemeOptionsInto(array(1, $_GET['th']), -1, $context['theme_options']);
-
+			$context['theme_options'] = loadThemeOptionsInto(array(1, $theme), -1, $context['theme_options']);
 			$context['theme_options_reset'] = false;
 		}
 		else
@@ -498,6 +506,7 @@ class ManageThemes_Controller extends Action_Controller
 			$context['theme_options_reset'] = true;
 		}
 
+		// Prepare the options for the template
 		foreach ($context['options'] as $i => $setting)
 		{
 			// Is this disabled?
@@ -512,6 +521,7 @@ class ManageThemes_Controller extends Action_Controller
 				continue;
 			}
 
+			// Type of field so we display the right input field
 			if (!isset($setting['type']) || $setting['type'] == 'bool')
 				$context['options'][$i]['type'] = 'checkbox';
 			elseif ($setting['type'] == 'int' || $setting['type'] == 'integer')
@@ -547,18 +557,19 @@ class ManageThemes_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Themes.subs.php');
 
+		// Nothing chosen, back to the start you go
 		if (empty($_GET['th']) && empty($_GET['id']))
 			return $this->action_admin();
-		$_GET['th'] = isset($_GET['th']) ? (int) $_GET['th'] : (int) $_GET['id'];
+
+		$theme = isset($_GET['th']) ? (int) $_GET['th'] : (int) $_GET['id'];
+
+		// Validate inputs/user.
+		if (empty($theme))
+			fatal_lang_error('no_theme', false);
 
 		// Select the best fitting tab.
 		$context[$context['admin_menu_name']]['current_subsection'] = 'list';
-
 		loadLanguage('Admin');
-
-		// Validate inputs/user.
-		if (empty($_GET['th']))
-			fatal_lang_error('no_theme', false);
 
 		// Fetch the smiley sets...
 		$sets = explode(',', 'none,' . $modSettings['smiley_sets_known']);
@@ -572,7 +583,7 @@ class ManageThemes_Controller extends Action_Controller
 		$old_id = $settings['theme_id'];
 		$old_settings = $settings;
 
-		loadTheme($_GET['th'], false);
+		loadTheme($theme, false);
 
 		// Also load the actual themes language file - in case of special settings.
 		loadLanguage('Settings', '', true, true);
@@ -596,6 +607,7 @@ class ManageThemes_Controller extends Action_Controller
 		// Submitting!
 		if (isset($_POST['save']))
 		{
+			// Allowed?
 			checkSession();
 			validateToken('admin-sts');
 
@@ -611,6 +623,7 @@ class ManageThemes_Controller extends Action_Controller
 				if (!is_array($item))
 					continue;
 
+				// Clean them up for the database
 				foreach (array('options', 'default_options') as $option)
 				{
 					if (!isset($_POST[$option][$item['id']]))
@@ -627,7 +640,7 @@ class ManageThemes_Controller extends Action_Controller
 			// Set up the sql query.
 			$inserts = array();
 			foreach ($_POST['options'] as $opt => $val)
-				$inserts[] = array($_GET['th'], 0, $opt, is_array($val) ? implode(',', $val) : $val);
+				$inserts[] = array($theme, 0, $opt, is_array($val) ? implode(',', $val) : $val);
 
 			foreach ($_POST['default_options'] as $opt => $val)
 				$inserts[] = array(1, 0, $opt, is_array($val) ? implode(',', $val) : $val);
@@ -636,13 +649,12 @@ class ManageThemes_Controller extends Action_Controller
 			if (!empty($inserts))
 				updateThemeOptions($inserts);
 
-			cache_put_data('theme_settings-' . $_GET['th'], null, 90);
+			// Clear and Invalidate the cache.
+			cache_put_data('theme_settings-' . $theme, null, 90);
 			cache_put_data('theme_settings-1', null, 90);
-
-			// Invalidate the cache.
 			updateSettings(array('settings_updated' => time()));
 
-			redirectexit('action=admin;area=theme;sa=list;th=' . $_GET['th'] . ';' . $context['session_var'] . '=' . $context['session_id']);
+			redirectexit('action=admin;area=theme;sa=list;th=' . $theme . ';' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
 		$context['sub_template'] = 'set_settings';
@@ -663,6 +675,7 @@ class ManageThemes_Controller extends Action_Controller
 			if (!is_array($setting))
 				continue;
 
+			// Create the right input fields for the data
 			if (!isset($setting['type']) || $setting['type'] == 'bool')
 				$context['settings'][$i]['type'] = 'checkbox';
 			elseif ($setting['type'] == 'int' || $setting['type'] == 'integer')
@@ -722,25 +735,25 @@ class ManageThemes_Controller extends Action_Controller
 		validateToken('admin-tr', 'request');
 
 		// The theme's ID must be an integer.
-		$_GET['th'] = isset($_GET['th']) ? (int) $_GET['th'] : (int) $_GET['id'];
+		$theme = isset($_GET['th']) ? (int) $_GET['th'] : (int) $_GET['id'];
 
 		// You can't delete the default theme!
-		if ($_GET['th'] == 1)
+		if ($theme == 1)
 			fatal_lang_error('no_access', false);
 
 		$known = explode(',', $modSettings['knownThemes']);
 		for ($i = 0, $n = count($known); $i < $n; $i++)
 		{
-			if ($known[$i] == $_GET['th'])
+			if ($known[$i] == $theme)
 				unset($known[$i]);
 		}
 
-		deleteTheme($_GET['th']);
+		deleteTheme($theme);
 
 		$known = strtr(implode(',', $known), array(',,' => ','));
 
 		// Fix it if the theme was the overall default theme.
-		if ($modSettings['theme_guests'] == $_GET['th'])
+		if ($modSettings['theme_guests'] == $theme)
 			updateSettings(array('theme_guests' => '1', 'knownThemes' => $known));
 		else
 			updateSettings(array('knownThemes' => $known));
@@ -769,6 +782,7 @@ class ManageThemes_Controller extends Action_Controller
 				'error' => 1,
 				'text' => $txt['session_verify_fail'],
 			);
+
 			return;
 		}
 
@@ -796,10 +810,10 @@ class ManageThemes_Controller extends Action_Controller
 		}
 
 		// The theme's ID must be an integer.
-		$_GET['th'] = isset($_GET['th']) ? (int) $_GET['th'] : (int) $_GET['id'];
+		$theme = isset($_GET['th']) ? (int) $_GET['th'] : (int) $_GET['id'];
 
 		// You can't delete the default theme!
-		if ($_GET['th'] == 1)
+		if ($theme == 1)
 		{
 			loadLanguage('Errors');
 			$context['xml_data'] = array(
@@ -813,17 +827,17 @@ class ManageThemes_Controller extends Action_Controller
 		$known = explode(',', $modSettings['knownThemes']);
 		for ($i = 0, $n = count($known); $i < $n; $i++)
 		{
-			if ($known[$i] == $_GET['th'])
+			if ($known[$i] == $theme)
 				unset($known[$i]);
 		}
 
 		// Finally, remove it
-		deleteTheme($_GET['th']);
+		deleteTheme($theme);
 
 		$known = strtr(implode(',', $known), array(',,' => ','));
 
 		// Fix it if the theme was the overall default theme.
-		if ($modSettings['theme_guests'] == $_GET['th'])
+		if ($modSettings['theme_guests'] == $theme)
 			updateSettings(array('theme_guests' => '1', 'knownThemes' => $known));
 		else
 			updateSettings(array('knownThemes' => $known));
@@ -912,6 +926,7 @@ class ManageThemes_Controller extends Action_Controller
 			if (!empty($_GET['vrt']) && ($_REQUEST['u'] == '0' || $_REQUEST['u'] == '-1'))
 			{
 				updateThemeOptions(array($_GET['th'], 0, 'default_variant', $_GET['vrt']));
+
 				// Make it obvious that it's changed
 				cache_put_data('theme_settings-' . $_GET['th'], null, 90);
 			}
@@ -1310,14 +1325,14 @@ class ManageThemes_Controller extends Action_Controller
 	}
 
 	/**
-	 * Allows choosing, browsing, and editing a theme files.
+	 * Allows choosing, browsing, and editing a themes files.
 	 *
 	 * Its subactions handle several features:
 	 *  - edit_template: display and edit a PHP template file
 	 *  - edit_style: display and edit a CSS file
 	 *  - edit_file: display and edit other files in the theme
 	 *
-	 * uses the Themes template
+	 * @uses the ManageThemes template
 	 * accessed via ?action=admin;area=theme;sa=edit
 	 */
 	public function action_edit()
@@ -1331,11 +1346,11 @@ class ManageThemes_Controller extends Action_Controller
 
 		$selectedTheme = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
 
-		//Unfortunately we cannot edit an unkwown theme.. redirect.
+		// Unfortunately we cannot edit an unkwown theme.. redirect.
 		if (empty($selectedTheme))
 			redirectexit('action=admin;area=theme;sa=themelist');
 
-		// you're browsing around, aren't you
+		// You're browsing around, aren't you
 		elseif (!isset($_REQUEST['filename']))
 			redirectexit('action=admin;area=theme;sa=browse;th=' . $selectedTheme);
 
@@ -1343,7 +1358,6 @@ class ManageThemes_Controller extends Action_Controller
 		$context['session_error'] = false;
 
 		// We're editing a theme file.
-
 		// Get the directory of the theme we are editing.
 		$context['theme_id'] = $selectedTheme;
 		$theme_dir = themeDirectory($context['theme_id']);
@@ -1355,7 +1369,7 @@ class ManageThemes_Controller extends Action_Controller
 		{
 			$this->_action_edit_submit();
 
-			// now lets get out of here!
+			// Now lets get out of here!
 			return;
 		}
 
@@ -1391,7 +1405,7 @@ class ManageThemes_Controller extends Action_Controller
 	}
 
 	/**
-	 * Displays for edition in admin panel a template file.
+	 * Displays for editing in the admin panel a template file.
 	 *
 	 * This function is forwarded to, from
 	 * ?action=admin;area=theme;sa=edit
@@ -1402,25 +1416,28 @@ class ManageThemes_Controller extends Action_Controller
 	{
 		global $context;
 
-		// make sure the sub-template is set
+		// Make sure the sub-template is set
 		$context['sub_template'] = 'edit_template';
 
-		// retrieve the contents of the file
+		// Retrieve the contents of the file
 		$file_data = file($theme_dir . '/' . $_REQUEST['filename']);
 
-		// for a PHP template file, we display each function in separate boxes.
+		// For a PHP template file, we display each function in separate boxes.
 		$j = 0;
-		$context['file_parts'] = array(array('lines' => 0, 'line' => 1, 'data' => ''));
+		$context['file_parts'] = array(array('lines' => 0, 'line' => 1, 'data' => '', 'function' => ''));
 		for ($i = 0, $n = count($file_data); $i < $n; $i++)
 		{
-			if (isset($file_data[$i + 1]) && substr($file_data[$i + 1], 0, 9) == 'function ')
+			// @todo refactor this so the docblocks are in the function content window
+			if (substr($file_data[$i], 0, 9) === 'function ')
 			{
 				// Try to format the functions a little nicer...
-				$context['file_parts'][$j]['data'] = trim($context['file_parts'][$j]['data']) . "\n";
+				$context['file_parts'][$j]['data'] = trim($context['file_parts'][$j]['data']);
 
 				if (empty($context['file_parts'][$j]['lines']))
 					unset($context['file_parts'][$j]);
-				$context['file_parts'][++$j] = array('lines' => 0, 'line' => $i + 1, 'data' => '');
+
+				// Start a new function block
+				$context['file_parts'][++$j] = array('lines' => 0, 'line' => $i, 'data' => '');
 			}
 
 			$context['file_parts'][$j]['lines']++;
@@ -1431,7 +1448,7 @@ class ManageThemes_Controller extends Action_Controller
 	}
 
 	/**
-	 * Handles edition in admin of other types of files from a theme,
+	 * Handles editing in admin of other types of files from a theme,
 	 * except templates and css.
 	 *
 	 * This function is forwarded to, from
@@ -1450,8 +1467,7 @@ class ManageThemes_Controller extends Action_Controller
 
 	/**
 	 * This function handles submission of a template file.
-	 * It checks the file for syntax errors, and if it passes,
-	 * it saves it.
+	 * It checks the file for syntax errors, and if it passes, it saves it.
 	 *
 	 * This function is forwarded to, from
 	 * ?action=admin;area=theme;sa=edit
@@ -1491,9 +1507,11 @@ class ManageThemes_Controller extends Action_Controller
 				$entire_file = implode("\n", $file);
 			else
 				$entire_file = $file;
+
+			// Convert our tabs back to tabs!
 			$entire_file = rtrim(strtr($entire_file, array("\r" => '', '   ' => "\t")));
 
-			// errors? No errors!
+			// Errors? No errors!
 			$errors = array();
 
 			// For PHP files, we check the syntax.
@@ -1522,10 +1540,9 @@ class ManageThemes_Controller extends Action_Controller
 				// We're done here.
 				redirectexit('action=admin;area=theme;th=' . $selectedTheme . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=browse;directory=' . dirname($_REQUEST['filename']));
 			}
+			// I can't let you off the hook yet: syntax errors are a nasty beast.
 			else
 			{
-				// I can't let you off the hook yet: syntax errors are a nasty beast.
-
 				// Pick the right sub-template for the next try
 				if ($is_template)
 					$context['sub_template'] = 'edit_template';
@@ -1618,7 +1635,7 @@ class ManageThemes_Controller extends Action_Controller
 		// Now, where exactly are you?
 		if (isset($_GET['directory']))
 		{
-			if (substr($_GET['directory'], 0, 1) == '.')
+			if (substr($_GET['directory'], 0, 1) === '.')
 				$_GET['directory'] = '';
 			else
 			{
@@ -1706,7 +1723,7 @@ class ManageThemes_Controller extends Action_Controller
 
 	/**
 	 * Makes a copy of a template file in a new location
-	 * @uses Themes template, copy_template sub-template.
+	 * @uses ManageThemes template, copy_template sub-template.
 	 */
 	public function action_copy()
 	{
@@ -1844,7 +1861,7 @@ class ManageThemes_Controller extends Action_Controller
 
 	/**
 	* This function makes necessary pre-checks and fills
-	* the contextual data as needed by theme edition functions.
+	* the contextual data as needed by theme editing functions.
 	*
 	* @param string $theme_dir absolute path of the selected theme directory
 	*/
@@ -1857,7 +1874,7 @@ class ManageThemes_Controller extends Action_Controller
 			fatal_lang_error('theme_edit_missing', false);
 
 		// You're editing a file: we have extra-checks coming up first.
-		if (substr($_REQUEST['filename'], 0, 1) == '.')
+		if (substr($_REQUEST['filename'], 0, 1) === '.')
 			$_REQUEST['filename'] = '';
 		else
 		{

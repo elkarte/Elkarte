@@ -132,7 +132,7 @@ function preparsecode(&$message, $previewing = false)
 			$parts[$i] = preg_replace('~\[/(black|blue|green|red|white)\]~', '[/color]', $parts[$i]);   // And now do the closing tags
 
 			// Make sure all tags are lowercase.
-			$parts[$i] = preg_replace_callback('~\[([/]?)(list|li|table|tr|td)((\s[^\]]+)*)\]~i', create_function('$m', ' return "[$m[1]" . strtolower("$m[2]") . "$m[3]]";'), $parts[$i]);
+			$parts[$i] = preg_replace_callback('~\[([/]?)(list|li|table|tr|td|th)((\s[^\]]+)*)\]~i', create_function('$m', ' return "[$m[1]" . strtolower("$m[2]") . "$m[3]]";'), $parts[$i]);
 
 			$list_open = substr_count($parts[$i], '[list]') + substr_count($parts[$i], '[list ');
 			$list_close = substr_count($parts[$i], '[/list]');
@@ -144,14 +144,14 @@ function preparsecode(&$message, $previewing = false)
 			$mistake_fixes = array(
 				// Find [table]s not followed by [tr].
 				'~\[table\](?![\s' . $non_breaking_space . ']*\[tr\])~su' => '[table][tr]',
-				// Find [tr]s not followed by [td].
-				'~\[tr\](?![\s' . $non_breaking_space . ']*\[td\])~su' => '[tr][td]',
-				// Find [/td]s not followed by something valid.
-				'~\[/td\](?![\s' . $non_breaking_space . ']*(?:\[td\]|\[/tr\]|\[/table\]))~su' => '[/td][/tr]',
+				// Find [tr]s not followed by [td] or [th]
+				'~\[tr\](?![\s' . $non_breaking_space . ']*\[t[dh]\])~su' => '[tr][td]',
+				// Find [/td] and [/th]s not followed by something valid.
+				'~\[/t([dh])\](?![\s' . $non_breaking_space . ']*(?:\[t[dh]\]|\[/tr\]|\[/table\]))~su' => '[/t$1][/tr]',
 				// Find [/tr]s not followed by something valid.
 				'~\[/tr\](?![\s' . $non_breaking_space . ']*(?:\[tr\]|\[/table\]))~su' => '[/tr][/table]',
-				// Find [/td]s incorrectly followed by [/table].
-				'~\[/td\][\s' . $non_breaking_space . ']*\[/table\]~su' => '[/td][/tr][/table]',
+				// Find [/td] [/th]s incorrectly followed by [/table].
+				'~\[/t([dh])\][\s' . $non_breaking_space . ']*\[/table\]~su' => '[/t$1][/tr][/table]',
 				// Find [table]s, [tr]s, and [/td]s (possibly correctly) followed by [td].
 				'~\[(table|tr|/td)\]([\s' . $non_breaking_space . ']*)\[td\]~su' => '[$1]$2[_td_]',
 				// Now, any [td]s left should have a [tr] before them.
@@ -197,10 +197,12 @@ function preparsecode(&$message, $previewing = false)
 			$table_array = array();
 			$table_order = array(
 				'table' => 'td',
+				'table' => 'th',
 				'tr' => 'table',
 				'td' => 'tr',
+				'th' => 'tr',
 			);
-			while (preg_match('~\[(/)*(table|tr|td)\]~', $table_check, $matches) != false)
+			while (preg_match('~\[(/)*(table|tr|td|th)\]~', $table_check, $matches) != false)
 			{
 				// Keep track of where this is.
 				$offset = strpos($table_check, $matches[0]);

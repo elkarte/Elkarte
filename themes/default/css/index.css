@@ -157,7 +157,7 @@ textarea, .editor {
 	font-size: 1em;
 }
 .sceditor-container {
-	margin: 0 0 12px 0;
+	margin: 0 0 6px 0;
 }
 /* Gecko-specific reset - makes buttons consistent with other browsers. */
 /* Yes, rotten browser-specific code. It will save some dramas though. */
@@ -685,6 +685,13 @@ div.windowbg, div.windowbg2 {
 	color: inherit;
 	font: inherit;
 	vertical-align: top;
+	padding: 0 1em 0 0;
+}
+.bbc_table th {
+	color: inherit;
+	font: inherit;
+	font-weight: bold;
+	padding: 0 1em 0 0;
 }
 .bbc_u {
 	text-decoration: underline;
@@ -2260,6 +2267,8 @@ img.new_posts {
 fieldset.send_topic {
 	padding: 6px;
 	border: none;
+	margin: 0;
+	box-shadow: none;
 }
 dl.send_topic {
 	margin-bottom: 0;

@@ -70,6 +70,7 @@ class Reports_Controller extends Action_Controller
 		);
 
 		call_integration_hook('integrate_report_types');
+
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['generate_reports'],
@@ -93,6 +94,7 @@ class Reports_Controller extends Action_Controller
 			$context['sub_template'] = 'report_type';
 			return;
 		}
+
 		$context['report_type'] = $_REQUEST['rt'];
 		$context['sub_template'] = 'generate_report';
 
@@ -127,7 +129,7 @@ class Reports_Controller extends Action_Controller
 		// Build the reports button array.
 		$context['report_buttons'] = array(
 			'generate_reports' => array('text' => 'generate_reports', 'image' => 'print.png', 'lang' => true, 'url' => $scripturl . '?action=admin;area=reports', 'active' => true),
-			'print' => array('text' => 'print', 'image' => 'print.png', 'lang' => true, 'url' => $scripturl . '?action=admin;area=reports;rt=' . $context['report_type']. ';st=print', 'custom' => 'target="_blank"'),
+			'print' => array('text' => 'print', 'image' => 'print.png', 'lang' => true, 'url' => $scripturl . '?action=admin;area=reports;rt=' . $context['report_type'] . ';st=print', 'custom' => 'target="_blank"'),
 		);
 
 		// Allow mods to add additional buttons here
@@ -157,6 +159,7 @@ class Reports_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Boards.subs.php');
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 		require_once(SUBSDIR . '/Reports.subs.php');
+
 		loadLanguage('ManagePermissions');
 		loadPermissionProfiles();
 
@@ -185,6 +188,7 @@ class Reports_Controller extends Action_Controller
 			'moderators' => $txt['board_moderators'],
 			'groups' => $txt['board_groups'],
 		);
+
 		if (!empty($modSettings['deny_boards_access']))
 			$boardSettings['disallowed_groups'] = $txt['board_disallowed_groups'];
 
@@ -227,7 +231,9 @@ class Reports_Controller extends Action_Controller
 				else
 					unset($allowedGroups[$key]);
 			}
+
 			$boardData['groups'] = implode(', ', $allowedGroups);
+
 			if (!empty($modSettings['deny_boards_access']))
 			{
 				$disallowedGroups = explode(',', $row['deny_member_groups']);
@@ -238,6 +244,7 @@ class Reports_Controller extends Action_Controller
 					else
 						unset($disallowedGroups[$key]);
 				}
+
 				$boardData['disallowed_groups'] = implode(', ', $disallowedGroups);
 			}
 
@@ -364,9 +371,7 @@ class Reports_Controller extends Action_Controller
 					}
 					// Otherwise means it's set to disallow..
 					else
-					{
 						$curData[$id_group] = 'x';
-					}
 
 					// Now actually make the data for the group look right.
 					if (empty($curData[$id_group]))
@@ -741,6 +746,7 @@ function addData($inc_data, $custom_table = null)
 			$data[$key] = array(
 				'v' => $value,
 			);
+			
 			if (substr($key, 0, 5) == '#sep#')
 				$data[$key]['separator'] = true;
 		}
@@ -785,10 +791,12 @@ function addSeparator($title = '', $custom_table = null)
 		$table = $context['current_table'];
 
 	// Plumb in the separator
-	$context['tables'][$table]['data'][] = array(0 => array(
-		'separator' => true,
-		'v' => $title
-	));
+	$context['tables'][$table]['data'][] = array(
+		0 => array(
+			'separator' => true,
+			'v' => $title
+		)
+	);
 }
 
 /**
@@ -831,8 +839,7 @@ function finishTables()
  * addData. It also sets the way we are adding data to the data table.
  * method specifies whether the data passed to addData represents a new
  * column, or a new row.
- * keys is an array whose keys are the keys for data being passed to
- * addData().
+ * keys is an array whose keys are the keys for data being passed to addData().
  * if reverse is set to true, then the values of the variable "keys"
  * are used as oppossed to the keys(!
  *

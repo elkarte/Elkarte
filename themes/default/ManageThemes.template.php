@@ -897,7 +897,7 @@ function template_browse()
 		if ($file['is_editable'])
 			echo '<a href="', $file['href'], '"', $file['is_template'] ? ' style="font-weight: bold;"' : '', '>', $file['filename'], '</a>';
 		elseif ($file['is_directory'])
-			echo '<a href="', $file['href'], '" class="is_directory">', $file['filename'], '</a>';
+			echo '<a href="', $file['href'], '" class="is_directory">', $file['filename'], '</a>', ($file['is_writable']) ? '' : ' (' . $txt['theme_edit_not_writable'] . ')';
 		else
 			echo $file['filename'];
 

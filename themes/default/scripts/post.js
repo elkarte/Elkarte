@@ -362,6 +362,10 @@ function onDocSent(XMLDoc)
 	$('.spoilerheader').click(function(){
 		$(this).next().children().slideToggle("fast");
 	});
+
+	// Fix code blocks
+	if (typeof elk_codefix === 'function')
+		elk_codefix();
 }
 
 /**
