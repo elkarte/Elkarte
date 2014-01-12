@@ -400,7 +400,6 @@ $txt['core_settings_disabled'] = 'Deaktiviert';
 $txt['languages_lang_name'] = 'Name der Sprache';
 $txt['languages_locale'] = 'Lokalisierung'; // ? :)
 $txt['languages_default'] = 'Standard';
-$txt['languages_character_set'] = 'Zeichensatz';
 $txt['languages_users'] = 'Benutzer';
 $txt['language_settings_writable'] = 'Warnung: Settings.php ist nicht beschreibbar, deshalb kann die Standardspracheinstellung nicht gespeichert werden.';
 $txt['edit_languages'] = 'Sprachen ändern';
