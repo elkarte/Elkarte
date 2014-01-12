@@ -371,9 +371,7 @@ $helptxt['themes'] = 'Here you can select whether the default theme can be chose
 	as well as other options. Click on a theme to the right to change the settings for it.';
 $helptxt['theme_install'] = 'This allows you to install new themes.  You can do this from an already created directory, by uploading an archive for the theme, or by copying the default theme.<br /><br />Note that the archive or directory must have a <span class="tt">theme_info.xml</span> definition file.';
 $helptxt['enableVideoEmbeding'] = 'This allows for standard URLS to be automatically conveted into an embeded video when the post is viewed.  Currently only supports YouTube, Vimo and Dailymotion video links';
-$helptxt['enableEmbeddedFlash'] = 'This option will allow your users to use Flash directly inside their posts,
-	just like images.  This could pose a security risk, although few have successfully exploited it.
-	USE AT YOUR OWN RISK!';
+$helptxt['enableCodePrettify'] = 'This will load the Prettify script which will color highlight code used in code tags.  It adds styles to code snippets so that tokens stand out and your users can more easly read the code.';
 // !!! Add more information about how to use them here.
 $helptxt['xmlnews_enable'] = 'Allows people to link to <a href="%1$s?action=.xml;sa=news" target="_blank" class="new_win">Recent news</a>
 	and similar data.  It is also recommended that you limit the size of recent posts/news because, when rss data
