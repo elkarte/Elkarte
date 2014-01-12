@@ -129,20 +129,9 @@ class Announce_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Topic.subs.php');
 		$topic_info = getTopicInfo($topic, 'message');
 
-		// Prepare a plain text body for email use
-		if (!empty($modSettings['maillist_enabled']) && !empty($modSettings['pbe_post_enabled']))
-		{
-			require_once(SUBSDIR . '/Emailpost.subs.php');
-
-			// Convert to markdown markup e.g. text ;), does the censoring as well
-			pbe_prepare_text($topic_info['body'], $topic_info['subject']);
-		}
-		else
-		{
-			censorText($topic_info['subject']);
-			censorText($topic_info['body']);
-			$topic_info['body'] = trim(un_htmlspecialchars(strip_tags(strtr(parse_bbc($topic_info['body'], false, $topic_info['id_first_msg']), array('<br />' => "\n", '</div>' => "\n", '</li>' => "\n", '&#91;' => '[', '&#93;' => ']')))));
-		}
+		// Prepare a plain text (markdown) body for email use, does the censoring as well
+		require_once(SUBSDIR . '/Emailpost.subs.php');
+		pbe_prepare_text($topic_info['body'], $topic_info['subject']);
 
 		// We need this in order to be able send emails.
 		require_once(SUBSDIR . '/Mail.subs.php');
