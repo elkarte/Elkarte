@@ -182,6 +182,9 @@ class Search_Controller extends Action_Controller
 
 		// Simple or not?
 		$context['simple_search'] = isset($context['search_params']['advanced']) ? empty($context['search_params']['advanced']) : !empty($modSettings['simpleSearch']) && !isset($_REQUEST['advanced']);
+		if (isset($_GET['basic']))
+			$context['minmax_preferences']['pmsearch'] = 0;
+
 		$context['page_title'] = $txt['set_parameters'];
 
 		call_integration_hook('integrate_search');

@@ -509,12 +509,12 @@ function availableThemes($current_theme, $current_member)
 		if (file_exists($theme_data['theme_dir'] . '/index.template.php') && (empty($theme_data['disable_user_variant']) || allowedTo('admin_forum')))
 		{
 			$file_contents = implode('', file($theme_data['theme_dir'] . '/index.template.php'));
-			if (preg_match('~\$settings\[\'theme_variants\'\]\s*=(.+?);~', $file_contents, $matches))
+			if (preg_match('~\'theme_variants\'\s*=>(.+?\)),$~sm', $file_contents, $matches))
 			{
 				$settings['theme_variants'] = array();
 
 				// Fill settings up.
-				eval('global $settings;' . $matches[0]);
+				eval('global $settings; $settings[\'theme_variants\'] = ' . $matches[1] . ';');
 
 				if (!empty($settings['theme_variants']))
 				{

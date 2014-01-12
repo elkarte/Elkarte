@@ -648,26 +648,27 @@ function template_display_poll_above()
 	if ($context['poll']['show_results'] || !$context['allow_vote'])
 	{
 		echo '
-					<dl class="options">';
+					<ul class="options">';
 
 		// Show each option with its corresponding percentage bar.
 		foreach ($context['poll']['options'] as $option)
 		{
 			echo '
-						<dt class="', $option['voted_this'] ? 'voted' : '', '">', $option['option'], '</dt>
-						<dd class="statsbar', $option['voted_this'] ? ' voted' : '', '">';
+						<li class="', $option['voted_this'] ? 'voted' : '', '">', $option['option'], '
+							<div class="results">';
 
 			if ($context['allow_poll_view'])
 				echo '
-							', $option['bar_ndt'], '
-							<span class="percentage">', $option['votes'], ' (', $option['percent'], '%)</span>';
+								<div class="statsbar"> ', $option['bar_ndt'], '</div>
+								<span class="percentage">', $option['votes'], ' (', $option['percent'], '%)</span>';
 
 			echo '
-						</dd>';
+							</div>
+						</li>';
 		}
 
 		echo '
-					</dl>';
+					</ul>';
 
 		if ($context['allow_poll_view'])
 			echo '

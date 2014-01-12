@@ -224,14 +224,6 @@ class ManageLanguages_Controller extends Action_Controller
 						'),
 					),
 				),
-				'character_set' => array(
-					'header' => array(
-						'value' => $txt['languages_character_set'],
-					),
-					'data' => array(
-						'db_htmlsafe' => 'char_set',
-					),
-				),
 				'count' => array(
 					'header' => array(
 						'value' => $txt['languages_users'],
@@ -760,7 +752,6 @@ class ManageLanguages_Controller extends Action_Controller
 
 			// These are the replacements. old => new
 			$replace_array = array(
-				'~\$txt\[\'lang_character_set\'\]\s=\s(\'|")[^\r\n]+~' => '$txt[\'lang_character_set\'] = \'' . addslashes($_POST['character_set']) . '\';',
 				'~\$txt\[\'lang_locale\'\]\s=\s(\'|")[^\r\n]+~' => '$txt[\'lang_locale\'] = \'' . addslashes($_POST['locale']) . '\';',
 				'~\$txt\[\'lang_dictionary\'\]\s=\s(\'|")[^\r\n]+~' => '$txt[\'lang_dictionary\'] = \'' . addslashes($_POST['dictionary']) . '\';',
 				'~\$txt\[\'lang_spelling\'\]\s=\s(\'|")[^\r\n]+~' => '$txt[\'lang_spelling\'] = \'' . addslashes($_POST['spelling']) . '\';',
@@ -782,7 +773,6 @@ class ManageLanguages_Controller extends Action_Controller
 		// Setup the primary settings context.
 		$context['primary_settings'] = array(
 			'name' => Util::ucwords(strtr($context['lang_id'], array('_' => ' ', '-utf8' => ''))),
-			'character_set' => 'UTF-8',
 			'locale' => $txt['lang_locale'],
 			'dictionary' => $txt['lang_dictionary'],
 			'spelling' => $txt['lang_spelling'],

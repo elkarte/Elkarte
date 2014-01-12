@@ -93,11 +93,6 @@ img#logo {
 	top: 0.5em;
 	left: 0.5em;
 }
-#substep_progress {
-	height: 2.3em;
-	z-index: 1;
-	background: #eebaf4;
-}
 #main_screen {
 	padding: 1em 1em 0.5em 1em;
 }

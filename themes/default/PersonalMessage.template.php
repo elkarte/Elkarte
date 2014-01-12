@@ -532,7 +532,7 @@ function template_search()
 	}
 
 	// Basic search
-	if ($context['simple_search'] && (empty($context['minmax_preferences']['pmsearch']) || isset($_GET['basic'])))
+	if ($context['simple_search'] && empty($context['minmax_preferences']['pmsearch']))
 	{
 		echo '
 		<fieldset id="simple_search" class="content">

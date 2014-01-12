@@ -23,7 +23,7 @@ define('REQUIRED_PHP_VERSION', '5.1.0');
 $databases = array(
 	'mysql' => array(
 		'name' => 'MySQL',
-		'version' => '4.1.13',
+		'version' => '5.0.19',
 		'version_check' => 'return min(mysqli_get_server_info($db_connection), mysqli_get_client_info($db_connection));',
 		'utf8_support' => true,
 		'utf8_version' => '4.1.0',
@@ -32,7 +32,7 @@ $databases = array(
 	),
 	'postgresql' => array(
 		'name' => 'PostgreSQL',
-		'version' => '8.0',
+		'version' => '8.3',
 		'utf8_support' => true,
 		'version_check' => '$version = pg_version(); return $version[\'client\'];',
 		'always_has_db' => true,
@@ -214,7 +214,7 @@ if (isset($modSettings['elkVersion']))
 }
 
 // Make sure we have the theme information setup
-if (!isset($modSettings['theme_url']))
+if (!isset($modSettings['theme_url']) || !file_exists($modSettings['theme_url']))
 {
 	$modSettings['theme_dir'] = BOARDDIR . '/themes/default';
 	$modSettings['theme_url'] = 'themes/default';
@@ -494,6 +494,10 @@ function loadEssentialData()
 		cleanRequest();
 	}
 
+	// Set a session life limit for the admin
+	if (isset($modSettings['admin_session_lifetime']))
+		$modSettings['admin_session_lifetime'] = 5;
+
 	if (!isset($_GET['substep']))
 		$_GET['substep'] = 0;
 }
@@ -542,7 +546,7 @@ function initialize_inputs()
  */
 function action_welcomeLogin()
 {
-	global $modSettings, $upgradeurl, $upcontext, $db_type, $databases;
+	global $modSettings, $upgradeurl, $upcontext, $db_type, $databases, $txt;
 
 	$db = database();
 
@@ -1082,7 +1086,7 @@ function action_databaseChanges()
 	$upcontext['page_title'] = 'Database Changes';
 
 	// All possible files.
-	// Name, version, insert_on_complete.
+	// Name, less than version, insert_on_complete.
 	$files = array(
 		array('upgrade_1-0.sql', '1.1', '1.1 RC0'),
 		array('upgrade_1-1.sql', '2.0', '2.0 a'),
@@ -1120,7 +1124,7 @@ function action_databaseChanges()
 			$upcontext['cur_file_name'] = $file[0];
 
 			// @todo Do we actually need to do this still?
-			if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] < $file[1])
+			if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] < $file[1] || ($modSettings['elkVersion'] == '2.1 dev0' && $file[0] == 'upgrade_elk_1-0_' . $db_type . '.sql'))
 			{
 				$nextFile = parse_sql(dirname(__FILE__) . '/' . $file[0]);
 				if ($nextFile)
@@ -1141,6 +1145,7 @@ function action_databaseChanges()
 				{
 					// Flag to move on to the next.
 					$upcontext['completed_step'] = true;
+
 					// Did we complete the whole file?
 					if ($nextFile)
 						$upcontext['current_debug_item_num'] = -1;
@@ -1273,6 +1278,10 @@ function action_deleteUpgrade()
 	if ($db_type == 'mysql' && in_array(substr($server_version, 0, 6), array('5.0.50', '5.0.51')))
 		updateSettings(array('db_mysql_group_by_fix' => '1'));
 
+	// Set jquery to auto if its not already set
+	if (!isset($modSettings['jquery_source']))
+		updateSettings(array('jquery_source' => 'auto'));
+
 	if ($command_line)
 	{
 		echo $endl;
@@ -1384,6 +1393,7 @@ function convertSettingsToTheme()
 
 		$themeData[] = array(0, 1, $variable, $value);
 	}
+
 	if (!empty($themeData))
 	{
 		$db = database();
@@ -1530,7 +1540,7 @@ function updateLastError()
  */
 function db_version_check()
 {
-	global $db_type, $databases;
+	global $db_type, $databases, $db_connection;
 
 	$curver = eval($databases[$db_type]['version_check']);
 	$curver = preg_replace('~\-.+?$~', '', $curver);
@@ -1599,7 +1609,7 @@ function fixRelativePath($path)
 function parse_sql($filename)
 {
 	global $db_prefix, $db_collation, $boardurl, $command_line, $file_steps, $step_progress, $custom_warning;
-	global $upcontext, $support_js, $is_debug, $databases, $db_type, $db_character_set;
+	global $upcontext, $support_js, $is_debug, $databases, $db_type, $db_character_set, $db_connection;
 
 /*
 	Failure allowed on:
@@ -1901,14 +1911,16 @@ function upgrade_query($string, $unbuffered = false)
 	// Get the query result - working around some specific security - just this once!
 	$modSettings['disableQueryCheck'] = true;
 	$db_unbuffered = $unbuffered;
-	$result = $db->query('', $string, 'security_override');
+	$result = $db->query('', $string, array('security_override' => true, 'db_error_skip' => true));
 	$db_unbuffered = false;
 
 	// Failure?!
 	if ($result !== false)
 		return $result;
 
+	// Grab the error message and see if its failure worthy
 	$db_error_message = $db->last_error($db_connection);
+
 	// If MySQL we do something more clever.
 	if ($db_type == 'mysql')
 	{
@@ -2218,7 +2230,7 @@ function textfield_alter($change, $substep)
  */
 function checkChange(&$change)
 {
-	global $db_type, $databases;
+	global $db_type, $databases, $db_connection;
 	static $database_version, $where_field_support;
 
 	$db = database();
@@ -2264,13 +2276,15 @@ function checkChange(&$change)
 			FROM {db_prefix}{raw:table}',
 			array(
 				'table' => $change['table'],
-		));
+			)
+		);
+
 		// Mayday!
-		if ($db->num_rows() == 0)
+		if ($db->num_rows($request) == 0)
 			return;
 
 		// Oh where, oh where has my little field gone. Oh where can it be...
-		while ($row = $db->query($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			if ($row['Field'] == $temp[1] || $row['Field'] == $temp[2])
 			{
@@ -2323,7 +2337,7 @@ function nextSubstep($substep)
 	if (!empty($step_progress))
 	{
 		$upcontext['substep_progress'] = 0;
-		$upcontext['substep_progress_name'] = $step_progress['name'];
+		$upcontext['substep_progress_name'] = isset($step_progress['name']) ? $step_progress['name'] : '';
 		if ($step_progress['current'] > $step_progress['total'])
 			$upcontext['substep_progress'] = 99.9;
 		else
@@ -3285,7 +3299,7 @@ function loadEssentialFunctions()
  */
 function template_chmod()
 {
-	global $upcontext, $settings;
+	global $upcontext, $settings, $txt;
 
 	// Don't call me twice!
 	if (!empty($upcontext['chmod_called']))
@@ -3337,8 +3351,9 @@ function template_chmod()
 			<script><!-- // --><![CDATA[
 				function warning_popup()
 				{
-					popup = window.open(\'\',\'popup\',\'height=150,width=400,scrollbars=yes\');
-					var content = popup.document;
+					var popup = window.open(\'\',\'popup\',\'height=150,width=400,scrollbars=yes\'),
+						content = popup.document;
+
 					content.write(\'<!DOCTYPE html>\n\');
 					content.write(\'<html ', $upcontext['right_to_left'] ? 'dir="rtl"' : '', '>\n\t<head>\n\t\t<meta name="robots" content="noindex" />\n\t\t\');
 					content.write(\'<title>Warning</title>\n\t\t<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css" />\n\t</head>\n\t<body id="popup">\n\t\t\');
@@ -3416,19 +3431,20 @@ function template_upgrade_above()
 		<meta name="robots" content="noindex" />
 		<title>', $txt['upgrade_upgrade_utility'], '</title>
 		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css?beta10" />
-		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index_light.css?beta10" />
+		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/_light/index_light.css?beta10" />
 		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/install.css?beta10" />
 		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 		<script><!-- // --><![CDATA[
-			var elk_scripturl = \'', $upgradeurl, '\';
-			var elk_charset = \'UTF-8\';
-			var startPercent = ', $upcontext['overall_percent'], ';
+			var elk_scripturl = \'', $upgradeurl, '\',
+				elk_charset = \'UTF-8\',
+				startPercent = ', $upcontext['overall_percent'], ';
 
 			// This function dynamically updates the step progress bar - and overall one as required.
 			function updateStepProgress(current, max, overall_weight)
 			{
 				// What out the actual percent.
 				var width = parseInt((current / max) * 100);
+
 				if (document.getElementById(\'step__progress\'))
 				{
 					document.getElementById(\'step__progress\').style.width = width + "%";
@@ -3508,16 +3524,18 @@ function template_upgrade_above()
 
 	echo '
 						<div id="substep_bar_div" class="smalltext" style="display: ', isset($upcontext['substep_progress']) ? '' : 'none', ';">', isset($upcontext['substep_progress_name']) ? trim(strtr($upcontext['substep_progress_name'], array('.' => ''))) : '', ':</div>
-						<div id="substep_bar_div2" style="font-size: 8pt; height: 12pt; border: 1px solid black; background: white; width: 50%; margin: 5px auto; display: ', isset($upcontext['substep_progress']) ? '' : 'none', ';">
-							<div id="substep_text" style="color: #000; position: absolute; margin-left: -5em;">', isset($upcontext['substep_progress']) ? $upcontext['substep_progress'] : '', '%</div>
-							<div id="substep_progress" style="width: ', isset($upcontext['substep_progress']) ? $upcontext['substep_progress'] : 0, '%; height: 12pt; z-index: 1; background: #eebaf4;">&nbsp;</div>
+						<div id="substep_bar_div2" class="progress_bar" style="display: ', isset($upcontext['substep_progress']) ? '' : 'none', ';">
+							<div id="substep_text" class="full_bar">', isset($upcontext['substep_progress']) ? $upcontext['substep_progress'] : '', '%</div>
+							<div id="substep_progress" class="blue_percent" style="width: ', isset($upcontext['substep_progress']) ? $upcontext['substep_progress'] : 0, '%; background-color: #eebaf4;">&nbsp;</div>
 						</div>';
 
 	// How long have we been running this?
 	$elapsed = time() - $upcontext['started'];
 	$mins = (int) ($elapsed / 60);
 	$seconds = $elapsed - $mins * 60;
-	echo '
+
+	if (!empty($elapsed))
+		echo '
 						<div class="smalltext" style="padding: 5px; text-align: center;">', $txt['upgrade_time_elapsed'], ':
 							<span id="mins_elapsed">', $mins, '</span> ', $txt['upgrade_time_mins'], ', <span id="secs_elapsed">', $seconds, '</span> ', $txt['upgrade_time_secs'], '.
 						</div>';
@@ -3580,9 +3598,10 @@ function template_upgrade_below()
 	{
 		echo '
 		<script><!-- // --><![CDATA[
+			var countdown = 3,
+				dontSubmit = false;
+
 			window.onload = doAutoSubmit;
-			var countdown = 3;
-			var dontSubmit = false;
 
 			function doAutoSubmit()
 			{
@@ -3739,26 +3758,26 @@ function template_welcome_message()
 			<h3>For security purposes please login with your admin account to proceed with the upgrade.</h3>
 			<table>
 				<tr style="vertical-align:top">
-					<td><strong ', $disable_security ? 'style="color: gray;"' : '', '>Username:</strong></td>
+					<td><strong ', $disable_security ? 'style="color: lightgray;"' : '', '>Username:</strong></td>
 					<td>
 						<input type="text" name="user" value="', !empty($upcontext['username']) ? $upcontext['username'] : '', '" ', $disable_security ? 'disabled="disabled"' : '', ' class="input_text" />';
 
 	if (!empty($upcontext['username_incorrect']))
 		echo '
-						<div class="smalltext" style="color: red;">Username Incorrect</div>';
+						<div class="error">Username Incorrect</div>';
 
 	echo '
 					</td>
 				</tr>
 				<tr style="vertical-align:top">
-					<td><strong ', $disable_security ? 'style="color: gray;"' : '', '>Password:</strong></td>
+					<td><strong ', $disable_security ? 'style="color: lightgray;"' : '', '>Password:</strong></td>
 					<td>
 						<input type="password" name="passwrd" value=""', $disable_security ? ' disabled="disabled"' : '', ' class="input_password" />
 						<input type="hidden" name="hash_passwrd" value="" />';
 
 	if (!empty($upcontext['password_failed']))
 		echo '
-						<div class="smalltext" style="color: red;">Password Incorrect</div>';
+						<div class="error">Password Incorrect</div>';
 
 	echo '
 					</td>
@@ -3778,7 +3797,7 @@ function template_welcome_message()
 	echo '
 			</table><br />
 			<span class="smalltext">
-				<strong>Note:</strong> If necessary the above security check can be bypassed for users who may administrate a server but not have admin rights on the forum. In order to bypass the above check simply open &quot;upgrade.php&quot; in a text editor and replace &quot;$disable_security = 0;&quot; with &quot;$disable_security = 1;&quot; and refresh this page.
+				<strong>Note:</strong> If necessary the above security check can be bypassed for users who may administrate a server but not have admin rights on the forum. In order to bypass the above check simply open &quot;upgrade.php&quot; in a text editor and replace &quot;$disable_security = false;&quot; with &quot;$disable_security = true1;&quot; and refresh this page.
 			</span>
 			<input type="hidden" name="login_attempt" id="login_attempt" value="1" />
 			<input type="hidden" name="js_works" id="js_works" value="0" />';
@@ -3795,7 +3814,8 @@ function template_welcome_message()
 			// Latest version?
 			function ourCurrentVersion()
 			{
-				var ourVer, yourVer;
+				var ourVer,
+					yourVer;
 
 				if (!(\'elkVersion\' in window))
 					return;
@@ -3924,6 +3944,7 @@ function template_backup_database()
 		echo '
 		<script><!-- // --><![CDATA[
 			var lastTable = ', $upcontext['cur_table_num'], ';
+
 			function getNextTables()
 			{
 				getXMLDocument(\'', $upcontext['form_url'], '&xml&substep=\' + lastTable, onBackupUpdate);
@@ -3932,9 +3953,10 @@ function template_backup_database()
 			// Got an update!
 			function onBackupUpdate(oXMLDoc)
 			{
-				var sCurrentTableName = "";
-				var iTableNum = 0;
-				var sCompletedTableName = document.getElementById(\'current_table\').innerHTML;
+				var sCurrentTableName = "",
+					iTableNum = 0,
+					sCompletedTableName = document.getElementById(\'current_table\').innerHTML;
+
 				for (var i = 0; i < oXMLDoc.getElementsByTagName("table")[0].childNodes.length; i++)
 					sCurrentTableName += oXMLDoc.getElementsByTagName("table")[0].childNodes[i].nodeValue;
 				iTableNum = oXMLDoc.getElementsByTagName("table")[0].getAttribute("num");
@@ -4019,7 +4041,7 @@ function template_database_changes()
 		if ($is_debug)
 		{
 			echo '
-			<div id="debug_section" style="height: 200px; overflow: auto;">
+			<div id="debug_section" class="roundframe" style="height: 200px; overflow: auto;">
 			<span id="debuginfo"></span>
 			</div>';
 		}
@@ -4041,17 +4063,18 @@ function template_database_changes()
 	{
 		echo '
 		<script><!-- // --><![CDATA[
-			var lastItem = ', $upcontext['current_debug_item_num'], ';
-			var sLastString = "', strtr($upcontext['current_debug_item_name'], array('"' => '&quot;')), '";
-			var iLastSubStepProgress = -1;
-			var curFile = ', $upcontext['cur_file_num'], ';
-			var totalItems = 0;
-			var prevFile = 0;
-			var retryCount = 0;
-			var testvar = 0;
-			var timeOutID = 0;
-			var getData = "";
-			var debugItems = ', $upcontext['debug_items'], ';
+			var lastItem = ', $upcontext['current_debug_item_num'], ',
+				sLastString = "', strtr($upcontext['current_debug_item_name'], array('"' => '&quot;')), '",
+				iLastSubStepProgress = -1,
+				curFile = ', $upcontext['cur_file_num'], ',
+				totalItems = 0,
+				prevFile = 0,
+				retryCount = 0,
+				testvar = 0,
+				timeOutID = 0,
+				getData = "",
+				debugItems = ', $upcontext['debug_items'], ';
+
 			function getNextItem()
 			{
 				// We want to track this...
@@ -4065,13 +4088,13 @@ function template_database_changes()
 			// Got an update!
 			function onItemUpdate(oXMLDoc)
 			{
-				var sItemName = "";
-				var sDebugName = "";
-				var iItemNum = 0;
-				var iSubStepProgress = -1;
-				var iDebugNum = 0;
-				var bIsComplete = 0;
-				getData = "";
+				var sItemName = "",
+					sDebugName = "",
+					iItemNum = 0,
+					iSubStepProgress = -1,
+					iDebugNum = 0,
+					bIsComplete = 0,
+					getData = "";
 
 				// We\'ve got something - so reset the timeout!
 				if (timeOutID)
@@ -4081,7 +4104,7 @@ function template_database_changes()
 				document.getElementById("error_block").style.display = "none";
 
 				// Are we getting some duff info?
-				if (!oXMLDoc.getElementsByTagName("item")[0])
+				if (!oXMLDoc || !oXMLDoc.getElementsByTagName("item")[0])
 				{
 					// Too many errors?
 					if (retryCount > 15)
@@ -4178,7 +4201,6 @@ function template_database_changes()
 					document.getElementById(\'debug_section\').style.display = "none";';
 
 		echo '
-
 					document.getElementById(\'commess\').style.display = "";
 					document.getElementById(\'contbutt\').disabled = 0;
 					document.getElementById(\'database_done\').value = 1;';

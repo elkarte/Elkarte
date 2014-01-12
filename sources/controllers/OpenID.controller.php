@@ -190,7 +190,7 @@ class OpenID_Controller extends Action_Controller
 			ob_start();
 
 		header('Content-Type: application/xrds+xml');
-		echo '<?xml version="1.0" encoding="', $context['character_set'], '"?' . '>';
+		echo '<?xml version="1.0" encoding="UTF-8"?' . '>';
 		// Generate the XRDS data for OpenID 2.0, YADIS discovery..
 		echo '
 <xrds:XRDS xmlns:xrds="xri://$xrds" xmlns="xri://$xrd*($v*2.0)">

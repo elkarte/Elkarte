@@ -550,7 +550,7 @@ ADD COLUMN filter_order int(10) NOT NULL default '0';
 
 ---# Set the default values so the order is set / maintained
 UPDATE {$db_prefix}postby_emails_filters
-SET filter_order = 'id_filter');
+SET filter_order = 'id_filter';
 ---#
 
 ---# Adding new columns to log_activity...
