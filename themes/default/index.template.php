@@ -18,17 +18,17 @@
  /**
  * This template is, perhaps, the most important template in the theme. It
  * contains the main template layer that displays the header and footer of
- * the forum, namely with main_above and main_below. It also contains the
+ * the forum, namely with body_above and body_below. It also contains the
  * menu sub template, which appropriately displays the menu; the init sub
  * template, which is there to set the theme up; (init can be missing.) and
  * the linktree sub template, which sorts out the link tree.
  *
  * The init sub template should load any data and set any hardcoded options.
  *
- * The main_above sub template is what is shown above the main content, and
+ * The body_above sub template is what is shown above the main content, and
  * should contain anything that should be shown up there.
  *
- * The main_below sub template, conversely, is shown after the main content.
+ * The body_below sub template, conversely, is shown after the main content.
  * It should probably contain the copyright statement and some other things.
  *
  * The linktree sub template should display the link tree, using the data
@@ -44,58 +44,58 @@
  */
 function template_init()
 {
-	global $settings;
+	return array(
+		/* Use images from default theme when using templates from the default theme?
+		  if this is 'always', images from the default theme will be used.
+		  if this is 'defaults', images from the default theme will only be used with default templates.
+		  if this is 'never' or isn't set at all, images from the default theme will not be used. */
+		'use_default_images' => 'never',
 
-	/* Use images from default theme when using templates from the default theme?
-	  if this is 'always', images from the default theme will be used.
-	  if this is 'defaults', images from the default theme will only be used with default templates.
-	  if this is 'never' or isn't set at all, images from the default theme will not be used. */
-	$settings['use_default_images'] = 'never';
+		// The version this template/theme is for. This should probably be the version of the forum it was created for.
+		'theme_version' => '1.0',
 
-	// The version this template/theme is for. This should probably be the version of the forum it was created for.
-	$settings['theme_version'] = '1.0';
+		// Use plain buttons - as opposed to text buttons?
+		'use_buttons' => true,
 
-	// Use plain buttons - as opposed to text buttons?
-	$settings['use_buttons'] = true;
+		// Show sticky and lock status separate from topic icons?
+		'separate_sticky_lock' => true,
 
-	// Show sticky and lock status separate from topic icons?
-	$settings['separate_sticky_lock'] = true;
+		// Set the following variable to true if this theme requires the optional theme strings file to be loaded.
+		'require_theme_strings' => false,
 
-	// Set the following variable to true if this theme requires the optional theme strings file to be loaded.
-	$settings['require_theme_strings'] = false;
+		// This is used for the color variants.
+		'theme_variants' => array('light', 'dark', 'besocial'),
 
-	// This is used for the color variants.
-	$settings['theme_variants'] = array('light', 'dark', 'besocial');
+		// If the following variable is set to true, the avatar of the last poster will be displayed on the boardindex and message index.
+		'avatars_on_indexes' => true,
 
-	// If the following variable is set to true, the avatar of the last poster will be displayed on the boardindex and message index.
-	$settings['avatars_on_indexes'] = true;
+		// This is used in the main menus to create a number next to the title of the menu to indicate the number of unread messages,
+		// moderation reports, etc. You can style each menu level indicator as desired.
+		'menu_numeric_notice' => array(
+			// Top level menu entries
+			0 => ' <span class="pm_indicator">%1$s</span>',
+			// First dropdown
+			1 => ' <span>[<strong>%1$s</strong>]</span>',
+			// Second level dropdown
+			2 => ' <span>[<strong>%1$s</strong>]</span>',
+		),
 
-	// This is used in the main menus to create a number next to the title of the menu to indicate the number of unread messages,
-	// moderation reports, etc. You can style each menu level indicator as desired.
-	$settings['menu_numeric_notice'] = array(
-		// Top level menu entries
-		0 => ' <span class="pm_indicator">%1$s</span>',
-		// First dropdown
-		1 => ' <span>[<strong>%1$s</strong>]</span>',
-		// Second level dropdown
-		2 => ' <span>[<strong>%1$s</strong>]</span>',
+		// This slightly more complex array, instead, will deal with page indexes as frequently requested by Ant :P
+		// Oh no you don't. :D This slightly less complex array now has cleaner markup. :P
+		// @todo - God it's still ugly though. Can't we just have links where we need them, without all those spans?
+		// How do we get anchors only, where they will work? Spans and strong only where necessary?
+		'page_index_template' => array(
+			'base_link' => '<li class="linavPages"><a class="navPages" href="{base_link}" role="menuitem">%2$s</a></li>',
+			'previous_page' => '<span class="previous_page" role="menuitem">{prev_txt}</span>',
+			'current_page' => '<li class="linavPages"><strong class="current_page" role="menuitem">%1$s</strong></li>',
+			'next_page' => '<span class="next_page" role="menuitem">{next_txt}</span>',
+			'expand_pages' => '<li class="linavPages expand_pages" role="menuitem" {custom}> <a href="#">...</a> </li>',
+			'all' => '<li class="linavPages all_pages" role="menuitem">{all_txt}</li>',
+		),
+
+		// @todo find a better place if we are going to create a notifications template
+		'mentions' => array('mentioner_template' => '<a href="{mem_url}" class="mentionavatar">{avatar_img}{mem_name}</a>')
 	);
-
-	// This slightly more complex array, instead, will deal with page indexes as frequently requested by Ant :P
-	// Oh no you don't. :D This slightly less complex array now has cleaner markup. :P
-	// @todo - God it's still ugly though. Can't we just have links where we need them, without all those spans?
-	// How do we get anchors only, where they will work? Spans and strong only where necessary?
-	$settings['page_index_template'] = array(
-		'base_link' => '<li class="linavPages"><a class="navPages" href="{base_link}" role="menuitem">%2$s</a></li>',
-		'previous_page' => '<span class="previous_page" role="menuitem">{prev_txt}</span>',
-		'current_page' => '<li class="linavPages"><strong class="current_page" role="menuitem">%1$s</strong></li>',
-		'next_page' => '<span class="next_page" role="menuitem">{next_txt}</span>',
-		'expand_pages' => '<li class="linavPages expand_pages" role="menuitem" {custom}> <a href="#">...</a> </li>',
-		'all' => '<li class="linavPages all_pages" role="menuitem">{all_txt}</li>',
-	);
-
-	// @todo find a better place if we are going to create a notifications template
-	$settings['mentions']['mentioner_template'] = '<a href="{mem_url}" class="mentionavatar">{avatar_img}{mem_name}</a>';
 }
 
 /**
@@ -104,6 +104,17 @@ function template_init()
 function template_html_above()
 {
 	global $context, $settings, $scripturl, $txt, $modSettings;
+
+	// Increased mobile device support.
+	if ($context['browser_body_id'] == 'mobile')
+	{
+		// Disable the preview text.
+		$settings['message_index_preview'] = 0;
+		// Force the usage of click menu instead of a hover menu.
+		$context['javascript_vars']['use_click_menu'] = true;
+		// Disable the search dropdown.
+		$modSettings['search_dropdown'] = false;
+	}
 
 	// Show right to left and the character set for ease of translating.
 	echo '<!DOCTYPE html>
@@ -130,6 +141,7 @@ function template_html_above()
 	echo '
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="viewport" content="width=device-width" />
+	<meta name="mobile-web-app-capable" content="yes" />
 	<meta name="description" content="', $context['page_title_html_safe'], '" />', !empty($context['meta_keywords']) ? '
 	<meta name="keywords" content="' . $context['meta_keywords'] . '" />' : '';
 
@@ -150,6 +162,7 @@ function template_html_above()
 
 	// Show all the relative links, such as help, search, contents, and the like.
 	echo '
+	<link rel="shortcut icon" sizes="196x196" href="' . $settings['images_url'] . '/mobile.png" />
 	<link rel="help" href="', $scripturl, '?action=help" />
 	<link rel="contents" href="', $scripturl, '" />', ($context['allow_search'] ? '
 	<link rel="search" href="' . $scripturl . '?action=search" />' : '');
@@ -261,7 +274,7 @@ function template_body_above()
 			$selected = !empty($context['current_topic']) ? 'current_topic' : (!empty($context['current_board']) ? 'current_board' : 'all');
 
 			echo '
-				<select name="search_selection">
+				<select name="search_selection" id="search_selection">
 					<option value="all"', ($selected == 'all' ? ' selected="selected"' : ''), '>', $txt['search_entireforum'], ' </option>';
 
 			// Can't limit it to a specific topic if we are not in one
@@ -298,10 +311,6 @@ function template_body_above()
 				<input type="hidden" name="advanced" value="0" />
 			</form>';
 	}
-
-	// Guest may have collapsed the header, check the cookie to prevent collapse jumping
-	if (!isset($context['minmax_preferences']['upshrink']) && isset($_COOKIE['upshrink']))
-		$context['minmax_preferences']['upshrink'] = $_COOKIE['upshrink'];
 
 	echo '
 		</div>
@@ -416,15 +425,17 @@ function template_html_below()
 }
 
 /**
- * Show a linktree. This is that thing that shows "My Community | General Category | General Discussion"..
- * @param bool $force_show = false
+ * Show a linktree. This is that thing that shows
+ * "My Community | General Category | General Discussion"..
+ * @param string $default a string representing the index in $context where
+ *               the linktree is stored (default value is 'linktree')
  */
-function theme_linktree($force_show = false)
+function theme_linktree($default = 'linktree')
 {
 	global $context, $settings;
 
 	// If linktree is empty, just return - also allow an override.
-	if (empty($context['linktree']) || (!empty($context['dont_default_linktree']) && !$force_show))
+	if (empty($context[$default]))
 		return;
 
 	// @todo - Look at changing markup here slightly. Need to incorporate relevant aria roles.
@@ -433,10 +444,10 @@ function theme_linktree($force_show = false)
 
 	// Each tree item has a URL and name. Some may have extra_before and extra_after.
 	// Added a linktree class to make targeting dividers easy.
-	foreach ($context['linktree'] as $link_num => $tree)
+	foreach ($context[$default] as $link_num => $tree)
 	{
 		echo '
-					<li class="linktree', ($link_num == count($context['linktree']) - 1) ? '_last' : '', '">';
+					<li class="linktree', ($link_num == count($context[$default]) - 1) ? '_last' : '', '">';
 
 		// Dividers moved to pseudo-elements in CSS. @todo- rtl.css
 		// Show something before the link?
@@ -572,6 +583,10 @@ function template_menu()
 function template_button_strip($button_strip, $direction = '', $strip_options = array())
 {
 	global $context, $txt;
+
+	// Not sure if this can happen, but people can misuse functions very efficiently
+	if (empty($button_strip))
+		return;
 
 	if (!is_array($strip_options))
 		$strip_options = array();

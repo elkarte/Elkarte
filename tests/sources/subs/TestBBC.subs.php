@@ -55,7 +55,7 @@ class TestBBC extends UnitTestCase
 			array(
 				'Tables',
 				'[table][tr][td][table][tr][td]test[/td][/tr][/table][/td][/tr][/table]',
-				'<table class="bbc_table"><tr><td><table class="bbc_table"><tr><td>test</td></tr></table></td></tr></table>',
+				'<div class="bbc_table_container"><table class="bbc_table"><tr><td><div class="bbc_table_container"><table class="bbc_table"><tr><td>test</td></tr></table></div></td></tr></table></div>',
 			),
 			array(
 				'Normal list',

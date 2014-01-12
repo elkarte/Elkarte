@@ -18,6 +18,10 @@
 if (!defined('ELK'))
 	die('No access...');
 
+// Let's define the name of the class so that we will be able to use it in the instantiations
+if (!defined('DB_TYPE'))
+	define('DB_TYPE', 'MySQL');
+
 /**
  * SQL database class, implements database class to control mysql functions
  */
@@ -93,6 +97,13 @@ class Database_MySQL implements Database
 		);
 
 		self::$_db->_connection = $connection;
+
+		// Few databases still have not set UTF-8 as their default input charset
+		self::$_db->query('', '
+			SET NAMES UTF8',
+			array(
+			)
+		);
 
 		return $connection;
 	}

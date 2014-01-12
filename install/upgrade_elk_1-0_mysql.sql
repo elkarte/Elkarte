@@ -550,7 +550,7 @@ ADD COLUMN filter_order int(10) NOT NULL default '0';
 
 ---# Set the default values so the order is set / maintained
 UPDATE {$db_prefix}postby_emails_filters
-SET filter_order = 'id_filter');
+SET filter_order = 'id_filter';
 ---#
 
 ---# Adding new columns to log_activity...
@@ -628,7 +628,7 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}log_mentions (
 	status tinyint(1) NOT NULL DEFAULT '0',
 	id_member_from mediumint(8) unsigned NOT NULL DEFAULT '0',
 	log_time int(10) unsigned NOT NULL DEFAULT '0',
-	notif_type varchar(5) NOT NULL DEFAULT '',
+	mention_type varchar(5) NOT NULL DEFAULT '',
 	PRIMARY KEY (id_mention),
 	KEY id_member (id_member,status)
 ) ENGINE=MyISAM;

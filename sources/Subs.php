@@ -1232,8 +1232,8 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			),
 			array(
 				'tag' => 'table',
-				'before' => '<table class="bbc_table">',
-				'after' => '</table>',
+				'before' => '<div class="bbc_table_container"><table class="bbc_table">',
+				'after' => '</table></div>',
 				'trim' => 'inside',
 				'require_children' => array('tr'),
 				'block_level' => true,
@@ -1249,11 +1249,21 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'disabled_after' => '',
 			),
 			array(
+				'tag' => 'th',
+				'before' => '<th>',
+				'after' => '</th>',
+				'require_parents' => array('tr'),
+				'trim' => 'outside',
+				'block_level' => true,
+				'disabled_before' => '',
+				'disabled_after' => '',
+			),
+			array(
 				'tag' => 'tr',
 				'before' => '<tr>',
 				'after' => '</tr>',
 				'require_parents' => array('table'),
-				'require_children' => array('td'),
+				'require_children' => array('td', 'th'),
 				'trim' => 'both',
 				'block_level' => true,
 				'disabled_before' => '',
@@ -2954,7 +2964,6 @@ function template_admin_warning_above()
 	{
 		echo '
 	<div class="errorbox">
-		<p class="alert">!!</p>
 		<h3>', $context['user']['is_admin'] ? $txt['query_command_denied'] : $txt['query_command_denied_guests'], '</h3>
 		<ul>';
 
@@ -2963,6 +2972,7 @@ function template_admin_warning_above()
 			echo '
 			<li><pre>', $context['user']['is_admin'] ? $error : sprintf($txt['query_command_denied_guests_msg'], $error), '</pre></li>';
 		}
+
 		echo '
 		</ul>
 	</div>';
@@ -2972,7 +2982,6 @@ function template_admin_warning_above()
 	{
 		echo '
 	<div class="errorbox">
-		<p class="alert">!!</p>
 		<h3>', empty($context['security_controls']['files']['to_remove']) ? $txt['generic_warning'] : $txt['security_risk'], '</h3>
 		<p>';
 
@@ -2981,7 +2990,7 @@ function template_admin_warning_above()
 			foreach ($context['security_controls']['files']['to_remove'] as $securityFile)
 			{
 				echo '
-			', sprintf($txt['not_removed'], '<strong>' . $securityFile . '</strong>'), '!<br />';
+			', sprintf($txt['not_removed'], $securityFile), '<br />';
 
 				if ($securityFile == 'Settings.php~' || $securityFile == 'Settings_bak.php~')
 					echo '
@@ -2994,11 +3003,11 @@ function template_admin_warning_above()
 
 		if (!empty($context['security_controls']['files']['cache']))
 			echo '
-			<strong>', $txt['cache_writable'], '</strong><br />';
+			', $txt['cache_writable'], '<br />';
 
 		if (!empty($context['security_controls']['files']['agreement']))
 			echo '
-			<strong>', $txt['agreement_missing'], '</strong><br />';
+			', $txt['agreement_missing'], '<br />';
 
 		echo '
 		</p>

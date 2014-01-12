@@ -253,12 +253,6 @@ function template_modify_language_entries()
 						<legend>', $context['primary_settings']['name'], '</legend>
 						<dl class="settings">
 							<dt>
-								<label for="character_set">', $txt['languages_character_set'], ':</label>
-							</dt>
-							<dd>
-								<input type="text" name="character_set" id="character_set" size="20" value="', $context['primary_settings']['character_set'], '"', (empty($context['file_entries']) ? '' : ' disabled="disabled"'), ' class="input_text" />
-							</dd>
-							<dt>
 								<label for="locale">', $txt['languages_locale'], ':</label>
 							</dt>
 							<dd>

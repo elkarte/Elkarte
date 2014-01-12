@@ -27,7 +27,7 @@ $GLOBALS['required_php_version'] = '5.1.0';
 $databases = array(
 	'mysql' => array(
 		'name' => 'MySQL',
-		'version' => '4.1.13',
+		'version' => '5.0.19',
 		'version_check' => 'return min(mysqli_get_server_info($db_connection), mysqli_get_client_info($db_connection));',
 		'supported' => function_exists('mysqli_connect'),
 		'default_user' => 'mysqli.default_user',
@@ -46,7 +46,7 @@ $databases = array(
 	),
 	'postgresql' => array(
 		'name' => 'PostgreSQL',
-		'version' => '8.0',
+		'version' => '8.3',
 		'function_check' => 'pg_connect',
 		'version_check' => '$request = pg_query(\'SELECT version()\'); list ($version) = pg_fetch_row($request); list ($pgl, $version) = explode(" ", $version); return $version;',
 		'supported' => function_exists('pg_connect'),
@@ -192,7 +192,7 @@ function initialize_inputs()
  */
 function load_lang_file()
 {
-	global $incontext;
+	global $incontext, $txt;
 
 	$incontext['detected_languages'] = array();
 
@@ -604,7 +604,7 @@ function action_checkFilesWritable()
  */
 function action_databaseSettings()
 {
-	global $txt, $databases, $incontext, $db_type;
+	global $txt, $databases, $incontext, $db_type, $db_connection, $modSettings;
 
 	$incontext['sub_template'] = 'database_settings';
 	$incontext['page_title'] = $txt['db_settings'];
@@ -814,7 +814,7 @@ function action_databaseSettings()
  */
 function action_forumSettings()
 {
-	global $txt, $incontext, $databases, $db_type;
+	global $txt, $incontext, $databases, $db_type, $db_connection;
 
 	$incontext['sub_template'] = 'forum_settings';
 	$incontext['page_title'] = $txt['install_settings'];
@@ -1305,6 +1305,9 @@ function action_deleteInstall()
 {
 	global $txt, $incontext, $db_character_set;
 	global $current_version, $databases, $forum_version, $modSettings, $user_info, $db_type;
+
+	// A few items we will load in from settings and make avaialble.
+	global $boardurl, $db_prefix, $cookiename, $mbname, $language;
 
 	$incontext['page_title'] = $txt['congratulations'];
 	$incontext['sub_template'] = 'delete_install';
@@ -2017,7 +2020,7 @@ function template_install_above()
 		<meta name="robots" content="noindex" />
 		<title>', $txt['installer'], '</title>
 		<link rel="stylesheet" href="themes/default/css/index.css?beta10" />
-		<link rel="stylesheet" href="themes/default/css/index_light.css?beta10" />
+		<link rel="stylesheet" href="themes/default/css/_light/index_light.css?beta10" />
 		<link rel="stylesheet" href="themes/default/css/install.css?beta10" />
 		<script src="themes/default/scripts/script.js"></script>
 	</head>
@@ -2088,7 +2091,7 @@ function template_install_below()
 	if (!empty($incontext['continue']))
 	{
 		echo '
-								<div class="clear">';
+								<div class="clear righttext">';
 
 		if (!empty($incontext['continue']))
 			echo '
@@ -2353,7 +2356,9 @@ function template_database_settings()
 	<script><!-- // --><![CDATA[
 		function validatePgsql()
 		{
-			if (document.getElementById(\'db_type_input\').value == \'postgresql\')
+			var dbtype = document.getElementById(\'db_type_input\');
+
+			if (dbtype !== null && dbtype.value == \'postgresql\')
 				document.getElementById(\'db_name_info_warning\').style.display = \'none\';
 			else
 				document.getElementById(\'db_name_info_warning\').style.display = \'\';
@@ -2530,8 +2535,8 @@ function template_delete_install()
 		<script><!-- // --><![CDATA[
 			function doTheDelete()
 			{
-				var theCheck = document.getElementById ? document.getElementById("delete_self") : document.all.delete_self;
-				var tempImage = new Image();
+				var theCheck = document.getElementById ? document.getElementById("delete_self") : document.all.delete_self,
+					tempImage = new Image();
 
 				tempImage.src = "', $installurl, '?delete=1&ts_" + (new Date().getTime());
 				tempImage.width = 0;

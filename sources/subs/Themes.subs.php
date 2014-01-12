@@ -296,16 +296,21 @@ function get_file_listing($path, $relative)
 {
 	global $scripturl, $txt, $context;
 
+	// Only files with these extensions will be deemed editable
+	$editable = 'php|pl|css|js|vbs|xml|xslt|txt|xsl|html|htm|shtm|shtml|asp|aspx|cgi|py';
+
 	// Is it even a directory?
 	if (!is_dir($path))
 		fatal_lang_error('error_invalid_dir', 'critical');
 
-	$dir = dir($path);
+	// Read this directorys contents
 	$entries = array();
+	$dir = dir($path);
 	while ($entry = $dir->read())
 		$entries[] = $entry;
 	$dir->close();
 
+	// Sort it so it looks natural to the user
 	natcasesort($entries);
 
 	$listing1 = array();
@@ -314,9 +319,10 @@ function get_file_listing($path, $relative)
 	foreach ($entries as $entry)
 	{
 		// Skip all dot files, including .htaccess.
-		if (substr($entry, 0, 1) == '.' || $entry == 'CVS')
+		if (substr($entry, 0, 1) === '.' || $entry === 'CVS')
 			continue;
 
+		// A directory entry
 		if (is_dir($path . '/' . $entry))
 			$listing1[] = array(
 				'filename' => $entry,
@@ -328,6 +334,7 @@ function get_file_listing($path, $relative)
 				'href' => $scripturl . '?action=admin;area=theme;th=' . $_GET['th'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=browse;directory=' . $relative . $entry,
 				'size' => '',
 			);
+		// A file entry has some more checks
 		else
 		{
 			$size = filesize($path . '/' . $entry);
@@ -336,13 +343,15 @@ function get_file_listing($path, $relative)
 			else
 				$size = comma_format($size) . ' ' . $txt['themeadmin_edit_bytes'];
 
+			$writable =  is_writable($path . '/' . $entry);
+
 			$listing2[] = array(
 				'filename' => $entry,
-				'is_writable' => is_writable($path . '/' . $entry),
+				'is_writable' => $writable,
 				'is_directory' => false,
 				'is_template' => preg_match('~\.template\.php$~', $entry) != 0,
-				'is_image' => preg_match('~\.(jpg|jpeg|gif|bmp|png)$~', $entry) != 0,
-				'is_editable' => is_writable($path . '/' . $entry) && preg_match('~\.(php|pl|css|js|vbs|xml|xslt|txt|xsl|html|htm|shtm|shtml|asp|aspx|cgi|py)$~', $entry) != 0,
+				'is_image' => preg_match('~\.(jpg|jpeg|gif|bmp|png|ico)$~', $entry) != 0,
+				'is_editable' => $writable && preg_match('~\.(' . $editable . ')$~', $entry) != 0,
 				'href' => $scripturl . '?action=admin;area=theme;th=' . $_GET['th'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=edit;filename=' . $relative . $entry,
 				'size' => $size,
 				'last_modified' => standardTime(filemtime($path . '/' . $entry)),
@@ -509,12 +518,12 @@ function availableThemes($current_theme, $current_member)
 		if (file_exists($theme_data['theme_dir'] . '/index.template.php') && (empty($theme_data['disable_user_variant']) || allowedTo('admin_forum')))
 		{
 			$file_contents = implode('', file($theme_data['theme_dir'] . '/index.template.php'));
-			if (preg_match('~\$settings\[\'theme_variants\'\]\s*=(.+?);~', $file_contents, $matches))
+			if (preg_match('~\'theme_variants\'\s*=>(.+?\)),$~sm', $file_contents, $matches))
 			{
 				$settings['theme_variants'] = array();
 
 				// Fill settings up.
-				eval('global $settings;' . $matches[0]);
+				eval('global $settings; $settings[\'theme_variants\'] = ' . $matches[1] . ';');
 
 				if (!empty($settings['theme_variants']))
 				{

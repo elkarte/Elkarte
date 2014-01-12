@@ -1,3 +1,15 @@
-.description {
+.description, .information {
 	margin-top: 4px;
+}
+#support_resources, #credits_sections {
+	margin: 0;
+}
+#manage_boards, #admincenter {
+	margin-top: 12px;
+}
+#admincenter>#admin_form_wrapper {
+	margin-top: 0;
+}
+#manage_boards h2 {
+	margin-bottom: 6px;
 }

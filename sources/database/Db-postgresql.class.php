@@ -18,6 +18,10 @@
 if (!defined('ELK'))
 	die('No access...');
 
+// Let's define the name of the class so that we will be able to use it in the instantiations
+if (!defined('DB_TYPE'))
+	define('DB_TYPE', 'PostgreSQL');
+
 /**
  * PostgreSQL database class, implements database class to control mysql functions
  */
@@ -325,9 +329,6 @@ class Database_PostgreSQL implements Database
 			),
 			'insert_log_search_results_subject' => array(
 				'~NOT RLIKE~' => '!~',
-			),
-			'set_character_set' => array(
-				'~SET\\s+NAMES\\s([a-zA-Z0-9\\-_]+)~' => 'SET NAMES \'$1\'',
 			),
 			'pm_conversation_list' => array(
 				'~ORDER\\s+BY\\s+\\{raw:sort\\}~' => 'ORDER BY ' . (isset($db_values['sort']) ? ($db_values['sort'] === 'pm.id_pm' ? 'MAX(pm.id_pm)' : $db_values['sort']) : ''),

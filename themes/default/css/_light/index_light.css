@@ -106,7 +106,7 @@ input:focus, textarea:focus, button:focus, select:focus, .editor:focus {
 	border: 1px solid #999;
 }
 /* Give disabled text input elements a different background color. */
-input[disabled].input_text {
+input[disabled].input_text, input[disabled].input_password {
 	background: #eee;
 }
 
@@ -959,9 +959,6 @@ div.bbc_footnotes .meaction{
 .board_stats {
 	color: #777;
 }
-.board_avatar {
-	display: none;
-}
 .lastpost_link>a {
 	color: #377828;
 }
@@ -1151,28 +1148,12 @@ div.bbc_footnotes .meaction{
 
 /* The display template (topic view).
 /* Poll vote options */
-/* @todo - Slow selectors for the next few declarations here. Change? */
-#poll_options ul.options {
-
+#poll_options .options {
 	border-top: 1px solid #9999aa;
 }
 
 /* Poll results */
-#poll_options dl.options {
-	border: solid #9999aa;
-	border-width: 1px 0;
-}
-
-/*	$TOPICS		*/
-/* ------------------------------------------------------- */
-
-#poll_options dl.options dd {
-	border: 1px solid #aaa;
-	border-radius: 2px;
-	background: #fff;
-}
-
-#poll_options dl.options .percentage {
+#poll_options .options .percentage {
 	background: #fff;
 }
 
@@ -1778,9 +1759,6 @@ div.bbc_footnotes .meaction{
 		top: -5px;
 		font-size: 10px;
 		line-height: 12px;
-	}
-	.linklevel1 .avatar {
-		display: none;
 	}
 	.listlevel1#button_profile .linklevel1 {
 		min-width: 0.5em;

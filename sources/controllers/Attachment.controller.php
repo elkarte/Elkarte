@@ -45,7 +45,6 @@ class Attachment_Controller extends Action_Controller
 		global $txt, $modSettings, $user_info, $context, $topic;
 
 		// Some defaults that we need.
-		$context['character_set'] = 'UTF-8';
 		$context['no_last_modified'] = true;
 
 		// Make sure some attachment was requested!

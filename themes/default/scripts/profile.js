@@ -211,6 +211,33 @@ function changeSel(selected)
 	}
 }
 
+function init_avatars()
+{
+	var avatar = document.getElementById("avatar");
+
+	// If we are using an avatar from the gallery, let's load it
+	if (avatar != null)
+			changeSel(selavatar);
+
+	// And now show the proper interface for the selected avatar type
+	swap_avatar();
+}
+
+// Show the right avatar based on what radio button they just selected
+function swap_avatar()
+{
+	$('#avatar_choices input').each(function() {
+		var choice_id = $(this).attr('id');
+
+		if ($(this).is(':checked'))
+			$('#' + choice_id.replace('_choice', '')).css({display: ''});
+		else
+			$('#' + choice_id.replace('_choice', '')).css({display: 'none'});
+	});
+
+	return true;
+}
+
 /**
  * Updates the avatar img preview with the selected one
  */
@@ -223,7 +250,6 @@ function showAvatar()
 
 	oAvatar.src = avatardir + file.options[file.selectedIndex].value;
 	oAvatar.alt = file.options[file.selectedIndex].text;
-	oAvatar.alt += file.options[file.selectedIndex].text === size ? "!" : "";
 	oAvatar.style.width = "";
 	oAvatar.style.height = "";
 }
@@ -232,29 +258,21 @@ function showAvatar()
  * Allows for the previewing of an externally stored avatar
  *
  * @param {string} src
- * @param {string} sid
  */
-function previewExternalAvatar(src, sid)
+function previewExternalAvatar(src)
 {
-	sid = (typeof(sid) === 'undefined') ? "avatar" : sid;
+	var oSid = document.getElementById("external");
 
-	if (!document.getElementById(sid))
-		return;
+	// Assign the source to the image tag
+	oSid.src = src;
 
-	var tempImage = new Image();
-
-	tempImage.src = src;
-	if (maxWidth !== 0 && tempImage.width > maxWidth)
-	{
-		document.getElementById(sid).style.height = parseInt((maxWidth * tempImage.height) / tempImage.width) + "px";
-		document.getElementById(sid).style.width = maxWidth + "px";
-	}
-	else if (maxHeight !== 0 && tempImage.height > maxHeight)
-	{
-		document.getElementById(sid).style.width = parseInt((maxHeight * tempImage.width) / tempImage.height) + "px";
-		document.getElementById(sid).style.height = maxHeight + "px";
-	}
-	document.getElementById(sid).src = src;
+	// Create an in-memory element to measure the real size of the image
+	$('<img />').load(function() {
+		if (refuse_too_large && ((maxWidth !== 0 && this.width > maxWidth) || (maxHeight !== 0 && this.height > maxHeight)))
+			$('#avatar_external').addClass('error');
+		else
+			$('#avatar_external').removeClass('error');
+	}).attr('src', src);
 }
 
 /**

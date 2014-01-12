@@ -12,7 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- * 
+ *
  */
 
 /**
@@ -151,6 +151,7 @@ function template_error_log()
 					<td class="checkbox_column">
 						<input type="checkbox" name="delete[]" value="', $error['id'], '" class="input_check" />
 					</td>
+					<td></td>
 				</tr>';
 	}
 
@@ -198,8 +199,7 @@ function template_show_file()
 	<head>
 		<title>', $context['file_data']['file'], '</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<link rel="stylesheet" href="', $settings['theme_url'], '/css/admin.css?beta10" />
-		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?beta10" />
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/admin.css', CACHE_STALE, '" />
 	</head>
 	<body>
 		<table id="errorfile_table" class="table_grid">';

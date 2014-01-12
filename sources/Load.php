@@ -27,18 +27,9 @@ if (!defined('ELK'))
  */
 function reloadSettings()
 {
-	global $modSettings, $db_character_set;
+	global $modSettings;
 
 	$db = database();
-
-	// Most database systems have not set UTF-8 as their default input charset.
-	// @todo is this still necessary? (I mean the if, not the query itself.)
-	if (!empty($db_character_set))
-		$db->query('set_character_set', '
-			SET NAMES ' . $db_character_set,
-			array(
-			)
-		);
 
 	// Try to load it from the cache first; it'll never get cached if the setting is off.
 	if (($modSettings = cache_get_data('modSettings', 90)) == null)
@@ -1367,6 +1358,9 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	if (!$user_info['is_guest'])
 		$context['minmax_preferences'] = !empty($options['minmax_preferences']) ? unserialize($options['minmax_preferences']) : array();
+	// Guest may have collapsed the header, check the cookie to prevent collapse jumping
+	elseif ($user_info['is_guest'] && isset($_COOKIE['upshrink']))
+		$context['minmax_preferences'] = array('upshrink' => $_COOKIE['upshrink']);
 
 	// Determine the current smiley set.
 	$user_info['smiley_set'] = (!in_array($user_info['smiley_set'], explode(',', $modSettings['smiley_sets_known'])) && $user_info['smiley_set'] != 'none') || empty($modSettings['smiley_sets_enable']) ? (!empty($settings['smiley_sets_default']) ? $settings['smiley_sets_default'] : $modSettings['smiley_sets_default']) : $user_info['smiley_set'];
@@ -1470,7 +1464,8 @@ function loadTheme($id_theme = 0, $initialize = true)
 	}
 
 	// Initialize the theme.
-	loadSubTemplate('init', 'ignore');
+	if (function_exists('template_init'))
+		$settings += template_init();
 
 	// Guests may still need a name.
 	if ($context['user']['is_guest'] && empty($context['user']['name']))
@@ -1523,8 +1518,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	// Make a special URL for the language.
 	$settings['lang_images_url'] = $settings['images_url'] . '/' . (!empty($txt['image_lang']) ? $txt['image_lang'] : $user_info['language']);
 
-	// Set the character set from the template.
-	$context['character_set'] = 'UTF-8';
+	// Set a couple of bits for the template.
 	$context['right_to_left'] = !empty($txt['lang_rtl']);
 	$context['tabindex'] = 1;
 
@@ -1826,7 +1820,7 @@ function loadSubTemplate($sub_template_name, $fatal = false)
 		die(log_error(sprintf(isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load the %s sub template!', (string) $sub_template_name), 'template'));
 
 	// Are we showing debugging for templates?  Just make sure not to do it before the doctype...
-	if (allowedTo('admin_forum') && isset($_REQUEST['debug']) && !in_array($sub_template_name, array('init', 'main_below')) && ob_get_length() > 0 && !isset($_REQUEST['xml']))
+	if (allowedTo('admin_forum') && isset($_REQUEST['debug']) && !in_array($sub_template_name, array('init')) && ob_get_length() > 0 && !isset($_REQUEST['xml']))
 	{
 		echo '
 <div style="font-size: 8pt; border: 1px dashed red; background: orange; text-align: center; font-weight: bold;">---- ', $sub_template_name, ' ends ----</div>';
@@ -1856,7 +1850,7 @@ function loadCSSFile($filenames, $params = array(), $id = '')
 		$filenames = array($filenames);
 
 	// Static values for all these settings
-	$params['stale'] = (!isset($params['stale']) || $params['stale'] === true) ? '?beta10' : (is_string($params['stale']) ? ($params['stale'] = $params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']) : '');
+	$params['stale'] = (!isset($params['stale']) || $params['stale'] === true) ? CACHE_STALE : (is_string($params['stale']) ? ($params['stale'] = $params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']) : '');
 	$params['fallback'] = (!empty($params['fallback']) && ($params['fallback'] === false)) ? false : true;
 
 	// Whoa ... we've done this before yes?
@@ -1941,7 +1935,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 		$filenames = array($filenames);
 
 	// Static values for all these files
-	$params['stale'] = (!isset($params['stale']) || $params['stale'] === true) ? '?beta10' : (is_string($params['stale']) ? ($params['stale'] = $params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']) : '');
+	$params['stale'] = (!isset($params['stale']) || $params['stale'] === true) ? CACHE_STALE : (is_string($params['stale']) ? ($params['stale'] = $params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']) : '');
 	$params['fallback'] = (!empty($params['fallback']) && ($params['fallback'] === false)) ? false : true;
 
 	// Dejvu?
@@ -2102,16 +2096,17 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 		$found = false;
 		foreach ($attempts as $k => $file)
 		{
-			if (file_exists($file[0] . '/languages/' . $lang . '/' . $file[1] . '.' . $file[2] . '.php'))
+			if (file_exists($file[0] . '/languages/' . $file[2] . '/' . $file[1] . '.' . $file[2] . '.php'))
 			{
 				// Include it!
-				template_include($file[0] . '/languages/' . $lang . '/' . $file[1] . '.' . $file[2] . '.php');
+				template_include($file[0] . '/languages/' . $file[2] . '/' . $file[1] . '.' . $file[2] . '.php');
 
 				// Note that we found it.
 				$found = true;
 
 				break;
 			}
+			// @deprecated since 1.0 - old way of archiving language files, all in one directory
 			elseif (file_exists($file[0] . '/languages/' . $file[1] . '.' . $file[2] . '.php'))
 			{
 				// Include it!

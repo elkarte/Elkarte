@@ -499,8 +499,8 @@ function template_ssi_above()
 <html>
 	<head>
 		<title>SSI.php Examples</title>
-		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css?beta10" />
-		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index_light.css?beta10" />
+		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css', CACHE_STALE, '" />
+		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/_light/index_light.css' , CACHE_STALE, '" />
 		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 		<style>
 			#wrapper {

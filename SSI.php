@@ -24,6 +24,9 @@ if (defined('ELK'))
 
 define('ELK', 'SSI');
 
+// Shortcut for the browser cache stale
+define('CACHE_STALE', '?beta10');
+
 // We're going to want a few globals... these are all set later.
 global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
 global $boardurl, $webmaster_email, $cookiename;
@@ -101,7 +104,6 @@ require_once(SOURCEDIR . '/Errors.class.php');
 require_once(SUBSDIR . '/Util.class.php');
 require_once(SUBSDIR . '/TemplateLayers.class.php');
 require_once(SOURCEDIR . '/Action.controller.php');
-require_once(SOURCEDIR . '/Positioning.class.php');
 
 // Clean the request variables.
 cleanRequest();
