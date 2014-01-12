@@ -44,54 +44,57 @@
  */
 function template_init()
 {
-	global $settings, $context;
+	return array(
+		/* Use images from default theme when using templates from the default theme?
+		  if this is 'always', images from the default theme will be used.
+		  if this is 'defaults', images from the default theme will only be used with default templates.
+		  if this is 'never' or isn't set at all, images from the default theme will not be used. */
+		'use_default_images' => 'never',
 
-	/* Use images from default theme when using templates from the default theme?
-	  if this is 'always', images from the default theme will be used.
-	  if this is 'defaults', images from the default theme will only be used with default templates.
-	  if this is 'never' or isn't set at all, images from the default theme will not be used. */
-	$settings['use_default_images'] = 'never';
+		// The version this template/theme is for. This should probably be the version of the forum it was created for.
+		'theme_version' => '1.0',
 
-	// The version this template/theme is for. This should probably be the version of the forum it was created for.
-	$settings['theme_version'] = '1.0';
+		// Use plain buttons - as opposed to text buttons?
+		'use_buttons' => true,
 
-	// Use plain buttons - as opposed to text buttons?
-	$settings['use_buttons'] = true;
+		// Show sticky and lock status separate from topic icons?
+		'separate_sticky_lock' => true,
 
-	// Show sticky and lock status separate from topic icons?
-	$settings['separate_sticky_lock'] = true;
+		// Set the following variable to true if this theme requires the optional theme strings file to be loaded.
+		'require_theme_strings' => false,
 
-	// Set the following variable to true if this theme requires the optional theme strings file to be loaded.
-	$settings['require_theme_strings'] = false;
+		// This is used for the color variants.
+		'theme_variants' => array('light', 'dark', 'besocial'),
 
-	// This is used for the color variants.
-	$settings['theme_variants'] = array('light', 'dark', 'besocial');
+		// If the following variable is set to true, the avatar of the last poster will be displayed on the boardindex and message index.
+		'avatars_on_indexes' => true,
 
-	// If the following variable is set to true, the avatar of the last poster will be displayed on the boardindex and message index.
-	$settings['avatars_on_indexes'] = true;
+		// This is used in the main menus to create a number next to the title of the menu to indicate the number of unread messages,
+		// moderation reports, etc. You can style each menu level indicator as desired.
+		'menu_numeric_notice' => array(
+			// Top level menu entries
+			0 => ' <span class="pm_indicator">%1$s</span>',
+			// First dropdown
+			1 => ' <span>[<strong>%1$s</strong>]</span>',
+			// Second level dropdown
+			2 => ' <span>[<strong>%1$s</strong>]</span>',
+		),
 
-	// This is used in the main menus to create a number next to the title of the menu to indicate the number of unread messages,
-	// moderation reports, etc. You can style each menu level indicator as desired.
-	$settings['menu_numeric_notice'] = array(
-		// Top level menu entries
-		0 => ' <span class="pm_indicator">%1$s</span>',
-		// First dropdown
-		1 => ' <span>[<strong>%1$s</strong>]</span>',
-		// Second level dropdown
-		2 => ' <span>[<strong>%1$s</strong>]</span>',
-	);
+		// This slightly more complex array, instead, will deal with page indexes as frequently requested by Ant :P
+		// Oh no you don't. :D This slightly less complex array now has cleaner markup. :P
+		// @todo - God it's still ugly though. Can't we just have links where we need them, without all those spans?
+		// How do we get anchors only, where they will work? Spans and strong only where necessary?
+		'page_index_template' => array(
+			'base_link' => '<li class="linavPages"><a class="navPages" href="{base_link}" role="menuitem">%2$s</a></li>',
+			'previous_page' => '<span class="previous_page" role="menuitem">{prev_txt}</span>',
+			'current_page' => '<li class="linavPages"><strong class="current_page" role="menuitem">%1$s</strong></li>',
+			'next_page' => '<span class="next_page" role="menuitem">{next_txt}</span>',
+			'expand_pages' => '<li class="linavPages expand_pages" role="menuitem" {custom}> <a href="#">...</a> </li>',
+			'all' => '<li class="linavPages all_pages" role="menuitem">{all_txt}</li>',
+		),
 
-	// This slightly more complex array, instead, will deal with page indexes as frequently requested by Ant :P
-	// Oh no you don't. :D This slightly less complex array now has cleaner markup. :P
-	// @todo - God it's still ugly though. Can't we just have links where we need them, without all those spans?
-	// How do we get anchors only, where they will work? Spans and strong only where necessary?
-	$settings['page_index_template'] = array(
-		'base_link' => '<li class="linavPages"><a class="navPages" href="{base_link}" role="menuitem">%2$s</a></li>',
-		'previous_page' => '<span class="previous_page" role="menuitem">{prev_txt}</span>',
-		'current_page' => '<li class="linavPages"><strong class="current_page" role="menuitem">%1$s</strong></li>',
-		'next_page' => '<span class="next_page" role="menuitem">{next_txt}</span>',
-		'expand_pages' => '<li class="linavPages expand_pages" role="menuitem" {custom}> <a href="#">...</a> </li>',
-		'all' => '<li class="linavPages all_pages" role="menuitem">{all_txt}</li>',
+		// @todo find a better place if we are going to create a notifications template
+		'mentions' => array('mentioner_template' => '<a href="{mem_url}" class="mentionavatar">{avatar_img}{mem_name}</a>')
 	);
 }
 
