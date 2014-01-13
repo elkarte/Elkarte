@@ -393,13 +393,13 @@ $.sceditor.plugins.bbcode.bbcode
 				sDate = '<date timestamp="' + attr_date + '">' + new Date(attrs.date * 1000) + '</date>';
 			}
 
-			// build the blockquote up with the data
+			// Build the blockquote up with the data
 			if (sAuthor === '' && sDate === '')
 				sAuthor = bbc_quote;
 			else
 				sAuthor += sDate !== '' ? ' ' + bbc_search_on : '';
 
-			content = '<blockquote author="' + attr_author + '" date="' + attr_date + '" link="' + attr_link + '"><cite>' + sAuthor + ' ' + sDate + '</cite>' + content + '</blockquote>';
+			content = '<blockquote author="' + attr_author + '" link="' + attr_link + '" date="' + attr_date + '"><cite>' + sAuthor + ' ' + sDate + '</cite>' + content + '</blockquote>';
 
 			return content;
 		}
