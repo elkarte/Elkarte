@@ -139,8 +139,8 @@ $txt['warning_issue'] = 'Verwarnen';
 $txt['message_index'] = 'Nachrichtenindex';
 $txt['news'] = 'Neues';
 $txt['page'] = 'Seite';
-$txt['prev'] = 'vorherige Seite';
-$txt['next'] = 'nächste Seite';
+$txt['prev'] = 'vorherige';
+$txt['next'] = 'nächste';
 
 $txt['lock_unlock'] = 'Thema sperren/entsperren';
 $txt['post'] = 'Beitrag';
