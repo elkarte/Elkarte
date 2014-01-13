@@ -583,8 +583,6 @@ $txt['mm_emailtemplates'] = 'Vorlagen';
 $txt['mm_emailsettings'] = 'Einstellungen';
 
 $txt['removeNestedQuotes'] = 'Verschachtelte Zitate beim Zitieren entfernen';
-$txt['enableEmbeddedFlash'] = 'Flash in Beiträge einbetten';
-$txt['enableEmbeddedFlash_warning'] = 'kann ein Sicherheitsrisiko darstellen!';
 $txt['enableSpellChecking'] = 'Rechtschreibprüfung aktivieren';
 $txt['enableSpellChecking_warning'] = 'dies funktioniert nicht auf allen Servern.';
 $txt['enableSpellChecking_error'] = 'dies funktioniert auf Ihrem Server nicht.';
