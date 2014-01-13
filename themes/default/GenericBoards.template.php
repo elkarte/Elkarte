@@ -35,7 +35,7 @@ function template_list_boards($boards, $id)
 	foreach ($boards as $board)
 	{
 		echo '
-				<li class="board_row ', (!empty($board['children'])) ? 'parent_board' : '', '" id="board_', $board['id'], '">
+				<li class="board_row', (!empty($board['children'])) ? ' parent_board' : '', $board['is_redirect'] ? ' board_row_redirect' : '', '" id="board_', $board['id'], '">
 					<div class="board_info">
 						<a class="icon_anchor" href="', ($board['is_redirect'] || $context['user']['is_guest'] ? $board['href'] : $scripturl . '?action=unread;board=' . $board['id'] . '.0;children'), '">';
 

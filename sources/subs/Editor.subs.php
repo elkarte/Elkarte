@@ -357,27 +357,6 @@ function create_control_richedit($editorOptions)
 				'code' => 'email',
 				'description' => $txt['insert_email']
 			),
-			array(
-				'code' => 'ftp',
-				'description' => $txt['ftp']
-			),
-			array(
-				'code' => 'flash',
-				'description' => $txt['flash']
-			),
-			array(),
-			array(
-				'code' => 'glow',
-				'description' => $txt['glow']
-			),
-			array(
-				'code' => 'shadow',
-				'description' => $txt['shadow']
-			),
-			array(
-				'code' => 'move',
-				'description' => $txt['marquee']
-			),
 		);
 
 		// Allow mods to modify BBC buttons.
@@ -401,9 +380,6 @@ function create_control_richedit($editorOptions)
 		$disabled_tags = array();
 		if (!empty($modSettings['disabledBBC']))
 			$disabled_tags = explode(',', $modSettings['disabledBBC']);
-
-		if (empty($modSettings['enableEmbeddedFlash']))
-			$disabled_tags[] = 'flash';
 
 		foreach ($disabled_tags as $tag)
 		{

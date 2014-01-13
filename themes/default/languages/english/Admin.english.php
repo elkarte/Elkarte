@@ -584,8 +584,6 @@ $txt['mm_emailtemplates'] = 'Templates';
 $txt['mm_emailsettings'] = 'Settings';
 
 $txt['removeNestedQuotes'] = 'Remove nested quotes when quoting';
-$txt['enableEmbeddedFlash'] = 'Embed flash into posts';
-$txt['enableEmbeddedFlash_warning'] = 'may be a security risk!';
 $txt['enableSpellChecking'] = 'Enable spell checking';
 $txt['enableSpellChecking_warning'] = 'this does not work on all servers.';
 $txt['enableSpellChecking_error'] = 'this does not work on your server.';
