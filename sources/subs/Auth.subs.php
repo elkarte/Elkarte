@@ -97,14 +97,17 @@ function setLoginCookie($cookie_length, $id, $password = '')
 		// We need to meddle with the session.
 		require_once(SOURCEDIR . '/Session.php');
 
-		// Backup and remove the old session.
+		// Backup the old session.
 		$oldSessionData = $_SESSION;
+
+		// Remove the old session data and file / db entry
 		$_SESSION = array();
 		session_destroy();
 
 		// Recreate and restore the new session.
 		loadSession();
-		// @todo should we use session_regenerate_id(true); now that we are 5.1+
+
+		// Get a new session id, and load it with the data
 		session_regenerate_id();
 		$_SESSION = $oldSessionData;
 
