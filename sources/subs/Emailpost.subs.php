@@ -871,7 +871,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	$subject = un_htmlspecialchars($subject);
 
 	// Convert bbc [quotes] before we go to parsebbc so they are easier to plain-textify later
-	$message = preg_replace('~(\[quote)\s?author=(.*)\s?link=(.*)\s?date=([0-9]{10})(\])~seU', "<blockquote>{$txt['email_on']}: ' . date('D M j, Y','\\4') . ' \\2 {$txt['email_wrote']}:", $message);
+	$message = preg_replace('~(\[quote)\s?author=(.*)\s?link=(.*)\s?date=([0-9]{10})(\])~seU', "'<blockquote>{$txt['email_on']}: ' . date('D M j, Y','\\4') . ' \\2 {$txt['email_wrote']}:'", $message);
 	$message = preg_replace('~(\[quote\s?\])~sU', '<blockquote>', $message);
 	$message = str_replace('[/quote]', "</blockquote>\n\n", $message);
 
