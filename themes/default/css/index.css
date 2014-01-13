@@ -847,6 +847,9 @@ a.bbc_link {
 	vertical-align: top;
 	padding: 0 0 1em 0;
 }
+#news .bbc_link {
+	display: inline;
+}
 
 /* The login form. */
 #guest_form {
