@@ -797,6 +797,9 @@ a.active {
 	overflow: auto;
 	resize: vertical;
 }
+#news_line .bbc_link, #elkFadeScroller .bbc_link{
+	resize: none;
+}
 
 .navigate_section {
 	padding-left: 15px;
