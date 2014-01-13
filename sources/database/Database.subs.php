@@ -67,7 +67,7 @@ function db_table()
 	require_once(SOURCEDIR . '/database/DbTable.class.php');
 	require_once(SOURCEDIR . '/database/DbTable-' . $db_type . '.php');
 
-	return call_user_func(array('Database_' . DB_TYPE, 'db_table'));
+	return call_user_func(array('DbTable_' . DB_TYPE, 'db_table'));
 }
 
 /**
@@ -84,5 +84,5 @@ function db_search()
 	require_once(SOURCEDIR . '/database/DbSearch.php');
 	require_once(SOURCEDIR . '/database/DbSearch-' . $db_type . '.php');
 
-	return call_user_func(array('Database_' . DB_TYPE, 'db_search'));
+	return call_user_func(array('DbSearch_' . DB_TYPE, 'db_search'));
 }
