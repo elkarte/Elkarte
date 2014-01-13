@@ -37,7 +37,7 @@ function template_recent()
 					<div class="counter">', $post['counter'], '</div>
 					<div class="topic_details">
 						<h5>', $post['board']['link'], ' / ', $post['link'], '</h5>
-						<span class="smalltext">', $txt['last_post'], ' ', $txt['by'], ' <strong>', $post['poster']['link'], ' </strong> - ', $post['time'], '</span>
+						<span class="smalltext">', $txt['last_post'], ' ', $txt['by'], ' <strong>', $post['poster']['link'], ' </strong> - ', $post['html_time'], '</span>
 					</div>
 					<div class="inner">', $post['message'], '</div>';
 
@@ -179,7 +179,7 @@ function template_unread()
 									</p>
 									<p class="topic_lastpost">
 										<a href="', $topic['last_post']['href'], '"><img src="', $settings['images_url'], '/icons/last_post.png" alt="', $txt['last_post'], '" title="', $txt['last_post'], '" /></a>
-										', $topic['last_post']['time'], '<br />
+										', $topic['last_post']['html_time'], '<br />
 										', $txt['by'], ' ', $topic['last_post']['member']['link'], '
 									</p>
 								</div>';
@@ -327,7 +327,7 @@ function template_replies()
 									</p>
 									<p class="topic_lastpost">
 										<a href="', $topic['last_post']['href'], '"><img src="', $settings['images_url'], '/icons/last_post.png" alt="', $txt['last_post'], '" title="', $txt['last_post'], '" /></a>
-										', $topic['last_post']['time'], '<br />
+										', $topic['last_post']['html_time'], '<br />
 										', $txt['by'], ' ', $topic['last_post']['member']['link'], '
 									</p>
 								</div>';
