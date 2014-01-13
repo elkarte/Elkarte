@@ -615,7 +615,16 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 }
 
 /**
- * Show a box with an error message.
+ * Show a box with a message, mostly used to show errors, but can be used to show
+ * sucess as well
+ *
+ * Looks for the display infomration in the $context[$error_id] array
+ * Keys of array are 'type'
+ *	- empty or success for successbox
+ *  - serious for error box
+ *  - warning for warning box
+ * 'title' - optional value to place above list
+ * 'errors' - array of text strings to display in the box
  *
  * @param string $error_id
  */
