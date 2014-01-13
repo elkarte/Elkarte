@@ -21,7 +21,7 @@ if (!defined('ELK'))
  * conventions and then that will be converted to bbc.
  *
  * requires Html2BBC.class.php for the html to bbc conversion
- * requires markdown.php for text to html convesions
+ * requires markdown.php for text to html conversions
  *
  * @param string $text
  * @param boolean $html
