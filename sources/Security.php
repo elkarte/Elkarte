@@ -68,7 +68,7 @@ function validateSession($type = 'admin')
 	if (!empty($modSettings['securityDisable' . ($type != 'admin' ? '_' . $type : '')]))
 		return;
 
-	// If their admin or moderator session hasn't expired yet, let it pass.
+	// If their admin or moderator session hasn't expired yet, let it pass, let the admin session trump a moderation one as well
 	if ((!empty($_SESSION[$type . '_time']) && $_SESSION[$type . '_time'] + $refreshTime >= time()) || (!empty($_SESSION['admin_time']) && $_SESSION['admin_time'] + $refreshTime >= time()))
 		return;
 
