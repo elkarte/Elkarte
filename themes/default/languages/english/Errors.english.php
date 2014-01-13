@@ -286,7 +286,7 @@ $txt['smileys_upload_error_blank'] = 'All smiley sets must have an image.';
 $txt['smileys_upload_error_name'] = 'All smileys must have the same file name.'; // TODO: rephrase this. can be misunderstood.
 $txt['smileys_upload_error_illegal'] = 'Illegal Type.';
 
-$txt['search_invalid_weights'] = 'Search weights are not properly configured. At least one weight should be configure to be non-zero.';
+$txt['search_invalid_weights'] = 'Search weights are not configured properly. At least one weight should be configured to be non-zero. Please report this error to an administrator.';
 $txt['unable_to_create_temporary'] = 'The search function was unable to create temporary tables.  Please try again.';
 
 $txt['package_no_file'] = 'Unable to find package file!';
@@ -296,14 +296,14 @@ $txt['package_cant_uninstall'] = 'This package was either never installed or was
 $txt['package_cant_download'] = 'You cannot download or install new packages because the &quot;packages&quot; directory or one of the files in it are not writable!';
 $txt['package_upload_error_nofile'] = 'You did not select a package to upload.';
 $txt['package_upload_error_failed'] = 'Could not upload package, please check directory permissions!';
-$txt['package_upload_error_exists'] = 'The file you are uploading already exists on the server. Please delete it first then try again.';
-$txt['package_upload_already_exists'] = 'The package you are trying to upload already exists on the server under filename: %1$s';
+$txt['package_upload_error_exists'] = 'The file you are uploading already exists on the server. Please delete it first, then try again.';
+$txt['package_upload_already_exists'] = 'The package you are trying to upload already exists on the server under file name: %1$s';
 $txt['package_upload_error_supports'] = 'The package manager currently allows only these file types: %1$s.';
 $txt['package_upload_error_broken'] = 'Package upload failed due to the following error:<br />&quot;%1$s&quot;';
 
 $txt['package_get_error_not_found'] = 'The package you are trying to install cannot be located. You may want to manually upload the package to your &quot;packages&quot; directory.';
 $txt['package_get_error_missing_xml'] = 'The package you are attempting to install is missing the package-info.xml that must be in the root package directory.';
-$txt['package_get_error_is_zero'] = 'Although the package was downloaded to the server it appears to be empty. Please check the &quot;packages&quot; directory, and the &quot;temp&quot; sub-directory are both writable. If you continue to experience this problem you should try extracting the package on your PC and uploading the extracted files into a subdirectory in your &quot;packages&quot; directory and try again. For example, if the package was called shout.tar.gz you should:<br />1) Download the package to your local PC and extract it into files.<br />2) Using an FTP client create a new directory in your &quot;packages&quot; folder, in this example you may call it "shout".<br />3) Upload all the files from the extracted package to this directory.<br />4) Go back to the package manager browse page and the package will be automatically found.';
+$txt['package_get_error_is_zero'] = 'Although the package was downloaded to the server it appears to be empty. Please check the &quot;packages&quot; directory, and the &quot;temp&quot; sub-directory are both writable. If you continue to experience this problem you should try extracting the package on your PC and uploading the extracted files into a subdirectory in your &quot;packages&quot; directory and try again. For example, if the package was called shout.tar.gz you should:<br />1) Download the package to your local PC and extract its files.<br />2) Create a new directory in your &quot;packages&quot; folder using an FTP client, in this example you may call it "shout".<br />3) Upload all the files from the extracted package to this directory.<br />4) Go back to the package manager browse page. The package will be automatically found.';
 $txt['package_get_error_packageinfo_corrupt'] = 'Unable to find any valid information within the package-info.xml file included within the package. There may be an error in the add-on, or the package may be corrupt.';
 $txt['package_get_error_is_theme'] = 'You can\'t install a theme from this section, please use the <a href="{MANAGETHEMEURL}">Themes and Layout</a> management page to upload it';
 
@@ -352,7 +352,7 @@ $txt['mysql_error_space'] = ' - check database storage space or contact the serv
 
 $txt['icon_not_found'] = 'The icon image could not be found in the default theme - please ensure the image has been uploaded and try again.';
 $txt['icon_after_itself'] = 'The icon cannot be positioned after itself.';
-$txt['icon_name_too_long'] = 'Icon filenames cannot be more than 16 characters long';
+$txt['icon_name_too_long'] = 'Icon file names cannot be more than 16 characters long';
 
 $txt['name_censored'] = 'Sorry, the name you tried to use, %1$s, contains words which have been censored.  Please try another name.';
 
@@ -364,10 +364,10 @@ $txt['error_while_editing_poll'] = 'The following error or errors occurred while
 
 $txt['loadavg_search_disabled'] = 'Due to high stress on the server, the search function has been automatically and temporarily disabled.  Please try again in a short while.';
 $txt['loadavg_generic_disabled'] = 'Sorry, because of high stress on the server, this feature is currently unavailable.';
-$txt['loadavg_allunread_disabled'] = 'The server\'s resources are temporarily under too high a demand to find all the topics you have not read.';
+$txt['loadavg_allunread_disabled'] = 'The server\'s resources are temporarily under a too high demand to find all the topics you have not read.';
 $txt['loadavg_unreadreplies_disabled'] = 'The server is currently under high stress.  Please try again shortly.';
 $txt['loadavg_show_posts_disabled'] = 'Please try again later.  This member\'s posts are not currently available due to high load on the server.';
-$txt['loadavg_unread_disabled'] = 'The server\'s resources are temporarily under too high a demand to list out the topics you have not read.';
+$txt['loadavg_unread_disabled'] = 'The server\'s resources are temporarily under a too high demand to list out the topics you have not read.';
 $txt['loadavg_userstats_disabled'] = 'Please try again later.  This member\'s statistics are not currently available due to high load on the server.';
 
 $txt['cannot_edit_permissions_inherited'] = 'You cannot edit inherited permissions directly, you must either edit the parent group or edit the member group inheritance.';
@@ -406,7 +406,7 @@ $txt['cannot_connect_doc_site'] = 'Could not connect to the documentation site. 
 $txt['movetopic_no_reason'] = 'You must enter a reason for moving the topic, or uncheck the option to \'post a redirection topic\'.';
 $txt['movetopic_no_board'] = 'You must choose a board to move the topic to.';
 
-$txt['splittopic_no_reason'] = 'You must enter a reason for moving the topic, or uncheck the option to \'post a redirection message\'.';
+$txt['splittopic_no_reason'] = 'You must enter a reason for splitting the topic, or uncheck the option to \'post a redirection message\'.';
 
 // OpenID error strings
 $txt['openid_server_bad_response'] = 'The requested identifier did not return the proper information.';
