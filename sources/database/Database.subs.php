@@ -49,8 +49,6 @@ function db_extend($type = 'extra')
  */
 function database()
 {
-	global $db_type;
-
 	return call_user_func(array('Database_' . DB_TYPE, 'db'));
 }
 
@@ -67,7 +65,7 @@ function db_table()
 	require_once(SOURCEDIR . '/database/DbTable.class.php');
 	require_once(SOURCEDIR . '/database/DbTable-' . $db_type . '.php');
 
-	return call_user_func(array('Database_' . DB_TYPE, 'db_table'));
+	return call_user_func(array('DbTable_' . DB_TYPE, 'db_table'));
 }
 
 /**
