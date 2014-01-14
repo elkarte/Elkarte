@@ -78,27 +78,32 @@ function template_pm_below()
 }
 
 /**
- * Messages folder.
+ * Messages folder, used to viewing a listing of messages
  */
 function template_folder()
 {
 	global $context, $scripturl, $options, $txt;
 
-	// Got some messages to display?
+	$start = true;
+
+	// Do we have some messages to display?
 	if ($context['get_pmessage']('message', true))
 	{
 		echo '
 					<div class="forumposts">';
 
-		// Show the helpful titlebar - generally.
-		if ($context['display_mode'] != 1)
-			echo '
-						<h2 class="category_header">
-							', $txt[$context['display_mode'] == 0 ? 'messages' : 'conversation'], '
-						</h2>';
-
 		while ($message = $context['get_pmessage']('message'))
 		{
+			// Show the helpful titlebar - generally.
+			if ($start && $context['display_mode'] != 1)
+			{
+				echo '
+						<h2 class="category_header">
+							', $context['display_mode'] == 0 ? $txt['messages'] : $txt['conversation'] . ': ' . $message['subject'], '
+						</h2>';
+				$start = false;
+			}
+
 			$window_class = $message['alternate'] === 0 ? 'windowbg' : 'windowbg2';
 
 			echo '
@@ -119,14 +124,16 @@ function template_folder()
 			// @todo - above needs fixing re document outlining (a11y stuffz).
 			// Show who the message was sent to.
 			echo '
-										<strong> ', $txt['sent_to'], ':</strong> ';
+										<strong>', $txt['sent_to'], ': </strong>';
 
 			// People it was sent directly to....
 			if (!empty($message['recipients']['to']))
-				echo implode(', ', $message['recipients']['to']);
+				echo
+										implode(', ', $message['recipients']['to']);
 			// Otherwise, we're just going to say "some people"...
 			elseif ($context['folder'] != 'sent')
-				echo '(', $txt['pm_undisclosed_recipients'], ')';
+				echo
+										'(', $txt['pm_undisclosed_recipients'], ')';
 
 			echo '
 										<strong> ', $txt['on'], ':</strong> ', $message['time'];
