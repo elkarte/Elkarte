@@ -213,6 +213,8 @@ class Maintenance_Controller extends Action_Controller
 
 	/**
 	 * Supporting function for the routine maintenance area.
+	 *
+	 * @uses sub template maintain_routine, Template file Maintenance
 	 */
 	public function action_routine()
 	{
@@ -290,8 +292,9 @@ class Maintenance_Controller extends Action_Controller
 		// Get all membergroups - for deleting members and the like.
 		$context['membergroups'] = getBasicMembergroupData(array('all'));
 
-		if (isset($_GET['done']) && $_GET['done'] == 'recountposts')
-			$context['maintenance_finished'] = $txt['maintain_recountposts'];
+		// Show that we completed this action
+		if (isset($_REQUEST['done']) && $_REQUEST['done'] == 'recountposts')
+			$context['maintenance_finished']['errors'][] = sprintf($txt['maintain_complete'], $txt['maintain_recountposts']);
 
 		loadJavascriptFile('suggest.js', array('defer' => true));
 
@@ -566,14 +569,16 @@ class Maintenance_Controller extends Action_Controller
 		isAllowedTo('admin_forum');
 		checkSession('request');
 
+		// Functions
 		require_once(SUBSDIR . '/Maintenance.subs.php');
 
-		// validate the request or the loop
+		// Validate the request or the loop
 		if (!isset($_REQUEST['step']))
 			validateToken('admin-maint');
 		else
 			validateToken('admin-boardrecount');
 
+		// For the loop template
 		$context['page_title'] = $txt['not_done_title'];
 		$context['continue_post_data'] = '';
 		$context['continue_countdown'] = 3;
@@ -1269,25 +1274,27 @@ class Maintenance_Controller extends Action_Controller
 	{
 		global $txt, $context;
 
-		// You have to be allowed in here
-		isAllowedTo('admin_forum');
-		checkSession('request');
+		// Check the session
+		checkSession();
 
-		// Set up to the context.
+		// Set up to the context for the pause screen
 		$context['page_title'] = $txt['not_done_title'];
 		$context['continue_countdown'] = 3;
 		$context['continue_get_data'] = '';
 		$context['sub_template'] = 'not_done';
 
-		// init
+		// Init, do 200 members in a bunch
 		$increment = 200;
 		$_REQUEST['start'] = !isset($_REQUEST['start']) ? 0 : (int) $_REQUEST['start'];
 
 		// Ask for some extra time, on big boards this may take a bit
 		@set_time_limit(600);
 
+		// The functions here will come in handy
+		require_once(SUBSDIR . '/Maintenance.subs.php');
+
 		// Only run this query if we don't have the total number of members that have posted
-		if (!isset($_SESSION['total_members']))
+		if (!isset($_SESSION['total_members']) || $_REQUEST['start'] == 0)
 		{
 			validateToken('admin-maint');
 			$_SESSION['total_members'] = countContributors();
@@ -1295,30 +1302,33 @@ class Maintenance_Controller extends Action_Controller
 		else
 			validateToken('admin-recountposts');
 
-		// Lets get a group of members and determine their post count (from the boards that have post count enabled of course).
+		// Lets get the next group of members and determine their post count
+		// (from the boards that have post count enabled of course).
 		$total_rows = updateMembersPostCount($_REQUEST['start'], $increment);
 
 		// Continue?
 		if ($total_rows == $increment)
 		{
-			$_REQUEST['start'] += $increment;
-			$context['continue_get_data'] = '?action=admin;area=maintain;sa=members;activity=recountposts;start=' . $_REQUEST['start'] . ';' . $context['session_var'] . '=' . $context['session_id'];
-			$context['continue_percent'] = round(100 * $_REQUEST['start'] / $_SESSION['total_members']);
-
 			createToken('admin-recountposts');
-			$context['continue_post_data'] = '<input type="hidden" name="' . $context['admin-recountposts_token_var'] . '" value="' . $context['admin-recountposts_token'] . '" />';
+
+			$_REQUEST['start'] += $increment;
+			$context['continue_get_data'] = '?action=admin;area=maintain;sa=members;activity=recountposts;start=' . $_REQUEST['start'];
+			$context['continue_percent'] = round(100 * $_REQUEST['start'] / $_SESSION['total_members']);
+			$context['not_done_title'] = $txt['not_done_title'] . ' (' . $context['continue_percent'] . '%)';
+			$context['continue_post_data'] = '<input type="hidden" name="' . $context['admin-recountposts_token_var'] . '" value="' . $context['admin-recountposts_token'] . '" />
+					<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />';
 
 			if (function_exists('apache_reset_timeout'))
 				apache_reset_timeout();
+
 			return;
 		}
 
 		// No countable posts? set posts counter to 0
 		updateZeroPostMembers();
 
-		// all done
+		// All done, clean up and go back to maintainance
 		unset($_SESSION['total_members']);
-		$context['maintenance_finished'] = $txt['maintain_recountposts'];
 		redirectexit('action=admin;area=maintain;sa=members;done=recountposts');
 	}
 
