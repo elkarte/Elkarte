@@ -1118,3 +1118,20 @@ function initEditProfileBoards()
 		);
 	});
 }
+
+function frame_security_toggle()
+{
+	elem = document.getElementById('frame_security');
+
+	if (elem.options[elem.selectedIndex].value == 'ALLOW-FROM')
+	{
+		$('#frame_security_allow_from').parent().fadeIn('fast');
+		$('#frame_security_allow_from').parent().prev().fadeIn('fast');
+	}
+	else
+	{
+		$('#frame_security_allow_from').parent().fadeOut('fast');
+		$('#frame_security_allow_from').parent().prev().fadeOut('fast');
+	}
+
+}

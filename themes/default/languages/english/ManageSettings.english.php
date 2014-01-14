@@ -460,5 +460,8 @@ $txt['languages_delete_confirm'] = 'Are you sure you want to delete this languag
 
 $txt['setting_frame_security'] = 'Frame Security Options';
 $txt['setting_frame_security_SAMEORIGIN'] = 'Allow Same Origin';
+$txt['setting_frame_security_ALLOW-FROM'] = 'Allow From Specified Origins';
 $txt['setting_frame_security_DENY'] = 'Deny all frames';
 $txt['setting_frame_security_DISABLE'] = 'Disabled';
+$txt['setting_frame_security_allow_from'] = 'URL of hosts allowed to include your site into frames';
+$txt['setting_frame_security_allow_from_desc'] = 'One address per line<br />This option may not be supported by all browsers.';

@@ -1072,6 +1072,7 @@ function template_show_settings()
 		</form>
 	</div>';
 
+	// @deprecated since 1.0 use addInlineJavascript instead
 	if (!empty($context['settings_post_javascript']))
 		echo '
 	<script><!-- // --><![CDATA[

@@ -123,6 +123,48 @@ class ManageSecurity_Controller extends Action_Controller
 		{
 			checkSession();
 
+			// ALLOW-FROM requires addresses
+			if (!empty($_POST['frame_security']) && $_POST['frame_security'] == 'ALLOW-FROM')
+			{
+				$allowed = array();
+
+				// Cleanup, should we do more? (htmlspecialchars maybe?)
+				if (!empty($_POST['frame_security_allow_from']))
+				{
+					// This baby makes our work easier! :D
+					require_once(SUBSDIR . '/DataValidator.class.php');
+
+					// Initialize a common validator
+					$validation = new Data_Validator();
+					$validation->sanitation_rules(array(
+						'allow_from' => 'trim|htmlspecialchars',
+					));
+					$validation->validation_rules(array(
+						'allow_from' => 'valid_url',
+					));
+
+					// And now, each url should look like... an url
+					foreach (explode("\n", $_POST['frame_security_allow_from']) as $url)
+					{
+						// Fake the data array...
+						$allow_from['allow_from'] = $url;
+						// Do the actual validation
+						if ($validation->validate($allow_from))
+						{
+							// If valid, extract just few bits (scheme and host)
+							$parsed = parse_url($validation->allow_from);
+							$allowed[] = $parsed['scheme'] . '://' . $parsed['host'];
+						}
+					}
+				}
+
+				// If no valid hosts were specified, just set fall back to same origin
+				if (empty($allowed))
+					$_POST['frame_security'] = 'SAMEORIGIN';
+				else
+					$_POST['frame_security_allow_from'] = implode("\n", $allowed);
+			}
+
 			Settings_Form::save_db($config_vars);
 
 			call_integration_hook('integrate_save_general_security_settings');
@@ -133,6 +175,7 @@ class ManageSecurity_Controller extends Action_Controller
 
 		$context['post_url'] = $scripturl . '?action=admin;area=securitysettings;save;sa=general';
 		$context['settings_title'] = $txt['mods_cat_security_general'];
+		addInlineJavascript('frame_security_toggle()', true);
 
 		Settings_Form::prepare_db($config_vars);
 	}
@@ -472,7 +515,8 @@ class ManageSecurity_Controller extends Action_Controller
 				array('select', 'password_strength', array($txt['setting_password_strength_low'], $txt['setting_password_strength_medium'], $txt['setting_password_strength_high'])),
 				array('check', 'enable_password_conversion'),
 			'',
-				array('select', 'frame_security', array('SAMEORIGIN' => $txt['setting_frame_security_SAMEORIGIN'], 'DENY' => $txt['setting_frame_security_DENY'], 'DISABLE' => $txt['setting_frame_security_DISABLE'])),
+				array('select', 'frame_security', array('SAMEORIGIN' => $txt['setting_frame_security_SAMEORIGIN'], 'ALLOW-FROM' => $txt['setting_frame_security_ALLOW-FROM'], 'DENY' => $txt['setting_frame_security_DENY'], 'DISABLE' => $txt['setting_frame_security_DISABLE']), 'onchange' => 'frame_security_toggle();'),
+				array('large_text', 'frame_security_allow_from', 'subtext' => $txt['setting_frame_security_allow_from_desc']),
 		);
 
 		call_integration_hook('integrate_general_security_settings', array(&$config_vars));
