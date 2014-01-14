@@ -519,7 +519,9 @@ div.bbc_footnotes .meaction{
 	border: 1px solid transparent;
 	box-shadow: none;
 }
-
+.post li.avatar a {
+	display: inline;
+}
 #main_menu .linklevel1, #main_menu .linklevel1:link, #main_menu .linklevel1:visited,
 .poster li.listlevel1, .poster li.listlevel1 a, .poster li.listlevel1 a:hover {
 	border-radius: none;
@@ -792,7 +794,8 @@ a.active {
 }
 #news_line, #elkFadeScroller {
 	color: #666666;
-	min-height: 20px;
+	min-height: 60px;
+	height: 60px;
 	padding: 3px;
 	overflow: auto;
 	resize: vertical;
