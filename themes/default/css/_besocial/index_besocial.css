@@ -522,7 +522,7 @@ div.bbc_footnotes .meaction{
 .poster li.avatar a {
 	display: inline-block;
 }
-.poster .listlevel1:hover >a {
+.poster .listlevel1:hover>a {
 	border: 1px solid transparent;
 	background-color: transparent;
 	box-shadow: none;
@@ -887,7 +887,7 @@ span.views_text {
 	border: 1px solid #eaeaea;
 	border-radius: 10px;
 }
-/* Need an offset to some of our anchors due to the fixed top navigation */
+/* We need an offset for some of our anchors due to the fixed top navigation */
 .post_anchor, .pm_anchor, #new {
 	display: block;
 	margin-top: -45px;
