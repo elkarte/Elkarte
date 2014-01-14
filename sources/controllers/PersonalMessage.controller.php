@@ -373,18 +373,21 @@ class PersonalMessage_Controller extends Action_Controller
 			else
 				$display_pms = array($lastData['id']);
 
-			// This is pretty much EVERY pm!
-			$all_pms = array_unique(array_merge($pms, $display_pms));
-
 			// At this point we know the main id_pm's. But if we are looking at conversations we need
 			// the PMs that make up the conversation
 			if ($context['display_mode'] == 2)
 			{
 				list($display_pms, $posters) = loadConversationList($lastData['head'], $recipients, $context['folder']);
 
+				// Conversation list may expose additonal PM's being displayed
+				$all_pms = array_unique(array_merge($pms, $display_pms));
+
 				// See if any of these 'listing' PM's are in a conversation thread that has unread entries
 				$context['conversation_unread'] = loadConversationUnreadStatus($all_pms);
 			}
+			// This is pretty much EVERY pm!
+			else
+				$all_pms = array_unique(array_merge($pms, $display_pms));
 
 			// Get recipients (don't include bcc-recipients for your inbox, you're not supposed to know :P).
 			list($context['message_labels'], $context['message_replied'], $context['message_unread']) = loadPMRecipientInfo($all_pms, $recipients, $context['folder']);
