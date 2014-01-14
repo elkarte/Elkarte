@@ -912,14 +912,14 @@ function markPMsRead($memberID)
  * Load personal messages.
  *
  * This function loads messages considering the options given, an array of:
- * 'display_mode' - the PMs display mode (i.e. conversation, all)
- * 'is_postgres' - (temporary) boolean to allow choice of PostgreSQL-specific sorting query
- * 'sort_by_query' - query to sort by
- * 'descending' - whether to sort descending
- * 'sort_by' - field to sort by
- * 'pmgs' - personal message id (if any). Note: it may not be set.
- * 'label_query' - query by labels
- * 'start' - start id, if any
+ *  - 'display_mode' - the PMs display mode (i.e. conversation, all)
+ *  - 'is_postgres' - (temporary) boolean to allow choice of PostgreSQL-specific sorting query
+ *  - 'sort_by_query' - query to sort by
+ *  - 'descending' - whether to sort descending
+ *  - 'sort_by' - field to sort by
+ *  - 'pmgs' - personal message id (if any). Note: it may not be set.
+ *  - 'label_query' - query by labels
+ *  - 'start' - start id, if any
  *
  * @param array $pm_options options for loading
  * @param int $id_member id member
