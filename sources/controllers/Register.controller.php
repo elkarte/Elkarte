@@ -623,8 +623,8 @@ class Register_Controller extends Action_Controller
 
 		// Get the code from the database...
 		$row = findUser(empty($_REQUEST['u']) ? '
-			WHERE member_name = {string:email_address} OR email_address = {string:email_address}' : '
-			WHERE id_member = {int:id_member}', array(
+			member_name = {string:email_address} OR email_address = {string:email_address}' : '
+			id_member = {int:id_member}', array(
 				'id_member' => isset($_REQUEST['u']) ? (int) $_REQUEST['u'] : 0,
 				'email_address' => isset($_POST['user']) ? $_POST['user'] : '',
 			), false
