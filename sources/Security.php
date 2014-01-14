@@ -656,7 +656,6 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 		if ($check !== $sc)
 			$error = 'session_timeout';
 	}
-
 	// How about $_GET['sesc']?
 	elseif ($type === 'get')
 	{
@@ -664,7 +663,6 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 		if ($check !== $sc)
 			$error = 'session_verify_fail';
 	}
-
 	// Or can it be in either?
 	elseif ($type == 'request')
 	{
@@ -829,9 +827,9 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 	// This nasty piece of code validates a token.
 	// 1. The token exists in session.
 	// 2. The {$type} variable should exist.
-	// 3. We concat the variable we received with the user agent
+	// 3. We concatenate the variable we received with the user agent
 	// 4. Match that result against what is in the session.
-	// 5. If it matchs, success, otherwise we fallout.
+	// 5. If it matches, success, otherwise we fallout.
 
 	// we use user agent
 	$req = request();
@@ -1099,7 +1097,7 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 		$permissions = array($permissions);
 
 	/*
-	 * Set $simple to true to use this function in compatability mode
+	 * Set $simple to true to use this function in compatibility mode
 	 * Otherwise, the resultant array becomes split into the multiple
 	 * permissions that were passed. Other than that, it's just the normal
 	 * state of play that you're used to.
@@ -1166,7 +1164,7 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 	{
 		foreach ($permissions as $permission)
 		{
-			// never had it to start with
+			// Never had it to start with
 			if (empty($boards[$permission]))
 				$boards[$permission] = array();
 			else
@@ -1493,7 +1491,6 @@ function validatePasswordFlood($id_member, $password_flood_value = false, $was_c
 
 	// Otherwise set the members data. If they correct on their first attempt then we actually clear it, otherwise we set it!
 	updateMemberData($id_member, array('passwd_flood' => $was_correct && $number_tries == 1 ? '' : $time_stamp . '|' . $number_tries));
-
 }
 
 /**
