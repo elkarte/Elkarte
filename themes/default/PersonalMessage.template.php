@@ -136,12 +136,12 @@ function template_folder()
 										'(', $txt['pm_undisclosed_recipients'], ')';
 
 			echo '
-										<strong> ', $txt['on'], ':</strong> ', $message['time'];
+										<strong> ', $txt['on'], ': </strong>', $message['time'];
 
 			// If we're in the sent items folder, show who it was sent to besides the "To:" people.
 			if (!empty($message['recipients']['bcc']))
 				echo '
-										<br /><strong> ', $txt['pm_bcc'], ':</strong> ', implode(', ', $message['recipients']['bcc']);
+										<br /><strong> ', $txt['pm_bcc'], ': </strong>', implode(', ', $message['recipients']['bcc']);
 
 			if (!empty($message['is_replied_to']))
 				echo '
@@ -162,13 +162,16 @@ function template_folder()
 			// Showing all then give a remove item checkbox
 			if (empty($context['display_mode']))
 				echo '
-									<li class="listlevel1 quickmod_check"><input type="checkbox" name="pms[]" id="deletedisplay', $message['id'], '" value="', $message['id'], '" onclick="document.getElementById(\'deletelisting', $message['id'], '\').checked = this.checked;" class="input_check" /></li>';
+									<li class="listlevel1 quickmod_check">
+										<input type="checkbox" name="pms[]" id="deletedisplay', $message['id'], '" value="', $message['id'], '" onclick="document.getElementById(\'deletelisting', $message['id'], '\').checked = this.checked;" class="input_check" />
+									</li>';
 
 			// Maybe there is something...more :P (this is the more button)
 			if (!empty($context['additional_pm_drop_buttons']))
 			{
 				echo '
-									<li class="listlevel1 subsections" aria-haspopup="true"><a class="linklevel1 post_options">', $txt['post_options'], '</a>
+									<li class="listlevel1 subsections" aria-haspopup="true">
+										<a class="linklevel1 post_options">', $txt['post_options'], '</a>
 										<ul class="menulevel2">';
 
 				foreach ($context['additional_pm_drop_buttons'] as $key => $button)
@@ -941,7 +944,7 @@ function template_send()
 
 	// Send, Preview, spellchecker buttons.
 	echo '
-					<div class="submitbutton">
+					<div id="post_confirm_buttons" class="submitbutton">
 						', template_control_richedit_buttons($context['post_box_name']), '
 					</div>
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -1083,11 +1086,8 @@ function template_send()
 				bBccShowByDefault: ', empty($context['recipients']['bcc']) && empty($context['bcc_value']) ? 'false' : 'true', ',
 				sShowBccLinkTemplate: ', JavaScriptEscape('
 					<a href="#" id="bcc_link">' . $txt['make_bcc'] . '</a> <a href="' . $scripturl . '?action=quickhelp;help=pm_bcc" onclick="return reqOverlayDiv(this.href);"><img class="icon" src="' . $settings['images_url'] . '/helptopics.png" alt="(?)" /></a>'
-	), '
+				), '
 			});
-		';
-
-	echo '
 		// ]]></script>';
 }
 
