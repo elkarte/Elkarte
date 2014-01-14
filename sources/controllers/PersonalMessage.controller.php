@@ -71,7 +71,7 @@ class PersonalMessage_Controller extends Action_Controller
 		}
 
 		// A previous message was sent successfully? show a small indication.
-		if (isset($_GET['done']) && ($_GET['done'] == 'sent'))
+		if (isset($_GET['done']) && ($_GET['done'] === 'sent'))
 			$context['pm_sent'] = true;
 
 		// Now we have the labels, and assuming we have unsorted mail, apply our rules!
@@ -230,7 +230,7 @@ class PersonalMessage_Controller extends Action_Controller
 		else
 			$start = 'new';
 
-		// Set up some basic theme stuff.
+		// Set up some basic template stuff.
 		$context['from_or_to'] = $context['folder'] !== 'sent' ? 'from' : 'to';
 		$context['get_pmessage'] = 'preparePMContext_callback';
 		$context['signature_enabled'] = substr($modSettings['signature_settings'], 0, 1) == 1;
@@ -276,7 +276,7 @@ class PersonalMessage_Controller extends Action_Controller
 			);
 		}
 
-		// Build it further if we have a label.
+		// Build it further if we also have a label.
 		if ($context['current_label_id'] !== -1)
 		{
 			$context['linktree'][] = array(
@@ -2336,7 +2336,7 @@ function messageIndexBar($area)
 }
 
 /**
- * Get a personal message for the theme. (used to save memory.)
+ * Get a personal message for the template. (used to save memory.)
  * This is a callback function that will fetch the actual results, as needed, of a previously run
  * subject (loadPMSubjectRequest) or message (loadPMMessageRequest) query.
  *
@@ -2372,6 +2372,7 @@ function preparePMContext_callback($type = 'subject', $reset = false)
 			return false;
 		}
 
+		// Make sure we have a subject
 		$subject['subject'] = $subject['subject'] == '' ? $txt['no_subject'] : $subject['subject'];
 		censorText($subject['subject']);
 
@@ -2452,7 +2453,7 @@ function preparePMContext_callback($type = 'subject', $reset = false)
 	// Run BBC interpreter on the message.
 	$message['body'] = parse_bbc($message['body'], true, 'pm' . $message['id_pm']);
 
-	// Send the array.
+	// Return the array.
 	$output = array(
 		'alternate' => $counter % 2,
 		'id' => $message['id_pm'],
@@ -2491,7 +2492,7 @@ function preparePMContext_callback($type = 'subject', $reset = false)
 			'text' => $txt['pm_mark_unread']
 		);
 
-	// Or give take karma for a PM
+	// Or give / take karma for a PM
 	if (!empty($output['member']['karma']['allow']))
 	{
 		$output['member']['karma'] += array(
