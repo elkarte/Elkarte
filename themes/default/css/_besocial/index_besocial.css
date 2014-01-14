@@ -879,6 +879,12 @@ span.views_text {
 	border: 1px solid #eaeaea;
 	border-radius: 10px;
 }
+/* Need an offset to some of our anchors due to the fixed top navigation */
+.post_anchor, .pm_anchor, #new {
+	display: block;
+	margin-top: -45px;
+	padding-top: 45px;
+}
 .windowbg {
 	background-color: #f6f6f6;
 }
