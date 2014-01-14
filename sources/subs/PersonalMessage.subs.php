@@ -1178,6 +1178,7 @@ function applyRules($all_messages = false)
 							// Get a basic pot started!
 							if (!isset($actions['labels'][$row['id_pm']]))
 								$actions['labels'][$row['id_pm']] = empty($row['labels']) ? array() : explode(',', $row['labels']);
+
 							$actions['labels'][$row['id_pm']][] = $ruleAction['v'];
 						}
 					}
@@ -1378,6 +1379,7 @@ function changePMLabels($to_label, $label_type, $user_id)
 	global $options;
 
 	$db = database();
+
 	$labels = array();
 	$to_update = array();
 
@@ -1394,15 +1396,15 @@ function changePMLabels($to_label, $label_type, $user_id)
 			'to_label' => array_keys($to_label),
 		)
 	);
-
 	while ($row = $db->fetch_assoc($request))
 	{
 		$labels = $row['labels'] == '' ? array('-1') : explode(',', trim($row['labels']));
 
 		// Already exists?  Then... unset it!
-		$ID_LABEL = array_search($to_label[$row['id_pm']], $labels);
-		if ($ID_LABEL !== false && $label_type[$row['id_pm']] !== 'add')
-			unset($labels[$ID_LABEL]);
+		$id_label = array_search($to_label[$row['id_pm']], $labels);
+
+		if ($id_label !== false && $label_type[$row['id_pm']] !== 'add')
+			unset($labels[$id_label]);
 		elseif ($label_type[$row['id_pm']] !== 'rem')
 			$labels[] = $to_label[$row['id_pm']];
 
@@ -1418,7 +1420,7 @@ function changePMLabels($to_label, $label_type, $user_id)
 	$db->free_result($request);
 
 	if (!empty($to_update))
-		return updatePMLabels($to_update);
+		return updatePMLabels($to_update, $user_id);
 }
 
 /**

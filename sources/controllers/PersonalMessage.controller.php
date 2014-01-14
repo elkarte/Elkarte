@@ -983,7 +983,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 	/**
 	 * This function performs all additional actions
-	 * including the deleting of PM's
+	 * including the deleting and labeling of PM's
 	 */
 	public function action_pmactions()
 	{
@@ -994,6 +994,7 @@ class PersonalMessage_Controller extends Action_Controller
 		if (isset($_REQUEST['del_selected']))
 			$_REQUEST['pm_action'] = 'delete';
 
+		// Create a list of pm's that we need to work on
 		if (isset($_REQUEST['pm_action']) && $_REQUEST['pm_action'] != '' && !empty($_REQUEST['pms']) && is_array($_REQUEST['pms']))
 		{
 			foreach ($_REQUEST['pms'] as $pm)
@@ -1038,11 +1039,12 @@ class PersonalMessage_Controller extends Action_Controller
 					break;
 				default:
 					$type = 'unk';
-					if ($action == '-1' || $action == '0' || (int) $action > 0)
-					{
-						$to_label[(int) $pm] = (int) $action;
-						$label_type[(int) $pm] = $type;
-					}
+			}
+
+			if ($action == '-1' || $action == '0' || (int) $action > 0)
+			{
+				$to_label[(int) $pm] = (int) $action;
+				$label_type[(int) $pm] = $type;
 			}
 		}
 
