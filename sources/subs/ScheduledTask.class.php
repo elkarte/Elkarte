@@ -1618,6 +1618,7 @@ class ScheduledTask
 					}
 				}
 			}
+			return true;
 		}
 	}
 }

@@ -24,7 +24,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Removes the passed id_topic's. (permissions are NOT checked here!).
+ * Removes the passed id_topic's.
+ * Permissions are NOT checked here because the function is used in a scheduled task
  *
  * @param array/int $topics The topics to remove (can be an id or an array of ids).
  * @param bool $decreasePostCount if true users' post count will be reduced
