@@ -362,7 +362,7 @@ function clean_cache($type = '')
 				if (!$memcached)
 					return;
 
-				// clear it out, really invalidate whats there
+				// Clear it out, really invalidate whats there
 				if (function_exists('memcache_flush'))
 					memcache_flush($memcached);
 				else
@@ -382,7 +382,7 @@ function clean_cache($type = '')
 		case 'mmcache':
 			if (function_exists('mmcache_gc'))
 			{
-				// removes all expired keys from shared memory, this is not a complete cache flush :(
+				// Removes all expired keys from shared memory, this is not a complete cache flush :(
 				// @todo there is no clear function, should we try to find all of the keys and delete those? with mmcache_rm
 				mmcache_gc();
 			}
@@ -390,7 +390,7 @@ function clean_cache($type = '')
 		case 'apc':
 			if (function_exists('apc_clear_cache'))
 			{
-				// if passed a type, clear that type out
+				// If passed a type, clear that type out
 				if ($type === '' || $type === 'data')
 				{
 					apc_clear_cache('user');
@@ -407,7 +407,7 @@ function clean_cache($type = '')
 		case 'xcache':
 			if (function_exists('xcache_clear_cache') && function_exists('xcache_count'))
 			{
-				// xcache may need auth credentials, depending on how its been set up
+				// Xcache may need auth credentials, depending on how its been set up
 				if (!empty($cache_uid) && !empty($cache_password))
 				{
 					$_SERVER["PHP_AUTH_USER"] = $cache_uid;
@@ -432,20 +432,20 @@ function clean_cache($type = '')
 				}
 			}
 			break;
-		default:
-			// No directory = no game.
-			if (!is_dir(CACHEDIR))
-				return;
+	}
 
-			// Remove the files in our own disk cache, if any
-			$dh = opendir(CACHEDIR);
-			while ($file = readdir($dh))
-			{
-				if ($file != '.' && $file != '..' && $file != 'index.php' && $file != '.htaccess' && (!$type || substr($file, 0, strlen($type)) == $type))
-					@unlink(CACHEDIR . '/' . $file);
-			}
-			closedir($dh);
-			break;
+	// To be complete, we also clear out the cache dir so we get any js/css hive files
+	if (is_dir(CACHEDIR))
+	{
+		// Remove the cache files in our disk cache directory
+		$dh = opendir(CACHEDIR);
+		while ($file = readdir($dh))
+		{
+			if ($file != '.' && $file != '..' && $file != 'index.php' && $file != '.htaccess' && (!$type || substr($file, 0, strlen($type)) == $type))
+				@unlink(CACHEDIR . '/' . $file);
+		}
+
+		closedir($dh);
 	}
 
 	// Invalidate cache, to be sure!
