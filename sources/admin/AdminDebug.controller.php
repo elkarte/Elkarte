@@ -67,8 +67,6 @@ class AdminDebug_Controller extends Action_Controller
 				redirectexit($_SESSION['old_url']);
 		}
 
-		call_integration_hook('integrate_egg_nog');
-
 		$query_id = isset($_REQUEST['qq']) ? (int) $_REQUEST['qq'] - 1 : -1;
 
 		echo '<!DOCTYPE html>

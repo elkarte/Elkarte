@@ -38,6 +38,9 @@ class Admin_Controller extends Action_Controller
 	{
 		global $txt, $context, $scripturl, $modSettings, $settings;
 
+		// Make sure the administrator has a valid session...
+		validateSession();
+
 		// Load the language and templates....
 		loadLanguage('Admin');
 		loadTemplate('Admin', 'admin');
@@ -49,6 +52,7 @@ class Admin_Controller extends Action_Controller
 		// No indexing evil stuff.
 		$context['robot_no_index'] = true;
 
+		// Need these to do much
 		require_once(SUBSDIR . '/Menu.subs.php');
 		require_once(SUBSDIR . '/Action.class.php');
 
@@ -564,9 +568,6 @@ class Admin_Controller extends Action_Controller
 
 		// Any files to include for administration?
 		call_integration_include_hook('integrate_admin_include');
-
-		// Make sure the administrator has a valid session...
-		validateSession();
 
 		$menuOptions = array('default_include_dir' => ADMINDIR);
 

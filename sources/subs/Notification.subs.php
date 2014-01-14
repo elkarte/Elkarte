@@ -398,6 +398,7 @@ function sendBoardNotifications(&$topicData)
 	$db = database();
 
 	require_once(SUBSDIR . '/Mail.subs.php');
+	require_once(SUBSDIR . '/Emailpost.subs.php');
 
 	// Do we have one or lots of topics?
 	if (isset($topicData['body']))
@@ -405,8 +406,6 @@ function sendBoardNotifications(&$topicData)
 
 	// Using the post to email functions?
 	$maillist = !empty($modSettings['maillist_enabled']) && !empty($modSettings['pbe_post_enabled']);
-	if ($maillist)
-		require_once(SUBSDIR . '/Emailpost.subs.php');
 
 	// Find out what boards we have... and clear out any rubbish!
 	$boards = array();

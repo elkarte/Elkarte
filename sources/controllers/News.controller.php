@@ -271,7 +271,6 @@ class News_Controller extends Action_Controller
 				<description><![CDATA[
 					', template_webslice_header_above(), '
 					', template_webslice_recent_posts(), '
-					', template_webslice_header_below(), '
 				]]></description>
 			</item>
 		</channel>

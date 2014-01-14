@@ -730,8 +730,8 @@ function updateMembersPostCount($start, $increment)
 }
 
 /**
- * Used to find members who have a post count >0 that should not..
- * made more difficult since we don't yet support sub-selects on joins
+ * Used to find members who have a post count >0 that should not.
+ * Made more difficult since we don't yet support sub-selects on joins so we
  * place all members who have posts in the message table in a temp table
  */
 function updateZeroPostMembers()
@@ -756,12 +756,14 @@ function updateZeroPostMembers()
 				'zero' => 0,
 				'string_zero' => '0',
 				'db_error_skip' => true,
+				'recycle' => $modSettings['recycle_enable'],
 			)
 		) !== false;
 
 		if ($createTemporary)
 		{
-			// outer join the members table on the temporary table finding the members that have a post count but no posts in the message table
+			// Outer join the members table on the temporary table finding the members that
+			// have a post count but no posts in the message table
 			$request = $db->query('', '
 				SELECT mem.id_member, mem.posts
 				FROM {db_prefix}members AS mem
@@ -774,11 +776,12 @@ function updateZeroPostMembers()
 				)
 			);
 
-			// set the post count to zero for any delinquents we may have found
+			// Set the post count to zero for any delinquents we may have found
 			$members = array();
 			while ($row = $db->fetch_assoc($request))
 				$members[] = $row['id_member'];
 			$db->free_result($request);
+
 			if (!empty($members))
 				updateMemberData($members, array('posts' => 0));
 		}

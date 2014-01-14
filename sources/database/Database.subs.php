@@ -49,8 +49,6 @@ function db_extend($type = 'extra')
  */
 function database()
 {
-	global $db_type;
-
 	return call_user_func(array('Database_' . DB_TYPE, 'db'));
 }
 

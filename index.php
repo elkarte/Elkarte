@@ -63,7 +63,6 @@ DEFINE('CACHEDIR', $cachedir);
 DEFINE('EXTDIR', $extdir);
 DEFINE('LANGUAGEDIR', $languagedir);
 DEFINE('SOURCEDIR', $sourcedir);
-
 DEFINE('ADMINDIR', $sourcedir . '/admin');
 DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
 DEFINE('SUBSDIR', $sourcedir . '/subs');

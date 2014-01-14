@@ -440,7 +440,6 @@ function mimespecialchars($string, $with_charset = true, $hotmail_fix = false, $
 		// Convert all 'special' characters to HTML entities.
 		return array($charset, preg_replace_callback('~([\x80-\x{10FFFF}])~u', $entityConvert, $string), '7bit');
 	}
-
 	// We don't need to mess with the line if no special characters were in it..
 	elseif (!$hotmail_fix && preg_match('~([^\x09\x0A\x0D\x20-\x7F])~', $string) === 1)
 	{
@@ -457,7 +456,6 @@ function mimespecialchars($string, $with_charset = true, $hotmail_fix = false, $
 
 		return array($charset, $string, 'base64');
 	}
-
 	else
 		return array($charset, $string, '7bit');
 }

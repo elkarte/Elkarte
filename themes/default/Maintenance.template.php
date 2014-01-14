@@ -284,11 +284,7 @@ function template_maintain_topics()
 	global $scripturl, $txt, $context, $settings, $modSettings;
 
 	// If maintenance has finished tell the user.
-	if (!empty($context['maintenance_finished']))
-		echo '
-	<div class="successbox">
-		', sprintf($txt['maintain_done'], $context['maintenance_finished']), '
-	</div>';
+	template_show_error('maintenance_finished');
 
 	// Bit of javascript for showing which boards to prune in an otherwise hidden list.
 	echo '
