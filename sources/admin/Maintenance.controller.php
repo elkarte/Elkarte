@@ -479,9 +479,9 @@ class Maintenance_Controller extends Action_Controller
 						<input type="hidden" name="' . $context['admin-convertMsg_token_var'] . '" value="' . $context['admin-convertMsg_token'] . '" />
 						<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
 						<input type="hidden" name="id_msg_exceeding" value="' . implode(',', $id_msg_exceeding) . '" />';
-
 					$context['continue_get_data'] = '?action=admin;area=maintain;sa=database;activity=convertmsgbody;start=' . $_REQUEST['start'];
 					$context['continue_percent'] = round(100 * $_REQUEST['start'] / $max_msgs);
+					$context['not_done_title'] = $txt['not_done_title'] . ' (' . $context['continue_percent'] . '%)';
 
 					return;
 				}
@@ -582,7 +582,7 @@ class Maintenance_Controller extends Action_Controller
 		global $txt, $context, $modSettings, $time_start;
 
 		isAllowedTo('admin_forum');
-		checkSession('request');
+		checkSession();
 
 		// Functions
 		require_once(SUBSDIR . '/Maintenance.subs.php');
@@ -626,10 +626,12 @@ class Maintenance_Controller extends Action_Controller
 				if (microtime(true) - $time_start > 3)
 				{
 					createToken('admin-boardrecount');
-					$context['continue_post_data'] = '<input type="hidden" name="' . $context['admin-boardrecount_token_var'] . '" value="' . $context['admin-boardrecount_token'] . '" />';
-
-					$context['continue_get_data'] = '?action=admin;area=maintain;sa=routine;activity=recount;step=0;start=' . $_REQUEST['start'] . ';' . $context['session_var'] . '=' . $context['session_id'];
+					$context['continue_post_data'] = '
+						<input type="hidden" name="' . $context['admin-boardrecount_token_var'] . '" value="' . $context['admin-boardrecount_token'] . '" />
+						<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />';
+					$context['continue_get_data'] = '?action=admin;area=maintain;sa=routine;activity=recount;step=0;start=' . $_REQUEST['start'];
 					$context['continue_percent'] = round((100 * $_REQUEST['start'] / $max_topics) / $total_steps);
+					$context['not_done_title'] = $txt['not_done_title'] . ' (' . $context['continue_percent'] . '%)';
 
 					return;
 				}
@@ -653,10 +655,12 @@ class Maintenance_Controller extends Action_Controller
 				if (microtime(true) - $time_start > 3)
 				{
 					createToken('admin-boardrecount');
-					$context['continue_post_data'] = '<input type="hidden" name="' . $context['admin-boardrecount_token_var'] . '" value="' . $context['admin-boardrecount_token'] . '" />';
-
-					$context['continue_get_data'] = '?action=admin;area=maintain;sa=routine;activity=recount;step=1;start=' . $_REQUEST['start'] . ';' . $context['session_var'] . '=' . $context['session_id'];
+					$context['continue_post_data'] = '
+						<input type="hidden" name="' . $context['admin-boardrecount_token_var'] . '" value="' . $context['admin-boardrecount_token'] . '" />
+						<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />';
+					$context['continue_get_data'] = '?action=admin;area=maintain;sa=routine;activity=recount;step=1;start=' . $_REQUEST['start'];
 					$context['continue_percent'] = round((200 + 100 * $_REQUEST['start'] / $max_topics) / $total_steps);
+					$context['not_done_title'] = $txt['not_done_title'] . ' (' . $context['continue_percent'] . '%)';
 
 					return;
 				}
@@ -679,10 +683,12 @@ class Maintenance_Controller extends Action_Controller
 				if (microtime(true) - $time_start > 3)
 				{
 					createToken('admin-boardrecount');
-					$context['continue_post_data'] = '<input type="hidden" name="' . $context['admin-boardrecount_token_var'] . '" value="' . $context['admin-boardrecount_token'] . '" />';
-
-					$context['continue_get_data'] = '?action=admin;area=maintain;sa=routine;activity=recount;step=2;start=' . $_REQUEST['start'] . ';' . $context['session_var'] . '=' . $context['session_id'];
+					$context['continue_post_data'] = '
+						<input type="hidden" name="' . $context['admin-boardrecount_token_var'] . '" value="' . $context['admin-boardrecount_token'] . '" />
+						<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />';
+					$context['continue_get_data'] = '?action=admin;area=maintain;sa=routine;activity=recount;step=2;start=' . $_REQUEST['start'];
 					$context['continue_percent'] = round((300 + 100 * $_REQUEST['start'] / $max_topics) / $total_steps);
+					$context['not_done_title'] = $txt['not_done_title'] . ' (' . $context['continue_percent'] . '%)';
 
 					return;
 				}
@@ -706,10 +712,12 @@ class Maintenance_Controller extends Action_Controller
 				if (microtime(true) - $time_start > 3)
 				{
 					createToken('admin-boardrecount');
-					$context['continue_post_data'] = '<input type="hidden" name="' . $context['admin-boardrecount_token_var'] . '" value="' . $context['admin-boardrecount_token'] . '" />';
-
-					$context['continue_get_data'] = '?action=admin;area=maintain;sa=routine;activity=recount;step=3;start=' . $_REQUEST['start'] . ';' . $context['session_var'] . '=' . $context['session_id'];
+					$context['continue_post_data'] = '
+						<input type="hidden" name="' . $context['admin-boardrecount_token_var'] . '" value="' . $context['admin-boardrecount_token'] . '" />
+						<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />';
+					$context['continue_get_data'] = '?action=admin;area=maintain;sa=routine;activity=recount;step=3;start=' . $_REQUEST['start'];
 					$context['continue_percent'] = round((400 + 100 * $_REQUEST['start'] / $max_topics) / $total_steps);
+					$context['not_done_title'] = $txt['not_done_title'] . ' (' . $context['continue_percent'] . '%)';
 
 					return;
 				}
@@ -732,10 +740,12 @@ class Maintenance_Controller extends Action_Controller
 				if (microtime(true) - $time_start > 3)
 				{
 					createToken('admin-boardrecount');
-					$context['continue_post_data'] = '<input type="hidden" name="' . $context['admin-boardrecount_token_var'] . '" value="' . $context['admin-boardrecount_token'] . '" />';
-
-					$context['continue_get_data'] = '?action=admin;area=maintain;sa=routine;activity=recount;step=4;start=' . $_REQUEST['start'] . ';' . $context['session_var'] . '=' . $context['session_id'];
+					$context['continue_post_data'] = '
+						<input type="hidden" name="' . $context['admin-boardrecount_token_var'] . '" value="' . $context['admin-boardrecount_token'] . '" />
+						<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />';
+					$context['continue_get_data'] = '?action=admin;area=maintain;sa=routine;activity=recount;step=4;start=' . $_REQUEST['start'];
 					$context['continue_percent'] = round((500 + 100 * $_REQUEST['start'] / $max_topics) / $total_steps);
+					$context['not_done_title'] = $txt['not_done_title'] . ' (' . $context['continue_percent'] . '%)';
 
 					return;
 				}
@@ -752,10 +762,12 @@ class Maintenance_Controller extends Action_Controller
 			if (microtime(true) - $time_start > 3)
 			{
 				createToken('admin-boardrecount');
-				$context['continue_post_data'] = '<input type="hidden" name="' . $context['admin-boardrecount_token_var'] . '" value="' . $context['admin-boardrecount_token'] . '" />';
-
-				$context['continue_get_data'] = '?action=admin;area=maintain;sa=routine;activity=recount;step=6;start=0;' . $context['session_var'] . '=' . $context['session_id'];
+				$context['continue_post_data'] = '
+					<input type="hidden" name="' . $context['admin-boardrecount_token_var'] . '" value="' . $context['admin-boardrecount_token'] . '" />
+					<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />';
+				$context['continue_get_data'] = '?action=admin;area=maintain;sa=routine;activity=recount;step=6;start=0';
 				$context['continue_percent'] = round(700 / $total_steps);
+				$context['not_done_title'] = $txt['not_done_title'] . ' (' . $context['continue_percent'] . '%)';
 
 				return;
 			}
@@ -773,10 +785,12 @@ class Maintenance_Controller extends Action_Controller
 				if (microtime(true) - $time_start > 3)
 				{
 					createToken('admin-boardrecount');
-					$context['continue_post_data'] = '<input type="hidden" name="' . $context['admin-boardrecount_token_var'] . '" value="' . $context['admin-boardrecount_token'] . '" />';
-
-					$context['continue_get_data'] = '?action=admin;area=maintain;sa=routine;activity=recount;step=6;start=' . $_REQUEST['start'] . ';' . $context['session_var'] . '=' . $context['session_id'];
+					$context['continue_post_data'] = '
+						<input type="hidden" name="' . $context['admin-boardrecount_token_var'] . '" value="' . $context['admin-boardrecount_token'] . '" />
+						<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />';
+					$context['continue_get_data'] = '?action=admin;area=maintain;sa=routine;activity=recount;step=6;start=' . $_REQUEST['start'];
 					$context['continue_percent'] = round((700 + 100 * $_REQUEST['start'] / $modSettings['maxMsgID']) / $total_steps);
+					$context['not_done_title'] = $txt['not_done_title'] . ' (' . $context['continue_percent'] . '%)';
 
 					return;
 				}
