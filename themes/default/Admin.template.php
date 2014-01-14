@@ -791,11 +791,14 @@ function template_not_done()
 
 	echo '
 	<div id="admincenter">
-		<h3 class="category_header">', $txt['not_done_title'], '</h3>
+		<h3 class="category_header">', empty($context['not_done_title']) ? $txt['not_done_title'] : $context['not_done_title'], '</h3>
 		<div class="windowbg">
-			<div class="content">
-				', $txt['not_done_reason'];
+			<div class="infobox">
+				', $txt['not_done_reason'], '
+			</div>
+			<form id="autoSubmit" name="autoSubmit" action="', $scripturl, $context['continue_get_data'], '" method="post" accept-charset="UTF-8" >';
 
+	// Show the progress bars
 	if (!empty($context['continue_percent']))
 		echo '
 				<div class="progress_bar">
@@ -811,16 +814,15 @@ function template_not_done()
 				</div>';
 
 	echo '
-				<form action="', $scripturl, $context['continue_get_data'], '" method="post" accept-charset="UTF-8" name="autoSubmit" id="autoSubmit">
-					<input type="submit" name="cont" value="', $txt['not_done_continue'], '" class="right_submit" />
-					', $context['continue_post_data'], '
-				</form>
-			</div>
+				<input type="submit" name="cont" value="', $txt['not_done_continue'], '" class="right_submit" />
+				', $context['continue_post_data'], '
+			</form>
 		</div>
 	</div>
 	<script><!-- // --><![CDATA[
 		var countdown = ', $context['continue_countdown'], ',
 			txt_message = "', $txt['not_done_continue'], '";
+
 		doAutoSubmit();
 	// ]]></script>';
 }
