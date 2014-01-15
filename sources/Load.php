@@ -1475,6 +1475,9 @@ function loadTheme($id_theme = 0, $initialize = true)
 	if (!empty($settings['require_theme_strings']))
 		loadLanguage('ThemeStrings', '', false);
 
+	// Load font Awesome fonts
+	loadCSSFile('font-awesome.css');
+
 	// We allow theme variants, because we're cool.
 	$context['theme_variant'] = '';
 	$context['theme_variant_url'] = '';
