@@ -3715,7 +3715,6 @@ a.help .icon {
 	#password_login select {
 		display: none;
 	}
-
 }
 /* This one does 800 screens at default font size. */
 @media screen and (max-width: 50em) {
@@ -4167,6 +4166,7 @@ a.help .icon {
 		overflow: auto;
 	}
 }
+/* This one does 480px screens at default font size. */
 @media screen and (max-width: 30em) {
 	#button_admin {
 		display: none;
