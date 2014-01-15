@@ -912,14 +912,14 @@ function markPMsRead($memberID)
  * Load personal messages.
  *
  * This function loads messages considering the options given, an array of:
- * 'display_mode' - the PMs display mode (i.e. conversation, all)
- * 'is_postgres' - (temporary) boolean to allow choice of PostgreSQL-specific sorting query
- * 'sort_by_query' - query to sort by
- * 'descending' - whether to sort descending
- * 'sort_by' - field to sort by
- * 'pmgs' - personal message id (if any). Note: it may not be set.
- * 'label_query' - query by labels
- * 'start' - start id, if any
+ *  - 'display_mode' - the PMs display mode (i.e. conversation, all)
+ *  - 'is_postgres' - (temporary) boolean to allow choice of PostgreSQL-specific sorting query
+ *  - 'sort_by_query' - query to sort by
+ *  - 'descending' - whether to sort descending
+ *  - 'sort_by' - field to sort by
+ *  - 'pmgs' - personal message id (if any). Note: it may not be set.
+ *  - 'label_query' - query by labels
+ *  - 'start' - start id, if any
  *
  * @param array $pm_options options for loading
  * @param int $id_member id member
@@ -1178,6 +1178,7 @@ function applyRules($all_messages = false)
 							// Get a basic pot started!
 							if (!isset($actions['labels'][$row['id_pm']]))
 								$actions['labels'][$row['id_pm']] = empty($row['labels']) ? array() : explode(',', $row['labels']);
+
 							$actions['labels'][$row['id_pm']][] = $ruleAction['v'];
 						}
 					}
@@ -1191,7 +1192,7 @@ function applyRules($all_messages = false)
 	if (!empty($actions['deletes']))
 		deleteMessages($actions['deletes']);
 
-	// Relabel?
+	// Re-label?
 	if (!empty($actions['labels']))
 	{
 		foreach ($actions['labels'] as $pm => $labels)
@@ -1301,12 +1302,12 @@ function loadPMLimits($id_group = false)
 			'newbie_group' => 4,
 		)
 	);
-
 	$groups = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		if ($row['id_group'] != 1)
 			$groups[$row['id_group']] = $row;
-
+	}
 	$db->free_result($request);
 
 	return $groups;
@@ -1378,6 +1379,7 @@ function changePMLabels($to_label, $label_type, $user_id)
 	global $options;
 
 	$db = database();
+
 	$labels = array();
 	$to_update = array();
 
@@ -1394,15 +1396,15 @@ function changePMLabels($to_label, $label_type, $user_id)
 			'to_label' => array_keys($to_label),
 		)
 	);
-
 	while ($row = $db->fetch_assoc($request))
 	{
 		$labels = $row['labels'] == '' ? array('-1') : explode(',', trim($row['labels']));
 
 		// Already exists?  Then... unset it!
-		$ID_LABEL = array_search($to_label[$row['id_pm']], $labels);
-		if ($ID_LABEL !== false && $label_type[$row['id_pm']] !== 'add')
-			unset($labels[$ID_LABEL]);
+		$id_label = array_search($to_label[$row['id_pm']], $labels);
+
+		if ($id_label !== false && $label_type[$row['id_pm']] !== 'add')
+			unset($labels[$id_label]);
 		elseif ($label_type[$row['id_pm']] !== 'rem')
 			$labels[] = $to_label[$row['id_pm']];
 
@@ -1418,7 +1420,7 @@ function changePMLabels($to_label, $label_type, $user_id)
 	$db->free_result($request);
 
 	if (!empty($to_update))
-		return updatePMLabels($to_update);
+		return updatePMLabels($to_update, $user_id);
 }
 
 /**
@@ -1451,6 +1453,7 @@ function updateLabelsToPM($searchArray, $new_labels, $user_id)
 		$toChange = explode(',', $row['labels']);
 
 		foreach ($toChange as $key => $value)
+		{
 			if (in_array($value, $searchArray))
 			{
 				if (isset($new_labels[$value]))
@@ -1458,6 +1461,7 @@ function updateLabelsToPM($searchArray, $new_labels, $user_id)
 				else
 					unset($toChange[$key]);
 			}
+		}
 
 		if (empty($toChange))
 			$toChange[] = '-1';
@@ -1489,6 +1493,7 @@ function updatePMLabels($to_update, $user_id)
 		if (strlen($set) > 60)
 		{
 			$updateErrors++;
+
 			// Make the string as long as possible and update anyway
 			$set = substr($set, 0, 60);
 			$set = substr($set, 0, strrpos($set, ','));

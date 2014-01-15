@@ -78,27 +78,32 @@ function template_pm_below()
 }
 
 /**
- * Messages folder.
+ * Messages folder, used to viewing a listing of messages
  */
 function template_folder()
 {
 	global $context, $scripturl, $options, $txt;
 
-	// Got some messages to display?
+	$start = true;
+
+	// Do we have some messages to display?
 	if ($context['get_pmessage']('message', true))
 	{
 		echo '
 					<div class="forumposts">';
 
-		// Show the helpful titlebar - generally.
-		if ($context['display_mode'] != 1)
-			echo '
-						<h2 class="category_header">
-							', $txt[$context['display_mode'] == 0 ? 'messages' : 'conversation'], '
-						</h2>';
-
 		while ($message = $context['get_pmessage']('message'))
 		{
+			// Show the helpful titlebar - generally.
+			if ($start && $context['display_mode'] != 1)
+			{
+				echo '
+						<h2 class="category_header">
+							', $context['display_mode'] == 0 ? $txt['messages'] : $txt['conversation'] . ': ' . $message['subject'], '
+						</h2>';
+				$start = false;
+			}
+
 			$window_class = $message['alternate'] === 0 ? 'windowbg' : 'windowbg2';
 
 			echo '
@@ -119,22 +124,24 @@ function template_folder()
 			// @todo - above needs fixing re document outlining (a11y stuffz).
 			// Show who the message was sent to.
 			echo '
-										<strong> ', $txt['sent_to'], ':</strong> ';
+										<strong>', $txt['sent_to'], ': </strong>';
 
 			// People it was sent directly to....
 			if (!empty($message['recipients']['to']))
-				echo implode(', ', $message['recipients']['to']);
+				echo
+										implode(', ', $message['recipients']['to']);
 			// Otherwise, we're just going to say "some people"...
 			elseif ($context['folder'] != 'sent')
-				echo '(', $txt['pm_undisclosed_recipients'], ')';
+				echo
+										'(', $txt['pm_undisclosed_recipients'], ')';
 
 			echo '
-										<strong> ', $txt['on'], ':</strong> ', $message['time'];
+										<strong> ', $txt['on'], ': </strong>', $message['time'];
 
 			// If we're in the sent items folder, show who it was sent to besides the "To:" people.
 			if (!empty($message['recipients']['bcc']))
 				echo '
-										<br /><strong> ', $txt['pm_bcc'], ':</strong> ', implode(', ', $message['recipients']['bcc']);
+										<br /><strong> ', $txt['pm_bcc'], ': </strong>', implode(', ', $message['recipients']['bcc']);
 
 			if (!empty($message['is_replied_to']))
 				echo '
@@ -155,13 +162,16 @@ function template_folder()
 			// Showing all then give a remove item checkbox
 			if (empty($context['display_mode']))
 				echo '
-									<li class="listlevel1 quickmod_check"><input type="checkbox" name="pms[]" id="deletedisplay', $message['id'], '" value="', $message['id'], '" onclick="document.getElementById(\'deletelisting', $message['id'], '\').checked = this.checked;" class="input_check" /></li>';
+									<li class="listlevel1 quickmod_check">
+										<input type="checkbox" name="pms[]" id="deletedisplay', $message['id'], '" value="', $message['id'], '" onclick="document.getElementById(\'deletelisting', $message['id'], '\').checked = this.checked;" class="input_check" />
+									</li>';
 
 			// Maybe there is something...more :P (this is the more button)
 			if (!empty($context['additional_pm_drop_buttons']))
 			{
 				echo '
-									<li class="listlevel1 subsections" aria-haspopup="true"><a class="linklevel1 post_options">', $txt['post_options'], '</a>
+									<li class="listlevel1 subsections" aria-haspopup="true">
+										<a class="linklevel1 post_options">', $txt['post_options'], '</a>
 										<ul class="menulevel2">';
 
 				foreach ($context['additional_pm_drop_buttons'] as $key => $button)
@@ -934,7 +944,7 @@ function template_send()
 
 	// Send, Preview, spellchecker buttons.
 	echo '
-					<div class="submitbutton">
+					<div id="post_confirm_buttons" class="submitbutton">
 						', template_control_richedit_buttons($context['post_box_name']), '
 					</div>
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -1076,11 +1086,8 @@ function template_send()
 				bBccShowByDefault: ', empty($context['recipients']['bcc']) && empty($context['bcc_value']) ? 'false' : 'true', ',
 				sShowBccLinkTemplate: ', JavaScriptEscape('
 					<a href="#" id="bcc_link">' . $txt['make_bcc'] . '</a> <a href="' . $scripturl . '?action=quickhelp;help=pm_bcc" onclick="return reqOverlayDiv(this.href);"><img class="icon" src="' . $settings['images_url'] . '/helptopics.png" alt="(?)" /></a>'
-	), '
+				), '
 			});
-		';
-
-	echo '
 		// ]]></script>';
 }
 

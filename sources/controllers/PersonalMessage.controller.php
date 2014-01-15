@@ -2,8 +2,8 @@
 
 /**
  * This file is mainly meant for controlling the actions related to personal
- * messages. It allows viewing, sending, deleting, and marking personal
- * messages. For compatibility reasons, they are often called "instant messages".
+ * messages. It allows viewing, sending, deleting, and marking.
+ * For compatibility reasons, they are often called "instant messages".
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -71,7 +71,7 @@ class PersonalMessage_Controller extends Action_Controller
 		}
 
 		// A previous message was sent successfully? show a small indication.
-		if (isset($_GET['done']) && ($_GET['done'] == 'sent'))
+		if (isset($_GET['done']) && ($_GET['done'] === 'sent'))
 			$context['pm_sent'] = true;
 
 		// Now we have the labels, and assuming we have unsorted mail, apply our rules!
@@ -230,12 +230,13 @@ class PersonalMessage_Controller extends Action_Controller
 		else
 			$start = 'new';
 
-		// Set up some basic theme stuff.
+		// Set up some basic template stuff.
 		$context['from_or_to'] = $context['folder'] !== 'sent' ? 'from' : 'to';
 		$context['get_pmessage'] = 'preparePMContext_callback';
 		$context['signature_enabled'] = substr($modSettings['signature_settings'], 0, 1) == 1;
 		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
 
+		// Set the template layers we need
 		$template_layers = Template_Layers::getInstance();
 		$template_layers->addAfter('subject_list', 'pm');
 
@@ -276,7 +277,7 @@ class PersonalMessage_Controller extends Action_Controller
 			);
 		}
 
-		// Build it further if we have a label.
+		// Build it further if we also have a label.
 		if ($context['current_label_id'] !== -1)
 		{
 			$context['linktree'][] = array(
@@ -373,18 +374,21 @@ class PersonalMessage_Controller extends Action_Controller
 			else
 				$display_pms = array($lastData['id']);
 
-			// This is pretty much EVERY pm!
-			$all_pms = array_unique(array_merge($pms, $display_pms));
-
 			// At this point we know the main id_pm's. But if we are looking at conversations we need
 			// the PMs that make up the conversation
 			if ($context['display_mode'] == 2)
 			{
 				list($display_pms, $posters) = loadConversationList($lastData['head'], $recipients, $context['folder']);
 
+				// Conversation list may expose additonal PM's being displayed
+				$all_pms = array_unique(array_merge($pms, $display_pms));
+
 				// See if any of these 'listing' PM's are in a conversation thread that has unread entries
 				$context['conversation_unread'] = loadConversationUnreadStatus($all_pms);
 			}
+			// This is pretty much EVERY pm!
+			else
+				$all_pms = array_unique(array_merge($pms, $display_pms));
 
 			// Get recipients (don't include bcc-recipients for your inbox, you're not supposed to know :P).
 			list($context['message_labels'], $context['message_replied'], $context['message_unread']) = loadPMRecipientInfo($all_pms, $recipients, $context['folder']);
@@ -393,10 +397,8 @@ class PersonalMessage_Controller extends Action_Controller
 			if ($context['display_mode'] == 1)
 			{
 				foreach ($posters as $pm_key => $sender)
-				{
 					if (!in_array($pm_key, $display_pms))
 						unset($posters[$pm_key]);
-				}
 			}
 
 			// Load some information about the message sender
@@ -513,7 +515,7 @@ class PersonalMessage_Controller extends Action_Controller
 				fatal_lang_error('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
 		}
 
-		// Quoting/Replying to a message?
+		// Quoting / Replying to a message?
 		if (!empty($_REQUEST['pmsg']))
 		{
 			$pmsg = (int) $_REQUEST['pmsg'];
@@ -711,6 +713,7 @@ class PersonalMessage_Controller extends Action_Controller
 	{
 		global $txt, $context, $user_info, $modSettings;
 
+		// All the helpers we need
 		require_once(SUBSDIR . '/Auth.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
 
@@ -745,7 +748,7 @@ class PersonalMessage_Controller extends Action_Controller
 		if (!isset($_REQUEST['xml']) && checkSession('post', '', false) != '')
 			$post_errors->addError('session_timeout');
 
-		$_REQUEST['subject'] = isset($_REQUEST['subject']) ? strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => '')) : '';
+		$_REQUEST['subject'] = isset($_REQUEST['subject']) ? strtr(Util::htmltrim($_POST['subject']), array("\r" => '', "\n" => '', "\t" => '')) : '';
 		$_REQUEST['to'] = empty($_POST['to']) ? (empty($_GET['to']) ? '' : $_GET['to']) : $_POST['to'];
 		$_REQUEST['bcc'] = empty($_POST['bcc']) ? (empty($_GET['bcc']) ? '' : $_GET['bcc']) : $_POST['bcc'];
 
@@ -793,6 +796,7 @@ class PersonalMessage_Controller extends Action_Controller
 					// Assume all are not found, until proven otherwise.
 					$namesNotFound[$recipientType] = $namedRecipientList[$recipientType];
 
+					// Make sure we only have each member listed once, incase they did not use the select list
 					foreach ($foundMembers as $member)
 					{
 						$testNames = array(
@@ -845,7 +849,7 @@ class PersonalMessage_Controller extends Action_Controller
 			}
 		}
 
-		// Did they make any mistakes?
+		// Did they make any mistakes like no subject or message?
 		if ($_REQUEST['subject'] == '')
 			$post_errors->addError('no_subject');
 
@@ -868,6 +872,7 @@ class PersonalMessage_Controller extends Action_Controller
 		if (!$user_info['is_admin'] && !isset($_REQUEST['xml']) && !empty($modSettings['pm_posts_verification']) && $user_info['posts'] < $modSettings['pm_posts_verification'])
 		{
 			require_once(SUBSDIR . '/VerificationControls.class.php');
+
 			$verificationOptions = array(
 				'id' => 'pm',
 			);
@@ -980,7 +985,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 	/**
 	 * This function performs all additional actions
-	 * including the deleting of PM's
+	 * including the deleting and labeling of PM's
 	 */
 	public function action_pmactions()
 	{
@@ -991,6 +996,7 @@ class PersonalMessage_Controller extends Action_Controller
 		if (isset($_REQUEST['del_selected']))
 			$_REQUEST['pm_action'] = 'delete';
 
+		// Create a list of pm's that we need to work on
 		if (isset($_REQUEST['pm_action']) && $_REQUEST['pm_action'] != '' && !empty($_REQUEST['pms']) && is_array($_REQUEST['pms']))
 		{
 			foreach ($_REQUEST['pms'] as $pm)
@@ -1020,6 +1026,7 @@ class PersonalMessage_Controller extends Action_Controller
 		$label_type = array();
 		foreach ($_REQUEST['pm_actions'] as $pm => $action)
 		{
+			// What are we doing with the selected messages, adding a label, removing, other?
 			switch (substr($action, 0, 4))
 			{
 				case 'dele':
@@ -1035,11 +1042,12 @@ class PersonalMessage_Controller extends Action_Controller
 					break;
 				default:
 					$type = 'unk';
-					if ($action == '-1' || $action == '0' || (int) $action > 0)
-					{
-						$to_label[(int) $pm] = (int) $action;
-						$label_type[(int) $pm] = $type;
-					}
+			}
+
+			if ($action == '-1' || $action == '0' || (int) $action > 0)
+			{
+				$to_label[(int) $pm] = (int) $action;
+				$label_type[(int) $pm] = $type;
 			}
 		}
 
@@ -1147,6 +1155,7 @@ class PersonalMessage_Controller extends Action_Controller
 			'name' => $txt['pm_manage_labels']
 		);
 
+		// Some things for the template
 		$context['page_title'] = $txt['pm_manage_labels'];
 		$context['sub_template'] = 'labels';
 
@@ -1469,7 +1478,12 @@ class PersonalMessage_Controller extends Action_Controller
 	}
 
 	/**
-	 * List all rules, and allow adding/entering etc...
+	 * List and allow adding/entering all man rules, such as
+	 * - If it itches, it will be scratched.
+	 * - Yes or No are perfectly acceptable answers to almost every question.
+	 * - Men see in only 16 colors, Peach, for example, is a fruit, not a color.
+	 *
+	 * @uses sub template rules
 	 */
 	public function action_manrules()
 	{
@@ -1508,6 +1522,7 @@ class PersonalMessage_Controller extends Action_Controller
 			$context['rid'] = isset($_GET['rid']) && isset($context['rules'][$_GET['rid']])? (int) $_GET['rid'] : 0;
 			$context['sub_template'] = 'add_rule';
 
+			// Oh my, we have a lot of text strings for this
 			addJavascriptVar(array(
 				'criteriaNum' => 0,
 				'actionNum' => 0,
@@ -1666,6 +1681,8 @@ class PersonalMessage_Controller extends Action_Controller
 	 * - uses the search sub template of the PersonalMessage template.
 	 * - decodes and loads search parameters given in the URL (if any).
 	 * - the form redirects to index.php?action=pm;sa=search2.
+	 *
+	 * @uses search sub template
 	 */
 	public function action_search()
 	{
@@ -1739,7 +1756,6 @@ class PersonalMessage_Controller extends Action_Controller
 		$context['simple_search'] = isset($context['search_params']['advanced']) ? empty($context['search_params']['advanced']) : !empty($modSettings['simpleSearch']) && !isset($_REQUEST['advanced']);
 		if (isset($_GET['basic']))
 			$context['minmax_preferences']['pmsearch'] = 0;
-
 		$context['page_title'] = $txt['pm_search_title'];
 		$context['sub_template'] = 'search';
 		$context['linktree'][] = array(
@@ -2336,7 +2352,7 @@ function messageIndexBar($area)
 }
 
 /**
- * Get a personal message for the theme. (used to save memory.)
+ * Get a personal message for the template. (used to save memory.)
  * This is a callback function that will fetch the actual results, as needed, of a previously run
  * subject (loadPMSubjectRequest) or message (loadPMMessageRequest) query.
  *
@@ -2372,6 +2388,7 @@ function preparePMContext_callback($type = 'subject', $reset = false)
 			return false;
 		}
 
+		// Make sure we have a subject
 		$subject['subject'] = $subject['subject'] == '' ? $txt['no_subject'] : $subject['subject'];
 		censorText($subject['subject']);
 
@@ -2452,7 +2469,7 @@ function preparePMContext_callback($type = 'subject', $reset = false)
 	// Run BBC interpreter on the message.
 	$message['body'] = parse_bbc($message['body'], true, 'pm' . $message['id_pm']);
 
-	// Send the array.
+	// Return the array.
 	$output = array(
 		'alternate' => $counter % 2,
 		'id' => $message['id_pm'],
@@ -2491,7 +2508,7 @@ function preparePMContext_callback($type = 'subject', $reset = false)
 			'text' => $txt['pm_mark_unread']
 		);
 
-	// Or give take karma for a PM
+	// Or give / take karma for a PM
 	if (!empty($output['member']['karma']['allow']))
 	{
 		$output['member']['karma'] += array(
