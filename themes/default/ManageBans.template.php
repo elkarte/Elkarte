@@ -182,20 +182,12 @@ function template_ban_edit()
 	}
 
 	echo '
-	</div>
-	<script><!-- // --><![CDATA[
-		var fUpdateStatus = function ()
-		{
-			document.getElementById("expire_date").disabled = !document.getElementById("expires_one_day").checked;
-			document.getElementById("cannot_post").disabled = document.getElementById("full_ban").checked;
-			document.getElementById("cannot_register").disabled = document.getElementById("full_ban").checked;
-			document.getElementById("cannot_login").disabled = document.getElementById("full_ban").checked;
-		}
-		addLoadEvent(fUpdateStatus);';
+	</div>';
 
 	// Auto suggest only needed for adding new bans, not editing
-	if ($context['ban']['is_new'] && empty($_REQUEST['u']))
+	if (!empty($context['use_autosuggest']))
 		echo '
+	<script><!-- // --><![CDATA[
 		var oAddMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oAddMemberSuggest\',
 			sSessionId: elk_session_id,
@@ -207,29 +199,7 @@ function template_ban_edit()
 			bItemList: false
 		});
 
-		function onUpdateName(oAutoSuggest)
-		{
-			document.getElementById(\'user_check\').checked = true;
-			return true;
-		}
-
-		oAddMemberSuggest.registerCallback(\'onBeforeUpdate\', \'onUpdateName\');';
-
-	echo '
-		function confirmBan(aForm)
-		{
-			if (aForm.ban_name.value === \'\')
-			{
-				alert(\'', $txt['ban_name_empty'], '\');
-				return false;
-			}
-
-			if (aForm.partial_ban.checked && !(aForm.cannot_post.checked || aForm.cannot_register.checked || aForm.cannot_login.checked))
-			{
-				alert(\'', $txt['ban_restriction_empty'], '\');
-				return false;
-			}
-		}
+		oAddMemberSuggest.registerCallback(\'onBeforeUpdate\', \'onUpdateName\');
 	// ]]></script>';
 }
 
@@ -311,12 +281,6 @@ function template_ban_edit_trigger()
 			sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
 			bItemList: false
 		});
-
-		function onUpdateName(oAutoSuggest)
-		{
-			document.getElementById(\'user_check\').checked = true;
-			return true;
-		}
 
 		oAddMemberSuggest.registerCallback(\'onBeforeUpdate\', \'onUpdateName\');
 	// ]]></script>';
