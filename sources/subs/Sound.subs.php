@@ -130,4 +130,6 @@ function createWaveFile($word)
 
 	// Output the wav.
 	echo $wav;
+
+	return true;
 }

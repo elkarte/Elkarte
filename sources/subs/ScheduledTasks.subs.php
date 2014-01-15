@@ -190,21 +190,42 @@ function loadTasks($tasks)
 }
 
 /**
- * Logs a finished task.
+ * Logs a task.
  *
- * @param int $task_id
- * @param int $total_time
+ * @param int $id_log the id of the log entry of the task just run. If empty it is considered a new log entry
+ * @param int $task_id the id of the task run (from the table scheduled_tasks)
+ * @param int $total_time How long the task took to finish. If NULL (default value) -1 will be used
+ * @return int the id_log value
  */
-function logTask($task_id, $total_time)
+function logTask($id_log, $task_id, $total_time = null)
 {
 	$db = database();
 
-	$db->insert('',
-		'{db_prefix}log_scheduled_tasks',
-		array('id_task' => 'int', 'time_run' => 'int', 'time_taken' => 'float'),
-		array($task_id, time(), $total_time),
-		array('id_task')
-	);
+	if (empty($id_log))
+	{
+		$db->insert('',
+			'{db_prefix}log_scheduled_tasks',
+			array('id_task' => 'int', 'time_run' => 'int', 'time_taken' => 'float'),
+			array($task_id, time(), $total_time === null ? -1 : $total_time),
+			array('id_task')
+		);
+
+		return $db->insert_id('{db_prefix}log_scheduled_tasks', 'id_log');
+	}
+	else
+	{
+		$db->query('', '
+			UPDATE {db_prefix}log_scheduled_tasks
+			SET time_taken = {float:time_taken}
+			WHERE id_log = {int:id_log}',
+			array(
+				'time_taken' => $total_time,
+				'id_log' => $id_log,
+			)
+		);
+
+		return $id_log;
+	}
 }
 
 /**
@@ -404,7 +425,9 @@ function getTaskLogEntries($start, $items_per_page, $sort)
 			'id' => $row['id_log'],
 			'name' => isset($txt['scheduled_task_' . $row['task']]) ? $txt['scheduled_task_' . $row['task']] : $row['task'],
 			'time_run' => $row['time_run'],
-			'time_taken' => $row['time_taken'],
+			// -1 means failed task, but in order to look better in the UI we switch it to 0
+			'time_taken' => $row['time_taken'] == -1 ? 0 : $row['time_taken'],
+			'task_completed' => $row['time_taken'] != -1,
 		);
 	$db->free_result($request);
 
@@ -454,8 +477,6 @@ function emptyTaskLog()
  */
 function processNextTasks($ts = 0)
 {
-	global $time_start, $modSettings;
-
 	$db = database();
 
 	// We'll run tasks, or so we hope.
@@ -515,65 +536,79 @@ function processNextTasks($ts = 0)
 		// and do this only if we updated it before.
 		if ((!empty($ts) || $ts == $row['next_time']) && $affected_rows)
 		{
-			// The method must exist in ScheduledTask class, or we are wasting our time.
-			// Actually for extendability sake, we need to have other ways, so:
-			// A simple procedural function?
-			if (strpos($row['task'], '::') === false && function_exists($row['task']))
-			{
-				$method = $row['task'];
-
-				ignore_user_abort(true);
-
-				// Do the task...
-				$completed = $method();
-			}
-			// It may be a class (no static, sorry)
-			else
-			{
-				// It may be a custom one
-				if (strpos($row['task'], '::') !== false)
-				{
-					$call = explode('::', $row['task']);
-					$task = new $call[0];
-					$method = $call[1];
-				}
-				// Otherwise we try with the ScheduledTask class
-				else
-				{
-					$task = new ScheduledTask();
-					$method = $row['task'];
-				}
-
-				if (method_exists($task, $method))
-				{
-					ignore_user_abort(true);
-
-					// Do the task...
-					$completed = $task->{$method}();
-				}
-			}
-
-			// Log that we did it ;)
-			if ($completed)
-			{
-				// Taking care of scheduleTaskImmediate having a maximum of 10 "fast" executions
-				$scheduleTaskImmediate = @unserialize($modSettings['scheduleTaskImmediate']);
-				if (!empty($scheduleTaskImmediate) && isset($scheduleTaskImmediate[$row['task']]))
-				{
-					$scheduleTaskImmediate[$row['task']]++;
-
-					if ($scheduleTaskImmediate[$row['task']] > 9)
-						removeScheduleTaskImmediate($row['task'], false);
-					else
-						updateSettings(array('scheduleTaskImmediate' => serialize($scheduleTaskImmediate)));
-				}
-
-				$total_time = round(microtime(true) - $time_start, 3);
-				logTask($row['id_task'], $total_time);
-			}
+			ignore_user_abort(true);
+			run_this_task($row['id_task'], $row['task']);
 		}
+
 	}
 	$db->free_result($request);
+}
+
+function run_this_task($id_task, $task_name)
+{
+	global $time_start, $modSettings;
+
+	// Let's start logging the task and saying we failed it
+	$log_task_id = logTask(0, $id_task);
+
+	// The method must exist in ScheduledTask class, or we are wasting our time.
+	// Actually for extendability sake, we need to have other ways, so:
+	// A simple procedural function?
+	if (strpos($task_name, '::') === false && function_exists($task_name))
+	{
+		$method = $task_name;
+
+		// Do the task...
+		$completed = $method();
+	}
+	// It may be a class (no static, sorry)
+	else
+	{
+		// It may be a custom one
+		if (strpos($task_name, '::') !== false)
+		{
+			$call = explode('::', $task_name);
+			$task_object = new $call[0];
+			$method = $call[1];
+		}
+		// Otherwise we try with the ScheduledTask class
+		else
+		{
+			$task_object = new ScheduledTask();
+			$method = $task_name;
+		}
+
+		if (method_exists($task_object, $method))
+		{
+			// Try to stop a timeout, this would be bad...
+			@set_time_limit(300);
+			if (function_exists('apache_reset_timeout'))
+				@apache_reset_timeout();
+
+			// Do the task...
+			$completed = $task_object->{$method}();
+		}
+	}
+
+	// Log that we did it ;)
+	if ($completed)
+	{
+		// Taking care of scheduleTaskImmediate having a maximum of 10 "fast" executions
+		$scheduleTaskImmediate = @unserialize($modSettings['scheduleTaskImmediate']);
+		if (!empty($scheduleTaskImmediate) && isset($scheduleTaskImmediate[$task_name]))
+		{
+			$scheduleTaskImmediate[$task_name]++;
+
+			if ($scheduleTaskImmediate[$task_name] > 9)
+				removeScheduleTaskImmediate($task_name, false);
+			else
+				updateSettings(array('scheduleTaskImmediate' => serialize($scheduleTaskImmediate)));
+		}
+
+		$total_time = round(microtime(true) - $time_start, 3);
+		// If the task ended successfully, then log the proper time taken to complete
+		logTask($log_task_id, $id_task, $total_time);
+	}
 }
 
 /**

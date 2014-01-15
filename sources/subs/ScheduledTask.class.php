@@ -474,7 +474,7 @@ class ScheduledTask
 		require_once(SUBSDIR . '/Boards.subs.php');
 		// Just get the board names.
 
-		$boards = fetchBoardsInfo(array('boards' => $boards));
+		$boards = fetchBoardsInfo(array('boards' => $boards), array('override_permissions' => true));
 
 		if (empty($boards))
 			return true;
@@ -1618,6 +1618,7 @@ class ScheduledTask
 					}
 				}
 			}
+			return true;
 		}
 	}
 }
