@@ -111,9 +111,6 @@ class ManageSearch_Controller extends Action_Controller
 
 		$config_vars = $this->_searchSettings->settings();
 
-		if (!isset($context['settings_post_javascript']))
-			$context['settings_post_javascript'] = '';
-
 		call_integration_hook('integrate_modify_search_settings', array(&$config_vars));
 
 		// Perhaps the search method wants to add some settings?

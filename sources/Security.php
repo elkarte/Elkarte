@@ -1514,7 +1514,15 @@ function frameOptionsHeader($override = null)
 		return;
 
 	// Finally set it.
-	header('X-Frame-Options: ' . $option);
+	if ($option != 'ALLOW-FROM')
+		header('X-Frame-Options: ' . $option);
+	// But if we want to allow some hosts then we need more work
+	else
+	{
+		$allowed = explode("\n", $modSetting['frame_security_allow_from']);
+		foreach ($allowed as $url)
+			header('X-Frame-Options: ALLOW-FROM ' . $url);
+	}
 }
 
 /**
