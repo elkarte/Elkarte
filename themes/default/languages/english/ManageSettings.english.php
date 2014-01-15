@@ -9,10 +9,6 @@ $txt['modification_settings_desc'] = 'This page contains settings added by any m
 
 $txt['modification_no_misc_settings'] = 'There are no addons installed that have added any settings to this area yet.';
 
-$txt['pollMode'] = 'Poll mode';
-$txt['disable_polls'] = 'Disable polls';
-$txt['enable_polls'] = 'Enable polls';
-$txt['polls_as_topics'] = 'Show existing polls as topics';
 $txt['allow_guestAccess'] = 'Allow guests to browse the forum';
 $txt['userLanguage'] = 'Enable user-selectable language support';
 $txt['allow_editDisplayName'] = 'Allow users to edit their displayed name';

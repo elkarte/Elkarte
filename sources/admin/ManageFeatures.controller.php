@@ -1398,9 +1398,6 @@ class ManageFeatures_Controller extends Action_Controller
 		$can_personal_text = !in_array('personal_text', $disabled_fields) && !in_array('personal_text', $reg_fields);
 
 		$config_vars = array(
-				// Big Options... polls, sticky, bbc....
-				array('select', 'pollMode', array($txt['disable_polls'], $txt['enable_polls'], $txt['polls_as_topics'])),
-			'',
 				// Basic stuff, titles, permissions...
 				array('check', 'allow_guestAccess'),
 				array('check', 'enable_buddylist'),
