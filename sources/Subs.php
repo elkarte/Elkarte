@@ -2407,6 +2407,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 		template_header();
 		$header_done = true;
 	}
+
 	if ($do_footer)
 	{
 		// Show the footer.

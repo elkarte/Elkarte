@@ -62,7 +62,7 @@ function loadSession()
 			$_POST[session_name()] = $session_id;
 		}
 
-		// Use database sessions? (they don't work in 4.1.x!)
+		// Use database sessions?
 		if (!empty($modSettings['databaseSession_enable']))
 		{
 			@ini_set('session.serialize_handler', 'php');
@@ -76,6 +76,7 @@ function loadSession()
 		if (empty($modSettings['databaseSession_enable']) && !empty($modSettings['cache_enable']) && php_sapi_name() != 'cli')
 		{
 			call_integration_hook('integrate_session_handlers');
+
 			// @todo move these to a plugin.
 			if (function_exists('mmcache_set_session_handlers'))
 				mmcache_set_session_handlers();
@@ -101,7 +102,7 @@ function loadSession()
 }
 
 /**
- * Implementation of sessionOpen() replacing the standard open handler.
+ * Implementation of sessionOpen(), executed when the session is being opened with db sessions
  * It simply returns true.
  *
  * @param string $save_path
@@ -114,7 +115,7 @@ function sessionOpen($save_path, $session_name)
 }
 
 /**
- * Implementation of sessionClose() replacing the standard close handler.
+ * Implementation of sessionClose() executed after the session write callback has been called
  * It simply returns true.
  *
  * @return boolean
@@ -125,7 +126,8 @@ function sessionClose()
 }
 
 /**
- * Implementation of sessionRead() replacing the standard read handler.
+ * Implementation of sessionRead() Called when the session starts or when session_start() is called
+ * Must always return a session encoded (serialized) string, or an empty string if there is no data to read.
  *
  * @param string $session_id
  * @return string
@@ -155,7 +157,7 @@ function sessionRead($session_id)
 }
 
 /**
- * Implementation of sessionWrite() replacing the standard write handler.
+ * Implementation of sessionWrite().  Called when the session needs to be saved and closed.
  *
  * @param string $session_id
  * @param string $data
@@ -194,7 +196,8 @@ function sessionWrite($session_id, $data)
 }
 
 /**
- * Implementation of sessionDestroy() replacing the standard destroy handler.
+ * Implementation of sessionDestroy() This callback is executed when a session is
+ * destroyed with session_destroy() or with session_regenerate_id(true).
  *
  * @param string $session_id
  * @return boolean
@@ -218,8 +221,8 @@ function sessionDestroy($session_id)
 }
 
 /**
- * Implementation of sessionGC() replacing the standard gc handler.
- * Callback for garbage collection.
+ * Implementation of sessionGC() The garbage collector callback is invoked
+ * internally by PHP periodically in order to purge old session data.
  *
  * @param int $max_lifetime
  * @return boolean
