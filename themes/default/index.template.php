@@ -416,7 +416,7 @@ function template_html_below()
 	template_javascript(true);
 
 	// Anything special to put out?
-	if (!empty($context['insert_after_template']) && !isset($_REQUEST['xml']))
+	if (!empty($context['insert_after_template']))
 		echo $context['insert_after_template'];
 
 	echo '
