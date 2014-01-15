@@ -183,14 +183,13 @@ class Topic_Controller extends Action_Controller
 
 		// Whatever happens don't index this.
 		$context['robot_no_index'] = true;
-		$is_poll = $topicinfo['id_poll'] > 0 && $modSettings['pollMode'] == '1' && allowedTo('poll_view');
 
 		// Redirect to the boardindex if no valid topic id is provided.
 		if (empty($topicinfo))
 			redirectexit();
 
 		// @todo this code is almost the same as the one in Display.controller.php
-		if ($is_poll)
+		if ($topicinfo['id_poll'] > 0 && !empty($modSettings['pollMode']) && allowedTo('poll_view'))
 		{
 			loadLanguage('Post');
 			require_once(SUBSDIR . '/Poll.subs.php');

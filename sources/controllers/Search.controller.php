@@ -1925,7 +1925,7 @@ class Search_Controller extends Action_Controller
 			'id' => $message['id_topic'],
 			'is_sticky' => !empty($modSettings['enableStickyTopics']) && !empty($message['is_sticky']),
 			'is_locked' => !empty($message['locked']),
-			'is_poll' => $modSettings['pollMode'] == '1' && $message['id_poll'] > 0,
+			'is_poll' => !empty($modSettings['pollMode']) && $message['id_poll'] > 0,
 			'is_hot' => !empty($modSettings['useLikesNotViews']) ? $message['num_likes'] >= $modSettings['hotTopicPosts'] : $message['num_replies'] >= $modSettings['hotTopicPosts'],
 			'is_very_hot' => !empty($modSettings['useLikesNotViews']) ? $message['num_likes'] >= $modSettings['hotTopicVeryPosts'] : $message['num_replies'] >= $modSettings['hotTopicVeryPosts'],
 			'posted_in' => !empty($participants[$message['id_topic']]),

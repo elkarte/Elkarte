@@ -28,6 +28,18 @@ if (!isset($modSettings['package_make_full_backups']) && isset($modSettings['pac
 ---}
 ---#
 
+---# Fix some settings that changed in the meantime...
+---{
+if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersion'], '1.0') == -1)
+{
+	upgrade_query("
+		UPDATE {$db_prefix}settings
+		SET value = CASE WHEN value = '2' THEN '0' ELSE value END
+		WHERE variable LIKE 'pollMode'");
+}
+---}
+---#
+
 ---# Adding new settings to the settings table...
 INSERT IGNORE INTO {$db_prefix}settings
 	(variable, value)
@@ -272,8 +284,8 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}user_drafts (
 ---# Adding draft permissions...
 ---{
 // We cannot do this twice
-// @todo this won't work when you upgrade from smf
-if (@$modSettings['elkVersion'] < '1.0')
+// @todo this won't work when you upgrade from smf <= is it still true?
+if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersion'], '1.0') == -1)
 {
 	// Anyone who can currently post unapproved topics we assume can create drafts as well ...
 	$request = upgrade_query("
@@ -371,8 +383,8 @@ VALUES
 ---# Move existing values...
 ---{
 // We cannot do this twice
-// @todo this won't work when you upgrade from smf
-if (@$modSettings['elkVersion'] < '1.0')
+// @todo this won't work when you upgrade from smf <= is it still true?
+if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersion'], '1.0') == -1)
 {
 	$request = upgrade_query("
 		SELECT id_member, aim, icq, msn, yim
@@ -415,7 +427,7 @@ ALTER TABLE `{$db_prefix}members`
 ---# Adding gravatar permissions...
 ---{
 // Don't do this twice!
-if (@$modSettings['elkVersion'] < '1.0')
+if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersion'], '1.0') == -1)
 {
 	// Try find people who probably can use remote avatars.
 	$request = upgrade_query("

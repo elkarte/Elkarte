@@ -129,8 +129,7 @@ class ManageTopics_Controller extends Action_Controller
 				array('check', 'enableStickyTopics'),
 				array('check', 'enableParticipation'),
 				array('check', 'enableFollowup'),
-				array('select', 'pollMode', array($txt['disable_polls'], $txt['enable_polls'], $txt['polls_as_topics'])),
-			'',
+				array('check', 'pollMode'),
 			'',
 				// Pagination etc...
 				array('int', 'oldTopicDays', 'postinput' => $txt['manageposts_days'], 'subtext' => $txt['oldTopicDays_zero']),

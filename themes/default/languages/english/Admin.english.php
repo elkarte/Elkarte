@@ -563,10 +563,7 @@ $txt['manageposts_days'] = 'days';
 $txt['manageposts_posts'] = 'posts';
 $txt['manageposts_topics'] = 'topics';
 
-$txt['pollMode'] = 'Poll mode';
-$txt['disable_polls'] = 'Disable polls';
-$txt['enable_polls'] = 'Enable polls';
-$txt['polls_as_topics'] = 'Show existing polls as topics';
+$txt['pollMode'] = 'Enable polls';
 
 $txt['manageposts_settings'] = 'Post Settings';
 $txt['manageposts_settings_description'] = 'Here you can set everything related to posts and posting.';
