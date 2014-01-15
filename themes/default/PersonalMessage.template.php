@@ -102,7 +102,7 @@ function template_folder()
 			$window_class = $message['alternate'] === 0 ? 'windowbg' : 'windowbg2';
 
 			echo '
-						<div id="msg_', $message['id'], '" class="', $window_class, '">';
+						<a class="pm_anchor" id="msg_', $message['id'], '"></a><div class="', $window_class, '">';
 
 			// Showing the sidebar posting area?
 			if (empty($options['hide_poster_area']))
