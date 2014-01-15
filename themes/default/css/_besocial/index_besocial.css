@@ -1105,25 +1105,36 @@ span.views_text {
 	.board_lastpost {
 		float: none;
 	}
-	.board_info {
-		width: 90%;
-	}
-	.board_latest {
-		min-width: 16em;
-		width: 16em;
-	}
 }
 
 /* This one does 800 screens at default font size. */
 @media screen and (max-width: 50em) {
 	body {
-		margin-top: 35px;
+		margin-top: 20px;
 	}
 	#menu_sidebar {
 		border: 1px solid #aaa;
 		border-radius: 4px;
 		background: #fff;
 		box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
+	}
+	[data-icon]:before {
+		font-family: 'FontAwesome';
+		border: 3px solid white;
+		padding: 1px;
+		margin: 2px;
+		height: 30px;
+		width: 30px;
+		text-align: center;
+		display: inline-block;
+		border-radius: 4px;
+		font-size: 25px;
+		color: #43a8da;
+		content: attr(data-icon);
+		speak: none;
+	}
+	.indicator[data-icon]:before {
+		color: orange;
 	}
 }
 /* This one does up to 540 screens. */
@@ -1206,40 +1217,8 @@ span.views_text {
 		width: 48%;
 		box-sizing: border-box;
 	}
-		body {
-		margin-top: 15px;
-	}
-	#main_menu .linklevel1 {
-		background-image: url(../../images/_besocial/mobile_icons.png) !important;
-		background-repeat: no-repeat;
-		width: 20em;
-		color: transparent;
-		font-size: 2px;
-		height: 35px;
-	}
-	#button_home>a{
-		background-position: 0 -2px;
-	}
-	#button_profile>a{
-		background-position: 0 -212px;
-	}
-	#button_mention>a{
-		background-position: 0 -87px;
-	}
-	#button_pm>a{
-		background-position: 0 -45px;
-	}
-	#button_unread>a{
-		background-position: 0 -129px ;
-	}
-	#button_unreadreplies>a{
-		background-position: 0 -170px;
-	}
-	#button_register>a{
-		background-position: 0 -339px;
-	}
-	#button_login>a{
-		background-position: 0 -381px;
+	body {
+		margin-top: 20px;
 	}
 	.listlevel1#button_profile {
 		float: left;
@@ -1249,13 +1228,7 @@ span.views_text {
 		right: auto;
 	}
 	#button_pm .pm_indicator, #button_mention .pm_indicator {
-		position: relative;
-		z-index: 9999;
-		float: left;
-		left: 26px;
-		top: 2px;
-		font-size: 10px;
-		line-height: 13px;
+		display: none;
 	}
 	.listlevel1#button_profile .linklevel1 {
 		min-width: 0.5em;

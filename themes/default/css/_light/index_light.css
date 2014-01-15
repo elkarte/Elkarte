@@ -1642,6 +1642,48 @@ div.bbc_footnotes .meaction{
 		background: #fff;
 		box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
 	}
+	[data-icon]:before {
+		font-family: 'FontAwesome';
+		border: 3px solid #666;
+		padding: 1px;
+		margin: 2px;
+		height: 30px;
+		width: 30px;
+		text-align: center;
+		display: inline-block;
+		border-radius: 4px;
+		font-size: 25px;
+		color: #666;
+		content: attr(data-icon);
+		speak: none;
+	}
+	.indicator[data-icon]:before {
+		color: #5ba048;
+	}
+	#main_menu .linklevel1 {
+		margin-right: 2px;
+	}
+	#main_menu .linklevel1.active, #main_menu .linklevel1.active:hover {
+		border: 1px solid transparent;
+		background: transparent;
+	}
+	.listlevel1#button_profile {
+		float: left;
+	}
+	.listlevel1#button_profile:hover .menulevel2, .listlevel1#button_profile.sfhover .menulevel2 {
+		left: 0;
+		right: auto;
+	}
+	#button_pm .pm_indicator, #button_mention .pm_indicator, #button_admin .pm_indicator, #button_moderate .pm_indicator {
+		display: none;
+	}
+	.listlevel1#button_profile .linklevel1 {
+		min-width: 0.5em;
+	}
+	.linklevel1.active, .listlevel1:hover .active, #collapse_button .linklevel1 {
+		padding: 0;
+	}
+
 }
 /* This one does up to 540 screens. */
 @media screen and (max-width: 33.750em) {
@@ -1704,66 +1746,5 @@ div.bbc_footnotes .meaction{
 	}
 	.subsections:hover .linklevel1:after {
 		content: "";
-	}
-	#main_menu .linklevel1.active, #main_menu .linklevel1.active:hover {
-		border: 1px solid transparent;
-		background: transparent;
-	}
-	#main_menu .linklevel1 {
-		background-image: url(../../images/_light/mobile_icons.png) !important;
-		background-repeat: no-repeat !important;
-		width: 35px;
-		color: transparent;
-		font-size: 0.1px;
-		height: 35px;
-		box-shadow: none;
-		border: 1px solid transparent;
-		
-	}
-	#button_home>a, #button_home>a.active{
-		background-position: 0 -2px  !important;
-	}
-	#button_profile>a, #button_profile>a.active{
-		background-position: 0 -212px  !important;
-	}
-	#button_mention>a{
-		background-position: 0 -87px !important;
-	}
-	#button_pm>a{
-		background-position: 0 -45px !important;
-	}
-	#button_unread>a{
-		background-position: 0 -129px !important;
-	}
-	#button_unreadreplies>a{
-		background-position: 0 -170px !important;
-	}
-	#button_register>a{
-		background-position: 0 -339px;
-	}
-	#button_login>a{
-		background-position: 0 -381px;
-	}
-	.listlevel1#button_profile {
-		float: left;
-	}
-	.listlevel1#button_profile:hover .menulevel2, .listlevel1#button_profile.sfhover .menulevel2 {
-		left: 0;
-		right: auto;
-	}
-	#button_pm .pm_indicator, #button_mention .pm_indicator {
-		position: relative;
-		z-index: 9999;
-		float: left;
-		left: 16px;
-		top: -5px;
-		font-size: 10px;
-		line-height: 12px;
-	}
-	.listlevel1#button_profile .linklevel1 {
-		min-width: 0.5em;
-	}
-	.linklevel1.active, .listlevel1:hover .active, #collapse_button .linklevel1 {
-		padding: 0;
 	}
 }
