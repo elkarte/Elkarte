@@ -1192,7 +1192,7 @@ function applyRules($all_messages = false)
 	if (!empty($actions['deletes']))
 		deleteMessages($actions['deletes']);
 
-	// Relabel?
+	// Re-label?
 	if (!empty($actions['labels']))
 	{
 		foreach ($actions['labels'] as $pm => $labels)
@@ -1302,12 +1302,12 @@ function loadPMLimits($id_group = false)
 			'newbie_group' => 4,
 		)
 	);
-
 	$groups = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		if ($row['id_group'] != 1)
 			$groups[$row['id_group']] = $row;
-
+	}
 	$db->free_result($request);
 
 	return $groups;
@@ -1453,6 +1453,7 @@ function updateLabelsToPM($searchArray, $new_labels, $user_id)
 		$toChange = explode(',', $row['labels']);
 
 		foreach ($toChange as $key => $value)
+		{
 			if (in_array($value, $searchArray))
 			{
 				if (isset($new_labels[$value]))
@@ -1460,6 +1461,7 @@ function updateLabelsToPM($searchArray, $new_labels, $user_id)
 				else
 					unset($toChange[$key]);
 			}
+		}
 
 		if (empty($toChange))
 			$toChange[] = '-1';
@@ -1491,6 +1493,7 @@ function updatePMLabels($to_update, $user_id)
 		if (strlen($set) > 60)
 		{
 			$updateErrors++;
+
 			// Make the string as long as possible and update anyway
 			$set = substr($set, 0, 60);
 			$set = substr($set, 0, strrpos($set, ','));

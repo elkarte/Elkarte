@@ -2,8 +2,8 @@
 
 /**
  * This file is mainly meant for controlling the actions related to personal
- * messages. It allows viewing, sending, deleting, and marking personal
- * messages. For compatibility reasons, they are often called "instant messages".
+ * messages. It allows viewing, sending, deleting, and marking.
+ * For compatibility reasons, they are often called "instant messages".
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -236,6 +236,7 @@ class PersonalMessage_Controller extends Action_Controller
 		$context['signature_enabled'] = substr($modSettings['signature_settings'], 0, 1) == 1;
 		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
 
+		// Set the template layers we need
 		$template_layers = Template_Layers::getInstance();
 		$template_layers->addAfter('subject_list', 'pm');
 
@@ -396,10 +397,8 @@ class PersonalMessage_Controller extends Action_Controller
 			if ($context['display_mode'] == 1)
 			{
 				foreach ($posters as $pm_key => $sender)
-				{
 					if (!in_array($pm_key, $display_pms))
 						unset($posters[$pm_key]);
-				}
 			}
 
 			// Load some information about the message sender
@@ -516,7 +515,7 @@ class PersonalMessage_Controller extends Action_Controller
 				fatal_lang_error('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
 		}
 
-		// Quoting/Replying to a message?
+		// Quoting / Replying to a message?
 		if (!empty($_REQUEST['pmsg']))
 		{
 			$pmsg = (int) $_REQUEST['pmsg'];
@@ -714,6 +713,7 @@ class PersonalMessage_Controller extends Action_Controller
 	{
 		global $txt, $context, $user_info, $modSettings;
 
+		// All the helpers we need
 		require_once(SUBSDIR . '/Auth.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
 
@@ -796,6 +796,7 @@ class PersonalMessage_Controller extends Action_Controller
 					// Assume all are not found, until proven otherwise.
 					$namesNotFound[$recipientType] = $namedRecipientList[$recipientType];
 
+					// Make sure we only have each member listed once, incase they did not use the select list
 					foreach ($foundMembers as $member)
 					{
 						$testNames = array(
@@ -848,7 +849,7 @@ class PersonalMessage_Controller extends Action_Controller
 			}
 		}
 
-		// Did they make any mistakes?
+		// Did they make any mistakes like no subject or message?
 		if ($_REQUEST['subject'] == '')
 			$post_errors->addError('no_subject');
 
@@ -871,6 +872,7 @@ class PersonalMessage_Controller extends Action_Controller
 		if (!$user_info['is_admin'] && !isset($_REQUEST['xml']) && !empty($modSettings['pm_posts_verification']) && $user_info['posts'] < $modSettings['pm_posts_verification'])
 		{
 			require_once(SUBSDIR . '/VerificationControls.class.php');
+
 			$verificationOptions = array(
 				'id' => 'pm',
 			);
@@ -1024,6 +1026,7 @@ class PersonalMessage_Controller extends Action_Controller
 		$label_type = array();
 		foreach ($_REQUEST['pm_actions'] as $pm => $action)
 		{
+			// What are we doing with the selected messages, adding a label, removing, other?
 			switch (substr($action, 0, 4))
 			{
 				case 'dele':
@@ -1152,6 +1155,7 @@ class PersonalMessage_Controller extends Action_Controller
 			'name' => $txt['pm_manage_labels']
 		);
 
+		// Some things for the template
 		$context['page_title'] = $txt['pm_manage_labels'];
 		$context['sub_template'] = 'labels';
 
@@ -1474,7 +1478,12 @@ class PersonalMessage_Controller extends Action_Controller
 	}
 
 	/**
-	 * List all rules, and allow adding/entering etc...
+	 * List and allow adding/entering all man rules, such as
+	 * - If it itches, it will be scratched.
+	 * - Yes or No are perfectly acceptable answers to almost every question.
+	 * - Men see in only 16 colors, Peach, for example, is a fruit, not a color.
+	 *
+	 * @uses sub template rules
 	 */
 	public function action_manrules()
 	{
@@ -1513,6 +1522,7 @@ class PersonalMessage_Controller extends Action_Controller
 			$context['rid'] = isset($_GET['rid']) && isset($context['rules'][$_GET['rid']])? (int) $_GET['rid'] : 0;
 			$context['sub_template'] = 'add_rule';
 
+			// Oh my, we have a lot of text strings for this
 			addJavascriptVar(array(
 				'criteriaNum' => 0,
 				'actionNum' => 0,
@@ -1671,6 +1681,8 @@ class PersonalMessage_Controller extends Action_Controller
 	 * - uses the search sub template of the PersonalMessage template.
 	 * - decodes and loads search parameters given in the URL (if any).
 	 * - the form redirects to index.php?action=pm;sa=search2.
+	 *
+	 * @uses search sub template
 	 */
 	public function action_search()
 	{
@@ -1744,7 +1756,6 @@ class PersonalMessage_Controller extends Action_Controller
 		$context['simple_search'] = isset($context['search_params']['advanced']) ? empty($context['search_params']['advanced']) : !empty($modSettings['simpleSearch']) && !isset($_REQUEST['advanced']);
 		if (isset($_GET['basic']))
 			$context['minmax_preferences']['pmsearch'] = 0;
-
 		$context['page_title'] = $txt['pm_search_title'];
 		$context['sub_template'] = 'search';
 		$context['linktree'][] = array(
