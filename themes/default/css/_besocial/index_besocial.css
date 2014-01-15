@@ -1220,9 +1220,6 @@ span.views_text {
 	body {
 		margin-top: 20px;
 	}
-	.listlevel1#button_profile {
-		float: left;
-	}
 	.listlevel1#button_profile:hover .menulevel2, .listlevel1#button_profile.sfhover .menulevel2 {
 		left: 0;
 		right: auto;
