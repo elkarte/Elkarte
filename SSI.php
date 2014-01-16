@@ -1078,7 +1078,7 @@ function ssi_login($redirect_to = '', $output_method = 'echo')
 	$context['default_username'] = isset($_POST['user']) ? preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($_POST['user'], ENT_COMPAT, 'UTF-8')) : '';
 
 	echo '
-		<script src="', $settings['default_theme_url'], '/scripts/sha1.js"></script>
+		<script src="', $settings['default_theme_url'], '/scripts/sha256.js"></script>
 
 		<form action="', $scripturl, '?action=login2" name="frmLogin" id="frmLogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');"' : '', '>
 		<div class="login">
