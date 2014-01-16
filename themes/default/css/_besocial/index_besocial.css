@@ -1122,8 +1122,10 @@ span.views_text {
 		font-family: 'FontAwesome';
 		border: 3px solid white;
 		padding: 1px;
+		padding-bottom: 0px;
 		margin: 2px;
 		height: 30px;
+		line-height: 30px;
 		width: 30px;
 		text-align: center;
 		display: inline-block;
@@ -1135,6 +1137,9 @@ span.views_text {
 	}
 	.indicator[data-icon]:before {
 		color: orange;
+	}
+	#main_menu .linklevel1>.pm_indicator {
+		display: none;
 	}
 }
 /* This one does up to 540 screens. */
