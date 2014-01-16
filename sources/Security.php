@@ -75,13 +75,14 @@ function validateSession($type = 'admin')
 	require_once(SUBSDIR . '/Auth.subs.php');
 
 	// Hashed password, ahoy!
-	if (isset($_POST[$type . '_hash_pass']) && strlen($_POST[$type . '_hash_pass']) == 40)
+	if (isset($_POST[$type . '_hash_pass']) && strlen($_POST[$type . '_hash_pass']) == 64)
 	{
 		checkSession();
 
+		// Allow integration to verify the password
 		$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($user_info['username'], $_POST[$type . '_hash_pass'], true)), true);
 
-		if ($good_password || $_POST[$type . '_hash_pass'] == sha1($user_info['passwd'] . $sc))
+		if ($good_password || $_POST[$type . '_hash_pass'] == hash('sha256', $user_info['passwd'] . $sc))
 		{
 			$_SESSION[$type . '_time'] = time();
 			unset($_SESSION['request_referer']);
@@ -94,6 +95,7 @@ function validateSession($type = 'admin')
 	{
 		checkSession();
 
+		// Give integrated systems a chance to verify this password
 		$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($user_info['username'], $_POST[$type . '_pass'], false)), true);
 
 		// Password correct?
