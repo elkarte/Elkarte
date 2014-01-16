@@ -1232,6 +1232,20 @@ function loadRules($reload = false)
 	if (isset($context['rules']) && !$reload)
 		return;
 
+	// This is just a simple list of "all" known rules
+	$context['known_rules'] = array(
+		// member_id == "Sender Name"
+		'mid',
+		// group_id == "Sender's Groups"
+		'gid',
+		// subject == "Message Subject Contains"
+		'sub',
+		// message == "Message Body Contains"
+		'msg',
+		// buddy == "Sender is Buddy"
+		'bud',
+	);
+
 	$request = $db->query('', '
 		SELECT
 			id_rule, rule_name, criteria, actions, delete_pm, is_or

@@ -1737,31 +1737,6 @@ function expandCollapse(id, icon, speed)
 }
 
 /**
- * Maintains the personal message rule options to conform with the rule choice
- * so that the form only makes available the proper choices (input, select, none, etc)
- *
- * @param {string} optNum
- */
-function updateRuleDef(optNum)
-{
-	if (document.getElementById("ruletype" + optNum).value === "gid")
-	{
-		document.getElementById("defdiv" + optNum).style.display = "none";
-		document.getElementById("defseldiv" + optNum).style.display = "";
-	}
-	else if (document.getElementById("ruletype" + optNum).value === "bud" || document.getElementById("ruletype" + optNum).value === "")
-	{
-		document.getElementById("defdiv" + optNum).style.display = "none";
-		document.getElementById("defseldiv" + optNum).style.display = "none";
-	}
-	else
-	{
-		document.getElementById("defdiv" + optNum).style.display = "";
-		document.getElementById("defseldiv" + optNum).style.display = "none";
-	}
-}
-
-/**
  * Highlight a selection box by changing its class name
  * @todo depreciated?
  *

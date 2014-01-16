@@ -881,7 +881,7 @@ function template_send()
 	// To and bcc. Include a button to search for members.
 	echo '
 						<dt>
-							<span', (isset($context['post_error']['no_to']) || isset($context['post_error']['bad_to']) ? ' class="error"' : ''), ' id="caption_to">', $txt['pm_to'], ':</span>
+							<label for="to_control"', (isset($context['post_error']['no_to']) || isset($context['post_error']['bad_to']) ? ' class="error"' : ''), ' id="caption_to">', $txt['pm_to'], ':</label>
 						</dt>';
 
 	// Autosuggest will be added by the javascript later on.
@@ -903,7 +903,7 @@ function template_send()
 	// This BCC row will be hidden by default if javascript is enabled.
 	echo '
 						<dt  class="clear_left" id="bcc_div">
-							<span', (isset($context['post_error']['no_to']) || isset($context['post_error']['bad_bcc']) ? ' class="error"' : ''), ' id="caption_bbc">', $txt['pm_bcc'], ':</span>
+							<label for="bcc_control"', (isset($context['post_error']['no_to']) || isset($context['post_error']['bad_bcc']) ? ' class="error"' : ''), ' id="caption_bbc">', $txt['pm_bcc'], ':</label>
 						</dt>
 						<dd id="bcc_div2">
 							<input type="text" name="bcc" id="bcc_control" value="', $context['bcc_value'], '" tabindex="', $context['tabindex']++, '" size="40" style="width: 130px;" class="input_text" />
@@ -913,10 +913,10 @@ function template_send()
 	// The subject of the PM.
 	echo '
 						<dt class="clear_left">
-							<span', (isset($context['post_error']['no_subject']) ? ' class="error"' : ''), ' id="caption_subject">', $txt['subject'], ':</span>
+							<label for="subject"', (isset($context['post_error']['no_subject']) ? ' class="error"' : ''), ' id="caption_subject">', $txt['subject'], ':</label>
 						</dt>
 						<dd id="pm_subject">
-							<input type="text" name="subject" value="', $context['subject'], '" tabindex="', $context['tabindex']++, '" size="80" maxlength="80"', isset($context['post_error']['no_subject']) ? ' class="error"' : ' class="input_text"', ' placeholder="', $txt['subject'], '" required="required" />
+							<input type="text" id="subject" name="subject" value="', $context['subject'], '" tabindex="', $context['tabindex']++, '" size="80" maxlength="80"', isset($context['post_error']['no_subject']) ? ' class="error"' : ' class="input_text"', ' placeholder="', $txt['subject'], '" required="required" />
 						</dd>
 					</dl>';
 
@@ -1116,11 +1116,11 @@ function template_prune()
 	global $context, $scripturl, $txt;
 
 	echo '
-	<form action="', $scripturl, '?action=pm;sa=prune" method="post" accept-charset="UTF-8" onsubmit="return confirm(\'', $txt['pm_prune_warning'], '\');">
+	<form id="prune_pm" action="', $scripturl, '?action=pm;sa=prune" method="post" accept-charset="UTF-8" onsubmit="return confirm(\'', $txt['pm_prune_warning'], '\');">
 		<h2 class="category_header">', $txt['pm_prune'], '</h2>
 		<div class="windowbg">
 			<div class="content">
-				<p>', $txt['pm_prune_desc1'], ' <input type="text" name="age" size="3" value="14" class="input_text" /> ', $txt['pm_prune_desc2'], '</p>
+				<p><label for="age">', sprintf($txt['pm_prune_desc'], '<input type="text" id="age" name="age" size="3" value="14" class="input_text" />'), '</label></p>
 				<input type="submit" value="', $txt['delete'], '" class="right_submit" />
 			</div>
 		</div>
@@ -1376,41 +1376,21 @@ function template_add_rule()
 	global $context, $txt, $scripturl;
 
 	echo '
-	<script><!-- // --><![CDATA[';
-
-	// All of the groups
-	foreach ($context['groups'] as $id => $title)
-		echo '
-		groups[', $id, '] = "', addslashes($title), '";';
-
-	// And any existing labels
-	foreach ($context['labels'] as $label)
-		if ($label['id'] != -1)
-			echo '
-		labels[', ($label['id'] + 1), '] = "', addslashes($label['name']), '";';
-
-	echo '
-	// ]]></script>';
-
-	echo '
 	<form action="', $scripturl, '?action=pm;sa=manrules;save;rid=', $context['rid'], '" method="post" accept-charset="UTF-8" name="addrule" id="addrule" class="flow_hidden">
 		<h2 class="category_header">', $context['rid'] == 0 ? $txt['pm_add_rule'] : $txt['pm_edit_rule'], '</h2>
 		<div class="windowbg">
 			<div class="content">
 				<dl class="addrules">
 					<dt class="floatleft">
-						<strong>', $txt['pm_rule_name'], ':</strong><br />
+						<strong><label for="rule_name">', $txt['pm_rule_name'], '</label>:</strong><br />
 						<span class="smalltext">', $txt['pm_rule_name_desc'], '</span>
 					</dt>
 					<dd class="floatleft">
-						<input type="text" name="rule_name" value="', empty($context['rule']['name']) ? $txt['pm_rule_name_default'] : $context['rule']['name'], '" size="50" class="input_text" />
+						<input type="text" id="rule_name" name="rule_name" value="', empty($context['rule']['name']) ? $txt['pm_rule_name_default'] : $context['rule']['name'], '" size="50" class="input_text" />
 					</dd>
 				</dl>
-				<fieldset>
+				<fieldset id="criteria">
 					<legend>', $txt['pm_rule_criteria'], '</legend>';
-
-	// Add a dummy criteria to allow expansion for none js users.
-	$context['rule']['criteria'][] = array('t' => '', 'v' => '');
 
 	// For each criteria print it out.
 	$isFirst = true;
@@ -1422,19 +1402,19 @@ function template_add_rule()
 			echo '<br />';
 
 		echo '
-					<select name="ruletype[', $k, ']" id="ruletype', $k, '" onchange="updateRuleDef(', $k, '); rebuildRuleDesc();">
-						<option value="">', $txt['pm_rule_criteria_pick'], ':</option>
-						<option value="mid" ', $criteria['t'] == 'mid' ? 'selected="selected"' : '', '>', $txt['pm_rule_mid'], '</option>
-						<option value="gid" ', $criteria['t'] == 'gid' ? 'selected="selected"' : '', '>', $txt['pm_rule_gid'], '</option>
-						<option value="sub" ', $criteria['t'] == 'sub' ? 'selected="selected"' : '', '>', $txt['pm_rule_sub'], '</option>
-						<option value="msg" ', $criteria['t'] == 'msg' ? 'selected="selected"' : '', '>', $txt['pm_rule_msg'], '</option>
-						<option value="bud" ', $criteria['t'] == 'bud' ? 'selected="selected"' : '', '>', $txt['pm_rule_bud'], '</option>
+					<select name="ruletype[', $k, ']" id="ruletype', $k, '" data-optnum="', $k, '">
+						<option value="">', $txt['pm_rule_criteria_pick'], ':</option>';
+		foreach ($context['known_rules'] as $rule)
+			echo '
+						<option value="', $rule, '" ', $criteria['t'] == $rule ? 'selected="selected"' : '', '>', $txt['pm_rule_' . $rule], '</option>';
+
+		echo '
 					</select>
 					<span id="defdiv', $k, '" ', !in_array($criteria['t'], array('gid', 'bud')) ? '' : 'style="display: none;"', '>
-						<input type="text" name="ruledef[', $k, ']" id="ruledef', $k, '" onkeyup="rebuildRuleDesc();" value="', in_array($criteria['t'], array('mid', 'sub', 'msg')) ? $criteria['v'] : '', '" class="input_text" />
+						<input type="text" name="ruledef[', $k, ']" id="ruledef', $k, '" value="', in_array($criteria['t'], array('mid', 'sub', 'msg')) ? $criteria['v'] : '', '" class="input_text" />
 					</span>
 					<span id="defseldiv', $k, '" ', $criteria['t'] == 'gid' ? '' : 'style="display: none;"', '>
-						<select name="ruledefgroup[', $k, ']" id="ruledefgroup', $k, '" onchange="rebuildRuleDesc();">
+						<select class="criteria" name="ruledefgroup[', $k, ']" id="ruledefgroup', $k, '">
 							<option value="">', $txt['pm_rule_sel_group'], '</option>';
 
 		foreach ($context['groups'] as $id => $group)
@@ -1454,15 +1434,15 @@ function template_add_rule()
 
 	echo '
 					<span id="criteriaAddHere"></span><br />
-					<a id="addonjs1" class="linkbutton" href="#" onclick="addCriteriaOption(); return false;"  style="display: none;">', $txt['pm_rule_criteria_add'], '</a>
+					<a id="addonjs1" class="linkbutton" href="#" onclick="addCriteriaOption();"  style="display: none;">', $txt['pm_rule_criteria_add'], '</a>
 					<br /><br />
 					', $txt['pm_rule_logic'], ':
-					<select name="rule_logic" id="logic" onchange="rebuildRuleDesc();">
+					<select name="rule_logic" id="logic"">
 						<option value="and" ', $context['rule']['logic'] == 'and' ? 'selected="selected"' : '', '>', $txt['pm_rule_logic_and'], '</option>
 						<option value="or" ', $context['rule']['logic'] == 'or' ? 'selected="selected"' : '', '>', $txt['pm_rule_logic_or'], '</option>
 					</select>
 				</fieldset>
-				<fieldset>
+				<fieldset id="actions">
 					<legend>', $txt['pm_rule_actions'], '</legend>';
 
 	// As with criteria - add a dummy action for "expansion".
@@ -1478,13 +1458,13 @@ function template_add_rule()
 			echo '<br />';
 
 		echo '
-					<select name="acttype[', $k, ']" id="acttype', $k, '" onchange="updateActionDef(', $k, '); rebuildRuleDesc();">
+					<select name="acttype[', $k, ']" id="acttype', $k, '" data-actnum="', $k, '">
 						<option value="">', $txt['pm_rule_sel_action'], ':</option>
 						<option value="lab" ', $action['t'] == 'lab' ? 'selected="selected"' : '', '>', $txt['pm_rule_label'], '</option>
 						<option value="del" ', $action['t'] == 'del' ? 'selected="selected"' : '', '>', $txt['pm_rule_delete'], '</option>
 					</select>
 					<span id="labdiv', $k, '">
-						<select name="labdef[', $k, ']" id="labdef', $k, '" onchange="rebuildRuleDesc();">
+						<select name="labdef[', $k, ']" id="labdef', $k, '">
 							<option value="">', $txt['pm_rule_sel_label'], '</option>';
 
 		foreach ($context['labels'] as $label)
@@ -1521,18 +1501,8 @@ function template_add_rule()
 
 	// Now setup all the bits!
 	echo '
-	<script><!-- // --><![CDATA[';
-
-	foreach ($context['rule']['criteria'] as $k => $c)
-		echo '
-			updateRuleDef(', $k, ');';
-
-	foreach ($context['rule']['actions'] as $k => $c)
-		echo '
-			updateActionDef(', $k, ');';
-
-	echo '
-			rebuildRuleDesc();';
+	<script><!-- // --><![CDATA[
+		initUpdateRulesActions();';
 
 	// If this isn't a new rule and we have JS enabled remove the JS compatibility stuff.
 	if ($context['rid'])

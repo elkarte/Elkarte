@@ -206,6 +206,7 @@ function loadLabelChoices()
 
 /**
  * Rebuild the rule description!
+ * @todo: string concatenation is bad for internationalization
  */
 function rebuildRuleDesc()
 {
@@ -292,6 +293,71 @@ function rebuildRuleDesc()
 	document.getElementById("ruletext").innerHTML = text;
 }
 
+function initUpdateRulesActions()
+{
+	/**
+	 * Maintains the personal message rule options to conform with the rule choice
+	 * so that the form only makes available the proper choices (input, select, none, etc)
+	 */
+	$('#criteria').on('change', '[name^="ruletype"]', function() {
+		var optNum = $(this).data('optnum');
+
+		if (document.getElementById("ruletype" + optNum).value === "gid")
+		{
+			document.getElementById("defdiv" + optNum).style.display = "none";
+			document.getElementById("defseldiv" + optNum).style.display = "";
+		}
+		else if (document.getElementById("ruletype" + optNum).value === "bud" || document.getElementById("ruletype" + optNum).value === "")
+		{
+			document.getElementById("defdiv" + optNum).style.display = "none";
+			document.getElementById("defseldiv" + optNum).style.display = "none";
+		}
+		else
+		{
+			document.getElementById("defdiv" + optNum).style.display = "";
+			document.getElementById("defseldiv" + optNum).style.display = "none";
+		}
+	});
+
+	/**
+	* Maintains the personal message rule action options to conform with the action choice
+	* so that the form only makes available the proper choice
+	*/
+	$('#actions').on('change', '[name^="acttype"]', function() {
+		var optNum = $(this).data('actnum');
+
+		if (document.getElementById("acttype" + optNum).value === "lab")
+		{
+			document.getElementById("labdiv" + optNum).style.display = "";
+		}
+		else
+		{
+			document.getElementById("labdiv" + optNum).style.display = "none";
+		}
+	});
+
+	// Trigger a change on the existing in order to let the function run
+	$('#criteria [name^="ruletype"]').change();
+	$('#actions [name^="acttype"]').change();
+
+	// Make sure the description is rebuilt every time something changes, even on elements not yet existing
+	$('#criteria').on('change keyup',
+		'[name^="ruletype"], [name^="ruledefgroup"], [name^="ruledef"], [name^="acttype"], [name^="labdef"], #logic',
+		function() {
+			rebuildRuleDesc();
+	});
+
+	// Make sure the description is rebuilt every time something changes, even on elements not yet existing
+	$('#criteria, #actions').on('change keyup',
+		'[name^="ruletype"], [name^="ruledefgroup"], [name^="ruledef"], [name^="acttype"], [name^="labdef"], #logic',
+		function() {
+			rebuildRuleDesc();
+	});
+
+	// Rebuild once at the beginning to ensure everything is correct
+	rebuildRuleDesc();
+}
+
 /**
  * Add a new rule criteria for PM filtering
  */
@@ -305,12 +371,19 @@ function addCriteriaOption()
 	}
 	criteriaNum++;
 
+	// rules select
+	var rules_option = '';
+	for (var index in rules)
+		rules_option += '<option value="' + index + '">' + rules[index] + '</option>';
+
 	// group selections
 	var group_option = '';
 	for (var index in groups)
 		group_option += '<option value="' + index + '">' + groups[index] + '</option>';
 
-	setOuterHTML(document.getElementById("criteriaAddHere"), '<br /><select name="ruletype[' + criteriaNum + ']" id="ruletype' + criteriaNum + '" onchange="updateRuleDef(' + criteriaNum + ');rebuildRuleDesc();"><option value="">' + txt_pm_rule_criteria_pick + ':</option><option value="mid">' + txt_pm_rule_mid + '</option><option value="gid">' + txt_pm_rule_gid + '</option><option value="sub">' + txt_pm_rule_sub + '</option><option value="msg">' + txt_pm_rule_msg + '</option><option value="bud">' + txt_pm_rule_bud + '</option></select>&nbsp;<span id="defdiv' + criteriaNum + '" style="display: none;"><input type="text" name="ruledef[' + criteriaNum + ']" id="ruledef' + criteriaNum + '" onkeyup="rebuildRuleDesc();" value="" class="input_text" /></span><span id="defseldiv' + criteriaNum + '" style="display: none;"><select name="ruledefgroup[' + criteriaNum + ']" id="ruledefgroup' + criteriaNum + '" onchange="rebuildRuleDesc();"><option value="">' + txt_pm_rule_sel_group + '</option>' + group_option + '</select></span><span id="criteriaAddHere"></span>');
+	setOuterHTML(document.getElementById("criteriaAddHere"), '<br /><select name="ruletype[' + criteriaNum + ']" id="ruletype' + criteriaNum + '" data-optnum="' + criteriaNum + '"><option value="">' + txt_pm_rule_criteria_pick + ':</option>' + rules_option + '</select>&nbsp;<span id="defdiv' + criteriaNum + '" style="display: none;"><input type="text" name="ruledef[' + criteriaNum + ']" id="ruledef' + criteriaNum + '" value="" class="input_text" /></span><span id="defseldiv' + criteriaNum + '" style="display: none;"><select name="ruledefgroup[' + criteriaNum + ']" id="ruledefgroup' + criteriaNum + '"><option value="">' + txt_pm_rule_sel_group + '</option>' + group_option + '</select></span><span id="criteriaAddHere"></span>');
+
+	return false;
 }
 
 /**
@@ -331,23 +404,5 @@ function addActionOption()
 	for (var index in labels)
 		label_option += '<option value="' + index + '">' + labels[index] + '</option>';
 
-	setOuterHTML(document.getElementById("actionAddHere"), '<br /><select name="acttype[' + actionNum + ']" id="acttype' + actionNum + '" onchange="updateActionDef(' + actionNum + ');rebuildRuleDesc();"><option value="">' + txt_pm_rule_sel_action + ':</option><option value="lab">' + txt_pm_rule_label + '</option><option value="del">' + txt_pm_rule_delete + '</option></select>&nbsp;<span id="labdiv' + actionNum + '" style="display: none;"><select name="labdef[' + actionNum + ']" id="labdef' + actionNum + '" onchange="rebuildRuleDesc();"><option value="">' + txt_pm_rule_sel_label + '</option>' + label_option + '</select></span><span id="actionAddHere"></span>');
-}
-
-/**
- * Maintains the personal message rule action options to conform with the action choice
- * so that the form only makes available the proper choice
- *
- * @param {string} optNum
- */
-function updateActionDef(optNum)
-{
-	if (document.getElementById("acttype" + optNum).value === "lab")
-	{
-		document.getElementById("labdiv" + optNum).style.display = "";
-	}
-	else
-	{
-		document.getElementById("labdiv" + optNum).style.display = "none";
-	}
+	setOuterHTML(document.getElementById("actionAddHere"), '<br /><select name="acttype[' + actionNum + ']" id="acttype' + actionNum + '" data-actnum="' + actionNum + '"><option value="">' + txt_pm_rule_sel_action + ':</option><option value="lab">' + txt_pm_rule_label + '</option><option value="del">' + txt_pm_rule_delete + '</option></select>&nbsp;<span id="labdiv' + actionNum + '" style="display: none;"><select name="labdef[' + actionNum + ']" id="labdef' + actionNum + '"><option value="">' + txt_pm_rule_sel_label + '</option>' + label_option + '</select></span><span id="actionAddHere"></span>');
 }

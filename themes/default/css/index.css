@@ -3058,6 +3058,7 @@ dl.merge_topic dd {
 }
 #addrule fieldset {
 	clear: both;
+	padding: 0.5em;
 }
 #to_item_list_container div, #bcc_item_list_container div {
 	float: left;
