@@ -131,7 +131,9 @@ input[disabled].input_text {
 	background: #f4f4f4;
 	color: #555;
 }
-
+.button_submit, .right_submit, .left_submit, .button_reset {
+	font-size: 0.88em;
+}
 /* Hover effects. */
 .button_submit:hover, .right_submit:hover, .left_submit:hover,
 .button_reset:hover,
@@ -141,6 +143,8 @@ input[disabled].input_text {
 	color: #555;
 	text-decoration: none;
 }
+
+
 
 /* the new "button" */
 .new_posts, .new_posts:visited, .new_posts:link {
