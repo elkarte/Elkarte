@@ -1677,9 +1677,6 @@ div.bbc_footnotes .meaction{
 		left: 0;
 		right: auto;
 	}
-	#button_pm .pm_indicator, #button_mention .pm_indicator, #button_admin .pm_indicator, #button_moderate .pm_indicator {
-		display: none;
-	}
 	.listlevel1#button_profile .linklevel1 {
 		min-width: 0.5em;
 	}

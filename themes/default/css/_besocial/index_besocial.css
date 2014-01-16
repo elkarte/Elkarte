@@ -1229,9 +1229,6 @@ span.views_text {
 		left: 0;
 		right: auto;
 	}
-	#button_pm .pm_indicator, #button_mention .pm_indicator {
-		display: none;
-	}
 	.listlevel1#button_profile .linklevel1 {
 		min-width: 0.5em;
 	}
