@@ -530,37 +530,6 @@ class Auth_Controller extends Action_Controller
 	}
 
 	/**
-	 * Checks the cookie and update salt.
-	 * If successful, it redirects to action=auth;sa=check.
-	 * Accessed by ?action=auth;sa=salt.
-	 */
-	public function action_salt()
-	{
-		global $user_info, $user_settings, $context, $cookiename;
-
-		// We deal only with logged in folks in here!
-		if (!$user_info['is_guest'])
-		{
-			if (isset($_COOKIE[$cookiename]) && preg_match('~^a:[34]:\{i:0;i:\d{1,8};i:1;s:(0|64):"([a-fA-F0-9]{64})?";i:2;[id]:\d{1,14};(i:3;i:\d;)?\}$~', $_COOKIE[$cookiename]) === 1)
-				list (,, $timeout) = @unserialize($_COOKIE[$cookiename]);
-			elseif (isset($_SESSION['login_' . $cookiename]))
-				list (,, $timeout) = @unserialize($_SESSION['login_' . $cookiename]);
-			else
-				trigger_error('Auth: Cannot be logged in without a session or cookie', E_USER_ERROR);
-
-			$user_settings['password_salt'] = substr(md5(mt_rand()), 0, 4);
-			updateMemberData($user_info['id'], array('password_salt' => $user_settings['password_salt']));
-
-			setLoginCookie($timeout - time(), $user_info['id'], hash('sha256', ($user_settings['passwd'] . $user_settings['password_salt'])));
-
-			redirectexit('action=auth;sa=check;member=' . $user_info['id'], $context['server']['needs_login_fix']);
-		}
-
-		// Lets be sure.
-		redirectexit();
-	}
-
-	/**
 	 * Double check the cookie.
 	 */
 	public function action_check()
