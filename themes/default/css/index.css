@@ -1947,9 +1947,6 @@ img.new_posts {
 #poll_main ul {
 	margin-top: 8px;
 }
-#poll_main li {
-	margin-top: 3px;
-}
 #poll .content {
 	padding: 0 12px;
 }
@@ -2443,7 +2440,7 @@ ul.post_options li {
 }
 
 /* The event editor section. */
-#event_main {
+#event_main, #poll_options, #poll_main {
 	margin-bottom: 0.5em;
 }
 #event_main .roundframe {
@@ -2485,35 +2482,35 @@ ul.post_options li {
 #edit_poll {
 	overflow: hidden;
 }
-#edit_poll fieldset {
+#poll_main, #poll_options, #poll_reset {
 	clear: both;
 	overflow: hidden;
 	padding: 6px;
 }
-#edit_poll fieldset input {
-	margin-left: 7.8em;
+#poll_main #question {
+	margin-left: 2em;
 }
-#edit_poll ul.poll_main li {
+#poll_main .poll_main li {
 	padding-left: 12px;
 }
-#edit_poll ul.poll_main input {
+#poll_main .poll_main input {
 	margin-left: 12px;
 }
-#edit_poll ul.poll_main, dl.poll_options {
+#poll_main .poll_main, dl.poll_options {
 	overflow: hidden;
 	padding: 0 0 8px 8px;
 }
-#edit_poll ul.poll_main li {
+#poll_main .poll_main li {
 	margin: 2px 0;
 }
-#edit_poll dl.poll_options dt {
+#poll_options .poll_options dt {
 	padding: 0 0 0 12px;
 	width: 33%;
 }
-#edit_poll dl.poll_options dd {
+#poll_options .poll_options dd {
 	width: 65%;
 }
-#edit_poll dl.poll_options dd input {
+#poll_options .poll_options dd input {
 	margin-left: 0;
 }
 
