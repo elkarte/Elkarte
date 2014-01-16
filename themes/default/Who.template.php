@@ -29,18 +29,18 @@ function template_whos_selection_above()
 			<h2 class="category_header">', $txt['who_title'], '</h2>';
 
 	$extra = '
-				<div class="selectbox floatright">' . $txt['who_show1'] . '
-					<select name="show_top" onchange="document.forms.whoFilter.show.value = this.value; document.forms.whoFilter.submit();">';
+			<div class="selectbox floatright"><label for="show_top">' . $txt['who_show1'] . '</label>
+				<select name="show_top" id="show_top" onchange="document.forms.whoFilter.show.value = this.value; document.forms.whoFilter.submit();">';
 
 	foreach ($context['show_methods'] as $value => $label)
 		$extra .= '
-						<option value="' . $value . '" ' . ($value == $context['show_by'] ? ' selected="selected"' : '') . '>' . $label . '</option>';
+					<option value="' . $value . '" ' . ($value == $context['show_by'] ? ' selected="selected"' : '') . '>' . $label . '</option>';
 	$extra .= '
-					</select>
-					<noscript>
-						<input type="submit" name="submit_top" value="' . $txt['go'] . '" class="button_submit submitgo" />
-					</noscript>
-				</div>';
+				</select>
+				<noscript>
+					<input type="submit" name="submit_top" value="' . $txt['go'] . '" class="button_submit submitgo" />
+				</noscript>
+			</div>';
 
 	template_pagesection(false, false, array('extra' => $extra));
 }
@@ -119,21 +119,21 @@ function template_whos_selection_below()
 {
 	global $context, $txt;
 
-	$extra_bottom = '
-			<div class="selectbox floatright">' . $txt['who_show1'] . '
-				<select name="show" onchange="document.forms.whoFilter.submit();">';
+	$extra = '
+			<div class="selectbox floatright"><label for="show">' . $txt['who_show1'] . '</label>
+				<select name="show" id="show" onchange="document.forms.whoFilter.submit();">';
 
 	foreach ($context['show_methods'] as $value => $label)
-		$extra_bottom .= '
+		$extra .= '
 					<option value="' . $value . '" ' . ($value == $context['show_by'] ? ' selected="selected"' : '') . '>' . $label . '</option>';
-	$extra_bottom .= '
+	$extra .= '
 				</select>
 				<noscript>
 					<input type="submit" name="submit_top" value="' . $txt['go'] . '" class="button_submit submitgo" />
 				</noscript>
 			</div>';
 
-	template_pagesection(false, false, array('extra' => $extra_bottom));
+	template_pagesection(false, false, array('extra' => $extra));
 
 	echo '
 		</form>
