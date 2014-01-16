@@ -38,9 +38,8 @@ function template_searchform()
 		echo '
 					<fieldset id="simple_search" class="content">
 						<div id="search_term_input">
-							<strong>', $txt['search_for'], ':</strong>
-							<input type="text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' maxlength="', $context['search_string_limit'], '" size="40" class="input_text" placeholder="' . $txt['search'] . '" required="required" autofocus="autofocus" />
-							', $context['require_verification'] ? '' : '&nbsp;<input type="submit" name="s_search" value="' . $txt['search'] . '" class="button_submit" />', '
+							<label for="search"><strong>', $txt['search_for'], '</strong></label>:
+							<input type="text" id="search" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' maxlength="', $context['search_string_limit'], '" size="40" class="input_text" placeholder="' . $txt['search'] . '" required="required" autofocus="autofocus" />', '
 						</div>';
 
 		if (empty($modSettings['search_simple_fulltext']))
@@ -54,12 +53,12 @@ function template_searchform()
 							<strong>' . $txt['search_visual_verification_label'] . ':</strong>
 							<br />', '<br />');
 			echo '
-							<input id="submit" type="submit" name="s_search" value="' . $txt['search'] . '" class="button_submit"/>
 						</div>';
 		}
 
 		// Show the button to enable advanced search
 		echo '
+						<input id="submit" type="submit" name="s_search" value="' . $txt['search'] . '" class="button_submit"/>
 						<a class="linkbutton" href="', $scripturl, '?action=search;advanced" onclick="elk_setThemeOption(\'minmax_preferences\', \'1\', null, elk_session_id, elk_session_var, \';minmax_key=asearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);">', $txt['search_advanced'], '</a>
 						<input type="hidden" name="advanced" value="0" />
 					</fieldset>';
@@ -145,7 +144,7 @@ function template_searchform()
 		{
 			template_control_verification($context['visual_verification_id'], '
 						<p>
-							<strong>' . $txt['verification'] . ':</strong>
+							<strong>' . $txt['search_visual_verification_label'] . ':</strong>
 							', '
 						</p>');
 		}
@@ -304,10 +303,10 @@ function template_results()
 						<form action="', $scripturl, '?action=search2" method="post" accept-charset="UTF-8">
 							<dl class="settings">
 								<dt class="righttext">
-									<strong>', $txt['search_for'], ':</strong>
+									<label for="search"><strong>', $txt['search_for'], ':</strong></label>
 								</dt>
 								<dd>
-									<input type="text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' maxlength="', $context['search_string_limit'], '" size="40" class="input_text" />
+									<input type="text" id="search" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' maxlength="', $context['search_string_limit'], '" size="40" class="input_text" />
 								</dd>
 							</dl>
 							<div class="submitbutton" >
