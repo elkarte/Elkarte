@@ -538,8 +538,12 @@ class Profile_Controller extends Action_Controller
 					// Does the integration want to check passwords?
 					$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($cur_profile['member_name'], $_POST['oldpasswrd'], false)), true);
 
+					// Start up the password checker, we have work to do
+					require_once(EXTDIR . '/PasswordHash.php');
+					$t_hasher = new PasswordHash(8, false);
+
 					// Bad password!!!
-					if (!$good_password && $user_info['passwd'] != sha1(strtolower($user_profile[$memID]['member_name']) . un_htmlspecialchars(stripslashes($_POST['oldpasswrd']))))
+					if (!$good_password && $t_hasher->CheckPassword($_POST['oldpasswrd'], $user_info['passwd']) === false)
 						$post_errors[] = 'bad_password';
 
 					// Warn other elements not to jump the gun and do custom changes!

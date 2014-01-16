@@ -499,13 +499,16 @@ class ProfileOptions_Controller extends Action_Controller
 					call_integration_hook('integrate_reset_pass', array($cur_profile['member_name'], $cur_profile['member_name'], $_POST['passwrd1']));
 
 					// Go then.
-					$passwd = sha1(strtolower($cur_profile['member_name']) . un_htmlspecialchars($_POST['passwrd1']));
+					require_once(EXTDIR . '/PasswordHash.php');
+					$t_hasher = new PasswordHash(8, false);
+					$sha_passwd = hash('sha256', strtolower($cur_profile['member_name']) . un_htmlspecialchars($_POST['passwrd1']));
+					$passwd = $t_hasher->HashPassword($sha_passwd);
 
 					// Do the important bits.
 					updateMemberData($memID, array('openid_uri' => '', 'passwd' => $passwd));
 					if ($context['user']['is_owner'])
 					{
-						setLoginCookie(60 * $modSettings['cookieTime'], $memID, sha1(sha1(strtolower($cur_profile['member_name']) . un_htmlspecialchars($_POST['passwrd2'])) . $cur_profile['password_salt']));
+						setLoginCookie(60 * $modSettings['cookieTime'], $memID, hash('sha256', strtolower($cur_profile['member_name']) . un_htmlspecialchars($_POST['passwrd2']) . $cur_profile['password_salt']));
 						redirectexit('action=profile;area=authentication;updated');
 					}
 					else
