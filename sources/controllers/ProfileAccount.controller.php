@@ -50,10 +50,13 @@ class ProfileAccount_Controller extends Action_Controller
 		// make sure the sub-template is set...
 		loadTemplate('ProfileAccount');
 		$context['sub_template'] = 'issueWarning';
-
 		// We need this because of template_load_warning_variables
 		loadTemplate('Profile');
 		loadJavascriptFile('profile.js');
+		// jQuery-UI FTW!
+		$modSettings['jquery_include_ui'] = true;
+		loadCSSFile('jquery.ui.slider.css');
+		loadCSSFile('jquery.ui.theme.css');
 
 		// Get all the actual settings.
 		list ($modSettings['warning_enable'], $modSettings['user_limit']) = explode(',', $modSettings['warning_settings']);

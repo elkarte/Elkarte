@@ -985,6 +985,22 @@ span.views_text {
 .signature {
 	opacity: 0.9;
 }
+
+/*	$PROFILE		*/
+/* ------------------------------------------------------- */
+#warndiv .ui-widget-header {
+	background: transparent;
+}
+#warndiv .watched .ui-widget-header {
+	background: green;
+}
+#warndiv .moderated .ui-widget-header {
+	background: orange;
+}
+#warndiv .muted .ui-widget-header {
+	background: red;
+}
+
 /*	$HELP		*/
 /* ------------------------------------------------------- */
 

@@ -3011,7 +3011,13 @@ dl.merge_topic dd {
 #new_template_link a {
 	margin-bottom: 2px;
 }
-
+#warndiv {
+	margin: 0 0 1em 5%;
+}
+#slider-range-min {
+	width: 90%;
+	margin-top: 1em;
+}
 
 /* $PERSONAL	*/
 /* ------------------------------------------------------- */
@@ -4170,6 +4176,9 @@ a.help .icon {
 	}
 	#month_grid {
 		display: none;
+	}
+	#warning_level {
+		max-width: 5em !important;
 	}
 }
 /* This one does 480px screens at default font size. */

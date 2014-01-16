@@ -93,7 +93,7 @@ function template_trackIP()
 						<label for="searchip"><strong>', $txt['enter_ip'], ':</strong></label>
 					</dt>
 					<dd>
-						<input type="text" name="searchip" value="', $context['ip'], '" class="input_text" />
+						<input type="text" id="searchip" name="searchip" value="', $context['ip'], '" class="input_text" />
 					</dd>
 				</dl>
 				<input type="submit" value="', $txt['trackIP'], '" class="right_submit" />
