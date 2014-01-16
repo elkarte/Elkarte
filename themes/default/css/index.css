@@ -620,7 +620,11 @@ div.windowbg, div.windowbg2 {
 	padding: 1px 4px;
 	cursor: pointer;
 }
-
+/* To ensure the question and the input are on two different lines */
+.verificationquestion label {
+	display: block;
+	width: 100%;
+}
 
 /*	$BBC		*/
 /* ------------------------------------------------------- */

@@ -66,9 +66,9 @@ function template_control_verification_questions($verify_id, $verify_context)
 
 	foreach ($verify_context as $question)
 		echo '
-				<div class="smalltext">
-					', $question['q'], ':<br />
-					<input type="text" name="', $verify_id, '_vv[q][', $question['id'], ']" size="30" value="', $question['a'], '" ', $question['is_error'] ? ' class="border_error"' : '', ' tabindex="', $context['tabindex']++, '" class="input_text" />
+				<div class="verificationquestion">
+					<label for="', $verify_id, '_vv[q][', $question['id'], ']">', $question['q'], ':</label>
+					<input type="text" id="', $verify_id, '_vv[q][', $question['id'], ']" name="', $verify_id, '_vv[q][', $question['id'], ']" size="30" value="', $question['a'], '" ', $question['is_error'] ? ' class="border_error"' : '', ' tabindex="', $context['tabindex']++, '" class="input_text" />
 				</div>';
 }
 
@@ -97,13 +97,13 @@ function template_control_verification_captcha($verify_id, $verify_context)
 	echo '
 				<div class="smalltext" style="margin: 4px 0 8px 0;">
 					<a href="', $verify_context['image_href'], ';sound" id="visual_verification_', $verify_id, '_sound" rel="nofollow">', $txt['visual_verification_sound'], '</a> / <a href="#visual_verification_', $verify_id, '_refresh" id="visual_verification_', $verify_id, '_refresh">', $txt['visual_verification_request_new'], '</a><br /><br />
-					', $txt['visual_verification_description'], ':
-					<input type="text" name="', $verify_id, '_vv[code]" value="', !empty($verify_context['text_value']) ? $verify_context['text_value'] : '', '" size="30" tabindex="', $context['tabindex']++, '" class="', $verify_context['is_error'] ? 'border_error ' : '', 'input_text" />
+					<label for="', $verify_id, '_vv[code]">', $txt['visual_verification_description'], '</label>:
+					<input type="text" id="', $verify_id, '_vv[code]" name="', $verify_id, '_vv[code]" value="', !empty($verify_context['text_value']) ? $verify_context['text_value'] : '', '" size="30" tabindex="', $context['tabindex']++, '" class="', $verify_context['is_error'] ? 'border_error ' : '', 'input_text" />
 				</div>';
 }
 
 /**
- * Display the empty field verificaiton
+ * Display the empty field verification
  *
  * @param int $verify_id
  * @param array $verify_context
@@ -112,10 +112,10 @@ function template_control_verification_emptyfield($verify_id, $verify_context)
 {
 	global $context, $txt;
 
-	// Display an empty field verificaiton
+	// Display an empty field verification
 	echo '
 			<div class="smalltext verification_control_valid">
-				', $txt['visual_verification_hidden'], ':
-				<input type="text" name="', $verify_context['field_name'], '" autocomplete="off" size="30" value="', (!empty($verify_context['user_value']) ? $verify_context['user_value'] : '' ), '" tabindex="', $context['tabindex']++, '" class="', $verify_context['is_error'] ? 'border_error ' : '', 'input_text" />
+				<label for="', $verify_context['field_name'], '">', $txt['visual_verification_hidden'], '</label>:
+				<input type="text" id="', $verify_context['field_name'], '" name="', $verify_context['field_name'], '" autocomplete="off" size="30" value="', (!empty($verify_context['user_value']) ? $verify_context['user_value'] : '' ), '" tabindex="', $context['tabindex']++, '" class="', $verify_context['is_error'] ? 'border_error ' : '', 'input_text" />
 			</div>';
 }
