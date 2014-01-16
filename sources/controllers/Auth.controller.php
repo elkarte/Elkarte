@@ -162,7 +162,7 @@ class Auth_Controller extends Action_Controller
 			$_POST['user'] = Util::substr($_POST['user'], 0, 80);
 
 		// Hmm... maybe 'admin' will login with no password. Uhh... NO!
-		if ((!isset($_POST['passwrd']) || $_POST['passwrd'] == '') && (!isset($_POST['hash_passwrd']) || strlen($_POST['hash_passwrd']) != 40))
+		if ((!isset($_POST['passwrd']) || $_POST['passwrd'] == '') && (!isset($_POST['hash_passwrd']) || strlen($_POST['hash_passwrd']) != 64))
 		{
 			$context['login_errors'] = array($txt['no_password']);
 			return;
@@ -193,20 +193,28 @@ class Auth_Controller extends Action_Controller
 			return;
 		}
 
+		// Here resides our functions to work with password hashes
+		require_once(EXTDIR . '/PasswordHash.php');
+		$t_hasher = new PasswordHash(8, false);
+		$valid_password = false;
+
 		// Figure out the password using Elk's encryption - if what they typed is right.
-		if (isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) == 40)
+		if (isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) == 64)
 		{
 			// Needs upgrading?
-			if (strlen($user_settings['passwd']) != 40)
+			if (strlen($user_settings['passwd']) == 40 && $_POST['hash_passwrd'] == $user_settings['passwd'])
 			{
 				$context['login_errors'] = array($txt['login_hash_error']);
 				$context['disable_login_hashing'] = true;
 				unset($user_settings);
 				return;
 			}
-			// Challenge passed.
-			elseif ($_POST['hash_passwrd'] == sha1($user_settings['passwd'] . $sc . $tk))
-				$sha_passwd = $user_settings['passwd'];
+			// Challenge what was passed, will the passed password satisfy the saved hash
+			elseif ($t_hasher->CheckPassword($_POST['hash_passwrd'], $user_settings['passwd']))
+			{
+				$sha_passwd = $_POST['hash_passwrd'];
+				$valid_password = true;
+			}
 			else
 			{
 				// Don't allow this!
@@ -227,11 +235,15 @@ class Auth_Controller extends Action_Controller
 				}
 			}
 		}
+		// Plain text password, no JS or hashing turned off to upgrade from old style
 		else
-			$sha_passwd = sha1(strtolower($user_settings['member_name']) . un_htmlspecialchars($_POST['passwrd']));
+		{
+			$sha_passwd = hash('sha256', (strtolower($user_settings['member_name']) . un_htmlspecialchars($_POST['passwrd'])));
+			$valid_password = $t_hasher->CheckPassword($sha_passwd, $user_settings['passwd']);
+		}
 
 		// Bad password!  Thought you could fool the database?!
-		if ($user_settings['passwd'] != $sha_passwd)
+		if ($valid_password === false)
 		{
 			// Let's be cautious, no hacking please. thanx.
 			validatePasswordFlood($user_settings['id_member'], $user_settings['passwd_flood']);
@@ -282,6 +294,7 @@ class Auth_Controller extends Action_Controller
 			{
 				// Maybe they are using a hash from before the password fix.
 				$other_passwords[] = sha1(strtolower($user_settings['member_name']) . un_htmlspecialchars($_POST['passwrd']));
+				$other_passwords[] = sha1($user_settings['passwd'] . $sc . $tk);
 
 				if (!empty($modSettings['enable_password_conversion']))
 				{
@@ -311,7 +324,7 @@ class Auth_Controller extends Action_Controller
 
 				// Xenforo?
 				$other_passwords[] = sha1(sha1($_POST['passwrd']) . $user_settings['password_salt']);
-				$other_passwords[] = sha256(sha256($_POST['passwrd']) . $user_settings['password_salt']);
+				$other_passwords[] = hash('sha256', (hash('sha256', ($_POST['passwrd']) . $user_settings['password_salt'])));
 			}
 
 			// ElkArte's sha1 function can give a funny result on Linux (Not our fault!). If we've now got the real one let the old one be valid!
@@ -327,7 +340,7 @@ class Auth_Controller extends Action_Controller
 			// Whichever encryption it was using, let's make it use ElkArte's now ;).
 			if (in_array($user_settings['passwd'], $other_passwords))
 			{
-				$user_settings['passwd'] = $sha_passwd;
+				$user_settings['passwd'] = $t_hasher->HashPassword($sha_passwd);
 				$user_settings['password_salt'] = substr(md5(mt_rand()), 0, 4);
 
 				// Update the password and set up the hash.
@@ -507,7 +520,7 @@ class Auth_Controller extends Action_Controller
 		// We deal only with logged in folks in here!
 		if (!$user_info['is_guest'])
 		{
-			if (isset($_COOKIE[$cookiename]) && preg_match('~^a:[34]:\{i:0;i:\d{1,8};i:1;s:(0|40):"([a-fA-F0-9]{40})?";i:2;[id]:\d{1,14};(i:3;i:\d;)?\}$~', $_COOKIE[$cookiename]) === 1)
+			if (isset($_COOKIE[$cookiename]) && preg_match('~^a:[34]:\{i:0;i:\d{1,8};i:1;s:(0|64):"([a-fA-F0-9]{64})?";i:2;[id]:\d{1,14};(i:3;i:\d;)?\}$~', $_COOKIE[$cookiename]) === 1)
 				list (,, $timeout) = @unserialize($_COOKIE[$cookiename]);
 			elseif (isset($_SESSION['login_' . $cookiename]))
 				list (,, $timeout) = @unserialize($_SESSION['login_' . $cookiename]);
@@ -517,7 +530,7 @@ class Auth_Controller extends Action_Controller
 			$user_settings['password_salt'] = substr(md5(mt_rand()), 0, 4);
 			updateMemberData($user_info['id'], array('password_salt' => $user_settings['password_salt']));
 
-			setLoginCookie($timeout - time(), $user_info['id'], sha1($user_settings['passwd'] . $user_settings['password_salt']));
+			setLoginCookie($timeout - time(), $user_info['id'], hash('sha256', ($user_settings['passwd'] . $user_settings['password_salt'])));
 
 			redirectexit('action=auth;sa=check;member=' . $user_info['id'], $context['server']['needs_login_fix']);
 		}
@@ -645,7 +658,7 @@ function doLogin()
 	$user_info['id'] = $user_settings['id_member'];
 
 	// Bam!  Cookie set.  A session too, just in case.
-	setLoginCookie(60 * $modSettings['cookieTime'], $user_settings['id_member'], sha1($user_settings['passwd'] . $user_settings['password_salt']));
+	setLoginCookie(60 * $modSettings['cookieTime'], $user_settings['id_member'], hash('sha256', ($user_settings['passwd'] . $user_settings['password_salt'])));
 
 	// Reset the login threshold.
 	if (isset($_SESSION['failed_login']))
