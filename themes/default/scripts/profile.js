@@ -14,6 +14,16 @@
  * This file contains javascript associated with the user profile
  */
 
+$(document).ready(function() {
+	// Profile options changing karma
+	$('#karma_good, #karma_bad').keyup(function() {
+		var good = parseInt($('#karma_good').val()),
+			bad = parseInt($('#karma_bad').val());
+
+		$('#karmaTotal').text((isNaN(good) ? 0 : good) - (isNaN(bad) ? 0 : bad));
+	});
+});
+
 /**
  * Function to detect the time offset and populate the offset box
  *
