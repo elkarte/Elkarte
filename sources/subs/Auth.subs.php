@@ -397,8 +397,11 @@ function resetPassword($memID, $username = null)
 	}
 
 	// Generate a random password.
+	require_once(EXTDIR . '/PasswordHash.php');
+	$t_hasher = new PasswordHash(8, false);
 	$newPassword = substr(preg_replace('/\W/', '', md5(mt_rand())), 0, 10);
-	$newPassword_sha1 = sha1(strtolower($user) . $newPassword);
+	$newPassword_sha256 = hash('sha256', strtolower($user) . $newPassword);
+	$db_hash = $t_hasher->HashPassword($newPassword_sha256);
 
 	// Do some checks on the username if needed.
 	if ($username !== null)
@@ -413,10 +416,10 @@ function resetPassword($memID, $username = null)
 			fatal_error($error, $error_severity === null ? false : 'general');
 
 		// Update the database...
-		updateMemberData($memID, array('member_name' => $user, 'passwd' => $newPassword_sha1));
+		updateMemberData($memID, array('member_name' => $user, 'passwd' => $db_hash));
 	}
 	else
-		updateMemberData($memID, array('passwd' => $newPassword_sha1));
+		updateMemberData($memID, array('passwd' => $db_hash));
 
 	call_integration_hook('integrate_reset_pass', array($old_user, $user, $newPassword));
 
