@@ -2443,44 +2443,38 @@ ul.post_options li {
 }
 
 /* The event editor section. */
-#post_event .roundframe {
+#event_main {
+	margin-bottom: 0.5em;
+}
+#event_main .roundframe {
 	overflow: auto;
 	padding: 12px 12%;
 }
-#post_event fieldset {
+#event_main fieldset {
 	clear: both;
 }
-#post_event #event_main input {
-	float: left;
-	margin: 0 0 12px 0;
+#event_main #datepicker, #event_main #caption_evtitle {
+	display: inline-block;
+	padding-left: 1em;
+	padding-top: 0.5em;
 }
-#post_event #event_main div.smalltext {
-	float: right;
-	width: 34.6em;
+#event_main #evtitle {
+	margin-top: 0.5em;
 }
-#post_event div.event_options {
-	float: right;
-}
-#post_event .event_main, .event_options {
+#event_main .event_options {
 	overflow: hidden;
 	padding: 0;
 }
-#post_event .event_main li {
-	float: left;
-	margin: 2px 0;
-	width: 49%;
-}
-/* @todo - div.event_options and ul.event_options? Meh. :P Fix. */
-#post_event ul.event_options {
+#event_main .event_options {
 	margin: 0;
-	padding: 0 0 8px 8px;
+	padding: 1em 0.5em 0.5em 1em;
 }
-#post_event ul.event_options li {
-	margin: 0;
-	float: left;
+#event_main .event_options li {
+	padding-top: 0.5em;
+	padding-bottom: 0.5em;
 }
-#post_event #event_main select, #post_event ul.event_options li select,
-#post_event ul.event_options li .input_check {
+#event_main select, .event_options li select,
+#event_main ul.event_options li .input_check {
 	margin: 0 12px 0 0;
 }
 #datepicker {

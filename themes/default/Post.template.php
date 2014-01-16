@@ -113,32 +113,32 @@ function template_postarea_above()
 	{
 		echo '
 							<dt>
-								<span', isset($context['post_error']['long_name']) || isset($context['post_error']['no_name']) || isset($context['post_error']['bad_name']) ? ' class="error"' : '', ' id="caption_guestname">', $txt['name'], ':</span>
+								<label for="guestname"', isset($context['post_error']['long_name']) || isset($context['post_error']['no_name']) || isset($context['post_error']['bad_name']) ? ' class="error"' : '', ' id="caption_guestname">', $txt['name'], ':</label>
 							</dt>
 							<dd>
-								<input type="text" name="guestname" size="25" value="', $context['name'], '" tabindex="', $context['tabindex']++, '" class="input_text" />
+								<input type="text" id="guestname" name="guestname" size="25" value="', $context['name'], '" tabindex="', $context['tabindex']++, '" class="input_text" required="required" />
 							</dd>';
 
 		if (empty($modSettings['guest_post_no_email']))
 			echo '
 							<dt>
-								<span', isset($context['post_error']['no_email']) || isset($context['post_error']['bad_email']) ? ' class="error"' : '', ' id="caption_email">', $txt['email'], ':</span>
+								<label for="email"', isset($context['post_error']['no_email']) || isset($context['post_error']['bad_email']) ? ' class="error"' : '', ' id="caption_email">', $txt['email'], ':</label>
 							</dt>
 							<dd>
-								<input type="text" name="email" size="25" value="', $context['email'], '" tabindex="', $context['tabindex']++, '" class="input_text" />
+								<input type="email" id="email" name="email" size="25" value="', $context['email'], '" tabindex="', $context['tabindex']++, '" class="input_text" required="required" />
 							</dd>';
 	}
 
 	// Now show the subject box for this post.
 	echo '
 							<dt class="clear">
-								<span', isset($context['post_error']['no_subject']) ? ' class="error"' : '', ' id="caption_subject">', $txt['subject'], ':</span>
+								<label for="post_subject"', isset($context['post_error']['no_subject']) ? ' class="error"' : '', ' id="caption_subject">', $txt['subject'], ':</label>
 							</dt>
 							<dd>
 								<input id="post_subject" type="text" name="subject"', $context['subject'] == '' ? '' : ' value="' . $context['subject'] . '"', ' tabindex="', $context['tabindex']++, '" size="80" maxlength="80"', isset($context['post_error']['no_subject']) ? ' class="error"' : ' class="input_text"', ' placeholder="', $txt['subject'], '" required="required" />
 							</dd>
 							<dt class="clear_left">
-								', $txt['message_icon'], ':
+								<label for="icon">', $txt['message_icon'], '</label>:
 							</dt>
 							<dd>
 								<select name="icon" id="icon" onchange="showimage()">';
@@ -156,7 +156,7 @@ function template_postarea_above()
 	if (!empty($context['show_boards_dropdown']))
 		echo '
 							<dt class="clear_left">
-								', $txt['post_in_board'], ':
+								<label for="post_in_board">', $txt['post_in_board'], '</label>:
 							</dt>
 							<dd>', template_select_boards('post_in_board'), '
 							</dd>';
@@ -192,10 +192,11 @@ function template_make_event_above()
 					<hr class="clear" />
 					<div id="post_event">
 						<fieldset id="event_main">
-							<legend><span', isset($context['post_error']['no_event']) ? ' class="error"' : '', ' id="caption_evtitle">', $txt['calendar_event_title'], '</span></legend>
-							<input type="text" name="evtitle" maxlength="255" size="55" value="', $context['event']['title'], '" tabindex="', $context['tabindex']++, '" class="input_text" />
+							<legend>', $txt['calendar_event_options'], '</legend>
+							<label for="evtitle"', isset($context['post_error']['no_event']) ? ' class="error"' : '', ' id="caption_evtitle">', $txt['calendar_event_title'], ':</label>
+							<input type="text" id="evtitle" name="evtitle" maxlength="255" size="55" value="', $context['event']['title'], '" tabindex="', $context['tabindex']++, '" class="input_text" />
 							<div class="smalltext" id="datepicker">
-								<input type="hidden" name="calendar" value="1" />', $txt['calendar_year'], '
+								<input type="hidden" name="calendar" value="1" /><label for="year">', $txt['calendar_year'], '</label>
 								<select name="year" id="year" tabindex="', $context['tabindex']++, '" onchange="generateDays();">';
 
 	// Show a list of all the years we allow...
@@ -205,7 +206,7 @@ function template_make_event_above()
 
 	echo '
 								</select>
-									', $txt['calendar_month'], '
+								<label for="month">', $txt['calendar_month'], '</label>
 								<select name="month" id="month" onchange="generateDays();">';
 
 	// There are 12 months per year - ensure that they all get listed.
@@ -215,7 +216,7 @@ function template_make_event_above()
 
 	echo '
 								</select>
-									', $txt['calendar_day'], '
+								<label for="day">', $txt['calendar_day'], '</label>
 								<select name="day" id="day">';
 
 	// This prints out all the days in the current month - this changes dynamically as we switch months.
@@ -225,54 +226,49 @@ function template_make_event_above()
 
 	echo '
 								</select>
-							</div>
-						</fieldset>';
+							</div>';
 
 	if (!empty($modSettings['cal_allowspan']) || ($context['event']['new'] && $context['is_new_post']))
 	{
 		echo '
-						<fieldset id="event_options">
-							<legend>', $txt['calendar_event_options'], '</legend>
-							<div class="event_options smalltext">
-								<ul class="event_options">';
+							<ul class="event_options">';
 
 		// If events can span more than one day then allow the user to select how long it should last.
 		if (!empty($modSettings['cal_allowspan']))
 		{
 			echo '
-									<li>
-										', $txt['calendar_numb_days'], '
-										<select name="span">';
+								<li>
+									<label for="span">', $txt['calendar_numb_days'], '</label>
+									<select id="span" name="span">';
 
 			for ($days = 1; $days <= $modSettings['cal_maxspan']; $days++)
 				echo '
-											<option value="', $days, '"', $days == $context['event']['span'] ? ' selected="selected"' : '', '>', $days, '&nbsp;</option>';
+										<option value="', $days, '"', $days == $context['event']['span'] ? ' selected="selected"' : '', '>', $days, '&nbsp;</option>';
 
 			echo '
-										</select>
-									</li>';
+									</select>
+								</li>';
 		}
 
 		// If this is a new event let the user specify which board they want the linked post to be put into.
 		if ($context['event']['new'] && $context['is_new_post'])
 		{
 			echo '
-									<li>
-										', template_select_boards('board', $txt['calendar_post_in']), '
-									</li>';
+								<li>
+									', template_select_boards('board', $txt['calendar_post_in']), '
+								</li>';
 		}
 
 		echo '
-								</ul>
-							</div>
-						</fieldset>';
+							</ul>';
 	}
 
 	if ($context['make_event'] && (!$context['event']['new'] || !empty($context['current_board'])))
 		echo '
-			<input type="hidden" name="eventid" value="', $context['event']['id'], '" />';
+							<input type="hidden" name="eventid" value="', $context['event']['id'], '" />';
 
 	echo '
+						</fieldset>
 					</div>';
 }
 
@@ -321,7 +317,7 @@ function template_post_page()
 	// Option to add a poll (javascript if enabled, otherwise preview with poll)
 	if (!$context['make_poll'] && $context['can_add_poll'])
 		echo '
-							<input type="submit" name="poll" value="', $txt['add_poll'], '" onclick="return loadAddNewPoll(this, ', empty($context['current_board']) ? '' : $context['current_board'], ', \'postmodify\');" class="button_submit" />';
+							<input type="submit" name="poll" value="', $txt['add_poll'], '" onclick="return loadAddNewPoll(this, ', empty($context['current_board']) ? '0' : $context['current_board'], ', \'postmodify\');" class="button_submit" />';
 
 	echo '
 						</div>';
@@ -771,8 +767,8 @@ function template_spellcheck()
 			<table class="table_grid">
 				<tr class="windowbg">
 					<td style="width:50%;vertical-align:top">
-						', $txt['spellcheck_change_to'], '<br />
-						<input type="text" name="changeto" style="width: 98%;" class="input_text" />
+						<label for="changeto">', $txt['spellcheck_change_to'], '</label><br />
+						<input type="text" id="changeto" name="changeto" style="width: 98%;" class="input_text" />
 					</td>
 					<td style="width:50%">
 						', $txt['spellcheck_suggest'], '<br />
