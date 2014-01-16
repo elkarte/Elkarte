@@ -577,7 +577,8 @@ div.bbc_footnotes .meaction{
 	color: #eee;
 }
 #menu_nav {
-	background: linear-gradient(to bottom, #4d4f53 0%,#333 49%,#333 51%,#4d4f53 100%);
+	background: #333;
+	background-image: linear-gradient(to bottom, #4d4f53 0%,#333 49%,#333 51%,#4d4f53 100%);
 	position: fixed;
 	top: 0;
 	z-index: 99;
