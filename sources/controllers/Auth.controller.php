@@ -161,6 +161,11 @@ class Auth_Controller extends Action_Controller
 		if (Util::strlen($_POST['user']) > 80)
 			$_POST['user'] = Util::substr($_POST['user'], 0, 80);
 
+		// Can't use a password > 64 characters sorry, to long and only good for a DoS attack
+		// Plus we expect a 64 character one from sha256
+		if ((isset($_POST['passwrd']) && strlen($_POST['passwrd']) > 64) || (isset($_POST['hash_passwrd']) || strlen($_POST['hash_passwrd']) > 64))
+			$_POST['user'] = Util::substr($_POST['user'], 0, 80);
+
 		// Hmm... maybe 'admin' will login with no password. Uhh... NO!
 		if ((!isset($_POST['passwrd']) || $_POST['passwrd'] == '') && (!isset($_POST['hash_passwrd']) || strlen($_POST['hash_passwrd']) != 64))
 		{
@@ -204,9 +209,12 @@ class Auth_Controller extends Action_Controller
 			// Needs upgrading?
 			if (strlen($user_settings['passwd']) == 40 && $_POST['hash_passwrd'] == $user_settings['passwd'])
 			{
+				// Our storred hash is sha1 (40 characters), needs to be updated so we
+				// will need to ask for the password again.
 				$context['login_errors'] = array($txt['login_hash_error']);
 				$context['disable_login_hashing'] = true;
 				unset($user_settings);
+
 				return;
 			}
 			// Challenge what was passed, will the passed password satisfy the saved hash
