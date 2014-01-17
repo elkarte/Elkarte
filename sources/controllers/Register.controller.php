@@ -641,11 +641,10 @@ class Register_Controller extends Action_Controller
 		}
 
 		// Change their email address? (they probably tried a fake one first :P.)
-		require_once(EXTDIR . '/PasswordHash.php');
-		$t_hasher = new PasswordHash(8, false);
-		$sha_passwd = hash('sha256', strtolower($row['member_name']) . $_REQUEST['passwd']);
+		require_once(SUBSDIR . '/Auth.subs.php');
+		$sha_passwd = $_REQUEST['passwd'];
 
-		if (isset($_POST['new_email'], $_REQUEST['passwd']) && $t_hasher->CheckPassword($sha_passwd, $row['passwd']) && ($row['is_activated'] == 0 || $row['is_activated'] == 2))
+		if (isset($_POST['new_email'], $_REQUEST['passwd']) && validateLoginPassword($sha_passwd, $row['passwd'], $row['member_name'], true) && ($row['is_activated'] == 0 || $row['is_activated'] == 2))
 		{
 			if (empty($modSettings['registration_method']) || $modSettings['registration_method'] == 3)
 				fatal_lang_error('no_access', false);

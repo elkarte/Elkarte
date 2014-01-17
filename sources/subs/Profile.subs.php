@@ -660,10 +660,8 @@ function loadProfileFields($force_reload = false)
 					return \'password_\' . $passwordErrors;
 
 				// Set up the new password variable... ready for storage.
-				require_once(EXTDIR . \'/PasswordHash.php\');
-				$t_hasher = new PasswordHash(8, false);
-				$value = hash(\'sha256\', strtolower($cur_profile[\'member_name\']) . un_htmlspecialchars($value));
-				$value = $t_hasher->HashPassword($value);
+				require_once(SUBSDIR . \'/Auth.subs.php\');
+				validateLoginPassword($value, \'\', $cur_profile[\'member_name\'], true);
 				return true;
 			'),
 		),

@@ -235,11 +235,9 @@ class Reminder_Controller extends Action_Controller
 		validatePasswordFlood($_POST['u'], $member['passwd_flood'], true);
 
 		// User validated.  Update the database!
-		require_once(EXTDIR . '/PasswordHash.php');
-		$t_hasher = new PasswordHash(8, false);
-		$sha_passwd = hash('sha256', (strtolower($member['member_name']) . $_POST['passwrd1']));
-
-		updateMemberData($_POST['u'], array('validation_code' => '', 'passwd' => $t_hasher->HashPassword($sha_passwd)));
+		require_once(SUBSDIR . '/Auth.subs.php');
+		$sha_passwd = $_POST['passwrd1'];
+		updateMemberData($_POST['u'], array('validation_code' => '', 'passwd' => validateLoginPassword($sha_passwd, '', $member['member_name'], true)));
 
 		call_integration_hook('integrate_reset_pass', array($member['member_name'], $member['member_name'], $_POST['passwrd1']));
 
@@ -310,11 +308,9 @@ class Reminder_Controller extends Action_Controller
 			fatal_lang_error('profile_error_password_' . $passwordError, false);
 
 		// Alright, so long as 'yer sure.
-		require_once(EXTDIR . '/PasswordHash.php');
-		$t_hasher = new PasswordHash(8, false);
-		$sha_passwd = hash('sha256', (strtolower($member['member_name']) . $_POST['passwrd1']));
-
-		updateMemberData($member['id_member'], array('passwd' => $t_hasher->HashPassword($sha_passwd)));
+		require_once(SUBSDIR . '/Auth.subs.php');
+		$sha_passwd = $_POST['passwrd1'];
+		updateMemberData($member['id_member'], array('passwd' => validateLoginPassword($sha_passwd, '', $member['member_name'], true)));
 
 		call_integration_hook('integrate_reset_pass', array($member['member_name'], $member['member_name'], $_POST['passwrd1']));
 

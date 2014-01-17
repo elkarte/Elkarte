@@ -581,16 +581,13 @@ function registerMember(&$regOptions, $error_context = 'register')
 		fatal_lang_error('no_theme');
 
 	// New password hash
-	require_once(EXTDIR . '/PasswordHash.php');
-	$t_hasher = new PasswordHash(8, false);
-	$sha_passwd = hash('sha256', strtolower($regOptions['username']) . $regOptions['password']);
+	require_once(SUBSDIR . '/Auth.subs.php');
 
 	// Some of these might be overwritten. (the lower ones that are in the arrays below.)
-
 	$regOptions['register_vars'] = array(
 		'member_name' => $regOptions['username'],
 		'email_address' => $regOptions['email'],
-		'passwd' => $t_hasher->HashPassword($sha_passwd),
+		'passwd' => validateLoginPassword($regOptions['password'], '', $regOptions['username'], true),
 		'password_salt' => substr(md5(mt_rand()), 0, 4) ,
 		'posts' => 0,
 		'date_registered' => time(),

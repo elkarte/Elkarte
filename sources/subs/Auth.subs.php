@@ -516,12 +516,12 @@ function validatePassword($password, $username, $restrict_in = array())
 /**
  * Checks whether an entered password is correct for the user
  * - called when logging in or whenever a password needs to be validated for a user
- * - can be used to generate a new hash for the db, used during registariton or password changes
+ * - can be used to generate a new hash for the db, used during registration or password changes
  *
- * @param name $user user name
- * @param string $password user password if not 64 characters long will be SHA256 with the user name
+ * @param string $password user password if not already 64 characters long will be SHA256 with the user name
  * @param string $hash hash as generated from a SHA256 password
- * @param boolean $returnhash flag to determine if we are returning a hash for the database
+ * @param name $user user name only required if creating a SHA-256 password
+ * @param boolean $returnhash flag to determine if we are returning a hash suitable for the database
  */
 function validateLoginPassword(&$password, $hash, $user = '', $returnhash = false)
 {
@@ -529,7 +529,7 @@ function validateLoginPassword(&$password, $hash, $user = '', $returnhash = fals
 	require_once(EXTDIR . '/PasswordHash.php');
 
 	// Base-2 logarithm of the iteration count used for password stretching, the
-	// higher the numnber the more secure and CPU time consuming
+	// higher the number the more secure and CPU time consuming
 	$hash_cost_log2 = 10;
 
 	// Do we require the hashes to be portable to older systems (less secure)?
