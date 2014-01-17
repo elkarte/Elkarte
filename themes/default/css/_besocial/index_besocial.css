@@ -1146,6 +1146,16 @@ span.views_text {
 	#main_menu .linklevel1>.pm_indicator {
 		display: none;
 	}
+	.statistics .flow_hidden, .statistics .floatleft {
+		border: none;
+	}
+	.statistics .category_header {
+		border: none;
+		border-bottom: 1px solid #ccc;
+		border-radius: 0;
+		background-color: #f6f6f6;
+		margin-bottom: 5px !important;
+	}
 }
 /* This one does up to 540 screens. */
 @media screen and (max-width: 33.750em) {
@@ -1154,6 +1164,9 @@ span.views_text {
 	}
 	#top_section .wrapper {
 		padding: 0;
+	}
+	dd.statsbar {
+		padding: 0 !important;
 	}
 	.frame {
 		border-radius: 0;
