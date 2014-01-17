@@ -1227,9 +1227,6 @@ span.views_text {
 		width: 48%;
 		box-sizing: border-box;
 	}
-	body {
-		margin-top: 20px;
-	}
 	.listlevel1#button_profile .linklevel1 {
 		min-width: 0.5em;
 	}
