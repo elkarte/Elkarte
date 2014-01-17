@@ -1970,9 +1970,17 @@ function ssi_checkPassword($id = null, $password = null, $is_username = false)
 		return;
 
 	require_once(SUBSDIR . '/Auth.subs.php');
+	require_once(EXTDIR . '/PasswordHash.php');
+
 	$member = loadExistingMember($id, !$is_username);
 
-	return sha1(strtolower($member['member_name']) . $member['passwd']) == $password && $member['is_activated'] == 1;
+
+	$t_hasher = new PasswordHash(8, false);
+	$newPassword = substr(preg_replace('/\W/', '', md5(mt_rand())), 0, 10);
+	$newPassword_sha256 = hash('sha256', strtolower($user) . $newPassword);
+	$db_hash = $t_hasher->HashPassword($newPassword_sha256);
+
+	return hash('sha256', strtolower($member['member_name']) . $member['passwd']) == $password && $member['is_activated'] == 1;
 }
 
 /**
