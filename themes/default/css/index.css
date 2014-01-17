@@ -3490,6 +3490,16 @@ a.help .icon {
 	display: none;
 	padding: 0.5em;
 }
+#mlsearch_options.nojs {
+	display: none;
+}
+#mlsearch_options.nojs li:nth-child(odd) {
+	float: left;
+	max-width: 25em;
+}
+#mlsearch_options.nojs li:nth-child(even) {
+	float: right;
+}
 #mlsearch_options .mlsearch_option .input_check {
 	margin-left: 0.5em;
 }

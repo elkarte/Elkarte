@@ -430,6 +430,10 @@ div.bbc_footnotes .meaction{
 	opacity: 1;
 }
 
+#mlsearch_options {
+	background-color: white;
+}
+
 /* Main forum area. */
 /* Box-shadow only on this one. */
 #wrapper {
