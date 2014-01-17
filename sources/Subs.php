@@ -3327,6 +3327,7 @@ function setupMenuContext()
 			'home' => array(
 				'title' => $txt['community'],
 				'href' => $scripturl,
+				'data-icon' => '&#xf015',
 				'show' => true,
 				'sub_buttons' => array(
 					'help' => array(
@@ -3366,6 +3367,7 @@ function setupMenuContext()
 				'title' => $context['current_action'] !== 'moderate' ? $txt['admin'] : $txt['moderate'],
 				'counter' => 'grand_total',
 				'href' => $scripturl . '?action=admin',
+				'data-icon' => '&#xf013',
 				'show' => true,
 				'sub_buttons' => array(
 					'admin_center' => array(
@@ -3439,6 +3441,7 @@ function setupMenuContext()
 				'title' => $txt['moderate'],
 				'counter' => 'grand_total',
 				'href' => $scripturl . '?action=moderate',
+				'data-icon' => '&#xf013',
 				'show' => $context['allow_moderation_center'],
 				'sub_buttons' => array(
 					'reports' => array(
@@ -3478,6 +3481,7 @@ function setupMenuContext()
 			'profile' => array(
 				'title' => (!empty($user_info['avatar']['image']) ? $user_info['avatar']['image'] . ' ' : '') . (!empty($modSettings['displayMemberNames']) ? $user_info['name'] : $txt['account_short']),
 				'href' => $scripturl . '?action=profile',
+				'data-icon' => '&#xf007',
 				'show' => $context['allow_edit_profile'],
 				'sub_buttons' => array(
 					'account' => array(
@@ -3509,6 +3513,7 @@ function setupMenuContext()
 				'title' => $txt['pm_short'],
 				'counter' => 'unread_messages',
 				'href' => $scripturl . '?action=pm',
+				'data-icon' => '&#xf0e0',
 				'show' => $context['allow_pm'],
 				'sub_buttons' => array(
 					'pm_read' => array(
@@ -3528,6 +3533,7 @@ function setupMenuContext()
 				'title' => $txt['mention'],
 				'counter' => 'mentions',
 				'href' => $scripturl . '?action=mentions',
+				'data-icon' => '&#xf0f3',
 				'show' => !$user_info['is_guest'] && !empty($modSettings['mentions_enabled']),
 			),
 
@@ -3537,6 +3543,7 @@ function setupMenuContext()
 			'unread' => array(
 				'title' => $txt['view_unread_category'],
 				'href' => $scripturl . '?action=unread',
+				'data-icon' => '&#xf086;',
 				'show' => !$user_info['is_guest'],
 			),
 
@@ -3546,6 +3553,7 @@ function setupMenuContext()
 			'unreadreplies' => array(
 				'title' => $txt['view_replies_category'],
 				'href' => $scripturl . '?action=unreadreplies',
+				'data-icon' => '&#xf0e6',
 				'show' => !$user_info['is_guest'],
 			),
 
@@ -3554,12 +3562,14 @@ function setupMenuContext()
 			'login' => array(
 				'title' => $txt['login'],
 				'href' => $scripturl . '?action=login',
+				'data-icon' => '&#xf023',
 				'show' => $user_info['is_guest'],
 			),
 
 			'register' => array(
 				'title' => $txt['register'],
 				'href' => $scripturl . '?action=register',
+				'data-icon' => '&#xf090',
 				'show' => $user_info['is_guest'] && $context['can_register'],
 			),
 		);
@@ -3583,7 +3593,10 @@ function setupMenuContext()
 				{
 					$button['alttitle'] = $button['title'] . ' [' . $menu_count[$button['counter']] . ']';
 					if (!empty($settings['menu_numeric_notice'][0]))
+					{
 						$button['title'] .= sprintf($settings['menu_numeric_notice'][0], $menu_count[$button['counter']]);
+						$button['indicator'] = true;
+					}
 				}
 
 				// Go through the sub buttons if there are any.
