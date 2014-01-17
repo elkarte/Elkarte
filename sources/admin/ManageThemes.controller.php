@@ -331,6 +331,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		// Off to the template we go
 		$context['sub_template'] = 'list_themes';
+		addJavascriptVar(array('txt_theme_remove_confirm' => $txt['theme_remove_confirm']), true);
 		$context['reset_dir'] = realpath(BOARDDIR . '/themes');
 		$context['reset_url'] = $boardurl . '/themes';
 
@@ -1397,7 +1398,15 @@ class ManageThemes_Controller extends Action_Controller
 	 */
 	private function _action_edit_style($theme_dir)
 	{
-		global $context;
+		global $context, $settings;
+
+		addJavascriptVar(array(
+			'previewData' => '',
+			'previewTimeout' => '',
+			'refreshPreviewCache' => '',
+			'editFilename' => $context['edit_filename'],
+			'theme_id' => $settings['theme_id'],
+		), true);
 
 		// pick the template and send it the file
 		$context['sub_template'] = 'edit_style';
@@ -1580,14 +1589,6 @@ class ManageThemes_Controller extends Action_Controller
 			// Notify the template of trouble
 			$context['session_error'] = true;
 
-			// Choose sub-template
-			if ($is_template)
-				$context['sub_template'] = 'edit_template';
-			elseif ($is_css)
-				$context['sub_template'] = 'edit_style';
-			else
-				$context['sub_template'] = 'edit_file';
-
 			// Recycle the submitted data.
 			if (is_array($file))
 				$context['entire_file'] = htmlspecialchars(implode("\n", $file), ENT_COMPAT, 'UTF-8');
@@ -1595,6 +1596,23 @@ class ManageThemes_Controller extends Action_Controller
 				$context['entire_file'] = htmlspecialchars($file, ENT_COMPAT, 'UTF-8');
 
 			$context['edit_filename'] = htmlspecialchars($_POST['filename'], ENT_COMPAT, 'UTF-8');
+
+			// Choose sub-template
+			if ($is_template)
+				$context['sub_template'] = 'edit_template';
+			elseif ($is_css)
+			{
+				addJavascriptVar(array(
+					'previewData' => '',
+					'previewTimeout' => '',
+					'refreshPreviewCache' => '',
+					'editFilename' => JavaScriptEscape($context['edit_filename']),
+					'theme_id' => $settings['theme_id'],
+				));
+				$context['sub_template'] = 'edit_style';
+			}
+			else
+				$context['sub_template'] = 'edit_file';
 
 			// Re-create the token so that it can be used
 			createToken('admin-te-' . md5($selectedTheme . '-' . $_REQUEST['filename']));

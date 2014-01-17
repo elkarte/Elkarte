@@ -1160,6 +1160,170 @@ function initEditProfileBoards()
 	});
 }
 
+/**
+ * Attache the AJAX handling of things to the various themes to remove
+ * Used in ManageThemes (template_list_themes)
+ */
+function initDeleteThemes()
+{
+	$(".delete_theme").bind("click", function (event) {
+		event.preventDefault();
+		var theme_id = $(this).data("theme_id"),
+			base_url = $(this).attr("href"),
+			pattern = new RegExp(elk_session_var + "=" + elk_session_id + ";(.*)$"),
+			tokens = pattern.exec(base_url)[1].split("="),
+			token = tokens[1],
+			token_var = tokens[0];
+
+		if (confirm(txt_theme_remove_confirm))
+		{
+			$.ajax({
+				type: "GET",
+				url: base_url + ";api;xml",
+				beforeSend: ajax_indicator(true)
+			})
+			.done(function(request) {
+				if ($(request).find("error").length === 0)
+				{
+					var new_token = $(request).find("token").text(),
+						new_token_var = $(request).find("token_var").text();
+
+					$(".theme_" + theme_id).slideToggle("slow", function () {
+						$(this).remove();
+					});
+
+					$(".delete_theme").each(function () {
+						$(this).attr("href", $(this).attr("href").replace(token_var + "=" + token, new_token_var + "=" + new_token));
+					});
+				}
+				// @todo improve error handling
+				else
+				{
+					alert($(request).find("text").text());
+					// Redirect to the delete theme page, though it will result in a token verification error
+					window.location = base_url;
+				}
+			})
+			.fail(function(request) {
+				window.location = base_url;
+			})
+			.always(function() {
+				// turn off the indicator
+				ajax_indicator(false);
+			});
+		}
+	});
+}
+
+/**
+ * These two functions (navigatePreview and refreshPreview) are used in ManageThemes
+ * (template_edit_style) to create a preview of the site with the changed stylesheets
+ */
+function navigatePreview(url)
+{
+	var myDoc = new XMLHttpRequest();
+	myDoc.onreadystatechange = function ()
+	{
+		if (myDoc.readyState !== 4)
+			return;
+
+		if (myDoc.responseText !== null && myDoc.status === 200)
+		{
+			previewData = myDoc.responseText;
+			document.getElementById("css_preview_box").style.display = "";
+
+			// Revert to the theme they actually use ;).
+			var tempImage = new Image();
+			tempImage.src = elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=theme;sa=edit;theme=' + theme_id + ';preview;' + (new Date().getTime());
+
+			refreshPreviewCache = null;
+			refreshPreview(false);
+		}
+	};
+
+	var anchor = "";
+	if (url.indexOf("#") !== -1)
+	{
+		anchor = url.substr(url.indexOf("#"));
+		url = url.substr(0, url.indexOf("#"));
+	}
+
+	myDoc.open("GET", url + (url.indexOf("?") === -1 ? "?" : ";") + 'theme=', theme_id + anchor, true);
+	myDoc.send(null);
+}
+
+function refreshPreview(check)
+{
+	var identical = document.forms.stylesheetForm.entire_file.value == refreshPreviewCache;
+
+	// Don\'t reflow the whole thing if nothing changed!!
+	if (check && identical)
+		return;
+
+	refreshPreviewCache = document.forms.stylesheetForm.entire_file.value;
+
+	// Replace the paths for images.
+	refreshPreviewCache = refreshPreviewCache.replace(/url\(\.\.\/images/gi, "url(" + elk_images_url);
+
+	// Try to do it without a complete reparse.
+	if (identical)
+	{
+		try
+		{
+			if (is_ie)
+			{
+				var sheets = frames["css_preview_box"].document.styleSheets;
+				for (var j = 0; j < sheets.length; j++)
+				{
+					if (sheets[j].id == "css_preview_box")
+						sheets[j].cssText = document.forms.stylesheetForm.entire_file.value;
+				}
+			}
+			else
+			{
+				frames["css_preview_box"].document.getElementById("css_preview_sheet").innerHTML = document.forms.stylesheetForm.entire_file.value;
+			}
+		}
+		catch (e)
+		{
+			identical = false;
+		}
+	}
+
+	// This will work most of the time... could be done with an after-apply, maybe.
+	if (!identical)
+	{
+		var data = previewData,
+			preview_sheet = document.forms.stylesheetForm.entire_file.value,
+			stylesheetMatch = new RegExp('<link rel="stylesheet"[^>]+href="[^"]+' + editFilename + '[^>]*>');
+
+		// Replace the paths for images.
+		preview_sheet = preview_sheet.replace(/url\(\.\.\/images/gi, "url(" + elk_images_url);
+		data = data.replace(stylesheetMatch, '<style type="text/css" id="css_preview_sheet">' + preview_sheet + "<" + "/style>");
+
+		iframe = document.getElementById("css_preview_box");
+		iframe.contentWindow.document.open()
+		iframe.contentWindow.document.write(data);
+		iframe.contentWindow.document.close();
+
+		// Next, fix all its links so we can handle them and reapply the new css!
+		iframe.onload = function ()
+		{
+			var fixLinks = frames["css_preview_box"].document.getElementsByTagName("a");
+			for (var i = 0; i < fixLinks.length; i++)
+			{
+				if (fixLinks[i].onclick)
+					continue;
+
+				fixLinks[i].onclick = function ()
+				{
+					window.parent.navigatePreview(this.href);
+					return false;
+				};
+			}
+		};
+	}
+}
 // Ban edit page
 function onUpdateName(oAutoSuggest)
 {
