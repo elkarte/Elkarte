@@ -2575,6 +2575,7 @@ dl.merge_topic dd {
 }
 .merge_options {
 	clear: both;
+	padding: 0.5em;
 }
 .custom_subject {
 	margin: 6px 0;
