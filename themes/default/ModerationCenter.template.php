@@ -713,38 +713,5 @@ function template_warn_template()
 				return ajax_getTemplatePreview();
 			});
 		});
-
-		function ajax_getTemplatePreview ()
-		{
-			$.ajax({
-				type: "POST",
-				url: "' . $scripturl . '?action=xmlpreview;xml",
-				data: {item: "warning_preview", title: $("#template_title").val(), body: $("#template_body").val(), user: $(\'input[name="u"]\').attr("value")},
-				context: document.body
-			})
-			.done(function(request) {
-				$("#box_preview").css({display:""});
-				$("#template_preview").html($(request).find(\'body\').text());
-				if ($(request).find("error").text() != \'\')
-				{
-					$("#errors").css({display:""});
-					var errors_html = \'\',
-						errors = $(request).find(\'error\').each(function() {
-						errors_html += $(this).text() + \'<br />\';
-					});
-
-					$(document).find("#error_list").html(errors_html);
-				}
-				else
-				{
-					$("#errors").css({display:"none"});
-					$("#error_list").html(\'\');
-				}
-
-				return false;
-			});
-
-			return false;
-		}
 	// ]]></script>';
 }
