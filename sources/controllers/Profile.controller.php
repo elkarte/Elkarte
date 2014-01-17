@@ -28,7 +28,7 @@ if (!defined('ELK'))
 class Profile_Controller extends Action_Controller
 {
 	/**
-	 * If the save was sucessful or not
+	 * If the save was successful or not
 	 * @var boolean
 	 */
 	private $_completed_save = false;
