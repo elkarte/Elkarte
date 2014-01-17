@@ -514,6 +514,56 @@ function validatePassword($password, $username, $restrict_in = array())
 }
 
 /**
+ * Checks whether an entered password is correct for the user
+ * - called when logging in or whenever a password needs to be validated for a user
+ * - can be used to generate a new hash for the db, used during registariton or password changes
+ *
+ * @param name $user user name
+ * @param string $password user password if not 64 characters long will be SHA256 with the user name
+ * @param string $hash hash as generated from a SHA256 password
+ * @param boolean $returnhash flag to determine if we are returning a hash for the database
+ */
+function validateLoginPassword(&$password, $hash, $user = '', $returnhash = false)
+{
+	// Our hashing controller
+	require_once(EXTDIR . '/PasswordHash.php');
+
+	// Base-2 logarithm of the iteration count used for password stretching, the
+	// higher the numnber the more secure and CPU time consuming
+	$hash_cost_log2 = 10;
+
+	// Do we require the hashes to be portable to older systems (less secure)?
+	$hash_portable = false;
+
+	// Get an instance of the hasher
+	$hasher = new PasswordHash($hash_cost_log2, $hash_portable);
+
+	// Guilty until we know otherwise
+	$passhash = false;
+
+	// If the password is not 64 characters, lets make it a (SHA-256)
+	if (strlen($password) !== 64)
+		$password = hash('sha256', strtolower($user) . un_htmlspecialchars($password));
+
+	// They need a password hash?
+	if ($returnhash)
+	{
+		$passhash = $hasher->HashPassword($password);
+
+		// Something is not right, we can not generate a valid hash thats <20 characters
+		if (strlen($hash) < 20)
+			$passhash = false;
+	}
+	// Or doing a password check?
+	else
+	 	$passhash = (bool) $hasher->CheckPassword($password, $hash);
+
+	unset($hasher);
+
+	return $passhash;
+}
+
+/**
  * Quickly find out what moderation authority this user has
  * - builds the moderator, group and board level querys for the user
  * - stores the information on the current users moderation powers in $user_info['mod_cache'] and $_SESSION['mc']
