@@ -551,7 +551,7 @@ function validateLoginPassword(&$password, $hash, $user = '', $returnhash = fals
 		$passhash = $hasher->HashPassword($password);
 
 		// Something is not right, we can not generate a valid hash thats <20 characters
-		if (strlen($hash) < 20)
+		if (strlen($passhash) < 20)
 			$passhash = false;
 	}
 	// Or doing a password check?
