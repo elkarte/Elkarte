@@ -748,6 +748,12 @@ ul.pending_payments {
 .edit_board.changed {
 	background-image: url(../images/icons/field_invalid.png);
 }
+.rename_profile {
+	float: left;
+}
+.perm_profile_delete {
+	width:5%;
+}
 
 /* Styles for the themes section.
 ------------------------------------------------- */

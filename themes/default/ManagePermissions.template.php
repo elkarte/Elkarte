@@ -282,7 +282,7 @@ function template_by_board()
 				echo '
 								<a id="edit_board_', $board['id'], '" href="', $scripturl, '?action=admin;area=permissions;sa=index;pid=', $board['profile'], ';', $context['session_var'], '=', $context['session_id'], '"> [', $board['profile_name'], ']</a>
 							</span>
-							<a class="edit_board" style="display: none" data-boardid="', $board['id'], '" data-boardprofile="', $board['profile'], '" href="', $scripturl, '?action=admin;area=permissions;sa=board;edit;', $context['session_var'], '=', $context['session_id'], '"></a>';
+							<a class="edit_board" data-boardid="', $board['id'], '" data-boardprofile="', $board['profile'], '" href="', $scripturl, '?action=admin;area=permissions;sa=board;edit;', $context['session_var'], '=', $context['session_id'], '"></a>';
 
 			echo '
 						</li>';
@@ -332,7 +332,7 @@ function template_edit_profiles()
 					<tr class="table_head">
 						<th>', $txt['permissions_profile_name'], '</th>
 						<th>', $txt['permissions_profile_used_by'], '</th>
-						<th style="width:5%', !empty($context['show_rename_boxes']) ? ';display:none"' : '"', ' >', $txt['delete'], '</th>
+						<th class="perm_profile_delete" style="', !empty($context['show_rename_boxes']) ? ';display:none"' : '"', ' >', $txt['delete'], '</th>
 					</tr>
 				</thead>
 				<tbody>';
@@ -349,14 +349,14 @@ function template_edit_profiles()
 							<input type="text" name="rename_profile[', $profile['id'], ']" value="', $profile['name'], '" class="input_text" />';
 		else
 			echo '
-							<a href="', $scripturl, '?action=admin;area=permissions;sa=index;pid=', $profile['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $profile['name'], '</a>';
+							<a ', $profile['can_edit'] ? 'class="rename_profile" data-pid="' . $profile['id'] . '" ' : '', 'href="', $scripturl, '?action=admin;area=permissions;sa=index;pid=', $profile['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $profile['name'], '</a>';
 
 		echo '
 						</td>
 						<td>
 							', !empty($profile['boards_text']) ? $profile['boards_text'] : $txt['permissions_profile_used_by_none'], '
 						</td>
-						<td class="centertext" ', !empty($context['show_rename_boxes']) ? 'style="display:none"' : '', '>
+						<td class="centertext perm_profile_delete" ', !empty($context['show_rename_boxes']) ? 'style="display:none"' : '', '>
 							<input type="checkbox" name="delete_profile[]" value="', $profile['id'], '" ', $profile['can_delete'] ? '' : 'disabled="disabled"', ' class="input_check" />
 						</td>
 					</tr>';
@@ -372,10 +372,10 @@ function template_edit_profiles()
 
 	if ($context['can_edit_something'])
 		echo '
-				<input type="submit" name="rename" value="', empty($context['show_rename_boxes']) ? $txt['permissions_profile_rename'] : $txt['permissions_commit'], '" class="button_submit" />';
+				<input type="submit" id="rename" name="rename" value="', empty($context['show_rename_boxes']) ? $txt['permissions_profile_rename'] : $txt['permissions_commit'], '" class="button_submit" />';
 
 	echo '
-				<input type="submit" name="delete" value="', $txt['quickmod_delete_selected'], '" class="button_submit" ', !empty($context['show_rename_boxes']) ? ' style="display:none"' : '', '/>
+				<input type="submit" id="delete" name="delete" value="', $txt['quickmod_delete_selected'], '" class="button_submit" ', !empty($context['show_rename_boxes']) ? ' style="display:none"' : '', '/>
 			</div>
 		</form>
 		<br />
@@ -385,16 +385,16 @@ function template_edit_profiles()
 				<div class="content">
 					<dl class="settings">
 						<dt>
-							<strong>', $txt['permissions_profile_name'], ':</strong>
+							<strong><label for="profile_name">', $txt['permissions_profile_name'], '</label>:</strong>
 						</dt>
 						<dd>
-							<input type="text" name="profile_name" value="" class="input_text" />
+							<input type="text" id="profile_name" name="profile_name" value="" class="input_text" />
 						</dd>
 						<dt>
-							<strong>', $txt['permissions_profile_copy_from'], ':</strong>
+							<strong><label for="copy_from">', $txt['permissions_profile_copy_from'], '</label>:</strong>
 						</dt>
 						<dd>
-							<select name="copy_from">';
+							<select id="copy_from" name="copy_from">';
 
 	foreach ($context['profiles'] as $id => $profile)
 		echo '
@@ -411,6 +411,9 @@ function template_edit_profiles()
 				</div>
 			</div>
 		</form>
+		<script><!-- // --><![CDATA[
+			initEditPermissionProfiles();
+		// ]]></script>
 	</div>';
 }
 

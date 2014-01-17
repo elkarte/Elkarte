@@ -788,7 +788,8 @@ function testFTPResults(oXMLDoc)
 }
 
 /**
- * Part of package manager, expands a folders contents to show permission levels of files it contains
+ * Part of package manager, expands a folders contents to show
+ * permission levels of files it contains.
  * Will use an ajax call to get any permissions it has not loaded
  *
  * @param {type} folderIdent
@@ -1157,6 +1158,60 @@ function initEditProfileBoards()
 			.attr('name', 'save_changes')
 			.attr('value', txt_save)
 		);
+	});
+}
+
+/**
+ * Creates the image and attach the even to convert the name of the permission
+ * profile into an input to change its name and back.
+ * It also removes the "Rename all" and "Remove Selected" buttons
+ * and the "Delete" column for consistency
+ */
+function initEditPermissionProfiles()
+{
+	// We need a variable to be sure we are going to create only 1 cancel button
+	var run_once = false;
+
+	$('.rename_profile').each(function() {
+		var $this_profile = $(this);
+
+		$this_profile.after($('<a class="js-ed edit_board" />').attr('href', '#').click(function(ev) {
+			ev.preventDefault();
+
+			// If we have already created the cancel let's skip it
+			if (!run_once)
+			{
+				run_once = true;
+				$cancel = $('<a class="js-ed-rm linkbutton" />').click(function(ev) {
+					ev.preventDefault();
+
+					// js-ed is again a class introduced by this function only
+					// Any element with this class will be restored when cancel is clicked
+					$('.js-ed').show();
+
+					// js-ed-rm is hopefully a class introduced but this function
+					// Any element with this class will be removed when cancelling
+					$('.js-ed-rm').remove();
+
+					// The cancel button is removed as well,
+					// so we ned to generate it again later (if we need it again)
+					run_once = false;
+
+					$('#rename').val(txt_permissions_profile_rename);
+				}).text(ajax_notification_cancel_text).attr('href', '#');
+			}
+
+			$this_profile.after($('<input type="text" class="js-ed-rm input_text" />')
+				.attr('name', 'rename_profile[' + $this_profile.data('pid') + ']')
+				.val($this_profile.text()));
+
+			// These will have to pop back hitting cancel, so let's prepare them
+			$('#rename').addClass('js-ed').val(txt_permissions_commit).before($cancel);
+			$this_profile.addClass('js-ed').hide();
+			$('#delete').addClass('js-ed').hide();
+			$('.perm_profile_delete').addClass('js-ed').hide();
+			$(this).hide();
+		}));
 	});
 }
 
