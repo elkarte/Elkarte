@@ -78,14 +78,17 @@ function validateSession($type = 'admin')
 	if (isset($_POST[$type . '_hash_pass']) && strlen($_POST[$type . '_hash_pass']) == 64)
 	{
 		checkSession();
+		validateToken('admin-login');
 
 		// Allow integration to verify the password
 		$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($user_info['username'], $_POST[$type . '_hash_pass'], true)), true);
 
-		if ($good_password || $_POST[$type . '_hash_pass'] == hash('sha256', $user_info['passwd'] . $sc))
+		$password = $_POST[$type . '_hash_pass'];
+		if ($good_password || validateLoginPassword($password, $user_info['passwd']))
 		{
 			$_SESSION[$type . '_time'] = time();
 			unset($_SESSION['request_referer']);
+
 			return;
 		}
 	}
@@ -94,6 +97,7 @@ function validateSession($type = 'admin')
 	if (isset($_POST[$type. '_pass']))
 	{
 		checkSession();
+		validateToken('admin-login');
 
 		require_once(SUBSDIR . '/Auth.subs.php');
 
@@ -106,7 +110,7 @@ function validateSession($type = 'admin')
 		{
 			$_SESSION[$type . '_time'] = time();
 			unset($_SESSION['request_referer']);
-			
+
 			return;
 		}
 	}
