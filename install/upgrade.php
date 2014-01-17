@@ -18,7 +18,7 @@
 // Version information...
 define('CURRENT_VERSION', '1.0 Beta');
 define('CURRENT_LANG_VERSION', '1.0');
-define('REQUIRED_PHP_VERSION', '5.1.0');
+define('REQUIRED_PHP_VERSION', '5.1.2');
 
 $databases = array(
 	'mysql' => array(
