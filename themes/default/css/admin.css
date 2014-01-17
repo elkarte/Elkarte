@@ -575,8 +575,20 @@ dl.settings dd.questions input {
 #manage_boards .post_group, #manage_boards .regular_members {
 	cursor: help;
 }
-.select_all_box {
-	display: none;
+.select_all_box label {
+	margin-left:5em;
+	font-style: italic;
+}
+#visible_boards .board .floatright {
+	width:50%;
+}
+#visible_boards .category:after, #visible_boards .board:after {
+	display: block;
+	clear: both;
+	content: "";
+}
+#visible_boards li {
+	padding: 2px;
 }
 
 /* Styles for the manage smiley section.
@@ -1045,9 +1057,16 @@ ul.moderation_notes li {
 	}
 
 }*/
-@media screen and (max-width: 490px),(max-width: 32em) {
+@media screen and (max-width: 33.750em) {
 	body {
 		padding: 0;
+	}
+	#visible_boards .select_all_box {
+		display: block;
+	}
+	#visible_boards label {
+		width: auto!important;
+		display: inline;
 	}
 	#wrapper, #footer_section .frame {
 		min-width: 100%;

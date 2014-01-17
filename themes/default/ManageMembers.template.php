@@ -282,16 +282,16 @@ function template_admin_browse()
 				<div class="content">
 					<dl class="settings">
 						<dt>
-							', $txt['admin_browse_outstanding_days_1'], ':
+							<label for="time_passed">', $txt['admin_browse_outstanding_days_1'], '</label>:
 						</dt>
 						<dd>
-							<input type="text" name="time_passed" value="14" maxlength="4" size="3" class="input_text" /> ', $txt['admin_browse_outstanding_days_2'], '.
+							<input type="text" id="time_passed" name="time_passed" value="14" maxlength="4" size="3" class="input_text" /> ', $txt['admin_browse_outstanding_days_2'], '.
 						</dd>
 						<dt>
-							', $txt['admin_browse_outstanding_perform'], ':
+							<label for="todo">', $txt['admin_browse_outstanding_perform'], '</label>:
 						</dt>
 						<dd>
-							<select name="todo">
+							<select id="todo" name="todo">
 								', $context['browse_type'] == 'activate' ? '
 								<option value="ok">' . $txt['admin_browse_w_activate'] . '</option>' : '', '
 								<option value="okemail">', $context['browse_type'] == 'approve' ? $txt['admin_browse_w_approve'] : $txt['admin_browse_w_activate'], ' ', $txt['admin_browse_w_email'], '</option>', $context['browse_type'] == 'activate' ? '' : '
