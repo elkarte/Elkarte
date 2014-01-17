@@ -516,7 +516,8 @@ function validatePassword($password, $username, $restrict_in = array())
 /**
  * Checks whether an entered password is correct for the user
  * - called when logging in or whenever a password needs to be validated for a user
- * - can be used to generate a new hash for the db, used during registration or password changes
+ * - used to generate a new hash for the db, used during registration or any password changes
+ * - if a non SHA256 password is sent, will generate one with SHA256(password + $user) and return it in password
  *
  * @param string $password user password if not already 64 characters long will be SHA256 with the user name
  * @param string $hash hash as generated from a SHA256 password
@@ -543,7 +544,7 @@ function validateLoginPassword(&$password, $hash, $user = '', $returnhash = fals
 
 	// If the password is not 64 characters, lets make it a (SHA-256)
 	if (strlen($password) !== 64)
-		$password = hash('sha256', strtolower($user) . un_htmlspecialchars($password));
+		$password = hash('sha256', Util::strtolower($user) . un_htmlspecialchars($password));
 
 	// They need a password hash, something to save in the db?
 	if ($returnhash)

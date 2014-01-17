@@ -584,7 +584,7 @@ class Register_Controller extends Action_Controller
 		{
 			call_integration_hook('integrate_activate', array($regOptions['username']));
 
-			setLoginCookie(60 * $modSettings['cookieTime'], $memberID, hash('sha256', strtolower($regOptions['username']) . $regOptions['password'] . $regOptions['register_vars']['password_salt']));
+			setLoginCookie(60 * $modSettings['cookieTime'], $memberID, hash('sha256', Util::strtolower($regOptions['username']) . $regOptions['password'] . $regOptions['register_vars']['password_salt']));
 
 			redirectexit('action=auth;sa=check;member=' . $memberID, $context['server']['needs_login_fix']);
 		}
