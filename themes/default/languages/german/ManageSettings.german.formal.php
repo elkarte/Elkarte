@@ -9,10 +9,6 @@ $txt['modification_settings_desc'] = 'Diese Seite beinhaltet Einstellungen, die 
 
 $txt['modification_no_misc_settings'] = 'Es sind noch keine Erweiterungen installiert, die irgendwelche Einstellungen hinzugefügt hätten.';
 
-$txt['pollMode'] = 'Umfragemodus';
-$txt['disable_polls'] = 'Umfragen deaktivieren';
-$txt['enable_polls'] = 'Umfragen aktivieren';
-$txt['polls_as_topics'] = 'Vorhandene Umfragen als Themen anzeigen';
 $txt['allow_guestAccess'] = 'Gästen das Benutzen des Forums erlauben';
 $txt['userLanguage'] = 'Benutzerseitige Sprachauswahl aktivieren';
 $txt['allow_editDisplayName'] = 'Benutzern die Änderung ihres Anzeigenamens erlauben';

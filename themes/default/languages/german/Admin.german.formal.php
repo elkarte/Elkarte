@@ -235,6 +235,7 @@ $txt['maintain_sub_members'] = 'Mitglieder';
 $txt['maintain_sub_topics'] = 'Themen';
 $txt['maintain_sub_attachments'] = 'Anhänge';
 $txt['maintain_done'] = 'Die Wartungsaufgabe \'%1$s\' wurde erfolgreich ausgeführt.';
+$txt['maintain_fail'] = 'Die Wartungsaufgabe \'%1$s\' wurde nicht erfolgreich ausgeführt.';
 $txt['maintain_no_errors'] = 'Glückwunsch, es wurden keine Fehler gefunden.  Danke für\'s Nachsehen.';
 
 $txt['maintain_tasks'] = 'Geplante Aufgaben';
@@ -560,6 +561,8 @@ $txt['manageposts_characters'] = 'Zeichen';
 $txt['manageposts_days'] = 'Tage';
 $txt['manageposts_posts'] = 'Beiträge';
 $txt['manageposts_topics'] = 'Themen';
+
+$txt['pollMode'] = 'Umfragen aktivieren';
 
 $txt['manageposts_settings'] = 'Beitragseinstellungen';
 $txt['manageposts_settings_description'] = 'Hier können Sie alles einstellen, was mit Beiträgen zu tun hat.';

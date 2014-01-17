@@ -63,5 +63,6 @@ $txt['scheduled_log_empty'] = 'Zurzeit gibt es keine Aufgabenprotokolleinträge.
 $txt['scheduled_log_time_run'] = 'Ausführzeitpunkt';
 $txt['scheduled_log_time_taken'] = 'Dauer';
 $txt['scheduled_log_time_taken_seconds'] = '%1$d Sekunden';
+$txt['scheduled_log_completed'] = 'Aufgabe abgeschlossen';
 $txt['scheduled_log_empty_log'] = 'Protokoll leeren';
 $txt['scheduled_log_empty_log_confirm'] = 'Sind Sie sich sicher, dass Sie das Protokoll vollständig leeren möchten?';
