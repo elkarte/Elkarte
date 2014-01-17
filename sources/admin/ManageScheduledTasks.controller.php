@@ -127,32 +127,12 @@ class ManageScheduledTasks_Controller extends Action_Controller
 
 			// Lets get it on!
 			require_once(SUBSDIR . '/ScheduledTask.class.php');
-			$task = new ScheduledTask();
+			call_integration_include_hook('integrate_autotask_include');
 
 			ignore_user_abort(true);
+
 			foreach ($nextTasks as $task_id => $taskname)
-			{
-				$start_time = microtime(true);
-
-				// The methods got to exist for the tasks.
-				if (!method_exists($task, $taskname))
-					continue;
-
-				// Try to stop a timeout, this would be bad...
-				@set_time_limit(300);
-				if (function_exists('apache_reset_timeout'))
-					@apache_reset_timeout();
-
-				// Do the task...
-				$completed = $task->{$taskname}();
-
-				// Log that we did it ;)
-				if ($completed)
-				{
-					$total_time = round(microtime(true) - $start_time, 3);
-					logTask($task_id, $total_time);
-				}
-			}
+				run_this_task($task_id, $taskname);
 
 			// Things go as expected?  If not save the error in session
 			if (!empty($context['scheduled_errors']))
@@ -416,6 +396,18 @@ class ManageScheduledTasks_Controller extends Action_Controller
 					'sort' => array(
 						'default' => 'lst.time_taken',
 						'reverse' => 'lst.time_taken DESC',
+					),
+				),
+				'task_completed' => array(
+					'header' => array(
+						'value' => $txt['scheduled_log_completed'],
+					),
+					'data' => array(
+						'function' => create_function('$rowData', '
+							global $settings, $txt;
+
+							return \'<img src="\' . $settings[\'images_url\'] . \'/admin/complete_\' . ($rowData[\'task_completed\'] ? \'success\' : \'fail\') . \'.png" alt="\' . sprintf($txt[$rowData[\'task_completed\'] ? \'maintain_done\' : \'maintain_fail\'], $rowData[\'name\']) . \'" />\';
+						'),
 					),
 				),
 			),

@@ -46,20 +46,12 @@ function template_edit_profile_field()
 {
 	global $context, $txt, $settings, $scripturl;
 
-	// All the javascript for this page - quite a bit in script.js!
-	echo '
-	<script><!-- // --><![CDATA[
-		var startOptID = ', count($context['field']['options']), ';
-	// ]]></script>';
-
 	// any errors messages to show?
-	if (isset($_GET['msg']))
+	if (!empty($context['custom_option__error']))
 	{
-		loadLanguage('Errors');
-		if (isset($txt['custom_option_' . $_GET['msg']]))
 			echo '
-	<div class="errorbox">',
-			$txt['custom_option_' . $_GET['msg']], '
+	<div class="errorbox">
+		', $context['custom_option__error'], '
 	</div>';
 	}
 

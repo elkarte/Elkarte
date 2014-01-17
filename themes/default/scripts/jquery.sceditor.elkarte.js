@@ -71,7 +71,7 @@
 
 						if (base.opts.emoticonsCompat)
 						{
-							start = '<span>';
+							start = '<span> ';
 							end   = ' </span>';
 						}
 

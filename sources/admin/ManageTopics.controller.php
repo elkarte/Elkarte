@@ -125,10 +125,11 @@ class ManageTopics_Controller extends Action_Controller
 
 		// initialize it with our settings
 		$config_vars = array(
-				// Some simple bools...
+				// Some simple big bools...
 				array('check', 'enableStickyTopics'),
 				array('check', 'enableParticipation'),
 				array('check', 'enableFollowup'),
+				array('check', 'pollMode'),
 			'',
 				// Pagination etc...
 				array('int', 'oldTopicDays', 'postinput' => $txt['manageposts_days'], 'subtext' => $txt['oldTopicDays_zero']),

@@ -183,7 +183,7 @@ class MessageIndex_Controller extends Action_Controller
 		// Set the variables up for the template.
 		$context['can_mark_notify'] = allowedTo('mark_notify') && !$user_info['is_guest'];
 		$context['can_post_new'] = allowedTo('post_new') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_topics'));
-		$context['can_post_poll'] = $modSettings['pollMode'] == '1' && allowedTo('poll_post') && $context['can_post_new'];
+		$context['can_post_poll'] = !empty($modSettings['pollMode']) && allowedTo('poll_post') && $context['can_post_new'];
 		$context['can_moderate_forum'] = allowedTo('moderate_forum');
 		$context['can_approve_posts'] = allowedTo('approve_posts');
 
@@ -276,9 +276,6 @@ class MessageIndex_Controller extends Action_Controller
 		// Begin 'printing' the message index for current board.
 		foreach ($topics_info as $row)
 		{
-			if ($row['id_poll'] > 0 && $modSettings['pollMode'] == '0')
-				continue;
-
 			$topic_ids[] = $row['id_topic'];
 
 			// Does the theme support message previews?
@@ -394,7 +391,7 @@ class MessageIndex_Controller extends Action_Controller
 				),
 				'is_sticky' => !empty($modSettings['enableStickyTopics']) && !empty($row['is_sticky']),
 				'is_locked' => !empty($row['locked']),
-				'is_poll' => $modSettings['pollMode'] == '1' && $row['id_poll'] > 0,
+				'is_poll' => !empty($modSettings['pollMode']) && $row['id_poll'] > 0,
 				'is_hot' => !empty($modSettings['useLikesNotViews']) ? $row['num_likes'] >= $modSettings['hotTopicPosts'] : $row['num_replies'] >= $modSettings['hotTopicPosts'],
 				'is_very_hot' => !empty($modSettings['useLikesNotViews']) ? $row['num_likes'] >= $modSettings['hotTopicVeryPosts'] : $row['num_replies'] >= $modSettings['hotTopicVeryPosts'],
 				'is_posted_in' => false,

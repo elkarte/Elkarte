@@ -170,7 +170,7 @@ class Post_Controller extends Action_Controller
 			$context['can_sticky'] = allowedTo('make_sticky') && !empty($modSettings['enableStickyTopics']);
 			$context['notify'] = !empty($context['notify']);
 			$context['sticky'] = isset($_REQUEST['sticky']) ? !empty($_REQUEST['sticky']) : $sticky;
-			$context['can_add_poll'] = (allowedTo('poll_add_any') || (!empty($_REQUEST['msg']) && $id_first_msg == $_REQUEST['msg'] && allowedTo('poll_add_own'))) && $modSettings['pollMode'] == '1' && $pollID <= 0;
+			$context['can_add_poll'] = (allowedTo('poll_add_any') || (!empty($_REQUEST['msg']) && $id_first_msg == $_REQUEST['msg'] && allowedTo('poll_add_own'))) && !empty($modSettings['pollMode']) && $pollID <= 0;
 		}
 		else
 		{
@@ -191,7 +191,7 @@ class Post_Controller extends Action_Controller
 
 			$context['notify'] = !empty($context['notify']);
 			$context['sticky'] = !empty($_REQUEST['sticky']);
-			$context['can_add_poll'] = (allowedTo('poll_add_any') || allowedTo('poll_add_own')) && $modSettings['pollMode'] == '1';
+			$context['can_add_poll'] = (allowedTo('poll_add_any') || allowedTo('poll_add_own')) && !empty($modSettings['pollMode']);
 		}
 
 		// @todo These won't work if you're posting an event!
@@ -223,7 +223,7 @@ class Post_Controller extends Action_Controller
 			fatal_lang_error('topic_locked', false);
 
 		// Check the users permissions - is the user allowed to add or post a poll?
-		if (isset($_REQUEST['poll']) && $modSettings['pollMode'] == '1')
+		if (isset($_REQUEST['poll']) && !empty($modSettings['pollMode']))
 		{
 			// New topic, new poll.
 			if (empty($topic))
@@ -1375,7 +1375,7 @@ class Post_Controller extends Action_Controller
 			$post_errors->addError('no_event');
 
 		// Validate the poll...
-		if (isset($_REQUEST['poll']) && $modSettings['pollMode'] == '1')
+		if (isset($_REQUEST['poll']) && !empty($modSettings['pollMode']))
 		{
 			if (!empty($topic) && !isset($_REQUEST['msg']))
 				fatal_lang_error('no_access', false);

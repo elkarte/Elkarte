@@ -875,9 +875,6 @@ class Recent_Controller extends Action_Controller
 
 		while ($row = $db->fetch_assoc($request))
 		{
-			if ($row['id_poll'] > 0 && $modSettings['pollMode'] == '0')
-				continue;
-
 			$topic_ids[] = $row['id_topic'];
 
 			if (!empty($settings['message_index_preview']))
@@ -989,7 +986,7 @@ class Recent_Controller extends Action_Controller
 				'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . ($row['num_replies'] == 0 ? '.0' : '.msg' . $row['new_from']) . ';topicseen#msg' . $row['new_from'] . '" rel="nofollow">' . $row['first_subject'] . '</a>',
 				'is_sticky' => !empty($modSettings['enableStickyTopics']) && !empty($row['is_sticky']),
 				'is_locked' => !empty($row['locked']),
-				'is_poll' => $modSettings['pollMode'] == '1' && $row['id_poll'] > 0,
+				'is_poll' => !empty($modSettings['pollMode']) && $row['id_poll'] > 0,
 				'is_hot' => !empty($modSettings['useLikesNotViews']) ? $row['num_likes'] >= $modSettings['hotTopicPosts'] : $row['num_replies'] >= $modSettings['hotTopicPosts'],
 				'is_very_hot' => !empty($modSettings['useLikesNotViews']) ? $row['num_likes'] >= $modSettings['hotTopicVeryPosts'] : $row['num_replies'] >= $modSettings['hotTopicVeryPosts'],
 				'is_posted_in' => false,

@@ -176,11 +176,12 @@ if (isset($_GET['ssi']))
 	require_once(SOURCEDIR . '/Load.php');
 	require_once(SUBSDIR . '/Cache.subs.php');
 	require_once(SOURCEDIR . '/Security.php');
-	require_once(SUBSDIR . '/Package.subs.php');
 
 	loadUserSettings();
 	loadPermissions();
 }
+// We may need this later
+require_once(SUBSDIR . '/Package.subs.php');
 
 // All the non-SSI stuff.
 loadEssentialFunctions();

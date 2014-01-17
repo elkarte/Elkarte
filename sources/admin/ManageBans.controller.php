@@ -479,13 +479,23 @@ class ManageBans_Controller extends Action_Controller
 						$context['ban_suggestions']['other_ips'] = banLoadAdditionalIPs($context['ban_suggestions']['member']['id']);
 					}
 				}
+				else
+				{
+					$context['use_autosuggest'] = true;
+					loadJavascriptFile('suggest.js', array('default_theme' => true), 'suggest.js');
+				}
 			}
 		}
 
 		// Template needs this to show errors using javascript
 		loadLanguage('Errors');
 		$context['sub_template'] = 'ban_edit';
-		loadJavascriptFile('suggest.js', array('default_theme' => true), 'suggest.js');
+		// A couple of text strings we *may* need
+		addJavascriptVar(array(
+			'txt_ban_name_empty' => $txt['ban_name_empty'],
+			'txt_ban_restriction_empty' => $txt['ban_restriction_empty']), true);
+		// And a bit of javascript to enable/disable some fields
+		addInlineJavascript('addLoadEvent(fUpdateStatus);', true);
 	}
 
 	/**
@@ -745,6 +755,8 @@ class ManageBans_Controller extends Action_Controller
 
 		$context['sub_template'] = 'ban_edit_trigger';
 		$context['form_url'] = $scripturl . '?action=admin;area=ban;sa=edittrigger';
+		// The autosuggest avoids some typing!
+		loadJavascriptFile('suggest.js', array('default_theme' => true), 'suggest.js');
 
 		$ban_group = isset($_REQUEST['bg']) ? (int) $_REQUEST['bg'] : 0;
 		$ban_id = isset($_REQUEST['bi']) ? (int) $_REQUEST['bi'] : 0;

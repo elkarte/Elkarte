@@ -167,6 +167,9 @@ class Topic_Controller extends Action_Controller
 		if (empty($topic))
 			redirectexit();
 
+		$template_layers = Template_Layers::getInstance();
+		$template_layers->removeAll();
+
 		if (!empty($modSettings['disable_print_topic']))
 		{
 			unset($_REQUEST['action']);
@@ -183,25 +186,23 @@ class Topic_Controller extends Action_Controller
 
 		// Whatever happens don't index this.
 		$context['robot_no_index'] = true;
-		$is_poll = $topicinfo['id_poll'] > 0 && $modSettings['pollMode'] == '1' && allowedTo('poll_view');
 
 		// Redirect to the boardindex if no valid topic id is provided.
 		if (empty($topicinfo))
 			redirectexit();
 
 		// @todo this code is almost the same as the one in Display.controller.php
-		if ($is_poll)
+		if ($topicinfo['id_poll'] > 0 && !empty($modSettings['pollMode']) && allowedTo('poll_view'))
 		{
 			loadLanguage('Post');
 			require_once(SUBSDIR . '/Poll.subs.php');
 
 			loadPollContext($topicinfo['id_poll']);
+			$template_layers->addAfter('print_poll', 'print');
 		}
 
 		// Lets "output" all that info.
 		loadTemplate('Printpage');
-		$template_layers = Template_Layers::getInstance();
-		$template_layers->removeAll();
 		$template_layers->add('print');
 		$context['sub_template'] = 'print_page';
 		$context['board_name'] = $board_info['name'];
@@ -225,9 +226,14 @@ class Topic_Controller extends Action_Controller
 		{
 			require_once(SUBSDIR . '/Topic.subs.php');
 			$context['printattach'] = messagesAttachments(array_keys($context['posts']));
+			$context['viewing_attach'] = true;
 		}
 
 		// Set a canonical URL for this page.
 		$context['canonical_url'] = $scripturl . '?topic=' . $topic . '.0';
+		$context['view_attach_mode'] = array(
+			'text' => $scripturl . '?action=topic;sa=printpage;topic=' . $topic . '.0',
+			'images' => $scripturl . '?action=topic;sa=printpage;topic=' . $topic . '.0;images',
+		);
 	}
 }
