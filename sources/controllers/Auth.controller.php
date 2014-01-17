@@ -202,7 +202,7 @@ class Auth_Controller extends Action_Controller
 		if (isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) === 64)
 		{
 			// Needs upgrading if the db string is a 40 char SHA-1
-			if (strlen($user_settings['passwd']) === 40)
+			if (strlen($user_settings['passwd']) === 40 && !validateLoginPassword($_POST['hash_passwrd'], $user_settings['passwd']))
 			{
 				// Need to update so we will need to ask for the password again.
 				$context['login_errors'] = array($txt['login_hash_error']);
