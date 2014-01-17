@@ -357,6 +357,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 		$context['id_spider'] = !empty($_GET['sid']) ? (int) $_GET['sid'] : 0;
 		$context['page_title'] = $context['id_spider'] ? $txt['spiders_edit'] : $txt['spiders_add'];
 		$context['sub_template'] = 'spider_edit';
+		require_once(SUBSDIR . '/SearchEngines.subs.php');
 
 		// Are we saving?
 		if (!empty($_POST['save']))
@@ -379,7 +380,6 @@ class ManageSearchEngines_Controller extends Action_Controller
 			updateSpider($context['id_spider'], $_POST['spider_name'], $_POST['spider_agent'], $ips);
 
 			// Order by user agent length.
-			require_once(SUBSDIR . '/SearchEngines.subs.php');
 			sortSpiderTable();
 
 			cache_put_data('spider_search', null, 300);
