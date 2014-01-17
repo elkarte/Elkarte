@@ -1861,11 +1861,13 @@ img.new_posts {
 .topic_moderation_alt img {
 	padding: 2px 2px 0 2px;
 }
+.topic_listing .warningbox {
+	margin-bottom: 0px;
+}
 .qaction_row {
 	text-align: right;
 	padding: 6px;
 }
-
 .sticky_row .topic_info {
 	background: url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
 }
@@ -1873,9 +1875,7 @@ img.new_posts {
 	background: url(../images/icons/quick_sticky_lock.png) no-repeat 98% 4px;
 }
 /* @todo - Extra classes for search results, etc. See if I can clean them up. */
-.locked_row, .locked_row.core_posts {
-	background: #f7f7f7;
-}
+
 .locked_row .topic_info, .locked_row .topic_details {
 	background: url(../images/icons/quick_lock.png) no-repeat 98% 4px;
 }

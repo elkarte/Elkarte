@@ -160,7 +160,7 @@ function template_topic_listing()
 		{
 			echo '
 			<li class="basic_row">
-				<div class="warningbox" style="margin-bottom:0">! ', $context['unapproved_posts_message'], '</div>
+				<div class="warningbox">! ', $context['unapproved_posts_message'], '</div>
 			</li>';
 		}
 
