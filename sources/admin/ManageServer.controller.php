@@ -329,15 +329,16 @@ class ManageServer_Controller extends Action_Controller
 			// If the cookie name was changed, reset the cookie.
 			if ($cookiename != $_POST['cookiename'])
 			{
-				$original_session_id = $context['session_id'];
-				include_once(SUBSDIR . '/Auth.subs.php');
+				require_once(SUBSDIR . '/Auth.subs.php');
 
-				// Remove the old cookie.
+				$original_session_id = $context['session_id'];
+
+				// Remove the old cookie, nom nom nom
 				setLoginCookie(-3600, 0);
 
 				// Set the new one.
 				$cookiename = $_POST['cookiename'];
-				setLoginCookie(60 * $modSettings['cookieTime'], $user_settings['id_member'], sha1($user_settings['passwd'] . $user_settings['password_salt']));
+				setLoginCookie(60 * $modSettings['cookieTime'], $user_settings['id_member'], hash('sha256', $user_settings['passwd'] . $user_settings['password_salt']));
 
 				redirectexit('action=admin;area=serversettings;sa=cookie;' . $context['session_var'] . '=' . $original_session_id, $context['server']['needs_login_fix']);
 			}
