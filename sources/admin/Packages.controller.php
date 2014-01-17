@@ -102,7 +102,7 @@ class Packages_Controller extends Action_Controller
 		global $txt, $context, $scripturl, $settings;
 
 		// You have to specify a file!!
-		if (!isset($_REQUEST['package']) || $_REQUEST['package'] == '')
+		if (!isset($_REQUEST['package']) || trim($_REQUEST['package']) == '')
 			redirectexit('action=admin;area=packages');
 
 		$context['filename'] = preg_replace('~[\.]+~', '.', $_REQUEST['package']);
@@ -127,7 +127,7 @@ class Packages_Controller extends Action_Controller
 			if (!mktree(BOARDDIR . '/packages/temp', 0777))
 			{
 				deltree(BOARDDIR . '/packages/temp', false);
-				create_chmod_control(array(BOARDDIR . '/packages/temp/delme.tmp'), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=' . $_REQUEST['sa'] . ';package=' . $_REQUEST['package'], 'crash_on_error' => true));
+				create_chmod_control(array(BOARDDIR . '/packages/temp/delme.tmp'), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=' . $_REQUEST['sa'] . ';package=' . $context['filename'], 'crash_on_error' => true));
 
 				deltree(BOARDDIR . '/packages/temp', false);
 				if (!mktree(BOARDDIR . '/packages/temp', 0777))

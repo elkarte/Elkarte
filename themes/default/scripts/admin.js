@@ -1118,3 +1118,33 @@ function initEditProfileBoards()
 		);
 	});
 }
+
+// Ban edit page
+function onUpdateName(oAutoSuggest)
+{
+	document.getElementById('user_check').checked = true;
+	return true;
+}
+
+function confirmBan(aForm)
+{
+	if (aForm.ban_name.value === '')
+	{
+		alert(txt_ban_name_empty);
+		return false;
+	}
+
+	if (aForm.partial_ban.checked && !(aForm.cannot_post.checked || aForm.cannot_register.checked || aForm.cannot_login.checked))
+	{
+		alert(txt_ban_restriction_empty);
+		return false;
+	}
+}
+
+var fUpdateStatus = function ()
+{
+	document.getElementById("expire_date").disabled = !document.getElementById("expires_one_day").checked;
+	document.getElementById("cannot_post").disabled = document.getElementById("full_ban").checked;
+	document.getElementById("cannot_register").disabled = document.getElementById("full_ban").checked;
+	document.getElementById("cannot_login").disabled = document.getElementById("full_ban").checked;
+}

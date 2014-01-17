@@ -20,10 +20,7 @@
  */
 function template_print_above()
 {
-	global $context, $txt, $topic, $scripturl;
-
-	$url_text = $scripturl . '?action=topic;sa=printpage;topic=' . $topic . '.0';
-	$url_images = $url_text . ';images';
+	global $context, $txt;
 
 	echo '<!DOCTYPE html>
 <html ', $context['right_to_left'] ? 'dir="rtl"' : '', '>
@@ -113,12 +110,12 @@ function template_print_above()
 		<div class="print_options">';
 
 	// Which option is set, text or text&images
-	if (isset($_REQUEST['images']))
+	if (!empty($context['viewing_attach']))
 		echo '
-			<a href="', $url_text, '">', $txt['print_page_text'], '</a> | <strong><a href="', $url_images, '">', $txt['print_page_images'], '</a></strong>';
+			<a href="', $context['view_attach_mode']['text'], '">', $txt['print_page_text'], '</a> | <strong><a href="', $context['view_attach_mode']['images'], '">', $txt['print_page_images'], '</a></strong>';
 	else
 		echo '
-			<strong><a href="', $url_text, '">', $txt['print_page_text'], '</a></strong> | <a href="', $url_images, '">', $txt['print_page_images'], '</a>';
+			<strong><a href="', $context['view_attach_mode']['text'], '">', $txt['print_page_text'], '</a></strong> | <a href="', $context['view_attach_mode']['images'], '">', $txt['print_page_images'], '</a>';
 
 	echo '
 		</div>
@@ -128,9 +125,9 @@ function template_print_above()
 }
 
 /**
- * Interface for print page central view.
+ * The topic may have a poll
  */
-function template_print_page()
+function template_print_poll_above()
 {
 	global $context, $txt, $scripturl, $topic;
 
@@ -150,6 +147,14 @@ function template_print_page()
 		echo '
 			</div>';
 	}
+}
+
+/**
+ * Interface for print page central view.
+ */
+function template_print_page()
+{
+	global $context, $txt, $scripturl, $topic;
 
 	foreach ($context['posts'] as $post)
 	{
@@ -162,7 +167,7 @@ function template_print_page()
 				', $post['body'];
 
 		// Show attachment images
-		if (isset($_GET['images']) && !empty($context['printattach'][$post['id_msg']]))
+		if (!empty($context['printattach'][$post['id_msg']]))
 		{
 			echo '
 				<hr />';
@@ -182,22 +187,19 @@ function template_print_page()
  */
 function template_print_below()
 {
-	global $topic, $txt, $scripturl;
-
-	$url_text = $scripturl . '?action=topic;sa=printpage;topic=' . $topic . '.0';
-	$url_images = $url_text . ';images';
+	global $txt, $context;
 
 	echo '
 		</div>
 		<div class="print_options">';
 
 	// Show the text / image links
-	if (isset($_GET['images']))
+	if (!empty($context['viewing_attach']))
 		echo '
-			<a href="', $url_text, '">', $txt['print_page_text'], '</a> | <strong><a href="', $url_images, '">', $txt['print_page_images'], '</a></strong>';
+			<a href="', $context['view_attach_mode']['text'], '">', $txt['print_page_text'], '</a> | <strong><a href="', $context['view_attach_mode']['images'], '">', $txt['print_page_images'], '</a></strong>';
 	else
 		echo '
-			<strong><a href="', $url_text, '">', $txt['print_page_text'], '</a></strong> | <a href="', $url_images, '">', $txt['print_page_images'], '</a>';
+			<strong><a href="', $context['view_attach_mode']['text'], '">', $txt['print_page_text'], '</a></strong> | <a href="', $context['view_attach_mode']['images'], '">', $txt['print_page_images'], '</a>';
 
 	echo '
 		</div>
