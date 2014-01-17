@@ -1251,11 +1251,17 @@ function action_adminAccount()
 		}
 		elseif ($_POST['username'] != '')
 		{
+			require_once(SUBSDIR . '/Auth.subs.php');
+
 			$incontext['member_salt'] = substr(md5(mt_rand()), 0, 4);
 
 			// Format the username properly.
 			$_POST['username'] = preg_replace('~[\t\n\r\x0B\0\xA0]+~', ' ', $_POST['username']);
 			$ip = isset($_SERVER['REMOTE_ADDR']) ? substr($_SERVER['REMOTE_ADDR'], 0, 255) : '';
+
+			// Get a security hash for this combination
+			$password = stripslashes($_POST['password1']);
+			$incontext['passwd'] = validateLoginPassword($password, '', $_POST['username'], true);
 
 			$request = $db->insert('',
 				$db_prefix . 'members',
@@ -1269,7 +1275,7 @@ function action_adminAccount()
 					'additional_groups' => 'string', 'ignore_boards' => 'string', 'openid_uri' => 'string',
 				),
 				array(
-					stripslashes($_POST['username']), stripslashes($_POST['username']), sha1(strtolower(stripslashes($_POST['username'])) . stripslashes($_POST['password1'])), stripslashes($_POST['email']),
+					stripslashes($_POST['username']), stripslashes($_POST['username']), $incontext['passwd'], stripslashes($_POST['email']),
 					1, 0, time(), 0,
 					$incontext['member_salt'], '', '', '',
 					$ip, $ip, '', '',
@@ -1371,7 +1377,7 @@ function action_deleteInstall()
 
 	// Automatically log them in ;)
 	if (isset($incontext['member_id']) && isset($incontext['member_salt']))
-		setLoginCookie(3153600 * 60, $incontext['member_id'], sha1(sha1(strtolower($_POST['username']) . $_POST['password1']) . $incontext['member_salt']));
+		setLoginCookie(3153600 * 60, $incontext['member_id'], hash('sha256', $incontext['passwd'] . $incontext['member_salt']));
 
 	$result = $db->query('', '
 		SELECT value

@@ -727,19 +727,28 @@ function checkLogin()
 				foreach ($groups as $k => $v)
 					$groups[$k] = (int) $v;
 
-				// Figure out the password using our encryption - if what they typed is right.
-				if (isset($_REQUEST['hash_passwrd']) && strlen($_REQUEST['hash_passwrd']) == 40)
+				// Figure out if the password is using our encryption - if what they typed is right.
+				if (isset($_REQUEST['hash_passwrd']) && strlen($_REQUEST['hash_passwrd']) === 64)
 				{
-					require_once(SOURCEDIR . '/Security.php');
-					$tk = validateToken('login');
+					require_once(SUBSDIR . '/Auth.subs.php');
+					validateToken('login');
 
 					// Challenge passed.
-					if ($_REQUEST['hash_passwrd'] == sha1($password . $upcontext['rid'] . $tk))
-						$sha_passwd = $password;
+					if (validateLoginPassword($_REQUEST['hash_passwrd'], $password))
+					{
+						$sha_passwd = $_REQUEST['hash_passwrd'];
+						$valid_password = true;
+					}
 				}
+				// Maybe a plain text password was used this time
 				else
-					$sha_passwd = sha1(strtolower($name) . un_htmlspecialchars($_REQUEST['passwrd']));
+				{
+					// validateLoginPassword will convert this to a SHA-256 pw and check it
+					$sha_passwd = $_POST['passwrd'];
+					$valid_password = validateLoginPassword($sha_passwd, $user_settings['passwd'], $user_settings['member_name']);
+				}
 			}
+			// Can't find this user in the database
 			else
 				$upcontext['username_incorrect'] = true;
 
@@ -762,11 +771,11 @@ function checkLogin()
 			$upcontext['user']['version'] = $modSettings['elkVersion'];
 
 		// Didn't get anywhere?
-		if ((empty($sha_passwd) || $password != $sha_passwd) && empty($upcontext['username_incorrect']) && !$disable_security)
+		if (empty($valid_password) && empty($upcontext['username_incorrect']) && !$disable_security)
 		{
-			// MD5?
-			$md5pass = md5_hmac($_REQUEST['passwrd'], strtolower($_POST['user']));
-			if ($md5pass != $password)
+			// SHA1?
+			$sha1pass = sha1($_REQUEST['passwrd'], Util::strtolower($_POST['user']));
+			if ($sha1pass !== $password)
 			{
 				$upcontext['password_failed'] = true;
 
