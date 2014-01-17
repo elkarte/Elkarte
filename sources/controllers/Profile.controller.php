@@ -542,7 +542,7 @@ class Profile_Controller extends Action_Controller
 					require_once(SUBSDIR . '/Auth.subs.php');
 
 					// Bad password!!!
-					if (!$good_password && !validateLoginPassword($_POST['oldpasswrd'], $user_info['passwd']))
+					if (!$good_password && !validateLoginPassword($_POST['oldpasswrd'], $user_info['passwd'], $user_profile[$memID]['member_name']))
 						$post_errors[] = 'bad_password';
 
 					// Warn other elements not to jump the gun and do custom changes!

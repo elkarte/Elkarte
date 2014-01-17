@@ -661,7 +661,7 @@ function loadProfileFields($force_reload = false)
 
 				// Set up the new password variable... ready for storage.
 				require_once(SUBSDIR . \'/Auth.subs.php\');
-				validateLoginPassword($value, \'\', $cur_profile[\'member_name\'], true);
+				$value = validateLoginPassword($value, \'\', $cur_profile[\'member_name\'], true);
 				return true;
 			'),
 		),

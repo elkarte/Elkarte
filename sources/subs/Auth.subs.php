@@ -545,7 +545,7 @@ function validateLoginPassword(&$password, $hash, $user = '', $returnhash = fals
 	if (strlen($password) !== 64)
 		$password = hash('sha256', strtolower($user) . un_htmlspecialchars($password));
 
-	// They need a password hash?
+	// They need a password hash, something to save in the db?
 	if ($returnhash)
 	{
 		$passhash = $hasher->HashPassword($password);
