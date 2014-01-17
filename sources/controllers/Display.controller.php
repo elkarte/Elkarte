@@ -355,7 +355,7 @@ class Display_Controller
 		$context['is_very_hot'] = $topicinfo['num_replies'] >= $modSettings['hotTopicVeryPosts'];
 		$context['is_hot'] = $topicinfo['num_replies'] >= $modSettings['hotTopicPosts'];
 		$context['is_approved'] = $topicinfo['approved'];
-		$context['is_poll'] = $topicinfo['id_poll'] > 0 && $modSettings['pollMode'] == '1' && allowedTo('poll_view');
+		$context['is_poll'] = $topicinfo['id_poll'] > 0 && !empty($modSettings['pollMode']) && allowedTo('poll_view');
 		determineTopicClass($context);
 
 		// Did this user start the topic or not?
@@ -625,8 +625,8 @@ class Display_Controller
 		$context['can_mark_notify'] &= !$context['user']['is_guest'];
 		$context['can_sticky'] &= !empty($modSettings['enableStickyTopics']);
 		$context['calendar_post'] &= !empty($modSettings['cal_enabled']);
-		$context['can_add_poll'] &= $modSettings['pollMode'] == '1' && $topicinfo['id_poll'] <= 0;
-		$context['can_remove_poll'] &= $modSettings['pollMode'] == '1' && $topicinfo['id_poll'] > 0;
+		$context['can_add_poll'] &= !empty($modSettings['pollMode']) && $topicinfo['id_poll'] <= 0;
+		$context['can_remove_poll'] &= !empty($modSettings['pollMode']) && $topicinfo['id_poll'] > 0;
 		$context['can_reply'] &= empty($topicinfo['locked']) || allowedTo('moderate_board');
 		$context['can_reply_unapproved'] &= $modSettings['postmod_active'] && (empty($topicinfo['locked']) || allowedTo('moderate_board'));
 		$context['can_issue_warning'] &= in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']);
