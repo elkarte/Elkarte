@@ -1129,13 +1129,13 @@ span.views_text {
 		padding: 1px;
 		padding-bottom: 0px;
 		margin: 2px;
-		height: 30px;
-		line-height: 30px;
-		width: 30px;
+		height: 1.05em;
+		line-height: 1.05em;
+		width: 1.05em;
 		text-align: center;
 		display: inline-block;
 		border-radius: 4px;
-		font-size: 25px;
+		font-size: 2.5em;
 		color: #43a8da;
 		content: attr(data-icon);
 		speak: none;
@@ -1229,10 +1229,6 @@ span.views_text {
 	}
 	body {
 		margin-top: 20px;
-	}
-	.listlevel1#button_profile:hover .menulevel2, .listlevel1#button_profile.sfhover .menulevel2 {
-		left: 0;
-		right: auto;
 	}
 	.listlevel1#button_profile .linklevel1 {
 		min-width: 0.5em;

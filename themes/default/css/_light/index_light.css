@@ -1647,12 +1647,13 @@ div.bbc_footnotes .meaction{
 		border: 3px solid #666;
 		padding: 1px;
 		margin: 2px;
-		height: 30px;
-		width: 30px;
+		height: 1.15em;
+		width: 1.15em;
 		text-align: center;
 		display: inline-block;
 		border-radius: 4px;
-		font-size: 25px;
+		line-height: 1.2em;
+		font-size: 2em;
 		color: #666;
 		content: attr(data-icon);
 		speak: none;
@@ -1670,20 +1671,12 @@ div.bbc_footnotes .meaction{
 		border: 1px solid transparent;
 		background: transparent;
 	}
-	.listlevel1#button_profile {
-		float: left;
-	}
-	.listlevel1#button_profile:hover .menulevel2, .listlevel1#button_profile.sfhover .menulevel2 {
-		left: 0;
-		right: auto;
-	}
 	.listlevel1#button_profile .linklevel1 {
 		min-width: 0.5em;
 	}
 	.linklevel1.active, .listlevel1:hover .active, #collapse_button .linklevel1 {
 		padding: 0;
 	}
-
 }
 /* This one does up to 540 screens. */
 @media screen and (max-width: 33.750em) {

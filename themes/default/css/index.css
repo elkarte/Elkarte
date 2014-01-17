@@ -3719,13 +3719,12 @@ a.help .icon {
 /* This one does 800 screens at default font size. */
 @media screen and (max-width: 50em) {
 	#main_menu .linklevel1 {
-		width: 40px;
 		margin-right: 5px;
-		color: transparent;
-		font-size: 0.1px;
-		height: 42px;
 		box-shadow: none;
 		border: 1px solid transparent;
+	}
+	.button_title {
+		display: none;
 	}
 	#collapse_button {
 		display: none;
