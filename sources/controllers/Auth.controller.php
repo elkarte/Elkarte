@@ -201,22 +201,25 @@ class Auth_Controller extends Action_Controller
 		// Figure out the password using Elk's encryption - if what they typed is right.
 		if (isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) === 64)
 		{
-			// Needs upgrading if the db string is a 40 char SHA-1
-			if (strlen($user_settings['passwd']) === 40 && !validateLoginPassword($_POST['hash_passwrd'], $user_settings['passwd']))
+			$valid_password = validateLoginPassword($_POST['hash_passwrd'], $user_settings['passwd']);
+
+			// Challenge what was passed
+			if ($valid_password)
 			{
-				// Need to update so we will need to ask for the password again.
+				$sha_passwd = $_POST['hash_passwrd'];
+				$valid_password = true;
+			}
+			// Needs upgrading if the db string is an actual 40 hexchar SHA-1
+			elseif (preg_match('/^[0-9a-f]{40}$/i', $user_settings['passwd']))
+			{
+				// Might Need to update so we will need to ask for the password again.
 				$context['login_errors'] = array($txt['login_hash_error']);
 				$context['disable_login_hashing'] = true;
 				unset($user_settings);
 
 				return;
 			}
-			// Challenge what was passed
-			elseif (validateLoginPassword($_POST['hash_passwrd'], $user_settings['passwd']))
-			{
-				$sha_passwd = $_POST['hash_passwrd'];
-				$valid_password = true;
-			}
+			// Bad password entered
 			else
 			{
 				// Don't allow this!
