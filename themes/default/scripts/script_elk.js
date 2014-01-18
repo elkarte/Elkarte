@@ -480,14 +480,28 @@ function revalidateMentions(sForm, sInput)
 				names = cached_names[cached_queries[k]];
 				for (var l = 0, ncount = names.length; l < ncount; l++)
 				{
-					pos = body.indexOf(' @' + names[l].name);
-					// If there is something like "{space}@username" AND the following char is a space or a punctation mark
-					if (pos !== -1 && body.charAt(pos + 2 + names[l].name.length + 1).search(boundaries_pattern) === 0)
-						mentions.append($('<input type="hidden" name="uid[]" />').val(names[l].id));
+					if(checkWordOccurrence(body, names[l].name)) {
+						// alert(names[l].name);
+						pos = body.indexOf(' @' + names[l].name);
+						// If there is something like "{space}@username" AND the following char is a space or a punctation mark
+						if (pos !== -1 && body.charAt(pos + 2 + names[l].name.length + 1).search(boundaries_pattern) === 0)
+							mentions.append($('<input type="hidden" name="uid[]" />').val(names[l].id));
+					}
 				}
 			}
 		}
 	}
+}
+
+/**
+ * Check whether the word exists in a given paragraph
+ *
+ * @param paragraph to check
+ * @param word to match
+ */
+
+function checkWordOccurrence(paragraph, word){
+  return new RegExp( '\\b' + word + '\\b', 'i').test(paragraph);
 }
 
 /**
