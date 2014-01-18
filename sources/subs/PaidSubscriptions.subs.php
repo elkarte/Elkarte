@@ -663,7 +663,8 @@ function getSubscriptionDetails($sub_id)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT name, description, cost, length, id_group, add_groups, active, repeatable, allow_partial, email_complete, reminder
+		SELECT
+			name, description, cost, length, id_group, add_groups, active, repeatable, allow_partial, email_complete, reminder
 		FROM {db_prefix}subscriptions
 		WHERE id_subscribe = {int:current_subscription}
 		LIMIT 1',
@@ -671,6 +672,7 @@ function getSubscriptionDetails($sub_id)
 			'current_subscription' => $sub_id,
 		)
 	);
+	$subscription = array();
 	while ($row = $db->fetch_assoc($request))
 	{
 		// Sort the date.
@@ -686,13 +688,8 @@ function getSubscriptionDetails($sub_id)
 			$span_unit = 'D';
 		}
 
-		// Is this a flexible one?
-		if ($row['length'] == 'F')
-			$isFlexible = true;
-		else
-			$isFlexible = false;
-
 		$subscription = array(
+			'id' => $row['id_subscribe'],
 			'name' => $row['name'],
 			'desc' => $row['description'],
 			'cost' => @unserialize($row['cost']),
@@ -705,47 +702,11 @@ function getSubscriptionDetails($sub_id)
 			'active' => $row['active'],
 			'repeatable' => $row['repeatable'],
 			'allow_partial' => $row['allow_partial'],
-			'duration' => $isFlexible ? 'flexible' : 'fixed',
+			'duration' => $row['length'] == 'F' ? 'flexible' : 'fixed',
 			'email_complete' => htmlspecialchars($row['email_complete'], ENT_COMPAT, 'UTF-8'),
 			'reminder' => $row['reminder'],
 		);
 	}
-	$db->free_result($request);
-
-	return $subscription;
-}
-
-/**
- * Gets some basic details from a given subsciption.
- *
- * @param int $id_sub
- * @return array
- */
-function getSubscription($id_sub)
-{
-	$db = database();
-
-	// Load the subscription information.
-	$request = $db->query('', '
-		SELECT id_subscribe, name, description, cost, length, id_group, add_groups, active
-		FROM {db_prefix}subscriptions
-		WHERE id_subscribe = {int:current_subscription}',
-		array(
-			'current_subscription' => $id_sub,
-		)
-	);
-	// Something wrong?
-	if ($db->num_rows($request) == 0)
-		fatal_lang_error('no_access', false);
-
-	// Do the subscription context.
-	$row = $db->fetch_assoc($request);
-	$subscription = array(
-		'id' => $row['id_subscribe'],
-		'name' => $row['name'],
-		'desc' => $row['description'],
-		'active' => $row['active'],
-	);
 	$db->free_result($request);
 
 	return $subscription;

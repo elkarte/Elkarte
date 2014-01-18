@@ -599,7 +599,7 @@ class ManagePaid_Controller extends Action_Controller
 		$context['sub_id'] = (int) $_REQUEST['sid'];
 
 		// Load the subscription information.
-		$context['subscription'] = getSubscription($context['sub_id']);
+		$context['subscription'] = getSubscriptionDetails($context['sub_id']);
 
 		// Are we searching for people?
 		$search_string = isset($_POST['ssearch']) && !empty($_POST['sub_search']) ? ' AND IFNULL(mem.real_name, {string:guest}) LIKE {string:search}' : '';
@@ -786,7 +786,7 @@ class ManagePaid_Controller extends Action_Controller
 
 		if (!isset($context['subscriptions'][$context['sub_id']]))
 			fatal_lang_error('no_access', false);
-		
+
 		$context['current_subscription'] = $context['subscriptions'][$context['sub_id']];
 
 		// Searching?
