@@ -531,6 +531,11 @@ div.bbc_footnotes .meaction{
 	background-color: transparent;
 	box-shadow: none;
 }
+.poster .listlevel2:hover>a {
+	color: #008299;
+	border: none;
+	box-shadow: none;
+}
 #main_menu .linklevel1, #main_menu .linklevel1:link, #main_menu .linklevel1:visited,
 .poster li.listlevel1, .poster li.listlevel1 a, .poster li.listlevel1 a:hover {
 	border-radius: none;
