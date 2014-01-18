@@ -589,7 +589,7 @@ function countActiveSubscriptions($sub_id)
 
 	// Don't do groups if there are active members
 	$request = $db->query('', '
-		SELECT 
+		SELECT
 			COUNT(*)
 		FROM {db_prefix}log_subscribed
 		WHERE id_subscribe = {int:current_subscription}
@@ -673,7 +673,8 @@ function getSubscriptionDetails($sub_id)
 
 	$request = $db->query('', '
 		SELECT
-			name, description, cost, length, id_group, add_groups, active, repeatable, allow_partial, email_complete, reminder
+			id_subscribe, name, description, cost, length, id_group, add_groups, active, repeatable,
+			allow_partial, email_complete, reminder
 		FROM {db_prefix}subscriptions
 		WHERE id_subscribe = {int:current_subscription}
 		LIMIT 1',
