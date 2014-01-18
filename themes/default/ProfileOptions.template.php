@@ -1413,13 +1413,13 @@ function template_authentication_method()
 				<div class="content">
 					<dl>
 						<dt>
-							<input type="radio" onclick="updateAuthMethod();" name="authenticate" value="openid" id="auth_openid"', $context['auth_method'] == 'openid' ? ' checked="checked"' : '', ' class="input_radio" /><label for="auth_openid"><strong>', $txt['authenticate_openid'], '</strong></label>&nbsp;<em><a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="help"><img class="icon" src="', $settings['images_url'], '/helptopics.png" alt="(?)" /></a></em><br />
-							<input type="radio" onclick="updateAuthMethod();" name="authenticate" value="passwd" id="auth_pass"', $context['auth_method'] == 'password' ? ' checked="checked"' : '', ' class="input_radio" /><label for="auth_pass"><strong>', $txt['authenticate_password'], '</strong></label>
+							<input type="radio" onclick="updateAuthMethod();" name="authenticate" value="openid" id="auth_openid"', $context['auth_method'] == 'openid' ? ' checked="checked"' : '', ' class="input_radio" /><strong><label for="auth_openid">', $txt['authenticate_openid'], '</label></strong>&nbsp;<em><a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="help"><img class="icon" src="', $settings['images_url'], '/helptopics.png" alt="(?)" /></a></em><br />
+							<input type="radio" onclick="updateAuthMethod();" name="authenticate" value="passwd" id="auth_pass"', $context['auth_method'] == 'password' ? ' checked="checked"' : '', ' class="input_radio" /><strong><label for="auth_pass">', $txt['authenticate_password'], '</label></strong>
 						</dt>
 						<dd>
 							<dl id="openid_group">
 								<dt>
-									<em><label for="openid_url">', $txt['authenticate_openid_url'], '</label>:<em>
+									<em><label for="openid_url">', $txt['authenticate_openid_url'], '</label>:</em>
 								</dt>
 								<dd>
 									<input type="text" name="openid_identifier" id="openid_url" size="30" tabindex="', $context['tabindex']++, '" value="', $context['member']['openid_uri'], '" class="input_text openid_login" />
