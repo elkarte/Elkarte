@@ -34,7 +34,8 @@ function list_getSubscribedUserCount($id_sub, $search_string, $search_vars = arr
 
 	// Get the total amount of users.
 	$request = $db->query('', '
-		SELECT COUNT(*) AS total_subs
+		SELECT
+			COUNT(*) AS total_subs
 		FROM {db_prefix}log_subscribed AS ls
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = ls.id_member)
 		WHERE ls.id_subscribe = {int:current_subscription} ' . $search_string . '
@@ -69,8 +70,9 @@ function list_getSubscribedUsers($start, $items_per_page, $sort, $id_sub, $searc
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT ls.id_sublog, IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, {string:guest}) AS name, ls.start_time, ls.end_time,
-			ls.status, ls.payments_pending
+		SELECT
+			ls.id_sublog, ls.start_time, ls.end_time, ls.status, ls.payments_pending,
+			IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, {string:guest}) AS name
 		FROM {db_prefix}log_subscribed AS ls
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = ls.id_member)
 		WHERE ls.id_subscribe = {int:current_subscription} ' . $search_string . '
@@ -127,7 +129,9 @@ function reapplySubscriptions($users)
 	}
 
 	$request = $db->query('', '
-		SELECT ls.id_member, ls.old_id_group, s.id_group, s.add_groups
+		SELECT
+			ls.id_member, ls.old_id_group,
+			s.id_group, s.add_groups
 		FROM {db_prefix}log_subscribed AS ls
 			INNER JOIN {db_prefix}subscriptions AS s ON (s.id_subscribe = ls.id_subscribe)
 		WHERE ls.id_member IN ({array_int:user_list})
@@ -218,7 +222,8 @@ function addSubscription($id_subscribe, $id_member, $renewal = 0, $forceStartTim
 
 	// Firstly, see whether it exists, and is active. If so then this is meerly an extension.
 	$request = $db->query('', '
-		SELECT id_sublog, end_time, start_time
+		SELECT
+			id_sublog, end_time, start_time
 		FROM {db_prefix}log_subscribed
 		WHERE id_subscribe = {int:current_subscription}
 			AND id_member = {int:current_member}
@@ -296,7 +301,8 @@ function addSubscription($id_subscribe, $id_member, $renewal = 0, $forceStartTim
 
 	// Now log the subscription - maybe we have a dorment subscription we can restore?
 	$request = $db->query('', '
-		SELECT id_sublog, end_time, start_time
+		SELECT
+			id_sublog, end_time, start_time
 		FROM {db_prefix}log_subscribed
 		WHERE id_subscribe = {int:current_subscription}
 			AND id_member = {int:current_member}',
@@ -425,7 +431,8 @@ function loadSubscriptions()
 	loadLanguage('ManagePaid');
 
 	$request = $db->query('', '
-		SELECT id_subscribe, name, description, cost, length, id_group, add_groups, active, repeatable
+		SELECT
+			id_subscribe, name, description, cost, length, id_group, add_groups, active, repeatable
 		FROM {db_prefix}subscriptions',
 		array(
 		)
@@ -510,7 +517,8 @@ function loadSubscriptions()
 
 	// How many payments are we waiting on?
 	$request = $db->query('', '
-		SELECT SUM(payments_pending) AS total_pending, id_subscribe
+		SELECT
+			SUM(payments_pending) AS total_pending, id_subscribe
 		FROM {db_prefix}log_subscribed
 		GROUP BY id_subscribe',
 		array(
@@ -581,7 +589,8 @@ function countActiveSubscriptions($sub_id)
 
 	// Don't do groups if there are active members
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}log_subscribed
 		WHERE id_subscribe = {int:current_subscription}
 			AND status = {int:is_active}',
@@ -723,17 +732,21 @@ function validateSubscriptionID($id)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT id_subscribe
+		SELECT
+			id_subscribe
 		FROM {db_prefix}log_subscribed
-		WHERE id_sublog = {int:current_log_item}',
+		WHERE id_sublog = {int:current_log_item}
+		LIMIT 1',
 		array(
 			'current_log_item' => $id,
 		)
 	);
-	if ($db->num_rows($request) == 0)
-		fatal_lang_error('no_access', false);
 	list ($sub_id) = $db->fetch_row($request);
 	$db->free_result($request);
+
+	// Humm this should not happen, if it does, boom
+	if ($sub_id === null)
+		fatal_lang_error('no_access', false);
 
 	return $sub_id;
 }
@@ -751,7 +764,8 @@ function alreadySubscribed($id_sub, $id_member)
 
 	// Ensure the member doesn't already have a subscription!
 	$request = $db->query('', '
-		SELECT id_subscribe
+		SELECT
+			id_subscribe
 		FROM {db_prefix}log_subscribed
 		WHERE id_subscribe = {int:current_subscription}
 			AND id_member = {int:current_member}',
@@ -760,12 +774,10 @@ function alreadySubscribed($id_sub, $id_member)
 			'current_member' => $id_member,
 		)
 	);
-	if ($db->num_rows($request) != 0)
-		return true;
-
+	$result = $db->num_rows($request) != 0;
 	$db->free_result($request);
 
-	return false;
+	return $result;
 }
 
 /**
@@ -781,18 +793,22 @@ function getSubscriptionStatus($log_id)
 	$status = array();
 
 	$request = $db->query('', '
-		SELECT id_member, status
+		SELECT
+			id_member, status
 		FROM {db_prefix}log_subscribed
-		WHERE id_sublog = {int:current_log_item}',
+		WHERE id_sublog = {int:current_log_item}
+		LIMIT 1',
 		array(
 			'current_log_item' => $log_id,
 		)
 	);
-	if ($db->num_rows($request) == 0)
-		fatal_lang_error('no_access', false);
-
-	list ($status['id_member'], $status['old_status']) = $db->fetch_row($request);
+	if ($db->num_rows($request) !== 0)
+		list ($status['id_member'], $status['old_status']) = $db->fetch_row($request);
 	$db->free_result($request);
+
+	// Nothing found?
+	if (empty($status))
+		fatal_lang_error('no_access', false);
 
 	return $status;
 }
@@ -864,7 +880,7 @@ function handleRefund($subscription_info, $member_id, $time)
 }
 
 /**
- * Wanna delete a subscription? Prepare the delete for the members as well.
+ * Want to delete a subscription? Prepare the delete for the members as well.
  *
  * @param array $toDelete
  * @return array $delete
@@ -874,7 +890,8 @@ function prepareDeleteSubscriptions($toDelete)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT id_subscribe, id_member
+		SELECT
+			id_subscribe, id_member
 		FROM {db_prefix}log_subscribed
 		WHERE id_sublog IN ({array_int:subscription_list})',
 		array(
@@ -899,8 +916,9 @@ function getPendingSubscriptions($log_id)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT ls.id_sublog, ls.id_subscribe, ls.id_member, start_time, end_time, status, payments_pending, pending_details,
-			IFNULL(mem.real_name, {string:blank_string}) AS username
+		SELECT
+			ls.id_sublog, ls.id_subscribe, ls.id_member,
+			start_time, end_time, status, payments_pending, pending_details, IFNULL(mem.real_name, {string:blank_string}) AS username
 		FROM {db_prefix}log_subscribed AS ls
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = ls.id_member)
 		WHERE ls.id_sublog = {int:current_subscription_item}
@@ -912,6 +930,7 @@ function getPendingSubscriptions($log_id)
 	);
 	$row = $db->fetch_assoc($request);
 	$db->free_result($request);
+
 	return $row;
 }
 
@@ -994,7 +1013,8 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 
 	// Get all of the subscriptions for this user that are active - it will be necessary!
 	$request = $db->query('', '
-		SELECT id_subscribe, old_id_group
+		SELECT
+			id_subscribe, old_id_group
 		FROM {db_prefix}log_subscribed
 		WHERE id_member = {int:current_member}
 			AND status = {int:is_active}',
