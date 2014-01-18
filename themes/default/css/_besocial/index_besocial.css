@@ -837,6 +837,25 @@ a.active {
 .topic_name h4 a {
 	color: #43a8da;
 }
+.topic_listing .warningbox {
+	margin-bottom: 6px;
+}
+.qaction_row {
+	background: #fff;
+}
+.approvetopic_row, .approve_row {
+	background: #fff5cd;
+}
+.sticky_row, .locked_row.sticky_row {
+	background: #f0f0ff;
+}
+.locked_row {
+	background: #f7f7f7;
+}
+#topic_icons {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+}
 li.modified {
 	color: #888;
 	font-size: 0.7em;

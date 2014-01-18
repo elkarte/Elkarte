@@ -1039,6 +1039,9 @@ div.bbc_footnotes .meaction{
 .sticky_row, .locked_row.sticky_row {
 	background: #ffffe0;
 }
+.locked_row, .locked_row.core_posts {
+	background: #f7f7f7;
+}
 #topic_icons {
 	border: 1px solid #ddd;
 	border-radius: 3px;

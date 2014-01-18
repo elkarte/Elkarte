@@ -514,6 +514,7 @@ class PostModeration_Controller extends Action_Controller
 
 		$current_msg = (int) $_REQUEST['msg'];
 
+		require_once(SUBSDIR . '/Topic.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');
 
