@@ -973,6 +973,8 @@ function swapMembers()
 		if (membersForm.elements[i].type.toLowerCase() === "checkbox")
 			membersForm.elements[i].checked = !membersSwap;
 	}
+
+	return false;
 }
 
 /**
@@ -1040,6 +1042,16 @@ function swapRot()
 		if (oBoardCheckBoxes[i].type.toLowerCase() === "checkbox")
 			oBoardCheckBoxes[i].checked = !rotSwap;
 	}
+}
+
+function confirmMoveTopics(confirmText)
+{
+	var from = document.getElementById('id_board_from'),
+		to = document.getElementById('id_board_to');
+	if (from.options[from.selectedIndex].disabled || from.options[to.selectedIndex].disabled)
+		return false;
+
+	return confirm(confirmText.replace(/%board_from%/, from.options[from.selectedIndex].text.replace(/^=+&gt;&nbsp;/, '')).replace(/%board_to%/, to.options[to.selectedIndex].text.replace(/^=+&gt;&nbsp;/, '')));
 }
 
 /**

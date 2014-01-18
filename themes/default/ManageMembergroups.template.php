@@ -409,8 +409,8 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 	$deny = !empty($modSettings['deny_boards_access']);
 
 	echo '
-							<fieldset id="visible_boards">
-								<legend>', $txt['membergroups_new_board_desc'], '</legend>
+							<fieldset class="visible_boards">
+								<legend', $collapse ? ' data-collapsed="true"' : '', '>', $txt['membergroups_new_board_desc'], '</legend>
 								<ul>';
 
 	foreach ($context['categories'] as $category)
@@ -485,8 +485,7 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 								$(document).ready(function () {
 									$(".select_all_box").each(function () {
 										$(this).show();
-									});', $collapse ? '
-									$("#visible_boards legend").click();' : '', '
+									});
 								});
 							// ]]></script>';
 }

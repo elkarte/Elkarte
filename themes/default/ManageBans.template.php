@@ -40,7 +40,7 @@ function template_ban_edit()
 			<div class="content">
 				<dl class="settings">
 					<dt id="ban_name_label">
-						<strong>', $txt['ban_name'], ':</strong>
+						<strong><label for="ban_name">', $txt['ban_name'], '</label>:</strong>
 					</dt>
 					<dd>
 						<input type="text" id="ban_name" name="ban_name" value="', $context['ban']['name'], '" size="45" maxlength="60" class="input_text" />

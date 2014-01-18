@@ -590,15 +590,15 @@ dl.settings dd.questions input {
 	margin-left:5em;
 	font-style: italic;
 }
-#visible_boards .board .floatright {
+.visible_boards .board .floatright {
 	width:50%;
 }
-#visible_boards .category:after, #visible_boards .board:after {
+.visible_boards .category:after, .visible_boards .board:after {
 	display: block;
 	clear: both;
 	content: "";
 }
-#visible_boards li {
+.visible_boards li {
 	padding: 2px;
 }
 
@@ -631,9 +631,7 @@ padding: 7px 10px;
 #membersText, #rotText {
 	font-weight: bold;
 }
-#membersPanel {
-	padding: 3px;
-}
+
 /* Styles for the badbehaviour section.
 ------------------------------------------------- */
 .bbfilter {
@@ -1072,10 +1070,10 @@ ul.moderation_notes li {
 	body {
 		padding: 0;
 	}
-	#visible_boards .select_all_box {
+	.visible_boards .select_all_box {
 		display: block;
 	}
-	#visible_boards label {
+	.visible_boards label {
 		width: auto!important;
 		display: inline;
 	}
