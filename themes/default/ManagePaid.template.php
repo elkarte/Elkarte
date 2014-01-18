@@ -408,7 +408,7 @@ function template_user_subscription()
 	else
 	{
 		echo '
-			<div class="information">
+			<div class="infobox">
 				', $txt['paid_subs_desc'], '
 			</div>';
 
@@ -427,11 +427,13 @@ function template_user_subscription()
 			<div class="windowbg', $alternate ? '' : '2', '">
 				<div class="content">
 					<p><strong>', $subscription['name'], '</strong></p>
-					<p class="smalltext">', $subscription['desc'], '</p>';
+					<p class="content">', $subscription['desc'], '</p>';
 
 			if (!$subscription['flexible'])
 				echo '
-					<div><strong>', $txt['paid_duration'], ':</strong> ', $subscription['length'], '</div>';
+					<div>
+						<strong>', $txt['paid_duration'], ':</strong> ', $subscription['length'], '
+					</div>';
 
 			if ($context['user']['is_owner'])
 			{
@@ -456,7 +458,6 @@ function template_user_subscription()
 					', sprintf($modSettings['paid_currency_symbol'], $subscription['costs']['fixed']);
 
 				echo '
-					<hr />
 					<input type="submit" name="sub_id[', $subscription['id'], ']" value="', $txt['paid_order'], '" class="right_submit" />';
 			}
 			else
@@ -471,28 +472,29 @@ function template_user_subscription()
 
 	echo '
 		</form>
-		<h2 class="category_header">', $txt['paid_current'], '</h2>
-		<div class="information">
-			', $txt['paid_current_desc'], '
-		</div>
-		<table class="table_grid">
-			<thead>
-				<tr class="table_head">
-					<th class="style="width:30%">', $txt['paid_name'], '</th>
-					<th>', $txt['paid_status'], '</th>
-					<th>', $txt['start_date'], '</th>
-					<th>', $txt['end_date'], '</th>
-				</tr>
-			</thead>
-			<tbody>';
+		<div id="profilecenter">
+			<h2 class="category_header">', $txt['paid_current'], '</h2>
+			<div class="infobox">
+				', $txt['paid_current_desc'], '
+			</div>
+			<table class="table_grid">
+				<thead>
+					<tr class="table_head">
+						<th class="grid33">', $txt['paid_name'], '</th>
+						<th>', $txt['paid_status'], '</th>
+						<th>', $txt['start_date'], '</th>
+						<th>', $txt['end_date'], '</th>
+					</tr>
+				</thead>
+				<tbody>';
 
 	if (empty($context['current']))
 		echo '
-				<tr class="windowbg">
-					<td class="centertext" colspan="4">
-						', $txt['paid_none_yet'], '
-					</td>
-				</tr>';
+					<tr class="windowbg">
+						<td class="centertext" colspan="4">
+							', $txt['paid_none_ordered'], '
+						</td>
+					</tr>';
 
 	$alternate = false;
 	foreach ($context['current'] as $sub)
@@ -501,21 +503,22 @@ function template_user_subscription()
 
 		if (!$sub['hide'])
 			echo '
-				<tr class="windowbg', $alternate ? '' : '2', '">
-					<td>
-						', (allowedTo('admin_forum') ? '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=modifyuser;lid=' . $sub['id'] . '">' . $sub['name'] . '</a>' : $sub['name']), '
-					</td><td>
-						<span style="color: ', ($sub['status'] == 2 ? 'green' : ($sub['status'] == 1 ? 'red' : 'orange')), '"><strong>', $sub['status_text'], '</strong></span>
-					</td><td>
-						', $sub['start'], '
-					</td><td>
-						', $sub['end'], '
-					</td>
-				</tr>';
+					<tr class="windowbg', $alternate ? '' : '2', '">
+						<td>
+							', (allowedTo('admin_forum') ? '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=modifyuser;lid=' . $sub['id'] . '">' . $sub['name'] . '</a>' : $sub['name']), '
+						</td><td>
+							<span style="color: ', ($sub['status'] == 2 ? 'green' : ($sub['status'] == 1 ? 'red' : 'orange')), '"><strong>', $sub['status_text'], '</strong></span>
+						</td><td>
+							', $sub['start'], '
+						</td><td>
+							', $sub['end'], '
+						</td>
+					</tr>';
 	}
 	echo '
-			</tbody>
-		</table>
+				</tbody>
+			</table>
+		</div>
 	</div>';
 }
 
