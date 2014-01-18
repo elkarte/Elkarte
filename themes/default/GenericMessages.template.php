@@ -73,8 +73,8 @@ function template_build_poster_div($message, $ignoring = false)
 		if ($message['member']['karma']['allow'])
 			$poster_div .= '
 									<li class="listlevel2 karma_allow">
-										<a class="linklevel2" href="' . $message['member']['karma']['applaud_url'] . '">' . $modSettings['karmaApplaudLabel'] . '</a>
-										<a class="linklevel2" href="' . $message['member']['karma']['smite_url'] . '">' . $modSettings['karmaSmiteLabel'] . '</a>
+										<a class="linklevel2" href="' . $message['member']['karma']['applaud_url'] . '">' . $modSettings['karmaApplaudLabel'] . '</a>' .
+										(empty($modSettings['karmaDisableSmite']) ? '<a class="linklevel2" href="' . $message['member']['karma']['smite_url'] . '">' . $modSettings['karmaSmiteLabel'] . '</a>' : '') . '
 									</li>';
 
 		// Show the member's gender icon?

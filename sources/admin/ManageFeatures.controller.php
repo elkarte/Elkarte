@@ -1530,6 +1530,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('int', 'karmaMinPosts', 6, 'postinput' => strtolower($txt['posts'])),
 				array('float', 'karmaWaitTime', 6, 'postinput' => $txt['hours']),
 				array('check', 'karmaTimeRestrictAdmins'),
+				array('check', 'karmaDisableSmite'),
 			'',
 				// What does it look like?  [smite]?
 				array('text', 'karmaLabel'),
