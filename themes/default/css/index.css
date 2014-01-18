@@ -3724,6 +3724,13 @@ a.help .icon {
 		box-shadow: none;
 		border: 1px solid transparent;
 	}
+	#main_menu .linklevel1, #main_menu .linklevel1 a  {
+		margin: 0;
+		padding: 0;
+	}
+	#main_menu .linklevel1>.pm_indicator {
+		display: none;
+	}
 	.button_title {
 		display: none;
 	}
