@@ -87,7 +87,7 @@ function template_whos_online()
 
 		echo '
 							</td>
-							<td nowrap="nowrap">', $member['time'], '</td>
+							<td>', $member['time'], '</td>
 							<td>', $member['action'], '</td>
 						</tr>';
 
