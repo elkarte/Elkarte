@@ -138,8 +138,6 @@ class Site_Combiner
 			$this->_combineFiles('js');
 
 			// Minify these files to save space,
-			define('URL', 'http://closure-compiler.appspot.com/compile');
-			define('POST_HEADER', 'output_info=compiled_code&output_format=text&compilation_level=SIMPLE_OPTIMIZATIONS');
 			$this->_minified_cache = $this->_jsCompiler();
 
 			// And save them for future users
@@ -257,7 +255,10 @@ class Site_Combiner
 
 			// CSS needs relative locations converted for the moved hive to work
 			if ($type === 'css')
+			{
 				$tempfile = str_replace(array('../../images', '../images'), $file['url'] . '/images', $tempfile);
+				$tempfile = str_replace(array('../../webfonts', '../webfonts'), $file['url'] . '/webfonts', $tempfile);
+			}
 
 			$this->_cache .= (($i == true) ? "\n" : '') . $tempfile;
 			$i = true;
@@ -301,10 +302,14 @@ class Site_Combiner
 		$fetch_data = '';
 		$post_data = '';
 
+		// Details of the closure request
+		$url = 'http://closure-compiler.appspot.com/compile';
+		$post_header = 'output_info=compiled_code&output_format=text&compilation_level=SIMPLE_OPTIMIZATIONS';
+
 		// Build the closure request using code_url param, this allows us to do a single request
 		foreach ($this->_combine_files as $file)
 			$post_data .= '&code_url=' . urlencode($file['url'] . '/scripts/' . $file['basename']);
-		$fetch_data = fetch_web_data(URL, POST_HEADER . $post_data);
+		$fetch_data = fetch_web_data($url, $post_header . $post_data);
 
 		// Nothing returned or an error then we try our internal minimizer
 		if ($fetch_data === false || trim($fetch_data) == '' || preg_match('/^Error\(\d{1,2}\):\s/m', $fetch_data))
@@ -321,10 +326,10 @@ class Site_Combiner
 		if ($fetch_data === false || trim($fetch_data) == '')
 		{
 			// As long as we are below 200000 in post data size we can do this in one request
-			if (Util::strlen(urlencode(POST_HEADER . $this->_cache)) <= 200000)
+			if (Util::strlen(urlencode($post_header . $this->_cache)) <= 200000)
 			{
 				$post_data = '&js_code=' . urlencode($this->_cache);
-				$fetch_data = fetch_web_data(URL, POST_HEADER . $post_data);
+				$fetch_data = fetch_web_data($url, $post_header . $post_data);
 			}
 			else
 			{
@@ -362,7 +367,7 @@ class Site_Combiner
 
 					// Send it off and get the results
 					$post_data = '&js_code=' . $post_data;
-					$data = fetch_web_data(URL, POST_HEADER . $post_data);
+					$data = fetch_web_data($url, $post_header . $post_data);
 
 					// Use the results or the raw data
 					$fetch_data .= ($data === false || trim($data) == '' || preg_match('/^Error\(\d{1,2}\):\s/m', $data)) ? $post_data_raw : $data;
