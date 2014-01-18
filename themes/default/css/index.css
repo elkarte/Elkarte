@@ -1710,7 +1710,7 @@ dl.settings textarea {
 	right: 0;
 }
 .sort_by_item {
-	width: 7em;
+	width: 100%;
 }
 .topic_sorting>li {
 	float: right;
@@ -1749,6 +1749,10 @@ img.new_posts {
 /* Styles for the message (topic) index. */
 #messageindex, #unread {
 	clear: both;
+}
+.action_unread .topic_sorting #sortby, .action_unread #sortby,
+.action_unreadreplies .topic_sorting #sortby, .action_unreadreplies #sortby {
+	width: 9em;
 }
 #unread_header {
 	margin-top: 0.5em;
