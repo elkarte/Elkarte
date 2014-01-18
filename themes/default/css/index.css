@@ -785,10 +785,12 @@ a.bbc_link {
 #search_form  * {
 	margin: 0;
 	border-radius: 0;
-	font-size: 0.929em;
 	/* Webkit (bleh) fix. */
 	float: left;
 }
+chrome #search_form .button_submit {
+	font-size: 1em;
+ }
 /* The logo and slogan. */
 #header {
 	padding: 2px 2px 0 2px;
