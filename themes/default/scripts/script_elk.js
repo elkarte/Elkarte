@@ -1207,7 +1207,7 @@ errorbox_handler.prototype.init = function()
 		var current_error_handler = this.opt.self;
 		$(document).ready(function() {
 			var current_error = eval(current_error_handler);
-			$('#' + current_error.opt.editor_id).data("sceditor").addEvent(current_error.opt.editor_id, 'keyup', function() {
+			$('#' + current_error.opt.editor_id).data("sceditor").addEvent(current_error.opt.editor_id, 'blur', function() {
 				current_error.checkErrors();
 			});
 		});
