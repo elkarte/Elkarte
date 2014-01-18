@@ -1664,9 +1664,6 @@ div.bbc_footnotes .meaction{
 	.indicator[data-icon]:before {
 		color: #5ba048;
 	}
-	#main_menu .linklevel1>.pm_indicator {
-		display: none;
-	}
 	#main_menu .linklevel1 {
 		margin-right: 2px;
 	}

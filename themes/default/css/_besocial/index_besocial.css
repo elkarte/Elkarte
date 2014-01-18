@@ -531,6 +531,11 @@ div.bbc_footnotes .meaction{
 	background-color: transparent;
 	box-shadow: none;
 }
+.poster .listlevel2:hover>a {
+	color: #008299;
+	border: none;
+	box-shadow: none;
+}
 #main_menu .linklevel1, #main_menu .linklevel1:link, #main_menu .linklevel1:visited,
 .poster li.listlevel1, .poster li.listlevel1 a, .poster li.listlevel1 a:hover {
 	border-radius: none;
@@ -1145,25 +1150,22 @@ span.views_text {
 	[data-icon]:before {
 		font-family: 'FontAwesome';
 		border: 3px solid white;
-		padding: 1px;
+		padding: 3px;
 		padding-bottom: 0px;
 		margin: 2px;
-		height: 1.05em;
-		line-height: 1.05em;
-		width: 1.05em;
+		height: 1.1em;
+		line-height: 1.1em;
+		width: 1.1em;
 		text-align: center;
 		display: inline-block;
 		border-radius: 4px;
-		font-size: 2.5em;
+		font-size: 2.1em;
 		color: #43a8da;
 		content: attr(data-icon);
 		speak: none;
 	}
 	.indicator[data-icon]:before {
 		color: orange;
-	}
-	#main_menu .linklevel1>.pm_indicator {
-		display: none;
 	}
 	.statistics .flow_hidden, .statistics .floatleft {
 		border: none;

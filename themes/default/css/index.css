@@ -699,6 +699,7 @@ div.windowbg, div.windowbg2 {
 .bbc_list {
 	padding: 0 0 0 35px;
 	text-align: left;
+	list-style-type: square;
 }
 /* Everything is same except HTML5 valid */
 .bbc_tt {
@@ -780,7 +781,6 @@ a.bbc_link {
 #search_form {
 	padding: 12px 0 4px 8px;
 	float: right;
-	font-size: 1em;
 }
 #search_form  * {
 	margin: 0;
@@ -3725,6 +3725,13 @@ a.help .icon {
 		margin-right: 5px;
 		box-shadow: none;
 		border: 1px solid transparent;
+	}
+	#main_menu .linklevel1, #main_menu .linklevel1 a  {
+		margin: 0;
+		padding: 0;
+	}
+	#main_menu .linklevel1>.pm_indicator {
+		display: none;
 	}
 	.button_title {
 		display: none;
