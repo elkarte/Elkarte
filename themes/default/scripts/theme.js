@@ -55,6 +55,9 @@ $(document).ready(function() {
 	$('legend').click(function(){
 		$(this).siblings().slideToggle("fast");
 		$(this).parent().toggleClass("collapsed");
+	}).each(function () {
+		if ($(this).data('collapsed'))
+			$(this).click();
 	});
 
 	// Spoiler

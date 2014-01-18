@@ -844,6 +844,9 @@ class ManageLanguages_Controller extends Action_Controller
 			$context['file_entries'] = array();
 			foreach ($entries as $entryKey => $entryValue)
 			{
+				// Nowadays some entries have fancy keys, so better use something "portable" for the form
+				$md5EntryKey = md5($entryKey);
+
 				// Ignore some things we set separately.
 				$ignore_files = array('lang_character_set', 'lang_locale', 'lang_dictionary', 'lang_spelling', 'lang_rtl');
 				if (in_array($entryKey, $ignore_files))
@@ -876,9 +879,9 @@ class ManageLanguages_Controller extends Action_Controller
 						$subValue = strtr($subValue, array('"' => '', '\'' => '', ')' => ''));
 
 						// Can we save?
-						if (isset($save_strings[$entryKey . '-+- ' . $cur_index]))
+						if (isset($save_strings[$md5EntryKey . '-+- ' . $cur_index]))
 						{
-							$save_cache['entries'][$cur_index] = strtr($save_strings[$entryKey . '-+- ' . $cur_index], array('\'' => ''));
+							$save_cache['entries'][$cur_index] = strtr($save_strings[$md5EntryKey . '-+- ' . $cur_index], array('\'' => ''));
 							$save_cache['enabled'] = true;
 						}
 						else
@@ -886,6 +889,7 @@ class ManageLanguages_Controller extends Action_Controller
 
 						$context['file_entries'][] = array(
 							'key' => $entryKey . '-+- ' . $cur_index,
+							'display_key' => $entryKey . '-+- ' . $cur_index,
 							'value' => $subValue,
 							'rows' => 1,
 						);
@@ -922,25 +926,26 @@ class ManageLanguages_Controller extends Action_Controller
 				else
 				{
 					// Saving?
-					if (isset($save_strings[$entryKey]) && $save_strings[$entryKey] != $entryValue['entry'])
+					if (isset($save_strings[$md5EntryKey]) && $save_strings[$md5EntryKey] != $entryValue['entry'])
 					{
 						// @todo Fix this properly.
-						if ($save_strings[$entryKey] == '')
-							$save_strings[$entryKey] = '\'\'';
+						if ($save_strings[$md5EntryKey] == '')
+							$save_strings[$md5EntryKey] = '\'\'';
 
 						// Set the new value.
-						$entryValue['entry'] = $save_strings[$entryKey];
+						$entryValue['entry'] = $save_strings[$md5EntryKey];
 
 						// And we know what to save now!
 						$final_saves[$entryKey] = array(
 							'find' => $entryValue['full'],
-							'replace' => '$' . $entryValue['type'] . '[\'' . $entryKey . '\'] = ' . $save_strings[$entryKey] . ';',
+							'replace' => '$' . $entryValue['type'] . '[\'' . $entryKey . '\'] = ' . $save_strings[$md5EntryKey] . ';',
 						);
 					}
 
 					$editing_string = cleanLangString($entryValue['entry'], true);
 					$context['file_entries'][] = array(
-						'key' => $entryKey,
+						'key' => $md5EntryKey,
+						'display_key' => $entryKey,
 						'value' => $editing_string,
 						'rows' => (int) (strlen($editing_string) / 38) + substr_count($editing_string, "\n") + 1,
 					);

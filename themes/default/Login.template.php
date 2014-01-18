@@ -46,7 +46,7 @@ function template_login()
 				<dl>
 					<dt>', $txt['username'], ':</dt>
 					<dd>
-						<input type="text" name="user" size="20" maxlength="80" value="', $context['default_username'], '" class="input_text" ', !$context['using_openid'] ? 'autofocus="autofocus" ' : '', 'placeholder="', $txt['username'], '" />
+						<input type="text" name="user" size="20" maxlength="80" value="', $context['default_username'], '" class="input_text" ', !empty($context['using_openid']) ? 'autofocus="autofocus" ' : '', 'placeholder="', $txt['username'], '" />
 					</dd>
 					<dt>', $txt['password'], ':</dt>
 					<dd>
@@ -59,7 +59,7 @@ function template_login()
 				<dl>
 					<dt>', $txt['openid'], ':</dt>
 					<dd>
-						<input type="text" id="openid_identifier" name="openid_identifier" class="input_text openid_login" size="17"', $context['using_openid'] ? ' autofocus="autofocus" ' : '', ' />&nbsp;<a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" /></a>
+						<input type="text" id="openid_identifier" name="openid_identifier" class="input_text openid_login" size="17"', !empty($context['using_openid']) ? ' autofocus="autofocus" ' : '', ' />&nbsp;<a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" /></a>
 					</dd>
 				</dl>
 				<hr />';
@@ -99,7 +99,7 @@ function template_login()
 	// Focus on the correct input - username or password.
 	echo '
 		<script><!-- // --><![CDATA[
-			document.forms.frmLogin.', $context['using_openid'] ? 'openid_identifier' : (isset($context['default_username']) && $context['default_username'] != '' ? 'passwrd' : 'user'), '.focus();
+			document.forms.frmLogin.', !empty($context['using_openid']) ? 'openid_identifier' : (isset($context['default_username']) && $context['default_username'] != '' ? 'passwrd' : 'user'), '.focus();
 		// ]]></script>';
 }
 

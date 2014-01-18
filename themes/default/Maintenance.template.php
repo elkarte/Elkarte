@@ -54,7 +54,7 @@ function template_maintain_database()
 		<h3 class="category_header">
 			<a href="', $scripturl, '?action=quickhelp;help=maintenance_backup" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['maintain_backup'], '
 		</h3>
-		<div class="windowbg2">
+		<div class="windowbg">
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=database;activity=backup" method="post" accept-charset="UTF-8">
 					<p>', $txt['maintain_backup_info'], '</p>';
@@ -179,7 +179,7 @@ function template_maintain_members()
 
 	echo '
 		<h3 class="category_header">', $txt['maintain_reattribute_posts'], '</h3>
-		<div class="windowbg2">
+		<div class="windowbg">
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=members;activity=reattribute" method="post" accept-charset="UTF-8">
 					<p><strong>', $txt['reattribute_guest_posts'], '</strong></p>
@@ -223,22 +223,22 @@ function template_maintain_members()
 		<div class="windowbg">
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=members;activity=purgeinactive" method="post" accept-charset="UTF-8" id="membersForm">
-					<p><a id="membersLink"></a>', $txt['maintain_members_since1'], '
+					<p><a id="membersLink"></a>', str_replace(array('{select_conditions}', '{num_days}'), array('
 					<select name="del_type">
-						<option value="activated" selected="selected">', $txt['maintain_members_activated'], '</option>
-						<option value="logged">', $txt['maintain_members_logged_in'], '</option>
-					</select> ', $txt['maintain_members_since2'], ' <input type="text" name="maxdays" value="30" size="3" class="input_text" />', $txt['maintain_members_since3'], '</p>';
+						<option value="activated" selected="selected">' . $txt['maintain_members_activated'] . '</option>
+						<option value="logged">' . $txt['maintain_members_logged_in'] . '</option>
+					</select> ', ' <input type="text" name="maxdays" value="30" size="3" class="input_text" />'), $txt['maintain_members_since']), '</p>';
 
 	echo '
-					<p><a href="#membersLink" onclick="swapMembers();"><img src="', $settings['images_url'], '/selected.png" alt="+" id="membersIcon" /></a> <a href="#membersLink" onclick="swapMembers();" id="membersText">', $txt['maintain_members_all'], '</a></p>
-					<div style="display: none;" id="membersPanel">';
+					<fieldset id="membersPanel">
+						<legend data-collapsed="true">', $txt['maintain_members_all'], '</legend>';
 
 	foreach ($context['membergroups'] as $group)
 		echo '
 						<label for="groups', $group['id'], '"><input type="checkbox" name="groups[', $group['id'], ']" id="groups', $group['id'], '" checked="checked" class="input_check" /> ', $group['name'], '</label><br />';
 
 	echo '
-					</div>
+					</fieldset>
 					<div class="submitbutton">
 						<input type="submit" value="', $txt['maintain_old_remove'], '" onclick="return confirm(\'', $txt['maintain_members_confirm'], '\');" class="button_submit" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -304,7 +304,7 @@ function template_maintain_topics()
 	// The otherwise hidden "choose which boards to prune".
 	echo '
 					<p>
-						<a id="rotLink"></a>', $txt['maintain_old_since_days1'], '<input type="text" name="maxdays" value="30" size="3" />', $txt['maintain_old_since_days2'], '
+						<a id="rotLink"></a><label for="maxdays">', sprintf($txt['maintain_old_since_days'], '<input type="text" id="maxdays" name="maxdays" value="30" size="3" />'), '</label>
 					</p>
 					<p>
 						<label for="delete_type_nothing"><input type="radio" name="delete_type" id="delete_type_nothing" value="nothing" class="input_radio" /> ', $txt['maintain_old_nothing_else'], '</label><br />
@@ -367,7 +367,7 @@ function template_maintain_topics()
 		<div class="windowbg">
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=topics;activity=olddrafts" method="post" accept-charset="UTF-8">
-					<p>', $txt['maintain_old_drafts_days'], '&nbsp;<input type="text" name="draftdays" value="', (!empty($modSettings['drafts_keep_days']) ? $modSettings['drafts_keep_days'] : 30), '" size="3" />&nbsp;', $txt['days_word'], '</p>
+					<p><label for="draftdays">', sprintf($txt['maintain_old_drafts_days'], ' <input type="text" id="draftdays" name="draftdays" value="' . (!empty($modSettings['drafts_keep_days']) ? $modSettings['drafts_keep_days'] : 30) . '" size="3" /> '), '</label></p>
 					<div class="submitbutton">
 						<input type="submit" value="', $txt['maintain_old_remove'], '" onclick="return confirm(\'', $txt['maintain_old_drafts_confirm'], '\');" class="button_submit" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -377,7 +377,7 @@ function template_maintain_topics()
 			</div>
 		</div>
 		<h3 class="category_header">', $txt['move_topics_maintenance'], '</h3>
-		<div class="windowbg2">
+		<div class="windowbg">
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=topics;activity=massmove" method="post" accept-charset="UTF-8">
 					<p>';
@@ -388,8 +388,9 @@ function template_maintain_topics()
 	echo '
 					</p>
 					<div class="submitbutton">
-						<input type="submit" value="', $txt['move_topics_now'], '" onclick="if (document.getElementById(\'id_board_from\').options[document.getElementById(\'id_board_from\').selectedIndex].disabled || document.getElementById(\'id_board_from\').options[document.getElementById(\'id_board_to\').selectedIndex].disabled) return false; var confirmText = \'', $txt['move_topics_confirm'] . '\'; return confirm(confirmText.replace(/%board_from%/, document.getElementById(\'id_board_from\').options[document.getElementById(\'id_board_from\').selectedIndex].text.replace(/^=+&gt;&nbsp;/, \'\')).replace(/%board_to%/, document.getElementById(\'id_board_to\').options[document.getElementById(\'id_board_to\').selectedIndex].text.replace(/^=+&gt;&nbsp;/, \'\')));" class="button_submit" />
+						<input type="submit" value="', $txt['move_topics_now'], '" onclick="return confirmMoveTopics(', JavaScriptEscape($txt['move_topics_confirm']), ');" class="button_submit" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+						<input type="hidden" name="', $context['admin-maint_token_var'], '" value="', $context['admin-maint_token'], '" />
 					</div>
 				</form>
 			</div>

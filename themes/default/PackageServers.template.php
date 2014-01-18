@@ -58,16 +58,16 @@ function template_servers()
 					<form action="' . $scripturl . '?action=admin;area=packageservers;sa=add" method="post" accept-charset="UTF-8">
 						<dl class="settings">
 							<dt>
-								<strong>' . $txt['server_name'] . ':</strong>
+								<strong><label for="servername">' . $txt['server_name'] . '</label>:</strong>
 							</dt>
 							<dd>
-								<input type="text" name="servername" size="44" value="ElkArte" class="input_text" />
+								<input type="text" id="servername" name="servername" size="44" value="ElkArte" class="input_text" />
 							</dd>
 							<dt>
-								<strong>' . $txt['serverurl'] . ':</strong>
+								<strong><label for="serverurl">' . $txt['serverurl'] . '</label>:</strong>
 							</dt>
 							<dd>
-								<input type="text" name="serverurl" size="44" value="http://" class="input_text" />
+								<input type="text" id="serverurl" name="serverurl" size="44" value="http://" class="input_text" />
 							</dd>
 						</dl>
 						<div class="submitbutton">
@@ -81,16 +81,16 @@ function template_servers()
 					<form action="', $scripturl, '?action=admin;area=packageservers;sa=download;byurl;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
 						<dl class="settings">
 							<dt>
-								<strong>' . $txt['serverurl'] . ':</strong>
+								<strong><label for="package">' . $txt['serverurl'] . '</label>:</strong>
 							</dt>
 							<dd>
-								<input type="text" name="package" size="44" value="http://" class="input_text" />
+								<input type="text" id="package" name="package" size="44" value="http://" class="input_text" />
 							</dd>
 							<dt>
-								<strong>', $txt['package_download_filename'], ':</strong>
+								<strong><label for="filename">', $txt['package_download_filename'], '</label>:</strong>
 							</dt>
 							<dd>
-								<input type="text" name="filename" size="44" class="input_text" /><br />
+								<input type="text" id="filename" name="filename" size="44" class="input_text" /><br />
 								<span class="smalltext">', $txt['package_download_filename_info'], '</span>
 							</dd>
 						</dl>
@@ -357,10 +357,10 @@ function template_upload()
 				<form action="' . $scripturl . '?action=admin;area=packageservers;sa=upload2" method="post" accept-charset="UTF-8" enctype="multipart/form-data" style="margin-bottom: 0;">
 					<dl class="settings">
 						<dt>
-							<strong>' . $txt['package_upload_select'] . ':</strong>
+							<strong><label for="package">' . $txt['package_upload_select'] . '</label>:</strong>
 						</dt>
 						<dd>
-							<input type="file" name="package" size="38" class="input_file" />
+							<input type="file" id="package" name="package" size="38" class="input_file" />
 						</dd>
 					</dl>
 					<hr />

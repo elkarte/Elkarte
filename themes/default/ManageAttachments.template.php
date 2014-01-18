@@ -73,8 +73,8 @@ function template_maintenance()
 		<div class="windowbg">
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=manageattachments" method="post" accept-charset="UTF-8" onsubmit="return confirm(\'', $txt['attachment_pruning_warning'], '\');">
-					', $txt['attachment_remove_old'], ' <input type="text" name="age" value="25" size="4" class="input_text" /> ', $txt['days_word'], '<br />
-					', $txt['attachment_pruning_message'], ': <input type="text" name="notice" value="', $txt['attachment_delete_admin'], '" size="40" class="input_text" /><br />
+					<label for="age">', sprintf($txt['attachment_remove_old'], ' <input type="text" id="age" name="age" value="25" size="4" class="input_text" /> '), '</label><br />
+					<label for="age_notice">', $txt['attachment_pruning_message'], '</label>: <input type="text" id="age_notice" name="notice" value="', $txt['attachment_delete_admin'], '" size="40" class="input_text" /><br />
 					<input type="submit" name="remove" value="', $txt['remove'], '" class="right_submit" />
 					<input type="hidden" name="type" value="attachments" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -83,8 +83,8 @@ function template_maintenance()
 				</form>
 				<hr />
 				<form action="', $scripturl, '?action=admin;area=manageattachments" method="post" accept-charset="UTF-8" onsubmit="return confirm(\'', $txt['attachment_pruning_warning'], '\');">
-					', $txt['attachment_remove_size'], ' <input type="text" name="size" id="size" value="100" size="4" class="input_text" /> ', $txt['kilobyte'], '<br />
-					', $txt['attachment_pruning_message'], ': <input type="text" name="notice" value="', $txt['attachment_delete_admin'], '" size="40" class="input_text" /><br />
+					<label for="size">', sprintf($txt['attachment_remove_size'], ' <input type="text" name="size" id="size" value="100" size="4" class="input_text" /> '), '</label><br />
+					<label for="size_notice">', $txt['attachment_pruning_message'], '</label>: <input type="text" id="size_notice" name="notice" value="', $txt['attachment_delete_admin'], '" size="40" class="input_text" /><br />
 					<input type="submit" name="remove" value="', $txt['remove'], '" class="right_submit" />
 					<input type="hidden" name="type" value="attachments" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -93,7 +93,7 @@ function template_maintenance()
 				</form>
 				<hr />
 				<form action="', $scripturl, '?action=admin;area=manageattachments" method="post" accept-charset="UTF-8" onsubmit="return confirm(\'', $txt['attachment_pruning_warning'], '\');">
-					', $txt['attachment_manager_avatars_older'], ' <input type="text" name="age" value="45" size="4" class="input_text" /> ', $txt['days_word'], '<br />
+					<label for="avatar_age">', sprintf($txt['attachment_manager_avatars_older'], ' <input type="text" id="avatar_age" name="age" value="45" size="4" class="input_text" /> '), '</label><br />
 					<input type="submit" name="remove" value="', $txt['remove'], '" class="right_submit" />
 					<input type="hidden" name="type" value="avatars" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -115,9 +115,9 @@ function template_maintenance()
 				<form action="', $scripturl, '?action=admin;area=manageattachments;sa=transfer" method="post" accept-charset="UTF-8">
 					<p class="infobox">', $txt['attachment_transfer_desc'], '</p>
 					<dl class="settings">
-						<dt>', $txt['attachment_transfer_from'], '</dt>
+						<dt><label for="from">', $txt['attachment_transfer_from'], '</label></dt>
 						<dd>
-							<select name="from">
+							<select id="from" name="from">
 								<option value="0">', $txt['attachment_transfer_select'], '</option>';
 
 	foreach ($context['attach_dirs'] as $id => $dir)
@@ -127,9 +127,9 @@ function template_maintenance()
 	echo '
 							</select>
 						</dd>
-						<dt>', $txt['attachment_transfer_auto'], '</dt>
+						<dt><label for="auto">', $txt['attachment_transfer_auto'], '</label></dt>
 						<dd>
-							<select name="auto">
+							<select id="auto" name="auto">
 								<option value="0">', $txt['attachment_transfer_auto_select'], '</option>
 								<option value="-1">', $txt['attachment_transfer_forum_root'], '</option>';
 
@@ -144,9 +144,9 @@ function template_maintenance()
 	echo '
 							</select>
 						</dd>
-						<dt>', $txt['attachment_transfer_to'], '</dt>
+						<dt><label for="to">', $txt['attachment_transfer_to'], '</label></dt>
 						<dd>
-							<select name="to">
+							<select id="to" name="to">
 								<option value="0">', $txt['attachment_transfer_select'], '</option>';
 
 	foreach ($context['attach_dirs'] as $id => $dir)

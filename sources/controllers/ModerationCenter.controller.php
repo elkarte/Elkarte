@@ -659,6 +659,7 @@ class ModerationCenter_Controller extends Action_Controller
 		global $context, $txt, $user_info;
 
 		require_once(SUBSDIR . '/Moderation.subs.php');
+		loadJavascriptFile('admin.js', array(), 'admin_scripts');
 
 		$context['id_template'] = isset($_REQUEST['tid']) ? (int) $_REQUEST['tid'] : 0;
 		$context['is_edit'] = $context['id_template'];

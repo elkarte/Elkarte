@@ -449,6 +449,17 @@ ul.package_servers li {
 	padding: 0 1em;
 }
 
+/* Styles for the language edit strings page.
+------------------------------------------------- */
+.strings_edit li {
+	display: inline-block;
+	width: 49%;
+	vertical-align:top;
+}
+.strings_edit textarea {
+	width: 96%;
+}
+
 /* Styles for the file permissions section.
 ------------------------------------------------- */
 .filepermissions {
@@ -575,8 +586,20 @@ dl.settings dd.questions input {
 #manage_boards .post_group, #manage_boards .regular_members {
 	cursor: help;
 }
-.select_all_box {
-	display: none;
+.select_all_box label {
+	margin-left:5em;
+	font-style: italic;
+}
+.visible_boards .board .floatright {
+	width:50%;
+}
+.visible_boards .category:after, .visible_boards .board:after {
+	display: block;
+	clear: both;
+	content: "";
+}
+.visible_boards li {
+	padding: 2px;
 }
 
 /* Styles for the manage smiley section.
@@ -608,9 +631,7 @@ padding: 7px 10px;
 #membersText, #rotText {
 	font-weight: bold;
 }
-#membersPanel {
-	padding: 3px;
-}
+
 /* Styles for the badbehaviour section.
 ------------------------------------------------- */
 .bbfilter {
@@ -747,6 +768,12 @@ ul.pending_payments {
 }
 .edit_board.changed {
 	background-image: url(../images/icons/field_invalid.png);
+}
+.rename_profile {
+	float: left;
+}
+.perm_profile_delete {
+	width:5%;
 }
 
 /* Styles for the themes section.
@@ -1039,9 +1066,16 @@ ul.moderation_notes li {
 	}
 
 }*/
-@media screen and (max-width: 490px),(max-width: 32em) {
+@media screen and (max-width: 33.750em) {
 	body {
 		padding: 0;
+	}
+	.visible_boards .select_all_box {
+		display: block;
+	}
+	.visible_boards label {
+		width: auto!important;
+		display: inline;
 	}
 	#wrapper, #footer_section .frame {
 		min-width: 100%;

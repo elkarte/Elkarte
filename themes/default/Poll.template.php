@@ -47,8 +47,9 @@ function template_poll_edit()
 					<input type="hidden" name="poll" value="', $context['poll']['id'], '" />';
 	echo '
 						<fieldset id="poll_main">
-							<legend><span ', (isset($context['poll_error']['no_question']) ? ' class="error"' : ''), '>', $txt['poll_question'], ':</span></legend>
-							<input type="text" name="question" value="', isset($context['poll']['question']) ? $context['poll']['question'] : '', '" tabindex="', $context['tabindex']++, '" size="80" class="input_text" required="required" placeholder="', $txt['poll_question'], '" />
+							<legend>', $txt['poll_question_options'], '</legend>
+							<label for="question"', (isset($context['poll_error']['no_question']) ? ' class="error"' : ''), '>', $txt['poll_question'], ':</label>
+							<input type="text" id="question" name="question" value="', isset($context['poll']['question']) ? $context['poll']['question'] : '', '" tabindex="', $context['tabindex']++, '" size="80" class="input_text" required="required" placeholder="', $txt['poll_question'], '" />
 							<ul class="poll_main">';
 
 	// Loop through all the choices and print them out.
@@ -128,11 +129,12 @@ function template_poll_edit()
 						</fieldset>';
 
 	// If this is an edit, we can allow them to reset the vote counts.
+	// @todo a warning maybe while saving?
 	if (!empty($context['is_edit']))
 		echo '
 					<fieldset id="poll_reset">
 						<legend>', $txt['reset_votes'], '</legend>
-						<input type="checkbox" name="resetVoteCount" value="on" class="input_check" /> ' . $txt['reset_votes_check'] . '
+						<input type="checkbox" id="resetVoteCount" name="resetVoteCount" value="on" class="input_check" /> <label for="resetVoteCount">' . $txt['reset_votes_check'] . '</label>
 					</fieldset>';
 
 	if (!empty($context['form_url']))

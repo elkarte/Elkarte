@@ -430,6 +430,10 @@ div.bbc_footnotes .meaction{
 	opacity: 1;
 }
 
+#mlsearch_options {
+	background-color: white;
+}
+
 /* Main forum area. */
 /* Box-shadow only on this one. */
 #wrapper {
@@ -990,6 +994,22 @@ span.views_text {
 .signature {
 	opacity: 0.9;
 }
+
+/*	$PROFILE		*/
+/* ------------------------------------------------------- */
+#warndiv .ui-widget-header {
+	background: transparent;
+}
+#warndiv .watched .ui-widget-header {
+	background: green;
+}
+#warndiv .moderated .ui-widget-header {
+	background: orange;
+}
+#warndiv .muted .ui-widget-header {
+	background: red;
+}
+
 /*	$HELP		*/
 /* ------------------------------------------------------- */
 

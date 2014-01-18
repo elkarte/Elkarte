@@ -28,7 +28,7 @@ function template_mlsearch_above()
 			<li>
 				<input id="mlsearch_input" onfocus="toggle_mlsearch_opt();" type="text" name="search" value="" class="input_text" placeholder="' . $txt['search'] . '" />&nbsp;
 				<input type="submit" name="search2" value="' . $txt['search'] . '" class="button_submit" />
-				<ul id="mlsearch_options">';
+				<ul id="mlsearch_options" class="nojs">';
 
 	foreach ($context['search_fields'] as $id => $title)
 	{
@@ -48,20 +48,8 @@ function template_mlsearch_above()
 
 	echo '
 	<script><!-- // --><![CDATA[
-		function toggle_mlsearch_opt()
-		{
-			$(\'body\').on(\'click\', mlsearch_opt_hide);
-			$(\'#mlsearch_options\').slideToggle(\'fast\');
-		}
-
-		function mlsearch_opt_hide(ev)
-		{
-			if (ev.target.id === \'mlsearch_options\' || ev.target.id === \'mlsearch_input\')
-				return;
-
-			$(\'body\').off(\'click\', mlsearch_opt_hide);
-			$(\'#mlsearch_options\').slideToggle(\'fast\');
-		}
+		// Removes the nojs class to properly style the dropdown according to js availability
+		$(\'#mlsearch_options\').removeClass(\'nojs\');
 	// ]]></script>';
 }
 

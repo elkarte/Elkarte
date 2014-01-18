@@ -324,7 +324,7 @@ class Calendar_Controller extends Action_Controller
 
 		// Template, sub template, etc.
 		loadTemplate('Calendar');
-		$context['sub_template'] = 'event_post';
+		$context['sub_template'] = 'unlinked_event_post';
 
 		$context['page_title'] = isset($event_id) ? $txt['calendar_edit'] : $txt['calendar_post_event'];
 		$context['linktree'][] = array(

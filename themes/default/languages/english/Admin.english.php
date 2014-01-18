@@ -103,8 +103,8 @@ $txt['attachment_files'] = 'Total files remaining';
 
 $txt['attachment_options'] = 'File Attachment Options';
 $txt['attachment_log'] = 'Attachment Log';
-$txt['attachment_remove_old'] = 'Remove attachments older than';
-$txt['attachment_remove_size'] = 'Remove attachments larger than';
+$txt['attachment_remove_old'] = 'Remove attachments older than %1$s days';
+$txt['attachment_remove_size'] = 'Remove attachments larger than %1$s KB';
 $txt['attachment_name'] = 'Attachment name';
 $txt['attachment_file_size'] = 'File Size';
 $txt['attachmentdir_size_not_set'] = 'No maximum directory size is currently set';
@@ -350,7 +350,7 @@ $txt['attachment_manager_attachments'] = 'Attachments';
 $txt['attachment_manager_thumbs'] = 'Thumbnails';
 $txt['attachment_manager_last_active'] = 'Last Active';
 $txt['attachment_manager_member'] = 'Member';
-$txt['attachment_manager_avatars_older'] = 'Remove avatars from members not active for more than';
+$txt['attachment_manager_avatars_older'] = 'Remove avatars from members not active for more than %1$s days';
 $txt['attachment_manager_total_avatars'] = 'Total avatars';
 
 $txt['attachment_manager_avatars_no_entries'] = 'There are currently no avatars.';

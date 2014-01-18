@@ -13,3 +13,11 @@
 #manage_boards h2 {
 	margin-bottom: 6px;
 }
+
+/* Styles for the manage boards section.
+------------------------------------------------- */
+
+#manage_boards .post_group, #manage_boards .regular_members {
+	border-bottom: 1px dotted #000;
+}
+

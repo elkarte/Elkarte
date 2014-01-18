@@ -1392,6 +1392,19 @@ div.bbc_footnotes .meaction{
 	border-bottom: 1px solid #ccc;
 }
 
+#warndiv .ui-widget-header {
+	background: transparent;
+}
+#warndiv .watched .ui-widget-header {
+	background: green;
+}
+#warndiv .moderated .ui-widget-header {
+	background: orange;
+}
+#warndiv .muted .ui-widget-header {
+	background: red;
+}
+
 
 /* $PERSONAL	*/
 /* ------------------------------------------------------- */

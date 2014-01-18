@@ -1381,3 +1381,32 @@ function addAnotherOption(parent, oDtName, oDdName, oData)
 	placeHolder.parentNode.insertBefore(newDT, placeHolder);
 	placeHolder.parentNode.insertBefore(newDD, placeHolder);
 }
+
+/**
+ * Shows the member search dropdown with the serch options
+ */
+function toggle_mlsearch_opt()
+{
+	// If the box is already visible just forget about it
+	if ($('#mlsearch_options').is(':visible'))
+		return;
+
+	// Time to show the droppy
+	$('#mlsearch_options').fadeIn('fast');
+
+	// A click anywhere on the page will close the droppy
+	$('body').on('click', mlsearch_opt_hide);
+	// Except clicking on the box itself or into the search text input
+	$('#mlsearch_options, #mlsearch_input').off('click', mlsearch_opt_hide).click(function(ev) {
+		ev.stopPropagation();
+	});
+}
+
+/**
+ * Hides the member search dropdown and detach the body click event
+ */
+function mlsearch_opt_hide()
+{
+	$('body').off('click', mlsearch_opt_hide);
+	$('#mlsearch_options').slideToggle('fast');
+}
