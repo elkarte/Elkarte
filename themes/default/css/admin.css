@@ -449,6 +449,17 @@ ul.package_servers li {
 	padding: 0 1em;
 }
 
+/* Styles for the language edit strings page.
+------------------------------------------------- */
+.strings_edit li {
+	display: inline-block;
+	width: 49%;
+	vertical-align:top;
+}
+.strings_edit textarea {
+	width: 96%;
+}
+
 /* Styles for the file permissions section.
 ------------------------------------------------- */
 .filepermissions {
