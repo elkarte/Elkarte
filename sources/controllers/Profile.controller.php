@@ -28,7 +28,7 @@ if (!defined('ELK'))
 class Profile_Controller extends Action_Controller
 {
 	/**
-	 * If the save was sucessful or not
+	 * If the save was successful or not
 	 * @var boolean
 	 */
 	private $_completed_save = false;
@@ -538,8 +538,11 @@ class Profile_Controller extends Action_Controller
 					// Does the integration want to check passwords?
 					$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($cur_profile['member_name'], $_POST['oldpasswrd'], false)), true);
 
+					// Start up the password checker, we have work to do
+					require_once(SUBSDIR . '/Auth.subs.php');
+
 					// Bad password!!!
-					if (!$good_password && $user_info['passwd'] != sha1(strtolower($user_profile[$memID]['member_name']) . un_htmlspecialchars(stripslashes($_POST['oldpasswrd']))))
+					if (!$good_password && !validateLoginPassword($_POST['oldpasswrd'], $user_info['passwd'], $user_profile[$memID]['member_name']))
 						$post_errors[] = 'bad_password';
 
 					// Warn other elements not to jump the gun and do custom changes!

@@ -75,16 +75,20 @@ function validateSession($type = 'admin')
 	require_once(SUBSDIR . '/Auth.subs.php');
 
 	// Hashed password, ahoy!
-	if (isset($_POST[$type . '_hash_pass']) && strlen($_POST[$type . '_hash_pass']) == 40)
+	if (isset($_POST[$type . '_hash_pass']) && strlen($_POST[$type . '_hash_pass']) == 64)
 	{
 		checkSession();
+		validateToken('admin-login');
 
+		// Allow integration to verify the password
 		$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($user_info['username'], $_POST[$type . '_hash_pass'], true)), true);
 
-		if ($good_password || $_POST[$type . '_hash_pass'] == sha1($user_info['passwd'] . $sc))
+		$password = $_POST[$type . '_hash_pass'];
+		if ($good_password || validateLoginPassword($password, $user_info['passwd']))
 		{
 			$_SESSION[$type . '_time'] = time();
 			unset($_SESSION['request_referer']);
+
 			return;
 		}
 	}
@@ -93,14 +97,20 @@ function validateSession($type = 'admin')
 	if (isset($_POST[$type. '_pass']))
 	{
 		checkSession();
+		validateToken('admin-login');
 
+		require_once(SUBSDIR . '/Auth.subs.php');
+
+		// Give integrated systems a chance to verify this password
 		$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($user_info['username'], $_POST[$type . '_pass'], false)), true);
 
 		// Password correct?
-		if ($good_password || sha1(strtolower($user_info['username']) . $_POST[$type . '_pass']) == $user_info['passwd'])
+		$password = $_POST[$type . '_pass'];
+		if ($good_password || validateLoginPassword($password, $user_info['passwd'], $user_info['username']))
 		{
 			$_SESSION[$type . '_time'] = time();
 			unset($_SESSION['request_referer']);
+
 			return;
 		}
 	}

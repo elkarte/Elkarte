@@ -400,8 +400,11 @@ function resetPassword($memID, $username = null)
 	}
 
 	// Generate a random password.
+	require_once(EXTDIR . '/PasswordHash.php');
+	$t_hasher = new PasswordHash(8, false);
 	$newPassword = substr(preg_replace('/\W/', '', md5(mt_rand())), 0, 10);
-	$newPassword_sha1 = sha1(strtolower($user) . $newPassword);
+	$newPassword_sha256 = hash('sha256', strtolower($user) . $newPassword);
+	$db_hash = $t_hasher->HashPassword($newPassword_sha256);
 
 	// Do some checks on the username if needed.
 	if ($username !== null)
@@ -416,10 +419,10 @@ function resetPassword($memID, $username = null)
 			fatal_error($error, $error_severity === null ? false : 'general');
 
 		// Update the database...
-		updateMemberData($memID, array('member_name' => $user, 'passwd' => $newPassword_sha1));
+		updateMemberData($memID, array('member_name' => $user, 'passwd' => $db_hash));
 	}
 	else
-		updateMemberData($memID, array('passwd' => $newPassword_sha1));
+		updateMemberData($memID, array('passwd' => $db_hash));
 
 	call_integration_hook('integrate_reset_pass', array($old_user, $user, $newPassword));
 
@@ -511,6 +514,57 @@ function validatePassword($password, $username, $restrict_in = array())
 	$good &= Util::strtolower($password) != $password;
 
 	return $good ? null : 'chars';
+}
+
+/**
+ * Checks whether an entered password is correct for the user
+ * - called when logging in or whenever a password needs to be validated for a user
+ * - used to generate a new hash for the db, used during registration or any password changes
+ * - if a non SHA256 password is sent, will generate one with SHA256(password + $user) and return it in password
+ *
+ * @param string $password user password if not already 64 characters long will be SHA256 with the user name
+ * @param string $hash hash as generated from a SHA256 password
+ * @param name $user user name only required if creating a SHA-256 password
+ * @param boolean $returnhash flag to determine if we are returning a hash suitable for the database
+ */
+function validateLoginPassword(&$password, $hash, $user = '', $returnhash = false)
+{
+	// Our hashing controller
+	require_once(EXTDIR . '/PasswordHash.php');
+
+	// Base-2 logarithm of the iteration count used for password stretching, the
+	// higher the number the more secure and CPU time consuming
+	$hash_cost_log2 = 10;
+
+	// Do we require the hashes to be portable to older systems (less secure)?
+	$hash_portable = false;
+
+	// Get an instance of the hasher
+	$hasher = new PasswordHash($hash_cost_log2, $hash_portable);
+
+	// Guilty until we know otherwise
+	$passhash = false;
+
+	// If the password is not 64 characters, lets make it a (SHA-256)
+	if (strlen($password) !== 64)
+		$password = hash('sha256', Util::strtolower($user) . un_htmlspecialchars($password));
+
+	// They need a password hash, something to save in the db?
+	if ($returnhash)
+	{
+		$passhash = $hasher->HashPassword($password);
+
+		// Something is not right, we can not generate a valid hash thats <20 characters
+		if (strlen($passhash) < 20)
+			$passhash = false;
+	}
+	// Or doing a password check?
+	else
+	 	$passhash = (bool) $hasher->CheckPassword($password, $hash);
+
+	unset($hasher);
+
+	return $passhash;
 }
 
 /**

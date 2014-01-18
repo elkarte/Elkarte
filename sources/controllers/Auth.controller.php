@@ -162,8 +162,13 @@ class Auth_Controller extends Action_Controller
 		if (Util::strlen($_POST['user']) > 80)
 			$_POST['user'] = Util::substr($_POST['user'], 0, 80);
 
+		// Can't use a password > 64 characters sorry, to long and only good for a DoS attack
+		// Plus we expect a 64 character one from SHA-256
+		if ((isset($_POST['passwrd']) && strlen($_POST['passwrd']) > 64) || (isset($_POST['hash_passwrd']) || strlen($_POST['hash_passwrd']) > 64))
+			$_POST['user'] = Util::substr($_POST['user'], 0, 80);
+
 		// Hmm... maybe 'admin' will login with no password. Uhh... NO!
-		if ((!isset($_POST['passwrd']) || $_POST['passwrd'] == '') && (!isset($_POST['hash_passwrd']) || strlen($_POST['hash_passwrd']) != 40))
+		if ((!isset($_POST['passwrd']) || $_POST['passwrd'] == '') && (!isset($_POST['hash_passwrd']) || strlen($_POST['hash_passwrd']) != 64))
 		{
 			$context['login_errors'] = array($txt['no_password']);
 			return;
@@ -195,19 +200,27 @@ class Auth_Controller extends Action_Controller
 		}
 
 		// Figure out the password using Elk's encryption - if what they typed is right.
-		if (isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) == 40)
+		if (isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) === 64)
 		{
-			// Needs upgrading?
-			if (strlen($user_settings['passwd']) != 40)
+			$valid_password = validateLoginPassword($_POST['hash_passwrd'], $user_settings['passwd']);
+
+			// Challenge what was passed
+			if ($valid_password)
 			{
+				$sha_passwd = $_POST['hash_passwrd'];
+				$valid_password = true;
+			}
+			// Needs upgrading if the db string is an actual 40 hexchar SHA-1
+			elseif (preg_match('/^[0-9a-f]{40}$/i', $user_settings['passwd']))
+			{
+				// Might Need to update so we will need to ask for the password again.
 				$context['login_errors'] = array($txt['login_hash_error']);
 				$context['disable_login_hashing'] = true;
 				unset($user_settings);
+
 				return;
 			}
-			// Challenge passed.
-			elseif ($_POST['hash_passwrd'] == sha1($user_settings['passwd'] . $sc . $tk))
-				$sha_passwd = $user_settings['passwd'];
+			// Bad password entered
 			else
 			{
 				// Don't allow this!
@@ -215,123 +228,46 @@ class Auth_Controller extends Action_Controller
 
 				$_SESSION['failed_login'] = isset($_SESSION['failed_login']) ? ($_SESSION['failed_login'] + 1) : 1;
 
+				// To many tries, maybe they need a reminder
 				if ($_SESSION['failed_login'] >= $modSettings['failed_login_threshold'])
 					redirectexit('action=reminder');
 				else
 				{
 					log_error($txt['incorrect_password'] . ' - <span class="remove">' . $user_settings['member_name'] . '</span>', 'user');
 
+					// Wrong password, lets go plain text in case form hashing is causing problems
 					$context['disable_login_hashing'] = true;
 					$context['login_errors'] = array($txt['incorrect_password']);
 					unset($user_settings);
+
 					return;
 				}
 			}
 		}
+		// Plain text password, no JS or hashing has been turned off
 		else
-			$sha_passwd = sha1(strtolower($user_settings['member_name']) . un_htmlspecialchars($_POST['passwrd']));
+		{
+			// validateLoginPassword will convert this to a SHA-256 pw and check it
+			$sha_passwd = $_POST['passwrd'];
+			$valid_password = validateLoginPassword($sha_passwd, $user_settings['passwd'], $user_settings['member_name']);
+		}
 
 		// Bad password!  Thought you could fool the database?!
-		if ($user_settings['passwd'] != $sha_passwd)
+		if ($valid_password === false)
 		{
 			// Let's be cautious, no hacking please. thanx.
 			validatePasswordFlood($user_settings['id_member'], $user_settings['passwd_flood']);
 
 			// Maybe we were too hasty... let's try some other authentication methods.
-			$other_passwords = array();
-
-			// None of the below cases will be used most of the time (because the salt is normally set.)
-			if (!empty($modSettings['enable_password_conversion']) && $user_settings['password_salt'] == '')
-			{
-				// YaBB SE, Discus, MD5 (used a lot), SHA-1 (used some), SMF 1.0.x, IkonBoard, and none at all.
-				$other_passwords[] = crypt($_POST['passwrd'], substr($_POST['passwrd'], 0, 2));
-				$other_passwords[] = crypt($_POST['passwrd'], substr($user_settings['passwd'], 0, 2));
-				$other_passwords[] = md5($_POST['passwrd']);
-				$other_passwords[] = sha1($_POST['passwrd']);
-				$other_passwords[] = md5_hmac($_POST['passwrd'], strtolower($user_settings['member_name']));
-				$other_passwords[] = md5($_POST['passwrd'] . strtolower($user_settings['member_name']));
-				$other_passwords[] = md5(md5($_POST['passwrd']));
-				$other_passwords[] = $_POST['passwrd'];
-
-				// This one is a strange one... MyPHP, crypt() on the MD5 hash.
-				$other_passwords[] = crypt(md5($_POST['passwrd']), md5($_POST['passwrd']));
-
-				// Snitz style - SHA-256.  Technically, this is a downgrade, but most PHP configurations don't support sha256 anyway.
-				if (strlen($user_settings['passwd']) == 64 && function_exists('mhash') && defined('MHASH_SHA256'))
-					$other_passwords[] = bin2hex(mhash(MHASH_SHA256, $_POST['passwrd']));
-
-				// phpBB3 users new hashing.  We now support it as well ;).
-				$other_passwords[] = phpBB3_password_check($_POST['passwrd'], $user_settings['passwd']);
-
-				// APBoard 2 Login Method.
-				$other_passwords[] = md5(crypt($_POST['passwrd'], 'CRYPT_MD5'));
-			}
-			// The hash should be 40 if it's SHA-1, so we're safe with more here too.
-			elseif (!empty($modSettings['enable_password_conversion']) && strlen($user_settings['passwd']) == 32)
-			{
-				// vBulletin 3 style hashing?  Let's welcome them with open arms \o/.
-				$other_passwords[] = md5(md5($_POST['passwrd']) . stripslashes($user_settings['password_salt']));
-
-				// Hmm.. p'raps it's Invision 2 style?
-				$other_passwords[] = md5(md5($user_settings['password_salt']) . md5($_POST['passwrd']));
-
-				// Some common md5 ones.
-				$other_passwords[] = md5($user_settings['password_salt'] . $_POST['passwrd']);
-				$other_passwords[] = md5($_POST['passwrd'] . $user_settings['password_salt']);
-			}
-			elseif (strlen($user_settings['passwd']) == 40)
-			{
-				// Maybe they are using a hash from before the password fix.
-				$other_passwords[] = sha1(strtolower($user_settings['member_name']) . un_htmlspecialchars($_POST['passwrd']));
-
-				if (!empty($modSettings['enable_password_conversion']))
-				{
-					// BurningBoard3 style of hashing.
-					$other_passwords[] = sha1($user_settings['password_salt'] . sha1($user_settings['password_salt'] . sha1($_POST['passwrd'])));
-
-					// PunBB 1.4 and later
-					$other_passwords[] = sha1($user_settings['password_salt'] . sha1($_POST['passwrd']));
-				}
-
-				// Perhaps we converted to UTF-8 and have a valid password being hashed differently.
-				if (!empty($modSettings['previousCharacterSet']) && $modSettings['previousCharacterSet'] != 'utf8')
-				{
-					// Try iconv first, for no particular reason.
-					if (function_exists('iconv'))
-						$other_passwords['iconv'] = sha1(strtolower(iconv('UTF-8', $modSettings['previousCharacterSet'], $user_settings['member_name'])) . un_htmlspecialchars(iconv('UTF-8', $modSettings['previousCharacterSet'], $_POST['passwrd'])));
-
-					// Say it aint so, iconv failed!
-					if (empty($other_passwords['iconv']) && function_exists('mb_convert_encoding'))
-						$other_passwords[] = sha1(strtolower(mb_convert_encoding($user_settings['member_name'], 'UTF-8', $modSettings['previousCharacterSet'])) . un_htmlspecialchars(mb_convert_encoding($_POST['passwrd'], 'UTF-8', $modSettings['previousCharacterSet'])));
-				}
-			}
-			elseif (strlen($user_settings['passwd']) == 64 && !empty($modSettings['enable_password_conversion']))
-			{
-				// Yet another downgrade .. PHP-Fusion7
-				$other_passwords[] = hash_hmac('sha256', $_POST['passwrd'], $user_settings['password_salt']);
-
-				// Xenforo?
-				$other_passwords[] = sha1(sha1($_POST['passwrd']) . $user_settings['password_salt']);
-				$other_passwords[] = sha256(sha256($_POST['passwrd']) . $user_settings['password_salt']);
-			}
-
-			// ElkArte's sha1 function can give a funny result on Linux (Not our fault!). If we've now got the real one let the old one be valid!
-			if (stripos(PHP_OS, 'win') !== 0)
-			{
-				require_once(SUBSDIR . '/Compat.subs.php');
-				$other_passwords[] = sha1_smf(strtolower($user_settings['member_name']) . un_htmlspecialchars($_POST['passwrd']));
-			}
-
-			// Allows mods to easily extend the $other_passwords array
-			call_integration_hook('integrate_other_passwords', array(&$other_passwords));
+			$other_passwords = $this->_other_passwords($user_settings, $tk);
 
 			// Whichever encryption it was using, let's make it use ElkArte's now ;).
 			if (in_array($user_settings['passwd'], $other_passwords))
 			{
-				$user_settings['passwd'] = $sha_passwd;
+				$user_settings['passwd'] = validateLoginPassword($sha_passwd, '', '', true);
 				$user_settings['password_salt'] = substr(md5(mt_rand()), 0, 4);
 
-				// Update the password and set up the hash.
+				// Update the password hash and set up the salt.
 				updateMemberData($user_settings['id_member'], array('passwd' => $user_settings['passwd'], 'password_salt' => $user_settings['password_salt'], 'passwd_flood' => ''));
 			}
 			// Okay, they for sure didn't enter the password!
@@ -497,37 +433,6 @@ class Auth_Controller extends Action_Controller
 	}
 
 	/**
-	 * Checks the cookie and update salt.
-	 * If successful, it redirects to action=auth;sa=check.
-	 * Accessed by ?action=auth;sa=salt.
-	 */
-	public function action_salt()
-	{
-		global $user_info, $user_settings, $context, $cookiename;
-
-		// We deal only with logged in folks in here!
-		if (!$user_info['is_guest'])
-		{
-			if (isset($_COOKIE[$cookiename]) && preg_match('~^a:[34]:\{i:0;i:\d{1,8};i:1;s:(0|40):"([a-fA-F0-9]{40})?";i:2;[id]:\d{1,14};(i:3;i:\d;)?\}$~', $_COOKIE[$cookiename]) === 1)
-				list (,, $timeout) = @unserialize($_COOKIE[$cookiename]);
-			elseif (isset($_SESSION['login_' . $cookiename]))
-				list (,, $timeout) = @unserialize($_SESSION['login_' . $cookiename]);
-			else
-				trigger_error('Auth: Cannot be logged in without a session or cookie', E_USER_ERROR);
-
-			$user_settings['password_salt'] = substr(md5(mt_rand()), 0, 4);
-			updateMemberData($user_info['id'], array('password_salt' => $user_settings['password_salt']));
-
-			setLoginCookie($timeout - time(), $user_info['id'], sha1($user_settings['passwd'] . $user_settings['password_salt']));
-
-			redirectexit('action=auth;sa=check;member=' . $user_info['id'], $context['server']['needs_login_fix']);
-		}
-
-		// Lets be sure.
-		redirectexit();
-	}
-
-	/**
 	 * Double check the cookie.
 	 */
 	public function action_check()
@@ -568,6 +473,119 @@ class Auth_Controller extends Action_Controller
 
 		// It'll never get here... until it does :P
 		redirectexit();
+	}
+
+	/**
+	 * Loads other possible password hash / crypts using the post data
+	 * Used when a board is converted to see if the user credentials and a 3rd
+	 * party hash satisfy whats in the db
+	 */
+	private function _other_passwords($user_settings, $tk)
+	{
+		global $modSettings, $sc;
+
+		// What kind of data are we dealing with
+		$pw_strlen = strlen($user_settings['passwd']);
+
+		// Maybe we were too hasty... let's try some other authentication methods.
+		$other_passwords = array();
+
+		// None of the below cases will be used most of the time (because the salt is normally set.)
+		if (!empty($modSettings['enable_password_conversion']) && $user_settings['password_salt'] == '')
+		{
+			// YaBB SE, Discus, MD5 (used a lot), SHA-1 (used some), SMF 1.0.x, IkonBoard, and none at all.
+			$other_passwords[] = crypt($_POST['passwrd'], substr($_POST['passwrd'], 0, 2));
+			$other_passwords[] = crypt($_POST['passwrd'], substr($user_settings['passwd'], 0, 2));
+			$other_passwords[] = md5($_POST['passwrd']);
+			$other_passwords[] = sha1($_POST['passwrd']);
+			$other_passwords[] = md5_hmac($_POST['passwrd'], strtolower($user_settings['member_name']));
+			$other_passwords[] = md5($_POST['passwrd'] . strtolower($user_settings['member_name']));
+			$other_passwords[] = md5(md5($_POST['passwrd']));
+			$other_passwords[] = $_POST['passwrd'];
+
+			// This one is a strange one... MyPHP, crypt() on the MD5 hash.
+			$other_passwords[] = crypt(md5($_POST['passwrd']), md5($_POST['passwrd']));
+
+			// Snitz style - SHA-256.  Technically, this is a downgrade.
+			if ($pw_strlen === 64 && function_exists('mhash') && defined('MHASH_SHA256'))
+				$other_passwords[] = bin2hex(mhash(MHASH_SHA256, $_POST['passwrd']));
+
+			// Normal SHA-256
+			if ($pw_strlen === 64)
+				$other_passwords[] = hash('sha256', $_POST['passwrd']);
+
+			// phpBB3 users new hashing.  We now support it as well ;).
+			$other_passwords[] = phpBB3_password_check($_POST['passwrd'], $user_settings['passwd']);
+
+			// APBoard 2 Login Method.
+			$other_passwords[] = md5(crypt($_POST['passwrd'], 'CRYPT_MD5'));
+		}
+		// The hash should be 40 if it's SHA-1, so we're safe with more here too.
+		elseif (!empty($modSettings['enable_password_conversion']) && $pw_strlen === 32)
+		{
+			// vBulletin 3 style hashing?  Let's welcome them with open arms \o/.
+			$other_passwords[] = md5(md5($_POST['passwrd']) . stripslashes($user_settings['password_salt']));
+
+			// Hmm.. p'raps it's Invision 2 style?
+			$other_passwords[] = md5(md5($user_settings['password_salt']) . md5($_POST['passwrd']));
+
+			// Some common md5 ones.
+			$other_passwords[] = md5($user_settings['password_salt'] . $_POST['passwrd']);
+			$other_passwords[] = md5($_POST['passwrd'] . $user_settings['password_salt']);
+		}
+		// The hash is 40 characters, lets try some SHA-1 style auth
+		elseif ($pw_strlen === 40)
+		{
+			// Maybe they are using a hash from before our password fix.
+			$other_passwords[] = sha1(strtolower($user_settings['member_name']) . un_htmlspecialchars($_POST['passwrd']));
+			$other_passwords[] = sha1($user_settings['passwd'] . $sc . $tk);
+
+			if (!empty($modSettings['enable_password_conversion']))
+			{
+				// BurningBoard3 style of hashing.
+				$other_passwords[] = sha1($user_settings['password_salt'] . sha1($user_settings['password_salt'] . sha1($_POST['passwrd'])));
+
+				// PunBB 1.4 and later
+				$other_passwords[] = sha1($user_settings['password_salt'] . sha1($_POST['passwrd']));
+			}
+
+			// Perhaps we converted from a non UTF-8 db and have a valid password being hashed differently.
+			if (!empty($modSettings['previousCharacterSet']) && $modSettings['previousCharacterSet'] != 'utf8')
+			{
+				// Try iconv first, for no particular reason.
+				if (function_exists('iconv'))
+					$other_passwords['iconv'] = sha1(strtolower(iconv('UTF-8', $modSettings['previousCharacterSet'], $user_settings['member_name'])) . un_htmlspecialchars(iconv('UTF-8', $modSettings['previousCharacterSet'], $_POST['passwrd'])));
+
+				// Say it aint so, iconv failed!
+				if (empty($other_passwords['iconv']) && function_exists('mb_convert_encoding'))
+					$other_passwords[] = sha1(strtolower(mb_convert_encoding($user_settings['member_name'], 'UTF-8', $modSettings['previousCharacterSet'])) . un_htmlspecialchars(mb_convert_encoding($_POST['passwrd'], 'UTF-8', $modSettings['previousCharacterSet'])));
+			}
+		}
+		// SHA-256 will be 64 characters long, lets check some of these possibilities
+		elseif (!empty($modSettings['enable_password_conversion']) && $pw_strlen === 64)
+		{
+			// Yet another downgrade .. PHP-Fusion7
+			$other_passwords[] = hash_hmac('sha256', $_POST['passwrd'], $user_settings['password_salt']);
+
+			// Plain SHA-256?
+			$other_passwords[] = hash('sha256', $_POST['passwrd'] . $user_settings['password_salt']);
+
+			// Xenforo?
+			$other_passwords[] = sha1(sha1($_POST['passwrd']) . $user_settings['password_salt']);
+			$other_passwords[] = hash('sha256', (hash('sha256', ($_POST['passwrd']) . $user_settings['password_salt'])));
+		}
+
+		// ElkArte's sha1 function can give a funny result on Linux (Not our fault!). If we've now got the real one let the old one be valid!
+		if (stripos(PHP_OS, 'win') !== 0)
+		{
+			require_once(SUBSDIR . '/Compat.subs.php');
+			$other_passwords[] = sha1_smf(strtolower($user_settings['member_name']) . un_htmlspecialchars($_POST['passwrd']));
+		}
+
+		// Allows mods to easily extend the $other_passwords array
+		call_integration_hook('integrate_other_passwords', array(&$other_passwords));
+
+		return $other_passwords;
 	}
 }
 
@@ -646,7 +664,7 @@ function doLogin()
 	$user_info['id'] = $user_settings['id_member'];
 
 	// Bam!  Cookie set.  A session too, just in case.
-	setLoginCookie(60 * $modSettings['cookieTime'], $user_settings['id_member'], sha1($user_settings['passwd'] . $user_settings['password_salt']));
+	setLoginCookie(60 * $modSettings['cookieTime'], $user_settings['id_member'], hash('sha256', ($user_settings['passwd'] . $user_settings['password_salt'])));
 
 	// Reset the login threshold.
 	if (isset($_SESSION['failed_login']))
