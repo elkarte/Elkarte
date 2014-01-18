@@ -198,9 +198,9 @@ function template_modify_category()
 	if (count($context['category_order']) > 1)
 	{
 		echo '
-						<dt><strong>', $txt['order'], ':</strong></dt>
+						<dt><strong><label for="cat_order">', $txt['order'], '</label>:</strong></dt>
 						<dd>
-							<select name="cat_order">';
+							<select id="cat_order" name="cat_order">';
 
 		// Print every existing category into a select box.
 		foreach ($context['category_order'] as $order)
@@ -215,11 +215,11 @@ function template_modify_category()
 	// Allow the user to edit the category name and/or choose whether you can collapse the category.
 	echo '
 						<dt>
-							<strong>', $txt['full_name'], ':</strong><br />
+							<strong><label for="cat_name">', $txt['full_name'], '</label>:</strong><br />
 							<span class="smalltext">', $txt['name_on_display'], '</span>
 						</dt>
 						<dd>
-							<input type="text" name="cat_name" value="', $context['category']['editable_name'], '" size="30" tabindex="', $context['tabindex']++, '" class="input_text" />
+							<input type="text" id="cat_name" name="cat_name" value="', $context['category']['editable_name'], '" size="30" tabindex="', $context['tabindex']++, '" class="input_text" />
 						</dd>
 						<dt>
 							<strong>' . $txt['collapse_enable'] . '</strong><br />
@@ -337,10 +337,10 @@ function template_modify_board()
 	echo '
 
 						<dt>
-							<strong>', $txt['mboards_category'], ':</strong>
+							<strong><label for="new_cat">', $txt['mboards_category'], '</label>:</strong>
 						</dt>
 						<dd>
-							<select name="new_cat" onchange="if (this.form.order) {this.form.order.disabled = this.options[this.selectedIndex].value != 0; this.form.board_order.disabled = this.options[this.selectedIndex].value != 0 || this.form.order.options[this.form.order.selectedIndex].value == \'\';}">';
+							<select id="new_cat" name="new_cat" onchange="if (this.form.order) {this.form.order.disabled = this.options[this.selectedIndex].value != 0; this.form.board_order.disabled = this.options[this.selectedIndex].value != 0 || this.form.order.options[this.form.order.selectedIndex].value == \'\';}">';
 
 	foreach ($context['categories'] as $category)
 		echo '
@@ -355,7 +355,7 @@ function template_modify_board()
 	{
 		echo '
 						<dt>
-							<strong>', $txt['order'], ':</strong>
+							<strong><label for="order">', $txt['order'], '</label>:</strong>
 						</dt>
 						<dd>';
 
@@ -385,25 +385,25 @@ function template_modify_board()
 	// Options for board name and description.
 	echo '
 						<dt>
-							<strong>', $txt['full_name'], ':</strong><br />
+							<strong><label for="board_name">', $txt['full_name'], '</label>:</strong><br />
 							<span class="smalltext">', $txt['name_on_display'], '</span>
 						</dt>
 						<dd>
-							<input type="text" name="board_name" value="', $context['board']['name'], '" size="30" class="input_text" />
+							<input type="text" id="board_name" name="board_name" value="', $context['board']['name'], '" size="30" class="input_text" />
 						</dd>
 						<dt>
-							<strong>', $txt['mboards_description'], ':</strong><br />
+							<strong><label for="desc">', $txt['mboards_description'], '</label>:</strong><br />
 							<span class="smalltext">', $txt['mboards_description_desc'], '</span>
 						</dt>
 						<dd>
-							<textarea name="desc" rows="3" cols="35" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 99%; min-width: 99%' : 'width: 99%') . ';">', $context['board']['description'], '</textarea>
+							<textarea id="desc" name="desc" rows="3" cols="35" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 99%; min-width: 99%' : 'width: 99%') . ';">', $context['board']['description'], '</textarea>
 						</dd>
 						<dt>
-							<strong>', $txt['permission_profile'], ':</strong><br />
+							<strong><label for="profile">', $txt['permission_profile'], '</label>:</strong><br />
 							<span class="smalltext">', $context['can_manage_permissions'] ? sprintf($txt['permission_profile_desc'], $scripturl . '?action=admin;area=permissions;sa=profiles;' . $context['session_var'] . '=' . $context['session_id']) : strip_tags($txt['permission_profile_desc']), '</span>
 						</dt>
 						<dd>
-							<select name="profile">';
+							<select id="profile" name="profile">';
 
 	if (isset($context['board']['is_new']))
 		echo '
@@ -450,11 +450,9 @@ function template_modify_board()
 			echo '
 								<tr>
 									<td>
-										<label for="groups_', $group['id'], '_a">
-											<span', $group['is_post_group'] ? ' class="post_group" title="' . $txt['mboards_groups_post_group'] . '"' : '', $group['id'] == 0 ? ' class="regular_members" title="' . $txt['mboards_groups_regular_members'] . '"' : '', '>
-												', $group['name'], '
-											</span>
-										</label>
+										<span', $group['is_post_group'] ? ' class="post_group" title="' . $txt['mboards_groups_post_group'] . '"' : '', $group['id'] == 0 ? ' class="regular_members" title="' . $txt['mboards_groups_regular_members'] . '"' : '', '>
+											', $group['name'], '
+										</span>
 									</td>
 									<td>
 										<input type="radio" name="groups[', $group['id'], ']" value="allow" id="groups_', $group['id'], '_a"', $group['allow'] ? ' checked="checked"' : '', ' class="input_radio" />
@@ -471,7 +469,7 @@ function template_modify_board()
 	if (empty($modSettings['deny_boards_access']))
 		echo '
 							<span class="select_all_box">
-								<em>', $txt['check_all'], '</em> <input type="checkbox" class="input_check" onclick="invertAll(this, this.form, \'groups[\');" />
+								<em><label for="check_all">', $txt['check_all'], '</label></em> <input type="checkbox" id="check_all" class="input_check" onclick="invertAll(this, this.form, \'groups[\');" />
 							</span>
 							<br />
 							<br />
@@ -500,7 +498,7 @@ function template_modify_board()
 	// Options to choose moderators, specify as announcement board and choose whether to count posts here.
 	echo '
 						<dt>
-							<strong>', $txt['mboards_moderators'], ':</strong><br />
+							<strong><label for="moderators">', $txt['mboards_moderators'], '</label>:</strong><br />
 							<span class="smalltext">', $txt['mboards_moderators_desc'], '</span><br />
 						</dt>
 						<dd>
@@ -524,11 +522,11 @@ function template_modify_board()
 		echo '
 					<dl class="settings">
 						<dt>
-							<strong', $context['board']['topics'] ? ' style="color: gray;"' : '', '>', $txt['mboards_redirect'], ':</strong><br />
+							<strong><label for="redirect_enable">', $txt['mboards_redirect'], '</label>:</strong><br />
 							<span class="smalltext">', $txt['mboards_redirect_desc'], '</span><br />
 						</dt>
 						<dd>
-							<input type="checkbox" id="redirect_enable" name="redirect_enable"', $context['board']['topics'] ? ' disabled="disabled"' : '', $context['board']['redirect'] != '' ? ' checked="checked"' : '', ' onclick="refreshOptions();" class="input_check" />
+							<input type="checkbox" id="redirect_enable" name="redirect_enable"', $context['board']['redirect'] != '' ? ' checked="checked"' : '', ' onclick="refreshOptions();" class="input_check" />
 						</dd>
 					</dl>';
 
@@ -549,11 +547,11 @@ function template_modify_board()
 					<div id="redirect_address_div">
 						<dl class="settings">
 							<dt>
-								<strong>', $txt['mboards_redirect_url'], ':</strong><br />
+								<strong><label for="redirect_address">', $txt['mboards_redirect_url'], '</label>:</strong><br />
 								<span class="smalltext">', $txt['mboards_redirect_url_desc'], '</span><br />
 							</dt>
 							<dd>
-								<input type="text" name="redirect_address" value="', $context['board']['redirect'], '" size="40" class="input_text" />
+								<input type="text" id="redirect_address" name="redirect_address" value="', $context['board']['redirect'], '" size="40" class="input_text" />
 							</dd>
 						</dl>
 					</div>';
@@ -563,11 +561,11 @@ function template_modify_board()
 					<div id="reset_redirect_div">
 						<dl class="settings">
 							<dt>
-								<strong>', $txt['mboards_redirect_reset'], ':</strong><br />
+								<strong><label for="reset_redirect">', $txt['mboards_redirect_reset'], '</label>:</strong><br />
 								<span class="smalltext">', $txt['mboards_redirect_reset_desc'], '</span><br />
 							</dt>
 							<dd>
-								<input type="checkbox" name="reset_redirect" class="input_check" />
+								<input type="checkbox" id="reset_redirect" name="reset_redirect" class="input_check" />
 								<em>(', sprintf($txt['mboards_current_redirects'], $context['board']['posts']), ')</em>
 							</dd>
 						</dl>
@@ -578,11 +576,11 @@ function template_modify_board()
 					<div id="count_posts_div">
 						<dl class="settings">
 							<dt>
-								<strong>', $txt['mboards_count_posts'], ':</strong><br />
+								<strong><label for="count">', $txt['mboards_count_posts'], '</label>:</strong><br />
 								<span class="smalltext">', $txt['mboards_count_posts_desc'], '</span><br />
 							</dt>
 							<dd>
-								<input type="checkbox" name="count" ', $context['board']['count_posts'] ? ' checked="checked"' : '', ' class="input_check" />
+								<input type="checkbox" id="count" name="count" ', $context['board']['count_posts'] ? ' checked="checked"' : '', ' class="input_check" />
 							</dd>
 						</dl>
 					</div>';
@@ -592,7 +590,7 @@ function template_modify_board()
 					<div id="board_theme_div">
 						<dl class="settings">
 							<dt>
-								<strong>', $txt['mboards_theme'], ':</strong><br />
+								<strong><label for="boardtheme">', $txt['mboards_theme'], '</label>:</strong><br />
 								<span class="smalltext">', $txt['mboards_theme_desc'], '</span><br />
 							</dt>
 							<dd>
@@ -611,11 +609,11 @@ function template_modify_board()
 					<div id="override_theme_div">
 						<dl class="settings">
 							<dt>
-								<strong>', $txt['mboards_override_theme'], ':</strong><br />
+								<strong><label for="override_theme">', $txt['mboards_override_theme'], '</label>:</strong><br />
 								<span class="smalltext">', $txt['mboards_override_theme_desc'], '</span><br />
 							</dt>
 							<dd>
-								<input type="checkbox" name="override_theme"', $context['board']['override_theme'] ? ' checked="checked"' : '', ' class="input_check" />
+								<input type="checkbox" id="override_theme" name="override_theme"', $context['board']['override_theme'] ? ' checked="checked"' : '', ' class="input_check" />
 							</dd>
 						</dl>
 					</div>';
