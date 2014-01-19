@@ -99,6 +99,7 @@ class authorize_display
 		$return_data['hidden']['x_type'] = 'AUTH_CAPTURE';
 		$return_data['hidden']['x_cust_id'] = $context['user']['name'];
 		$return_data['hidden']['x_relay_url'] = $boardurl . '/subscriptions.php';
+		$return_data['hidden']['x_receipt_link_url'] = $return_url;
 
 		return $return_data;
 	}
