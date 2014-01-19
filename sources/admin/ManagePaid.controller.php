@@ -612,7 +612,7 @@ class ManagePaid_Controller extends Action_Controller
 			'base_href' => $scripturl . '?action=admin;area=paidsubscribe;sa=viewsub;sid=' . $context['sub_id'],
 			'default_sort_col' => 'name',
 			'get_items' => array(
-				'function' => 'list_getSubscribedUsers',
+				'function' => array($this, 'getSubscribedUsers'),
 				'params' => array(
 					$context['sub_id'],
 					$search_string,
@@ -620,7 +620,7 @@ class ManagePaid_Controller extends Action_Controller
 				),
 			),
 			'get_count' => array(
-				'function' => 'list_getSubscribedUserCount',
+				'function' => array($this, 'getSubscribedUserCount'),
 				'params' => array(
 					$context['sub_id'],
 					$search_string,
@@ -761,8 +761,32 @@ class ManagePaid_Controller extends Action_Controller
 	}
 
 	/**
+	 * Callback for createList(),
+	 * Returns the number of subscribers to a specific subscription in the system
+	 *
+	 * @param int $messageID
+	 */
+	public function getSubscribedUserCount($id_sub, $search_string, $search_vars)
+	{
+	   return list_getSubscribedUserCount($id_sub, $search_string, $search_vars);
+	}
+
+	/**
+	 * Callback for createList()
+	 * Returns an array of subscription details and members for a specific subscription
+	 *
+	 * @param int $start
+	 * @param int $items_per_page
+	 * @param string $sort
+	 */
+	public function getSubscribedUsers($start, $items_per_page, $sort, $id_sub, $search_string, $search_vars)
+	{
+		return list_getSubscribedUsers($start, $items_per_page, $sort, $id_sub, $search_string, $search_vars);
+	}
+
+	/**
 	 * Edit or add a user subscription.
-	 * Accessed from ?action=admin;area=paidsubscribe;sa=modifyuser.
+	 * Accessed from ?action=admin;area=paidsubscribe;sa=modifyuser
 	 */
 	public function action_modifyuser()
 	{
