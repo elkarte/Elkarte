@@ -953,7 +953,7 @@ function prepareDeleteSubscriptions($toDelete)
 }
 
 /**
- * Get all the pending subscriptions.
+ * Get all the pending subscriptions for a specific subscription id
  *
  * @param int $log_id
  * @return array
@@ -1005,6 +1005,28 @@ function logSubscription($details)
 }
 
 /**
+ * Somebody paid the first time? Let's log ...
+ *
+ * @param array $details
+ */
+function logNewSubscription($sub_id, $memID, $pending_details)
+{
+	$db = database();
+
+	$db->insert('',
+		'{db_prefix}log_subscribed',
+		array(
+			'id_subscribe' => 'int', 'id_member' => 'int', 'status' => 'int', 'payments_pending' => 'int',
+			'pending_details' => 'string-65534', 'start_time' => 'int', 'vendor_ref' => 'string-255',
+		),
+		array(
+			$sub_id, $memID, 0, 0, $pending_details, time(), '',
+		),
+		array('id_sublog')
+	);
+}
+
+/**
  * Updated details for a pending subscription? Logging..
  *
  * @param int $log_id
@@ -1044,6 +1066,31 @@ function updateActiveSubscription($sub_id, $memID, $details)
 			AND id_member = {int:selected_member}',
 		array(
 			'current_subscription_id' => $sub_id,
+			'selected_member' => $memID,
+			'pending_details' => $details,
+		)
+	);
+}
+
+/**
+ * Updated details for a pending subscription
+ *
+ * @param int $log_id
+ * @param int $memID
+ * @param string $details
+ */
+function updatePendingSubscriptionFull($pending_count, $sub_id,  $memID, $details)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}log_subscribed
+		SET payments_pending = {int:pending_count}, pending_details = {string:pending_details}
+		WHERE id_sublog = {int:current_subscription_item}
+			AND id_member = {int:selected_member}',
+		array(
+			'pending_count' => $pending_count,
+			'current_subscription_item' => $sub_id,
 			'selected_member' => $memID,
 			'pending_details' => $details,
 		)

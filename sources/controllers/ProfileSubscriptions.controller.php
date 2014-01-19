@@ -102,7 +102,7 @@ class ProfileSubscriptions_Controller extends Action_Controller
 		// Get the members current subscriptions.
 		$context['current'] = loadMemberSubscription($memID, $context['subscriptions']);
 
-		// id the subscribes ones
+		// id the subscribed ones
 		foreach ($context['current'] as $id => $current)
 		{
 			if ($current['status'] == 1)
@@ -202,7 +202,7 @@ class ProfileSubscriptions_Controller extends Action_Controller
 				}
 			}
 
-			// Bugger?!
+			// No active payments, then no way to pay, time to bail out
 			if (empty($context['gateways']))
 				fatal_error($txt['paid_admin_not_setup_gateway']);
 
@@ -231,38 +231,14 @@ class ProfileSubscriptions_Controller extends Action_Controller
 				{
 					$current_pending[] = $new_data;
 					$pending_details = serialize($current_pending);
-
-					$db->query('', '
-						UPDATE {db_prefix}log_subscribed
-						SET payments_pending = {int:pending_count}, pending_details = {string:pending_details}
-						WHERE id_sublog = {int:current_subscription_item}
-							AND id_member = {int:selected_member}',
-						array(
-							'pending_count' => $pending_count,
-							'current_subscription_item' => $context['current'][$context['sub']['id']]['id'],
-							'selected_member' => $memID,
-							'pending_details' => $pending_details,
-						)
-					);
+					updatePendingSubscriptionFull($pending_count, $context['current'][$context['sub']['id']]['id'], $memID, $pending_details);
 				}
-
 			}
 			// Never had this before, lovely.
 			else
 			{
 				$pending_details = serialize(array($new_data));
-				$db->insert('',
-					'{db_prefix}log_subscribed',
-					array(
-						'id_subscribe' => 'int', 'id_member' => 'int', 'status' => 'int', 'payments_pending' => 'int', 'pending_details' => 'string-65534',
-						'start_time' => 'int', 'vendor_ref' => 'string-255',
-					),
-					array(
-						$context['sub']['id'], $memID, 0, 0, $pending_details,
-						time(), '',
-					),
-					array('id_sublog')
-				);
+				logNewSubscription($context['sub']['id'], $memID, $pending_details);
 			}
 
 			// Change the template.
