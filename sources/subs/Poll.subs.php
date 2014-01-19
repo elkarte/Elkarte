@@ -224,6 +224,41 @@ function pollInfoForTopic($topicID)
 }
 
 /**
+ * Retrieve the id of the topic associated to a poll
+ *
+ * @param int $pollID the topic with an associated poll.
+ * @return int the topic id, false if no topics found
+ */
+function topicFromPoll($pollID)
+{
+	$db = database();
+
+	// Check if a poll currently exists on this topic, and get the id, question and starter.
+	$request = $db->query('', '
+		SELECT
+			t.id_topic
+		FROM {db_prefix}topics AS t
+			LEFT JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
+		WHERE p.id_poll = {int:current_poll}
+		LIMIT 1',
+		array(
+			'current_poll' => $pollID,
+		)
+	);
+
+	// The topic must exist
+	if ($db->num_rows($request) == 0)
+		$topicID = false;
+	// Get the poll information.
+	else
+		list ($topicID) = $db->fetch_row($request);
+
+	$db->free_result($request);
+
+	return $topicID;
+}
+
+/**
  * Return poll options, customized for a given member.
  * The function adds to poll options the information if the user
  * has voted in this poll.

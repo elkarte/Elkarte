@@ -1468,9 +1468,11 @@ function ssi_showPoll($topic = null, $output_method = 'echo')
  */
 function ssi_pollVote()
 {
-	global $context, $db_prefix, $user_info, $sc, $modSettings;
+	global $context, $db_prefix, $user_info, $sc, $modSettings, $topic;
 
-	if (!isset($_POST[$context['session_var']]) || $_POST[$context['session_var']] != $sc || empty($_POST['options']) || !isset($_POST['poll']))
+	$pollID = isset($_POST['poll']) ? (int) $_POST['poll'] : 0;
+
+	if (empty($pollID) || !isset($_POST[$context['session_var']]) || $_POST[$context['session_var']] != $sc || empty($_POST['options']))
 	{
 		echo '<!DOCTYPE html>
 <html>
@@ -1484,95 +1486,16 @@ function ssi_pollVote()
 		return;
 	}
 
-	// This can cause weird errors! (ie. copyright missing.)
-	checkSession();
+	require_once(CONTROLLERDIR . '/Poll.controller.php');
+	require_once(SUBSDIR . '/Poll.subs.php');
+	// We fake we are in a topic so that we can use the proper controller
+	$topic = topicFromPoll($pollID);
+	loadBoard();
 
-	$_POST['poll'] = (int) $_POST['poll'];
+	$poll_action = new Poll_Controller();
 
-	$db = database();
-
-	// Check if they have already voted, or voting is locked.
-	$request = $db->query('', '
-		SELECT
-			p.id_poll, p.voting_locked, p.expire_time, p.max_votes, p.guest_vote,
-			t.id_topic,
-			IFNULL(lp.id_choice, -1) AS selected
-		FROM {db_prefix}polls AS p
-			INNER JOIN {db_prefix}topics AS t ON (t.id_poll = {int:current_poll})
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
-			LEFT JOIN {db_prefix}log_polls AS lp ON (lp.id_poll = p.id_poll AND lp.id_member = {int:current_member})
-		WHERE p.id_poll = {int:current_poll}
-			AND {query_see_board}' . ($modSettings['postmod_active'] ? '
-			AND t.approved = {int:is_approved}' : '') . '
-		LIMIT 1',
-		array(
-			'current_member' => $user_info['id'],
-			'current_poll' => $_POST['poll'],
-			'is_approved' => 1,
-		)
-	);
-	if ($db->num_rows($request) == 0)
-		die;
-	$row = $db->fetch_assoc($request);
-	$db->free_result($request);
-
-	if (!empty($row['voting_locked']) || ($row['selected'] != -1 && !$user_info['is_guest']) || (!empty($row['expire_time']) && time() > $row['expire_time']))
-		redirectexit('topic=' . $row['id_topic'] . '.0');
-
-	// Too many options checked?
-	if (count($_REQUEST['options']) > $row['max_votes'])
-		redirectexit('topic=' . $row['id_topic'] . '.0');
-
-	// It's a guest who has already voted?
-	if ($user_info['is_guest'])
-	{
-		// Guest voting disabled?
-		if (!$row['guest_vote'])
-			redirectexit('topic=' . $row['id_topic'] . '.0');
-		// Already voted?
-		elseif (isset($_COOKIE['guest_poll_vote']) && in_array($row['id_poll'], explode(',', $_COOKIE['guest_poll_vote'])))
-			redirectexit('topic=' . $row['id_topic'] . '.0');
-	}
-
-	$options = array();
-	$inserts = array();
-	foreach ($_REQUEST['options'] as $id)
-	{
-		$id = (int) $id;
-
-		$options[] = $id;
-		$inserts[] = array($_POST['poll'], $user_info['id'], $id);
-	}
-
-	// Add their vote in to the tally.
-	$db->insert('insert',
-		$db_prefix . 'log_polls',
-		array('id_poll' => 'int', 'id_member' => 'int', 'id_choice' => 'int'),
-		$inserts,
-		array('id_poll', 'id_member', 'id_choice')
-	);
-	$db->query('', '
-		UPDATE {db_prefix}poll_choices
-		SET votes = votes + 1
-		WHERE id_poll = {int:current_poll}
-			AND id_choice IN ({array_int:option_list})',
-		array(
-			'option_list' => $options,
-			'current_poll' => $_POST['poll'],
-		)
-	);
-
-	// Track the vote if a guest.
-	if ($user_info['is_guest'])
-	{
-		$_COOKIE['guest_poll_vote'] = !empty($_COOKIE['guest_poll_vote']) ? ($_COOKIE['guest_poll_vote'] . ',' . $row['id_poll']) : $row['id_poll'];
-
-		require_once(SUBSDIR . '/Auth.subs.php');
-		$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
-		elk_setcookie('guest_poll_vote', $_COOKIE['guest_poll_vote'], time() + 2500000, $cookie_url[1], $cookie_url[0], false, false);
-	}
-
-	redirectexit('topic=' . $row['id_topic'] . '.0');
+	// The controller takes already care of redirecting properly or fail
+	$poll_action->action_vote();
 }
 
 /**
