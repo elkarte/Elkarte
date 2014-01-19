@@ -538,7 +538,7 @@ function loadSubscriptions()
  * @param int $memID id of the member
  * @param type $active_subscriptions array of active susbcriptions they can have
  */
-function loadMemberSubscription($memID, $active_subscriptions)
+function loadMemberSubscriptions($memID, $active_subscriptions)
 {
 	global $txt;
 
@@ -1049,37 +1049,13 @@ function updatePendingSubscription($sub_id, $details)
 }
 
 /**
- * Updated details for a activated subscription
+ * Updates the number of pending subscriptions for a given product and user
  *
  * @param int $log_id
  * @param int $memID
  * @param string $details
  */
-function updateActiveSubscription($sub_id, $memID, $details)
-{
-	$db = database();
-
-	$db->query('', '
-		UPDATE {db_prefix}log_subscribed
-		SET payments_pending = payments_pending + 1, pending_details = {string:pending_details}
-		WHERE id_sublog = {int:current_subscription_id}
-			AND id_member = {int:selected_member}',
-		array(
-			'current_subscription_id' => $sub_id,
-			'selected_member' => $memID,
-			'pending_details' => $details,
-		)
-	);
-}
-
-/**
- * Updated details for a pending subscription
- *
- * @param int $log_id
- * @param int $memID
- * @param string $details
- */
-function updatePendingSubscriptionFull($pending_count, $sub_id,  $memID, $details)
+function updatePendingSubscriptionCount($pending_count, $sub_id, $memID, $details)
 {
 	$db = database();
 
@@ -1091,6 +1067,33 @@ function updatePendingSubscriptionFull($pending_count, $sub_id,  $memID, $detail
 		array(
 			'pending_count' => $pending_count,
 			'current_subscription_item' => $sub_id,
+			'selected_member' => $memID,
+			'pending_details' => $details,
+		)
+	);
+}
+
+/**
+ * Update a pending payment for a memmber
+ * Generally used to change the status from prepay to payback to indicate that the user completed
+ * the order screen and was redirected to the thank you screen (from the gateway).
+ * Note the payment is still pending until the gateway posts to subscriptions.php and its validated
+ *
+ * @param int $log_id
+ * @param int $memID
+ * @param string $details
+ */
+function updatePendingStatus($sub_id, $memID, $details)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}log_subscribed
+		SET payments_pending = payments_pending + 1, pending_details = {string:pending_details}
+		WHERE id_sublog = {int:current_subscription_id}
+			AND id_member = {int:selected_member}',
+		array(
+			'current_subscription_id' => $sub_id,
 			'selected_member' => $memID,
 			'pending_details' => $details,
 		)

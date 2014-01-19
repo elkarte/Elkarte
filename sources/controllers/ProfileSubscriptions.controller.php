@@ -39,7 +39,7 @@ class ProfileSubscriptions_Controller extends Action_Controller
 	 */
 	public function action_subscriptions()
 	{
-		global $context, $txt, $modSettings, $scripturl;
+		global $context, $txt;
 
 		// Load the paid template anyway.
 		loadTemplate('ManagePaid');
@@ -96,9 +96,9 @@ class ProfileSubscriptions_Controller extends Action_Controller
 			fatal_error($txt['paid_admin_not_setup_gateway']);
 
 		// Get the members current subscriptions.
-		$context['current'] = loadMemberSubscription($memID, $context['subscriptions']);
+		$context['current'] = loadMemberSubscriptions($memID, $context['subscriptions']);
 
-		// Find the subscribed ones
+		// Find the active subscribed ones
 		foreach ($context['current'] as $id => $current)
 		{
 			if ($current['status'] == 1)
@@ -117,7 +117,7 @@ class ProfileSubscriptions_Controller extends Action_Controller
 	}
 
 	/**
-	 * Called when the user selects Order from the subsctiption page
+	 * Called when the user selects Order from the subscription page
 	 * accessed with ?action=profile;u=123;area=subscriptions;confirm
 	 */
 	private function _confirmOrder($gateways, $memID)
@@ -128,7 +128,7 @@ class ProfileSubscriptions_Controller extends Action_Controller
 		foreach ($_POST['sub_id'] as $k => $v)
 			$id_sub = (int) $k;
 
-		// Selecting a subscrption that does not exist or is not active?
+		// Selecting a subscription that does not exist or is not active?
 		if (!isset($context['subscriptions'][$id_sub]) || $context['subscriptions'][$id_sub]['active'] == 0)
 			fatal_lang_error('paid_sub_not_active');
 
@@ -190,6 +190,8 @@ class ProfileSubscriptions_Controller extends Action_Controller
 
 		// Now we are going to assume they want to take this out ;)
 		$new_data = array($order['id'], $context['value'], $period, 'prepay');
+
+		// They have one of these already?
 		if (isset($context['current'][$order['id']]))
 		{
 			// What are the details like?
@@ -209,11 +211,12 @@ class ProfileSubscriptions_Controller extends Action_Controller
 					$pending_count++;
 			}
 
+			// If its already pending, don't increase the pending count
 			if (!in_array($new_data, $current_pending))
 			{
 				$current_pending[] = $new_data;
 				$pending_details = serialize($current_pending);
-				updatePendingSubscriptionFull($pending_count, $context['current'][$order['id']]['id'], $memID, $pending_details);
+				updatePendingSubscriptionCount($pending_count, $context['current'][$order['id']]['id'], $memID, $pending_details);
 			}
 		}
 		// Never had this before, lovely.
@@ -244,15 +247,16 @@ class ProfileSubscriptions_Controller extends Action_Controller
 		// Must exist but let's be sure...
 		if (isset($context['current'][$sub_id]))
 		{
-			// What are the details?
+			// What are the pending details?
 			$current_pending = @unserialize($context['current'][$sub_id]['pending_details']);
 
+			// Nothing pending, nothing to do
 			if (!empty($current_pending))
 			{
 				$current_pending = array_reverse($current_pending);
 				foreach ($current_pending as $id => $sub)
 				{
-					// Just find one and change it.
+					// Just find one and change it to payback
 					if ($sub[0] == $sub_id && $sub[3] == 'prepay')
 					{
 						$current_pending[$id][3] = 'payback';
@@ -262,7 +266,7 @@ class ProfileSubscriptions_Controller extends Action_Controller
 
 				// Save the details back.
 				$pending_details = serialize($current_pending);
-				updateActiveSubscription($context['current'][$sub_id]['id'], $memID, $pending_details);
+				updatePendingStatus($context['current'][$sub_id]['id'], $memID, $pending_details);
 			}
 		}
 
