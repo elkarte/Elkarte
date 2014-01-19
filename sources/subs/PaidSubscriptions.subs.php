@@ -1007,10 +1007,10 @@ function logSubscription($details)
 /**
  * Updated details for a pending subscription? Logging..
  *
- * @param id $log_id
+ * @param int $log_id
  * @param string $details
  */
-function updatePendingSubscription($log_id, $details)
+function updatePendingSubscription($sub_id, $details)
 {
 	$db = database();
 
@@ -1020,7 +1020,31 @@ function updatePendingSubscription($log_id, $details)
 		SET payments_pending = payments_pending - 1, pending_details = {string:pending_details}
 		WHERE id_sublog = {int:current_subscription_item}',
 		array(
-			'current_subscription_item' => $log_id,
+			'current_subscription_item' => $sub_id,
+			'pending_details' => $details,
+		)
+	);
+}
+
+/**
+ * Updated details for a activated subscription
+ *
+ * @param int $log_id
+ * @param int $memID
+ * @param string $details
+ */
+function updateActiveSubscription($sub_id, $memID, $details)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}log_subscribed
+		SET payments_pending = payments_pending + 1, pending_details = {string:pending_details}
+		WHERE id_sublog = {int:current_subscription_id}
+			AND id_member = {int:selected_member}',
+		array(
+			'current_subscription_id' => $sub_id,
+			'selected_member' => $memID,
 			'pending_details' => $details,
 		)
 	);

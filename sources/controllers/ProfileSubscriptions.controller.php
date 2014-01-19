@@ -134,18 +134,7 @@ class ProfileSubscriptions_Controller extends Action_Controller
 
 					// Save the details back.
 					$pending_details = serialize($current_pending);
-
-					$db->query('', '
-						UPDATE {db_prefix}log_subscribed
-						SET payments_pending = payments_pending + 1, pending_details = {string:pending_details}
-						WHERE id_sublog = {int:current_subscription_id}
-							AND id_member = {int:selected_member}',
-						array(
-							'current_subscription_id' => $context['current'][$_GET['sub_id']]['id'],
-							'selected_member' => $memID,
-							'pending_details' => $pending_details,
-						)
-					);
+					updateActiveSubscription($context['current'][$_GET['sub_id']]['id'], $memID, $pending_details);
 				}
 			}
 
@@ -158,16 +147,16 @@ class ProfileSubscriptions_Controller extends Action_Controller
 		{
 			// Hopefully just one.
 			foreach ($_POST['sub_id'] as $k => $v)
-				$ID_SUB = (int) $k;
+				$id_sub = (int) $k;
 
-			if (!isset($context['subscriptions'][$ID_SUB]) || $context['subscriptions'][$ID_SUB]['active'] == 0)
+			if (!isset($context['subscriptions'][$id_sub]) || $context['subscriptions'][$id_sub]['active'] == 0)
 				fatal_lang_error('paid_sub_not_active');
 
 			// Simplify...
-			$context['sub'] = $context['subscriptions'][$ID_SUB];
+			$context['sub'] = $context['subscriptions'][$id_sub];
 			$period = 'xx';
 			if ($context['sub']['flexible'])
-				$period = isset($_POST['cur'][$ID_SUB]) && isset($context['sub']['costs'][$_POST['cur'][$ID_SUB]]) ? $_POST['cur'][$ID_SUB] : 'xx';
+				$period = isset($_POST['cur'][$id_sub]) && isset($context['sub']['costs'][$_POST['cur'][$id_sub]]) ? $_POST['cur'][$id_sub] : 'xx';
 
 			// Check we have a valid cost.
 			if ($context['sub']['flexible'] && $period == 'xx')
@@ -180,11 +169,11 @@ class ProfileSubscriptions_Controller extends Action_Controller
 			if ($context['sub']['flexible'])
 			{
 				// Real cost...
-				$context['value'] = $context['sub']['costs'][$_POST['cur'][$ID_SUB]];
-				$context['cost'] = sprintf($modSettings['paid_currency_symbol'], $context['value']) . '/' . $txt[$_POST['cur'][$ID_SUB]];
+				$context['value'] = $context['sub']['costs'][$_POST['cur'][$id_sub]];
+				$context['cost'] = sprintf($modSettings['paid_currency_symbol'], $context['value']) . '/' . $txt[$_POST['cur'][$id_sub]];
 
 				// The period value for paypal.
-				$context['paypal_period'] = strtoupper(substr($_POST['cur'][$ID_SUB], 0, 1));
+				$context['paypal_period'] = strtoupper(substr($_POST['cur'][$id_sub], 0, 1));
 			}
 			else
 			{
