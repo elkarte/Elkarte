@@ -15,7 +15,7 @@
  * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
- * 
+ *
  */
 
 // Start things rolling by getting the forum alive...
@@ -23,12 +23,10 @@ $ssi_guest_access = true;
 if (!file_exists(dirname(__FILE__) . '/SSI.php'))
 	die('Cannot find SSI.php');
 
+// Need lots of help
 require_once(dirname(__FILE__) . '/SSI.php');
 require_once(ADMINDIR . '/ManagePaid.php');
-
-// For any admin emailing.
 require_once(SUBSDIR . '/Admin.subs.php');
-
 require_once(SUBSDIR . '/Members.subs.php');
 
 loadLanguage('ManagePaid');
@@ -89,6 +87,7 @@ if (empty($member_id))
 
 // Verify the member.
 $member_info = getBasicMemberData($member_id);
+
 // Didn't find them?
 if (empty($member_info))
 	generateSubscriptionError(sprintf($txt['paid_could_not_find_member'], $member_id));
@@ -122,7 +121,7 @@ $request = $db->query('', '
 		'current_member' => $member_id,
 	)
 );
-if ($db->num_rows($request) === 0)
+if ($db->num_rows($request) == 0)
 	generateSubscriptionError(sprintf($txt['paid_count_not_find_subscription_log'], $member_id, $subscription_id));
 $subscription_info += $db->fetch_assoc($request);
 $db->free_result($request);
@@ -145,7 +144,6 @@ if ($gatewayClass->isRefund())
 
 		emailAdmins('paid_subscription_refund', $replacements, $notify_users);
 	}
-
 }
 // Otherwise is it what we want, a purchase?
 elseif ($gatewayClass->isPayment() || $gatewayClass->isSubscription())
