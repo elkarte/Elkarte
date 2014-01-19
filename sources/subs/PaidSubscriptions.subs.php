@@ -533,6 +533,52 @@ function loadSubscriptions()
 }
 
 /**
+ * Loads all of the members subscriptions from those that are active
+ *
+ * @param int $memID id of the member
+ * @param type $active_subscriptions array of active susbcriptions they can have
+ */
+function loadMemberSubscription($memID, $active_subscriptions)
+{
+	global $txt;
+
+	$db = database();
+
+	// Get the current subscriptions.
+	$request = $db->query('', '
+		SELECT
+			id_sublog, id_subscribe, start_time, end_time, status, payments_pending, pending_details
+		FROM {db_prefix}log_subscribed
+		WHERE id_member = {int:selected_member}',
+		array(
+			'selected_member' => $memID,
+		)
+	);
+	$current = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		// The subscription must exist!
+		if (!isset($active_subscriptions[$row['id_subscribe']]))
+			continue;
+
+		$current[$row['id_subscribe']] = array(
+			'id' => $row['id_sublog'],
+			'sub_id' => $row['id_subscribe'],
+			'hide' => $row['status'] == 0 && $row['end_time'] == 0 && $row['payments_pending'] == 0,
+			'name' => $active_subscriptions[$row['id_subscribe']]['name'],
+			'start' => standardTime($row['start_time'], false),
+			'end' => $row['end_time'] == 0 ? $txt['not_applicable'] : standardTime($row['end_time'], false),
+			'pending_details' => $row['pending_details'],
+			'status' => $row['status'],
+			'status_text' => $row['status'] == 0 ? ($row['payments_pending'] ? $txt['paid_pending'] : $txt['paid_finished']) : $txt['paid_active'],
+		);
+	}
+	$db->free_result($request);
+
+	return $current;
+}
+
+/**
  * Removes a subscription
  *
  * @param int $id

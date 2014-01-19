@@ -48,11 +48,11 @@ class ProfileSubscriptions_Controller extends Action_Controller
 		loadLanguage('ManagePaid');
 
 		$memID = currentMemberID();
+		$context['member']['id'] = $memID;
 
 		// Load all of the subscriptions.
 		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 		loadSubscriptions();
-		$context['member']['id'] = $memID;
 
 		// Remove any invalid ones.
 		foreach ($context['subscriptions'] as $id => $sub)
@@ -61,6 +61,8 @@ class ProfileSubscriptions_Controller extends Action_Controller
 			$costs = @unserialize($sub['real_cost']);
 
 			$cost_array = array();
+
+			// Flexible cost to length
 			if ($sub['real_length'] == 'F')
 			{
 				foreach ($costs as $duration => $cost)
@@ -72,6 +74,7 @@ class ProfileSubscriptions_Controller extends Action_Controller
 			else
 				$cost_array['fixed'] = $costs['fixed'];
 
+			// No cost associated with it, then drop it
 			if (empty($cost_array))
 				unset($context['subscriptions'][$id]);
 			else
@@ -82,7 +85,7 @@ class ProfileSubscriptions_Controller extends Action_Controller
 			}
 		}
 
-		// Work out what gateways are enabled.
+		// Work out what payment gateways are enabled.
 		$gateways = loadPaymentGateways();
 		foreach ($gateways as $id => $gateway)
 		{
@@ -96,38 +99,15 @@ class ProfileSubscriptions_Controller extends Action_Controller
 		if (empty($gateways))
 			fatal_error($txt['paid_admin_not_setup_gateway']);
 
-		// Get the current subscriptions.
-		$request = $db->query('', '
-			SELECT id_sublog, id_subscribe, start_time, end_time, status, payments_pending, pending_details
-			FROM {db_prefix}log_subscribed
-			WHERE id_member = {int:selected_member}',
-			array(
-				'selected_member' => $memID,
-			)
-		);
-		$context['current'] = array();
-		while ($row = $db->fetch_assoc($request))
+		// Get the members current subscriptions.
+		$context['current'] = loadMemberSubscription($memID, $context['subscriptions']);
+
+		// id the subscribes ones
+		foreach ($context['current'] as $id => $current)
 		{
-			// The subscription must exist!
-			if (!isset($context['subscriptions'][$row['id_subscribe']]))
-				continue;
-
-			$context['current'][$row['id_subscribe']] = array(
-				'id' => $row['id_sublog'],
-				'sub_id' => $row['id_subscribe'],
-				'hide' => $row['status'] == 0 && $row['end_time'] == 0 && $row['payments_pending'] == 0,
-				'name' => $context['subscriptions'][$row['id_subscribe']]['name'],
-				'start' => standardTime($row['start_time'], false),
-				'end' => $row['end_time'] == 0 ? $txt['not_applicable'] : standardTime($row['end_time'], false),
-				'pending_details' => $row['pending_details'],
-				'status' => $row['status'],
-				'status_text' => $row['status'] == 0 ? ($row['payments_pending'] ? $txt['paid_pending'] : $txt['paid_finished']) : $txt['paid_active'],
-			);
-
-			if ($row['status'] == 1)
-				$context['subscriptions'][$row['id_subscribe']]['subscribed'] = true;
+			if ($current['status'] == 1)
+				$context['subscriptions'][$id]['subscribed'] = true;
 		}
-		$db->free_result($request);
 
 		// Simple "done"?
 		if (isset($_GET['done']))
