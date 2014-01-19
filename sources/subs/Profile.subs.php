@@ -660,7 +660,8 @@ function loadProfileFields($force_reload = false)
 					return \'password_\' . $passwordErrors;
 
 				// Set up the new password variable... ready for storage.
-				$value = sha1(strtolower($cur_profile[\'member_name\']) . un_htmlspecialchars($value));
+				require_once(SUBSDIR . \'/Auth.subs.php\');
+				$value = validateLoginPassword($value, \'\', $cur_profile[\'member_name\'], true);
 				return true;
 			'),
 		),
@@ -1812,7 +1813,7 @@ function profileReloadUser()
 	if (isset($_POST['passwrd2']) && $_POST['passwrd2'] != '')
 	{
 		require_once(SUBSDIR . '/Auth.subs.php');
-		setLoginCookie(60 * $modSettings['cookieTime'], $context['id_member'], sha1(sha1(strtolower($cur_profile['member_name']) . un_htmlspecialchars($_POST['passwrd2'])) . $cur_profile['password_salt']));
+		setLoginCookie(60 * $modSettings['cookieTime'], $context['id_member'], hash('sha256', Util::strtolower($cur_profile['member_name']) . un_htmlspecialchars($_POST['passwrd2']) . $cur_profile['password_salt']));
 	}
 
 	loadUserSettings();

@@ -30,8 +30,8 @@ function template_reminder()
 			<div class="roundframe">
 				<p class="smalltext centertext">', $txt['password_reminder_desc'], '</p>
 				<dl>
-					<dt>', $txt['user_email'], ':</dt>
-					<dd><input type="text" name="user" size="30" class="input_text" /></dd>
+					<dt><label for="user">', $txt['user_email'], '</label>:</dt>
+					<dd><input type="text" id="user" name="user" size="30" class="input_text" /></dd>
 				</dl>
 				<input type="submit" value="', $txt['reminder_continue'], '" class="right_submit" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -103,14 +103,14 @@ function template_set_password()
 			<h2 class="category_header">', $context['page_title'], '</h2>
 			<div class="roundframe">
 				<dl>
-					<dt>', $txt['choose_pass'], ': </dt>
+					<dt><label for="elk_autov_pwmain">', $txt['choose_pass'], '</label>: </dt>
 					<dd>
 						<input type="password" name="passwrd1" id="elk_autov_pwmain" size="22" class="input_password" />
 						<span id="elk_autov_pwmain_div" style="display: none;">
 							<img id="elk_autov_pwmain_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
 						</span>
 					</dd>
-					<dt>', $txt['verify_pass'], ': </dt>
+					<dt><label for="elk_autov_pwverify">', $txt['verify_pass'], '</label>: </dt>
 					<dd>
 						<input type="password" name="passwrd2" id="elk_autov_pwverify" size="22" class="input_password" />
 						<span id="elk_autov_pwverify_div" style="display: none;">
@@ -158,19 +158,19 @@ function template_ask()
 				<dl>
 					<dt>', $txt['secret_question'], ':</dt>
 					<dd>', $context['secret_question'], '</dd>
-					<dt>', $txt['secret_answer'], ':</dt>
+					<dt><label for="secret_answer">', $txt['secret_answer'], '</label>:</dt>
 					<dd><input type="text" name="secret_answer" size="22" class="input_text" /></dd>';
 
 	if ($context['account_type'] == 'password')
 		echo '
-					<dt>', $txt['choose_pass'], ': </dt>
+					<dt><label for="elk_autov_pwmain">', $txt['choose_pass'], '</label>: </dt>
 					<dd>
 						<input type="password" name="passwrd1" id="elk_autov_pwmain" size="22" class="input_password" />
 						<span id="elk_autov_pwmain_div" style="display: none;">
 							<img id="elk_autov_pwmain_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
 						</span>
 					</dd>
-					<dt>', $txt['verify_pass'], ': </dt>
+					<dt><label for="elk_autov_pwverify">', $txt['verify_pass'], '</label>: </dt>
 					<dd>
 						<input type="password" name="passwrd2" id="elk_autov_pwverify" size="22" class="input_password" />
 						<span id="elk_autov_pwverify_div" style="display: none;">

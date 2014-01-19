@@ -480,14 +480,28 @@ function revalidateMentions(sForm, sInput)
 				names = cached_names[cached_queries[k]];
 				for (var l = 0, ncount = names.length; l < ncount; l++)
 				{
-					pos = body.indexOf(' @' + names[l].name);
-					// If there is something like "{space}@username" AND the following char is a space or a punctation mark
-					if (pos !== -1 && body.charAt(pos + 2 + names[l].name.length + 1).search(boundaries_pattern) === 0)
-						mentions.append($('<input type="hidden" name="uid[]" />').val(names[l].id));
+					if(checkWordOccurrence(body, names[l].name)) {
+						// alert(names[l].name);
+						pos = body.indexOf(' @' + names[l].name);
+						// If there is something like "{space}@username" AND the following char is a space or a punctation mark
+						if (pos !== -1 && body.charAt(pos + 2 + names[l].name.length + 1).search(boundaries_pattern) === 0)
+							mentions.append($('<input type="hidden" name="uid[]" />').val(names[l].id));
+					}
 				}
 			}
 		}
 	}
+}
+
+/**
+ * Check whether the word exists in a given paragraph
+ *
+ * @param paragraph to check
+ * @param word to match
+ */
+
+function checkWordOccurrence(paragraph, word){
+  return new RegExp( '\\b' + word + '\\b', 'i').test(paragraph);
 }
 
 /**
@@ -1207,7 +1221,7 @@ errorbox_handler.prototype.init = function()
 		var current_error_handler = this.opt.self;
 		$(document).ready(function() {
 			var current_error = eval(current_error_handler);
-			$('#' + current_error.opt.editor_id).data("sceditor").addEvent(current_error.opt.editor_id, 'keyup', function() {
+			$('#' + current_error.opt.editor_id).data("sceditor").addEvent(current_error.opt.editor_id, 'blur', function() {
 				current_error.checkErrors();
 			});
 		});
@@ -1366,4 +1380,33 @@ function addAnotherOption(parent, oDtName, oDdName, oData)
 
 	placeHolder.parentNode.insertBefore(newDT, placeHolder);
 	placeHolder.parentNode.insertBefore(newDD, placeHolder);
+}
+
+/**
+ * Shows the member search dropdown with the serch options
+ */
+function toggle_mlsearch_opt()
+{
+	// If the box is already visible just forget about it
+	if ($('#mlsearch_options').is(':visible'))
+		return;
+
+	// Time to show the droppy
+	$('#mlsearch_options').fadeIn('fast');
+
+	// A click anywhere on the page will close the droppy
+	$('body').on('click', mlsearch_opt_hide);
+	// Except clicking on the box itself or into the search text input
+	$('#mlsearch_options, #mlsearch_input').off('click', mlsearch_opt_hide).click(function(ev) {
+		ev.stopPropagation();
+	});
+}
+
+/**
+ * Hides the member search dropdown and detach the body click event
+ */
+function mlsearch_opt_hide()
+{
+	$('body').off('click', mlsearch_opt_hide);
+	$('#mlsearch_options').slideToggle('fast');
 }

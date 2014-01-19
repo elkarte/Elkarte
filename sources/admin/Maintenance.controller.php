@@ -303,7 +303,7 @@ class Maintenance_Controller extends Action_Controller
 				'errors' => array(sprintf($txt['maintain_done'], $txt['maintain_recountposts'])),
 			);
 
-		loadJavascriptFile('suggest.js', array('defer' => true));
+		loadJavascriptFile('suggest.js');
 
 		// Set up the sub-template
 		$context['sub_template'] = 'maintain_members';

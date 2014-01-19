@@ -1039,6 +1039,9 @@ div.bbc_footnotes .meaction{
 .sticky_row, .locked_row.sticky_row {
 	background: #ffffe0;
 }
+.locked_row, .locked_row.core_posts {
+	background: #f7f7f7;
+}
 #topic_icons {
 	border: 1px solid #ddd;
 	border-radius: 3px;
@@ -1389,6 +1392,19 @@ div.bbc_footnotes .meaction{
 	border-bottom: 1px solid #ccc;
 }
 
+#warndiv .ui-widget-header {
+	background: transparent;
+}
+#warndiv .watched .ui-widget-header {
+	background: green;
+}
+#warndiv .moderated .ui-widget-header {
+	background: orange;
+}
+#warndiv .muted .ui-widget-header {
+	background: red;
+}
+
 
 /* $PERSONAL	*/
 /* ------------------------------------------------------- */
@@ -1660,9 +1676,6 @@ div.bbc_footnotes .meaction{
 	}
 	.indicator[data-icon]:before {
 		color: #5ba048;
-	}
-	#main_menu .linklevel1>.pm_indicator {
-		display: none;
 	}
 	#main_menu .linklevel1 {
 		margin-right: 2px;

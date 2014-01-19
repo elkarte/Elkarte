@@ -430,6 +430,10 @@ div.bbc_footnotes .meaction{
 	opacity: 1;
 }
 
+#mlsearch_options {
+	background-color: white;
+}
+
 /* Main forum area. */
 /* Box-shadow only on this one. */
 #wrapper {
@@ -529,6 +533,11 @@ div.bbc_footnotes .meaction{
 .poster .listlevel1:hover>a {
 	border: 1px solid transparent;
 	background-color: transparent;
+	box-shadow: none;
+}
+.poster .listlevel2:hover>a {
+	color: #008299;
+	border: none;
 	box-shadow: none;
 }
 #main_menu .linklevel1, #main_menu .linklevel1:link, #main_menu .linklevel1:visited,
@@ -837,6 +846,25 @@ a.active {
 .topic_name h4 a {
 	color: #43a8da;
 }
+.topic_listing .warningbox {
+	margin-bottom: 6px;
+}
+.qaction_row {
+	background: #fff;
+}
+.approvetopic_row, .approve_row {
+	background: #fff5cd;
+}
+.sticky_row, .locked_row.sticky_row {
+	background: #f0f0ff;
+}
+.locked_row {
+	background: #f7f7f7;
+}
+#topic_icons {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+}
 li.modified {
 	color: #888;
 	font-size: 0.7em;
@@ -966,6 +994,22 @@ span.views_text {
 .signature {
 	opacity: 0.9;
 }
+
+/*	$PROFILE		*/
+/* ------------------------------------------------------- */
+#warndiv .ui-widget-header {
+	background: transparent;
+}
+#warndiv .watched .ui-widget-header {
+	background: green;
+}
+#warndiv .moderated .ui-widget-header {
+	background: orange;
+}
+#warndiv .muted .ui-widget-header {
+	background: red;
+}
+
 /*	$HELP		*/
 /* ------------------------------------------------------- */
 
@@ -1126,25 +1170,22 @@ span.views_text {
 	[data-icon]:before {
 		font-family: 'FontAwesome';
 		border: 3px solid white;
-		padding: 1px;
+		padding: 3px;
 		padding-bottom: 0px;
 		margin: 2px;
-		height: 1.05em;
-		line-height: 1.05em;
-		width: 1.05em;
+		height: 1.1em;
+		line-height: 1.1em;
+		width: 1.1em;
 		text-align: center;
 		display: inline-block;
 		border-radius: 4px;
-		font-size: 2.5em;
+		font-size: 2.1em;
 		color: #43a8da;
 		content: attr(data-icon);
 		speak: none;
 	}
 	.indicator[data-icon]:before {
 		color: orange;
-	}
-	#main_menu .linklevel1>.pm_indicator {
-		display: none;
 	}
 	.statistics .flow_hidden, .statistics .floatleft {
 		border: none;

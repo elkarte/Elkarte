@@ -554,7 +554,7 @@ function template_browse()
 					</p>
 					<dl class="settings">
 						<dt>
-							<strong>', $txt['package_emulate'], ':</strong><br />
+							<strong><label for="ve">', $txt['package_emulate'], '</label>:</strong><br />
 							<span class="smalltext">
 								<a href="#" onclick="document.getElementById(\'ve\').value = \'', $forum_version, '\';document.getElementsByName(\'version_emulate\')[0].value = \'', $forum_version, '\';return false">', $txt['package_emulate_revert'], '</a>
 							</span>
@@ -732,7 +732,7 @@ function template_control_chmod()
 
 	if (empty($context['package_ftp']['form_elements_only']))
 		echo '
-					<div class="righttext" style="margin: 1ex;">
+					<div class="righttext">
 						<span id="test_ftp_placeholder_full"></span>
 						<input type="submit" value="', $txt['package_proceed'], '" class="right_submit" />
 					</div>';
@@ -818,6 +818,7 @@ function template_file_permissions()
 	global $txt, $scripturl, $context, $settings;
 
 	// This will handle expanding the selection.
+	// @todo most of this code should go in to admin.js
 	echo '
 	<script><!-- // --><![CDATA[
 		var oRadioColors = {

@@ -967,7 +967,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			array(
 				'tag' => 'color',
 				'type' => 'unparsed_equals',
-				'test' => '(#[\da-fA-F]{3}|#[\da-fA-F]{6}|[A-Za-z]{1,20}|rgb\(\d{1,3}, ?\d{1,3}, ?\d{1,3}\))\]',
+				'test' => '(#[\da-fA-F]{3}|#[\da-fA-F]{6}|[A-Za-z]{1,20}|rgb\((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\s?,\s?){2}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\))\]',
 				'before' => '<span style="color: $1;" class="bbc_color">',
 				'after' => '</span>',
 			),
@@ -3327,7 +3327,7 @@ function setupMenuContext()
 			'home' => array(
 				'title' => $txt['community'],
 				'href' => $scripturl,
-				'data-icon' => '&#xf015',
+				'data-icon' => '&#xf015;',
 				'show' => true,
 				'sub_buttons' => array(
 					'help' => array(
@@ -3367,7 +3367,7 @@ function setupMenuContext()
 				'title' => $context['current_action'] !== 'moderate' ? $txt['admin'] : $txt['moderate'],
 				'counter' => 'grand_total',
 				'href' => $scripturl . '?action=admin',
-				'data-icon' => '&#xf013',
+				'data-icon' => '&#xf013;',
 				'show' => true,
 				'sub_buttons' => array(
 					'admin_center' => array(
@@ -3441,7 +3441,7 @@ function setupMenuContext()
 				'title' => $txt['moderate'],
 				'counter' => 'grand_total',
 				'href' => $scripturl . '?action=moderate',
-				'data-icon' => '&#xf013',
+				'data-icon' => '&#xf013;',
 				'show' => $context['allow_moderation_center'],
 				'sub_buttons' => array(
 					'reports' => array(
@@ -3481,7 +3481,7 @@ function setupMenuContext()
 			'profile' => array(
 				'title' => (!empty($user_info['avatar']['image']) ? $user_info['avatar']['image'] . ' ' : '') . (!empty($modSettings['displayMemberNames']) ? $user_info['name'] : $txt['account_short']),
 				'href' => $scripturl . '?action=profile',
-				'data-icon' => '&#xf007',
+				'data-icon' => '&#xf007;',
 				'show' => $context['allow_edit_profile'],
 				'sub_buttons' => array(
 					'account' => array(
@@ -3513,7 +3513,7 @@ function setupMenuContext()
 				'title' => $txt['pm_short'],
 				'counter' => 'unread_messages',
 				'href' => $scripturl . '?action=pm',
-				'data-icon' => '&#xf0e0',
+				'data-icon' => '&#xf0e0;',
 				'show' => $context['allow_pm'],
 				'sub_buttons' => array(
 					'pm_read' => array(
@@ -3533,7 +3533,7 @@ function setupMenuContext()
 				'title' => $txt['mention'],
 				'counter' => 'mentions',
 				'href' => $scripturl . '?action=mentions',
-				'data-icon' => '&#xf0f3',
+				'data-icon' => '&#xf0f3;',
 				'show' => !$user_info['is_guest'] && !empty($modSettings['mentions_enabled']),
 			),
 
@@ -3553,7 +3553,7 @@ function setupMenuContext()
 			'unreadreplies' => array(
 				'title' => $txt['view_replies_category'],
 				'href' => $scripturl . '?action=unreadreplies',
-				'data-icon' => '&#xf0e6',
+				'data-icon' => '&#xf0e6;',
 				'show' => !$user_info['is_guest'],
 			),
 
@@ -3562,14 +3562,14 @@ function setupMenuContext()
 			'login' => array(
 				'title' => $txt['login'],
 				'href' => $scripturl . '?action=login',
-				'data-icon' => '&#xf023',
+				'data-icon' => '&#xf023;',
 				'show' => $user_info['is_guest'],
 			),
 
 			'register' => array(
 				'title' => $txt['register'],
 				'href' => $scripturl . '?action=register',
-				'data-icon' => '&#xf090',
+				'data-icon' => '&#xf090;',
 				'show' => $user_info['is_guest'] && $context['can_register'],
 			),
 		);

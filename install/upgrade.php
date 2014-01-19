@@ -18,7 +18,7 @@
 // Version information...
 define('CURRENT_VERSION', '1.0 Beta');
 define('CURRENT_LANG_VERSION', '1.0');
-define('REQUIRED_PHP_VERSION', '5.1.0');
+define('REQUIRED_PHP_VERSION', '5.1.2');
 
 $databases = array(
 	'mysql' => array(
@@ -722,25 +722,64 @@ function checkLogin()
 			{
 				list ($id_member, $name, $password, $id_group, $addGroups, $user_language) = $db->fetch_row($request);
 
+				// These will come in handy, if you want to login
+				require_once(SOURCEDIR . '/Security.php');
+				require_once(SUBSDIR . '/Auth.subs.php');
+
 				$groups = explode(',', $addGroups);
 				$groups[] = $id_group;
 
 				foreach ($groups as $k => $v)
 					$groups[$k] = (int) $v;
 
-				// Figure out the password using our encryption - if what they typed is right.
-				if (isset($_REQUEST['hash_passwrd']) && strlen($_REQUEST['hash_passwrd']) == 40)
+				// Figure out if the password is using our encryption - if what they typed is right.
+				if (isset($_REQUEST['hash_passwrd']) && strlen($_REQUEST['hash_passwrd']) === 64)
 				{
-					require_once(SOURCEDIR . '/Security.php');
-					$tk = validateToken('login');
+					validateToken('login');
+
+					$valid_password =  validateLoginPassword($_REQUEST['hash_passwrd'], $password);
 
 					// Challenge passed.
-					if ($_REQUEST['hash_passwrd'] == sha1($password . $upcontext['rid'] . $tk))
-						$sha_passwd = $password;
+					if ($valid_password)
+					{
+						$sha_passwd = $_REQUEST['hash_passwrd'];
+						$valid_password = true;
+					}
+					// Needs upgrading if the db string is an actual 40 hexchar SHA-1
+					elseif (preg_match('/^[0-9a-f]{40}$/i', $password))
+					{
+						// Might Need to update so we will need to ask for the password again.
+						$upcontext['disable_login_hashing'] = true;
+						$upcontext['login_hash_error'] = true;
+					}
 				}
+				// Maybe a plain text password was used this time
 				else
-					$sha_passwd = sha1(strtolower($name) . un_htmlspecialchars($_REQUEST['passwrd']));
+				{
+					// validateLoginPassword will convert this to a SHA-256 pw and check it
+					$sha_passwd = $_POST['passwrd'];
+					$valid_password = validateLoginPassword($sha_passwd, $password, $_POST['user']);
+				}
+
+				// Password still not working?
+				if ($valid_password === false && !empty($_POST['passwrd']))
+				{
+					// SHA-1 from SMF?
+					$sha_passwd = sha1(Util::strtolower($_POST['user']) . $_POST['passwrd']);
+					$valid_password = $sha_passwd === $password;
+
+					// Lets upgrade this to our new password
+					if ($valid_password)
+					{
+						$password = validateLoginPassword($_POST['passwrd'], '', $_POST['user'], true);
+						$password_salt = substr(md5(mt_rand()), 0, 4);
+
+						// Update the password hash and set up the salt.
+						updateMemberData($id_member, array('passwd' => $password, 'password_salt' => $password_salt, 'passwd_flood' => ''));
+					}
+				}
 			}
+			// Can't find this user in the database
 			else
 				$upcontext['username_incorrect'] = true;
 
@@ -763,16 +802,16 @@ function checkLogin()
 			$upcontext['user']['version'] = $modSettings['elkVersion'];
 
 		// Didn't get anywhere?
-		if ((empty($sha_passwd) || $password != $sha_passwd) && empty($upcontext['username_incorrect']) && !$disable_security)
+		if (empty($valid_password) && empty($upcontext['username_incorrect']) && !$disable_security)
 		{
 			// MD5?
 			$md5pass = md5_hmac($_REQUEST['passwrd'], strtolower($_POST['user']));
 			if ($md5pass != $password)
 			{
-				$upcontext['password_failed'] = true;
+					$upcontext['password_failed'] = true;
 
-				// Disable the hashing this time.
-				$upcontext['disable_login_hashing'] = true;
+					// Disable the hashing this time.
+					$upcontext['disable_login_hashing'] = true;
 			}
 		}
 
@@ -3669,7 +3708,7 @@ function template_welcome_message()
 
 	echo '
 		<script src="http://elkarte.github.io/Elkarte/site/current-version.js?version=' . CURRENT_VERSION . '"></script>
-		<script src="', $settings['default_theme_url'], '/scripts/sha1.js"></script>
+		<script src="', $settings['default_theme_url'], '/scripts/sha256.js"></script>
 		<h3>', sprintf($txt['upgrade_ready_proceed'], CURRENT_VERSION), '</h3>
 		<form id="upform" action="', $upcontext['form_url'], '" method="post" accept-charset="UTF-8" name="upform"', empty($upcontext['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $upcontext['rid'] . '\', \'' . (!empty($upcontext['login_token']) ? $upcontext['login_token'] : '') . '\');"' : '', '>
 		<input type="hidden" name="', $upcontext['login_token_var'], '" value="', $upcontext['login_token'], '" />
@@ -3776,7 +3815,10 @@ function template_welcome_message()
 						<input type="password" name="passwrd" value=""', $disable_security ? ' disabled="disabled"' : '', ' class="input_password" />
 						<input type="hidden" name="hash_passwrd" value="" />';
 
-	if (!empty($upcontext['password_failed']))
+	if (!empty($upcontext['login_hash_error']))
+		echo '
+						<div class="error">Password security has recently been upgraded. Please enter your password again.</div>';
+	elseif (!empty($upcontext['password_failed']))
 		echo '
 						<div class="error">Password Incorrect</div>';
 

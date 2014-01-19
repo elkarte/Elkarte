@@ -1522,12 +1522,32 @@ class PersonalMessage_Controller extends Action_Controller
 			$context['rid'] = isset($_GET['rid']) && isset($context['rules'][$_GET['rid']])? (int) $_GET['rid'] : 0;
 			$context['sub_template'] = 'add_rule';
 
+			// Any known rule
+			$js_rules = '{';
+			foreach ($context['known_rules'] as $rule)
+				$js_rules .= JavaScriptEscape($rule) . ': ' . JavaScriptEscape($txt['pm_rule_' . $rule]) . ',';
+			$js_rules = substr($js_rules, 0, -1) . '}';
+
+			// Any known label
+			$js_labels = '{';
+			foreach ($context['labels'] as $label)
+				if ($label['id'] != -1)
+					$js_labels .= JavaScriptEscape($label['id'] + 1) . ': ' . JavaScriptEscape($label['name']) . ',';
+			$js_labels = substr($js_labels, 0, -1) . '}';
+
+			// And all of the groups as well
+			$js_groups = '{';
+			foreach ($context['groups'] as $id => $title)
+				$js_groups .= JavaScriptEscape($id) . ': ' . JavaScriptEscape($title) . ',';
+			$js_groups = substr($js_groups, 0, -1) . '}';
+
 			// Oh my, we have a lot of text strings for this
 			addJavascriptVar(array(
 				'criteriaNum' => 0,
 				'actionNum' => 0,
-				'groups' => '[]',
-				'labels' => '[]',
+				'groups' => $js_groups,
+				'labels' => $js_labels,
+				'rules' => $js_rules,
 				'txt_pm_readable_and' => '"' . $txt['pm_readable_and'] . '"',
 				'txt_pm_readable_or' => '"' . $txt['pm_readable_or'] . '"',
 				'txt_pm_readable_member' => '"' . $txt['pm_readable_member'] . '"',
@@ -1541,12 +1561,7 @@ class PersonalMessage_Controller extends Action_Controller
 				'txt_pm_readable_end' => '"' . $txt['pm_readable_end'] . '"',
 				'txt_pm_readable_then' => '"' . $txt['pm_readable_then'] . '"',
 				'txt_pm_rule_not_defined' => '"' . $txt['pm_rule_not_defined'] . '"',
-				'txt_pm_rule_bud' => '"' . $txt['pm_rule_bud'] . '"',
-				'txt_pm_rule_sub' => '"' . $txt['pm_rule_sub'] . '"',
-				'txt_pm_rule_msg' => '"' . $txt['pm_rule_msg'] . '"',
 				'txt_pm_rule_criteria_pick' => '"' . $txt['pm_rule_criteria_pick'] . '"',
-				'txt_pm_rule_mid' => '"' . $txt['pm_rule_mid'] . '"',
-				'txt_pm_rule_gid' => '"' . $txt['pm_rule_gid'] . '"',
 				'txt_pm_rule_sel_group' => '"' . $txt['pm_rule_sel_group'] . '"',
 				'txt_pm_rule_sel_action' => '"' . $txt['pm_rule_sel_action'] . '"',
 				'txt_pm_rule_label' => '"' . $txt['pm_rule_label'] . '"',
@@ -1581,6 +1596,9 @@ class PersonalMessage_Controller extends Action_Controller
 					'actions' => array(),
 					'logic' => 'and',
 				);
+
+			// Add a dummy criteria to allow expansion for none js users.
+			$context['rule']['criteria'][] = array('t' => '', 'v' => '');
 		}
 		// Saving?
 		elseif (isset($_GET['save']))

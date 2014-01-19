@@ -61,6 +61,8 @@ function list_integration_hooks_data($start, $per_page, $sort)
 {
 	global $settings, $txt, $context, $scripturl, $modSettings;
 
+	require_once(SUBSDIR . '/Package.subs.php');
+
 	$hooks = $temp_hooks = get_integration_hooks();
 	$hooks_data = $temp_data = $hook_status = array();
 
@@ -98,7 +100,7 @@ function list_integration_hooks_data($start, $per_page, $sort)
 
 						if (substr($hook, -8) === '_include')
 						{
-							$hook_status[$hook][$function]['exists'] = file_exists(strtr(trim($function), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR, '$themedir' => $settings['theme_dir'])));
+							$hook_status[$hook][$function]['exists'] = file_exists(parse_path(trim($function)));
 
 							// I need to know if there is at least one function called in this file.
 							$temp_data['include'][basename($function)] = array('hook' => $hook, 'function' => $function);
@@ -208,7 +210,7 @@ function list_integration_hooks_data($start, $per_page, $sort)
 					'hook_name' => $hook,
 					'function_name' => $function,
 					'real_function' => $exploded[0],
-					'included_file' => isset($exploded[1]) ? strtr(trim($exploded[1]), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR, '$themedir' => $settings['theme_dir'])) : '',
+					'included_file' => isset($exploded[1]) ? parse_path(trim($exploded[1])) : '',
 					'file_name' => (isset($hook_status[$hook][$function]['in_file']) ? $hook_status[$hook][$function]['in_file'] : ''),
 					'hook_exists' => $hook_exists,
 					'status' => $hook_exists ? ($enabled ? 'allow' : 'moderate') : 'deny',

@@ -39,16 +39,16 @@ function template_modify_subscription()
 				<div class="content">
 					<dl class="settings">
 						<dt>
-							', $txt['paid_mod_name'], ':
+							<label for="name">', $txt['paid_mod_name'], '</label>:
 						</dt>
 						<dd>
-							<input type="text" name="name" value="', $context['sub']['name'], '" size="30" class="input_text" />
+							<input type="text" id="name" name="name" value="', $context['sub']['name'], '" size="30" class="input_text" />
 						</dd>
 						<dt>
-							', $txt['paid_mod_desc'], ':
+							<label for="desc">', $txt['paid_mod_desc'], '</label>:
 						</dt>
 						<dd>
-							<textarea name="desc" rows="3" cols="40">', $context['sub']['desc'], '</textarea>
+							<textarea id="desc" name="desc" rows="3" cols="40">', $context['sub']['desc'], '</textarea>
 						</dd>
 						<dt>
 							<label for="repeatable_check">', $txt['paid_mod_repeatable'], '</label>:
@@ -66,10 +66,10 @@ function template_modify_subscription()
 					<hr />
 					<dl class="settings">
 						<dt>
-							', $txt['paid_mod_prim_group'], ':<br /><span class="smalltext">', $txt['paid_mod_prim_group_desc'], '</span>
+							<label for="prim_group">', $txt['paid_mod_prim_group'], '</label>:<br /><span class="smalltext">', $txt['paid_mod_prim_group_desc'], '</span>
 						</dt>
 						<dd>
-							<select name="prim_group" ', !empty($context['disable_groups']) ? 'disabled="disabled"' : '', '>
+							<select id="prim_group" name="prim_group" ', !empty($context['disable_groups']) ? 'disabled="disabled"' : '', '>
 								<option value="0" ', $context['sub']['prim_group'] == 0 ? 'selected="selected"' : '', '>', $txt['paid_mod_no_group'], '</option>';
 
 	// Put each group into the box.
@@ -88,21 +88,21 @@ function template_modify_subscription()
 	// Put a checkbox in for each group
 	foreach ($context['groups'] as $groups)
 		echo '
-							<label for="addgroup_', $groups['id'], '"><input type="checkbox" id="addgroup_', $groups['id_group'], '" name="addgroup[', $groups['id'], ']"', in_array($groups['id'], $context['sub']['add_groups']) ? ' checked="checked"' : '', ' ', !empty($context['disable_groups']) ? ' disabled="disabled"' : '', ' class="input_check" />&nbsp;<span class="smalltext">', $groups['name'], '</span></label><br />';
+							<input type="checkbox" id="addgroup_', $groups['id'], '" name="addgroup[', $groups['id'], ']"', in_array($groups['id'], $context['sub']['add_groups']) ? ' checked="checked"' : '', ' ', !empty($context['disable_groups']) ? ' disabled="disabled"' : '', ' class="input_check" />&nbsp;<label for="addgroup_', $groups['id'], '" class="smalltext">', $groups['name'], '</label><br />';
 
 	echo '
 						</dd>
 						<dt>
-							', $txt['paid_mod_reminder'], ':<br /><span class="smalltext">', $txt['paid_mod_reminder_desc'], '</span>
+							<label for="reminder">', $txt['paid_mod_reminder'], '</label>:<br /><span class="smalltext">', $txt['paid_mod_reminder_desc'], '</span>
 						</dt>
 						<dd>
-							<input type="text" name="reminder" value="', $context['sub']['reminder'], '" size="6" class="input_text" />
+							<input type="text" id="reminder" name="reminder" value="', $context['sub']['reminder'], '" size="6" class="input_text" />
 						</dd>
 						<dt>
-							', $txt['paid_mod_email'], ':<br /><span class="smalltext">', $txt['paid_mod_email_desc'], '</span>
+							<label for="emailcomplete">', $txt['paid_mod_email'], '</label>:<br /><span class="smalltext">', $txt['paid_mod_email_desc'], '</span>
 						</dt>
 						<dd>
-							<textarea name="emailcomplete" rows="6" cols="40">', $context['sub']['email_complete'], '</textarea>
+							<textarea id="emailcomplete" name="emailcomplete" rows="6" cols="40">', $context['sub']['email_complete'], '</textarea>
 						</dd>
 					</dl>
 					<hr />
@@ -113,16 +113,16 @@ function template_modify_subscription()
 						<fieldset>
 							<dl class="settings">
 								<dt>
-									', $txt['paid_cost'], ' (', str_replace('%1.2f', '', $modSettings['paid_currency_symbol']), '):
+									<label for="cost">', $txt['paid_cost'], '</label> (', str_replace('%1.2f', '', $modSettings['paid_currency_symbol']), '):
 								</dt>
 								<dd>
-									<input type="text" name="cost" value="', empty($context['sub']['cost']['fixed']) ? '0' : $context['sub']['cost']['fixed'], '" size="4" class="input_text" />
+									<input type="text" id="cost" name="cost" value="', empty($context['sub']['cost']['fixed']) ? '0' : $context['sub']['cost']['fixed'], '" size="4" class="input_text" />
 								</dd>
 								<dt>
-									', $txt['paid_mod_span'], ':
+									<label for="span_value">', $txt['paid_mod_span'], '</label>:
 								</dt>
 								<dd>
-									<input type="text" name="span_value" value="', $context['sub']['span']['value'], '" size="4" class="input_text" />
+									<input type="text" id="span_value" name="span_value" value="', $context['sub']['span']['value'], '" size="4" class="input_text" />
 									<select name="span_unit">
 										<option value="D" ', $context['sub']['span']['unit'] == 'D' ? 'selected="selected"' : '', '>', $txt['paid_mod_span_days'], '</option>
 										<option value="W" ', $context['sub']['span']['unit'] == 'W' ? 'selected="selected"' : '', '>', $txt['paid_mod_span_weeks'], '</option>
@@ -164,28 +164,28 @@ function template_modify_subscription()
 									<strong>', $txt['paid_cost'], ' (', preg_replace('~%[df\.\d]+~', '', $modSettings['paid_currency_symbol']), ')</strong>
 								</dd>
 								<dt>
-									', $txt['paid_per_day'], ':
+									<label for="cost_day">', $txt['paid_per_day'], '</label>:
 								</dt>
 								<dd>
-									<input type="text" name="cost_day" value="', empty($context['sub']['cost']['day']) ? '0' : $context['sub']['cost']['day'], '" size="5" class="input_text" />
+									<input type="text" id="cost_day" name="cost_day" value="', empty($context['sub']['cost']['day']) ? '0' : $context['sub']['cost']['day'], '" size="5" class="input_text" />
 								</dd>
 								<dt>
-									', $txt['paid_per_week'], ':
+									<label for="cost_week">', $txt['paid_per_week'], '</label>:
 								</dt>
 								<dd>
-									<input type="text" name="cost_week" value="', empty($context['sub']['cost']['week']) ? '0' : $context['sub']['cost']['week'], '" size="5" class="input_text" />
+									<input type="text" id="cost_week" name="cost_week" value="', empty($context['sub']['cost']['week']) ? '0' : $context['sub']['cost']['week'], '" size="5" class="input_text" />
 								</dd>
 								<dt>
-									', $txt['paid_per_month'], ':
+									<label for="cost_month">', $txt['paid_per_month'], '</label>:
 								</dt>
 								<dd>
-									<input type="text" name="cost_month" value="', empty($context['sub']['cost']['month']) ? '0' : $context['sub']['cost']['month'], '" size="5" class="input_text" />
+									<input type="text" id="cost_month" name="cost_month" value="', empty($context['sub']['cost']['month']) ? '0' : $context['sub']['cost']['month'], '" size="5" class="input_text" />
 								</dd>
 								<dt>
-									', $txt['paid_per_year'], ':
+									<label for="cost_year">', $txt['paid_per_year'], '</label>:
 								</dt>
 								<dd>
-									<input type="text" name="cost_year" value="', empty($context['sub']['cost']['year']) ? '0' : $context['sub']['cost']['year'], '" size="5" class="input_text" />
+									<input type="text" id="cost_year" name="cost_year" value="', empty($context['sub']['cost']['year']) ? '0' : $context['sub']['cost']['year'], '" size="5" class="input_text" />
 								</dd>
 							</dl>
 						</fieldset>
@@ -245,7 +245,7 @@ function template_modify_user_subscription()
 	if ($context['action_type'] == 'add')
 		echo '
 						<dt>
-							<strong>', $txt['paid_username'], ':</strong><br />
+							<strong><label for="name_control">', $txt['paid_username'], '</label>:</strong><br />
 							<span class="smalltext">', $txt['one_username'], '</span>
 						</dt>
 						<dd>
@@ -254,10 +254,10 @@ function template_modify_user_subscription()
 
 	echo '
 						<dt>
-							<strong>', $txt['paid_status'], ':</strong>
+							<strong><label for="status">', $txt['paid_status'], '</label>:</strong>
 						</dt>
 						<dd>
-							<select name="status">
+							<select id="status" name="status">
 								<option value="0" ', $context['sub']['status'] == 0 ? 'selected="selected"' : '', '>', $txt['paid_finished'], '</option>
 								<option value="1" ', $context['sub']['status'] == 1 ? 'selected="selected"' : '', '>', $txt['paid_active'], '</option>
 							</select>
@@ -294,11 +294,12 @@ function template_modify_user_subscription()
 
 	echo '
 						</select>
-						', $txt['hour'], ': <input type="text" name="hour" value="', $context['sub']['start']['hour'], '" size="2" class="input_text" />
-						', $txt['minute'], ': <input type="text" name="minute" value="', $context['sub']['start']['min'], '" size="2" class="input_text" />
+						<label for="hour">', $txt['hour'], '</label>: <input type="text" id="hour" name="hour" value="', $context['sub']['start']['hour'], '" size="2" class="input_text" />
+						<label for="minute">', $txt['minute'], '</label>: <input type="text" id="minute" name="minute" value="', $context['sub']['start']['min'], '" size="2" class="input_text" />
 					</fieldset>
 					<fieldset>
 						<legend>', $txt['end_date_and_time'], '</legend>
+						<label for="yearend">', $txt['calendar_year'], '</label>&nbsp;
 						<select name="yearend" id="yearend" onchange="generateDays(\'end\');">';
 
 	// Show a list of all the years we allow...
@@ -308,7 +309,7 @@ function template_modify_user_subscription()
 
 	echo '
 						</select>&nbsp;
-						', (isset($txt['calendar_month']) ? $txt['calendar_month'] : $txt['calendar_month']), '&nbsp;
+						<label for="monthend">', $txt['calendar_month'], '</label>&nbsp;
 						<select name="monthend" id="monthend" onchange="generateDays(\'end\');">';
 
 	// There are 12 months per year - ensure that they all get listed.
@@ -318,7 +319,7 @@ function template_modify_user_subscription()
 
 	echo '
 						</select>&nbsp;
-						', (isset($txt['calendar_day']) ? $txt['calendar_day'] : $txt['calendar_day']), '&nbsp;
+						<label for="dayend">', $txt['calendar_day'], '</label>&nbsp;
 						<select name="dayend" id="dayend">';
 
 	// This prints out all the days in the current month - this changes dynamically as we switch months.
@@ -328,8 +329,8 @@ function template_modify_user_subscription()
 
 	echo '
 						</select>
-						', $txt['hour'], ': <input type="text" name="hourend" value="', $context['sub']['end']['hour'], '" size="2" class="input_text" />
-						', $txt['minute'], ': <input type="text" name="minuteend" value="', $context['sub']['end']['min'], '" size="2" class="input_text" />
+						<label for="hourend">', $txt['hour'], '</label>: <input type="text" id="hourend" name="hourend" value="', $context['sub']['end']['hour'], '" size="2" class="input_text" />
+						<label for="minuteend">', $txt['minute'], '</label>: <input type="text" id="minuteend" name="minuteend" value="', $context['sub']['end']['min'], '" size="2" class="input_text" />
 					</fieldset>
 					<input type="submit" name="save_sub" value="', $txt['paid_settings_save'], '" class="right_submit" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -435,12 +436,12 @@ function template_user_subscription()
 			if ($context['user']['is_owner'])
 			{
 				echo '
-					<strong>', $txt['paid_cost'], ':</strong>';
+					<strong><label for="cur', $subscription['id'], '">', $txt['paid_cost'], '</label>:</strong>';
 
 				if ($subscription['flexible'])
 				{
 					echo '
-					<select name="cur[', $subscription['id'], ']">';
+					<select id="cur', $subscription['id'], '" name="cur[', $subscription['id'], ']">';
 
 					// Print out the costs for this one.
 					foreach ($subscription['costs'] as $duration => $value)

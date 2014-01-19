@@ -100,42 +100,38 @@ function template_unread()
 
 		echo '
 						<h2 class="category_header" id="unread_header">
-							', $context['showing_all_topics'] ? $txt['unread_topics_all'] : $txt['unread_topics_visit'];
-
-		echo '
-							<span class="sort_by_container">
-								<ul id="sort_by" class="topic_sorting">';
+							', $context['showing_all_topics'] ? $txt['unread_topics_all'] : $txt['unread_topics_visit'], '
+						</h2>
+						<ul id="sort_by" class="topic_sorting">';
 
 		// Show a "select all" box for quick moderation?
 		if ($context['showCheckboxes'])
 			echo '
-									<li class="listlevel1 quickmod_select_all">
-										<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" class="input_check" />
-									</li>';
+							<li class="listlevel1 quickmod_select_all">
+								<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" class="input_check" />
+							</li>';
 
 		$current_header = $context['topics_headers'][$context['sort_by']];
 		echo '
-									<li class="listlevel1 topic_sorting_row">
-										<a href="', $current_header['url'], '">', $current_header['sort_dir_img'], '</a>
-									</li>';
+							<li class="listlevel1 topic_sorting_row">
+								<a href="', $current_header['url'], '">', $current_header['sort_dir_img'], '</a>
+							</li>';
 
 		echo '
-									<li class="listlevel1 topic_sorting_row">', $txt['sort_by'], ': <a href="', $current_header['url'], '">', $txt[$context['sort_by']], '</a>
-										<ul class="menulevel2" id="sortby">';
+							<li class="listlevel1 topic_sorting_row">', $txt['sort_by'], ': <a href="', $current_header['url'], '">', $txt[$context['sort_by']], '</a>
+								<ul class="menulevel2" id="sortby">';
 
 		foreach ($context['topics_headers'] as $key => $value)
 			echo '
-											<li class="listlevel2 sort_by_item" id="sort_by_item_', $key, '"><a href="', $value['url'], '" class="linklevel2">', $txt[$key], ' ', $value['sort_dir_img'], '</a></li>';
+									<li class="listlevel2 sort_by_item" id="sort_by_item_', $key, '"><a href="', $value['url'], '" class="linklevel2">', $txt[$key], ' ', $value['sort_dir_img'], '</a></li>';
 		echo '
-										</ul>';
+								</ul>';
 
 		echo '
-									</li>
-								</ul>
-							</span>';
+							</li>
+						</ul>';
 
 		echo '
-						</h2>
 						<ul class="topic_listing" id="unread">';
 
 		foreach ($context['topics'] as $topic)
@@ -247,40 +243,36 @@ function template_replies()
 		// [WIP] There is trial code here to hide the topic icon column. Colspan can be cleaned up later.
 		echo '
 						<h2 class="category_header" id="unread_header">
-							', $txt['unread_replies'];
-
-		echo '
-							<span class="sort_by_container">
-								<ul id="sort_by" class="topic_sorting" >';
+							', $txt['unread_replies'], '
+						</h2>
+						<ul id="sort_by" class="topic_sorting" >';
 		if ($context['showCheckboxes'])
 			echo '
-									<li class="listlevel1 quickmod_select_all">
-										<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" class="input_check" />
-									</li>';
+							<li class="listlevel1 quickmod_select_all">
+								<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" class="input_check" />
+							</li>';
 
 		$current_header = $context['topics_headers'][$context['sort_by']];
 		echo '
-									<li class="listlevel1 topic_sorting_row">
-										<a href="', $current_header['url'], '">', $current_header['sort_dir_img'], '</a>
-									</li>';
+							<li class="listlevel1 topic_sorting_row">
+								<a href="', $current_header['url'], '">', $current_header['sort_dir_img'], '</a>
+							</li>';
 
 		echo '
-									<li class="listlevel1 topic_sorting_row">', $txt['sort_by'], ': <a href="', $current_header['url'], '">', $txt[$context['sort_by']], '</a>
-										<ul class="menulevel2" id="sortby">';
+							<li class="listlevel1 topic_sorting_row">', $txt['sort_by'], ': <a href="', $current_header['url'], '">', $txt[$context['sort_by']], '</a>
+								<ul class="menulevel2" id="sortby">';
 		foreach ($context['topics_headers'] as $key => $value)
 			echo '
-											<li class="listlevel2 sort_by_item" id="sort_by_item_', $key, '"><a href="', $value['url'], '" class="linklevel2">', $txt[$key], ' ', $value['sort_dir_img'], '</a></li>';
+									<li class="listlevel2 sort_by_item" id="sort_by_item_', $key, '"><a href="', $value['url'], '" class="linklevel2">', $txt[$key], ' ', $value['sort_dir_img'], '</a></li>';
 		echo '
-										</ul>';
+								</ul>';
 
 		// Show a "select all" box for quick moderation?
 		echo '
-									</li>
-								</ul>
-							</span>';
+							</li>
+						</ul>';
 
 		echo '
-						</h2>
 						<ul class="topic_listing" id="unread">';
 
 		foreach ($context['topics'] as $topic)

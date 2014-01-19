@@ -410,6 +410,9 @@ class Control_Verification_Questions implements Control_Verifications
 		// Same questions as before.
 		else
 			$this->_questionIDs = !empty($_SESSION[$this->_options['id'] . '_vv']['q']) ? $_SESSION[$this->_options['id'] . '_vv']['q'] : array();
+
+		if (empty($this->_questionIDs) && !$refresh)
+			$this->createTest(true);
 	}
 
 	public function prepareContext()

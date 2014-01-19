@@ -303,8 +303,8 @@ function template_modify_language_entries()
 					', $txt['edit_language_entries'], '
 				</h3>
 				<div id="taskpad" class="floatright">
-					', $txt['edit_language_entries_file'], ':
-					<select name="tfid" onchange="if (this.value != -1) document.forms.entry_form.submit();">';
+					<label for="tfid">', $txt['edit_language_entries_file'], '</label>:
+					<select id="tfid" name="tfid" onchange="if (this.value != -1) document.forms.entry_form.submit();">';
 
 	foreach ($context['possible_files'] as $id_theme => $theme)
 	{
@@ -337,56 +337,21 @@ function template_modify_language_entries()
 	{
 		echo '
 			<div class="content">
-				<dl class="settings">';
+				<ul class="strings_edit settings">';
 
 		$cached = array();
 		foreach ($context['file_entries'] as $entry)
 		{
-			// Do it in two's!
-			if (empty($cached))
-			{
-				$cached = $entry;
-				continue;
-			}
-
 			echo '
-					<dt>
-						<span class="smalltext">', $cached['key'], '</span>
-					</dt>
-					<dd>
-						<span class="smalltext">', $entry['key'], '</span>
-					</dd>
-					<dt>
-						<input type="hidden" name="comp[', $cached['key'], ']" value="', $cached['value'], '" />
-						<textarea name="entry[', $cached['key'], ']" cols="40" rows="', $cached['rows'] < 2 ? 2 : $cached['rows'], '" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 96%; min-width: 96%' : 'width: 96%') . ';">', $cached['value'], '</textarea>
-					</dt>
-					<dd>
+					<li>
+						<label for="entry_', $entry['key'], '" class="smalltext">', $entry['display_key'], '</label>
 						<input type="hidden" name="comp[', $entry['key'], ']" value="', $entry['value'], '" />
-						<textarea name="entry[', $entry['key'], ']" cols="40" rows="', $entry['rows'] < 2 ? 2 : $entry['rows'], '" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 96%; min-width: 96%' : 'width: 96%') . ';">', $entry['value'], '</textarea>
-					</dd>';
-			$cached = array();
-		}
-
-		// Odd number?
-		if (!empty($cached))
-		{
-			// Alternative time
-			echo '
-					<dt>
-						<span class="smalltext">', $cached['key'], '</span>
-					</dt>
-					<dd>
-					</dd>
-					<dt>
-						<input type="hidden" name="comp[', $cached['key'], ']" value="', $cached['value'], '" />
-						<textarea name="entry[', $cached['key'], ']" cols="40" rows="2" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 96%; min-width: 96%' : 'width: 96%') . ';">', $cached['value'], '</textarea>
-					</dt>
-					<dd>
-					</dd>';
+						<textarea id="entry_', $entry['key'], '" name="entry[', $entry['key'], ']" cols="40" rows="', $entry['rows'] < 2 ? 2 : $entry['rows'], '" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 96%; min-width: 96%' : '') . ';">', $entry['value'], '</textarea>
+					</li>';
 		}
 
 		echo '
-				</dl>
+				</ul>
 				<input type="submit" name="save_entries" value="', $txt['save'], '"', !empty($context['entries_not_writable_message']) ? ' disabled="disabled"' : '', ' class="button_submit" />
 			</div>';
 	}
@@ -411,8 +376,8 @@ function template_add_language()
 				<div class="content">
 					<fieldset>
 						<legend>', $txt['add_language_elk'], '</legend>
-						<label class="smalltext">', $txt['add_language_elk_browse'], '</label>
-						<input type="text" name="lang_add" size="40" value="', !empty($context['elk_search_term']) ? $context['elk_search_term'] : '', '" class="input_text" />';
+						<label for="lang_add" class="smalltext">', $txt['add_language_elk_browse'], '</label>
+						<input type="text" id="lang_add" name="lang_add" size="40" value="', !empty($context['elk_search_term']) ? $context['elk_search_term'] : '', '" class="input_text" />';
 
 	// Do we have some errors? Too bad.
 	if (!empty($context['langfile_error']))

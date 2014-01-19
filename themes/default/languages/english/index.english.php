@@ -463,6 +463,7 @@ $txt['rt_years'] = '%s years ago';
 
 $txt['new_poll'] = 'New poll';
 $txt['poll_question'] = 'Question';
+$txt['poll_question_options'] = 'Question and Options';
 $txt['poll_vote'] = 'Submit Vote';
 $txt['poll_total_voters'] = 'Total Members Voted';
 $txt['shortcuts'] = 'shortcuts: alt+s submit/post, alt+p preview';

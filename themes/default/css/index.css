@@ -620,7 +620,11 @@ div.windowbg, div.windowbg2 {
 	padding: 1px 4px;
 	cursor: pointer;
 }
-
+/* To ensure the question and the input are on two different lines */
+.verificationquestion label {
+	display: block;
+	width: 100%;
+}
 
 /*	$BBC		*/
 /* ------------------------------------------------------- */
@@ -699,6 +703,7 @@ div.windowbg, div.windowbg2 {
 .bbc_list {
 	padding: 0 0 0 35px;
 	text-align: left;
+	list-style-type: square;
 }
 /* Everything is same except HTML5 valid */
 .bbc_tt {
@@ -784,9 +789,11 @@ a.bbc_link {
 #search_form  * {
 	margin: 0;
 	border-radius: 0;
-	font-size: 0.929em;
 	/* Webkit (bleh) fix. */
 	float: left;
+}
+#chrome #search_form .button_submit {
+	font-size: 1em;
 }
 /* The logo and slogan. */
 #header {
@@ -1703,7 +1710,7 @@ dl.settings textarea {
 	right: 0;
 }
 .sort_by_item {
-	width: 7em;
+	width: 100%;
 }
 .topic_sorting>li {
 	float: right;
@@ -1742,6 +1749,10 @@ img.new_posts {
 /* Styles for the message (topic) index. */
 #messageindex, #unread {
 	clear: both;
+}
+.action_unread .topic_sorting #sortby, .action_unread #sortby,
+.action_unreadreplies .topic_sorting #sortby, .action_unreadreplies #sortby {
+	width: 9em;
 }
 #unread_header {
 	margin-top: 0.5em;
@@ -1861,11 +1872,13 @@ img.new_posts {
 .topic_moderation_alt img {
 	padding: 2px 2px 0 2px;
 }
+.topic_listing .warningbox {
+	margin-bottom: 0px;
+}
 .qaction_row {
 	text-align: right;
 	padding: 6px;
 }
-
 .sticky_row .topic_info {
 	background: url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
 }
@@ -1873,9 +1886,7 @@ img.new_posts {
 	background: url(../images/icons/quick_sticky_lock.png) no-repeat 98% 4px;
 }
 /* @todo - Extra classes for search results, etc. See if I can clean them up. */
-.locked_row, .locked_row.core_posts {
-	background: #f7f7f7;
-}
+
 .locked_row .topic_info, .locked_row .topic_details {
 	background: url(../images/icons/quick_lock.png) no-repeat 98% 4px;
 }
@@ -1939,9 +1950,6 @@ img.new_posts {
 }
 #poll_main ul {
 	margin-top: 8px;
-}
-#poll_main li {
-	margin-top: 3px;
 }
 #poll .content {
 	padding: 0 12px;
@@ -2436,44 +2444,38 @@ ul.post_options li {
 }
 
 /* The event editor section. */
-#post_event .roundframe {
+#event_main, #poll_options, #poll_main {
+	margin-bottom: 0.5em;
+}
+#event_main .roundframe {
 	overflow: auto;
 	padding: 12px 12%;
 }
-#post_event fieldset {
+#event_main fieldset {
 	clear: both;
 }
-#post_event #event_main input {
-	float: left;
-	margin: 0 0 12px 0;
+#event_main #datepicker, #event_main #caption_evtitle {
+	display: inline-block;
+	padding-left: 1em;
+	padding-top: 0.5em;
 }
-#post_event #event_main div.smalltext {
-	float: right;
-	width: 34.6em;
+#event_main #evtitle {
+	margin-top: 0.5em;
 }
-#post_event div.event_options {
-	float: right;
-}
-#post_event .event_main, .event_options {
+#event_main .event_options {
 	overflow: hidden;
 	padding: 0;
 }
-#post_event .event_main li {
-	float: left;
-	margin: 2px 0;
-	width: 49%;
-}
-/* @todo - div.event_options and ul.event_options? Meh. :P Fix. */
-#post_event ul.event_options {
+#event_main .event_options {
 	margin: 0;
-	padding: 0 0 8px 8px;
+	padding: 1em 0.5em 0.5em 1em;
 }
-#post_event ul.event_options li {
-	margin: 0;
-	float: left;
+#event_main .event_options li {
+	padding-top: 0.5em;
+	padding-bottom: 0.5em;
 }
-#post_event #event_main select, #post_event ul.event_options li select,
-#post_event ul.event_options li .input_check {
+#event_main select, .event_options li select,
+#event_main ul.event_options li .input_check {
 	margin: 0 12px 0 0;
 }
 #datepicker {
@@ -2484,35 +2486,35 @@ ul.post_options li {
 #edit_poll {
 	overflow: hidden;
 }
-#edit_poll fieldset {
+#poll_main, #poll_options, #poll_reset {
 	clear: both;
 	overflow: hidden;
 	padding: 6px;
 }
-#edit_poll fieldset input {
-	margin-left: 7.8em;
+#poll_main #question {
+	margin-left: 2em;
 }
-#edit_poll ul.poll_main li {
+#poll_main .poll_main li {
 	padding-left: 12px;
 }
-#edit_poll ul.poll_main input {
+#poll_main .poll_main input {
 	margin-left: 12px;
 }
-#edit_poll ul.poll_main, dl.poll_options {
+#poll_main .poll_main, dl.poll_options {
 	overflow: hidden;
 	padding: 0 0 8px 8px;
 }
-#edit_poll ul.poll_main li {
+#poll_main .poll_main li {
 	margin: 2px 0;
 }
-#edit_poll dl.poll_options dt {
+#poll_options .poll_options dt {
 	padding: 0 0 0 12px;
 	width: 33%;
 }
-#edit_poll dl.poll_options dd {
+#poll_options .poll_options dd {
 	width: 65%;
 }
-#edit_poll dl.poll_options dd input {
+#poll_options .poll_options dd input {
 	margin-left: 0;
 }
 
@@ -2577,6 +2579,7 @@ dl.merge_topic dd {
 }
 .merge_options {
 	clear: both;
+	padding: 0.5em;
 }
 .custom_subject {
 	margin: 6px 0;
@@ -3004,7 +3007,13 @@ dl.merge_topic dd {
 #new_template_link a {
 	margin-bottom: 2px;
 }
-
+#warndiv {
+	margin: 0 0 1em 5%;
+}
+#slider-range-min {
+	width: 90%;
+	margin-top: 1em;
+}
 
 /* $PERSONAL	*/
 /* ------------------------------------------------------- */
@@ -3054,6 +3063,7 @@ dl.merge_topic dd {
 }
 #addrule fieldset {
 	clear: both;
+	padding: 0.5em;
 }
 #to_item_list_container div, #bcc_item_list_container div {
 	float: left;
@@ -3484,6 +3494,16 @@ a.help .icon {
 	display: none;
 	padding: 0.5em;
 }
+#mlsearch_options.nojs {
+	display: none;
+}
+#mlsearch_options.nojs li:nth-child(odd) {
+	float: left;
+	max-width: 25em;
+}
+#mlsearch_options.nojs li:nth-child(even) {
+	float: right;
+}
 #mlsearch_options .mlsearch_option .input_check {
 	margin-left: 0.5em;
 }
@@ -3722,6 +3742,13 @@ a.help .icon {
 		margin-right: 5px;
 		box-shadow: none;
 		border: 1px solid transparent;
+	}
+	#main_menu .linklevel1, #main_menu .linklevel1 a  {
+		margin: 0;
+		padding: 0;
+	}
+	#main_menu .linklevel1>.pm_indicator {
+		display: none;
 	}
 	.button_title {
 		display: none;
@@ -4163,6 +4190,9 @@ a.help .icon {
 	}
 	#month_grid {
 		display: none;
+	}
+	#warning_level {
+		max-width: 5em !important;
 	}
 }
 /* This one does 480px screens at default font size. */

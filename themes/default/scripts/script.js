@@ -645,7 +645,8 @@ function hashLoginPassword(doForm, cur_session_id, token)
 	if (cur_session_id === null)
 		cur_session_id = elk_session_id;
 
-	if (typeof(hex_sha1) === 'undefined')
+	// Don't have our hash lib availalbe?
+	if (typeof(hex_sha256) === 'undefined')
 		return;
 
 	// Are they using an email address?
@@ -656,7 +657,7 @@ function hashLoginPassword(doForm, cur_session_id, token)
 	if (!('opera' in window))
 		doForm.passwrd.autocomplete = 'off';
 
-	doForm.hash_passwrd.value = hex_sha1(hex_sha1(doForm.user.value.php_to8bit().php_strtolower() + doForm.passwrd.value.php_to8bit()) + cur_session_id + token);
+	doForm.hash_passwrd.value = hex_sha256(doForm.user.value.php_strtolower() + doForm.passwrd.value);
 
 	// It looks nicer to fill it with asterisks, but Firefox will try to save that.
 	if (is_ff !== -1)
@@ -675,11 +676,11 @@ function hashLoginPassword(doForm, cur_session_id, token)
  */
 function hashAdminPassword(doForm, username, cur_session_id, token)
 {
-	// Missing sha1.js?
-	if (typeof(hex_sha1) === 'undefined')
+	// Missing sha256.js?
+	if (typeof(hex_sha256) === 'undefined')
 		return;
 
-	doForm.admin_hash_pass.value = hex_sha1(hex_sha1(username.php_to8bit().php_strtolower() + doForm.admin_pass.value.php_to8bit()) + cur_session_id + token);
+	doForm.admin_hash_pass.value = hex_sha256(username.php_strtolower() + doForm.admin_pass.value);
 	doForm.admin_pass.value = doForm.admin_pass.value.replace(/./g, '*');
 }
 
@@ -693,11 +694,11 @@ function hashAdminPassword(doForm, username, cur_session_id, token)
  */
 function hashModeratePassword(doForm, username, cur_session_id, token)
 {
-	// Missing sha1.js?
-	if (typeof(hex_sha1) === 'undefined')
+	// Missing sha256.js?
+	if (typeof(hex_sha256) === 'undefined')
 		return;
 
-	doForm.moderate_hash_pass.value = hex_sha1(hex_sha1(username.php_to8bit().php_strtolower() + doForm.moderate_pass.value.php_to8bit()) + cur_session_id + token);
+	doForm.moderate_hash_pass.value = hex_sha256(username.php_strtolower() + doForm.moderate_pass.value);
 	doForm.moderate_pass.value = doForm.moderate_pass.value.replace(/./g, '*');
 }
 
@@ -1734,31 +1735,6 @@ function expandCollapse(id, icon, speed)
 
 	// Open or collaspe the content id
 	oId.slideToggle(speed);
-}
-
-/**
- * Maintains the personal message rule options to conform with the rule choice
- * so that the form only makes available the proper choices (input, select, none, etc)
- *
- * @param {string} optNum
- */
-function updateRuleDef(optNum)
-{
-	if (document.getElementById("ruletype" + optNum).value === "gid")
-	{
-		document.getElementById("defdiv" + optNum).style.display = "none";
-		document.getElementById("defseldiv" + optNum).style.display = "";
-	}
-	else if (document.getElementById("ruletype" + optNum).value === "bud" || document.getElementById("ruletype" + optNum).value === "")
-	{
-		document.getElementById("defdiv" + optNum).style.display = "none";
-		document.getElementById("defseldiv" + optNum).style.display = "none";
-	}
-	else
-	{
-		document.getElementById("defdiv" + optNum).style.display = "";
-		document.getElementById("defseldiv" + optNum).style.display = "none";
-	}
 }
 
 /**

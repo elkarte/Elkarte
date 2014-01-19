@@ -57,10 +57,7 @@ $(document).ready(function() {
 		$(this).parent().toggleClass("collapsed");
 	}).each(function () {
 		if ($(this).data('collapsed'))
-		{
-			$(this).siblings().css({display: "none"});
-			$(this).parent().toggleClass("collapsed");
-		}
+			$(this).click();
 	});
 
 	// Spoiler

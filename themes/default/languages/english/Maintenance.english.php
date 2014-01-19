@@ -146,8 +146,7 @@ $txt['maintain_backup_gz'] = 'Compress the file with gzip.';
 $txt['maintain_backup_save'] = 'Download';
 
 $txt['maintain_old'] = 'Remove Old Posts';
-$txt['maintain_old_since_days1'] = 'Remove all topics not posted in for ';
-$txt['maintain_old_since_days2'] = ' days, which are:';
+$txt['maintain_old_since_days'] = 'Remove all topics not posted in for %1$s  days, which are:';
 $txt['maintain_old_nothing_else'] = 'Any sort of topic.';
 $txt['maintain_old_are_moved'] = 'Moved topic notices.';
 $txt['maintain_old_are_locked'] = 'Locked.';
@@ -158,13 +157,11 @@ $txt['maintain_old_remove'] = 'Remove now';
 $txt['maintain_old_confirm'] = 'Are you really sure you want to delete old posts now?\\n\\nThis cannot be undone!';
 
 $txt['maintain_old_drafts'] = 'Remove old drafts';
-$txt['maintain_old_drafts_days'] = 'Remove all drafts older than';
+$txt['maintain_old_drafts_days'] = 'Remove all drafts older than %1$s days';
 $txt['maintain_old_drafts_confirm'] = 'Are you really sure you want to delete old drafts now?\\n\\nThis cannot be undone!';
 $txt['maintain_members'] = 'Remove Inactive Members';
 $txt['maintain_members_ungrouped'] = 'Ungrouped Members <span class="smalltext">(Members with no assigned groups)</span>';
-$txt['maintain_members_since1'] = 'Remove all members who have not';
-$txt['maintain_members_since2'] = 'for';
-$txt['maintain_members_since3'] = 'days.';
+$txt['maintain_members_since'] = 'Remove all members who have not {select_conditions} for {num_days} days.';
 $txt['maintain_members_activated'] = 'activated their account';
 $txt['maintain_members_logged_in'] = 'logged in';
 $txt['maintain_members_all'] = 'All Member Groups';

@@ -84,7 +84,16 @@ function template_issueWarning()
 
 	echo '
 					<dt>
-						<strong>', $txt['profile_warning_level'], ':</strong>';
+						<strong><label for="warning_level">', $txt['profile_warning_level'], '</label>:</strong>
+							<div class="smalltext">', $txt['profile_warning_impact'], ':<br />';
+
+	// For non-javascript give a better list.
+	foreach ($context['level_effects'] as $limit => $effect)
+		echo '
+							', sprintf($txt['profile_warning_effect_text'], $limit, $effect), '<br />';
+
+	echo '
+							</div>';
 
 	// Is there only so much they can apply?
 	if ($context['warning_limit'])
@@ -94,29 +103,13 @@ function template_issueWarning()
 	echo '
 					</dt>
 					<dd>
-						<div id="warndiv1" style="display: none;">
-							<div>
-								<span class="floatleft" style="padding: .1em .5em"><a href="#" onclick="changeWarnLevel(-5); return false;">[-]</a></span>
-								<div  class="floatleft progress_bar" style="width: ', $context['warningBarWidth'], 'px; margin:0" onmousedown="setWarningBarPos(event, true);" onmousemove="setWarningBarPos(event, true);" onclick="setWarningBarPos(event);">
-									<div id="warning_text" class="full_bar">', $context['member']['warning'], '%</div>
-									<div id="warning_progress" class="green_percent" style="width: ', $context['member']['warning'], '%;">&nbsp;</div>
-								</div>
-								<span class="floatleft" style="padding: .1em .5em"><a href="#" onclick="changeWarnLevel(5); return false;">[+]</a></span>
-								<div class="clear_left smalltext">', $txt['profile_warning_impact'], ': <span id="cur_level_div">', $context['level_effects'][$context['current_level']], '</span></div>
-							</div>
-							<input type="hidden" name="warning_level" id="warning_level" value="SAME" />
-						</div>
-						<div id="warndiv2">
-							<input type="text" name="warning_level_nojs" size="6" maxlength="4" value="', $context['member']['warning'], '" class="input_text" />&nbsp;', $txt['profile_warning_max'], '
-							<div class="smalltext">', $txt['profile_warning_impact'], ':<br />';
+						<div id="warndiv">
+							<input type="text" id="warning_level" name="warning_level" size="6" maxlength="4" value="', $context['member']['warning'], '" class="input_text" />&nbsp;', $txt['profile_warning_max'], '
+							<div id="slider-range-min"></div>
 
-	// For non-javascript give a better list.
-	foreach ($context['level_effects'] as $limit => $effect)
-		echo '
-							', sprintf($txt['profile_warning_effect_text'], $limit, $effect), '<br />';
-
-	echo '
-							</div>
+							<script><!-- // --><![CDATA[
+								initWarnSlider("slider-range-min", "warning_level", [', implode(',', array_keys($context['level_effects'])), ']);
+							// ]]></script>
 						</div>
 					</dd>';
 
@@ -124,7 +117,7 @@ function template_issueWarning()
 	{
 		echo '
 					<dt>
-						<strong>', $txt['profile_warning_reason'], ':</strong><br />
+						<strong><label for="warn_reason">', $txt['profile_warning_reason'], '</label>:</strong><br />
 						<span class="smalltext">', $txt['profile_warning_reason_desc'], '</span>
 					</dt>
 					<dd>
@@ -201,9 +194,7 @@ function template_issueWarning()
 	// Do our best to get pretty javascript enabled.
 	echo '
 	<script><!-- // --><![CDATA[
-		document.getElementById(\'warndiv1\').style.display = "";
-		document.getElementById(\'preview_button\').style.display = "none";
-		document.getElementById(\'warndiv2\').style.display = "none";';
+		document.getElementById(\'preview_button\').style.display = "none";';
 
 	if (!$context['user']['is_owner'])
 		echo '
@@ -284,8 +275,8 @@ function template_deleteAccount()
 		echo '
 					<div class="errorbox">', $txt['own_profile_confirm'], '</div>
 					<div>
-						<strong', (isset($context['modify_error']['bad_password']) || isset($context['modify_error']['no_password']) ? ' class="error"' : ''), '>', $txt['current_password'], ': </strong>
-						<input type="password" name="oldpasswrd" size="20" class="input_password" />&nbsp;&nbsp;&nbsp;&nbsp;
+						<strong', (isset($context['modify_error']['bad_password']) || isset($context['modify_error']['no_password']) ? ' class="error"' : ''), '><label for="oldpasswrd">', $txt['current_password'], '</label>: </strong>
+						<input type="password" id="oldpasswrd" name="oldpasswrd" size="20" class="input_password" />&nbsp;&nbsp;&nbsp;&nbsp;
 						<input type="submit" value="', $txt['delete'], '" class="button_submit submitgo" />';
 
 		if (!empty($context['token_check']))

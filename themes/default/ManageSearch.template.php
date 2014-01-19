@@ -139,16 +139,16 @@ function template_select_search_method()
 					<fieldset class="search_settings">
 						<legend>', $txt['search_index'], '</legend>
 						<dl>
-							<dt><input type="radio" name="search_index" value=""', empty($modSettings['search_index']) ? ' checked="checked"' : '', ' class="input_radio" />
-							', $txt['search_index_none'], '
+							<dt><input type="radio" id="search_index_none" name="search_index" value="none"', empty($modSettings['search_index']) ? ' checked="checked"' : '', ' class="input_radio" />
+							<label for="search_index_none">', $txt['search_index_none'], '</label>
 							</dt>';
 
 	if ($context['supports_fulltext'])
 	{
 		echo '
 							<dt>
-								<input type="radio" name="search_index" value="fulltext"', !empty($modSettings['search_index']) && $modSettings['search_index'] == 'fulltext' ? ' checked="checked"' : '', empty($context['fulltext_index']) ? ' onclick="alert(\'' . $txt['search_method_fulltext_warning'] . '\'); selectRadioByName(this.form.search_index, \'fulltext\');"' : '', ' class="input_radio" />
-								', $txt['search_method_fulltext_index'], '
+								<input type="radio" id="search_index_full" name="search_index" value="fulltext"', !empty($modSettings['search_index']) && $modSettings['search_index'] == 'fulltext' ? ' checked="checked"' : '', empty($context['fulltext_index']) ? ' onclick="alert(\'' . $txt['search_method_fulltext_warning'] . '\'); selectRadioByName(this.form.search_index, \'none\');"' : '', ' class="input_radio" />
+								<label for="search_index_full">', $txt['search_method_fulltext_index'], '</label>
 							</dt>
 							<dd>
 
@@ -171,8 +171,8 @@ function template_select_search_method()
 
 	echo '
 							<dt>
-								<input type="radio" name="search_index" value="custom"', !empty($modSettings['search_index']) && $modSettings['search_index'] == 'custom' ? ' checked="checked"' : '', $context['custom_index'] ? '' : ' onclick="alert(\'' . $txt['search_index_custom_warning'] . '\'); selectRadioByName(this.form.search_method, \'1\');"', ' class="input_radio" />
-								', $txt['search_index_custom'], '
+								<input type="radio" id="search_index_custom" name="search_index" value="custom"', !empty($modSettings['search_index']) && $modSettings['search_index'] == 'custom' ? ' checked="checked"' : '', $context['custom_index'] ? '' : ' onclick="alert(\'' . $txt['search_index_custom_warning'] . '\'); selectRadioByName(this.form.search_index, \'none\');"', ' class="input_radio" />
+								<label for="search_index_custom">', $txt['search_index_custom'], '</label>
 							</dt>
 							<dd>
 								<span class="smalltext">';
@@ -200,8 +200,8 @@ function template_select_search_method()
 
 		echo '
 							<dt>
-								<input type="radio" name="search_index" value="', $api['setting_index'], '"', !empty($modSettings['search_index']) && $modSettings['search_index'] == $api['setting_index'] ? ' checked="checked"' : '', ' class="input_radio" />
-								', $api['label'], '
+								<input type="radio" id="search_index_', $api['setting_index'], '" name="search_index" value="', $api['setting_index'], '"', !empty($modSettings['search_index']) && $modSettings['search_index'] == $api['setting_index'] ? ' checked="checked"' : '', ' class="input_radio" />
+								<label for="search_index_', $api['setting_index'], '">', $api['label'], '</label>
 							</dt>';
 
 		if ($api['desc'])
@@ -391,7 +391,7 @@ function template_show_spider_logs()
 			<div class="windowbg">
 				<div class="content">
 					<p>
-						', sprintf($txt['spider_stats_delete_older'], '<input type="text" name="older" id="older" value="7" size="3" class="input_text" />'), '
+						<label for="older">', sprintf($txt['spider_stats_delete_older'], '<input type="text" name="older" id="older" value="7" size="3" class="input_text" />'), '</label>
 					</p>
 					<input type="submit" name="delete_entries" value="', $txt['spider_logs_delete_submit'], '" onclick="if (document.getElementById(\'older\').value &lt; 1 &amp;&amp; !confirm(\'' . addcslashes($txt['spider_logs_delete_confirm'], "'") . '\')) return false; return true;" class="right_submit" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -421,7 +421,7 @@ function template_show_spider_stats()
 			<div class="windowbg">
 				<div class="content">
 					<p>
-						', sprintf($txt['spider_stats_delete_older'], '<input type="text" name="older" id="older" value="90" size="3" class="input_text" />'), '
+						<label for="older">', sprintf($txt['spider_stats_delete_older'], '<input type="text" name="older" id="older" value="7" size="3" class="input_text" />'), '</label>
 					</p>
 					<hr />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

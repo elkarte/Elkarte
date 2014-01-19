@@ -37,7 +37,7 @@ $txt['login_below_or_register'] = 'Please login below or <a href="%1$s">register
 $txt['may_change_in_profile'] = 'You may change it after you login by going to the profile page, or by visiting this page after you login:';
 $txt['your_username_is'] = 'Your user name is: ';
 
-$txt['login_hash_error'] = 'Password security has recently been upgraded.  Please enter your password again.';
+$txt['login_hash_error'] = 'Password security has recently been upgraded.<br>Please enter your password again.';
 
 $txt['ban_register_prohibited'] = 'Sorry, you are not allowed to register on this forum.';
 $txt['under_age_registration_prohibited'] = 'Sorry, but users under the age of %1$d are not allowed to register on this forum.';
