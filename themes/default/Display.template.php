@@ -633,6 +633,7 @@ function template_quickreply_below()
 function template_display_poll_above()
 {
 	global $settings, $context, $txt, $scripturl;
+
 	echo '
 			<div id="poll">
 				<h3 class="category_header">
@@ -654,7 +655,7 @@ function template_display_poll_above()
 		foreach ($context['poll']['options'] as $option)
 		{
 			echo '
-						<li class="', $option['voted_this'] ? 'voted' : '', '">', $option['option'], '
+						<li', $option['voted_this'] ? ' class="voted"' : '', '>', $option['option'], '
 							<div class="results">';
 
 			if ($context['allow_poll_view'])

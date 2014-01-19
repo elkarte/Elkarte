@@ -142,24 +142,46 @@ function resetVotes($pollID)
  * Only returns info on the poll, not its options.
  *
  * @param int $id_poll
- *
+ * @param bool $ignore_permissions if true permissions are not checked.
+ *             If false, {query_see_board} boardsAllowedTo('poll_view') and
+ *             $modSettings['postmod_active'] will be considered in the query.
+ *             This param is currently used only in SSI, it may be useful in any
+ *             kind of integration
  * @return array|false array of poll information, or false if no poll is found
  */
-function pollInfo($id_poll)
+function pollInfo($id_poll, $ignore_permissions = true)
 {
+	global $modSettings;
+
 	$db = database();
+
+	$boardsAllowed = array();
+	if ($ignore_permissions === false)
+	{
+		$boardsAllowed = boardsAllowedTo('poll_view');
+
+		if (empty($boardsAllowed))
+			return false;
+	}
 
 	// Read info from the db
 	$request = $db->query('', '
 		SELECT
 			p.question, p.voting_locked, p.hide_results, p.expire_time, p.max_votes, p.change_vote,
-			p.guest_vote, p.id_member, IFNULL(mem.real_name, p.poster_name) AS poster_name, p.num_guest_voters, p.reset_poll
+			p.guest_vote, p.id_member, IFNULL(mem.real_name, p.poster_name) AS poster_name,
+			p.num_guest_voters, p.reset_poll' . ($ignore_permissions ? '' : ',
+			b.id_board') . '
 		FROM {db_prefix}polls AS p
-			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = p.id_member)
-		WHERE p.id_poll = {int:id_poll}
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = p.id_member)' . ($ignore_permissions ? '' : '
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)') . '
+		WHERE p.id_poll = {int:id_poll}' . ($ignore_permissions ? '' : ((in_array(0, $boardsAllowed) ? '' : '
+			AND b.id_board IN ({array_int:boards_allowed_see})') . (!$modSettings['postmod_active'] ? '' : '
+			AND t.approved = {int:is_approved}'))) . '
 		LIMIT 1',
 		array(
 			'id_poll' => $id_poll,
+			'boards_allowed_see' => $boardsAllowed,
+			'is_approved' => 1,
 		)
 	);
 	$poll_info = $db->fetch_assoc($request);
