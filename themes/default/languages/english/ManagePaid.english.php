@@ -196,7 +196,7 @@ $txt['paid_make_recurring'] = 'Make this a recurring payment';
 
 $txt['subscriptions'] = 'Subscriptions';
 $txt['subscription'] = 'Subscription';
-$txt['paid_subs_desc'] = 'Below is a list of all the subscriptions which are available on this forum.';
+$txt['paid_subs_desc'] = 'Below is a list of all the subscriptions which are available on this site.';
 $txt['paid_subs_none'] = 'There are currently no paid subscriptions available.';
 
 $txt['paid_current'] = 'Existing Subscriptions';
