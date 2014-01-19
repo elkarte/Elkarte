@@ -37,7 +37,7 @@ $txt['login_below_or_register'] = 'Bitte melden Sie sich unten an oder <a href="
 $txt['may_change_in_profile'] = 'Sie können Änderungen vornehmen, indem Sie Ihr Profil öffnen oder nach der Anmeldung diese Seite besuchen:';
 $txt['your_username_is'] = 'Ihr Benutzername lautet: ';
 
-$txt['login_hash_error'] = 'Es wurden kürzlich Änderungen an der Passwortsicherheit vorgenommen.  Bitte geben Sie Ihr Passwort erneut ein.';
+$txt['login_hash_error'] = 'Es wurden kürzlich Änderungen an der Passwortsicherheit vorgenommen.<br />Bitte geben Sie Ihr Passwort erneut ein.';
 
 $txt['ban_register_prohibited'] = 'Verzeihung, aber Sie dürfen sich in diesem Forum nicht registrieren.';
 $txt['under_age_registration_prohibited'] = 'Verzeihung, aber Personen unter %1$d Jahren dürfen sich in diesem Forum nicht registrieren.';

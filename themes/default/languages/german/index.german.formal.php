@@ -463,6 +463,7 @@ $txt['rt_years'] = 'Vor %s Jahren';
 
 $txt['new_poll'] = 'Neue Umfrage';
 $txt['poll_question'] = 'Frage';
+$txt['poll_question_options'] = 'Frage und Optionen';
 $txt['poll_vote'] = 'Abstimmen';
 $txt['poll_total_voters'] = 'Teilnehmer insgesamt';
 $txt['shortcuts'] = 'Tastenkürzel: Alt+s absenden/verfassen, Alt+p Vorschau';

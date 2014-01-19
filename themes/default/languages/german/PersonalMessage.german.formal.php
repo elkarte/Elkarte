@@ -45,8 +45,7 @@ $txt['pm_mark_unread'] = 'Als ungelesen markieren';
 
 // Message Pruning.
 $txt['pm_prune'] = 'Nachrichten aufräumen';
-$txt['pm_prune_desc1'] = 'Alle privaten Nachrichten löschen, die älter als';
-$txt['pm_prune_desc2'] = 'Tage sind.';
+$txt['pm_prune_desc'] = 'Alle privaten Nachrichten löschen, die älter als %1$s Tage sind.';
 $txt['pm_prune_warning'] = 'Sind Sie sich sicher, dass Sie die privaten Nachrichten aufräumen möchten?';
 
 // Actions Drop Down.

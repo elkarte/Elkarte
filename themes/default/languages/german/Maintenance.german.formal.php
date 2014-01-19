@@ -146,8 +146,7 @@ $txt['maintain_backup_gz'] = 'Datei per GZip komprimieren.';
 $txt['maintain_backup_save'] = 'Herunterladen';
 
 $txt['maintain_old'] = 'Alte Beiträge entfernen';
-$txt['maintain_old_since_days1'] = 'Alle Themen entfernen, in denen seit ';
-$txt['maintain_old_since_days2'] = ' Tagen nichts geschrieben wurde, nämlich:';
+$txt['maintain_old_since_days'] = 'Alle Themen entfernen, in denen seit %1$s Tagen nichts geschrieben wurde, nämlich:';
 $txt['maintain_old_nothing_else'] = 'Jede Art von Thema.';
 $txt['maintain_old_are_moved'] = 'Thema-verschoben-Hinweise.';
 $txt['maintain_old_are_locked'] = 'Gesperrt.';
@@ -158,13 +157,11 @@ $txt['maintain_old_remove'] = 'Jetzt entfernen';
 $txt['maintain_old_confirm'] = 'Sind Sie sich wirklich sicher, dass Sie jetzt diese alten Beiträge entfernen möchten?\\n\\nDies kann nicht rückgängig gemacht werden!';
 
 $txt['maintain_old_drafts'] = 'Alte Entwürfe entfernen';
-$txt['maintain_old_drafts_days'] = 'Alle Entwürfe entfernen, die älter sind als';
+$txt['maintain_old_drafts_days'] = 'Alle Entwürfe entfernen, die älter sind als %1$s Tage';
 $txt['maintain_old_drafts_confirm'] = 'Sind Sie sich wirklich sicher, dass Sie jetzt diese alten Entwürfe entfernen möchten?\\n\\nDies kann nicht rückgängig gemacht werden!';
 $txt['maintain_members'] = 'Inaktive Benutzer entfernen';
 $txt['maintain_members_ungrouped'] = 'Nicht gruppierte Mitglieder <span class="smalltext">(Mitglieder ohne zugewiesene Benutzergruppe)</span>';
-$txt['maintain_members_since1'] = 'Alle Mitglieder entfernen, deren letzte';
-$txt['maintain_members_since2'] = 'länger als';
-$txt['maintain_members_since3'] = 'Tage zurückliegt.';
+$txt['maintain_members_since'] = 'Alle Mitglieder entfernen, deren letzte {select_conditions} länger als {num_days} Tage zurückliegt.';
 $txt['maintain_members_activated'] = 'Aktivierung';
 $txt['maintain_members_logged_in'] = 'Anmeldung';
 $txt['maintain_members_all'] = 'Alle Benutzergruppen';
