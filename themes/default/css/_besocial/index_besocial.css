@@ -1212,6 +1212,9 @@ span.views_text {
 	.frame {
 		border-radius: 0;
 	}
+	#forumtitle {
+		margin-left: 10px;
+	}
 	.topic_listing>li {
 		border: 1px solid #ccc;
 		box-shadow: 1px 1px 1px #eee;
