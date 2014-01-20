@@ -249,7 +249,7 @@ function pollInfoForTopic($topicID)
  * Retrieve the id of the topic associated to a poll
  *
  * @param int $pollID the topic with an associated poll.
- * @return int the topic id, false if no topics found
+ * @return array the topic id and the board id, false if no topics found
  */
 function topicFromPoll($pollID)
 {
@@ -258,9 +258,10 @@ function topicFromPoll($pollID)
 	// Check if a poll currently exists on this topic, and get the id, question and starter.
 	$request = $db->query('', '
 		SELECT
-			t.id_topic
+			t.id_topic, b.id_board
 		FROM {db_prefix}topics AS t
 			LEFT JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
+			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
 		WHERE p.id_poll = {int:current_poll}
 		LIMIT 1',
 		array(
@@ -273,11 +274,11 @@ function topicFromPoll($pollID)
 		$topicID = false;
 	// Get the poll information.
 	else
-		list ($topicID) = $db->fetch_row($request);
+		list ($topicID, $boardID) = $db->fetch_row($request);
 
 	$db->free_result($request);
 
-	return $topicID;
+	return array($topicID, $boardID);
 }
 
 /**

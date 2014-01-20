@@ -1286,16 +1286,13 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
  * is the definition of the poll moderation button array (see Display.controller.php
  * for details).
  *
- * Warning: calling this function many times on the same page may be expensive
- * for the server because it has to load the boards informations for almost any topic
- *
  * @param int $topicID = null
  * @param string $output_method = 'echo'
  */
 function ssi_showPoll($topicID = null, $output_method = 'echo')
 {
 	global $txt, $settings, $boardurl, $user_info, $context, $modSettings;
-	global $topic, $board;
+	global $board;
 	static $last_board = null;
 
 	require_once(SUBSDIR . '/Poll.subs.php');
@@ -1309,19 +1306,19 @@ function ssi_showPoll($topicID = null, $output_method = 'echo')
 	if (empty($topicID))
 		return array();
 
-	// In order to properly check permissions we have to be in a board, so:
-	$topic = $topicID;
-
-	// In order to try to avoid some overhead, if the correct board is already loaded
-	// do not load it again
-	if (empty($last_board) || $last_board != $board)
-	{
-		loadBoard();
-		$last_board = $board;
-	}
-
 	// Get the topic starter information.
-	$topicinfo = getTopicInfo($topic, 'starter');
+	$topicinfo = getTopicInfo($topicID, 'starter');
+
+	$boards_can_poll = boardsAllowedTo('poll_view');
+
+	// If:
+	//  - is not allowed to see poll in any board,
+	//  - or:
+	//     - is not allowed in the specific board, and
+	//     - is not an admin
+	// fail
+	if (empty($boards_can_poll) || (!in_array($topicinfo['id_board'], $boards_can_poll) && !in_array(0, $boards_can_poll)))
+		return array();
 
 	$context['user']['started'] = $user_info['id'] == $topicinfo['id_member'] && !$user_info['is_guest'];
 
@@ -1423,7 +1420,7 @@ function ssi_showPoll($topicID = null, $output_method = 'echo')
  */
 function ssi_pollVote()
 {
-	global $context, $db_prefix, $user_info, $sc, $modSettings, $topic;
+	global $context, $db_prefix, $user_info, $sc, $modSettings, $topic, $board;
 
 	$pollID = isset($_POST['poll']) ? (int) $_POST['poll'] : 0;
 
@@ -1443,8 +1440,8 @@ function ssi_pollVote()
 
 	require_once(CONTROLLERDIR . '/Poll.controller.php');
 	require_once(SUBSDIR . '/Poll.subs.php');
-	// We fake we are in a topic so that we can use the proper controller
-	$topic = topicFromPoll($pollID);
+	// We have to fake we are in a topic so that we can use the proper controller
+	list ($topic, $board) = topicFromPoll($pollID);
 	loadBoard();
 
 	$poll_action = new Poll_Controller();
