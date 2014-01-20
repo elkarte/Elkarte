@@ -943,9 +943,7 @@ function toggleBaseDir ()
 		dir_elem = document.getElementById('basedirectory_for_attachments');
 
 	if (auto_attach.selectedIndex === 0)
-	{
 		dir_elem.disabled = 1;
-	}
 	else
 		dir_elem.disabled = !sub_dir.checked;
 }
@@ -1044,10 +1042,17 @@ function swapRot()
 	}
 }
 
+/**
+ * Updates the move confirmation text so its descriptive for the current items
+ * being moved.
+ *
+ * @param {string} confirmText
+ */
 function confirmMoveTopics(confirmText)
 {
 	var from = document.getElementById('id_board_from'),
 		to = document.getElementById('id_board_to');
+
 	if (from.options[from.selectedIndex].disabled || from.options[to.selectedIndex].disabled)
 		return false;
 
@@ -1104,7 +1109,7 @@ function ajax_getTemplatePreview()
 	.done(function(request) {
 		$("#box_preview").css({display:""});
 		$("#template_preview").html($(request).find('body').text());
-		if ($(request).find("error").text() != '')
+		if ($(request).find("error").text() !== '')
 		{
 			$("#errors").css({display:""});
 			var errors_html = '',
@@ -1137,6 +1142,7 @@ function initEditProfileBoards()
 
 		$('.edit_board').click();
 	});
+
 	$('.edit_board').show().click(function(e) {
 		var $icon = $(this),
 			board_id = $icon.data('boardid'),
@@ -1146,15 +1152,15 @@ function initEditProfileBoards()
 				.attr('name', 'boardprofile[' + board_id + ']')
 				.change(function() {
 					$(this).find('option:selected').each(function() {
-						if ($(this).attr('value') == board_profile)
+						if ($(this).attr('value') === board_profile)
 							$icon.addClass('nochanges').removeClass('changed');
 						else
 							$icon.addClass('changed').removeClass('nochanges');
-					})
+					});
 				});
 
 		e.preventDefault();
-		$(permission_profiles).each(function(key, value) {   
+		$(permission_profiles).each(function(key, value) {
 			var $opt = $('<option />').attr('value', value.id).text(value.name);
 
 			if (value.id == board_profile)
@@ -1228,7 +1234,7 @@ function initEditPermissionProfiles()
 }
 
 /**
- * Attache the AJAX handling of things to the various themes to remove
+ * Attach the AJAX handling of things to the various themes to remove
  * Used in ManageThemes (template_list_themes)
  */
 function initDeleteThemes()
@@ -1319,11 +1325,17 @@ function navigatePreview(url)
 	myDoc.send(null);
 }
 
+/**
+ * Used when editing a stylesheet.  Allows for the preview to be updated to reflect
+ * changes made to the css in the editor.
+ *
+ * @param {boolean} check
+ */
 function refreshPreview(check)
 {
 	var identical = document.forms.stylesheetForm.entire_file.value == refreshPreviewCache;
 
-	// Don\'t reflow the whole thing if nothing changed!!
+	// Don't reflow the whole thing if nothing changed!!
 	if (check && identical)
 		return;
 
@@ -1391,13 +1403,24 @@ function refreshPreview(check)
 		};
 	}
 }
-// Ban edit page
+
+/**
+ * Callback (onBeforeUpdate) used by the AutoSuggest, used when adding new bans
+ *
+ * @param {object} oAutoSuggest
+ */
 function onUpdateName(oAutoSuggest)
 {
 	document.getElementById('user_check').checked = true;
 	return true;
 }
 
+/**
+ * Validates that the ban form is filled out properly before submitting
+ * Used when editing bans
+ *
+ * @param {object} aForm this form object to check
+ */
 function confirmBan(aForm)
 {
 	if (aForm.ban_name.value === '')
@@ -1413,10 +1436,44 @@ function confirmBan(aForm)
 	}
 }
 
+// Enable/disable some fields when working with bans.
 var fUpdateStatus = function ()
 {
 	document.getElementById("expire_date").disabled = !document.getElementById("expires_one_day").checked;
 	document.getElementById("cannot_post").disabled = document.getElementById("full_ban").checked;
 	document.getElementById("cannot_register").disabled = document.getElementById("full_ban").checked;
 	document.getElementById("cannot_login").disabled = document.getElementById("full_ban").checked;
+};
+
+/**
+ * Used when setting up subscriptions, used to toggle the currency code divs
+ * based on which currencys are chosen.
+ */
+function toggleCurrencyOther()
+{
+	var otherOn = document.getElementById("paid_currency").value === 'other',
+		currencydd = document.getElementById("custom_currency_code_div_dd");
+
+	if (otherOn)
+	{
+		document.getElementById("custom_currency_code_div").style.display = "";
+		document.getElementById("custom_currency_symbol_div").style.display = "";
+
+		if (currencydd)
+		{
+			document.getElementById("custom_currency_code_div_dd").style.display = "";
+			document.getElementById("custom_currency_symbol_div_dd").style.display = "";
+		}
+	}
+	else
+	{
+		document.getElementById("custom_currency_code_div").style.display = "none";
+		document.getElementById("custom_currency_symbol_div").style.display = "none";
+
+		if (currencydd)
+		{
+			document.getElementById("custom_currency_symbol_div_dd").style.display = "none";
+			document.getElementById("custom_currency_code_div_dd").style.display = "none";
+		}
+	}
 }
