@@ -536,7 +536,7 @@ function loadSubscriptions()
  * Loads all of the members subscriptions from those that are active
  *
  * @param int $memID id of the member
- * @param type $active_subscriptions array of active susbcriptions they can have
+ * @param type $active_subscriptions array of active subscriptions they can have
  */
 function loadMemberSubscriptions($memID, $active_subscriptions)
 {
@@ -621,8 +621,8 @@ function loadAllSubsctiptions($sub_id)
 
 /**
  * Removes a subscription from the system
- * Updates members group subscriptions for members whos group associations
- * were releated to the subscription
+ * Updates members group subscriptions for members whose group associations
+ * were related to the subscription
  *
  * @param int $id
  */
@@ -970,7 +970,7 @@ function updateSubscriptionItem($item)
 
 /**
  * When a refund is processed, this either removes it or sets a new end time to
- * reflect its no longer re-occuring
+ * reflect its no longer re-occurring
  *
  * @param array $subscription_info the susbscription information array
  * @param int $member_id
@@ -1091,7 +1091,7 @@ function logSubscription($details)
 }
 
 /**
- * Somebody paid the first time? Let's log ...
+ * Somebody paid the first time? Let's log
  *
  * @param array $details
  */
@@ -1113,7 +1113,7 @@ function logNewSubscription($sub_id, $memID, $pending_details)
 }
 
 /**
- * Updated details for a pending subscription? Logging..
+ * Updated details for a pending subscription? Logging.
  *
  * @param int $log_id
  * @param string $details
@@ -1160,7 +1160,7 @@ function updatePendingSubscriptionCount($pending_count, $sub_id, $memID, $detail
 }
 
 /**
- * Update a pending payment for a memmber
+ * Update a pending payment for a member
  * Generally used to change the status from prepay to payback to indicate that the user completed
  * the order screen and was redirected to the thank you screen (from the gateway).
  * Note the payment is still pending until the gateway posts to subscriptions.php and its validated
