@@ -101,7 +101,7 @@ $txt['maillist_imap_ssl'] = 'IMAP/SSL';
 $txt['maillist_pop3_tls'] = 'POP3/TLS';
 $txt['maillist_pop3_ssl'] = 'POP3/SSL';
 $txt['maillist_imap_delete'] = 'Delete Messages';
-$txt['maillist_imap_delete_desc'] = 'Attempt to remove mailbox messages that have been retrieved.';
+$txt['maillist_imap_delete_desc'] = 'Attempt to remove mailbox messages that have been retrieved and processed.';
 $txt['maillist_imap_reason'] = 'The following should be left BLANK if you intend to pipe messages into the forum (recommended)';
 $txt['maillist_imap_missing'] = 'IMAP functions are not installed on your system, no settings are available';
 $txt['maillist_imap_cron'] = 'Fake-Cron (scheduled task)';
@@ -116,11 +116,11 @@ $txt['maillist_newtopic_needsapproval'] = 'Require New Topic approval';
 $txt['maillist_newtopic_needsapproval_desc'] = 'Require all new topics sent by email to be approved before they are posted to prevent email spoofing';
 $txt['recommended'] = 'This is recommended';
 $txt['receiving_address'] = 'Receiving email addresses';
-$txt['receiving_board'] = 'Board to Post it to';
+$txt['receiving_board'] = 'Board to post new messages to';
 $txt['reply_add_more'] = 'Add another address';
-$txt['receiving_address_desc'] = 'Enter a list of email address followed by board to where received email should be posted,  This is needed to start a NEW topic in a specific board, members must send an email to that email address and it will post in the corresponding board.  To remove and existing item, just clear the email address and save';
+$txt['receiving_address_desc'] = 'Enter a list of email address followed by board to where received email should be posted.  This is needed to start a NEW topic in a specific board, members must send an email to that email address and it will post in the corresponding board.  To remove an existing item, just clear the email address and save';
 $txt['email_not_valid'] = 'The email address (%s) is not valid';
-$txt['board_not_valid'] = 'You have entered an invalid board id (%d)';
+$txt['board_not_valid'] = 'You have entered an invalid board ID (%d)';
 
 // Other settings
 $txt['misc'] = 'Other Settings';
