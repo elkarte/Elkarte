@@ -2579,7 +2579,7 @@ function setupThemeContext($forceload = false)
 			$txt['welcome_guest'] .= $txt['welcome_guest_activate'];
 
 		// If we've upgraded recently, go easy on the passwords.
-		if (!empty($modSettings['disableHashTime']) && ($modSettings['disableHashTime'] == 1 || time() < $modSettings['disableHashTime']))
+		if (!empty($modSettings['enable_password_conversion']))
 			$context['disable_login_hashing'] = true;
 	}
 
