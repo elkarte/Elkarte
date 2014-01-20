@@ -1738,20 +1738,16 @@ function expandCollapse(id, icon, speed)
 }
 
 /**
- * Highlight a selection box by changing its class name
- * @todo depreciated?
+ * Highlight a selection box by adding the highlight2 class
  *
- * @param {type} box
+ * @param string container_id
  */
-function highlightSelected(box)
+function initHighlightSelection(container_id)
 {
-	if (prevClass !== "")
-		prevDiv.className = prevClass;
-
-	prevDiv = document.getElementById(box);
-	prevClass = prevDiv.className;
-
-	prevDiv.className = "highlight2";
+	$('#' + container_id + ' [name="def_language"]').click(function (ev) {
+		$('#' + container_id + ' .standard_row').removeClass('highlight2');
+		$(this).parent().parent().addClass('highlight2');
+	});
 }
 
 /**
