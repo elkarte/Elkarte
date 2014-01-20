@@ -579,7 +579,50 @@ function loadMemberSubscriptions($memID, $active_subscriptions)
 }
 
 /**
- * Removes a subscription
+ * Find all members with an active subscription to a specific item
+ *
+ * @param int $sub_id id of the subscription we are looking for
+ */
+function loadAllSubsctiptions($sub_id)
+{
+	global $txt;
+
+	$db = database();
+
+	// Need a subscription id
+	if (empty($sub_id))
+		return array();
+
+	// Find some basic information for each member that has subscribed
+	$request = $db->query('', '
+		SELECT
+			ls.id_member, ls.old_id_group, ls.id_subscribe, ls.status,
+			mem.id_group, mem.additional_groups, IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, {string:guest}) AS name
+		FROM {db_prefix}log_subscribed AS ls
+			INNER JOIN {db_prefix}members AS mem ON (ls.id_member = mem.id_member)
+		WHERE ls.id_subscribe = {int:current_subscription}
+			AND status = {int:is_active}',
+		array(
+			'current_subscription' => $sub_id,
+			'is_active' => 1,
+			'guest' => $txt['guest'],
+		)
+	);
+	$members = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		$id_member = $row['id_member'];
+		$members[$id_member] = $row;
+	}
+	$db->free_result($request);
+
+	return $members;
+}
+
+/**
+ * Removes a subscription from the system
+ * Updates members group subscriptions for members whos group associations
+ * were releated to the subscription
  *
  * @param int $id
  */
@@ -587,6 +630,49 @@ function deleteSubscription($id)
 {
 	$db = database();
 
+	// Removing it, first lets see if anyone is subscribed
+	$members = loadAllSubsctiptions($id);
+	if (!empty($members))
+	{
+		$changes = array();
+
+		// Get the specifics of this subscription
+		$sub_detail = getSubscriptionDetails($id);
+
+		// Do we need to reset the primary group?
+		if (!empty($sub_detail['prim_group']))
+		{
+			// If this subscription changed the primary group, change it back
+			foreach ($members as $id_member => $member_data)
+			{
+				if ($member_data['old_id_group'] != $member_data['id_group'] && $member_data['id_group'] == $sub_detail['prim_group'])
+					$changes[$id_member]['id_group'] = $member_data['old_id_group'];
+			}
+		}
+
+		// Did the subscription add any secondary groups that we now must to remove?
+		if (!empty($sub_detail['add_groups']))
+		{
+			foreach ($members as $id_member => $member_data)
+			{
+				$current_groups = explode(',', $member_data['additional_groups']);
+				$non_sub_groups = array_diff($current_groups, $sub_detail['add_groups']);
+
+				// If they have any of the subscription groups, remove them
+				if (implode(',', $non_sub_groups) != $member_data['additional_groups'])
+					$changes[$id_member]['additional_groups'] = $new_groups;
+			}
+		}
+
+		// Apply the group changes, if there are any
+		if (!empty($changes))
+		{
+			foreach ($changes as $id_member => $new_values)
+				updateMemberData($id_member, $new_values);
+		}
+	}
+
+	// Remove the subscription as well
 	$db->query('delete_subscription', '
 		DELETE FROM {db_prefix}subscriptions
 		WHERE id_subscribe = {int:current_subscription}',
