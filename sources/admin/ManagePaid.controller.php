@@ -286,7 +286,7 @@ class ManagePaid_Controller extends Action_Controller
 				'name' => array(
 					'header' => array(
 						'value' => $txt['paid_name'],
-						'style' => 'width: 35%;',
+						'style' => 'width: 30%;',
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
@@ -311,7 +311,7 @@ class ManagePaid_Controller extends Action_Controller
 				'pending' => array(
 					'header' => array(
 						'value' => $txt['paid_pending'],
-						'style' => 'width: 18%;',
+						'style' => 'white_space: nowrap;',
 					),
 					'data' => array(
 						'db_htmlsafe' => 'pending',
@@ -345,22 +345,41 @@ class ManagePaid_Controller extends Action_Controller
 						'),
 					),
 				),
-				'modify' => array(
+				'subscribers' => array(
+					'header' => array(
+						'value' => $txt['subscribers'],
+					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $context, $txt, $scripturl;
+							global $scripturl, $txt, $settings;
 
-							return \'<a href="\' . $scripturl . \'?action=admin;area=paidsubscribe;sa=modify;sid=\' . $rowData[\'id\'] . \'">\' . $txt[\'modify\'] . \'</a>\';
+							return \'<a href="\' . $scripturl . \'?action=admin;area=paidsubscribe;sa=viewsub;sid=\' . $rowData[\'id\'] . \'"><img title="\' . $txt[\'view\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/members.png" alt="*" /></a>\';
+						'),
+						'class' => 'centertext',
+					),
+				),
+				'modify' => array(
+					'header' => array(
+						'value' => $txt['modify'],
+					),
+					'data' => array(
+						'function' => create_function('$rowData', '
+							global $txt, $scripturl, $settings;
+
+							return \'<a href="\' . $scripturl . \'?action=admin;area=paidsubscribe;sa=modify;sid=\' . $rowData[\'id\'] . \'"><img title="\' . $txt[\'modify\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/modify_inline.png" alt="*" /></a>\';
 						'),
 						'class' => 'centertext',
 					),
 				),
 				'delete' => array(
+					'header' => array(
+						'value' => $txt['remove']
+					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $context, $txt, $scripturl;
+							global $txt, $scripturl, $settings;
 
-							return \'<a href="\' . $scripturl . \'?action=admin;area=paidsubscribe;sa=modify;delete;sid=\' . $rowData[\'id\'] . \'">\' . $txt[\'delete\'] . \'</a>\';
+							return \'<a href="\' . $scripturl . \'?action=admin;area=paidsubscribe;sa=modify;delete;sid=\' . $rowData[\'id\'] . \'"><img title="\' . $txt[\'delete\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/delete.png" alt="*" /></a>\';
 						'),
 						'class' => 'centertext',
 					),
