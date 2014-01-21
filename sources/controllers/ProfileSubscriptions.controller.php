@@ -173,7 +173,7 @@ class ProfileSubscriptions_Controller extends Action_Controller
 		$context['gateways'] = array();
 		foreach ($gateways as $id => $gateway)
 		{
-			$fields = $gateways[$id]->fetchGatewayFields($order['id'] . '+' . $memID, $order, $context['value'], $period, $scripturl . '?action=profile;u=' . $memID . ';area=subscriptions;sub_id=' . $order['id'] . ';done');
+			$fields = $gateways[$id]->fetchGatewayFields($order['id'] . '+' . $memID, $order, $context['value'], $period, $scripturl . '?action=profile&u=' . $memID . '&area=subscriptions&sub_id=' . $order['id'] . '&done');
 			if (!empty($fields['form']))
 			{
 				$context['gateways'][] = $fields;

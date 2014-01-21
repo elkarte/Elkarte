@@ -209,6 +209,8 @@ class paypal_payment
 			curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
 			curl_setopt($curl, CURLOPT_FORBID_REUSE, 1);
 			curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+				'Content-Type: application/x-www-form-urlencoded',
+				'Content-Length: ' . strlen($requestString),
 				'Host: www.' . (!empty($modSettings['paidsubs_test']) ? 'sandbox.' : '') . 'paypal.com',
 				'Connection: close'
 			));
@@ -229,7 +231,7 @@ class paypal_payment
 			$header = 'POST /cgi-bin/webscr HTTP/1.1' . "\r\n";
 			$header .= 'Content-Type: application/x-www-form-urlencoded' . "\r\n";
 			$header .= 'Host: www.' . (!empty($modSettings['paidsubs_test']) ? 'sandbox.' : '') . 'paypal.com' . "\r\n";
-			$header .= 'Content-Length: ' . strlen ($requestString) . "\r\n";
+			$header .= 'Content-Length: ' . strlen($requestString) . "\r\n";
 			$header .= 'Connection: close' . "\r\n\r\n";
 
 			// Open the connection.
