@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The Xml_Array class is an xml parser.
+ * The Ftp_Connection class is a Simple FTP protocol implementation.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
