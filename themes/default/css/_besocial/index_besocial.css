@@ -232,8 +232,8 @@ strong {
 	color: #ff7200;
 }
 /* Legacy highlight color, for selected membergroups etc. */
-/* Used by JS to show a selected item. @todo - deprecate? */
-.highlight2 {
+/* Used by JS to show a selected item. Still used in manage languages */
+.table_grid .standard_row.highlight2 {
 	background: #d1e1ef;
 	color: #555;
 }

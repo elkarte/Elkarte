@@ -16,7 +16,7 @@
  */
 
 /**
- * depreciated?
+ * @deprecated since 1.0
  */
 function template_sendbody()
 {
@@ -312,7 +312,7 @@ function template_results()
 }
 
 /**
- * Build the jump to box, depreciated?
+ * Build the jump to box
  */
 function template_jump_to()
 {

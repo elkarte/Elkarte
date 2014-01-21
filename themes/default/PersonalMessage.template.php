@@ -424,13 +424,12 @@ function template_subject_list()
 							<tr class="standard_row">
 								<td colspan="5">', $txt['pm_alert_none'], '</td>
 							</tr>';
-	$next_alternate = false;
 
 	// Use the query callback to get the subject list
 	while ($message = $context['get_pmessage']('subject'))
 	{
 		echo '
-							<tr class="', $next_alternate ? 'standard_row' : 'alternate_row', '">
+							<tr class="standard_row">
 								<td class="pm_icon">
 									<script><!-- // --><![CDATA[
 										currentLabels[', $message['id'], '] = {';
@@ -464,8 +463,6 @@ function template_subject_list()
 									<input type="checkbox" name="pms[]" id="deletelisting', $message['id'], '" value="', $message['id'], '"', $message['is_selected'] ? ' checked="checked"' : '', ' onclick="if (document.getElementById(\'deletedisplay', $message['id'], '\')) document.getElementById(\'deletedisplay', $message['id'], '\').checked = this.checked;" class="input_check" />
 								</td>
 							</tr>';
-
-		$next_alternate = !$next_alternate;
 	}
 
 	echo '

@@ -237,12 +237,6 @@ strong {
 .highlight {
 	color: #ff7200;
 }
-/* Legacy highlight color, for selected membergroups etc. */
-/* Used by JS to show a selected item. @todo - deprecate? */
-.highlight2 {
-	background: #d1e1ef;
-	color: #555;
-}
 
 /* Used for sections that need somewhat larger corners */
 /* @todo - Daft name. Other stuffz. :P */
@@ -910,8 +904,14 @@ div.bbc_footnotes .meaction{
 .table_grid td, .letterspacing {
 	border-bottom: 1px solid #ccc;
 }
-.table_grid .alternate_row {
+.table_grid .standard_row:nth-child(even) {
 	background: #fafafa;
+}
+/* Legacy highlight color, for selected membergroups etc. */
+/* Used by JS to show a selected item. Still used in manage languages */
+.table_grid .standard_row.highlight2 {
+	background: #d1e1ef;
+	color: #555;
 }
 
 /* For Errors.template.php. */
