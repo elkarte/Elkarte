@@ -353,6 +353,7 @@ strong {
 /* /me uses this a lot. (emote, try typing /me in a post.) */
 .meaction {
 	color: #50aa3a;
+	vertical-align: bottom;
 }
 .meaction:before {
 	content: "\270c";
@@ -1211,6 +1212,9 @@ span.views_text {
 	}
 	.frame {
 		border-radius: 0;
+	}
+	#forumtitle {
+		margin-left: 10px;
 	}
 	.topic_listing>li {
 		border: 1px solid #ccc;
