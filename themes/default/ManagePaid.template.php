@@ -566,7 +566,7 @@ function template_choose_payment()
 					<input type="hidden" id="', $gateway['id'], '_', $name, '" name="', $name, '" value="', $value, '" />';
 
 		echo '
-					<br><input type="submit" value="', $gateway['submit'], '" class="right_submit" />
+					<br /><input type="submit" value="', $gateway['submit'], '" class="right_submit" />
 				</form>
 			</div>
 		</div>';
