@@ -1407,6 +1407,17 @@ function loadTheme($id_theme = 0, $initialize = true)
 	// This allows sticking some HTML on the page output - useful for controls.
 	$context['insert_after_template'] = '';
 
+	// Just some mobile-friendly settings
+	if ($context['browser_body_id'] == 'mobile')
+	{
+		// Disable the preview text.
+		$modSettings['message_index_preview'] = 0;
+		// Force the usage of click menu instead of a hover menu.
+		$options['use_click_menu'] = 1;
+		// Disable the search dropdown.
+		$modSettings['search_dropdown'] = false;
+	}
+
 	if (!isset($txt))
 		$txt = array();
 

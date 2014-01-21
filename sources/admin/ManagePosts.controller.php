@@ -298,6 +298,7 @@ class ManagePosts_Controller extends Action_Controller
 				array('int', 'edit_disable_time', 'subtext' => $txt['edit_disable_time_zero'], 'postinput' => $txt['manageposts_minutes']),
 			'',
 				// First & Last message preview lengths
+				array('select', 'message_index_preview', array($txt['message_index_preview_off'], $txt['message_index_preview_first'], $txt['message_index_preview_last'])),
 				array('int', 'preview_characters', 'subtext' => $txt['preview_characters_zero'], 'postinput' => $txt['preview_characters_units']),
 		);
 

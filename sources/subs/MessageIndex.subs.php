@@ -74,6 +74,16 @@ function messageIndexTopics($id_board, $id_member, $start, $per_page, $sort_by, 
 	// and some you wish you didn't! :P
 	if (!$ids_query || !empty($topic_ids))
 	{
+		// If empty, no preview at all
+		if (empty($indexOptions['previews']))
+			$preview_bodies = '';
+		// If -1 means everything
+		elseif ($indexOptions['previews'] === -1)
+			$preview_bodies = ', ml.body AS last_body, mf.body AS first_body';
+		// Default: a SUBSTRING
+		else
+			$preview_bodies = ', SUBSTRING(ml.body, 1, ' . ($indexOptions['previews'] + 256) . ') AS last_body, SUBSTRING(mf.body, 1, ' . ($indexOptions['previews'] + 256) . ') AS first_body';
+
 		$request = $db->query('substring', '
 			SELECT
 				t.id_topic, t.num_replies, t.locked, t.num_views, t.num_likes, t.is_sticky, t.id_poll, t.id_previous_board,
@@ -84,9 +94,9 @@ function messageIndexTopics($id_board, $id_member, $start, $per_page, $sort_by, 
 				IFNULL(meml.real_name, ml.poster_name) AS last_display_name,
 				mf.poster_time AS first_poster_time, mf.subject AS first_subject, mf.icon AS first_icon,
 				mf.poster_name AS first_member_name, mf.id_member AS first_id_member, mf.smileys_enabled AS first_smileys,
-				IFNULL(memf.real_name, mf.poster_name) AS first_display_name' .
-				(!empty($indexOptions['previews']) ? ' ,SUBSTRING(ml.body, 1, ' . ($indexOptions['previews'] + 256) . ') AS last_body, SUBSTRING(mf.body, 1, ' . ($indexOptions['previews'] + 256) . ') AS first_body' : '') .
-				(!empty($indexOptions['include_avatars']) ? ' ,meml.avatar ,IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type, meml.email_address' : '') .
+				IFNULL(memf.real_name, mf.poster_name) AS first_display_name
+				' . $preview_bodies . '
+				' . (!empty($indexOptions['include_avatars']) ? ' ,meml.avatar ,IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type, meml.email_address' : '') .
 				(!empty($indexOptions['custom_selects']) ? ' ,' . implode(',', $indexOptions['custom_selects']) : '') . '
 			FROM {db_prefix}topics AS t
 				INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)

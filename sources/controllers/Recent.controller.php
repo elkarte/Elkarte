@@ -451,6 +451,16 @@ class Recent_Controller extends Action_Controller
 
 		$is_topics = $_REQUEST['action'] == 'unread';
 
+		// If empty, no preview at all
+		if (empty($modSettings['message_index_preview']))
+			$preview_bodies = '';
+		// If 0 means everything
+		elseif (empty($modSettings['preview_characters']))
+			$preview_bodies = 'ml.body AS last_body, ms.body AS first_body,';
+		// Default: a SUBSTRING
+		else
+			$preview_bodies = 'SUBSTRING(ml.body, 1, ' . ($modSettings['preview_characters'] + 256) . ') AS last_body, SUBSTRING(ms.body, 1, ' . ($modSettings['preview_characters'] + 256) . ') AS first_body,';
+
 		// This part is the same for each query.
 		$select_clause = '
 					ms.subject AS first_subject, ms.poster_time AS first_poster_time, ms.id_topic, t.id_board, b.name AS bname,
@@ -458,8 +468,9 @@ class Recent_Controller extends Action_Controller
 					ml.poster_time AS last_poster_time, IFNULL(mems.real_name, ms.poster_name) AS first_poster_name,
 					IFNULL(meml.real_name, ml.poster_name) AS last_poster_name, ml.subject AS last_subject,
 					ml.icon AS last_icon, ms.icon AS first_icon, t.id_poll, t.is_sticky, t.locked, ml.modified_time AS last_modified_time,
-					IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1 AS new_from, SUBSTRING(ml.body, 1, 385) AS last_body,
-					SUBSTRING(ms.body, 1, 385) AS first_body, ml.smileys_enabled AS last_smileys, ms.smileys_enabled AS first_smileys, t.id_first_msg, t.id_last_msg';
+					IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1 AS new_from,
+					' . $preview_bodies . '
+					ml.smileys_enabled AS last_smileys, ms.smileys_enabled AS first_smileys, t.id_first_msg, t.id_last_msg';
 
 		if ($context['showing_all_topics'])
 			$earliest_msg = earliest_msg();
@@ -877,7 +888,7 @@ class Recent_Controller extends Action_Controller
 		{
 			$topic_ids[] = $row['id_topic'];
 
-			if (!empty($settings['message_index_preview']))
+			if (!empty($modSettings['message_index_preview']))
 			{
 				// Limit them to 128 characters - do this FIRST because it's a lot of wasted censoring otherwise.
 				$row['first_body'] = strip_tags(strtr(parse_bbc($row['first_body'], $row['first_smileys'], $row['id_first_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
@@ -980,6 +991,7 @@ class Recent_Controller extends Action_Controller
 					'href' => $scripturl . '?topic=' . $row['id_topic'] . ($row['num_replies'] == 0 ? '.0' : '.msg' . $row['id_last_msg']) . ';topicseen#msg' . $row['id_last_msg'],
 					'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . ($row['num_replies'] == 0 ? '.0' : '.msg' . $row['id_last_msg']) . ';topicseen#msg' . $row['id_last_msg'] . '" rel="nofollow">' . $row['last_subject'] . '</a>'
 				),
+				'default_preview' => trim($row[!empty($modSettings['message_index_preview']) && $modSettings['message_index_preview'] == 2 ? 'last_body' : 'first_body']),
 				'new_from' => $row['new_from'],
 				'new_href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['new_from'] . ';topicseen#new',
 				'href' => $scripturl . '?topic=' . $row['id_topic'] . ($row['num_replies'] == 0 ? '.0' : '.msg' . $row['new_from']) . ';topicseen' . ($row['num_replies'] == 0 ? '' : 'new'),
