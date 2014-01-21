@@ -211,7 +211,7 @@ function logLastDatabaseError()
 function displayDebug()
 {
 	global $context, $scripturl, $modSettings;
-	global $db_cache, $db_count, $db_show_debug, $cache_count, $cache_hits, $txt;
+	global $db_cache, $db_count, $db_show_debug, $cache_count, $cache_hits, $txt, $rusage_start;
 
 	// Add to Settings.php if you want to show the debugging information.
 	if (!isset($db_show_debug) || $db_show_debug !== true || (isset($_GET['action']) && $_GET['action'] == 'viewquery') || isset($_GET['api']))
@@ -259,7 +259,6 @@ function displayDebug()
 	if (function_exists('getrusage'))
 	{
 		$rusage_end = getrusage();
-		$rusage_start();
 		$context['user_time'] = ($rusage_end['ru_utime.tv_sec'] - $rusage_start['ru_utime.tv_sec'] + ($rusage_end['ru_utime.tv_usec'] / 1000000));
 		$context['system_time'] = ($rusage_end['ru_stime.tv_sec'] - $rusage_start['ru_stime.tv_sec'] + ($rusage_end['ru_stime.tv_usec'] / 1000000));
 	}
