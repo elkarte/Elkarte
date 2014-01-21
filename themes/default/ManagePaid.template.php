@@ -587,9 +587,9 @@ function template_paid_done()
 		<h3 class="category_header">', $txt['paid_done'], '</h3>
 		<div class="windowbg2">
 			<div class="content">
-				<p>', $txt['paid_done_desc'], '</p>
+				<p class="successbox">', $txt['paid_done_desc'], '</p>
 				<br />
-				<a href="', $scripturl, '?action=profile;u=', $context['member']['id'], ';area=subscriptions">', $txt['paid_sub_return'], '</a>
+				<a class="linkbutton_right" href="', $scripturl, '?action=profile;u=', $context['member']['id'], ';area=subscriptions">', $txt['paid_sub_return'], '</a>
 			</div>
 		</div>
 	</div>';
