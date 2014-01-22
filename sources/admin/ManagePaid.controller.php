@@ -184,6 +184,7 @@ class ManagePaid_Controller extends Action_Controller
 					$_POST['paid_currency_code'] = $_POST['paid_currency'];
 					$_POST['paid_currency_symbol'] = $txt[$_POST['paid_currency'] . '_symbol'];
 				}
+				$_POST['paid_currency_code'] = trim($_POST['paid_currency_code']);
 
 				unset($config_vars['dummy_currency']);
 				Settings_Form::save_db($config_vars);
