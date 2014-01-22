@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta
+ * @version 1.0 Beta 2
  *
  */
 
@@ -31,7 +31,7 @@ class Sphinx_Search
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
 	 * @var string
 	 */
-	public $version_compatible = 'ElkArte 1.0 Beta';
+	public $version_compatible = 'ElkArte 1.0 Beta 2';
 
 	/**
 	 * This won't work with versions of ElkArte less than this.
