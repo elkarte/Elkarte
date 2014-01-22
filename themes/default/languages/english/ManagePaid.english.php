@@ -183,6 +183,7 @@ $txt['paid_all_freq_blank'] = 'You must enter a cost for at least one of the fou
 $txt['paid_no_data'] = 'No valid data was sent to the script.';
 
 $txt['paypal_could_not_connect'] = 'Could not connect to PayPal server';
+$txt['paypal_currency_unkown'] = 'The currency code from PayPal (%1$s) does not match the code in your settings (%2$s)';
 $txt['paid_sub_not_active'] = 'That subscription is not taking any new users.';
 $txt['paid_disabled'] = 'Paid subscriptions are currently disabled.';
 $txt['paid_unknown_transaction_type'] = 'Unknown Paid Subscriptions transaction type.';

@@ -57,8 +57,7 @@ if (!empty($modSettings['paid_email_to']))
 $db = database();
 
 // We need to see whether we can find the correct payment gateway,
-// we'll going to go through all our gateway scripts and find out
-// if they are happy with what we have.
+// Go through all our gateway scripts and find out if they are happy with what we have.
 $txnType = '';
 $gatewayHandles = loadPaymentGateways();
 foreach ($gatewayHandles as $gateway)

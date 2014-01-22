@@ -184,18 +184,34 @@ class paypal_payment
 	{
 		global $modSettings, $txt;
 
+		$my_post = array();
+
+		// Reading POSTed data directly from $_POST may causes serialization issues with array data
+		// in the POST. Instead, read raw POST data from the input stream.
+		$raw_post_data = file_get_contents('php://input');
+		$raw_post_array = explode('&', $raw_post_data);
+
+		// Process it
+		foreach ($raw_post_array as $keyval)
+		{
+			$keyval = explode('=', $keyval);
+			if (count($keyval) === 2)
+				$my_post[$keyval[0]] = urldecode($keyval[1]);
+		}
+
 		// Put this to some default value.
-		if (!isset($_POST['txn_type']))
-			$_POST['txn_type'] = '';
+		if (!isset($my_post['txn_type']))
+			$my_post['txn_type'] = '';
 
 		// Build the request string - starting with the minimum requirement.
 		$requestString = 'cmd=_notify-validate';
 
-		// Now my dear, add all the posted bits in the order we got them
-		foreach ($_POST as $k => $v)
-			$requestString .= '&' . $k . '=' . urlencode($v);
+		// Now my dear, add all the posted bits back in the exact order we got them
+		foreach ($my_post as $key => $value)
+			$requestString .= '&' . $key . '=' . urlencode($value);
 
-		// Can we use curl?
+		// Post IPN data back to PayPal to validate the IPN data is genuine
+		// First we try cURL
 		if (function_exists('curl_init') && $curl = curl_init((!empty($modSettings['paidsubs_test']) ? 'https://www.sandbox.' : 'http://www.') . 'paypal.com/cgi-bin/webscr'))
 		{
 			// Set the post data.
@@ -208,6 +224,11 @@ class paypal_payment
 			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 1);
 			curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
 			curl_setopt($curl, CURLOPT_FORBID_REUSE, 1);
+
+			// Set TCP timeout to 30 seconds
+			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
+
+			// Set the http headers
 			curl_setopt($curl, CURLOPT_HTTPHEADER, array(
 				'Content-Type: application/x-www-form-urlencoded',
 				'Content-Length: ' . strlen($requestString),
@@ -215,7 +236,7 @@ class paypal_payment
 				'Connection: close'
 			));
 
-			// Fetch the data returned as a string.
+			// The data returned as a string.
 			curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
 			// Fetch the data.
@@ -259,11 +280,12 @@ class paypal_payment
 			fclose($fp);
 		}
 
-		// If this isn't verified then give up...
+		// If PayPal IPN does not return verified then give up...
 		if (strcmp(trim($this->return_data), 'VERIFIED') !== 0)
 			exit;
 
-		// Check that this is intended for us.
+		// Now that we have received a VERIFIED response from PayPal, we perform some checks
+		// before we assume that the IPN is legitimate. First check that this is intended for us.
 		if ($modSettings['paypal_email'] !== $_POST['business'] && (empty($modSettings['paypal_additional_emails']) || !in_array($_POST['business'], explode(',', $modSettings['paypal_additional_emails']))))
 			exit;
 
@@ -273,8 +295,8 @@ class paypal_payment
 			$this->_findSubscription();
 
 		// Verify the currency!
-		if (strtolower($_POST['mc_currency']) !== strtolower($modSettings['paid_currency_code']));
-			exit;
+		if (trim(strtolower($_POST['mc_currency'])) !== strtolower($modSettings['paid_currency_code']))
+			generateSubscriptionError(sprintf($txt['paypal_currency_unkown'], $_POST['mc_currency'], $modSettings['paid_currency_code']));
 
 		// Can't exist if it doesn't contain anything.
 		if (empty($_POST['item_number']))
@@ -335,7 +357,6 @@ class paypal_payment
 
 	/**
 	 * Record the transaction reference and exit
-	 *
 	 */
 	public function close()
 	{
@@ -376,7 +397,8 @@ class paypal_payment
 
 		// Do we have this in the database?
 		$request = $db->query('', '
-			SELECT id_member, id_subscribe
+			SELECT
+				id_member, id_subscribe
 			FROM {db_prefix}log_subscribed
 			WHERE vendor_ref = {string:vendor_ref}
 			LIMIT 1',
@@ -392,7 +414,8 @@ class paypal_payment
 			{
 				$db->free_result($request);
 				$request = $db->query('', '
-					SELECT ls.id_member, ls.id_subscribe
+					SELECT
+						ls.id_member, ls.id_subscribe
 					FROM {db_prefix}log_subscribed AS ls
 						INNER JOIN {db_prefix}members AS mem ON (mem.id_member = ls.id_member)
 					WHERE mem.email_address = {string:payer_email}
