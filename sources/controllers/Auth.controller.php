@@ -143,6 +143,7 @@ class Auth_Controller extends Action_Controller
 			'name' => $txt['login'],
 		);
 
+		// This is an OpenID login. Let's validate...
 		if (!empty($_POST['openid_identifier']) && !empty($modSettings['enableOpenID']))
 		{
 			require_once(SUBSDIR . '/OpenID.subs.php');
