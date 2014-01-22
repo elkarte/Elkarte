@@ -245,8 +245,13 @@ class Generic_List
 				if (!empty($column['data']['comma_format']))
 					$cur_data['value'] = comma_format($cur_data['value']);
 				elseif (!empty($column['data']['timeformat']))
-					$cur_data['value'] = standardTime($cur_data['value']);
-
+				{
+					// Maybe we need a relative time?
+					if ($column['data']['timeformat'] == 'html_time')
+						$cur_data['value'] = htmlTime($cur_data['value']);
+					else
+						$cur_data['value'] = standardTime($cur_data['value']);
+				}
 				// Set a style class for this column?
 				if (isset($column['data']['class']))
 					$cur_data['class'] = $column['data']['class'];
