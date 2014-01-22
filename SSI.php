@@ -402,7 +402,7 @@ function ssi_fetchPosts($post_ids = array(), $override_permissions = false, $out
 	);
 
 	// Then make the query and dump the data.
-	return ssi_queryPosts($query_where, $query_where_params, '', 'm.id_msg DESC', $output_method);
+	return ssi_queryPosts($query_where, $query_where_params, '', 'm.id_msg DESC', $output_method, false, $override_permissions);
 }
 
 /**
