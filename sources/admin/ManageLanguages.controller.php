@@ -226,7 +226,7 @@ class ManageLanguages_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $scripturl, $context;
+							global $scripturl;
 
 							return sprintf(\'<a href="%1$s?action=admin;area=languages;sa=editlang;lid=%2$s">%3$s</a>\', $scripturl, $rowData[\'id\'], $rowData[\'name\']);
 						'),
@@ -549,7 +549,7 @@ class ManageLanguages_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $context, $txt;
+							global $txt;
 
 							return \'<strong>\' . $rowData[\'name\'] . \'</strong><br /><span class="smalltext">\' . $txt[\'languages_download_dest\'] . \': \' . $rowData[\'destination\'] . \'</span>\' . ($rowData[\'version_compare\'] == \'older\' ? \'<br />\' . $txt[\'languages_download_older\'] : \'\');
 						'),
@@ -573,8 +573,6 @@ class ManageLanguages_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $txt;
-
 							return \'<span class="\' . ($rowData[\'version_compare\'] == \'older\' ? \'error\' : ($rowData[\'version_compare\'] == \'same\' ? \'softalert\' : \'success\')) . \';">\' . $rowData[\'version\'] . \'</span>\';
 						'),
 					),

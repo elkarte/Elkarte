@@ -431,6 +431,7 @@ class ManageSmileys_Controller extends Action_Controller
 					'data' => array(
 						'function' => create_function('$rowData', '
 							global $settings;
+
 							return $rowData[\'selected\'] ? \'<img src="\' . $settings[\'images_url\'] . \'/icons/field_valid.png" alt="*" class="icon" />\' : \'\';
 						'),
 						'class' => 'centertext',

@@ -397,6 +397,7 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'profile_extra',
 			'input_validate' => create_function('&$value', '
 				global $cur_profile;
+
 				// @todo Should we check for this year and tell them they made a mistake :P? (based on coppa at least?)
 				if (preg_match(\'/(\d{4})[\-\., ](\d{2})[\-\., ](\d{2})/\', $value, $dates) === 1)
 				{
@@ -417,7 +418,7 @@ function loadProfileFields($force_reload = false)
 			'log_change' => true,
 			'permission' => 'moderate_forum',
 			'input_validate' => create_function('&$value', '
-				global $txt, $user_info, $modSettings, $cur_profile, $context;
+				global $txt, $user_info, $modSettings, $cur_profile;
 
 				// Bad date!  Go try again - please?
 				if (($value = strtotime($value)) === -1)
@@ -889,6 +890,7 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'profile_extra',
 			'preload' => create_function('', '
 				global $context, $cur_profile;
+
 				$context[\'member\'][\'time_offset\'] = $cur_profile[\'time_offset\'];
 				return true;
 			'),

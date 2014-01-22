@@ -861,8 +861,6 @@ class ManageMembers_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $modSettings;
-
 							return host_from_ip($rowData[\'member_ip\']);
 						'),
 						'class' => 'smalltext',
