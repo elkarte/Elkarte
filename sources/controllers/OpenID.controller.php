@@ -181,7 +181,7 @@ class OpenID_Controller extends Action_Controller
 	 */
 	public function action_xrds()
 	{
-		global $scripturl, $modSettings, $context;
+		global $scripturl, $modSettings;
 
 		ob_end_clean();
 		if (!empty($modSettings['enableCompressedOutput']))
