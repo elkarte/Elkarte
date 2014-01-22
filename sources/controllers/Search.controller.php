@@ -35,12 +35,14 @@ class Search_Controller extends Action_Controller
 {
 	/**
 	 * Intended entry point for this class.
+	 * The default action for no sub-action is... present the search screen
 	 *
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
 		// Call the right method.
+		$this->action_search();
 	}
 
 	/**
@@ -51,12 +53,12 @@ class Search_Controller extends Action_Controller
 	 * - uses the Search language file.
 	 * - requires the search_posts permission.
 	 * - decodes and loads search parameters given in the URL (if any).
-	 * - the form redirects to index.php?action=search2.
+	 * - the form redirects to index.php?action=search;sa=results.
 	 *
 	 * @uses Search language file and Errors language when needed
 	 * @uses Search template, searchform sub template
 	 */
-	public function action_plushsearch1()
+	public function action_search()
 	{
 		global $txt, $scripturl, $modSettings, $user_info, $context;
 
@@ -97,7 +99,7 @@ class Search_Controller extends Action_Controller
 			$context['visual_verification_id'] = $verificationOptions['id'];
 		}
 
-		// If you got back from search2 by using the linktree, you get your original search parameters back.
+		// If you got back from search;sa=results by using the linktree, you get your original search parameters back.
 		if (isset($_REQUEST['params']))
 		{
 			// Due to IE's 2083 character limit, we have to compress long search strings
@@ -200,7 +202,7 @@ class Search_Controller extends Action_Controller
 	 * - stores the results into the search cache.
 	 * - show the results of the search query.
 	 */
-	public function action_plushsearch2()
+	public function action_results()
 	{
 		global $scripturl, $modSettings, $txt;
 		global $user_info, $context, $options, $messages_request, $boards_can;
@@ -906,7 +908,7 @@ class Search_Controller extends Action_Controller
 			'name' => $txt['search']
 		);
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=search2;params=' . $context['params'],
+			'url' => $scripturl . '?action=search;sa=results;params=' . $context['params'],
 			'name' => $txt['search_results']
 		);
 
@@ -1762,7 +1764,7 @@ class Search_Controller extends Action_Controller
 		}
 
 		// Now that we know how many results to expect we can start calculating the page numbers.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=search2;params=' . $context['params'], $_REQUEST['start'], $num_results, $modSettings['search_results_per_page'], false);
+		$context['page_index'] = constructPageIndex($scripturl . '?action=search;sa=results;params=' . $context['params'], $_REQUEST['start'], $num_results, $modSettings['search_results_per_page'], false);
 
 		// Consider the search complete!
 		if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)

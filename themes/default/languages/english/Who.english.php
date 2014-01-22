@@ -110,7 +110,7 @@ $txt['whoallow_memberlist'] = 'Viewing the <a href="' . $scripturl . '?action=me
 $txt['whoallow_optimizetables'] = 'Optimizing the database tables.';
 $txt['whoallow_repairboards'] = 'Repairing the database tables.';
 $txt['whoallow_search'] = '<a href="' . $scripturl . '?action=search">Searching</a> the forum.';
-$txt['whoallow_search2'] = 'Viewing the results of a search.';
+// $txt['whoallow_search2'] = 'Viewing the results of a search.';
 $txt['whoallow_setcensor'] = 'Editing the censor text.';
 $txt['whoallow_setreserve'] = 'Editing the reserved names.';
 $txt['whoallow_stats'] = 'Viewing the <a href="' . $scripturl . '?action=stats">forum stats</a>.';
