@@ -506,7 +506,7 @@ class Auth_Controller extends Action_Controller
 			// This one is a strange one... MyPHP, crypt() on the MD5 hash.
 			$other_passwords[] = crypt(md5($_POST['passwrd']), md5($_POST['passwrd']));
 
-			// Snitz style - SHA-256.  Technically, this is a downgrade.
+			// Snitz style - SHA-256.
 			if ($pw_strlen === 64 && function_exists('mhash') && defined('MHASH_SHA256'))
 				$other_passwords[] = bin2hex(mhash(MHASH_SHA256, $_POST['passwrd']));
 
