@@ -109,7 +109,6 @@ class TestDispatcher extends UnitTestCase
 			'notify' => array('Notify.controller.php', 'Notify_Controller', 'action_notify'),
 			'notifyboard' => array('Notify.controller.php', 'Notify_Controller', 'action_notifyboard'),
 			'pm' => array('PersonalMessage.controller.php', 'PersonalMessage_Controller', 'action_index'),
-			'post' => array('Post.controller.php', 'Post_Controller', 'action_post'),
 			'post2' => array('Post.controller.php', 'Post_Controller', 'action_post2'),
 			'recent' => array('Recent.controller.php', 'Recent_Controller', 'action_recent'),
 			'register' => array('Register.controller.php', 'Register_Controller', 'action_register'),
