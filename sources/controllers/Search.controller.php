@@ -33,6 +33,40 @@ $GLOBALS['search_versions'] = array(
  */
 class Search_Controller extends Action_Controller
 {
+	private $_weight = array();
+	private $_weight_total = 0;
+	private $_weight_factors = array();
+
+	/**
+	 * Called before any other action method in this class.
+	 * If coming from the quick reply allows to route to the proper action
+	 * if needed (for example external search engine or members search
+	 */
+	public function pre_dispatch()
+	{
+		global $modSettings;
+
+		// Coming from quick search box and going to some custome place?
+		if (isset($_REQUEST['search_selection']) && !empty($modSettings['additional_search_engines']))
+		{
+			$engines = prepareSearchEngines();
+			if (isset($engines[$_REQUEST['search_selection']]))
+			{
+				$engine = $engines[$_REQUEST['search_selection']];
+				redirectexit($engine['url'] . urlencode(implode($engine['separator'], explode(' ', $_REQUEST['search']))));
+			}
+		}
+
+		// if comming from the quick search box, and we want to search on members, well we need to do that ;)
+		if (isset($_REQUEST['search_selection']) && $_REQUEST['search_selection'] === 'members')
+			redirectexit($scripturl . '?action=memberlist;sa=search;fields=name,email;search=' . urlencode($_REQUEST['search']));
+
+		// If load balancing is on and the load is high, no need to even show the form.
+		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
+			fatal_lang_error('loadavg_search_disabled', false);
+
+	}
+
 	/**
 	 * Intended entry point for this class.
 	 * The default action for no sub-action is... present the search screen
@@ -212,25 +246,6 @@ class Search_Controller extends Action_Controller
 		$db = database();
 		$db_search = db_search();
 
-		// if coming from the quick search box, and we want to search on members, well we need to do that ;)
-		// Coming from quick search box and going to some custome place?
-		if (isset($_REQUEST['search_selection']) && !empty($modSettings['additional_search_engines']))
-		{
-			$engines = prepareSearchEngines();
-			if (isset($engines[$_REQUEST['search_selection']]))
-			{
-				$engine = $engines[$_REQUEST['search_selection']];
-				redirectexit($engine['url'] . urlencode(implode($engine['separator'], explode(' ', $_REQUEST['search']))));
-			}
-		}
-
-		// if comming from the quick search box, and we want to search on members, well we need to do that ;)
-		if (isset($_REQUEST['search_selection']) && $_REQUEST['search_selection'] === 'members')
-			redirectexit($scripturl . '?action=memberlist;sa=search;fields=name,email;search=' . urlencode($_REQUEST['search']));
-
-		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
-			fatal_lang_error('loadavg_search_disabled', false);
-
 		// No, no, no... this is a bit hard on the server, so don't you go prefetching it!
 		if (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch')
 		{
@@ -239,45 +254,7 @@ class Search_Controller extends Action_Controller
 			die;
 		}
 
-		$weight_factors = array(
-			'frequency' => array(
-				'search' => 'COUNT(*) / (MAX(t.num_replies) + 1)',
-				'results' => '(t.num_replies + 1)',
-			),
-			'age' => array(
-				'search' => 'CASE WHEN MAX(m.id_msg) < {int:min_msg} THEN 0 ELSE (MAX(m.id_msg) - {int:min_msg}) / {int:recent_message} END',
-				'results' => 'CASE WHEN t.id_first_msg < {int:min_msg} THEN 0 ELSE (t.id_first_msg - {int:min_msg}) / {int:recent_message} END',
-			),
-			'length' => array(
-				'search' => 'CASE WHEN MAX(t.num_replies) < {int:huge_topic_posts} THEN MAX(t.num_replies) / {int:huge_topic_posts} ELSE 1 END',
-				'results' => 'CASE WHEN t.num_replies < {int:huge_topic_posts} THEN t.num_replies / {int:huge_topic_posts} ELSE 1 END',
-			),
-			'subject' => array(
-				'search' => 0,
-				'results' => 0,
-			),
-			'first_message' => array(
-				'search' => 'CASE WHEN MIN(m.id_msg) = MAX(t.id_first_msg) THEN 1 ELSE 0 END',
-			),
-			'sticky' => array(
-				'search' => 'MAX(t.is_sticky)',
-				'results' => 't.is_sticky',
-			),
-		);
-
-		call_integration_hook('integrate_search_weights', array(&$weight_factors));
-
-		$weight = array();
-		$weight_total = 0;
-		foreach ($weight_factors as $weight_factor => $value)
-		{
-			$weight[$weight_factor] = empty($modSettings['search_weight_' . $weight_factor]) ? 0 : (int) $modSettings['search_weight_' . $weight_factor];
-			$weight_total += $weight[$weight_factor];
-		}
-
-		// Zero weight.  Weightless :P.
-		if (empty($weight_total))
-			fatal_lang_error('search_invalid_weights');
+		$this->_setup_weight_factors();
 
 		// These vars don't require an interface, they're just here for tweaking.
 		$recentPercentage = 0.30;
@@ -743,110 +720,9 @@ class Search_Controller extends Action_Controller
 			}
 		}
 
-		// *** Spell checking
-		$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && function_exists('pspell_new');
-		if ($context['show_spellchecking'])
-		{
-			// Windows fix.
-			ob_start();
-			$old = error_reporting(0);
-
-			pspell_new('en');
-			$pspell_link = pspell_new($txt['lang_dictionary'], $txt['lang_spelling'], '', 'utf-8', PSPELL_FAST | PSPELL_RUN_TOGETHER);
-
-			if (!$pspell_link)
-				$pspell_link = pspell_new('en', '', '', '', PSPELL_FAST | PSPELL_RUN_TOGETHER);
-
-			error_reporting($old);
-			ob_end_clean();
-
-			$did_you_mean = array('search' => array(), 'display' => array());
-			$found_misspelling = false;
-			foreach ($searchArray as $word)
-			{
-				if (empty($pspell_link))
-					continue;
-
-				// Don't check phrases.
-				if (preg_match('~^\w+$~', $word) === 0)
-				{
-					$did_you_mean['search'][] = '"' . $word . '"';
-					$did_you_mean['display'][] = '&quot;' . Util::htmlspecialchars($word) . '&quot;';
-					continue;
-				}
-				// For some strange reason spell check can crash PHP on decimals.
-				elseif (preg_match('~\d~', $word) === 1)
-				{
-					$did_you_mean['search'][] = $word;
-					$did_you_mean['display'][] = Util::htmlspecialchars($word);
-					continue;
-				}
-				elseif (pspell_check($pspell_link, $word))
-				{
-					$did_you_mean['search'][] = $word;
-					$did_you_mean['display'][] = Util::htmlspecialchars($word);
-					continue;
-				}
-
-				$suggestions = pspell_suggest($pspell_link, $word);
-				foreach ($suggestions as $i => $s)
-				{
-					// Search is case insensitive.
-					if (Util::strtolower($s) == Util::strtolower($word))
-						unset($suggestions[$i]);
-					// Plus, don't suggest something the user thinks is rude!
-					elseif ($suggestions[$i] != censorText($s))
-						unset($suggestions[$i]);
-				}
-
-				// Anything found?  If so, correct it!
-				if (!empty($suggestions))
-				{
-					$suggestions = array_values($suggestions);
-					$did_you_mean['search'][] = $suggestions[0];
-					$did_you_mean['display'][] = '<em><strong>' . Util::htmlspecialchars($suggestions[0]) . '</strong></em>';
-					$found_misspelling = true;
-				}
-				else
-				{
-					$did_you_mean['search'][] = $word;
-					$did_you_mean['display'][] = Util::htmlspecialchars($word);
-				}
-			}
-
-			if ($found_misspelling)
-			{
-				// Don't spell check excluded words, but add them still...
-				$temp_excluded = array('search' => array(), 'display' => array());
-				foreach ($excludedWords as $word)
-				{
-					if (preg_match('~^\w+$~', $word) == 0)
-					{
-						$temp_excluded['search'][] = '-"' . $word . '"';
-						$temp_excluded['display'][] = '-&quot;' . Util::htmlspecialchars($word) . '&quot;';
-					}
-					else
-					{
-						$temp_excluded['search'][] = '-' . $word;
-						$temp_excluded['display'][] = '-' . Util::htmlspecialchars($word);
-					}
-				}
-
-				$did_you_mean['search'] = array_merge($did_you_mean['search'], $temp_excluded['search']);
-				$did_you_mean['display'] = array_merge($did_you_mean['display'], $temp_excluded['display']);
-
-				$temp_params = $search_params;
-				$temp_params['search'] = implode(' ', $did_you_mean['search']);
-				if (isset($temp_params['brd']))
-					$temp_params['brd'] = implode(',', $temp_params['brd']);
-
-				$context['params'] = array();
-				foreach ($temp_params as $k => $v)
-					$context['did_you_mean_params'][] = $k . '|\'|' . $v;
-				$context['did_you_mean_params'] = base64_encode(implode('|"|', $context['did_you_mean_params']));
-				$context['did_you_mean'] = implode(' ', $did_you_mean['display']);
-			}
-		}
+		// *** Spell checking?
+		if (!empty($modSettings['enableSpellChecking']) && function_exists('pspell_new'))
+			$this->_load_suggestions($searchArray);
 
 		// Let the user adjust the search query, should they wish?
 		$context['search_params'] = $search_params;
@@ -1042,17 +918,17 @@ class Search_Controller extends Action_Controller
 
 						// Build the search relevance query
 						$relevance = '1000 * (';
-						foreach ($weight_factors as $type => $value)
+						foreach ($this->_weight_factors as $type => $value)
 						{
 							if (isset($value['results']))
 							{
-								$relevance .= $weight[$type];
+								$relevance .= $this->_weight[$type];
 								if (!empty($value['results']))
 									$relevance .= ' * ' . $value['results'];
 								$relevance .= ' + ';
 							}
 						}
-						$relevance = substr($relevance, 0, -3) . ') / ' . $weight_total . ' AS relevance';
+						$relevance = substr($relevance, 0, -3) . ') / ' . $this->_weight_total . ' AS relevance';
 
 						$ignoreRequest = $db_search->search_query('insert_log_search_results_subject',
 							($db->support_ignore() ? '
@@ -1144,7 +1020,7 @@ class Search_Controller extends Action_Controller
 						$main_query['select']['id_topic'] = 't.id_topic';
 						$main_query['select']['id_msg'] = 'MAX(m.id_msg) AS id_msg';
 						$main_query['select']['num_matches'] = 'COUNT(*) AS num_matches';
-						$main_query['weights'] = $weight_factors;
+						$main_query['weights'] = $this->_weight_factors;
 						$main_query['group_by'][] = 't.id_topic';
 					}
 					else
@@ -1516,11 +1392,11 @@ class Search_Controller extends Action_Controller
 						$new_weight_total = 0;
 						foreach ($main_query['weights'] as $type => $value)
 						{
-							$relevance .= $weight[$type];
+							$relevance .= $this->_weight[$type];
 							if (!empty($value['search']))
 								$relevance .= ' * ' . $value['search'];
 							$relevance .= ' + ';
-							$new_weight_total += $weight[$type];
+							$new_weight_total += $this->_weight[$type];
 						}
 						$main_query['select']['relevance'] = substr($relevance, 0, -3) . ') / ' . $new_weight_total . ' AS relevance';
 
@@ -1581,15 +1457,15 @@ class Search_Controller extends Action_Controller
 					if ($_SESSION['search_cache']['num_results'] < $modSettings['search_max_results'] && $numSubjectResults !== 0)
 					{
 						$relevance = '1000 * (';
-						foreach ($weight_factors as $type => $value)
+						foreach ($this->_weight_factors as $type => $value)
 							if (isset($value['results']))
 							{
-								$relevance .= $weight[$type];
+								$relevance .= $this->_weight[$type];
 								if (!empty($value['results']))
 									$relevance .= ' * ' . $value['results'];
 								$relevance .= ' + ';
 							}
-						$relevance = substr($relevance, 0, -3) . ') / ' . $weight_total . ' AS relevance';
+						$relevance = substr($relevance, 0, -3) . ') / ' . $this->_weight_total . ' AS relevance';
 
 						$usedIDs = array_flip(empty($inserts) ? array() : array_keys($inserts));
 						$ignoreRequest = $db_search->search_query('insert_log_search_results_sub_only', ($db->support_ignore() ? ( '
@@ -2053,6 +1929,189 @@ class Search_Controller extends Action_Controller
 		call_integration_hook('integrate_search_message_context', array($counter, &$output));
 
 		return $output;
+	}
+
+	/**
+	 * Prepares the weighting factors and 
+	 */
+	private function _setup_weight_factors()
+	{
+		global $user_info, $modSettings, $txt;
+
+		$default_factors = $this->_weight_factors = array(
+			'frequency' => array(
+				'search' => 'COUNT(*) / (MAX(t.num_replies) + 1)',
+				'results' => '(t.num_replies + 1)',
+			),
+			'age' => array(
+				'search' => 'CASE WHEN MAX(m.id_msg) < {int:min_msg} THEN 0 ELSE (MAX(m.id_msg) - {int:min_msg}) / {int:recent_message} END',
+				'results' => 'CASE WHEN t.id_first_msg < {int:min_msg} THEN 0 ELSE (t.id_first_msg - {int:min_msg}) / {int:recent_message} END',
+			),
+			'length' => array(
+				'search' => 'CASE WHEN MAX(t.num_replies) < {int:huge_topic_posts} THEN MAX(t.num_replies) / {int:huge_topic_posts} ELSE 1 END',
+				'results' => 'CASE WHEN t.num_replies < {int:huge_topic_posts} THEN t.num_replies / {int:huge_topic_posts} ELSE 1 END',
+			),
+			'subject' => array(
+				'search' => 0,
+				'results' => 0,
+			),
+			'first_message' => array(
+				'search' => 'CASE WHEN MIN(m.id_msg) = MAX(t.id_first_msg) THEN 1 ELSE 0 END',
+			),
+			'sticky' => array(
+				'search' => 'MAX(t.is_sticky)',
+				'results' => 't.is_sticky',
+			),
+		);
+
+		// These are fallback weights in case of errors somewhere.
+		// Not intended to be passed to the hook
+		$default_weights = array(
+			'search_weight_frequency' => '30',
+			'search_weight_age' => '25',
+			'search_weight_length' => '20',
+			'search_weight_subject' => '15',
+			'search_weight_first_message' => '10',
+		);
+
+		call_integration_hook('integrate_search_weights', array(&$this->_weight_factors));
+
+		foreach ($this->_weight_factors as $weight_factor => $value)
+		{
+			$this->_weight[$weight_factor] = empty($modSettings['search_weight_' . $weight_factor]) ? 0 : (int) $modSettings['search_weight_' . $weight_factor];
+			$this->_weight_total += $this->_weight[$weight_factor];
+		}
+
+		// Zero weight.  Weightless :P.
+		if (empty($this->_weight_total))
+		{
+			// Admins can be bothered with a failure
+			if ($user_info['is_admin'])
+				fatal_lang_error('search_invalid_weights');
+
+			// Even if users will get an answer, the admin should know something is broken
+			log_lang_error('search_invalid_weights');
+
+			// Instead is better to give normal users and guests some kind of result
+			// using our defaults.
+			// Using a different variable here because it may be the hook is screwing
+			// things up
+			foreach ($default_factors as $weight_factor => $value)
+			{
+				$this->_weight[$weight_factor] = empty($default_weights['search_weight_' . $weight_factor]) ? 0 : (int) $default_weights['search_weight_' . $weight_factor];
+				$this->_weight_total += $this->_weight[$weight_factor];
+			}
+		}
+	}
+
+	/**
+	 * Setup spellchecking suggestions and load them into $context
+	 *
+	 * @param array an array of terms
+	 */
+	private function _load_suggestions($searchArray = array())
+	{
+		global $txt, $context;
+
+		// Windows fix.
+		ob_start();
+		$old = error_reporting(0);
+
+		pspell_new('en');
+		$pspell_link = pspell_new($txt['lang_dictionary'], $txt['lang_spelling'], '', 'utf-8', PSPELL_FAST | PSPELL_RUN_TOGETHER);
+
+		if (!$pspell_link)
+			$pspell_link = pspell_new('en', '', '', '', PSPELL_FAST | PSPELL_RUN_TOGETHER);
+
+		error_reporting($old);
+		ob_end_clean();
+
+		$did_you_mean = array('search' => array(), 'display' => array());
+		$found_misspelling = false;
+		foreach ($searchArray as $word)
+		{
+			if (empty($pspell_link))
+				continue;
+
+			// Don't check phrases.
+			if (preg_match('~^\w+$~', $word) === 0)
+			{
+				$did_you_mean['search'][] = '"' . $word . '"';
+				$did_you_mean['display'][] = '&quot;' . Util::htmlspecialchars($word) . '&quot;';
+				continue;
+			}
+			// For some strange reason spell check can crash PHP on decimals.
+			elseif (preg_match('~\d~', $word) === 1)
+			{
+				$did_you_mean['search'][] = $word;
+				$did_you_mean['display'][] = Util::htmlspecialchars($word);
+				continue;
+			}
+			elseif (pspell_check($pspell_link, $word))
+			{
+				$did_you_mean['search'][] = $word;
+				$did_you_mean['display'][] = Util::htmlspecialchars($word);
+				continue;
+			}
+
+			$suggestions = pspell_suggest($pspell_link, $word);
+			foreach ($suggestions as $i => $s)
+			{
+				// Search is case insensitive.
+				if (Util::strtolower($s) == Util::strtolower($word))
+					unset($suggestions[$i]);
+				// Plus, don't suggest something the user thinks is rude!
+				elseif ($suggestions[$i] != censorText($s))
+					unset($suggestions[$i]);
+			}
+
+			// Anything found?  If so, correct it!
+			if (!empty($suggestions))
+			{
+				$suggestions = array_values($suggestions);
+				$did_you_mean['search'][] = $suggestions[0];
+				$did_you_mean['display'][] = '<em><strong>' . Util::htmlspecialchars($suggestions[0]) . '</strong></em>';
+				$found_misspelling = true;
+			}
+			else
+			{
+				$did_you_mean['search'][] = $word;
+				$did_you_mean['display'][] = Util::htmlspecialchars($word);
+			}
+		}
+
+		if ($found_misspelling)
+		{
+			// Don't spell check excluded words, but add them still...
+			$temp_excluded = array('search' => array(), 'display' => array());
+			foreach ($excludedWords as $word)
+			{
+				if (preg_match('~^\w+$~', $word) == 0)
+				{
+					$temp_excluded['search'][] = '-"' . $word . '"';
+					$temp_excluded['display'][] = '-&quot;' . Util::htmlspecialchars($word) . '&quot;';
+				}
+				else
+				{
+					$temp_excluded['search'][] = '-' . $word;
+					$temp_excluded['display'][] = '-' . Util::htmlspecialchars($word);
+				}
+			}
+
+			$did_you_mean['search'] = array_merge($did_you_mean['search'], $temp_excluded['search']);
+			$did_you_mean['display'] = array_merge($did_you_mean['display'], $temp_excluded['display']);
+
+			$temp_params = $search_params;
+			$temp_params['search'] = implode(' ', $did_you_mean['search']);
+			if (isset($temp_params['brd']))
+				$temp_params['brd'] = implode(',', $temp_params['brd']);
+
+			$context['params'] = array();
+			foreach ($temp_params as $k => $v)
+				$context['did_you_mean_params'][] = $k . '|\'|' . $v;
+			$context['did_you_mean_params'] = base64_encode(implode('|"|', $context['did_you_mean_params']));
+			$context['did_you_mean'] = implode(' ', $did_you_mean['display']);
+		}
 	}
 }
 
