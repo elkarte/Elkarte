@@ -229,7 +229,7 @@ class Mentions_Controller extends Action_Controller
 					),
 					'data' => array(
 						'db' => 'log_time',
-						'timeformat' => true,
+						'timeformat' => 'html_time',
 					),
 					'sort' => array(
 						'default' => 'mtn.log_time DESC',
