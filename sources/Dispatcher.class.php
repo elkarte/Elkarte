@@ -71,6 +71,9 @@ class Site_Dispatcher
 			'function' => 'action_boardindex'
 		);
 
+		// Reminder: hooks need to account for multiple addons setting this hook.
+		call_integration_hook('integrate_frontpage', array(&$default_action));
+
 		// Maintenance mode: you're out of here unless you're admin
 		if (!empty($maintenance) && !allowedTo('admin_forum'))
 		{
@@ -101,9 +104,6 @@ class Site_Dispatcher
 			// Home page: board index
 			if (empty($board) && empty($topic))
 			{
-				// Reminder: hooks need to account for multiple addons setting this hook.
-				call_integration_hook('integrate_frontpage', array(&$default_action));
-
 				// Was it, wasn't it....
 				if (empty($this->_function_name))
 				{
