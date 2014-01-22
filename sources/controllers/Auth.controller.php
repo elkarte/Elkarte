@@ -564,7 +564,7 @@ class Auth_Controller extends Action_Controller
 		// SHA-256 will be 64 characters long, lets check some of these possibilities
 		elseif (!empty($modSettings['enable_password_conversion']) && $pw_strlen === 64)
 		{
-			// Yet another downgrade .. PHP-Fusion7
+			// PHP-Fusion7
 			$other_passwords[] = hash_hmac('sha256', $_POST['passwrd'], $user_settings['password_salt']);
 
 			// Plain SHA-256?
