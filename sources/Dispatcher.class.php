@@ -276,20 +276,11 @@ class Site_Dispatcher
 		if (empty($this->_file_name) || empty($this->_function_name))
 		{
 			// Catch the action with the theme?
-			// @todo remove this?
-			if (!empty($settings['catch_action']))
-			{
-				$this->_file_name = SUBSDIR . '/Themes.subs.php';
-				$this->_function_name = 'WrapAction';
-			}
-			else
-			{
-				// We still haven't found what we're looking for...
-				$this->_file_name = $default_action['file'];
-				if (isset($default_action['controller']))
-					$this->_controller_name = $default_action['controller'];
-				$this->_function_name = $default_action['function'];
-			}
+			// We still haven't found what we're looking for...
+			$this->_file_name = $default_action['file'];
+			if (isset($default_action['controller']))
+				$this->_controller_name = $default_action['controller'];
+			$this->_function_name = $default_action['function'];
 		}
 
 		if (isset($_REQUEST['api']))
