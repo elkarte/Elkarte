@@ -1015,7 +1015,7 @@ function getBoardList($boardListOptions = array(), $simple = false)
 			LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)' . (empty($join) ? '' : implode(' ', $join)) . (empty($where) ? '' : '
 		WHERE ' . implode('
 			AND ', $where)) . '
-		ORDER BY board_order',
+		ORDER BY c.cat_order, b.board_order',
 		$where_parameters
 	);
 
