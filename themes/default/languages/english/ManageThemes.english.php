@@ -76,10 +76,6 @@ $txt['enable_news_desc'] = '<strong>Off</strong>: no news shown
 <br><strong>Fader</strong>: all the news are displayed sequentially';
 $txt['show_group_key'] = 'Show group key on board index';
 $txt['additional_options_collapsible'] = 'Enable collapsible additional post options';
-$txt['message_index_preview'] = 'Show post previews on the message index';
-$txt['message_index_preview_off'] = 'Do not show the previews';
-$txt['message_index_preview_first'] = 'Show the text of the first post';
-$txt['message_index_preview_last'] = 'Show the text of the last post';
 $txt['allow_no_censored'] = 'Allow users to turn off word censoring';
 $txt['who_display_viewing'] = 'Show who is viewing the board index and posts';
 $txt['who_display_viewing_off'] = 'Don\'t show';

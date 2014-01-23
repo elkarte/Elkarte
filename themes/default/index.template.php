@@ -105,17 +105,6 @@ function template_html_above()
 {
 	global $context, $settings, $scripturl, $txt, $modSettings;
 
-	// Increased mobile device support.
-	if ($context['browser_body_id'] == 'mobile')
-	{
-		// Disable the preview text.
-		$settings['message_index_preview'] = 0;
-		// Force the usage of click menu instead of a hover menu.
-		$context['javascript_vars']['use_click_menu'] = true;
-		// Disable the search dropdown.
-		$modSettings['search_dropdown'] = false;
-	}
-
 	// Show right to left and the character set for ease of translating.
 	echo '<!DOCTYPE html>
 <html', $context['right_to_left'] ? ' dir="rtl"' : '', '>

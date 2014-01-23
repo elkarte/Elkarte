@@ -198,7 +198,7 @@ function template_topic_listing()
 							<a class="new_posts" href="', $topic['new_href'], '" id="newicon' . $topic['first_post']['id'] . '">' . $txt['new'] . '</a>';
 
 			echo '
-							', $topic['is_sticky'] ? '<strong>' : '', '<span class="preview" title="', $topic[(!empty($settings['message_index_preview']) && $settings['message_index_preview'] == 2 ? 'last_post' : 'first_post')]['preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], ($context['can_approve_posts'] && !$topic['approved'] ? '&nbsp;&nbsp;<em><img src="' . $settings['images_url'] . '/admin/post_moderation_moderate.png" style="width:16px" alt="' . $txt['awaiting_approval'] . '" title="' . $txt['awaiting_approval'] . '" />(' . $txt['awaiting_approval'] . ')</em>' : ''), '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
+							', $topic['is_sticky'] ? '<strong>' : '', '<span class="preview" title="', $topic['default_preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], ($context['can_approve_posts'] && !$topic['approved'] ? '&nbsp;&nbsp;<em><img src="' . $settings['images_url'] . '/admin/post_moderation_moderate.png" style="width:16px" alt="' . $txt['awaiting_approval'] . '" title="' . $txt['awaiting_approval'] . '" />(' . $txt['awaiting_approval'] . ')</em>' : ''), '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
 						</h4>
 					</div>
 					<div class="topic_starter">

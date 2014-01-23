@@ -282,16 +282,6 @@ function template_settings()
 			'id' => 'additional_options_collapsible',
 			'label' => $txt['additional_options_collapsible'],
 		),
-	'',
-		array(
-			'id' => 'message_index_preview',
-			'label' => $txt['message_index_preview'],
-			'options' => array(
-				0 => $txt['message_index_preview_off'],
-				1 => $txt['message_index_preview_first'],
-				2 => $txt['message_index_preview_last'],
-			),
-		),
 	);
 
 	addInlineJavascript('

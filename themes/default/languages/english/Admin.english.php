@@ -603,7 +603,11 @@ $txt['edit_disable_time'] = 'Maximum time after posting to allow edit';
 $txt['edit_disable_time_zero'] = '0 to disable';
 $txt['preview_characters'] = 'Maximum length of last/first post preview';
 $txt['preview_characters_units'] = 'characters';
-$txt['preview_characters_zero'] = '0 to disable';
+$txt['preview_characters_zero'] = '0 to show the entire message';
+$txt['message_index_preview'] = 'Show post previews on the message index';
+$txt['message_index_preview_off'] = 'Do not show the previews';
+$txt['message_index_preview_first'] = 'Show the text of the first post';
+$txt['message_index_preview_last'] = 'Show the text of the last post';
 
 $txt['enableBBC'] = 'Enable bulletin board code (BBC)';
 $txt['enablePostHTML'] = 'Enable <em>basic</em> HTML in posts';
