@@ -17,6 +17,7 @@ $txt['error_too_quickly'] = 'You went through the registration process too quick
 $txt['error_token_verification'] = 'Token verification failed. Please try again.';
 $txt['need_username'] = 'You need to fill in a username.';
 $txt['no_password'] = 'You didn\'t enter your password.';
+$txt['improper_password'] = 'The supplied password is too long.';
 $txt['incorrect_password'] = 'Password incorrect';
 $txt['choose_username'] = 'Choose username';
 $txt['maintain_mode'] = 'Maintenance Mode';
