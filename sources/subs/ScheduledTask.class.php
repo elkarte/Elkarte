@@ -1093,10 +1093,8 @@ class ScheduledTask
 						'not_ignored' => 0,
 					)
 				);
-
 				while ($row = $db->fetch_row($result))
 					$reports[] = $row[0];
-
 				$db->free_result($result);
 
 				if (!empty($reports))
