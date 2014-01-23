@@ -301,6 +301,15 @@ function determineActions($urls, $preferred_prefix = false)
 				$data[$k] = $txt['who_hidden'];
 				$topic_ids[$topic][$k] = $txt['whotopic_' . $actions['action']];
 			}
+			// Viewable if and only if they can see the board...
+			elseif (isset($actions['sa']) && isset($txt['whotopic_' . $actions['action'] . '_' . $actions['sa']]))
+			{
+				// Find out what topic they are accessing.
+				$topic = (int) (isset($actions['topic']) ? $actions['topic'] : (isset($actions['from']) ? $actions['from'] : 0));
+
+				$data[$k] = $txt['who_hidden'];
+				$topic_ids[$topic][$k] = $txt['whotopic_' . $actions['action'] . '_' . $actions['sa']];
+			}
 			elseif (isset($txt['whopost_' . $actions['action']]))
 			{
 				// Find out what message they are accessing.
@@ -334,7 +343,12 @@ function determineActions($urls, $preferred_prefix = false)
 			elseif (isset($allowedActions[$actions['action']]))
 			{
 				if (allowedTo($allowedActions[$actions['action']]))
-					$data[$k] = $txt['whoallow_' . $actions['action']];
+				{
+					if (isset($actions['sa']) && isset($txt['whoallow_' . $actions['action'] . '_' . $actions['sa']]))
+						$data[$k] = $txt['whoallow_' . $actions['action'] . '_' . $actions['sa']];
+					else
+						$data[$k] = $txt['whoallow_' . $actions['action']];
+				}
 				elseif (in_array('moderate_forum', $allowedActions[$actions['action']]))
 					$data[$k] = $txt['who_moderate'];
 				elseif (in_array('admin_forum', $allowedActions[$actions['action']]))
