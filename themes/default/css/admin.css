@@ -1188,8 +1188,7 @@ ul.moderation_notes li {
 }
 .ui-dialog .ui-dialog-titlebar {
 	padding: 0 1em;
-	font-weight: 600;
-	font-family: "Segoe UI Semibold", "Helvetica Neue Medium";
+	font-weight: bold;
 	font-size: 1.1em;
 }
 .ui-dialog .ui-dialog-content {
