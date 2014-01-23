@@ -679,7 +679,7 @@ function template_display_poll_above()
 	else
 	{
 		echo '
-						<form action="', $scripturl, '?action=vote;topic=', $context['current_topic'], '.', $context['start'], ';poll=', $context['poll']['id'], '" method="post" accept-charset="UTF-8">';
+						<form action="', $scripturl, '?action=poll;sa=vote;topic=', $context['current_topic'], '.', $context['start'], ';poll=', $context['poll']['id'], '" method="post" accept-charset="UTF-8">';
 
 		// Show a warning if they are allowed more than one option.
 		if ($context['poll']['allowed_warning'])

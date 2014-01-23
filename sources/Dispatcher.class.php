@@ -35,25 +35,25 @@ class Site_Dispatcher
 	 * File name to load
 	 * @var string
 	 */
-	private $_file_name;
+	protected $_file_name;
 
 	/**
 	 * Function or method to call
 	 * @var string
 	 */
-	private $_function_name;
+	protected $_function_name;
 
 	/**
 	 * Class name, for object oriented controllers
 	 * @var string
 	 */
-	private $_controller_name;
+	protected $_controller_name;
 
 	/**
 	 * Name of pre_dispatch function, for procedural controllers
 	 * @var string
 	 */
-	private $_pre_dispatch_func;
+	protected $_pre_dispatch_func;
 
 	/**
 	 * Create an instance and initialize it.
@@ -195,7 +195,7 @@ class Site_Dispatcher
 			'unreadreplies' => array('Recent.controller.php', 'Recent_Controller', 'action_unread'),
 			'verificationcode' => array('Register.controller.php', 'Register_Controller', 'action_verificationcode'),
 			'viewprofile' => array('Profile.controller.php', 'Profile_Controller', 'action_index'),
-			'vote' => array('Poll.controller.php', 'Poll_Controller', 'action_vote'),
+// 			'vote' => array('Poll.controller.php', 'Poll_Controller', 'action_vote'),
 			'viewquery' => array('AdminDebug.controller.php', 'AdminDebug_Controller', 'action_viewquery'),
 			'viewadminfile' => array('AdminDebug.controller.php', 'AdminDebug_Controller', 'action_viewadminfile'),
 			'.xml' => array('News.controller.php', 'News_Controller', 'action_showfeed'),

@@ -44,7 +44,7 @@ class Poll_Controller extends Action_Controller
 	 * Must be called with a topic and option specified.
 	 * Requires the poll_vote permission.
 	 * Upon successful completion of action will direct user back to topic.
-	 * Accessed via ?action=vote.
+	 * Accessed via ?action=poll;sa=vote.
 	 *
 	 * @uses Post language file.
 	 */
