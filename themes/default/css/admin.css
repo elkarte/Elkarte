@@ -723,6 +723,7 @@ dl.settings dd.large_caption {
 ul.pending_payments {
 	margin: 0;
 	padding: 0;
+	line-height: 2em;
 }
 
 /* Styles for the manage permissions section.

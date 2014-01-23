@@ -73,6 +73,7 @@ $txt['paid_finished'] = 'Finished';
 $txt['paid_total'] = 'Total';
 $txt['paid_is_active'] = 'Activated';
 $txt['paid_none_yet'] = 'You haven\'t set up any subscriptions yet.';
+$txt['paid_none_ordered'] = 'You don\'t any subscriptions.';
 $txt['paid_payments_pending'] = 'Payments Pending';
 $txt['paid_order'] = 'Order';
 
@@ -182,6 +183,7 @@ $txt['paid_all_freq_blank'] = 'You must enter a cost for at least one of the fou
 $txt['paid_no_data'] = 'No valid data was sent to the script.';
 
 $txt['paypal_could_not_connect'] = 'Could not connect to PayPal server';
+$txt['paypal_currency_unkown'] = 'The currency code from PayPal (%1$s) does not match the code in your settings (%2$s)';
 $txt['paid_sub_not_active'] = 'That subscription is not taking any new users.';
 $txt['paid_disabled'] = 'Paid subscriptions are currently disabled.';
 $txt['paid_unknown_transaction_type'] = 'Unknown Paid Subscriptions transaction type.';
@@ -195,7 +197,8 @@ $txt['paid_make_recurring'] = 'Make this a recurring payment';
 
 $txt['subscriptions'] = 'Subscriptions';
 $txt['subscription'] = 'Subscription';
-$txt['paid_subs_desc'] = 'Below is a list of all the subscriptions which are available on this forum.';
+$txt['subscribers'] = 'Subscribers';
+$txt['paid_subs_desc'] = 'Below is a list of all the subscriptions which are available on this site.';
 $txt['paid_subs_none'] = 'There are currently no paid subscriptions available.';
 
 $txt['paid_current'] = 'Existing Subscriptions';

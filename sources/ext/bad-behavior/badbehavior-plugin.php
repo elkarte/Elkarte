@@ -162,13 +162,24 @@ function bb2_insert($settings, $package, $key)
 	$session = !empty($sc) ? (string) $sc : '';
 
 	// Prepare the headers etc for db insertion
-	// We are passed ...  Host. User-Agent, Accept, Accept-Language, Accept-Encoding, DNT, Connection, Referer, Cookie, Authorization
+	// We are passed at least
+	//	Host, User-Agent, Accept, Accept-Language, Accept-Encoding, DNT, Connection, Referer, Cookie, Authorization
 	$headers = '';
-	$skip = array('User-Agent');
+	$length = 0;
+	$skip = array('User-Agent', 'Accept-Encoding', 'DNT', 'X-Wap-Profile');
 	foreach ($package['headers'] as $h => $v)
 	{
 		if (!in_array($h, $skip))
-			$headers .= bb2_db_escape($h . ': ' .  $v . "\n");
+		{
+			// Make sure this header it will fit in the db, if not move on to the next
+			// @todo increase the db space to 512 or convert to text?
+			$check = $length + Util::strlen($h) + Util::strlen($v) + 2;
+			if ($check < 255)
+			{
+				$headers .= bb2_db_escape($h . ': ' .  $v . "\n");
+				$length = $check;
+			}
+		}
 	}
 
 	$request_entity = '';

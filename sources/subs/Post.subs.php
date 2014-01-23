@@ -271,9 +271,7 @@ function un_preparsecode($message)
 	{
 		// If $i is a multiple of four (0, 4, 8, ...) then it's not a code section...
 		if ($i % 4 == 0)
-		{
 			$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~i', create_function('$m', 'return "[html]" . strtr(htmlspecialchars("$m[1]", ENT_QUOTES, "UTF-8"), array("\\&quot;" => "&quot;", "&amp;#13;" => "<br />", "&amp;#32;" => " ", "&amp;#91;" => "[", "&amp;#93;" => "]")) . "[/html]";'), $parts[$i]);
-		}
 
 		call_integration_hook('integrate_unpreparse_code', array(&$message, &$parts, &$i));
 	}
@@ -335,7 +333,7 @@ function fixTags(&$message)
 	);
 
 	call_integration_hook('integrate_fixtags', array(&$fixArray, &$message));
-	
+
 	// Fix each type of tag.
 	foreach ($fixArray as $param)
 		fixTag($message, $param['tag'], $param['protocols'], $param['embeddedUrl'], $param['hasEqualSign'], !empty($param['hasExtra']));

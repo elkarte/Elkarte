@@ -24,13 +24,13 @@ function template_modify_subscription()
 
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=paidsubscribe;sa=modify;sid=', $context['sub_id'], '" method="post">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=paidsubscribe;sa=modify;sid=', $context['sub_id'], '" method="post">
 			<h2 class="category_header">', $txt['paid_' . $context['action_type'] . '_subscription'], '</h2>';
 
 	if (!empty($context['disable_groups']))
 		echo '
-			<div class="information">
-				<span class="alert">', $txt['paid_mod_edit_note'], '</span>
+			<div class="warningbox">
+				', $txt['paid_mod_edit_note'], '
 			</div>
 			';
 
@@ -209,11 +209,11 @@ function template_delete_subscription()
 
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=paidsubscribe;sa=modify;sid=', $context['sub_id'], ';delete" method="post">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=paidsubscribe;sa=modify;sid=', $context['sub_id'], ';delete" method="post">
 			<h2 class="category_header">', $txt['paid_delete_subscription'], '</h2>
 			<div class="windowbg">
 				<div class="content">
-					<p>', $txt['paid_mod_delete_warning'], '</p>
+					<p class="warningbox">', $txt['paid_mod_delete_warning'], '</p>
 					<input type="submit" name="delete_confirm" value="', $txt['paid_delete_subscription'], '" class="right_submit" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['admin-pmsd_token_var'], '" value="', $context['admin-pmsd_token'], '" />
@@ -232,7 +232,7 @@ function template_modify_user_subscription()
 
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=paidsubscribe;sa=modifyuser;sid=', $context['sub_id'], ';lid=', $context['log_id'], '" method="post">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=paidsubscribe;sa=modifyuser;sid=', $context['sub_id'], ';lid=', $context['log_id'], '" method="post">
 			<h2 class="category_header">
 				', $txt['paid_' . $context['action_type'] . '_subscription'], ' - ', $context['current_subscription']['name'], '
 				', empty($context['sub']['username']) ? '' : ' (' . $txt['user'] . ': ' . $context['sub']['username'] . ')', '
@@ -265,7 +265,7 @@ function template_modify_user_subscription()
 					</dl>
 					<fieldset>
 						<legend>', $txt['start_date_and_time'], '</legend>
-						<select name="year" id="year" onchange="generateDays(\'\');">';
+						<select name="year" id="year" onchange="generateDays();">';
 
 	// Show a list of all the years we allow...
 	for ($year = 2010; $year <= 2030; $year++)
@@ -275,7 +275,7 @@ function template_modify_user_subscription()
 	echo '
 						</select>&nbsp;
 						', (isset($txt['calendar_month']) ? $txt['calendar_month'] : $txt['calendar_month']), '&nbsp;
-						<select name="month" id="month" onchange="generateDays(\'\');">';
+						<select name="month" id="month" onchange="generateDays();">';
 
 	// There are 12 months per year - ensure that they all get listed.
 	for ($month = 1; $month <= 12; $month++)
@@ -350,34 +350,33 @@ function template_modify_user_subscription()
 			bItemList: false
 			});', true);
 
+	// If we have pending payments for this user, show them
 	if (!empty($context['pending_payments']))
 	{
 		echo '
-		<h3 class="category_header">', $txt['pending_payments'], '</h3>
-		<div class="information">
-			', $txt['pending_payments_desc'], '
-		</div>
-		<h3 class="category_header">', $txt['pending_payments_value'], '</h3>
-		<div class="windowbg">
-			<div class="content">
-				<ul class="pending_payments">';
+		<div class="generic_list_wrapper">
+			<h3 class="category_header">', $txt['pending_payments'], '</h3>
+			<div class="infobox">
+				', $txt['pending_payments_desc'], '
+			</div>
+			<h3 class="category_header">', $txt['pending_payments_value'], '</h3>
+			<div class="windowbg">
+				<div class="content">
+					<ul class="pending_payments flow_auto">';
 
 		foreach ($context['pending_payments'] as $id => $payment)
 		{
 			echo '
-					<li>
-						', $payment['desc'], '
-						<span class="floatleft">
-							<a href="', $scripturl, '?action=admin;area=paidsubscribe;sa=modifyuser;lid=', $context['log_id'], ';pending=', $id, ';accept">', $txt['pending_payments_accept'], '</a>
-						</span>
-						<span class="floatright">
-							<a href="', $scripturl, '?action=admin;area=paidsubscribe;sa=modifyuser;lid=', $context['log_id'], ';pending=', $id, ';remove">', $txt['pending_payments_remove'], '</a>
-						</span>
-					</li>';
+						<li>
+							', $payment['desc'], '
+							<a class="linkbutton_left" href="', $scripturl, '?action=admin;area=paidsubscribe;sa=modifyuser;lid=', $context['log_id'], ';pending=', $id, ';accept">', $txt['pending_payments_accept'], '</a>
+							<a class="linkbutton_right" href="', $scripturl, '?action=admin;area=paidsubscribe;sa=modifyuser;lid=', $context['log_id'], ';pending=', $id, ';remove">', $txt['pending_payments_remove'], '</a>
+						</li>';
 		}
 
 		echo '
-				</ul>
+					</ul>
+				</div>
 			</div>
 		</div>';
 	}
@@ -408,7 +407,7 @@ function template_user_subscription()
 	else
 	{
 		echo '
-			<div class="information">
+			<div class="infobox">
 				', $txt['paid_subs_desc'], '
 			</div>';
 
@@ -427,11 +426,13 @@ function template_user_subscription()
 			<div class="windowbg', $alternate ? '' : '2', '">
 				<div class="content">
 					<p><strong>', $subscription['name'], '</strong></p>
-					<p class="smalltext">', $subscription['desc'], '</p>';
+					<p class="content">', $subscription['desc'], '</p>';
 
 			if (!$subscription['flexible'])
 				echo '
-					<div><strong>', $txt['paid_duration'], ':</strong> ', $subscription['length'], '</div>';
+					<div>
+						<strong>', $txt['paid_duration'], ':</strong> ', $subscription['length'], '
+					</div>';
 
 			if ($context['user']['is_owner'])
 			{
@@ -456,12 +457,11 @@ function template_user_subscription()
 					', sprintf($modSettings['paid_currency_symbol'], $subscription['costs']['fixed']);
 
 				echo '
-					<hr />
 					<input type="submit" name="sub_id[', $subscription['id'], ']" value="', $txt['paid_order'], '" class="right_submit" />';
 			}
 			else
 				echo '
-					<a href="', $scripturl, '?action=admin;area=paidsubscribe;sa=modifyuser;sid=', $subscription['id'], ';uid=', $context['member']['id'], (empty($context['current'][$subscription['id']]) ? '' : ';lid=' . $context['current'][$subscription['id']]['id']), '">', empty($context['current'][$subscription['id']]) ? $txt['paid_admin_add'] : $txt['paid_edit_subscription'], '</a>';
+					<a class="linkbutton" href="', $scripturl, '?action=admin;area=paidsubscribe;sa=modifyuser;sid=', $subscription['id'], ';uid=', $context['member']['id'], (empty($context['current'][$subscription['id']]) ? '' : ';lid=' . $context['current'][$subscription['id']]['id']), '">', empty($context['current'][$subscription['id']]) ? $txt['paid_admin_add'] : $txt['paid_edit_subscription'], '</a>';
 
 			echo '
 				</div>
@@ -471,28 +471,29 @@ function template_user_subscription()
 
 	echo '
 		</form>
-		<h2 class="category_header">', $txt['paid_current'], '</h2>
-		<div class="information">
-			', $txt['paid_current_desc'], '
-		</div>
-		<table class="table_grid">
-			<thead>
-				<tr class="table_head">
-					<th class="style="width:30%">', $txt['paid_name'], '</th>
-					<th>', $txt['paid_status'], '</th>
-					<th>', $txt['start_date'], '</th>
-					<th>', $txt['end_date'], '</th>
-				</tr>
-			</thead>
-			<tbody>';
+		<div id="profilecenter">
+			<h2 class="category_header">', $txt['paid_current'], '</h2>
+			<div class="infobox">
+				', $txt['paid_current_desc'], '
+			</div>
+			<table class="table_grid">
+				<thead>
+					<tr class="table_head">
+						<th class="grid33">', $txt['paid_name'], '</th>
+						<th>', $txt['paid_status'], '</th>
+						<th>', $txt['start_date'], '</th>
+						<th>', $txt['end_date'], '</th>
+					</tr>
+				</thead>
+				<tbody>';
 
 	if (empty($context['current']))
 		echo '
-				<tr class="windowbg">
-					<td class="centertext" colspan="4">
-						', $txt['paid_none_yet'], '
-					</td>
-				</tr>';
+					<tr class="windowbg">
+						<td class="centertext" colspan="4">
+							', $txt['paid_none_ordered'], '
+						</td>
+					</tr>';
 
 	$alternate = false;
 	foreach ($context['current'] as $sub)
@@ -501,21 +502,22 @@ function template_user_subscription()
 
 		if (!$sub['hide'])
 			echo '
-				<tr class="windowbg', $alternate ? '' : '2', '">
-					<td>
-						', (allowedTo('admin_forum') ? '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=modifyuser;lid=' . $sub['id'] . '">' . $sub['name'] . '</a>' : $sub['name']), '
-					</td><td>
-						<span style="color: ', ($sub['status'] == 2 ? 'green' : ($sub['status'] == 1 ? 'red' : 'orange')), '"><strong>', $sub['status_text'], '</strong></span>
-					</td><td>
-						', $sub['start'], '
-					</td><td>
-						', $sub['end'], '
-					</td>
-				</tr>';
+					<tr class="windowbg', $alternate ? '' : '2', '">
+						<td>
+							', (allowedTo('admin_forum') ? '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=modifyuser;lid=' . $sub['id'] . '">' . $sub['name'] . '</a>' : $sub['name']), '
+						</td><td>
+							<span style="color: ', ($sub['status'] == 2 ? 'green' : ($sub['status'] == 1 ? 'red' : 'orange')), '"><strong>', $sub['status_text'], '</strong></span>
+						</td><td>
+							', $sub['start'], '
+						</td><td>
+							', $sub['end'], '
+						</td>
+					</tr>';
 	}
 	echo '
-			</tbody>
-		</table>
+				</tbody>
+			</table>
+		</div>
 	</div>';
 }
 
@@ -588,9 +590,9 @@ function template_paid_done()
 		<h3 class="category_header">', $txt['paid_done'], '</h3>
 		<div class="windowbg2">
 			<div class="content">
-				<p>', $txt['paid_done_desc'], '</p>
+				<p class="successbox">', $txt['paid_done_desc'], '</p>
 				<br />
-				<a href="', $scripturl, '?action=profile;u=', $context['member']['id'], ';area=subscriptions">', $txt['paid_sub_return'], '</a>
+				<a class="linkbutton_right" href="', $scripturl, '?action=profile;u=', $context['member']['id'], ';area=subscriptions">', $txt['paid_sub_return'], '</a>
 			</div>
 		</div>
 	</div>';

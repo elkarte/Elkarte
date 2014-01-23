@@ -1544,7 +1544,7 @@ function securityOptionsHeader($override = null)
 {
 	if ($override !== true)
 	{
-		header('X-XSS-Protection: 1; mode=block');
+		header('X-XSS-Protection: 1');
 		header('X-Content-Type-Options: nosniff');
 	}
 }

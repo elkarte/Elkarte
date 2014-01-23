@@ -165,8 +165,11 @@ class Auth_Controller extends Action_Controller
 
 		// Can't use a password > 64 characters sorry, to long and only good for a DoS attack
 		// Plus we expect a 64 character one from SHA-256
-		if ((isset($_POST['passwrd']) && strlen($_POST['passwrd']) > 64) || (isset($_POST['hash_passwrd']) || strlen($_POST['hash_passwrd']) > 64))
-			$_POST['user'] = Util::substr($_POST['user'], 0, 80);
+		if ((isset($_POST['passwrd']) && strlen($_POST['passwrd']) > 64) || (isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) > 64))
+		{
+			$context['login_errors'] = array($txt['improper_password']);
+			return;
+		}
 
 		// Hmm... maybe 'admin' will login with no password. Uhh... NO!
 		if ((!isset($_POST['passwrd']) || $_POST['passwrd'] == '') && (!isset($_POST['hash_passwrd']) || strlen($_POST['hash_passwrd']) != 64))
