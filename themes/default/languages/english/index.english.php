@@ -891,6 +891,10 @@ $txt['debug_hide_queries'] = '[Hide Queries]';
 $txt['debug_tokens'] = 'Tokens: ';
 $txt['debug_browser'] = 'Browser ID: ';
 $txt['debug_hooks'] = 'Hooks called: ';
+$txt['debug_system_type'] = 'System: ';
+$txt['debug_server_load'] = 'Server Load: ';
+$txt['debug_script_mem_load'] = 'Script Memory Usage: ';
+$txt['debug_script_cpu_load'] = 'Script CPU Time (user/system): ';
 
 // Video embedding
 $txt['preview_image'] = 'Video Preview Image';

@@ -587,7 +587,7 @@ class ProfileOptions_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$board', '
-							global $settings, $txt;
+							global $txt;
 
 							$link = $board[\'link\'];
 
@@ -674,7 +674,7 @@ class ProfileOptions_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$topic', '
-							global $settings, $txt;
+							global $txt;
 
 							$link = $topic[\'link\'];
 

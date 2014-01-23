@@ -1376,8 +1376,6 @@ class ModerationCenter_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $context, $txt, $scripturl;
-
 							return \'<input type="checkbox" name="deltpl[]" value="\' . $rowData[\'id_comment\'] . \'" class="input_check" />\';
 						'),
 						'class' => 'centertext',

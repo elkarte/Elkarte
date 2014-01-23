@@ -95,7 +95,7 @@ elk_DraftAutoSave.prototype.draftSave = function ()
 
 	// Nothing to save?
 	var sPostdata = document.forms.postmodify["message"].value;
-	if (isEmptyText(sPostdata))
+	if (isEmptyText(sPostdata) || !('topic' in document.forms.postmodify.elements))
 		return false;
 
 	// Flag that we are saving a draft

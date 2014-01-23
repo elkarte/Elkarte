@@ -232,8 +232,8 @@ strong {
 	color: #ff7200;
 }
 /* Legacy highlight color, for selected membergroups etc. */
-/* Used by JS to show a selected item. @todo - deprecate? */
-.highlight2 {
+/* Used by JS to show a selected item. Still used in manage languages */
+.table_grid .standard_row.highlight2 {
 	background: #d1e1ef;
 	color: #555;
 }
@@ -353,6 +353,7 @@ strong {
 /* /me uses this a lot. (emote, try typing /me in a post.) */
 .meaction {
 	color: #50aa3a;
+	vertical-align: bottom;
 }
 .meaction:before {
 	content: "\270c";
@@ -1211,6 +1212,9 @@ span.views_text {
 	}
 	.frame {
 		border-radius: 0;
+	}
+	#forumtitle {
+		margin-left: 10px;
 	}
 	.topic_listing>li {
 		border: 1px solid #ccc;

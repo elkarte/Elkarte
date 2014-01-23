@@ -58,9 +58,9 @@ $txt['site_slogan'] = 'Site slogan';
 $txt['site_slogan_desc'] = 'Add your own text for a slogan here. It will replace the default logo.';
 $txt['header_layout'] = 'Header layout';
 $txt['header_layout_desc'] = 'This setting allows you to select one of three layouts for the header.
-<br><strong>Default</strong>: the logo is placed on the right and the name of the community on the left
-<br><strong>Only logo</strong>: only the logo is displayed, in a centered position
-<br><strong>Logo on the left</strong>: similar to Default, but with logo and name inverted (i.e. name on the right, logo on the left)';
+<br /><strong>Default</strong>: the logo is placed on the right and the name of the community on the left
+<br /><strong>Only logo</strong>: only the logo is displayed, in a centered position
+<br /><strong>Logo on the left</strong>: similar to Default, but with logo and name inverted (i.e. name on the right, logo on the left)';
 $txt['header_layout_default'] = 'Default';
 $txt['header_layout_logo_only'] = 'Only logo';
 $txt['header_layout_inverted'] = 'Logo on the left';
@@ -72,14 +72,10 @@ $txt['enable_news_off'] = 'Off';
 $txt['enable_news_random'] = 'Random';
 $txt['enable_news_fader'] = 'Fader';
 $txt['enable_news_desc'] = '<strong>Off</strong>: no news shown
-<br><strong>Random</strong>: one news shown chosen at random
-<br><strong>Fader</strong>: all the news are displayed sequentially';
+<br /><strong>Random</strong>: one news shown chosen at random
+<br /><strong>Fader</strong>: all the news are displayed sequentially';
 $txt['show_group_key'] = 'Show group key on board index';
 $txt['additional_options_collapsible'] = 'Enable collapsible additional post options';
-$txt['message_index_preview'] = 'Show post previews on the message index';
-$txt['message_index_preview_off'] = 'Do not show the previews';
-$txt['message_index_preview_first'] = 'Show the text of the first post';
-$txt['message_index_preview_last'] = 'Show the text of the last post';
 $txt['allow_no_censored'] = 'Allow users to turn off word censoring';
 $txt['who_display_viewing'] = 'Show who is viewing the board index and posts';
 $txt['who_display_viewing_off'] = 'Don\'t show';

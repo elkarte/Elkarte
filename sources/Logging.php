@@ -211,7 +211,7 @@ function logLastDatabaseError()
 function displayDebug()
 {
 	global $context, $scripturl, $modSettings;
-	global $db_cache, $db_count, $db_show_debug, $cache_count, $cache_hits, $txt;
+	global $db_cache, $db_count, $db_show_debug, $cache_count, $cache_hits, $txt, $rusage_start;
 
 	// Add to Settings.php if you want to show the debugging information.
 	if (!isset($db_show_debug) || $db_show_debug !== true || (isset($_GET['action']) && $_GET['action'] == 'viewquery') || isset($_GET['api']))
@@ -249,26 +249,45 @@ function displayDebug()
 	$temp = ob_get_contents();
 	ob_clean();
 
+	// Compute some system info, if we can
+	$context['system'] = php_uname();
+	$context['server_load'] = detectServerLoad();
+	if (function_exists('memory_get_peak_usage'))
+		$context['memory_usage'] = round(memory_get_peak_usage() / 1024 / 1024, 2) . 'MB';
+
+	// getrusage() information is CPU time, not wall clock time like microtime, *nix only
+	if (function_exists('getrusage'))
+	{
+		$rusage_end = getrusage();
+		$context['user_time'] = ($rusage_end['ru_utime.tv_sec'] - $rusage_start['ru_utime.tv_sec'] + ($rusage_end['ru_utime.tv_usec'] / 1000000));
+		$context['system_time'] = ($rusage_end['ru_stime.tv_sec'] - $rusage_start['ru_stime.tv_sec'] + ($rusage_end['ru_stime.tv_usec'] / 1000000));
+	}
+
 	echo preg_replace('~</body>\s*</html>~', '', $temp), '
-<div id="debug_logging_wrapper">
-<div id="debug_logging" class="smalltext">
-	', $txt['debug_browser'], $context['browser_body_id'], ' <em>(', implode('</em>, <em>', array_reverse(array_keys($context['browser'], true))), ')</em><br />
-	', $txt['debug_templates'], count($context['debug']['templates']), ': <em>', implode('</em>, <em>', $context['debug']['templates']), '</em>.<br />
-	', $txt['debug_subtemplates'], count($context['debug']['sub_templates']), ': <em>', implode('</em>, <em>', $context['debug']['sub_templates']), '</em>.<br />
-	', $txt['debug_language_files'], count($context['debug']['language_files']), ': <em>', implode('</em>, <em>', $context['debug']['language_files']), '</em>.<br />
-	', $txt['debug_stylesheets'], count($context['debug']['sheets']), ': <em>', implode('</em>, <em>', $context['debug']['sheets']), '</em>.<br />
-	', $txt['debug_javascript'] . (!empty($context['debug']['javascript']) ? count($context['debug']['javascript']) . ': <em>' . implode('</em>, <em>', $context['debug']['javascript']) . '</em>.<br />' : '') . '
-	', $txt['debug_hooks'], empty($context['debug']['hooks']) ? 0 : count($context['debug']['hooks']) . ' (<a href="javascript:void(0);" onclick="document.getElementById(\'debug_hooks\').style.display = \'inline\'; this.style.display = \'none\'; return false;">', $txt['debug_show'], '</a><span id="debug_hooks" style="display: none;"><em>' . implode('</em>, <em>', $context['debug']['hooks']), '</em></span>)', '<br />
-	', $txt['debug_files_included'], count($files), ' - ', round($total_size / 1024), $txt['debug_kb'], ' (<a href="javascript:void(0);" onclick="document.getElementById(\'debug_include_info\').style.display = \'inline\'; this.style.display = \'none\'; return false;">', $txt['debug_show'], '</a><span id="debug_include_info" style="display: none;"><em>', implode('</em>, <em>', $files), '</em></span>)<br />';
+	<div id="debug_logging_wrapper">
+		<div id="debug_logging" class="smalltext">
+			', $txt['debug_system_type'], $context['system'], '<br />
+			', !empty($context['server_load']) ? $txt['debug_server_load'] . $context['server_load'] . '<br />' : '', '
+			', !empty($context['memory_usage']) ? $txt['debug_script_mem_load'] . $context['memory_usage'] . '<br />' : '', '
+			', !empty($context['user_time']) ? $txt['debug_script_cpu_load'] . $context['user_time'] . ' / ' .$context['system_time'] . '<br />' : '', '
+			', $txt['debug_browser'], $context['browser_body_id'], ' <em>(', implode('</em>, <em>', array_reverse(array_keys($context['browser'], true))), ')</em><br />
+			', $txt['debug_templates'], count($context['debug']['templates']), ': <em>', implode('</em>, <em>', $context['debug']['templates']), '</em>.<br />
+			', $txt['debug_subtemplates'], count($context['debug']['sub_templates']), ': <em>', implode('</em>, <em>', $context['debug']['sub_templates']), '</em>.<br />
+			', $txt['debug_language_files'], count($context['debug']['language_files']), ': <em>', implode('</em>, <em>', $context['debug']['language_files']), '</em>.<br />
+			', $txt['debug_stylesheets'], count($context['debug']['sheets']), ': <em>', implode('</em>, <em>', $context['debug']['sheets']), '</em>.<br />
+			', $txt['debug_javascript'] . (!empty($context['debug']['javascript']) ? count($context['debug']['javascript']) . ': <em>' . implode('</em>, <em>', $context['debug']['javascript']) . '</em>.<br />' : '') . '
+			', $txt['debug_hooks'], empty($context['debug']['hooks']) ? 0 : count($context['debug']['hooks']) . ' (<a href="javascript:void(0);" onclick="document.getElementById(\'debug_hooks\').style.display = \'inline\'; this.style.display = \'none\'; return false;">', $txt['debug_show'], '</a><span id="debug_hooks" style="display: none;"><em>' . implode('</em>, <em>', $context['debug']['hooks']), '</em></span>)', '<br />
+			', $txt['debug_files_included'], count($files), ' - ', round($total_size / 1024), $txt['debug_kb'], ' (<a href="javascript:void(0);" onclick="document.getElementById(\'debug_include_info\').style.display = \'inline\'; this.style.display = \'none\'; return false;">', $txt['debug_show'], '</a><span id="debug_include_info" style="display: none;"><em>', implode('</em>, <em>', $files), '</em></span>)<br />';
 
 	// What tokens are active?
 	if (isset($_SESSION['token']))
 	{
 		$token_list = array_keys($_SESSION['token']);
-
-		echo $txt['debug_tokens'] . '<em>' . implode(',</em> <em>', $token_list), '</em>.<br />';
+		echo '
+			', $txt['debug_tokens'] . '<em>' . implode(',</em> <em>', $token_list), '</em>.<br />';
 	}
 
+	// If the cache is on, how successful was it?
 	if (!empty($modSettings['cache_enable']) && !empty($cache_hits))
 	{
 		$entries = array();
@@ -282,12 +301,12 @@ function displayDebug()
 		}
 
 		echo '
-	', $txt['debug_cache_hits'], $cache_count, ': ', sprintf($txt['debug_cache_seconds_bytes_total'], comma_format($total_t, 5), comma_format($total_s)), ' (<a href="javascript:void(0);" onclick="document.getElementById(\'debug_cache_info\').style.display = \'inline\'; this.style.display = \'none\'; return false;">', $txt['debug_show'], '</a><span id="debug_cache_info" style="display: none;"><em>', implode('</em>, <em>', $entries), '</em></span>)<br />';
+			', $txt['debug_cache_hits'], $cache_count, ': ', sprintf($txt['debug_cache_seconds_bytes_total'], comma_format($total_t, 5), comma_format($total_s)), ' (<a href="javascript:void(0);" onclick="document.getElementById(\'debug_cache_info\').style.display = \'inline\'; this.style.display = \'none\'; return false;">', $txt['debug_show'], '</a><span id="debug_cache_info" style="display: none;"><em>', implode('</em>, <em>', $entries), '</em></span>)<br />';
 	}
 
+	// Want to see the querys in a new windows?
 	echo '
-	<a href="', $scripturl, '?action=viewquery" target="_blank" class="new_win">', $warnings == 0 ? sprintf($txt['debug_queries_used'], (int) $db_count) : sprintf($txt['debug_queries_used_and_warnings'], (int) $db_count, $warnings), '</a><br />
-	<br />';
+			<a href="', $scripturl, '?action=viewquery" target="_blank" class="new_win">', $warnings == 0 ? sprintf($txt['debug_queries_used'], (int) $db_count) : sprintf($txt['debug_queries_used_and_warnings'], (int) $db_count, $warnings), '</a><br />';
 
 	if ($_SESSION['view_queries'] == 1 && !empty($db_cache))
 		foreach ($db_cache as $q => $qq)
@@ -326,9 +345,12 @@ function displayDebug()
 	<br />';
 		}
 
+	// Or show/hide the querys in line with all of this data
 	echo '
-	<a href="' . $scripturl . '?action=viewquery;sa=hide">', $txt['debug_' . (empty($_SESSION['view_queries']) ? 'show' : 'hide') . '_queries'], '</a>
-</div></div></body></html>';
+			<a href="' . $scripturl . '?action=viewquery;sa=hide">', $txt['debug_' . (empty($_SESSION['view_queries']) ? 'show' : 'hide') . '_queries'], '</a>
+		</div>
+	</div>
+</body></html>';
 }
 
 /**

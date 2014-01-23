@@ -17,6 +17,7 @@ $txt['error_too_quickly'] = 'You went through the registration process too quick
 $txt['error_token_verification'] = 'Token verification failed. Please try again.';
 $txt['need_username'] = 'You need to fill in a user name.';
 $txt['no_password'] = 'You didn\'t enter your password.';
+$txt['improper_password'] = 'The supplied password is too long.';
 $txt['incorrect_password'] = 'Password incorrect';
 $txt['choose_username'] = 'Choose user name';
 $txt['maintain_mode'] = 'Maintenance Mode';
@@ -37,7 +38,7 @@ $txt['login_below_or_register'] = 'Please login below or <a href="%1$s">register
 $txt['may_change_in_profile'] = 'You may change it after you login by going to the profile page, or by visiting this page after you login:';
 $txt['your_username_is'] = 'Your user name is: ';
 
-$txt['login_hash_error'] = 'Password security has recently been upgraded.<br>Please enter your password again.';
+$txt['login_hash_error'] = 'Password security has recently been upgraded.<br />Please enter your password again.';
 
 $txt['ban_register_prohibited'] = 'Sorry, you are not allowed to register on this forum.';
 $txt['under_age_registration_prohibited'] = 'Sorry, but users under the age of %1$d are not allowed to register on this forum.';

@@ -4181,7 +4181,7 @@ a.help .icon {
 	.popup_window {
 		width: 95%;
 	}
-	 .poster .menulevel2 {
+	.poster .menulevel2 {
 		 display: none !important;
 	}
 	.bbc_table_container {
@@ -4193,6 +4193,11 @@ a.help .icon {
 	}
 	#warning_level {
 		max-width: 5em !important;
+	}
+	/* mentions */
+	.mentionavatar .avatar {
+		max-width: 40px;
+		max-height: 40px; 
 	}
 }
 /* This one does 480px screens at default font size. */

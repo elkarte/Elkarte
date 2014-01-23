@@ -402,7 +402,7 @@ function ssi_fetchPosts($post_ids = array(), $override_permissions = false, $out
 	);
 
 	// Then make the query and dump the data.
-	return ssi_queryPosts($query_where, $query_where_params, '', 'm.id_msg DESC', $output_method);
+	return ssi_queryPosts($query_where, $query_where_params, '', 'm.id_msg DESC', $output_method, false, $override_permissions);
 }
 
 /**
@@ -1281,186 +1281,138 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 
 /**
  * Show a poll.
+ * It is possible to use this function in combination with the template
+ * template_display_poll_above from Display.template.php, the only part missing
+ * is the definition of the poll moderation button array (see Display.controller.php
+ * for details).
  *
- * @param int $topic = null
+ * @param int $topicID = null
  * @param string $output_method = 'echo'
  */
-function ssi_showPoll($topic = null, $output_method = 'echo')
+function ssi_showPoll($topicID = null, $output_method = 'echo')
 {
 	global $txt, $settings, $boardurl, $user_info, $context, $modSettings;
+	global $board;
+	static $last_board = null;
 
-	$boardsAllowed = boardsAllowedTo('poll_view');
+	require_once(SUBSDIR . '/Poll.subs.php');
+	require_once(SUBSDIR . '/Topic.subs.php');
 
-	if (empty($boardsAllowed))
+	if ($topicID === null && isset($_REQUEST['ssi_topic']))
+		$topicID = (int) $_REQUEST['ssi_topic'];
+	else
+		$topicID = (int) $topicID;
+
+	if (empty($topicID))
 		return array();
 
-	$db = database();
+	// Get the topic starter information.
+	$topicinfo = getTopicInfo($topicID, 'starter');
 
-	if ($topic === null && isset($_REQUEST['ssi_topic']))
-		$topic = (int) $_REQUEST['ssi_topic'];
-	else
-		$topic = (int) $topic;
+	$boards_can_poll = boardsAllowedTo('poll_view');
 
-	$request = $db->query('', '
-		SELECT
-			p.id_poll, p.question, p.voting_locked, p.hide_results, p.expire_time, p.max_votes, p.guest_vote, b.id_board
-		FROM {db_prefix}topics AS t
-			INNER JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
-		WHERE t.id_topic = {int:current_topic}
-			AND {query_see_board}' . (!in_array(0, $boardsAllowed) ? '
-			AND b.id_board IN ({array_int:boards_allowed_see})' : '') . ($modSettings['postmod_active'] ? '
-			AND t.approved = {int:is_approved}' : '') . '
-		LIMIT 1',
-		array(
-			'current_topic' => $topic,
-			'boards_allowed_see' => $boardsAllowed,
-			'is_approved' => 1,
-		)
-	);
-
-	// Either this topic has no poll, or the user cannot view it.
-	if ($db->num_rows($request) == 0)
+	// If:
+	//  - is not allowed to see poll in any board,
+	//  - or:
+	//     - is not allowed in the specific board, and
+	//     - is not an admin
+	// fail
+	if (empty($boards_can_poll) || (!in_array($topicinfo['id_board'], $boards_can_poll) && !in_array(0, $boards_can_poll)))
 		return array();
 
-	$row = $db->fetch_assoc($request);
-	$db->free_result($request);
+	$context['user']['started'] = $user_info['id'] == $topicinfo['id_member'] && !$user_info['is_guest'];
 
-	// Check if they can vote.
-	if (!empty($row['expire_time']) && $row['expire_time'] < time())
-		$allow_vote = false;
-	elseif ($user_info['is_guest'] && $row['guest_vote'] && (!isset($_COOKIE['guest_poll_vote']) || !in_array($row['id_poll'], explode(',', $_COOKIE['guest_poll_vote']))))
-		$allow_vote = true;
-	elseif ($user_info['is_guest'])
-		$allow_vote = false;
-	elseif (!empty($row['voting_locked']) || !allowedTo('poll_vote', $row['id_board']))
-		$allow_vote = false;
-	else
-	{
-		$request = $db->query('', '
-			SELECT id_member
-			FROM {db_prefix}log_polls
-			WHERE id_poll = {int:current_poll}
-				AND id_member = {int:current_member}
-			LIMIT 1',
-			array(
-				'current_member' => $user_info['id'],
-				'current_poll' => $row['id_poll'],
-			)
-		);
-		$allow_vote = $db->num_rows($request) == 0;
-		$db->free_result($request);
-	}
+	$poll_id = associatedPoll($topicID);
+	loadPollContext($poll_id);
 
-	// Can they view?
-	$is_expired = !empty($row['expire_time']) && $row['expire_time'] < time();
-	$allow_view_results = allowedTo('moderate_board') || $row['hide_results'] == 0 || ($row['hide_results'] == 1 && !$allow_vote) || $is_expired;
+	if (empty($context['poll']))
+		return array();
 
-	$request = $db->query('', '
-		SELECT COUNT(DISTINCT id_member)
-		FROM {db_prefix}log_polls
-		WHERE id_poll = {int:current_poll}',
-		array(
-			'current_poll' => $row['id_poll'],
-		)
-	);
-	list ($total) = $db->fetch_row($request);
-	$db->free_result($request);
-
-	$request = $db->query('', '
-		SELECT id_choice, label, votes
-		FROM {db_prefix}poll_choices
-		WHERE id_poll = {int:current_poll}',
-		array(
-			'current_poll' => $row['id_poll'],
-		)
-	);
-	$options = array();
-	$total_votes = 0;
-	while ($rowChoice = $db->fetch_assoc($request))
-	{
-		censorText($rowChoice['label']);
-
-		$options[$rowChoice['id_choice']] = array($rowChoice['label'], $rowChoice['votes']);
-		$total_votes += $rowChoice['votes'];
-	}
-	$db->free_result($request);
-
-	$return = array(
-		'id' => $row['id_poll'],
-		'image' => empty($row['voting_locked']) ? 'poll' : 'locked_poll',
-		'question' => $row['question'],
-		'total_votes' => $total,
-		'is_locked' => !empty($row['voting_locked']),
-		'allow_vote' => $allow_vote,
-		'allow_view_results' => $allow_view_results,
-		'topic' => $topic
-	);
-
-	// Calculate the percentages and bar lengths...
-	$divisor = $total_votes == 0 ? 1 : $total_votes;
-	foreach ($options as $i => $option)
-	{
-		$bar = floor(($option[1] * 100) / $divisor);
-		$barWide = $bar == 0 ? 1 : floor(($bar * 5) / 3);
-		$return['options'][$i] = array(
-			'id' => 'options-' . $i,
-			'percent' => $bar,
-			'votes' => $option[1],
-			'bar' => '<span style="white-space: nowrap;"><img src="' . $settings['images_url'] . '/poll_' . ($context['right_to_left'] ? 'right' : 'left') . '.png" alt="" /><img src="' . $settings['images_url'] . '/poll_middle.png" style="width:' . $barWide . 'px; height:12ps" alt="-" /><img src="' . $settings['images_url'] . '/poll_' . ($context['right_to_left'] ? 'left' : 'right') . '.png" alt="" /></span>',
-			'option' => parse_bbc($option[0]),
-			'vote_button' => '<input type="' . ($row['max_votes'] > 1 ? 'checkbox' : 'radio') . '" name="options[]" id="options-' . $i . '" value="' . $i . '" class="input_' . ($row['max_votes'] > 1 ? 'check' : 'radio') . '" />'
-		);
-	}
-
-	$return['allowed_warning'] = $row['max_votes'] > 1 ? sprintf($txt['poll_options6'], min(count($options), $row['max_votes'])) : '';
+	// For "compatibility" sake
+	// @deprecated since 1.0
+	$context['poll']['allow_vote'] = $context['allow_vote'];
+	$context['poll']['allow_view_results'] = $context['allow_poll_view'];
+	$context['poll']['topic'] = $topicID;
 
 	if ($output_method != 'echo')
-		return $return;
+		return $context['poll'];
 
-	if ($return['allow_vote'])
+	echo '
+		<div class="content" id="poll_options">
+			<h4 id="pollquestion">
+				', $context['poll']['question'], '
+			</h4>';
+
+	if ($context['poll']['allow_vote'])
 	{
 		echo '
-			<form class="ssi_poll" action="', $boardurl, '/SSI.php?ssi_function=pollVote" method="post" accept-charset="UTF-8">
-				<strong>', $return['question'], '</strong><br />
-				', !empty($return['allowed_warning']) ? $return['allowed_warning'] . '<br />' : '';
+			<form action="', $scripturl, '?action=vote;topic=', $context['current_topic'], '.', $context['start'], ';poll=', $context['poll']['id'], '" method="post" accept-charset="UTF-8">';
 
-		foreach ($return['options'] as $option)
+		// Show a warning if they are allowed more than one option.
+		if ($context['poll']['allowed_warning'])
 			echo '
-				<label for="', $option['id'], '">', $option['vote_button'], ' ', $option['option'], '</label><br />';
+				<p>', $context['poll']['allowed_warning'], '</p>';
 
 		echo '
-				<input type="submit" value="', $txt['poll_vote'], '" class="button_submit" />
-				<input type="hidden" name="poll" value="', $return['id'], '" />
-				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+				<ul class="options">';
+
+		// Show each option with its button - a radio likely.
+		foreach ($context['poll']['options'] as $option)
+			echo '
+					<li>', $option['vote_button'], ' <label for="', $option['id'], '">', $option['option'], '</label></li>';
+
+		echo '
+				</ul>
+				<div class="submitbutton">
+					<input type="submit" value="', $txt['poll_vote'], '" class="button_submit" />
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+				</div>
 			</form>';
+		// Is the clock ticking?
+		if (!empty($context['poll']['expire_time']))
+			echo '
+			<p><strong>', ($context['poll']['is_expired'] ? $txt['poll_expired_on'] : $txt['poll_expires_on']), ':</strong> ', $context['poll']['expire_time'], '</p>';
+
 	}
-	elseif ($return['allow_view_results'])
+	elseif ($context['poll']['allow_view_results'])
 	{
 		echo '
-			<div class="ssi_poll">
-				<strong>', $return['question'], '</strong>
-				<dl>';
+			<ul class="options">';
 
-		foreach ($return['options'] as $option)
+		// Show each option with its corresponding percentage bar.
+		foreach ($context['poll']['options'] as $option)
+		{
 			echo '
-					<dt>', $option['option'], '</dt>
-					<dd>
-						<div class="ssi_poll_bar" style="border: 1px solid #666; height: 1em">
-							<div class="ssi_poll_bar_fill" style="background: #ccf; height: 1em; width: ', $option['percent'], '%;">
-							</div>
-						</div>
-						', $option['votes'], ' (', $option['percent'], '%)
-					</dd>';
+				<li', $option['voted_this'] ? ' class="voted"' : '', '>', $option['option'], '
+					<div class="results">';
+
+			if ($context['allow_poll_view'])
+				echo '
+						<div class="statsbar"> ', $option['bar_ndt'], '</div>
+						<span class="percentage">', $option['votes'], ' (', $option['percent'], '%)</span>';
+
+			echo '
+					</div>
+				</li>';
+		}
 
 		echo '
-				</dl>
-				<strong>', $txt['poll_total_voters'], ': ', $return['total_votes'], '</strong>
-			</div>';
+			</ul>';
+
+		if ($context['allow_poll_view'])
+			echo '
+			<p><strong>', $txt['poll_total_voters'], ':</strong> ', $context['poll']['total_votes'], '</p>';
+		// Is the clock ticking?
+		if (!empty($context['poll']['expire_time']))
+			echo '
+			<p><strong>', ($context['poll']['is_expired'] ? $txt['poll_expired_on'] : $txt['poll_expires_on']), ':</strong> ', $context['poll']['expire_time'], '</p>';
 	}
 	// Cannot see it I'm afraid!
 	else
 		echo $txt['poll_cannot_see'];
+
+	echo '
+			</div>';
 }
 
 /**
@@ -1468,9 +1420,11 @@ function ssi_showPoll($topic = null, $output_method = 'echo')
  */
 function ssi_pollVote()
 {
-	global $context, $db_prefix, $user_info, $sc, $modSettings;
+	global $context, $db_prefix, $user_info, $sc, $modSettings, $topic, $board;
 
-	if (!isset($_POST[$context['session_var']]) || $_POST[$context['session_var']] != $sc || empty($_POST['options']) || !isset($_POST['poll']))
+	$pollID = isset($_POST['poll']) ? (int) $_POST['poll'] : 0;
+
+	if (empty($pollID) || !isset($_POST[$context['session_var']]) || $_POST[$context['session_var']] != $sc || empty($_POST['options']))
 	{
 		echo '<!DOCTYPE html>
 <html>
@@ -1484,95 +1438,16 @@ function ssi_pollVote()
 		return;
 	}
 
-	// This can cause weird errors! (ie. copyright missing.)
-	checkSession();
+	require_once(CONTROLLERDIR . '/Poll.controller.php');
+	require_once(SUBSDIR . '/Poll.subs.php');
+	// We have to fake we are in a topic so that we can use the proper controller
+	list ($topic, $board) = topicFromPoll($pollID);
+	loadBoard();
 
-	$_POST['poll'] = (int) $_POST['poll'];
+	$poll_action = new Poll_Controller();
 
-	$db = database();
-
-	// Check if they have already voted, or voting is locked.
-	$request = $db->query('', '
-		SELECT
-			p.id_poll, p.voting_locked, p.expire_time, p.max_votes, p.guest_vote,
-			t.id_topic,
-			IFNULL(lp.id_choice, -1) AS selected
-		FROM {db_prefix}polls AS p
-			INNER JOIN {db_prefix}topics AS t ON (t.id_poll = {int:current_poll})
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
-			LEFT JOIN {db_prefix}log_polls AS lp ON (lp.id_poll = p.id_poll AND lp.id_member = {int:current_member})
-		WHERE p.id_poll = {int:current_poll}
-			AND {query_see_board}' . ($modSettings['postmod_active'] ? '
-			AND t.approved = {int:is_approved}' : '') . '
-		LIMIT 1',
-		array(
-			'current_member' => $user_info['id'],
-			'current_poll' => $_POST['poll'],
-			'is_approved' => 1,
-		)
-	);
-	if ($db->num_rows($request) == 0)
-		die;
-	$row = $db->fetch_assoc($request);
-	$db->free_result($request);
-
-	if (!empty($row['voting_locked']) || ($row['selected'] != -1 && !$user_info['is_guest']) || (!empty($row['expire_time']) && time() > $row['expire_time']))
-		redirectexit('topic=' . $row['id_topic'] . '.0');
-
-	// Too many options checked?
-	if (count($_REQUEST['options']) > $row['max_votes'])
-		redirectexit('topic=' . $row['id_topic'] . '.0');
-
-	// It's a guest who has already voted?
-	if ($user_info['is_guest'])
-	{
-		// Guest voting disabled?
-		if (!$row['guest_vote'])
-			redirectexit('topic=' . $row['id_topic'] . '.0');
-		// Already voted?
-		elseif (isset($_COOKIE['guest_poll_vote']) && in_array($row['id_poll'], explode(',', $_COOKIE['guest_poll_vote'])))
-			redirectexit('topic=' . $row['id_topic'] . '.0');
-	}
-
-	$options = array();
-	$inserts = array();
-	foreach ($_REQUEST['options'] as $id)
-	{
-		$id = (int) $id;
-
-		$options[] = $id;
-		$inserts[] = array($_POST['poll'], $user_info['id'], $id);
-	}
-
-	// Add their vote in to the tally.
-	$db->insert('insert',
-		$db_prefix . 'log_polls',
-		array('id_poll' => 'int', 'id_member' => 'int', 'id_choice' => 'int'),
-		$inserts,
-		array('id_poll', 'id_member', 'id_choice')
-	);
-	$db->query('', '
-		UPDATE {db_prefix}poll_choices
-		SET votes = votes + 1
-		WHERE id_poll = {int:current_poll}
-			AND id_choice IN ({array_int:option_list})',
-		array(
-			'option_list' => $options,
-			'current_poll' => $_POST['poll'],
-		)
-	);
-
-	// Track the vote if a guest.
-	if ($user_info['is_guest'])
-	{
-		$_COOKIE['guest_poll_vote'] = !empty($_COOKIE['guest_poll_vote']) ? ($_COOKIE['guest_poll_vote'] . ',' . $row['id_poll']) : $row['id_poll'];
-
-		require_once(SUBSDIR . '/Auth.subs.php');
-		$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
-		elk_setcookie('guest_poll_vote', $_COOKIE['guest_poll_vote'], time() + 2500000, $cookie_url[1], $cookie_url[0], false, false);
-	}
-
-	redirectexit('topic=' . $row['id_topic'] . '.0');
+	// The controller takes already care of redirecting properly or fail
+	$poll_action->action_vote();
 }
 
 /**

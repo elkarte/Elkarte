@@ -143,35 +143,7 @@ class ManagePaid_Controller extends Action_Controller
 
 		// We want javascript for our currency options.
 		addInlineJavascript('
-		function toggleOther()
-		{
-			var otherOn = document.getElementById("paid_currency").value == \'other\';
-			var currencydd = document.getElementById("custom_currency_code_div_dd");
-
-			if (otherOn)
-			{
-				document.getElementById("custom_currency_code_div").style.display = "";
-				document.getElementById("custom_currency_symbol_div").style.display = "";
-
-				if (currencydd)
-				{
-					document.getElementById("custom_currency_code_div_dd").style.display = "";
-					document.getElementById("custom_currency_symbol_div_dd").style.display = "";
-				}
-			}
-			else
-			{
-				document.getElementById("custom_currency_code_div").style.display = "none";
-				document.getElementById("custom_currency_symbol_div").style.display = "none";
-
-				if (currencydd)
-				{
-					document.getElementById("custom_currency_symbol_div_dd").style.display = "none";
-					document.getElementById("custom_currency_code_div_dd").style.display = "none";
-				}
-			}
-		}
-		toggleOther();', true);
+		toggleCurrencyOther();', true);
 
 		// Saving the settings?
 		if (isset($_GET['save']))
@@ -212,6 +184,7 @@ class ManagePaid_Controller extends Action_Controller
 					$_POST['paid_currency_code'] = $_POST['paid_currency'];
 					$_POST['paid_currency_symbol'] = $txt[$_POST['paid_currency'] . '_symbol'];
 				}
+				$_POST['paid_currency_code'] = trim($_POST['paid_currency_code']);
 
 				unset($config_vars['dummy_currency']);
 				Settings_Form::save_db($config_vars);
@@ -314,7 +287,7 @@ class ManagePaid_Controller extends Action_Controller
 				'name' => array(
 					'header' => array(
 						'value' => $txt['paid_name'],
-						'style' => 'width: 35%;',
+						'style' => 'width: 30%;',
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
@@ -330,7 +303,7 @@ class ManagePaid_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $context, $txt;
+							global $txt;
 
 							return $rowData[\'flexible\'] ? \'<em>\' . $txt[\'flexible\'] . \'</em>\' : $rowData[\'cost\'] . \' / \' . $rowData[\'length\'];
 						'),
@@ -339,7 +312,7 @@ class ManagePaid_Controller extends Action_Controller
 				'pending' => array(
 					'header' => array(
 						'value' => $txt['paid_pending'],
-						'style' => 'width: 18%;',
+						'style' => 'white_space: nowrap;',
 					),
 					'data' => array(
 						'db_htmlsafe' => 'pending',
@@ -367,28 +340,47 @@ class ManagePaid_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $context, $txt;
+							global $txt;
 
 							return \'<span class="\' . ($rowData[\'active\'] ? \'success\' : \'alert\') . \'">\' . ($rowData[\'active\'] ? $txt[\'yes\'] : $txt[\'no\']) . \'</span>\';
 						'),
 					),
 				),
-				'modify' => array(
+				'subscribers' => array(
+					'header' => array(
+						'value' => $txt['subscribers'],
+					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $context, $txt, $scripturl;
+							global $scripturl, $txt, $settings;
 
-							return \'<a href="\' . $scripturl . \'?action=admin;area=paidsubscribe;sa=modify;sid=\' . $rowData[\'id\'] . \'">\' . $txt[\'modify\'] . \'</a>\';
+							return \'<a href="\' . $scripturl . \'?action=admin;area=paidsubscribe;sa=viewsub;sid=\' . $rowData[\'id\'] . \'"><img title="\' . $txt[\'view\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/members.png" alt="*" /></a>\';
+						'),
+						'class' => 'centertext',
+					),
+				),
+				'modify' => array(
+					'header' => array(
+						'value' => $txt['modify'],
+					),
+					'data' => array(
+						'function' => create_function('$rowData', '
+							global $txt, $scripturl, $settings;
+
+							return \'<a href="\' . $scripturl . \'?action=admin;area=paidsubscribe;sa=modify;sid=\' . $rowData[\'id\'] . \'"><img title="\' . $txt[\'modify\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/modify_inline.png" alt="*" /></a>\';
 						'),
 						'class' => 'centertext',
 					),
 				),
 				'delete' => array(
+					'header' => array(
+						'value' => $txt['remove']
+					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $context, $txt, $scripturl;
+							global $txt, $scripturl, $settings;
 
-							return \'<a href="\' . $scripturl . \'?action=admin;area=paidsubscribe;sa=modify;delete;sid=\' . $rowData[\'id\'] . \'">\' . $txt[\'delete\'] . \'</a>\';
+							return \'<a href="\' . $scripturl . \'?action=admin;area=paidsubscribe;sa=modify;delete;sid=\' . $rowData[\'id\'] . \'"><img title="\' . $txt[\'delete\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/delete.png" alt="*" /></a>\';
 						'),
 						'class' => 'centertext',
 					),
@@ -599,7 +591,7 @@ class ManagePaid_Controller extends Action_Controller
 		$context['sub_id'] = (int) $_REQUEST['sid'];
 
 		// Load the subscription information.
-		$context['subscription'] = getSubscription($context['sub_id']);
+		$context['subscription'] = getSubscriptionDetails($context['sub_id']);
 
 		// Are we searching for people?
 		$search_string = isset($_POST['ssearch']) && !empty($_POST['sub_search']) ? ' AND IFNULL(mem.real_name, {string:guest}) LIKE {string:search}' : '';
@@ -612,7 +604,7 @@ class ManagePaid_Controller extends Action_Controller
 			'base_href' => $scripturl . '?action=admin;area=paidsubscribe;sa=viewsub;sid=' . $context['sub_id'],
 			'default_sort_col' => 'name',
 			'get_items' => array(
-				'function' => 'list_getSubscribedUsers',
+				'function' => array($this, 'getSubscribedUsers'),
 				'params' => array(
 					$context['sub_id'],
 					$search_string,
@@ -620,7 +612,7 @@ class ManagePaid_Controller extends Action_Controller
 				),
 			),
 			'get_count' => array(
-				'function' => 'list_getSubscribedUserCount',
+				'function' => array($this, 'getSubscribedUserCount'),
 				'params' => array(
 					$context['sub_id'],
 					$search_string,
@@ -636,7 +628,7 @@ class ManagePaid_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $context, $txt, $scripturl;
+							global $txt, $scripturl;
 
 							return $rowData[\'id_member\'] == 0 ? $txt[\'guest\'] : \'<a href="\' . $scripturl . \'?action=profile;u=\' . $rowData[\'id_member\'] . \'">\' . $rowData[\'name\'] . \'</a>\';
 						'),
@@ -707,7 +699,7 @@ class ManagePaid_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $context, $txt, $scripturl;
+							global $txt, $scripturl;
 
 							return \'<a href="\' . $scripturl . \'?action=admin;area=paidsubscribe;sa=modifyuser;lid=\' . $rowData[\'id\'] . \'">\' . $txt[\'modify\'] . \'</a>\';
 						'),
@@ -721,8 +713,6 @@ class ManagePaid_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $context, $txt, $scripturl;
-
 							return \'<input type="checkbox" name="delsub[\' . $rowData[\'id\'] . \']" class="input_check" />\';
 						'),
 						'class' => 'centertext',
@@ -761,8 +751,32 @@ class ManagePaid_Controller extends Action_Controller
 	}
 
 	/**
+	 * Callback for createList(),
+	 * Returns the number of subscribers to a specific subscription in the system
+	 *
+	 * @param int $messageID
+	 */
+	public function getSubscribedUserCount($id_sub, $search_string, $search_vars)
+	{
+	   return list_getSubscribedUserCount($id_sub, $search_string, $search_vars);
+	}
+
+	/**
+	 * Callback for createList()
+	 * Returns an array of subscription details and members for a specific subscription
+	 *
+	 * @param int $start
+	 * @param int $items_per_page
+	 * @param string $sort
+	 */
+	public function getSubscribedUsers($start, $items_per_page, $sort, $id_sub, $search_string, $search_vars)
+	{
+		return list_getSubscribedUsers($start, $items_per_page, $sort, $id_sub, $search_string, $search_vars);
+	}
+
+	/**
 	 * Edit or add a user subscription.
-	 * Accessed from ?action=admin;area=paidsubscribe;sa=modifyuser.
+	 * Accessed from ?action=admin;area=paidsubscribe;sa=modifyuser
 	 */
 	public function action_modifyuser()
 	{
@@ -786,7 +800,7 @@ class ManagePaid_Controller extends Action_Controller
 
 		if (!isset($context['subscriptions'][$context['sub_id']]))
 			fatal_lang_error('no_access', false);
-		
+
 		$context['current_subscription'] = $context['subscriptions'][$context['sub_id']];
 
 		// Searching?
