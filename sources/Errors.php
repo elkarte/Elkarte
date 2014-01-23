@@ -120,6 +120,30 @@ function log_error($error_message, $error_type = 'general', $file = null, $line 
 }
 
 /**
+ * Similar to log_error, it accepts a language index as error, takes care of
+ * loading the forum default language and log the error (forwarding to log_error)
+ *
+ * @param string $error
+ * @param string $error_type = 'general'
+ * @param string $sprintf = array()
+ * @param string $file = null
+ * @param int $line = null
+ */
+function log_lang_error($error, $error_type = 'general', $sprintf = array(), $file = null, $line = null)
+{
+	global $user_info, $language, $txt;
+
+	loadLanguage('Errors', $language);
+	$reload_lang_file = $language != $user_info['language'];
+	$error_message = !isset($txt[$error]) ? $error : (empty($sprintf) ? $txt[$error] : vsprintf($txt[$error], $sprintf));
+	log_error($error_message, $error_type, $file, $line);
+
+	// Load the language file, only if it needs to be reloaded
+	if ($reload_lang_file)
+		loadLanguage('Errors');
+}
+
+/**
  * An irrecoverable error. This function stops execution and displays an error message.
  * It logs the error message if $log is specified.
  *
