@@ -345,93 +345,11 @@ function template_additional_options_below()
 
 	// If this post already has attachments on it - give information about them.
 	if (!empty($context['attachments']['current']))
-	{
-		echo '
-						<dl id="postAttachment">
-							<dt>
-								', $txt['attached'], ':
-							</dt>
-							<dd class="smalltext" style="width: 100%;">
-								<input type="hidden" name="attach_del[]" value="0" />
-								', $txt['uncheck_unwatchd_attach'], ':
-							</dd>';
-
-		foreach ($context['attachments']['current'] as $attachment)
-			echo '
-							<dd class="smalltext">
-								<label for="attachment_', $attachment['id'], '"><input type="checkbox" id="attachment_', $attachment['id'], '" name="attach_del[]" value="', $attachment['id'], '"', empty($attachment['unchecked']) ? ' checked="checked"' : '', ' class="input_check" /> ', $attachment['name'], (empty($attachment['approved']) ? ' (' . $txt['awaiting_approval'] . ')' : ''),
-			!empty($modSettings['attachmentPostLimit']) || !empty($modSettings['attachmentSizeLimit']) ? sprintf($txt['attach_kb'], comma_format(round(max($attachment['size'], 1028) / 1028), 0)) : '', '</label>
-							</dd>';
-
-		echo '
-						</dl>';
-
-		if (!empty($context['files_in_session_warning']))
-			echo '
-						<div class="smalltext">', $context['files_in_session_warning'], '</div>';
-	}
+		$context['attachments']['templates']['existing']();
 
 	// Is the user allowed to post any additional ones? If so give them the boxes to do it!
 	if ($context['attachments']['can']['post'])
-	{
-		echo '
-						<dl id="postAttachment2">';
-
-		// But, only show them if they haven't reached a limit. Or a mod author hasn't hidden them.
-		if ($context['attachments']['num_allowed'] > 0 || !empty($context['dont_show_them']))
-		{
-			echo '
-							<dt>
-								', $txt['attach'], ':
-							</dt>
-							<dd class="smalltext">
-								', empty($modSettings['attachmentSizeLimit']) ? '' : ('<input type="hidden" name="MAX_FILE_SIZE" value="' . $modSettings['attachmentSizeLimit'] * 1028 . '" />'), '
-								<input type="file" multiple="multiple" name="attachment[]" id="attachment1" class="input_file" /> (<a href="javascript:void(0);" onclick="cleanFileInput(\'attachment1\');">', $txt['clean_attach'], '</a>)';
-
-			// Show more boxes if they aren't approaching that limit.
-			if ($context['attachments']['num_allowed'] > 1)
-				echo '
-								<script><!-- // --><![CDATA[
-									var allowed_attachments = ', $context['attachments']['num_allowed'], ',
-										current_attachment = 1,
-										txt_more_attachments_error = "', $txt['more_attachments_error'], '",
-										txt_more_attachments = "', $txt['more_attachments'], '",
-										txt_clean_attach = "', $txt['clean_attach'], '";
-								// ]]></script>
-							</dd>
-							<dd class="smalltext" id="moreAttachments"><a href="#" onclick="addAttachment(); return false;">(', $txt['more_attachments'], ')</a></dd>';
-			else
-				echo '
-							</dd>';
-		}
-
-		// Add any template changes for an alternative upload system here.
-		call_integration_hook('integrate_upload_template');
-
-		echo '
-							<dd class="smalltext">';
-
-		// Show some useful information such as allowed extensions, maximum size and amount of attachments allowed.
-		if (!empty($context['attachments']['allowed_extensions']))
-			echo '
-								', $txt['allowed_types'], ': ', $context['attachments']['allowed_extensions'], '<br />';
-
-		if (!empty($context['attachments']['restrictions']))
-			echo '
-								', $txt['attach_restrictions'], ' ', implode(', ', $context['attachments']['restrictions']), '<br />';
-
-		if ($context['attachments']['num_allowed'] == 0)
-			echo '
-								', $txt['attach_limit_nag'], '<br />';
-
-		if (!$context['attachments']['can']['post_unapproved'])
-			echo '
-								<span class="alert">', $txt['attachment_requires_approval'], '</span>', '<br />';
-
-		echo '
-							</dd>
-						</dl>';
-	}
+		$context['attachments']['templates']['add_new']();
 
 	// Display the check boxes for all the standard options - if they are available to the user!
 	echo '
@@ -450,6 +368,101 @@ function template_additional_options_below()
 
 	echo '
 					</div>';
+}
+
+/**
+ * Creates a list of attachments already attached to this message
+ */
+function template_show_existing_attachments()
+{
+	global $context, $txt, $modSettings;
+
+	echo '
+						<dl id="postAttachment">
+							<dt>
+								', $txt['attached'], ':
+							</dt>
+							<dd class="smalltext" style="width: 100%;">
+								<input type="hidden" name="attach_del[]" value="0" />
+								', $txt['uncheck_unwatchd_attach'], ':
+							</dd>';
+
+	foreach ($context['attachments']['current'] as $attachment)
+		echo '
+							<dd class="smalltext">
+								<label for="attachment_', $attachment['id'], '"><input type="checkbox" id="attachment_', $attachment['id'], '" name="attach_del[]" value="', $attachment['id'], '"', empty($attachment['unchecked']) ? ' checked="checked"' : '', ' class="input_check" /> ', $attachment['name'], (empty($attachment['approved']) ? ' (' . $txt['awaiting_approval'] . ')' : ''),
+		!empty($modSettings['attachmentPostLimit']) || !empty($modSettings['attachmentSizeLimit']) ? sprintf($txt['attach_kb'], comma_format(round(max($attachment['size'], 1028) / 1028), 0)) : '', '</label>
+							</dd>';
+
+	echo '
+						</dl>';
+
+	if (!empty($context['files_in_session_warning']))
+		echo '
+						<div class="smalltext">', $context['files_in_session_warning'], '</div>';
+}
+
+/**
+ * Creates the interface to upload attachments
+ */
+function template_add_new_attachments()
+{
+	global $context, $txt, $modSettings;
+
+	echo '
+						<dl id="postAttachment2">';
+
+	// But, only show them if they haven't reached a limit. Or a mod author hasn't hidden them.
+	if ($context['attachments']['num_allowed'] > 0 || !empty($context['dont_show_them']))
+	{
+		echo '
+							<dt>
+								', $txt['attach'], ':
+							</dt>
+							<dd class="smalltext">
+								', empty($modSettings['attachmentSizeLimit']) ? '' : ('<input type="hidden" name="MAX_FILE_SIZE" value="' . $modSettings['attachmentSizeLimit'] * 1028 . '" />'), '
+								<input type="file" multiple="multiple" name="attachment[]" id="attachment1" class="input_file" /> (<a href="javascript:void(0);" onclick="cleanFileInput(\'attachment1\');">', $txt['clean_attach'], '</a>)';
+
+		// Show more boxes if they aren't approaching that limit.
+		if ($context['attachments']['num_allowed'] > 1)
+			echo '
+								<script><!-- // --><![CDATA[
+									var allowed_attachments = ', $context['attachments']['num_allowed'], ',
+										current_attachment = 1,
+										txt_more_attachments_error = "', $txt['more_attachments_error'], '",
+										txt_more_attachments = "', $txt['more_attachments'], '",
+										txt_clean_attach = "', $txt['clean_attach'], '";
+								// ]]></script>
+							</dd>
+							<dd class="smalltext" id="moreAttachments"><a href="#" onclick="addAttachment(); return false;">(', $txt['more_attachments'], ')</a></dd>';
+		else
+			echo '
+							</dd>';
+	}
+
+	echo '
+							<dd class="smalltext">';
+
+	// Show some useful information such as allowed extensions, maximum size and amount of attachments allowed.
+	if (!empty($context['attachments']['allowed_extensions']))
+		echo '
+								', $txt['allowed_types'], ': ', $context['attachments']['allowed_extensions'], '<br />';
+
+	if (!empty($context['attachments']['restrictions']))
+		echo '
+								', $txt['attach_restrictions'], ' ', implode(', ', $context['attachments']['restrictions']), '<br />';
+
+	if ($context['attachments']['num_allowed'] == 0)
+		echo '
+								', $txt['attach_limit_nag'], '<br />';
+
+	if (!$context['attachments']['can']['post_unapproved'])
+		echo '
+								<span class="alert">', $txt['attachment_requires_approval'], '</span>', '<br />';
+
+	echo '
+							</dd>
+						</dl>';
 }
 
 /**

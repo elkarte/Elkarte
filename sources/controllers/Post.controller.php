@@ -942,6 +942,10 @@ class Post_Controller extends Action_Controller
 			$context['attachments']['can']['post_unapproved'] = allowedTo('post_attachment');
 			$context['attachments']['restrictions'] = array();
 			$context['attachments']['allowed_extensions'] = strtr(strtolower($modSettings['attachmentExtensions']), array(',' => ', '));
+			$context['attachments']['templates'] = array(
+				'add_new' => 'template_add_new_attachments',
+				'existing' => 'template_show_existing_attachments',
+			);
 
 			$attachmentRestrictionTypes = array('attachmentNumPerPostLimit', 'attachmentPostLimit', 'attachmentSizeLimit');
 			foreach ($attachmentRestrictionTypes as $type)
