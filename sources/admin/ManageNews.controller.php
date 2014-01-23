@@ -179,7 +179,6 @@ class ManageNews_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$news', '
-
 							return \'<textarea class="" id="data_\' . $news[\'id\'] . \'" rows="3" name="news[]">\' . $news[\'unparsed\'] . \'</textarea>
 								<br />
 								<div id="preview_\' . $news[\'id\'] . \'"></div>\';
@@ -193,7 +192,6 @@ class ManageNews_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$news', '
-
 							return \'<div id="box_preview_\' . $news[\'id\'] . \'">\' . $news[\'parsed\'] . \'</div>\';
 						'),
 						'class' => 'newspreview',
@@ -206,7 +204,6 @@ class ManageNews_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$news', '
-
 							if (is_numeric($news[\'id\']))
 								return \'<input type="checkbox" name="remove[]" value="\' . $news[\'id\'] . \'" class="input_check" />\';
 							else

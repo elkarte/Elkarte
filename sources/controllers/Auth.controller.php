@@ -96,7 +96,7 @@ class Auth_Controller extends Action_Controller
 	 */
 	public function action_login2()
 	{
-		global $txt, $scripturl, $user_info, $user_settings, $modSettings, $context, $sc;
+		global $txt, $scripturl, $user_info, $user_settings, $modSettings, $context;
 
 		// Load cookie authentication and all stuff.
 		require_once(SUBSDIR . '/Auth.subs.php');

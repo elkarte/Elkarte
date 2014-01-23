@@ -330,7 +330,7 @@ class ManagePaid_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $context, $txt;
+							global $txt;
 
 							return $rowData[\'flexible\'] ? \'<em>\' . $txt[\'flexible\'] . \'</em>\' : $rowData[\'cost\'] . \' / \' . $rowData[\'length\'];
 						'),
@@ -367,7 +367,7 @@ class ManagePaid_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $context, $txt;
+							global $txt;
 
 							return \'<span class="\' . ($rowData[\'active\'] ? \'success\' : \'alert\') . \'">\' . ($rowData[\'active\'] ? $txt[\'yes\'] : $txt[\'no\']) . \'</span>\';
 						'),
@@ -376,7 +376,7 @@ class ManagePaid_Controller extends Action_Controller
 				'modify' => array(
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $context, $txt, $scripturl;
+							global $txt, $scripturl;
 
 							return \'<a href="\' . $scripturl . \'?action=admin;area=paidsubscribe;sa=modify;sid=\' . $rowData[\'id\'] . \'">\' . $txt[\'modify\'] . \'</a>\';
 						'),
@@ -386,7 +386,7 @@ class ManagePaid_Controller extends Action_Controller
 				'delete' => array(
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $context, $txt, $scripturl;
+							global $txt, $scripturl;
 
 							return \'<a href="\' . $scripturl . \'?action=admin;area=paidsubscribe;sa=modify;delete;sid=\' . $rowData[\'id\'] . \'">\' . $txt[\'delete\'] . \'</a>\';
 						'),
@@ -636,7 +636,7 @@ class ManagePaid_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $context, $txt, $scripturl;
+							global $txt, $scripturl;
 
 							return $rowData[\'id_member\'] == 0 ? $txt[\'guest\'] : \'<a href="\' . $scripturl . \'?action=profile;u=\' . $rowData[\'id_member\'] . \'">\' . $rowData[\'name\'] . \'</a>\';
 						'),
@@ -707,7 +707,7 @@ class ManagePaid_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $context, $txt, $scripturl;
+							global $txt, $scripturl;
 
 							return \'<a href="\' . $scripturl . \'?action=admin;area=paidsubscribe;sa=modifyuser;lid=\' . $rowData[\'id\'] . \'">\' . $txt[\'modify\'] . \'</a>\';
 						'),
@@ -721,8 +721,6 @@ class ManagePaid_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $context, $txt, $scripturl;
-
 							return \'<input type="checkbox" name="delsub[\' . $rowData[\'id\'] . \']" class="input_check" />\';
 						'),
 						'class' => 'centertext',
@@ -786,7 +784,7 @@ class ManagePaid_Controller extends Action_Controller
 
 		if (!isset($context['subscriptions'][$context['sub_id']]))
 			fatal_lang_error('no_access', false);
-		
+
 		$context['current_subscription'] = $context['subscriptions'][$context['sub_id']];
 
 		// Searching?

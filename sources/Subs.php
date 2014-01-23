@@ -3023,7 +3023,7 @@ function template_admin_warning_above()
 
 		if (!empty($context['security_controls']['admin_session']))
 			echo
-				sprintf($txt['admin_session_active'], ($scripturl . '?action=admin;area=adminlogoff;redir;' . $context['session_var'] . '=' . $context['session_id'])) . '<br>';
+				sprintf($txt['admin_session_active'], ($scripturl . '?action=admin;area=adminlogoff;redir;' . $context['session_var'] . '=' . $context['session_id'])) . '<br />';
 
 		if (!empty($context['security_controls']['maintenance']))
 			echo

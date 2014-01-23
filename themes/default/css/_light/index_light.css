@@ -169,6 +169,20 @@ strong {
 	font-weight: bold;
 }
 
+/* Use demi bold font weight for some key areas */
+.codeheader, .quoteheader,
+.expand_pages,
+.table_head>th,
+.topic_sorting_row>h3, .topic_name h4 a,
+.poster .name,
+.keyinfo h5 a, .keyinfo h5 a strong,
+.ui-tabs .ui-tabs-nav .ui-state-active a, .ui-tabs .ui-tabs-nav .ui-state-active,
+.ui-dialog .ui-dialog-titlebar,
+.popup_heading {
+    font-weight: 600;
+    font-family: "Segoe UI Semibold", "Helvetica Neue Medium";
+}
+
 /* @todo - Test this everywhere. */
 .standard_category {
 	border-radius: 4px 4px 0 0;
@@ -333,7 +347,6 @@ strong {
 	content: "\270c";
 	font-size: 1.7em;
 	line-height: 1em;
-	vertical-align: top;
 }
 .spoilerheader {
 	font-weight: bold;
