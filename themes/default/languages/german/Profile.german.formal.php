@@ -24,7 +24,7 @@ $txt['profile_user_info'] = 'Mitgliedsinformationen';
 $txt['profile_contact_no'] = 'Es sind keine Kontaktinformationen für dieses Mitglied hinterlegt';
 $txt['profile_signature_no'] = 'Dieses Mitglied hat keine Signatur angelegt';
 $txt['profile_additonal_no'] = 'Es gibt keine weiteren Informationen über dieses Mitglied';
-$txt['profile_user_summary'] = 'Zusammenfassung';
+$txt['profile_user_summary'] = 'Profil';
 $txt['profile_action'] = 'Derzeit';
 $txt['profile_recent_activity'] = 'Letzte Aktivität';
 $txt['profile_activity'] = 'Aktivität';
@@ -398,7 +398,7 @@ $txt['request_group_membership_desc'] = 'Bevor Sie dieser Gruppe beitreten könne
 $txt['submit_request'] = 'Anfrage übermitteln';
 
 $txt['profile_updated_own'] = 'Ihr Profil wurde erfolgreich aktualisiert.';
-$txt['profile_updated_else'] = 'Das Profil von %1$s wurde erfolgreich aktualisiert.';
+$txt['profile_updated_else'] = 'Das Profil von <strong>%1$s</strong> wurde erfolgreich aktualisiert.';
 
 $txt['profile_error_signature_max_length'] = 'Ihre Signatur darf nicht mehr als %1$d Zeichen enthalten';
 $txt['profile_error_signature_max_lines'] = 'Ihre Signatur darf nicht aus mehr als %1$d Zeilen bestehen';

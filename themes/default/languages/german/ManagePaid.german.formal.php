@@ -73,6 +73,7 @@ $txt['paid_finished'] = 'Abgeschlossen';
 $txt['paid_total'] = 'Gesamt';
 $txt['paid_is_active'] = 'Aktiviert';
 $txt['paid_none_yet'] = 'Sie haben noch keine Abonnements eingerichtet.';
+$txt['paid_none_ordered'] = 'Sie haben keine Abonnements.';
 $txt['paid_payments_pending'] = 'Ausstehende Bezahlungen';
 $txt['paid_order'] = 'Bestellung';
 
@@ -179,6 +180,7 @@ $txt['paid_all_freq_blank'] = 'Sie m체ssen f체r mindestens einen der vier Zeitr�
 $txt['paid_no_data'] = 'Dem Skript wurden keine g체ltigen Daten 체bermittelt.';
 
 $txt['paypal_could_not_connect'] = 'Konnte nicht mit dem PayPal-Server verbinden';
+$txt['paypal_currency_unknown'] = 'Der W채hrungscode von PayPal (%1$s) stimmt nicht mit dem Code in Ihren Einstellungen (%2$) 체berein.';
 $txt['paid_sub_not_active'] = 'Dieses Abonnement steht keinem weiteren Mitglied mehr zur Verf체gung.';
 $txt['paid_disabled'] = 'Bezahlte Abonnements sind derzeit deaktiviert.';
 $txt['paid_unknown_transaction_type'] = 'Unbekannter Transaktionstyp.';

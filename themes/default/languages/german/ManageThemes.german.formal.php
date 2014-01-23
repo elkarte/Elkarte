@@ -58,9 +58,9 @@ $txt['site_slogan'] = 'Seitenmotto'; // ? :)
 $txt['site_slogan_desc'] = 'Fügen Sie hier Ihren eigenen Text als Motto ein. Er wird das Standardlogo ersetzen.';
 $txt['header_layout'] = 'Kopfzeilenaufteilung';
 $txt['header_layout_desc'] = 'Diese Einstellung ermöglicht es Ihnen, eine von drei Aufteilungen für die Kopfzeile auszuwählen.
-<br><strong>Standard</strong>: das Logo wird rechts und der Name des Forums links platziert
-<br><strong>Nur Logo</strong>: nur das Logo wird angezeigt und mittig angeordnet
-<br><strong>Logo links</strong>: ähnlich dem Standard, aber umgekehrte Reihenfolge (also Logo links, Name rechts)';
+<br /><strong>Standard</strong>: das Logo wird rechts und der Name des Forums links platziert
+<br /><strong>Nur Logo</strong>: nur das Logo wird angezeigt und mittig angeordnet
+<br /><strong>Logo links</strong>: ähnlich dem Standard, aber umgekehrte Reihenfolge (also Logo links, Name rechts)';
 $txt['header_layout_default'] = 'Standard';
 $txt['header_layout_logo_only'] = 'Nur Logo';
 $txt['header_layout_inverted'] = 'Logo links';
@@ -72,14 +72,10 @@ $txt['enable_news_off'] = 'Aus';
 $txt['enable_news_random'] = 'Zufällig';
 $txt['enable_news_fader'] = 'Einblenden';
 $txt['enable_news_desc'] = '<strong>Aus</strong>: keine Neuigkeiten angezeigt
-<br><strong>Zufällig</strong>: es wird eine zufällig ausgewählte Neuigkeit angezeigt
-<br><strong>Einblenden</strong>: alle Neuigkeiten werden nacheinander angezeigt';
+<br /><strong>Zufällig</strong>: es wird eine zufällig ausgewählte Neuigkeit angezeigt
+<br /><strong>Einblenden</strong>: alle Neuigkeiten werden nacheinander angezeigt';
 $txt['show_group_key'] = 'Gruppenschlüssel auf der Startseite anzeigen'; // ? :)
 $txt['additional_options_collapsible'] = 'Ausklappbare weitere Beitragsoptionen aktivieren';
-$txt['message_index_preview'] = 'Beitragsvorschau in der Nachrichtenübersicht anzeigen';
-$txt['message_index_preview_off'] = 'Vorschau nicht anzeigen';
-$txt['message_index_preview_first'] = 'Den Text des ersten Beitrags anzeigen';
-$txt['message_index_preview_last'] = 'Den Text des letzten Beitrags anzeigen';
 $txt['allow_no_censored'] = 'Benutzern das Abschalten der Wortzensur erlauben';
 $txt['who_display_viewing'] = 'Anzeigen, wer die Startseite und Beiträge ansieht';
 $txt['who_display_viewing_off'] = 'Nicht anzeigen';

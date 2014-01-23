@@ -106,6 +106,7 @@ $txt['karma_options'] = 'Karma deaktivieren|Gesamtkarma aktivieren|Positives/neg
 $txt['karmaMinPosts'] = 'Mindestanzahl an Beiträgen zur Änderung des Karmas';
 $txt['karmaWaitTime'] = 'Wartezeit in Stunden festlegen';
 $txt['karmaTimeRestrictAdmins'] = 'Administratoren auf Wartezeit beschränken';
+$txt['karmaDisableSmite'] = 'Benutzern die Möglichkeit zum Zerschmettern nehmen';
 $txt['karmaLabel'] = 'Karmabeschriftung';
 $txt['karmaApplaudLabel'] = 'Applaus-Beschriftung';
 $txt['karmaSmiteLabel'] = 'Zerschmettern-Beschriftung';

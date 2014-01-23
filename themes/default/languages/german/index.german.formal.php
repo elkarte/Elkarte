@@ -890,7 +890,11 @@ $txt['debug_show_queries'] = '[Abfragen zeigen]';
 $txt['debug_hide_queries'] = '[Abfragen verstecken]';
 $txt['debug_tokens'] = 'Tokens: ';
 $txt['debug_browser'] = 'Browser-ID: ';
-$txt['debug_hooks'] = 'Aufgerufene Hooks: ';
+$txt['debug_hooks'] = 'Aufgerufene Einschubmethoden: ';
+$txt['debug_system_type'] = 'System: ';
+$txt['debug_server_load'] = 'Serverlast: ';
+$txt['debug_script_mem_load'] = 'Skriptspeicherbelegung: ';
+$txt['debug_script_cpu_load'] = 'Skript-CPU-Zeit (Benutzer/System): ';
 
 // Video embedding
 $txt['preview_image'] = 'Videovorschaubild';

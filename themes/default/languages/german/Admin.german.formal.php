@@ -602,7 +602,11 @@ $txt['edit_disable_time'] = 'Maximale Zeitspanne, innerhalb derer ein Beitrag ge
 $txt['edit_disable_time_zero'] = '0 zum Deaktivieren';
 $txt['preview_characters'] = 'Maximale Länge der Vorschau des ersten/letzten Beitrags';
 $txt['preview_characters_units'] = 'Zeichen';
-$txt['preview_characters_zero'] = '0 zum Deaktivieren';
+$txt['preview_characters_zero'] = '0, um den ganzen Beitrag anzuzeigen';
+$txt['message_index_preview'] = 'Beitragsvorschau im Nachrichtenindex anzeigen';
+$txt['message_index_preview_off'] = 'Vorschau nicht anzeigen';
+$txt['message_index_preview_first'] = 'Den Text des ersten Beitrags anzeigen';
+$txt['message_index_preview_last'] = 'Den Text des letzten Beitrags anzeigen';
 
 $txt['enableBBC'] = 'Bulletin Board Code (BBCode) aktivieren';
 $txt['enablePostHTML'] = '<em>Grundlegendes</em> HTML in Beiträgen erlauben';

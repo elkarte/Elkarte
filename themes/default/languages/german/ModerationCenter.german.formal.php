@@ -11,7 +11,7 @@ $txt['mc_groups'] = 'Mitglieder und Gruppen';
 
 $txt['mc_view_groups'] = 'Benutzergruppen ansehen';
 
-$txt['mc_description'] = '<strong>%1$s %2$s!</strong><br>Dies ist Ihr &quot;Moderationszentrum&quot;. Von hier aus können Sie alle Moderationshandlungen durchführen, die Ihnen vom Administrator genehmigt wurden. Diese Seite stellt eine Übersicht über die neuesten Geschehnisse in Ihrer Community bereit. Sie können <a href="' . $scripturl . '?action=moderate;area=settings">die Darstellung anpassen, indem Sie hier klicken</a>.';
+$txt['mc_description'] = '<strong>%1$s %2$s!</strong><br />Dies ist Ihr &quot;Moderationszentrum&quot;. Von hier aus können Sie alle Moderationshandlungen durchführen, die Ihnen vom Administrator genehmigt wurden. Diese Seite stellt eine Übersicht über die neuesten Geschehnisse in Ihrer Community bereit. Sie können <a href="' . $scripturl . '?action=moderate;area=settings">die Darstellung anpassen, indem Sie hier klicken</a>.';
 $txt['mc_group_requests'] = 'Benutzergruppenanfragen';
 $txt['mc_member_requests'] = 'Mitgliedsanfragen';
 $txt['mc_unapproved_posts'] = 'Nicht freigegebene Beiträge';

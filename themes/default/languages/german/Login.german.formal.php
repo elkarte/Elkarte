@@ -17,6 +17,7 @@ $txt['error_too_quickly'] = 'Sie haben sich zu schnell registriert - schneller a
 $txt['error_token_verification'] = 'Tokenverifizierung fehlgeschlagen. Bitte versuchen Sie es erneut.';
 $txt['need_username'] = 'Sie müssen einen Benutzernamen angeben.';
 $txt['no_password'] = 'Sie haben kein Passwort eingegeben.';
+$txt['improper_password'] = 'Das angegebene Passwort ist zu lang.';
 $txt['incorrect_password'] = 'Passwort falsch';
 $txt['choose_username'] = 'Wählen Sie einen Benutzernamen aus';
 $txt['maintain_mode'] = 'MWartungsmodus';

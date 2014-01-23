@@ -124,13 +124,13 @@ $txt['board_not_valid'] = 'You have entered an invalid board ID (%d)';
 
 // Other settings
 $txt['misc'] = 'Other Settings';
-$txt['maillist_allow_attachments'] = 'Allow email file attachments to be posted (will not work for PM\'s)';
+$txt['maillist_allow_attachments'] = 'Allow email file attachments to be posted (will not work for PMs)';
 $txt['maillist_key_active'] = 'Days to keep keys active in the database';
 $txt['maillist_key_active_desc'] = 'e.g. How long after a notification is sent are you willing to accept a response';
 $txt['maillist_sig_keys'] = 'Words that signify the start of someones signature';
-$txt['maillist_sig_keys_desc'] = 'Separate words with a | character, suggested to use "best|regard|thank" lines starting with these will be triggered as the start of a signature line';
+$txt['maillist_sig_keys_desc'] = 'Separate words with a | character, suggested to use "best|regard|thank". Lines starting with these will be triggered as the start of a signature line';
 $txt['maillist_leftover_remove'] = 'Lines that are left over from emails';
-$txt['maillist_leftover_remove_desc'] = 'Separate words with a | character suggested to use "To: |Re: |Sent: |Subject: |Date: |From: ", Most things get removed by the parser but some things end up in quotes.  Don\'t add to this unless you know what you are doing.';
+$txt['maillist_leftover_remove_desc'] = 'Separate words with a | character suggested to use "To: |Re: |Sent: |Subject: |Date: |From: ". Most things get removed by the parser but some things end up in quotes.  Don\'t add to this unless you know what you are doing.';
 $txt['maillist_short_line'] = 'Short line length, used to unwrap emails';
 $txt['maillist_short_line_desc'] = 'Changing this from the default may cause unusual results, change with caution';
 
@@ -153,15 +153,15 @@ $txt['show_notice_text'] = 'Post text';
 $txt['noaccess'] = 'Private Messages can not be reviewed';
 $txt['badid'] = 'Invalid or missing email ID';
 $txt['delete_warning'] = 'Are you sure you want to delete this entry?';
-$txt['filter_delete_warning'] = 'Are you sure you want to remove this Filter?';
-$txt['parser_delete_warning'] = 'Are you sure you want to remove this Parser?';
+$txt['filter_delete_warning'] = 'Are you sure you want to remove this filter?';
+$txt['parser_delete_warning'] = 'Are you sure you want to remove this parser?';
 $txt['bounce'] = 'Bounce';
 $txt['heading'] = 'This is the failed post by email listing, from here you can choose to view, approve (if possible), delete or bounce back to the sender';
 $txt['cant_find'] = 'The email file could not be found';
 $txt['no_subject'] = 'No Subject';
 $txt['cant_approve'] = 'The error does not allow for the item to be approved (can\'t auto repair)';
 $txt['actions'] = 'Actions';
-$txt['email_attachments'] = '[There are %d Email attachments in this message]';
+$txt['email_attachments'] = '[There are %d email attachments in this message]';
 $txt['email_failure'] = 'Failure Reason';
 
 // Filters
@@ -177,31 +177,31 @@ $txt['filter_to_desc'] = 'Replace the found text with this';
 $txt['filter_from'] = 'Search Text';
 $txt['filter_from_desc'] = 'Enter the text you want to search for';
 $txt['filter_type'] = 'Type';
-$txt['filter_type_desc'] = 'Standard will find the exact phase and replace it with the text in the replace field.  Regular Expression is the wildcard option of Standard, but must in in regex format.';
+$txt['filter_type_desc'] = 'Standard will find the exact phase and replace it with the text in the replace field.  Regular Expression is the wildcard option of Standard, it must be supplied in PCRE format.';
 $txt['filter_name'] = 'Name';
 $txt['filter_name_desc'] = 'Optionally enter a name to help you remember what this filter does';
 $txt['filters_title'] = 'From this area you can add, edit or remove email filters. Filters search for specific text in a reply and then replace that with the text of your choosing, usually nothing.';
 $txt['filter_invalid'] = 'The definition is not valid and could not be saved';
-$txt['error_no_id_filter'] = 'The filter id is not valid';
+$txt['error_no_id_filter'] = 'The filter ID is not valid';
 $txt['saved_filter'] = 'The filter was saved successfully';
-$txt['filter_sort_description'] = 'Filters are executed in the order shown, regex grouping first, then the standard grouping, to change this drag and drop an item to a new location in the list (However you can not force a standard filter to run before a regex filter).';
+$txt['filter_sort_description'] = 'Filters are executed in the order shown, regex grouping first, then the standard grouping, to change this drag and drop an item to a new location in the list (however you can not force a standard filter to run before a regex filter).';
 
 // Parsers
 $txt['saved_parser'] = 'The parser was saved successfully';
 $txt['parser_reordered'] = 'The fields were successfully reordered';
-$txt['error_no_id_parser'] = 'The parser id is not valid';
+$txt['error_no_id_parser'] = 'The parser ID is not valid';
 $txt['add_parser'] = 'Add Parser';
 $txt['sort_parser'] = 'Sort Parsers';
 $txt['edit_parser'] = 'Edit Existing Parser';
 $txt['parsers'] = 'Email Parsers';
-$txt['parser_from'] = 'Search term in Original Email';
-$txt['parser_from_desc'] = 'Enter the starting id of the original email, the system will cut the message at this point leaving only the new message (if possible).  If using a regular expression it must be properly delimited';
+$txt['parser_from'] = 'Search term in original email';
+$txt['parser_from_desc'] = 'Enter the starting term of the original email, the system will cut the message at this point leaving only the new message (if possible).  If using a regular expression it must be properly delimited';
 $txt['parser_type'] = 'Type';
-$txt['parser_type_desc'] = 'Standard will find the exact phase and cut the email at that point.  Regular Expression is the wildcard option of Standard, but must in in regex format.';
+$txt['parser_type_desc'] = 'Standard will find the exact phase and cut the email at that point.  Regular Expression is the wildcard option of Standard, it must be supplied in PCRE format.';
 $txt['parser_name'] = 'Name';
 $txt['parser_name_desc'] = 'Optionally enter a name to help you remember what email client this parser is for';
 $txt['no_parsers'] = 'You have not defined any parsers';
-$txt['parsers_title'] = 'From this area you can add, edit or remove email parsers.  Parsers look for the specific line and cut the message at that point in an effort to remove the original replied to message. If a parser results in no text (e.g a reply below or intermixed in the original message) then it will be skipped';
+$txt['parsers_title'] = 'From this area you can add, edit or remove email parsers.  Parsers look for the specific line and cut the message at that point in an effort to remove the original replied to message. If a parser results in no text (e.g. a reply below or intermixed in the original message), it will be skipped';
 $txt['option_standard'] = 'Standard';
 $txt['option_regex'] = 'Regular Expression';
 $txt['button_edit'] = 'Edit';
