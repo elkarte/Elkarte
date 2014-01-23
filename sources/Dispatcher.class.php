@@ -176,7 +176,7 @@ class Site_Dispatcher
 			'quotefast' => array('Post.controller.php', 'Post_Controller', 'action_quotefast'),
 			'quickmod' => array('MessageIndex.controller.php', 'MessageIndex_Controller', 'action_quickmod'),
 			'quickmod2' => array('Display.controller.php', 'Display_Controller', 'action_quickmod2'),
-			'recent' => array('Recent.controller.php', 'Recent_Controller', 'action_recent'),
+// 			'recent' => array('Recent.controller.php', 'Recent_Controller', 'action_recent'),
 			'register' => array('Register.controller.php', 'Register_Controller', 'action_register'),
 			'register2' => array('Register.controller.php', 'Register_Controller', 'action_register2'),
 // 			'removepoll' => array('Poll.controller.php', 'Poll_Controller', 'action_removepoll'),
