@@ -330,10 +330,10 @@ class Site_Dispatcher
 				// Things went pretty bad, huh?
 				// board index :P
 				require_once(CONTROLLERDIR . '/BoardIndex.controller.php');
-				call_integration_hook('integrate_action_boardindex_before');
+				call_integration_hook('integrate_boardindex_before');
 				$controller = new BoardIndex_Controller();
 				$this->action_boardindex();
-				call_integration_hook('integrate_action_boardindex_after');
+				call_integration_hook('integrate_boardindex_after');
 			}
 			call_integration_hook('integrate_' . $hook . '_after');
 		}
