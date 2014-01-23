@@ -113,7 +113,7 @@ class TestDispatcher extends UnitTestCase
 			'recent' => array('Recent.controller.php', 'Recent_Controller', 'action_recent'),
 			'register' => array('Register.controller.php', 'Register_Controller', 'action_register'),
 			'register2' => array('Register.controller.php', 'Register_Controller', 'action_register2'),
-			'removepoll' => array('Poll.controller.php', 'Poll_Controller', 'action_removepoll'),
+// 			'removepoll' => array('Poll.controller.php', 'Poll_Controller', 'action_removepoll'),
 			'removetopic2' => array('RemoveTopic.controller.php', 'RemoveTopic_Controller', 'action_removetopic2'),
 			'reporttm' => array('Emailuser.controller.php', 'Emailuser_Controller', 'action_reporttm'),
 			'restoretopic' => array('RemoveTopic.controller.php', 'RemoveTopic_Controller', 'action_restoretopic'),
