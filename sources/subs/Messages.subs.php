@@ -169,7 +169,7 @@ function prepareMessageContext($message)
 	// Load up 'em attachments!
 	foreach ($message['attachment_stuff'] as $attachment)
 	{
-		$context['current_attachments'][] = array(
+		$context['attachments']['current'][] = array(
 			'name' => htmlspecialchars($attachment['filename'], ENT_COMPAT, 'UTF-8'),
 			'size' => $attachment['filesize'],
 			'id' => $attachment['id_attach'],

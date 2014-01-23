@@ -337,14 +337,14 @@ function template_additional_options_below()
 						<span id="category_toggle">&nbsp;
 							<span id="postMoreExpand" class="', empty($context['minmax_preferences']['pmdraft']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
 						</span>
-						<a href="#" id="postMoreExpandLink">', $context['can_post_attachment'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt'], '</a>
+						<a href="#" id="postMoreExpandLink">', $context['attachments']['can']['post'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt'], '</a>
 					</h3>';
 
 	echo '
 					<div id="', empty($settings['additional_options_collapsible']) ? 'postAdditionalOptionsNC"' : 'postAdditionalOptions"', empty($settings['additional_options_collapsible']) || empty($context['minmax_preferences']['post']) ? '' : ' style="display: none;"', '>';
 
 	// If this post already has attachments on it - give information about them.
-	if (!empty($context['current_attachments']))
+	if (!empty($context['attachments']['current']))
 	{
 		echo '
 						<dl id="postAttachment">
@@ -356,7 +356,7 @@ function template_additional_options_below()
 								', $txt['uncheck_unwatchd_attach'], ':
 							</dd>';
 
-		foreach ($context['current_attachments'] as $attachment)
+		foreach ($context['attachments']['current'] as $attachment)
 			echo '
 							<dd class="smalltext">
 								<label for="attachment_', $attachment['id'], '"><input type="checkbox" id="attachment_', $attachment['id'], '" name="attach_del[]" value="', $attachment['id'], '"', empty($attachment['unchecked']) ? ' checked="checked"' : '', ' class="input_check" /> ', $attachment['name'], (empty($attachment['approved']) ? ' (' . $txt['awaiting_approval'] . ')' : ''),
@@ -372,13 +372,13 @@ function template_additional_options_below()
 	}
 
 	// Is the user allowed to post any additional ones? If so give them the boxes to do it!
-	if ($context['can_post_attachment'])
+	if ($context['attachments']['can']['post'])
 	{
 		echo '
 						<dl id="postAttachment2">';
 
 		// But, only show them if they haven't reached a limit. Or a mod author hasn't hidden them.
-		if ($context['num_allowed_attachments'] > 0 || !empty($context['dont_show_them']))
+		if ($context['attachments']['num_allowed'] > 0 || !empty($context['dont_show_them']))
 		{
 			echo '
 							<dt>
@@ -389,10 +389,10 @@ function template_additional_options_below()
 								<input type="file" multiple="multiple" name="attachment[]" id="attachment1" class="input_file" /> (<a href="javascript:void(0);" onclick="cleanFileInput(\'attachment1\');">', $txt['clean_attach'], '</a>)';
 
 			// Show more boxes if they aren't approaching that limit.
-			if ($context['num_allowed_attachments'] > 1)
+			if ($context['attachments']['num_allowed'] > 1)
 				echo '
 								<script><!-- // --><![CDATA[
-									var allowed_attachments = ', $context['num_allowed_attachments'], ',
+									var allowed_attachments = ', $context['attachments']['num_allowed'], ',
 										current_attachment = 1,
 										txt_more_attachments_error = "', $txt['more_attachments_error'], '",
 										txt_more_attachments = "', $txt['more_attachments'], '",
@@ -412,19 +412,19 @@ function template_additional_options_below()
 							<dd class="smalltext">';
 
 		// Show some useful information such as allowed extensions, maximum size and amount of attachments allowed.
-		if (!empty($modSettings['attachmentCheckExtensions']))
+		if (!empty($context['attachments']['allowed_extensions']))
 			echo '
-								', $txt['allowed_types'], ': ', $context['allowed_extensions'], '<br />';
+								', $txt['allowed_types'], ': ', $context['attachments']['allowed_extensions'], '<br />';
 
-		if (!empty($context['attachment_restrictions']))
+		if (!empty($context['attachments']['restrictions']))
 			echo '
-								', $txt['attach_restrictions'], ' ', implode(', ', $context['attachment_restrictions']), '<br />';
+								', $txt['attach_restrictions'], ' ', implode(', ', $context['attachments']['restrictions']), '<br />';
 
-		if ($context['num_allowed_attachments'] == 0)
+		if ($context['attachments']['num_allowed'] == 0)
 			echo '
 								', $txt['attach_limit_nag'], '<br />';
 
-		if (!$context['can_post_attachment_unapproved'])
+		if (!$context['attachments']['can']['post_unapproved'])
 			echo '
 								<span class="alert">', $txt['attachment_requires_approval'], '</span>', '<br />';
 
@@ -691,8 +691,8 @@ function template_postarea_below()
 				aSwapLinks: [
 					{
 						sId: \'postMoreExpandLink\',
-						msgExpanded: ', JavaScriptEscape($context['can_post_attachment'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt']), ',
-						msgCollapsed: ', JavaScriptEscape($context['can_post_attachment'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt']), '
+						msgExpanded: ', JavaScriptEscape($context['attachments']['can']['post'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt']), ',
+						msgCollapsed: ', JavaScriptEscape($context['attachments']['can']['post'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt']), '
 					}
 				],
 				oThemeOptions: {
