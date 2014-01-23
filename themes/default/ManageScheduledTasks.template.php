@@ -36,7 +36,7 @@ function template_view_scheduled_tasks()
 		{
 			echo '
 	<div id="errors" class="errorbox">
-		', $txt['scheduled_tasks_were_run_errors'], '<br>';
+		', $txt['scheduled_tasks_were_run_errors'], '<br />';
 
 			foreach ($context['scheduled_errors'] as $task => $errors)
 			{

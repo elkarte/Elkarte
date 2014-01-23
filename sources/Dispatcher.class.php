@@ -71,6 +71,9 @@ class Site_Dispatcher
 			'function' => 'action_boardindex'
 		);
 
+		// Reminder: hooks need to account for multiple addons setting this hook.
+		call_integration_hook('integrate_frontpage', array(&$default_action));
+
 		// Maintenance mode: you're out of here unless you're admin
 		if (!empty($maintenance) && !allowedTo('admin_forum'))
 		{
@@ -101,9 +104,6 @@ class Site_Dispatcher
 			// Home page: board index
 			if (empty($board) && empty($topic))
 			{
-				// Reminder: hooks need to account for multiple addons setting this hook.
-				call_integration_hook('integrate_frontpage', array(&$default_action));
-
 				// Was it, wasn't it....
 				if (empty($this->_function_name))
 				{
@@ -171,7 +171,6 @@ class Site_Dispatcher
 			'openidreturn' => array('OpenID.controller.php', 'OpenID_Controller', 'action_openidreturn'),
 			'xrds' => array('OpenID.controller.php', 'OpenID_Controller', 'action_xrds'),
 			'pm' => array('PersonalMessage.controller.php', 'PersonalMessage_Controller', 'action_index'),
-// 			'post' => array('Post.controller.php', 'Post_Controller', 'action_post'),
 			'post2' => array('Post.controller.php', 'Post_Controller', 'action_post2'),
 			'profile' => array('Profile.controller.php', 'Profile_Controller', 'action_index'),
 			'quotefast' => array('Post.controller.php', 'Post_Controller', 'action_quotefast'),
@@ -276,20 +275,11 @@ class Site_Dispatcher
 		if (empty($this->_file_name) || empty($this->_function_name))
 		{
 			// Catch the action with the theme?
-			// @todo remove this?
-			if (!empty($settings['catch_action']))
-			{
-				$this->_file_name = SUBSDIR . '/Themes.subs.php';
-				$this->_function_name = 'WrapAction';
-			}
-			else
-			{
-				// We still haven't found what we're looking for...
-				$this->_file_name = $default_action['file'];
-				if (isset($default_action['controller']))
-					$this->_controller_name = $default_action['controller'];
-				$this->_function_name = $default_action['function'];
-			}
+			// We still haven't found what we're looking for...
+			$this->_file_name = $default_action['file'];
+			if (isset($default_action['controller']))
+				$this->_controller_name = $default_action['controller'];
+			$this->_function_name = $default_action['function'];
 		}
 
 		if (isset($_REQUEST['api']))

@@ -1031,7 +1031,7 @@ function template_file_permissions()
 	echo '
 	<div class="warningbox">
 		<div>
-			<strong>', $txt['package_file_perms_warning'], ':</strong><br>
+			<strong>', $txt['package_file_perms_warning'], ':</strong><br />
 				', $txt['package_file_perms_warning_desc'], '
 		</div>
 	</div>

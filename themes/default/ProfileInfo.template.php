@@ -579,17 +579,22 @@ function template_profile_block_summary()
 	echo '
 			<div class="profileblock_left">
 				<h3 class="category_header hdicon cat_img_profile">
-					', ($context['user']['is_owner']) ? '<a href="' . $scripturl . '?action=profile;area=forumprofile;u=' . $context['member']['id'] . '">' . $txt['profile_user_summary'] . ' - ' . $context['member']['name'] . '</a>' : ($txt['profile_user_summary'] . ' - ' . $context['member']['name']), '
+					', ($context['user']['is_owner']) ? '<a href="' . $scripturl . '?action=profile;area=forumprofile;u=' . $context['member']['id'] . '">' . $txt['profile_user_summary'] . '</a>' : $txt['profile_user_summary'], '
 				</h3>
 				<div id="basicinfo">
 					<div class="username">
-						<h4>', $context['member']['name'], ' <span class="position">', (!empty($context['member']['group']) ? $context['member']['group'] : $context['member']['post_group']), '</span></h4>
+						<h4><span class="position">', (!empty($context['member']['group']) ? $context['member']['group'] : $context['member']['post_group']), '</span></h4>
 					</div>
 					', $context['member']['avatar']['image'], '
 					<span id="userstatus">', $context['can_send_pm'] ? '<a href="' . $context['member']['online']['href'] . '" title="' . $context['member']['online']['text'] . '" rel="nofollow">' : '', $settings['use_image_buttons'] ? '<img src="' . $context['member']['online']['image_href'] . '" alt="' . $context['member']['online']['text'] . '" class="centericon" />' : $context['member']['online']['label'], $context['can_send_pm'] ? '</a>' : '', $settings['use_image_buttons'] ? '<span class="smalltext"> ' . $context['member']['online']['label'] . '</span>' : '', '</span>
 				</div>
 				<div id="detailedinfo">
 					<dl>';
+
+	// The members display name
+	echo '
+						<dt>', $txt['display_name'], ':</dt>
+						<dd>', $context['member']['name'], '</dd>';
 
 	// The username if allowed
 	if ($context['user']['is_owner'] || $context['user']['is_admin'])

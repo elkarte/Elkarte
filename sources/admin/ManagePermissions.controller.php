@@ -244,8 +244,6 @@ class ManagePermissions_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $txt, $scripturl;
-
 							return $rowData[\'num_permissions\'][\'allowed\'];
 						'),
 					),
@@ -258,8 +256,6 @@ class ManagePermissions_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $txt, $scripturl;
-
 							return $rowData[\'num_permissions\'][\'denied\'];
 						'),
 					),
@@ -873,7 +869,7 @@ class ManagePermissions_Controller extends Action_Controller
 		global $context, $modSettings, $txt, $scripturl;
 
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
-		
+
 		// Initialize the form
 		$this->_initPermSettingsForm();
 

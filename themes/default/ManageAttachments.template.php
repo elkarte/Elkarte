@@ -239,7 +239,7 @@ function template_attachment_repair()
 				echo '
 				<input type="checkbox" name="to_fix[]" id="', $error, '" value="', $error, '" class="input_check" />
 				<label for="', $error, '">', sprintf($txt['attach_repair_' . $error], $number), '</label>
-				<br>';
+				<br />';
 		}
 
 		echo '

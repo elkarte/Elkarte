@@ -2579,7 +2579,7 @@ function setupThemeContext($forceload = false)
 			$txt['welcome_guest'] .= $txt['welcome_guest_activate'];
 
 		// If we've upgraded recently, go easy on the passwords.
-		if (!empty($modSettings['disableHashTime']) && ($modSettings['disableHashTime'] == 1 || time() < $modSettings['disableHashTime']))
+		if (!empty($modSettings['enable_password_conversion']))
 			$context['disable_login_hashing'] = true;
 	}
 
@@ -3023,7 +3023,7 @@ function template_admin_warning_above()
 
 		if (!empty($context['security_controls']['admin_session']))
 			echo
-				sprintf($txt['admin_session_active'], ($scripturl . '?action=admin;area=adminlogoff;redir;' . $context['session_var'] . '=' . $context['session_id'])) . '<br>';
+				sprintf($txt['admin_session_active'], ($scripturl . '?action=admin;area=adminlogoff;redir;' . $context['session_var'] . '=' . $context['session_id'])) . '<br />';
 
 		if (!empty($context['security_controls']['maintenance']))
 			echo

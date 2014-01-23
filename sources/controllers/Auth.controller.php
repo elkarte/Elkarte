@@ -96,7 +96,7 @@ class Auth_Controller extends Action_Controller
 	 */
 	public function action_login2()
 	{
-		global $txt, $scripturl, $user_info, $user_settings, $modSettings, $context, $sc;
+		global $txt, $scripturl, $user_info, $user_settings, $modSettings, $context;
 
 		// Load cookie authentication and all stuff.
 		require_once(SUBSDIR . '/Auth.subs.php');
@@ -143,6 +143,7 @@ class Auth_Controller extends Action_Controller
 			'name' => $txt['login'],
 		);
 
+		// This is an OpenID login. Let's validate...
 		if (!empty($_POST['openid_identifier']) && !empty($modSettings['enableOpenID']))
 		{
 			require_once(SUBSDIR . '/OpenID.subs.php');
@@ -509,7 +510,7 @@ class Auth_Controller extends Action_Controller
 			// This one is a strange one... MyPHP, crypt() on the MD5 hash.
 			$other_passwords[] = crypt(md5($_POST['passwrd']), md5($_POST['passwrd']));
 
-			// Snitz style - SHA-256.  Technically, this is a downgrade.
+			// Snitz style - SHA-256.
 			if ($pw_strlen === 64 && function_exists('mhash') && defined('MHASH_SHA256'))
 				$other_passwords[] = bin2hex(mhash(MHASH_SHA256, $_POST['passwrd']));
 
@@ -567,7 +568,7 @@ class Auth_Controller extends Action_Controller
 		// SHA-256 will be 64 characters long, lets check some of these possibilities
 		elseif (!empty($modSettings['enable_password_conversion']) && $pw_strlen === 64)
 		{
-			// Yet another downgrade .. PHP-Fusion7
+			// PHP-Fusion7
 			$other_passwords[] = hash_hmac('sha256', $_POST['passwrd'], $user_settings['password_salt']);
 
 			// Plain SHA-256?

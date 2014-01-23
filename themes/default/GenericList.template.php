@@ -136,11 +136,10 @@ function template_show_list($list_id = null)
 	// Show the list rows.
 	elseif (!empty($cur_list['rows']))
 	{
-		$alternate = false;
 		foreach ($cur_list['rows'] as $id => $row)
 		{
 			echo '
-				<tr class="', $alternate ? 'alternate_' : 'standard_', 'row ', $row['class'], '" id="list_', $list_id, '_', $id, '">';
+				<tr class="standard_row ', $row['class'], '" id="list_', $list_id, '_', $id, '">';
 
 			foreach ($row['data'] as $row_data)
 				echo '
@@ -148,8 +147,6 @@ function template_show_list($list_id = null)
 
 			echo '
 				</tr>';
-
-			$alternate = !$alternate;
 		}
 	}
 

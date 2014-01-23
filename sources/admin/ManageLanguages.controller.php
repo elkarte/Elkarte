@@ -192,6 +192,14 @@ class ManageLanguages_Controller extends Action_Controller
 			'items_per_page' => 20,
 			'base_href' => $scripturl . '?action=admin;area=languages',
 			'title' => $txt['edit_languages'],
+			'data_check' => array(
+				'class'=> create_function('$rowData', '
+					if ($rowData[\'default\'])
+						return \'highlight2\';
+					else
+						return \'\';
+				')
+			),
 			'get_items' => array(
 				'function' => 'list_getLanguages',
 			),
@@ -206,7 +214,7 @@ class ManageLanguages_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							return \'<input type="radio" name="def_language" value="\' . $rowData[\'id\'] . \'" \' . ($rowData[\'default\'] ? \'checked="checked"\' : \'\') . \' onclick="highlightSelected(\\\'list_language_list_\' . $rowData[\'id\'] . \'\\\');" class="input_radio" />\';
+							return \'<input type="radio" name="def_language" value="\' . $rowData[\'id\'] . \'" \' . ($rowData[\'default\'] ? \'checked="checked"\' : \'\') . \' class="input_radio" />\';
 						'),
 						'style' => 'width: 8%;',
 						'class' => 'centertext',
@@ -218,7 +226,7 @@ class ManageLanguages_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $scripturl, $context;
+							global $scripturl;
 
 							return sprintf(\'<a href="%1$s?action=admin;area=languages;sa=editlang;lid=%2$s">%3$s</a>\', $scripturl, $rowData[\'id\'], $rowData[\'name\']);
 						'),
@@ -255,9 +263,7 @@ class ManageLanguages_Controller extends Action_Controller
 			),
 			// For highlighting the default.
 			'javascript' => '
-						var prevClass = "",
-							prevDiv = "";
-						highlightSelected("list_language_list_' . ($language == '' ? 'english' : $language) . '");
+				initHighlightSelection(\'language_list\');
 			',
 		);
 
@@ -543,7 +549,7 @@ class ManageLanguages_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $context, $txt;
+							global $txt;
 
 							return \'<strong>\' . $rowData[\'name\'] . \'</strong><br /><span class="smalltext">\' . $txt[\'languages_download_dest\'] . \': \' . $rowData[\'destination\'] . \'</span>\' . ($rowData[\'version_compare\'] == \'older\' ? \'<br />\' . $txt[\'languages_download_older\'] : \'\');
 						'),
@@ -567,8 +573,6 @@ class ManageLanguages_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $txt;
-
 							return \'<span class="\' . ($rowData[\'version_compare\'] == \'older\' ? \'error\' : ($rowData[\'version_compare\'] == \'same\' ? \'softalert\' : \'success\')) . \';">\' . $rowData[\'version\'] . \'</span>\';
 						'),
 					),
