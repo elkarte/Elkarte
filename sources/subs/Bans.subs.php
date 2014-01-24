@@ -374,7 +374,7 @@ function addTriggers($group_id = 0, $triggers = array(), $logs = array())
 	$ban_errors = Error_Context::context('ban', 1);
 
 	if (empty($group_id))
-		$ban_errors->addError('ban_group_id_empty');
+		$ban_errors->addError('ban_not_found');
 
 	// Preset all values that are required.
 	$values = array(
@@ -470,7 +470,7 @@ function updateTriggers($ban_item = 0, $group_id = 0, $trigger = array(), $logs 
 	if (empty($ban_item))
 		$ban_errors->addError('ban_ban_item_empty');
 	if (empty($group_id))
-		$ban_errors->addError('ban_group_id_empty');
+		$ban_errors->addError('ban_not_found');
 	if (empty($trigger))
 		$ban_errors->addError('ban_no_triggers');
 
