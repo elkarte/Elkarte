@@ -42,7 +42,12 @@ class Convert_Md
 	/**
 	 * Wordwrap output, set to 0 to skip wrapping
 	 */
-	public $body_width = 75;
+	public $body_width = 80;
+
+	/**
+	 * Strip remaining tags, set to false to leave them in
+	 */
+	public $strip_tags = true;
 
 	/**
 	 * Regex to run on plain text to prevent markdown from erroneously converting
@@ -63,13 +68,16 @@ class Convert_Md
 		if (class_exists('DOMDocument'))
 		{
 			$this->_parser = true;
+			$previous = libxml_use_internal_errors(true);
+
+			// Set up basic parameters for DomDocument, including silencing structural errors
 			$this->doc = new DOMDocument();
 			$this->doc->preserveWhiteSpace = false;
-
-			// Make it a UTF-8 doc always and be silent about those html structure errors
-			libxml_use_internal_errors(true);
-			$this->doc->loadHTML('<?xml encoding="UTF-8">' . $html);
 			$this->doc->encoding = 'UTF-8';
+			$this->doc->loadHTML('<?xml encoding="UTF-8">' . $html);
+
+			// Set the error handle back to what it was, and flush
+			libxml_use_internal_errors($previous);
 			libxml_clear_errors();
 		}
 		// Or using the external simple html parser
@@ -126,12 +134,14 @@ class Convert_Md
 		$markdown = str_replace("\xC2\xA0\x20", ' ', $markdown);
 		$markdown = str_replace("\xC2\xA0", ' ', $markdown);
 
-		// Remove any tags
-		$markdown = strip_tags($markdown);
+		// Remove any "bonus" tags
+		if ($this->strip_tags)
+			$markdown = strip_tags($markdown);
 
 		// Strip the chaff and any excess blank lines we may have produced
 		$markdown = trim($markdown);
-		$markdown = preg_replace("~(\n){3,}~", "\n\n", $markdown);
+		$markdown = preg_replace("~(\n(\s)?){3,}~", "\n\n", $markdown);
+		$markdown = preg_replace("~(^\s\s\n){3,}~", "  \n  \n", $markdown);
 
 		// Wordwrap?
 		if (!empty($this->body_width))
@@ -152,7 +162,7 @@ class Convert_Md
 		$parent = $parser ? $node->parentNode : $node->parentNode();
 		while ($parent)
 		{
-			if (is_null($parent))
+			if ($parent === null)
 				return false;
 
 			// Anywhere nested inside a code block we don't render tags
@@ -289,15 +299,19 @@ class Convert_Md
 				$markdown = $this->_convert_list($node);
 				break;
 			case 'p':
-				$markdown = str_replace("\n", ' ', $this->_get_value($node)) . $this->line_break;
 				if (!$node->hasChildNodes())
+				{
+					$markdown = str_replace("\n", ' ', $this->_get_value($node)) . $this->line_break;
 					$markdown = $this->_escape_text($markdown);
+				}
+				else
+					$markdown = rtrim($this->_get_value($node)) . $this->line_break;
 				break;
 			case 'pre':
 				$markdown = $this->_get_value($node) . $this->line_break;
 				break;
 			case 'div':
-				$markdown = $this->_get_value($node) . $this->line_end;
+				$markdown = $this->line_end . $this->_get_value($node) . $this->line_end;
 				if (!$node->hasChildNodes())
 					$markdown = $this->_escape_text($markdown);
 				break;
@@ -376,9 +390,13 @@ class Convert_Md
 	{
 		$href = htmlentities($node->getAttribute('href'));
 		$title = $node->getAttribute('title');
+		$class = $node->getAttribute('class');
 		$value = $this->_get_value($node);
 
-		if (!empty($title))
+		// Special processing just for our own footnotes
+		if ($class === 'target' || $class === 'footnote_return')
+			$markdown = $value;
+		elseif (!empty($title))
 			$markdown = '[' . $value . '](' . $href . ' "' . $title . '")';
 		else
 			$markdown = '[' . $value . '](' . $href . ')';
@@ -416,7 +434,7 @@ class Convert_Md
 	/**
 	 * Converts code tags to markdown span `code` or block code
 	 * Converts single line code to inline tick mark
-	 * Converts multi line to indented code
+	 * Converts multi line to 4 space indented code
 	 *
 	 * html: <code>code</code>
 	 * md: `code`
@@ -425,8 +443,15 @@ class Convert_Md
 	 */
 	private function _convert_code($node)
 	{
-		$markdown = '';
 		$value = $this->_get_innerHTML($node);
+
+		// If we have a multi line code block, we are working outside to in, and need to convert the br's ourselfs
+		$value = preg_replace('~<br( /)?' . '>~', "\n", str_replace('&nbsp;', ' ', $value));
+
+		// If there are html tags in this code block, we need to disable strip tags
+		// This is NOT the ideal way to handle this, needs something along the lines of preparse and unpreparse.
+		if ($this->strip_tags && preg_match('~<[^<]+>~', $value))
+			$this->strip_tags = false;
 
 		// Get the number of lines of code that we have
 		$lines = preg_split('~\r\n|\r|\n~', $value);
@@ -445,10 +470,17 @@ class Convert_Md
 				array_pop($lines);
 
 			// Convert what remains
+			$markdown = '';
 			foreach ($lines as $line)
-				$markdown .= str_repeat(' ', 4) . $line . $this->line_end;
+			{
+				// Adjust the word wrapping since this has code tags, leave it up to
+				// the email client to mess these up ;)
+				$line_strlen = strlen($line) + 5;
+				if ($line_strlen > $this->body_width)
+					$this->body_width = $line_strlen;
 
-			$markdown = rtrim($markdown, $this->line_end);
+				$markdown .= str_repeat(' ', 4) . $line . $this->line_end;
+			}
 
 			// The parser will encode, but we don't want that for our code block
 			if ($this->_parser)
@@ -464,10 +496,11 @@ class Convert_Md
 				// If the ticks were at the start/end of the word space it off
 				if ($lines[0][0] == '`' || substr($lines[0], -1) == '`')
 					$lines[0] = ' ' . $lines[0] . ' ';
-				$markdown .= $ticks . ($this->_parser ? html_entity_decode($lines[0], ENT_QUOTES, 'UTF-8') : $lines[0]) . $ticks;
+
+				$markdown = $ticks . ($this->_parser ? html_entity_decode($lines[0], ENT_QUOTES, 'UTF-8') : $lines[0]) . $ticks;
 			}
 			else
-				$markdown .= '`' . ($this->_parser ? html_entity_decode($lines[0], ENT_QUOTES, 'UTF-8') : $lines[0]) . '`';
+				$markdown = '`' . ($this->_parser ? html_entity_decode($lines[0], ENT_QUOTES, 'UTF-8') : $lines[0]) . '`';
 		}
 
 		return $markdown;
@@ -631,6 +664,11 @@ class Convert_Md
 				if ($row === 0)
 					$rows[] = '| ' . implode(' | ', $header) . ' | ';
 			}
+
+			// Adjust the word wrapping since this has a table, will get mussed by email anyway
+			$line_strlen = strlen($rows[1]) + 2;
+			if ($line_strlen > $this->body_width)
+				$this->body_width = $line_strlen;
 
 			// Return what we did so it can be swapped in
 			return implode($this->line_end, $rows);
