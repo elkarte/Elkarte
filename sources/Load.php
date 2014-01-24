@@ -1602,7 +1602,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	{
 		addInlineJavascript('
 		var oRttime = ({
-			currentTime : ' . JavaScriptEscape(forum_time()) . ',
+			referenceTime : ' . forum_time() * 1000 . ',
 			now : ' . JavaScriptEscape($txt['rt_now']) . ',
 			minute : ' . JavaScriptEscape($txt['rt_minute']) . ',
 			minutes : ' . JavaScriptEscape($txt['rt_minutes']) . ',
