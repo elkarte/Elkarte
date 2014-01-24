@@ -1346,7 +1346,7 @@ function ssi_showPoll($topicID = null, $output_method = 'echo')
 	if ($context['poll']['allow_vote'])
 	{
 		echo '
-			<form action="', $scripturl, '?action=vote;topic=', $context['current_topic'], '.', $context['start'], ';poll=', $context['poll']['id'], '" method="post" accept-charset="UTF-8">';
+			<form action="', $scripturl, '?action=poll;sa=vote;topic=', $context['current_topic'], '.', $context['start'], ';poll=', $context['poll']['id'], '" method="post" accept-charset="UTF-8">';
 
 		// Show a warning if they are allowed more than one option.
 		if ($context['poll']['allowed_warning'])
@@ -1466,7 +1466,7 @@ function ssi_quickSearch($output_method = 'echo')
 		return $scripturl . '?action=search';
 
 	echo '
-		<form action="', $scripturl, '?action=search2" method="post" accept-charset="UTF-8">
+		<form action="', $scripturl, '?action=search;sa=results" method="post" accept-charset="UTF-8">
 			<input type="hidden" name="advanced" value="0" /><input type="text" name="ssi_search" size="30" class="input_text" /> <input type="submit" value="', $txt['search'], '" class="button_submit" />
 		</form>';
 }

@@ -254,7 +254,7 @@ function template_body_above()
 	if ($context['allow_search'])
 	{
 		echo '
-			<form id="search_form" action="', $scripturl, '?action=search2" method="post" accept-charset="UTF-8">
+			<form id="search_form" action="', $scripturl, '?action=search;sa=results" method="post" accept-charset="UTF-8">
 				<input type="text" name="search" value="" class="input_text" placeholder="', $txt['search'], '" />';
 
 		// Using the quick search dropdown?
@@ -296,7 +296,7 @@ function template_body_above()
 				<input type="hidden" name="', (!empty($modSettings['search_dropdown']) ? 'sd_brd[' : 'brd['), $context['current_board'], ']"', ' value="', $context['current_board'], '" />';
 
 		echo '
-				<input type="submit" name="search2" value="', $txt['search'], '" class="button_submit', (!empty($modSettings['search_dropdown'])) ? ' with_select' : '', '" />
+				<input type="submit" name="search;sa=results" value="', $txt['search'], '" class="button_submit', (!empty($modSettings['search_dropdown'])) ? ' with_select' : '', '" />
 				<input type="hidden" name="advanced" value="0" />
 			</form>';
 	}

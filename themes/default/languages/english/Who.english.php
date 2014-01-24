@@ -76,7 +76,7 @@ $txt['whotopic_post'] = 'Posting in <a href="' . $scripturl . '?topic=%1$d.0">%2
 $txt['whotopic_post2'] = 'Posting in <a href="' . $scripturl . '?topic=%1$d.0">%2$s</a>.';
 $txt['whotopic_printpage'] = 'Printing the topic &quot;<a href="' . $scripturl . '?topic=%1$d.0">%2$s</a>&quot;.';
 $txt['whotopic_quickmod2'] = 'Moderating the topic <a href="' . $scripturl . '?topic=%1$d.0">%2$s</a>.';
-$txt['whotopic_removepoll'] = 'Removing the poll in &quot;<a href="' . $scripturl . '?topic=%1$d.0">%2$s</a>&quot;.';
+$txt['whotopic_poll_remove'] = 'Removing the poll in &quot;<a href="' . $scripturl . '?topic=%1$d.0">%2$s</a>&quot;.';
 $txt['whotopic_removetopic2'] = 'Removing the topic <a href="' . $scripturl . '?topic=%1$d.0">%2$s</a>.';
 $txt['whotopic_sendtopic'] = 'Sending the topic &quot;<a href="' . $scripturl . '?topic=%1$d.0">%2$s</a>&quot; to a friend.';
 $txt['whotopic_splittopics'] = 'Splitting the topic &quot;<a href="' . $scripturl . '?topic=%1$d.0">%2$s</a>&quot; into two topics.';
@@ -110,8 +110,8 @@ $txt['whoallow_memberlist'] = 'Viewing the <a href="' . $scripturl . '?action=me
 $txt['whoallow_optimizetables'] = 'Optimizing the database tables.';
 $txt['whoallow_repairboards'] = 'Repairing the database tables.';
 $txt['whoallow_search'] = '<a href="' . $scripturl . '?action=search">Searching</a> the forum.';
-$txt['whoallow_search2'] = 'Viewing the results of a search.';
-$txt['whoallow_setcensor'] = 'Editing the word censorship.';
+$txt['whoallow_search_results'] = 'Viewing the results of a search.';
+$txt['whoallow_setcensor'] = 'Editing the censor text.';
 $txt['whoallow_setreserve'] = 'Editing the reserved names.';
 $txt['whoallow_stats'] = 'Viewing the <a href="' . $scripturl . '?action=stats">forum stats</a>.';
 $txt['whoallow_viewErrorLog'] = 'Viewing the error log.';

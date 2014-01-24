@@ -44,7 +44,7 @@ class Poll_Controller extends Action_Controller
 	 * Must be called with a topic and option specified.
 	 * Requires the poll_vote permission.
 	 * Upon successful completion of action will direct user back to topic.
-	 * Accessed via ?action=vote.
+	 * Accessed via ?action=poll;sa=vote.
 	 *
 	 * @uses Post language file.
 	 */
@@ -676,9 +676,9 @@ class Poll_Controller extends Action_Controller
 	 * Requires poll_remove_any permission, unless it's the poll starter
 	 * with poll_remove_own permission.
 	 * Upon successful completion of action will direct user back to topic.
-	 * Accessed via ?action=removepoll.
+	 * Accessed via ?action=poll;sa=remove.
 	 */
-	public function action_removepoll()
+	public function action_remove()
 	{
 		global $topic, $user_info;
 

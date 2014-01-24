@@ -3649,8 +3649,8 @@ function setupMenuContext()
 
 	if (isset($context['menu_buttons'][$context['current_action']]))
 		$current_action = $context['current_action'];
-	elseif ($context['current_action'] == 'search2')
-		$current_action = 'search';
+// 	elseif ($context['current_action'] == 'search2')
+// 		$current_action = 'search';
 	elseif ($context['current_action'] == 'profile')
 		$current_action = 'pm';
 	elseif ($context['current_action'] == 'theme')

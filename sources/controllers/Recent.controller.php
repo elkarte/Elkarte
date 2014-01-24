@@ -33,6 +33,7 @@ class Recent_Controller extends Action_Controller
 	public function action_index()
 	{
 		// Figure out what action to do
+		$this->action_recent();
 	}
 
 	/**
