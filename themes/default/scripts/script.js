@@ -641,10 +641,6 @@ function elk_avatarResize()
  */
 function hashLoginPassword(doForm, cur_session_id, token)
 {
-	// Compatibility.
-	if (cur_session_id === null)
-		cur_session_id = elk_session_id;
-
 	// Don't have our hash lib availalbe?
 	if (typeof(hex_sha256) === 'undefined')
 		return;
@@ -653,17 +649,16 @@ function hashLoginPassword(doForm, cur_session_id, token)
 	if (doForm.user.value.indexOf('@') !== -1)
 		return;
 
-	// Unless the browser is Opera, the password will not save properly.
-	if (!('opera' in window))
-		doForm.passwrd.autocomplete = 'off';
+	doForm.passwrd.autocomplete = 'off';
 
+	// Fill in the hidden fields with our sha hash
 	doForm.hash_passwrd.value = hex_sha256(doForm.user.value.php_strtolower() + doForm.passwrd.value);
 
-	// It looks nicer to fill it with asterisks, but Firefox will try to save that.
-	if (is_ff !== -1)
-		doForm.passwrd.value = '';
-	else
-		doForm.passwrd.value = doForm.passwrd.value.replace(/./g, '*');
+	// If the form also contains the old hash input fill it to smooth transitions
+	if ('old_hash_passwrd' in doForm && typeof(hex_sha1) !== 'undefined')
+		doForm.old_hash_passwrd.value = hex_sha1(hex_sha1(doForm.user.value.php_strtolower() + doForm.passwrd.value) + cur_session_id + token);
+
+	doForm.passwrd.value = doForm.passwrd.value.replace(/./g, '*');
 }
 
 /**

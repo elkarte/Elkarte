@@ -34,7 +34,7 @@ function template_login()
 	// Did they make a mistake last time?
 	if (!empty($context['login_errors']))
 		echo '
-			<p class="errorbox">', implode('<br />', $context['login_errors']), '</p><br />';
+			<p class="errorbox">', implode('<br />', $context['login_errors']), '</p>';
 
 	// Or perhaps there's some special description for this time?
 	if (isset($context['description']))
@@ -90,6 +90,7 @@ function template_login()
 					<a href="', $scripturl, '?action=reminder">', $txt['forgot_your_password'], '</a>
 				</p>
 				<input type="hidden" name="hash_passwrd" value="" />
+				<input type="hidden" name="old_hash_passwrd" value="" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />
 			</div>

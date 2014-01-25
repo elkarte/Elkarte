@@ -96,7 +96,7 @@ class Auth_Controller extends Action_Controller
 	 */
 	public function action_login2()
 	{
-		global $txt, $scripturl, $user_info, $user_settings, $modSettings, $context;
+		global $txt, $scripturl, $user_info, $user_settings, $modSettings, $context, $sc;
 
 		// Load cookie authentication and all stuff.
 		require_once(SUBSDIR . '/Auth.subs.php');
@@ -212,7 +212,7 @@ class Auth_Controller extends Action_Controller
 				$valid_password = true;
 			}
 			// Needs upgrading if the db string is an actual 40 hexchar SHA-1
-			elseif (preg_match('/^[0-9a-f]{40}$/i', $user_settings['passwd']))
+			elseif (preg_match('/^[0-9a-f]{40}$/i', $user_settings['passwd']) && isset($_POST['old_hash_passwrd']) && $_POST['old_hash_passwrd'] === hash('sha1', $user_settings['passwd'] . $sc . $tk))
 			{
 				// Might Need to update so we will need to ask for the password again.
 				$context['login_errors'] = array($txt['login_hash_error']);
