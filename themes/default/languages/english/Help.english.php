@@ -34,9 +34,9 @@ $helptxt['manage_boards'] = '
 		</li>
 	</ul>
 	Categories allow you to break down the board into broad topics (&quot;Cars,
-	Sports&quot;), and the &quot;Boards&quot; under them are the actual topics under which
+	&quot;Sports&quot;), and the &quot;Boards&quot; under them are the actual topics under which
 	members can post. A user interested in Pintos
-	would post a message under &quot;Cars->Pinto&quot;. Categories allow people to
+	would post a message under &quot;Cars&rarr;Pinto&quot;. Categories allow people to
 	quickly find what their interests are: Instead of a &quot;Store&quot; you have
 	&quot;Hardware&quot; and &quot;Clothing&quot; stores you can go to. This simplifies your
 	search for &quot;pipe joint compound&quot; because you can go to the Hardware
@@ -87,7 +87,7 @@ $helptxt['view_members'] = '
 			<strong>Awaiting Activation</strong><br />
 			This section will only be visible if you have activation of member accounts enabled on the forum. This section will list all
 			members who have still not activated their new accounts. From this screen you can choose to either accept, reject or remind
-			members with outstanding registrations. As above you can also choose to email the member to inform them of the
+			members with outstanding activations. As above you can also choose to email the member to inform them of the
 			action you have taken.<br /><br />
 		</li>
 	</ul>';
