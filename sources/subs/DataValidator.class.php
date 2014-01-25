@@ -115,6 +115,16 @@ class Data_Validator
 	}
 
 	/**
+	 * Allow testing data values for empty/isset
+	 *
+	 * @param string $property key name of array value to return
+	 */
+	public function __isset($property)
+	{
+		return isset($this->_data[$property]);
+	}
+
+	/**
 	 * Shorthand static method for simple inline validation
 	 *
 	 * @param array $data
