@@ -3695,6 +3695,12 @@ a.help .icon {
 	#password_login select {
 		display: none;
 	}
+	.bbc_img, .elk_video {
+		max-width: 100%;
+	}
+	.elk_previewvideo {
+		max-width: 100%;
+	}
 }
 /* This one does 800 screens at default font size. */
 @media screen and (max-width: 50em) {
@@ -3801,13 +3807,7 @@ a.help .icon {
 	.ignoreboards.floatright {
 		float: none;
 	}
-	.bbc_img, .elk_video {
-		max-width: 30em;
-	}
-	.elk_previewvideo {
-		max-width: 30em;
-	}
-		/* our stats page */
+	/* our stats page */
 	.statistics .category_header {
 		width: 100%;
 		box-sizing: border-box;
@@ -4080,12 +4080,6 @@ a.help .icon {
 	}
 	.postarea, .forumtitle {
 		padding: 2px;
-	}
-	.bbc_img, .elk_video {
-		max-width: 30em;
-	}
-	.elk_previewvideo {
-		max-width: 30em;
 	}
 	a.bbc_link {
 	    display: inline-block;
