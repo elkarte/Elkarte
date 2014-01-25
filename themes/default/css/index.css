@@ -1208,66 +1208,26 @@ a.bbc_link {
 	background-image: url(../images/theme/quickbuttons.png);
 }
 /* The long list of sprite coordinates is much less verbose this way. */
-.quote_button:before {
-	background-position: 0 0;
-}
-.remove_button:before {
-	background-position: 0 -24px;
-}
-.modify_button:before {
-	background-position: 0 -48px;
-}
-.approve_button:before {
-	background-position: 0 -72px;
-}
-.restore_button:before {
-	background-position: 0 -96px;
-}
-.split_button:before {
-	background-position: 0 -120px;
-}
-.reply_button:before {
-	background-position: 0 -144px;
-}
-.reply_all_button:before {
-	background-position: 0 -144px;
-}
-.notify_button:before {
-	background-position: 0 -168px;
-}
-.unapprove_button:before {
-	background-position: 0 -192px;
-}
-.close_button:before {
-	background-position: 0 -216px;
-}
-.im_reply_button:before {
-	background-position: 0 -240px;
-}
-.details_button:before {
-	background-position: 0 -264px;
-}
-.ignore_button:before {
-	background-position: 0 -288px;
-}
-.report_button:before {
-	background-position: 0 -312px;
-}
-.warn_button:before {
-	background-position: 0 -336px;
-}
-.quotetonew_button:before {
-	background-position: 0 -360px;
-}
-.like_button:before {
-	background-position: 0 -384px;
-}
-.unlike_button:before {
-	background-position: 0 -408px;
-}
-.likes_button:before {
-	background-position: 0 -432px;
-}
+.quote_button:before {background-position: 0 0;}
+.remove_button:before {background-position: 0 -24px;}
+.modify_button:before {background-position: 0 -48px;}
+.approve_button:before {background-position: 0 -72px;}
+.restore_button:before {background-position: 0 -96px;}
+.split_button:before {background-position: 0 -120px;}
+.reply_button:before {background-position: 0 -144px;}
+.reply_all_button:before {background-position: 0 -144px;}
+.notify_button:before {background-position: 0 -168px;}
+.unapprove_button:before {background-position: 0 -192px;}
+.close_button:before {background-position: 0 -216px;}
+.im_reply_button:before {background-position: 0 -240px;}
+.details_button:before {background-position: 0 -264px;}
+.ignore_button:before {background-position: 0 -288px;}
+.report_button:before {background-position: 0 -312px;}
+.warn_button:before {background-position: 0 -336px;}
+.quotetonew_button:before {background-position: 0 -360px;}
+.like_button:before {background-position: 0 -384px;}
+.unlike_button:before {background-position: 0 -408px;}
+.likes_button:before {background-position: 0 -432px;}
 /* No icon here. */
 .quick_edit .linklevel1:before, .linklevel1.post_options:before,
 .follow_ups .linklevel1:before {
@@ -3735,6 +3695,12 @@ a.help .icon {
 	#password_login select {
 		display: none;
 	}
+	.bbc_img, .elk_video {
+		max-width: 100%;
+	}
+	.elk_previewvideo {
+		max-width: 100%;
+	}
 }
 /* This one does 800 screens at default font size. */
 @media screen and (max-width: 50em) {
@@ -3841,13 +3807,7 @@ a.help .icon {
 	.ignoreboards.floatright {
 		float: none;
 	}
-	.bbc_img, .elk_video {
-		max-width: 30em;
-	}
-	.elk_previewvideo {
-		max-width: 30em;
-	}
-		/* our stats page */
+	/* our stats page */
 	.statistics .category_header {
 		width: 100%;
 		box-sizing: border-box;
@@ -4121,12 +4081,6 @@ a.help .icon {
 	.postarea, .forumtitle {
 		padding: 2px;
 	}
-	.bbc_img, .elk_video {
-		max-width: 30em;
-	}
-	.elk_previewvideo {
-		max-width: 30em;
-	}
 	a.bbc_link {
 	    display: inline-block;
 		max-width: 16em;
@@ -4197,7 +4151,7 @@ a.help .icon {
 	/* mentions */
 	.mentionavatar .avatar {
 		max-width: 40px;
-		max-height: 40px; 
+		max-height: 40px;
 	}
 }
 /* This one does 480px screens at default font size. */

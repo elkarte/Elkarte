@@ -228,7 +228,7 @@ function updateRelativeTime()
 	relative_time_refresh = 3600000;
 
 	$('time').each(function() {
-		var oRelativeTime = new relativeTime($(this).data('timestamp')),
+		var oRelativeTime = new relativeTime($(this).data('timestamp') * 1000, oRttime.referenceTime),
 			time_text = '';
 
 		if (oRelativeTime.seconds())
@@ -273,6 +273,7 @@ function updateRelativeTime()
 			relative_time_refresh = Math.min(relative_time_refresh, 3600000);
 		}
 	});
+	oRttime.referenceTime += relative_time_refresh;
 
 	setTimeout('updateRelativeTime()', relative_time_refresh);
 }
@@ -289,10 +290,7 @@ function relativeTime(sFrom, sTo)
 {
 	if (typeof sTo === 'undefined')
 	{
-		if (typeof oRttime.currentTime === 'undefined')
-			this.dateTo = new Date();
-		else
-			this.dateTo = new Date(oRttime.currentTime * 1000);
+		this.dateTo = new Date();
 	}
 	else if (parseInt(sTo) == 'NaN')
 	{
@@ -300,7 +298,7 @@ function relativeTime(sFrom, sTo)
 		this.dateTo = new Date(sToSplit[0], --sToSplit[1], sToSplit[2], sToSplit[3], sToSplit[4]);
 	}
 	else
-		this.dateTo = new Date(sTo * 1000);
+		this.dateTo = new Date(sTo);
 
 	if (parseInt(sFrom) == 'NaN')
 	{
@@ -308,7 +306,7 @@ function relativeTime(sFrom, sTo)
 		this.dateFrom = new Date(sFromSplit[0], --sFromSplit[1], sFromSplit[2], sFromSplit[3], sFromSplit[4]);
 	}
 	else
-		this.dateFrom = new Date(sFrom * 1000);
+		this.dateFrom = new Date(sFrom);
 
 	this.time_text = '';
 	this.past_time = (this.dateTo - this.dateFrom) / 1000;
@@ -1258,7 +1256,7 @@ errorbox_handler.prototype.checkErrors = function()
 				this.removeError(this.oError_box, $elem);
 		}
 
-		this.oError_box.attr("class", "noticebox");
+		this.oError_box.attr("class", "errorbox");
 	}
 
 	// Hide show the error box based on if we have any errors

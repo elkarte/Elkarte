@@ -15,17 +15,17 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta
+ * @version 1.0 Beta 2
  *
  */
 
-$forum_version = 'ElkArte 1.0 Beta';
+$forum_version = 'ElkArte 1.0 Beta 2';
 
 // First things first, but not necessarily in that order.
 define('ELK', 1);
 
 // Shortcut for the browser cache stale
-define('CACHE_STALE', '?beta10');
+define('CACHE_STALE', '?10beta2');
 
 if (function_exists('set_magic_quotes_runtime'))
 	@set_magic_quotes_runtime(0);

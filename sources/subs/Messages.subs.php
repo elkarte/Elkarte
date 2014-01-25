@@ -16,7 +16,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta
+ * @version 1.0 Beta 2
  *
  */
 
@@ -169,7 +169,7 @@ function prepareMessageContext($message)
 	// Load up 'em attachments!
 	foreach ($message['attachment_stuff'] as $attachment)
 	{
-		$context['current_attachments'][] = array(
+		$context['attachments']['current'][] = array(
 			'name' => htmlspecialchars($attachment['filename'], ENT_COMPAT, 'UTF-8'),
 			'size' => $attachment['filesize'],
 			'id' => $attachment['id_attach'],

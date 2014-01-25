@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta
+ * @version 1.0 Beta 2
  *
  */
 
@@ -230,11 +230,14 @@ function template_build_poster_div($message, $ignoring = false)
 		// The plan is to make these buttons act sensibly, and link to your own inbox in your own posts (with new PM notification).
 		// Still has a little bit of hard-coded text. This may be a place where translators should be able to write inclusive strings,
 		// instead of dealing with $txt['by'] etc in the markup. Must be brief to work, anyway. Cannot ramble on at all.
+	
+		// we start with their own..
 		if ($context['can_send_pm'] && $message['is_message_author'])
 		{
 			$poster_div .= '
 							<li class="listlevel1 poster_online"><a class="linklevel1' . ($context['user']['unread_messages'] > 0 ? ' new_pm' : '') . '" href="' . $scripturl . '?action=pm">' . $txt['pm_short'] . ' ' . ($context['user']['unread_messages'] > 0 ? '<span class="pm_indicator">' . $context['user']['unread_messages'] . '</span>' : '') . '</a></li>';
 		}
+		// Allowed to send PMs and the message is not their own and not from a guest.
 		elseif ($context['can_send_pm'] && !$message['is_message_author'] && !$message['member']['is_guest'])
 		{
 			if (!empty($modSettings['onlineEnable']))
@@ -244,9 +247,8 @@ function template_build_poster_div($message, $ignoring = false)
 				$poster_div .= '
 							<li class="listlevel1 poster_online"><a class="linklevel1" href="' . $scripturl . '?action=pm;sa=send;u=' . $message['member']['id'] . '">' . $txt['send_message'] . ' </a></li>';
 		}
-		elseif (!$context['can_send_pm'] && !empty($modSettings['onlineEnable']))
-			$poster_div .= '
-							<li class="listlevel1 poster_online"><span class="nolink">' . ($message['member']['online']['is_online'] ? $txt['online'] : $txt['offline']) . ' <img src="' . $message['member']['online']['image_href'] . '" alt="" /></span></li>';
+		// Not allowed to send a PM, online status disabled and not from a guest.
+		elseif (!$context['can_send_pm'] && !empty($modSettings['onlineEnable']) && !$message['member']['is_guest'])
 
 		// Are we showing the warning status?
 		if (!$message['member']['is_guest'] && $message['member']['can_see_warning'])

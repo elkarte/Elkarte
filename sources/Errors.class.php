@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta
+ * @version 1.0 Beta 2
  *
  */
 
@@ -107,8 +107,8 @@ class Error_Context
 				$this->_errors[$severity][$error] = $error;
 		}
 
-		if (!empty($lang_file))
-			$this->_language_files[] = $lang_file;
+		if (!empty($lang_file) && !isset($this->_language_files[$lang_file]))
+			$this->_language_files[$lang_file] = false;
 	}
 
 	/**
@@ -209,12 +209,7 @@ class Error_Context
 		if (empty($this->_errors))
 			return array();
 
-		// Load the default error language and any other language file needed
-		// @todo: we could load these languages only if really necessary...it just needs a couple of changes
-		loadLanguage('Errors');
-		if (!empty($this->_language_files))
-			foreach ($this->_language_files as $language)
-				loadLanguage($language);
+		$this->_loadLang();
 
 		call_integration_hook('integrate_' . $this->_name . '_errors', array(&$this->_errors, &$this->_severity_levels));
 
@@ -237,6 +232,26 @@ class Error_Context
 		}
 
 		return $returns;
+	}
+
+	/**
+	 * Load the default error language and any other language file needed
+	 */
+	private function _loadLang()
+	{
+		// Errors is always needed
+		loadLanguage('Errors');
+
+		// Any custom one?
+		if (!empty($this->_language_files))
+			foreach ($this->_language_files as $language => $loaded)
+				if (!$loaded)
+				{
+					loadLanguage($language);
+
+					// Remember this file has been loaded already
+					$this->_language_files[$language] = true;
+				}
 	}
 
 	/**
