@@ -375,6 +375,10 @@ function template_additional_options_below()
 	if ($context['can_post_attachment'])
 	{
 		echo '
+						<div class="drop_attachments">
+							<div class="drop_area">', $txt['attach_drop_files'], '</div>
+							<div class="progress_tracker"></div>
+						</div>
 						<dl id="postAttachment2">';
 
 		// But, only show them if they haven't reached a limit. Or a mod author hasn't hidden them.

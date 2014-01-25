@@ -29,10 +29,116 @@ class Attachment_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		// Default action to execute, guess which one
-		$this->action_dlattach();
+		require_once(SUBSDIR . '/Action.class.php');
+
+		// add an subaction array to act accordingly
+		$subActions = array(
+			'dlattach' => array($this, 'action_dlattach'),
+			'ulattach' => array($this, 'action_ulattach'),
+			'rmattach' => array($this, 'action_rmattach'),
+		);
+
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'dlattach';
+
+		// call the action handler
+		$action = new Action();
+		$action->initialize($subActions, 'dlattach');
+		$action->dispatch($subAction);
 	}
 
+	/**
+	 * Function to utilize for upload of attachement
+	 * Currently called by drag drop attachment functionality
+	 */
+	public function action_ulattach()
+	{
+		global $txt, $context;
+
+
+		$resp_data = array();
+		if (isset($_FILES["attachment"]))
+		{
+			$attach_errors = attachment_Error_Context::context('attachment', 1);
+			$attach_errors->activate();
+
+			require_once(SUBSDIR . '/Attachments.subs.php');
+			if (isset($_REQUEST['msg']))
+				processAttachments((int) $_REQUEST['msg']);
+			else
+				processAttachments();
+
+			// Any mistakes?
+			if ($attach_errors->hasErrors())
+			{
+				loadLanguage('Post');
+				$errors = $attach_errors->prepareErrors();
+
+				foreach ($errors as $key => $error)
+				{
+					$resp_data[] = $error;
+				}
+				echo json_encode(array('result' => false, 'data' => $resp_data));
+				die();
+			}
+			else
+			{
+				foreach ($_SESSION['temp_attachments'] as $key => $val) {
+					// we need to grab the name anyhow
+					if (!empty($val['name']) || !empty($val['tmp_name'])) {
+						$resp_data = array(
+							'name'=> $val['name'],
+							'temp_name' => $key,
+							'temp_path' => $val['tmp_name']
+						);
+					}
+				}
+				echo json_encode(array('result' => true, 'data' => $resp_data));
+				die();
+			}
+		} else {
+			echo json_encode(array('result' => false, 'data' => 'files not there'));
+			die();
+		}
+	}
+
+	public function action_rmattach() {
+		if(isset($_REQUEST['filename']) && $_REQUEST['filepath']) {
+			if (file_exists($_REQUEST['filepath'])) {
+				unlink($_REQUEST['filepath']);
+				unset($_SESSION['temp_attachments'][$_REQUEST['filename']]);
+
+				echo json_encode(array('result' => true));
+			} else {
+				echo json_encode(array('result' => false, 'data' => 'files not there'));
+			}
+			die();
+		} else {
+			echo json_encode(array('result' => false, 'data' => 'No file name provided'));
+			die();
+		}
+		// foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
+		// {
+		// 	if (strpos($attachID, 'post_tmp_' . $user_info['id']) !== false)
+		// 	if (file_exists($attachment['tmp_name']))
+		// 		unlink($attachment['tmp_name']);
+		// }
+
+
+		// See if any files still exist before showing the warning message and the files attached.
+		// foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
+		// {
+		// 	if (strpos($attachID, 'post_tmp_' . $user_info['id']) === false)
+		// 		continue;
+
+		// 	if (file_exists($attachment['tmp_name']))
+		// 	{
+		// 		$attach_errors->addError('temp_attachments_new');
+		// 		$context['files_in_session_warning'] = $txt['attached_files_in_session'];
+		// 		unset($_SESSION['temp_attachments']['post']['files']);
+		// 		break;
+		// 	}
+		// }
+	}
 	/**
 	 * Downloads an attachment or avatar, and increments the download count.
 	 * It requires the view_attachments permission. (not for avatars!)
