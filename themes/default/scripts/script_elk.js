@@ -1256,7 +1256,7 @@ errorbox_handler.prototype.checkErrors = function()
 				this.removeError(this.oError_box, $elem);
 		}
 
-		this.oError_box.attr("class", "noticebox");
+		this.oError_box.attr("class", "errorbox");
 	}
 
 	// Hide show the error box based on if we have any errors
