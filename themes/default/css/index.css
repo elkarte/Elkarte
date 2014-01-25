@@ -2443,6 +2443,61 @@ ul.post_options li {
 	margin: 0 0 1em 0;
 	overflow: auto;
 }
+#postAttachment2 .drop_area {
+	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	font-size: 26px;
+	font-weight: 300;
+	height: 70px;
+	line-height: 70px;
+	text-align: center;
+	text-indent: 0;
+	padding: 10px 5%;
+	margin: 10px 5%;
+}
+
+.progress_tracker {
+	float: left;
+	position: relative;
+	overflow: hidden;
+	width: 100%;
+}
+
+.statusbar {
+	width: 94%;
+	padding: 5px 3%;
+	overflow: hidden;
+}
+
+.info {
+	float: left;
+	position: relative;
+	overflow: hidden;
+	width: 60%;
+	line-height: 22px;
+}
+
+.progressBar {
+	width: 20%;
+	border-radius: 5px;
+	float: left;
+	position: relative;
+	overflow: hidden;
+}
+
+.progressBar div {
+	color: #fff;
+	background-color: rgb(64, 118, 182);
+}
+
+.abort, .remove {
+	float: right;
+	position: relative;
+	overflow: hidden;
+	font: 14px/22px normal arial;
+	margin-left: 3%;
+	padding: 0 8px;
+}
+
 #postMoreOptions, #postAttachment, #postAttachment2 {
 	margin: -1px 0 0 0;
 	padding: 10px;

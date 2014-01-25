@@ -426,6 +426,8 @@ function template_add_new_attachments()
 	if ($context['attachments']['num_allowed'] > 0 || !empty($context['dont_show_them']))
 	{
 		echo '
+							<dt class="drop_area">', $txt['attach_drop_files'], '</dt>
+							<dd class="progress_tracker"></dd>
 							<dt>
 								', $txt['attach'], ':
 							</dt>
