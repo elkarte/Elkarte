@@ -159,7 +159,7 @@ $txt['ban_ip'] = 'IP-Adressen sperren: (z. B. 192.168.12.213 oder 128.0.*.*) - e
 $txt['ban_email'] = 'E-Mail-Adressen sperren: (z. B. boesewicht@irgendwo.de) - ein Eintrag pro Zeile';
 $txt['ban_username'] = 'Benutzernamen sperren: (z. B. l33tuser) - ein Eintrag pro Zeile';
 
-$txt['ban_errors_detected'] = 'Folgende Fehler sind beim Speichern oder Ändern der Sperrgruppe oder des Auslösers aufgetreten';
+$txt['ban_errors_detected'] = 'Folgende Fehler sind beim Speichern oder Ändern der Sperre oder des Auslösers aufgetreten';
 $txt['ban_description'] = 'Hier können Sie problematische Benutzer per IP-Adresse, Hostname, Benutzername oder E-Mail-Adresse aussperren.';
 $txt['ban_add_new'] = 'Neue Sperre hinzufügen';
 $txt['ban_banned_entity'] = 'Gesperrte Einheit';

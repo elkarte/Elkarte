@@ -191,7 +191,6 @@ $txt['ban_not_found'] = 'Sperre nicht gefunden';
 $txt['ban_unknown_restriction_type'] = 'Beschränkungstyp unbekannt';
 $txt['ban_name_empty'] = 'Der Name der Sperre wurde leer gelassen';
 $txt['ban_id_empty'] = 'Verdammt, Entschuldigung. Wir haben versucht, diese Sperr-ID zu finden, aber hatten keinen Erfolg.';
-$txt['ban_group_id_empty'] = 'Eine Sperrgruppe benötigt eine Gruppen-ID, und diese Gruppe hatte keine.';
 $txt['ban_no_triggers'] = 'Haben Sie vergessen, Auslöser für die Sperre auszuwählen? Wir brauchen mindestens einen, haben aber keinen.';
 $txt['ban_ban_item_empty'] = 'Sperrauslöser nicht gefunden';
 $txt['impossible_insert_new_bangroup'] = 'Ein Fehler ist beim Einfügen der neuen Sperre aufgetreten';
