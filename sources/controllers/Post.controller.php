@@ -216,7 +216,7 @@ class Post_Controller extends Action_Controller
 		$context['show_approval'] = allowedTo('approve_posts') && $context['becomes_approved'] ? 2 : (allowedTo('approve_posts') ? 1 : 0);
 
 		// An array to hold all the attachments for this topic.
-		$context['current_attachments'] = array();
+		$context['attachments']['current'] = array();
 
 		// Don't allow a post if it's locked and you aren't all powerful.
 		if ($locked && !allowedTo('moderate_board'))
@@ -607,19 +607,19 @@ class Post_Controller extends Action_Controller
 			}
 		}
 
-		$context['can_post_attachment'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
-		if ($context['can_post_attachment'])
+		$context['attachments']['can']['post'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
+		if ($context['attachments']['can']['post'])
 		{
 			// If there are attachments, calculate the total size and how many.
-			$context['attachments']['total_size'] = 0;
-			$context['attachments']['quantity'] = 0;
+			$attachments['total_size'] = 0;
+			$attachments['quantity'] = 0;
 
 			// If this isn't a new post, check the current attachments.
 			if (isset($_REQUEST['msg']))
 			{
-				$context['attachments']['quantity'] = count($context['current_attachments']);
-				foreach ($context['current_attachments'] as $attachment)
-					$context['attachments']['total_size'] += $attachment['size'];
+				$attachments['quantity'] = count($context['attachments']['current']);
+				foreach ($context['attachments']['current'] as $attachment)
+					$attachments['total_size'] += $attachment['size'];
 			}
 
 			// A bit of house keeping first.
@@ -734,13 +734,13 @@ class Post_Controller extends Action_Controller
 						continue;
 					}
 
-					$context['attachments']['quantity']++;
-					$context['attachments']['total_size'] += $attachment['size'];
+					$attachments['quantity']++;
+					$attachments['total_size'] += $attachment['size'];
 
 					if (!isset($context['files_in_session_warning']))
 						$context['files_in_session_warning'] = $txt['attached_files_in_session'];
 
-					$context['current_attachments'][] = array(
+					$context['attachments']['current'][] = array(
 						'name' => '<u>' . htmlspecialchars($attachment['name'], ENT_COMPAT, 'UTF-8') . '</u>',
 						'size' => $attachment['size'],
 						'id' => $attachID,
@@ -935,26 +935,30 @@ class Post_Controller extends Action_Controller
 		}
 
 		// If the user can post attachments prepare the warning labels.
-		if ($context['can_post_attachment'])
+		if ($context['attachments']['can']['post'])
 		{
 			// If they've unchecked an attachment, they may still want to attach that many more files, but don't allow more than num_allowed_attachments.
-			$context['num_allowed_attachments'] = empty($modSettings['attachmentNumPerPostLimit']) ? 50 : min($modSettings['attachmentNumPerPostLimit'] - count($context['current_attachments']), $modSettings['attachmentNumPerPostLimit']);
-			$context['can_post_attachment_unapproved'] = allowedTo('post_attachment');
-			$context['attachment_restrictions'] = array();
-			$context['allowed_extensions'] = strtr(strtolower($modSettings['attachmentExtensions']), array(',' => ', '));
+			$context['attachments']['num_allowed'] = empty($modSettings['attachmentNumPerPostLimit']) ? 50 : min($modSettings['attachmentNumPerPostLimit'] - count($context['attachments']['current']), $modSettings['attachmentNumPerPostLimit']);
+			$context['attachments']['can']['post_unapproved'] = allowedTo('post_attachment');
+			$context['attachments']['restrictions'] = array();
+			$context['attachments']['allowed_extensions'] = strtr(strtolower($modSettings['attachmentExtensions']), array(',' => ', '));
+			$context['attachments']['templates'] = array(
+				'add_new' => 'template_add_new_attachments',
+				'existing' => 'template_show_existing_attachments',
+			);
 
 			$attachmentRestrictionTypes = array('attachmentNumPerPostLimit', 'attachmentPostLimit', 'attachmentSizeLimit');
 			foreach ($attachmentRestrictionTypes as $type)
 			{
 				if (!empty($modSettings[$type]))
 				{
-					$context['attachment_restrictions'][] = sprintf($txt['attach_restrict_' . $type], comma_format($modSettings[$type], 0));
+					$context['attachments']['restrictions'][] = sprintf($txt['attach_restrict_' . $type], comma_format($modSettings[$type], 0));
 
 					// Show some numbers. If they exist.
-					if ($type == 'attachmentNumPerPostLimit' && $context['attachments']['quantity'] > 0)
-						$context['attachment_restrictions'][] = sprintf($txt['attach_remaining'], $modSettings['attachmentNumPerPostLimit'] - $context['attachments']['quantity']);
-					elseif ($type == 'attachmentPostLimit' && $context['attachments']['total_size'] > 0)
-						$context['attachment_restrictions'][] = sprintf($txt['attach_available'], comma_format(round(max($modSettings['attachmentPostLimit'] - ($context['attachments']['total_size'] / 1028), 0)), 0));
+					if ($type == 'attachmentNumPerPostLimit' && $attachments['quantity'] > 0)
+						$context['attachments']['restrictions'][] = sprintf($txt['attach_remaining'], $modSettings['attachmentNumPerPostLimit'] - $attachments['quantity']);
+					elseif ($type == 'attachmentPostLimit' && $attachments['total_size'] > 0)
+						$context['attachments']['restrictions'][] = sprintf($txt['attach_available'], comma_format(round(max($modSettings['attachmentPostLimit'] - ($attachments['total_size'] / 1028), 0)), 0));
 				}
 			}
 		}
@@ -1081,8 +1085,8 @@ class Post_Controller extends Action_Controller
 		}
 
 		// Then try to upload any attachments.
-		$context['can_post_attachment'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
-		if ($context['can_post_attachment'] && empty($_POST['from_qr']))
+		$context['attachments']['can']['post'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
+		if ($context['attachments']['can']['post'] && empty($_POST['from_qr']))
 		{
 			require_once(SUBSDIR . '/Attachments.subs.php');
 			if (isset($_REQUEST['msg']))
@@ -1543,7 +1547,7 @@ class Post_Controller extends Action_Controller
 			$id_poll = 0;
 
 		// ...or attach a new file...
-		if (empty($ignore_temp) && $context['can_post_attachment'] && !empty($_SESSION['temp_attachments']) && empty($_POST['from_qr']))
+		if (empty($ignore_temp) && $context['attachments']['can']['post'] && !empty($_SESSION['temp_attachments']) && empty($_POST['from_qr']))
 		{
 			$attachIDs = array();
 
