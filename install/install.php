@@ -11,11 +11,11 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta
+ * @version 1.0 Beta 2
  *
  */
 
-define('CURRENT_VERSION', '1.0 Beta');
+define('CURRENT_VERSION', '1.0 Beta 2');
 define('DB_SCRIPT_VERSION', '1-0');
 
 $GLOBALS['required_php_version'] = '5.1.2';
@@ -2124,7 +2124,7 @@ function template_install_below()
 		<div id="footer_section">
 			<div class="frame">
 				<ul>
-					<li class="copyright"><a href="http://www.elkarte.net/" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy; 2012, ElkArte Community</a></li>
+					<li class="copyright"><a href="http://www.elkarte.net/" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy; 2012 - 2014, ElkArte Community</a></li>
 				</ul>
 			</div>
 		</div>

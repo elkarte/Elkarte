@@ -11,12 +11,12 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta
+ * @version 1.0 Beta 2
  *
  */
 
 // Version information...
-define('CURRENT_VERSION', '1.0 Beta');
+define('CURRENT_VERSION', '1.0 Beta 2');
 define('CURRENT_LANG_VERSION', '1.0');
 define('REQUIRED_PHP_VERSION', '5.1.2');
 
@@ -3628,7 +3628,7 @@ function template_upgrade_below()
 		</div>
 	</div></div>
 	<div id="footer_section"><div class="frame" style="height: 40px;">
-		<div class="smalltext"><a href="http://www.elkarte.net/" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy;2013, ElkArte</a></div>
+		<div class="smalltext"><a href="http://www.elkarte.net/" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy; 2012 - 2014, ElkArte</a></div>
 	</div></div>
 	</body>
 </html>';

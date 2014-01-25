@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta
+ * @version 1.0 Beta 2
  *
  */
 
@@ -1602,7 +1602,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	{
 		addInlineJavascript('
 		var oRttime = ({
-			currentTime : ' . JavaScriptEscape(forum_time()) . ',
+			referenceTime : ' . forum_time() * 1000 . ',
 			now : ' . JavaScriptEscape($txt['rt_now']) . ',
 			minute : ' . JavaScriptEscape($txt['rt_minute']) . ',
 			minutes : ' . JavaScriptEscape($txt['rt_minutes']) . ',
