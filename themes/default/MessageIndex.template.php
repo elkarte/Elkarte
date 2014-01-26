@@ -206,7 +206,7 @@ function template_topic_listing()
 						<ul class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '" role="menubar">' . $topic['pages'] . '</ul>' : '', '
 					</div>
 				</div>
-				<div class="topic_latest">
+				<div class="topic_latest', (!empty($modSettings['todayMod']) && $modSettings['todayMod'] > 2) ? ' relative' : ' dd', '">
 					<p class="topic_stats">
 					', $topic['replies'], ' ', $txt['replies'], '
 					<br />
@@ -223,7 +223,7 @@ function template_topic_listing()
 			if (!empty($settings['avatars_on_indexes']))
 				echo '
 						<span class="board_avatar"><a href="', $topic['last_post']['member']['href'], '">', $topic['last_post']['member']['avatar']['image'], '</a></span>';
-	
+
 			echo '
 						<a href="', $topic['last_post']['href'], '"><img src="', $settings['images_url'], '/icons/last_post.png" alt="', $txt['last_post'], '" title="', $txt['last_post'], '" /></a>
 						', $topic['last_post']['html_time'], '<br />
