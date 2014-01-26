@@ -420,7 +420,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 			// Execute the load message query if a message has been chosen and let
 			// preparePMContext_callback fetch the results.  Otherwise just show the pm selection list
-			if (empty($pmsg) && empty($pmID))
+			if (empty($pmsg) && empty($pmID) && $context['display_mode'] != 0)
 				$messages_request = false;
 			else
 				$messages_request = loadPMMessageRequest($display_pms, $sort_by_query, $sort_by, $descending, $context['display_mode'], $context['folder']);
