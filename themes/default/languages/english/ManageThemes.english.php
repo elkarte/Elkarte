@@ -157,5 +157,4 @@ $txt['themeadmin_themelist_link'] = 'Show the list of themes';
 
 // Strings for the variants
 $txt['variant_light'] = 'ElkArte Light';
-$txt['variant_dark'] = 'ElkArte Dark';
 $txt['variant_besocial'] = 'ElkArte Be Social!';
