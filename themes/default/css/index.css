@@ -1677,6 +1677,8 @@ dl.settings textarea {
 }
 .topic_sorting {
 	float: right;
+	font-size: 1.167em;
+	margin-top: -2px;
 }
 .topic_sorting>li {
 	padding: 0 3px;
@@ -1982,6 +1984,8 @@ img.new_posts {
 #whoisviewing, #redirectfrom {
 	font-size: 0.857em;
 	padding: 4px 0;
+}
+#redirectfrom {
 	display: inline-block;
 }
 /* Poster and postarea + moderation area underneath */
