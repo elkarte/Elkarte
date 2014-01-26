@@ -94,10 +94,10 @@ $helptxt['view_members'] = '
 
 $helptxt['ban_members'] = '<strong>Ban Members</strong><br />
 	This provides the ability to &quot;ban&quot; users, to prevent people who have violated the trust of the board
-	by spamming, trolling, etc. This allows you to those users who are detrimental to your forum. As an admin,
+	by spamming, trolling, etc. from continuing. This allows you to ban those users who are detrimental to your forum. As an admin,
 	when you view messages, you can see each user\'s IP address used to post at that time. In the ban list,
-	you simply type that IP address in, save, and they can no longer post from that location.<br />You can also
-	ban people through their email address.';
+	you simply type that IP address in, save, and they can no longer post from that location.<br />
+	You can also ban people through their email address.';
 
 $helptxt['featuresettings'] = '<strong>Features and Options</strong><br />
 	There are several features in this section that can be changed to your preference.';
@@ -105,14 +105,14 @@ $helptxt['featuresettings'] = '<strong>Features and Options</strong><br />
 $helptxt['securitysettings'] = '<strong>Security and Moderation</strong><br />
 	This section contains settings relating to the security and moderation of your forum.';
 
-$helptxt['addonsettings'] = '<strong>Add-Ons Settings</strong><br />
-	This section should contain any settings added by addons installed on your forum.';
+$helptxt['addonsettings'] = '<strong>Add-On Settings</strong><br />
+	This section should contain any settings added by add-ons installed on your forum.';
 
 $helptxt['time_format'] = '<strong>Time Format</strong><br />
 	You have the power to adjust how the time and date look for yourself. There are a lot of little letters, but it\'s quite simple.
 	The conventions follow PHP\'s strftime function and are described as below (more details can be found at <a href="http://www.php.net/manual/function.strftime.php" target="_blank" class="new_win">php.net</a>).<br />
 	<br />
-	The following characters are recognized in the format string: <br />
+	The following characters are recognized in the format string:<br />
 	<span class="smalltext">
 	&nbsp;&nbsp;%a - abbreviated weekday name<br />
 	&nbsp;&nbsp;%A - full weekday name<br />
@@ -135,7 +135,8 @@ $helptxt['time_format'] = '<strong>Time Format</strong><br />
 	<br />
 	<em>* Does not work on Windows-based servers.</em></span>';
 
-$helptxt['deleteAccount_posts'] = 'Replies Only: This will remove just the posts this member made in reply to other posts.<br />Topics and Replies: This will do the same as above, and additionally will remove all topic threads started by this member.';
+$helptxt['deleteAccount_posts'] = 'Replies Only: This will remove just the posts this member made in reply to other posts.<br />
+	Topics and Replies: This will do the same as above, and additionally will remove all topic threads started by this member.';
 
 $helptxt['live_news'] = '<strong>Live announcements</strong><br />
 	This box shows recently updated announcements from <a href="http://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>.
@@ -159,12 +160,12 @@ $helptxt['registrations'] = '<strong>Registration Management</strong><br />
 		</li>
 		<li>
 			<strong>Set Reserved Names</strong><br />
-			Using this interface you can specify words or names which may not be used by your users.<br /><br />
+			Using this interface you can specify names which may not be used by your users.<br /><br />
 		</li>
 		<li>
 			<strong>Settings</strong><br />
 			This section will only be visible if you have permission to administrate the forum. From this screen you can decide on the registration method
-			is use on your forum, as well as other registration related settings.
+			for use on your forum, as well as other registration related settings.
 		</li>
 	</ul>';
 
