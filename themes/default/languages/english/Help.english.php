@@ -218,7 +218,7 @@ $helptxt['smileys'] = '<strong>Smiley Center</strong><br />
 	You are also able to edit message icons from here, if you have them enabled on the settings page.';
 
 $helptxt['calendar'] = '<strong>Manage Calendar</strong><br />Here you can modify the current calendar settings as well as add and remove holidays that appear on the calendar.';
-$helptxt['calendar_settings'] = 'The calendar can be used for showing birthdays, or for showing important moments happening in your community.<br /><br />Remember that usage of the calendar (posting events, viewing events, etc.) is controlled by permissions set on the permissions screen.';
+$helptxt['calendar_settings'] = 'The calendar can be used for showing birthdays or for showing important moments happening in your community.<br /><br />Remember that usage of the calendar (posting events, viewing events, etc.) is controlled by permissions set on the permissions screen.';
 $helptxt['cal_days_for_index'] = 'Max days in advance on board index:<br />If this is set to 7, the next week\'s worth of events will be shown.';
 $helptxt['cal_showevents'] = 'Enables the highlighting of events on the Mini Calendars, Main Calendar, both places, or disable event highlighting.';
 $helptxt['cal_showholidays'] = 'This setting allows you to highlight holidays on the Mini Calendars, Main Calendar, both places, or disable event highlighting.';
