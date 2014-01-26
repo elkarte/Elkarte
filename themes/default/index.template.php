@@ -64,7 +64,7 @@ function template_init()
 		'require_theme_strings' => false,
 
 		// This is used for the color variants.
-		'theme_variants' => array('light', 'dark', 'besocial'),
+		'theme_variants' => array('light', 'besocial'),
 
 		// If the following variable is set to true, the avatar of the last poster will be displayed on the boardindex and message index.
 		'avatars_on_indexes' => true,
