@@ -3893,10 +3893,6 @@ a.help .icon {
 		padding: 5px;
 		width: 97%;
 	}
-	ul.buttonlist, ul.buttonlist li, .pagelinks {
-		float: none;
-		display: block;
-	}
 	ul.buttonlist:before {
 		display: block;
 		clear: both;
