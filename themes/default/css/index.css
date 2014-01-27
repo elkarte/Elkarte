@@ -177,8 +177,11 @@ input, button, select {
 select {
 	padding: 1px;
 }
-#opera select, #chrome select {
+#opera select, #chrome select, #safari select {
 	padding: 2px;
+}
+#safari select {
+	-webkit-appearance:none;
 }
 select option {
 	padding: 0 4px;
