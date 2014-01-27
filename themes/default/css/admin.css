@@ -923,11 +923,6 @@ ul.moderation_notes li {
 	margin: 0 8px 0 0;
 }
 
-/* Scheduled tasks */
-.errorbox ul {
-	margin-left: 5em;
-}
-
 /* Styles for the Report generation
 ------------------------------------------------- */
 #report_buttons {
