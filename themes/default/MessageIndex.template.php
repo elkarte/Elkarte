@@ -43,7 +43,10 @@ function template_display_child_boards_above()
 }
 
 /**
- * Header bar and extra details above topic listing.
+ * Header bar and extra details above topic listing
+ *  - board description
+ *  - who is viewing
+ *  - sort container
  */
 function template_topic_listing_above()
 {
@@ -70,61 +73,59 @@ function template_topic_listing_above()
 		echo '
 			<div class="generalinfo">';
 
-		// Sort topics mumbo-jumbo
-		echo '
-				<ul id="sort_by" class="topic_sorting">';
-		if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1)
-			echo '
-					<li class="listlevel1 quickmod_select_all">
-						<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" class="input_check" />
-					</li>';
-
-		$current_header = $context['topics_headers'][$context['sort_by']];
-		echo '
-					<li class="listlevel1 topic_sorting_row">
-						<a href="', $current_header['url'], '">', $current_header['sort_dir_img'], '</a>
-					</li>';
-
-		echo '
-					<li class="listlevel1 topic_sorting_row">', $txt['sort_by'], ': <a href="', $current_header['url'], '">', $txt[$context['sort_by']], '</a>
-						<ul class="menulevel2" id="sortby">';
-		foreach ($context['topics_headers'] as $key => $value)
-			echo '
-							<li class="listlevel2 sort_by_item" id="sort_by_item_', $key, '"><a href="', $value['url'], '" class="linklevel2">', $txt[$key], ' ', $value['sort_dir_img'], '</a></li>';
-		echo '
-						</ul>';
-
-		echo '
-					</li>
-				</ul>';
-
+		// Show the board description
 		if (!empty($context['description']))
 			echo '
 				<div id="boarddescription">
 					', $context['description'], '
 				</div>';
 
-		// @todo - Thought the who is stuff was better here. Presentation still WIP.
-		if (!empty($settings['display_who_viewing']))
-		{
-			echo '
+		echo '
 				<div id="whoisviewing">';
 
+		// If we are showing who is viewing this topic, build it out
+		if (!empty($settings['display_who_viewing']))
+		{
 			if ($settings['display_who_viewing'] == 1)
 				echo count($context['view_members']), ' ', count($context['view_members']) === 1 ? $txt['who_member'] : $txt['members'];
 			else
 				echo empty($context['view_members_list']) ? '0 ' . $txt['members'] : implode(', ', $context['view_members_list']) . (empty($context['view_num_hidden']) || $context['can_moderate_forum'] ? '' : ' (+ ' . $context['view_num_hidden'] . ' ' . $txt['hidden'] . ')');
 
 			echo $txt['who_and'], $context['view_num_guests'], ' ', $context['view_num_guests'] == 1 ? $txt['guest'] : $txt['guests'], $txt['who_viewing_board'];
-
-			echo '
-				</div>';
 		}
 
+		// Sort topics mumbo-jumbo
 		echo '
-			</div>';
+					<ul id="sort_by" class="topic_sorting">';
+
+		if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1)
+			echo '
+						<li class="listlevel1 quickmod_select_all">
+							<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" class="input_check" />
+						</li>';
+
+		$current_header = $context['topics_headers'][$context['sort_by']];
+		echo '
+						<li class="listlevel1 topic_sorting_row">
+							<a href="', $current_header['url'], '">', $current_header['sort_dir_img'], '</a>
+						</li>';
 
 		echo '
+						<li class="listlevel1 topic_sorting_row">', $txt['sort_by'], ': <a href="', $current_header['url'], '">', $txt[$context['sort_by']], '</a>
+							<ul class="menulevel2" id="sortby">';
+
+		foreach ($context['topics_headers'] as $key => $value)
+			echo '
+								<li class="listlevel2 sort_by_item" id="sort_by_item_', $key, '"><a href="', $value['url'], '" class="linklevel2">', $txt[$key], ' ', $value['sort_dir_img'], '</a></li>';
+
+		echo '
+							</ul>
+						</li>
+					</ul>';
+
+		echo '
+				</div>
+			</div>
 		</div>';
 	}
 }
@@ -206,7 +207,7 @@ function template_topic_listing()
 						<ul class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '" role="menubar">' . $topic['pages'] . '</ul>' : '', '
 					</div>
 				</div>
-				<div class="topic_latest">
+				<div class="topic_latest', (!empty($modSettings['todayMod']) && $modSettings['todayMod'] > 2) ? ' relative' : ' dd', '">
 					<p class="topic_stats">
 					', $topic['replies'], ' ', $txt['replies'], '
 					<br />
@@ -223,7 +224,7 @@ function template_topic_listing()
 			if (!empty($settings['avatars_on_indexes']))
 				echo '
 						<span class="board_avatar"><a href="', $topic['last_post']['member']['href'], '">', $topic['last_post']['member']['avatar']['image'], '</a></span>';
-	
+
 			echo '
 						<a href="', $topic['last_post']['href'], '"><img src="', $settings['images_url'], '/icons/last_post.png" alt="', $txt['last_post'], '" title="', $txt['last_post'], '" /></a>
 						', $topic['last_post']['html_time'], '<br />

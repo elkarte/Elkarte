@@ -44,7 +44,7 @@ foreach (array('db_character_set', 'cachedir') as $variable)
 require_once(dirname(__FILE__) . '/Settings.php');
 
 // Directional only script time usage for display
-if ($db_show_debug === true && function_exists('getrusage'))
+if (!empty($db_show_debug) && function_exists('getrusage'))
 	$rusage_start = getrusage();
 
 // Make sure the paths are correct... at least try to fix them.
