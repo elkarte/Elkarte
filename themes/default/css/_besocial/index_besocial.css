@@ -1217,19 +1217,43 @@ span.views_text {
 		margin-left: 10px;
 	}
 	.topic_listing>li {
-		border: 1px solid #ccc;
-		box-shadow: 1px 1px 1px #eee;
-		margin-bottom: 6px;
+		border: 1px solid #bfbfbf;
+		box-shadow: 3px 3px 6px #e5e5e5;
+		border-radius: 3px;
+		margin-bottom: 8px;
+	}
+	.new_posts {
+		font-size: 0.7em;
+		position: relative;
+		top: -3px;
+	}
+	.topic_listing h4 {
+		border-bottom: 1px solid #ddd;
+		margin-bottom: 3px;
+		max-width: 20em;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+	}
+	.basic_row {
+		background-color: #fafafa;
+	}
+	.topic_starter {
+		color: #777;
 	}
 	.topic_sorting_row {
 		border: none !important;
 	}
 	.topic_name h4 {
-		font-size: 1.5em;
+		font-size: 1.4em;
+		padding-bottom: 2px;
 	}
 	.topic_latest:after {
 		content: '\A';
 		white-space: pre;
+	}
+	.topic_latest.relative {
+		min-width: 15em;
 	}
 	.poster:after, .posterarea:before {
 		border-bottom: 1px solid #bfbfbf;
