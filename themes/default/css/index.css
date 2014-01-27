@@ -177,8 +177,11 @@ input, button, select {
 select {
 	padding: 1px;
 }
-#opera select, #chrome select {
+#opera select, #chrome select, #safari select {
 	padding: 2px;
+}
+#safari select {
+	-webkit-appearance:none;
 }
 select option {
 	padding: 0 4px;
@@ -1677,6 +1680,8 @@ dl.settings textarea {
 }
 .topic_sorting {
 	float: right;
+	font-size: 1.167em;
+	margin-top: -2px;
 }
 .topic_sorting>li {
 	padding: 0 3px;
@@ -1803,9 +1808,12 @@ img.new_posts {
 	display: table-cell;
 	vertical-align: top;
 	width: 20%;
-	min-width: 34em;
+	min-width: 35em;
 	padding: 7px 4px 6px 4px;
 	font-size: 0.929em;
+}
+.topic_latest.relative {
+	min-width: 30em;
 }
 .topic_stats {
 	text-align: right;
@@ -1979,6 +1987,8 @@ img.new_posts {
 #whoisviewing, #redirectfrom {
 	font-size: 0.857em;
 	padding: 4px 0;
+}
+#redirectfrom {
 	display: inline-block;
 }
 /* Poster and postarea + moderation area underneath */
