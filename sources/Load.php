@@ -2784,6 +2784,15 @@ function doSecurityChecks()
 		}
 	}
 
+	// Are there any members waiting for approval?
+	if (allowedTo('moderate_forum') && ((!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion'])) && !empty($modSettings['unapprovedMembers']))
+	{
+		$context['warning_controls']['unapproved_members'] = sprintf($txt[$modSettings['unapprovedMembers'] == 1 ? 'approve_one_member_waiting' : 'approve_many_members_waiting'], $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve', $modSettings['unapprovedMembers']);
+	}
+
+	if (!empty($context['open_mod_reports']) && empty($user_settings['mod_prefs']) || $user_settings['mod_prefs'][0] == 1)
+		$context['warning_controls']['open_mod_reports'] = '<a href="' . $scripturl . '?action=moderate;area=reports">' . sprintf($txt['mod_reports_waiting'], $context['open_mod_reports']) . '</a>';
+
 	if (isset($_SESSION['ban']['cannot_post']))
 	{
 		// An admin cannot be banned (technically he could), and if it is better he knows.

@@ -2523,13 +2523,6 @@ function setupThemeContext($forceload = false)
 			$context['user']['popup_messages'] = false;
 		$_SESSION['unread_messages'] = $user_info['unread_messages'];
 
-		if (allowedTo('moderate_forum'))
-		{
-			$context['unapproved_members'] = (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion']) ? $modSettings['unapprovedMembers'] : 0;
-			$context['unapproved_members_text'] = $context['unapproved_members'] == 1 ? sprintf($txt['approve_one_member_waiting'], $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve') : sprintf($txt['approve_many_members_waiting'], $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve', $context['unapproved_members']);
-		}
-		$context['show_open_reports'] = empty($user_settings['mod_prefs']) || $user_settings['mod_prefs'][0] == 1;
-
 		$context['user']['avatar'] = array();
 
 		// Figure out the avatar... uploaded?
@@ -2986,9 +2979,11 @@ function template_admin_warning_above()
 	if (!empty($context['warning_controls']))
 	{
 		echo '
-			<div class="warningbox">
-				', implode('<br />', $context['warning_controls']), '
-			</div>';
+	<div class="warningbox">
+		<ul>
+			<li class="listlevel1">', implode('</li><li class="listlevel1">', $context['warning_controls']), '</li>
+		</ul>
+	</div>';
 	}
 }
 

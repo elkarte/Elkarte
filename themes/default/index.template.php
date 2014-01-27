@@ -343,15 +343,6 @@ function template_body_above()
 	// Show the navigation tree.
 	theme_linktree();
 
-	// Are there any members waiting for approval?
-	if (!empty($context['unapproved_members']))
-		echo '
-		<div class="modtask warningbox">', $context['unapproved_members_text'], '</div>';
-
-	if (!empty($context['open_mod_reports']) && $context['show_open_reports'])
-		echo '
-		<div class="modtask warningbox"><a href="', $scripturl, '?action=moderate;area=reports">', sprintf($txt['mod_reports_waiting'], $context['open_mod_reports']), '</a></div>';
-
 	// The main content should go here. @todo - Skip nav link.
 	echo '
 		<div id="main_content_section"><a id="skipnav"></a>';

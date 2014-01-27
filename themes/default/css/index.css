@@ -3596,7 +3596,8 @@ a.help .icon {
 	text-decoration: underline;
 	font-size: 1.1em;
 }
-.errorbox .listlevel1 {
+.errorbox .listlevel1,
+.warningbox .listlevel1 {
 	float: none;
 	padding-left: 1em;
 	line-height: 1.75em;
