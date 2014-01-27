@@ -180,6 +180,7 @@ strong {
 .ui-dialog .ui-dialog-titlebar,
 .popup_heading {
     font-weight: 600;
+	-webkit-font-smoothing: antialiased;
     font-family: "Segoe UI Semibold", "Helvetica Neue Medium";
 }
 
