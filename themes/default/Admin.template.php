@@ -1492,7 +1492,7 @@ function template_callback_external_search_engines()
 		<dt id="add_more_searches" style="display: none;"></dt>
 		<dd></dd>
 		<dt id="add_more_link_div" style="display: none;">
-			<a href="#" onclick="addAnotherSearch(', JavaScriptEscape($txt['name']), ', ', JavaScriptEscape($txt['url']), ', ', JavaScriptEscape($txt['words_sep']), '); return false;">&#171; ', $txt['setup_search_engine_add_more'], ' &#187;</a>
+			<a class="linkbutton" href="#" onclick="addAnotherSearch(', JavaScriptEscape($txt['name']), ', ', JavaScriptEscape($txt['url']), ', ', JavaScriptEscape($txt['words_sep']), '); return false;">', $txt['setup_search_engine_add_more'], '</a>
 		</dt>
 		<dd></dd>';
 
