@@ -155,6 +155,7 @@ input, button, select, textarea, .editor {
 textarea, .editor {
 	border-radius: 4px;
 	font-size: 1em;
+	padding: 2px 4px;
 }
 .sceditor-container {
 	margin: 0 0 6px 0;
@@ -168,23 +169,71 @@ select::-moz-focus-inner {
 	padding: 0;
 }
 /* Apply the font only to these elements, and top align them. */
-input, button, select {
+input, button, select{
 	padding: 2px 6px;
 	vertical-align: top;
 	font-size: 0.857em;
 }
 /* Selects require browser-specific targeting too, unfortunately. */
 select {
-	padding: 1px;
-}
-#opera select, #chrome select, #safari select {
-	padding: 2px;
+	padding: 1px 6px;
 }
 #safari select {
-	-webkit-appearance:none;
+	padding-bottom: 2px;
+	padding-top: 2px;
 }
 select option {
 	padding: 0 4px;
+}
+
+/* Selects don't like to behave across OS and browsers, unfortunately. */
+.styled-select {
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	overflow: hidden;
+	background: #fff url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAMAAABhq6zVAAAACVBMVEX///////8AAACO9MPsAAAAAXRSTlMAQObYZgAAACVJREFUeNpjIBIwIQOG/3AAkmKEAiawQjgbzIOy4TwmZCMJ2AkA4U4KOd8H2boAAAAASUVORK5CYII=) no-repeat no-repeat 98% 50%;
+	display: inline-block;
+	border: 1px solid #ccc;
+	border-radius: 2px;
+	vertical-align: middle;
+}
+/* Turn off the default select arrow where we can */
+.styled-select select {
+	 appearance: button;
+	-webkit-appearance: button;
+	-moz-appearance: button;
+	-ms-appearance: button;
+	text-indent: 0.01px;
+	text-overflow: '';
+}
+.styled-select select::-ms-expand {
+    display: none;
+}
+/* A styled div to hold the style-less select objects */
+.styled-select select {
+	font-size: 0.857em;
+	font-weight: normal;
+	background: transparent;
+	border: none;
+	outline: none;
+    box-shadow: none;
+    background-image: none;
+	width: 100%;
+	padding: 1px 2px;
+	padding-right: 1.5em;
+}
+/* Can't hide the arrow in ie<10 so we positon it off div */
+#ie8 .styled-select select, #ie9 .styled-select select {
+	width: 136%;
+}
+#ie8 .styled-select, #ie9 .styled-select {
+	min-width: 7em;
+	padding-right: 0;
+}
+.styled-select select:hover, .styled-select select:focus {
+	outline: none;
+	border: none;
 }
 
 /* No borders around checkboxes or radio buttons, and middle aligned. */
@@ -476,12 +525,8 @@ h2 a.collapse {
 	position: relative;
 	padding: 0;
 }
-.collapse {
-	background-position: 0 -25px;
-}
-.expand {
-	background-position: -116px -25px;
-}
+.collapse {background-position: 0 -25px;}
+.expand {background-position: -116px -25px;}
 
 /* Alternating backgrounds for posts, and several other sections of the forum. */
 .windowbg, #preview_body, .windowbg2 {}
@@ -760,7 +805,7 @@ a.bbc_link {
 #top_section_notice {
 	float: left;
 	margin: 0;
-	padding: 14px 8px 0 8px;
+	padding: 12px 8px 0 8px;
 	line-height: 1.3em;
 	min-width: 38%;
 	/* @todo - See me grumblez in Issue #552. ;) */
@@ -768,6 +813,10 @@ a.bbc_link {
 #top_section_notice .toggle_login {
 	display: inline;
 	cursor: pointer;
+}
+#top_section_notice .button_submit {
+	margin-top: 0px;
+	vertical-align: top;
 }
 #top_section_notice form {
 	white-space: nowrap;
@@ -784,6 +833,7 @@ a.bbc_link {
 #password_login {
 	display: inline-block;
 	vertical-align: middle;
+	-webkit-appearance: caps-lock-indicator;
 }
 #search_form {
 	padding: 12px 0 4px 8px;
@@ -1449,6 +1499,10 @@ a.bbc_link {
 .additional_row {
 	padding: 6px 0;
 }
+.additional_row .styled-select {
+	float: right;
+	margin-left: 2px;
+}
 .sort_by_item .sort, .sort {
 	margin: 0 0 -4px 4px;
 }
@@ -1512,6 +1566,12 @@ dl.settings dt a img {
 }
 dl.settings textarea {
 	width: 85%;
+}
+dl.settings label {
+	vertical-align: top;
+}
+dl.settings dt .styled-select select {
+	width: 170%;
 }
 
 
@@ -3403,6 +3463,9 @@ a.help .icon {
 	padding-top: 12px;
 	width: 600px;
 }
+#search_options .styled-select {
+	width: 14em;
+}
 #advanced_search dt {
 	float: left;
 	clear: both;
@@ -3416,6 +3479,10 @@ a.help .icon {
 	padding: 3px 2px;
 	width: 80%;
 	text-align: left;
+}
+#search_options .styled-select option {
+	border-right: 1px solid #666;
+	outline: none;
 }
 
 /* The search results page.
@@ -3648,6 +3715,8 @@ a.help .icon {
 	width: 35px;
 	height: 35px;
 }
+
+
 /*	$MEDIA		*/
 /* Experimental media queries.
 /* ------------------------------------------------------- */
@@ -3702,7 +3771,7 @@ a.help .icon {
 	.board_stats, .topic_stats {
 		display: none;
 	}
-	#password_login select {
+	#password_login .styled-select {
 		display: none;
 	}
 	.bbc_img, .elk_video {

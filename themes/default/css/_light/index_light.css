@@ -414,14 +414,9 @@ div.bbc_footnotes .meaction{
 	color: #333;
 }
 #search_form select {
-	padding-right: 4px;
-	border: 1px solid #bbb;
-	border-right: none;
 	opacity: 0.8;
 }
 #search_form select:focus {
-	border: 1px solid #999;
-	border-right: none;
 	opacity: 1;
 }
 .forumtitle>a {
