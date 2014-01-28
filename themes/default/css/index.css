@@ -3596,8 +3596,11 @@ a.help .icon {
 	text-decoration: underline;
 	font-size: 1.1em;
 }
-.errorbox p {
-	margin: 12px 0 0 0;
+.errorbox .listlevel1,
+.warningbox .listlevel1 {
+	float: none;
+	padding-left: 1em;
+	line-height: 1.75em;
 }
 .errorbox .alert {
 	float: left;
@@ -3606,8 +3609,9 @@ a.help .icon {
 	width: 12px;
 	font-size: 1.5em;
 }
-.errorbox span {
-	text-decoration: underline;
+.errorbox .smalltext {
+	display: block;
+	padding-left: 1em;
 }
 
 .ban_cannot_post {

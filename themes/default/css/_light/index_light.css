@@ -567,7 +567,6 @@ div.bbc_footnotes .meaction{
 	color: #fff;
 	font-weight: bold;
 	box-shadow: 1px 1px 2px #bbb;
-	padding: 0 5px;
 }
 /* Hover effects for those buttons. */
 .linklevel1.active:hover,.listlevel1:hover .linklevel1.active,
@@ -1700,9 +1699,6 @@ div.bbc_footnotes .meaction{
 	}
 	.listlevel1#button_profile .linklevel1 {
 		min-width: 0.5em;
-	}
-	.linklevel1.active, .listlevel1:hover .active, #collapse_button .linklevel1 {
-		padding: 0;
 	}
 }
 /* This one does up to 540 screens. */
