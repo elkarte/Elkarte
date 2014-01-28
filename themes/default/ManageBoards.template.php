@@ -200,15 +200,17 @@ function template_modify_category()
 		echo '
 						<dt><strong><label for="cat_order">', $txt['order'], '</label>:</strong></dt>
 						<dd>
-							<select id="cat_order" name="cat_order">';
+							<div class="styled-select">
+								<select id="cat_order" name="cat_order">';
 
 		// Print every existing category into a select box.
 		foreach ($context['category_order'] as $order)
 			echo '
-								<option', $order['selected'] ? ' selected="selected"' : '', ' value="', $order['id'], '">', $order['name'], '</option>';
+									<option', $order['selected'] ? ' selected="selected"' : '', ' value="', $order['id'], '">', $order['name'], '</option>';
 
 		echo '
-							</select>
+								</select>
+							</div>
 						</dd>';
 	}
 
@@ -294,15 +296,17 @@ function template_confirm_category_delete()
 					<p>
 						<label for="delete_action0"><input type="radio" id="delete_action0" name="delete_action" value="0" class="input_radio" checked="checked" />', $txt['mboards_delete_option1'], '</label><br />
 						<label for="delete_action1"><input type="radio" id="delete_action1" name="delete_action" value="1" class="input_radio"', count($context['category_order']) == 1 ? ' disabled="disabled"' : '', ' />', $txt['mboards_delete_option2'], '</label>:
-						<select name="cat_to" ', count($context['category_order']) == 1 ? 'disabled="disabled"' : '', '>';
+						<div class="styled-select">
+							<select name="cat_to" ', count($context['category_order']) == 1 ? 'disabled="disabled"' : '', '>';
 
 	foreach ($context['category_order'] as $cat)
 		if ($cat['id'] != 0)
 			echo '
-							<option value="', $cat['id'], '">', $cat['true_name'], '</option>';
+								<option value="', $cat['id'], '">', $cat['true_name'], '</option>';
 
 	echo '
-						</select>
+							</select>
+						</div>
 					</p>
 					<input type="submit" name="delete" value="', $txt['mboards_delete_confirm'], '" class="button_submit" />
 					<input type="submit" name="cancel" value="', $txt['mboards_delete_cancel'], '" class="button_submit" />
@@ -340,14 +344,16 @@ function template_modify_board()
 							<strong><label for="new_cat">', $txt['mboards_category'], '</label>:</strong>
 						</dt>
 						<dd>
-							<select id="new_cat" name="new_cat" onchange="if (this.form.order) {this.form.order.disabled = this.options[this.selectedIndex].value != 0; this.form.board_order.disabled = this.options[this.selectedIndex].value != 0 || this.form.order.options[this.form.order.selectedIndex].value == \'\';}">';
+							<div class="styled-select">
+								<select id="new_cat" name="new_cat" onchange="if (this.form.order) {this.form.order.disabled = this.options[this.selectedIndex].value != 0; this.form.board_order.disabled = this.options[this.selectedIndex].value != 0 || this.form.order.options[this.form.order.selectedIndex].value == \'\';}">';
 
 	foreach ($context['categories'] as $category)
 		echo '
-								<option', $category['selected'] ? ' selected="selected"' : '', ' value="', $category['id'], '">', $category['name'], '</option>';
+									<option', $category['selected'] ? ' selected="selected"' : '', ' value="', $category['id'], '">', $category['name'], '</option>';
 
 	echo '
-							</select>
+								</select>
+							</div>
 						</dd>';
 
 	// If this isn't the only board in this category let the user choose where the board is to live.
@@ -361,24 +367,28 @@ function template_modify_board()
 
 		// The first select box gives the user the option to position it before, after or as a child of another board.
 		echo '
-							<select id="order" name="placement" onchange="this.form.board_order.disabled = this.options[this.selectedIndex].value == \'\';">
-								', !isset($context['board']['is_new']) ? '<option value="">(' . $txt['mboards_unchanged'] . ')</option>' : '', '
-								<option value="after">' . $txt['mboards_order_after'] . '...</option>
-								<option value="child">' . $txt['mboards_order_child_of'] . '...</option>
-								<option value="before">' . $txt['mboards_order_before'] . '...</option>
-							</select>';
+							<div class="styled-select">
+								<select id="order" name="placement" onchange="this.form.board_order.disabled = this.options[this.selectedIndex].value == \'\';">
+									', !isset($context['board']['is_new']) ? '<option value="">(' . $txt['mboards_unchanged'] . ')</option>' : '', '
+									<option value="after">' . $txt['mboards_order_after'] . '...</option>
+									<option value="child">' . $txt['mboards_order_child_of'] . '...</option>
+									<option value="before">' . $txt['mboards_order_before'] . '...</option>
+								</select>
+							</div>';
 
 		// The second select box lists all the boards in the category.
 		echo '
-							<select id="board_order" name="board_order" ', isset($context['board']['is_new']) ? '' : 'disabled="disabled"', '>
-								', !isset($context['board']['is_new']) ? '<option value="">(' . $txt['mboards_unchanged'] . ')</option>' : '';
+							<div class="styled-select">
+								<select id="board_order" name="board_order" ', isset($context['board']['is_new']) ? '' : 'disabled="disabled"', '>
+									', !isset($context['board']['is_new']) ? '<option value="">(' . $txt['mboards_unchanged'] . ')</option>' : '';
 
 		foreach ($context['board_order'] as $order)
 			echo '
-								<option', $order['selected'] ? ' selected="selected"' : '', ' value="', $order['id'], '">', $order['name'], '</option>';
+									<option', $order['selected'] ? ' selected="selected"' : '', ' value="', $order['id'], '">', $order['name'], '</option>';
 
 		echo '
-							</select>
+								</select>
+							</div>
 						</dd>';
 	}
 
@@ -403,18 +413,20 @@ function template_modify_board()
 							<span class="smalltext">', $context['can_manage_permissions'] ? sprintf($txt['permission_profile_desc'], $scripturl . '?action=admin;area=permissions;sa=profiles;' . $context['session_var'] . '=' . $context['session_id']) : strip_tags($txt['permission_profile_desc']), '</span>
 						</dt>
 						<dd>
-							<select id="profile" name="profile">';
+							<div class="styled-select">
+								<select id="profile" name="profile">';
 
 	if (isset($context['board']['is_new']))
 		echo '
-								<option value="-1">[', $txt['permission_profile_inherit'], ']</option>';
+									<option value="-1">[', $txt['permission_profile_inherit'], ']</option>';
 
 	foreach ($context['profiles'] as $id => $profile)
 		echo '
-								<option value="', $id, '" ', $id == $context['board']['profile'] ? 'selected="selected"' : '', '>', $profile['name'], '</option>';
+									<option value="', $id, '" ', $id == $context['board']['profile'] ? 'selected="selected"' : '', '>', $profile['name'], '</option>';
 
 	echo '
-							</select>
+								</select>
+							</div>
 						</dd>
 						<dt>
 							<strong>', $txt['mboards_groups'], ':</strong><br />
@@ -594,15 +606,17 @@ function template_modify_board()
 								<span class="smalltext">', $txt['mboards_theme_desc'], '</span><br />
 							</dt>
 							<dd>
-								<select name="boardtheme" id="boardtheme" onchange="refreshOptions();">
-									<option value="0"', $context['board']['theme'] == 0 ? ' selected="selected"' : '', '>', $txt['mboards_theme_default'], '</option>';
+								<div class="styled-select">
+									<select name="boardtheme" id="boardtheme" onchange="refreshOptions();">
+										<option value="0"', $context['board']['theme'] == 0 ? ' selected="selected"' : '', '>', $txt['mboards_theme_default'], '</option>';
 
 	foreach ($context['themes'] as $theme)
 		echo '
-									<option value="', $theme['id'], '"', $context['board']['theme'] == $theme['id'] ? ' selected="selected"' : '', '>', $theme['name'], '</option>';
+										<option value="', $theme['id'], '"', $context['board']['theme'] == $theme['id'] ? ' selected="selected"' : '', '>', $theme['name'], '</option>';
 
 	echo '
-								</select>
+									</select>
+								</div>
 							</dd>
 						</dl>
 					</div>
@@ -742,15 +756,17 @@ function template_confirm_board_delete()
 					<p>
 						<label for="delete_action0"><input type="radio" id="delete_action0" name="delete_action" value="0" class="input_radio" checked="checked" />', $txt['mboards_delete_board_option1'], '</label><br />
 						<label for="delete_action1"><input type="radio" id="delete_action1" name="delete_action" value="1" class="input_radio"', empty($context['can_move_children']) ? ' disabled="disabled"' : '', ' />', $txt['mboards_delete_board_option2'], '</label>:
-						<select name="board_to" ', empty($context['can_move_children']) ? 'disabled="disabled"' : '', '>';
+						<div class="styled-select">
+							<select name="board_to" ', empty($context['can_move_children']) ? 'disabled="disabled"' : '', '>';
 
 	foreach ($context['board_order'] as $board)
 		if ($board['id'] != $context['board']['id'] && empty($board['is_child']))
 			echo '
-							<option value="', $board['id'], '">', $board['name'], '</option>';
+								<option value="', $board['id'], '">', $board['name'], '</option>';
 
 	echo '
-						</select>
+							</select>
+						</div>
 					</p>
 					<input type="submit" name="delete" value="', $txt['mboards_delete_confirm'], '" class="button_submit" />
 					<input type="submit" name="cancel" value="', $txt['mboards_delete_cancel'], '" class="button_submit" />
