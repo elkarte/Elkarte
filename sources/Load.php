@@ -2718,7 +2718,7 @@ function detectServer()
  */
 function doSecurityChecks()
 {
-	global $modSettings, $context, $maintenance, $user_info, $txt, $scripturl;
+	global $modSettings, $context, $maintenance, $user_info, $txt, $scripturl, $user_settings;
 
 	if (allowedTo('admin_forum') && !$user_info['is_guest'])
 	{
@@ -2780,17 +2780,15 @@ function doSecurityChecks()
 		{
 			$context['security_controls']['query']['title'] = $txt['query_command_denied_guests'];
 			foreach ($_SESSION['query_command_denied'] as $command => $error)
-				$context['security_controls']['query']['messages'][$command] = '<pre>' .  sprintf($txt['query_command_denied_guests_msg'], Util::htmlspecialchars($command)) . '</pre>';
+				$context['security_controls']['query']['messages'][$command] = '<pre>' . sprintf($txt['query_command_denied_guests_msg'], Util::htmlspecialchars($command)) . '</pre>';
 		}
 	}
 
 	// Are there any members waiting for approval?
 	if (allowedTo('moderate_forum') && ((!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion'])) && !empty($modSettings['unapprovedMembers']))
-	{
 		$context['warning_controls']['unapproved_members'] = sprintf($txt[$modSettings['unapprovedMembers'] == 1 ? 'approve_one_member_waiting' : 'approve_many_members_waiting'], $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve', $modSettings['unapprovedMembers']);
-	}
 
-	if (!empty($context['open_mod_reports']) && empty($user_settings['mod_prefs']) || $user_settings['mod_prefs'][0] == 1)
+	if (!empty($context['open_mod_reports']) && (empty($user_settings['mod_prefs']) || $user_settings['mod_prefs'][0] == 1))
 		$context['warning_controls']['open_mod_reports'] = '<a href="' . $scripturl . '?action=moderate;area=reports">' . sprintf($txt['mod_reports_waiting'], $context['open_mod_reports']) . '</a>';
 
 	if (isset($_SESSION['ban']['cannot_post']))
