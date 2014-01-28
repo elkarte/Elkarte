@@ -101,15 +101,14 @@ function template_modify_weights()
  */
 function template_select_search_method()
 {
-	global $context, $scripturl, $txt, $modSettings;
+	global $context, $scripturl, $txt, $modSettings, $settings;
 
 	echo '
 	<div id="admincenter">
 		<h2 class="category_header">', $txt['search_method'], '</h2>
-		<div class="information">
-			<div class="smalltext" style="font-weight: normal;"><a href="', $scripturl, '?action=quickhelp;help=search_why_use_index" onclick="return reqOverlayDiv(this.href);">', $txt['search_create_index_why'], '</a></div>
+		<div class="infobox">
+			<a href="', $scripturl, '?action=quickhelp;help=search_why_use_index" onclick="return reqOverlayDiv(this.href);">', $txt['search_create_index_why'], '</a>
 		</div>
-
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=managesearch;sa=method" method="post" accept-charset="UTF-8">
 			<h3 class="category_header">', $txt['search_method'], '</h3>
 			<div class="windowbg">
