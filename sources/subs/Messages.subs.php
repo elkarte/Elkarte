@@ -1015,7 +1015,7 @@ function loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $options
 			m.id_msg_modified < {int:new_from} AS is_read
 			' . (!empty($msg_selects) ? implode(',', $msg_selects) : '') . '
 		FROM {db_prefix}messages AS m
-			' . (!empty($msg_tables) ? implode("\n\t", $msg_tables) : '') . '
+			' . (!empty($msg_tables) ? implode("\n\t\t\t", $msg_tables) : '') . '
 		WHERE m.id_msg IN ({array_int:message_list})
 		ORDER BY m.id_msg' . (empty($options['view_newest_first']) ? '' : ' DESC'),
 		$msg_parameters

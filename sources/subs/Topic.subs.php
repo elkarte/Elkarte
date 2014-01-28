@@ -1139,8 +1139,8 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 			LEFT JOIN {db_prefix}members as mem ON (mem.id_member = ms.id_member)' : '') . ($follow_ups_table ? '
 			LEFT JOIN {db_prefix}follow_ups AS fu ON (fu.follow_up = t.id_topic)' : '') . ($logs_table && !$user_info['is_guest'] ? '
 			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = {int:topic} AND lt.id_member = {int:member})
-			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = {int:board} AND lmr.id_member = {int:member})' : '') .
-			(!empty($tables) ? implode("\n\t\t\t", $tables) : '') . '
+			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = {int:board} AND lmr.id_member = {int:member})' : '') . (!empty($tables) ? '
+			' . implode("\n\t\t\t", $tables) : '') . '
 		WHERE t.id_topic = {int:topic}
 		LIMIT 1',
 			$topic_parameters
