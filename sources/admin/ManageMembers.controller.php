@@ -933,15 +933,16 @@ class ManageMembers_Controller extends Action_Controller
 				array(
 					'position' => 'below_table_data',
 					'value' => '
-						<a class="linkbutton" href="' . $scripturl . '?action=admin;area=viewmembers;sa=browse;showdupes=' . ($context['show_duplicates'] ? 0 : 1) . ';type=' . $context['browse_type'] . (!empty($context['show_filter']) ? ';filter=' . $context['current_filter'] : '') . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . ($context['show_duplicates'] ? $txt['dont_check_for_duplicate'] : $txt['check_for_duplicate']) . '</a>
-						<select name="todo" onchange="onSelectChange();">
-							' . $allowed_actions . '
-						</select>
+						<div class="styled-select float_right">
+							<select name="todo" onchange="onSelectChange();">
+								' . $allowed_actions . '
+							</select>
+						</div>
+						<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=viewmembers;sa=browse;showdupes=' . ($context['show_duplicates'] ? 0 : 1) . ';type=' . $context['browse_type'] . (!empty($context['show_filter']) ? ';filter=' . $context['current_filter'] : '') . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . ($context['show_duplicates'] ? $txt['dont_check_for_duplicate'] : $txt['check_for_duplicate']) . '</a>
 						<noscript>
 							<input type="submit" value="' . $txt['go'] . '" class="right_submit" /><br class="clear_right" />
 						</noscript>
 					',
-					'class' => 'floatright',
 				),
 			),
 		);
