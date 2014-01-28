@@ -2746,6 +2746,7 @@ dl.merge_topic dd {
 	white-space: pre-wrap;
 	font-weight: 100;
 	font-size: 1.4em;
+	padding-right: 2px;
 }
 #basicinfo h4 .position {
 	display: block;
