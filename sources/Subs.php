@@ -2523,13 +2523,6 @@ function setupThemeContext($forceload = false)
 			$context['user']['popup_messages'] = false;
 		$_SESSION['unread_messages'] = $user_info['unread_messages'];
 
-		if (allowedTo('moderate_forum'))
-		{
-			$context['unapproved_members'] = (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion']) ? $modSettings['unapprovedMembers'] : 0;
-			$context['unapproved_members_text'] = $context['unapproved_members'] == 1 ? sprintf($txt['approve_one_member_waiting'], $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve') : sprintf($txt['approve_many_members_waiting'], $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve', $context['unapproved_members']);
-		}
-		$context['show_open_reports'] = empty($user_settings['mod_prefs']) || $user_settings['mod_prefs'][0] == 1;
-
 		$context['user']['avatar'] = array();
 
 		// Figure out the avatar... uploaded?
@@ -2961,98 +2954,36 @@ function template_admin_warning_above()
 {
 	global $context, $user_info, $scripturl, $txt;
 
-	if (!empty($context['security_controls']['query']))
+	if (!empty($context['security_controls']))
 	{
-		echo '
+		foreach ($context['security_controls'] as $error)
+		{
+			echo '
 	<div class="errorbox">
-		<h3>', $context['user']['is_admin'] ? $txt['query_command_denied'] : $txt['query_command_denied_guests'], '</h3>
+		<h3>', $error['title'], '</h3>
 		<ul>';
 
-		foreach ($context['security_controls']['query'] as $error)
-		{
-			echo '
-			<li><pre>', $context['user']['is_admin'] ? $error : sprintf($txt['query_command_denied_guests_msg'], $error), '</pre></li>';
-		}
-
-		echo '
-		</ul>
-	</div>';
-	}
-
-	if (!empty($context['security_controls']['files']))
-	{
-		echo '
-	<div class="errorbox">
-		<h3>', empty($context['security_controls']['files']['to_remove']) ? $txt['generic_warning'] : $txt['security_risk'], '</h3>
-		<p>';
-
-		if (!empty($context['security_controls']['files']['to_remove']))
-		{
-			foreach ($context['security_controls']['files']['to_remove'] as $securityFile)
+			foreach ($error['messages'] as $text)
 			{
 				echo '
-			', sprintf($txt['not_removed'], $securityFile), '<br />';
-
-                                if ($securityFile == 'Settings.php~' || $securityFile == 'Settings_bak.php~')
-					echo '
-			', sprintf($txt['not_removed_extra'], $securityFile, substr($securityFile, 0, -1)), '<br />';
+			<li class="listlevel1">', $text, '</li>';
 			}
-		}
 
-		if (!empty($context['security_controls']['files']['theme_dir']))
-			echo $context['security_controls']['files']['theme_dir'] . '<br />';
-
-		if (!empty($context['security_controls']['files']['cache']))
 			echo '
-			', $txt['cache_writable'], '<br />';
-
-		if (!empty($context['security_controls']['files']['agreement']))
-			echo '
-			', $txt['agreement_missing'], '<br />';
-
-		echo '
-		</p>
+		</ul>
 	</div>';
+		}
 	}
 
 	// Any special notices to remind the admin about?
-	if (!empty($context['security_controls']['admin_session']) || !empty($context['security_controls']['maintenance']))
+	if (!empty($context['warning_controls']))
 	{
 		echo '
-			<div class="warningbox">';
-
-		if (!empty($context['security_controls']['admin_session']))
-			echo
-				sprintf($txt['admin_session_active'], ($scripturl . '?action=admin;area=adminlogoff;redir;' . $context['session_var'] . '=' . $context['session_id'])) . '<br />';
-
-		if (!empty($context['security_controls']['maintenance']))
-			echo
-				sprintf($txt['admin_maintenance_active'], ($scripturl . '?action=admin;area=serversettings;' . $context['session_var'] . '=' . $context['session_id']));
-
-		echo '
-			</div>';
-	}
-
-	// If the user is banned from posting inform them of it.
-	if (isset($_SESSION['ban']['cannot_post']))
-	{
-		echo '
-			<div class="windowbg ban_cannot_post">
-				', sprintf($txt['you_are_post_banned'], $user_info['is_guest'] ? $txt['guest_title'] : $user_info['name']);
-
-		if (!empty($_SESSION['ban']['cannot_post']['reason']))
-			echo '
-				<div style="padding-left: 4ex; padding-top: 1ex;">', $_SESSION['ban']['cannot_post']['reason'], '</div>';
-
-		if (!empty($_SESSION['ban']['expire_time']))
-			echo '
-				<div>', sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)), '</div>';
-		else
-			echo '
-				<div>', $txt['your_ban_expires_never'], '</div>';
-
-		echo '
-			</div>';
+	<div class="warningbox">
+		<ul>
+			<li class="listlevel1">', implode('</li><li class="listlevel1">', $context['warning_controls']), '</li>
+		</ul>
+	</div>';
 	}
 }
 

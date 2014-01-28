@@ -1790,7 +1790,9 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 		if (!empty($context['user']['is_admin']) && !isset($_GET['th']))
 		{
 			loadLanguage('Errors');
-			$context['security_controls']['files']['theme_dir'] = '<a href="' . $scripturl . '?action=admin;area=theme;sa=list;th=1;' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['theme_dir_wrong'] . '</a>';
+			if (!isset($context['security_controls']['files']['title']))
+				$context['security_controls']['files']['title'] = $txt['generic_warning'];
+			$context['security_controls']['files']['messages']['theme_dir'] = '<a href="' . $scripturl . '?action=admin;area=theme;sa=list;th=1;' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['theme_dir_wrong'] . '</a>';
 		}
 
 		loadTemplate($template_name);
@@ -2716,16 +2718,38 @@ function detectServer()
  */
 function doSecurityChecks()
 {
-	global $modSettings, $context, $maintenance, $user_info;
+	global $modSettings, $context, $maintenance, $user_info, $txt, $scripturl;
 
 	if (allowedTo('admin_forum') && !$user_info['is_guest'])
 	{
+		// If agreement is enabled, at least the english version shall exists
+		if ($modSettings['requireAgreement'] && !file_exists(BOARDDIR . '/agreement.txt'))
+		{
+			$context['security_controls']['files']['title'] = $txt['generic_warning'];
+			$context['security_controls']['files']['messages']['agreement'] = $txt['agreement_missing'];
+		}
+
+		// Cache directory writeable?
+		if (!empty($modSettings['cache_enable']) && !is_writable(CACHEDIR))
+		{
+			$context['security_controls']['files']['title'] = $txt['generic_warning'];
+			$context['security_controls']['files']['messages']['cache'] = $txt['cache_writable'];
+		}
+
 		// @todo add a hook here
 		$securityFiles = array('install.php', 'webinstall.php', 'upgrade.php', 'convert.php', 'repair_paths.php', 'repair_settings.php', 'Settings.php~', 'Settings_bak.php~');
-		foreach ($securityFiles as $i => $securityFile)
+		foreach ($securityFiles as $securityFile)
 		{
 			if (file_exists(BOARDDIR . '/' . $securityFile))
-				$context['security_controls']['files']['to_remove'][] = $securityFile;
+			{
+				$context['security_controls']['files']['title'] = $txt['security_risk'];
+				$context['security_controls']['files']['messages'][$securityFile] = sprintf($txt['not_removed'], $securityFile);
+
+				if ($securityFile == 'Settings.php~' || $securityFile == 'Settings_bak.php~')
+				{
+					$context['security_controls']['files']['messages'][$securityFile] .= '<span class="smalltext">' . sprintf($txt['not_removed_extra'], $securityFile, substr($securityFile, 0, -1)) . '</span>';
+				}
+			}
 		}
 
 		// We are already checking so many files...just few more doesn't make any difference! :P
@@ -2734,36 +2758,59 @@ function doSecurityChecks()
 		secureDirectory($path, true);
 		secureDirectory(CACHEDIR);
 
-		// If agreement is enabled, at least the english version shall exists
-		if ($modSettings['requireAgreement'] && !file_exists(BOARDDIR . '/agreement.txt'))
-			$context['security_controls']['files']['agreement'] = true;
-
-		// Cache directory writeable?
-		if (!empty($modSettings['cache_enable']) && !is_writable(CACHEDIR))
-			$context['security_controls']['files']['cache'] = true;
-
 		// Active admin session?
 		if (empty($modSettings['securityDisable']) && (isset($_SESSION['admin_time']) && $_SESSION['admin_time'] + ($modSettings['admin_session_lifetime'] * 60) > time()))
-			$context['security_controls']['admin_session'] = true;
+			$context['warning_controls']['admin_session'] = sprintf($txt['admin_session_active'], ($scripturl . '?action=admin;area=adminlogoff;redir;' . $context['session_var'] . '=' . $context['session_id']));
 
 		// Maintenance mode enabled?
 		if (!empty($maintenance))
-			$context['security_controls']['maintenance'] = true;
+			$context['warning_controls']['maintenance'] = sprintf($txt['admin_maintenance_active'], ($scripturl . '?action=admin;area=serversettings;' . $context['session_var'] . '=' . $context['session_id']));
 	}
 
 	// Check for database errors.
 	if (!empty($_SESSION['query_command_denied']))
 	{
 		if ($user_info['is_admin'])
+		{
+			$context['security_controls']['query']['title'] = $txt['query_command_denied'];
 			foreach ($_SESSION['query_command_denied'] as $command => $error)
-				$context['security_controls']['query'][$command] = Util::htmlspecialchars($error);
+				$context['security_controls']['query']['messages'][$command] = '<pre>' . Util::htmlspecialchars($error) . '</pre>';
+		}
 		else
+		{
+			$context['security_controls']['query']['title'] = $txt['query_command_denied_guests'];
 			foreach ($_SESSION['query_command_denied'] as $command => $error)
-				$context['security_controls']['query'][$command] = Util::htmlspecialchars($command);
+				$context['security_controls']['query']['messages'][$command] = '<pre>' .  sprintf($txt['query_command_denied_guests_msg'], Util::htmlspecialchars($command)) . '</pre>';
+		}
+	}
+
+	// Are there any members waiting for approval?
+	if (allowedTo('moderate_forum') && ((!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion'])) && !empty($modSettings['unapprovedMembers']))
+	{
+		$context['warning_controls']['unapproved_members'] = sprintf($txt[$modSettings['unapprovedMembers'] == 1 ? 'approve_one_member_waiting' : 'approve_many_members_waiting'], $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve', $modSettings['unapprovedMembers']);
+	}
+
+	if (!empty($context['open_mod_reports']) && empty($user_settings['mod_prefs']) || $user_settings['mod_prefs'][0] == 1)
+		$context['warning_controls']['open_mod_reports'] = '<a href="' . $scripturl . '?action=moderate;area=reports">' . sprintf($txt['mod_reports_waiting'], $context['open_mod_reports']) . '</a>';
+
+	if (isset($_SESSION['ban']['cannot_post']))
+	{
+		// An admin cannot be banned (technically he could), and if it is better he knows.
+		$context['security_controls']['ban']['title'] = sprintf($txt['you_are_post_banned'], $user_info['is_guest'] ? $txt['guest_title'] : $user_info['name']);
+
+		$context['security_controls']['ban']['messages']['reason'] = '';
+
+		if (!empty($_SESSION['ban']['cannot_post']['reason']))
+			$context['security_controls']['ban']['messages']['reason'] = $_SESSION['ban']['cannot_post']['reason'];
+
+		if (!empty($_SESSION['ban']['expire_time']))
+			$context['security_controls']['ban']['messages']['reason'] .= '<span class="smalltext">' . sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) . '</span>';
+		else
+			$context['security_controls']['ban']['messages']['reason'] .= '<span class="smalltext">' . $txt['your_ban_expires_never'] . '</span>';
 	}
 
 	// Finally, let's show the layer.
-	if (!empty($context['security_controls']))
+	if (!empty($context['security_controls']) || !empty($context['warning_controls']))
 		Template_Layers::getInstance()->addAfter('admin_warning', 'body');
 }
 

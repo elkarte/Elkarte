@@ -43,7 +43,7 @@ function template_view_scheduled_tasks()
 				echo
 				isset($txt['scheduled_task_' . $task]) ? $txt['scheduled_task_' . $task] : $task, '
 				<ul>
-					<li>', implode('</li><li>', $errors), '</li>
+					<li class="listlevel1">', implode('</li><li class="listlevel1">', $errors), '</li>
 				</ul>';
 			}
 
