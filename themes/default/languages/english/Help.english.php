@@ -197,7 +197,7 @@ $helptxt['warning_enable'] = '<strong>User Warning System</strong><br />
 			If this warning level is passed by a member they will find themselves under a post ban. The member will lose all posting rights.
 		</li>
 		<li>
-			<strong>Maximum Member Warning Point per Day</strong><br />
+			<strong>Maximum Member Warning Points per Day</strong><br />
 			This setting limits the amount of points a moderator may add/remove to any particular member in a twenty four hour period. This will
 			can be used to limit what a moderator can do in a small period of time. This setting can be disabled by setting to a value of zero. Note that
 			any member with administrator permissions are not affected by this value.
