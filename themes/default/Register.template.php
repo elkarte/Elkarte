@@ -689,7 +689,7 @@ function template_edit_agreement()
 	// Show the actual agreement in an oversized text box.
 	echo '
 					<p class="agreement">
-						<textarea cols="70" rows="20" name="agreement" id="agreement">', $context['agreement'], '</textarea>
+						<textarea cols="70" rows="10" name="agreement" id="agreement">', $context['agreement'], '</textarea>
 					</p>
 					<p>
 						<label for="requireAgreement"><input type="checkbox" name="requireAgreement" id="requireAgreement"', $context['require_agreement'] ? ' checked="checked"' : '', ' tabindex="', $context['tabindex']++, '" value="1" class="input_check" /> ', $txt['admin_agreement'], '.</label>
