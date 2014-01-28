@@ -971,14 +971,16 @@ function template_show_settings()
 				elseif ($config_var['type'] == 'select')
 				{
 					echo '
-							<select name="', $config_var['name'], '" id="', $config_var['name'], '" ', $javascript, $disabled, (!empty($config_var['multiple']) ? ' multiple="multiple"' : ''), '>';
+							<div class="styled-select">
+								<select name="', $config_var['name'], '" id="', $config_var['name'], '" ', $javascript, $disabled, (!empty($config_var['multiple']) ? ' multiple="multiple"' : ''), '>';
 
 					foreach ($config_var['data'] as $option)
 						echo '
-								<option value="', $option[0], '"', (!empty($config_var['value']) && ($option[0] == $config_var['value'] || (!empty($config_var['multiple']) && in_array($option[0], $config_var['value']))) ? ' selected="selected"' : ''), '>', $option[1], '</option>';
+									<option value="', $option[0], '"', (!empty($config_var['value']) && ($option[0] == $config_var['value'] || (!empty($config_var['multiple']) && in_array($option[0], $config_var['value']))) ? ' selected="selected"' : ''), '>', $option[1], '</option>';
 
 					echo '
-							</select>';
+								</select>
+							</div>';
 				}
 				// Text area?
 				elseif ($config_var['type'] == 'large_text')
@@ -1179,14 +1181,16 @@ function template_callback_question_answer_list()
 		if (!empty($context['languages']))
 		{
 			echo '
-				<select name="language[', $data['id_question'], ']">';
+				<div class="styled-select">
+					<select name="language[', $data['id_question'], ']">';
 
 			foreach ($context['languages'] as $lang)
 				echo '
-					<option value="', $lang['filename'], '"', $lang['filename'] == $data['language'] ? ' selected="selected"' : '', '>', $lang['name'], '</option>';
+						<option value="', $lang['filename'], '"', $lang['filename'] == $data['language'] ? ' selected="selected"' : '', '>', $lang['name'], '</option>';
 
 			echo '
-				</select>';
+					</select>
+				</div>';
 		}
 
 		echo '
@@ -1207,6 +1211,7 @@ function template_callback_question_answer_list()
 	if (!empty($context['languages']))
 	{
 		$lang_dropdown .= '
+			<div class="styled-select">
 				<select name="language[b-%question_last_blank%]">';
 
 		foreach ($context['languages'] as $lang)
@@ -1214,7 +1219,8 @@ function template_callback_question_answer_list()
 					<option value="' . $lang['filename'] . '"' . ($lang['selected'] ? ' selected="selected"' : '') . '>' . $lang['name'] . '</option>';
 
 		$lang_dropdown .= '
-				</select>';
+				</select>
+			</div>';
 	}
 
 	// Some blank ones.
@@ -1453,11 +1459,13 @@ function template_admin_quick_search()
 			<form action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="UTF-8" id="quick_search" class="floatright">
 				<img class="icon" src="', $settings['images_url'], '/filter.png" alt="" />
 				<input type="text" name="search_term" placeholder="', $txt['admin_search'], '" class="input_text" />
-				<select name="search_type">
-					<option value="internal"', (empty($context['admin_preferences']['sb']) || $context['admin_preferences']['sb'] == 'internal' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_internal'], '</option>
-					<option value="member"', (!empty($context['admin_preferences']['sb']) && $context['admin_preferences']['sb'] == 'member' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_member'], '</option>
-					<option value="online"', (!empty($context['admin_preferences']['sb']) && $context['admin_preferences']['sb'] == 'online' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_online'], '</option>
-				</select>
+				<div class="styled-select">
+					<select name="search_type">
+						<option value="internal"', (empty($context['admin_preferences']['sb']) || $context['admin_preferences']['sb'] == 'internal' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_internal'], '</option>
+						<option value="member"', (!empty($context['admin_preferences']['sb']) && $context['admin_preferences']['sb'] == 'member' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_member'], '</option>
+						<option value="online"', (!empty($context['admin_preferences']['sb']) && $context['admin_preferences']['sb'] == 'online' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_online'], '</option>
+					</select>
+				</div>
 				<input type="submit" name="search_go" id="search_go" value="', $txt['admin_search_go'], '" class="button_submit" />
 			</form>';
 }

@@ -407,12 +407,14 @@ function template_unapproved_posts()
 	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && !empty($context['unapproved_items']))
 		$quick_mod = '
 					<div class="floatright">
-						<select name="do" onchange="if (this.value != 0 &amp;&amp; confirm(\'' . $txt['mc_unapproved_sure'] . '\')) submit();">
-							<option value="0">' . $txt['with_selected'] . ':</option>
-							<option value="0" disabled="disabled">' . str_repeat('&#8212;', strlen($txt['approve'])) . '</option>
-							<option value="approve">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $txt['approve'] . '</option>
-							<option value="delete">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $txt['remove'] . '</option>
-						</select>
+						<div class="styled-select">
+							<select name="do" onchange="if (this.value != 0 &amp;&amp; confirm(\'' . $txt['mc_unapproved_sure'] . '\')) submit();">
+								<option value="0">' . $txt['with_selected'] . ':</option>
+								<option value="0" disabled="disabled">' . str_repeat('&#8212;', strlen($txt['approve'])) . '</option>
+								<option value="approve">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $txt['approve'] . '</option>
+								<option value="delete">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $txt['remove'] . '</option>
+							</select>
+						</div>
 						<noscript>
 							<input type="submit" name="mc_go" value="' . $txt['go'] . '" class="button_submit submitgo" />
 						</noscript>
@@ -566,11 +568,13 @@ function template_moderation_settings()
 							<strong><label for="mod_notify_report">', $txt['mc_prefs_notify_report'], '</label>:</strong>
 						</dt>
 						<dd>
-							<select id="mod_notify_report" name="mod_notify_report">
-								<option value="0" ', $context['mod_settings']['notify_report'] == 0 ? 'selected="selected"' : '', '>', $txt['mc_prefs_notify_report_never'], '</option>
-								<option value="1" ', $context['mod_settings']['notify_report'] == 1 ? 'selected="selected"' : '', '>', $txt['mc_prefs_notify_report_moderator'], '</option>
-								<option value="2" ', $context['mod_settings']['notify_report'] == 2 ? 'selected="selected"' : '', '>', $txt['mc_prefs_notify_report_always'], '</option>
-							</select>
+							<div class="styled-select">
+								<select id="mod_notify_report" name="mod_notify_report">
+									<option value="0" ', $context['mod_settings']['notify_report'] == 0 ? 'selected="selected"' : '', '>', $txt['mc_prefs_notify_report_never'], '</option>
+									<option value="1" ', $context['mod_settings']['notify_report'] == 1 ? 'selected="selected"' : '', '>', $txt['mc_prefs_notify_report_moderator'], '</option>
+									<option value="2" ', $context['mod_settings']['notify_report'] == 2 ? 'selected="selected"' : '', '>', $txt['mc_prefs_notify_report_always'], '</option>
+								</select>
+							</div>
 						</dd>';
 	}
 

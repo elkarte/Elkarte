@@ -65,32 +65,36 @@ function template_manage_themes()
 								<label for="theme_guests">', $txt['theme_guests'], ':</label>
 							</dt>
 							<dd>
-								<select name="options[theme_guests]" id="theme_guests">';
+								<div class="styled-select">
+									<select name="options[theme_guests]" id="theme_guests">';
 
 	// Put an option for each theme in the select box.
 	foreach ($context['themes'] as $theme)
 		echo '
-									<option value="', $theme['id'], '"', $modSettings['theme_guests'] == $theme['id'] ? ' selected="selected"' : '', '>', $theme['name'], '</option>';
+										<option value="', $theme['id'], '"', $modSettings['theme_guests'] == $theme['id'] ? ' selected="selected"' : '', '>', $theme['name'], '</option>';
 
 	echo '
-								</select>
+									</select>
+								</div>
 								<span class="smalltext pick_theme"><a href="', $scripturl, '?action=theme;sa=pick;u=-1;', $context['session_var'], '=', $context['session_id'], '">', $txt['theme_select'], '</a></span>
 							</dd>
 							<dt>
 								<label for="theme_reset">', $txt['theme_reset'], '</label>:
 							</dt>
 							<dd>
-								<select name="theme_reset" id="theme_reset">
-									<option value="-1" selected="selected">', $txt['theme_nochange'], '</option>
-									<option value="0">', $txt['theme_forum_default'], '</option>';
+								<div class="styled-select">
+									<select name="theme_reset" id="theme_reset">
+										<option value="-1" selected="selected">', $txt['theme_nochange'], '</option>
+										<option value="0">', $txt['theme_forum_default'], '</option>';
 
 	// Same thing, this time for changing the theme of everyone.
 	foreach ($context['themes'] as $theme)
 		echo '
-									<option value="', $theme['id'], '">', $theme['name'], '</option>';
+										<option value="', $theme['id'], '">', $theme['name'], '</option>';
 
 	echo '
-								</select>
+									</select>
+								</div>
 								<span class="smalltext pick_theme"><a href="', $scripturl, '?action=theme;sa=pick;u=0;', $context['session_var'], '=', $context['session_id'], '">', $txt['theme_select'], '</a></span>
 							</dd>
 						</dl>
@@ -308,11 +312,13 @@ function template_set_options()
 		// Show the change option box ?
 		if ($context['theme_options_reset'])
 			echo '
-							<span class="floatleft"><select name="', !empty($setting['default']) ? 'default_' : '', 'options_master[', $setting['id'], ']" onchange="this.form.options_', $setting['id'], '.disabled = this.selectedIndex != 1;">
-								<option value="0" selected="selected">', $txt['themeadmin_reset_options_none'], '</option>
-								<option value="1">', $txt['themeadmin_reset_options_change'], '</option>
-								<option value="2">', $txt['themeadmin_reset_options_default'], '</option>
-							</select>&nbsp;</span>';
+							<div class="styled-select">
+								<select name="', !empty($setting['default']) ? 'default_' : '', 'options_master[', $setting['id'], ']" onchange="this.form.options_', $setting['id'], '.disabled = this.selectedIndex != 1;">
+									<option value="0" selected="selected">', $txt['themeadmin_reset_options_none'], '</option>
+									<option value="1">', $txt['themeadmin_reset_options_change'], '</option>
+									<option value="2">', $txt['themeadmin_reset_options_default'], '</option>
+								</select>
+							</div>';
 
 		// Display checkbox options
 		if ($setting['type'] == 'checkbox')
@@ -342,14 +348,16 @@ function template_set_options()
 			echo '
 						</dt>
 						<dd ', $context['theme_options_reset'] ? 'style="width:40%"' : '', '>
-							&nbsp;<select class="floatleft" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="options_', $setting['id'], '"', $context['theme_options_reset'] ? ' disabled="disabled"' : '', '>';
+							<div class="styled-select">
+								<select class="floatleft" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="options_', $setting['id'], '"', $context['theme_options_reset'] ? ' disabled="disabled"' : '', '>';
 
 			foreach ($setting['options'] as $value => $label)
 				echo '
-								<option value="', $value, '"', $value == $setting['value'] ? ' selected="selected"' : '', '>', $label, '</option>';
+									<option value="', $value, '"', $value == $setting['value'] ? ' selected="selected"' : '', '>', $label, '</option>';
 
 			echo '
-							</select>';
+								</select>
+							</div>';
 		}
 		// a textbox it is then
 		else
@@ -467,14 +475,16 @@ function template_set_settings()
 							<label for="variant">', $txt['theme_variants_default'], '</label>:
 						</dt>
 						<dd>
-							<select id="variant" name="options[default_variant]" onchange="changeVariant(this.value)">';
+							<div class="styled-select">
+								<select id="variant" name="options[default_variant]" onchange="changeVariant(this.value)">';
 
 		foreach ($context['theme_variants'] as $key => $variant)
 			echo '
-								<option value="', $key, '" ', $context['default_variant'] == $key ? 'selected="selected"' : '', '>', $variant['label'], '</option>';
+									<option value="', $key, '" ', $context['default_variant'] == $key ? 'selected="selected"' : '', '>', $variant['label'], '</option>';
 
 		echo '
-							</select>
+								</select>
+							</div>
 						</dd>
 						<dt>
 							<label for="disable_user_variant">', $txt['theme_variants_user_disable'], '</label>:
@@ -556,14 +566,16 @@ function template_set_settings()
 			echo '
 						</dt>
 						<dd id="dd_', $setting['id'], '">
-							<select name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="', $setting['id'], '">';
+							<div class="styled-select">
+								<select name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="', $setting['id'], '">';
 
 			foreach ($setting['options'] as $value => $label)
 				echo '
-							<option value="', $value, '"', $value == $setting['value'] ? ' selected="selected"' : '', '>', $label, '</option>';
+									<option value="', $value, '"', $value == $setting['value'] ? ' selected="selected"' : '', '>', $label, '</option>';
 
 			echo '
-							</select>
+								</select>
+							</div>
 						</dd>';
 		}
 		// A regular input box, then?
@@ -643,16 +655,18 @@ function template_pick()
 		{
 			echo '
 					<label for="variant', $theme['id'], '"><strong>', $theme['pick_label'], '</strong></label>:
-					<select id="variant', $theme['id'], '" name="vrt[', $theme['id'], ']" onchange="changeVariant', $theme['id'], '(this.value);">';
+					<div class="styled-select">
+						<select id="variant', $theme['id'], '" name="vrt[', $theme['id'], ']" onchange="changeVariant', $theme['id'], '(this.value);">';
 
 			foreach ($theme['variants'] as $key => $variant)
 			{
 				echo '
-						<option value="', $key, '" ', $theme['selected_variant'] == $key ? 'selected="selected"' : '', '>', $variant['label'], '</option>';
+							<option value="', $key, '" ', $theme['selected_variant'] == $key ? 'selected="selected"' : '', '>', $variant['label'], '</option>';
 			}
 
 			echo '
-					</select>
+						</select>
+					</div>
 					<noscript>
 						<input type="submit" name="save[', $theme['id'], ']" value="', $txt['save'], '" class="right_submit" />
 					</noscript>';

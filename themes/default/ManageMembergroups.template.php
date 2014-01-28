@@ -92,38 +92,44 @@ function template_new_group()
 								<legend>', $txt['membergroups_select_permission_type'], '</legend>
 								<input type="radio" name="perm_type" id="perm_type_inherit" value="inherit" checked="checked" class="input_radio" />
 								<label for="perm_type_inherit">', $txt['membergroups_new_as_inherit'], ':</label>
-								<select name="inheritperm" id="inheritperm_select" onclick="document.getElementById(\'perm_type_inherit\').checked = true;">
-									<option value="-1">', $txt['membergroups_guests'], '</option>
-									<option value="0" selected="selected">', $txt['membergroups_members'], '</option>';
+								<div class="styled-select">
+									<select name="inheritperm" id="inheritperm_select" onclick="document.getElementById(\'perm_type_inherit\').checked = true;">
+										<option value="-1">', $txt['membergroups_guests'], '</option>
+										<option value="0" selected="selected">', $txt['membergroups_members'], '</option>';
 
 		foreach ($context['groups'] as $group)
 			echo '
-									<option value="', $group['id'], '">', $group['name'], '</option>';
+										<option value="', $group['id'], '">', $group['name'], '</option>';
 
 		echo '
-								</select>
+									</select>
+								</div>
 								<br />
 								<input type="radio" name="perm_type" id="perm_type_copy" value="copy" class="input_radio" />
 								<label for="perm_type_copy">', $txt['membergroups_new_as_copy'], ':</label>
-								<select name="copyperm" id="copyperm_select" onclick="document.getElementById(\'perm_type_copy\').checked = true;">
-									<option value="-1">', $txt['membergroups_guests'], '</option>
-									<option value="0" selected="selected">', $txt['membergroups_members'], '</option>';
+								<div class="styled-select">
+									<select name="copyperm" id="copyperm_select" onclick="document.getElementById(\'perm_type_copy\').checked = true;">
+										<option value="-1">', $txt['membergroups_guests'], '</option>
+										<option value="0" selected="selected">', $txt['membergroups_members'], '</option>';
 
 		foreach ($context['groups'] as $group)
 			echo '
-									<option value="', $group['id'], '">', $group['name'], '</option>';
+										<option value="', $group['id'], '">', $group['name'], '</option>';
 
 		echo '
-								</select>
+									</select>
+								</div>
 								<br />
 								<input type="radio" name="perm_type" id="perm_type_predefined" value="predefined" class="input_radio" />
 								<label for="perm_type_predefined">', $txt['membergroups_new_as_type'], ':</label>
-								<select name="level" id="level_select" onclick="document.getElementById(\'perm_type_predefined\').checked = true;">
-									<option value="restrict">', $txt['permitgroups_restrict'], '</option>
-									<option value="standard" selected="selected">', $txt['permitgroups_standard'], '</option>
-									<option value="moderator">', $txt['permitgroups_moderator'], '</option>
-									<option value="maintenance">', $txt['permitgroups_maintenance'], '</option>
-								</select>
+								<div class="styled-select">
+									<select name="level" id="level_select" onclick="document.getElementById(\'perm_type_predefined\').checked = true;">
+										<option value="restrict">', $txt['permitgroups_restrict'], '</option>
+										<option value="standard" selected="selected">', $txt['permitgroups_standard'], '</option>
+										<option value="moderator">', $txt['permitgroups_moderator'], '</option>
+										<option value="maintenance">', $txt['permitgroups_maintenance'], '</option>
+									</select>
+								</div>
 							</fieldset>
 						</dd>';
 	}
@@ -234,11 +240,13 @@ function template_edit_group()
 						<label for="group_hidden_input"><strong>', $txt['membergroups_edit_hidden'], ':</strong></label>
 					</dt>
 					<dd>
-						<select name="group_hidden" id="group_hidden_input" onchange="if (this.value == 2 &amp;&amp; !confirm(\'', $txt['membergroups_edit_hidden_warning'], '\')) this.value = 0;">
-							<option value="0" ', $context['group']['hidden'] ? '' : 'selected="selected"', '>', $txt['membergroups_edit_hidden_no'], '</option>
-							<option value="1" ', $context['group']['hidden'] == 1 ? 'selected="selected"' : '', '>', $txt['membergroups_edit_hidden_boardindex'], '</option>
-							<option value="2" ', $context['group']['hidden'] == 2 ? 'selected="selected"' : '', '>', $txt['membergroups_edit_hidden_all'], '</option>
-						</select>
+						<div class="styled-select">
+							<select name="group_hidden" id="group_hidden_input" onchange="if (this.value == 2 &amp;&amp; !confirm(\'', $txt['membergroups_edit_hidden_warning'], '\')) this.value = 0;">
+								<option value="0" ', $context['group']['hidden'] ? '' : 'selected="selected"', '>', $txt['membergroups_edit_hidden_no'], '</option>
+								<option value="1" ', $context['group']['hidden'] == 1 ? 'selected="selected"' : '', '>', $txt['membergroups_edit_hidden_boardindex'], '</option>
+								<option value="2" ', $context['group']['hidden'] == 2 ? 'selected="selected"' : '', '>', $txt['membergroups_edit_hidden_all'], '</option>
+							</select>
+						</div>
 					</dd>';
 
 	// Can they inherit permissions?
@@ -250,18 +258,20 @@ function template_edit_group()
 						<span class="smalltext">', $txt['membergroups_edit_inherit_permissions_desc'], '</span>
 					</dt>
 					<dd>
-						<select name="group_inherit" id="group_inherit_input">
-							<option value="-2">', $txt['membergroups_edit_inherit_permissions_no'], '</option>
-							<option value="-1" ', $context['group']['inherited_from'] == -1 ? 'selected="selected"' : '', '>', $txt['membergroups_edit_inherit_permissions_from'], ': ', $txt['membergroups_guests'], '</option>
-							<option value="0" ', $context['group']['inherited_from'] == 0 ? 'selected="selected"' : '', '>', $txt['membergroups_edit_inherit_permissions_from'], ': ', $txt['membergroups_members'], '</option>';
+						<div class="styled-select">
+							<select name="group_inherit" id="group_inherit_input">
+								<option value="-2">', $txt['membergroups_edit_inherit_permissions_no'], '</option>
+								<option value="-1" ', $context['group']['inherited_from'] == -1 ? 'selected="selected"' : '', '>', $txt['membergroups_edit_inherit_permissions_from'], ': ', $txt['membergroups_guests'], '</option>
+								<option value="0" ', $context['group']['inherited_from'] == 0 ? 'selected="selected"' : '', '>', $txt['membergroups_edit_inherit_permissions_from'], ': ', $txt['membergroups_members'], '</option>';
 
 		// For all the inheritable groups show an option.
 		foreach ($context['inheritable_groups'] as $id => $group)
 			echo '
-							<option value="', $id, '" ', $context['group']['inherited_from'] == $id ? 'selected="selected"' : '', '>', $txt['membergroups_edit_inherit_permissions_from'], ': ', $group, '</option>';
+								<option value="', $id, '" ', $context['group']['inherited_from'] == $id ? 'selected="selected"' : '', '>', $txt['membergroups_edit_inherit_permissions_from'], ': ', $group, '</option>';
 
 		echo '
-						</select>
+							</select>
+						</div>
 						<input type="hidden" name="old_inherit" value="', $context['group']['inherited_from'], '" />
 					</dd>';
 	}
@@ -426,12 +436,14 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 										<strong>', $category['name'], '</strong>
 										<span class="select_all_box">
 											<label for="a', $category['id'], '">', $txt['all_boards_in_cat'], ': </label>
-											<select id="a', $category['id'], '" onchange="select_in_category(', $category['id'], ', this, [', implode(',', array_keys($category['boards'])), ']);">
-												<option>---</option>
-												<option value="allow">', $txt['board_perms_allow'], '</option>
-												<option value="ignore">', $txt['board_perms_ignore'], '</option>
-												<option value="deny">', $txt['board_perms_deny'], '</option>
-											</select>
+											<div class="styled-select">
+												<select id="a', $category['id'], '" onchange="select_in_category(', $category['id'], ', this, [', implode(',', array_keys($category['boards'])), ']);">
+													<option>---</option>
+													<option value="allow">', $txt['board_perms_allow'], '</option>
+													<option value="ignore">', $txt['board_perms_ignore'], '</option>
+													<option value="deny">', $txt['board_perms_deny'], '</option>
+												</select>
+											</div>
 										</span>
 										<ul id="boards_list_', $category['id'], '">';
 

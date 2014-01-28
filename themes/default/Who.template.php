@@ -30,13 +30,15 @@ function template_whos_selection_above()
 
 	$extra = '
 			<div class="selectbox floatright"><label for="show_top">' . $txt['who_show1'] . '</label>
-				<select name="show_top" id="show_top" onchange="document.forms.whoFilter.show.value = this.value; document.forms.whoFilter.submit();">';
+				<div class="styled-select">
+					<select name="show_top" id="show_top" onchange="document.forms.whoFilter.show.value = this.value; document.forms.whoFilter.submit();">';
 
 	foreach ($context['show_methods'] as $value => $label)
 		$extra .= '
-					<option value="' . $value . '" ' . ($value == $context['show_by'] ? ' selected="selected"' : '') . '>' . $label . '</option>';
+						<option value="' . $value . '" ' . ($value == $context['show_by'] ? ' selected="selected"' : '') . '>' . $label . '</option>';
 	$extra .= '
-				</select>
+					</select>
+				</div>
 				<noscript>
 					<input type="submit" name="submit_top" value="' . $txt['go'] . '" class="button_submit submitgo" />
 				</noscript>
@@ -121,13 +123,15 @@ function template_whos_selection_below()
 
 	$extra = '
 			<div class="selectbox floatright"><label for="show">' . $txt['who_show1'] . '</label>
-				<select name="show" id="show" onchange="document.forms.whoFilter.submit();">';
+				<div class="styled-select">
+					<select name="show" id="show" onchange="document.forms.whoFilter.submit();">';
 
 	foreach ($context['show_methods'] as $value => $label)
 		$extra .= '
-					<option value="' . $value . '" ' . ($value == $context['show_by'] ? ' selected="selected"' : '') . '>' . $label . '</option>';
+						<option value="' . $value . '" ' . ($value == $context['show_by'] ? ' selected="selected"' : '') . '>' . $label . '</option>';
 	$extra .= '
-				</select>
+					</select>
+				</div>
 				<noscript>
 					<input type="submit" name="submit_top" value="' . $txt['go'] . '" class="button_submit submitgo" />
 				</noscript>
