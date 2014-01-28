@@ -2739,7 +2739,7 @@ dl.merge_topic dd {
 #detailedinfo {
 	float: right;
 	width: 70%;
-	margin-top: 4px;
+	margin-top: 0;
 }
 #basicinfo h4 {
 	overflow: hidden;
