@@ -1044,20 +1044,20 @@ function template_file_permissions()
 		</div>
 	</div>
 
-	<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=packages;sa=perms;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
+	<form id="admin_form_wrapper" class="file_permissions" action="', $scripturl, '?action=admin;area=packages;sa=perms;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
 		<h2 class="category_header">
 			<span class="floatleft">', $txt['package_file_perms'], '</span><span class="fperm floatright">', $txt['package_file_perms_new_status'], '</span>
 		</h2>
 		<table class="table_grid">
 			<thead>
 				<tr class="table_head">
-					<th class="lefttext" style="width:30%">&nbsp;', $txt['package_file_perms_name'], '&nbsp;</th>
-					<th class="lefttext" style="width:30%">', $txt['package_file_perms_status'], '</th>
-					<th class="centertext" style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_read'], '</span></th>
-					<th class="centertext" style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_write'], '</span></th>
-					<th class="centertext" style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_execute'], '</span></th>
-					<th class="centertext" style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_custom'], '</span></th>
-					<th class="centertext" style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_no_change'], '</span></th>
+					<th class="lefttext grid30">&nbsp;', $txt['package_file_perms_name'], '&nbsp;</th>
+					<th class="lefttext grid30">', $txt['package_file_perms_status'], '</th>
+					<th class="centertext grid8"><span class="filepermissions">', $txt['package_file_perms_status_read'], '</span></th>
+					<th class="centertext grid8"><span class="filepermissions">', $txt['package_file_perms_status_write'], '</span></th>
+					<th class="centertext grid8"><span class="filepermissions">', $txt['package_file_perms_status_execute'], '</span></th>
+					<th class="centertext grid8"><span class="filepermissions">', $txt['package_file_perms_status_custom'], '</span></th>
+					<th class="centertext grid8"><span class="filepermissions">', $txt['package_file_perms_status_no_change'], '</span></th>
 				</tr>
 			</thead>
 			<tbody>';
@@ -1066,24 +1066,24 @@ function template_file_permissions()
 	{
 		echo '
 				<tr class="windowbg2">
-					<td style="width:30%"><strong>';
+					<td class="grid30"><strong>';
 
 		if (!empty($dir['type']) && ($dir['type'] == 'dir' || $dir['type'] == 'dir_recursive'))
 			echo '
 						<img src="', $settings['default_images_url'], '/board.png" alt="*" />';
 
 		echo '
-						', $name, '
-					</strong></td>
-					<td style="width:30%">
+						', $name, '</strong>
+					</td>
+					<td class="grid30">
 						<span style="color: ', ($dir['perms']['chmod'] ? 'green' : 'red'), '">', ($dir['perms']['chmod'] ? $txt['package_file_perms_writable'] : $txt['package_file_perms_not_writable']), '</span>
 						', ($dir['perms']['perms'] ? '&nbsp;(' . $txt['package_file_perms_chmod'] . ': ' . substr(sprintf('%o', $dir['perms']['perms']), -4) . ')' : ''), '
 					</td>
-					<td class="perm_read centertext" style="width:8%"><input type="radio" name="permStatus[', $name, ']" value="read" class="input_radio" /></td>
-					<td class="perm_write centertext" style="width:8%"><input type="radio" name="permStatus[', $name, ']" value="writable" class="input_radio" /></td>
-					<td class="perm_execute centertext" style="width:8%"><input type="radio" name="permStatus[', $name, ']" value="execute" class="input_radio" /></td>
-					<td class="perm_custom centertext" style="width:8%"><input type="radio" name="permStatus[', $name, ']" value="custom" class="input_radio" /></td>
-					<td class="perm_nochange centertext" style="width:8%"><input type="radio" name="permStatus[', $name, ']" value="no_change" checked="checked" class="input_radio" /></td>
+					<td class="perm_read centertext grid8"><input type="radio" name="permStatus[', $name, ']" value="read" class="input_radio" /></td>
+					<td class="perm_write centertext grid8"><input type="radio" name="permStatus[', $name, ']" value="writable" class="input_radio" /></td>
+					<td class="perm_execute centertext grid8"><input type="radio" name="permStatus[', $name, ']" value="execute" class="input_radio" /></td>
+					<td class="perm_custom centertext grid8"><input type="radio" name="permStatus[', $name, ']" value="custom" class="input_radio" /></td>
+					<td class="perm_nochange centertext grid8"><input type="radio" name="permStatus[', $name, ']" value="no_change" checked="checked" class="input_radio" /></td>
 				</tr>
 			';
 
@@ -1182,7 +1182,7 @@ function template_permission_show_contents($ident, $contents, $level, $has_more 
 			$cur_ident = preg_replace('~[^A-Za-z0-9_\-=:]~', ':-:', $ident . '/' . $name);
 			echo '
 				<tr class="windowbg" id="content_', $cur_ident, '">
-					<td class="smalltext" style="width:30%">' . str_repeat('&nbsp;', $level * 5), '
+					<td class="smalltext grid30">' . str_repeat('&nbsp;', $level * 5), '
 						', (!empty($dir['type']) && $dir['type'] == 'dir_recursive') || !empty($dir['list_contents']) ? '<a id="link_' . $cur_ident . '" href="' . $scripturl . '?action=admin;area=packages;sa=perms;find=' . base64_encode($ident . '/' . $name) . ';back_look=' . $context['back_look_data'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '#fol_' . $cur_ident . '" onclick="return expandFolder(\'' . $cur_ident . '\', \'' . addcslashes($ident . '/' . $name, "'\\") . '\');">' : '';
 
 			if (!empty($dir['type']) && ($dir['type'] == 'dir' || $dir['type'] == 'dir_recursive'))
@@ -1193,15 +1193,15 @@ function template_permission_show_contents($ident, $contents, $level, $has_more 
 						', $name, '
 						', (!empty($dir['type']) && $dir['type'] == 'dir_recursive') || !empty($dir['list_contents']) ? '</a>' : '', '
 					</td>
-					<td class="smalltext">
+					<td class="smalltext grid30">
 						<span class="', ($dir['perms']['chmod'] ? 'success' : 'error'), '">', ($dir['perms']['chmod'] ? $txt['package_file_perms_writable'] : $txt['package_file_perms_not_writable']), '</span>
 						', ($dir['perms']['perms'] ? '&nbsp;(' . $txt['package_file_perms_chmod'] . ': ' . substr(sprintf('%o', $dir['perms']['perms']), -4) . ')' : ''), '
 					</td>
-					<td class="perm_read centertext" style="width:8%"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="read" class="input_radio" /></td>
-					<td class="perm_write centertext" style="width:8%"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="writable" class="input_radio" /></td>
-					<td class="perm_execute centertext" style="width:8%"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="execute" class="input_radio" /></td>
-					<td class="perm_custom centertext" style="width:8%"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="custom" class="input_radio" /></td>
-					<td class="perm_nochange centertext" style="width:8%"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="no_change" checked="checked" class="input_radio" /></td>
+					<td class="perm_read centertext grid8"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="read" class="input_radio" /></td>
+					<td class="perm_write centertext grid8"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="writable" class="input_radio" /></td>
+					<td class="perm_execute centertext grid8"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="execute" class="input_radio" /></td>
+					<td class="perm_custom centertext grid8"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="custom" class="input_radio" /></td>
+					<td class="perm_nochange centertext grid8"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="no_change" checked="checked" class="input_radio" /></td>
 				</tr>
 				<tr id="insert_div_loc_' . $cur_ident . '" style="display: none;"><td colspan="7"></td></tr>';
 

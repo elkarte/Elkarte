@@ -686,6 +686,14 @@ dl.admin_permissions dd {
 	width: 64%;
 }
 
+/* Styles for the package manager file permissions
+------------------------------------------------- */
+.file_permissions .table_grid {
+	table-layout: fixed;
+	word-wrap: break-word;
+	hyphens: auto;
+}
+
 /* Styles for the manage search section.
 ------------------------------------------------- */
 dl.settings dt.large_caption {
