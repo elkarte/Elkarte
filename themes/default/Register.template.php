@@ -35,16 +35,19 @@ function template_registration_agreement()
 		else
 		{
 			echo '
-				<select onchange="this.form.submit()" class="floatright" name="lngfile">';
+				<div class="styled-select">
+					<select onchange="this.form.submit()" class="floatright" name="lngfile">';
 
 			foreach ($context['languages'] as $lang_key => $lang_val)
 				echo '
-					<option value="', $lang_key, '"', empty($lang_val['selected']) ? '' : ' selected="selected"', '>', $lang_val['name'], '</option>';
+						<option value="', $lang_key, '"', empty($lang_val['selected']) ? '' : ' selected="selected"', '>', $lang_val['name'], '</option>';
 
 			echo '
-				</select>';
+					</select>
+				</div>';
 		}
 	}
+
 	echo '
 			</h2>
 			<div class="roundframe">
@@ -288,7 +291,8 @@ function template_registration_form()
 				elseif ($field['type'] == 'select')
 				{
 					echo '
-							<select name="', $key, '" id="', $key, '" tabindex="', $context['tabindex']++, '">';
+							<div class="styled-select">
+								<select name="', $key, '" id="', $key, '" tabindex="', $context['tabindex']++, '">';
 
 					if (isset($field['options']))
 					{
@@ -300,11 +304,12 @@ function template_registration_form()
 						if (is_array($field['options']))
 							foreach ($field['options'] as $value => $name)
 								echo '
-								<option value="', $value, '" ', $value == $field['value'] ? 'selected="selected"' : '', '>', $name, '</option>';
+									<option value="', $value, '" ', $value == $field['value'] ? 'selected="selected"' : '', '>', $name, '</option>';
 					}
 
 					echo '
-							</select>';
+								</select>
+							</div>';
 				}
 
 				// Something to end with?
@@ -593,14 +598,16 @@ function template_admin_register()
 							<span class="smalltext">', $txt['admin_register_group_desc'], '</span>
 						</dt>
 						<dd>
-							<select name="group" id="group_select" tabindex="', $context['tabindex']++, '">';
+							<div class="styled-select">
+								<select name="group" id="group_select" tabindex="', $context['tabindex']++, '">';
 
 		foreach ($context['member_groups'] as $id => $name)
 			echo '
-								<option value="', $id, '">', $name, '</option>';
+									<option value="', $id, '">', $name, '</option>';
 
 		echo '
-							</select>
+								</select>
+							</div>
 						</dd>';
 	}
 
@@ -660,14 +667,16 @@ function template_edit_agreement()
 					<div class="information">
 						<form action="', $scripturl, '?action=admin;area=regcenter" id="change_reg" method="post" accept-charset="UTF-8" style="display: inline;">
 							<strong>', $txt['admin_agreement_select_language'], ':</strong>&nbsp;
-							<select name="agree_lang" onchange="document.getElementById(\'change_reg\').submit();" tabindex="', $context['tabindex']++, '">';
+							<div class="styled-select">
+								<select name="agree_lang" onchange="document.getElementById(\'change_reg\').submit();" tabindex="', $context['tabindex']++, '">';
 
 		foreach ($context['editable_agreements'] as $file => $name)
 			echo '
-								<option value="', $file, '" ', $context['current_agreement'] == $file ? 'selected="selected"' : '', '>', $name, '</option>';
+									<option value="', $file, '" ', $context['current_agreement'] == $file ? 'selected="selected"' : '', '>', $name, '</option>';
 
 		echo '
-							</select>
+								</select>
+							</div>
 							<div class="submitbutton">
 								<input type="hidden" name="sa" value="agreement" />
 								<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -680,7 +689,7 @@ function template_edit_agreement()
 	// Show the actual agreement in an oversized text box.
 	echo '
 					<p class="agreement">
-						<textarea cols="70" rows="20" name="agreement" id="agreement">', $context['agreement'], '</textarea>
+						<textarea cols="70" rows="10" name="agreement" id="agreement">', $context['agreement'], '</textarea>
 					</p>
 					<p>
 						<label for="requireAgreement"><input type="checkbox" name="requireAgreement" id="requireAgreement"', $context['require_agreement'] ? ' checked="checked"' : '', ' tabindex="', $context['tabindex']++, '" value="1" class="input_check" /> ', $txt['admin_agreement'], '.</label>

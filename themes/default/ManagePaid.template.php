@@ -69,16 +69,18 @@ function template_modify_subscription()
 							<label for="prim_group">', $txt['paid_mod_prim_group'], '</label>:<br /><span class="smalltext">', $txt['paid_mod_prim_group_desc'], '</span>
 						</dt>
 						<dd>
-							<select id="prim_group" name="prim_group" ', !empty($context['disable_groups']) ? 'disabled="disabled"' : '', '>
-								<option value="0" ', $context['sub']['prim_group'] == 0 ? 'selected="selected"' : '', '>', $txt['paid_mod_no_group'], '</option>';
+							<div class="styled-select">
+								<select id="prim_group" name="prim_group" ', !empty($context['disable_groups']) ? 'disabled="disabled"' : '', '>
+									<option value="0" ', $context['sub']['prim_group'] == 0 ? 'selected="selected"' : '', '>', $txt['paid_mod_no_group'], '</option>';
 
 	// Put each group into the box.
 	foreach ($context['groups'] as $groups)
 		echo '
-								<option value="', $groups['id'], '" ', $context['sub']['prim_group'] == $groups['id'] ? 'selected="selected"' : '', '>', $groups['name'], '</option>';
+									<option value="', $groups['id'], '" ', $context['sub']['prim_group'] == $groups['id'] ? 'selected="selected"' : '', '>', $groups['name'], '</option>';
 
 	echo '
-							</select>
+								</select>
+							</div>
 						</dd>
 						<dt>
 							', $txt['paid_mod_add_groups'], ':<br /><span class="smalltext">', $txt['paid_mod_add_groups_desc'], '</span>
@@ -123,12 +125,14 @@ function template_modify_subscription()
 								</dt>
 								<dd>
 									<input type="text" id="span_value" name="span_value" value="', $context['sub']['span']['value'], '" size="4" class="input_text" />
-									<select name="span_unit">
-										<option value="D" ', $context['sub']['span']['unit'] == 'D' ? 'selected="selected"' : '', '>', $txt['paid_mod_span_days'], '</option>
-										<option value="W" ', $context['sub']['span']['unit'] == 'W' ? 'selected="selected"' : '', '>', $txt['paid_mod_span_weeks'], '</option>
-										<option value="M" ', $context['sub']['span']['unit'] == 'M' ? 'selected="selected"' : '', '>', $txt['paid_mod_span_months'], '</option>
-										<option value="Y" ', $context['sub']['span']['unit'] == 'Y' ? 'selected="selected"' : '', '>', $txt['paid_mod_span_years'], '</option>
-									</select>
+									<div class="styled-select">
+										<select name="span_unit">
+											<option value="D" ', $context['sub']['span']['unit'] == 'D' ? 'selected="selected"' : '', '>', $txt['paid_mod_span_days'], '</option>
+											<option value="W" ', $context['sub']['span']['unit'] == 'W' ? 'selected="selected"' : '', '>', $txt['paid_mod_span_weeks'], '</option>
+											<option value="M" ', $context['sub']['span']['unit'] == 'M' ? 'selected="selected"' : '', '>', $txt['paid_mod_span_months'], '</option>
+											<option value="Y" ', $context['sub']['span']['unit'] == 'Y' ? 'selected="selected"' : '', '>', $txt['paid_mod_span_years'], '</option>
+										</select>
+									</div>
 								</dd>
 							</dl>
 						</fieldset>
@@ -257,78 +261,92 @@ function template_modify_user_subscription()
 							<strong><label for="status">', $txt['paid_status'], '</label>:</strong>
 						</dt>
 						<dd>
-							<select id="status" name="status">
-								<option value="0" ', $context['sub']['status'] == 0 ? 'selected="selected"' : '', '>', $txt['paid_finished'], '</option>
-								<option value="1" ', $context['sub']['status'] == 1 ? 'selected="selected"' : '', '>', $txt['paid_active'], '</option>
-							</select>
+							<div class="styled-select">
+								<select id="status" name="status">
+									<option value="0" ', $context['sub']['status'] == 0 ? 'selected="selected"' : '', '>', $txt['paid_finished'], '</option>
+									<option value="1" ', $context['sub']['status'] == 1 ? 'selected="selected"' : '', '>', $txt['paid_active'], '</option>
+								</select>
+							</div>
 						</dd>
 					</dl>
 					<fieldset>
 						<legend>', $txt['start_date_and_time'], '</legend>
-						<select name="year" id="year" onchange="generateDays();">';
+						<div class="styled-select">
+							<select name="year" id="year" onchange="generateDays();">';
 
 	// Show a list of all the years we allow...
 	for ($year = 2010; $year <= 2030; $year++)
 		echo '
-							<option value="', $year, '"', $year == $context['sub']['start']['year'] ? ' selected="selected"' : '', '>', $year, '</option>';
+								<option value="', $year, '"', $year == $context['sub']['start']['year'] ? ' selected="selected"' : '', '>', $year, '</option>';
 
 	echo '
-						</select>&nbsp;
+							</select>&nbsp;
+						</div>
 						', (isset($txt['calendar_month']) ? $txt['calendar_month'] : $txt['calendar_month']), '&nbsp;
-						<select name="month" id="month" onchange="generateDays();">';
+						<div class="styled-select">
+							<select name="month" id="month" onchange="generateDays();">';
 
 	// There are 12 months per year - ensure that they all get listed.
 	for ($month = 1; $month <= 12; $month++)
 		echo '
-							<option value="', $month, '"', $month == $context['sub']['start']['month'] ? ' selected="selected"' : '', '>', $txt['months'][$month], '</option>';
+								<option value="', $month, '"', $month == $context['sub']['start']['month'] ? ' selected="selected"' : '', '>', $txt['months'][$month], '</option>';
 
 	echo '
-						</select>&nbsp;
+							</select>&nbsp;
+						</div>
 						', (isset($txt['calendar_day']) ? $txt['calendar_day'] : $txt['calendar_day']), '&nbsp;
-						<select name="day" id="day">';
+						<div class="styled-select">
+							<select name="day" id="day">';
 
 	// This prints out all the days in the current month - this changes dynamically as we switch months.
 	for ($day = 1; $day <= $context['sub']['start']['last_day']; $day++)
 		echo '
-							<option value="', $day, '"', $day == $context['sub']['start']['day'] ? ' selected="selected"' : '', '>', $day, '</option>';
+								<option value="', $day, '"', $day == $context['sub']['start']['day'] ? ' selected="selected"' : '', '>', $day, '</option>';
 
 	echo '
-						</select>
+							</select>
+						</div>
 						<label for="hour">', $txt['hour'], '</label>: <input type="text" id="hour" name="hour" value="', $context['sub']['start']['hour'], '" size="2" class="input_text" />
 						<label for="minute">', $txt['minute'], '</label>: <input type="text" id="minute" name="minute" value="', $context['sub']['start']['min'], '" size="2" class="input_text" />
 					</fieldset>
 					<fieldset>
 						<legend>', $txt['end_date_and_time'], '</legend>
 						<label for="yearend">', $txt['calendar_year'], '</label>&nbsp;
-						<select name="yearend" id="yearend" onchange="generateDays(\'end\');">';
+						<div class="styled-select">
+							<select name="yearend" id="yearend" onchange="generateDays(\'end\');">';
 
 	// Show a list of all the years we allow...
 	for ($year = 2010; $year <= 2030; $year++)
 		echo '
-							<option value="', $year, '"', $year == $context['sub']['end']['year'] ? ' selected="selected"' : '', '>', $year, '</option>';
+								<option value="', $year, '"', $year == $context['sub']['end']['year'] ? ' selected="selected"' : '', '>', $year, '</option>';
 
 	echo '
-						</select>&nbsp;
+							</select>&nbsp;
+						</div>
 						<label for="monthend">', $txt['calendar_month'], '</label>&nbsp;
-						<select name="monthend" id="monthend" onchange="generateDays(\'end\');">';
+						<div class="styled-select">
+							<select name="monthend" id="monthend" onchange="generateDays(\'end\');">';
 
 	// There are 12 months per year - ensure that they all get listed.
 	for ($month = 1; $month <= 12; $month++)
 		echo '
-							<option value="', $month, '"', $month == $context['sub']['end']['month'] ? ' selected="selected"' : '', '>', $txt['months'][$month], '</option>';
+								<option value="', $month, '"', $month == $context['sub']['end']['month'] ? ' selected="selected"' : '', '>', $txt['months'][$month], '</option>';
 
 	echo '
-						</select>&nbsp;
+							</select>&nbsp;
+						</div>
 						<label for="dayend">', $txt['calendar_day'], '</label>&nbsp;
-						<select name="dayend" id="dayend">';
+						<div class="styled-select">
+							<select name="dayend" id="dayend">';
 
 	// This prints out all the days in the current month - this changes dynamically as we switch months.
 	for ($day = 1; $day <= $context['sub']['end']['last_day']; $day++)
 		echo '
-							<option value="', $day, '"', $day == $context['sub']['end']['day'] ? ' selected="selected"' : '', '>', $day, '</option>';
+								<option value="', $day, '"', $day == $context['sub']['end']['day'] ? ' selected="selected"' : '', '>', $day, '</option>';
 
 	echo '
-						</select>
+							</select>
+						</div>
 						<label for="hourend">', $txt['hour'], '</label>: <input type="text" id="hourend" name="hourend" value="', $context['sub']['end']['hour'], '" size="2" class="input_text" />
 						<label for="minuteend">', $txt['minute'], '</label>: <input type="text" id="minuteend" name="minuteend" value="', $context['sub']['end']['min'], '" size="2" class="input_text" />
 					</fieldset>
@@ -442,15 +460,17 @@ function template_user_subscription()
 				if ($subscription['flexible'])
 				{
 					echo '
-					<select id="cur', $subscription['id'], '" name="cur[', $subscription['id'], ']">';
+					<div class="styled-select">
+						<select id="cur', $subscription['id'], '" name="cur[', $subscription['id'], ']">';
 
 					// Print out the costs for this one.
 					foreach ($subscription['costs'] as $duration => $value)
 						echo '
-						<option value="', $duration, '">', sprintf($modSettings['paid_currency_symbol'], $value), '/', $txt[$duration], '</option>';
+							<option value="', $duration, '">', sprintf($modSettings['paid_currency_symbol'], $value), '/', $txt[$duration], '</option>';
 
 					echo '
-					</select>';
+						</select>
+					</div>';
 				}
 				else
 					echo '

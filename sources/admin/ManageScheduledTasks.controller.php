@@ -158,7 +158,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 					'data' => array(
 						'sprintf' => array(
 							'format' => '
-								<a href="' . $scripturl . '?action=admin;area=scheduledtasks;sa=taskedit;tid=%1$d">%2$s</a><br /><span class="smalltext">%3$s</span>',
+								<a href="' . $scripturl . '?action=admin;area=scheduledtasks;sa=taskedit;tid=%1$d"><i class="fa fa-pencil-square-o"></i> %2$s</a><br /><span class="smalltext">%3$s</span>',
 							'params' => array(
 								'id' => false,
 								'name' => false,

@@ -355,16 +355,14 @@ function processAttachments($id_msg = null)
 		log_error(sprintf($txt['attach_folder_admin_warning'], $context['attach_dir']), 'critical');
 	}
 
-	if (!isset($initial_error) && !isset($context['attachments']))
+	if (!isset($initial_error) && !isset($context['attachments']['quantity']))
 	{
 		// If this isn't a new post, check the current attachments.
 		if (!empty($id_msg))
 			list ($context['attachments']['quantity'], $context['attachments']['total_size']) = attachmentsSizeForMessage($id_msg);
 		else
-			$context['attachments'] = array(
-				'quantity' => 0,
-				'total_size' => 0,
-			);
+			$context['attachments']['quantity'] = 0;
+			$context['attachments']['total_size'] = 0;
 	}
 
 	// Hmm. There are still files in session.
@@ -449,6 +447,7 @@ function processAttachments($id_msg = null)
 				log_error($_FILES['attachment']['name'][$n] . ': ' . $txt['php_upload_error_6'], 'critical');
 			else
 				log_error($_FILES['attachment']['name'][$n] . ': ' . $txt['php_upload_error_' . $_FILES['attachment']['error'][$n]]);
+
 			if (empty($errors))
 				$errors[] = 'attach_php_error';
 		}
@@ -489,7 +488,8 @@ function processAttachments($id_msg = null)
 				unlink($_FILES['attachment']['tmp_name'][$n]);
 		}
 
-		// If there's no errors to this pont. We still do need to apply some addtional checks before we are finished.
+		// If there's no errors to this pont. We still do need to apply some addtional checks
+		// before we are finished.
 		if (empty($_SESSION['temp_attachments'][$attachID]['errors']))
 			attachmentChecks($attachID);
 
@@ -599,7 +599,7 @@ function attachmentChecks($attachID)
 		}
 	}
 
-	// Is there room for this sucker?
+	// Is there room for this in the directory?
 	if (!empty($modSettings['attachmentDirSizeLimit']) || !empty($modSettings['attachmentDirFileLimit']))
 	{
 		// Check the folder size and count. If it hasn't been done already.

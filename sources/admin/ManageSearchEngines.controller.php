@@ -565,18 +565,20 @@ class ManageSearchEngines_Controller extends Action_Controller
 		// Prepare the HTML.
 		$date_select = '
 			' . $txt['spider_stats_select_month'] . ':
-			<select name="new_date" onchange="document.spider_stat_list.submit();">';
+			<div class="styled-select">
+				<select name="new_date" onchange="document.spider_stat_list.submit();">';
 
 		if (empty($date_choices))
 			$date_select .= '
-				<option></option>';
+					<option></option>';
 		else
 			foreach ($date_choices as $id => $text)
 				$date_select .= '
-				<option value="' . $id . '"' . ($current_date == $id ? ' selected="selected"' : '') . '>' . $text . '</option>';
+					<option value="' . $id . '"' . ($current_date == $id ? ' selected="selected"' : '') . '>' . $text . '</option>';
 
 		$date_select .= '
-			</select>
+				</select>
+			</div>
 			<noscript>
 				<input type="submit" name="go" value="' . $txt['go'] . '" class="right_submit" />
 			</noscript>';

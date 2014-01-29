@@ -262,7 +262,7 @@ class ManageThemes_Controller extends Action_Controller
 	 */
 	public function action_list()
 	{
-		global $context, $boardurl;
+		global $context, $boardurl, $txt;
 
 		// Load in the helpers we need
 		require_once(SUBSDIR . '/Themes.subs.php');

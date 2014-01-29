@@ -85,10 +85,12 @@ function template_searchform()
 								', $txt['search_match'], ':</label>
 							</dt>
 							<dd>
-								<select name="searchtype" id="searchtype">
-									<option value="1"', empty($context['search_params']['searchtype']) ? ' selected="selected"' : '', '>', $txt['all_words'], '</option>
-									<option value="2"', !empty($context['search_params']['searchtype']) ? ' selected="selected"' : '', '>', $txt['any_words'], '</option>
-								</select>
+								<div class="styled-select">
+									<select name="searchtype" id="searchtype">
+										<option value="1"', empty($context['search_params']['searchtype']) ? ' selected="selected"' : '', '>', $txt['all_words'], '</option>
+										<option value="2"', !empty($context['search_params']['searchtype']) ? ' selected="selected"' : '', '>', $txt['any_words'], '</option>
+									</select>
+								</div>
 							</dd>
 							<dt class="righttext"><label for="userspec">
 								', $txt['by_user'], ':</label>
@@ -100,13 +102,15 @@ function template_searchform()
 								', $txt['search_order'], ':</label>
 							</dt>
 							<dd>
-								<select id="sort" name="sort">
-									<option value="relevance|desc">', $txt['search_orderby_relevant_first'], '</option>
-									<option value="num_replies|desc">', $txt['search_orderby_large_first'], '</option>
-									<option value="num_replies|asc">', $txt['search_orderby_small_first'], '</option>
-									<option value="id_msg|desc">', $txt['search_orderby_recent_first'], '</option>
-									<option value="id_msg|asc">', $txt['search_orderby_old_first'], '</option>
-								</select>
+								<div class="styled-select">
+									<select id="sort" name="sort">
+										<option value="relevance|desc">', $txt['search_orderby_relevant_first'], '</option>
+										<option value="num_replies|desc">', $txt['search_orderby_large_first'], '</option>
+										<option value="num_replies|asc">', $txt['search_orderby_small_first'], '</option>
+										<option value="id_msg|desc">', $txt['search_orderby_recent_first'], '</option>
+										<option value="id_msg|asc">', $txt['search_orderby_old_first'], '</option>
+									</select>
+								</div>
 							</dd>
 							<dt class="righttext options">
 								', $txt['search_options'], ':
@@ -455,26 +459,28 @@ function template_results()
 			if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
 			{
 				echo '
-						<div class="additional_row floatright">
-							<select class="qaction" name="qaction"', $context['can_move'] ? ' onchange="this.form.move_to.disabled = (this.options[this.selectedIndex].value != \'move\');"' : '', '>
-								<option value="">&nbsp;</option>';
+						<div class="additional_row">
+							<div class="styled-select">
+								<select class="qaction" name="qaction"', $context['can_move'] ? ' onchange="this.form.move_to.disabled = (this.options[this.selectedIndex].value != \'move\');"' : '', '>
+									<option value="">&nbsp;</option>';
 
 				foreach ($context['qmod_actions'] as $qmod_action)
 					if ($context['can_' . $qmod_action])
 						echo '
-								<option value="' . $qmod_action . '">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;', $txt['quick_mod_' . $qmod_action] . '</option>';
+									<option value="' . $qmod_action . '">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;', $txt['quick_mod_' . $qmod_action] . '</option>';
 
 				echo '
-							</select>';
+								</select>
+							</div>';
 
 				// Show a list of boards they can move the topic to.
 				if ($context['can_move'])
 					echo '
-									<span id="quick_mod_jump_to">&nbsp;</span>';
+							<span id="quick_mod_jump_to">&nbsp;</span>';
 
 				echo '
-									<input type="hidden" name="redirect_url" value="', $scripturl . '?action=search;sa=results;params=' . $context['params'], '" />
-									<input type="submit" value="', $txt['quick_mod_go'], '" onclick="return document.forms.topicForm.qaction.value != \'\' &amp;&amp; confirm(\'', $txt['quickmod_confirm'], '\');" class="button_submit submitgo" />
+							<input type="hidden" name="redirect_url" value="', $scripturl . '?action=search;sa=results;params=' . $context['params'], '" />
+							<input type="submit" value="', $txt['quick_mod_go'], '" onclick="return document.forms.topicForm.qaction.value != \'\' &amp;&amp; confirm(\'', $txt['quickmod_confirm'], '\');" class="button_submit submitgo" />
 
 						</div>';
 			}

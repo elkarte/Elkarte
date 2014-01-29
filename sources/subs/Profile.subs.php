@@ -220,7 +220,7 @@ function loadCustomFields($memID, $area = 'summary')
 		}
 		elseif ($row['field_type'] == 'select')
 		{
-			$input_html = '<select name="customfield[' . $row['col_name'] . ']"><option value="-1"></option>';
+			$input_html = '<div class="styled-select"><select name="customfield[' . $row['col_name'] . ']"><option value="-1"></option>';
 			$options = explode(',', $row['field_options']);
 			foreach ($options as $k => $v)
 			{
@@ -230,7 +230,7 @@ function loadCustomFields($memID, $area = 'summary')
 					$output_html = $v;
 			}
 
-			$input_html .= '</select>';
+			$input_html .= '</select></div>';
 		}
 		elseif ($row['field_type'] == 'radio')
 		{

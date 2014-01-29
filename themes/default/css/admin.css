@@ -151,12 +151,18 @@ fieldset dl {
 }
 /* Chrome fix. */
 #quick_search .icon, #quick_search .input_text,
-#quick_search select, #quick_search .button_submit {
+#quick_search select, #quick_search .button_submit, #quick_search .styled-select  {
 	float: left;
 	margin: 2px 0 0 4px;
 }
 #quick_search .icon {
 	margin: 8px 0 0 0;
+}
+#quick_search .styled-select select {
+	margin: 0 0 0 4px;
+}
+#quick_log_search .button_submit {
+	margin: -2px 1px 0 2px;
 }
 
 /* @todo - The welcome thingy. */
@@ -678,6 +684,14 @@ dl.admin_permissions dt {
 }
 dl.admin_permissions dd {
 	width: 64%;
+}
+
+/* Styles for the package manager file permissions
+------------------------------------------------- */
+.file_permissions .table_grid {
+	table-layout: fixed;
+	word-wrap: break-word;
+	hyphens: auto;
 }
 
 /* Styles for the manage search section.

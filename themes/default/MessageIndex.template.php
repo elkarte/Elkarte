@@ -272,16 +272,18 @@ function template_topic_listing()
 		{
 			echo '
 			<li class="qaction_row">
-				<select class="qaction" name="qaction"', $context['can_move'] ? ' onchange="this.form.move_to.disabled = (this.options[this.selectedIndex].value != \'move\');"' : '', '>
-					<option value="">&nbsp;</option>';
+				<div class="styled-select">
+					<select class="qaction" name="qaction"', $context['can_move'] ? ' onchange="this.form.move_to.disabled = (this.options[this.selectedIndex].value != \'move\');"' : '', '>
+						<option value="">&nbsp;</option>';
 
 			foreach ($context['qmod_actions'] as $qmod_action)
 				if ($context['can_' . $qmod_action])
 					echo '
-					<option value="' . $qmod_action . '">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;', $txt['quick_mod_' . $qmod_action] . '</option>';
+						<option value="' . $qmod_action . '">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;', $txt['quick_mod_' . $qmod_action] . '</option>';
 
 			echo '
-				</select>';
+					</select>
+				</div>';
 
 			// Show a list of boards they can move the topic to.
 			if ($context['can_move'])

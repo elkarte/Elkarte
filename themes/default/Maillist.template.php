@@ -119,16 +119,18 @@ function template_bounce_email()
 						<strong>', $txt['bounce_notify_template'], ':</strong>
 					</dt>
 					<dd>
-						<select name="warn_temp" id="warn_temp" disabled="disabled" onchange="populateNotifyTemplate();">
-							<option value="-1">', $txt['bounce_notify_template'], '</option>
-							<option value="-1" disabled="disabled">', str_repeat('&#8212;', strlen($txt['bounce_notify_template'])), '</option>';
+						<div class="styled-select">
+							<select name="warn_temp" id="warn_temp" disabled="disabled" onchange="populateNotifyTemplate();">
+								<option value="-1">', $txt['bounce_notify_template'], '</option>
+								<option value="-1" disabled="disabled">', str_repeat('&#8212;', strlen($txt['bounce_notify_template'])), '</option>';
 
 	foreach ($context['bounce_templates'] as $id_template => $template)
 		echo '
-							<option value="', $id_template, '">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;', $template['title'], '</option>';
+								<option value="', $id_template, '">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;', $template['title'], '</option>';
 
 	echo '
-						</select>
+							</select>
+						</div>
 					</dd>
 					<dt>
 						<strong>', $txt['bounce_notify_subject'], ':</strong>
@@ -187,14 +189,16 @@ function template_callback_maillist_receive_email_list()
 				<input type="text" name="emailfrom[', $data['id'], ']" value="', $data['emailfrom'], '" size="50" class="input_text" />
 			</dt>
 			<dd>
-				<select class="input_select" name="boardto[', $data['id'], ']" >';
+				<div class="styled-select">
+					<select class="input_select" name="boardto[', $data['id'], ']" >';
 
 		foreach ($context['boards'] as $board_id => $board_name)
 			echo '
-					<option value="', $board_id, '"', (($data['boardto'] == $board_id) ? ' selected="selected"' : ''), '>', $board_name, '</option>';
+						<option value="', $board_id, '"', (($data['boardto'] == $board_id) ? ' selected="selected"' : ''), '>', $board_name, '</option>';
 
 		echo '
-				</select>
+					</select>
+				</div>
 			</dd>';
 	}
 
@@ -208,14 +212,16 @@ function template_callback_maillist_receive_email_list()
 				<input type="text" name="emailfrom[]" size="50" class="input_text" />
 			</dt>
 			<dd>
-				<select name="boardto[', $count, ']" >';
+				<div class="styled-select">
+					<select name="boardto[', $count, ']" >';
 
 			foreach ($context['boards'] as $board_id => $board_name)
 				echo '
-					<option value="', $board_id, '">', $board_name, '</option>';
+						<option value="', $board_id, '">', $board_name, '</option>';
 
 			echo '
-				</select>
+					</select>
+				</div>
 			</dd>';
 		}
 	}

@@ -210,9 +210,6 @@ function modifyBoard($board_id, &$boardOptions)
 	if (!isset($boards[$board_id]) || (isset($boardOptions['target_board']) && !isset($boards[$boardOptions['target_board']])) || (isset($boardOptions['target_category']) && !isset($cat_tree[$boardOptions['target_category']])))
 		fatal_lang_error('no_board');
 
-	$id = $board_id;
-	call_integration_hook('integrate_pre_modify_board', array($id, &$boardOptions));
-
 	// All things that will be updated in the database will be in $boardUpdates.
 	$boardUpdates = array();
 	$boardUpdateParameters = array();
@@ -390,8 +387,7 @@ function modifyBoard($board_id, &$boardOptions)
 		$boardUpdateParameters['num_posts'] = (int) $boardOptions['num_posts'];
 	}
 
-	$id = $board_id;
-	call_integration_hook('integrate_modify_board', array($id, &$boardUpdates, &$boardUpdateParameters));
+	call_integration_hook('integrate_modify_board', array($board_id, $boardOptions, &$boardUpdates, &$boardUpdateParameters));
 
 	// Do the updates (if any).
 	if (!empty($boardUpdates))
@@ -523,8 +519,6 @@ function createBoard($boardOptions)
 		$boardOptions['target_category'], $boardOptions['board_name'] , '', 0,
 		'-1,0', '',
 	);
-
-	call_integration_hook('integrate_create_board', array(&$boardOptions, &$board_columns, &$board_parameters));
 
 	// Insert a board, the settings are dealt with later.
 	$db->insert('',

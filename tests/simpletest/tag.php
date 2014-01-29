@@ -83,9 +83,19 @@ class SimpleTagBuilder {
                 'checkbox' => 'SimpleCheckboxTag',
                 'radio' => 'SimpleRadioButtonTag',
                 'text' => 'SimpleTextTag',
+		'email' => 'SimpleTextTag',
+		'url' => 'SimpleTextTag',
+		'search' => 'SimpleTextTag',
+		'number' => 'SimpleTextTag',
+		'color' => 'SimpleTextTag',
+		'datetime' => 'SimpleTextTag',
+		'datetime-local' => 'SimpleTextTag',
+		'date' => 'SimpleTextTag',
+		'month' => 'SimpleTextTag',
+		'week' => 'SimpleTextTag',
+		'time' => 'SimpleTextTag',
                 'hidden' => 'SimpleTextTag',
                 'password' => 'SimpleTextTag',
-                'email' => 'SimpleTextTag',
                 'file' => 'SimpleUploadTag');
         if (array_key_exists($type, $map)) {
             $tag_class = $map[$type];
