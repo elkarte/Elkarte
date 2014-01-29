@@ -20,7 +20,7 @@
 /*
 /*		$TABLES..............Generic tables (memberlist, error log, etc).
 /*		$SETTINGS............Generic lists for settings pages.
-/*		$BOARDS..............Board index, child boards, and message index.
+/*		$BOARDS..............Board index, sub-boards, and message index.
 /*
 /*		$TOPICS..............The display template (topic view), including send.
 /*		$EDITOR..............Main editor (posts, events, polls) and topic summary.
@@ -932,7 +932,7 @@ div.bbc_footnotes .meaction{
 /*	$BOARDS		*/
 /* ------------------------------------------------------- */
 /* Set up some general framing classes. @todo */
-/*    .forum_category for board index/child boards.             */
+/*    .forum_category for board index/sub-boards.             */
 /*    .forumposts for thread pages and recent posts, etc.       */
 /*    .content_category for general divisions around the place. */
 /* All styled the same in default variant, but available for fun and games. */
