@@ -323,7 +323,7 @@ function template_topic_listing_below()
 
 	echo '
 	<div id="topic_icons" class="description">
-		<p class="floatright" id="message_index_jump_to">&nbsp;</p>';
+		<div class="floatright" id="message_index_jump_to">&nbsp;</div>';
 
 	if (!$context['no_topic_listing'])
 		echo '

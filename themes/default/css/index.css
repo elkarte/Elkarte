@@ -1955,12 +1955,8 @@ img.new_posts {
 #message_index_jump_to {
 	font-size: 1.167em;
 }
-/* @todo - An oddone. Look into it later. */
-#message_index_jump_to label {
-	vertical-align: top;
-}
-#message_index_jump_to .button_submit {
-	margin: 0 0 10px;
+#message_index_jump_to .right_submit {
+	margin: 1px 0 0;
 }
 .jump_to_header {
 	padding: 0 4px;
