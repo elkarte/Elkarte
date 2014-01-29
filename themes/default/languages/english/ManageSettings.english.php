@@ -292,6 +292,7 @@ $txt['custom_profile_fieldtype'] = 'Field Type';
 $txt['custom_profile_make_new'] = 'New Field';
 $txt['custom_profile_none'] = 'You have not created any custom profile fields yet!';
 $txt['custom_profile_icon'] = 'Icon';
+$txt['custom_profile_sort'] = 'To change the order of the custom fields, simply drag and drip it to the location you want.';
 
 $txt['custom_profile_type_text'] = 'Text';
 $txt['custom_profile_type_textarea'] = 'Large Text';

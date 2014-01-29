@@ -1025,6 +1025,10 @@ class ManageFeatures_Controller extends Action_Controller
 					'value' => '<input type="submit" name="onoff" value="' . $txt['save'] . '" class="right_submit" />
 					<input type="submit" name="new" value="' . $txt['custom_profile_make_new'] . '" class="right_submit" />',
 				),
+				array(
+					'position' => 'top_of_list',
+					'value' => '<p class="infobox">' . $txt['custom_profile_sort'] . '</p>',
+				),
 			),
 			'javascript' => '
 				$().elkSortable({

@@ -728,13 +728,13 @@ function template_edit_censored()
 	foreach ($context['censored_words'] as $vulgar => $proper)
 		echo '
 					<div class="censorWords">
-						<input type="text" name="censor_vulgar[]" value="', $vulgar, '" size="30" /> => <input type="text" name="censor_proper[]" value="', $proper, '" size="30" />
+						<input type="text" name="censor_vulgar[]" value="', $vulgar, '" size="30" /> <i class="fa  fa-arrow-circle-right"></i> <input type="text" name="censor_proper[]" value="', $proper, '" size="30" />
 					</div>';
 
 	// Now provide a way to censor more words.
 	echo '
 					<div class="censorWords">
-						<input type="text" name="censor_vulgar[]" size="30" class="input_text" /> => <input type="text" name="censor_proper[]" size="30" class="input_text" />
+						<input type="text" name="censor_vulgar[]" size="30" class="input_text" /> <i class="fa  fa-arrow-circle-right"></i> <input type="text" name="censor_proper[]" size="30" class="input_text" />
 					</div>
 					<div id="moreCensoredWords"></div><div class="censorWords" style="display: none;" id="moreCensoredWords_link">
 						<a class="linkbutton_left" href="#;" onclick="addNewWord(); return false;">', $txt['censor_clickadd'], '</a><br />
@@ -1492,7 +1492,7 @@ function template_callback_external_search_engines()
 		<dt id="add_more_searches" style="display: none;"></dt>
 		<dd></dd>
 		<dt id="add_more_link_div" style="display: none;">
-			<a href="#" onclick="addAnotherSearch(', JavaScriptEscape($txt['name']), ', ', JavaScriptEscape($txt['url']), ', ', JavaScriptEscape($txt['words_sep']), '); return false;">&#171; ', $txt['setup_search_engine_add_more'], ' &#187;</a>
+			<a class="linkbutton" href="#" onclick="addAnotherSearch(', JavaScriptEscape($txt['name']), ', ', JavaScriptEscape($txt['url']), ', ', JavaScriptEscape($txt['words_sep']), '); return false;">', $txt['setup_search_engine_add_more'], '</a>
 		</dt>
 		<dd></dd>';
 

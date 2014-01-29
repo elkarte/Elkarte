@@ -280,12 +280,14 @@ class Modlog_Controller extends Action_Controller
 				array(
 					'position' => 'below_table_data',
 					'value' => '
-						' . $txt['modlog_search'] . ' (' . $txt['modlog_by'] . ': ' . $context['search']['label'] . '):
-						<input type="text" name="search" size="18" value="' . Util::htmlspecialchars($context['search']['string']) . '" class="input_text" />
-						<input type="submit" name="is_search" value="' . $txt['modlog_go'] . '" class="button_submit" />
-						' . ($context['can_delete'] ? '|&nbsp;
-						<input type="submit" name="remove" value="' . $txt['modlog_remove'] . '" onclick="return confirm(\'' . $txt['modlog_remove_selected_confirm'] . '\');" class="right_submit" />
-						<input type="submit" name="removeall" value="' . $txt['modlog_removeall'] . '" onclick="return confirm(\'' . $txt['modlog_remove_all_confirm'] . '\');" class="right_submit" />' : ''),
+						<div id="quick_log_search">
+							' . $txt['modlog_search'] . ' (' . $txt['modlog_by'] . ': ' . $context['search']['label'] . '):
+							<input type="text" name="search" size="18" value="' . Util::htmlspecialchars($context['search']['string']) . '" class="input_text" />
+							<input type="submit" name="is_search" value="' . $txt['modlog_go'] . '" class="button_submit" />
+							' . ($context['can_delete'] ? '|&nbsp;
+							<input type="submit" name="remove" value="' . $txt['modlog_remove'] . '" onclick="return confirm(\'' . $txt['modlog_remove_selected_confirm'] . '\');" class="right_submit" />
+							<input type="submit" name="removeall" value="' . $txt['modlog_removeall'] . '" onclick="return confirm(\'' . $txt['modlog_remove_all_confirm'] . '\');" class="right_submit" />' : '') . '
+						</div>',
 					'class' => 'floatright',
 				),
 			),
