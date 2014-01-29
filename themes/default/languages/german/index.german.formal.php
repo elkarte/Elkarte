@@ -544,7 +544,7 @@ $txt['pm_online'] = 'Private Nachricht (online)';
 $txt['pm_offline'] = 'Private Nachricht (offline)';
 $txt['status'] = 'Status';
 
-$txt['skip_nav'] = 'Navigation beenden';
+$txt['skip_nav'] = 'Zum Hauptinhalt springen';
 $txt['go_up'] = 'Nach oben';
 $txt['go_down'] = 'Nach unten';
 

@@ -291,6 +291,7 @@ $txt['custom_profile_fieldtype'] = 'Feldtyp';
 $txt['custom_profile_make_new'] = 'Neues Feld';
 $txt['custom_profile_none'] = 'Sie haben noch keine eigenen Profilfelder erstellt!';
 $txt['custom_profile_icon'] = 'Symbol';
+$txt['custom_profile_sort'] = 'Um die Reihenfolge der eigenen Felder zu ändern, ziehen Sie sie einfach an die gewünschte Stelle.';
 
 $txt['custom_profile_type_text'] = 'Text';
 $txt['custom_profile_type_textarea'] = 'Großer Text';
