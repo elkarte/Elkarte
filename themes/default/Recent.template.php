@@ -102,7 +102,7 @@ function template_unread()
 						<h2 class="category_header" id="unread_header">
 							', $context['showing_all_topics'] ? $txt['unread_topics_all'] : $txt['unread_topics_visit'], '
 						</h2>
-						<ul id="sort_by" class="topic_sorting">';
+						<ul id="sort_by" class="topic_sorting topic_sorting_recent">';
 
 		// Show a "select all" box for quick moderation?
 		if ($context['showCheckboxes'])

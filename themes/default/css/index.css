@@ -1760,6 +1760,9 @@ dl.settings dt .styled-select select {
 .topic_sorting>li {
 	padding: 0 3px;
 }
+.topic_sorting.topic_sorting_recent {
+	margin-top: 0;
+}
 #expanded_pages_container {
 	position: absolute;
 }
