@@ -454,6 +454,17 @@ function template_additional_options_below()
 
 	echo '
 					</div>';
+
+	// Initiate file drag drop
+	echo '
+		<script><!-- // --><![CDATA[
+			dragDropAttachment({
+				allowedExtensions: "', $context['allowed_extensions'],'",
+				totalSizeAllowed: "', $modSettings['attachmentPostLimit'], '",
+				individualSizeAllowed: "', $modSettings['attachmentSizeLimit'], '",
+				numOfAttachmentAllowed: "',$context['num_allowed_attachments'],'",
+			});
+		// ]]></script>';
 }
 
 /**

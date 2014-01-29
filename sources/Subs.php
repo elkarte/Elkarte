@@ -4231,3 +4231,56 @@ function removeScheduleTaskImmediate($task, $calculateNextTrigger = true)
 		}
 	}
 }
+
+function checkJsonEncode() {
+	if (!function_exists('json_encode')) {
+		function json_encode($a = false) {
+
+			switch(gettype($a)) {
+				case 'integer':
+				case 'double':
+					return floatval(str_replace(",", ".", strval($a)));
+				break;
+
+				case 'NULL':
+				case 'resource':
+				case 'unknown':
+					return 'null';
+				break;
+
+				case 'boolean':
+					return $a ? 'true' : 'false' ;
+				break;
+
+				case 'array':
+				case 'object':
+					$output = array();
+					$isAssoc = false;
+
+					foreach(array_keys($a) as $key) {
+						if (!is_int($key)) {
+							$isAssoc = true;
+							break;
+						}
+					}
+
+					if($isAssoc) {
+						foreach($a as $k => $val) {
+							$output []= json_encode($k) . ':' . json_encode($val);
+						}
+						$output = '{' . implode(',', $output) . '}';
+					} else {
+						foreach($a as $val){
+							$output []= json_encode($val);
+						}
+						$output = '[' . implode(',', $output) . ']';
+					}
+					return $output;
+				break;
+
+				default:
+				return '"' . addslashes($a) . '"';
+			}
+		}
+	}
+}
