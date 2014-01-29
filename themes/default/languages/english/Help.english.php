@@ -204,7 +204,7 @@ $helptxt['warning_enable'] = '<strong>User Warning System</strong><br />
 		</li>
 	</ul>';
 $helptxt['error_log'] = '<strong>Error Log</strong><br />
-	The error log tracks logs every serious error encountered by users using your forum. It lists all of these errors by date which can be sorted
+	The error log tracks every serious error encountered by users using your forum. It lists all of these errors by date which can be sorted
 	by clicking the black arrow next to each date. Additionally you can filter the errors by clicking the picture next to each error statistic. This
 	allows you to filter, for example, by member. When a filter is active the only results that will be displayed will be those that match that filter.';
 $helptxt['theme_settings'] = '<strong>Theme Settings</strong><br />
