@@ -544,6 +544,6 @@ function memberByOpenID($claimed_id)
 
 	$member_found = $db->fetch_assoc($result);
 	$db->free_result($result);
-print_r($member_found); die('hier');
+
 	return $member_found;
 }
