@@ -82,7 +82,7 @@ class OpenID_Controller extends Action_Controller
 		foreach ($signed as $sign)
 			$verify_str .= $sign . ':' . strtr($_GET['openid_' . str_replace('.', '_', $sign)], array('&amp;' => '&')) . "\n";
 
-		$verify_str = base64_encode(sha1_hmac($verify_str, $secret));
+		$verify_str = base64_encode(hash_hmac('sha1', $verify_str, $secret, true));
 
 		// Verify the OpenID signature.
 		if ($verify_str != $_GET['openid_sig'])

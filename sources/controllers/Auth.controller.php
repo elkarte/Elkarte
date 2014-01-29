@@ -150,6 +150,11 @@ class Auth_Controller extends Action_Controller
 			$open_id = new OpenID();
 			if (($open_id->validate($_POST['openid_identifier'])) !== 'no_data')
 				return $open_id;
+			else
+			{
+				$context['login_errors'] = array($txt['openid_not_found']);
+				return;
+			}
 		}
 
 		// You forgot to type your username, dummy!

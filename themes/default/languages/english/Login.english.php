@@ -19,6 +19,7 @@ $txt['need_username'] = 'You need to fill in a username.';
 $txt['no_password'] = 'You didn\'t enter your password.';
 $txt['improper_password'] = 'The supplied password is too long.';
 $txt['incorrect_password'] = 'Password incorrect';
+$txt['openid_not_found'] = 'Supplied OpenID identifier not found.';
 $txt['choose_username'] = 'Choose username';
 $txt['maintain_mode'] = 'Maintenance Mode';
 $txt['registration_successful'] = 'Registration Successful';
