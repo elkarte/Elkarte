@@ -1446,7 +1446,7 @@ function template_add_rule()
 
 	echo '
 					<span id="criteriaAddHere"></span><br />
-					<a id="addonjs1" class="linkbutton" href="#" onclick="addCriteriaOption();"  style="display: none;">', $txt['pm_rule_criteria_add'], '</a>
+					<a id="addonjs1" class="linkbutton" href="#" onclick="addCriteriaOption(); return false;" style="display: none;">', $txt['pm_rule_criteria_add'], '</a>
 					<br /><br />
 					', $txt['pm_rule_logic'], ':
 					<div class="styled-select">
