@@ -569,7 +569,7 @@ function createBoard($boardOptions)
 /**
  * Remove one or more boards.
  * Allows to move the children of the board before deleting it
- * if moveChildrenTo is set to null, the child boards will be deleted.
+ * if moveChildrenTo is set to null, the sub-boards will be deleted.
  * Deletes:
  *   - all topics that are on the given boards;
  *   - all information that's associated with the given boards;
@@ -595,7 +595,7 @@ function deleteBoards($boards_to_remove, $moveChildrenTo = null)
 	// If $moveChildrenTo is set to null, include the children in the removal.
 	if ($moveChildrenTo === null)
 	{
-		// Get a list of the child boards that will also be removed.
+		// Get a list of the sub-boards that will also be removed.
 		$child_boards_to_remove = array();
 		foreach ($boards_to_remove as $board_to_remove)
 			recursiveBoards($child_boards_to_remove, $boards[$board_to_remove]['tree']);
@@ -1129,7 +1129,7 @@ function recursiveBoards(&$_boardList, &$_tree)
 }
 
 /**
- * Returns whether the child board id is actually a child of the parent (recursive).
+ * Returns whether the sub-board id is actually a child of the parent (recursive).
  * @param int $child
  * @param int $parent
  * @return boolean
@@ -1302,7 +1302,7 @@ function getBoardNotificationsCount($memID)
 
 /**
  * Returns all the boards accessible to the current user.
- * If $id_parents is given, return only the child boards of those boards.
+ * If $id_parents is given, return only the sub-boards of those boards.
  * If $id_boards is given, filters the boards to only those accessible.
  *
  * The function doesn't guarantee the boards are properly sorted
@@ -1801,7 +1801,7 @@ function fetchBoardsInfo($conditions = 'all', $params = array())
 }
 
 /**
- * Retrieve the all the child boards of an array of boards
+ * Retrieve the all the sub-boards of an array of boards
  * and add the ids to the same array
  * @param mixed $boards an array of board IDs (it accepts a single board too
  *              The param is passed by ref and the result it returned through the param itself

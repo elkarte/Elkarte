@@ -541,7 +541,7 @@ class ManageBoards_Controller extends Action_Controller
 			}
 		}
 
-		// Are there any places to move child boards to in the case where we are confirming a delete?
+		// Are there any places to move sub-boards to in the case where we are confirming a delete?
 		if (!empty($_REQUEST['boardid']))
 		{
 			$context['can_move_children'] = false;
@@ -705,7 +705,7 @@ class ManageBoards_Controller extends Action_Controller
 		}
 		elseif (isset($_POST['delete']))
 		{
-			// First off - check if we are moving all the current child boards first - before we start deleting!
+			// First off - check if we are moving all the current sub-boards first - before we start deleting!
 			if (isset($_POST['delete_action']) && $_POST['delete_action'] == 1)
 			{
 				if (empty($_POST['board_to']))

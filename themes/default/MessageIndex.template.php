@@ -24,7 +24,7 @@ function template_MessageIndex_init()
 }
 
 /**
- * Used to display child boards.
+ * Used to display sub-boards.
  */
 function template_display_child_boards_above()
 {

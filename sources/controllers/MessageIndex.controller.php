@@ -38,7 +38,7 @@ class MessageIndex_Controller extends Action_Controller
 	}
 
 	/**
-	 * Show the list of topics in this board, along with any child boards.
+	 * Show the list of topics in this board, along with any sub-boards.
 	 * @uses MessageIndex template topic_listing sub template
 	 */
 	public function action_messageindex()
@@ -46,7 +46,7 @@ class MessageIndex_Controller extends Action_Controller
 		global $txt, $scripturl, $board, $modSettings, $context;
 		global $options, $settings, $board_info, $user_info;
 
-		// Fairly often, we'll work with boards. Current board, child boards.
+		// Fairly often, we'll work with boards. Current board, sub-boards.
 		require_once(SUBSDIR . '/Boards.subs.php');
 
 		// If this is a redirection board head off.
@@ -187,7 +187,7 @@ class MessageIndex_Controller extends Action_Controller
 		$context['can_moderate_forum'] = allowedTo('moderate_forum');
 		$context['can_approve_posts'] = allowedTo('approve_posts');
 
-		// Prepare child boards for display.
+		// Prepare sub-boards for display.
 		require_once(SUBSDIR . '/BoardIndex.subs.php');
 		$boardIndexOptions = array(
 			'include_categories' => false,
