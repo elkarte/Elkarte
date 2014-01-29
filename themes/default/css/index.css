@@ -1441,11 +1441,13 @@ a.bbc_link {
 }
 /* Skip navigation link. */
 #top {
-	position: fixed;
+	position: absolute;
 	top: -10em;
-	left: 10%;
+	left: 3em;
 	padding: 1em 2em;
 	font-weight: bold;
+	background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
+    transition: top .5s ease-out 0s, background 1s linear 0s;
 }
 #top:focus {
 	top: -4px;
