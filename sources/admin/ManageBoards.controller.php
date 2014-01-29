@@ -90,8 +90,6 @@ class ManageBoards_Controller extends Action_Controller
 				'permission' => 'admin_forum'),
 		);
 
-		call_integration_hook('integrate_manage_boards', array(&$subActions));
-
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['boards_and_cats'],
@@ -600,7 +598,7 @@ class ManageBoards_Controller extends Action_Controller
 	{
 		global $context;
 
-		$_POST['boardid'] = (int) $_POST['boardid'];
+		$board_id = isset($_POST['boardid']) ? (int) $_POST['boardid'] : 0;
 		checkSession();
 		validateToken('admin-be-' . $_REQUEST['boardid']);
 
@@ -667,9 +665,9 @@ class ManageBoards_Controller extends Action_Controller
 			$boardOptions['inherit_permissions'] = $_POST['profile'] == -1;
 
 			// We need to know what used to be case in terms of redirection.
-			if (!empty($_POST['boardid']))
+			if (!empty($board_id))
 			{
-				$properties = getBoardProperties($_POST['boardid']);
+				$properties = getBoardProperties($board_id);
 
 				// If we're turning redirection on check the board doesn't have posts in it - if it does don't make it a redirection board.
 				if ($boardOptions['redirect'] && empty($properties['oldRedirect']) && $properties['numPosts'])
@@ -682,6 +680,8 @@ class ManageBoards_Controller extends Action_Controller
 					$boardOptions['num_posts'] = 0;
 
 			}
+
+			call_integration_hook('integrate_save_board', array($board_id, &$boardOptions));
 
 			// Create a new board...
 			if (isset($_POST['add']))
@@ -696,7 +696,7 @@ class ManageBoards_Controller extends Action_Controller
 			}
 			// ...or update an existing board.
 			else
-				modifyBoard($_POST['boardid'], $boardOptions);
+				modifyBoard($board_id, $boardOptions);
 		}
 		elseif (isset($_POST['delete']) && !isset($_POST['confirmation']) && !isset($_POST['no_children']))
 		{
@@ -711,10 +711,10 @@ class ManageBoards_Controller extends Action_Controller
 				if (empty($_POST['board_to']))
 					fatal_lang_error('mboards_delete_board_error');
 
-				deleteBoards(array($_POST['boardid']), (int) $_POST['board_to']);
+				deleteBoards(array($board_id), (int) $_POST['board_to']);
 			}
 			else
-				deleteBoards(array($_POST['boardid']), 0);
+				deleteBoards(array($board_id), 0);
 		}
 
 		if (isset($_REQUEST['rid']) && $_REQUEST['rid'] == 'permissions')
