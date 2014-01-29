@@ -186,7 +186,7 @@ $helptxt['moderate_enable'] = '<strong>Warning Level for Post Moderation</strong
 $helptxt['mute_enable'] = '<strong>Warning Level for Member Muting</strong><br />If this warning level is passed by a member they will find themselves under a post ban. The member will lose all posting rights.';
 $helptxt['perday_limit'] = '<strong>Maximum Member Warning Points per Day</strong><br />This setting limits the amount of points a moderator may add/remove to any particular member in a twenty four hour period. This can be used to limit what a moderator can do in a small period of time. This setting can be disabled by setting to a value of zero. Note that any member with administrator permissions are not affected by this value.';
 $helptxt['error_log'] = '<strong>Error Log</strong><br />
-	The error log tracks logs every serious error encountered by users using your forum. It lists all of these errors by date which can be sorted
+	The error log tracks every serious error encountered by users using your forum. It lists all of these errors by date which can be sorted
 	by clicking the black arrow next to each date. Additionally you can filter the errors by clicking the picture next to each error statistic. This
 	allows you to filter, for example, by member. When a filter is active the only results that will be displayed will be those that match that filter.';
 $helptxt['theme_settings'] = '<strong>Theme Settings</strong><br />
