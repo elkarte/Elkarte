@@ -265,7 +265,7 @@ function template_messages()
 			// Can they like this post?
 			if ($message['can_like'])
 				echo '
-							<li class="listlevel1"><a href="', $scripturl, '?action=likes;sa=likepost;topic=', $context['current_topic'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 like_button">', !empty($message['like_counter']) ? '&nbsp;' . $message['like_counter'] . '&nbsp;' . $txt['likes'] : '&nbsp;', '</a></li>';
+							<li class="listlevel1"><a href="', $scripturl, '?action=likes;sa=likepost;topic=', $context['current_topic'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 like_button">', !empty($message['like_counter']) ? '&nbsp;' . $message['like_counter'] . '&nbsp;' . $txt['likes'] : $txt['like_post'], '</a></li>';
 			// Or remove the like they made
 			elseif ($message['can_unlike'])
 				echo '
@@ -279,7 +279,7 @@ function template_messages()
 		// Can the user quick modify the contents of this post?  Show the quick (inline) modify button.
 		if ($message['can_modify'])
 			echo '
-							<li class="listlevel1 quick_edit" style="display: none"><a class="linklevel1"><img src="', $settings['images_url'], '/icons/modify_inline.png" alt="', $txt['modify_msg'], '" title="', $txt['modify_msg'], '" class="modifybutton" id="modify_button_', $message['id'], '" onclick="oQuickModify.modifyMsg(\'', $message['id'], '\')" />', $txt['quick_edit'], '</a></li>';
+							<li class="listlevel1 quick_edit" style="display: none"><a class="linklevel1"><img src="', $settings['images_url'], '/icons/modify_inline.png" alt="', $txt['modify_msg'], '" title="" class="modifybutton" id="modify_button_', $message['id'], '" onclick="oQuickModify.modifyMsg(\'', $message['id'], '\')" />', $txt['quick_edit'], '</a></li>';
 
 		// Can they quote to a new topic? @todo - This needs rethinking for GUI layout.
 		if ($context['can_follow_up'])
@@ -519,7 +519,7 @@ function template_quickreply_below()
 	// Tooltips for likes
 	echo '
 			<script><!-- // --><![CDATA[
-				$(".like_button").SiteTooltip({hoverIntent: {sensitivity: 10, interval: 150, timeout: 50}});
+				$(".like_button, .unlike_button").SiteTooltip({hoverIntent: {sensitivity: 10, interval: 150, timeout: 50}});
 			// ]]></script>';
 
 	// Quick moderation options
