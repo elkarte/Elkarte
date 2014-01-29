@@ -192,7 +192,7 @@ select option {
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 	overflow: hidden;
-	background: #fff url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAMAAABhq6zVAAAACVBMVEX///////8AAACO9MPsAAAAAXRSTlMAQObYZgAAACVJREFUeNpjIBIwIQOG/3AAkmKEAiawQjgbzIOy4TwmZCMJ2AkA4U4KOd8H2boAAAAASUVORK5CYII=) no-repeat no-repeat 98% 50%;
+	background: #fff url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYAQAAAADb20ChAAAAAnRSTlMAAQGU/a4AAAApSURBVHjaY/zPgIL+MTL+aWb84c74QZ/xgT6yFJALFARKARUAlaFpBACuqxnhHOnncgAAAABJRU5ErkJggg==) 98% 50% no-repeat;
 	display: inline-block;
 	border: 1px solid #ccc;
 	border-radius: 2px;
@@ -210,7 +210,7 @@ select option {
 .styled-select select::-ms-expand {
     display: none;
 }
-/* A styled div to hold the style-less select objects */
+/* A div to hold the select */
 .styled-select select {
 	font-size: 0.857em;
 	font-weight: normal;
@@ -220,8 +220,10 @@ select option {
     box-shadow: none;
     background-image: none;
 	width: 100%;
-	padding: 1px 2px;
-	padding-right: 1.5em;
+	padding: 1px 2em 1px 2px;
+}
+.styled-select select:disabled {
+	background: #eee url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYCAQAAABZqbWHAAAAKklEQVR42mMYiqCBgDQI4pXGp6QBBWJKY8ABB+Q4ElMajxKyghqhZCgCAL3SGQGs8tZQAAAAAElFTkSuQmCC) 98% 50% no-repeat;
 }
 /* Can't hide the arrow in ie<10 so we positon it off div */
 #ie8 .styled-select select, #ie9 .styled-select select {
