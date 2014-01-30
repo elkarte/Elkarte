@@ -260,16 +260,14 @@ $helptxt['enableAllMessages'] = 'Set this to the <em>maximum</em> number of post
 $helptxt['enableStickyTopics'] = 'Stickies are topics that remain on top of the topic list. They are mostly used for important
 		messages. Although you can change this with permissions, by default only moderators and administrators can make topics sticky.';
 $helptxt['allow_guestAccess'] = 'Unchecking this box will stop guests from doing anything but very basic actions - login, register, password reminder, etc. - on your forum.  This is not the same as disallowing guest access to boards.';
-$helptxt['userLanguage'] = 'Turning this option on will allow users to select which language file they use. It will not affect the
-		default selection.';
+$helptxt['userLanguage'] = 'Turning this option on will allow users to select which language file they use. It will not affect the default selection.';
 $helptxt['trackStats'] = 'Stats:<br />This will allow users to see the latest posts and the most popular topics on your forum.
-		It will also show several statistics, like the most members online, new members and new topics.<hr />
-		Page views:<br />Adds another column to the stats page with the number of pageviews on your forum.';
+		It will also show several statistics like the most members online, new members and new topics.<hr />
+		Page views:<br />Adds another column to the stats page with the number of page views on your forum.';
 $helptxt['enable_unwatch'] = 'Enabling this option will allow users to selectively turn off new reply notifications for topics in which they had previously posted.';
 $helptxt['titlesEnable'] = 'Switching Custom Titles on will allow members with the relevant permission to create a special title for themselves.
-		This will be shown underneath the name.<br /><em>For example:</em><br />Jeff<br />Cool Guy';
-$helptxt['topbottomEnable'] = 'This will add go up and go down buttons, so that member can go to the top and bottom of a page
-		without scrolling.';
+		This will be shown underneath the name.<br /><em>Example:</em><br />Jeff<br />Cool Guy';
+$helptxt['topbottomEnable'] = 'This will add go up and go down buttons, so that member can go to the top and bottom of a page without scrolling.';
 $helptxt['onlineEnable'] = 'This will show an image to indicate whether the member is online or offline';
 $helptxt['todayMod'] = 'This will format &quot;Today&quot; or &quot;Yesterday&quot; in a variety of formats instead of the full date.<br /><br />
 		<strong>Examples:</strong><br /><br />
