@@ -404,6 +404,10 @@ div.bbc_footnotes .meaction{
 	font-weight: 700;
 	color: #a80000;
 }
+#search_form .input_text {
+	border-radius: 2px 0 0 2px;
+	border-right: none;
+}
 #search_form .button_submit {
 	border-radius: 0 2px 2px 0;
 	font-variant: small-caps;
