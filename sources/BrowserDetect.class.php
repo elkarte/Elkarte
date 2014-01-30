@@ -388,9 +388,10 @@ class Browser_Detector
 			$context['browser_body_id'] = 'tablet';
 		else
 		{
-			// add in any specific detection conversions here if you want a special body id e.g. 'is_opera9' => 'opera9'
+			// Add in any specific detection conversions here if you want a special body id e.g. 'is_opera9' => 'opera9'
 			$browser_priority = array(
 				'is_ie8' => 'ie8',
+				'is_ie9' => 'ie9',
 				'is_ie' => 'ie',
 				'is_firefox' => 'firefox',
 				'is_chrome' => 'chrome',
