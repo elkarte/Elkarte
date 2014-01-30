@@ -1307,6 +1307,10 @@ div.bbc_footnotes .meaction{
 	color: #fff;
 	cursor: pointer;
 }
+.drop_attachments_error {
+	color: #ff0000;
+}
+
 #postMoreOptions, #postAttachment, #postAttachment2 {
 	border-top: 1px solid #ccc;
 }

@@ -338,7 +338,7 @@ function template_post_page()
  */
 function template_additional_options_below()
 {
-	global $context, $settings, $options, $txt;
+	global $context, $settings, $options, $txt, $modSettings;
 
 	// If the admin has enabled the hiding of the additional options - show a link and image for it.
 	if (!empty($settings['additional_options_collapsible']))
@@ -383,10 +383,10 @@ function template_additional_options_below()
 	echo '
 		<script><!-- // --><![CDATA[
 			dragDropAttachment({
-				allowedExtensions: "', $context['allowed_extensions'],'",
+				allowedExtensions: "', $context['attachments']['allowed_extensions'],'",
 				totalSizeAllowed: "', $modSettings['attachmentPostLimit'], '",
 				individualSizeAllowed: "', $modSettings['attachmentSizeLimit'], '",
-				numOfAttachmentAllowed: "',$context['num_allowed_attachments'],'",
+				numOfAttachmentAllowed: "',$context['attachments']['num_allowed'],'",
 			});
 		// ]]></script>';
 }
@@ -439,6 +439,7 @@ function template_add_new_attachments()
 		echo '
 							<dt class="drop_area">', $txt['attach_drop_files'], '</dt>
 							<dd class="progress_tracker"></dd>
+							<dd class="drop_attachments_error"></dd>
 							<dt>
 								', $txt['attach'], ':
 							</dt>
