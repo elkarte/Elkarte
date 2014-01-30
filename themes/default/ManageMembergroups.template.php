@@ -285,7 +285,7 @@ function template_edit_group()
 						<input type="text" name="min_posts" id="min_posts_input"', $context['group']['is_post_group'] ? ' value="' . $context['group']['min_posts'] . '"' : '', ' size="6" class="input_text" />
 					</dd>';
 
-	// Hide the online color for our lokal moderators group.
+	// Hide the online color for our local moderators group.
 	if ($context['group']['id'] != 3)
 		echo '
 					<dt>
