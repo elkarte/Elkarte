@@ -27,7 +27,7 @@ $txt['setting_cal_minyear'] = 'Mindestjahr';
 $txt['setting_cal_maxyear'] = 'Höchstjahr';
 $txt['setting_cal_allowspan'] = 'Ereignisse dürfen mehrere Tage umfassen';
 $txt['setting_cal_maxspan'] = 'Max. Anzahl an Tagen, die ein Ereignis umfassen darf';
-$txt['setting_cal_showInTopic'] = 'Verknüpfte Ereignisse in Themenübersicht anzeigen';
+$txt['setting_cal_showInTopic'] = 'Verknüpfte Ereignisse in Themenansicht anzeigen';
 
 // Adding/Editing/Viewing Holidays
 $txt['manage_holidays_desc'] = 'Von hier aus können Sie Feiertage dem Kalender hinzufügen und sie aus ihm entfernen.';
