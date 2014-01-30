@@ -285,13 +285,16 @@ function template_edit_group()
 						<input type="text" name="min_posts" id="min_posts_input"', $context['group']['is_post_group'] ? ' value="' . $context['group']['min_posts'] . '"' : '', ' size="6" class="input_text" />
 					</dd>';
 
-	echo '
+	// Hide the online color for our lokal moderators group.
+	if ($context['group']['id'] != 3)
+		echo '
 					<dt>
 						<label for="online_color_input"><strong>', $txt['membergroups_online_color'], ':</strong></label>
 					</dt>
 					<dd>
 						<input type="text" name="online_color" id="online_color_input" value="', $context['group']['color'], '" size="20" class="input_text" />
-					</dd>
+					</dd>';
+	echo '
 					<dt>
 						<label for="icon_count_input"><strong>', $txt['membergroups_icon_count'], ':</strong></label>
 					</dt>
