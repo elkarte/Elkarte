@@ -37,7 +37,7 @@
 		 * Monitor for a ctrl+enter keypress, this is our keystroke cue to split the tag(s)
 		 */
 		base.signalKeypressEvent = function(e) {
-			if (e.keyCode === 13 && e.ctrlKey)
+			if ((e.keyCode === 10 || e.keyCode === 13) && e.ctrlKey)
 				oSplitTags.split();
 		};
 	};
@@ -69,7 +69,8 @@
 		else
 		{
 			var i = 0,
-				tagText = "",
+				tagTextStart = "",
+				tagTextEnd = "",
 				contents = base.val(),
 				editor = $(".sceditor-container").find("textarea")[0],
 				endPos = Math.min(editor.selectionStart, contents.length);
@@ -82,14 +83,18 @@
 			{
 				// Traverse in reverse and build closing tags.
 				for (i = this.tagStack.length - 1; i >= 0; i--)
-					tagText += '[/' + this.tagStack[i].name + "]";
+					tagTextStart += '[/' + this.tagStack[i].name + "]";
 
 				// Traverse forward and build opening tags (with attr's)
 				for (i = 0; i < this.tagStack.length; i++)
-					tagText += '\n[' + this.tagStack[i].name + this.tagStack[i].attributes + "]";
+				{
+					if (i === 0)
+						tagTextEnd += "\n";
+					tagTextEnd += '[' + this.tagStack[i].name + this.tagStack[i].attributes + "]";
+				}
 
 				// Insert the new close/open tags at the cursor position
-				base.insert(tagText);
+				base.insert(tagTextStart, tagTextEnd);
 			}
 		}
 	};
