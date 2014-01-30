@@ -21,7 +21,7 @@
 /*
 /*		$TABLES..............Generic tables (memberlist, error log, etc).
 /*		$SETTINGS............Generic lists for settings pages.
-/*		$BOARDS..............Board index, child boards, and message index.
+/*		$BOARDS..............Board index, sub-boards, and message index.
 /*
 /*		$TOPICS..............The display template (topic view), including send.
 /*		$EDITOR..............Main editor (posts, events, polls) and topic summary.
@@ -192,7 +192,7 @@ select option {
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 	overflow: hidden;
-	background: #fff url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAMAAABhq6zVAAAACVBMVEX///////8AAACO9MPsAAAAAXRSTlMAQObYZgAAACVJREFUeNpjIBIwIQOG/3AAkmKEAiawQjgbzIOy4TwmZCMJ2AkA4U4KOd8H2boAAAAASUVORK5CYII=) no-repeat no-repeat 98% 50%;
+	background: #fff url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYAQAAAADb20ChAAAAAnRSTlMAAQGU/a4AAAApSURBVHjaY/zPgIL+MTL+aWb84c74QZ/xgT6yFJALFARKARUAlaFpBACuqxnhHOnncgAAAABJRU5ErkJggg==) 98% 50% no-repeat;
 	display: inline-block;
 	border: 1px solid #ccc;
 	border-radius: 2px;
@@ -210,7 +210,7 @@ select option {
 .styled-select select::-ms-expand {
     display: none;
 }
-/* A styled div to hold the style-less select objects */
+/* A div to hold the select */
 .styled-select select {
 	font-size: 0.857em;
 	font-weight: normal;
@@ -220,8 +220,10 @@ select option {
     box-shadow: none;
     background-image: none;
 	width: 100%;
-	padding: 1px 2px;
-	padding-right: 1.5em;
+	padding: 1px 2em 1px 2px;
+}
+.styled-select select:disabled {
+	background: #eee url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYCAQAAABZqbWHAAAAKklEQVR42mMYiqCBgDQI4pXGp6QBBWJKY8ABB+Q4ElMajxKyghqhZCgCAL3SGQGs8tZQAAAAAElFTkSuQmCC) 98% 50% no-repeat;
 }
 /* Can't hide the arrow in ie<10 so we positon it off div */
 #ie8 .styled-select select, #ie9 .styled-select select {
@@ -1758,6 +1760,9 @@ dl.settings dt .styled-select select {
 .topic_sorting>li {
 	padding: 0 3px;
 }
+.topic_sorting.topic_sorting_recent {
+	margin-top: 0;
+}
 #expanded_pages_container {
 	position: absolute;
 }
@@ -1955,12 +1960,8 @@ img.new_posts {
 #message_index_jump_to {
 	font-size: 1.167em;
 }
-/* @todo - An oddone. Look into it later. */
-#message_index_jump_to label {
-	vertical-align: top;
-}
-#message_index_jump_to .button_submit {
-	margin: 0 0 10px;
+#message_index_jump_to .right_submit {
+	margin: 1px 0 0;
 }
 .jump_to_header {
 	padding: 0 4px;

@@ -19,8 +19,9 @@ $txt['need_username'] = 'Sie müssen einen Benutzernamen angeben.';
 $txt['no_password'] = 'Sie haben kein Passwort eingegeben.';
 $txt['improper_password'] = 'Das angegebene Passwort ist zu lang.';
 $txt['incorrect_password'] = 'Passwort falsch';
+$txt['openid_not_found'] = 'Angegebene OpenID nicht gefunden.';
 $txt['choose_username'] = 'Wählen Sie einen Benutzernamen aus';
-$txt['maintain_mode'] = 'MWartungsmodus';
+$txt['maintain_mode'] = 'Wartungsmodus';
 $txt['registration_successful'] = 'Erfolgreich registriert';
 $txt['now_a_member'] = 'Erfolg! Sie sind nun ein Mitglied dieses Forums.';
 // Use numeric entities in the below string.

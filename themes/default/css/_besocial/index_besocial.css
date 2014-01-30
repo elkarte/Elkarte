@@ -24,7 +24,7 @@
 /*
 /*		$TABLES..............Generic tables (memberlist, error log, etc).
 /*		$SETTINGS............Generic lists for settings pages.
-/*		$BOARDS..............Board index, child boards, and message index.
+/*		$BOARDS..............Board index, sub-boards, and message index.
 /*
 /*		$TOPICS..............The display template (topic view), including send.
 /*		$EDITOR..............Main editor (posts, events, polls) and topic summary.
@@ -420,13 +420,10 @@ div.bbc_footnotes .meaction{
 	color: #333;
 }
 #search_form select {
-	padding-right: 4px;
-	border: 1px solid #bbb;
 	border-right: none;
 	opacity: 0.8;
 }
 #search_form select:focus {
-	border: 1px solid #999;
 	border-right: none;
 	opacity: 1;
 }
@@ -1092,7 +1089,7 @@ span.views_text {
 	padding-top: 0;
 }
 .ui-tabs-panel {
-	border-top: 8px solid #f6f6f6; 
+	border-top: 8px solid #f6f6f6;
 }
 .ui-tabs .ui-tabs-nav li {
 	border-radius: 5px 5px 0 0;

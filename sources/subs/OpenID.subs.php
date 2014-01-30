@@ -38,16 +38,18 @@ class OpenID
 	 * @param string $return_action = null
 	 * @return string
 	 */
-	function validate($openid_uri, $return = false, $save_fields = array(), $return_action = null)
+	public function validate($openid_uri, $return = false, $save_fields = array(), $return_action = null)
 	{
 		global $scripturl, $modSettings;
 
-		$openid_url = $this->canonize($openid_uri);
-
+		$openid_url = $this->_canonize($openid_uri);
 		$response_data = $this->getServerInfo($openid_url);
+
+		// We can't do anything without the proper response data.
 		if ($response_data === false || empty($response_data['provider']))
 			return 'no_data';
 
+		// Is there an existing association?
 		if (($assoc = $this->getAssociation($response_data['provider'])) == null)
 			$assoc = $this->makeAssociation($response_data['provider']);
 
@@ -68,18 +70,21 @@ class OpenID
 			'cookieTime' => $modSettings['cookieTime'],
 		);
 
-		$id_select = 'http://specs.openid.net/auth/2.0/identifier_select';
-		$openid_identity = $id_select;
-		$openid_claimedid = $id_select;
+		// Set identity and claimed id to match the specs.
+		$openid_identity = 'http://specs.openid.net/auth/2.0/identifier_select';
+		$openid_claimedid = $openid_identity;
+
+		// OpenID url an server response equal?
 		if ($openid_url != $response_data['server'])
 		{
 			$openid_identity = urlencode(empty($response_data['delegate']) ? $openid_url : $response_data['delegate']);
 			if (strpos($openid_identity, 'https') === 0)
-				$openid_claimedid = str_replace("http://", "https://", $openid_url);
+				$openid_claimedid = str_replace('http://', 'https://', $openid_url);
 			else
 				$openid_claimedid = $openid_url;
 		}
 
+		// Prepare parameters for the OpenID setup.
 		$parameters = array(
 			'openid.mode=checkid_setup',
 			'openid.realm=' . $scripturl,
@@ -109,7 +114,7 @@ class OpenID
 	 *
 	 * @return boolean
 	 */
-	function revalidate()
+	public function revalidate()
 	{
 		global $user_settings;
 
@@ -133,7 +138,7 @@ class OpenID
 	 * @param bool $no_delete = false
 	 * @return array
 	 */
-	function getAssociation($server, $handle = null, $no_delete = false)
+	public function getAssociation($server, $handle = null, $no_delete = false)
 	{
 		$db = database();
 
@@ -276,7 +281,7 @@ class OpenID
 	 *
 	 * @param string $uri
 	 */
-	function canonize($uri)
+	private function _canonize($uri)
 	{
 		// @todo Add in discovery.
 
@@ -295,7 +300,7 @@ class OpenID
 	 * @param bool $regenerate = false
 	 * @return array|false return false on failure or an array() on success
 	 */
-	function setup_DH($regenerate = false)
+	public function setup_DH($regenerate = false)
 	{
 		global $p, $g;
 
@@ -393,7 +398,7 @@ class OpenID
 	 * @param string $openid_url
 	 * @return boolean|array
 	 */
-	function getServerInfo($openid_url)
+	public function getServerInfo($openid_url)
 	{
 		require_once(SUBSDIR . '/Package.subs.php');
 
@@ -436,29 +441,6 @@ class OpenID
 
 		return $response_data;
 	}
-}
-
-/**
- * keyed-hash function that provides message authentication using the HMAC
- * algorithm and the SHA-1 hash function.
- *
- * @param string $data
- * @param string $key
- * @return string
- */
-function sha1_hmac($data, $key)
-{
-	if (strlen($key) > 64)
-		$key = sha1($key, true);
-
-	// Pad the key if need be.
-	$key = str_pad($key, 64, chr(0x00));
-	$ipad = str_repeat(chr(0x36), 64);
-	$opad = str_repeat(chr(0x5c), 64);
-	$hash1 = sha1(($key ^ $ipad) . $data, true);
-	$hmac = sha1(($key ^ $opad) . $hash1, true);
-
-	return $hmac;
 }
 
 /**

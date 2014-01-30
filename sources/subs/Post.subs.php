@@ -1287,7 +1287,7 @@ function updateLastMessages($setboards, $id_msg = 0)
 	// Keep track of last modified dates.
 	$lastModified = $lastMsg;
 
-	// Get all the child boards for the parents, if they have some...
+	// Get all the sub-boards for the parents, if they have some...
 	foreach ($setboards as $id_board)
 	{
 		if (!isset($lastMsg[$id_board]))
@@ -1316,7 +1316,7 @@ function updateLastMessages($setboards, $id_msg = 0)
 	}
 
 	// Note to help understand what is happening here. For parents we update the timestamp of the last message for determining
-	// whether there are child boards which have not been read. For the boards themselves we update both this and id_last_msg.
+	// whether there are sub-boards which have not been read. For the boards themselves we update both this and id_last_msg.
 	$board_updates = array();
 	$parent_updates = array();
 

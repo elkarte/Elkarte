@@ -23,7 +23,7 @@ if (!defined('ELK'))
 
 /**
  * Fetches a list of boards and (optional) categories including
- * statistical information, child boards and moderators.
+ * statistical information, sub-boards and moderators.
  *  - Used by both the board index (main data) and the message index (child
  * boards).
  *  - Depending on the include_categories setting returns an associative
@@ -169,7 +169,7 @@ function getBoardIndex($boardIndexOptions)
 				$this_category[$row_board['id_board']]['link_moderators'][] = '<a href="' . $scripturl . '?action=profile;u=' . $row_board['id_moderator'] . '" title="' . $txt['board_moderator'] . '">' . $row_board['mod_real_name'] . '</a>';
 			}
 		}
-		// Found a child board.... make sure we've found its parent and the child hasn't been set already.
+		// Found a sub-board.... make sure we've found its parent and the child hasn't been set already.
 		elseif (isset($this_category[$row_board['id_parent']]['children']) && !isset($this_category[$row_board['id_parent']]['children'][$row_board['id_board']]))
 		{
 			// A valid child!
@@ -190,7 +190,7 @@ function getBoardIndex($boardIndexOptions)
 				'link' => '<a href="' . $scripturl . '?board=' . $row_board['id_board'] . '.0">' . $row_board['board_name'] . '</a>'
 			);
 
-			// Counting child board posts is... slow :/.
+			// Counting sub-board posts is... slow :/.
 			if (!empty($boardIndexOptions['countChildPosts']) && !$row_board['is_redirect'])
 			{
 				$this_category[$row_board['id_parent']]['posts'] += $row_board['num_posts'];

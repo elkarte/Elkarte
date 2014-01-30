@@ -78,7 +78,7 @@ function template_manage_boards()
 		// List through every board in the category, printing its name and link to modify the board.
 		foreach ($category['boards'] as $board)
 		{
-			// Going in a level deeper (child board)
+			// Going in a level deeper (sub-board)
 			if ($board['child_level'] > $depth)
 				echo '
 							<ul class="nolist">';
@@ -725,7 +725,7 @@ function template_modify_board()
 }
 
 /**
- * A template used when a user is deleting a board with child boards in it - to see what they want to do with them.
+ * A template used when a user is deleting a board with sub-boards in it - to see what they want to do with them.
  */
 function template_confirm_board_delete()
 {

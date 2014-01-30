@@ -219,8 +219,8 @@ $txt['search'] = 'Suchen';
 $txt['all'] = 'Alles';
 $txt['search_entireforum'] = 'Ganzes Forum';
 $txt['search_thisbrd'] = 'Dieses Board';
-$txt['search_thistopic'] = 'This topic';
-$txt['search_members'] = 'Members';
+$txt['search_thistopic'] = 'Dieses Thema';
+$txt['search_members'] = 'Mitglieder';
 
 $txt['back'] = 'Zurück';
 $txt['continue'] = 'Weiter';
