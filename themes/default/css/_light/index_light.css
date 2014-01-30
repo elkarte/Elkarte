@@ -82,7 +82,7 @@ legend {
 	cursor: pointer;
 	padding-left: 20px;
 	color: #333;
-	font-size: 1.2em;
+	font-size: 1.214em;
 	margin-left: 15px;
 }
 .collapsed legend {
@@ -346,13 +346,13 @@ strong {
 }
 .meaction:before {
 	content: "\270c";
-	font-size: 1.7em;
+	font-size: 1.714em;
 	line-height: 1em;
 }
 .spoilerheader {
 	font-weight: bold;
 	cursor: pointer;
-	font-size: 0.85em;
+	font-size: 0.857em;
 }
 .spoiler {
 	border: 1px solid #ccc;
@@ -430,8 +430,8 @@ div.bbc_footnotes .meaction{
 #news>h2 {
 	float: left;
 	color: #4b863c;
-	font-size: 1.25em;
-	line-height: 1.2em;
+	font-size: 1.286em;
+	line-height: 1.286em;
 	font-weight: 700;
 	font-variant: small-caps;
 	margin: 7px -4em 0 12px;
@@ -581,14 +581,14 @@ div.bbc_footnotes .meaction{
 }
 #main_menu .subsections:hover .linklevel1:after {
 	top: 88%;
-	font-size: 1.4em;
+	font-size: 1.429em;
 	color: #eee;
 	text-shadow: 0 4px 0 #3d6e32;
 }
 .admin_menu  .subsections:hover .linklevel1:after {
 	top: 72%;
 	color: #3d6e32;
-	font-size: 1.2em;
+	font-size: 1.214em;
 }
 /* Corrections for other menus. */
 .quickbuttons .subsections:hover .linklevel1:after {
@@ -635,7 +635,7 @@ div.bbc_footnotes .meaction{
 	box-shadow: 3px 3px 3px rgba(0,0,0,0.25);
 	font-weight: 700;
 	line-height: 1.8em;
-	font-size: 0.923em;
+	font-size: 0.929em;
 	z-index: 2;
 }
 .poster .pm_indicator {
@@ -660,7 +660,7 @@ div.bbc_footnotes .meaction{
 	right: 6px;
 	color: #777;
 	content: "\2192";
-	font-size: 1.3em;
+	font-size: 1.286em;
 }
 /* Level 2: dividers between admin/moderation, and pm/profile links. */
 #button_admin .listlevel2.subsections, #button_pm .listlevel2.subsections {
@@ -859,12 +859,12 @@ div.bbc_footnotes .meaction{
 .small_pagelinks:before {
 	content: '\00AB';
 	float: left;
-	font-size: 1.3em;
+	font-size: 1.286em;
 }
 .small_pagelinks:after {
 	content: '\00BB';
 	float: left;
-	font-size: 1.3em;
+	font-size: 1.286em;
 }
 
 /* Globally accessible top/bottom links. */
@@ -1462,7 +1462,7 @@ div.bbc_footnotes .meaction{
 }
 #main_grid .weeks {
 	font-weight: bold;
-	font-size: 1.8em;
+	font-size: 1.786em;
 }
 #main_grid .weeks a:hover {
 	text-decoration: none;
