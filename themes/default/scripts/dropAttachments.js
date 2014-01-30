@@ -2,9 +2,10 @@
 var dragDropAttachment = function(params) {
 	var filesUploadedSuccessfully = [],
 		allowedExtensions = params.allowedExtensions.split(/[\s,]+/) || [],
-		totalSizeAllowed = params.totalSizeAllowed || '',
+		totalSizeAllowed = params.totalSizeAllowed || null,
 		individualSizeAllowed = params.individualSizeAllowed || '',
 		numOfAttachmentAllowed = params.numOfAttachmentAllowed || '',
+		totalAttachmentsUploaded = 0,
 
 		sendFileToServer = function(formData, status) {
 			var jqXHR = $.ajax({
@@ -132,24 +133,41 @@ var dragDropAttachment = function(params) {
 		},
 
 		handleFileUpload = function(files, obj) {
+			var errorMsgs = {};
 			for (var i = 0; i < files.length; i++) {
 				var fileExtensionCheck = /(?:\.([^.]+))?$/,
 					extension = fileExtensionCheck.exec(files[i].name)[1],
-					fileSize = parseInt(files[i].size / 1024, 10);
+					fileSize = parseInt(files[i].size / 1024, 10),
+					errorFlag = false;
 
 				if (allowedExtensions.length > 0 && allowedExtensions.indexOf(extension) < 0) {
-					alert('File extension not allowed');
-					return false;
+					errorMsgs.extnError = 'File extension not allowed';
+					errorFlag = true;
 				}
 				if (individualSizeAllowed !== '' && fileSize > individualSizeAllowed) {
-					alert('File size too big');
-					return false;
+					errorMsgs.individualSizeErr = 'File size too big';
+					errorFlag = true;
 				}
-				var fd = new FormData();
-				fd.append('attachment[]', files[i]);
-				var status = new createStatusbar(obj);
-				status.setFileNameSize(files[i].name, files[i].size);
-				sendFileToServer(fd, status);
+
+				totalAttachmentsUploaded += fileSize;
+				if (totalSizeAllowed !== null && totalAttachmentsUploaded > totalSizeAllowed) {
+					errorMsgs.totalSizeError = 'Maximum file size reached';
+					errorFlag = true;
+				}
+
+				if (errorFlag === false) {
+					var fd = new FormData();
+					fd.append('attachment[]', files[i]);
+					var status = new createStatusbar(obj);
+					status.setFileNameSize(files[i].name, files[i].size);
+					sendFileToServer(fd, status);
+				}
+			}
+			$('.drop_attachments_error').html('');
+			for(var err in errorMsgs) {
+				if(errorMsgs.hasOwnProperty(err)) {
+					$('.drop_attachments_error').append('<p class="warningbox">'+ errorMsgs[err] +'</p>');
+				}
 			}
 		},
 

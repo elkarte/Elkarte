@@ -378,6 +378,7 @@ function template_additional_options_below()
 						<div class="drop_attachments">
 							<div class="drop_area">', $txt['attach_drop_files'], '</div>
 							<div class="progress_tracker"></div>
+							<div class="drop_attachments_error"></div>
 						</div>
 						<dl id="postAttachment2">';
 
