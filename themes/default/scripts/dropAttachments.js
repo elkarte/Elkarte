@@ -35,9 +35,10 @@ var dragDropAttachment = function(params) {
 
 					if (resp.result) {
 						status.setProgress(100);
-						var curFileNum = filesUploadedSuccessfully.length;
-						filesUploadedSuccessfully.push(resp.data);
-						var data = resp.data;
+						var curFileNum = filesUploadedSuccessfully.length,
+							data = resp.data;
+
+						filesUploadedSuccessfully.push(data);
 						data.curFileNum = curFileNum;
 						status.onUploadSuccess(data);
 					} else {
@@ -54,7 +55,6 @@ var dragDropAttachment = function(params) {
 
 		removeFileFromServer = function(options) {
 			var dataToSend = filesUploadedSuccessfully[options.fileNum];
-			console.log(dataToSend);
 			$.ajax({
 				url: elk_scripturl + '?action=attachment;sa=rmattach',
 				type: "POST",
@@ -68,7 +68,7 @@ var dragDropAttachment = function(params) {
 					if (typeof(resp) !== 'object') resp = JSON.parse(resp);
 
 					if (resp.result) {
-						console.log('success');
+						totalAttachmentsUploaded -= filesUploadedSuccessfully[options.fileNum].size / 1024;
 						$('#' + dataToSend.temp_name).unbind();
 						$('#' + dataToSend.temp_name).remove();
 					} else {
@@ -120,6 +120,7 @@ var dragDropAttachment = function(params) {
 				$(this.str).find('.abort').removeClass('abort').addClass('remove');
 				$(this.str).find('.remove').attr('id', data.curFileNum);
 				$(this.str).attr('id', data.temp_name);
+				$(this.str).attr('data-size', data.size);
 
 				$(this.str).find('.progressBar').fadeOut(500);
 				$(this.str).find('.remove').bind('click', function(e) {
@@ -133,23 +134,29 @@ var dragDropAttachment = function(params) {
 		},
 
 		handleFileUpload = function(files, obj) {
-			var errorMsgs = {};
+			var errorMsgs = {},
+				extnErrorFiles = [],
+				sizeErrorFiles = [];
+
 			for (var i = 0; i < files.length; i++) {
 				var fileExtensionCheck = /(?:\.([^.]+))?$/,
 					extension = fileExtensionCheck.exec(files[i].name)[1],
-					fileSize = parseInt(files[i].size / 1024, 10),
+					fileSize = files[i].size / 1024,
 					errorFlag = false;
 
 				if (allowedExtensions.length > 0 && allowedExtensions.indexOf(extension) < 0) {
 					errorMsgs.extnError = 'File extension not allowed';
+					extnErrorFiles.push(files[i].name);
 					errorFlag = true;
 				}
 				if (individualSizeAllowed !== '' && fileSize > individualSizeAllowed) {
 					errorMsgs.individualSizeErr = 'File size too big';
+					sizeErrorFiles.push(files[i].name);
 					errorFlag = true;
 				}
 
-				totalAttachmentsUploaded += fileSize;
+				if (errorFlag === false) totalAttachmentsUploaded += fileSize;
+
 				if (totalSizeAllowed !== null && totalAttachmentsUploaded > totalSizeAllowed) {
 					errorMsgs.totalSizeError = 'Maximum file size reached';
 					errorFlag = true;
@@ -163,10 +170,33 @@ var dragDropAttachment = function(params) {
 					sendFileToServer(fd, status);
 				}
 			}
+			populateErrors({
+				'errorMsgs': errorMsgs,
+				'extnErrorFiles': extnErrorFiles,
+				'sizeErrorFiles': sizeErrorFiles
+			});
+		},
+
+		populateErrors = function(params) {
 			$('.drop_attachments_error').html('');
-			for(var err in errorMsgs) {
-				if(errorMsgs.hasOwnProperty(err)) {
-					$('.drop_attachments_error').append('<p class="warningbox">'+ errorMsgs[err] +'</p>');
+
+			for (var err in params.errorMsgs) {
+				if (params.errorMsgs.hasOwnProperty(err)) {
+					var errorMsg = '';
+					switch (err) {
+						case 'extnError':
+							errorMsg = '<p class="warningbox">' + params.errorMsgs[err] + '<br/ ><span>' + params.extnErrorFiles.join(', ') + '</span></p>';
+							break;
+
+						case 'individualSizeErr':
+							errorMsg = '<p class="warningbox">' + params.errorMsgs[err] + '<br/ ><span>' + params.sizeErrorFiles.join(', ') + '</span></p>';
+							break;
+
+						default:
+							errorMsg = '<p class="warningbox">' + params.errorMsgs[err] + '</p>';
+							break;
+					}
+					$('.drop_attachments_error').append(errorMsg);
 				}
 			}
 		},
