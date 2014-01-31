@@ -88,7 +88,8 @@ class Attachment_Controller extends Action_Controller
 						$resp_data = array(
 							'name'=> $val['name'],
 							'temp_name' => $key,
-							'temp_path' => $val['tmp_name']
+							'temp_path' => $val['tmp_name'],
+							'size' => $val['size']
 						);
 					}
 				}
