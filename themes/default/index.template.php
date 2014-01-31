@@ -226,7 +226,7 @@ function template_body_above()
 		echo '
 			<div id="top_section_notice" class="user">
 				<script src="', $settings['default_theme_url'], '/scripts/sha256.js"></script>
-				<form action="', $scripturl, '?action=login2;quicklogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');"' : '', '>
+				<form action="', $scripturl, '?action=login2;quicklogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', '>
 					<div id="password_login">
 						<input type="text" name="user" size="10" class="input_text" placeholder="', $txt['username'], '" />
 						<input type="password" name="passwrd" size="10" class="input_password" placeholder="', $txt['password'], '" />

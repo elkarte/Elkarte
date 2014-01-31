@@ -107,7 +107,7 @@ class Auth_Controller extends Action_Controller
 
 		// Are you guessing with a script?
 		checkSession('post');
-		$tk = validateToken('login');
+		validateToken('login');
 		spamProtection('login');
 
 		// Set the login_url if it's not already set (but careful not to send us to an attachment).
@@ -222,7 +222,7 @@ class Auth_Controller extends Action_Controller
 				$valid_password = true;
 			}
 			// Maybe is an old SHA-1 and needs upgrading if the db string is an actual 40 hexchar SHA-1
-			elseif (preg_match('/^[0-9a-f]{40}$/i', $user_settings['passwd']) && isset($_POST['old_hash_passwrd']) && $_POST['old_hash_passwrd'] === hash('sha1', $user_settings['passwd'] . $sc . $tk))
+			elseif (preg_match('/^[0-9a-f]{40}$/i', $user_settings['passwd']) && isset($_POST['old_hash_passwrd']) && $_POST['old_hash_passwrd'] === hash('sha1', $user_settings['passwd'] . $sc))
 			{
 				// Old password passed, turn off hashing and ask for it again so we can update the db to something more secure.
 				$context['login_errors'] = array($txt['login_hash_error']);
@@ -270,7 +270,7 @@ class Auth_Controller extends Action_Controller
 			validatePasswordFlood($user_settings['id_member'], $user_settings['passwd_flood']);
 
 			// Maybe we were too hasty... let's try some other authentication methods.
-			$other_passwords = $this->_other_passwords($user_settings, $tk);
+			$other_passwords = $this->_other_passwords($user_settings);
 
 			// Whichever encryption it was using, let's make it use ElkArte's now ;).
 			if (in_array($user_settings['passwd'], $other_passwords))
@@ -491,7 +491,7 @@ class Auth_Controller extends Action_Controller
 	 * Used when a board is converted to see if the user credentials and a 3rd
 	 * party hash satisfy whats in the db
 	 */
-	private function _other_passwords($user_settings, $tk)
+	private function _other_passwords($user_settings)
 	{
 		global $modSettings, $sc;
 
@@ -549,7 +549,7 @@ class Auth_Controller extends Action_Controller
 		{
 			// Maybe they are using a hash from before our password upgrade
 			$other_passwords[] = sha1(strtolower($user_settings['member_name']) . un_htmlspecialchars($_POST['passwrd']));
-			$other_passwords[] = sha1($user_settings['passwd'] . $sc . $tk);
+			$other_passwords[] = sha1($user_settings['passwd'] . $sc);
 
 			if (!empty($modSettings['enable_password_conversion']))
 			{
