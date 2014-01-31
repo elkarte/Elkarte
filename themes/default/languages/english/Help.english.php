@@ -284,7 +284,7 @@ $helptxt['todayMod'] = 'This will format &quot;Today&quot; or &quot;Yesterday&qu
 $helptxt['disableCustomPerPage'] = 'Check this option to stop users from customizing the amount of messages and topics to display per page on the Message Index and Topic Display page respectively.';
 $helptxt['enablePreviousNext'] = 'This will show a link to the next and previous topic.';
 $helptxt['pollMode'] = 'This selects whether polls are enabled or not. If polls are disabled, the regular topic without their polls are shown.
-<br /><br />To choose who can post polls, view polls, and similar, you can allow and disallow those permissions. Remember this if polls are not working.';
+<br /><br />To choose who can post polls, view polls, and similar, you can allow and disallow those permissions. Remember this if polls don\'t seem to be working.';
 $helptxt['enableVBStyleLogin'] = 'This will show a more compact login on every page of the forum for guests.';
 $helptxt['enableCompressedOutput'] = 'This option will compress output to lower bandwidth consumption, but it requires
 		zlib to be installed.';
