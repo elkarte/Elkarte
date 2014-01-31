@@ -378,17 +378,6 @@ function template_additional_options_below()
 
 	echo '
 					</div>';
-
-	// Initiate file drag drop
-	echo '
-		<script><!-- // --><![CDATA[
-			dragDropAttachment({
-				allowedExtensions: "', $context['attachments']['allowed_extensions'],'",
-				totalSizeAllowed: "', $modSettings['attachmentPostLimit'], '",
-				individualSizeAllowed: "', $modSettings['attachmentSizeLimit'], '",
-				numOfAttachmentAllowed: "',$context['attachments']['num_allowed'],'",
-			});
-		// ]]></script>';
 }
 
 /**
@@ -487,6 +476,17 @@ function template_add_new_attachments()
 	echo '
 							</dd>
 						</dl>';
+
+	// Initiate file drag drop
+	echo '
+		<script><!-- // --><![CDATA[
+			dragDropAttachment({
+				allowedExtensions: "', $context['attachments']['allowed_extensions'],'",
+				totalSizeAllowed: "', $modSettings['attachmentPostLimit'], '",
+				individualSizeAllowed: "', $modSettings['attachmentSizeLimit'], '",
+				numOfAttachmentAllowed: "',$context['attachments']['num_allowed'],'",
+			});
+		// ]]></script>';
 }
 
 /**
