@@ -6,6 +6,8 @@ var dragDropAttachment = function(params) {
 		individualSizeAllowed = params.individualSizeAllowed || '',
 		numOfAttachmentAllowed = params.numOfAttachmentAllowed || '',
 		totalAttachmentsUploaded = 0,
+		uploadInProgress = false,
+		attachmentQueue = [],
 
 		sendFileToServer = function(formData, status) {
 			var jqXHR = $.ajax({
@@ -48,6 +50,10 @@ var dragDropAttachment = function(params) {
 				error: function(error) {
 					console.log('error');
 					console.log(error);
+				},
+				complete: function() {
+					uploadInProgress = false;
+					runAttachmentQueue();
 				}
 			});
 			status.setAbort(jqXHR);
@@ -122,7 +128,7 @@ var dragDropAttachment = function(params) {
 				$(this.str).attr('id', data.temp_name);
 				$(this.str).attr('data-size', data.size);
 
-				$(this.str).find('.progressBar').fadeOut(500);
+				// $(this.str).find('.progressBar').fadeOut(500);
 				$(this.str).find('.remove').bind('click', function(e) {
 					e.preventDefault();
 					var fileNum = e.target.id;
@@ -167,7 +173,10 @@ var dragDropAttachment = function(params) {
 					fd.append('attachment[]', files[i]);
 					var status = new createStatusbar(obj);
 					status.setFileNameSize(files[i].name, files[i].size);
-					sendFileToServer(fd, status);
+					attachmentQueue.push({
+						'formData': fd,
+						'statusInstance': status
+					});
 				}
 			}
 			populateErrors({
@@ -175,6 +184,16 @@ var dragDropAttachment = function(params) {
 				'extnErrorFiles': extnErrorFiles,
 				'sizeErrorFiles': sizeErrorFiles
 			});
+			runAttachmentQueue();
+		},
+
+		runAttachmentQueue = function() {
+			if(attachmentQueue.length > 0 && uploadInProgress === false) {
+				uploadInProgress = true;
+				var currentData = attachmentQueue[0];
+				sendFileToServer(currentData.formData, currentData.statusInstance);
+				attachmentQueue.splice(0, 1);
+			}
 		},
 
 		populateErrors = function(params) {

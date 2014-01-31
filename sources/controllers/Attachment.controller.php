@@ -52,20 +52,24 @@ class Attachment_Controller extends Action_Controller
 	 */
 	public function action_ulattach()
 	{
-		global $txt, $context;
-
+		global $txt, $context, $modSettings;
 
 		$resp_data = array();
+
+		$context['attachments']['can']['post'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
+
 		if (isset($_FILES["attachment"]))
 		{
 			$attach_errors = attachment_Error_Context::context('attachment', 1);
 			$attach_errors->activate();
-
-			require_once(SUBSDIR . '/Attachments.subs.php');
-			if (isset($_REQUEST['msg']))
-				processAttachments((int) $_REQUEST['msg']);
-			else
-				processAttachments();
+			if ($context['attachments']['can']['post'] && empty($_POST['from_qr']))
+			{
+				require_once(SUBSDIR . '/Attachments.subs.php');
+				if (isset($_REQUEST['msg']))
+					processAttachments((int) $_REQUEST['msg']);
+				else
+					processAttachments();
+			}
 
 			// Any mistakes?
 			if ($attach_errors->hasErrors())
