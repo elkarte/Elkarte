@@ -1144,6 +1144,8 @@ function action_adminAccount()
 
 	// Need this to check whether we need the database password.
 	require(dirname(__FILE__) . '/Settings.php');
+	if (!defined('ELK'))
+		define('ELK', 1);
 	definePaths();
 
 	// These files may be or may not be already included, better safe than sorry for now
@@ -1324,6 +1326,8 @@ function action_deleteInstall()
 	$incontext['continue'] = 0;
 
 	require(dirname(__FILE__) . '/Settings.php');
+	if (!defined('ELK'))
+		define('ELK', 1);
 	definePaths();
 
 	$db = load_database();

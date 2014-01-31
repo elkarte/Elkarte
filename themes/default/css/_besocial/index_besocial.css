@@ -81,7 +81,7 @@ legend {
 	cursor: pointer;
 	padding-left: 20px;
 	color: #333;
-	font-size: 1.2em;
+	font-size: 1.214em;
 	margin-left: 15px;
 }
 .collapsed legend {
@@ -132,7 +132,7 @@ input[disabled].input_text {
 	color: #555;
 }
 .button_submit, .right_submit, .left_submit, .button_reset {
-	font-size: 0.88em;
+	font-size: 0.857em;
 }
 /* Hover effects. */
 .button_submit:hover, .right_submit:hover, .left_submit:hover,
@@ -357,14 +357,14 @@ strong {
 }
 .meaction:before {
 	content: "\270c";
-	font-size: 1.7em;
+	font-size: 1.714em;
 	line-height: 1em;
 	vertical-align: top;
 }
 .spoilerheader {
 	font-weight: bold;
 	cursor: pointer;
-	font-size: 0.85em;
+	font-size: 0.857em;
 }
 .spoiler {
 	border: 1px solid #ccc;
@@ -475,10 +475,10 @@ div.bbc_footnotes .meaction{
 	background-image: linear-gradient(to bottom, #efefef, #e4e4e4);
 	box-shadow: 1px 1px 2px #e5e5e5;
 	color: #666;
-	font-size: 0.9em;
+	font-size: 0.929em;
 }
 .quickbuttons .listlevel1 {
-	font-size: 0.9em;
+	font-size: 0.929em;
 }
 
 /* Level 1 button hover and focus effects. */
@@ -695,7 +695,7 @@ a.active {
 	right: 6px;
 	color: #ccc;
 	content: "\25b6";
-	font-size: 1.3em;
+	font-size: 1.286em;
 }
 
 /* Levels 2 and 3: highlighting of current section */
@@ -748,14 +748,14 @@ a.active {
 .small_pagelinks:before {
 	content: '\00AB';
 	float: left;
-	font-size: 1.3em;
+	font-size: 1.286em;
 	line-height: 1.3em;
 	color: #999;
 }
 .small_pagelinks:after {
 	content: '\00BB';
 	float: left;
-	font-size: 1.3em;
+	font-size: 1.286em;
 	line-height: 1.3em;
 	color: #999;
 }
@@ -836,7 +836,7 @@ a.active {
 .board_name>a {
 	color: #43a8da;
 	font-weight: bold;
-	font-size: 1.2em;
+	font-size: 1.214em;
 }
 .board_row, .childboard_row {
 	border-bottom: 1px solid #eee;
@@ -865,7 +865,7 @@ a.active {
 }
 li.modified {
 	color: #888;
-	font-size: 0.7em;
+	font-size: 0.714em;
 }
 span.views_text {
 	display: none;
@@ -1177,7 +1177,7 @@ span.views_text {
 		text-align: center;
 		display: inline-block;
 		border-radius: 4px;
-		font-size: 2.1em;
+		font-size: 2.071em;
 		color: #43a8da;
 		content: attr(data-icon);
 		speak: none;
@@ -1220,7 +1220,7 @@ span.views_text {
 		margin-bottom: 8px;
 	}
 	.new_posts {
-		font-size: 0.7em;
+		font-size: 0.714em;
 		position: relative;
 		top: -3px;
 	}
@@ -1242,7 +1242,7 @@ span.views_text {
 		border: none !important;
 	}
 	.topic_name h4 {
-		font-size: 1.4em;
+		font-size: 1.429em;
 		padding-bottom: 2px;
 	}
 	.topic_latest:after {

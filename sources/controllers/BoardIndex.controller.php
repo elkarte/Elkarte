@@ -39,7 +39,6 @@ class BoardIndex_Controller extends Action_Controller
 	/**
 	 * This function shows the board index.
 	 * It uses the BoardIndex template, and main sub template.
-	 * It may use the boardindex subtemplate for wireless support.
 	 * It updates the most online statistics.
 	 * It is accessed by ?action=boardindex.
 	 */

@@ -356,9 +356,11 @@ function onDocSent(XMLDoc)
 		$(this).next().children().slideToggle("fast");
 	});
 
-	// Fix code blocks
+	// Fix and Prettify code blocks
 	if (typeof elk_codefix === 'function')
 		elk_codefix();
+	if (typeof prettyPrint === 'function')
+		prettyPrint();
 }
 
 /**

@@ -148,6 +148,7 @@ class Auth_Controller extends Action_Controller
 		{
 			require_once(SUBSDIR . '/OpenID.subs.php');
 			$open_id = new OpenID();
+
 			if (($open_id->validate($_POST['openid_identifier'])) !== 'no_data')
 				return $open_id;
 			else
@@ -208,21 +209,22 @@ class Auth_Controller extends Action_Controller
 			return;
 		}
 
-		// Figure out the password using Elk's encryption - if what they typed is right.
+		// Figure out if the password is using Elk's encryption - if what they typed is right.
 		if (isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) === 64)
 		{
+			// Challenge what was passed
 			$valid_password = validateLoginPassword($_POST['hash_passwrd'], $user_settings['passwd']);
 
-			// Challenge what was passed
+			// Let them in
 			if ($valid_password)
 			{
 				$sha_passwd = $_POST['hash_passwrd'];
 				$valid_password = true;
 			}
-			// Needs upgrading if the db string is an actual 40 hexchar SHA-1
+			// Maybe is an old SHA-1 and needs upgrading if the db string is an actual 40 hexchar SHA-1
 			elseif (preg_match('/^[0-9a-f]{40}$/i', $user_settings['passwd']) && isset($_POST['old_hash_passwrd']) && $_POST['old_hash_passwrd'] === hash('sha1', $user_settings['passwd'] . $sc . $tk))
 			{
-				// Might Need to update so we will need to ask for the password again.
+				// Old password passed, turn off hashing and ask for it again so we can update the db to something more secure.
 				$context['login_errors'] = array($txt['login_hash_error']);
 				$context['disable_login_hashing'] = true;
 				unset($user_settings);
@@ -244,7 +246,7 @@ class Auth_Controller extends Action_Controller
 				{
 					log_error($txt['incorrect_password'] . ' - <span class="remove">' . $user_settings['member_name'] . '</span>', 'user');
 
-					// Wrong password, lets go plain text in case form hashing is causing problems
+					// Wrong password, lets enable plain text responses in case form hashing is causing problems
 					$context['disable_login_hashing'] = true;
 					$context['login_errors'] = array($txt['incorrect_password']);
 					unset($user_settings);
@@ -256,7 +258,7 @@ class Auth_Controller extends Action_Controller
 		// Plain text password, no JS or hashing has been turned off
 		else
 		{
-			// validateLoginPassword will convert this to a SHA-256 pw and check it
+			// validateLoginPassword will hash this like the form normally would and check its valid
 			$sha_passwd = $_POST['passwrd'];
 			$valid_password = validateLoginPassword($sha_passwd, $user_settings['passwd'], $user_settings['member_name']);
 		}
@@ -496,7 +498,7 @@ class Auth_Controller extends Action_Controller
 		// What kind of data are we dealing with
 		$pw_strlen = strlen($user_settings['passwd']);
 
-		// Maybe we were too hasty... let's try some other authentication methods.
+		// Start off with none, thats safe
 		$other_passwords = array();
 
 		// None of the below cases will be used most of the time (because the salt is normally set.)
@@ -545,7 +547,7 @@ class Auth_Controller extends Action_Controller
 		// The hash is 40 characters, lets try some SHA-1 style auth
 		elseif ($pw_strlen === 40)
 		{
-			// Maybe they are using a hash from before our password fix.
+			// Maybe they are using a hash from before our password upgrade
 			$other_passwords[] = sha1(strtolower($user_settings['member_name']) . un_htmlspecialchars($_POST['passwrd']));
 			$other_passwords[] = sha1($user_settings['passwd'] . $sc . $tk);
 

@@ -205,7 +205,7 @@ function adminLogin($type = 'admin')
 
 	// And title the page something like "Login".
 	if (!isset($context['page_title']))
-		$context['page_title'] = $txt['login'];
+		$context['page_title'] = $txt['admin_login'];
 
 	// The type of action.
 	$context['sessionCheckType'] = $type;
@@ -520,7 +520,7 @@ function validatePassword($password, $username, $restrict_in = array())
  * Checks whether an entered password is correct for the user
  * - called when logging in or whenever a password needs to be validated for a user
  * - used to generate a new hash for the db, used during registration or any password changes
- * - if a non SHA256 password is sent, will generate one with SHA256(password + $user) and return it in password
+ * - if a non SHA256 password is sent, will generate one with SHA256(user + password) and return it in password
  *
  * @param string $password user password if not already 64 characters long will be SHA256 with the user name
  * @param string $hash hash as generated from a SHA256 password

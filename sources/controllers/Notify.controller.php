@@ -74,7 +74,7 @@ class Notify_Controller extends Action_Controller
 			// Set the template variables...
 			$context['topic_href'] = $scripturl . '?topic=' . $topic . '.' . $_REQUEST['start'];
 			$context['start'] = $_REQUEST['start'];
-			$context['page_title'] = $txt['notification'];
+			$context['page_title'] = $txt['notifications'];
 			$context['sub_template'] = 'notification_settings';
 
 			return;
@@ -184,7 +184,7 @@ class Notify_Controller extends Action_Controller
 			// Set the template variables...
 			$context['board_href'] = $scripturl . '?board=' . $board . '.' . $_REQUEST['start'];
 			$context['start'] = $_REQUEST['start'];
-			$context['page_title'] = $txt['notification'];
+			$context['page_title'] = $txt['notifications'];
 			$context['sub_template'] = 'notify_board';
 
 			return;

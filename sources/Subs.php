@@ -346,7 +346,6 @@ function removeSettings($toRemove)
  *
  * - builds the page list, e.g. 1 ... 6 7 [8] 9 10 ... 15.
  * - flexible_start causes it to use "url.page" instead of "url;start=page".
- * - handles any wireless settings (adding special things to URLs.)
  * - very importantly, cleans up the start value passed, and forces it to
  *   be a multiple of num_per_page.
  * - checks that start is not more than max_value.

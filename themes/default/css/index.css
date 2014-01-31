@@ -68,6 +68,10 @@ body {
 	padding: 0 0 0 0;
 	/* Set a font-size that will look the same in all browsers. */
 	/* Start with the best Vista/W7 font, then Mac, Linux, then old fallbacks. */
+	/* this results in a base 14pt and pt to em translation approx as so
+	/* 9 - .643, 10 - .714, 11 - .786, 12 - .857, 13 - .929, 14 - 1, 15 - 1.071, 16 - 1.143
+	/* 17 - 1.214, 18 - 1.286, 19 - 1.357, 20 - 1.429, 21 - 1.5, 22 - 1.571, 23 - 1.643
+	/* 24 - 1.714, 25 - 1.786, 26 - 1.857, 27 - 1.929, 28 - 2, 29 - 2.071 */
 	font: 87.5%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", "Trebuchet MS", Arial, sans-serif;
 }
 
@@ -320,7 +324,7 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 .new_posts {
 	display: inline;
 	padding: 1px 4px 2px 4px;
-	font-size: 9px;
+	font-size: .643em;
 	font-family: verdana, sans-serif;
 }
 .new_posts:hover {
@@ -553,12 +557,12 @@ div.windowbg, div.windowbg2 {
 /* Other highlighted text, such as search results. */
 .highlight {
 	font-weight: bold;
-	font-size: 1.1em;
+	font-size: 1.071em;
 }
 /* Legacy highlight color, for selected membergroups etc. */
 /* Used by JS to show a selected item. @todo - deprecate? */
 .highlight2 {
-	font-size: 1.1em;
+	font-size: 1.071em;
 }
 
 /* Sometimes there will be an error when you post */
@@ -595,7 +599,7 @@ div.windowbg, div.windowbg2 {
 	padding: 6px 12px;
 	border: 1px solid #ccc;
 	background: #fff;
-	font-size: 0.857em;
+	font-size: 0.929em;
 }
 /* Information boxes. */
 .information {
@@ -776,7 +780,7 @@ div.windowbg, div.windowbg2 {
 	overflow: auto;
 }
 .footnote_return {
-	font-size: 1.35em;
+	font-size: 1.357em;
 }
 /* Shorten url's inside posts. */
 a.bbc_link {
@@ -799,7 +803,7 @@ a.bbc_link {
 	padding: 15px;
 	width: 100%;
 	text-align: center;
-	font-size: 1.6em;
+	font-size: 1.571em;
 	z-index: 100;
 }
 #ajax_in_progress a {
@@ -928,7 +932,7 @@ a.bbc_link {
 	padding: 0 0 8px 0;
 }
 #guest_form input, #guest_form select {
-	font-size: 1.083em;
+	font-size: 1.071em;
 	margin: 0 0 8px 0;
 }
 .modtask {
@@ -1408,7 +1412,7 @@ a.bbc_link {
 }
 .small_pagelinks .navPages {
 	padding: 2px 3px 0 3px;
-	font-size: 0.889em;
+	font-size: 0.857em;
 	display: block;
 	float: left;
 }
@@ -1513,7 +1517,7 @@ a.bbc_link {
 .additional_row {
 	padding: 6px 0;
 }
-.additional_row .styled-select {
+.styled-select .additional_row  {
 	float: right;
 	margin-left: 2px;
 }
@@ -1631,13 +1635,13 @@ dl.settings dt .styled-select select {
 }
 .board_name {
 	padding: 0 0 1px 0;
-	font-size: 1.154em;
+	font-size: 1.143em;
 }
 .board_description, .moderators {
 	margin: 0 0 0 56px;
 }
 .moderators {
-	font-size: 0.923em;
+	font-size: 0.929em;
 }
 .board_stats {
 	text-align: right;
@@ -1657,7 +1661,7 @@ dl.settings dt .styled-select select {
 	white-space: pre;
 }
 .lastpost_link>a {
-	font-size: 1.077em;
+	font-size: 1.071em;
 	line-height: 1.571em;
 }
 .board_lasttime {
@@ -1696,7 +1700,7 @@ dl.settings dt .styled-select select {
 .ic_section_header {
 	margin: 0 0 8px 0;
 	padding: 0 0 4px 0;
-	font-size: 1.072em;
+	font-size: 1.071em;
 }
 /* Icons for info centre title bars. */
 .ic_section_header .icon{
@@ -1754,7 +1758,7 @@ dl.settings dt .styled-select select {
 }
 .topic_sorting {
 	float: right;
-	font-size: 1.167em;
+	font-size: 1.143em;
 	margin-top: -2px;
 }
 .topic_sorting>li {
@@ -1805,7 +1809,7 @@ img.new_posts {
 }
 #description_board .moderators {
 	margin: 0;
-	font-size: 0.765em;
+	font-size: 0.786em;
 }
 #description_board .generalinfo, #forumposts .generalinfo {
 	margin-top: 2px;
@@ -1844,7 +1848,7 @@ img.new_posts {
 	padding: 8px 8px 0 8px;
 }
 .sort_by_container {
-	font-size: 0.892em;
+	font-size: 0.857em;
 	float: right;
 	vertical-align: top;
 }
@@ -1958,7 +1962,7 @@ img.new_posts {
 	line-height: 2em;
 }
 #message_index_jump_to {
-	font-size: 1.167em;
+	font-size: 1.143em;
 }
 #message_index_jump_to .right_submit {
 	margin: 1px 0 0;
@@ -2052,7 +2056,7 @@ img.new_posts {
 /* Topic information */
 .views_text, .nextlinks {
 	white-space: pre;
-	font-size: 0.765em;
+	font-size: 0.786em;
 }
 .nextlinks {
 	float: right;
@@ -2100,13 +2104,13 @@ img.new_posts {
 	padding: 6px;
 	text-align: center;
 	font-weight: bold;
-	font-size: 1.333em;
+	font-size: 1.357em;
 }
 .poster.poster2 .name {
 	margin-top: 0;
 	padding: 0 8px 0 0;
 	text-align: left;
-	font-size: 1.167em;
+	font-size: 1.143em;
 }
 /* Drop menu for the poster info. */
 .poster .listlevel1.sfhover .menulevel2, .poster .listlevel1:hover .menulevel2 {
@@ -2219,7 +2223,7 @@ img.new_posts {
 }
 #topic_summary .keyinfo h5 {
 	padding: 0;
-	font-size: 1.167em;
+	font-size: 1.143em;
 }
 /* @todo - Move strong tag outside anchor. Will save css. */
 .keyinfo h5 a, .keyinfo h5 a strong {
@@ -2298,7 +2302,7 @@ img.new_posts {
 /* The jump to box */
 #display_jump_to {
 	float: right;
-	padding: 11px 5px 5px 0;
+	padding: 6px 5px 5px 0;
 }
 
 /* The quick reply area. */
@@ -2455,7 +2459,7 @@ ul.post_options li {
 	border-top: none;
 }
 #postDraftOptions .settings strong{
-	font-size: 1.167em;
+	font-size: 1.143em;
 }
 .post_verification {
 	margin-top: 6px;
@@ -2758,13 +2762,13 @@ dl.merge_topic dd {
 	overflow: hidden;
 	white-space: pre-wrap;
 	font-weight: 100;
-	font-size: 1.4em;
+	font-size: 1.429em;
 	padding-right: 2px;
 }
 #basicinfo h4 .position {
 	display: block;
 	font-weight: 100;
-	font-size: 0.8em;
+	font-size: 0.786em;
 }
 #basicinfo .avatar {
 	display: block;
@@ -3168,7 +3172,7 @@ div.labels {
 	margin-bottom: 12px;
 }
 #month_grid .table_head {
-	font-size: 0.909em;
+	font-size: 0.929em;
 }
 #main_grid .days {
 	padding: 4px;
@@ -3179,7 +3183,7 @@ div.labels {
 }
 #main_grid .weeks {
 	font-weight: bold;
-	font-size: 1.8em;
+	font-size: 1.786em;
 }
 #main_grid .weeks a:hover {
 	text-decoration: none;
@@ -3419,7 +3423,7 @@ a.help .icon {
 .popup_heading {
 	padding: 0 0 6px 0;
 	font-weight: bold;
-	font-size: 1.1em;
+	font-size: 1.071em;
 	line-height: 2em;
 }
 
@@ -3467,7 +3471,7 @@ a.help .icon {
 }
 #search_term_input {
 	margin: 0 0 12px;
-	font-size: 1.1em;
+	font-size: 1.071em;
 }
 
 /* The advanced search section. */
@@ -3646,16 +3650,9 @@ a.help .icon {
 #admin_content .custom_field {
 	margin-bottom: 15px;
 }
-#admin_login .centertext {
+#admin_login {
 	padding: 12px;
 }
-#admin_login .centertext .error {
-	padding: 0 0 12px 0;
-}
-#admin_login .centertext a.help img {
-	vertical-align: middle;
-}
-
 
 /*	$ERRORS		*/
 /* ------------------------------------------------------- */
@@ -3675,7 +3672,7 @@ a.help .icon {
 	margin: 0;
 	padding: 0;
 	text-decoration: underline;
-	font-size: 1.1em;
+	font-size: 1.071em;
 }
 .errorbox .listlevel1,
 .warningbox .listlevel1 {
@@ -3694,7 +3691,6 @@ a.help .icon {
 	display: block;
 	padding-left: 1em;
 }
-
 .ban_cannot_post {
 	margin: 2ex;
 	padding: 2ex;
@@ -3995,7 +3991,7 @@ a.help .icon {
 	}
 	.topic_name h4 {
 		display: block;
-		font-size: 1.4em;
+		font-size: 1.357em;
 	}
 	.topic_name h4 a {
 		word-wrap: break-word;
@@ -4052,7 +4048,7 @@ a.help .icon {
 		padding: 15px 0px;
 	}
 	.board_info h3 a {
-		font-size: 1.3em;
+		font-size: 1.357em;
 		word-wrap: break-word;
 	}
 	.board_name {
@@ -4075,13 +4071,13 @@ a.help .icon {
 		margin-bottom: 5px;
 	}
 	.topic_name h4 {
-		font-size: 1.8em;
+		font-size: 1.786em;
 	}
 	.icon_anchor {
 		min-width: 0;
 	}
 	.lastpost_link {
-		font-size: 1.1em;
+		font-size: 1.071em;
 		display: block;
 	}
 	.recentboard, .recentposter {

@@ -105,7 +105,7 @@ div.quick_tasks {
 	padding: 4px 2px;
 }
 h3.category_header form {
-	font-size: 80%;
+	font-size: .786em;
 }
 /* Chrome trick to avoid multiple lines of feature names */
 .category_header>h3 {
@@ -129,7 +129,7 @@ h3 a.help .icon {
 
 .table_caption, tr.table_caption td {
 	color: #000;
-	font-size: 10px;
+	font-size: .714em;
 	font-weight: bold;
 }
 .additional_row div.floatleft {
@@ -147,7 +147,7 @@ fieldset dl {
 ------------------------------------------------------- */
 /* @todo - Admin quick search bar, and results page. */
 #quick_search {
-	font-size: 0.892em;
+	font-size: 0.857em;
 }
 /* Chrome fix. */
 #quick_search .icon, #quick_search .input_text,
@@ -175,7 +175,7 @@ fieldset dl {
 	overflow: visible;
 }
 #welcome {
-	font-size: 0.9em;
+	font-size: 0.929em;
 	padding: 12px 9px 8px 9px;
 }
 #welcome a {
@@ -238,7 +238,7 @@ fieldset dl {
 }
 #live_news div.content, #supportVersionsTable  div.content {
 	padding: 0 4px;
-	font-size: 0.9em;
+	font-size: 0.929em;
 }
 #supportVersionsTable  div.content {
 	padding: 0 8px;
@@ -373,7 +373,7 @@ div.quick_tasks {
 .features h3 {
 	padding: 0;
 	margin: 0 6px 0 105px;
-	font-size: 1.1em;
+	font-size: 1.071em;
 	overflow: hidden;
 	white-space: pre;
 	text-overflow: ellipsis;
@@ -426,7 +426,7 @@ div.quick_tasks {
 #find_code, #replace_code {
 	display: block;
 	font-family: "dejavu sans mono", "monaco", "lucida console", "courier new", monospace;
-	font-size: 0.9em;
+	font-size: 0.929em;
 	margin: 1px 0 6px 0;
 	padding: 3px 12px;
 	overflow: auto;
@@ -469,7 +469,7 @@ ul.package_servers li {
 /* Styles for the file permissions section.
 ------------------------------------------------- */
 .filepermissions {
-	font-size: 0.8em;
+	font-size: 0.786em;
 	white-space: nowrap;
 }
 .fperm {
@@ -557,7 +557,7 @@ dl.settings dd.questions input {
 #manage_boards li .floatleft {
 	font-weight: bold;
 	padding: 0 6px;
-	font-size: 1.1em;
+	font-size: 1.071em;
 	cursor: move;
 	width: 60%;
 }
@@ -565,7 +565,7 @@ dl.settings dd.questions input {
 	font-family: "Segoe UI Symbol", "DejaVu Sans", "GNU Unifont";
 	content: "\21f3";
 	padding-right: 5px;
-	font-size: 1.3em;
+	font-size: 1.286em;
 	float: left;
 	margin-top: -1px;
 }
@@ -1161,7 +1161,7 @@ ul.moderation_notes li {
 	font-family: "Segoe UI Symbol", "DejaVu Sans", "GNU Unifont";
 	content: "\21f3";
 	padding-right: 5px;
-	font-size: 1.8em;
+	font-size: 1.786em;
 }
 #custom_profile_fields td:nth-child(2):before {
 	float: left;
@@ -1199,7 +1199,7 @@ ul.moderation_notes li {
 .ui-dialog .ui-dialog-titlebar {
 	padding: 0 1em;
 	font-weight: bold;
-	font-size: 1.1em;
+	font-size: 1.071em;
 }
 .ui-dialog .ui-dialog-content {
 	padding: 4px;
