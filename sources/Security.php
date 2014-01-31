@@ -74,44 +74,43 @@ function validateSession($type = 'admin')
 
 	require_once(SUBSDIR . '/Auth.subs.php');
 
-	// Hashed password, ahoy!
-	if (isset($_POST[$type . '_hash_pass']) && strlen($_POST[$type . '_hash_pass']) == 64)
+	// Comming from the login screen
+	if (isset($_POST[$type. '_pass']) || isset($_POST[$type . '_hash_pass']))
 	{
 		checkSession();
 		validateToken('admin-login');
 
-		// Allow integration to verify the password
-		$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($user_info['username'], $_POST[$type . '_hash_pass'], true)), true);
-
-		$password = $_POST[$type . '_hash_pass'];
-		if ($good_password || validateLoginPassword($password, $user_info['passwd']))
+		// Hashed password, ahoy!
+		if (isset($_POST[$type . '_hash_pass']) && strlen($_POST[$type . '_hash_pass']) === 64)
 		{
-			$_SESSION[$type . '_time'] = time();
-			unset($_SESSION['request_referer']);
+			// Allow integration to verify the password
+			$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($user_info['username'], $_POST[$type . '_hash_pass'], true)), true);
 
-			return;
+			$password = $_POST[$type . '_hash_pass'];
+			if ($good_password || validateLoginPassword($password, $user_info['passwd']))
+			{
+				$_SESSION[$type . '_time'] = time();
+				unset($_SESSION['request_referer']);
+
+				return;
+			}
 		}
-	}
 
-	// Posting the password... check it.
-	if (isset($_POST[$type. '_pass']))
-	{
-		checkSession();
-		validateToken('admin-login');
-
-		require_once(SUBSDIR . '/Auth.subs.php');
-
-		// Give integrated systems a chance to verify this password
-		$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($user_info['username'], $_POST[$type . '_pass'], false)), true);
-
-		// Password correct?
-		$password = $_POST[$type . '_pass'];
-		if ($good_password || validateLoginPassword($password, $user_info['passwd'], $user_info['username']))
+		// Posting the password... check it.
+		if (isset($_POST[$type. '_pass']) && str_replace('*', '', $_POST[$type. '_pass']) !== '')
 		{
-			$_SESSION[$type . '_time'] = time();
-			unset($_SESSION['request_referer']);
+			// Give integrated systems a chance to verify this password
+			$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($user_info['username'], $_POST[$type . '_pass'], false)), true);
 
-			return;
+			// Password correct?
+			$password = $_POST[$type . '_pass'];
+			if ($good_password || validateLoginPassword($password, $user_info['passwd'], $user_info['username']))
+			{
+				$_SESSION[$type . '_time'] = time();
+				unset($_SESSION['request_referer']);
+
+				return;
+			}
 		}
 	}
 
