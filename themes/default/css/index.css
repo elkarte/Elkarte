@@ -1889,12 +1889,9 @@ img.new_posts {
 	display: table-cell;
 	vertical-align: top;
 	width: 20%;
-	min-width: 35em;
+	min-width: 30em;
 	padding: 7px 4px 6px 4px;
 	font-size: 0.929em;
-}
-.topic_latest.relative {
-	min-width: 30em;
 }
 .topic_stats {
 	text-align: right;
