@@ -182,8 +182,8 @@ function template_issueWarning()
 
 	echo '
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="submit" name="preview" id="preview_button" value="', $txt['preview'], '" class="button_submit" />
 					<input type="submit" name="save" value="', $context['user']['is_owner'] ? $txt['change_profile'] : $txt['profile_warning_issue'], '" class="button_submit" />
+					<input type="submit" name="preview" id="preview_button" value="', $txt['preview'], '" class="button_submit" />
 				</div>
 			</div>
 		</div>
@@ -200,44 +200,7 @@ function template_issueWarning()
 
 	if (!$context['user']['is_owner'])
 		echo '
-		modifyWarnNotify();
-		$(document).ready(function() {
-			$("#preview_button").click(function() {
-				return ajax_getTemplatePreview();
-			});
-		});
-
-		function ajax_getTemplatePreview ()
-		{
-			$.ajax({
-				type: "POST",
-				url: "' . $scripturl . '?action=xmlpreview;xml",
-				data: {item: "warning_preview", title: $("#warn_sub").val(), body: $("#warn_body").val(), issuing: true},
-				context: document.body
-			})
-			.done(function(request) {
-				$("#box_preview").show();
-				$("#body_preview").html($(request).find(\'body\').text());
-				if ($(request).find("error").text() != \'\')
-				{
-					$("#profile_error").show();
-					var errors_html = \'<span>\' + $("#profile_error").find("span").html() + \'</span>\' + \'<ul class="list_errors">\';
-					var errors = $(request).find(\'error\').each(function() {
-						errors_html += \'<li>\' + $(this).text() + \'</li>\';
-					});
-					errors_html += \'</ul>\';
-
-					$("#profile_error").html(errors_html);
-				}
-				else
-				{
-					$("#profile_error").hide();
-					$("#error_list").html(\'\');
-				}
-			return false;
-			});
-			return false;
-		}';
+		modifyWarnNotify();';
 
 	echo '
 	// ]]></script>';
