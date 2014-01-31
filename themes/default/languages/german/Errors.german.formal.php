@@ -4,7 +4,6 @@
 global $scripturl, $modSettings;
 
 $txt['no_access'] = 'Verzeihung, aber wir können Ihnen keinen Zugriff auf diesen Bereich gewähren. Wir dürften Ihnen nicht einmal verraten, dass er existiert. Sie sind aber herzlich dazu eingeladen, die Hauptseite zu besuchen und sich von dort aus auf den Weg zu machen.';
-$txt['wireless_error_notyet'] = 'Pardon, dieser Bereich ist für kabellose Nutzer derzeit nicht zugänglich.';
 $txt['not_guests'] = 'Pardon, diese Aktion ist Gästen momentan nicht gestattet.';
 
 $txt['mods_only'] = 'Nur Moderatoren können die Direkt-entfernen-Funktion benutzen, bitte entfernen Sie diese Nachricht mittels der Ändern-Funktion.';
