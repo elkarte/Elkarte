@@ -339,7 +339,7 @@ function initWarnSlider(sliderID, levelID, levels)
 
 	// Just in case someone wants to type, let's keep the two in synch
 	$("#" + levelID).keyup(function() {
-		var val = Math.max(0, Mant.min(100, $(this).val()));
+		var val = Math.max(0, Math.min(100, $(this).val()));
 
 		$("#" + sliderID).slider("value", val);
 	});
