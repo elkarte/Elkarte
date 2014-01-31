@@ -669,7 +669,7 @@ function doLogin()
 	require_once(SUBSDIR . '/Auth.subs.php');
 
 	// Call login integration functions.
-	call_integration_hook('integrate_login', array($user_settings['member_name'], isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) == 40 ? $_POST['hash_passwrd'] : null, $modSettings['cookieTime']));
+	call_integration_hook('integrate_login', array($user_settings['member_name'], isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) == 64 ? $_POST['hash_passwrd'] : null, $modSettings['cookieTime']));
 
 	// Get ready to set the cookie...
 	$user_info['id'] = $user_settings['id_member'];
