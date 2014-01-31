@@ -43,13 +43,12 @@ class Post_Controller extends Action_Controller
 	 * Handles showing the post screen, loading the post to be modified, and loading any post quoted.
 	 *
 	 * - additionally handles previews of posts.
-	 * - @uses the Post template and language file, main sub template.
-	 * - allows wireless access using the protocol_post sub template.
 	 * - requires different permissions depending on the actions, but most notably post_new, post_reply_own, and post_reply_any.
 	 * - shows options for the editing and posting of calendar events and attachments, as well as the posting of polls.
 	 * - accessed from ?action=post.
 	 *
-	 *  @param array $post_errors holds any errors found tyring to post
+	 * @uses the Post template and language file, main sub template.
+	 * @param array $post_errors holds any errors found tyring to post
 	 */
 	function action_post()
 	{
@@ -1875,7 +1874,7 @@ class Post_Controller extends Action_Controller
 		$context['sub_template'] = 'quotefast';
 		if (!empty($row))
 			$can_view_post = $row['approved'] || ($row['id_member'] != 0 && $row['id_member'] == $user_info['id']) || allowedTo('approve_posts', $row['id_board']);
-		
+
 		if (!empty($can_view_post))
 		{
 			// Remove special formatting we don't want anymore.
