@@ -163,7 +163,7 @@ $txt['show'] = 'Show';
 $txt['hide'] = 'Hide';
 $txt['sort_by'] = 'Sort By';
 
-$txt['admin_login'] = 'Administration Login';
+$txt['admin_login'] = 'Administration Log in';
 // Use numeric entities in the below string.
 $txt['topic'] = 'Topic';
 $txt['help'] = 'Help';
