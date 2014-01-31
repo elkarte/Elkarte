@@ -1517,7 +1517,7 @@ a.bbc_link {
 .additional_row {
 	padding: 6px 0;
 }
-.additional_row .styled-select {
+.styled-select .additional_row  {
 	float: right;
 	margin-left: 2px;
 }
@@ -2302,7 +2302,7 @@ img.new_posts {
 /* The jump to box */
 #display_jump_to {
 	float: right;
-	padding: 11px 5px 5px 0;
+	padding: 6px 5px 5px 0;
 }
 
 /* The quick reply area. */
