@@ -1,11 +1,14 @@
 // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest
+
 var dragDropAttachment = function(params) {
+	console.log(params);
 	var filesUploadedSuccessfully = [],
-		allowedExtensions = params.allowedExtensions.split(/[\s,]+/) || [],
-		totalSizeAllowed = params.totalSizeAllowed || null,
-		individualSizeAllowed = params.individualSizeAllowed || '',
-		numOfAttachmentAllowed = params.numOfAttachmentAllowed || '',
-		totalAttachmentsUploaded = 0,
+		allowedExtensions = (params.allowedExtensions === '') ? [] : params.allowedExtensions.replace(/\s/g, '').split(','),
+		totalSizeAllowed = (params.totalSizeAllowed === '') ? null : params.totalSizeAllowed,
+		individualSizeAllowed = (params.individualSizeAllowed === '') ? null : params.individualSizeAllowed,
+		numOfAttachmentAllowed = (params.numOfAttachmentAllowed === '') ? null : params.numOfAttachmentAllowed,
+		totalAttachSizeUploaded = 0,
+		numAttachUploaded = 0,
 		uploadInProgress = false,
 		attachmentQueue = [],
 
@@ -74,7 +77,8 @@ var dragDropAttachment = function(params) {
 					if (typeof(resp) !== 'object') resp = JSON.parse(resp);
 
 					if (resp.result) {
-						totalAttachmentsUploaded -= filesUploadedSuccessfully[options.fileNum].size / 1024;
+						totalAttachSizeUploaded -= filesUploadedSuccessfully[options.fileNum].size / 1024;
+						numAttachUploaded--;
 						$('#' + dataToSend.temp_name).unbind();
 						$('#' + dataToSend.temp_name).remove();
 					} else {
@@ -155,20 +159,28 @@ var dragDropAttachment = function(params) {
 					extnErrorFiles.push(files[i].name);
 					errorFlag = true;
 				}
-				if (individualSizeAllowed !== '' && fileSize > individualSizeAllowed) {
+				if (individualSizeAllowed !== null && fileSize > individualSizeAllowed) {
 					errorMsgs.individualSizeErr = 'File size too big';
 					sizeErrorFiles.push(files[i].name);
 					errorFlag = true;
 				}
 
-				if (errorFlag === false) totalAttachmentsUploaded += fileSize;
+				if (numAttachUploaded >= numOfAttachmentAllowed) {
+					errorMsgs.maxNumErr = 'Sorry, you aren\'t allowed to post any more attachments.';
+					sizeErrorFiles.push(files[i].name);
+					errorFlag = true;
+				}
 
-				if (totalSizeAllowed !== null && totalAttachmentsUploaded > totalSizeAllowed) {
+				if (errorFlag === false) totalAttachSizeUploaded += fileSize;
+
+				if (totalSizeAllowed !== null && totalAttachSizeUploaded > totalSizeAllowed) {
 					errorMsgs.totalSizeError = 'Maximum file size reached';
 					errorFlag = true;
 				}
 
 				if (errorFlag === false) {
+					numAttachUploaded++;
+
 					var fd = new FormData();
 					fd.append('attachment[]', files[i]);
 					var status = new createStatusbar(obj);
@@ -188,7 +200,7 @@ var dragDropAttachment = function(params) {
 		},
 
 		runAttachmentQueue = function() {
-			if(attachmentQueue.length > 0 && uploadInProgress === false) {
+			if (attachmentQueue.length > 0 && uploadInProgress === false) {
 				uploadInProgress = true;
 				var currentData = attachmentQueue[0];
 				sendFileToServer(currentData.formData, currentData.statusInstance);
