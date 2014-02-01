@@ -478,13 +478,16 @@ function template_add_new_attachments()
 						</dl>';
 
 	// Initiate file drag drop
+	// @todo move all the logic to the controller
 	echo '
 		<script><!-- // --><![CDATA[
 			dragDropAttachment({
-				allowedExtensions: "', $context['attachments']['allowed_extensions'],'",
-				totalSizeAllowed: "', $modSettings['attachmentPostLimit'], '",
-				individualSizeAllowed: "', $modSettings['attachmentSizeLimit'], '",
-				numOfAttachmentAllowed: "',$context['attachments']['num_allowed'],'",
+				allowedExtensions: "', $context['attachments']['allowed_extensions'], '",
+				totalSizeAllowed: "', empty($modSettings['attachmentPostLimit']) ? '' : $modSettings['attachmentPostLimit'], '",
+				individualSizeAllowed: "', empty($modSettings['attachmentSizeLimit']) ? '' : $modSettings['attachmentSizeLimit'], '",
+				numOfAttachmentAllowed: "',$context['attachments']['num_allowed'], '",
+				totalAttachSizeUploaded: "', isset($context['attachments']['total_size']) && !empty($context['attachments']['total_size']) ? $context['attachments']['total_size'] : 0, '",
+				numAttachUploaded: "', isset($context['attachments']['quantity']) && !empty($context['attachments']['quantity']) ? $context['attachments']['quantity'] : 0, '"
 			});
 		// ]]></script>';
 }
