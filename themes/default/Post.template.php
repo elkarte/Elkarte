@@ -464,6 +464,8 @@ function template_additional_options_below()
 				totalSizeAllowed: "', empty($modSettings['attachmentPostLimit']) ? null : $modSettings['attachmentPostLimit'] ,'",
 				individualSizeAllowed: "', empty($modSettings['attachmentSizeLimit']) ? '' : $modSettings['attachmentSizeLimit'] , '",
 				numOfAttachmentAllowed: "', empty($context['num_allowed_attachments']) ? '' : $context['num_allowed_attachments'] ,'",
+				totalAttachSizeUploaded: "', isset($context['attachments']['total_size']) && !empty($context['attachments']['total_size']) ? $context['attachments']['total_size'] : 0,'",
+				numAttachUploaded: "', isset($context['attachments']['quantity']) && !empty($context['attachments']['quantity']) ? $context['attachments']['quantity'] : 0,'"
 			});
 		// ]]></script>';
 }
