@@ -1,7 +1,9 @@
 // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest
 
 var dragDropAttachment = function(params) {
-	var filesUploadedSuccessfully = [],
+	var sessionId = params.sessionId,
+		sessionVar = params.sessionVar,
+		filesUploadedSuccessfully = [],
 		allowedExtensions = (params.allowedExtensions === '') ? [] : params.allowedExtensions.replace(/\s/g, '').split(','),
 		totalSizeAllowed = (params.totalSizeAllowed === '') ? null : params.totalSizeAllowed,
 		individualSizeAllowed = (params.individualSizeAllowed === '') ? null : params.individualSizeAllowed,
@@ -28,7 +30,7 @@ var dragDropAttachment = function(params) {
 					}
 					return xhrobj;
 				},
-				url: elk_scripturl + '?action=attachment;sa=ulattach',
+				url: elk_scripturl + '?action=attachment;sa=ulattach;' + sessionVar + '=' + sessionId,
 				type: "POST",
 				contentType: false,
 				processData: false,
@@ -64,7 +66,7 @@ var dragDropAttachment = function(params) {
 		removeFileFromServer = function(options) {
 			var dataToSend = filesUploadedSuccessfully[options.fileNum];
 			$.ajax({
-				url: elk_scripturl + '?action=attachment;sa=rmattach',
+				url: elk_scripturl + '?action=attachment;sa=rmattach;' + sessionVar + '=' + sessionId,
 				type: "POST",
 				cache: false,
 				dataType: 'json',

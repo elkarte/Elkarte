@@ -460,6 +460,8 @@ function template_additional_options_below()
 	echo '
 		<script><!-- // --><![CDATA[
 			dragDropAttachment({
+				sessionId: elk_session_id,
+				sessionVar: elk_session_var,
 				allowedExtensions: "', empty($modSettings['attachmentCheckExtensions']) ? '' : $context['allowed_extensions'] ,'",
 				totalSizeAllowed: "', empty($modSettings['attachmentPostLimit']) ? null : $modSettings['attachmentPostLimit'] ,'",
 				individualSizeAllowed: "', empty($modSettings['attachmentSizeLimit']) ? '' : $modSettings['attachmentSizeLimit'] , '",
