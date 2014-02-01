@@ -1291,7 +1291,7 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
  */
 function ssi_showPoll($topicID = null, $output_method = 'echo')
 {
-	global $txt, $settings, $boardurl, $user_info, $context, $modSettings;
+	global $txt, $user_info, $context, $scripturl;
 	global $board;
 	static $last_board = null;
 
@@ -1420,7 +1420,7 @@ function ssi_showPoll($topicID = null, $output_method = 'echo')
  */
 function ssi_pollVote()
 {
-	global $context, $db_prefix, $user_info, $sc, $modSettings, $topic, $board;
+	global $context, $sc, $topic, $board;
 
 	$pollID = isset($_POST['poll']) ? (int) $_POST['poll'] : 0;
 
