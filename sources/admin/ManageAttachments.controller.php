@@ -214,7 +214,7 @@ class ManageAttachments_Controller extends Action_Controller
 	 */
 	private function _settings()
 	{
-		global $modSettings, $txt, $scripturl;
+		global $modSettings, $txt, $scripturl, $context;
 
 		require_once(SUBSDIR . '/Attachments.subs.php');
 

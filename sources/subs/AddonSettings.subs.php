@@ -59,7 +59,7 @@ function get_files_recursive($dir_path)
  */
 function list_integration_hooks_data($start, $per_page, $sort)
 {
-	global $settings, $txt, $context, $scripturl, $modSettings;
+	global $txt, $context, $scripturl, $modSettings;
 
 	require_once(SUBSDIR . '/Package.subs.php');
 

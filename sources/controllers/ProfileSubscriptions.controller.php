@@ -122,7 +122,7 @@ class ProfileSubscriptions_Controller extends Action_Controller
 	 */
 	private function _confirmOrder($gateways, $memID)
 	{
-		global $context, $modSettings, $scripturl;
+		global $context, $modSettings, $scripturl, $txt;
 
 		// Hopefully just one, if not we use the last one.
 		foreach ($_POST['sub_id'] as $k => $v)

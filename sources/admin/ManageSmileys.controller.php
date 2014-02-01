@@ -194,7 +194,7 @@ class ManageSmileys_Controller extends Action_Controller
 	 */
 	private function _settings()
 	{
-		global $txt, $modSettings;
+		global $txt, $modSettings, $context;
 
 		// The directories...
 		$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? BOARDDIR . '/smileys' : $modSettings['smileys_dir'];

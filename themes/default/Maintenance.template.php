@@ -158,7 +158,7 @@ function template_maintain_routine()
  */
 function template_maintain_members()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
 	<script><!-- // --><![CDATA[

@@ -412,7 +412,7 @@ class ScheduledTask
 	 */
 	function daily_digest()
 	{
-		global $is_weekly, $txt, $mbname, $scripturl, $context, $modSettings, $boardurl;
+		global $is_weekly, $txt, $mbname, $scripturl, $modSettings, $boardurl;
 
 		$db = database();
 

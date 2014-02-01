@@ -1080,7 +1080,7 @@ function ssi_login($redirect_to = '', $output_method = 'echo')
 	echo '
 		<script src="', $settings['default_theme_url'], '/scripts/sha256.js"></script>
 
-		<form action="', $scripturl, '?action=login2" name="frmLogin" id="frmLogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');"' : '', '>
+		<form action="', $scripturl, '?action=login2" name="frmLogin" id="frmLogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', '>
 		<div class="login">
 			<div class="roundframe">';
 
@@ -1291,7 +1291,7 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
  */
 function ssi_showPoll($topicID = null, $output_method = 'echo')
 {
-	global $txt, $settings, $boardurl, $user_info, $context, $modSettings;
+	global $txt, $user_info, $context, $scripturl;
 	global $board;
 	static $last_board = null;
 
@@ -1420,7 +1420,7 @@ function ssi_showPoll($topicID = null, $output_method = 'echo')
  */
 function ssi_pollVote()
 {
-	global $context, $db_prefix, $user_info, $sc, $modSettings, $topic, $board;
+	global $context, $sc, $topic, $board;
 
 	$pollID = isset($_POST['poll']) ? (int) $_POST['poll'] : 0;
 

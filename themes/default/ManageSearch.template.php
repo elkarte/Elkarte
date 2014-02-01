@@ -101,7 +101,7 @@ function template_modify_weights()
  */
 function template_select_search_method()
 {
-	global $context, $scripturl, $txt, $modSettings, $settings;
+	global $context, $scripturl, $txt, $modSettings;
 
 	echo '
 	<div id="admincenter">

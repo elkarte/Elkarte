@@ -22,48 +22,6 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Creates the javascript code for localization of the editor (SCEditor)
- */
-function action_loadlocale()
-{
-	global $txt, $editortxt, $modSettings;
-
-	loadLanguage('Editor');
-
-	Template_Layers::getInstance()->removeAll();
-
-	// Lets make sure we aren't going to output anything nasty.
-	@ob_end_clean();
-	if (!empty($modSettings['enableCompressedOutput']))
-		@ob_start('ob_gzhandler');
-	else
-		@ob_start();
-
-	// If we don't have any locale better avoid broken js
-	if (empty($txt['lang_locale']))
-		die();
-
-	$file_data = '(function ($) {
-	\'use strict\';
-
-	$.sceditor.locale[' . javaScriptEscape($txt['lang_locale']) . '] = {';
-
-	foreach ($editortxt as $key => $val)
-		$file_data .= '
-		' . javaScriptEscape($key) . ': ' . javaScriptEscape($val) . ',';
-
-	$file_data .= '
-		dateFormat: "day.month.year"
-	}
-})(jQuery);';
-
-	// Make sure they know what type of file we are.
-	header('Content-Type: text/javascript');
-	echo $file_data;
-	obExit(false);
-}
-
-/**
  * Retrieves a list of message icons.
  * - Based on the settings, the array will either contain a list of default
  *   message icons or a list of custom message icons retrieved from the database.
@@ -190,7 +148,7 @@ function create_control_richedit($editorOptions)
 
 		// editor language file
 		if (!empty($txt['lang_locale']) && $txt['lang_locale'] != 'en_US')
-			loadJavascriptFile($scripturl . '?action=loadeditorlocale', array(), 'sceditor_language');
+			loadJavascriptFile($scripturl . '?action=jslocale;sa=sceditor', array(), 'sceditor_language');
 
 		// Drafts?
 		if ((!empty($context['drafts_save']) || !empty($context['drafts_pm_save'])) && !empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))

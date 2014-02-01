@@ -137,9 +137,10 @@ class Stats_Controller extends Action_Controller
 		// This would be the amount of time the forum has been up... in days...
 		$total_days_up = ceil((time() - strtotime($averages['date'])) / (60 * 60 * 24));
 		$date = strftime('%Y-%m-%d', forum_time(false));
+		$disabled_fields = !empty($modSettings['disabled_profile_fields']) ? array_map('trim', explode(',', $modSettings['disabled_profile_fields'])) : array();
 
 		// Male vs. female ratio - let's calculate this only every four minutes.
-		if (($context['gender'] = cache_get_data('stats_gender', 240)) == null)
+		if (!in_array('gender', $disabled_fields) && ($context['gender'] = cache_get_data('stats_gender', 240)) == null)
 		{
 			$context['gender'] = genderRatio();
 
@@ -192,8 +193,9 @@ class Stats_Controller extends Action_Controller
 			'total_boards' => comma_format(countBoards('all', array('include_redirects' => false))),
 			'latest_member' => &$context['common_stats']['latest_member'],
 			'average_online' => comma_format(round($averages['most_on'] / $total_days_up, 2)),
-			'gender_ratio' => $context['gender']['ratio'],
 		);
+		if (!in_array('gender', $disabled_fields))
+			$context['general_statistics']['right']['gender_ratio'] = $context['gender']['ratio'];
 
 		if (!empty($modSettings['hitStats']))
 			$context['general_statistics']['right'] += array(

@@ -1867,7 +1867,7 @@ class PersonalMessage_Controller extends Action_Controller
 			$members = membersBy('member_names', array('member_names' => $possible_users));
 
 			foreach ($possible_users as $key => $possible_user)
-				$searchq_parameters['guest_user_name_implode_' . $key] = $possible_user;
+				$searchq_parameters['guest_user_name_implode_' . $key] = defined('DB_CASE_SENSITIVE') ? strtolower($possible_user) : $possible_user;
 
 			// Simply do nothing if there are too many members matching the criteria.
 			if (count($members) > $maxMembersToSearch)

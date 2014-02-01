@@ -886,7 +886,7 @@ function template_browse()
  */
 function template_edit_style()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	if ($context['session_error'])
 		echo '
