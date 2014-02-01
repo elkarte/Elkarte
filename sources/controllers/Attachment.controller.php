@@ -36,7 +36,7 @@ class Attachment_Controller extends Action_Controller
 			'dlattach' => array($this, 'action_dlattach'),
 			'ulattach' => array($this, 'action_ulattach'),
 			'rmattach' => array($this, 'action_rmattach'),
-		);
+			);
 
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'dlattach';
 
@@ -62,6 +62,11 @@ class Attachment_Controller extends Action_Controller
 
 		loadTemplate('Json');
 		$context['sub_template'] = 'send_json';
+
+		if (checkSession('request', '', false) != '') {
+			$context['json_data'] = array('result' => false, 'data' => 'session timeout');
+			return false;
+		}
 
 		if (isset($_FILES["attachment"]))
 		{
@@ -118,6 +123,11 @@ class Attachment_Controller extends Action_Controller
 
 		loadTemplate('Json');
 		$context['sub_template'] = 'send_json';
+
+		if (checkSession('request', '', false) != '') {
+			$context['json_data'] = array('result' => false, 'data' => 'session timeout');
+			return false;
+		}
 
 		if(isset($_REQUEST['filename']) && $_REQUEST['filepath'])
 		{
