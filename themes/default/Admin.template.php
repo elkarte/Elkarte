@@ -288,24 +288,14 @@ function template_credits()
 	// This sets the latest support stuff.
 	echo '
 					<script><!-- // --><![CDATA[
-						function ourCurrentVersion()
-						{
-							var ourVer,
-								yourVer;
-
-							if (!window.elkVersion)
-								return;
-
-							ourVer = document.getElementById("ourVersion");
-							yourVer = document.getElementById("yourVersion");
-
-							ourVer.innerHTML = window.elkVersion;
-
-							var currentVersion = yourVer;
-							if (currentVersion != window.ourVersion)
-								yourVer.innerHTML = "<span class=\"alert\">" + currentVersion + "</span>";
-						}
-						addLoadEvent(ourCurrentVersion)
+						var oAdminIndex = new elk_AdminIndex({
+							bLoadVersions: true,
+							sOurVersionContainerId: \'ourVersion\',
+							sYourVersionContainerId: \'yourVersion\',
+							sVersionOutdatedTemplate: ', JavaScriptEscape('
+								<span class="alert">%currentVersion%</span>
+							'), ',
+						});
 					// ]]></script>';
 }
 
