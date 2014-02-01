@@ -55,8 +55,13 @@ class Attachment_Controller extends Action_Controller
 		global $txt, $context, $modSettings;
 
 		$resp_data = array();
-
 		$context['attachments']['can']['post'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
+
+		$template_layers = Template_Layers::getInstance();
+		$template_layers->removeAll();
+
+		loadTemplate('Json');
+		$context['sub_template'] = 'send_json';
 
 		if (isset($_FILES["attachment"]))
 		{
@@ -81,8 +86,7 @@ class Attachment_Controller extends Action_Controller
 				{
 					$resp_data[] = $error;
 				}
-				echo json_encode(array('result' => false, 'data' => $resp_data));
-				die();
+				$context['json_data'] = array('result' => false, 'data' => $resp_data);
 			}
 			else
 			{
@@ -97,52 +101,42 @@ class Attachment_Controller extends Action_Controller
 						);
 					}
 				}
-				echo json_encode(array('result' => true, 'data' => $resp_data));
-				die();
+				$context['json_data'] = array('result' => true, 'data' => $resp_data);
 			}
-		} else {
-			echo json_encode(array('result' => false, 'data' => 'files not there'));
-			die();
+		}
+		else
+		{
+			$context['json_data'] = array('result' => false, 'data' => 'files not there');
 		}
 	}
 
 	public function action_rmattach() {
-		if(isset($_REQUEST['filename']) && $_REQUEST['filepath']) {
-			if (file_exists($_REQUEST['filepath'])) {
+		global $context;
+
+		$template_layers = Template_Layers::getInstance();
+		$template_layers->removeAll();
+
+		loadTemplate('Json');
+		$context['sub_template'] = 'send_json';
+
+		if(isset($_REQUEST['filename']) && $_REQUEST['filepath'])
+		{
+			if (file_exists($_REQUEST['filepath']))
+			{
 				unlink($_REQUEST['filepath']);
 				unset($_SESSION['temp_attachments'][$_REQUEST['filename']]);
 
-				echo json_encode(array('result' => true));
-			} else {
-				echo json_encode(array('result' => false, 'data' => 'files not there'));
+				$context['json_data'] = array('result' => true);
 			}
-			die();
-		} else {
-			echo json_encode(array('result' => false, 'data' => 'No file name provided'));
-			die();
+			else
+			{
+				$context['json_data'] = array('result' => false, 'data' => 'files not there');
+			}
 		}
-		// foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
-		// {
-		// 	if (strpos($attachID, 'post_tmp_' . $user_info['id']) !== false)
-		// 	if (file_exists($attachment['tmp_name']))
-		// 		unlink($attachment['tmp_name']);
-		// }
-
-
-		// See if any files still exist before showing the warning message and the files attached.
-		// foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
-		// {
-		// 	if (strpos($attachID, 'post_tmp_' . $user_info['id']) === false)
-		// 		continue;
-
-		// 	if (file_exists($attachment['tmp_name']))
-		// 	{
-		// 		$attach_errors->addError('temp_attachments_new');
-		// 		$context['files_in_session_warning'] = $txt['attached_files_in_session'];
-		// 		unset($_SESSION['temp_attachments']['post']['files']);
-		// 		break;
-		// 	}
-		// }
+		else
+		{
+			$context['json_data'] = array('result' => false, 'data' => 'No file name provided');
+		}
 	}
 	/**
 	 * Downloads an attachment or avatar, and increments the download count.

@@ -1,7 +1,6 @@
 // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest
 
 var dragDropAttachment = function(params) {
-	console.log(params);
 	var filesUploadedSuccessfully = [],
 		allowedExtensions = (params.allowedExtensions === '') ? [] : params.allowedExtensions.replace(/\s/g, '').split(','),
 		totalSizeAllowed = (params.totalSizeAllowed === '') ? null : params.totalSizeAllowed,
