@@ -98,7 +98,6 @@ class TestDispatcher extends UnitTestCase
 			'editpoll2' => array('Poll.controller.php', 'Poll_Controller', 'action_editpoll2'),
 			'jsmodify' => array('Post.controller.php', 'Post_Controller', 'action_jsmodify'),
 			'jsoption' => array('Themes.php', 'Themes_Controller', 'action_jsoption'),
-			'loadeditorlocale' => array('subs/Editor.subs.php', 'action_loadlocale'),
 			'lockvoting' => array('Poll.controller.php', 'Poll_Controller', 'action_lockvoting'),
 			'markasread' => array('Markasread.controller.php', 'MarkRead_Controller', 'action_index'),
 			'mergetopics' => array('MergeTopics.controller.php', 'MergeTopics_Controller', 'action_index'),
