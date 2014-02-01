@@ -181,7 +181,7 @@ strong {
 .popup_heading {
     font-weight: 600;
 	-webkit-font-smoothing: antialiased;
-    font-family: "Segoe UI Semibold", "Helvetica Neue Medium";
+    font-family: "Segoe UI Semibold", "Helvetica Neue Medium", "Helvetica Neue";
 }
 
 /* @todo - Test this everywhere. */
