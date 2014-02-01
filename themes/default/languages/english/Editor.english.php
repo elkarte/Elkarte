@@ -58,5 +58,5 @@ $editortxt['Insert FTP Link'] = 'Insert FTP Link';
 $editortxt['Shadow'] = 'Shadow';
 $editortxt['Teletype'] = 'Teletype';
 $editortxt['Move'] = 'Move';
-$editortxt['Spoiler'] = 'Insert Spoiler';
-$editortxt['Footnote'] = 'Insert Footnote';
+$editortxt['Insert Spoiler'] = 'Insert Spoiler';
+$editortxt['Insert Footnote'] = 'Insert Footnote';
