@@ -2130,6 +2130,7 @@ img.new_posts {
 .poster .title {
 	white-space: normal;
 	word-wrap: break-word;
+	max-width: 14em;
 }
 .poster .linklevel2, .poster .linklevel2:focus,
 .poster .listlevel2:hover .linklevel2 {
