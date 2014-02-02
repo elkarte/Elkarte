@@ -302,8 +302,8 @@ $helptxt['enableErrorQueryLogging'] = 'This will include the full query sent to 
 $helptxt['allow_disableAnnounce'] = 'This will allow users to opt out of notification of topics you announce by checking the &quot;announce topic&quot; checkbox when posting.';
 $helptxt['disallow_sendBody'] = 'This option removes the possibility to receive the text of replies, posts and personal messages in notification emails.<br /><br />Often, members will reply to the notification email, which in most cases means the webmaster receives the reply.';
 $helptxt['enable_contactform'] = 'This option adds a contact us button to the registration screen';
-$helptxt['jquery_source'] = 'This will determine the source used to load the jQuery Library.  Auto will use the CDN first and if not available fall back to the local source.  Local will only use the local source, CDN will only load it from Google\'s CDN network';
-$helptxt['minify_css_js'] = 'This will combine multiple CSS or Javascript files on a per page as needed basis.  It will also remove unnecessary whitespace and comments from the files to reduce their size.  The combined and minimized files are saved so further requests can be served with those files.';
+$helptxt['jquery_source'] = 'This will determine the source used to load the jQuery Library.  Auto will use the CDN first and if not available fall back to the local source.  Local will only use the local source, CDN will only load it from Google\'s Content Delivery Network';
+$helptxt['minify_css_js'] = 'This will combine multiple CSS or JavaScript files per page as needed.  It will also remove unnecessary whitespace and comments from the files to reduce their size.  The combined and minimized files are saved so further requests can instaltly serve those files.';
 $helptxt['compactTopicPagesEnable'] = 'This will just show a selection of the number of pages.<br /><em>Example:</em>
 		&quot;3&quot; to display: 1 ... 4 [5] 6 ... 9 <br />
 		&quot;5&quot; to display: 1 ... 3 4 [5] 6 7 ... 9';
