@@ -1933,7 +1933,7 @@ img.new_posts {
 .qaction_row {
 	text-align: right;
 	padding: 6px;
-	display: block !important;
+	display: block;
 }
 .basic_row, .sticky_row, .locked_row {
 	max-width: 100%;
