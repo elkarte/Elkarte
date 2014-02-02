@@ -1395,8 +1395,8 @@ function membersBy($query, $query_params, $details = false, $only_active = true)
 
 			foreach ($members[\'member_names\'] as $key => $param)
 			{
-				$mem_query[] = \'LOWER(real_name) LIKE {string:member_names_\' . $key . \'}\';
-				$members[\'member_names_\' . $key] = $param;
+				$mem_query[] = (defined(\'DB_CASE_SENSITIVE\') ? \'LOWER(real_name)\' : \'real_name\') . \' LIKE {string:member_names_\' . $key . \'}\';
+				$members[\'member_names_\' . $key] = defined(\'DB_CASE_SENSITIVE\') ? strtolower($param) : $param;
 			}
 			return implode("\n\t\t\tOR ", $mem_query);
 		'),

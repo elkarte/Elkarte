@@ -44,7 +44,7 @@ class Search_Controller extends Action_Controller
 	 */
 	public function pre_dispatch()
 	{
-		global $modSettings;
+		global $modSettings, $scripturl;
 
 		// Coming from quick search box and going to some custome place?
 		if (isset($_REQUEST['search_selection']) && !empty($modSettings['additional_search_engines']))

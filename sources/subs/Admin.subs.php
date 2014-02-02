@@ -67,7 +67,15 @@ function getServerVersions($checkFor)
 
 	// If we're using memcache we need the server info.
 	if (empty($memcached) && function_exists('memcache_get') && isset($modSettings['cache_memcached']) && trim($modSettings['cache_memcached']) != '')
+	{
+		require_once(SUBSDIR . '/Cache.subs.php');
 		get_memcached_server();
+	}
+	else
+	{
+		if (($key = array_search('memcache', $checkFor)) !== false)
+			unset($checkFor[$key]);
+	}
 
 	// Check to see if we have any accelerators installed...
 	if (in_array('mmcache', $checkFor) && defined('MMCACHE_VERSION'))

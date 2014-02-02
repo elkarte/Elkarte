@@ -656,7 +656,7 @@ function hashLoginPassword(doForm, cur_session_id, token)
 
 	// If the form also contains the old hash input fill it to smooth transitions
 	if ('old_hash_passwrd' in doForm && typeof(hex_sha1) !== 'undefined')
-		doForm.old_hash_passwrd.value = hex_sha1(hex_sha1(doForm.user.value.php_strtolower() + doForm.passwrd.value) + cur_session_id + token);
+		doForm.old_hash_passwrd.value = hex_sha1(hex_sha1(doForm.user.value.php_strtolower() + doForm.passwrd.value) + cur_session_id + (typeof token == 'undefined' ? '' : token));
 
 	doForm.passwrd.value = doForm.passwrd.value.replace(/./g, '*');
 }

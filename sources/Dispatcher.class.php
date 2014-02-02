@@ -154,7 +154,6 @@ class Site_Dispatcher
 			'quickhelp' => array('Help.controller.php', 'Help_Controller', 'action_quickhelp'),
 			'jsmodify' => array('Post.controller.php', 'Post_Controller', 'action_jsmodify'),
 			'jsoption' => array('ManageThemes.controller.php', 'ManageThemes_Controller', 'action_jsoption'),
-			'loadeditorlocale' => array('subs/Editor.subs.php', 'action_loadlocale'),
 			'lockvoting' => array('Poll.controller.php', 'Poll_Controller', 'action_lockvoting'),
 			'login' => array('Auth.controller.php', 'Auth_Controller', 'action_login'),
 			'login2' => array('Auth.controller.php', 'Auth_Controller', 'action_login2'),

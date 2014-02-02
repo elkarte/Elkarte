@@ -73,6 +73,7 @@ body {
 	/* 17 - 1.214, 18 - 1.286, 19 - 1.357, 20 - 1.429, 21 - 1.5, 22 - 1.571, 23 - 1.643
 	/* 24 - 1.714, 25 - 1.786, 26 - 1.857, 27 - 1.929, 28 - 2, 29 - 2.071 */
 	font: 87.5%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", "Trebuchet MS", Arial, sans-serif;
+	text-rendering: optimizeLegibility;
 }
 
 /* Tables should show empty cells. */
@@ -1889,12 +1890,9 @@ img.new_posts {
 	display: table-cell;
 	vertical-align: top;
 	width: 20%;
-	min-width: 35em;
+	min-width: 30em;
 	padding: 7px 4px 6px 4px;
 	font-size: 0.929em;
-}
-.topic_latest.relative {
-	min-width: 30em;
 }
 .topic_stats {
 	text-align: right;

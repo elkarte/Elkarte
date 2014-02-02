@@ -653,7 +653,7 @@ function action_welcomeLogin()
 		return true;
 
 	require_once(SOURCEDIR . '/Security.php');
-	$upcontext += createToken('login');
+	createToken('login');
 
 	return false;
 }
@@ -3710,7 +3710,7 @@ function template_welcome_message()
 		<script src="http://elkarte.github.io/Elkarte/site/current-version.js?version=' . CURRENT_VERSION . '"></script>
 		<script src="', $settings['default_theme_url'], '/scripts/sha256.js"></script>
 		<h3>', sprintf($txt['upgrade_ready_proceed'], CURRENT_VERSION), '</h3>
-		<form id="upform" action="', $upcontext['form_url'], '" method="post" accept-charset="UTF-8" name="upform"', empty($upcontext['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $upcontext['rid'] . '\', \'' . (!empty($upcontext['login_token']) ? $upcontext['login_token'] : '') . '\');"' : '', '>
+		<form id="upform" action="', $upcontext['form_url'], '" method="post" accept-charset="UTF-8" name="upform"', empty($upcontext['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $upcontext['rid'] . '\');"' : '', '>
 		<input type="hidden" name="', $upcontext['login_token_var'], '" value="', $upcontext['login_token'], '" />
 		<div id="version_warning" class="errorbox" style="display: none;">
 			<strong style="text-decoration: underline;">', $txt['upgrade_warning'], '</strong><br />

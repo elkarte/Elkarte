@@ -58,21 +58,11 @@ function template_show_list($list_id = null)
 		template_additional_rows('top_of_list', $cur_list);
 
 	$close_div = false;
-	if ((!empty($cur_list['items_per_page']) && !empty($cur_list['page_index'])) || isset($cur_list['additional_rows']['above_column_headers']))
+	if (isset($cur_list['additional_rows']['above_column_headers']))
 	{
 		$close_div = true;
 		echo '
-			<div class="flow_auto">';
-
-		// Show the page index (if this list doesn't intend to show all items). @todo - Needs old top/bottom stuff cleaned up.
-		if (!empty($cur_list['items_per_page']) && !empty($cur_list['page_index']))
-			echo '
-				<div class="floatleft">',
-			template_pagesection(false, false, array('page_index_markup' => $cur_list['page_index'])), '
-				</div>';
-
-		if (isset($cur_list['additional_rows']['above_column_headers']))
-			template_additional_rows('above_column_headers', $cur_list);
+			<div class="flow_auto">', template_additional_rows('above_column_headers', $cur_list);
 	}
 
 	// These are the main tabs that is used all around the template.
@@ -85,6 +75,19 @@ function template_show_list($list_id = null)
 		$close_div = true;
 
 		template_create_list_menu($cur_list['list_menu']);
+	}
+
+		// Show the page index (if this list doesn't intend to show all items). @todo - Needs old top/bottom stuff cleaned up.
+	if (!empty($cur_list['items_per_page']) && !empty($cur_list['page_index']))
+	{
+		if (!$close_div)
+			echo '
+			<div class="flow_auto">';
+
+		echo '
+				<div class="floatleft">', template_pagesection(false, false, array('page_index_markup' => $cur_list['page_index'])), '
+				</div>';
+		$close_div = true;
 	}
 
 	if ($close_div)
@@ -237,7 +240,7 @@ function template_create_list_menu($list_menu)
 	global $settings;
 
 	echo '
-			<div class="float', $list_menu['position'], ' additional_row', empty($list_menu['class']) ? '' : ' ' . $list_menu['class'], '"', empty($list_menu['style']) ? '' : ' style="' . $list_menu['style'] . '"', '>';
+			<div class="menu', $list_menu['position'], ' additional_row', empty($list_menu['class']) ? '' : ' ' . $list_menu['class'], '"', empty($list_menu['style']) ? '' : ' style="' . $list_menu['style'] . '"', '>';
 
 	$items = count($list_menu['links']);
 	$count = 0;

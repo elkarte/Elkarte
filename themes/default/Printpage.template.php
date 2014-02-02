@@ -129,7 +129,7 @@ function template_print_above()
  */
 function template_print_poll_above()
 {
-	global $context, $txt, $scripturl, $topic;
+	global $context, $txt;
 
 	if (!empty($context['poll']))
 	{

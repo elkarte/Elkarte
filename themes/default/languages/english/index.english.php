@@ -158,7 +158,7 @@ $txt['last_poster'] = 'Last post by';
 // @todo - Clean this up a bit. See notes in template.
 // Just moved a space, so the output looks better when things break to an extra line.
 $txt['last_post_message'] = '<span class="lastpost_link">%2$s </span><span class="board_lastposter">by %1$s</span><span class="board_lasttime"><strong>Last post: </strong>%3$s</span>';
-$txt['boardindex_total_posts'] = '%1$s Posts in %2$d Topics by %3$d Members';
+$txt['boardindex_total_posts'] = '%1$s Posts in %2$s Topics by %3$s Members';
 $txt['show'] = 'Show';
 $txt['hide'] = 'Hide';
 $txt['sort_by'] = 'Sort By';

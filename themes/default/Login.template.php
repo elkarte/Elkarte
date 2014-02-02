@@ -24,7 +24,7 @@ function template_login()
 
 	echo '
 		<script src="', $settings['default_theme_url'], '/scripts/sha256.js"></script>
-		<form action="', $scripturl, '?action=login2" name="frmLogin" id="frmLogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');"' : '', '>
+		<form action="', $scripturl, '?action=login2" name="frmLogin" id="frmLogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', '>
 		<div class="login">
 			<h2 class="category_header hdicon cat_img_login">
 				', $txt['login'], '
@@ -114,7 +114,7 @@ function template_kick_guest()
 	// This isn't that much... just like normal login but with a message at the top.
 	echo '
 	<script src="', $settings['default_theme_url'], '/scripts/sha256.js"></script>
-	<form action="', $scripturl, '?action=login2" method="post" accept-charset="UTF-8" name="frmLogin" id="frmLogin"', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');"' : '', '>
+	<form action="', $scripturl, '?action=login2" method="post" accept-charset="UTF-8" name="frmLogin" id="frmLogin"', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', '>
 		<div class="login">
 			<h2 class="category_header">', $txt['warning'], '</h2>';
 
@@ -197,7 +197,7 @@ function template_maintenance()
 	// Display the administrator's message at the top.
 	echo '
 <script src="', $settings['default_theme_url'], '/scripts/sha256.js"></script>
-<form action="', $scripturl, '?action=login2" method="post" accept-charset="UTF-8"', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');"' : '', '>
+<form action="', $scripturl, '?action=login2" method="post" accept-charset="UTF-8"', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', '>
 	<div class="login" id="maintenance_mode">
 		<h2 class="category_header">', $context['title'], '</h2>
 		<p class="description flow_auto">

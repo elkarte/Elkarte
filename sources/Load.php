@@ -1484,7 +1484,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	// Initialize the theme.
 	if (function_exists('template_init'))
-		$settings += template_init();
+		$settings = array_merge($settings, template_init());
 
 	// Guests may still need a name.
 	if ($context['user']['is_guest'] && empty($context['user']['name']))
@@ -1887,6 +1887,7 @@ function loadCSSFile($filenames, $params = array(), $id = '')
 	}
 	else
 	{
+		$this_build = array();
 		// All the files in this group use the parameters as defined above
 		foreach ($filenames as $filename)
 		{
@@ -1921,14 +1922,14 @@ function loadCSSFile($filenames, $params = array(), $id = '')
 
 			// Add it to the array for use in the template
 			if (!empty($filename))
-				$context['css_files'][$this_id] = array('filename' => $filename, 'options' => $params);
+				$this_build[$this_id] = $context['css_files'][$this_id] = array('filename' => $filename, 'options' => $params);
 
 			if ($db_show_debug === true)
 				$context['debug']['sheets'][] = $params['basename'] . (!empty($params['url']) ? '(' . basename($params['url']) . ')' : '');
-		}
 
-		// Save this build
-		cache_put_data($cache_name, $context['css_files'], 600);
+			// Save this build
+			cache_put_data($cache_name, $this_build, 600);
+		}
 	}
 }
 
@@ -1972,6 +1973,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 	}
 	else
 	{
+		$this_build = array();
 		// All the files in this group use the above parameters
 		foreach ($filenames as $filename)
 		{
@@ -2007,15 +2009,15 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 			// Add it to the array for use in the template
 			if (!empty($filename))
 			{
-				$context['javascript_files'][$this_id] = array('filename' => $filename, 'options' => $params);
+				$this_build[$this_id] = $context['javascript_files'][$this_id] = array('filename' => $filename, 'options' => $params);
 
 				if ($db_show_debug === true)
 					$context['debug']['javascript'][] = $params['basename'] . '(' . (!empty($params['local']) ? (!empty($params['url']) ? basename($params['url']) : basename($params['dir'])) : '') . ')';
 			}
-		}
 
-		// Save it so we don't have to build this so often
-		cache_put_data($cache_name, $context['javascript_files'], 600);
+			// Save it so we don't have to build this so often
+			cache_put_data($cache_name, $this_build, 600);
+		}
 	}
 }
 
