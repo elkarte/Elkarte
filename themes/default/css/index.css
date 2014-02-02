@@ -232,10 +232,10 @@ select option {
 }
 /* Can't hide the arrow in ie<10 so we positon it off div */
 #ie8 .styled-select select, #ie9 .styled-select select {
-	width: 136%;
+	width: 140%;
 }
 #ie8 .styled-select, #ie9 .styled-select {
-	min-width: 7em;
+	min-width: 7.25em;
 	padding-right: 0;
 }
 .styled-select select:hover, .styled-select select:focus {
@@ -834,6 +834,10 @@ a.bbc_link {
 #top_section_notice .button_submit {
 	margin-top: 0px;
 	vertical-align: top;
+}
+/* some help for ie8 */
+#ie8 #top_section_notice .button_submit, #ie8 #search_form .button_submit {
+	padding: 1px 6px;
 }
 #top_section_notice form {
 	white-space: nowrap;
