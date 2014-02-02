@@ -1827,9 +1827,12 @@ img.new_posts {
 }
 .topic_listing {
 	padding: 1px 0 0 0;
+	display: table;
+	border-collapse: collapse;
 }
 .topic_listing>li {
 	margin: 1px 0 0 0;
+	display: table-row;
 }
 .topic_sorting>.topic_sorting_row, .topic_listing>.topic_sorting_row {
 	margin: 0;
@@ -1889,17 +1892,15 @@ img.new_posts {
 .topic_latest {
 	display: table-cell;
 	vertical-align: top;
-	width: 20%;
-	min-width: 30em;
 	padding: 7px 4px 6px 4px;
+	min-width: 30em;
 	font-size: 0.929em;
 }
 .topic_stats {
 	text-align: right;
+	dispay: table-cell;
 	float: right;
 	min-width: 14em;
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 	padding: 0 16px 0 16px;
 }
@@ -1925,6 +1926,11 @@ img.new_posts {
 .qaction_row {
 	text-align: right;
 	padding: 6px;
+}
+.basic_row, .sticky_row, .locked_row {
+	display: table-row;
+	max-width: 100%;
+	width: 100%;
 }
 .sticky_row .topic_info {
 	background: url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
@@ -2120,6 +2126,10 @@ img.new_posts {
 }
 .poster .listlevel2 {
 	width: 14em;
+}
+.poster .title {
+	white-space: normal;
+	word-wrap: break-word;
 }
 .poster .linklevel2, .poster .linklevel2:focus,
 .poster .listlevel2:hover .linklevel2 {
@@ -3769,13 +3779,12 @@ a.help .icon {
 
 /* This one does 1024 screens at default font size. */
 @media screen and (max-width: 64em) {
+	.topic_latest {
+		min-width: 20em;
+	}
 	.board_latest {
 		min-width: 20em;
 		width: 40%;
-	}
-	.topic_latest {
-		width: 30%;
-		min-width: 30%;
 	}
 	.lastpost_link {
 		display: block;
@@ -3795,6 +3804,9 @@ a.help .icon {
 }
 /* This one does 800 screens at default font size. */
 @media screen and (max-width: 50em) {
+		.topic_latest {
+		min-width: 15em;
+	}
 	#main_menu .linklevel1 {
 		margin-right: 5px;
 		box-shadow: none;
@@ -3965,6 +3977,9 @@ a.help .icon {
 		display: block;
 		width: 95%;
 		padding: 8px;
+	}
+	.locked_row, .sticky_row, .basic_row,.topic_listing, .topic_listing>li {
+		display: block;
 	}
 	.topic_icons, .topic_moderation {
 		display: none;
