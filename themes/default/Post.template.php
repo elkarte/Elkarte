@@ -459,7 +459,7 @@ function template_additional_options_below()
 	// Initiate file drag drop
 	echo '
 		<script><!-- // --><![CDATA[
-			dragDropAttachment({
+			var dropAttach = dragDropAttachment.prototype.init({
 				sessionId: elk_session_id,
 				sessionVar: elk_session_var,
 				allowedExtensions: "', empty($modSettings['attachmentCheckExtensions']) ? '' : $context['allowed_extensions'] ,'",

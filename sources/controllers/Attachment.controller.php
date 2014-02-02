@@ -47,13 +47,16 @@ class Attachment_Controller extends Action_Controller
 	}
 
 	/**
-	 * Function to utilize for upload of attachement
+	 * Function to upload attachements via ajax calls
 	 * Currently called by drag drop attachment functionality
+	 * Pass the form data with session vars
+	 * resp back with errors or file data
 	 */
 	public function action_ulattach()
 	{
 		global $txt, $context, $modSettings;
 
+		checkJsonEncode();
 		$resp_data = array();
 		$context['attachments']['can']['post'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
 
@@ -115,9 +118,16 @@ class Attachment_Controller extends Action_Controller
 		}
 	}
 
+	/**
+	 * Function to remove attachements which were added via ajax calls
+	 * Currently called by drag drop attachment functionality
+	 * Requires file name and file path
+	 * resp back with success or error
+	 */
 	public function action_rmattach() {
 		global $context;
 
+		checkJsonEncode();
 		$template_layers = Template_Layers::getInstance();
 		$template_layers->removeAll();
 
