@@ -481,7 +481,7 @@ function template_add_new_attachments()
 	// @todo move all the logic to the controller
 	echo '
 		<script><!-- // --><![CDATA[
-			dragDropAttachment({
+			var dropAttach = dragDropAttachment.prototype.init({
 				sessionId: elk_session_id,
 				sessionVar: elk_session_var,
 				allowedExtensions: "', $context['attachments']['allowed_extensions'], '",
