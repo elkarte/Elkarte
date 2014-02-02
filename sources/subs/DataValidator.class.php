@@ -61,8 +61,8 @@ if (!defined('ELK'))
  * Current validation can be one or a combination of:
  *    max_length[x], min_length[x], length[x],
  *    alpha, alpha_numeric, alpha_dash
- *    numeric, integer, boolean, float, notequal[x,y,z]
- *    valid_url, valid_ip, valid_ipv6, valid_email,
+ *    numeric, integer, boolean, float, notequal[x,y,z], is_array
+ *    valid_url, valid_ip, valid_ipv6, valid_email, valid_color
  *    php_syntax, contains[x,y,x], required, without[x,y,z]
  */
 class Data_Validator
@@ -144,7 +144,7 @@ class Data_Validator
 
 		// Replace the data
 		if (!empty($sanitation_rules))
-			$data = array_replace($data, $validator->validation_data());
+			$data = $validator->_array_replace($data, $validator->validation_data());
 
 		// Return true or false on valid data
 		return $result;
@@ -261,6 +261,21 @@ class Data_Validator
 			return $this->_data;
 
 		return isset($this->_data[$key]) ? $this->_data[$key] : null;
+	}
+
+	/**
+	 * array_replace is a php 5.3+ function, this is needed to support the oldies
+	 */
+	private function _array_replace()
+	{
+		$array = array();
+		$n = func_num_args();
+
+		// Union each array passed
+		while ($n-- > 0)
+			$array += func_get_arg($n);
+
+		return $array;
 	}
 
 	/**
@@ -904,7 +919,6 @@ class Data_Validator
 		if (!isset($input[$field]))
 			return;
 
-		// A character with the Unicode property of letter (any kind of letter from any language)
 		if (!is_array($input[$field]))
 		{
 			return array(
