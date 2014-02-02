@@ -1828,6 +1828,7 @@ img.new_posts {
 .topic_listing {
 	padding: 1px 0 0 0;
 	display: table;
+	width: 100%;
 	border-collapse: collapse;
 }
 .topic_listing>li {
@@ -1893,17 +1894,23 @@ img.new_posts {
 	display: table-cell;
 	vertical-align: top;
 	padding: 7px 4px 6px 4px;
-	min-width: 30em;
+	width: auto;
+	min-width: 35em;
+	white-space: nowrap;
 	font-size: 0.929em;
+}
+.topic_latest.relative {
+	min-width: 30em;
 }
 .topic_stats {
 	text-align: right;
-	dispay: table-cell;
+	display: table-cell;
 	float: right;
 	min-width: 14em;
 	box-sizing: border-box;
 	padding: 0 16px 0 16px;
 }
+
 .topic_lastpost img {
 	float: right;
 	padding: 4px;
@@ -1926,9 +1933,9 @@ img.new_posts {
 .qaction_row {
 	text-align: right;
 	padding: 6px;
+	display: block !important;
 }
 .basic_row, .sticky_row, .locked_row {
-	display: table-row;
 	max-width: 100%;
 	width: 100%;
 }
@@ -3783,6 +3790,9 @@ a.help .icon {
 	.topic_latest {
 		min-width: 20em;
 	}
+	.topic_latest.relative {
+		min-width: 15em;
+	}
 	.board_latest {
 		min-width: 20em;
 		width: 40%;
@@ -3805,8 +3815,11 @@ a.help .icon {
 }
 /* This one does 800 screens at default font size. */
 @media screen and (max-width: 50em) {
-		.topic_latest {
+	.topic_latest {
 		min-width: 15em;
+	}
+	.board_avatar {
+		display: none;
 	}
 	#main_menu .linklevel1 {
 		margin-right: 5px;
@@ -3926,7 +3939,6 @@ a.help .icon {
 	.stats dt {
 		font-weight: bold;
 	}
-
 }
 /* This one does 540 and smaller screens at default font size. */
 @media screen and (max-width: 33.750em) {
