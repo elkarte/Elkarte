@@ -1902,6 +1902,10 @@ img.new_posts {
 .topic_latest.relative {
 	min-width: 30em;
 }
+.board_lastpost, .topic_lastpost {
+	min-width: 18em;
+	margin-left: 1em;
+}
 .topic_stats {
 	text-align: right;
 	display: table-cell;
@@ -1910,7 +1914,6 @@ img.new_posts {
 	box-sizing: border-box;
 	padding: 0 16px 0 16px;
 }
-
 .topic_lastpost img {
 	float: right;
 	padding: 4px;
