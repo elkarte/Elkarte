@@ -71,6 +71,18 @@ INSERT IGNORE INTO {$db_prefix}settings
 	(variable, value)
 VALUES
 	('jquery_source', 'local');
+INSERT IGNORE INTO {$db_prefix}settings
+	(variable, value)
+VALUES
+	('mentions_enabled', '1');
+INSERT IGNORE INTO {$db_prefix}settings
+	(variable, value)
+VALUES
+	('mentions_buddy', '0');
+INSERT IGNORE INTO {$db_prefix}settings
+	(variable, value)
+VALUES
+	('mentions_dont_notify_rlike', '0');
 ---#
 
 /******************************************************************************/

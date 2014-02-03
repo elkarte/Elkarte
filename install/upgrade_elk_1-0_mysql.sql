@@ -50,7 +50,10 @@ VALUES
 	('xmlnews_limit', 5),
 	('visual_verification_num_chars', '6'),
 	('enable_unwatch', 0),
-	('jquery_source', 'local');
+	('jquery_source', 'local'),
+	('mentions_enabled', '1'),
+	('mentions_buddy', '0'),
+	('mentions_dont_notify_rlike', '0');
 ---#
 
 /******************************************************************************/
