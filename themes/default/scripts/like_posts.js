@@ -16,9 +16,14 @@
 	function likePosts() {}
 
 	likePosts.prototype = function() {
-		var likeUnlikePost = function(params) {
+		var likeUnlikePosts = function(e, mId, tId, ssId, ssVar) {
+			var messageId = parseInt(mId, 10),
+				topicId = parseInt(tId, 10),
+				sessionId = sessionId,
+				sessionVar = ssVar;
+
 			$.ajax({
-				url: 'http://localhost/forum/elkarte/index.php?action=likes;sa=unlikepost;topic=2;msg=2;dad5b604146=17d230dace20ed32359d95b065512fce',
+				url: elk_scripturl + '?action=likes;sa=unlikepost;topic=2;msg=2;dad5b604146=17d230dace20ed32359d95b065512fce',
 				type: 'GET',
 				error: function(err) {
 					console.log('error');
@@ -32,8 +37,10 @@
 		};
 
 		return {
-			init: init
+			likeUnlikePosts: likeUnlikePosts
 		};
 	}();
+
+	// instead of this, we can use namespace too
 	this.likePosts = likePosts;
 }());
