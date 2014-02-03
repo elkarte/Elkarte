@@ -470,6 +470,20 @@ function template_additional_options_below()
 				numAttachUploaded: "', isset($context['attachments']['quantity']) && !empty($context['attachments']['quantity']) ? $context['attachments']['quantity'] : 0,'"
 			});
 		// ]]></script>';
+
+    // To work out with latest code
+		// <script>
+		// 	var dropAttach = dragDropAttachment.prototype.init({
+		// 		sessionId: elk_session_id,
+		// 		sessionVar: elk_session_var,
+		// 		allowedExtensions: "', empty($modSettings['attachmentCheckExtensions']) ? '' : $context['attachments']['allowed_extensions'] ,'",
+		// 		totalSizeAllowed: "', empty($modSettings['attachmentPostLimit']) ? null : $modSettings['attachmentPostLimit'] ,'",
+		// 		individualSizeAllowed: "', empty($modSettings['attachmentSizeLimit']) ? '' : $modSettings['attachmentSizeLimit'] , '",
+		// 		numOfAttachmentAllowed: "', empty($context['attachments']['num_allowed']) ? '' : $context['attachments']['num_allowed'] ,'",
+		// 		totalAttachSizeUploaded: "', isset($context['attachments']['total_size']) && !empty($context['attachments']['total_size']) ? $context['attachments']['total_size'] : 0,'",
+		// 		numAttachUploaded: "', isset($context['attachments']['quantity']) && !empty($context['attachments']['quantity']) ? $context['attachments']['quantity'] : 0,'"
+		// 	});
+		// </script>';
 }
 
 /**
