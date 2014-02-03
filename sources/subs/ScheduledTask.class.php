@@ -1538,6 +1538,7 @@ class ScheduledTask
 			// Checks 10 users at a time, the scheduled task is set to run once per hour, so 240 users a day
 			// @todo <= I know you like it Spuds! :P It may be necessary to set it to something higher.
 			$limit = 10;
+			$current_check = !empty($modSettings['mentions_member_check']) ? $modSettings['mentions_member_check'] : 0;
 
 			require_once(SUBSDIR . '/Members.subs.php');
 			require_once(SUBSDIR . '/Mentions.subs.php');
@@ -1549,7 +1550,7 @@ class ScheduledTask
 				WHERE id_member > {int:last_id_member}
 					AND mention_type IN ({array_string:mention_types})',
 				array(
-					'last_id_member' => !empty($modSettings['mentions_member_check']) ? $modSettings['mentions_member_check'] : 0,
+					'last_id_member' => $current_check,
 					'mention_types' => array('men', 'like', 'rlike'),
 				)
 			);
@@ -1558,7 +1559,7 @@ class ScheduledTask
 			$db->free_result($request);
 
 			if ($remaining == 0)
-				$modSettings['mentions_member_check'] = 0;
+				$current_check = 0;
 
 			// Grab users with mentions
 			$request = $db->query('', '
@@ -1568,14 +1569,14 @@ class ScheduledTask
 					AND mention_type IN ({array_string:mention_types})
 				LIMIT {int:limit}',
 				array(
-					'last_id_member' => !empty($modSettings['mentions_member_check']) ? $modSettings['mentions_member_check'] : 0,
+					'last_id_member' => $current_check,
 					'mention_types' => array('men', 'like', 'rlike'),
 					'limit' => $limit,
 				)
 			);
 
 			// Remember where we are
-			updateSettings(array('mentions_member_check' => $modSettings['mentions_member_check'] + $limit));
+			updateSettings(array('mentions_member_check' => $current_check + $limit));
 
 			while ($row = $db->fetch_assoc($request))
 			{
