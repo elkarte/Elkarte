@@ -4012,8 +4012,29 @@ a.help .icon {
 		/* Necessary for some browsers to keep the pages all on the same line */
 		min-width: 100%;
 	}
+	.quickbuttons {
+		white-space: nowrap;
+	}
+	.pagesection .buttonlist {
+		float: none;
+		width: 100%;
+	}
+	#whoisviewing {
+		display: none;
+	}
+	.childboards li {
+		display: block;
+		font-size: 1.2em;
+	}
+	.pagesection .buttonlist li {
+		white-space: nowrap;
+		margin-bottom: 4px;
+	}
 	.topic_name, .topic_starter {
 		margin: 0;
+	}
+	.topic_starter {
+		margin-top: 5px;
 	}
 	.topic_name h4 {
 		display: block;
