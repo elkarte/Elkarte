@@ -1,0 +1,33 @@
+/*	$LINKTREE	*/
+/* ------------------------------------------------------- */
+/* The navigation list (i.e. linktree) */
+/* Color for linktree items. */
+.linktree {
+	border-left: 2px solid #ccc;
+	border-right: 0;
+}
+.linktree:before {
+	border-right: 0.75em solid #ccc;
+	border-left: 0;
+}
+.linktree:hover:before, .linktree_last:before {
+	border-right: 0.75em solid #3d6e32;
+	border-left: 0;
+}
+.linktree:after {
+	border-right: 0.75em solid #fcfcfc;
+	border-left: 0;
+}
+.linktree:hover, .linktree_last {
+	border-left: 2px solid #3d6e32;
+	border-right: 0;
+	background-image: linear-gradient(to left, #4b863c, #5ba048);
+}
+.linktree:hover:after, .linktree_last:after {
+	border-right: 0.75em solid #5ba048;
+	border-left: 0;
+}
+.linktree_last:hover:after {
+	border-right: 0.75em solid #4b863c;
+	border-left: 0;
+}

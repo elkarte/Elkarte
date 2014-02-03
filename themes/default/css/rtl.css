@@ -89,9 +89,6 @@ h4.category_header img.icon {
 
 /* Styles for the standard dropdown menus.
 ------------------------------------------------------- */
-#main_menu {
-	float: right;
-}
 .dropmenu {
 	float: right;
 	padding: 0;
@@ -183,9 +180,9 @@ img#upshrink {
 img#logo {
 	margin-right: 1em;
 }
-#upper_section div.news {
-	float: left;
-	text-align: left;
+#news > h2 {
+	float: right;
+	margin: 7px 12px 0px -4em;
 }
 div#upper_section div.user {
 	float: right;
@@ -199,8 +196,26 @@ div#upper_section div.user ul {
 	padding-right: 10px;
 }
 
+.left_submit, .linkbutton_left {
+	float: right;
+}
+.right_submit, .linkbutton_right {
+	float: left;
+}
 .button_submit, .button_reset, .linkbutton {
 	float: left;
+}
+.styled-select select {
+	padding: 1px 2px 1px 2em;
+}
+.styled-select {
+	background: #fff url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYAQAAAADb20ChAAAAAnRSTlMAAQGU/a4AAAApSURBVHjaY/zPgIL+MTL+aWb84c74QZ/xgT6yFJALFARKARUAlaFpBACuqxnhHOnncgAAAABJRU5ErkJggg==) 2% 50% no-repeat;
+}
+.styled-select select:disabled {
+	background: #eee url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYCAQAAABZqbWHAAAAKklEQVR42mMYiqCBgDQI4pXGp6QBBWJKY8ABB+Q4ElMajxKyghqhZCgCAL3SGQGs8tZQAAAAAElFTkSuQmCC) 2% 50% no-repeat;
+}
+#ie8 .styled-select, #ie9 .styled-select {
+	padding-left: 0;
 }
 
 #search_form {
@@ -552,6 +567,46 @@ dl.register_form dt {
 	margin-left: 1em;
 }
 /* common for all admin sections */
+.admin_menu {
+	float: right;
+}
+.listlevel1 {
+	float: right;
+}
+.listlevel1#collapse_button, .listlevel1#button_profile {
+	float: left;
+}
+.listlevel1:hover .menulevel2, .listlevel1.sfhover .menulevel2 {
+	right: 0px;
+}
+.listlevel2:hover .menulevel3, .listlevel2.sfhover .menulevel3 {
+	right: -14px;
+}
+/* Levels 2 and 3: drop menu wrapper. */
+.menulevel2, .menulevel3 {
+	right: -9999px;
+}
+.menulevel3 {
+	margin: -2em 15.3em 0px 0px;
+}
+.listlevel1#button_profile:hover .menulevel2, .listlevel1#button_profile.sfhover .menulevel2 {
+	right: auto;
+	left: 0px;
+}
+.linktree, .linktree_last {
+	float: right;
+	margin: -1px -1em -1px 1em;
+	padding: 0 1.5em 0 0.5em;
+}
+/* Nifty indicators. */
+.linktree:before, .linktree:after, .linktree_last:before, .linktree_last:after {
+	right: 100%;
+	margin-right: 2px;
+	border-left: none;
+}
+.linktree:after, .linktree_last:after {
+	margin-right: 0;
+}
 h3.titlebg img {
 	margin-left: 0.5em;
 }

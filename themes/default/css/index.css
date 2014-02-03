@@ -213,7 +213,7 @@ select option {
 	text-overflow: '';
 }
 .styled-select select::-ms-expand {
-    display: none;
+	display: none;
 }
 /* A div to hold the select */
 .styled-select select {
@@ -222,8 +222,8 @@ select option {
 	background: transparent;
 	border: none;
 	outline: none;
-    box-shadow: none;
-    background-image: none;
+	box-shadow: none;
+	background-image: none;
 	width: 100%;
 	padding: 1px 2em 1px 2px;
 }
