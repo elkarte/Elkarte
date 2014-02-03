@@ -19,19 +19,32 @@
 		var likeUnlikePosts = function(e, mId, tId, ssId, ssVar) {
 			var messageId = parseInt(mId, 10),
 				topicId = parseInt(tId, 10),
-				sessionId = sessionId,
-				sessionVar = ssVar;
+				sessionId = ssId,
+				sessionVar = ssVar,
+				isLike = false;
+
+			var check = $(e.target).attr('class');
+			if (check.indexOf('unlike_button') >= 0) isLike = true;
+
+			var values = {
+				'action': 'likes',
+				'sa': (isLike === false) ? 'likepost' : 'unlikepost',
+				'topic': topicId,
+				'msg': messageId,
+			};
+			values[sessionVar] = sessionId;
 
 			$.ajax({
-				url: elk_scripturl + '?action=likes;sa=unlikepost;topic=2;msg=2;dad5b604146=17d230dace20ed32359d95b065512fce',
+				url: elk_scripturl,
 				type: 'GET',
+				data: values,
 				error: function(err) {
 					console.log('error');
-					console.log(err);
+					// console.log(err);
 				},
 				success: function(resp) {
 					console.log('success');
-					console.log(resp);
+					// console.log(resp);
 				},
 			});
 		};
