@@ -51,13 +51,19 @@ class Likes_Controller extends Action_Controller
 	 */
 	public function action_likepost()
 	{
-		global $user_info, $topic, $modSettings;
+		global $context, $user_info, $topic, $modSettings;
 
 		$id_liked = !empty($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : 0;
 
 		// We like these
 		require_once(SUBSDIR . '/Likes.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');
+
+		$template_layers = Template_Layers::getInstance();
+		$template_layers->removeAll();
+
+		loadTemplate('Json');
+		$context['sub_template'] = 'send_json';
 
 		// Have to be able to access it to like it
 		if ($this->prepare_like() && canAccessMessage($id_liked))
@@ -80,10 +86,15 @@ class Likes_Controller extends Action_Controller
 					$mentions->action_add();
 				}
 			}
+			$context['json_data'] = array('result' => true, 'data' => 'success in like');
+			return false;
+		} else {
+			$context['json_data'] = array('result' => false, 'data' => 'error in like');
+			return false;
 		}
 
 		// Back to where we were, in theory
-		redirectexit('topic=' . $topic . '.msg' . $id_liked . '#msg' . $id_liked);
+		// redirectexit('topic=' . $topic . '.msg' . $id_liked . '#msg' . $id_liked);
 	}
 
 	/**
@@ -93,13 +104,19 @@ class Likes_Controller extends Action_Controller
 	 */
 	public function action_unlikepost()
 	{
-		global $user_info, $topic, $modSettings;
+		global $context, $user_info, $topic, $modSettings;
 
 		$id_liked = !empty($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : 0;
 
 		// We used to like these
 		require_once(SUBSDIR . '/Likes.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');
+
+		$template_layers = Template_Layers::getInstance();
+		$template_layers->removeAll();
+
+		loadTemplate('Json');
+		$context['sub_template'] = 'send_json';
 
 		// Have to be able to access it to unlike it now
 		if ($this->prepare_like() && canAccessMessage($id_liked))
@@ -125,14 +142,18 @@ class Likes_Controller extends Action_Controller
 					else
 						$mentions->action_add();
 				}
+				$context['json_data'] = array('result' => true, 'data' => 'success in unlike');
+				return false;
 			}
+		} else {
+			$context['json_data'] = array('result' => false, 'data' => 'error in unlike');
+			return false;
 		}
 
 		// Back we go
-		if (!isset($_REQUEST['profile']))
-			redirectexit('topic=' . $topic . '.msg' . $id_liked . '#msg' . $id_liked);
-		else
+		if (isset($_REQUEST['profile']))
 			redirectexit('action=profile;area=showlikes;sa=given;u=' .$user_info['id']);
+			
 	}
 
 	/**
@@ -144,8 +165,8 @@ class Likes_Controller extends Action_Controller
 
 		$check = true;
 
-		// Valid request
-		checkSession('get');
+		// need to work on session check
+		// checkSession('get');
 
 		// If you're a guest or simply can't do this, we stop
 		is_not_guest();

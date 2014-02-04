@@ -268,19 +268,11 @@ function template_messages()
 		// Hide likes if its off
 		if ($message['likes_enabled'])
 		{
-			// Can they like this post?
-			if ($message['can_like'])
+			// Can they like/unlike this post?
+			if ($message['can_like'] || $message['can_unlike'])
 				echo '
 							<li class="listlevel1">
-								<a href="javascript:void(0)" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 like_button" onclick="likePosts.prototype.likeUnlikePosts(event,', $message['id'],', ',$context['current_topic'],',\'',$context['session_var'],'\',\'',$context['session_id'],'\'); return false;">', !empty($message['like_counter']) ? '&nbsp;' . $message['like_counter'] . '&nbsp;' . $txt['likes'] : $txt['like_post'], '
-								</a>
-							</li>';
-
-			// Or remove the like they made
-			elseif ($message['can_unlike'])
-				echo '
-							<li class="listlevel1">
-								<a href="javascript:void(0)" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 unlike_button" onclick="likePosts.prototype.likeUnlikePosts(event,', $message['id'],', ',$context['current_topic'],',\'',$context['session_var'],'\',\'',$context['session_id'],'\'); return false;">', !empty($message['like_counter']) ? '&nbsp;' . $message['like_counter'] . '&nbsp;' . $txt['likes'] : '&nbsp;', '
+								<a class="linklevel1 ', $message['can_unlike'] ? 'unlike_button' : 'like_button', '" href="javascript:void(0)" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" onclick="likePosts.prototype.likeUnlikePosts(event,', $message['id'],', ',$context['current_topic'],',\'',$context['session_var'],'\',\'',$context['session_id'],'\'); return false;">', !empty($message['like_counter']) ? '&nbsp;' . $message['like_counter'] . '&nbsp;' . $txt['likes'] : $txt['like_post'], '
 								</a>
 							</li>';
 

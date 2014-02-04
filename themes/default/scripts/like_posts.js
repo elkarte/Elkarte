@@ -21,30 +21,30 @@
 				topicId = parseInt(tId, 10),
 				sessionId = ssId,
 				sessionVar = ssVar,
-				isLike = false;
+				subAction = '';
 
 			var check = $(e.target).attr('class');
-			if (check.indexOf('unlike_button') >= 0) isLike = true;
+			if (check.indexOf('unlike_button') >= 0) subAction = 'unlikepost';
+			else subAction = 'likepost';
 
 			var values = {
-				'action': 'likes',
-				'sa': (isLike === false) ? 'likepost' : 'unlikepost',
 				'topic': topicId,
 				'msg': messageId,
 			};
 			values[sessionVar] = sessionId;
 
 			$.ajax({
-				url: elk_scripturl,
-				type: 'GET',
+				url: elk_scripturl + '?action=likes;sa=' + subAction,
+				type: 'POST',
+				dataType: 'json',
 				data: values,
-				error: function(err) {
-					console.log('error');
-					// console.log(err);
-				},
 				success: function(resp) {
 					console.log('success');
 					// console.log(resp);
+				},
+				error: function(err) {
+					console.log('error');
+					// console.log(err);
 				},
 			});
 		};
