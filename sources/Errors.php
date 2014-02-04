@@ -175,7 +175,7 @@ function fatal_error($error, $log = 'general')
  *
  * @param string $error
  * @param string $log defaults to 'general'
- * @param array $sprintf defaults to empty array()
+ * @param string[] $sprintf defaults to empty array()
  */
 function fatal_lang_error($error, $log = 'general', $sprintf = array())
 {

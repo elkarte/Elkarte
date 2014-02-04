@@ -537,7 +537,7 @@ function banPermissions()
  * Log the current user in the ban logs.
  * Increment the hit counters for the specified ban ID's (if any.)
  *
- * @param array $ban_ids = array()
+ * @param int[] $ban_ids = array()
  * @param string $email = null
  */
 function log_ban($ban_ids = array(), $email = null)
@@ -955,7 +955,7 @@ function checkSubmitOnce($action, $is_fatal = true)
  * Always returns true if the user is an administrator.
  *
  * @param string $permission permission
- * @param array $boards = null array of board IDs
+ * @param int[] $boards = null array of board IDs
  * @return boolean if the user can do the permission
  */
 function allowedTo($permission, $boards = null)
@@ -1032,7 +1032,7 @@ function allowedTo($permission, $boards = null)
  * If they are a guest and cannot do it, this calls is_not_guest().
  *
  * @param string $permission
- * @param array $boards = null
+ * @param int[]|null $boards = null
  */
 function isAllowedTo($permission, $boards = null)
 {
@@ -1091,7 +1091,7 @@ function isAllowedTo($permission, $boards = null)
  *  - returns an empty array if he or she cannot do this on any board.
  * If check_access is true will also make sure the group has proper access to that board.
  *
- * @param array $permissions
+ * @param string[] $permissions array of permission names to check access against
  * @param bool $check_access = true
  * @param bool $simple = true
  */

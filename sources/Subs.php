@@ -90,8 +90,8 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
  *
  * if the member's post number is updated, updates their post groups.
  *
- * @param mixed $members An array of integers
- * @param array $data
+ * @param int[] $members An array of member ids
+ * @param mixed[] $data An associative array of the columns to be updated and their respective values.
  */
 function updateMemberData($members, $data)
 {
@@ -243,7 +243,7 @@ function updateMemberData($members, $data)
  * - when update is true, the value can be true or false to increment
  *  or decrement it, respectively.
  *
- * @param array $changeArray
+ * @param mixed[] $changeArray associative array of variable => value
  * @param bool $update = false
  * @param bool $debug = false
  * @todo: add debugging features, $debug isn't used
@@ -361,7 +361,7 @@ function removeSettings($toRemove)
  * @param int $max_value
  * @param int $num_per_page
  * @param bool $flexible_start = false
- * @param array $show
+ * @param mixed[] $show associative array of option => boolean
  */
 function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flexible_start = false, $show = array())
 {
@@ -710,7 +710,7 @@ function shorten_text($text, $len = 384, $cutword = false, $buffer = 12)
  * should not be called on huge arrays (bigger than like 10 elements.)
  * returns an array containing each permutation.
  *
- * @param array $array
+ * @param mixed[] $array
  * @return array
  */
 function permute($array)
@@ -751,7 +751,7 @@ function permute($array)
  * @param string $message
  * @param bool $smileys = true
  * @param string $cache_id = ''
- * @param array $parse_tags = null
+ * @param string[]|null $parse_tags array of tags to parse, null for all
  * @return string
  */
 function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = array())
@@ -2451,7 +2451,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 /**
  * Sets the class of the current topic based on is_very_hot, veryhot, hot, etc
  *
- * @param array $topic_context
+ * @param mixed[] $topic_context
  */
 function determineTopicClass(&$topic_context)
 {
@@ -3629,7 +3629,7 @@ function elk_seed_generator()
  * supports static class method calls.
  *
  * @param string $hook
- * @param array $parameters = array()
+ * @param mixed[] $parameters = array()
  * @return array the results of the functions
  */
 function call_integration_hook($hook, $parameters = array())
@@ -3656,11 +3656,12 @@ function call_integration_hook($hook, $parameters = array())
 	if (!empty($settings['theme_dir']))
 		$path_replacements['$themedir'] = $settings['theme_dir'];
 
-	$functions = explode(',', $modSettings[$hook]);
 	// Loop through each function.
+	$functions = explode(',', $modSettings[$hook]);
 	foreach ($functions as $function)
 	{
 		$function = trim($function);
+
 		// OOP static method
 		if (strpos($function, '::') !== false)
 		{
@@ -3893,7 +3894,7 @@ function sanitizeMSCutPaste($string)
  * Uses capture group 2 in the supplied array
  * Does basic scan to ensure characters are inside a valid range
  *
- * @param array $matches
+ * @param mixed[] $matches matches from a preg_match_all
  * @return string $string
 */
 function replaceEntities__callback($matches)
@@ -3936,7 +3937,7 @@ function replaceEntities__callback($matches)
  * Uses capture group 1 in the supplied array
  * Does basic checks to keep characters inside a viewable range.
  *
- * @param array $matches
+ * @param mixed[] $matches array of matches as output from preg_match_all
  * @return string $string
 */
 function fixchar__callback($matches)
@@ -3970,7 +3971,7 @@ function fixchar__callback($matches)
  * Callback function used of preg_replace_callback in smcFunc $ent_checks, for example
  * strpos, strlen, substr etc
  *
- * @param array $matches
+ * @param mixed[] $matches array of matches for a preg_match_all
  * @return string
 */
 function entity_fix__callback($matches)
@@ -3980,7 +3981,7 @@ function entity_fix__callback($matches)
 
 	$num = $matches[2][0] === 'x' ? hexdec(substr($matches[2], 1)) : (int) $matches[2];
 
-	// we don't allow control characters, characters out of range, byte markers, etc
+	// We don't allow control characters, characters out of range, byte markers, etc
 	if ($num < 0x20 || $num > 0x10FFFF || ($num >= 0xD800 && $num <= 0xDFFF) || $num == 0x202D || $num == 0x202E)
 		return '';
 	else
@@ -4046,9 +4047,9 @@ function currentContext($messages_request, $reset = false)
  * Intended for addon use to allow such things as
  *  - adding in a new menu item to an existing menu array
  *
- * @param array $input the array we will insert to
+ * @param mixed[] $input the array we will insert to
  * @param string $key the key in the array that we are looking to find for the insert action
- * @param array $insert the actual data to insert before or after the key
+ * @param mixed[] $insert the actual data to insert before or after the key
  * @param string $where adding before or after
  * @param bool $assoc if the array is a assoc array with named keys or a basic index array
  * @param bool $strict search for identical elements, this means it will also check the types of the needle.

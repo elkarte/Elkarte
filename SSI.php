@@ -318,8 +318,8 @@ function ssi_logout($redirect_to = '', $output_method = 'echo')
  * @todo this may use getLastPosts with some modification
  *
  * @param int $num_recent
- * @param array $exclude_boards
- * @param array $include_boards
+ * @param int[] $exclude_boards
+ * @param int[] $include_boards
  * @param string $output_method
  * @param bool $limit_body
  */
@@ -371,7 +371,7 @@ function ssi_recentPosts($num_recent = 8, $exclude_boards = null, $include_board
  *
  * @todo this may use getRecentPosts with some modification
  *
- * @param array $post_ids
+ * @param int[] $post_ids
  * @param bool $override_permissions
  * @param string $output_method = 'echo'
  */
@@ -406,7 +406,7 @@ function ssi_fetchPosts($post_ids = array(), $override_permissions = false, $out
  * @todo if ssi_recentPosts and ssi_fetchPosts will use Recent.subs.php this can be removed
  *
  * @param string $query_where
- * @param array $query_where_params
+ * @param mixed[] $query_where_params
  * @param int $query_limit
  * @param string $query_order
  * @param string $output_method = 'echo'
@@ -515,7 +515,7 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
  *  [board] Subject by Poster	Date
  *
  * @param int $num_recent
- * @param array $exclude_boards
+ * @param int[] $exclude_boards
  * @param bool $include_boards
  * @param string $output_method = 'echo'
  */
@@ -855,7 +855,7 @@ function ssi_randomMember($random_type = '', $output_method = 'echo')
 /**
  * Fetch a specific member.
  *
- * @param array $member_ids = array()
+ * @param int[] $member_ids = array()
  * @param string $output_method = 'echo'
  */
 function ssi_fetchMember($member_ids = array(), $output_method = 'echo')
@@ -1849,7 +1849,7 @@ function ssi_checkPassword($id = null, $password = null, $is_username = false)
  * We want to show the recent attachments outside of the forum.
  *
  * @param int $num_attachments = 10
- * @param array $attachment_ext = array()
+ * @param string[] $attachment_ext = array()
  * @param string $output_method = 'echo'
  */
 function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(), $output_method = 'echo')

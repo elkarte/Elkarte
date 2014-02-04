@@ -1733,7 +1733,7 @@ function loadEssentialThemeData()
  *
  * @uses the template_include() function to include the file.
  * @param string $template_name
- * @param array $style_sheets = array()
+ * @param string[] $style_sheets = array()
  * @param bool $fatal = true if fatal is true, dies with an error message if the template cannot be found
  * @return boolean
  */
@@ -1853,7 +1853,7 @@ function loadSubTemplate($sub_template_name, $fatal = false)
  * Add a CSS file for output later
  *
  * @param mixed $filenames string or array of filenames to work on
- * @param array $params = array()
+ * @param mixed[] $params = array()
  *		Keys are the following:
  *			- ['local'] (true/false): define if the file is local
  *			- ['fallback'] (true/false): if false  will attempt to load the file from the default theme
@@ -1938,7 +1938,7 @@ function loadCSSFile($filenames, $params = array(), $id = '')
  * need specific parameters on a per file basis, call it multiple times
  *
  * @param mixed $filenames string or array of filenames to work on
- * @param array $params = array()
+ * @param mixed[] $params = array()
  *		Keys are the following:
  *			- ['local'] (true/false): define if the file is local
  *			- ['defer'] (true/false): define if the file should load in <head> or before the closing <html> tag
@@ -2022,7 +2022,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 /**
  * Add a Javascript variable for output later (for feeding text strings and similar to JS)
  *
- * @param array $vars array of vars to include in the output done as 'varname' => 'var value'
+ * @param mixed[] $vars array of vars to include in the output done as 'varname' => 'var value'
  * @param bool $escape = false, whether or not to escape the value
  */
 function addJavascriptVar($vars, $escape = false)
@@ -2594,7 +2594,8 @@ function loadDatabase()
  *
  * @todo this function seems more useful than expected, it should be improved. :P
  *
- * @param array $profile
+ * @param mixed[] $profile array containing the users profile data
+ *
  * @return array $avatar
  */
 function determineAvatar($profile)

@@ -260,7 +260,7 @@ function expandIPv6($addr, $strict_check = true)
  * - importantly, does not effect keys, only values.
  * - calls itself recursively if necessary.
  *
- * @param array|string $var
+ * @param string[]|string $var
  * @param int $level = 0
  * @return array|string
  */
@@ -283,7 +283,7 @@ function htmlspecialchars__recursive($var, $level = 0)
  * - does not effect keys, only values.
  * - may call itself recursively if needed.
  *
- * @param array|string $var
+ * @param string[]|string $var
  * @param int $level = 0
  * @return array|string
  */

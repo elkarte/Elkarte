@@ -360,7 +360,7 @@ function displayDebug()
  * It does not actually commit the changes until the end of the page view.
  * It depends on the trackStats setting.
  *
- * @param array $stats = array()
+ * @param mixed[] $stats = array() array of array => direction (+/-)
  * @return boolean|array
  */
 function trackStats($stats = array())
@@ -372,6 +372,7 @@ function trackStats($stats = array())
 
 	if (empty($modSettings['trackStats']))
 		return false;
+
 	if (!empty($stats))
 		return $cache_stats = array_merge($cache_stats, $stats);
 	elseif (empty($cache_stats))
@@ -383,6 +384,7 @@ function trackStats($stats = array())
 	$update_parameters = array(
 		'current_date' => $date,
 	);
+
 	foreach ($cache_stats as $field => $change)
 	{
 		$setStringUpdate .= '
@@ -425,7 +427,7 @@ function trackStats($stats = array())
  * @deprecated
  *
  * @param string $action
- * @param array $extra = array()
+ * @param string[] $extra = array()
  * @param string $log_type options: 'moderate', 'admin', ...etc.
  */
 function logAction($action, $extra = array(), $log_type = 'moderate')
@@ -441,7 +443,7 @@ function logAction($action, $extra = array(), $log_type = 'moderate')
  * Log changes to the forum, such as moderation events or administrative changes.
  * This behaves just like logAction() did, except that it is designed to log multiple actions at once.
  *
- * @param array $logs
+ * @param mixed[] $logs array of actions to log [] = array(action => log_type=> extra=>)
  * @return the last logged ID
  */
 function logActions($logs)

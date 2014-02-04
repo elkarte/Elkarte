@@ -93,7 +93,7 @@ class Site_Combiner
 	/**
 	 * Combine javascript files in to a single file to save requests
 	 *
-	 * @param array $files -- array created by loadjavascriptfile function
+	 * @param mixed[] $files -- array created by loadjavascriptfile function
 	 * @param bool $do_defered
 	 */
 	public function site_js_combine($files, $do_defered)
@@ -151,7 +151,7 @@ class Site_Combiner
 	/**
 	 * Combine css files in to a single file
 	 *
-	 * @param array $files
+	 * @param string[] $files
 	 */
 	public function site_css_combine($files)
 	{

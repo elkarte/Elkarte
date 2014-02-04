@@ -60,7 +60,7 @@ class Curl_Fetch_Webdata
 	 * Start the cURL object
 	 * - allow for user override values
 	 *
-	 * @param array $options cURL options as an array
+	 * @param mixed[] $options cURL options as an array
 	 * @param int $max_redirect use to override the default of 3
 	 */
 	public function __construct($options = array(), $max_redirect = 3)
@@ -78,7 +78,7 @@ class Curl_Fetch_Webdata
 	 *  - calls _setOptions to set the curl opts array values based on the defaults and user input
 	 *
 	 * @param string $url the site we are going to fetch
-	 * @param array $post_data any post data as form name => value
+	 * @param mixed[] $post_data any post data as form name => value
 	 */
 	public function get_url_data($url, $post_data = array())
 	{
@@ -216,7 +216,7 @@ class Curl_Fetch_Webdata
 	 *  - forms the date (for post) in to a string var=xyz&var2=abc&var3=123
 	 *  - drops vars with @ since we don't support sending files (uploading)
 	 *
-	 * @param array $post_data
+	 * @param mixed[] $post_data
 	*/
 	private function _buildPostData($post_data)
 	{
