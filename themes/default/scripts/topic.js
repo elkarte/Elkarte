@@ -589,7 +589,13 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 
 		// Show this message as 'modified on x by y'.
 		if (this.opt.bShowModify)
-			document.getElementById('modified_' + this.sCurMessageId.substr(4)).innerHTML = message.getElementsByTagName('modified')[0].childNodes[0].nodeValue;
+		{
+			var modified_element = document.getElementById('modified_' + this.sCurMessageId.substr(4));
+			modified_element.innerHTML = message.getElementsByTagName('modified')[0].childNodes[0].nodeValue;
+
+			// Just in case it's the first time the message is modified and the element is hidden
+			modified_element.style.display = '';
+		}
 
 		// Hide the icon if we were told to
 		if (this.opt.sIconHide !== null)
