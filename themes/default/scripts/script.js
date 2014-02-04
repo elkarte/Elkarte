@@ -314,8 +314,8 @@ function smc_Popup(oOptions)
 // Show the popup div & prepare the close events
 smc_Popup.prototype.show = function ()
 {
-	popup_class = 'popup_window ' + (this.opt.custom_class ? this.opt.custom_class : 'description');
-	icon = this.opt.icon ? '<img src="' + this.opt.icon + '" class="icon" alt="" /> ' : '';
+	var popup_class = 'popup_window ' + (this.opt.custom_class ? this.opt.custom_class : 'description');
+	var icon = this.opt.icon ? '<img src="' + this.opt.icon + '" class="icon" alt="" /> ' : '';
 
 	// Create the div that will be shown - max-height added here - essential anyway,
 	// so better here than in the CSS.
@@ -595,7 +595,9 @@ function elk_avatarResize()
 
 	for (var i = 0; i < possibleAvatars.length; i++)
 	{
-		var tempAvatars = []; j = 0;
+		var tempAvatars = [],
+			j = 0;
+
 		if (possibleAvatars[i].className !== 'avatar')
 			continue;
 
@@ -656,7 +658,7 @@ function hashLoginPassword(doForm, cur_session_id, token)
 
 	// If the form also contains the old hash input fill it to smooth transitions
 	if ('old_hash_passwrd' in doForm && typeof(hex_sha1) !== 'undefined')
-		doForm.old_hash_passwrd.value = hex_sha1(hex_sha1(doForm.user.value.php_strtolower() + doForm.passwrd.value) + cur_session_id + (typeof token == 'undefined' ? '' : token));
+		doForm.old_hash_passwrd.value = hex_sha1(hex_sha1(doForm.user.value.php_strtolower() + doForm.passwrd.value) + cur_session_id + (typeof token === 'undefined' ? '' : token));
 
 	doForm.passwrd.value = doForm.passwrd.value.replace(/./g, '*');
 }
@@ -1166,6 +1168,7 @@ JumpTo.prototype.showSelect = function ()
 
 	for (var i = this.opt.iCurBoardChildLevel; i > 0; i--)
 		sChildLevelPrefix += this.opt.sBoardChildLevelIndicator;
+
 	if (sChildLevelPrefix !== '')
 		sChildLevelPrefix = sChildLevelPrefix + this.opt.sBoardPrefix;
 
@@ -1214,8 +1217,9 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 		{
 			for (j = aBoardsAndCategories[i].childLevel, sChildLevelPrefix = ''; j > 0; j--)
 				sChildLevelPrefix += this.opt.sBoardChildLevelIndicator;
+
 			if (sChildLevelPrefix != '')
-				sChildLevelPrefix = sChildLevelPrefix + this.opt.sBoardPrefix
+				sChildLevelPrefix = sChildLevelPrefix + this.opt.sBoardPrefix;
 		}
 
 		oOption = document.createElement('option');
@@ -1606,7 +1610,7 @@ function applyWindowClasses(oList)
 
 	oListItems = oList.getElementsByTagName("li");
 
-	for (i = 0; i < oListItems.length; i++)
+	for (var i = 0; i < oListItems.length; i++)
 	{
 		// Skip dummies.
 		if (oListItems[i].id === "")
@@ -1665,7 +1669,7 @@ function generateDays(offset)
 
 	days = monthLength[monthElement.value - 1];
 
-	for (i = 1; i <= days; i++)
+	for (var i = 1; i <= days; i++)
 		dayElement.options[dayElement.length] = new Option(i, i);
 
 	if (selected < days)
@@ -1701,7 +1705,8 @@ function initSearch()
 function selectBoards(ids, aFormID)
 {
 	var toggle = true,
-		aForm = document.getElementById(aFormID);
+		aForm = document.getElementById(aFormID),
+		i = 0;
 
 	for (i = 0; i < ids.length; i++)
 		toggle = toggle && aForm["brd" + ids[i]].checked;

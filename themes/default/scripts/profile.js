@@ -291,7 +291,8 @@ function previewExternalAvatar(src)
  */
 function modifyWarnNotify()
 {
-	disable = !document.getElementById('warn_notify').checked;
+	var disable = !document.getElementById('warn_notify').checked;
+
 	document.getElementById('warn_sub').disabled = disable;
 	document.getElementById('warn_body').disabled = disable;
 	document.getElementById('warn_temp').disabled = disable;
@@ -314,7 +315,7 @@ function modifyWarnNotify()
 			$("#box_preview").show();
 			$("#body_preview").html($(request).find('body').text());
 
-			if ($(request).find("error").text() != '')
+			if ($(request).find("error").text() !== '')
 			{
 				$("#profile_error").show();
 				var errors_html = '<span>' + $("#profile_error").find("span").html() + '</span>' + '<ul class="list_errors">';
@@ -388,8 +389,9 @@ function initWarnSlider(sliderID, levelID, levels)
  */
 function populateNotifyTemplate()
 {
-	// no selection means no template
-	index = document.getElementById('warn_temp').value;
+	var index = document.getElementById('warn_temp').value;
+
+	// No selection means no template
 	if (index === -1)
 		return false;
 

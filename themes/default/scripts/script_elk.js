@@ -294,7 +294,7 @@ function relativeTime(sFrom, sTo)
 	}
 	else if (parseInt(sTo) == 'NaN')
 	{
-		sToSplit = sTo.split(/\D/);
+		var sToSplit = sTo.split(/\D/);
 		this.dateTo = new Date(sToSplit[0], --sToSplit[1], sToSplit[2], sToSplit[3], sToSplit[4]);
 	}
 	else
@@ -302,7 +302,7 @@ function relativeTime(sFrom, sTo)
 
 	if (parseInt(sFrom) == 'NaN')
 	{
-		sFromSplit = sFrom.split(/\D/);
+		var sFromSplit = sFrom.split(/\D/);
 		this.dateFrom = new Date(sFromSplit[0], --sFromSplit[1], sFromSplit[2], sFromSplit[3], sFromSplit[4]);
 	}
 	else
@@ -475,12 +475,14 @@ function revalidateMentions(sForm, sInput)
 
 			for (var k = 0, ccount = cached_queries.length; k < ccount; k++)
 			{
-				names = cached_names[cached_queries[k]];
+				var names = cached_names[cached_queries[k]];
+
 				for (var l = 0, ncount = names.length; l < ncount; l++)
 				{
 					if(checkWordOccurrence(body, names[l].name)) {
 						// alert(names[l].name);
 						pos = body.indexOf(' @' + names[l].name);
+
 						// If there is something like "{space}@username" AND the following char is a space or a punctation mark
 						if (pos !== -1 && body.charAt(pos + 2 + names[l].name.length + 1).search(boundaries_pattern) === 0)
 							mentions.append($('<input type="hidden" name="uid[]" />').val(names[l].id));
@@ -788,7 +790,7 @@ function setBoardIds() {
 ;(function($) {
 	$.fn.expand_pages = function() {
 		var $container,
-			lastPositions = new Array();
+			lastPositions = [];
 
 		// Hovering over an ... we expand it as much as we can
 		function hover_expand($element)
@@ -906,7 +908,7 @@ function setBoardIds() {
 				'padding-left': $container.find('#pages_scroll_left').outerWidth(),
 				'margin-left': lastPositions[firstpage]
 			});
-		};
+		}
 
 		// Used when the user clicks on the ... to expand instead of just a hover expand
 		function expand_pages($element)

@@ -378,7 +378,7 @@ function addCriteriaOption()
 
 	// group selections
 	var group_option = '';
-	for (var index in groups)
+	for (index in groups)
 		group_option += '<option value="' + index + '">' + groups[index] + '</option>';
 
 	setOuterHTML(document.getElementById("criteriaAddHere"), '<br /><div class="styled-select"><select name="ruletype[' + criteriaNum + ']" id="ruletype' + criteriaNum + '" data-optnum="' + criteriaNum + '"><option value="">' + txt_pm_rule_criteria_pick + ':</option>' + rules_option + '</select></div>&nbsp;<span id="defdiv' + criteriaNum + '" style="display: none;"><input type="text" name="ruledef[' + criteriaNum + ']" id="ruledef' + criteriaNum + '" value="" class="input_text" /></span><span id="defseldiv' + criteriaNum + '" style="display: none;"><div class="styled-select"><select name="ruledefgroup[' + criteriaNum + ']" id="ruledefgroup' + criteriaNum + '"><option value="">' + txt_pm_rule_sel_group + '</option>' + group_option + '</select></div></span><span id="criteriaAddHere"></span>');
