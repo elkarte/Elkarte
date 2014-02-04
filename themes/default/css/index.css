@@ -1895,7 +1895,7 @@ img.new_posts {
 	vertical-align: top;
 	padding: 7px 4px 6px 4px;
 	width: auto;
-	min-width: 35em;
+	min-width: 36em;
 	white-space: nowrap;
 	font-size: 0.929em;
 }
@@ -1903,7 +1903,7 @@ img.new_posts {
 	min-width: 30em;
 }
 .board_lastpost, .topic_lastpost {
-	min-width: 18em;
+	min-width: 21em;
 	margin-left: 1em;
 }
 .topic_stats {
