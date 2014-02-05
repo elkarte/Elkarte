@@ -106,8 +106,8 @@ $txt['search_error_indexed_chars'] = 'Ungültige Anzahl indizierter Zeichen. Fü
 $txt['search_error_max_percentage'] = 'Ungültiger Anteil zu überspringender Wörter. Verwenden Sie einen Wert von mindestens 5 %.';
 $txt['error_string_too_long'] = 'Der Suchbegriff darf höchstens %1$d Zeichen lang sein.';
 
-$txt['search_warning_ignored_word'] = 'Dieser Term wurde in Ihrer Suche nicht berücksichtigt';
-$txt['search_warning_ignored_words'] = 'Diese Termini wurden in Ihrer Suche nicht berücksichtigt';
+$txt['search_warning_ignored_word'] = 'Folgender Term wurde in Ihrer Suche nicht berücksichtigt';
+$txt['search_warning_ignored_words'] = 'Folgende Termini wurden in Ihrer Suche nicht berücksichtigt';
 
 $txt['search_adjust_query'] = 'Suchparameter einstellen';
 $txt['search_adjust_submit'] = 'Erneut suchen';
