@@ -133,7 +133,7 @@ class DbSearch_MySQL implements DbSearch
 	/**
 	 * Method for the custom word index table.
 	 *
-	 * @param $size
+	 * @param string $size
 	 */
 	function create_word_search($size)
 	{

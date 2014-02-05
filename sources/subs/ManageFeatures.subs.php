@@ -265,7 +265,7 @@ function updateRenamedProfileField($key, $newOptions, $name, $option)
 /**
  * Update the custom profile fields active status on/off
  *
- * @param array $enabled
+ * @param int[] $enabled
  */
 function updateRenamedProfileStatus($enabled)
 {
@@ -284,7 +284,7 @@ function updateRenamedProfileStatus($enabled)
 /**
  * Update the profile field
  *
- * @param array $field_data
+ * @param mixed[] $field_data
  */
 function updateProfileField($field_data)
 {
@@ -345,7 +345,7 @@ function updateProfileFieldOrder($replace)
 /**
  * Deletes selected values from old profile field selects
  *
- * @param array $newOptions
+ * @param string[] $newOptions
  * @param string $fieldname
  */
 function deleteOldProfileFieldSelects($newOptions, $fieldname)
@@ -368,7 +368,7 @@ function deleteOldProfileFieldSelects($newOptions, $fieldname)
 /**
  * Used to add a new custom profile field
  *
- * @param array $field
+ * @param mixed[] $field
  */
 function addProfileField($field)
 {

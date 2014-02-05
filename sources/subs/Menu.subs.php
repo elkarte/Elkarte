@@ -24,7 +24,7 @@ if (!defined('ELK'))
  * Create a menu.
  *
  * @param string $menuData the menu array
- * @param array $menuOptions an array of options that can be used to override some default behaviours.
+ * @param mixed[] $menuOptions an array of options that can be used to override some default behaviours.
  *   It can accept the following indexes:
  *    - action                    => overrides the default action
  *    - current_area              => overrides the current area
@@ -364,7 +364,7 @@ function destroyMenu($menu_id = 'last')
  * If it is not set, then $selectedMenu['function'] is
  * simply a function to call.
  *
- * @param array $selectedMenu
+ * @param mixed[] $selectedMenu
  */
 function callMenu($selectedMenu)
 {

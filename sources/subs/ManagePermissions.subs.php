@@ -25,8 +25,8 @@ if (!defined('ELK'))
  * @internal
  *
  * @param string $level
- * @param int $group
- * @param mixed $profile = null, int expected
+ * @param integer|null $group
+ * @param integer|null $profile = null, int expected
  */
 function setPermissionLevel($level, $group = null, $profile = null)
 {
@@ -674,8 +674,8 @@ function loadAllPermissions()
 /**
  * Counts membergroup permissions.
  *
- * @param array $groups
- * @param array $hidden_permissions
+ * @param int[] $groups
+ * @param string[]|null $hidden_permissions
  * @return array
  */
 function countPermissions($groups, $hidden_permissions = null)
@@ -702,9 +702,9 @@ function countPermissions($groups, $hidden_permissions = null)
 /**
  * Counts board permissions.
  *
- * @param array $groups
- * @param array $hidden_permissions
- * @param int $profile_id
+ * @param int[] $groups
+ * @param string[]|null $hidden_permissions
+ * @param integer|null $profile_id
  * @return array
  */
 function countBoardPermissions($groups, $hidden_permissions = null , $profile_id = null)
@@ -756,9 +756,9 @@ function assignPermissionProfileToBoard($profile, $board)
  * Copy a set of permissions from one group to another..
  *
  * @param int $copy_from
- * @param array $groups
- * @param array $illgeal_permissions
- * @param array $non_guest_permissions
+ * @param int[] $groups
+ * @param string[] $illgeal_permissions
+ * @param string[] $non_guest_permissions
  * @todo another function with the same name in Membergroups.subs.php
  */
 function copyPermission($copy_from, $groups, $illgeal_permissions, $non_guest_permissions = array())
@@ -822,9 +822,9 @@ function copyPermission($copy_from, $groups, $illgeal_permissions, $non_guest_pe
  * Copy a set of board permissions from one group to another..
  *
  * @param int $copy_from
- * @param array $groups
+ * @param int[] $groups
  * @param int $profile_id
- * @param array $non_guest_permissions
+ * @param string[] $non_guest_permissions
  */
 function copyBoardPermission($copy_from, $groups, $profile_id, $non_guest_permissions)
 {
@@ -884,9 +884,9 @@ function copyBoardPermission($copy_from, $groups, $profile_id, $non_guest_permis
 /**
  * Deletes membergroup permissions.
  *
- * @param array $groups
+ * @param int[] $groups
  * @param string $permission
- * @param array $illegal_permissions
+ * @param string[] $illegal_permissions
  */
 function deletePermission($groups, $permission, $illegal_permissions)
 {
@@ -908,7 +908,7 @@ function deletePermission($groups, $permission, $illegal_permissions)
 /**
  * Delete board permissions.
  *
- * @param array $group
+ * @param int[] $group
  * @param int $profile_id
  * @param string $permission
  */
@@ -932,7 +932,7 @@ function deleteBoardPermission($group, $profile_id, $permission)
 /**
  * Replaces existing membergroup permissions with the given ones.
  *
- * @param array $permChange
+ * @param mixed[] $permChange associative array permission, id_group, add_deny
  */
 function replacePermission($permChange)
 {
@@ -949,7 +949,7 @@ function replacePermission($permChange)
 /**
  * * Replaces existing board permissions with the given ones.
  *
- * @param array $permChange
+ * @param mixed[] $permChange associative array of 'permission', 'id_group', 'add_deny', 'id_profile'
  */
 function replaceBoardPermission($permChange)
 {
@@ -1045,7 +1045,7 @@ function fetchBoardPermissions($id_group, $permission_type, $profile_id)
  * Deletes invalid permissions for the given group.
  *
  * @param int $id_group
- * @param array $illegal_permissions
+ * @param string[] $illegal_permissions
  */
 function deleteInvalidPermissions($id_group, $illegal_permissions)
 {
@@ -1226,7 +1226,7 @@ function renamePermissionProfile($id_profile, $name)
 /**
  * Delete a permission profile
  *
- * @param array $profiles
+ * @param int[] $profiles
  */
 function deletePermissionProfiles($profiles)
 {
@@ -1257,9 +1257,9 @@ function deletePermissionProfiles($profiles)
 }
 
 /**
- * checks, if a permission profile is in use.
+ * Checks, if a permission profile is in use.
  *
- * @param array $profiles
+ * @param int[] $profiles
  * @return array
  */
 function permProfilesInUse($profiles)
@@ -1290,8 +1290,8 @@ function permProfilesInUse($profiles)
 /**
  * Delete a board permission.
  *
- * @param array $groups
- * @param array $profile
+ * @param mixed[] $groups array where the keys are the group id's
+ * @param int[] $profile
  * @param string $permissions
  */
 function deleteBoardPermissions($groups, $profile, $permissions)
@@ -1315,7 +1315,7 @@ function deleteBoardPermissions($groups, $profile, $permissions)
 /**
  * Adds a new board permission to the board_permissions table.
  *
- * @param array $new_permissions
+ * @param mixed[] $new_permissions
  */
 function insertBoardPermission($new_permissions)
 {
@@ -1332,7 +1332,7 @@ function insertBoardPermission($new_permissions)
 /**
  * Lists the board permissions.
  *
- * @param array $group
+ * @param int[] $group
  * @param int $profile
  * @param array $permissions
  * @return array

@@ -108,7 +108,7 @@ class Convert_BBC
 	/**
 	 * If we want to skip over some tags (that would normally be converted)
 	 *
-	 * @param array $tags
+	 * @param string[] $tags
 	 */
 	public function skip_tags($tags = array())
 	{
@@ -431,7 +431,6 @@ class Convert_BBC
 
 		$href = htmlentities($node->getAttribute('href'));
 		$id = htmlentities($node->getAttribute('id'));
-		$title = $node->getAttribute('title');
 		$value = $this->_get_value($node);
 
 		// An anchor link
@@ -611,7 +610,6 @@ class Convert_BBC
 		$style = $node->getAttribute('style');
 
 		$size = '';
-		$styles = array();
 
 		// Do the basic things first, title/alt
 		if (!empty($title) && empty($alt))

@@ -108,7 +108,7 @@ class Email_Parse
 	/**
 	 * Holds the return path as set in the email header
 	 */
-	public $return_rpath = null;
+	public $return_path = null;
 
 	/**
 	 * Holds the message subject

@@ -29,7 +29,7 @@ class Ftp_Connection
 {
 	/**
 	 * holds the connection response
-	 * @var type
+	 * @var resource
 	 */
 	public $connection;
 
@@ -203,7 +203,7 @@ class Ftp_Connection
 	/**
 	 * Reads the response to the command from the server
 	 *
-	 * @param mixed $desired string or array of acceptable return values
+	 * @param string[]|string $desired string or array of acceptable return values
 	 */
 	public function check_response($desired)
 	{
@@ -298,7 +298,7 @@ class Ftp_Connection
 	 * Generates a direcotry listing for the current directory
 	 *
 	 * @param string $ftp_path
-	 * @param string $search
+	 * @param string|boolean $search
 	 * @return boolean
 	 */
 	public function list_dir($ftp_path = '', $search = false)
@@ -343,7 +343,7 @@ class Ftp_Connection
 	 * Determins the current dirctory we are in
 	 *
 	 * @param string $file
-	 * @param array $listing
+	 * @param mixed[]|null $listing
 	 * @return string|boolean
 	 */
 	public function locate($file, $listing = null)
@@ -413,7 +413,7 @@ class Ftp_Connection
 	 * Detects the current path
 	 *
 	 * @param string $filesystem_path
-	 * @param string $lookup_file
+	 * @param string|null $lookup_file
 	 */
 	public function detect_path($filesystem_path, $lookup_file = null)
 	{

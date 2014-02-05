@@ -165,7 +165,7 @@ class DbSearch_PostgreSQL implements DbSearch
 	/**
 	 * Make a custom word index.
 	 *
-	 * @param $size
+	 * @param string $size
 	 */
 	function create_word_search($size)
 	{

@@ -253,7 +253,7 @@ class Data_Validator
 
 	/**
 	 * Return the validation data, all or a specific key
-	 * @param int|string $key int or string
+	 * @param integer|string|null $key int or string
 	 */
 	public function validation_data($key = null)
 	{
@@ -527,7 +527,7 @@ class Data_Validator
 	/**
 	 * Process any errors and return the error strings
 	 *
-	 * @param mixed[]|boolean $keys
+	 * @param mixed[]|null $keys
 	 */
 	private function _get_error_messages($keys)
 	{

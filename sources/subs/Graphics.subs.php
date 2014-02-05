@@ -164,7 +164,7 @@ function checkImagick()
 /**
  * See if we have enough memory to thumbnail an image
  *
- * @param array $sizes image size
+ * @param int[] $sizes image size
  * @return whether we do
  */
 function imageMemoryCheck($sizes)
@@ -178,9 +178,11 @@ function imageMemoryCheck($sizes)
 		return true;
 	}
 
-	// Determine the memory requirements for this image, note: if you want to use an image formula W x H x bits/8 x channels x Overhead factor
-	// you will need to account for single bit images as GD expands them to an 8 bit and will greatly overun the calculated value.  The 5 is
-	// simply a shortcut of 8bpp, 3 channels, 1.66 overhead
+	// Determine the memory requirements for this image, note: if you want to use an image formula
+	// W x H x bits/8 x channels x Overhead factor
+	// You will need to account for single bit images as GD expands them to an 8 bit and will greatly
+	// overun the calculated value.
+	// The 5 below is simply a shortcut of 8bpp, 3 channels, 1.66 overhead
 	$needed_memory = ($sizes[0] * $sizes[1] * 5);
 
 	// If we need more, lets try to get it
@@ -275,7 +277,7 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
  * @uses GD
  * @uses Imagick
  *
- * @param resource $src_img
+ * @param resource|null $src_img null for Imagick images, resource form imagecreatefrom for GD
  * @param string $destName
  * @param int $src_width
  * @param int $src_height
@@ -620,7 +622,7 @@ if (!function_exists('imagecreatefrombmp'))
 
 /**
  * Writes a gif file to disk as a png file.
-
+ *
  * @param resource $gif
  * @param string $lpszFileName
  * @param int $background_color = -1

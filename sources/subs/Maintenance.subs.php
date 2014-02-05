@@ -791,7 +791,7 @@ function updateZeroPostMembers()
  * Removing old and inactive members
  *
  * @param string $type
- * @param array $groups
+ * @param int[] $groups
  * @param int $time_limit
  * @return array
  */

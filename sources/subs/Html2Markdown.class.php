@@ -320,6 +320,7 @@ class Convert_Md
 			//	break;
 			case 'title':
 				$markdown = '# ' . $this->_get_value($node) . $this->line_break;
+				break;
 			case 'table':
 				$markdown = $this->_convert_table($node) . $this->line_break;
 				break;

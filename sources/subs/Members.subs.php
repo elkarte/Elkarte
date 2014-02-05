@@ -34,7 +34,7 @@ if (!defined('ELK'))
  * karma votes.
  *   - updates member statistics afterwards.
  *
- * @param array $users
+ * @param int[]|int $users
  * @param bool $check_not_admin = false
  */
 function deleteMembers($users, $check_not_admin = false)
@@ -438,7 +438,7 @@ function deleteMembers($users, $check_not_admin = false)
  * The function will adjust member statistics.
  * If an error is detected will fatal error on all errors unless return_errors is true.
  *
- * @param array $regOptions
+ * @param mixed[] $regOptions
  * @param string $error_context
  * @return int, the ID of the newly created member
  */
@@ -954,7 +954,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
  * The function takes different permission settings into account.
  *
  * @param string $permission
- * @param int $board_id = null
+ * @param integer|null $board_id = null
  * @return an array containing an array for the allowed membergroup ID's
  * and an array for the denied membergroup ID's.
  */
@@ -1033,7 +1033,7 @@ function groupsAllowedTo($permission, $board_id = null)
  * Takes possible moderators (on board 'board_id') into account.
  *
  * @param string $permission
- * @param int $board_id = null
+ * @param integer|null $board_id = null
  * @return an array containing member ID's.
  */
 function membersAllowedTo($permission, $board_id = null)
@@ -1077,8 +1077,8 @@ function membersAllowedTo($permission, $board_id = null)
  * If add_to_post_count is set, the member's post count is increased.
  *
  * @param int $memID
- * @param string $email = false
- * @param string $membername = false
+ * @param string|false $email = false
+ * @param string|false $membername = false
  * @param bool $post_count = false
  * @return nothing
  */
@@ -1159,12 +1159,12 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
 /**
  * Callback for createList().
  *
- * @param $start
- * @param $items_per_page
- * @param $sort
- * @param $where
- * @param $where_params
- * @param $get_duplicates
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param string $where
+ * @param mixed[] $where_params
+ * @param boolean $get_duplicates
  */
 function list_getMembers($start, $items_per_page, $sort, $where, $where_params = array(), $get_duplicates = false)
 {
@@ -1201,8 +1201,8 @@ function list_getMembers($start, $items_per_page, $sort, $where, $where_params =
 /**
  * Callback for createList().
  *
- * @param $where
- * @param $where_params
+ * @param string $where
+ * @param mixed[] $where_params
  */
 function list_getNumMembers($where, $where_params = array())
 {
@@ -1379,9 +1379,9 @@ function isAnotherAdmin($memberID)
 /**
  * This function retrieves a list of member ids based on some conditions
  *
- * @param mixed $query can be an array of "type" of conditions,
+ * @param mixed[]|string $query can be an array of "type" of conditions,
  *              or a string used as raw query
- * @param array $query_params is an array containing the parameters to be passed
+ * @param mixed[] $query_params is an array containing the parameters to be passed
  *              to the query
  * @param bool $details if true returns additional member details (name, email, ip, etc.)
  * @param bool $only_active
@@ -1484,17 +1484,17 @@ function membersBy($query, $query_params, $details = false, $only_active = true)
 /**
  * Counts the number of members based on conditions
  *
- * @param mixed $query can be an array of "type" of conditions,
+ * @param mixed[]|string $query can be an array of "type" of conditions,
  *              or a string used as raw query
- * @param array $query_params is an array containing the parameters to be passed
+ * @param mixed[] $query_params is an array containing the parameters to be passed
  *              to the query
  * @param boolean $only_active
  */
 function countMembersBy($query, $query_params, $only_active = true)
 {
 	$allowed_conditions = array(
-		'member_ids'       => 'id_member IN ({array_int:member_ids})',
-		'member_names'     => create_function('&$members', '
+		'member_ids' => 'id_member IN ({array_int:member_ids})',
+		'member_names' => create_function('&$members', '
 			$mem_query = array();
 
 			foreach ($members[\'member_names\'] as $key => $param)
@@ -1504,11 +1504,11 @@ function countMembersBy($query, $query_params, $only_active = true)
 			}
 			return implode("\n\t\t\tOR ", $mem_query);
 		'),
-		'not_in_group'     => '(id_group != {int:not_in_group} AND FIND_IN_SET({int:not_in_group}, additional_groups) = 0)',
-		'in_group'         => '(id_group = {int:in_group} OR FIND_IN_SET({int:in_group}, additional_groups) != 0)',
+		'not_in_group' => '(id_group != {int:not_in_group} AND FIND_IN_SET({int:not_in_group}, additional_groups) = 0)',
+		'in_group' => '(id_group = {int:in_group} OR FIND_IN_SET({int:in_group}, additional_groups) != 0)',
 		'in_group_primary' => 'id_group = {int:in_group_primary}',
-		'in_post_group'    => 'id_post_group = {int:in_post_group}',
-		'in_group_no_add'  => '(id_group = {int:in_group_no_add} AND FIND_IN_SET({int:in_group_no_add}, additional_groups) = 0)',
+		'in_post_group' => 'id_post_group = {int:in_post_group}',
+		'in_group_no_add' => '(id_group = {int:in_group_no_add} AND FIND_IN_SET({int:in_group_no_add}, additional_groups) = 0)',
 	);
 
 	if (is_array($query))
@@ -1627,8 +1627,8 @@ function maxMemberID()
 /**
  * Load some basic member infos
  *
- * @param mixed $member_ids an array of member IDs or a single ID
- * @param array $options an array of possible little alternatives, can be:
+ * @param int[]|int $member_ids an array of member IDs or a single ID
+ * @param mixed[] $options an array of possible little alternatives, can be:
  *                - 'add_guest' (set or not) to add a guest user to the returned array
  *                - 'limit' int if set overrides the default query limit
  *                - 'sort' (string) a column to sort the results
@@ -1734,8 +1734,6 @@ function getMemberByName($name, $flexible = false)
 {
 	$db = database();
 
-	$member = array();
-
 	$request = $db->query('', '
 		SELECT id_member, id_group
 		FROM {db_prefix}members
@@ -1748,7 +1746,6 @@ function getMemberByName($name, $flexible = false)
 	);
 	if ($db->num_rows($request) == 0)
 		return false;
-
 	$member = $db->fetch_assoc($request);
 	$db->free_result($request);
 
@@ -1760,7 +1757,7 @@ function getMemberByName($name, $flexible = false)
  * Optionaly will only search/find the member in a buddy list
  *
  * @param string $search string to search real_name for like finds
- * @param array $buddies
+ * @param int[]|null $buddies
  */
 function getMember($search, $buddies = array())
 {
@@ -1807,7 +1804,7 @@ function getMember($search, $buddies = array())
  * Requires a unix timestamp as input, returns an integer.
  * Named in honour of Jeff Lewis, the original creator of...this function.
  *
- * @param $old
+ * @param int $old
  * @return int, the returned number of days, based on the forum time.
  */
 function jeffsdatediff($old)
@@ -1834,7 +1831,7 @@ function jeffsdatediff($old)
 /**
  * Retrieves MemberData based on conditions
  *
- * @param array $conditions associative array holding the conditions for the
+ * @param mixed[] $conditions associative array holding the conditions for the
  *               WHERE clause of the query. Possible keys:
  *                 - activated_status (boolen) must be present
  *                 - time_before (integer)
@@ -1926,7 +1923,7 @@ function retrieveMemberData($conditions)
 /**
  * Activate members
  *
- * @param array $conditions associative array holding the conditions for the
+ * @param mixed[] $conditions associative array holding the conditions for the
  *               WHERE clause of the query. Possible keys:
  *                 - activated_status (boolen) must be present
  *                 - time_before (integer)
@@ -1968,7 +1965,7 @@ function approveMembers($conditions)
 /**
  * Set these members for activation
  *
- * @param array $conditions associative array holding the conditions for the
+ * @param mixed[] $conditions associative array holding the conditions for the
  *               WHERE clause of the query. Possible keys:
  *                 - selected_member (integer) must be present
  *                 - activated_status (boolen) must be present
@@ -2035,7 +2032,7 @@ function countMembersInGroup($id_group = 0)
 /**
  * Get the total amount of members online.
  *
- * @param array $conditions
+ * @param string[] $conditions
  * @return int
  */
 function countMembersOnline($conditions)
@@ -2059,7 +2056,7 @@ function countMembersOnline($conditions)
 /**
  * Look for people online, provided they don't mind if you see they are.
  *
- * @param array $conditions
+ * @param string[] $conditions
  * @param string $sort_method
  * @param string $sort_direction
  * @param int $start
@@ -2158,7 +2155,7 @@ function recentMembers($limit)
  *
  * @param int $member
  * @param int $primary_group
- * @param string $additional_groups
+ * @param int[] $additional_groups
  */
 function assignGroupsToMember($member, $primary_group, $additional_groups)
 {
@@ -2168,7 +2165,7 @@ function assignGroupsToMember($member, $primary_group, $additional_groups)
 /**
  * Get a list of members from a membergroups request.
  *
- * @param array $groups
+ * @param int[] $groups
  * @param string $where
  * @return mixed
  */
@@ -2279,28 +2276,13 @@ function canContact($who)
 		return true;
 	// 1 = all except ignore
 	elseif ($receive_from == 1)
-	{
-		if (!empty($ignore_list) && in_array($user_info['id'], $ignore_list))
-			return false;
-		else
-			return true;
-	}
+		return !(!empty($ignore_list) && in_array($user_info['id'], $ignore_list));
 	// 2 = buddies and admin
 	elseif ($receive_from == 2)
-	{
-		if ($user_info['is_admin'] || (!empty($buddy_list) && in_array($user_info['id'], $buddy_list)))
-			return true;
-		else
-			return false;
-	}
+		return ($user_info['is_admin'] || (!empty($buddy_list) && in_array($user_info['id'], $buddy_list)));
 	// 3 = admin only
 	else
-	{
-		if ($user_info['is_admin'])
-			return true;
-		else
-			return false;
-	}
+		return (bool) $user_info['is_admin'];
 }
 
 /**
@@ -2311,8 +2293,8 @@ function canContact($who)
  *
  * Used by updateStats('member').
  *
- * @param int $id_member = null If not an integer reload from the database
- * @param string $real_name = null
+ * @param integer|null $id_member = null If not an integer reload from the database
+ * @param string|null $real_name = null
  */
 function updateMemberStats($id_member = null, $real_name = null)
 {

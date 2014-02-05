@@ -257,8 +257,6 @@ function maillist_load_filter_parser($id, $style)
 {
 	$db = database();
 
-	$row = array();
-
 	// Load filter/parser details for editing
 	$request = $db->query('', '
 		SELECT *
@@ -354,7 +352,7 @@ function enable_maillist_imap_cron($switch)
  * Load in the custom (public and this users private) email templates
  *
  * @param string $template_type - the type of template (e.g. 'bounce', 'warntpl', etc.)
- * @param string $subject - A subject for the template
+ * @param string|null $subject - A subject for the template
  */
 function maillist_templates($template_type, $subject = null)
 {
@@ -395,7 +393,7 @@ function maillist_templates($template_type, $subject = null)
 /**
  * Log in post-by emails an email being sent
  *
- * @param array $sent
+ * @param mixed[] $sent associative array of id_email, time_sent, email_to
  */
 function log_email($sent)
 {
@@ -417,7 +415,7 @@ function log_email($sent)
  * Called by Xmlcontroller as part of drag sort event
  *
  * @param string $replace constucted as WHEN fieldname=value THEN new viewvalue WHEN .....
- * @param array $filters list of ids in the WHEN clause to keep from updating the entire table
+ * @param int[] $filters list of ids in the WHEN clause to keep from updating the entire table
  */
 function updateParserFilterOrder($replace, $filters)
 {

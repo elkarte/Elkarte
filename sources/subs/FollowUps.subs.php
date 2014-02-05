@@ -18,7 +18,7 @@ if (!defined('ELK'))
 /**
  * Retrieves all the follow-up topic for a certain message
  *
- * @param array $messages int array of message ids to work on
+ * @param int[] $messages int array of message ids to work on
  * @param boolean $include_approved
  */
 function followupTopics($messages, $include_approved = false)
@@ -140,7 +140,7 @@ function removeFollowUpsByTopic($topics)
 /**
  * Removes all the follow-ups from the db by message id
  *
- * @param mixed $msgs int or array of ints for the message id's to work on
+ * @param int[]|int $msgs int or array of ints for the message id's to work on
  */
 function removeFollowUpsByMessage($msgs)
 {

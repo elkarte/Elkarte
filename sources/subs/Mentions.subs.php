@@ -19,8 +19,8 @@ if (!defined('ELK'))
  * callback for createList in action_list of Mentions_Controller
  *
  * @param bool $all : if true counts all the mentions, otherwise only the unread
- * @param mixed $type : the type of the mention can be a string or an array of strings.
- * @param string $id_member : the id of the member the counts are for, defaults to user_info['id']
+ * @param string[]|string $type : the type of the mention can be a string or an array of strings.
+ * @param string|null $id_member : the id of the member the counts are for, defaults to user_info['id']
  */
 function countUserMentions($all = false, $type = '', $id_member = null)
 {
@@ -64,7 +64,7 @@ function countUserMentions($all = false, $type = '', $id_member = null)
  * @param int $limit Number of mentions returned
  * @param string $sort Sorting
  * @param bool $all if show all mentions or only unread ones
- * @param mixed $type : the type of the mention can be a string or an array of strings.
+ * @param string[]|string $type : the type of the mention can be a string or an array of strings.
  */
 function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 {
@@ -114,11 +114,11 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
  * Checks if the mention already exists (in any status) to prevent any duplicates
  *
  * @param int $member_from the id of the member mentioning
- * @param array $members_to an array of ids of the members mentioned
+ * @param int[] $members_to an array of ids of the members mentioned
  * @param int $msg the id of the message involved in the mention
  * @param string $type the type of mention
- * @param string $time optional value to set the time of the mention, defaults to now
- * @param string $status optional value to set a status, defaults to 0
+ * @param string|null $time optional value to set the time of the mention, defaults to now
+ * @param string|null $status optional value to set a status, defaults to 0
  */
 function addMentions($member_from, $members_to, $msg, $type, $time = null, $status = null)
 {
@@ -185,7 +185,7 @@ function addMentions($member_from, $members_to, $msg, $type, $time = null, $stat
  * Softly and gently removes a 'like' mention when the post is unliked
  *
  * @param int $member_from the id of the member mentioning
- * @param array $members_to an array of ids of the members mentioned
+ * @param int[] $members_to an array of ids of the members mentioned
  * @param int $msg the id of the message involved in the mention
  * @param int $newstatus status to change the mention to if found as unread, default
  *  is to set it as read (status = 1)
@@ -256,7 +256,7 @@ function changeMentionStatus($id_mention, $status = 1)
  * Toggles a mention on/off
  * This is used to turn mentions on when a message is approved
  *
- * @param array $msgs array of messages that you want to toggle
+ * @param int[] $msgs array of messages that you want to toggle
  * @param bool $approved direction of the toggle read / unread
  */
 function toggleMentionsApproval($msgs, $approved)
@@ -329,7 +329,7 @@ function toggleMentionsVisibility($type, $enable)
 /**
  * Toggles a bunch of mentions accessibility on/off
  *
- * @param array $mentions an array of mention id
+ * @param int[] $mentions an array of mention id
  * @param bool $access if true make the mentions accessible (if visible and other things), otherwise marks them as inaccessible
  */
 function toggleMentionsAccessibility($mentions, $access)
@@ -353,8 +353,8 @@ function toggleMentionsAccessibility($mentions, $access)
  * Called from the validation class
  *
  * @param string $field
- * @param array $input
- * @param array $validation_parameters
+ * @param mixed[] $input
+ * @param string|null $validation_parameters
  */
 function validate_ownmention($field, $input, $validation_parameters = null)
 {

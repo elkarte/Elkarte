@@ -343,7 +343,7 @@ function draftsCount($member_id, $draft_type = 0)
  *       this should go away and use the refractored PM subs
  *
  * @param int[] $allRecipients
- * @param int[] $recipient_ids
+ * @param mixed[] $recipient_ids
  */
 function draftsRecipients($allRecipients, $recipient_ids)
 {

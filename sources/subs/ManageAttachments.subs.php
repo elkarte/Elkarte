@@ -26,7 +26,7 @@ if (!defined('ELK'))
 /**
  * Approve an attachment, or maybe even more - no permission check!
  *
- * @param array $attachments
+ * @param int[] $attachments
  */
 function approveAttachments($attachments)
 {
@@ -116,7 +116,7 @@ function approveAttachments($attachments)
  * $condition parameter.
  * It does no permissions check.
  *
- * @param array $condition
+ * @param mixed[] $condition
  * @param string $query_type
  * @param bool $return_affected_messages = false
  * @param bool $autoThumbRemoval = true
@@ -394,7 +394,7 @@ function getAttachmentDirs()
  * It assumes the files have no message, no member information.
  * It only removes the attachments and thumbnails from the database.
  *
- * @param array $attach_ids
+ * @param int[] $attach_ids
  */
 function removeOrphanAttachments($attach_ids)
 {
@@ -423,7 +423,7 @@ function removeOrphanAttachments($attach_ids)
  * Set or retrieve the size of an attachment.
  *
  * @param int $attach_id
- * @param int $filesize = null
+ * @param int|null $filesize = null
  */
 function attachment_filesize($attach_id, $filesize = null)
 {
@@ -465,7 +465,7 @@ function attachment_filesize($attach_id, $filesize = null)
  * Set or retrieve the ID of the folder where an attachment is stored on disk.
  *
  * @param int $attach_id
- * @param int $folder_id = null
+ * @param int|null $folder_id = null
  */
 function attachment_folder($attach_id, $folder_id = null)
 {
@@ -532,7 +532,7 @@ function maxNoThumb()
  *
  * @param int $start
  * @param boolean $fix_errors
- * @param array $to_fix
+ * @param string[] $to_fix
  */
 function findOrphanThumbnails($start, $fix_errors, $to_fix)
 {
@@ -597,7 +597,7 @@ function findOrphanThumbnails($start, $fix_errors, $to_fix)
  *
  * @param int $start
  * @param boolean $fix_errors
- * @param array $to_fix
+ * @param string[] $to_fix
  */
 function findParentsOrphanThumbnails($start, $fix_errors, $to_fix)
 {
@@ -648,7 +648,7 @@ function findParentsOrphanThumbnails($start, $fix_errors, $to_fix)
  *
  * @param int $start
  * @param boolean $fix_errors
- * @param array $to_fix
+ * @param string[] $to_fix
  */
 function repairAttachmentData($start, $fix_errors, $to_fix)
 {
@@ -779,7 +779,7 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
  *
  * @param int $start
  * @param boolean $fix_errors
- * @param array $to_fix
+ * @param string[] $to_fix
  */
 function findOrphanAvatars($start, $fix_errors, $to_fix)
 {
@@ -845,7 +845,7 @@ function findOrphanAvatars($start, $fix_errors, $to_fix)
  *
  * @param int $start
  * @param boolean $fix_errors
- * @param array $to_fix
+ * @param string[] $to_fix
  */
 function findOrphanAttachments($start, $fix_errors, $to_fix)
 {
@@ -977,7 +977,7 @@ function validateAttachments($attachments, $approve_query)
 /**
  * Finds an attachments parent topic/message and returns the values in an array
  *
- * @param array $attachment
+ * @param int $attachment
  */
 function attachmentBelongsTo($attachment)
 {

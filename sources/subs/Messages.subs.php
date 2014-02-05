@@ -654,6 +654,7 @@ function removeMessage($message, $decreasePostCount = true)
 
 		// Delete follow-ups too
 		require_once(SUBSDIR . '/FollowUps.subs.php');
+
 		// If it is an entire topic
 		if ($row['id_first_msg'] == $message)
 		{
@@ -704,7 +705,7 @@ function removeMessage($message, $decreasePostCount = true)
  * If $topicID is passed, the message is updated to point to the new topic.
  *
  * @param int $msg_id message ID
- * @param int $topicID = null topic ID, if null is passed the ID of the topic is retrieved and returned
+ * @param integer|null $topicID = null topic ID, if null is passed the ID of the topic is retrieved and returned
  * @return mixed, int topic ID if any, or false
  */
 function associatedTopic($msg_id, $topicID = null)
@@ -830,7 +831,7 @@ function nextMessage($id_msg, $id_topic)
  *
  * @param int $start the offset of the message/s
  * @param int $id_topic the id of the topic
- * @param array $params an (optional) array of params, includes:
+ * @param mixed[] $params an (optional) array of params, includes:
  *      - 'not_in' => array - of messages to exclude
  *      - 'include' => array - of messages to explicitely include
  *      - 'only_approved' => true/false - include or exclude the unapproved messages
@@ -882,7 +883,7 @@ function messageAt($start, $id_topic, $params = array())
  * Finds an open report for a certain message if it exists and increase the
  * number of reports for that message, otherwise it creates one
 
- * @param array $message array of several message details (id_msg, id_topic, etc.)
+ * @param mixed[] $message array of several message details (id_msg, id_topic, etc.)
  * @param string $poster_comment the comment made by the reporter
  *
  */
@@ -998,9 +999,10 @@ function countNewPosts($topic, $topicinfo, $timestamp)
 
 /**
  * Loads the details from a message
- * @param array $msg_selects
- * @param array $msg_tables
- * @param array $msg_parameters
+ *
+ * @param string[] $msg_selects
+ * @param string[] $msg_tables
+ * @param mixed[] $msg_parameters
  * @param string $options
  * @return array
  */
@@ -1027,11 +1029,9 @@ function loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $options
 /**
  * Checks, which messages can be removed from a certain member.
  *
- * @global type $user_info
- * @global type $modSettings
  * @param int $topic
- * @param array $messages
- * @param bol $allowed_all
+ * @param int[] $messages
+ * @param bool $allowed_all
  * @return array
  */
 function determineRemovableMessages($topic, $messages, $allowed_all)
@@ -1072,7 +1072,7 @@ function determineRemovableMessages($topic, $messages, $allowed_all)
  *
  * @param int $topic
  * @param bool $include_unapproved
- * @param array $selection
+ * @param int[] $selection
  */
 function countSplitMessages($topic, $include_unapproved, $selection = array())
 {
@@ -1132,8 +1132,8 @@ function mailFromMesasge($id_msg)
  * parameters 1 and 2, respectively.
  * Used by updateStats('message').
  *
- * @param bool $increment = null If true and $max_msg_id != null, then increment the total messages by one, otherwise recount all messages and get the max message id
- * @param int $max_msg_id = null, Only used if $increment === true
+ * @param bool|null $increment = null If true and $max_msg_id != null, then increment the total messages by one, otherwise recount all messages and get the max message id
+ * @param int|null $max_msg_id = null, Only used if $increment === true
  */
 function updateMessageStats($increment = null, $max_msg_id = null)
 {
@@ -1173,7 +1173,7 @@ function updateMessageStats($increment = null, $max_msg_id = null)
  * Used by updateStats('subject').
  *
  * @param int $id_topic
- * @param string $subject
+ * @param string|null $subject
  */
 function updateSubjectStats($id_topic, $subject = null)
 {
