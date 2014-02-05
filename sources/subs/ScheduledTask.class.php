@@ -1453,77 +1453,63 @@ class ScheduledTask
 					continue;
 
 				require_once(SUBSDIR . '/Boards.subs.php');
+				require_once(SUBSDIR . '/Mentions.subs.php');
+
 				$user_see_board = memberQuerySeeBoard($member);
+				$limit = 100;
 
-				// If you are admin how the heck did you end up here?
-				if ($user_see_board == '1=1')
+				// We need to repeat this twice: once to find the boards the user can access,
+				// once for those he cannot access
+				foreach (array('can', 'cannot') as $can)
 				{
-					// Drop it
-					unset($user_access_mentions[$member]);
+					// Let's always start from the begin
+					$start = $begin;
 
-					// And save everything for the next run
-					updateSettings(array('user_access_mentions' => serialize($user_access_mentions)));
-				}
-				// Here you are someone that may or may not be able to access a certain board
-				else
-				{
-					$limit = 100;
-
-					require_once(SUBSDIR . '/Mentions.subs.php');
-
-					// We need to repeat this twice: once to find the boards the user can access,
-					// once for those he cannot access
-					foreach (array('can', 'cannot') as $can)
+					while (true)
 					{
-						// Let's always start from the begin
-						$start = $begin;
+						// Find all the mentions that this user can or cannot see
+						$request = $db->query('', '
+							SELECT mnt.id_mention
+							FROM {db_prefix}log_mentions as mnt
+								LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = mnt.id_msg)
+								LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
+							WHERE mnt.id_member = {int:current_member}
+								AND mnt.mention_type IN ({array_string:mention_types})
+								AND {raw:user_see_board}
+							LIMIT {int:start}, {int:limit}',
+							array(
+								'current_member' => $member,
+								'mention_types' => array('men', 'like', 'rlike'),
+								'user_see_board' => ($can == 'can' ? '' : 'NOT ') . $user_see_board,
+								'start' => $start,
+								'limit' => $limit,
+							)
+						);
+						$mentions = array();
+						while ($row = $db->fetch_assoc($request))
+							$mentions[] = $row['id_mention'];
+						$db->free_result($request);
 
-						while (true)
-						{
-							// Find all the mentions that this user can or cannot see
-							$request = $db->query('', '
-								SELECT mnt.id_mention
-								FROM {db_prefix}log_mentions as mnt
-									LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = mnt.id_msg)
-									LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
-								WHERE mnt.id_member = {int:current_member}
-									AND mnt.mention_type IN ({array_string:mention_types})
-									AND {raw:user_see_board}
-								LIMIT {int:start}, {int:limit}',
-								array(
-									'current_member' => $member,
-									'mention_types' => array('men', 'like', 'rlike'),
-									'user_see_board' => ($can == 'can' ? '' : 'NOT ') . $user_see_board,
-									'start' => $start,
-									'limit' => $limit,
-								)
-							);
-							$mentions = array();
-							while ($row = $db->fetch_assoc($request))
-								$mentions[] = $row['id_mention'];
-							$db->free_result($request);
+						// If we found something toggle them and increment the start for the next round
+						if (!empty($mentions))
+							toggleMentionsAccessibility($mentions, $can == 'can');
+						// Otherwise it means we have finished with this access level for this member
+						else
+							break;
 
-							// If we found something toggle them and increment the start for the next round
-							if (!empty($mentions))
-								toggleMentionsAccessibility($mentions, $can == 'can');
-							// Otherwise it means we have finished with this access level for this member
-							else
-								break;
-
-							// Next batch
-							$start += $limit;
-						}
+						// Next batch
+						$start += $limit;
 					}
-
-					// Drop the member
-					unset($user_access_mentions[$member]);
-
-					// And save everything for the next run
-					updateSettings(array('user_access_mentions' => serialize($user_access_mentions)));
-
-					// Run this only once for each user, it may be quite heavy, let's split up the load
-					break;
 				}
+
+				// Drop the member
+				unset($user_access_mentions[$member]);
+
+				// And save everything for the next run
+				updateSettings(array('user_access_mentions' => serialize($user_access_mentions)));
+
+				// Run this only once for each user, it may be quite heavy, let's split up the load
+				break;
 			}
 
 			// If there is no more users, scheduleTaskImmediate can be stopped
@@ -1538,6 +1524,7 @@ class ScheduledTask
 			// Checks 10 users at a time, the scheduled task is set to run once per hour, so 240 users a day
 			// @todo <= I know you like it Spuds! :P It may be necessary to set it to something higher.
 			$limit = 10;
+			$current_check = !empty($modSettings['mentions_member_check']) ? $modSettings['mentions_member_check'] : 0;
 
 			require_once(SUBSDIR . '/Members.subs.php');
 			require_once(SUBSDIR . '/Mentions.subs.php');
@@ -1549,7 +1536,7 @@ class ScheduledTask
 				WHERE id_member > {int:last_id_member}
 					AND mention_type IN ({array_string:mention_types})',
 				array(
-					'last_id_member' => !empty($modSettings['mentions_member_check']) ? $modSettings['mentions_member_check'] : 0,
+					'last_id_member' => $current_check,
 					'mention_types' => array('men', 'like', 'rlike'),
 				)
 			);
@@ -1558,7 +1545,7 @@ class ScheduledTask
 			$db->free_result($request);
 
 			if ($remaining == 0)
-				$modSettings['mentions_member_check'] = 0;
+				$current_check = 0;
 
 			// Grab users with mentions
 			$request = $db->query('', '
@@ -1568,14 +1555,14 @@ class ScheduledTask
 					AND mention_type IN ({array_string:mention_types})
 				LIMIT {int:limit}',
 				array(
-					'last_id_member' => !empty($modSettings['mentions_member_check']) ? $modSettings['mentions_member_check'] : 0,
+					'last_id_member' => $current_check,
 					'mention_types' => array('men', 'like', 'rlike'),
 					'limit' => $limit,
 				)
 			);
 
 			// Remember where we are
-			updateSettings(array('mentions_member_check' => $modSettings['mentions_member_check'] + $limit));
+			updateSettings(array('mentions_member_check' => $current_check + $limit));
 
 			while ($row = $db->fetch_assoc($request))
 			{
