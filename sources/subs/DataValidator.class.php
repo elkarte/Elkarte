@@ -527,7 +527,7 @@ class Data_Validator
 	/**
 	 * Process any errors and return the error strings
 	 *
-	 * @param mixed[]|null $keys
+	 * @param mixed[]|boolean $keys
 	 */
 	private function _get_error_messages($keys)
 	{

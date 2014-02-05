@@ -21,13 +21,13 @@ if (!defined('ELK'))
  * checks permissions for each member who is "signed up" for notifications.
  * It will not send 'reply' notifications more than once in a row.
  *
- * @param array $topics - represents the topics the action is happening to.
+ * @param int[]|int $topics - represents the topics the action is happening to.
  * @param string $type - can be any of reply, sticky, lock, unlock, remove,
  *                       move, merge, and split.  An appropriate message will be sent for each.
- * @param array $exclude = array() - members in the exclude array will not be
+ * @param int[]|int $exclude = array() - members in the exclude array will not be
  *                                   processed for the topic with the same key.
- * @param array $members_only = array() - are the only ones that will be sent the notification if they have it on.
- * @param array $pbe = array() - array containing user_info if this is being run as a result of an email posting
+ * @param int[]|int $members_only = array() - are the only ones that will be sent the notification if they have it on.
+ * @param mixed[] $pbe = array() - array containing user_info if this is being run as a result of an email posting
  * @uses Post language file
  */
 function sendNotifications($topics, $type, $exclude = array(), $members_only = array(), $pbe = array())
@@ -389,7 +389,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
  * only sends notifications to those who can *currently* see the topic (it doesn't matter if they could when they requested notification.)
  * loads the Post language file multiple times for each language if the userLanguage setting is set.
  *
- * @param array $topicData
+ * @param mixed[] $topicData
  */
 function sendBoardNotifications(&$topicData)
 {
@@ -555,7 +555,7 @@ function sendBoardNotifications(&$topicData)
 /**
  * A special function for handling the hell which is sending approval notifications.
  *
- * @param $topicData
+ * @param mixed[] $topicData
  */
 function sendApprovalNotifications(&$topicData)
 {
@@ -707,7 +707,7 @@ function sendApprovalNotifications(&$topicData)
  *
  * @param string $type types supported are 'approval', 'activation', and 'standard'.
  * @param int $memberID
- * @param string $member_name = null
+ * @param string|null $member_name = null
  * @uses the Login language file.
  */
 function sendAdminNotifications($type, $memberID, $member_name = null)
@@ -806,7 +806,7 @@ function sendAdminNotifications($type, $memberID, $member_name = null)
  * Returns false if they do not have the proper group access to a board
  * Sets email_perm to false if they should not get a reply-able message
  *
- * @param array $row
+ * @param mixed[] $row
  * @param boolean $maillist
  * @param boolean $email_perm
  */

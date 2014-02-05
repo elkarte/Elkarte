@@ -22,7 +22,7 @@
  * If $pollID is passed, the topic is updated to point to the new poll.
  *
  * @param int $topicID the ID of the topic
- * @param int $pollID = null the ID of the poll, if any. If null is passed, it retrieves the current ID.
+ * @param int|null $pollID = null the ID of the poll, if any. If null is passed, it retrieves the current ID.
  */
 function associatedPoll($topicID, $pollID = null)
 {
@@ -101,7 +101,7 @@ function removePoll($pollID)
 /**
  * Reset votes for the poll.
  *
- * @param $pollID
+ * @param int $pollID
  */
 function resetVotes($pollID)
 {
@@ -321,7 +321,7 @@ function pollOptionsForMember($id_poll, $id_member)
  * Returns poll options.
  * It censors the label in the result array.
  *
- * @param $id_poll
+ * @param int $id_poll
  */
 function pollOptions($id_poll)
 {
@@ -353,11 +353,11 @@ function pollOptions($id_poll)
  * @param int $id_member = false The id of the creator
  * @param string $poster_name The name of the poll creator
  * @param int $max_votes = 1 The maximum number of votes you can do
- * @param bool $hide_results = true If the results should be hidden
+ * @param int $hide_results = 1 If the results should be hidden
  * @param int $expire = 0 The time in days that this poll will expire
- * @param bool $can_change_vote = false If you can change your vote
- * @param bool $can_guest_vote = false If guests can vote
- * @param array $options = array() The poll options
+ * @param int $can_change_vote = 0 If you can change your vote
+ * @param int $can_guest_vote = 0 If guests can vote
+ * @param mixed[] $options = array() The poll options
  * @return int the id of the created poll
  */
 function createPoll($question, $id_member, $poster_name, $max_votes = 1, $hide_results = 1, $expire = 0, $can_change_vote = 0, $can_guest_vote = 0, array $options = array())
@@ -394,10 +394,10 @@ function createPoll($question, $id_member, $poster_name, $max_votes = 1, $hide_r
  * @param int $id_poll The id of the poll that should be updated
  * @param string $question The title/question of the poll
  * @param int $max_votes = 1 The maximum number of votes you can do
- * @param bool $hide_results = true If the results should be hidden
+ * @param int $hide_results = 1 If the results should be hidden
  * @param int $expire = 0 The time in days that this poll will expire
- * @param bool $can_change_vote = false If you can change your vote
- * @param bool $can_guest_vote = false If guests can vote
+ * @param int $can_change_vote = 0 If you can change your vote
+ * @param int $can_guest_vote = 0 If guests can vote
  */
 function modifyPoll($id_poll, $question, $max_votes = 1, $hide_results = 1, $expire = 0, $can_change_vote = 0, $can_guest_vote = 0)
 {
@@ -431,7 +431,7 @@ function modifyPoll($id_poll, $question, $max_votes = 1, $hide_results = 1, $exp
  * Add options to an already created poll
  *
  * @param int $id_poll The id of the poll you're adding the options to
- * @param array $options The options to choose from
+ * @param mixed[] $options The options to choose from
  */
 function addPollOptions($id_poll, array $options)
 {
@@ -452,7 +452,7 @@ function addPollOptions($id_poll, array $options)
 /**
  * Insert some options to an already created poll
  *
- * @param array $options An array holding the poll choices
+ * @param mixed[] $options An array holding the poll choices
  */
 function insertPollOptions($options)
 {
@@ -471,7 +471,7 @@ function insertPollOptions($options)
 /**
  * Add a single option to an already created poll
  *
- * @param array $options An array holding the poll choices
+ * @param mixed[] $options An array holding the poll choices
  */
 function modifyPollOption($options)
 {
@@ -495,7 +495,7 @@ function modifyPollOption($options)
  * Delete a bunch of options from a poll
  *
  * @param int $id_poll The id of the poll you're deleting the options from
- * @param array $id_options An array holding the choice id
+ * @param int[] $id_options An array holding the choice id
  */
 function deletePollOptions($id_poll, $id_options)
 {
@@ -610,7 +610,7 @@ function removeVote($id_member, $id_poll)
  * Used to decrease the vote counter for the given poll.
  *
  * @param int $id_poll
- * @param array $options
+ * @param int[] $options
  */
 function decreaseVoteCounter($id_poll, $options)
 {
@@ -634,7 +634,7 @@ function decreaseVoteCounter($id_poll, $options)
  * Increase the vote counter for the given poll.
  *
  * @param int $id_poll
- * @param array $options
+ * @param int[] $options
  */
 function increaseVoteCounter($id_poll, $options)
 {
@@ -655,7 +655,7 @@ function increaseVoteCounter($id_poll, $options)
 /**
  * Add a vote to a poll.
  *
- * @param array $insert
+ * @param mixed[] $insert
  */
 function addVote($insert)
 {

@@ -17,7 +17,7 @@ if (!defined('ELK'))
 /**
  * Fetches a list of package servers.
  *
- * @param int $server
+ * @param int|null $server
  * @return array
  */
 function fetchPackageServers($server = null)

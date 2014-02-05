@@ -219,7 +219,7 @@ function ml_selectMembers($query_parameters, $where = '', $limit = 0, $sort = ''
  *  - Uses printMemberListRows to load the query results in to context
  *
  * @param mixed[] $query_parameters
- * @param string[]|null $customJoin
+ * @param string|string[]|null $customJoin
  * @param string $where
  * @param int $limit
  */

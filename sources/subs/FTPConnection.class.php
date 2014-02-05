@@ -343,7 +343,7 @@ class Ftp_Connection
 	 * Determins the current dirctory we are in
 	 *
 	 * @param string $file
-	 * @param mixed[]|null $listing
+	 * @param string|null $listing
 	 * @return string|boolean
 	 */
 	public function locate($file, $listing = null)

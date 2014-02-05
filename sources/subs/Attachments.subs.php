@@ -1672,7 +1672,7 @@ function filter_accessible_attachment($attachment_info, $all_posters)
 {
 	global $user_info;
 
-	return !$attachment_info['approved'] && (!isset($all_posters[$attachment_info['id_msg']]) || $all_posters[$attachment_info['id_msg']] != $user_info['id']);
+	return !(!$attachment_info['approved'] && (!isset($all_posters[$attachment_info['id_msg']]) || $all_posters[$attachment_info['id_msg']] != $user_info['id']));
 }
 
 /**

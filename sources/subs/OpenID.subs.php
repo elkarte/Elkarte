@@ -34,8 +34,8 @@ class OpenID
 	 *
 	 * @param string $openid_uri
 	 * @param bool $return = false
-	 * @param array $save_fields = array()
-	 * @param string $return_action = null
+	 * @param mixed[]|null $save_fields = array()
+	 * @param string|null $return_action = null
 	 * @return string
 	 */
 	public function validate($openid_uri, $return = false, $save_fields = array(), $return_action = null)
@@ -134,7 +134,7 @@ class OpenID
 	 * Retrieve an existing, not expired, association if there is any.
 	 *
 	 * @param string $server
-	 * @param string $handle = null
+	 * @param string|null $handle = null
 	 * @param bool $no_delete = false
 	 * @return array
 	 */

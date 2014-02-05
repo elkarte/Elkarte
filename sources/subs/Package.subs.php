@@ -29,7 +29,7 @@ if (!defined('ELK'))
  * @param string $destination
  * @param bool $single_file = false
  * @param bool $overwrite = false
- * @param array $files_to_extract = null
+ * @param string[]|null $files_to_extract = null
  */
 function read_tgz_file($gzfilename, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
@@ -74,7 +74,7 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
  * @param string $destination
  * @param bool $single_file = false,
  * @param bool $overwrite = false,
- * @param array $files_to_extract = null
+ * @param string[]|null $files_to_extract = null
  */
 function read_tgz_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
@@ -260,7 +260,7 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
  * @param string $destination
  * @param bool $single_file
  * @param bool $overwrite
- * @param array $files_to_extract
+ * @param string[]|null $files_to_extract
  */
 function read_zip_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
@@ -523,8 +523,8 @@ function getPackageInfo($gzfilename)
 /**
  * Create a chmod control for chmoding files.
  *
- * @param array $chmodFiles
- * @param array $chmodOptions
+ * @param string[] $chmodFiles
+ * @param mixed[] $chmodOptions
  * @param boolean $restore_write_status
  * @return boolean
  */
@@ -843,7 +843,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
  * Use FTP functions to work with a package download/install
  *
  * @param string $destination_url
- * @param array $files = none
+ * @param string[]|null $files = none
  * @param bool $return = false
  */
 function packageRequireFTP($destination_url, $files = null, $return = false)
@@ -1755,7 +1755,7 @@ function deltree($dir, $delete_dir = true)
  * creates every directory in path until it finds one that already exists.
  *
  * @param string $strPath
- * @param int $mode
+ * @param int|false $mode
  * @return boolean true if successful, false otherwise
  */
 function mktree($strPath, $mode)
@@ -1911,7 +1911,7 @@ function listtree($path, $sub_path = '')
  * @param string $file
  * @param bool $testing = true tells it the modifications shouldn't actually be saved.
  * @param bool $undo = false specifies that the modifications the file requests should be undone; this doesn't work with everything (regular expressions.)
- * @param array $theme_paths = array()
+ * @param mixed[] $theme_paths = array()
  * @return array an array of those changes made.
  */
 function parseModification($file, $testing = true, $undo = false, $theme_paths = array())
@@ -2294,7 +2294,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
  * @param string $file
  * @param bool $testing = true tells it the modifications shouldn't actually be saved.
  * @param bool $undo = false specifies that the modifications the file requests should be undone.
- * @param array $theme_paths = array()
+ * @param mixed[] $theme_paths = array()
  * @return array an array of those changes made.
  */
 function parseBoardMod($file, $testing = true, $undo = false, $theme_paths = array())
@@ -2359,9 +2359,6 @@ function parseBoardMod($file, $testing = true, $undo = false, $theme_paths = arr
 				$template_changes[$id][$counter] = substr($filename, strlen($theme['theme_dir']) + 1);
 		}
 	}
-
-	// Anything above $counter must be for custom themes.
-	$custom_template_begin = $counter;
 
 	// Reference for what theme ID this action belongs to.
 	$theme_id_ref = array();
@@ -2610,7 +2607,7 @@ function parseBoardMod($file, $testing = true, $undo = false, $theme_paths = arr
  * Get the physical contents of a packages file
  *
  * @param string $filename
- * @return boolean
+ * @return string
  */
 function package_get_contents($filename)
 {
@@ -2723,10 +2720,10 @@ function package_flush_cache($trash = false)
 
 		$result = package_chmod($filename);
 
-		// if we are not doing our test pass, then lets do a full write check
+		// If we are not doing our test pass, then lets do a full write check
 		if (!$trash)
 		{
-			// acid test, can we really open this file for writing?
+			// Acid test, can we really open this file for writing?
 			$fp = ($result) ? fopen($filename, 'r+') : $result;
 			if (!$fp)
 			{
@@ -3381,7 +3378,7 @@ function checkPackageDependency($id)
 /**
  * Adds a record to the log packages table
  *
- * @param array $packageInfo
+ * @param mixed[] $packageInfo
  * @param string $failed_step_insert
  * @param string $themes_installed
  * @param string $db_changes

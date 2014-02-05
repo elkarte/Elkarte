@@ -160,7 +160,7 @@ function checkMessagePermissions($message)
 /**
  * Prepare context for a message.
  *
- * @param int $message the message id
+ * @param mixed[] $message the message array
  */
 function prepareMessageContext($message)
 {

@@ -954,8 +954,8 @@ function checkSubmitOnce($action, $is_fatal = true)
  * If boards parameter is specified, checks those boards instead of the current one (if applicable).
  * Always returns true if the user is an administrator.
  *
- * @param string $permission permission
- * @param int[] $boards = null array of board IDs
+ * @param string[]|string $permission permission
+ * @param int[]|null $boards = null array of board IDs
  * @return boolean if the user can do the permission
  */
 function allowedTo($permission, $boards = null)

@@ -35,7 +35,7 @@ if (!defined('ELK'))
  *    - can_toggle_drop_down      => (boolean) if the menu can "toggle"
  *    - template_name             => an alternative template to load (instead of Generic)
  *    - layer_name                => alternative layer name for the menu
- * @return boolean|array
+ * @return mixed[]|false
  */
 function createMenu($menuData, $menuOptions = array())
 {

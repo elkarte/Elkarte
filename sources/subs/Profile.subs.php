@@ -23,8 +23,8 @@ if (!defined('ELK'))
 /**
  * Find the ID of the "current" member
  *
- * @param $fatal if the function ends in a fatal error in case of problems (default true)
- * @param $reload_id if true the already set value is ignored (default false)
+ * @param boolean $fatal if the function ends in a fatal error in case of problems (default true)
+ * @param boolean $reload_id if true the already set value is ignored (default false)
  *
  * @return mixed and integer if no error, false in case of problems if $fatal is false
  */
@@ -67,7 +67,7 @@ function currentMemberID($fatal = true, $reload_id = false)
 /**
  * Setup the context for a page load!
  *
- * @param array $fields
+ * @param mixed[] $fields
  * @param string $hook a string that represent the hook that can be used to operate on $fields
  */
 function setupProfileContext($fields, $hook = '')
@@ -1146,7 +1146,7 @@ function profileValidateEmail($email, $memID = 0)
 /**
  * Save the profile changes
  *
- * @param array $profile_vars
+ * @param mixed[] $profile_vars
  * @param int $memID id_member
  */
 function saveProfileChanges(&$profile_vars, $memID)
@@ -1158,15 +1158,9 @@ function saveProfileChanges(&$profile_vars, $memID)
 
 	// Permissions...
 	if ($context['user']['is_owner'])
-	{
-		$changeIdentity = allowedTo(array('profile_identity_any', 'profile_identity_own'));
 		$changeOther = allowedTo(array('profile_extra_any', 'profile_extra_own'));
-	}
 	else
-	{
-		$changeIdentity = allowedTo('profile_identity_any');
 		$changeOther = allowedTo('profile_extra_any');
-	}
 
 	// Arrays of all the changes - makes things easier.
 	$profile_bools = array(
@@ -1358,7 +1352,6 @@ function makeNotificationChanges($memID)
 			$_POST['notify_boards'][$index] = (int) $id;
 
 		// id_board = 0 is reserved for topic notifications only
-		$notification_wanted = array();
 		$notification_wanted = array_diff($_POST['notify_boards'], array(0));
 
 		// Gather up any any existing board notifications.
@@ -1825,7 +1818,7 @@ function profileReloadUser()
 /**
  * Validate the signature
  *
- * @param mixed $value
+ * @param string $value
  */
 function profileValidateSignature(&$value)
 {
@@ -2018,7 +2011,7 @@ function profileValidateSignature(&$value)
  * The avatar is incredibly complicated, what with the options... and what not.
  * @todo argh, the avatar here. Take this out of here!
  *
- * @param array $value
+ * @param mixed[] $value
  * @return mixed
  */
 function profileSaveAvatarData(&$value)
@@ -2467,7 +2460,7 @@ function list_getUserWarningCount($memID)
  * @param int $start
  * @param int $items_per_page
  * @param string $sort
- * @param array $boardsAllowed
+ * @param int[] $boardsAllowed
  * @param ing $memID
  */
 function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, $memID)
@@ -2541,7 +2534,7 @@ function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, 
  * Gets the total number of attachments for the user
  * (used by createList() callbacks)
  *
- * @param array $boardsAllowed
+ * @param int[] $boardsAllowed
  * @param int $memID
  */
 function getNumAttachments($boardsAllowed, $memID)
@@ -2672,7 +2665,7 @@ function getNumUnwatchedBy($memID)
  * Counts all posts or just the posts made on a particular board
  *
  * @param int $memID
- * @param int $board
+ * @param int|null $board
  */
 function count_user_posts($memID, $board = '')
 {
@@ -2707,7 +2700,7 @@ function count_user_posts($memID, $board = '')
  * Counts all posts or just the topics made on a particular board
  *
  * @param int $memID
- * @param int $board
+ * @param int|null $board
  */
 function count_user_topics($memID, $board = '')
 {
@@ -2743,7 +2736,7 @@ function count_user_topics($memID, $board = '')
  * Used to help limit queries by proving start/stop points
  *
  * @param int $memID
- * @param int $board
+ * @param int|null $board
  */
 function findMinMaxUserMessage($memID, $board = '')
 {
@@ -2751,7 +2744,6 @@ function findMinMaxUserMessage($memID, $board = '')
 
 	$db = database();
 
-	$minmax = array(0, 0);
 	$is_owner = $memID == $user_info['id'];
 
 	$request = $db->query('', '
@@ -2769,7 +2761,7 @@ function findMinMaxUserMessage($memID, $board = '')
 	$minmax = $db->fetch_row($request);
 	$db->free_result($request);
 
-	return $minmax;
+	return empty($minmax) ? array(0, 0) : $minmax;
 }
 
 /**
@@ -2781,9 +2773,9 @@ function findMinMaxUserMessage($memID, $board = '')
  * @param int $memID
  * @param int $start
  * @param int $count
- * @param string $range_limit
+ * @param string|null $range_limit
  * @param boolean $reverse
- * @param string $board
+ * @param int|null $board
  */
 function load_user_posts($memID, $start, $count, $range_limit = '', $reverse = false, $board = '')
 {
@@ -2900,7 +2892,7 @@ function load_user_topics($memID, $start, $count, $range_limit = '', $reverse = 
 /**
  * Loads the permissions that are given to a member group or set of groups
  *
- * @param array $curGroups
+ * @param int[] $curGroups
  */
 function getMemberGeneralPermissions($curGroups)
 {
@@ -2965,8 +2957,8 @@ function getMemberGeneralPermissions($curGroups)
  * If $board is supplied will return just the permissions for that board
  *
  * @param int $memID
- * @param array $curGroups
- * @param int $board
+ * @param int[] $curGroups
+ * @param int|null $board
  */
 function getMemberBoardPermissions($memID, $curGroups, $board = '')
 {
@@ -3109,7 +3101,7 @@ function getMembersIPs($memID)
  * Return the details of the members using a certain range of IPs
  * except the current one
  *
- * @param array $ips a list of IP addresses
+ * @param string[] $ips a list of IP addresses
  * @param int $memID the id of the "current" member (maybe it could be retrieved with currentMemberID)
  */
 function getMembersInRange($ips, $memID)

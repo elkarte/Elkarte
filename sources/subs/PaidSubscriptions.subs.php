@@ -26,7 +26,7 @@ if (!defined('ELK'))
  *
  * @param int $id_sub
  * @param string $search_string
- * @param array $search_vars = array()
+ * @param mixed[] $search_vars = array()
  */
 function list_getSubscribedUserCount($id_sub, $search_string, $search_vars = array())
 {
@@ -61,7 +61,7 @@ function list_getSubscribedUserCount($id_sub, $search_string, $search_vars = arr
  * @param string $sort
  * @param int $id_sub
  * @param string $search_string
- * @param string $search_vars
+ * @param mixed[] $search_vars
  */
 function list_getSubscribedUsers($start, $items_per_page, $sort, $id_sub, $search_string, $search_vars = array())
 {
@@ -106,7 +106,7 @@ function list_getSubscribedUsers($start, $items_per_page, $sort, $id_sub, $searc
 /**
  * Reapplies all subscription rules for each of the users.
  *
- * @param array $users
+ * @param int[]|int $users
  */
 function reapplySubscriptions($users)
 {
@@ -176,11 +176,11 @@ function reapplySubscriptions($users)
  *
  * @param int $id_subscribe
  * @param int $id_member
- * @param string $renewal = 0, options 'D', 'W', 'M', 'Y'
+ * @param string $renewal options 'D', 'W', 'M', 'Y', ''
  * @param int $forceStartTime = 0
  * @param int $forceEndTime = 0
  */
-function addSubscription($id_subscribe, $id_member, $renewal = 0, $forceStartTime = 0, $forceEndTime = 0)
+function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTime = 0, $forceEndTime = 0)
 {
 	global $context;
 
@@ -650,7 +650,7 @@ function deleteSubscription($id)
 			}
 		}
 
-		// Did the subscription add any secondary groups that we now must to remove?
+		// Did the subscription add secondary groups that we now must remove?
 		if (!empty($sub_detail['add_groups']))
 		{
 			foreach ($members as $id_member => $member_data)
@@ -660,7 +660,7 @@ function deleteSubscription($id)
 
 				// If they have any of the subscription groups, remove them
 				if (implode(',', $non_sub_groups) != $member_data['additional_groups'])
-					$changes[$id_member]['additional_groups'] = $new_groups;
+					$changes[$id_member]['additional_groups'] = $non_sub_groups;
 			}
 		}
 
@@ -685,7 +685,7 @@ function deleteSubscription($id)
 /**
  * Adds a new subscription
  *
- * @param array $insert
+ * @param mixed[] $insert
  */
 function insertSubscription($insert)
 {
@@ -740,7 +740,7 @@ function countActiveSubscriptions($sub_id)
 /**
  * Updates a changed subscription.
  *
- * @param array $update
+ * @param mixed[] $update
  * @param int $ignore_active - used to ignore already active subscriptions.
  */
 function updateSubscription($update, $ignore_active)
@@ -775,7 +775,7 @@ function updateSubscription($update, $ignore_active)
  * Update a non-recurrent subscription
  * (one-time payment)
  *
- * @param array $subscription_info
+ * @param mixed[] $subscription_info
  */
 function updateNonrecurrent($subscription_info)
 {
@@ -972,7 +972,7 @@ function updateSubscriptionItem($item)
  * When a refund is processed, this either removes it or sets a new end time to
  * reflect its no longer re-occurring
  *
- * @param array $subscription_info the susbscription information array
+ * @param mixed[] $subscription_info the susbscription information array
  * @param int $member_id
  * @param int $time
  */
@@ -1015,7 +1015,7 @@ function handleRefund($subscription_info, $member_id, $time)
 /**
  * Want to delete a subscription? Prepare the delete for the members as well.
  *
- * @param array $toDelete
+ * @param int[] $toDelete
  * @return array $delete
  */
 function prepareDeleteSubscriptions($toDelete)
@@ -1070,7 +1070,7 @@ function getPendingSubscriptions($log_id)
 /**
  * Somebody paid the first time? Let's log ...
  *
- * @param array $details
+ * @param mixed[] $details associative array for the insert
  */
 function logSubscription($details)
 {
@@ -1093,7 +1093,9 @@ function logSubscription($details)
 /**
  * Somebody paid the first time? Let's log
  *
- * @param array $details
+ * @param int $sub_id
+ * @param int $memID
+ * @param string $pending_details
  */
 function logNewSubscription($sub_id, $memID, $pending_details)
 {
@@ -1115,7 +1117,7 @@ function logNewSubscription($sub_id, $memID, $pending_details)
 /**
  * Updated details for a pending subscription? Logging.
  *
- * @param int $log_id
+ * @param int $sub_id
  * @param string $details
  */
 function updatePendingSubscription($sub_id, $details)
@@ -1137,7 +1139,8 @@ function updatePendingSubscription($sub_id, $details)
 /**
  * Updates the number of pending subscriptions for a given product and user
  *
- * @param int $log_id
+ * @param int $pending_count
+ * @param int $sub_id
  * @param int $memID
  * @param string $details
  */
@@ -1165,7 +1168,7 @@ function updatePendingSubscriptionCount($pending_count, $sub_id, $memID, $detail
  * the order screen and was redirected to the thank you screen (from the gateway).
  * Note the payment is still pending until the gateway posts to subscriptions.php and its validated
  *
- * @param int $log_id
+ * @param int $sub_id
  * @param int $memID
  * @param string $details
  */
@@ -1189,9 +1192,9 @@ function updatePendingStatus($sub_id, $memID, $details)
 /**
  * Removes a subscription from a user, as in removes the groups.
  *
- * @param $id_subscribe
- * @param $id_member
- * @param $delete
+ * @param int $id_subscribe
+ * @param int $id_member
+ * @param boolean $delete
  */
 function removeSubscription($id_subscribe, $id_member, $delete = false)
 {
@@ -1215,6 +1218,7 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 				'current_member' => $id_member,
 			)
 		);
+
 		return;
 	}
 
