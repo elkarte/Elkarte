@@ -17,7 +17,7 @@ if (!defined('ELK'))
 /**
  * Calculate the next time the passed tasks should be triggered.
  *
- * @param array $tasks = array() the tasks
+ * @param string[]|string $tasks = array() the tasks
  * @param boolean $forceUpdate
  */
 function calculateNextTrigger($tasks = array(), $forceUpdate = false)

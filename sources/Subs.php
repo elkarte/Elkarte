@@ -490,7 +490,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
  * - caches the formatting data from the setting for optimization.
  *
  * @param float $number
- * @param bool $override_decimal_count = false
+ * @param int|bool $override_decimal_count = false or number of decimals
  */
 function comma_format($number, $override_decimal_count = false)
 {

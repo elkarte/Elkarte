@@ -73,7 +73,7 @@ class Action
 	/**
 	 * Constructor!
 	 *
-	 * @param string $name
+	 * @param string|null $name
 	 */
 	public function __construct($name = null)
 	{
@@ -85,7 +85,7 @@ class Action
 	 * Sub-actions have to be in the format expected for Action::_subActions array,
 	 * indexed by sa.
 	 *
-	 * @param array $subactions array of know subactions
+	 * @param mixed[] $subactions array of know subactions
 	 * @param string $default default action if unknown sa is requested
 	 */
 	public function initialize($subactions, $default = '')

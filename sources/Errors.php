@@ -174,7 +174,7 @@ function fatal_error($error, $log = 'general')
  *  - the information is logged if log is specified.
  *
  * @param string $error
- * @param string $log defaults to 'general'
+ * @param string|boolean $log defaults to 'general' false will skip logging, true will use general
  * @param string[] $sprintf defaults to empty array()
  */
 function fatal_lang_error($error, $log = 'general', $sprintf = array())

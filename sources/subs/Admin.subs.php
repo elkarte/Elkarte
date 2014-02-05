@@ -25,7 +25,7 @@ if (!defined('ELK'))
 /**
  * Get a list of versions that are currently installed on the server.
  *
- * @param array $checkFor
+ * @param string[] $checkFor
  */
 function getServerVersions($checkFor)
 {
@@ -183,8 +183,9 @@ function getQuickAdminTasks()
  *   the results should be sorted.
  * - returns an array containing information on source files, templates and
  *   language files found in the default theme directory (grouped by language).
+ * - options include include_ssi, include_subscriptions, sort_results
  *
- * @param array $versionOptions
+ * @param mixed[] $versionOptions associative array of options
  *
  * @return array
  */
@@ -213,7 +214,7 @@ function getFileVersions(&$versionOptions)
 	// Find the version in SSI.php's file header.
 	if (!empty($versionOptions['include_ssi']) && file_exists(BOARDDIR . '/SSI.php'))
 	{
-		$header = file_get_contents(BOARDDIR . '/SSI.php', null, null, 0, 768);
+		$header = file_get_contents(BOARDDIR . '/SSI.php', false, null, 0, 768);
 		if (preg_match($version_regex, $header, $match) == 1)
 			$version_info['file_versions']['SSI.php'] = $match[1];
 		// Not found!  This is bad.
@@ -224,7 +225,7 @@ function getFileVersions(&$versionOptions)
 	// Do the paid subscriptions handler?
 	if (!empty($versionOptions['include_subscriptions']) && file_exists(BOARDDIR . '/subscriptions.php'))
 	{
-		$header = file_get_contents(BOARDDIR . '/subscriptions.php', null, null, 0, 768);
+		$header = file_get_contents(BOARDDIR . '/subscriptions.php', false, null, 0, 768);
 		if (preg_match($version_regex, $header, $match) == 1)
 			$version_info['file_versions']['subscriptions.php'] = $match[1];
 		// If we haven't how do we all get paid?
@@ -275,7 +276,7 @@ function getFileVersions(&$versionOptions)
 			if (substr($entry, -12) == 'template.php' && !is_dir($dirname . '/' . $entry))
 			{
 				// Read the first 768 bytes from the file.... enough for the header.
-				$header = file_get_contents($dirname . '/' . $entry, null, null, 0, 768);
+				$header = file_get_contents($dirname . '/' . $entry, false, null, 0, 768);
 
 				// Look for the version comment in the file header.
 				if (preg_match($version_regex, $header, $match) == 1)
@@ -295,7 +296,7 @@ function getFileVersions(&$versionOptions)
 		if (substr($entry, -4) == '.php' && $entry != 'index.php' && !is_dir($lang_dir . '/' . $entry))
 		{
 			// Read the first 768 bytes from the file.... enough for the header.
-			$header = file_get_contents($lang_dir . '/' . $entry, null, null, 0, 768);
+			$header = file_get_contents($lang_dir . '/' . $entry, false, null, 0, 768);
 
 			// Split the file name off into useful bits.
 			list ($name, $language) = explode('.', $entry);
@@ -377,8 +378,8 @@ function updateAdminPreferences()
  * It sends them an email.
  *
  * @param string $template
- * @param array $replacements
- * @param array $additional_recipients
+ * @param mixed[] $replacements
+ * @param int[] $additional_recipients
  */
 function emailAdmins($template, $replacements = array(), $additional_recipients = array())
 {
