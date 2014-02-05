@@ -94,7 +94,7 @@ function getBadBehaviorLogEntryCount($filter)
  * @param int $start
  * @param int $items_per_page
  * @param string $sort
- * @param mixed[]|null $filter
+ * @param string|mixed[]|null $filter
  */
 function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')
 {

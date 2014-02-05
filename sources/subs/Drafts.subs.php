@@ -14,8 +14,8 @@
 /**
  * Create PM draft in the database
  *
- * @param array $draft
- * @param array $recipientList
+ * @param mixed[] $draft
+ * @param string[] $recipientList
  */
 function create_pm_draft($draft, $recipientList)
 {
@@ -57,8 +57,8 @@ function create_pm_draft($draft, $recipientList)
 /**
  * Update an existing PM draft with the new data
  *
- * @param array $draft
- * @param array $recipientList
+ * @param mixed[] $draft
+ * @param string[] $recipientList
  */
 function modify_pm_draft($draft, $recipientList)
 {
@@ -89,7 +89,7 @@ function modify_pm_draft($draft, $recipientList)
 /**
  * Create a new post draft in the database
  *
- * @param array $draft
+ * @param mixed[] $draft
  */
 function create_post_draft($draft)
 {
@@ -141,7 +141,7 @@ function create_post_draft($draft)
 /**
  * Update a Post draft with the supplied data
  *
- * @param array $draft
+ * @param mixed[] $draft
  */
 function modify_post_draft($draft)
 {
@@ -229,7 +229,7 @@ function load_draft($id_draft, $uid, $type = 0, $drafts_keep_days = 0, $check = 
  *
  * @param int $member_id - user id to get drafts for
  * @param int $draft_type - 0 for post, 1 for pm
- * @param int $topic - if set, load drafts for that specific topic / pm
+ * @param int|false $topic - if set, load drafts for that specific topic / pm
  * @param string $order - optional parameter to order the results
  * @param string $limit - optional parameter to limit the number returned 0,15
  */
@@ -342,8 +342,8 @@ function draftsCount($member_id, $draft_type = 0)
  * @todo this is the same as whats in PersonalMessage.controller, when that gets refractored
  *       this should go away and use the refractored PM subs
  *
- * @param array $allRecipients
- * @param array $recipient_ids
+ * @param int[] $allRecipients
+ * @param int[] $recipient_ids
  */
 function draftsRecipients($allRecipients, $recipient_ids)
 {
@@ -498,7 +498,7 @@ function saveDraft()
  * The core draft feature must be enabled, as well as the pm draft option
  * Determines if this is a new or and update to an existing pm draft
  *
- * @param array $recipientList
+ * @param mixed[] $recipientList
  */
 function savePMDraft($recipientList)
 {
@@ -619,7 +619,6 @@ function loadDraft($id_draft, $type = 0, $check = true, $load = false)
 	$draft_info = load_draft($id_draft, $user_info['id'], $type, $drafts_keep_days, $check);
 
 	// Load it up for the templates as well
-	$recipients = array();
 	if (!empty($load) && !empty($draft_info))
 	{
 		if ($type === 0)

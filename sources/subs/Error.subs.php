@@ -21,8 +21,8 @@ if (!defined('ELK'))
  * Redirects back to the error log when done.
  *
  * @param string $type action
- * @param array $filter db query of the view filter being used
- * @param array $error_list int list of error ID's to work on
+ * @param mixed[]|null $filter db query of the view filter being used
+ * @param int[]|null $error_list int list of error ID's to work on
  */
 function deleteErrors($type, $filter = null, $error_list = null)
 {
@@ -50,7 +50,7 @@ function deleteErrors($type, $filter = null, $error_list = null)
 			DELETE FROM {db_prefix}log_errors
 			WHERE id_error IN ({array_int:error_list})',
 			array(
-				'error_list' => array_unique($error_list),
+				'error_list' => is_array($error_list) ? array_unique($error_list) : '',
 			)
 		);
 }
@@ -58,7 +58,7 @@ function deleteErrors($type, $filter = null, $error_list = null)
 /**
  * Counts error log entries
  *
- * @param array $filter db query of the filter being used
+ * @param mixed[] $filter db query of the filter being used
  */
 function numErrors($filter = array())
 {
@@ -85,7 +85,7 @@ function numErrors($filter = array())
  *
  * @param int $start
  * @param string $sort_direction
- * @param array $filter
+ * @param mixed[]|null $filter
  */
 function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 {
@@ -163,8 +163,8 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 /**
  * Fetches errors and group them by error type
  *
- * @param bool $sort
- * @param int $filter
+ * @param int|null $filter
+ * @param bool|null $sort
  */
 function fetchErrorsByType($filter = null, $sort = null)
 {

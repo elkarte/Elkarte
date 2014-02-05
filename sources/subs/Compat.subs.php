@@ -25,7 +25,7 @@ if (!defined('ELK'))
 /**
  * Define the old SMF sha1 function.
  *
- * @param $str the string
+ * @param string $str the string
  */
 function sha1_smf($str)
 {
@@ -48,7 +48,7 @@ function sha1_smf($str)
 /**
  * This is the core SHA-1 calculation routine, used by sha1().
  *
- * @param array $x
+ * @param int[] $x
  * @param int $len
  */
 function sha1_core($x, $len)

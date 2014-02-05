@@ -106,6 +106,26 @@ class Email_Parse
 	public $message_id = null;
 
 	/**
+	 * Holds the return path as set in the email header
+	 */
+	public $return_rpath = null;
+
+	/**
+	 * Holds the message subject
+	 */
+	public $subject = null;
+
+	/**
+	 * Holds the email to from & cc emails and names
+	 */
+	public $email = array();
+
+	/**
+	 * Holds the sending ip of the email
+	 */
+	public $ip = false;
+
+	/**
 	 * If the file was converted to utf8
 	 */
 	public $_converted_utf8 = false;
@@ -632,6 +652,7 @@ class Email_Parse
 			}
 			$val = $decoded;
 		}
+
 		return trim($val);
 	}
 
@@ -689,7 +710,6 @@ class Email_Parse
 	 */
 	public function load_returnpath()
 	{
-		$this->return_path = null;
 		$matches = array();
 
 		// Fetch the return path
@@ -710,8 +730,6 @@ class Email_Parse
 	 */
 	public function load_subject()
 	{
-		$this->subject = null;
-
 		// Account for those no-subject emails
 		if (!isset($this->headers['subject']))
 			$this->headers['subject'] = '';
@@ -804,7 +822,6 @@ class Email_Parse
 	 */
 	public function load_address()
 	{
-		$this->email = array();
 		$this->email['to'] = array();
 		$this->email['from'] = array();
 		$this->email['cc'] = array();

@@ -26,7 +26,7 @@ if (!defined('ELK'))
  * used by ManageBoards.controller.php to change the settings of a category.
  *
  * @param int $category_id
- * @param array $catOptions
+ * @param mixed[] $catOptions
  */
 function modifyCategory($category_id, $catOptions)
 {
@@ -126,7 +126,7 @@ function modifyCategory($category_id, $catOptions)
  * allows (almost) the same options as the modifyCat() function.
  * returns the ID of the newly created category.
  *
- * @param array $catOptions
+ * @param mixed[] $catOptions
  */
 function createCategory($catOptions)
 {
@@ -177,12 +177,12 @@ function createCategory($catOptions)
  * Remove one or more categories.
  * general function to delete one or more categories.
  * allows to move all boards in the categories to a different category before deleting them.
- * if moveChildrenTo is set to null, all boards inside the given categorieswill be deleted.
+ * if moveBoardsTo is set to null, all boards inside the given categories will be deleted.
  * deletes all information that's associated with the given categories.
  * updates the statistics to reflect the new situation.
  *
  * @param string $categories
- * @param int $moveBoardsTo = null
+ * @param integer|null $moveBoardsTo = null
  */
 function deleteCategories($categories, $moveBoardsTo = null)
 {
@@ -204,11 +204,9 @@ function deleteCategories($categories, $moveBoardsTo = null)
 		if (!empty($boards_inside))
 			deleteBoards($boards_inside, null);
 	}
-
 	// Make sure the safe category is really safe.
 	elseif (in_array($moveBoardsTo, $categories))
 		trigger_error('deleteCategories(): You cannot move the boards to a category that\'s being deleted', E_USER_ERROR);
-
 	// Move the boards inside the categories to a safe category.
 	else
 		$db->query('', '
@@ -253,9 +251,9 @@ function deleteCategories($categories, $moveBoardsTo = null)
  * allows three changes to the status: 'expand', 'collapse' and 'toggle'.
  * if check_collapsable is set, only category allowed to be collapsed, will be collapsed.
  *
- * @param array $categories
+ * @param integer[] $categories
  * @param string $new_status
- * @param array $members = null
+ * @param integer[]|null $members = null
  * @param bool $check_collapsable = true
  */
 function collapseCategories($categories, $new_status, $members = null, $check_collapsable = true)

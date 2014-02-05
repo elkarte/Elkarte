@@ -1031,7 +1031,7 @@ function allowedTo($permission, $boards = null)
  * If they are not, it loads the Errors language file and shows an error using $txt['cannot_' . $permission].
  * If they are a guest and cannot do it, this calls is_not_guest().
  *
- * @param string $permission
+ * @param string[]|string $permission array of or single string, of persmission to check
  * @param int[]|null $boards = null
  */
 function isAllowedTo($permission, $boards = null)

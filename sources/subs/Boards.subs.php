@@ -576,7 +576,7 @@ function createBoard($boardOptions)
  * updates the statistics to reflect the new situation.
  *
  * @param int[] $boards_to_remove
- * @param int[]|null $moveChildrenTo = null
+ * @param int|null $moveChildrenTo = null
  */
 function deleteBoards($boards_to_remove, $moveChildrenTo = null)
 {
@@ -1839,7 +1839,7 @@ function addChildBoards(&$boards)
  * Increment a board stat field, for example num_posts.
  *
  * @param int $id_board
- * @param mixed[] $values an array of index => value of a string representing the index to increment
+ * @param mixed[]|string $values an array of index => value of a string representing the index to increment
  */
 function incrementBoard($id_board, $values)
 {

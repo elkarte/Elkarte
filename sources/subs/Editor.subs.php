@@ -104,7 +104,19 @@ function getMessageIcons($board_id)
 
 /**
  * Creates a box that can be used for richedit stuff like BBC, Smileys etc.
- * @param array $editorOptions
+ * @param mixed[] $editorOptions associative array of options => value
+ *	must contain
+ *		id => unique id for the css
+ *		value => text for the editor or blank
+ * Optionaly
+ *		height => height of the intial box
+ * 		width => width of the box (100%)
+ *		force_rich => force wysiwyg to be enabled
+ *		disable_smiley_box => boolean to turn off the smiley box
+ * 		labels => array(
+ * 			'post_button' => $txt['for post button'],
+ * 		),
+ * 		preview_type => 2 how to act on preview click, see template_control_richedit_buttons
  */
 function create_control_richedit($editorOptions)
 {

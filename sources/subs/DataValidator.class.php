@@ -253,7 +253,7 @@ class Data_Validator
 
 	/**
 	 * Return the validation data, all or a specific key
-	 * @param mixed $key int or string
+	 * @param int|string $key int or string
 	 */
 	public function validation_data($key = null)
 	{
@@ -527,7 +527,7 @@ class Data_Validator
 	/**
 	 * Process any errors and return the error strings
 	 *
-	 * @param mixed[]|null $keys
+	 * @param mixed[]|boolean $keys
 	 */
 	private function _get_error_messages($keys)
 	{
@@ -574,7 +574,7 @@ class Data_Validator
 	 *
 	 * @param string $field
 	 * @param mixed[] $input
-	 * @param mixed[]|null $validation_parameters array or null
+	 * @param string|null $validation_parameters array or null
 	 */
 	protected function _validate_contains($field, $input, $validation_parameters = null)
 	{
@@ -600,7 +600,7 @@ class Data_Validator
 	 *
 	 * @param string $field
 	 * @param mixed[] $input
-	 * @param mixed[]|null $validation_parameters array or null
+	 * @param string|null $validation_parameters array or null
 	 */
 	protected function _validate_notequal($field, $input, $validation_parameters = null)
 	{
@@ -1213,8 +1213,8 @@ class Data_Validator
 	 * - Gmail ignores all . (dots) in username
 	 * - auser@gmail.com, a.user@gmail.com, auser+big@gmail.com and a.user+gigantic@googlemail.com are same email address.
 	 *
-	 * @param mixed[] $input
-	 * @param mixed[]|null $sanitation_parameters
+	 * @param string $input
+	 * @param string|null $sanitation_parameters
 	 */
 	protected function _sanitation_gmail_normalize($input, $sanitation_parameters = null)
 	{

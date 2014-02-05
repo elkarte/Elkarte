@@ -29,9 +29,9 @@ class MaillistSettingsClass extends Settings_Form
 	/**
 	 * static function saveTableSettings, now part of the Settings Form class
 	 *
-	 * @param array $config_vars the key names of the vars are the table cols
+	 * @param mixed[] $config_vars the key names of the vars are the table cols
 	 * @param string $tablename name of the table the values will be saved in
-	 * @param array $index for compatability
+	 * @param string[] $index for compatability
 	 * @param integer $editid -1 add a row, otherwise edit a row with the supplied key value
 	 * @param string $editname used when editing a row, needs to be the name of the col to find $editid key value
 	 */

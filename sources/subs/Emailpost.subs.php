@@ -39,9 +39,6 @@ function pbe_email_to_bbc($text, $html)
 	// We are starting with HTML, our goal is to convert the best parts of it to BBC,
 	if ($html)
 	{
-		// Set a gmail flag for special quote processing since its quotes are strange
-		$gmail = (bool) preg_match('~<div class="gmail_quote">~i', $text);
-
 		// Convert the email-HTML to BBC
 		$text = preg_replace(array_keys($tags), array_values($tags), $text);
 		require_once(SUBSDIR . '/Html2BBC.class.php');
@@ -69,6 +66,9 @@ function pbe_email_to_bbc($text, $html)
 		// Bottom feeder?  If we have no message they could have replied below the original message
 		if (empty($result) || trim(strip_tags(pbe_filter_email_message($text))) === '')
 			$text = $text_save;
+
+		// Set a gmail flag for special quote processing since its quotes are strange
+		$gmail = (bool) preg_match('~<div class="gmail_quote">~i', $text);
 
 		// Attempt to fix textual ('>') quotes so we also fix wrapping issues first!
 		$text = pbe_fix_email_quotes($text, ($html && !$gmail));
@@ -173,7 +173,6 @@ function pbe_fix_email_quotes($body, $html)
 	$original = $body_array;
 
 	// Init
-	$body = '';
 	$current_quote = 0;
 	$quote_done = '';
 
@@ -342,7 +341,6 @@ function pbe_parse_email_message(&$body)
 
 	// Look for the markers, **stop** after the first successful one, good hunting!
 	$match = false;
-	$split = array();
 	foreach ($expressions as $expression)
 	{
 		if ($expression['type'] === 'regex')
@@ -504,6 +502,7 @@ function pbe_fix_client_quotes($body)
 			}
 		}
 	}
+
 	return $body;
 }
 
@@ -513,6 +512,7 @@ function pbe_fix_client_quotes($body)
  * @param string $needle
  * @param string $replace
  * @param string $haystack
+ * @return string
  */
 function pbe_str_replace_once($needle, $replace, $haystack)
 {
@@ -528,7 +528,7 @@ function pbe_str_replace_once($needle, $replace, $haystack)
  * Does a moderation check on a given user (global)
  *  - Removes permissions of PBE concern that a given moderated level denies
  *
- * @param array $pbe array of user values
+ * @param mixed[] $pbe array of user values
  */
 function pbe_check_moderation(&$pbe)
 {
@@ -645,7 +645,6 @@ function pbe_emailError($error, $email_message)
 			$message_type = 'p';
 
 		// Find all keys sent to this user, sorted by date
-		$user_keys = array();
 		$user_keys = query_user_keys($email_message->email['from']);
 
 		// While we have keys to look at see if we can match up this lost message on subjects
@@ -709,7 +708,7 @@ function pbe_emailError($error, $email_message)
  *  - adds valid ones to attachmentOptions
  *  - calls createAttachment to store them
  *
- * @param array $pbe
+ * @param mixed[] $pbe
  * @param object $email_message
  */
 function pbe_email_attachments($pbe, $email_message)
@@ -719,7 +718,6 @@ function pbe_email_attachments($pbe, $email_message)
 
 	// Init
 	$attachment_count = 0;
-	$attachments = array();
 	$attachIDs = array();
 
 	// Make sure we're uploading the files to the right place.
@@ -1032,8 +1030,8 @@ function query_load_user_info($email)
  *  - Similar to the functions in loadPermissions()
  *
  * @param string $type board to load board permissions, otherwise general permissions
- * @param array $pbe
- * @param array $topic_info
+ * @param mixed[] $pbe
+ * @param mixed[] $topic_info
  */
 function query_load_permissions($type, &$pbe, $topic_info = array())
 {
@@ -1081,8 +1079,6 @@ function query_load_permissions($type, &$pbe, $topic_info = array())
 function query_sender_wrapper($from)
 {
 	$db = database();
-
-	$result = array();
 
 	// The signature and email visibility details
 	$request = $db->query('', '
@@ -1263,7 +1259,7 @@ function query_load_subject($message_id, $message_type, $email)
  *
  * @param string $message_type
  * @param int $message_id
- * @param array $pbe
+ * @param mixed[] $pbe
  */
 function query_load_message($message_type, $message_id, $pbe)
 {
@@ -1362,7 +1358,7 @@ function query_load_board($message_id)
  * Loads the basic board information for a given board id
  *
  * @param int $board_id
- * @param array $pbe
+ * @param mixed[] $pbe
  */
 function query_load_board_details($board_id, $pbe)
 {
@@ -1393,7 +1389,7 @@ function query_load_board_details($board_id, $pbe)
  *
  * @param int $id_member
  * @param int $id_theme
- * @param array $board_info
+ * @param mixed[] $board_info
  */
 function query_get_theme($id_member, $id_theme, $board_info)
 {
@@ -1447,7 +1443,7 @@ function query_get_theme($id_member, $id_theme, $board_info)
  * @param int $id_board
  * @param int $id_topic
  * @param boolean $auto_notify
- * @param array $permissions
+ * @param mixed[] $permissions
  */
 function query_notifications($id_member, $id_board, $id_topic, $auto_notify, $permissions)
 {
@@ -1580,7 +1576,7 @@ function query_key_maintenance($email_message)
 	// but we let PM's slide, they often seem to be re re re replied to
 	if ($email_message->message_type !== 'p')
 	{
-		$request = $db->query('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}postby_emails
 			WHERE id_email = {string:message_key_id}',
 			array(
@@ -1591,7 +1587,7 @@ function query_key_maintenance($email_message)
 
 	// Since we are here lets delete any items older than delete_old days,
 	// if they have not responded in that time tuff
-	$request = $db->query('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}postby_emails
 		WHERE time_sent < {int:delete_old}',
 		array(
@@ -1607,9 +1603,9 @@ function query_key_maintenance($email_message)
  *  - Updates last active
  *  - Updates the who's online list with the member and action
  *
- * @param array $pbe
+ * @param mixed[] $pbe
  * @param object $email_message
- * @param array $topic_info
+ * @param mixed[] $topic_info
  */
 function query_update_member_stats($pbe, $email_message, $topic_info = array())
 {
