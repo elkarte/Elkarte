@@ -268,10 +268,13 @@ function template_topic_listing()
 			</li>';
 		}
 
+		echo '
+		</ul>';
+
 		if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1 && !empty($context['topics']))
 		{
 			echo '
-			<li class="qaction_row">
+			<div class="qaction_row">
 				<div class="styled-select">
 					<select class="qaction" name="qaction"', $context['can_move'] ? ' onchange="this.form.move_to.disabled = (this.options[this.selectedIndex].value != \'move\');"' : '', '>
 						<option value="">&nbsp;</option>';
@@ -292,11 +295,9 @@ function template_topic_listing()
 
 			echo '
 				<input type="submit" value="', $txt['quick_mod_go'], '" onclick="return document.forms.quickModForm.qaction.value != \'\' &amp;&amp; confirm(\'', $txt['quickmod_confirm'], '\');" class="button_submit" />
-			</li>';
+			</div>';
 		}
 
-		echo '
-		</ul>';
 
 		// Finish off the form - again.
 		if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] > 0 && !empty($context['topics']))

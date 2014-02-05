@@ -914,6 +914,9 @@ span.views_text {
 .topic_listing li {
 	border-bottom: 1px solid #eee;
 }
+.topic_listing li.sticky_row {
+	border-bottom: 1px solid #fff;
+}
 .post_wrapper {
 	border: 1px solid #eaeaea;
 	border-radius: 10px;
@@ -1224,13 +1227,18 @@ span.views_text {
 		position: relative;
 		top: -3px;
 	}
-	.topic_listing h4 {
+	.topic_name {
 		border-bottom: 1px solid #ddd;
+	}
+	.topic_listing h4 {
 		margin-bottom: 3px;
 		max-width: 20em;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 		overflow: hidden;
+	}
+	.topic_listing li.sticky_row {
+		border-bottom: 1px solid #ccc;
 	}
 	.basic_row {
 		background-color: #fafafa;
