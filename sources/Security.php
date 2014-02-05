@@ -1091,7 +1091,7 @@ function isAllowedTo($permission, $boards = null)
  *  - returns an empty array if he or she cannot do this on any board.
  * If check_access is true will also make sure the group has proper access to that board.
  *
- * @param string[] $permissions array of permission names to check access against
+ * @param string[]|string $permissions array of permission names to check access against
  * @param bool $check_access = true
  * @param bool $simple = true
  */

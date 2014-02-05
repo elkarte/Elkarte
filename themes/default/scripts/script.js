@@ -1218,7 +1218,7 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 			for (j = aBoardsAndCategories[i].childLevel, sChildLevelPrefix = ''; j > 0; j--)
 				sChildLevelPrefix += this.opt.sBoardChildLevelIndicator;
 
-			if (sChildLevelPrefix != '')
+			if (sChildLevelPrefix !== '')
 				sChildLevelPrefix = sChildLevelPrefix + this.opt.sBoardPrefix;
 		}
 

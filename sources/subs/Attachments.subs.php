@@ -271,7 +271,7 @@ function automanage_attachments_by_space()
  * Finds the current directory tree for the supplied base directory
  *
  * @param string $directory
- * @return boolean on fail else array of directory names
+ * @return string[]|boolean on fail else array of directory names
  */
 function get_directory_tree_elements($directory)
 {
@@ -1680,7 +1680,7 @@ function filter_accessible_attachment($attachment_info, $all_posters)
  *
  * @param string $filename
  * @param int $attachment_id
- * @param string|null dir
+ * @param string|null $dir
  * @param boolean $new
  */
 function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $new = false)

@@ -250,7 +250,7 @@ function getFileVersions(&$versionOptions)
 			if (substr($entry, -4) === '.php' && !is_dir($dir . '/' . $entry) && $entry !== 'index.php' && $entry !== 'sphinxapi.php')
 			{
 				// Read the first 4k from the file.... enough for the header.
-				$header = file_get_contents($dir . '/' . $entry, null, null, 0, 768);
+				$header = file_get_contents($dir . '/' . $entry, false, null, 0, 768);
 
 				// Look for the version comment in the file header.
 				if (preg_match($version_regex, $header, $match))

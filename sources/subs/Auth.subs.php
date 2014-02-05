@@ -221,7 +221,7 @@ function adminLogin($type = 'admin')
  * if 'value' is an array, the function is called recursively.
  *
  * @param string $k key
- * @param string $v value
+ * @param string|boolean $v value
  * @return string 'hidden' HTML form fields, containing key-value-pairs
  */
 function adminLogin_outputPostVars($k, $v)

@@ -28,7 +28,7 @@ if (!defined('ELK'))
  * @param string $key cache entry key
  * @param string $file file to include
  * @param string $function function to call
- * @param array $params parameters sent to the function
+ * @param mixed[] $params parameters sent to the function
  * @param int $level = 1
  * @return string
  */

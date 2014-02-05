@@ -90,7 +90,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
  *
  * if the member's post number is updated, updates their post groups.
  *
- * @param int[] $members An array of member ids
+ * @param int[]|int $members An array of member ids
  * @param mixed[] $data An associative array of the columns to be updated and their respective values.
  */
 function updateMemberData($members, $data)

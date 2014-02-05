@@ -21,7 +21,7 @@ if (!defined('ELK'))
  * Redirects back to the badbehavior log when done.
  *
  * @param string $type
- * @param array $filter
+ * @param mixed[] $filter
  */
 function deleteBadBehavior($type, $filter)
 {
@@ -68,7 +68,7 @@ function deleteBadBehavior($type, $filter)
  * Get the number of badbehavior log entries.
  * Will take in to acount any current filter value in its count result
  *
- * @param array $filter
+ * @param mixed[] $filter
  */
 function getBadBehaviorLogEntryCount($filter)
 {
@@ -94,7 +94,7 @@ function getBadBehaviorLogEntryCount($filter)
  * @param int $start
  * @param int $items_per_page
  * @param string $sort
- * @param array $filter
+ * @param mixed[]|null $filter
  */
 function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')
 {
@@ -122,7 +122,7 @@ function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')
 		// Turn the key in to something nice to show
 		$key_response = bb2_get_response($row['valid']);
 
-		//Prevent undefined errors and log ..
+		// Prevent undefined errors and log ..
 		if (isset($key_response[0]) && $key_response[0] == '00000000')
 		{
 			$key_response['response'] = '';
