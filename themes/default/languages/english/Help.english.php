@@ -315,14 +315,14 @@ $helptxt['max_image_width'] = 'This allows you to set a maximum size for posted 
 $helptxt['mail_type'] = 'This setting allows you to choose either PHP\'s default settings, or to override those settings with SMTP.  PHP doesn\'t support using authentication with SMTP (which many hosts require now) so if you want that you should select SMTP.  Please note that SMTP can be slower, and some servers will not take user names and passwords.<br /><br />You don\'t need to fill in the SMTP settings if this is set to PHP\'s default.';
 $helptxt['mail_batch_size'] = 'This setting determines how many emails will be sent per page load and can not be set greater than the maximum allowed per minute.<br />Leaving this as 0, the system will automatically determine a batch size to evenly spread the load and fill the quota.<br />If you want to set your own values, setting this to the same value as your limit is a good option for low per minute limits, or 1/6 of the limit for higher per minute limits.';
 
-$helptxt['attachment_manager_settings'] = 'Here you can configure your Attachment settings with information such as choosing a location to store the uploaded files, maximum visible sizes and limiting file extension use.';
+$helptxt['attachment_manager_settings'] = 'Here you can configure your attachment settings with information such as choosing a location to store the uploaded files, the maximum visible sizes and limiting the usage of file extensions.';
 $helptxt['attachmentEnable'] = 'Enable/Disable the attachment system or disable only new attachments leaving old one available.';
 $helptxt['attachmentRecodeLineEndings'] = 'Enabling this will re-code line endings of text based files (txt, css, html, php, xml) based on your server (Windows, Mac or Unix).';
 $helptxt['automanage_attachments'] = 'This will create a directory structure based on the selected option.  This can be post date (subdividing attachments by year, or by year and month or by year, month and day) or simply adding a new directory when the space limit is reached.  Each directory created will have the same file count and total size restrictions.  This will help prevent directories from reaching a file or size limit and can improve performance by having directories with fewer files.';
 $helptxt['use_sub-directories_for_attachments'] = 'This will create all new directories as sub directory under the main attachment directory.';
 $helptxt['attachmentDirSizeLimit'] = ' Set how large the attachment folder can be.';
 $helptxt['attachmentDirFileLimit'] = 'Set the max number of files an individual attachment directory may contain';
-$helptxt['attachmentPostLimit'] = 'Specify how large a single post\'s upload by a can be in (in KB), this is the total of all attachments made in a post.';
+$helptxt['attachmentPostLimit'] = 'Specify how large a single post\'s upload by a can be in (in KiB), this is the total of all attachments made in a post.';
 $helptxt['attachmentSizeLimit'] = 'Specify the largest size a single attachment in a post can be.';
 $helptxt['attachmentNumPerPostLimit'] = 'Select the number of attachments a member can add per post.';
 $helptxt['attachmentCheckExtensions'] = 'Check this box to enable attachment filtering, which will only allow files to be uploaded with the file extensions that you have defined.';
