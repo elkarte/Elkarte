@@ -1902,6 +1902,9 @@ img.new_posts {
 .topic_latest.relative {
 	min-width: 30em;
 }
+#ie8 .topic_latest.relative {
+	min-width: 36em;
+}
 .board_lastpost, .topic_lastpost {
 	min-width: 21em;
 	margin-left: 1em;
