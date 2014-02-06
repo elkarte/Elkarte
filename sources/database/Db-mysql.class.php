@@ -1093,7 +1093,7 @@ class Database_MySQL implements Database
 	 *
 	 * @param mixed $db_name_str string holding the database name, or false, default false
 	 * @param mixed $filter string to filter by, or false, default false
-	 * @return array, an array of table names. (strings)
+	 * @return string[] an array of table names. (strings)
 	 */
 	function db_list_tables($db_name_str = false, $filter = false)
 	{

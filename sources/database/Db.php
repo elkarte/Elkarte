@@ -101,8 +101,8 @@ interface Database
 	/**
 	 * Reset the internal result pointer.
 	 *
-	 * @param $request
-	 * @param $counter
+	 * @param resource $request
+	 * @param int $counter
 	 */
 	function data_seek($request, $counter);
 
@@ -154,11 +154,11 @@ interface Database
 	/**
 	 * This function tries to work out additional error information from a back trace.
 	 *
-	 * @param $error_message
-	 * @param $log_message
-	 * @param $error_type
-	 * @param $file
-	 * @param $line
+	 * @param string $error_message
+	 * @param string $log_message
+	 * @param string|false $error_type
+	 * @param string|null $file
+	 * @param int|null $line
 	 */
 	function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null);
 

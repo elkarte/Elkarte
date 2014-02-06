@@ -846,7 +846,7 @@ function generateValidationCode()
  * @param string $name
  * @param bool $is_id if true it treats $name as a member ID and try to load the data for that ID
  *
- * @return mixed, array or false if nothing is found
+ * @return mixed[]|false false if nothing is found
  */
 function loadExistingMember($name, $is_id = false)
 {

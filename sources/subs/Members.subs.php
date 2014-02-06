@@ -1484,9 +1484,8 @@ function membersBy($query, $query_params, $details = false, $only_active = true)
 /**
  * Counts the number of members based on conditions
  *
- *              or a string used as raw query
- * @param mixed[] $query_params is an array containing the parameters to be passed
- *              to the query
+ * @param string[]|string $query strings used as raw query
+ * @param mixed[] $query_params is an array containing the parameters to be passed to the query
  * @param boolean $only_active
  */
 function countMembersBy($query, $query_params, $only_active = true)
@@ -1804,7 +1803,7 @@ function getMember($search, $buddies = array())
  * Named in honour of Jeff Lewis, the original creator of...this function.
  *
  * @param int $old
- * @return int, the returned number of days, based on the forum time.
+ * @return int the returned number of days, based on the forum time.
  */
 function jeffsdatediff($old)
 {

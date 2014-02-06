@@ -32,7 +32,7 @@ if (!defined('ELK'))
  * @param string $source
  * @param int $max_width
  * @param int $max_height
- * @return boolean, whether the thumbnail creation was successful.
+ * @return boolean whether the thumbnail creation was successful.
  */
 function createThumbnail($source, $max_width, $max_height)
 {
@@ -67,7 +67,7 @@ function createThumbnail($source, $max_width, $max_height)
  *
  * @param string $fileName
  * @param int $preferred_format = 0
- * @return boolean, true on success, false on failure.
+ * @return boolean true on success, false on failure.
  */
 function reencodeImage($fileName, $preferred_format = 0)
 {
@@ -621,7 +621,7 @@ if (!function_exists('imagecreatefrombmp'))
  * @param resource $gif
  * @param string $lpszFileName
  * @param int $background_color = -1
- * @return boolean, whether it was successful or not.
+ * @return boolean whether it was successful or not.
  */
 function gif_outputAsPng($gif, $lpszFileName, $background_color = -1)
 {

@@ -40,9 +40,9 @@ class Emailpost_Controller extends Action_Controller
 	 * - Keys are used once and then discarded
 	 * Accessed by email imap cron script, and ManageMaillist.controller.php.
 	 *
-	 * @param string $data used to supply a full body+headers email
+	 * @param string|null $data used to supply a full body+headers email
 	 * @param boolean $force used to override common failure errors
-	 * @param string $key used to supply a lost key
+	 * @param string|null $key used to supply a lost key
 	 */
 	function action_pbe_post($data = null, $force = false, $key = null)
 	{
@@ -57,7 +57,6 @@ class Emailpost_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Emailpost.subs.php');
 
 		// Init
-		$pbe = array();
 		loadLanguage('Maillist');
 		setMemoryLimit('256M');
 
@@ -113,7 +112,6 @@ class Emailpost_Controller extends Action_Controller
 		if ($email_message->message_type === 't' || $email_message->message_type === 'm')
 		{
 			// Load the message/topic details
-			$topic_info = array();
 			$topic_info = query_load_message($email_message->message_type, $email_message->message_id, $pbe);
 			if (empty($topic_info))
 				return pbe_emailError('error_topic_gone', $email_message);
@@ -124,7 +122,6 @@ class Emailpost_Controller extends Action_Controller
 		else
 		{
 			// Load the PM details
-			$pm_info = array();
 			$pm_info = query_load_message($email_message->message_type, $email_message->message_id, $pbe);
 			if (empty($pm_info))
 			{
@@ -169,7 +166,7 @@ class Emailpost_Controller extends Action_Controller
 			$result = pbe_create_post($pbe, $email_message, $topic_info);
 		// Must be a PM then
 		elseif ($email_message->message_type === 'p')
-			$result = pbe_create_pm($pbe, $email_message, $topic_info);
+			$result = pbe_create_pm($pbe, $email_message);
 
 		if (!empty($result))
 		{
@@ -190,7 +187,7 @@ class Emailpost_Controller extends Action_Controller
 	 * - It must have been sent to an email ID that has been set to post new topics
 	 * Accessed through emailtopic.
 	 *
-	 * @param string $data used to supply a full body+headers email
+	 * @param string|null $data used to supply a full body+headers email
 	 */
 	function action_pbe_topic($data = null)
 	{
@@ -205,7 +202,6 @@ class Emailpost_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Emailpost.subs.php');
 
 		// Init
-		$pbe = array();
 		loadLanguage('Maillist');
 		setMemoryLimit('256M');
 
@@ -300,16 +296,6 @@ class Emailpost_Controller extends Action_Controller
 		$email_message->load_address();
 		$email_message->load_key();
 
-		// Any reason to avoid using the html version since it helps with formatting
-		if ($html && preg_match_all('~<table.*?>~i', $email_message->body, $matches) >= 2)
-		{
-			// Some mobile responses wrap everything in a table structure
-			$text = $email_message->plain_body;
-			$html = false;
-		}
-		else
-			$text = $email_message->body;
-
 		// Convert to BBC and Format for the preview
 		$text = pbe_load_text($html, $email_message, $pbe);
 
@@ -337,9 +323,9 @@ class Emailpost_Controller extends Action_Controller
  *  - Calls pbe_load_text to prepare text for the post
  *  - returns true if successful or false for any number of failures
  *
- * @param array $pbe array of all pbe user_info values
- * @param string $email_message
- * @param array $topic_info
+ * @param mixed[] $pbe array of all pbe user_info values
+ * @param object $email_message
+ * @param mixed[] $topic_info
  */
 function pbe_create_post($pbe, $email_message, $topic_info)
 {
@@ -435,8 +421,8 @@ function pbe_create_post($pbe, $email_message, $topic_info)
  *  - Uses sendpm to do the actual "sending"
  *  - Returns true if successful or false for any number of failures
  *
- * @param array $pbe array of pbe 'user_info' values
- * @param string $email_message
+ * @param mixed[] $pbe array of pbe 'user_info' values
+ * @param object $email_message
 */
 function pbe_create_pm($pbe, $email_message)
 {
@@ -487,9 +473,9 @@ function pbe_create_pm($pbe, $email_message)
  *  - Calls query_update_member_stats to show they did something
  * Requires pbe and email_message to be populated.
  *
- * @param array $pbe array of pbe 'user_info' values
- * @param string $email_message
- * @param array $board_info
+ * @param mixed[] $pbe array of pbe 'user_info' values
+ * @param object $email_message
+ * @param mixed[] $board_info
  */
 function pbe_create_topic($pbe, $email_message, $board_info)
 {
@@ -596,8 +582,10 @@ function pbe_create_topic($pbe, $email_message, $board_info)
  * @param boolean $html
  * @param object $email_message
  * @param array $pbe
+ *
+ * @return string
  */
-function pbe_load_text($html, $email_message, $pbe)
+function pbe_load_text(&$html, $email_message, $pbe)
 {
 	if ($html && preg_match_all('~<table.*?>~i', $email_message->body, $matches) >= 2)
 	{
@@ -614,7 +602,7 @@ function pbe_load_text($html, $email_message, $pbe)
 	$text = pbe_fix_email_body($text, $html, $pbe['profile']['real_name'], (empty($email_message->_converted_utf8) ? $email_message->headers['x-parameters']['content-type']['charset'] : 'UTF-8'));
 
 	// Do we even have a message left to post?
-	$text = Util::htmltrim($text, ENT_QUOTES);
+	$text = Util::htmltrim($text);
 	if (empty($text))
 		return;
 

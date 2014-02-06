@@ -206,7 +206,7 @@ function convertIPv6toInts($ip)
  *
  * @param string $addr ipv6 address string
  * @param boolean $strict_check checks lenght to expaned address for compliance
- * @return boolean/string expanded ipv6 address.
+ * @return boolean|string expanded ipv6 address.
  */
 function expandIPv6($addr, $strict_check = true)
 {

@@ -372,7 +372,7 @@ function getAvatarCount()
 /**
  * Get the attachments directories, as an array.
  *
- * @return array, the attachments directory/directories
+ * @return mixed[] the attachments directory/directories
  */
 function getAttachmentDirs()
 {
@@ -1036,7 +1036,7 @@ function validateAttachID($id_attach)
  * @param int $items_per_page
  * @param string $sort
  * @param string $approve_query additional restrictions based on the boards the approver can see
- * @return array, an array of unapproved attachments
+ * @return mixed[] an array of unapproved attachments
  */
 function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_query)
 {

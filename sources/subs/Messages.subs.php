@@ -705,7 +705,7 @@ function removeMessage($message, $decreasePostCount = true)
  *
  * @param int $msg_id message ID
  * @param integer|null $topicID = null topic ID, if null is passed the ID of the topic is retrieved and returned
- * @return mixed, int topic ID if any, or false
+ * @return int|false int topic ID if any, or false
  */
 function associatedTopic($msg_id, $topicID = null)
 {

@@ -891,7 +891,7 @@ class Email_Parse
 	 * Finds if any spam headers have been positively set and returns that flag
 	 * - will look in various header fields where the spam status may reside
 	 *
-	 * @return string|boolean on fail
+	 * @return boolean on fail
 	 */
 	public function load_spam()
 	{

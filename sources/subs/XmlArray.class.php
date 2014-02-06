@@ -138,7 +138,7 @@ class Xml_Array
 	 *  $element = $xml->path('html/body');
 	 * @param string $path  - the path to the element to get
 	 * @param bool $return_full  - always return full result set
-	 * @return Xml_Array, a new Xml_Array.
+	 * @return Xml_Array a new Xml_Array.
 	 */
 	public function path($path, $return_full = false)
 	{
@@ -238,7 +238,7 @@ class Xml_Array
 	 * Example use:
 	 *  echo $xml->count('html/head/meta');
 	 * @param string $path - the path to search for.
-	 * @return int, the number of elements the path matches.
+	 * @return int the number of elements the path matches.
 	 */
 	public function count($path)
 	{
@@ -263,7 +263,7 @@ class Xml_Array
 	 * Example use:
 	 *  foreach ($xml->set('html/body/p') as $p)
 	 * @param string $path  - the path to search for.
-	 * @return array, an array of Xml_Array objects
+	 * @return array an array of Xml_Array objects
 	 */
 	public function set($path)
 	{

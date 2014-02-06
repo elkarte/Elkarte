@@ -1221,7 +1221,7 @@ function getAvatarPath()
  * This returns the id of the folder where the attachment or avatar will be saved.
  * If multiple attachment directories are not enabled, this will be 1 by default.
  *
- * @return int, return 1 if multiple attachment directories are not enabled,
+ * @return int 1 if multiple attachment directories are not enabled,
  * or the id of the current attachment directory otherwise.
  */
 function getAttachmentPathID()
@@ -1235,7 +1235,7 @@ function getAttachmentPathID()
 /**
  * Returns the ID of the folder avatars are currently saved in.
  *
- * @return int, returns 1 if custom avatar directory is enabled,
+ * @return int 1 if custom avatar directory is enabled,
  * and the ID of the current attachment folder otherwise.
  * NB: the latter could also be 1.
  */
@@ -1308,7 +1308,7 @@ function getAttachments($messages, $includeUnapproved = false, $filter = null, $
  *
  * @deprecated since 1.0
  *
- * @return array, avatars information
+ * @return mixed[] avatars information
  */
 function getAvatarsDefault()
 {

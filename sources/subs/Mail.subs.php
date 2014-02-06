@@ -36,7 +36,7 @@ if (!defined('ELK'))
  * @param bool $is_private
  * @param string|null $from_wrapper - used to provide envelope from wrapper based on if we sharing a users display name
  * @param int|null $reference - The parent topic id for use in a References header
- * @return boolean, whether or not the email was accepted properly.
+ * @return boolean whether or not the email was accepted properly.
  */
 function sendmail($to, $subject, $message, $from = null, $message_id = null, $send_html = false, $priority = 3, $hotmail_fix = null, $is_private = false, $from_wrapper = null, $reference = null)
 {
@@ -1324,7 +1324,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
  *
  * @param int $id_msg the id of a message
  * @param int $topic_id the topic the message belongs to
- * @return array, the poster's details
+ * @return mixed[] the poster's details
  */
 function posterDetails($id_msg, $topic_id)
 {

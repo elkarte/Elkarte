@@ -2650,7 +2650,7 @@ function setupThemeContext($forceload = false)
  *
  * @param string $needed The amount of memory to request, if needed, like 256M
  * @param bool $in_use Set to true to account for current memory usage of the script
- * @return boolean, true if we have at least the needed memory
+ * @return boolean true if we have at least the needed memory
  */
 function setMemoryLimit($needed, $in_use = false)
 {

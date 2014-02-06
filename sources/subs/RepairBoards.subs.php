@@ -1410,7 +1410,7 @@ function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0
  * won't have to recheck everything.
  *
  * @param $do_fix
- * @return array, the errors found.
+ * @return mixed[] the errors found.
  */
 function findForumErrors($do_fix = false)
 {

@@ -211,6 +211,7 @@ function deleteMembergroups($groups)
  * Non-admins are not able to remove members from the admin group.
  *
  * @param int[]|int $members
+ * @param integer $groups
  * @param bool $permissionCheckDone = false
  *
  * @return boolean
@@ -1820,7 +1821,7 @@ function accessibleGroups()
  *
  * @param string $where
  * @param string $where_parameters
- * @return int, the count of group requests
+ * @return int the count of group requests
  */
 function list_getGroupRequestCount($where, $where_parameters)
 {
@@ -1847,7 +1848,7 @@ function list_getGroupRequestCount($where, $where_parameters)
  * @param string $sort
  * @param string $where
  * @param string $where_parameters
- * @return array, an array of group requests
+ * @return mixed[] an array of group requests
  * Each group request has:
  *   'id'
  *   'member_link'
