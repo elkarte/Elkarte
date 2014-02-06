@@ -1523,10 +1523,10 @@ class PersonalMessage_Controller extends Action_Controller
 			$context['sub_template'] = 'add_rule';
 
 			// Any known rule
-			$js_rules = '{';
+			$js_rules = '';
 			foreach ($context['known_rules'] as $rule)
 				$js_rules .= JavaScriptEscape($rule) . ': ' . JavaScriptEscape($txt['pm_rule_' . $rule]) . ',';
-			$js_rules = substr($js_rules, 0, -1) . '}';
+			$js_rules = '{' . substr($js_rules, 0, -1) . '}';
 
 			// Any known label
 			$js_labels = '';
