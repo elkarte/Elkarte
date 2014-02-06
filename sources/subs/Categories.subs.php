@@ -181,7 +181,7 @@ function createCategory($catOptions)
  * deletes all information that's associated with the given categories.
  * updates the statistics to reflect the new situation.
  *
- * @param string $categories
+ * @param int[] $categories
  * @param integer|null $moveBoardsTo = null
  */
 function deleteCategories($categories, $moveBoardsTo = null)

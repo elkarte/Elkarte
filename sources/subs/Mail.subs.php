@@ -1352,7 +1352,7 @@ function posterDetails($id_msg, $topic_id)
 /**
  * Little utility function to calculate how long ago a time was.
  *
- * @param long $time_diff
+ * @param integer|double $time_diff
  * @return string
  */
 function time_since($time_diff)

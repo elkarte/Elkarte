@@ -226,8 +226,8 @@ function init_avatars()
 	var avatar = document.getElementById("avatar");
 
 	// If we are using an avatar from the gallery, let's load it
-	if (avatar != null)
-			changeSel(selavatar);
+	if (avatar !== null)
+		changeSel(selavatar);
 
 	// And now show the proper interface for the selected avatar type
 	swap_avatar();

@@ -141,17 +141,17 @@
 				iSelectionPosition = iTop + offset.top - $(window).scrollTop(),
 				iAvailableSpace = iWindowHeight - (iSelectionPosition - iDocViewTop);
 
-		   if (iAvailableSpace >= select_height)
-		   {
-			   // Enough space below
-			   iTop = iTop + offset.top + select_height - $(window).scrollTop();
-		   }
-		   else
-		   {
-			   // Place it above instead
-			   // @todo should check if this is more space than below
-			   iTop= iTop + offset.top - $(window).scrollTop();
-		   }
+			if (iAvailableSpace >= select_height)
+			{
+				// Enough space below
+				iTop = iTop + offset.top + select_height - $(window).scrollTop();
+			}
+			else
+			{
+				// Place it above instead
+				// @todo should check if this is more space than below
+				iTop= iTop + offset.top - $(window).scrollTop();
+			}
 
 			// Move the select box
 			offset = {left: iLeft, top: iTop};

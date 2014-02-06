@@ -163,8 +163,8 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 /**
  * Fetches errors and group them by error type
  *
- * @param int|null $filter
- * @param bool|null $sort
+ * @param mixed[]|null $filter
+ * @param string|bool|null $sort
  */
 function fetchErrorsByType($filter = null, $sort = null)
 {

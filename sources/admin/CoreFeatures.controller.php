@@ -357,7 +357,7 @@ class CoreFeatures_Controller extends Action_Controller
 	/**
 	 * This function makes sure the requested subaction does exists, if it doesn't, it sets a default action or.
 	 *
-	 * @param array $subActions = array() An array containing all possible subactions.
+	 * @param mixed[] $subActions = array() An array containing all possible subactions.
 	 * @param string $defaultAction = '' the default action to be called if no valid subaction was found.
 	 */
 	public function loadGeneralSettingParameters($subActions = array(), $defaultAction = '')

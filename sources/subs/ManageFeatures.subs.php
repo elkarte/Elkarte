@@ -239,7 +239,7 @@ function ensureUniqueProfileField($colname, $initial_colname, $unique = false)
  * Update the profile fields name
  *
  * @param string $key
- * @param string $newOptions
+ * @param mixed[] $newOptions
  * @param string $name
  * @param string $option
  */
