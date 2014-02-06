@@ -1356,10 +1356,10 @@ function createSalvageArea()
  * If max_substep is set, $_GET['substep'] / $max_substep is the percent
  * done this step is.
  *
- * @param array $to_fix
+ * @param mixed[] $to_fix
  * @param string $current_step_description
  * @param int $max_substep = none
- * @param force $force = false
+ * @param boolean $force = false
  */
 function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0, $force = false)
 {

@@ -111,8 +111,8 @@ function themeUrl($id_theme)
 /**
  * Validates a theme name
  *
- * @param string $indexes
- * @param array $value_data
+ * @param mixed[] $indexes
+ * @param mixed[] $value_data
  */
 function validateThemeName($indexes, $value_data)
 {
@@ -146,7 +146,7 @@ function validateThemeName($indexes, $value_data)
 /**
  * Get a basic list of themes
  *
- * @param array $themes
+ * @param int[] $themes
  * @return array
  */
 function getBasicThemeInfos($themes)
@@ -216,7 +216,7 @@ function getCustomThemes()
 /**
  * Returns all named and installed themes paths as an array of theme name => path
  *
- * @param array $theme_list
+ * @param int[] $theme_list
  */
 function getThemesPathbyID($theme_list = array())
 {
@@ -256,7 +256,7 @@ function getThemesPathbyID($theme_list = array())
  * Load the installed themes
  * (minimum data)
  *
- * @param array $knownThemes available themes
+ * @param int[] $knownThemes available themes
  */
 function loadThemes($knownThemes)
 {
@@ -585,18 +585,18 @@ function countConfiguredMemberOptions()
 /**
  * Deletes all outdated options from the themes table
  *
- * @param mixed $theme : if int to remove option from a specific theme,
+ * @param int|string $theme : if int to remove option from a specific theme,
  *              if string it can be:
  *               - 'default' => to remove from the default theme
  *               - 'custom' => to remove from all the custom themes
  *               - 'all' => to remove from both default and custom
- * @param mixed $membergroups : if int a specific member
+ * @param int|string $membergroups : if int a specific member
  *              if string a "group" of members and it can assume the following values:
  *               - 'guests' => obviously guests,
  *               - 'members' => all members with custom settings (i.e. id_member > 0)
  *               - 'non_default' => guests and members with custom settings (i.e. id_member != 0)
  *               - 'all' => any record
- * @param mixed $old_settings can be a string or an array of strings. If empty deletes all settings.
+ * @param string[]|string $old_settings can be a string or an array of strings. If empty deletes all settings.
  */
 function removeThemeOptions($theme, $membergroups, $old_settings = '')
 {
@@ -655,7 +655,7 @@ function removeThemeOptions($theme, $membergroups, $old_settings = '')
 /**
  * Update the default options for our users.
  *
- * @param array $setValues in the order: id_theme, id_member, variable name, value
+ * @param mixed[] $setValues in the order: id_theme, id_member, variable name, value
  */
 function updateThemeOptions($setValues)
 {
@@ -674,7 +674,7 @@ function updateThemeOptions($setValues)
  *
  * @param int $id_theme
  * @param string $options
- * @param mixed $value
+ * @param string[]|string $value
  */
 function addThemeOptions($id_theme, $options, $value)
 {
@@ -765,7 +765,7 @@ function nextTheme()
 /**
  * Adds a new theme to the database.
  *
- * @param array $details
+ * @param mixed[] $details
  */
 function addTheme($details)
 {
@@ -833,9 +833,9 @@ function deleteVariants($id)
  * If supplied a variable array it will only load / return those values
  *
  * @param int $theme
- * @param int $memID
- * @param array $options
- * @param array $variables
+ * @param int|null $memID
+ * @param mixed[] $options
+ * @param mixed[] $variables
  */
 function loadThemeOptionsInto($theme, $memID = null, $options = array(), $variables = array())
 {
@@ -915,7 +915,7 @@ function loadBasedOnTheme($based_on, $explicit_images = false)
  * @param string $name
  * @param string $version
  * @param string $theme_dir
- * @param array $theme_values
+ * @param mixed[] $theme_values
  */
 function write_theme_info($name, $version, $theme_dir, $theme_values)
 {

@@ -85,7 +85,7 @@ class Fulltext_Search
 	 * Check whether the method can be performed by this API.
 	 *
 	 * @param string $methodName
-	 * @param mixed $query_params
+	 * @param mixed[]|null $query_params
 	 * @return
 	 */
 	public function supportsMethod($methodName, $query_params = null)
@@ -162,9 +162,9 @@ class Fulltext_Search
 	 * Do we have to do some work with the words we are searching for to prepare them?
 	 *
 	 * @param string $word
-	 * @param array $wordsSearch
-	 * @param array $wordsExclude
-	 * @param array $isExcluded
+	 * @param mixed[] $wordsSearch
+	 * @param string[] $wordsExclude
+	 * @param boolean $isExcluded
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
 	{
@@ -205,8 +205,8 @@ class Fulltext_Search
 	 *
 	 * Search for indexed words.
 	 *
-	 * @param array $words
-	 * @param array $search_data
+	 * @param mixed[] $words
+	 * @param mixed[] $search_data
 	 * @return
 	 */
 	public function indexedWordQuery($words, $search_data)

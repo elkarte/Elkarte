@@ -39,7 +39,7 @@ function loadVerificationControls()
 /**
  * Create a anti-bot verification control?
  *
- * @param array $verificationOptions
+ * @param mixed[] $verificationOptions
  * @param bool $do_test = false
  */
 function create_control_verification(&$verificationOptions, $do_test = false)

@@ -67,7 +67,7 @@ class paypal_display
 	 * plus all the standard ones for the subscription form
 	 *
 	 * @param int $unique_id for the transaction
-	 * @param array $sub_data subscription data array, name, reocurring, etc
+	 * @param mixed[] $sub_data subscription data array, name, reocurring, etc
 	 * @param int $value amount of the transaction
 	 * @param string $period length of the transaction
 	 * @param string $return_url
@@ -224,7 +224,7 @@ class paypal_payment
 			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 1);
 			curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
 			curl_setopt($curl, CURLOPT_FORBID_REUSE, 1);
-
++
 			// Set TCP timeout to 30 seconds
 			curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 30);
 
@@ -313,10 +313,7 @@ class paypal_payment
 	 */
 	public function isRefund()
 	{
-		if ($_POST['payment_status'] === 'Refunded' || $_POST['payment_status'] === 'Reversed' || $_POST['txn_type'] === 'Refunded' || ($_POST['txn_type'] === 'reversal' && $_POST['payment_status'] === 'Completed'))
-			return true;
-		else
-			return false;
+		return (($_POST['payment_status'] === 'Refunded' || $_POST['payment_status'] === 'Reversed' || $_POST['txn_type'] === 'Refunded' || ($_POST['txn_type'] === 'reversal' && $_POST['payment_status'] === 'Completed')));
 	}
 
 	/**
@@ -326,10 +323,7 @@ class paypal_payment
 	 */
 	public function isSubscription()
 	{
-		if (substr($_POST['txn_type'], 0, 14) === 'subscr_payment' && $_POST['payment_status'] === 'Completed')
-			return true;
-		else
-			return false;
+		return (substr($_POST['txn_type'], 0, 14) === 'subscr_payment' && $_POST['payment_status'] === 'Completed');
 	}
 
 	/**
@@ -339,10 +333,7 @@ class paypal_payment
 	 */
 	public function isPayment()
 	{
-		if ($_POST['payment_status'] === 'Completed' && $_POST['txn_type'] === 'web_accept')
-			return true;
-		else
-			return false;
+		return ($_POST['payment_status'] === 'Completed' && $_POST['txn_type'] === 'web_accept');
 	}
 
 	/**
@@ -368,6 +359,7 @@ class paypal_payment
 		if ($_POST['txn_type'] == 'subscr_payment' && !empty($_POST['subscr_id']))
 		{
 			$_POST['subscr_id'] = $_POST['subscr_id'];
+			
 			$db->query('', '
 				UPDATE {db_prefix}log_subscribed
 				SET vendor_ref = {string:vendor_ref}

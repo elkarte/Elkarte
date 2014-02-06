@@ -84,7 +84,7 @@ class Sphinx_Search
 	 * Check whether the method can be performed by this API.
 	 *
 	 * @param string $methodName
-	 * @param mixed $query_params
+	 * @param mixed[]|null $query_params
 	 */
 	public function supportsMethod($methodName, $query_params = null)
 	{
@@ -137,10 +137,10 @@ class Sphinx_Search
 	/**
 	 * Do we have to do some work with the words we are searching for to prepare them?
 	 *
-	 * @param array $word
-	 * @param array $wordsSearch
-	 * @param array $wordsExclude
-	 * @param array $isExcluded
+	 * @param mixed[] $word
+	 * @param mixed[] $wordsSearch
+	 * @param string[] $wordsExclude
+	 * @param boolean $isExcluded
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
 	{
@@ -155,11 +155,11 @@ class Sphinx_Search
 	/**
 	 * This has it's own custom search.
 	 *
-	 * @param array $search_params
-	 * @param array $search_words
-	 * @param array $excluded_words
-	 * @param array $participants
-	 * @param array $search_results
+	 * @param mixed[] $search_params
+	 * @param mixed[] $search_words
+	 * @param string[] $excluded_words
+	 * @param int[] $participants
+	 * @param string[] $search_results
 	 */
 	public function searchQuery($search_params, $search_words, $excluded_words, &$participants, &$search_results)
 	{

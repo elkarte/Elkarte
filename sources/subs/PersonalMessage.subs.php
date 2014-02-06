@@ -332,7 +332,7 @@ function markMessages($personal_messages = null, $label = null, $owner = null)
 /**
  * Mark the specified personal messages as unread.
  *
- * @param int[] $personal_messages = array of pm ids to mark unread
+ * @param int[]|int $personal_messages = array of pm ids to mark unread
  */
 function markMessagesUnread($personal_messages)
 {

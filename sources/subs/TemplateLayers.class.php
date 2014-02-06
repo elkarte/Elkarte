@@ -94,7 +94,7 @@ class Template_Layers
 	 * Add a new layer to the pile
 	 *
 	 * @param string $layer name of a layer
-	 * @param int $priority an integer defining the priority of the layer.
+	 * @param int|null $priority an integer defining the priority of the layer.
 	 */
 	public function add($layer, $priority = null)
 	{
@@ -137,7 +137,7 @@ class Template_Layers
 	 * Add a layer at the end of the pile
 	 *
 	 * @param string $layer name of a layer
-	 * @param int $priority an integer defining the priority of the layer.
+	 * @param int|null $priority an integer defining the priority of the layer.
 	 */
 	public function addEnd($layer, $priority = null)
 	{
@@ -152,7 +152,7 @@ class Template_Layers
 	 * Add a layer at the beginning of the pile
 	 *
 	 * @param string $layer name of a layer
-	 * @param int $priority an integer defining the priority of the layer.
+	 * @param int|null $priority an integer defining the priority of the layer.
 	 */
 	public function addBegin($layer, $priority = null)
 	{

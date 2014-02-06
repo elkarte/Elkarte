@@ -61,7 +61,7 @@ class authorize_display
 	 * Called from Profile-Actions.php to return a unique set of fields for the given gateway
 	 *
 	 * @param int $unique_id
-	 * @param array $sub_data
+	 * @param mixed[] $sub_data
 	 * @param int $value
 	 * @param string $period
 	 * @param string $return_url
@@ -205,10 +205,7 @@ class authorize_payment
 	 */
 	public function isPayment()
 	{
-		if ($_POST['x_response_code'] == 1)
-			return true;
-		else
-			return false;
+		return $_POST['x_response_code'] == 1;
 	}
 
 	/**

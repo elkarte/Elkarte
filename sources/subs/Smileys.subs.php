@@ -23,7 +23,7 @@ if (!defined('ELK'))
 /**
  * Validates, if a smiley already exists
  *
- * @param array $smileys
+ * @param string[] $smileys
  * @return array
  */
 function smileyExists($smileys)
@@ -50,7 +50,7 @@ function smileyExists($smileys)
  * Validates duplicate smileys
  *
  * @param string $code
- * @param string $current
+ * @param string|null $current
  * @return boolean
  */
 function validateDuplicateSmiley($code, $current = null)
@@ -103,7 +103,7 @@ function nextSmileyLocation($location)
 /**
  * Adds a smiley to the database
  *
- * @param array $param
+ * @param mixed[] $param associative array to use in the insert
  */
 function addSmiley($param)
 {
@@ -122,7 +122,7 @@ function addSmiley($param)
 /**
  * Deletes smileys.
  *
- * @param array $smileys
+ * @param int[] $smileys
  */
 function deleteSmileys($smileys)
 {
@@ -140,7 +140,7 @@ function deleteSmileys($smileys)
 /**
  * Changes the display type of given smileys.
  *
- * @param array $smileys
+ * @param int[] $smileys
  * @param int $display_type
  */
 function updateSmileyDisplayType($smileys, $display_type)
@@ -161,7 +161,7 @@ function updateSmileyDisplayType($smileys, $display_type)
 /**
  * Updates a smiley.
  *
- * @param array $param
+ * @param mixed[] $param
  */
 function updateSmiley($param)
 {
@@ -389,16 +389,13 @@ function isSmileySetInstalled($set)
 			'current_package' => $set,
 		)
 	);
-	if ($db->num_rows($request) > 0)
-		return false;
-
-	return true;
+	return !($db->num_rows($request) > 0);
 }
 
 /**
  * Logs the installation of a new smiley set.
  *
- * @param array $param
+ * @param mixed[] $param
  */
 function logPackageInstall($param)
 {
@@ -496,7 +493,7 @@ function list_getSmileySets($start, $items_per_page, $sort)
 	}
 
 	$sort_flag = strpos($sort, 'DESC') === false ? SORT_ASC : SORT_DESC;
-	
+
 	if (substr($sort, 0, 4) === 'name')
 		array_multisort($cols['name'], $sort_flag, SORT_REGULAR, $cols['path'], $cols['selected'], $cols['id']);
 	elseif (substr($sort, 0, 4) === 'path')

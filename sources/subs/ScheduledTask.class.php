@@ -1367,7 +1367,6 @@ class ScheduledTask
 				'poster_time_old' => time() - (86400 * $modSettings['drafts_keep_days']),
 			)
 		);
-
 		while ($row = $db->fetch_row($request))
 			$drafts[] = (int) $row[0];
 		$db->free_result($request);
@@ -1512,7 +1511,7 @@ class ScheduledTask
 				break;
 			}
 
-			// If there is no more users, scheduleTaskImmediate can be stopped
+			// If there are no more users, scheduleTaskImmediate can be stopped
 			if (empty($user_access_mentions))
 				removeScheduleTaskImmediate('user_access_mentions', false);
 
@@ -1521,6 +1520,7 @@ class ScheduledTask
 		else
 		{
 			$start = !empty($modSettings['user_access_mentions']) ? $modSettings['user_access_mentions'] : 0;
+
 			// Checks 10 users at a time, the scheduled task is set to run once per hour, so 240 users a day
 			// @todo <= I know you like it Spuds! :P It may be necessary to set it to something higher.
 			$limit = 10;
@@ -1603,6 +1603,7 @@ class ScheduledTask
 					}
 				}
 			}
+
 			return true;
 		}
 	}

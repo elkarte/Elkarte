@@ -275,7 +275,7 @@ function load_user_drafts($member_id, $draft_type = 0, $topic = false, $order = 
  * Validates the drafts are from the user
  * If supplied an array of drafts will attempt to remove all of them
  *
- * @param int $id_draft
+ * @param int[]|int $id_draft
  * @param int $member_id
  * @param bool $check
  */

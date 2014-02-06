@@ -27,7 +27,7 @@ if (!defined('ELK'))
  * Removes the passed id_topic's.
  * Permissions are NOT checked here because the function is used in a scheduled task
  *
- * @param array/int $topics The topics to remove (can be an id or an array of ids).
+ * @param int[]|int $topics The topics to remove (can be an id or an array of ids).
  * @param bool $decreasePostCount if true users' post count will be reduced
  * @param bool $ignoreRecycling if true topics are not moved to the recycle board (if it exists).
  */
@@ -405,7 +405,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
  * Updates the posts count of the affected boards
  * This function doesn't check permissions.
  *
- * @param array $topics
+ * @param int[]|int $topics
  * @param int $toBoard
  */
 function moveTopics($topics, $toBoard)
@@ -773,7 +773,7 @@ function increaseViewCounter($id_topic)
 /**
  * Mark topic(s) as read by the given member, at the specified message.
  *
- * @param array $mark_topics array($id_member, $id_topic, $id_msg)
+ * @param mixed[] $mark_topics array($id_member, $id_topic, $id_msg)
  * @param bool $was_set = false - whether the topic has been previously read by the user
  */
 function markTopicsRead($mark_topics, $was_set = false)
@@ -1087,14 +1087,14 @@ function setTopicWatch($id_member, $topic, $on = false)
  * - returns topic details, subject, last message read, etc when full is true
  * - uses any integration information (value selects, tables and parameters) if passed and full is true
  *
- * @param array $topic_parameters can also accept a int value for a topic
+ * @param mixed[]|int $topic_parameters can also accept a int value for a topic
  * @param string $full defines the values returned by the function:
  *		- if empty returns only the data from {db_prefix}topics
  *		- if 'message' returns also informations about the message (subject, body, etc.)
  *		- if 'starter' returns also informations about the topic starter (id_member and poster_name)
  *		- if 'all' returns additional infos about the read/unwatched status
- * @param array $selects (optional from integation)
- * @param array $tables (optional from integation)
+ * @param string[] $selects (optional from integation)
+ * @param string[] $tables (optional from integation)
  */
 function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables = array())
 {
@@ -1369,7 +1369,7 @@ function countMessagesBefore($id_topic, $id_msg, $include_current = false, $only
  * @param int $topic
  * @param int $start
  * @param int $per_page
- * @param array $messages
+ * @param mixed[] $messages
  * @param bool $only_approved
  */
 function selectMessages($topic, $start, $per_page, $messages = array(), $only_approved = false)
@@ -1449,7 +1449,6 @@ function topicMessages($topic)
 			'current_member' => $user_info['id'],
 		)
 	);
-
 	$posts = array();
 	while ($row = $db->fetch_assoc($request))
 	{
@@ -1477,7 +1476,7 @@ function topicMessages($topic)
  * Returns array of file attachment name along with width/height properties
  * Will only return approved attachments
  *
- * @param array $id_messages
+ * @param int[] $id_messages
  */
 function messagesAttachments($id_messages)
 {
@@ -1575,7 +1574,7 @@ function unapprovedPosts($id_topic, $id_member)
 /**
  * Update topic info after a successful split of a topic.
  *
- * @param array $options
+ * @param mixed[] $options
  * @param int $id_board
  */
 function updateSplitTopics($options, $id_board)
@@ -1691,7 +1690,7 @@ function topicStatus($topic)
  * It sets the new value for the attribute as passed to it.
  *
  * @param int $topic
- * @param array $attributes
+ * @param mixed[] $attributes
  */
 function setTopicAttribute($topic, $attributes)
 {
@@ -1759,7 +1758,7 @@ function topicAttribute($id_topic, $attribute)
 /**
  * Retrieve some details about the topic
  *
- * @param array $topics an array of topic id
+ * @param int[] $topics an array of topic id
  */
 function topicsDetails($topics)
 {
@@ -1786,7 +1785,7 @@ function topicsDetails($topics)
 /**
  * Toggle sticky status for the passed topics.
  *
- * @param array $topics
+ * @param int[] $topics
  */
 function toggleTopicSticky($topics)
 {
@@ -1810,7 +1809,7 @@ function toggleTopicSticky($topics)
  * Get topics from the log_topics table belonging to a certain user
  *
  * @param int $member a member id
- * @param array $topics an array of topics
+ * @param int[] $topics an array of topics
  * @return array an array of topics in the table (key) and its unwatched status (value)
  *
  * @todo find a better name
@@ -1840,7 +1839,7 @@ function getLoggedTopics($member, $topics)
 /**
  * Returns a list of topics ids and their subjects
  *
- * @param array $topic_ids
+ * @param int[] $topic_ids
  */
 function topicsList($topic_ids)
 {
@@ -1886,7 +1885,7 @@ function topicsList($topic_ids)
  * limit or sort direction.
  *
  * @param int $topic
- * @param array $limit
+ * @param mixed[] $limit
  * @param string $sort
  * @return array
  */
@@ -1930,8 +1929,8 @@ function getTopicsPostsAndPoster($topic, $limit, $sort)
 /**
  * Remove a batch of messages (or topics)
  *
- * @param array $messages
- * @param array $messageDetails
+ * @param int[] $messages
+ * @param mixed[] $messageDetails
  * @param string $type = replies
  */
 function removeMessages($messages, $messageDetails, $type = 'replies')
@@ -1967,8 +1966,8 @@ function removeMessages($messages, $messageDetails, $type = 'replies')
 /**
  * Approve a batch of posts (or topics in their own right)
  *
- * @param array $messages
- * @param array $messageDetails
+ * @param int[] $messages
+ * @param mixed[] $messageDetails
  * @param (string) $type = replies
  */
 function approveMessages($messages, $messageDetails, $type = 'replies')
@@ -1995,7 +1994,7 @@ function approveMessages($messages, $messageDetails, $type = 'replies')
 /**
  * Approve topics, all we got.
  *
- * @param array $topics array of topics ids
+ * @param int[] $topics array of topics ids
  * @param bool $approve = true
  */
 function approveTopics($topics, $approve = true)
@@ -2035,7 +2034,7 @@ function approveTopics($topics, $approve = true)
  *
  * @param string $reason the text that will become the message body
  * @param string $subject the text that will become the message subject
- * @param array $board_info some board informations (at least id, name, if posts are counted)
+ * @param mixed[] $board_info some board informations (at least id, name, if posts are counted)
  * @param string $new_topic used to buld the url for moving to a new topic
  */
 function postSplitRedirect($reason, $subject, $board_info, $new_topic)
@@ -2086,7 +2085,7 @@ function postSplitRedirect($reason, $subject, $board_info, $new_topic)
  * a notification is sent to all users monitoring this topic.
  *
  * @param int $split1_ID_TOPIC
- * @param array $splitMessages
+ * @param int[] $splitMessages
  * @param string $new_subject
  * @return int the topic ID of the new split topic.
  */
@@ -2346,7 +2345,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
  * If we are also moving the topic somewhere else, let's try do to it
  * Includes checks for permissions move_own/any, etc.
  *
- * @param array $boards an array containing basic info of the origin and destination boards (from splitDestinationBoard)
+ * @param mixed[] $boards an array containing basic info of the origin and destination boards (from splitDestinationBoard)
  * @param int $totopic id of the destination topic
  */
 function splitAttemptMove($boards, $totopic)
@@ -2359,7 +2358,6 @@ function splitAttemptMove($boards, $totopic)
 	if ($boards['destination']['id'] != $board)
 	{
 		$doMove = false;
-		$new_topic = array();
 		if (allowedTo('move_any'))
 			$doMove = true;
 		else
@@ -2674,7 +2672,7 @@ function mergeableTopics($id_board, $id_topic, $approved, $offset)
 /**
  * Determines all messages from a given array of topics.
  *
- * @param array $topics integer array of topics to work with
+ * @param int[] $topics integer array of topics to work with
  * @return array
  */
 function messagesInTopics($topics)
@@ -2700,7 +2698,7 @@ function messagesInTopics($topics)
 /**
  * Retrieves the members that posted in a group of topics.
  *
- * @param array $topics integer array of topics to work with
+ * @param int[] $topics integer array of topics to work with
  * @return array of topics each member posted in (grouped by members)
  */
 function topicsPosters($topics)
@@ -2727,7 +2725,7 @@ function topicsPosters($topics)
  * Updates all the tables involved when two or more topics are merged
  *
  * @param int $first_msg the first message of the new topic
- * @param array $topics ids of all the topics merged
+ * @param int[] $topics ids of all the topics merged
  * @param int $id_topic id of the merged topic
  * @param int $target_board id of the target board where the topic will resides
  * @param string $target_subject subject of the new topic
@@ -2923,7 +2921,7 @@ function getSubject($id_topic)
  * or if parameter $increment is true it simply increments them.
  * Used by updateStats('topic').
  *
- * @param bool $increment = null if true, increment + 1 the total topics, otherwise recount all topics
+ * @param bool|null $increment = null if true, increment + 1 the total topics, otherwise recount all topics
  */
 function updateTopicStats($increment = null)
 {

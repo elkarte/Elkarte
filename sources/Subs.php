@@ -748,8 +748,8 @@ function permute($array)
  * - uses the cache_id as a unique identifier to facilitate any caching it may do.
  *  -returns the modified message.
  *
- * @param string $message
- * @param bool $smileys = true
+ * @param string|false $message if false return list of enabled bbc codes
+ * @param bool|string $smileys = true
  * @param string $cache_id = ''
  * @param string[]|null $parse_tags array of tags to parse, null for all
  * @return string

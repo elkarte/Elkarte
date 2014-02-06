@@ -95,7 +95,7 @@ class Custom_Search
 	 * Check whether the search can be performed by this API.
 	 *
 	 * @param string $methodName
-	 * @param string $query_params
+	 * @param string|null $query_params
 	 * @return boolean
 	 */
 	public function supportsMethod($methodName, $query_params = null)
@@ -151,8 +151,8 @@ class Custom_Search
 	 * Do we have to do some work with the words we are searching for to prepare them?
 	 *
 	 * @param string $word
-	 * @param array $wordsSearch
-	 * @param array $wordsExclude
+	 * @param mixed[] $wordsSearch
+	 * @param string[] $wordsExclude
 	 * @param boolean $isExcluded
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
@@ -184,8 +184,8 @@ class Custom_Search
 	/**
 	 * Search for indexed words.
 	 *
-	 * @param array $words
-	 * @param array $search_data
+	 * @param mixed[] $words
+	 * @param mixed[] $search_data
 	 */
 	public function indexedWordQuery($words, $search_data)
 	{
@@ -279,9 +279,9 @@ class Custom_Search
 	/**
 	 * After a post is made, we update the search index database
 	 *
-	 * @param array $msgOptions
-	 * @param array $topicOptions
-	 * @param array $posterOptions
+	 * @param mixed[] $msgOptions
+	 * @param mixed[] $topicOptions
+	 * @param mixed[] $posterOptions
 	 */
 	public function postCreated($msgOptions, $topicOptions, $posterOptions)
 	{
@@ -307,9 +307,9 @@ class Custom_Search
 	/**
 	 * After a post is modified, we update the search index database.
 	 *
-	 * @param array $msgOptions
-	 * @param array $topicOptions
-	 * @param array $posterOptions
+	 * @param mixed[] $msgOptions
+	 * @param mixed[] $topicOptions
+	 * @param mixed[] $posterOptions
 	 */
 	public function postModified($msgOptions, $topicOptions, $posterOptions)
 	{

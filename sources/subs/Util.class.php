@@ -120,7 +120,7 @@ class Util
 	 *
 	 * @param string $string
 	 * @param string $start
-	 * @param int $length
+	 * @param int|null $length
 	 */
 	static function substr($string, $start, $length = null)
 	{
@@ -249,7 +249,7 @@ class Util
 	 * @todo not used, consider removing
 	 * @deprecated since 1.0
 	 *
-	 * @param array|string $var
+	 * @param mixed[]|string $var
 	 * @return array|string
 	 */
 	static function escapestring_recursive($var)
@@ -277,7 +277,7 @@ class Util
 	 * @todo not used, consider removing
 	 * @deprecated since 1.0
 	 *
-	 * @param array|string $var
+	 * @param mixed[]|string $var
 	 * @param int $level = 0
 	 * @return array|string
 	 */
@@ -306,7 +306,7 @@ class Util
 	 * @todo not used, consider removing
 	 * @deprecated since 1.0
 	 *
-	 * @param array|string $var
+	 * @param mixed[]|string $var
 	 * @param int $level = 0
 	 * @return array|string
 	 */
@@ -335,7 +335,7 @@ class Util
 	 * @todo not used, consider removing
 	 * @deprecated since 1.0
 	 *
-	 * @param array|string $var
+	 * @param mixed[]|string $var
 	 * @return array|string
 	 */
 	function unescapestring_recursive($var)

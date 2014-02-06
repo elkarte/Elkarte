@@ -140,7 +140,7 @@ function genderRatio()
 /**
  * Loads a list of top x posters, x is configurable via $modSettings['stats_limit'].
  *
- * @param int $limit
+ * @param int|null $limit
  * @return array
  */
 function topPosters($limit = null)
@@ -196,7 +196,7 @@ function topPosters($limit = null)
 /**
  * Loads a list of top x boards, x is configurable via $modSettings['stats_limit'].
  *
- * @param int $limit if not supplied, defaults to 10
+ * @param int|null $limit if not supplied, defaults to 10
  * @param boolean $read_status
  * @return array
  */
@@ -262,7 +262,7 @@ function topBoards($limit = null, $read_status = false)
 /**
  * Loads a list of top x topic replies, x is configurable via $modSettings['stats_limit'].
  *
- * @param int $limit if not supplied, defaults to 10
+ * @param int|null $limit if not supplied, defaults to 10
  * @return array
  */
 function topTopicReplies($limit = null)
@@ -355,7 +355,7 @@ function topTopicReplies($limit = null)
 /**
  * Loads a list of top x topic views, x is configurable via $modSettings['stats_limit'].
  *
- * @param int $limit if not supplied, defaults to 10
+ * @param int|null $limit if not supplied, defaults to 10
  * @return array
  */
 function topTopicViews($limit = null)
@@ -661,9 +661,9 @@ function monthlyActivity()
 /**
  * Loads the statistics on a daily basis in $context.
  * called by action_stats().
- * 
+ *
  * @param string $condition_string
- * @param array $condition_parameters = array()
+ * @param mixed[] $condition_parameters = array()
  */
 function getDailyStats($condition_string, $condition_parameters = array())
 {

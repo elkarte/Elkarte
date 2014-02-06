@@ -45,11 +45,9 @@ function createWaveFile($word)
 	// Try to see if there's a sound font in the user's language.
 	if (file_exists($settings['default_theme_dir'] . '/fonts/sound/a.' . $user_info['language'] . '.wav'))
 		$sound_language = $user_info['language'];
-
 	// English should be there.
 	elseif (file_exists($settings['default_theme_dir'] . '/fonts/sound/a.english.wav'))
 		$sound_language = 'english';
-
 	// Guess not...
 	else
 		return false;
@@ -91,7 +89,6 @@ function createWaveFile($word)
 						$sound_word .= chr(min(max(ord($sound_letter[$j]) + $shift, 0x00), 0xFF));
 				}
 			break;
-
 		}
 
 		$sound_word .= str_repeat(chr(0x80), mt_rand(10000, 10500));

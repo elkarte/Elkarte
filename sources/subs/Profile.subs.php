@@ -2667,7 +2667,7 @@ function getNumUnwatchedBy($memID)
  * @param int $memID
  * @param int|null $board
  */
-function count_user_posts($memID, $board = '')
+function count_user_posts($memID, $board = null)
 {
 	global $modSettings, $user_info;
 
@@ -2702,7 +2702,7 @@ function count_user_posts($memID, $board = '')
  * @param int $memID
  * @param int|null $board
  */
-function count_user_topics($memID, $board = '')
+function count_user_topics($memID, $board = null)
 {
 	global $modSettings, $user_info;
 
@@ -2738,7 +2738,7 @@ function count_user_topics($memID, $board = '')
  * @param int $memID
  * @param int|null $board
  */
-function findMinMaxUserMessage($memID, $board = '')
+function findMinMaxUserMessage($memID, $board = null)
 {
 	global $modSettings, $user_info;
 
@@ -2777,7 +2777,7 @@ function findMinMaxUserMessage($memID, $board = '')
  * @param boolean $reverse
  * @param int|null $board
  */
-function load_user_posts($memID, $start, $count, $range_limit = '', $reverse = false, $board = '')
+function load_user_posts($memID, $start, $count, $range_limit = '', $reverse = false, $board = null)
 {
 	global $modSettings, $user_info;
 
@@ -2838,9 +2838,9 @@ function load_user_posts($memID, $start, $count, $range_limit = '', $reverse = f
  * @param int $count
  * @param string $range_limit
  * @param boolean $reverse
- * @param string $board
+ * @param int|null $board
  */
-function load_user_topics($memID, $start, $count, $range_limit = '', $reverse = false, $board = '')
+function load_user_topics($memID, $start, $count, $range_limit = '', $reverse = false, $board = null)
 {
 	global $modSettings, $user_info;
 
@@ -2960,7 +2960,7 @@ function getMemberGeneralPermissions($curGroups)
  * @param int[] $curGroups
  * @param int|null $board
  */
-function getMemberBoardPermissions($memID, $curGroups, $board = '')
+function getMemberBoardPermissions($memID, $curGroups, $board = null)
 {
 	global $txt;
 

@@ -165,7 +165,7 @@ class Settings_Form
 	/**
 	 * Helper method, it sets up the context for database settings.
 	 *
-	 * @param array $config_vars
+	 * @param mixed[] $config_vars
 	 */
 	static function prepare_db(&$config_vars)
 	{
@@ -430,7 +430,7 @@ class Settings_Form
 	/**
 	 * Helper method for saving database settings.
 	 *
-	 * @param array $config_vars
+	 * @param mixed[] $config_vars
 	 */
 	static function save_db(&$config_vars)
 	{
@@ -521,7 +521,7 @@ class Settings_Form
 	 * - attempts to create a backup file and will use it should the writing of the
 	 *   new settings file fail
 	 *
-	 * @param array $config_vars
+	 * @param mixed[] $config_vars
 	 */
 	static function save_file($config_vars)
 	{
@@ -679,7 +679,7 @@ class Settings_Form
 	 *  - either, an empty string for a horizontal rule.
 	 *  - or, a string for a titled section.
 	 *
-	 * @param array $config_vars = null array of config vars, if null the method returns the current configuration
+	 * @param mixed[]|null $config_vars = null array of config vars, if null the method returns the current configuration
 	 */
 	public function settings($config_vars = null)
 	{
