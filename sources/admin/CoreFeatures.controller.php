@@ -24,7 +24,6 @@ if (!defined('ELK'))
  * This class takes care of the Core Features admin screen.
  * It sets up the context, initializes the features info for display,
  * updates the settings for enabled/disabled core features as requested.
- *
  */
 class CoreFeatures_Controller extends Action_Controller
 {
@@ -49,7 +48,6 @@ class CoreFeatures_Controller extends Action_Controller
 	 *    settings - Array of settings to change (For each name => value) on enable - reverse is done for disable. If > 1 will not change value if set.
 	 *    setting_callback - Function that returns an array of settings to save - takes one parameter which is value for this feature.
 	 *    save_callback - Function called on save, takes state as parameter.
-	 *
 	 */
 	public function action_features()
 	{
@@ -96,6 +94,7 @@ class CoreFeatures_Controller extends Action_Controller
 							$setting_changes[$key] = !empty($_POST['feature_' . $id]) ? $value : !$value;
 					}
 				}
+
 				// Is there a call back for settings?
 				if (isset($feature['setting_callback']))
 				{
@@ -146,6 +145,7 @@ class CoreFeatures_Controller extends Action_Controller
 		// Are they a new user?
 		$context['is_new_install'] = !isset($modSettings['admin_features']);
 		$context['force_disable_tabs'] = $context['is_new_install'];
+
 		// Don't show them this twice!
 		if ($context['is_new_install'])
 			updateSettings(array('admin_features' => ''));
@@ -376,7 +376,11 @@ class CoreFeatures_Controller extends Action_Controller
 		$context['sub_template'] = 'show_settings';
 
 		// By default do the basic settings.
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (!empty($defaultAction) ? $defaultAction : array_pop($temp = array_keys($subActions)));
-		$context['sub_action'] = $_REQUEST['sa'];
+		if (isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]))
+			$context['sub_action'] = $_REQUEST['sa'];
+		elseif (!empty($defaultAction))
+			$context['sub_action'] = $defaultAction;
+		else
+			$context['sub_action'] = array_pop($temp = array_keys($subActions));
 	}
 }

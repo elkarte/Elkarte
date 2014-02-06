@@ -1525,7 +1525,7 @@ function moveAvatars()
 /**
  * Extend the message body with a removal message.
  *
- * @param string $messages messages to update
+ * @param int[] $messages array of message id's to update
  * @param string $notice notice to add
  */
 function setRemovalNotice($messages, $notice)
@@ -1580,7 +1580,7 @@ function attachmentsOfMessage($id_msg, $unapproved = false)
 /**
  * Counts attachments for the given folder.
  *
- * @param id $id_folder
+ * @param int $id_folder
  */
 function countAttachmentsInFolders($id_folder)
 {

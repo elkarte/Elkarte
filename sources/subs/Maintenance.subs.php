@@ -147,9 +147,11 @@ function detectExceedingMessages($start, $increment)
 }
 
 /**
- * loads messages, which exceed the lenght
+ * loads messages, which exceed the lenght that will fit in the col field
+ * Used by maintenance when convert the column "body" of the table from TEXT to MEDIUMTEXT
+ * and vice versa.
  *
- * @param int $msg
+ * @param int[] $msg
  * @return array
  */
 function getExceedingMessages($msg)

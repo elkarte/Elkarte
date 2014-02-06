@@ -77,7 +77,7 @@ function saveTriggers($suggestions, $ban_group, $member = 0, $ban_id = 0)
  * Doesn't clean the inputs
  *
  * @param int[]|int $items_ids
- * @param boolean $group_id
+ * @param int|boolean $group_id
  * @return bool
  */
 function removeBanTriggers($items_ids = array(), $group_id = false)

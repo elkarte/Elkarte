@@ -236,10 +236,11 @@ class Data_Validator
 	/**
 	 * Return any errors found, either in the raw or nicely formatted
 	 *
-	 * @param mixed[]|boolean $raw
+	 * @param mixed[]|string|boolean $raw
 	 *    - true returns the raw error array,
 	 *    - array returns just error messages of those fields
-	 *    - otherwise all error message(s)
+	 *    - string returns just that error message
+	 *    - default is all error message(s)
 	 */
 	public function validation_errors($raw = false)
 	{

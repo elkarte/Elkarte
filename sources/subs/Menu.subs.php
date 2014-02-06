@@ -23,7 +23,7 @@ if (!defined('ELK'))
 /**
  * Create a menu.
  *
- * @param string $menuData the menu array
+ * @param mixed[] $menuData the menu array
  * @param mixed[] $menuOptions an array of options that can be used to override some default behaviours.
  *   It can accept the following indexes:
  *    - action                    => overrides the default action

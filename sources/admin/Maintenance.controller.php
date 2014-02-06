@@ -521,6 +521,7 @@ class Maintenance_Controller extends Action_Controller
 
 		isAllowedTo('admin_forum');
 
+		// Some validation
 		checkSession('post');
 		validateToken('admin-maint');
 
