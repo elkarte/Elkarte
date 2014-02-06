@@ -866,7 +866,7 @@ class Email_Parse
 	 * - will look in various header fields where the ip may reside
 	 * - returns false if it can't find a valid IP4
 	 *
-	 * @return string or boolean on fail
+	 * @return string|boolean on fail
 	 */
 	public function load_ip()
 	{
@@ -891,7 +891,7 @@ class Email_Parse
 	 * Finds if any spam headers have been positively set and returns that flag
 	 * - will look in various header fields where the spam status may reside
 	 *
-	 * @return string or boolean on fail
+	 * @return string|boolean on fail
 	 */
 	public function load_spam()
 	{
