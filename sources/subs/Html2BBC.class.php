@@ -823,6 +823,7 @@ class Convert_BBC
 	 * Gets the inner html of a node
 	 *
 	 * @param object $node
+	 * @return string
 	 */
 	private function _get_innerHTML($node)
 	{

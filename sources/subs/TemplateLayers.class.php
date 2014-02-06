@@ -330,7 +330,7 @@ class Template_Layers
 	 * or create a new instance if it didn't already exist.
 	 *
 	 * @param boolean $error_safe if error mode is on or off
-	 * @return an instance of the class
+	 * @return Template_Layers instance of the class
 	 */
 	public static function getInstance($error_safe = false)
 	{

@@ -494,7 +494,7 @@ class Xml_Array
 	 * Get a specific element's xml. (privately used...)
 	 *
 	 * @param $array
-	 * @param $indent
+	 * @param null|integer $indent
 	 */
 	protected function _xml($array, $indent)
 	{

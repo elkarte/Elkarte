@@ -46,7 +46,6 @@ class Register_Controller extends Action_Controller
 	 *
 	 * @uses Register template, registration_agreement or registration_form sub template
 	 * @uses Login language file
-	 * @param array $reg_errors = array()
 	 */
 	function action_register()
 	{

@@ -285,7 +285,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
  * @param bool $send_html = false
  * @param int $priority = 3
  * @param boolean $is_private
- * @param string|int $message_id
+ * @param string|null $message_id
  * @return boolean
  */
 function AddMailQueue($flush = false, $to_array = array(), $subject = '', $message = '', $headers = '', $send_html = false, $priority = 3, $is_private = false, $message_id = '')
@@ -392,7 +392,7 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
  *  characters are converted to HTML entities to assure proper display of the mail
  * @param string $line_break
  * @param string|null $custom_charset = null, if set, it uses this character set
- * @return array an array containing the character set, the converted string and the transport method.
+ * @return string[] an array containing the character set, the converted string and the transport method.
  */
 function mimespecialchars($string, $with_charset = true, $hotmail_fix = false, $line_break = "\r\n", $custom_charset = null)
 {
@@ -647,7 +647,7 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
  * @param string $message - the message to send
  * @param resource $socket - socket to send on
  * @param string $response - the expected response code
- * @return whether it responded as such.
+ * @return string|boolean it responded as such.
  */
 function server_parse($message, $socket, $response)
 {

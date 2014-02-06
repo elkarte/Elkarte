@@ -41,6 +41,7 @@ class MarkRead_Controller extends Action_Controller
 
 	/**
 	 * This function forwards the request to the appropriate function.
+	 * @return string
 	 */
 	private function _dispatch()
 	{

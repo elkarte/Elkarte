@@ -377,7 +377,7 @@ class paypal_payment
 	/**
 	 * A private function to find out the subscription details.
 	 *
-	 * @return boolean
+	 * @return false|null
 	 */
 	private function _findSubscription()
 	{

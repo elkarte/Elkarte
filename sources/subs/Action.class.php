@@ -87,6 +87,7 @@ class Action
 	 *
 	 * @param mixed[] $subactions array of know subactions
 	 * @param string $default default action if unknown sa is requested
+	 * @return string
 	 */
 	public function initialize($subactions, $default = '')
 	{

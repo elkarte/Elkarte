@@ -332,7 +332,6 @@ function markMessages($personal_messages = null, $label = null, $owner = null)
 /**
  * Mark the specified personal messages as unread.
  *
- * @param int[]|int $personal_messages = array of pm ids to mark unread
  */
 function markMessagesUnread($personal_messages)
 {
@@ -425,7 +424,7 @@ function updatePMMenuCounts($owner)
  *
  * @param int $pmID
  * @param $validFor
- * @return boolean
+ * @return boolean|null
  */
 function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
 {
@@ -1386,7 +1385,7 @@ function getPmsFromDiscussion($pm_heads)
  * @param mixed[] $to_label
  * @param string $label_type
  * @param int $user_id
- * @return updatePMLabels
+ * @return integer|null
  */
 function changePMLabels($to_label, $label_type, $user_id)
 {
@@ -1442,7 +1441,7 @@ function changePMLabels($to_label, $label_type, $user_id)
  * @param mixed[] $searchArray
  * @param mixed[] $new_labels
  * @param int $user_id
- * @return updatePMLabels
+ * @return integer|null
  */
 function updateLabelsToPM($searchArray, $new_labels, $user_id)
 {
@@ -2118,6 +2117,7 @@ function loadPersonalMessage($pm_id)
  * @param string $timeQuery raw query, used if we are limiting results to time periods
  * @param string $searchQuery raw query, the actual thing you are searching for in the subject and/or body
  * @param mixed[] $searchq_parameters value parameters used in the above query
+ * @return integer
  */
 function numPMSeachResults($userQuery, $labelQuery, $timeQuery, $searchQuery, $searchq_parameters)
 {

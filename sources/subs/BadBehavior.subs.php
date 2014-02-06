@@ -69,6 +69,7 @@ function deleteBadBehavior($type, $filter)
  * Will take in to acount any current filter value in its count result
  *
  * @param mixed[] $filter
+ * @return integer
  */
 function getBadBehaviorLogEntryCount($filter)
 {

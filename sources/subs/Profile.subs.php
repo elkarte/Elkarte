@@ -1579,7 +1579,7 @@ function profileSendActivation()
 /**
  * Load key signature context data.
  *
- * @return true
+ * @return boolean
  */
 function profileLoadSignatureData()
 {
@@ -1643,7 +1643,7 @@ function profileLoadSignatureData()
 /**
  * Load avatar context data.
  *
- * @return true
+ * @return boolean
  */
 function profileLoadAvatarData()
 {
@@ -2012,7 +2012,7 @@ function profileValidateSignature(&$value)
  * @todo argh, the avatar here. Take this out of here!
  *
  * @param mixed[] $value
- * @return mixed
+ * @return false|string
  */
 function profileSaveAvatarData(&$value)
 {
@@ -2461,7 +2461,7 @@ function list_getUserWarningCount($memID)
  * @param int $items_per_page
  * @param string $sort
  * @param int[] $boardsAllowed
- * @param ing $memID
+ * @param integer $memID
  */
 function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, $memID)
 {
@@ -2666,6 +2666,7 @@ function getNumUnwatchedBy($memID)
  *
  * @param int $memID
  * @param int|null $board
+ * @return integer
  */
 function count_user_posts($memID, $board = null)
 {
@@ -2701,6 +2702,7 @@ function count_user_posts($memID, $board = null)
  *
  * @param int $memID
  * @param int|null $board
+ * @return integer
  */
 function count_user_topics($memID, $board = null)
 {

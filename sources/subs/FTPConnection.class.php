@@ -299,7 +299,7 @@ class Ftp_Connection
 	 *
 	 * @param string $ftp_path
 	 * @param string|boolean $search
-	 * @return boolean
+	 * @return false|string
 	 */
 	public function list_dir($ftp_path = '', $search = false)
 	{
@@ -344,7 +344,7 @@ class Ftp_Connection
 	 *
 	 * @param string $file
 	 * @param string|null $listing
-	 * @return string|boolean
+	 * @return string|false
 	 */
 	public function locate($file, $listing = null)
 	{

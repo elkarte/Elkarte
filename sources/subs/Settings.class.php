@@ -92,7 +92,6 @@ class Settings_Form
 	 * the following named keys are also permitted
 	 *	'disabled' => 'postinput' => 'preinput' =>
 	 *
-	 * @param array $config_vars
 	 */
 	public function prepare_file()
 	{

@@ -1187,6 +1187,7 @@ function url_image_size($url)
  *  - if the forum is using multiple attachments directories,
  *    then the current path is stored as unserialize($modSettings['attachmentUploadDir'])[$modSettings['currentAttachmentUploadDir']]
  *  - otherwise, the current path is $modSettings['attachmentUploadDir'].
+ * @return string
  */
 function getAttachmentPath()
 {
@@ -1206,6 +1207,7 @@ function getAttachmentPath()
 /**
  * The avatars path: if custom avatar directory is set, that's it.
  * Otherwise, it's attachments path.
+ * @return string
  */
 function getAvatarPath()
 {

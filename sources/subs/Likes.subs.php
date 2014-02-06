@@ -17,7 +17,7 @@
  *
  * @param int $id_liker - user_id of the liker/disliker
  * @param mixed[] $liked_message - message array that is being worked on
- * @param char $direction - + for like - for unlike a previous liked one
+ * @param string $direction - + for like - for unlike a previous liked one
  */
 function likePost($id_liker, $liked_message, $direction)
 {
@@ -84,7 +84,7 @@ function loadLikes($messages, $prepare = true)
  * Truncates the like list at a given number and adds in +x others
  *
  * @param int[] $likes array of like ids to process
- * @return array
+ * @return integer[]
  */
 function prepareLikes($likes)
 {

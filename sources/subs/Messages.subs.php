@@ -237,7 +237,6 @@ function removeNonTopicMessages($memID)
  *
  * @param int $message The message id
  * @param bool $decreasePostCount if true users' post count will be reduced
- * @return array an array to set the cookie on with domain and path in it, in that order
  */
 function removeMessage($message, $decreasePostCount = true)
 {

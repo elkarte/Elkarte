@@ -917,7 +917,7 @@ function alreadySubscribed($id_sub, $id_member)
  * Get the current status from a given subscription.
  *
  * @param int $log_id
- * @return array
+ * @return integer
  */
 function getSubscriptionStatus($log_id)
 {

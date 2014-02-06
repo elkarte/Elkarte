@@ -386,6 +386,7 @@ class Convert_Md
 	 * md: [Awesome Site](http://somesite.com 'Title')
 	 *
 	 * @param object $node
+	 * @return string
 	 */
 	private function _convert_anchor($node)
 	{

@@ -211,7 +211,7 @@ function template_generic_menu_dropdown_below()
 /**
  * Some code for showing a tabbed view.
  *
- * @param array $menu_context
+ * @param integer $menu_context
  */
 function template_generic_menu_tabs(&$menu_context)
 {

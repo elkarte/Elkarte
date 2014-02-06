@@ -312,7 +312,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
 /**
  * Deletes one setting from the settings table and takes care of $modSettings as well
  *
- * @param mixed $toRemove the setting or the settings to be removed
+ * @param string $toRemove the setting or the settings to be removed
  */
 function removeSettings($toRemove)
 {
@@ -490,7 +490,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
  * - caches the formatting data from the setting for optimization.
  *
  * @param float $number
- * @param int|bool $override_decimal_count = false or number of decimals
+ * @param integer $override_decimal_count = false or number of decimals
  */
 function comma_format($number, $override_decimal_count = false)
 {
@@ -653,7 +653,7 @@ function forum_time($use_user_offset = true, $timestamp = null)
  * - additionally converts &nbsp with str_replace
  *
  * @param string $string
- * @return the string without entities
+ * @return string string without entities
  */
 function un_htmlspecialchars($string)
 {
@@ -3097,6 +3097,7 @@ function ip2range($fullip)
  * Lookup an IP; try shell_exec first because we can do a timeout on it.
  *
  * @param string $ip
+ * @return string
  */
 function host_from_ip($ip)
 {
@@ -3200,7 +3201,7 @@ function text2words($text, $max_chars = 20, $encrypt = false)
  * @param string $name
  * @param string $alt
  * @param string $label = ''
- * @param boolean $custom = ''
+ * @param string|boolean $custom = ''
  * @param boolean $force_use = false
  * @return string
  *
@@ -4017,6 +4018,7 @@ function prepareSearchEngines()
  *
  * @param object $messages_request holds a query result
  * @param bool $reset
+ * @return integer|null
  */
 function currentContext($messages_request, $reset = false)
 {

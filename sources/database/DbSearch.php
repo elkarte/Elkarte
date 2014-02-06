@@ -26,6 +26,7 @@ interface DbSearch
 	 * @param string $db_string
 	 * @param array $db_values
 	 * @param resource $connection
+	 * @return resource
 	 */
 	function search_query($identifier, $db_string, $db_values = array(), $connection = null);
 
@@ -33,6 +34,7 @@ interface DbSearch
 	 * This method will tell you whether this database type supports this search type.
 	 *
 	 * @param string $search_type
+	 * @return boolean
 	 */
 	function search_support($search_type);
 
@@ -40,6 +42,7 @@ interface DbSearch
 	 * Method for the custom word index table.
 	 *
 	 * @param string $size
+	 * @return void
 	 */
 	function create_word_search($size);
 

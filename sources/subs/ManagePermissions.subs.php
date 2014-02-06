@@ -676,7 +676,7 @@ function loadAllPermissions()
  *
  * @param int[] $groups
  * @param string[]|null $hidden_permissions
- * @return array
+ * @return integer[]
  */
 function countPermissions($groups, $hidden_permissions = null)
 {
@@ -705,7 +705,7 @@ function countPermissions($groups, $hidden_permissions = null)
  * @param int[] $groups
  * @param string[]|null $hidden_permissions
  * @param integer|null $profile_id
- * @return array
+ * @return integer[]
  */
 function countBoardPermissions($groups, $hidden_permissions = null , $profile_id = null)
 {
@@ -1066,7 +1066,7 @@ function deleteInvalidPermissions($id_group, $illegal_permissions)
  * Deletes a membergroup's board permissions from a specified permission profile.
  *
  * @param int $id_group
- * @param profile $id_profile
+ * @param integer $id_profile
  */
 function deleteAllBoardPermissions($id_group, $id_profile)
 {
@@ -1260,7 +1260,7 @@ function deletePermissionProfiles($profiles)
  * Checks, if a permission profile is in use.
  *
  * @param int[] $profiles
- * @return array
+ * @return integer[]
  */
 function permProfilesInUse($profiles)
 {

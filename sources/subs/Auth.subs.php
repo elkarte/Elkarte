@@ -122,7 +122,6 @@ function setLoginCookie($cookie_length, $id, $password = '')
  *
  * @param bool $local
  * @param bool $global
- * @return array an array to set the cookie on with domain and path in it, in that order
  */
 function url_parts($local, $global)
 {
@@ -243,7 +242,7 @@ function adminLogin_outputPostVars($k, $v)
  * Properly urlencodes a string to be used in a query
  *
  * @param mixed[] $get associative array from $_GET
- * @return our query string
+ * @return string query string
  */
 function construct_query_string($get)
 {
@@ -797,7 +796,7 @@ function findUser($where, $where_params, $fatal = true)
  * Find users by their email address.
  *
  * @param string $email
- * @return int
+ * @return boolean
  */
 function userByEmail($email)
 {

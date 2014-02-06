@@ -169,10 +169,25 @@ function create_control_verification(&$verificationOptions, $do_test = false)
  */
 interface Control_Verifications
 {
+	/**
+	 * @return boolean
+	 */
 	function showVerification($isNew, $force_refresh = true);
+
+	/**
+	 * @return void
+	 */
 	function createTest($refresh = true);
 	function prepareContext();
+
+	/**
+	 * @return string|boolean
+	 */
 	function doTest();
+
+	/**
+	 * @return boolean
+	 */
 	function hasVisibleTemplate();
 	function settings();
 }
@@ -545,8 +560,7 @@ class Control_Verification_Questions implements Control_Verifications
 
 	/**
 	* Checks if an the answers to anti-spam questions are correct
-	* @param string $verificationId the ID of the verification element
-	* @return mixed true if the answers are correct, an array of id of wrong questions otherwise
+	* @return boolean
 	*/
 	private function _verifyAnswers()
 	{
@@ -645,6 +659,9 @@ class Control_Verification_Questions implements Control_Verifications
 		);
 	}
 
+	/**
+	 * @param string $question
+	 */
 	private function _update($id, $question, $answers, $language)
 	{
 		$db = database();

@@ -1725,6 +1725,7 @@ function setTopicAttribute($topic, $attributes)
  *
  * @param int $id_topic topic to get the status for
  * @param string $attribute 'locked' or 'sticky'
+ * @return integer
  */
 function topicAttribute($id_topic, $attribute)
 {
@@ -2454,7 +2455,7 @@ function splitDestinationBoard()
  * (used by createList() callbacks, amongst others.)
  *
  * @param int $memID id_member
- * @return string
+ * @return integer
  */
 function topicNotificationCount($memID)
 {

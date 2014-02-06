@@ -46,6 +46,7 @@ interface Database
 	 * @param string $db_string
 	 * @param array $db_values
 	 * @param resource $connection = null
+	 * @return string
 	 */
 	function quote($db_string, $db_values, $connection = null);
 
@@ -79,6 +80,7 @@ interface Database
 	 * Free the resultset.
 	 *
 	 * @param resource $result
+	 * @return void
 	 */
 	function free_result($result);
 
@@ -139,12 +141,13 @@ interface Database
 	 * Insert data.
 	 *
 	 * @param string $method - options 'replace', 'ignore', 'insert'
-	 * @param $table
+	 * @param string $table
 	 * @param $columns
 	 * @param $data
 	 * @param $keys
 	 * @param bool $disable_trans = false
 	 * @param resource $connection = null
+	 * @return void
 	 */
 	function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null);
 
@@ -163,6 +166,7 @@ interface Database
 	 * Escape string for the database input
 	 *
 	 * @param string $string
+	 * @return string
 	 */
 	function escape_string($string);
 
@@ -171,6 +175,7 @@ interface Database
 	 *
 	 * @param $string
 	 * @param bool $translate_human_wildcards = false, if true, turns human readable wildcards into SQL wildcards.
+	 * @return string
 	 */
 	function escape_wildcard_string($string, $translate_human_wildcards=false);
 
@@ -178,6 +183,7 @@ interface Database
 	 * Unescape an escaped string.
 	 *
 	 * @param string $string
+	 * @return string
 	 */
 	function unescape_string($string);
 
@@ -185,6 +191,7 @@ interface Database
 	 * Return last error string from the database server
 	 *
 	 * @param resource $connection = null
+	 * @return string
 	 */
 	function last_error($connection = null);
 
@@ -197,6 +204,7 @@ interface Database
 
 	/**
 	 * Get the name (title) of the database system.
+	 * @return string
 	 */
 	function db_title();
 

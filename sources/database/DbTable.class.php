@@ -90,7 +90,7 @@ abstract class DbTable
 	 * Change a column.
 	 *
 	 * @param string $table_name
-	 * @param $old_column
+	 * @param string $old_column
 	 * @param $column_info
 	 * @param array $parameters default array()
 	 * @param string $error default 'fatal'

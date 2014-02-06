@@ -222,6 +222,7 @@ function ml_selectMembers($query_parameters, $where = '', $limit = 0, $sort = ''
  * @param string|string[]|null $customJoin
  * @param string $where
  * @param int $limit
+ * @return integer
  */
 function ml_searchMembers($query_parameters, $customJoin = '', $where = '', $limit = 0)
 {

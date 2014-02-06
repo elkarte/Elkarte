@@ -23,6 +23,7 @@ if (!defined('ELK'))
 
 /**
  * Return the number of currently online members.
+ * @return double
  */
 function onlineCount()
 {

@@ -30,6 +30,7 @@ if (!defined('ELK'))
  * @param bool $single_file = false
  * @param bool $overwrite = false
  * @param string[]|null $files_to_extract = null
+ * @return string
  */
 function read_tgz_file($gzfilename, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
@@ -75,6 +76,7 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
  * @param bool $single_file = false,
  * @param bool $overwrite = false,
  * @param string[]|null $files_to_extract = null
+ * @return string
  */
 function read_tgz_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {

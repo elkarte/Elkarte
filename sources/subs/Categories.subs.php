@@ -346,6 +346,7 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
  * Return the name of the given category
  *
  * @param int $id_cat
+ * @return string
  */
 function categoryName($id_cat)
 {

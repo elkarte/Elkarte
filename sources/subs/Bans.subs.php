@@ -77,7 +77,6 @@ function saveTriggers($suggestions, $ban_group, $member = 0, $ban_id = 0)
  * Doesn't clean the inputs
  *
  * @param int[]|int $items_ids
- * @param int|boolean $group_id
  * @return bool
  */
 function removeBanTriggers($items_ids = array(), $group_id = false)
@@ -192,7 +191,6 @@ function removeBanLogs($ids = array())
  * This function validates the ban triggers
  *
  * @param mixed[] $triggers
- * @return array triggers and logs info ready to be used
  */
 function validateTriggers(&$triggers)
 {
@@ -365,7 +363,7 @@ function validateTriggers(&$triggers)
  * @param int $group_id
  * @param mixed[] $triggers associative array of trigger keys and the values
  * @param mixed[] $logs
- * @return nothing
+ * @return boolean
  */
 function addTriggers($group_id = 0, $triggers = array(), $logs = array())
 {
@@ -1195,7 +1193,6 @@ function list_getNumBans()
  *
  * @param int $start
  * @param int $items_per_page
- * @param string $sort
  * @param int $ban_group_id
  * @return array
  */

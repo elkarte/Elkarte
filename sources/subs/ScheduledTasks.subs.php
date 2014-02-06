@@ -232,7 +232,7 @@ function logTask($id_log, $task_id, $total_time = null)
  * All the scheduled tasks associated with the id passed to
  * the function are enabled, while the remaining are disabled
  *
- * @param array $enablers array od task IDs
+ * @param integer[] $enablers array od task IDs
  */
 function updateTaskStatus($enablers)
 {

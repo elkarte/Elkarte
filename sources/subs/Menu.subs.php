@@ -339,7 +339,7 @@ function createMenu($menuData, $menuOptions = array())
  * Delete a menu.
  *
  * @param string $menu_id = 'last'
- * @return boolean|void
+ * @return false|null
  */
 function destroyMenu($menu_id = 'last')
 {

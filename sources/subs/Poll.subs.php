@@ -23,6 +23,7 @@
  *
  * @param int $topicID the ID of the topic
  * @param int|null $pollID = null the ID of the poll, if any. If null is passed, it retrieves the current ID.
+ * @return integer
  */
 function associatedPoll($topicID, $pollID = null)
 {
@@ -693,7 +694,7 @@ function increaseGuestVote($id_poll)
  *
  * @param int $id_member
  * @param int $id_poll
- * @return array
+ * @return integer[]
  */
 function determineVote($id_member, $id_poll)
 {

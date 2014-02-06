@@ -1844,7 +1844,6 @@ class ManageMaillist_Controller extends Action_Controller
 	/**
 	 * Callback for createList() to get the number of bounce templates in the system
 	 *
-	 * @param string $template_type
 	 */
 	public function list_getBounceTemplateCount()
 	{

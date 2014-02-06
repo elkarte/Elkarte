@@ -96,7 +96,7 @@ class Custom_Search
 	 *
 	 * @param string $methodName
 	 * @param string|null $query_params
-	 * @return boolean
+	 * @return boolean|null
 	 */
 	public function supportsMethod($methodName, $query_params = null)
 	{

@@ -112,7 +112,7 @@ class OpenID
 	 * Revalidate a user using OpenID.
 	 * Note that this function will not return when authentication is required.
 	 *
-	 * @return boolean
+	 * @return boolean|null
 	 */
 	public function revalidate()
 	{
@@ -298,7 +298,7 @@ class OpenID
 	/**
 	 * Prepare for a Diffie-Hellman key exchange.
 	 * @param bool $regenerate = false
-	 * @return array|false return false on failure or an array() on success
+	 * @return string return false on failure or an array() on success
 	 */
 	public function setup_DH($regenerate = false)
 	{
@@ -356,7 +356,7 @@ class OpenID
 	/**
 	 * Generate private key
 	 *
-	 * @return float
+	 * @return string
 	 */
 	public function generate_private_key()
 	{

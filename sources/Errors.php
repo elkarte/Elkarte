@@ -302,7 +302,7 @@ function error_handler($error_level, $error_string, $file, $line)
  * @uses Errors template, fatal_error sub template
  *
  * @param string $error_message
- * @param mixed $error_code string or int code
+ * @param string $error_code string or int code
  */
 function setup_fatal_error_context($error_message, $error_code)
 {

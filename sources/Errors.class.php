@@ -260,6 +260,7 @@ class Error_Context
 	 *
 	 * @param string $id
 	 * @param int $default_severity
+	 * @return string
 	 */
 	public static function context($id = 'default', $default_severity = null)
 	{
@@ -347,7 +348,6 @@ class attachment_error_context
 	 * Add an error
 	 *
 	 * @param string $error error code
-	 * @param string $attachID = 'generic'
 	 * @param string $lang_file = null
 	 */
 	public function addError($error, $lang_file = null)

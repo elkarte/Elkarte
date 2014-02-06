@@ -584,8 +584,8 @@ class Database_PostgreSQL implements Database
 	/**
 	 * Reset the internal result pointer.
 	 *
-	 * @param $request
-	 * @param $counter
+	 * @param boolean $request
+	 * @param integer $counter
 	 */
 	function data_seek($request, $counter)
 	{
@@ -802,11 +802,11 @@ class Database_PostgreSQL implements Database
 	/**
 	 * This function tries to work out additional error information from a back trace.
 	 *
-	 * @param $error_message
+	 * @param string $error_message
 	 * @param $log_message
 	 * @param $error_type
-	 * @param $file
-	 * @param $line
+	 * @param string $file
+	 * @param integer $line
 	 */
 	function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null)
 	{
@@ -1080,8 +1080,8 @@ class Database_PostgreSQL implements Database
 	 * This function lists all tables in the database.
 	 * The listing could be filtered according to $filter.
 	 *
-	 * @param mixed $db_name_str string holding the database name, or false, default false
-	 * @param mixed $filter string to filter by, or false, default false
+	 * @param boolean $db_name_str string holding the database name, or false, default false
+	 * @param string $filter string to filter by, or false, default false
 	 * @return array an array of table names. (strings)
 	 */
 	function db_list_tables($db_name_str = false, $filter = false)
@@ -1282,7 +1282,7 @@ class Database_PostgreSQL implements Database
 	/**
 	 * Retrieve the connection object
 	 *
-	 * @return guess what? The connection
+	 * @return resource what? The connection
 	 */
 	function connection()
 	{

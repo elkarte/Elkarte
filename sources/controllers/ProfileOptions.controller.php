@@ -458,7 +458,6 @@ class ProfileOptions_Controller extends Action_Controller
 	 * Changing authentication method?
 	 * Only appropriate for people using OpenID.
 	 *
-	 * @param int $memID id_member
 	 * @param bool $saving = false
 	 */
 	public function action_authentication($saving = false)
@@ -778,7 +777,7 @@ class ProfileOptions_Controller extends Action_Controller
 	 * Retrieve topic notifications count.
 	 *
 	 * @param int $memID id_member
-	 * @return string
+	 * @return integer
 	 */
 	function list_getTopicNotificationCount($memID)
 	{
@@ -952,7 +951,7 @@ class ProfileOptions_Controller extends Action_Controller
 	/**
 	 * This function actually makes all the group changes
 	 *
-	 * @return mixed
+	 * @return string
 	 */
 	function action_groupMembership2()
 	{

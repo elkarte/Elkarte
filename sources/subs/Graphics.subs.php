@@ -92,7 +92,6 @@ function reencodeImage($fileName, $preferred_format = 0)
  *
  * @param string $fileName
  * @param bool $extensiveCheck = false
- * @return true on success, false on failure.
  */
 function checkImageContents($fileName, $extensiveCheck = false)
 {
@@ -135,7 +134,6 @@ function checkImageContents($fileName, $extensiveCheck = false)
  * Sets a global $gd2 variable needed by some functions to determine
  * whether the GD2 library is present.
  *
- * @return whether or not GD1 is available.
  */
 function checkGD()
 {
@@ -154,7 +152,6 @@ function checkGD()
 /**
  * Checks whether the Imagick class is present.
  *
- * @return whether or not Imagick is available.
  */
 function checkImagick()
 {
@@ -165,7 +162,6 @@ function checkImagick()
  * See if we have enough memory to thumbnail an image
  *
  * @param int[] $sizes image size
- * @return whether we do
  */
 function imageMemoryCheck($sizes)
 {
@@ -200,7 +196,6 @@ function imageMemoryCheck($sizes)
  * @param int $max_width
  * @param int $max_height
  * @param int $preferred_format = 0
- * @return whether it succeeded.
  */
 function resizeImageFile($source, $destination, $max_width, $max_height, $preferred_format = 0)
 {
@@ -654,7 +649,7 @@ function gif_outputAsPng($gif, $lpszFileName, $background_color = -1)
  * Outputs a png if possible, otherwise a gif.
  *
  * @param string $code
- * @return false if something goes wrong.
+ * @return false|null if something goes wrong.
  */
 function showCodeImage($code)
 {

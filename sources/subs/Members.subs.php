@@ -440,7 +440,7 @@ function deleteMembers($users, $check_not_admin = false)
  *
  * @param mixed[] $regOptions
  * @param string $error_context
- * @return int, the ID of the newly created member
+ * @return integer the ID of the newly created member
  */
 function registerMember(&$regOptions, $error_context = 'register')
 {
@@ -1484,7 +1484,6 @@ function membersBy($query, $query_params, $details = false, $only_active = true)
 /**
  * Counts the number of members based on conditions
  *
- * @param mixed[]|string $query can be an array of "type" of conditions,
  *              or a string used as raw query
  * @param mixed[] $query_params is an array containing the parameters to be passed
  *              to the query
@@ -1728,7 +1727,7 @@ function countInactiveMembers()
  *
  * @param string $name
  * @param bool $flexible if true searches for both real_name and member_name (default false)
- * @return array
+ * @return integer
  */
 function getMemberByName($name, $flexible = false)
 {

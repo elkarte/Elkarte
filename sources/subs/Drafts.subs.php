@@ -309,6 +309,7 @@ function deleteDrafts($id_draft, $member_id = -1, $check = true)
  *
  * @param int $member_id
  * @param int $draft_type
+ * @return integer
  */
 function draftsCount($member_id, $draft_type = 0)
 {

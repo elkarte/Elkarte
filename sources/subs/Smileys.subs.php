@@ -216,7 +216,7 @@ function getSmiley($id)
  *
  * @param int $location
  * @param int $id
- * @return array
+ * @return integer
  */
 function getSmileyPosition($location, $id)
 {
@@ -421,6 +421,7 @@ function logPackageInstall($param)
 
 /**
  * Get the last smiley_order from the first smileys row.
+ * @return string
  */
 function getMaxSmileyOrder()
 {

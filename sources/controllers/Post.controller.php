@@ -48,7 +48,6 @@ class Post_Controller extends Action_Controller
 	 * - accessed from ?action=post.
 	 *
 	 * @uses the Post template and language file, main sub template.
-	 * @param array $post_errors holds any errors found tyring to post
 	 */
 	function action_post()
 	{
@@ -2289,7 +2288,7 @@ class Post_Controller extends Action_Controller
 	 *
 	 * @param int $member_id
 	 * @param int $id_topic if set, load drafts for the specified topic
-	 * @return boolean
+	 * @return false|null
 	 */
 	private function _prepareDraftsContext($member_id, $id_topic = false)
 	{

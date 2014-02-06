@@ -1733,9 +1733,8 @@ function loadEssentialThemeData()
  *
  * @uses the template_include() function to include the file.
  * @param string $template_name
- * @param string[]|string $style_sheets = array() or string for single
  * @param bool $fatal = true if fatal is true, dies with an error message if the template cannot be found
- * @return boolean
+ * @return boolean|null
  */
 function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 {

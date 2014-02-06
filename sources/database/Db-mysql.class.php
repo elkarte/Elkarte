@@ -496,7 +496,7 @@ class Database_MySQL implements Database
 	 * Reset the internal result pointer.
 	 *
 	 * @param $request
-	 * @param $counter
+	 * @param integer $counter
 	 */
 	function data_seek($request, $counter)
 	{
@@ -808,11 +808,11 @@ class Database_MySQL implements Database
 	/**
 	 * This function tries to work out additional error information from a back trace.
 	 *
-	 * @param $error_message
+	 * @param string $error_message
 	 * @param $log_message
 	 * @param $error_type
-	 * @param $file
-	 * @param $line
+	 * @param string $file
+	 * @param integer $line
 	 */
 	function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null)
 	{
@@ -1409,7 +1409,7 @@ class Database_MySQL implements Database
 	/**
 	 * Retrieve the connection object
 	 *
-	 * @return mysqli
+	 * @return resource
 	 */
 	function connection()
 	{

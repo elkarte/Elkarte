@@ -211,7 +211,6 @@ function deleteMembergroups($groups)
  * Non-admins are not able to remove members from the admin group.
  *
  * @param int[]|int $members
- * @param int[]|int|null $groups = null if groups is null, the specified members are stripped from all their membergroups.
  * @param bool $permissionCheckDone = false
  *
  * @return boolean
@@ -1548,7 +1547,7 @@ function detachGroupModerators($id_group)
  * Get the id_member from the membergroup moderators.
  *
  * @param string[] $moderators
- * @return array
+ * @return integer[]
  */
 function getIDMemberFromGroupModerators($moderators)
 {

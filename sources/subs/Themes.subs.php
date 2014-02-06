@@ -59,6 +59,7 @@ function installedThemes()
  * Retrieve theme directory
  *
  * @param int $id_theme the id of the theme
+ * @return string
  */
 function themeDirectory($id_theme)
 {
@@ -835,7 +836,7 @@ function deleteVariants($id)
  * @param int $theme
  * @param int|null $memID
  * @param mixed[] $options
- * @param mixed[] $variables
+ * @param string[] $variables
  */
 function loadThemeOptionsInto($theme, $memID = null, $options = array(), $variables = array())
 {

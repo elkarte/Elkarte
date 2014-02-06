@@ -772,7 +772,7 @@ function addData($inc_data, $custom_table = null)
  * @param string $title = ''
  * @param string $custom_table = null
  *
- * @return boolean returns false if there are no tables
+ * @return null|false returns false if there are no tables
  */
 function addSeparator($title = '', $custom_table = null)
 {

@@ -2686,7 +2686,7 @@ function messagePostError($named_recipients, $recipient_ids = array())
  *
  * @param int $member_id
  * @param int $id_pm = false if set, it will try to load drafts for this id
- * @return boolean
+ * @return false|null
  */
 function prepareDraftsContext($member_id, $id_pm = false)
 {
