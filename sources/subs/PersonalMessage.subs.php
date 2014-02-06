@@ -1746,7 +1746,7 @@ function loadConversationList($head, &$recipients, $folder = '')
 		// This is, frankly, a joke. We will put in a workaround for people sending to themselves - yawn!
 		if ($folder == 'sent' && $row['id_member_from'] == $user_info['id'] && $row['deleted_by_sender'] == 1)
 			continue;
-		elseif ($row['id_member'] == $user_info['id'] & $row['deleted'] == 1)
+		elseif ($row['id_member'] == $user_info['id'] && $row['deleted'] == 1)
 			continue;
 
 		if (!isset($recipients[$row['id_pm']]))
