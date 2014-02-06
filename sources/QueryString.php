@@ -178,7 +178,7 @@ function isValidIPv6($ip)
  * Converts IPv6s to numbers.  This makes ban checks much easier.
  *
  * @param string $ip ip address to be converted
- * @return array
+ * @return int[] array
  */
 function convertIPv6toInts($ip)
 {
@@ -262,7 +262,7 @@ function expandIPv6($addr, $strict_check = true)
  *
  * @param string[]|string $var
  * @param int $level = 0
- * @return array|string
+ * @return mixed[]|string
  */
 function htmlspecialchars__recursive($var, $level = 0)
 {
@@ -285,7 +285,7 @@ function htmlspecialchars__recursive($var, $level = 0)
  *
  * @param string[]|string $var
  * @param int $level = 0
- * @return array|string
+ * @return mixed[]|string
  */
 function htmltrim__recursive($var, $level = 0)
 {

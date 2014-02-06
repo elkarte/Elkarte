@@ -792,7 +792,7 @@ class ProfileOptions_Controller extends Action_Controller
 	 * @param int $items_per_page
 	 * @param string $sort
 	 * @param int $memID id_member
-	 * @return array
+	 * @return mixed array of topic notifications
 	 */
 	function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
 	{
@@ -807,7 +807,7 @@ class ProfileOptions_Controller extends Action_Controller
 	 * @param int $items_per_page
 	 * @param string $sort
 	 * @param int $memID id_member
-	 * @return array
+	 * @return mixed[] array of board notifications
 	 */
 	function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
 	{

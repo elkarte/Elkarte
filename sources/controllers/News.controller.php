@@ -338,7 +338,7 @@ class News_Controller extends Action_Controller
 	 * The array will be generated to match the format.
 	 *
 	 * @param string $xml_format
-	 * @return array
+	 * @return mixed[]
 	 */
 	public function action_xmlmembers($xml_format)
 	{
@@ -395,7 +395,7 @@ class News_Controller extends Action_Controller
 	 * The returned array will be generated to match the xmf_format.
 	 *
 	 * @param $xml_format
-	 * @return array, array of topics
+	 * @return mixed[] array of topics
 	 */
 	public function action_xmlnews($xml_format)
 	{
@@ -496,7 +496,7 @@ class News_Controller extends Action_Controller
 	 * The returned array will be generated to match the xml_format.
 	 *
 	 * @param $xml_format
-	 * @return array, of recent posts
+	 * @return mixed[] of recent posts
 	 */
 	public function action_xmlrecent($xml_format)
 	{
@@ -604,7 +604,7 @@ class News_Controller extends Action_Controller
 	 * which will be generated to match the xml_format.
 	 *
 	 * @param $xml_format
-	 * @return array, of profile data.
+	 * @return mixed[] array of profile data.
 	 */
 	public function action_xmlprofile($xml_format)
 	{

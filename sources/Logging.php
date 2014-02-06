@@ -444,7 +444,7 @@ function logAction($action, $extra = array(), $log_type = 'moderate')
  * This behaves just like logAction() did, except that it is designed to log multiple actions at once.
  *
  * @param mixed[] $logs array of actions to log [] = array(action => log_type=> extra=>)
- * @return the last logged ID
+ * @return int the last logged ID
  */
 function logActions($logs)
 {

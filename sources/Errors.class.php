@@ -91,9 +91,9 @@ class Error_Context
 	/**
 	 * Add an error to the list
 	 *
-	 * @param string $error error code
-	 * @param mixed $severity error severity
-	 * @param string $lang_file lang_file
+	 * @param string[]|string $error error code
+	 * @param mixed|null $severity error severity
+	 * @param string|null $lang_file lang_file
 	 */
 	public function addError($error, $severity = null, $lang_file = null)
 	{
@@ -259,8 +259,8 @@ class Error_Context
 	 * or create a new instance for $id if it didn't already exist.
 	 *
 	 * @param string $id
-	 * @param int $default_severity
-	 * @return string
+	 * @param int|null $default_severity
+	 * @return Error_Context
 	 */
 	public static function context($id = 'default', $default_severity = null)
 	{

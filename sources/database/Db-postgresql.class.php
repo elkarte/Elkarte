@@ -1082,7 +1082,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @param boolean $db_name_str string holding the database name, or false, default false
 	 * @param string $filter string to filter by, or false, default false
-	 * @return array an array of table names. (strings)
+	 * @return string[] an array of table names. (strings)
 	 */
 	function db_list_tables($db_name_str = false, $filter = false)
 	{

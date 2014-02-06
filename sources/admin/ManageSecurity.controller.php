@@ -218,7 +218,7 @@ class ManageSecurity_Controller extends Action_Controller
 	/**
 	 * Initialize moderation settings form with the current configuration options.
 	 *
-	 * @return array
+	 * @return mixed[] config var settings array
 	 */
 	private function _initModerationSettingsForm()
 	{

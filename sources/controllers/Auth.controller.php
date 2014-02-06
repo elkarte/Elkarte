@@ -733,7 +733,7 @@ function doLogin()
  *
  * @param string $data
  * @param string $key
- * @return string, the HMAC MD5 of data with key
+ * @return string the HMAC MD5 of data with key
  */
 function md5_hmac($data, $key)
 {

@@ -2595,7 +2595,7 @@ function loadDatabase()
  *
  * @param mixed[] $profile array containing the users profile data
  *
- * @return array $avatar
+ * @return mixed[] $avatar
  */
 function determineAvatar($profile)
 {

@@ -786,7 +786,7 @@ function checkConfirm($action)
  *
  * @param string $action
  * @param string $type = 'post'
- * @return array
+ * @return string[] array of token var and token
  */
 function createToken($action, $type = 'post')
 {
@@ -1299,7 +1299,7 @@ function spamProtection($error_type, $fatal = true)
  *
  * @param string $path the (absolute) directory path
  * @param boolean $attachments if the directory is an attachments directory or not
- * @return true on success error string if anything fails
+ * @return string|true on success error string if anything fails
  */
 function secureDirectory($path, $attachments = false)
 {

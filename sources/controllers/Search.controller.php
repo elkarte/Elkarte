@@ -1674,7 +1674,7 @@ class Search_Controller extends Action_Controller
 	 * - loads the necessary contextual data to show a search result.
 	 *
 	 * @param $reset = false
-	 * @return array
+	 * @return array of messages that match the search
 	 */
 	public function prepareSearchContext_callback($reset = false)
 	{

@@ -711,7 +711,7 @@ function shorten_text($text, $len = 384, $cutword = false, $buffer = 12)
  * returns an array containing each permutation.
  *
  * @param mixed[] $array
- * @return array
+ * @return mixed[]
  */
 function permute($array)
 {
@@ -2654,15 +2654,15 @@ function setupThemeContext($forceload = false)
  */
 function setMemoryLimit($needed, $in_use = false)
 {
-	// everything in bytes
+	// Everything in bytes
 	$memory_current = memoryReturnBytes(ini_get('memory_limit'));
 	$memory_needed = memoryReturnBytes($needed);
 
-	// should we account for how much is currently being used?
+	// Should we account for how much is currently being used?
 	if ($in_use)
 		$memory_needed += function_exists('memory_get_usage') ? memory_get_usage() : (4 * 1048576);
 
-	// if more is needed, request it
+	// If more is needed, request it
 	if ($memory_current < $memory_needed)
 	{
 		@ini_set('memory_limit', ceil($memory_needed / 1048576) . 'M');
@@ -2671,7 +2671,7 @@ function setMemoryLimit($needed, $in_use = false)
 
 	$memory_current = max($memory_current, memoryReturnBytes(get_cfg_var('memory_limit')));
 
-	// return success or not
+	// Return success or not
 	return (bool) ($memory_current >= $memory_needed);
 }
 
@@ -3631,7 +3631,7 @@ function elk_seed_generator()
  *
  * @param string $hook
  * @param mixed[] $parameters = array()
- * @return array the results of the functions
+ * @return mixed[] the results of the functions
  */
 function call_integration_hook($hook, $parameters = array())
 {
@@ -3992,7 +3992,7 @@ function entity_fix__callback($matches)
 /**
  * Retrieve additional search engines, if there are any, as an array.
  *
- * @return array array of engines
+ * @return mixed[] array of engines
 */
 function prepareSearchEngines()
 {

@@ -337,7 +337,7 @@ class CoreFeatures_Controller extends Action_Controller
 	 * Return the array of core features in the format expected by search.
 	 * Callback for admin internal search.
 	 *
-	 * @return array in a config_var format
+	 * @return mixed[] array in a config_var format
 	 */
 	public function config_vars()
 	{
