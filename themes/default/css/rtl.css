@@ -1,5 +1,14 @@
 /* Common classes to ease styling.
 ------------------------------------------------------- */
+.warningbox {
+	padding-right: 35px;
+}
+.successbox {
+	padding-right: 35px;
+}
+.infobox {
+	padding-right: 35px;
+}
 
 .floatright {
 	float: left;
@@ -230,6 +239,62 @@ div#upper_section div.user ul {
 
 /* Styles for the board index.
 ------------------------------------------------- */
+.icon_anchor { 
+	float: right;
+	padding: 2px 0px 0px 6px;
+}
+.board_stats { 
+	float: left;
+	padding: 1px 6px 1px 0px;
+	text-align: left;
+}
+.board_avatar {
+	float: right;
+	margin-left: 5px;
+	margin-right: 0;
+}
+.topic_lastpost img { 
+	float: left;
+}
+.topic_stats { 
+	box-sizing: border-box;
+	float: left;
+	text-align: left;
+}
+.topic_icons { 
+	float: right;
+	padding: 6px 0px 0px 16px;
+}
+.topic_name, .topic_starter { 
+	margin: 0px 50px 0px 0px;
+}
+.topic_info { 
+	padding: 7px 12px 6px 8px;
+}
+.topic_name h4 { 
+	padding-right: 0;
+	padding-left: 30px;
+}
+.topic_sorting { 
+	float: left;
+}
+.topic_sorting > li { 
+	float: left;
+}
+.fred { 
+	right: 50%;
+	margin: 0px -2px 0px 0px;
+}
+
+.sticky_row .topic_info {
+	background: url(../images/icons/quick_sticky.png) no-repeat 2% 4px;
+}
+.locked_row.sticky_row .topic_info {
+	background: url(../images/icons/quick_sticky_lock.png) no-repeat 2% 4px;
+}
+.locked_row .topic_info, .locked_row .topic_details {
+	background: url(../images/icons/quick_lock.png) no-repeat 2% 4px;
+}
 
 /* the posting icons */
 #posting_icons {
