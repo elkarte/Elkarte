@@ -550,7 +550,7 @@ class Data_Validator
 			$field = isset($this->_replacements[$error['field']]) ? $this->_replacements[$error['field']] : $error['field'];
 
 			// Just want specific field errors returned?
-			if (!empty($keys) && !in_array($error['field'], $keys))
+			if (!empty($keys) && is_array($keys) && !in_array($error['field'], $keys))
 				continue;
 
 			// Set the error message for this validation failure
