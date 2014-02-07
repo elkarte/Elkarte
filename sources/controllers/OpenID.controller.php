@@ -37,7 +37,7 @@ class OpenID_Controller extends Action_Controller
 	/**
 	 * Callback action handler for OpenID
 	 */
-	function action_openidreturn()
+	public function action_openidreturn()
 	{
 		global $modSettings, $context, $user_settings;
 
