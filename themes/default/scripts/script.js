@@ -274,7 +274,7 @@ function reqOverlayDiv(desktopURL, sHeader, sIcon)
 	// Set up our div details
 	var sAjax_indicator = '<div class="centertext"><img src="' + elk_images_url + '/loading.gif" ></div>';
 
-	sIcon = elk_images_url + '/' + (typeof(sIcon) === 'string' ? sIcon : 'helptopics.png'),
+	sIcon = elk_images_url + '/' + (typeof(sIcon) === 'string' ? sIcon : 'helptopics.png');
 	sHeader = typeof(sHeader) === 'string' ? sHeader : help_popup_heading_text;
 
 	// Create the div that we are going to load
