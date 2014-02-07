@@ -128,17 +128,17 @@ h2 a.collapse {
 .warningbox {
 	padding-left: 12px;
 	padding-right: 35px;
-	background: #fff6ca url(../images/profile/warning_moderate.png) 10px 50% no-repeat;
+	background: #fff6ca url(../images/profile/warning_moderate.png) 99% 50% no-repeat;
 }
 .successbox {
 	padding-left: 12px;
 	padding-right: 35px;
-	background: #efe url(../images/icons/field_valid.png) 10px 50% no-repeat;
+	background: #efe url(../images/icons/field_valid.png) 99% 50% no-repeat;
 }
 .infobox {
 	padding-left: 12px;
 	padding-right: 35px;
-	background: #d9edf7 url(../images/icons/quick_sticky.png) 10px 50% no-repeat;
+	background: #d9edf7 url(../images/icons/quick_sticky.png) 99% 50% no-repeat;
 }
 
 /*	$BBC		*/
