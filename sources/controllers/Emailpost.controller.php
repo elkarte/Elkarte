@@ -324,7 +324,7 @@ class Emailpost_Controller extends Action_Controller
  *  - returns true if successful or false for any number of failures
  *
  * @param mixed[] $pbe array of all pbe user_info values
- * @param object $email_message
+ * @param Email_Parse $email_message
  * @param mixed[] $topic_info
  */
 function pbe_create_post($pbe, $email_message, $topic_info)
@@ -422,7 +422,7 @@ function pbe_create_post($pbe, $email_message, $topic_info)
  *  - Returns true if successful or false for any number of failures
  *
  * @param mixed[] $pbe array of pbe 'user_info' values
- * @param object $email_message
+ * @param Email_Parse $email_message
 */
 function pbe_create_pm($pbe, $email_message)
 {
@@ -474,7 +474,7 @@ function pbe_create_pm($pbe, $email_message)
  * Requires pbe and email_message to be populated.
  *
  * @param mixed[] $pbe array of pbe 'user_info' values
- * @param object $email_message
+ * @param Email_Parse $email_message
  * @param mixed[] $board_info
  */
 function pbe_create_topic($pbe, $email_message, $board_info)
@@ -580,7 +580,7 @@ function pbe_create_topic($pbe, $email_message, $board_info)
  * Calls the necessary functions to extract and format the message so its ready for posting
  *
  * @param boolean $html
- * @param object $email_message
+ * @param Email_Parse $email_message
  * @param array $pbe
  *
  * @return string

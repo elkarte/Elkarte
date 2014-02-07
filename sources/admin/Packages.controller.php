@@ -1026,13 +1026,14 @@ class Packages_Controller extends Action_Controller
 					/**
 					 * Table sorting function used in usort
 					 *
-					 * @param array $a
-					 * @param array $b
+					 * @param string[] $a
+					 * @param string[] $b
 					 */
 					function sort_table_first($a, $b)
 					{
 						if ($a[0] == $b[0])
 							return 0;
+
 						return $a[0] == 'remove_table' ? -1 : 1;
 					}
 					usort($db_package_log, 'sort_table_first');
@@ -1978,7 +1979,7 @@ class Packages_Controller extends Action_Controller
 				 * Builds a list of special files recursively for a given path
 				 *
 				 * @param string $path
-				 * @param array $data
+				 * @param mixed[] $data
 				 */
 				function build_special_files__recursive($path, &$data)
 				{

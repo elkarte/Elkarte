@@ -43,7 +43,7 @@ class Error_Context
 	/**
 	 * A list of all severity code from the less important to the most serious.
 	 *
-	 * @var array/mixed
+	 * @var array|mixed
 	 */
 	private $_severity_levels = array(0);
 

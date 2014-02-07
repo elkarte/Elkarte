@@ -44,7 +44,7 @@ interface Database
 	 * but it doesn't execute the query.
 	 *
 	 * @param string $db_string
-	 * @param array $db_values
+	 * @param mixed[] $db_values
 	 * @param resource $connection = null
 	 * @return string
 	 */
@@ -55,7 +55,7 @@ interface Database
 	 *
 	 * @param string $identifier
 	 * @param string $db_string
-	 * @param array $db_values = array()
+	 * @param mixed[] $db_values = array()
 	 * @param resource $connection = null
 	 */
 	function query($identifier, $db_string, $db_values = array(), $connection = null);
@@ -116,7 +116,7 @@ interface Database
 	 *
 	 * @param string $table
 	 * @param string $field = null
-	 * @param resource $connection = null
+	 * @param resource|null $connection = null
 	 */
 	function insert_id($table, $field = null, $connection = null);
 
@@ -124,7 +124,7 @@ interface Database
 	 * Do a transaction.
 	 *
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
-	 * @param resource $connection = null
+	 * @param resource|null $connection = null
 	 */
 	function db_transaction($type = 'commit', $connection = null);
 
@@ -133,7 +133,7 @@ interface Database
 	 * Backtrace, log, try to fix.
 	 *
 	 * @param string $db_string
-	 * @param resource $connection = null
+	 * @param resource|null $connection = null
 	 */
 	function error($db_string, $connection = null);
 
@@ -142,11 +142,11 @@ interface Database
 	 *
 	 * @param string $method - options 'replace', 'ignore', 'insert'
 	 * @param string $table
-	 * @param $columns
-	 * @param $data
-	 * @param $keys
+	 * @param mixed[] $columns
+	 * @param mixed[] $data
+	 * @param mixed[] $keys
 	 * @param bool $disable_trans = false
-	 * @param resource $connection = null
+	 * @param resource|null $connection = null
 	 * @return void
 	 */
 	function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null);
@@ -177,7 +177,7 @@ interface Database
 	 * @param bool $translate_human_wildcards = false, if true, turns human readable wildcards into SQL wildcards.
 	 * @return string
 	 */
-	function escape_wildcard_string($string, $translate_human_wildcards=false);
+	function escape_wildcard_string($string, $translate_human_wildcards = false);
 
 	/**
 	 * Unescape an escaped string.
@@ -229,7 +229,7 @@ interface Database
 	 * Select database.
 	 *
 	 * @param string $dbName = null
-	 * @param resource $connection = null
+	 * @param resource|null $connection = null
 	 */
 	function select_db($dbName = null, $connection = null);
 }

@@ -292,7 +292,7 @@ class Xml_Array
 	 * Example use:
 	 *  echo $this->create_xml();
 	 * @param string|null $path - the path to the element. (optional)
-	 * @return string, xml-formatted string.
+	 * @return string xml-formatted string.
 	 */
 	public function create_xml($path = null)
 	{

@@ -97,9 +97,9 @@ class DbTable_PostgreSQL extends DbTable
 	 *    - 'error' will return false if the table already exists.
 	 *
 	 * @param string $table_name
-	 * @param array $columns in the format specified.
-	 * @param array $indexes default array(), in the format specified.
-	 * @param array $parameters default array()
+	 * @param mixed[] $columns in the format specified.
+	 * @param mixed[] $indexes default array(), in the format specified.
+	 * @param mixed[] $parameters default array()
 	 * @param string $if_exists default 'ignore'
 	 * @param string $error default 'fatal'
 	 */
@@ -221,7 +221,7 @@ class DbTable_PostgreSQL extends DbTable
 	 * Drop a table.
 	 *
 	 * @param string $table_name
-	 * @param array $parameters default array()
+	 * @param mixed[] $parameters default array()
 	 * @param string $error default 'fatal'
 	 */
 	function db_drop_table($table_name, $parameters = array(), $error = 'fatal')
@@ -281,8 +281,8 @@ class DbTable_PostgreSQL extends DbTable
 	 * This function adds a column.
 	 *
 	 * @param string $table_name the name of the table
-	 * @param array $column_info with column information
-	 * @param array $parameters default array()
+	 * @param mixed[] $column_info with column information
+	 * @param mixed[] $parameters default array()
 	 * @param string $if_exists default 'update'
 	 * @param string $error default 'fatal'
 	 */
@@ -341,7 +341,7 @@ class DbTable_PostgreSQL extends DbTable
 	 *
 	 * @param string $table_name
 	 * @param string $column_name
-	 * @param array $parameters default array()
+	 * @param mixed[] $parameters default array()
 	 * @param string $error default 'fatal'
 	 */
 	function db_remove_column($table_name, $column_name, $parameters = array(), $error = 'fatal')
@@ -388,7 +388,7 @@ class DbTable_PostgreSQL extends DbTable
 	 * @param string $table_name
 	 * @param $old_column
 	 * @param $column_info
-	 * @param array $parameters default array()
+	 * @param mixed[] $parameters default array()
 	 * @param string $error default 'fatal'
 	 */
 	function db_change_column($table_name, $old_column, $column_info, $parameters = array(), $error = 'fatal')
@@ -422,6 +422,7 @@ class DbTable_PostgreSQL extends DbTable
 				)
 			);
 		}
+		
 		// Different default?
 		if (isset($column_info['default']) && $column_info['default'] != $old_info['default'])
 		{
@@ -434,6 +435,7 @@ class DbTable_PostgreSQL extends DbTable
 				)
 			);
 		}
+
 		// Is it null - or otherwise?
 		if (isset($column_info['null']) && $column_info['null'] != $old_info['null'])
 		{
@@ -461,6 +463,7 @@ class DbTable_PostgreSQL extends DbTable
 			);
 			$db->db_transaction('commit');
 		}
+
 		// What about a change in type?
 		if (isset($column_info['type']) && ($column_info['type'] != $old_info['type'] || (isset($column_info['size']) && $column_info['size'] != $old_info['size'])))
 		{
@@ -501,6 +504,7 @@ class DbTable_PostgreSQL extends DbTable
 			);
 			$db->db_transaction('commit');
 		}
+
 		// Finally - auto increment?!
 		if (isset($column_info['auto']) && $column_info['auto'] != $old_info['auto'])
 		{
@@ -546,8 +550,8 @@ class DbTable_PostgreSQL extends DbTable
 	 * Add an index.
 	 *
 	 * @param string $table_name
-	 * @param array $index_info
-	 * @param array $parameters default array()
+	 * @param mixed[] $index_info
+	 * @param mixed[] $parameters default array()
 	 * @param string $if_exists default 'update'
 	 * @param string $error default 'fatal'
 	 */
@@ -588,6 +592,7 @@ class DbTable_PostgreSQL extends DbTable
 
 		// Let's get all our indexes.
 		$indexes = $this->db_list_indexes($table_name, true);
+
 		// Do we already have it?
 		foreach ($indexes as $index)
 		{
@@ -628,7 +633,7 @@ class DbTable_PostgreSQL extends DbTable
 	 *
 	 * @param string $table_name
 	 * @param string $index_name
-	 * @param array $parameters default array()
+	 * @param mixed[] $parameters default array()
 	 * @param string $error default 'fatal'
 	 */
 	function db_remove_index($table_name, $index_name, $parameters = array(), $error = 'fatal')
@@ -661,6 +666,7 @@ class DbTable_PostgreSQL extends DbTable
 
 				return true;
 			}
+
 			if ($index['name'] == $index_name)
 			{
 				// Drop the bugger...
@@ -683,13 +689,14 @@ class DbTable_PostgreSQL extends DbTable
 	 * Get the schema formatted name for a type.
 	 *
 	 * @param string $type_name
-	 * @param $type_size
-	 * @param $reverse
+	 * @param int|null $type_size
+	 * @param boolean $reverse
 	 */
 	function db_calculate_type($type_name, $type_size = null, $reverse = false)
 	{
 		// Let's be sure it's lowercase MySQL likes both, others no.
 		$type_name = strtolower($type_name);
+
 		// Generic => Specific.
 		if (!$reverse)
 		{
@@ -719,6 +726,7 @@ class DbTable_PostgreSQL extends DbTable
 				$type_size = 255;
 			$type_name = $types[$type_name];
 		}
+
 		// Numbers don't have a size.
 		if (strpos($type_name, 'int') !== false)
 				$type_size = null;
@@ -730,7 +738,7 @@ class DbTable_PostgreSQL extends DbTable
 	 * Get table structure.
 	 *
 	 * @param string $table_name
-	 * @param array $parameters default array()
+	 * @param mixed[] $parameters default array()
 	 */
 	function db_table_structure($table_name, $parameters = array())
 	{
@@ -750,7 +758,7 @@ class DbTable_PostgreSQL extends DbTable
 	 *
 	 * @param string $table_name
 	 * @param bool $detail
-	 * @param array $parameters default array()
+	 * @param mixed[] $parameters default array()
 	 * @return mixed
 	 */
 	function db_list_columns($table_name, $detail = false, $parameters = array())
@@ -781,6 +789,7 @@ class DbTable_PostgreSQL extends DbTable
 			else
 			{
 				$auto = false;
+
 				// What is the default?
 				if (preg_match('~nextval\(\'(.+?)\'(.+?)*\)~i', $row['column_default'], $matches) != 0)
 				{
@@ -815,7 +824,7 @@ class DbTable_PostgreSQL extends DbTable
 	 *
 	 * @param string $table_name
 	 * @param bool $detail
-	 * @param array $parameters
+	 * @param mixed[] $parameters
 	 * @return mixed
 	 */
 	function db_list_indexes($table_name, $detail = false, $parameters = array())

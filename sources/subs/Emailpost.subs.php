@@ -580,7 +580,7 @@ function pbe_check_moderation(&$pbe)
  *   can choose to approve the email with the corrections
  *
  * @param string $error
- * @param object $email_message
+ * @param Email_Parse $email_message
  */
 function pbe_emailError($error, $email_message)
 {
@@ -709,7 +709,7 @@ function pbe_emailError($error, $email_message)
  *  - calls createAttachment to store them
  *
  * @param mixed[] $pbe
- * @param object $email_message
+ * @param Email_Parse $email_message
  */
 function pbe_email_attachments($pbe, $email_message)
 {
@@ -1499,8 +1499,8 @@ function query_notifications($id_member, $id_board, $id_topic, $auto_notify, $pe
  *  - Marks the PM replied to as replied to
  *  - Updates the number of unread to reflect this
  *
- * @param object $email_message
- * @param array $pbe
+ * @param Email_Parse $email_message
+ * @param mixed[] $pbe
  */
 function query_mark_pms($email_message, $pbe)
 {
@@ -1560,7 +1560,7 @@ function query_mark_pms($email_message, $pbe)
  * Once a key has been used it is removed and can not be used again
  * Also removes any old keys to minimize security issues
  *
- * @param object $email_message
+ * @param Email_Parse $email_message
  */
 function query_key_maintenance($email_message)
 {
@@ -1604,7 +1604,7 @@ function query_key_maintenance($email_message)
  *  - Updates the who's online list with the member and action
  *
  * @param mixed[] $pbe
- * @param object $email_message
+ * @param Email_Parse $email_message
  * @param mixed[] $topic_info
  */
 function query_update_member_stats($pbe, $email_message, $topic_info = array())

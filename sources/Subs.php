@@ -42,8 +42,8 @@ if (!defined('ELK'))
  *  post-based membergroups in the database (restricted by parameter1).
  *
  * @param string $type Stat type - can be 'member', 'message', 'topic', 'subject' or 'postgroups'
- * @param mixed $parameter1 = null
- * @param mixed $parameter2 = null
+ * @param mixed|null $parameter1 = null
+ * @param mixed|null $parameter2 = null
  */
 function updateStats($type, $parameter1 = null, $parameter2 = null)
 {
@@ -63,7 +63,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 			break;
 		case 'topic':
 			require_once(SUBSDIR . '/Topic.subs.php');
-			updateTopicStats($parameter1, $parameter2);
+			updateTopicStats($parameter1);
 			break;
 		case 'postgroups':
 			require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -490,7 +490,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
  * - caches the formatting data from the setting for optimization.
  *
  * @param float $number
- * @param integer $override_decimal_count = false or number of decimals
+ * @param integer|false $override_decimal_count = false or number of decimals
  */
 function comma_format($number, $override_decimal_count = false)
 {
@@ -524,8 +524,8 @@ function comma_format($number, $override_decimal_count = false)
  * - performs localization (more than just strftime would do alone.)
  *
  * @param int $log_time
- * @param bool $show_today = true
- * @param string $offset_type = false
+ * @param string|bool $show_today = true
+ * @param string|false $offset_type = false
  */
 function standardTime($log_time, $show_today = true, $offset_type = false)
 {
@@ -630,7 +630,7 @@ function htmlTime($timestamp)
  * - always applies the offset in the time_offset setting.
  *
  * @param bool $use_user_offset = true if use_user_offset is true, applies the user's offset as well
- * @param int $timestamp = null
+ * @param int|null $timestamp = null
  * @return int seconds since the unix epoch
  */
 function forum_time($use_user_offset = true, $timestamp = null)
@@ -2347,8 +2347,8 @@ function redirectexit($setLocation = '', $refresh = false)
  * Takes care of template loading and remembering the previous URL.
  * Calls ob_start() with ob_sessrewrite to fix URLs if necessary.
  *
- * @param bool $header = null
- * @param bool $do_footer = null
+ * @param bool|null $header = null
+ * @param bool|null $do_footer = null
  * @param bool $from_index = false
  * @param bool $from_fatal_error = false
  */
@@ -2999,11 +2999,11 @@ function template_admin_warning_above()
  * @todo and of course everything relies on this behavior and work around it. :P.
  * Converters included.
  *
- * @param $filename
- * @param $attachment_id
- * @param $dir
- * @param $new
- * @param $file_hash
+ * @param string $filename
+ * @param int $attachment_id
+ * @param string|null $dir
+ * @param bool $new
+ * @param string $file_hash
  */
 function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = false, $file_hash = '')
 {
@@ -3849,7 +3849,7 @@ function remove_integration_function($hook, $function, $file = '')
  * that are not normally displayable.  This converts the popular ones that
  * appear from a cut and paste from windows.
  *
- * @param string $string
+ * @param string|false $string
  * @return string $string
 */
 function sanitizeMSCutPaste($string)
@@ -4016,7 +4016,7 @@ function prepareSearchEngines()
  * posts in topic display page, posts search results page, or personal
  * messages.
  *
- * @param object $messages_request holds a query result
+ * @param resource $messages_request holds a query result
  * @param bool $reset
  * @return integer|null
  */
@@ -4066,10 +4066,7 @@ function elk_array_insert($input, $key, $insert, $where = 'before', $assoc = tru
 
 	// If the key is not found, just insert it at the end
 	if ($position === false)
-	{
-		$input = array_merge($input, $insert);
-		return;
-	}
+		return array_merge($input, $insert);
 
 	if ($where === 'after')
 		$position += 1;
@@ -4084,7 +4081,7 @@ function elk_array_insert($input, $key, $insert, $where = 'before', $assoc = tru
 }
 
 /**
- * From time to time it may be necessary to fire a scheduled tast ASAP
+ * From time to time it may be necessary to fire a scheduled task ASAP
  * this function set the scheduled task to be called before any other one
  *
  * @param string $task the name of a scheduled task

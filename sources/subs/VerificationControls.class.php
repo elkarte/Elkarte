@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file contains those functions specific to the editing box and is
- * generally used for WYSIWYG type functionality.
+ * This file contains those functions specific to the various verification controls
+ * used to challange users, and hopefully robots as well.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -22,7 +22,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Very simple function that loads and returns the verification controls known to Elk
+ * Simple function that loads and returns all the verification controls known to Elk
  */
 function loadVerificationControls()
 {
@@ -31,6 +31,8 @@ function loadVerificationControls()
 		'questions',
 		'emptyfield'
 	);
+
+	// Let integration add some more controls
 	call_integration_hook('integrate_control_verification', array(&$known_verifications));
 
 	return $known_verifications;
@@ -71,7 +73,6 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 		$known_verifications = loadVerificationControls();
 		$all_instances[$verificationOptions['id']] = array();
 
-		$current_instance = null;
 		foreach ($known_verifications as $verification)
 		{
 			$class_name = 'Control_Verification_' . ucfirst($verification);
@@ -164,8 +165,8 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 }
 
 /**
- * A simple interface that defines all the methods a "Control_Verification"
- * class must have because used in the process of creating the verification
+ * A simple interface that defines all the methods any "Control_Verification"
+ * class MUST have because they are used in the process of creating the verification
  */
 interface Control_Verifications
 {
@@ -178,6 +179,10 @@ interface Control_Verifications
 	 * @return void
 	 */
 	function createTest($refresh = true);
+
+	/**
+	 * @return void
+	 */
 	function prepareContext();
 
 	/**
@@ -189,9 +194,16 @@ interface Control_Verifications
 	 * @return boolean
 	 */
 	function hasVisibleTemplate();
+
+	/**
+	 * @return void
+	 */
 	function settings();
 }
 
+/**
+ * Class to manage, create, show and validate captcha images
+ */
 class Control_Verification_Captcha implements Control_Verifications
 {
 	private $_options = null;
@@ -202,6 +214,13 @@ class Control_Verification_Captcha implements Control_Verifications
 	private $_use_graphic_library = false;
 	private $_standard_captcha_range = array();
 
+	/**
+	 * Get things started,
+	 * set the letters we will use to avoid confusion
+	 * set graphics capability
+	 *
+	 * @param mixed[]|null $verificationOptions override_range, override_visual, id
+	 */
 	public function __construct($verificationOptions = null)
 	{
 		$this->_use_graphic_library = in_array('gd', get_loaded_extensions());
@@ -213,6 +232,12 @@ class Control_Verification_Captcha implements Control_Verifications
 			$this->_options = $verificationOptions;
 	}
 
+	/**
+	 * Show a verification captcha
+	 *
+	 * @param boolean $isNew
+	 * @param boolean $force_refresh
+	 */
 	public function showVerification($isNew, $force_refresh = true)
 	{
 		global $context, $modSettings, $scripturl;
@@ -227,6 +252,7 @@ class Control_Verification_Captcha implements Control_Verifications
 
 		$this->_tested = false;
 
+		// Requesting a new challange, build the image link, seed the JS
 		if ($isNew)
 		{
 			$this->_show_captcha = !empty($this->_options['override_visual']) || (!empty($modSettings['visual_verification_type']) && !isset($this->_option['override_visual']));
@@ -247,6 +273,11 @@ class Control_Verification_Captcha implements Control_Verifications
 		return $this->_show_captcha;
 	}
 
+	/**
+	 * Build the string that will be used to build the captcha
+	 *
+	 * @param boolean $refresh
+	 */
 	public function createTest($refresh = true)
 	{
 		global $modSettings;
@@ -268,6 +299,9 @@ class Control_Verification_Captcha implements Control_Verifications
 			$this->_text_value = !empty($_REQUEST[$this->_options['id'] . '_vv']['code']) ? Util::htmlspecialchars($_REQUEST[$this->_options['id'] . '_vv']['code']) : '';
 	}
 
+	/**
+	 * Prepare the captcha for the template
+	 */
 	public function prepareContext()
 	{
 		return array(
@@ -281,6 +315,10 @@ class Control_Verification_Captcha implements Control_Verifications
 		);
 	}
 
+	/**
+	 * Peform the test, make people do it again and robots pass :P
+	 * @return string|boolean
+	 */
 	public function doTest()
 	{
 		$this->_tested = true;
@@ -291,11 +329,20 @@ class Control_Verification_Captcha implements Control_Verifications
 		return true;
 	}
 
+	/**
+	 *
+	 * @return true
+	 */
 	public function hasVisibleTemplate()
 	{
 		return true;
 	}
 
+	/**
+	 * Configuration settings for the admin template
+	 *
+	 * @return string
+	 */
 	public function settings()
 	{
 		global $txt, $scripturl, $modSettings;
@@ -313,6 +360,7 @@ class Control_Verification_Captcha implements Control_Verifications
 				'subtext'=> $txt['setting_visual_verification_type_desc'], 'onchange' => $this->_use_graphic_library ? 'refreshImages();' : ''),
 		);
 
+		// Save it
 		if (isset($_GET['save']))
 		{
 			if (isset($_POST['visual_verification_num_chars']) && $_POST['visual_verification_num_chars'] < 6)
@@ -341,12 +389,19 @@ class Control_Verification_Captcha implements Control_Verifications
 		return $config_vars;
 	}
 
+	/**
+	 * Does what they typed = what was supplied in the image
+	 * @return boolean
+	 */
 	private function _verifyCode()
 	{
 		return !$this->_show_captcha || (!empty($_REQUEST[$this->_options['id'] . '_vv']['code']) && !empty($_SESSION[$this->_options['id'] . '_vv']['code']) && strtoupper($_REQUEST[$this->_options['id'] . '_vv']['code']) === $_SESSION[$this->_options['id'] . '_vv']['code']);
 	}
 }
 
+/**
+ * Class to manage, prepare, show, and validate question -> answer verifiations
+ */
 class Control_Verification_Questions implements Control_Verifications
 {
 	private $_options = null;
@@ -355,12 +410,26 @@ class Control_Verification_Questions implements Control_Verifications
 	private $_questions_language = null;
 	private $_possible_questions = null;
 
+	/**
+	 * On your mark
+	 *
+	 * @param mixed[] $verificationOptions
+	 */
 	public function __construct($verificationOptions = null)
 	{
 		if (!empty($verificationOptions))
 			$this->_options = $verificationOptions;
 	}
 
+	/**
+	 * Show the question to the user
+	 * Trys to account for lanaguges
+	 *
+	 * @param boolean $isNew
+	 * @param boolean $force_refresh
+	 *
+	 * @return boolean
+	 */
 	public function showVerification($isNew, $force_refresh = true)
 	{
 		global $modSettings, $user_info, $language;
@@ -405,6 +474,11 @@ class Control_Verification_Questions implements Control_Verifications
 		return !empty($this->_number_questions);
 	}
 
+	/**
+	 * Prepare the Q&A test/lsit for this request
+	 *
+	 * @param boolean $refresh
+	 */
 	public function createTest($refresh = true)
 	{
 		if (empty($this->_number_questions))
@@ -430,6 +504,11 @@ class Control_Verification_Questions implements Control_Verifications
 			$this->createTest(true);
 	}
 
+	/**
+	 * Get things ready for the template
+	 *
+	 * @return mixed[]
+	 */
 	public function prepareContext()
 	{
 		loadTemplate('VerificationControls');
@@ -457,6 +536,11 @@ class Control_Verification_Questions implements Control_Verifications
 		);
 	}
 
+	/**
+	 * Perfom the test to see if the answer is correct
+	 *
+	 * @return string|boolean
+	 */
 	public function doTest()
 	{
 		if ($this->_number_questions && (!isset($_SESSION[$this->_options['id'] . '_vv']['q']) || !isset($_REQUEST[$this->_options['id'] . '_vv']['q'])))
@@ -468,11 +552,20 @@ class Control_Verification_Questions implements Control_Verifications
 		return true;
 	}
 
+	/**
+	 *
+	 * @return true
+	 */
 	public function hasVisibleTemplate()
 	{
 		return true;
 	}
 
+	/**
+	 * Admin panel interface to manage the anti spam question area
+	 *
+	 * @return mixed[]
+	 */
 	public function settings()
 	{
 		global $txt, $context, $language;
@@ -486,6 +579,7 @@ class Control_Verification_Questions implements Control_Verifications
 			);
 		$context['question_answers'] = $this->_loadAntispamQuestions($filter);
 		$languages = getLanguages();
+
 		// Languages dropdown only if we have more than a lang installed, otherwise is plain useless
 		if (count($languages) > 1)
 		{
@@ -495,6 +589,7 @@ class Control_Verification_Questions implements Control_Verifications
 					$lang['selected'] = true;
 		}
 
+		// Saving them?
 		if (isset($_GET['save']))
 		{
 			// Handle verification questions.
@@ -518,6 +613,7 @@ class Control_Verification_Questions implements Control_Verifications
 				if (isset($context['question_answers'][$id]))
 				{
 					$count_questions++;
+
 					// Changed?
 					if ($question == '' || empty($answers))
 					{
@@ -560,6 +656,7 @@ class Control_Verification_Questions implements Control_Verifications
 
 	/**
 	* Checks if an the answers to anti-spam questions are correct
+	 *
 	* @return boolean
 	*/
 	private function _verifyAnswers()
@@ -609,7 +706,8 @@ class Control_Verification_Questions implements Control_Verifications
 
 	/**
 	 * Loads all the available antispam questions, or a subset based on a filter
-	 * @param array $filter, if specified it myst be an array with two indexes:
+	 *
+	 * @param mixed[]|null $filter, if specified it myst be an array with two indexes:
 	 *              - 'type' => a valid filter, it can be 'language' or 'id_question'
 	 *              - 'value' => the value of the filter (i.e. the language)
 	 */
@@ -646,6 +744,11 @@ class Control_Verification_Questions implements Control_Verifications
 		return $question_answers;
 	}
 
+	/**
+	 * Remove a question by id
+	 *
+	 * @param int $id
+	 */
 	private function _delete($id)
 	{
 		$db = database();
@@ -660,6 +763,8 @@ class Control_Verification_Questions implements Control_Verifications
 	}
 
 	/**
+	 * Update an existing question
+	 *
 	 * @param string $question
 	 */
 	private function _update($id, $question, $answers, $language)
@@ -683,6 +788,11 @@ class Control_Verification_Questions implements Control_Verifications
 		);
 	}
 
+	/**
+	 * Adds the questions to the db
+	 *
+	 * @param mixed $questions
+	 */
 	private function _insert($questions)
 	{
 		$db = database();
@@ -714,6 +824,11 @@ class Control_Verification_EmptyField implements Control_Verifications
 	private $_terms = array('gadget', 'device', 'uid', 'gid', 'guid', 'uuid', 'unique', 'identifier', 'bb2');
 	private $_second_terms = array('hash', 'cipher', 'code', 'key', 'unlock', 'bit', 'value', 'screener');
 
+	/**
+	 * Get things rolling
+	 *
+	 * @param mixed[] $verificationOptions
+	 */
 	public function __construct($verificationOptions = null)
 	{
 		if (!empty($verificationOptions))
@@ -805,6 +920,11 @@ class Control_Verification_EmptyField implements Control_Verifications
 		return true;
 	}
 
+	/**
+	 * Not used, just returns false
+	 *
+	 * @return false
+	 */
 	public function hasVisibleTemplate()
 	{
 		return false;

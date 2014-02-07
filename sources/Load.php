@@ -1733,7 +1733,9 @@ function loadEssentialThemeData()
  *
  * @uses the template_include() function to include the file.
  * @param string $template_name
+ * @param string[]|string any style sheets to load with the template
  * @param bool $fatal = true if fatal is true, dies with an error message if the template cannot be found
+ * 
  * @return boolean|null
  */
 function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
@@ -1821,7 +1823,8 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
  * @todo get rid of reading $_REQUEST directly
  *
  * @param string $sub_template_name
- * @param bool $fatal = false, $fatal = true is for templates that shouldn't get a 'pretty' error screen.
+ * @param bool|string $fatal = false, $fatal = true is for templates that shouldn't get a 'pretty' error screen
+ *			'ignore' to skip
  */
 function loadSubTemplate($sub_template_name, $fatal = false)
 {

@@ -15,15 +15,15 @@
  */
 
 /**
- * 	Admin index class with the following methods
- * 	elk_AdminIndex(oOptions)
- * 	{
- * 		public init()
- * 		public loadAdminIndex()
- * 		public setAnnouncements()
- * 		public showCurrentVersion()
- * 		public checkUpdateAvailable()
- * 	}
+ * Admin index class with the following methods
+ * elk_AdminIndex(oOptions)
+ * {
+ *		public init()
+ *		public loadAdminIndex()
+ *		public setAnnouncements()
+ *		public showCurrentVersion()
+ *		public checkUpdateAvailable()
+ * }
  *
  * @param {object} oOptions
  */
@@ -1311,7 +1311,7 @@ function navigatePreview(url)
 		if (myDoc.responseText !== null && myDoc.status === 200)
 		{
 			previewData = myDoc.responseText;
-			document.getElementById("css_preview_box").style.display = "";
+			document.getElementById('css_preview_box').style.display = "";
 
 			// Revert to the theme they actually use ;).
 			var tempImage = new Image();
@@ -1359,16 +1359,16 @@ function refreshPreview(check)
 		{
 			if (is_ie)
 			{
-				var sheets = frames["css_preview_box"].document.styleSheets;
+				var sheets = frames['css_preview_box'].document.styleSheets;
 				for (var j = 0; j < sheets.length; j++)
 				{
-					if (sheets[j].id === "css_preview_box")
+					if (sheets[j].id === 'css_preview_box')
 						sheets[j].cssText = document.forms.stylesheetForm.entire_file.value;
 				}
 			}
 			else
 			{
-				frames["css_preview_box"].document.getElementById("css_preview_sheet").innerHTML = document.forms.stylesheetForm.entire_file.value;
+				frames['css_preview_box'].document.getElementById("css_preview_sheet").innerHTML = document.forms.stylesheetForm.entire_file.value;
 			}
 		}
 		catch (e)

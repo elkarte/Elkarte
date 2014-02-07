@@ -659,7 +659,7 @@ function add_elk_mention(selector, oOptions)
 				postdata += '&received=' + receiver;
 
 				if (oSettings.token !== '')
-					postdata += '&' + oSettings.token['token_var'] + '=' + oSettings.token['token_id'];
+					postdata += '&' + oSettings.toke.token_var + '=' + oSettings.token.token_id;
 
 				// And with the post data prepared, lets make the ajax request
 				$.ajax({
@@ -718,8 +718,8 @@ function add_elk_mention(selector, oOptions)
 					if (textStatus === 'success' && $(data).find("elk > tokens > token").length !== 0)
 					{
 						// Reset the token
-						oSettings.token['token_id'] = $(data).find("tokens").find('[type="token"]').text();
-						oSettings.token['token_var'] = $(data).find("tokens").find('[type="token_var"]').text();
+						oSettings.token.token_id = $(data).find("tokens").find('[type="token"]').text();
+						oSettings.token.token_var = $(data).find("tokens").find('[type="token_var"]').text();
 					}
 				});
 			}
@@ -1034,7 +1034,7 @@ function setBoardIds() {
 		var positionTooltip = function(event)
 		{
 			var iPosx = 0,
-					iPosy = 0;
+				iPosy = 0;
 
 			if (!event)
 				event = window.event;
@@ -1170,7 +1170,6 @@ function setBoardIds() {
 				hideTooltip(this);
 				return true;
 			});
-
 		});
 	};
 })(jQuery);
@@ -1322,23 +1321,23 @@ errorbox_handler.prototype.removeError = function(error_box, error_elem)
 function addAnotherOption(parent, oDtName, oDdName, oData)
 {
 	// Some defaults to use if none are passed
-	oDtName['type'] = oDtName['type'] || 'text';
-	oDtName['class'] = oDtName['class'] || 'input_text';
-	oDtName['size'] = oDtName['size'] || '20';
+	oDtName['type'] = oDtName.type || 'text';
+	oDtName['class'] = oDtName.class || 'input_text';
+	oDtName['size'] = oDtName.size || '20';
 
-	oDdName['type'] = oDdName['type'] || 'text';
-	oDdName['class'] = oDdName['class'] || 'input_text';
-	oDdName['size'] = oDdName['size'] || '20';
+	oDdName['type'] = oDdName.type || 'text';
+	oDdName['class'] = oDdName.class || 'input_text';
+	oDdName['size'] = oDdName.size || '20';
 	oData = oData || '';
 
 	// Our new <dt> element
 	var newDT = document.createElement('dt'),
 		newInput = document.createElement('input');
 
-	newInput.name = oDtName['name'];
-	newInput.type = oDtName['type'];
+	newInput.name = oDtName.name;
+	newInput.type = oDtName.type;
 	newInput.setAttribute('class', oDtName['class']);
-	newInput.size = oDtName['size'];
+	newInput.size = oDtName.size;
 	newDT.appendChild(newInput);
 
 	// And its matching <dd>
@@ -1350,9 +1349,9 @@ function addAnotherOption(parent, oDtName, oDdName, oData)
 	else
 		newInput = document.createElement('select');
 
-	newInput.name = oDdName['name'];
-	newInput.type = oDdName['type'];
-	newInput.size = oDdName['size'];
+	newInput.name = oDdName.name;
+	newInput.type = oDdName.type;
+	newInput.size = oDdName.size;
 	newInput.setAttribute('class', oDdName['class']);
 	newDD.appendChild(newInput);
 
