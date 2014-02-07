@@ -482,7 +482,7 @@ class ManageSearch_Controller extends Action_Controller
 				$context['step'] = 3;
 			else
 			{
-				list ($context['start'], $complete) = removeCommonWordsFromIndex($context['start'], $index_properties[$context['index_settings']['bytes_per_word']]['step_size']);
+				list ($context['start'], $complete) = removeCommonWordsFromIndex($context['start'], $index_properties[$context['index_settings']['bytes_per_word']]);
 				if ($complete)
 					$context['step'] = 3;
 

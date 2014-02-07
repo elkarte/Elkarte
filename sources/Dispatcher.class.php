@@ -321,7 +321,7 @@ class Site_Dispatcher
 				require_once(CONTROLLERDIR . '/BoardIndex.controller.php');
 				call_integration_hook('integrate_boardindex_before');
 				$controller = new BoardIndex_Controller();
-				$this->action_boardindex();
+				$controller->action_boardindex();
 				call_integration_hook('integrate_boardindex_after');
 			}
 			call_integration_hook('integrate_' . $hook . '_after');
