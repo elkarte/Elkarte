@@ -25,7 +25,7 @@ class DbSearch_MySQL implements DbSearch
 {
 	/**
 	 * This instance of the search
-	 * @var instance
+	 * @var DbSearch_MySQL
 	 */
 	private static $_search = null;
 

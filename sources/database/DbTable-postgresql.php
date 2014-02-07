@@ -32,7 +32,7 @@ class DbTable_PostgreSQL extends DbTable
 {
 	/**
 	 * Holds this instance of the table interface
-	 * @var instance
+	 * @var DbTable_PostgreSQL
 	 */
 	private static $_tbl = null;
 
@@ -422,7 +422,7 @@ class DbTable_PostgreSQL extends DbTable
 				)
 			);
 		}
-		
+
 		// Different default?
 		if (isset($column_info['default']) && $column_info['default'] != $old_info['default'])
 		{

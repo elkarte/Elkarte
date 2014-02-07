@@ -32,7 +32,7 @@ class DbTable_MySQL extends DbTable
 {
 	/**
 	 * Holds this instance of the table interface
-	 * @var instance
+	 * @var DbTable_MySQL
 	 */
 	private static $_tbl = null;
 
@@ -470,7 +470,7 @@ class DbTable_MySQL extends DbTable
 
 				return true;
 			}
-			
+
 			if ($index['name'] == $index_name)
 			{
 				// Drop the bugger...

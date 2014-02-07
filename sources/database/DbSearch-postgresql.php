@@ -25,7 +25,7 @@ class DbSearch_PostgreSQL implements DbSearch
 {
 	/**
 	 * This instance of the search
-	 * @var instance
+	 * @var DbSearch_PostgreSQL
 	 */
 	private static $_search = null;
 

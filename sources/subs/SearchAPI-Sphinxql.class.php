@@ -37,7 +37,7 @@ class Sphinxql_Search
 	 * This won't work with versions of ElkArte less than this.
 	 * @var string
 	 */
-	public $min_elk_version = 'ElkArte 1.0 Beta';
+	public $min_elk_version = 'ElkArte 1.0 Beta 1';
 
 	/**
 	 * Is it supported?
@@ -85,7 +85,6 @@ class Sphinxql_Search
 	 *
 	 * @param string $methodName
 	 * @param string|null $query_params
-	 * @return
 	 */
 	public function supportsMethod($methodName, $query_params = null)
 	{

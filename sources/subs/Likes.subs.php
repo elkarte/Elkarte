@@ -254,7 +254,7 @@ function updateLike($id_liker, $liked_message, $direction)
  * Increase the number of likes for this topic.
  *
  * @param int $id_topic - the topic
- * @param char $direction +/- liking or unliking
+ * @param string $direction +/- liking or unliking
  */
 function increaseTopicLikes($id_topic, $direction)
 {

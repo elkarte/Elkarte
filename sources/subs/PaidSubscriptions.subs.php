@@ -536,7 +536,7 @@ function loadSubscriptions()
  * Loads all of the members subscriptions from those that are active
  *
  * @param int $memID id of the member
- * @param type $active_subscriptions array of active subscriptions they can have
+ * @param mixed[] $active_subscriptions array of active subscriptions they can have
  */
 function loadMemberSubscriptions($memID, $active_subscriptions)
 {

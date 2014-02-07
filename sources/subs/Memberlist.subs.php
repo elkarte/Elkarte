@@ -158,7 +158,7 @@ function ml_memberCount()
 /**
  * Get all all the members who's name starts below a given letter
  *
- * @param char $start
+ * @param string $start single letter to start with
  */
 function ml_alphaStart($start)
 {

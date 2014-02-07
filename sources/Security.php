@@ -145,7 +145,7 @@ function validateSession($type = 'admin')
  * Message is what to tell them when asking them to login.
  *
  * @param string $message = ''
- * @param bollean $is_fatal = true
+ * @param boolean $is_fatal = true
  */
 function is_not_guest($message = '', $is_fatal = true)
 {
@@ -1299,7 +1299,7 @@ function spamProtection($error_type, $fatal = true)
  *
  * @param string $path the (absolute) directory path
  * @param boolean $attachments if the directory is an attachments directory or not
- * @return string|true on success error string if anything fails
+ * @return string|boolean on success error string if anything fails
  */
 function secureDirectory($path, $attachments = false)
 {

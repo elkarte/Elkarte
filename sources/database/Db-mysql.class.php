@@ -29,7 +29,7 @@ class Database_MySQL implements Database
 {
 	/**
 	 * Holds current instance of the class
-	 * @var instance
+	 * @var Database_MySQL
 	 */
 	private static $_db = null;
 

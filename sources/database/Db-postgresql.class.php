@@ -1112,7 +1112,7 @@ class Database_PostgreSQL implements Database
 	 * This function optimizes a table.
 	 *
 	 * @param string $table - the table to be optimized
-	 * @return how much it was gained
+	 * @return int how much it was gained
 	 */
 	function db_optimize_table($table)
 	{

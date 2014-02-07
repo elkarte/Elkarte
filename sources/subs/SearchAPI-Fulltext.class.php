@@ -86,7 +86,6 @@ class Fulltext_Search
 	 *
 	 * @param string $methodName
 	 * @param mixed[]|null $query_params
-	 * @return
 	 */
 	public function supportsMethod($methodName, $query_params = null)
 	{
@@ -207,7 +206,6 @@ class Fulltext_Search
 	 *
 	 * @param mixed[] $words
 	 * @param mixed[] $search_data
-	 * @return
 	 */
 	public function indexedWordQuery($words, $search_data)
 	{
