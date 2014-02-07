@@ -1,0 +1,326 @@
+/* INTRODUCTION
+/* This is a very basic version of the Elkarte default theme.
+/* It is intended primarily as a "clean slate" for custom theming.
+/* This is eye candy only. All the layout code is in index.css.
+/*
+/* All theme variants depend on the layout code for stability.
+/* It is better to copy code to a variant CSS file for testing.
+/*
+/* This variant uses named colours instead of hex codes.
+/* CSS colour names at http://www.w3schools.com/cssref/css_colornames.asp
+/* ------------------------------------------------------- */
+/* $CONTENTS - still a bit WIP. @todo
+/*
+/*		$GENERAL.............Global resets, clearfixes, etc.
+/*		$COMMON..............Common classes to drive you bonkers.
+/*		$BBC.................Quotes, code blocks, BBC styles.
+/*		$AJAX................The "loading" bar (quick edit, etc).
+/*
+/*		$MAIN................Forum header, wrapper, and footer.
+/*		$MENUS...............Main and secondary menus.
+/*		$LINKTREE............The breadcrumbs.
+/*		$BUTTONS.............Most button strips.
+/*		$PAGELINKS...........Page navigation links.
+/*
+/*		$TABLES..............Generic tables (memberlist, error log, etc).
+/*		$SETTINGS............Generic lists for settings pages.
+/*		$BOARDS..............Board index, sub-boards, and message index.
+/*
+/*		$TOPICS..............The display template (topic view), including send.
+/*		$EDITOR..............Main editor (posts, events, polls) and topic summary.
+/*		$MODERATE............Move topic, split topic, merge topic.
+/*
+/*		$PROFILE.............The profile areas.
+/*		$PERSONAL............The personal messages (PM) areas.
+/*		$CALENDAR............Wombats (and the calendar).
+/*		$STATISTICS..........The statistics centre.
+/*
+/*		$HELP................Help pages, help icons and pop-ups, tooltips.
+/*		$SEARCH..............Search pages, including memberlist search.
+/*		$LOGIN...............Login and registration, maintenance mode.
+/*
+/*		$ERRORS..............Error messages.
+/*		$PROGRESS............Nifty progress bars.
+/*		$MEDIA...............Experimental media queries.
+/* ------------------------------------------------------- */
+
+/*	$GENERAL	*/
+/* ------------------------------------------------------- */
+
+/* Stop white band under footer on short pages. */
+/* This color should match $FOOTER background. */
+legend {
+	background: url(../../images/selected_open.png) no-repeat scroll right center transparent;
+	padding-left: 0;
+	padding-right: 20px;
+	margin-left: 0;
+	margin-right: 15px;
+}
+.collapsed legend {
+	background:  url(../../images/selected.png) no-repeat scroll right center transparent;
+}
+
+/* The OpenID login form */
+.openid_login {
+	padding-left: 0;
+	padding-right: 20px;
+	background-position: 98% 50%;
+}
+
+/* Styles for main headers. */
+.category_header, .forum_category .category_header {
+	text-shadow: -1px 1px 0 #ebebeb;
+}
+/* Styles for subsection headers. @todo */
+.secondary_header {
+	text-shadow: -1px 1px 0 #fff;
+}
+
+/* More little boxes on a hillside. */
+.warningbox {
+	border-left: 1px solid #ffd324;
+	border-right: 5px solid #ffd324;
+}
+.successbox {
+	border-left: 1px solid #9ece9e;
+	border-right: 5px solid #9ece9e;
+}
+.infobox {
+	border-left: 1px solid #3a87ad;
+	border-right: 5px solid #3a87ad;
+}
+.errorbox {
+	border-left: 1px solid #ce9e9e;
+	border-right: 5px solid #ce9e9e;
+}
+
+/*	$BBC		*/
+/* ------------------------------------------------------- */
+/* Extra quote styling */
+.bbc_standard_quote, .bbc_alternate_quote, .quoteheader {
+	box-shadow: -2px 2px 2px #ddd;
+}
+/* /me uses this a lot. (emote, try typing /me in a post.) */
+.meaction {
+	color: #50aa3a;
+	vertical-align: bottom;
+}
+
+/*	$AJAX		*/
+/* ------------------------------------------------------- */
+
+/*	$MAIN.		*/
+/* ------------------------------------------------------- */
+/* @todo these two may be broken */
+#search_form select {
+	border-left: none;
+}
+#search_form select:focus {
+	border-left: none;
+}
+
+/*	$MENUS		*/
+/* ------------------------------------------------------- */
+/* Level 1 Menu bar: link or button. General styling. */
+.linklevel1, .linklevel1:link, .linklevel1:visited {
+	border-left: 1px solid #afafaf;
+	border-right: 1px solid #bfbfbf;
+	box-shadow: -1px 1px 2px #e5e5e5;
+}
+
+/* Level 1 button hover and focus effects. */
+.linklevel1:hover, .listlevel1:hover .linklevel1,
+.linklevel2:hover, .listlevel2:hover .linklevel2,
+.linklevel3:hover, .listlevel3:hover .linklevel3,
+#menu_sidebar .linklevel1:hover, #menu_sidebar .listlevel1:hover .linklevel1,
+#menu_current_area>strong>.linklevel1 {
+	border-left: 1px solid #ccc;
+	border-right: 1px solid #afafaf;
+	box-shadow: -2px 1px 1px rgba(0,0,0,0.07) inset;
+}
+
+.poster li.poster_online:hover .linklevel1 {
+	border-left: 1px solid #ccc;
+	border-right: 1px solid #afafaf;
+	box-shadow: -2px 1px 1px rgba(0,0,0,0.07) inset;
+}
+.poster li.poster_online .nolink {
+	border-left: 1px solid #afafaf;
+	border-right: 1px solid #bfbfbf;
+	box-shadow: -1px 1px 2px #e5e5e5;
+}
+/* Common button styling. */
+/* It is being replaced with three classes: */
+/*    .button_submit is not floated    */
+/*    .right_submit is right floated   */
+/*    .left_submit is left floated     */
+/* The button_reset class may need attention too. */
+.button_submit, .right_submit, .left_submit, .button_reset,
+/* Anchors styled to look like buttons. */
+/* These have standard body text size. Can be chained with smalltext class. */
+.linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
+.linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
+	border-left: 1px solid #afafaf;
+	border-right: 1px solid #bfbfbf;
+	box-shadow: -1px 1px 2px #e5e5e5;
+}
+
+/* Hover effects. */
+.button_submit:hover, .right_submit:hover, .left_submit:hover,
+.button_reset:hover,
+.linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover {
+	border-left: 1px solid #ccc;
+	border-right: 1px solid #afafaf;
+	box-shadow: -2px 1px 1px rgba(0,0,0,0.07) inset;
+}
+
+/* Top level subsection indicators. */
+/* Level 1 active buttons. */
+.pm_indicator {
+	box-shadow: -1px 1px 2px #444;
+	left: auto;
+	right: -1px;
+}
+
+/* Admin menu icons. */
+.linklevel2>img {
+	margin: 0 -4px 0 0;
+}
+
+/* Level 2: subsection indicators. */
+.listlevel2.subsections .linklevel2:after {
+	right: auto;
+	left: 6px;
+	content: "\25c0";
+}
+
+/* Level 1: subsection indicators. */
+#menu_sidebar .listlevel1.subsections .linklevel1:after {
+	right: auto;
+	left: 6px;
+	content: "\2190";
+}
+
+/*	$PAGELINKS	*/
+/* ------------------------------------------------------- */
+/* our buddies &laquo; &raquo; */
+.small_pagelinks:before {
+	content: '\00BB';
+	float: right;
+}
+.small_pagelinks:after {
+	content: '\00AB';
+	float: right;
+}
+
+/* Globally accessible top/bottom links. */
+#gotop, #gobottom {
+	border-radius: 0 20px 0 0;
+}
+#gobottom {
+	border-radius: 0 0 20px 0;
+}
+/*End sidebar flyout coding. */
+
+/*	$MAIN.		*/
+/* ------------------------------------------------------- */
+#forumtitle {
+	text-shadow: -1px 1px 2px #fff;
+}
+
+.navigate_section {
+	padding-left: 0;
+	padding-right: 15px;
+}
+.linktree, .linktree_last {
+	padding: 0 1em 0 0.5em;
+}
+.linktree:after {
+	border-right: 0.7em solid #eee;
+	margin-right: 0;
+	margin-left: 4px;
+}
+
+/*	$BOARDICONS	*/
+/* ------------------------------------------------------- */
+.board_icon {
+	float: right;
+}
+.board_key:before {
+	float: right;
+}
+.category_boards .board_icon, .board_key:before {
+	background-image: url(../../images/_besocial/board_icons_rtl.png);
+}
+.board_stats {
+	text-align: right;
+	padding: 1px 0 1px 6px;
+	float: right;
+}
+
+/*	$TOPICS		*/
+/* ------------------------------------------------------- */
+
+/*	$PROGRESS	*/
+/* ------------------------------------------------------- */
+
+/*	$TOPICS		*/
+/* ------------------------------------------------------- */
+
+/*	$PROFILE		*/
+/* ------------------------------------------------------- */
+
+/*	$HELP		*/
+/* ------------------------------------------------------- */
+
+/* Styles for the tooltips. */
+.tooltip {
+	box-shadow: -3px 3px 3px rgba(0,0,0,0.3);
+}
+
+/* $STATISTICS	*/
+/* ------------------------------------------------------- */
+.stats.floatleft {
+	border-right: 0;
+	border-left: 1px solid #ccc;
+}
+.statsbar .bar {
+	background: #43a8da;
+	border-radius: 0 4px 4px 0;
+}
+/* Styles for the $TABS	*/
+/* We can't control what jqueryui pollutes the DOM with, so deal with it */
+/* Styles for the profile summary tabs, or any jquery ui tabs */
+/* ---------------------------------------------------------- */
+.ui-tabs .ui-tabs-nav li {
+	box-shadow: -2px 0px 0px rgba(0,0,0,0.3);
+	margin-left: 0;
+	margin-right: 2px;
+}
+
+/*	$MEDIA		*/
+/* This one does 800 screens at default font size. */
+@media screen and (max-width: 50em) {
+	#menu_sidebar {
+		box-shadow: -3px 3px 3px rgba(0,0,0,0.3);
+	}
+}
+/* This one does up to 540 screens. */
+@media screen and (max-width: 33.750em) {
+	.board_latest {
+		border-right: 0;
+	}
+	#forumtitle {
+		margin-left: 0;
+		margin-right: 10px;
+	}
+	.topic_listing>li {
+		box-shadow: -3px 3px 6px #e5e5e5;
+	}
+	.forumposts .windowbg, .forumposts .windowbg2 {
+		box-shadow: -3px 3px 6px #e5e5e5;
+	}
+	.admin_menu li {
+		float: right;
+	}
+}

@@ -44,6 +44,10 @@
 
 /*	$GENERAL	*/
 /* ------------------------------------------------------- */
+/* Selects don't like to behave across OS and browsers, unfortunately. */
+.styled-select {
+	background: #fff url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYAQAAAADb20ChAAAAAnRSTlMAAQGU/a4AAAApSURBVHjaY/zPgIL+MTL+aWb84c74QZ/xgT6yFJALFARKARUAlaFpBACuqxnhHOnncgAAAABJRU5ErkJggg==) 2% 50% no-repeat;
+}
 /* A div to hold the select */
 .styled-select select {
 	padding: 1px 2px 1px 2em;
@@ -120,7 +124,7 @@ h2 a.collapse {
 #category_toggle span, #category_toggle_more span, #upshrink_header span {
 	right: 50%;
 	left: auto;
-	margin-right: -58px;
+	margin-right: -42px;
 	margin-left: 0;
 }
 
