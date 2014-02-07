@@ -33,6 +33,11 @@ class News_Controller extends Action_Controller
 	private $_query_this_board = null;
 
 	/**
+	 * Holds the limit for the number of items to get
+	 */
+	private $_limit;
+
+	/**
 	 * Dispatcher. Forwards to the action to execute.
 	 *
 	 * @see Action_Controller::action_index()
@@ -71,7 +76,7 @@ class News_Controller extends Action_Controller
 
 		// Default to latest 5.  No more than whats defined in the ACP or 255
 		$limit = empty($modSettings['xmlnews_limit']) ? 5 : min($modSettings['xmlnews_limit'], 255);
-		$this->limit = empty($_GET['limit']) || (int) $_GET['limit'] < 1 ? $limit : min((int) $_GET['limit'], $limit);
+		$this->_limit = empty($_GET['limit']) || (int) $_GET['limit'] < 1 ? $limit : min((int) $_GET['limit'], $limit);
 
 		// Handle the cases where a board, boards, or category is asked for.
 		$this->_query_this_board = '1=1';
@@ -100,7 +105,7 @@ class News_Controller extends Action_Controller
 
 			// Try to limit the number of messages we look through.
 			if ($total_cat_posts > 100 && $total_cat_posts > $modSettings['totalMessages'] / 15)
-				$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 400 - $this->limit * 5);
+				$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 400 - $this->_limit * 5);
 		}
 		elseif (!empty($_REQUEST['boards']))
 		{
@@ -128,7 +133,7 @@ class News_Controller extends Action_Controller
 
 			// The more boards, the more we're going to look through...
 			if ($total_posts > 100 && $total_posts > $modSettings['totalMessages'] / 12)
-				$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 500 - $this->limit * 5);
+				$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 500 - $this->_limit * 5);
 		}
 		elseif (!empty($board))
 		{
@@ -141,13 +146,13 @@ class News_Controller extends Action_Controller
 
 			// Try to look through just a few messages, if at all possible.
 			if ($boards_data[$board]['num_posts'] > 80 && $boards_data[$board]['num_posts'] > $modSettings['totalMessages'] / 10)
-				$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 600 - $this->limit * 5);
+				$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 600 - $this->_limit * 5);
 		}
 		else
 		{
 			$this->_query_this_board = '{query_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 				AND b.id_board != ' . $modSettings['recycle_board'] : '');
-			$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 100 - $this->limit * 5);
+			$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 100 - $this->_limit * 5);
 		}
 
 		// If format isn't set, rss2 is default
@@ -178,7 +183,7 @@ class News_Controller extends Action_Controller
 		}
 
 		// We only want some information, not all of it.
-		$cachekey = array($xml_format, $_GET['action'], $this->limit, $subAction);
+		$cachekey = array($xml_format, $_GET['action'], $this->_limit, $subAction);
 		foreach (array('board', 'boards', 'c') as $var)
 		{
 			if (isset($_REQUEST[$var]))
@@ -349,7 +354,7 @@ class News_Controller extends Action_Controller
 
 		// Find the most recent members.
 		require_once(SUBSDIR . '/Members.subs.php');
-		$members = recentMembers((int) $this->limit);
+		$members = recentMembers((int) $this->_limit);
 
 		$data = array();
 		foreach ($members as $member)
@@ -403,7 +408,7 @@ class News_Controller extends Action_Controller
 
 		// Get the latest topics from a board
 		require_once(SUBSDIR . '/News.subs.php');
-		$results = getXMLNews($this->_query_this_board, $board, $this->limit);
+		$results = getXMLNews($this->_query_this_board, $board, $this->_limit);
 
 		// Prepare it for the feed in the format chosen (rss, atom, etc)
 		$data = array();
@@ -435,7 +440,7 @@ class News_Controller extends Action_Controller
 
 				// Add the poster name on if we are rss2
 				if ($xml_format == 'rss2')
-					$data[sizeof($data) - 1]['dc:creator'] = $row['poster_name'];
+					$data[count($data) - 1]['dc:creator'] = $row['poster_name'];
 			}
 			// RDF Format anyone
 			elseif ($xml_format == 'rdf')
@@ -504,7 +509,7 @@ class News_Controller extends Action_Controller
 
 		// Get the latest news
 		require_once(SUBSDIR . '/News.subs.php');
-		$results = getXMLRecent($this->_query_this_board, $board, $this->limit);
+		$results = getXMLRecent($this->_query_this_board, $board, $this->_limit);
 
 		// Loop on the results and prepare them in the format requested
 		$data = array();
@@ -534,9 +539,9 @@ class News_Controller extends Action_Controller
 					'guid' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg']
 				);
 
-				// add the poster name on if we are rss2
+				// Add the poster name on if we are rss2
 				if ($xml_format == 'rss2')
-					$data[sizeof($data) - 1]['dc:creator'] = $row['poster_name'];
+					$data[count($data) - 1]['dc:creator'] = $row['poster_name'];
 			}
 			elseif ($xml_format == 'rdf')
 			{
