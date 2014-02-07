@@ -3432,7 +3432,7 @@ function setupMenuContext()
 					// The old "logout" is meh. Not a real word. "Log out" is better.
 					'logout' => array(
 						'title' => $txt['logout'],
-						'href' => $scripturl . '?action=logout;' . $context['session_var'] . '=' . $context['session_id'],
+						'href' => $scripturl . '?action=logout',
 						'show' => !$user_info['is_guest'],
 					),
 				),
@@ -3570,6 +3570,9 @@ function setupMenuContext()
 		if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
 			cache_put_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $menu_buttons, $cacheTime);
 	}
+
+	if (!empty($menu_buttons['profile']['sub_buttons']['logout']))
+		$menu_buttons['profile']['sub_buttons']['logout']['href'] .= ';' . $context['session_var'] . '=' . $context['session_id'];
 
 	$context['menu_buttons'] = $menu_buttons;
 

@@ -226,7 +226,7 @@ function template_topic_listing()
 						<span class="board_avatar"><a href="', $topic['last_post']['member']['href'], '">', $topic['last_post']['member']['avatar']['image'], '</a></span>';
 
 			echo '
-						<a href="', $topic['last_post']['href'], '"><img src="', $settings['images_url'], '/icons/last_post.png" alt="', $txt['last_post'], '" title="', $txt['last_post'], '" /></a>
+						<a href="', $topic['last_post']['href'], '"><img src="', $settings['images_url'], '/icons/last_post', $context['right_to_left'] ? '_rtl' : '', '.png" alt="', $txt['last_post'], '" title="', $txt['last_post'], '" /></a>
 						', $topic['last_post']['html_time'], '<br />
 						', $txt['by'], ' ', $topic['last_post']['member']['link'], '
 					</p>
