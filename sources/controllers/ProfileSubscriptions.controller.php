@@ -119,6 +119,9 @@ class ProfileSubscriptions_Controller extends Action_Controller
 	/**
 	 * Called when the user selects Order from the subscription page
 	 * accessed with ?action=profile;u=123;area=subscriptions;confirm
+	 *
+	 * @param mixed[] $gateways array of available payment gateway objects
+	 * @param int $memID
 	 */
 	private function _confirmOrder($gateways, $memID)
 	{

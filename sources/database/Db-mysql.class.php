@@ -56,7 +56,7 @@ class Database_MySQL implements Database
 	 * @param string $db_user
 	 * @param string $db_passwd
 	 * @param string $db_prefix
-	 * @param array $db_options
+	 * @param mixed[] $db_options
 	 *
 	 * @return resource
 	 */
@@ -129,7 +129,7 @@ class Database_MySQL implements Database
 	 * their current values from $user_info.
 	 * In addition, it performs checks and sanitization on the values sent to the database.
 	 *
-	 * @param $matches
+	 * @param mixed[] $matches
 	 */
 	function replacement__callback($matches)
 	{
@@ -245,8 +245,8 @@ class Database_MySQL implements Database
 	 * Just like the db_query, escape and quote a string, but not executing the query.
 	 *
 	 * @param string $db_string
-	 * @param array $db_values
-	 * @param resource $connection = null
+	 * @param mixed[] $db_values
+	 * @param resource|null $connection = null
 	 */
 	function quote($db_string, $db_values, $connection = null)
 	{
@@ -273,8 +273,8 @@ class Database_MySQL implements Database
 	 *
 	 * @param string $identifier
 	 * @param string $db_string
-	 * @param array $db_values = array()
-	 * @param resource $connection = null
+	 * @param mixed[] $db_values = array()
+	 * @param resource|null $connection = null
 	 */
 	function query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
@@ -379,10 +379,11 @@ class Database_MySQL implements Database
 
 					$pos = $pos2 + 1;
 				}
-				$clean .= ' %s ';
 
+				$clean .= ' %s ';
 				$old_pos = $pos + 1;
 			}
+
 			$clean .= substr($db_string, $old_pos);
 			$clean = trim(strtolower(preg_replace($allowed_comments_from, $allowed_comments_to, $clean)));
 
@@ -423,7 +424,7 @@ class Database_MySQL implements Database
 	/**
 	 * Affected rows from previous operation.
 	 *
-	 * @param resource $connection
+	 * @param resource|null $connection
 	 */
 	function affected_rows($connection = null)
 	{
@@ -434,8 +435,8 @@ class Database_MySQL implements Database
 	 * Last inserted id.
 	 *
 	 * @param string $table
-	 * @param string $field = null
-	 * @param resource $connection = null
+	 * @param string|null $field = null
+	 * @param resource|null $connection = null
 	 */
 	function insert_id($table, $field = null, $connection = null)
 	{
@@ -478,7 +479,7 @@ class Database_MySQL implements Database
 	 */
 	function num_rows($result)
 	{
-		// simply delegate to the native function
+		// Simply delegate to the native function
 		return mysqli_num_rows($result);
 	}
 
@@ -500,7 +501,7 @@ class Database_MySQL implements Database
 	 */
 	function data_seek($request, $counter)
 	{
-		// delegate to native mysql function
+		// Delegate to native mysql function
 		return mysqli_data_seek($request, $counter);
 	}
 
@@ -508,7 +509,7 @@ class Database_MySQL implements Database
 	 * Do a transaction.
 	 *
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
-	 * @param resource $connection = null
+	 * @param resource|null $connection = null
 	 */
 	function db_transaction($type = 'commit', $connection = null)
 	{
@@ -528,7 +529,7 @@ class Database_MySQL implements Database
 	/**
 	 * Return last error string from the database server
 	 *
-	 * @param resource $connection = null
+	 * @param resource|null $connection = null
 	 */
 	function last_error($connection = null)
 	{
@@ -544,7 +545,7 @@ class Database_MySQL implements Database
 	 * Backtrace, log, try to fix.
 	 *
 	 * @param string $db_string
-	 * @param resource $connection = null
+	 * @param resource|null $connection = null
 	 */
 	function error($db_string, $connection = null)
 	{
@@ -744,12 +745,12 @@ class Database_MySQL implements Database
 	 * Insert data.
 	 *
 	 * @param string $method - options 'replace', 'ignore', 'insert'
-	 * @param $table
-	 * @param $columns
-	 * @param $data
-	 * @param $keys
+	 * @param string $table
+	 * @param mixed[] $columns
+	 * @param mixed[] $data
+	 * @param mixed[] $keys
 	 * @param bool $disable_trans = false
-	 * @param resource $connection = null
+	 * @param resource|null $connection = null
 	 */
 	function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 	{
@@ -809,10 +810,10 @@ class Database_MySQL implements Database
 	 * This function tries to work out additional error information from a back trace.
 	 *
 	 * @param string $error_message
-	 * @param $log_message
-	 * @param $error_type
-	 * @param string $file
-	 * @param integer $line
+	 * @param string $log_message
+	 * @param string|false $error_type
+	 * @param string|null $file
+	 * @param integer|null $line
 	 */
 	function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null)
 	{
@@ -862,7 +863,7 @@ class Database_MySQL implements Database
 	 * @param $string
 	 * @param bool $translate_human_wildcards = false, if true, turns human readable wildcards into SQL wildcards.
 	 */
-	function escape_wildcard_string($string, $translate_human_wildcards=false)
+	function escape_wildcard_string($string, $translate_human_wildcards = false)
 	{
 		$replacements = array(
 			'%' => '\%',
@@ -891,7 +892,7 @@ class Database_MySQL implements Database
 	/**
 	 * Returns whether the database system supports ignore.
 	 *
-	 * @return bool
+	 * @return true
 	 */
 	function support_ignore()
 	{
@@ -904,6 +905,7 @@ class Database_MySQL implements Database
 	 *
 	 * @param string $tableName - the table to create the inserts for.
 	 * @param bool $new_table
+	 *
 	 * @return string the query to insert the data back in, or an empty string if the table was empty.
 	 */
 	function insert_sql($tableName, $new_table = false)
@@ -980,6 +982,7 @@ class Database_MySQL implements Database
 	 * Dumps the schema (CREATE) for a table.
 	 *
 	 * @param string $tableName - the table
+	 *
 	 * @return string - the CREATE statement as string
 	 */
 	function db_table_sql($tableName)
@@ -1046,7 +1049,7 @@ class Database_MySQL implements Database
 		$indexes = array();
 		while ($row = $this->fetch_assoc($result))
 		{
-			// IS this a primary key, unique index, or regular index?
+			// Is this a primary key, unique index, or regular index?
 			$row['Key_name'] = $row['Key_name'] == 'PRIMARY' ? 'PRIMARY KEY' : (empty($row['Non_unique']) ? 'UNIQUE ' : ($row['Comment'] == 'FULLTEXT' || (isset($row['Index_type']) && $row['Index_type'] == 'FULLTEXT') ? 'FULLTEXT ' : 'KEY ')) . '`' . $row['Key_name'] . '`';
 
 			// Is this the first column in the index?
@@ -1091,8 +1094,9 @@ class Database_MySQL implements Database
 	 * This function lists all tables in the database.
 	 * The listing could be filtered according to $filter.
 	 *
-	 * @param mixed $db_name_str string holding the database name, or false, default false
-	 * @param mixed $filter string to filter by, or false, default false
+	 * @param string|false $db_name_str string holding the database name, or false, default false
+	 * @param string|false $filter string to filter by, or false, default false
+	 *
 	 * @return string[] an array of table names. (strings)
 	 */
 	function db_list_tables($db_name_str = false, $filter = false)
@@ -1124,6 +1128,7 @@ class Database_MySQL implements Database
 	 * This function optimizes a table.
 	 *
 	 * @param string $table - the table to be optimized
+	 *
 	 * @return int how much it was gained
 	 */
 	function db_optimize_table($table)
@@ -1134,31 +1139,31 @@ class Database_MySQL implements Database
 
 		// Get how much overhead there is.
 		$request = $this->query('', '
-				SHOW TABLE STATUS LIKE {string:table_name}',
-				array(
-					'table_name' => str_replace('_', '\_', $table),
-				)
-			);
+			SHOW TABLE STATUS LIKE {string:table_name}',
+			array(
+				'table_name' => str_replace('_', '\_', $table),
+			)
+		);
 		$row = $this->fetch_assoc($request);
 		$this->free_result($request);
 
 		$data_before = isset($row['Data_free']) ? $row['Data_free'] : 0;
 		$request = $this->query('', '
-				OPTIMIZE TABLE `{raw:table}`',
-				array(
-					'table' => $table,
-				)
-			);
+			OPTIMIZE TABLE `{raw:table}`',
+			array(
+				'table' => $table,
+			)
+		);
 		if (!$request)
 			return -1;
 
 		// How much left?
 		$request = $this->query('', '
-				SHOW TABLE STATUS LIKE {string:table}',
-				array(
-					'table' => str_replace('_', '\_', $table),
-				)
-			);
+			SHOW TABLE STATUS LIKE {string:table}',
+			array(
+				'table' => str_replace('_', '\_', $table),
+			)
+		);
 		$row = $this->fetch_assoc($request);
 		$this->free_result($request);
 
@@ -1172,6 +1177,7 @@ class Database_MySQL implements Database
 	 *
 	 * @param string $table
 	 * @param string $backup_table
+	 *
 	 * @return resource - the request handle to the table creation query
 	 */
 	function db_backup_table($table, $backup_table)
@@ -1225,6 +1231,7 @@ class Database_MySQL implements Database
 		$create = preg_split('/[\n\r]/', $create);
 
 		$auto_inc = '';
+
 		// Default engine type.
 		$engine = 'MyISAM';
 		$charset = '';
@@ -1321,6 +1328,8 @@ class Database_MySQL implements Database
 
 	/**
 	 * Get the name (title) of the database system.
+	 *
+	 * @return string
 	 */
 	function db_title()
 	{
@@ -1330,7 +1339,7 @@ class Database_MySQL implements Database
 	/**
 	 * Whether the database system is case sensitive.
 	 *
-	 * @return bool
+	 * @return false
 	 */
 	function db_case_sensitive()
 	{
@@ -1353,7 +1362,7 @@ class Database_MySQL implements Database
 	 * It ignores $counter parameter.
 	 *
 	 * @param resource $request
-	 * @param mixed $counter = false
+	 * @param int|false $counter = false
 	 */
 	function fetch_assoc($request, $counter = false)
 	{
@@ -1363,7 +1372,8 @@ class Database_MySQL implements Database
 	/**
 	 * Return server info.
 	 *
-	 * @param resource $connection
+	 * @param resource|null $connection
+	 *
 	 * @return string
 	 */
 	function db_server_info($connection = null)
@@ -1395,8 +1405,8 @@ class Database_MySQL implements Database
 	/**
 	 * Select database.
 	 *
-	 * @param string $dbName = null
-	 * @param resource $connection = null
+	 * @param string|null $dbName = null
+	 * @param resource|null $connection = null
 	 */
 	function select_db($dbName = null, $connection = null)
 	{

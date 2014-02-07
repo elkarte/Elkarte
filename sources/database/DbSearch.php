@@ -24,8 +24,8 @@ interface DbSearch
 	 *
 	 * @param string $identifier
 	 * @param string $db_string
-	 * @param array $db_values
-	 * @param resource $connection
+	 * @param mixed[] $db_values
+	 * @param resource|null $connection
 	 * @return resource
 	 */
 	function search_query($identifier, $db_string, $db_values = array(), $connection = null);

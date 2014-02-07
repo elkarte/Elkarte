@@ -32,7 +32,6 @@ function template_generic_menu_sidebar_above()
 	$menu_context = &$context['menu_data_' . $context['cur_menu_id']];
 
 	// For every section that appears on the sidebar...
-	$firstSection = true;
 	foreach ($menu_context['sections'] as $section)
 	{
 		// Show the section header - and pump up the line spacing for readability.
@@ -92,8 +91,6 @@ function template_generic_menu_sidebar_above()
 
 		echo '
 			</ul>';
-
-		$firstSection = false;
 	}
 
 	// This is where the actual "main content" area for the admin section starts.

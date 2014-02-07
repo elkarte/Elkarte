@@ -171,11 +171,16 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 interface Control_Verifications
 {
 	/**
+	 * @param boolean $isNew
+	 * @param boolean $force_refresh
+	 *
 	 * @return boolean
 	 */
 	function showVerification($isNew, $force_refresh = true);
 
 	/**
+	 * @param boolean $refresh
+	 *
 	 * @return void
 	 */
 	function createTest($refresh = true);
@@ -255,7 +260,7 @@ class Control_Verification_Captcha implements Control_Verifications
 		// Requesting a new challange, build the image link, seed the JS
 		if ($isNew)
 		{
-			$this->_show_captcha = !empty($this->_options['override_visual']) || (!empty($modSettings['visual_verification_type']) && !isset($this->_option['override_visual']));
+			$this->_show_captcha = !empty($this->_options['override_visual']) || (!empty($modSettings['visual_verification_type']) && !isset($this->_options['override_visual']));
 
 			if ($this->_show_captcha)
 			{
@@ -409,11 +414,12 @@ class Control_Verification_Questions implements Control_Verifications
 	private $_number_questions = null;
 	private $_questions_language = null;
 	private $_possible_questions = null;
+	private $_incorrectQuestions = null;
 
 	/**
 	 * On your mark
 	 *
-	 * @param mixed[] $verificationOptions
+	 * @param mixed[]|null $verificationOptions
 	 */
 	public function __construct($verificationOptions = null)
 	{
@@ -707,7 +713,7 @@ class Control_Verification_Questions implements Control_Verifications
 	/**
 	 * Loads all the available antispam questions, or a subset based on a filter
 	 *
-	 * @param mixed[]|null $filter, if specified it myst be an array with two indexes:
+	 * @param mixed[]|null $filter if specified it myst be an array with two indexes:
 	 *              - 'type' => a valid filter, it can be 'language' or 'id_question'
 	 *              - 'value' => the value of the filter (i.e. the language)
 	 */
@@ -765,7 +771,10 @@ class Control_Verification_Questions implements Control_Verifications
 	/**
 	 * Update an existing question
 	 *
+	 * @param int $id
 	 * @param string $question
+	 * @param string $answers
+	 * @param string $language
 	 */
 	private function _update($id, $question, $answers, $language)
 	{
@@ -827,7 +836,7 @@ class Control_Verification_EmptyField implements Control_Verifications
 	/**
 	 * Get things rolling
 	 *
-	 * @param mixed[] $verificationOptions
+	 * @param mixed[]|null $verificationOptions
 	 */
 	public function __construct($verificationOptions = null)
 	{
@@ -838,8 +847,8 @@ class Control_Verification_EmptyField implements Control_Verifications
 	/**
 	 * Returns if we are showing this verification control or not
 	 *
-	 * @param type $isNew
-	 * @param type $force_refresh
+	 * @param boolean $isNew
+	 * @param boolean $force_refresh
 	 */
 	public function showVerification($isNew, $force_refresh = true)
 	{
@@ -849,7 +858,7 @@ class Control_Verification_EmptyField implements Control_Verifications
 
 		if ($isNew)
 		{
-			$this->_empty_field = !empty($this->_options['no_empty_field']) || (!empty($modSettings['enable_emptyfield']) && !isset($this->_option['no_empty_field']));
+			$this->_empty_field = !empty($this->_options['no_empty_field']) || (!empty($modSettings['enable_emptyfield']) && !isset($this->_options['no_empty_field']));
 			$this->_user_value = '';
 		}
 
