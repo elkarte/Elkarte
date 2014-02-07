@@ -30,6 +30,18 @@ class ManageMaillist_Controller extends Action_Controller
 	protected $_maillistSettings;
 
 	/**
+	 * Basic filter settings form
+	 * @var type
+	 */
+	protected $_filtersSettings;
+
+	/**
+	 * Parsers settings form
+	 * @var type
+	 */
+	protected $_parsersSettings;
+
+	/**
 	 * Main dispatcher.
 	 * This function checks permissions and passes control to the sub action.
 	 * @see Action_Controller::action_index()
