@@ -785,12 +785,12 @@ div.windowbg, div.windowbg2 {
 }
 /* Shorten url's inside posts. */
 a.bbc_link {
-    display: inline-block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 24em;
-    vertical-align: bottom;
+	display: inline-block;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 24em;
+	vertical-align: bottom;
 }
 
 /*	$AJAX		*/
@@ -1458,7 +1458,7 @@ a.bbc_link {
 	padding: 1em 2em;
 	font-weight: bold;
 	background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
-    transition: top .5s ease-out 0s, background 1s linear 0s;
+	transition: top .5s ease-out 0s, background 1s linear 0s;
 }
 #top:focus {
 	top: -4px;
@@ -1975,7 +1975,6 @@ img.new_posts {
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
-
 }
 
 
@@ -2099,7 +2098,7 @@ img.new_posts {
 	text-align: center;
 	font-size: 1em;
 }
-/* #todo - Add an h3 for a11y? Breaks Stoopidfish. Bleh. :P */
+/* @todo - Add an h3 for a11y? Breaks Stoopidfish. Bleh. :P */
 .poster .name {
 	overflow: hidden;
 	margin-top: -0.4em;
@@ -4173,7 +4172,7 @@ a.help .icon {
 		padding: 2px;
 	}
 	a.bbc_link {
-	    display: inline-block;
+		display: inline-block;
 		max-width: 16em;
 	}
 	.linktree .board_moderators, .linktree_last .board_moderators {
