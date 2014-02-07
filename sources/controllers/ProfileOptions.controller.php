@@ -522,7 +522,7 @@ class ProfileOptions_Controller extends Action_Controller
 				require_once(SUBSDIR . '/Members.subs.php');
 
 				$openID = new OpenID();
-				$_POST['openid_identifier'] = $openID->canonize($_POST['openid_identifier']);
+				$_POST['openid_identifier'] = $openID->_canonize($_POST['openid_identifier']);
 
 				if (memberExists($_POST['openid_identifier']))
 					$post_errors[] = 'openid_in_use';
