@@ -420,8 +420,6 @@ function loadBoard()
 			// So did it find anything?
 			if ($topic !== false)
 			{
-				$topic = $topic;
-
 				// Save save save.
 				cache_put_data('msg_topic-' . $_REQUEST['msg'], $topic, 120);
 			}
@@ -2279,7 +2277,7 @@ function getLanguages($use_cache = true)
 					continue;
 
 				// @todo at some point we may want to simplify that stuff (I mean scanning all the files just for index)
-				$file_dir = dir($dir->path . '/' . $entry);
+				$file_dir = dir($dir->path() . '/' . $entry);
 				while ($file_entry = $file_dir->read())
 				{
 					// Look for the index language file....
