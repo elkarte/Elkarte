@@ -37,7 +37,7 @@ class Sphinx_Search
 	 * This won't work with versions of ElkArte less than this.
 	 * @var string
 	 */
-	public $min_elk_version = 'ElkArte 1.0 Alpha';
+	public $min_elk_version = 'ElkArte 1.0 Beta 1';
 
 	/**
 	 * Is it supported?
@@ -116,7 +116,7 @@ class Sphinx_Search
 	}
 
 	/**
-	 * callback function for usort used to sort the results.
+	 * Callback function for usort used to sort the results.
 	 * the order of sorting is: large words, small words, large words that
 	 * are excluded from the search, small words that are excluded.
 	 *
@@ -272,7 +272,7 @@ class Sphinx_Search
 	 * Clean up a search word/phrase/term for Sphinx.
 	 *
 	 * @param string $sphinx_term
-	 * @param string $sphinx_client
+	 * @param SphinxClient $sphinx_client
 	 */
 	private function _cleanWordSphinx($sphinx_term, $sphinx_client)
 	{

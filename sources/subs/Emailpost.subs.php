@@ -596,7 +596,7 @@ function pbe_emailError($error, $email_message)
 	// Clean the subject like we don't know where it has been
 	$subject = trim(str_replace($pm_subject_leader, '', $email_message->subject));
 	$subject = pbe_clean_email_subject($subject);
-	$subject = ($subject === '') ? $txt['no_subject'] : $subject;
+	$subject = ($subject === '' ? $txt['no_subject'] : $subject);
 
 	// Start off with what we know about the security key, even if its nothing
 	$message_key = (string) $email_message->message_key_id;
@@ -1363,8 +1363,6 @@ function query_load_board($message_id)
 function query_load_board_details($board_id, $pbe)
 {
 	$db = database();
-
-	$board_info = array();
 
 	// To post a NEW Topic, we need certain board details
 	$request = $db->query('', '

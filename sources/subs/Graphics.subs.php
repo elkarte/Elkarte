@@ -133,7 +133,6 @@ function checkImageContents($fileName, $extensiveCheck = false)
 /**
  * Sets a global $gd2 variable needed by some functions to determine
  * whether the GD2 library is present.
- *
  */
 function checkGD()
 {
@@ -151,7 +150,6 @@ function checkGD()
 
 /**
  * Checks whether the Imagick class is present.
- *
  */
 function checkImagick()
 {
@@ -613,33 +611,6 @@ if (!function_exists('imagecreatefrombmp'))
 
 		return $dst_img;
 	}
-}
-
-/**
- * Writes a gif file to disk as a png file.
- *
- * @param resource $gif
- * @param string $lpszFileName
- * @param int $background_color = -1
- * @return boolean whether it was successful or not.
- */
-function gif_outputAsPng($gif, $lpszFileName, $background_color = -1)
-{
-	if (!isset($gif) || @get_class($gif) != 'cgif' || !$gif->loaded || $lpszFileName == '')
-		return false;
-
-	$fd = $gif->get_png_data($background_color);
-	if (strlen($fd) <= 0)
-		return false;
-
-	if (!($fh = @fopen($lpszFileName, 'wb')))
-		return false;
-
-	fwrite($fh, $fd, strlen($fd));
-	fflush($fh);
-	fclose($fh);
-
-	return true;
 }
 
 /**
