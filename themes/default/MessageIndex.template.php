@@ -208,7 +208,6 @@ function template_topic_listing()
 					</div>
 				</div>
 				<div class="topic_latest', (!empty($modSettings['todayMod']) && $modSettings['todayMod'] > 2) ? ' relative' : ' dd', '">
-
 					<p class="topic_stats">
 					', $topic['replies'], ' ', $txt['replies'], '
 					<br />
