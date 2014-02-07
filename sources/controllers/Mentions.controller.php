@@ -65,6 +65,14 @@ class Mentions_Controller extends Action_Controller
 	protected $_type = '';
 
 	/**
+	 * The url of the display mentions button (all, unread, etc)
+	 *
+	 * @var string
+	 */
+	protected $_url_param = '';
+	protected $_page = '';
+
+	/**
 	 * Determine if we are looking only at unread mentions or any kind of
 	 *
 	 * @var boolean
