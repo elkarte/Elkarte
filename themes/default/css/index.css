@@ -4305,4 +4305,7 @@ a.help .icon {
 	#button_admin {
 		display: none;
 	}
+	.quickbuttons .modified {
+		display: none;
+	}
 }
