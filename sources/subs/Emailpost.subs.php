@@ -1508,7 +1508,7 @@ function query_mark_pms($email_message, $pbe)
 		UPDATE {db_prefix}pm_recipients
 		SET is_read = is_read | 1
 		WHERE id_member = {int:id_member}
-			AND NOT (is_read & 1 >= 1)
+			AND NOT ((is_read & 1) >= 1)
 			AND id_pm = {int:personal_messages}',
 		array(
 			'personal_messages' => $email_message->message_id,
@@ -1524,7 +1524,7 @@ function query_mark_pms($email_message, $pbe)
 				labels, COUNT(*) AS num
 			FROM {db_prefix}pm_recipients
 			WHERE id_member = {int:id_member}
-				AND NOT (is_read & 1 >= 1)
+				AND NOT ((is_read & 1) >= 1)
 				AND deleted = {int:is_not_deleted}
 			GROUP BY labels',
 			array(
