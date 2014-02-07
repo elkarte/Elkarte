@@ -274,7 +274,7 @@ class Database_MySQL implements Database
 	 * @param string $identifier
 	 * @param string $db_string
 	 * @param mixed[] $db_values = array()
-	 * @param resource|null $connection = null
+	 * @param resource|false|null $connection = null
 	 */
 	function query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
@@ -811,7 +811,7 @@ class Database_MySQL implements Database
 	 *
 	 * @param string $error_message
 	 * @param string $log_message
-	 * @param string|false $error_type
+	 * @param string|boolean $error_type
 	 * @param string|null $file
 	 * @param integer|null $line
 	 */

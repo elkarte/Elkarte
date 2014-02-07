@@ -3851,7 +3851,7 @@ function remove_integration_function($hook, $function, $file = '')
  *
  * @param string|false $string
  * @return string $string
-*/
+ */
 function sanitizeMSCutPaste($string)
 {
 	if (empty($string))
@@ -3897,7 +3897,7 @@ function sanitizeMSCutPaste($string)
  *
  * @param mixed[] $matches matches from a preg_match_all
  * @return string $string
-*/
+ */
 function replaceEntities__callback($matches)
 {
 	if (!isset($matches[2]))
@@ -3940,7 +3940,7 @@ function replaceEntities__callback($matches)
  *
  * @param mixed[] $matches array of matches as output from preg_match_all
  * @return string $string
-*/
+ */
 function fixchar__callback($matches)
 {
 	if (!isset($matches[1]))
@@ -3974,7 +3974,7 @@ function fixchar__callback($matches)
  *
  * @param mixed[] $matches array of matches for a preg_match_all
  * @return string
-*/
+ */
 function entity_fix__callback($matches)
 {
 	if (!isset($matches[2]))
@@ -3993,7 +3993,7 @@ function entity_fix__callback($matches)
  * Retrieve additional search engines, if there are any, as an array.
  *
  * @return mixed[] array of engines
-*/
+ */
 function prepareSearchEngines()
 {
 	global $modSettings;

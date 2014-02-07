@@ -275,9 +275,9 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @param string $identifier
 	 * @param string $db_string
-	 * @param string $db_values
+	 * @param mixed[] $db_values
 	 * @param resource|null $connection
-	 * @return boolean
+	 * @return resource|boolean
 	 */
 	function query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
@@ -533,7 +533,7 @@ class Database_PostgreSQL implements Database
 	 * Fetch a row from the resultset given as parameter.
 	 *
 	 * @param resource $request
-	 * @param bool $counter = false
+	 * @param integer|bool $counter = false
 	 */
 	function fetch_row($request, $counter = false)
 	{
@@ -691,7 +691,7 @@ class Database_PostgreSQL implements Database
 	 * @param string $table
 	 * @param mixed[] $columns
 	 * @param mixed[] $data
-	 * @param string $keys
+	 * @param mixed[] $keys
 	 * @param bool $disable_trans = false
 	 * @param resource|null $connection = null
 	 */
@@ -803,7 +803,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @param string $error_message
 	 * @param string $log_message
-	 * @param string|false $error_type
+	 * @param string|boolean $error_type
 	 * @param string|null $file
 	 * @param integer|null $line
 	 */
@@ -912,7 +912,6 @@ class Database_PostgreSQL implements Database
 			$start = 0;
 		}
 
-		$data = '';
 		$tableName = str_replace('{db_prefix}', $db_prefix, $tableName);
 
 		// This will be handy...

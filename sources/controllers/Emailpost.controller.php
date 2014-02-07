@@ -423,7 +423,7 @@ function pbe_create_post($pbe, $email_message, $topic_info)
  *
  * @param mixed[] $pbe array of pbe 'user_info' values
  * @param Email_Parse $email_message
-*/
+ */
 function pbe_create_pm($pbe, $email_message)
 {
 	global $modSettings, $txt;

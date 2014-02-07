@@ -1110,7 +1110,7 @@ function detectBrowser()
  *
  * Wrapper function for detectBrowser
  * @param string $browser  the browser we are checking for.
-*/
+ */
 function isBrowser($browser)
 {
 	global $context;
@@ -1733,9 +1733,9 @@ function loadEssentialThemeData()
  *
  * @uses the template_include() function to include the file.
  * @param string $template_name
- * @param string[]|string any style sheets to load with the template
+ * @param string[]|string $style_sheets any style sheets to load with the template
  * @param bool $fatal = true if fatal is true, dies with an error message if the template cannot be found
- * 
+ *
  * @return boolean|null
  */
 function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
