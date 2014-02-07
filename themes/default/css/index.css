@@ -4120,7 +4120,7 @@ a.help .icon {
 	.menulevel3 {
 		display: none !important;
 	}
-	#main_menu li ul li, .admin_menu li ul li{
+	#main_menu li ul li, .admin_menu li ul li {
 		float: left;
 		display: block;
 		width: 100%;

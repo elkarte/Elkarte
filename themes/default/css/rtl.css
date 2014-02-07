@@ -1152,9 +1152,11 @@ div.labels {
 /* ------------------------------------------------------- */
 
 /*	$MEDIA		*/
+/* ------------------------------------------------------- */
 /* This one does 800 screens at default font size. */
 @media screen and (max-width: 50em) {
 	#main_menu .linklevel1 {
+		margin-right: 0;
 		margin-left: 5px;
 	}
 	.board_name {
@@ -1184,6 +1186,17 @@ div.labels {
 	#forumposts .nextlinks {
 		text-align: left;
 	}
+	.ignoreboards.floatright {
+		float: none;
+	}
+	/* our stats page */
+	.statistics .category_header {
+		margin: 0;
+	}
+	.stats {
+		float: none;
+		margin: 0;
+	}
 }
 /* This one does 540 and smaller screens at default font size. */
 @media screen and (max-width: 33.750em) {
@@ -1191,8 +1204,7 @@ div.labels {
 		text-align: right;
 	}
 	dd {
-		/* @todo inherit? */
-		padding-left: 0 !important;
+		padding-left: 0;
 		padding-right: 8% !important;
 	}
 	#main_content_section {
@@ -1201,12 +1213,33 @@ div.labels {
 	.post {
 		margin: 0 5px 0 0;
 	}
+	#wrapper {
+		padding-left: 2px;
+		padding-right: 2px;
+	}
 	#gobottom, #gotop {
 		padding-left: 0;
 		padding-right: 0.25em;
 	}
+	#message_index_jump_to {
+		float: none;
+	}
+	.postarea {
+		display: block;
+		margin: 0;
+	}
+	h2 .views_text, h2 .nextlinks {
+		display: block;
+		float: none;
+	}
+	.childboards {
+		margin: 0 5px;
+	}
 	.board_name {
 		margin: 0 35px 0 0;
+	}
+	#basicinfo, #detailedinfo {
+		float: none;
 	}
 	.admin_menu li {
 		float: right;
@@ -1218,8 +1251,18 @@ div.labels {
 		left: auto;
 		right: -4px;
 	}
-	#main_menu li ul li, .admin_menu li ul li{
+	#main_menu li ul li, .admin_menu li ul li {
 		float: right;
+	}
+	ul.poster {
+		display: block;
+		clear: both;
+	}
+	.poster {
+		float: none;
+	}
+	.poster .listlevel1 {
+		display: inline-block;
 	}
 	.poster li.avatar {
 		float: right;
@@ -1231,7 +1274,20 @@ div.labels {
 	.poster .membergroup {
 		float: left;
 	}
+	.postarea, .forumtitle {
+		padding: 2px;
+	}
 	.quickbuttons {
 		margin: 8px 3px 6px 8px;
+	}
+	#search_form {
+		float: none;
+		text-align: center;
+	}
+	.profileblock_left, .profileblock_right {
+		float: none;
+	}
+	.pagesection div.floatright {
+		float: none;
 	}
 }

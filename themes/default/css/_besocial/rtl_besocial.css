@@ -300,6 +300,12 @@ legend {
 
 /*	$MEDIA		*/
 /* This one does 800 screens at default font size. */
+@media screen and (max-width: 64em) {
+	.board_lastpost {
+		float: none;
+	}
+}
+/* This one does 800 screens at default font size. */
 @media screen and (max-width: 50em) {
 	#menu_sidebar {
 		box-shadow: -3px 3px 3px rgba(0,0,0,0.3);
@@ -322,5 +328,11 @@ legend {
 	}
 	.admin_menu li {
 		float: right;
+	}
+	#search_form {
+		float: none;
+	}
+	#search_form * {
+		float: none;
 	}
 }
