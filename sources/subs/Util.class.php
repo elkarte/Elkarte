@@ -268,6 +268,9 @@ class Util
 	 * - importantly escapes all keys and values!
 	 * - calls itself recursively if necessary.
 	 *
+	 * @todo not used, consider removing
+	 * @deprecated since 1.0
+	 *
 	 * @param array|string $var
 	 * @return array|string
 	 */
@@ -295,6 +298,9 @@ class Util
 	 * - effects both keys and values of arrays.
 	 * - calls itself recursively to handle arrays of arrays.
 	 *
+	 * @todo not used, consider removing
+	 * @deprecated since 1.0
+	 *
 	 * @param array|string $var
 	 * @param int $level = 0
 	 * @return array|string
@@ -321,6 +327,9 @@ class Util
 	 * - importantly, does it to keys too!
 	 * - calls itself recursively if there are any sub arrays.
 	 *
+	 * @todo not used, consider removing
+	 * @deprecated since 1.0
+	 *
 	 * @param array|string $var
 	 * @param int $level = 0
 	 * @return array|string
@@ -346,6 +355,9 @@ class Util
 	 * - unescapes, recursively, from the array or string var.
 	 * - effects both keys and values of arrays.
 	 * - calls itself recursively to handle arrays of arrays.
+	 *
+	 * @todo not used, consider removing
+	 * @deprecated since 1.0
 	 *
 	 * @param array|string $var
 	 * @return array|string
