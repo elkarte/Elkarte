@@ -15,7 +15,7 @@
 	function elk_Mentions(options) {
 		// All the passed options and defaults are loaded to the opts object
 		this.opts = $.extend({}, this.defaults, options);
-	};
+	}
 
 	elk_Mentions.prototype.attachAtWho = function(oMentions, $element, oIframeWindow) {
 		var mentioned = document.getElementById('mentioned');

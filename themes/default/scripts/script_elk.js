@@ -3,7 +3,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta 2
  *
  * This file contains javascript utility functions specific to ElkArte
  */
@@ -659,7 +659,7 @@ function add_elk_mention(selector, oOptions)
 				postdata += '&received=' + receiver;
 
 				if (oSettings.token !== '')
-					postdata += '&' + oSettings.toke.token_var + '=' + oSettings.token.token_id;
+					postdata += '&' + oSettings.token.token_var + '=' + oSettings.token.token_id;
 
 				// And with the post data prepared, lets make the ajax request
 				$.ajax({
