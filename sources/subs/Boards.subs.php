@@ -1752,7 +1752,8 @@ function fetchBoardsInfo($conditions = 'all', $params = array())
 		// id_board, name, id_profile => used in admin/Reports.controller.php
 		$request = $db->query('', '
 			SELECT ' . $select . '
-			FROM {db_prefix}boards AS b',
+			FROM {db_prefix}boards AS b
+			' . $sort_by,
 			array()
 		);
 	}
@@ -1783,7 +1784,8 @@ function fetchBoardsInfo($conditions = 'all', $params = array())
 			WHERE ' . $security . (!empty($clauses) ? '
 				AND b.' . implode(' OR b.', $clauses) : '') . ($params['include_recycle'] ? '' : '
 				AND b.id_board != {int:recycle_board}') . ($params['include_redirects'] ? '' : '
-				AND b.redirect = {string:empty_string}'),
+				AND b.redirect = {string:empty_string}
+			' . $sort_by),
 			array_merge($clauseParameters, array(
 				'recycle_board' => !empty($modSettings['recycle_board']) ? $modSettings['recycle_board'] : 0,
 				'empty_string' => '',

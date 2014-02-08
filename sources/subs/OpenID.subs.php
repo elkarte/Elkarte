@@ -42,7 +42,7 @@ class OpenID
 	{
 		global $scripturl, $modSettings;
 
-		$openid_url = $this->_canonize($openid_uri);
+		$openid_url = $this->canonize($openid_uri);
 		$response_data = $this->getServerInfo($openid_url);
 
 		// We can't do anything without the proper response data.
@@ -182,7 +182,7 @@ class OpenID
 	 * @param string $server
 	 * @return array
 	 */
-	function makeAssociation($server)
+	public function makeAssociation($server)
 	{
 		global $p;
 
@@ -263,7 +263,7 @@ class OpenID
 	 *
 	 * @param string $handle
 	 */
-	function removeAssociation($handle)
+	public function removeAssociation($handle)
 	{
 		$db = database();
 
@@ -281,7 +281,7 @@ class OpenID
 	 *
 	 * @param string $uri
 	 */
-	private function _canonize($uri)
+	public function canonize($uri)
 	{
 		// @todo Add in discovery.
 
@@ -324,7 +324,7 @@ class OpenID
 	 *
 	 * @param bool $regenerate
 	 */
-	function get_keys($regenerate)
+	public function get_keys($regenerate)
 	{
 		global $modSettings, $p, $g;
 
@@ -358,7 +358,7 @@ class OpenID
 	 *
 	 * @return float
 	 */
-	function generate_private_key()
+	public function generate_private_key()
 	{
 		global $p;
 		static $cache = array();

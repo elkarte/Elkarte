@@ -63,7 +63,7 @@ class Post_Controller extends Action_Controller
 			unset($_REQUEST['poll']);
 
 		$post_errors = Error_Context::context('post', 1);
-		$attach_errors = attachment_Error_Context::context('attachment', 1);
+		$attach_errors = attachment_Error_Context::context();
 		$attach_errors->activate();
 		$first_subject = '';
 

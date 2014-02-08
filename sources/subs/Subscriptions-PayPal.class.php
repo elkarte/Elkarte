@@ -226,7 +226,7 @@ class paypal_payment
 			curl_setopt($curl, CURLOPT_FORBID_REUSE, 1);
 
 			// Set TCP timeout to 30 seconds
-			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
+			curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 30);
 
 			// Set the http headers
 			curl_setopt($curl, CURLOPT_HTTPHEADER, array(

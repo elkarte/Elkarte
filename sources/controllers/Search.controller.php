@@ -795,7 +795,7 @@ class Search_Controller extends Action_Controller
 		if (!empty($context['search_errors']))
 		{
 			$_REQUEST['params'] = $context['params'];
-			return $this->action_plushsearch1();
+			return $this->action_search();
 		}
 
 		// Spam me not, Spam-a-lot?
@@ -1324,7 +1324,7 @@ class Search_Controller extends Action_Controller
 						{
 							$context['search_errors']['query_not_specific_enough'] = true;
 							$_REQUEST['params'] = $context['params'];
-							return $this->action_plushsearch1();
+							return $this->action_search();
 						}
 						elseif (!empty($indexedResults))
 						{
@@ -1932,7 +1932,7 @@ class Search_Controller extends Action_Controller
 	}
 
 	/**
-	 * Prepares the weighting factors and 
+	 * Prepares the weighting factors and
 	 */
 	private function _setup_weight_factors()
 	{

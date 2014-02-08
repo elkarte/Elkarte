@@ -1523,23 +1523,23 @@ class PersonalMessage_Controller extends Action_Controller
 			$context['sub_template'] = 'add_rule';
 
 			// Any known rule
-			$js_rules = '{';
+			$js_rules = '';
 			foreach ($context['known_rules'] as $rule)
 				$js_rules .= JavaScriptEscape($rule) . ': ' . JavaScriptEscape($txt['pm_rule_' . $rule]) . ',';
-			$js_rules = substr($js_rules, 0, -1) . '}';
+			$js_rules = '{' . substr($js_rules, 0, -1) . '}';
 
 			// Any known label
-			$js_labels = '{';
+			$js_labels = '';
 			foreach ($context['labels'] as $label)
 				if ($label['id'] != -1)
 					$js_labels .= JavaScriptEscape($label['id'] + 1) . ': ' . JavaScriptEscape($label['name']) . ',';
-			$js_labels = substr($js_labels, 0, -1) . '}';
+			$js_labels = '{' . substr($js_labels, 0, -1) . '}';
 
 			// And all of the groups as well
-			$js_groups = '{';
+			$js_groups = '';
 			foreach ($context['groups'] as $id => $title)
 				$js_groups .= JavaScriptEscape($id) . ': ' . JavaScriptEscape($title) . ',';
-			$js_groups = substr($js_groups, 0, -1) . '}';
+			$js_groups = '{' . substr($js_groups, 0, -1) . '}';
 
 			// Oh my, we have a lot of text strings for this
 			addJavascriptVar(array(
