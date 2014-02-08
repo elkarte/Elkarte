@@ -283,7 +283,7 @@ class InlinePermissions_Form
 	 * @uses ManagePermissions language
 	 * @uses ManagePermissions template.
 	 */
-	static function init_inline_permissions($permissions, $excluded_groups = array())
+	public static function init_inline_permissions($permissions, $excluded_groups = array())
 	{
 		global $context, $txt, $modSettings;
 

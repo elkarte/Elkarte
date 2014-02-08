@@ -60,7 +60,7 @@ class Database_MySQL implements Database
 	 *
 	 * @return resource
 	 */
-	static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
+	public static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 	{
 		global $mysql_set_mode;
 
@@ -1430,7 +1430,7 @@ class Database_MySQL implements Database
 	/**
 	 * Returns a reference to the existing instance
 	 */
-	static function db()
+	public static function db()
 	{
 		return self::$_db;
 	}

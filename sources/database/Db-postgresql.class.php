@@ -77,7 +77,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @return resource
 	 */
-	static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
+	public static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 	{
 		// initialize the instance... if not done already!
 		if (self::$_db === null)
@@ -1301,7 +1301,7 @@ class Database_PostgreSQL implements Database
 	/**
 	 * Returns a reference to the existing instance
 	 */
-	static function db()
+	public static function db()
 	{
 		return self::$_db;
 	}
