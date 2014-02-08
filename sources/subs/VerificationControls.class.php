@@ -176,34 +176,34 @@ interface Control_Verifications
 	 *
 	 * @return boolean
 	 */
-	function showVerification($isNew, $force_refresh = true);
+	public function showVerification($isNew, $force_refresh = true);
 
 	/**
 	 * @param boolean $refresh
 	 *
 	 * @return void
 	 */
-	function createTest($refresh = true);
+	public function createTest($refresh = true);
 
 	/**
 	 * @return void
 	 */
-	function prepareContext();
+	public function prepareContext();
 
 	/**
 	 * @return string|boolean
 	 */
-	function doTest();
+	public function doTest();
 
 	/**
 	 * @return boolean
 	 */
-	function hasVisibleTemplate();
+	public function hasVisibleTemplate();
 
 	/**
 	 * @return void
 	 */
-	function settings();
+	public function settings();
 }
 
 /**

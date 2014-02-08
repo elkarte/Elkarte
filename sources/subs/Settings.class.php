@@ -166,7 +166,7 @@ class Settings_Form
 	 *
 	 * @param mixed[] $config_vars
 	 */
-	static function prepare_db(&$config_vars)
+	public static function prepare_db(&$config_vars)
 	{
 		global $txt, $helptxt, $context, $modSettings;
 
@@ -431,7 +431,7 @@ class Settings_Form
 	 *
 	 * @param mixed[] $config_vars
 	 */
-	static function save_db(&$config_vars)
+	public static function save_db(&$config_vars)
 	{
 		validateToken('admin-dbsc');
 
@@ -522,7 +522,7 @@ class Settings_Form
 	 *
 	 * @param mixed[] $config_vars
 	 */
-	static function save_file($config_vars)
+	public static function save_file($config_vars)
 	{
 		global $context;
 

@@ -44,7 +44,7 @@ class Emailpost_Controller extends Action_Controller
 	 * @param boolean $force used to override common failure errors
 	 * @param string|null $key used to supply a lost key
 	 */
-	function action_pbe_post($data = null, $force = false, $key = null)
+	public function action_pbe_post($data = null, $force = false, $key = null)
 	{
 		global $txt, $modSettings, $language, $user_info, $maintenance;
 
@@ -189,7 +189,7 @@ class Emailpost_Controller extends Action_Controller
 	 *
 	 * @param string|null $data used to supply a full body+headers email
 	 */
-	function action_pbe_topic($data = null)
+	public function action_pbe_topic($data = null)
 	{
 		global $modSettings, $user_info, $maintenance;
 
@@ -272,7 +272,7 @@ class Emailpost_Controller extends Action_Controller
 	 * @param string $data raw email string, including headers
 	 * @return boolean
 	 */
-	function action_pbe_preview($data = null)
+	public function action_pbe_preview($data = null)
 	{
 		global $txt, $modSettings;
 

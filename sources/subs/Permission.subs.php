@@ -214,7 +214,7 @@ class InlinePermissions_Form
 	 *
 	 * @param string[] $permissions
 	 */
-	static function save_inline_permissions($permissions)
+	public static function save_inline_permissions($permissions)
 	{
 		global $context;
 

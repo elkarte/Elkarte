@@ -270,7 +270,6 @@ function pbe_email_quote_depth(&$string, $update = true)
 	$level = 0;
 	$check = true;
 	$string_save = $string;
-	$matches = array();
 
 	while ($check)
 	{
@@ -281,7 +280,7 @@ function pbe_email_quote_depth(&$string, $update = true)
 			$string = substr($string, 2);
 		}
 		// Maybe a poorly nested quote, with no spaces between the >'s or the > and the data with no space
-		elseif ((substr($string, 0, 2) === '>>') || (preg_match('~^>[a-z0-9<-]+~Uis', $string, $matches) == 1))
+		elseif ((substr($string, 0, 2) === '>>') || (preg_match('~^>[a-z0-9<-]+~Uis', $string) == 1))
 		{
 			$level++;
 			$string = substr($string, 1);
@@ -433,7 +432,7 @@ function pbe_clean_email_subject($text, $check = false)
 	if ($fw !== false)
 		$text = substr($text, 0, $fw) . substr($text, $fw + strlen($txt['FW:']), strlen($text));
 
-	$gr = strpos($text, "[{$sitename}]");
+	$gr = strpos($text, '[' . $sitename . ']');
 	if ($gr !== false)
 		$text = substr($text, 0, $gr) . substr($text, $gr + strlen($sitename) + 2, strlen($text));
 
@@ -442,7 +441,7 @@ function pbe_clean_email_subject($text, $check = false)
 		$text = substr($text, 0, $fwd) . substr($text, $fwd + strlen($txt['FWD:']), strlen($text));
 
 	// if not done then call ourselves again, we like the sound of our name
-	if (strpos(strtoupper($text), $txt['RE:']) || strpos(strtoupper($text), $txt['FW:']) || strpos(strtoupper($text), $txt['FWD:']) || strpos($text, "[{$sitename}]"))
+	if (strpos(strtoupper($text), $txt['RE:']) || strpos(strtoupper($text), $txt['FW:']) || strpos(strtoupper($text), $txt['FWD:']) || strpos($text, '[' . $sitename . ']'))
 		$text = pbe_clean_email_subject($text);
 
 	// clean or not?
@@ -468,21 +467,21 @@ function pbe_fix_client_quotes($body)
 	$regex = array();
 
 	// On mon, jan 12, 2004 at 10:10 AM, John Smith wrote: [quote]
-	$regex[] = "~(?:" . $txt['email_on'] . ")?\w{3}, \w{3} \d{1,2},\s?\d{4} " . $txt['email_at'] . " \d{1,2}:\d{1,2} [AP]M,(.*)?" . $txt['email_wrote'] . ":\s?\s{1,4}\[quote\]~i";
+	$regex[] = '~(?:' . $txt['email_on'] . ')?\w{3}, \w{3} \d{1,2},\s?\d{4} ' . $txt['email_at'] . ' \d{1,2}:\d{1,2} [AP]M,(.*)?' . $txt['email_wrote'] . ':\s?\s{1,4}\[quote\]~i';
 	// [quote] on: mon jan 12, 2004 John Smith wrote:
-	$regex[] = "~\[quote\]\s?" . $txt['email_on'] . ": \w{3} \w{3} \d{1,2}, \d{4} (.*)?" . $txt['email_wrote'] . ":\s~i";
+	$regex[] = '~\[quote\]\s?' . $txt['email_on'] . ': \w{3} \w{3} \d{1,2}, \d{4} (.*)?' . $txt['email_wrote'] . ':\s~i';
 	// on jan 12, 2004 at 10:10 PM, John Smith wrote:   [quote]
-	$regex[] = "~" .  $txt['email_on'] . " \w{3} \d{1,2}, \d{4}, " . $txt['email_at'] . " \d{1,2}:\d{1,2} [AP]M,(.*)?" . $txt['email_wrote'] . ":\s{1,4}\[quote\]~i";
+	$regex[] = '~' .  $txt['email_on'] . ' \w{3} \d{1,2}, \d{4}, ' . $txt['email_at'] . ' \d{1,2}:\d{1,2} [AP]M,(.*)?' . $txt['email_wrote'] . ':\s{1,4}\[quote\]~i';
 	// on jan 12, 2004 at 10:10, John Smith wrote   [quote]
-	$regex[] = "~" .  $txt['email_on'] . " \w{3} \d{1,2}, \d{4}, " . $txt['email_at'] . " \d{1,2}:\d{1,2}, (.*)?" . $txt['email_wrote'] . ":\s{1,4}\[quote\]~i";
+	$regex[] = '~' .  $txt['email_on'] . ' \w{3} \d{1,2}, \d{4}, ' . $txt['email_at'] . ' \d{1,2}:\d{1,2}, (.*)?' . $txt['email_wrote'] . ':\s{1,4}\[quote\]~i';
 	// quoting: John Smith on stuffz at 10:10:23 AM
-	$regex[] = "~" . $txt['email_quotefrom'] . ": (.*) " . $txt['email_on'] . " .* " . $txt['email_at'] . " \d{1,2}:\d{1,2}:\d{1,2} [AP]M~";
+	$regex[] = '~' . $txt['email_quotefrom'] . ': (.*) ' . $txt['email_on'] . ' .* ' . $txt['email_at'] . ' \d{1,2}:\d{1,2}:\d{1,2} [AP]M~';
 	// quoting John Smith <johnsmith@tardis.com>
-	$regex[] = "~" . $txt['email_quoting'] . " (.*) (?:<|&lt;|\[email\]).*?@.*?(?:>|&gt;|\[/email\]):~i";
+	$regex[] = '~' . $txt['email_quoting'] . ' (.*) (?:<|&lt;|\[email\]).*?@.*?(?:>|&gt;|\[/email\]):~i';
 	// --- in some group name "John Smith" <johnsmith@tardis.com> wrote:
-	$regex[] = "~---\s.*?\"(.*)\"\s+" . $txt['email_wrote'] . ":\s(\[quote\])?~i";
+	$regex[] = '~---\s.*?"(.*)"\s+' . $txt['email_wrote'] . ':\s(\[quote\])?~i';
 	// --- in some@group.name John Smith wrote
-	$regex[] = "~---\s.*?\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,6}\b,\s(.*?)\s" . $txt['email_wrote'] . ":?~i";
+	$regex[] = '~---\s.*?\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,6}\b,\s(.*?)\s' . $txt['email_wrote'] . ':?~i';
 
 	// For each one see if we can do a nice [quote author=john smith]
 	foreach ($regex as $reg)
@@ -682,7 +681,7 @@ function pbe_emailError($error, $email_message)
 	$db->insert(isset($_POST['item']) ? 'replace' : 'ignore',
 		'{db_prefix}postby_emails_error',
 		array('id_email' => 'int', 'error' => 'string', 'data_id' => 'string', 'subject' => 'string', 'id_message' => 'int', 'id_board' => 'int', 'email_from' => 'string', 'message_type' => 'string', 'message' => 'string'),
-		array($id, $error, $message_key, $email_message->subject, $message_id, $board_id, $email_message->email['from'], $message_type, $email_message->raw_message),
+		array($id, $error, $message_key, $subject, $message_id, $board_id, $email_message->email['from'], $message_type, $email_message->raw_message),
 		array('id_email')
 	);
 

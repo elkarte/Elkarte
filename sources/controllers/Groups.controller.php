@@ -32,7 +32,7 @@ class Groups_Controller extends Action_Controller
 	 *
 	 * @see Action_Controller::action_index()
 	 */
-	function action_index()
+	public function action_index()
 	{
 		global $context;
 

@@ -171,7 +171,7 @@ class twocheckout_payment
 	/**
 	 * Returns whether this is a normal payment
 	 */
-	function isPayment()
+	public function isPayment()
 	{
 		// We have to assume so?
 		return true;

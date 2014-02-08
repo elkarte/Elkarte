@@ -595,7 +595,7 @@ class Convert_Md
 	 *
 	 * @param object $node
 	 */
-	function _convert_table($node)
+	private function _convert_table($node)
 	{
 		$table_heading = $node->getElementsByTagName('th');
 		if ($this->_get_item($table_heading, 0) === null)

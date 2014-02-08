@@ -574,7 +574,7 @@ class Xml_Array
 	 *
 	 * @param string $data
 	 */
-	function _to_cdata($data)
+	protected function _to_cdata($data)
 	{
 		$inCdata = $inComment = false;
 		$output = '';

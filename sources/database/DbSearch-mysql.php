@@ -34,7 +34,7 @@ class DbSearch_MySQL implements DbSearch
 	 *
 	 * @param string $search_type
 	 */
-	function search_support($search_type)
+	public function search_support($search_type)
 	{
 		$supported_types = array('fulltext');
 
@@ -49,7 +49,7 @@ class DbSearch_MySQL implements DbSearch
 	 * @param array $db_values
 	 * @param resource $connection
 	 */
-	function search_query($identifier, $db_string, $db_values = array(), $connection = null)
+	public function search_query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
 		$db = database();
 
@@ -135,7 +135,7 @@ class DbSearch_MySQL implements DbSearch
 	 *
 	 * @param string $size
 	 */
-	function create_word_search($size)
+	public function create_word_search($size)
 	{
 		$db = database();
 

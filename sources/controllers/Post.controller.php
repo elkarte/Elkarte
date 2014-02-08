@@ -49,7 +49,7 @@ class Post_Controller extends Action_Controller
 	 *
 	 * @uses the Post template and language file, main sub template.
 	 */
-	function action_post()
+	public function action_post()
 	{
 		global $txt, $scripturl, $topic, $modSettings, $board, $user_info, $context, $options, $language;
 
@@ -989,7 +989,7 @@ class Post_Controller extends Action_Controller
 	 * sends off notifications, and allows for announcements and moderation.
 	 * accessed from ?action=post2.
 	 */
-	function action_post2()
+	public function action_post2()
 	{
 		global $board, $topic, $txt, $modSettings, $context, $user_settings;
 		global $user_info, $board_info, $options, $ignore_temp;
@@ -1835,7 +1835,7 @@ class Post_Controller extends Action_Controller
 	 * uses special (sadly browser dependent) javascript to parse entities for internationalization reasons.
 	 * accessed with ?action=quotefast and ?action=quotefast;modify
 	 */
-	function action_quotefast()
+	public function action_quotefast()
 	{
 		global $modSettings, $user_info, $context;
 
@@ -1933,7 +1933,7 @@ class Post_Controller extends Action_Controller
 	 * Used to edit the body or subject of a message inline
 	 * called from action=jsmodify from script and topic js
 	 */
-	function action_jsmodify()
+	public function action_jsmodify()
 	{
 		global $modSettings, $board, $topic, $txt;
 		global $user_info, $context, $language;
@@ -2196,7 +2196,7 @@ class Post_Controller extends Action_Controller
 	 * It has problems with internationalization.
 	 * It is accessed via ?action=spellcheck.
 	 */
-	function action_spellcheck()
+	public function action_spellcheck()
 	{
 		global $txt, $context;
 

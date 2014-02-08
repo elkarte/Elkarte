@@ -1429,7 +1429,7 @@ class ManageSmileys_Controller extends Action_Controller
 	/**
 	 * Install a smiley set.
 	 */
-	function action_install()
+	public function action_install()
 	{
 		global $modSettings, $scripturl, $context, $txt, $user_info;
 

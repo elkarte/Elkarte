@@ -779,9 +779,9 @@ class ProfileOptions_Controller extends Action_Controller
 	 * @param int $memID id_member
 	 * @return integer
 	 */
-	function list_getTopicNotificationCount($memID)
+	public function list_getTopicNotificationCount($memID)
 	{
-		// topic notifications count, for the list
+		// Topic notifications count, for the list
 		return topicNotificationCount($memID);
 	}
 
@@ -794,7 +794,7 @@ class ProfileOptions_Controller extends Action_Controller
 	 * @param int $memID id_member
 	 * @return mixed array of topic notifications
 	 */
-	function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
+	public function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
 	{
 		// topic notifications, for the list
 		return topicNotifications($start, $items_per_page, $sort, $memID);
@@ -809,7 +809,7 @@ class ProfileOptions_Controller extends Action_Controller
 	 * @param int $memID id_member
 	 * @return mixed[] array of board notifications
 	 */
-	function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
+	public function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
 	{
 		// return boards you see and their notification status for the list
 		return boardNotifications($start, $items_per_page, $sort, $memID);
@@ -953,7 +953,7 @@ class ProfileOptions_Controller extends Action_Controller
 	 *
 	 * @return string
 	 */
-	function action_groupMembership2()
+	public function action_groupMembership2()
 	{
 		global $context, $user_profile, $modSettings, $scripturl, $language;
 

@@ -116,7 +116,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @return string
 	 */
-	function fix_prefix($db_prefix, $db_name)
+	public function fix_prefix($db_prefix, $db_name)
 	{
 		return $db_prefix;
 	}
@@ -131,7 +131,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @param mixed[] $matches
 	 */
-	function replacement__callback($matches)
+	public function replacement__callback($matches)
 	{
 		global $db_callback, $user_info, $db_prefix;
 
@@ -248,7 +248,7 @@ class Database_PostgreSQL implements Database
 	 * @param string $db_values
 	 * @param resource|null $connection
 	 */
-	function quote($db_string, $db_values, $connection = null)
+	public function quote($db_string, $db_values, $connection = null)
 	{
 		global $db_callback;
 
@@ -279,7 +279,7 @@ class Database_PostgreSQL implements Database
 	 * @param resource|null $connection
 	 * @return resource|boolean
 	 */
-	function query($identifier, $db_string, $db_values = array(), $connection = null)
+	public function query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
 		global $db_cache, $db_count, $db_show_debug, $time_start, $db_callback, $modSettings;
 
@@ -487,7 +487,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @param resource|null $result
 	 */
-	function affected_rows($result = null)
+	public function affected_rows($result = null)
 	{
 		if ($this->_db_replace_result !== null)
 			return $this->_db_replace_result;
@@ -504,7 +504,7 @@ class Database_PostgreSQL implements Database
 	 * @param string|null $field = null
 	 * @param resource|null $connection = null
 	 */
-	function insert_id($table, $field = null, $connection = null)
+	public function insert_id($table, $field = null, $connection = null)
 	{
 		global $db_prefix;
 
@@ -535,7 +535,7 @@ class Database_PostgreSQL implements Database
 	 * @param resource $request
 	 * @param integer|bool $counter = false
 	 */
-	function fetch_row($request, $counter = false)
+	public function fetch_row($request, $counter = false)
 	{
 		global $db_row_count;
 
@@ -555,7 +555,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @param resource $result
 	 */
-	function free_result($result)
+	public function free_result($result)
 	{
 		// Just delegate to the native function
 		pg_free_result($result);
@@ -566,7 +566,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @param resource $result
 	 */
-	function num_rows($result)
+	public function num_rows($result)
 	{
 		// simply delegate to the native function
 		return pg_num_rows($result);
@@ -577,7 +577,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @param resource $request
 	 */
-	function num_fields($request)
+	public function num_fields($request)
 	{
 		return pg_num_fields($request);
 	}
@@ -588,7 +588,7 @@ class Database_PostgreSQL implements Database
 	 * @param boolean $request
 	 * @param integer $counter
 	 */
-	function data_seek($request, $counter)
+	public function data_seek($request, $counter)
 	{
 		global $db_row_count;
 
@@ -603,7 +603,7 @@ class Database_PostgreSQL implements Database
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
 	 * @param resource|null $connection = null
 	 */
-	function db_transaction($type = 'commit', $connection = null)
+	public function db_transaction($type = 'commit', $connection = null)
 	{
 		// Decide which connection to use
 		$connection = $connection === null ? $this->_connection : $connection;
@@ -629,7 +629,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @param resource|null $connection = null
 	 */
-	function last_error($connection = null)
+	public function last_error($connection = null)
 	{
 		// Decide which connection to use
 		$connection = $connection === null ? $this->_connection : $connection;
@@ -645,7 +645,7 @@ class Database_PostgreSQL implements Database
 	 * @param string $db_string
 	 * @param resource|null $connection = null
 	 */
-	function error($db_string, $connection = null)
+	public function error($db_string, $connection = null)
 	{
 		global $txt, $context, $modSettings, $db_show_debug;
 
@@ -695,7 +695,7 @@ class Database_PostgreSQL implements Database
 	 * @param bool $disable_trans = false
 	 * @param resource|null $connection = null
 	 */
-	function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
+	public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 	{
 		global $db_prefix;
 
@@ -807,7 +807,7 @@ class Database_PostgreSQL implements Database
 	 * @param string|null $file
 	 * @param integer|null $line
 	 */
-	function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null)
+	public function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null)
 	{
 		if (empty($log_message))
 			$log_message = $error_message;
@@ -855,7 +855,7 @@ class Database_PostgreSQL implements Database
 	 * @param string $string
 	 * @param bool $translate_human_wildcards = false, if true, turns human readable wildcards into SQL wildcards.
 	 */
-	function escape_wildcard_string($string, $translate_human_wildcards = false)
+	public function escape_wildcard_string($string, $translate_human_wildcards = false)
 	{
 		$replacements = array(
 			'%' => '\%',
@@ -876,7 +876,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @param string $string
 	 */
-	function unescape_string($string)
+	public function unescape_string($string)
 	{
 		return strtr($string, array('\'\'' => '\''));
 	}
@@ -886,7 +886,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @return false
 	 */
-	function support_ignore()
+	public function support_ignore()
 	{
 		return false;
 	}
@@ -900,7 +900,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @return string the query to insert the data back in, or an empty string if the table was empty.
 	 */
-	function insert_sql($tableName, $new_table = false)
+	public function insert_sql($tableName, $new_table = false)
 	{
 		global $db_prefix;
 
@@ -978,7 +978,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @return string - the CREATE statement as string
 	 */
-	function db_table_sql($tableName)
+	public function db_table_sql($tableName)
 	{
 		global $db_prefix;
 
@@ -1087,7 +1087,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @return string[] an array of table names. (strings)
 	 */
-	function db_list_tables($db_name_str = false, $filter = false)
+	public function db_list_tables($db_name_str = false, $filter = false)
 	{
 		$request = $this->query('', '
 			SELECT tablename
@@ -1114,7 +1114,7 @@ class Database_PostgreSQL implements Database
 	 * @param string $table - the table to be optimized
 	 * @return int how much it was gained
 	 */
-	function db_optimize_table($table)
+	public function db_optimize_table($table)
 	{
 		global $db_prefix;
 
@@ -1145,7 +1145,7 @@ class Database_PostgreSQL implements Database
 	 * @param string $backup_table
 	 * @return resource -the request handle to the table creation query
 	 */
-	function db_backup_table($table, $backup_table)
+	public function db_backup_table($table, $backup_table)
 	{
 		global $db_prefix;
 
@@ -1189,7 +1189,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @return string - the version
 	 */
-	function db_server_version()
+	public function db_server_version()
 	{
 		$version = pg_version();
 
@@ -1201,7 +1201,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @return string
 	 */
-	function db_title()
+	public function db_title()
 	{
 		return 'PostgreSQL';
 	}
@@ -1211,7 +1211,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @return true
 	 */
-	function db_case_sensitive()
+	public function db_case_sensitive()
 	{
 		return true;
 	}
@@ -1221,7 +1221,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @param string $string
 	 */
-	function escape_string($string)
+	public function escape_string($string)
 	{
 		return pg_escape_string($string);
 	}
@@ -1232,7 +1232,7 @@ class Database_PostgreSQL implements Database
 	 * @param resource $request
 	 * @param int|false $counter
 	 */
-	function fetch_assoc($request, $counter = false)
+	public function fetch_assoc($request, $counter = false)
 	{
 		global $db_row_count;
 
@@ -1254,7 +1254,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @return string
 	 */
-	function db_server_info($connection = null)
+	public function db_server_info($connection = null)
 	{
 		// give info on client! we use it in install and upgrade and such things.
 		$version = pg_version();
@@ -1267,7 +1267,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @return string - the version
 	 */
-	function db_client_version()
+	public function db_client_version()
 	{
 		$version = pg_version();
 
@@ -1282,7 +1282,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @return true
 	 */
-	function select_db($db_name = null, $connection = null)
+	public function select_db($db_name = null, $connection = null)
 	{
 		return true;
 	}
@@ -1292,7 +1292,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @return resource what? The connection
 	 */
-	function connection()
+	public function connection()
 	{
 		// find it, find it
 		return $this->_connection;

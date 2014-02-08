@@ -35,7 +35,7 @@ class MaillistSettingsClass extends Settings_Form
 	 * @param integer $editid -1 add a row, otherwise edit a row with the supplied key value
 	 * @param string $editname used when editing a row, needs to be the name of the col to find $editid key value
 	 */
-	static function saveTableSettings($config_vars, $tablename, $index = array(), $editid = -1, $editname = '')
+	public static function saveTableSettings($config_vars, $tablename, $index = array(), $editid = -1, $editname = '')
 	{
 		$db = database();
 

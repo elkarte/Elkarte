@@ -30,7 +30,7 @@ class ScheduledTask
 	 * Function to sending out approval notices to moderators.
 	 * It checks who needs to receive approvals notifications and sends emails.
 	 */
-	function approval_notification()
+	public function approval_notification()
 	{
 		global $scripturl, $txt;
 
@@ -248,7 +248,7 @@ class ScheduledTask
 	 *  - regenerate Diffie-Hellman keys for OpenID
 	 *  - remove obsolete login history logs
 	 */
-	function daily_maintenance()
+	public function daily_maintenance()
 	{
 		global $modSettings, $db_type;
 
@@ -361,7 +361,7 @@ class ScheduledTask
 	/**
 	 * Auto optimize the database.
 	 */
-	function auto_optimize()
+	public function auto_optimize()
 	{
 		global $modSettings, $db_prefix;
 
@@ -410,7 +410,7 @@ class ScheduledTask
 	 * It sends notifications about replies or new topics,
 	 * and moderation actions.
 	 */
-	function daily_digest()
+	public function daily_digest()
 	{
 		global $is_weekly, $txt, $mbname, $scripturl, $modSettings, $boardurl;
 
@@ -803,7 +803,7 @@ class ScheduledTask
 	 *
 	 * This method forwards to daily_digest()
 	 */
-	function weekly_digest()
+	public function weekly_digest()
 	{
 		global $is_weekly;
 
@@ -815,7 +815,7 @@ class ScheduledTask
 	/**
 	 * This task retrieves files from the official server.
 	 */
-	function fetchFiles()
+	public function fetchFiles()
 	{
 		global $txt, $language, $forum_version, $modSettings, $context;
 
@@ -886,7 +886,7 @@ class ScheduledTask
 	 * Schedule birthday emails.
 	 * (aka "Happy birthday!!")
 	 */
-	function birthdayemails()
+	public function birthdayemails()
 	{
 		global $modSettings, $txt, $txtBirthdayEmails;
 
@@ -973,7 +973,7 @@ class ScheduledTask
 	 *  - obsolete paid subscriptions
 	 *  - clear sessions table
 	 */
-	function weekly_maintenance()
+	public function weekly_maintenance()
 	{
 		global $modSettings;
 
@@ -1174,7 +1174,7 @@ class ScheduledTask
 	 *  - remove expired subscriptions
 	 *  - notify of subscriptions about to expire
 	 */
-	function paid_subscriptions()
+	public function paid_subscriptions()
 	{
 		global $scripturl, $modSettings, $language;
 
@@ -1261,7 +1261,7 @@ class ScheduledTask
 	 * Check for un-posted attachments is something we can do once in a while :P
 	 * This function uses opendir cycling through all the attachments
 	 */
-	function remove_temp_attachments()
+	public function remove_temp_attachments()
 	{
 		global $context, $txt;
 
@@ -1305,7 +1305,7 @@ class ScheduledTask
 	 * Check for move topic notices that have past their best by date:
 	 *  - remove them if the time has expired.
 	 */
-	function remove_topic_redirect()
+	public function remove_topic_redirect()
 	{
 		$db = database();
 
@@ -1343,7 +1343,7 @@ class ScheduledTask
 	/**
 	 * Check for old drafts and remove them
 	 */
-	function remove_old_drafts()
+	public function remove_old_drafts()
 	{
 		global $modSettings;
 
@@ -1385,7 +1385,7 @@ class ScheduledTask
 	 * If we can't run this via cron, run it as a task instead
 	 * Fetch emails from an imap box and process them
 	 */
-	function maillist_fetch_IMAP()
+	public function maillist_fetch_IMAP()
 	{
 		// Only should be run if the user can't set up a proper cron job and can not pipe emails
 		require_once(BOARDDIR . '/email_imap_cron.php');
@@ -1396,7 +1396,7 @@ class ScheduledTask
 	/**
 	 * Check for followups from removed topics and remove them from the table
 	 */
-	function remove_old_followups()
+	public function remove_old_followups()
 	{
 		global $modSettings;
 
@@ -1435,7 +1435,7 @@ class ScheduledTask
 	 * to a board, this will correct the viewing of the mention table.  Since this can be
 	 * a large job it is run as a scheduled immediate task
 	 */
-	function user_access_mentions()
+	public function user_access_mentions()
 	{
 		global $modSettings;
 

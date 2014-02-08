@@ -47,13 +47,13 @@ class Register_Controller extends Action_Controller
 	 * @uses Register template, registration_agreement or registration_form sub template
 	 * @uses Login language file
 	 */
-	function action_register()
+	public function action_register()
 	{
 		global $txt, $context, $modSettings, $user_info, $language, $scripturl, $cur_profile;
 
 		// Is this an incoming AJAX check?
 		if (isset($_GET['sa']) && $_GET['sa'] == 'usernamecheck')
-			return registerCheckUsername();
+			return $this->_registerCheckUsername();
 
 		// Check if the administrator has it disabled.
 		if (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == '3')
@@ -250,7 +250,7 @@ class Register_Controller extends Action_Controller
 	 *
 	 * @param bool $verifiedOpenID = false
 	 */
-	function action_register2($verifiedOpenID = false)
+	public function action_register2($verifiedOpenID = false)
 	{
 		global $txt, $modSettings, $context, $user_info;
 
@@ -593,7 +593,7 @@ class Register_Controller extends Action_Controller
 	 * Verify the activation code, and activate the user if correct.
 	 * Accessed by ?action=activate
 	 */
-	function action_activate()
+	public function action_activate()
 	{
 		global $context, $txt, $modSettings, $scripturl, $language, $user_info;
 
@@ -740,7 +740,7 @@ class Register_Controller extends Action_Controller
 	 * This function will display the contact information for the forum, as well a form to fill in.
 	 * Accessed by action=coppa
 	 */
-	function action_coppa()
+	public function action_coppa()
 	{
 		global $context, $modSettings, $txt;
 
@@ -816,7 +816,7 @@ class Register_Controller extends Action_Controller
 	 * Show the verification code or let it hear.
 	 * Accessed by ?action=verificationcode
 	 */
-	function action_verificationcode()
+	public function action_verificationcode()
 	{
 		global $context, $scripturl;
 
@@ -881,7 +881,7 @@ class Register_Controller extends Action_Controller
 	 * Shows the contact form for the user to fill out
 	 * Needs to be enabled to be used
 	 */
-	function action_contact()
+	public function action_contact()
 	{
 		global $context, $txt, $user_info, $modSettings;
 
@@ -975,28 +975,28 @@ class Register_Controller extends Action_Controller
 
 		createToken('contact');
 	}
-}
 
-/**
- * See if a username already exists.
- */
-function registerCheckUsername()
-{
-	global $context;
+	/**
+	 * See if a username already exists.
+	 */
+	private function _registerCheckUsername()
+	{
+		global $context;
 
-	// This is XML!
-	loadTemplate('Xml');
-	$context['sub_template'] = 'check_username';
-	$context['checked_username'] = isset($_GET['username']) ? un_htmlspecialchars($_GET['username']) : '';
-	$context['valid_username'] = true;
+		// This is XML!
+		loadTemplate('Xml');
+		$context['sub_template'] = 'check_username';
+		$context['checked_username'] = isset($_GET['username']) ? un_htmlspecialchars($_GET['username']) : '';
+		$context['valid_username'] = true;
 
-	// Clean it up like mother would.
-	$context['checked_username'] = preg_replace('~[\t\n\r \x0B\0\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}]+~u', ' ', $context['checked_username']);
+		// Clean it up like mother would.
+		$context['checked_username'] = preg_replace('~[\t\n\r \x0B\0\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}]+~u', ' ', $context['checked_username']);
 
-	$errors = Error_Context::context('valid_username', 0);
+		$errors = Error_Context::context('valid_username', 0);
 
-	require_once(SUBSDIR . '/Auth.subs.php');
-	validateUsername(0, $context['checked_username'], 'valid_username');
+		require_once(SUBSDIR . '/Auth.subs.php');
+		validateUsername(0, $context['checked_username'], 'valid_username');
 
-	$context['valid_username'] = !$errors->hasErrors();
+		$context['valid_username'] = !$errors->hasErrors();
+	}
 }
