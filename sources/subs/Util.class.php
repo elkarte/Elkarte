@@ -276,14 +276,14 @@ class Util
 		global $smcFunc;
 
 		if (!is_array($var))
-			return $smcFunc['db_escape_string']($var);
+			return addslashes($var);
 
 		// Reindex the array with slashes.
 		$new_var = array();
 
 		// Add slashes to every element, even the indexes!
 		foreach ($var as $k => $v)
-			$new_var[$smcFunc['db_escape_string']($k)] = escapestring_recursive($v);
+			$new_var[addslashes($k)] = Util::escapestring_recursive($v);
 
 		return $new_var;
 	}
