@@ -530,43 +530,6 @@ class ManageServer_Controller extends Action_Controller
 	}
 
 	/**
-	 * Handles the submission of new/changed load balancing settings.
-	 * Uses the _balancingSettings form.
-	 */
-	public function action_balancingSettings_save()
-	{
-		global $context;
-
-		// Initialize the form
-		$this->_initBalancingSettingsForm();
-
-		// Initialize it with our settings
-		$config_vars = $this->_balancingSettingsForm->settings();
-
-		// Double-check ourselves, we are about to save
-		if (isset($_GET['save']))
-		{
-			// Stupidity is not allowed.
-			foreach ($_POST as $key => $value)
-			{
-				if (strpos($key, 'loadavg') === 0 || $key === 'loadavg_enable')
-					continue;
-				elseif ($key == 'loadavg_auto_opt' && $value <= 1)
-					$_POST['loadavg_auto_opt'] = '1.0';
-				elseif ($key == 'loadavg_forum' && $value < 10)
-					$_POST['loadavg_forum'] = '10.0';
-				elseif ($value < 2)
-					$_POST[$key] = '2.0';
-			}
-
-			call_integration_hook('integrate_save_loadavg_settings');
-
-			Settings_Form::save_db($config_vars);
-			redirectexit('action=admin;area=serversettings;sa=loads;' . $context['session_var'] . '=' . $context['session_id']);
-		}
-	}
-
-	/**
 	 * Allows us to see the servers php settings
 	 *
 	 * - loads the settings into an array for display in a template
