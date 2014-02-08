@@ -39,15 +39,24 @@
 				dataType: 'json',
 				data: values,
 				success: function(resp) {
-					console.log('success');
-					// console.log(resp);
+					updateUi({
+						'elem': $(e.target),
+						'action': subAction
+					});
 				},
 				error: function(err) {
 					console.log('error');
 					// console.log(err);
 				},
 			});
-		};
+		},
+
+			updateUi = function(params) {
+				var currentClass = (params.action === 'unlikepost') ? 'unlike_button' : 'like_button';
+				var nextClass = (params.action === 'unlikepost') ? 'like_button' : 'unlike_button';
+
+				$(params.elem).removeClass(currentClass).addClass(nextClass);
+			};
 
 		return {
 			likeUnlikePosts: likeUnlikePosts
