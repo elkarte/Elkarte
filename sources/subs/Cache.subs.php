@@ -94,7 +94,7 @@ function cache_put_data($key, $value, $ttl = 120)
 		return;
 
 	$cache_count = isset($cache_count) ? $cache_count + 1 : 1;
-	if (isset($db_show_debug) && $db_show_debug === true)
+	if ($db_show_debug === true)
 	{
 		$cache_hits[$cache_count] = array('k' => $key, 'd' => 'put', 's' => $value === null ? 0 : strlen(serialize($value)));
 		$st = microtime(true);
@@ -194,7 +194,7 @@ function cache_put_data($key, $value, $ttl = 120)
 	if (function_exists('call_integration_hook'))
 		call_integration_hook('cache_put_data', array($key, $value, $ttl));
 
-	if (isset($db_show_debug) && $db_show_debug === true)
+	if ($db_show_debug === true)
 		$cache_hits[$cache_count]['t'] = microtime(true) - $st;
 }
 
@@ -215,7 +215,7 @@ function cache_get_data($key, $ttl = 120)
 		return;
 
 	$cache_count = isset($cache_count) ? $cache_count + 1 : 1;
-	if (isset($db_show_debug) && $db_show_debug === true)
+	if ($db_show_debug === true)
 	{
 		$cache_hits[$cache_count] = array(
 			'k' => $key,
@@ -282,7 +282,7 @@ function cache_get_data($key, $ttl = 120)
 			break;
 	}
 
-	if (isset($db_show_debug) && $db_show_debug === true)
+	if ($db_show_debug === true)
 	{
 		$cache_hits[$cache_count]['t'] = microtime(true) - $st;
 		$cache_hits[$cache_count]['s'] = isset($value) ? strlen($value) : 0;

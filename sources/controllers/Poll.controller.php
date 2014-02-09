@@ -729,8 +729,7 @@ class Poll_Controller extends Action_Controller
 		loadLanguage('Post');
 		Template_Layers::getInstance()->removeAll();
 
-		if (isset($db_show_debug))
-			$db_show_debug = false;
+		$db_show_debug = false;
 
 		$context['sub_template'] = 'poll_edit';
 

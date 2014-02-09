@@ -2242,7 +2242,7 @@ function redirectexit($setLocation = '', $refresh = false)
 		header('Location: ' . str_replace(' ', '%20', $setLocation));
 
 	// Debugging.
-	if (isset($db_show_debug) && $db_show_debug === true)
+	if ($db_show_debug === true)
 		$_SESSION['debug_redirect'] = $db_cache;
 
 	obExit(false);

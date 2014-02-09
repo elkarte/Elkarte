@@ -259,7 +259,7 @@ function error_handler($error_level, $error_string, $file, $line)
 			$file = realpath($settings['current_include_filename']) . ' (eval?)';
 	}
 
-	if (isset($db_show_debug) && $db_show_debug === true)
+	if ($db_show_debug === true)
 	{
 		// Commonly, undefined indexes will occur inside attributes; try to show them anyway!
 		if ($error_level % 255 != E_ERROR)

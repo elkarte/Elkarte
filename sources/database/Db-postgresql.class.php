@@ -376,7 +376,7 @@ class Database_PostgreSQL implements Database
 		}
 
 		// Debugging.
-		if (isset($db_show_debug) && $db_show_debug === true)
+		if ($db_show_debug === true)
 		{
 			// Get the file and line number this function was called.
 			list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);
@@ -463,7 +463,7 @@ class Database_PostgreSQL implements Database
 			$this->db_transaction('commit', $connection);
 
 		// Debugging.
-		if (isset($db_show_debug) && $db_show_debug === true)
+		if ($db_show_debug === true)
 			$db_cache[$db_count]['t'] = microtime(true) - $st;
 
 		return $this->_db_last_result;
@@ -664,7 +664,8 @@ class Database_PostgreSQL implements Database
 		if (allowedTo('admin_forum'))
 			$context['error_message'] .= '<br /><br />' . sprintf($txt['database_error_versions'], $modSettings['elkVersion']);
 
-		if (allowedTo('admin_forum') && isset($db_show_debug) && $db_show_debug === true)
+		if (allowedTo('admin_forum') && $db_show_debug === true)
+		{
 			$context['error_message'] .= '<br /><br />' . nl2br($db_string);
 
 		// It's already been logged... don't log it again.
