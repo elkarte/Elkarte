@@ -59,6 +59,12 @@ class Database_PostgreSQL implements Database
 	private $_in_transaction = false;
 
 	/**
+	 * Number of queries run (may include queries from $_SESSION if is a redirect)
+	 * @var resource
+	 */
+	private $_query_count = 0;
+
+	/**
 	 * Private constructor.
 	 */
 	private function __construct()
@@ -277,7 +283,7 @@ class Database_PostgreSQL implements Database
 	 */
 	public function query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
-		global $db_cache, $db_count, $db_show_debug, $time_start, $db_callback, $modSettings;
+		global $db_show_debug, $time_start, $db_callback, $modSettings;
 
 		// Decide which connection to use.
 		$connection = $connection === null ? $this->_connection : $connection;
@@ -357,7 +363,7 @@ class Database_PostgreSQL implements Database
 		);
 
 		// One more query....
-		$db_count = !isset($db_count) ? 1 : $db_count + 1;
+		$this->_query_count++;
 		$this->_db_replace_result = null;
 
 		if (empty($modSettings['disableQueryCheck']) && strpos($db_string, '\'') !== false && empty($db_values['security_override']))
@@ -381,24 +387,21 @@ class Database_PostgreSQL implements Database
 			// Get the file and line number this function was called.
 			list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);
 
-			// Initialize $db_cache if not already initialized.
-			if (!isset($db_cache))
-				$db_cache = array();
-
 			if (!empty($_SESSION['debug_redirect']))
 			{
-				$db_cache = array_merge($_SESSION['debug_redirect'], $db_cache);
-				$db_count = count($db_cache) + 1;
+				Debug::merge_db($_SESSION['debug_redirect']);
+				// @todo this may be off by 1
+				$this->_query_count += count($_SESSION['debug_redirect']);
 				$_SESSION['debug_redirect'] = array();
 			}
 
 			$st = microtime(true);
 
 			// Don't overload it.
-			$db_cache[$db_count]['q'] = $db_count < 50 ? $db_string : '...';
-			$db_cache[$db_count]['f'] = $file;
-			$db_cache[$db_count]['l'] = $line;
-			$db_cache[$db_count]['s'] = array_sum(explode(' ', $st)) - array_sum(explode(' ', $time_start));
+			$db_cache['q'] = $this->_query_count < 50 ? $db_string : '...';
+			$db_cache['f'] = $file;
+			$db_cache['l'] = $line;
+			$db_cache['s'] = array_sum(explode(' ', $st)) - array_sum(explode(' ', $time_start));
 		}
 
 		// First, we clean strings out of the query, reduce whitespace, lowercase, and trim - so we can check it over.
@@ -464,7 +467,10 @@ class Database_PostgreSQL implements Database
 
 		// Debugging.
 		if ($db_show_debug === true)
-			$db_cache[$db_count]['t'] = microtime(true) - $st;
+		{
+			$db_cache['t'] = microtime(true) - $st;
+			Debug::db($db_cache);
+		}
 
 		return $this->_db_last_result;
 	}
@@ -1268,6 +1274,16 @@ class Database_PostgreSQL implements Database
 	{
 		// find it, find it
 		return $this->_connection;
+	}
+
+	/**
+	 * Return the number of queries executed
+	 *
+	 * @return int
+	 */
+	function num_queries()
+	{
+		return $this->_query_count;
 	}
 
 	/**

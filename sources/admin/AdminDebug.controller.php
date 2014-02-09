@@ -59,7 +59,7 @@ class AdminDebug_Controller extends Action_Controller
 		// If we're just hiding/showing, do it now.
 		if (isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'hide')
 		{
-			$_SESSION['view_queries'] = $_SESSION['view_queries'] == 1 ? 0 : 1;
+			Debug::toggleViewQueries();
 
 			if (strpos($_SESSION['old_url'], 'action=viewquery') !== false)
 				redirectexit();
@@ -95,6 +95,8 @@ class AdminDebug_Controller extends Action_Controller
 	/**
 	 * Get admin information from the database.
 	 * Accessed by ?action=viewadminfile.
+	 *
+	 * @todo candidate for removal I think
 	 */
 	public function action_viewadminfile()
 	{

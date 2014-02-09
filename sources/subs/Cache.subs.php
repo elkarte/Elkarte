@@ -87,16 +87,15 @@ function cache_quick_get($key, $file, $function, $params, $level = 1)
  */
 function cache_put_data($key, $value, $ttl = 120)
 {
-	global $cache_memcached, $memcached, $cache_hits, $cache_count, $db_show_debug;
+	global $cache_memcached, $memcached, $db_show_debug;
 	global $cache_accelerator, $cache_enable;
 
 	if (empty($cache_enable))
 		return;
 
-	$cache_count = isset($cache_count) ? $cache_count + 1 : 1;
 	if ($db_show_debug === true)
 	{
-		$cache_hits[$cache_count] = array('k' => $key, 'd' => 'put', 's' => $value === null ? 0 : strlen(serialize($value)));
+		$cache_hit = array('k' => $key, 'd' => 'put', 's' => $value === null ? 0 : strlen(serialize($value)));
 		$st = microtime(true);
 	}
 
@@ -195,7 +194,10 @@ function cache_put_data($key, $value, $ttl = 120)
 		call_integration_hook('cache_put_data', array($key, $value, $ttl));
 
 	if ($db_show_debug === true)
-		$cache_hits[$cache_count]['t'] = microtime(true) - $st;
+	{
+		$cache_hit['t'] = microtime(true) - $st;
+		Debug::cache($cache_hit);
+	}
 }
 
 /**
@@ -208,16 +210,15 @@ function cache_put_data($key, $value, $ttl = 120)
  */
 function cache_get_data($key, $ttl = 120)
 {
-	global $cache_memcached, $memcached, $cache_hits, $cache_count, $db_show_debug;
+	global $cache_memcached, $memcached, $db_show_debug;
 	global $cache_accelerator, $cache_enable, $expired;
 
 	if (empty($cache_enable))
 		return;
 
-	$cache_count = isset($cache_count) ? $cache_count + 1 : 1;
 	if ($db_show_debug === true)
 	{
-		$cache_hits[$cache_count] = array(
+		$cache_hit = array(
 			'k' => $key,
 			'd' => 'get'
 		);
@@ -284,8 +285,9 @@ function cache_get_data($key, $ttl = 120)
 
 	if ($db_show_debug === true)
 	{
-		$cache_hits[$cache_count]['t'] = microtime(true) - $st;
-		$cache_hits[$cache_count]['s'] = isset($value) ? strlen($value) : 0;
+		$cache_hit['t'] = microtime(true) - $st;
+		$cache_hit['s'] = isset($value) ? strlen($value) : 0;
+		Debug::cache($cache_hit);
 	}
 
 	if (function_exists('call_integration_hook') && isset($value))

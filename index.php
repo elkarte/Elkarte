@@ -33,6 +33,12 @@ error_reporting(E_ALL | E_STRICT);
 $time_start = microtime(true);
 $db_show_debug = false;
 
+// Directional only script time usage for display
+if (function_exists('getrusage'))
+	$rusage_start = getrusage();
+else
+	$rusage_start = array();
+
 // Turn on output buffering.
 ob_start();
 
@@ -43,10 +49,6 @@ foreach (array('db_character_set', 'cachedir') as $variable)
 
 // Ready to load the site settings.
 require_once(dirname(__FILE__) . '/Settings.php');
-
-// Directional only script time usage for display
-if ($db_show_debug === true && function_exists('getrusage'))
-	$rusage_start = getrusage();
 
 // Make sure the paths are correct... at least try to fix them.
 if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt'))
@@ -84,6 +86,10 @@ require_once(SUBSDIR . '/Cache.subs.php');
 require_once(SOURCEDIR . '/Security.php');
 
 spl_autoload_register('elk_autoloader');
+if ($db_show_debug === true)
+{
+	Debug::rusage('start', $rusage_start);
+}
 
 // Forum in extended maintenance mode? Our trip ends here with a bland message.
 if (!empty($maintenance) && $maintenance == 2)

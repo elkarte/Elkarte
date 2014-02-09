@@ -2205,7 +2205,7 @@ function highlight_php_code($code)
  */
 function redirectexit($setLocation = '', $refresh = false)
 {
-	global $scripturl, $context, $modSettings, $db_show_debug, $db_cache;
+	global $scripturl, $context, $modSettings, $db_show_debug;
 
 	// In case we have mail to send, better do that - as obExit doesn't always quite make it...
 	if (!empty($context['flush_mail']))
@@ -2243,7 +2243,7 @@ function redirectexit($setLocation = '', $refresh = false)
 
 	// Debugging.
 	if ($db_show_debug === true)
-		$_SESSION['debug_redirect'] = $db_cache;
+		$_SESSION['debug_redirect'] = Debug::get_db();
 
 	obExit(false);
 }
@@ -2281,7 +2281,7 @@ function redirectexit_callback($matches)
  */
 function obExit($header = null, $do_footer = null, $from_index = false, $from_fatal_error = false)
 {
-	global $context, $txt;
+	global $context, $txt, $db_show_debug;
 
 	static $header_done = false, $footer_done = false, $level = 0, $has_fatal_error = false;
 
@@ -2333,9 +2333,11 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 			$footer_done = true;
 			template_footer();
 
+			// Add $db_show_debug = true; to Settings.php if you want to show the debugging information.
 			// (since this is just debugging... it's okay that it's after </html>.)
-			if (!isset($_REQUEST['xml']))
-				displayDebug();
+			if ($db_show_debug === true)
+				if (!isset($_REQUEST['xml']) && ((!isset($_GET['action']) || $_GET['action'] != 'viewquery') && !isset($_GET['api'])))
+				Debug::display();
 		}
 	}
 
@@ -2699,12 +2701,14 @@ function theme_copyright()
  */
 function template_footer()
 {
-	global $context, $settings, $modSettings, $time_start, $db_count;
+	global $context, $settings, $modSettings, $time_start;
+
+	$db = database();
 
 	// Show the load time?  (only makes sense for the footer.)
 	$context['show_load_time'] = !empty($modSettings['timeLoadPageEnable']);
 	$context['load_time'] = round(microtime(true) - $time_start, 3);
-	$context['load_queries'] = $db_count;
+	$context['load_queries'] = $db->num_queries();
 
 	if (isset($settings['use_default_images']) && $settings['use_default_images'] == 'defaults' && isset($settings['default_template']))
 	{
@@ -3600,7 +3604,7 @@ function call_integration_hook($hook, $parameters = array())
 	);
 
 	if ($db_show_debug === true)
-		$context['debug']['hooks'][] = $hook;
+		Debug::add('hooks', $hook);
 
 	$results = array();
 	if (empty($modSettings[$hook]))
@@ -3659,7 +3663,7 @@ function call_integration_include_hook($hook)
 	);
 
 	if ($db_show_debug === true)
-		$context['debug']['hooks'][] = $hook;
+		Debug::add('hooks', $hook);
 
 	// Any file to include?
 	if (!empty($modSettings[$hook]))
