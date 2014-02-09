@@ -295,6 +295,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 	if (!empty($members))
 	{
 		require_once(SUBSDIR . '/Members.subs.php');
+
 		// Get the latest activated member's display name.
 		$result = getBasicMemberData(array_keys($members));
 		foreach ($result as $row)
@@ -308,6 +309,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 					'href' => $scripturl . '?action=profile;u=' . $row['id_member'],
 					'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>'
 				);
+
 				// Make the member number into a name.
 				$entries[$action]['extra']['member'] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>';
 			}
@@ -344,16 +346,13 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
  *
  * Our callback that does the actual replacment.
  *
- * @param string $entries
- * @param string $key
- * @param string $matches
  */
 class ModLogEntriesReplacement
 {
 	/**
-	 * Our callback that does the actual smiley replacments.
+	 * Matching function to return the value in the callback
 	 *
-	 * @param string $matches
+	 * @param string[] $matches
 	 */
 	function callback($matches)
 	{

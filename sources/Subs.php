@@ -2236,7 +2236,7 @@ function parsesmileys(&$message)
 			}
 		}
 
-		$smileyPregSearch = '~(?<=[>:\?\.\s' . $non_breaking_space . '[\]()*\\\;]|^)(' . implode('|', $searchParts) . ')(?=[^[:alpha:]0-9]|$)~' . ($context['utf8'] ? 'u' : '');
+		$smileyPregSearch = '~(?<=[>:\?\.\s' . $non_breaking_space . '[\]()*\\\;]|^)(' . implode('|', $searchParts) . ')(?=[^[:alpha:]0-9]|$)~';
 		$callback = new ParseSmileysReplacement;
 		$callback->replacements = $smileyPregReplacements;
 	}
@@ -2256,7 +2256,7 @@ class ParseSmileysReplacement
 	/**
 	 * Our callback that does the actual smiley replacments.
 	 *
-	 * @param string $matches
+	 * @param string[] $matches
 	 */
 	function callback($matches)
 	{
