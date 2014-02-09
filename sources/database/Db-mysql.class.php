@@ -346,7 +346,7 @@ class Database_MySQL implements Database
 			$db_cache['q'] = $this->_query_count < 50 ? $db_string : '...';
 			$db_cache['f'] = $file;
 			$db_cache['l'] = $line;
-			$db_cache['s'] = array_sum(explode(' ', $st)) - array_sum(explode(' ', $time_start));
+			$db_cache['s'] = $st - $time_start;
 		}
 
 		// First, we clean strings out of the query, reduce whitespace, lowercase, and trim - so we can check it over.

@@ -95,7 +95,11 @@ function cache_put_data($key, $value, $ttl = 120)
 
 	if ($db_show_debug === true)
 	{
-		$cache_hit = array('k' => $key, 'd' => 'put', 's' => $value === null ? 0 : strlen(serialize($value)));
+		$cache_hit = array(
+			'k' => $key,
+			'd' => 'put',
+			's' => $value === null ? 0 : strlen(serialize($value))
+		);
 		$st = microtime(true);
 	}
 

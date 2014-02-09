@@ -21,7 +21,16 @@ if (!defined('ELK'))
 
 class Debug
 {
+	/**
+	 * This is used to remember if the debug is on or off
+	 * @var bool
+	 */
 	private static $_track = true;
+
+	/**
+	 * A list of known debug entities (here to preserve a kind of order)
+	 * @var array|array
+	 */
 	private static $_debugs = array(
 		'templates' => array(),
 		'sub_templates' => array(),
@@ -32,13 +41,50 @@ class Debug
 		'files_included' => array(),
 		'tokens' => array(),
 	);
+
+	/**
+	 * Holds the output ot the getrusage php function
+	 * @var array|array
+	 */
 	private static $_rusage = array();
+
+	/**
+	 * Holds All the cache hits for a page load
+	 * @var array|string
+	 */
 	private static $_cache_hits = array();
+
+	/**
+	 * Number of times the cache has been used
+	 * @var int
+	 */
 	private static $_cache_count = 0;
+
+	/**
+	 * All the queries executed
+	 * @var array|array
+	 */
 	private static $_db_cache = array();
+
+	/**
+	 * Number of queries
+	 * @var int
+	 */
 	private static $_db_count = 0;
+
+	/**
+	 * Some generic "system" debug info
+	 * @var array|string
+	 */
 	private static $_system = array();
 
+
+	/**
+	 * Adds a new generic debug entry
+	 *
+	 * @param string the kind of debug entry
+	 * @param mixed string or array of the entry to show
+	 */
 	public static function add($type, $value)
 	{
 		if (!self::$_track)
@@ -50,6 +96,15 @@ class Debug
 			self::$_debugs[$type][] = $value;
 	}
 
+	/**
+	 * Adds a new cache hits
+	 *
+	 * @param array contains the relevant cache info, in the form:
+	 *         d => method: put or get
+	 *         k => cache key
+	 *         t => time taken to get/put the entry
+	 *         s => length of the serialized value
+	 */
 	public static function cache($value)
 	{
 		if (!self::$_track)
@@ -59,11 +114,26 @@ class Debug
 		self::$_cache_count++;
 	}
 
+	/**
+	 * Return the number of cache hits
+	 *
+	 * @return int
+	 */
 	public static function cache_count()
 	{
 		return self::$_cache_count;
 	}
 
+	/**
+	 * Adds a new database query
+	 *
+	 * @param array contains the relevant queries info, in the form:
+	 *         q => the query string (only for the first 50 queries, after that only a "...")
+	 *         f => the file in which the query has been executed
+	 *         l => the line at which the query has been executed
+	 *         s => seconds at which the query has been executed into the request
+	 *         t => time taken by the query
+	 */
 	public static function db($value)
 	{
 		if (!self::$_track)
@@ -73,6 +143,11 @@ class Debug
 		self::$_db_count++;
 	}
 
+	/**
+	 * Merges the values passed with the current database entries
+	 *
+	 * @param array|array An array of queries info, see the db method for details
+	 */
 	public static function merge_db($value)
 	{
 		if (!self::$_track)
@@ -82,6 +157,11 @@ class Debug
 		self::$_db_count = count(self::$_db_cache) + 1;
 	}
 
+	/**
+	 * Return the current database entries
+	 *
+	 * @return array
+	 */
 	public static function get_db()
 	{
 		if (!self::$_track)
@@ -90,6 +170,14 @@ class Debug
 		return self::$_db_cache;
 	}
 
+	/**
+	 * Adds a new getrusage value (by default two are added: one at the beginning
+	 * of the script execution and one at the end
+	 *
+	 * @param string $point can be end or start depending on when the function
+	 *               is called
+	 * @param mixed value of getrusage or null to let the method call it
+	 */
 	public static function rusage($point, $rusage = null)
 	{
 		if (!function_exists('getrusage') || !self::$_track)
@@ -101,21 +189,34 @@ class Debug
 			self::$_rusage[$point] = $rusage;
 	}
 
+	/**
+	 * Enables tracking of debug entries
+	 */
 	public static function on()
 	{
 		self::$_track = true;
 	}
 
+	/**
+	 * Disables tracking of debug entries
+	 */
 	public static function off()
 	{
 		self::$_track = false;
 	}
 
+	/**
+	 * Toggles the visibility of the queries
+	 */
 	public static function toggleViewQueries()
 	{
 		$_SESSION['view_queries'] = $_SESSION['view_queries'] == 1 ? 0 : 1;
 	}
 
+	/**
+	 * Collects some other generic system informations necessary for the
+	 * debug screen
+	 */
 	private static function _prepare_last_bits()
 	{
 		global $context;
@@ -228,6 +329,12 @@ class Debug
 	</body></html>';
 	}
 
+	/**
+	 * Displays a page with all the queries executed during the "current"
+	 * page load and allows to EXPLAIN them
+	 *
+	 * @param integer the id of the query to EXPLAIN, if -1 no queries are explained
+	 */
 	public static function viewQueries($query_id)
 	{
 		$queries_data = array();
@@ -248,6 +355,10 @@ class Debug
 		return $queries_data;
 	}
 
+	/**
+	 * Displays a list of queries executed during the current
+	 * page load
+	 */
 	private static function _show_queries()
 	{
 		global $scripturl, $txt;
