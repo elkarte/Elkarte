@@ -25,14 +25,14 @@ if (defined('ELK'))
 define('ELK', 'SSI');
 
 // Shortcut for the browser cache stale
-define('CACHE_STALE', '?beta10');
+define('CACHE_STALE', '?10beta2');
 
 // We're going to want a few globals... these are all set later.
 global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
 global $boardurl, $webmaster_email, $cookiename;
 global $db_server, $db_name, $db_user, $db_prefix, $db_persist, $db_error_send, $db_last_error;
 global $modSettings, $context, $sc, $user_info, $topic, $board, $txt;
-global $smcFunc, $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd;
+global $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd;
 global $sourcedir, $boarddir;
 
 // Remember the current configuration so it can be set back.
@@ -108,17 +108,11 @@ require_once(SOURCEDIR . '/Action.controller.php');
 // Clean the request variables.
 cleanRequest();
 
-// Create a variable to store some specific functions in.
-$smcFunc = array();
-
 // Initiate the database connection and define some database functions to use.
 loadDatabase();
 
 // Load settings from the database.
 reloadSettings();
-
-// Temporarily, compatibility for access to utility functions through $smcFunc is enabled by default.
-Util::compat_init();
 
 // Seed the random generator?
 elk_seed_generator();

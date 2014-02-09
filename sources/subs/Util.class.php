@@ -21,28 +21,6 @@ if (!defined('ELK'))
 class Util
 {
 	/**
-	* Compatibility function: it initializes $smcFunc array with utility methods.
-	*/
-	static function compat_init()
-	{
-		global $smcFunc;
-
-		$smcFunc += array(
-			'entity_fix' => create_function('$string', 'return Util::entity_fix($string);'),
-			'htmlspecialchars' => create_function('$string, $quote_style = ENT_COMPAT, $charset = \'UTF-8\'', 'return Util::htmlspecialchars($string);'),
-			'htmltrim' => create_function('$string', 'return Util::htmltrim($string);'),
-			'strlen' => create_function('$string', 'return Util::strlen($string);'),
-			'strpos' => create_function('$haystack, $needle, $offset = 0', 'return Util::strpos($haystack, $needle);'),
-			'substr' => create_function('$string, $start, $length = null', 'return Util::substr($string, $start);'),
-			'strtolower' => create_function('$string', 'return Util::strtolower($string);'),
-			'strtoupper' => create_function('$string', 'return Util::strtoupper($string);'),
-			'truncate' => create_function('$string, $length', 'return Util::truncate($string, $length);'),
-			'ucfirst' => create_function('$string', 'return Util::ucfirst($string);'),
-			'ucwords' => create_function('$string', 'return Util::ucwords($string);'),
-		);
-	}
-
-	/**
 	 * Converts invalid / disallowed / out of range entities to nulls
 	 *
 	 * @param string $string
@@ -268,22 +246,23 @@ class Util
 	 * - importantly escapes all keys and values!
 	 * - calls itself recursively if necessary.
 	 *
+	 * @todo not used, consider removing
+	 * @deprecated since 1.0
+	 *
 	 * @param array|string $var
 	 * @return array|string
 	 */
 	static function escapestring_recursive($var)
 	{
-		global $smcFunc;
-
 		if (!is_array($var))
-			return $smcFunc['db_escape_string']($var);
+			return addslashes($var);
 
 		// Reindex the array with slashes.
 		$new_var = array();
 
 		// Add slashes to every element, even the indexes!
 		foreach ($var as $k => $v)
-			$new_var[$smcFunc['db_escape_string']($k)] = escapestring_recursive($v);
+			$new_var[addslashes($k)] = Util::escapestring_recursive($v);
 
 		return $new_var;
 	}
@@ -294,6 +273,9 @@ class Util
 	 * - removes slashes, recursively, from the array or string var.
 	 * - effects both keys and values of arrays.
 	 * - calls itself recursively to handle arrays of arrays.
+	 *
+	 * @todo not used, consider removing
+	 * @deprecated since 1.0
 	 *
 	 * @param array|string $var
 	 * @param int $level = 0
@@ -321,6 +303,9 @@ class Util
 	 * - importantly, does it to keys too!
 	 * - calls itself recursively if there are any sub arrays.
 	 *
+	 * @todo not used, consider removing
+	 * @deprecated since 1.0
+	 *
 	 * @param array|string $var
 	 * @param int $level = 0
 	 * @return array|string
@@ -346,6 +331,9 @@ class Util
 	 * - unescapes, recursively, from the array or string var.
 	 * - effects both keys and values of arrays.
 	 * - calls itself recursively to handle arrays of arrays.
+	 *
+	 * @todo not used, consider removing
+	 * @deprecated since 1.0
 	 *
 	 * @param array|string $var
 	 * @return array|string
