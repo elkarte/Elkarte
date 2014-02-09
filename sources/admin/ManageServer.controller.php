@@ -539,7 +539,6 @@ class ManageServer_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		$info_lines = array();
 		$category = $txt['phpinfo_settings'];
 		$pinfo = array();
 
