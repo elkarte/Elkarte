@@ -2274,12 +2274,12 @@ function getLanguages($use_cache = true)
 			$dir = dir($language_dir);
 			while ($entry = $dir->read())
 			{
-				// Only directories are intereting
+				// Only directories are interesting
 				if ($entry == '..' || !is_dir($dir->path . '/' . $entry))
 					continue;
 
 				// @todo at some point we may want to simplify that stuff (I mean scanning all the files just for index)
-				$file_dir = dir($dir->path() . '/' . $entry);
+				$file_dir = dir($dir->path . '/' . $entry);
 				while ($file_entry = $file_dir->read())
 				{
 					// Look for the index language file....
