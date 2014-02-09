@@ -234,6 +234,26 @@ class Debug
 	</body></html>';
 	}
 
+	public static function viewQueries($query_id)
+	{
+		$queries_data = array();
+
+		$query_analysis = new Query_Analysis();
+
+		foreach ($_SESSION['debug'] as $q => $query_data)
+		{
+			$queries_data[$q] = $query_analysis->extractInfo($query_data);
+
+			// Explain the query.
+			if ($query_id == $q && $queries_data[$q]['is_select'])
+			{
+				$queries_data[$q]['explain'] = $query_analysis->doExplain();
+			}
+		}
+
+		return $queries_data;
+	}
+
 	private static function _show_queries()
 	{
 		global $scripturl, $txt;

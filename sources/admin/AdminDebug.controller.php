@@ -75,21 +75,8 @@ class AdminDebug_Controller extends Action_Controller
 		$layers->add('html');
 		loadTemplate('Admin');
 
-		$query_analysis = new Query_Analysis();
-
 		$context['sub_template'] = 'viewquery';
-		$context['queries_data'] = array();
-
-		foreach ($_SESSION['debug'] as $q => $query_data)
-		{
-			$context['queries_data'][$q] = $query_analysis->extractInfo($query_data);
-
-			// Explain the query.
-			if ($query_id == $q && $context['queries_data'][$q]['is_select'])
-			{
-				$context['queries_data'][$q]['explain'] = $query_analysis->doExplain();
-			}
-		}
+		$context['queries_data'] = Debug::viewQueries($query_id);
 	}
 
 	/**
