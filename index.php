@@ -31,6 +31,7 @@ if (function_exists('set_magic_quotes_runtime'))
 	@set_magic_quotes_runtime(0);
 error_reporting(E_ALL | E_STRICT);
 $time_start = microtime(true);
+$db_show_debug = false;
 
 // Turn on output buffering.
 ob_start();
@@ -44,7 +45,7 @@ foreach (array('db_character_set', 'cachedir') as $variable)
 require_once(dirname(__FILE__) . '/Settings.php');
 
 // Directional only script time usage for display
-if (!empty($db_show_debug) && function_exists('getrusage'))
+if ($db_show_debug === true && function_exists('getrusage'))
 	$rusage_start = getrusage();
 
 // Make sure the paths are correct... at least try to fix them.
