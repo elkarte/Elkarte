@@ -2166,7 +2166,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 function parsesmileys(&$message)
 {
 	global $modSettings, $txt, $user_info ;
-	static $smileyPregSearch = null, $smileyPregReplacements = array();
+	static $smileyPregSearch = null, $smileyPregReplacements = array(), $callback;
 
 	$db = database();
 
@@ -2236,29 +2236,35 @@ function parsesmileys(&$message)
 			}
 		}
 
-		$smileyPregSearch = '~(?<=[>:\?\.\s' . $non_breaking_space . '[\]()*\\\;]|^)(' . implode('|', $searchParts) . ')(?=[^[:alpha:]0-9]|$)~';
+		$smileyPregSearch = '~(?<=[>:\?\.\s' . $non_breaking_space . '[\]()*\\\;]|^)(' . implode('|', $searchParts) . ')(?=[^[:alpha:]0-9]|$)~' . ($context['utf8'] ? 'u' : '');
+		$callback = new ParseSmileysReplacement;
+		$callback->replacements = $smileyPregReplacements;
 	}
 
 	// Replace away!
 	// @todo When support changes to PHP 5.3+, this can be changed this to "use" keyword and simpifly this.
-	$callback = pregReplaceCurry('smileyPregReplaceCallback', 2);
-	$message = preg_replace_callback($smileyPregSearch, $callback($smileyPregReplacements), $message);
+	$message = preg_replace_callback($smileyPregSearch, array($callback, 'callback'), $message);
 }
 
 /**
  * Smiley Replacment Callback.
  *
- * Our callback that does the actual smiley replacments.
- *
- * Original code from: http://php.net/manual/en/function.preg-replace-callback.php#88013
  * This is needed until ELK supports PHP 5.3+ and we can change to "use"
- *
- * @param string $replacements
- * @param string $matches
  */
-function smileyPregReplaceCallback($replacements, $matches)
+class ParseSmileysReplacement
 {
-	return $replacements[$matches[1]];
+	/**
+	 * Our callback that does the actual smiley replacments.
+	 *
+	 * @param string $matches
+	 */
+	function callback($matches)
+	{
+		if (isset($this->replacements[$matches[0]]))
+			return $this->replacements[$matches[0]];
+		else
+			return '';
+	}
 }
 
 /**
