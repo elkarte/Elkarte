@@ -315,7 +315,8 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 	}
 
 	// Do some formatting of the action string.
-	$callback = pregReplaceCurry('list_getModLogEntriesCallback', 3);
+	$callback = new ModLogEntriesReplacement;
+	$callback->entries = $entries;
 	foreach ($entries as $k => $entry)
 	{
 		// Make any message info links so its easier to go find that message.
@@ -329,7 +330,9 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 
 		if (empty($entries[$k]['action_text']))
 			$entries[$k]['action_text'] = isset($txt['modlog_ac_' . $entry['action']]) ? $txt['modlog_ac_' . $entry['action']] : $entry['action'];
-		$entries[$k]['action_text'] = preg_replace_callback('~\{([A-Za-z\d_]+)\}~i', $callback($entries, $k), $entries[$k]['action_text']);
+
+		$callback->key = $k;
+		$entries[$k]['action_text'] = preg_replace_callback('~\{([A-Za-z\d_]+)\}~i', array($callback, 'callback'), $entries[$k]['action_text']);
 	}
 
 	// Back we go!
@@ -345,9 +348,20 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
  * @param string $key
  * @param string $matches
  */
-function list_getModLogEntriesCallback($entries, $key, $matches)
+class ModLogEntriesReplacement
 {
-	return isset($entries[$key]['extra'][$matches[1]]) ? $entries[$key]['extra'][$matches[1]] : '';
+	/**
+	 * Our callback that does the actual smiley replacments.
+	 *
+	 * @param string $matches
+	 */
+	function callback($matches)
+	{
+		if (isset($this->entries[$this->key]['extra'][$matches[1]]))
+			return $this->entries[$this->key]['extra'][$matches[1]];
+		else
+			return '';
+	}
 }
 
 /**

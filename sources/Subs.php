@@ -4042,38 +4042,6 @@ function currentContext($messages_request, $reset = false)
 }
 
 /**
- * Preg Replacment Curry.
- *
- * This allows for delayed argument binding (currying) and bringing in the replacement variables
- * for preg replacments.
- *
- * Original code from: http://php.net/manual/en/function.preg-replace-callback.php#88013
- * This is needed until ELK only supports PHP 5.3+ and we change to "use" keyword
- *
- * @param string $func
- * @param int $arity
- */
-function pregReplaceCurry($func, $arity)
-{
-	return create_function('', "
-		\$args = func_get_args();
-
-		if (count(\$args) >= $arity)
-			return call_user_func_array('$func', \$args);
-
-		\$args = var_export(\$args, 1);
-
-		return create_function('','
-			\$a = func_get_args();
-			\$z = ' . \$args . ';
-			\$a = array_merge(\$z,\$a);
-
-			return call_user_func_array(\'$func\', \$a);
-		');
-	");
-}
-
-/**
  * Helper function to insert an array in to an existing array
  * Intended for addon use to allow such things as
  *  - adding in a new menu item to an existing menu array
