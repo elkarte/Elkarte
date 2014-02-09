@@ -37,7 +37,6 @@ class Debug
 	private static $_cache_count = 0;
 	private static $_db_cache = array();
 	private static $_db_count = 0;
-	private static $_warnings = 0;
 	private static $_system = array();
 
 	public static function add($type, $value)
@@ -133,17 +132,8 @@ class Debug
 			Debug::add('files_included', strtr($files[$i], array(BOARDDIR => '.')));
 		}
 
-		self::$_warnings = 0;
 		if (!empty(self::$_db_cache))
-		{
-			foreach (self::$_db_cache as $q => $qq)
-			{
-				if (!empty($qq['w']))
-					self::$_warnings += count($qq['w']);
-			}
-
 			$_SESSION['debug'] = self::$_db_cache;
-		}
 
 		// Compute some system info, if we can
 		self::$_system['system_type'] = php_uname();
@@ -225,7 +215,7 @@ class Debug
 
 		// Want to see the querys in a new windows?
 		echo '
-				<a href="', $scripturl, '?action=viewquery" target="_blank" class="new_win">', self::$_warnings == 0 ? sprintf($txt['debug_queries_used'], self::$_db_count) : sprintf($txt['debug_queries_used_and_warnings'], self::$_db_count, self::$_warnings), '</a><br />';
+				<a href="', $scripturl, '?action=viewquery" target="_blank" class="new_win">', sprintf($txt['debug_queries_used'], self::$_db_count), '</a><br />';
 
 		if ($_SESSION['view_queries'] == 1 && !empty(self::$_db_cache))
 			self::_show_queries();
