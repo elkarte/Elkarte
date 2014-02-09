@@ -83,7 +83,7 @@ class Debug
 	 * Adds a new generic debug entry
 	 *
 	 * @param string the kind of debug entry
-	 * @param mixed string or array of the entry to show
+	 * @param string|string[] string or array of the entry to show
 	 */
 	public static function add($type, $value)
 	{
@@ -99,7 +99,7 @@ class Debug
 	/**
 	 * Adds a new cache hits
 	 *
-	 * @param array contains the relevant cache info, in the form:
+	 * @param mixed[] contains the relevant cache info, in the form:
 	 *         d => method: put or get
 	 *         k => cache key
 	 *         t => time taken to get/put the entry
@@ -127,7 +127,7 @@ class Debug
 	/**
 	 * Adds a new database query
 	 *
-	 * @param array contains the relevant queries info, in the form:
+	 * @param mixed[] contains the relevant queries info, in the form:
 	 *         q => the query string (only for the first 50 queries, after that only a "...")
 	 *         f => the file in which the query has been executed
 	 *         l => the line at which the query has been executed
@@ -146,7 +146,7 @@ class Debug
 	/**
 	 * Merges the values passed with the current database entries
 	 *
-	 * @param array|array An array of queries info, see the db method for details
+	 * @param mixed[] An array of queries info, see the db method for details
 	 */
 	public static function merge_db($value)
 	{
@@ -176,7 +176,7 @@ class Debug
 	 *
 	 * @param string $point can be end or start depending on when the function
 	 *               is called
-	 * @param mixed value of getrusage or null to let the method call it
+	 * @param string[]|null value of getrusage or null to let the method call it
 	 */
 	public static function rusage($point, $rusage = null)
 	{
