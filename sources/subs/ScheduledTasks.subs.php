@@ -108,7 +108,6 @@ function next_time($regularity, $unit, $offset, $immediate = false)
 		$regularity = 2;
 
 	$curMin = date('i', time());
-	$next_time = 9999999999;
 
 	// If we have scheduleTaskImmediate running, then it's 10 seconds
 	if (empty($unit) && $immediate)

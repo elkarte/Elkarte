@@ -1531,12 +1531,10 @@ class ManageSmileys_Controller extends Action_Controller
 		$context['actions'] = array();
 		$context['ftp_needed'] = false;
 
-		$has_readme = false;
 		foreach ($actions as $action)
 		{
 			if ($action['type'] == 'readme' || $action['type'] == 'license')
 			{
-				$has_readme = true;
 				$type = 'package_' . $action['type'];
 				if (file_exists(BOARDDIR . '/packages/temp/' . $base_path . $action['filename']))
 					$context[$type] = htmlspecialchars(trim(file_get_contents(BOARDDIR . '/packages/temp/' . $base_path . $action['filename']), "\n\r"), ENT_COMPAT, 'UTF-8');

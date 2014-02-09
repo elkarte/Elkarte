@@ -299,7 +299,6 @@ class Site_Combiner
 	{
 		global $context;
 
-		$fetch_data = '';
 		$post_data = '';
 
 		// Details of the closure request

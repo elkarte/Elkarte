@@ -1344,7 +1344,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			if (empty($parse_tags) || in_array($code['tag'], $parse_tags))
 				$bbc_codes[substr($code['tag'], 0, 1)][] = $code;
 		}
-		$codes = null;
 	}
 
 	// Shall we take the time to cache this?
@@ -1546,7 +1545,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 
 			$look_for = strtolower(substr($message, $pos + 2, $pos2 - $pos - 2));
 
-			$to_close = array();
 			$block_level = null;
 
 			do

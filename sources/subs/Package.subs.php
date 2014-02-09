@@ -30,7 +30,7 @@ if (!defined('ELK'))
  * @param bool $single_file = false
  * @param bool $overwrite = false
  * @param string[]|null $files_to_extract = null
- * @return string
+ * @return string|false
  */
 function read_tgz_file($gzfilename, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
@@ -68,15 +68,15 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
  * overwrites existing files with newer modification times if and only if overwrite is true.
  * creates the destination directory if it doesn't exist, and is is specified.
  * requires zlib support be built into PHP.
- * returns an array of the files extracted.
- * if files_to_extract is not equal to null only extracts file within this array.
+ * returns an array of the files extracted on success
+ * if files_to_extract is not equal to null only extracts the files within this array.
  *
  * @param string $data
  * @param string $destination
  * @param bool $single_file = false,
  * @param bool $overwrite = false,
  * @param string[]|null $files_to_extract = null
- * @return string
+ * @return string|false
  */
 function read_tgz_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
@@ -104,7 +104,7 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
 	if (strtolower($header['a'] . $header['b']) != '1f8b')
 	{
 		// Okay, this is not a tar.gz, but maybe it's a zip file.
-		if (substr($data, 0, 2) == 'PK')
+		if (substr($data, 0, 2) === 'PK')
 			return read_zip_data($data, $destination, $single_file, $overwrite, $files_to_extract);
 		else
 			return false;

@@ -414,6 +414,7 @@ class Ftp_Connection
 	 *
 	 * @param string $filesystem_path
 	 * @param string|null $lookup_file
+	 * @return string[] $username, $path, found_path
 	 */
 	public function detect_path($filesystem_path, $lookup_file = null)
 	{

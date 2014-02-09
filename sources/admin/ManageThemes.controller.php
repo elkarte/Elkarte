@@ -1024,7 +1024,7 @@ class ManageThemes_Controller extends Action_Controller
 
 	/**
 	 * Installs new themes, either from a gzip or copy of the default.
-	 * - puts themes in $boardurl/Themes.
+	 * - puts themes in $boardurl/themes.
 	 * - assumes the gzip has a root directory in it. (ie default.)
 	 * Requires admin_forum.
 	 * @uses ManageThemes template

@@ -1417,8 +1417,6 @@ function loadBadBehavior()
 {
 	global $modSettings, $user_info, $bb2_results;
 
-	$bb_run = false;
-
 	// Bad Behavior Enabled?
 	if (!empty($modSettings['badbehavior_enabled']))
 	{

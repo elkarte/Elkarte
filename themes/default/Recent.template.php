@@ -137,7 +137,6 @@ function template_unread()
 		foreach ($context['topics'] as $topic)
 		{
 			// Calculate the color class of the topic.
-			$color_class = '';
 			if ($topic['is_sticky'] && $topic['is_locked'])
 				$color_class = 'locked_row sticky_row';
 			// Sticky topics should get a different color, too.
@@ -278,7 +277,6 @@ function template_replies()
 		foreach ($context['topics'] as $topic)
 		{
 			// Calculate the color class of the topic.
-			$color_class = '';
 			if ($topic['is_sticky'] && $topic['is_locked'])
 				$color_class = 'locked_row sticky_row';
 			// Sticky topics should get a different color, too.

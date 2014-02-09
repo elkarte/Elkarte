@@ -107,9 +107,6 @@ class DbTable_PostgreSQL extends DbTable
 	{
 		global $db_prefix;
 
-		// Working with the db
-		$db = database();
-
 		// Strip out the table name, we might not need it in some cases
 		$real_prefix = preg_match('~^("?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
 

@@ -222,7 +222,6 @@ class PersonalMessage_Controller extends Action_Controller
 		}
 
 		// Make sure the starting location is valid.
-		$start = '';
 		if (isset($_GET['start']) && $_GET['start'] !== 'new')
 			$start = (int) $_GET['start'];
 		elseif (!isset($_GET['start']) && !empty($options['view_newest_pm_first']))
@@ -1361,7 +1360,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Load up the fields.
 		require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
 		$controller = new ProfileOptions_Controller();
-		$controller->action_pmprefs($user_info['id']);
+		$controller->action_pmprefs();
 	}
 
 	/**
