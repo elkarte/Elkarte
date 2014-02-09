@@ -617,7 +617,12 @@ class Xml_Array
 		$trans_tbl = array_flip(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES));
 
 		// Translate all the entities out.
-		$data = strtr(preg_replace_callback('~&#(\d{1,4});~', create_function('$m', 'return chr("$m[1]");'), $data), $trans_tbl);
+		if (preg_match_all('~&#(\d{1,4});~', $data, $entities, PREG_PATTERN_ORDER))
+		{
+			foreach($entities[0] as $key => $swap)
+				$data = str_replace($swap, chr($entities[1][$key]), $data);
+		}
+		$data = strtr($data, $trans_tbl);
 
 		return $this->trim ? trim($data) : $data;
 	}

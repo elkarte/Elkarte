@@ -2166,7 +2166,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 function parsesmileys(&$message)
 {
 	global $modSettings, $txt, $user_info ;
-	static $smileyPregSearch = null, $smileyPregReplacements = array();
+	static $smileyPregSearch = null, $smileyPregReplacements = array(), $callback;
 
 	$db = database();
 
@@ -2237,28 +2237,34 @@ function parsesmileys(&$message)
 		}
 
 		$smileyPregSearch = '~(?<=[>:\?\.\s' . $non_breaking_space . '[\]()*\\\;]|^)(' . implode('|', $searchParts) . ')(?=[^[:alpha:]0-9]|$)~';
+		$callback = new ParseSmileysReplacement;
+		$callback->replacements = $smileyPregReplacements;
 	}
 
 	// Replace away!
 	// @todo When support changes to PHP 5.3+, this can be changed this to "use" keyword and simpifly this.
-	$callback = pregReplaceCurry('smileyPregReplaceCallback', 2);
-	$message = preg_replace_callback($smileyPregSearch, $callback($smileyPregReplacements), $message);
+	$message = preg_replace_callback($smileyPregSearch, array($callback, 'callback'), $message);
 }
 
 /**
  * Smiley Replacment Callback.
  *
- * Our callback that does the actual smiley replacments.
- *
- * Original code from: http://php.net/manual/en/function.preg-replace-callback.php#88013
  * This is needed until ELK supports PHP 5.3+ and we can change to "use"
- *
- * @param string $replacements
- * @param string $matches
  */
-function smileyPregReplaceCallback($replacements, $matches)
+class ParseSmileysReplacement
 {
-	return $replacements[$matches[1]];
+	/**
+	 * Our callback that does the actual smiley replacments.
+	 *
+	 * @param string[] $matches
+	 */
+	function callback($matches)
+	{
+		if (isset($this->replacements[$matches[0]]))
+			return $this->replacements[$matches[0]];
+		else
+			return '';
+	}
 }
 
 /**
@@ -4033,38 +4039,6 @@ function currentContext($messages_request, $reset = false)
 	}
 
 	return $message;
-}
-
-/**
- * Preg Replacment Curry.
- *
- * This allows for delayed argument binding (currying) and bringing in the replacement variables
- * for preg replacments.
- *
- * Original code from: http://php.net/manual/en/function.preg-replace-callback.php#88013
- * This is needed until ELK only supports PHP 5.3+ and we change to "use" keyword
- *
- * @param string $func
- * @param int $arity
- */
-function pregReplaceCurry($func, $arity)
-{
-	return create_function('', "
-		\$args = func_get_args();
-
-		if (count(\$args) >= $arity)
-			return call_user_func_array('$func', \$args);
-
-		\$args = var_export(\$args, 1);
-
-		return create_function('','
-			\$a = func_get_args();
-			\$z = ' . \$args . ';
-			\$a = array_merge(\$z,\$a);
-
-			return call_user_func_array(\'$func\', \$a);
-		');
-	");
 }
 
 /**
