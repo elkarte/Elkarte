@@ -356,7 +356,7 @@ $helptxt['enableVideoEmbeding'] = 'This allows automatic conversion of standard 
 $helptxt['enableCodePrettify'] = 'This will load the Prettify script which will color highlight code used in code tags.  It adds styles to code snippets so that tokens stand out and your users can more easily read the code.';
 // !!! Add more information about how to use them here.
 $helptxt['xmlnews_enable'] = 'Allows people to link to <a href="%1$s?action=.xml;sa=news" target="_blank" class="new_win">Recent news</a>
-	and similar data.  It is also recommended that you limit the size of recent posts/news because, when rss data
+	and similar data.  It is also recommended that you limit the number of recent posts/news because, when RSS data
 	is displayed in some clients, like Trillian, it is expected to be truncated.';
 $helptxt['hotTopicPosts'] = 'Change the number of posts for a topic to reach the state of a &quot;hot&quot; or
 	&quot;very hot&quot; topic.  Select the likes option to base this state on the number of likes instead of the number of posts';
