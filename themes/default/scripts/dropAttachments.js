@@ -43,8 +43,8 @@
 				totalSizeAllowed = (params.totalSizeAllowed === '') ? null : params.totalSizeAllowed;
 				individualSizeAllowed = (params.individualSizeAllowed === '') ? null : params.individualSizeAllowed;
 				numOfAttachmentAllowed = (params.numOfAttachmentAllowed === '') ? null : params.numOfAttachmentAllowed;
-				totalAttachSizeUploaded = (params.numOfAttachmentAllowed === 0) ? 0 : parseInt(params.totalAttachSizeUploaded, 10) / 1024;
-				numAttachUploaded = parseInt(params.numAttachUploaded, 10);
+				totalAttachSizeUploaded = params.totalAttachSizeUploaded / 1024;
+				numAttachUploaded = params.numAttachUploaded;
 				filesUploadedSuccessfully = [];
 			},
 

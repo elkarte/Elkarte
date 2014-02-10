@@ -482,12 +482,12 @@ function template_add_new_attachments()
 	echo '
 		<script><!-- // --><![CDATA[
 			var dropAttach = dragDropAttachment.init({
-				allowedExtensions: "', $context['attachments']['allowed_extensions'], '",
-				totalSizeAllowed: "', empty($modSettings['attachmentPostLimit']) ? '' : $modSettings['attachmentPostLimit'], '",
-				individualSizeAllowed: "', empty($modSettings['attachmentSizeLimit']) ? '' : $modSettings['attachmentSizeLimit'], '",
-				numOfAttachmentAllowed: "',$context['attachments']['num_allowed'], '",
-				totalAttachSizeUploaded: "', isset($context['attachments']['total_size']) && !empty($context['attachments']['total_size']) ? $context['attachments']['total_size'] : 0, '",
-				numAttachUploaded: "', isset($context['attachments']['quantity']) && !empty($context['attachments']['quantity']) ? $context['attachments']['quantity'] : 0, '"
+				allowedExtensions: ', JavaScriptEscape($context['attachments']['allowed_extensions']), ',
+				totalSizeAllowed: ', JavaScriptEscape(empty($modSettings['attachmentPostLimit']) ? '' : $modSettings['attachmentPostLimit']), ',
+				individualSizeAllowed: ', JavaScriptEscape(empty($modSettings['attachmentSizeLimit']) ? '' : $modSettings['attachmentSizeLimit']), ',
+				numOfAttachmentAllowed: ', $context['attachments']['num_allowed'], ',
+				totalAttachSizeUploaded: ', isset($context['attachments']['total_size']) && !empty($context['attachments']['total_size']) ? $context['attachments']['total_size'] : 0, ',
+				numAttachUploaded: ', isset($context['attachments']['quantity']) && !empty($context['attachments']['quantity']) ? $context['attachments']['quantity'] : 0, '
 			});
 		// ]]></script>';
 
