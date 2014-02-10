@@ -16,7 +16,7 @@
 (function() {
 	function dragDropAttachment() {}
 
-	dragDropAttachment.prototype = function() {
+	dragDropAttachment = function() {
 		// Few internal global vars
 		var sessionId = null,
 			sessionVar = null,
@@ -358,7 +358,7 @@
 			e.preventDefault();
 			$(this).css('border', 'solid 1px rgb(64, 118, 182)');
 			var files = e.originalEvent.dataTransfer.files;
-			dragDropAttachment.prototype.handleFileUpload(files, obj);
+			dragDropAttachment.handleFileUpload(files, obj);
 		});
 	});
 	this.dragDropAttachment = dragDropAttachment;
