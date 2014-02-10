@@ -78,7 +78,8 @@
 					processData: false,
 					cache: false,
 					data: formData,
-					success: function(resp) {
+				})
+				.done(function(resp) {
 						if (typeof(resp) !== 'object') resp = JSON.parse(resp);
 
 						if (resp.result) {
@@ -92,18 +93,17 @@
 						} else {
 							status.setProgress(0);
 						}
-					},
-					error: function(error) {
+				})
+				.fail(function(error) {
 						console.log('error');
 						console.log(error);
-					},
-					complete: function() {
+				})
+				.always(function() {
 						uploadInProgress = false;
 						runAttachmentQueue();
-					}
 				});
 				status.setAbort(jqXHR);
-			},
+			};
 
 			/**
 			 * private function
@@ -120,8 +120,9 @@
 					data: {
 						'filename': dataToSend.temp_name,
 						'filepath': dataToSend.temp_path,
-					},
-					success: function(resp) {
+					}
+				})
+				.done(function(resp) {
 						if (typeof(resp) !== 'object') resp = JSON.parse(resp);
 
 						if (resp.result) {
@@ -132,12 +133,11 @@
 						} else {
 							console.log('error success');
 						}
-					},
-					error: function(error) {
+				})
+				.fail(function(error) {
 						console.log('error');
-					}
 				});
-			},
+			};
 
 			/**
 			 * private function
