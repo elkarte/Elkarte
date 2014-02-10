@@ -76,19 +76,15 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 
 /**
  * Updates the columns in the members table.
- * Assumes the data has been htmlspecialchar'd.
- * this function should be used whenever member data needs to be
- * updated in place of an UPDATE query.
+ * Assumes the data has been htmlspecialchar'd, no sanitization is performed on the data.
+ * this function should be used whenever member data needs to be updated in place of an UPDATE query.
  *
- * id_member is either an int or an array of ints to be updated.
- *
- * data is an associative array of the columns to be updated and their respective values.
+ * $data is an associative array of the columns to be updated and their respective values.
  * any string values updated should be quoted and slashed.
  *
- * the value of any column can be '+' or '-', which mean 'increment'
- * and decrement, respectively.
+ * The value of any column can be '+' or '-', which mean 'increment' and decrement, respectively.
  *
- * if the member's post number is updated, updates their post groups.
+ * If the member's post number is updated, updates their post groups.
  *
  * @param mixed $members An array of integers
  * @param array $data
@@ -2116,13 +2112,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 		$fn_count = isset($fn_total) ? $fn_total : 0;
 
 		// Replace our footnote text with a [1] link, save the text for use at the end of the message
-		$message = preg_replace_callback('~(%fn%(.*?)%fn%)~is', create_function('$m', '
-			global $fn_num, $fn_content, $fn_count;
-
-			$fn_num++;
-			$fn_content[] = "<div class=\"target\" id=\"fn$fn_num" . "_" . "$fn_count\"><sup>$fn_num&nbsp;</sup>$m[2]<a class=\"footnote_return\" href=\"#ref$fn_num" . "_" . "$fn_count\">&crarr;</a></div>";
-			return "<a class=\"target\" href=\"#fn$fn_num" . "_" . "$fn_count\" id=\"ref$fn_num" . "_" . "$fn_count\">[$fn_num]</a>";'), $message);
-
+		$message = preg_replace_callback('~(%fn%(.*?)%fn%)~is', 'footnote_callback', $message);
 		$fn_total += $fn_num;
 
 		// If we have footnotes, add them in at the end of the message
@@ -2150,6 +2140,23 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 	}
 
 	return $message;
+}
+
+/**
+ * Call back function for footnotes, builds the unique id and to/for link
+ * for each footnote in a message and page
+ *
+ * @param mixed[] $matches
+ * @return string
+ */
+function footnote_callback($matches)
+{
+	global $fn_num, $fn_content, $fn_count;
+
+	$fn_num++;
+	$fn_content[] = '<div class="target" id="fn' . $fn_num . '_' . $fn_count . '"><sup>' . $fn_num . '&nbsp;</sup>' . $matches[2] . '<a class="footnote_return" href="#ref' . $fn_num . "_" . $fn_count . '">&crarr;</a></div>';
+
+	return '<a class="target" href="#fn' . $fn_num . '_' . $fn_count . '" id="ref' . $fn_num . "_" . $fn_count . '">[' . $fn_num . ']</a>';
 }
 
 /**
@@ -2291,11 +2298,15 @@ function highlight_php_code($code)
 }
 
 /**
- * Make sure the browser doesn't come back and repost the form data.
+ * Ends execution and redirects the user to a new location
+ * Makes sure the browser doesn't come back and repost the form data.
  * Should be used whenever anything is posted.
+ * Calls AddMailQueue to process any mail queue items its can
+ * Calls call_integration_hook integrate_redirect before headers are sent
  *
  * @param string $setLocation = ''
- * @param bool $refresh = false
+ * @param bool $refresh = false, enable to send a refresh header, default is a location header
+ *
  */
 function redirectexit($setLocation = '', $refresh = false)
 {
@@ -2321,9 +2332,9 @@ function redirectexit($setLocation = '', $refresh = false)
 	if (!empty($modSettings['queryless_urls']) && (empty($context['server']['is_cgi']) || ini_get('cgi.fix_pathinfo') == 1 || @get_cfg_var('cgi.fix_pathinfo') == 1) && (!empty($context['server']['is_apache']) || !empty($context['server']['is_lighttpd']) || !empty($context['server']['is_litespeed'])))
 	{
 		if (defined('SID') && SID != '')
-			$setLocation = preg_replace_callback('~^' . preg_quote($scripturl, '/') . '\?(?:' . SID . '(?:;|&|&amp;))((?:board|topic)=[^#]+?)(#[^"]*?)?$~', create_function('$m', 'global $scripturl; return $scripturl . "/" . strtr("$m[1]", \'&;=\', \'//,\') . ".html?" . SID . (isset($m[2]) ? $m[2] : "");'), $setLocation);
+			$setLocation = preg_replace_callback('~^' . preg_quote($scripturl, '/') . '\?(?:' . SID . '(?:;|&|&amp;))((?:board|topic)=[^#]+?)(#[^"]*?)?$~', 'redirectexit_callback', $setLocation);
 		else
-			$setLocation = preg_replace_callback('~^' . preg_quote($scripturl, '/') . '\?((?:board|topic)=[^#"]+?)(#[^"]*?)?$~', create_function('$m', 'global $scripturl; return $scripturl . "/" . strtr("$m[1]", \'&;=\', \'//,\') . ".html" . (isset($m[2]) ? $m[2] : "");'), $setLocation);
+			$setLocation = preg_replace_callback('~^' . preg_quote($scripturl, '/') . '\?((?:board|topic)=[^#"]+?)(#[^"]*?)?$~', 'redirectexit_callback', $setLocation);
 	}
 
 	// Maybe integrations want to change where we are heading?
@@ -2340,6 +2351,23 @@ function redirectexit($setLocation = '', $refresh = false)
 		$_SESSION['debug_redirect'] = $db_cache;
 
 	obExit(false);
+}
+
+/**
+ * URL fixer for redirect exit
+ * Similar to the callback function used in ob_sessrewrite
+ * Envoked by enabling queryless_urls for systems that support that function
+ *
+ * @param mixed[] $matches
+ */
+function redirectexit_callback($matches)
+{
+	global $scripturl;
+
+	if (defined('SID') && SID != '')
+		return $scripturl . '/' . strtr($matches[1], '&;=', '//,') . '.html?' . SID . (isset($matches[2]) ? $matches[2] : '');
+	else
+		return $scripturl . '/' . strtr($matches[1], '&;=', '//,') . '.html' . (isset($matches[2]) ? $matches[2] : '');
 }
 
 /**
