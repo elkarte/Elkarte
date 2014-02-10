@@ -19,8 +19,8 @@
  * This function displays all the stuff you get with a richedit box - BBC, smileys etc.
  *
  * @param string $editor_id
- * @param boolean $smileyContainer show the smiley container
- * @param boolean $bbcContainer show the bbc container
+ * @param string|null $smileyContainer if set show the smiley container id
+ * @param string|null $bbcContainer show the bbc container id
  */
 function template_control_richedit($editor_id, $smileyContainer = null, $bbcContainer = null)
 {

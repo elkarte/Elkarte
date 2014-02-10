@@ -52,7 +52,7 @@ class Xml_Array
 	 *
 	 * @param string $data the xml data or an array of, unless is_clone is true.
 	 * @param bool $auto_trim default false, used to automatically trim textual data.
-	 * @param int $level default null, the debug level, specifies whether notices should be generated for missing elements and attributes.
+	 * @param int|null $level default null, the debug level, specifies whether notices should be generated for missing elements and attributes.
 	 * @param bool $is_clone default false. If is_clone is true, the  Xml_Array is cloned from another - used internally only.
 	 */
 	public function __construct($data, $auto_trim = false, $level = null, $is_clone = false)
@@ -136,9 +136,9 @@ class Xml_Array
 	 * or return_set is true.
 	 * Example use:
 	 *  $element = $xml->path('html/body');
-	 * @param $path string - the path to the element to get
-	 * @param $return_full bool - always return full result set
-	 * @return Xml_Array, a new Xml_Array.
+	 * @param string $path  - the path to the element to get
+	 * @param bool $return_full  - always return full result set
+	 * @return Xml_Array a new Xml_Array.
 	 */
 	public function path($path, $return_full = false)
 	{
@@ -238,7 +238,7 @@ class Xml_Array
 	 * Example use:
 	 *  echo $xml->count('html/head/meta');
 	 * @param string $path - the path to search for.
-	 * @return int, the number of elements the path matches.
+	 * @return int the number of elements the path matches.
 	 */
 	public function count($path)
 	{
@@ -262,8 +262,8 @@ class Xml_Array
 	 * of elements, an array of Xml_Array's is returned for use with foreach.
 	 * Example use:
 	 *  foreach ($xml->set('html/body/p') as $p)
-	 * @param $path string - the path to search for.
-	 * @return array, an array of Xml_Array objects
+	 * @param string $path  - the path to search for.
+	 * @return array an array of Xml_Array objects
 	 */
 	public function set($path)
 	{
@@ -291,8 +291,8 @@ class Xml_Array
 	 * Create an xml file from an Xml_Array, the specified path if any.
 	 * Example use:
 	 *  echo $this->create_xml();
-	 * @param string $path - the path to the element. (optional)
-	 * @return string, xml-formatted string.
+	 * @param string|null $path - the path to the element. (optional)
+	 * @return string xml-formatted string.
 	 */
 	public function create_xml($path = null)
 	{
@@ -320,7 +320,7 @@ class Xml_Array
 	 * Example use:
 	 *  print_r($xml->to_array());
 	 *
-	 * @param string $path the path to output.
+	 * @param string|null $path the path to output.
 	 */
 	public function to_array($path = null)
 	{
@@ -494,7 +494,7 @@ class Xml_Array
 	 * Get a specific element's xml. (privately used...)
 	 *
 	 * @param $array
-	 * @param $indent
+	 * @param null|integer $indent
 	 */
 	protected function _xml($array, $indent)
 	{
@@ -546,7 +546,7 @@ class Xml_Array
 	/**
 	 * Return an element as an array
 	 *
-	 * @param array $array
+	 * @param mixed[] $array
 	 */
 	protected function _array($array)
 	{
@@ -572,9 +572,9 @@ class Xml_Array
 	/**
 	 * Parse out CDATA tags. (htmlspecialchars them...)
 	 *
-	 * @param $data
+	 * @param string $data
 	 */
-	function _to_cdata($data)
+	protected function _to_cdata($data)
 	{
 		$inCdata = $inComment = false;
 		$output = '';
@@ -609,7 +609,7 @@ class Xml_Array
 	/**
 	 * Turn the CDATAs back to normal text.
 	 *
-	 * @param $data
+	 * @param string $data
 	 */
 	protected function _from_cdata($data)
 	{
@@ -630,7 +630,7 @@ class Xml_Array
 	/**
 	 * Given an array, return the text from that array. (recursive and privately used.)
 	 *
-	 * @param array $array
+	 * @param string[]|string $array
 	 */
 	protected function _fetch($array)
 	{
@@ -660,7 +660,7 @@ class Xml_Array
 	/**
 	 * Get a specific array by path, one level down. (privately used...)
 	 *
-	 * @param array $array
+	 * @param mixed[] $array
 	 * @param string $path
 	 * @param int $level
 	 * @param bool $no_error

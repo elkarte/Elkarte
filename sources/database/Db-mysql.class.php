@@ -29,7 +29,7 @@ class Database_MySQL implements Database
 {
 	/**
 	 * Holds current instance of the class
-	 * @var instance
+	 * @var Database_MySQL
 	 */
 	private static $_db = null;
 
@@ -56,11 +56,11 @@ class Database_MySQL implements Database
 	 * @param string $db_user
 	 * @param string $db_passwd
 	 * @param string $db_prefix
-	 * @param array $db_options
+	 * @param mixed[] $db_options
 	 *
 	 * @return resource
 	 */
-	static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
+	public static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 	{
 		global $mysql_set_mode;
 
@@ -116,7 +116,7 @@ class Database_MySQL implements Database
 	 *
 	 * @return string
 	 */
-	function fix_prefix($db_prefix, $db_name)
+	public function fix_prefix($db_prefix, $db_name)
 	{
 		$db_prefix = is_numeric(substr($db_prefix, 0, 1)) ? $db_name . '.' . $db_prefix : '`' . $db_name . '`.' . $db_prefix;
 
@@ -129,9 +129,9 @@ class Database_MySQL implements Database
 	 * their current values from $user_info.
 	 * In addition, it performs checks and sanitization on the values sent to the database.
 	 *
-	 * @param $matches
+	 * @param mixed[] $matches
 	 */
-	function replacement__callback($matches)
+	public function replacement__callback($matches)
 	{
 		global $db_callback, $user_info, $db_prefix;
 
@@ -245,10 +245,10 @@ class Database_MySQL implements Database
 	 * Just like the db_query, escape and quote a string, but not executing the query.
 	 *
 	 * @param string $db_string
-	 * @param array $db_values
-	 * @param resource $connection = null
+	 * @param mixed[] $db_values
+	 * @param resource|null $connection = null
 	 */
-	function quote($db_string, $db_values, $connection = null)
+	public function quote($db_string, $db_values, $connection = null)
 	{
 		global $db_callback;
 
@@ -273,10 +273,10 @@ class Database_MySQL implements Database
 	 *
 	 * @param string $identifier
 	 * @param string $db_string
-	 * @param array $db_values = array()
-	 * @param resource $connection = null
+	 * @param mixed[] $db_values = array()
+	 * @param resource|false|null $connection = null
 	 */
-	function query($identifier, $db_string, $db_values = array(), $connection = null)
+	public function query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
 		global $db_cache, $db_count, $db_show_debug, $time_start;
 		global $db_unbuffered, $db_callback, $modSettings;
@@ -379,10 +379,11 @@ class Database_MySQL implements Database
 
 					$pos = $pos2 + 1;
 				}
-				$clean .= ' %s ';
 
+				$clean .= ' %s ';
 				$old_pos = $pos + 1;
 			}
+
 			$clean .= substr($db_string, $old_pos);
 			$clean = trim(strtolower(preg_replace($allowed_comments_from, $allowed_comments_to, $clean)));
 
@@ -423,9 +424,9 @@ class Database_MySQL implements Database
 	/**
 	 * Affected rows from previous operation.
 	 *
-	 * @param resource $connection
+	 * @param resource|null $connection
 	 */
-	function affected_rows($connection = null)
+	public function affected_rows($connection = null)
 	{
 		return mysqli_affected_rows($connection === null ? $this->_connection : $connection);
 	}
@@ -434,10 +435,10 @@ class Database_MySQL implements Database
 	 * Last inserted id.
 	 *
 	 * @param string $table
-	 * @param string $field = null
-	 * @param resource $connection = null
+	 * @param string|null $field = null
+	 * @param resource|null $connection = null
 	 */
-	function insert_id($table, $field = null, $connection = null)
+	public function insert_id($table, $field = null, $connection = null)
 	{
 		global $db_prefix;
 
@@ -454,7 +455,7 @@ class Database_MySQL implements Database
 	 * @param resource $result
 	 * @param boolean $counter = false
 	 */
-	function fetch_row($result, $counter = false)
+	public function fetch_row($result, $counter = false)
 	{
 		// Just delegate to MySQL's function
 		return mysqli_fetch_row($result);
@@ -465,7 +466,7 @@ class Database_MySQL implements Database
 	 *
 	 * @param resource $result
 	 */
-	function free_result($result)
+	public function free_result($result)
 	{
 		// Just delegate to MySQL's function
 		mysqli_free_result($result);
@@ -476,9 +477,9 @@ class Database_MySQL implements Database
 	 *
 	 * @param resource $result
 	 */
-	function num_rows($result)
+	public function num_rows($result)
 	{
-		// simply delegate to the native function
+		// Simply delegate to the native function
 		return mysqli_num_rows($result);
 	}
 
@@ -487,7 +488,7 @@ class Database_MySQL implements Database
 	 *
 	 * @param resource $request
 	 */
-	function num_fields($request)
+	public function num_fields($request)
 	{
 		return mysqli_num_fields($request);
 	}
@@ -496,11 +497,11 @@ class Database_MySQL implements Database
 	 * Reset the internal result pointer.
 	 *
 	 * @param $request
-	 * @param $counter
+	 * @param integer $counter
 	 */
-	function data_seek($request, $counter)
+	public function data_seek($request, $counter)
 	{
-		// delegate to native mysql function
+		// Delegate to native mysql function
 		return mysqli_data_seek($request, $counter);
 	}
 
@@ -508,9 +509,9 @@ class Database_MySQL implements Database
 	 * Do a transaction.
 	 *
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
-	 * @param resource $connection = null
+	 * @param resource|null $connection = null
 	 */
-	function db_transaction($type = 'commit', $connection = null)
+	public function db_transaction($type = 'commit', $connection = null)
 	{
 		// Decide which connection to use
 		$connection = $connection === null ? $this->_connection : $connection;
@@ -528,9 +529,9 @@ class Database_MySQL implements Database
 	/**
 	 * Return last error string from the database server
 	 *
-	 * @param resource $connection = null
+	 * @param resource|null $connection = null
 	 */
-	function last_error($connection = null)
+	public function last_error($connection = null)
 	{
 		// Decide which connection to use
 		$connection = $connection === null ? $this->_connection : $connection;
@@ -544,9 +545,9 @@ class Database_MySQL implements Database
 	 * Backtrace, log, try to fix.
 	 *
 	 * @param string $db_string
-	 * @param resource $connection = null
+	 * @param resource|null $connection = null
 	 */
-	function error($db_string, $connection = null)
+	public function error($db_string, $connection = null)
 	{
 		global $txt, $context, $webmaster_email, $modSettings;
 		global $db_last_error, $db_persist;
@@ -744,14 +745,14 @@ class Database_MySQL implements Database
 	 * Insert data.
 	 *
 	 * @param string $method - options 'replace', 'ignore', 'insert'
-	 * @param $table
-	 * @param $columns
-	 * @param $data
-	 * @param $keys
+	 * @param string $table
+	 * @param mixed[] $columns
+	 * @param mixed[] $data
+	 * @param mixed[] $keys
 	 * @param bool $disable_trans = false
-	 * @param resource $connection = null
+	 * @param resource|null $connection = null
 	 */
-	function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
+	public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 	{
 		global $db_prefix;
 
@@ -808,13 +809,13 @@ class Database_MySQL implements Database
 	/**
 	 * This function tries to work out additional error information from a back trace.
 	 *
-	 * @param $error_message
-	 * @param $log_message
-	 * @param $error_type
-	 * @param $file
-	 * @param $line
+	 * @param string $error_message
+	 * @param string $log_message
+	 * @param string|boolean $error_type
+	 * @param string|null $file
+	 * @param integer|null $line
 	 */
-	function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null)
+	public function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null)
 	{
 		if (empty($log_message))
 			$log_message = $error_message;
@@ -862,7 +863,7 @@ class Database_MySQL implements Database
 	 * @param $string
 	 * @param bool $translate_human_wildcards = false, if true, turns human readable wildcards into SQL wildcards.
 	 */
-	function escape_wildcard_string($string, $translate_human_wildcards=false)
+	public function escape_wildcard_string($string, $translate_human_wildcards = false)
 	{
 		$replacements = array(
 			'%' => '\%',
@@ -883,7 +884,7 @@ class Database_MySQL implements Database
 	 *
 	 * @param $string
 	 */
-	function unescape_string($string)
+	public function unescape_string($string)
 	{
 		return stripslashes($string);
 	}
@@ -891,9 +892,9 @@ class Database_MySQL implements Database
 	/**
 	 * Returns whether the database system supports ignore.
 	 *
-	 * @return bool
+	 * @return true
 	 */
-	function support_ignore()
+	public function support_ignore()
 	{
 		return true;
 	}
@@ -904,9 +905,10 @@ class Database_MySQL implements Database
 	 *
 	 * @param string $tableName - the table to create the inserts for.
 	 * @param bool $new_table
+	 *
 	 * @return string the query to insert the data back in, or an empty string if the table was empty.
 	 */
-	function insert_sql($tableName, $new_table = false)
+	public function insert_sql($tableName, $new_table = false)
 	{
 		global $db_prefix;
 
@@ -980,9 +982,10 @@ class Database_MySQL implements Database
 	 * Dumps the schema (CREATE) for a table.
 	 *
 	 * @param string $tableName - the table
+	 *
 	 * @return string - the CREATE statement as string
 	 */
-	function db_table_sql($tableName)
+	public function db_table_sql($tableName)
 	{
 		global $db_prefix;
 
@@ -1046,7 +1049,7 @@ class Database_MySQL implements Database
 		$indexes = array();
 		while ($row = $this->fetch_assoc($result))
 		{
-			// IS this a primary key, unique index, or regular index?
+			// Is this a primary key, unique index, or regular index?
 			$row['Key_name'] = $row['Key_name'] == 'PRIMARY' ? 'PRIMARY KEY' : (empty($row['Non_unique']) ? 'UNIQUE ' : ($row['Comment'] == 'FULLTEXT' || (isset($row['Index_type']) && $row['Index_type'] == 'FULLTEXT') ? 'FULLTEXT ' : 'KEY ')) . '`' . $row['Key_name'] . '`';
 
 			// Is this the first column in the index?
@@ -1091,11 +1094,12 @@ class Database_MySQL implements Database
 	 * This function lists all tables in the database.
 	 * The listing could be filtered according to $filter.
 	 *
-	 * @param mixed $db_name_str string holding the database name, or false, default false
-	 * @param mixed $filter string to filter by, or false, default false
-	 * @return array, an array of table names. (strings)
+	 * @param string|false $db_name_str string holding the database name, or false, default false
+	 * @param string|false $filter string to filter by, or false, default false
+	 *
+	 * @return string[] an array of table names. (strings)
 	 */
-	function db_list_tables($db_name_str = false, $filter = false)
+	public function db_list_tables($db_name_str = false, $filter = false)
 	{
 		global $db_name;
 
@@ -1124,9 +1128,10 @@ class Database_MySQL implements Database
 	 * This function optimizes a table.
 	 *
 	 * @param string $table - the table to be optimized
-	 * @return how much it was gained
+	 *
+	 * @return int how much it was gained
 	 */
-	function db_optimize_table($table)
+	public function db_optimize_table($table)
 	{
 		global $db_prefix;
 
@@ -1134,31 +1139,31 @@ class Database_MySQL implements Database
 
 		// Get how much overhead there is.
 		$request = $this->query('', '
-				SHOW TABLE STATUS LIKE {string:table_name}',
-				array(
-					'table_name' => str_replace('_', '\_', $table),
-				)
-			);
+			SHOW TABLE STATUS LIKE {string:table_name}',
+			array(
+				'table_name' => str_replace('_', '\_', $table),
+			)
+		);
 		$row = $this->fetch_assoc($request);
 		$this->free_result($request);
 
 		$data_before = isset($row['Data_free']) ? $row['Data_free'] : 0;
 		$request = $this->query('', '
-				OPTIMIZE TABLE `{raw:table}`',
-				array(
-					'table' => $table,
-				)
-			);
+			OPTIMIZE TABLE `{raw:table}`',
+			array(
+				'table' => $table,
+			)
+		);
 		if (!$request)
 			return -1;
 
 		// How much left?
 		$request = $this->query('', '
-				SHOW TABLE STATUS LIKE {string:table}',
-				array(
-					'table' => str_replace('_', '\_', $table),
-				)
-			);
+			SHOW TABLE STATUS LIKE {string:table}',
+			array(
+				'table' => str_replace('_', '\_', $table),
+			)
+		);
 		$row = $this->fetch_assoc($request);
 		$this->free_result($request);
 
@@ -1172,9 +1177,10 @@ class Database_MySQL implements Database
 	 *
 	 * @param string $table
 	 * @param string $backup_table
+	 *
 	 * @return resource - the request handle to the table creation query
 	 */
-	function db_backup_table($table, $backup_table)
+	public function db_backup_table($table, $backup_table)
 	{
 		global $db_prefix;
 
@@ -1225,6 +1231,7 @@ class Database_MySQL implements Database
 		$create = preg_split('/[\n\r]/', $create);
 
 		$auto_inc = '';
+
 		// Default engine type.
 		$engine = 'MyISAM';
 		$charset = '';
@@ -1306,7 +1313,7 @@ class Database_MySQL implements Database
 	 *
 	 * @return string - the version
 	 */
-	function db_server_version()
+	public function db_server_version()
 	{
 		$request = $this->query('', '
 			SELECT VERSION()',
@@ -1321,8 +1328,10 @@ class Database_MySQL implements Database
 
 	/**
 	 * Get the name (title) of the database system.
+	 *
+	 * @return string
 	 */
-	function db_title()
+	public function db_title()
 	{
 		return 'MySQL';
 	}
@@ -1330,9 +1339,9 @@ class Database_MySQL implements Database
 	/**
 	 * Whether the database system is case sensitive.
 	 *
-	 * @return bool
+	 * @return false
 	 */
-	function db_case_sensitive()
+	public function db_case_sensitive()
 	{
 		return false;
 	}
@@ -1342,7 +1351,7 @@ class Database_MySQL implements Database
 	 *
 	 * @param string $string
 	 */
-	function escape_string($string)
+	public function escape_string($string)
 	{
 		return addslashes($string);
 	}
@@ -1353,9 +1362,9 @@ class Database_MySQL implements Database
 	 * It ignores $counter parameter.
 	 *
 	 * @param resource $request
-	 * @param mixed $counter = false
+	 * @param int|false $counter = false
 	 */
-	function fetch_assoc($request, $counter = false)
+	public function fetch_assoc($request, $counter = false)
 	{
 		return mysqli_fetch_assoc($request);
 	}
@@ -1363,10 +1372,11 @@ class Database_MySQL implements Database
 	/**
 	 * Return server info.
 	 *
-	 * @param resource $connection
+	 * @param resource|null $connection
+	 *
 	 * @return string
 	 */
-	function db_server_info($connection = null)
+	public function db_server_info($connection = null)
 	{
 		// Decide which connection to use
 		$connection = $connection === null ? $this->_connection : $connection;
@@ -1379,7 +1389,7 @@ class Database_MySQL implements Database
 	 *
 	 *  @return string - the version
 	 */
-	function db_client_version()
+	public function db_client_version()
 	{
 		$request = $this->query('', '
 			SELECT VERSION()',
@@ -1395,10 +1405,10 @@ class Database_MySQL implements Database
 	/**
 	 * Select database.
 	 *
-	 * @param string $dbName = null
-	 * @param resource $connection = null
+	 * @param string|null $dbName = null
+	 * @param resource|null $connection = null
 	 */
-	function select_db($dbName = null, $connection = null)
+	public function select_db($dbName = null, $connection = null)
 	{
 		// Decide which connection to use
 		$connection = $connection === null ? $this->_connection : $connection;
@@ -1409,9 +1419,9 @@ class Database_MySQL implements Database
 	/**
 	 * Retrieve the connection object
 	 *
-	 * @return mysqli
+	 * @return resource
 	 */
-	function connection()
+	public function connection()
 	{
 		// find it, find it
 		return $this->_connection;
@@ -1420,7 +1430,7 @@ class Database_MySQL implements Database
 	/**
 	 * Returns a reference to the existing instance
 	 */
-	static function db()
+	public static function db()
 	{
 		return self::$_db;
 	}

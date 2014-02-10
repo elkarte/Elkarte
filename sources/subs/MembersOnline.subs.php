@@ -26,7 +26,7 @@ if (!defined('ELK'))
  * Also returns the membergroups of the users that are currently online.
  * (optionally) hides members that chose to hide their online presense.
  *
- * @param array $membersOnlineOptions
+ * @param mixed[] $membersOnlineOptions
  * @return array
  */
 function getMembersOnlineStats($membersOnlineOptions)
@@ -44,6 +44,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 		'online_color',
 		'group_name',
 	);
+
 	// Default the sorting method to 'most recent online members first'.
 	if (!isset($membersOnlineOptions['sort']))
 	{
@@ -104,7 +105,6 @@ function getMembersOnlineStats($membersOnlineOptions)
 
 			continue;
 		}
-
 		elseif (empty($row['show_online']) && empty($membersOnlineOptions['show_hidden']))
 		{
 			// Just increase the stats and don't add this hidden user to any list.

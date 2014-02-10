@@ -42,8 +42,8 @@ if (!defined('ELK'))
  *  post-based membergroups in the database (restricted by parameter1).
  *
  * @param string $type Stat type - can be 'member', 'message', 'topic', 'subject' or 'postgroups'
- * @param mixed $parameter1 = null
- * @param mixed $parameter2 = null
+ * @param int|string|mixed[]|null $parameter1 = null pass through value
+ * @param int|string|mixed[]|null $parameter2 = null pass through value
  */
 function updateStats($type, $parameter1 = null, $parameter2 = null)
 {
@@ -63,7 +63,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 			break;
 		case 'topic':
 			require_once(SUBSDIR . '/Topic.subs.php');
-			updateTopicStats($parameter1, $parameter2);
+			updateTopicStats($parameter1);
 			break;
 		case 'postgroups':
 			require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -90,8 +90,8 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
  *
  * if the member's post number is updated, updates their post groups.
  *
- * @param mixed $members An array of integers
- * @param array $data
+ * @param int[]|int $members An array of member ids
+ * @param mixed[] $data An associative array of the columns to be updated and their respective values.
  */
 function updateMemberData($members, $data)
 {
@@ -243,7 +243,7 @@ function updateMemberData($members, $data)
  * - when update is true, the value can be true or false to increment
  *  or decrement it, respectively.
  *
- * @param array $changeArray
+ * @param mixed[] $changeArray associative array of variable => value
  * @param bool $update = false
  * @param bool $debug = false
  * @todo: add debugging features, $debug isn't used
@@ -312,7 +312,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
 /**
  * Deletes one setting from the settings table and takes care of $modSettings as well
  *
- * @param mixed $toRemove the setting or the settings to be removed
+ * @param string $toRemove the setting or the settings to be removed
  */
 function removeSettings($toRemove)
 {
@@ -361,7 +361,7 @@ function removeSettings($toRemove)
  * @param int $max_value
  * @param int $num_per_page
  * @param bool $flexible_start = false
- * @param array $show
+ * @param mixed[] $show associative array of option => boolean
  */
 function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flexible_start = false, $show = array())
 {
@@ -490,7 +490,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
  * - caches the formatting data from the setting for optimization.
  *
  * @param float $number
- * @param bool $override_decimal_count = false
+ * @param integer|false $override_decimal_count = false or number of decimals
  */
 function comma_format($number, $override_decimal_count = false)
 {
@@ -524,8 +524,8 @@ function comma_format($number, $override_decimal_count = false)
  * - performs localization (more than just strftime would do alone.)
  *
  * @param int $log_time
- * @param bool $show_today = true
- * @param string $offset_type = false
+ * @param string|bool $show_today = true
+ * @param string|false $offset_type = false
  */
 function standardTime($log_time, $show_today = true, $offset_type = false)
 {
@@ -630,7 +630,7 @@ function htmlTime($timestamp)
  * - always applies the offset in the time_offset setting.
  *
  * @param bool $use_user_offset = true if use_user_offset is true, applies the user's offset as well
- * @param int $timestamp = null
+ * @param int|null $timestamp = null
  * @return int seconds since the unix epoch
  */
 function forum_time($use_user_offset = true, $timestamp = null)
@@ -653,7 +653,7 @@ function forum_time($use_user_offset = true, $timestamp = null)
  * - additionally converts &nbsp with str_replace
  *
  * @param string $string
- * @return the string without entities
+ * @return string string without entities
  */
 function un_htmlspecialchars($string)
 {
@@ -710,8 +710,8 @@ function shorten_text($text, $len = 384, $cutword = false, $buffer = 12)
  * should not be called on huge arrays (bigger than like 10 elements.)
  * returns an array containing each permutation.
  *
- * @param array $array
- * @return array
+ * @param mixed[] $array
+ * @return mixed[]
  */
 function permute($array)
 {
@@ -748,10 +748,10 @@ function permute($array)
  * - uses the cache_id as a unique identifier to facilitate any caching it may do.
  *  -returns the modified message.
  *
- * @param string $message
- * @param bool $smileys = true
+ * @param string|false $message if false return list of enabled bbc codes
+ * @param bool|string $smileys = true
  * @param string $cache_id = ''
- * @param array $parse_tags = null
+ * @param string[]|null $parse_tags array of tags to parse, null for all
  * @return string
  */
 function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = array())
@@ -1344,7 +1344,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			if (empty($parse_tags) || in_array($code['tag'], $parse_tags))
 				$bbc_codes[substr($code['tag'], 0, 1)][] = $code;
 		}
-		$codes = null;
 	}
 
 	// Shall we take the time to cache this?
@@ -1546,7 +1545,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 
 			$look_for = strtolower(substr($message, $pos + 2, $pos2 - $pos - 2));
 
-			$to_close = array();
 			$block_level = null;
 
 			do
@@ -2347,8 +2345,8 @@ function redirectexit($setLocation = '', $refresh = false)
  * Takes care of template loading and remembering the previous URL.
  * Calls ob_start() with ob_sessrewrite to fix URLs if necessary.
  *
- * @param bool $header = null
- * @param bool $do_footer = null
+ * @param bool|null $header = null
+ * @param bool|null $do_footer = null
  * @param bool $from_index = false
  * @param bool $from_fatal_error = false
  */
@@ -2451,7 +2449,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 /**
  * Sets the class of the current topic based on is_very_hot, veryhot, hot, etc
  *
- * @param array $topic_context
+ * @param mixed[] $topic_context
  */
 function determineTopicClass(&$topic_context)
 {
@@ -2650,19 +2648,19 @@ function setupThemeContext($forceload = false)
  *
  * @param string $needed The amount of memory to request, if needed, like 256M
  * @param bool $in_use Set to true to account for current memory usage of the script
- * @return boolean, true if we have at least the needed memory
+ * @return boolean true if we have at least the needed memory
  */
 function setMemoryLimit($needed, $in_use = false)
 {
-	// everything in bytes
+	// Everything in bytes
 	$memory_current = memoryReturnBytes(ini_get('memory_limit'));
 	$memory_needed = memoryReturnBytes($needed);
 
-	// should we account for how much is currently being used?
+	// Should we account for how much is currently being used?
 	if ($in_use)
 		$memory_needed += function_exists('memory_get_usage') ? memory_get_usage() : (4 * 1048576);
 
-	// if more is needed, request it
+	// If more is needed, request it
 	if ($memory_current < $memory_needed)
 	{
 		@ini_set('memory_limit', ceil($memory_needed / 1048576) . 'M');
@@ -2671,7 +2669,7 @@ function setMemoryLimit($needed, $in_use = false)
 
 	$memory_current = max($memory_current, memoryReturnBytes(get_cfg_var('memory_limit')));
 
-	// return success or not
+	// Return success or not
 	return (bool) ($memory_current >= $memory_needed);
 }
 
@@ -2999,11 +2997,11 @@ function template_admin_warning_above()
  * @todo and of course everything relies on this behavior and work around it. :P.
  * Converters included.
  *
- * @param $filename
- * @param $attachment_id
- * @param $dir
- * @param $new
- * @param $file_hash
+ * @param string $filename
+ * @param int $attachment_id
+ * @param string|null $dir
+ * @param bool $new
+ * @param string $file_hash
  */
 function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = false, $file_hash = '')
 {
@@ -3097,6 +3095,7 @@ function ip2range($fullip)
  * Lookup an IP; try shell_exec first because we can do a timeout on it.
  *
  * @param string $ip
+ * @return string
  */
 function host_from_ip($ip)
 {
@@ -3200,7 +3199,7 @@ function text2words($text, $max_chars = 20, $encrypt = false)
  * @param string $name
  * @param string $alt
  * @param string $label = ''
- * @param boolean $custom = ''
+ * @param string|boolean $custom = ''
  * @param boolean $force_use = false
  * @return string
  *
@@ -3629,8 +3628,8 @@ function elk_seed_generator()
  * supports static class method calls.
  *
  * @param string $hook
- * @param array $parameters = array()
- * @return array the results of the functions
+ * @param mixed[] $parameters = array()
+ * @return mixed[] the results of the functions
  */
 function call_integration_hook($hook, $parameters = array())
 {
@@ -3656,11 +3655,12 @@ function call_integration_hook($hook, $parameters = array())
 	if (!empty($settings['theme_dir']))
 		$path_replacements['$themedir'] = $settings['theme_dir'];
 
-	$functions = explode(',', $modSettings[$hook]);
 	// Loop through each function.
+	$functions = explode(',', $modSettings[$hook]);
 	foreach ($functions as $function)
 	{
 		$function = trim($function);
+
 		// OOP static method
 		if (strpos($function, '::') !== false)
 		{
@@ -3847,9 +3847,9 @@ function remove_integration_function($hook, $function, $file = '')
  * that are not normally displayable.  This converts the popular ones that
  * appear from a cut and paste from windows.
  *
- * @param string $string
+ * @param string|false $string
  * @return string $string
-*/
+ */
 function sanitizeMSCutPaste($string)
 {
 	if (empty($string))
@@ -3893,9 +3893,9 @@ function sanitizeMSCutPaste($string)
  * Uses capture group 2 in the supplied array
  * Does basic scan to ensure characters are inside a valid range
  *
- * @param array $matches
+ * @param mixed[] $matches matches from a preg_match_all
  * @return string $string
-*/
+ */
 function replaceEntities__callback($matches)
 {
 	if (!isset($matches[2]))
@@ -3936,9 +3936,9 @@ function replaceEntities__callback($matches)
  * Uses capture group 1 in the supplied array
  * Does basic checks to keep characters inside a viewable range.
  *
- * @param array $matches
+ * @param mixed[] $matches array of matches as output from preg_match_all
  * @return string $string
-*/
+ */
 function fixchar__callback($matches)
 {
 	if (!isset($matches[1]))
@@ -3970,9 +3970,9 @@ function fixchar__callback($matches)
  * Callback function used of preg_replace_callback in smcFunc $ent_checks, for example
  * strpos, strlen, substr etc
  *
- * @param array $matches
+ * @param mixed[] $matches array of matches for a preg_match_all
  * @return string
-*/
+ */
 function entity_fix__callback($matches)
 {
 	if (!isset($matches[2]))
@@ -3980,7 +3980,7 @@ function entity_fix__callback($matches)
 
 	$num = $matches[2][0] === 'x' ? hexdec(substr($matches[2], 1)) : (int) $matches[2];
 
-	// we don't allow control characters, characters out of range, byte markers, etc
+	// We don't allow control characters, characters out of range, byte markers, etc
 	if ($num < 0x20 || $num > 0x10FFFF || ($num >= 0xD800 && $num <= 0xDFFF) || $num == 0x202D || $num == 0x202E)
 		return '';
 	else
@@ -3990,8 +3990,8 @@ function entity_fix__callback($matches)
 /**
  * Retrieve additional search engines, if there are any, as an array.
  *
- * @return array array of engines
-*/
+ * @return mixed[] array of engines
+ */
 function prepareSearchEngines()
 {
 	global $modSettings;
@@ -4014,8 +4014,9 @@ function prepareSearchEngines()
  * posts in topic display page, posts search results page, or personal
  * messages.
  *
- * @param object $messages_request holds a query result
+ * @param resource $messages_request holds a query result
  * @param bool $reset
+ * @return integer|null
  */
 function currentContext($messages_request, $reset = false)
 {
@@ -4046,9 +4047,9 @@ function currentContext($messages_request, $reset = false)
  * Intended for addon use to allow such things as
  *  - adding in a new menu item to an existing menu array
  *
- * @param array $input the array we will insert to
+ * @param mixed[] $input the array we will insert to
  * @param string $key the key in the array that we are looking to find for the insert action
- * @param array $insert the actual data to insert before or after the key
+ * @param mixed[] $insert the actual data to insert before or after the key
  * @param string $where adding before or after
  * @param bool $assoc if the array is a assoc array with named keys or a basic index array
  * @param bool $strict search for identical elements, this means it will also check the types of the needle.
@@ -4063,10 +4064,7 @@ function elk_array_insert($input, $key, $insert, $where = 'before', $assoc = tru
 
 	// If the key is not found, just insert it at the end
 	if ($position === false)
-	{
-		$input = array_merge($input, $insert);
-		return;
-	}
+		return array_merge($input, $insert);
 
 	if ($where === 'after')
 		$position += 1;
@@ -4081,7 +4079,7 @@ function elk_array_insert($input, $key, $insert, $where = 'before', $assoc = tru
 }
 
 /**
- * From time to time it may be necessary to fire a scheduled tast ASAP
+ * From time to time it may be necessary to fire a scheduled task ASAP
  * this function set the scheduled task to be called before any other one
  *
  * @param string $task the name of a scheduled task

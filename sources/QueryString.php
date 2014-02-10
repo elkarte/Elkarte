@@ -178,7 +178,7 @@ function isValidIPv6($ip)
  * Converts IPv6s to numbers.  This makes ban checks much easier.
  *
  * @param string $ip ip address to be converted
- * @return array
+ * @return int[] array
  */
 function convertIPv6toInts($ip)
 {
@@ -206,7 +206,7 @@ function convertIPv6toInts($ip)
  *
  * @param string $addr ipv6 address string
  * @param boolean $strict_check checks lenght to expaned address for compliance
- * @return boolean/string expanded ipv6 address.
+ * @return boolean|string expanded ipv6 address.
  */
 function expandIPv6($addr, $strict_check = true)
 {
@@ -260,9 +260,9 @@ function expandIPv6($addr, $strict_check = true)
  * - importantly, does not effect keys, only values.
  * - calls itself recursively if necessary.
  *
- * @param array|string $var
+ * @param string[]|string $var
  * @param int $level = 0
- * @return array|string
+ * @return mixed[]|string
  */
 function htmlspecialchars__recursive($var, $level = 0)
 {
@@ -283,9 +283,9 @@ function htmlspecialchars__recursive($var, $level = 0)
  * - does not effect keys, only values.
  * - may call itself recursively if needed.
  *
- * @param array|string $var
+ * @param string[]|string $var
  * @param int $level = 0
- * @return array|string
+ * @return mixed[]|string
  */
 function htmltrim__recursive($var, $level = 0)
 {

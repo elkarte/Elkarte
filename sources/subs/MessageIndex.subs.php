@@ -24,7 +24,7 @@ if (!defined('ELK'))
  * @param int $per_page how many to return
  * @param string $sort_by how to sort the results asc/desc
  * @param string $sort_column which value we sort by
- * @param array $indexOptions
+ * @param mixed[] $indexOptions
  * 		'include_sticky' => if on, loads sticky topics as additonal
  * 		'only_approved' => if on, only load approved topics
  * 		'previews' => if on, loads in a substring of the first/last message text for use in previews
@@ -158,7 +158,7 @@ function messageIndexSort()
  * and returns the list of those topics they posted in.
  *
  * @param int $id_member member to check
- * @param array $topic_ids array of topics ids to check for participation
+ * @param int[] $topic_ids array of topics ids to check for participation
  */
 function topicsParticipation($id_member, $topic_ids)
 {

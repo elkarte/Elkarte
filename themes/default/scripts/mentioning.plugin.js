@@ -15,7 +15,7 @@
 	function elk_Mentions(options) {
 		// All the passed options and defaults are loaded to the opts object
 		this.opts = $.extend({}, this.defaults, options);
-	};
+	}
 
 	elk_Mentions.prototype.attachAtWho = function(oMentions, $element, oIframeWindow) {
 		var mentioned = document.getElementById('mentioned');
@@ -141,17 +141,17 @@
 				iSelectionPosition = iTop + offset.top - $(window).scrollTop(),
 				iAvailableSpace = iWindowHeight - (iSelectionPosition - iDocViewTop);
 
-		   if (iAvailableSpace >= select_height)
-		   {
-			   // Enough space below
-			   iTop = iTop + offset.top + select_height - $(window).scrollTop();
-		   }
-		   else
-		   {
-			   // Place it above instead
-			   // @todo should check if this is more space than below
-			   iTop= iTop + offset.top - $(window).scrollTop();
-		   }
+			if (iAvailableSpace >= select_height)
+			{
+				// Enough space below
+				iTop = iTop + offset.top + select_height - $(window).scrollTop();
+			}
+			else
+			{
+				// Place it above instead
+				// @todo should check if this is more space than below
+				iTop= iTop + offset.top - $(window).scrollTop();
+			}
 
 			// Move the select box
 			offset = {left: iLeft, top: iTop};

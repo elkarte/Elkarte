@@ -64,6 +64,12 @@ class ManageFeatures_Controller extends Action_Controller
 	protected $_mentionSettings;
 
 	/**
+	 * Mentions settings form
+	 * @var Settings_Form
+	 */
+	protected $_PMSettings;
+
+	/**
 	 * This function passes control through to the relevant tab.
 	 * @see Action_Controller::action_index()
 	 *
@@ -1455,6 +1461,7 @@ class ManageFeatures_Controller extends Action_Controller
 		if (function_exists('timezone_identifiers_list') && function_exists('date_default_timezone_set'))
 		{
 			$all_zones = timezone_identifiers_list();
+
 			// Make sure we set the value to the same as the printed value.
 			foreach ($all_zones as $zone)
 				$config_vars['default_timezone'][2][$zone] = $zone;

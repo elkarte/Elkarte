@@ -47,7 +47,7 @@ class Standard_Search
 	 * Method to check whether the method can be performed by the API.
 	 *
 	 * @param string $methodName
-	 * @param mixed $query_params
+	 * @param string|null $query_params
 	 * @return boolean
 	 */
 	public function supportsMethod($methodName, $query_params = null)

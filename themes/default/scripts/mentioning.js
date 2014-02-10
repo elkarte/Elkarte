@@ -16,11 +16,11 @@
  */
 function elk_mentions(oOptions)
 {
-	this.last_call = 0,
-	this.names = [],
-	this.cached_names = [],
-	this.cached_queries = [],
-	this.mentions = null,
+	this.last_call = 0;
+	this.names = [];
+	this.cached_names = [];
+	this.cached_queries = [];
+	this.mentions = null;
 	this.$atwho = null;
 
 	this.opt = oOptions;

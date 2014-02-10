@@ -158,7 +158,7 @@ function ml_memberCount()
 /**
  * Get all all the members who's name starts below a given letter
  *
- * @param char $start
+ * @param string $start single letter to start with
  */
 function ml_alphaStart($start)
 {
@@ -184,7 +184,7 @@ function ml_alphaStart($start)
  * Primary query for the memberlist display, runs the query based on the users
  * sort and start selections.
  *
- * @param array $query_parameters
+ * @param mixed[] $query_parameters
  * @param string $where
  * @param int $limit
  * @param string $sort
@@ -218,10 +218,11 @@ function ml_selectMembers($query_parameters, $where = '', $limit = 0, $sort = ''
  * sort and start selections.
  *  - Uses printMemberListRows to load the query results in to context
  *
- * @param array $query_parameters
- * @param string $customJoin
+ * @param mixed[] $query_parameters
+ * @param string|string[]|null $customJoin
  * @param string $where
  * @param int $limit
+ * @return integer
  */
 function ml_searchMembers($query_parameters, $customJoin = '', $where = '', $limit = 0)
 {

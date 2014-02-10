@@ -1674,7 +1674,7 @@ class Search_Controller extends Action_Controller
 	 * - loads the necessary contextual data to show a search result.
 	 *
 	 * @param $reset = false
-	 * @return array
+	 * @return array of messages that match the search
 	 */
 	public function prepareSearchContext_callback($reset = false)
 	{
@@ -2007,7 +2007,7 @@ class Search_Controller extends Action_Controller
 	/**
 	 * Setup spellchecking suggestions and load them into $context
 	 *
-	 * @param array an array of terms
+	 * @param string[] $searchArray an array of terms
 	 */
 	private function _load_suggestions($searchArray = array())
 	{

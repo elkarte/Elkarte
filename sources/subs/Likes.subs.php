@@ -16,8 +16,8 @@
  * the request, such as being a narcissist
  *
  * @param int $id_liker - user_id of the liker/disliker
- * @param array $liked_message - message array that is being worked on
- * @param char $direction - + for like - for unlike a previous liked one
+ * @param mixed[] $liked_message - message array that is being worked on
+ * @param string $direction - + for like - for unlike a previous liked one
  */
 function likePost($id_liker, $liked_message, $direction)
 {
@@ -39,7 +39,7 @@ function likePost($id_liker, $liked_message, $direction)
  * Returns an array of message_id to members who liked that post
  * If prepare is true, will also prep the array for template use
  *
- * @param array $messages
+ * @param int[]|int $messages
  * @param bool $prepare
  */
 function loadLikes($messages, $prepare = true)
@@ -83,8 +83,8 @@ function loadLikes($messages, $prepare = true)
  * Replaces the current member id with 'You' if they like a post and makes it first
  * Truncates the like list at a given number and adds in +x others
  *
- * @param array $likes array of like ids to process
- * @return array
+ * @param int[] $likes array of like ids to process
+ * @return integer[]
  */
 function prepareLikes($likes)
 {
@@ -156,7 +156,6 @@ function lastLikeOn($id_liker)
 {
 	global $modSettings;
 
-	$actions = 0;
 	if (empty($modSettings['likeWaitCount']))
 		return true;
 
@@ -180,7 +179,7 @@ function lastLikeOn($id_liker)
  * Perform a like action, either + or -
  *
  * @param int $id_liker
- * @param array $liked_message
+ * @param int[] $liked_message
  * @param int $direction - options: - or +
  */
 function updateLike($id_liker, $liked_message, $direction)
@@ -255,7 +254,7 @@ function updateLike($id_liker, $liked_message, $direction)
  * Increase the number of likes for this topic.
  *
  * @param int $id_topic - the topic
- * @param char $direction +/- liking or unliking
+ * @param string $direction +/- liking or unliking
  */
 function increaseTopicLikes($id_topic, $direction)
 {

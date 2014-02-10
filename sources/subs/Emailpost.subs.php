@@ -39,9 +39,6 @@ function pbe_email_to_bbc($text, $html)
 	// We are starting with HTML, our goal is to convert the best parts of it to BBC,
 	if ($html)
 	{
-		// Set a gmail flag for special quote processing since its quotes are strange
-		$gmail = (bool) preg_match('~<div class="gmail_quote">~i', $text);
-
 		// Convert the email-HTML to BBC
 		$text = preg_replace(array_keys($tags), array_values($tags), $text);
 		require_once(SUBSDIR . '/Html2BBC.class.php');
@@ -69,6 +66,9 @@ function pbe_email_to_bbc($text, $html)
 		// Bottom feeder?  If we have no message they could have replied below the original message
 		if (empty($result) || trim(strip_tags(pbe_filter_email_message($text))) === '')
 			$text = $text_save;
+
+		// Set a gmail flag for special quote processing since its quotes are strange
+		$gmail = (bool) preg_match('~<div class="gmail_quote">~i', $text);
 
 		// Attempt to fix textual ('>') quotes so we also fix wrapping issues first!
 		$text = pbe_fix_email_quotes($text, ($html && !$gmail));
@@ -173,7 +173,6 @@ function pbe_fix_email_quotes($body, $html)
 	$original = $body_array;
 
 	// Init
-	$body = '';
 	$current_quote = 0;
 	$quote_done = '';
 
@@ -271,7 +270,6 @@ function pbe_email_quote_depth(&$string, $update = true)
 	$level = 0;
 	$check = true;
 	$string_save = $string;
-	$matches = array();
 
 	while ($check)
 	{
@@ -282,7 +280,7 @@ function pbe_email_quote_depth(&$string, $update = true)
 			$string = substr($string, 2);
 		}
 		// Maybe a poorly nested quote, with no spaces between the >'s or the > and the data with no space
-		elseif ((substr($string, 0, 2) === '>>') || (preg_match('~^>[a-z0-9<-]+~Uis', $string, $matches) == 1))
+		elseif ((substr($string, 0, 2) === '>>') || (preg_match('~^>[a-z0-9<-]+~Uis', $string) == 1))
 		{
 			$level++;
 			$string = substr($string, 1);
@@ -342,7 +340,6 @@ function pbe_parse_email_message(&$body)
 
 	// Look for the markers, **stop** after the first successful one, good hunting!
 	$match = false;
-	$split = array();
 	foreach ($expressions as $expression)
 	{
 		if ($expression['type'] === 'regex')
@@ -435,7 +432,7 @@ function pbe_clean_email_subject($text, $check = false)
 	if ($fw !== false)
 		$text = substr($text, 0, $fw) . substr($text, $fw + strlen($txt['FW:']), strlen($text));
 
-	$gr = strpos($text, "[{$sitename}]");
+	$gr = strpos($text, '[' . $sitename . ']');
 	if ($gr !== false)
 		$text = substr($text, 0, $gr) . substr($text, $gr + strlen($sitename) + 2, strlen($text));
 
@@ -444,7 +441,7 @@ function pbe_clean_email_subject($text, $check = false)
 		$text = substr($text, 0, $fwd) . substr($text, $fwd + strlen($txt['FWD:']), strlen($text));
 
 	// if not done then call ourselves again, we like the sound of our name
-	if (strpos(strtoupper($text), $txt['RE:']) || strpos(strtoupper($text), $txt['FW:']) || strpos(strtoupper($text), $txt['FWD:']) || strpos($text, "[{$sitename}]"))
+	if (strpos(strtoupper($text), $txt['RE:']) || strpos(strtoupper($text), $txt['FW:']) || strpos(strtoupper($text), $txt['FWD:']) || strpos($text, '[' . $sitename . ']'))
 		$text = pbe_clean_email_subject($text);
 
 	// clean or not?
@@ -470,21 +467,21 @@ function pbe_fix_client_quotes($body)
 	$regex = array();
 
 	// On mon, jan 12, 2004 at 10:10 AM, John Smith wrote: [quote]
-	$regex[] = "~(?:" . $txt['email_on'] . ")?\w{3}, \w{3} \d{1,2},\s?\d{4} " . $txt['email_at'] . " \d{1,2}:\d{1,2} [AP]M,(.*)?" . $txt['email_wrote'] . ":\s?\s{1,4}\[quote\]~i";
+	$regex[] = '~(?:' . $txt['email_on'] . ')?\w{3}, \w{3} \d{1,2},\s?\d{4} ' . $txt['email_at'] . ' \d{1,2}:\d{1,2} [AP]M,(.*)?' . $txt['email_wrote'] . ':\s?\s{1,4}\[quote\]~i';
 	// [quote] on: mon jan 12, 2004 John Smith wrote:
-	$regex[] = "~\[quote\]\s?" . $txt['email_on'] . ": \w{3} \w{3} \d{1,2}, \d{4} (.*)?" . $txt['email_wrote'] . ":\s~i";
+	$regex[] = '~\[quote\]\s?' . $txt['email_on'] . ': \w{3} \w{3} \d{1,2}, \d{4} (.*)?' . $txt['email_wrote'] . ':\s~i';
 	// on jan 12, 2004 at 10:10 PM, John Smith wrote:   [quote]
-	$regex[] = "~" .  $txt['email_on'] . " \w{3} \d{1,2}, \d{4}, " . $txt['email_at'] . " \d{1,2}:\d{1,2} [AP]M,(.*)?" . $txt['email_wrote'] . ":\s{1,4}\[quote\]~i";
+	$regex[] = '~' .  $txt['email_on'] . ' \w{3} \d{1,2}, \d{4}, ' . $txt['email_at'] . ' \d{1,2}:\d{1,2} [AP]M,(.*)?' . $txt['email_wrote'] . ':\s{1,4}\[quote\]~i';
 	// on jan 12, 2004 at 10:10, John Smith wrote   [quote]
-	$regex[] = "~" .  $txt['email_on'] . " \w{3} \d{1,2}, \d{4}, " . $txt['email_at'] . " \d{1,2}:\d{1,2}, (.*)?" . $txt['email_wrote'] . ":\s{1,4}\[quote\]~i";
+	$regex[] = '~' .  $txt['email_on'] . ' \w{3} \d{1,2}, \d{4}, ' . $txt['email_at'] . ' \d{1,2}:\d{1,2}, (.*)?' . $txt['email_wrote'] . ':\s{1,4}\[quote\]~i';
 	// quoting: John Smith on stuffz at 10:10:23 AM
-	$regex[] = "~" . $txt['email_quotefrom'] . ": (.*) " . $txt['email_on'] . " .* " . $txt['email_at'] . " \d{1,2}:\d{1,2}:\d{1,2} [AP]M~";
+	$regex[] = '~' . $txt['email_quotefrom'] . ': (.*) ' . $txt['email_on'] . ' .* ' . $txt['email_at'] . ' \d{1,2}:\d{1,2}:\d{1,2} [AP]M~';
 	// quoting John Smith <johnsmith@tardis.com>
-	$regex[] = "~" . $txt['email_quoting'] . " (.*) (?:<|&lt;|\[email\]).*?@.*?(?:>|&gt;|\[/email\]):~i";
+	$regex[] = '~' . $txt['email_quoting'] . ' (.*) (?:<|&lt;|\[email\]).*?@.*?(?:>|&gt;|\[/email\]):~i';
 	// --- in some group name "John Smith" <johnsmith@tardis.com> wrote:
-	$regex[] = "~---\s.*?\"(.*)\"\s+" . $txt['email_wrote'] . ":\s(\[quote\])?~i";
+	$regex[] = '~---\s.*?"(.*)"\s+' . $txt['email_wrote'] . ':\s(\[quote\])?~i';
 	// --- in some@group.name John Smith wrote
-	$regex[] = "~---\s.*?\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,6}\b,\s(.*?)\s" . $txt['email_wrote'] . ":?~i";
+	$regex[] = '~---\s.*?\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,6}\b,\s(.*?)\s' . $txt['email_wrote'] . ':?~i';
 
 	// For each one see if we can do a nice [quote author=john smith]
 	foreach ($regex as $reg)
@@ -504,6 +501,7 @@ function pbe_fix_client_quotes($body)
 			}
 		}
 	}
+
 	return $body;
 }
 
@@ -513,6 +511,7 @@ function pbe_fix_client_quotes($body)
  * @param string $needle
  * @param string $replace
  * @param string $haystack
+ * @return string
  */
 function pbe_str_replace_once($needle, $replace, $haystack)
 {
@@ -528,7 +527,7 @@ function pbe_str_replace_once($needle, $replace, $haystack)
  * Does a moderation check on a given user (global)
  *  - Removes permissions of PBE concern that a given moderated level denies
  *
- * @param array $pbe array of user values
+ * @param mixed[] $pbe array of user values
  */
 function pbe_check_moderation(&$pbe)
 {
@@ -580,7 +579,7 @@ function pbe_check_moderation(&$pbe)
  *   can choose to approve the email with the corrections
  *
  * @param string $error
- * @param object $email_message
+ * @param Email_Parse $email_message
  */
 function pbe_emailError($error, $email_message)
 {
@@ -596,7 +595,7 @@ function pbe_emailError($error, $email_message)
 	// Clean the subject like we don't know where it has been
 	$subject = trim(str_replace($pm_subject_leader, '', $email_message->subject));
 	$subject = pbe_clean_email_subject($subject);
-	$subject = ($subject === '') ? $txt['no_subject'] : $subject;
+	$subject = ($subject === '' ? $txt['no_subject'] : $subject);
 
 	// Start off with what we know about the security key, even if its nothing
 	$message_key = (string) $email_message->message_key_id;
@@ -645,7 +644,6 @@ function pbe_emailError($error, $email_message)
 			$message_type = 'p';
 
 		// Find all keys sent to this user, sorted by date
-		$user_keys = array();
 		$user_keys = query_user_keys($email_message->email['from']);
 
 		// While we have keys to look at see if we can match up this lost message on subjects
@@ -683,7 +681,7 @@ function pbe_emailError($error, $email_message)
 	$db->insert(isset($_POST['item']) ? 'replace' : 'ignore',
 		'{db_prefix}postby_emails_error',
 		array('id_email' => 'int', 'error' => 'string', 'data_id' => 'string', 'subject' => 'string', 'id_message' => 'int', 'id_board' => 'int', 'email_from' => 'string', 'message_type' => 'string', 'message' => 'string'),
-		array($id, $error, $message_key, $email_message->subject, $message_id, $board_id, $email_message->email['from'], $message_type, $email_message->raw_message),
+		array($id, $error, $message_key, $subject, $message_id, $board_id, $email_message->email['from'], $message_type, $email_message->raw_message),
 		array('id_email')
 	);
 
@@ -709,8 +707,8 @@ function pbe_emailError($error, $email_message)
  *  - adds valid ones to attachmentOptions
  *  - calls createAttachment to store them
  *
- * @param array $pbe
- * @param object $email_message
+ * @param mixed[] $pbe
+ * @param Email_Parse $email_message
  */
 function pbe_email_attachments($pbe, $email_message)
 {
@@ -719,7 +717,6 @@ function pbe_email_attachments($pbe, $email_message)
 
 	// Init
 	$attachment_count = 0;
-	$attachments = array();
 	$attachIDs = array();
 
 	// Make sure we're uploading the files to the right place.
@@ -1032,8 +1029,8 @@ function query_load_user_info($email)
  *  - Similar to the functions in loadPermissions()
  *
  * @param string $type board to load board permissions, otherwise general permissions
- * @param array $pbe
- * @param array $topic_info
+ * @param mixed[] $pbe
+ * @param mixed[] $topic_info
  */
 function query_load_permissions($type, &$pbe, $topic_info = array())
 {
@@ -1081,8 +1078,6 @@ function query_load_permissions($type, &$pbe, $topic_info = array())
 function query_sender_wrapper($from)
 {
 	$db = database();
-
-	$result = array();
 
 	// The signature and email visibility details
 	$request = $db->query('', '
@@ -1263,7 +1258,7 @@ function query_load_subject($message_id, $message_type, $email)
  *
  * @param string $message_type
  * @param int $message_id
- * @param array $pbe
+ * @param mixed[] $pbe
  */
 function query_load_message($message_type, $message_id, $pbe)
 {
@@ -1362,13 +1357,11 @@ function query_load_board($message_id)
  * Loads the basic board information for a given board id
  *
  * @param int $board_id
- * @param array $pbe
+ * @param mixed[] $pbe
  */
 function query_load_board_details($board_id, $pbe)
 {
 	$db = database();
-
-	$board_info = array();
 
 	// To post a NEW Topic, we need certain board details
 	$request = $db->query('', '
@@ -1393,7 +1386,7 @@ function query_load_board_details($board_id, $pbe)
  *
  * @param int $id_member
  * @param int $id_theme
- * @param array $board_info
+ * @param mixed[] $board_info
  */
 function query_get_theme($id_member, $id_theme, $board_info)
 {
@@ -1447,7 +1440,7 @@ function query_get_theme($id_member, $id_theme, $board_info)
  * @param int $id_board
  * @param int $id_topic
  * @param boolean $auto_notify
- * @param array $permissions
+ * @param mixed[] $permissions
  */
 function query_notifications($id_member, $id_board, $id_topic, $auto_notify, $permissions)
 {
@@ -1503,8 +1496,8 @@ function query_notifications($id_member, $id_board, $id_topic, $auto_notify, $pe
  *  - Marks the PM replied to as replied to
  *  - Updates the number of unread to reflect this
  *
- * @param object $email_message
- * @param array $pbe
+ * @param Email_Parse $email_message
+ * @param mixed[] $pbe
  */
 function query_mark_pms($email_message, $pbe)
 {
@@ -1514,7 +1507,7 @@ function query_mark_pms($email_message, $pbe)
 		UPDATE {db_prefix}pm_recipients
 		SET is_read = is_read | 1
 		WHERE id_member = {int:id_member}
-			AND NOT (is_read & 1 >= 1)
+			AND NOT ((is_read & 1) >= 1)
 			AND id_pm = {int:personal_messages}',
 		array(
 			'personal_messages' => $email_message->message_id,
@@ -1530,7 +1523,7 @@ function query_mark_pms($email_message, $pbe)
 				labels, COUNT(*) AS num
 			FROM {db_prefix}pm_recipients
 			WHERE id_member = {int:id_member}
-				AND NOT (is_read & 1 >= 1)
+				AND NOT ((is_read & 1) >= 1)
 				AND deleted = {int:is_not_deleted}
 			GROUP BY labels',
 			array(
@@ -1564,7 +1557,7 @@ function query_mark_pms($email_message, $pbe)
  * Once a key has been used it is removed and can not be used again
  * Also removes any old keys to minimize security issues
  *
- * @param object $email_message
+ * @param Email_Parse $email_message
  */
 function query_key_maintenance($email_message)
 {
@@ -1580,7 +1573,7 @@ function query_key_maintenance($email_message)
 	// but we let PM's slide, they often seem to be re re re replied to
 	if ($email_message->message_type !== 'p')
 	{
-		$request = $db->query('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}postby_emails
 			WHERE id_email = {string:message_key_id}',
 			array(
@@ -1591,7 +1584,7 @@ function query_key_maintenance($email_message)
 
 	// Since we are here lets delete any items older than delete_old days,
 	// if they have not responded in that time tuff
-	$request = $db->query('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}postby_emails
 		WHERE time_sent < {int:delete_old}',
 		array(
@@ -1607,9 +1600,9 @@ function query_key_maintenance($email_message)
  *  - Updates last active
  *  - Updates the who's online list with the member and action
  *
- * @param array $pbe
- * @param object $email_message
- * @param array $topic_info
+ * @param mixed[] $pbe
+ * @param Email_Parse $email_message
+ * @param mixed[] $topic_info
  */
 function query_update_member_stats($pbe, $email_message, $topic_info = array())
 {

@@ -43,7 +43,7 @@ class Error_Context
 	/**
 	 * A list of all severity code from the less important to the most serious.
 	 *
-	 * @var array/mixed
+	 * @var array|mixed
 	 */
 	private $_severity_levels = array(0);
 
@@ -91,9 +91,9 @@ class Error_Context
 	/**
 	 * Add an error to the list
 	 *
-	 * @param string $error error code
-	 * @param mixed $severity error severity
-	 * @param string $lang_file lang_file
+	 * @param string[]|string $error error code
+	 * @param mixed|null $severity error severity
+	 * @param string|null $lang_file lang_file
 	 */
 	public function addError($error, $severity = null, $lang_file = null)
 	{
@@ -259,7 +259,8 @@ class Error_Context
 	 * or create a new instance for $id if it didn't already exist.
 	 *
 	 * @param string $id
-	 * @param int $default_severity
+	 * @param int|null $default_severity
+	 * @return Error_Context
 	 */
 	public static function context($id = 'default', $default_severity = null)
 	{
@@ -347,7 +348,6 @@ class attachment_error_context
 	 * Add an error
 	 *
 	 * @param string $error error code
-	 * @param string $attachID = 'generic'
 	 * @param string $lang_file = null
 	 */
 	public function addError($error, $lang_file = null)

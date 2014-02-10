@@ -106,6 +106,26 @@ class Email_Parse
 	public $message_id = null;
 
 	/**
+	 * Holds the return path as set in the email header
+	 */
+	public $return_path = null;
+
+	/**
+	 * Holds the message subject
+	 */
+	public $subject = null;
+
+	/**
+	 * Holds the email to from & cc emails and names
+	 */
+	public $email = array();
+
+	/**
+	 * Holds the sending ip of the email
+	 */
+	public $ip = false;
+
+	/**
 	 * If the file was converted to utf8
 	 */
 	public $_converted_utf8 = false;
@@ -632,6 +652,7 @@ class Email_Parse
 			}
 			$val = $decoded;
 		}
+
 		return trim($val);
 	}
 
@@ -689,7 +710,6 @@ class Email_Parse
 	 */
 	public function load_returnpath()
 	{
-		$this->return_path = null;
 		$matches = array();
 
 		// Fetch the return path
@@ -710,8 +730,6 @@ class Email_Parse
 	 */
 	public function load_subject()
 	{
-		$this->subject = null;
-
 		// Account for those no-subject emails
 		if (!isset($this->headers['subject']))
 			$this->headers['subject'] = '';
@@ -804,7 +822,6 @@ class Email_Parse
 	 */
 	public function load_address()
 	{
-		$this->email = array();
 		$this->email['to'] = array();
 		$this->email['from'] = array();
 		$this->email['cc'] = array();
@@ -849,7 +866,7 @@ class Email_Parse
 	 * - will look in various header fields where the ip may reside
 	 * - returns false if it can't find a valid IP4
 	 *
-	 * @return string or boolean on fail
+	 * @return string|boolean on fail
 	 */
 	public function load_ip()
 	{
@@ -874,7 +891,7 @@ class Email_Parse
 	 * Finds if any spam headers have been positively set and returns that flag
 	 * - will look in various header fields where the spam status may reside
 	 *
-	 * @return string or boolean on fail
+	 * @return boolean on fail
 	 */
 	public function load_spam()
 	{

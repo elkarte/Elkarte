@@ -222,7 +222,6 @@ class PersonalMessage_Controller extends Action_Controller
 		}
 
 		// Make sure the starting location is valid.
-		$start = '';
 		if (isset($_GET['start']) && $_GET['start'] !== 'new')
 			$start = (int) $_GET['start'];
 		elseif (!isset($_GET['start']) && !empty($options['view_newest_pm_first']))
@@ -1361,7 +1360,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Load up the fields.
 		require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
 		$controller = new ProfileOptions_Controller();
-		$controller->action_pmprefs($user_info['id']);
+		$controller->action_pmprefs();
 	}
 
 	/**
@@ -2686,7 +2685,7 @@ function messagePostError($named_recipients, $recipient_ids = array())
  *
  * @param int $member_id
  * @param int $id_pm = false if set, it will try to load drafts for this id
- * @return boolean
+ * @return false|null
  */
 function prepareDraftsContext($member_id, $id_pm = false)
 {
@@ -2713,8 +2712,9 @@ function prepareDraftsContext($member_id, $id_pm = false)
 	// Add them to the context draft array for template display
 	foreach ($user_drafts as $draft)
 	{
+		$short_subject = empty($draft['subject']) ? $txt['drafts_none'] : shorten_text(stripslashes($draft['subject']), !empty($modSettings['draft_subject_length']) ? $modSettings['draft_subject_length'] : 24);
 		$context['drafts'][] = array(
-			'subject' => empty($draft['subject']) ? $txt['drafts_none'] : censorText(shorten_text(stripslashes($draft['subject']), !empty($modSettings['draft_subject_length']) ? $modSettings['draft_subject_length'] : 24)),
+			'subject' => censorText($short_subject),
 			'poster_time' => standardTime($draft['poster_time']),
 				'link' => '<a href="' . $scripturl . '?action=pm;sa=send;id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
 			);

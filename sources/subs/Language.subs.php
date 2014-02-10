@@ -118,8 +118,8 @@ function list_getLanguages()
 /**
  * This function cleans language entries to/from display.
  *
- * @param $string
- * @param $to_display
+ * @param string $string
+ * @param boolean $to_display
  */
 function cleanLangString($string, $to_display = true)
 {
@@ -138,6 +138,7 @@ function cleanLangString($string, $to_display = true)
 			{
 				// Toggle the escape.
 				$is_escape = !$is_escape;
+
 				// If we're now escaped don't add this string.
 				if ($is_escape)
 					continue;
@@ -212,17 +213,19 @@ function cleanLangString($string, $to_display = true)
 
 			// Actually add the character to the string!
 			$new_string .= $string[$i];
+
 			// If anything was escaped it ain't any longer!
 			$is_escape = false;
 		}
 
-		// Unhtml then rehtml the whole thing!
+		// Un-html then re-html the whole thing!
 		$new_string = Util::htmlspecialchars(un_htmlspecialchars($new_string));
 	}
 	else
 	{
 		// Keep track of what we're doing...
 		$in_string = 0;
+
 		// This is for deciding whether to HTML a quote.
 		$in_html = false;
 		$str_len = strlen($string);

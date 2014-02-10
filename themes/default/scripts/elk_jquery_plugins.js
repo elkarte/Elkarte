@@ -387,7 +387,7 @@
  * Copyright (c) 2013 Joel Birch
  *
  * Licensed under the MIT license:
- * 	http://www.opensource.org/licenses/mit-license.php
+ * http://www.opensource.org/licenses/mit-license.php
  */
 
 ;(function($) {

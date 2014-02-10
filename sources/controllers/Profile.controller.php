@@ -589,7 +589,7 @@ class Profile_Controller extends Action_Controller
 			{
 				require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
 				$controller = new ProfileOptions_Controller();
-				$controller->action_authentication($memID, true);
+				$controller->action_authentication(true);
 			}
 			elseif (in_array($current_area, array('account', 'forumprofile', 'theme', 'contactprefs')))
 				saveProfileFields();

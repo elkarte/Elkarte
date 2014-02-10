@@ -60,6 +60,7 @@ class Jslocale_Controller extends Action_Controller
 
 	/**
 	 * Handy shortcut to prepare the "system"
+	 * @param string $language_file
 	 */
 	private function _prepareLocale($language_file)
 	{

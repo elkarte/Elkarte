@@ -70,7 +70,7 @@ class Browser_Detector
 	 * be queried for information on client browser.
 	 * It also attempts to detect if the client is a robot.
 	 */
-	function detectBrowser()
+	public function detectBrowser()
 	{
 		global $context, $user_info;
 
@@ -124,11 +124,11 @@ class Browser_Detector
 	}
 
 	/**
-	* Determine if the browser is Opera or not (for Opera < 15)
-	*
-	* @return boolean true if the browser is Opera otherwise false
-	*/
-	function isOpera()
+	 * Determine if the browser is Opera or not (for Opera < 15)
+	 *
+	 * @return boolean true if the browser is Opera otherwise false
+	 */
+	public function isOpera()
 	{
 		if (!isset($this->_browsers['is_opera']))
 			$this->_browsers['is_opera'] = strpos($this->_ua, 'Opera') !== false;
@@ -137,11 +137,11 @@ class Browser_Detector
 	}
 
 	/**
-	* Determine if the browser is IE or not
-	*
-	* @return boolean true if the browser is IE otherwise false
-	*/
-	function isIe()
+	 * Determine if the browser is IE or not
+	 *
+	 * @return boolean true if the browser is IE otherwise false
+	 */
+	public function isIe()
 	{
 		// I'm IE, Yes I'm the real IE; All you other IEs are just imitating.
 		if (!isset($this->_browsers['is_ie']))
@@ -151,11 +151,11 @@ class Browser_Detector
 	}
 
 	/**
-	* Determine if the browser is a Webkit based one or not
-	*
-	* @return boolean true if the browser is Webkit based otherwise false
-	*/
-	function isWebkit()
+	 * Determine if the browser is a Webkit based one or not
+	 *
+	 * @return boolean true if the browser is Webkit based otherwise false
+	 */
+	public function isWebkit()
 	{
 		if (!isset($this->_browsers['is_webkit']))
 			$this->_browsers['is_webkit'] = strpos($this->_ua, 'AppleWebKit') !== false;
@@ -164,11 +164,11 @@ class Browser_Detector
 	}
 
 	/**
-	* Determine if the browser is Firefox or one of its variants
-	*
-	* @return boolean true if the browser is Firefox otherwise false
-	*/
-	function isFirefox()
+	 * Determine if the browser is Firefox or one of its variants
+	 *
+	 * @return boolean true if the browser is Firefox otherwise false
+	 */
+	public function isFirefox()
 	{
 		if (!isset($this->_browsers['is_firefox']))
 			$this->_browsers['is_firefox'] = preg_match('~(?:Firefox|Ice[wW]easel|IceCat|Shiretoko|Minefield)/~', $this->_ua) === 1 && $this->isGecko();
@@ -177,11 +177,11 @@ class Browser_Detector
 	}
 
 	/**
-	* Determine if the browser is WebTv or not
-	*
-	* @return boolean true if the browser is WebTv otherwise false
-	*/
-	function isWebTv()
+	 * Determine if the browser is WebTv or not
+	 *
+	 * @return boolean true if the browser is WebTv otherwise false
+	 */
+	public function isWebTv()
 	{
 		if (!isset($this->_browsers['is_web_tv']))
 			$this->_browsers['is_web_tv'] = strpos($this->_ua, 'WebTV') !== false;
@@ -190,11 +190,11 @@ class Browser_Detector
 	}
 
 	/**
-	* Determine if the browser is konqueror or not
-	*
-	* @return boolean true if the browser is konqueror otherwise false
-	*/
-	function isKonqueror()
+     * Determine if the browser is konqueror or not
+	 *
+	 * @return boolean true if the browser is konqueror otherwise false
+	 */
+	public function isKonqueror()
 	{
 		if (!isset($this->_browsers['is_konqueror']))
 			$this->_browsers['is_konqueror'] = strpos($this->_ua, 'Konqueror') !== false;
@@ -203,11 +203,11 @@ class Browser_Detector
 	}
 
 	/**
-	* Determine if the browser is Gecko or not
-	*
-	* @return boolean true if the browser is Gecko otherwise false
-	*/
-	function isGecko()
+	 * Determine if the browser is Gecko or not
+	 *
+	 * @return boolean true if the browser is Gecko otherwise false
+	 */
+	public function isGecko()
 	{
 		if (!isset($this->_browsers['is_gecko']))
 			$this->_browsers['is_gecko'] = strpos($this->_ua, 'Gecko') !== false && strpos($this->_ua, 'like Gecko') === false && !$this->isWebkit() && !$this->isKonqueror();
@@ -216,11 +216,11 @@ class Browser_Detector
 	}
 
 	/**
-	* Determine if the browser is OperaMini or not
-	*
-	* @return boolean true if the browser is OperaMini otherwise false
-	*/
-	function isOperaMini()
+	 * Determine if the browser is OperaMini or not
+	 *
+	 * @return boolean true if the browser is OperaMini otherwise false
+	 */
+	public function isOperaMini()
 	{
 		if (!isset($this->_browsers['is_opera_mini']))
 			$this->_browsers['is_opera_mini'] = (isset($_SERVER['HTTP_X_OPERAMINI_PHONE_UA']) || stripos($this->_ua, 'opera mini') !== false);
@@ -231,11 +231,11 @@ class Browser_Detector
 	}
 
 	/**
-	* Determine if the browser is OperaMobi or not
-	*
-	* @return boolean true if the browser is OperaMobi otherwise false
-	*/
-	function isOperaMobi()
+	 * Determine if the browser is OperaMobi or not
+	 *
+	 * @return boolean true if the browser is OperaMobi otherwise false
+	 */
+	public function isOperaMobi()
 	{
 		if (!isset($this->_browsers['is_opera_mobi']))
 			$this->_browsers['is_opera_mobi'] = stripos($this->_ua, 'opera mobi') !== false;

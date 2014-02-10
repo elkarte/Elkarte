@@ -98,8 +98,8 @@ function loadPMLabels()
  * Get the number of PMs.
  *
  * @param bool $descending
- * @param int $pmID
- * @param int $labelQuery
+ * @param int|null $pmID
+ * @param string $labelQuery
  * @return int
  */
 function getPMCount($descending = false, $pmID = null, $labelQuery = '')
@@ -152,9 +152,9 @@ function getPMCount($descending = false, $pmID = null, $labelQuery = '')
 /**
  * Delete the specified personal messages.
  *
- * @param array $personal_messages array of pm ids
- * @param string $folder = null
- * @param int $owner = null
+ * @param int[]|null $personal_messages array of pm ids
+ * @param string|null $folder = null
+ * @param int|null $owner = null
  */
 function deleteMessages($personal_messages, $folder = null, $owner = null)
 {
@@ -294,9 +294,9 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 /**
  * Mark the specified personal messages read.
  *
- * @param array $personal_messages = null, array of pm ids
- * @param string $label = null, if label is set, only marks messages with that label
- * @param int $owner = null, if owner is set, marks messages owned by that member id
+ * @param int[]|null $personal_messages = null, array of pm ids
+ * @param string|null $label = null, if label is set, only marks messages with that label
+ * @param int|null $owner = null, if owner is set, marks messages owned by that member id
  */
 function markMessages($personal_messages = null, $label = null, $owner = null)
 {
@@ -332,7 +332,7 @@ function markMessages($personal_messages = null, $label = null, $owner = null)
 /**
  * Mark the specified personal messages as unread.
  *
- * @param array $personal_messages = array of pm ids to mark unread
+ * @param integer|integer[] $personal_messages
  */
 function markMessagesUnread($personal_messages)
 {
@@ -425,7 +425,7 @@ function updatePMMenuCounts($owner)
  *
  * @param int $pmID
  * @param $validFor
- * @return boolean
+ * @return boolean|null
  */
 function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
 {
@@ -476,13 +476,13 @@ function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
  * Sends a personal message from the specified person to the specified people
  * ($from defaults to the user)
  *
- * @param array $recipients - an array containing the arrays 'to' and 'bcc', both containing id_member's.
+ * @param mixed[] $recipients - an array containing the arrays 'to' and 'bcc', both containing id_member's.
  * @param string $subject - should have no slashes and no html entities
  * @param string $message - should have no slashes and no html entities
  * @param bool $store_outbox
- * @param array $from - an array with the id, name, and username of the member.
+ * @param mixed[]|null $from - an array with the id, name, and username of the member.
  * @param int $pm_head - the ID of the chain being replied to - if any.
- * @return array, an array with log entries telling how many recipients were successful and which recipients it failed to send to.
+ * @return mixed[] an array with log entries telling how many recipients were successful and which recipients it failed to send to.
  */
 function sendpm($recipients, $subject, $message, $store_outbox = true, $from = null, $pm_head = 0)
 {
@@ -921,7 +921,7 @@ function markPMsRead($memberID)
  *  - 'label_query' - query by labels
  *  - 'start' - start id, if any
  *
- * @param array $pm_options options for loading
+ * @param mixed[] $pm_options options for loading
  * @param int $id_member id member
  */
 function loadPMs($pm_options, $id_member)
@@ -1299,7 +1299,7 @@ function toggleNewPM($id_member, $new = false)
 /**
  * Load the PM limits for each group or for a specified group
  *
- * @param int $id_group (optional) the id of a membergroup
+ * @param int|false $id_group (optional) the id of a membergroup
  */
 function loadPMLimits($id_group = false)
 {
@@ -1356,7 +1356,7 @@ function getDiscussions($id_pms)
 /**
  * Return all the PMs belonging to one or more discussions
  *
- * @param array $pm_heads array of pm id head nodes
+ * @param int[] $pm_heads array of pm id head nodes
  */
 function getPmsFromDiscussion($pm_heads)
 {
@@ -1383,10 +1383,10 @@ function getPmsFromDiscussion($pm_heads)
 /**
  * Determines the PMs which need an updated label.
  *
- * @param array $to_label
+ * @param mixed[] $to_label
  * @param string $label_type
  * @param int $user_id
- * @return updatePMLabels
+ * @return integer|null
  */
 function changePMLabels($to_label, $label_type, $user_id)
 {
@@ -1394,7 +1394,6 @@ function changePMLabels($to_label, $label_type, $user_id)
 
 	$db = database();
 
-	$labels = array();
 	$to_update = array();
 
 	// Get information about each message...
@@ -1440,10 +1439,10 @@ function changePMLabels($to_label, $label_type, $user_id)
 /**
  * Detects personal messages which need a new label.
  *
- * @param array $searchArray
- * @param array $new_labels
+ * @param mixed[] $searchArray
+ * @param mixed[] $new_labels
  * @param int $user_id
- * @return updatePMLabels
+ * @return integer|null
  */
 function updateLabelsToPM($searchArray, $new_labels, $user_id)
 {
@@ -1491,7 +1490,7 @@ function updateLabelsToPM($searchArray, $new_labels, $user_id)
 /**
  * Updates PMs with their new label.
  *
- * @param array $to_update
+ * @param mixed[] $to_update
  * @param int $user_id
  * @return int
  */
@@ -1587,7 +1586,7 @@ function getPMsOlderThan($user_id, $time)
  * Used to delete PM rules from the given member.
  *
  * @param int $id_member
- * @param array $rule_changes
+ * @param int[] $rule_changes
  */
 function deletePMRules($id_member, $rule_changes)
 {
@@ -1609,7 +1608,7 @@ function deletePMRules($id_member, $rule_changes)
  *
  * @param int $id_rule
  * @param int $id_member
- * @param array $actions
+ * @param mixed[] $actions
  */
 function updatePMRuleAction($id_rule, $id_member, $actions)
 {
@@ -1715,7 +1714,7 @@ function setPMRepliedStatus($id_member, $replied_to)
  * Used to load the conversation view of a PM
  *
  * @param int $head id of the head pm of the conversation
- * @param array $recipients
+ * @param mixed[] $recipients
  * @param string $folder the current folder we are working in
  */
 function loadConversationList($head, &$recipients, $folder = '')
@@ -1746,7 +1745,7 @@ function loadConversationList($head, &$recipients, $folder = '')
 		// This is, frankly, a joke. We will put in a workaround for people sending to themselves - yawn!
 		if ($folder == 'sent' && $row['id_member_from'] == $user_info['id'] && $row['deleted_by_sender'] == 1)
 			continue;
-		elseif ($row['id_member'] == $user_info['id'] && $row['deleted'] == 1)
+		elseif (($row['id_member'] == $user_info['id']) && $row['deleted'] == 1)
 			continue;
 
 		if (!isset($recipients[$row['id_pm']]))
@@ -1768,7 +1767,7 @@ function loadConversationList($head, &$recipients, $folder = '')
  * Returns array of keys with the head id and value details of the the newest
  * unread message.
  *
- * @param array $pms array of pm ids to search
+ * @param int[] $pms array of pm ids to search
  */
 function loadConversationUnreadStatus($pms)
 {
@@ -1832,8 +1831,8 @@ function loadConversationUnreadStatus($pms)
  * Tracks any message labels in use
  * If optional search parameter is set to true will return message first label, useful for linking
  *
- * @param array $all_pms
- * @param array $recipients
+ * @param int[] $all_pms
+ * @param mixed[] $recipients
  * @param string $folder
  * @param boolean $search
  */
@@ -1893,8 +1892,8 @@ function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = fal
  * This is used by preparePMContext_callback.  That function uses these
  * query results and handles the free_result action as well.
  *
- * @param array $pms array of PM ids to fetch
- * @param string $orderBy raw query defining how to order the results
+ * @param int[] $pms array of PM ids to fetch
+ * @param string[] $orderBy raw query defining how to order the results
  */
 function loadPMSubjectRequest($pms, $orderBy)
 {
@@ -1922,11 +1921,11 @@ function loadPMSubjectRequest($pms, $orderBy)
  * Similar to loadSubjectRequest, this is used by preparePMContext_callback.
  * That function uses these query results and handles the free_result action as well.
  *
- * @param array $display_pms list of PM's to fetch
+ * @param int[] $display_pms list of PM's to fetch
  * @param string $sort_by_query raw query used in the sorting option
  * @param string $sort_by used to signal when addition joins are needed
  * @param boolean $descending if true descending order of display
- * @param int $display_mode how are they being viewed, all, conversation, etc
+ * @param int|string $display_mode how are they being viewed, all, conversation, etc
  * @param string $folder current pm folder
  */
 function loadPMMessageRequest($display_pms, $sort_by_query, $sort_by, $descending, $display_mode = '', $folder = '')
@@ -2118,7 +2117,8 @@ function loadPersonalMessage($pm_id)
  * @param string $labelQuery raw query, used if we are searching only specific labels
  * @param string $timeQuery raw query, used if we are limiting results to time periods
  * @param string $searchQuery raw query, the actual thing you are searching for in the subject and/or body
- * @param array $searchq_parameters value parameters used in the above query
+ * @param mixed[] $searchq_parameters value parameters used in the above query
+ * @return integer
  */
 function numPMSeachResults($userQuery, $labelQuery, $timeQuery, $searchQuery, $searchq_parameters)
 {
@@ -2157,8 +2157,8 @@ function numPMSeachResults($userQuery, $labelQuery, $timeQuery, $searchQuery, $s
  * @param string $labelQuery raw query, used if we are searching only specific labels
  * @param string $timeQuery raw query, used if we are limiting results to time periods
  * @param string $searchQuery raw query, the actual thing you are searching for in the subject and/or body
- * @param array $searchq_parameters value parameters used in the above query
- * @param array $search_params additional search parameters, like sort and direction
+ * @param mixed[] $searchq_parameters value parameters used in the above query
+ * @param mixed[] $search_params additional search parameters, like sort and direction
  */
 function loadPMSearchMessages($userQuery, $labelQuery, $timeQuery, $searchQuery, $searchq_parameters, $search_params)
 {
@@ -2203,7 +2203,7 @@ function loadPMSearchMessages($userQuery, $labelQuery, $timeQuery, $searchQuery,
  * When we are in conversation view, we need to find the base head pm of the
  * conversation.  This will set the root head id to each of the node heads
  *
- * @param array $head_pms array of pm ids that were found in the id_pm_head col
+ * @param int[] $head_pms array of pm ids that were found in the id_pm_head col
  * during the initial search
  */
 function loadPMSearchHeads($head_pms)
@@ -2240,8 +2240,8 @@ function loadPMSearchHeads($head_pms)
 /**
  * Loads the actual details of the PM's that were found during the search stage
  *
- * @param array $foundMessages array of found message id's
- * @param array $search_params as specified in the form, here used for sorting
+ * @param int[] $foundMessages array of found message id's
+ * @param mixed[] $search_params as specified in the form, here used for sorting
  */
 function loadPMSearchResults($foundMessages, $search_params)
 {

@@ -25,18 +25,18 @@ if (!defined('ELK'))
  * This function sends an email to the specified recipient(s).
  * It uses the mail_type settings and webmaster_email variable.
  *
- * @param array $to - the email(s) to send to
+ * @param string[]|string $to - the email(s) to send to
  * @param string $subject - email subject, expected to have entities, and slashes, but not be parsed
  * @param string $message - email body, expected to have slashes, no htmlentities
- * @param string $from = null - the address to use for replies
- * @param string $message_id = null - if specified, it will be used as local part of the Message-ID header.
+ * @param string|null $from = null - the address to use for replies
+ * @param string|null $message_id = null - if specified, it will be used as local part of the Message-ID header.
  * @param bool $send_html = false, whether or not the message is HTML vs. plain text
  * @param int $priority = 3
- * @param bool $hotmail_fix = null
+ * @param bool|null $hotmail_fix = null
  * @param bool $is_private
- * @param string $from_wrapper - used to provide envelope from wrapper based on if we sharing a users display name
- * @param int $reference - The parent topic id for use in a References header
- * @return boolean, whether or not the email was accepted properly.
+ * @param string|null $from_wrapper - used to provide envelope from wrapper based on if we sharing a users display name
+ * @param int|null $reference - The parent topic id for use in a References header
+ * @return boolean whether or not the email was accepted properly.
  */
 function sendmail($to, $subject, $message, $from = null, $message_id = null, $send_html = false, $priority = 3, $hotmail_fix = null, $is_private = false, $from_wrapper = null, $reference = null)
 {
@@ -278,14 +278,14 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
  * Add an email to the mail queue.
  *
  * @param bool $flush = false
- * @param array $to_array = array()
+ * @param string[] $to_array = array()
  * @param string $subject = ''
  * @param string $message = ''
  * @param string $headers = ''
  * @param bool $send_html = false
  * @param int $priority = 3
- * @param $is_private
- * @param $message_id
+ * @param boolean $is_private
+ * @param string|null $message_id
  * @return boolean
  */
 function AddMailQueue($flush = false, $to_array = array(), $subject = '', $message = '', $headers = '', $send_html = false, $priority = 3, $is_private = false, $message_id = '')
@@ -390,9 +390,9 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
  * @param bool $with_charset = true
  * @param bool $hotmail_fix = false, with hotmail_fix set all higher ASCII
  *  characters are converted to HTML entities to assure proper display of the mail
- * @param $line_break
- * @param string $custom_charset = null, if set, it uses this character set
- * @return array an array containing the character set, the converted string and the transport method.
+ * @param string $line_break
+ * @param string|null $custom_charset = null, if set, it uses this character set
+ * @return string[] an array containing the character set, the converted string and the transport method.
  */
 function mimespecialchars($string, $with_charset = true, $hotmail_fix = false, $line_break = "\r\n", $custom_charset = null)
 {
@@ -465,11 +465,12 @@ function mimespecialchars($string, $with_charset = true, $hotmail_fix = false, $
  * It expects no slashes or entities.
  * @internal
  *
- * @param array $mail_to_array - array of strings (email addresses)
+ * @param string[] $mail_to_array - array of strings (email addresses)
  * @param string $subject email subject
  * @param string $message email message
  * @param string $headers
- * @param string $message_id
+ * @param int $priority
+ * @param string|null $message_id
  * @return boolean whether it sent or not.
  */
 function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $message_id = null)
@@ -646,7 +647,7 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
  * @param string $message - the message to send
  * @param resource $socket - socket to send on
  * @param string $response - the expected response code
- * @return whether it responded as such.
+ * @return string|boolean it responded as such.
  */
 function server_parse($message, $socket, $response)
 {
@@ -686,7 +687,7 @@ function server_parse($message, $socket, $response)
  * @param string $message
  * @param string $unq_head
  * @param string $encoded_unq_head
- * @param bool $line_break
+ * @param string $line_break
  */
 function mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break)
 {
@@ -1323,7 +1324,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
  *
  * @param int $id_msg the id of a message
  * @param int $topic_id the topic the message belongs to
- * @return array, the poster's details
+ * @return mixed[] the poster's details
  */
 function posterDetails($id_msg, $topic_id)
 {
@@ -1351,7 +1352,7 @@ function posterDetails($id_msg, $topic_id)
 /**
  * Little utility function to calculate how long ago a time was.
  *
- * @param long $time_diff
+ * @param integer|double $time_diff
  * @return string
  */
 function time_since($time_diff)

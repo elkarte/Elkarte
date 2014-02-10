@@ -145,7 +145,7 @@ function validateSession($type = 'admin')
  * Message is what to tell them when asking them to login.
  *
  * @param string $message = ''
- * @param bollean $is_fatal = true
+ * @param boolean $is_fatal = true
  */
 function is_not_guest($message = '', $is_fatal = true)
 {
@@ -537,7 +537,7 @@ function banPermissions()
  * Log the current user in the ban logs.
  * Increment the hit counters for the specified ban ID's (if any.)
  *
- * @param array $ban_ids = array()
+ * @param int[] $ban_ids = array()
  * @param string $email = null
  */
 function log_ban($ban_ids = array(), $email = null)
@@ -786,7 +786,7 @@ function checkConfirm($action)
  *
  * @param string $action
  * @param string $type = 'post'
- * @return array
+ * @return string[] array of token var and token
  */
 function createToken($action, $type = 'post')
 {
@@ -954,8 +954,8 @@ function checkSubmitOnce($action, $is_fatal = true)
  * If boards parameter is specified, checks those boards instead of the current one (if applicable).
  * Always returns true if the user is an administrator.
  *
- * @param string $permission permission
- * @param array $boards = null array of board IDs
+ * @param string[]|string $permission permission
+ * @param int[]|null $boards = null array of board IDs
  * @return boolean if the user can do the permission
  */
 function allowedTo($permission, $boards = null)
@@ -1031,8 +1031,8 @@ function allowedTo($permission, $boards = null)
  * If they are not, it loads the Errors language file and shows an error using $txt['cannot_' . $permission].
  * If they are a guest and cannot do it, this calls is_not_guest().
  *
- * @param string $permission
- * @param array $boards = null
+ * @param string[]|string $permission array of or single string, of persmission to check
+ * @param int[]|null $boards = null
  */
 function isAllowedTo($permission, $boards = null)
 {
@@ -1091,7 +1091,7 @@ function isAllowedTo($permission, $boards = null)
  *  - returns an empty array if he or she cannot do this on any board.
  * If check_access is true will also make sure the group has proper access to that board.
  *
- * @param array $permissions
+ * @param string[]|string $permissions array of permission names to check access against
  * @param bool $check_access = true
  * @param bool $simple = true
  */
@@ -1299,7 +1299,7 @@ function spamProtection($error_type, $fatal = true)
  *
  * @param string $path the (absolute) directory path
  * @param boolean $attachments if the directory is an attachments directory or not
- * @return true on success error string if anything fails
+ * @return string|boolean on success error string if anything fails
  */
 function secureDirectory($path, $attachments = false)
 {
@@ -1416,8 +1416,6 @@ function constructBanQueryIP($fullip)
 function loadBadBehavior()
 {
 	global $modSettings, $user_info, $bb2_results;
-
-	$bb_run = false;
 
 	// Bad Behavior Enabled?
 	if (!empty($modSettings['badbehavior_enabled']))

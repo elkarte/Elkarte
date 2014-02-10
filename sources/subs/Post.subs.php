@@ -27,8 +27,8 @@ if (!defined('ELK'))
  * Cleans up links (javascript, etc.) and code/quote sections.
  * Won't convert \n's and a few other things if previewing is true.
  *
- * @param $message
- * @param $previewing
+ * @param string $message
+ * @param boolean $previewing
  */
 function preparsecode(&$message, $previewing = false)
 {
@@ -260,7 +260,7 @@ function preparsecode(&$message, $previewing = false)
 /**
  * This is very simple, and just removes things done by preparsecode.
  *
- * @param $message
+ * @param string $message
  */
 function un_preparsecode($message)
 {
@@ -506,9 +506,9 @@ function resizeBBCImages(&$message)
  * - Integers have been cast to integer.
  * - Mandatory parameters are set.
  *
- * @param array $msgOptions
- * @param array $topicOptions
- * @param array $posterOptions
+ * @param mixed[] $msgOptions
+ * @param mixed[] $topicOptions
+ * @param mixed[] $posterOptions
  */
 function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 {
@@ -702,7 +702,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			'id_topic' => $topicOptions['id'],
 			'counter_increment' => 1,
 		);
-		$topics_columns = array();
+
 		if ($msgOptions['approved'])
 			$topics_columns = array(
 				'id_member_updated = {int:poster_id}',
@@ -713,10 +713,12 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			$topics_columns = array(
 				'unapproved_posts = unapproved_posts + {int:counter_increment}',
 			);
+
 		if ($topicOptions['lock_mode'] !== null)
 			$topics_columns = array(
 				'locked = {int:locked}',
 			);
+
 		if ($topicOptions['sticky_mode'] !== null)
 			$topics_columns = array(
 				'is_sticky = {int:is_sticky}',
@@ -848,9 +850,9 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 /**
  * Modifying a post...
  *
- * @param array $msgOptions
- * @param array $topicOptions
- * @param array $posterOptions
+ * @param mixed[] $msgOptions
+ * @param mixed[] $topicOptions
+ * @param mixed[] $posterOptions
  */
 function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 {
@@ -996,7 +998,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 /**
  * Approve (or not) some posts... without permission checks...
  *
- * @param array $msgs - array of message ids
+ * @param int[] $msgs - array of message ids
  * @param bool $approve = true
  */
 function approvePosts($msgs, $approve = true)
@@ -1239,7 +1241,7 @@ function approvePosts($msgs, $approve = true)
  * Note that id_last_msg should always be updated using this function,
  * and is not automatically updated upon other changes.
  *
- * @param array $setboards
+ * @param int[]|int $setboards
  * @param int $id_msg = 0
  */
 function updateLastMessages($setboards, $id_msg = 0)
@@ -1543,7 +1545,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
  * Update topic subject.
  * If $all is true, for all messages in the topic, otherwise only the first message.
  *
- * @param array $topic_info topic information as returned by getTopicInfo()
+ * @param mixed[] $topic_info topic information as returned by getTopicInfo()
  * @param string $custom_subject
  * @param string $response_prefix = ''
  * @param bool $all = false

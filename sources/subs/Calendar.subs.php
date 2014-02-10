@@ -27,7 +27,7 @@ if (!defined('ELK'))
  *
  * @param string $low_date inclusive, YYYY-MM-DD
  * @param string $high_date inclusive, YYYY-MM-DD
- * @return array days, each of which an array of birthday information for the context
+ * @return mixed[] days, each of which an array of birthday information for the context
  */
 function getBirthdayRange($low_date, $high_date)
 {
@@ -97,7 +97,7 @@ function getBirthdayRange($low_date, $high_date)
  * @param string $low_date
  * @param string $high_date
  * @param bool $use_permissions = true
- * @param int $limit
+ * @param integer|null $limit
  * @return array contextual information if use_permissions is true, and an array of the data needed to build that otherwise
  */
 function getEventRange($low_date, $high_date, $use_permissions = true, $limit = null)
@@ -319,7 +319,7 @@ function getTodayInfo()
  * Provides information (link, month, year) about the previous and next month.
  * @param int $month
  * @param int $year
- * @param array $calendarOptions
+ * @param mixed[] $calendarOptions
  * @return array containing all the information needed to show a calendar grid for the given month
  */
 function getCalendarGrid($month, $year, $calendarOptions)
@@ -475,7 +475,7 @@ function getCalendarGrid($month, $year, $calendarOptions)
  * @param int $month
  * @param int $year
  * @param int $day
- * @param array $calendarOptions
+ * @param mixed[] $calendarOptions
  * @return array
  */
 function getCalendarWeek($month, $year, $day, $calendarOptions)
@@ -627,7 +627,7 @@ function cache_getOffsetIndependentEvents($days_to_index)
  * cache callback function used to retrieve the upcoming birthdays, holidays, and events within the given period, taking into account the users time offset.
  * Called from the BoardIndex to display the current day's events on the board index
  * used by the board index and SSI to show the upcoming events.
- * @param array $eventOptions
+ * @param mixed[] $eventOptions
  * @return array
  */
 function cache_getRecentEvents($eventOptions)
@@ -838,7 +838,7 @@ function getEventPoster($event_id)
  * allows to either set a time span (in days) or an end_date.
  * does not check any permissions of any sort.
  *
- * @param array $eventOptions
+ * @param mixed[] $eventOptions
  */
 function insertEvent(&$eventOptions)
 {
@@ -896,7 +896,7 @@ function insertEvent(&$eventOptions)
  * does not check any permissions of any sort.
  *
  * @param int $event_id
- * @param array $eventOptions
+ * @param mixed[] $eventOptions
  */
 function modifyEvent($event_id, &$eventOptions)
 {
@@ -1124,7 +1124,7 @@ function list_getNumHolidays()
 /**
  * Remove a holiday from the calendar.
  *
- * @param array $holiday_ids An array of ids for holidays.
+ * @param int[] $holiday_ids An array of ids for holidays.
  */
 function removeHolidays($holiday_ids)
 {

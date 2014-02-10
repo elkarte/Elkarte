@@ -15,15 +15,15 @@
  */
 
 /**
- * 	Admin index class with the following methods
- * 	elk_AdminIndex(oOptions)
- * 	{
- * 		public init()
- * 		public loadAdminIndex()
- * 		public setAnnouncements()
- * 		public showCurrentVersion()
- * 		public checkUpdateAvailable()
- * 	}
+ * Admin index class with the following methods
+ * elk_AdminIndex(oOptions)
+ * {
+ *		public init()
+ *		public loadAdminIndex()
+ *		public setAnnouncements()
+ *		public showCurrentVersion()
+ *		public checkUpdateAvailable()
+ * }
  *
  * @param {object} oOptions
  */
@@ -37,9 +37,11 @@ function elk_AdminIndex(oOptions)
 elk_AdminIndex.prototype.init = function ()
 {
 	window.adminIndexInstanceRef = this;
+
 	var fHandlePageLoaded = function () {
 		window.adminIndexInstanceRef.loadAdminIndex();
 	};
+
 	addLoadEvent(fHandlePageLoaded);
 };
 
@@ -411,7 +413,8 @@ function addNewWord()
  */
 function toggleBBCDisabled(section, disable)
 {
-	elems = document.getElementById(section).getElementsByTagName('*');
+	var elems = document.getElementById(section).getElementsByTagName('*');
+
 	for (var i = 0; i < elems.length; i++)
 	{
 		if (typeof(elems[i].name) === "undefined" || (elems[i].name.substr((section.length + 1), (elems[i].name.length - 2 - (section.length + 1))) !== "enabledTags") || (elems[i].name.indexOf(section) !== 0))
@@ -428,8 +431,9 @@ function toggleBBCDisabled(section, disable)
  */
 function updateInputBoxes()
 {
-	curType = document.getElementById("field_type").value;
-	privStatus = document.getElementById("private").value;
+	var curType = document.getElementById("field_type").value,
+		privStatus = document.getElementById("private").value;
+
 	document.getElementById("max_length_dt").style.display = curType === "text" || curType === "textarea" ? "" : "none";
 	document.getElementById("max_length_dd").style.display = curType === "text" || curType === "textarea" ? "" : "none";
 	document.getElementById("dimension_dt").style.display = curType === "textarea" ? "" : "none";
@@ -698,6 +702,7 @@ function swap_database_changes()
 {
 	db_vis = !db_vis;
 	database_changes_area.style.display = db_vis ? "" : "none";
+
 	return false;
 }
 
@@ -718,7 +723,7 @@ function testFTP()
 	};
 
 	var sPostData = "";
-	for (i = 0; i < 5; i++)
+	for (var i = 0; i < 5; i++)
 		sPostData = sPostData + (sPostData.length === 0 ? "" : "&") + oPostData[i] + "=" + escape(document.getElementById(oPostData[i]).value);
 
 	// Post the data out.
@@ -1291,10 +1296,13 @@ function initDeleteThemes()
 /**
  * These two functions (navigatePreview and refreshPreview) are used in ManageThemes
  * (template_edit_style) to create a preview of the site with the changed stylesheets
+ *
+ * @param {string} url
  */
 function navigatePreview(url)
 {
 	var myDoc = new XMLHttpRequest();
+
 	myDoc.onreadystatechange = function ()
 	{
 		if (myDoc.readyState !== 4)
@@ -1303,7 +1311,7 @@ function navigatePreview(url)
 		if (myDoc.responseText !== null && myDoc.status === 200)
 		{
 			previewData = myDoc.responseText;
-			document.getElementById("css_preview_box").style.display = "";
+			document.getElementById('css_preview_box').style.display = "";
 
 			// Revert to the theme they actually use ;).
 			var tempImage = new Image();
@@ -1351,16 +1359,16 @@ function refreshPreview(check)
 		{
 			if (is_ie)
 			{
-				var sheets = frames["css_preview_box"].document.styleSheets;
+				var sheets = frames['css_preview_box'].document.styleSheets;
 				for (var j = 0; j < sheets.length; j++)
 				{
-					if (sheets[j].id == "css_preview_box")
+					if (sheets[j].id === 'css_preview_box')
 						sheets[j].cssText = document.forms.stylesheetForm.entire_file.value;
 				}
 			}
 			else
 			{
-				frames["css_preview_box"].document.getElementById("css_preview_sheet").innerHTML = document.forms.stylesheetForm.entire_file.value;
+				frames['css_preview_box'].document.getElementById("css_preview_sheet").innerHTML = document.forms.stylesheetForm.entire_file.value;
 			}
 		}
 		catch (e)
@@ -1381,7 +1389,7 @@ function refreshPreview(check)
 		data = data.replace(stylesheetMatch, '<style type="text/css" id="css_preview_sheet">' + preview_sheet + "<" + "/style>");
 
 		iframe = document.getElementById("css_preview_box");
-		iframe.contentWindow.document.open()
+		iframe.contentWindow.document.open();
 		iframe.contentWindow.document.write(data);
 		iframe.contentWindow.document.close();
 
