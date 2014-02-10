@@ -18,9 +18,7 @@
 
 	dragDropAttachment = function() {
 		// Few internal global vars
-		var sessionId = null,
-			sessionVar = null,
-			allowedExtensions = [],
+		var allowedExtensions = [],
 			totalSizeAllowed = null,
 			individualSizeAllowed = null,
 			numOfAttachmentAllowed = null,
@@ -33,8 +31,6 @@
 			/**
 			 * public function, accisible with prototype chain
 			 * @param {object} params
-			 * sessionId - ID or current session
-			 * sessionVar - current session variable
 			 * allowedExtensions - types of attachments allowed
 			 * totalSizeAllowed - maximum size of total attachments allowed
 			 * individualSizeAllowed - maximum individual file size allowed
@@ -43,8 +39,6 @@
 			 * numAttachUploaded - number of already attached files(modifying post)
 			 */
 			init = function(params) {
-				sessionId = params.sessionId;
-				sessionVar = params.sessionVar;
 				allowedExtensions = (params.allowedExtensions === '') ? [] : params.allowedExtensions.replace(/\s/g, '').split(',');
 				totalSizeAllowed = (params.totalSizeAllowed === '') ? null : params.totalSizeAllowed;
 				individualSizeAllowed = (params.individualSizeAllowed === '') ? null : params.individualSizeAllowed;
@@ -78,7 +72,7 @@
 						}
 						return xhrobj;
 					},
-					url: elk_scripturl + '?action=attachment;sa=ulattach;' + sessionVar + '=' + sessionId,
+					url: elk_scripturl + '?action=attachment;sa=ulattach;' + elk_session_var + '=' + elk_session_id,
 					type: "POST",
 					contentType: false,
 					processData: false,
@@ -119,7 +113,7 @@
 			removeFileFromServer = function(options) {
 				var dataToSend = filesUploadedSuccessfully[options.fileNum];
 				$.ajax({
-					url: elk_scripturl + '?action=attachment;sa=rmattach;' + sessionVar + '=' + sessionId,
+					url: elk_scripturl + '?action=attachment;sa=rmattach;' + elk_session_var + '=' + elk_session_id,
 					type: "POST",
 					cache: false,
 					dataType: 'json',

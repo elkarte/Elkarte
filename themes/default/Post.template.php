@@ -482,8 +482,6 @@ function template_add_new_attachments()
 	echo '
 		<script><!-- // --><![CDATA[
 			var dropAttach = dragDropAttachment.init({
-				sessionId: elk_session_id,
-				sessionVar: elk_session_var,
 				allowedExtensions: "', $context['attachments']['allowed_extensions'], '",
 				totalSizeAllowed: "', empty($modSettings['attachmentPostLimit']) ? '' : $modSettings['attachmentPostLimit'], '",
 				individualSizeAllowed: "', empty($modSettings['attachmentSizeLimit']) ? '' : $modSettings['attachmentSizeLimit'], '",
