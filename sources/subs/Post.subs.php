@@ -38,7 +38,7 @@ function preparsecode(&$message, $previewing = false)
 	$message = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', $message);
 
 	// Clean up after nobbc ;).
-	$message = preg_replace_callback('~\[nobbc\](.+?)\[/nobbc\]~i', create_function('$m', ' return "[nobbc]" . strtr("$m[1]", array("[" => "&#91;", "]" => "&#93;", ":" => "&#58;", "@" => "&#64;")) . "[/nobbc]";'), $message);
+	$message = preg_replace_callback('~\[nobbc\](.+?)\[/nobbc\]~i', 'preparsecode_nobbc_callback', $message);
 
 	// Remove \r's... they're evil!
 	$message = strtr($message, array("\r" => ''));
@@ -115,7 +115,7 @@ function preparsecode(&$message, $previewing = false)
 			if (!$previewing && strpos($parts[$i], '[html]') !== false)
 			{
 				if (allowedTo('admin_forum'))
-					$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~is', create_function('$m', 'return "[html]" . strtr(un_htmlspecialchars("$m[1]"), array("\n" => \'&#13;\', \'  \' => \' &#32;\', \'[\' => \'&#91;\', \']\' => \'&#93;\')) . "[/html]";'), $parts[$i]);
+					$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~is', 'preparsecode_html_callback', $parts[$i]);
 				// We should edit them out, or else if an admin edits the message they will get shown...
 				else
 				{
@@ -125,7 +125,7 @@ function preparsecode(&$message, $previewing = false)
 			}
 
 			// Make sure all tags are lowercase.
-			$parts[$i] = preg_replace_callback('~\[([/]?)(list|li|table|tr|td|th)((\s[^\]]+)*)\]~i', create_function('$m', ' return "[$m[1]" . strtolower("$m[2]") . "$m[3]]";'), $parts[$i]);
+			$parts[$i] = preg_replace_callback('~\[([/]?)(list|li|table|tr|td|th)((\s[^\]]+)*)\]~i', 'preparsecode_lowertags_callback', $parts[$i]);
 
 			$list_open = substr_count($parts[$i], '[list]') + substr_count($parts[$i], '[list ');
 			$list_close = substr_count($parts[$i], '[/list]');
@@ -258,6 +258,33 @@ function preparsecode(&$message, $previewing = false)
 }
 
 /**
+ * Ensure tags inside of nobbc do not get parsed by converting the markers to html entities
+ * @param string[] $matches
+ */
+function preparsecode_nobbc_callback($matches)
+{
+	return '[nobbc]' . strtr($matches[1], array('[' => '&#91;', ']' => '&#93;', ':' => '&#58;', '@' => '&#64;')) . '[/nobbc]';
+}
+
+/**
+ * Prepares text inside of html tags to make them safe for display and prevent bbc rendering
+ * @param string[] $matches
+ */
+function preparsecode_html_callback($matches)
+{
+	return '[html]' . strtr(un_htmlspecialchars($matches[1]), array("\n" => '&#13;', '  ' => ' &#32;', '[' => '&#91;', ']' => '&#93;')) . '[/html]';
+}
+
+/**
+ * Takes a tag and lowercases it
+ * @param string[] $matches
+ */
+function preparsecode_lowertags_callback($matches)
+{
+	return '[' . $matches[1] . strtolower($matches[2]) . $matches[3] . ']';
+}
+
+/**
  * This is very simple, and just removes things done by preparsecode.
  *
  * @param $message
@@ -271,13 +298,22 @@ function un_preparsecode($message)
 	{
 		// If $i is a multiple of four (0, 4, 8, ...) then it's not a code section...
 		if ($i % 4 == 0)
-			$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~i', create_function('$m', 'return "[html]" . strtr(htmlspecialchars("$m[1]", ENT_QUOTES, "UTF-8"), array("\\&quot;" => "&quot;", "&amp;#13;" => "<br />", "&amp;#32;" => " ", "&amp;#91;" => "[", "&amp;#93;" => "]")) . "[/html]";'), $parts[$i]);
+			$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~i', 'preparsecode_lowertags_callback', $parts[$i]);
 
 		call_integration_hook('integrate_unpreparse_code', array(&$message, &$parts, &$i));
 	}
 
 	// Change breaks back to \n's and &nsbp; back to spaces.
 	return preg_replace('~<br( /)?' . '>~', "\n", str_replace('&nbsp;', ' ', implode('', $parts)));
+}
+
+/**
+ * Reverses what was done by preparsecode to html tags
+ * @param string[] $matches
+ */
+function preparsecode_lowertags_callback($matches)
+{
+	return '[html]' . strtr(htmlspecialchars($matches[1], ENT_QUOTES, 'UTF-8'), array('\\&quot;' => '&quot;', '&amp;#13;' => '<br />', '&amp;#32;' => ' ', '&amp;#91;' => '[', '&amp;#93;' => ']')) . '[/html]';
 }
 
 /**
@@ -339,11 +375,20 @@ function fixTags(&$message)
 		fixTag($message, $param['tag'], $param['protocols'], $param['embeddedUrl'], $param['hasEqualSign'], !empty($param['hasExtra']));
 
 	// Now fix possible security problems with images loading links automatically...
-	$message = preg_replace_callback('~(\[img.*?\])(.+?)\[/img\]~is', create_function('$m', 'return "$m[1]" . preg_replace("~action(=|%3d)(?!dlattach)~i", "action-", "$m[2]") . "[/img]";'), $message);
+	$message = preg_replace_callback('~(\[img.*?\])(.+?)\[/img\]~is', 'fixTags_img_callback', $message);
 
 	// Limit the size of images posted?
 	if (!empty($modSettings['max_image_width']) || !empty($modSettings['max_image_height']))
 		resizeBBCImages($message);
+}
+
+/**
+ * Ensure image tags do not load anything by themselfs (security)
+ * @param string[] $matches
+ */
+function fixTags_img_callback($matches)
+{
+	return $matches[1] . preg_replace('~action(=|%3d)(?!dlattach)~i', 'action-', $matches[2]) . '[/img]';
 }
 
 /**
@@ -1500,7 +1545,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 				{
 					// It goes 0 = outside, 1 = begin tag, 2 = inside, 3 = close tag, repeat.
 					if ($i % 4 == 0)
-						$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~is', create_function('$m', ' return "[html]" . preg_replace(\'~<br\s?/?' . '>~i\', \'&lt;br /&gt;<br />\', "$m[1]") . "[/html]";'), $parts[$i]);
+						$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~is', 'getFormMsgSubject_br_callback', $parts[$i]);
 				}
 				$form_message = implode('', $parts);
 			}
@@ -1537,6 +1582,17 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 
 		return array($form_subject, $form_message);
 	}
+}
+
+/**
+ * Converts br's to entity safe versions <br /> => $lt;br /&gt;<br /> so messages
+ * with bbc html tags can be edited
+ *
+ * @param string[] $matches
+ */
+function getFormMsgSubject_br_callback($matches)
+{
+	return '[html]' . preg_replace('~<br\s?/?' . '>~i', '&lt;br /&gt;<br />', $matches[1]) . '[/html]';
 }
 
 /**
