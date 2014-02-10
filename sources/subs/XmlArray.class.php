@@ -46,12 +46,6 @@ class Xml_Array
 	public $trim;
 
 	/**
-	 * holds the translation array
-	 * @var array
-	 */
-	protected $_trans_tbl;
-
-	/**
 	 * Constructor for the xml parser.
 	 * Example use:
 	 *  $xml = new Xml_Array(file('data.xml'));
@@ -65,9 +59,6 @@ class Xml_Array
 	{
 		// If we're using this try to get some more memory.
 		setMemoryLimit('32M');
-
-		// Get the HTML translation table and reverse it
-		$this->_trans_tbl = array_flip(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES));
 
 		// Set the debug level.
 		$this->debug_level = $level !== null ? $level : error_reporting();
@@ -630,9 +621,12 @@ class Xml_Array
 	 */
 	protected function _from_cdata($data)
 	{
+		// Get the HTML translation table and reverse it
+		$trans_tbl = array_flip(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES));
+
 		// Translate all the entities out.
 		$data = preg_replace_callback('~&#(\d{1,4});~', array($this, '_from_cdata_callback'), $data);
-		$data = strtr($data, $this->_trans_tbl);
+		$data = strtr($data, $trans_tbl);
 
 		return $this->trim ? trim($data) : $data;
 	}
