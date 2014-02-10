@@ -331,6 +331,10 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 .new_posts:hover {
 	text-decoration: underline;
 }
+.childboards .new_posts {
+    font-size: 0.857em;
+    padding: 1px 3px 2px;
+}
 
 /* Standard horizontal rule.. ([hr], etc.) */
 hr {
