@@ -298,7 +298,7 @@ function un_preparsecode($message)
 	{
 		// If $i is a multiple of four (0, 4, 8, ...) then it's not a code section...
 		if ($i % 4 == 0)
-			$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~i', 'preparsecode_lowertags_callback', $parts[$i]);
+			$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~i', 'preparsecode_unhtml_callback', $parts[$i]);
 
 		call_integration_hook('integrate_unpreparse_code', array(&$message, &$parts, &$i));
 	}
@@ -311,7 +311,7 @@ function un_preparsecode($message)
  * Reverses what was done by preparsecode to html tags
  * @param string[] $matches
  */
-function preparsecode_lowertags_callback($matches)
+function preparsecode_unhtml_callback($matches)
 {
 	return '[html]' . strtr(htmlspecialchars($matches[1], ENT_QUOTES, 'UTF-8'), array('\\&quot;' => '&quot;', '&amp;#13;' => '<br />', '&amp;#32;' => ' ', '&amp;#91;' => '[', '&amp;#93;' => ']')) . '[/html]';
 }
