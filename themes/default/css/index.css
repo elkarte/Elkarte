@@ -3824,6 +3824,9 @@ a.help .icon {
 }
 /* This one does 800 screens at default font size. */
 @media screen and (max-width: 50em) {
+	#logobox img {
+		max-width: 95%;
+	}
 	.topic_latest {
 		min-width: 15em;
 	}
