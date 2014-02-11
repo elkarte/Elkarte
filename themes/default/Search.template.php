@@ -39,7 +39,7 @@ function template_searchform()
 					<fieldset id="simple_search" class="content">
 						<div id="search_term_input">
 							<label for="search"><strong>', $txt['search_for'], '</strong></label>:
-							<input type="text" id="search" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' maxlength="', $context['search_string_limit'], '" size="40" class="input_text" placeholder="' . $txt['search'] . '" required="required" autofocus="autofocus" />', '
+							<input type="search" id="search" class="input_text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' maxlength="', $context['search_string_limit'], '" size="40" placeholder="' . $txt['search'] . '" required="required" autofocus="autofocus" />', '
 						</div>';
 
 		if (empty($modSettings['search_simple_fulltext']))
@@ -73,7 +73,7 @@ function template_searchform()
 								<strong><label for="searchfor">', $txt['search_for'], ':</label></strong>
 							</dt>
 							<dd>
-								<input type="text" name="search" id="searchfor" ', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' maxlength="', $context['search_string_limit'], '" size="40" class="input_text" placeholder="' . $txt['search'] . '" required="required" autofocus="autofocus" />';
+								<input type="search" name="search" id="searchfor" ', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' maxlength="', $context['search_string_limit'], '" size="40" class="input_text" placeholder="' . $txt['search'] . '" required="required" autofocus="autofocus" />';
 
 		if (empty($modSettings['search_simple_fulltext']))
 			echo '
@@ -92,14 +92,14 @@ function template_searchform()
 									</select>
 								</div>
 							</dd>
-							<dt class="righttext"><label for="userspec">
-								', $txt['by_user'], ':</label>
+							<dt class="righttext">
+								<label for="userspec">', $txt['by_user'], ':</label>
 							</dt>
 							<dd>
 								<input id="userspec" type="text" name="userspec" value="', empty($context['search_params']['userspec']) ? '*' : $context['search_params']['userspec'], '" size="40" class="input_text" />
 							</dd>
-							<dt class="righttext"><label for="sort">
-								', $txt['search_order'], ':</label>
+							<dt class="righttext">
+								<label for="sort">', $txt['search_order'], ':</label>
 							</dt>
 							<dd>
 								<div class="styled-select">
