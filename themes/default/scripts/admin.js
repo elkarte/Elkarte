@@ -1065,7 +1065,48 @@ function confirmMoveTopics(confirmText)
 }
 
 /**
- * Used in manageMembergroups to enabel disable form elements based on allowable choices
+ * Used in manageFeatures to show / hide custom level input elements based on the checkbox choices
+ * Will show or hide the jquery and jqueryui custom input fields for admins that like to roll the dice
+ *
+ * @param {boolean} isChecked
+ */
+function showhideJqueryOptions()
+{
+	var jqBase = document.getElementById('jquery_default').checked,
+		jqUi = document.getElementById('jqueryui_default').checked,
+		jqBase_val = $('#jquery_version'),
+		jqUi_val = $('#jqueryui_version');
+
+	// Show the jquery custom level box only if the option has been selected
+	// yes the dt dd stuff makes it this ugly
+	if (jqBase === false)
+	{
+		// dd and the dt
+		jqBase_val.parent().slideUp();
+		jqBase_val.parent().prev().slideUp();
+	}
+	else
+	{
+		jqBase_val.parent().slideDown();
+		jqBase_val.parent().prev().slideDown();
+	}
+
+	// And the same for the UI areas as well
+	if (jqUi === false)
+	{
+		// The parent is the dd and the sibling is its dt
+		jqUi_val.parent().slideUp();
+		jqUi_val.parent().prev().slideUp();
+	}
+	else
+	{
+		jqUi_val.parent().slideDown();
+		jqUi_val.parent().prev().slideDown();
+	}
+}
+
+/**
+ * Used in manageMembergroups to enable disable form elements based on allowable choices
  * If post based group is selected, it will disable moderation selection, visability, group description
  * and enable post count input box
  *
