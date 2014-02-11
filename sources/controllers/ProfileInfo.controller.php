@@ -1097,7 +1097,7 @@ class ProfileInfo_Controller extends Action_Controller
 	 * @param int $start
 	 * @param int $items_per_page
 	 * @param string $sort
-	 * @param array $boardsAllowed
+	 * @param int[] $boardsAllowed
 	 * @param int $memID
 	 */
 	public function list_getAttachments($start, $items_per_page, $sort, $boardsAllowed, $memID)
@@ -1110,7 +1110,7 @@ class ProfileInfo_Controller extends Action_Controller
 	/**
 	 * Callback for createList()
 	 *
-	 * @param array $boardsAllowed
+	 * @param int[] $boardsAllowed
 	 * @param int $memID
 	 */
 	public function list_getNumAttachments($boardsAllowed, $memID)
