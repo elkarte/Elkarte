@@ -410,10 +410,10 @@ function mimespecialchars($string, $with_charset = true, $hotmail_fix = false, $
 		unset($matches);
 
 		if ($simple)
-			$string = preg_replace_callback('~&#(\d{3,8});~', create_function('$m', ' return chr("$m[1]");'), $string);
+			$string = preg_replace_callback('~&#(\d{3,7});~', 'mimespecialchars_callback', $string);
 		else
 		{
-			$string = preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $string);
+			$string = preg_replace_callback('~&#(\d{3,7});~', 'fixchar__callback', $string);
 
 			// Unicode, baby.
 			$charset = 'UTF-8';
@@ -423,22 +423,8 @@ function mimespecialchars($string, $with_charset = true, $hotmail_fix = false, $
 	// Convert all special characters to HTML entities...just for Hotmail :-\
 	if ($hotmail_fix)
 	{
-		// @todo ... another replaceEntities ?
-		$entityConvert = create_function('$m', '
-			$c = $m[1];
-			if (strlen($c) === 1 && ord($c[0]) <= 0x7F)
-				return $c;
-			elseif (strlen($c) === 2 && ord($c[0]) >= 0xC0 && ord($c[0]) <= 0xDF)
-				return "&#" . (((ord($c[0]) ^ 0xC0) << 6) + (ord($c[1]) ^ 0x80)) . ";";
-			elseif (strlen($c) === 3 && ord($c[0]) >= 0xE0 && ord($c[0]) <= 0xEF)
-				return "&#" . (((ord($c[0]) ^ 0xE0) << 12) + ((ord($c[1]) ^ 0x80) << 6) + (ord($c[2]) ^ 0x80)) . ";";
-			elseif (strlen($c) === 4 && ord($c[0]) >= 0xF0 && ord($c[0]) <= 0xF7)
-				return "&#" . (((ord($c[0]) ^ 0xF0) << 18) + ((ord($c[1]) ^ 0x80) << 12) + ((ord($c[2]) ^ 0x80) << 6) + (ord($c[3]) ^ 0x80)) . ";";
-			else
-				return "";');
-
 		// Convert all 'special' characters to HTML entities.
-		return array($charset, preg_replace_callback('~([\x80-\x{10FFFF}])~u', $entityConvert, $string), '7bit');
+		return array($charset, preg_replace_callback('~([\x80-\x{10FFFF}])~u', 'entityConvert', $string), '7bit');
 	}
 	// We don't need to mess with the line if no special characters were in it..
 	elseif (!$hotmail_fix && preg_match('~([^\x09\x0A\x0D\x20-\x7F])~', $string) === 1)
@@ -458,6 +444,41 @@ function mimespecialchars($string, $with_charset = true, $hotmail_fix = false, $
 	}
 	else
 		return array($charset, $string, '7bit');
+}
+
+/**
+ * Converts out of ascii range characters in to HTML entities
+ * Character codes <= 128 are left as is
+ * Callback function of preg_replace_callback, used just for hotmail address
+ *
+ * @param mixed[] $match
+ */
+function entityConvert($match)
+{
+	$c = $match[1];
+	$c_strlen = strlen($c);
+	$c_ord = ord($c[0]);
+
+	if ($c_strlen === 1 && $c_ord <= 0x7F)
+		return $c;
+	elseif ($c_strlen === 2 && $c_ord >= 0xC0 && $c_ord <= 0xDF)
+		return '&#' . ((($c_ord ^ 0xC0) << 6) + (ord($c[1]) ^ 0x80)) . ';';
+	elseif ($c_strlen === 3 && $c_ord >= 0xE0 && $c_ord <= 0xEF)
+		return '&#' . ((($c_ord ^ 0xE0) << 12) + ((ord($c[1]) ^ 0x80) << 6) + (ord($c[2]) ^ 0x80)) . ';';
+	elseif ($c_strlen === 4 && $c_ord >= 0xF0 && $c_ord <= 0xF7)
+		return '&#' . ((($c_ord ^ 0xF0) << 18) + ((ord($c[1]) ^ 0x80) << 12) + ((ord($c[2]) ^ 0x80) << 6) + (ord($c[3]) ^ 0x80)) . ';';
+	else
+		return '';
+}
+
+/**
+ * Callback for the preg_replace in mimespecialchars
+ *
+ * @param mixed[] $match
+ */
+function mimespecialchars_callback($match)
+{
+	return chr($match[1]);
 }
 
 /**

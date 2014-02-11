@@ -219,7 +219,6 @@ function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style
  *
  * @param int $id
  * @param string $style
- * @return
  */
 function list_count_filter_parser($id, $style)
 {
