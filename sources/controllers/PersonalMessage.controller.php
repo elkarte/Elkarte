@@ -2241,15 +2241,15 @@ function messageIndexBar($area)
 			'title' => $txt['pm_messages'],
 			'counter' => 'unread_messages',
 			'areas' => array(
-				'send' => array(
-					'label' => $txt['new_message'],
-					'custom_url' => $scripturl . '?action=pm;sa=send',
-					'permission' => allowedTo('pm_send'),
-				),
 				'inbox' => array(
 					'label' => $txt['inbox'],
 					'custom_url' => $scripturl . '?action=pm',
 					'counter' => 'unread_messages',
+				),
+				'send' => array(
+					'label' => $txt['new_message'],
+					'custom_url' => $scripturl . '?action=pm;sa=send',
+					'permission' => allowedTo('pm_send'),
 				),
 				'sent' => array(
 					'label' => $txt['sent_items'],
