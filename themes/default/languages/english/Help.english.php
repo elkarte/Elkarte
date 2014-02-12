@@ -377,12 +377,12 @@ $helptxt['xmlnews_enable'] = 'Allows people to link to <a href="%1$s?action=.xml
 	is displayed in some clients, like Trillian, it is expected to be truncated.';
 $helptxt['hotTopicPosts'] = 'Change the number of posts for a topic to reach the state of a &quot;hot&quot; or
 	&quot;very hot&quot; topic.  Select the likes option to base this state on the number of likes instead of the number of posts';
-$helptxt['globalCookies'] = 'Makes log in cookies available across subdomains.  For example, if...<br />
+$helptxt['globalCookies'] = 'Makes login cookies available across subdomains.  For example, if...<br />
 	Your site is at http://www.myserver.com/,<br />
 	And your forum is at http://forum.myserver.com/,<br />
 	Using this option will allow you to access the forum\'s cookie on your site.  Do not enable this if there are other subdomains (like hacker.elkarte.net) not controlled by you.<br />
 	This option does not function when local cookies are enabled.';
-$helptxt['globalCookiesDomain'] = 'Define the main domain to be used when log in cookies are available across subdomains';
+$helptxt['globalCookiesDomain'] = 'Define the main domain to be used when login cookies are available across subdomains';
 $helptxt['httponlyCookies'] = 'With this setting on, Cookies will not be accessible by scripting languages, such as JavaScript. This setting can help to reduce identity theft through XSS attacks. This may cause issues with some third party scripts but is recommended to be on when possible.';
 $helptxt['secureCookies'] = 'Enabling this option will force the cookies created for users on your forum to be marked as secure. Only enable this option if you are using HTTPS throughout your site as it will break cookie handling otherwise!';
 $helptxt['admin_session_lifetime'] = 'This controls the length of time an admin session can remain active. Once this timer expires the session will end, requiring you to enter your admin credentials to continue accessing the admin area. The minimum value is 5 minutes, the maximum allowed value is 14400 minutes (a day). It is strongly recommended to use a value less than 60 minutes for security reasons.';
