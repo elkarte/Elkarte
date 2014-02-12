@@ -23,7 +23,7 @@ if (!defined('ELK'))
 /**
  * Get the latest posts of a forum.
  *
- * @param array $latestPostOptions
+ * @param mixed[] $latestPostOptions
  * @return array
  */
 function getLastPosts($latestPostOptions)
@@ -32,7 +32,7 @@ function getLastPosts($latestPostOptions)
 
 	$db = database();
 
-	// Find all the posts.  Newer ones will have higher IDs.  (assuming the last 20 * number are accessable...)
+	// Find all the posts. Newer ones will have higher IDs. (assuming the last 20 * number are accessable...)
 	// @todo SLOW This query is now slow, NEEDS to be fixed.  Maybe break into two?
 	$request = $db->query('substring', '
 		SELECT
@@ -101,7 +101,7 @@ function getLastPosts($latestPostOptions)
 /**
  * Callback-function for the cache for getLastPosts().
  *
- * @param array $latestPostOptions
+ * @param mixed[] $latestPostOptions
  */
 function cache_getLastPosts($latestPostOptions)
 {
@@ -127,7 +127,7 @@ function cache_getLastPosts($latestPostOptions)
  * 	  or 'any' array.  Reminder The controller needs to check permissions
  *  - Returns two arrays, one of the posts one of any/own
  *
- * @param array $messages
+ * @param int[] $messages
  * @param int $start
  */
 function getRecentPosts($messages, $start)
@@ -220,7 +220,6 @@ function getRecentPosts($messages, $start)
 	$db->free_result($request);
 
 	return array($posts, $board_ids);
-
 }
 
 /**

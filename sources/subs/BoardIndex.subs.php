@@ -30,7 +30,7 @@ if (!defined('ELK'))
  * array with categories->boards->child_boards or an associative array
  * with boards->child_boards.
  *
- * @param array $boardIndexOptions
+ * @param mixed[] $boardIndexOptions
  * @return array
  */
 function getBoardIndex($boardIndexOptions)

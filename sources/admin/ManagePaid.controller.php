@@ -754,7 +754,6 @@ class ManagePaid_Controller extends Action_Controller
 	 * Callback for createList(),
 	 * Returns the number of subscribers to a specific subscription in the system
 	 *
-	 * @param int $messageID
 	 */
 	public function getSubscribedUserCount($id_sub, $search_string, $search_vars)
 	{

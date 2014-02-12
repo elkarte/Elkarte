@@ -271,7 +271,7 @@ function automanage_attachments_by_space()
  * Finds the current directory tree for the supplied base directory
  *
  * @param string $directory
- * @return boolean on fail else array of directory names
+ * @return string[]|boolean on fail else array of directory names
  */
 function get_directory_tree_elements($directory)
 {
@@ -299,7 +299,7 @@ function get_directory_tree_elements($directory)
  * Helper function for automanage_attachments_create_directory
  * Gets the directory w/o drive letter for windows
  *
- * @param array $tree
+ * @param string[] $tree
  * @param int $count
  */
 function attachments_init_dir(&$tree, &$count)
@@ -328,7 +328,7 @@ function attachments_init_dir(&$tree, &$count)
  * Loops through $_FILES['attachment'] array and saves each file to the current attachments folder.
  * Validates the save location actually exists.
  *
- * @param $id_msg = null id of the message with attachments, if any.
+ * @param int|null $id_msg = null or id of the message with attachments, if any.
  *                  If null, this is an upload in progress for a new post.
  */
 function processAttachments($id_msg = null)
@@ -714,7 +714,7 @@ function attachmentChecks($attachID)
  * - Renames the temporary file.
  * - Creates a thumbnail if the file is an image and the option enabled.
  *
- * @param array $attachmentOptions
+ * @param mixed[] $attachmentOptions associative array of options
  */
 function createAttachment(&$attachmentOptions)
 {
@@ -1187,6 +1187,7 @@ function url_image_size($url)
  *  - if the forum is using multiple attachments directories,
  *    then the current path is stored as unserialize($modSettings['attachmentUploadDir'])[$modSettings['currentAttachmentUploadDir']]
  *  - otherwise, the current path is $modSettings['attachmentUploadDir'].
+ * @return string
  */
 function getAttachmentPath()
 {
@@ -1206,6 +1207,7 @@ function getAttachmentPath()
 /**
  * The avatars path: if custom avatar directory is set, that's it.
  * Otherwise, it's attachments path.
+ * @return string
  */
 function getAvatarPath()
 {
@@ -1219,7 +1221,7 @@ function getAvatarPath()
  * This returns the id of the folder where the attachment or avatar will be saved.
  * If multiple attachment directories are not enabled, this will be 1 by default.
  *
- * @return int, return 1 if multiple attachment directories are not enabled,
+ * @return int 1 if multiple attachment directories are not enabled,
  * or the id of the current attachment directory otherwise.
  */
 function getAttachmentPathID()
@@ -1233,7 +1235,7 @@ function getAttachmentPathID()
 /**
  * Returns the ID of the folder avatars are currently saved in.
  *
- * @return int, returns 1 if custom avatar directory is enabled,
+ * @return int 1 if custom avatar directory is enabled,
  * and the ID of the current attachment folder otherwise.
  * NB: the latter could also be 1.
  */
@@ -1252,10 +1254,10 @@ function getAvatarPathID()
  * Get all attachments associated with a set of posts.
  * This does not check permissions.
  *
- * @param array $messages array of messages ids
+ * @param int[] $messages array of messages ids
  * @param bool $includeUnapproved = false
- * @param string $filter name of a callback function
- * @param array $all_posters
+ * @param string|null $filter name of a callback function
+ * @param mixed[] $all_posters
  */
 function getAttachments($messages, $includeUnapproved = false, $filter = null, $all_posters = array())
 {
@@ -1306,7 +1308,7 @@ function getAttachments($messages, $includeUnapproved = false, $filter = null, $
  *
  * @deprecated since 1.0
  *
- * @return array, avatars information
+ * @return mixed[] avatars information
  */
 function getAvatarsDefault()
 {
@@ -1647,9 +1649,9 @@ function loadAttachmentContext($id_msg)
 
 /**
  * A sort function for putting unapproved attachments first.
- * @param array $a
- * @param array $b
- * @return int, -1, 0, 1
+ * @param mixed[] $a
+ * @param mixed[] $b
+ * @return int -1, 0, 1
  */
 function approved_attach_sort($a, $b)
 {
@@ -1665,26 +1667,23 @@ function approved_attach_sort($a, $b)
  *  - the attachment is unapproved, and
  *  - the viewer is not the poster of the message where the attachment is
  *
- * @param array $attachment_info
- * @param array $all_posters
+ * @param mixed[] $attachment_info
+ * @param mixed[] $all_posters
  */
 function filter_accessible_attachment($attachment_info, $all_posters)
 {
 	global $user_info;
 
-	if (!$attachment_info['approved'] && (!isset($all_posters[$attachment_info['id_msg']]) || $all_posters[$attachment_info['id_msg']] != $user_info['id']))
-		return false;
-
-	return true;
+	return !(!$attachment_info['approved'] && (!isset($all_posters[$attachment_info['id_msg']]) || $all_posters[$attachment_info['id_msg']] != $user_info['id']));
 }
 
 /**
  * Older attachments may still use this function.
  *
- * @param $filename
- * @param $attachment_id
- * @param $dir
- * @param $new
+ * @param string $filename
+ * @param int $attachment_id
+ * @param string|null $dir
+ * @param boolean $new
  */
 function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $new = false)
 {

@@ -25,14 +25,14 @@ if (defined('ELK'))
 define('ELK', 'SSI');
 
 // Shortcut for the browser cache stale
-define('CACHE_STALE', '?beta10');
+define('CACHE_STALE', '?10beta2');
 
 // We're going to want a few globals... these are all set later.
 global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
 global $boardurl, $webmaster_email, $cookiename;
 global $db_server, $db_name, $db_user, $db_prefix, $db_persist, $db_error_send, $db_last_error;
 global $modSettings, $context, $sc, $user_info, $topic, $board, $txt;
-global $smcFunc, $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd;
+global $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd;
 global $sourcedir, $boarddir;
 
 // Remember the current configuration so it can be set back.
@@ -108,17 +108,11 @@ require_once(SOURCEDIR . '/Action.controller.php');
 // Clean the request variables.
 cleanRequest();
 
-// Create a variable to store some specific functions in.
-$smcFunc = array();
-
 // Initiate the database connection and define some database functions to use.
 loadDatabase();
 
 // Load settings from the database.
 reloadSettings();
-
-// Temporarily, compatibility for access to utility functions through $smcFunc is enabled by default.
-Util::compat_init();
 
 // Seed the random generator?
 elk_seed_generator();
@@ -324,8 +318,8 @@ function ssi_logout($redirect_to = '', $output_method = 'echo')
  * @todo this may use getLastPosts with some modification
  *
  * @param int $num_recent
- * @param array $exclude_boards
- * @param array $include_boards
+ * @param int[]|null $exclude_boards
+ * @param int[]|null $include_boards
  * @param string $output_method
  * @param bool $limit_body
  */
@@ -377,7 +371,7 @@ function ssi_recentPosts($num_recent = 8, $exclude_boards = null, $include_board
  *
  * @todo this may use getRecentPosts with some modification
  *
- * @param array $post_ids
+ * @param int[] $post_ids
  * @param bool $override_permissions
  * @param string $output_method = 'echo'
  */
@@ -412,7 +406,7 @@ function ssi_fetchPosts($post_ids = array(), $override_permissions = false, $out
  * @todo if ssi_recentPosts and ssi_fetchPosts will use Recent.subs.php this can be removed
  *
  * @param string $query_where
- * @param array $query_where_params
+ * @param mixed[] $query_where_params
  * @param int $query_limit
  * @param string $query_order
  * @param string $output_method = 'echo'
@@ -521,8 +515,8 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
  *  [board] Subject by Poster	Date
  *
  * @param int $num_recent
- * @param array $exclude_boards
- * @param bool $include_boards
+ * @param int[]|null $exclude_boards
+ * @param bool|null $include_boards
  * @param string $output_method = 'echo'
  */
 function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boards = null, $output_method = 'echo')
@@ -861,7 +855,7 @@ function ssi_randomMember($random_type = '', $output_method = 'echo')
 /**
  * Fetch a specific member.
  *
- * @param array $member_ids = array()
+ * @param int[] $member_ids = array()
  * @param string $output_method = 'echo'
  */
 function ssi_fetchMember($member_ids = array(), $output_method = 'echo')
@@ -893,8 +887,8 @@ function ssi_fetchGroupMembers($group_id = null, $output_method = 'echo')
 /**
  * Fetch some member data!
  *
- * @param string $query_where
- * @param string $query_where_params
+ * @param string|null $query_where
+ * @param string|string[] $query_where_params
  * @param string $query_limit
  * @param string $query_order
  * @param string $output_method
@@ -1286,7 +1280,7 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
  * is the definition of the poll moderation button array (see Display.controller.php
  * for details).
  *
- * @param int $topicID = null
+ * @param int|null $topicID = null
  * @param string $output_method = 'echo'
  */
 function ssi_showPoll($topicID = null, $output_method = 'echo')
@@ -1624,10 +1618,10 @@ function ssi_todaysCalendar($output_method = 'echo')
 /**
  * Show the latest news, with a template... by board.
  *
- * @param int $board
- * @param int $limit
- * @param int $start
- * @param int $length
+ * @param int|null $board
+ * @param int|null $limit
+ * @param int|null $start
+ * @param int|null $length
  * @param string $preview
  * @param string $output_method = 'echo'
  */
@@ -1834,8 +1828,8 @@ function ssi_recentEvents($max_events = 7, $output_method = 'echo')
  * Check the passed id_member/password.
  *  If $is_username is true, treats $id as a username.
  *
- * @param int $id
- * @param string $password
+ * @param int|null $id
+ * @param string|null $password
  * @param bool $is_username
  */
 function ssi_checkPassword($id = null, $password = null, $is_username = false)
@@ -1855,7 +1849,7 @@ function ssi_checkPassword($id = null, $password = null, $is_username = false)
  * We want to show the recent attachments outside of the forum.
  *
  * @param int $num_attachments = 10
- * @param array $attachment_ext = array()
+ * @param string[] $attachment_ext = array()
  * @param string $output_method = 'echo'
  */
 function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(), $output_method = 'echo')

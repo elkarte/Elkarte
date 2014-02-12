@@ -57,17 +57,47 @@ class Curl_Fetch_Webdata
 	);
 
 	/**
+	 * Holds the passed or defautl value for redirects
+	 */
+	private $_max_redirect = 3;
+
+	/**
+	 * Holds the current redirect count for the request
+	 */
+	private $_current_redirect = 0;
+
+	/**
+	 * Holds the passed user options array
+	 */
+	private $_user_options = array();
+
+	/**
+	 * Holds any data that will be posted to a form
+	 */
+	private $_post_data = '';
+
+	/**
+	 * Holds the response to the cURL request, headers, data, code, etc
+	 */
+	private $_response = array();
+
+	/**
+	 * Holds response headers to the request
+	 */
+	private $_headers = array();
+
+	/**
 	 * Start the cURL object
 	 * - allow for user override values
 	 *
-	 * @param array $options cURL options as an array
+	 * @param mixed[] $options cURL options as an array
 	 * @param int $max_redirect use to override the default of 3
 	 */
 	public function __construct($options = array(), $max_redirect = 3)
 	{
 		// Initialize class variables
-		$this->max_redirect = intval($max_redirect);
-		$this->user_options = $options;
+		$this->_max_redirect = intval($max_redirect);
+		$this->_user_options = $options;
 	}
 
 	/**
@@ -78,15 +108,14 @@ class Curl_Fetch_Webdata
 	 *  - calls _setOptions to set the curl opts array values based on the defaults and user input
 	 *
 	 * @param string $url the site we are going to fetch
-	 * @param array $post_data any post data as form name => value
 	 */
 	public function get_url_data($url, $post_data = array())
 	{
 		// POSTing some data perhaps?
 		if (!empty($post_data) && is_array($post_data))
-			$this->post_data = $this->_buildPostData($post_data);
+			$this->_post_data = $this->_buildPostData($post_data);
 		elseif (!empty($post_data))
-			$this->post_data = trim($post_data);
+			$this->_post_data = trim($post_data);
 
 		// Set the options and get it
 		$this->_setOptions();
@@ -114,8 +143,8 @@ class Curl_Fetch_Webdata
 		// If we have not already been redirected, set it up so we can
 		if (!$redirect)
 		{
-			$this->current_redirect = 1;
-			$this->response = array();
+			$this->_current_redirect = 1;
+			$this->_response = array();
 		}
 
 		// Initialize the curl object and make the call
@@ -135,19 +164,19 @@ class Curl_Fetch_Webdata
 		curl_close($cr);
 
 		// Store this 'loops' data, someone may want all of these :O
-		$this->response[] = array(
+		$this->_response[] = array(
 			'url' => $url,
 			'code' => $http_code,
 			'error' => $error,
-			'headers' => isset($this->headers) ? $this->headers : false,
+			'headers' => isset($this->_headers) ? $this->_headers : false,
 			'body' => $body,
 		);
 
 		// If this a redirect with a location header and we have not given up, then we play it again Sam
-		if (preg_match('~30[127]~i', $http_code) === 1 && $this->headers['location'] != '' && $this->current_redirect <= $this->max_redirect)
+		if (preg_match('~30[127]~i', $http_code) === 1 && $this->_headers['location'] != '' && $this->_current_redirect <= $this->_max_redirect)
 		{
-			$this->current_redirect++;
-			$header_location = $this->_getRedirectURL($url, $this->headers['location']);
+			$this->_current_redirect++;
+			$header_location = $this->_getRedirectURL($url, $this->_headers['location']);
 			$this->_redirect($header_location, $url);
 		}
 	}
@@ -184,13 +213,13 @@ class Curl_Fetch_Webdata
 	 */
 	public function result($area = '')
 	{
-		$max_result = count($this->response) - 1;
+		$max_result = count($this->_response) - 1;
 
 		// just return a specified area or the entire result?
 		if ($area == '')
-			return $this->response[$max_result];
+			return $this->_response[$max_result];
 		else
-			return isset($this->response[$max_result][$area]) ? $this->response[$max_result][$area] : $this->response[$max_result];
+			return isset($this->_response[$max_result][$area]) ? $this->_response[$max_result][$area] : $this->_response[$max_result];
 	}
 
 	/**
@@ -203,11 +232,11 @@ class Curl_Fetch_Webdata
 	public function result_raw($response_number = '')
 	{
 		if (!is_numeric($response_number))
-			return $this->response;
+			return $this->_response;
 		else
 		{
-			$response_number = min($response_number, count($this->response) - 1);
-			return $this->response[$response_number];
+			$response_number = min($response_number, count($this->_response) - 1);
+			return $this->_response[$response_number];
 		}
 	}
 
@@ -216,7 +245,7 @@ class Curl_Fetch_Webdata
 	 *  - forms the date (for post) in to a string var=xyz&var2=abc&var3=123
 	 *  - drops vars with @ since we don't support sending files (uploading)
 	 *
-	 * @param array $post_data
+	 * @param mixed[] $post_data
 	*/
 	private function _buildPostData($post_data)
 	{
@@ -246,20 +275,20 @@ class Curl_Fetch_Webdata
 		$this->default_options[CURLOPT_HEADERFUNCTION] = array($this, '_headerCallback');
 
 		// Any user options to account for
-		if (is_array($this->user_options))
+		if (is_array($this->_user_options))
 		{
-			$keys = array_merge(array_keys($this->default_options), array_keys($this->user_options));
-			$vals = array_merge($this->default_options, $this->user_options);
+			$keys = array_merge(array_keys($this->default_options), array_keys($this->_user_options));
+			$vals = array_merge($this->default_options, $this->_user_options);
 			$this->options = array_combine($keys, $vals);
 		}
 		else
 			$this->options = $this->default_options;
 
 		// POST data options, here we don't allow any override
-		if (isset($this->post_data))
+		if (isset($this->_post_data))
 		{
 			$this->options[CURLOPT_POST] = 1;
-			$this->options[CURLOPT_POSTFIELDS] = $this->post_data;
+			$this->options[CURLOPT_POSTFIELDS] = $this->_post_data;
 		}
 	}
 
@@ -292,7 +321,7 @@ class Curl_Fetch_Webdata
 
 		// set proper headers only
 		if (isset($temp[0]) && isset($temp[1]))
-			$this->headers[strtolower($temp[0])] = strtolower(trim($temp[1]));
+			$this->_headers[strtolower($temp[0])] = strtolower(trim($temp[1]));
 
 		// return the length of what was *passed* unless you want a Failed writing header error ;)
 		return strlen($header);

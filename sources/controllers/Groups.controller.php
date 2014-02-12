@@ -32,7 +32,7 @@ class Groups_Controller extends Action_Controller
 	 *
 	 * @see Action_Controller::action_index()
 	 */
-	function action_index()
+	public function action_index()
 	{
 		global $context;
 
@@ -496,7 +496,6 @@ class Groups_Controller extends Action_Controller
 							assignGroupsToMember($id, $groups['primary'], $groups['add']);
 						}
 
-						$lastLng = $user_info['language'];
 						foreach ($concerned['email_details'] as $email)
 						{
 							$replacements = array(
@@ -513,7 +512,6 @@ class Groups_Controller extends Action_Controller
 					else
 					{
 						// Same as for approving, kind of.
-						$lastLng = $user_info['language'];
 						foreach ($concerned['email_details'] as $email)
 						{
 							$custom_reason = isset($_POST['groupreason']) && isset($_POST['groupreason'][$email['rid']]) ? $_POST['groupreason'][$email['rid']] : '';

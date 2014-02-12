@@ -178,7 +178,6 @@ function getNewsletterRecipients($sendQuery, $sendParams, $start, $increment, $c
 			'is_activated' => 1,
 		))
 	);
-
 	while ($row = $db->fetch_assoc($result))
 		$recipients[] = $row;
 	$db->free_result($result);

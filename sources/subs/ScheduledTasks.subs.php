@@ -17,7 +17,7 @@ if (!defined('ELK'))
 /**
  * Calculate the next time the passed tasks should be triggered.
  *
- * @param array $tasks = array() the tasks
+ * @param string[]|string $tasks = array() the tasks
  * @param boolean $forceUpdate
  */
 function calculateNextTrigger($tasks = array(), $forceUpdate = false)
@@ -108,7 +108,6 @@ function next_time($regularity, $unit, $offset, $immediate = false)
 		$regularity = 2;
 
 	$curMin = date('i', time());
-	$next_time = 9999999999;
 
 	// If we have scheduleTaskImmediate running, then it's 10 seconds
 	if (empty($unit) && $immediate)
@@ -232,7 +231,7 @@ function logTask($id_log, $task_id, $total_time = null)
  * All the scheduled tasks associated with the id passed to
  * the function are enabled, while the remaining are disabled
  *
- * @param array $enablers array od task IDs
+ * @param integer[] $enablers array od task IDs
  */
 function updateTaskStatus($enablers)
 {

@@ -24,9 +24,9 @@ if (!defined('ELK'))
  * Get the number of mod log entries.
  * Callback for createList() in Modlog::action_log().
  *
- * @param $query_string
- * @param $query_params
- * @param $log_type
+ * @param string|null $query_string
+ * @param mixed[] $query_params
+ * @param int $log_type
  */
 function list_getModLogEntryCount($query_string = '', $query_params = array(), $log_type = 1)
 {
@@ -66,8 +66,8 @@ function list_getModLogEntryCount($query_string = '', $query_params = array(), $
  * @param int $start
  * @param int $items_per_page
  * @param string $sort
- * @param array $query_string
- * @param array $query_params
+ * @param string|null $query_string
+ * @param mixed[] $query_params
  * @param int $log_type
  */
 function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '', $query_params = array(), $log_type = 1)
@@ -368,7 +368,7 @@ class ModLogEntriesReplacement
  *
  * @param int $id_log
  * @param int $time
- * @param array $delete
+ * @param string[]|null $delete
  */
 function deleteLogAction($id_log, $time, $delete = null)
 {

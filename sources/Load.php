@@ -1110,7 +1110,7 @@ function detectBrowser()
  *
  * Wrapper function for detectBrowser
  * @param string $browser  the browser we are checking for.
-*/
+ */
 function isBrowser($browser)
 {
 	global $context;
@@ -1733,9 +1733,10 @@ function loadEssentialThemeData()
  *
  * @uses the template_include() function to include the file.
  * @param string $template_name
- * @param array $style_sheets = array()
+ * @param string[]|string $style_sheets any style sheets to load with the template
  * @param bool $fatal = true if fatal is true, dies with an error message if the template cannot be found
- * @return boolean
+ *
+ * @return boolean|null
  */
 function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 {
@@ -1822,7 +1823,8 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
  * @todo get rid of reading $_REQUEST directly
  *
  * @param string $sub_template_name
- * @param bool $fatal = false, $fatal = true is for templates that shouldn't get a 'pretty' error screen.
+ * @param bool|string $fatal = false, $fatal = true is for templates that shouldn't get a 'pretty' error screen
+ *			'ignore' to skip
  */
 function loadSubTemplate($sub_template_name, $fatal = false)
 {
@@ -1853,7 +1855,7 @@ function loadSubTemplate($sub_template_name, $fatal = false)
  * Add a CSS file for output later
  *
  * @param mixed $filenames string or array of filenames to work on
- * @param array $params = array()
+ * @param mixed[] $params = array()
  *		Keys are the following:
  *			- ['local'] (true/false): define if the file is local
  *			- ['fallback'] (true/false): if false  will attempt to load the file from the default theme
@@ -1938,7 +1940,7 @@ function loadCSSFile($filenames, $params = array(), $id = '')
  * need specific parameters on a per file basis, call it multiple times
  *
  * @param mixed $filenames string or array of filenames to work on
- * @param array $params = array()
+ * @param mixed[] $params = array()
  *		Keys are the following:
  *			- ['local'] (true/false): define if the file is local
  *			- ['defer'] (true/false): define if the file should load in <head> or before the closing <html> tag
@@ -2022,7 +2024,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 /**
  * Add a Javascript variable for output later (for feeding text strings and similar to JS)
  *
- * @param array $vars array of vars to include in the output done as 'varname' => 'var value'
+ * @param mixed[] $vars array of vars to include in the output done as 'varname' => 'var value'
  * @param bool $escape = false, whether or not to escape the value
  */
 function addJavascriptVar($vars, $escape = false)
@@ -2272,7 +2274,7 @@ function getLanguages($use_cache = true)
 			$dir = dir($language_dir);
 			while ($entry = $dir->read())
 			{
-				// Only directories are intereting
+				// Only directories are interesting
 				if ($entry == '..' || !is_dir($dir->path . '/' . $entry))
 					continue;
 
@@ -2594,8 +2596,9 @@ function loadDatabase()
  *
  * @todo this function seems more useful than expected, it should be improved. :P
  *
- * @param array $profile
- * @return array $avatar
+ * @param mixed[] $profile array containing the users profile data
+ *
+ * @return mixed[] $avatar
  */
 function determineAvatar($profile)
 {

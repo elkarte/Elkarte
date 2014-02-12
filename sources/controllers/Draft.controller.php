@@ -79,9 +79,7 @@ class Draft_Controller extends Action_Controller
 			$_REQUEST['viewscount'] = 10;
 
 		// Get things started
-		$user_drafts = array();
 		$msgCount = draftsCount($memID, 0);
-
 		$maxIndex = (int) $modSettings['defaultMaxMessages'];
 
 		// Make sure the starting place makes sense and construct our friend the page index.
@@ -201,7 +199,6 @@ class Draft_Controller extends Action_Controller
 		}
 
 		// Init
-		$user_drafts = array();
 		$maxIndex = (int) $modSettings['defaultMaxMessages'];
 
 		// Default to 10.

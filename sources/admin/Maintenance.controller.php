@@ -521,6 +521,7 @@ class Maintenance_Controller extends Action_Controller
 
 		isAllowedTo('admin_forum');
 
+		// Some validation
 		checkSession('post');
 		validateToken('admin-maint');
 
@@ -1378,7 +1379,7 @@ class Maintenance_Controller extends Action_Controller
 	 *
 	 * @return int
 	 */
-	function list_getIntegrationHooksCount()
+	public function list_getIntegrationHooksCount()
 	{
 		global $context;
 
@@ -1396,7 +1397,7 @@ class Maintenance_Controller extends Action_Controller
 	 * @param int $per_page
 	 * @param string $sort
 	 */
-	function list_getIntegrationHooks($start, $per_page, $sort)
+	public function list_getIntegrationHooks($start, $per_page, $sort)
 	{
 		return list_integration_hooks_data($start, $per_page, $sort);
 	}

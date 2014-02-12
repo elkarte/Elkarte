@@ -40,7 +40,7 @@ class Recent_Controller extends Action_Controller
 	 * Find the ten most recent posts.
 	 * Accessed by action=recent.
 	 */
-	function action_recent()
+	public function action_recent()
 	{
 		global $txt, $scripturl, $user_info, $context, $modSettings, $board;
 
@@ -265,7 +265,7 @@ class Recent_Controller extends Action_Controller
 	 * Find unread topics and replies.
 	 * Accessed by action=unread and action=unreadreplies
 	 */
-	function action_unread()
+	public function action_unread()
 	{
 		global $board, $txt, $scripturl;
 		global $user_info, $context, $settings, $modSettings, $options;

@@ -65,6 +65,14 @@ class Mentions_Controller extends Action_Controller
 	protected $_type = '';
 
 	/**
+	 * The url of the display mentions button (all, unread, etc)
+	 *
+	 * @var string
+	 */
+	protected $_url_param = '';
+	protected $_page = '';
+
+	/**
 	 * Determine if we are looking only at unread mentions or any kind of
 	 *
 	 * @var boolean
@@ -373,7 +381,7 @@ class Mentions_Controller extends Action_Controller
 	 * @param array $mentions : Mentions retrieved from the database by getUserMentions
 	 * @param string $type : the type of the mention
 	 */
-	function prepareMentionMessage(&$mentions, $type)
+	public function prepareMentionMessage(&$mentions, $type)
 	{
 		global $txt, $scripturl, $context, $modSettings, $user_info;
 
@@ -589,10 +597,7 @@ class Mentions_Controller extends Action_Controller
 		$this->_validator->sanitation_rules($sanitization);
 		$this->_validator->validation_rules($validation);
 
-		if (!$this->_validator->validate($this->_data))
-			return false;
-
-		return true;
+		return $this->_validator->validate($this->_data);
 	}
 
 	/**

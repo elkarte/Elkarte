@@ -64,6 +64,12 @@ class ManageFeatures_Controller extends Action_Controller
 	protected $_mentionSettings;
 
 	/**
+	 * Mentions settings form
+	 * @var Settings_Form
+	 */
+	protected $_PMSettings;
+
+	/**
 	 * This function passes control through to the relevant tab.
 	 * @see Action_Controller::action_index()
 	 *
@@ -1414,6 +1420,9 @@ class ManageFeatures_Controller extends Action_Controller
 		$reg_fields = isset($modSettings['registration_fields']) ? explode(',', $modSettings['registration_fields']) : array();
 		$can_personal_text = !in_array('personal_text', $disabled_fields) && !in_array('personal_text', $reg_fields);
 
+		// Show / hide custom jquery fields as required
+		addInlineJavascript('showhideJqueryOptions();', true);
+
 		$config_vars = array(
 				// Basic stuff, titles, permissions...
 				array('check', 'allow_guestAccess'),
@@ -1426,6 +1435,10 @@ class ManageFeatures_Controller extends Action_Controller
 			'',
 				// Javascript and CSS options
 				array('select', 'jquery_source', array('auto' => $txt['jquery_auto'], 'local' => $txt['jquery_local'], 'cdn' => $txt['jquery_cdn'])),
+				array('check', 'jquery_default', 'onchange' => 'showhideJqueryOptions();'),
+				array('text', 'jquery_version', 'postinput' => $txt['jquery_custom_after']),
+				array('check', 'jqueryui_default', 'onchange' => 'showhideJqueryOptions();'),
+				array('text', 'jqueryui_version', 'postinput' => $txt['jqueryui_custom_after']),
 				array('check', 'minify_css_js'),
 			'',
 				// SEO stuff
@@ -1455,6 +1468,7 @@ class ManageFeatures_Controller extends Action_Controller
 		if (function_exists('timezone_identifiers_list') && function_exists('date_default_timezone_set'))
 		{
 			$all_zones = timezone_identifiers_list();
+
 			// Make sure we set the value to the same as the printed value.
 			foreach ($all_zones as $zone)
 				$config_vars['default_timezone'][2][$zone] = $zone;

@@ -24,7 +24,7 @@ if (!defined('ELK'))
 /**
  * Mark a board or multiple boards read.
  *
- * @param array $boards
+ * @param int[]|int $boards
  * @param bool $unread = false
  * @param bool $resetTopics = false
  */
@@ -195,7 +195,7 @@ function getMsgMemberID($messageID)
  * Used by ManageBoards.controller.php to change the settings of a board.
  *
  * @param int $board_id
- * @param array $boardOptions
+ * @param mixed[] $boardOptions
  */
 function modifyBoard($board_id, &$boardOptions)
 {
@@ -391,7 +391,7 @@ function modifyBoard($board_id, &$boardOptions)
 
 	// Do the updates (if any).
 	if (!empty($boardUpdates))
-		$request = $db->query('', '
+		$db->query('', '
 			UPDATE {db_prefix}boards
 			SET
 				' . implode(',
@@ -483,7 +483,7 @@ function modifyBoard($board_id, &$boardOptions)
  * With the option inherit_permissions set, the parent board permissions
  * will be inherited.
  *
- * @param array $boardOptions
+ * @param mixed[] $boardOptions
  * @return int The new board id
  */
 function createBoard($boardOptions)
@@ -575,8 +575,8 @@ function createBoard($boardOptions)
  *   - all information that's associated with the given boards;
  * updates the statistics to reflect the new situation.
  *
- * @param array $boards_to_remove
- * @param array $moveChildrenTo = null
+ * @param int[] $boards_to_remove
+ * @param int|null $moveChildrenTo = null
  */
 function deleteBoards($boards_to_remove, $moveChildrenTo = null)
 {
@@ -922,7 +922,7 @@ function getBoardTree()
  * Generates the query to determine the list of available boards for a user
  * Executes the query and returns the list
  *
- * @param array $boardListOptions
+ * @param mixed[] $boardListOptions
  * @param boolean $simple if true a simple array is returned containing some basic
  *                informations regarding the board (id_board, board_name, child_level, id_cat, cat_name)
  *                if false the boards are returned in an array subdivided by categories including also
@@ -1113,8 +1113,8 @@ function getBoardList($boardListOptions = array(), $simple = false)
  * Recursively get a list of boards.
  * Used by getBoardTree
  *
- * @param array $_boardList
- * @param array $_tree
+ * @param int[] $_boardList
+ * @param int[] $_tree
  */
 function recursiveBoards(&$_boardList, &$_tree)
 {
@@ -1131,7 +1131,7 @@ function recursiveBoards(&$_boardList, &$_tree)
 /**
  * Returns whether the sub-board id is actually a child of the parent (recursive).
  * @param int $child
- * @param int $parent
+ * @param mixed[]|int $parent
  * @return boolean
  */
 function isChildOf($child, $parent)
@@ -1307,8 +1307,8 @@ function getBoardNotificationsCount($memID)
  *
  * The function doesn't guarantee the boards are properly sorted
  *
- * @param array $id_parents array of ints representing board ids
- * @param array $id_boards
+ * @param int[]|null $id_parents array of ints representing board ids
+ * @param int[]|null $id_boards
  */
 function accessibleBoards($id_parents = null, $id_boards = null)
 {
@@ -1401,7 +1401,7 @@ function wantedBoards($see_board, $hide_recycle = true)
  *  - honors query_see_board to ensure a user can see the information
  *
  * @param int $board_id
- * @param int $topic_id
+ * @param int|null $topic_id
  */
 function boardInfo($board_id, $topic_id = null)
 {
@@ -1648,8 +1648,8 @@ function getBoardProperties($idboard)
 
 /**
  * Fetch the number of posts in an array of boards based on board IDs or category IDs
- * @param array $boards an array of board IDs
- * @param array $categories an array of category IDs
+ * @param int[]|null $boards an array of board IDs
+ * @param int[]|null $categories an array of category IDs
  * @param bool $wanna_see_board if true uses {query_wanna_see_board}, otherwise {query_see_board}
  */
 function boardsPosts($boards, $categories, $wanna_see_board = false)
@@ -1658,11 +1658,13 @@ function boardsPosts($boards, $categories, $wanna_see_board = false)
 
 	$clauses = array();
 	$clauseParameters = array();
+
 	if (!empty($categories))
 	{
 		$clauses[] = 'id_cat IN ({array_int:category_list})';
 		$clauseParameters['category_list'] = $categories;
 	}
+
 	if (!empty($boards))
 	{
 		$clauses[] = 'id_board IN ({array_int:board_list})';
@@ -1691,16 +1693,16 @@ function boardsPosts($boards, $categories, $wanna_see_board = false)
 /**
  * Returns information of a set of boards based on board IDs or category IDs
  *
- * @param mixed $conditions is an associative array that holds the board or the cat IDs
+ * @param mixed[]|string $conditions is an associative array that holds the board or the cat IDs
  *              'categories' => an array of category IDs (it accepts a single ID too)
  *              'boards' => an array of board IDs (it accepts a single ID too)
  *              if conditions is set to 'all' (not an array) all the boards are queried
- * @param array $params is an optional array that allows to control the results returned:
+ * @param mixed[] $params is an optional array that allows to control the results returned:
  *              'sort_by' => (string) defines the sorting of the results (allowed: id_board, name)
  *              'selects' => (string) determines what informations are retrieved and returned
  *                           Allowed values: 'name', 'posts', 'detailed', 'permissions', 'reports';
  *                           default: 'name';
- *                           see the function for detailes on the fields associated to each value
+ *                           see the function for details on the fields associated to each value
  *              'override_permissions' => (bool) if true doesn't use neither {query_wanna_see_board} nor {query_see_board} (default false)
  *              'wanna_see_board' => (bool) if true uses {query_wanna_see_board}, otherwise {query_see_board}
  *              'include_recycle' => (bool) recycle board is included (default true)
@@ -1746,7 +1748,7 @@ function fetchBoardsInfo($conditions = 'all', $params = array())
 
 	$select = $known_selects[empty($params['selects']) || !isset($known_selects[$params['selects']]) ? 'name' : $params['selects']];
 
-	// if $conditions wasn't set or is 'all', get all boards
+	// If $conditions wasn't set or is 'all', get all boards
 	if (!is_array($conditions) && $conditions == 'all')
 	{
 		// id_board, name, id_profile => used in admin/Reports.controller.php
@@ -1759,14 +1761,14 @@ function fetchBoardsInfo($conditions = 'all', $params = array())
 	}
 	else
 	{
-		// only some categories?
+		// Only some categories?
 		if (!empty($conditions['categories']))
 		{
 			$clauses[] = 'id_cat IN ({array_int:category_list})';
 			$clauseParameters['category_list'] = is_array($conditions['categories']) ? $conditions['categories'] : array($conditions['categories']);
 		}
 
-		// only a few boards, perhaps!
+		// Only a few boards, perhaps!
 		if (!empty($conditions['boards']))
 		{
 			$clauses[] = 'id_board IN ({array_int:board_list})';
@@ -1792,7 +1794,6 @@ function fetchBoardsInfo($conditions = 'all', $params = array())
 			))
 		);
 	}
-
 	$return = array();
 	while ($row = $db->fetch_assoc($request))
 		$return[$row['id_board']] = $row;
@@ -1805,7 +1806,7 @@ function fetchBoardsInfo($conditions = 'all', $params = array())
 /**
  * Retrieve the all the sub-boards of an array of boards
  * and add the ids to the same array
- * @param mixed $boards an array of board IDs (it accepts a single board too
+ * @param int[]|int $boards an array of board IDs (it accepts a single board too
  *              The param is passed by ref and the result it returned through the param itself
  */
 function addChildBoards(&$boards)
@@ -1838,7 +1839,7 @@ function addChildBoards(&$boards)
  * Increment a board stat field, for example num_posts.
  *
  * @param int $id_board
- * @param mixed $values an array of index => value of a string representing the index to increment
+ * @param mixed[]|string $values an array of index => value of a string representing the index to increment
  */
 function incrementBoard($id_board, $values)
 {
@@ -1881,7 +1882,7 @@ function incrementBoard($id_board, $values)
  * Decrement a board stat field, for example num_posts.
  *
  * @param int $id_board
- * @param mixed $values an array of index => value of a string representing the index to decrement
+ * @param mixed[] $values an array of index => value of a string representing the index to decrement
  */
 function decrementBoard($id_board, $values)
 {
@@ -1998,11 +1999,11 @@ function boardNotifications($start, $items_per_page, $sort, $memID)
 /**
  * Count boards all or specific depending on argument, redirect boards excluded by default.
  *
- * @param mixed $conditions is an associative array that holds the board or the cat IDs
+ * @param mixed[] $conditions is an associative array that holds the board or the cat IDs
  *              'categories' => an array of category IDs (it accepts a single ID too)
  *              'boards' => an array of board IDs (it accepts a single ID too)
  *              if conditions is set to 'all' (not an array) all the boards are queried
- * @param array $params is an optional array that allows to control the results returned if $conditions is not set to 'all':
+ * @param mixed[]|null $params is an optional array that allows to control the results returned if $conditions is not set to 'all':
  *              'wanna_see_board' => (bool) if true uses {query_wanna_see_board}, otherwise {query_see_board}
  *              'include_recycle' => (bool) recycle board is included (default true)
  *              'include_redirects' => (bool) redirects are included (default true)

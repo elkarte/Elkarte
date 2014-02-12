@@ -3,7 +3,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta 2
  *
  * This file contains javascript utility functions specific to ElkArte
  */
@@ -294,7 +294,7 @@ function relativeTime(sFrom, sTo)
 	}
 	else if (parseInt(sTo) == 'NaN')
 	{
-		sToSplit = sTo.split(/\D/);
+		var sToSplit = sTo.split(/\D/);
 		this.dateTo = new Date(sToSplit[0], --sToSplit[1], sToSplit[2], sToSplit[3], sToSplit[4]);
 	}
 	else
@@ -302,7 +302,7 @@ function relativeTime(sFrom, sTo)
 
 	if (parseInt(sFrom) == 'NaN')
 	{
-		sFromSplit = sFrom.split(/\D/);
+		var sFromSplit = sFrom.split(/\D/);
 		this.dateFrom = new Date(sFromSplit[0], --sFromSplit[1], sFromSplit[2], sFromSplit[3], sFromSplit[4]);
 	}
 	else
@@ -475,12 +475,14 @@ function revalidateMentions(sForm, sInput)
 
 			for (var k = 0, ccount = cached_queries.length; k < ccount; k++)
 			{
-				names = cached_names[cached_queries[k]];
+				var names = cached_names[cached_queries[k]];
+
 				for (var l = 0, ncount = names.length; l < ncount; l++)
 				{
 					if(checkWordOccurrence(body, names[l].name)) {
 						// alert(names[l].name);
 						pos = body.indexOf(' @' + names[l].name);
+
 						// If there is something like "{space}@username" AND the following char is a space or a punctation mark
 						if (pos !== -1 && body.charAt(pos + 2 + names[l].name.length + 1).search(boundaries_pattern) === 0)
 							mentions.append($('<input type="hidden" name="uid[]" />').val(names[l].id));
@@ -657,7 +659,7 @@ function add_elk_mention(selector, oOptions)
 				postdata += '&received=' + receiver;
 
 				if (oSettings.token !== '')
-					postdata += '&' + oSettings.token['token_var'] + '=' + oSettings.token['token_id'];
+					postdata += '&' + oSettings.token.token_var + '=' + oSettings.token.token_id;
 
 				// And with the post data prepared, lets make the ajax request
 				$.ajax({
@@ -716,8 +718,8 @@ function add_elk_mention(selector, oOptions)
 					if (textStatus === 'success' && $(data).find("elk > tokens > token").length !== 0)
 					{
 						// Reset the token
-						oSettings.token['token_id'] = $(data).find("tokens").find('[type="token"]').text();
-						oSettings.token['token_var'] = $(data).find("tokens").find('[type="token_var"]').text();
+						oSettings.token.token_id = $(data).find("tokens").find('[type="token"]').text();
+						oSettings.token.token_var = $(data).find("tokens").find('[type="token_var"]').text();
 					}
 				});
 			}
@@ -788,7 +790,7 @@ function setBoardIds() {
 ;(function($) {
 	$.fn.expand_pages = function() {
 		var $container,
-			lastPositions = new Array();
+			lastPositions = [];
 
 		// Hovering over an ... we expand it as much as we can
 		function hover_expand($element)
@@ -906,7 +908,7 @@ function setBoardIds() {
 				'padding-left': $container.find('#pages_scroll_left').outerWidth(),
 				'margin-left': lastPositions[firstpage]
 			});
-		};
+		}
 
 		// Used when the user clicks on the ... to expand instead of just a hover expand
 		function expand_pages($element)
@@ -1032,7 +1034,7 @@ function setBoardIds() {
 		var positionTooltip = function(event)
 		{
 			var iPosx = 0,
-					iPosy = 0;
+				iPosy = 0;
 
 			if (!event)
 				event = window.event;
@@ -1168,7 +1170,6 @@ function setBoardIds() {
 				hideTooltip(this);
 				return true;
 			});
-
 		});
 	};
 })(jQuery);
@@ -1320,23 +1321,23 @@ errorbox_handler.prototype.removeError = function(error_box, error_elem)
 function addAnotherOption(parent, oDtName, oDdName, oData)
 {
 	// Some defaults to use if none are passed
-	oDtName['type'] = oDtName['type'] || 'text';
-	oDtName['class'] = oDtName['class'] || 'input_text';
-	oDtName['size'] = oDtName['size'] || '20';
+	oDtName['type'] = oDtName.type || 'text';
+	oDtName['class'] = oDtName.class || 'input_text';
+	oDtName['size'] = oDtName.size || '20';
 
-	oDdName['type'] = oDdName['type'] || 'text';
-	oDdName['class'] = oDdName['class'] || 'input_text';
-	oDdName['size'] = oDdName['size'] || '20';
+	oDdName['type'] = oDdName.type || 'text';
+	oDdName['class'] = oDdName.class || 'input_text';
+	oDdName['size'] = oDdName.size || '20';
 	oData = oData || '';
 
 	// Our new <dt> element
 	var newDT = document.createElement('dt'),
 		newInput = document.createElement('input');
 
-	newInput.name = oDtName['name'];
-	newInput.type = oDtName['type'];
+	newInput.name = oDtName.name;
+	newInput.type = oDtName.type;
 	newInput.setAttribute('class', oDtName['class']);
-	newInput.size = oDtName['size'];
+	newInput.size = oDtName.size;
 	newDT.appendChild(newInput);
 
 	// And its matching <dd>
@@ -1348,9 +1349,9 @@ function addAnotherOption(parent, oDtName, oDdName, oData)
 	else
 		newInput = document.createElement('select');
 
-	newInput.name = oDdName['name'];
-	newInput.type = oDdName['type'];
-	newInput.size = oDdName['size'];
+	newInput.name = oDdName.name;
+	newInput.type = oDdName.type;
+	newInput.size = oDdName.size;
 	newInput.setAttribute('class', oDdName['class']);
 	newDD.appendChild(newInput);
 

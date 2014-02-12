@@ -384,7 +384,7 @@ class ManageNews_Controller extends Action_Controller
 			foreach ($toClean as $type)
 			{
 				// Remove the quotes.
-				$_POST[$type] = strtr($_POST[$type], array('\\"' => '"'));
+				$_POST[$type] = strtr((string) $_POST[$type], array('\\"' => '"'));
 
 				preg_match_all('~"([^"]+)"~', $_POST[$type], $matches);
 				$_POST[$type] = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $_POST[$type]))));

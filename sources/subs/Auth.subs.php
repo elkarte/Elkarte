@@ -122,7 +122,6 @@ function setLoginCookie($cookie_length, $id, $password = '')
  *
  * @param bool $local
  * @param bool $global
- * @return array an array to set the cookie on with domain and path in it, in that order
  */
 function url_parts($local, $global)
 {
@@ -221,7 +220,7 @@ function adminLogin($type = 'admin')
  * if 'value' is an array, the function is called recursively.
  *
  * @param string $k key
- * @param string $v value
+ * @param string|boolean $v value
  * @return string 'hidden' HTML form fields, containing key-value-pairs
  */
 function adminLogin_outputPostVars($k, $v)
@@ -242,8 +241,8 @@ function adminLogin_outputPostVars($k, $v)
 /**
  * Properly urlencodes a string to be used in a query
  *
- * @param array $get
- * @return our query string
+ * @param mixed[] $get associative array from $_GET
+ * @return string query string
  */
 function construct_query_string($get)
 {
@@ -283,7 +282,7 @@ function construct_query_string($get)
  * - searches for members whose username, display name, or e-mail address match the given pattern of array names.
  * - searches only buddies if buddies_only is set.
  *
- * @param array $names
+ * @param string[]|string $names
  * @param bool $use_wildcards = false, accepts wildcards ? and * in the patern if true
  * @param bool $buddies_only = false,
  * @param int $max = 500 retrieves a maximum of max members, if passed
@@ -376,7 +375,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
  * - if username is not set, only a new password is generated and sent.
  *
  * @param int $memID
- * @param string $username = null
+ * @param string|null $username = null
  */
 function resetPassword($memID, $username = null)
 {
@@ -442,7 +441,7 @@ function resetPassword($memID, $username = null)
  *
  * @param int $memID
  * @param string $username
- * @param boolean $error_context
+ * @param string $error_context
  * @param boolean $check_reserved_name
  * @return string Returns null if fine
  */
@@ -484,7 +483,7 @@ function validateUsername($memID, $username, $error_context = 'register', $check
  *
  * @param string $password
  * @param string $username
- * @param array $restrict_in = array()
+ * @param string[] $restrict_in = array()
  * @return string an error identifier if the password is invalid
  */
 function validatePassword($password, $username, $restrict_in = array())
@@ -524,7 +523,7 @@ function validatePassword($password, $username, $restrict_in = array())
  *
  * @param string $password user password if not already 64 characters long will be SHA256 with the user name
  * @param string $hash hash as generated from a SHA256 password
- * @param name $user user name only required if creating a SHA-256 password
+ * @param string $user user name only required if creating a SHA-256 password
  * @param boolean $returnhash flag to determine if we are returning a hash suitable for the database
  */
 function validateLoginPassword(&$password, $hash, $user = '', $returnhash = false)
@@ -652,8 +651,8 @@ function rebuildModCache()
  * @param int $expire = 0
  * @param string $path = ''
  * @param string $domain = ''
- * @param bool $secure = false
- * @param bool $httponly = null
+ * @param boolean|null $secure = false
+ * @param boolean|null $httponly = null
  */
 function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = '', $secure = null, $httponly = null)
 {
@@ -688,7 +687,7 @@ function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = ''
 /**
  * Set the passed users online or not, in the online log table
  *
- * @param array|int $ids ids of the member(s) to log
+ * @param int[]|int $ids ids of the member(s) to log
  * @param bool $on = false if true, add the user(s) to online log, if false, remove 'em
  */
 function logOnline($ids, $on = false)
@@ -797,7 +796,7 @@ function findUser($where, $where_params, $fatal = true)
  * Find users by their email address.
  *
  * @param string $email
- * @return int
+ * @return boolean
  */
 function userByEmail($email)
 {
@@ -847,7 +846,7 @@ function generateValidationCode()
  * @param string $name
  * @param bool $is_id if true it treats $name as a member ID and try to load the data for that ID
  *
- * @return mixed, array or false if nothing is found
+ * @return mixed[]|false false if nothing is found
  */
 function loadExistingMember($name, $is_id = false)
 {

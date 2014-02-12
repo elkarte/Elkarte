@@ -86,25 +86,6 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// This is the menu structure - refer to subs/Menu.subs.php for the details.
 		$moderation_areas = array(
-			array(
-				'main' => array(
-					'title' => $txt['mc_main'],
-				),
-				'logs' => array(
-					'title' => $txt['mc_logs'],
-				),
-				'posts' => array(
-					'title' => $txt['mc_posts'] . (!empty($mod_counts['pt_total']) ? ' [' . $mod_counts['pt_total'] . ']' : ''),
-					'enabled' => $context['can_moderate_boards'] || $context['can_moderate_approvals'],
-				),
-				'groups' => array(
-					'title' => $txt['mc_groups'] . (!empty($mod_counts['mg_total']) ? ' [' . $mod_counts['mg_total'] . ']' : ''),
-					'enabled' => $context['can_moderate_groups'],
-				),
-			)
-		);
-
-		$moderation_areas = array(
 			'main' => array(
 				'title' => $txt['mc_main'],
 				'areas' => array(

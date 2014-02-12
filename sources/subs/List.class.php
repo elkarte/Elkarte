@@ -2,7 +2,7 @@
 
 /**
  * This class implements a standard way of displaying lists.
- * 
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -57,7 +57,7 @@ class Generic_List
 	 * Makes sure the passed list contains the miniumn needed options to create a list
 	 * Loads the options in to this instance
 	 *
-	 * @param array $listOptions
+	 * @param mixed[] $listOptions
 	 */
 	public function __construct($listOptions)
 	{
@@ -77,7 +77,7 @@ class Generic_List
 	/**
 	 * Validate the options sent
 	 *
-	 * @param array $listOptions
+	 * @param mixed[] $listOptions
 	 */
 	protected function _validateListOptions($listOptions)
 	{
@@ -363,7 +363,7 @@ class Generic_List
 /**
  * This function creates a new GenericList from all the passed options.
  *
- * @param array $listOptions
+ * @param mixed[] $listOptions associative array of option => value
  */
 function createList($listOptions)
 {

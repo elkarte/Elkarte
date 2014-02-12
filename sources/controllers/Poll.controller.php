@@ -113,7 +113,6 @@ class Poll_Controller extends Action_Controller
 		elseif (!empty($row['change_vote']) && !$user_info['is_guest'] && empty($_POST['options']))
 		{
 			checkSession('request');
-			$pollOptions = array();
 
 			// Find out what they voted for before.
 			$pollOptions = determineVote($user_info['id'], $row['id_poll']);

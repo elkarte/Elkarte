@@ -28,7 +28,7 @@ if (!defined('ELK'))
  * @param string $key cache entry key
  * @param string $file file to include
  * @param string $function function to call
- * @param array $params parameters sent to the function
+ * @param mixed[] $params parameters sent to the function
  * @param int $level = 1
  * @return string
  */
@@ -205,7 +205,6 @@ function cache_put_data($key, $value, $ttl = 120)
  *
  * @param string $key
  * @param int $ttl = 120
- * @return string
  */
 function cache_get_data($key, $ttl = 120)
 {

@@ -990,11 +990,11 @@ function sendtopicForm(oPopup_body, url, oContainer)
 
 		data = $this_form.serialize() + '&send=1';
 
-		send_comment = $this_form.find('input[name="comment"]').val();
-		sender_name = $this_form.find('input[name="y_name"]').val();
-		sender_mail = $this_form.find('input[name="y_email"]').val();
-		recipient_name = $this_form.find('input[name="r_name"]').val();
-		recipient_mail = $this_form.find('input[name="r_email"]').val();
+		var send_comment = $this_form.find('input[name="comment"]').val(),
+			sender_name = $this_form.find('input[name="y_name"]').val(),
+			sender_mail = $this_form.find('input[name="y_email"]').val,
+			recipient_name = $this_form.find('input[name="r_name"]').val(),
+			recipient_mail = $this_form.find('input[name="r_email"]').val();
 
 		var missing_elems = false;
 		if (sender_name === '')

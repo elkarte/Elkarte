@@ -222,7 +222,6 @@ class PersonalMessage_Controller extends Action_Controller
 		}
 
 		// Make sure the starting location is valid.
-		$start = '';
 		if (isset($_GET['start']) && $_GET['start'] !== 'new')
 			$start = (int) $_GET['start'];
 		elseif (!isset($_GET['start']) && !empty($options['view_newest_pm_first']))
@@ -1361,7 +1360,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Load up the fields.
 		require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
 		$controller = new ProfileOptions_Controller();
-		$controller->action_pmprefs($user_info['id']);
+		$controller->action_pmprefs();
 	}
 
 	/**
@@ -2151,7 +2150,7 @@ class PersonalMessage_Controller extends Action_Controller
 					$query = trim($query, "\*+");
 					$query = strtr(Util::htmlspecialchars($query), array('\\\'' => '\''));
 
-					$body_highlighted = preg_replace_callback('/((<[^>]*)|' . preg_quote(strtr($query, array('\'' => '&#039;')), '/') . ')/iu', create_function('$m', 'return isset($m[2]) && "$m[2]" == "$m[1]" ? stripslashes("$m[1]") : "<strong class=\"highlight\">$m[1]</strong>";'), $row['body']);
+					$body_highlighted = preg_replace_callback('/((<[^>]*)|' . preg_quote(strtr($query, array('\'' => '&#039;')), '/') . ')/iu', array($this, '_highlighted_callback'), $row['body']);
 					$subject_highlighted = preg_replace('/(' . preg_quote($query, '/') . ')/iu', '<strong class="highlight">$1</strong>', $row['subject']);
 				}
 
@@ -2185,6 +2184,17 @@ class PersonalMessage_Controller extends Action_Controller
 			'url' => $scripturl . '?action=pm;sa=search',
 			'name' => $txt['pm_search_bar_title'],
 		);
+	}
+
+	/**
+	 * Used to highlight body text with strings that match the search term
+	 * Callback function used in $body_highlighted
+	 * 
+	 * @param string[] $matches
+	 */
+	private function _highlighted_callback($matches)
+	{
+		return isset($matches[2]) && $matches[2] == $matches[1] ? stripslashes($matches[1]) : '<strong class="highlight">' . $matches[1] . '</strong>';
 	}
 
 	/**
@@ -2686,7 +2696,7 @@ function messagePostError($named_recipients, $recipient_ids = array())
  *
  * @param int $member_id
  * @param int $id_pm = false if set, it will try to load drafts for this id
- * @return boolean
+ * @return false|null
  */
 function prepareDraftsContext($member_id, $id_pm = false)
 {
@@ -2713,8 +2723,9 @@ function prepareDraftsContext($member_id, $id_pm = false)
 	// Add them to the context draft array for template display
 	foreach ($user_drafts as $draft)
 	{
+		$short_subject = empty($draft['subject']) ? $txt['drafts_none'] : shorten_text(stripslashes($draft['subject']), !empty($modSettings['draft_subject_length']) ? $modSettings['draft_subject_length'] : 24);
 		$context['drafts'][] = array(
-			'subject' => empty($draft['subject']) ? $txt['drafts_none'] : censorText(shorten_text(stripslashes($draft['subject']), !empty($modSettings['draft_subject_length']) ? $modSettings['draft_subject_length'] : 24)),
+			'subject' => censorText($short_subject),
 			'poster_time' => standardTime($draft['poster_time']),
 				'link' => '<a href="' . $scripturl . '?action=pm;sa=send;id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
 			);

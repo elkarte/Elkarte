@@ -55,7 +55,7 @@ function reportsBoardsList()
  * Fetch membergroups names and ids
  *
  * @param string $group_clause a string used as WHERE cluase in the query
- * @param array $query_groups an array of group ids
+ * @param int[] $query_groups an array of group ids
  */
 function allMembergroups($group_clause, $query_groups = array())
 {
@@ -81,7 +81,6 @@ function allMembergroups($group_clause, $query_groups = array())
 			'moderator_group' => 3,
 		)
 	);
-
 	$member_groups = array();
 	while ($row = $db->fetch_assoc($request))
 		$member_groups[$row['id_group']] = $row['group_name'];
@@ -95,7 +94,7 @@ function allMembergroups($group_clause, $query_groups = array())
  *
  * @param array $profiles a list of board profile ids
  * @param string $group_clause a string used as WHERE cluase in the query
- * @param array $query_groups an array of group ids
+ * @param int[] $query_groups an array of group ids
  */
 function boardPermissions($profiles, $group_clause, $query_groups)
 {
@@ -177,9 +176,9 @@ function allMembergroupsBoardAccess()
 
 /**
  * Boards profiles and related permissions based on groups
- * 
+ *
  * @param string $group_clause a string used as WHERE cluase in the query
- * @param array $query_groups an array of group ids
+ * @param int[] $query_groups an array of group ids
  */
 function boardPermissionsByGroup($group_clause, $query_groups)
 {

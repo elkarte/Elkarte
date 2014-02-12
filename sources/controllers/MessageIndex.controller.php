@@ -796,8 +796,6 @@ class MessageIndex_Controller extends Action_Controller
 
 				if (!empty($topicRecounts))
 				{
-					$members = array();
-
 					// Get all the members who have posted in the moved topics.
 					$posters = topicsPosters(array_keys($topicRecounts));
 					foreach ($posters as $id_member => $topics)
