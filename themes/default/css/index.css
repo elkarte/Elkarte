@@ -4300,6 +4300,13 @@ a.help .icon {
 		max-width: 40px;
 		max-height: 40px;
 	}
+	ul.navigate_section li:not(:first-child):not(:last-child) a {
+		width: 3em;
+		display: inline-block;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
 }
 /* This one does 480px screens at default font size. */
 @media screen and (max-width: 30em) {
