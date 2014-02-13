@@ -196,6 +196,8 @@ $.sceditor.command
 		txtExec: ['[spoiler]', '[/spoiler]'],
 		tooltip: 'Insert Spoiler'
 	})
+	.set('space', {
+	})
 	.set('footnote', {
 		state: function() {
 			var currentNode = this.currentNode();
