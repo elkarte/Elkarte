@@ -70,7 +70,7 @@ function fetchMessageIconsDetails()
  *
  * @param int[] $icons
  */
-function deleteMessageIcon($icons)
+function deleteMessageIcons($icons)
 {
 	$db = database();
 
