@@ -113,26 +113,21 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					emoticons:
 					{}';
 
+	// Show all the editor command buttons
 	if ($context['show_bbc'] && $bbcContainer !== null)
 	{
 		echo ',
-					toolbar: "emoticon,';
-		$count_tags = count($context['bbc_tags']);
+					toolbar: "';
 
-		// create the tooltag to display the buttons in the editor
+		// Create the tooltag rows to display the buttons in the editor
 		foreach ($context['bbc_toolbar'] as $i => $buttonRow)
-		{
-			echo implode('|', $buttonRow);
-			$count_tags--;
-			if (!empty($count_tags))
-				echo '||';
-		}
+			echo implode('', $buttonRow), '||';
 
-		echo '",';
+		echo ',emoticon",';
 	}
 	else
 		echo ',
-					toolbar: "emoticon,source",';
+					toolbar: "source,emoticon",';
 
 	echo '
 				});
