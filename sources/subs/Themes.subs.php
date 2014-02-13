@@ -288,6 +288,32 @@ function loadThemes($knownThemes)
 }
 
 /**
+ * Load all themes that a package is installed in
+ *
+ * @param int $id id of the package we are checking
+ */
+function loadThemesAffected($id)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT themes_installed
+		FROM {db_prefix}log_packages
+		WHERE id_install = {int:install_id}
+		LIMIT 1',
+		array(
+			'install_id' => $id,
+		)
+	);
+	$themes = array();
+	while ($row = $db->fetch_row($request))
+		$themes = explode(',', $row[0]);
+	$db->free_result($request);
+
+	return $themes;
+}
+
+/**
  * Generates a file listing for a given directory
  *
  * @param string $path
