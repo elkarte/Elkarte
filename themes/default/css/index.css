@@ -789,7 +789,7 @@ a.bbc_link {
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	max-width: 24em;
+	max-width: 100%;
 	vertical-align: bottom;
 }
 
@@ -4228,10 +4228,6 @@ a.help .icon {
 	}
 	.postarea, .forumtitle {
 		padding: 2px;
-	}
-	a.bbc_link {
-		display: inline-block;
-		max-width: 16em;
 	}
 	.linktree .board_moderators, .linktree_last .board_moderators {
 		display: none;
