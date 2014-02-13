@@ -271,7 +271,7 @@ class Site_Combiner
 	 */
 	private function _combineFiles($type = null)
 	{
-		$i = false;
+		$i = '';
 
 		// Remove any old cache file(s)
 		@unlink($this->_archive_dir . '/' . $this->_archive_name);
@@ -290,8 +290,8 @@ class Site_Combiner
 				$tempfile = str_replace(array('../../webfonts', '../webfonts'), $file['url'] . '/webfonts', $tempfile);
 			}
 
-			$this->_cache .= (($i == true) ? "\n" : '') . $tempfile;
-			$i = true;
+			$this->_cache .= $i . $tempfile;
+			$i = "\n";
 		}
 	}
 
