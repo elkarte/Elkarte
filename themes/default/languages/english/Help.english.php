@@ -385,7 +385,7 @@ $helptxt['globalCookies'] = 'Makes login cookies available across subdomains.  F
 	Using this option will allow you to access the forum\'s cookie on your site.  Do not enable this if there are other subdomains (like hacker.elkarte.net) not controlled by you.<br />
 	This option does not function when local cookies are enabled.';
 $helptxt['globalCookiesDomain'] = 'Define the main domain to be used when login cookies are available across subdomains';
-$helptxt['httponlyCookies'] = 'With this setting on, Cookies will not be accessible by scripting languages, such as JavaScript. This setting can help to reduce identity theft through XSS attacks. This may cause issues with some third party scripts but is recommended to be on when possible.';
+$helptxt['httponlyCookies'] = 'With this setting on, cookies will not be accessible by scripting languages, such as JavaScript. This setting can help to reduce identity theft through XSS attacks. This may cause issues with some third party scripts but is recommended to be on when possible.';
 $helptxt['secureCookies'] = 'Enabling this option will force the cookies created for users on your forum to be marked as secure. Only enable this option if you are using HTTPS throughout your site as it will break cookie handling otherwise!';
 $helptxt['admin_session_lifetime'] = 'This controls the length of time an admin session can remain active. Once this timer expires the session will end, requiring you to enter your admin credentials to continue accessing the admin area. The minimum value is 5 minutes, the maximum allowed value is 14400 minutes (a day). It is strongly recommended to use a value less than 60 minutes for security reasons.';
 $helptxt['auto_admin_session'] = 'This controls  whether an administrative session is activated during logon or not.';
@@ -398,7 +398,7 @@ $helptxt['emailmembers'] = 'In this message you can use a few &quot;variables&qu
 	{$current_time} - The current time.<br />
 	{$member.email} - The current member\'s email.<br />
 	{$member.link} - The current member\'s link.<br />
-	{$member.id} - The current member\'s id.<br />
+	{$member.id} - The current member\'s ID.<br />
 	{$member.name} - The current member\'s name.  (for personalization.)<br />
 	{$latest_member.link} - The most recently registered member\'s link.<br />
 	{$latest_member.id} - The most recently registered member\'s id.<br />
