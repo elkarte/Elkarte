@@ -24,3 +24,18 @@
 	border-bottom: 1px dotted #000;
 }
 
+/* jQuery Dialog */
+.ui-dialog {
+	border: 1px solid #999;
+	box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.3);
+	background-color: #f5f5f5;
+	border-radius: 4px 4px 0 0;
+}
+.ui-dialog .ui-dialog-titlebar {
+	background-color: #fafafa;
+	border-radius: 4px 4px 0 0;
+}
+.ui-widget-overlay {
+	background-color: #000;
+	opacity: 0.3;
+}
