@@ -78,6 +78,20 @@ class Site_Combiner
 	private $_archive_url = null;
 
 	/**
+	 * The stale parameter added to the url
+	 *
+	 * @var string
+	 */
+	private $_archive_stale = '';
+
+	/**
+	 * All the cache-stale params added to the file urls
+	 *
+	 * @var string[]
+	 */
+	private $_stales = array();
+
+	/**
 	 * Nothing much to do but start
 	 *
 	 * @param string $cachedir
@@ -107,13 +121,7 @@ class Site_Combiner
 		{
 			// Get the ones that we would load locally so we can merge them
 			if (!empty($file['options']['local']) && (!$do_defered && empty($file['options']['defer'])) || ($do_defered && !empty($file['options']['defer'])))
-			{
-				$filename = $file['options']['dir'] . $file['options']['basename'];
-				$this->_combine_files[$file['options']['basename']]['file'] = $filename;
-				$this->_combine_files[$file['options']['basename']]['time'] = filemtime($filename);
-				$this->_combine_files[$file['options']['basename']]['basename'] = $file['options']['basename'];
-				$this->_combine_files[$file['options']['basename']]['url'] = $file['options']['url'];
-			}
+				$this->_addFile($file['options']);
 			// One off's get output now
 			elseif ((!$do_defered && empty($file['options']['defer'])) || ($do_defered && !empty($file['options']['defer'])))
 				echo '
@@ -145,7 +153,7 @@ class Site_Combiner
 		}
 
 		// Return the name for inclusion in the output
-		return $this->_archive_url . '/' . $this->_archive_name;
+		return $this->_archive_url . '/' . $this->_archive_name . $this->_archive_stale;
 	}
 
 	/**
@@ -164,13 +172,7 @@ class Site_Combiner
 		{
 			// Get the ones that we would load locally so we can merge them
 			if (!empty($file['options']['local']))
-			{
-				$filename = $file['options']['dir'] . $file['options']['basename'];
-				$this->_combine_files[$file['options']['basename']]['file'] = $filename;
-				$this->_combine_files[$file['options']['basename']]['time'] = filemtime($filename);
-				$this->_combine_files[$file['options']['basename']]['basename'] = $file['options']['basename'];
-				$this->_combine_files[$file['options']['basename']]['url'] = $file['options']['url'];
-			}
+				$this->_addFile($file['options']);
 		}
 
 		// Nothing to do so return
@@ -195,7 +197,30 @@ class Site_Combiner
 		}
 
 		// Return the name
-		return $this->_archive_url . '/' . $this->_archive_name;
+		return $this->_archive_url . '/' . $this->_archive_name . $this->_archive_stale;
+	}
+
+	/**
+	 * Just add all the file parameters to the $_combine_files array
+	 * If the file has a 'stale' option defined it will be added to the
+	 * $_stales array as well to be used later
+	 *
+	 * @param string[] An array with all the file options:
+	 *                  - dir
+	 *                  - basename
+	 *                  - file
+	 *                  - url
+	 *                  - stale (optional)
+	 */
+	private function _addFile($options)
+	{
+		$filename = $options['dir'] . $options['basename'];
+		$this->_combine_files[$options['basename']]['file'] = $filename;
+		$this->_combine_files[$options['basename']]['basename'] = $options['basename'];
+		$this->_combine_files[$options['basename']]['url'] = $options['url'];
+
+		if (isset($options['stale']))
+			$this->_stales[] = $options['stale'];
 	}
 
 	/**
@@ -233,6 +258,9 @@ class Site_Combiner
 
 		// Save the hive, or a nest, or a conglomeration. Like it was grown
 		$this->_archive_name = 'hive-' . sha1($this->_archive_filenames) . $type;
+
+		if (!empty($this->_stales))
+			$this->_archive_stale = '?' . substr(md5(implode(' ', $this->_stales)), 0, 6);
 	}
 
 	/**
