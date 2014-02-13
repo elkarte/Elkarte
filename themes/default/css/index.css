@@ -4248,6 +4248,9 @@ a.help .icon {
 	#collapse_button, p.inline.membergroups, #message_index_jump_to {
 		display: none !important;
 	}
+	#display_jump_to {
+		float: none;
+	}
 	#button_profile .avatar {
 		display: none;
 	}
@@ -4296,6 +4299,13 @@ a.help .icon {
 	.mentionavatar .avatar {
 		max-width: 40px;
 		max-height: 40px;
+	}
+	ul.navigate_section li:not(:first-child):not(:last-child) a {
+		width: 3em;
+		display: inline-block;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 }
 /* This one does 480px screens at default font size. */
