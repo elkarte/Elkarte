@@ -215,12 +215,14 @@ class Site_Combiner
 	private function _addFile($options)
 	{
 		$filename = $options['dir'] . $options['basename'];
-		$this->_combine_files[$options['basename']]['file'] = $filename;
-		$this->_combine_files[$options['basename']]['basename'] = $options['basename'];
-		$this->_combine_files[$options['basename']]['url'] = $options['url'];
+		$this->_combine_files[$options['basename']] = array(
+			'file' => $filename,
+			'basename' => $options['basename'],
+			'url' => $options['url'],
+			'filemtime' => filemtime($filename),
+		);
 
-		if (isset($options['stale']))
-			$this->_stales[] = $options['stale'];
+		$this->_stales[] = $this->_combine_files[$options['basename']]['filemtime'];
 	}
 
 	/**
@@ -234,7 +236,7 @@ class Site_Combiner
 
 		foreach ($this->_combine_files as $file)
 		{
-			if (filemtime($file['file']) > $filemtime)
+			if ($file['filemtime'] > $filemtime)
 				return true;
 		}
 		return false;
@@ -260,7 +262,7 @@ class Site_Combiner
 		$this->_archive_name = 'hive-' . sha1($this->_archive_filenames) . $type;
 
 		if (!empty($this->_stales))
-			$this->_archive_stale = '?' . substr(md5(implode(' ', $this->_stales)), 0, 6);
+			$this->_archive_stale = '?' . hash('crc32', implode(' ', $this->_stales));
 	}
 
 	/**
