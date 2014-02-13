@@ -221,122 +221,44 @@ function create_control_richedit($editorOptions)
 
 	if (empty($context['bbc_tags']))
 	{
-		// The below array makes it dead easy to add images to this control. Add it to the array
-		// and everything else is done for you!
-		//
-		//	array(
-		//		'image' => 'bold', // png image to load for the button
-		//		'code' => 'bold', // the name of the new code
-		//		'before' => '[b]', // the bbc text to insert before
-		//		'after' => '[/b]', // the bbc text to insert after
-		//		'description' => $txt['bold'] | 'some_key', // The tooltip desciption to show when hovering
-		//		over the button.  If a key is given the text as defined by $editortxt['some_key'] will be used
-		//		this is the prefered way as it aids in translations.
-		//	),
-		//
-		$context['bbc_tags'] = array();
-		$context['bbc_tags'][] = array(
-			array(
-				'code' => 'bold',
-			),
-			array(
-				'code' => 'italic',
-			),
-			array(
-				'code' => 'underline',
-			),
-			array(
-				'code' => 'strike',
-			),
-			array(
-				'code' => 'superscript',
-			),
-			array(
-				'code' => 'subscript',
-			),
-			array(),
-			array(
-				'code' => 'left',
-			),
-			array(
-				'code' => 'center',
-			),
-			array(
-				'code' => 'right',
-			),
-			array(
-				'code' => 'pre',
-			),
-			array(
-				'code' => 'tt',
-			),
-			array(),
-			array(
-				'code' => 'font',
-			),
-			array(
-				'code' => 'size',
-			),
-			array(
-				'code' => 'color',
-			),
+		// The below array is used to show a command button in the editor, the execution
+		// and display details of any added buttons must be defined in the javascript files
+		// see  jquery.sceditor.elkarte.js under teh $.sceditor.plugins.bbcode.bbcode area
+		// for examples of how to use the .set command to add codes.  Include your new
+		// JS with addInlineJavascript() or loadJavascriptFile()
+		$context['bbc_tags']['row1'] = array(
+			'bold', 'italic', 'underline', 'strike', 'superscript', 'subscript',
+			'space',
+			'left', 'center', 'right', 'pre', 'tt',
+			'space',
+			'font', 'size', 'color',
+			'space',
 		);
-		// Second Row of tags
-		$context['bbc_tags'][] = array(
-			array(
-				'code' => 'bulletlist',
-			),
-			array(
-				'code' => 'orderedlist',
-			),
-			array(
-				'code' => 'horizontalrule',
-			),
-			array(),
-			array(
-				'code' => 'table',
-			),
-			array(),
-			array(
-				'code' => 'code',
-			),
-			array(
-				'code' => 'quote',
-			),
-			array(
-				'code' => 'spoiler',
-			),
-			array(
-				'code' => 'footnote',
-			),
-			array(),
-			array(
-				'code' => 'image',
-			),
-			array(
-				'code' => 'link',
-			),
-			array(
-				'code' => 'email',
-			),
+		$context['bbc_tags']['row2'] = array(
+			'bulletlist', 'orderedlist', 'horizontalrule',
+			'space',
+			'table', 'code', 'quote',
+			'space',
+			'spoiler', 'footnote',
+			'space',
+			'image', 'link', 'email',
+			'space',
 		);
 
-		// Allow mods to modify BBC buttons.
+		// Allow mods to add BBC buttons to the toolbar, actions are defined in the JS
 		call_integration_hook('integrate_bbc_buttons');
 
-		// Show the toggle?
+		// Show the wysiwyg format and toggle buttons?
 		if (empty($modSettings['disable_wysiwyg']))
 		{
-			$context['bbc_tags'][count($context['bbc_tags']) - 1][] = array();
-			$context['bbc_tags'][count($context['bbc_tags']) - 1][] = array(
-				'code' => 'unformat',
-			);
-			$context['bbc_tags'][count($context['bbc_tags']) - 1][] = array(
-				'code' => 'toggle',
-			);
+			$context['bbc_tags']['row2'] = array_merge($context['bbc_tags']['row2'], array(
+				'removeformat',
+				'source',
+				'space',
+			));
 		}
 
-		// Generate a list of buttons that shouldn't be shown - this should be the fastest way to do this.
+		// Generate a list of buttons that shouldn't be shown
 		$disabled_tags = array();
 		if (!empty($modSettings['disabledBBC']))
 			$disabled_tags = explode(',', $modSettings['disabledBBC']);
@@ -360,11 +282,8 @@ function create_control_richedit($editorOptions)
 			$context['disabled_tags'][trim($tag)] = true;
 		}
 
-		$bbcodes_styles = '';
-		$context['bbcodes_handlers'] = '';
+		// Build our toolbar, taking in to account any bbc codes from integration
 		$context['bbc_toolbar'] = array();
-
-		// Build our toolbar, taking in to account any custom bbc codes from integration
 		foreach ($context['bbc_tags'] as $row => $tagRow)
 		{
 			if (!isset($context['bbc_toolbar'][$row]))
@@ -372,61 +291,18 @@ function create_control_richedit($editorOptions)
 
 			$tagsRow = array();
 
-			// For each "row" of buttons defined, lets build our tags
+			// For each row of buttons defined, lets build our tags
 			foreach ($tagRow as $tag)
 			{
-				if (!empty($tag))
-				{
-					if (empty($context['disabled_tags'][$tag['code']]))
-					{
-						$tagsRow[] = $tag['code'];
-
-						// Special Image used for this BBC tag
-						if (isset($tag['image']))
-							$bbcodes_styles .= '
-		.sceditor-button-' . $tag['code'] . ' div {
-			background: url(\'' . $settings['default_theme_url'] . '/images/bbc/' . $tag['image'] . '.png\');
-		}';
-
-						// Special commands,
-						if (isset($tag['before']))
-						{
-							$context['bbcodes_handlers'] = '
-				$.sceditor.command.set(
-					' . javaScriptEscape($tag['code']) . ', {
-					exec: function () {
-						this.wysiwygEditorInsertHtml(' . javaScriptEscape($tag['before']) . (isset($tag['after']) ? ', ' . javaScriptEscape($tag['after']) : '') . ');
-					},
-					tooltip:' . javaScriptEscape($tag['description']) . ',
-					txtExec: [' . javaScriptEscape($tag['before']) . (isset($tag['after']) ? ', ' . javaScriptEscape($tag['after']) : '') . '],
-					}
-				);';
-						}
-					}
-				}
-				else
-				{
-					$context['bbc_toolbar'][$row][] = implode(',', $tagsRow);
-					$tagsRow = array();
-				}
-			}
-
-			// If this is the second "row" of buttons, we insert the wysiwyg if enabled
-			if ($row === 1 && empty($modSettings['disable_wysiwyg']))
-			{
-				$tagsRow[] = 'removeformat';
-				$tagsRow[] = 'source';
+				// Just add this code in the existing grouping
+				if (!isset($context['disabled_tags'][$tag]))
+					$tagsRow[] = $tag;
 			}
 
 			// Build that beautiful button row
 			if (!empty($tagsRow))
 				$context['bbc_toolbar'][$row][] = implode(',', $tagsRow);
 		}
-
-		if (!empty($bbcodes_styles))
-			$context['html_headers'] .= '
-	<style>' . $bbcodes_styles . '
-	</style>';
 	}
 
 	// Initialize smiley array... if not loaded before.
