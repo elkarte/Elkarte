@@ -1285,6 +1285,7 @@ div.bbc_footnotes .meaction{
 	-webkit-font-smoothing: antialiased;
 	color: rgb(21, 125, 251);
 	background-color: rgb(230, 230, 230);
+	border: dashed 1px #ccc;
 }
 .statusbar {
 	border-top: 1px solid #A9CCD1;

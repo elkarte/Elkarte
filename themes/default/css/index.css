@@ -2450,26 +2450,29 @@ ul.post_options li {
 	margin: 0 0 1em 0;
 	overflow: auto;
 }
+
+/*	$DRAG-N-DROP		*/
+/* ------------------------------------------------------- */
 #postAttachment2 .drop_area {
 	font-size: 1.857em;
 	font-weight: normal;
 	height: 60px;
 	line-height: 60px;
 	text-align: center;
+	opacity: 0.7;
+}
+#postAttachment >dd.progress_tracker {
+	margin:0;
 }
 .progress_tracker {
-	float: left;
-	position: relative;
 	overflow: hidden;
-	width: 100%;
+	width: 97%;
 }
-
 .statusbar {
 	width: 94%;
 	padding: 5px 3%;
 	overflow: hidden;
 }
-
 .info {
 	float: left;
 	position: relative;
@@ -2477,7 +2480,6 @@ ul.post_options li {
 	width: 60%;
 	line-height: 22px;
 }
-
 .progressBar {
 	width: 20%;
 	border-radius: 5px;
@@ -2485,12 +2487,10 @@ ul.post_options li {
 	position: relative;
 	overflow: hidden;
 }
-
 .progressBar div {
 	color: #fff;
 	background-color: rgb(64, 118, 182);
 }
-
 .abort, .remove {
 	float: right;
 	position: relative;
@@ -2499,7 +2499,6 @@ ul.post_options li {
 	margin-left: 3%;
 	padding: 0 8px;
 }
-
 .drop_attachments_error {
 	padding: 10px 0;
 	position: relative;
