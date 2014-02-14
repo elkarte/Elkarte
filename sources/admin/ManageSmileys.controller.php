@@ -1298,6 +1298,9 @@ class ManageSmileys_Controller extends Action_Controller
 			),
 			'form' => array(
 				'href' => $scripturl . '?action=admin;area=smileys;sa=editicons',
+				'hidden_fields' => array(
+					'icons_save' => 1,
+				)
 			),
 			'additional_rows' => array(
 				array(

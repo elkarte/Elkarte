@@ -430,6 +430,8 @@ function template_subject_list()
 	// Use the query callback to get the subject list
 	while ($message = $context['get_pmessage']('subject'))
 	{
+		$discussion_url = $context['display_mode'] == 0 || $context['current_pm'] == $message['id'] ? '' : ($scripturl . '?action=pm;pmid=' . $message['id'] . ';kstart;f=' . $context['folder'] . ';start=' . $context['start'] . ';sort=' . $context['sort_by'] . ($context['sort_direction'] == 'up' ? ';' : ';desc') . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''));
+
 		echo '
 							<tr class="standard_row">
 								<td class="pm_icon">
@@ -454,8 +456,8 @@ function template_subject_list()
 								<td class="pm_date">', $message['time'], '</td>
 								<td class="pm_subject">',
 									($context['display_mode'] != 0 && $context['current_pm'] == $message['id'] ? '<img src="' . $settings['images_url'] . '/selected.png" alt="*" />' : ''),
-									'<a href="', ($context['display_mode'] == 0 || $context['current_pm'] == $message['id'] ? '' : ($scripturl . '?action=pm;pmid=' . $message['id'] . ';kstart;f=' . $context['folder'] . ';start=' . $context['start'] . ';sort=' . $context['sort_by'] . ($context['sort_direction'] == 'up' ? ';' : ';desc') . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''))), '#msg_', $message['id'], '">
-										', $message['subject'], $message['is_unread'] ? '&nbsp;<span class="new_posts">' . $txt['new'] . '</span>' : '', '
+									'<a href="', $discussion_url, '#msg_', $message['id'], '">
+										', $message['subject'], '</a>', $message['is_unread'] ? '&nbsp;<a href="' . $discussion_url . '#msg_' . $message['id'] . '" class="new_posts">' . $txt['new'] . '</a>' : '', '
 									</a>
 								</td>
 								<td class="pm_from">
