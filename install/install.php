@@ -1991,6 +1991,27 @@ function definePaths()
 }
 
 /**
+ * Escapes (replaces) characters in strings to make them safe for use in javascript
+ *
+ * @param string $string
+ * @return string
+ */
+function JavaScriptEscape($string)
+{
+	return '\'' . strtr($string, array(
+		"\r" => '',
+		"\n" => '\\n',
+		"\t" => '\\t',
+		'\\' => '\\\\',
+		'\'' => '\\\'',
+		'</' => '<\' + \'/',
+		'<script' => '<scri\'+\'pt',
+		'<body>' => '<bo\'+\'dy>',
+		'<a href' => '<a hr\'+\'ef',
+	)) . '\'';
+}
+
+/**
  * Delete the installer and its additional files.
  * Called by ?delete
  */
@@ -2040,7 +2061,11 @@ function template_install_above()
 		<link rel="stylesheet" href="themes/default/css/index.css?beta10" />
 		<link rel="stylesheet" href="themes/default/css/_light/index_light.css?beta10" />
 		<link rel="stylesheet" href="themes/default/css/install.css?beta10" />
-		<script src="themes/default/scripts/script.js"></script>
+		<script src="themes/default/scripts/script.js"></script>		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" id="jquery"></script>
+		<script><!-- // --><![CDATA[
+			window.jQuery || document.write(\'<script src="themes/default/scripts/jquery-1.10.2.min.js"><\/script>\');
+		// ]]></script>
+
 	</head>
 	<body>
 		<div id="header">
@@ -2149,15 +2174,29 @@ function template_welcome_message()
 
 	echo '
 	<script src="http://elkarte.github.io/Elkarte/site/current-version.js?version=' . CURRENT_VERSION . '"></script>
+	<script src="themes/default/scripts/admin.js"></script>
+		<script><!-- // --><![CDATA[
+			var oUpgradeCenter = new elk_AdminIndex({
+				bLoadAnnouncements: false,
+
+				bLoadVersions: true,
+				slatestVersionContainerId: \'latestVersion\',
+				sinstalledVersionContainerId: \'version_warning\',
+				sVersionOutdatedTemplate: ', JavaScriptEscape('
+			<div style="float: left; width: 2ex; font-size: 2em; color: red;">!!</div>
+			<strong style="text-decoration: underline;">' . $txt['error_warning_notice'] . '</strong><br />
+			<div style="padding-left: 6ex;">
+				' . sprintf($txt['error_script_outdated'], '<em id="elkVersion" style="white-space: nowrap;">??</em>', '<em style="white-space: nowrap;">' . CURRENT_VERSION . '</em>') . '
+			</div>
+				'), ',
+
+				bLoadUpdateNotification: false
+			});
+		// ]]></script>
 	<form action="', $incontext['form_url'], '" method="post">
 		<p>', sprintf($txt['install_welcome_desc'], CURRENT_VERSION), '</p>
-		<div id="version_warning" style="margin: 2ex; padding: 2ex; border: 2px dashed #a92174; color: black; background-color: #fbbbe2; display: none;">
-			<div style="float: left; width: 2ex; font-size: 2em; color: red;">!!</div>
-			<strong style="text-decoration: underline;">', $txt['error_warning_notice'], '</strong><br />
-			<div style="padding-left: 6ex;">
-				', sprintf($txt['error_script_outdated'], '<em id="latestVersion" style="white-space: nowrap;">??</em>', '<em id="installedVersion" style="white-space: nowrap;">' . CURRENT_VERSION . '</em>'), '
-			</div>
-		</div>';
+		<div id="version_warning" style="margin: 2ex; padding: 2ex; border: 2px dashed #a92174; color: black; background-color: #fbbbe2; display: none;">',CURRENT_VERSION, '</div>
+		<div id="latestVersion" style="display: none;">???</div>';
 
 	// Show the warnings, or not.
 	if (template_warning_divs())
@@ -2171,24 +2210,30 @@ function template_welcome_message()
 	// For the latest version stuff.
 	echo '
 		<script><!-- // --><![CDATA[
+			var currentVersionRounds = 0;
+
 			// Latest version?
 			function ourCurrentVersion()
 			{
-				var ourVer, yourVer;
+				var latestVer,
+					setLatestVer;
 
-				if (!(\'latestVersion\' in window))
+				latestVer = document.getElementById(\'latestVersion\');
+				setLatestVer = document.getElementById(\'elkVersion\');
+
+				if (latestVer.innerHTML == \'???\')
+				{
+					// Just to avoid too many tries
+					if (currentVersionRounds > 9)
+						return;
+
+					currentVersionRounds++;
+					setTimeout(\'ourCurrentVersion()\', 50);
 					return;
+				}
 
-				window.latestVersion = window.latestVersion.replace(/ElkArte\s?/g, \'\');
-
-				ourVer = document.getElementById("latestVersion");
-				yourVer = document.getElementById("installedVersion");
-
-				ourVer.innerHTML = window.latestVersion;
-
-				var currentVersion = yourVer.innerHTML;
-				if (currentVersion < window.latestVersion)
-					document.getElementById(\'version_warning\').style.display = \'\';
+				setLatestVer.innerHTML = latestVer.innerHTML.replace(\'ElkArte \', \'\');
+				document.getElementById(\'version_warning\').style.display = \'\';
 			}
 			addLoadEvent(ourCurrentVersion);
 		// ]]></script>';

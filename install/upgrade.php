@@ -3893,7 +3893,7 @@ function template_welcome_message()
 				}
 
 				setLatestVer.innerHTML = latestVer.innerHTML.replace(\'ElkArte \', \'\');
-				document.getElementById(\'version_warning\').style.display = \'block\';
+				document.getElementById(\'version_warning\').style.display = \'\';
 			}
 			addLoadEvent(ourCurrentVersion);
 
