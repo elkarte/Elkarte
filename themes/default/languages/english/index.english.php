@@ -436,17 +436,19 @@ $txt['database_error'] = 'Database Error';
 $txt['try_again'] = 'Please try again.  If you come back to this error screen, report the error to an administrator.';
 $txt['file'] = 'File';
 $txt['line'] = 'Line';
+
 // Use numeric entities in the below string.
 $txt['tried_to_repair'] = 'ElkArte has detected and automatically tried to repair an error in your database.  If you continue to have problems, or continue to receive these emails, please contact your host.';
 $txt['database_error_versions'] = '<strong>Note:</strong> Your database version is %1$s.';
 $txt['template_parse_error'] = 'Template Parse Error!';
 $txt['template_parse_error_message'] = 'It seems something has gone sour on the forum with the template system.  This problem should only be temporary, so please come back later and try again.  If you continue to see this message, please contact the administrator.<br /><br />You can also try <a href="javascript:location.reload();">refreshing this page</a>.';
 $txt['template_parse_error_details'] = 'There was a problem loading the <span class="tt"><strong>%1$s</strong></span> template or language file.  Please check the syntax and try again - remember, single quotes (<span class="tt">\'</span>) often have to be escaped with a backslash (<span class="tt">\\</span>).  To see more specific error information from PHP, try <a href="' . $boardurl . '%1$s">accessing the file directly</a>.<br /><br />You may want to try to <a href="javascript:location.reload();">refresh this page</a> or <a href="' . $scripturl . '?theme=1">use the default theme</a>.';
+$txt['template_parse_undefined'] = 'An undefined error occurred during the parsing of this template';
 
 $txt['today'] = 'Today at ';
 $txt['yesterday'] = 'Yesterday at ';
 
-//Relative times
+// Relative times
 $txt['rt_now'] = 'just now';
 $txt['rt_minute'] = 'A minute ago';
 $txt['rt_minutes'] = '%s minutes ago';
