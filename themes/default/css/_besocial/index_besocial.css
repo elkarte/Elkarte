@@ -986,11 +986,11 @@ span.views_text {
 
 .progressBar div {
 	color: #fff;
-	background-color: rgb(64, 118, 182);
+	background-color: #43a8da;
 }
 
 .abort, .remove {
-	background-color: #A8352F;
+	background-color: #a8352f;
 	border-radius: 5px;
 	color: #fff;
 	cursor: pointer;
