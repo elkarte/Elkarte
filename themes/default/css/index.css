@@ -2451,17 +2451,12 @@ ul.post_options li {
 	overflow: auto;
 }
 #postAttachment2 .drop_area {
-	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-	font-size: 26px;
-	font-weight: 300;
-	height: 70px;
-	line-height: 70px;
+	font-size: 1.857em;
+	font-weight: normal;
+	height: 60px;
+	line-height: 60px;
 	text-align: center;
-	text-indent: 0;
-	padding: 10px 5%;
-	margin: 10px 5%;
 }
-
 .progress_tracker {
 	float: left;
 	position: relative;

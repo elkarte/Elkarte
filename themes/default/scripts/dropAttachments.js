@@ -232,7 +232,7 @@
 				for (var i = 0; i < files.length; i++)
 				{
 					var fileExtensionCheck = /(?:\.([^.]+))?$/,
-						extension = fileExtensionCheck.exec(files[i].name)[1],
+						extension = fileExtensionCheck.exec(files[i].name)[1].toLowerCase(),
 						fileSize = files[i].size / 1024,
 						errorFlag = false;
 
