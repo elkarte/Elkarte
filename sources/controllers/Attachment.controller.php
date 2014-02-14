@@ -29,10 +29,135 @@ class Attachment_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		// Default action to execute, guess which one
-		$this->action_dlattach();
+		require_once(SUBSDIR . '/Action.class.php');
+
+		// add an subaction array to act accordingly
+		$subActions = array(
+			'dlattach' => array($this, 'action_dlattach'),
+			'ulattach' => array($this, 'action_ulattach'),
+			'rmattach' => array($this, 'action_rmattach'),
+			);
+
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'dlattach';
+
+		// call the action handler
+		$action = new Action();
+		$action->initialize($subActions, 'dlattach');
+		$action->dispatch($subAction);
 	}
 
+	/**
+	 * Function to upload attachements via ajax calls
+	 * Currently called by drag drop attachment functionality
+	 * Pass the form data with session vars
+	 * resp back with errors or file data
+	 */
+	public function action_ulattach()
+	{
+		global $txt, $context, $modSettings;
+
+		checkJsonEncode();
+		$resp_data = array();
+		$context['attachments']['can']['post'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
+
+		$template_layers = Template_Layers::getInstance();
+		$template_layers->removeAll();
+
+		loadTemplate('Json');
+		$context['sub_template'] = 'send_json';
+
+		if (checkSession('request', '', false) != '') {
+			$context['json_data'] = array('result' => false, 'data' => 'session timeout');
+			return false;
+		}
+
+		if (isset($_FILES["attachment"]))
+		{
+			$attach_errors = attachment_Error_Context::context('attachment', 1);
+			$attach_errors->activate();
+			if ($context['attachments']['can']['post'] && empty($_POST['from_qr']))
+			{
+				require_once(SUBSDIR . '/Attachments.subs.php');
+				if (isset($_REQUEST['msg']))
+					processAttachments((int) $_REQUEST['msg']);
+				else
+					processAttachments();
+			}
+
+			// Any mistakes?
+			if ($attach_errors->hasErrors())
+			{
+				loadLanguage('Post');
+				$errors = $attach_errors->prepareErrors();
+
+				foreach ($errors as $key => $error)
+				{
+					$resp_data[] = $error;
+				}
+				$context['json_data'] = array('result' => false, 'data' => $resp_data);
+			}
+			else
+			{
+				foreach ($_SESSION['temp_attachments'] as $key => $val) {
+					// we need to grab the name anyhow
+					if (!empty($val['name']) || !empty($val['tmp_name'])) {
+						$resp_data = array(
+							'name'=> $val['name'],
+							'temp_name' => $key,
+							'temp_path' => $val['tmp_name'],
+							'size' => $val['size']
+						);
+					}
+				}
+				$context['json_data'] = array('result' => true, 'data' => $resp_data);
+			}
+		}
+		else
+		{
+			$context['json_data'] = array('result' => false, 'data' => 'files not there');
+		}
+	}
+
+	/**
+	 * Function to remove attachements which were added via ajax calls
+	 * Currently called by drag drop attachment functionality
+	 * Requires file name and file path
+	 * resp back with success or error
+	 */
+	public function action_rmattach() {
+		global $context;
+
+		checkJsonEncode();
+		$template_layers = Template_Layers::getInstance();
+		$template_layers->removeAll();
+
+		loadTemplate('Json');
+		$context['sub_template'] = 'send_json';
+
+		if (checkSession('request', '', false) != '') {
+			$context['json_data'] = array('result' => false, 'data' => 'session timeout');
+			return false;
+		}
+
+		if(isset($_REQUEST['filename']) && $_REQUEST['filepath'])
+		{
+			if (file_exists($_REQUEST['filepath']))
+			{
+				unlink($_REQUEST['filepath']);
+				unset($_SESSION['temp_attachments'][$_REQUEST['filename']]);
+
+				$context['json_data'] = array('result' => true);
+			}
+			else
+			{
+				$context['json_data'] = array('result' => false, 'data' => 'files not there');
+			}
+		}
+		else
+		{
+			$context['json_data'] = array('result' => false, 'data' => 'No file name provided');
+		}
+	}
 	/**
 	 * Downloads an attachment or avatar, and increments the download count.
 	 * It requires the view_attachments permission. (not for avatars!)

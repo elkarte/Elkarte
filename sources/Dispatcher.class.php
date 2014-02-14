@@ -146,6 +146,7 @@ class Site_Dispatcher
 			'contact' => array('Register.controller.php', 'Register_Controller', 'action_contact'),
 			'coppa' => array('Register.controller.php', 'Register_Controller', 'action_coppa'),
 			'deletemsg' => array('RemoveTopic.controller.php', 'RemoveTopic_Controller', 'action_deletemsg'),
+			// @todo: move this to attachment action also
 			'dlattach' => array('Attachment.controller.php', 'Attachment_Controller', 'action_index'),
 			'unwatchtopic' => array('Notify.controller.php', 'Notify_Controller', 'action_unwatchtopic'),
 			'editpoll' => array('Poll.controller.php', 'Poll_Controller', 'action_editpoll'),
