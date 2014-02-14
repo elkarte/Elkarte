@@ -331,6 +331,13 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 .new_posts:hover {
 	text-decoration: underline;
 }
+del .bbc_link:link, del .bbc_link:visited {
+	text-decoration: line-through;
+}
+.childboards .new_posts {
+    font-size: 0.857em;
+    padding: 1px 3px 2px;
+}
 
 /* Standard horizontal rule.. ([hr], etc.) */
 hr {
@@ -3557,8 +3564,11 @@ a.help .icon {
 	font-style: italic;
 }
 #search_term_input {
-	margin: 0 0 12px;
+	margin: 0 0 10px;
 	font-size: 1.071em;
+}
+#search_term_input .button_submit  {
+	margin: 0 0 2px;
 }
 
 /* The advanced search section. */
@@ -3570,6 +3580,7 @@ a.help .icon {
 }
 #search_options .styled-select {
 	width: 14em;
+	margin: 0 0 3px;
 }
 #advanced_search dt {
 	float: left;

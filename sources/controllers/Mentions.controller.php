@@ -378,7 +378,7 @@ class Mentions_Controller extends Action_Controller
 	/**
 	 * Callback used to prepare the mention message for mentions, likes, removed likes and buddies
 	 *
-	 * @param array $mentions : Mentions retrieved from the database by getUserMentions
+	 * @param mixed[] $mentions : Mentions retrieved from the database by getUserMentions
 	 * @param string $type : the type of the mention
 	 */
 	public function prepareMentionMessage(&$mentions, $type)
@@ -489,7 +489,7 @@ class Mentions_Controller extends Action_Controller
 	/**
 	 * Sets the specifics of a mention call in this instance
 	 *
-	 * @param array $data must contain uid, type and msg at a minimum
+	 * @param mixed[] $data must contain uid, type and msg at a minimum
 	 */
 	public function setData($data)
 	{

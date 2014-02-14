@@ -40,7 +40,9 @@ function createWaveFile($word)
 	cache_put_data('wave_file/' . $user_info['ip2'], $ip2 ? $ip2 + 1 : 1, 20);
 
 	// Fixate randomization for this word.
-	mt_srand(end(unpack('n', md5($word . session_id()))));
+	// @todo not sure this works as expected in 5.2+
+	$unpacked = unpack('n', md5($word . session_id()));
+	mt_srand(end($unpacked));
 
 	// Try to see if there's a sound font in the user's language.
 	if (file_exists($settings['default_theme_dir'] . '/fonts/sound/a.' . $user_info['language'] . '.wav'))

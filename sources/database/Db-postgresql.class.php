@@ -150,14 +150,8 @@ class Database_PostgreSQL implements Database
 		if ($matches[1] === 'query_wanna_see_board')
 			return $user_info['query_wanna_see_board'];
 
-		if ($matches[1] === 'empty')
-			return '\'\'';
-
 		if (!isset($matches[2]))
 			$this->error_backtrace('Invalid value inserted or no type specified.', '', E_USER_ERROR, __FILE__, __LINE__);
-
-		if ($matches[1] === 'literal')
-			return '\'' . pg_escape_string($matches[2]) . '\'';
 
 		if (!isset($values[$matches[2]]))
 			$this->error_backtrace('The database value you\'re trying to insert does not exist: ' . htmlspecialchars($matches[2], ENT_COMPAT, 'UTF-8'), '', E_USER_ERROR, __FILE__, __LINE__);
@@ -444,19 +438,13 @@ class Database_PostgreSQL implements Database
 			$clean .= substr($db_string, $old_pos);
 			$clean = trim(strtolower(preg_replace($allowed_comments_from, $allowed_comments_to, $clean)));
 
-			// We don't use UNION, at least so far.  But it's useful for injections.
-			if (strpos($clean, 'union') !== false && preg_match('~(^|[^a-z])union($|[^[a-z])~s', $clean) != 0)
-				$fail = true;
 			// Comments?  We don't use comments in our queries, we leave 'em outside!
-			elseif (strpos($clean, '/*') > 2 || strpos($clean, '--') !== false || strpos($clean, ';') !== false)
+			if (strpos($clean, '/*') > 2 || strpos($clean, '--') !== false || strpos($clean, ';') !== false)
 				$fail = true;
 			// Trying to change passwords, slow us down, or something?
 			elseif (strpos($clean, 'sleep') !== false && preg_match('~(^|[^a-z])sleep($|[^[_a-z])~s', $clean) != 0)
 				$fail = true;
 			elseif (strpos($clean, 'benchmark') !== false && preg_match('~(^|[^a-z])benchmark($|[^[a-z])~s', $clean) != 0)
-				$fail = true;
-			// Sub selects?  We don't use those either.
-			elseif (preg_match('~\([^)]*?select~s', $clean) != 0)
 				$fail = true;
 
 			if (!empty($fail) && function_exists('log_error'))

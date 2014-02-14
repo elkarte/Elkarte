@@ -530,7 +530,7 @@ function template_subject_list()
  */
 function template_search()
 {
-	global $context, $scripturl, $txt;
+	global $context, $scripturl, $txt, $modSettings;
 
 	echo '
 	<form action="', $scripturl, '?action=pm;sa=search2" method="post" accept-charset="UTF-8" name="searchform" id="searchform">
@@ -550,8 +550,8 @@ function template_search()
 		echo '
 		<fieldset id="simple_search" class="content">
 			<div id="search_term_input">
-				<label for="search"><strong>', $txt['pm_search_text'], ':</strong>
-				<input type="text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' size="40" class="input_text" placeholder="', $txt['search'], '" required="required" autofocus="autofocus" /></label>
+				<label for="search"><strong>', $txt['pm_search_text'], ':</strong></label>
+				<input id="search" class="input_text" type="search" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' size="40" placeholder="', $txt['search'], '" required="required" autofocus="autofocus" />
 				<input type="submit" name="pm_search" value="', $txt['pm_search_go'], '" class="button_submit" />
 			</div>
 			<a class="linkbutton" href="', $scripturl, '?action=pm;sa=search;advanced" onclick="elk_setThemeOption(\'minmax_preferences\', \'1\', null, elk_session_id, elk_session_var, \';minmax_key=pmsearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);">', $txt['pm_search_advanced'], '</a>
@@ -568,7 +568,7 @@ function template_search()
 					<label for="search"><strong>', $txt['pm_search_text'], ':</strong></label>
 				</dt>
 				<dd>
-					<input type="text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' size="40" class="input_text" placeholder="', $txt['search'], '" required="required" autofocus="autofocus" />
+					<input type="search" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' size="40" class="input_text" placeholder="', $txt['search'], '" required="required" autofocus="autofocus" />
 					<div class="styled-select">
 						<select name="searchtype">
 							<option value="1"', empty($context['search_params']['searchtype']) ? ' selected="selected"' : '', '>', $txt['pm_search_match_all'], '</option>
@@ -617,16 +617,23 @@ function template_search()
 				<dt>
 				</dt>
 				<dd>
-					<a href="', $scripturl, '?action=pm;sa=search;basic" onclick="elk_setThemeOption(\'minmax_preferences\', \'0\', null, elk_session_id, elk_session_var, \';minmax_key=pmsearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);" class="linkbutton">', $txt['pm_search_simple'], '</a>
-				</dd>
-			</dl>
-			<input type="hidden" name="advanced" value="1" />';
+					<div class="centertext">';
 
+		// If we allow a simple form, show a link to get back to it
+		if (!empty($modSettings['simpleSearch']))
+			echo '
+						<a href="', $scripturl, '?action=pm;sa=search;basic" onclick="elk_setThemeOption(\'minmax_preferences\', \'0\', null, elk_session_id, elk_session_var, \';minmax_key=pmsearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);" class="linkbutton">', $txt['pm_search_simple'], '</a>';
+
+		// If they don't have any labels show the search button here as well
 		if (!$context['currently_using_labels'])
 			echo '
-			<input type="submit" name="pm_search" value="', $txt['pm_search_go'], '" class="right_submit" />';
+						<input type="submit" name="pm_search" value="', $txt['pm_search_go'], '" class="button_submit" />';
 
-		echo '
+			echo '
+					</div>
+				</dd>
+			</dl>
+			<input type="hidden" name="advanced" value="1" />
 		</fieldset>';
 
 		// Do we have some labels setup? If so offer to search by them!
