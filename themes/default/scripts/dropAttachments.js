@@ -41,7 +41,7 @@
 			 */
 			init = function(params)
 			{
-				allowedExtensions = (params.allowedExtensions === '') ? [] : params.allowedExtensions.replace(/\s/g, '').split(',');
+				allowedExtensions = (params.allowedExtensions === '') ? [] : params.allowedExtensions.toLowerCase().replace(/\s/g, '').split(',');
 				totalSizeAllowed = (params.totalSizeAllowed === '') ? null : params.totalSizeAllowed;
 				individualSizeAllowed = (params.individualSizeAllowed === '') ? null : params.individualSizeAllowed;
 				numOfAttachmentAllowed = (params.numOfAttachmentAllowed === '') ? null : params.numOfAttachmentAllowed;
@@ -380,7 +380,7 @@
 		obj.on('dragenter', function(e) {
 			e.stopPropagation();
 			e.preventDefault();
-			$(this).css('border', 'solid 1px rgb(64, 118, 182)');
+			$(this).css('opacity', '1');
 		});
 
 		obj.on('dragover', function(e) {
@@ -390,9 +390,14 @@
 
 		obj.on('drop', function(e) {
 			e.preventDefault();
-			$(this).css('border', 'solid 1px rgb(64, 118, 182)');
+			$(this).css('opacity', '0.7');
 			var files = e.originalEvent.dataTransfer.files;
 			dragDropAttachment.handleFileUpload(files, obj);
+		});
+
+		obj.on('dragexit', function(e) {
+			e.preventDefault();
+			$(this).css('opacity', '0.7');
 		});
 	});
 	this.dragDropAttachment = dragDropAttachment;
