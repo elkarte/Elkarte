@@ -256,7 +256,6 @@ function bb2_read_settings()
 	// Return the settings so BadBehavior can use them
 	return array(
 		'log_table' => '{db_prefix}log_badbehavior',
-		'display_stats' => !empty($modSettings['badbehavior_display_stats']),
 		'strict' => !empty($modSettings['badbehavior_strict']),
 		'verbose' => !empty($modSettings['badbehavior_verbose']),
 		'logging' => !empty($modSettings['badbehavior_logging']),

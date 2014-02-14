@@ -197,7 +197,6 @@ $txt['badbehavior_httpbl_threat_desc'] = '(default 25)';
 $txt['badbehavior_httpbl_maxage'] = 'http:BL Maximum Age';
 $txt['badbehavior_httpbl_maxage_desc'] = '(default 30)';
 $txt['badbehavior_eucookie'] = 'Check to enable EU Cookie Handling';
-$txt['badbehavior_display_stats'] = 'Check to display bad behavior in the page footer';
 $txt['badbehavior_reverse_proxy'] = 'Enable Reverse Proxy';
 $txt['badbehavior_reverse_proxy_header'] = 'Reverse Proxy Header';
 $txt['badbehavior_reverse_proxy_header_desc'] = '(default X-Forwarded-For)';
