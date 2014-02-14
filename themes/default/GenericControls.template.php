@@ -16,7 +16,7 @@
  */
 
 /**
- * This function displays all the stuff you get with a richedit box - BBC, smileys etc.
+ * This function displays all the goodies you get with a richedit box - BBC, smileys etc.
  *
  * @param string $editor_id
  * @param string|null $smileyContainer if set show the smiley container id
@@ -40,8 +40,8 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					height: "100%",
 					resizeWidth: false,
 					resizeMaxHeight: -1,
-					emoticonsCompat: true,', !empty($editor_context['locale']) ? '
-					locale: \'' . $editor_context['locale'] . '\',' : '', '
+					emoticonsCompat: true,
+					locale: "', !empty($editor_context['locale']) ? $editor_context['locale'] : 'en_US', '",
 					colors: "black,red,yellow,pink,green,orange,purple,blue,beige,brown,teal,navy,maroon,limegreen,white",
 					enablePasteFiltering: true,
 					plugins: "bbcode, splittag', !empty($context['mentions_enabled']) ? ', mention' : '', (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']) ? ', draft",
@@ -113,26 +113,21 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					emoticons:
 					{}';
 
+	// Show all the editor command buttons
 	if ($context['show_bbc'] && $bbcContainer !== null)
 	{
 		echo ',
-					toolbar: "emoticon,';
-		$count_tags = count($context['bbc_tags']);
+					toolbar: "';
 
-		// create the tooltag to display the buttons in the editor
+		// Create the tooltag rows to display the buttons in the editor
 		foreach ($context['bbc_toolbar'] as $i => $buttonRow)
-		{
-			echo implode('|', $buttonRow);
-			$count_tags--;
-			if (!empty($count_tags))
-				echo '||';
-		}
+			echo implode('', $buttonRow), '||';
 
-		echo '",';
+		echo ',emoticon",';
 	}
 	else
 		echo ',
-					toolbar: "emoticon,source",';
+					toolbar: "source,emoticon",';
 
 	echo '
 				});
