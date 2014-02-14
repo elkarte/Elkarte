@@ -100,7 +100,7 @@
 			var emoticons = $.extend({}, this.opts.emoticons.dropdown),
 				popup_exists = false,
 				smiley_popup = '';
-		
+
 			base = this;
 			content = $('<div class="sceditor-insertemoticon" />');
 			line = $('<div id="sceditor-smileycontainer" />');
@@ -184,11 +184,20 @@
 })(jQuery);
 
 /**
- * ElkArte unique commands to add to the toolbar
+ * ElkArte unique commands to add to the toolbar, when a button
+ * with the same name is selected, it will trigger these defiintions
+ *
+ * tooltip - the hover text, this is the name in the editors.xxxx.php file
+ * txtExec - this is the text to insert before and after the cursor or seleted text
+ *			when in the plain text part of the editor
+ * exec - this is called when in the wizzy part of the editor to insert text or html tags
+ * state - this is used to determine if a button should be shown as active or not
  *
  * Adds Tt, Pre, Spoiler, Footnote commands
  */
 $.sceditor.command
+	.set('space', {
+	})
 	.set('spoiler', {
 		exec: function () {
 			this.insert('[spoiler]', '[/spoiler]');
@@ -261,6 +270,9 @@ $.sceditor.command
 
 /**
  * ElkArte custom bbc tags added to provide for the existing user experience
+ *
+ * These command define what happens to tags as to toggle from and to wizzy mode
+ * It converts html back to bbc or bbc back to html.  Read the sceditor docs for more
  *
  * Adds / modifies BBC codes List, Tt, Pre, quote, footnote, code, img
  */

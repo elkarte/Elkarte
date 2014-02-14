@@ -818,10 +818,15 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 
 	// If they have post by email enabled, override disallow_sendBody
 	if (!$maillist && !empty($modSettings['disallow_sendBody']))
+	{
 		$message = '';
-
-	require_once(SUBSDIR . '/Emailpost.subs.php');
-	pbe_prepare_text($message, $subject);
+		censorText($subject);
+	}
+	else
+	{
+		require_once(SUBSDIR . '/Emailpost.subs.php');
+		pbe_prepare_text($message, $subject);
+	}
 
 	$to_names = array();
 	if (count($to_list) > 1)

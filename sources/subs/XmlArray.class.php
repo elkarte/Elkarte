@@ -501,7 +501,7 @@ class Xml_Array
 	/**
 	 * Get a specific element's xml. (privately used...)
 	 *
-	 * @param $array
+	 * @param mixed[] $array
 	 * @param null|integer $indent
 	 */
 	protected function _xml($array, $indent)

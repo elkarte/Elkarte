@@ -331,6 +331,13 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 .new_posts:hover {
 	text-decoration: underline;
 }
+del .bbc_link:link, del .bbc_link:visited {
+	text-decoration: line-through;
+}
+.childboards .new_posts {
+    font-size: 0.857em;
+    padding: 1px 3px 2px;
+}
 
 /* Standard horizontal rule.. ([hr], etc.) */
 hr {
@@ -2443,6 +2450,68 @@ ul.post_options li {
 	margin: 0 0 1em 0;
 	overflow: auto;
 }
+#postAttachment2 .drop_area {
+	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	font-size: 26px;
+	font-weight: 300;
+	height: 70px;
+	line-height: 70px;
+	text-align: center;
+	text-indent: 0;
+	padding: 10px 5%;
+	margin: 10px 5%;
+}
+
+.progress_tracker {
+	float: left;
+	position: relative;
+	overflow: hidden;
+	width: 100%;
+}
+
+.statusbar {
+	width: 94%;
+	padding: 5px 3%;
+	overflow: hidden;
+}
+
+.info {
+	float: left;
+	position: relative;
+	overflow: hidden;
+	width: 60%;
+	line-height: 22px;
+}
+
+.progressBar {
+	width: 20%;
+	border-radius: 5px;
+	float: left;
+	position: relative;
+	overflow: hidden;
+}
+
+.progressBar div {
+	color: #fff;
+	background-color: rgb(64, 118, 182);
+}
+
+.abort, .remove {
+	float: right;
+	position: relative;
+	overflow: hidden;
+	font: 14px/22px normal arial;
+	margin-left: 3%;
+	padding: 0 8px;
+}
+
+.drop_attachments_error {
+	padding: 10px 0;
+	position: relative;
+	overflow: hidden;
+	width: 100%;
+}
+
 #postMoreOptions, #postAttachment, #postAttachment2 {
 	margin: -1px 0 0 0;
 	padding: 10px;
@@ -3495,8 +3564,11 @@ a.help .icon {
 	font-style: italic;
 }
 #search_term_input {
-	margin: 0 0 12px;
+	margin: 0 0 10px;
 	font-size: 1.071em;
+}
+#search_term_input .button_submit  {
+	margin: 0 0 2px;
 }
 
 /* The advanced search section. */
@@ -3508,6 +3580,7 @@ a.help .icon {
 }
 #search_options .styled-select {
 	width: 14em;
+	margin: 0 0 3px;
 }
 #advanced_search dt {
 	float: left;
@@ -4248,6 +4321,9 @@ a.help .icon {
 	#collapse_button, p.inline.membergroups, #message_index_jump_to {
 		display: none !important;
 	}
+	#display_jump_to {
+		float: none;
+	}
 	#button_profile .avatar {
 		display: none;
 	}
@@ -4296,6 +4372,13 @@ a.help .icon {
 	.mentionavatar .avatar {
 		max-width: 40px;
 		max-height: 40px;
+	}
+	ul.navigate_section li:not(:first-child):not(:last-child) a {
+		width: 3em;
+		display: inline-block;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 }
 /* This one does 480px screens at default font size. */

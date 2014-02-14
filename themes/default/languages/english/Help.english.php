@@ -180,29 +180,11 @@ $helptxt['badbehaviorlog'] = '<strong>Bad Behavior Log</strong><br />
 $helptxt['warning_enable'] = '<strong>User Warning System</strong><br />
 	This feature enables members of the admin and moderation team to issue warnings to members - and to use a members warning level to determine the
 	actions available to them on the forum. Upon enabling this feature a permission will be available within the permissions section to define
-	which groups may assign warnings to members. Warning levels can be adjusted from a members profile. The following additional options are available:
-	<ul class="normallist">
-		<li>
-			<strong>Warning Level for Member Watch</strong><br />
-			This setting defines the percentage warning level a member must reach to automatically assign a &quot;watch&quot; to the member.
-			Any member who is being &quot;watched&quot; will appear in the relevant area of the moderation center.
-		</li>
-		<li>
-			<strong>Warning Level for Post Moderation</strong><br />
-			Any member passing the value of this setting will find all their posts require moderator approval before they appear to the forum
-			community. This will override any local board permissions which may exist related to post moderation.
-		</li>
-		<li>
-			<strong>Warning Level for Member Muting</strong><br />
-			If this warning level is passed by a member they will find themselves under a post ban. The member will lose all posting rights.
-		</li>
-		<li>
-			<strong>Maximum Member Warning Points per Day</strong><br />
-			This setting limits the amount of points a moderator may add/remove to any particular member in a twenty four hour period. This
-			can be used to limit what a moderator can do in a small period of time. This setting can be disabled by setting to a value of zero. Note that
-			any member with administrator permissions are not affected by this value.
-		</li>
-	</ul>';
+	which groups may assign warnings to members. Warning levels can be adjusted from a members profile. The following additional options are available:';
+$helptxt['watch_enable'] = '<strong>Warning Level for Member Watch</strong><br />This setting defines the percentage warning level a member must reach to automatically assign a &quot;watch&quot; to the member. Any member who is being &quot;watched&quot; will appear in the relevant area of the moderation center.';
+$helptxt['moderate_enable'] = '<strong>Warning Level for Post Moderation</strong><br />Any member passing the value of this setting will find all their posts require moderator approval before they appear to the forum community. This will override any local board permissions which may exist related to post moderation.';
+$helptxt['mute_enable'] = '<strong>Warning Level for Member Muting</strong><br />If this warning level is passed by a member they will find themselves under a post ban. The member will lose all posting rights.';
+$helptxt['perday_limit'] = '<strong>Maximum Member Warning Point per Day</strong><br />This setting limits the amount of points a moderator may add/remove to any particular member in a twenty four hour period. This will can be used to limit what a moderator can do in a small period of time. This setting can be disabled by setting to a value of zero. Note that any member with administrator permissions are not affected by this value.';
 $helptxt['error_log'] = '<strong>Error Log</strong><br />
 	The error log tracks every serious error encountered by users using your forum. It lists all of these errors by date which can be sorted
 	by clicking the black arrow next to each date. Additionally you can filter the errors by clicking the picture next to each error statistic. This
@@ -652,7 +634,6 @@ $helptxt['badbehavior_verbose'] = 'Enabling verbose mode causes all HTTP request
 $helptxt['badbehavior_logging'] = 'Should Bad Behavior keep a log of requests? On by default, and it is not recommended to disable it, since it will cause additional spam to get through.';
 $helptxt['badbehavior_strict'] = 'Bad Behavior operates in two blocking modes: normal and strict.<br />When strict mode is enabled, additional checks for (old) software which have been spam sources are enabled, but occasional legitimate users using the same software may be blocked as well.';
 $helptxt['badbehavior_offsite_forms'] = 'Bad Behavior normally prevents your site from receiving data posted from forms on other web sites. This prevents spammers from, e.g., using a Google cached version of your web site to send you spam. However, some web applications such as OpenID require that your site be able to receive form data in this way. If you are running OpenID, enable this option.';
-$helptxt['badbehavior_display_stats'] = 'Enabling this option will add a blurb to your web site footer (theme dependant) advertising Bad Behavior’s presence and the number of recently blocked requests. This option is not available or has no effect when logging is not in use.';
 $helptxt['badbehavior_postcount_wl'] = 'This allows you to bypass bad behavior checks for users over a certain post count.<br />-1 will bypass all registered users, including those with no posts<br />0 will disable bypassing and scan everyone regardless of post count<br />A post count number greater than zero under which users will be checked.';
 $helptxt['badbehavior_ip_wl'] = 'IP address ranges use the CIDR format.  To remove an address just leave it blank and then save';
 $helptxt['badbehavior_useragent_wl'] = 'User agents are matched by exact match only.';

@@ -1281,6 +1281,36 @@ div.bbc_footnotes .meaction{
 	border-radius: 4px;
 	background: #fdfdfd;
 }
+.drop_area {
+	-webkit-font-smoothing: antialiased;
+	color: rgb(21, 125, 251);
+	background-color: rgb(230, 230, 230);
+}
+.statusbar {
+	border-top: 1px solid #A9CCD1;
+	border-bottom: 1px solid #A9CCD1;
+	background: rgb(241, 241, 241);
+}
+
+.progressBar {
+	border: 1px solid #ddd;
+}
+
+.progressBar div {
+	color: #fff;
+	background-color: rgb(64, 118, 182);
+}
+
+.abort, .remove {
+	background-color: #A8352F;
+	border-radius: 5px;
+	color: #fff;
+	cursor: pointer;
+}
+.drop_attachments_error {
+	color: #ff0000;
+}
+
 #postMoreOptions, #postAttachment, #postAttachment2 {
 	border-top: 1px solid #ccc;
 }

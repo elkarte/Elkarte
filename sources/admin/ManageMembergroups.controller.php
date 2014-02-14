@@ -612,7 +612,6 @@ class ManageMembergroups_Controller extends Action_Controller
 			// Remove everyone from this group!
 			if ($min_posts != -1)
 				detachDeletedGroupFromMembers($current_group['id_group']);
-
 			elseif ($current_group['id_group'] != 3)
 			{
 				// Making it a hidden group? If so remove everyone with it as primary group (Actually, just make them additional).

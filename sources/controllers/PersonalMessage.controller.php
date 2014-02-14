@@ -1769,10 +1769,11 @@ class PersonalMessage_Controller extends Action_Controller
 			}
 		}
 
-		// Prep the template
+		// Simple search or not?
 		$context['simple_search'] = isset($context['search_params']['advanced']) ? empty($context['search_params']['advanced']) : !empty($modSettings['simpleSearch']) && !isset($_REQUEST['advanced']);
 		if (isset($_GET['basic']))
 			$context['minmax_preferences']['pmsearch'] = 0;
+
 		$context['page_title'] = $txt['pm_search_title'];
 		$context['sub_template'] = 'search';
 		$context['linktree'][] = array(
@@ -2241,15 +2242,15 @@ function messageIndexBar($area)
 			'title' => $txt['pm_messages'],
 			'counter' => 'unread_messages',
 			'areas' => array(
-				'send' => array(
-					'label' => $txt['new_message'],
-					'custom_url' => $scripturl . '?action=pm;sa=send',
-					'permission' => allowedTo('pm_send'),
-				),
 				'inbox' => array(
 					'label' => $txt['inbox'],
 					'custom_url' => $scripturl . '?action=pm',
 					'counter' => 'unread_messages',
+				),
+				'send' => array(
+					'label' => $txt['new_message'],
+					'custom_url' => $scripturl . '?action=pm;sa=send',
+					'permission' => allowedTo('pm_send'),
 				),
 				'sent' => array(
 					'label' => $txt['sent_items'],

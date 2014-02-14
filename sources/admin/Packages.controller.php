@@ -1489,6 +1489,21 @@ class Packages_Controller extends Action_Controller
 		// Load up any custom themes we may want to install into...
 		$theme_paths = getThemesPathbyID();
 
+		// For uninstall operations we only consider the themes in which the package is installed.
+		if (isset($_REQUEST['reverse']) && !empty($_REQUEST['install_id']))
+		{
+			$install_id = (int) $_REQUEST['install_id'];
+			if ($install_id > 0)
+			{
+				$old_themes = loadThemesAffected($install_id);
+				foreach ($theme_paths as $id => $data)
+				{
+					if ($id != 1 && !in_array($id, $old_themes))
+						unset($theme_paths[$id]);
+				}
+			}
+		}
+
 		// Boardmod?
 		if (isset($_REQUEST['boardmod']))
 			$mod_actions = parseBoardMod(@file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $_REQUEST['filename']), true, $reverse, $theme_paths);

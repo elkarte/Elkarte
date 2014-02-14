@@ -201,7 +201,6 @@ $txt['badbehavior_httpbl_threat_desc'] = '(default 25)';
 $txt['badbehavior_httpbl_maxage'] = 'http:BL Maximum Age';
 $txt['badbehavior_httpbl_maxage_desc'] = '(default 30)';
 $txt['badbehavior_eucookie'] = 'Check to enable EU Cookie Handling';
-$txt['badbehavior_display_stats'] = 'Check to display bad behavior in the page footer';
 $txt['badbehavior_reverse_proxy'] = 'Enable Reverse Proxy';
 $txt['badbehavior_reverse_proxy_header'] = 'Reverse Proxy Header';
 $txt['badbehavior_reverse_proxy_header_desc'] = '(default X-Forwarded-For)';
@@ -249,6 +248,7 @@ $txt['setup_verification_add_more_answers'] = 'Add another answer';
 
 $txt['moderation_settings'] = 'Moderation Settings';
 $txt['setting_warning_enable'] = 'Enable User Warning System';
+$txt['warning_enable'] = '<strong>User Warning System</strong><br />This feature enables members of the admin and moderation team to issue warnings to members - and to use a members warning level to determine the actions available to them on the forum. Upon enabling this feature a permission will be available within the permissions section to define which groups may assign warnings to members. Warning levels can be adjusted from a members profile.';
 $txt['setting_warning_watch'] = 'Warning level for user watch';
 $txt['setting_warning_watch_note'] = 'The user warning level after which a user watch is put in place - 0 to disable.';
 $txt['setting_warning_moderate'] = 'Warning level for post moderation';

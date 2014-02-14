@@ -437,6 +437,7 @@ function getCalendarGrid($month, $year, $calendarOptions)
 			'days' => array(),
 			'number' => $month_info['first_day']['week_num'] + $nRow + $nWeekAdjust
 		);
+		
 		// Handle the dreaded "week 53", it can happen, but only once in a blue moon ;)
 		if ($calendarGrid['weeks'][$nRow]['number'] == 53 && $nShift != 4 && $month_info['first_day_of_next_year'] < 4)
 			$calendarGrid['weeks'][$nRow]['number'] = 1;

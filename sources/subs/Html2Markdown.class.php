@@ -113,6 +113,10 @@ class Convert_Md
 	 */
 	public function get_markdown()
 	{
+		// If there is nothing to parse, its quite easy
+		if (($this->_parser && $this->doc->getElementsByTagName("body")->item(0) === null) || (!$this->_parser && $this->doc === false))
+			return '';
+
 		// For this html node, find all child elements and convert
 		$body = ($this->_parser) ? $this->doc->getElementsByTagName("body")->item(0) : $this->doc->root;
 		$this->_convert_childNodes($body);

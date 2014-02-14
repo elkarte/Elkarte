@@ -497,7 +497,7 @@ function template_viewmodreport()
 /**
  * Callback function for showing a watched users post in the table.
  *
- * @param array $post
+ * @param mixed[] $post
  */
 function template_user_watch_post_callback($post)
 {

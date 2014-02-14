@@ -49,7 +49,7 @@ $txt['membergroups_min_posts'] = 'Required posts';
 $txt['membergroups_online_color'] = 'Color in online list';
 $txt['membergroups_icon_count'] = 'Number of icon images';
 $txt['membergroups_icon_image'] = 'Icon image filename';
-$txt['membergroups_icon_image_note'] = 'Upload icon images in to the default theme directory to enable selection.';
+$txt['membergroups_icon_image_note'] = 'Upload icon images in to the default theme directory to enable selection.<br />Select the icon to change it.';
 $txt['membergroups_max_messages'] = 'Max personal messages';
 $txt['membergroups_max_messages_note'] = '0 = unlimited';
 $txt['membergroups_max_messages_desc'] = 'Here you can set the limit of personal messages a user can keep on the server.<br />

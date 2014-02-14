@@ -1820,7 +1820,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			if ($pos2 !== false && ($pos2 <= $pos3 || $pos3 === false))
 			{
 				preg_match('~^(<br />|&nbsp;|\s|\[)+~', substr($message, $pos2 + 6), $matches);
-				$message = substr($message, 0, $pos2) . "\n" . (!empty($matches[0]) && substr($matches[0], -1) == '[' ? '[/li]' : '[/li][/list]') . "\n" . substr($message, $pos2);
+				$message = substr($message, 0, $pos2) . (!empty($matches[0]) && substr($matches[0], -1) == '[' ? '[/li]' : '[/li][/list]') . substr($message, $pos2);
 
 				$open_tags[count($open_tags) - 2]['after'] = '</ul>';
 			}
@@ -3058,7 +3058,7 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 	{
 		if (!is_array($modSettings['attachmentUploadDir']))
 			$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
-		$path = isset($modSettings['attachmentUploadDir'][$dir]) ? $modSettings['attachmentUploadDir'][$dir] : $modSettings['attachmentUploadDir'];
+		$path = isset($modSettings['attachmentUploadDir'][$dir]) ? $modSettings['attachmentUploadDir'][$dir] : $modSettings['basedirectory_for_attachments'];
 	}
 	else
 		$path = $modSettings['attachmentUploadDir'];
@@ -4168,6 +4168,59 @@ function removeScheduleTaskImmediate($task, $calculateNextTrigger = true)
 		{
 			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 			calculateNextTrigger($task);
+		}
+	}
+}
+
+function checkJsonEncode() {
+	if (!function_exists('json_encode')) {
+		function json_encode($a = false) {
+
+			switch(gettype($a)) {
+				case 'integer':
+				case 'double':
+					return floatval(str_replace(",", ".", strval($a)));
+				break;
+
+				case 'NULL':
+				case 'resource':
+				case 'unknown':
+					return 'null';
+				break;
+
+				case 'boolean':
+					return $a ? 'true' : 'false' ;
+				break;
+
+				case 'array':
+				case 'object':
+					$output = array();
+					$isAssoc = false;
+
+					foreach(array_keys($a) as $key) {
+						if (!is_int($key)) {
+							$isAssoc = true;
+							break;
+						}
+					}
+
+					if($isAssoc) {
+						foreach($a as $k => $val) {
+							$output []= json_encode($k) . ':' . json_encode($val);
+						}
+						$output = '{' . implode(',', $output) . '}';
+					} else {
+						foreach($a as $val){
+							$output []= json_encode($val);
+						}
+						$output = '[' . implode(',', $output) . ']';
+					}
+					return $output;
+				break;
+
+				default:
+				return '"' . addslashes($a) . '"';
+			}
 		}
 	}
 }
