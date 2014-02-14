@@ -11,12 +11,12 @@
 
 /**
  * Simply invoke the constructor by calling dragDropAttachment
- *
  */
 (function() {
 	function dragDropAttachment() {}
 
 	dragDropAttachment = function() {
+
 		// Few internal global vars
 		var allowedExtensions = [],
 			totalSizeAllowed = null,
@@ -31,14 +31,16 @@
 			/**
 			 * public function, accisible with prototype chain
 			 * @param {object} params
-			 * allowedExtensions - types of attachments allowed
-			 * totalSizeAllowed - maximum size of total attachments allowed
-			 * individualSizeAllowed - maximum individual file size allowed
-			 * numOfAttachmentAllowed - number of files that can be attached in a post
-			 * totalAttachSizeUploaded - total size of already attached files(modifying post)
-			 * numAttachUploaded - number of already attached files(modifying post)
+			 *
+			 *		allowedExtensions - types of attachments allowed
+			 *		totalSizeAllowed - maximum size of total attachments allowed
+			 *		individualSizeAllowed - maximum individual file size allowed
+			 *		numOfAttachmentAllowed - number of files that can be attached in a post
+			 *		totalAttachSizeUploaded - total size of already attached files(modifying post)
+			 *		numAttachUploaded - number of already attached files(modifying post)
 			 */
-			init = function(params) {
+			init = function(params)
+			{
 				allowedExtensions = (params.allowedExtensions === '') ? [] : params.allowedExtensions.replace(/\s/g, '').split(',');
 				totalSizeAllowed = (params.totalSizeAllowed === '') ? null : params.totalSizeAllowed;
 				individualSizeAllowed = (params.individualSizeAllowed === '') ? null : params.individualSizeAllowed;
@@ -55,21 +57,26 @@
 			 * status - current progress bar UI instance
 			 * upload the file to server and update the UI
 			 */
-			sendFileToServer = function(formData, status) {
+			sendFileToServer = function(formData, status)
+			{
 				var jqXHR = $.ajax({
 					xhr: function() {
 						var xhrobj = $.ajaxSettings.xhr();
-						if (xhrobj.upload) {
+
+						if (xhrobj.upload)
+						{
 							xhrobj.upload.addEventListener('progress', function(event) {
-								var percent = 0;
-								var position = event.loaded || event.position;
-								var total = event.total;
-								if (event.lengthComputable) {
+								var percent = 0,
+									position = event.loaded || event.position,
+									total = event.total;
+
+								if (event.lengthComputable)
 									percent = Math.ceil(position / total * 100);
-								}
+
 								status.setProgress(percent);
 							}, false);
 						}
+
 						return xhrobj;
 					},
 					url: elk_scripturl + '?action=attachment;sa=ulattach;' + elk_session_var + '=' + elk_session_id,
@@ -77,41 +84,47 @@
 					contentType: false,
 					processData: false,
 					cache: false,
-					data: formData,
+					data: formData
 				})
 				.done(function(resp) {
-						if (typeof(resp) !== 'object') resp = JSON.parse(resp);
+					if (typeof(resp) !== 'object')
+						resp = JSON.parse(resp);
 
-						if (resp.result) {
-							status.setProgress(100);
-							var curFileNum = filesUploadedSuccessfully.length,
-								data = resp.data;
+					if (resp.result)
+					{
+						status.setProgress(100);
+						var curFileNum = filesUploadedSuccessfully.length,
+							data = resp.data;
 
-							filesUploadedSuccessfully.push(data);
-							data.curFileNum = curFileNum;
-							status.onUploadSuccess(data);
-						} else {
-							status.setProgress(0);
-						}
+						filesUploadedSuccessfully.push(data);
+						data.curFileNum = curFileNum;
+						status.onUploadSuccess(data);
+					}
+					else
+						status.setProgress(0);
 				})
 				.fail(function(error) {
-						console.log('error');
-						console.log(error);
+					console.log('error');
+					console.log(error);
 				})
 				.always(function() {
-						uploadInProgress = false;
-						runAttachmentQueue();
+					uploadInProgress = false;
+					runAttachmentQueue();
 				});
 				status.setAbort(jqXHR);
 			};
 
 			/**
 			 * private function
+			 *
+			 * removes the file from the server
+			 *
 			 * @param {object} options
-			 * removes the file to server
 			 */
-			removeFileFromServer = function(options) {
+			removeFileFromServer = function(options)
+			{
 				var dataToSend = filesUploadedSuccessfully[options.fileNum];
+
 				$.ajax({
 					url: elk_scripturl + '?action=attachment;sa=rmattach;' + elk_session_var + '=' + elk_session_id,
 					type: "POST",
@@ -123,47 +136,52 @@
 					}
 				})
 				.done(function(resp) {
-						if (typeof(resp) !== 'object') resp = JSON.parse(resp);
+					if (typeof(resp) !== 'object')
+						resp = JSON.parse(resp);
 
-						if (resp.result) {
-							totalAttachSizeUploaded -= filesUploadedSuccessfully[options.fileNum].size / 1024;
-							numAttachUploaded--;
-							$('#' + dataToSend.temp_name).unbind();
-							$('#' + dataToSend.temp_name).remove();
-						} else {
-							console.log('error success');
-						}
+					if (resp.result)
+					{
+						totalAttachSizeUploaded -= filesUploadedSuccessfully[options.fileNum].size / 1024;
+						numAttachUploaded--;
+						$('#' + dataToSend.temp_name).unbind();
+						$('#' + dataToSend.temp_name).remove();
+					}
+					else
+						console.log('error success');
 				})
 				.fail(function(error) {
-						console.log('error');
+					console.log('error');
 				});
 			};
 
 			/**
 			 * private function
-			 * @param {object} options
+			 *
 			 * creates the UI for each file
+			 *
+			 * @param {object} obj options
 			 */
-			createStatusbar = function(obj) {
+			createStatusbar = function(obj)
+			{
 				this.str = $('<div class="statusbar"><div class="info"></div><div class="progressBar"><div></div></div><div class="abort">X</div></div>');
 
 				$('.progress_tracker').append(this.str);
 				this.setFileNameSize = function(name, size) {
-					var sizeStr = "";
-					var sizeKB = size / 1024;
+					var sizeStr = "",
+						sizeKB = size / 1024,
+						sizeMB = sizeKB / 1024;
 
-					if (parseInt(sizeKB, 10) > 1024) {
-						var sizeMB = sizeKB / 1024;
+					if (parseInt(sizeKB, 10) > 1024)
 						sizeStr = sizeMB.toFixed(2) + " MB";
-					} else {
+					else
 						sizeStr = sizeKB.toFixed(2) + " KB";
-					}
 
 					$(this.str).find('.info').html(name + ' (' + sizeStr + ')');
 				};
 
 				this.setProgress = function(progress) {
 					var progressBarWidth = progress * $(this.str).find('.progressBar').width() / 100;
+
 					$(this.str).find('.progressBar div').animate({
 						width: progressBarWidth
 					}, 10).html(progress + "% ");
@@ -171,6 +189,7 @@
 
 				this.setAbort = function(jqxhr) {
 					var sb = $(this.str);
+
 					$(this.str).find('.abort').bind('click', function(e) {
 						e.preventDefault();
 						jqxhr.abort();
@@ -189,6 +208,7 @@
 					$(this.str).find('.remove').bind('click', function(e) {
 						e.preventDefault();
 						var fileNum = e.target.id;
+
 						removeFileFromServer({
 							'fileNum': fileNum
 						});
@@ -198,52 +218,61 @@
 
 			/**
 			 * public function
-			 * @param files and region of UI
+			 *
 			 * handle the functionality when file is dropped
-			 * files - what files to upload
-			 * obj - parent object in which file progress is shown
+			 *
+			 * @param {object} files what files to upload
+			 * @param {object} obj parent object in which file progress is shown
 			 */
 			handleFileUpload = function(files, obj) {
 				var errorMsgs = {},
 					extnErrorFiles = [],
 					sizeErrorFiles = [];
 
-				for (var i = 0; i < files.length; i++) {
+				for (var i = 0; i < files.length; i++)
+				{
 					var fileExtensionCheck = /(?:\.([^.]+))?$/,
 						extension = fileExtensionCheck.exec(files[i].name)[1],
 						fileSize = files[i].size / 1024,
 						errorFlag = false;
 
-					if (allowedExtensions.length > 0 && allowedExtensions.indexOf(extension) < 0) {
+					if (allowedExtensions.length > 0 && allowedExtensions.indexOf(extension) < 0)
+					{
 						errorMsgs.extnError = 'File extension not allowed';
 						extnErrorFiles.push(files[i].name);
 						errorFlag = true;
 					}
-					if (individualSizeAllowed !== null && fileSize > individualSizeAllowed) {
+
+					if (individualSizeAllowed !== null && fileSize > individualSizeAllowed)
+					{
 						errorMsgs.individualSizeErr = 'File size too big';
 						sizeErrorFiles.push(files[i].name);
 						errorFlag = true;
 					}
 
-					if (numAttachUploaded >= numOfAttachmentAllowed) {
+					if (numAttachUploaded >= numOfAttachmentAllowed)
+					{
 						errorMsgs.maxNumErr = 'Sorry, you aren\'t allowed to post any more attachments.';
 						sizeErrorFiles.push(files[i].name);
 						errorFlag = true;
 					}
 
-					if (errorFlag === false) totalAttachSizeUploaded += fileSize;
+					if (errorFlag === false)
+						totalAttachSizeUploaded += fileSize;
 
-					if (totalSizeAllowed !== null && totalAttachSizeUploaded > totalSizeAllowed) {
+					if (totalSizeAllowed !== null && totalAttachSizeUploaded > totalSizeAllowed)
+					{
 						errorMsgs.totalSizeError = 'Maximum file size reached';
 						errorFlag = true;
 					}
 
-					if (errorFlag === false) {
-						numAttachUploaded++;
+					if (errorFlag === false)
+					{
+						var fd = new FormData(),
+							status = new createStatusbar(obj);
 
-						var fd = new FormData();
+						numAttachUploaded++;
 						fd.append('attachment[]', files[i]);
-						var status = new createStatusbar(obj);
 						status.setFileNameSize(files[i].name, files[i].size);
 						attachmentQueue.push({
 							'formData': fd,
@@ -264,9 +293,11 @@
 			 * checks if there is an file pending to upload
 			 */
 			runAttachmentQueue = function() {
-				if (attachmentQueue.length > 0 && uploadInProgress === false) {
-					uploadInProgress = true;
+				if (attachmentQueue.length > 0 && uploadInProgress === false)
+				{
 					var currentData = attachmentQueue[0];
+
+					uploadInProgress = true;
 					sendFileToServer(currentData.formData, currentData.statusInstance);
 					attachmentQueue.splice(0, 1);
 				}
@@ -274,10 +305,13 @@
 
 			/**
 			 * private function
+			 *
+			 * populates the warning box when something does not go as expected
+			 *
 			 * @param {object} params
-			 * error messages to show
-			 * file names having extension error
-			 * file names having size error
+			 *		error messages to show
+			 *		file names having extension error
+			 *		file names having size error
 			 */
 			populateErrors = function(params) {
 				$('.drop_attachments_error').html('');
@@ -305,26 +339,32 @@
 
 			/**
 			 * private function
-			 * @param string
-			 * to check if value exist in array
+			 *
+			 * Used to check if value exist in array
+			 * @param {string} needle
 			 */
 			indexOf = function(needle) {
-				if (typeof Array.prototype.indexOf === 'function') {
+				if (typeof Array.prototype.indexOf === 'function')
 					indexOf = Array.prototype.indexOf;
-				} else {
+				else
+				{
 					indexOf = function(needle) {
 						var i = -1,
 							index = -1;
 
-						for (i = 0; i < this.length; i++) {
-							if (this[i] === needle) {
+						for (i = 0; i < this.length; i++)
+						{
+							if (this[i] === needle)
+							{
 								index = i;
 								break;
 							}
 						}
+
 						return index;
 					};
 				}
+
 				return indexOf.call(this, needle);
 			};
 
