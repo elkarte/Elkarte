@@ -2155,7 +2155,7 @@ function template_welcome_message()
 			<div style="float: left; width: 2ex; font-size: 2em; color: red;">!!</div>
 			<strong style="text-decoration: underline;">', $txt['error_warning_notice'], '</strong><br />
 			<div style="padding-left: 6ex;">
-				', sprintf($txt['error_script_outdated'], '<em id="ourVersion" style="white-space: nowrap;">??</em>', '<em id="yourVersion" style="white-space: nowrap;">' . CURRENT_VERSION . '</em>'), '
+				', sprintf($txt['error_script_outdated'], '<em id="latestVersion" style="white-space: nowrap;">??</em>', '<em id="installedVersion" style="white-space: nowrap;">' . CURRENT_VERSION . '</em>'), '
 			</div>
 		</div>';
 
@@ -2176,18 +2176,18 @@ function template_welcome_message()
 			{
 				var ourVer, yourVer;
 
-				if (!(\'ourVersion\' in window))
+				if (!(\'latestVersion\' in window))
 					return;
 
-				window.ourVersion = window.ourVersion.replace(/ElkArte\s?/g, \'\');
+				window.latestVersion = window.latestVersion.replace(/ElkArte\s?/g, \'\');
 
-				ourVer = document.getElementById("ourVersion");
-				yourVer = document.getElementById("yourVersion");
+				ourVer = document.getElementById("latestVersion");
+				yourVer = document.getElementById("installedVersion");
 
-				ourVer.innerHTML = window.ourVersion;
+				ourVer.innerHTML = window.latestVersion;
 
 				var currentVersion = yourVer.innerHTML;
-				if (currentVersion < window.ourVersion)
+				if (currentVersion < window.latestVersion)
 					document.getElementById(\'version_warning\').style.display = \'\';
 			}
 			addLoadEvent(ourCurrentVersion);

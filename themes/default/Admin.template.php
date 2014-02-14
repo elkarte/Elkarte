@@ -57,9 +57,9 @@ function template_admin()
 										<div id="version_details">
 											<strong>', $txt['support_versions'], ':</strong><br />
 											', $txt['support_versions_forum'], ':
-											<em id="yourVersion">', $context['forum_version'], '</em><br />
+											<em id="installedVersion">', $context['forum_version'], '</em><br />
 											', $txt['support_versions_current'], ':
-											<em id="ourVersion">??</em><br />
+											<em id="latestVersion">??</em><br />
 											', $context['can_admin'] ? '<a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />';
 
 	// Display all the members who can administrate the forum.
@@ -97,16 +97,7 @@ function template_admin()
 								</ul>
 							</div>
 						</div>
-					</div>';
-
-	// The below functions include all the scripts needed from the ElkArte site. The language and format are passed for internationalization.
-	if (empty($modSettings['disable_elk_js']))
-		echo '
-					<script src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
-					<script src="', $scripturl, '?action=viewadminfile;filename=latest-news.js"></script>';
-
-	// This sets the announcements and current versions themselves ;).
-	echo '
+					</div>
 					<script><!-- // --><![CDATA[
 						var oAdminIndex = new elk_AdminIndex({
 							sSelf: \'oAdminCenter\',
@@ -126,8 +117,8 @@ function template_admin()
 							sAnnouncementContainerId: \'ourAnnouncements\',
 
 							bLoadVersions: true,
-							sOurVersionContainerId: \'ourVersion\',
-							sYourVersionContainerId: \'yourVersion\',
+							slatestVersionContainerId: \'latestVersion\',
+							sinstalledVersionContainerId: \'installedVersion\',
 							sVersionOutdatedTemplate: ', JavaScriptEscape('
 								<span class="alert">%currentVersion%</span>
 							'), ',
@@ -172,9 +163,9 @@ function template_credits()
 								<div class="content">
 									<strong>', $txt['support_versions'], ':</strong><br />
 										', $txt['support_versions_forum'], ':
-									<em id="yourVersion">', $context['forum_version'], '</em>', $context['can_admin'] ? ' <a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />
+									<em id="installedVersion">', $context['forum_version'], '</em>', $context['can_admin'] ? ' <a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />
 										', $txt['support_versions_current'], ':
-									<em id="ourVersion">??</em><br />';
+									<em id="latestVersion">??</em><br />';
 
 	// Display all the variables we have server information for.
 	foreach ($context['current_versions'] as $version)
@@ -290,8 +281,8 @@ function template_credits()
 					<script><!-- // --><![CDATA[
 						var oAdminIndex = new elk_AdminIndex({
 							bLoadVersions: true,
-							sOurVersionContainerId: \'ourVersion\',
-							sYourVersionContainerId: \'yourVersion\',
+							slatestVersionContainerId: \'latestVersion\',
+							sinstalledVersionContainerId: \'installedVersion\',
 							sVersionOutdatedTemplate: ', JavaScriptEscape('
 								<span class="alert">%currentVersion%</span>
 							'), ',
@@ -335,10 +326,10 @@ function template_view_versions()
 											', $txt['admin_elkpackage'], '
 										</td>
 										<td class="windowbg">
-											<em id="yourVersion">', $context['forum_version'], '</em>
+											<em id="installedVersion">', $context['forum_version'], '</em>
 										</td>
 										<td class="windowbg">
-											<em id="ourVersion">??</em>
+											<em id="latestVersion">??</em>
 										</td>
 									</tr>';
 

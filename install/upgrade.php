@@ -3866,7 +3866,7 @@ function template_welcome_message()
 				window.elkVersion = window.elkVersion.replace(/ELKARTE\s?/ig, \'\');
 
 				ourVer = document.getElementById(\'elkVersion\');
-				yourVer = document.getElementById(\'yourVersion\');
+				yourVer = document.getElementById(\'installedVersion\');
 
 				ourVer.innerHTML = window.elkVersion;
 

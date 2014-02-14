@@ -76,16 +76,13 @@ elk_AdminIndex.prototype.setAnnouncements = function ()
 // Updates the current version container with the current version found in current-version.js
 elk_AdminIndex.prototype.showCurrentVersion = function ()
 {
-	if (!('elkVersion' in window))
-		return;
-
-	var oElkVersionContainer = document.getElementById(this.opt.sOurVersionContainerId),
-		oYourVersionContainer = document.getElementById(this.opt.sYourVersionContainerId),
-		sCurrentVersion = oYourVersionContainer.innerHTML;
+	var oElkVersionContainer = document.getElementById(this.opt.slatestVersionContainerId),
+		oinstalledVersionContainer = document.getElementById(this.opt.sinstalledVersionContainerId),
+		sCurrentVersion = oinstalledVersionContainer.innerHTML;
 
 	oElkVersionContainer.innerHTML = window.elkVersion;
 	if (sCurrentVersion !== window.elkVersion)
-		oYourVersionContainer.innerHTML = this.opt.sVersionOutdatedTemplate.replace('%currentVersion%', sCurrentVersion);
+		oinstalledVersionContainer.innerHTML = this.opt.sVersionOutdatedTemplate.replace('%currentVersion%', sCurrentVersion);
 };
 
 // Checks if a new version of ElkArte is available and if so updates the admin info box
@@ -289,7 +286,7 @@ elk_ViewVersions.prototype.determineVersions = function ()
 		if (!document.getElementById('our' + sFilename))
 			continue;
 
-		var sYourVersion = document.getElementById('your' + sFilename).innerHTML,
+		var sinstalledVersion = document.getElementById('your' + sFilename).innerHTML,
 			sCurVersionType;
 
 		for (var sVersionType in oLowVersion)
@@ -302,23 +299,23 @@ elk_ViewVersions.prototype.determineVersions = function ()
 		// use compareVersion to determine which version is >< the other
 		if (typeof(sCurVersionType) !== 'undefined')
 		{
-			if ((this.compareVersions(oHighYour[sCurVersionType], sYourVersion) || oHighYour[sCurVersionType] === '??') && !oLowVersion[sCurVersionType])
-				oHighYour[sCurVersionType] = sYourVersion;
+			if ((this.compareVersions(oHighYour[sCurVersionType], sinstalledVersion) || oHighYour[sCurVersionType] === '??') && !oLowVersion[sCurVersionType])
+				oHighYour[sCurVersionType] = sinstalledVersion;
 
 			if (this.compareVersions(oHighCurrent[sCurVersionType], ourVersions[sFilename]) || oHighCurrent[sCurVersionType] === '??')
 				oHighCurrent[sCurVersionType] = ourVersions[sFilename];
 
-			if (this.compareVersions(sYourVersion, ourVersions[sFilename]))
+			if (this.compareVersions(sinstalledVersion, ourVersions[sFilename]))
 			{
-				oLowVersion[sCurVersionType] = sYourVersion;
+				oLowVersion[sCurVersionType] = sinstalledVersion;
 				document.getElementById('your' + sFilename).style.color = 'red';
 			}
 		}
-		else if (this.compareVersions(sYourVersion, ourVersions[sFilename]))
-			oLowVersion[sCurVersionType] = sYourVersion;
+		else if (this.compareVersions(sinstalledVersion, ourVersions[sFilename]))
+			oLowVersion[sCurVersionType] = sinstalledVersion;
 
 		document.getElementById('our' + sFilename).innerHTML = ourVersions[sFilename];
-		document.getElementById('your' + sFilename).innerHTML = sYourVersion;
+		document.getElementById('your' + sFilename).innerHTML = sinstalledVersion;
 	}
 
 	if (!('ourLanguageVersions' in window))
@@ -333,18 +330,18 @@ elk_ViewVersions.prototype.determineVersions = function ()
 
 			document.getElementById('our' + sFilename + this.opt.aKnownLanguages[i]).innerHTML = ourLanguageVersions[sFilename];
 
-			sYourVersion = document.getElementById('your' + sFilename + this.opt.aKnownLanguages[i]).innerHTML;
-			document.getElementById('your' + sFilename + this.opt.aKnownLanguages[i]).innerHTML = sYourVersion;
+			sinstalledVersion = document.getElementById('your' + sFilename + this.opt.aKnownLanguages[i]).innerHTML;
+			document.getElementById('your' + sFilename + this.opt.aKnownLanguages[i]).innerHTML = sinstalledVersion;
 
-			if ((this.compareVersions(oHighYour.Languages, sYourVersion) || oHighYour.Languages === '??') && !oLowVersion.Languages)
-				oHighYour.Languages = sYourVersion;
+			if ((this.compareVersions(oHighYour.Languages, sinstalledVersion) || oHighYour.Languages === '??') && !oLowVersion.Languages)
+				oHighYour.Languages = sinstalledVersion;
 
 			if (this.compareVersions(oHighCurrent.Languages, ourLanguageVersions[sFilename]) || oHighCurrent.Languages === '??')
 				oHighCurrent.Languages = ourLanguageVersions[sFilename];
 
-			if (this.compareVersions(sYourVersion, ourLanguageVersions[sFilename]))
+			if (this.compareVersions(sinstalledVersion, ourLanguageVersions[sFilename]))
 			{
-				oLowVersion.Languages = sYourVersion;
+				oLowVersion.Languages = sinstalledVersion;
 				document.getElementById('your' + sFilename + this.opt.aKnownLanguages[i]).style.color = 'red';
 			}
 		}
