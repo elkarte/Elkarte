@@ -211,6 +211,7 @@ class ManageSecurity_Controller extends Action_Controller
 
 		$context['post_url'] = $scripturl . '?action=admin;area=securitysettings;save;sa=moderation';
 		$context['settings_title'] = $txt['moderation_settings'];
+		$context['settings_message'] = $txt['warning_enable'];
 
 		Settings_Form::prepare_db($config_vars);
 	}
@@ -421,10 +422,10 @@ class ManageSecurity_Controller extends Action_Controller
 
 		$config_vars = array(
 			// Warning system?
-			array('int', 'warning_watch', 'subtext' => $txt['setting_warning_watch_note'], 'help' => 'warning_enable'),
-			'moderate' => array('int', 'warning_moderate', 'subtext' => $txt['setting_warning_moderate_note']),
-			array('int', 'warning_mute', 'subtext' => $txt['setting_warning_mute_note']),
-			'rem1' => array('int', 'user_limit', 'subtext' => $txt['setting_user_limit_note']),
+			array('int', 'warning_watch', 'subtext' => $txt['setting_warning_watch_note'], 'help' => 'watch_enable'),
+			'moderate' => array('int', 'warning_moderate', 'subtext' => $txt['setting_warning_moderate_note'], 'help' => 'moderate_enable'),
+			array('int', 'warning_mute', 'subtext' => $txt['setting_warning_mute_note'], 'help' => 'mute_enable'),
+			'rem1' => array('int', 'user_limit', 'subtext' => $txt['setting_user_limit_note'], 'help' => 'perday_limit'),
 			'rem2' => array('int', 'warning_decrement', 'subtext' => $txt['setting_warning_decrement_note']),
 			array('select', 'warning_show', 'subtext' => $txt['setting_warning_show_note'], array($txt['setting_warning_show_mods'], $txt['setting_warning_show_user'], $txt['setting_warning_show_all'])),
 		);
