@@ -964,6 +964,42 @@ span.views_text {
 	border-radius: 4px;
 }
 
+/*	$EDITOR		*/
+/* ------------------------------------------------------- */
+
+.drop_area {
+	-webkit-font-smoothing: antialiased;
+	color: #43a8da;;
+	background-color: #eee;
+	border: 1px dashed #ccc;
+	border-radius: 5px;
+}
+.statusbar {
+	border-top: 1px solid #a9ccd1;
+	border-bottom: 1px solid #A9ccd1;
+	background: #eee;
+}
+
+.progressBar {
+	border: 1px solid #ddd;
+}
+
+.progressBar div {
+	color: #fff;
+	background-color: #43a8da;
+}
+
+.abort, .remove {
+	background-color: #a8352f;
+	border-radius: 5px;
+	color: #fff;
+	cursor: pointer;
+}
+.drop_attachments_error {
+	color: #ff0000;
+}
+
+
 /*	$PROGRESS	*/
 /* ------------------------------------------------------- */
 /* Styles for the progress bar */
