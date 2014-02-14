@@ -49,7 +49,7 @@ $txt['membergroups_min_posts'] = 'Benötigte Beiträge';
 $txt['membergroups_online_color'] = 'Farbe in Onlineliste';
 $txt['membergroups_icon_count'] = 'Anzahl an Symbolbildern';
 $txt['membergroups_icon_image'] = 'Symbolbild-Dateiname';
-$txt['membergroups_icon_image_note'] = 'Laden Sie Bilddateien in das Standardthemeverzeichnis hoch, um die Auswahl zu aktivieren.';
+$txt['membergroups_icon_image_note'] = 'Laden Sie Bilddateien in das Standardthemeverzeichnis hoch, um die Auswahl zu aktivieren.<br />Wählen Sie das Symbol aus, um es zu ändern.';
 $txt['membergroups_max_messages'] = 'Max. private Nachrichten';
 $txt['membergroups_max_messages_note'] = '0 = unbegrenzt';
 $txt['membergroups_max_messages_desc'] = 'Hier können Sie die Höchstzahl an privaten Nachrichten festlegen, die ein Benutzer auf dem Server speichern darf.<br />

@@ -9,41 +9,8 @@ $txt['post_in_board'] = 'Schreibe ins Forum';
 $txt['subject_not_filled'] = 'Der Betreff wurde nicht ausgefüllt. Er wird benötigt.';
 $txt['message_body_not_filled'] = 'Der Nachrichtentext wurde nicht ausgefüllt. Er wird benötigt.';
 
-// Use numeric entities in the below string.
-$txt['add_bbc'] = 'BBCode einfügen';
-$txt['bold'] = 'Fett';
-$txt['italic'] = 'Kursiv';
-$txt['underline'] = 'Unterstrichen';
-$txt['center'] = 'Zentriert';
-$txt['hyperlink'] = 'Hyperlink einfügen';
-$txt['insert_email'] = 'E-Mail-Adresse einfügen';
-$txt['bbc_code'] = 'Code einfügen';
-
 // Escape any single quotes in here twice.. 'it\'s' -> 'it\\\'s'.
 $txt['bbc_quote'] = 'Zitat einfügen';
-$txt['bbc_spoiler'] = 'Spoiler einfügen';
-$txt['bbc_footnote'] = 'Fußnote einfügen';
-$txt['list'] = 'Liste einfügen';
-$txt['list_unordered'] = 'Unsortierte Liste einfügen';
-$txt['list_ordered'] = 'Sortierte Liste einfügen';
-
-$txt['change_color'] = 'Farbe ändern';
-$txt['black'] = 'Schwarz';
-$txt['red'] = 'Rot';
-$txt['yellow'] = 'Gelb';
-$txt['pink'] = 'Rosa';
-$txt['green'] = 'Grün';
-$txt['orange'] = 'Orange';
-$txt['purple'] = 'Violett';
-$txt['blue'] = 'Blau';
-$txt['beige'] = 'Beige';
-$txt['brown'] = 'Braun';
-$txt['teal'] = 'Aquamarinblau';
-$txt['navy'] = 'Marineblau';
-$txt['maroon'] = 'Kastanienbraun';
-$txt['lime_green'] = 'Hellgrün';
-$txt['white'] = 'Weiß';
-
 $txt['disable_smileys'] = 'Smileys deaktivieren';
 $txt['dont_use_smileys'] = 'Keine Smileys verwenden.';
 
@@ -57,23 +24,7 @@ $txt['question_mark'] = 'Fragezeichen';
 $txt['icon_poll'] = 'Umfrage';
 $txt['lamp'] = 'Lampe';
 $txt['add_smileys'] = 'Smileys einfügen';
-$txt['image'] = 'Bild einfügen';
-$txt['table'] = 'Tabelle einfügen';
-$txt['table_td'] = 'Tabellenspalte einfügen';
 $txt['topic_notify_no'] = 'Es gibt keine Themen mit Benachrichtigung.';
-$txt['teletype'] = 'Schreibmaschine';
-$txt['strike'] = 'Durchgestrichen';
-$txt['preformatted'] = 'Vorformatierter Text';
-$txt['left_align'] = 'Linksbündig';
-$txt['right_align'] = 'Rechtsbündig';
-$txt['superscript'] = 'Hochgestellt';
-$txt['subscript'] = 'Tiefgestellt';
-$txt['table_tr'] = 'Tabellenzeile einfügen';
-$txt['horizontal_rule'] = 'Horizontaler Trenner';
-$txt['font_size'] = 'Schriftgröße';
-$txt['font_face'] = 'Schriftart';
-$txt['toggle_view'] = 'Ansicht umschalten';
-$txt['unformat_text'] = 'Formatierung entfernen';
 
 $txt['rich_edit_wont_work'] = 'Ihr Browser unterstützt keine WYSIWYG-Bearbeitung.';
 $txt['rich_edit_function_disabled'] = 'Ihr Browser unterstützt diese Funktion nicht.';

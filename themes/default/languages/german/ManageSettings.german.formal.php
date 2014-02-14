@@ -201,7 +201,6 @@ $txt['badbehavior_httpbl_threat_desc'] = '(Standard 25)';
 $txt['badbehavior_httpbl_maxage'] = 'http:BL maximales Alter';
 $txt['badbehavior_httpbl_maxage_desc'] = '(Standard 30)';
 $txt['badbehavior_eucookie'] = 'Aktivieren, um EU-Cookiebehandlung zu aktivieren';
-$txt['badbehavior_display_stats'] = 'Aktivieren, um schädliches Verhalten in der Fußzeile anzuzeigen';
 $txt['badbehavior_reverse_proxy'] = 'Reverse Proxy aktivieren'; // translator note: there's no good German term for that :/
 $txt['badbehavior_reverse_proxy_header'] = 'Reverse-Proxy-Header';
 $txt['badbehavior_reverse_proxy_header_desc'] = '(Standard X-Forwarded-For)';
@@ -249,6 +248,7 @@ $txt['setup_verification_add_more_answers'] = 'Eine weitere Antwort hinzufügen'
 
 $txt['moderation_settings'] = 'Moderationseinstellungen';
 $txt['setting_warning_enable'] = 'Verwarnsystem aktivieren';
+$txt['warning_enable'] = '<strong>Benutzerverwarnsystem</strong><br />Diese Funktion erlaubt es Mitgliedern des Administrations- und des Moderationsteams, Benutzer zu verwarnen und eine Verwarnstufe festzulegen, anhand derer die Funktionen festgelegt werden, die diesen im Forum zur Verfügung stehen. Bei Aktivierung dieser Option wird eine Befugnis zur Verfügung gestellt, mittels derer definiert werden kann, welche Benutzergruppen Mitglieder verwarnen dürfen. Verwarnstufen können aus einem Benutzerprofil heraus angepasst werden.';
 $txt['setting_warning_watch'] = 'Verwarnstufe zur Beobachtung eines Benutzers';
 $txt['setting_warning_watch_note'] = 'Die Verwarnstufe, ab der ein Benutzer automatisch auf die Beobachtungsliste gesetzt wird - 0 zum Deaktivieren.';
 $txt['setting_warning_moderate'] = 'Verwarnstufe zur Beitragsmoderation';
