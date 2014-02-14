@@ -15,7 +15,6 @@
  *
  */
 
-
 /**
 * Just a simple template for now to output json
 * used to output the json formatted data for ajax calls
