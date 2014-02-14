@@ -164,13 +164,17 @@ function initialize_inputs()
 			@session_start();
 	}
 
+	// Reject magic_quotes_sybase='on'.
+	if (ini_get('magic_quotes_sybase') || strtolower(ini_get('magic_quotes_sybase')) == 'on')
+		die('magic_quotes_sybase=on was detected: your host is using an unsecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.');
+
+	if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc() != 0)
+		die('magic_quotes_gpc=on was detected: your host is using an unsecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.');
+
 	// Add slashes, as long as they aren't already being added.
-	if (!function_exists('get_magic_quotes_gpc') || @get_magic_quotes_gpc() == 0)
-	{
-		foreach ($_POST as $k => $v)
-			if (strpos($k, 'password') === false)
-				$_POST[$k] = addslashes($v);
-	}
+	foreach ($_POST as $k => $v)
+		if (strpos($k, 'password') === false)
+			$_POST[$k] = addslashes($v);
 
 	// This is really quite simple; if ?delete is on the URL, delete the installer...
 	if (isset($_GET['delete']))
