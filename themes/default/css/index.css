@@ -331,6 +331,9 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 .new_posts:hover {
 	text-decoration: underline;
 }
+del .bbc_link:link, del .bbc_link:visited {
+	text-decoration: line-through;
+}
 .childboards .new_posts {
     font-size: 0.857em;
     padding: 1px 3px 2px;
