@@ -30,6 +30,8 @@
 function elk_AdminIndex(oOptions)
 {
 	this.opt = oOptions;
+	this.news = {};
+	this.current = {};
 	this.init();
 }
 

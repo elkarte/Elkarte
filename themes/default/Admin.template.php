@@ -99,9 +99,7 @@ function template_admin()
 						</div>
 					</div>
 					<script><!-- // --><![CDATA[
-						var oAdminIndex = new elk_AdminIndex({
-							sSelf: \'oAdminCenter\',
-
+						var oAdminCenter = new elk_AdminIndex({
 							bLoadAnnouncements: true,
 							sAnnouncementTemplate: ', JavaScriptEscape('
 								<dl>

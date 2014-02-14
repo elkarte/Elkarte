@@ -653,7 +653,7 @@ function action_welcomeLogin()
 		return true;
 
 	require_once(SOURCEDIR . '/Security.php');
-	createToken('login');
+	$upcontext += createToken('login');
 
 	return false;
 }
@@ -3473,6 +3473,10 @@ function template_upgrade_above()
 		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css?beta10" />
 		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/_light/index_light.css?beta10" />
 		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/install.css?beta10" />
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" id="jquery"></script>
+		<script><!-- // --><![CDATA[
+			window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-1.10.2.min.js"><\/script>\');
+		// ]]></script>
 		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 		<script><!-- // --><![CDATA[
 			var elk_scripturl = \'', $upgradeurl, '\',
@@ -3707,17 +3711,30 @@ function template_welcome_message()
 	global $upcontext, $disable_security, $settings, $txt;
 
 	echo '
-		<script src="http://elkarte.github.io/Elkarte/site/current-version.js?version=' . CURRENT_VERSION . '"></script>
 		<script src="', $settings['default_theme_url'], '/scripts/sha256.js"></script>
+		<script src="', $settings['default_theme_url'], '/scripts/admin.js"></script>
+		<script><!-- // --><![CDATA[
+			var oUpgradeCenter = new elk_AdminIndex({
+				bLoadAnnouncements: false,
+
+				bLoadVersions: true,
+				slatestVersionContainerId: \'latestVersion\',
+				sinstalledVersionContainerId: \'version_warning\',
+				sVersionOutdatedTemplate: ', JavaScriptEscape('
+				<strong style="text-decoration: underline;">' . $txt['upgrade_warning'] . '</strong><br />
+				<div style="padding-left: 6ex;">
+					' . sprintf($txt['upgrade_warning_out_of_date'], CURRENT_VERSION, '%currentVersion%') . '
+				</div>
+				'), ',
+
+				bLoadUpdateNotification: false
+			});
+		// ]]></script>
 		<h3>', sprintf($txt['upgrade_ready_proceed'], CURRENT_VERSION), '</h3>
 		<form id="upform" action="', $upcontext['form_url'], '" method="post" accept-charset="UTF-8" name="upform"', empty($upcontext['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $upcontext['rid'] . '\');"' : '', '>
 		<input type="hidden" name="', $upcontext['login_token_var'], '" value="', $upcontext['login_token'], '" />
-		<div id="version_warning" class="errorbox" style="display: none;">
-			<strong style="text-decoration: underline;">', $txt['upgrade_warning'], '</strong><br />
-			<div style="padding-left: 6ex;">
-				', sprintf($txt['upgrade_warning_out_of_date'], CURRENT_VERSION), '
-			</div>
-		</div>';
+		<div id="version_warning" class="errorbox" style="display: none;">',CURRENT_VERSION, '</div>
+		<div id="latestVersion" style="display: none;">???</div>';
 
 	$upcontext['chmod_in_form'] = true;
 	template_chmod();
@@ -3853,26 +3870,30 @@ function template_welcome_message()
 		<script><!-- // --><![CDATA[
 			if (document.getElementById(\'js_works\'))
 				document.getElementById(\'js_works\').value = 1;
+			var currentVersionRounds = 0;
 
 			// Latest version?
 			function ourCurrentVersion()
 			{
-				var ourVer,
-					yourVer;
+				var latestVer,
+					setLatestVer;
 
-				if (!(\'elkVersion\' in window))
+				latestVer = document.getElementById(\'latestVersion\');
+				setLatestVer = document.getElementById(\'elkVersion\');
+
+				if (latestVer.innerHTML == \'???\')
+				{
+					// Just to avoid too many tries
+					if (currentVersionRounds > 9)
+						return;
+
+					currentVersionRounds++;
+					setTimeout(\'ourCurrentVersion()\', 50);
 					return;
+				}
 
-				window.elkVersion = window.elkVersion.replace(/ELKARTE\s?/ig, \'\');
-
-				ourVer = document.getElementById(\'elkVersion\');
-				yourVer = document.getElementById(\'installedVersion\');
-
-				ourVer.innerHTML = window.elkVersion;
-
-				var currentVersion = yourVer.innerHTML;
-				if (currentVersion < window.elkVersion)
-					document.getElementById(\'version_warning\').style.display = \'\';
+				setLatestVer.innerHTML = latestVer.innerHTML.replace(\'ElkArte \', \'\');
+				document.getElementById(\'version_warning\').style.display = \'block\';
 			}
 			addLoadEvent(ourCurrentVersion);
 
