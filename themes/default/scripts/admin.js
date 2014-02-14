@@ -78,11 +78,125 @@ elk_AdminIndex.prototype.showCurrentVersion = function ()
 {
 	var oElkVersionContainer = document.getElementById(this.opt.slatestVersionContainerId),
 		oinstalledVersionContainer = document.getElementById(this.opt.sinstalledVersionContainerId),
-		sCurrentVersion = oinstalledVersionContainer.innerHTML;
+		sCurrentVersion = oinstalledVersionContainer.innerHTML,
+		adminIndex = this,
+		elkVersion = '???';
 
-	oElkVersionContainer.innerHTML = window.elkVersion;
-	if (sCurrentVersion !== window.elkVersion)
-		oinstalledVersionContainer.innerHTML = this.opt.sVersionOutdatedTemplate.replace('%currentVersion%', sCurrentVersion);
+	$.getJSON('https://api.github.com/repos/elkarte/Elkarte/releases', {format: "json"},
+	function(data, textStatus, jqXHR) {
+		var mostRecent = {},
+			previous = {};
+		adminIndex.current = adminIndex.normalizeVersion(sCurrentVersion);
+
+		$.each(data, function(idx, elem) {
+			// No drafts, thank you
+			if (elem.draft)
+				return;
+
+			var release = adminIndex.normalizeVersion(elem.tag_name);
+
+			if (!previous.hasOwnProperty('major') || adminIndex.compareVersion(release, previous))
+			{
+				// Using a preprelease? Then you may need to know a new one is out!
+				if ((elem.prerelease && adminIndex.current.prerelease) || (!elem.prerelease))
+				{
+					previous = release;
+					mostRecent = elem;
+				}
+			}
+		});
+		elkVersion = mostRecent.name;
+
+		oElkVersionContainer.innerHTML = elkVersion;
+		if (sCurrentVersion !== elkVersion)
+			oinstalledVersionContainer.innerHTML = adminIndex.opt.sVersionOutdatedTemplate.replace('%currentVersion%', sCurrentVersion);
+	});
+};
+
+// Compare two different versions and return true if the firs is higher than the second
+elk_AdminIndex.prototype.compareVersion = function (curVer, refVer)
+{
+	if (curVer.major > refVer.major)
+		return true;
+	else if (curVer.major < refVer.major)
+		return false;
+
+	if (curVer.minor > refVer.minor)
+		return true;
+	else if (curVer.minor < refVer.minor)
+		return false;
+
+	if (curVer.micro > refVer.micro)
+		return true;
+	else if (curVer.micro < refVer.micro)
+		return false;
+
+	if (curVer.prerelease)
+	{
+		if (curVer.nano > refVer.nano)
+			return true;
+		else if (curVer.nano < refVer.nano)
+			return false;
+	}
+
+	return false;
+}
+
+// Split a string representing a version number into an object
+elk_AdminIndex.prototype.normalizeVersion = function (sVersion)
+{
+	var splitVersion = sVersion.split(/[\s-]/),
+	normalVersion = {
+		major: 0,
+		minor: 0,
+		micro: 0,
+		prerelease: false,
+		nano: 0,
+	},
+	prerelease = false;
+
+	for (var i = 0; i < splitVersion.length; i++)
+	{
+		if (splitVersion[i].toLowerCase() == 'elkarte')
+			continue;
+
+		if (splitVersion[i].substring(0, 4).toLowerCase() == 'beta' || splitVersion[i].substring(0, 2).toLowerCase() == 'rc')
+		{
+			normalVersion.prerelease = true;
+			prerelease = true;
+
+			// the tag name comes with the number attached to the beta/rc
+			if (splitVersion[i].indexOf('.') > 0)
+			{
+				var splitPre = splitVersion[i].split('.');
+				normalVersion.nano = parseFloat(splitPre[1]);
+			}
+		}
+
+		// If we have passed a "beta" or an "RC" string, no need to go further
+		if (prerelease)
+		{
+			// Only numbers and dots means a number
+			if (splitVersion[i].replace(/[\d\.]/g, '') == '')
+				normalVersion.nano = parseFloat(splitVersion[i]);
+
+			continue;
+		}
+
+		// Likely from the tag
+		if (splitVersion[i].substring(0, 1) == 'v')
+			splitVersion[i] = splitVersion[i].substring(1);
+
+		// Only numbers and dots means a number
+		if (splitVersion[i].replace(/[\d\.]/g, '') == '')
+		{
+			var ver = splitVersion[i].split('.');
+			normalVersion.major = parseInt(ver[0]);
+			normalVersion.minor = parseInt(ver[1]);
+			normalVersion.micro = ver.length > 2 ? parseInt(ver[2]) : 0;
+		}
+	}
+	return normalVersion;
 };
 
 // Checks if a new version of ElkArte is available and if so updates the admin info box

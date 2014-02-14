@@ -97,16 +97,7 @@ function template_admin()
 								</ul>
 							</div>
 						</div>
-					</div>';
-
-	// The below functions include all the scripts needed from the ElkArte site. The language and format are passed for internationalization.
-	if (empty($modSettings['disable_elk_js']))
-		echo '
-					<script src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
-					<script src="', $scripturl, '?action=viewadminfile;filename=latest-news.js"></script>';
-
-	// This sets the announcements and current versions themselves ;).
-	echo '
+					</div>
 					<script><!-- // --><![CDATA[
 						var oAdminIndex = new elk_AdminIndex({
 							sSelf: \'oAdminCenter\',
