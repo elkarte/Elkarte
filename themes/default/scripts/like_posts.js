@@ -9,51 +9,52 @@
  */
 
 /**
- * Simply invoke the constructor by calling dragDropAttachment
+ * Simply invoke the constructor by calling likePosts
  *
  */
 (function() {
 	function likePosts() {}
 
 	likePosts.prototype = function() {
-		var likeUnlikePosts = function(e, mId, tId) {
-			var messageId = parseInt(mId, 10),
-				topicId = parseInt(tId, 10),
-				subAction = '';
+		var init = '',
+			likeUnlikePosts = function(e, mId, tId) {
+				var messageId = parseInt(mId, 10),
+					topicId = parseInt(tId, 10),
+					subAction = '';
 
-			var check = $(e.target).attr('class');
-			if (check.indexOf('unlike_button') >= 0) subAction = 'unlikepost';
-			else subAction = 'likepost';
+				var check = $(e.target).attr('class');
+				subAction = 'likepost';
+				if (check.indexOf('unlike_button') >= 0) subAction = 'unlikepost';
+				else subAction = 'likepost';
 
-			var values = {
-				'topic': topicId,
-				'msg': messageId,
-			};
+				var values = {
+					'topic': topicId,
+					'msg': messageId,
+				};
 
-			$.ajax({
-				url: elk_scripturl + '?action=likes;sa=' + subAction + ';' + elk_session_var + '=' + elk_session_id,
-				type: 'POST',
-				dataType: 'json',
-				data: values,
-				cache: false,
-				success: function(resp) {
-					if (resp.result === true) {
-						console.log(resp);
-						updateUi({
-							'elem': $(e.target),
-							'count': resp.count,
-							'newText': resp.newText,
-							'action': subAction
-						});
-					} else {
-						handleError(resp);
-					}
-				},
-				error: function(err) {
-					handleError(err);
-				},
-			});
-		},
+				$.ajax({
+					url: elk_scripturl + '?action=likes;sa=' + subAction + ';' + elk_session_var + '=' + elk_session_id,
+					type: 'POST',
+					dataType: 'json',
+					data: values,
+					cache: false,
+					success: function(resp) {
+						if (resp.result === true) {
+							updateUi({
+								'elem': $(e.target),
+								'count': resp.count,
+								'newText': resp.newText,
+								'action': subAction
+							});
+						} else {
+							handleError(resp);
+						}
+					},
+					error: function(err) {
+						handleError(err);
+					},
+				});
+			},
 
 			updateUi = function(params) {
 				var currentClass = (params.action === 'unlikepost') ? 'unlike_button' : 'like_button',
@@ -65,7 +66,32 @@
 			},
 
 			handleError = function(params) {
-				console.log('test');
+				var str = '<div class="floating_error"><div class="error_heading">Error in Likes</div><p class="error_msg">' + params.data + '</p><p class="error_btn">OK</p></div>';
+				$('body').append(str);
+
+				var screenWidth = $(window).width(),
+					screenHeight = $(window).height(),
+					popupHeight = $('.floating_error').outerHeight(),
+					popupWidth = $('.floating_error').outerWidth(),
+					topPopUpOffset = (screenHeight - popupHeight) / 2,
+					leftPopUpOffset = (screenWidth - popupWidth) / 2;
+
+				$('.floating_error').css({
+					top: topPopUpOffset + 'px',
+					left: leftPopUpOffset + 'px'
+				});
+
+				$(document).one('click keyup', removeOverlay);
+			},
+
+			removeOverlay = function(e) {
+				if (typeof(e) === 'undefined' && this.timeoutTimer === null) return false;
+				else if ((e.type == 'keyup' && e.keyCode == 27) || e.type == 'click') {
+					$('.floating_error').remove();
+					$('.floating_error').unbind('click');
+					$(document).unbind('click', removeOverlay);
+					$(document).unbind('keyup', removeOverlay);
+				}
 			};
 
 		return {

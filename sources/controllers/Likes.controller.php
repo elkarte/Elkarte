@@ -74,7 +74,7 @@ class Likes_Controller extends Action_Controller
 			{
 				$likeResult = likePost($user_info['id'], $liked_message, '+');
 
-				if ($likeResult) {
+				if ($likeResult === true) {
 					// Lets add in a mention to the member that just had their post liked
 					if (!empty($modSettings['mentions_enabled']))
 					{
@@ -135,7 +135,7 @@ class Likes_Controller extends Action_Controller
 			{
 				$likeResult = likePost($user_info['id'], $liked_message, '-');
 
-				if ($likeResult) {
+				if ($likeResult === true) {
 					// Oh noes, taking the like back, let them know so they can complain
 					if (!empty($modSettings['mentions_enabled']))
 					{
@@ -188,7 +188,7 @@ class Likes_Controller extends Action_Controller
 
 		// If you're a guest or simply can't do this, we stop
 		is_not_guest();
-		isAllowedTo('like_posts');
+		allowedTo('like_posts');
 
 		// Load up the helpers
 		require_once(SUBSDIR . '/Likes.subs.php');
