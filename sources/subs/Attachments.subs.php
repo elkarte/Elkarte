@@ -361,8 +361,10 @@ function processAttachments($id_msg = null)
 		if (!empty($id_msg))
 			list ($context['attachments']['quantity'], $context['attachments']['total_size']) = attachmentsSizeForMessage($id_msg);
 		else
+		{
 			$context['attachments']['quantity'] = 0;
 			$context['attachments']['total_size'] = 0;
+		}
 	}
 
 	// Hmm. There are still files in session.
@@ -388,7 +390,7 @@ function processAttachments($id_msg = null)
 			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 			{
 				if (strpos($attachID, 'post_tmp_' . $user_info['id']) !== false)
-					unlink($attachment['tmp_name']);
+					@unlink($attachment['tmp_name']);
 			}
 
 			$attach_errors->activate()->addError('temp_attachments_flushed');
@@ -443,11 +445,14 @@ function processAttachments($id_msg = null)
 		{
 			if ($_FILES['attachment']['error'][$n] == 2)
 				$errors[] = array('file_too_big', array($modSettings['attachmentSizeLimit']));
+			// Missing or a full a temporary directory on the server
 			elseif ($_FILES['attachment']['error'][$n] == 6)
 				log_error($_FILES['attachment']['name'][$n] . ': ' . $txt['php_upload_error_6'], 'critical');
+			// One of many errors such as exceeds the upload_max_filesize directive in php.ini
 			else
 				log_error($_FILES['attachment']['name'][$n] . ': ' . $txt['php_upload_error_' . $_FILES['attachment']['error'][$n]]);
 
+			// If we did not set an specific error to show the user, give them a generic one
 			if (empty($errors))
 				$errors[] = 'attach_php_error';
 		}
@@ -492,8 +497,7 @@ function processAttachments($id_msg = null)
 		// before we are finished.
 		if (empty($_SESSION['temp_attachments'][$attachID]['errors']))
 			attachmentChecks($attachID);
-
-		if (!empty($_SESSION['temp_attachments'][$attachID]['errors']))
+		else
 		{
 			// Sort out the errors for display and delete any associated files.
 			$attach_errors->addAttach($attachID, $_SESSION['temp_attachments'][$attachID]['name']);
