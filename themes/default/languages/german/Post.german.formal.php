@@ -68,7 +68,7 @@ $txt['reported_by'] = 'wurde gemeldet von';
 $txt['board_moderate'] = 'in einem von Ihnen moderierten Forum';
 $txt['report_comment'] = 'Der Melder hat folgenden Kommentar beigefügt';
 
-$txt['attach_drop_files'] = 'Legen Sie Dateien hier ab';
+$txt['attach_drop_files'] = 'Ziehen Sie Dateien hierher';
 $txt['attach_restrict_attachmentPostLimit'] = 'maximale Gesamtgröße %1$d KiB';
 $txt['attach_restrict_attachmentSizeLimit'] = 'maximale Größe pro Datei %1$d KiB';
 $txt['attach_restrict_attachmentNumPerPostLimit'] = '%1$d pro Beitrag';
