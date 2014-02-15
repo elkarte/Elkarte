@@ -3618,7 +3618,7 @@ function template_upgrade_below()
 
 	if (!empty($upcontext['continue']))
 		echo '
-									<input type="submit" id="contbutt" name="contbutt" value="', $txt['upgrade_continue'], '"', $upcontext['continue'] == 2 ? ' disabled="disabled"' : '', ' class="button_submit" />';
+									<input type="submit" id="contbutt" disabled="disabled" name="contbutt" value="', $txt['upgrade_continue'], '"', $upcontext['continue'] == 2 ? ' disabled="disabled"' : '', ' class="button_submit" />';
 	if (!empty($upcontext['skip']))
 		echo '
 									<input type="submit" id="skip" name="skip" value="', $txt['upgrade_skip'], '" onclick="dontSubmit = true; document.getElementById(\'contbutt\').disabled = \'disabled\'; return true;" class="button_submit" />';
@@ -3883,9 +3883,9 @@ function template_welcome_message()
 
 				if (latestVer.innerHTML == \'???\')
 				{
-					// Just to avoid too many tries
+					// After few many tries let the use run the script
 					if (currentVersionRounds > 9)
-						return;
+						document.getElementById(\'contbutt\').disabled = 0;
 
 					currentVersionRounds++;
 					setTimeout(\'ourCurrentVersion()\', 50);
@@ -3894,6 +3894,7 @@ function template_welcome_message()
 
 				setLatestVer.innerHTML = latestVer.innerHTML.replace(\'ElkArte \', \'\');
 				document.getElementById(\'version_warning\').style.display = \'\';
+				document.getElementById(\'contbutt\').disabled = 0;
 			}
 			addLoadEvent(ourCurrentVersion);
 

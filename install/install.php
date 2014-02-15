@@ -2183,7 +2183,7 @@ function template_welcome_message()
 				slatestVersionContainerId: \'latestVersion\',
 				sinstalledVersionContainerId: \'version_warning\',
 				sVersionOutdatedTemplate: ', JavaScriptEscape('
-			<div style="float: left; width: 2ex; font-size: 2em; color: red;">!!</div>
+			<div style="float: left; width: 2ex; font-size: 2em; color: red; overflow: hidden;">!!</div>
 			<strong style="text-decoration: underline;">' . $txt['error_warning_notice'] . '</strong><br />
 			<div style="padding-left: 6ex;">
 				' . sprintf($txt['error_script_outdated'], '<em id="elkVersion" style="white-space: nowrap;">??</em>', '<em style="white-space: nowrap;">' . CURRENT_VERSION . '</em>') . '
@@ -2218,22 +2218,22 @@ function template_welcome_message()
 				var latestVer,
 					setLatestVer;
 
+				// After few many tries let the use run the script
+				if (currentVersionRounds > 9)
+					document.getElementById(\'contbutt\').disabled = 0;
+
 				latestVer = document.getElementById(\'latestVersion\');
 				setLatestVer = document.getElementById(\'elkVersion\');
 
 				if (latestVer.innerHTML == \'???\')
 				{
-					// Just to avoid too many tries
-					if (currentVersionRounds > 9)
-						return;
-
-					currentVersionRounds++;
 					setTimeout(\'ourCurrentVersion()\', 50);
 					return;
 				}
 
 				setLatestVer.innerHTML = latestVer.innerHTML.replace(\'ElkArte \', \'\');
 				document.getElementById(\'version_warning\').style.display = \'\';
+				document.getElementById(\'contbutt\').disabled = 0;
 			}
 			addLoadEvent(ourCurrentVersion);
 		// ]]></script>';
