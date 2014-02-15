@@ -338,7 +338,7 @@ function template_post_page()
  */
 function template_additional_options_below()
 {
-	global $context, $settings, $options, $txt, $modSettings;
+	global $context, $settings, $options, $txt;
 
 	// If the admin has enabled the hiding of the additional options - show a link and image for it.
 	if (!empty($settings['additional_options_collapsible']))
@@ -426,7 +426,7 @@ function template_add_new_attachments()
 	if ($context['attachments']['num_allowed'] > 0 || !empty($context['dont_show_them']))
 	{
 		echo '
-							<dt class="drop_area">', $txt['attach_drop_files'], '</dt>
+							<dt class="drop_area">', $txt['attach_drop_files'], ' <i class="fa fa-upload"></i></dt>
 							<dd class="progress_tracker"></dd>
 							<dd class="drop_attachments_error"></dd>
 							<dt>
@@ -476,34 +476,6 @@ function template_add_new_attachments()
 	echo '
 							</dd>
 						</dl>';
-
-	// Initiate file drag drop
-	// @todo move all the logic to the controller
-	echo '
-		<script><!-- // --><![CDATA[
-			var dropAttach = dragDropAttachment.init({
-				allowedExtensions: ', JavaScriptEscape($context['attachments']['allowed_extensions']), ',
-				totalSizeAllowed: ', JavaScriptEscape(empty($modSettings['attachmentPostLimit']) ? '' : $modSettings['attachmentPostLimit']), ',
-				individualSizeAllowed: ', JavaScriptEscape(empty($modSettings['attachmentSizeLimit']) ? '' : $modSettings['attachmentSizeLimit']), ',
-				numOfAttachmentAllowed: ', $context['attachments']['num_allowed'], ',
-				totalAttachSizeUploaded: ', isset($context['attachments']['total_size']) && !empty($context['attachments']['total_size']) ? $context['attachments']['total_size'] : 0, ',
-				numAttachUploaded: ', isset($context['attachments']['quantity']) && !empty($context['attachments']['quantity']) ? $context['attachments']['quantity'] : 0, '
-			});
-		// ]]></script>';
-
-    // To work out with latest code
-		// <script>
-		// 	var dropAttach = dragDropAttachment.prototype.init({
-		// 		sessionId: elk_session_id,
-		// 		sessionVar: elk_session_var,
-		// 		allowedExtensions: "', empty($modSettings['attachmentCheckExtensions']) ? '' : $context['attachments']['allowed_extensions'] ,'",
-		// 		totalSizeAllowed: "', empty($modSettings['attachmentPostLimit']) ? null : $modSettings['attachmentPostLimit'] ,'",
-		// 		individualSizeAllowed: "', empty($modSettings['attachmentSizeLimit']) ? '' : $modSettings['attachmentSizeLimit'] , '",
-		// 		numOfAttachmentAllowed: "', empty($context['attachments']['num_allowed']) ? '' : $context['attachments']['num_allowed'] ,'",
-		// 		totalAttachSizeUploaded: "', isset($context['attachments']['total_size']) && !empty($context['attachments']['total_size']) ? $context['attachments']['total_size'] : 0,'",
-		// 		numAttachUploaded: "', isset($context['attachments']['quantity']) && !empty($context['attachments']['quantity']) ? $context['attachments']['quantity'] : 0,'"
-		// 	});
-		// </script>';
 }
 
 /**

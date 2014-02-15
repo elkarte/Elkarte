@@ -4172,54 +4172,68 @@ function removeScheduleTaskImmediate($task, $calculateNextTrigger = true)
 	}
 }
 
-function checkJsonEncode() {
-	if (!function_exists('json_encode')) {
-		function json_encode($a = false) {
-
-			switch(gettype($a)) {
+/**
+ * Json encode support function for versions of php < 5.2
+ */
+function checkJsonEncode()
+{
+	if (!function_exists('json_encode'))
+	{
+		/**
+		 * Running an old version of php, so we define our own function to do this.
+		 * 
+		 * @param mixed[]|int|float|string|false $a
+		 */
+		function json_encode($a = false)
+		{
+			switch (gettype($a))
+			{
 				case 'integer':
 				case 'double':
-					return floatval(str_replace(",", ".", strval($a)));
-				break;
-
+					return floatval(str_replace(',', '.', strval($a)));
+					break;
 				case 'NULL':
 				case 'resource':
 				case 'unknown':
 					return 'null';
-				break;
-
+					break;
 				case 'boolean':
-					return $a ? 'true' : 'false' ;
-				break;
-
+					return $a ? 'true' : 'false';
+					break;
 				case 'array':
 				case 'object':
 					$output = array();
 					$isAssoc = false;
 
-					foreach(array_keys($a) as $key) {
-						if (!is_int($key)) {
+					// Determine what type of array we have associative or numeric
+					foreach (array_keys($a) as $key)
+					{
+						if (!is_int($key))
+						{
 							$isAssoc = true;
 							break;
 						}
 					}
 
-					if($isAssoc) {
-						foreach($a as $k => $val) {
-							$output []= json_encode($k) . ':' . json_encode($val);
-						}
+					// Now that we know what it is, deal with each appropriately
+					if ($isAssoc)
+					{
+						foreach ($a as $key => $val)
+							$output [] = json_encode($key) . ':' . json_encode($val);
+
 						$output = '{' . implode(',', $output) . '}';
-					} else {
-						foreach($a as $val){
-							$output []= json_encode($val);
-						}
+					}
+					else
+					{
+						foreach ($a as $val)
+							$output [] = json_encode($val);
+
 						$output = '[' . implode(',', $output) . ']';
 					}
 					return $output;
-				break;
-
+					break;
 				default:
-				return '"' . addslashes($a) . '"';
+					return '"' . addslashes($a) . '"';
 			}
 		}
 	}
