@@ -39,23 +39,31 @@
 				dataType: 'json',
 				data: values,
 				success: function(resp) {
-					updateUi({
-						'elem': $(e.target),
-						'action': subAction
-					});
+					if (resp.result === true) {
+						console.log(resp);
+						updateUi({
+							'elem': $(e.target),
+							'count': resp.count,
+							'newText': resp.newText,
+							'action': subAction
+						});
+					} else {
+						console.log('error');
+					}
 				},
 				error: function(err) {
 					console.log('error');
-					// console.log(err);
 				},
 			});
 		},
 
 			updateUi = function(params) {
-				var currentClass = (params.action === 'unlikepost') ? 'unlike_button' : 'like_button';
-				var nextClass = (params.action === 'unlikepost') ? 'like_button' : 'unlike_button';
+				var currentClass = (params.action === 'unlikepost') ? 'unlike_button' : 'like_button',
+					nextClass = (params.action === 'unlikepost') ? 'like_button' : 'unlike_button',
+					likeText = ((params.count !==0) ? params.count : '') + ' ' + params.newText;
 
 				$(params.elem).removeClass(currentClass).addClass(nextClass);
+				$(params.elem).text(likeText);
 			};
 
 		return {

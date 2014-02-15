@@ -51,7 +51,7 @@ class Likes_Controller extends Action_Controller
 	 */
 	public function action_likepost()
 	{
-		global $context, $user_info, $topic, $modSettings;
+		global $context, $user_info, $topic, $txt, $modSettings;
 
 		$id_liked = !empty($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : 0;
 
@@ -71,30 +71,38 @@ class Likes_Controller extends Action_Controller
 			$liked_message = basicMessageInfo($id_liked, true, true);
 			if ($liked_message)
 			{
-				likePost($user_info['id'], $liked_message, '+');
+				$likeResult = likePost($user_info['id'], $liked_message, '+');
 
-				// Lets add in a mention to the member that just had their post liked
-				if (!empty($modSettings['mentions_enabled']))
-				{
-					require_once(CONTROLLERDIR . '/Mentions.controller.php');
-					$mentions = new Mentions_Controller();
-					$mentions->setData(array(
-						'id_member' => $liked_message['id_member'],
-						'type' => 'like',
-						'id_msg' => $id_liked,
-					));
-					$mentions->action_add();
+				if ($likeResult) {
+					// Lets add in a mention to the member that just had their post liked
+					if (!empty($modSettings['mentions_enabled']))
+					{
+						require_once(CONTROLLERDIR . '/Mentions.controller.php');
+						$mentions = new Mentions_Controller();
+						$mentions->setData(array(
+							'id_member' => $liked_message['id_member'],
+							'type' => 'like',
+							'id_msg' => $id_liked,
+						));
+						$mentions->action_add();
+					}
+
+					// Get the counts for ajax
+					$count = (int) messageLikeCount($id_liked);
+					$context['json_data'] = array('result' => true, 'newText' => $txt['likes'], 'count' => $count);
+					return false;
+				} else {
+					$context['json_data'] = array('result' => false, 'data' => $likeResult);
+					return false;
 				}
+			} else {
+				$context['json_data'] = array('result' => false, 'data' => 'error in like');
+				return false;
 			}
-			$context['json_data'] = array('result' => true, 'data' => 'success in like');
-			return false;
 		} else {
-			$context['json_data'] = array('result' => false, 'data' => 'error in like');
+			$context['json_data'] = array('result' => false, 'data' => 'Not allowed to like posts');
 			return false;
 		}
-
-		// Back to where we were, in theory
-		// redirectexit('topic=' . $topic . '.msg' . $id_liked . '#msg' . $id_liked);
 	}
 
 	/**
@@ -104,7 +112,7 @@ class Likes_Controller extends Action_Controller
 	 */
 	public function action_unlikepost()
 	{
-		global $context, $user_info, $topic, $modSettings;
+		global $context, $user_info, $topic, $txt, $modSettings;
 
 		$id_liked = !empty($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : 0;
 
@@ -124,36 +132,49 @@ class Likes_Controller extends Action_Controller
 			$liked_message = basicMessageInfo($id_liked, true, true);
 			if ($liked_message)
 			{
-				likePost($user_info['id'], $liked_message, '-');
+				$likeResult = likePost($user_info['id'], $liked_message, '-');
 
-				// Oh noes, taking the like back, let them know so they can complain
-				if (!empty($modSettings['mentions_enabled']))
-				{
-					require_once(CONTROLLERDIR . '/Mentions.controller.php');
-					$mentions = new Mentions_Controller();
-					$mentions->setData(array(
-						'id_member' => $liked_message['id_member'],
-						'type' => 'rlike',
-						'id_msg' => $id_liked,
-					));
+				if ($likeResult) {
+					// Oh noes, taking the like back, let them know so they can complain
+					if (!empty($modSettings['mentions_enabled']))
+					{
+						require_once(CONTROLLERDIR . '/Mentions.controller.php');
+						$mentions = new Mentions_Controller();
+						$mentions->setData(array(
+							'id_member' => $liked_message['id_member'],
+							'type' => 'rlike',
+							'id_msg' => $id_liked,
+						));
 
-					if (!empty($modSettings['mentions_dont_notify_rlike']))
-						$mentions->action_rlike();
-					else
-						$mentions->action_add();
+						if (!empty($modSettings['mentions_dont_notify_rlike']))
+							$mentions->action_rlike();
+						else
+							$mentions->action_add();
+					}
+					
+					// Get the counts for ajax
+					$count = (int) messageLikeCount($id_liked);
+
+					$likeText = $txt['likes'];
+					if($count === 0) $likeText = $txt['like_post'];
+					$context['json_data'] = array('result' => true, 'newText' => $likeText, 'count' => $count);
+					return false;
+				} else {
+					$context['json_data'] = array('result' => false, 'data' => $likeResult);
+					return false;
 				}
-				$context['json_data'] = array('result' => true, 'data' => 'success in unlike');
+			} else {
+				$context['json_data'] = array('result' => false, 'data' => 'error in like');
 				return false;
 			}
 		} else {
-			$context['json_data'] = array('result' => false, 'data' => 'error in unlike');
+			$context['json_data'] = array('result' => false, 'data' => 'Not allowed to like posts');
 			return false;
 		}
 
 		// Back we go
-		if (isset($_REQUEST['profile']))
-			redirectexit('action=profile;area=showlikes;sa=given;u=' .$user_info['id']);
-			
+		// if (isset($_REQUEST['profile']))
+		// 	redirectexit('action=profile;area=showlikes;sa=given;u=' .$user_info['id']);
 	}
 
 	/**

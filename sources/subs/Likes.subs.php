@@ -21,16 +21,18 @@
  */
 function likePost($id_liker, $liked_message, $direction)
 {
-	global $modSettings;
+	global $txt, $modSettings;
 
 	// If we have a message, then we have passed all checks ...
 	if (!empty($liked_message))
 	{
 		// You can't like your own stuff, no matter how brilliant you think you are
-		if ($liked_message['id_member'] == $id_liker && empty($modSettings['likeAllowSelf']))
-			fatal_lang_error('cant_like_yourself', false);
-
-		updateLike($id_liker, $liked_message, $direction);
+		if ($liked_message['id_member'] == $id_liker && empty($modSettings['likeAllowSelf'])) {
+			return $txt['cant_like_yourself'];
+		} else {
+			updateLike($id_liker, $liked_message, $direction);
+			return true;
+		}
 	}
 }
 
