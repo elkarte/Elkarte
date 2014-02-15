@@ -16,11 +16,9 @@
 	function likePosts() {}
 
 	likePosts.prototype = function() {
-		var likeUnlikePosts = function(e, mId, tId, ssId, ssVar) {
+		var likeUnlikePosts = function(e, mId, tId) {
 			var messageId = parseInt(mId, 10),
 				topicId = parseInt(tId, 10),
-				sessionId = ssId,
-				sessionVar = ssVar,
 				subAction = '';
 
 			var check = $(e.target).attr('class');
@@ -31,13 +29,13 @@
 				'topic': topicId,
 				'msg': messageId,
 			};
-			values[sessionVar] = sessionId;
 
 			$.ajax({
-				url: elk_scripturl + '?action=likes;sa=' + subAction,
+				url: elk_scripturl + '?action=likes;sa=' + subAction + ';' + elk_session_var + '=' + elk_session_id,
 				type: 'POST',
 				dataType: 'json',
 				data: values,
+				cache: false,
 				success: function(resp) {
 					if (resp.result === true) {
 						console.log(resp);

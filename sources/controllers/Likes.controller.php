@@ -56,6 +56,7 @@ class Likes_Controller extends Action_Controller
 		$id_liked = !empty($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : 0;
 
 		// We like these
+		loadLanguage('Errors');
 		require_once(SUBSDIR . '/Likes.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');
 
@@ -96,11 +97,11 @@ class Likes_Controller extends Action_Controller
 					return false;
 				}
 			} else {
-				$context['json_data'] = array('result' => false, 'data' => 'error in like');
+				$context['json_data'] = array('result' => false, 'data' => $txt['like_unlike_error']);
 				return false;
 			}
 		} else {
-			$context['json_data'] = array('result' => false, 'data' => 'Not allowed to like posts');
+			$context['json_data'] = array('result' => false, 'data' => $txt['not_allowed_like']);
 			return false;
 		}
 	}
@@ -164,17 +165,13 @@ class Likes_Controller extends Action_Controller
 					return false;
 				}
 			} else {
-				$context['json_data'] = array('result' => false, 'data' => 'error in like');
+				$context['json_data'] = array('result' => false, 'data' => $txt['like_unlike_error']);
 				return false;
 			}
 		} else {
-			$context['json_data'] = array('result' => false, 'data' => 'Not allowed to like posts');
+			$context['json_data'] = array('result' => false, 'data' => $txt['not_allowed_like']);
 			return false;
 		}
-
-		// Back we go
-		// if (isset($_REQUEST['profile']))
-		// 	redirectexit('action=profile;area=showlikes;sa=given;u=' .$user_info['id']);
 	}
 
 	/**
@@ -187,7 +184,7 @@ class Likes_Controller extends Action_Controller
 		$check = true;
 
 		// need to work on session check
-		// checkSession('get');
+		checkSession('get');
 
 		// If you're a guest or simply can't do this, we stop
 		is_not_guest();
