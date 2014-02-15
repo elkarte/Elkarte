@@ -15,7 +15,7 @@
 (function() {
 	function dragDropAttachment() {}
 
-	dragDropAttachment = function() {
+	dragDropAttachment.prototype = function() {
 
 		// Few internal global vars
 		var allowedExtensions = [],
@@ -175,8 +175,14 @@
 			/**
 			 * private function
 			 *
-			 * creates the UI for each file
-			 *
+			 * Creates the status UI for each file dropped
+			 * Initialte as new createStatusbar
+			 * Has the following methods availble to it
+			 *	- setFileNameSize
+			 *	- setProgress
+			 *	- setAbort
+			 *	- setServerFail
+			 *	- onUploadSuccess
 			 * @param {object} obj options
 			 */
 			createStatusbar = function(obj)
@@ -445,7 +451,7 @@
 
 			e.preventDefault();
 			$(this).css('opacity', '0.6');
-			dragDropAttachment.handleFileUpload(files, obj);
+			dragDropAttachment.prototype.handleFileUpload(files, obj);
 		});
 
 		// Wait, where are you going?  Lets show you are outside the zone

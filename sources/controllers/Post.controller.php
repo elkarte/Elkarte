@@ -962,7 +962,7 @@ class Post_Controller extends Action_Controller
 
 			// Load up the drag and drop attachment magic
 			addInlineJavascript('
-			var dropAttach = dragDropAttachment.init({
+			var dropAttach = dragDropAttachment.prototype.init({
 				board: ' . $board . ',
 				allowedExtensions: ' . JavaScriptEscape($context['attachments']['allowed_extensions']) . ',
 				totalSizeAllowed: ' . JavaScriptEscape(empty($modSettings['attachmentPostLimit']) ? '' : $modSettings['attachmentPostLimit']) . ',
