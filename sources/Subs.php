@@ -171,6 +171,7 @@ function updateMemberData($members, $data)
 	foreach ($data as $var => $val)
 	{
 		$type = 'string';
+
 		if (in_array($var, $knownInts))
 			$type = 'int';
 		elseif (in_array($var, $knownFloats))
@@ -223,6 +224,7 @@ function updateMemberData($members, $data)
 				cache_put_data('member_data-normal-' . $member, null, 120);
 				cache_put_data('member_data-minimal-' . $member, null, 120);
 			}
+
 			cache_put_data('user_settings-' . $member, null, 60);
 		}
 	}
@@ -267,6 +269,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
 					'variable' => $variable,
 				)
 			);
+
 			$modSettings[$variable] = $value === true ? $modSettings[$variable] + 1 : ($value === false ? $modSettings[$variable] - 1 : $value);
 		}
 
@@ -319,8 +322,10 @@ function removeSettings($toRemove)
 	if (empty($toRemove))
 		return;
 
-	$toRemove = is_array($toRemove) ? $toRemove : array($toRemove);
+	if (!is_array($toRemove))
+		$toRemove = array($toRemove);
 
+	// Remove the setting from the db
 	$db->query('', '
 		DELETE FROM {db_prefix}settings
 		WHERE variable IN ({array_string:setting_name})',
@@ -329,6 +334,7 @@ function removeSettings($toRemove)
 		)
 	);
 
+	// Remove it from $modSettings now so it does not persist
 	foreach ($toRemove as $setting)
 		if (isset($modSettings[$setting]))
 			unset($modSettings[$setting]);
@@ -657,7 +663,6 @@ function un_htmlspecialchars($string)
 	$string = str_replace('&nbsp;', ' ', $string);
 
 	return $string;
-
 }
 
 /**
@@ -702,12 +707,17 @@ function shorten_text($text, $len = 384, $cutword = false, $buffer = 12)
 }
 
 /**
- * Calculates all the possible permutations (orders) of array.
- * should not be called on huge arrays (bigger than like 10 elements.)
- * returns an array containing each permutation.
+ * Calculates all the possible permutations (orders) of an array.
+ *	- should not be called on arrays bigger than 10 elements as this function is memory hungry
+ *  - returns an array containing each permutation.
+ *  - e.g. (1,2,3) returns (1,2,3), (1,3,2), (2,1,3), (2,3,1), (3,1,2), and (3,2,1)
+ *  - really a combinations without repetition N! function so 3! = 6 and 10! = 4098 combinations
  *
- * @param mixed[] $array
- * @return mixed[]
+ * Used by parse_bbc to allow bbc tag parameters to be in any order and still be
+ * parsed properly
+ *
+ * @param mixed[] $array index array of values
+ * @return mixed[] array representing all premutations of the supplied array
  */
 function permute($array)
 {
@@ -1719,7 +1729,8 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				foreach ($possible['parameters'] as $p => $info)
 					$preg[] = '(\s+' . $p . '=' . (empty($info['quoted']) ? '' : '&quot;') . (isset($info['match']) ? $info['match'] : '(.+?)') . (empty($info['quoted']) ? '' : '&quot;') . ')' . (empty($info['optional']) ? '' : '?');
 
-				// Okay, this may look ugly and it is, but it's not going to happen much and it is the best way of allowing any order of parameters but still parsing them right.
+				// Okay, this may look ugly and it is, but it's not going to happen much and it is the best way
+				// of allowing any order of parameters but still parsing them right.
 				$match = false;
 				$orders = permute($preg);
 				foreach ($orders as $p)
@@ -2170,7 +2181,7 @@ function footnote_callback($matches)
  */
 function parsesmileys(&$message)
 {
-	global $modSettings, $txt, $user_info ;
+	global $modSettings, $txt, $user_info;
 	static $smileyPregSearch = null, $smileyPregReplacements = array(), $callback;
 
 	$db = database();
@@ -2263,7 +2274,7 @@ class ParseSmileysReplacement
 	 *
 	 * @param string[] $matches
 	 */
-	function callback($matches)
+	public function callback($matches)
 	{
 		if (isset($this->replacements[$matches[0]]))
 			return $this->replacements[$matches[0]];
@@ -2304,7 +2315,6 @@ function highlight_php_code($code)
  *
  * @param string $setLocation = ''
  * @param bool $refresh = false, enable to send a refresh header, default is a location header
- *
  */
 function redirectexit($setLocation = '', $refresh = false)
 {
@@ -2388,6 +2398,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	++$level;
 	if ($level > 1 && !$from_fatal_error && !$has_fatal_error)
 		exit;
+
 	if ($from_fatal_error)
 		$has_fatal_error = true;
 
@@ -2577,7 +2588,7 @@ function setupThemeContext($forceload = false)
 		elseif ($user_info['avatar']['url'] === 'gravatar')
 			$context['user']['avatar']['href'] = '//www.gravatar.com/avatar/' . md5(strtolower($user_settings['email_address'])) . 'd=' . $modSettings['avatar_max_height_external'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
 		// Otherwise we assume it's server stored?
-		elseif ($user_info['avatar']['url'] != '')
+		elseif ($user_info['avatar']['url'] !== '')
 			$context['user']['avatar']['href'] = $modSettings['avatar_url'] . '/' . htmlspecialchars($user_info['avatar']['url']);
 
 		if (!empty($context['user']['avatar']))
@@ -2717,7 +2728,7 @@ function memoryReturnBytes($val)
 	$num = intval(substr($val, 0, strlen($val) - 1));
 	$last = strtolower(substr($val, -1));
 
-	// convert to bytes
+	// Convert to bytes
 	switch ($last)
 	{
 		case 'g':
@@ -2834,7 +2845,6 @@ function template_footer()
  *  - if the admin option to combine files is set, will use Combiner.class
  *
  * @param bool $do_defered = false
- *
  */
 function template_javascript($do_defered = false)
 {
@@ -3163,6 +3173,7 @@ function host_from_ip($ip)
 	if (!isset($host) && stripos(PHP_OS, 'win') !== false && strpos(strtolower(PHP_OS), 'darwin') === false && mt_rand(0, 1) == 1)
 	{
 		$test = @shell_exec('nslookup -timeout=1 ' . @escapeshellarg($ip));
+
 		if (strpos($test, 'Non-existent domain') !== false)
 			$host = '';
 		elseif (preg_match('~Name:\s+([^\s]+)~', $test, $match) == 1)
@@ -3184,8 +3195,10 @@ function host_from_ip($ip)
  * Chops a string into words and prepares them to be inserted into (or searched from) the database.
  *
  * @param string $text
- * @param int $max_chars = 20
- * @param bool $encrypt = false
+ * @param int|null $max_chars = 20
+ *		- if encrypt = true this is the maximum number of bytes to use in integer hashes (for searching)
+ *		- if encrypt = false this is the maximum number of letters in each word
+ * @param bool $encrypt = false Used for custom search indexes to return an array of ints representing the words
  */
 function text2words($text, $max_chars = 20, $encrypt = false)
 {
@@ -3200,16 +3213,22 @@ function text2words($text, $max_chars = 20, $encrypt = false)
 
 	if ($encrypt)
 	{
+		// Range of characters that crypt will produce (0-9, a-z, A-Z .)
 		$possible_chars = array_flip(array_merge(range(46, 57), range(65, 90), range(97, 122)));
 		$returned_ints = array();
 		foreach ($words as $word)
 		{
 			if (($word = trim($word, '-_\'')) !== '')
 			{
+				// Get a crypt representation of this work
 				$encrypted = substr(crypt($word, 'uk'), 2, $max_chars);
 				$total = 0;
+
+				// Create an integer reprsentation
 				for ($i = 0; $i < $max_chars; $i++)
 					$total += $possible_chars[ord($encrypted{$i})] * pow(63, $i);
+
+				// Return the value
 				$returned_ints[] = $max_chars == 4 ? min($total, 16777215) : $total;
 			}
 		}
@@ -3260,7 +3279,6 @@ function create_button($name, $alt, $label = '', $custom = '', $force_use = fals
  * Sets up all of the top menu buttons
  * Saves them in the cache if it is available and on
  * Places the results in $context
- *
  */
 function setupMenuContext()
 {
@@ -3329,8 +3347,8 @@ function setupMenuContext()
 			)
 		);
 
-			// Will change title correctly if user is either a mod or an admin.
-			// Button highlighting works properly too (see current action stuffz).
+		// Will change title correctly if user is either a mod or an admin.
+		// Button highlighting works properly too (see current action stuffz).
 		if ($context['allow_admin'])
 		{
 			$buttons['admin'] = array(
@@ -4043,11 +4061,9 @@ function prepareSearchEngines()
 }
 
 /**
- * This function receives a request handle and attempts to retrieve
- * the next result.
+ * This function receives a request handle and attempts to retrieve the next result.
  * It is used by the controller callbacks from the template, such as
- * posts in topic display page, posts search results page, or personal
- * messages.
+ * posts in topic display page, posts search results page, or personal messages.
  *
  * @param resource $messages_request holds a query result
  * @param bool $reset
@@ -4181,7 +4197,7 @@ function checkJsonEncode()
 	{
 		/**
 		 * Running an old version of php, so we define our own function to do this.
-		 * 
+		 *
 		 * @param mixed[]|int|float|string|false $a
 		 */
 		function json_encode($a = false)
