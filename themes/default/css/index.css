@@ -2450,66 +2450,51 @@ ul.post_options li {
 	margin: 0 0 1em 0;
 	overflow: auto;
 }
+
+/*	$DRAG-N-DROP		*/
+/* ------------------------------------------------------- */
 #postAttachment2 .drop_area {
-	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-	font-size: 26px;
-	font-weight: 300;
-	height: 70px;
-	line-height: 70px;
+	font-size: 1.857em;
+	font-weight: normal;
+	height: 60px;
+	line-height: 60px;
 	text-align: center;
-	text-indent: 0;
-	padding: 10px 5%;
-	margin: 10px 5%;
+	opacity: 0.6;
 }
-
+#postAttachment >dd.progress_tracker {
+	margin:0;
+}
 .progress_tracker {
-	float: left;
-	position: relative;
 	overflow: hidden;
-	width: 100%;
+	width: 97%;
 }
-
 .statusbar {
-	width: 94%;
-	padding: 5px 3%;
+	padding: 5px;
 	overflow: hidden;
 }
-
 .info {
 	float: left;
 	position: relative;
 	overflow: hidden;
 	width: 60%;
-	line-height: 22px;
+	line-height: 1.375em;
 }
-
 .progressBar {
 	width: 20%;
 	border-radius: 5px;
 	float: left;
-	position: relative;
-	overflow: hidden;
+	text-align: center;
 }
-
-.progressBar div {
-	color: #fff;
-	background-color: rgb(64, 118, 182);
-}
-
 .abort, .remove {
 	float: right;
-	position: relative;
 	overflow: hidden;
-	font: 14px/22px normal arial;
-	margin-left: 3%;
-	padding: 0 8px;
+	font-size: 1em;
+	padding: 4px 6px;
 }
-
-.drop_attachments_error {
+.drop_attachmnts_error {
 	padding: 10px 0;
-	position: relative;
 	overflow: hidden;
-	width: 100%;
+	width: 97%;
 }
 
 #postMoreOptions, #postAttachment, #postAttachment2 {
@@ -2520,7 +2505,7 @@ ul.post_options li {
 	overflow: hidden;
 }
 #postAttachment dd, #postAttachment2 dd {
-	margin: 4px 0 4px 12px;
+	margin: 4px 12px;
 }
 #postAttachment dd {
 	float: left;
