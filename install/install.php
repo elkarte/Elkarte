@@ -2173,7 +2173,6 @@ function template_welcome_message()
 	global $incontext, $txt;
 
 	echo '
-	<script src="http://elkarte.github.io/Elkarte/site/current-version.js?version=' . CURRENT_VERSION . '"></script>
 	<script src="themes/default/scripts/admin.js"></script>
 		<script><!-- // --><![CDATA[
 			var oUpgradeCenter = new elk_AdminIndex({

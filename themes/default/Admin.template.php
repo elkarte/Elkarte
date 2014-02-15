@@ -99,12 +99,6 @@ function template_admin()
 						</div>
 					</div>';
 
-	// The below functions include all the scripts needed from the ElkArte site. The language and format are passed for internationalization.
-	if (empty($modSettings['disable_elk_js']))
-		echo '
-					<script src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
-					<script src="', $scripturl, '?action=viewadminfile;filename=latest-news.js"></script>';
-
 	// This sets the announcements and current versions themselves ;).
 	echo '
 					<script><!-- // --><![CDATA[
@@ -277,22 +271,20 @@ function template_credits()
 		echo '
 						ourSupportVersions.', $variable, ' = "', $version['version'], '";';
 
-	// Now we just have to include the script and wait ;).
 	echo '
-					// ]]></script>
-					<script src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
-					<script src="', $scripturl, '?action=viewadminfile;filename=latest-news.js"></script>';
+					// ]]></script>';
 
 	// This sets the latest support stuff.
 	echo '
 					<script><!-- // --><![CDATA[
-						var oAdminIndex = new elk_AdminIndex({
+						var oAdminCenter = new elk_AdminIndex({
 							bLoadVersions: true,
 							slatestVersionContainerId: \'latestVersion\',
 							sinstalledVersionContainerId: \'installedVersion\',
 							sVersionOutdatedTemplate: ', JavaScriptEscape('
 								<span class="alert">%currentVersion%</span>
-							'), ',
+							'), '
+
 						});
 					// ]]></script>';
 }

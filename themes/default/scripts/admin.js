@@ -72,7 +72,7 @@ elk_AdminIndex.prototype.setAnnouncement = function (announcement)
 	this.init_news = true;
 };
 
-// Updates the current version container with the current version found in current-version.js
+// Updates the current version container with the current version found in the repository
 elk_AdminIndex.prototype.showCurrentVersion = function ()
 {
 	var oElkVersionContainer = document.getElementById(this.opt.slatestVersionContainerId),
