@@ -30,8 +30,9 @@
 function elk_AdminIndex(oOptions)
 {
 	this.opt = oOptions;
-	this.news = {};
+	this.announcements = [];
 	this.current = {};
+	this.init_news = false;
 	this.init();
 }
 
@@ -49,10 +50,6 @@ elk_AdminIndex.prototype.init = function ()
 
 elk_AdminIndex.prototype.loadAdminIndex = function ()
 {
-	// Load the text box containing the latest news items.
-	if (this.opt.bLoadAnnouncements)
-		this.setAnnouncements();
-
 	// Load the current master and your version numbers.
 	if (this.opt.bLoadVersions)
 		this.showCurrentVersion();
@@ -63,16 +60,16 @@ elk_AdminIndex.prototype.loadAdminIndex = function ()
 };
 
 // Update the announcement container with news
-elk_AdminIndex.prototype.setAnnouncements = function ()
+elk_AdminIndex.prototype.setAnnouncement = function (announcement)
 {
-	if (!('ourAnnouncements' in window) || !('length' in window.ourAnnouncements))
-		return;
+	var oElem = document.getElementById(this.opt.sAnnouncementContainerId),
+		sMessages = this.init_news ? oElem.innerHTML : '',
+		sMessage = '';
 
-	var sMessages = '';
-	for (var i = 0; i < window.ourAnnouncements.length; i++)
-		sMessages += this.opt.sAnnouncementMessageTemplate.replace('%href%', window.ourAnnouncements[i].href).replace('%subject%', window.ourAnnouncements[i].subject).replace('%time%', window.ourAnnouncements[i].time).replace('%message%', window.ourAnnouncements[i].message);
+	sMessage = this.opt.sAnnouncementMessageTemplate.replace('%href%', announcement.html_url).replace('%subject%', announcement.name).replace('%time%', announcement.published_at.replace(/[TZ]/g, ' ')).replace('%message%', announcement.body);
 
-	document.getElementById(this.opt.sAnnouncementContainerId).innerHTML = this.opt.sAnnouncementTemplate.replace('%content%', sMessages);
+	oElem.innerHTML = sMessages + this.opt.sAnnouncementTemplate.replace('%content%', sMessage);
+	this.init_news = true;
 };
 
 // Updates the current version container with the current version found in current-version.js
@@ -106,6 +103,10 @@ elk_AdminIndex.prototype.showCurrentVersion = function ()
 					mostRecent = elem;
 				}
 			}
+
+			// Load the text box containing the latest news items.
+			if (adminIndex.opt.bLoadAnnouncements)
+				adminIndex.setAnnouncement(elem);
 		});
 		elkVersion = mostRecent.name;
 
