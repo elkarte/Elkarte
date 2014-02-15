@@ -78,8 +78,11 @@ class Attachment_Controller extends Action_Controller
 		// We should have files, otherwise why are we here?
 		if (isset($_FILES["attachment"]))
 		{
-			$attach_errors = attachment_Error_Context::context('attachment', 1);
+			loadLanguage('Post');
+
+			$attach_errors = attachment_Error_Context::context();
 			$attach_errors->activate();
+
 			if ($context['attachments']['can']['post'] && empty($_POST['from_qr']))
 			{
 				require_once(SUBSDIR . '/Attachments.subs.php');
@@ -93,7 +96,6 @@ class Attachment_Controller extends Action_Controller
 			// Any mistakes?
 			if ($attach_errors->hasErrors())
 			{
-				loadLanguage('Post');
 				$errors = $attach_errors->prepareErrors();
 
 				// Bad news for you, the attachments did not process, lets tell them why
