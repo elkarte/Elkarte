@@ -235,7 +235,7 @@ searchd
  * Drop one or more indexes from a table and adds them back if specified
  *
  * @param string $table
- * @param mixed $indexes
+ * @param string[]|string $indexes
  * @param boolean $add
  */
 function alterFullTextIndex($table, $indexes, $add = false)
@@ -272,10 +272,10 @@ function alterFullTextIndex($table, $indexes, $add = false)
  *
  * @param int $start
  * @param int $messages_per_batch
- * @param array $column_definition
- * @param array $index_settings array containing specifics of what to create e.g. bytes per word
+ * @param string $column_size_definition
+ * @param mixed[] $index_settings array containing specifics of what to create e.g. bytes per word
  */
-function createSearchIndex($start, $messages_per_batch, $column_definition, $index_settings)
+function createSearchIndex($start, $messages_per_batch, $column_size_definition, $index_settings)
 {
 	global $modSettings;
 
@@ -286,7 +286,7 @@ function createSearchIndex($start, $messages_per_batch, $column_definition, $ind
 	{
 		drop_log_search_words();
 
-		$db_search->create_word_search($column_definition);
+		$db_search->create_word_search($column_size_definition);
 
 		// Temporarily switch back to not using a search index.
 		if (!empty($modSettings['search_index']) && $modSettings['search_index'] == 'custom')
@@ -389,7 +389,7 @@ function createSearchIndex($start, $messages_per_batch, $column_definition, $ind
  * Removes common stop words from the index as they inhibit search performance
  *
  * @param int $start
- * @param array $column_definition
+ * @param mixed[] $column_definition
  */
 function removeCommonWordsFromIndex($start, $column_definition)
 {

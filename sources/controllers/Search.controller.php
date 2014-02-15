@@ -795,7 +795,7 @@ class Search_Controller extends Action_Controller
 		if (!empty($context['search_errors']))
 		{
 			$_REQUEST['params'] = $context['params'];
-			return $this->action_plushsearch1();
+			return $this->action_search();
 		}
 
 		// Spam me not, Spam-a-lot?
@@ -1324,7 +1324,7 @@ class Search_Controller extends Action_Controller
 						{
 							$context['search_errors']['query_not_specific_enough'] = true;
 							$_REQUEST['params'] = $context['params'];
-							return $this->action_plushsearch1();
+							return $this->action_search();
 						}
 						elseif (!empty($indexedResults))
 						{
@@ -1674,7 +1674,7 @@ class Search_Controller extends Action_Controller
 	 * - loads the necessary contextual data to show a search result.
 	 *
 	 * @param $reset = false
-	 * @return array
+	 * @return array of messages that match the search
 	 */
 	public function prepareSearchContext_callback($reset = false)
 	{
@@ -1896,7 +1896,7 @@ class Search_Controller extends Action_Controller
 			$query = trim($query, "\*+");
 			$query = strtr(Util::htmlspecialchars($query), array('\\\'' => '\''));
 
-			$body_highlighted = preg_replace_callback('/((<[^>]*)|' . preg_quote(strtr($query, array('\'' => '&#039;')), '/') . ')/iu', create_function('$m', 'return isset($m[2]) && "$m[2]" == "$m[1]" ? stripslashes("$m[1]") : "<strong class=\"highlight\">$m[1]</strong>";'), $body_highlighted);
+			$body_highlighted = preg_replace_callback('/((<[^>]*)|' . preg_quote(strtr($query, array('\'' => '&#039;')), '/') . ')/iu', array($this, '_highlighted_callback'), $body_highlighted);
 			$subject_highlighted = preg_replace('/(' . preg_quote($query, '/') . ')/iu', '<strong class="highlight">$1</strong>', $subject_highlighted);
 		}
 
@@ -1932,7 +1932,18 @@ class Search_Controller extends Action_Controller
 	}
 
 	/**
-	 * Prepares the weighting factors and 
+	 * Used to highlight body text with strings that match the search term
+	 * Callback function used in $body_highlighted
+	 *
+	 * @param string[] $matches
+	 */
+	private function _highlighted_callback($matches)
+	{
+		return isset($matches[2]) && $matches[2] == $matches[1] ? stripslashes($matches[1]) : '<strong class="highlight">' . $matches[1] . '</strong>';
+	}
+
+	/**
+	 * Prepares the weighting factors and
 	 */
 	private function _setup_weight_factors()
 	{
@@ -2007,7 +2018,7 @@ class Search_Controller extends Action_Controller
 	/**
 	 * Setup spellchecking suggestions and load them into $context
 	 *
-	 * @param array an array of terms
+	 * @param string[] $searchArray an array of terms
 	 */
 	private function _load_suggestions($searchArray = array())
 	{

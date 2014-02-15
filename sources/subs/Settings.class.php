@@ -92,7 +92,6 @@ class Settings_Form
 	 * the following named keys are also permitted
 	 *	'disabled' => 'postinput' => 'preinput' =>
 	 *
-	 * @param array $config_vars
 	 */
 	public function prepare_file()
 	{
@@ -165,9 +164,9 @@ class Settings_Form
 	/**
 	 * Helper method, it sets up the context for database settings.
 	 *
-	 * @param array $config_vars
+	 * @param mixed[] $config_vars
 	 */
-	static function prepare_db(&$config_vars)
+	public static function prepare_db(&$config_vars)
 	{
 		global $txt, $helptxt, $context, $modSettings;
 
@@ -430,9 +429,9 @@ class Settings_Form
 	/**
 	 * Helper method for saving database settings.
 	 *
-	 * @param array $config_vars
+	 * @param mixed[] $config_vars
 	 */
-	static function save_db(&$config_vars)
+	public static function save_db(&$config_vars)
 	{
 		validateToken('admin-dbsc');
 
@@ -521,9 +520,9 @@ class Settings_Form
 	 * - attempts to create a backup file and will use it should the writing of the
 	 *   new settings file fail
 	 *
-	 * @param array $config_vars
+	 * @param mixed[] $config_vars
 	 */
-	static function save_file($config_vars)
+	public static function save_file($config_vars)
 	{
 		global $context;
 
@@ -679,7 +678,7 @@ class Settings_Form
 	 *  - either, an empty string for a horizontal rule.
 	 *  - or, a string for a titled section.
 	 *
-	 * @param array $config_vars = null array of config vars, if null the method returns the current configuration
+	 * @param mixed[]|null $config_vars = null array of config vars, if null the method returns the current configuration
 	 */
 	public function settings($config_vars = null)
 	{

@@ -1298,6 +1298,9 @@ class ManageSmileys_Controller extends Action_Controller
 			),
 			'form' => array(
 				'href' => $scripturl . '?action=admin;area=smileys;sa=editicons',
+				'hidden_fields' => array(
+					'icons_save' => 1,
+				)
 			),
 			'additional_rows' => array(
 				array(
@@ -1429,7 +1432,7 @@ class ManageSmileys_Controller extends Action_Controller
 	/**
 	 * Install a smiley set.
 	 */
-	function action_install()
+	public function action_install()
 	{
 		global $modSettings, $scripturl, $context, $txt, $user_info;
 
@@ -1531,12 +1534,10 @@ class ManageSmileys_Controller extends Action_Controller
 		$context['actions'] = array();
 		$context['ftp_needed'] = false;
 
-		$has_readme = false;
 		foreach ($actions as $action)
 		{
 			if ($action['type'] == 'readme' || $action['type'] == 'license')
 			{
-				$has_readme = true;
 				$type = 'package_' . $action['type'];
 				if (file_exists(BOARDDIR . '/packages/temp/' . $base_path . $action['filename']))
 					$context[$type] = htmlspecialchars(trim(file_get_contents(BOARDDIR . '/packages/temp/' . $base_path . $action['filename']), "\n\r"), ENT_COMPAT, 'UTF-8');

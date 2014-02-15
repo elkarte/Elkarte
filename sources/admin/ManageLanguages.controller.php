@@ -339,7 +339,7 @@ class ManageLanguages_Controller extends Action_Controller
 			elseif (!empty($install_files))
 			{
 				// @todo retrieve the language pack per naming pattern from our sites
-				$archive_content = read_tgz_file('http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr($forum_version, array('ElkArte ' => ''))) . ';fetch=' . urlencode($_GET['did']), BOARDDIR, false, true, $install_files);
+				read_tgz_file('http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr($forum_version, array('ElkArte ' => ''))) . ';fetch=' . urlencode($_GET['did']), BOARDDIR, false, true, $install_files);
 
 				// Make sure the files aren't stuck in the cache.
 				package_flush_cache();

@@ -439,10 +439,9 @@ class Likes_Controller extends Action_Controller
 	 * Function to return an array of users that liked a particular
 	 * message.  Used in profile so a user can see the full
 	 * list of members, vs the truncated (optional) one shown in message display
-	 *
-	 * @param int $message
+	 * accessed by ?action=likes;sa=showWhoLiked;msg=x
 	 */
-	public function action_showWhoLiked($message)
+	public function action_showWhoLiked()
 	{
 		global $context, $txt, $scripturl;
 

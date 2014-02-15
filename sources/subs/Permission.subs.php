@@ -82,8 +82,8 @@ function loadIllegalGuestPermissions()
 /**
  * This function updates the permissions of any groups based on the given groups.
  *
- * @param mixed $parents (array or int) group or groups whose children are to be updated
- * @param mixed $profile = null an int or null for the customized profile, if any
+ * @param mixed[]|int $parents (array or int) group or groups whose children are to be updated
+ * @param int|null $profile = null an int or null for the customized profile, if any
  */
 function updateChildPermissions($parents, $profile = null)
 {
@@ -212,9 +212,9 @@ class InlinePermissions_Form
 	/**
 	 * Save the permissions of a form containing inline permissions.
 	 *
-	 * @param array $permissions
+	 * @param string[] $permissions
 	 */
-	static function save_inline_permissions($permissions)
+	public static function save_inline_permissions($permissions)
 	{
 		global $context;
 
@@ -277,13 +277,13 @@ class InlinePermissions_Form
 	 * It loads a context variables for each permission.
 	 * This function is used by several settings screens to set specific permissions.
 	 *
-	 * @param array $permissions
-	 * @param array $excluded_groups = array()
+	 * @param string[] $permissions
+	 * @param int[] $excluded_groups = array()
 	 *
 	 * @uses ManagePermissions language
 	 * @uses ManagePermissions template.
 	 */
-	static function init_inline_permissions($permissions, $excluded_groups = array())
+	public static function init_inline_permissions($permissions, $excluded_groups = array())
 	{
 		global $context, $txt, $modSettings;
 

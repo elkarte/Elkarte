@@ -710,7 +710,7 @@ class ProfileHistory_Controller extends Action_Controller
 	 * @param string $sort
 	 * @param string $where
 	 * @param array $where_vars
-	 * @return array error messages
+	 * @return mixed[] error messages array
 	 */
 	public function list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars = array())
 	{
@@ -780,7 +780,7 @@ class ProfileHistory_Controller extends Action_Controller
 	 * @param string $sort
 	 * @param string $where
 	 * @param array $where_vars
-	 * @return array an array of messages
+	 * @return mixed[] an array of basic messages / details
 	 */
 	public function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars = array())
 	{
@@ -858,7 +858,7 @@ class ProfileHistory_Controller extends Action_Controller
 	 * @param string $sort
 	 * @param string $where
 	 * @param array $where_vars
-	 * @return array an array of messages
+	 * @return mixed[] an array of messages
 	 */
 	public function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = array())
 	{
@@ -920,7 +920,7 @@ class ProfileHistory_Controller extends Action_Controller
 	 * @param int $items_per_page
 	 * @param string $sort
 	 * @param int $memID
-	 * @return array
+	 * @return mixed[] array of profile edits
 	 */
 	public function list_getProfileEdits($start, $items_per_page, $sort, $memID)
 	{

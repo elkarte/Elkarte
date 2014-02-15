@@ -154,7 +154,6 @@ function list_integration_hooks_data($start, $per_page, $sort)
 		$hooks_filters[] = '<option ' . ($context['current_filter'] == $hook ? 'selected="selected" ' : '') . 'onclick="window.location = \'' . $scripturl . '?action=admin;area=addonsettings;sa=hooks;filter=' . $hook . '\';">' . $hook . '</option>';
 		foreach ($functions as $function)
 		{
-			$enabled = strstr($function, ']') === false;
 			$function = str_replace(']', '', $function);
 
 			// This is a not an include and the function is included in a certain file (if not it doesn't exists so don't care)

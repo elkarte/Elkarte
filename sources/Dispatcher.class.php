@@ -146,6 +146,7 @@ class Site_Dispatcher
 			'contact' => array('Register.controller.php', 'Register_Controller', 'action_contact'),
 			'coppa' => array('Register.controller.php', 'Register_Controller', 'action_coppa'),
 			'deletemsg' => array('RemoveTopic.controller.php', 'RemoveTopic_Controller', 'action_deletemsg'),
+			// @todo: move this to attachment action also
 			'dlattach' => array('Attachment.controller.php', 'Attachment_Controller', 'action_index'),
 			'unwatchtopic' => array('Notify.controller.php', 'Notify_Controller', 'action_unwatchtopic'),
 			'editpoll' => array('Poll.controller.php', 'Poll_Controller', 'action_editpoll'),
@@ -321,7 +322,7 @@ class Site_Dispatcher
 				require_once(CONTROLLERDIR . '/BoardIndex.controller.php');
 				call_integration_hook('integrate_boardindex_before');
 				$controller = new BoardIndex_Controller();
-				$this->action_boardindex();
+				$controller->action_boardindex();
 				call_integration_hook('integrate_boardindex_after');
 			}
 			call_integration_hook('integrate_' . $hook . '_after');

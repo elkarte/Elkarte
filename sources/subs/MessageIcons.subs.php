@@ -68,9 +68,9 @@ function fetchMessageIconsDetails()
 /**
  * Delete a message icon.
  *
- * @param array $icons
+ * @param int[] $icons
  */
-function deleteMessageIcon($icons)
+function deleteMessageIcons($icons)
 {
 	$db = database();
 
@@ -87,7 +87,7 @@ function deleteMessageIcon($icons)
 /**
  * Updates a message icon.
  *
- * @param array $icon array of values to use in the $db->insert
+ * @param mixed[] $icon array of values to use in the $db->insert
  */
 function updateMessageIcon($icon)
 {
@@ -104,7 +104,7 @@ function updateMessageIcon($icon)
 /**
  * Adds a new message icon.
  *
- * @param array $icon
+ * @param mixed[] $icon associative array to use in the insert
  */
 function addMessageIcon($icon)
 {

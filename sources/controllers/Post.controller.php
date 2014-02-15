@@ -48,9 +48,8 @@ class Post_Controller extends Action_Controller
 	 * - accessed from ?action=post.
 	 *
 	 * @uses the Post template and language file, main sub template.
-	 * @param array $post_errors holds any errors found tyring to post
 	 */
-	function action_post()
+	public function action_post()
 	{
 		global $txt, $scripturl, $topic, $modSettings, $board, $user_info, $context, $options, $language;
 
@@ -63,7 +62,7 @@ class Post_Controller extends Action_Controller
 			unset($_REQUEST['poll']);
 
 		$post_errors = Error_Context::context('post', 1);
-		$attach_errors = attachment_Error_Context::context('attachment', 1);
+		$attach_errors = attachment_Error_Context::context();
 		$attach_errors->activate();
 		$first_subject = '';
 
@@ -960,6 +959,24 @@ class Post_Controller extends Action_Controller
 						$context['attachments']['restrictions'][] = sprintf($txt['attach_available'], comma_format(round(max($modSettings['attachmentPostLimit'] - ($attachments['total_size'] / 1028), 0)), 0));
 				}
 			}
+
+			// Load up the drag and drop attachment magic
+			addInlineJavascript('
+			var dropAttach = dragDropAttachment.init({
+				board: ' . $board . ',
+				allowedExtensions: ' . JavaScriptEscape($context['attachments']['allowed_extensions']) . ',
+				totalSizeAllowed: ' . JavaScriptEscape(empty($modSettings['attachmentPostLimit']) ? '' : $modSettings['attachmentPostLimit']) . ',
+				individualSizeAllowed: ' . JavaScriptEscape(empty($modSettings['attachmentSizeLimit']) ? '' : $modSettings['attachmentSizeLimit']) . ',
+				numOfAttachmentAllowed: ' . $context['attachments']['num_allowed'] . ',
+				totalAttachSizeUploaded: ' . (isset($context['attachments']['total_size']) && !empty($context['attachments']['total_size']) ? $context['attachments']['total_size'] : 0) . ',
+				numAttachUploaded: ' . (isset($context['attachments']['quantity']) && !empty($context['attachments']['quantity']) ? $context['attachments']['quantity'] : 0) . ',
+				oTxt: ({
+					allowedExtensions : ' . JavaScriptEscape(sprintf($txt['cant_upload_type'], $context['attachments']['allowed_extensions'])) . ',
+					totalSizeAllowed : ' . JavaScriptEscape($txt['attach_max_total_file_size']) . ',
+					individualSizeAllowed : ' . JavaScriptEscape(sprintf($txt['file_too_big'], comma_format($modSettings['attachmentSizeLimit'], 0))) . ',
+					numOfAttachmentAllowed : ' . JavaScriptEscape(sprintf($txt['attachments_limit_per_post'], $modSettings['attachmentNumPerPostLimit'])) . ',
+				}),
+			});', true);
 		}
 
 		$context['back_to_topic'] = isset($_REQUEST['goback']) || (isset($_REQUEST['msg']) && !isset($_REQUEST['subject']));
@@ -990,7 +1007,7 @@ class Post_Controller extends Action_Controller
 	 * sends off notifications, and allows for announcements and moderation.
 	 * accessed from ?action=post2.
 	 */
-	function action_post2()
+	public function action_post2()
 	{
 		global $board, $topic, $txt, $modSettings, $context, $user_settings;
 		global $user_info, $board_info, $options, $ignore_temp;
@@ -1355,7 +1372,7 @@ class Post_Controller extends Action_Controller
 		if (!isset($_POST['subject']) || Util::htmltrim(Util::htmlspecialchars($_POST['subject'])) === '')
 			$post_errors->addError('no_subject', 0);
 
-		if (!isset($_POST['message']) || Util::htmltrim(Util::htmlspecialchars($_POST['message']), ENT_QUOTES) === '')
+		if (!isset($_POST['message']) || Util::htmltrim(Util::htmlspecialchars($_POST['message'], ENT_QUOTES)) === '')
 			$post_errors->addError('no_message');
 		elseif (!empty($modSettings['max_messageLength']) && Util::strlen($_POST['message']) > $modSettings['max_messageLength'])
 			$post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
@@ -1836,7 +1853,7 @@ class Post_Controller extends Action_Controller
 	 * uses special (sadly browser dependent) javascript to parse entities for internationalization reasons.
 	 * accessed with ?action=quotefast and ?action=quotefast;modify
 	 */
-	function action_quotefast()
+	public function action_quotefast()
 	{
 		global $modSettings, $user_info, $context;
 
@@ -1934,7 +1951,7 @@ class Post_Controller extends Action_Controller
 	 * Used to edit the body or subject of a message inline
 	 * called from action=jsmodify from script and topic js
 	 */
-	function action_jsmodify()
+	public function action_jsmodify()
 	{
 		global $modSettings, $board, $topic, $txt;
 		global $user_info, $context, $language;
@@ -2197,7 +2214,7 @@ class Post_Controller extends Action_Controller
 	 * It has problems with internationalization.
 	 * It is accessed via ?action=spellcheck.
 	 */
-	function action_spellcheck()
+	public function action_spellcheck()
 	{
 		global $txt, $context;
 
@@ -2289,7 +2306,7 @@ class Post_Controller extends Action_Controller
 	 *
 	 * @param int $member_id
 	 * @param int $id_topic if set, load drafts for the specified topic
-	 * @return boolean
+	 * @return false|null
 	 */
 	private function _prepareDraftsContext($member_id, $id_topic = false)
 	{
@@ -2316,8 +2333,9 @@ class Post_Controller extends Action_Controller
 		// add them to the context draft array for template display
 		foreach ($user_drafts as $draft)
 		{
+			$short_subject = empty($draft['subject']) ? $txt['drafts_none'] : shorten_text(stripslashes($draft['subject']), !empty($modSettings['draft_subject_length']) ? $modSettings['draft_subject_length'] : 24);
 			$context['drafts'][] = array(
-				'subject' => empty($draft['subject']) ? $txt['drafts_none'] : censorText(shorten_text(stripslashes($draft['subject']), !empty($modSettings['draft_subject_length']) ? $modSettings['draft_subject_length'] : 24)),
+				'subject' => censorText($short_subject),
 				'poster_time' => standardTime($draft['poster_time']),
 					'link' => '<a href="' . $scripturl . '?action=post;board=' . $draft['id_board'] . ';' . (!empty($draft['id_topic']) ? 'topic='. $draft['id_topic'] .'.0;' : '') . 'id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
 				);

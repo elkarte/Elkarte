@@ -9,41 +9,8 @@ $txt['post_in_board'] = 'Post in the board';
 $txt['subject_not_filled'] = 'The subject field was not filled out. It is required.';
 $txt['message_body_not_filled'] = 'The message body was not filled out. It is required.';
 
-// Use numeric entities in the below string.
-$txt['add_bbc'] = 'Add BBC tags';
-$txt['bold'] = 'Bold';
-$txt['italic'] = 'Italicized';
-$txt['underline'] = 'Underline';
-$txt['center'] = 'Centered';
-$txt['hyperlink'] = 'Insert Hyperlink';
-$txt['insert_email'] = 'Insert Email';
-$txt['bbc_code'] = 'Insert Code';
-
 // Escape any single quotes in here twice.. 'it\'s' -> 'it\\\'s'.
 $txt['bbc_quote'] = 'Insert Quote';
-$txt['bbc_spoiler'] = 'Insert Spoiler';
-$txt['bbc_footnote'] = 'Insert Footnote';
-$txt['list'] = 'Insert List';
-$txt['list_unordered'] = 'Insert unordered list';
-$txt['list_ordered'] = 'Insert ordered list';
-
-$txt['change_color'] = 'Change color';
-$txt['black'] = 'Black';
-$txt['red'] = 'Red';
-$txt['yellow'] = 'Yellow';
-$txt['pink'] = 'Pink';
-$txt['green'] = 'Green';
-$txt['orange'] = 'Orange';
-$txt['purple'] = 'Purple';
-$txt['blue'] = 'Blue';
-$txt['beige'] = 'Beige';
-$txt['brown'] = 'Brown';
-$txt['teal'] = 'Teal';
-$txt['navy'] = 'Navy';
-$txt['maroon'] = 'Maroon';
-$txt['lime_green'] = 'Lime Green';
-$txt['white'] = 'White';
-
 $txt['disable_smileys'] = 'Disable smileys';
 $txt['dont_use_smileys'] = 'Don\'t use smileys.';
 
@@ -57,23 +24,7 @@ $txt['question_mark'] = 'Question mark';
 $txt['icon_poll'] = 'Poll';
 $txt['lamp'] = 'Lamp';
 $txt['add_smileys'] = 'Add smileys';
-$txt['image'] = 'Insert image';
-$txt['table'] = 'Insert table';
-$txt['table_td'] = 'Insert table column';
 $txt['topic_notify_no'] = 'There are no topics with notification.';
-$txt['teletype'] = 'Teletype';
-$txt['strike'] = 'Strikethrough';
-$txt['preformatted'] = 'Preformatted text';
-$txt['left_align'] = 'Left align';
-$txt['right_align'] = 'Right align';
-$txt['superscript'] = 'Superscript';
-$txt['subscript'] = 'Subscript';
-$txt['table_tr'] = 'Insert table row';
-$txt['horizontal_rule'] = 'Horizontal Rule';
-$txt['font_size'] = 'Font size';
-$txt['font_face'] = 'Font face';
-$txt['toggle_view'] = 'Toggle view';
-$txt['unformat_text'] = 'Remove formatting';
 
 $txt['rich_edit_wont_work'] = 'Your browser does not support Rich Text editing.';
 $txt['rich_edit_function_disabled'] = 'Your browser does not support this function.';
@@ -117,6 +68,7 @@ $txt['reported_by'] = 'has been reported by';
 $txt['board_moderate'] = 'on a board you moderate';
 $txt['report_comment'] = 'The reporter has made the following comment';
 
+$txt['attach_drop_files'] = 'Drag and Drop files here';
 $txt['attach_restrict_attachmentPostLimit'] = 'maximum total size %1$s KB';
 $txt['attach_restrict_attachmentSizeLimit'] = 'maximum individual size %1$s KB';
 $txt['attach_restrict_attachmentNumPerPostLimit'] = '%1$d per post';

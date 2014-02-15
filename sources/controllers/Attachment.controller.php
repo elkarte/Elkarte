@@ -29,8 +29,148 @@ class Attachment_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		// Default action to execute, guess which one
-		$this->action_dlattach();
+		require_once(SUBSDIR . '/Action.class.php');
+
+		// add an subaction array to act accordingly
+		$subActions = array(
+			'dlattach' => array($this, 'action_dlattach'),
+			'ulattach' => array($this, 'action_ulattach'),
+			'rmattach' => array($this, 'action_rmattach'),
+		);
+
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'dlattach';
+
+		// Call the action handler
+		$action = new Action();
+		$action->initialize($subActions, 'dlattach');
+		$action->dispatch($subAction);
+	}
+
+	/**
+	 * Function to upload attachements via ajax calls
+	 * Currently called by drag drop attachment functionality
+	 * Pass the form data with session vars
+	 * responds back with errors or file data
+	 */
+	public function action_ulattach()
+	{
+		global $context, $modSettings;
+
+		// Make sure we have json encoding available, if not add it
+		checkJsonEncode();
+
+		$resp_data = array();
+		$context['attachments']['can']['post'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
+
+		// Set up the template details
+		$template_layers = Template_Layers::getInstance();
+		$template_layers->removeAll();
+		loadTemplate('Json');
+		$context['sub_template'] = 'send_json';
+
+		// Make sure the session is still valid
+		if (checkSession('request', '', false) != '')
+		{
+			$context['json_data'] = array('result' => false, 'data' => 'session timeout');
+			return false;
+		}
+
+		// We should have files, otherwise why are we here?
+		if (isset($_FILES["attachment"]))
+		{
+			loadLanguage('Post');
+
+			$attach_errors = attachment_Error_Context::context();
+			$attach_errors->activate();
+
+			if ($context['attachments']['can']['post'] && empty($_POST['from_qr']))
+			{
+				require_once(SUBSDIR . '/Attachments.subs.php');
+
+				if (isset($_REQUEST['msg']))
+					processAttachments((int) $_REQUEST['msg']);
+				else
+					processAttachments();
+			}
+
+			// Any mistakes?
+			if ($attach_errors->hasErrors())
+			{
+				$errors = $attach_errors->prepareErrors();
+
+				// Bad news for you, the attachments did not process, lets tell them why
+				foreach ($errors as $key => $error)
+					$resp_data[] = $error;
+
+				$context['json_data'] = array('result' => false, 'data' => $resp_data);
+			}
+			// No errors, lets get the details of what we have for our response back
+			else
+			{
+				foreach ($_SESSION['temp_attachments'] as $key => $val)
+				{
+					// We need to grab the name anyhow
+					if (!empty($val['name']) || !empty($val['tmp_name']))
+					{
+						$resp_data = array(
+							'name' => $val['name'],
+							'temp_name' => $key,
+							'temp_path' => $val['tmp_name'],
+							'size' => $val['size']
+						);
+					}
+				}
+
+				$context['json_data'] = array('result' => true, 'data' => $resp_data);
+			}
+		}
+		// Could not find the files you claimed to have sent
+		else
+			$context['json_data'] = array('result' => false, 'data' => 'files not there');
+	}
+
+	/**
+	 * Function to remove attachements which were added via ajax calls
+	 * Currently called by drag drop attachment functionality
+	 * Requires file name and file path
+	 * responds back with success or error
+	 */
+	public function action_rmattach()
+	{
+		global $context;
+
+		checkJsonEncode();
+
+		// Prepare the template so we can respond with json
+		$template_layers = Template_Layers::getInstance();
+		$template_layers->removeAll();
+		loadTemplate('Json');
+		$context['sub_template'] = 'send_json';
+
+		// Make sure the session is valid
+		if (checkSession('request', '', false) !== '')
+		{
+			$context['json_data'] = array('result' => false, 'data' => 'session timeout');
+			return false;
+		}
+
+		// We need a filename and path or we are not going any further
+		if (isset($_REQUEST['filename']) && $_REQUEST['filepath'])
+		{
+			// This file does exist, so lets terminate it!
+			if (file_exists($_REQUEST['filepath']))
+			{
+				@unlink($_REQUEST['filepath']);
+				unset($_SESSION['temp_attachments'][$_REQUEST['filename']]);
+
+				$context['json_data'] = array('result' => true);
+			}
+			// Nope can't delete it if we can't find it
+			else
+				$context['json_data'] = array('result' => false, 'data' => 'files not there');
+		}
+		else
+			$context['json_data'] = array('result' => false, 'data' => 'No file name provided');
 	}
 
 	/**

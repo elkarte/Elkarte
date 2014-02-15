@@ -438,7 +438,7 @@ function getSpiderStats($start, $items_per_page, $sort)
  * Get the number of spider stat rows from the log spider stats table
  * (used by createList() callbacks)
  *
- * @param int $time (optional) if specified counts only the entries before that date
+ * @param int|null $time (optional) if specified counts only the entries before that date
  * @return int
  */
 function getNumSpiderStats($time = null)
@@ -500,7 +500,7 @@ function removeSpiderOldStats($time)
 /**
  * Remove all the entries connected to a certain spider (description, entries, stats)
  *
- * @param array $spiders_id an array of spider ids
+ * @param int[] $spiders_id an array of spider ids
  */
 function removeSpiders($spiders_id)
 {

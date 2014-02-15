@@ -209,13 +209,11 @@ class ProfileInfo_Controller extends Action_Controller
 				$boardsAllowed = array(-1);
 			$attachments = $this->list_getAttachments(0, $settings['attachments_on_summary'], 'm.poster_time DESC', $boardsAllowed, $memID);
 
-			// Load them in to $context for use in the template
-			$i = 0;
-
-			// @todo keep or loose the mime thumbs ... useful at all?
+			// Some generic images for mime types
 			$mime_images_url = $settings['default_images_url'] . '/mime_images/';
 			$mime_path = $settings['default_theme_dir'] . '/images/mime_images/';
 
+			// Load them in to $context for use in the template
 			for ($i = 0, $count = count($attachments); $i < $count; $i++)
 			{
 				$context['thumbs'][$i] = array(
@@ -425,10 +423,10 @@ class ProfileInfo_Controller extends Action_Controller
 
 		// If we're specifically dealing with attachments use that function!
 		if (isset($_GET['sa']) && $_GET['sa'] == 'attach')
-			return $this->action_showAttachments($memID);
+			return $this->action_showAttachments();
 		// Instead, if we're dealing with unwatched topics (and the feature is enabled) use that other function.
 		elseif (isset($_GET['sa']) && $_GET['sa'] == 'unwatchedtopics' && $modSettings['enable_unwatch'])
-			return $this->action_showUnwatched($memID);
+			return $this->action_showUnwatched();
 
 		// Are we just viewing topics?
 		$context['is_topics'] = isset($_GET['sa']) && $_GET['sa'] == 'topics' ? true : false;
@@ -467,7 +465,6 @@ class ProfileInfo_Controller extends Action_Controller
 			$msgCount = count_user_posts($memID, $board);
 
 		list ($min_msg_member, $max_msg_member) = findMinMaxUserMessage($memID, $board);
-		$reverse = false;
 		$range_limit = '';
 		$maxIndex = (int) $modSettings['defaultMaxMessages'];
 
@@ -1100,7 +1097,7 @@ class ProfileInfo_Controller extends Action_Controller
 	 * @param int $start
 	 * @param int $items_per_page
 	 * @param string $sort
-	 * @param array $boardsAllowed
+	 * @param int[] $boardsAllowed
 	 * @param int $memID
 	 */
 	public function list_getAttachments($start, $items_per_page, $sort, $boardsAllowed, $memID)
@@ -1113,7 +1110,7 @@ class ProfileInfo_Controller extends Action_Controller
 	/**
 	 * Callback for createList()
 	 *
-	 * @param array $boardsAllowed
+	 * @param int[] $boardsAllowed
 	 * @param int $memID
 	 */
 	public function list_getNumAttachments($boardsAllowed, $memID)
@@ -1132,7 +1129,7 @@ class ProfileInfo_Controller extends Action_Controller
 	 * @param string $sort
 	 * @param int $memID
 	 */
-	function list_getUnwatched($start, $items_per_page, $sort, $memID)
+	public function list_getUnwatched($start, $items_per_page, $sort, $memID)
 	{
 		return getUnwatchedBy($start, $items_per_page, $sort, $memID);
 	}

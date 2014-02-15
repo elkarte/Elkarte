@@ -391,7 +391,7 @@ class ProfileAccount_Controller extends Action_Controller
 	/**
 	 * Present a screen to make sure the user wants to be deleted.
 	 */
-	function action_deleteaccount()
+	public function action_deleteaccount()
 	{
 		global $txt, $context, $modSettings, $cur_profile;
 
@@ -415,7 +415,7 @@ class ProfileAccount_Controller extends Action_Controller
 	/**
 	 * Actually delete an account.
 	 */
-	function action_deleteaccount2()
+	public function action_deleteaccount2()
 	{
 		global $user_info, $context, $cur_profile, $user_profile, $modSettings;
 
@@ -510,7 +510,7 @@ class ProfileAccount_Controller extends Action_Controller
 	 * Activate an account.
 	 * This function is called from the profile account actions area.
 	 */
-	function action_activateaccount()
+	public function action_activateaccount()
 	{
 		global $context, $user_profile, $modSettings;
 

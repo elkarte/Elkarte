@@ -32,7 +32,7 @@ class DbTable_MySQL extends DbTable
 {
 	/**
 	 * Holds this instance of the table interface
-	 * @var instance
+	 * @var DbTable_MySQL
 	 */
 	private static $_tbl = null;
 
@@ -101,13 +101,13 @@ class DbTable_MySQL extends DbTable
 	 *    - 'error' will return false if the table already exists.
 	 *
 	 * @param string $table_name
-	 * @param array $columns in the format specified.
-	 * @param array $indexes default array(), in the format specified.
-	 * @param array $parameters default array()
+	 * @param mixed[] $columns in the format specified.
+	 * @param mixed[] $indexes default array(), in the format specified.
+	 * @param mixed[] $parameters default array()
 	 * @param string $if_exists default 'ignore'
 	 * @param string $error default 'fatal'
 	 */
-	function db_create_table($table_name, $columns, $indexes = array(), $parameters = array(), $if_exists = 'ignore', $error = 'fatal')
+	public function db_create_table($table_name, $columns, $indexes = array(), $parameters = array(), $if_exists = 'ignore', $error = 'fatal')
 	{
 		global $db_prefix;
 
@@ -180,10 +180,10 @@ class DbTable_MySQL extends DbTable
 	 * Drop a table.
 	 *
 	 * @param string $table_name
-	 * @param array $parameters default array()
+	 * @param mixed[] $parameters default array()
 	 * @param string $error default 'fatal'
 	 */
-	function db_drop_table($table_name, $parameters = array(), $error = 'fatal')
+	public function db_drop_table($table_name, $parameters = array(), $error = 'fatal')
 	{
 		global $db_prefix;
 
@@ -223,12 +223,12 @@ class DbTable_MySQL extends DbTable
 	 * This function adds a column.
 	 *
 	 * @param string $table_name the name of the table
-	 * @param array $column_info with column information
-	 * @param array $parameters default array()
+	 * @param mixed[] $column_info with column information
+	 * @param mixed[] $parameters default array()
 	 * @param string $if_exists default 'update'
 	 * @param string $error default 'fatal'
 	 */
-	function db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
+	public function db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
 	{
 		global $db_prefix;
 
@@ -271,10 +271,10 @@ class DbTable_MySQL extends DbTable
 	 *
 	 * @param string $table_name
 	 * @param string $column_name
-	 * @param array $parameters default array()
+	 * @param mixed[] $parameters default array()
 	 * @param string $error default 'fatal'
 	 */
-	function db_remove_column($table_name, $column_name, $parameters = array(), $error = 'fatal')
+	public function db_remove_column($table_name, $column_name, $parameters = array(), $error = 'fatal')
 	{
 		global $db_prefix;
 
@@ -309,10 +309,10 @@ class DbTable_MySQL extends DbTable
 	 * @param string $table_name
 	 * @param $old_column
 	 * @param $column_info
-	 * @param array $parameters default array()
+	 * @param mixed[] $parameters default array()
 	 * @param string $error default 'fatal'
 	 */
-	function db_change_column($table_name, $old_column, $column_info, $parameters = array(), $error = 'fatal')
+	public function db_change_column($table_name, $old_column, $column_info, $parameters = array(), $error = 'fatal')
 	{
 		global $db_prefix;
 
@@ -361,12 +361,12 @@ class DbTable_MySQL extends DbTable
 	 * Add an index.
 	 *
 	 * @param string $table_name
-	 * @param array $index_info
-	 * @param array $parameters default array()
+	 * @param mixed[] $index_info
+	 * @param mixed[] $parameters default array()
 	 * @param string $if_exists default 'update'
 	 * @param string $error default 'fatal'
 	 */
-	function db_add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
+	public function db_add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
 	{
 		global $db_prefix;
 
@@ -439,14 +439,14 @@ class DbTable_MySQL extends DbTable
 	 *
 	 * @param string $table_name
 	 * @param string $index_name
-	 * @param array $parameters default array()
+	 * @param mixed[] $parameters default array()
 	 * @param string $error default 'fatal'
 	 */
-	function db_remove_index($table_name, $index_name, $parameters = array(), $error = 'fatal')
+	public function db_remove_index($table_name, $index_name, $parameters = array(), $error = 'fatal')
 	{
 		global $db_prefix;
 
-		// need this
+		// Need this
 		$db = database();
 
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
@@ -470,6 +470,7 @@ class DbTable_MySQL extends DbTable
 
 				return true;
 			}
+
 			if ($index['name'] == $index_name)
 			{
 				// Drop the bugger...
@@ -493,10 +494,10 @@ class DbTable_MySQL extends DbTable
 	 * Get the schema formatted name for a type.
 	 *
 	 * @param string $type_name
-	 * @param $type_size
-	 * @param $reverse
+	 * @param int|null $type_size
+	 * @param boolean $reverse
 	 */
-	function db_calculate_type($type_name, $type_size = null, $reverse = false)
+	public function db_calculate_type($type_name, $type_size = null, $reverse = false)
 	{
 		// MySQL is actually the generic baseline.
 		return array($type_name, $type_size);
@@ -506,9 +507,9 @@ class DbTable_MySQL extends DbTable
 	 * Get table structure.
 	 *
 	 * @param string $table_name
-	 * @param array $parameters default array()
+	 * @param mixed[] $parameters default array()
 	 */
-	function db_table_structure($table_name, $parameters = array())
+	public function db_table_structure($table_name, $parameters = array())
 	{
 		global $db_prefix;
 
@@ -526,10 +527,10 @@ class DbTable_MySQL extends DbTable
 	 *
 	 * @param string $table_name
 	 * @param bool $detail
-	 * @param array $parameters default array()
+	 * @param mixed[] $parameters default array()
 	 * @return mixed
 	 */
-	function db_list_columns($table_name, $detail = false, $parameters = array())
+	public function db_list_columns($table_name, $detail = false, $parameters = array())
 	{
 		global $db_prefix;
 
@@ -597,10 +598,10 @@ class DbTable_MySQL extends DbTable
 	 *
 	 * @param string $table_name
 	 * @param bool $detail
-	 * @param array $parameters
+	 * @param mixed[] $parameters
 	 * @return mixed
 	 */
-	function db_list_indexes($table_name, $detail = false, $parameters = array())
+	public function db_list_indexes($table_name, $detail = false, $parameters = array())
 	{
 		global $db_prefix;
 
@@ -658,7 +659,7 @@ class DbTable_MySQL extends DbTable
 	/**
 	 * Creates a query for a column
 	 *
-	 * @param array $column
+	 * @param mixed[] $column
 	 */
 	private function _db_create_query_column($column)
 	{
@@ -692,7 +693,7 @@ class DbTable_MySQL extends DbTable
 	/**
 	 * Return a copy of this instance package log
 	 */
-	function package_log()
+	public function package_log()
 	{
 		return $this->_package_log;
 	}

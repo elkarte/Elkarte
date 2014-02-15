@@ -147,9 +147,11 @@ function detectExceedingMessages($start, $increment)
 }
 
 /**
- * loads messages, which exceed the lenght
+ * loads messages, which exceed the lenght that will fit in the col field
+ * Used by maintenance when convert the column "body" of the table from TEXT to MEDIUMTEXT
+ * and vice versa.
  *
- * @param int $msg
+ * @param int[] $msg
  * @return array
  */
 function getExceedingMessages($msg)
@@ -791,7 +793,7 @@ function updateZeroPostMembers()
  * Removing old and inactive members
  *
  * @param string $type
- * @param array $groups
+ * @param int[] $groups
  * @param int $time_limit
  * @return array
  */

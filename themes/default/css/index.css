@@ -213,7 +213,7 @@ select option {
 	text-overflow: '';
 }
 .styled-select select::-ms-expand {
-    display: none;
+	display: none;
 }
 /* A div to hold the select */
 .styled-select select {
@@ -222,8 +222,8 @@ select option {
 	background: transparent;
 	border: none;
 	outline: none;
-    box-shadow: none;
-    background-image: none;
+	box-shadow: none;
+	background-image: none;
 	width: 100%;
 	padding: 1px 2em 1px 2px;
 }
@@ -330,6 +330,13 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 }
 .new_posts:hover {
 	text-decoration: underline;
+}
+del .bbc_link:link, del .bbc_link:visited {
+	text-decoration: line-through;
+}
+.childboards .new_posts {
+    font-size: 0.857em;
+    padding: 1px 3px 2px;
 }
 
 /* Standard horizontal rule.. ([hr], etc.) */
@@ -785,12 +792,12 @@ div.windowbg, div.windowbg2 {
 }
 /* Shorten url's inside posts. */
 a.bbc_link {
-    display: inline-block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 24em;
-    vertical-align: bottom;
+	display: inline-block;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 100%;
+	vertical-align: bottom;
 }
 
 /*	$AJAX		*/
@@ -1458,7 +1465,7 @@ a.bbc_link {
 	padding: 1em 2em;
 	font-weight: bold;
 	background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
-    transition: top .5s ease-out 0s, background 1s linear 0s;
+	transition: top .5s ease-out 0s, background 1s linear 0s;
 }
 #top:focus {
 	top: -4px;
@@ -1831,9 +1838,13 @@ img.new_posts {
 }
 .topic_listing {
 	padding: 1px 0 0 0;
+	display: table;
+	width: 100%;
+	border-collapse: collapse;
 }
 .topic_listing>li {
 	margin: 1px 0 0 0;
+	display: table-row;
 }
 .topic_sorting>.topic_sorting_row, .topic_listing>.topic_sorting_row {
 	margin: 0;
@@ -1893,17 +1904,27 @@ img.new_posts {
 .topic_latest {
 	display: table-cell;
 	vertical-align: top;
-	width: 20%;
-	min-width: 30em;
 	padding: 7px 4px 6px 4px;
+	width: auto;
+	min-width: 36em;
+	white-space: nowrap;
 	font-size: 0.929em;
+}
+.topic_latest.relative {
+	min-width: 30em;
+}
+#ie8 .topic_latest.relative {
+	min-width: 36em;
+}
+.board_lastpost, .topic_lastpost {
+	min-width: 21em;
+	margin-left: 1em;
 }
 .topic_stats {
 	text-align: right;
+	display: table-cell;
 	float: right;
 	min-width: 14em;
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 	padding: 0 16px 0 16px;
 }
@@ -1929,6 +1950,11 @@ img.new_posts {
 .qaction_row {
 	text-align: right;
 	padding: 6px;
+	display: block;
+}
+.basic_row, .sticky_row, .locked_row {
+	max-width: 100%;
+	width: 100%;
 }
 .sticky_row .topic_info {
 	background: url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
@@ -1975,7 +2001,6 @@ img.new_posts {
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
-
 }
 
 
@@ -2099,7 +2124,7 @@ img.new_posts {
 	text-align: center;
 	font-size: 1em;
 }
-/* #todo - Add an h3 for a11y? Breaks Stoopidfish. Bleh. :P */
+/* @todo - Add an h3 for a11y? Breaks Stoopidfish. Bleh. :P */
 .poster .name {
 	overflow: hidden;
 	margin-top: -0.4em;
@@ -2124,6 +2149,11 @@ img.new_posts {
 }
 .poster .listlevel2 {
 	width: 14em;
+}
+.poster .title {
+	white-space: normal;
+	word-wrap: break-word;
+	max-width: 14em;
 }
 .poster .linklevel2, .poster .linklevel2:focus,
 .poster .listlevel2:hover .linklevel2 {
@@ -2420,6 +2450,53 @@ ul.post_options li {
 	margin: 0 0 1em 0;
 	overflow: auto;
 }
+
+/*	$DRAG-N-DROP		*/
+/* ------------------------------------------------------- */
+#postAttachment2 .drop_area {
+	font-size: 1.857em;
+	font-weight: normal;
+	height: 60px;
+	line-height: 60px;
+	text-align: center;
+	opacity: 0.6;
+}
+#postAttachment >dd.progress_tracker {
+	margin:0;
+}
+.progress_tracker {
+	overflow: hidden;
+	width: 97%;
+}
+.statusbar {
+	padding: 5px;
+	overflow: hidden;
+}
+.info {
+	float: left;
+	position: relative;
+	overflow: hidden;
+	width: 60%;
+	line-height: 1.375em;
+}
+.progressBar {
+	width: 20%;
+	border-radius: 5px;
+	float: left;
+	text-align: center;
+}
+.abort, .remove {
+	float: right;
+	overflow: hidden;
+	font-size: 1em;
+	padding: 4px 6px;
+}
+.drop_attachmnts_error {
+	padding: 10px 0;
+	overflow: hidden;
+	width: 97%;
+}
+
 #postMoreOptions, #postAttachment, #postAttachment2 {
 	margin: -1px 0 0 0;
 	padding: 10px;
@@ -2428,7 +2505,7 @@ ul.post_options li {
 	overflow: hidden;
 }
 #postAttachment dd, #postAttachment2 dd {
-	margin: 4px 0 4px 12px;
+	margin: 4px 12px;
 }
 #postAttachment dd {
 	float: left;
@@ -3472,8 +3549,11 @@ a.help .icon {
 	font-style: italic;
 }
 #search_term_input {
-	margin: 0 0 12px;
+	margin: 0 0 10px;
 	font-size: 1.071em;
+}
+#search_term_input .button_submit  {
+	margin: 0 0 2px;
 }
 
 /* The advanced search section. */
@@ -3485,6 +3565,7 @@ a.help .icon {
 }
 #search_options .styled-select {
 	width: 14em;
+	margin: 0 0 3px;
 }
 #advanced_search dt {
 	float: left;
@@ -3773,13 +3854,15 @@ a.help .icon {
 
 /* This one does 1024 screens at default font size. */
 @media screen and (max-width: 64em) {
+	.topic_latest {
+		min-width: 20em;
+	}
+	.topic_latest.relative {
+		min-width: 15em;
+	}
 	.board_latest {
 		min-width: 20em;
 		width: 40%;
-	}
-	.topic_latest {
-		width: 30%;
-		min-width: 30%;
 	}
 	.lastpost_link {
 		display: block;
@@ -3799,6 +3882,15 @@ a.help .icon {
 }
 /* This one does 800 screens at default font size. */
 @media screen and (max-width: 50em) {
+	#logobox img {
+		max-width: 95%;
+	}
+	.topic_latest {
+		min-width: 15em;
+	}
+	.board_avatar {
+		display: none;
+	}
 	#main_menu .linklevel1 {
 		margin-right: 5px;
 		box-shadow: none;
@@ -3917,7 +4009,6 @@ a.help .icon {
 	.stats dt {
 		font-weight: bold;
 	}
-
 }
 /* This one does 540 and smaller screens at default font size. */
 @media screen and (max-width: 33.750em) {
@@ -3970,6 +4061,9 @@ a.help .icon {
 		width: 95%;
 		padding: 8px;
 	}
+	.locked_row, .sticky_row, .basic_row,.topic_listing, .topic_listing>li {
+		display: block;
+	}
 	.topic_icons, .topic_moderation {
 		display: none;
 	}
@@ -3988,8 +4082,29 @@ a.help .icon {
 		/* Necessary for some browsers to keep the pages all on the same line */
 		min-width: 100%;
 	}
+	.quickbuttons {
+		white-space: nowrap;
+	}
+	.pagesection .buttonlist {
+		float: none;
+		width: 100%;
+	}
+	#whoisviewing {
+		display: none;
+	}
+	.childboards li {
+		display: block;
+		font-size: 1.2em;
+	}
+	.pagesection .buttonlist li {
+		white-space: nowrap;
+		margin-bottom: 4px;
+	}
 	.topic_name, .topic_starter {
 		margin: 0;
+	}
+	.topic_starter {
+		margin-top: 5px;
 	}
 	.topic_name h4 {
 		display: block;
@@ -4121,7 +4236,7 @@ a.help .icon {
 	.menulevel3 {
 		display: none !important;
 	}
-	#main_menu li ul li, .admin_menu li ul li{
+	#main_menu li ul li, .admin_menu li ul li {
 		float: left;
 		display: block;
 		width: 100%;
@@ -4172,10 +4287,6 @@ a.help .icon {
 	.postarea, .forumtitle {
 		padding: 2px;
 	}
-	a.bbc_link {
-	    display: inline-block;
-		max-width: 16em;
-	}
 	.linktree .board_moderators, .linktree_last .board_moderators {
 		display: none;
 	}
@@ -4192,8 +4303,11 @@ a.help .icon {
 	a.linklevel1.button_strip_print, a.linklevel1.button_strip_send, .inline_mod_check,
 	a.linklevel1.quotetonew_button, a.linklevel1.button_strip_post_poll,
 	a.linklevel1.post_options, .keyinfo .post_subject, li.listlevel1.quickmod_select_all,
-	#collapse_button, p.inline.membergroups {
+	#collapse_button, p.inline.membergroups, #message_index_jump_to {
 		display: none !important;
+	}
+	#display_jump_to {
+		float: none;
 	}
 	#button_profile .avatar {
 		display: none;
@@ -4244,10 +4358,20 @@ a.help .icon {
 		max-width: 40px;
 		max-height: 40px;
 	}
+	ul.navigate_section li:not(:first-child):not(:last-child) a {
+		width: 3em;
+		display: inline-block;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
 }
 /* This one does 480px screens at default font size. */
 @media screen and (max-width: 30em) {
 	#button_admin {
+		display: none;
+	}
+	.quickbuttons .modified {
 		display: none;
 	}
 }

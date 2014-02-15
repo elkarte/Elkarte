@@ -113,6 +113,10 @@ class Convert_Md
 	 */
 	public function get_markdown()
 	{
+		// If there is nothing to parse, its quite easy
+		if (($this->_parser && $this->doc->getElementsByTagName("body")->item(0) === null) || (!$this->_parser && $this->doc === false))
+			return '';
+
 		// For this html node, find all child elements and convert
 		$body = ($this->_parser) ? $this->doc->getElementsByTagName("body")->item(0) : $this->doc->root;
 		$this->_convert_childNodes($body);
@@ -320,6 +324,7 @@ class Convert_Md
 			//	break;
 			case 'title':
 				$markdown = '# ' . $this->_get_value($node) . $this->line_break;
+				break;
 			case 'table':
 				$markdown = $this->_convert_table($node) . $this->line_break;
 				break;
@@ -385,6 +390,7 @@ class Convert_Md
 	 * md: [Awesome Site](http://somesite.com 'Title')
 	 *
 	 * @param object $node
+	 * @return string
 	 */
 	private function _convert_anchor($node)
 	{
@@ -593,7 +599,7 @@ class Convert_Md
 	 *
 	 * @param object $node
 	 */
-	function _convert_table($node)
+	private function _convert_table($node)
 	{
 		$table_heading = $node->getElementsByTagName('th');
 		if ($this->_get_item($table_heading, 0) === null)

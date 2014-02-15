@@ -42,8 +42,8 @@ if (!defined('ELK'))
  *  post-based membergroups in the database (restricted by parameter1).
  *
  * @param string $type Stat type - can be 'member', 'message', 'topic', 'subject' or 'postgroups'
- * @param mixed $parameter1 = null
- * @param mixed $parameter2 = null
+ * @param int|string|mixed[]|null $parameter1 = null pass through value
+ * @param int|string|mixed[]|null $parameter2 = null pass through value
  */
 function updateStats($type, $parameter1 = null, $parameter2 = null)
 {
@@ -63,7 +63,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 			break;
 		case 'topic':
 			require_once(SUBSDIR . '/Topic.subs.php');
-			updateTopicStats($parameter1, $parameter2);
+			updateTopicStats($parameter1);
 			break;
 		case 'postgroups':
 			require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -76,22 +76,18 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 
 /**
  * Updates the columns in the members table.
- * Assumes the data has been htmlspecialchar'd.
- * this function should be used whenever member data needs to be
- * updated in place of an UPDATE query.
+ * Assumes the data has been htmlspecialchar'd, no sanitization is performed on the data.
+ * this function should be used whenever member data needs to be updated in place of an UPDATE query.
  *
- * id_member is either an int or an array of ints to be updated.
- *
- * data is an associative array of the columns to be updated and their respective values.
+ * $data is an associative array of the columns to be updated and their respective values.
  * any string values updated should be quoted and slashed.
  *
- * the value of any column can be '+' or '-', which mean 'increment'
- * and decrement, respectively.
+ * The value of any column can be '+' or '-', which mean 'increment' and decrement, respectively.
  *
- * if the member's post number is updated, updates their post groups.
+ * If the member's post number is updated, updates their post groups.
  *
- * @param mixed $members An array of integers
- * @param array $data
+ * @param int[]|int $members An array of member ids
+ * @param mixed[] $data An associative array of the columns to be updated and their respective values.
  */
 function updateMemberData($members, $data)
 {
@@ -243,7 +239,7 @@ function updateMemberData($members, $data)
  * - when update is true, the value can be true or false to increment
  *  or decrement it, respectively.
  *
- * @param array $changeArray
+ * @param mixed[] $changeArray associative array of variable => value
  * @param bool $update = false
  * @param bool $debug = false
  * @todo: add debugging features, $debug isn't used
@@ -312,7 +308,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
 /**
  * Deletes one setting from the settings table and takes care of $modSettings as well
  *
- * @param mixed $toRemove the setting or the settings to be removed
+ * @param string $toRemove the setting or the settings to be removed
  */
 function removeSettings($toRemove)
 {
@@ -361,7 +357,7 @@ function removeSettings($toRemove)
  * @param int $max_value
  * @param int $num_per_page
  * @param bool $flexible_start = false
- * @param array $show
+ * @param mixed[] $show associative array of option => boolean
  */
 function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flexible_start = false, $show = array())
 {
@@ -490,7 +486,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
  * - caches the formatting data from the setting for optimization.
  *
  * @param float $number
- * @param bool $override_decimal_count = false
+ * @param integer|false $override_decimal_count = false or number of decimals
  */
 function comma_format($number, $override_decimal_count = false)
 {
@@ -524,8 +520,8 @@ function comma_format($number, $override_decimal_count = false)
  * - performs localization (more than just strftime would do alone.)
  *
  * @param int $log_time
- * @param bool $show_today = true
- * @param string $offset_type = false
+ * @param string|bool $show_today = true
+ * @param string|false $offset_type = false
  */
 function standardTime($log_time, $show_today = true, $offset_type = false)
 {
@@ -630,7 +626,7 @@ function htmlTime($timestamp)
  * - always applies the offset in the time_offset setting.
  *
  * @param bool $use_user_offset = true if use_user_offset is true, applies the user's offset as well
- * @param int $timestamp = null
+ * @param int|null $timestamp = null
  * @return int seconds since the unix epoch
  */
 function forum_time($use_user_offset = true, $timestamp = null)
@@ -653,7 +649,7 @@ function forum_time($use_user_offset = true, $timestamp = null)
  * - additionally converts &nbsp with str_replace
  *
  * @param string $string
- * @return the string without entities
+ * @return string string without entities
  */
 function un_htmlspecialchars($string)
 {
@@ -710,8 +706,8 @@ function shorten_text($text, $len = 384, $cutword = false, $buffer = 12)
  * should not be called on huge arrays (bigger than like 10 elements.)
  * returns an array containing each permutation.
  *
- * @param array $array
- * @return array
+ * @param mixed[] $array
+ * @return mixed[]
  */
 function permute($array)
 {
@@ -748,10 +744,10 @@ function permute($array)
  * - uses the cache_id as a unique identifier to facilitate any caching it may do.
  *  -returns the modified message.
  *
- * @param string $message
- * @param bool $smileys = true
+ * @param string|false $message if false return list of enabled bbc codes
+ * @param bool|string $smileys = true
  * @param string $cache_id = ''
- * @param array $parse_tags = null
+ * @param string[]|null $parse_tags array of tags to parse, null for all
  * @return string
  */
 function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = array())
@@ -1344,7 +1340,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			if (empty($parse_tags) || in_array($code['tag'], $parse_tags))
 				$bbc_codes[substr($code['tag'], 0, 1)][] = $code;
 		}
-		$codes = null;
 	}
 
 	// Shall we take the time to cache this?
@@ -1546,7 +1541,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 
 			$look_for = strtolower(substr($message, $pos + 2, $pos2 - $pos - 2));
 
-			$to_close = array();
 			$block_level = null;
 
 			do
@@ -1826,7 +1820,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			if ($pos2 !== false && ($pos2 <= $pos3 || $pos3 === false))
 			{
 				preg_match('~^(<br />|&nbsp;|\s|\[)+~', substr($message, $pos2 + 6), $matches);
-				$message = substr($message, 0, $pos2) . "\n" . (!empty($matches[0]) && substr($matches[0], -1) == '[' ? '[/li]' : '[/li][/list]') . "\n" . substr($message, $pos2);
+				$message = substr($message, 0, $pos2) . (!empty($matches[0]) && substr($matches[0], -1) == '[' ? '[/li]' : '[/li][/list]') . substr($message, $pos2);
 
 				$open_tags[count($open_tags) - 2]['after'] = '</ul>';
 			}
@@ -2116,13 +2110,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 		$fn_count = isset($fn_total) ? $fn_total : 0;
 
 		// Replace our footnote text with a [1] link, save the text for use at the end of the message
-		$message = preg_replace_callback('~(%fn%(.*?)%fn%)~is', create_function('$m', '
-			global $fn_num, $fn_content, $fn_count;
-
-			$fn_num++;
-			$fn_content[] = "<div class=\"target\" id=\"fn$fn_num" . "_" . "$fn_count\"><sup>$fn_num&nbsp;</sup>$m[2]<a class=\"footnote_return\" href=\"#ref$fn_num" . "_" . "$fn_count\">&crarr;</a></div>";
-			return "<a class=\"target\" href=\"#fn$fn_num" . "_" . "$fn_count\" id=\"ref$fn_num" . "_" . "$fn_count\">[$fn_num]</a>";'), $message);
-
+		$message = preg_replace_callback('~(%fn%(.*?)%fn%)~is', 'footnote_callback', $message);
 		$fn_total += $fn_num;
 
 		// If we have footnotes, add them in at the end of the message
@@ -2153,6 +2141,23 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 }
 
 /**
+ * Call back function for footnotes, builds the unique id and to/for link
+ * for each footnote in a message and page
+ *
+ * @param mixed[] $matches
+ * @return string
+ */
+function footnote_callback($matches)
+{
+	global $fn_num, $fn_content, $fn_count;
+
+	$fn_num++;
+	$fn_content[] = '<div class="target" id="fn' . $fn_num . '_' . $fn_count . '"><sup>' . $fn_num . '&nbsp;</sup>' . $matches[2] . '<a class="footnote_return" href="#ref' . $fn_num . "_" . $fn_count . '">&crarr;</a></div>';
+
+	return '<a class="target" href="#fn' . $fn_num . '_' . $fn_count . '" id="ref' . $fn_num . "_" . $fn_count . '">[' . $fn_num . ']</a>';
+}
+
+/**
  * Parse smileys in the passed message.
  *
  * The smiley parsing function which makes pretty faces appear :).
@@ -2166,7 +2171,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 function parsesmileys(&$message)
 {
 	global $modSettings, $txt, $user_info ;
-	static $smileyPregSearch = null, $smileyPregReplacements = array();
+	static $smileyPregSearch = null, $smileyPregReplacements = array(), $callback;
 
 	$db = database();
 
@@ -2237,28 +2242,34 @@ function parsesmileys(&$message)
 		}
 
 		$smileyPregSearch = '~(?<=[>:\?\.\s' . $non_breaking_space . '[\]()*\\\;]|^)(' . implode('|', $searchParts) . ')(?=[^[:alpha:]0-9]|$)~';
+		$callback = new ParseSmileysReplacement;
+		$callback->replacements = $smileyPregReplacements;
 	}
 
 	// Replace away!
 	// @todo When support changes to PHP 5.3+, this can be changed this to "use" keyword and simpifly this.
-	$callback = pregReplaceCurry('smileyPregReplaceCallback', 2);
-	$message = preg_replace_callback($smileyPregSearch, $callback($smileyPregReplacements), $message);
+	$message = preg_replace_callback($smileyPregSearch, array($callback, 'callback'), $message);
 }
 
 /**
  * Smiley Replacment Callback.
  *
- * Our callback that does the actual smiley replacments.
- *
- * Original code from: http://php.net/manual/en/function.preg-replace-callback.php#88013
  * This is needed until ELK supports PHP 5.3+ and we can change to "use"
- *
- * @param string $replacements
- * @param string $matches
  */
-function smileyPregReplaceCallback($replacements, $matches)
+class ParseSmileysReplacement
 {
-	return $replacements[$matches[1]];
+	/**
+	 * Our callback that does the actual smiley replacments.
+	 *
+	 * @param string[] $matches
+	 */
+	function callback($matches)
+	{
+		if (isset($this->replacements[$matches[0]]))
+			return $this->replacements[$matches[0]];
+		else
+			return '';
+	}
 }
 
 /**
@@ -2285,11 +2296,15 @@ function highlight_php_code($code)
 }
 
 /**
- * Make sure the browser doesn't come back and repost the form data.
+ * Ends execution and redirects the user to a new location
+ * Makes sure the browser doesn't come back and repost the form data.
  * Should be used whenever anything is posted.
+ * Calls AddMailQueue to process any mail queue items its can
+ * Calls call_integration_hook integrate_redirect before headers are sent
  *
  * @param string $setLocation = ''
- * @param bool $refresh = false
+ * @param bool $refresh = false, enable to send a refresh header, default is a location header
+ *
  */
 function redirectexit($setLocation = '', $refresh = false)
 {
@@ -2315,9 +2330,9 @@ function redirectexit($setLocation = '', $refresh = false)
 	if (!empty($modSettings['queryless_urls']) && (empty($context['server']['is_cgi']) || ini_get('cgi.fix_pathinfo') == 1 || @get_cfg_var('cgi.fix_pathinfo') == 1) && (!empty($context['server']['is_apache']) || !empty($context['server']['is_lighttpd']) || !empty($context['server']['is_litespeed'])))
 	{
 		if (defined('SID') && SID != '')
-			$setLocation = preg_replace_callback('~^' . preg_quote($scripturl, '/') . '\?(?:' . SID . '(?:;|&|&amp;))((?:board|topic)=[^#]+?)(#[^"]*?)?$~', create_function('$m', 'global $scripturl; return $scripturl . "/" . strtr("$m[1]", \'&;=\', \'//,\') . ".html?" . SID . (isset($m[2]) ? $m[2] : "");'), $setLocation);
+			$setLocation = preg_replace_callback('~^' . preg_quote($scripturl, '/') . '\?(?:' . SID . '(?:;|&|&amp;))((?:board|topic)=[^#]+?)(#[^"]*?)?$~', 'redirectexit_callback', $setLocation);
 		else
-			$setLocation = preg_replace_callback('~^' . preg_quote($scripturl, '/') . '\?((?:board|topic)=[^#"]+?)(#[^"]*?)?$~', create_function('$m', 'global $scripturl; return $scripturl . "/" . strtr("$m[1]", \'&;=\', \'//,\') . ".html" . (isset($m[2]) ? $m[2] : "");'), $setLocation);
+			$setLocation = preg_replace_callback('~^' . preg_quote($scripturl, '/') . '\?((?:board|topic)=[^#"]+?)(#[^"]*?)?$~', 'redirectexit_callback', $setLocation);
 	}
 
 	// Maybe integrations want to change where we are heading?
@@ -2337,12 +2352,29 @@ function redirectexit($setLocation = '', $refresh = false)
 }
 
 /**
+ * URL fixer for redirect exit
+ * Similar to the callback function used in ob_sessrewrite
+ * Envoked by enabling queryless_urls for systems that support that function
+ *
+ * @param mixed[] $matches
+ */
+function redirectexit_callback($matches)
+{
+	global $scripturl;
+
+	if (defined('SID') && SID != '')
+		return $scripturl . '/' . strtr($matches[1], '&;=', '//,') . '.html?' . SID . (isset($matches[2]) ? $matches[2] : '');
+	else
+		return $scripturl . '/' . strtr($matches[1], '&;=', '//,') . '.html' . (isset($matches[2]) ? $matches[2] : '');
+}
+
+/**
  * Ends execution.
  * Takes care of template loading and remembering the previous URL.
  * Calls ob_start() with ob_sessrewrite to fix URLs if necessary.
  *
- * @param bool $header = null
- * @param bool $do_footer = null
+ * @param bool|null $header = null
+ * @param bool|null $do_footer = null
  * @param bool $from_index = false
  * @param bool $from_fatal_error = false
  */
@@ -2445,7 +2477,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 /**
  * Sets the class of the current topic based on is_very_hot, veryhot, hot, etc
  *
- * @param array $topic_context
+ * @param mixed[] $topic_context
  */
 function determineTopicClass(&$topic_context)
 {
@@ -2644,19 +2676,19 @@ function setupThemeContext($forceload = false)
  *
  * @param string $needed The amount of memory to request, if needed, like 256M
  * @param bool $in_use Set to true to account for current memory usage of the script
- * @return boolean, true if we have at least the needed memory
+ * @return boolean true if we have at least the needed memory
  */
 function setMemoryLimit($needed, $in_use = false)
 {
-	// everything in bytes
+	// Everything in bytes
 	$memory_current = memoryReturnBytes(ini_get('memory_limit'));
 	$memory_needed = memoryReturnBytes($needed);
 
-	// should we account for how much is currently being used?
+	// Should we account for how much is currently being used?
 	if ($in_use)
 		$memory_needed += function_exists('memory_get_usage') ? memory_get_usage() : (4 * 1048576);
 
-	// if more is needed, request it
+	// If more is needed, request it
 	if ($memory_current < $memory_needed)
 	{
 		@ini_set('memory_limit', ceil($memory_needed / 1048576) . 'M');
@@ -2665,7 +2697,7 @@ function setMemoryLimit($needed, $in_use = false)
 
 	$memory_current = max($memory_current, memoryReturnBytes(get_cfg_var('memory_limit')));
 
-	// return success or not
+	// Return success or not
 	return (bool) ($memory_current >= $memory_needed);
 }
 
@@ -2808,33 +2840,40 @@ function template_javascript($do_defered = false)
 {
 	global $context, $modSettings, $settings, $boardurl;
 
-	// First up, load jquery
+	// First up, load jQuery and jQuery UI
 	if (isset($modSettings['jquery_source']) && !$do_defered)
 	{
+		// Using a specified version of jquery or what was shipped 1.10.2 and 1.10.3
+		$jquery_version = (!empty($modSettings['jquery_default']) && !empty($modSettings['jquery_version'])) ? $modSettings['jquery_version'] : '1.10.2';
+		$jqueryui_version = (!empty($modSettings['jqueryui_default']) && !empty($modSettings['jqueryui_version'])) ? $modSettings['jqueryui_version'] : '1.10.3';
+
 		switch ($modSettings['jquery_source'])
 		{
+			// Only getting the files from the CDN?
 			case 'cdn':
 				echo '
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" id="jquery"></script>',
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/' . $jquery_version . '/jquery.min.js" id="jquery"></script>',
 	(!empty($modSettings['jquery_include_ui']) ? '
-	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js" id="jqueryui"></script>' : '');
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/' . $jqueryui_version . '/jquery-ui.min.js" id="jqueryui"></script>' : '');
 				break;
+			// Just use the local file
 			case 'local':
 				echo '
-	<script src="', $settings['default_theme_url'], '/scripts/jquery-1.10.2.min.js" id="jquery"></script>',
+	<script src="', $settings['default_theme_url'], '/scripts/jquery-' . $jquery_version . '.min.js" id="jquery"></script>',
 	(!empty($modSettings['jquery_include_ui']) ? '
-	<script src="' . $settings['default_theme_url'] . '/scripts/jqueryui-1.10.3.min.js" id="jqueryui"></script>' : '');
+	<script src="' . $settings['default_theme_url'] . '/scripts/jqueryui-' . $jqueryui_version . '.min.js" id="jqueryui"></script>' : '');
 				break;
+			// CDN with local fallback
 			case 'auto':
 				echo '
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" id="jquery"></script>',
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/' . $jquery_version . '/jquery.min.js" id="jquery"></script>',
 	(!empty($modSettings['jquery_include_ui']) ? '
-	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js" id="jqueryui"></script>' : '');
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/' . $jqueryui_version . '/jquery-ui.min.js" id="jqueryui"></script>' : '');
 				echo '
 	<script><!-- // --><![CDATA[
-		window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-1.10.2.min.js"><\/script>\');',
+		window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-' . $jquery_version . '.min.js"><\/script>\');',
 		(!empty($modSettings['jquery_include_ui']) ? '
-		window.jQuery.ui || document.write(\'<script src="' . $settings['default_theme_url'] . '/scripts/jqueryui-1.10.3.min.js"><\/script>\')' : ''), '
+		window.jQuery.ui || document.write(\'<script src="' . $settings['default_theme_url'] . '/scripts/jqueryui-' . $jqueryui_version . '.min.js"><\/script>\')' : ''), '
 	// ]]></script>';
 				break;
 		}
@@ -2993,11 +3032,11 @@ function template_admin_warning_above()
  * @todo and of course everything relies on this behavior and work around it. :P.
  * Converters included.
  *
- * @param $filename
- * @param $attachment_id
- * @param $dir
- * @param $new
- * @param $file_hash
+ * @param string $filename
+ * @param int $attachment_id
+ * @param string|null $dir
+ * @param bool $new
+ * @param string $file_hash
  */
 function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = false, $file_hash = '')
 {
@@ -3019,7 +3058,7 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 	{
 		if (!is_array($modSettings['attachmentUploadDir']))
 			$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
-		$path = isset($modSettings['attachmentUploadDir'][$dir]) ? $modSettings['attachmentUploadDir'][$dir] : $modSettings['attachmentUploadDir'];
+		$path = isset($modSettings['attachmentUploadDir'][$dir]) ? $modSettings['attachmentUploadDir'][$dir] : $modSettings['basedirectory_for_attachments'];
 	}
 	else
 		$path = $modSettings['attachmentUploadDir'];
@@ -3091,6 +3130,7 @@ function ip2range($fullip)
  * Lookup an IP; try shell_exec first because we can do a timeout on it.
  *
  * @param string $ip
+ * @return string
  */
 function host_from_ip($ip)
 {
@@ -3194,7 +3234,7 @@ function text2words($text, $max_chars = 20, $encrypt = false)
  * @param string $name
  * @param string $alt
  * @param string $label = ''
- * @param boolean $custom = ''
+ * @param string|boolean $custom = ''
  * @param boolean $force_use = false
  * @return string
  *
@@ -3432,7 +3472,7 @@ function setupMenuContext()
 					// The old "logout" is meh. Not a real word. "Log out" is better.
 					'logout' => array(
 						'title' => $txt['logout'],
-						'href' => $scripturl . '?action=logout;' . $context['session_var'] . '=' . $context['session_id'],
+						'href' => $scripturl . '?action=logout',
 						'show' => !$user_info['is_guest'],
 					),
 				),
@@ -3571,6 +3611,9 @@ function setupMenuContext()
 			cache_put_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $menu_buttons, $cacheTime);
 	}
 
+	if (!empty($menu_buttons['profile']['sub_buttons']['logout']))
+		$menu_buttons['profile']['sub_buttons']['logout']['href'] .= ';' . $context['session_var'] . '=' . $context['session_id'];
+
 	$context['menu_buttons'] = $menu_buttons;
 
 	// Figure out which action we are doing so we can set the active tab.
@@ -3620,8 +3663,8 @@ function elk_seed_generator()
  * supports static class method calls.
  *
  * @param string $hook
- * @param array $parameters = array()
- * @return array the results of the functions
+ * @param mixed[] $parameters = array()
+ * @return mixed[] the results of the functions
  */
 function call_integration_hook($hook, $parameters = array())
 {
@@ -3647,11 +3690,12 @@ function call_integration_hook($hook, $parameters = array())
 	if (!empty($settings['theme_dir']))
 		$path_replacements['$themedir'] = $settings['theme_dir'];
 
-	$functions = explode(',', $modSettings[$hook]);
 	// Loop through each function.
+	$functions = explode(',', $modSettings[$hook]);
 	foreach ($functions as $function)
 	{
 		$function = trim($function);
+
 		// OOP static method
 		if (strpos($function, '::') !== false)
 		{
@@ -3838,9 +3882,9 @@ function remove_integration_function($hook, $function, $file = '')
  * that are not normally displayable.  This converts the popular ones that
  * appear from a cut and paste from windows.
  *
- * @param string $string
+ * @param string|false $string
  * @return string $string
-*/
+ */
 function sanitizeMSCutPaste($string)
 {
 	if (empty($string))
@@ -3884,9 +3928,9 @@ function sanitizeMSCutPaste($string)
  * Uses capture group 2 in the supplied array
  * Does basic scan to ensure characters are inside a valid range
  *
- * @param array $matches
+ * @param mixed[] $matches matches from a preg_match_all
  * @return string $string
-*/
+ */
 function replaceEntities__callback($matches)
 {
 	if (!isset($matches[2]))
@@ -3927,9 +3971,9 @@ function replaceEntities__callback($matches)
  * Uses capture group 1 in the supplied array
  * Does basic checks to keep characters inside a viewable range.
  *
- * @param array $matches
+ * @param mixed[] $matches array of matches as output from preg_match_all
  * @return string $string
-*/
+ */
 function fixchar__callback($matches)
 {
 	if (!isset($matches[1]))
@@ -3961,9 +4005,9 @@ function fixchar__callback($matches)
  * Callback function used of preg_replace_callback in smcFunc $ent_checks, for example
  * strpos, strlen, substr etc
  *
- * @param array $matches
+ * @param mixed[] $matches array of matches for a preg_match_all
  * @return string
-*/
+ */
 function entity_fix__callback($matches)
 {
 	if (!isset($matches[2]))
@@ -3971,7 +4015,7 @@ function entity_fix__callback($matches)
 
 	$num = $matches[2][0] === 'x' ? hexdec(substr($matches[2], 1)) : (int) $matches[2];
 
-	// we don't allow control characters, characters out of range, byte markers, etc
+	// We don't allow control characters, characters out of range, byte markers, etc
 	if ($num < 0x20 || $num > 0x10FFFF || ($num >= 0xD800 && $num <= 0xDFFF) || $num == 0x202D || $num == 0x202E)
 		return '';
 	else
@@ -3981,8 +4025,8 @@ function entity_fix__callback($matches)
 /**
  * Retrieve additional search engines, if there are any, as an array.
  *
- * @return array array of engines
-*/
+ * @return mixed[] array of engines
+ */
 function prepareSearchEngines()
 {
 	global $modSettings;
@@ -4005,8 +4049,9 @@ function prepareSearchEngines()
  * posts in topic display page, posts search results page, or personal
  * messages.
  *
- * @param object $messages_request holds a query result
+ * @param resource $messages_request holds a query result
  * @param bool $reset
+ * @return integer|null
  */
 function currentContext($messages_request, $reset = false)
 {
@@ -4033,45 +4078,13 @@ function currentContext($messages_request, $reset = false)
 }
 
 /**
- * Preg Replacment Curry.
- *
- * This allows for delayed argument binding (currying) and bringing in the replacement variables
- * for preg replacments.
- *
- * Original code from: http://php.net/manual/en/function.preg-replace-callback.php#88013
- * This is needed until ELK only supports PHP 5.3+ and we change to "use" keyword
- *
- * @param string $func
- * @param int $arity
- */
-function pregReplaceCurry($func, $arity)
-{
-	return create_function('', "
-		\$args = func_get_args();
-
-		if (count(\$args) >= $arity)
-			return call_user_func_array('$func', \$args);
-
-		\$args = var_export(\$args, 1);
-
-		return create_function('','
-			\$a = func_get_args();
-			\$z = ' . \$args . ';
-			\$a = array_merge(\$z,\$a);
-
-			return call_user_func_array(\'$func\', \$a);
-		');
-	");
-}
-
-/**
  * Helper function to insert an array in to an existing array
  * Intended for addon use to allow such things as
  *  - adding in a new menu item to an existing menu array
  *
- * @param array $input the array we will insert to
+ * @param mixed[] $input the array we will insert to
  * @param string $key the key in the array that we are looking to find for the insert action
- * @param array $insert the actual data to insert before or after the key
+ * @param mixed[] $insert the actual data to insert before or after the key
  * @param string $where adding before or after
  * @param bool $assoc if the array is a assoc array with named keys or a basic index array
  * @param bool $strict search for identical elements, this means it will also check the types of the needle.
@@ -4086,10 +4099,7 @@ function elk_array_insert($input, $key, $insert, $where = 'before', $assoc = tru
 
 	// If the key is not found, just insert it at the end
 	if ($position === false)
-	{
-		$input = array_merge($input, $insert);
-		return;
-	}
+		return array_merge($input, $insert);
 
 	if ($where === 'after')
 		$position += 1;
@@ -4104,7 +4114,7 @@ function elk_array_insert($input, $key, $insert, $where = 'before', $assoc = tru
 }
 
 /**
- * From time to time it may be necessary to fire a scheduled tast ASAP
+ * From time to time it may be necessary to fire a scheduled task ASAP
  * this function set the scheduled task to be called before any other one
  *
  * @param string $task the name of a scheduled task
@@ -4158,6 +4168,73 @@ function removeScheduleTaskImmediate($task, $calculateNextTrigger = true)
 		{
 			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 			calculateNextTrigger($task);
+		}
+	}
+}
+
+/**
+ * Json encode support function for versions of php < 5.2
+ */
+function checkJsonEncode()
+{
+	if (!function_exists('json_encode'))
+	{
+		/**
+		 * Running an old version of php, so we define our own function to do this.
+		 * 
+		 * @param mixed[]|int|float|string|false $a
+		 */
+		function json_encode($a = false)
+		{
+			switch (gettype($a))
+			{
+				case 'integer':
+				case 'double':
+					return floatval(str_replace(',', '.', strval($a)));
+					break;
+				case 'NULL':
+				case 'resource':
+				case 'unknown':
+					return 'null';
+					break;
+				case 'boolean':
+					return $a ? 'true' : 'false';
+					break;
+				case 'array':
+				case 'object':
+					$output = array();
+					$isAssoc = false;
+
+					// Determine what type of array we have associative or numeric
+					foreach (array_keys($a) as $key)
+					{
+						if (!is_int($key))
+						{
+							$isAssoc = true;
+							break;
+						}
+					}
+
+					// Now that we know what it is, deal with each appropriately
+					if ($isAssoc)
+					{
+						foreach ($a as $key => $val)
+							$output [] = json_encode($key) . ':' . json_encode($val);
+
+						$output = '{' . implode(',', $output) . '}';
+					}
+					else
+					{
+						foreach ($a as $val)
+							$output [] = json_encode($val);
+
+						$output = '[' . implode(',', $output) . ']';
+					}
+					return $output;
+					break;
+				default:
+					return '"' . addslashes($a) . '"';
+			}
 		}
 	}
 }

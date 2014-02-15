@@ -94,17 +94,11 @@ if (!empty($maintenance) && $maintenance == 2)
 // Clean the request.
 cleanRequest();
 
-// Create a variable to store some specific functions in.
-$smcFunc = array();
-
 // Initiate the database connection and define some database functions to use.
 loadDatabase();
 
 // It's time for settings loaded from the database.
 reloadSettings();
-
-// Temporarily, compatibility for access to utility functions through $smcFunc is enabled by default.
-Util::compat_init();
 
 // Our good ole' contextual array, which will hold everything
 $context = array();

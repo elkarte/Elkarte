@@ -341,7 +341,6 @@ function template_modify_language_entries()
 			<div class="content">
 				<ul class="strings_edit settings">';
 
-		$cached = array();
 		foreach ($context['file_entries'] as $entry)
 		{
 			echo '

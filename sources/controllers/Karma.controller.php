@@ -110,6 +110,7 @@ class Karma_Controller extends Action_Controller
 	 * Makes sure that a user can perform the karma action
 	 *
 	 * @param int $id_target
+	 * @return integer
 	 */
 	private function _prepare_karma($id_target)
 	{

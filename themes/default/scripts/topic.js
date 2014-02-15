@@ -589,7 +589,13 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 
 		// Show this message as 'modified on x by y'.
 		if (this.opt.bShowModify)
-			document.getElementById('modified_' + this.sCurMessageId.substr(4)).innerHTML = message.getElementsByTagName('modified')[0].childNodes[0].nodeValue;
+		{
+			var modified_element = document.getElementById('modified_' + this.sCurMessageId.substr(4));
+			modified_element.innerHTML = message.getElementsByTagName('modified')[0].childNodes[0].nodeValue;
+
+			// Just in case it's the first time the message is modified and the element is hidden
+			modified_element.style.display = '';
+		}
 
 		// Hide the icon if we were told to
 		if (this.opt.sIconHide !== null)
@@ -984,11 +990,11 @@ function sendtopicForm(oPopup_body, url, oContainer)
 
 		data = $this_form.serialize() + '&send=1';
 
-		send_comment = $this_form.find('input[name="comment"]').val();
-		sender_name = $this_form.find('input[name="y_name"]').val();
-		sender_mail = $this_form.find('input[name="y_email"]').val();
-		recipient_name = $this_form.find('input[name="r_name"]').val();
-		recipient_mail = $this_form.find('input[name="r_email"]').val();
+		var send_comment = $this_form.find('input[name="comment"]').val(),
+			sender_name = $this_form.find('input[name="y_name"]').val(),
+			sender_mail = $this_form.find('input[name="y_email"]').val,
+			recipient_name = $this_form.find('input[name="r_name"]').val(),
+			recipient_mail = $this_form.find('input[name="r_email"]').val();
 
 		var missing_elems = false;
 		if (sender_name === '')

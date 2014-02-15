@@ -108,7 +108,7 @@ function bb2_db_query($query)
  * or equivalent and appending the result of each call to an array.
  *
  * @param object $result
- * @return array
+ * @return mixed[] associate array of query results
  */
 function bb2_db_rows($result)
 {
@@ -233,7 +233,7 @@ function bb2_read_whitelist()
  * Retrieve bad behavior settings from database and supply them to
  * bad behavior so it knows to not behave badly
  *
- * @return array
+ * @return mixed[]
  */
 function bb2_read_settings()
 {
@@ -256,7 +256,6 @@ function bb2_read_settings()
 	// Return the settings so BadBehavior can use them
 	return array(
 		'log_table' => '{db_prefix}log_badbehavior',
-		'display_stats' => !empty($modSettings['badbehavior_display_stats']),
 		'strict' => !empty($modSettings['badbehavior_strict']),
 		'verbose' => !empty($modSettings['badbehavior_verbose']),
 		'logging' => !empty($modSettings['badbehavior_logging']),

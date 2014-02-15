@@ -25,7 +25,7 @@ class DbSearch_PostgreSQL implements DbSearch
 {
 	/**
 	 * This instance of the search
-	 * @var instance
+	 * @var DbSearch_PostgreSQL
 	 */
 	private static $_search = null;
 
@@ -34,7 +34,7 @@ class DbSearch_PostgreSQL implements DbSearch
 	 *
 	 * @param string $search_type
 	 */
-	function search_support($search_type)
+	public function search_support($search_type)
 	{
 		$supported_types = array('custom');
 
@@ -47,10 +47,10 @@ class DbSearch_PostgreSQL implements DbSearch
 	 *
 	 * @param string $identifier
 	 * @param string $db_string
-	 * @param array $db_values default array()
-	 * @param resource $connection
+	 * @param mixed[] $db_values default array()
+	 * @param resource|null $connection
 	 */
-	function search_query($identifier, $db_string, $db_values = array(), $connection = null)
+	public function search_query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
 		$db = database();
 
@@ -165,9 +165,9 @@ class DbSearch_PostgreSQL implements DbSearch
 	/**
 	 * Make a custom word index.
 	 *
-	 * @param $size
+	 * @param string $size
 	 */
-	function create_word_search($size)
+	public function create_word_search($size)
 	{
 		$db = database();
 

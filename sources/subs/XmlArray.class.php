@@ -52,7 +52,7 @@ class Xml_Array
 	 *
 	 * @param string $data the xml data or an array of, unless is_clone is true.
 	 * @param bool $auto_trim default false, used to automatically trim textual data.
-	 * @param int $level default null, the debug level, specifies whether notices should be generated for missing elements and attributes.
+	 * @param int|null $level default null, the debug level, specifies whether notices should be generated for missing elements and attributes.
 	 * @param bool $is_clone default false. If is_clone is true, the  Xml_Array is cloned from another - used internally only.
 	 */
 	public function __construct($data, $auto_trim = false, $level = null, $is_clone = false)
@@ -136,9 +136,9 @@ class Xml_Array
 	 * or return_set is true.
 	 * Example use:
 	 *  $element = $xml->path('html/body');
-	 * @param $path string - the path to the element to get
-	 * @param $return_full bool - always return full result set
-	 * @return Xml_Array, a new Xml_Array.
+	 * @param string $path  - the path to the element to get
+	 * @param bool $return_full  - always return full result set
+	 * @return Xml_Array a new Xml_Array.
 	 */
 	public function path($path, $return_full = false)
 	{
@@ -158,7 +158,7 @@ class Xml_Array
 				$el = substr($el, 0, strpos($el, '['));
 			}
 			// Find an attribute.
-			elseif (substr($el, 0, 1) == '@')
+			elseif (substr($el, 0, 1) === '@')
 			{
 				// It simplifies things if the attribute is already there ;).
 				if (isset($array[$el]))
@@ -174,6 +174,7 @@ class Xml_Array
 					// Cause an error.
 					if ($this->debug_level & E_NOTICE)
 						trigger_error('Undefined XML attribute: ' . substr($el, 1) . $debug, E_USER_NOTICE);
+
 					return false;
 				}
 			}
@@ -185,7 +186,7 @@ class Xml_Array
 		}
 
 		// Clean up after $lvl, for $return_full.
-		if ($return_full && (!isset($array['name']) || substr($array['name'], -1) != ']'))
+		if ($return_full && (!isset($array['name']) || substr($array['name'], -1) !== ']'))
 			$array = array('name' => $el . '[]', $array);
 
 		// Create the right type of class...
@@ -215,13 +216,15 @@ class Xml_Array
 		foreach ($path as $el)
 		{
 			// Deal with sets....
-			if (strpos($el, '[') !== false)
+			$el_strpos = strpos($el, '[');
+
+			if ($el_strpos !== false)
 			{
-				$lvl = (int) substr($el, strpos($el, '[') + 1);
-				$el = substr($el, 0, strpos($el, '['));
+				$lvl = (int) substr($el, $el_strpos + 1);
+				$el = substr($el, 0, $el_strpos);
 			}
 			// Find an attribute.
-			elseif (substr($el, 0, 1) == '@')
+			elseif (substr($el, 0, 1) === '@')
 				return isset($array[$el]);
 			else
 				$lvl = null;
@@ -238,7 +241,7 @@ class Xml_Array
 	 * Example use:
 	 *  echo $xml->count('html/head/meta');
 	 * @param string $path - the path to search for.
-	 * @return int, the number of elements the path matches.
+	 * @return int the number of elements the path matches.
 	 */
 	public function count($path)
 	{
@@ -262,8 +265,8 @@ class Xml_Array
 	 * of elements, an array of Xml_Array's is returned for use with foreach.
 	 * Example use:
 	 *  foreach ($xml->set('html/body/p') as $p)
-	 * @param $path string - the path to search for.
-	 * @return array, an array of Xml_Array objects
+	 * @param string $path  - the path to search for.
+	 * @return array an array of Xml_Array objects
 	 */
 	public function set($path)
 	{
@@ -274,7 +277,7 @@ class Xml_Array
 		foreach ($xml->array as $val)
 		{
 			// Skip these, they aren't elements.
-			if (!is_array($val) || $val['name'] == '!')
+			if (!is_array($val) || $val['name'] === '!')
 				continue;
 
 			// Create the right type of class...
@@ -291,8 +294,8 @@ class Xml_Array
 	 * Create an xml file from an Xml_Array, the specified path if any.
 	 * Example use:
 	 *  echo $this->create_xml();
-	 * @param string $path - the path to the element. (optional)
-	 * @return string, xml-formatted string.
+	 * @param string|null $path - the path to the element. (optional)
+	 * @return string xml-formatted string.
 	 */
 	public function create_xml($path = null)
 	{
@@ -320,7 +323,7 @@ class Xml_Array
 	 * Example use:
 	 *  print_r($xml->to_array());
 	 *
-	 * @param string $path the path to output.
+	 * @param string|null $path the path to output.
 	 */
 	public function to_array($path = null)
 	{
@@ -354,7 +357,7 @@ class Xml_Array
 		);
 
 		// Loop until we're out of data.
-		while ($data != '')
+		while ($data !== '')
 		{
 			// Find and remove the next tag.
 			preg_match('/\A<([\w\-:]+)((?:\s+.+?)?)([\s]?\/)?' . '>/', $data, $match);
@@ -362,25 +365,26 @@ class Xml_Array
 				$data = preg_replace('/' . preg_quote($match[0], '/') . '/s', '', $data, 1);
 
 			// Didn't find a tag?  Keep looping....
-			if (!isset($match[1]) || $match[1] == '')
+			if (!isset($match[1]) || $match[1] === '')
 			{
 				// If there's no <, the rest is data.
-				if (strpos($data, '<') === false)
+				$data_strpos = strpos($data, '<');
+				if ($data_strpos === false)
 				{
 					$text_value = $this->_from_cdata($data);
 					$data = '';
 
-					if ($text_value != '')
+					if ($text_value !== '')
 						$current[] = array(
 							'name' => '!',
 							'value' => $text_value
 						);
 				}
 				// If the < isn't immediately next to the current position... more data.
-				elseif (strpos($data, '<') > 0)
+				elseif ($data_strpos > 0)
 				{
-					$text_value = $this->_from_cdata(substr($data, 0, strpos($data, '<')));
-					$data = substr($data, strpos($data, '<'));
+					$text_value = $this->_from_cdata(substr($data, 0, $data_strpos));
+					$data = substr($data, $data_strpos);
 
 					if ($text_value != '')
 						$current[] = array(
@@ -389,12 +393,13 @@ class Xml_Array
 						);
 				}
 				// If we're looking at a </something> with no start, kill it.
-				elseif (strpos($data, '<') !== false && strpos($data, '<') == 0)
+				elseif ($data_strpos !== false && $data_strpos === 0)
 				{
-					if (strpos($data, '<', 1) !== false)
+					$data_strpos = strpos($data, '<', 1);
+					if ($data_strpos !== false)
 					{
-						$text_value = $this->_from_cdata(substr($data, 0, strpos($data, '<', 1)));
-						$data = substr($data, strpos($data, '<', 1));
+						$text_value = $this->_from_cdata(substr($data, 0, $data_strpos));
+						$data = substr($data, $data_strpos);
 
 						if ($text_value != '')
 							$current[] = array(
@@ -436,6 +441,7 @@ class Xml_Array
 				{
 					// Where is the next start tag?
 					$next_tag_start = strpos($data, '<' . $match[1], $offset);
+
 					// If the next start tag is after the last end tag then we've found the right close.
 					if ($next_tag_start === false || $next_tag_start > $last_tag_end)
 						break;
@@ -452,8 +458,10 @@ class Xml_Array
 						$offset = $next_tag_start + 1;
 					}
 				}
+
 				// Parse the insides.
 				$inner_match = substr($data, 0, $last_tag_end);
+
 				// Data now starts from where this section ends.
 				$data = substr($data, $last_tag_end + strlen('</' . $match[1]. '>'));
 
@@ -475,7 +483,7 @@ class Xml_Array
 			}
 
 			// If we're dealing with attributes as well, parse them out.
-			if (isset($match[2]) && $match[2] != '')
+			if (isset($match[2]) && $match[2] !== '')
 			{
 				// Find all the attribute pairs in the string.
 				preg_match_all('/([\w:]+)="(.+?)"/', $match[2], $attr, PREG_SET_ORDER);
@@ -493,8 +501,8 @@ class Xml_Array
 	/**
 	 * Get a specific element's xml. (privately used...)
 	 *
-	 * @param $array
-	 * @param $indent
+	 * @param mixed[] $array
+	 * @param null|integer $indent
 	 */
 	protected function _xml($array, $indent)
 	{
@@ -511,9 +519,9 @@ class Xml_Array
 		}
 
 		// This is just text!
-		if ($array['name'] == '!')
+		if ($array['name'] === '!')
 			return $indentation . '<![CDATA[' . $array['value'] . ']]>';
-		elseif (substr($array['name'], -2) == '[]')
+		elseif (substr($array['name'], -2) === '[]')
 			$array['name'] = substr($array['name'], 0, -2);
 
 		// Start the element.
@@ -525,7 +533,7 @@ class Xml_Array
 		// Run through and recurively output all the elements or attrbutes inside this.
 		foreach ($array as $k => $v)
 		{
-			if (substr($k, 0, 1) == '@')
+			if (substr($k, 0, 1) === '@')
 				$output .= ' ' . substr($k, 1) . '="' . $v . '"';
 			elseif (is_array($v))
 			{
@@ -546,7 +554,7 @@ class Xml_Array
 	/**
 	 * Return an element as an array
 	 *
-	 * @param array $array
+	 * @param mixed[] $array
 	 */
 	protected function _array($array)
 	{
@@ -557,7 +565,7 @@ class Xml_Array
 			if (!is_array($value) || !isset($value['name']))
 				continue;
 
-			if ($value['name'] == '!')
+			if ($value['name'] === '!')
 				$text .= $value['value'];
 			else
 				$return[$value['name']] = $this->_array($value);
@@ -572,9 +580,9 @@ class Xml_Array
 	/**
 	 * Parse out CDATA tags. (htmlspecialchars them...)
 	 *
-	 * @param $data
+	 * @param string $data
 	 */
-	function _to_cdata($data)
+	protected function _to_cdata($data)
 	{
 		$inCdata = $inComment = false;
 		$output = '';
@@ -609,23 +617,34 @@ class Xml_Array
 	/**
 	 * Turn the CDATAs back to normal text.
 	 *
-	 * @param $data
+	 * @param string $data
 	 */
 	protected function _from_cdata($data)
 	{
-		// Get the HTML translation table and reverse it.
+		// Get the HTML translation table and reverse it
 		$trans_tbl = array_flip(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES));
 
 		// Translate all the entities out.
-		$data = strtr(preg_replace_callback('~&#(\d{1,4});~', create_function('$m', 'return chr("$m[1]");'), $data), $trans_tbl);
+		$data = preg_replace_callback('~&#(\d{1,4});~', array($this, '_from_cdata_callback'), $data);
+		$data = strtr($data, $trans_tbl);
 
 		return $this->trim ? trim($data) : $data;
 	}
 
 	/**
+	 * Callback for the preg_replace in _from_cdata
+	 *
+	 * @param mixed[] $match
+	 */
+	protected function _from_cdata_callback($match)
+	{
+		return chr($match[1]);
+	}
+
+	/**
 	 * Given an array, return the text from that array. (recursive and privately used.)
 	 *
-	 * @param array $array
+	 * @param string[]|string $array
 	 */
 	protected function _fetch($array)
 	{
@@ -641,7 +660,7 @@ class Xml_Array
 				continue;
 
 			// This is text!
-			if ($text['name'] == '!')
+			if ($text['name'] === '!')
 				$temp .= $text['value'];
 			// Another element - dive in ;).
 			else
@@ -655,7 +674,7 @@ class Xml_Array
 	/**
 	 * Get a specific array by path, one level down. (privately used...)
 	 *
-	 * @param array $array
+	 * @param mixed[] $array
 	 * @param string $path
 	 * @param int $level
 	 * @param bool $no_error
@@ -667,7 +686,7 @@ class Xml_Array
 			return false;
 
 		// Asking for *no* path?
-		if ($path == '' || $path == '.')
+		if ($path === '' || $path === '.')
 			return $array;
 		$paths = explode('|', $path);
 
@@ -699,15 +718,17 @@ class Xml_Array
 			$i = 0;
 			while ($i < count($trace) && isset($trace[$i]['class']) && $trace[$i]['class'] == get_class($this))
 				$i++;
+
 			$debug = ' from ' . $trace[$i - 1]['file'] . ' on line ' . $trace[$i - 1]['line'];
 
 			// Cause an error.
 			if ($this->debug_level & E_NOTICE && !$no_error)
 				trigger_error('Undefined XML element: ' . $path . $debug, E_USER_NOTICE);
+
 			return false;
 		}
 		// Only one result.
-		elseif (count($results) == 1 || $level !== null)
+		elseif (count($results) === 1 || $level !== null)
 			return $results[0];
 		// Return the result set.
 		else

@@ -914,6 +914,9 @@ span.views_text {
 .topic_listing li {
 	border-bottom: 1px solid #eee;
 }
+.topic_listing li.sticky_row {
+	border-bottom: 1px solid #fff;
+}
 .post_wrapper {
 	border: 1px solid #eaeaea;
 	border-radius: 10px;
@@ -960,6 +963,42 @@ span.views_text {
 	background: #fff;
 	border-radius: 4px;
 }
+
+/*	$EDITOR		*/
+/* ------------------------------------------------------- */
+
+.drop_area {
+	-webkit-font-smoothing: antialiased;
+	color: #43a8da;;
+	background-color: #eee;
+	border: 1px dashed #ccc;
+	border-radius: 5px;
+}
+.statusbar {
+	border-top: 1px solid #a9ccd1;
+	border-bottom: 1px solid #A9ccd1;
+	background: #eee;
+}
+
+.progressBar {
+	border: 1px solid #ddd;
+}
+
+.progressBar div {
+	color: #fff;
+	background-color: #43a8da;
+}
+
+.abort, .remove {
+	background-color: #a8352f;
+	border-radius: 5px;
+	color: #fff;
+	cursor: pointer;
+}
+.drop_attachments_error {
+	color: #ff0000;
+}
+
 
 /*	$PROGRESS	*/
 /* ------------------------------------------------------- */
@@ -1224,13 +1263,18 @@ span.views_text {
 		position: relative;
 		top: -3px;
 	}
-	.topic_listing h4 {
+	.topic_name {
 		border-bottom: 1px solid #ddd;
+	}
+	.topic_listing h4 {
 		margin-bottom: 3px;
 		max-width: 20em;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 		overflow: hidden;
+	}
+	.topic_listing li.sticky_row {
+		border-bottom: 1px solid #ccc;
 	}
 	.basic_row {
 		background-color: #fafafa;
@@ -1246,7 +1290,7 @@ span.views_text {
 		padding-bottom: 2px;
 	}
 	.topic_latest:after {
-		content: '\A';
+		content: ' ';
 		white-space: pre;
 	}
 	.topic_latest.relative {

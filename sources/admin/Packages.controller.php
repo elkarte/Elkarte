@@ -1022,21 +1022,7 @@ class Packages_Controller extends Action_Controller
 				{
 					// We're really just checking for entries which are create table AND add columns (etc).
 					$tables = array();
-
-					/**
-					 * Table sorting function used in usort
-					 *
-					 * @param array $a
-					 * @param array $b
-					 */
-					function sort_table_first($a, $b)
-					{
-						if ($a[0] == $b[0])
-							return 0;
-						return $a[0] == 'remove_table' ? -1 : 1;
-					}
-					usort($db_package_log, 'sort_table_first');
-
+					usort($db_package_log, array($this, '_sort_table_first'));
 					foreach ($db_package_log as $k => $log)
 					{
 						if ($log[0] == 'remove_table')
@@ -1044,6 +1030,7 @@ class Packages_Controller extends Action_Controller
 						elseif (in_array($log[1], $tables))
 							unset($db_package_log[$k]);
 					}
+
 					$package_installed['db_changes'] = serialize($db_package_log);
 				}
 				else
@@ -1092,6 +1079,20 @@ class Packages_Controller extends Action_Controller
 
 		// Restore file permissions?
 		create_chmod_control(array(), array(), true);
+	}
+
+	/**
+	 * Table sorting function used in usort
+	 *
+	 * @param string[] $a
+	 * @param string[] $b
+	 */
+	private function _sort_table_first($a, $b)
+	{
+		if ($a[0] == $b[0])
+			return 0;
+
+		return $a[0] == 'remove_table' ? -1 : 1;
 	}
 
 	/**
@@ -1487,6 +1488,21 @@ class Packages_Controller extends Action_Controller
 
 		// Load up any custom themes we may want to install into...
 		$theme_paths = getThemesPathbyID();
+
+		// For uninstall operations we only consider the themes in which the package is installed.
+		if (isset($_REQUEST['reverse']) && !empty($_REQUEST['install_id']))
+		{
+			$install_id = (int) $_REQUEST['install_id'];
+			if ($install_id > 0)
+			{
+				$old_themes = loadThemesAffected($install_id);
+				foreach ($theme_paths as $id => $data)
+				{
+					if ($id != 1 && !in_array($id, $old_themes))
+						unset($theme_paths[$id]);
+				}
+			}
+		}
 
 		// Boardmod?
 		if (isset($_REQUEST['boardmod']))
@@ -1933,37 +1949,12 @@ class Packages_Controller extends Action_Controller
 			// Haven't counted the items yet?
 			if (empty($context['total_items']))
 			{
-				/**
-				 * Counts all the directorys under a given path
-				 *
-				 * @param string $dir
-				 */
-				function count_directories__recursive($dir)
-				{
-					global $context;
-
-					$count = 0;
-					$dh = @opendir($dir);
-					while ($entry = readdir($dh))
-					{
-						if ($entry != '.' && $entry != '..' && is_dir($dir . '/' . $entry))
-						{
-							$context['directory_list'][$dir . '/' . $entry] = 1;
-							$count++;
-							$count += count_directories__recursive($dir . '/' . $entry);
-						}
-					}
-					closedir($dh);
-
-					return $count;
-				}
-
 				foreach ($context['file_tree'] as $path => $data)
 				{
 					if (is_dir($path))
 					{
 						$context['directory_list'][$path] = 1;
-						$context['total_items'] += count_directories__recursive($path);
+						$context['total_items'] += $this->count_directories__recursive($path);
 						$context['total_items']++;
 					}
 				}
@@ -1974,27 +1965,8 @@ class Packages_Controller extends Action_Controller
 			{
 				$context['special_files'] = array();
 
-				/**
-				 * Builds a list of special files recursively for a given path
-				 *
-				 * @param string $path
-				 * @param array $data
-				 */
-				function build_special_files__recursive($path, &$data)
-				{
-					global $context;
-
-					if (!empty($data['writable_on']))
-						if ($context['predefined_type'] === 'standard' || $data['writable_on'] === 'restrictive')
-							$context['special_files'][$path] = 1;
-
-					if (!empty($data['contents']))
-						foreach ($data['contents'] as $name => $contents)
-							build_special_files__recursive($path . '/' . $name, $contents);
-				}
-
 				foreach ($context['file_tree'] as $path => $data)
-					build_special_files__recursive($path, $data);
+					$this->build_special_files__recursive($path, $data);
 			}
 			// Free doesn't need special files.
 			elseif ($context['predefined_type'] === 'free')
@@ -2058,6 +2030,50 @@ class Packages_Controller extends Action_Controller
 	}
 
 	/**
+	 * Builds a list of special files recursively for a given path
+	 *
+	 * @param string $path
+	 * @param mixed[] $data
+	 */
+	public function build_special_files__recursive($path, &$data)
+	{
+		global $context;
+
+		if (!empty($data['writable_on']))
+			if ($context['predefined_type'] === 'standard' || $data['writable_on'] === 'restrictive')
+				$context['special_files'][$path] = 1;
+
+		if (!empty($data['contents']))
+			foreach ($data['contents'] as $name => $contents)
+				$this->build_special_files__recursive($path . '/' . $name, $contents);
+	}
+
+	/**
+	 * Recursive counts all the directorys under a given path
+	 *
+	 * @param string $dir
+	 */
+	public function count_directories__recursive($dir)
+	{
+		global $context;
+
+		$count = 0;
+		$dh = @opendir($dir);
+		while ($entry = readdir($dh))
+		{
+			if ($entry != '.' && $entry != '..' && is_dir($dir . '/' . $entry))
+			{
+				$context['directory_list'][$dir . '/' . $entry] = 1;
+				$count++;
+				$count += $this->count_directories__recursive($dir . '/' . $entry);
+			}
+		}
+		closedir($dh);
+
+		return $count;
+	}
+
+	/**
 	 * Get a listing of all the packages
 	 * Determines if the package is a mod, avatar, language package
 	 * Determines if the package has been installed or not
@@ -2068,7 +2084,7 @@ class Packages_Controller extends Action_Controller
 	 * @param array $params
 	 * @param bool $installed
 	 */
-	function list_packages($start, $items_per_page, $sort, $params, $installed)
+	public function list_packages($start, $items_per_page, $sort, $params, $installed)
 	{
 		global $scripturl, $context, $forum_version;
 		static $instadds, $packages;

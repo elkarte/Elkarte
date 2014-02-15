@@ -65,6 +65,14 @@ class Mentions_Controller extends Action_Controller
 	protected $_type = '';
 
 	/**
+	 * The url of the display mentions button (all, unread, etc)
+	 *
+	 * @var string
+	 */
+	protected $_url_param = '';
+	protected $_page = '';
+
+	/**
 	 * Determine if we are looking only at unread mentions or any kind of
 	 *
 	 * @var boolean
@@ -370,10 +378,10 @@ class Mentions_Controller extends Action_Controller
 	/**
 	 * Callback used to prepare the mention message for mentions, likes, removed likes and buddies
 	 *
-	 * @param array $mentions : Mentions retrieved from the database by getUserMentions
+	 * @param mixed[] $mentions : Mentions retrieved from the database by getUserMentions
 	 * @param string $type : the type of the mention
 	 */
-	function prepareMentionMessage(&$mentions, $type)
+	public function prepareMentionMessage(&$mentions, $type)
 	{
 		global $txt, $scripturl, $context, $modSettings, $user_info;
 
@@ -481,7 +489,7 @@ class Mentions_Controller extends Action_Controller
 	/**
 	 * Sets the specifics of a mention call in this instance
 	 *
-	 * @param array $data must contain uid, type and msg at a minimum
+	 * @param mixed[] $data must contain uid, type and msg at a minimum
 	 */
 	public function setData($data)
 	{
@@ -589,10 +597,7 @@ class Mentions_Controller extends Action_Controller
 		$this->_validator->sanitation_rules($sanitization);
 		$this->_validator->validation_rules($validation);
 
-		if (!$this->_validator->validate($this->_data))
-			return false;
-
-		return true;
+		return $this->_validator->validate($this->_data);
 	}
 
 	/**

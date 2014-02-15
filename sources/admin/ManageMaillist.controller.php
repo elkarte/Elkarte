@@ -30,6 +30,18 @@ class ManageMaillist_Controller extends Action_Controller
 	protected $_maillistSettings;
 
 	/**
+	 * Basic filter settings form
+	 * @var type
+	 */
+	protected $_filtersSettings;
+
+	/**
+	 * Parsers settings form
+	 * @var type
+	 */
+	protected $_parsersSettings;
+
+	/**
 	 * Main dispatcher.
 	 * This function checks permissions and passes control to the sub action.
 	 * @see Action_Controller::action_index()
@@ -1844,7 +1856,6 @@ class ManageMaillist_Controller extends Action_Controller
 	/**
 	 * Callback for createList() to get the number of bounce templates in the system
 	 *
-	 * @param string $template_type
 	 */
 	public function list_getBounceTemplateCount()
 	{

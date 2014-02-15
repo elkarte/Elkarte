@@ -178,7 +178,7 @@ function isValidIPv6($ip)
  * Converts IPv6s to numbers.  This makes ban checks much easier.
  *
  * @param string $ip ip address to be converted
- * @return array
+ * @return int[] array
  */
 function convertIPv6toInts($ip)
 {
@@ -206,7 +206,7 @@ function convertIPv6toInts($ip)
  *
  * @param string $addr ipv6 address string
  * @param boolean $strict_check checks lenght to expaned address for compliance
- * @return boolean/string expanded ipv6 address.
+ * @return boolean|string expanded ipv6 address.
  */
 function expandIPv6($addr, $strict_check = true)
 {
@@ -260,9 +260,9 @@ function expandIPv6($addr, $strict_check = true)
  * - importantly, does not effect keys, only values.
  * - calls itself recursively if necessary.
  *
- * @param array|string $var
+ * @param string[]|string $var
  * @param int $level = 0
- * @return array|string
+ * @return mixed[]|string
  */
 function htmlspecialchars__recursive($var, $level = 0)
 {
@@ -283,9 +283,9 @@ function htmlspecialchars__recursive($var, $level = 0)
  * - does not effect keys, only values.
  * - may call itself recursively if needed.
  *
- * @param array|string $var
+ * @param string[]|string $var
  * @param int $level = 0
- * @return array|string
+ * @return mixed[]|string
  */
 function htmltrim__recursive($var, $level = 0)
 {
@@ -371,12 +371,24 @@ function ob_sessrewrite($buffer)
 	if (!empty($modSettings['queryless_urls']) && (!$context['server']['is_cgi'] || ini_get('cgi.fix_pathinfo') == 1 || @get_cfg_var('cgi.fix_pathinfo') == 1) && ($context['server']['is_apache'] || $context['server']['is_lighttpd'] || $context['server']['is_litespeed']))
 	{
 		// Let's do something special for session ids!
-		if (defined('SID') && SID != '')
-			$buffer = preg_replace_callback('~"' . preg_quote($scripturl, '/') . '\?(?:' . SID . '(?:;|&|&amp;))((?:board|topic)=[^#"]+?)(#[^"]*?)?"~', create_function('$m', 'global $scripturl; return \'"\' . $scripturl . "/" . strtr("$m[1]", \'&;=\', \'//,\') . ".html?" . SID . (isset($m[2]) ? $m[2] : "") . \'"\';'), $buffer);
-		else
-			$buffer = preg_replace_callback('~"' . preg_quote($scripturl, '/') . '\?((?:board|topic)=[^#"]+?)(#[^"]*?)?"~', create_function('$m', 'global $scripturl; return \'"\' . $scripturl . "/" . strtr("$m[1]", \'&;=\', \'//,\') . ".html" . (isset($m[2]) ? $m[2] : "") . \'"\';'), $buffer);
+		$buffer = preg_replace_callback('~"' . preg_quote($scripturl, '/') . '\?((?:board|topic)=[^#"]+?)(#[^"]*?)?"~', 'buffer_callback', $buffer);
 	}
 
 	// Return the changed buffer.
 	return $buffer;
+}
+
+/**
+ * Callback function for the Rewrite URLs preg_replace_callback
+ *
+ * @param mixed[] $matches
+ */
+function buffer_callback($matches)
+{
+	global $scripturl;
+
+	if (defined('SID') && SID != '')
+		return '"' . $scripturl . '/' . strtr($matches[1], '&;=', '//,') . '.html?' . SID . (isset($matches[2]) ? $matches[2] : '') . '"';
+	else
+		return '"' . $scripturl . '/' . strtr($matches[1], '&;=', '//,') . '.html' . (isset($matches[2]) ? $matches[2] : '') . '"';
 }

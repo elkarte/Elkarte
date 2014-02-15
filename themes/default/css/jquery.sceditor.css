@@ -174,9 +174,6 @@
 	overflow: hidden;
 	display: inline-block;
 	margin: 2px 0 2px -1px;
-	border: 1px solid #bbb;
-	border-bottom: 1px solid #aaa;
-	border-left: none;
 }
 .sceditor-row {
 	overflow: hidden;
@@ -187,11 +184,15 @@
 	float: left;
 	cursor: pointer;
 	background: #fff;
-	border-left: 1px solid #bbb;
-	box-shadow: -1px -1px 2px rgba(0,0,0,0.15) inset;
-	padding: 3px 6px 2px 6px;
+	box-shadow: -1px -1px 2px rgba(0, 0, 0, 0.15) inset;
+	padding: 3px 6px;
+	margin-bottom: 5px;
 	color: #222;
+	border: 1px solid #bbb;
+	border-bottom: 1px solid #aaa;
+	border-right: none;
 }
+
 .sceditor-button.disabled div {
 	filter: alpha(opacity=30);
 	opacity: 0.3;
@@ -227,9 +228,17 @@
 }
 div.sceditor-group {
 	display: inline-block;
-	margin: 0 5px 0 0;
+	margin: 0;
 }
 /* Elkarte BBC buttons styles */
+a.sceditor-button-space, .sceditor-button-space div {
+	background: transparent;
+	width: 6px;
+	padding: 4px 0;
+	box-shadow: none;
+	border: none;
+	border-left: 1px solid #bbb;
+}
 .sceditor-button-source div, .sceditor-button-toggle div  {
 	/*background: url('../images/bbc/toggle.png');*/
 	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAoVJREFUeNqkk19IU3EUx8+9d95tad45LZgxFVebsnAPOvDhEmvBComE/rGBkIhCIIT1kNlLD8VFeikbVKD45MOi8qGH/qyWykyJcAVzElgtmHNMWOXUG3d09+v8xtYfCHrwwId7f/ec7/d3Dr/fZQghsJ1gYZuxbQMGo/BSHKUScSEepBExFuu+IJ+QIDKNZEu6kgGDBse0Wm2fx+PZ29XVtTsWi5XPzs7yNCmKYs5ut29NTEysBYPBD4qijKLuEd2XjqBDBpxO52A4HBYnJydtqqpWmc1mfmtLBgqKePqN5mgNraWagpbjuCO468t0Oq3IskwooVCI0BgdHSeieJB4PEcJdkVKeVpLNVSrQRdve3u7Edvnc7lcYS5JknBnFfz+O4W1xbIfVlaWoJRnFxf5a4lEK67OcyzLrut0umZ0rMe5NNgqRCIRFGTBZKoHs9kCFRWVUF7OgsvlglQqBe9mZn4cstn0ZdPTMjVIxePx/Pz8vNrW1lYjCMJOahKLRaGx0QGCYESzGLjdB2CXIQ3Pnr/Nevv79S6f70mLLF/lcFQVu1pMJpOrgUBgfXl5OeNwODi9voxfWnrNZzKfweGwb1gbNrPRucsb3V5r9b6W3rGELEt4GnP0DDnEgFTjCEbsaA8+63AtFE8IxFZiOtVBnD19g83+G8ML958yI2+i+ceY+la6jTuoAWJCakvYG6D2Qg9z+t4IE/q+OkRuDjGvek/AcczVFDUsPYU8Ihf5FVe6AZrqwKo3wZnDnZfc43eHpxSFSJh68Wed5l/3e+AktoKXeO0r4zt38X3H7etNU5ubRMrn/xYXrvB//hVytpN5IBjglqGKhOmHjwmAsYe/C34KMAD+Xw9tUS2BCgAAAABJRU5ErkJggg==);

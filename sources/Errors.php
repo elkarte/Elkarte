@@ -30,7 +30,7 @@ if (!defined('ELK'))
  *  die(log_error($msg));
  *
  * @param string $error_message
- * @param string $error_type = 'general'
+ * @param string|boolean $error_type = 'general'
  * @param string $file = null
  * @param int $line = null
  */
@@ -148,7 +148,7 @@ function log_lang_error($error, $error_type = 'general', $sprintf = array(), $fi
  * It logs the error message if $log is specified.
  *
  * @param string $error
- * @param string $log = 'general'
+ * @param string|boolean $log defaults to  'general', use false to skip setup_fatal_error_context
  */
 function fatal_error($error, $log = 'general')
 {
@@ -160,6 +160,7 @@ function fatal_error($error, $log = 'general')
 
 	if (class_exists('Template_Layers'))
 		Template_Layers::getInstance()->isError();
+
 	setup_fatal_error_context($log || (!empty($modSettings['enableErrorLogging']) && $modSettings['enableErrorLogging'] == 2) ? log_error($error, $log) : $error, $error);
 }
 
@@ -174,8 +175,8 @@ function fatal_error($error, $log = 'general')
  *  - the information is logged if log is specified.
  *
  * @param string $error
- * @param string $log defaults to 'general'
- * @param array $sprintf defaults to empty array()
+ * @param string|boolean $log defaults to 'general' false will skip logging, true will use general
+ * @param string[] $sprintf defaults to empty array()
  */
 function fatal_lang_error($error, $log = 'general', $sprintf = array())
 {
@@ -301,7 +302,7 @@ function error_handler($error_level, $error_string, $file, $line)
  * @uses Errors template, fatal_error sub template
  *
  * @param string $error_message
- * @param mixed $error_code string or int code
+ * @param string $error_code string or int code
  */
 function setup_fatal_error_context($error_message, $error_code)
 {

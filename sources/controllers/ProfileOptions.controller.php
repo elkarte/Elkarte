@@ -458,7 +458,6 @@ class ProfileOptions_Controller extends Action_Controller
 	 * Changing authentication method?
 	 * Only appropriate for people using OpenID.
 	 *
-	 * @param int $memID id_member
 	 * @param bool $saving = false
 	 */
 	public function action_authentication($saving = false)
@@ -778,11 +777,11 @@ class ProfileOptions_Controller extends Action_Controller
 	 * Retrieve topic notifications count.
 	 *
 	 * @param int $memID id_member
-	 * @return string
+	 * @return integer
 	 */
-	function list_getTopicNotificationCount($memID)
+	public function list_getTopicNotificationCount($memID)
 	{
-		// topic notifications count, for the list
+		// Topic notifications count, for the list
 		return topicNotificationCount($memID);
 	}
 
@@ -793,9 +792,9 @@ class ProfileOptions_Controller extends Action_Controller
 	 * @param int $items_per_page
 	 * @param string $sort
 	 * @param int $memID id_member
-	 * @return array
+	 * @return mixed array of topic notifications
 	 */
-	function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
+	public function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
 	{
 		// topic notifications, for the list
 		return topicNotifications($start, $items_per_page, $sort, $memID);
@@ -808,9 +807,9 @@ class ProfileOptions_Controller extends Action_Controller
 	 * @param int $items_per_page
 	 * @param string $sort
 	 * @param int $memID id_member
-	 * @return array
+	 * @return mixed[] array of board notifications
 	 */
-	function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
+	public function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
 	{
 		// return boards you see and their notification status for the list
 		return boardNotifications($start, $items_per_page, $sort, $memID);
@@ -952,9 +951,9 @@ class ProfileOptions_Controller extends Action_Controller
 	/**
 	 * This function actually makes all the group changes
 	 *
-	 * @return mixed
+	 * @return string
 	 */
-	function action_groupMembership2()
+	public function action_groupMembership2()
 	{
 		global $context, $user_profile, $modSettings, $scripturl, $language;
 

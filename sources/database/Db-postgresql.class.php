@@ -73,11 +73,11 @@ class Database_PostgreSQL implements Database
 	 * @param string $db_user
 	 * @param string $db_passwd
 	 * @param string $db_prefix
-	 * @param array $db_options
+	 * @param mixed[] $db_options
 	 *
 	 * @return resource
 	 */
-	static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
+	public static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 	{
 		// initialize the instance... if not done already!
 		if (self::$_db === null)
@@ -97,13 +97,9 @@ class Database_PostgreSQL implements Database
 		if (!$connection)
 		{
 			if (!empty($db_options['non_fatal']))
-			{
 				return null;
-			}
 			else
-			{
 				display_db_error();
-			}
 		}
 
 		self::$_db->_connection = $connection;
@@ -120,22 +116,22 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @return string
 	 */
-	function fix_prefix($db_prefix, $db_name)
+	public function fix_prefix($db_prefix, $db_name)
 	{
 		return $db_prefix;
 	}
 
 	/**
-	 * Callback for preg_replace_calback on the query.
+	 * Callback for preg_replace_callback on the query.
 	 * It allows to replace on the fly a few pre-defined strings, for
 	 * convenience ('query_see_board', 'query_wanna_see_board'), with
 	 * their current values from $user_info.
 	 * In addition, it performs checks and sanitization on the values
 	 * sent to the database.
 	 *
-	 * @param $matches
+	 * @param mixed[] $matches
 	 */
-	function replacement__callback($matches)
+	public function replacement__callback($matches)
 	{
 		global $db_callback, $user_info, $db_prefix;
 
@@ -154,14 +150,8 @@ class Database_PostgreSQL implements Database
 		if ($matches[1] === 'query_wanna_see_board')
 			return $user_info['query_wanna_see_board'];
 
-		if ($matches[1] === 'empty')
-			return '\'\'';
-
 		if (!isset($matches[2]))
 			$this->error_backtrace('Invalid value inserted or no type specified.', '', E_USER_ERROR, __FILE__, __LINE__);
-
-		if ($matches[1] === 'literal')
-			return '\'' . pg_escape_string($matches[2]) . '\'';
 
 		if (!isset($values[$matches[2]]))
 			$this->error_backtrace('The database value you\'re trying to insert does not exist: ' . htmlspecialchars($matches[2], ENT_COMPAT, 'UTF-8'), '', E_USER_ERROR, __FILE__, __LINE__);
@@ -250,9 +240,9 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @param string $db_string
 	 * @param string $db_values
-	 * @param resource $connection
+	 * @param resource|null $connection
 	 */
-	function quote($db_string, $db_values, $connection = null)
+	public function quote($db_string, $db_values, $connection = null)
 	{
 		global $db_callback;
 
@@ -279,11 +269,11 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @param string $identifier
 	 * @param string $db_string
-	 * @param string $db_values
-	 * @param resource $connection
-	 * @return boolean
+	 * @param mixed[] $db_values
+	 * @param resource|null $connection
+	 * @return resource|boolean
 	 */
-	function query($identifier, $db_string, $db_values = array(), $connection = null)
+	public function query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
 		global $db_cache, $db_count, $db_show_debug, $time_start, $db_callback, $modSettings;
 
@@ -404,6 +394,7 @@ class Database_PostgreSQL implements Database
 			}
 
 			$st = microtime(true);
+
 			// Don't overload it.
 			$db_cache[$db_count]['q'] = $db_count < 50 ? $db_string : '...';
 			$db_cache[$db_count]['f'] = $file;
@@ -428,6 +419,7 @@ class Database_PostgreSQL implements Database
 				{
 					$pos1 = strpos($db_string, '\'', $pos + 1);
 					$pos2 = strpos($db_string, '\'\'', $pos + 1);
+
 					if ($pos1 === false)
 						break;
 					elseif ($pos2 == false || $pos2 > $pos1)
@@ -438,26 +430,21 @@ class Database_PostgreSQL implements Database
 
 					$pos = $pos2 + 1;
 				}
-				$clean .= ' %s ';
 
+				$clean .= ' %s ';
 				$old_pos = $pos + 1;
 			}
+
 			$clean .= substr($db_string, $old_pos);
 			$clean = trim(strtolower(preg_replace($allowed_comments_from, $allowed_comments_to, $clean)));
 
-			// We don't use UNION, at least so far.  But it's useful for injections.
-			if (strpos($clean, 'union') !== false && preg_match('~(^|[^a-z])union($|[^[a-z])~s', $clean) != 0)
-				$fail = true;
 			// Comments?  We don't use comments in our queries, we leave 'em outside!
-			elseif (strpos($clean, '/*') > 2 || strpos($clean, '--') !== false || strpos($clean, ';') !== false)
+			if (strpos($clean, '/*') > 2 || strpos($clean, '--') !== false || strpos($clean, ';') !== false)
 				$fail = true;
 			// Trying to change passwords, slow us down, or something?
 			elseif (strpos($clean, 'sleep') !== false && preg_match('~(^|[^a-z])sleep($|[^[_a-z])~s', $clean) != 0)
 				$fail = true;
 			elseif (strpos($clean, 'benchmark') !== false && preg_match('~(^|[^a-z])benchmark($|[^[a-z])~s', $clean) != 0)
-				$fail = true;
-			// Sub selects?  We don't use those either.
-			elseif (preg_match('~\([^)]*?select~s', $clean) != 0)
 				$fail = true;
 
 			if (!empty($fail) && function_exists('log_error'))
@@ -486,9 +473,9 @@ class Database_PostgreSQL implements Database
 	/**
 	 * Affected rows from previous operation.
 	 *
-	 * @param resource $result
+	 * @param resource|null $result
 	 */
-	function affected_rows($result = null)
+	public function affected_rows($result = null)
 	{
 		if ($this->_db_replace_result !== null)
 			return $this->_db_replace_result;
@@ -502,10 +489,10 @@ class Database_PostgreSQL implements Database
 	 * Last inserted id.
 	 *
 	 * @param string $table
-	 * @param string $field = null
-	 * @param resource $connection = null
+	 * @param string|null $field = null
+	 * @param resource|null $connection = null
 	 */
-	function insert_id($table, $field = null, $connection = null)
+	public function insert_id($table, $field = null, $connection = null)
 	{
 		global $db_prefix;
 
@@ -519,8 +506,10 @@ class Database_PostgreSQL implements Database
 			),
 			$connection
 		);
+
 		if (!$request)
 			return false;
+
 		list ($lastID) = $this->fetch_row($request);
 		$this->free_result($request);
 
@@ -532,9 +521,9 @@ class Database_PostgreSQL implements Database
 	 * Fetch a row from the resultset given as parameter.
 	 *
 	 * @param resource $request
-	 * @param bool $counter = false
+	 * @param integer|bool $counter = false
 	 */
-	function fetch_row($request, $counter = false)
+	public function fetch_row($request, $counter = false)
 	{
 		global $db_row_count;
 
@@ -554,7 +543,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @param resource $result
 	 */
-	function free_result($result)
+	public function free_result($result)
 	{
 		// Just delegate to the native function
 		pg_free_result($result);
@@ -565,7 +554,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @param resource $result
 	 */
-	function num_rows($result)
+	public function num_rows($result)
 	{
 		// simply delegate to the native function
 		return pg_num_rows($result);
@@ -576,7 +565,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @param resource $request
 	 */
-	function num_fields($request)
+	public function num_fields($request)
 	{
 		return pg_num_fields($request);
 	}
@@ -584,10 +573,10 @@ class Database_PostgreSQL implements Database
 	/**
 	 * Reset the internal result pointer.
 	 *
-	 * @param $request
-	 * @param $counter
+	 * @param boolean $request
+	 * @param integer $counter
 	 */
-	function data_seek($request, $counter)
+	public function data_seek($request, $counter)
 	{
 		global $db_row_count;
 
@@ -600,9 +589,9 @@ class Database_PostgreSQL implements Database
 	 * Do a transaction.
 	 *
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
-	 * @param resource $connection = null
+	 * @param resource|null $connection = null
 	 */
-	function db_transaction($type = 'commit', $connection = null)
+	public function db_transaction($type = 'commit', $connection = null)
 	{
 		// Decide which connection to use
 		$connection = $connection === null ? $this->_connection : $connection;
@@ -626,9 +615,9 @@ class Database_PostgreSQL implements Database
 	/**
 	 * Return last error string from the database server
 	 *
-	 * @param resource $connection = null
+	 * @param resource|null $connection = null
 	 */
-	function last_error($connection = null)
+	public function last_error($connection = null)
 	{
 		// Decide which connection to use
 		$connection = $connection === null ? $this->_connection : $connection;
@@ -642,9 +631,9 @@ class Database_PostgreSQL implements Database
 	 * Backtrace, log, try to fix.
 	 *
 	 * @param string $db_string
-	 * @param resource $connection = null
+	 * @param resource|null $connection = null
 	 */
-	function error($db_string, $connection = null)
+	public function error($db_string, $connection = null)
 	{
 		global $txt, $context, $modSettings, $db_show_debug;
 
@@ -677,9 +666,7 @@ class Database_PostgreSQL implements Database
 			$context['error_message'] .= '<br /><br />' . sprintf($txt['database_error_versions'], $modSettings['elkVersion']);
 
 		if (allowedTo('admin_forum') && isset($db_show_debug) && $db_show_debug === true)
-		{
 			$context['error_message'] .= '<br /><br />' . nl2br($db_string);
-		}
 
 		// It's already been logged... don't log it again.
 		fatal_error($context['error_message'], false);
@@ -689,14 +676,14 @@ class Database_PostgreSQL implements Database
 	 * Insert data.
 	 *
 	 * @param string $method - options 'replace', 'ignore', 'insert'
-	 * @param $table
-	 * @param $columns
-	 * @param $data
-	 * @param $keys
+	 * @param string $table
+	 * @param mixed[] $columns
+	 * @param mixed[] $data
+	 * @param mixed[] $keys
 	 * @param bool $disable_trans = false
-	 * @param resource $connection = null
+	 * @param resource|null $connection = null
 	 */
-	function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
+	public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 	{
 		global $db_prefix;
 
@@ -802,13 +789,13 @@ class Database_PostgreSQL implements Database
 	/**
 	 * This function tries to work out additional error information from a back trace.
 	 *
-	 * @param $error_message
-	 * @param $log_message
-	 * @param $error_type
-	 * @param $file
-	 * @param $line
+	 * @param string $error_message
+	 * @param string $log_message
+	 * @param string|boolean $error_type
+	 * @param string|null $file
+	 * @param integer|null $line
 	 */
-	function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null)
+	public function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null)
 	{
 		if (empty($log_message))
 			$log_message = $error_message;
@@ -853,10 +840,10 @@ class Database_PostgreSQL implements Database
 	/**
 	 * Escape the LIKE wildcards so that they match the character and not the wildcard.
 	 *
-	 * @param $string
+	 * @param string $string
 	 * @param bool $translate_human_wildcards = false, if true, turns human readable wildcards into SQL wildcards.
 	 */
-	function escape_wildcard_string($string, $translate_human_wildcards=false)
+	public function escape_wildcard_string($string, $translate_human_wildcards = false)
 	{
 		$replacements = array(
 			'%' => '\%',
@@ -877,7 +864,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @param string $string
 	 */
-	function unescape_string($string)
+	public function unescape_string($string)
 	{
 		return strtr($string, array('\'\'' => '\''));
 	}
@@ -885,9 +872,9 @@ class Database_PostgreSQL implements Database
 	/**
 	 * Returns whether the database system supports ignore.
 	 *
-	 * @return bool
+	 * @return false
 	 */
-	function support_ignore()
+	public function support_ignore()
 	{
 		return false;
 	}
@@ -898,9 +885,10 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @param string $tableName - the table to create the inserts for.
 	 * @param bool $new_table
+	 *
 	 * @return string the query to insert the data back in, or an empty string if the table was empty.
 	 */
-	function insert_sql($tableName, $new_table = false)
+	public function insert_sql($tableName, $new_table = false)
 	{
 		global $db_prefix;
 
@@ -912,7 +900,6 @@ class Database_PostgreSQL implements Database
 			$start = 0;
 		}
 
-		$data = '';
 		$tableName = str_replace('{db_prefix}', $db_prefix, $tableName);
 
 		// This will be handy...
@@ -976,9 +963,10 @@ class Database_PostgreSQL implements Database
 	 * Dumps the schema (CREATE) for a table.
 	 *
 	 * @param string $tableName - the table
+	 *
 	 * @return string - the CREATE statement as string
 	 */
-	function db_table_sql($tableName)
+	public function db_table_sql($tableName)
 	{
 		global $db_prefix;
 
@@ -1008,6 +996,7 @@ class Database_PostgreSQL implements Database
 				$row['data_type'] = 'varchar';
 			elseif ($row['data_type'] == 'character')
 				$row['data_type'] = 'char';
+
 			if ($row['character_maximum_length'])
 				$row['data_type'] .= '(' . $row['character_maximum_length'] . ')';
 
@@ -1033,6 +1022,7 @@ class Database_PostgreSQL implements Database
 					);
 					list ($max_ind) = $this->fetch_row($count_req);
 					$this->free_result($count_req);
+
 					// Get the right bloody start!
 					$seq_create .= 'CREATE SEQUENCE ' . $matches[1] . ' START WITH ' . ($max_ind + 1) . ';' . $crlf . $crlf;
 				}
@@ -1080,11 +1070,12 @@ class Database_PostgreSQL implements Database
 	 * This function lists all tables in the database.
 	 * The listing could be filtered according to $filter.
 	 *
-	 * @param mixed $db_name_str string holding the database name, or false, default false
-	 * @param mixed $filter string to filter by, or false, default false
-	 * @return array an array of table names. (strings)
+	 * @param boolean $db_name_str string holding the database name, or false, default false
+	 * @param string|false $filter string to filter by, or false, default false
+	 *
+	 * @return string[] an array of table names. (strings)
 	 */
-	function db_list_tables($db_name_str = false, $filter = false)
+	public function db_list_tables($db_name_str = false, $filter = false)
 	{
 		$request = $this->query('', '
 			SELECT tablename
@@ -1097,7 +1088,6 @@ class Database_PostgreSQL implements Database
 				'filter' => $filter,
 			)
 		);
-
 		$tables = array();
 		while ($row = $this->fetch_row($request))
 			$tables[] = $row[0];
@@ -1110,20 +1100,20 @@ class Database_PostgreSQL implements Database
 	 * This function optimizes a table.
 	 *
 	 * @param string $table - the table to be optimized
-	 * @return how much it was gained
+	 * @return int how much it was gained
 	 */
-	function db_optimize_table($table)
+	public function db_optimize_table($table)
 	{
 		global $db_prefix;
 
 		$table = str_replace('{db_prefix}', $db_prefix, $table);
 
 		$request = $this->query('', '
-				VACUUM ANALYZE {raw:table}',
-				array(
-					'table' => $table,
-				)
-			);
+			VACUUM ANALYZE {raw:table}',
+			array(
+				'table' => $table,
+			)
+		);
 		if (!$request)
 			return -1;
 
@@ -1143,7 +1133,7 @@ class Database_PostgreSQL implements Database
 	 * @param string $backup_table
 	 * @return resource -the request handle to the table creation query
 	 */
-	function db_backup_table($table, $backup_table)
+	public function db_backup_table($table, $backup_table)
 	{
 		global $db_prefix;
 
@@ -1171,6 +1161,7 @@ class Database_PostgreSQL implements Database
 				'table' => $table,
 			)
 		);
+
 		$this->query('', '
 			INSERT INTO {raw:backup_table}
 			SELECT * FROM {raw:table}',
@@ -1186,7 +1177,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @return string - the version
 	 */
-	function db_server_version()
+	public function db_server_version()
 	{
 		$version = pg_version();
 
@@ -1195,8 +1186,10 @@ class Database_PostgreSQL implements Database
 
 	/**
 	 * Get the name (title) of the database system.
+	 *
+	 * @return string
 	 */
-	function db_title()
+	public function db_title()
 	{
 		return 'PostgreSQL';
 	}
@@ -1204,9 +1197,9 @@ class Database_PostgreSQL implements Database
 	/**
 	 * Whether the database system is case sensitive.
 	 *
-	 * @return bool
+	 * @return true
 	 */
-	function db_case_sensitive()
+	public function db_case_sensitive()
 	{
 		return true;
 	}
@@ -1216,7 +1209,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @param string $string
 	 */
-	function escape_string($string)
+	public function escape_string($string)
 	{
 		return pg_escape_string($string);
 	}
@@ -1225,9 +1218,9 @@ class Database_PostgreSQL implements Database
 	 * Get an associative array
 	 *
 	 * @param resource $request
-	 * @param mixed $counter
+	 * @param int|false $counter
 	 */
-	function fetch_assoc($request, $counter = false)
+	public function fetch_assoc($request, $counter = false)
 	{
 		global $db_row_count;
 
@@ -1245,10 +1238,11 @@ class Database_PostgreSQL implements Database
 	/**
 	 * Return server info.
 	 *
-	 * @param resource $connection
+	 * @param resource|null $connection
+	 *
 	 * @return string
 	 */
-	function db_server_info($connection = null)
+	public function db_server_info($connection = null)
 	{
 		// give info on client! we use it in install and upgrade and such things.
 		$version = pg_version();
@@ -1261,7 +1255,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @return string - the version
 	 */
-	function db_client_version()
+	public function db_client_version()
 	{
 		$version = pg_version();
 
@@ -1271,10 +1265,12 @@ class Database_PostgreSQL implements Database
 	/**
 	 * Dummy function really. Doesn't do anything on PostgreSQL.
 	 *
-	 * @param string $db_name = null
-	 * @param resource $connection = null
+	 * @param string|null $db_name = null
+	 * @param resource|null $connection = null
+	 *
+	 * @return true
 	 */
-	function select_db($db_name = null, $connection = null)
+	public function select_db($db_name = null, $connection = null)
 	{
 		return true;
 	}
@@ -1282,9 +1278,9 @@ class Database_PostgreSQL implements Database
 	/**
 	 * Retrieve the connection object
 	 *
-	 * @return guess what? The connection
+	 * @return resource what? The connection
 	 */
-	function connection()
+	public function connection()
 	{
 		// find it, find it
 		return $this->_connection;
@@ -1293,7 +1289,7 @@ class Database_PostgreSQL implements Database
 	/**
 	 * Returns a reference to the existing instance
 	 */
-	static function db()
+	public static function db()
 	{
 		return self::$_db;
 	}

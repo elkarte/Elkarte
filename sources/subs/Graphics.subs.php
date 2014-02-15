@@ -32,7 +32,7 @@ if (!defined('ELK'))
  * @param string $source
  * @param int $max_width
  * @param int $max_height
- * @return boolean, whether the thumbnail creation was successful.
+ * @return boolean whether the thumbnail creation was successful.
  */
 function createThumbnail($source, $max_width, $max_height)
 {
@@ -67,7 +67,7 @@ function createThumbnail($source, $max_width, $max_height)
  *
  * @param string $fileName
  * @param int $preferred_format = 0
- * @return boolean, true on success, false on failure.
+ * @return boolean true on success, false on failure.
  */
 function reencodeImage($fileName, $preferred_format = 0)
 {
@@ -92,7 +92,6 @@ function reencodeImage($fileName, $preferred_format = 0)
  *
  * @param string $fileName
  * @param bool $extensiveCheck = false
- * @return true on success, false on failure.
  */
 function checkImageContents($fileName, $extensiveCheck = false)
 {
@@ -134,8 +133,6 @@ function checkImageContents($fileName, $extensiveCheck = false)
 /**
  * Sets a global $gd2 variable needed by some functions to determine
  * whether the GD2 library is present.
- *
- * @return whether or not GD1 is available.
  */
 function checkGD()
 {
@@ -153,8 +150,6 @@ function checkGD()
 
 /**
  * Checks whether the Imagick class is present.
- *
- * @return whether or not Imagick is available.
  */
 function checkImagick()
 {
@@ -164,8 +159,7 @@ function checkImagick()
 /**
  * See if we have enough memory to thumbnail an image
  *
- * @param array $sizes image size
- * @return whether we do
+ * @param int[] $sizes image size
  */
 function imageMemoryCheck($sizes)
 {
@@ -178,9 +172,11 @@ function imageMemoryCheck($sizes)
 		return true;
 	}
 
-	// Determine the memory requirements for this image, note: if you want to use an image formula W x H x bits/8 x channels x Overhead factor
-	// you will need to account for single bit images as GD expands them to an 8 bit and will greatly overun the calculated value.  The 5 is
-	// simply a shortcut of 8bpp, 3 channels, 1.66 overhead
+	// Determine the memory requirements for this image, note: if you want to use an image formula
+	// W x H x bits/8 x channels x Overhead factor
+	// You will need to account for single bit images as GD expands them to an 8 bit and will greatly
+	// overun the calculated value.
+	// The 5 below is simply a shortcut of 8bpp, 3 channels, 1.66 overhead
 	$needed_memory = ($sizes[0] * $sizes[1] * 5);
 
 	// If we need more, lets try to get it
@@ -198,7 +194,6 @@ function imageMemoryCheck($sizes)
  * @param int $max_width
  * @param int $max_height
  * @param int $preferred_format = 0
- * @return whether it succeeded.
  */
 function resizeImageFile($source, $destination, $max_width, $max_height, $preferred_format = 0)
 {
@@ -275,7 +270,7 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
  * @uses GD
  * @uses Imagick
  *
- * @param resource $src_img
+ * @param resource|null $src_img null for Imagick images, resource form imagecreatefrom for GD
  * @param string $destName
  * @param int $src_width
  * @param int $src_height
@@ -619,40 +614,13 @@ if (!function_exists('imagecreatefrombmp'))
 }
 
 /**
- * Writes a gif file to disk as a png file.
-
- * @param resource $gif
- * @param string $lpszFileName
- * @param int $background_color = -1
- * @return boolean, whether it was successful or not.
- */
-function gif_outputAsPng($gif, $lpszFileName, $background_color = -1)
-{
-	if (!isset($gif) || @get_class($gif) != 'cgif' || !$gif->loaded || $lpszFileName == '')
-		return false;
-
-	$fd = $gif->get_png_data($background_color);
-	if (strlen($fd) <= 0)
-		return false;
-
-	if (!($fh = @fopen($lpszFileName, 'wb')))
-		return false;
-
-	fwrite($fh, $fd, strlen($fd));
-	fflush($fh);
-	fclose($fh);
-
-	return true;
-}
-
-/**
  * Show an image containing the visual verification code for registration.
  * Requires the GD extension.
  * Uses a random font for each letter from default_theme_dir/fonts.
  * Outputs a png if possible, otherwise a gif.
  *
  * @param string $code
- * @return false if something goes wrong.
+ * @return false|null if something goes wrong.
  */
 function showCodeImage($code)
 {

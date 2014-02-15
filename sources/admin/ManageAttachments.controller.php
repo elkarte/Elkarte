@@ -845,7 +845,6 @@ class ManageAttachments_Controller extends Action_Controller
 
 			for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 250)
 			{
-				$to_remove = array();
 				$repair_errors = repairAttachmentData($_GET['substep'], $fix_errors, $to_fix);
 
 				foreach($repair_errors as $key => $value)
@@ -1510,6 +1509,7 @@ class ManageAttachments_Controller extends Action_Controller
 
 		checkSession();
 
+		// We will need the functions from here
 		require_once(SUBSDIR . '/Attachments.subs.php');
 		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
@@ -1571,7 +1571,7 @@ class ManageAttachments_Controller extends Action_Controller
 				if (function_exists('apache_reset_timeout'))
 					@apache_reset_timeout();
 
-				// If limts are set, get the file count and size for the destination folder
+				// If limits are set, get the file count and size for the destination folder
 				if ($dir_files <= 0 && (!empty($modSettings['attachmentDirSizeLimit']) || !empty($modSettings['attachmentDirFileLimit'])))
 					list ($dir_files, $dir_size) = attachDirProperties($new_dir);
 
@@ -1667,7 +1667,6 @@ class ManageAttachments_Controller extends Action_Controller
 					);
 				}
 
-				$moved = array();
 				$new_dir = $modSettings['currentAttachmentUploadDir'];
 
 				// Create the progress bar.
@@ -1679,6 +1678,7 @@ class ManageAttachments_Controller extends Action_Controller
 							<div class="full_bar">' . $percent_done . '%</div>
 							<div class="green_percent" style="width: ' . $percent_done . '%;">&nbsp;</div>
 						</div>';
+
 					// Write it to a file so it can be displayed
 					$fp = fopen(BOARDDIR . '/progress.php', "w");
 					fwrite($fp, $prog_bar);
@@ -1705,7 +1705,7 @@ class ManageAttachments_Controller extends Action_Controller
  * Called by repairAttachments().
  * If repairAttachments() has more steps added, this function needs updated!
  *
- * @param array $to_fix attachments to fix
+ * @param mixed[] $to_fix attachments to fix
  * @param int $max_substep = 0
  * @todo Move to ManageAttachments.subs.php
  */

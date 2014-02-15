@@ -1063,6 +1063,8 @@ class ManageMembers_Controller extends Action_Controller
 		// Maybe we're sending it off for activation?
 		elseif ($_POST['todo'] == 'require_activation')
 		{
+			require_once(SUBSDIR . '/Auth.subs.php');
+
 			// We have to do this for each member I'm afraid.
 			foreach ($member_info as $member)
 			{

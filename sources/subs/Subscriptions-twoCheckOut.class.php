@@ -60,7 +60,7 @@ class twocheckout_display
 	 * plus all the standard ones for the subscription form
 	 *
 	 * @param int $unique_id for the transaction
-	 * @param array $sub_data subscription data array, name, reocurring, etc
+	 * @param mixed[] $sub_data subscription data array, name, reocurring, etc
 	 * @param int $value amount of the transaction
 	 * @param string $period length of the transaction
 	 * @param string $return_url
@@ -171,7 +171,7 @@ class twocheckout_payment
 	/**
 	 * Returns whether this is a normal payment
 	 */
-	function isPayment()
+	public function isPayment()
 	{
 		// We have to assume so?
 		return true;

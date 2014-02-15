@@ -173,7 +173,7 @@ function loadAddNewPoll(button, id_board, form_name)
 		$('#poll_main, #poll_options').hide().find('input').each(function() {
 			if ($(this).attr('required') == 'required')
 			{
-				$(this).data('required', 'required')
+				$(this).data('required', 'required');
 				$(this).removeAttr('required');
 			}
 		});

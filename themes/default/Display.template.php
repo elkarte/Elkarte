@@ -189,7 +189,7 @@ function template_messages()
 
 		// Show the quickbuttons, for various operations on posts.
 		echo '
-						<ul class="quickbuttons">';
+						<ul id="buttons_', $message['id'], '" class="quickbuttons">';
 
 		// Show a checkbox for quick moderation?
 		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $message['can_remove'])
@@ -197,10 +197,10 @@ function template_messages()
 							<li class="listlevel1 inline_mod_check" style="display: none;" id="in_topic_mod_check_', $message['id'], '"></li>';
 
 		// Show "Last Edit: Time by Person" if this post was edited.
-		if ($settings['show_modify'] && !empty($message['modified']['name']))
+		if ($settings['show_modify'])
 			echo '
-							<li class="listlevel1 modified" id="modified_', $message['id'], '">
-								', $message['modified']['last_edit_text'], '
+							<li class="listlevel1 modified" id="modified_', $message['id'], '"',  !empty($message['modified']['name']) ? '' : ' style="display:none"', '>
+								',  !empty($message['modified']['name']) ? $message['modified']['last_edit_text'] : '', '
 							</li>';
 
 		// Maybe they can modify the post (this is the more button)

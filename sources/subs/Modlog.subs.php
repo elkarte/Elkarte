@@ -24,9 +24,9 @@ if (!defined('ELK'))
  * Get the number of mod log entries.
  * Callback for createList() in Modlog::action_log().
  *
- * @param $query_string
- * @param $query_params
- * @param $log_type
+ * @param string|null $query_string
+ * @param mixed[] $query_params
+ * @param int $log_type
  */
 function list_getModLogEntryCount($query_string = '', $query_params = array(), $log_type = 1)
 {
@@ -66,8 +66,8 @@ function list_getModLogEntryCount($query_string = '', $query_params = array(), $
  * @param int $start
  * @param int $items_per_page
  * @param string $sort
- * @param array $query_string
- * @param array $query_params
+ * @param string|null $query_string
+ * @param mixed[] $query_params
  * @param int $log_type
  */
 function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '', $query_params = array(), $log_type = 1)
@@ -295,6 +295,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 	if (!empty($members))
 	{
 		require_once(SUBSDIR . '/Members.subs.php');
+
 		// Get the latest activated member's display name.
 		$result = getBasicMemberData(array_keys($members));
 		foreach ($result as $row)
@@ -308,6 +309,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 					'href' => $scripturl . '?action=profile;u=' . $row['id_member'],
 					'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>'
 				);
+
 				// Make the member number into a name.
 				$entries[$action]['extra']['member'] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>';
 			}
@@ -315,7 +317,8 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 	}
 
 	// Do some formatting of the action string.
-	$callback = pregReplaceCurry('list_getModLogEntriesCallback', 3);
+	$callback = new ModLogEntriesReplacement;
+	$callback->entries = $entries;
 	foreach ($entries as $k => $entry)
 	{
 		// Make any message info links so its easier to go find that message.
@@ -329,7 +332,9 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 
 		if (empty($entries[$k]['action_text']))
 			$entries[$k]['action_text'] = isset($txt['modlog_ac_' . $entry['action']]) ? $txt['modlog_ac_' . $entry['action']] : $entry['action'];
-		$entries[$k]['action_text'] = preg_replace_callback('~\{([A-Za-z\d_]+)\}~i', $callback($entries, $k), $entries[$k]['action_text']);
+
+		$callback->key = $k;
+		$entries[$k]['action_text'] = preg_replace_callback('~\{([A-Za-z\d_]+)\}~i', array($callback, 'callback'), $entries[$k]['action_text']);
 	}
 
 	// Back we go!
@@ -341,13 +346,21 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
  *
  * Our callback that does the actual replacment.
  *
- * @param string $entries
- * @param string $key
- * @param string $matches
  */
-function list_getModLogEntriesCallback($entries, $key, $matches)
+class ModLogEntriesReplacement
 {
-	return isset($entries[$key]['extra'][$matches[1]]) ? $entries[$key]['extra'][$matches[1]] : '';
+	/**
+	 * Matching function to return the value in the callback
+	 *
+	 * @param string[] $matches
+	 */
+	function callback($matches)
+	{
+		if (isset($this->entries[$this->key]['extra'][$matches[1]]))
+			return $this->entries[$this->key]['extra'][$matches[1]];
+		else
+			return '';
+	}
 }
 
 /**
@@ -355,7 +368,7 @@ function list_getModLogEntriesCallback($entries, $key, $matches)
  *
  * @param int $id_log
  * @param int $time
- * @param array $delete
+ * @param string[]|null $delete
  */
 function deleteLogAction($id_log, $time, $delete = null)
 {

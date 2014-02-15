@@ -34,15 +34,15 @@ class OpenID
 	 *
 	 * @param string $openid_uri
 	 * @param bool $return = false
-	 * @param array $save_fields = array()
-	 * @param string $return_action = null
+	 * @param mixed[]|null $save_fields = array()
+	 * @param string|null $return_action = null
 	 * @return string
 	 */
 	public function validate($openid_uri, $return = false, $save_fields = array(), $return_action = null)
 	{
 		global $scripturl, $modSettings;
 
-		$openid_url = $this->_canonize($openid_uri);
+		$openid_url = $this->canonize($openid_uri);
 		$response_data = $this->getServerInfo($openid_url);
 
 		// We can't do anything without the proper response data.
@@ -112,7 +112,7 @@ class OpenID
 	 * Revalidate a user using OpenID.
 	 * Note that this function will not return when authentication is required.
 	 *
-	 * @return boolean
+	 * @return boolean|null
 	 */
 	public function revalidate()
 	{
@@ -134,7 +134,7 @@ class OpenID
 	 * Retrieve an existing, not expired, association if there is any.
 	 *
 	 * @param string $server
-	 * @param string $handle = null
+	 * @param string|null $handle = null
 	 * @param bool $no_delete = false
 	 * @return array
 	 */
@@ -182,7 +182,7 @@ class OpenID
 	 * @param string $server
 	 * @return array
 	 */
-	function makeAssociation($server)
+	public function makeAssociation($server)
 	{
 		global $p;
 
@@ -263,7 +263,7 @@ class OpenID
 	 *
 	 * @param string $handle
 	 */
-	function removeAssociation($handle)
+	public function removeAssociation($handle)
 	{
 		$db = database();
 
@@ -281,7 +281,7 @@ class OpenID
 	 *
 	 * @param string $uri
 	 */
-	private function _canonize($uri)
+	public function canonize($uri)
 	{
 		// @todo Add in discovery.
 
@@ -298,7 +298,7 @@ class OpenID
 	/**
 	 * Prepare for a Diffie-Hellman key exchange.
 	 * @param bool $regenerate = false
-	 * @return array|false return false on failure or an array() on success
+	 * @return string return false on failure or an array() on success
 	 */
 	public function setup_DH($regenerate = false)
 	{
@@ -324,7 +324,7 @@ class OpenID
 	 *
 	 * @param bool $regenerate
 	 */
-	function get_keys($regenerate)
+	public function get_keys($regenerate)
 	{
 		global $modSettings, $p, $g;
 
@@ -356,9 +356,9 @@ class OpenID
 	/**
 	 * Generate private key
 	 *
-	 * @return float
+	 * @return string
 	 */
-	function generate_private_key()
+	public function generate_private_key()
 	{
 		global $p;
 		static $cache = array();

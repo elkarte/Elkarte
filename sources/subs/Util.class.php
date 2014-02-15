@@ -21,33 +21,11 @@ if (!defined('ELK'))
 class Util
 {
 	/**
-	* Compatibility function: it initializes $smcFunc array with utility methods.
-	*/
-	static function compat_init()
-	{
-		global $smcFunc;
-
-		$smcFunc += array(
-			'entity_fix' => create_function('$string', 'return Util::entity_fix($string);'),
-			'htmlspecialchars' => create_function('$string, $quote_style = ENT_COMPAT, $charset = \'UTF-8\'', 'return Util::htmlspecialchars($string);'),
-			'htmltrim' => create_function('$string', 'return Util::htmltrim($string);'),
-			'strlen' => create_function('$string', 'return Util::strlen($string);'),
-			'strpos' => create_function('$haystack, $needle, $offset = 0', 'return Util::strpos($haystack, $needle);'),
-			'substr' => create_function('$string, $start, $length = null', 'return Util::substr($string, $start);'),
-			'strtolower' => create_function('$string', 'return Util::strtolower($string);'),
-			'strtoupper' => create_function('$string', 'return Util::strtoupper($string);'),
-			'truncate' => create_function('$string, $length', 'return Util::truncate($string, $length);'),
-			'ucfirst' => create_function('$string', 'return Util::ucfirst($string);'),
-			'ucwords' => create_function('$string', 'return Util::ucwords($string);'),
-		);
-	}
-
-	/**
 	 * Converts invalid / disallowed / out of range entities to nulls
 	 *
 	 * @param string $string
 	 */
-	static function entity_fix($string)
+	public static function entity_fix($string)
 	{
 		$num = $string[0] === 'x' ? hexdec(substr($string, 1)) : (int) $string;
 		return $num < 0x20 || $num > 0x10FFFF || ($num >= 0xD800 && $num <= 0xDFFF) || $num === 0x202E || $num === 0x202D ? '' : '&#' . $num . ';';
@@ -61,7 +39,7 @@ class Util
 	 * @param string $quote_style
 	 * @param string $charset only UTF-8 allowed
 	 */
-	static function htmlspecialchars($string, $quote_style = ENT_COMPAT, $charset = 'UTF-8')
+	public static function htmlspecialchars($string, $quote_style = ENT_COMPAT, $charset = 'UTF-8')
 	{
 		global $modSettings;
 
@@ -80,7 +58,7 @@ class Util
 	 *
 	 * @param string $string
 	 */
-	static function htmltrim($string)
+	public static function htmltrim($string)
 	{
 		global $modSettings;
 
@@ -103,7 +81,7 @@ class Util
 	 * @param string $needle what is being looked for
 	 * @param int $offset where to start, assumed 0
 	 */
-	static function strpos($haystack, $needle, $offset = 0)
+	public static function strpos($haystack, $needle, $offset = 0)
 	{
 		global $modSettings;
 
@@ -142,9 +120,9 @@ class Util
 	 *
 	 * @param string $string
 	 * @param string $start
-	 * @param int $length
+	 * @param int|null $length
 	 */
-	static function substr($string, $start, $length = null)
+	public static function substr($string, $start, $length = null)
 	{
 		global $modSettings;
 
@@ -162,7 +140,7 @@ class Util
 	 *
 	 * @param string $string
 	 */
-	static function strtolower($string)
+	public static function strtolower($string)
 	{
 		if (function_exists('mb_strtolower'))
 			return mb_strtolower($string, 'UTF-8');
@@ -179,7 +157,7 @@ class Util
 	 *
 	 * @param string $string
 	 */
-	static function strtoupper($string)
+	public static function strtoupper($string)
 	{
 		if (function_exists('mb_strtoupper'))
 			return mb_strtoupper($string, 'UTF-8');
@@ -197,7 +175,7 @@ class Util
 	 * @param string $string
 	 * @param int $length
 	 */
-	static function truncate($string, $length)
+	public static function truncate($string, $length)
 	{
 		global $modSettings;
 
@@ -222,7 +200,7 @@ class Util
 	 *
 	 * @param string $string
 	 */
-	static function ucfirst($string)
+	public static function ucfirst($string)
 	{
 		return Util::strtoupper(Util::substr($string, 0, 1)) . Util::substr($string, 1);
 	}
@@ -232,7 +210,7 @@ class Util
 	 *
 	 * @param string $string
 	 */
-	static function ucwords($string)
+	public static function ucwords($string)
 	{
 		$words = preg_split('~([\s\r\n\t]+)~', $string, -1, PREG_SPLIT_DELIM_CAPTURE);
 		for ($i = 0, $n = count($words); $i < $n; $i += 2)
@@ -245,7 +223,7 @@ class Util
 	 *
 	 * @param string $string
 	 */
-	static function strlen($string)
+	public static function strlen($string)
 	{
 		global $modSettings;
 
@@ -268,22 +246,23 @@ class Util
 	 * - importantly escapes all keys and values!
 	 * - calls itself recursively if necessary.
 	 *
-	 * @param array|string $var
+	 * @todo not used, consider removing
+	 * @deprecated since 1.0
+	 *
+	 * @param mixed[]|string $var
 	 * @return array|string
 	 */
-	static function escapestring_recursive($var)
+	public static function escapestring_recursive($var)
 	{
-		global $smcFunc;
-
 		if (!is_array($var))
-			return $smcFunc['db_escape_string']($var);
+			return addslashes($var);
 
 		// Reindex the array with slashes.
 		$new_var = array();
 
 		// Add slashes to every element, even the indexes!
 		foreach ($var as $k => $v)
-			$new_var[$smcFunc['db_escape_string']($k)] = escapestring_recursive($v);
+			$new_var[addslashes($k)] = Util::escapestring_recursive($v);
 
 		return $new_var;
 	}
@@ -295,11 +274,14 @@ class Util
 	 * - effects both keys and values of arrays.
 	 * - calls itself recursively to handle arrays of arrays.
 	 *
-	 * @param array|string $var
+	 * @todo not used, consider removing
+	 * @deprecated since 1.0
+	 *
+	 * @param mixed[]|string $var
 	 * @param int $level = 0
 	 * @return array|string
 	 */
-	static function stripslashes_recursive($var, $level = 0)
+	public static function stripslashes_recursive($var, $level = 0)
 	{
 		if (!is_array($var))
 			return stripslashes($var);
@@ -321,11 +303,14 @@ class Util
 	 * - importantly, does it to keys too!
 	 * - calls itself recursively if there are any sub arrays.
 	 *
-	 * @param array|string $var
+	 * @todo not used, consider removing
+	 * @deprecated since 1.0
+	 *
+	 * @param mixed[]|string $var
 	 * @param int $level = 0
 	 * @return array|string
 	 */
-	function urldecode_recursive($var, $level = 0)
+	public function urldecode_recursive($var, $level = 0)
 	{
 		if (!is_array($var))
 			return urldecode($var);
@@ -347,10 +332,13 @@ class Util
 	 * - effects both keys and values of arrays.
 	 * - calls itself recursively to handle arrays of arrays.
 	 *
-	 * @param array|string $var
+	 * @todo not used, consider removing
+	 * @deprecated since 1.0
+	 *
+	 * @param mixed[]|string $var
 	 * @return array|string
 	 */
-	function unescapestring_recursive($var)
+	public function unescapestring_recursive($var)
 	{
 		$db = database();
 

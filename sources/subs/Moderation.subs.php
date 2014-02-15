@@ -66,7 +66,7 @@ function recountOpenReports($flush = true)
  *  - Sets $context['total_unapproved_posts']
  *  - approve_query is set to list of boards they can see
  *
- * @param string $approve_query
+ * @param string|null $approve_query
  * @return array of values
  */
 function recountUnapprovedPosts($approve_query = null)
@@ -117,7 +117,7 @@ function recountUnapprovedPosts($approve_query = null)
 /**
  * How many falied emails (that they can see) do we have?
  *
- * @param string $approve_query
+ * @param string|null $approve_query
  */
 function recountFailedEmails($approve_query = null)
 {
@@ -174,7 +174,7 @@ function totalReports($status = 0)
 /**
  * Changes a property of all the reports passed (and the user can see)
  *
- * @param array $reports_id an array of report IDs
+ * @param int[]|int $reports_id an array of report IDs
  * @param string $property the property to update ('close' or 'ignore')
  * @param int $status the status of the property (mainly: 0 or 1)
  */
@@ -214,7 +214,7 @@ function updateReportsStatus($reports_id, $property = 'close', $status = 0)
  *  - Reported posts
  *  - Members awaiting approval (activation, deletion, group requests)
  *
- * @param int $brd
+ * @param int|null $brd
  */
 function loadModeratorMenuCounts($brd = null)
 {
@@ -510,9 +510,9 @@ function warningTemplateCount($template_type = 'warntpl')
 /**
  * Get all issued warnings in the system.
  *
- * @param $start
- * @param $items_per_page
- * @param $sort
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
  */
 function warnings($start, $items_per_page, $sort)
 {
@@ -748,7 +748,7 @@ function getModReports($status = 0, $start = 0, $limit = 10)
 /**
  * Grabs all the comments made by the reporters to a set of reports
  *
- * @param array $id_reports an array of report ids
+ * @param int[] $id_reports an array of report ids
  */
 function getReportsUserComments($id_reports)
 {
@@ -1030,7 +1030,7 @@ function watchedUserPostsCount($approve_query, $warning_watch)
  * @param int $items_per_page
  * @param string $sort
  * @param string $approve_query
- * @param array $delete_boards
+ * @param int[] $delete_boards
  */
 function watchedUserPosts($start, $items_per_page, $sort, $approve_query, $delete_boards)
 {
