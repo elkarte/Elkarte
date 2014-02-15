@@ -1665,7 +1665,7 @@ dl.settings dt .styled-select select {
 	float: left;
 	margin-right: 5px;
 }
-.board_avatar img {
+.board_avatar .avatar {
 	max-width: 40px;
 	max-height: 40px;
 }
@@ -2181,7 +2181,7 @@ img.new_posts {
 .listlevel2>ol>li img, .listlevel2.warning img, .listlevel2.poster_ip img {
 	padding: 0 4px;
 }
-.avatar>.linklevel1>.avatar {
+.avatar {
 	width: auto;
 	height: auto;
 	max-width: 13em;
@@ -4024,6 +4024,9 @@ a.help .icon {
 	.stats dt {
 		font-weight: bold;
 	}
+	#list_mentions .listaction {
+		display: none;
+	}
 }
 /* This one does 540 and smaller screens at default font size. */
 @media screen and (max-width: 33.750em) {
@@ -4142,7 +4145,7 @@ a.help .icon {
 	#news, #logobox, .rightheader #logobox, #top_section_notice {
 		display: none;
 	}
-	.avatar>.linklevel1>.avatar {
+	.avatar {
 		max-width: 40px;
 		max-height: 40px;
 	}
