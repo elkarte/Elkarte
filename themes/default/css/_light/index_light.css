@@ -1299,7 +1299,7 @@ div.bbc_footnotes .meaction{
 
 .progressBar div {
 	color: #fff;
-	background-color: rgb(64, 118, 182);
+	background-color: green;
 }
 
 .abort, .remove {
