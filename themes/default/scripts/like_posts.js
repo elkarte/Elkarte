@@ -48,11 +48,11 @@
 							'action': subAction
 						});
 					} else {
-						console.log('error');
+						handleError(resp);
 					}
 				},
 				error: function(err) {
-					console.log('error');
+					handleError(err);
 				},
 			});
 		},
@@ -60,10 +60,14 @@
 			updateUi = function(params) {
 				var currentClass = (params.action === 'unlikepost') ? 'unlike_button' : 'like_button',
 					nextClass = (params.action === 'unlikepost') ? 'like_button' : 'unlike_button',
-					likeText = ((params.count !==0) ? params.count : '') + ' ' + params.newText;
+					likeText = ((params.count !== 0) ? params.count : '') + ' ' + params.newText;
 
 				$(params.elem).removeClass(currentClass).addClass(nextClass);
 				$(params.elem).text(likeText);
+			},
+
+			handleError = function(params) {
+				console.log('test');
 			};
 
 		return {
