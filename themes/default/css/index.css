@@ -3813,6 +3813,35 @@ a.help .icon {
 	height: 35px;
 }
 
+/*floating error box*/
+/* currently used by like funcationality*/
+.floating_error {
+	position: fixed;
+	width: 50%;
+	margin: 0;
+	padding: 10px 0 0;
+	text-align: center;
+	z-index: 102;
+}
+
+.floating_error .error_heading {
+	margin: 0;
+	padding: 5px 10px 0;
+}
+
+.floating_error .error_msg {
+	margin: 10px auto 15px;
+	width: 100%;
+}
+
+.floating_error .error_btn {
+	padding: 10px;
+	position: relative;
+	margin: 0;
+	text-align: center;
+}
+
+
 
 /*	$MEDIA		*/
 /* Experimental media queries.
@@ -4374,46 +4403,4 @@ a.help .icon {
 	.quickbuttons .modified {
 		display: none;
 	}
-}
-
-.floating_error {
-	background: rgba(255, 255, 255, 1);
-	position: fixed;
-	width: 50%;
-	margin: 0;
-	padding: 10px 0 0;
-	color: #000;
-	text-align: center;
-	font-size: 15px;
-	color: #404040;
-	z-index: 102;
-	border-radius: 10px;
-	border: solid 1px #E4E4E4;
-}
-
-.floating_error .error_heading {
-	font-weight: bold;
-    margin: 0;
-    padding: 5px 10px 0;
-}
-
-.floating_error .error_msg {
-	margin: 10px auto 15px;
-    width: 100%;
-    color: #3D3C3C;
-}
-
-.floating_error .error_btn {
-	border-top: solid 1px #D6D6D6;
-	padding: 10px;
-	color: #157DFB;
-	position: relative;
-	margin: 0;
-	font-size: 16px;
-	text-align: center;
-	font-weight: bold;
-}
-
-.floating_error .error_btn:hover {
-	cursor: pointer;
 }
