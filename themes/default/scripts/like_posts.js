@@ -10,62 +10,94 @@
 
 /**
  * Simply invoke the constructor by calling likePosts
- *
  */
 (function() {
 	function likePosts() {}
 
+	/**
+	 * This is bound to a click event on the page like/unlike buttons
+	 * likePosts.prototype.likeUnlikePosts(event, messageID, topidID)
+	 */
 	likePosts.prototype = function() {
 		var init = '',
 			likeUnlikePosts = function(e, mId, tId) {
 				var messageId = parseInt(mId, 10),
 					topicId = parseInt(tId, 10),
-					subAction = '';
+					subAction = '',
+					check = $(e.target).attr('class');
 
-				var check = $(e.target).attr('class');
-				subAction = 'likepost';
-				if (check.indexOf('unlike_button') >= 0) subAction = 'unlikepost';
-				else subAction = 'likepost';
+				// Set the subAction to what they are doing
+				if (check.indexOf('unlike_button') >= 0)
+					subAction = 'unlikepost';
+				else
+					subAction = 'likepost';
 
+				// Need to know what we are liking of course
 				var values = {
 					'topic': topicId,
-					'msg': messageId,
+					'msg': messageId
 				};
 
+				// Make the ajax call to the likes system
 				$.ajax({
-					url: elk_scripturl + '?action=likes;sa=' + subAction + ';' + elk_session_var + '=' + elk_session_id,
+					url: elk_scripturl + '?action=likes;sa=' + subAction + ';api;' + elk_session_var + '=' + elk_session_id,
 					type: 'POST',
 					dataType: 'json',
 					data: values,
-					cache: false,
-					success: function(resp) {
-						if (resp.result === true) {
-							updateUi({
-								'elem': $(e.target),
-								'count': resp.count,
-								'newText': resp.newText,
-								'action': subAction
-							});
-						} else {
-							handleError(resp);
-						}
-					},
-					error: function(err) {
-						handleError(err);
-					},
+					cache: false
+				})
+				.done(function(resp) {
+					// json response from the server says success?
+					if (resp.result === true)
+					{
+						// Update the page with the new likes information
+						updateUi({
+							'elem': $(e.target),
+							'count': resp.count,
+							'text': resp.text,
+							'title': resp.title,
+							'action': subAction
+						});
+					}
+					// Some failure trying to process the request
+					else
+						handleError(resp);
+				})
+				.fail(function(err, textStatus, errorThrown) {
+					// Some failure sending the request
+					console.log(textStatus);
+					console.log(errorThrown);
+					handleError(err);
 				});
 			},
 
-			updateUi = function(params) {
+			/**
+			 * Does the actual update to the page the user is viewing
+			 *
+			 * @param {object} params object of new values from the ajax request
+			 */
+			updateUi = function(params)
+			{
 				var currentClass = (params.action === 'unlikepost') ? 'unlike_button' : 'like_button',
-					nextClass = (params.action === 'unlikepost') ? 'like_button' : 'unlike_button',
-					likeText = ((params.count !== 0) ? params.count : '') + ' ' + params.newText;
+					nextClass = (params.action === 'unlikepost') ? 'like_button' : 'unlike_button';
 
+				// Swap the button class as needed, update the text for the hover
 				$(params.elem).removeClass(currentClass).addClass(nextClass);
-				$(params.elem).text(likeText);
+				$(params.elem).html('&nbsp;' + params.text);
+				$(params.elem).attr('title', params.title);
+
+				// Changed the title text, update the tooltips
+				$("." + nextClass).SiteTooltip({hoverIntent: {sensitivity: 10, interval: 150, timeout: 50}});
 			},
 
-			handleError = function(params) {
+			/**
+			 * Show a non modal error box when something goes wrong with
+			 * sending the request or processing it
+			 *
+			 * @param {type} params
+			 */
+			handleError = function(params)
+			{
 				var str = '<div class="floating_error"><div class="error_heading">Error in Likes</div><p class="error_msg">' + params.data + '</p><p class="error_btn">OK</p></div>';
 				$('body').append(str);
 
@@ -84,9 +116,17 @@
 				$(document).one('click keyup', removeOverlay);
 			},
 
-			removeOverlay = function(e) {
-				if (typeof(e) === 'undefined' && this.timeoutTimer === null) return false;
-				else if ((e.type == 'keyup' && e.keyCode == 27) || e.type == 'click') {
+			/**
+			 * Clear the error box from the screen by click or escape key
+			 *
+			 * @param {type} e
+			 */
+			removeOverlay = function(e)
+			{
+				if (typeof(e) === 'undefined' && this.timeoutTimer === null)
+					return false;
+				else if ((e.type === 'keyup' && e.keyCode === 27) || e.type === 'click')
+				{
 					$('.floating_error').remove();
 					$('.floating_error').unbind('click');
 					$(document).unbind('click', removeOverlay);

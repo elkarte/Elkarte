@@ -549,6 +549,12 @@ class Display_Controller
 			{
 				require_once(SUBSDIR . '/Likes.subs.php');
 				$context['likes'] = loadLikes($messages, true);
+
+				// ajax controller for likes
+				loadJavascriptFile('like_posts.js', array('defer' => true));
+
+				// Tooltips for likes
+				addInlineJavascript('$(".like_button, .unlike_button").SiteTooltip({hoverIntent: {sensitivity: 10, interval: 150, timeout: 50}});', true);
 			}
 
 			$messages_request = loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $options);
@@ -657,9 +663,6 @@ class Display_Controller
 
 		if (!empty($context['drafts_autosave']) && empty($options['use_editor_quick_reply']))
 			loadJavascriptFile('drafts.js');
-
-		// We needzz like chekzz
-		loadJavascriptFile('like_posts.js');
 
 		if (!empty($modSettings['mentions_enabled']))
 		{
