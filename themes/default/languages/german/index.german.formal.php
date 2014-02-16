@@ -908,3 +908,5 @@ $txt['dailymotion'] = 'Dailymotion-Video:';
 
 // Spoiler BBC
 $txt['spoiler'] = 'Spoiler (klicken zum Umschalten)';
+
+$txt['ok_uppercase'] = 'OK';
