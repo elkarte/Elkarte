@@ -54,7 +54,8 @@
 						updateUi({
 							'elem': $(e.target),
 							'count': resp.count,
-							'newText': resp.newText,
+							'text': resp.text,
+							'title': resp.title,
 							'action': subAction
 						});
 					}
@@ -78,13 +79,15 @@
 			updateUi = function(params)
 			{
 				var currentClass = (params.action === 'unlikepost') ? 'unlike_button' : 'like_button',
-					nextClass = (params.action === 'unlikepost') ? 'like_button' : 'unlike_button',
-					likeText = ((params.count !== 0) ? params.count : '') + ' ' + params.newText;
+					nextClass = (params.action === 'unlikepost') ? 'like_button' : 'unlike_button';
 
 				// Swap the button class as needed, update the text for the hover
 				$(params.elem).removeClass(currentClass).addClass(nextClass);
-				$(params.elem).text(likeText);
-				$(nextClass).SiteTooltip({hoverIntent: {sensitivity: 10, interval: 150, timeout: 50}});
+				$(params.elem).html('&nbsp;' + params.text);
+				$(params.elem).attr('title', params.title);
+
+				// Changed the title text, update the tooltips
+				$("." + nextClass).SiteTooltip({hoverIntent: {sensitivity: 10, interval: 150, timeout: 50}});
 			},
 
 			/**
