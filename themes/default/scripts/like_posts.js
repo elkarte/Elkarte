@@ -9,17 +9,28 @@
  */
 
 /**
- * Simply invoke the constructor by calling likePosts
+ * Simply invoke the constructor by calling likePosts with init method
  */
 (function() {
 	function likePosts() {}
 
-	/**
-	 * This is bound to a click event on the page like/unlike buttons
-	 * likePosts.prototype.likeUnlikePosts(event, messageID, topidID)
-	 */
+
 	likePosts.prototype = function() {
-		var init = '',
+		var oTxt = {},
+
+			/**
+			 * Initiate likePosts with this method
+			 * likePosts.prototype.init(params)
+			 * currently passing the text from php
+			 */
+			init = function(params) {
+				oTxt = params.oTxt;
+			},
+
+			/**
+			 * This is bound to a click event on the page like/unlike buttons
+			 * likePosts.prototype.likeUnlikePosts(event, messageID, topidID)
+			 */
 			likeUnlikePosts = function(e, mId, tId) {
 				var messageId = parseInt(mId, 10),
 					topicId = parseInt(tId, 10),
@@ -46,29 +57,28 @@
 					data: values,
 					cache: false
 				})
-				.done(function(resp) {
-					// json response from the server says success?
-					if (resp.result === true)
-					{
-						// Update the page with the new likes information
-						updateUi({
-							'elem': $(e.target),
-							'count': resp.count,
-							'text': resp.text,
-							'title': resp.title,
-							'action': subAction
-						});
-					}
-					// Some failure trying to process the request
-					else
-						handleError(resp);
-				})
-				.fail(function(err, textStatus, errorThrown) {
-					// Some failure sending the request
-					console.log(textStatus);
-					console.log(errorThrown);
-					handleError(err);
-				});
+					.done(function(resp) {
+						// json response from the server says success?
+						if (resp.result === true) {
+							// Update the page with the new likes information
+							updateUi({
+								'elem': $(e.target),
+								'count': resp.count,
+								'text': resp.text,
+								'title': resp.title,
+								'action': subAction
+							});
+						}
+						// Some failure trying to process the request
+						else
+							handleError(resp);
+					})
+					.fail(function(err, textStatus, errorThrown) {
+						// Some failure sending the request
+						console.log(textStatus);
+						console.log(errorThrown);
+						handleError(err);
+					});
 			},
 
 			/**
@@ -76,8 +86,7 @@
 			 *
 			 * @param {object} params object of new values from the ajax request
 			 */
-			updateUi = function(params)
-			{
+			updateUi = function(params) {
 				var currentClass = (params.action === 'unlikepost') ? 'unlike_button' : 'like_button',
 					nextClass = (params.action === 'unlikepost') ? 'like_button' : 'unlike_button';
 
@@ -87,7 +96,13 @@
 				$(params.elem).attr('title', params.title);
 
 				// Changed the title text, update the tooltips
-				$("." + nextClass).SiteTooltip({hoverIntent: {sensitivity: 10, interval: 150, timeout: 50}});
+				$("." + nextClass).SiteTooltip({
+					hoverIntent: {
+						sensitivity: 10,
+						interval: 150,
+						timeout: 50
+					}
+				});
 			},
 
 			/**
@@ -96,9 +111,8 @@
 			 *
 			 * @param {type} params
 			 */
-			handleError = function(params)
-			{
-				var str = '<div class="floating_error"><div class="error_heading">Error in Likes</div><p class="error_msg">' + params.data + '</p><p class="error_btn">OK</p></div>';
+			handleError = function(params) {
+				var str = '<div class="floating_error"><div class="error_heading">' + oTxt.likeHeadingError + '</div><p class="error_msg">' + params.data + '</p><p class="error_btn">' + oTxt.btnText + '</p></div>';
 				$('body').append(str);
 
 				var screenWidth = $(window).width(),
@@ -121,12 +135,10 @@
 			 *
 			 * @param {type} e
 			 */
-			removeOverlay = function(e)
-			{
+			removeOverlay = function(e) {
 				if (typeof(e) === 'undefined')
 					return false;
-				else if ((e.type === 'keyup' && e.keyCode === 27) || e.type === 'click')
-				{
+				else if ((e.type === 'keyup' && e.keyCode === 27) || e.type === 'click') {
 					$('.floating_error').remove();
 					$('.floating_error').unbind('click');
 					$(document).unbind('click', removeOverlay);
@@ -135,6 +147,7 @@
 			};
 
 		return {
+			init: init,
 			likeUnlikePosts: likeUnlikePosts
 		};
 	}();
