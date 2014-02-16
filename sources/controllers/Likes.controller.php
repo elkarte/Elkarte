@@ -20,6 +20,12 @@ if (!defined('ELK'))
 class Likes_Controller extends Action_Controller
 {
 	/**
+	 * Holds the ajax response
+	 */
+	protected $_likes_response = array();
+	protected $api = false;
+
+	/**
 	 * Default action method, if a specific methods wasn't
 	 * directly called already. Simply forwards to likepost.
 	 *
@@ -43,6 +49,18 @@ class Likes_Controller extends Action_Controller
 			fatal_lang_error('feature_disabled', true);
 	}
 
+	public function action_likepost_api()
+	{
+		$this->api = true;
+		$this->action_likepost();
+	}
+
+	public function action_unlikepost_api()
+	{
+		$this->api = true;
+		$this->action_unlikepost();
+	}
+
 	/**
 	 * Likes a post due to its awesomeness
 	 * Permission checks are done in prepare_likes
@@ -51,20 +69,13 @@ class Likes_Controller extends Action_Controller
 	 */
 	public function action_likepost()
 	{
-		global $context, $user_info, $topic, $txt, $modSettings;
+		global $user_info, $topic, $txt, $modSettings;
 
 		$id_liked = !empty($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : 0;
 
 		// We like these
-		loadLanguage('Errors');
 		require_once(SUBSDIR . '/Likes.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');
-
-		$template_layers = Template_Layers::getInstance();
-		$template_layers->removeAll();
-
-		loadTemplate('Json');
-		$context['sub_template'] = 'send_json';
 
 		// Have to be able to access it to like it
 		if ($this->prepare_like() && canAccessMessage($id_liked))
@@ -72,9 +83,10 @@ class Likes_Controller extends Action_Controller
 			$liked_message = basicMessageInfo($id_liked, true, true);
 			if ($liked_message)
 			{
+				// Like it
 				$likeResult = likePost($user_info['id'], $liked_message, '+');
-
-				if ($likeResult === true) {
+				if ($likeResult === true)
+				{
 					// Lets add in a mention to the member that just had their post liked
 					if (!empty($modSettings['mentions_enabled']))
 					{
@@ -87,23 +99,23 @@ class Likes_Controller extends Action_Controller
 						));
 						$mentions->action_add();
 					}
-
-					// Get the counts for ajax
-					$count = (int) messageLikeCount($id_liked);
-					$context['json_data'] = array('result' => true, 'newText' => $txt['likes'], 'count' => $count);
-					return false;
-				} else {
-					$context['json_data'] = array('result' => false, 'data' => $likeResult);
-					return false;
+					$this->_likes_response = array('result' => true, 'newText' => $txt['likes'], 'count' => messageLikeCount($id_liked));
 				}
-			} else {
-				$context['json_data'] = array('result' => false, 'data' => $txt['like_unlike_error']);
-				return false;
+				else
+					$this->_likes_response = array('result' => false, 'data' => $likeResult);
 			}
-		} else {
-			$context['json_data'] = array('result' => false, 'data' => $txt['not_allowed_like']);
-			return false;
+			else
+			{
+				loadLanguage('Errors');
+				$this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
+			}
 		}
+
+		// Back to where we were, in theory
+		if ($this->api)
+			$this->likeResponse();
+		else
+			redirectexit('topic=' . $topic . '.msg' . $id_liked . '#msg' . $id_liked);
 	}
 
 	/**
@@ -113,19 +125,13 @@ class Likes_Controller extends Action_Controller
 	 */
 	public function action_unlikepost()
 	{
-		global $context, $user_info, $topic, $txt, $modSettings;
+		global $user_info, $topic, $txt, $modSettings;
 
 		$id_liked = !empty($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : 0;
 
 		// We used to like these
 		require_once(SUBSDIR . '/Likes.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');
-
-		$template_layers = Template_Layers::getInstance();
-		$template_layers->removeAll();
-
-		loadTemplate('Json');
-		$context['sub_template'] = 'send_json';
 
 		// Have to be able to access it to unlike it now
 		if ($this->prepare_like() && canAccessMessage($id_liked))
@@ -134,8 +140,8 @@ class Likes_Controller extends Action_Controller
 			if ($liked_message)
 			{
 				$likeResult = likePost($user_info['id'], $liked_message, '-');
-
-				if ($likeResult === true) {
+				if ($likeResult === true)
+				{
 					// Oh noes, taking the like back, let them know so they can complain
 					if (!empty($modSettings['mentions_enabled']))
 					{
@@ -147,31 +153,55 @@ class Likes_Controller extends Action_Controller
 							'id_msg' => $id_liked,
 						));
 
+						// Notifying that likes were removed ?
 						if (!empty($modSettings['mentions_dont_notify_rlike']))
 							$mentions->action_rlike();
 						else
 							$mentions->action_add();
 					}
-					
-					// Get the counts for ajax
-					$count = (int) messageLikeCount($id_liked);
 
-					$likeText = $txt['likes'];
-					if($count === 0) $likeText = $txt['like_post'];
-					$context['json_data'] = array('result' => true, 'newText' => $likeText, 'count' => $count);
-					return false;
-				} else {
-					$context['json_data'] = array('result' => false, 'data' => $likeResult);
-					return false;
+					// Get the counts for ajax
+					$count = messageLikeCount($id_liked);
+					$likeText = $count !== 0 ? $txt['likes'] : $txt['like_post'];
+					$this->_likes_response = array('result' => true, 'newText' => $likeText, 'count' => $count);
 				}
-			} else {
-				$context['json_data'] = array('result' => false, 'data' => $txt['like_unlike_error']);
-				return false;
+				else
+					$this->_likes_response = array('result' => false, 'data' => $likeResult);
 			}
-		} else {
-			$context['json_data'] = array('result' => false, 'data' => $txt['not_allowed_like']);
-			return false;
+			else
+			{
+				loadLanguage('Errors');
+				$this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
+			}
 		}
+
+		// Back we go
+		if ($this->api)
+			$this->likeResponse();
+		elseif (!isset($_REQUEST['profile']))
+-			redirectexit('topic=' . $topic . '.msg' . $id_liked . '#msg' . $id_liked);
+		else
+-			redirectexit('action=profile;area=showlikes;sa=given;u=' .$user_info['id']);
+	}
+
+	/**
+	 * When liking / unliking via ajax, clears the templates and returns a json
+	 * response to the page
+	 */
+	private function likeResponse()
+	{
+		global $context;
+
+		// Clear the templates
+		$template_layers = Template_Layers::getInstance();
+		$template_layers->removeAll();
+
+		// Make room for ajax
+		loadTemplate('Json');
+		$context['sub_template'] = 'send_json';
+
+		// Provide the response
+		$context['json_data'] = $this->_likes_response;
 	}
 
 	/**
@@ -183,7 +213,7 @@ class Likes_Controller extends Action_Controller
 
 		$check = true;
 
-		// need to work on session check
+		// Valid request
 		checkSession('get');
 
 		// If you're a guest or simply can't do this, we stop
