@@ -194,8 +194,7 @@ $txt['ban_no_triggers'] = 'Did you forget to select ban triggers? We need at lea
 $txt['ban_ban_item_empty'] = 'Ban trigger not found';
 $txt['impossible_insert_new_bangroup'] = 'An error occurred while inserting the new ban';
 
-$txt['not_allowed_like'] = 'Sorry, your are not allowed to like/unlike posts';
-$txt['like_unlike_error'] = 'Oops, there\'s an error while liking/unliking the post';
+$txt['like_unlike_error'] = 'Oops, there was an error while liking/unliking the post';
 $txt['cant_like_yourself'] = 'Liking your own posts ... its like laughing at your own jokes when there is no one else around  ... lol ... Wait did I just lol myself?';
 
 $txt['ban_name_exists'] = 'The name of this ban (%1$s) already exists. Please choose a different name.';
