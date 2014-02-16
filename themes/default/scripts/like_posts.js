@@ -123,7 +123,7 @@
 			 */
 			removeOverlay = function(e)
 			{
-				if (typeof(e) === 'undefined' && this.timeoutTimer === null)
+				if (typeof(e) === 'undefined')
 					return false;
 				else if ((e.type === 'keyup' && e.keyCode === 27) || e.type === 'click')
 				{
