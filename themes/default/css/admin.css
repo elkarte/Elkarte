@@ -197,7 +197,7 @@ fieldset dl {
 	padding: 0 20px;
 	line-height: 1.7em;
 }
-#yourVersion, #ourVersion {
+#installedVersion, #latestVersion {
 	white-space: nowrap;
 }
 .versionFile {
