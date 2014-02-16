@@ -21,16 +21,19 @@
  */
 function likePost($id_liker, $liked_message, $direction)
 {
-	global $modSettings;
+	global $txt, $modSettings;
 
 	// If we have a message, then we have passed all checks ...
 	if (!empty($liked_message))
 	{
 		// You can't like your own stuff, no matter how brilliant you think you are
 		if ($liked_message['id_member'] == $id_liker && empty($modSettings['likeAllowSelf']))
-			fatal_lang_error('cant_like_yourself', false);
-
-		updateLike($id_liker, $liked_message, $direction);
+			return $txt['cant_like_yourself'];
+		else
+		{
+			updateLike($id_liker, $liked_message, $direction);
+			return true;
+		}
 	}
 }
 
@@ -55,7 +58,9 @@ function loadLikes($messages, $prepare = true)
 
 	// Load up them likes from the db
 	$request = $db->query('', '
-		SELECT l.id_member, l.id_msg, m.real_name
+		SELECT
+			l.id_member, l.id_msg,
+			m.real_name
 		FROM {db_prefix}message_likes AS l
 			LEFT JOIN {db_prefix}members AS m ON (m.id_member = l.id_member)
 		WHERE id_msg IN ({array_int:id_messages})',
@@ -66,7 +71,7 @@ function loadLikes($messages, $prepare = true)
 	while ($row = $db->fetch_assoc($request))
 		$likes[$row['id_msg']]['member'][$row['id_member']] = $row['real_name'];
 
-	// total likes for this group
+	// Total likes for this group
 	foreach ($likes as $msg_id => $like)
 		$likes[$msg_id]['count'] = count($like['member']);
 
@@ -188,7 +193,8 @@ function updateLike($id_liker, $liked_message, $direction)
 
 	// See if they already likeyed this message
 	$request = $db->query('', '
-		SELECT id_member
+		SELECT
+			id_member
 		FROM {db_prefix}message_likes
 		WHERE id_member = {int:id_member}
 			AND id_msg = {int:id_msg}
@@ -323,7 +329,8 @@ function likesPostsGiven($start, $items_per_page, $sort, $memberID)
 
 	// Load up what the user likes from the db
 	$request = $db->query('', '
-		SELECT l.id_member, l.id_msg,
+		SELECT
+			l.id_member, l.id_msg,
 			m.subject, m.poster_name, m.id_board, m.id_topic,
 			b.name
 		FROM {db_prefix}message_likes AS l
@@ -372,7 +379,9 @@ function likesPostsReceived($start, $items_per_page, $sort, $memberID)
 
 	// Load up what the user likes from the db
 	$request = $db->query('', '
-		SELECT m.subject, m.id_topic, b.name, l.id_msg, COUNT(l.id_msg) AS likes
+		SELECT
+			m.subject, m.id_topic,
+			b.name, l.id_msg, COUNT(l.id_msg) AS likes
 		FROM {db_prefix}message_likes AS l
 			LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = l.id_msg)
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
@@ -420,7 +429,9 @@ function postLikers($start, $items_per_page, $sort, $messageID)
 
 	// Load up the likes for this message
 	$request = $db->query('', '
-		SELECT l.id_member, l.id_msg, m.real_name
+		SELECT
+			l.id_member, l.id_msg,
+			m.real_name
 		FROM {db_prefix}message_likes AS l
 			LEFT JOIN {db_prefix}members AS m ON (m.id_member = l.id_member)
 		WHERE id_msg = {int:id_message}
@@ -471,5 +482,5 @@ function messageLikeCount($message)
 	list ($total) = $db->fetch_row($request);
 	$db->free_result($request);
 
-	return $total;
+	return (int) $total;
 }

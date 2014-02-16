@@ -3813,6 +3813,35 @@ a.help .icon {
 	height: 35px;
 }
 
+/*floating error box*/
+/* currently used by like funcationality*/
+.floating_error {
+	position: fixed;
+	width: 50%;
+	margin: 0;
+	padding: 10px 0 0;
+	text-align: center;
+	z-index: 102;
+}
+
+.floating_error .error_heading {
+	margin: 0;
+	padding: 5px 10px 0;
+}
+
+.floating_error .error_msg {
+	margin: 10px auto 15px;
+	width: 100%;
+}
+
+.floating_error .error_btn {
+	padding: 10px;
+	position: relative;
+	margin: 0;
+	text-align: center;
+}
+
+
 
 /*	$MEDIA		*/
 /* Experimental media queries.
