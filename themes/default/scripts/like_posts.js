@@ -5,7 +5,9 @@
  *
  * @version 1.0 Beta 2
  *
- * Ajaxifying likes - WIP
+ * Functions to provide ajax capability to the like / unlike button
+ * Makes the appropriate call in the background and updates the button text
+ * and button hover title text with the new like totals / likers
  */
 
 /**
@@ -13,7 +15,6 @@
  */
 (function() {
 	function likePosts() {}
-
 
 	likePosts.prototype = function() {
 		var oTxt = {},
@@ -74,9 +75,9 @@
 							handleError(resp);
 					})
 					.fail(function(err, textStatus, errorThrown) {
-						// Some failure sending the request
-						console.log(textStatus);
-						console.log(errorThrown);
+						// Some failure sending the request, this generally means some html in
+						// the output from php error or access denied fatal errors etc
+						err.data = oTxt.error_occurred + ' : ' + errorThrown;
 						handleError(err);
 					});
 			},
@@ -122,6 +123,7 @@
 					topPopUpOffset = (screenHeight - popupHeight) / 2,
 					leftPopUpOffset = (screenWidth - popupWidth) / 2;
 
+				// Center the error popup on the screen
 				$('.floating_error').css({
 					top: topPopUpOffset + 'px',
 					left: leftPopUpOffset + 'px'
@@ -138,7 +140,8 @@
 			removeOverlay = function(e) {
 				if (typeof(e) === 'undefined')
 					return false;
-				else if ((e.type === 'keyup' && e.keyCode === 27) || e.type === 'click') {
+				else if ((e.type === 'keyup' && e.keyCode === 27) || e.type === 'click')
+				{
 					$('.floating_error').remove();
 					$('.floating_error').unbind('click');
 					$(document).unbind('click', removeOverlay);

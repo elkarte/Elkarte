@@ -554,18 +554,24 @@ class Display_Controller
 				loadJavascriptFile('like_posts.js', array('defer' => true));
 				loadLanguage('Errors');
 
-				// Initiate likes
-				// Tooltips for likes
+				// Initiate likes and the tooltips for likes
 				addInlineJavascript('
 				$(document).ready(function () {
 					var likePostInstance = likePosts.prototype.init({
 						oTxt: ({
-							btnText: ' . JavaScriptEscape($txt['ok_uppercase']) . ',
-							likeHeadingError : ' . JavaScriptEscape($txt['like_heading_error']) . '
+							btnText : ' . JavaScriptEscape($txt['ok_uppercase']) . ',
+							likeHeadingError : ' . JavaScriptEscape($txt['like_heading_error']) . ',
+							error_occurred : ' . JavaScriptEscape($txt['error_occurred']) . '
 						}),
 					});
 
-					$(".like_button, .unlike_button").SiteTooltip({hoverIntent: {sensitivity: 10, interval: 150, timeout: 50}});
+					$(".like_button, .unlike_button").SiteTooltip({
+						hoverIntent: {
+							sensitivity: 10,
+							interval: 150,
+							timeout: 50
+						}
+					});
 				});', true);
 			}
 
