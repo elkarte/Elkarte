@@ -110,13 +110,13 @@ function template_bounce_email()
 			<div class="content">
 				<dl class="settings">
 					<dt>
-						<strong>', $txt['bounce_notify'], ':</strong>
+						<strong><label for="warn_notify">', $txt['bounce_notify'], '</label>:</strong>
 					</dt>
 					<dd>
 						<input type="checkbox" name="warn_notify" id="warn_notify" onclick="modifyWarnNotify();" ', $context['warning_data']['notify'] ? 'checked="checked"' : '', ' class="input_check" />
 					</dd>
 					<dt>
-						<strong>', $txt['bounce_notify_template'], ':</strong>
+						<strong><label for="warn_temp">', $txt['bounce_notify_template'], '</label>:</strong>
 					</dt>
 					<dd>
 						<div class="styled-select">
@@ -133,13 +133,13 @@ function template_bounce_email()
 						</div>
 					</dd>
 					<dt>
-						<strong>', $txt['bounce_notify_subject'], ':</strong>
+						<strong><label for="warn_sub">', $txt['bounce_notify_subject'], '</label>:</strong>
 					</dt>
 					<dd>
 						<input type="text" name="warn_sub" id="warn_sub" value="', empty($context['warning_data']['notify_subject']) ? '' : $context['warning_data']['notify_subject'], '" size="50" style="width: 80%;" class="input_text" />
 					</dd>
 					<dt>
-						<strong>', $txt['bounce_notify_body'], ':</strong>
+						<strong><label for="warn_body">', $txt['bounce_notify_body'], '</label>:</strong>
 					</dt>
 					<dd>
 						<textarea name="warn_body" id="warn_body" cols="40" rows="8">', $context['warning_data']['notify_body'], '</textarea>
@@ -316,49 +316,5 @@ function template_bounce_template()
 				return ajax_getTemplatePreview();
 			});
 		});
-
-		function ajax_getTemplatePreview()
-		{
-			$.ajax({
-				type: "POST",
-				url: "' . $scripturl . '?action=xmlpreview;xml",
-				data: {item: "bounce_preview", title: $("#template_title").val(), body: $("#template_body").val()},
-				context: document.body
-			})
-			.done(function(request) {
-				// Show the preivew section, populated with the resonse
-				$("#preview_section").css({display: ""});
-				$("#template_preview").html($(request).find(\'body\').text());
-				$("#preview_subject").html($(request).find(\'subject\').text());
-
-				// Any error we need to let them know about?
-				if ($(request).find("error").text() !== \'\')
-				{
-					var errors_html = \'\';
-
-					// Build the error string
-					errors = $(request).find(\'error\').each(function() {
-						errors_html += $(this).text() + \'<br />\';
-					});
-
-					// Add it to the error div, set the class level, and show it
-					$(document).find("#error_list").html(errors_html);
-					$("#errors").css({display: ""});
-					$("#errors").attr(\'class\', parseInt($(request).find(\'errors\').attr(\'serious\')) === 0 ? \'warningbox\' : \'errorbox\');
-
-					// Navigate to the preview
-					location.hash = \'#\' + \'preview_section\';
-				}
-				else
-				{
-					$("#errors").css({display: "none"});
-					$("#error_list").html(\'\');
-				}
-
-				return false;
-			});
-
-			return false;
-		}
 	// ]]></script>';
 }

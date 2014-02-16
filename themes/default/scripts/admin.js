@@ -1640,3 +1640,52 @@ function toggleCurrencyOther()
 		}
 	}
 }
+
+// Used to ajax-ively preview the templates of bounced emails (template_bounce_template)
+function ajax_getTemplatePreview()
+{
+	$.ajax({
+		type: "POST",
+		url: elk_scripturl + "?action=xmlpreview;xml",
+		data: {
+			item: "bounce_preview",
+			title: $("#template_title").val(),
+			body: $("#template_body").val()
+		},
+		context: document.body
+	})
+	.done(function(request) {
+		// Show the preivew section, populated with the resonse
+		$("#preview_section").css({display: ""});
+		$("#template_preview").html($(request).find('body').text());
+		$("#preview_subject").html($(request).find('subject').text());
+
+		// Any error we need to let them know about?
+		if ($(request).find("error").text() !== '')
+		{
+			var errors_html = '';
+
+			// Build the error string
+			errors = $(request).find('error').each(function() {
+				errors_html += $(this).text() + '<br />';
+			});
+
+			// Add it to the error div, set the class level, and show it
+			$(document).find("#error_list").html(errors_html);
+			$("#errors").css({display: ""});
+			$("#errors").attr('class', parseInt($(request).find('errors').attr('serious')) === 0 ? 'warningbox' : 'errorbox');
+
+			// Navigate to the preview
+			location.hash = '#' + 'preview_section';
+		}
+		else
+		{
+			$("#errors").css({display: "none"});
+			$("#error_list").html('');
+		}
+
+		return false;
+	});
+
+	return false;
+}
