@@ -30,6 +30,9 @@
 function elk_AdminIndex(oOptions)
 {
 	this.opt = oOptions;
+	this.announcements = [];
+	this.current = {};
+	this.init_news = false;
 	this.init();
 }
 
@@ -47,10 +50,6 @@ elk_AdminIndex.prototype.init = function ()
 
 elk_AdminIndex.prototype.loadAdminIndex = function ()
 {
-	// Load the text box containing the latest news items.
-	if (this.opt.bLoadAnnouncements)
-		this.setAnnouncements();
-
 	// Load the current master and your version numbers.
 	if (this.opt.bLoadVersions)
 		this.showCurrentVersion();
@@ -61,31 +60,146 @@ elk_AdminIndex.prototype.loadAdminIndex = function ()
 };
 
 // Update the announcement container with news
-elk_AdminIndex.prototype.setAnnouncements = function ()
+elk_AdminIndex.prototype.setAnnouncement = function (announcement)
 {
-	if (!('ourAnnouncements' in window) || !('length' in window.ourAnnouncements))
-		return;
+	var oElem = document.getElementById(this.opt.sAnnouncementContainerId),
+		sMessages = this.init_news ? oElem.innerHTML : '',
+		sMessage = '';
 
-	var sMessages = '';
-	for (var i = 0; i < window.ourAnnouncements.length; i++)
-		sMessages += this.opt.sAnnouncementMessageTemplate.replace('%href%', window.ourAnnouncements[i].href).replace('%subject%', window.ourAnnouncements[i].subject).replace('%time%', window.ourAnnouncements[i].time).replace('%message%', window.ourAnnouncements[i].message);
+	sMessage = this.opt.sAnnouncementMessageTemplate.replace('%href%', announcement.html_url).replace('%subject%', announcement.name).replace('%time%', announcement.published_at.replace(/[TZ]/g, ' ')).replace('%message%', announcement.body);
 
-	document.getElementById(this.opt.sAnnouncementContainerId).innerHTML = this.opt.sAnnouncementTemplate.replace('%content%', sMessages);
+	oElem.innerHTML = sMessages + this.opt.sAnnouncementTemplate.replace('%content%', sMessage);
+	this.init_news = true;
 };
 
-// Updates the current version container with the current version found in current-version.js
+// Updates the current version container with the current version found in the repository
 elk_AdminIndex.prototype.showCurrentVersion = function ()
 {
-	if (!('elkVersion' in window))
-		return;
+	var oElkVersionContainer = document.getElementById(this.opt.slatestVersionContainerId),
+		oinstalledVersionContainer = document.getElementById(this.opt.sinstalledVersionContainerId),
+		sCurrentVersion = oinstalledVersionContainer.innerHTML,
+		adminIndex = this,
+		elkVersion = '???';
 
-	var oElkVersionContainer = document.getElementById(this.opt.sOurVersionContainerId),
-		oYourVersionContainer = document.getElementById(this.opt.sYourVersionContainerId),
-		sCurrentVersion = oYourVersionContainer.innerHTML;
+	$.getJSON('https://api.github.com/repos/elkarte/Elkarte/releases', {format: "json"},
+	function(data, textStatus, jqXHR) {
+		var mostRecent = {},
+			previous = {};
+		adminIndex.current = adminIndex.normalizeVersion(sCurrentVersion);
 
-	oElkVersionContainer.innerHTML = window.elkVersion;
-	if (sCurrentVersion !== window.elkVersion)
-		oYourVersionContainer.innerHTML = this.opt.sVersionOutdatedTemplate.replace('%currentVersion%', sCurrentVersion);
+		$.each(data, function(idx, elem) {
+			// No drafts, thank you
+			if (elem.draft)
+				return;
+
+			var release = adminIndex.normalizeVersion(elem.tag_name);
+
+			if (!previous.hasOwnProperty('major') || adminIndex.compareVersion(release, previous))
+			{
+				// Using a preprelease? Then you may need to know a new one is out!
+				if ((elem.prerelease && adminIndex.current.prerelease) || (!elem.prerelease))
+				{
+					previous = release;
+					mostRecent = elem;
+				}
+			}
+
+			// Load the text box containing the latest news items.
+			if (adminIndex.opt.bLoadAnnouncements)
+				adminIndex.setAnnouncement(elem);
+		});
+		elkVersion = mostRecent.name;
+
+		oElkVersionContainer.innerHTML = elkVersion;
+		if (sCurrentVersion !== elkVersion)
+			oinstalledVersionContainer.innerHTML = adminIndex.opt.sVersionOutdatedTemplate.replace('%currentVersion%', sCurrentVersion);
+	});
+};
+
+// Compare two different versions and return true if the firs is higher than the second
+elk_AdminIndex.prototype.compareVersion = function (curVer, refVer)
+{
+	if (curVer.major > refVer.major)
+		return true;
+	else if (curVer.major < refVer.major)
+		return false;
+
+	if (curVer.minor > refVer.minor)
+		return true;
+	else if (curVer.minor < refVer.minor)
+		return false;
+
+	if (curVer.micro > refVer.micro)
+		return true;
+	else if (curVer.micro < refVer.micro)
+		return false;
+
+	if (curVer.prerelease)
+	{
+		if (curVer.nano > refVer.nano)
+			return true;
+		else if (curVer.nano < refVer.nano)
+			return false;
+	}
+
+	return false;
+}
+
+// Split a string representing a version number into an object
+elk_AdminIndex.prototype.normalizeVersion = function (sVersion)
+{
+	var splitVersion = sVersion.split(/[\s-]/),
+	normalVersion = {
+		major: 0,
+		minor: 0,
+		micro: 0,
+		prerelease: false,
+		nano: 0,
+	},
+	prerelease = false;
+
+	for (var i = 0; i < splitVersion.length; i++)
+	{
+		if (splitVersion[i].toLowerCase() == 'elkarte')
+			continue;
+
+		if (splitVersion[i].substring(0, 4).toLowerCase() == 'beta' || splitVersion[i].substring(0, 2).toLowerCase() == 'rc')
+		{
+			normalVersion.prerelease = true;
+			prerelease = true;
+
+			// the tag name comes with the number attached to the beta/rc
+			if (splitVersion[i].indexOf('.') > 0)
+			{
+				var splitPre = splitVersion[i].split('.');
+				normalVersion.nano = parseFloat(splitPre[1]);
+			}
+		}
+
+		// If we have passed a "beta" or an "RC" string, no need to go further
+		if (prerelease)
+		{
+			// Only numbers and dots means a number
+			if (splitVersion[i].replace(/[\d\.]/g, '') == '')
+				normalVersion.nano = parseFloat(splitVersion[i]);
+
+			continue;
+		}
+
+		// Likely from the tag
+		if (splitVersion[i].substring(0, 1) == 'v')
+			splitVersion[i] = splitVersion[i].substring(1);
+
+		// Only numbers and dots means a number
+		if (splitVersion[i].replace(/[\d\.]/g, '') == '')
+		{
+			var ver = splitVersion[i].split('.');
+			normalVersion.major = parseInt(ver[0]);
+			normalVersion.minor = parseInt(ver[1]);
+			normalVersion.micro = ver.length > 2 ? parseInt(ver[2]) : 0;
+		}
+	}
+	return normalVersion;
 };
 
 // Checks if a new version of ElkArte is available and if so updates the admin info box
@@ -289,7 +403,7 @@ elk_ViewVersions.prototype.determineVersions = function ()
 		if (!document.getElementById('our' + sFilename))
 			continue;
 
-		var sYourVersion = document.getElementById('your' + sFilename).innerHTML,
+		var sinstalledVersion = document.getElementById('your' + sFilename).innerHTML,
 			sCurVersionType;
 
 		for (var sVersionType in oLowVersion)
@@ -302,23 +416,23 @@ elk_ViewVersions.prototype.determineVersions = function ()
 		// use compareVersion to determine which version is >< the other
 		if (typeof(sCurVersionType) !== 'undefined')
 		{
-			if ((this.compareVersions(oHighYour[sCurVersionType], sYourVersion) || oHighYour[sCurVersionType] === '??') && !oLowVersion[sCurVersionType])
-				oHighYour[sCurVersionType] = sYourVersion;
+			if ((this.compareVersions(oHighYour[sCurVersionType], sinstalledVersion) || oHighYour[sCurVersionType] === '??') && !oLowVersion[sCurVersionType])
+				oHighYour[sCurVersionType] = sinstalledVersion;
 
 			if (this.compareVersions(oHighCurrent[sCurVersionType], ourVersions[sFilename]) || oHighCurrent[sCurVersionType] === '??')
 				oHighCurrent[sCurVersionType] = ourVersions[sFilename];
 
-			if (this.compareVersions(sYourVersion, ourVersions[sFilename]))
+			if (this.compareVersions(sinstalledVersion, ourVersions[sFilename]))
 			{
-				oLowVersion[sCurVersionType] = sYourVersion;
+				oLowVersion[sCurVersionType] = sinstalledVersion;
 				document.getElementById('your' + sFilename).style.color = 'red';
 			}
 		}
-		else if (this.compareVersions(sYourVersion, ourVersions[sFilename]))
-			oLowVersion[sCurVersionType] = sYourVersion;
+		else if (this.compareVersions(sinstalledVersion, ourVersions[sFilename]))
+			oLowVersion[sCurVersionType] = sinstalledVersion;
 
 		document.getElementById('our' + sFilename).innerHTML = ourVersions[sFilename];
-		document.getElementById('your' + sFilename).innerHTML = sYourVersion;
+		document.getElementById('your' + sFilename).innerHTML = sinstalledVersion;
 	}
 
 	if (!('ourLanguageVersions' in window))
@@ -333,18 +447,18 @@ elk_ViewVersions.prototype.determineVersions = function ()
 
 			document.getElementById('our' + sFilename + this.opt.aKnownLanguages[i]).innerHTML = ourLanguageVersions[sFilename];
 
-			sYourVersion = document.getElementById('your' + sFilename + this.opt.aKnownLanguages[i]).innerHTML;
-			document.getElementById('your' + sFilename + this.opt.aKnownLanguages[i]).innerHTML = sYourVersion;
+			sinstalledVersion = document.getElementById('your' + sFilename + this.opt.aKnownLanguages[i]).innerHTML;
+			document.getElementById('your' + sFilename + this.opt.aKnownLanguages[i]).innerHTML = sinstalledVersion;
 
-			if ((this.compareVersions(oHighYour.Languages, sYourVersion) || oHighYour.Languages === '??') && !oLowVersion.Languages)
-				oHighYour.Languages = sYourVersion;
+			if ((this.compareVersions(oHighYour.Languages, sinstalledVersion) || oHighYour.Languages === '??') && !oLowVersion.Languages)
+				oHighYour.Languages = sinstalledVersion;
 
 			if (this.compareVersions(oHighCurrent.Languages, ourLanguageVersions[sFilename]) || oHighCurrent.Languages === '??')
 				oHighCurrent.Languages = ourLanguageVersions[sFilename];
 
-			if (this.compareVersions(sYourVersion, ourLanguageVersions[sFilename]))
+			if (this.compareVersions(sinstalledVersion, ourLanguageVersions[sFilename]))
 			{
-				oLowVersion.Languages = sYourVersion;
+				oLowVersion.Languages = sinstalledVersion;
 				document.getElementById('your' + sFilename + this.opt.aKnownLanguages[i]).style.color = 'red';
 			}
 		}

@@ -20,6 +20,24 @@ if (!defined('ELK'))
 class Likes_Controller extends Action_Controller
 {
 	/**
+	 * Holds the ajax response
+	 * @var string[];
+	 */
+	protected $_likes_response = array();
+
+	/**
+	 * If this was an ajax request or not
+	 * @var boolean
+	 */
+	protected $_api = false;
+
+	/**
+	 * The id of the message being liked
+	 * @var int
+	 */
+	protected $_id_liked = null;
+
+	/**
 	 * Default action method, if a specific methods wasn't
 	 * directly called already. Simply forwards to likepost.
 	 *
@@ -44,6 +62,27 @@ class Likes_Controller extends Action_Controller
 	}
 
 	/**
+	 * Liking a post via ajax, then _api will be added to the sa=
+	 * and this method will be called
+	 * Calls the standard like method and then the api return method
+	 */
+	public function action_likepost_api()
+	{
+		$this->_api = true;
+		$this->action_likepost();
+	}
+
+	/**
+	 * Un liking a post via ajax
+	 * Calls the standard unlike method and then the api return method
+	 */
+	public function action_unlikepost_api()
+	{
+		$this->_api = true;
+		$this->action_unlikepost();
+	}
+
+	/**
 	 * Likes a post due to its awesomeness
 	 * Permission checks are done in prepare_likes
 	 * It redirects back to the referrer afterward.
@@ -51,39 +90,52 @@ class Likes_Controller extends Action_Controller
 	 */
 	public function action_likepost()
 	{
-		global $user_info, $topic, $modSettings;
+		global $user_info, $topic, $txt, $modSettings;
 
-		$id_liked = !empty($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : 0;
+		$this->_id_liked = !empty($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : 0;
 
 		// We like these
 		require_once(SUBSDIR . '/Likes.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');
 
 		// Have to be able to access it to like it
-		if ($this->prepare_like() && canAccessMessage($id_liked))
+		if ($this->prepare_like() && canAccessMessage($this->_id_liked))
 		{
-			$liked_message = basicMessageInfo($id_liked, true, true);
+			$liked_message = basicMessageInfo($this->_id_liked, true, true);
 			if ($liked_message)
 			{
-				likePost($user_info['id'], $liked_message, '+');
-
-				// Lets add in a mention to the member that just had their post liked
-				if (!empty($modSettings['mentions_enabled']))
+				// Like it
+				$likeResult = likePost($user_info['id'], $liked_message, '+');
+				if ($likeResult === true)
 				{
-					require_once(CONTROLLERDIR . '/Mentions.controller.php');
-					$mentions = new Mentions_Controller();
-					$mentions->setData(array(
-						'id_member' => $liked_message['id_member'],
-						'type' => 'like',
-						'id_msg' => $id_liked,
-					));
-					$mentions->action_add();
+					// Lets add in a mention to the member that just had their post liked
+					if (!empty($modSettings['mentions_enabled']))
+					{
+						require_once(CONTROLLERDIR . '/Mentions.controller.php');
+						$mentions = new Mentions_Controller();
+						$mentions->setData(array(
+							'id_member' => $liked_message['id_member'],
+							'type' => 'like',
+							'id_msg' => $this->_id_liked,
+						));
+						$mentions->action_add();
+					}
 				}
+				elseif ($this->_api)
+					$this->_likes_response = array('result' => false, 'data' => $likeResult);
+			}
+			elseif ($this->_api)
+			{
+				loadLanguage('Errors');
+				$this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
 			}
 		}
 
 		// Back to where we were, in theory
-		redirectexit('topic=' . $topic . '.msg' . $id_liked . '#msg' . $id_liked);
+		if ($this->_api)
+			$this->likeResponse();
+		else
+			redirectexit('topic=' . $topic . '.msg' . $this->_id_liked . '#msg' . $this->_id_liked);
 	}
 
 	/**
@@ -93,46 +145,93 @@ class Likes_Controller extends Action_Controller
 	 */
 	public function action_unlikepost()
 	{
-		global $user_info, $topic, $modSettings;
+		global $user_info, $topic, $txt, $modSettings;
 
-		$id_liked = !empty($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : 0;
+		$this->_id_liked = !empty($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : 0;
 
 		// We used to like these
 		require_once(SUBSDIR . '/Likes.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');
 
 		// Have to be able to access it to unlike it now
-		if ($this->prepare_like() && canAccessMessage($id_liked))
+		if ($this->prepare_like() && canAccessMessage($this->_id_liked))
 		{
-			$liked_message = basicMessageInfo($id_liked, true, true);
+			$liked_message = basicMessageInfo($this->_id_liked, true, true);
 			if ($liked_message)
 			{
-				likePost($user_info['id'], $liked_message, '-');
-
-				// Oh noes, taking the like back, let them know so they can complain
-				if (!empty($modSettings['mentions_enabled']))
+				$likeResult = likePost($user_info['id'], $liked_message, '-');
+				if ($likeResult === true)
 				{
-					require_once(CONTROLLERDIR . '/Mentions.controller.php');
-					$mentions = new Mentions_Controller();
-					$mentions->setData(array(
-						'id_member' => $liked_message['id_member'],
-						'type' => 'rlike',
-						'id_msg' => $id_liked,
-					));
+					// Oh noes, taking the like back, let them know so they can complain
+					if (!empty($modSettings['mentions_enabled']))
+					{
+						require_once(CONTROLLERDIR . '/Mentions.controller.php');
+						$mentions = new Mentions_Controller();
+						$mentions->setData(array(
+							'id_member' => $liked_message['id_member'],
+							'type' => 'rlike',
+							'id_msg' => $this->_id_liked,
+						));
 
-					if (!empty($modSettings['mentions_dont_notify_rlike']))
-						$mentions->action_rlike();
-					else
-						$mentions->action_add();
+						// Notifying that likes were removed ?
+						if (!empty($modSettings['mentions_dont_notify_rlike']))
+							$mentions->action_rlike();
+						else
+							$mentions->action_add();
+					}
 				}
+				elseif ($this->_api)
+					$this->_likes_response = array('result' => false, 'data' => $likeResult);
+			}
+			elseif ($this->_api)
+			{
+				loadLanguage('Errors');
+				$this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
 			}
 		}
 
 		// Back we go
-		if (!isset($_REQUEST['profile']))
-			redirectexit('topic=' . $topic . '.msg' . $id_liked . '#msg' . $id_liked);
+		if ($this->_api)
+			$this->likeResponse();
+		elseif (!isset($_REQUEST['profile']))
+			redirectexit('topic=' . $topic . '.msg' . $this->_id_liked . '#msg' . $this->_id_liked);
 		else
 			redirectexit('action=profile;area=showlikes;sa=given;u=' .$user_info['id']);
+	}
+
+	/**
+	 * When liking / unliking via ajax, clears the templates and returns a json
+	 * response to the page
+	 */
+	private function likeResponse()
+	{
+		global $context, $txt;
+
+		// Clear the templates
+		$template_layers = Template_Layers::getInstance();
+		$template_layers->removeAll();
+
+		// Make room for ajax
+		loadTemplate('Json');
+		$context['sub_template'] = 'send_json';
+
+		// No errors, build the new button tag
+		if (empty($this->_likes_response))
+		{
+			$details = loadLikes($this->_id_liked, true);
+			$count = empty($details) ? 0 : $details[$this->_id_liked]['count'];
+			$text = $count !== 0 ? $count . ' ' . $txt['likes'] : $txt['like_post'];
+			$title = empty($details) ? '' : $txt['liked_by'] . ' ' . implode(', ', $details[$this->_id_liked]['member']);
+			$this->_likes_response = array(
+				'result' => true,
+				'text' => $text,
+				'count' => $count,
+				'title' => $title
+			);
+		}
+
+		// Provide the response
+		$context['json_data'] = $this->_likes_response;
 	}
 
 	/**
@@ -149,7 +248,7 @@ class Likes_Controller extends Action_Controller
 
 		// If you're a guest or simply can't do this, we stop
 		is_not_guest();
-		isAllowedTo('like_posts');
+		allowedTo('like_posts');
 
 		// Load up the helpers
 		require_once(SUBSDIR . '/Likes.subs.php');

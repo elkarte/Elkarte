@@ -65,25 +65,31 @@ function template_latest_news()
 
 	// This requires a lot of javascript...
 	echo '
-								<script src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
-								<script src="', $scripturl, '?action=viewadminfile;filename=latest-news.js"></script>
+								<span style="display:none" id="installedVersion">', $context['forum_version'], '</span>
+								<span style="display:none" id="latestVersion">', $context['forum_version'], '</span>
 								<script><!-- // --><![CDATA[
-									var oAdminIndex = new elk_AdminIndex({
-										sSelf: \'oAdminCenter\',
-										bLoadAnnouncements: true,
-										sAnnouncementTemplate: ', JavaScriptEscape('
-											<dl>
-												%content%
-											</dl>
-										'), ',
-										sAnnouncementMessageTemplate: ', JavaScriptEscape('
-											<dt><a href="%href%">%subject%</a> ' . $txt['on'] . ' %time%</dt>
-											<dd>
-												%message%
-											</dd>
-										'), ',
-										sAnnouncementContainerId: \'ourAnnouncements\'
-									});
+						var oAdminCenter = new elk_AdminIndex({
+							bLoadAnnouncements: true,
+							sAnnouncementTemplate: ', JavaScriptEscape('
+								<dl>
+									%content%
+								</dl>
+							'), ',
+							sAnnouncementMessageTemplate: ', JavaScriptEscape('
+								<dt><a href="%href%">%subject%</a> ' . $txt['on'] . ' %time%</dt>
+								<dd>
+									%message%
+								</dd>
+							'), ',
+							sAnnouncementContainerId: \'ourAnnouncements\',
+
+							bLoadVersions: true,
+							slatestVersionContainerId: \'latestVersion\',
+							sinstalledVersionContainerId: \'installedVersion\',
+							sVersionOutdatedTemplate: ', JavaScriptEscape('
+								<span class="alert">%currentVersion%</span>
+							'), '
+						});
 								// ]]></script>';
 }
 

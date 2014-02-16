@@ -154,6 +154,6 @@ img#logo {
 }
 
 /* Version check */
-#elkVersion, #yourVersion {
+#elkVersion, #installedVersion {
 	white-space: nowrap;
 }

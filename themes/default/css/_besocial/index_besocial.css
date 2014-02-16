@@ -1163,6 +1163,35 @@ span.views_text {
 	text-decoration: none;
 }
 
+/*floating error box*/
+/* currently used by like funcationality*/
+.floating_error {
+	background: rgba(255, 255, 255, 1);
+	font-size: 15px;
+	color: #404040;
+	border-radius: 10px;
+	border: solid 1px #E4E4E4;
+}
+
+.floating_error .error_heading {
+	font-weight: bold;
+}
+
+.floating_error .error_msg {
+	color: #3D3C3C;
+}
+
+.floating_error .error_btn {
+	border-top: solid 1px #D6D6D6;
+	color: #157DFB;
+	font-size: 16px;
+	font-weight: bold;
+}
+
+.floating_error .error_btn:hover {
+	cursor: pointer;
+}
+
 /*	$MEDIA		*/
 /* Experimental media queries.
 /* ------------------------------------------------------- */
