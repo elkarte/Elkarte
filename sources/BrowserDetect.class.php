@@ -21,7 +21,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- *  This class is an experiment for the job of correctly detecting browsers and settings needed for them.
+ * This class is an experiment for the job of correctly detecting browsers and
+ * settings needed for them.
  * - Detects the following browsers
  * - Opera, Webkit, Firefox, Web_tv, Konqueror, IE, Gecko
  * - Webkit variants: Chrome, iphone, blackberry, android, safari, ipad, ipod
@@ -78,9 +79,6 @@ class Browser_Detector
 		$this->_browsers = array();
 		$this->_is_mobile = false;
 		$this->_is_tablet = false;
-
-		// Initialize some values we'll set differently if necessary...
-		$this->_browsers['needs_size_fix'] = false;
 
 		// Saves us many many calls
 		$req = request();
@@ -296,6 +294,10 @@ class Browser_Detector
 		{
 			if (preg_match('~OPR[/]([0-9][0-9]?[.])~i', $this->_ua, $match) === 1)
 				$this->_browsers['is_opera' . (int) trim($match[1])] = true;
+
+			// Since opera >= 15 wants to look like chrome, set the body to do just that
+			if (trim($match[1]) >= 15)
+				$this->_browsers['is_chrome'] = true;
 		}
 	}
 
@@ -304,7 +306,6 @@ class Browser_Detector
 	 *  - determines the version of the IE browser in use
 	 *  - detects ie4 onward
 	 *  - attempts to distinguish between IE and IE in compatabilty view
-	 *  - checks for old IE on macs as well, since we can
 	 */
 	private function _setupIe()
 	{
@@ -355,7 +356,7 @@ class Browser_Detector
 	}
 
 	/**
-	 * More Opera checks if we are opera.
+	 * More Opera checks if we are opera <15
 	 *  - checks for the version of Opera in use
 	 *  - uses checks for 10 first and falls through to <9
 	 */
@@ -367,9 +368,6 @@ class Browser_Detector
 		// Opera pre 10 is supposed to uses the Opera tag alone, as do some spoofers
 		elseif (preg_match('~Opera[ /]([0-9]+)(?!\\.[89])~', $this->_ua, $match))
 			$this->_browsers['is_opera' . (int) $match[1]] = true;
-
-		// Needs size fix?
-		$this->_browsers['needs_size_fix'] = !empty($this->_browsers['is_opera6']);
 	}
 
 	/**
