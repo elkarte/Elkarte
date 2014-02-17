@@ -205,12 +205,12 @@ class Site_Combiner
 	 * If the file has a 'stale' option defined it will be added to the
 	 * $_stales array as well to be used later
 	 *
-	 * @param string[] An array with all the file options:
-	 *                  - dir
-	 *                  - basename
-	 *                  - file
-	 *                  - url
-	 *                  - stale (optional)
+	 * @param string[] $options An array with all the file options:
+	 *			- dir
+	 *			- basename
+	 *			- file
+	 *			- url
+	 *			- stale (optional)
 	 */
 	private function _addFile($options)
 	{
@@ -269,7 +269,7 @@ class Site_Combiner
 	 * Combines files into a single compilation
 	 * @param string $type one of css or js
 	 */
-	private function _combineFiles($type = null)
+	private function _combineFiles($type)
 	{
 		$i = '';
 

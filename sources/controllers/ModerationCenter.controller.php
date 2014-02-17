@@ -1464,7 +1464,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 * @param int $items_per_page
 	 * @param string $sort
 	 * @param string $approve_query
-	 * @param array $delete_boards
+	 * @param int[] $delete_boards
 	 */
 	public function list_getWatchedUserPosts($start, $items_per_page, $sort, $approve_query, $delete_boards)
 	{
@@ -1475,9 +1475,9 @@ class ModerationCenter_Controller extends Action_Controller
 	/**
 	 * Callback for createList() to get all the templates of a type from the system
 	 *
-	 * @param $start
-	 * @param $items_per_page
-	 * @param $sort
+	 * @param int $start
+	 * @param int $items_per_page
+	 * @param sring $sort
 	 * @param $template_type type of template to load
 	 */
 	public function list_getWarningTemplates($start, $items_per_page, $sort, $template_type = 'warntpl')
@@ -1498,9 +1498,9 @@ class ModerationCenter_Controller extends Action_Controller
 	/**
 	 * Callback for createList() to get all issued warnings in the system
 	 *
-	 * @param $start
-	 * @param $items_per_page
-	 * @param $sort
+	 * @param int $start
+	 * @param int $items_per_page
+	 * @param string $sort
 	 */
 	public function list_getWarnings($start, $items_per_page, $sort)
 	{

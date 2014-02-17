@@ -538,7 +538,7 @@ function banPermissions()
  * Increment the hit counters for the specified ban ID's (if any.)
  *
  * @param int[] $ban_ids = array()
- * @param string $email = null
+ * @param string|null $email = null
  */
 function log_ban($ban_ids = array(), $email = null)
 {
@@ -955,7 +955,7 @@ function checkSubmitOnce($action, $is_fatal = true)
  * Always returns true if the user is an administrator.
  *
  * @param string[]|string $permission permission
- * @param int[]|null $boards = null array of board IDs
+ * @param int[]|int|null $boards array of board IDs, a single id or null
  * @return boolean if the user can do the permission
  */
 function allowedTo($permission, $boards = null)
@@ -1447,9 +1447,9 @@ function loadBadBehavior()
  * This protects against brute force attacks on a member's password.
  * Importantly, even if the password was right we DON'T TELL THEM!
  *
- * @param $id_member
- * @param $password_flood_value = false
- * @param $was_correct = false
+ * @param int $id_member
+ * @param string|false $password_flood_value = false or string joined on |'s
+ * @param boolean $was_correct = false
  */
 function validatePasswordFlood($id_member, $password_flood_value = false, $was_correct = false)
 {
@@ -1503,7 +1503,7 @@ function validatePasswordFlood($id_member, $password_flood_value = false, $was_c
 /**
  * This sets the X-Frame-Options header.
  *
- * @param string $override the frame option, defaults to deny.
+ * @param string|null $override the frame option, defaults to deny.
  */
 function frameOptionsHeader($override = null)
 {

@@ -194,10 +194,10 @@ class Emailuser_Controller extends Action_Controller
 	}
 
 	/**
-	 * Prepares the form data and database data for sending in an email format\
+	 * Prepares the form data and database data for sending in an email format
 	 * Does the actual sending of the email if everthing checks out as OK
 	 *
-	 * @param array $row
+	 * @param mixed[] $row
 	 */
 	private function _sendTopic($row)
 	{

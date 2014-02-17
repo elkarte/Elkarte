@@ -42,8 +42,8 @@ if (!defined('ELK'))
  *  post-based membergroups in the database (restricted by parameter1).
  *
  * @param string $type Stat type - can be 'member', 'message', 'topic', 'subject' or 'postgroups'
- * @param int|string|mixed[]|null $parameter1 = null pass through value
- * @param int|string|mixed[]|null $parameter2 = null pass through value
+ * @param int|string|false|mixed[]|null $parameter1 pass through value
+ * @param int|string|false|mixed[]|null $parameter2 pass through value
  */
 function updateStats($type, $parameter1 = null, $parameter2 = null)
 {

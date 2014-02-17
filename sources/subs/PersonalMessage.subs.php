@@ -1335,7 +1335,7 @@ function loadPMLimits($id_group = false)
 /**
  * Retrieve the discussion one or more PMs belong to
  *
- * @param int $id_pms
+ * @param int[] $id_pms
  */
 function getDiscussions($id_pms)
 {
@@ -1389,7 +1389,7 @@ function getPmsFromDiscussion($pm_heads)
  * Determines the PMs which need an updated label.
  *
  * @param mixed[] $to_label
- * @param string $label_type
+ * @param int[] $label_type
  * @param int $user_id
  * @return integer|null
  */

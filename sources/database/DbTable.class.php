@@ -91,7 +91,7 @@ abstract class DbTable
 	 *
 	 * @param string $table_name
 	 * @param string $old_column
-	 * @param $column_info
+	 * @param mixed[] $column_info
 	 * @param mixed[] $parameters default array()
 	 * @param string $error default 'fatal'
 	 */

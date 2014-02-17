@@ -401,7 +401,7 @@ class RemoveTopic_Controller extends Action_Controller
 	/**
 	 * Take a load of messages from one place and stick them in a topic
 	 *
-	 * @param array $msgs
+	 * @param int[] $msgs
 	 * @param integer $from_topic
 	 * @param integer $target_topic
 	 */
