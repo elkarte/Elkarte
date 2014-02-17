@@ -1541,6 +1541,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 
 			$look_for = strtolower(substr($message, $pos + 2, $pos2 - $pos - 2));
 
+			$to_close = array();
 			$block_level = null;
 
 			do
