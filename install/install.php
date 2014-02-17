@@ -54,6 +54,8 @@ $databases = array(
 		'utf8_version' => '8.0',
 		'utf8_version_check' => '$request = pg_query(\'SELECT version()\'); list ($version) = pg_fetch_row($request); list ($pgl, $version) = explode(" ", $version); return $version;',
 		'validate_prefix' => create_function('&$value', '
+			global $txt;
+			
 			$value = preg_replace(\'~[^A-Za-z0-9_\$]~\', \'\', $value);
 
 			// Is it reserved?
