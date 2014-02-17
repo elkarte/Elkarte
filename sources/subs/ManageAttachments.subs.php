@@ -1240,18 +1240,8 @@ function attachDirStatus($dir, $expected_files)
 	elseif (!is_writable($dir))
 		return array('not_writable', true, '');
 
-	// Everything is okay so far, start to scan through the directory.
-	$num_files = 0;
-	$dir_handle = dir($dir);
-	while ($file = $dir_handle->read())
-	{
-		// Now do we have a real file here?
-		if (in_array($file, array('.', '..', '.htaccess', 'index.php')))
-			continue;
-
-		$num_files++;
-	}
-	$dir_handle->close();
+	// Count the files with a glob, easier and less time consuming
+	$num_files = count(glob($dir . '/*.elk'));
 
 	if ($num_files < $expected_files)
 		return array('files_missing', true, $num_files);
