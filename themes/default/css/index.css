@@ -3570,15 +3570,14 @@ a.help .icon {
 #advanced_search dt {
 	float: left;
 	clear: both;
-	padding: 2px;
-	width: 15%;
+	padding: 2px 4px;
+	width: 35%;
 	text-align: right;
 }
 #advanced_search dd {
 	float: left;
-	margin: 0 0 0 6px;
 	padding: 3px 2px;
-	width: 80%;
+	width: 65%;
 	text-align: left;
 }
 #search_options .styled-select option {
