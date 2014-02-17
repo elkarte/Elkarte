@@ -114,9 +114,9 @@ function template_searchform()
 						</div>
 						<a id="upshrink_link" href="', $scripturl, '?action=search;basic" class="linkbutton" style="display:none">', $txt['search_simple'], '</a>';
 
-		// Set the initial state of the form
+		// Set the initial search style for the form
 		echo '
-						<input id="advanced" type="hidden" name="advanced" value="', empty($context['minmax_preferences']['asearch']) ? 1 : 0,'" />';
+						<input id="advanced" type="hidden" name="advanced" value="1" />';
 
 		// If $context['search_params']['topic'] is set, that means we're searching just one topic.
 		if (!empty($context['search_params']['topic']))
@@ -243,6 +243,9 @@ function template_searchform()
 			},
 		});
 
+		// Set the search style
+		document.getElementById(\'advanced\').value = "' . (empty($context['minmax_preferences']['asearch']) ? '1' : '0') . '";
+
 		// And allow for the collapsing of the advanced search options
 		var oSearchToggle = new elk_Toggle({
 			bToggleEnabled: true,
@@ -259,8 +262,8 @@ function template_searchform()
 			aSwapLinks: [
 				{
 					sId: \'upshrink_link\',
-					msgExpanded: \'Hide Advanced Options\',
-					msgCollapsed: \'Show Advanced Options\',
+					msgExpanded: ' . JavaScriptEscape($txt['search_simple']) . ',
+					msgCollapsed: ' . JavaScriptEscape($txt['search_advanced']) . '
 				}
 			],
 			oThemeOptions: {
