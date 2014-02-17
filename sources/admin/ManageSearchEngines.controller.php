@@ -260,11 +260,11 @@ class ManageSearchEngines_Controller extends Action_Controller
 						'value' => $txt['spider_name'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $scripturl;
 
-							return sprintf(\'<a href="%1$s?action=admin;area=sengines;sa=editspiders;sid=%2$d">%3$s</a>\', $scripturl, $rowData[\'id_spider\'], htmlspecialchars($rowData[\'spider_name\'], ENT_COMPAT, \'UTF-8\'));
-						'),
+							return sprintf('<a href="%1$s?action=admin;area=sengines;sa=editspiders;sid=%2$d">%3$s</a>', $scripturl, $rowData['id_spider'], htmlspecialchars($rowData['spider_name'], ENT_COMPAT, 'UTF-8'));
+						},
 					),
 					'sort' => array(
 						'default' => 'spider_name',
@@ -276,11 +276,11 @@ class ManageSearchEngines_Controller extends Action_Controller
 						'value' => $txt['spider_last_seen'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $context, $txt;
 
-							return isset($context[\'spider_last_seen\'][$rowData[\'id_spider\']]) ? standardTime($context[\'spider_last_seen\'][$rowData[\'id_spider\']]) : $txt[\'spider_last_never\'];
-						'),
+							return isset($context['spider_last_seen'][$rowData['id_spider']]) ? standardTime($context['spider_last_seen'][$rowData['id_spider']]) : $txt['spider_last_never'];
+						},
 					),
 				),
 				'user_agent' => array(
@@ -460,9 +460,9 @@ class ManageSearchEngines_Controller extends Action_Controller
 						'value' => $txt['spider_time'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							return standardTime($rowData[\'log_time\']);
-						'),
+						'function' => function ($rowData) {
+							return standardTime($rowData['log_time']);
+						},
 					),
 					'sort' => array(
 						'default' => 'sl.id_hit DESC',

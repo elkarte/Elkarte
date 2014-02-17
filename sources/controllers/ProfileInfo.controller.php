@@ -651,9 +651,9 @@ class ProfileInfo_Controller extends Action_Controller
 				),
 			),
 			'data_check' => array(
-				'class' => create_function('$data', '
-					return $data[\'approved\'] ? \'\' : \'approvebg\';
-				')
+				'class' => function ($data) {
+					return $data['approved'] ? '' : 'approvebg';
+				},
 			),
 			'columns' => array(
 				'filename' => array(

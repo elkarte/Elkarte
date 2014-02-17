@@ -1065,11 +1065,11 @@ class ModerationCenter_Controller extends Action_Controller
 						'value' => $txt['mc_watched_users_warning'],
 					),
 					'data' => array(
-						'function' => create_function('$member', '
+						'function' => function ($member) {
 							global $scripturl;
 
-							return allowedTo(\'issue_warning\') ? \'<a href="\' . $scripturl . \'?action=profile;area=issuewarning;u=\' . $member[\'id\'] . \'">\' . $member[\'warning\'] . \'%</a>\' : $member[\'warning\'] . \'%\';
-						'),
+							return allowedTo('issue_warning') ? '<a href="' . $scripturl . '?action=profile;area=issuewarning;u=' . $member['id'] . '">' . $member['warning'] . '%</a>' : $member['warning'] . '%';
+						},
 					),
 					'sort' => array(
 						'default' => 'warning',
@@ -1111,14 +1111,14 @@ class ModerationCenter_Controller extends Action_Controller
 						'value' => $txt['mc_watched_users_last_post'],
 					),
 					'data' => array(
-						'function' => create_function('$member', '
+						'function' => function ($member) {
 							global $scripturl;
 
-							if ($member[\'last_post_id\'])
-								return \'<a href="\' . $scripturl . \'?msg=\' . $member[\'last_post_id\'] . \'">\' . $member[\'last_post\'] . \'</a>\';
+							if ($member['last_post_id'])
+								return '<a href="' . $scripturl . '?msg=' . $member['last_post_id'] . '">' . $member['last_post'] . '</a>';
 							else
-								return $member[\'last_post\'];
-						'),
+								return $member['last_post'];
+						},
 					),
 				),
 			),
@@ -1146,9 +1146,9 @@ class ModerationCenter_Controller extends Action_Controller
 			$listOptions['columns'] = array(
 				'posts' => array(
 					'data' => array(
-						'function' => create_function('$post', '
+						'function' => function ($post) {
 							return template_user_watch_post_callback($post);
-						'),
+						},
 					),
 				),
 			);
@@ -1231,19 +1231,19 @@ class ModerationCenter_Controller extends Action_Controller
 						'value' => $txt['profile_warning_previous_reason'],
 					),
 					'data' => array(
-						'function' => create_function('$warning', '
+						'function' => function ($warning) {
 							global $scripturl, $settings, $txt;
 
-							$output = \'
+							$output = '
 								<div class="floatleft">
-									\' . $warning[\'reason\'] . \'
-								</div>\';
+									' . $warning['reason'] . '
+								</div>';
 
-							if (!empty($warning[\'id_notice\']))
-								$output .= \'
-									<a href="\' . $scripturl . \'?action=moderate;area=notice;nid=\' . $warning[\'id_notice\'] . \'" onclick="window.open(this.href, \\\'\\\', \\\'scrollbars=yes,resizable=yes,width=480,height=320\\\');return false;" target="_blank" class="new_win" title="\' . $txt[\'profile_warning_previous_notice\'] . \'"><img src="\' . $settings[\'default_images_url\'] . \'/filter.png" alt="\' . $txt[\'profile_warning_previous_notice\'] . \'" /></a>\';
+							if (!empty($warning['id_notice']))
+								$output .= '
+									<a href="' . $scripturl . '?action=moderate;area=notice;nid=' . $warning['id_notice'] . '" onclick="window.open(this.href, \'\', \'scrollbars=yes,resizable=yes,width=480,height=320\');return false;" target="_blank" class="new_win" title="' . $txt['profile_warning_previous_notice'] . '"><img src="' . $settings['default_images_url'] . '/filter.png" alt="' . $txt['profile_warning_previous_notice'] . '" /></a>';
 							return $output;
-						'),
+						},
 					),
 				),
 				'points' => array(
@@ -1356,9 +1356,9 @@ class ModerationCenter_Controller extends Action_Controller
 						'style' => 'width: 4%;text-align: center;',
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							return \'<input type="checkbox" name="deltpl[]" value="\' . $rowData[\'id_comment\'] . \'" class="input_check" />\';
-						'),
+						'function' => function ($rowData) {
+							return '<input type="checkbox" name="deltpl[]" value="' . $rowData['id_comment'] . '" class="input_check" />';
+						},
 						'class' => 'centertext',
 					),
 				),

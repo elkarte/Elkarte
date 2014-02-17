@@ -429,11 +429,11 @@ class ManageSmileys_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $settings;
 
-							return $rowData[\'selected\'] ? \'<img src="\' . $settings[\'images_url\'] . \'/icons/field_valid.png" alt="*" class="icon" />\' : \'\';
-						'),
+							return $rowData['selected'] ? '<img src="' . $settings['images_url'] . '/icons/field_valid.png" alt="*" class="icon" />' : '';
+						},
 						'class' => 'centertext',
 					),
 					'sort' => array(
@@ -488,9 +488,9 @@ class ManageSmileys_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							return $rowData[\'id\'] == 0 ? \'\' : sprintf(\'<input type="checkbox" name="smiley_set[%1$d]" class="input_check" />\', $rowData[\'id\']);
-						'),
+						'function' => function ($rowData) {
+							return $rowData['id'] == 0 ? '' : sprintf('<input type="checkbox" name="smiley_set[%1$d]" class="input_check" />', $rowData['id']);
+						},
 						'class' => 'centertext',
 					),
 				),
@@ -919,16 +919,16 @@ class ManageSmileys_Controller extends Action_Controller
 							'value' => $txt['smileys_location'],
 						),
 						'data' => array(
-							'function' => create_function('$rowData', '
+							'function' => function ($rowData) {
 								global $txt;
 
-								if (empty($rowData[\'hidden\']))
-									return $txt[\'smileys_location_form\'];
-								elseif ($rowData[\'hidden\'] == 1)
-									return $txt[\'smileys_location_hidden\'];
+								if (empty($rowData['hidden']))
+									return $txt['smileys_location_form'];
+								elseif ($rowData['hidden'] == 1)
+									return $txt['smileys_location_hidden'];
 								else
-									return $txt[\'smileys_location_popup\'];
-							'),
+									return $txt['smileys_location_popup'];
+							},
 						),
 						'sort' => array(
 							'default' => 'FIND_IN_SET(hidden, \'' . implode(',', array_keys($smiley_locations)) . '\')',
@@ -940,24 +940,25 @@ class ManageSmileys_Controller extends Action_Controller
 							'value' => $txt['smileys_description'],
 						),
 						'data' => array(
-							'function' => create_function('$rowData', empty($modSettings['smileys_dir']) || !is_dir($modSettings['smileys_dir']) ? '
-								return htmlspecialchars($rowData[\'description\'], ENT_COMPAT, \'UTF-8\');
-							' : '
+							'function' => function ($rowData) {
 								global $context, $txt, $modSettings;
+
+								if (empty($modSettings['smileys_dir']) || !is_dir($modSettings['smileys_dir'])) 
+									return htmlspecialchars($rowData['description'], ENT_COMPAT, 'UTF-8');
 
 								// Check if there are smileys missing in some sets.
 								$missing_sets = array();
-								foreach ($context[\'smiley_sets\'] as $smiley_set)
-									if (!file_exists(sprintf(\'%1$s/%2$s/%3$s\', $modSettings[\'smileys_dir\'], $smiley_set[\'path\'], $rowData[\'filename\'])))
-										$missing_sets[] = $smiley_set[\'path\'];
+								foreach ($context['smiley_sets'] as $smiley_set)
+									if (!file_exists(sprintf('%1$s/%2$s/%3$s', $modSettings['smileys_dir'], $smiley_set['path'], $rowData['filename'])))
+										$missing_sets[] = $smiley_set['path'];
 
-								$description = htmlspecialchars($rowData[\'description\'], ENT_COMPAT, \'UTF-8\');
+								$description = htmlspecialchars($rowData['description'], ENT_COMPAT, 'UTF-8');
 
 								if (!empty($missing_sets))
-									$description .= sprintf(\'<br /><span class="smalltext"><strong>%1$s:</strong> %2$s</span>\', $txt[\'smileys_not_found_in_set\'], implode(\', \', $missing_sets));
+									$description .= sprintf('<br /><span class="smalltext"><strong>%1$s:</strong> %2$s</span>', $txt['smileys_not_found_in_set'], implode(', ', $missing_sets));
 
 								return $description;
-							'),
+							},
 						),
 						'sort' => array(
 							'default' => 'description',
