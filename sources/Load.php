@@ -1178,13 +1178,16 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	$member = empty($user_info['id']) ? -1 : $user_info['id'];
 
+	// Do we already have this members theme data and specific options loaded (for agressive cache settings)
 	if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2 && ($temp = cache_get_data('theme_settings-' . $id_theme . ':' . $member, 60)) != null && time() - 60 > $modSettings['settings_updated'])
 	{
 		$themeData = $temp;
 		$flag = true;
 	}
+	// Or do we just have the system wide theme settings cached
 	elseif (($temp = cache_get_data('theme_settings-' . $id_theme, 90)) != null && time() - 60 > $modSettings['settings_updated'])
 		$themeData = $temp + array($member => array());
+	// Nothing at all then
 	else
 		$themeData = array(-1 => array(), 0 => array(), $member => array());
 
@@ -1228,6 +1231,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 			}
 		}
 
+		// If being aggressive we save the site wide and member theme settings
 		if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
 			cache_put_data('theme_settings-' . $id_theme . ':' . $member, $themeData, 60);
 		// Only if we didn't already load that part of the cache...
