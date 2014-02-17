@@ -530,7 +530,7 @@ function template_subject_list()
  */
 function template_search()
 {
-	global $context, $scripturl, $txt, $modSettings;
+	global $context, $scripturl, $txt;
 
 	echo '
 	<form action="', $scripturl, '?action=pm;sa=search2" method="post" accept-charset="UTF-8" name="searchform" id="searchform">
@@ -678,41 +678,41 @@ function template_search()
 					sAdditionalVars: \';minmax_key=pm\'
 				},
 			});', true);
-		}
+	}
 
-		// And the JS to make the advanced / basic form work
-		addInlineJavascript('
-			// Set the search style
-			document.getElementById(\'advanced\').value = "' . (empty($context['minmax_preferences']['pmsearch']) ? '1' : '0') . '";
+	// And the JS to make the advanced / basic form work
+	addInlineJavascript('
+		// Set the search style
+		document.getElementById(\'advanced\').value = "' . (empty($context['minmax_preferences']['pmsearch']) ? '1' : '0') . '";
 
-			// And allow for the collapsing of the advanced search options
-			var oSearchToggle = new elk_Toggle({
-				bToggleEnabled: true,
-				bCurrentlyCollapsed: ' . (empty($context['minmax_preferences']['pmsearch']) ? 'false' : 'true') . ',
-				funcOnBeforeCollapse: function () {
-					document.getElementById(\'advanced\').value = \'0\';
-				},
-				funcOnBeforeExpand: function () {
-					document.getElementById(\'advanced\').value = \'1\';
-				},
-				aSwappableContainers: [
-					\'advanced_search\'
-				],
-				aSwapLinks: [
-					{
-						sId: \'upshrink_link\',
-						msgExpanded: ' . JavaScriptEscape($txt['search_simple']) . ',
-						msgCollapsed: ' . JavaScriptEscape($txt['search_advanced']) . '
-					}
-				],
-				oThemeOptions: {
-					bUseThemeSettings: ' . ($context['user']['is_guest'] ? 'false' : 'true') . ',
-					sOptionName: \'minmax_preferences\',
-					sSessionId: elk_session_id,
-					sSessionVar: elk_session_var,
-					sAdditionalVars: \';minmax_key=pmsearch\'
-				},
-			});', true);
+		// And allow for the collapsing of the advanced search options
+		var oSearchToggle = new elk_Toggle({
+			bToggleEnabled: true,
+			bCurrentlyCollapsed: ' . (empty($context['minmax_preferences']['pmsearch']) ? 'false' : 'true') . ',
+			funcOnBeforeCollapse: function () {
+				document.getElementById(\'advanced\').value = \'0\';
+			},
+			funcOnBeforeExpand: function () {
+				document.getElementById(\'advanced\').value = \'1\';
+			},
+			aSwappableContainers: [
+				\'advanced_search\'
+			],
+			aSwapLinks: [
+				{
+					sId: \'upshrink_link\',
+					msgExpanded: ' . JavaScriptEscape($txt['search_simple']) . ',
+					msgCollapsed: ' . JavaScriptEscape($txt['search_advanced']) . '
+				}
+			],
+			oThemeOptions: {
+				bUseThemeSettings: ' . ($context['user']['is_guest'] ? 'false' : 'true') . ',
+				sOptionName: \'minmax_preferences\',
+				sSessionId: elk_session_id,
+				sSessionVar: elk_session_var,
+				sAdditionalVars: \';minmax_key=pmsearch\'
+			},
+		});', true);
 
 	echo '
 	</form>';
