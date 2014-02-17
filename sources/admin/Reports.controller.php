@@ -694,19 +694,18 @@ function newTable($title = '', $default_value = '', $shading = 'all', $width_nor
 
 /**
  * Adds an array of data into an existing table.
- * if there are no existing tables, will create one with default
- * attributes.
- * if custom_table isn't specified, it will use the last table created,
- * if it is specified and doesn't exist the function will return false.
- * if a set of keys have been specified, the function will check each
+ * - if there are no existing tables, will create one with default attributes.
+ * - if custom_table isn't specified, it will use the last table created,
+ * - if it is specified and doesn't exist the function will return false.
+ * - if a set of keys have been specified, the function will check each
  * required key is present in the incoming data. If this data is missing
  * the current tables default value will be used.
- * if any key in the incoming data begins with '#sep#', the function
+ * - if any key in the incoming data begins with '#sep#', the function
  * will add a separator accross the table at this point.
  * once the incoming data has been sanitized, it is added to the table.
  *
- * @param array $inc_data
- * @param int $custom_table = null
+ * @param mixed[] $inc_data
+ * @param int|null $custom_table = null
  */
 function addData($inc_data, $custom_table = null)
 {
@@ -770,7 +769,7 @@ function addData($inc_data, $custom_table = null)
  * Add a separator row, only really used when adding data by rows.
  *
  * @param string $title = ''
- * @param string $custom_table = null
+ * @param string|null $custom_table = null
  *
  * @return null|false false if there are no tables
  */
@@ -833,18 +832,18 @@ function finishTables()
 }
 
 /**
- * Set the keys in use by the tables - these ensure entries MUST exist if the data isn't sent.
- *
- * sets the current set of "keys" expected in each data array passed to
- * addData. It also sets the way we are adding data to the data table.
- * method specifies whether the data passed to addData represents a new
+ * Set the keys in use by the tables - these ensure entries MUST exist if the data isn't sent
+ *  - sets the current set of "keys" expected in each data array passed to
+ * addData.
+ * - It also sets the way we are adding data to the data table.
+ * - method specifies whether the data passed to addData represents a new
  * column, or a new row.
- * keys is an array whose keys are the keys for data being passed to addData().
- * if reverse is set to true, then the values of the variable "keys"
+ * - keys is an array whose keys are the keys for data being passed to addData().
+ * - if reverse is set to true, then the values of the variable "keys"
  * are used as oppossed to the keys(!
  *
  * @param string $method = 'rows' rows or cols
- * @param array $keys = array()
+ * @param mixed[] $keys = array()
  * @param bool $reverse = false
  */
 function setKeys($method = 'rows', $keys = array(), $reverse = false)

@@ -395,11 +395,10 @@ class News_Controller extends Action_Controller
 	}
 
 	/**
-	 * Get the latest topics information from a specific board,
-	 * to display later.
+	 * Get the latest topics information from a specific board, to display later.
 	 * The returned array will be generated to match the xmf_format.
 	 *
-	 * @param $xml_format
+	 * @param string $xml_format one of rss, rss2, rdf, atom
 	 * @return mixed[] array of topics
 	 */
 	public function action_xmlnews($xml_format)
@@ -500,7 +499,7 @@ class News_Controller extends Action_Controller
 	 * Get the recent topics to display.
 	 * The returned array will be generated to match the xml_format.
 	 *
-	 * @param $xml_format
+	 * @param string $xml_format one of rss, rss2, rdf, atom
 	 * @return mixed[] of recent posts
 	 */
 	public function action_xmlrecent($xml_format)
@@ -608,7 +607,7 @@ class News_Controller extends Action_Controller
 	 * Get the profile information for member into an array,
 	 * which will be generated to match the xml_format.
 	 *
-	 * @param $xml_format
+	 * @param string $xml_format one of rss, rss2, rdf, atom
 	 * @return mixed[] array of profile data.
 	 */
 	public function action_xmlprofile($xml_format)
@@ -851,12 +850,12 @@ function cdata_parse($data, $ns = '')
  * Additionally formats data based on the specific format passed.
  * This function is recursively called to handle sub arrays of data.
 
- * @param array $data the array to output as xml data
+ * @param mixed[] $data the array to output as xml data
  * @param int $i the amount of indentation to use.
- * @param string $tag if specified, it will be used instead of the keys of data.
- * @param string $xml_format
+ * @param string|null $tag if specified, it will be used instead of the keys of data.
+ * @param string $xml_format  one of rss, rss2, rdf, atom
  */
-function dumpTags($data, $i, $tag = null, $xml_format = '')
+function dumpTags($data, $i, $tag = null, $xml_format = 'rss')
 {
 	// For every array in the data...
 	foreach ($data as $key => $val)

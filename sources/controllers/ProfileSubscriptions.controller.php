@@ -240,6 +240,8 @@ class ProfileSubscriptions_Controller extends Action_Controller
 	 * which will point to subscriptions.php
 	 *
 	 * ?action=profile;u=123;area=subscriptions;sub_id=?;done
+	 *
+	 * @param int $memID
 	 */
 	private function _orderDone($memID)
 	{

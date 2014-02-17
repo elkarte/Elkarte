@@ -87,6 +87,11 @@ class Curl_Fetch_Webdata
 	private $_headers = array();
 
 	/**
+	 * Holds the options for this request
+	 */
+	private $_options = array();
+
+	/**
 	 * Start the cURL object
 	 * - allow for user override values
 	 *
@@ -108,6 +113,7 @@ class Curl_Fetch_Webdata
 	 *  - calls _setOptions to set the curl opts array values based on the defaults and user input
 	 *
 	 * @param string $url the site we are going to fetch
+	 * @param mixed[]|string $post_data data to send in the curl request as post data
 	 */
 	public function get_url_data($url, $post_data = array())
 	{
@@ -138,7 +144,7 @@ class Curl_Fetch_Webdata
 		if ($url == '')
 			return false;
 		else
-			$this->options[CURLOPT_URL] = $url;
+			$this->_options[CURLOPT_URL] = $url;
 
 		// If we have not already been redirected, set it up so we can
 		if (!$redirect)
@@ -149,7 +155,7 @@ class Curl_Fetch_Webdata
 
 		// Initialize the curl object and make the call
 		$cr = curl_init();
-		curl_setopt_array($cr, $this->options);
+		curl_setopt_array($cr, $this->_options);
 		curl_exec($cr);
 
 		// Get what was returned
@@ -227,7 +233,7 @@ class Curl_Fetch_Webdata
 	 *  - Can be called as ->result_raw(x) where x is a specific loop results.
 	 *  - Call as ->result_raw() for everything.
 	 *
-	 * @param int $response_number
+	 * @param int|string $response_number
 	 */
 	public function result_raw($response_number = '')
 	{
@@ -279,16 +285,16 @@ class Curl_Fetch_Webdata
 		{
 			$keys = array_merge(array_keys($this->default_options), array_keys($this->_user_options));
 			$vals = array_merge($this->default_options, $this->_user_options);
-			$this->options = array_combine($keys, $vals);
+			$this->_options = array_combine($keys, $vals);
 		}
 		else
-			$this->options = $this->default_options;
+			$this->_options = $this->default_options;
 
 		// POST data options, here we don't allow any override
 		if (isset($this->_post_data))
 		{
-			$this->options[CURLOPT_POST] = 1;
-			$this->options[CURLOPT_POSTFIELDS] = $this->_post_data;
+			$this->_options[CURLOPT_POST] = 1;
+			$this->_options[CURLOPT_POSTFIELDS] = $this->_post_data;
 		}
 	}
 
@@ -303,7 +309,7 @@ class Curl_Fetch_Webdata
 	{
 		// No no I last saw that over there ... really, 301, 302, 307
 		$this->_setOptions();
-		$this->options[CURLOPT_REFERER] = $referer_url;
+		$this->_options[CURLOPT_REFERER] = $referer_url;
 		$this->_curlRequest($target_url, true);
 	}
 

@@ -272,7 +272,7 @@ class Emailpost_Controller extends Action_Controller
 	 * @param string $data raw email string, including headers
 	 * @return boolean
 	 */
-	public function action_pbe_preview($data = null)
+	public function action_pbe_preview($data)
 	{
 		global $txt, $modSettings;
 
@@ -581,7 +581,7 @@ function pbe_create_topic($pbe, $email_message, $board_info)
  *
  * @param boolean $html
  * @param Email_Parse $email_message
- * @param array $pbe
+ * @param mixed[] $pbe
  *
  * @return string
  */

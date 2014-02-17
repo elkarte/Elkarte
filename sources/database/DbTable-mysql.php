@@ -307,8 +307,8 @@ class DbTable_MySQL extends DbTable
 	 * Change a column.
 	 *
 	 * @param string $table_name
-	 * @param $old_column
-	 * @param $column_info
+	 * @param string $old_column
+	 * @param mixed[] $column_info
 	 * @param mixed[] $parameters default array()
 	 * @param string $error default 'fatal'
 	 */

@@ -2190,7 +2190,7 @@ class PersonalMessage_Controller extends Action_Controller
 	/**
 	 * Used to highlight body text with strings that match the search term
 	 * Callback function used in $body_highlighted
-	 * 
+	 *
 	 * @param string[] $matches
 	 */
 	private function _highlighted_callback($matches)
@@ -2554,8 +2554,8 @@ function preparePMContext_callback($type = 'subject', $reset = false)
 /**
  * An error in the message...
  *
- * @param array $named_recipients
- * @param array $recipient_ids
+ * @param mixed[] $named_recipients
+ * @param int[] $recipient_ids
  */
 function messagePostError($named_recipients, $recipient_ids = array())
 {
@@ -2696,7 +2696,7 @@ function messagePostError($named_recipients, $recipient_ids = array())
  * Will load a draft if selected is supplied via post
  *
  * @param int $member_id
- * @param int $id_pm = false if set, it will try to load drafts for this id
+ * @param int|false $id_pm = false if set, it will try to load drafts for this id
  * @return false|null
  */
 function prepareDraftsContext($member_id, $id_pm = false)

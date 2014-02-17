@@ -63,7 +63,7 @@ function associatedPoll($topicID, $pollID = null)
 /**
  * Remove a poll.
  *
- * @param int $pollID
+ * @param int[] $pollID
  */
 function removePoll($pollID)
 {

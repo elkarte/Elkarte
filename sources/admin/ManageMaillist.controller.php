@@ -1843,9 +1843,9 @@ class ManageMaillist_Controller extends Action_Controller
 	/**
 	 * Callback for createList() to get all the bounce templates from the system
 	 *
-	 * @param $start
-	 * @param $items_per_page
-	 * @param $sort
+	 * @param int $start
+	 * @param int $items_per_page
+	 * @param string $sort
 	 * @param $template_type type of template to load
 	 */
 	public function list_getBounceTemplates($start, $items_per_page, $sort)

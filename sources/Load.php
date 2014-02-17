@@ -775,7 +775,7 @@ function loadPermissions()
 /**
  * Loads an array of users' data by ID or member_name.
  *
- * @param mixed $users An array of users by id or name
+ * @param int[]|int|string[]|string $users An array of users by id or name
  * @param bool $is_name = false $users is by name or by id
  * @param string $set = 'normal' What kind of data to load (normal, profile, minimal)
  * @return array|bool The ids of the members loaded or false
@@ -1730,9 +1730,10 @@ function loadEssentialThemeData()
  * What this function does:
  *  - loads a template file with the name template_name from the current, default, or base theme.
  *  - detects a wrong default theme directory and tries to work around it.
+ *	- can be used to only load style sheets by using false as the template name
  *
  * @uses the template_include() function to include the file.
- * @param string $template_name
+ * @param string|false $template_name
  * @param string[]|string $style_sheets any style sheets to load with the template
  * @param bool $fatal = true if fatal is true, dies with an error message if the template cannot be found
  *

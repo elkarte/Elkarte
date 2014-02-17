@@ -354,7 +354,7 @@ class ModLogEntriesReplacement
 	 *
 	 * @param string[] $matches
 	 */
-	function callback($matches)
+	public function callback($matches)
 	{
 		if (isset($this->entries[$this->key]['extra'][$matches[1]]))
 			return $this->entries[$this->key]['extra'][$matches[1]];

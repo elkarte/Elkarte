@@ -962,7 +962,7 @@ class Post_Controller extends Action_Controller
 
 			// Load up the drag and drop attachment magic
 			addInlineJavascript('
-			var dropAttach = dragDropAttachment.init({
+			var dropAttach = dragDropAttachment.prototype.init({
 				board: ' . $board . ',
 				allowedExtensions: ' . JavaScriptEscape($context['attachments']['allowed_extensions']) . ',
 				totalSizeAllowed: ' . JavaScriptEscape(empty($modSettings['attachmentPostLimit']) ? '' : $modSettings['attachmentPostLimit']) . ',
@@ -2305,7 +2305,7 @@ class Post_Controller extends Action_Controller
 	 * Will load a draft if selected is supplied via post
 	 *
 	 * @param int $member_id
-	 * @param int $id_topic if set, load drafts for the specified topic
+	 * @param int|false $id_topic if set, load drafts for the specified topic
 	 * @return false|null
 	 */
 	private function _prepareDraftsContext($member_id, $id_topic = false)
