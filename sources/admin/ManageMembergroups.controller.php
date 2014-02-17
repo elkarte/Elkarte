@@ -137,25 +137,25 @@ class ManageMembergroups_Controller extends Action_Controller
 						'value' => $txt['membergroups_name'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $scripturl;
 
 							// Since the moderator group has no explicit members, no link is needed.
-							if ($rowData[\'id_group\'] == 3)
-								$group_name = $rowData[\'group_name\'];
+							if ($rowData['id_group'] == 3)
+								$group_name = $rowData['group_name'];
 							else
 							{
-								$group_name = sprintf(\'<a href="%1$s?action=admin;area=membergroups;sa=members;group=%2$d">%3$s</a>\', $scripturl, $rowData[\'id_group\'], $rowData[\'group_name_color\']);
+								$group_name = sprintf('<a href="%1$s?action=admin;area=membergroups;sa=members;group=%2$d">%3$s</a>', $scripturl, $rowData['id_group'], $rowData['group_name_color']);
 							}
 
 							// Add a help option for moderator and administrator.
-							if ($rowData[\'id_group\'] == 1)
-								$group_name .= sprintf(\' (<a href="%1$s?action=quickhelp;help=membergroup_administrator" onclick="return reqOverlayDiv(this.href);">?</a>)\', $scripturl);
-							elseif ($rowData[\'id_group\'] == 3)
-								$group_name .= sprintf(\' (<a href="%1$s?action=quickhelp;help=membergroup_moderator" onclick="return reqOverlayDiv(this.href);">?</a>)\', $scripturl);
+							if ($rowData['id_group'] == 1)
+								$group_name .= sprintf(' (<a href="%1$s?action=quickhelp;help=membergroup_administrator" onclick="return reqOverlayDiv(this.href);">?</a>)', $scripturl);
+							elseif ($rowData['id_group'] == 3)
+								$group_name .= sprintf(' (<a href="%1$s?action=quickhelp;help=membergroup_moderator" onclick="return reqOverlayDiv(this.href);">?</a>)', $scripturl);
 
 							return $group_name;
-						'),
+						},
 					),
 					'sort' => array(
 						'default' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, mg.group_name',
@@ -167,14 +167,14 @@ class ManageMembergroups_Controller extends Action_Controller
 						'value' => $txt['membergroups_icons'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $settings;
 
-							if (!empty($rowData[\'icons\'][0]) && !empty($rowData[\'icons\'][1]))
-								return str_repeat(\'<img src="\' . $settings[\'images_url\'] . \'/group_icons/\' . $rowData[\'icons\'][1] . \'" alt="*" />\', $rowData[\'icons\'][0]);
+							if (!empty($rowData['icons'][0]) && !empty($rowData['icons'][1]))
+								return str_repeat('<img src="' . $settings['images_url'] . '/group_icons/' . $rowData['icons'][1] . '" alt="*" />', $rowData['icons'][0]);
 							else
-								return \'\';
-						'),
+								return '';
+						},
 					),
 					'sort' => array(
 						'default' => 'mg.icons',
@@ -186,12 +186,12 @@ class ManageMembergroups_Controller extends Action_Controller
 						'value' => $txt['membergroups_members_top'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $txt;
 
 							// No explicit members for the moderator group.
-							return $rowData[\'id_group\'] == 3 ? $txt[\'membergroups_guests_na\'] : comma_format($rowData[\'num_members\']);
-						'),
+							return $rowData['id_group'] == 3 ? $txt['membergroups_guests_na'] : comma_format($rowData['num_members']);
+						},
 					),
 					'sort' => array(
 						'default' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, 1',
@@ -249,11 +249,11 @@ class ManageMembergroups_Controller extends Action_Controller
 						'value' => $txt['membergroups_name'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $scripturl;
 
-							return sprintf(\'<a href="%1$s?action=admin;area=membergroups;sa=members;group=%2$d">%3$s</a>\', $scripturl, $rowData[\'id_group\'], $rowData[\'group_name_color\']);
-						'),
+							return sprintf('<a href="%1$s?action=admin;area=membergroups;sa=members;group=%2$d">%3$s</a>', $scripturl, $rowData['id_group'], $rowData['group_name_color']);
+						},
 					),
 					'sort' => array(
 						'default' => 'mg.group_name',
@@ -265,14 +265,14 @@ class ManageMembergroups_Controller extends Action_Controller
 						'value' => $txt['membergroups_icons'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $settings;
 
-							if (!empty($rowData[\'icons\'][0]) && !empty($rowData[\'icons\'][1]))
-								return str_repeat(\'<img src="\' . $settings[\'images_url\'] . \'/group_icons/\' . $rowData[\'icons\'][1] . \'" alt="*" />\', $rowData[\'icons\'][0]);
+							if (!empty($rowData['icons'][0]) && !empty($rowData['icons'][1]))
+								return str_repeat('<img src="' . $settings['images_url'] . '/group_icons/' . $rowData['icons'][1] . '" alt="*" />', $rowData['icons'][0]);
 							else
-								return \'\';
-						'),
+								return '';
+						},
 					),
 					'sort' => array(
 						'default' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, icons',

@@ -324,11 +324,11 @@ class Attachment_Controller extends Action_Controller
 		{
 			$req = request();
 			if (strpos($req->user_agent(), 'Windows') !== false)
-				$callback = create_function('$buffer', 'return preg_replace(\'~[\r]?\n~\', "\r\n", $buffer);');
+				$callback = function ($buffer) {return preg_replace('~[\r]?\n~', "\r\n", $buffer);};
 			elseif (strpos($req->user_agent(), 'Mac') !== false)
-				$callback = create_function('$buffer', 'return preg_replace(\'~[\r]?\n~\', "\r", $buffer);');
+				$callback = function ($buffer) {return preg_replace('~[\r]?\n~', "\r", $buffer);};
 			else
-				$callback = create_function('$buffer', 'return preg_replace(\'~[\r]?\n~\', "\n", $buffer);');
+				$callback = function ($buffer) {return preg_replace('~[\r]?\n~', "\n", $buffer);};
 		}
 
 		// Since we don't do output compression for files this large...

@@ -866,11 +866,11 @@ class ManageFeatures_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							$isChecked = $rowData[\'disabled\'] ? \'\' : \' checked="checked"\';
-							$onClickHandler = $rowData[\'can_show_register\'] ? sprintf(\'onclick="document.getElementById(\\\'reg_%1$s\\\').disabled = !this.checked;"\', $rowData[\'id\']) : \'\';
-							return sprintf(\'<input type="checkbox" name="active[]" id="active_%1$s" value="%1$s" class="input_check" %2$s %3$s />\', $rowData[\'id\'], $isChecked, $onClickHandler);
-						'),
+						'function' => function ($rowData) {
+							$isChecked = $rowData['disabled'] ? '' : ' checked="checked"';
+							$onClickHandler = $rowData['can_show_register'] ? sprintf('onclick="document.getElementById(\'reg_%1$s\').disabled = !this.checked;"', $rowData['id']) : '';
+							return sprintf('<input type="checkbox" name="active[]" id="active_%1$s" value="%1$s" class="input_check" %2$s %3$s />', $rowData['id'], $isChecked, $onClickHandler);
+						},
 						'style' => 'width: 20%;',
 						'class' => 'centertext',
 					),
@@ -881,11 +881,11 @@ class ManageFeatures_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							$isChecked = $rowData[\'on_register\'] && !$rowData[\'disabled\'] ? \' checked="checked"\' : \'\';
-							$isDisabled = $rowData[\'can_show_register\'] ? \'\' : \' disabled="disabled"\';
-							return sprintf(\'<input type="checkbox" name="reg[]" id="reg_%1$s" value="%1$s" class="input_check" %2$s %3$s />\', $rowData[\'id\'], $isChecked, $isDisabled);
-						'),
+						'function' => function ($rowData) {
+							$isChecked = $rowData['on_register'] && !$rowData['disabled'] ? ' checked="checked"' : '';
+							$isDisabled = $rowData['can_show_register'] ? '' : ' disabled="disabled"';
+							return sprintf('<input type="checkbox" name="reg[]" id="reg_%1$s" value="%1$s" class="input_check" %2$s %3$s />', $rowData['id'], $isChecked, $isDisabled);
+						},
 						'style' => 'width: 20%;',
 						'class' => 'centertext',
 					),
@@ -943,11 +943,11 @@ class ManageFeatures_Controller extends Action_Controller
 						'value' => $txt['custom_profile_fieldname'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $scripturl;
 
-							return sprintf(\'<a href="%1$s?action=admin;area=featuresettings;sa=profileedit;fid=%2$d">%3$s</a><div class="smalltext">%4$s</div>\', $scripturl, $rowData[\'id_field\'], $rowData[\'field_name\'], $rowData[\'field_desc\']);
-						'),
+							return sprintf('<a href="%1$s?action=admin;area=featuresettings;sa=profileedit;fid=%2$d">%3$s</a><div class="smalltext">%4$s</div>', $scripturl, $rowData['id_field'], $rowData['field_name'], $rowData['field_desc']);
+						},
 						'style' => 'width: 65%;',
 					),
 					'sort' => array(
@@ -960,12 +960,12 @@ class ManageFeatures_Controller extends Action_Controller
 						'value' => $txt['custom_profile_fieldtype'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $txt;
 
-							$textKey = sprintf(\'custom_profile_type_%1$s\', $rowData[\'field_type\']);
+							$textKey = sprintf('custom_profile_type_%1$s', $rowData['field_type']);
 							return isset($txt[$textKey]) ? $txt[$textKey] : $textKey;
-						'),
+						},
 						'style' => 'width: 10%;',
 					),
 					'sort' => array(
@@ -979,10 +979,10 @@ class ManageFeatures_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							$isChecked = $rowData[\'active\'] ? \' checked="checked"\' :  \'\';
-							return sprintf(\'<input type="checkbox" name="cust[]" id="cust_%1$s" value="%1$s" class="input_check"%2$s />\', $rowData[\'id_field\'], $isChecked);
-						'),
+						'function' => function ($rowData) {
+							$isChecked = $rowData['active'] ? ' checked="checked"' :  '';
+							return sprintf('<input type="checkbox" name="cust[]" id="cust_%1$s" value="%1$s" class="input_check"%2$s />', $rowData['id_field'], $isChecked);
+						},
 						'style' => 'width: 8%;',
 						'class' => 'centertext',
 					),
@@ -996,11 +996,11 @@ class ManageFeatures_Controller extends Action_Controller
 						'value' => $txt['custom_profile_placement'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $txt;
 
-							return $txt[\'custom_profile_placement_\' . (empty($rowData[\'placement\']) ? \'standard\' : ($rowData[\'placement\'] == 1 ? \'withicons\' : \'abovesignature\'))];
-						'),
+							return $txt['custom_profile_placement_' . (empty($rowData['placement']) ? 'standard' : ($rowData['placement'] == 1 ? 'withicons' : 'abovesignature'))];
+						},
 						'style' => 'width: 5%;',
 					),
 					'sort' => array(

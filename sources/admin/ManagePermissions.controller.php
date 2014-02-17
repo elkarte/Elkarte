@@ -185,29 +185,29 @@ class ManagePermissions_Controller extends Action_Controller
 						'value' => $txt['membergroups_name'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $scripturl, $txt;
 
 							// Since the moderator group has no explicit members, no link is needed.
 							// Since guests and regular members are not groups, no link is needed.
-							if (in_array($rowData[\'id_group\'], array(-1, 0, 3)))
-								$group_name = $rowData[\'group_name\'];
+							if (in_array($rowData['id_group'], array(-1, 0, 3)))
+								$group_name = $rowData['group_name'];
 							else
 							{
-								$group_name = sprintf(\'<a href="%1$s?action=admin;area=membergroups;sa=members;group=%2$d">%3$s</a>\', $scripturl, $rowData[\'id_group\'], $rowData[\'group_name_color\']);
+								$group_name = sprintf('<a href="%1$s?action=admin;area=membergroups;sa=members;group=%2$d">%3$s</a>', $scripturl, $rowData['id_group'], $rowData['group_name_color']);
 							}
 
 							// Add a help option for guests, regular members, moderator and administrator.
-							if (!empty($rowData[\'help\']))
-								$group_name .= sprintf(\' (<a href="%1$s?action=quickhelp;help=\' . $rowData[\'help\'] . \'" onclick="return reqOverlayDiv(this.href);">?</a>)\', $scripturl);
+							if (!empty($rowData['help']))
+								$group_name .= sprintf(' (<a href="%1$s?action=quickhelp;help=' . $rowData['help'] . '" onclick="return reqOverlayDiv(this.href);">?</a>)', $scripturl);
 
-							if (!empty($rowData[\'children\']))
-								$group_name .= \'
+							if (!empty($rowData['children']))
+								$group_name .= '
 									<br />
-									<span class="smalltext">\' . $txt[\'permissions_includes_inherited\'] . \': &quot;\' . implode(\'&quot;, &quot;\', $rowData[\'children\']) . \'&quot;</span>\';
+									<span class="smalltext">' . $txt['permissions_includes_inherited'] . ': &quot;' . implode('&quot;, &quot;', $rowData['children']) . '&quot;</span>';
 
 							return $group_name;
-						'),
+						},
 					),
 					'sort' => array(
 						'default' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, mg.group_name',
@@ -220,17 +220,17 @@ class ManagePermissions_Controller extends Action_Controller
 						'style' => 'width:10%;',
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $txt, $scripturl;
 
 							// No explicit members for guests and the moderator group.
-							if (in_array($rowData[\'id_group\'], array(-1, 3)))
-								return $txt[\'membergroups_guests_na\'];
-							elseif ($rowData[\'can_search\'])
-								return \'<a href="\' . $scripturl . \'?action=moderate;area=viewgroups;sa=members;group=\' . $rowData[\'id_group\'] . \'">\' . comma_format($rowData[\'num_members\']) . \'</a>\';
+							if (in_array($rowData['id_group'], array(-1, 3)))
+								return $txt['membergroups_guests_na'];
+							elseif ($rowData['can_search'])
+								return '<a href="' . $scripturl . '?action=moderate;area=viewgroups;sa=members;group=' . $rowData['id_group'] . '">' . comma_format($rowData['num_members']) . '</a>';
 							else
-								return comma_format($rowData[\'num_members\']);
-						'),
+								return comma_format($rowData['num_members']);
+						},
 					),
 					'sort' => array(
 						'default' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, 1',
@@ -243,9 +243,9 @@ class ManagePermissions_Controller extends Action_Controller
 						'style' => 'width:8%;',
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							return $rowData[\'num_permissions\'][\'allowed\'];
-						'),
+						'function' => function ($rowData) {
+							return $rowData['num_permissions']['allowed'];
+						},
 					),
 				),
 				'permissions_denied' => array(
@@ -255,9 +255,9 @@ class ManagePermissions_Controller extends Action_Controller
 						'style' => 'width:8%;',
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							return $rowData[\'num_permissions\'][\'denied\'];
-						'),
+						'function' => function ($rowData) {
+							return $rowData['num_permissions']['denied'];
+						},
 					),
 				),
 				'modify' => array(
@@ -266,12 +266,12 @@ class ManagePermissions_Controller extends Action_Controller
 						'style' => 'width:8%;',
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $scripturl;
 
-							if ($rowData[\'id_group\'] != 1)
-								return \'<a href="\' . $scripturl . \'?action=admin;area=permissions;sa=modify;group=\' . $rowData[\'id_group\'] . \'' . (isset($_REQUEST['pid']) ? ';pid=' . $_REQUEST['pid'] : '') . '">' . $txt['membergroups_modify'] . '</a>\';
-						'),
+							if ($rowData['id_group'] != 1)
+								return '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_group'] . '' . (isset($_REQUEST['pid']) ? ';pid=' . $_REQUEST['pid'] : '') . '">' . $txt['membergroups_modify'] . '</a>';
+						},
 					),
 				),
 				'check' => array(
@@ -281,10 +281,10 @@ class ManagePermissions_Controller extends Action_Controller
 						'style' => 'width:4%;',
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							if ($rowData[\'id_group\'] != 1)
-								return \'<input type="checkbox" name="group[]" value="\' . $rowData[\'id_group\'] . \'" class="input_check" />\';
-						'),
+						'function' => function ($rowData) {
+							if ($rowData['id_group'] != 1)
+								return '<input type="checkbox" name="group[]" value="' . $rowData['id_group'] . '" class="input_check" />';
+						},
 						'class' => 'centertext',
 					),
 				),
@@ -325,11 +325,11 @@ class ManagePermissions_Controller extends Action_Controller
 							'value' => $txt['membergroups_name'],
 						),
 						'data' => array(
-							'function' => create_function('$rowData', '
+							'function' => function ($rowData) {
 								global $scripturl;
 
-								return sprintf(\'<a href="%1$s?action=admin;area=permissions;sa=members;group=%2$d">%3$s</a>\', $scripturl, $rowData[\'id_group\'], $rowData[\'group_name_color\']);
-							'),
+								return sprintf('<a href="%1$s?action=admin;area=permissions;sa=members;group=%2$d">%3$s</a>', $scripturl, $rowData['id_group'], $rowData['group_name_color']);
+							},
 						),
 						'sort' => array(
 							'default' => 'mg.group_name',
@@ -354,14 +354,14 @@ class ManagePermissions_Controller extends Action_Controller
 							'style' => 'width:10%;',
 						),
 						'data' => array(
-							'function' => create_function('$rowData', '
+							'function' => function ($rowData) {
 								global $scripturl;
 
-								if ($rowData[\'can_search\'])
-									return \'<a href="\' . $scripturl . \'?action=moderate;area=viewgroups;sa=members;group=\' . $rowData[\'id_group\'] . \'">\' . comma_format($rowData[\'num_members\']) . \'</a>\';
+								if ($rowData['can_search'])
+									return '<a href="' . $scripturl . '?action=moderate;area=viewgroups;sa=members;group=' . $rowData['id_group'] . '">' . comma_format($rowData['num_members']) . '</a>';
 								else
-									return comma_format($rowData[\'num_members\']);
-							'),
+									return comma_format($rowData['num_members']);
+							},
 						),
 						'sort' => array(
 							'default' => '1 DESC',
@@ -374,9 +374,9 @@ class ManagePermissions_Controller extends Action_Controller
 							'style' => 'width:8%;',
 						),
 						'data' => array(
-							'function' => create_function('$rowData', '
-								return $rowData[\'num_permissions\'][\'allowed\'];
-							'),
+							'function' => function ($rowData) {
+								return $rowData['num_permissions']['allowed'];
+							},
 						),
 					),
 					'permissions_denied' => array(
@@ -386,9 +386,9 @@ class ManagePermissions_Controller extends Action_Controller
 							'style' => 'width:8%;',
 						),
 						'data' => array(
-							'function' => create_function('$rowData', '
-								return $rowData[\'num_permissions\'][\'denied\'];
-							'),
+							'function' => function ($rowData) {
+								return $rowData['num_permissions']['denied'];
+							},
 						),
 					),
 					'modify' => array(

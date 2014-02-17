@@ -119,9 +119,9 @@ class ManageMail_Controller extends Action_Controller
 						'value' => $txt['mailqueue_subject'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							return Util::strlen($rowData[\'subject\']) > 50 ? sprintf(\'%1$s...\', Util::htmlspecialchars(Util::substr($rowData[\'subject\'], 0, 47))) : Util::htmlspecialchars($rowData[\'subject\']);
-						'),
+						'function' => function ($rowData) {
+							return Util::strlen($rowData['subject']) > 50 ? sprintf('%1$s...', Util::htmlspecialchars(Util::substr($rowData['subject'], 0, 47))) : Util::htmlspecialchars($rowData['subject']);
+						},
 						'class' => 'smalltext',
 					),
 					'sort' => array(
@@ -153,15 +153,15 @@ class ManageMail_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $txt;
 
 							// We probably have a text label with your priority.
-							$txtKey = sprintf(\'mq_mpriority_%1$s\', $rowData[\'priority\']);
+							$txtKey = sprintf('mq_mpriority_%1$s', $rowData['priority']);
 
 							// But if not, revert to priority 0.
-							return isset($txt[$txtKey]) ? $txt[$txtKey] : $txt[\'mq_mpriority_1\'];
-						'),
+							return isset($txt[$txtKey]) ? $txt[$txtKey] : $txt['mq_mpriority_1'];
+						},
 						'class' => 'centertext smalltext',
 					),
 					'sort' => array(
@@ -174,9 +174,9 @@ class ManageMail_Controller extends Action_Controller
 						'value' => $txt['mailqueue_age'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							return time_since(time() - $rowData[\'time_sent\']);
-						'),
+						'function' => function ($rowData) {
+							return time_since(time() - $rowData['time_sent']);
+						},
 						'class' => 'smalltext',
 					),
 					'sort' => array(
@@ -190,9 +190,9 @@ class ManageMail_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							return \'<input type="checkbox" name="delete[]" value="\' . $rowData[\'id_mail\'] . \'" class="input_check" />\';
-						'),
+						'function' => function ($rowData) {
+							return '<input type="checkbox" name="delete[]" value="' . $rowData['id_mail'] . '" class="input_check" />';
+						},
 						'class' => 'centertext',
 					),
 				),

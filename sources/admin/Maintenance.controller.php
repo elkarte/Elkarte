@@ -1188,14 +1188,14 @@ class Maintenance_Controller extends Action_Controller
 						'value' => $txt['hooks_field_function_name'],
 					),
 					'data' => array(
-						'function' => create_function('$data', '
+						'function' => function ($data) {
 							global $txt;
 
-							if (!empty($data[\'included_file\']))
-								return $txt[\'hooks_field_function\'] . \': \' . $data[\'real_function\'] . \'<br />\' . $txt[\'hooks_field_included_file\'] . \': \' . $data[\'included_file\'];
+							if (!empty($data['included_file']))
+								return $txt['hooks_field_function'] . ': ' . $data['real_function'] . '<br />' . $txt['hooks_field_included_file'] . ': ' . $data['included_file'];
 							else
-								return $data[\'real_function\'];
-						'),
+								return $data['real_function'];
+						},
 					),
 					'sort' =>  array(
 						'default' => 'function_name',
@@ -1220,17 +1220,17 @@ class Maintenance_Controller extends Action_Controller
 						'style' => 'width:3%;',
 					),
 					'data' => array(
-						'function' => create_function('$data', '
+						'function' => function ($data) {
 							global $txt, $settings, $scripturl, $context;
 
-							$change_status = array(\'before\' => \'\', \'after\' => \'\');
-							if ($data[\'can_be_disabled\'] && $data[\'status\'] != \'deny\')
+							$change_status = array('before' => '', 'after' => '');
+							if ($data['can_be_disabled'] && $data['status'] != 'deny')
 							{
-								$change_status[\'before\'] = \'<a href="\' . $scripturl . \'?action=admin;area=maintain;sa=hooks;do=\' . ($data[\'enabled\'] ? \'disable\' : \'enable\') . \';hook=\' . $data[\'hook_name\'] . \';function=\' . $data[\'real_function\'] . (!empty($data[\'included_file\']) ? \';includedfile=\' . urlencode($data[\'included_file\']) : \'\') . $context[\'filter_url\'] . \';\' . $context[\'admin-hook_token_var\'] . \'=\' . $context[\'admin-hook_token\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'" onclick="return confirm(\' . javaScriptEscape($txt[\'quickmod_confirm\']) . \');">\';
-								$change_status[\'after\'] = \'</a>\';
+								$change_status['before'] = '<a href="' . $scripturl . '?action=admin;area=maintain;sa=hooks;do=' . ($data['enabled'] ? 'disable' : 'enable') . ';hook=' . $data['hook_name'] . ';function=' . $data['real_function'] . (!empty($data['included_file']) ? ';includedfile=' . urlencode($data['included_file']) : '') . $context['filter_url'] . ';' . $context['admin-hook_token_var'] . '=' . $context['admin-hook_token'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . javaScriptEscape($txt['quickmod_confirm']) . ');">';
+								$change_status['after'] = '</a>';
 							}
-							return $change_status[\'before\'] . \'<img src="\' . $settings[\'images_url\'] . \'/admin/post_moderation_\' . $data[\'status\'] . \'.png" alt="\' . $data[\'img_text\'] . \'" title="\' . $data[\'img_text\'] . \'" />\' . $change_status[\'after\'];
-						'),
+							return $change_status['before'] . '<img src="' . $settings['images_url'] . '/admin/post_moderation_' . $data['status'] . '.png" alt="' . $data['img_text'] . '" title="' . $data['img_text'] . '" />' . $change_status['after'];
+						},
 						'class' => 'centertext',
 					),
 					'sort' =>  array(
@@ -1269,15 +1269,15 @@ class Maintenance_Controller extends Action_Controller
 					'style' => 'width:3%',
 				),
 				'data' => array(
-					'function' => create_function('$data', '
+					'function' => function ($data) {
 						global $txt, $settings, $scripturl, $context;
 
-						if (!$data[\'hook_exists\'])
-							return \'
-							<a href="\' . $scripturl . \'?action=admin;area=maintain;sa=hooks;do=remove;hook=\' . $data[\'hook_name\'] . \';function=\' . urlencode($data[\'function_name\']) . $context[\'filter_url\'] . \';\' . $context[\'admin-hook_token_var\'] . \'=\' . $context[\'admin-hook_token\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'" onclick="return confirm(\' . javaScriptEscape($txt[\'quickmod_confirm\']) . \');">
-								<img src="\' . $settings[\'images_url\'] . \'/icons/quick_remove.png" alt="\' . $txt[\'hooks_button_remove\'] . \'" title="\' . $txt[\'hooks_button_remove\'] . \'" />
-							</a>\';
-					'),
+						if (!$data['hook_exists'])
+							return '
+							<a href="' . $scripturl . '?action=admin;area=maintain;sa=hooks;do=remove;hook=' . $data['hook_name'] . ';function=' . urlencode($data['function_name']) . $context['filter_url'] . ';' . $context['admin-hook_token_var'] . '=' . $context['admin-hook_token'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . javaScriptEscape($txt['quickmod_confirm']) . ');">
+								<img src="' . $settings['images_url'] . '/icons/quick_remove.png" alt="' . $txt['hooks_button_remove'] . '" title="' . $txt['hooks_button_remove'] . '" />
+							</a>';
+					},
 					'class' => 'centertext',
 				),
 			);

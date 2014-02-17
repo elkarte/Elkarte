@@ -1390,16 +1390,16 @@ function membersBy($query, $query_params, $details = false, $only_active = true)
 {
 	$allowed_conditions = array(
 		'member_ids'       => 'id_member IN ({array_int:member_ids})',
-		'member_names'     => create_function('&$members', '
+		'member_names'     => function (&$members) {
 			$mem_query = array();
 
-			foreach ($members[\'member_names\'] as $key => $param)
+			foreach ($members['member_names'] as $key => $param)
 			{
-				$mem_query[] = (defined(\'DB_CASE_SENSITIVE\') ? \'LOWER(real_name)\' : \'real_name\') . \' LIKE {string:member_names_\' . $key . \'}\';
-				$members[\'member_names_\' . $key] = defined(\'DB_CASE_SENSITIVE\') ? strtolower($param) : $param;
+				$mem_query[] = (defined('DB_CASE_SENSITIVE') ? 'LOWER(real_name)' : 'real_name') . ' LIKE {string:member_names_' . $key . '}';
+				$members['member_names_' . $key] = defined('DB_CASE_SENSITIVE') ? strtolower($param) : $param;
 			}
 			return implode("\n\t\t\tOR ", $mem_query);
-		'),
+		},
 		'not_in_group'     => '(id_group != {int:not_in_group} AND FIND_IN_SET({int:not_in_group}, additional_groups) = 0)',
 		'in_group'         => '(id_group = {int:in_group} OR FIND_IN_SET({int:in_group}, additional_groups) != 0)',
 		'in_group_primary' => 'id_group = {int:in_group_primary}',
@@ -1492,16 +1492,16 @@ function countMembersBy($query, $query_params, $only_active = true)
 {
 	$allowed_conditions = array(
 		'member_ids' => 'id_member IN ({array_int:member_ids})',
-		'member_names' => create_function('&$members', '
+		'member_names' => function (&$members) {
 			$mem_query = array();
 
-			foreach ($members[\'member_names\'] as $key => $param)
+			foreach ($members['member_names'] as $key => $param)
 			{
-				$mem_query[] = \'LOWER(real_name) LIKE {string:member_names_\' . $key . \'}\';
-				$members[\'member_names_\' . $key] = $param;
+				$mem_query[] = 'LOWER(real_name) LIKE {string:member_names_' . $key . '}';
+				$members['member_names_' . $key] = $param;
 			}
 			return implode("\n\t\t\tOR ", $mem_query);
-		'),
+		},
 		'not_in_group' => '(id_group != {int:not_in_group} AND FIND_IN_SET({int:not_in_group}, additional_groups) = 0)',
 		'in_group' => '(id_group = {int:in_group} OR FIND_IN_SET({int:in_group}, additional_groups) != 0)',
 		'in_group_primary' => 'id_group = {int:in_group_primary}',

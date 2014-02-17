@@ -408,9 +408,9 @@ class PostModeration_Controller extends Action_Controller
 						'value' => $txt['mc_unapproved_attach_poster'],
 					),
 					'data' => array(
-						'function' => create_function('$data', '
-							return $data[\'poster\'][\'link\'];'
-						)
+						'function' => function ($data) {
+							return $data['poster']['link'];
+						},
 					),
 					'sort' => array(
 						'default' => 'm.id_member',
@@ -437,11 +437,11 @@ class PostModeration_Controller extends Action_Controller
 						'value' => $txt['post'],
 					),
 					'data' => array(
-						'function' => create_function('$data', '
+						'function' => function ($data) {
 							global $modSettings;
 
-							return \'<a href="\' . $data[\'message\'][\'href\'] . \'">\' . shorten_text($data[\'message\'][\'subject\'], !empty($modSettings[\'subject_length\']) ? $modSettings[\'subject_length\'] : 24) . \'</a>\';'
-						),
+							return '<a href="' . $data['message']['href'] . '">' . shorten_text($data['message']['subject'], !empty($modSettings['subject_length']) ? $modSettings['subject_length'] : 24) . '</a>';
+						},
 						'class' => 'smalltext',
 						'style' => 'width:15em;',
 					),

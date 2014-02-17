@@ -270,10 +270,9 @@ class ProfileAccount_Controller extends Action_Controller
 						'style' => 'width: 20%;',
 					),
 					'data' => array(
-						'function' => create_function('$warning', '
-							return $warning[\'issuer\'][\'link\'];
-						'
-						),
+						'function' => function ($warning) {
+							return $warning['issuer']['link'];
+						},
 					),
 					'sort' => array(
 						'default' => 'lc.member_name DESC',
@@ -298,22 +297,24 @@ class ProfileAccount_Controller extends Action_Controller
 						'value' => $txt['profile_warning_previous_reason'],
 					),
 					'data' => array(
-						'function' => create_function('$warning', '
+						'function' => function ($warning) {
 							global $scripturl, $txt, $settings;
 
-							$ret = \'
+							$ret = '
 							<div class="floatleft">
-								\' . $warning[\'reason\'] . \'
-							</div>\';
+								' . $warning['reason'] . '
+							</div>';
 
 							// If a notice was sent, provide a way to view it
-							if (!empty($warning[\'id_notice\']))
-								$ret .= \'
+							if (!empty($warning['id_notice']))
+								$ret .= '
 							<div class="floatright">
-								<a href="\' . $scripturl . \'?action=moderate;area=notice;nid=\' . $warning[\'id_notice\'] . \'" onclick="window.open(this.href, \\\'\\\', \\\'scrollbars=yes,resizable=yes,width=400,height=250\\\');return false;" target="_blank" class="new_win" title="\' . $txt[\'profile_warning_previous_notice\'] . \'"><img src="\' . $settings[\'images_url\'] . \'/filter.png" alt="" /></a>
-							</div>\';
+								<a href="' . $scripturl . '?action=moderate;area=notice;nid=' . $warning['id_notice'] . '" onclick="window.open(this.href, \'\', \'scrollbars=yes,resizable=yes,width=400,height=250\');return false;" target="_blank" class="new_win" title="' . $txt['profile_warning_previous_notice'] . '"><img src="' . $settings['images_url'] . '/filter.png" alt="" /></a>
+							</div>';
 
-							return $ret;'),
+							return $ret;
+						
+						},
 					),
 				),
 				'level' => array(
