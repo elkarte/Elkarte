@@ -1244,7 +1244,7 @@ class ManageThemes_Controller extends Action_Controller
 	 */
 	public function action_jsoption()
 	{
-		global $settings, $user_info, $options;
+		global $settings, $user_info, $options, $modSettings;
 
 		// Check the session id.
 		checkSession('get');
@@ -1285,7 +1285,8 @@ class ManageThemes_Controller extends Action_Controller
 		if (isset($_GET['th']) || isset($_GET['id']))
 		{
 			// Invalidate the current themes cache too.
-			cache_put_data('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id'], null, 60);
+			if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
+				cache_put_data('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id'], null, 60);
 
 			$settings['theme_id'] = isset($_GET['th']) ? (int) $_GET['th'] : (int) $_GET['id'];
 		}
@@ -1319,7 +1320,8 @@ class ManageThemes_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Themes.subs.php');
 		updateThemeOptions(array($settings['theme_id'], $user_info['id'], $_GET['var'], is_array($_GET['val']) ? implode(',', $_GET['val']) : $_GET['val']));
 
-		cache_put_data('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id'], null, 60);
+		if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
+			cache_put_data('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id'], null, 60);
 
 		// Don't output anything...
 		redirectexit($settings['images_url'] . '/blank.png');

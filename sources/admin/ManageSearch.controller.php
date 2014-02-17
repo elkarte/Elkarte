@@ -207,7 +207,6 @@ class ManageSearch_Controller extends Action_Controller
 				// Permission...
 				array('permissions', 'search_posts'),
 				// Some simple settings.
-				array('check', 'simpleSearch'),
 				array('check', 'search_dropdown'),
 				array('int', 'search_results_per_page'),
 				array('int', 'search_max_results', 'subtext' => $txt['search_max_results_disable']),

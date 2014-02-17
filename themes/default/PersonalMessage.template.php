@@ -530,116 +530,94 @@ function template_subject_list()
  */
 function template_search()
 {
-	global $context, $scripturl, $txt, $modSettings;
+	global $context, $scripturl, $txt;
 
 	echo '
 	<form action="', $scripturl, '?action=pm;sa=search2" method="post" accept-charset="UTF-8" name="searchform" id="searchform">
 		<h2 class="category_header">', $txt['pm_search_title'], '</h2>';
 
+	// Any search errors we need to let them know about
 	if (!empty($context['search_errors']))
-	{
 		echo '
-		<div class="errorbox">
-			', implode('<br />', $context['search_errors']['messages']), '
-		</div>';
-	}
+		<div class="errorbox">', implode('<br />', $context['search_errors']['messages']), '</div>';
 
-	// Basic search
-	if ($context['simple_search'] && empty($context['minmax_preferences']['pmsearch']))
-	{
-		echo '
+	// Start with showing the basic search input box
+	echo '
 		<fieldset id="simple_search" class="content">
 			<div id="search_term_input">
-				<label for="search"><strong>', $txt['pm_search_text'], ':</strong></label>
-				<input id="search" class="input_text" type="search" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' size="40" placeholder="', $txt['search'], '" required="required" autofocus="autofocus" />
+				<label for="search">
+					<strong>', $txt['pm_search_text'], ':</strong>
+				</label>
+				<input type="search" id="search" class="input_text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' size="40" placeholder="', $txt['search'], '" required="required" autofocus="autofocus" />
 				<input type="submit" name="pm_search" value="', $txt['pm_search_go'], '" class="button_submit" />
+			</div>';
+
+	// Now all the advanced options, hidden or shown by JS based on the users minmax choices
+	echo '
+			<div id="advanced_search" class="content">
+				<dl id="search_options">
+					<dt class="righttext"><label for="searchtype">
+						', $txt['search_match'], ':</label>
+					</dt>
+					<dd>
+						<div class="styled-select">
+							<select name="searchtype">
+								<option value="1"', empty($context['search_params']['searchtype']) ? ' selected="selected"' : '', '>', $txt['pm_search_match_all'], '</option>
+								<option value="2"', !empty($context['search_params']['searchtype']) ? ' selected="selected"' : '', '>', $txt['pm_search_match_any'], '</option>
+							</select>
+						</div>
+					</dd>
+					<dt>
+						<label for="userspec">', $txt['pm_search_user'], ':</label>
+					</dt>
+					<dd>
+						<input type="text" name="userspec" value="', empty($context['search_params']['userspec']) ? '*' : $context['search_params']['userspec'], '" size="40" class="input_text" />
+					</dd>
+					<dt>
+						<label for="sort">', $txt['pm_search_order'], ':</label>
+					</dt>
+					<dd>
+						<div class="styled-select">
+							<select name="sort" id="sort">
+								<option value="relevance|desc">', $txt['pm_search_orderby_relevant_first'], '</option>
+								<option value="id_pm|desc">', $txt['pm_search_orderby_recent_first'], '</option>
+								<option value="id_pm|asc">', $txt['pm_search_orderby_old_first'], '</option>
+							</select>
+						</div>
+					</dd>
+					<dt class="options">
+						', $txt['pm_search_options'], ':
+					</dt>
+					<dd class="options">
+						<label for="show_complete">
+							<input type="checkbox" name="show_complete" id="show_complete" value="1"', !empty($context['search_params']['show_complete']) ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['pm_search_show_complete'], '
+						</label><br />
+						<label for="subject_only">
+							<input type="checkbox" name="subject_only" id="subject_only" value="1"', !empty($context['search_params']['subject_only']) ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['pm_search_subject_only'], '
+						</label><br />
+						<label for="sent_only">
+							<input type="checkbox" name="sent_only" id="sent_only" value="1"', !empty($context['search_params']['sent_only']) ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['pm_search_sent_only'], '
+						</label>
+					</dd>
+					<dt class="between">
+						', $txt['pm_search_post_age'], ':
+					</dt>
+					<dd>
+						<label for="minage">', $txt['pm_search_between'], ' <input type="text" id="minage" name="minage" value="', empty($context['search_params']['minage']) ? '0' : $context['search_params']['minage'], '" size="5" maxlength="5" class="input_text" /></label>&nbsp;<label for="maxage">', $txt['pm_search_between_and'], '&nbsp;<input type="text" name="maxage" id="maxage" value="', empty($context['search_params']['maxage']) ? '9999' : $context['search_params']['maxage'], '" size="5" maxlength="5" class="input_text" /></label> ', $txt['pm_search_between_days'], '
+					</dd>
+				</dl>
 			</div>
-			<a class="linkbutton" href="', $scripturl, '?action=pm;sa=search;advanced" onclick="elk_setThemeOption(\'minmax_preferences\', \'1\', null, elk_session_id, elk_session_var, \';minmax_key=pmsearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);">', $txt['pm_search_advanced'], '</a>
-			<input type="hidden" name="advanced" value="0" />
+			<a id="upshrink_link" href="', $scripturl, '?action=search;advanced" class="linkbutton" style="display:none">', $txt['pm_search_simple'], '</a>';
+
+	// Set the initial search style for the form
+	echo '
+			<input id="advanced" type="hidden" name="advanced" value="1" />
 		</fieldset>';
-	}
-	// Advanced search!
-	else
+
+	// Do we have some labels setup? If so offer to search by them!
+	if ($context['currently_using_labels'])
 	{
 		echo '
-		<fieldset id="advanced_search" class="content">
-			<dl class="settings" id="search_options">
-				<dt>
-					<label for="search"><strong>', $txt['pm_search_text'], ':</strong></label>
-				</dt>
-				<dd>
-					<input type="search" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' size="40" class="input_text" placeholder="', $txt['search'], '" required="required" autofocus="autofocus" />
-					<div class="styled-select">
-						<select name="searchtype">
-							<option value="1"', empty($context['search_params']['searchtype']) ? ' selected="selected"' : '', '>', $txt['pm_search_match_all'], '</option>
-							<option value="2"', !empty($context['search_params']['searchtype']) ? ' selected="selected"' : '', '>', $txt['pm_search_match_any'], '</option>
-						</select>
-					</div>
-				</dd>
-				<dt>
-					<label for="userspec">', $txt['pm_search_user'], ':</label>
-				</dt>
-				<dd>
-					<input type="text" name="userspec" value="', empty($context['search_params']['userspec']) ? '*' : $context['search_params']['userspec'], '" size="40" class="input_text" />
-				</dd>
-				<dt>
-					<label for="sort">', $txt['pm_search_order'], ':</label>
-				</dt>
-				<dd>
-					<div class="styled-select">
-						<select name="sort" id="sort">
-							<option value="relevance|desc">', $txt['pm_search_orderby_relevant_first'], '</option>
-							<option value="id_pm|desc">', $txt['pm_search_orderby_recent_first'], '</option>
-							<option value="id_pm|asc">', $txt['pm_search_orderby_old_first'], '</option>
-						</select>
-					</div>
-				</dd>
-				<dt class="options">
-					', $txt['pm_search_options'], ':
-				</dt>
-				<dd class="options">
-					<label for="show_complete">
-						<input type="checkbox" name="show_complete" id="show_complete" value="1"', !empty($context['search_params']['show_complete']) ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['pm_search_show_complete'], '
-					</label><br />
-					<label for="subject_only">
-						<input type="checkbox" name="subject_only" id="subject_only" value="1"', !empty($context['search_params']['subject_only']) ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['pm_search_subject_only'], '
-					</label><br />
-					<label for="sent_only">
-						<input type="checkbox" name="sent_only" id="sent_only" value="1"', !empty($context['search_params']['sent_only']) ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['pm_search_sent_only'], '
-					</label>
-				</dd>
-				<dt class="between">
-					', $txt['pm_search_post_age'], ':
-				</dt>
-				<dd>
-					<label for="minage">', $txt['pm_search_between'], ' <input type="text" id="minage" name="minage" value="', empty($context['search_params']['minage']) ? '0' : $context['search_params']['minage'], '" size="5" maxlength="5" class="input_text" /></label>&nbsp;<label for="maxage">', $txt['pm_search_between_and'], '&nbsp;<input type="text" name="maxage" id="maxage" value="', empty($context['search_params']['maxage']) ? '9999' : $context['search_params']['maxage'], '" size="5" maxlength="5" class="input_text" /></label> ', $txt['pm_search_between_days'], '
-				</dd>
-				<dt>
-				</dt>
-				<dd>
-					<div class="centertext">';
-
-		// If we allow a simple form, show a link to get back to it
-		if (!empty($modSettings['simpleSearch']))
-			echo '
-						<a href="', $scripturl, '?action=pm;sa=search;basic" onclick="elk_setThemeOption(\'minmax_preferences\', \'0\', null, elk_session_id, elk_session_var, \';minmax_key=pmsearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);" class="linkbutton">', $txt['pm_search_simple'], '</a>';
-
-		// If they don't have any labels show the search button here as well
-		if (!$context['currently_using_labels'])
-			echo '
-						<input type="submit" name="pm_search" value="', $txt['pm_search_go'], '" class="button_submit" />';
-
-			echo '
-					</div>
-				</dd>
-			</dl>
-			<input type="hidden" name="advanced" value="1" />
-		</fieldset>';
-
-		// Do we have some labels setup? If so offer to search by them!
-		if ($context['currently_using_labels'])
-		{
-			echo '
 		<fieldset class="content">
 			<h3 class="secondary_header">
 				<span id="category_toggle">&nbsp;
@@ -662,19 +640,17 @@ function template_search()
 			</div>
 			<div class="submitbuttons content">
 				<input type="checkbox" name="all" id="check_all" value="" ', $context['check_all'] ? 'checked="checked"' : '', ' onclick="invertAll(this, this.form, \'searchlabel\');" class="input_check" /><em> <label for="check_all">', $txt['check_all'], '</label></em>
-				<input type="submit" name="pm_search" value="', $txt['pm_search_go'], '" class="right_submit" />
 			</div>
 		</fieldset>';
 
-			// Some javascript for the advanced toggling
-			echo '
-		<script><!-- // --><![CDATA[
+		// And now some javascript for the advanced label toggling
+		addInlineJavascript('
 			createEventListener(window);
 			window.addEventListener("load", initSearch, false);
 
 			var oAdvancedPanelToggle = new elk_Toggle({
 				bToggleEnabled: true,
-				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['pm']) ? 'false' : 'true', ',
+				bCurrentlyCollapsed: ' .(empty($context['minmax_preferences']['pm']) ? 'false' : 'true') . ',
 				aSwappableContainers: [
 					\'advanced_panel_div\'
 				],
@@ -682,29 +658,61 @@ function template_search()
 					{
 						sId: \'advanced_panel_toggle\',
 						classExpanded: \'collapse\',
-						titleExpanded: ', JavaScriptEscape($txt['hide']), ',
+						titleExpanded: ' . JavaScriptEscape($txt['hide']) . ',
 						classCollapsed: \'expand\',
-						titleCollapsed: ', JavaScriptEscape($txt['show']), '
+						titleCollapsed: ' . JavaScriptEscape($txt['show']) . '
 					}
 				],
 				aSwapLinks: [
 					{
 						sId: \'advanced_panel_link\',
-						msgExpanded: ', JavaScriptEscape($txt['pm_search_choose_label']), ',
-						msgCollapsed: ', JavaScriptEscape($txt['pm_search_choose_label']), '
+						msgExpanded: ' . JavaScriptEscape($txt['pm_search_choose_label']) . ',
+						msgCollapsed: ' . JavaScriptEscape($txt['pm_search_choose_label']) . '
 					}
 				],
 				oThemeOptions: {
-					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
+					bUseThemeSettings: ' . ($context['user']['is_guest'] ? 'false' : 'true') . ',
 					sOptionName: \'minmax_preferences\',
 					sSessionId: elk_session_id,
 					sSessionVar: elk_session_var,
 					sAdditionalVars: \';minmax_key=pm\'
 				},
-			});
-		// ]]></script>';
-		}
+			});', true);
 	}
+
+	// And the JS to make the advanced / basic form work
+	addInlineJavascript('
+		// Set the search style
+		document.getElementById(\'advanced\').value = "' . (empty($context['minmax_preferences']['pmsearch']) ? '1' : '0') . '";
+
+		// And allow for the collapsing of the advanced search options
+		var oSearchToggle = new elk_Toggle({
+			bToggleEnabled: true,
+			bCurrentlyCollapsed: ' . (empty($context['minmax_preferences']['pmsearch']) ? 'false' : 'true') . ',
+			funcOnBeforeCollapse: function () {
+				document.getElementById(\'advanced\').value = \'0\';
+			},
+			funcOnBeforeExpand: function () {
+				document.getElementById(\'advanced\').value = \'1\';
+			},
+			aSwappableContainers: [
+				\'advanced_search\'
+			],
+			aSwapLinks: [
+				{
+					sId: \'upshrink_link\',
+					msgExpanded: ' . JavaScriptEscape($txt['search_simple']) . ',
+					msgCollapsed: ' . JavaScriptEscape($txt['search_advanced']) . '
+				}
+			],
+			oThemeOptions: {
+				bUseThemeSettings: ' . ($context['user']['is_guest'] ? 'false' : 'true') . ',
+				sOptionName: \'minmax_preferences\',
+				sSessionId: elk_session_id,
+				sSessionVar: elk_session_var,
+				sAdditionalVars: \';minmax_key=pmsearch\'
+			},
+		});', true);
 
 	echo '
 	</form>';

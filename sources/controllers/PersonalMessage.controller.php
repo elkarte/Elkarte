@@ -1769,11 +1769,6 @@ class PersonalMessage_Controller extends Action_Controller
 			}
 		}
 
-		// Simple search or not?
-		$context['simple_search'] = isset($context['search_params']['advanced']) ? empty($context['search_params']['advanced']) : !empty($modSettings['simpleSearch']) && !isset($_REQUEST['advanced']);
-		if (isset($_GET['basic']))
-			$context['minmax_preferences']['pmsearch'] = 0;
-
 		$context['page_title'] = $txt['pm_search_title'];
 		$context['sub_template'] = 'search';
 		$context['linktree'][] = array(
