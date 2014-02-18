@@ -197,6 +197,13 @@ function template_searchform()
 	echo '
 				</form>';
 
+	// Start guest off collapsed
+	if ($context['user']['is_guest'] && !isset($context['minmax_preferences']['asearch']))
+	{
+		$context['minmax_preferences']['asearch'] = 1;
+		$context['minmax_preferences']['search'] = 1;
+	}
+
 	// And now all the JS to make this work
 	addInlineJavascript('
 		createEventListener(window);
