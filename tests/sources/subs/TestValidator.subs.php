@@ -33,6 +33,7 @@ class TestDataValidator extends UnitTestCase
 			'without'       => 'without[1,2,3]',
 			'min_len_csv'   => 'min_length[4]',
 			'min_len_array' => 'min_length[4]',
+			'limits'		=> 'limits[0,10]',
 		);
 
 		$this->invalid_data = array(
@@ -56,6 +57,7 @@ class TestDataValidator extends UnitTestCase
 			'without'       => '1 way 2 do this',
 			'min_len_csv'   => '1234,12345, 123',
 			'min_len_array' => array('1234', '12345', '123'),
+			'limits'		=> 11,
 		);
 
 		$this->valid_data = array(
@@ -79,6 +81,7 @@ class TestDataValidator extends UnitTestCase
 			'without'       => 'this does not have one or two',
 			'min_len_csv'   => '1234,12345,123456',
 			'min_len_array' => array('1234', '12345', '123456'),
+			'limits'		=> 9,
 		);
 	}
 
@@ -94,7 +97,6 @@ class TestDataValidator extends UnitTestCase
 		$validation->input_processing(array('min_len_csv' => 'csv', 'min_len_array' => 'array'));
 		$validation->validate($this->invalid_data);
 
-
 		foreach ($this->invalid_data as $key => $value)
 		{
 			$test = $validation->validation_errors($key);
@@ -104,7 +106,8 @@ class TestDataValidator extends UnitTestCase
 
 		// These should all pass
 		$validation = new Data_Validator();
-		$validation->input_processing(array('min_length_csv' => 'csv', 'min_length_array' => 'array'));
+		$validation->validation_rules($this->rules);
+		$validation->input_processing(array('min_len_csv' => 'csv', 'min_len_array' => 'array'));
 		$validation->validate($this->valid_data);
 
 		foreach ($this->valid_data as $key => $value)
@@ -112,7 +115,6 @@ class TestDataValidator extends UnitTestCase
 			$test = $validation->validation_errors($key);
 			$value = is_array($value) ? implode(' | ', $value) : $value;
 			$this->assertNull($validation->validation_errors($key), 'Test: ' . $test[0] . ' failed data: ' . $value . ' but it should have passed');
-
 		}
 	}
 }
