@@ -519,13 +519,15 @@ class Auth_Controller extends Action_Controller
 			// This one is a strange one... MyPHP, crypt() on the MD5 hash.
 			$other_passwords[] = crypt(md5($_POST['passwrd']), md5($_POST['passwrd']));
 
-			// Snitz style - SHA-256.
-			if ($pw_strlen === 64 && function_exists('mhash') && defined('MHASH_SHA256'))
-				$other_passwords[] = bin2hex(mhash(MHASH_SHA256, $_POST['passwrd']));
-
-			// Normal SHA-256
+			// SHA-256
 			if ($pw_strlen === 64)
+			{
+				// Snitz style
+				$other_passwords[] = bin2hex(hash('sha256', $_POST['passwrd']));
+
+				// Normal SHA-256
 				$other_passwords[] = hash('sha256', $_POST['passwrd']);
+			}
 
 			// phpBB3 users new hashing.  We now support it as well ;).
 			$other_passwords[] = phpBB3_password_check($_POST['passwrd'], $user_settings['passwd']);

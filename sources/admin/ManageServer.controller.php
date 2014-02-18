@@ -696,6 +696,8 @@ class ManageServer_Controller extends Action_Controller
 
 		// Detect all available optimizers
 		$detected = array();
+		$detected['filebased'] = $txt['default_cache'];
+
 		if (function_exists('eaccelerator_put'))
 			$detected['eaccelerator'] = $txt['eAccelerator_cache'];
 		if (function_exists('mmcache_put'))
@@ -708,21 +710,10 @@ class ManageServer_Controller extends Action_Controller
 			$detected['memcached'] = $txt['memcached_cache'];
 		if (function_exists('xcache_set'))
 			$detected['xcache'] = $txt['xcache_cache'];
-		if (function_exists('file_put_contents'))
-			$detected['filebased'] = $txt['default_cache'];
 
 		// Set our values to show what, if anything, we found
-		if (empty($detected))
-		{
-			$txt['cache_settings_message'] = $txt['detected_no_caching'];
-			$cache_level = array($txt['cache_off']);
-			$detected['none'] = $txt['cache_off'];
-		}
-		else
-		{
-			$txt['cache_settings_message'] = sprintf($txt['detected_accelerators'], implode(', ', $detected));
-			$cache_level = array($txt['cache_off'], $txt['cache_level1'], $txt['cache_level2'], $txt['cache_level3']);
-		}
+		$txt['cache_settings_message'] = sprintf($txt['detected_accelerators'], implode(', ', $detected));
+		$cache_level = array($txt['cache_off'], $txt['cache_level1'], $txt['cache_level2'], $txt['cache_level3']);
 
 		// Define the variables we want to edit.
 		$config_vars = array(
