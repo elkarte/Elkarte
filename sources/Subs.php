@@ -2425,26 +2425,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 		// Start up the session URL fixer.
 		ob_start('ob_sessrewrite');
 
-		if (!empty($settings['output_buffers']) && is_string($settings['output_buffers']))
-			$buffers = explode(',', $settings['output_buffers']);
-		elseif (!empty($settings['output_buffers']))
-			$buffers = $settings['output_buffers'];
-		else
-			$buffers = array();
-
-		if (isset($modSettings['integrate_buffer']))
-			$buffers = array_merge(explode(',', $modSettings['integrate_buffer']), $buffers);
-
-		if (!empty($buffers))
-			foreach ($buffers as $function)
-			{
-				$function = trim($function);
-				$call = strpos($function, '::') !== false ? explode('::', $function) : $function;
-
-				// Is it valid?
-				if (is_callable($call))
-					ob_start($call);
-			}
+		call_integration_buffer();
 
 		// Display the screen in the logical order.
 		template_header();
@@ -3788,6 +3769,58 @@ function call_integration_include_hook($hook)
 			if (file_exists($include))
 				require_once($include);
 		}
+	}
+}
+
+/**
+ * Special hook call executed during obExit
+ */
+function call_integration_buffer()
+{
+	global $modSettings;
+
+	if (isset($modSettings['integrate_buffer']))
+		$buffers = explode(',', $modSettings['integrate_buffer']);
+
+	if (empty($buffers))
+		return;
+
+	foreach ($buffers as $function)
+	{
+		$function = trim($function);
+
+		// OOP static method
+		if (strpos($function, '::') !== false)
+		{
+			$call = explode('::', $function);
+			if (strpos($call[1], ':') !== false)
+			{
+				list ($func, $file) = explode(':', $call[1]);
+				$call = array($call[0], $func);
+			}
+		}
+		// Normal plain function
+		else
+		{
+			$call = $function;
+			if (strpos($function, ':') !== false)
+			{
+				list ($func, $file) = explode(':', $function);
+				$call = $func;
+			}
+		}
+
+		if (!empty($file))
+		{
+			$absPath = strtr(trim($file), $path_replacements);
+
+			if (file_exists($absPath))
+				require_once($absPath);
+		}
+
+		// Is it valid?
+		if (is_callable($call))
+			ob_start($call);
 	}
 }
 
