@@ -46,7 +46,7 @@ function template_login()
 				<dl>
 					<dt><label for="user">', $txt['username'], '</label>:</dt>
 					<dd>
-						<input type="text" name="user id="user" size="20" maxlength="80" value="', $context['default_username'], '" class="input_text" ', !empty($context['using_openid']) ? 'autofocus="autofocus" ' : '', 'placeholder="', $txt['username'], '" />
+						<input type="text" name="user" id="user" size="20" maxlength="80" value="', $context['default_username'], '" class="input_text" ', !empty($context['using_openid']) ? 'autofocus="autofocus" ' : '', 'placeholder="', $txt['username'], '" />
 					</dd>
 					<dt><label for="passwrd">', $txt['password'], '</label>:</dt>
 					<dd>
