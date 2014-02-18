@@ -18,7 +18,7 @@
 define('CURRENT_VERSION', '1.0 Beta 2');
 define('DB_SCRIPT_VERSION', '1-0');
 
-$GLOBALS['required_php_version'] = '5.1.2';
+$GLOBALS['required_php_version'] = '5.2.0';
 
 // Don't have PHP support, do you?
 // ><html dir="ltr"><head><title>Error!</title></head><body>Sorry, this installer requires PHP!<div style="display: none;">
@@ -55,7 +55,7 @@ $databases = array(
 		'utf8_version_check' => '$request = pg_query(\'SELECT version()\'); list ($version) = pg_fetch_row($request); list ($pgl, $version) = explode(" ", $version); return $version;',
 		'validate_prefix' => create_function('&$value', '
 			global $txt;
-			
+
 			$value = preg_replace(\'~[^A-Za-z0-9_\$]~\', \'\', $value);
 
 			// Is it reserved?
