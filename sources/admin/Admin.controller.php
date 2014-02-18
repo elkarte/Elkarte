@@ -120,6 +120,8 @@ class Admin_Controller extends Action_Controller
 							'installed' => array($txt['installed_packages']),
 							'perms' => array($txt['package_file_perms']),
 							'options' => array($txt['package_settings']),
+							'servers' => array($txt['download_packages']),
+							'upload' => array($txt['upload_packages']),
 						),
 					),
 					'packageservers' => array(
@@ -130,10 +132,7 @@ class Admin_Controller extends Action_Controller
 						'permission' => array('admin_forum'),
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_packages',
-						'subsections' => array(
-							'servers' => array($txt['download_packages']),
-							'upload' => array($txt['upload_packages']),
-						),
+						'hidden' => true,
 					),
 					'search' => array(
 						'controller' => 'Admin_Controller',
