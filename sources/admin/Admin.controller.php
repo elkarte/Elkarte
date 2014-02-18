@@ -258,10 +258,6 @@ class Admin_Controller extends Action_Controller
 						'class' => 'admin_img_modifications',
 						'subsections' => array(
 							'general' => array($txt['mods_cat_modifications_misc']),
-							// @deprecated: do not rely on this line, use the appropriate hook and tools provided
-							// Addon Authors for a "ADD AFTER" on this line. Ensure you end your change with a comma. For example:
-							// 'shout' => array($txt['shout']),
-							// Note the comma!! The setting with automatically appear with the first mod to be added.
 						),
 					),
 				),

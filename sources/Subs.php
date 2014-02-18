@@ -2510,7 +2510,7 @@ function determineTopicClass(&$topic_context)
 		$topic_context['class'] .= '_sticky';
 
 	// This is so old themes will still work.
-	// @deprecated will be removed from 1.1 do not rely on it
+	// @deprecated since 1.0 do not rely on it
 	$topic_context['extended_class'] = &$topic_context['class'];
 }
 
@@ -3258,7 +3258,7 @@ function text2words($text, $max_chars = 20, $encrypt = false)
  * @param boolean $force_use = false
  * @return string
  *
- * @deprecated: this will be removed at some point, do not rely on this function
+ * @deprecated since 1.0 this will be removed at some point, do not rely on this function
  */
 function create_button($name, $alt, $label = '', $custom = '', $force_use = false)
 {

@@ -258,7 +258,7 @@ function recacheSpiderNames()
 /**
  * Sort the search engine table by user agent name to avoid misidentification of engine.
  *
- * @deprecated the ordering is done in the query, probably not needed
+ * @deprecated since 1.0 - the ordering is done in the query, probably not needed
  */
 function sortSpiderTable()
 {

@@ -717,7 +717,7 @@ function deleteBoards($boards_to_remove, $moveChildrenTo = null)
  * Put all boards in the right order and sorts the records of the boards table.
  * Used by modifyBoard(), deleteBoards(), modifyCategory(), and deleteCategories() functions
  *
- * @deprecated the ordering is done in the query, probably not needed
+ * @deprecated since 1.0 - the ordering is done in the query, probably not needed
  */
 function reorderBoards()
 {
