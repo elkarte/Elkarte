@@ -61,7 +61,7 @@ if (!defined('ELK'))
  * Current validation can be one or a combination of:
  *    max_length[x], min_length[x], length[x],
  *    alpha, alpha_numeric, alpha_dash
- *    numeric, integer, boolean, float, notequal[x,y,z], is_array
+ *    numeric, integer, boolean, float, notequal[x,y,z], is_array, limits[min,max]
  *    valid_url, valid_ip, valid_ipv6, valid_email, valid_color
  *    php_syntax, contains[x,y,x], required, without[x,y,z]
  */
@@ -556,6 +556,7 @@ class Data_Validator
 			// Set the error message for this validation failure
 			if (isset($error['error']))
 				$result[] = sprintf($txt[$error['error']], $field, $error['error_msg']);
+			// Use our error text based on the function name itself
 			elseif (isset($txt[$error['function']]))
 			{
 				if (!empty($error['param']))
@@ -563,6 +564,9 @@ class Data_Validator
 				else
 					$result[] = sprintf($txt[$error['function']], $field, $error['input']);
 			}
+			// can't find the function text, so set a generic one
+			else
+				$result[] = sprintf($txt['_validate_generic'], $field);
 		}
 
 		return $result;
@@ -610,6 +614,47 @@ class Data_Validator
 		$value = trim(strtolower($input[$field]));
 
 		if (!in_array($value, $validation_parameters))
+			return;
+
+		return array(
+			'field' => $field,
+			'input' => $input[$field],
+			'function' => __FUNCTION__,
+			'param' => implode(',', $validation_parameters)
+		);
+	}
+
+	/**
+	 * Limits ... Verify that a value is within the defined limits
+	 *
+	 * Usage: '[key]' => 'limits[min, max]'
+	 * >= min and <= max
+	 * Limits may be specified one sided
+	 * 	- limits[,10] means <=10 with no lower bound check
+	 *  - limits[10,] means >= 10 with no upper bound
+	 *
+	 * @param string $field
+	 * @param mixed[] $input
+	 * @param string|null $validation_parameters array or null
+	 */
+	protected function _validate_limits($field, $input, $validation_parameters = null)
+	{
+		$validation_parameters = explode(',', $validation_parameters);
+		$validation_parameters = array_filter($validation_parameters, 'strlen');
+		$input[$field] = isset($input[$field]) ? $input[$field] : '';
+		$value = $input[$field];
+
+		// Lower bound ?
+		$passmin = true;
+		if (isset($validation_parameters[0]))
+			$passmin = $value >= $validation_parameters[0];
+
+		// Upper bound ?
+		$passmax = true;
+		if (isset($validation_parameters[1]))
+			$passmax = $value <= $validation_parameters[1];
+
+		if ($passmax && $passmin)
 			return;
 
 		return array(
