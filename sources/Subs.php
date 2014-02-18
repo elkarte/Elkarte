@@ -2698,7 +2698,7 @@ function setMemoryLimit($needed, $in_use = false)
 
 	// Should we account for how much is currently being used?
 	if ($in_use)
-		$memory_needed += function_exists('memory_get_usage') ? memory_get_usage() : (4 * 1048576);
+		$memory_needed += memory_get_usage();
 
 	// If more is needed, request it
 	if ($memory_current < $memory_needed)
