@@ -1465,18 +1465,14 @@ class ManageFeatures_Controller extends Action_Controller
 		);
 
 		// Get all the time zones.
-		if (function_exists('timezone_identifiers_list') && function_exists('date_default_timezone_set'))
+		$all_zones = timezone_identifiers_list();
+		if ($all_zones === false)
+			unset($config_vars['default_timezone']);
+		else
 		{
-			$all_zones = timezone_identifiers_list();
-
 			// Make sure we set the value to the same as the printed value.
 			foreach ($all_zones as $zone)
 				$config_vars['default_timezone'][2][$zone] = $zone;
-		}
-		else
-		{
-			// we don't know this, huh?
-			unset($config_vars['default_timezone']);
 		}
 
 		call_integration_hook('integrate_modify_basic_settings', array(&$config_vars));
