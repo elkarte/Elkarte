@@ -28,7 +28,6 @@ $txt['search_specific_topic'] = 'Searching only posts in the topic';
 
 $txt['mods_cat_search'] = 'Search';
 $txt['groups_search_posts'] = 'Member groups with access to the search function';
-$txt['simpleSearch'] = 'Enable simple search';
 $txt['search_dropdown'] = 'Enable the Quick Search dropdown';
 $txt['search_results_per_page'] = 'Number of search results per page';
 $txt['search_weight_frequency'] = 'Relative search weight for the number of matching messages within a topic';

@@ -401,8 +401,8 @@ function template_quickreply_below()
 		// Guests just need more.
 		if ($context['user']['is_guest'])
 			echo '
-							<strong>', $txt['name'], ':</strong> <input type="text" name="guestname" value="', $context['name'], '" size="25" class="input_text" tabindex="', $context['tabindex']++, '" />
-							<strong>', $txt['email'], ':</strong> <input type="text" name="email" value="', $context['email'], '" size="25" class="input_text" tabindex="', $context['tabindex']++, '" />
+							<strong><label for="guestname">', $txt['name'], '</label>:</strong> <input type="text" name="guestname" id="guestname" value="', $context['name'], '" size="25" class="input_text" tabindex="', $context['tabindex']++, '" />
+							<strong><label for="email">', $txt['email'], '</label>:</strong> <input type="text" name="email" id="email" value="', $context['email'], '" size="25" class="input_text" tabindex="', $context['tabindex']++, '" />
 							<br />';
 
 		// Is visual verification enabled?

@@ -2352,7 +2352,7 @@ class Packages_Controller extends Action_Controller
  * Checks the permissions of all the areas that will be affected by the package
  *
  * @param string $path
- * @param array $data
+ * @param mixed[] $data
  * @param int $level
  */
 function fetchPerms__recursive($path, &$data, $level)

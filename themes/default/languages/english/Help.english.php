@@ -293,7 +293,6 @@ $helptxt['compactTopicPagesEnable'] = 'This will show the supplied number of sur
 		&quot;5&quot; to display: 1 ... 3 4 [5] 6 7 ... 9';
 $helptxt['timeLoadPageEnable'] = 'This will show the time in seconds taken to create that page at the bottom of the board.';
 $helptxt['removeNestedQuotes'] = 'This will strip nested quotes from a post when citing the post in question via a quote link.';
-$helptxt['simpleSearch'] = 'This will show a simple search form and a link to a more advanced form.';
 $helptxt['search_dropdown'] = 'This will show a search selection dropdown next to the quick search box.  From this you can choose to search the current site, current board (if in a board), current topic (if in a topic) or search for members.';
 $helptxt['max_image_width'] = 'This allows you to set a maximum size for posted pictures. Pictures smaller than the maximum will not be affected. This also determines how attached images are displayed when a thumbnail is clicked on.';
 $helptxt['mail_type'] = 'This setting allows you to choose either PHP\'s default settings, or to override those settings with SMTP.  PHP doesn\'t support using authentication with SMTP (which many hosts require now) so if you want that you should select SMTP.  Please note that SMTP can be slower, and some servers will not take user names and passwords.<br /><br />You don\'t need to fill in the SMTP settings if this is set to PHP\'s default.';
@@ -417,7 +416,7 @@ $helptxt['ssi_db_user'] = 'Optional setting to use a different database user and
 $helptxt['queryless_urls'] = 'This changes the format of URLs a little so search engines will like them better.  They will look like index.php/topic,1.0.html.<br /><br />This feature will ' . ($context['server']['is_apache'] || $context['server']['is_lighttpd'] ? '' : 'not') . ' work on your server.';
 $helptxt['countChildPosts'] = 'Checking this option will mean that posts and topics in a board\'s sub-board will count toward its totals on the index page.<br /><br />This will make things notably slower, but means that a parent with no posts in it won\'t show \'0\'.';
 $helptxt['allow_ignore_boards'] = 'Checking this option will allow users to select boards they wish to ignore.';
-$helptxt['deny_boards_access'] = 'Checking this option will allow you to deny access to certain boards based on membergroup access';
+$helptxt['deny_boards_access'] = 'Checking this option will allow you to deny access to certain boards based on member group access';
 
 $helptxt['who_enabled'] = 'This option allows you to turn on or off the ability for users to see who is browsing the forum and what they are doing.';
 

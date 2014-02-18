@@ -489,7 +489,9 @@ class Auth_Controller extends Action_Controller
 	/**
 	 * Loads other possible password hash / crypts using the post data
 	 * Used when a board is converted to see if the user credentials and a 3rd
-	 * party hash satisfy whats in the db
+	 * party hash satisfy whats in the db passwd field
+	 *
+	 * @param mixed[] $user_settings
 	 */
 	private function _other_passwords($user_settings)
 	{

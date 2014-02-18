@@ -746,7 +746,7 @@ function isFirstLogin($id_member)
  * Search for a member by given criterias
  *
  * @param string $where
- * @param string $where_params
+ * @param mixed[] $where_params array of values to used in the where statement
  * @param bool $fatal
  * @return boolean
  */

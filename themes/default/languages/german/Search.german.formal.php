@@ -28,7 +28,6 @@ $txt['search_specific_topic'] = 'Durchsuche nur Beiträge im Thema';
 
 $txt['mods_cat_search'] = 'Suche';
 $txt['groups_search_posts'] = 'Benutzergruppen mit Zugriff auf die Suchfunktion';
-$txt['simpleSearch'] = 'Einfache Suche aktivieren';
 $txt['search_dropdown'] = 'Schnellsuchfeld aktivieren';
 $txt['search_results_per_page'] = 'Anzahl an Suchergebnissen pro Seite';
 $txt['search_weight_frequency'] = 'Relative Suchgewichtung für die Anzahl an Treffern in einem Thema';

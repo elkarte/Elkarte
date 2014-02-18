@@ -69,7 +69,7 @@ class Error_Context
 	 * Create and initialize an instance of the class
 	 *
 	 * @param string $id the error identifier
-	 * @param int $default_severity the default error severity level
+	 * @param int|null $default_severity the default error severity level
 	 */
 	private function __construct ($id = 'default', $default_severity = null)
 	{
@@ -92,7 +92,7 @@ class Error_Context
 	 * Add an error to the list
 	 *
 	 * @param string[]|string $error error code
-	 * @param mixed|null $severity error severity
+	 * @param string|int|null $severity error severity
 	 * @param string|null $lang_file lang_file
 	 */
 	public function addError($error, $severity = null, $lang_file = null)
@@ -133,7 +133,7 @@ class Error_Context
 	 * Return an array of errors of a certain severity.
 	 * @todo is it needed at all?
 	 *
-	 * @param string $severity the severity level wanted. If null returns all the errors
+	 * @param string|int|null $severity the severity level wanted. If null returns all the errors
 	 */
 	public function getErrors($severity = null)
 	{
@@ -148,7 +148,7 @@ class Error_Context
 	/**
 	 * Returns if there are errors or not.
 	 *
-	 * @param string $severity the severity level wanted. If null returns all the errors
+	 * @param string|null $severity the severity level wanted. If null returns all the errors
 	 * @return bool
 	 */
 	public function hasErrors($severity = null)
@@ -200,7 +200,7 @@ class Error_Context
 	 * Return an array containing the error strings
 	 * If severity is null the function returns all the errors
 	 *
-	 * @param string $severity the severity level wanted
+	 * @param string|null $severity the severity level wanted
 	 */
 	public function prepareErrors($severity = null)
 	{

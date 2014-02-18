@@ -1887,7 +1887,7 @@ function topicsList($topic_ids)
  *
  * @param int $topic
  * @param mixed[] $limit
- * @param string $sort
+ * @param boolean $sort set to false for a desc sort
  * @return array
  */
 function getTopicsPostsAndPoster($topic, $limit, $sort)
@@ -2730,7 +2730,7 @@ function topicsPosters($topics)
  * @param int $id_topic id of the merged topic
  * @param int $target_board id of the target board where the topic will resides
  * @param string $target_subject subject of the new topic
- * @param bool $enforce_subject if true all the messages will be set to the same subject
+ * @param string $enforce_subject if not empty all the messages will be set to the same subject
  * @param array $notifications array of topics with active notifications
  */
 function fixMergedTopics($first_msg, $topics, $id_topic, $target_board, $target_subject, $enforce_subject, $notifications)

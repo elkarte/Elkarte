@@ -31,8 +31,8 @@ if (!defined('ELK'))
  *
  * @param string $error_message
  * @param string|boolean $error_type = 'general'
- * @param string $file = null
- * @param int $line = null
+ * @param string|null $file = null
+ * @param int|null $line = null
  */
 function log_error($error_message, $error_type = 'general', $file = null, $line = null)
 {
@@ -126,8 +126,8 @@ function log_error($error_message, $error_type = 'general', $file = null, $line 
  * @param string $error
  * @param string $error_type = 'general'
  * @param string $sprintf = array()
- * @param string $file = null
- * @param int $line = null
+ * @param string|null $file = null
+ * @param int|null $line = null
  */
 function log_lang_error($error, $error_type = 'general', $sprintf = array(), $file = null, $line = null)
 {

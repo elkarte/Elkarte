@@ -775,7 +775,7 @@ function loadPermissions()
 /**
  * Loads an array of users' data by ID or member_name.
  *
- * @param mixed $users An array of users by id or name
+ * @param int[]|int|string[]|string $users An array of users by id or name
  * @param bool $is_name = false $users is by name or by id
  * @param string $set = 'normal' What kind of data to load (normal, profile, minimal)
  * @return array|bool The ids of the members loaded or false
@@ -1178,13 +1178,16 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	$member = empty($user_info['id']) ? -1 : $user_info['id'];
 
+	// Do we already have this members theme data and specific options loaded (for agressive cache settings)
 	if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2 && ($temp = cache_get_data('theme_settings-' . $id_theme . ':' . $member, 60)) != null && time() - 60 > $modSettings['settings_updated'])
 	{
 		$themeData = $temp;
 		$flag = true;
 	}
+	// Or do we just have the system wide theme settings cached
 	elseif (($temp = cache_get_data('theme_settings-' . $id_theme, 90)) != null && time() - 60 > $modSettings['settings_updated'])
 		$themeData = $temp + array($member => array());
+	// Nothing at all then
 	else
 		$themeData = array(-1 => array(), 0 => array(), $member => array());
 
@@ -1228,6 +1231,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 			}
 		}
 
+		// If being aggressive we save the site wide and member theme settings
 		if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
 			cache_put_data('theme_settings-' . $id_theme . ':' . $member, $themeData, 60);
 		// Only if we didn't already load that part of the cache...
@@ -1730,9 +1734,10 @@ function loadEssentialThemeData()
  * What this function does:
  *  - loads a template file with the name template_name from the current, default, or base theme.
  *  - detects a wrong default theme directory and tries to work around it.
+ *	- can be used to only load style sheets by using false as the template name
  *
  * @uses the template_include() function to include the file.
- * @param string $template_name
+ * @param string|false $template_name
  * @param string[]|string $style_sheets any style sheets to load with the template
  * @param bool $fatal = true if fatal is true, dies with an error message if the template cannot be found
  *

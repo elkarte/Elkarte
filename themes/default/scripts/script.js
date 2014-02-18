@@ -567,23 +567,15 @@ window.setTimeout('elk_sessionKeepAlive();', 1200000);
  * @param {string} option name being set
  * @param {string} value of the option
  * @param {string} theme its being set or null for all
- * @param {string} cur_session_id
- * @param {string} cur_session_var
  * @param {string} additional_vars to use in the url request that will be sent
  */
-function elk_setThemeOption(option, value, theme, cur_session_id, cur_session_var, additional_vars)
+function elk_setThemeOption(option, value, theme, additional_vars)
 {
-	// Compatibility.
-	if (cur_session_id === null)
-		cur_session_id = elk_session_id;
-	if (typeof(cur_session_var) === 'undefined')
-		cur_session_var = 'sesc';
-
 	if (additional_vars === null)
 		additional_vars = '';
 
 	var tempImage = new Image();
-	tempImage.src = elk_prepareScriptUrl(elk_scripturl) + 'action=jsoption;var=' + option + ';val=' + value + ';' + cur_session_var + '=' + cur_session_id + additional_vars + (theme === null ? '' : '&th=' + theme) + ';time=' + (new Date().getTime());
+	tempImage.src = elk_prepareScriptUrl(elk_scripturl) + 'action=jsoption;var=' + option + ';val=' + value + ';' + elk_session_var + '=' + elk_session_id + additional_vars + (theme === null ? '' : '&th=' + theme) + ';time=' + (new Date().getTime());
 }
 
 /**
@@ -995,7 +987,7 @@ elk_Toggle.prototype.changeState = function(bCollapse, bInit)
 		this.oCookie.set(this.opt.oCookieOptions.sCookieName, this.bCollapsed ? '1' : '0');
 
 	if (!bInit && 'oThemeOptions' in this.opt && this.opt.oThemeOptions.bUseThemeSettings)
-		elk_setThemeOption(this.opt.oThemeOptions.sOptionName, this.bCollapsed ? '1' : '0', 'sThemeId' in this.opt.oThemeOptions ? this.opt.oThemeOptions.sThemeId : null, elk_session_id, elk_session_var, 'sAdditionalVars' in this.opt.oThemeOptions ? this.opt.oThemeOptions.sAdditionalVars : null);
+		elk_setThemeOption(this.opt.oThemeOptions.sOptionName, this.bCollapsed ? '1' : '0', 'sThemeId' in this.opt.oThemeOptions ? this.opt.oThemeOptions.sThemeId : null, 'sAdditionalVars' in this.opt.oThemeOptions ? this.opt.oThemeOptions.sAdditionalVars : null);
 };
 
 elk_Toggle.prototype.toggle = function()

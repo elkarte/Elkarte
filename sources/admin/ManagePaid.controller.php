@@ -754,6 +754,9 @@ class ManagePaid_Controller extends Action_Controller
 	 * Callback for createList(),
 	 * Returns the number of subscribers to a specific subscription in the system
 	 *
+	 * @param int $id_sub
+	 * @param string $search_string
+	 * @param mixed[] $search_vars
 	 */
 	public function getSubscribedUserCount($id_sub, $search_string, $search_vars)
 	{
@@ -767,6 +770,9 @@ class ManagePaid_Controller extends Action_Controller
 	 * @param int $start
 	 * @param int $items_per_page
 	 * @param string $sort
+	 * @param int $id_sub
+	 * @param string $search_string
+	 * @param mixed[] $search_vars
 	 */
 	public function getSubscribedUsers($start, $items_per_page, $sort, $id_sub, $search_string, $search_vars)
 	{

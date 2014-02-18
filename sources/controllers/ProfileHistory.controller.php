@@ -683,7 +683,7 @@ class ProfileHistory_Controller extends Action_Controller
 	 * Callback for createList in action_trackip() and action_trackactivity()
 	 *
 	 * @param string $where
-	 * @param array $where_vars = array()
+	 * @param mixed[] $where_vars = array() or values used in the where statement
 	 * @return string number of user errors
 	 */
 	public function list_getUserErrorCount($where, $where_vars = array())
@@ -709,7 +709,7 @@ class ProfileHistory_Controller extends Action_Controller
 	 * @param int $items_per_page
 	 * @param string $sort
 	 * @param string $where
-	 * @param array $where_vars
+	 * @param mixed[] $where_vars array of values used in the where statement
 	 * @return mixed[] error messages array
 	 */
 	public function list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars = array())
@@ -752,7 +752,7 @@ class ProfileHistory_Controller extends Action_Controller
 	 * Callback for createList() in TrackIP()
 	 *
 	 * @param string $where
-	 * @param array $where_vars
+	 * @param mixed[] $where_vars array of values used in the where statement
 	 * @return string count of messages matching the IP
 	 */
 	public function list_getIPMessageCount($where, $where_vars = array())
@@ -779,7 +779,7 @@ class ProfileHistory_Controller extends Action_Controller
 	 * @param int $items_per_page
 	 * @param string $sort
 	 * @param string $where
-	 * @param array $where_vars
+	 * @param mixed[] $where_vars array of values used in the where statement
 	 * @return mixed[] an array of basic messages / details
 	 */
 	public function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars = array())
@@ -829,7 +829,7 @@ class ProfileHistory_Controller extends Action_Controller
 	 * (createList() in TrackLogins())
 	 *
 	 * @param string $where
-	 * @param array $where_vars
+	 * @param mixed[] $where_vars array of values used in the where statement
 	 * @return string count of messages matching the IP
 	 */
 	public function list_getLoginCount($where, $where_vars = array())
@@ -857,7 +857,7 @@ class ProfileHistory_Controller extends Action_Controller
 	 * @param int $items_per_page
 	 * @param string $sort
 	 * @param string $where
-	 * @param array $where_vars
+	 * @param mixed[] $where_vars array of values used in the where statement
 	 * @return mixed[] an array of messages
 	 */
 	public function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = array())
