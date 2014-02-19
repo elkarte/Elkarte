@@ -98,6 +98,33 @@ elk_mentions.prototype.attachAtWho = function ()
 				_self.mentions.append($('<input type="hidden" name="uid[]" />').val($li.data('id')).attr('data-name', $li.data('value')));
 
 				return value;
+			},
+			matcher: function(flag, subtext, should_start_with_space) {
+				var match, regexp;
+
+				flag = flag.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+
+				if (should_start_with_space)
+					flag = '(?:^|\\s)' + flag;
+
+				regexp = new RegExp(flag + pattern + '([^ <>&"\'=\\\\\n]*)$|' + flag + '([^\\x00-\\xff]*)$', 'gi');
+				match = regexp.exec(subtext.replace());
+				if (match)
+					return match[2] || match[1];
+				else
+					return null;
+			},
+			highlighter: function(li, query) {
+				var regexp;
+				if (!query)
+					return li;
+
+				// regexp from http://phpjs.org/functions/preg_quote/
+				query = (query + '').replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\-]', 'g'), '\\$&');
+				regexp = new RegExp(">\\s*(\\w*)(" + query.replace("+", "\\+") + ")(\\w*)\\s*<", 'ig');
+				return li.replace(regexp, function(str, $1, $2, $3) {
+					return '> ' + $1 + '<strong>' + $2 + '</strong>' + $3 + ' <';
+				});
 			}
 		}
 	});
