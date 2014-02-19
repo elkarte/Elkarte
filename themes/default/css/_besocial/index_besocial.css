@@ -523,15 +523,15 @@ div.bbc_footnotes .meaction{
 	border: 1px solid transparent;
 	box-shadow: none;
 }
-.poster li.avatar a {
+.poster .poster_avatar .linklevel1 {
 	display: inline-block;
 }
-.poster .listlevel1:hover>a {
+.poster .listlevel1:hover .linklevel1 {
 	border: 1px solid transparent;
 	background-color: transparent;
 	box-shadow: none;
 }
-.poster .listlevel2:hover>a {
+.poster .listlevel2:hover .linklevel2 {
 	color: #008299;
 	border: none;
 	box-shadow: none;

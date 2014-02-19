@@ -604,7 +604,8 @@ div.bbc_footnotes .meaction{
 	top: 1em;
 }
 /* Do one override here for .poster. Still saves code all round. */
-.avatar .linklevel1, .avatar:hover .linklevel1, .avatar .linklevel1:focus,
+.poster_avatar .linklevel1, .poster_avatar:hover .linklevel1,
+.poster_avatar .linklevel1:focus,
 .name.linklevel1, .name.linklevel1:hover, .name.linklevel1:focus {
 	background: none;
 	border: none;
