@@ -900,7 +900,10 @@ function loadExistingMember($name, $is_id = false)
 	if ($db->num_rows($request) == 0)
 		$user_settings = false;
 	else
+	{
 		$user_settings = $db->fetch_assoc($request);
+		$user_settings['id_member'] = (int) $user_settings['id_member'];
+	}
 
 	$db->free_result($request);
 
