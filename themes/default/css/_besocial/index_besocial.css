@@ -707,9 +707,10 @@ a.active {
 /* Level 2: subsection indicators. */
 .listlevel2.subsections .linklevel2:after {
 	position: absolute;
+	font-family: "FontAwesome";
 	right: 6px;
 	color: #ccc;
-	content: "\25b6";
+	content: "\f0da";
 	font-size: 1.286em;
 }
 
@@ -741,7 +742,8 @@ a.active {
 #menu_sidebar .listlevel1.subsections .linklevel1:after {
 	position: absolute;
 	right: 6px;
-	content: "\2192";
+	font-family: "FontAwesome";
+	content: "\f0da";
 }
 /*	$PAGELINKS	*/
 /* ------------------------------------------------------- */
