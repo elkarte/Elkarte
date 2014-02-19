@@ -4188,3 +4188,35 @@ function removeScheduleTaskImmediate($task, $calculateNextTrigger = true)
 		}
 	}
 }
+
+/**
+ * Call a template
+ * Should always be used to allow events
+ * 
+ * @param string $name
+ */
+function template_call($name)
+{
+	$args = func_get_args();
+	$name = array_shift($args);
+
+	if (empty($name))
+	{
+		throw new InvalidArgumentException('$name cannot be empty');
+	}
+
+	$return = null;
+	$hook = 'integrate_' . $name;
+
+	call_integration_hook($hook . '__pre', $args);
+
+	$do_execute = call_integration_hook($hook . '__execute', $args);
+	if (empty($do_execute))
+	{
+		$return = call_user_func_array($name, $args);
+	}
+
+	call_integration_hook($hook . '__post', $args);
+
+	return $return;
+}
