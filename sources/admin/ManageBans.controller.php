@@ -818,10 +818,12 @@ class ManageBans_Controller extends Action_Controller
 		// Otherwise its an existing trigger they want to edit
 		else
 		{
-			$row = banDetails($ban_id, $ban_group);
-			if (empty($row))
+			$ban_row = banDetails($ban_id, $ban_group);
+			if (empty($ban_row))
 				fatal_lang_error('ban_not_found', false);
+			$row = $ban_row[$ban_id];
 
+			// Load it up for the template
 			$context['ban_trigger'] = array(
 				'id' => $row['id_ban'],
 				'group' => $row['id_ban_group'],
@@ -846,7 +848,7 @@ class ManageBans_Controller extends Action_Controller
 		}
 
 		// The template uses the autosuggest functions
-		loadJavascriptFile('suggest.js', array('default_theme' => true, 'defer' => true), 'suggest.js');
+		loadJavascriptFile('suggest.js');
 
 		// Template we will use
 		$context['sub_template'] = 'ban_edit_trigger';
