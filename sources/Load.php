@@ -1793,7 +1793,7 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 
 		// If they have specified an initialization function for this template, go ahead and call it now.
 		if (function_exists('template_' . $template_name . '_init'))
-			call_user_func('template_' . $template_name . '_init');
+			template_call('template_' . $template_name . '_init');
 	}
 	// Hmmm... doesn't exist?!  I don't suppose the directory is wrong, is it?
 	elseif (!file_exists($settings['default_theme_dir']) && file_exists(BOARDDIR . '/themes/default'))
@@ -1844,7 +1844,9 @@ function loadSubTemplate($sub_template_name, $fatal = false)
 	$theme_function = 'template_' . $sub_template_name;
 
 	if (function_exists($theme_function))
-		$theme_function();
+	{
+		template_call($theme_function);
+	}
 	elseif ($fatal === false)
 		fatal_lang_error('theme_template_error', 'template', array((string) $sub_template_name));
 	elseif ($fatal !== 'ignore')

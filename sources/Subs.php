@@ -2447,7 +2447,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 			}
 
 		// Display the screen in the logical order.
-		template_header();
+		template_call('template_header');
 		$header_done = true;
 	}
 
@@ -2460,7 +2460,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 		if (!$footer_done)
 		{
 			$footer_done = true;
-			template_footer();
+			template_call('template_footer');
 
 			// (since this is just debugging... it's okay that it's after </html>.)
 			if (!isset($_REQUEST['xml']))
