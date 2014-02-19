@@ -168,7 +168,12 @@ class Post_Controller extends Action_Controller
 			$context['can_sticky'] = allowedTo('make_sticky') && !empty($modSettings['enableStickyTopics']);
 			$context['notify'] = !empty($context['notify']);
 			$context['sticky'] = isset($_REQUEST['sticky']) ? !empty($_REQUEST['sticky']) : $sticky;
-			$context['can_add_poll'] = (allowedTo('poll_add_any') || (!empty($_REQUEST['msg']) && $id_first_msg == $_REQUEST['msg'] && allowedTo('poll_add_own'))) && !empty($modSettings['pollMode']) && $pollID <= 0;
+
+			// It's a new reply
+			if (empty($_REQUEST['msg']))
+				$context['can_add_poll'] = false;
+			else
+				$context['can_add_poll'] = (allowedTo('poll_add_any') || (!empty($_REQUEST['msg']) && $id_first_msg == $_REQUEST['msg'] && allowedTo('poll_add_own'))) && !empty($modSettings['pollMode']) && $pollID <= 0;
 		}
 		else
 		{
