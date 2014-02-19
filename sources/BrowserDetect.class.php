@@ -45,14 +45,14 @@ class Browser_Detector
 	/**
 	 * Holds if the detected device may be a mobile one
 	 *
-	 * @var type
+	 * @var boolean
 	 */
 	private $_is_mobile = null;
 
 	/**
 	 * Holds if the detected device may be a tablet
 	 *
-	 * @var type
+	 * @var boolean
 	 */
 	private $_is_tablet = null;
 

@@ -35,7 +35,7 @@ class Xml_Array
 
 	/**
 	 * holds debugging level
-	 * @var type
+	 * @var int|null
 	 */
 	public $debug_level;
 
