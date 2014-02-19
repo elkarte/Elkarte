@@ -746,17 +746,14 @@ class ManageBans_Controller extends Action_Controller
 	 * Editing existing ban triggers:
 	 *  - is accessed by ?action=admin;area=ban;sa=edittrigger;bg=x;bi=y
 	 *  - uses the ban_edit_trigger sub template of ManageBans.
+	 *
+	 * @uses sub template ban_edit_trigger
 	 */
 	public function action_edittrigger()
 	{
 		global $context, $scripturl;
 
 		require_once(SUBSDIR . '/Bans.subs.php');
-
-		$context['sub_template'] = 'ban_edit_trigger';
-		$context['form_url'] = $scripturl . '?action=admin;area=ban;sa=edittrigger';
-		// The autosuggest avoids some typing!
-		loadJavascriptFile('suggest.js', array('default_theme' => true), 'suggest.js');
 
 		$ban_group = isset($_REQUEST['bg']) ? (int) $_REQUEST['bg'] : 0;
 		$ban_id = isset($_REQUEST['bi']) ? (int) $_REQUEST['bi'] : 0;
@@ -785,9 +782,7 @@ class ManageBans_Controller extends Action_Controller
 			redirectexit('action=admin;area=ban;sa=edit' . (!empty($ban_group) ? ';bg=' . $ban_group : ''));
 		}
 
-		// The template uses the autosuggest functions
-		loadJavascriptFile('suggest.js', array('default_theme' => true, 'defer' => true), 'suggest.js');
-
+		// No id supplied, this must be a new trigger being added
 		if (empty($ban_id))
 		{
 			$context['ban_trigger'] = array(
@@ -812,6 +807,7 @@ class ManageBans_Controller extends Action_Controller
 				'is_new' => true,
 			);
 		}
+		// Otherwise its an existing trigger they want to edit
 		else
 		{
 			$row = banDetails($ban_id, $ban_group);
@@ -840,6 +836,13 @@ class ManageBans_Controller extends Action_Controller
 				'is_new' => false,
 			);
 		}
+
+		// The template uses the autosuggest functions
+		loadJavascriptFile('suggest.js', array('default_theme' => true, 'defer' => true), 'suggest.js');
+
+		// Template we will use
+		$context['sub_template'] = 'ban_edit_trigger';
+		$context['form_url'] = $scripturl . '?action=admin;area=ban;sa=edittrigger';
 
 		createToken('admin-bet');
 	}
