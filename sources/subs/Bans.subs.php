@@ -1440,12 +1440,15 @@ function banLoadAdditionalIPs($member_id)
 /**
  * Fetches ban details
  *
- * @param int $ban_id
- * @param int $ban_group
+ * @param int[]int $ban_ids
+ * @param int|false $ban_group
  */
-function banDetails($ban_id, $ban_group)
+function banDetails($ban_ids, $ban_group = false)
 {
 	$db = database();
+
+	if (!is_array($ban_ids))
+		$ban_ids = array($ban_ids);
 
 	$request = $db->query('', '
 		SELECT
@@ -1455,11 +1458,10 @@ function banDetails($ban_id, $ban_group)
 			mem.member_name, mem.real_name
 		FROM {db_prefix}ban_items AS bi
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = bi.id_member)
-		WHERE bi.id_ban = {int:ban_item}
-			AND bi.id_ban_group = {int:ban_group}
-		LIMIT 1',
+		WHERE bi.id_ban = {array_int:ban_items}' . ($ban_group !== false ? '
+			AND bi.id_ban_group = {int:ban_group}' : ''),
 		array(
-			'ban_item' => $ban_id,
+			'ban_items' => $ban_ids,
 			'ban_group' => $ban_group,
 		)
 	);
