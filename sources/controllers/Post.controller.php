@@ -814,12 +814,12 @@ class Post_Controller extends Action_Controller
 			if (isset($_REQUEST['xml']))
 				$limit = empty($context['new_replies']) ? 0 : (int) $context['new_replies'];
 			else
-				$limit = empty($modSettings['topicSummaryPosts']) ? 0 : (int) $modSettings['topicSummaryPosts'];
+				$limit = $modSettings['topicSummaryPosts'];
 
 			$before = isset($_REQUEST['msg']) ? array('before' => (int) $_REQUEST['msg']) : array();
 
 			$counter = 0;
-			$context['previous_posts'] = selectMessages($topic, 0, $limit, $before, $only_approved);
+			$context['previous_posts'] = empty($limit) ? array() : selectMessages($topic, 0, $limit, $before, $only_approved);
 			foreach ($context['previous_posts'] as &$post)
 			{
 				$post['is_new'] = !empty($context['new_replies']);
