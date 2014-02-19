@@ -312,6 +312,7 @@ class ManageBans_Controller extends Action_Controller
 		createToken('admin-bet');
 		$context['form_url'] = $scripturl . '?action=admin;area=ban;sa=edit';
 
+		// Prepare any errors found to the template to show
 		$context['ban_errors'] = array(
 			'errors' => $ban_errors->prepareErrors(),
 			'type' => $ban_errors->getErrorType() == 0 ? 'minor' : 'serious',
@@ -469,7 +470,8 @@ class ManageBans_Controller extends Action_Controller
 						// Default the ban name to the name of the banned member.
 						$context['ban']['name'] = $context['ban_suggestions']['member']['name'];
 
-						// @todo: there should be a better solution...used to lock the "Ban on Username" input when banning from profile
+						// @todo: there should be a better solution...
+						// used to lock the "Ban on Username" input when banning from profile
 						$context['ban']['from_user'] = true;
 
 						// Would be nice if we could also ban the hostname.
@@ -490,10 +492,13 @@ class ManageBans_Controller extends Action_Controller
 		// Template needs this to show errors using javascript
 		loadLanguage('Errors');
 		$context['sub_template'] = 'ban_edit';
+
 		// A couple of text strings we *may* need
 		addJavascriptVar(array(
 			'txt_ban_name_empty' => $txt['ban_name_empty'],
-			'txt_ban_restriction_empty' => $txt['ban_restriction_empty']), true);
+			'txt_ban_restriction_empty' => $txt['ban_restriction_empty']), true
+		);
+
 		// And a bit of javascript to enable/disable some fields
 		addInlineJavascript('addLoadEvent(fUpdateStatus);', true);
 	}
@@ -761,11 +766,13 @@ class ManageBans_Controller extends Action_Controller
 		if (empty($ban_group))
 			fatal_lang_error('ban_not_found', false);
 
+		// Adding a new trigger
 		if (isset($_POST['add_new_trigger']) && !empty($_POST['ban_suggestions']))
 		{
 			saveTriggers($_POST['ban_suggestions'], $ban_group, 0, $ban_id);
 			redirectexit('action=admin;area=ban;sa=edit' . (!empty($ban_group) ? ';bg=' . $ban_group : ''));
 		}
+		// Edit an existing trigger with new / updated details
 		elseif (isset($_POST['edit_trigger']) && !empty($_POST['ban_suggestions']))
 		{
 			// The first replaces the old one, the others are added new
@@ -776,6 +783,7 @@ class ManageBans_Controller extends Action_Controller
 
 			redirectexit('action=admin;area=ban;sa=edit' . (!empty($ban_group) ? ';bg=' . $ban_group : ''));
 		}
+		// Removing a ban trigger by clearing the checkbox
 		elseif (isset($_POST['edit_trigger']))
 		{
 			removeBanTriggers($ban_id);
