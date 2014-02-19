@@ -3777,7 +3777,19 @@ function call_integration_include_hook($hook)
  */
 function call_integration_buffer()
 {
-	global $modSettings;
+	global $modSettings, $settings;
+
+	static $path_replacements = array(
+		'BOARDDIR' => BOARDDIR,
+		'SOURCEDIR' => SOURCEDIR,
+		'EXTDIR' => EXTDIR,
+		'LANGUAGEDIR' => LANGUAGEDIR,
+		'ADMINDIR' => ADMINDIR,
+		'CONTROLLERDIR' => CONTROLLERDIR,
+		'SUBSDIR' => SUBSDIR,
+	);
+	if (!empty($settings['theme_dir']))
+		$path_replacements['$themedir'] = $settings['theme_dir'];
 
 	if (isset($modSettings['integrate_buffer']))
 		$buffers = explode(',', $modSettings['integrate_buffer']);
