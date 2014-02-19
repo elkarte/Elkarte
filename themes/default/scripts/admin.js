@@ -1060,7 +1060,7 @@ function hideGlobalCookies()
 		$("#setting_globalCookiesDomain").closest("dt").slideUp();
 		$("#globalCookiesDomain").closest("dd").slideUp();
 	}
-};
+}
 
 /**
  * Attachments Settings
