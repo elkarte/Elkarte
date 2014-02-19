@@ -91,7 +91,7 @@
 					if (should_start_with_space)
 						flag = '(?:^|\\s)' + flag;
 
-					regexp = new RegExp(flag + pattern + '([^ <>&"\'=\\\\\n]*)$|' + flag + '([^\\x00-\\xff]*)$', 'gi');
+					regexp = new RegExp(flag + '([^ <>&"\'=\\\\\n]*)$|' + flag + '([^\\x00-\\xff]*)$', 'gi');
 					match = regexp.exec(subtext.replace());
 					if (match)
 						return match[2] || match[1];
