@@ -33,9 +33,11 @@ $txt['whoall_groups'] = 'Viewing the member groups page.';
 $txt['whoall_help'] = 'Viewing the <a href="' . $scripturl . '?action=help">help page</a>.';
 $txt['whoall_quickhelp'] = 'Viewing a help popup.';
 $txt['whoall_pm'] = 'Viewing their messages.';
-$txt['whoall_login'] = 'Logging into the forum.';
-$txt['whoall_login2'] = 'Logging into the forum.';
+$txt['whoall_auth'] = 'Logging into the forum.';
+$txt['whoall_login'] = 'Viewing the login page.';
+$txt['whoall_login2'] = 'Viewing the login page.';
 $txt['whoall_logout'] = 'Logging out of the forum.';
+$txt['whoall_auth'] = 'Viewing the login page.';
 $txt['whoall_markasread'] = 'Marking topics read or unread.';
 $txt['whoall_modifykarma_applaud'] = 'Applauding a member.';
 $txt['whoall_modifykarma_smite'] = 'Smiting a member.';
@@ -82,6 +84,8 @@ $txt['whotopic_sendtopic'] = 'Sending the topic &quot;<a href="' . $scripturl . 
 $txt['whotopic_splittopics'] = 'Splitting the topic &quot;<a href="' . $scripturl . '?topic=%1$d.0">%2$s</a>&quot; into two topics.';
 $txt['whotopic_sticky'] = 'Setting the topic &quot;<a href="' . $scripturl . '?topic=%1$d.0">%2$s</a>&quot; as sticky.';
 $txt['whotopic_vote'] = 'Voting in <a href="' . $scripturl . '?topic=%1$d.0">%2$s</a>.';
+$txt['whotopic_watch'] = 'Started watching a topic.';
+$txt['whotopic_unwatch'] = 'Stopped watching a topic.';
 
 $txt['whopost_quotefast'] = 'Quoting a post from &quot;<a href="' . $scripturl . '?topic=%1$d.0">%2$s</a>&quot;.';
 
