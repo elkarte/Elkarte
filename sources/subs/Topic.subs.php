@@ -1757,6 +1757,49 @@ function topicAttribute($id_topic, $attribute)
 }
 
 /**
+ * Retrieve some topic attributes based on the user:
+ *   - locked
+ *   - notify
+ *   - is_sticky
+ *   - id_poll
+ *   - id_last_msg
+ *   - id_member of the first message in the topic
+ *   - id_first_msg
+ *   - subject of the first message in the topic
+ *   - last_post_time that is poster_time if poster_time > modified_time, or
+ *       modified_time otherwise
+ *
+ * @param int $id_topic topic to get the status for
+ * @param int $user a user id
+ * @return mixed[]
+ */
+function topicUserAttributes($id_topic, $user)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT
+			t.locked, IFNULL(ln.id_topic, 0) AS notify, t.is_sticky, t.id_poll, t.id_last_msg, mf.id_member,
+			t.id_first_msg, mf.subject,
+			CASE WHEN ml.poster_time > ml.modified_time THEN ml.poster_time ELSE ml.modified_time END AS last_post_time
+		FROM {db_prefix}topics AS t
+			LEFT JOIN {db_prefix}log_notify AS ln ON (ln.id_topic = t.id_topic AND ln.id_member = {int:current_member})
+			LEFT JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
+			LEFT JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
+		WHERE t.id_topic = {int:current_topic}
+		LIMIT 1',
+		array(
+			'current_member' => $user,
+			'current_topic' => $id_topic,
+		)
+	);
+	$return = $db->fetch_assoc($request);
+	$db->free_result($request);
+
+	return $return;
+}
+
+/**
  * Retrieve some details about the topic
  *
  * @param int[] $topics an array of topic id

@@ -53,8 +53,6 @@ class Post_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $topic, $modSettings, $board, $user_info, $context, $options, $language;
 
-		$db = database();
-
 		loadLanguage('Post');
 
 		// You can't reply with a poll... hacker.
@@ -84,6 +82,7 @@ class Post_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Post.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');
+		require_once(SUBSDIR . '/Topic.subs.php');
 
 		if (isset($_REQUEST['xml']))
 		{
@@ -108,24 +107,7 @@ class Post_Controller extends Action_Controller
 		// Check if it's locked. It isn't locked if no topic is specified.
 		if (!empty($topic))
 		{
-			$request = $db->query('', '
-				SELECT
-					t.locked, IFNULL(ln.id_topic, 0) AS notify, t.is_sticky, t.id_poll, t.id_last_msg, mf.id_member,
-					t.id_first_msg, mf.subject,
-					CASE WHEN ml.poster_time > ml.modified_time THEN ml.poster_time ELSE ml.modified_time END AS last_post_time
-				FROM {db_prefix}topics AS t
-					LEFT JOIN {db_prefix}log_notify AS ln ON (ln.id_topic = t.id_topic AND ln.id_member = {int:current_member})
-					LEFT JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
-					LEFT JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
-				WHERE t.id_topic = {int:current_topic}
-				LIMIT 1',
-				array(
-					'current_member' => $user_info['id'],
-					'current_topic' => $topic,
-				)
-			);
-			list ($locked, $context['notify'], $sticky, $pollID, $context['topic_last_message'], $id_member_poster, $id_first_msg, $first_subject, $lastPostTime) = $db->fetch_row($request);
-			$db->free_result($request);
+			list ($locked, $context['notify'], $sticky, $pollID, $context['topic_last_message'], $id_member_poster, $id_first_msg, $first_subject, $lastPostTime) = array_values(topicUserAttributes($topic, $user_info['id']));
 
 			// If this topic already has a poll, they sure can't add another.
 			if (isset($_REQUEST['poll']) && $pollID > 0)
@@ -356,7 +338,6 @@ class Post_Controller extends Action_Controller
 		{
 			if (empty($options['no_new_reply_warning']) && isset($_REQUEST['last_msg']) && $context['topic_last_message'] > $_REQUEST['last_msg'])
 			{
-				require_once(SUBSDIR . '/Topic.subs.php');
 				$context['new_replies'] = countMessagesSince($topic, (int) $_REQUEST['last_msg'], false, $modSettings['postmod_active'] && !allowedTo('approve_posts'));
 
 				if (!empty($context['new_replies']))
@@ -808,7 +789,6 @@ class Post_Controller extends Action_Controller
 		// Update the topic summary, needed to show new posts in a preview
 		if (!empty($topic) && !empty($modSettings['topicSummaryPosts']))
 		{
-			require_once(SUBSDIR . '/Topic.subs.php');
 			$only_approved = $modSettings['postmod_active'] && !allowedTo('approve_posts');
 
 			if (isset($_REQUEST['xml']))
