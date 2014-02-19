@@ -105,7 +105,7 @@ $txt['maillist_imap_delete_desc'] = 'Attempt to remove mailbox messages that hav
 $txt['maillist_imap_reason'] = 'The following should be left BLANK if you intend to pipe messages into the forum (recommended)';
 $txt['maillist_imap_missing'] = 'IMAP functions are not installed on your system, no settings are available';
 $txt['maillist_imap_cron'] = 'Fake-Cron (scheduled task)';
-$txt['maillist_imap_cron_desc'] = 'If you can\'t run a cron job on you system, as a last resort check this to instead run this as an ElkArte scheduled task';
+$txt['maillist_imap_cron_desc'] = 'If you can\'t run a cron job on your system, as a last resort check this to instead run this as an ElkArte scheduled task';
 $txt['scheduled_task_desc_pbeIMAP'] = 'Runs the post by email IMAP mailbox program to read new email from the designated inbox';
 
 // General Receiving Settings
