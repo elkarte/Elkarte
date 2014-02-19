@@ -36,7 +36,7 @@ function template_display_child_boards_above()
 			', $txt['parent_boards'], '
 		</h2>';
 
-	template_list_boards($context['boards'], 'board_' . $context['current_board'] . '_children');
+	template_call('template_list_boards', $context['boards'], 'board_' . $context['current_board'] . '_children');
 
 	echo '
 	</div>';
@@ -55,7 +55,7 @@ function template_topic_listing_above()
 	if ($context['no_topic_listing'])
 		return;
 
-	template_pagesection('normal_buttons', 'right');
+	template_call('template_pagesection', 'normal_buttons', 'right');
 
 	if (!empty($context['description']) || !empty($context['moderators']))
 	{

@@ -110,7 +110,9 @@ function template_merge()
 				</div>
 			</div><br />
 			<h3 class="category_header">', $txt['target_topic'], '</h3>
-			', template_pagesection(), '
+			';
+	template_call('template_pagesection');
+	echo '
 			<div class="windowbg2">
 				<div class="content">
 					<ul class="merge_topics">';
@@ -125,7 +127,9 @@ function template_merge()
 	echo '
 					</ul>
 				</div>
-			</div>', template_pagesection(), '
+			</div>';
+	template_call('template_pagesection');
+	echo '
 		</div>';
 }
 

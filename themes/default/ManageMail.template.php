@@ -38,7 +38,7 @@ function template_mail_queue()
 			</div>
 		</div>';
 
-	template_show_list('mail_queue');
+	template_call('template_show_list', 'mail_queue');
 
 	echo '
 	</div>';

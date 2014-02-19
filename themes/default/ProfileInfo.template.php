@@ -83,14 +83,14 @@ function template_action_summary()
 					foreach ($templates as $template)
 					{
 						$block = 'template_profile_block_' . $template;
-						$block();
+						template_call($block);
 					}
 				}
 				// Or just a single template is fine
 				else
 				{
 					$block = 'template_profile_block_' . $templates;
-					$block();
+					template_call($block);
 				}
 
 				echo '
@@ -117,7 +117,7 @@ function template_action_showPosts()
 {
 	global $context, $scripturl, $txt;
 
-	template_pagesection();
+	template_call('template_pagesection');
 
 	echo '
 		<div class="forumposts">
@@ -185,7 +185,7 @@ function template_action_showPosts()
 		}
 	}
 	else
-		template_show_list('attachments');
+		template_call('template_show_list', 'attachments');
 
 	// No posts? Just end the table with a informative message.
 	if ((isset($context['attachments']) && empty($context['attachments'])) || (!isset($context['attachments']) && empty($context['posts'])))
@@ -200,7 +200,7 @@ function template_action_showPosts()
 		</div>';
 
 	// Show more page numbers.
-	template_pagesection();
+	template_call('template_pagesection');
 }
 
 /**
@@ -520,7 +520,7 @@ function template_viewWarning()
 {
 	global $context, $txt;
 
-	template_load_warning_variables();
+	template_call('template_load_warning_variables');
 
 	echo '
 		<h2 class="category_header hdicon cat_img_profile">
@@ -565,7 +565,7 @@ function template_viewWarning()
 			</div>
 		</div>';
 
-	template_show_list('view_warnings');
+	template_call('template_show_list', 'view_warnings');
 }
 
 /**

@@ -267,7 +267,7 @@ function template_attach_paths()
 	global $modSettings;
 
 	if (!empty($modSettings['attachment_basedirectories']))
-		template_show_list('base_paths');
+		template_call('template_show_list', 'base_paths');
 
-	template_show_list('attach_paths');
+	template_call('template_show_list', 'attach_paths');
 }

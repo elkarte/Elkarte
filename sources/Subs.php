@@ -2447,7 +2447,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 			}
 
 		// Display the screen in the logical order.
-		template_header();
+		template_call('template_header');
 		$header_done = true;
 	}
 
@@ -2460,7 +2460,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 		if (!$footer_done)
 		{
 			$footer_done = true;
-			template_footer();
+			template_call('template_footer');
 
 			// (since this is just debugging... it's okay that it's after </html>.)
 			if (!isset($_REQUEST['xml']))
@@ -4187,4 +4187,45 @@ function removeScheduleTaskImmediate($task, $calculateNextTrigger = true)
 			calculateNextTrigger($task);
 		}
 	}
+}
+
+/**
+ * Call a template
+ * Should always be used to allow events
+ * 
+ * @param string $name
+ */
+function template_call($name)
+{
+	$args = func_get_args();
+	$name = array_shift($args);
+
+	if (empty($name))
+	{
+		throw new InvalidArgumentException('$name cannot be empty');
+	}
+
+	$hook = 'integrate_' . $name;
+
+	call_integration_hook($hook . '__pre', $args);
+
+	$skip_execute = true;
+
+	$execute_result = call_integration_hook($hook . '__execute', $args);
+	foreach ($execute_result as $hook_result)
+	{
+		if (!empty($hook_result))
+		{
+			$skip_execute = true;
+			break;
+		}
+					
+	}
+
+	if (empty($skip_execute))
+	{
+		call_user_func_array($name, $args);
+	}
+
+	call_integration_hook($hook . '__post', $args);
 }

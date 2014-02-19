@@ -34,7 +34,7 @@ function template_ban_edit()
 			<div class="information">', $txt['ban_add_notes'], '</div>';
 
 	// If there were errors creating the ban, show them.
-	template_show_error('ban_errors');
+	template_call('template_show_error', 'ban_errors');
 
 	echo '
 			<div class="content">
@@ -178,7 +178,7 @@ function template_ban_edit()
 		echo '
 		<br />';
 
-		template_show_list('ban_items');
+		template_call('template_show_list', 'ban_items');
 	}
 
 	echo '

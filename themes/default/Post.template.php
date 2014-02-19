@@ -76,9 +76,9 @@ function template_postarea_above()
 					<div class="editor_wrapper">';
 
 	// If an error occurred, explain what happened.
-	template_show_error('post_error');
+	template_call('template_show_error', 'post_error');
 	if (!empty($context['attachment_error_keys']))
-		template_attachment_errors();
+		template_call('template_attachment_errors');
 
 	// If this won't be approved let them know!
 	// @todo why not use the template_show_error above?
@@ -160,7 +160,7 @@ function template_postarea_above()
 							<dt class="clear_left">
 								<label for="post_in_board">', $txt['post_in_board'], '</label>:
 							</dt>
-							<dd>', template_select_boards('post_in_board'), '
+							<dd>', template_call('template_select_boards', 'post_in_board'), '
 							</dd>';
 
 	echo '
@@ -176,7 +176,7 @@ function template_poll_edit_above()
 					<hr class="clear" />
 					<div id="edit_poll">';
 
-	template_poll_edit();
+	template_call('template_poll_edit');
 
 	echo '
 					</div>';
@@ -265,7 +265,7 @@ function template_make_event_above()
 		{
 			echo '
 								<li>
-									', template_select_boards('board', $txt['calendar_post_in']), '
+									', template_call('template_select_boards', 'board', $txt['calendar_post_in']), '
 								</li>';
 		}
 
@@ -291,7 +291,7 @@ function template_post_page()
 
 	// Show the actual posting area...
 	echo '
-					', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
+					', template_call('template_control_richedit_buttons', $context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
 
 	// A placeholder for our mention box if needed
 	if (!empty($context['member_ids']))
@@ -317,7 +317,7 @@ function template_post_page()
 	// Show our submit buttons before any more options
 	echo '
 						<div id="post_confirm_buttons" class="submitbutton">
-							', template_control_richedit_buttons($context['post_box_name']);
+							', template_call('template_control_richedit_buttons', $context['post_box_name']);
 
 	// Option to delete an event if user is editing one.
 	if ($context['make_event'] && !$context['event']['new'])
@@ -641,7 +641,7 @@ function template_postarea_below()
 	// Is visual verification enabled?
 	if ($context['require_verification'])
 	{
-		template_control_verification($context['visual_verification_id'], '
+		template_call('template_control_verification', $context['visual_verification_id'], '
 						<div class="post_verification">
 							<span' . (!empty($context['post_error']['need_qr_verification']) ? ' class="error"' : '') . '>
 								<strong>' . $txt['verification'] . ':</strong>
@@ -733,7 +733,7 @@ function template_postarea_below()
 	echo '
 		// ]]></script>';
 
-	template_topic_replies_below();
+	template_call('template_topic_replies_below');
 }
 
 /**

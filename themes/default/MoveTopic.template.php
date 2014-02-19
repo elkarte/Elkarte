@@ -41,7 +41,9 @@ function template_move_topic()
 							<dt>
 								<strong>', $txt['move_to'], ':</strong>
 							</dt>
-							<dd>', template_select_boards('toboard'), '
+							<dd>';
+	template_call('template_select_boards', 'toboard');
+	echo '
 							</dd>';
 
 	// Disable the reason textarea when the postRedirect checkbox is unchecked...

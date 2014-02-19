@@ -36,7 +36,7 @@ function template_send_topic()
 {
 	global $context, $settings, $txt, $scripturl;
 
-	template_show_error('sendtopic_error');
+	template_call('template_show_error', 'sendtopic_error');
 
 	echo '
 	<div id="send_topic">
@@ -101,7 +101,7 @@ function template_custom_email()
 {
 	global $context, $settings, $txt, $scripturl;
 
-	template_show_error('sendemail_error');
+	template_call('template_show_error', 'sendtopic_error');
 
 	echo '
 	<div id="send_topic">
@@ -212,7 +212,7 @@ function template_report()
 				<div class="windowbg">
 					<div class="content">';
 
-	template_show_error('report_error');
+	template_call('template_show_error', 'report_error');
 
 	echo '
 						<p class="warningbox">', $txt['report_to_mod_func'], '</p>
@@ -240,7 +240,7 @@ function template_report()
 
 	if ($context['require_verification'])
 	{
-		template_control_verification($context['visual_verification_id'], '
+		template_call('template_control_verification', $context['visual_verification_id'], '
 							<dt>
 								' . $txt['verification'] . ':
 							</dt>

@@ -40,10 +40,10 @@ function template_permission_index()
 		echo '
 			<h3 class="category_header">', $txt['permissions_title'], '</h3>';
 
-	template_show_list('regular_membergroups_list');
+	template_call('template_show_list', 'regular_membergroups_list');
 
 	if (!empty($context['post_count_membergroups_list']))
-		template_show_list('post_count_membergroups_list');
+		template_call('template_show_list', 'post_count_membergroups_list');
 
 	echo '
 			<br />';
@@ -484,7 +484,7 @@ function template_modify_group()
 			<div class="flow_hidden">';
 
 	// Draw out the main bits.
-	template_modify_group_classic($context['permission_type']);
+	template_call('template_modify_group_classic', $context['permission_type']);
 
 	echo '
 			</div>';
@@ -500,7 +500,7 @@ function template_modify_group()
 			</div>
 			<div class="flow_hidden">';
 
-		template_modify_group_classic('board');
+		template_call('template_modify_group_classic', 'board');
 
 		echo '
 			</div>';

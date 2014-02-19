@@ -69,7 +69,7 @@ function template_generate_report()
 		<div id="report_buttons">';
 
 	if (!empty($context['report_buttons']))
-		template_button_strip($context['report_buttons'], 'right');
+		template_call('template_button_strip', $context['report_buttons'], 'right');
 
 	echo '
 		</div>

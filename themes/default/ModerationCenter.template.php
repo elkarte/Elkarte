@@ -36,7 +36,12 @@ function template_moderation_center()
 		$block_function = 'template_' . $block;
 
 		echo '
-							<div class="modblock_', $alternate ? 'left' : 'right', '">', function_exists($block_function) ? $block_function() : '', '</div>';
+							<div class="modblock_', $alternate ? 'left' : 'right', '">';
+
+		if (function_exists($block_function))
+			template_call($block_function);
+
+		echo '</div>';
 
 		$alternate = !$alternate;
 	}
@@ -278,7 +283,7 @@ function template_reported_posts()
 						</h3>';
 
 	if (!empty($context['reports']))
-		template_pagesection();
+		template_call('template_pagesection');
 
 	$alternate = 0;
 	foreach ($context['reports'] as $report)
@@ -332,7 +337,7 @@ function template_reported_posts()
 							</div>
 						</div>';
 	else
-		template_pagesection(false, false, array('extra' => !$context['view_closed'] ? '<input type="submit" name="close_selected" value="' . $txt['mc_reportedp_close_selected'] . '" class="right_submit" />' : ''));
+		template_call('template_pagesection', false, false, array('extra' => !$context['view_closed'] ? '<input type="submit" name="close_selected" value="' . $txt['mc_reportedp_close_selected'] . '" class="right_submit" />' : ''));
 
 	echo '
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -347,7 +352,7 @@ function template_unapproved_posts()
 {
 	global $options, $context, $txt, $scripturl;
 
-	template_pagesection();
+	template_call('template_pagesection');
 
 	// Just a big div of it all really...
 	echo '
@@ -426,7 +431,7 @@ function template_unapproved_posts()
 						</noscript>
 					</div>';
 
-	template_pagesection(false, false, array('extra' => $quick_mod));
+	template_call('template_pagesection', false, false, array('extra' => $quick_mod));
 
 	echo '
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -492,7 +497,7 @@ function template_viewmodreport()
 								</div>
 							</div>';
 
-	template_show_list('moderation_actions_list');
+	template_call('template_show_list', 'moderation_actions_list');
 
 	echo '
 							<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

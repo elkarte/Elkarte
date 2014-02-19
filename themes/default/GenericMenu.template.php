@@ -100,7 +100,7 @@ function template_generic_menu_sidebar_above()
 
 	// If there are any "tabs" setup, this is the place to shown them.
 	if (empty($context['force_disable_tabs']))
-		template_generic_menu_tabs($menu_context);
+		template('template_generic_menu_tabs', $menu_context);
 }
 
 /**
@@ -193,7 +193,7 @@ function template_generic_menu_dropdown_above()
 				<div id="admin_content">';
 
 	// It's possible that some pages have their own tabs they wanna force...
-	template_generic_menu_tabs($menu_context);
+	template('template_generic_menu_tabs', $menu_context);
 }
 
 /**
@@ -303,7 +303,7 @@ function template_generic_menu_tabs(&$menu_context)
 		// The function is in Admin.template.php, but since this template is used elsewhere,
 		// we need to check if the function is available.
 		if (function_exists('template_admin_quick_search'))
-			template_admin_quick_search();
+			template_call('template_admin_quick_search');
 		echo '
 					</div>';
 	}

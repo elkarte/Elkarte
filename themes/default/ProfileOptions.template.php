@@ -287,7 +287,7 @@ function template_edit_options()
 			if (isset($field['callback_func']) && function_exists('template_profile_' . $field['callback_func']))
 			{
 				$callback_func = 'template_profile_' . $field['callback_func'];
-				$callback_func();
+				template_call($callback_func);
 			}
 		}
 		else
@@ -1051,7 +1051,7 @@ function template_ignoreboards()
 				</ul>';
 
 	// Show the standard "Save Settings" profile button.
-	template_profile_save();
+	template_call('template_profile_save');
 
 	echo '
 			</div>

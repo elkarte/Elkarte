@@ -249,7 +249,7 @@ function template_registration_form()
 				if (isset($field['callback_func']) && function_exists('template_profile_' . $field['callback_func']))
 				{
 					$callback_func = 'template_profile_' . $field['callback_func'];
-					$callback_func();
+					template_call($callback_func);
 				}
 			}
 			else
@@ -349,7 +349,7 @@ function template_registration_form()
 
 	if ($context['visual_verification'])
 	{
-		template_control_verification($context['visual_verification_id'], '
+		template_call('template_control_verification', $context['visual_verification_id'], '
 			<h3 class="category_header">' . $txt['verification'] . '</h3>
 			<div class="windowbg2">
 				<fieldset class="content centertext">
@@ -790,7 +790,7 @@ function template_contact_form()
 
 	if ($context['require_verification'])
 	{
-		template_control_verification($context['visual_verification_id'], '
+		template_call('template_control_verification', $context['visual_verification_id'], '
 					<dt>
 							' . $txt['verification'] . ':
 					</dt>

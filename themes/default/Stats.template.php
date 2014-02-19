@@ -32,14 +32,14 @@ function template_statistics()
 	foreach ($context['statistics_callbacks'] as $callback)
 	{
 		$function = 'template_' . $callback;
-		$function();
+		template_call($function);
 	}
 
 	echo '
 		</ul>
 	</div>';
 
-	template_forum_history();
+	template_call('template_forum_history');
 }
 
 /**

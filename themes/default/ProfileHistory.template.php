@@ -71,7 +71,7 @@ function template_trackActivity()
 		<br />';
 
 	// Show the track user list.
-	template_show_list('track_name_user_list');
+	template_call('template_show_list', 'track_name_user_list');
 }
 
 /**
@@ -154,9 +154,9 @@ function template_trackIP()
 	</div>
 	<br />';
 
-	template_show_list('track_message_list');
+	template_call('template_show_list', 'track_message_list');
 
 	echo '<br />';
 
-	template_show_list('track_ip_user_list');
+	template_call('template_show_list', 'track_ip_user_list');
 }

@@ -24,7 +24,11 @@ function template_badbehavior_log()
 			<h3 class="category_header">
 				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=badbehaviorlog" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['badbehaviorlog_log'], '
 			</h3>
-			', template_pagesection(), '
+			';
+
+	template_call('template_pagesection');
+
+	echo '
 			<table class="table_grid" id="error_log">';
 
 	if ($context['has_filter'])
@@ -105,7 +109,7 @@ function template_badbehavior_log()
 			<div class="flow_auto">
 				<div class="floatleft">';
 
-	template_pagesection();
+	template_call('template_pagesection');
 
 	echo '
 				</div>
