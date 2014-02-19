@@ -65,8 +65,8 @@ function template_latest_news()
 
 	// This requires a lot of javascript...
 	echo '
-								<span style="display:none" id="installedVersion">', $context['forum_version'], '</span>
-								<span style="display:none" id="latestVersion">', $context['forum_version'], '</span>
+								<span style="display:none" id="installedVersion">??</span>
+								<span style="display:none" id="latestVersion">??</span>
 								<script><!-- // --><![CDATA[
 						var oAdminCenter = new elk_AdminIndex({
 							bLoadAnnouncements: true,
