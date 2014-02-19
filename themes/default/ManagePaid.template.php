@@ -34,6 +34,8 @@ function template_modify_subscription()
 			</div>
 			';
 
+	template_show_error('subscription_error');
+
 	echo '
 			<div class="windowbg">
 				<div class="content">
