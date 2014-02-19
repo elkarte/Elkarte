@@ -962,30 +962,28 @@ class ManageBans_Controller extends Action_Controller
 				),
 			),
 			'list_menu' => array(
-				array(
-					'show_on' => 'top',
-					'value' => array(
-						array(
-							'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=ip',
-							'is_selected' => $context['selected_entity'] == 'ip',
-							'label' => $txt['ip']
-						),
-						array(
-							'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=hostname',
-							'is_selected' => $context['selected_entity'] == 'hostname',
-							'label' => $txt['hostname']
-						),
-						array(
-							'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=email',
-							'is_selected' => $context['selected_entity'] == 'email',
-							'label' => $txt['email']
-						),
-						array(
-							'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=member',
-							'is_selected' => $context['selected_entity'] == 'member',
-							'label' => $txt['username']
-						)
+				'show_on' => 'top',
+				'links' => array(
+					array(
+						'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=ip',
+						'is_selected' => $context['selected_entity'] == 'ip',
+						'label' => $txt['ip']
 					),
+					array(
+						'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=hostname',
+						'is_selected' => $context['selected_entity'] == 'hostname',
+						'label' => $txt['hostname']
+					),
+					array(
+						'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=email',
+						'is_selected' => $context['selected_entity'] == 'email',
+						'label' => $txt['email']
+					),
+					array(
+						'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=member',
+						'is_selected' => $context['selected_entity'] == 'member',
+						'label' => $txt['username']
+					)
 				),
 			),
 		);
