@@ -20,6 +20,18 @@ if (!defined('ELK'))
 class MarkRead_Controller extends Action_Controller
 {
 	/**
+	 * String used to redirect user to the correct boards when marking unread
+	 * ajax-ively
+	 */
+	private $_querystring_board_limits = '';
+
+	/**
+	 * String used to remember user's sorting options when marking unread
+	 * ajax-ively
+	 */
+	private $_querystring_sort_limits = '';
+
+	/**
 	 * This is the main function for markasread file.
 	 *
 	 * @see Action_Controller::action_index()
@@ -114,10 +126,11 @@ class MarkRead_Controller extends Action_Controller
 		$this->_dispatch();
 
 		// For the time being this is a special case, but in BoardIndex no, we don't want it
-		if (isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'all' && !isset($_REQUEST['bi']))
+		if (isset($_REQUEST['sa']) && ($_REQUEST['sa'] == 'all' || $_REQUEST['sa'] == 'board') && !isset($_REQUEST['bi']))
 		{
 			$context['xml_data'] = array(
-				'text' => $txt['unread_topics_visit_none'],
+				'text' => $txt['topic_alert_none'],
+				'body' => strtr($txt['unread_topics_visit_none'], array('?action=unread;all' => '?action=unread;all' . sprintf($this->_querystring_board_limits, 0) . $this->_querystring_sort_limits)),
 			);
 		}
 		// No need to do anything, just die
@@ -273,6 +286,24 @@ class MarkRead_Controller extends Action_Controller
 			if (isset($_SESSION['topicseen_cache'][$b]))
 				$_SESSION['topicseen_cache'][$b] = array();
 		}
+
+		$this->_querystring_board_limits = $_REQUEST['sa'] == 'board' ? ';boards=' . implode(',', $boards) . ';start=%d' : '';
+
+		$sort_methods = array(
+			'subject',
+			'starter',
+			'replies',
+			'views',
+			'first_post',
+			'last_post'
+		);
+
+		// The default is the most logical: newest first.
+		if (!isset($_REQUEST['sort']) || !in_array($_REQUEST['sort'], $sort_methods))
+			$this->_querystring_sort_limits = isset($_REQUEST['asc']) ? ';asc' : '';
+		// But, for other methods the default sort is ascending.
+		else
+			$this->_querystring_sort_limits = ';sort=' . $_REQUEST['sort'] . (isset($_REQUEST['desc']) ? ';desc' : '');
 
 		if (!isset($_REQUEST['unread']))
 		{
