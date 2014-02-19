@@ -1424,6 +1424,8 @@ function loadTheme($id_theme = 0, $initialize = true)
 		$modSettings['message_index_preview'] = 0;
 		// Force the usage of click menu instead of a hover menu.
 		$options['use_click_menu'] = 1;
+		// No space left for a sidebar
+		$options['use_sidebar_menu'] = false;
 		// Disable the search dropdown.
 		$modSettings['search_dropdown'] = false;
 	}
