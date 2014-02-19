@@ -2698,7 +2698,7 @@ function setMemoryLimit($needed, $in_use = false)
 
 	// Should we account for how much is currently being used?
 	if ($in_use)
-		$memory_needed += function_exists('memory_get_usage') ? memory_get_usage() : (4 * 1048576);
+		$memory_needed += memory_get_usage();
 
 	// If more is needed, request it
 	if ($memory_current < $memory_needed)
@@ -4185,73 +4185,6 @@ function removeScheduleTaskImmediate($task, $calculateNextTrigger = true)
 		{
 			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 			calculateNextTrigger($task);
-		}
-	}
-}
-
-/**
- * Json encode support function for versions of php < 5.2
- */
-function checkJsonEncode()
-{
-	if (!function_exists('json_encode'))
-	{
-		/**
-		 * Running an old version of php, so we define our own function to do this.
-		 *
-		 * @param mixed[]|int|float|string|false $a
-		 */
-		function json_encode($a = false)
-		{
-			switch (gettype($a))
-			{
-				case 'integer':
-				case 'double':
-					return floatval(str_replace(',', '.', strval($a)));
-					break;
-				case 'NULL':
-				case 'resource':
-				case 'unknown':
-					return 'null';
-					break;
-				case 'boolean':
-					return $a ? 'true' : 'false';
-					break;
-				case 'array':
-				case 'object':
-					$output = array();
-					$isAssoc = false;
-
-					// Determine what type of array we have associative or numeric
-					foreach (array_keys($a) as $key)
-					{
-						if (!is_int($key))
-						{
-							$isAssoc = true;
-							break;
-						}
-					}
-
-					// Now that we know what it is, deal with each appropriately
-					if ($isAssoc)
-					{
-						foreach ($a as $key => $val)
-							$output [] = json_encode($key) . ':' . json_encode($val);
-
-						$output = '{' . implode(',', $output) . '}';
-					}
-					else
-					{
-						foreach ($a as $val)
-							$output [] = json_encode($val);
-
-						$output = '[' . implode(',', $output) . ']';
-					}
-					return $output;
-					break;
-				default:
-					return '"' . addslashes($a) . '"';
-			}
 		}
 	}
 }

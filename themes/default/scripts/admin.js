@@ -143,7 +143,7 @@ elk_AdminIndex.prototype.compareVersion = function (curVer, refVer)
 	}
 
 	return false;
-}
+};
 
 // Split a string representing a version number into an object
 elk_AdminIndex.prototype.normalizeVersion = function (sVersion)
@@ -154,16 +154,16 @@ elk_AdminIndex.prototype.normalizeVersion = function (sVersion)
 		minor: 0,
 		micro: 0,
 		prerelease: false,
-		nano: 0,
+		nano: 0
 	},
 	prerelease = false;
 
 	for (var i = 0; i < splitVersion.length; i++)
 	{
-		if (splitVersion[i].toLowerCase() == 'elkarte')
+		if (splitVersion[i].toLowerCase() === 'elkarte')
 			continue;
 
-		if (splitVersion[i].substring(0, 4).toLowerCase() == 'beta' || splitVersion[i].substring(0, 2).toLowerCase() == 'rc')
+		if (splitVersion[i].substring(0, 4).toLowerCase() === 'beta' || splitVersion[i].substring(0, 2).toLowerCase() === 'rc')
 		{
 			normalVersion.prerelease = true;
 			prerelease = true;
@@ -180,18 +180,18 @@ elk_AdminIndex.prototype.normalizeVersion = function (sVersion)
 		if (prerelease)
 		{
 			// Only numbers and dots means a number
-			if (splitVersion[i].replace(/[\d\.]/g, '') == '')
+			if (splitVersion[i].replace(/[\d\.]/g, '') === '')
 				normalVersion.nano = parseFloat(splitVersion[i]);
 
 			continue;
 		}
 
 		// Likely from the tag
-		if (splitVersion[i].substring(0, 1) == 'v')
+		if (splitVersion[i].substring(0, 1) === 'v')
 			splitVersion[i] = splitVersion[i].substring(1);
 
 		// Only numbers and dots means a number
-		if (splitVersion[i].replace(/[\d\.]/g, '') == '')
+		if (splitVersion[i].replace(/[\d\.]/g, '') === '')
 		{
 			var ver = splitVersion[i].split('.');
 			normalVersion.major = parseInt(ver[0]);
@@ -374,15 +374,21 @@ elk_ViewVersions.prototype.determineVersions = function ()
 		'Templates'
 	];
 
+	var sCurVersionType,
+		sinstalledVersion,
+		oSection,
+		oSectionLink;
+
 	for (var i = 0, n = sSections.length; i < n; i++)
 	{
 		// Collapse all sections.
-		var oSection = document.getElementById(sSections[i]);
+		oSection = document.getElementById(sSections[i]);
+
 		if (typeof(oSection) === 'object' && oSection !== null)
 			oSection.style.display = 'none';
 
 		// Make all section links clickable.
-		var oSectionLink = document.getElementById(sSections[i] + '-link');
+		oSectionLink = document.getElementById(sSections[i] + '-link');
 		if (typeof(oSectionLink) === 'object' && oSectionLink !== null)
 		{
 			oSectionLink.instanceRef = this;
@@ -403,8 +409,7 @@ elk_ViewVersions.prototype.determineVersions = function ()
 		if (!document.getElementById('our' + sFilename))
 			continue;
 
-		var sinstalledVersion = document.getElementById('your' + sFilename).innerHTML,
-			sCurVersionType;
+		sinstalledVersion = document.getElementById('your' + sFilename).innerHTML;
 
 		for (var sVersionType in oLowVersion)
 			if (sFilename.substr(0, sVersionType.length) === sVersionType)

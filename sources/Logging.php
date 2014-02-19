@@ -252,8 +252,7 @@ function displayDebug()
 	// Compute some system info, if we can
 	$context['system'] = php_uname();
 	$context['server_load'] = detectServerLoad();
-	if (function_exists('memory_get_peak_usage'))
-		$context['memory_usage'] = round(memory_get_peak_usage() / 1024 / 1024, 2) . 'MB';
+	$context['memory_usage'] = round(memory_get_peak_usage() / 1024 / 1024, 2) . 'MB';
 
 	// getrusage() information is CPU time, not wall clock time like microtime, *nix only
 	if (function_exists('getrusage'))

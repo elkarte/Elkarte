@@ -197,6 +197,13 @@ function template_searchform()
 	echo '
 				</form>';
 
+	// Start guest off collapsed
+	if ($context['user']['is_guest'] && !isset($context['minmax_preferences']['asearch']))
+	{
+		$context['minmax_preferences']['asearch'] = 1;
+		$context['minmax_preferences']['search'] = 1;
+	}
+
 	// And now all the JS to make this work
 	addInlineJavascript('
 		createEventListener(window);
@@ -283,6 +290,7 @@ function template_results()
 {
 	global $context, $settings, $options, $txt, $scripturl, $message;
 
+	// Let them know if we ignored a word in the search
 	if (!empty($context['search_ignored']))
 		echo '
 			<div id="search_results">
@@ -292,6 +300,7 @@ function template_results()
 				<p class="warningbox">', $txt['search_warning_ignored_word' . (count($context['search_ignored']) == 1 ? '' : 's')], ': ', implode(', ', $context['search_ignored']), '</p>
 			</div>';
 
+	// Or perhaps they made a spelling error, lets give them a hint
 	if (isset($context['did_you_mean']) || empty($context['topics']))
 	{
 		echo '
@@ -337,6 +346,7 @@ function template_results()
 				<br />';
 	}
 
+	// Nice and tidy view of the results
 	if ($context['compact'])
 	{
 		// Quick moderation set to checkboxes? Oh, how fun :/.
@@ -495,6 +505,7 @@ function template_results()
 					<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
 				</form>';
 	}
+	// Or the more verbose view of the search results
 	else
 	{
 		echo '

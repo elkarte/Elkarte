@@ -56,9 +56,6 @@ class Attachment_Controller extends Action_Controller
 	{
 		global $context, $modSettings;
 
-		// Make sure we have json encoding available, if not add it
-		checkJsonEncode();
-
 		$resp_data = array();
 		$context['attachments']['can']['post'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
 
@@ -138,8 +135,6 @@ class Attachment_Controller extends Action_Controller
 	public function action_rmattach()
 	{
 		global $context;
-
-		checkJsonEncode();
 
 		// Prepare the template so we can respond with json
 		$template_layers = Template_Layers::getInstance();

@@ -275,7 +275,7 @@ function updateRelativeTime()
 	});
 	oRttime.referenceTime += relative_time_refresh;
 
-	setTimeout('updateRelativeTime()', relative_time_refresh);
+	setTimeout(function() {updateRelativeTime();}, relative_time_refresh);
 }
 
 /**

@@ -27,7 +27,7 @@ class Emailpost_Controller extends Action_Controller
 	public function action_index()
 	{
 		// default, default, by default... preview
-		$this->action_pbe_preview();
+		$this->action_pbe_preview(' ');
 	}
 
 	/**

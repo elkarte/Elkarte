@@ -557,9 +557,9 @@ function elk_sessionKeepAlive()
 		lastKeepAliveCheck = curTime;
 	}
 
-	window.setTimeout('elk_sessionKeepAlive();', 1200000);
+	window.setTimeout(function() {elk_sessionKeepAlive();}, 1200000);
 }
-window.setTimeout('elk_sessionKeepAlive();', 1200000);
+window.setTimeout(function() {elk_sessionKeepAlive();}, 1200000);
 
 /**
  * Set a theme option through javascript. / ajax
@@ -1757,5 +1757,5 @@ function doAutoSubmit()
 	document.forms[formID].cont.value = txt_message + ' (' + countdown + ')';
 	countdown--;
 
-	setTimeout("doAutoSubmit();", 1000);
+	setTimeout(function() {doAutoSubmit();}, 1000);
 }
