@@ -21,7 +21,7 @@
 function template_show_custom_profile()
 {
 	// Standard fields.
-	template_show_list('standard_profile_fields');
+	template_call('template_show_list', 'standard_profile_fields');
 
 	// Disable the show on registration box if the profile field is not active
 	echo '
@@ -36,7 +36,7 @@ function template_show_custom_profile()
 	// ]]></script>';
 
 	// Custom fields.
-	template_show_list('custom_profile_fields');
+	template_call('template_show_list', 'custom_profile_fields');
 }
 
 /**

@@ -42,7 +42,7 @@ function template_control_verification($verify_id, $before = '', $after = '')
 		echo '
 			<div id="verification_control_', $i, '" class="verification_control">';
 
-		call_user_func('template_control_verification_' . $verification['template'], $verify_id, $verification['values']);
+		template_call('template_control_verification_' . $verification['template'], $verify_id, $verification['values']);
 
 		echo '
 			</div>';

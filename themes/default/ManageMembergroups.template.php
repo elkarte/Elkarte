@@ -20,11 +20,11 @@
  */
 function template_regular_membergroups_list()
 {
-	template_show_list('regular_membergroups_list');
+	template_call('template_show_list', 'regular_membergroups_list');
 
 	echo '<br /><br />';
 
-	template_show_list('post_count_membergroups_list');
+	template_call('template_show_list', 'post_count_membergroups_list');
 }
 
 /**
@@ -141,7 +141,7 @@ function template_new_group()
 						</dt>
 						<dd>';
 
-	template_add_edit_group_boards_list('new_group', false);
+	template_call('template_add_edit_group_boards_list', 'new_group', false);
 
 	echo '
 						</dd>
@@ -332,7 +332,7 @@ function template_edit_group()
 					</dt>
 					<dd>';
 
-		template_add_edit_group_boards_list('groupForm', true);
+		template_call('template_add_edit_group_boards_list', 'groupForm', true);
 
 		echo '
 					</dd>';
@@ -565,7 +565,9 @@ function template_group_members()
 				</div>
 			</div>
 			<h3 class="category_header">', $txt['membergroups_members_group_members'], '</h3>
-			', template_pagesection(), '
+			';
+	template_call('template_pagesection');
+	echo '
 			<table class="table_grid">
 				<thead>
 					<tr class="table_head">
@@ -650,7 +652,7 @@ function template_group_members()
 			<div class="flow_auto">
 				<div class="floatleft">';
 
-	template_pagesection();
+	template_call('template_pagesection');
 
 	echo '
 				</div>

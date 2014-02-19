@@ -28,7 +28,7 @@ function template_profile_above()
 
 	// If an error occurred while trying to save previously, give the user a clue!
 	echo '
-					', template_error_message();
+					', template_call('template_error_message');
 
 	// If the profile was update successfully, let the user know this.
 	if (!empty($context['profile_updated']))
@@ -49,7 +49,7 @@ function template_showDrafts()
 		<h3 class="category_header">
 			', $txt['drafts'], ' - ', $context['member']['name'], '
 		</h3>',
-	template_pagesection();
+	template_call('template_pagesection');
 
 	// No drafts? Just show an informative message.
 	if (empty($context['drafts']))
@@ -96,7 +96,7 @@ function template_showDrafts()
 	}
 
 	// Show page numbers.
-	template_pagesection();
+	template_call('template_pagesection');
 }
 
 /**

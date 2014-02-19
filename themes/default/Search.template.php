@@ -51,7 +51,7 @@ function template_searchform()
 	// Does the search require a visual verification screen to annoy them?
 	if ($context['require_verification'])
 	{
-			template_control_verification($context['visual_verification_id'], '
+			template_call('template_control_verification', $context['visual_verification_id'], '
 						<div class="verification">
 							<strong>' . $txt['search_visual_verification_label'] . ':</strong>
 							<br />', '
@@ -369,7 +369,7 @@ function template_results()
 
 		// Was anything even found?
 		if (!empty($context['topics']))
-			template_pagesection();
+			template_call('template_pagesection');
 		else
 			echo '
 					<div class="roundframe">', $txt['find_no_results'], '</div>';
@@ -461,7 +461,7 @@ function template_results()
 					<div class="flow_auto">
 						<div class="floatleft">';
 
-			template_pagesection();
+			template_call('template_pagesection');
 
 			echo '
 						</div>';
@@ -513,7 +513,7 @@ function template_results()
 					', $txt['mlist_search_results'], ':&nbsp;', $context['search_params']['search'], '
 				</h3>';
 
-		template_pagesection();
+		template_call('template_pagesection');
 
 		if (empty($context['topics']))
 			echo '
@@ -565,7 +565,7 @@ function template_results()
 			}
 		}
 
-		template_pagesection();
+		template_call('template_pagesection');
 	}
 
 	// Show a jump to box for easy navigation.

@@ -47,7 +47,7 @@ function template_show_list($list_id = null)
 		echo '
 			<div class="information flow_hidden">';
 
-		template_additional_rows('after_title', $cur_list);
+		template_call('template_additional_rows', 'after_title', $cur_list);
 
 		echo '
 			</div>';
@@ -55,14 +55,16 @@ function template_show_list($list_id = null)
 
 	// Show some data above this list
 	if (isset($cur_list['additional_rows']['top_of_list']))
-		template_additional_rows('top_of_list', $cur_list);
+		template_call('template_additional_rows', 'top_of_list', $cur_list);
 
 	$close_div = false;
 	if (isset($cur_list['additional_rows']['above_column_headers']))
 	{
 		$close_div = true;
 		echo '
-			<div class="flow_auto">', template_additional_rows('above_column_headers', $cur_list);
+			<div class="flow_auto">';
+		
+		template_call('template_additional_rows', 'above_column_headers', $cur_list);
 	}
 
 	// These are the main tabs that is used all around the template.
@@ -74,7 +76,7 @@ function template_show_list($list_id = null)
 
 		$close_div = true;
 
-		template_create_list_menu($cur_list['list_menu']);
+		template_call('template_create_list_menu', $cur_list['list_menu']);
 	}
 
 		// Show the page index (if this list doesn't intend to show all items). @todo - Needs old top/bottom stuff cleaned up.
@@ -85,7 +87,9 @@ function template_show_list($list_id = null)
 			<div class="flow_auto">';
 
 		echo '
-				<div class="floatleft">', template_pagesection(false, false, array('page_index_markup' => $cur_list['page_index'])), '
+				<div class="floatleft">';
+		template_call('template_pagesection', false, false, array('page_index_markup' => $cur_list['page_index']));
+		echo '
 				</div>';
 		$close_div = true;
 	}
@@ -166,24 +170,25 @@ function template_show_list($list_id = null)
 		// Show the page index (if this list doesn't intend to show all items).
 		if (!empty($cur_list['items_per_page']) && !empty($cur_list['page_index']))
 			echo '
-				<div class="floatleft">',
-			template_pagesection(false, false, array('page_index_markup' => $cur_list['page_index'])), '
+				<div class="floatleft">';
+			template_call('template_pagesection', false, false, array('page_index_markup' => $cur_list['page_index']));
+			echo '
 				</div>';
 
 		if (isset($cur_list['additional_rows']['below_table_data']))
-			template_additional_rows('below_table_data', $cur_list);
+			template_call('template_additional_rows', 'below_table_data', $cur_list);
 	}
 
 	// Tabs at the bottom.  Usually bottom aligned.
 	if (isset($cur_list['list_menu'], $cur_list['list_menu']['show_on']) && ($cur_list['list_menu']['show_on'] == 'both' || $cur_list['list_menu']['show_on'] == 'bottom'))
-		template_create_list_menu($cur_list['list_menu']);
+		template_call('template_create_list_menu', $cur_list['list_menu']);
 
 	echo '
 			</div>';
 
 	// Last chance to show more data, like buttons and links
 	if (isset($cur_list['additional_rows']['bottom_of_list']))
-		template_additional_rows('bottom_of_list', $cur_list);
+		template_call('template_additional_rows', 'bottom_of_list', $cur_list);
 
 	if (isset($cur_list['form']))
 	{

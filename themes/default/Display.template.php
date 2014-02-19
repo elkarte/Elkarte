@@ -128,13 +128,24 @@ function template_messages()
 
 		// Showing the sidebar posting area?
 		if (empty($options['hide_poster_area']))
+		{
 			echo '
-					<ul class="poster">', template_build_poster_div($message, $ignoring), '</ul>';
+					<ul class="poster">';
+			template_call('template_build_poster_div', $message, $ignoring);
+			echo '</ul>';
+		}
 
 		echo '
 					<div class="postarea', empty($options['hide_poster_area']) ? '' : '2', '">
 						<div class="keyinfo">
-						', (!empty($options['hide_poster_area']) ? '<ul class="poster poster2">' . template_build_poster_div($message, $ignoring) . '</ul>' : '');
+						';
+
+		if (!empty($options['hide_poster_area']))
+		{
+			echo '<ul class="poster poster2">';
+			template_call('template_build_poster_div', $message, $ignoring);
+			echo '</ul>';
+		}
 
 		if (!empty($context['follow_ups'][$message['id']]))
 		{
@@ -185,7 +196,7 @@ function template_messages()
 
 		// Assuming there are attachments...
 		if (!empty($message['attachment']))
-			template_display_attachments($message, $ignoring);
+			template_call('template_display_attachments', $message, $ignoring);
 
 		// Show the quickbuttons, for various operations on posts.
 		echo '
@@ -407,8 +418,10 @@ function template_quickreply_below()
 
 		// Is visual verification enabled?
 		if ($context['require_verification'])
-			template_control_verification($context['visual_verification_id'], '
+		{
+			template_call('template_control_verification', $context['visual_verification_id'], '
 							<strong>' . $txt['verification'] . ':</strong>', '<br />');
+		}
 
 		// Using the full editor or a plain text box?
 		if (empty($options['use_editor_quick_reply']))
@@ -431,7 +444,8 @@ function template_quickreply_below()
 							<div id="smileyBox_message"></div>';
 
 			echo '
-							', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
+							';
+			template_call('template_control_richedit', $context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
 		}
 
 		echo '
@@ -715,7 +729,7 @@ function template_display_poll_above()
 			</div>
 			<div id="pollmoderation">';
 
-	template_button_strip($context['poll_buttons']);
+	template_call('template_button_strip', $context['poll_buttons']);
 
 	echo '
 			</div>';
@@ -760,7 +774,7 @@ function template_pages_and_buttons_above()
 			<a id="msg', $context['first_message'], '"></a>', $context['first_new_message'] ? '<a name="new" id="new"></a>' : '';
 
 	// Show the page index... "Pages: [1]".
-	template_pagesection('normal_buttons', 'right');
+	template_call('template_pagesection', 'normal_buttons', 'right');
 }
 
 /**
@@ -771,10 +785,10 @@ function template_pages_and_buttons_below()
 	global $context;
 
 	// Show the page index... "Pages: [1]".
-	template_pagesection('normal_buttons', 'right');
+	template_call('template_pagesection', 'normal_buttons', 'right');
 
 	// Show the lower breadcrumbs.
-	theme_linktree();
+	template_call('theme_linktree');
 
 	echo '
 			<div id="moderationbuttons">', template_button_strip($context['mod_buttons'], 'bottom', array('id' => 'moderationbuttons_strip')), '</div>';

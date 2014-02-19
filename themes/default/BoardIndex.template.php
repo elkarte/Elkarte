@@ -57,7 +57,7 @@ function template_boards_list()
 
 		// Assuming the category hasn't been collapsed...
 		if (!$category['is_collapsed'])
-			template_list_boards($category['boards'], 'category_' . $category['id'] . '_boards');
+			template_call('template_list_boards', $category['boards'], 'category_' . $category['id'] . '_boards');
 
 		echo '
 		</div>';
@@ -94,8 +94,12 @@ function template_boardindex_outer_below()
 
 	// Show the mark all as read button?
 	if ($settings['show_mark_read'] && !$context['user']['is_guest'] && !empty($context['categories']))
+	{
 		echo '
-			', template_button_strip($context['mark_read_button'], 'right');
+			';
+
+		template_call('template_button_strip', $context['mark_read_button'], 'right');
+	}
 
 	if ($context['user']['is_logged'])
 		echo '
@@ -107,7 +111,7 @@ function template_boardindex_outer_below()
 		</div>';
 
 	if (!empty($context['info_center_callbacks']))
-		template_info_center();
+		template_call('template_info_center');
 }
 
 /**
@@ -132,7 +136,7 @@ function template_info_center()
 	{
 		$func = 'template_ic_' . $callback;
 		if (function_exists($func))
-			$func();
+			template_call($func);
 	}
 
 	echo '

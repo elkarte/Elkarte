@@ -33,18 +33,25 @@ function template_show_calendar()
 	echo '
 		<div id="calendar">
 			<div id="month_grid">
-				', template_show_month_grid('prev'), '
-				', template_show_month_grid('current'), '
-				', template_show_month_grid('next'), '
+				';
+	template_call('template_show_month_grid', 'prev');
+	echo '
+				';
+	template_call('template_show_month_grid', 'current');
+	echo '
+				';
+	template_call('template_show_month_grid', 'next');
+	echo '
 			</div>
 			<div id="main_grid">
-				', $context['view_week'] ? template_show_week_grid('main') : template_show_month_grid('main');
+				';
+	$context['view_week'] ? template_call('template_show_week_grid', 'main') : template_call('template_show_month_grid', 'main');
 
 	// Show some controls to allow easy calendar navigation.
 	echo '
 				<form id="calendar_navigation" action="', $scripturl, '?action=calendar" method="post" accept-charset="UTF-8">';
 
-	template_button_strip($context['calendar_buttons'], 'right');
+	template_call('template_button_strip', $context['calendar_buttons'], 'right');
 
 	echo '
 					<div class="styled-select">
@@ -183,7 +190,9 @@ function template_unlinked_event_post()
 							<input type="checkbox" class="input_check" id="link_to_board" name="link_to_board" checked="checked" onclick="toggleLinked(this.form);" />
 						</li>
 						<li>
-							', template_select_boards('board', $txt['calendar_post_in'], 'onchange="this.form.submit();"'), '
+							';
+		template_call('template_select_boards', 'board', $txt['calendar_post_in'], 'onchange="this.form.submit();"');
+		echo '
 						</li>';
 	}
 

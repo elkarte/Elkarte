@@ -330,7 +330,9 @@ function template_view_package()
 			<h3 class="category_header">', $txt['package_ftp_necessary'], '</h3>
 
 			<div>
-				', template_control_chmod(), '
+				';
+		template_call('template_control_chmod');
+		echo '
 			</div>';
 	}
 
@@ -467,7 +469,7 @@ function template_extract_package()
 	if (function_exists('template_show_list') && !empty($context['restore_file_permissions']['rows']))
 	{
 		echo '<br />';
-		template_show_list('restore_file_permissions');
+		template_call('template_show_list', 'restore_file_permissions');
 	}
 
 	echo '
@@ -537,7 +539,7 @@ function template_browse()
 	{
 		if (!empty($context['available_' . $type]))
 		{
-			template_show_list('packages_lists_' . $type);
+			template_call('template_show_list', 'packages_lists_' . $type);
 			$adds_available = true;
 		}
 	}
@@ -786,7 +788,9 @@ function template_ftp_required()
 				', $txt['package_ftp_necessary'], '
 			</legend>
 			<div class="ftp_details">
-				', template_control_chmod(), '
+				';
+		template_call('template_control_chmod');
+		echo '
 			</div>
 		</fieldset>';
 }
@@ -1130,7 +1134,9 @@ function template_file_permissions()
 				<p>
 					', $txt['package_file_perms_ftp_details'], ':
 				</p>
-				', template_control_chmod(), '
+				';
+		template_call('template_control_chmod');
+		echo '
 				<div class="information">', $txt['package_file_perms_ftp_retain'], '</div>';
 
 	echo '
@@ -1206,7 +1212,7 @@ function template_permission_show_contents($ident, $contents, $level, $has_more 
 				<tr id="insert_div_loc_' . $cur_ident . '" style="display: none;"><td colspan="7"></td></tr>';
 
 			if (!empty($dir['contents']))
-				template_permission_show_contents($ident . '/' . $name, $dir['contents'], $level + 1, !empty($dir['more_files']));
+				template_call('template_permission_show_contents', $ident . '/' . $name, $dir['contents'], $level + 1, !empty($dir['more_files']));
 		}
 	}
 

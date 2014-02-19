@@ -897,7 +897,7 @@ function template_show_settings()
 		if (is_array($config_var) && $config_var['type'] == 'callback')
 		{
 			if (function_exists('template_callback_' . $config_var['name']))
-				call_user_func('template_callback_' . $config_var['name']);
+				template_call('template_callback_' . $config_var['name']);
 
 			continue;
 		}

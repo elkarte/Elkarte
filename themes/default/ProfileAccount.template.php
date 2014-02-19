@@ -22,7 +22,7 @@ function template_issueWarning()
 {
 	global $context, $scripturl, $txt;
 
-	template_load_warning_variables();
+	template_call('template_load_warning_variables');
 
 	echo '
 	<script><!-- // --><![CDATA[

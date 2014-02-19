@@ -44,7 +44,7 @@ function template_whos_selection_above()
 				</noscript>
 			</div>';
 
-	template_pagesection(false, false, array('extra' => $extra));
+	template_call('template_pagesection', false, false, array('extra' => $extra));
 }
 
 /**
@@ -137,7 +137,7 @@ function template_whos_selection_below()
 				</noscript>
 			</div>';
 
-	template_pagesection(false, false, array('extra' => $extra));
+	template_call('template_pagesection', false, false, array('extra' => $extra));
 
 	echo '
 		</form>

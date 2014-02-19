@@ -22,7 +22,7 @@ function template_recent()
 {
 	global $context, $txt, $scripturl;
 
-	template_pagesection();
+	template_call('template_pagesection');
 
 	echo '
 		<div id="recentposts" class="forumposts">
@@ -77,7 +77,7 @@ function template_recent()
 	echo '
 		</div>';
 
-	template_pagesection();
+	template_call('template_pagesection');
 }
 
 /**
@@ -89,7 +89,7 @@ function template_unread()
 
 	if (!empty($context['topics']))
 	{
-		template_pagesection('recent_buttons', 'right');
+		template_call('template_pagesection', 'recent_buttons', 'right');
 
 		if ($context['showCheckboxes'])
 			echo '
@@ -195,7 +195,7 @@ function template_unread()
 			echo '
 					</form>';
 
-		template_pagesection('recent_buttons', 'right');
+		template_call('template_pagesection', 'recent_buttons', 'right');
 
 		echo '
 					<div id="topic_icons" class="description">
@@ -230,7 +230,7 @@ function template_replies()
 
 	if (!empty($context['topics']))
 	{
-		template_pagesection('recent_buttons', 'right');
+		template_call('template_pagesection', 'recent_buttons', 'right');
 
 		if ($context['showCheckboxes'])
 			echo '
@@ -338,7 +338,7 @@ function template_replies()
 			echo '
 					</form>';
 
-		template_pagesection('recent_buttons', 'right');
+		template_call('template_pagesection', 'recent_buttons', 'right');
 
 		echo '
 					<div id="topic_icons" class="description">

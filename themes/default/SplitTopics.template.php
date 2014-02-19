@@ -69,7 +69,7 @@ function template_ask()
 	if (!empty($context['can_move']))
 		echo '
 						<p>
-							<label for="move_new_topic"><input type="checkbox" name="move_new_topic" id="move_new_topic" onclick="document.getElementById(\'board_list\').style.display = this.checked ? \'\' : \'none\';" class="input_check" /> ', $txt['splittopic_move'], '.</label>', template_select_boards('board_list'), '
+							<label for="move_new_topic"><input type="checkbox" name="move_new_topic" id="move_new_topic" onclick="document.getElementById(\'board_list\').style.display = this.checked ? \'\' : \'none\';" class="input_check" /> ', $txt['splittopic_move'], '.</label>', template_call('template_select_boards', 'board_list'), '
 							<script><!-- // --><![CDATA[
 								document.getElementById(\'board_list\').style.display = \'none\';
 							// ]]></script>
@@ -131,7 +131,7 @@ function template_select()
 					<h2 class="category_header">', $txt['split_topic'], ' - ', $txt['select_split_posts'], '</h2>
 					<div class="information">
 						', $txt['please_select_split'], '
-					</div>', template_pagesection(false, false, array('page_index_markup' => $context['not_selected']['page_index'], 'page_index_id' => 'pageindex_not_selected')), '
+					</div>', template_call('template_pagesection', false, false, array('page_index_markup' => $context['not_selected']['page_index'], 'page_index_id' => 'pageindex_not_selected')), '
 					<ul id="messages_not_selected" class="split_messages smalltext">';
 
 	foreach ($context['not_selected']['messages'] as $message)
@@ -157,7 +157,7 @@ function template_select()
 					</h3>
 					<div class="information">
 						', $txt['split_selected_posts_desc'], '
-					</div>', template_pagesection(false, false, array('page_index_markup' => $context['selected']['page_index'], 'page_index_id' => 'pageindex_selected')), '
+					</div>', template_call('template_pagesection', false, false, array('page_index_markup' => $context['selected']['page_index'], 'page_index_id' => 'pageindex_selected')), '
 					<ul id="messages_selected" class="split_messages smalltext">';
 
 	if (!empty($context['selected']['messages']))

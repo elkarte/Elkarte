@@ -384,7 +384,7 @@ function template_show_spider_logs()
 	<div id="admincenter">';
 
 	// Standard fields.
-	template_show_list('spider_logs');
+	template_call('template_show_list', 'spider_logs');
 
 	echo '
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=sengines;sa=logs" method="post" accept-charset="UTF-8">
@@ -414,7 +414,7 @@ function template_show_spider_stats()
 	<div id="admincenter">';
 
 	// Standard fields.
-	template_show_list('spider_stat_list');
+	template_call('template_show_list', 'spider_stat_list');
 
 	echo '
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=sengines;sa=stats" method="post" accept-charset="UTF-8">

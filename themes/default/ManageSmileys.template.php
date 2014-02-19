@@ -31,7 +31,7 @@ function template_editsets()
 	echo '
 	<div id="admincenter">';
 
-		template_show_list('smiley_set_list');
+		template_call('template_show_list', 'smiley_set_list');
 
 	echo '
 	</div>';
@@ -501,7 +501,9 @@ function template_editicon()
 						<dt>
 							<strong><label for="icon_board_select">', $txt['icons_board'], '</label>: </strong>
 						</dt>
-						<dd>', template_select_boards('icon_board', '', '', true), '
+						<dd>';
+	template_call('template_select_boards', 'icon_board', '', '', true);
+	echo '
 						</dd>
 						<dt>
 							<strong><label for="icon_location">', $txt['smileys_location'], '</label>: </strong>

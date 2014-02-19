@@ -40,7 +40,7 @@ function template_poll_edit()
 			<div>
 				<div class="roundframe">';
 
-	template_show_error('poll_error');
+	template_call('template_show_error', 'poll_error');
 
 	if (!empty($context['poll']['id']))
 		echo '

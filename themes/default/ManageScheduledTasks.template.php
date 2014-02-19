@@ -52,7 +52,7 @@ function template_view_scheduled_tasks()
 		}
 	}
 
-	template_show_list('scheduled_tasks');
+	template_call('template_show_list', 'scheduled_tasks');
 }
 
 /**

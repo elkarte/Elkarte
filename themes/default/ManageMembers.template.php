@@ -256,7 +256,7 @@ function template_admin_browse()
 	echo '
 	<div id="admincenter">';
 
-	template_show_list('approve_list');
+	template_call('template_show_list', 'approve_list');
 
 	// If we have lots of outstanding members try and make the admin's life easier.
 	if ($context['approve_list']['total_num_items'] > 10)

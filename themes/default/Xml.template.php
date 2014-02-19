@@ -400,7 +400,7 @@ function template_generic_xml()
 	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>';
 
 	// Show the data.
-	template_generic_xml_recursive($context['xml_data'], 'elk', '', -1);
+	template_call('template_generic_xml_recursive', $context['xml_data'], 'elk', '', -1);
 }
 
 /**
@@ -422,7 +422,7 @@ function template_generic_xml_recursive($xml_data, $parent_ident, $child_ident, 
 	{
 		// A group?
 		if (is_array($data) && isset($data['identifier']))
-			template_generic_xml_recursive($data['children'], $key, $data['identifier'], $level);
+			template_call('template_generic_xml_recursive', $data['children'], $key, $data['identifier'], $level);
 		// An item...
 		elseif (is_array($data) && isset($data['value']))
 		{

@@ -175,7 +175,7 @@ function template_maintain_members()
 	<div id="manage_maintenance">';
 
 	// If maintenance has finished tell the user.
-	template_show_error('maintenance_finished');
+	template_call('template_show_error', 'maintenance_finished');
 
 	echo '
 		<h3 class="category_header">', $txt['maintain_reattribute_posts'], '</h3>
@@ -286,7 +286,7 @@ function template_maintain_topics()
 	global $scripturl, $txt, $context, $settings, $modSettings;
 
 	// If maintenance has finished tell the user.
-	template_show_error('maintenance_finished');
+	template_call('template_show_error', 'maintenance_finished');
 
 	// Bit of javascript for showing which boards to prune in an otherwise hidden list.
 	echo '
@@ -384,8 +384,8 @@ function template_maintain_topics()
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=topics;activity=massmove" method="post" accept-charset="UTF-8">
 					<p>';
 
-	template_select_boards('id_board_from', $txt['move_topics_from']);
-	template_select_boards('id_board_to', $txt['move_topics_to']);
+	template_call('template_select_boards', 'id_board_from', $txt['move_topics_from']);
+	template_call('template_select_boards', 'id_board_to', $txt['move_topics_to']);
 
 	echo '
 					</p>

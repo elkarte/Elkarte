@@ -118,7 +118,7 @@ function template_html_above()
 	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />';
 
 	// load in any css from addons or themes so they can overwrite if wanted
-	template_css();
+	template_call('template_css');
 
 	// Save some database hits, if a width for multiple wrappers is set in admin.
 	if (!empty($settings['forum_width']))
@@ -179,7 +179,7 @@ function template_html_above()
 	<link rel="index" href="', $scripturl, '?board=', $context['current_board'], '.0" />';
 
 	// load in any javascript files from addons and themes
-	template_javascript();
+	template_call('template_javascript');
 
 	// Output any remaining HTML headers. (from addons, maybe?)
 	echo $context['html_headers'];
@@ -326,7 +326,7 @@ function template_body_above()
 	// WAI-ARIA a11y tweaks have been applied here.
 	echo '
 		<div id="menu_nav" role="navigation">
-			', template_menu(), '
+			', template_call('template_menu'), '
 		</div>
 	</div>
 	<div id="wrapper" class="wrapper">
@@ -338,7 +338,7 @@ function template_body_above()
 		echo '
 			<div id="news">
 				<h2>', $txt['news'], '</h2>
-				', template_news_fader(), '
+				', template_call('template_news_fader'), '
 			</div>';
 	}
 
@@ -394,7 +394,7 @@ function template_html_below()
 	global $context;
 
 	// load in any javascript that could be deferred to the end of the page
-	template_javascript(true);
+	template_call('template_javascript', true);
 
 	// Anything special to put out?
 	if (!empty($context['insert_after_template']))
@@ -684,7 +684,7 @@ function template_pagesection($button_strip = false, $strip_direction = '', $opt
 	echo '
 			<div class="pagesection">
 				', $pages, '
-				', !empty($button_strip) && !empty($context[$button_strip]) ? template_button_strip($context[$button_strip], $strip_direction) : '',
+				', !empty($button_strip) && !empty($context[$button_strip]) ? template_call('template_button_strip', $context[$button_strip], $strip_direction) : '',
 	$options['extra'], '
 			</div>';
 }

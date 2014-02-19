@@ -52,7 +52,7 @@ function template_email_members()
 						</dt>
 						<dd>';
 
-	template_list_groups_collapsible('groups');
+	template_call('template_list_groups_collapsible', 'groups');
 
 	echo '
 						</dd>
@@ -101,7 +101,7 @@ function template_email_members()
 						</dt>
 						<dd>';
 
-	template_list_groups_collapsible('exclude_groups');
+	template_call('template_list_groups_collapsible', 'exclude_groups');
 
 	echo '
 						<dt>
@@ -252,7 +252,8 @@ function template_email_members_compose()
 
 	// Show BBC buttons, smileys and textbox.
 	echo '
-					', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
+					';
+	template_call('template_control_richedit', $context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
 
 	echo '
 					<ul>
@@ -261,7 +262,9 @@ function template_email_members_compose()
 						<li><label for="parse_html"><input type="checkbox" name="parse_html" id="parse_html" checked="checked" disabled="disabled" class="input_check" /> ', $txt['email_parsed_html'], '</label></li>
 					</ul>
 					<div class="submitbutton">
-						', template_control_richedit_buttons($context['post_box_name']), '
+						';
+	template_call('template_control_richedit_buttons', $context['post_box_name']);
+	echo '
 					</div>
 				</div>
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

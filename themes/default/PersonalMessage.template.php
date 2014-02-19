@@ -111,13 +111,17 @@ function template_folder()
 
 			// Showing the sidebar posting area?
 			if (empty($options['hide_poster_area']))
+			{
 				echo '
-							<ul class="poster">', template_build_poster_div($message), '</ul>';
+							<ul class="poster">';
+				template_call('template_build_poster_div', $message);
+				echo '</ul>';
+			}
 
 			echo '
 							<div class="postarea', empty($options['hide_poster_area']) ? '' : '2', '">
 								<div class="keyinfo">
-									', (!empty($options['hide_poster_area']) ? '<ul class="poster poster2">' . template_build_poster_div($message) . '</ul>' : ''), '
+									', (!empty($options['hide_poster_area']) ? '<ul class="poster poster2">' . template_call('template_build_poster_div', $message) . '</ul>' : ''), '
 									<span id="post_subject_', $message['id'], '" class="post_subject">', $message['subject'], '</span>
 									<h5 id="info_', $message['id'], '">';
 
@@ -336,9 +340,9 @@ function template_pm_pages_and_buttons_above()
 
 	// Show a few buttons if we are in conversation mode and outputting the first message.
 	if ($context['display_mode'] == 2)
-		template_pagesection('conversation_buttons', 'right', array('page_index' => false));
+		template_call('template_pagesection', 'conversation_buttons', 'right', array('page_index' => false));
 	else
-		template_pagesection();
+		template_call('template_pagesection');
 }
 
 /**
@@ -349,10 +353,10 @@ function template_pm_pages_and_buttons_below()
 	global $context, $txt;
 
 	if (empty($context['display_mode']))
-		template_pagesection(false, false, array('extra' => '<input type="submit" name="del_selected" value="' . $txt['quickmod_delete_selected'] . '" style="font-weight: normal;" onclick="if (!confirm(\'' . $txt['delete_selected_confirm'] . '\')) return false;" class="right_submit" />'));
+		template_call('template_pagesection', false, false, array('extra' => '<input type="submit" name="del_selected" value="' . $txt['quickmod_delete_selected'] . '" style="font-weight: normal;" onclick="if (!confirm(\'' . $txt['delete_selected_confirm'] . '\')) return false;" class="right_submit" />'));
 	// Show a few buttons if we are in conversation mode and outputting the first message.
 	elseif ($context['display_mode'] == 2 && isset($context['conversation_buttons']))
-		template_pagesection('conversation_buttons', 'right', array('page_index' => false));
+		template_call('template_pagesection', 'conversation_buttons', 'right', array('page_index' => false));
 }
 
 /**
@@ -366,7 +370,7 @@ function template_subject_list_above()
 	// If we are not in single display mode show the subjects on the top! @todo - Horrible markup here.
 	if ($context['display_mode'] != 1)
 	{
-		template_subject_list();
+		template_call('template_subject_list');
 
 		echo '
 					<hr class="clear" />';
@@ -386,7 +390,7 @@ function template_subject_list_below()
 		echo '
 					<br />';
 
-		template_subject_list();
+		template_call('template_subject_list');
 	}
 }
 
@@ -522,7 +526,7 @@ function template_subject_list()
 	$extra .= '
 					</ul>';
 
-	template_pagesection(false, false, array('extra' => $extra));
+	template_call('template_pagesection', false, false, array('extra' => $extra));
 }
 
 /**
@@ -726,7 +730,7 @@ function template_search_results()
 	global $context, $scripturl, $txt;
 
 	echo '
-		', template_pagesection(), '
+		', template_call('template_pagesection'), '
 		<div class="forumposts">
 			<h2 class="category_header">
 				', $txt['pm_search_results'], '
@@ -831,7 +835,7 @@ function template_search_results()
 	echo '
 		</div>';
 
-	template_pagesection();
+	template_call('template_pagesection');
 }
 
 /**
@@ -889,7 +893,7 @@ function template_send()
 				<div class="editor_wrapper">';
 
 	// If there were errors for sending the PM, show them.
-	template_show_error('post_error');
+	template_call('template_show_error', 'post_error');
 
 	if (!empty($modSettings['drafts_pm_enabled']))
 		echo '
@@ -954,11 +958,11 @@ function template_send()
 
 	// Show BBC buttons, smileys and textbox.
 	echo '
-					', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
+					', template_call('template_control_richedit', $context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
 
 	// Require an image to be typed to save spamming?
 	if ($context['require_verification'])
-		template_control_verification($context['visual_verification_id'], '
+		template_call('template_control_verification', $context['visual_verification_id'], '
 					<div class="post_verification">
 						<strong>' . $txt['pm_visual_verification_label'] . ':</strong>
 						', '
@@ -967,7 +971,7 @@ function template_send()
 	// Send, Preview, spellchecker buttons.
 	echo '
 					<div id="post_confirm_buttons" class="submitbutton">
-						', template_control_richedit_buttons($context['post_box_name']), '
+						', template_call('template_control_richedit_buttons', $context['post_box_name']), '
 					</div>
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="seqnum" value="', $context['form_sequence_number'], '" />
@@ -1564,7 +1568,7 @@ function template_showPMDrafts()
 		<h2 class="category_header hdicon cat_img_talk">
 			', $txt['drafts_show'], '
 		</h2>';
-	template_pagesection();
+	template_call('template_pagesection');
 
 	// No drafts? Just show an informative message.
 	if (empty($context['drafts']))
@@ -1608,5 +1612,5 @@ function template_showPMDrafts()
 	}
 
 	// Show page numbers.
-	template_pagesection();
+	template_call('template_pagesection');
 }

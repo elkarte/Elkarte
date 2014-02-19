@@ -44,7 +44,7 @@ function template_mlsearch_above()
 		</ul>
 	</form>';
 
-	template_pagesection('memberlist_buttons', 'right', array('extra' => $extra));
+	template_call('template_pagesection', 'memberlist_buttons', 'right', array('extra' => $extra));
 
 	echo '
 	<script><!-- // --><![CDATA[
@@ -182,7 +182,7 @@ function template_mlsearch_below()
 		$extra = '';
 
 	// Show the page numbers again. (makes 'em easier to find!)
-	template_pagesection(false, false, array('extra' => $extra));
+	template_call('template_pagesection', false, false, array('extra' => $extra));
 
 	echo '
 	</div>';

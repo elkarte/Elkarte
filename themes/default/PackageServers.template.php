@@ -33,7 +33,7 @@ function template_servers()
 		<h2 class="category_header">', $txt['package_servers'], '</h2>';
 
 	if ($context['package_download_broken'])
-		template_ftp_required();
+		template_call('template_ftp_required');
 
 	echo '
 		<div class="windowbg2">
@@ -345,7 +345,7 @@ function template_upload()
 
 	if ($context['package_download_broken'])
 	{
-		template_ftp_required();
+		template_call('template_ftp_required');
 
 		echo '
 			<h3 class="category_header">' . $txt['package_upload_title'] . '</h3>';

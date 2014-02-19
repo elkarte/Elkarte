@@ -61,7 +61,7 @@ function template_download_language()
 			</div>';
 
 	// Show the main files.
-	template_show_list('lang_main_files_list');
+	template_call('template_show_list', 'lang_main_files_list');
 
 	// Now, all the images and the likes, hidden via javascript 'cause there are so fecking many.
 	echo '
@@ -405,7 +405,7 @@ function template_add_language()
 		echo '
 			<div class="information">', $txt['add_language_elk_found'], '</div>';
 
-		template_show_list('languages');
+		template_call('template_show_list', 'languages');
 	}
 
 	echo '

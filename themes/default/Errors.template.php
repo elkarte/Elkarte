@@ -53,7 +53,7 @@ function template_error_log()
 			<div class="flow_auto">
 				<div class="floatleft">';
 
-	template_pagesection();
+	template_call('template_pagesection');
 
 	echo '
 				</div>
@@ -166,7 +166,7 @@ function template_error_log()
 			<div class="flow_auto">
 				<div class="floatleft">';
 
-	template_pagesection();
+	template_call('template_pagesection');
 
 	echo '
 				</div>
@@ -235,7 +235,7 @@ function template_attachment_errors()
 		<div class="windowbg">';
 
 	foreach ($context['attachment_error_keys'] as $key)
-		template_show_error($key);
+		template_call('template_show_error', $key);
 
 	echo '
 		</div>
