@@ -4288,6 +4288,7 @@ a.help .icon {
 		float: none;
 	}
 	.poster .listlevel1 {
+		float: left;
 		display: inline-block;
 	}
 	.poster li.membergroup {
@@ -4301,11 +4302,6 @@ a.help .icon {
 		max-height: 1.5em;
 		float: right;
 		text-align: right;
-	}
-	.poster .subsections>a {
-		text-overflow: ellipsis;
-		white-space: nowrap;
-		overflow: hidden;
 	}
 	.poster .membergroup {
 		float: right;
