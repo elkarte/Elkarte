@@ -1131,6 +1131,10 @@ a.bbc_link {
 	top: 0.35em;
 	left: 170px;
 }
+#menu_sidebar .pm_indicator {
+	font-size: 0.6em;
+	font-weight: normal;
+}
 /* @todo - Note: The next declarations are for keyboard access with js disabled. */
 /* Hmm. These are tricky with the new Superfish/Superclick combo. */
 /* May need a noScript class added somewhere. Pondering required. */
