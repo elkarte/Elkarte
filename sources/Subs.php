@@ -4209,8 +4209,20 @@ function template_call($name)
 
 	call_integration_hook($hook . '__pre', $args);
 
-	$do_execute = call_integration_hook($hook . '__execute', $args);
-	if (empty($do_execute))
+	$skip_execute = true;
+
+	$execute_result = call_integration_hook($hook . '__execute', $args);
+	foreach ($execute_result as $hook_result)
+	{
+		if (!empty($hook_result))
+		{
+			$skip_execute = true;
+			break;
+		}
+					
+	}
+
+	if (empty($skip_execute))
 	{
 		call_user_func_array($name, $args);
 	}
