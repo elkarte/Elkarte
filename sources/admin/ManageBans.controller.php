@@ -484,7 +484,7 @@ class ManageBans_Controller extends Action_Controller
 				else
 				{
 					$context['use_autosuggest'] = true;
-					loadJavascriptFile('suggest.js', array('default_theme' => true), 'suggest.js');
+					loadJavascriptFile('suggest.js');
 				}
 			}
 		}
