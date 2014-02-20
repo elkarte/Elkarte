@@ -1117,7 +1117,7 @@ function template_profile_block_buddies()
 					echo '
 							&nbsp;<a href="', $scripturl, '?action=pm;sa=send;u=', $data['id'], '"><img src="', $settings['images_url'], '/profile/', ($data['online']['is_online']) ? 'im_on.png' : 'im_off.png', '" alt="', $txt['profile_sendpm_short'], '" title="', $txt['profile_sendpm_short'], ' to ', $data['name'], '" class="icon"/></a>';
 
-				// Is there other contact info form the custom fields?
+				// Other contact info from custom profile fields?
 				$im = array();
 				foreach ($data['custom_fields'] as $key => $cpf)
 					if ($cpf['placement'] == 1)
@@ -1126,6 +1126,7 @@ function template_profile_block_buddies()
 				echo '
 							&nbsp;' . implode('&nbsp;', $im);
 
+				// Done with the contact information
 				echo '
 						</td>';
 
@@ -1134,7 +1135,7 @@ function template_profile_block_buddies()
 				</tr>';
 			}
 
-			// close this final row
+			// Close this final row
 			if ($i % $per_line !== 0)
 				echo '
 				</tr>';
@@ -1175,6 +1176,7 @@ function template_profile_block_attachments()
 	<div class="windowbg">
 		<div class="content">
 			<table class="profile_attachments">';
+
 	// Show the thumbnails
 	if (!empty($context['thumbs']))
 	{
