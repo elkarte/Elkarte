@@ -675,7 +675,8 @@ function removeMessage($message, $decreasePostCount = true)
 
 	// Update the pesky statistics.
 	updateMessageStats();
-	updateStats('topic');
+	require_once(SUBSDIR . '/Topic.subs.php');
+	updateTopicStats();
 	updateSettings(array(
 		'calendar_updated' => time(),
 	));
