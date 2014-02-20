@@ -622,7 +622,10 @@ class Profile_Controller extends Action_Controller
 
 				// What if this is the newest member?
 				if ($modSettings['latestMember'] == $memID)
-					updateStats('member');
+				{
+					require_once(SUBSDIR . '/Members.subs.php');
+					updateMemberStats();
+				}
 				elseif (isset($profile_vars['real_name']))
 					updateSettings(array('memberlist_updated' => time()));
 

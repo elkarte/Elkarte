@@ -546,7 +546,8 @@ class ProfileAccount_Controller extends Action_Controller
 				updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > 1 ? $modSettings['unapprovedMembers'] - 1 : 0)));
 
 			// Make sure we update the stats too.
-			updateStats('member', false);
+			require_once(SUBSDIR . '/Members.subs.php');
+			updateMemberStats(false);
 		}
 
 		// Leave it be...

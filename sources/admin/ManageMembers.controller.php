@@ -1169,7 +1169,8 @@ class ManageMembers_Controller extends Action_Controller
 			updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > $data['member_count'] ? $modSettings['unapprovedMembers'] - $data['member_count'] : 0)));
 
 		// Update the member's stats. (but, we know the member didn't change their name.)
-		updateStats('member', false);
+		require_once(SUBSDIR . '/Members.subs.php');
+		updateMemberStats(false);
 
 		// If they haven't been deleted, update the post group statistics on them...
 		if (!in_array($_POST['todo'], array('delete', 'deleteemail', 'reject', 'rejectemail', 'remind')))

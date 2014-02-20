@@ -663,7 +663,8 @@ class Register_Controller extends Action_Controller
 		updateMemberData($row['id_member'], array('is_activated' => 1, 'validation_code' => ''));
 
 		// Also do a proper member stat re-evaluation.
-		updateStats('member', false);
+		require_once(SUBSDIR . '/Members.subs.php');
+		updateMemberStats(false);
 
 		if (!isset($_POST['new_email']))
 		{
