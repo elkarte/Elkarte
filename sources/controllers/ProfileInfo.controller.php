@@ -260,7 +260,7 @@ class ProfileInfo_Controller extends Action_Controller
 			// Get the info for this buddy
 			foreach ($user_info['buddies'] as $buddy)
 			{
-				loadMemberContext($buddy);
+				loadMemberContext($buddy, true);
 				$context['buddies'][$buddy] = $memberContext[$buddy];
 			}
 		}
