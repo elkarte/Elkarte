@@ -300,6 +300,10 @@ $txt['custom_profile_icon'] = 'Icon';
 $txt['custom_profile_sort'] = 'To change the order of the custom fields, simply drag and drop it to the location you want.';
 
 $txt['custom_profile_type_text'] = 'Text';
+$txt['custom_profile_type_url'] = 'Url';
+$txt['custom_profile_type_date'] = 'Date';
+$txt['custom_profile_type_email'] = 'Email';
+$txt['custom_profile_type_color'] = 'Color';
 $txt['custom_profile_type_textarea'] = 'Large Text';
 $txt['custom_profile_type_select'] = 'Select Box';
 $txt['custom_profile_type_radio'] = 'Radio Button';

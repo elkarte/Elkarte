@@ -212,12 +212,15 @@ function loadCustomFields($memID, $area = 'summary')
 
 		// HTML for the input form.
 		$output_html = $value;
+
+		// Checkbox inputs
 		if ($row['field_type'] == 'check')
 		{
 			$true = (!$exists && $row['default_value']) || $value;
 			$input_html = '<input type="checkbox" name="customfield[' . $row['col_name'] . ']" ' . ($true ? 'checked="checked"' : '') . ' class="input_check" />';
 			$output_html = $true ? $txt['yes'] : $txt['no'];
 		}
+		// A select list
 		elseif ($row['field_type'] == 'select')
 		{
 			$input_html = '<div class="styled-select"><select name="customfield[' . $row['col_name'] . ']"><option value="-1"></option>';
@@ -232,6 +235,7 @@ function loadCustomFields($memID, $area = 'summary')
 
 			$input_html .= '</select></div>';
 		}
+		// Radio buttons
 		elseif ($row['field_type'] == 'radio')
 		{
 			$input_html = '<fieldset>';
@@ -245,10 +249,12 @@ function loadCustomFields($memID, $area = 'summary')
 			}
 			$input_html .= '</fieldset>';
 		}
-		elseif ($row['field_type'] == 'text')
+		// A standard input field, including some html5 varients
+		elseif (in_array($row['field_type'], array('text', 'url', 'search', 'date', 'email', 'color')))
 		{
-			$input_html = '<input type="text" name="customfield[' . $row['col_name'] . ']" ' . ($row['field_length'] != 0 ? 'maxlength="' . $row['field_length'] . '"' : '') . ' size="' . ($row['field_length'] == 0 || $row['field_length'] >= 50 ? 50 : ($row['field_length'] > 30 ? 30 : ($row['field_length'] > 10 ? 20 : 10))) . '" value="' . $value . '" class="input_text" />';
+			$input_html = '<input type="' . $row['field_type'] . '" name="customfield[' . $row['col_name'] . ']" ' . ($row['field_length'] != 0 ? 'maxlength="' . $row['field_length'] . '"' : '') . ' size="' . ($row['field_length'] == 0 || $row['field_length'] >= 50 ? 50 : ($row['field_length'] > 30 ? 30 : ($row['field_length'] > 10 ? 20 : 10))) . '" value="' . $value . '" class="input_text" />';
 		}
+		// Only thing left, a textbox for you
 		else
 		{
 			@list ($rows, $cols) = @explode(',', $row['default_value']);
@@ -412,7 +418,7 @@ function loadProfileFields($force_reload = false)
 			'),
 		),
 		'date_registered' => array(
-			'type' => 'text',
+			'type' => 'date',
 			'value' => empty($cur_profile['date_registered']) ? $txt['not_applicable'] : strftime('%Y-%m-%d', $cur_profile['date_registered'] + ($user_info['time_offset'] + $modSettings['time_offset']) * 3600),
 			'label' => $txt['date_registered'],
 			'log_change' => true,
@@ -436,7 +442,7 @@ function loadProfileFields($force_reload = false)
 			'),
 		),
 		'email_address' => array(
-			'type' => 'text',
+			'type' => 'email',
 			'label' => $txt['user_email_address'],
 			'subtext' => $txt['valid_email'],
 			'log_change' => true,
@@ -928,7 +934,7 @@ function loadProfileFields($force_reload = false)
 			'link_with' => 'website',
 		),
 		'website_url' => array(
-			'type' => 'text',
+			'type' => 'url',
 			'label' => $txt['website_url'],
 			'subtext' => $txt['complete_url'],
 			'size' => 50,
