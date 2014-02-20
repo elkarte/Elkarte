@@ -111,7 +111,8 @@ class RepairBoards_Controller extends Action_Controller
 			updateSettings(array(
 				'settings_updated' => time(),
 			));
-			updateStats('message');
+			require_once(SUBSDIR . '/Messages.subs.php');
+			updateMessageStats();
 			require_once(SUBSDIR . '/Topic.subs.php');
 			updateTopicStats();
 			updateSettings(array(

@@ -1169,7 +1169,6 @@ function mailFromMesasge($id_msg)
  * This function changes the total number of messages,
  * and the highest message id by id_msg - which can be
  * parameters 1 and 2, respectively.
- * Used by updateStats('message').
  *
  * @param bool|null $increment = null If true and $max_msg_id != null, then increment the total messages by one, otherwise recount all messages and get the max message id
  * @param int|null $max_msg_id = null, Only used if $increment === true

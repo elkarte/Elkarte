@@ -816,7 +816,8 @@ class Maintenance_Controller extends Action_Controller
 		// Update all the basic statistics.
 		require_once(SUBSDIR . '/Members.subs.php');
 		updateMemberStats();
-		updateStats('message');
+		require_once(SUBSDIR . '/Messages.subs.php');
+		updateMessageStats();
 		require_once(SUBSDIR . '/Topic.subs.php');
 		updateTopicStats();
 

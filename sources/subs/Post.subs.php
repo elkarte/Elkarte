@@ -903,7 +903,8 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		$_SESSION['topicseen_cache'][$topicOptions['board']]--;
 
 	// Update all the stats so everyone knows about this new topic and message.
-	updateStats('message', true, $msgOptions['id']);
+	require_once(SUBSDIR . '/Messages.subs.php');
+	updateMessageStats(true, $msgOptions['id']);
 
 	// Update the last message on the board assuming it's approved AND the topic is.
 	if ($msgOptions['approved'])

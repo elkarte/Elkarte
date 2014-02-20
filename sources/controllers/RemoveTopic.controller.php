@@ -624,7 +624,8 @@ class RemoveTopic_Controller extends Action_Controller
 		// Update stats.
 		require_once(SUBSDIR . '/Topic.subs.php');
 		updateTopicStats();
-		updateStats('message');
+		require_once(SUBSDIR . '/Messages.subs.php');
+		updateMessageStats();
 
 		// Subject cache?
 		$cache_updates = array();

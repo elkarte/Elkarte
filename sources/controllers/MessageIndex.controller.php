@@ -845,7 +845,8 @@ class MessageIndex_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 		updateTopicStats();
-		updateStats('message');
+		require_once(SUBSDIR . '/Messages.subs.php');
+			updateMessageStats();
 		updateSettings(array(
 			'calendar_updated' => time(),
 		));
