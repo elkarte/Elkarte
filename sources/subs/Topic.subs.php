@@ -385,7 +385,8 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	call_integration_hook('integrate_remove_topics', array($topics));
 
 	// Update the totals...
-	updateStats('message');
+	require_once(SUBSDIR . '/Messages.subs.php');
+	updateMessageStats();
 	updateTopicStats();
 	updateSettings(array(
 		'calendar_updated' => time(),
@@ -706,7 +707,8 @@ function moveTopics($topics, $toBoard)
 
 	// Update 'em pesky stats.
 	updateTopicStats();
-	updateStats('message');
+	require_once(SUBSDIR . '/Messages.subs.php');
+	updateMessageStats();
 	updateSettings(array(
 		'calendar_updated' => time(),
 	));
