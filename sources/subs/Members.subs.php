@@ -2481,7 +2481,8 @@ function updateMemberData($members, $data)
 		$parameters
 	);
 
-	updateStats('postgroups', $members, array_keys($data));
+	require_once(SUBSDIR . '/Membergroups.subs.php');
+	updatePostGroupStats($members, array_keys($data));
 
 	// Clear any caching?
 	if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2 && !empty($members))

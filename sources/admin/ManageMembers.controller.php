@@ -1173,7 +1173,10 @@ class ManageMembers_Controller extends Action_Controller
 
 		// If they haven't been deleted, update the post group statistics on them...
 		if (!in_array($_POST['todo'], array('delete', 'deleteemail', 'reject', 'rejectemail', 'remind')))
-			updateStats('postgroups', $conditions['members']);
+		{
+			require_once(SUBSDIR . '/Membergroups.subs.php');
+			updatePostGroupStats($conditions['members']);
+		}
 
 		redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $_REQUEST['type'] . ';sort=' . $_REQUEST['sort'] . ';filter=' . $current_filter . ';start=' . $_REQUEST['start']);
 	}
