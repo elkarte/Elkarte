@@ -406,6 +406,7 @@ function resetPassword($memID, $username = null)
 	$db_hash = $t_hasher->HashPassword($newPassword_sha256);
 
 	// Do some checks on the username if needed.
+	require_once(SUBSDIR . '/Members.subs.php');
 	if ($username !== null)
 	{
 		$errors = Error_Context::context('reset_pwd', 0);

@@ -2380,3 +2380,159 @@ function memberQuerySeeBoard($id_member)
 		return '((FIND_IN_SET(' . implode(', b.member_groups) != 0 OR FIND_IN_SET(', $groups) . ', b.member_groups) != 0)' . (!empty($modSettings['deny_boards_access']) ? ' AND (FIND_IN_SET(' . implode(', b.deny_member_groups) = 0 AND FIND_IN_SET(', $groups) . ', b.deny_member_groups) = 0)' : '') . $mod_query . ')';
 	}
 }
+
+/**
+ * Updates the columns in the members table.
+ * Assumes the data has been htmlspecialchar'd, no sanitization is performed on the data.
+ * this function should be used whenever member data needs to be updated in place of an UPDATE query.
+ *
+ * $data is an associative array of the columns to be updated and their respective values.
+ * any string values updated should be quoted and slashed.
+ *
+ * The value of any column can be '+' or '-', which mean 'increment' and decrement, respectively.
+ *
+ * If the member's post number is updated, updates their post groups.
+ *
+ * @param int[]|int $members An array of member ids
+ * @param mixed[] $data An associative array of the columns to be updated and their respective values.
+ */
+function updateMemberData($members, $data)
+{
+	global $modSettings, $user_info;
+
+	$db = database();
+
+	$parameters = array();
+	if (is_array($members))
+	{
+		$condition = 'id_member IN ({array_int:members})';
+		$parameters['members'] = $members;
+	}
+	elseif ($members === null)
+		$condition = '1=1';
+	else
+	{
+		$condition = 'id_member = {int:member}';
+		$parameters['member'] = $members;
+	}
+
+	// Everything is assumed to be a string unless it's in the below.
+	$knownInts = array(
+		'date_registered', 'posts', 'id_group', 'last_login', 'personal_messages', 'unread_messages', 'mentions',
+		'new_pm', 'pm_prefs', 'gender', 'hide_email', 'show_online', 'pm_email_notify', 'receive_from', 'karma_good', 'karma_bad',
+		'notify_announcements', 'notify_send_body', 'notify_regularity', 'notify_types',
+		'id_theme', 'is_activated', 'id_msg_last_visit', 'id_post_group', 'total_time_logged_in', 'warning', 'likes_given', 'likes_received',
+	);
+	$knownFloats = array(
+		'time_offset',
+	);
+
+	if (!empty($modSettings['integrate_change_member_data']))
+	{
+		// Only a few member variables are really interesting for integration.
+		$integration_vars = array(
+			'member_name',
+			'real_name',
+			'email_address',
+			'id_group',
+			'gender',
+			'birthdate',
+			'website_title',
+			'website_url',
+			'location',
+			'hide_email',
+			'time_format',
+			'time_offset',
+			'avatar',
+			'lngfile',
+		);
+		$vars_to_integrate = array_intersect($integration_vars, array_keys($data));
+
+		// Only proceed if there are any variables left to call the integration function.
+		if (count($vars_to_integrate) != 0)
+		{
+			// Fetch a list of member_names if necessary
+			if ((!is_array($members) && $members === $user_info['id']) || (is_array($members) && count($members) == 1 && in_array($user_info['id'], $members)))
+				$member_names = array($user_info['username']);
+			else
+			{
+				$member_names = array();
+				$request = $db->query('', '
+					SELECT member_name
+					FROM {db_prefix}members
+					WHERE ' . $condition,
+					$parameters
+				);
+				while ($row = $db->fetch_assoc($request))
+					$member_names[] = $row['member_name'];
+				$db->free_result($request);
+			}
+
+			if (!empty($member_names))
+				foreach ($vars_to_integrate as $var)
+					call_integration_hook('integrate_change_member_data', array($member_names, &$var, &$data[$var], &$knownInts, &$knownFloats));
+		}
+	}
+
+	$setString = '';
+	foreach ($data as $var => $val)
+	{
+		$type = 'string';
+
+		if (in_array($var, $knownInts))
+			$type = 'int';
+		elseif (in_array($var, $knownFloats))
+			$type = 'float';
+		elseif ($var == 'birthdate')
+			$type = 'date';
+
+		// Doing an increment?
+		if ($type == 'int' && ($val === '+' || $val === '-'))
+		{
+			$val = $var . ' ' . $val . ' 1';
+			$type = 'raw';
+		}
+
+		// Ensure posts, personal_messages, and unread_messages don't overflow or underflow.
+		if (in_array($var, array('posts', 'personal_messages', 'unread_messages')))
+		{
+			if (preg_match('~^' . $var . ' (\+ |- |\+ -)([\d]+)~', $val, $match))
+			{
+				if ($match[1] != '+ ')
+					$val = 'CASE WHEN ' . $var . ' <= ' . abs($match[2]) . ' THEN 0 ELSE ' . $val . ' END';
+				$type = 'raw';
+			}
+		}
+
+		$setString .= ' ' . $var . ' = {' . $type . ':p_' . $var . '},';
+		$parameters['p_' . $var] = $val;
+	}
+
+	$db->query('', '
+		UPDATE {db_prefix}members
+		SET' . substr($setString, 0, -1) . '
+		WHERE ' . $condition,
+		$parameters
+	);
+
+	updateStats('postgroups', $members, array_keys($data));
+
+	// Clear any caching?
+	if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2 && !empty($members))
+	{
+		if (!is_array($members))
+			$members = array($members);
+
+		foreach ($members as $member)
+		{
+			if ($modSettings['cache_enable'] >= 3)
+			{
+				cache_put_data('member_data-profile-' . $member, null, 120);
+				cache_put_data('member_data-normal-' . $member, null, 120);
+				cache_put_data('member_data-minimal-' . $member, null, 120);
+			}
+
+			cache_put_data('user_settings-' . $member, null, 60);
+		}
+	}
+}

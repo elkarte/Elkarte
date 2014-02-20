@@ -661,6 +661,7 @@ class Register_Controller extends Action_Controller
 			if (userByEmail($_POST['new_email']))
 				fatal_lang_error('email_in_use', false, array(htmlspecialchars($_POST['new_email'], ENT_COMPAT, 'UTF-8')));
 
+			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($row['id_member'], array('email_address' => $_POST['new_email']));
 			$row['email_address'] = $_POST['new_email'];
 
@@ -715,6 +716,7 @@ class Register_Controller extends Action_Controller
 		call_integration_hook('integrate_activate', array($row['member_name']));
 
 		// Validation complete - update the database!
+		require_once(SUBSDIR . '/Members.subs.php');
 		updateMemberData($row['id_member'], array('is_activated' => 1, 'validation_code' => ''));
 
 		// Also do a proper member stat re-evaluation.

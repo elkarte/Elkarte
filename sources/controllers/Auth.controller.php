@@ -279,6 +279,7 @@ class Auth_Controller extends Action_Controller
 				$user_settings['password_salt'] = substr(md5(mt_rand()), 0, 4);
 
 				// Update the password hash and set up the salt.
+				require_once(SUBSDIR . '/Members.subs.php');
 				updateMemberData($user_settings['id_member'], array('passwd' => $user_settings['passwd'], 'password_salt' => $user_settings['password_salt'], 'passwd_flood' => ''));
 			}
 			// Okay, they for sure didn't enter the password!
@@ -307,6 +308,7 @@ class Auth_Controller extends Action_Controller
 			validatePasswordFlood($user_settings['id_member'], $user_settings['passwd_flood'], true);
 
 			// If we got here then we can reset the flood counter.
+			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($user_settings['id_member'], array('passwd_flood' => ''));
 		}
 
@@ -377,7 +379,10 @@ class Auth_Controller extends Action_Controller
 		// And some other housekeeping while we're at it.
 		session_destroy();
 		if (!empty($user_info['id']))
+		{
+			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($user_info['id'], array('password_salt' => substr(md5(mt_rand()), 0, 4)));
+		}
 
 		// Off to the merry board index we go!
 		if ($redirect)
@@ -639,6 +644,7 @@ function checkActivation()
 	{
 		if (isset($_REQUEST['undelete']))
 		{
+			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($user_settings['id_member'], array('is_activated' => 1));
 			updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > 0 ? $modSettings['unapprovedMembers'] - 1 : 0)));
 		}
@@ -715,6 +721,7 @@ function doLogin()
 	$req = request();
 
 	// You've logged in, haven't you?
+	require_once(SUBSDIR . '/Members.subs.php');
 	updateMemberData($user_info['id'], array('last_login' => time(), 'member_ip' => $user_info['ip'], 'member_ip2' => $req->ban_ip()));
 
 	// Get rid of the online entry for that old guest....

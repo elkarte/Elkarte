@@ -241,6 +241,7 @@ function loadUserSettings()
 			// If it was *at least* five hours ago...
 			if ($visitOpt['poster_time'] < time() - 5 * 3600)
 			{
+				require_once(SUBSDIR . '/Members.subs.php');
 				updateMemberData($id_member, array('id_msg_last_visit' => (int) $modSettings['maxMsgID'], 'last_login' => time(), 'member_ip' => $req->client_ip(), 'member_ip2' => $req->ban_ip()));
 				$user_settings['last_login'] = time();
 

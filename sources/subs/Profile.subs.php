@@ -950,6 +950,9 @@ function loadProfileFields($force_reload = false)
 
 	$disabled_fields = !empty($modSettings['disabled_profile_fields']) ? explode(',', $modSettings['disabled_profile_fields']) : array();
 
+	// Hard to imagine this won't be neccessary
+	require_once(SUBSDIR . '/Members.subs.php');
+
 	// For each of the above let's take out the bits which don't apply - to save memory and security!
 	foreach ($profile_fields as $key => $field)
 	{

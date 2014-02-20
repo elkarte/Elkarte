@@ -95,6 +95,7 @@ class Members_Controller extends Action_Controller
 		}
 
 		// Update the settings.
+		require_once(SUBSDIR . '/Members.subs.php');
 		updateMemberData($user_info['id'], array('buddy_list' => implode(',', $user_info['buddies'])));
 
 		// Redirect back to the profile
@@ -128,6 +129,7 @@ class Members_Controller extends Action_Controller
 			$user_info['buddies'] = array_diff($user_info['buddies'], array($user));
 
 		// Update the settings.
+		require_once(SUBSDIR . '/Members.subs.php');
 		updateMemberData($user_info['id'], array('buddy_list' => implode(',', $user_info['buddies'])));
 
 		// Redirect back to the profile
