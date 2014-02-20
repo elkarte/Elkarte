@@ -2464,6 +2464,7 @@ ul.post_options li {
 	line-height: 60px;
 	text-align: center;
 	opacity: 0.6;
+	display: none;
 }
 #postAttachment >dd.progress_tracker {
 	margin:0;
