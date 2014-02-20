@@ -291,7 +291,7 @@ class Curl_Fetch_Webdata
 			$this->_options = $this->default_options;
 
 		// POST data options, here we don't allow any override
-		if (isset($this->_post_data))
+		if (!empty($this->_post_data))
 		{
 			$this->_options[CURLOPT_POST] = 1;
 			$this->_options[CURLOPT_POSTFIELDS] = $this->_post_data;
