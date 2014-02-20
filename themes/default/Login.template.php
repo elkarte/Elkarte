@@ -72,7 +72,7 @@ function template_login()
 					</dd>
 					<dt><label for="cookieneverexp">', $txt['always_logged_in'], '</label>:</dt>
 					<dd>
-						<input type="checkbox" name="cookieneverexp id="cookieneverexp"', $context['never_expire'] ? ' checked="checked"' : '', ' class="input_check" onclick="this.form.cookielength.disabled = this.checked;" />
+						<input type="checkbox" name="cookieneverexp" id="cookieneverexp"', $context['never_expire'] ? ' checked="checked"' : '', ' class="input_check" onclick="this.form.cookielength.disabled = this.checked;" />
 					</dd>';
 
 	// If they have deleted their account, give them a chance to change their mind.
