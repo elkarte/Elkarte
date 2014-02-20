@@ -151,7 +151,6 @@ Class Elk_Testing_Setup
 				array('variable')
 			);
 
-
 		require_once(SUBSDIR . '/Members.subs.php');
 		updateMemberStats();
 		require_once(SUBSDIR . '/Messages.subs.php');
