@@ -549,7 +549,10 @@ function template_menu()
 							bUseCookie: elk_member_id == 0 ? true : false,
 							sCookieName: \'upshrink\'
 						},
-						funcOnBeforeExpand: function () {startNewsFader();}
+						funcOnBeforeExpand: function () {
+							if (window.startNewsFader)
+								startNewsFader();
+						}
 					});
 				// ]]></script>';
 }

@@ -435,7 +435,7 @@ function submitThisOnce(oControl)
 	return !elk_formSubmitted;
 }
 
-// Deprecated, as innerHTML is supported everywhere.
+// @deprecated since 1.0 - innerHTML is supported everywhere.
 function setInnerHTML(oElement, sToValue)
 {
 	if (oElement)

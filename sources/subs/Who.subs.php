@@ -357,7 +357,7 @@ function determineActions($urls, $preferred_prefix = false)
 					$data[$k] = $txt['who_hidden'];
 			}
 			elseif (!empty($actions['action']))
-				$data[$k] = $txt['who_generic'] . ' ' . $actions['action'];
+				$data[$k] = sprintf($txt['who_generic'], $actions['action']);
 			else
 				$data[$k] = $txt['who_unknown'];
 		}

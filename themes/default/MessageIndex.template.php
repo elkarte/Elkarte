@@ -209,13 +209,13 @@ function template_topic_listing()
 				</div>
 				<div class="topic_latest', (!empty($modSettings['todayMod']) && $modSettings['todayMod'] > 2) ? ' relative' : ' dd', '">
 					<p class="topic_stats">
-					', $topic['replies'], ' ', $txt['replies'], '
-					<br />
+					', $topic['replies'], ' ', $txt['replies'], '<br />
 					', $topic['views'], ' ', $txt['views'];
 
 			// Show likes?
 			if (!empty($modSettings['likes_enabled']))
-				echo ' / ', $topic['likes'], ' ', $txt['likes'];
+				echo '<br />
+					', $topic['likes'], ' ', $txt['likes'];
 
 			echo '
 					</p>

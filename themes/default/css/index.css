@@ -1433,6 +1433,12 @@ a.bbc_link {
 	float: left;
 }
 
+#expanded_pages_container {
+	position: absolute;
+}
+#expanded_pages_container, #expanded_pages {
+	overflow: hidden;
+}
 #pages_scroll_left, #pages_scroll_right {
 	position: absolute;
 	top: 0;
@@ -1782,12 +1788,6 @@ dl.settings dt .styled-select select {
 }
 .topic_sorting.topic_sorting_recent {
 	margin-top: 0;
-}
-#expanded_pages_container {
-	position: absolute;
-}
-#expanded_pages_container, #expanded_pages {
-	overflow: hidden;
 }
 
 /* For the who is template. */

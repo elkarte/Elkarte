@@ -121,7 +121,7 @@ function addMessageIcon($icon)
 /**
  * Sort the message icons table.
  *
- * @deprecated the ordering is done in the query, probably not needed
+ * @deprecated since 1.0 - the ordering is done in the query, probably not needed
  */
 function sortMessageIconTable()
 {
