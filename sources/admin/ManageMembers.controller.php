@@ -1164,7 +1164,7 @@ class ManageMembers_Controller extends Action_Controller
 				logAction($log_action, array('member' => $member['id']), 'admin');
 		}
 
-		// Although updateStats *may* catch this, best to do it manually just in case (Doesn't always sort out unapprovedMembers).
+		// Although updateMemberStats *may* catch this, best to do it manually just in case (Doesn't always sort out unapprovedMembers).
 		if (in_array($current_filter, array(3, 4)))
 			updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > $data['member_count'] ? $modSettings['unapprovedMembers'] - $data['member_count'] : 0)));
 
