@@ -3116,6 +3116,9 @@ dl.merge_topic dd {
 #paid_subscription dl.settings dd, #paid_subscription dl.settings dt {
 	margin-bottom: 4px;
 }
+#fixed_area .styled-select {
+	vertical-align: top;
+}
 
 /* Pick theme */
 #pick_theme {
