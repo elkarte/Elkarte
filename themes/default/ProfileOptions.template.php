@@ -317,6 +317,11 @@ function template_edit_options()
 				echo '
 							<input type="', $field['type'] == 'password' ? 'password' : 'text', '" name="', $key, '" id="', $key, '" size="', empty($field['size']) ? 30 : $field['size'], '" value="', $field['value'], '" ', $field['input_attr'], ' class="input_', $field['type'] == 'password' ? 'password' : 'text', '" />';
 
+			// Maybe it's an html5 input
+			elseif (in_array($field['type'], array('url', 'search', 'date', 'email', 'color')))
+				echo '
+							<input type="', $field['type'], '" name="', $key, '" id="', $key, '" size="', empty($field['size']) ? 30 : $field['size'], '" value="', $field['value'], '" ', $field['input_attr'], ' class="input_', $field['type'] == 'password' ? 'password' : 'text', '" />';
+
 			// You "checking" me out? ;)
 			elseif ($field['type'] == 'check')
 				echo '
