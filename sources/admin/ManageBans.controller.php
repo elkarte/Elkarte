@@ -190,11 +190,10 @@ class ManageBans_Controller extends Action_Controller
 						'value' => $txt['ban_added'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $context;
-
-							return standardTime($rowData[\'ban_time\'], empty($context[\'ban_time_format\']) ? true : $context[\'ban_time_format\']);
-						'),
+							return standardTime($rowData['ban_time'], empty($context['ban_time_format']) ? true : $context['ban_time_format']);
+						},
 					),
 					'sort' => array(
 						'default' => 'bg.ban_time',
@@ -206,21 +205,21 @@ class ManageBans_Controller extends Action_Controller
 						'value' => $txt['ban_expires'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $txt;
 
 							// This ban never expires...whahaha.
-							if ($rowData[\'expire_time\'] === null)
-								return $txt[\'never\'];
+							if ($rowData['expire_time'] === null)
+								return $txt['never'];
 
 							// This ban has already expired.
-							elseif ($rowData[\'expire_time\'] < time())
-								return sprintf(\'<span class="error">%1$s</span>\', $txt[\'ban_expired\']);
+							elseif ($rowData['expire_time'] < time())
+								return sprintf('<span class="error">%1$s</span>', $txt['ban_expired']);
 
 							// Still need to wait a few days for this ban to expire.
 							else
-								return sprintf(\'%1$d&nbsp;%2$s\', ceil(($rowData[\'expire_time\'] - time()) / (60 * 60 * 24)), $txt[\'ban_days\']);
-						'),
+								return sprintf('%1$d&nbsp;%2$s', ceil(($rowData['expire_time'] - time()) / (60 * 60 * 24)), $txt['ban_days']);
+						},
 					),
 					'sort' => array(
 						'default' => 'IFNULL(bg.expire_time, 1=1) DESC, bg.expire_time DESC',
@@ -354,16 +353,16 @@ class ManageBans_Controller extends Action_Controller
 								'style' => 'width: 60%;',
 							),
 							'data' => array(
-								'function' => create_function('$ban_item', '
+								'function' => function ($ban_item) {
 									global $txt;
 
-									if (in_array($ban_item[\'type\'], array(\'ip\', \'hostname\', \'email\')))
-										return \'<strong>\' . $txt[$ban_item[\'type\']] . \':</strong>&nbsp;\' . $ban_item[$ban_item[\'type\']];
-									elseif ($ban_item[\'type\'] == \'user\')
-										return \'<strong>\' . $txt[\'username\'] . \':</strong>&nbsp;\' . $ban_item[\'user\'][\'link\'];
+									if (in_array($ban_item['type'], array('ip', 'hostname', 'email')))
+										return '<strong>' . $txt[$ban_item['type']] . ':</strong>&nbsp;' . $ban_item[$ban_item['type']];
+									elseif ($ban_item['type'] == 'user')
+										return '<strong>' . $txt['username'] . ':</strong>&nbsp;' . $ban_item['user']['link'];
 									else
-										return \'<strong>\' . $txt[\'unknown\'] . \':</strong>&nbsp;\' . $ban_item[\'no_bantype_selected\'];
-								'),
+										return '<strong>' . $txt['unknown'] . ':</strong>&nbsp;' . $ban_item['no_bantype_selected'];
+								},
 							),
 						),
 						'hits' => array(
@@ -382,11 +381,11 @@ class ManageBans_Controller extends Action_Controller
 								'style' => 'width: 15%;',
 							),
 							'data' => array(
-								'function' => create_function('$ban_item', '
+								'function' => function ($ban_item) {
 									global $txt, $context, $scripturl;
 
-									return \'<a href="\' . $scripturl . \'?action=admin;area=ban;sa=edittrigger;bg=\' . $context[\'ban\'][\'id\'] . \';bi=\' . $ban_item[\'id\'] . \'">\' . $txt[\'ban_edit_trigger\'] . \'</a>\';
-								'),
+									return '<a href="' . $scripturl . '?action=admin;area=ban;sa=edittrigger;bg=' . $context['ban']['id'] . ';bi=' . $ban_item['id'] . '">' . $txt['ban_edit_trigger'] . '</a>';
+								},
 							),
 						),
 						'checkboxes' => array(
@@ -602,9 +601,9 @@ class ManageBans_Controller extends Action_Controller
 						'value' => $txt['ban_log_date'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							return standardTime($rowData[\'log_time\']);
-						'),
+						'function' => function ($rowData) {
+							return standardTime($rowData['log_time']);
+						},
 					),
 					'sort' => array(
 						'default' => 'lb.log_time DESC',
@@ -1002,27 +1001,27 @@ class ManageBans_Controller extends Action_Controller
 		if ($context['selected_entity'] === 'ip')
 		{
 			$listOptions['columns']['banned_entity']['data'] = array(
-				'function' => create_function('$rowData', '
+				'function' => function ($rowData) {
 					return range2ip(array(
-						$rowData[\'ip_low1\'],
-						$rowData[\'ip_low2\'],
-						$rowData[\'ip_low3\'],
-						$rowData[\'ip_low4\'],
-						$rowData[\'ip_low5\'],
-						$rowData[\'ip_low6\'],
-						$rowData[\'ip_low7\'],
-						$rowData[\'ip_low8\']
+						$rowData['ip_low1'],
+						$rowData['ip_low2'],
+						$rowData['ip_low3'],
+						$rowData['ip_low4'],
+						$rowData['ip_low5'],
+						$rowData['ip_low6'],
+						$rowData['ip_low7'],
+						$rowData['ip_low8']
 					), array(
-						$rowData[\'ip_high1\'],
-						$rowData[\'ip_high2\'],
-						$rowData[\'ip_high3\'],
-						$rowData[\'ip_high4\'],
-						$rowData[\'ip_high5\'],
-						$rowData[\'ip_high6\'],
-						$rowData[\'ip_high7\'],
-						$rowData[\'ip_high8\']
+						$rowData['ip_high1'],
+						$rowData['ip_high2'],
+						$rowData['ip_high3'],
+						$rowData['ip_high4'],
+						$rowData['ip_high5'],
+						$rowData['ip_high6'],
+						$rowData['ip_high7'],
+						$rowData['ip_high8']
 					));
-				'),
+				},
 			);
 			$listOptions['columns']['banned_entity']['sort'] = array(
 				'default' => 'bi.ip_low1, bi.ip_high1, bi.ip_low2, bi.ip_high2, bi.ip_low3, bi.ip_high3, bi.ip_low4, bi.ip_high4, bi.ip_low5, bi.ip_high5, bi.ip_low6, bi.ip_high6, bi.ip_low7, bi.ip_high7, bi.ip_low8, bi.ip_high8',
@@ -1032,9 +1031,9 @@ class ManageBans_Controller extends Action_Controller
 		elseif ($context['selected_entity'] === 'hostname')
 		{
 			$listOptions['columns']['banned_entity']['data'] = array(
-				'function' => create_function('$rowData', '
-					return strtr(Util::htmlspecialchars($rowData[\'hostname\']), array(\'%\' => \'*\'));
-				'),
+				'function' => function ($rowData) {
+					return strtr(Util::htmlspecialchars($rowData['hostname']), array('%' => '*'));
+				},
 			);
 			$listOptions['columns']['banned_entity']['sort'] = array(
 				'default' => 'bi.hostname',
@@ -1044,9 +1043,9 @@ class ManageBans_Controller extends Action_Controller
 		elseif ($context['selected_entity'] === 'email')
 		{
 			$listOptions['columns']['banned_entity']['data'] = array(
-				'function' => create_function('$rowData', '
-					return strtr(Util::htmlspecialchars($rowData[\'email_address\']), array(\'%\' => \'*\'));
-				'),
+				'function' => function ($rowData) {
+					return strtr(Util::htmlspecialchars($rowData['email_address']), array('%' => '*'));
+				},
 			);
 			$listOptions['columns']['banned_entity']['sort'] = array(
 				'default' => 'bi.email_address',

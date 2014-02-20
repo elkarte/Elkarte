@@ -939,34 +939,36 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'tag' => 'code',
 				'type' => 'unparsed_content',
 				'content' => '<div class="codeheader">' . $txt['code'] . ': <a href="javascript:void(0);" onclick="return elkSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div><pre class="bbc_code prettyprint">$1</pre>',
-				'validate' => isset($disabled['code']) ? null : create_function('&$tag, &$data, $disabled', '
+				'validate' => isset($disabled['code']) ? null : function(&$tag, &$data, $disabled) {
 					global $context;
 
-					if (!isset($disabled[\'code\']))
+					if (!isset($disabled['code']))
 					{
 						$data = str_replace("\t", "<span style=\"white-space: pre;\">\t</span>", $data);
 
 						// Recent Opera bug requiring temporary fix. &nsbp; is needed before </code> to avoid broken selection.
-						if ($context[\'browser\'][\'is_opera\'])
-							$data .= \'&nbsp;\';
-					}'),
+						if ($context['browser']['is_opera'])
+							$data .= '&nbsp;';
+					}
+				},
 				'block_level' => true,
 			),
 			array(
 				'tag' => 'code',
 				'type' => 'unparsed_equals_content',
 				'content' => '<div class="codeheader">' . $txt['code'] . ': ($2) <a href="#" onclick="return elkSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div><pre class="bbc_code prettyprint">$1</pre>',
-				'validate' => isset($disabled['code']) ? null : create_function('&$tag, &$data, $disabled', '
+				'validate' => isset($disabled['code']) ? null : function(&$tag, &$data, $disabled) {
 					global $context;
 
-					if (!isset($disabled[\'code\']))
+					if (!isset($disabled['code']))
 					{
 						$data[0] = str_replace("\t", "<span style=\"white-space: pre;\">\t</span>", $data[0]);
 
 						// Recent Opera bug requiring temporary fix. &nsbp; is needed before </code> to avoid broken selection.
-						if ($context[\'browser\'][\'is_opera\'])
-							$data[0] .= \'&nbsp;\';
-					}'),
+						if ($context['browser']['is_opera'])
+							$data[0] .= '&nbsp;';
+					}
+				},
 				'block_level' => true,
 			),
 			array(
@@ -980,7 +982,9 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'tag' => 'email',
 				'type' => 'unparsed_content',
 				'content' => '<a href="mailto:$1" class="bbc_email">$1</a>',
-				'validate' => create_function('&$tag, &$data, $disabled', '$data = strtr($data, array(\'<br />\' => \'\'));'),
+				'validate' => function(&$tag, &$data, $disabled) {
+					$data = strtr($data, array('<br />' => ''));
+				},
 			),
 			array(
 				'tag' => 'email',
@@ -1033,45 +1037,45 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 					'height' => array('optional' => true, 'value' => '$1px;', 'match' => '(\d+)'),
 				),
 				'content' => '<img src="$1" alt="{alt}" style="width:{width}height:{height}" class="bbc_img resized" />',
-				'validate' => create_function('&$tag, &$data, $disabled', '
-					$data = strtr($data, array(\'<br />\' => \'\'));
-					if (strpos($data, \'http://\') !== 0 && strpos($data, \'https://\') !== 0)
-						$data = \'http://\' . $data;
-				'),
+				'validate' => function(&$tag, &$data, $disabled) {
+					$data = strtr($data, array('<br />' => ''));
+					if (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
+						$data = 'http://' . $data;
+				},
 				'disabled_content' => '($1)',
 			),
 			array(
 				'tag' => 'img',
 				'type' => 'unparsed_content',
 				'content' => '<img src="$1" alt="" class="bbc_img" />',
-				'validate' => create_function('&$tag, &$data, $disabled', '
-					$data = strtr($data, array(\'<br />\' => \'\'));
-					if (strpos($data, \'http://\') !== 0 && strpos($data, \'https://\') !== 0)
-						$data = \'http://\' . $data;
-				'),
+				'validate' => function(&$tag, &$data, $disabled) {
+					$data = strtr($data, array('<br />' => ''));
+					if (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
+						$data = 'http://' . $data;
+				},
 				'disabled_content' => '($1)',
 			),
 			array(
 				'tag' => 'iurl',
 				'type' => 'unparsed_content',
 				'content' => '<a href="$1" class="bbc_link">$1</a>',
-				'validate' => create_function('&$tag, &$data, $disabled', '
-					$data = strtr($data, array(\'<br />\' => \'\'));
-					if (strpos($data, \'http://\') !== 0 && strpos($data, \'https://\') !== 0)
-						$data = \'http://\' . $data;
-				'),
+				'validate' => function(&$tag, &$data, $disabled) {
+					$data = strtr($data, array('<br />' => ''));
+					if (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
+						$data = 'http://' . $data;
+				},
 			),
 			array(
 				'tag' => 'iurl',
 				'type' => 'unparsed_equals',
 				'before' => '<a href="$1" class="bbc_link">',
 				'after' => '</a>',
-				'validate' => create_function('&$tag, &$data, $disabled', '
-					if (substr($data, 0, 1) == \'#\')
-						$data = \'#post_\' . substr($data, 1);
-					elseif (strpos($data, \'http://\') !== 0 && strpos($data, \'https://\') !== 0)
-						$data = \'http://\' . $data;
-				'),
+				'validate' => function(&$tag, &$data, $disabled) {
+					if ($data[0] === '#')
+						$data = '#post_' . substr($data, 1);
+					elseif (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
+						$data = 'http://' . $data;
+				},
 				'disallow_children' => array('email', 'ftp', 'url', 'iurl'),
 				'disabled_after' => ' ($1)',
 			),
@@ -1211,10 +1215,10 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'test' => '[1-7]\]',
 				'before' => '<span style="font-size: $1;" class="bbc_size">',
 				'after' => '</span>',
-				'validate' => create_function('&$tag, &$data, $disabled', '
+				'validate' => function(&$tag, &$data, $disabled) {
 					$sizes = array(1 => 0.7, 2 => 1.0, 3 => 1.35, 4 => 1.45, 5 => 2.0, 6 => 2.65, 7 => 3.95);
-					$data = $sizes[$data] . \'em\';'
-				),
+					$data = $sizes[$data] . 'em';
+				},
 				'disallow_parents' => array('size'),
 				'disallow_before' => '<span>',
 				'disallow_after' => '</span>',
@@ -1288,21 +1292,21 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'tag' => 'url',
 				'type' => 'unparsed_content',
 				'content' => '<a href="$1" class="bbc_link" target="_blank">$1</a>',
-				'validate' => create_function('&$tag, &$data, $disabled', '
-					$data = strtr($data, array(\'<br />\' => \'\'));
-					if (strpos($data, \'http://\') !== 0 && strpos($data, \'https://\') !== 0)
-						$data = \'http://\' . $data;
-				'),
+				'validate' => function(&$tag, &$data, $disabled) {
+					$data = strtr($data, array('<br />' => ''));
+					if (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
+						$data = 'http://' . $data;
+				},
 			),
 			array(
 				'tag' => 'url',
 				'type' => 'unparsed_equals',
 				'before' => '<a href="$1" class="bbc_link" target="_blank">',
 				'after' => '</a>',
-				'validate' => create_function('&$tag, &$data, $disabled', '
-					if (strpos($data, \'http://\') !== 0 && strpos($data, \'https://\') !== 0)
-						$data = \'http://\' . $data;
-				'),
+				'validate' => function(&$tag, &$data, $disabled) {
+					if (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
+						$data = 'http://' . $data;
+				},
 				'disallow_children' => array('email', 'ftp', 'url', 'iurl'),
 				'disabled_after' => ' ($1)',
 			),

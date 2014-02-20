@@ -183,16 +183,16 @@ class CoreFeatures_Controller extends Action_Controller
 			'cp' => array(
 				'url' => 'action=admin;area=featuresettings;sa=profile',
 				'save_callback' => 'custom_profiles_toggle_callback',
-				'setting_callback' => create_function('$value', '
+				'setting_callback' => function ($value) {
 					if (!$value)
 						return array(
-							\'disabled_profile_fields\' => \'\',
-							\'registration_fields\' => \'\',
-							\'displayFields\' => \'\',
+							'disabled_profile_fields' => '',
+							'registration_fields' => '',
+							'displayFields' => '',
 						);
 					else
 						return array();
-				'),
+				},
 			),
 			// dr = drafts
 			'dr' => array(
@@ -226,13 +226,13 @@ class CoreFeatures_Controller extends Action_Controller
 				'settings' => array(
 					'likes_enabled' => 1,
 				),
-				'setting_callback' => create_function('$value', '
-					require_once(SUBSDIR . \'/Mentions.subs.php\');
+				'setting_callback' => function ($value) {
+					require_once(SUBSDIR . '/Mentions.subs.php');
 
 					// Makes all the like/rlike mentions invisible (or visible)
-					toggleMentionsVisibility(\'like\', !empty($value));
-					toggleMentionsVisibility(\'rlike\', !empty($value));
-				'),
+					toggleMentionsVisibility('like', !empty($value));
+					toggleMentionsVisibility('rlike', !empty($value));
+				},
 			),
 			// ml = moderation log.
 			'ml' => array(
@@ -254,19 +254,18 @@ class CoreFeatures_Controller extends Action_Controller
 			// pm = post moderation.
 			'pm' => array(
 				'url' => 'action=admin;area=permissions;sa=postmod',
-				'setting_callback' => create_function('$value', '
-
+				'setting_callback' => function ($value) {
 					// Cannot use warning post moderation if disabled!
 					if (!$value)
 					{
-						require_once(SUBSDIR . \'/Moderation.subs.php\');
+						require_once(SUBSDIR . '/Moderation.subs.php');
 						approveAllUnapproved();
 
-						return array(\'warning_moderate\' => 0);
+						return array('warning_moderate' => 0);
 					}
 					else
 						return array();
-				'),
+				},
 			),
 			// ps = Paid Subscriptions.
 			'ps' => array(
@@ -283,32 +282,33 @@ class CoreFeatures_Controller extends Action_Controller
 			// w = warning.
 			'w' => array(
 				'url' => 'action=admin;area=securitysettings;sa=moderation',
-				'setting_callback' => create_function('$value', '
+				'setting_callback' => function($value) {
 					global $modSettings;
-					list ($modSettings[\'warning_enable\'], $modSettings[\'user_limit\'], $modSettings[\'warning_decrement\']) = explode(\',\', $modSettings[\'warning_settings\']);
-					$warning_settings = ($value ? 1 : 0) . \',\' . $modSettings[\'user_limit\'] . \',\' . $modSettings[\'warning_decrement\'];
+
+					list ($modSettings['warning_enable'], $modSettings['user_limit'], $modSettings['warning_decrement']) = explode(',', $modSettings['warning_settings']);
+					$warning_settings = ($value ? 1 : 0) . ',' . $modSettings['user_limit'] . ',' . $modSettings['warning_decrement'];
 					if (!$value)
 					{
 						$returnSettings = array(
-							\'warning_watch\' => 0,
-							\'warning_moderate\' => 0,
-							\'warning_mute\' => 0,
+							'warning_watch' => 0,
+							'warning_moderate' => 0,
+							'warning_mute' => 0,
 						);
 					}
-					elseif (empty($modSettings[\'warning_enable\']) && $value)
+					elseif (empty($modSettings['warning_enable']) && $value)
 					{
 						$returnSettings = array(
-							\'warning_watch\' => 10,
-							\'warning_moderate\' => 35,
-							\'warning_mute\' => 60,
+							'warning_watch' => 10,
+							'warning_moderate' => 35,
+							'warning_mute' => 60,
 						);
 					}
 					else
 						$returnSettings = array();
 
-					$returnSettings[\'warning_settings\'] = $warning_settings;
+					$returnSettings['warning_settings'] = $warning_settings;
 					return $returnSettings;
-				'),
+				},
 			),
 			// Search engines
 			'sp' => array(
@@ -316,14 +316,14 @@ class CoreFeatures_Controller extends Action_Controller
 				'settings' => array(
 					'spider_mode' => 1,
 				),
-				'setting_callback' => create_function('$value', '
+				'setting_callback' => function ($value) {
 					// Turn off the spider group if disabling.
 					if (!$value)
-						return array(\'spider_group\' => 0, \'show_spider_online\' => 0);
-				'),
-				'on_save' => create_function('', '
-					require_once(SUBSDIR . \'/SearchEngines.subs.php\');
-				'),
+						return array('spider_group' => 0, 'show_spider_online' => 0);
+				},
+				'on_save' => function () {
+					require_once(SUBSDIR . '/SearchEngines.subs.php');
+				},
 			),
 		);
 

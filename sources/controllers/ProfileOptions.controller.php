@@ -585,16 +585,16 @@ class ProfileOptions_Controller extends Action_Controller
 						'class' => 'lefttext',
 					),
 					'data' => array(
-						'function' => create_function('$board', '
+						'function' => function ($board) {
 							global $txt;
 
-							$link = $board[\'link\'];
+							$link = $board['link'];
 
-							if ($board[\'new\'])
-								$link .= \' <a href="\' . $board[\'href\'] . \'"><span class="new_posts">' . $txt['new'] . '</span></a>\';
+							if ($board['new'])
+								$link .= ' <a href="' . $board['href'] . '"><span class="new_posts">' . $txt['new'] . '</span></a>';
 
 							return $link;
-						'),
+						},
 					),
 					'sort' => array(
 						'default' => 'name',
@@ -672,18 +672,18 @@ class ProfileOptions_Controller extends Action_Controller
 						'class' => 'lefttext',
 					),
 					'data' => array(
-						'function' => create_function('$topic', '
+						'function' => function ($topic) {
 							global $txt;
 
-							$link = $topic[\'link\'];
+							$link = $topic['link'];
 
-							if ($topic[\'new\'])
-								$link .= \' <a href="\' . $topic[\'new_href\'] . \'"><span class="new_posts">\' . $txt[\'new\'] . \'</span></a>\';
+							if ($topic['new'])
+								$link .= ' <a href="' . $topic['new_href'] . '"><span class="new_posts">' . $txt['new'] . '</span></a>';
 
-							$link .= \'<br /><span class="smalltext"><em>\' . $txt[\'in\'] . \' \' . $topic[\'board_link\'] . \'</em></span>\';
+							$link .= '<br /><span class="smalltext"><em>' . $txt['in'] . ' ' . $topic['board_link'] . '</em></span>';
 
 							return $link;
-						'),
+						},
 					),
 					'sort' => array(
 						'default' => 'ms.subject',

@@ -361,13 +361,13 @@ class Likes_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$row', '
+						'function' => function ($row) {
 							global $txt, $settings;
 
-							$result = \'<a href="\' . $row[\'delete\'] . \'" onclick="return confirm(\\\'\' . $txt[\'likes_confirm_delete\'] . \'\\\');" title="\' . $txt[\'likes_delete\'] . \'"><img src="\' . $settings[\'images_url\'] . \'/icons/delete.png" alt="" /></a>\';
+							$result = '<a href="' . $row['delete'] . '" onclick="return confirm(\'' . $txt['likes_confirm_delete'] . '\');" title="' . $txt['likes_delete'] . '"><img src="' . $settings['images_url'] . '/icons/delete.png" alt="" /></a>';
 
-							return $result;'
-						),
+							return $result;
+						},
 						'class' => "centertext",
 						'style' => "width: 10%",
 					),
@@ -466,13 +466,13 @@ class Likes_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$row', '
+						'function' => function ($row) {
 							global $txt, $settings;
 
-							$result = \'<a href="\' . $row[\'who\'] . \'" title="\' . $txt[\'likes_show_who\'] . \'"><img src="\' . $settings[\'images_url\'] . \'/icons/members.png" alt="" /></a>\';
+							$result = '<a href="' . $row['who'] . '" title="' . $txt['likes_show_who'] . '"><img src="' . $settings['images_url'] . '/icons/members.png" alt="" /></a>';
 
-							return $result;'
-						),
+							return $result;
+						},
 						'class' => "centertext",
 						'style' => "width: 10%",
 					),

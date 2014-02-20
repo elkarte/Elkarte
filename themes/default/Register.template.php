@@ -211,11 +211,11 @@ function template_registration_form()
 							<strong', !empty($field['is_error']) ? ' style="color: red;"' : '', '>', $field['name'], ':</strong>
 							<span class="smalltext">', $field['desc'], '</span>
 						</dt>
-						<dd>', preg_replace_callback('~<(input|select|textarea) ~', create_function('$matches', '
+						<dd>', preg_replace_callback('~<(input|select|textarea) ~', function ($matches) {
 							global $context;
 
-							return \'<\' . $matches[1] . \' tabindex="\' . $context[\'tabindex\']++ . \'"\';
-						'), $field['input_html']), '</dd>';
+							return '<' . $matches[1] . ' tabindex="' . $context['tabindex']++ . '"';
+						}, $field['input_html']), '</dd>';
 
 				// Drop this one so we don't show the additonal information header unless needed
 				unset($context['custom_fields'][$key]);

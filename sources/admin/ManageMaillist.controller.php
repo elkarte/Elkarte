@@ -220,22 +220,22 @@ class ManageMaillist_Controller extends Action_Controller
 						'value' => $txt['message_type'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 						global $txt;
 
 						// Do we have a type?
-						if (empty($rowData[\'type\']))
-							return $txt[\'not_applicable\'];
+						if (empty($rowData['type']))
+							return $txt['not_applicable'];
 						// Personal?
-						elseif ($rowData[\'type\'] === \'p\')
-							return $txt[\'personal_message\'];
+						elseif ($rowData['type'] === 'p')
+							return $txt['personal_message'];
 						// New Topic?
-						elseif ($rowData[\'type\'] === \'x\')
-							return $txt[\'new_topic\'];
+						elseif ($rowData['type'] === 'x')
+							return $txt['new_topic'];
 						// Ah a Reply then
 						else
-							return $txt[\'topic\'] . \' \' . $txt[\'reply\'];
-					'),
+							return $txt['topic'] . ' ' . $txt['reply'];
+					},
 					),
 					'sort' => array(
 						'default' => 'message_type',
@@ -1705,9 +1705,9 @@ class ManageMaillist_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-						return \'<input type="checkbox" name="deltpl[]" value="\' . $rowData[\'id_comment\'] . \'" class="input_check" />\';
-					'),
+						'function' => function ($rowData) {
+							return '<input type="checkbox" name="deltpl[]" value="' . $rowData['id_comment'] . '" class="input_check" />';
+						},
 						'class' => 'centertext',
 					),
 				),

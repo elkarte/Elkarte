@@ -38,10 +38,10 @@ $databases = array(
 		'utf8_version' => '4.1.0',
 		'utf8_version_check' => 'return mysqli_get_server_info($db_connection);',
 		'alter_support' => true,
-		'validate_prefix' => create_function('&$value', '
-			$value = preg_replace(\'~[^A-Za-z0-9_\$]~\', \'\', $value);
+		'validate_prefix' => function (&$value) {
+			$value = preg_replace('~[^A-Za-z0-9_\$]~', '', $value);
 			return true;
-		'),
+		},
 		'require_db_confirm' => true,
 	),
 	'postgresql' => array(
@@ -53,21 +53,21 @@ $databases = array(
 		'utf8_support' => true,
 		'utf8_version' => '8.0',
 		'utf8_version_check' => '$request = pg_query(\'SELECT version()\'); list ($version) = pg_fetch_row($request); list ($pgl, $version) = explode(" ", $version); return $version;',
-		'validate_prefix' => create_function('&$value', '
+		'validate_prefix' => function (&$value) {
 			global $txt;
 
-			$value = preg_replace(\'~[^A-Za-z0-9_\$]~\', \'\', $value);
+			$value = preg_replace('~[^A-Za-z0-9_\$]~', '', $value);
 
 			// Is it reserved?
-			if ($value == \'pg_\')
-				return $txt[\'error_db_prefix_reserved\'];
+			if ($value == 'pg_')
+				return $txt['error_db_prefix_reserved'];
 
 			// Is the prefix numeric?
-			if (preg_match(\'~^\d~\', $value))
-				return $txt[\'error_db_prefix_numeric\'];
+			if (preg_match('~^\d~', $value))
+				return $txt['error_db_prefix_numeric'];
 
 			return true;
-		'),
+		},
 		'require_db_confirm' => true,
 	),
 );

@@ -196,23 +196,23 @@ class Mentions_Controller extends Action_Controller
 						'value' => $txt['mentions_from'],
 					),
 					'data' => array(
-						'function' => create_function('$row', '
+						'function' => function ($row) {
 							global $settings, $scripturl;
 
-							if (isset($settings[\'mentions\'][\'mentioner_template\']))
+							if (isset($settings['mentions']['mentioner_template']))
 								return str_replace(
 									array(
-										\'{avatar_img}\',
-										\'{mem_url}\',
-										\'{mem_name}\',
+										'{avatar_img}',
+										'{mem_url}',
+										'{mem_name}',
 									),
 									array(
-										$row[\'avatar\'][\'image\'],
-										!empty($row[\'id_member_from\']) ? $scripturl . \'?action=profile;u=\' . $row[\'id_member_from\'] : \'\',
-										$row[\'mentioner\'],
+										$row['avatar']['image'],
+										!empty($row['id_member_from']) ? $scripturl . '?action=profile;u=' . $row['id_member_from'] : '',
+										$row['mentioner'],
 									),
-									$settings[\'mentions\'][\'mentioner_template\']);
-						')
+									$settings['mentions']['mentioner_template']);
+						},
 					),
 					'sort' => array(
 						'default' => 'mtn.id_member_from',
@@ -250,18 +250,18 @@ class Mentions_Controller extends Action_Controller
 						'class' => 'listaction',
 					),
 					'data' => array(
-						'function' => create_function('$row', '
+						'function' => function ($row) {
 							global $txt, $settings, $context;
 
-							$opts = \'\';
+							$opts = '';
 
-							if (empty($row[\'status\']))
-								$opts = \'<a href="?action=mentions;sa=updatestatus;mark=read;item=\' . $row[\'id_mention\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img title="\' . $txt[\'mentions_markread\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/mark_read.png" alt="*" /></a>&nbsp;\';
+							if (empty($row['status']))
+								$opts = '<a href="?action=mentions;sa=updatestatus;mark=read;item=' . $row['id_mention'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';"><img title="' . $txt['mentions_markread'] . '" src="' . $settings['images_url'] . '/icons/mark_read.png" alt="*" /></a>&nbsp;';
 							else
-								$opts = \'<a href="?action=mentions;sa=updatestatus;mark=unread;item=\' . $row[\'id_mention\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img title="\' . $txt[\'mentions_markunread\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/mark_unread.png" alt="*" /></a>&nbsp;\';
+								$opts = '<a href="?action=mentions;sa=updatestatus;mark=unread;item=' . $row['id_mention'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';"><img title="' . $txt['mentions_markunread'] . '" src="' . $settings['images_url'] . '/icons/mark_unread.png" alt="*" /></a>&nbsp;';
 
-							return $opts . \'<a href="?action=mentions;sa=updatestatus;mark=delete;item=\' . $row[\'id_mention\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img title="\' . $txt[\'delete\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/delete.png" alt="*" /></a>\';
-						'),
+							return $opts . '<a href="?action=mentions;sa=updatestatus;mark=delete;item=' . $row['id_mention'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';"><img title="' . $txt['delete'] . '" src="' . $settings['images_url'] . '/icons/delete.png" alt="*" /></a>';
+						},
 						'class' => 'listaction',
 					),
 				),

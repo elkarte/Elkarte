@@ -259,9 +259,9 @@ class Modlog_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$entry', '
-							return \'<input type="checkbox" class="input_check" name="delete[]" value="\' . $entry[\'id\'] . \'"\' . ($entry[\'editable\'] ? \'\' : \' disabled="disabled"\') . \' />\';
-						'),
+						'function' => function ($entry) {
+							return '<input type="checkbox" class="input_check" name="delete[]" value="' . $entry['id'] . '"' . ($entry['editable'] ? '' : ' disabled="disabled"') . ' />';
+						},
 						'class' => 'centertext',
 					),
 				),
