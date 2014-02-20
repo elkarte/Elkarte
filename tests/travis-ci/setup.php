@@ -151,11 +151,16 @@ Class Elk_Testing_Setup
 				array('variable')
 			);
 
-		updateStats('member');
-		updateStats('message');
-		updateStats('topic');
+
+		require_once(SUBSDIR . '/Members.subs.php');
+		updateMemberStats();
+		require_once(SUBSDIR . '/Messages.subs.php');
+		updateMessageStats();
+		require_once(SUBSDIR . '/Topics.subs.php');
+		updateTopicStats();
 		loadLanguage('Install');
-		updateStats('subject', 1, htmlspecialchars($txt['default_topic_subject']));
+		require_once(SUBSDIR . '/Topics.subs.php');
+		updateSubjectStats(1, htmlspecialchars($txt['default_topic_subject']));
 	}
 
 	public function createTests()
