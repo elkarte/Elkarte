@@ -1771,6 +1771,10 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 		loadCSSFile($sheets);
 	}
 
+	// Load a custom CSS file?
+	if (!empty($context['theme_variant']) && file_exists($settings['theme_dir'] . '/css/' . $context['theme_variant'] . '/custom' . $context['theme_variant'] . '.css'))
+		 loadCSSFile($context['theme_variant'] . '/custom' . $context['theme_variant'] . '.css');
+
 	// No template to load?
 	if ($template_name === false)
 		return true;
