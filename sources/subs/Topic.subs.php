@@ -2309,7 +2309,8 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		);
 
 		// Cache the new topics subject... we can do it now as all the subjects are the same!
-		updateStats('subject', $split2_ID_TOPIC, $new_subject);
+		require_once(SUBSDIR . '/Messages.subs.php');
+		updateSubjectStats($split2_ID_TOPIC, $new_subject);
 	}
 
 	// Any associated reported posts better follow...

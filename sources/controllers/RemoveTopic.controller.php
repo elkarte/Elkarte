@@ -645,8 +645,9 @@ class RemoveTopic_Controller extends Action_Controller
 					'first_messages' => $cache_updates,
 				)
 			);
+			require_once(SUBSDIR . '/Messages.subs.php');
 			while ($row = $db->fetch_assoc($request))
-				updateStats('subject', $row['id_topic'], $row['subject']);
+				updateSubjectStats($row['id_topic'], $row['subject']);
 			$db->free_result($request);
 		}
 

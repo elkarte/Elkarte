@@ -1208,7 +1208,6 @@ function updateMessageStats($increment = null, $max_msg_id = null)
  * This function updates the log_search_subjects in the event of a topic being
  * moved, removed or split. It is being sent the topic id, and optionally
  * the new subject.
- * Used by updateStats('subject').
  *
  * @param int $id_topic
  * @param string|null $subject

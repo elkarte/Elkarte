@@ -753,7 +753,8 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 		updateTopicStats(true);
-		updateStats('subject', $topicOptions['id'], $msgOptions['subject']);
+		require_once(SUBSDIR . '/Messages.subs.php');
+		updateSubjectStats($topicOptions['id'], $msgOptions['subject']);
 
 		// What if we want to export new topics out to a CMS?
 		call_integration_hook('integrate_create_topic', array($msgOptions, $topicOptions, $posterOptions));
@@ -1055,7 +1056,10 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			)
 		);
 		if ($db->num_rows($request) == 1)
-			updateStats('subject', $topicOptions['id'], $msgOptions['subject']);
+		{
+			require_once(SUBSDIR . '/Messages.subs.php');
+			updateSubjectStats('subject', $topicOptions['id'], $msgOptions['subject']);
+		}
 		$db->free_result($request);
 	}
 
