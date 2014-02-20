@@ -2955,7 +2955,6 @@ function getSubject($id_topic)
 /**
  * This function updates the total number of topics,
  * or if parameter $increment is true it simply increments them.
- * Used by updateStats('topic').
  *
  * @param bool|null $increment = null if true, increment + 1 the total topics, otherwise recount all topics
  */

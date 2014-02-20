@@ -751,7 +751,8 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		// There's been a new topic AND a new post today.
 		trackStats(array('topics' => '+', 'posts' => '+'));
 
-		updateStats('topic', true);
+		require_once(SUBSDIR . '/Topic.subs.php');
+		updateTopicStats(true);
 		updateStats('subject', $topicOptions['id'], $msgOptions['subject']);
 
 		// What if we want to export new topics out to a CMS?
