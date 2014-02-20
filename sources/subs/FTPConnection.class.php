@@ -35,19 +35,19 @@ class Ftp_Connection
 
 	/**
 	 * holds any errors
-	 * @var type
+	 * @var string|boolean
 	 */
 	public $error;
 
 	/**
 	 * holds last message from the server
-	 * @var type
+	 * @var string
 	 */
 	public $last_message;
 
 	/**
 	 * Passive connection
-	 * @var type
+	 * @var mixed[]
 	 */
 	public $pasv;
 

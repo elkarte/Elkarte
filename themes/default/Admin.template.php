@@ -20,7 +20,7 @@
  */
 function template_admin()
 {
-	global $context, $settings, $scripturl, $txt, $modSettings;
+	global $context, $settings, $scripturl, $txt;
 
 	// Welcome message for the admin.
 	echo '

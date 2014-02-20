@@ -78,7 +78,7 @@ function ml_CustomProfile()
 				);
 
 			// Build the join and parameters for the sort query
-			$context['custom_profile_fields']['join'] = 'LEFT JOIN {db_prefix}custom_fields_data AS cfd' . $curField . ' ON (cfd' . $curField . '.variable = {string:cfd' . $curField . '} AND cfd' . $curField . '.id_theme = 1 AND cfd' . $curField . '.id_member = mem.id_member)';
+			$context['custom_profile_fields']['join'] = 'LEFT JOIN {db_prefix}custom_fields_data AS cfd' . $curField . ' ON (cfd' . $curField . '.variable = {string:cfd' . $curField . '} AND cfd' . $curField . '.id_member = mem.id_member)';
 			$context['custom_profile_fields']['parameters']['cfd' . $curField] = $row['col_name'];
 		}
 	}

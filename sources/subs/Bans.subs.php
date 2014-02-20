@@ -66,6 +66,7 @@ function saveTriggers($suggestions, $ban_group, $member = 0, $ban_id = 0)
 		else
 			updateTriggers($ban_id, $ban_group, array_shift($ban_triggers['ban_triggers']), $ban_triggers['log_info']);
 	}
+
 	if ($ban_errors->hasErrors())
 		return $triggers;
 	else
@@ -92,6 +93,10 @@ function removeBanTriggers($items_ids = array(), $group_id = false)
 
 	if (!is_array($items_ids))
 		$items_ids = array($items_ids);
+
+	// Log the ban removals so others know
+	$log_info = banLogItems(banDetails($items_ids, $group_id));
+	logTriggersUpdates($log_info, 'remove');
 
 	if ($group_id !== false)
 	{
@@ -307,9 +312,11 @@ function validateTriggers(&$triggers)
 			{
 				// Special case, those two are arrays themselves
 				$values = array_unique($value);
+
 				// Don't add the main IP again.
 				if (isset($triggers['main_ip']))
 					$values = array_diff($values, array($triggers['main_ip']));
+
 				unset($value);
 				foreach ($values as $val)
 				{
@@ -473,6 +480,7 @@ function updateTriggers($ban_item = 0, $group_id = 0, $trigger = array(), $logs 
 	if (empty($trigger))
 		$ban_errors->addError('ban_no_triggers');
 
+	// Any errors then we are not updating it
 	if ($ban_errors->hasErrors())
 		return;
 
@@ -531,7 +539,7 @@ function updateTriggers($ban_item = 0, $group_id = 0, $trigger = array(), $logs 
  * @param mixed[] $logs an array of logs, each log contains the following keys:
  *                - bantype: a known type of ban (ip_range, hostname, email, user, main_ip)
  *                - value: the value of the bantype (e.g. the IP or the email address banned)
- * @param boolean $new if the trigger is new or an update of an existing one
+ * @param boolean|string $new if the trigger is new (true), an update (false), or a removal ('remove') of an existing one
  */
 function logTriggersUpdates($logs, $new = true)
 {
@@ -550,7 +558,7 @@ function logTriggersUpdates($logs, $new = true)
 	foreach ($logs as $log)
 		logAction('ban', array(
 			$log_name_map[$log['bantype']] => $log['value'],
-			'new' => empty($new) ? 0 : 1,
+			'new' => empty($new) ? 0 : ($new === true ? 1 : -1),
 			'type' => $log['bantype'],
 		));
 }
@@ -858,11 +866,13 @@ function updateBanMembers()
 		$queryPart[] = 'mem.id_member IN ({array_string:member_ids})';
 		$queryValues['member_ids'] = $memberIDs;
 	}
+
 	if (!empty($memberEmails))
 	{
 		$queryPart[] = 'mem.email_address IN ({array_string:member_emails})';
 		$queryValues['member_emails'] = $memberEmails;
 	}
+
 	$count = 0;
 	foreach ($memberEmailWild as $email)
 	{
@@ -1440,12 +1450,15 @@ function banLoadAdditionalIPs($member_id)
 /**
  * Fetches ban details
  *
- * @param int $ban_id
- * @param int $ban_group
+ * @param int[]|int $ban_ids
+ * @param int|false $ban_group
  */
-function banDetails($ban_id, $ban_group)
+function banDetails($ban_ids, $ban_group = false)
 {
 	$db = database();
+
+	if (!is_array($ban_ids))
+		$ban_ids = array($ban_ids);
 
 	$request = $db->query('', '
 		SELECT
@@ -1455,16 +1468,70 @@ function banDetails($ban_id, $ban_group)
 			mem.member_name, mem.real_name
 		FROM {db_prefix}ban_items AS bi
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = bi.id_member)
-		WHERE bi.id_ban = {int:ban_item}
-			AND bi.id_ban_group = {int:ban_group}
-		LIMIT 1',
+		WHERE bi.id_ban = {array_int:ban_items}' . ($ban_group !== false ? '
+			AND bi.id_ban_group = {int:ban_group}' : ''),
 		array(
-			'ban_item' => $ban_id,
+			'ban_items' => $ban_ids,
 			'ban_group' => $ban_group,
 		)
 	);
-	$details = $db->fetch_assoc($request);
+	$details = array();
+	while ($row = $db->fetch_assoc($request))
+		$details[$row['id_ban']] = $row;
 	$db->free_result($request);
 
 	return $details;
+}
+
+/**
+ * When removing a ban trigger, this will return the specifics of whats being
+ * removed so it can be logged
+ *
+ * @param mixed[] $ban_details
+ */
+function banLogItems($ban_details)
+{
+	$log_info = array();
+
+	// For each ban, get the details for logging
+	foreach ($ban_details as $row)
+	{
+		// An ip ban
+		if (!empty($row['ip_high1']))
+		{
+			$ip = range2ip(array($row['ip_low1'], $row['ip_low2'], $row['ip_low3'], $row['ip_low4'], $row['ip_low5'], $row['ip_low6'], $row['ip_low7'], $row['ip_low8']), array($row['ip_high1'], $row['ip_high2'], $row['ip_high3'], $row['ip_high4'], $row['ip_high5'], $row['ip_high6'], $row['ip_high7'], $row['ip_high8']));
+			$is_range = (strpos($ip, '-') !== false || strpos($ip, '*') !== false);
+
+			$log_info[] = array(
+				'bantype' => ($is_range ? 'ip_range' : 'main_ip'),
+				'value' => $ip,
+			);
+		}
+		// Hostname
+		elseif (!empty($row['hostname']))
+		{
+			$log_info[] = array(
+				'bantype' => 'hostname',
+				'value' => $row['hostname'],
+			);
+		}
+		// Email Address
+		elseif (!empty($row['email_address']))
+		{
+			$log_info[] = array(
+				'bantype' => 'email',
+				'value' => str_replace('%', '*', $row['email_address']),
+			);
+		}
+		// Member ID
+		elseif (!empty($row['id_member']))
+		{
+			$log_info[] = array(
+				'bantype' => 'user',
+				'value' => $row['id_member'],
+			);
+		}
+	}
+
+	return $log_info;
 }

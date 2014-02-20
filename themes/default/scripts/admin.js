@@ -1029,6 +1029,40 @@ function toggleCache ()
 }
 
 /**
+ * Hides local / subdomain cookie options in the ACP based on selected choices
+ * area=serversettings;sa=cookie
+ */
+function hideGlobalCookies()
+{
+	var bUseLocal = document.getElementById("localCookies").checked,
+		bUseGlobal = !bUseLocal && document.getElementById("globalCookies").checked;
+
+	// Show/Hide the areas based on what they have chosen
+	if (!bUseLocal)
+	{
+		$("#setting_globalCookies").parent().slideDown();
+		$("#globalCookies").parent().slideDown();
+	}
+	else
+	{
+		$("#setting_globalCookies").parent().slideUp();
+		$("#globalCookies").parent().slideUp();
+	}
+
+	// Global selected means we need to reveil the domain input box
+	if (bUseGlobal)
+	{
+		$("#setting_globalCookiesDomain").closest("dt").slideDown();
+		$("#globalCookiesDomain").closest("dd").slideDown();
+	}
+	else
+	{
+		$("#setting_globalCookiesDomain").closest("dt").slideUp();
+		$("#globalCookiesDomain").closest("dd").slideUp();
+	}
+}
+
+/**
  * Attachments Settings
  */
 function toggleSubDir ()

@@ -347,36 +347,10 @@ class ManageServer_Controller extends Action_Controller
 		}
 
 		addInlineJavascript('
-		function hideGlobalCookies()
-		{
-			var usingLocal = $("#localCookies").prop("checked"),
-				usingGlobal = !usingLocal && $("#globalCookies").prop("checked");
-
-			// Show/Hide the areas based on what they have chosen
-			if (!usingLocal)
-			{
-				$("#setting_globalCookies").parent().slideDown();
-				$("#globalCookies").parent().slideDown();
-			}
-			else
-			{
-				$("#setting_globalCookies").parent().slideUp();
-				$("#globalCookies").parent().slideUp();
-			}
-
-			if (usingGlobal)
-			{
-				$("#setting_globalCookiesDomain").closest("dt").slideDown();
-				$("#globalCookiesDomain").closest("dd").slideDown();
-			}
-			else
-			{
-				$("#setting_globalCookiesDomain").closest("dt").slideUp();
-				$("#globalCookiesDomain").closest("dd").slideUp();
-			}
-		};
+		// Initial state
 		hideGlobalCookies();
 
+		// Update when clicked
 		$("#localCookies, #globalCookies").click(function() {
 			hideGlobalCookies();
 		});', true);

@@ -21,7 +21,7 @@ class Likes_Controller extends Action_Controller
 {
 	/**
 	 * Holds the ajax response
-	 * @var string[];
+	 * @var string[]
 	 */
 	protected $_likes_response = array();
 
