@@ -238,7 +238,7 @@ class ModerationCenter_Controller extends Action_Controller
 						'label' => $txt['mc_view_groups'],
 						'file' => 'Groups.controller.php',
 						'controller' => 'Groups_Controller',
-						'function' => 'action_list',
+						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_membergroups',
 					),
