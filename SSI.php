@@ -104,6 +104,7 @@ require_once(SOURCEDIR . '/Errors.class.php');
 require_once(SUBSDIR . '/Util.class.php');
 require_once(SUBSDIR . '/TemplateLayers.class.php');
 require_once(SOURCEDIR . '/Action.controller.php');
+require_once(SUBSDIR . '/Text.subs.php');
 
 // Clean the request variables.
 cleanRequest();
