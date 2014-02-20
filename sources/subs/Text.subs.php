@@ -1634,3 +1634,89 @@ function highlight_php_code($code)
 
 	return strtr($buffer, array('\'' => '&#039;', '<code>' => '', '</code>' => ''));
 }
+
+/**
+ * Shorten a string of text
+ *
+ * - shortens a text string so that it is either shorter than length, or that length plus an ellipsis.
+ * - optionally attempts to break the string on a word boundary approximately at the allowed length
+ * - if using cutword and the resulting length is > len plus buffer then it is truncated to length plus an ellipsis.
+ * - respects internationalization characters and entities as one character.
+ * - returns the shortened string.
+ *
+ * @param string $text
+ * @param int $len
+ * @param bool $cutword try to cut at a word boundary
+ * @param int $buffer maximum length overflow to allow when cutting on a word boundary
+ */
+function shorten_text($text, $len = 384, $cutword = false, $buffer = 12)
+{
+	// If its to long, cut it down to size
+	if (Util::strlen($text) > $len)
+	{
+		$text = html_entity_decode($text, ENT_QUOTES, 'UTF-8');
+
+		if ($cutword)
+		{
+			// Look for len - buffer characters and cut on first word boundary after
+			preg_match('~(.{' . ($len - $buffer) . '}.*?)\b~su', $text, $matches);
+
+			// Always one clown in the audience who likes long words or not using the spacebar
+			if (Util::strlen($matches[1]) > $len + $buffer)
+				$matches[1] = Util::substr($matches[1], 0, $len);
+
+			$text = rtrim($matches[1]) . ' ...';
+		}
+		else
+			$text = Util::substr($text, 0, $len) . '...';
+
+		$text = Util::htmlspecialchars($text);
+	}
+
+	return $text;
+}
+
+/**
+ * Microsoft uses their own character set Code Page 1252 (CP1252), which is a
+ * superset of ISO 8859-1, defining several characters between DEC 128 and 159
+ * that are not normally displayable.  This converts the popular ones that
+ * appear from a cut and paste from windows.
+ *
+ * @param string|false $string
+ * @return string $string
+ */
+function sanitizeMSCutPaste($string)
+{
+	if (empty($string))
+		return $string;
+
+	// UTF-8 occurences of MS special characters
+	$findchars_utf8 = array(
+		"\xe2\x80\x9a",	// single low-9 quotation mark
+		"\xe2\x80\x9e",	// double low-9 quotation mark
+		"\xe2\x80\xa6",	// horizontal ellipsis
+		"\xe2\x80\x98",	// left single curly quote
+		"\xe2\x80\x99",	// right single curly quote
+		"\xe2\x80\x9c",	// left double curly quote
+		"\xe2\x80\x9d",	// right double curly quote
+		"\xe2\x80\x93",	// en dash
+		"\xe2\x80\x94",	// em dash
+	);
+
+	// safe replacements
+	$replacechars = array(
+		',',	// &sbquo;
+		',,',	// &bdquo;
+		'...',	// &hellip;
+		"'",	// &lsquo;
+		"'",	// &rsquo;
+		'"',	// &ldquo;
+		'"',	// &rdquo;
+		'-',	// &ndash;
+		'--',	// &mdash;
+	);
+
+	$string = str_replace($findchars_utf8, $replacechars, $string);
+
+	return $string;
+}
