@@ -21,60 +21,6 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Update some basic statistics.
- *
- * 'member' statistic updates the latest member, the total member
- *  count, and the number of unapproved members.
- * 'member' also only counts approved members when approval is on, but
- *  is much more efficient with it off.
- *
- * 'message' changes the total number of messages, and the
- *  highest message id by id_msg - which can be parameters 1 and 2,
- *  respectively.
- *
- * 'topic' updates the total number of topics, or if parameter1 is true
- *  simply increments them.
- *
- * 'subject' updateds the log_search_subjects in the event of a topic being
- *  moved, removed or split.  parameter1 is the topicid, parameter2 is the new subject
- *
- * 'postgroups' case updates those members who match condition's
- *  post-based membergroups in the database (restricted by parameter1).
- *
- * @param string $type Stat type - can be 'member', 'message', 'topic', 'subject' or 'postgroups'
- * @param int|string|false|mixed[]|null $parameter1 pass through value
- * @param int|string|false|mixed[]|null $parameter2 pass through value
- */
-function updateStats($type, $parameter1 = null, $parameter2 = null)
-{
-	switch ($type)
-	{
-		case 'member':
-			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberStats($parameter1, $parameter2);
-			break;
-		case 'message':
-			require_once(SUBSDIR . '/Messages.subs.php');
-			updateMessageStats($parameter1, $parameter2);
-			break;
-		case 'subject':
-			require_once(SUBSDIR . '/Messages.subs.php');
-			updateSubjectStats($parameter1, $parameter2);
-			break;
-		case 'topic':
-			require_once(SUBSDIR . '/Topic.subs.php');
-			updateTopicStats($parameter1);
-			break;
-		case 'postgroups':
-			require_once(SUBSDIR . '/Membergroups.subs.php');
-			updatePostGroupStats($parameter1, $parameter2);
-			break;
-		default:
-			trigger_error('updateStats(): Invalid statistic type \'' . $type . '\'', E_USER_NOTICE);
-	}
-}
-
-/**
  * Updates the columns in the members table.
  * Assumes the data has been htmlspecialchar'd, no sanitization is performed on the data.
  * this function should be used whenever member data needs to be updated in place of an UPDATE query.
