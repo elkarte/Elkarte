@@ -90,7 +90,7 @@ function template_init()
 			'current_page' => '<li class="linavPages"><strong class="current_page" role="menuitem">%1$s</strong></li>',
 			'next_page' => '<span class="next_page" role="menuitem">{next_txt}</span>',
 			'expand_pages' => '<li class="linavPages expand_pages" role="menuitem" {custom}> <a href="#">...</a> </li>',
-			'all' => '<li class="linavPages all_pages" role="menuitem">{all_txt}</li>',
+			'all' => '<span class="linavPages all_pages" role="menuitem">{all_txt}</span>',
 		),
 
 		// @todo find a better place if we are going to create a notifications template
