@@ -155,6 +155,7 @@ function writeLog($force = false)
 			$_SESSION['timeOnlineUpdated'] = time();
 
 		$user_settings['total_time_logged_in'] += time() - $_SESSION['timeOnlineUpdated'];
+		require_once(SUBSDIR . '/Members.subs.php');
 		updateMemberData($user_info['id'], array('last_login' => time(), 'member_ip' => $user_info['ip'], 'member_ip2' => $req->ban_ip(), 'total_time_logged_in' => $user_settings['total_time_logged_in']));
 
 		if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)

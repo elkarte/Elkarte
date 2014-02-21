@@ -473,6 +473,8 @@ function updatePersonalMessagesCounter()
 {
 	$db = database();
 
+	require_once(SUBSDIR . '/Members.subs.php');
+
 	$request = $db->query('', '
 		SELECT /*!40001 SQL_NO_CACHE */ mem.id_member, COUNT(pmr.id_pm) AS real_num,
 			MAX(mem.personal_messages) AS personal_messages
@@ -724,6 +726,7 @@ function updateMembersPostCount($start, $increment)
 	$total_rows = $db->num_rows($request);
 
 	// Update the post count for this group
+	require_once(SUBSDIR . '/Members.subs.php');
 	while ($row = $db->fetch_assoc($request))
 		updateMemberData($row['id_member'], array('posts' => $row['posts']));
 	$db->free_result($request);
@@ -785,7 +788,10 @@ function updateZeroPostMembers()
 			$db->free_result($request);
 
 			if (!empty($members))
+			{
+				require_once(SUBSDIR . '/Members.subs.php');
 				updateMemberData($members, array('posts' => 0));
+			}
 		}
 }
 

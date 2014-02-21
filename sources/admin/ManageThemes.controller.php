@@ -222,7 +222,10 @@ class ManageThemes_Controller extends Action_Controller
 				'knownThemes' => implode(',', $_POST['options']['known_themes']),
 			));
 			if ((int) $_POST['theme_reset'] == 0 || in_array($_POST['theme_reset'], $_POST['options']['known_themes']))
+			{
+				require_once(SUBSDIR . '/Members.subs.php');
 				updateMemberData(null, array('id_theme' => (int) $_POST['theme_reset']));
+			}
 
 			redirectexit('action=admin;area=theme;' . $context['session_var'] . '=' . $context['session_id'] . ';sa=admin');
 		}
@@ -908,6 +911,7 @@ class ManageThemes_Controller extends Action_Controller
 			// Save for this user.
 			if (!isset($_REQUEST['u']) || !allowedTo('admin_forum'))
 			{
+				require_once(SUBSDIR . '/Members.subs.php');
 				updateMemberData($user_info['id'], array('id_theme' => (int) $_GET['th']));
 
 				// A variants to save for the user?
@@ -935,6 +939,7 @@ class ManageThemes_Controller extends Action_Controller
 			// For everyone.
 			if ($_REQUEST['u'] == '0')
 			{
+				require_once(SUBSDIR . '/Members.subs.php');
 				updateMemberData(null, array('id_theme' => (int) $_GET['th']));
 
 				// Remove any custom variants.
@@ -955,8 +960,9 @@ class ManageThemes_Controller extends Action_Controller
 			{
 				// The forum's default theme is always 0 and we
 				if (isset($_GET['th']) && $_GET['th'] == 0)
-						$_GET['th'] = $modSettings['theme_guests'];
+					$_GET['th'] = $modSettings['theme_guests'];
 
+				require_once(SUBSDIR . '/Members.subs.php');
 				updateMemberData((int) $_REQUEST['u'], array('id_theme' => (int) $_GET['th']));
 
 				if (!empty($_GET['vrt']))

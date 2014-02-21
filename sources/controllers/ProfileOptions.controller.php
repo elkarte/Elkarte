@@ -121,6 +121,7 @@ class ProfileOptions_Controller extends Action_Controller
 
 			// Make the changes.
 			$user_profile[$memID]['buddy_list'] = implode(',', $buddiesArray);
+			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($memID, array('buddy_list' => $user_profile[$memID]['buddy_list']));
 
 			// Redirect off the page because we don't like all this ugly query stuff to stick in the history.
@@ -187,6 +188,7 @@ class ProfileOptions_Controller extends Action_Controller
 
 				// Now update the current users buddy list.
 				$user_profile[$memID]['buddy_list'] = implode(',', $buddiesArray);
+				require_once(SUBSDIR . '/Members.subs.php');
 				updateMemberData($memID, array('buddy_list' => $user_profile[$memID]['buddy_list']));
 			}
 
@@ -259,6 +261,7 @@ class ProfileOptions_Controller extends Action_Controller
 
 			// Make the changes.
 			$user_profile[$memID]['pm_ignore_list'] = implode(',', $ignoreArray);
+			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($memID, array('pm_ignore_list' => $user_profile[$memID]['pm_ignore_list']));
 
 			// Redirect off the page because we don't like all this ugly query stuff to stick in the history.
@@ -302,6 +305,7 @@ class ProfileOptions_Controller extends Action_Controller
 
 				// Now update the current users buddy list.
 				$user_profile[$memID]['pm_ignore_list'] = implode(',', $ignoreArray);
+				require_once(SUBSDIR . '/Members.subs.php');
 				updateMemberData($memID, array('pm_ignore_list' => $user_profile[$memID]['pm_ignore_list']));
 			}
 
@@ -503,6 +507,7 @@ class ProfileOptions_Controller extends Action_Controller
 					$passwd = validateLoginPassword($new_pass, '', $cur_profile['member_name'], true);
 
 					// Do the important bits.
+					require_once(SUBSDIR . '/Members.subs.php');
 					updateMemberData($memID, array('openid_uri' => '', 'passwd' => $passwd));
 					if ($context['user']['is_owner'])
 					{
@@ -1193,6 +1198,7 @@ class ProfileOptions_Controller extends Action_Controller
 		else
 			updateSettings(array('settings_updated' => time()));
 
+		require_once(SUBSDIR . '/Members.subs.php');
 		updateMemberData($memID, array('id_group' => $newPrimary, 'additional_groups' => $addGroups));
 
 		return $changeType;

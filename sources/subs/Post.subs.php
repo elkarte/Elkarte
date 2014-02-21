@@ -868,6 +868,8 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		// Are you the one that happened to create this post?
 		if ($user_info['id'] == $posterOptions['id'])
 			$user_info['posts']++;
+
+		require_once(SUBSDIR . '/Members.subs.php');
 		updateMemberData($posterOptions['id'], array('posts' => '+'));
 	}
 
@@ -1273,8 +1275,11 @@ function approvePosts($msgs, $approve = true)
 
 	// Post count for the members?
 	if (!empty($member_post_changes))
+	{
+		require_once(SUBSDIR . '/Members.subs.php');
 		foreach ($member_post_changes as $id_member => $count_change)
 			updateMemberData($id_member, array('posts' => 'posts ' . ($approve ? '+' : '-') . ' ' . $count_change));
+	}
 
 	return true;
 }

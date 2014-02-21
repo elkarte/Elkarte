@@ -132,8 +132,11 @@ class Reminder_Controller extends Action_Controller
 			sendmail($member['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);
 
 			if (empty($member['openid_uri']))
+			{
+				require_once(SUBSDIR . '/Members.subs.php');
 				// Set the password in the database.
 				updateMemberData($member['id_member'], array('validation_code' => substr(md5($password), 0, 10)));
+			}
 
 			// Set up the template.
 			$context['sub_template'] = 'sent';
@@ -237,6 +240,7 @@ class Reminder_Controller extends Action_Controller
 		// User validated.  Update the database!
 		require_once(SUBSDIR . '/Auth.subs.php');
 		$sha_passwd = $_POST['passwrd1'];
+		require_once(SUBSDIR . '/Members.subs.php');
 		updateMemberData($_POST['u'], array('validation_code' => '', 'passwd' => validateLoginPassword($sha_passwd, '', $member['member_name'], true)));
 
 		call_integration_hook('integrate_reset_pass', array($member['member_name'], $member['member_name'], $_POST['passwrd1']));
@@ -310,6 +314,7 @@ class Reminder_Controller extends Action_Controller
 		// Alright, so long as 'yer sure.
 		require_once(SUBSDIR . '/Auth.subs.php');
 		$sha_passwd = $_POST['passwrd1'];
+		require_once(SUBSDIR . '/Members.subs.php');
 		updateMemberData($member['id_member'], array('passwd' => validateLoginPassword($sha_passwd, '', $member['member_name'], true)));
 
 		call_integration_hook('integrate_reset_pass', array($member['member_name'], $member['member_name'], $_POST['passwrd1']));

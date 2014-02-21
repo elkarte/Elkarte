@@ -595,7 +595,10 @@ function removeMessage($message, $decreasePostCount = true)
 	// If the poster was registered and the board this message was on incremented
 	// the member's posts when it was posted, decrease his or her post count.
 	if (!empty($row['id_member']) && $decreasePostCount && empty($row['count_posts']) && $row['approved'])
+	{
+		require_once(SUBSDIR . '/Members.subs.php');
 		updateMemberData($row['id_member'], array('posts' => '-'));
+	}
 
 	// Only remove posts if they're not recycled.
 	if (!$recycle)

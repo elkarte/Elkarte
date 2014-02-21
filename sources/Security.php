@@ -1497,6 +1497,7 @@ function validatePasswordFlood($id_member, $password_flood_value = false, $was_c
 		fatal_lang_error('login_threshold_brute_fail', 'critical');
 
 	// Otherwise set the members data. If they correct on their first attempt then we actually clear it, otherwise we set it!
+	require_once(SUBSDIR . '/Members.subs.php');
 	updateMemberData($id_member, array('passwd_flood' => $was_correct && $number_tries == 1 ? '' : $time_stamp . '|' . $number_tries));
 }
 

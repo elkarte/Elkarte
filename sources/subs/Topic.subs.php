@@ -66,6 +66,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		);
 		if ($db->num_rows($requestMembers) > 0)
 		{
+			require_once(SUBSDIR . '/Members.subs.php');
 			while ($rowMembers = $db->fetch_assoc($requestMembers))
 				updateMemberData($rowMembers['id_member'], array('posts' => 'posts - ' . $rowMembers['posts']));
 		}
@@ -2437,6 +2438,7 @@ function splitAttemptMove($boards, $totopic)
 				}
 				$db->free_result($request);
 
+				require_once(SUBSDIR . '/Members.subs.php');
 				foreach ($posters as $id_member => $posts)
 				{
 					// The board we're moving from counted posts, but not to.

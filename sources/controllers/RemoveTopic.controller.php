@@ -379,6 +379,7 @@ class RemoveTopic_Controller extends Action_Controller
 						)
 					);
 
+					require_once(SUBSDIR . '/Members.subs.php');
 					while ($member = $db->fetch_assoc($request2))
 						updateMemberData($member['id_member'], array('posts' => 'posts + ' . $member['post_count']));
 					$db->free_result($request2);
@@ -462,6 +463,7 @@ class RemoveTopic_Controller extends Action_Controller
 				)
 			);
 
+			require_once(SUBSDIR . '/Members.subs.php');
 			while ($row = $db->fetch_assoc($request))
 				updateMemberData($row['id_member'], array('posts' => '+'));
 		}

@@ -214,6 +214,7 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 				'pm_list' => $personal_messages !== null ? array_unique($personal_messages) : array(),
 			)
 		);
+		require_once(SUBSDIR . '/Members.subs.php');
 		// ...And update the statistics accordingly - now including unread messages!.
 		while ($row = $db->fetch_assoc($request))
 		{
@@ -413,6 +414,7 @@ function updatePMMenuCounts($owner)
 
 	// Need to store all this.
 	cache_put_data('labelCounts:' . $owner, $context['labels'], 720);
+	require_once(SUBSDIR . '/Members.subs.php');
 	updateMemberData($owner, array('unread_messages' => $total_unread));
 
 	// If it was for the current member, reflect this in the $user_info array too.
@@ -887,7 +889,10 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	}
 
 	if (!empty($all_to))
+	{
+		require_once(SUBSDIR . '/Members.subs.php');
 		updateMemberData($all_to, array('personal_messages' => '+', 'unread_messages' => '+', 'new_pm' => 1));
+	}
 
 	return $log;
 }

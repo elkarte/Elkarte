@@ -302,6 +302,7 @@ class MoveTopic_Controller extends Action_Controller
 		{
 			$posters = postersCount($topic);
 
+			require_once(SUBSDIR . '/Members.subs.php');
 			foreach ($posters as $id_member => $posts)
 			{
 				// The board we're moving from counted posts, but not to.

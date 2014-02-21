@@ -614,6 +614,7 @@ class Profile_Controller extends Action_Controller
 				if (isset($profile_vars['passwd']))
 					call_integration_hook('integrate_reset_pass', array($cur_profile['member_name'], $cur_profile['member_name'], $_POST['passwrd2']));
 
+				require_once(SUBSDIR . '/Members.subs.php');
 				updateMemberData($memID, $profile_vars);
 
 				// What if this is the newest member?
