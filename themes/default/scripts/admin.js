@@ -982,16 +982,13 @@ function dynamicExpandFolder()
 /**
  * Used when edit the boards and groups access to them
  *
- * @param {type} cat_id
- * @param {type} elem
+ * @param {type} operation
  * @param {type} brd_list
  */
-function select_in_category(cat_id, elem, brd_list)
+function select_in_category(operation, brd_list)
 {
 	for (var brd in brd_list)
-		document.getElementById(elem.value + '_brd' + brd_list[brd]).checked = true;
-
-	elem.selectedIndex = 0;
+		document.getElementById(operation + '_brd' + brd_list[brd]).checked = true;
 }
 
 /**
