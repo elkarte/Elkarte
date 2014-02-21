@@ -174,12 +174,12 @@ class Curl_Fetch_Webdata
 			'url' => $url,
 			'code' => $http_code,
 			'error' => $error,
-			'headers' => isset($this->_headers) ? $this->_headers : false,
+			'headers' => !empty($this->_headers) ? $this->_headers : false,
 			'body' => $body,
 		);
 
 		// If this a redirect with a location header and we have not given up, then we play it again Sam
-		if (preg_match('~30[127]~i', $http_code) === 1 && $this->_headers['location'] != '' && $this->_current_redirect <= $this->_max_redirect)
+		if (preg_match('~30[127]~i', $http_code) === 1 && $this->_headers['location'] !== '' && $this->_current_redirect <= $this->_max_redirect)
 		{
 			$this->_current_redirect++;
 			$header_location = $this->_getRedirectURL($url, $this->_headers['location']);
