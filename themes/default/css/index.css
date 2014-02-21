@@ -2464,6 +2464,7 @@ ul.post_options li {
 	line-height: 60px;
 	text-align: center;
 	opacity: 0.6;
+	display: none;
 }
 #postAttachment >dd.progress_tracker {
 	margin:0;
@@ -3115,6 +3116,9 @@ dl.merge_topic dd {
 }
 #paid_subscription dl.settings dd, #paid_subscription dl.settings dt {
 	margin-bottom: 4px;
+}
+#fixed_area .styled-select {
+	vertical-align: top;
 }
 
 /* Pick theme */

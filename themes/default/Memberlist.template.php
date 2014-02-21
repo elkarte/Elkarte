@@ -81,6 +81,7 @@ function template_memberlist()
 	foreach ($context['columns'] as $key => $column)
 	{
 		$table_span += isset($column['colspan']) ? $column['colspan'] : 1;
+
 		// This is a selected column, so underline it or some such.
 		if ($column['selected'])
 			echo '

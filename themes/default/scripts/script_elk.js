@@ -1330,11 +1330,11 @@ function addAnotherOption(parent, oDtName, oDdName, oData)
 {
 	// Some defaults to use if none are passed
 	oDtName['type'] = oDtName.type || 'text';
-	oDtName['class'] = oDtName.class || 'input_text';
+	oDtName['class'] = oDtName['class'] || 'input_text';
 	oDtName['size'] = oDtName.size || '20';
 
 	oDdName['type'] = oDdName.type || 'text';
-	oDdName['class'] = oDdName.class || 'input_text';
+	oDdName['class'] = oDdName['class'] || 'input_text';
 	oDdName['size'] = oDdName.size || '20';
 	oData = oData || '';
 

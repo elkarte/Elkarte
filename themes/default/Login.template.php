@@ -72,7 +72,7 @@ function template_login()
 					</dd>
 					<dt><label for="cookieneverexp">', $txt['always_logged_in'], '</label>:</dt>
 					<dd>
-						<input type="checkbox" name="cookieneverexp id="cookieneverexp"', $context['never_expire'] ? ' checked="checked"' : '', ' class="input_check" onclick="this.form.cookielength.disabled = this.checked;" />
+						<input type="checkbox" name="cookieneverexp" id="cookieneverexp"', $context['never_expire'] ? ' checked="checked"' : '', ' class="input_check" onclick="this.form.cookielength.disabled = this.checked;" />
 					</dd>';
 
 	// If they have deleted their account, give them a chance to change their mind.
@@ -149,7 +149,7 @@ function template_kick_guest()
 				</dl>
 				<p><strong>&mdash;', $txt['or'], '&mdash;</strong></p>
 				<dl>
-					<dt><label for="input_text">', $txt['openid'], '</label>:</dt>
+					<dt><label for="openid_identifier">', $txt['openid'], '</label>:</dt>
 					<dd>
 						<input type="text" name="openid_identifier" class="input_text openid_login" size="17" />
 					</dd>

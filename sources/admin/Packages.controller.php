@@ -2093,7 +2093,7 @@ class Packages_Controller extends Action_Controller
 	 * @param int $start
 	 * @param int $items_per_page
 	 * @param string $sort
-	 * @param array $params
+	 * @param string $params 'type' type of package
 	 * @param bool $installed
 	 */
 	public function list_packages($start, $items_per_page, $sort, $params, $installed)
