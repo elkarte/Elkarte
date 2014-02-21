@@ -730,8 +730,10 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		// There's been a new topic AND a new post today.
 		trackStats(array('topics' => '+', 'posts' => '+'));
 
-		updateStats('topic', true);
-		updateStats('subject', $topicOptions['id'], $msgOptions['subject']);
+		require_once(SUBSDIR . '/Topic.subs.php');
+		updateTopicStats(true);
+		require_once(SUBSDIR . '/Messages.subs.php');
+		updateSubjectStats($topicOptions['id'], $msgOptions['subject']);
 
 		// What if we want to export new topics out to a CMS?
 		call_integration_hook('integrate_create_topic', array($msgOptions, $topicOptions, $posterOptions));
@@ -879,7 +881,8 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		$_SESSION['topicseen_cache'][$topicOptions['board']]--;
 
 	// Update all the stats so everyone knows about this new topic and message.
-	updateStats('message', true, $msgOptions['id']);
+	require_once(SUBSDIR . '/Messages.subs.php');
+	updateMessageStats(true, $msgOptions['id']);
 
 	// Update the last message on the board assuming it's approved AND the topic is.
 	if ($msgOptions['approved'])
@@ -1029,7 +1032,10 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			)
 		);
 		if ($db->num_rows($request) == 1)
-			updateStats('subject', $topicOptions['id'], $msgOptions['subject']);
+		{
+			require_once(SUBSDIR . '/Messages.subs.php');
+			updateSubjectStats('subject', $topicOptions['id'], $msgOptions['subject']);
+		}
 		$db->free_result($request);
 	}
 

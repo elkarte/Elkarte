@@ -243,7 +243,8 @@ class MoveTopic_Controller extends Action_Controller
 					topicSubject($topic_info, $custom_subject);
 
 				// Fix the subject cache.
-				updateStats('subject', $topic, $custom_subject);
+				require_once(SUBSDIR . '/Messages.subs.php');
+				updateSubjectStats($topic, $custom_subject);
 			}
 		}
 

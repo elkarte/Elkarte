@@ -942,7 +942,8 @@ function updateBanMembers()
 			updateMemberData($members, array('is_activated' => $newStatus));
 
 	// Update the latest member and our total members as banning may change them.
-	updateStats('member');
+	require_once(SUBSDIR . '/Members.subs.php');
+	updateMemberStats();
 }
 
 /**
