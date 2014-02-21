@@ -3,3 +3,4 @@ template: responsive
 # we think protected and privates are useful for developers
 visibility: public,protected,private
 parseprivate: true
+docs-repository: elkarte/docs
