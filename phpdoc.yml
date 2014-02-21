@@ -16,7 +16,7 @@ docs-repository: elkarte/docs
 # default: /
 # docs-path: /docs
 # path to phpdoc config file inside your repository, see phpdoc --config <file>
-config: /phpdoc.config
+# config: /phpdoc.config
 # allowed file extensions, see phpdoc --extensions <list>
 extensions: php
 # ignored files, see phpdoc --ignore <list>
