@@ -13,18 +13,26 @@
 #admincenter>#admin_form_wrapper {
 	margin-top: 0;
 }
-#manage_boards h2 {
-	margin-bottom: 6px;
-}
 
 /* Styles for the manage boards section.
 ------------------------------------------------- */
-
+#manage_boards h2 {
+	margin-bottom: 6px;
+}
 #manage_boards .post_group, #manage_boards .regular_members {
 	border-bottom: 1px dotted #000;
 }
 
-/* jQuery Dialog */
+/* Styles for the manage membergroups.
+------------------------------------------------- */
+.select_category, .select_all_box {
+	font-style: italic;
+	border-top: 1px dashed #CCCCCC;
+	border-bottom: 1px dashed #CCCCCC;
+}
+
+/* jQuery Dialog
+------------------------------------------------- */
 .ui-dialog {
 	border: 1px solid #999;
 	box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.3);

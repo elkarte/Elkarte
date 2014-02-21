@@ -437,18 +437,24 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 			echo '
 									<li class="category">
 										<strong>', $category['name'], '</strong>
-										<span class="select_all_box">
-											<label for="a', $category['id'], '">', $txt['all_boards_in_cat'], ': </label>
-											<div class="styled-select">
-												<select id="a', $category['id'], '" onchange="select_in_category(', $category['id'], ', this, [', implode(',', array_keys($category['boards'])), ']);">
-													<option>---</option>
-													<option value="allow">', $txt['board_perms_allow'], '</option>
-													<option value="ignore">', $txt['board_perms_ignore'], '</option>
-													<option value="deny">', $txt['board_perms_deny'], '</option>
-												</select>
-											</div>
-										</span>
 										<ul id="boards_list_', $category['id'], '">';
+
+		if (!empty($deny))
+			echo '
+										<li class="select_category">
+											', $txt['all_boards_in_cat'], ':
+											<span class="floatright">
+												<label for="all_', $category['id'], '">
+													<input type="radio" onchange="select_in_category(\'allow\', [', implode(',', array_keys($category['boards'])), ']);" id="all_', $category['id'], '" class="input_check" /> ', $txt['board_perms_allow'], '
+												</label>
+												<label for="all_', $category['id'], '">
+													<input type="radio" onchange="select_in_category(\'ignore\', [', implode(',', array_keys($category['boards'])), ']);" id="all_', $category['id'], '" class="input_check" /> ', $txt['board_perms_ignore'], '
+												</label>
+												<label for="all_', $category['id'], '">
+													<input type="radio" onchange="select_in_category(\'deny\', [', implode(',', array_keys($category['boards'])), ']);" id="all_', $category['id'], '" class="input_check" /> ', $txt['board_perms_deny'], '
+												</label>
+											</span>
+										</li>';
 
 		foreach ($category['boards'] as $board)
 		{
@@ -459,14 +465,20 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 										</li>';
 			else
 				echo '
-											<li class="board">
-												<span style="margin-', $context['right_to_left'] ? 'right' : 'left', ': ', $board['child_level'], 'em;">', $board['name'], ': </span>
-												<span class="floatright">
-													<input type="radio" name="boardaccess[', $board['id'], ']" id="allow_brd', $board['id'], '" value="allow" ', $board['allow'] ? ' checked="checked"' : '', ' class="input_check" /> <label for="allow_brd', $board['id'], '">', $txt['permissions_option_on'], '</label>
-													<input type="radio" name="boardaccess[', $board['id'], ']" id="ignore_brd', $board['id'], '" value="ignore" ', !$board['allow'] && !$board['deny'] ? ' checked="checked"' : '', ' class="input_check" /> <label for="ignore_brd', $board['id'], '">', $txt['permissions_option_off'], '</label>
-													<input type="radio" name="boardaccess[', $board['id'], ']" id="deny_brd', $board['id'], '" value="deny" ', $board['deny'] ? ' checked="checked"' : '', ' class="input_check" /> <label for="deny_brd', $board['id'], '">', $txt['permissions_option_deny'], '</label>
-												</span>
-											</li>';
+										<li class="board">
+											<span style="margin-', $context['right_to_left'] ? 'right' : 'left', ': ', $board['child_level'], 'em;">', $board['name'], ': </span>
+											<span class="floatright">
+												<label for="allow_brd', $board['id'], '">
+													<input type="radio" name="boardaccess[', $board['id'], ']" id="allow_brd', $board['id'], '" value="allow" ', $board['allow'] ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['permissions_option_on'], '
+												</label>
+												<label for="ignore_brd', $board['id'], '">
+													<input type="radio" name="boardaccess[', $board['id'], ']" id="ignore_brd', $board['id'], '" value="ignore" ', !$board['allow'] && !$board['deny'] ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['permissions_option_off'], '
+												</label>
+												<label for="deny_brd', $board['id'], '">
+													<input type="radio" name="boardaccess[', $board['id'], ']" id="deny_brd', $board['id'], '" value="deny" ', $board['deny'] ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['permissions_option_deny'], '
+												</label>
+											</span>
+										</li>';
 		}
 
 		echo '
@@ -482,20 +494,27 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 								<br />
 								<span class="select_all_box">
 									<input type="checkbox" id="checkall_check" class="input_check" onclick="invertAll(this, this.form, \'boardaccess\');" /> <label for="checkall_check"><em>', $txt['check_all'], '</em></label>
-								</span>
-							</fieldset>';
+								</span>';
 	else
 		echo '
-								<span class="select_all_box">
-									<em>', $txt['all'], ': </em>
-									<input type="radio" name="select_all" id="allow_all" class="input_radio" onclick="selectAllRadio(this, this.form, \'boardaccess\', \'allow\');" /> <label for="allow_all">', $txt['board_perms_allow'], '</label>
-									<input type="radio" name="select_all" id="ignore_all" class="input_radio" onclick="selectAllRadio(this, this.form, \'boardaccess\', \'ignore\');" /> <label for="ignore_all">', $txt['board_perms_ignore'], '</label>
-									<input type="radio" name="select_all" id="deny_all" class="input_radio" onclick="selectAllRadio(this, this.form, \'boardaccess\', \'deny\');" /> <label for="deny_all">', $txt['board_perms_deny'], '</label>
-								</span>
-							</fieldset>';
+								<div class="select_all_box">
+									', $txt['all'], ':
+									<span class="floatright">
+										<label for="all_', $category['id'], '">
+											<input type="radio" name="select_all" id="allow_all" class="input_radio" onclick="selectAllRadio(this, this.form, \'boardaccess\', \'allow\');" /> ', $txt['board_perms_allow'], '
+										</label>
+										<label for="all_', $category['id'], '">
+											<input type="radio" name="select_all" id="ignore_all" class="input_radio" onclick="selectAllRadio(this, this.form, \'boardaccess\', \'ignore\');" /> ', $txt['board_perms_ignore'], '
+										</label>
+										<label for="all_', $category['id'], '">
+											<input type="radio" name="select_all" id="deny_all" class="input_radio" onclick="selectAllRadio(this, this.form, \'boardaccess\', \'deny\');" /> ', $txt['board_perms_deny'], '
+										</label>
+									</span>
+								</div>';
 
 	// select_all_box is display:none and it\'s removed if js is enabled
 	echo '
+							</fieldset>
 							<script><!-- // --><![CDATA[
 								$(document).ready(function () {
 									$(".select_all_box").each(function () {
