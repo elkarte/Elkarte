@@ -64,7 +64,6 @@ $txt['autoOptMaxOnline'] = 'Maximum users online when optimizing';
 $txt['autoFixDatabase'] = 'Automatically fix broken tables';
 $txt['allow_disableAnnounce'] = 'Allow users to disable announcements';
 $txt['disallow_sendBody'] = 'Don\'t allow post text in notifications';
-$txt['enable_contactform'] = 'Enable contact form';
 $txt['jquery_source'] = 'Source for the jQuery Library';
 $txt['jquery_local'] = 'Local';
 $txt['jquery_cdn'] = 'Google CDN';
