@@ -1019,7 +1019,7 @@ a.bbc_link {
 	padding: 0;
 }
 .listlevel1:hover {
-	z-index: 5;
+	z-index: 6;
 }
 .listlevel1#collapse_button, .listlevel1#button_profile {
 	float: right;
