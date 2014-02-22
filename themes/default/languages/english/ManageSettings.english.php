@@ -223,7 +223,7 @@ $txt['badbehavior_url_wl_add'] = 'Add another URL';
 $txt['badbehavior_wl_comment'] = 'Comment';
 
 $txt['configure_emptyfield'] = 'Verification Empty Field';
-$txt['configure_emptyfield_desc'] = '<span class="smalltext">Below you can enable the empty field verification method.  This will insert a hidden field that should stay empty, this is used to trick spam bots in to erroneosly posting information. Although this can be used alone, its best enabled with the CAPTCHA verifcation.</span>';
+$txt['configure_emptyfield_desc'] = '<span class="smalltext">Below you can enable the empty field verification method.  This will insert a hidden field that should stay empty which will be used to trick spam bots into erroneously posting information. Although this can be used alone, it\'s best enabled with the CAPTCHA verification.</span>';
 $txt['enable_emptyfield'] = 'Enable empty field verification';
 $txt['configure_verification_means'] = 'Configure Verification Methods';
 $txt['setting_qa_verification_number'] = 'Number of verification questions user must answer';
@@ -282,7 +282,7 @@ $txt['signature_max_image_height'] = 'Maximum height of signature images (pixels
 $txt['signature_max_font_size'] = 'Maximum font size allowed in signatures (pixels)';
 $txt['signature_bbc'] = 'Enabled BBC tags';
 
-$txt['groups_pm_send'] = 'Membergroups allowed to send personal messages';
+$txt['groups_pm_send'] = 'Member groups allowed to send personal messages';
 $txt['pm_posts_verification'] = 'Post count under which users must pass verification when sending personal messages';
 $txt['pm_posts_verification_note'] = '(0 for no limit, admins are exempt)';
 $txt['pm_posts_per_hour'] = 'Number of personal messages a user may send in an hour';
@@ -325,7 +325,7 @@ $txt['custom_edit_registration_disable'] = 'No';
 $txt['custom_edit_registration_allow'] = 'Yes';
 $txt['custom_edit_registration_require'] = 'Yes, and require entry';
 $txt['custom_edit_display'] = 'Show on Topic View';
-$txt['custom_edit_memberlist'] = 'Show on Memberlist View';
+$txt['custom_edit_memberlist'] = 'Show on Member List View';
 $txt['custom_edit_picktype'] = 'Field Type';
 
 $txt['custom_edit_max_length'] = 'Maximum Length';
@@ -344,17 +344,17 @@ $txt['custom_edit_privacy'] = 'Privacy';
 $txt['custom_edit_privacy_desc'] = 'Who can see and edit this field.';
 $txt['custom_edit_privacy_all'] = 'Users can see this field; owner can edit it';
 $txt['custom_edit_privacy_see'] = 'Users can see this field; only admins can edit it';
-$txt['custom_edit_privacy_owner'] = 'Users cannot see this field; owner and admins can edit it.';
+$txt['custom_edit_privacy_owner'] = 'Users cannot see this field; owner and admins can edit it';
 $txt['custom_edit_privacy_none'] = 'This field is only visible to admins';
 $txt['custom_edit_can_search'] = 'Searchable';
-$txt['custom_edit_can_search_desc'] = 'Can this field be searched from the members list.';
+$txt['custom_edit_can_search_desc'] = 'Can this field be searched from the members list?';
 $txt['custom_edit_mask'] = 'Input Mask';
 $txt['custom_edit_mask_desc'] = 'For text fields an input mask can be selected to validate the data.';
 $txt['custom_edit_mask_email'] = 'Valid Email';
 $txt['custom_edit_mask_number'] = 'Numeric';
 $txt['custom_edit_mask_nohtml'] = 'No HTML';
 $txt['custom_edit_mask_regex'] = 'Regex (Advanced)';
-$txt['custom_edit_enclose'] = 'Show Enclosed Within Text (Optional)';
+$txt['custom_edit_enclose'] = 'Wrap user input in text (Optional)';
 $txt['custom_edit_enclose_desc'] = 'We <strong>strongly</strong> recommend to use an input mask to validate the input supplied by the user.';
 
 $txt['custom_edit_placement'] = 'Choose Placement';
@@ -367,13 +367,13 @@ $txt['custom_profile_placement_withicons'] = 'With Icons';
 $txt['custom_profile_placement_abovesignature'] = 'Above Signature';
 
 // Use numeric entities in the string below!
-$txt['custom_edit_delete_sure'] = 'Are you sure you wish to delete this field - all related user data will be lost!';
+$txt['custom_edit_delete_sure'] = 'Are you sure you wish to delete this field? All related user data will be lost!';
 
 $txt['standard_profile_title'] = 'Standard Profile Fields';
 $txt['standard_profile_field'] = 'Field';
 
 $txt['core_settings_welcome_msg'] = 'Welcome to Your New Forum';
-$txt['core_settings_welcome_msg_desc'] = 'To get you started we suggest you select which of ElkArte\'s core features you want to enable. We\'d recommend only enabling with those features you need!';
+$txt['core_settings_welcome_msg_desc'] = 'To get you started we suggest you select which of ElkArte\'s core features you want to enable. We\'d recommend only enabling those features you actually need.'; // don't scream from the beginning :P
 $txt['core_settings_item_cd'] = 'Calendar';
 $txt['core_settings_item_cd_desc'] = 'Enabling this feature will open up a selection of options to enable your users to view the calendar, add and review events, see users birthdates on a calendar and much, much more.';
 $txt['core_settings_item_dr'] = 'Drafts';
@@ -385,17 +385,15 @@ $txt['core_settings_item_ih_desc'] = 'This feature allows you to enable or disab
 $txt['core_settings_item_k'] = 'Karma';
 $txt['core_settings_item_k_desc'] = 'Karma is a feature that shows the popularity of a member. Members, if allowed, can \'applaud\' or \'smite\' other members, which is how their popularity is calculated.';
 $txt['core_settings_item_pe'] = 'Post by Email Management';
-$txt['core_settings_item_pe_desc'] = 'This will allow users of your forum to reply to emailed notifications and personal messages and have them post directly as a reply to the appropriate thread or PM.  This provides a familiar mailist feel.  Use of this functionality will require additional setup steps on your hosting provider.';
+$txt['core_settings_item_pe_desc'] = 'This will allow users of your forum to reply to emailed notifications and personal messages and have them post directly as a reply to the appropriate thread or PM.  This provides a familiar mailing list feeling.  Use of this functionality will require additional setup steps on your hosting provider.';
 $txt['core_settings_item_l'] = 'Likes';
 $txt['core_settings_item_l_desc'] = 'Likes is a feature that allows members to like a post to show their approval and popularity of the message content.';
-$txt['core_settings_item_pe'] = 'Post by Email Management';
-$txt['core_settings_item_pe_desc'] = 'This will allow users of your forum to reply to emailed notifications and personal messages and have them post directly as a reply to the appropriate thread or PM.  This provides a familiar mailist feel.  Use of this functionality will require additional setup steps on your hosting provider.';
 $txt['core_settings_item_ml'] = 'Moderation, Administration and User Logs';
 $txt['core_settings_item_ml_desc'] = 'Enable the moderation and administration logs to keep an audit trail of all the key actions taken on your forum. Also allows forum moderators to view a history of key changes a user makes to their profile.';
 $txt['core_settings_item_pm'] = 'Post Moderation';
 $txt['core_settings_item_pm_desc'] = 'Post moderation enables you to select groups and boards within which posts must be approved before they become public. Upon enabling this feature be sure to visit the permission section to set up the relevant permissions.';
 $txt['core_settings_item_ps'] = 'Paid Subscriptions';
-$txt['core_settings_item_ps_desc'] = 'Paid subscriptions allow users to pay for subscriptions to change membergroups within the forum and thus change their access rights.';
+$txt['core_settings_item_ps_desc'] = 'Paid subscriptions allow users to pay for subscriptions to change member groups within the forum and thus change their access rights.';
 $txt['core_settings_item_rg'] = 'Report Generation';
 $txt['core_settings_item_rg_desc'] = 'This administration feature allows the generation of reports (which can be printed) to present your current forum setup in an easy to view manner - particularly useful for large forums.';
 $txt['core_settings_item_sp'] = 'Search Engine Tracking';
@@ -443,9 +441,9 @@ $txt['languages_download'] = 'Download Language Pack';
 $txt['languages_download_note'] = 'This page lists all the files that are contained within the language pack and some useful information about each one. All files that have their associated check box marked will be copied.';
 $txt['languages_download_info'] = '<strong>Note:</strong>
 	<ul class="normallist">
-		<li>Files which have the status &quot;Not Writable&quot; means the system will not be able to copy this file to the directory at the present and you must make the destination writable either using an FTP client or by filling in your details at the bottom of the page.</li>
-		<li>The Version information for a file displays the last forum version which it was updated for. If it is indicated in green then this is a newer version than you have at current. If amber this indicates it\'s the same version number as at current, red indicates you have a newer version installed than contained in the pack.</li>
-		<li>Where a file already exists on your forum the &quot;Already Exists&quot; column will have one of two values. &quot;Identical&quot; indicates that the file already exists in an identical form and need not be overwritten. &quot;Different&quot; means that the contents vary in some way and overwriting is probably the optimum solution.</li>
+		<li>The file status &quot;Not Writable&quot; means the system will not be able to copy this file to the directory at the present and you must make the destination writable either using an FTP client or by filling in your details at the bottom of the page.</li>
+		<li>The Version information for a file displays the last forum version which it was updated for. If it is indicated in green then this is a newer version than you have at current, amber indicates it\'s the same version number as at current, red indicates you have a newer version installed than contained in the pack.</li>
+		<li>In case a file already exists on your forum, the &quot;Already Exists&quot; column will have one of two values: &quot;Identical&quot; indicates that the file already exists in an identical form and does not need to be overwritten. &quot;Different&quot; means that the contents vary in some way and overwriting is probably the optimum solution.</li>
 	</ul>';
 
 $txt['languages_download_main_files'] = 'Primary Files';
