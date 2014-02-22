@@ -70,7 +70,13 @@ class Mentions_Controller extends Action_Controller
 	 * @var string
 	 */
 	protected $_url_param = '';
-	protected $_page = '';
+
+	/**
+	 * Used for pagenation, keeps track of the current start point
+	 *
+	 * @var int
+	 */
+	protected $_page = 0;
 
 	/**
 	 * Determine if we are looking only at unread mentions or any kind of

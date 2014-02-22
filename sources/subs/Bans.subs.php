@@ -1204,6 +1204,7 @@ function list_getNumBans()
  *
  * @param int $start
  * @param int $items_per_page
+ * @param int $sort
  * @param int $ban_group_id
  * @return array
  */
@@ -1234,7 +1235,6 @@ function list_getBanItems($start = 0, $items_per_page = 0, $sort = 0, $ban_group
 	);
 	if ($db->num_rows($request) == 0)
 		fatal_lang_error('ban_not_found', false);
-
 	while ($row = $db->fetch_assoc($request))
 	{
 		if (!isset($context['ban']))

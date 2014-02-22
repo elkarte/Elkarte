@@ -27,6 +27,11 @@ if (!defined('ELK'))
  */
 class PackageServers_Controller extends Action_Controller
 {
+	/**
+	 * Called before all other methods when comming from the dispatcher or
+	 * action class.  Loads lanaguage and templates files so they are available
+	 * to the other methods.
+	 */
 	public function pre_dispatch()
 	{
 		// Use the Packages language file. (split servers?)
