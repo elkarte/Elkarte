@@ -900,6 +900,7 @@ class Data_Validator
 	 * alpha_numeric ... Determine if the provided value contains only alpha-numeric characters
 	 *
 	 * Usage: '[key]' => 'alpha_numeric'
+	 * Allows letters, numbers dash and underscore characters
 	 *
 	 * @param string $field
 	 * @param mixed[] $input
