@@ -1508,17 +1508,17 @@ function matchHighestPackageVersion($versions, $reset = false, $the_version)
 	// Normalize the $versions
 	$versions = explode(',', str_replace(' ', '', strtolower($versions)));
 
-	// Adjust things higher even though the starting number is lower so we pick up the right (latest) version
+	// If it is not ElkArte, let's just give up
 	list ($the_brand,) = explode(' ', $forum_version, 2);
-	if ($the_brand == 'ElkArte')
-		$the_version = '1' . $the_version;
+	if ($the_brand != 'ElkArte')
+		return false;
 
 	// Loop through each version, save the highest we can find
 	foreach ($versions as $for)
 	{
 		// Adjust for those wild cards
 		if (strpos($for, '*') !== false)
-			$for = str_replace('*', '0dev0', $for) . '-' . str_replace('*', '999', $for);
+			$for = str_replace('*', '0', $for) . '-' . str_replace('*', '999', $for);
 
 		// If we have a range, grab the lower value, done this way so it looks normal-er to the user e.g. 1.0 vs 1.0.99
 		if (strpos($for, '-') !== false)

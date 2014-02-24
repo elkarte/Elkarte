@@ -279,7 +279,7 @@ function construct_query_string($get)
 
 /**
  * Finds members by email address, username, or real name.
- * - searches for members whose username, display name, or e-mail address match the given pattern of array names.
+ * - searches for members whose username, display name, or email address match the given pattern of array names.
  * - searches only buddies if buddies_only is set.
  *
  * @param string[]|string $names

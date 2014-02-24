@@ -593,7 +593,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		$db->free_result($request);
 	}
 
-	// If nothing was filled in as name/e-mail address, try the member table.
+	// If nothing was filled in as name/email address, try the member table.
 	if (!isset($posterOptions['name']) || $posterOptions['name'] == '' || (empty($posterOptions['email']) && !empty($posterOptions['id'])))
 	{
 		if (empty($posterOptions['id']))

@@ -620,7 +620,7 @@ function htmlTime($timestamp)
 
 	$timestamp = forum_time(true, $timestamp);
 	$time = date('Y-m-d H:i', $timestamp);
-	$stdtime = standardTime($timestamp);
+	$stdtime = standardTime($timestamp, true, true);
 
 	// @todo maybe htmlspecialchars on the title attribute?
 	return '<time title="' . $stdtime . '" datetime="' . $time . '" data-timestamp="' . $timestamp . '">' . $stdtime . '</time>';
