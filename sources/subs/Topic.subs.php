@@ -2012,7 +2012,7 @@ function removeMessages($messages, $messageDetails, $type = 'replies')
  *
  * @param int[] $messages
  * @param mixed[] $messageDetails
- * @param (string) $type = replies
+ * @param string $type = replies
  */
 function approveMessages($messages, $messageDetails, $type = 'replies')
 {

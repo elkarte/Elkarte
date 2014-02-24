@@ -34,6 +34,7 @@ class ManageSmileys_Controller extends Action_Controller
 
 	/**
 	 * Contextual information about smiley sets.
+	 * @var mixed[]
 	 */
 	private $_smiley_context = array();
 

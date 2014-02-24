@@ -465,7 +465,6 @@ function addTriggers($group_id = 0, $triggers = array(), $logs = array())
  * @param int $group_id
  * @param mixed[] $trigger associative array of ban trigger => value
  * @param mixed[] $logs
- * @return nothing
  */
 function updateTriggers($ban_item = 0, $group_id = 0, $trigger = array(), $logs = array())
 {

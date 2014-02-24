@@ -25,6 +25,8 @@ if (!defined('ELK'))
 
 /**
  * Check and create a directory automatically.
+ *
+ * @package Attachments
  */
 function automanage_attachments_check_directory()
 {
@@ -131,9 +133,12 @@ function automanage_attachments_check_directory()
 
 /**
  * Creates a directory as defined by the admin attach options
- * Attempts to make the directory writable
- * Places an .htaccess in new directories for security
  *
+ * What it does:
+ * - Attempts to make the directory writable
+ * - Places an .htaccess in new directories for security
+ *
+ * @package Attachments
  * @param string $updir
  */
 function automanage_attachments_create_directory($updir)
@@ -217,8 +222,12 @@ function automanage_attachments_create_directory($updir)
 
 /**
  * Determines the current base directory and attachment directory
- * Increments the above directory to the next availble slot
- * Uses automanage_attachments_create_directory to create the incremental directory
+ *
+ * What it does:
+ * - Increments the above directory to the next availble slot
+ * - Uses automanage_attachments_create_directory to create the incremental directory
+ *
+ * @package Attachments
  */
 function automanage_attachments_by_space()
 {
@@ -270,6 +279,7 @@ function automanage_attachments_by_space()
 /**
  * Finds the current directory tree for the supplied base directory
  *
+ * @package Attachments
  * @param string $directory
  * @return string[]|boolean on fail else array of directory names
  */
@@ -297,8 +307,11 @@ function get_directory_tree_elements($directory)
 
 /**
  * Helper function for automanage_attachments_create_directory
- * Gets the directory w/o drive letter for windows
  *
+ * What it does:
+ * - Gets the directory w/o drive letter for windows
+ *
+ * @package Attachments
  * @param string[] $tree
  * @param int $count
  */
@@ -325,9 +338,12 @@ function attachments_init_dir(&$tree, &$count)
 
 /**
  * Handles the actual saving of attachments to a directory.
- * Loops through $_FILES['attachment'] array and saves each file to the current attachments folder.
- * Validates the save location actually exists.
  *
+ * What it does:
+ * - Loops through $_FILES['attachment'] array and saves each file to the current attachments folder.
+ * - Validates the save location actually exists.
+ *
+ * @package Attachments
  * @param int|null $id_msg = null or id of the message with attachments, if any.
  *                  If null, this is an upload in progress for a new post.
  */
@@ -532,8 +548,11 @@ function processAttachments($id_msg = null)
 
 /**
  * Performs various checks on an uploaded file.
+ *
+ * What it does:
  * - Requires that $_SESSION['temp_attachments'][$attachID] be properly populated.
  *
+ * @package Attachments
  * @param int $attachID id of the attachment to check
  */
 function attachmentChecks($attachID)
@@ -714,10 +733,13 @@ function attachmentChecks($attachID)
 
 /**
  * Create an attachment, with the given array of parameters.
+ *
+ * What it does:
  * - Adds any addtional or missing parameters to $attachmentOptions.
  * - Renames the temporary file.
  * - Creates a thumbnail if the file is an image and the option enabled.
  *
+ * @package Attachments
  * @param mixed[] $attachmentOptions associative array of options
  */
 function createAttachment(&$attachmentOptions)
@@ -901,11 +923,13 @@ function createAttachment(&$attachmentOptions)
 
 /**
  * Get the avatar with the specified ID.
- * It gets avatar data (folder, name of the file, filehash, etc)
+ *
+ * What it does:
+ * - It gets avatar data (folder, name of the file, filehash, etc)
  * from the database.
+ * - Must return the same values and in the same order as getAttachmentFromTopic()
  *
- * Must return the same values and in the same order as getAttachmentFromTopic()
- *
+ * @package Attachments
  * @param int $id_attach
  */
 function getAvatar($id_attach)
@@ -940,12 +964,14 @@ function getAvatar($id_attach)
 }
 
 /**
- * Get the specified attachment. This includes a check of the topic
- * (it only returns the attachment if it's indeed attached to a message
- * in the topic given as parameter), and query_see_board...
+ * Get the specified attachment.
  *
- * Must return the same values and in the same order as getAvatar()
+ * What it does:
+ * - This includes a check of the topic
+ * - it only returns the attachment if it's indeed attached to a message in the topic given as parameter, and query_see_board...
+ * - Must return the same values and in the same order as getAvatar()
  *
+ * @package Attachments
  * @param int $id_attach
  * @param int $id_topic
  */
@@ -977,8 +1003,11 @@ function getAttachmentFromTopic($id_attach, $id_topic)
 
 /**
  * Increase download counter for id_attach.
- * Does not check if it's a thumbnail.
  *
+ * What it does:
+ * - Does not check if it's a thumbnail.
+ *
+ * @package Attachments
  * @param int $id_attach
  */
 function increaseDownloadCounter($id_attach)
@@ -997,13 +1026,16 @@ function increaseDownloadCounter($id_attach)
 
 /**
  * Saves a file and stores it locally for avatar use by id_member.
+ *
+ * What it does:
  * - supports GIF, JPG, PNG, BMP and WBMP formats.
  * - detects if GD2 is available.
  * - uses resizeImageFile() to resize to max_width by max_height, and saves the result to a file.
  * - updates the database info for the member's avatar.
  * - returns whether the download and resize was successful.
- * @uses subs/Graphics.subs.php
  *
+ * @uses subs/Graphics.subs.php
+ * @package Attachments
  * @param string $temporary_path the full path to the temporary file
  * @param int $memID member ID
  * @param int $max_width
@@ -1109,10 +1141,14 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 
 /**
  * Get the size of a specified image with better error handling.
- * @todo see if it's better in subs/Graphics.subs.php, but one step at the time.
- * Uses getimagesize() to determine the size of a file.
- * Attempts to connect to the server first so it won't time out.
  *
+ * What it does:
+ * - Uses getimagesize() to determine the size of a file.
+ * - Attempts to connect to the server first so it won't time out.
+ *
+ * @todo see if it's better in subs/Graphics.subs.php, but one step at the time.
+ *
+ * @package Attachments
  * @param string $url
  * @return array or false, the image size as array(width, height), or false on failure
  */
@@ -1187,10 +1223,14 @@ function url_image_size($url)
 
 /**
  * The current attachments path:
+ *
+ * What it does:
  *  - BOARDDIR . '/attachments', if nothing is set yet.
  *  - if the forum is using multiple attachments directories,
  *    then the current path is stored as unserialize($modSettings['attachmentUploadDir'])[$modSettings['currentAttachmentUploadDir']]
  *  - otherwise, the current path is $modSettings['attachmentUploadDir'].
+ *
+ * @package Attachments
  * @return string
  */
 function getAttachmentPath()
@@ -1211,6 +1251,8 @@ function getAttachmentPath()
 /**
  * The avatars path: if custom avatar directory is set, that's it.
  * Otherwise, it's attachments path.
+ *
+ * @package Attachments
  * @return string
  */
 function getAvatarPath()
@@ -1222,9 +1264,12 @@ function getAvatarPath()
 
 /**
  * Little utility function for the $id_folder computation for attachments.
- * This returns the id of the folder where the attachment or avatar will be saved.
- * If multiple attachment directories are not enabled, this will be 1 by default.
  *
+ * What it does:
+ * - This returns the id of the folder where the attachment or avatar will be saved.
+ * - If multiple attachment directories are not enabled, this will be 1 by default.
+ *
+ * @package Attachments
  * @return int 1 if multiple attachment directories are not enabled,
  * or the id of the current attachment directory otherwise.
  */
@@ -1239,6 +1284,7 @@ function getAttachmentPathID()
 /**
  * Returns the ID of the folder avatars are currently saved in.
  *
+ * @package Attachments
  * @return int 1 if custom avatar directory is enabled,
  * and the ID of the current attachment folder otherwise.
  * NB: the latter could also be 1.
@@ -1256,8 +1302,11 @@ function getAvatarPathID()
 
 /**
  * Get all attachments associated with a set of posts.
- * This does not check permissions.
  *
+ * What it does:
+ *  - This does not check permissions.
+ *
+ * @package Attachments
  * @param int[] $messages array of messages ids
  * @param bool $includeUnapproved = false
  * @param string|null $filter name of a callback function
@@ -1340,6 +1389,7 @@ function getAvatarsDefault()
 /**
  * Recursive function to retrieve server-stored avatar files
  *
+ * @package Attachments
  * @param string $directory
  * @param int $level
  * @return array
@@ -1423,11 +1473,11 @@ function getServerStoredAvatars($directory, $level)
 /**
  * Update an attachment's thumbnail
  *
+ * @package Attachments
  * @param string $filename
  * @param int $id_attach
  * @param int $id_msg
  * @param int $old_id_thumb = 0
- *
  * @return array The updated information
  */
 function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb = 0)
@@ -1503,6 +1553,7 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 /**
  * Compute and return the total size of attachments to a single message.
  *
+ * @package Attachments
  * @param int $id_msg
  * @param bool $include_count = true if true, it also returns the attachments count
  */
@@ -1544,12 +1595,16 @@ function attachmentsSizeForMessage($id_msg, $include_count = true)
 
 /**
  * This loads an attachment's contextual data including, most importantly, its size if it is an image.
- * Pre-condition: $attachments array to have been filled with the proper attachment data, as Display() does.
- * (@todo change this pre-condition, too fragile and error-prone.)
- * It requires the view_attachments permission to calculate image size.
- * It attempts to keep the "aspect ratio" of the posted image in line, even if it has to be resized by
+ *
+ * What it does:
+ *  - Pre-condition: $attachments array to have been filled with the proper attachment data, as Display() does.
+ * - It requires the view_attachments permission to calculate image size.
+ * - It attempts to keep the "aspect ratio" of the posted image in line, even if it has to be resized by
  * the max_image_width and max_image_height settings.
  *
+ * @todo change this pre-condition, too fragile and error-prone.
+ *
+ * @package Attachments
  * @param int $id_msg message number to load attachments for
  * @return array of attachments
  */
@@ -1653,6 +1708,8 @@ function loadAttachmentContext($id_msg)
 
 /**
  * A sort function for putting unapproved attachments first.
+ *
+ * @package Attachments
  * @param mixed[] $a
  * @param mixed[] $b
  * @return int -1, 0, 1
@@ -1667,10 +1724,13 @@ function approved_attach_sort($a, $b)
 
 /**
  * Callback filter for the retrieval of attachments.
+ *
+ * What it does:
  * This function returns false when:
  *  - the attachment is unapproved, and
  *  - the viewer is not the poster of the message where the attachment is
  *
+ * @package Attachments
  * @param mixed[] $attachment_info
  * @param mixed[] $all_posters
  */
@@ -1684,6 +1744,7 @@ function filter_accessible_attachment($attachment_info, $all_posters)
 /**
  * Older attachments may still use this function.
  *
+ * @package Attachments
  * @param string $filename
  * @param int $attachment_id
  * @param string|null $dir

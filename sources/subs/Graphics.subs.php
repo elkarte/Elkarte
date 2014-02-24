@@ -445,11 +445,13 @@ if (!function_exists('imagecreatefrombmp'))
 {
 	/**
 	 * It is set only if it doesn't already exist (for forwards compatiblity.)
-	 * It only supports uncompressed bitmaps.
+	 *
+	 * - It only supports uncompressed bitmaps.
+	 * - returns an image identifier representing the bitmap image
+	 * obtained from the given filename.
 	 *
 	 * @param string $filename
-	 * @return resource, an image identifier representing the bitmap image
-	 * obtained from the given filename.
+	 * @return resource
 	 */
 	function imagecreatefrombmp($filename)
 	{
