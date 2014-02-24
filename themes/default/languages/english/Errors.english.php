@@ -49,10 +49,10 @@ $txt['cant_find_messages'] = 'Unable to find messages';
 $txt['cant_find_user_email'] = 'Unable to find user\'s email address.';
 $txt['cant_insert_topic'] = 'Unable to insert topic';
 $txt['already_a_mod'] = 'You have chosen a user name of an already existing moderator. Please choose another user name';
-$txt['session_timeout'] = 'Your session timed out while posting.  Please go back and try again.';
+$txt['session_timeout'] = 'Your session timed out while posting. Please go back and try again.';
 $txt['session_verify_fail'] = 'Session verification failed. Please try logging out and back in again, and then try again.';
-$txt['verify_url_fail'] = 'Unable to verify referring URL.  Please go back and try again.';
-$txt['token_verify_fail'] = 'Token verification failed.  Please go back and try again.';
+$txt['verify_url_fail'] = 'Unable to verify referring URL. Please go back and try again.';
+$txt['token_verify_fail'] = 'Token verification failed. Please go back and try again.';
 $txt['guest_vote_disabled'] = 'Guests cannot vote in this poll.';
 
 $txt['cannot_access_mod_center'] = 'You do not have permission to access the moderation center.';
@@ -190,6 +190,10 @@ $txt['ban_not_found'] = 'Ban not found';
 $txt['ban_unknown_restriction_type'] = 'Restriction type unknown';
 $txt['ban_name_empty'] = 'The name of the ban was left empty';
 $txt['ban_id_empty'] = 'Dang, sorry. We tried to find this ban ID, but it can\'t be found.';
+<<<<<<< HEAD
+=======
+$txt['ban_group_id_empty'] = 'A ban group needs a group ID, and this group didn\'t have any.';
+>>>>>>> upstream/master
 $txt['ban_no_triggers'] = 'Did you forget to select ban triggers? We need at least one, and we haven\'t got any.';
 $txt['ban_ban_item_empty'] = 'Ban trigger not found';
 $txt['impossible_insert_new_bangroup'] = 'An error occurred while inserting the new ban';
@@ -285,7 +289,11 @@ $txt['smileys_upload_error_blank'] = 'All smiley sets must have an image.';
 $txt['smileys_upload_error_name'] = 'All smileys must have the same file name.'; // TODO: rephrase this. can be misunderstood.
 $txt['smileys_upload_error_illegal'] = 'Illegal Type.';
 
+<<<<<<< HEAD
 $txt['search_invalid_weights'] = 'Search weights are not configured properly. At least one weight should be configured to be non-zero.';
+=======
+$txt['search_invalid_weights'] = 'Search weights are not configured properly. At least one weight should be configured to be non-zero. Please report this error to an administrator.';
+>>>>>>> upstream/master
 $txt['unable_to_create_temporary'] = 'The search function was unable to create temporary tables.  Please try again.';
 
 $txt['package_no_file'] = 'Unable to find package file!';

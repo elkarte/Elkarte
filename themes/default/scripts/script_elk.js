@@ -101,7 +101,7 @@ function toggleHeaderAJAX(btn, container_id)
 {
 	// Show ajax is in progress
 	ajax_indicator(true);
-	var text_template = '<h3 class="category_header centertext">{text}</h3>';
+	var body_template = '<div class="board_row centertext">{body}</div>';
 
 	$.ajax({
 		type: 'GET',
@@ -110,17 +110,24 @@ function toggleHeaderAJAX(btn, container_id)
 		beforeSend: ajax_indicator(true)
 		})
 		.done(function(request) {
+			if (request === '')
+				return;
+
 			var oElement = $(request).find('elk')[0];
 
 			// No errors
 			if (oElement.getElementsByTagName('error').length === 0)
 			{
-				var text = oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
+				var text_elem = oElement.getElementsByTagName('text'),
+					body_elem = oElement.getElementsByTagName('body');
 
 				$('#' + container_id + ' .pagesection').remove();
-				$('#' + container_id + ' .category_header').remove();
 				$('#' + container_id + ' .topic_listing').remove();
-				$(text_template.replace('{text}', text)).insertBefore('#topic_icons');
+				$('#' + container_id + ' .topic_sorting').remove();
+				if (text_elem.length === 1)
+					$('#' + container_id + ' #unread_header').html(text_elem[0].firstChild.nodeValue.removeEntities());
+				if (body_elem.length === 1)
+					$(body_template.replace('{body}', body_elem[0].firstChild.nodeValue.removeEntities())).insertAfter('#unread_header');
 			}
 		})
 		.fail(function() {
@@ -215,6 +222,7 @@ function markallreadButton(btn)
 function markunreadButton(btn)
 {
 	toggleHeaderAJAX(btn, 'main_content_section');
+
 	return false;
 }
 
@@ -1322,11 +1330,11 @@ function addAnotherOption(parent, oDtName, oDdName, oData)
 {
 	// Some defaults to use if none are passed
 	oDtName['type'] = oDtName.type || 'text';
-	oDtName['class'] = oDtName.class || 'input_text';
+	oDtName['class'] = oDtName['class'] || 'input_text';
 	oDtName['size'] = oDtName.size || '20';
 
 	oDdName['type'] = oDdName.type || 'text';
-	oDdName['class'] = oDdName.class || 'input_text';
+	oDdName['class'] = oDdName['class'] || 'input_text';
 	oDdName['size'] = oDdName.size || '20';
 	oData = oData || '';
 

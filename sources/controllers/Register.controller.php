@@ -641,9 +641,8 @@ class Register_Controller extends Action_Controller
 
 		// Change their email address? (they probably tried a fake one first :P.)
 		require_once(SUBSDIR . '/Auth.subs.php');
-		$sha_passwd = $_REQUEST['passwd'];
 
-		if (isset($_POST['new_email'], $_REQUEST['passwd']) && validateLoginPassword($sha_passwd, $row['passwd'], $row['member_name'], true) && ($row['is_activated'] == 0 || $row['is_activated'] == 2))
+		if (isset($_POST['new_email'], $_REQUEST['passwd']) && validateLoginPassword($_REQUEST['passwd'], $row['passwd'], $row['member_name'], true) && ($row['is_activated'] == 0 || $row['is_activated'] == 2))
 		{
 			if (empty($modSettings['registration_method']) || $modSettings['registration_method'] == 3)
 				fatal_lang_error('no_access', false);

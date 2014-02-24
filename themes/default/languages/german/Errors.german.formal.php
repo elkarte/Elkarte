@@ -51,8 +51,8 @@ $txt['cant_insert_topic'] = 'Konnte Thema nicht einfügen';
 $txt['already_a_mod'] = 'Sie haben den Benutzernamen eines bereits vorhandenen Moderators ausgewählt. Bitte wählen Sie einen anderen Benutzernamen aus';
 $txt['session_timeout'] = 'Ihre Sitzung ist während des Verfassens des Beitrags abgelaufen.  Bitte gehen Sie zurück und versuchen Sie es erneut.';
 $txt['session_verify_fail'] = 'Sitzungsüberprüfung fehlgeschlagen. Bitte versuchen Sie sich ab- und wieder anzumelden und es dann erneut zu versuchen.';
-$txt['verify_url_fail'] = 'Konnte Ursprungs-URL nicht verifizieren.  Bitte gehen Sie zurück und versuchen Sie es erneut.';
-$txt['token_verify_fail'] = 'Tokenverifizierung fehlgeschlagen.  Bitte gehen Sie zurück und versuchen Sie es erneut.';
+$txt['verify_url_fail'] = 'Konnte Ursprungs-URL nicht verifizieren. Bitte gehen Sie zurück und versuchen Sie es erneut.';
+$txt['token_verify_fail'] = 'Tokenverifizierung fehlgeschlagen. Bitte gehen Sie zurück und versuchen Sie es erneut.';
 $txt['guest_vote_disabled'] = 'Gäste können an dieser Umfrage nicht teilnehmen.';
 
 $txt['cannot_access_mod_center'] = 'Sie sind nicht befugt, auf das Moderationszentrum zuzugreifen.';

@@ -620,7 +620,7 @@ function htmlTime($timestamp)
 
 	$timestamp = forum_time(true, $timestamp);
 	$time = date('Y-m-d H:i', $timestamp);
-	$stdtime = standardTime($timestamp);
+	$stdtime = standardTime($timestamp, true, true);
 
 	// @todo maybe htmlspecialchars on the title attribute?
 	return '<time title="' . $stdtime . '" datetime="' . $time . '" data-timestamp="' . $timestamp . '">' . $stdtime . '</time>';
@@ -2425,26 +2425,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 		// Start up the session URL fixer.
 		ob_start('ob_sessrewrite');
 
-		if (!empty($settings['output_buffers']) && is_string($settings['output_buffers']))
-			$buffers = explode(',', $settings['output_buffers']);
-		elseif (!empty($settings['output_buffers']))
-			$buffers = $settings['output_buffers'];
-		else
-			$buffers = array();
-
-		if (isset($modSettings['integrate_buffer']))
-			$buffers = array_merge(explode(',', $modSettings['integrate_buffer']), $buffers);
-
-		if (!empty($buffers))
-			foreach ($buffers as $function)
-			{
-				$function = trim($function);
-				$call = strpos($function, '::') !== false ? explode('::', $function) : $function;
-
-				// Is it valid?
-				if (is_callable($call))
-					ob_start($call);
-			}
+		call_integration_buffer();
 
 		// Display the screen in the logical order.
 		template_header();
@@ -2510,7 +2491,7 @@ function determineTopicClass(&$topic_context)
 		$topic_context['class'] .= '_sticky';
 
 	// This is so old themes will still work.
-	// @deprecated will be removed from 1.1 do not rely on it
+	// @deprecated since 1.0 do not rely on it
 	$topic_context['extended_class'] = &$topic_context['class'];
 }
 
@@ -3258,7 +3239,7 @@ function text2words($text, $max_chars = 20, $encrypt = false)
  * @param boolean $force_use = false
  * @return string
  *
- * @deprecated: this will be removed at some point, do not rely on this function
+ * @deprecated since 1.0 this will be removed at some point, do not rely on this function
  */
 function create_button($name, $alt, $label = '', $custom = '', $force_use = false)
 {
@@ -3788,6 +3769,70 @@ function call_integration_include_hook($hook)
 			if (file_exists($include))
 				require_once($include);
 		}
+	}
+}
+
+/**
+ * Special hook call executed during obExit
+ */
+function call_integration_buffer()
+{
+	global $modSettings, $settings;
+
+	static $path_replacements = array(
+		'BOARDDIR' => BOARDDIR,
+		'SOURCEDIR' => SOURCEDIR,
+		'EXTDIR' => EXTDIR,
+		'LANGUAGEDIR' => LANGUAGEDIR,
+		'ADMINDIR' => ADMINDIR,
+		'CONTROLLERDIR' => CONTROLLERDIR,
+		'SUBSDIR' => SUBSDIR,
+	);
+	if (!empty($settings['theme_dir']))
+		$path_replacements['$themedir'] = $settings['theme_dir'];
+
+	if (isset($modSettings['integrate_buffer']))
+		$buffers = explode(',', $modSettings['integrate_buffer']);
+
+	if (empty($buffers))
+		return;
+
+	foreach ($buffers as $function)
+	{
+		$function = trim($function);
+
+		// OOP static method
+		if (strpos($function, '::') !== false)
+		{
+			$call = explode('::', $function);
+			if (strpos($call[1], ':') !== false)
+			{
+				list ($func, $file) = explode(':', $call[1]);
+				$call = array($call[0], $func);
+			}
+		}
+		// Normal plain function
+		else
+		{
+			$call = $function;
+			if (strpos($function, ':') !== false)
+			{
+				list ($func, $file) = explode(':', $function);
+				$call = $func;
+			}
+		}
+
+		if (!empty($file))
+		{
+			$absPath = strtr(trim($file), $path_replacements);
+
+			if (file_exists($absPath))
+				require_once($absPath);
+		}
+
+		// Is it valid?
+		if (is_callable($call))
+			ob_start($call);
 	}
 }
 

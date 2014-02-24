@@ -28,6 +28,20 @@ if (!defined('ELK'))
 class PackageServers_Controller extends Action_Controller
 {
 	/**
+	 * Called before all other methods when comming from the dispatcher or
+	 * action class.  Loads lanaguage and templates files so they are available
+	 * to the other methods.
+	 */
+	public function pre_dispatch()
+	{
+		// Use the Packages language file. (split servers?)
+		loadLanguage('Packages');
+
+		// Use the PackageServers template.
+		loadTemplate('PackageServers', 'admin');
+	}
+
+	/**
 	 * Main dispatcher for package servers. Checks permissions,
 	 * load files, and forwards to the right method.
 	 * Accessed by action=admin;area=packageservers
@@ -71,20 +85,6 @@ class PackageServers_Controller extends Action_Controller
 		$action->initialize($subActions, 'servers');
 
 		$context['sub_action'] = $subAction;
-
-		// Now create the tabs for the template.
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['package_servers'],
-			'description' => $txt['package_servers_desc'],
-			'tabs' => array(
-				'servers' => array(
-					'description' => $txt['download_packages_desc'],
-				),
-				'upload' => array(
-					'description' => $txt['upload_packages_desc'],
-				),
-			),
-		);
 
 		// Lets just do it!
 		$action->dispatch($subAction);

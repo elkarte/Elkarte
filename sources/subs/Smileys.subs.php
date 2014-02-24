@@ -447,7 +447,7 @@ function getMaxSmileyOrder()
  * This function sorts the smiley table by code length,
  * it is needed as MySQL withdrew support for functions in order by.
  *
- * @deprecated the ordering is done in the query, probably not needed
+ * @deprecated since 1.0 - the ordering is done in the query, probably not needed
  */
 function sortSmileyTable()
 {

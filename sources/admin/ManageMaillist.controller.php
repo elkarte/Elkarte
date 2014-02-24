@@ -31,13 +31,13 @@ class ManageMaillist_Controller extends Action_Controller
 
 	/**
 	 * Basic filter settings form
-	 * @var type
+	 * @var Settings_Form
 	 */
 	protected $_filtersSettings;
 
 	/**
 	 * Parsers settings form
-	 * @var type
+	 * @var Settings_Form
 	 */
 	protected $_parsersSettings;
 

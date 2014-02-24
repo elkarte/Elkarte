@@ -138,7 +138,6 @@ class Members_Controller extends Action_Controller
 	 * Called by index.php?action=findmember.
 	 * This function result is used as a popup for searching members.
 	 *
-	 * @todo This function is "deprecated" and will be remove from 1.1
 	 * @deprecated since 1.0
 	 * @uses sub template find_members of the Members template.
 	 */

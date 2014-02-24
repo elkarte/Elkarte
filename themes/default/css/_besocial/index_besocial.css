@@ -353,13 +353,11 @@ strong {
 /* /me uses this a lot. (emote, try typing /me in a post.) */
 .meaction {
 	color: #50aa3a;
-	vertical-align: bottom;
 }
 .meaction:before {
 	content: "\270c";
 	font-size: 1.714em;
 	line-height: 1em;
-	vertical-align: top;
 }
 .spoilerheader {
 	font-weight: bold;
@@ -495,7 +493,6 @@ div.bbc_footnotes .meaction{
 	color: #555;
 	text-decoration: none;
 }
-
 .poster li.poster_online:hover .linklevel1 {
 	border: 1px solid #ccc;
 	border-top: 1px solid #afafaf;
@@ -525,22 +522,38 @@ div.bbc_footnotes .meaction{
 	border: 1px solid transparent;
 	box-shadow: none;
 }
-.poster li.avatar a {
+.poster .poster_avatar .linklevel1 {
 	display: inline-block;
 }
-.poster .listlevel1:hover>a {
+.poster .listlevel1:hover .linklevel1 {
 	border: 1px solid transparent;
 	background-color: transparent;
 	box-shadow: none;
 }
-.poster .listlevel2:hover>a {
+.poster .listlevel2:hover .linklevel2 {
 	color: #008299;
 	border: none;
 	box-shadow: none;
 }
+.poster .listlevel1.subsections:hover:after {
+	left: 40%;
+}
+.poster .subsections>a:after {
+	font-family: "FontAwesome";
+	font-size: 1.4em;
+	content: "\f0d7";
+	margin: 0 0 0 10px;
+	color: #ccc;
+}
+.poster_ip a {
+	display: inline;
+}
+.poster .linklevel2, .poster .linklevel2:hover {
+	border: 1px solid transparent !important;
+}
 #main_menu .linklevel1, #main_menu .linklevel1:link, #main_menu .linklevel1:visited,
 .poster li.listlevel1, .poster li.listlevel1 a, .poster li.listlevel1 a:hover {
-	border-radius: none;
+	border-radius: 0;
 	border: 1px solid transparent;
 	background-color: transparent;
 	background-image: none;
@@ -665,6 +678,8 @@ a.active {
 .menulevel2, .menulevel3 {
 	border: 1px solid grey;
 	background: white;
+	box-shadow: 1px 2px 4px #ccc;
+	border-radius: 5px;
 }
 
 /* Levels 2 and 3 drop menus: link or button. */
@@ -692,9 +707,10 @@ a.active {
 /* Level 2: subsection indicators. */
 .listlevel2.subsections .linklevel2:after {
 	position: absolute;
+	font-family: "FontAwesome";
 	right: 6px;
 	color: #ccc;
-	content: "\25b6";
+	content: "\f0da";
 	font-size: 1.286em;
 }
 
@@ -726,7 +742,8 @@ a.active {
 #menu_sidebar .listlevel1.subsections .linklevel1:after {
 	position: absolute;
 	right: 6px;
-	content: "\2192";
+	font-family: "FontAwesome";
+	content: "\f0da";
 }
 /*	$PAGELINKS	*/
 /* ------------------------------------------------------- */
@@ -1223,6 +1240,15 @@ span.views_text {
 }
 
 /* This one does 800 screens at default font size. */
+@media screen and (min-width: 50em) {
+		#menu_nav .listlevel1.subsections>a:before {
+		font-family: "FontAwesome";
+		margin: 0 5px 0 0;
+		font-size: 1.2em;
+		content: "\f0d7";
+		color: #43a8da;
+	}
+}
 @media screen and (max-width: 50em) {
 	body {
 		margin-top: 20px;
@@ -1327,6 +1353,9 @@ span.views_text {
 	}
 	.poster:after, .posterarea:before {
 		border-bottom: 1px solid #bfbfbf;
+	}
+	.poster .subsections>a:after {
+		content: "";
 	}
 	.board_icon {
 		width: 20px;

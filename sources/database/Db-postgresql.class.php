@@ -29,7 +29,7 @@ class Database_PostgreSQL implements Database
 {
 	/**
 	 * Holds current instance of the class
-	 * @var instance
+	 * @var Database_PostgreSQL
 	 */
 	private static $_db = null;
 

@@ -85,23 +85,24 @@
 				},
 				matcher: function(flag, subtext, should_start_with_space) {
 					var match, regexp;
+
 					flag = flag.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
-					if (should_start_with_space) {
+
+					if (should_start_with_space)
 						flag = '(?:^|\\s)' + flag;
-					}
+
 					regexp = new RegExp(flag + '([^ <>&"\'=\\\\\n]*)$|' + flag + '([^\\x00-\\xff]*)$', 'gi');
 					match = regexp.exec(subtext.replace());
-					if (match) {
+					if (match)
 						return match[2] || match[1];
-					} else {
+					else
 						return null;
-					}
 				},
 				highlighter: function(li, query) {
 					var regexp;
-					if (!query) {
+					if (!query)
 						return li;
-					}
+
 					// regexp from http://phpjs.org/functions/preg_quote/
 					query = (query + '').replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\-]', 'g'), '\\$&');
 					regexp = new RegExp(">\\s*(\\w*)(" + query.replace("+", "\\+") + ")(\\w*)\\s*<", 'ig');

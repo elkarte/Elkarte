@@ -180,7 +180,13 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 		// Bans are complex.
 		if ($row['action'] == 'ban')
 		{
-			$row['action_text'] = $txt['modlog_ac_ban'];
+			if (!isset($row['extra']['new']) || $row['extra']['new'] == 1)
+				$row['action_text'] = $txt['modlog_ac_ban'];
+			elseif ($row['extra']['new'] == 0)
+				$row['action_text'] = $txt['modlog_ac_ban_update'];
+			else
+				$row['action_text'] = $txt['modlog_ac_ban_remove'];
+
 			foreach (array('member', 'email', 'ip_range', 'hostname') as $type)
 				if (isset($row['extra'][$type]))
 					$row['action_text'] .= $txt['modlog_ac_ban_trigger_' . $type];

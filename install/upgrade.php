@@ -547,7 +547,7 @@ function initialize_inputs()
  */
 function action_welcomeLogin()
 {
-	global $modSettings, $upgradeurl, $upcontext, $db_type, $databases, $txt;
+	global $modSettings, $upgradeurl, $upcontext, $db_type, $databases, $txt, $db_character_set;
 
 	$db = database();
 
@@ -568,6 +568,10 @@ function action_welcomeLogin()
 
 	if (isset($modSettings['smfVersion']) && $modSettings['smfVersion'] < 1.1)
 		$check &= @file_exists(dirname(__FILE__) . '/upgrade_1-0.sql');
+
+	// If the db is not UTF
+	if (!isset($modSettings['elkVersion']) && ($db_type == 'mysql' || $db_type == 'mysqli') && (!isset($db_character_set) || $db_character_set !== 'utf8' || empty($modSettings['global_character_set']) || $modSettings['global_character_set'] !== 'UTF-8')
+		return throw_error('The upgrader detected your database is not UTF-8. In order to be able to upgrade, please first convert your database to the UTF-8 charset.');
 
 	// Don't tell them what files exactly because it's a spot check -
 	// just like teachers don't tell which problems they are spot checking, that's dumb.

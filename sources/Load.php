@@ -194,6 +194,9 @@ function loadUserSettings()
 			$user_settings = $db->fetch_assoc($request);
 			$db->free_result($request);
 
+			// Make the ID specifically an integer
+			$user_settings['id_member'] = (int) $user_settings['id_member'];
+
 			if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
 				cache_put_data('user_settings-' . $id_member, $user_settings, 60);
 		}
@@ -1771,6 +1774,10 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 		loadCSSFile($sheets);
 	}
 
+	// Load a custom CSS file?
+	if (!empty($context['theme_variant']) && file_exists($settings['theme_dir'] . '/css/' . $context['theme_variant'] . '/custom' . $context['theme_variant'] . '.css'))
+		 loadCSSFile($context['theme_variant'] . '/custom' . $context['theme_variant'] . '.css');
+
 	// No template to load?
 	if ($template_name === false)
 		return true;
@@ -1949,9 +1956,10 @@ function loadCSSFile($filenames, $params = array(), $id = '')
  * @param mixed $filenames string or array of filenames to work on
  * @param mixed[] $params = array()
  *		Keys are the following:
- *			- ['local'] (true/false): define if the file is local
+ *			- ['local'] (true/false): define if the file is local, if file does not start with http its assumed local
  *			- ['defer'] (true/false): define if the file should load in <head> or before the closing <html> tag
  *			- ['fallback'] (true/false): if true will attempt to load the file from the default theme if not found in the current
+ *							this is the default behavior if this is not supplied
  *			- ['async'] (true/false): if the script should be loaded asynchronously (HTML5)
  *			- ['stale'] (true/false/string): if true or null, use cache stale, false do not, or used a supplied string
  * @param string $id = '' optional id to use in html id=""
@@ -1981,6 +1989,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 	else
 	{
 		$this_build = array();
+
 		// All the files in this group use the above parameters
 		foreach ($filenames as $filename)
 		{

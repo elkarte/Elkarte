@@ -592,12 +592,24 @@ dl.settings dd.questions input {
 #manage_boards .post_group, #manage_boards .regular_members {
 	cursor: help;
 }
-.select_all_box label {
-	margin-left:5em;
+.select_category, .select_all_box {
 	font-style: italic;
+	border-top: 1px dashed #CCCCCC;
+	border-bottom: 1px dashed #CCCCCC;
 }
+.select_all_box {
+	margin-top: 0.5em;
+}
+.visible_boards .board label,
+.select_all_box label,
+.select_category label {
+	width: 30%;
+	display: inline-block;
+}
+.visible_boards .select_all_box .floatright,
+.visible_boards .select_category .floatright,
 .visible_boards .board .floatright {
-	width:50%;
+	width: 55%;
 }
 .visible_boards .category:after, .visible_boards .board:after {
 	display: block;

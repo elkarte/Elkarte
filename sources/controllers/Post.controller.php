@@ -53,8 +53,6 @@ class Post_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $topic, $modSettings, $board, $user_info, $context, $options, $language;
 
-		$db = database();
-
 		loadLanguage('Post');
 
 		// You can't reply with a poll... hacker.
@@ -84,6 +82,7 @@ class Post_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Post.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');
+		require_once(SUBSDIR . '/Topic.subs.php');
 
 		if (isset($_REQUEST['xml']))
 		{
@@ -108,24 +107,7 @@ class Post_Controller extends Action_Controller
 		// Check if it's locked. It isn't locked if no topic is specified.
 		if (!empty($topic))
 		{
-			$request = $db->query('', '
-				SELECT
-					t.locked, IFNULL(ln.id_topic, 0) AS notify, t.is_sticky, t.id_poll, t.id_last_msg, mf.id_member,
-					t.id_first_msg, mf.subject,
-					CASE WHEN ml.poster_time > ml.modified_time THEN ml.poster_time ELSE ml.modified_time END AS last_post_time
-				FROM {db_prefix}topics AS t
-					LEFT JOIN {db_prefix}log_notify AS ln ON (ln.id_topic = t.id_topic AND ln.id_member = {int:current_member})
-					LEFT JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
-					LEFT JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
-				WHERE t.id_topic = {int:current_topic}
-				LIMIT 1',
-				array(
-					'current_member' => $user_info['id'],
-					'current_topic' => $topic,
-				)
-			);
-			list ($locked, $context['notify'], $sticky, $pollID, $context['topic_last_message'], $id_member_poster, $id_first_msg, $first_subject, $lastPostTime) = $db->fetch_row($request);
-			$db->free_result($request);
+			list ($locked, $context['notify'], $sticky, $pollID, $context['topic_last_message'], $id_member_poster, $id_first_msg, $first_subject, $lastPostTime) = array_values(topicUserAttributes($topic, $user_info['id']));
 
 			// If this topic already has a poll, they sure can't add another.
 			if (isset($_REQUEST['poll']) && $pollID > 0)
@@ -168,7 +150,12 @@ class Post_Controller extends Action_Controller
 			$context['can_sticky'] = allowedTo('make_sticky') && !empty($modSettings['enableStickyTopics']);
 			$context['notify'] = !empty($context['notify']);
 			$context['sticky'] = isset($_REQUEST['sticky']) ? !empty($_REQUEST['sticky']) : $sticky;
-			$context['can_add_poll'] = (allowedTo('poll_add_any') || (!empty($_REQUEST['msg']) && $id_first_msg == $_REQUEST['msg'] && allowedTo('poll_add_own'))) && !empty($modSettings['pollMode']) && $pollID <= 0;
+
+			// It's a new reply
+			if (empty($_REQUEST['msg']))
+				$context['can_add_poll'] = false;
+			else
+				$context['can_add_poll'] = (allowedTo('poll_add_any') || (!empty($_REQUEST['msg']) && $id_first_msg == $_REQUEST['msg'] && allowedTo('poll_add_own'))) && !empty($modSettings['pollMode']) && $pollID <= 0;
 		}
 		else
 		{
@@ -351,7 +338,6 @@ class Post_Controller extends Action_Controller
 		{
 			if (empty($options['no_new_reply_warning']) && isset($_REQUEST['last_msg']) && $context['topic_last_message'] > $_REQUEST['last_msg'])
 			{
-				require_once(SUBSDIR . '/Topic.subs.php');
 				$context['new_replies'] = countMessagesSince($topic, (int) $_REQUEST['last_msg'], false, $modSettings['postmod_active'] && !allowedTo('approve_posts'));
 
 				if (!empty($context['new_replies']))
@@ -803,18 +789,17 @@ class Post_Controller extends Action_Controller
 		// Update the topic summary, needed to show new posts in a preview
 		if (!empty($topic) && !empty($modSettings['topicSummaryPosts']))
 		{
-			require_once(SUBSDIR . '/Topic.subs.php');
 			$only_approved = $modSettings['postmod_active'] && !allowedTo('approve_posts');
 
 			if (isset($_REQUEST['xml']))
 				$limit = empty($context['new_replies']) ? 0 : (int) $context['new_replies'];
 			else
-				$limit = empty($modSettings['topicSummaryPosts']) ? 0 : (int) $modSettings['topicSummaryPosts'];
+				$limit = $modSettings['topicSummaryPosts'];
 
 			$before = isset($_REQUEST['msg']) ? array('before' => (int) $_REQUEST['msg']) : array();
 
 			$counter = 0;
-			$context['previous_posts'] = selectMessages($topic, 0, $limit, $before, $only_approved);
+			$context['previous_posts'] = empty($limit) ? array() : selectMessages($topic, 0, $limit, $before, $only_approved);
 			foreach ($context['previous_posts'] as &$post)
 			{
 				$post['is_new'] = !empty($context['new_replies']);
@@ -2330,15 +2315,15 @@ class Post_Controller extends Action_Controller
 		$order = 'poster_time DESC';
 		$user_drafts = load_user_drafts($member_id, 0, $id_topic, $order);
 
-		// add them to the context draft array for template display
+		// Add them to the context draft array for template display
 		foreach ($user_drafts as $draft)
 		{
 			$short_subject = empty($draft['subject']) ? $txt['drafts_none'] : shorten_text(stripslashes($draft['subject']), !empty($modSettings['draft_subject_length']) ? $modSettings['draft_subject_length'] : 24);
 			$context['drafts'][] = array(
 				'subject' => censorText($short_subject),
 				'poster_time' => standardTime($draft['poster_time']),
-					'link' => '<a href="' . $scripturl . '?action=post;board=' . $draft['id_board'] . ';' . (!empty($draft['id_topic']) ? 'topic='. $draft['id_topic'] .'.0;' : '') . 'id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
-				);
+				'link' => '<a href="' . $scripturl . '?action=post;board=' . $draft['id_board'] . ';' . (!empty($draft['id_topic']) ? 'topic='. $draft['id_topic'] .'.0;' : '') . 'id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
+			);
 		}
 	}
 }

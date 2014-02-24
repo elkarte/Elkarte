@@ -432,6 +432,13 @@
 	$(document).ready(function() {
 		var obj = $(".drop_area");
 
+		// Make sure the browser supports this
+		if (!(window.FormData && ("onprogress" in $.ajaxSettings.xhr())))
+			return;
+
+		// All clear, show the drop zone
+		obj.toggle();
+
 		// Entering the dropzone, show it
 		obj.on('dragenter', function(e) {
 			e.stopPropagation();

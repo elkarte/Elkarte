@@ -312,6 +312,7 @@ class ManageBans_Controller extends Action_Controller
 		createToken('admin-bet');
 		$context['form_url'] = $scripturl . '?action=admin;area=ban;sa=edit';
 
+		// Prepare any errors found to the template to show
 		$context['ban_errors'] = array(
 			'errors' => $ban_errors->prepareErrors(),
 			'type' => $ban_errors->getErrorType() == 0 ? 'minor' : 'serious',
@@ -469,7 +470,8 @@ class ManageBans_Controller extends Action_Controller
 						// Default the ban name to the name of the banned member.
 						$context['ban']['name'] = $context['ban_suggestions']['member']['name'];
 
-						// @todo: there should be a better solution...used to lock the "Ban on Username" input when banning from profile
+						// @todo: there should be a better solution...
+						// used to lock the "Ban on Username" input when banning from profile
 						$context['ban']['from_user'] = true;
 
 						// Would be nice if we could also ban the hostname.
@@ -482,7 +484,7 @@ class ManageBans_Controller extends Action_Controller
 				else
 				{
 					$context['use_autosuggest'] = true;
-					loadJavascriptFile('suggest.js', array('default_theme' => true), 'suggest.js');
+					loadJavascriptFile('suggest.js');
 				}
 			}
 		}
@@ -490,10 +492,13 @@ class ManageBans_Controller extends Action_Controller
 		// Template needs this to show errors using javascript
 		loadLanguage('Errors');
 		$context['sub_template'] = 'ban_edit';
+
 		// A couple of text strings we *may* need
 		addJavascriptVar(array(
 			'txt_ban_name_empty' => $txt['ban_name_empty'],
-			'txt_ban_restriction_empty' => $txt['ban_restriction_empty']), true);
+			'txt_ban_restriction_empty' => $txt['ban_restriction_empty']), true
+		);
+
 		// And a bit of javascript to enable/disable some fields
 		addInlineJavascript('addLoadEvent(fUpdateStatus);', true);
 	}
@@ -746,6 +751,8 @@ class ManageBans_Controller extends Action_Controller
 	 * Editing existing ban triggers:
 	 *  - is accessed by ?action=admin;area=ban;sa=edittrigger;bg=x;bi=y
 	 *  - uses the ban_edit_trigger sub template of ManageBans.
+	 *
+	 * @uses sub template ban_edit_trigger
 	 */
 	public function action_edittrigger()
 	{
@@ -753,22 +760,19 @@ class ManageBans_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Bans.subs.php');
 
-		$context['sub_template'] = 'ban_edit_trigger';
-		$context['form_url'] = $scripturl . '?action=admin;area=ban;sa=edittrigger';
-		// The autosuggest avoids some typing!
-		loadJavascriptFile('suggest.js', array('default_theme' => true), 'suggest.js');
-
 		$ban_group = isset($_REQUEST['bg']) ? (int) $_REQUEST['bg'] : 0;
 		$ban_id = isset($_REQUEST['bi']) ? (int) $_REQUEST['bi'] : 0;
 
 		if (empty($ban_group))
 			fatal_lang_error('ban_not_found', false);
 
+		// Adding a new trigger
 		if (isset($_POST['add_new_trigger']) && !empty($_POST['ban_suggestions']))
 		{
 			saveTriggers($_POST['ban_suggestions'], $ban_group, 0, $ban_id);
 			redirectexit('action=admin;area=ban;sa=edit' . (!empty($ban_group) ? ';bg=' . $ban_group : ''));
 		}
+		// Edit an existing trigger with new / updated details
 		elseif (isset($_POST['edit_trigger']) && !empty($_POST['ban_suggestions']))
 		{
 			// The first replaces the old one, the others are added new
@@ -779,15 +783,14 @@ class ManageBans_Controller extends Action_Controller
 
 			redirectexit('action=admin;area=ban;sa=edit' . (!empty($ban_group) ? ';bg=' . $ban_group : ''));
 		}
+		// Removing a ban trigger by clearing the checkbox
 		elseif (isset($_POST['edit_trigger']))
 		{
 			removeBanTriggers($ban_id);
 			redirectexit('action=admin;area=ban;sa=edit' . (!empty($ban_group) ? ';bg=' . $ban_group : ''));
 		}
 
-		// The template uses the autosuggest functions
-		loadJavascriptFile('suggest.js', array('default_theme' => true, 'defer' => true), 'suggest.js');
-
+		// No id supplied, this must be a new trigger being added
 		if (empty($ban_id))
 		{
 			$context['ban_trigger'] = array(
@@ -812,12 +815,15 @@ class ManageBans_Controller extends Action_Controller
 				'is_new' => true,
 			);
 		}
+		// Otherwise its an existing trigger they want to edit
 		else
 		{
-			$row = banDetails($ban_id, $ban_group);
-			if (empty($row))
+			$ban_row = banDetails($ban_id, $ban_group);
+			if (empty($ban_row))
 				fatal_lang_error('ban_not_found', false);
+			$row = $ban_row[$ban_id];
 
+			// Load it up for the template
 			$context['ban_trigger'] = array(
 				'id' => $row['id_ban'],
 				'group' => $row['id_ban_group'],
@@ -840,6 +846,13 @@ class ManageBans_Controller extends Action_Controller
 				'is_new' => false,
 			);
 		}
+
+		// The template uses the autosuggest functions
+		loadJavascriptFile('suggest.js');
+
+		// Template we will use
+		$context['sub_template'] = 'ban_edit_trigger';
+		$context['form_url'] = $scripturl . '?action=admin;area=ban;sa=edittrigger';
 
 		createToken('admin-bet');
 	}
@@ -959,30 +972,28 @@ class ManageBans_Controller extends Action_Controller
 				),
 			),
 			'list_menu' => array(
-				array(
-					'show_on' => 'top',
-					'value' => array(
-						array(
-							'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=ip',
-							'is_selected' => $context['selected_entity'] == 'ip',
-							'label' => $txt['ip']
-						),
-						array(
-							'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=hostname',
-							'is_selected' => $context['selected_entity'] == 'hostname',
-							'label' => $txt['hostname']
-						),
-						array(
-							'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=email',
-							'is_selected' => $context['selected_entity'] == 'email',
-							'label' => $txt['email']
-						),
-						array(
-							'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=member',
-							'is_selected' => $context['selected_entity'] == 'member',
-							'label' => $txt['username']
-						)
+				'show_on' => 'top',
+				'links' => array(
+					array(
+						'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=ip',
+						'is_selected' => $context['selected_entity'] == 'ip',
+						'label' => $txt['ip']
 					),
+					array(
+						'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=hostname',
+						'is_selected' => $context['selected_entity'] == 'hostname',
+						'label' => $txt['hostname']
+					),
+					array(
+						'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=email',
+						'is_selected' => $context['selected_entity'] == 'email',
+						'label' => $txt['email']
+					),
+					array(
+						'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=member',
+						'is_selected' => $context['selected_entity'] == 'member',
+						'label' => $txt['username']
+					)
 				),
 			),
 		);

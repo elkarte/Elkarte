@@ -136,6 +136,14 @@
 	box-shadow: 0 1px 0 #fff;
 }
 
+/* Styles for the manage membergroups.
+------------------------------------------------- */
+.select_category, .select_all_box {
+	font-style: italic;
+	border-top: 1px dashed #CCCCCC;
+	border-bottom: 1px dashed #CCCCCC;
+}
+
 /* Styles for the manage permissions section.
 ------------------------------------------------- */
 .perm_boards li {
@@ -190,7 +198,8 @@ ul.moderation_notes li {
 	border-right: 1px solid #ddd;
 }
 
-/* jQuery Dialog */
+/* jQuery Dialog
+------------------------------------------------- */
 .ui-dialog {
 	border: 1px solid #999;
 	box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.3);

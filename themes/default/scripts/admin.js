@@ -551,23 +551,43 @@ function toggleBBCDisabled(section, disable)
 function updateInputBoxes()
 {
 	var curType = document.getElementById("field_type").value,
-		privStatus = document.getElementById("private").value;
+		privStatus = document.getElementById("private").value,
+		stdText = ['text', 'textarea', 'email', 'url', 'color', 'date'],
+		stdInput = ['text', 'email', 'url', 'color', 'date'];
 
-	document.getElementById("max_length_dt").style.display = curType === "text" || curType === "textarea" ? "" : "none";
-	document.getElementById("max_length_dd").style.display = curType === "text" || curType === "textarea" ? "" : "none";
+	var bIsStd = (stdInput.indexOf(curType) !== -1) ? true : false,
+		bIsText = (stdText.indexOf(curType) !== -1) ? true : false;
+
+	// Only Text like fields can see a max length input
+	document.getElementById("max_length_dt").style.display = bIsText ? "" : "none";
+	document.getElementById("max_length_dd").style.display = bIsText ? "" : "none";
+
+	// Textareas can get a row/col definition
 	document.getElementById("dimension_dt").style.display = curType === "textarea" ? "" : "none";
 	document.getElementById("dimension_dd").style.display = curType === "textarea" ? "" : "none";
-	document.getElementById("bbc_dt").style.display = curType === "text" || curType === "textarea" ? "" : "none";
-	document.getElementById("bbc_dd").style.display = curType === "text" || curType === "textarea" ? "" : "none";
+
+	// Text like fields can be styled with bbc
+	document.getElementById("bbc_dt").style.display = bIsText ? "" : "none";
+	document.getElementById("bbc_dd").style.display = bIsText ? "" : "none";
+
+	// Selects and radio can support a list of options
 	document.getElementById("options_dt").style.display = curType === "select" || curType === "radio" ? "" : "none";
 	document.getElementById("options_dd").style.display = curType === "select" || curType === "radio" ? "" : "none";
+
+	// Checkboxes can have a default
 	document.getElementById("default_dt").style.display = curType === "check" ? "" : "none";
 	document.getElementById("default_dd").style.display = curType === "check" ? "" : "none";
-	document.getElementById("mask_dt").style.display = curType === "text" ? "" : "none";
-	document.getElementById("mask").style.display = curType === "text" ? "" : "none";
-	document.getElementById("can_search_dt").style.display = curType === "text" || curType === "textarea" ? "" : "none";
-	document.getElementById("can_search_dd").style.display = curType === "text" || curType === "textarea" ? "" : "none";
-	document.getElementById("regex_div").style.display = curType === "text" && document.getElementById("mask").value === "regex" ? "" : "none";
+
+	// Normal input boxes can use a validation mask as well
+	document.getElementById("mask_dt").style.display = bIsStd ? "" : "none";
+	document.getElementById("mask").style.display = bIsStd ? "" : "none";
+
+	// And text like fields can be searchable
+	document.getElementById("can_search_dt").style.display = bIsText ? "" : "none";
+	document.getElementById("can_search_dd").style.display = bIsText ? "" : "none";
+
+	// Using regex in the mask, give them a place to supply the regex
+	document.getElementById("regex_div").style.display = bIsStd && document.getElementById("mask").value === "regex" ? "" : "none";
 	document.getElementById("display").disabled = false;
 
 	// Cannot show this on the topic
@@ -962,16 +982,13 @@ function dynamicExpandFolder()
 /**
  * Used when edit the boards and groups access to them
  *
- * @param {type} cat_id
- * @param {type} elem
+ * @param {type} operation
  * @param {type} brd_list
  */
-function select_in_category(cat_id, elem, brd_list)
+function select_in_category(operation, brd_list)
 {
 	for (var brd in brd_list)
-		document.getElementById(elem.value + '_brd' + brd_list[brd]).checked = true;
-
-	elem.selectedIndex = 0;
+		document.getElementById(operation + '_brd' + brd_list[brd]).checked = true;
 }
 
 /**
@@ -1025,6 +1042,40 @@ function toggleCache ()
 		$(cachepassword).slideUp(100);
 		$(cachepassword).parent().slideUp(100);
 		$(cachepassword).parent().prev().slideUp(100);
+	}
+}
+
+/**
+ * Hides local / subdomain cookie options in the ACP based on selected choices
+ * area=serversettings;sa=cookie
+ */
+function hideGlobalCookies()
+{
+	var bUseLocal = document.getElementById("localCookies").checked,
+		bUseGlobal = !bUseLocal && document.getElementById("globalCookies").checked;
+
+	// Show/Hide the areas based on what they have chosen
+	if (!bUseLocal)
+	{
+		$("#setting_globalCookies").parent().slideDown();
+		$("#globalCookies").parent().slideDown();
+	}
+	else
+	{
+		$("#setting_globalCookies").parent().slideUp();
+		$("#globalCookies").parent().slideUp();
+	}
+
+	// Global selected means we need to reveil the domain input box
+	if (bUseGlobal)
+	{
+		$("#setting_globalCookiesDomain").closest("dt").slideDown();
+		$("#globalCookiesDomain").closest("dd").slideDown();
+	}
+	else
+	{
+		$("#setting_globalCookiesDomain").closest("dt").slideUp();
+		$("#globalCookiesDomain").closest("dd").slideUp();
 	}
 }
 

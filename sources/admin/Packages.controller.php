@@ -61,6 +61,10 @@ class Packages_Controller extends Action_Controller
 			'flush' => array($this, 'action_flush'),
 			'examine' => array($this, 'action_examine'),
 			'showoperations' => array($this, 'action_showoperations'),
+			// The following two belong to PackageServers,
+			// for UI's sake moved here at least temporarily
+			'servers' => array('file' => 'PackageServers.controller.php', 'controller' => 'PackageServers_Controller', 'function' => 'action_list'),
+			'upload' => array('file' => 'PackageServers.controller.php', 'controller' => 'PackageServers_Controller', 'function' => 'action_upload'),
 		);
 
 		// Work out exactly who it is we are calling.
@@ -86,6 +90,14 @@ class Packages_Controller extends Action_Controller
 				),
 				'options' => array(
 					'description' => $txt['package_install_options_desc'],
+				),
+				// The following two belong to PackageServers,
+				// for UI's sake moved here at least temporarily
+				'servers' => array(
+					'description' => $txt['download_packages_desc'],
+				),
+				'upload' => array(
+					'description' => $txt['upload_packages_desc'],
 				),
 			),
 		);
@@ -2081,7 +2093,7 @@ class Packages_Controller extends Action_Controller
 	 * @param int $start
 	 * @param int $items_per_page
 	 * @param string $sort
-	 * @param array $params
+	 * @param string $params 'type' type of package
 	 * @param bool $installed
 	 */
 	public function list_packages($start, $items_per_page, $sort, $params, $installed)

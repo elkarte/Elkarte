@@ -20,9 +20,7 @@
  */
 function template_editBuddies()
 {
-	global $context, $settings, $scripturl, $modSettings, $txt;
-
-	$disabled_fields = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
+	global $context, $settings, $scripturl, $txt;
 
 	echo '
 	<div class="windowbg" id="edit_buddies">
@@ -39,6 +37,7 @@ function template_editBuddies()
 				<th scope="col">', $txt['email'], '</th>';
 
 	echo '
+				<th scope="col">', $txt['profile_contact'], '</th>
 				<th scope="col"></th>
 			</tr>';
 
@@ -64,17 +63,14 @@ function template_editBuddies()
 			echo '
 				<td>', ($buddy['show_email'] == 'no' ? '' : '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $buddy['id'] . '" rel="nofollow"><img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $buddy['name'] . '" /></a>'), '</td>';
 
-		// If these are off, don't show them
-		// @todo this used to show the IM agents for buddies ... do we want to get any custom profile fields to populate here?
-		if (isset($buddy_fields))
-		{
-			foreach ($buddy_fields as $key => $column)
-			{
-				if (!isset($disabled_fields[$column]))
-					echo '
-						<td>', $buddy[$column]['link'], '</td>';
-			}
-		}
+		//  Any custom profile (with icon) fields to show
+		$im = array();
+		foreach ($buddy['custom_fields'] as $key => $cpf)
+			if ($cpf['placement'] == 1)
+				$im[] = $cpf['value'];
+
+		echo '
+				<td>' . implode(' | ', $im) . '</td>';
 
 		echo '
 				<td class="righttext">
@@ -320,6 +316,11 @@ function template_edit_options()
 			elseif (in_array($field['type'], array('int', 'float', 'text', 'password')))
 				echo '
 							<input type="', $field['type'] == 'password' ? 'password' : 'text', '" name="', $key, '" id="', $key, '" size="', empty($field['size']) ? 30 : $field['size'], '" value="', $field['value'], '" ', $field['input_attr'], ' class="input_', $field['type'] == 'password' ? 'password' : 'text', '" />';
+
+			// Maybe it's an html5 input
+			elseif (in_array($field['type'], array('url', 'search', 'date', 'email', 'color')))
+				echo '
+							<input type="', $field['type'], '" name="', $key, '" id="', $key, '" size="', empty($field['size']) ? 30 : $field['size'], '" value="', $field['value'], '" ', $field['input_attr'], ' class="input_', $field['type'] == 'password' ? 'password' : 'text', '" />';
 
 			// You "checking" me out? ;)
 			elseif ($field['type'] == 'check')
@@ -1499,11 +1500,11 @@ function template_authentication_method()
 				<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
 
 	echo '
+			</div>
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<input type="hidden" name="u" value="', $context['id_member'], '" />
 				<input type="hidden" name="sa" value="', $context['menu_item_selected'], '" />
 				<input type="submit" value="', $txt['change_profile'], '" class="right_submit" />
-			</div>
 		</form>';
 
 	// The password stuff.

@@ -1019,7 +1019,7 @@ a.bbc_link {
 	padding: 0;
 }
 .listlevel1:hover {
-	z-index: 5;
+	z-index: 6;
 }
 .listlevel1#collapse_button, .listlevel1#button_profile {
 	float: right;
@@ -1433,6 +1433,12 @@ a.bbc_link {
 	float: left;
 }
 
+#expanded_pages_container {
+	position: absolute;
+}
+#expanded_pages_container, #expanded_pages {
+	overflow: hidden;
+}
 #pages_scroll_left, #pages_scroll_right {
 	position: absolute;
 	top: 0;
@@ -1782,12 +1788,6 @@ dl.settings dt .styled-select select {
 }
 .topic_sorting.topic_sorting_recent {
 	margin-top: 0;
-}
-#expanded_pages_container {
-	position: absolute;
-}
-#expanded_pages_container, #expanded_pages {
-	overflow: hidden;
 }
 
 /* For the who is template. */
@@ -2464,6 +2464,7 @@ ul.post_options li {
 	line-height: 60px;
 	text-align: center;
 	opacity: 0.6;
+	display: none;
 }
 #postAttachment >dd.progress_tracker {
 	margin:0;
@@ -3115,6 +3116,9 @@ dl.merge_topic dd {
 }
 #paid_subscription dl.settings dd, #paid_subscription dl.settings dt {
 	margin-bottom: 4px;
+}
+#fixed_area .styled-select {
+	vertical-align: top;
 }
 
 /* Pick theme */
@@ -4288,6 +4292,7 @@ a.help .icon {
 		float: none;
 	}
 	.poster .listlevel1 {
+		float: left;
 		display: inline-block;
 	}
 	.poster li.membergroup {
@@ -4301,11 +4306,6 @@ a.help .icon {
 		max-height: 1.5em;
 		float: right;
 		text-align: right;
-	}
-	.poster .subsections>a {
-		text-overflow: ellipsis;
-		white-space: nowrap;
-		overflow: hidden;
 	}
 	.poster .membergroup {
 		float: right;
