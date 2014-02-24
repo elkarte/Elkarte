@@ -69,38 +69,45 @@ class Data_Validator
 {
 	/**
 	 * Validation rules
+	 * @var mixed[]
 	 */
 	protected $_validation_rules = array();
 
 	/**
 	 * Sanitation rules
+	 * @var mixed[]
 	 */
 	protected $_sanitation_rules = array();
 
 	/**
 	 * Text substitutions for field names in the error messages
+	 * @var mixed[]
 	 */
 	protected $_replacements = array();
 
 	/**
 	 * Holds validation errors
+	 * @var mixed[]
 	 */
 	protected $_validation_errors = array();
 
 	/**
 	 * Holds our data
+	 * @var mixed[]
 	 */
 	protected $_data = array();
 
 	/**
 	 * Strict data processing,
 	 * if true drops data for which no sanitation rule was set
+	 * @var boolean
 	 */
 	protected $_strict = false;
 
 	/**
 	 * Holds any special processing that is required for certain fields
 	 * csv or array
+	 * @var string[]
 	 */
 	protected $_datatype = array();
 

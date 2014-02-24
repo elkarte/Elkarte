@@ -1080,7 +1080,6 @@ function membersAllowedTo($permission, $board_id = null)
  * @param string|false $email = false
  * @param string|false $membername = false
  * @param bool $post_count = false
- * @return nothing
  */
 function reattributePosts($memID, $email = false, $membername = false, $post_count = false)
 {
@@ -1234,7 +1233,7 @@ function list_getNumMembers($where, $where_params = array())
 /**
  * Find potential duplicate registation members based on the same IP address
  *
- * @param $members
+ * @param mixed[] $members
  */
 function populateDuplicateMembers(&$members)
 {

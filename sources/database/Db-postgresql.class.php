@@ -48,11 +48,13 @@ class Database_PostgreSQL implements Database
 	/**
 	 * Since PostgreSQL doesn't support INSERT REPLACE we are using this to remember
 	 * the rows affected by the delete
+	 * @var int
 	 */
 	private $_db_replace_result = null;
 
 	/**
 	 * A variable to remember if a transaction was started already or not
+	 * @var boolean
 	 */
 	private $_in_transaction = false;
 
@@ -1131,7 +1133,6 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @param string $table
 	 * @param string $backup_table
-	 * @return resource -the request handle to the table creation query
 	 */
 	public function db_backup_table($table, $backup_table)
 	{

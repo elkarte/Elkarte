@@ -1478,7 +1478,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 * @param int $start
 	 * @param int $items_per_page
 	 * @param string $sort
-	 * @param $template_type type of template to load
+	 * @param string $template_type type of template to load
 	 */
 	public function list_getWarningTemplates($start, $items_per_page, $sort, $template_type = 'warntpl')
 	{
