@@ -3892,8 +3892,6 @@ function remove_integration_function($hook, $function, $file = '')
 
 	$db = database();
 
-	$integration_call = (!empty($file)) ? $function . '|' . $file : $function;
-
 	// Get the permanent functions.
 	$request = $db->query('', '
 		SELECT value
@@ -3910,6 +3908,19 @@ function remove_integration_function($hook, $function, $file = '')
 	{
 		$current_functions = explode(',', $current_functions);
 
+		foreach ($current_functions as $filefunc)
+		{
+			if (strpos($funcfile, '|') !== false)
+				list($func, $inc_file) = explode('|', $filefunc);
+			else
+				$func = $filefunc;
+
+			if ($func == $function)
+			{
+				$integration_call = $filefunc;
+				break;
+			}
+		}
 		if (in_array($integration_call, $current_functions))
 			updateSettings(array($hook => implode(',', array_diff($current_functions, array($integration_call)))));
 	}
