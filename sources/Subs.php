@@ -3696,18 +3696,13 @@ function call_integration_hook($hook, $parameters = array())
 	{
 		$function = trim($function);
 		if (strpos($function, '|') !== false)
-			list ($func, $file) = explode('|', $function);
+			list ($call, $file) = explode('|', $function);
+		else
+			$call = $function;
 
 		// OOP static method
-		if (strpos($func, '::') !== false)
-		{
-			$call = explode('::', $function);
-		}
-		// Normal plain function
-		else
-		{
-			$call = $function;
-		}
+		if (strpos($call, '::') !== false)
+			$call = explode('::', $call);
 
 		if (!empty($file))
 		{
@@ -3794,17 +3789,14 @@ function call_integration_buffer()
 		$function = trim($function);
 
 		if (strpos($function, '|') !== false)
-			list($func, $file) = explode('|', $function);
+			list($call, $file) = explode('|', $function);
+		else
+			$call = $function;
 
 		// OOP static method
-		if (strpos($func, '::') !== false)
+		if (strpos($call, '::') !== false)
 		{
-			$call = explode('::', $func);
-		}
-		// Normal plain function
-		else
-		{
-			$call = $function;
+			$call = explode('::', $call);
 		}
 
 		if (!empty($file))
@@ -3915,7 +3907,7 @@ function remove_integration_function($hook, $function, $file = '')
 			else
 				$func = $filefunc;
 
-			if ($func == $function)
+			if ($func == $function && (empty($file) || (!empty($file) && !empty($inc_file) && $file == $inc_file)))
 			{
 				$integration_call = $filefunc;
 				break;
