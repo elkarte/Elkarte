@@ -1675,6 +1675,7 @@ class Search_Controller extends Action_Controller
 
 	/**
 	 * Callback to return messages - saves memory.
+	 *
 	 * @todo Fix this, update it, whatever... from Display.controller.php mainly.
 	 * Note that the call to loadAttachmentContext() doesn't work:
 	 * this function doesn't fulfill the pre-condition to fill $attachments global...
@@ -1684,7 +1685,7 @@ class Search_Controller extends Action_Controller
 	 * - callback function for the results sub template.
 	 * - loads the necessary contextual data to show a search result.
 	 *
-	 * @param $reset = false
+	 * @param boolean $reset = false
 	 * @return array of messages that match the search
 	 */
 	public function prepareSearchContext_callback($reset = false)

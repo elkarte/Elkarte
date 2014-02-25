@@ -22,12 +22,14 @@ class MarkRead_Controller extends Action_Controller
 	/**
 	 * String used to redirect user to the correct boards when marking unread
 	 * ajax-ively
+	 * @var string
 	 */
 	private $_querystring_board_limits = '';
 
 	/**
 	 * String used to remember user's sorting options when marking unread
 	 * ajax-ively
+	 * @var string
 	 */
 	private $_querystring_sort_limits = '';
 

@@ -17,6 +17,8 @@ if (!defined('ELK'))
 /**
  * Mentions_Controller Class:  Add mention notificaions for various actions such
  * as liking a post, adding a buddy, @ calling a member in a post
+ *
+ * @package Mentions
  */
 class Mentions_Controller extends Action_Controller
 {

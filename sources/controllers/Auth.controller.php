@@ -24,12 +24,15 @@ if (!defined('ELK'))
 /**
  * Auth_Controller class, deals with logging in and out members,
  * and the validation of them
+ *
+ * @pachage Authorization
  */
 class Auth_Controller extends Action_Controller
 {
 	/**
 	 * Entry point in Auth controller
-	 * (well no, not really. We route directly to the rest.)
+	 *
+	 * - (well no, not really. We route directly to the rest.)
 	 *
 	 * @see Action_Controller::action_index()
 	 */
@@ -40,10 +43,12 @@ class Auth_Controller extends Action_Controller
 	}
 
 	/**
-	 * Ask them for their login information. (shows a page for the user to type
-	 *  in their username and password.)
-	 *  It caches the referring URL in $_SESSION['login_url'].
-	 *  It is accessed from ?action=login.
+	 * Ask them for their login information.
+	 *
+	 * What it does:
+	 *  - shows a page for the user to type in their username and password.
+	 *  - It caches the referring URL in $_SESSION['login_url'].
+	 *  - It is accessed from ?action=login.
 	 *  @uses Login template and language file with the login sub-template.
 	 */
 	public function action_login()
@@ -84,6 +89,7 @@ class Auth_Controller extends Action_Controller
 
 	/**
 	 * Actually logs you in.
+	 *
 	 * What it does:
 	 * - checks credentials and checks that login was successful.
 	 * - it employs protection against a specific IP or user trying to brute force
@@ -326,12 +332,14 @@ class Auth_Controller extends Action_Controller
 
 	/**
 	 * Logs the current user out of their account.
-	 * It requires that the session hash is sent as well, to prevent automatic logouts by images or javascript.
-	 * It redirects back to $_SESSION['logout_url'], if it exists.
-	 * It is accessed via ?action=logout;session_var=...
 	 *
-	 * @param bool $internal if true, it doesn't check the session
-	 * @param $redirect
+	 * What it does:
+	 * - It requires that the session hash is sent as well, to prevent automatic logouts by images or javascript.
+	 * - It redirects back to $_SESSION['logout_url'], if it exists.
+	 * - It is accessed via ?action=logout;session_var=...
+	 *
+	 * @param boolean $internal if true, it doesn't check the session
+	 * @param boolean $redirect
 	 */
 	public function action_logout($internal = false, $redirect = true)
 	{
@@ -401,8 +409,10 @@ class Auth_Controller extends Action_Controller
 
 	/**
 	 * Throws guests out to the login screen when guest access is off.
-	 * It sets $_SESSION['login_url'] to $_SERVER['REQUEST_URL'].
-	 * It uses the 'kick_guest' sub template found in Login.template.php.
+	 *
+	 * What it does:
+	 * - It sets $_SESSION['login_url'] to $_SERVER['REQUEST_URL'].
+	 * - It uses the 'kick_guest' sub template found in Login.template.php.
 	 */
 	public function action_kickguest()
 	{
@@ -422,8 +432,10 @@ class Auth_Controller extends Action_Controller
 
 	/**
 	 * Display a message about the forum being in maintenance mode.
-	 * Displays a login screen with sub template 'maintenance'.
-	 * It sends a 503 header, so search engines don't index while we're in maintenance mode.
+	 *
+	 * What it does:
+	 * - Displays a login screen with sub template 'maintenance'.
+	 * - It sends a 503 header, so search engines don't index while we're in maintenance mode.
 	 */
 	public function action_maintenance_mode()
 	{
@@ -488,7 +500,9 @@ class Auth_Controller extends Action_Controller
 
 	/**
 	 * Loads other possible password hash / crypts using the post data
-	 * Used when a board is converted to see if the user credentials and a 3rd
+	 *
+	 * What it does:
+	 * - Used when a board is converted to see if the user credentials and a 3rd
 	 * party hash satisfy whats in the db passwd field
 	 *
 	 * @param mixed[] $user_settings
@@ -607,13 +621,16 @@ class Auth_Controller extends Action_Controller
 /**
  * Check activation status of the current user.
  *
- * > 10 Banned with activation status as value - 10
- * 5 = Awaiting COPPA concent
- * 4 = Awaiting Deletion approval
- * 3 = Awaiting Admin approval
- * 2 = Awaiting reactivation from email change
- * 1 = Approved and active
- * 0 = Not active
+ * What it does:
+ * - > 10 Banned with activation status as value - 10
+ * - 5 = Awaiting COPPA concent
+ * - 4 = Awaiting Deletion approval
+ * - 3 = Awaiting Admin approval
+ * - 2 = Awaiting reactivation from email change
+ * - 1 = Approved and active
+ * - 0 = Not active
+ *
+ * @package Authorization
  */
 function checkActivation()
 {
@@ -663,7 +680,11 @@ function checkActivation()
 
 /**
  * This function performs the logging in.
- * It sets the cookie, it call hooks, updates runtime settings for the user.
+ *
+ * What it does:
+ *  - It sets the cookie, it call hooks, updates runtime settings for the user.
+ *
+ * @package Authorization
  */
 function doLogin()
 {
@@ -735,6 +756,7 @@ function doLogin()
 /**
  * MD5 Encryption used for older passwords. (SMF 1.0.x/YaBB SE 1.5.x hashing)
  *
+ * @package Authorization
  * @param string $data
  * @param string $key
  * @return string the HMAC MD5 of data with key
@@ -748,6 +770,7 @@ function md5_hmac($data, $key)
 /**
  * Custom encryption for phpBB3 based passwords.
  *
+ * @package Authorization
  * @param string $passwd
  * @param string $passwd_hash
  * @return string

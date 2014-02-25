@@ -424,7 +424,7 @@ function updatePMMenuCounts($owner)
  * Check if the PM is available to the current user.
  *
  * @param int $pmID
- * @param $validFor
+ * @param string $validFor
  * @return boolean|null
  */
 function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
@@ -1283,7 +1283,7 @@ function loadRules($reload = false)
  * Update PM recipient when they receive or read a new PM
  *
  * @param int $id_member
- * @param $new = false
+ * @param boolean $new = false
  */
 function toggleNewPM($id_member, $new = false)
 {
