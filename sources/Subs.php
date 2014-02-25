@@ -4209,7 +4209,7 @@ function template_call($name)
 
 	call_integration_hook($hook . '__pre', $args);
 
-	$skip_execute = true;
+	$skip_execute = false;
 
 	$execute_result = call_integration_hook($hook . '__execute', $args);
 	foreach ($execute_result as $hook_result)
