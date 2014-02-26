@@ -1442,6 +1442,7 @@ a.bbc_link {
 #pages_scroll_left, #pages_scroll_right {
 	position: absolute;
 	top: 0;
+	margin: 0;
 }
 #pages_scroll_left {
 	left: 0;

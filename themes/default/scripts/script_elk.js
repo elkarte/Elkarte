@@ -853,7 +853,7 @@ function setBoardIds() {
 
 			$container.append($exp_pages);
 			$element.parent().superfish({
-				delay : 300,
+				delay: 300,
 				speed: 175,
 				speedOut: 50,
 				onHide: function () {
@@ -876,7 +876,7 @@ function setBoardIds() {
 							move = 0;
 
 						for (var i = 0, count = $exp_pages.find('a').length; i < count; i++)
-							move += $($pages[i]).outerWidth();
+							move += $($pages[i]).outerWidth(true);
 
 						move = (move + $container.find('#pages_scroll_left').outerWidth()) - ($container.outerWidth() - $container.find('#pages_scroll_right').outerWidth());
 
