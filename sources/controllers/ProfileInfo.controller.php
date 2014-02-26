@@ -526,9 +526,13 @@ class ProfileInfo_Controller extends Action_Controller
 				),
 				'board' => array(
 					'name' => $row['bname'],
-					'id' => $row['id_board']
+					'id' => $row['id_board'],
+					'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['bname'] . '</a>',
 				),
-				'topic' => $row['id_topic'],
+				'topic' => array(
+					'id' => $row['id_topic'],
+					'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.' . 'msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
+				),
 				'subject' => $row['subject'],
 				'start' => 'msg' . $row['id_msg'],
 				'time' => standardTime($row['poster_time']),
@@ -630,7 +634,7 @@ class ProfileInfo_Controller extends Action_Controller
 
 		// This is all the information required to list attachments.
 		$listOptions = array(
-			'id' => 'attachments',
+			'id' => 'profile_attachments',
 			'title' => $txt['showAttachments'] . ($context['user']['is_owner'] ? '' : ' - ' . $context['member']['name']),
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['show_attachments_none'],
@@ -719,7 +723,7 @@ class ProfileInfo_Controller extends Action_Controller
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';
-		$context['default_list'] = 'attachments';
+		$context['default_list'] = 'profile_attachments';
 	}
 
 	/**

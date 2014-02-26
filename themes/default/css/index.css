@@ -2762,12 +2762,14 @@ dl.merge_topic dd {
 	clear: both;
 	padding-top: 8px;
 }
-#profilecenter {
+#profilecenter, #unwatched_topics, #profile_attachments {
 	margin: 12px 0 0 0;
 	padding: 8px 8px 16px 8px;
 	overflow: auto;
 }
-#profilecenter .windowbg, #profilecenter .windowbg2 {
+#profilecenter .windowbg, #profilecenter .windowbg2,
+#profile_attachments .windowbg, #profile_attachments .windowbg2,
+#unwatched_topics .windowbg, #unwatched_topics .windowbg2 {
 	overflow: visible;
 	padding: 0 0 4px;
 }

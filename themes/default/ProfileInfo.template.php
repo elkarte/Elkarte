@@ -117,78 +117,80 @@ function template_action_showPosts()
 {
 	global $context, $scripturl, $txt;
 
-	template_pagesection();
-
 	echo '
-		<div class="forumposts">
+		<div id="profilecenter">
 			<h2 class="category_header">
 				', empty($context['is_topics']) ? $txt['showMessages'] : $txt['showTopics'], $context['user']['is_owner'] ? '' : ' - ' . $context['member']['name'], '
 			</h2>';
 
-	// For every post to be displayed, give it its own div, and show the important details of the post.
-	foreach ($context['posts'] as $post)
-	{
+	template_pagesection();
+
+	// No posts? Just end the table with a informative message.
+	if (empty($context['posts']))
 		echo '
-			<div class="', $post['alternate'] == 0 ? 'windowbg2' : 'windowbg', '">
+				<div class="windowbg2">
+					<div class="content">
+						', $context['is_topics'] ? $txt['show_topics_none'] : $txt['show_posts_none'], '
+					</div>
+				</div>';
+	else
+	{
+		// For every post to be displayed, give it its own div, and show the important details of the post.
+		foreach ($context['posts'] as $post)
+		{
+			echo '
+			<div class="', $post['alternate'] == 0 ? 'windowbg2' : 'windowbg', ' core_posts">
 				<div class="content">
 					<div class="counter">', $post['counter'], '</div>
 					<div class="topic_details">
-						<h5><strong><a href="', $scripturl, '?board=', $post['board']['id'], '.0">', $post['board']['name'], '</a> / <a href="', $scripturl, '?topic=', $post['topic'], '.', $post['start'], '#msg', $post['id'], '">', $post['subject'], '</a></strong></h5>
+						<h5><strong>', $post['board']['link'], ' / ', $post['topic']['link'], '</strong></h5>
 						<span class="smalltext">', $post['time'], '</span>
 					</div>
 					<div class="inner">';
 
-		if (!$post['approved'])
-			echo '
+			if (!$post['approved'])
+				echo '
 						<div class="approve_post">
 							<em>', $txt['post_awaiting_approval'], '</em>
 						</div>';
 
-		echo '
+			echo '
 					', $post['body'], '
 					</div>';
 
-		if ($post['can_reply'] || $post['can_mark_notify'] || $post['can_delete'])
-			echo '
+			if ($post['can_reply'] || $post['can_mark_notify'] || $post['can_delete'])
+				echo '
 					<ul class="quickbuttons">';
 
-		// How about... even... remove it entirely?!
-		if ($post['can_delete'])
-			echo '
-						<li class="listlevel1"><a href="', $scripturl, '?action=deletemsg;msg=', $post['id'], ';topic=', $post['topic'], ';profile;u=', $context['member']['id'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['remove_message'], '?\');" class="linklevel1 remove_button"><span>', $txt['remove'], '</span></a></li>';
+			// How about... even... remove it entirely?!
+			if ($post['can_delete'])
+				echo '
+						<li class="listlevel1"><a href="', $scripturl, '?action=deletemsg;msg=', $post['id'], ';topic=', $post['topic']['id'], ';profile;u=', $context['member']['id'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['remove_message'], '?\');" class="linklevel1 remove_button"><span>', $txt['remove'], '</span></a></li>';
 
-		// Can we request notification of topics?
-		if ($post['can_mark_notify'])
-			echo '
-						<li class="listlevel1"><a href="', $scripturl, '?action=notify;topic=', $post['topic'], '.', $post['start'], '" class="linklevel1 notify_button">', $txt['notify'], '</a></li>';
+			// Can we request notification of topics?
+			if ($post['can_mark_notify'])
+				echo '
+						<li class="listlevel1"><a href="', $scripturl, '?action=notify;topic=', $post['topic']['id'], '.', $post['start'], '" class="linklevel1 notify_button">', $txt['notify'], '</a></li>';
 
-		// If they *can* reply?
-		if ($post['can_reply'])
-			echo '
-						<li class="listlevel1"><a href="', $scripturl, '?action=post;topic=', $post['topic'], '.', $post['start'], '" class="linklevel1 reply_button">', $txt['reply'], '</a></li>';
+			// If they *can* reply?
+			if ($post['can_reply'])
+				echo '
+						<li class="listlevel1"><a href="', $scripturl, '?action=post;topic=', $post['topic']['id'], '.', $post['start'], '" class="linklevel1 reply_button">', $txt['reply'], '</a></li>';
 
-		// If they *can* quote?
-		if ($post['can_quote'])
-			echo '
-						<li class="listlevel1"><a href="', $scripturl . '?action=post;topic=', $post['topic'], '.', $post['start'], ';quote=', $post['id'], '" class="linklevel1 quote_button">', $txt['quote'], '</a></li>';
+			// If they *can* quote?
+			if ($post['can_quote'])
+				echo '
+						<li class="listlevel1"><a href="', $scripturl . '?action=post;topic=', $post['topic']['id'], '.', $post['start'], ';quote=', $post['id'], '" class="linklevel1 quote_button">', $txt['quote'], '</a></li>';
 
-		if ($post['can_reply'] || $post['can_mark_notify'] || $post['can_delete'])
-			echo '
+			if ($post['can_reply'] || $post['can_mark_notify'] || $post['can_delete'])
+				echo '
 					</ul>';
 
-		echo '
+			echo '
 				</div>
 			</div>';
+		}
 	}
-
-	// No posts? Just end the table with a informative message.
-	if ((isset($context['attachments']) && empty($context['attachments'])) || (!isset($context['attachments']) && empty($context['posts'])))
-		echo '
-				<div class="windowbg2">
-					<div class="content">
-						', isset($context['attachments']) ? $txt['show_attachments_none'] : ($context['is_topics'] ? $txt['show_topics_none'] : $txt['show_posts_none']), '
-					</div>
-				</div>';
 
 	echo '
 		</div>';
