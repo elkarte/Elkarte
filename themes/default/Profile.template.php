@@ -47,7 +47,7 @@ function template_showDrafts()
 
 	echo '
 		<h3 class="category_header">
-			', $txt['drafts'], ' - ', $context['member']['name'], '
+			', $txt['drafts'], $context['user']['is_owner'] ? '' : ' - ' . $context['member']['name'], '
 		</h3>',
 	template_pagesection();
 

@@ -615,7 +615,7 @@ class ProfileInfo_Controller extends Action_Controller
 	 */
 	public function action_showAttachments()
 	{
-		global $txt, $scripturl, $modSettings;
+		global $txt, $scripturl, $modSettings, $context;
 
 		// OBEY permissions!
 		$boardsAllowed = boardsAllowedTo('view_attachments');
@@ -631,7 +631,7 @@ class ProfileInfo_Controller extends Action_Controller
 		// This is all the information required to list attachments.
 		$listOptions = array(
 			'id' => 'attachments',
-			'width' => '100%',
+			'title' => $txt['showAttachments'] . ($context['user']['is_owner'] ? '' : ' - ' . $context['member']['name']),
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['show_attachments_none'],
 			'base_href' => $scripturl . '?action=profile;area=showposts;sa=attach;u=' . $memID,
@@ -717,6 +717,9 @@ class ProfileInfo_Controller extends Action_Controller
 
 		// Create the request list.
 		createList($listOptions);
+
+		$context['sub_template'] = 'show_list';
+		$context['default_list'] = 'attachments';
 	}
 
 	/**
@@ -737,7 +740,7 @@ class ProfileInfo_Controller extends Action_Controller
 		// And here they are: the topics you don't like
 		$listOptions = array(
 			'id' => 'unwatched_topics',
-			'width' => '100%',
+			'title' => $txt['showUnwatched'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['unwatched_topics_none'],
 			'base_href' => $scripturl . '?action=profile;area=showposts;sa=unwatchedtopics;u=' . $memID,
