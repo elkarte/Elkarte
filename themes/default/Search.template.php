@@ -40,7 +40,7 @@ function template_searchform()
 							<label for="search">
 								<strong>', $txt['search_for'], '</strong>
 							</label>:
-							<input type="search" id="search" class="input_text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' maxlength="', $context['search_string_limit'], '" size="40" placeholder="' . $txt['search'] . '" required="required" autofocus="autofocus" />', '
+							<input type="search" id="search" class="input_text" name="search" value="', $context['search_params']['search'], '" maxlength="', $context['search_string_limit'], '" size="40" placeholder="' . $txt['search'] . '" required="required" autofocus="autofocus" />', '
 							<input id="submit" type="submit" name="s_search" value="' . $txt['search'] . '" class="button_submit"/>
 						</div>';
 
@@ -77,7 +77,7 @@ function template_searchform()
 									<label for="userspec">', $txt['by_user'], ':</label>
 								</dt>
 								<dd>
-									<input id="userspec" type="text" name="userspec" value="', empty($context['search_params']['userspec']) ? '*' : $context['search_params']['userspec'], '" size="40" class="input_text" />
+									<input id="userspec" type="text" name="userspec" value="', $context['search_params']['userspec'], '" size="40" class="input_text" />
 								</dd>
 								<dt class="righttext">
 									<label for="sort">', $txt['search_order'], ':</label>
@@ -108,7 +108,7 @@ function template_searchform()
 									', $txt['search_post_age'], ':
 								</dt>
 								<dd><label for="minage">
-									', $txt['search_between'], '</label><input type="text" name="minage" id="minage" value="', empty($context['search_params']['minage']) ? '0' : $context['search_params']['minage'], '" size="5" maxlength="4" class="input_text" />&nbsp;<label for="maxage">', $txt['search_and'], '&nbsp;</label><input type="text" name="maxage" id="maxage" value="', empty($context['search_params']['maxage']) ? '9999' : $context['search_params']['maxage'], '" size="5" maxlength="4" class="input_text" /> ', $txt['days_word'], '
+									', $txt['search_between'], '</label><input type="text" name="minage" id="minage" value="', $context['search_params']['minage'], '" size="5" maxlength="4" class="input_text" />&nbsp;<label for="maxage">', $txt['search_and'], '&nbsp;</label><input type="text" name="maxage" id="maxage" value="', $context['search_params']['maxage'], '" size="5" maxlength="4" class="input_text" /> ', $txt['days_word'], '
 								</dd>
 							</dl>
 						</div>
@@ -320,18 +320,18 @@ function template_results()
 									<label for="search"><strong>', $txt['search_for'], ':</strong></label>
 								</dt>
 								<dd>
-									<input type="text" id="search" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' maxlength="', $context['search_string_limit'], '" size="40" class="input_text" />
+									<input type="text" id="search" name="search" value="', $context['search_params']['search'], '" maxlength="', $context['search_string_limit'], '" size="40" class="input_text" />
 								</dd>
 							</dl>
 							<div class="submitbutton" >
 								<input type="submit" name="edit_search" value="', $txt['search_adjust_submit'], '" class="button_submit" />
-								<input type="hidden" name="searchtype" value="', !empty($context['search_params']['searchtype']) ? $context['search_params']['searchtype'] : 0, '" />
-								<input type="hidden" name="userspec" value="', !empty($context['search_params']['userspec']) ? $context['search_params']['userspec'] : '', '" />
-								<input type="hidden" name="show_complete" value="', !empty($context['search_params']['show_complete']) ? 1 : 0, '" />
-								<input type="hidden" name="subject_only" value="', !empty($context['search_params']['subject_only']) ? 1 : 0, '" />
-								<input type="hidden" name="minage" value="', !empty($context['search_params']['minage']) ? $context['search_params']['minage'] : '0', '" />
-								<input type="hidden" name="maxage" value="', !empty($context['search_params']['maxage']) ? $context['search_params']['maxage'] : '9999', '" />
-								<input type="hidden" name="sort" value="', !empty($context['search_params']['sort']) ? $context['search_params']['sort'] : 'relevance', '" />
+								<input type="hidden" name="searchtype" value="', $context['search_params']['searchtype'], '" />
+								<input type="hidden" name="userspec" value="', $context['search_params']['userspec'], '" />
+								<input type="hidden" name="show_complete" value="', $context['search_params']['show_complete'], '" />
+								<input type="hidden" name="subject_only" value="', $context['search_params']['subject_only'], '" />
+								<input type="hidden" name="minage" value="', $context['search_params']['minage'], '" />
+								<input type="hidden" name="maxage" value="', $context['search_params']['maxage'], '" />
+								<input type="hidden" name="sort" value="', $context['search_params']['sort'], '" />
 							</div>';
 
 		if (!empty($context['search_params']['brd']))

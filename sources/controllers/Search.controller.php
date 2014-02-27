@@ -238,6 +238,7 @@ class Search_Controller extends Action_Controller
 		}
 
 		$context['page_title'] = $txt['set_parameters'];
+		$context['search_params'] = $this->_fill_default_search_params($context['search_params']);
 
 		call_integration_hook('integrate_search');
 	}
@@ -747,6 +748,12 @@ class Search_Controller extends Action_Controller
 			$context['search_params']['search'] = Util::htmlspecialchars($context['search_params']['search']);
 		if (isset($context['search_params']['userspec']))
 			$context['search_params']['userspec'] = Util::htmlspecialchars($context['search_params']['userspec']);
+		if (empty($context['search_params']['minage']))
+			$context['search_params']['minage'] = 0;
+		if (empty($context['search_params']['maxage']))
+			$context['search_params']['maxage'] = 9999;
+
+		$context['search_params'] = $this->_fill_default_search_params($context['search_params']);
 
 		// Do we have captcha enabled?
 		if ($user_info['is_guest'] && !empty($modSettings['search_enable_captcha']) && empty($_SESSION['ss_vv_passed']) && (empty($_SESSION['last_ss']) || $_SESSION['last_ss'] != $search_params['search']))
@@ -2059,6 +2066,38 @@ class Search_Controller extends Action_Controller
 				$this->_weight_total += $this->_weight[$weight_factor];
 			}
 		}
+	}
+
+	/**
+	 * Fills the empty spaces in an array with the default values for search params
+	 *
+	 * @param mixed[] $matches
+	 * @return mixed[] $matches
+	 */
+	private function _fill_default_search_params($array)
+	{
+		if (empty($array['search']))
+			$array['search'] = '';
+		if (empty($array['userspec']))
+			$array['userspec'] = '*';
+		if (empty($array['searchtype']))
+			$array['searchtype'] = 0;
+		if (!isset($array['show_complete']))
+			$array['show_complete'] = 0;
+		else
+			$array['show_complete'] = (int) $array['show_complete'];
+		if (!isset($array['subject_only']))
+			$array['subject_only'] = 0;
+		else
+			$array['subject_only'] = (int) $array['subject_only'];
+		if (empty($array['minage']))
+			$array['minage'] = 0;
+		if (empty($array['maxage']))
+			$array['maxage'] = 9999;
+		if (empty($array['sort']))
+			$array['sort'] = 'relevance';
+
+		return $array;
 	}
 
 	/**
