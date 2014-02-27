@@ -3604,10 +3604,10 @@ a.help .icon {
 .search_results_posts .quick_mod {
 	position: absolute;
 	right: 0px;
-	top: 30%;
+	top: 10%;
 }
 .search_results_posts .counter {
-	padding: 6px 25px;
+	padding: 6px 1.5em;
 }
 .compact_view .content {
 	overflow: auto;
