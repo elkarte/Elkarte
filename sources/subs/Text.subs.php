@@ -156,8 +156,7 @@ function parsesmileys(&$message)
 		}
 
 		$smileyPregSearch = '~(?<=[>:\?\.\s' . $non_breaking_space . '[\]()*\\\;]|^)(' . implode('|', $searchParts) . ')(?=[^[:alpha:]0-9]|$)~';
-		$callback = new ParseSmileysReplacement;
-		$callback->replacements = $smileyPregReplacements;
+		$callback = new ParseSmileysReplacement($smileyPregReplacements);
 	}
 
 	// Replace away!
@@ -172,6 +171,19 @@ function parsesmileys(&$message)
  */
 class ParseSmileysReplacement
 {
+	/**
+	 * @var array
+	 */
+	protected $replacements;
+
+	/**
+	 * @param array[] $replacements
+	 */
+	public function __construct(array $replacements)
+	{
+		$this->replacements = $replacements;
+	}
+
 	/**
 	 * Our callback that does the actual smiley replacments.
 	 *
