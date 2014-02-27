@@ -3595,6 +3595,35 @@ a.help .icon {
 .search_results_posts .buttons {
 	padding: 5px 12px 0 0;
 }
+.compact_view .topic_details {
+	border-bottom: 0px;
+}
+.search_results_posts .topic_details {
+	position: relative;
+}
+.search_results_posts .quick_mod {
+	position: absolute;
+	right: 0px;
+	top: 30%;
+}
+.search_results_posts .counter {
+	padding: 6px 25px;
+}
+.compact_view .content {
+	overflow: auto;
+}
+.compact_view .list_posts {
+	line-height: 2em;
+}
+#topicForm .pagesection,
+#topicForm .flow_auto {
+	display: inline-block;
+}
+#topicForm:after {
+	display: block;
+	clear: both;
+	content: "";
+}
 
 /* The memberlist. */
 #memberlist {
