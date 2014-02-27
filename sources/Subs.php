@@ -4192,17 +4192,18 @@ function removeScheduleTaskImmediate($task, $calculateNextTrigger = true)
 /**
  * Call a template
  * Should always be used to allow events
+ * This does not check if the function is callable. It will error if it isn't callable
  * 
- * @param string $name
+ * @throws \InvalidArgumentException if the first parameter is empty()
  */
-function template_call($name)
+function template_call()
 {
 	$args = func_get_args();
 	$name = array_shift($args);
 
-	if (empty($name))
+	if (empty($name) || !is_string($name))
 	{
-		throw new InvalidArgumentException('$name cannot be empty');
+		throw new \InvalidArgumentException('$name cannot be empty');
 	}
 
 	$hook = 'integrate_' . $name;
