@@ -3,8 +3,9 @@ require_once(BOARDDIR . '/sources/database/Db.php');
 require_once(BOARDDIR . '/sources/Errors.php');
 require_once(BOARDDIR . '/sources/subs/Cache.subs.php');
 require_once(BOARDDIR . '/sources/database/Database.subs.php');
+require_oNCE(SUBSDIR . '/Text.subs.php');
 
-Class Elk_Testing_Setup
+class Elk_Testing_Setup
 {
 	protected $_db;
 	protected $_queries_parts;
