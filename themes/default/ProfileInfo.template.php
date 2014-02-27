@@ -192,11 +192,11 @@ function template_action_showPosts()
 		}
 	}
 
-	echo '
-		</div>';
-
 	// Show more page numbers.
 	template_pagesection();
+
+	echo '
+		</div>';
 }
 
 /**

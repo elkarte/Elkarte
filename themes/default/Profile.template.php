@@ -96,11 +96,11 @@ function template_showDrafts()
 		}
 	}
 
-	echo '
-		</div>';
-
 	// Show page numbers.
 	template_pagesection();
+
+	echo '
+		</div>';
 }
 
 /**
