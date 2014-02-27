@@ -1827,9 +1827,11 @@ class Search_Controller extends Action_Controller
 			'posted_in' => !empty($participants[$message['id_topic']]),
 			'views' => $message['num_views'],
 			'replies' => $message['num_replies'],
-			'can_reply' => in_array($message['id_board'], $boards_can['post_reply_any']) || in_array(0, $boards_can['post_reply_any']),
-			'can_quote' => (in_array($message['id_board'], $boards_can['post_reply_any']) || in_array(0, $boards_can['post_reply_any'])) && $quote_enabled,
-			'can_mark_notify' => in_array($message['id_board'], $boards_can['mark_any_notify']) || in_array(0, $boards_can['mark_any_notify']) && !$context['user']['is_guest'],
+			'tests' => array(
+				'can_reply' => in_array($message['id_board'], $boards_can['post_reply_any']) || in_array(0, $boards_can['post_reply_any']),
+				'can_quote' => (in_array($message['id_board'], $boards_can['post_reply_any']) || in_array(0, $boards_can['post_reply_any'])) && $quote_enabled,
+				'can_mark_notify' => in_array($message['id_board'], $boards_can['mark_any_notify']) || in_array(0, $boards_can['mark_any_notify']) && !$context['user']['is_guest'],
+			),
 			'first_post' => array(
 				'id' => $message['first_msg'],
 				'time' => standardTime($message['first_poster_time']),
@@ -1943,6 +1945,30 @@ class Search_Controller extends Action_Controller
 			'start' => 'msg' . $message['id_msg']
 		);
 		$counter++;
+
+		if (!$context['compact'])
+		{
+			$output['buttons'] = array(
+				// Can we request notification of topics?
+				'notify' => array(
+					'href' => $scripturl . '?action=notify;topic=' . $output['id'] . '.' . 'msg' . $message['id_msg'],
+					'text' => $txt['notify'],
+					'test' => 'can_mark_notify',
+				),
+				// If they *can* reply?
+				'reply' => array(
+					'href' => $scripturl . '?action=post;topic=' . $output['id'] . '.msg' . $message['id_msg'],
+					'text' => $txt['reply'],
+					'test' => 'can_reply',
+				),
+				// If they *can* quote?
+				'quote' => array(
+					'href' => $scripturl . '?action=post;topic=' . $output['id'] . '.msg' . $message['id_msg'] . ';quote=' . $message['id_msg'],
+					'text' => $txt['quote'],
+					'test' => 'can_quote',
+				),
+			);
+		}
 
 		call_integration_hook('integrate_search_message_context', array($counter, &$output));
 

@@ -454,31 +454,8 @@ function template_results()
 				echo '
 							<div class="list_posts">', $message['body_highlighted'], '</div>';
 
-			if (!$context['compact'])
-			{
-				if ($topic['can_reply'] || $topic['can_mark_notify'])
-					echo '
-							<ul class="quickbuttons">';
-
-				// Can we request notification of topics?
-				if ($topic['can_mark_notify'])
-					echo '
-								<li class="listlevel1"><a href="', $scripturl . '?action=notify;topic=' . $topic['id'] . '.' . $message['start'], '" class="linklevel1 notify_button">', $txt['notify'], '</a></li>';
-
-				// If they *can* reply?
-				if ($topic['can_reply'])
-					echo '
-								<li class="listlevel1"><a href="', $scripturl . '?action=post;topic=' . $topic['id'] . '.' . $message['start'], '" class="linklevel1 reply_button">', $txt['reply'], '</a></li>';
-
-				// If they *can* quote?
-				if ($topic['can_quote'])
-					echo '
-								<li class="listlevel1"><a href="', $scripturl . '?action=post;topic=' . $topic['id'] . '.' . $message['start'] . ';quote=' . $message['id'] . '" class="linklevel1 quote_button">', $txt['quote'], '</a></li>';
-
-				if ($topic['can_reply'] || $topic['can_mark_notify'])
-				echo '
-							</ul>';
-			}
+			if (!empty($topic['buttons']))
+				template_quickbutton_strip($topic['buttons'], $topic['tests']);
 
 		echo '
 						</div>
