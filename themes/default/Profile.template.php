@@ -80,6 +80,7 @@ function template_showDrafts()
 				$draft['title'] .= '<img src="' . $settings['images_url'] . '/icons/quick_lock.png" alt="' . $txt['locked_topic'] . '" title="' . $txt['locked_topic'] . '" />';
 
 			$draft['date'] = '&#171;&nbsp;<strong>' . $txt['draft_saved_on'] . ':</strong> ' . ($draft['age'] > 0 ? sprintf($txt['draft_days_ago'], $draft['age']) : $draft['time']) . (!empty($draft['remaining']) ? ', ' . sprintf($txt['draft_retain'], $draft['remaining']) : '') . '&#187;';
+			$draft['class'] = $draft['alternate'] === 0 ? 'windowbg2' : 'windowbg';
 
 			template_simple_message($draft);
 		}

@@ -142,6 +142,7 @@ function template_action_showPosts()
 		{
 			$post['title'] = '<strong>' . $post['board']['link'] . ' / ' . $post['topic']['link'] . '</strong>';
 			$post['date'] = $post['html_time'];
+			$post['class'] = $post['alternate'] === 0 ? 'windowbg2' : 'windowbg';
 
 			if (!$post['approved'])
 				$post['body'] = '

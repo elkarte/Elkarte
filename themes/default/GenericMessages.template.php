@@ -264,7 +264,7 @@ function template_simple_message($msg)
 	global $context, $settings, $txt;
 
 	echo '
-			<div class="', $msg['alternate'] === 0 ? 'windowbg2' : 'windowbg', ' core_posts">
+			<div class="', $msg['class'], ' core_posts">
 				<div class="content">
 					<div class="counter">', $msg['counter'], '</div>
 					<div class="topic_details">
