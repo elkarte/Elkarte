@@ -546,75 +546,8 @@ function template_browse()
 		echo '
 		<div class="information">', $context['sub_action'] == 'browse' ? $txt['no_packages'] : $txt['no_adds_installed'], '</div>';
 
-	// the advanced (emulation) box, collapsed by default
 	echo '
-		<form class="generic_list_wrapper" action="', $scripturl, '?action=admin;area=packages;sa=', $context['sub_action'], '" method="get">
-			<h3 class="category_header">
-				<span id="category_toggle">&nbsp;
-					<span id="upshrink_ic" class="', empty($context['admin_preferences']['pkg']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
-				</span>
-				<a href="#" id="advanced_panel_link">', $txt['package_advanced_button'], '</a>
-			</h3>
-			<div id="advanced_panel_div" class="windowbg"', !empty($context['admin_preferences']['pkg']) ? ' style="display: none;"' : '', '>
-				<div class="content">
-					<p>
-						', $txt['package_emulate_desc'], '
-					</p>
-					<dl class="settings">
-						<dt>
-							<strong><label for="ve">', $txt['package_emulate'], '</label>:</strong><br />
-							<span class="smalltext">
-								<a href="#" onclick="document.getElementById(\'ve\').value = \'', $forum_version, '\';document.getElementsByName(\'version_emulate\')[0].value = \'', $forum_version, '\';return false">', $txt['package_emulate_revert'], '</a>
-							</span>
-						</dt>
-						<dd>
-							<input type="text" name="version_emulate" id="ve" value="', $context['forum_version'], '" size="25" class="input_text" />
-						</dd>
-					</dl>
-					<input type="submit" value="', $txt['package_apply'], '" class="right_submit" />
-				</div>
-			</div>
-			<input type="hidden" name="action" value="admin" />
-			<input type="hidden" name="area" value="packages" />
-			<input type="hidden" name="sa" value="', $context['sub_action'], '" />
-		</form>';
-
-	echo '
-	</div>
-
-	<script><!-- // --><![CDATA[
-		var oAdvancedPanelToggle = new elk_Toggle({
-			bToggleEnabled: true,
-			bCurrentlyCollapsed: ', empty($context['admin_preferences']['pkg']) ? 'false' : 'true', ',
-			aSwappableContainers: [
-				\'advanced_panel_div\'
-			],
-			aSwapClasses: [
-				{
-					sId: \'upshrink_ic\',
-					classExpanded: \'collapse\',
-					titleExpanded: ', JavaScriptEscape($txt['hide']), ',
-					classCollapsed: \'expand\',
-					titleCollapsed: ', JavaScriptEscape($txt['show']), '
-				}
-			],
-			aSwapLinks: [
-				{
-					sId: \'advanced_panel_link\',
-					msgExpanded: ', JavaScriptEscape($txt['package_advanced_button']), ',
-					msgCollapsed: ', JavaScriptEscape($txt['package_advanced_button']), '
-				}
-			],
-			oThemeOptions: {
-				bUseThemeSettings: true,
-				sOptionName: \'admin_preferences\',
-				sSessionId: elk_session_id,
-				sSessionVar: elk_session_var,
-				sThemeId: \'1\',
-				sAdditionalVars: \';admin_key=pkg\'
-			},
-		});
-	// ]]></script>';
+	</div>';
 }
 
 /**

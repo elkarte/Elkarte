@@ -46,17 +46,18 @@ function template_showDrafts()
 	global $context, $settings, $scripturl, $txt;
 
 	echo '
-		<h3 class="category_header">
-			', $txt['drafts'], ' - ', $context['member']['name'], '
-		</h3>',
+		<div id="profilecenter">
+			<h2 class="category_header">
+				', $txt['drafts'], $context['user']['is_owner'] ? '' : ' - ' . $context['member']['name'], '
+			</h2>';
 	template_pagesection();
 
 	// No drafts? Just show an informative message.
 	if (empty($context['drafts']))
 		echo '
-		<div class="information centertext">
-			', $txt['draft_none'], '
-		</div>';
+			<div class="information centertext">
+				', $txt['draft_none'], '
+			</div>';
 	else
 	{
 		// For every draft to be displayed, give it its own div, and show the important details of the draft.
@@ -67,7 +68,7 @@ function template_showDrafts()
 				<div class="content">
 					<div class="counter">', $draft['counter'], '</div>
 					<div class="topic_details">
-						<h5><strong><a href="', $scripturl, '?board=', $draft['board']['id'], '.0">', $draft['board']['name'], '</a> / ', $draft['topic']['link'], '</strong>&nbsp;&nbsp;';
+						<h5><strong>', $draft['board']['link'], ' / ', $draft['topic']['link'], '</strong>&nbsp;&nbsp;';
 
 			if (!empty($draft['sticky']))
 				echo '<img src="', $settings['images_url'], '/icons/quick_sticky.png" alt="', $txt['sticky_topic'], '" title="', $txt['sticky_topic'], '" />';
@@ -79,7 +80,7 @@ function template_showDrafts()
 						</h5>
 						<span class="smalltext">&#171;&nbsp;<strong>', $txt['draft_saved_on'], ':</strong> ', ($draft['age'] > 0 ? sprintf($txt['draft_days_ago'], $draft['age']) : $draft['time']), (!empty($draft['remaining']) ? ', ' . sprintf($txt['draft_retain'], $draft['remaining']) : ''), '&#187;</span>
 					</div>
-					<div class="list_posts">
+					<div class="inner">
 						', $draft['body'], '
 					</div>
 					<ul class="quickbuttons">
@@ -97,6 +98,9 @@ function template_showDrafts()
 
 	// Show page numbers.
 	template_pagesection();
+
+	echo '
+		</div>';
 }
 
 /**
