@@ -1170,7 +1170,7 @@ class ManageMembers_Controller extends Action_Controller
 
 		// Update the member's stats. (but, we know the member didn't change their name.)
 		require_once(SUBSDIR . '/Members.subs.php');
-		updateMemberStats(false);
+		updateMemberStats();
 
 		// If they haven't been deleted, update the post group statistics on them...
 		if (!in_array($_POST['todo'], array('delete', 'deleteemail', 'reject', 'rejectemail', 'remind')))

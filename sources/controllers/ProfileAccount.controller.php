@@ -547,7 +547,7 @@ class ProfileAccount_Controller extends Action_Controller
 
 			// Make sure we update the stats too.
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberStats(false);
+			updateMemberStats();
 		}
 
 		// Leave it be...

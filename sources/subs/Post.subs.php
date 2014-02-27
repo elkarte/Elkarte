@@ -1058,7 +1058,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		if ($db->num_rows($request) == 1)
 		{
 			require_once(SUBSDIR . '/Messages.subs.php');
-			updateSubjectStats('subject', $topicOptions['id'], $msgOptions['subject']);
+			updateSubjectStats($topicOptions['id'], $msgOptions['subject']);
 		}
 		$db->free_result($request);
 	}
