@@ -349,13 +349,13 @@ function template_results()
 	// Quick moderation set to checkboxes? Oh, how fun :/.
 	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
 		echo '
-			<form action="', $scripturl, '?action=quickmod" method="post" accept-charset="UTF-8" name="topicForm" id="topicForm"', $context['compact'] ? ' class="compact_view"' : '', '>';
+			<form action="', $scripturl, '?action=quickmod" method="post" accept-charset="UTF-8" name="topicForm" id="topicForm" class="search_results_posts', $context['compact'] ? ' compact_view' : '', '">';
 	elseif ($context['compact'])
 		echo '
-			<div id="topicForm" class="compact_view">';
+			<div id="topicForm" class="compact_view search_results_posts">';
 	else
 		echo '
-			<div id="topicForm">';
+			<div id="topicForm" class="search_results_posts">';
 
 	echo '
 				<h3 class="category_header hdicon cat_img_search">
@@ -401,65 +401,60 @@ function template_results()
 
 		foreach ($topic['matches'] as $message)
 		{
-			// @todo - Clean this up a bit. Too much crud.
 			echo '
-				<div class="search_results_posts">
-					<div class="', $color_class, ' core_posts">
-						<div class="content">
-							<div class="topic_details">
-								<div class="counter">', $message['counter'], '</div>
-								<h5>', $topic['board']['link'], ' / <a href="', $scripturl, '?topic=', $topic['id'], '.msg', $message['id'], '#msg', $message['id'], '">', $message['subject_highlighted'], '</a></h5>
-								<span class="smalltext">&#171;&nbsp;', $txt['by'], '&nbsp;<strong>', $message['member']['link'], '</strong> ', $txt['on'], '&nbsp;<em>', $message['time'], '</em>&nbsp;&#187;</span>';
+				<div class="', $color_class, ' core_posts">
+					<div class="topic_details">
+						<div class="counter">', $message['counter'], '</div>
+						<h5>', $topic['board']['link'], ' / <a href="', $scripturl, '?topic=', $topic['id'], '.msg', $message['id'], '#msg', $message['id'], '">', $message['subject_highlighted'], '</a></h5>
+						<span class="smalltext">&#171;&nbsp;', $txt['by'], '&nbsp;<strong>', $message['member']['link'], '</strong> ', $txt['on'], '&nbsp;<em>', $message['time'], '</em>&nbsp;&#187;</span>';
 
 			if (!empty($options['display_quick_mod']))
 			{
 				echo '
-							<div class="quick_mod">';
+						<div class="quick_mod">';
 
 				if ($options['display_quick_mod'] == 1)
 				{
 					echo '
-								<input type="checkbox" name="topics[]" value="', $topic['id'], '" class="input_check" />';
+							<input type="checkbox" name="topics[]" value="', $topic['id'], '" class="input_check" />';
 				}
 				else
 				{
 					if ($topic['quick_mod']['remove'])
 						echo '
-								<a href="', $scripturl, '?action=quickmod;actions[', $topic['id'], ']=remove;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');"><img src="', $settings['images_url'], '/icons/quick_remove.png" style="width:16px" alt="', $txt['remove_topic'], '" title="', $txt['remove_topic'], '" /></a>';
+							<a href="', $scripturl, '?action=quickmod;actions[', $topic['id'], ']=remove;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');"><img src="', $settings['images_url'], '/icons/quick_remove.png" style="width:16px" alt="', $txt['remove_topic'], '" title="', $txt['remove_topic'], '" /></a>';
 
 					if ($topic['quick_mod']['lock'])
 						echo '
-								<a href="', $scripturl, '?action=quickmod;actions[', $topic['id'], ']=lock;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');"><img src="', $settings['images_url'], '/icons/quick_lock.png" style="width:16px" alt="', $txt['set_lock'], '" title="', $txt['set_lock'], '" /></a>';
+							<a href="', $scripturl, '?action=quickmod;actions[', $topic['id'], ']=lock;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');"><img src="', $settings['images_url'], '/icons/quick_lock.png" style="width:16px" alt="', $txt['set_lock'], '" title="', $txt['set_lock'], '" /></a>';
 
 					if ($topic['quick_mod']['lock'] || $topic['quick_mod']['remove'])
 						echo '
-								<br />';
+							<br />';
 
 					if ($topic['quick_mod']['sticky'])
 						echo '
-								<a href="', $scripturl, '?action=quickmod;actions[', $topic['id'], ']=sticky;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');"><img src="', $settings['images_url'], '/icons/quick_sticky.png" style="width:16px" alt="', $txt['set_sticky'], '" title="', $txt['set_sticky'], '" /></a>';
+							<a href="', $scripturl, '?action=quickmod;actions[', $topic['id'], ']=sticky;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');"><img src="', $settings['images_url'], '/icons/quick_sticky.png" style="width:16px" alt="', $txt['set_sticky'], '" title="', $txt['set_sticky'], '" /></a>';
 
 					if ($topic['quick_mod']['move'])
 						echo '
-								<a href="', $scripturl, '?action=movetopic;topic=', $topic['id'], '.0"><img src="', $settings['images_url'], '/icons/quick_move.png" style="width:16px" alt="', $txt['move_topic'], '" title="', $txt['move_topic'], '" /></a>';
+							<a href="', $scripturl, '?action=movetopic;topic=', $topic['id'], '.0"><img src="', $settings['images_url'], '/icons/quick_move.png" style="width:16px" alt="', $txt['move_topic'], '" title="', $txt['move_topic'], '" /></a>';
 				}
 
 				echo '
-							</div>';
+						</div>';
 			}
 			echo '
-						</div>';
+					</div>';
 
 			if (!$context['compact'] || $message['body_highlighted'] != '')
 				echo '
-							<div class="list_posts">', $message['body_highlighted'], '</div>';
+					<div class="topic_body">', $message['body_highlighted'], '</div>';
 
 			if (!empty($topic['buttons']))
 				template_quickbutton_strip($topic['buttons'], $topic['tests']);
 
 		echo '
-						</div>
-					</div>
 				</div>';
 		}
 	}

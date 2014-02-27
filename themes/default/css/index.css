@@ -3600,6 +3600,17 @@ a.help .icon {
 }
 .search_results_posts .topic_details {
 	position: relative;
+	margin: 0.2em 1em 0px;
+}
+.search_results_posts .quickbuttons {
+	margin-left: 1em;
+	margin-right: 1em;
+}
+.search_results_posts .topic_body {
+	border-top: 1px solid #CCCCCC;
+	box-shadow: 0px 1px 0px #FFFFFF inset;
+	margin: 0px 1em 0px;
+	padding-top: 12px;
 }
 .search_results_posts .quick_mod {
 	position: absolute;
