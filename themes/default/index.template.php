@@ -599,6 +599,36 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 }
 
 /**
+ * Generate a strip of "quick" buttons (those present next to each message)
+ *
+ * @param string $strip_id, the $context index where the strip is stored
+ */
+function template_quickbutton_strip($strip, $tests = array())
+{
+	global $context;
+
+	$buttons = array();
+
+	foreach ($strip as $key => $value)
+	{
+		if (!isset($value['test']) || !empty($tests[$value['test']]))
+			$buttons[] = '
+						<li class="listlevel1">
+							<a href="' . $value['href'] . '" class="linklevel1 ' . $key . '_button"' . (isset($value['custom']) ? ' ' . $value['custom'] : '') . '>' . $value['text'] . '</a>
+						</li>';
+	}
+
+	// No buttons? No button strip either.
+	if (empty($buttons))
+		return;
+
+	echo '
+					<ul class="quickbuttons">', implode('
+						', $buttons), '
+					</ul>';
+}
+
+/**
  * Show a box with a message, mostly used to show errors, but can be used to show
  * sucess as well
  *
