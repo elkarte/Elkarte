@@ -719,7 +719,7 @@ class Register_Controller extends Action_Controller
 
 		// Also do a proper member stat re-evaluation.
 		require_once(SUBSDIR . '/Members.subs.php');
-		updateMemberStats(false);
+		updateMemberStats();
 
 		if (!isset($_POST['new_email']))
 		{
