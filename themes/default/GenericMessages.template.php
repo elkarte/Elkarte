@@ -278,7 +278,7 @@ function template_simple_message($msg)
 					</div>';
 
 	if (!empty($msg['buttons']))
-		template_quickbutton_strip($msg['buttons'], $msg['tests']);
+		template_quickbutton_strip($msg['buttons'], !empty($msg['tests']) ? $msg['tests'] : array());
 
 	echo '
 				</div>
