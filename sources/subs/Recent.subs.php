@@ -295,3 +295,68 @@ function earliest_msg()
 
 	return $earliest_msg;
 }
+
+function recent_log_topics_unread_tempTable($query_parameters, $query_this_board, $earliest_msg)
+{
+	global $modSettings, $user_info;
+
+	$db = database();
+
+	$db->query('', '
+		DROP TABLE IF EXISTS {db_prefix}log_topics_unread',
+		array(
+		)
+	);
+
+	// Let's copy things out of the log_topics table, to reduce searching.
+	return $db->query('', '
+		CREATE TEMPORARY TABLE {db_prefix}log_topics_unread (
+			PRIMARY KEY (id_topic)
+		)
+		SELECT lt.id_topic, lt.id_msg, lt.unwatched
+		FROM {db_prefix}topics AS t
+			INNER JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic)
+		WHERE lt.id_member = {int:current_member}
+			AND t.' . $query_this_board . (empty($earliest_msg) ? '' : '
+			AND t.id_last_msg > {int:earliest_msg}') . ($modSettings['postmod_active'] ? '
+			AND t.approved = {int:is_approved}' : '') . ($modSettings['enable_unwatch'] ? '
+			AND lt.unwatched != 1' : ''),
+		array_merge($query_parameters, array(
+			'current_member' => $user_info['id'],
+			'earliest_msg' => !empty($earliest_msg) ? $earliest_msg : 0,
+			'is_approved' => 1,
+			'db_error_skip' => true,
+		))
+	) !== false;
+}
+
+function countRecentTopics($query_parameters, $showing_all_topics, $have_temp_table, $is_first_login, $earliest_msg, $query_this_board, $id_msg_last_visit = 0)
+{
+	global $modSettings, $user_info;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT COUNT(*), MIN(t.id_last_msg)
+		FROM {db_prefix}topics AS t' . (!empty($have_temp_table) ? '
+			LEFT JOIN {db_prefix}log_topics_unread AS lt ON (lt.id_topic = t.id_topic)' : '
+			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})') . '
+			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
+		WHERE t.' . $query_this_board . ($showing_all_topics && !empty($earliest_msg) ? '
+			AND t.id_last_msg > {int:earliest_msg}' : (!$showing_all_topics && $is_first_login ? '
+			AND t.id_last_msg > {int:id_msg_last_visit}' : '')) . '
+			AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' .
+			($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
+			($modSettings['enable_unwatch'] ? ' AND IFNULL(lt.unwatched, 0) != 1' : ''),
+		array_merge($query_parameters, array(
+			'current_member' => $user_info['id'],
+			'earliest_msg' => !empty($earliest_msg) ? $earliest_msg : 0,
+			'id_msg_last_visit' => $id_msg_last_visit,
+			'is_approved' => 1,
+		))
+	);
+	list ($num_topics, $min_message) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return array($num_topics, $min_message);
+}
