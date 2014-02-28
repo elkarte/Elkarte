@@ -3900,7 +3900,7 @@ a.help .icon {
 		min-width: 15em;
 	}
 	.board_latest {
-		min-width: 20em;
+		min-width: 22em;
 		width: 40%;
 	}
 	.lastpost_link {
@@ -3957,7 +3957,7 @@ a.help .icon {
 		text-overflow: ellipsis;
 	}
 	.board_latest {
-		min-width: 20em;
+		min-width: 22em;
 	}
 	.board_row {
 		min-width: 20em;
