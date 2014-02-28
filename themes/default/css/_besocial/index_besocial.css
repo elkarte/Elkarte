@@ -950,6 +950,9 @@ span.views_text {
 .windowbg2 {
 	background-color: #fcfcfc;
 }
+.approvebg {
+	background-color: #fff5cd;
+}
 .board_stats {
 	text-align: left;
 	padding: 1px  6px 1px 0;
