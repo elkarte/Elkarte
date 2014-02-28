@@ -245,19 +245,48 @@ class Recent_Controller extends Action_Controller
 					// Okay, looks like they can do it for these posts.
 					foreach ($board_ids[$type][$board_id] as $counter)
 						if ($type == 'any' || $context['posts'][$counter]['poster']['id'] == $user_info['id'])
-							$context['posts'][$counter][$allowed] = true;
+							$context['posts'][$counter]['tests'][$allowed] = true;
 				}
 			}
 		}
 
 		$quote_enabled = empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC']));
-		foreach ($context['posts'] as $counter => $dummy)
+		foreach ($context['posts'] as $counter => $post)
 		{
 			// Some posts - the first posts - can't just be deleted.
-			$context['posts'][$counter]['can_delete'] &= $context['posts'][$counter]['delete_possible'];
+			$context['posts'][$counter]['tests']['can_delete'] &= $context['posts'][$counter]['delete_possible'];
 
 			// And some cannot be quoted...
-			$context['posts'][$counter]['can_quote'] = $context['posts'][$counter]['can_reply'] && $quote_enabled;
+			$context['posts'][$counter]['tests']['can_quote'] = $context['posts'][$counter]['tests']['can_reply'] && $quote_enabled;
+
+			// Let's add some buttons here!
+			$context['posts'][$counter]['buttons'] = array(
+				// How about... even... remove it entirely?!
+				'remove' => array(
+					'href' => $scripturl . '?action=deletemsg;msg=' . $post['id'] . ';topic=' . $post['topic'] . ';recent;' . $context['session_var'] . '=' . $context['session_id'],
+					'text' => $txt['remove'],
+					'test' => 'can_delete',
+					'custom' => 'onclick="return confirm(' . JavaScriptEscape($txt['remove_message'] . '?') . ');"',
+				),
+				// Can we request notification of topics?
+				'notify' => array(
+					'href' => $scripturl . '?action=notify;topic=' . $post['topic'] . '.' . $post['start'],
+					'text' => $txt['notify'],
+					'test' => 'can_mark_notify',
+				),
+				// If they *can* reply?
+				'reply' => array(
+					'href' => $scripturl . '?action=post;topic=' . $post['topic'] . '.' . $post['start'],
+					'text' => $txt['reply'],
+					'test' => 'can_reply',
+				),
+				// If they *can* quote?
+				'quote' => array(
+					'href' => $scripturl . '?action=post;topic=' . $post['topic'] . '.' . $post['start'] . ';quote=' . $post['id'],
+					'text' => $txt['quote'],
+					'test' => 'can_quote',
+				),
+			);
 		}
 	}
 

@@ -16,6 +16,14 @@
  */
 
 /**
+ * We need some help to proprerly display things
+ */
+function template_Recent_init()
+{
+	loadTemplate('GenericMessages');
+}
+
+/**
  * Recent posts page.
  */
 function template_recent()
@@ -31,47 +39,11 @@ function template_recent()
 	// @todo - I'm sure markup could be cleaned up a bit more here. CSS needs a bit of a tweak too.
 	foreach ($context['posts'] as $post)
 	{
-		echo '
-			<div class="', $post['alternate'] == 0 ? 'windowbg' : 'windowbg2', ' core_posts">
-				<div class="content">
-					<div class="counter">', $post['counter'], '</div>
-					<div class="topic_details">
-						<h5>', $post['board']['link'], ' / ', $post['link'], '</h5>
-						<span class="smalltext">', $txt['last_post'], ' ', $txt['by'], ' <strong>', $post['poster']['link'], ' </strong> - ', $post['html_time'], '</span>
-					</div>
-					<div class="inner">', $post['message'], '</div>';
+		$post['class'] = $post['alternate'] == 0 ? 'windowbg' : 'windowbg2';
+		$post['title'] = $post['board']['link'] . ' / ' . $post['link'];
+		$post['date'] = $txt['last_post'] . ' ' . $txt['by'] . ' <strong>' . $post['poster']['link'] . ' </strong> - ' . $post['html_time'];
 
-		if ($post['can_reply'] || $post['can_mark_notify'] || $post['can_delete'])
-			echo '
-					<ul class="quickbuttons">';
-
-		// How about... even... remove it entirely?!
-		if ($post['can_delete'])
-			echo '
-						<li class="listlevel1"><a href="', $scripturl, '?action=deletemsg;msg=', $post['id'], ';topic=', $post['topic'], ';recent;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['remove_message'], '?\');" class="linklevel1 remove_button">', $txt['remove'], '</a></li>';
-
-		// Can we request notification of topics?
-		if ($post['can_mark_notify'])
-			echo '
-						<li class="listlevel1"><a href="', $scripturl, '?action=notify;topic=', $post['topic'], '.', $post['start'], '" class="linklevel1 notify_button">', $txt['notify'], '</a></li>';
-
-		// If they *can* reply?
-		if ($post['can_reply'])
-			echo '
-						<li class="listlevel1"><a href="', $scripturl, '?action=post;topic=', $post['topic'], '.', $post['start'], '" class="linklevel1 reply_button">', $txt['reply'], '</a></li>';
-
-		// If they *can* quote?
-		if ($post['can_quote'])
-			echo '
-						<li class="listlevel1"><a href="', $scripturl, '?action=post;topic=', $post['topic'], '.', $post['start'], ';quote=', $post['id'], '" class="linklevel1 quote_button">', $txt['quote'], '</a></li>';
-
-		if ($post['can_reply'] || $post['can_mark_notify'] || $post['can_delete'])
-			echo '
-					</ul>';
-
-		echo '
-				</div>
-			</div>';
+		template_simple_message($post);
 	}
 
 	echo '
