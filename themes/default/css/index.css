@@ -3607,8 +3607,6 @@ a.help .icon {
 	margin-right: 1em;
 }
 .search_results_posts .topic_body {
-	border-top: 1px solid #CCCCCC;
-	box-shadow: 0px 1px 0px #FFFFFF inset;
 	margin: 0px 1em 0px;
 	padding-top: 12px;
 }
