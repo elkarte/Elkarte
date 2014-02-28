@@ -632,3 +632,75 @@ function getUnreadReplies($query_parameters, $select_clause, $query_this_board, 
 
 	return processUnreadQuery($request);
 }
+
+function unreadreplies_tempTable($board_id, $sort)
+{
+	global $modSettings, $user_info;
+
+	$db = database();
+
+	$db->query('', '
+		DROP TABLE IF EXISTS {db_prefix}topics_posted_in',
+		array(
+		)
+	);
+
+	$db->query('', '
+		DROP TABLE IF EXISTS {db_prefix}log_topics_posted_in',
+		array(
+		)
+	);
+
+	$sortKey_joins = array(
+		'ms.subject' => '
+			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)',
+		'IFNULL(mems.real_name, ms.poster_name)' => '
+			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)
+			LEFT JOIN {db_prefix}members AS mems ON (mems.id_member = ms.id_member)',
+	);
+
+	// The main benefit of this temporary table is not that it's faster; it's that it avoids locks later.
+	$have_temp_table = $db->query('', '
+		CREATE TEMPORARY TABLE {db_prefix}topics_posted_in (
+			id_topic mediumint(8) unsigned NOT NULL default {string:string_zero},
+			id_board smallint(5) unsigned NOT NULL default {string:string_zero},
+			id_last_msg int(10) unsigned NOT NULL default {string:string_zero},
+			id_msg int(10) unsigned NOT NULL default {string:string_zero},
+			PRIMARY KEY (id_topic)
+		)
+		SELECT t.id_topic, t.id_board, t.id_last_msg, IFNULL(lmr.id_msg, 0) AS id_msg' . (!in_array($sort, array('t.id_last_msg', 't.id_topic')) ? ', ' . $sort . ' AS sort_key' : '') . '
+		FROM {db_prefix}messages AS m
+			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
+			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})' . (isset($sortKey_joins[$sort]) ? $sortKey_joins[$sort] : '') . '
+		WHERE m.id_member = {int:current_member}' . (!empty($board_id) ? '
+			AND t.id_board = {int:current_board}' : '') .
+			($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
+			($modSettings['enable_unwatch'] ? ' AND IFNULL(lt.unwatched, 0) != 1' : '') . '
+		GROUP BY m.id_topic',
+		array(
+			'current_board' => $board_id,
+			'current_member' => $user_info['id'],
+			'is_approved' => 1,
+			'string_zero' => '0',
+			'db_error_skip' => true,
+		)
+	) !== false;
+
+	// If that worked, create a sample of the log_topics table too.
+	if ($have_temp_table)
+		$have_temp_table = $db->query('', '
+			CREATE TEMPORARY TABLE {db_prefix}log_topics_posted_in (
+				PRIMARY KEY (id_topic)
+			)
+			SELECT lt.id_topic, lt.id_msg
+			FROM {db_prefix}log_topics AS lt
+				INNER JOIN {db_prefix}topics_posted_in AS pi ON (pi.id_topic = lt.id_topic)
+			WHERE lt.id_member = {int:current_member}',
+			array(
+				'current_member' => $user_info['id'],
+				'db_error_skip' => true,
+			)
+		) !== false;
+
+	return $have_temp_table;
+}
