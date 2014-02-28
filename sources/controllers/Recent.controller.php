@@ -317,10 +317,7 @@ class Recent_Controller extends Action_Controller
 	 */
 	public function action_unread()
 	{
-		global $board, $scripturl;
-		global $user_info, $context, $modSettings;
-
-		$db = database();
+		global $board, $scripturl, $context, $modSettings;
 
 		$this->_entering_unread();
 
@@ -369,32 +366,7 @@ class Recent_Controller extends Action_Controller
 			else
 				$min_message = (int) $min_message;
 
-			$request = $db->query('substring', '
-				SELECT ' . $this->_select_clause . '
-				FROM {db_prefix}messages AS ms
-					INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ms.id_topic AND t.id_first_msg = ms.id_msg)
-					INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
-					LEFT JOIN {db_prefix}boards AS b ON (b.id_board = ms.id_board)
-					LEFT JOIN {db_prefix}members AS mems ON (mems.id_member = ms.id_member)
-					LEFT JOIN {db_prefix}members AS meml ON (meml.id_member = ml.id_member)
-					LEFT JOIN {db_prefix}log_topics_unread AS lt ON (lt.id_topic = t.id_topic)
-					LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
-				WHERE b.' . $this->_query_this_board . '
-					AND t.id_last_msg >= {int:min_message}
-					AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' .
-					($modSettings['postmod_active'] ? ' AND ms.approved = {int:is_approved}' : '') .
-					($modSettings['enable_unwatch'] ? ' AND IFNULL(lt.unwatched, 0) != 1' : '') . '
-				ORDER BY {raw:sort}
-				LIMIT {int:offset}, {int:limit}',
-				array_merge($this->_query_parameters, array(
-					'current_member' => $user_info['id'],
-					'min_message' => $min_message,
-					'is_approved' => 1,
-					'sort' => $this->_sort_query . ($this->_ascending ? '' : ' DESC'),
-					'offset' => $_REQUEST['start'],
-					'limit' => $context['topics_per_page'],
-				))
-			);
+			$context['topics'] = getUnreadTopics($this->_query_parameters, $this->_select_clause, 'message', $this->_query_this_board, $this->_have_temp_table, $min_message, $this->_sort_query, $this->_ascending, $_REQUEST['start'], $context['topics_per_page']);
 		}
 		// New posts with or without temp table
 		elseif ($this->_is_topics)
@@ -435,36 +407,13 @@ class Recent_Controller extends Action_Controller
 			else
 				$min_message = (int) $min_message;
 
-			$request = $db->query('substring', '
-				SELECT ' . $this->_select_clause . '
-				FROM {db_prefix}messages AS ms
-					INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ms.id_topic AND t.id_first_msg = ms.id_msg)
-					INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
-					LEFT JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
-					LEFT JOIN {db_prefix}members AS mems ON (mems.id_member = ms.id_member)
-					LEFT JOIN {db_prefix}members AS meml ON (meml.id_member = ml.id_member)' . (!empty($this->_have_temp_table) ? '
-					LEFT JOIN {db_prefix}log_topics_unread AS lt ON (lt.id_topic = t.id_topic)' : '
-					LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})') . '
-					LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
-				WHERE t.' . $this->_query_this_board . '
-					AND t.id_last_msg >= {int:min_message}
-					AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < ml.id_msg' .
-					($modSettings['postmod_active'] ? ' AND ms.approved = {int:is_approved}' : '') .
-					($modSettings['enable_unwatch'] ? ' AND IFNULL(lt.unwatched, 0) != 1' : '') . '
-				ORDER BY {raw:order}
-				LIMIT {int:offset}, {int:limit}',
-				array_merge($this->_query_parameters, array(
-					'current_member' => $user_info['id'],
-					'min_message' => $min_message,
-					'is_approved' => 1,
-					'order' => $this->_sort_query . ($this->_ascending ? '' : ' DESC'),
-					'offset' => $_REQUEST['start'],
-					'limit' => $context['topics_per_page'],
-				))
-			);
+			$context['topics'] = getUnreadTopics($this->_query_parameters, $this->_select_clause, 'topics', $this->_query_this_board, $this->_have_temp_table, $min_message, $this->_sort_query, $this->_ascending, $_REQUEST['start'], $context['topics_per_page']);
 		}
+		// Does it make sense?... Dunno.
+		else
+			return $this->action_unreadreplies();
 
-		$this->_exiting_unread($request);
+		$this->_exiting_unread();
 	}
 
 	/**
@@ -473,8 +422,7 @@ class Recent_Controller extends Action_Controller
 	 */
 	public function action_unreadreplies()
 	{
-		global $board, $scripturl;
-		global $user_info, $context, $modSettings;
+		global $board, $scripturl, $user_info, $context, $modSettings;
 
 		$db = database();
 
@@ -610,57 +558,11 @@ class Recent_Controller extends Action_Controller
 			return;
 		}
 
-		if (!empty($this->_have_temp_table))
-			$request = $db->query('', '
-				SELECT t.id_topic
-				FROM {db_prefix}topics_posted_in AS t
-					LEFT JOIN {db_prefix}log_topics_posted_in AS lt ON (lt.id_topic = t.id_topic)
-				WHERE t.' . $this->_query_this_board . '
-					AND IFNULL(lt.id_msg, t.id_msg) < t.id_last_msg
-				ORDER BY {raw:order}
-				LIMIT {int:offset}, {int:limit}',
-				array_merge($this->_query_parameters, array(
-					'order' => (in_array($this->_sort_query, array('t.id_last_msg', 't.id_topic')) ? $this->_sort_query : 't.sort_key') . ($this->_ascending ? '' : ' DESC'),
-					'offset' => $_REQUEST['start'],
-					'limit' => $context['topics_per_page'],
-				))
-			);
-		else
-			$request = $db->query('unread_replies', '
-				SELECT DISTINCT t.id_topic
-				FROM {db_prefix}topics AS t
-					INNER JOIN {db_prefix}messages AS m ON (m.id_topic = t.id_topic AND m.id_member = {int:current_member})' . (strpos($this->_sort_query, 'ms.') === false ? '' : '
-					INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)') . (strpos($this->_sort_query, 'mems.') === false ? '' : '
-					LEFT JOIN {db_prefix}members AS mems ON (mems.id_member = ms.id_member)') . '
-					LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
-					LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
-				WHERE t.' . $this->_query_this_board . '
-					AND t.id_last_msg >= {int:min_message}
-					AND (IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0))) < t.id_last_msg' .
-					($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
-					($modSettings['enable_unwatch'] ? ' AND IFNULL(lt.unwatched, 0) != 1' : '') . '
-				ORDER BY {raw:order}
-				LIMIT {int:offset}, {int:limit}',
-				array_merge($this->_query_parameters, array(
-					'current_member' => $user_info['id'],
-					'min_message' => (int) $min_message,
-					'is_approved' => 1,
-					'order' => $this->_sort_query . ($this->_ascending ? '' : ' DESC'),
-					'offset' => $_REQUEST['start'],
-					'limit' => $context['topics_per_page'],
-					'sort' => $this->_sort_query,
-				))
-			);
+		$context['topics'] = getUnreadReplies($this->_query_parameters, $this->_select_clause, $this->_query_this_board, $this->_have_temp_table, $min_message, $this->_sort_query, $this->_ascending, $_REQUEST['start'], $context['topics_per_page']);
 
-		$topics = array();
-		while ($row = $db->fetch_assoc($request))
-			$topics[] = $row['id_topic'];
-		$db->free_result($request);
-
-		// Sanity... where have you gone?
-		if (empty($topics))
+		if ($context['topics'] === false)
 		{
-			$context['topics'] = array();
+				$context['topics'] = array();
 			if ($context['querystring_board_limits'] == ';start=%d')
 				$context['querystring_board_limits'] = '';
 			else
@@ -668,26 +570,7 @@ class Recent_Controller extends Action_Controller
 			return;
 		}
 
-		$request = $db->query('substring', '
-			SELECT ' . $this->_select_clause . '
-			FROM {db_prefix}topics AS t
-				INNER JOIN {db_prefix}messages AS ms ON (ms.id_topic = t.id_topic AND ms.id_msg = t.id_first_msg)
-				INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
-				INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
-				LEFT JOIN {db_prefix}members AS mems ON (mems.id_member = ms.id_member)
-				LEFT JOIN {db_prefix}members AS meml ON (meml.id_member = ml.id_member)
-				LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
-				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
-			WHERE t.id_topic IN ({array_int:topic_list})
-			ORDER BY ' . $this->_sort_query . ($this->_ascending ? '' : ' DESC') . '
-			LIMIT ' . count($topics),
-			array(
-				'current_member' => $user_info['id'],
-				'topic_list' => $topics,
-			)
-		);
-
-		$this->_exiting_unread($request);
+		$this->_exiting_unread();
 	}
 
 	private function _entering_unread()
@@ -895,153 +778,11 @@ class Recent_Controller extends Action_Controller
 					ml.smileys_enabled AS last_smileys, ms.smileys_enabled AS first_smileys, t.id_first_msg, t.id_last_msg';
 	}
 
-	private function _exiting_unread($request)
+	private function _exiting_unread()
 	{
-		global $txt, $scripturl;
-		global $user_info, $context, $settings, $modSettings, $options;
+		global $scripturl, $user_info, $context, $settings, $modSettings;
 
-		$db = database();
-
-		$context['topics'] = array();
-		$topic_ids = array();
-
-		while ($row = $db->fetch_assoc($request))
-		{
-			$topic_ids[] = $row['id_topic'];
-
-			if (!empty($modSettings['message_index_preview']))
-			{
-				// Limit them to 128 characters - do this FIRST because it's a lot of wasted censoring otherwise.
-				$row['first_body'] = strip_tags(strtr(parse_bbc($row['first_body'], $row['first_smileys'], $row['id_first_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
-				$row['first_body'] = shorten_text($row['first_body'], !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128, true);
-
-				$row['last_body'] = strip_tags(strtr(parse_bbc($row['last_body'], $row['last_smileys'], $row['id_last_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
-				$row['last_body'] = shorten_text($row['last_body'], !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128, true);
-
-				// Censor the subject and message preview.
-				censorText($row['first_subject']);
-				censorText($row['first_body']);
-
-				// Don't censor them twice!
-				if ($row['id_first_msg'] == $row['id_last_msg'])
-				{
-					$row['last_subject'] = $row['first_subject'];
-					$row['last_body'] = $row['first_body'];
-				}
-				else
-				{
-					censorText($row['last_subject']);
-					censorText($row['last_body']);
-				}
-			}
-			else
-			{
-				$row['first_body'] = '';
-				$row['last_body'] = '';
-				censorText($row['first_subject']);
-
-				if ($row['id_first_msg'] == $row['id_last_msg'])
-					$row['last_subject'] = $row['first_subject'];
-				else
-					censorText($row['last_subject']);
-			}
-
-			// Decide how many pages the topic should have.
-			$topic_length = $row['num_replies'] + 1;
-			$messages_per_page = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
-			if ($topic_length > $messages_per_page)
-			{
-				$start = -1;
-				$pages = constructPageIndex($scripturl . '?topic=' . $row['id_topic'] . '.%1$d;topicseen', $start, $topic_length, $messages_per_page, true, array('prev_next' => false));
-
-				// If we can use all, show it.
-				if (!empty($modSettings['enableAllMessages']) && $topic_length < $modSettings['enableAllMessages'])
-					$pages .= ' &nbsp;<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0;all">' . $txt['all'] . '</a>';
-			}
-			else
-				$pages = '';
-
-			// We need to check the topic icons exist... you can never be too sure!
-			if (!empty($modSettings['messageIconChecks_enable']))
-			{
-				// First icon first... as you'd expect.
-				if (!isset($context['icon_sources'][$row['first_icon']]))
-					$context['icon_sources'][$row['first_icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $row['first_icon'] . '.png') ? 'images_url' : 'default_images_url';
-
-				// Last icon... last... duh.
-				if (!isset($context['icon_sources'][$row['last_icon']]))
-					$context['icon_sources'][$row['last_icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $row['last_icon'] . '.png') ? 'images_url' : 'default_images_url';
-			}
-
-			// And build the array.
-			$context['topics'][$row['id_topic']] = array(
-				'id' => $row['id_topic'],
-				'first_post' => array(
-					'id' => $row['id_first_msg'],
-					'member' => array(
-						'name' => $row['first_poster_name'],
-						'id' => $row['id_first_member'],
-						'href' => $scripturl . '?action=profile;u=' . $row['id_first_member'],
-						'link' => !empty($row['id_first_member']) ? '<a class="preview" href="' . $scripturl . '?action=profile;u=' . $row['id_first_member'] . '" title="' . $txt['profile_of'] . ' ' . $row['first_poster_name'] . '">' . $row['first_poster_name'] . '</a>' : $row['first_poster_name']
-					),
-					'time' => standardTime($row['first_poster_time']),
-					'html_time' => htmlTime($row['first_poster_time']),
-					'timestamp' => forum_time(true, $row['first_poster_time']),
-					'subject' => $row['first_subject'],
-					'preview' => $row['first_body'],
-					'icon' => $row['first_icon'],
-					'icon_url' => $settings[$context['icon_sources'][$row['first_icon']]] . '/post/' . $row['first_icon'] . '.png',
-					'href' => $scripturl . '?topic=' . $row['id_topic'] . '.0;topicseen',
-					'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0;topicseen">' . $row['first_subject'] . '</a>'
-				),
-				'last_post' => array(
-					'id' => $row['id_last_msg'],
-					'member' => array(
-						'name' => $row['last_poster_name'],
-						'id' => $row['id_last_member'],
-						'href' => $scripturl . '?action=profile;u=' . $row['id_last_member'],
-						'link' => !empty($row['id_last_member']) ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_last_member'] . '">' . $row['last_poster_name'] . '</a>' : $row['last_poster_name']
-					),
-					'time' => standardTime($row['last_poster_time']),
-					'html_time' => htmlTime($row['last_poster_time']),
-					'timestamp' => forum_time(true, $row['last_poster_time']),
-					'subject' => $row['last_subject'],
-					'preview' => $row['last_body'],
-					'icon' => $row['last_icon'],
-					'icon_url' => $settings[$context['icon_sources'][$row['last_icon']]] . '/post/' . $row['last_icon'] . '.png',
-					'href' => $scripturl . '?topic=' . $row['id_topic'] . ($row['num_replies'] == 0 ? '.0' : '.msg' . $row['id_last_msg']) . ';topicseen#msg' . $row['id_last_msg'],
-					'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . ($row['num_replies'] == 0 ? '.0' : '.msg' . $row['id_last_msg']) . ';topicseen#msg' . $row['id_last_msg'] . '" rel="nofollow">' . $row['last_subject'] . '</a>'
-				),
-				'default_preview' => trim($row[!empty($modSettings['message_index_preview']) && $modSettings['message_index_preview'] == 2 ? 'last_body' : 'first_body']),
-				'new_from' => $row['new_from'],
-				'new_href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['new_from'] . ';topicseen#new',
-				'href' => $scripturl . '?topic=' . $row['id_topic'] . ($row['num_replies'] == 0 ? '.0' : '.msg' . $row['new_from']) . ';topicseen' . ($row['num_replies'] == 0 ? '' : 'new'),
-				'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . ($row['num_replies'] == 0 ? '.0' : '.msg' . $row['new_from']) . ';topicseen#msg' . $row['new_from'] . '" rel="nofollow">' . $row['first_subject'] . '</a>',
-				'is_sticky' => !empty($modSettings['enableStickyTopics']) && !empty($row['is_sticky']),
-				'is_locked' => !empty($row['locked']),
-				'is_poll' => !empty($modSettings['pollMode']) && $row['id_poll'] > 0,
-				'is_hot' => !empty($modSettings['useLikesNotViews']) ? $row['num_likes'] >= $modSettings['hotTopicPosts'] : $row['num_replies'] >= $modSettings['hotTopicPosts'],
-				'is_very_hot' => !empty($modSettings['useLikesNotViews']) ? $row['num_likes'] >= $modSettings['hotTopicVeryPosts'] : $row['num_replies'] >= $modSettings['hotTopicVeryPosts'],
-				'is_posted_in' => false,
-				'icon' => $row['first_icon'],
-				'icon_url' => $settings[$context['icon_sources'][$row['first_icon']]] . '/post/' . $row['first_icon'] . '.png',
-				'subject' => $row['first_subject'],
-				'pages' => $pages,
-				'replies' => comma_format($row['num_replies']),
-				'views' => comma_format($row['num_views']),
-				'likes' => comma_format($row['num_likes']),
-				'board' => array(
-					'id' => $row['id_board'],
-					'name' => $row['bname'],
-					'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
-					'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['bname'] . '</a>'
-				)
-			);
-
-			$context['topics'][$row['id_topic']]['first_post']['started_by'] = sprintf($txt['topic_started_by'], $context['topics'][$row['id_topic']]['first_post']['member']['link'], $context['topics'][$row['id_topic']]['board']['link']);
-			determineTopicClass($context['topics'][$row['id_topic']]);
-		}
-		$db->free_result($request);
+		$topic_ids = array_keys($context['topics']);
 
 		if ($this->_is_topics && !empty($modSettings['enableParticipation']) && !empty($topic_ids))
 		{
