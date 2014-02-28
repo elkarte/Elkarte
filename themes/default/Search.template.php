@@ -139,61 +139,11 @@ function template_searchform()
 		if (empty($context['search_params']['topic']))
 		{
 			echo '
-					<fieldset class="content">
-						<h3 class="secondary_header">
-							<span id="category_toggle">&nbsp;
-								<span id="advanced_panel_toggle" class="', $context['boards_check_all'] ? 'expand' : 'collapse', '" style="display: none;" title="', $txt['hide'], '"></span>
-							</span>
-							<a href="#" id="advanced_panel_link">', $txt['choose_board'], '</a>
-						</h3>
-						<div id="advanced_panel_div"', $context['boards_check_all'] ? ' style="display: none;"' : '', '>';
+					<fieldset class="content">';
 
-			// Make two nice columns of boards, link each category header to toggle select all boards in each
-			$group_cats = optimizeBoardsSubdivision($context['boards_in_category'], $context['num_boards']);
-
-			foreach ($group_cats as $groups)
-			{
-				echo '
-							<ul class="ignoreboards floatleft">';
-				foreach ($groups as $cat_id)
-				{
-					$category = $context['categories'][$cat_id];
-					echo '
-								<li class="category">
-									<a href="javascript:void(0);" onclick="selectBoards([', implode(', ', $category['child_ids']), '], \'searchform\'); return false;">', $category['name'], '</a>
-									<ul>';
-
-					foreach ($category['boards'] as $board)
-					{
-						echo '
-										<li class="board" style="margin-', $context['right_to_left'] ? 'right' : 'left', ': ', $board['child_level'], 'em;">
-											<label for="brd', $board['id'], '">
-												<input type="checkbox" id="brd', $board['id'], '" name="brd[', $board['id'], ']" value="', $board['id'], '"', $board['selected'] ? ' checked="checked"' : '', ' class="input_check" /> ', $board['name'], '
-											</label>
-										</li>';
-					}
-
-					echo '
-									</ul>
-								</li>';
-				}
-				echo '
-							</ul>';
-			}
+			template_pick_boards('searchform');
 
 			echo '
-						</div>';
-
-			// Provide an easy way to select all boards
-			echo '
-						<div class="submitbutton">
-							<span class="floatleft">
-								<input type="checkbox" name="all" id="check_all" value=""', $context['boards_check_all'] ? ' checked="checked"' : '', ' onclick="invertAll(this, this.form, \'brd\');" class="input_check" />
-								<label for="check_all">
-									<em> ', $txt['check_all'], '</em>
-								</label>
-							</span>
-						</div>
 					</fieldset>';
 		}
 
@@ -212,31 +162,6 @@ function template_searchform()
 			sControlId: \'userspec\',
 			sSearchType: \'member\',
 			bItemList: false
-		});
-
-		// Some javascript for the advanced board select toggling
-		var oAdvancedPanelToggle = new elk_Toggle({
-			bToggleEnabled: true,
-			bCurrentlyCollapsed: ' . ($context['boards_check_all'] ? 'true' : 'false') . ',
-			aSwappableContainers: [
-				\'advanced_panel_div\'
-			],
-			aSwapClasses: [
-				{
-					sId: \'advanced_panel_toggle\',
-					classExpanded: \'collapse\',
-					titleExpanded: ' . JavaScriptEscape($txt['hide']) . ',
-					classCollapsed: \'expand\',
-					titleCollapsed: ' . JavaScriptEscape($txt['show']) . '
-				}
-			],
-			aSwapLinks: [
-				{
-					sId: \'advanced_panel_link\',
-					msgExpanded: ' . JavaScriptEscape($txt['choose_board']) . ',
-					msgCollapsed: ' . JavaScriptEscape($txt['choose_board']) . '
-				}
-			],
 		});
 
 		// Set the search style

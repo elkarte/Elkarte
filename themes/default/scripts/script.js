@@ -1694,17 +1694,17 @@ function initSearch()
  * @param {type} ids
  * @param {string} aFormID
  */
-function selectBoards(ids, aFormID)
+function selectBoards(ids, aFormID, sInputName)
 {
 	var toggle = true,
 		aForm = document.getElementById(aFormID),
 		i = 0;
 
 	for (i = 0; i < ids.length; i++)
-		toggle = toggle && aForm["brd" + ids[i]].checked;
+		toggle = toggle && aForm[sInputName + ids[i]].checked;
 
 	for (i = 0; i < ids.length; i++)
-		aForm["brd" + ids[i]].checked = !toggle;
+		aForm[sInputName + ids[i]].checked = !toggle;
 }
 
 /**
