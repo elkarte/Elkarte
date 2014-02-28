@@ -144,6 +144,11 @@ function template_topic_listing()
 			echo '
 	<form action="', $scripturl, '?action=quickmod;board=', $context['current_board'], '.', $context['start'], '" method="post" accept-charset="UTF-8" class="clear" name="quickModForm" id="quickModForm">';
 
+		// If this person can approve items and we have some awaiting approval tell them.
+		if (!empty($context['unapproved_posts_message']))
+			echo '
+		<div class="warningbox">! ', $context['unapproved_posts_message'], '</div>';
+
 		echo '
 		<ul class="topic_listing" id="messageindex">
 			<li class="topic_sorting_row">';
@@ -155,15 +160,6 @@ function template_topic_listing()
 
 		echo '
 			</li>';
-
-		// If this person can approve items and we have some awaiting approval tell them.
-		if (!empty($context['unapproved_posts_message']))
-		{
-			echo '
-			<li class="basic_row">
-				<div class="warningbox">! ', $context['unapproved_posts_message'], '</div>
-			</li>';
-		}
 
 		foreach ($context['topics'] as $topic)
 		{
