@@ -3,7 +3,6 @@ require_once(BOARDDIR . '/sources/database/Db.php');
 require_once(BOARDDIR . '/sources/Errors.php');
 require_once(BOARDDIR . '/sources/subs/Cache.subs.php');
 require_once(BOARDDIR . '/sources/database/Database.subs.php');
-require_oNCE(SUBSDIR . '/Text.subs.php');
 
 class Elk_Testing_Setup
 {
@@ -108,6 +107,7 @@ class Elk_Testing_Setup
 		require(BOARDDIR . '/sources/Subs.php');
 		require(BOARDDIR . '/sources/Load.php');
 		require_once(SUBSDIR . '/Util.class.php');
+		require_once(SUBSDIR . '/Text.subs.php');
 
 		$settings['theme_dir'] = $settings['default_theme_dir'] = BOARDDIR . '/Themes/default';
 		$settings['theme_url'] = $settings['default_theme_url'] = $boardurl . '/themes/default';
