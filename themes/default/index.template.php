@@ -605,17 +605,20 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
  */
 function template_quickbutton_strip($strip, $tests = array())
 {
-	global $context;
+	global $context, $options;
 
 	$buttons = array();
 
 	foreach ($strip as $key => $value)
 	{
 		if (!empty($value['checkbox']))
-			$buttons[] = '
+		{
+			if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
+				$buttons[] = '
 						<li class="listlevel1 ' . $key . '">
 							<input class="input_check" type="checkbox" name="' . $value['name'] . '[]" value="' . $value['value'] . '" />
 						</li>';
+		}
 		elseif (!isset($value['test']) || !empty($tests[$value['test']]))
 			$buttons[] = '
 						<li class="listlevel1">

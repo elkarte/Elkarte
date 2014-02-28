@@ -277,7 +277,7 @@ function template_action_required()
  */
 function template_reported_posts()
 {
-	global $context, $txt, $scripturl;
+	global $context, $txt, $scripturl, $options;
 
 	echo '
 					<form id="reported_posts" action="', $scripturl, '?action=moderate;area=reports', $context['view_closed'] ? ';sa=closed' : '', ';start=', $context['start'], '" method="post" accept-charset="UTF-8">
@@ -313,7 +313,7 @@ function template_reported_posts()
 							</div>
 						</div>';
 	else
-		template_pagesection(false, false, array('extra' => !$context['view_closed'] ? '<input type="submit" name="close_selected" value="' . $txt['mc_reportedp_close_selected'] . '" class="right_submit" />' : ''));
+		template_pagesection(false, false, array('extra' => !$context['view_closed'] && !empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 ? '<input type="submit" name="close_selected" value="' . $txt['mc_reportedp_close_selected'] . '" class="right_submit" />' : ''));
 
 	echo '
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
