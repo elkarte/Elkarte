@@ -232,6 +232,29 @@ class PostModeration_Controller extends Action_Controller
 			'delete_own_replies' => $delete_own_replies,
 		), $context['start'], 10);
 
+		foreach ($context['unapproved_items'] as $key => $item)
+		{
+			$context['unapproved_items'][$key]['buttons'] = array(
+				'quickmod_check' => array(
+					'checkbox' => true,
+					'name' => 'item',
+					'value' => $item['id'],
+				),
+					'approve' => array(
+						'href' => $scripturl . '?action=moderate;area=postmod;sa=' . $context['current_view'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';approve=' . $item['id'],
+						'text' => $txt['approve'],
+					),
+					'unapprove' => array(
+						'href' => $scripturl . '?action=moderate;area=postmod;sa=' . $context['current_view'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';delete=' . $item['id'],
+						'text' => $txt['remove'],
+						'test' => 'can_delete',
+					),
+			);
+			$context['unapproved_items'][$key]['tests'] = array(
+				'can_delete' => $item['can_delete']
+			);
+		}
+
 		$context['sub_template'] = 'unapproved_posts';
 	}
 

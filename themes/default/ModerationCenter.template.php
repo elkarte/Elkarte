@@ -349,40 +349,11 @@ function template_unapproved_posts()
 	// Loop through and show each unapproved post
 	foreach ($context['unapproved_items'] as $item)
 	{
-		echo '
-						<div class="', $item['alternate'] == 0 ? 'windowbg2' : 'windowbg', ' core_posts">
-							<div class="content">
-								<div class="counter">', $item['counter'], '</div>
-								<div class="topic_details">
-									<h5><strong>', $item['category']['link'], ' / ', $item['board']['link'], ' / ', $item['link'], '</strong></h5>
-									<span class="smalltext">', $txt['mc_unapproved_by'], ' <strong>', $item['poster']['link'], '</strong> ', ': ', $item['time'], '</span>
-								</div>
-								<div class="inner">', $item['body'], '</div>
-								<ul class="quickbuttons">';
+		$item['class'] = $item['alternate'] == 0 ? 'windowbg2' : 'windowbg';
+		$item['title'] = '<h5><strong>' . $item['category']['link'] . ' / ' . $item['board']['link'] . ' / ' . $item['link'] . '</strong></h5>';
+		$item['date'] = $txt['mc_unapproved_by'] . ' <strong>' . $item['poster']['link'] . '</strong> ' . ': ' . $item['time'];
 
-		// Quick moderation checkbox?
-		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
-			echo '
-									<li class="listlevel1 quickmod_check">
-										<input type="checkbox" name="item[]" value="', $item['id'], '" class="input_check" />
-									</li>';
-
-		// Approve and remove buttons
-		echo '
-									<li class="listlevel1">
-										<a class="linklevel1 approve_button" href="', $scripturl, '?action=moderate;area=postmod;sa=', $context['current_view'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], ';approve=', $item['id'], '">', $txt['approve'], '</a>
-									</li>';
-
-		if ($item['can_delete'])
-			echo '
-									<li class="listlevel1">
-										<a class="linklevel1 unapprove_button" href="', $scripturl, '?action=moderate;area=postmod;sa=', $context['current_view'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], ';delete=', $item['id'], '">', $txt['remove'], '</a>
-									</li>';
-
-		echo '
-								</ul>
-							</div>
-						</div>';
+		template_simple_message($item);
 	}
 
 	// Quick moderation checkbox action selection
