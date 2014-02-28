@@ -126,27 +126,31 @@ class PostModeration_Controller extends Action_Controller
 			checkSession('request');
 
 			require_once(SUBSDIR . '/Topic.subs.php');
+			require_once(SUBSDIR . '/Messages.subs.php');
 
 			// Handy shortcut.
 			$any_array = $curAction == 'approve' ? $approve_boards : $delete_any_boards;
 
 			// Now for each message work out whether it's actually a topic, and what board it's on.
-			$request = $db->query('', '
-				SELECT m.id_msg, m.id_member, m.id_board, m.subject, t.id_topic, t.id_first_msg, t.id_member_started
-				FROM {db_prefix}messages AS m
-					INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
-				LEFT JOIN {db_prefix}boards AS b ON (t.id_board = b.id_board)
-				WHERE m.id_msg IN ({array_int:message_list})
-					AND m.approved = {int:not_approved}
-					AND {query_see_board}',
+			$request = loadMessageDetails(
+				array('m.id_board', 't.id_topic', 't.id_first_msg', 't.id_member_started'),
+				array(
+					'INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)',
+					'LEFT JOIN {db_prefix}boards AS b ON (t.id_board = b.id_board)'
+				),
 				array(
 					'message_list' => $toAction,
 					'not_approved' => 0,
+				),
+				array(
+					'additional_conditions' => '
+					AND m.approved = {int:not_approved}
+					AND {query_see_board}'
 				)
 			);
 			$toAction = array();
 			$details = array();
-			while ($row = $db->fetch_assoc($request))
+			foreach ($request as $row)
 			{
 				// If it's not within what our view is ignore it...
 				if (($row['id_msg'] == $row['id_first_msg'] && $context['current_view'] != 'topics') || ($row['id_msg'] != $row['id_first_msg'] && $context['current_view'] != 'replies'))
@@ -182,7 +186,6 @@ class PostModeration_Controller extends Action_Controller
 				$details[$anItem]["member"] = ($context['current_view'] == 'topics') ? $row['id_member_started'] : $row['id_member'];
 				$details[$anItem]["board"] = $row['id_board'];
 			}
-			$db->free_result($request);
 
 			// If we have anything left we can actually do the approving (etc).
 			if (!empty($toAction))
