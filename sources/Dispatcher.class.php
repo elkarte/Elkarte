@@ -193,7 +193,7 @@ class Site_Dispatcher
 			'theme' => array('ManageThemes.controller.php', 'ManageThemes_Controller', 'action_thememain'),
 			'trackip' => array('ProfileHistory.controller.php', 'ProfileHistory_Controller', 'action_trackip'),
 			'unread' => array('Recent.controller.php', 'Recent_Controller', 'action_unread'),
-			'unreadreplies' => array('Recent.controller.php', 'Recent_Controller', 'action_unread'),
+			'unreadreplies' => array('Recent.controller.php', 'Recent_Controller', 'action_unreadreplies'),
 			'verificationcode' => array('Register.controller.php', 'Register_Controller', 'action_verificationcode'),
 			'viewprofile' => array('Profile.controller.php', 'Profile_Controller', 'action_index'),
 // 			'vote' => array('Poll.controller.php', 'Poll_Controller', 'action_vote'),
