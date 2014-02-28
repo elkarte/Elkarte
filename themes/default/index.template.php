@@ -611,7 +611,12 @@ function template_quickbutton_strip($strip, $tests = array())
 
 	foreach ($strip as $key => $value)
 	{
-		if (!isset($value['test']) || !empty($tests[$value['test']]))
+		if (!empty($value['checkbox']))
+			$buttons[] = '
+						<li class="listlevel1 ' . $key . '">
+							<input class="input_check" type="checkbox" name="' . $value['name'] . '[]" value="' . $value['value'] . '" />
+						</li>';
+		elseif (!isset($value['test']) || !empty($tests[$value['test']]))
 			$buttons[] = '
 						<li class="listlevel1">
 							<a href="' . $value['href'] . '" class="linklevel1 ' . $key . '_button"' . (isset($value['custom']) ? ' ' . $value['custom'] : '') . '>' . $value['text'] . '</a>
