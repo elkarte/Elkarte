@@ -1693,6 +1693,7 @@ function initSearch()
  *
  * @param {type} ids
  * @param {string} aFormID
+ * @param {string} sInputName
  */
 function selectBoards(ids, aFormID, sInputName)
 {
