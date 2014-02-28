@@ -263,10 +263,11 @@ function template_simple_message($msg)
 {
 	global $context, $settings, $txt;
 
+	// @todo find a better name for $msg['date']
 	echo '
 			<div class="', $msg['class'], ' core_posts">
-				<div class="content">
-					<div class="counter">', $msg['counter'], '</div>
+				<div class="content">', !empty($msg['counter']) ? '
+					<div class="counter">' . $msg['counter'] . '</div>' : '', '
 					<div class="topic_details">
 						<h5>
 							', $msg['title'], '

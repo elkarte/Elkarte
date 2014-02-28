@@ -16,6 +16,14 @@
  */
 
 /**
+ * Someone else did that for us, let's use it.
+ */
+function template_ModerationCenter_init()
+{
+	loadTemplate('GenericMessages');
+}
+
+/**
  * Template for the main page of moderation center.
  * It shows blocks with information.
  */
@@ -273,9 +281,9 @@ function template_reported_posts()
 
 	echo '
 					<form id="reported_posts" action="', $scripturl, '?action=moderate;area=reports', $context['view_closed'] ? ';sa=closed' : '', ';start=', $context['start'], '" method="post" accept-charset="UTF-8">
-						<h3 class="category_header">
+						<h2 class="category_header">
 							', $context['view_closed'] ? $txt['mc_reportedp_closed'] : $txt['mc_reportedp_active'], '
-						</h3>';
+						</h2>';
 
 	if (!empty($context['reports']))
 		template_pagesection();
@@ -283,44 +291,17 @@ function template_reported_posts()
 	$alternate = 0;
 	foreach ($context['reports'] as $report)
 	{
-		echo '
-						<div class="topic clear">
-							<div class="', ++$alternate % 2 ? 'windowbg' : 'windowbg2', ' core_posts">
-								<div class="content">
-									<h5>
-										<strong>', !empty($report['board_name']) ? '<a href="' . $scripturl . '?board=' . $report['board'] . '.0">' . $report['board_name'] . '</a>' : '??', ' / <a href="', $report['topic_href'], '">', $report['subject'], '</a></strong> ', $txt['mc_reportedp_by'], ' <strong>', $report['author']['link'], '</strong>
-									</h5>
-									<div class="smalltext">
-										', $txt['mc_reportedp_last_reported'], ': ', $report['last_updated'], '&nbsp;-&nbsp;';
+		$report['class'] = ++$alternate % 2 ? 'windowbg' : 'windowbg2';
+		$report['title'] = '<strong>' . (!empty($report['board_name']) ? '<a href="' . $scripturl . '?board=' . $report['board'] . '.0">' . $report['board_name'] . '</a>' : '??') . ' / <a href="' . $report['topic_href'] . '">' . $report['subject'] . '</a></strong> ' . $txt['mc_reportedp_by'] . ' <strong>' . $report['author']['link'] . '</strong>';
 
 		// Prepare the comments...
 		$comments = array();
 		foreach ($report['comments'] as $comment)
 			$comments[$comment['member']['id']] = $comment['member']['link'];
+		$report['date'] = $txt['mc_reportedp_last_reported'] . ': ' . $report['last_updated'] . '&nbsp;-&nbsp;' . '
+										' . $txt['mc_reportedp_reported_by'] . ': ' . implode(', ', $comments);
 
-		echo '
-										', $txt['mc_reportedp_reported_by'], ': ', implode(', ', $comments), '
-									</div>
-									<hr />
-									', $report['body'], '
-
-									<ul class="quickbuttons">
-										<li class="listlevel1 quickmod_check">', !$context['view_closed'] ? '
-											<input class="input_check" type="checkbox" name="close[]" value="' . $report['id'] . '" />' : '', '
-										</li>
-										<li class="listlevel1">
-											<a href="', $report['report_href'], '" class="linklevel1 details_button">', $txt['mc_reportedp_details'], '</a>
-										</li>
-										<li class="listlevel1">
-											<a href="', $scripturl, '?action=moderate;area=reports', $context['view_closed'] ? ';sa=closed' : '', ';ignore=', (int) !$report['ignore'], ';rid=', $report['id'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '" ', !$report['ignore'] ? 'onclick="return confirm(\'' . $txt['mc_reportedp_ignore_confirm'] . '\');"' : '', ' class="linklevel1 ignore_button">', $report['ignore'] ? $txt['mc_reportedp_unignore'] : $txt['mc_reportedp_ignore'], '</a>
-										</li>
-										<li class="listlevel1">
-											<a href="', $scripturl, '?action=moderate;area=reports', $context['view_closed'] ? ';sa=closed' : '', ';close=', (int) !$report['closed'], ';rid=', $report['id'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '" class="linklevel1 close_button">', $context['view_closed'] ? $txt['mc_reportedp_open'] : $txt['mc_reportedp_close'], '</a>
-										</li>
-									</ul>
-								</div>
-							</div>
-						</div>';
+		template_simple_message($report);
 	}
 
 	// Were none found?
@@ -347,15 +328,12 @@ function template_unapproved_posts()
 {
 	global $options, $context, $txt, $scripturl;
 
-	template_pagesection();
-
 	// Just a big div of it all really...
 	echo '
 				<form action="', $scripturl, '?action=moderate;area=postmod;start=', $context['start'], ';sa=', $context['current_view'], '" method="post" accept-charset="UTF-8">
-					<div id="unapprovedposts" class="forumposts">
-						<h3 class="category_header hdicon cat_img_posts">
+						<h2 class="category_header hdicon cat_img_posts">
 							', $context['header_title'], '
-						</h3>';
+						</h2>';
 
 	// No posts?
 	if (empty($context['unapproved_items']))
@@ -365,6 +343,8 @@ function template_unapproved_posts()
 								<p class="centertext">', $txt['mc_unapproved_' . $context['current_view'] . '_none_found'], '</p>
 							</div>
 						</div>';
+	else
+		template_pagesection();
 
 	// Loop through and show each unapproved post
 	foreach ($context['unapproved_items'] as $item)
@@ -405,9 +385,6 @@ function template_unapproved_posts()
 						</div>';
 	}
 
-	echo '
-					</div>';
-
 	// Quick moderation checkbox action selection
 	$quick_mod = '';
 	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && !empty($context['unapproved_items']))
@@ -426,7 +403,8 @@ function template_unapproved_posts()
 						</noscript>
 					</div>';
 
-	template_pagesection(false, false, array('extra' => $quick_mod));
+	if (!empty($context['unapproved_items']))
+		template_pagesection(false, false, array('extra' => $quick_mod));
 
 	echo '
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
