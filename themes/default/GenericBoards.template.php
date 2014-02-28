@@ -16,6 +16,73 @@
  */
 
 /**
+ * Helper function to subdivide the boards in a number of sets with
+ * approximately the same number of boards each, but preserving the
+ * grouping in categories
+ *
+ * @param int[] $categories contains the number of boards for each category
+ * @param int $total_boards total number of boards present
+ * @return int[]
+ */
+function optimizeBoardsSubdivision($categories, $total_boards)
+{
+	$num_groups = 2;
+	$optimal_boards = round($total_boards / $num_groups);
+	$groups = array(0 => array());
+	$group_totals = array(0 => 0);
+	$current_streak = 0;
+	$current_group = 0;
+
+	foreach ($categories as $cat => $boards_count)
+	{
+		$groups[$current_group][] = $cat;
+		// The +1 here are to take in consideration category headers
+		// that visuallt account for about one additional board
+		$group_totals[$current_group] += $boards_count + 1;
+		$current_streak += $boards_count + 1;
+
+		// Start a new streak
+		if ($current_streak > $optimal_boards && $current_group < ($num_groups - 1))
+		{
+			$current_streak = 0;
+			$current_group++;
+			$groups[$current_group] = array();
+			$group_totals[$current_group] = 0;
+		}
+	}
+
+	// The current difference of elements from left and right
+	$diff_current = $group_totals[0] - $group_totals[1];
+
+	// If we have less on the right, let's try picking one from the left
+	if ($diff_current > 0)
+	{
+		$last_group = array_pop($groups[0]);
+		// Same as above, +1 for cat header
+		$diff_alternate = $diff_current - 2 * ($categories[$last_group] + 1);
+
+		if ($diff_alternate < $diff_current)
+			array_unshift($groups[1], $last_group);
+		else
+			$groups[0][] = $last_group;
+	}
+	// If we have less on the left, let's try picking one from the right
+	elseif ($diff_current < 0)
+	{
+		$first_group = array_shift($groups[1]);
+		// Same as above, +1 for cat header
+		$diff_alternate = $diff_current + 2 * ($categories[$first_group] + 1);
+
+		if ($diff_alternate < abs($diff_current))
+			array_pop($groups[0], $first_group);
+		else
+			array_unshift($groups[1], $first_group);
+	}
+
+	return $groups;
+}
+
+/**
  * Main template for displaying the list of boards
  *
  * @param int $boards

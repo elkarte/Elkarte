@@ -210,8 +210,10 @@ class Search_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Boards.subs.php');
 		$context += getBoardList(array('not_redirection' => true));
-		foreach ($context['categories'] as &$category)
+		$context['boards_in_category'] = array();
+		foreach ($context['categories'] as $cat => &$category)
 		{
+			$context['boards_in_category'][$cat] = count($category['boards']);
 			$category['child_ids'] = array_keys($category['boards']);
 			foreach ($category['boards'] as &$board)
 				$board['selected'] = (empty($context['search_params']['brd']) && (empty($modSettings['recycle_enable']) || $board['id'] != $modSettings['recycle_board']) && !in_array($board['id'], $user_info['ignoreboards'])) || (!empty($context['search_params']['brd']) && in_array($board['id'], $context['search_params']['brd']));
@@ -239,6 +241,10 @@ class Search_Controller extends Action_Controller
 
 		$context['page_title'] = $txt['set_parameters'];
 		$context['search_params'] = $this->_fill_default_search_params($context['search_params']);
+
+		// Start guest off collapsed
+		if ($context['user']['is_guest'] && !isset($context['minmax_preferences']['asearch']))
+			$context['minmax_preferences']['asearch'] = 1;
 
 		call_integration_hook('integrate_search');
 	}
@@ -811,6 +817,10 @@ class Search_Controller extends Action_Controller
 			'url' => $scripturl . '?action=search;sa=results;params=' . $context['params'],
 			'name' => $txt['search_results']
 		);
+
+		// Start guest off collapsed
+		if ($context['user']['is_guest'] && !isset($context['minmax_preferences']['asearch']))
+			$context['minmax_preferences']['asearch'] = 1;
 
 		// *** A last error check
 		call_integration_hook('integrate_search_errors');

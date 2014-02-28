@@ -16,6 +16,14 @@
  */
 
 /**
+ * Lotsa boards we (may) have here!
+ */
+function template_Search_init()
+{
+	loadTemplate('GenericBoards');
+}
+
+/**
  * Main search page. Allows the user to search the forum according to criteria.
  */
 function template_searchform()
@@ -134,51 +142,46 @@ function template_searchform()
 					<fieldset class="content">
 						<h3 class="secondary_header">
 							<span id="category_toggle">&nbsp;
-								<span id="advanced_panel_toggle" class="', empty($context['minmax_preferences']['search']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
+								<span id="advanced_panel_toggle" class="', $context['boards_check_all'] ? 'expand' : 'collapse', '" style="display: none;" title="', $txt['hide'], '"></span>
 							</span>
 							<a href="#" id="advanced_panel_link">', $txt['choose_board'], '</a>
 						</h3>
-						<div id="advanced_panel_div"', $context['boards_check_all'] ? '' : ' style="display: none;"', '>
-							<ul class="ignoreboards floatleft">';
+						<div id="advanced_panel_div"', $context['boards_check_all'] ? ' style="display: none;"' : '', '>';
 
 			// Make two nice columns of boards, link each category header to toggle select all boards in each
-			$i = 0;
-			$limit = ceil($context['num_boards'] / 2);
-			foreach ($context['categories'] as $category)
+			$group_cats = optimizeBoardsSubdivision($context['boards_in_category'], $context['num_boards']);
+
+			foreach ($group_cats as $groups)
 			{
 				echo '
+							<ul class="ignoreboards floatleft">';
+				foreach ($groups as $cat_id)
+				{
+					$category = $context['categories'][$cat_id];
+					echo '
 								<li class="category">
 									<a href="javascript:void(0);" onclick="selectBoards([', implode(', ', $category['child_ids']), '], \'searchform\'); return false;">', $category['name'], '</a>
 									<ul>';
 
-				foreach ($category['boards'] as $board)
-				{
-					if ($i == $limit)
+					foreach ($category['boards'] as $board)
+					{
 						echo '
-									</ul>
-								</li>
-							</ul>
-							<ul class="ignoreboards floatright">
-								<li class="category">
-									<ul>';
-
-					echo '
 										<li class="board" style="margin-', $context['right_to_left'] ? 'right' : 'left', ': ', $board['child_level'], 'em;">
 											<label for="brd', $board['id'], '">
 												<input type="checkbox" id="brd', $board['id'], '" name="brd[', $board['id'], ']" value="', $board['id'], '"', $board['selected'] ? ' checked="checked"' : '', ' class="input_check" /> ', $board['name'], '
 											</label>
 										</li>';
+					}
 
-					$i ++;
-				}
-
-				echo '
+					echo '
 									</ul>
 								</li>';
+				}
+				echo '
+							</ul>';
 			}
 
 			echo '
-							</ul>
 						</div>';
 
 			// Provide an easy way to select all boards
@@ -197,13 +200,6 @@ function template_searchform()
 	echo '
 				</form>';
 
-	// Start guest off collapsed
-	if ($context['user']['is_guest'] && !isset($context['minmax_preferences']['asearch']))
-	{
-		$context['minmax_preferences']['asearch'] = 1;
-		$context['minmax_preferences']['search'] = 1;
-	}
-
 	// And now all the JS to make this work
 	addInlineJavascript('
 		createEventListener(window);
@@ -221,7 +217,7 @@ function template_searchform()
 		// Some javascript for the advanced board select toggling
 		var oAdvancedPanelToggle = new elk_Toggle({
 			bToggleEnabled: true,
-			bCurrentlyCollapsed: ' . (empty($context['minmax_preferences']['search']) ? 'false' : 'true') . ',
+			bCurrentlyCollapsed: ' . ($context['boards_check_all'] ? 'true' : 'false') . ',
 			aSwappableContainers: [
 				\'advanced_panel_div\'
 			],
@@ -241,13 +237,6 @@ function template_searchform()
 					msgCollapsed: ' . JavaScriptEscape($txt['choose_board']) . '
 				}
 			],
-			oThemeOptions: {
-				bUseThemeSettings: ' . ($context['user']['is_guest'] ? 'false' : 'true') . ',
-				sOptionName: \'minmax_preferences\',
-				sSessionId: elk_session_id,
-				sSessionVar: elk_session_var,
-				sAdditionalVars: \';minmax_key=search\'
-			},
 		});
 
 		// Set the search style
