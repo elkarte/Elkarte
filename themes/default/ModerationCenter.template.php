@@ -339,9 +339,7 @@ function template_unapproved_posts()
 	if (empty($context['unapproved_items']))
 		echo '
 						<div class="windowbg2 core_posts">
-							<div class="content">
-								<p class="centertext">', $txt['mc_unapproved_' . $context['current_view'] . '_none_found'], '</p>
-							</div>
+							<p class="centertext">', $txt['mc_unapproved_' . $context['current_view'] . '_none_found'], '</p>
 						</div>';
 	else
 		template_pagesection();

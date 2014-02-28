@@ -544,6 +544,7 @@ h2 a.collapse {
 
 /* General code for generic divs. Should make them behave. */
 /* @todo - Not keen on this. Do no-tag-names solution instead? */
+/* @todo - When sorted out take care of div.core_posts too */
 div.windowbg, div.windowbg2 {
 	overflow: auto;
 	padding: 10px 0;
@@ -2093,6 +2094,10 @@ img.new_posts {
 	overflow: visible;
 	margin: 4px 0 0 0;
 }
+/* @todo remove the div when div.windowbg and div.windowbg2 are sorted out */
+div.core_posts {
+	padding: 0.2em 1em;
+}
 
 /* Poster details and list of items */
 .poster {
@@ -2753,6 +2758,10 @@ dl.merge_topic dd {
 	margin: 12px 0 0 0;
 	padding: 8px 8px 16px 8px;
 	overflow: auto;
+}
+/* @todo remove the div when div.windowbg and div.windowbg2 are sorted out */
+#profilecenter div.core_posts {
+	padding: 0.2em 1em;
 }
 #profilecenter .windowbg, #profilecenter .windowbg2,
 #profile_attachments .windowbg, #profile_attachments .windowbg2,

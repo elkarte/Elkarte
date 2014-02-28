@@ -36,7 +36,6 @@ function template_recent()
 		<div id="recentposts" class="forumposts">
 			<h3 class="category_header hdicon cat_img_posts">', $txt['recent_posts'], '</h3>';
 
-	// @todo - I'm sure markup could be cleaned up a bit more here. CSS needs a bit of a tweak too.
 	foreach ($context['posts'] as $post)
 	{
 		$post['class'] = $post['alternate'] == 0 ? 'windowbg' : 'windowbg2';

@@ -265,24 +265,22 @@ function template_simple_message($msg)
 
 	// @todo find a better name for $msg['date']
 	echo '
-			<div class="', $msg['class'], ' core_posts">
-				<div class="content">', !empty($msg['counter']) ? '
-					<div class="counter">' . $msg['counter'] . '</div>' : '', '
-					<div class="topic_details">
-						<h5>
-							', $msg['title'], '
-						</h5>', !empty($msg['date']) ? '
-						<span class="smalltext">' . $msg['date'] . '</span>' : '', '
-					</div>
-					<div class="inner">
-						', $msg['body'], '
-					</div>';
+			<div class="', $msg['class'], ' core_posts">', !empty($msg['counter']) ? '
+				<div class="counter">' . $msg['counter'] . '</div>' : '', '
+				<div class="topic_details">
+					<h5>
+						', $msg['title'], '
+					</h5>', !empty($msg['date']) ? '
+					<span class="smalltext">' . $msg['date'] . '</span>' : '', '
+				</div>
+				<div class="inner">
+					', $msg['body'], '
+				</div>';
 
 	if (!empty($msg['buttons']))
 		template_quickbutton_strip($msg['buttons'], !empty($msg['tests']) ? $msg['tests'] : array());
 
 	echo '
-				</div>
 			</div>';
 
 }
