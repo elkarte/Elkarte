@@ -332,8 +332,8 @@ class Register_Controller extends Action_Controller
 
 		foreach ($_POST as $key => $value)
 		{
-			if (!is_array($_POST[$key]))
-				$_POST[$key] = htmltrim__recursive(str_replace(array("\n", "\r"), '', $_POST[$key]));
+			if (!is_array($value))
+				$_POST[$key] = htmltrim__recursive(str_replace(array("\n", "\r"), '', $value));
 		}
 
 		// Collect all extra registration fields someone might have filled in.
