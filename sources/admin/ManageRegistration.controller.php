@@ -130,12 +130,13 @@ class ManageRegistration_Controller extends Action_Controller
 			checkSession();
 			validateToken('admin-regc');
 
+			// @todo move this to a filter/sanitzation class
 			foreach ($_POST as $key => $value)
 				if (!is_array($value))
 					$_POST[$key] = htmltrim__recursive(str_replace(array("\n", "\r"), '', $value));
 
 			// Generate a password
-			if ((string) $_POST['password'] === '')
+			if (empty($_POST['password']) || !is_string($_POST['password']) || trim($_POST['password']) === '')
 			{
 				mt_srand(time() + 1277);
 				$password = generateValidationCode();

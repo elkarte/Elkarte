@@ -2086,9 +2086,10 @@ function assignGroupsToMember($member, $primary_group, $additional_groups)
  *
  * @param int[] $groups
  * @param string $where
+ * @param boolean $change_groups = false
  * @return mixed
  */
-function getConcernedMembers($groups, $where)
+function getConcernedMembers($groups, $where, $change_groups = false)
 {
 	global $modSettings, $language;
 
@@ -2118,7 +2119,7 @@ function getConcernedMembers($groups, $where)
 		$row['lngfile'] = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
 
 		// If we are approving work out what their new group is.
-		if ($_POST['req_action'] == 'approve')
+		if ($change_groups)
 		{
 			// For people with more than one request at once.
 			if (isset($group_changes[$row['id_member']]))
@@ -2136,7 +2137,8 @@ function getConcernedMembers($groups, $where)
 				$row['primary_group'] = $row['id_group'];
 			else
 				$row['additional_groups'][] = $row['id_group'];
-				// Add them to the group master list.
+
+			// Add them to the group master list.
 			$group_changes[$row['id_member']] = array(
 				'primary' => $row['primary_group'],
 				'add' => $row['additional_groups'],
