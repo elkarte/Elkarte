@@ -1591,7 +1591,7 @@ function template_showPMDrafts()
 					<br />
 					<span class="smalltext">&#171;&nbsp;<strong>', $txt['pm_bcc'], ':</strong> ', implode(', ', $draft['recipients']['bcc']), '&nbsp;&#187;</span>
 				</div>
-				<div class="list_posts">
+				<div class="inner">
 					', $draft['body'], '
 				</div>
 				<ul class="quickbuttons">

@@ -144,13 +144,17 @@ input[disabled].input_text {
 	text-decoration: none;
 }
 
-
-
 /* the new "button" */
 .new_posts, .new_posts:visited, .new_posts:link {
 	border-radius: 4px;
 /*	background: #43a8da; */
 	background: #7bb128;
+	color: #fff;
+}
+/* approval indicator  */
+.require_approval {
+	border-radius: 4px;
+	background: #f3b200;
 	color: #fff;
 }
 
@@ -949,6 +953,9 @@ span.views_text {
 }
 .windowbg2 {
 	background-color: #fcfcfc;
+}
+.approvebg {
+	background-color: #fff5cd;
 }
 .board_stats {
 	text-align: left;
