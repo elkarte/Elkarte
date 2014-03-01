@@ -1156,6 +1156,11 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 /**
  * So long as you are sure... all old posts will be gone.
  * Used in Maintenance.controller.php to prune old topics.
+ * 
+ * @param int[] $boards
+ * @param string $delete_type
+ * @param boolean $exclude_stickies
+ * @param int $older_than
  */
 function removeOldTopics(array $boards, $delete_type, $exclude_stickies, $older_than)
 {
