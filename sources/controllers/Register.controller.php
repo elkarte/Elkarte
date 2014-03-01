@@ -469,7 +469,7 @@ class Register_Controller extends Action_Controller
 
 		// Check whether we have fields that simply MUST be displayed?
 		require_once(SUBSDIR . '/Profile.subs.php');
-		loadCustomFields(0, 'register');
+		loadCustomFields(0, 'register', isset($_POST['customfield']) ? $_POST['customfield'] : array());
 
 		foreach ($context['custom_fields'] as $row)
 		{
