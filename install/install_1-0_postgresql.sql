@@ -166,13 +166,6 @@ CREATE TABLE {$db_prefix}admin_info_files (
 CREATE INDEX {$db_prefix}admin_info_files_filename ON {$db_prefix}admin_info_files (filename);
 
 #
-# Dumping data for table `admin_info_files`
-#
-
-INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, data, filetype) VALUES (1, 'detailed-version.js', 'http://elkarte.github.io/Elkarte/site/', 'language=%1$s&version=%3$s', '', 'text/javascript');
-# --------------------------------------------------------
-
-#
 # Sequence for table `antispam_questions`
 #
 
@@ -2397,6 +2390,7 @@ CREATE TABLE {$db_prefix}settings (
 
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('elkVersion', '{$current_version}');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('news', '{$default_news}');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('detailed-version.js', 'http://elkarte.github.io/Elkarte/site/detailed-version.js');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('compactTopicPagesContiguous', '5');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('compactTopicPagesEnable', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('enableStickyTopics', '1');

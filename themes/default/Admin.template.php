@@ -665,7 +665,7 @@ function template_view_versions()
 	  red.  It also contains the function, swapOption, that toggles showing the detailed information for each of the
 	  file categories. (sources, languages, and templates.) */
 	echo '
-						<script src="', $scripturl, '?action=viewadminfile;filename=detailed-version.js"></script>
+						<script src="', $context['detailed_version_url'], '"></script>
 						<script><!-- // --><![CDATA[
 							var oViewVersions = new elk_ViewVersions({
 								aKnownLanguages: [

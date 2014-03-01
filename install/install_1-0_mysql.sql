@@ -17,16 +17,6 @@ CREATE TABLE {$db_prefix}admin_info_files (
 ) ENGINE=MyISAM;
 
 #
-# Dumping data for table `admin_info_files`
-#
-
-INSERT INTO {$db_prefix}admin_info_files
-	(id_file, filename, path, parameters, data, filetype)
-VALUES
-	(1, 'detailed-version.js', 'http://elkarte.github.io/Elkarte/site/', 'language=%1$s&version=%3$s', '', 'text/javascript');
-# --------------------------------------------------------
-
-#
 # Table structure for table `antispam_questions`
 #
 
@@ -38,8 +28,6 @@ CREATE TABLE {$db_prefix}antispam_questions (
   PRIMARY KEY (id_question),
   KEY language (language(30))
 ) ENGINE=MyISAM;
-
-# --------------------------------------------------------
 
 #
 # Table structure for table `approval_queue`
@@ -1829,6 +1817,7 @@ INSERT INTO {$db_prefix}settings
 	(variable, value)
 VALUES ('elkVersion', '{$current_version}'),
 	('news', '{$default_news}'),
+	('detailed-version.js', 'http://elkarte.github.io/Elkarte/site/detailed-version.js'),
 	('compactTopicPagesContiguous', '5'),
 	('compactTopicPagesEnable', '1'),
 	('enableStickyTopics', '1'),
