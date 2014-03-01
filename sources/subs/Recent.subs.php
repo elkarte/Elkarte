@@ -670,12 +670,13 @@ function unreadreplies_tempTable($board_id, $sort)
 		)
 		SELECT t.id_topic, t.id_board, t.id_last_msg, IFNULL(lmr.id_msg, 0) AS id_msg' . (!in_array($sort, array('t.id_last_msg', 't.id_topic')) ? ', ' . $sort . ' AS sort_key' : '') . '
 		FROM {db_prefix}messages AS m
-			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
+			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)' . ($modSettings['enable_unwatch'] ? '
+			LEFT JOIN {db_prefix}log_topics AS lt ON (t.id_topic = lt.id_topic AND lt.id_member = {int:current_member})' : '') . '
 			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})' . (isset($sortKey_joins[$sort]) ? $sortKey_joins[$sort] : '') . '
 		WHERE m.id_member = {int:current_member}' . (!empty($board_id) ? '
-			AND t.id_board = {int:current_board}' : '') .
-			($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
-			($modSettings['enable_unwatch'] ? ' AND IFNULL(lt.unwatched, 0) != 1' : '') . '
+			AND t.id_board = {int:current_board}' : '') . ($modSettings['postmod_active'] ? '
+			AND t.approved = {int:is_approved}' : '') . ($modSettings['enable_unwatch'] ? '
+			AND IFNULL(lt.unwatched, 0) != 1' : '') . '
 		GROUP BY m.id_topic',
 		array(
 			'current_board' => $board_id,
