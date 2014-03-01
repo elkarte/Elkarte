@@ -59,19 +59,23 @@ class ManageRegistration_Controller extends Action_Controller
 			'register' => array(
 				'controller' => $this,
 				'function' => 'action_register',
-				'permission' => 'moderate_forum'),
+				'permission' => 'moderate_forum',
+			),
 			'agreement' => array(
 				'controller' => $this,
 				'function' => 'action_agreement',
-				'permission' => 'admin_forum'),
+				'permission' => 'admin_forum',
+			),
 			'reservednames' => array(
 				'controller' => $this,
 				'function' => 'action_reservednames',
-				'permission' => 'admin_forum'),
+				'permission' => 'admin_forum',
+			),
 			'settings' => array(
 				'controller' => $this,
 				'function' => 'action_registerSettings_display',
-				'permission' => 'admin_forum'),
+				'permission' => 'admin_forum',
+			),
 		);
 
 		call_integration_hook('integrate_manage_registrations', array(&$subActions));
@@ -126,22 +130,36 @@ class ManageRegistration_Controller extends Action_Controller
 			checkSession();
 			validateToken('admin-regc');
 
-			foreach ($_POST as $key => $dummy)
-				if (!is_array($_POST[$key]))
-					$_POST[$key] = htmltrim__recursive(str_replace(array("\n", "\r"), '', $_POST[$key]));
+			foreach ($_POST as $key => $value)
+				if (!is_array($value))
+					$_POST[$key] = htmltrim__recursive(str_replace(array("\n", "\r"), '', $value));
+
+			// Generate a password
+			if ((string) $_POST['password'] === '')
+			{
+				mt_srand(time() + 1277);
+				$password = generateValidationCode();
+			}
+			else
+			{
+				$password = $_POST['password'];
+			}
 
 			$regOptions = array(
 				'interface' => 'admin',
 				'username' => $_POST['user'],
 				'email' => $_POST['email'],
-				'password' => $_POST['password'],
-				'password_check' => $_POST['password'],
+				'password' => $password,
+				'password_check' => $password,
 				'check_reserved_name' => true,
 				'check_password_strength' => false,
 				'check_email_ban' => false,
-				'send_welcome_email' => isset($_POST['emailPassword']) || empty($_POST['password']),
+				'send_welcome_email' => isset($_POST['emailPassword']),
 				'require' => isset($_POST['emailActivate']) ? 'activation' : 'nothing',
 				'memberGroup' => empty($_POST['group']) || !allowedTo('manage_membergroups') ? 0 : (int) $_POST['group'],
+				'member_ip' => '127.0.0.1',
+				'member_ip2' => '127.0.0.1',
+				'auth_method' => 'password',
 			);
 
 			require_once(SUBSDIR . '/Members.subs.php');

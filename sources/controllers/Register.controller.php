@@ -257,6 +257,10 @@ class Register_Controller extends Action_Controller
 		// Start collecting together any errors.
 		$reg_errors = Error_Context::context('register', 0);
 
+		// Make sure they didn't just register with this session.
+		if (!empty($_SESSION['just_registered']) && empty($modSettings['disableRegisterCheck']))
+			fatal_lang_error('register_only_once', false);
+
 		// We can't validate the token and the session with OpenID enabled.
 		if(!$verifiedOpenID)
 		{

@@ -457,24 +457,6 @@ function registerMember(&$regOptions, $error_context = 'register')
 	// Put any errors in here.
 	$reg_errors = Error_Context::context($error_context, 0);
 
-	// Registration from the admin center, let them sweat a little more.
-	if ($regOptions['interface'] == 'admin')
-	{
-		is_not_guest();
-		isAllowedTo('moderate_forum');
-	}
-	// You're new around, aren't you? or else!
-	elseif ($regOptions['interface'] == 'guest')
-	{
-		// You cannot register twice...
-		if (empty($user_info['is_guest']))
-			redirectexit();
-
-		// Make sure they didn't just register with this session.
-		if (!empty($_SESSION['just_registered']) && empty($modSettings['disableRegisterCheck']))
-			fatal_lang_error('register_only_once', false);
-	}
-
 	// What method of authorization are we going to use?
 	if (empty($regOptions['auth_method']) || !in_array($regOptions['auth_method'], array('password', 'openid')))
 	{
@@ -495,19 +477,10 @@ function registerMember(&$regOptions, $error_context = 'register')
 	validateUsername(0, $regOptions['username'], $error_context, !empty($regOptions['check_reserved_name']));
 
 	// Generate a validation code if it's supposed to be emailed.
-	$validation_code = '';
-	if ($regOptions['require'] == 'activation')
-		$validation_code = generateValidationCode();
+	$validation_code = $regOptions['require'] === 'activation' ? generateValidationCode() : '';
 
-	// If you haven't put in a password generate one.
-	if ($regOptions['interface'] == 'admin' && $regOptions['password'] == '' && $regOptions['auth_method'] == 'password')
-	{
-		mt_srand(time() + 1277);
-		$regOptions['password'] = generateValidationCode();
-		$regOptions['password_check'] = $regOptions['password'];
-	}
 	// Does the first password match the second?
-	elseif ($regOptions['password'] != $regOptions['password_check'] && $regOptions['auth_method'] == 'password')
+	if ($regOptions['password'] != $regOptions['password_check'] && $regOptions['auth_method'] == 'password')
 		$reg_errors->addError('passwords_dont_match');
 
 	// That's kind of easy to guess...
@@ -529,26 +502,16 @@ function registerMember(&$regOptions, $error_context = 'register')
 			$reg_errors->addError('profile_error_password_' . $passwordError);
 	}
 
+	// @todo move to controller
 	// You may not be allowed to register this email.
 	if (!empty($regOptions['check_email_ban']))
 		isBannedEmail($regOptions['email'], 'cannot_register', $txt['ban_register_prohibited']);
 
 	// Check if the email address is in use.
-	$request = $db->query('', '
-		SELECT id_member
-		FROM {db_prefix}members
-		WHERE email_address = {string:email_address}
-			OR email_address = {string:username}
-		LIMIT 1',
-		array(
-			'email_address' => $regOptions['email'],
-			'username' => $regOptions['username'],
-		)
-	);
-
-	if ($db->num_rows($request) != 0)
+	if (userByEmail($regOptions['email'], $regOptions['username']))
+	{
 		$reg_errors->addError(array('email_in_use', array(htmlspecialchars($regOptions['email'], ENT_COMPAT, 'UTF-8'))));
-	$db->free_result($request);
+	}
 
 	// Perhaps someone else wants to check this user
 	call_integration_hook('integrate_register_check', array(&$regOptions, &$reg_errors));
@@ -580,9 +543,6 @@ function registerMember(&$regOptions, $error_context = 'register')
 	if (isset($regOptions['theme_vars']) && count(array_intersect(array_keys($regOptions['theme_vars']), $reservedVars)) != 0)
 		fatal_lang_error('no_theme');
 
-	// New password hash
-	require_once(SUBSDIR . '/Auth.subs.php');
-
 	// Some of these might be overwritten. (the lower ones that are in the arrays below.)
 	$regOptions['register_vars'] = array(
 		'member_name' => $regOptions['username'],
@@ -591,8 +551,8 @@ function registerMember(&$regOptions, $error_context = 'register')
 		'password_salt' => substr(md5(mt_rand()), 0, 4) ,
 		'posts' => 0,
 		'date_registered' => time(),
-		'member_ip' => $regOptions['interface'] == 'admin' ? '127.0.0.1' : $regOptions['ip'],
-		'member_ip2' => $regOptions['interface'] == 'admin' ? '127.0.0.1' : $regOptions['ip2'],
+		'member_ip' => $regOptions['ip'],
+		'member_ip2' => $regOptions['ip2'],
 		'validation_code' => $validation_code,
 		'real_name' => $regOptions['username'],
 		'personal_text' => $modSettings['default_personal_text'],
@@ -637,24 +597,13 @@ function registerMember(&$regOptions, $error_context = 'register')
 
 	if (isset($regOptions['memberGroup']))
 	{
+		require_once(SUBSDIR . '/Membergroups.subs.php');
+
 		// Make sure the id_group will be valid, if this is an administator.
 		$regOptions['register_vars']['id_group'] = $regOptions['memberGroup'] == 1 && !allowedTo('admin_forum') ? 0 : $regOptions['memberGroup'];
 
 		// Check if this group is assignable.
-		$unassignableGroups = array(-1, 3);
-		$request = $db->query('', '
-			SELECT id_group
-			FROM {db_prefix}membergroups
-			WHERE min_posts != {int:min_posts}' . (allowedTo('admin_forum') ? '' : '
-				OR group_type = {int:is_protected}'),
-			array(
-				'min_posts' => -1,
-				'is_protected' => 1,
-			)
-		);
-		while ($row = $db->fetch_assoc($request))
-			$unassignableGroups[] = $row['id_group'];
-		$db->free_result($request);
+		$unassignableGroups = getUnassignableGroups(allowedTo('admin_forum'));
 
 		if (in_array($regOptions['register_vars']['id_group'], $unassignableGroups))
 			$regOptions['register_vars']['id_group'] = 0;
@@ -716,6 +665,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 	else
 		updateMemberStats();
 
+	// @todo there's got to be a method that does this
 	// Theme variables too?
 	if (!empty($theme_vars))
 	{
@@ -733,6 +683,21 @@ function registerMember(&$regOptions, $error_context = 'register')
 	// If it's enabled, increase the registrations for today.
 	trackStats(array('registers' => '+'));
 
+	// @todo emails should be sent from the controller, with a new method.
+
+	// Don't worry about what the emails might want to replace. Just give them everything and let them sort it out.
+	$replacements = array(
+		'REALNAME' => $regOptions['register_vars']['real_name'],
+		'USERNAME' => $regOptions['username'],
+		'PASSWORD' => $regOptions['password'],
+		'FORGOTPASSWORDLINK' => $scripturl . '?action=reminder',
+		'ACTIVATIONLINK' => $scripturl . '?action=activate;u=' . $memberID . ';code=' . $validation_code,
+		'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=activate;u=' . $memberID,
+		'ACTIVATIONCODE' => $validation_code,
+		'OPENID' => !empty($regOptions['openid']) ? $regOptions['openid'] : '',
+		'COPPALINK' => $scripturl . '?action=coppa;u=' . $memberID,
+	);
+
 	// Administrative registrations are a bit different...
 	if ($regOptions['interface'] == 'admin')
 	{
@@ -743,16 +708,6 @@ function registerMember(&$regOptions, $error_context = 'register')
 
 		if (isset($email_message))
 		{
-			$replacements = array(
-				'REALNAME' => $regOptions['register_vars']['real_name'],
-				'USERNAME' => $regOptions['username'],
-				'PASSWORD' => $regOptions['password'],
-				'FORGOTPASSWORDLINK' => $scripturl . '?action=reminder',
-				'ACTIVATIONLINK' => $scripturl . '?action=activate;u=' . $memberID . ';code=' . $validation_code,
-				'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=activate;u=' . $memberID,
-				'ACTIVATIONCODE' => $validation_code,
-			);
-
 			$emaildata = loadEmailTemplate($email_message, $replacements);
 
 			sendmail($regOptions['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
@@ -767,13 +722,6 @@ function registerMember(&$regOptions, $error_context = 'register')
 	{
 		if (!empty($regOptions['send_welcome_email']))
 		{
-			$replacements = array(
-				'REALNAME' => $regOptions['register_vars']['real_name'],
-				'USERNAME' => $regOptions['username'],
-				'PASSWORD' => $regOptions['password'],
-				'FORGOTPASSWORDLINK' => $scripturl . '?action=reminder',
-				'OPENID' => !empty($regOptions['openid']) ? $regOptions['openid'] : '',
-			);
 			$emaildata = loadEmailTemplate('register_' . ($regOptions['auth_method'] == 'openid' ? 'openid_' : '') . 'immediate', $replacements);
 			sendmail($regOptions['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
 		}
@@ -785,25 +733,6 @@ function registerMember(&$regOptions, $error_context = 'register')
 	// Need to activate their account - or fall under COPPA.
 	elseif ($regOptions['require'] == 'activation' || $regOptions['require'] == 'coppa')
 	{
-		$replacements = array(
-			'REALNAME' => $regOptions['register_vars']['real_name'],
-			'USERNAME' => $regOptions['username'],
-			'PASSWORD' => $regOptions['password'],
-			'FORGOTPASSWORDLINK' => $scripturl . '?action=reminder',
-			'OPENID' => !empty($regOptions['openid']) ? $regOptions['openid'] : '',
-		);
-
-		if ($regOptions['require'] == 'activation')
-			$replacements += array(
-				'ACTIVATIONLINK' => $scripturl . '?action=activate;u=' . $memberID . ';code=' . $validation_code,
-				'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=activate;u=' . $memberID,
-				'ACTIVATIONCODE' => $validation_code,
-			);
-		else
-			$replacements += array(
-				'COPPALINK' => $scripturl . '?action=coppa;u=' . $memberID,
-			);
-
 		$emaildata = loadEmailTemplate('register_' . ($regOptions['auth_method'] == 'openid' ? 'openid_' : '') . ($regOptions['require'] == 'activation' ? 'activate' : 'coppa'), $replacements);
 
 		sendmail($regOptions['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
@@ -811,14 +740,6 @@ function registerMember(&$regOptions, $error_context = 'register')
 	// Must be awaiting approval.
 	else
 	{
-		$replacements = array(
-			'REALNAME' => $regOptions['register_vars']['real_name'],
-			'USERNAME' => $regOptions['username'],
-			'PASSWORD' => $regOptions['password'],
-			'FORGOTPASSWORDLINK' => $scripturl . '?action=reminder',
-			'OPENID' => !empty($regOptions['openid']) ? $regOptions['openid'] : '',
-		);
-
 		$emaildata = loadEmailTemplate('register_' . ($regOptions['auth_method'] == 'openid' ? 'openid_' : '') . 'pending', $replacements);
 
 		sendmail($regOptions['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
