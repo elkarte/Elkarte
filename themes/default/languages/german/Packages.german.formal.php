@@ -193,14 +193,8 @@ $txt['package_db_remove_table'] = 'Lösche Tabelle &quot;%1$s&quot;';
 $txt['package_db_remove_column'] = 'Entferne Spalte &quot;%2$s&quot; aus &quot;%1$s&quot;';
 $txt['package_db_remove_index'] = 'Entferne Index &quot;%1$s&quot; aus &quot;%2$s&quot;';
 
-$txt['package_advanced_button'] = 'Emulationsunterstützung'; // ? :)
-$txt['package_advanced_options'] = 'Erweiterte Optionen';
-$txt['package_apply'] = 'Anwenden';
-$txt['package_emulate'] = 'Version emulieren';
 $txt['package_emulate_install'] = 'Installieren als:';
 $txt['package_emulate_uninstall'] = 'Deinstallieren als:';
-$txt['package_emulate_revert'] = 'Umkehren';
-$txt['package_emulate_desc'] = 'Manchmal sind Pakete an frühe Versionen der Software gebunden, bleiben jedoch mit neueren Versionen kompatibel. Hier können Sie eine andere Version innerhalb der Paketverwaltung &quot;emulieren&quot;.';
 
 // Operations.
 $txt['operation_find'] = 'Suchen';
