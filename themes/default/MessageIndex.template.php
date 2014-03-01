@@ -144,6 +144,11 @@ function template_topic_listing()
 			echo '
 	<form action="', $scripturl, '?action=quickmod;board=', $context['current_board'], '.', $context['start'], '" method="post" accept-charset="UTF-8" class="clear" name="quickModForm" id="quickModForm">';
 
+		// If this person can approve items and we have some awaiting approval tell them.
+		if (!empty($context['unapproved_posts_message']))
+			echo '
+		<div class="warningbox">! ', $context['unapproved_posts_message'], '</div>';
+
 		echo '
 		<ul class="topic_listing" id="messageindex">
 			<li class="topic_sorting_row">';
@@ -155,15 +160,6 @@ function template_topic_listing()
 
 		echo '
 			</li>';
-
-		// If this person can approve items and we have some awaiting approval tell them.
-		if (!empty($context['unapproved_posts_message']))
-		{
-			echo '
-			<li class="basic_row">
-				<div class="warningbox">! ', $context['unapproved_posts_message'], '</div>
-			</li>';
-		}
 
 		foreach ($context['topics'] as $topic)
 		{
@@ -198,8 +194,12 @@ function template_topic_listing()
 				echo '
 							<a class="new_posts" href="', $topic['new_href'], '" id="newicon' . $topic['first_post']['id'] . '">' . $txt['new'] . '</a>';
 
+			// Is this an unapproved topic and they can approve it?
+			if ($context['can_approve_posts'] && !$topic['approved'])
+				echo '<span class="require_approval">' . $txt['awaiting_approval'] . '</span>';
+
 			echo '
-							', $topic['is_sticky'] ? '<strong>' : '', '<span class="preview" title="', $topic['default_preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], ($context['can_approve_posts'] && !$topic['approved'] ? '&nbsp;&nbsp;<em><img src="' . $settings['images_url'] . '/admin/post_moderation_moderate.png" style="width:16px" alt="' . $txt['awaiting_approval'] . '" title="' . $txt['awaiting_approval'] . '" />(' . $txt['awaiting_approval'] . ')</em>' : ''), '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
+							', $topic['is_sticky'] ? '<strong>' : '', '<span class="preview" title="', $topic['default_preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
 						</h4>
 					</div>
 					<div class="topic_starter">

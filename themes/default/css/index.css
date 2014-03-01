@@ -318,11 +318,11 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 /* the new "button" */
 /* @todo - Might add extra fallbacks. Possibly monospace. */
 /* @todo - Also, look at deprecating spans here. */
-.new_posts {
+.new_posts, .require_approval {
 	font-weight: bold;
 	line-height: 1.12px;
 }
-.new_posts {
+.new_posts, .require_approval {
 	display: inline;
 	padding: 1px 4px 2px 4px;
 	font-size: .643em;
@@ -3900,7 +3900,7 @@ a.help .icon {
 		min-width: 15em;
 	}
 	.board_latest {
-		min-width: 20em;
+		min-width: 22em;
 		width: 40%;
 	}
 	.lastpost_link {
@@ -3957,7 +3957,7 @@ a.help .icon {
 		text-overflow: ellipsis;
 	}
 	.board_latest {
-		min-width: 20em;
+		min-width: 22em;
 	}
 	.board_row {
 		min-width: 20em;
