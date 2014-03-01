@@ -22,11 +22,14 @@ if (!defined('ELK'))
 
 /**
  * Sets the login cookie and session based on the id_member and password passed.
+ *
+ * What it does:
  * - password should be already encrypted with the cookie salt.
  * - logs the user out if id_member is zero.
  * - sets the cookie and session to last the number of seconds specified by cookie_length.
  * - when logging out, if the globalCookies setting is enabled, attempts to clear the subdomain's cookie too.
  *
+ * @pachage Authorization
  * @param int $cookie_length
  * @param int $id The id of the member
  * @param string $password = ''
@@ -117,9 +120,12 @@ function setLoginCookie($cookie_length, $id, $password = '')
 
 /**
  * Get the domain and path for the cookie
+ *
+ * What it does:
  * - normally, local and global should be the localCookies and globalCookies settings, respectively.
  * - uses boardurl to determine these two things.
  *
+ * @pachage Authorization
  * @param bool $local
  * @param bool $global
  */
@@ -154,10 +160,13 @@ function url_parts($local, $global)
 
 /**
  * Question the verity of the admin by asking for his or her password.
+ *
+ * What it does:
  * - loads Login.template.php and uses the admin_login sub template.
  * - sends data to template so the admin is sent on to the page they
  *   wanted if their password is correct, otherwise they can try again.
  *
+ * @pachage Authorization
  * @param string $type = 'admin'
  */
 function adminLogin($type = 'admin')
@@ -217,8 +226,11 @@ function adminLogin($type = 'admin')
 
 /**
  * Used by the adminLogin() function.
- * if 'value' is an array, the function is called recursively.
  *
+ * What it does:
+ *  - if 'value' is an array, the function is called recursively.
+ *
+ * @pachage Authorization
  * @param string $k key
  * @param string|boolean $v value
  * @return string 'hidden' HTML form fields, containing key-value-pairs
@@ -241,6 +253,7 @@ function adminLogin_outputPostVars($k, $v)
 /**
  * Properly urlencodes a string to be used in a query
  *
+ * @pachage Authorization
  * @param mixed[] $get associative array from $_GET
  * @return string query string
  */
@@ -279,9 +292,12 @@ function construct_query_string($get)
 
 /**
  * Finds members by email address, username, or real name.
+ *
+ * What it does:
  * - searches for members whose username, display name, or e-mail address match the given pattern of array names.
  * - searches only buddies if buddies_only is set.
  *
+ * @pachage Authorization
  * @param string[]|string $names
  * @param bool $use_wildcards = false, accepts wildcards ? and * in the patern if true
  * @param bool $buddies_only = false,
@@ -368,12 +384,15 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 
 /**
  * Generates a random password for a user and emails it to them.
+ *
+ * What it does:
  * - called by ProfileOptions controller when changing someone's username.
  * - checks the validity of the new username.
  * - generates and sets a new password for the given user.
  * - mails the new password to the email address of the user.
  * - if username is not set, only a new password is generated and sent.
  *
+ * @pachage Authorization
  * @param int $memID
  * @param string|null $username = null
  */
@@ -439,11 +458,14 @@ function resetPassword($memID, $username = null)
 /**
  * Checks a username obeys a load of rules
  *
+ * - Returns null if fine
+ *
+ * @pachage Authorization
  * @param int $memID
  * @param string $username
  * @param string $error_context
  * @param boolean $check_reserved_name
- * @return string Returns null if fine
+ * @return string
  */
 function validateUsername($memID, $username, $error_context = 'register', $check_reserved_name = true)
 {
@@ -476,11 +498,14 @@ function validateUsername($memID, $username, $error_context = 'register', $check
 
 /**
  * Checks whether a password meets the current forum rules
+ *
+ * What it does:
  * - called when registering/choosing a password.
  * - checks the password obeys the current forum settings for password strength.
  * - if password checking is enabled, will check that none of the words in restrict_in appear in the password.
  * - returns an error identifier if the password is invalid, or null.
  *
+ * @pachage Authorization
  * @param string $password
  * @param string $username
  * @param string[] $restrict_in = array()
@@ -517,10 +542,13 @@ function validatePassword($password, $username, $restrict_in = array())
 
 /**
  * Checks whether an entered password is correct for the user
+ *
+ * What it does:
  * - called when logging in or whenever a password needs to be validated for a user
  * - used to generate a new hash for the db, used during registration or any password changes
  * - if a non SHA256 password is sent, will generate one with SHA256(user + password) and return it in password
  *
+ * @pachage Authorization
  * @param string $password user password if not already 64 characters long will be SHA256 with the user name
  * @param string $hash hash as generated from a SHA256 password
  * @param string $user user name only required if creating a SHA-256 password
@@ -568,8 +596,12 @@ function validateLoginPassword(&$password, $hash, $user = '', $returnhash = fals
 
 /**
  * Quickly find out what moderation authority this user has
+ *
+ * What it does:
  * - builds the moderator, group and board level querys for the user
  * - stores the information on the current users moderation powers in $user_info['mod_cache'] and $_SESSION['mc']
+ *
+ * @pachage Authorization
  */
 function rebuildModCache()
 {
@@ -644,8 +676,9 @@ function rebuildModCache()
 }
 
 /**
- * The same thing as setcookie but gives support for HTTP-Only cookies in PHP < 5.2
+ * The same thing as setcookie but allows for integration hook
  *
+ * @pachage Authorization
  * @param string $name
  * @param string $value = ''
  * @param int $expire = 0
@@ -667,26 +700,13 @@ function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = ''
 	// Intercept cookie?
 	call_integration_hook('integrate_cookie', array($name, $value, $expire, $path, $domain, $secure, $httponly));
 
-	// This function is pointless if we have PHP >= 5.2.
-	if (version_compare(PHP_VERSION, '5.2', '>='))
-		return setcookie($name, $value, $expire, $path, $domain, $secure, $httponly);
-
-	// $httponly is the only reason I made this function. If it's not being used, use setcookie().
-	if (!$httponly)
-		return setcookie($name, $value, $expire, $path, $domain, $secure);
-
-	// Ugh, looks like we have to resort to using a manual process.
-	header('Set-Cookie: '.rawurlencode($name).'='.rawurlencode($value)
-			.(empty($domain) ? '' : '; Domain='.$domain)
-			.(empty($expire) ? '' : '; Max-Age='.$expire)
-			.(empty($path) ? '' : '; Path='.$path)
-			.(!$secure ? '' : '; Secure')
-			.(!$httponly ? '' : '; HttpOnly'), false);
+	return setcookie($name, $value, $expire, $path, $domain, $secure, $httponly);
 }
 
 /**
  * Set the passed users online or not, in the online log table
  *
+ * @pachage Authorization
  * @param int[]|int $ids ids of the member(s) to log
  * @param bool $on = false if true, add the user(s) to online log, if false, remove 'em
  */
@@ -713,6 +733,7 @@ function logOnline($ids, $on = false)
 /**
  * Delete expired/outdated session from log_online
  *
+ * @pachage Authorization
  * @param string $session
  */
 function deleteOnline($session)
@@ -731,6 +752,7 @@ function deleteOnline($session)
 /**
  * This functions determines whether this is the first login of the given user.
  *
+ * @pachage Authorization
  * @param int $id_member the id of the member to check for
  */
 function isFirstLogin($id_member)
@@ -745,6 +767,7 @@ function isFirstLogin($id_member)
 /**
  * Search for a member by given criterias
  *
+ * @pachage Authorization
  * @param string $where
  * @param mixed[] $where_params array of values to used in the where statement
  * @param bool $fatal
@@ -795,6 +818,7 @@ function findUser($where, $where_params, $fatal = true)
 /**
  * Find users by their email address.
  *
+ * @pachage Authorization
  * @param string $email
  * @return boolean
  */
@@ -820,6 +844,8 @@ function userByEmail($email)
 
 /**
  * Generate a random validation code.
+ *
+ * @pachage Authorization
  */
 function generateValidationCode()
 {
@@ -840,12 +866,11 @@ function generateValidationCode()
 }
 
 /**
- * This function loads many settings of a user given by
- * name or email.
+ * This function loads many settings of a user given by name or email.
  *
+ * @pachage Authorization
  * @param string $name
  * @param bool $is_id if true it treats $name as a member ID and try to load the data for that ID
- *
  * @return mixed[]|false false if nothing is found
  */
 function loadExistingMember($name, $is_id = false)

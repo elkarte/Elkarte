@@ -35,7 +35,7 @@ interface Database
 	 * their current values from $user_info.
 	 * In addition, it performs checks and sanitization on the values sent to the database.
 	 *
-	 * @param $matches
+	 * @param mixed[] $matches
 	 */
 	public function replacement__callback($matches);
 
@@ -72,7 +72,7 @@ interface Database
 	 * Fetch a row from the resultset given as parameter.
 	 *
 	 * @param resource $result
-	 * @param $counter = false
+	 * @param int|boolean $counter = false
 	 */
 	public function fetch_row($result, $counter = false);
 
@@ -173,7 +173,7 @@ interface Database
 	/**
 	 * Escape the LIKE wildcards so that they match the character and not the wildcard.
 	 *
-	 * @param $string
+	 * @param string $string
 	 * @param bool $translate_human_wildcards = false, if true, turns human readable wildcards into SQL wildcards.
 	 * @return string
 	 */

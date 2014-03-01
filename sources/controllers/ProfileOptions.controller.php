@@ -44,7 +44,6 @@ class ProfileOptions_Controller extends Action_Controller
 
 	/**
 	 * Show all the users buddies, as well as a add/delete interface.
-	 *
 	 */
 	public function action_editBuddyIgnoreLists()
 	{
@@ -127,6 +126,7 @@ class ProfileOptions_Controller extends Action_Controller
 			// Redirect off the page because we don't like all this ugly query stuff to stick in the history.
 			redirectexit('action=profile;area=lists;sa=buddies;u=' . $memID);
 		}
+		// Or adding a new one
 		elseif (isset($_POST['new_buddy']))
 		{
 			checkSession();
@@ -214,7 +214,7 @@ class ProfileOptions_Controller extends Action_Controller
 		$context['buddies'] = array();
 		foreach ($buddies as $buddy)
 		{
-			loadMemberContext($buddy);
+			loadMemberContext($buddy, true);
 			$context['buddies'][$buddy] = $memberContext[$buddy];
 		}
 

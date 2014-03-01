@@ -484,7 +484,7 @@ class Database_MySQL implements Database
 	/**
 	 * Reset the internal result pointer.
 	 *
-	 * @param $request
+	 * @param resource $request
 	 * @param integer $counter
 	 */
 	public function data_seek($request, $counter)
@@ -848,7 +848,7 @@ class Database_MySQL implements Database
 	/**
 	 * Escape the LIKE wildcards so that they match the character and not the wildcard.
 	 *
-	 * @param $string
+	 * @param string $string
 	 * @param bool $translate_human_wildcards = false, if true, turns human readable wildcards into SQL wildcards.
 	 */
 	public function escape_wildcard_string($string, $translate_human_wildcards = false)
@@ -870,7 +870,7 @@ class Database_MySQL implements Database
 	/**
 	 * Unescape an escaped string!
 	 *
-	 * @param $string
+	 * @param string $string
 	 */
 	public function unescape_string($string)
 	{

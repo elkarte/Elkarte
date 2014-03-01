@@ -33,8 +33,24 @@ $GLOBALS['search_versions'] = array(
  */
 class Search_Controller extends Action_Controller
 {
+	/**
+	 * Weighing factor each area, ie frequncy, age, sticky, ec
+	 * @var array
+	 */
 	private $_weight = array();
+
+	/**
+	 * Holds the total of all weight factors, should be 100
+	 *
+	 * @var int
+	 */
 	private $_weight_total = 0;
+
+	/**
+	 * Holds array of search result relevancy weigh factors
+	 *
+	 * @var array
+	 */
 	private $_weight_factors = array();
 
 	/**
@@ -1659,6 +1675,7 @@ class Search_Controller extends Action_Controller
 
 	/**
 	 * Callback to return messages - saves memory.
+	 *
 	 * @todo Fix this, update it, whatever... from Display.controller.php mainly.
 	 * Note that the call to loadAttachmentContext() doesn't work:
 	 * this function doesn't fulfill the pre-condition to fill $attachments global...
@@ -1668,7 +1685,7 @@ class Search_Controller extends Action_Controller
 	 * - callback function for the results sub template.
 	 * - loads the necessary contextual data to show a search result.
 	 *
-	 * @param $reset = false
+	 * @param boolean $reset = false
 	 * @return array of messages that match the search
 	 */
 	public function prepareSearchContext_callback($reset = false)
@@ -1942,7 +1959,7 @@ class Search_Controller extends Action_Controller
 	 */
 	private function _setup_weight_factors()
 	{
-		global $user_info, $modSettings, $txt;
+		global $user_info, $modSettings;
 
 		$default_factors = $this->_weight_factors = array(
 			'frequency' => array(
@@ -1982,6 +1999,7 @@ class Search_Controller extends Action_Controller
 
 		call_integration_hook('integrate_search_weights', array(&$this->_weight_factors));
 
+		// Set the weight factors for each area (frequency, age, etc) as defined in the ACP
 		foreach ($this->_weight_factors as $weight_factor => $value)
 		{
 			$this->_weight[$weight_factor] = empty($modSettings['search_weight_' . $weight_factor]) ? 0 : (int) $modSettings['search_weight_' . $weight_factor];

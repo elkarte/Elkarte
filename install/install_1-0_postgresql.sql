@@ -2401,6 +2401,9 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('compactTopicPagesCon
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('compactTopicPagesEnable', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('enableStickyTopics', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('todayMod', '1');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('likes_enabled', '1');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('likeDisplayLimit', '5');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('likeMinPosts', '5');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('karmaMode', '0');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('karmaTimeRestrictAdmins', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('enablePreviousNext', '1');

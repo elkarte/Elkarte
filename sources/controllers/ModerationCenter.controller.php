@@ -238,7 +238,7 @@ class ModerationCenter_Controller extends Action_Controller
 						'label' => $txt['mc_view_groups'],
 						'file' => 'Groups.controller.php',
 						'controller' => 'Groups_Controller',
-						'function' => 'action_list',
+						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_membergroups',
 					),
@@ -1478,7 +1478,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 * @param int $start
 	 * @param int $items_per_page
 	 * @param string $sort
-	 * @param $template_type type of template to load
+	 * @param string $template_type type of template to load
 	 */
 	public function list_getWarningTemplates($start, $items_per_page, $sort, $template_type = 'warntpl')
 	{

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * class that will reflow/format an email message to make it look like a post again
  *
@@ -38,74 +39,88 @@ class Email_Format
 {
 	/**
 	 * The full message section we will return
+	 * @var string
 	 */
 	private $_body = null;
 
 	/**
 	 * The full message section broken in to parts
+	 * @var mixe[]
 	 */
 	private $_body_array = array();
 
 	/**
 	 * Holds the current quote level we are in
+	 * @var int
 	 */
 	private $_in_quote = 0;
 
 	/**
 	 * Holds the current code block level we are in
+	 * @var int
 	 */
 	private $_in_code = 0;
 
 	/**
 	 * Holds the level of bbc list we are in
+	 * @var int
 	 */
 	private $_in_bbclist = 0;
 
 	/**
 	 * Holds the level of plain list we are in
+	 * @var int
 	 */
 	private $_in_plainlist = 0;
 
 	/**
 	 * Holds if we are in a plain text list
+	 * @var int
 	 */
 	private $_in_list = 0;
 
 	/**
 	 * Set if we have entered an area of the message that is a signature block
+	 * @var boolean
 	 */
 	private $_found_sig = false;
 
 	/**
 	 * Holds the members display name, used for signature check etc.
+	 * @var string
 	 */
 	private $_real_name = null;
 
 	/**
 	 * Tuning value (fudge) used to decide if a line is short
 	 * change with care, used to help figure out wrapping decisions
+	 * @var int
 	 */
 	private $_maillist_short_line = null;
 
 	/**
 	 * Extra items to removed, defined in the acp
+	 * @var string[]
 	 */
 	private $_maillist_leftover_remove = null;
 
 	/**
-	 * Items that may indicatte the start of a signature line, defined in the acp
+	 * Items that may indicate the start of a signature line, defined in the acp
+	 * @var string[]
 	 */
 	private $_maillist_sig_keys = null;
 
 	/**
 	 * Tuning delta value (fudge) to help indicate the last line in a paragraph
 	 * change with care
+	 * @var int
 	 */
 	private $_para_check = 25;
 
 	/**
 	 * tuning value used to define a long line in a signature line
 	 * change with care
+	 * @var int
 	 */
 	private $_sig_longline = 67;
 

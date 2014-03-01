@@ -52,106 +52,127 @@ class Email_Parse
 {
 	/**
 	 * The full message section (headers, body, etc) we are working on
+	 * @var string
 	 */
 	public $raw_message = null;
 
 	/**
 	 * Attachments found after the message
+	 * @var string[]
 	 */
 	public $attachments = array();
 
 	/**
 	 * Attachments that we designated as inline with the text
+	 * @var string[]
 	 */
 	public $inline_files = array();
 
 	/**
 	 * Parsed and decoded message body, may be plain text or html
+	 * @var string
 	 */
 	public $body = null;
 
 	/**
 	 * Parsed and decoded message body, only plain text version
+	 * @var string
 	 */
 	public $plain_body = null;
 
 	/**
 	 * All of the parsed message headers
+	 * @var mixed[]
 	 */
 	public $headers = array();
 
 	/**
 	 * Full security key
+	 * @var string
 	 */
 	public $message_key_id = null;
 
 	/**
 	 * Message type of the key p, m or t
+	 * @var char
 	 */
 	public $message_type = null;
 
 	/**
 	 * If an html was found in the message
+	 * @var boolean
 	 */
 	public $html_found = false;
 
 	/**
 	 * If any positive spam headers were found in the message
+	 * @var boolean
 	 */
 	public $spam_found = false;
 
 	/**
 	 * Message id of the key
+	 * @var string
 	 */
 	public $message_id = null;
 
 	/**
 	 * Holds the return path as set in the email header
+	 * @var string
 	 */
 	public $return_path = null;
 
 	/**
 	 * Holds the message subject
+	 * @var string
 	 */
 	public $subject = null;
 
 	/**
 	 * Holds the email to from & cc emails and names
+	 * @var mixed[]
 	 */
 	public $email = array();
 
 	/**
 	 * Holds the sending ip of the email
+	 * @var string
 	 */
 	public $ip = false;
 
 	/**
 	 * If the file was converted to utf8
+	 * @var boolean
 	 */
 	public $_converted_utf8 = false;
 
 	/**
 	 * Holds the current email address, to, from, cc
+	 * @var mixed[]
 	 */
 	private $_email_address = null;
 
 	/**
 	 * Holds the current email name
+	 * @var string
 	 */
 	private $_email_name = null;
 
 	/**
 	 * Holds each boundary section of the message
+	 * @var string[]
 	 */
 	private $_boundary_section = array();
 
 	/**
 	 * The total number of boundary sections
+	 * @var int
 	 */
 	private $_boundary_section_count = null;
 
 	/**
 	 * The message header block
+	 * @var string
 	 */
 	private $_header_block = null;
 

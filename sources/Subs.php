@@ -620,7 +620,7 @@ function htmlTime($timestamp)
 
 	$timestamp = forum_time(true, $timestamp);
 	$time = date('Y-m-d H:i', $timestamp);
-	$stdtime = standardTime($timestamp);
+	$stdtime = standardTime($timestamp, true, true);
 
 	// @todo maybe htmlspecialchars on the title attribute?
 	return '<time title="' . $stdtime . '" datetime="' . $time . '" data-timestamp="' . $timestamp . '">' . $stdtime . '</time>';
@@ -1036,7 +1036,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 					'width' => array('optional' => true, 'value' => '$1px;', 'match' => '(\d+)'),
 					'height' => array('optional' => true, 'value' => '$1px;', 'match' => '(\d+)'),
 				),
-				'content' => '<img src="$1" alt="{alt}" style="width:{width}height:{height}" class="bbc_img resized" />',
+				'content' => '<img src="$1" alt="{alt}" style="width:{width};height:{height}" class="bbc_img resized" />',
 				'validate' => function(&$tag, &$data, $disabled) {
 					$data = strtr($data, array('<br />' => ''));
 					if (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
@@ -3699,27 +3699,14 @@ function call_integration_hook($hook, $parameters = array())
 	foreach ($functions as $function)
 	{
 		$function = trim($function);
+		if (strpos($function, '|') !== false)
+			list ($call, $file) = explode('|', $function);
+		else
+			$call = $function;
 
 		// OOP static method
-		if (strpos($function, '::') !== false)
-		{
-			$call = explode('::', $function);
-			if (strpos($call[1], ':') !== false)
-			{
-				list ($func, $file) = explode(':', $call[1]);
-				$call = array($call[0], $func);
-			}
-		}
-		// Normal plain function
-		else
-		{
-			$call = $function;
-			if (strpos($function, ':') !== false)
-			{
-				list ($func, $file) = explode(':', $function);
-				$call = $func;
-			}
-		}
+		if (strpos($call, '::') !== false)
+			$call = explode('::', $call);
 
 		if (!empty($file))
 		{
@@ -3805,25 +3792,15 @@ function call_integration_buffer()
 	{
 		$function = trim($function);
 
-		// OOP static method
-		if (strpos($function, '::') !== false)
-		{
-			$call = explode('::', $function);
-			if (strpos($call[1], ':') !== false)
-			{
-				list ($func, $file) = explode(':', $call[1]);
-				$call = array($call[0], $func);
-			}
-		}
-		// Normal plain function
+		if (strpos($function, '|') !== false)
+			list($call, $file) = explode('|', $function);
 		else
-		{
 			$call = $function;
-			if (strpos($function, ':') !== false)
-			{
-				list ($func, $file) = explode(':', $function);
-				$call = $func;
-			}
+
+		// OOP static method
+		if (strpos($call, '::') !== false)
+		{
+			$call = explode('::', $call);
 		}
 
 		if (!empty($file))
@@ -3855,7 +3832,7 @@ function add_integration_function($hook, $function, $file = '', $permanent = tru
 
 	$db = database();
 
-	$integration_call = (!empty($file) && $file !== true) ? $function . ':' . $file : $function;
+	$integration_call = (!empty($file) && $file !== true) ? $function . '|' . $file : $function;
 
 	// Is it going to be permanent?
 	if ($permanent)
@@ -3911,8 +3888,6 @@ function remove_integration_function($hook, $function, $file = '')
 
 	$db = database();
 
-	$integration_call = (!empty($file)) ? $function . ':' . $file : $function;
-
 	// Get the permanent functions.
 	$request = $db->query('', '
 		SELECT value
@@ -3929,6 +3904,19 @@ function remove_integration_function($hook, $function, $file = '')
 	{
 		$current_functions = explode(',', $current_functions);
 
+		foreach ($current_functions as $filefunc)
+		{
+			if (strpos($funcfile, '|') !== false)
+				list($func, $inc_file) = explode('|', $filefunc);
+			else
+				$func = $filefunc;
+
+			if ($func == $function && (empty($file) || (!empty($file) && !empty($inc_file) && $file == $inc_file)))
+			{
+				$integration_call = $filefunc;
+				break;
+			}
+		}
 		if (in_array($integration_call, $current_functions))
 			updateSettings(array($hook => implode(',', array_diff($current_functions, array($integration_call)))));
 	}

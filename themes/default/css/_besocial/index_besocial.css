@@ -548,7 +548,9 @@ div.bbc_footnotes .meaction{
 .poster_ip a {
 	display: inline;
 }
-
+.poster .linklevel2, .poster .linklevel2:hover {
+	border: 1px solid transparent !important;
+}
 #main_menu .linklevel1, #main_menu .linklevel1:link, #main_menu .linklevel1:visited,
 .poster li.listlevel1, .poster li.listlevel1 a, .poster li.listlevel1 a:hover {
 	border-radius: 0;

@@ -33,41 +33,49 @@ class Convert_BBC
 {
 	/**
 	 * The value that will hold our dom object
+	 * @var object
 	 */
 	public $doc;
 
 	/**
 	 * The value that will hold if we are using the internal or external parser
+	 * @var boolean
 	 */
 	private $_parser;
 
 	/**
 	 * Line end character
+	 * @var string
 	 */
 	public $line_end = "\n";
 
 	/**
 	 * Line break character
+	 * @var string
 	 */
 	public $line_break = "[br]";
 
 	/**
 	 * Font numbers to pt size
+	 * @var string[]
 	 */
 	public $sizes_equivalence = array(1 => '8pt', '10pt', '12pt', '14pt', '18pt', '24pt', '36pt');
 
 	/**
 	 * Holds block elements, its intentionally not complete and is used to prevent adding extra br's
+	 * @var string[]
 	 */
 	public $block_elements = array('p', 'div', 'ol', 'ul', 'pre', 'table', 'blockquote', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6');
 
 	/**
 	 * Used to strip newlines inside of 'p' and 'div' elements
+	 * @var boolean|null
 	 */
 	public $strip_newlines = null;
 
 	/**
 	 * Holds any html tags that would normally be convert to bbc but are instead skipped
+	 * @var string[]
 	 */
 	protected $_skip_tags = array();
 

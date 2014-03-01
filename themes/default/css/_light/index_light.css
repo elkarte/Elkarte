@@ -1372,13 +1372,15 @@ div.bbc_footnotes .meaction{
 	border: 1px solid #ddd;
 	border-top: 1px #ccc solid;
 }
-#profilecenter {
+#profilecenter, #profile_attachments, #unwatched_topics {
 	background: #efefef;
 	border: 1px solid #ccc;
 	border-radius: 7px;
 	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
 }
-#profilecenter .windowbg, #profilecenter .windowbg2 {
+#profilecenter .windowbg, #profilecenter .windowbg2,
+#profile_attachments .windowbg, #profile_attachments .windowbg2,
+#unwatched_topics .windowbg, #unwatched_topics .windowbg2 {
 	border: none;
 	background: #fff;
 }

@@ -1019,7 +1019,7 @@ a.bbc_link {
 	padding: 0;
 }
 .listlevel1:hover {
-	z-index: 5;
+	z-index: 6;
 }
 .listlevel1#collapse_button, .listlevel1#button_profile {
 	float: right;
@@ -1442,6 +1442,7 @@ a.bbc_link {
 #pages_scroll_left, #pages_scroll_right {
 	position: absolute;
 	top: 0;
+	margin: 0;
 }
 #pages_scroll_left {
 	left: 0;
@@ -2464,6 +2465,7 @@ ul.post_options li {
 	line-height: 60px;
 	text-align: center;
 	opacity: 0.6;
+	display: none;
 }
 #postAttachment >dd.progress_tracker {
 	margin:0;
@@ -2760,12 +2762,14 @@ dl.merge_topic dd {
 	clear: both;
 	padding-top: 8px;
 }
-#profilecenter {
+#profilecenter, #unwatched_topics, #profile_attachments {
 	margin: 12px 0 0 0;
 	padding: 8px 8px 16px 8px;
 	overflow: auto;
 }
-#profilecenter .windowbg, #profilecenter .windowbg2 {
+#profilecenter .windowbg, #profilecenter .windowbg2,
+#profile_attachments .windowbg, #profile_attachments .windowbg2,
+#unwatched_topics .windowbg, #unwatched_topics .windowbg2 {
 	overflow: visible;
 	padding: 0 0 4px;
 }
@@ -3115,6 +3119,9 @@ dl.merge_topic dd {
 }
 #paid_subscription dl.settings dd, #paid_subscription dl.settings dt {
 	margin-bottom: 4px;
+}
+#fixed_area .styled-select {
+	vertical-align: top;
 }
 
 /* Pick theme */

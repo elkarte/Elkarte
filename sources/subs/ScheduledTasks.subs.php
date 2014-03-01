@@ -543,6 +543,13 @@ function processNextTasks($ts = 0)
 	$db->free_result($request);
 }
 
+/**
+ * Calls the supplied task_name so that it is executed.
+ * Logs that the task was executed with success or if it failed
+ *
+ * @param int $id_task specific id of the task to run, used for logging
+ * @param string $task_name name of the task, class name, function name, method in ScheduledTask.class
+ */
 function run_this_task($id_task, $task_name)
 {
 	global $time_start, $modSettings;
@@ -605,6 +612,7 @@ function run_this_task($id_task, $task_name)
 		}
 
 		$total_time = round(microtime(true) - $time_start, 3);
+
 		// If the task ended successfully, then log the proper time taken to complete
 		logTask($log_task_id, $id_task, $total_time);
 	}

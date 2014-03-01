@@ -325,7 +325,7 @@ function setup_fatal_error_context($error_message, $error_code)
 		$context['error_title'] = $txt['error_occurred'];
 	$context['error_message'] = isset($context['error_message']) ? $context['error_message'] : $error_message;
 
-	$context['error_code'] = isset($error_code) ? 'id="' . $error_code . '" ' : '';
+	$context['error_code'] = isset($error_code) ? 'id="' . htmlspecialchars($error_code) . '" ' : '';
 
 	if (empty($context['page_title']))
 		$context['page_title'] = $context['error_title'];
