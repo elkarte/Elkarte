@@ -705,3 +705,49 @@ function unreadreplies_tempTable($board_id, $sort)
 
 	return $have_temp_table;
 }
+
+function countUnreadReplies($query_parameters, $query_this_board, $have_temp_table)
+{
+	global $modSettings, $user_info;
+
+	$db = database();
+
+	if (!empty($have_temp_table))
+	{
+		$request = $db->query('', '
+			SELECT COUNT(*)
+			FROM {db_prefix}topics_posted_in AS pi
+				LEFT JOIN {db_prefix}log_topics_posted_in AS lt ON (lt.id_topic = pi.id_topic)
+			WHERE pi.' . $query_this_board . '
+				AND IFNULL(lt.id_msg, pi.id_msg) < pi.id_last_msg',
+			array_merge($query_parameters, array(
+			))
+		);
+		list ($num_topics) = $db->fetch_row($request);
+		$db->free_result($request);
+		$min_message = 0;
+	}
+	else
+	{
+		$request = $db->query('unread_fetch_topic_count', '
+			SELECT COUNT(DISTINCT t.id_topic), MIN(t.id_last_msg)
+			FROM {db_prefix}topics AS t
+				INNER JOIN {db_prefix}messages AS m ON (m.id_topic = t.id_topic)
+				LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
+				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
+			WHERE t.' . $query_this_board . '
+				AND m.id_member = {int:current_member}
+				AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' . ($modSettings['postmod_active'] ? '
+				AND t.approved = {int:is_approved}' : '') . ($modSettings['enable_unwatch'] ? '
+				AND IFNULL(lt.unwatched, 0) != 1' : ''),
+			array_merge($query_parameters, array(
+				'current_member' => $user_info['id'],
+				'is_approved' => 1,
+			))
+		);
+		list ($num_topics, $min_message) = $db->fetch_row($request);
+		$db->free_result($request);
+	}
+
+	return array($num_topics, $min_message);
+}
