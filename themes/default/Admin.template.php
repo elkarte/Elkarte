@@ -325,10 +325,10 @@ function template_view_versions()
 											', $txt['admin_elkpackage'], '
 										</td>
 										<td class="windowbg">
-											<em id="installedVersion">', $context['forum_version'], '</em>
+											<em id="yourVersion">', $context['forum_version'], '</em>
 										</td>
 										<td class="windowbg">
-											<em id="latestVersion">??</em>
+											<em id="ourVersion">??</em>
 										</td>
 									</tr>';
 
@@ -379,7 +379,7 @@ function template_view_versions()
 										<td class="windowbg versionFile">
 											<a href="#" id="admin-link">', $txt['dvc_admin'], '</a>
 										</td>
-										<td class="windowbg versionNumber>
+										<td class="windowbg versionNumber">
 											<em id="youradmin">??</em>
 										</td>
 										<td class="windowbg versionNumber">
