@@ -822,17 +822,19 @@ function findUser($where, $where_params, $fatal = true)
  * @param string $email
  * @return boolean
  */
-function userByEmail($email)
+function userByEmail($email, $username = null)
 {
 	$db = database();
 
 	$request = $db->query('', '
 		SELECT id_member
 		FROM {db_prefix}members
-		WHERE email_address = {string:email_address}
+		WHERE email_address = {string:email_address}' . ($username === null ? '' : '
+			OR email_address = {string:username}') . '
 		LIMIT 1',
 		array(
 			'email_address' => $email,
+			'username' => $username,
 		)
 	);
 

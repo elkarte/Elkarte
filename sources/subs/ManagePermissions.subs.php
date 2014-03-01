@@ -822,7 +822,7 @@ function copyPermission($copy_from, $groups, $illgeal_permissions, $non_guest_pe
  * Copy a set of board permissions from one group to another..
  *
  * @param int $copy_from
- * @param int[] $groups
+ * @param int[] $groups The target groups
  * @param int $profile_id
  * @param string[] $non_guest_permissions
  */
@@ -847,7 +847,8 @@ function copyBoardPermission($copy_from, $groups, $profile_id, $non_guest_permis
 	$db->free_result($request);
 
 	$inserts = array();
-	foreach ($_POST['group'] as $group_id)
+	foreach ($groups as $group_id)
+	{
 		foreach ($target_perm as $perm => $add_deny)
 		{
 			// Are these for guests?
@@ -856,6 +857,7 @@ function copyBoardPermission($copy_from, $groups, $profile_id, $non_guest_permis
 
 			$inserts[] = array($perm, $group_id, $profile_id, $add_deny);
 		}
+	}
 
 	// Delete the previous global board permissions...
 	$db->query('', '

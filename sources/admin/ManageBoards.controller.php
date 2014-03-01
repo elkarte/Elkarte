@@ -511,7 +511,7 @@ class ManageBoards_Controller extends Action_Controller
 			)
 		);
 
-		$context['groups'] += getOtherGroups($curBoard);
+		$context['groups'] += getOtherGroups($curBoard, $_REQUEST['sa'] == 'newboard');
 
 		// Category doesn't exist, man... sorry.
 		if (!isset($boardList[$curBoard['category']]))

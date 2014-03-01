@@ -1975,3 +1975,31 @@ function updatePostGroupStats($members = null, $parameter2 = null)
 		)
 	);
 }
+
+/**
+ * Get the ids of the groups that are unassignable
+ * 
+ * @param boolean $ignore_protected To ignore protected groups
+ * @return int[]
+ */
+function getUnassignableGroups($ignore_protected)
+{
+	$db = database();
+
+	$unassignableGroups = array(-1, 3);
+	$request = $db->query('', '
+		SELECT id_group
+		FROM {db_prefix}membergroups
+		WHERE min_posts != {int:min_posts}' . ($ignore_protected ? '' : '
+			OR group_type = {int:is_protected}'),
+		array(
+			'min_posts' => -1,
+			'is_protected' => 1,
+		)
+	);
+	while ($row = $db->fetch_assoc($request))
+		$unassignableGroups[] = $row['id_group'];
+	$db->free_result($request);
+
+	return $unassignableGroups;
+}
