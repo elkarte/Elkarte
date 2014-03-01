@@ -83,6 +83,10 @@ INSERT IGNORE INTO {$db_prefix}settings
 	(variable, value)
 VALUES
 	('mentions_dont_notify_rlike', '0');
+INSERT IGNORE INTO {$db_prefix}settings
+	(variable, value)
+VALUES
+	('detailed-version.js', 'http://elkarte.github.io/Elkarte/site/detailed-version.js');
 ---#
 
 /******************************************************************************/
