@@ -57,8 +57,6 @@ class Recent_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $user_info, $context, $modSettings, $board;
 
-		$db = database();
-
 		loadTemplate('Recent');
 		$context['page_title'] = $txt['recent_posts'];
 		$context['sub_template'] = 'recent';
@@ -172,47 +170,7 @@ class Recent_Controller extends Action_Controller
 			'name' => $context['page_title']
 		);
 
-		$key = 'recent-' . $user_info['id'] . '-' . md5(serialize(array_diff_key($query_parameters, array('max_id_msg' => 0)))) . '-' . (int) $_REQUEST['start'];
-		if (empty($modSettings['cache_enable']) || ($messages = cache_get_data($key, 120)) == null)
-		{
-			$done = false;
-			while (!$done)
-			{
-				// Find the 10 most recent messages they can *view*.
-				// @todo SLOW This query is really slow still, probably?
-				$request = $db->query('', '
-					SELECT m.id_msg
-					FROM {db_prefix}messages AS m
-						INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
-					WHERE ' . $query_this_board . '
-						AND m.approved = {int:is_approved}
-					ORDER BY m.id_msg DESC
-					LIMIT {int:offset}, {int:limit}',
-					array_merge($query_parameters, array(
-						'is_approved' => 1,
-						'offset' => $_REQUEST['start'],
-						'limit' => 10,
-					))
-				);
-				// If we don't have 10 results, try again with an unoptimized version covering all rows, and cache the result.
-				if (isset($query_parameters['max_id_msg']) && $db->num_rows($request) < 10)
-				{
-					$db->free_result($request);
-					$query_this_board = str_replace('AND m.id_msg >= {int:max_id_msg}', '', $query_this_board);
-					$cache_results = true;
-					unset($query_parameters['max_id_msg']);
-				}
-				else
-					$done = true;
-			}
-			$messages = array();
-			while ($row = $db->fetch_assoc($request))
-				$messages[] = $row['id_msg'];
-			$db->free_result($request);
-
-			if (!empty($cache_results))
-				cache_put_data($key, $messages, 120);
-		}
+		$messages = findRecentMessages($query_parameters, $query_this_board, (int) $_REQUEST['start'], 10);
 
 		// Nothing here... Or at least, nothing you can see...
 		if (empty($messages))
