@@ -1114,14 +1114,17 @@ function template_profile_block_buddies()
 							&nbsp;<a href="', $scripturl, '?action=pm;sa=send;u=', $data['id'], '"><img src="', $settings['images_url'], '/profile/', ($data['online']['is_online']) ? 'im_on.png' : 'im_off.png', '" alt="', $txt['profile_sendpm_short'], '" title="', $txt['profile_sendpm_short'], ' to ', $data['name'], '" class="icon"/></a>';
 
 				// Other contact info from custom profile fields?
-				$im = array();
-				foreach ($data['custom_fields'] as $key => $cpf)
-					if ($cpf['placement'] == 1)
-						$im[] = $cpf['value'];
+				if (isset($data['custom_fields']))
+				{
+					$im = array();
 
-				echo '
+					foreach ($data['custom_fields'] as $key => $cpf)
+						if ($cpf['placement'] == 1)
+							$im[] = $cpf['value'];
+
+					echo '
 							&nbsp;' . implode('&nbsp;', $im);
-
+				}
 				// Done with the contact information
 				echo '
 						</td>';
