@@ -1310,7 +1310,7 @@ function getBoardNotificationsCount($memID)
  * @param int[]|null $id_parents array of ints representing board ids
  * @param int[]|null $id_boards
  */
-function accessibleBoards($id_parents = null, $id_boards = null)
+function accessibleBoards($id_boards = null, $id_parents = null)
 {
 	$db = database();
 

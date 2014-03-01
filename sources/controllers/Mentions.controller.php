@@ -426,7 +426,7 @@ class Mentions_Controller extends Action_Controller
 		{
 			require_once(SUBSDIR . '/Boards.subs.php');
 
-			$accessibleBoards = accessibleBoards(null, $boards);
+			$accessibleBoards = accessibleBoards($boards);
 
 			foreach ($boards as $key => $board)
 			{
