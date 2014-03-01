@@ -1080,7 +1080,6 @@ function membersAllowedTo($permission, $board_id = null)
  * @param string|false $email = false
  * @param string|false $membername = false
  * @param bool $post_count = false
- * @return nothing
  */
 function reattributePosts($memID, $email = false, $membername = false, $post_count = false)
 {
@@ -1234,7 +1233,7 @@ function list_getNumMembers($where, $where_params = array())
 /**
  * Find potential duplicate registation members based on the same IP address
  *
- * @param $members
+ * @param mixed[] $members
  */
 function populateDuplicateMembers(&$members)
 {
@@ -1377,14 +1376,18 @@ function isAnotherAdmin($memberID)
 }
 
 /**
- * This function retrieves a list of member ids based on some conditions
+ * This function retrieves a list of member ids based on a set of conditions
  *
  * @param mixed[]|string $query can be an array of "type" of conditions,
  *              or a string used as raw query
- * @param mixed[] $query_params is an array containing the parameters to be passed
- *              to the query
+ *				or a string that represents one of the built in conditions like member_names, not_in_group, etc
+ * @param mixed[] $query_params is an array containing the parameters to be passed to the query
+ *				'start' and 'limit' used in LIMIT
+ *				'order' used raw in ORDER BY
+ *				others passed as query params
  * @param bool $details if true returns additional member details (name, email, ip, etc.)
- * @param bool $only_active
+ *				false will only return an array of member id's that match the conditions
+ * @param bool $only_active only fetch active members
  */
 function membersBy($query, $query_params, $details = false, $only_active = true)
 {
@@ -1407,6 +1410,7 @@ function membersBy($query, $query_params, $details = false, $only_active = true)
 		'in_group_no_add'  => '(id_group = {int:in_group_no_add} AND FIND_IN_SET({int:in_group_no_add}, additional_groups) = 0)',
 	);
 
+	// Are there multiple parts to this query
 	if (is_array($query))
 	{
 		$query_parts = array('or' => array(), 'and' => array());
@@ -1433,6 +1437,7 @@ function membersBy($query, $query_params, $details = false, $only_active = true)
 
 		$query_where = implode("\n\t\t\tAND ", $query_parts['and']);
 	}
+	// Is it one of our predefined querys like member_ids, member_names, etc
 	elseif (isset($allowed_conditions[$query]))
 	{
 		if ($query == 'member_names')
@@ -1440,12 +1445,15 @@ function membersBy($query, $query_params, $details = false, $only_active = true)
 		else
 			$query_where = $allowed_conditions[$query];
 	}
+	// Somthing else, be careful ;)
 	else
 		$query_where = $query;
 
+	// Lazy loading, our favorite
 	if (empty($query_where))
 		return false;
 
+	// Only want active members
 	if ($only_active)
 	{
 		$query_where .= '
@@ -1455,6 +1463,7 @@ function membersBy($query, $query_params, $details = false, $only_active = true)
 
 	$db = database();
 
+	// Lets see who we can find that meets the built up conditions
 	$members = array();
 	$request = $db->query('', '
 		SELECT id_member' . ($details ? ', member_name, real_name, email_address, member_ip, date_registered, last_login,
@@ -1466,11 +1475,13 @@ function membersBy($query, $query_params, $details = false, $only_active = true)
 		$query_params
 	);
 
+	// Return all the details for each member found
 	if ($details)
 	{
 		while ($row = $db->fetch_assoc($request))
 			$members[$row['id_member']] = $row;
 	}
+	// Or just a int[] of found member id's
 	else
 	{
 		while ($row = $db->fetch_assoc($request))

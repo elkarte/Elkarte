@@ -1405,11 +1405,13 @@ function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0
 
 /**
  * Checks for errors in steps, until 5 seconds have passed.
- * It keeps track of the errors it did find, so that the actual repair
- * won't have to recheck everything.
  *
- * @param $do_fix
- * @return mixed[] the errors found.
+ * - It keeps track of the errors it did find, so that the actual repair
+ * won't have to recheck everything.
+ * - returns the errors found.
+ * 
+ * @param boolean $do_fix
+ * @return mixed[]
  */
 function findForumErrors($do_fix = false)
 {

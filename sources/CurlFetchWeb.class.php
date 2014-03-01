@@ -41,6 +41,7 @@ class Curl_Fetch_Webdata
 {
 	/**
 	 * Set the default items for this class
+	 * @var mixed[]
 	 */
 	private $default_options = array(
 		CURLOPT_RETURNTRANSFER	=> 1, // Get returned value as a string (don't output it)
@@ -58,36 +59,43 @@ class Curl_Fetch_Webdata
 
 	/**
 	 * Holds the passed or defautl value for redirects
+	 * @var int
 	 */
 	private $_max_redirect = 3;
 
 	/**
 	 * Holds the current redirect count for the request
+	 * @var int
 	 */
 	private $_current_redirect = 0;
 
 	/**
 	 * Holds the passed user options array
+	 * @var mixed[]
 	 */
 	private $_user_options = array();
 
 	/**
 	 * Holds any data that will be posted to a form
+	 * @var string
 	 */
 	private $_post_data = '';
 
 	/**
 	 * Holds the response to the cURL request, headers, data, code, etc
+	 * @var string[]
 	 */
 	private $_response = array();
 
 	/**
 	 * Holds response headers to the request
+	 * @var mixed[]
 	 */
 	private $_headers = array();
 
 	/**
 	 * Holds the options for this request
+	 * @var mixed[]
 	 */
 	private $_options = array();
 
@@ -174,12 +182,12 @@ class Curl_Fetch_Webdata
 			'url' => $url,
 			'code' => $http_code,
 			'error' => $error,
-			'headers' => isset($this->_headers) ? $this->_headers : false,
+			'headers' => !empty($this->_headers) ? $this->_headers : false,
 			'body' => $body,
 		);
 
 		// If this a redirect with a location header and we have not given up, then we play it again Sam
-		if (preg_match('~30[127]~i', $http_code) === 1 && $this->_headers['location'] != '' && $this->_current_redirect <= $this->_max_redirect)
+		if (preg_match('~30[127]~i', $http_code) === 1 && $this->_headers['location'] !== '' && $this->_current_redirect <= $this->_max_redirect)
 		{
 			$this->_current_redirect++;
 			$header_location = $this->_getRedirectURL($url, $this->_headers['location']);
@@ -291,7 +299,7 @@ class Curl_Fetch_Webdata
 			$this->_options = $this->default_options;
 
 		// POST data options, here we don't allow any override
-		if (isset($this->_post_data))
+		if (!empty($this->_post_data))
 		{
 			$this->_options[CURLOPT_POST] = 1;
 			$this->_options[CURLOPT_POSTFIELDS] = $this->_post_data;

@@ -72,10 +72,10 @@ $(document).ready(function() {
 			return true;
 
 		$(this).css({'cursor': 'pointer'});
-		$(this).click(function() {
+		$(this).on( "click.elk_bbc", function() {
 			var $this = $(this);
 
-			// No saved data, then lets set it to autp
+			// No saved data, then lets set it to auto
 			if ($.isEmptyObject($this.data()))
 			{
 				$this.data("bbc_img", {width: $this.css('width'), height: $this.css('height')});

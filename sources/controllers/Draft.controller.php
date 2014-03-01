@@ -127,6 +127,7 @@ class Draft_Controller extends Action_Controller
 				'board' => array(
 					'name' => $row['bname'],
 					'id' => $row['id_board'],
+					'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['bname'] . '</a>',
 				),
 				'topic' => array(
 					'id' => $row['id_topic'],

@@ -171,6 +171,8 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 interface Control_Verifications
 {
 	/**
+	 * Used to build the control and return if it should be shown or not
+	 *
 	 * @param boolean $isNew
 	 * @param boolean $force_refresh
 	 *
@@ -179,6 +181,8 @@ interface Control_Verifications
 	public function showVerification($isNew, $force_refresh = true);
 
 	/**
+	 * Create the actual test that will be used
+	 *
 	 * @param boolean $refresh
 	 *
 	 * @return void
@@ -186,21 +190,29 @@ interface Control_Verifications
 	public function createTest($refresh = true);
 
 	/**
+	 * Prepare the context for use in the template
+	 *
 	 * @return void
 	 */
 	public function prepareContext();
 
 	/**
+	 * Run the test, return if it passed or not
+	 *
 	 * @return string|boolean
 	 */
 	public function doTest();
 
 	/**
+	 * If the control has a visable location on the template or if its hidden
+	 *
 	 * @return boolean
 	 */
 	public function hasVisibleTemplate();
 
 	/**
+	 * Handles the ACP for the control
+	 *
 	 * @return void
 	 */
 	public function settings();
@@ -211,12 +223,53 @@ interface Control_Verifications
  */
 class Control_Verification_Captcha implements Control_Verifications
 {
+	/**
+	 * Holds the $verificationOptions passed to the constuctor
+	 *
+	 * @var array
+	 */
 	private $_options = null;
+
+	/**
+	 * If we are actualy displaying the captcha image
+	 *
+	 * @var boolean
+	 */
 	private $_show_captcha = false;
+
+	/**
+	 * The string of text that will be used in the image and verification
+	 *
+	 * @var string
+	 */
 	private $_text_value = null;
+
+	/**
+	 * The url to the created image
+	 *
+	 * @var string
+	 */
 	private $_image_href = null;
+
+	/**
+	 * If the response has been tested or not
+	 *
+	 * @var boolean
+	 */
 	private $_tested = false;
+
+	/**
+	 * If the GD libary is available for use
+	 *
+	 * @var boolean
+	 */
 	private $_use_graphic_library = false;
+
+	/**
+	 * array of allowable characters that can be used in the image
+	 *
+	 * @var array
+	 */
 	private $_standard_captcha_range = array();
 
 	/**
@@ -335,7 +388,7 @@ class Control_Verification_Captcha implements Control_Verifications
 	}
 
 	/**
-	 *
+	 * Required by the interface, returns true for Captcha display
 	 * @return true
 	 */
 	public function hasVisibleTemplate()
@@ -405,21 +458,55 @@ class Control_Verification_Captcha implements Control_Verifications
 }
 
 /**
- * Class to manage, prepare, show, and validate question -> answer verifiations
+ * Class to manage, prepare, show, and validate question -> answer verifications
  */
 class Control_Verification_Questions implements Control_Verifications
 {
+	/**
+	 * Holds any options passed to the class
+	 *
+	 * @var array
+	 */
 	private $_options = null;
+
+	/**
+	 * array holding all of the available question id
+	 * @var int[]
+	 */
 	private $_questionIDs = null;
+
+	/**
+	 * Number of challange questions to use
+	 *
+	 * @var int
+	 */
 	private $_number_questions = null;
+
+	/**
+	 * Language the question is in
+	 *
+	 * @var string
+	 */
 	private $_questions_language = null;
+
+	/**
+	 * Questions that can be used given what available (trys to account for lanaguges)
+	 *
+	 * @var int[]
+	 */
 	private $_possible_questions = null;
+
+	/**
+	 * Array of question id's that they provided a wrong answer to
+	 *
+	 * @var int[]
+	 */
 	private $_incorrectQuestions = null;
 
 	/**
 	 * On your mark
 	 *
-	 * @param mixed[]|null $verificationOptions
+	 * @param mixed[]|null $verificationOptions override_qs,
 	 */
 	public function __construct($verificationOptions = null)
 	{
@@ -457,9 +544,7 @@ class Control_Verification_Questions implements Control_Verifications
 			{
 				// Not even in the forum default? What the heck are you doing?!
 				if (empty($modSettings['question_id_cache'][$language]))
-				{
 					$this->_number_questions = 0;
-				}
 				// Fall back to the default
 				else
 					$this->_questions_language = $language;
@@ -481,7 +566,7 @@ class Control_Verification_Questions implements Control_Verifications
 	}
 
 	/**
-	 * Prepare the Q&A test/lsit for this request
+	 * Prepare the Q&A test/list for this request
 	 *
 	 * @param boolean $refresh
 	 */
@@ -559,6 +644,7 @@ class Control_Verification_Questions implements Control_Verifications
 	}
 
 	/**
+	 * Required by the interface, returns true for question challanges
 	 *
 	 * @return true
 	 */
@@ -661,10 +747,10 @@ class Control_Verification_Questions implements Control_Verifications
 	}
 
 	/**
-	* Checks if an the answers to anti-spam questions are correct
+	 * Checks if an the answers to anti-spam questions are correct
 	 *
-	* @return boolean
-	*/
+	 * @return boolean
+	 */
 	private function _verifyAnswers()
 	{
 		// Get the answers and see if they are all right!
@@ -685,8 +771,8 @@ class Control_Verification_Questions implements Control_Verifications
 	}
 
 	/**
-	* Updates the cache of questions IDs
-	*/
+	 * Updates the cache of questions IDs
+	 */
 	private function _refreshQuestionsCache()
 	{
 		global $modSettings;
@@ -824,19 +910,64 @@ class Control_Verification_Questions implements Control_Verifications
  */
 class Control_Verification_EmptyField implements Control_Verifications
 {
+	/**
+	 * Hold the options passed to the class
+	 *
+	 * @var array
+	 */
 	private $_options = null;
+
+	/**
+	 * If its going to be used or not on a form
+	 *
+	 * @var boolean
+	 */
 	private $_empty_field = null;
+
+	/**
+	 * Holds a randomly generated field name
+	 *
+	 * @var string
+	 */
 	private $_field_name = null;
+
+	/**
+	 * If the validation test has been run
+	 *
+	 * @var boolean
+	 */
 	private $_tested = false;
+
+	/**
+	 * What the user may have entered in the field
+	 *
+	 * @var string
+	 */
 	private $_user_value = null;
+
+	/**
+	 * Hash value used to generate the field name
+	 *
+	 * @var string
+	 */
 	private $_hash = null;
+
+	/**
+	 * Array of terms used in building the field name
+	 * @var string[]
+	 */
 	private $_terms = array('gadget', 'device', 'uid', 'gid', 'guid', 'uuid', 'unique', 'identifier', 'bb2');
+
+	/**
+	 * Secondary array used to build out the field name
+	 * @var string[]
+	 */
 	private $_second_terms = array('hash', 'cipher', 'code', 'key', 'unlock', 'bit', 'value', 'screener');
 
 	/**
 	 * Get things rolling
 	 *
-	 * @param mixed[]|null $verificationOptions
+	 * @param mixed[]|null $verificationOptions no_empty_field,
 	 */
 	public function __construct($verificationOptions = null)
 	{
@@ -846,6 +977,7 @@ class Control_Verification_EmptyField implements Control_Verifications
 
 	/**
 	 * Returns if we are showing this verification control or not
+	 * Build the control if we are
 	 *
 	 * @param boolean $isNew
 	 * @param boolean $force_refresh
@@ -930,7 +1062,7 @@ class Control_Verification_EmptyField implements Control_Verifications
 	}
 
 	/**
-	 * Not used, just returns false
+	 * Not used, just returns false for empty field verifications
 	 *
 	 * @return false
 	 */

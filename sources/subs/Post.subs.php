@@ -244,7 +244,7 @@ function preparsecode(&$message, $previewing = false)
 			$parts[$i] = preg_replace('~\[color=(?:#[\da-fA-F]{3}|#[\da-fA-F]{6}|[A-Za-z]{1,20}|rgb\(\d{1,3}, ?\d{1,3}, ?\d{1,3}\))\]\s*\[/color\]~', '', $parts[$i]);
 		}
 
-		call_integration_hook('integrate_preparse_code', array(&$parts[$i]));
+		call_integration_hook('integrate_preparse_code', array(&$parts[$i], $i, $previewing));
 	}
 
 	// Put it back together!
@@ -593,7 +593,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		$db->free_result($request);
 	}
 
-	// If nothing was filled in as name/e-mail address, try the member table.
+	// If nothing was filled in as name/email address, try the member table.
 	if (!isset($posterOptions['name']) || $posterOptions['name'] == '' || (empty($posterOptions['email']) && !empty($posterOptions['id'])))
 	{
 		if (empty($posterOptions['id']))

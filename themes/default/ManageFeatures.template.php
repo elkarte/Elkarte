@@ -146,6 +146,10 @@ function template_edit_profile_field()
 								<div class="styled-select">
 									<select name="field_type" id="field_type" onchange="updateInputBoxes();">
 										<option value="text"', $context['field']['type'] == 'text' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_text'], '</option>
+										<option value="email"', $context['field']['type'] == 'email' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_email'], '</option>
+										<option value="url"', $context['field']['type'] == 'url' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_url'], '</option>
+										<option value="date"', $context['field']['type'] == 'date' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_date'], '</option>
+										<option value="color"', $context['field']['type'] == 'color' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_color'], '</option>
 										<option value="textarea"', $context['field']['type'] == 'textarea' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_textarea'], '</option>
 										<option value="select"', $context['field']['type'] == 'select' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_select'], '</option>
 										<option value="radio"', $context['field']['type'] == 'radio' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_radio'], '</option>

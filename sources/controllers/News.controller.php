@@ -34,6 +34,7 @@ class News_Controller extends Action_Controller
 
 	/**
 	 * Holds the limit for the number of items to get
+	 * @var int
 	 */
 	private $_limit;
 

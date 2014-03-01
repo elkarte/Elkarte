@@ -18,8 +18,13 @@
  */
 
 /**
- * Attachment_Controller class.  It downloads an attachment or avatar, and
- * increments the download count where applicable.
+ * Attachment_Controller class.
+ *
+ * - Handles the downloading of an attachment or avatar
+ * - Handles the uploadign of attachments via Ajax
+ * - increments the download count where applicable
+ *
+ * @package Attachments
  */
 class Attachment_Controller extends Action_Controller
 {

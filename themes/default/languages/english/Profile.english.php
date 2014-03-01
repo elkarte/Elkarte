@@ -23,7 +23,7 @@ $txt['profile_buddies_no'] = 'You have not set any buddies';
 $txt['profile_user_info'] = 'User Info';
 $txt['profile_contact_no'] = 'There is no contact information for this member';
 $txt['profile_signature_no'] = 'There is no signature for this member';
-$txt['profile_additonal_no'] = 'There is no additonal information for this member';
+$txt['profile_additonal_no'] = 'There is no additional information for this member';
 $txt['profile_user_summary'] = 'Profile';
 $txt['profile_action'] = 'Currently';
 $txt['profile_recent_activity'] = 'Recent Activity';
@@ -123,7 +123,7 @@ $txt['notify_send_type_everything'] = 'Replies and moderation';
 $txt['notify_send_type_everything_own'] = 'Moderation only if I started the topic';
 $txt['notify_send_type_only_replies'] = 'Only replies';
 $txt['notify_send_type_nothing'] = 'Nothing at all';
-$txt['notify_send_body'] = 'When sending notification of a reply to a topic, send the post in the email (but please don\'t reply to these emails.)';
+$txt['notify_send_body'] = 'When sending notifications of a reply to a topic, send the post in the email (but please don\'t reply to these emails.)';
 
 $txt['notifications_topics'] = 'Current Topic Notifications';
 $txt['notifications_topics_list'] = 'You are being notified of replies to the following topics';
