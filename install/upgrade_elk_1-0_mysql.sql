@@ -54,7 +54,7 @@ VALUES
 	('mentions_enabled', '1'),
 	('mentions_buddy', '0'),
 	('mentions_dont_notify_rlike', '0'),
-	('detailed-version.js', 'http://elkarte.github.io/Elkarte/site/detailed-version.js');
+	('detailed-version.js', 'https://elkarte.github.io/Elkarte/site/detailed-version.js');
 ---#
 
 /******************************************************************************/

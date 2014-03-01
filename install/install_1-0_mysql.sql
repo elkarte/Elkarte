@@ -1817,7 +1817,7 @@ INSERT INTO {$db_prefix}settings
 	(variable, value)
 VALUES ('elkVersion', '{$current_version}'),
 	('news', '{$default_news}'),
-	('detailed-version.js', 'http://elkarte.github.io/Elkarte/site/detailed-version.js'),
+	('detailed-version.js', 'https://elkarte.github.io/Elkarte/site/detailed-version.js'),
 	('compactTopicPagesContiguous', '5'),
 	('compactTopicPagesEnable', '1'),
 	('enableStickyTopics', '1'),

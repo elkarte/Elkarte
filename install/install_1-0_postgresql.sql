@@ -2390,7 +2390,7 @@ CREATE TABLE {$db_prefix}settings (
 
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('elkVersion', '{$current_version}');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('news', '{$default_news}');
-INSERT INTO {$db_prefix}settings (variable, value) VALUES ('detailed-version.js', 'http://elkarte.github.io/Elkarte/site/detailed-version.js');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('detailed-version.js', 'https://elkarte.github.io/Elkarte/site/detailed-version.js');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('compactTopicPagesContiguous', '5');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('compactTopicPagesEnable', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('enableStickyTopics', '1');
