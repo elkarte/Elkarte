@@ -407,6 +407,7 @@ class Recent_Controller extends Action_Controller
 			);
 			list ($num_topics) = $db->fetch_row($request);
 			$db->free_result($request);
+			$min_message = 0;
 		}
 		else
 		{
