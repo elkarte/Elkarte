@@ -58,13 +58,8 @@ class ManageLanguages_Controller extends Action_Controller
 			'editlang' => array($this, 'action_editlang', 'permission' => 'admin_forum'),
 		);
 
-		call_integration_hook('integrate_manage_languages', array(&$subActions));
-
-		// By default we're managing languages.
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'edit';
-		$context['sub_action'] = $subAction;
-		$context['page_title'] = $txt['edit_languages'];
-		$context['sub_template'] = 'show_settings';
+		// Get ready for action
+		$action = new Action('manage_languages');
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -72,9 +67,15 @@ class ManageLanguages_Controller extends Action_Controller
 			'description' => $txt['language_description'],
 		);
 
+		// By default we're managing languages, call integrate_manage_languages
+		$subAction = $action->initialize($subActions, 'edit');
+
+		// Some final bits
+		$context['sub_action'] = $subAction;
+		$context['page_title'] = $txt['edit_languages'];
+		$context['sub_template'] = 'show_settings';
+
 		// Call the right function for this sub-action.
-		$action = new Action();
-		$action->initialize($subActions, 'edit');
 		$action->dispatch($subAction);
 	}
 

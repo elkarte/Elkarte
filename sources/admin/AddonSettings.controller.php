@@ -69,10 +69,10 @@ class AddonSettings_Controller extends Action_Controller
 			),
 		);
 
-		// Make it easier for addons to add new areas, this will call integrate_modify_modifications
+		// Set up the action controller
 		$action = new Action('modify_modifications');
 
-		// Pick the correct sub-action.
+		// Pick the correct sub-action, call integrate_modify_modifications
 		$subAction = $action->initialize($subActions, 'general');
 		$context['sub_action'] = $subAction;
 

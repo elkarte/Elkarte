@@ -41,14 +41,17 @@ class ManageTopics_Controller extends Action_Controller
 				'permission' => 'admin_forum')
 		);
 
-		// Only one option I'm afraid
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'display';
+		// Control for an action, why not!
+		$action = new Action('manage_topics');
+
+		// Only one option I'm afraid, but integrate_manage_topics may add more
+		$subAction = $action->initialize($subActions, 'display');
+
+		// Page items for the template
 		$context['sub_action'] = $subAction;
 		$context['page_title'] = $txt['manageposts_topic_settings'];
 
 		// Set up action/subaction stuff.
-		$action = new Action();
-		$action->initialize($subActions, 'display');
 		$action->dispatch($subAction);
 	}
 

@@ -59,13 +59,8 @@ class ManageMail_Controller extends Action_Controller
 			'settings' => array($this, 'action_mailSettings_display', 'permission' => 'admin_forum'),
 		);
 
-		call_integration_hook('integrate_manage_mail', array(&$subActions));
-
-		// By default we want to browse
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'browse';
-
-		$context['sub_action'] = $subAction;
-		$context['page_title'] = $txt['mailqueue_title'];
+		// Action control
+		$action = new Action('manage_mail');
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -74,9 +69,14 @@ class ManageMail_Controller extends Action_Controller
 			'description' => $txt['mailqueue_desc'],
 		);
 
+		// By default we want to browse, call integrate_manage_mail
+		$subAction = $action->initialize($subActions, 'browse');
+
+		// Final bits
+		$context['sub_action'] = $subAction;
+		$context['page_title'] = $txt['mailqueue_title'];
+
 		// Call the right function for this sub-action.
-		$action = new Action();
-		$action->initialize($subActions, 'browse');
 		$action->dispatch($subAction);
 	}
 

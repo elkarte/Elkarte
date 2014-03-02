@@ -74,10 +74,8 @@ class ManageNews_Controller extends Action_Controller
 				'permission' => 'admin_forum'),
 		);
 
-		call_integration_hook('integrate_manage_news');
-
-		// Default to sub action 'main' or 'settings' depending on permissions.
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('edit_news') ? 'editnews' : (allowedTo('send_mail') ? 'mailingmembers' : 'settings'));
+		// Action control
+		$action = new Action('manage_news');
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -96,6 +94,13 @@ class ManageNews_Controller extends Action_Controller
 			),
 		);
 
+		// Default to sub action 'editnews' or 'mailingmembers' or 'settings' depending on permissions.
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('edit_news') ? 'editnews' : (allowedTo('send_mail') ? 'mailingmembers' : 'settings'));
+
+		// Give integration its shot via integrate_manage_news
+		$action->initialize($subActions, 'settings');
+
+		// Some bits for the tempalte
 		$context['page_title'] = $txt['news_title'];
 		$context['sub_action'] = $subAction;
 
@@ -104,8 +109,6 @@ class ManageNews_Controller extends Action_Controller
 			$context[$context['admin_menu_name']]['current_subsection'] = 'mailingmembers';
 
 		// Call the right function for this sub-action.
-		$action = new Action();
-		$action->initialize($subActions, 'settings');
 		$action->dispatch($subAction);
 	}
 

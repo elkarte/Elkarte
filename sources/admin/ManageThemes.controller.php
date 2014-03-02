@@ -84,6 +84,9 @@ class ManageThemes_Controller extends Action_Controller
 			'browse' => array($this, 'action_browse', 'permission' => 'admin_forum'),
 		);
 
+		// Action controller
+		$action = new Action('manage_themes');
+
 		// @todo Layout Settings?
 		if (!empty($context['admin_menu_name']))
 		{
@@ -114,16 +117,14 @@ class ManageThemes_Controller extends Action_Controller
 			);
 		}
 
-		// Follow the sa or just go to administration.
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'admin';
+		// Follow the sa or just go to administration, call integrate_manage_themes
+		$subAction = $action->initialize($subActions, 'admin');
 
 		// Default the page title to Theme Administration by default.
 		$context['page_title'] = $txt['themeadmin_title'];
 		$context['sub_action'] = $subAction;
 
 		// Go to the action, if you have permissions
-		$action = new Action();
-		$action->initialize($subActions, 'admin');
 		$action->dispatch($subAction);
 	}
 

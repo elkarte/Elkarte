@@ -94,12 +94,8 @@ class ManagePermissions_Controller extends Action_Controller
 				'permission' => 'admin_forum'),
 		);
 
-		call_integration_hook('integrate_manage_permissions', array(&$subActions));
-
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) && empty($subActions[$_REQUEST['sa']]['disabled']) ? $_REQUEST['sa'] : (allowedTo('manage_permissions') ? 'index' : 'settings');
-
-		$context['page_title'] = $txt['permissions_title'];
-		$context['sub_action'] = $subAction;
+		// Action controller
+		$action = new Action('manage_permissions');
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -125,9 +121,17 @@ class ManagePermissions_Controller extends Action_Controller
 			),
 		);
 
-		// Call the right function for this sub-action.
-		$action = new Action();
+		// Set the subAction, taking permissions in to account
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) && empty($subActions[$_REQUEST['sa']]['disabled']) ? $_REQUEST['sa'] : (allowedTo('manage_permissions') ? 'index' : 'settings');
+
+		// Load the subactions, call integrate_manage_permissions
 		$action->initialize($subActions);
+		
+		// Last items needed
+		$context['page_title'] = $txt['permissions_title'];
+		$context['sub_action'] = $subAction;
+
+		// Call the right function for this sub-action.
 		$action->dispatch($subAction);
 	}
 

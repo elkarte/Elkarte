@@ -52,14 +52,15 @@ class ManageBBC_Controller extends Action_Controller
 				'permission' => 'admin_forum')
 		);
 
-		// Only one option I'm afraid
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'display';
+		// Set up
+		$action = new Action('manage_bbc');
+
+		// Only one option I'm afraid, but integrate_manage_bbc can add more
+		$subAction = $action->initialize($subActions, 'display');
 		$context['sub_action'] = $subAction;
 		$context['page_title'] = $txt['manageposts_bbc_settings_title'];
 
-		// Initiate and call
-		$action = new Action();
-		$action->initialize($subActions, 'display');
+		// Make the call
 		$action->dispatch($subAction);
 	}
 
