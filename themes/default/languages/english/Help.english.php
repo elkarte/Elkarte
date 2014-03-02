@@ -445,19 +445,19 @@ $helptxt['registration_method'] = 'This option determines what method of registr
 		</li>
 	</ul>';
 $helptxt['register_openid'] = '<strong>Authenticate with OpenID</strong><br />
-	OpenID is a means of using one username across different websites, to simplify the online experience. To use OpenID you first need to create an OpenID account - a list of providers can be found on the <a href="http://openid.net/" target="_blank">OpenID Official Site</a><br /><br />
-	Once you have an OpenID account simply enter your unique identification URL into the OpenID input box and submit. You will then be taken to your providers site to verify your identity before being passed back to this site.<br /><br />
-	On your first visit to this site you will be asked to confirm a couple of details before you will be recognized, after which you can login to this site and change your profile settings using just your OpenID.<br /><br />
+	OpenID allows you to use the same user credentials across different websites to simplify your online experience. To use OpenID you first need to create an OpenID account - a list of providers can be found on the <a href="http://openid.net/" target="_blank">OpenID Official Site</a><br /><br />
+	Once you have an OpenID account simply enter your unique identification URL into the OpenID input box and submit. You will then be taken to your provider\'s site to verify your identity before being passed back to this site.<br /><br />
+	On your first visit to this site you will be asked to supply a couple of details before you will be recognized, after which you can login to this site and change your profile settings using just your OpenID.<br /><br />
 	For more information please visit the <a href="http://openid.net/" target="_blank">OpenID Official Site</a>';
 
-$helptxt['send_validation_onChange'] = 'When this option is checked all members who change their email address in their profile will have to reactivate their account from an email sent to that address';
+$helptxt['send_validation_onChange'] = 'When this option is checked all members who change their email address in their profile will have to reactivate their account from an email sent to the new address';
 $helptxt['send_welcomeEmail'] = 'When this option is enabled all new members will be sent an email welcoming them to your community';
-$helptxt['password_strength'] = 'This setting determines the strength required for passwords selected by your forum users. The stronger the password, the harder it should be to compromise member\'s accounts.
+$helptxt['password_strength'] = 'This setting determines the strength required for passwords selected by your forum users. The stronger the password, the harder it should be to compromise the member\'s account.
 	Its possible options are:
 	<ul class="normallist">
 		<li><strong>Low:</strong> The password must be at least four characters long.</li>
-		<li><strong>Medium:</strong> The password must be at least eight characters long, and can not be part of a users name or email address.</li>
-		<li><strong>High:</strong> As for medium, except the password must also contain a mixture of upper and lower case letters, and at least one number.</li>
+		<li><strong>Medium:</strong> The password must be at least eight characters long, and can not be part of a user name or email address.</li>
+		<li><strong>High:</strong> As for medium, except the password must also contain a mixture of upper and lower case letters, and at least one digit.</li>
 	</ul>';
 $helptxt['enable_password_conversion'] = 'By enabling this setting, ElkArte will attempt to detect passwords stored in other formats and convert them for use in this software.  Typically this is used for converted forums, but may have other uses as well.  Disabling this prevents a user from logging in using their password after a conversion and would need to reset their password.';
 
