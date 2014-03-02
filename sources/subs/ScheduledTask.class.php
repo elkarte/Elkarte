@@ -22,13 +22,18 @@ if (!defined('ELK'))
 
 /**
  * This class handles known scheduled tasks.
- * Each method implements a task, and it's called automatically for the task to run.
+ *
+ * - Each method implements a task, and
+ * - it's called automatically for the task to run.
+ *
+ * @package ScheduledTasks
  */
 class ScheduledTask
 {
 	/**
 	 * Function to sending out approval notices to moderators.
-	 * It checks who needs to receive approvals notifications and sends emails.
+	 *
+	 * - It checks who needs to receive approvals notifications and sends emails.
 	 */
 	public function approval_notification()
 	{
@@ -242,11 +247,12 @@ class ScheduledTask
 
 	/**
 	 * This function does daily cleaning up:
-	 *  - decrements warning levels if it's enabled
-	 *  - consolidate spider statistics
-	 *  - fix MySQL version
-	 *  - regenerate Diffie-Hellman keys for OpenID
-	 *  - remove obsolete login history logs
+	 *
+	 * - decrements warning levels if it's enabled
+	 * - consolidate spider statistics
+	 * - fix MySQL version
+	 * - regenerate Diffie-Hellman keys for OpenID
+	 * - remove obsolete login history logs
 	 */
 	public function daily_maintenance()
 	{
@@ -407,7 +413,8 @@ class ScheduledTask
 
 	/**
 	 * Send out a daily email of all subscribed topics, to members.
-	 * It sends notifications about replies or new topics,
+	 *
+	 * - It sends notifications about replies or new topics,
 	 * and moderation actions.
 	 */
 	public function daily_digest()
@@ -471,9 +478,8 @@ class ScheduledTask
 		if (empty($boards))
 			return true;
 
-		require_once(SUBSDIR . '/Boards.subs.php');
 		// Just get the board names.
-
+		require_once(SUBSDIR . '/Boards.subs.php');
 		$boards = fetchBoardsInfo(array('boards' => $boards), array('override_permissions' => true));
 
 		if (empty($boards))
@@ -799,9 +805,9 @@ class ScheduledTask
 
 	/**
 	 * Sends out email notifications for new/updated topics.
-	 * Like the daily stuff - just seven times less regular ;)
 	 *
-	 * This method forwards to daily_digest()
+	 * - Like the daily stuff - just seven times less regular ;)
+	 * - This method forwards to daily_digest()
 	 */
 	public function weekly_digest()
 	{
@@ -967,11 +973,13 @@ class ScheduledTask
 	}
 
 	/**
-	 * Weekly maintenance:
-	 *  - remove empty or temporary settings
-	 *  - prune logs
-	 *  - obsolete paid subscriptions
-	 *  - clear sessions table
+	 * Weekly maintenance taks
+	 *
+	 * What it does:
+	 * - remove empty or temporary settings
+	 * - prune logs
+	 * - obsolete paid subscriptions
+	 * - clear sessions table
 	 */
 	public function weekly_maintenance()
 	{
@@ -1171,8 +1179,9 @@ class ScheduledTask
 
 	/**
 	 * Perform the standard checks on expiring/near expiring subscriptions:
-	 *  - remove expired subscriptions
-	 *  - notify of subscriptions about to expire
+	 *
+	 * - remove expired subscriptions
+	 * - notify of subscriptions about to expire
 	 */
 	public function paid_subscriptions()
 	{
@@ -1259,7 +1268,8 @@ class ScheduledTask
 
 	/**
 	 * Check for un-posted attachments is something we can do once in a while :P
-	 * This function uses opendir cycling through all the attachments
+	 *
+	 * - This function uses opendir cycling through all the attachments
 	 */
 	public function remove_temp_attachments()
 	{
@@ -1303,7 +1313,8 @@ class ScheduledTask
 
 	/**
 	 * Check for move topic notices that have past their best by date:
-	 *  - remove them if the time has expired.
+	 *
+	 * - remove them if the time has expired.
 	 */
 	public function remove_topic_redirect()
 	{
@@ -1382,8 +1393,9 @@ class ScheduledTask
 	}
 
 	/**
-	 * If we can't run this via cron, run it as a task instead
 	 * Fetch emails from an imap box and process them
+	 *
+	 * - If we can't run this via cron, run it as a task instead
 	 */
 	public function maillist_fetch_IMAP()
 	{
@@ -1431,9 +1443,11 @@ class ScheduledTask
 	}
 
 	/**
-	 * Re-syncs if a user can access a mention, for example if they loose or gain access
-	 * to a board, this will correct the viewing of the mention table.  Since this can be
-	 * a large job it is run as a scheduled immediate task
+	 * Re-syncs if a user can access a mention,
+	 *
+	 * - for example if they loose or gain access to a board, this will correct
+	 * the viewing of the mention table.  Since this can be a large job it is run
+	 * as a scheduled immediate task
 	 */
 	public function user_access_mentions()
 	{

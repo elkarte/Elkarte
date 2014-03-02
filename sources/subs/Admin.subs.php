@@ -25,6 +25,7 @@ if (!defined('ELK'))
 /**
  * Get a list of versions that are currently installed on the server.
  *
+ * @package Admin
  * @param string[] $checkFor
  */
 function getServerVersions($checkFor)
@@ -105,9 +106,12 @@ function getServerVersions($checkFor)
 
 /**
  * Builds the availalble tasks for this admin / moderator
- * Sets up the support resource txt stings
  *
- * Called from Admin.controller action_home and action_credits
+ * What it does:
+ * - Sets up the support resource txt stings
+ * - Called from Admin.controller action_home and action_credits
+ *
+ * @package Admin
  */
 function getQuickAdminTasks()
 {
@@ -179,14 +183,15 @@ function getQuickAdminTasks()
  * Search through source, theme and language files to determine their version.
  * Get detailed version information about the physical Elk files on the server.
  *
+ * What it does:
  * - the input parameter allows to set whether to include SSI.php and whether
  *   the results should be sorted.
  * - returns an array containing information on source files, templates and
  *   language files found in the default theme directory (grouped by language).
  * - options include include_ssi, include_subscriptions, sort_results
  *
+ * @package Admin
  * @param mixed[] $versionOptions associative array of options
- *
  * @return array
  */
 function getFileVersions(&$versionOptions)
@@ -333,10 +338,13 @@ function getFileVersions(&$versionOptions)
 
 /**
  * Saves the time of the last db error for the error log
+ *
+ * What it does:
  * - Done separately from Settings_Form::save_file() to avoid race conditions
- *   which can occur during a db error
+ * which can occur during a db error
  * - If it fails Settings.php will assume 0
  *
+ * @package Admin
  * @param int $time
  */
 function updateDbLastError($time)
@@ -348,6 +356,8 @@ function updateDbLastError($time)
 
 /**
  * Saves the admins current preferences to the database.
+ *
+ * @package Admin
  */
 function updateAdminPreferences()
 {
@@ -373,10 +383,13 @@ function updateAdminPreferences()
 
 /**
  * Send all the administrators a lovely email.
- * It loads all users who are admins or have the admin forum permission.
- * It uses the email template and replacements passed in the parameters.
- * It sends them an email.
  *
+ * What it does:
+ * - It loads all users who are admins or have the admin forum permission.
+ * - It uses the email template and replacements passed in the parameters.
+ * - It sends them an email.
+ *
+ * @package Admin
  * @param string $template
  * @param mixed[] $replacements
  * @param int[] $additional_recipients
@@ -461,8 +474,10 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 /**
  * Callback used in the core features page when the custom profiles
  * are enabled or disabled.
+ *
+ * @package Admin
  * @param bool $value the "new" status of the profile fields
- *            (true => enabled, false => disabled)
+ * (true => enabled, false => disabled)
  */
 function custom_profiles_toggle_callback($value)
 {
@@ -480,8 +495,10 @@ function custom_profiles_toggle_callback($value)
 /**
  * Callback used in the core features page when the drafts
  * are enabled or disabled.
+ *
+ * @package Admin
  * @param bool $value the "new" status of the drafts
- *            (true => enabled, false => disabled)
+ * (true => enabled, false => disabled)
  */
 function drafts_toggle_callback($value)
 {
@@ -496,8 +513,10 @@ function drafts_toggle_callback($value)
 /**
  * Callback used in the core features page when the paid subscriptions
  * are enabled or disabled.
+ *
+ * @package Admin
  * @param bool $value the "new" status of the paid subscriptions
- *            (true => enabled, false => disabled)
+ * (true => enabled, false => disabled)
  */
 function subscriptions_toggle_callback($value)
 {
@@ -512,8 +531,10 @@ function subscriptions_toggle_callback($value)
 /**
  * Callback used in the core features page when the post-by-email feature
  * is enabled or disabled.
+ *
+ * @package Admin
  * @param bool $value the "new" status of the post-by-email
- *            (true => enabled, false => disabled)
+ * (true => enabled, false => disabled)
  */
 function postbyemail_toggle_callback($value)
 {

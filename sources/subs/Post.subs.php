@@ -23,10 +23,12 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Takes a message and parses it, returning nothing.
- * Cleans up links (javascript, etc.) and code/quote sections.
- * Won't convert \n's and a few other things if previewing is true.
+ * Takes a message and parses it, returning the prepared message as a referance.
  *
+ * - Cleans up links (javascript, etc.) and code/quote sections.
+ * - Won't convert \n's and a few other things if previewing is true.
+ *
+ * @package Posts
  * @param string $message
  * @param boolean $previewing
  */
@@ -259,6 +261,8 @@ function preparsecode(&$message, $previewing = false)
 
 /**
  * Ensure tags inside of nobbc do not get parsed by converting the markers to html entities
+ *
+ * @package Posts
  * @param string[] $matches
  */
 function preparsecode_nobbc_callback($matches)
@@ -268,6 +272,8 @@ function preparsecode_nobbc_callback($matches)
 
 /**
  * Prepares text inside of html tags to make them safe for display and prevent bbc rendering
+ *
+ * @package Posts
  * @param string[] $matches
  */
 function preparsecode_html_callback($matches)
@@ -277,6 +283,8 @@ function preparsecode_html_callback($matches)
 
 /**
  * Takes a tag and lowercases it
+ *
+ * @package Posts
  * @param string[] $matches
  */
 function preparsecode_lowertags_callback($matches)
@@ -287,6 +295,7 @@ function preparsecode_lowertags_callback($matches)
 /**
  * This is very simple, and just removes things done by preparsecode.
  *
+ * @package Posts
  * @param string $message
  */
 function un_preparsecode($message)
@@ -309,6 +318,8 @@ function un_preparsecode($message)
 
 /**
  * Reverses what was done by preparsecode to html tags
+ *
+ * @package Posts
  * @param string[] $matches
  */
 function preparsecode_unhtml_callback($matches)
@@ -318,8 +329,10 @@ function preparsecode_unhtml_callback($matches)
 
 /**
  * Fix any URLs posted - ie. remove 'javascript:'.
- * Used by preparsecode, fixes links in message and returns nothing.
  *
+ * - Used by preparsecode, fixes links in message and returns nothing.
+ *
+ * @package Posts
  * @param string $message
  */
 function fixTags(&$message)
@@ -384,6 +397,8 @@ function fixTags(&$message)
 
 /**
  * Ensure image tags do not load anything by themselfs (security)
+ *
+ * @package Posts
  * @param string[] $matches
  */
 function fixTags_img_callback($matches)
@@ -393,8 +408,10 @@ function fixTags_img_callback($matches)
 
 /**
  * Fix a specific class of tag - ie. url with =.
- * Used by fixTags, fixes a specific tag's links.
  *
+ * - Used by fixTags, fixes a specific tag's links.
+ *
+ * @package Posts
  * @param string $message
  * @param string $myTag - the tag
  * @param string $protocols - http or ftp
@@ -475,8 +492,10 @@ function fixTag(&$message, $myTag, $protocols, $embeddedUrl = false, $hasEqualSi
 
 /**
  * Updates BBC img tags in a message so that the width / height respect the forum settings.
- * Will add the width/height attrib if needed, or update existing ones if they break the rules
  *
+ * - Will add the width/height attrib if needed, or update existing ones if they break the rules
+ *
+ * @package Posts
  * @param string $message
  */
 function resizeBBCImages(&$message)
@@ -546,11 +565,13 @@ function resizeBBCImages(&$message)
 
 /**
  * Create a post, either as new topic (id_topic = 0) or in an existing one.
+ *
  * The input parameters of this function assume:
  * - Strings have been escaped.
  * - Integers have been cast to integer.
  * - Mandatory parameters are set.
  *
+ * @package Posts
  * @param mixed[] $msgOptions
  * @param mixed[] $topicOptions
  * @param mixed[] $posterOptions
@@ -895,6 +916,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 /**
  * Modifying a post...
  *
+ * @package Posts
  * @param mixed[] $msgOptions
  * @param mixed[] $topicOptions
  * @param mixed[] $posterOptions
@@ -1043,6 +1065,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 /**
  * Approve (or not) some posts... without permission checks...
  *
+ * @package Posts
  * @param int[] $msgs - array of message ids
  * @param bool $approve = true
  */
@@ -1281,11 +1304,13 @@ function approvePosts($msgs, $approve = true)
 
 /**
  * Takes an array of board IDs and updates their last messages.
- * If the board has a parent, that parent board is also automatically updated.
- * The columns updated are id_last_msg and last_updated.
- * Note that id_last_msg should always be updated using this function,
+ *
+ * - If the board has a parent, that parent board is also automatically updated.
+ * - The columns updated are id_last_msg and last_updated.
+ * - Note that id_last_msg should always be updated using this function,
  * and is not automatically updated upon other changes.
  *
+ * @package Posts
  * @param int[]|int $setboards
  * @param int $id_msg = 0
  */
@@ -1420,8 +1445,10 @@ function updateLastMessages($setboards, $id_msg = 0)
 
 /**
  * Get the latest post made on the system
+ *
  * - respects approved, recycled, and board permissions
  *
+ * @package Posts
  * @return array
  */
 function lastPost()
@@ -1474,9 +1501,11 @@ function lastPost()
 
 /**
  * Prepares a post subject for the post form
- * Will add the approriate Re: to the post subject if its a reply to an existing post
- * If quoting a post, or editing a post, this function also prepares the message body
  *
+ * - Will add the approriate Re: to the post subject if its a reply to an existing post
+ * - If quoting a post, or editing a post, this function also prepares the message body
+ *
+ * @package Posts
  * @param boolean $editing
  * @param int $topic
  * @param string $first_subject
@@ -1590,6 +1619,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
  * Converts br's to entity safe versions <br /> => $lt;br /&gt;<br /> so messages
  * with bbc html tags can be edited
  *
+ * @package Posts
  * @param string[] $matches
  */
 function getFormMsgSubject_br_callback($matches)
@@ -1599,8 +1629,10 @@ function getFormMsgSubject_br_callback($matches)
 
 /**
  * Update topic subject.
- * If $all is true, for all messages in the topic, otherwise only the first message.
  *
+ * - If $all is true, for all messages in the topic, otherwise only the first message.
+ *
+ * @package Posts
  * @param mixed[] $topic_info topic information as returned by getTopicInfo()
  * @param string $custom_subject
  * @param string $response_prefix = ''

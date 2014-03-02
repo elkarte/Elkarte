@@ -32,6 +32,8 @@ $GLOBALS['search_versions'] = array(
 
 /**
  * Creates a search API and returns the object.
+ *
+ * @package Search
  */
 function findSearchAPI()
 {

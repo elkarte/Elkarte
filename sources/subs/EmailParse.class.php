@@ -17,10 +17,11 @@ if (!defined('ELK'))
 /**
  * Class to parse and email in to its header and body parts for use in posting
  *
- * Can read from a supplied string, stdin or from the failed email database
- * Parses and decodes headers, return them in a named array $headers
- * Parses, decodes and translates message body returns body and plain_body sections
- * Parses and decodes attachments returns attachments and inline_files
+ * What it does:
+ * - Can read from a supplied string, stdin or from the failed email database
+ * - Parses and decodes headers, return them in a named array $headers
+ * - Parses, decodes and translates message body returns body and plain_body sections
+ * - Parses and decodes attachments returns attachments and inline_files
  *
  * Load class
  * Initiate as
@@ -29,24 +30,26 @@ if (!defined('ELK'))
  * Make the call, loads data and performs all need parsing
  * - $email_message->read_email(true); // Read data and parse it, prefer html section
  *
- * Just load data
+ * Just load data:
  * - $email_message->read_data(); // load data from stdin
  * - $email_message->read_data($data); // load data from a supplied string
  *
- * Get some email details
+ * Get some email details:
  * - $email_message->headers // All the headers in an array
  * - $email_message->body // The decoded / translated message
  * - $email_message->raw_message // The entire message w/headers as read
  * - $email_message->plain_body // The plain text version of the message
  * - $email_message->attachments // Any attachments with key = filename
  *
- * Optional functions
- *  - $email_message->load_address(); // Returns array with to/from/cc addresses
- *  - $email_message->load_key(); // Returns the security key is found, also sets
- *      message_key_id, message_type and message_id
- *  - $email_message->load_spam(); // Returns boolean on if spam headers are set
- *  - $email_message->load_ip(); // Set ip origin of the email if available
- *  - $email_message->load_returnpath(); // Load the message return path
+ * Optional functions:
+ * - $email_message->load_address(); // Returns array with to/from/cc addresses
+ * - $email_message->load_key(); // Returns the security key is found, also sets
+ * message_key_id, message_type and message_id
+ * - $email_message->load_spam(); // Returns boolean on if spam headers are set
+ * - $email_message->load_ip(); // Set ip origin of the email if available
+ * - $email_message->load_returnpath(); // Load the message return path
+ *
+ * @package Maillist
  */
 class Email_Parse
 {
@@ -241,11 +244,13 @@ class Email_Parse
 	/**
 	 * Main email routine, calls the needed functions to parse the data so that
 	 * its available.
-	 *  - read/load data
-	 *  - split headers from the body
-	 *  - break header string in to individual header keys
-	 *  - determine content type and character encoding
-	 *  - convert message body's
+	 *
+	 * What it does:
+	 * - read/load data
+	 * - split headers from the body
+	 * - break header string in to individual header keys
+	 * - determine content type and character encoding
+	 * - convert message body's
 	 *
 	 * @param boolean $html - flag to determine if we are saving html or not
 	 * @param string $data - full header+message string
@@ -269,8 +274,8 @@ class Email_Parse
 	 * Separate the email message headers from the message body
 	 *
 	 * The header is separated from the body by
-	 *  (1) the first empty line or
-	 *  (2) a line that does not start with a tab, a field name followed by a colon or a space
+	 * 1 the first empty line or
+	 * 2 a line that does not start with a tab, a field name followed by a colon or a space
 	 */
 	private function _split_headers()
 	{
@@ -327,10 +332,11 @@ class Email_Parse
 
 	/**
 	 * Content headers need to be set so we can properly decode the message body.
-	 * Content headers often use the optional parameter value syntax which need to be
-	 * specially processed.
 	 *
-	 * Parses or sets defaults for the following:
+	 * What it does:
+	 * - Content headers often use the optional parameter value syntax which need to be
+	 * specially processed.
+	 * - Parses or sets defaults for the following:
 	 * content-type, content-disposition, content-transfer-encoding
 	 */
 	private function _parse_content_headers()
@@ -366,8 +372,8 @@ class Email_Parse
 	 * Checks if a given header has any optional parameter values
 	 *
 	 * A header like Content-type: text/plain; charset=iso-8859-1 will become
-	 * headers[Content-type] = text/plain
-	 * headers['x-parameters'][charset] = iso-8859-1
+	 * - headers[Content-type] = text/plain
+	 * - headers['x-parameters'][charset] = iso-8859-1
 	 *
 	 * If parameters are found, sets the primary value to the given key and the additional
 	 * values are placed to our catch all x-parameters key. Done this way to prevent
@@ -606,10 +612,11 @@ class Email_Parse
 	/**
 	 * Converts a header string to ascii/UTF8
 	 *
-	 * Headers, mostly subject and names may be encoded as quoted printable or base64
-	 * to allow for non ascii characters in those fields. This encoding is separate
-	 * from the message body encoding and must be determined since this encoding is
-	 * not directly specified by the headers themselves
+	 * What it does:
+	 * - Headers, mostly subject and names may be encoded as quoted printable or base64
+	 * to allow for non ascii characters in those fields.
+	 * - This encoding is separate from the message body encoding and must be
+	 * determined since this encoding is not directly specified by the headers themselves
 	 *
 	 * @param string $val
 	 * @param bool $strict
@@ -680,8 +687,9 @@ class Email_Parse
 	/**
 	 * Checks the body text to see if it may need to be further decoded
 	 *
-	 * Sadly whats in the body text is not always what the header claims, or the
-	 * header is just wrong.  Copy/paste in to email from other apps etc.
+	 * What it does:
+	 * - Sadly whats in the body text is not always what the header claims, or the
+	 * header is just wrong. Copy/paste in to email from other apps etc.
 	 * This does an extra check for quoted printable DNA and if found decodes the
 	 * message as such.
 	 *
@@ -745,7 +753,8 @@ class Email_Parse
 
 	/**
 	 * Returns the decoded subject of the email
-	 * Makes sure the subject header is set, if not sets it to ''
+	 *
+	 * - Makes sure the subject header is set, if not sets it to ''
 	 *
 	 * @return string or null
 	 */
@@ -763,9 +772,10 @@ class Email_Parse
 
 	/**
 	 * Check for the message security key in common headers, in-reply-to and references
-	 * If the key is not found in the header, will search the message body
-	 * If the key is still not found will search the entire input stream
-	 * returns the found key or false.  If found will also save it in the in-reply-to header
+	 *
+	 * - If the key is not found in the header, will search the message body
+	 * - If the key is still not found will search the entire input stream
+	 * - returns the found key or false.  If found will also save it in the in-reply-to header
 	 *
 	 * @param string $key optional
 	 * @return string of key of false on failure
@@ -836,8 +846,9 @@ class Email_Parse
 
 	/**
 	 * Loads in the most emal from, to and cc address
-	 * will attempt to return the name and address for fields "name:" <email>
-	 * will become email['to'] = email and email['to_name'] = name
+	 *
+	 * - will attempt to return the name and address for fields "name:" <email>
+	 * - will become email['to'] = email and email['to_name'] = name
 	 *
 	 * @return array of addresses
 	 */
@@ -884,6 +895,7 @@ class Email_Parse
 
 	/**
 	 * Finds the message sending ip and returns it
+	 *
 	 * - will look in various header fields where the ip may reside
 	 * - returns false if it can't find a valid IP4
 	 *
@@ -910,6 +922,7 @@ class Email_Parse
 
 	/**
 	 * Finds if any spam headers have been positively set and returns that flag
+	 *
 	 * - will look in various header fields where the spam status may reside
 	 *
 	 * @return boolean on fail
@@ -953,6 +966,7 @@ class Email_Parse
 
 	/**
 	 * Take an email address and parse out the email address and email name
+	 *
 	 * @param string $val
 	 */
 	private function _parse_address($val)

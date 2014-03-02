@@ -24,6 +24,8 @@ if (!defined('ELK'))
 /**
  * PackageServers controller handles browsing, adding and removing
  * package servers, and download of a package from them.
+ *
+ * @package Packages
  */
 class PackageServers_Controller extends Action_Controller
 {
@@ -44,7 +46,8 @@ class PackageServers_Controller extends Action_Controller
 	/**
 	 * Main dispatcher for package servers. Checks permissions,
 	 * load files, and forwards to the right method.
-	 * Accessed by action=admin;area=packageservers
+	 *
+	 * - Accessed by action=admin;area=packageservers
 	 *
 	 * @see Action_Controller::action_index()
 	 */
@@ -92,7 +95,8 @@ class PackageServers_Controller extends Action_Controller
 
 	/**
 	 * Load a list of package servers.
-	 * Accessed by action=admin;area=packageservers;sa=servers
+	 *
+	 * - Accessed by action=admin;area=packageservers;sa=servers
 	 */
 	public function action_list()
 	{
@@ -116,7 +120,8 @@ class PackageServers_Controller extends Action_Controller
 
 	/**
 	 * Browse a server's list of packages.
-	 * Accessed by action=admin;area=packageservers;sa=browse
+	 *
+	 * - Accessed by action=admin;area=packageservers;sa=browse
 	 */
 	public function action_browse()
 	{
@@ -450,7 +455,8 @@ class PackageServers_Controller extends Action_Controller
 
 	/**
 	 * Download a package.
-	 * Accessed by action=admin;area=packageservers;sa=download
+	 *
+	 * - Accessed by action=admin;area=packageservers;sa=download
 	 */
 	public function action_download()
 	{
@@ -573,7 +579,8 @@ class PackageServers_Controller extends Action_Controller
 
 	/**
 	 * Upload a new package to the packages directory.
-	 * Accessed by action=admin;area=packageservers;sa=upload2
+	 *
+	 * - Accessed by action=admin;area=packageservers;sa=upload2
 	 */
 	public function action_upload2()
 	{
@@ -664,7 +671,8 @@ class PackageServers_Controller extends Action_Controller
 
 	/**
 	 * Add a package server to the list.
-	 * Accessed by action=admin;area=packageservers;sa=add
+	 *
+	 * - Accessed by action=admin;area=packageservers;sa=add
 	 */
 	public function action_add()
 	{
@@ -694,7 +702,8 @@ class PackageServers_Controller extends Action_Controller
 
 	/**
 	 * Remove a server from the list.
-	 * Accessed by action=admin;area=packageservers;sa=remove
+	 *
+	 * - Accessed by action=admin;area=packageservers;sa=remove
 	 */
 	public function action_remove()
 	{
@@ -739,9 +748,10 @@ class PackageServers_Controller extends Action_Controller
 
 	/**
 	 * This method attempts to chmod packages and installed.list
-	 * using FTP if necessary.
-	 * It sets the $context['package_download_broken'] status for the template.
-	 * Used by package servers pages.
+	 *
+	 * - uses FTP if necessary.
+	 * - It sets the $context['package_download_broken'] status for the template.
+	 * - Used by package servers pages.
 	 */
 	public function ftp_connect()
 	{

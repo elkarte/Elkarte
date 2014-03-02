@@ -24,6 +24,8 @@ if (!defined('ELK'))
 /**
  * ManageSecurity controller handles the Security and Moderation
  * pages in admin panel.
+ *
+ * @package Security
  */
 class ManageSecurity_Controller extends Action_Controller
 {
@@ -106,7 +108,8 @@ class ManageSecurity_Controller extends Action_Controller
 
 	/**
 	 * Handle settings regarding general security of the site.
-	 * Uses a settings form for security options.
+	 *
+	 * - Uses a settings form for security options.
 	 */
 	public function action_securitySettings_display()
 	{
@@ -156,7 +159,8 @@ class ManageSecurity_Controller extends Action_Controller
 
 	/**
 	 * Allows to display and eventually change the moderation settings of the forum.
-	 * Uses the moderation settings form.
+	 *
+	 * - Uses the moderation settings form.
 	 */
 	public function action_moderationSettings_display()
 	{
@@ -237,7 +241,8 @@ class ManageSecurity_Controller extends Action_Controller
 
 	/**
 	 * Handles admin security spam settings.
-	 * Displays a page with settings and eventually allows the admin to change them.
+	 *
+	 * - Displays a page with settings and eventually allows the admin to change them.
 	 */
 	public function action_spamSettings_display()
 	{
@@ -397,7 +402,8 @@ class ManageSecurity_Controller extends Action_Controller
 
 	/**
 	 * Retrieves and returns the configuration settings for Bad Behavior.
-	 * Initializes bbSettings form.
+	 *
+	 * - Initializes bbSettings form.
 	 */
 	private function _initBBSettingsForm()
 	{

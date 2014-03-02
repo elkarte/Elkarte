@@ -24,6 +24,8 @@ if (!defined('ELK'))
  * This class is the administration package manager controller.
  * Its main job is to install/uninstall, allow to browse, packages.
  * In fact, just about everything related to addon packages, including FTP connections when necessary.
+ *
+ * @package Packages
  */
 class Packages_Controller extends Action_Controller
 {
@@ -1382,6 +1384,7 @@ class Packages_Controller extends Action_Controller
 
 	/**
 	 * Test an FTP connection.
+	 *
 	 * @uses Xml Template, generic_xml sub template
 	 */
 	public function action_ftptest()
@@ -2087,8 +2090,9 @@ class Packages_Controller extends Action_Controller
 
 	/**
 	 * Get a listing of all the packages
-	 * Determines if the package is a mod, avatar, language package
-	 * Determines if the package has been installed or not
+	 *
+	 * - Determines if the package is a mod, avatar, language package
+	 * - Determines if the package has been installed or not
 	 *
 	 * @param int $start
 	 * @param int $items_per_page
@@ -2363,6 +2367,7 @@ class Packages_Controller extends Action_Controller
 /**
  * Checks the permissions of all the areas that will be affected by the package
  *
+ * @package Packages
  * @param string $path
  * @param mixed[] $data
  * @param int $level
@@ -2533,7 +2538,10 @@ function fetchPerms__recursive($path, &$data, $level)
 
 /**
  * Function called to briefly pause execution of directory/file chmod actions
- * Called by action_perms_save().
+ *
+ * - Called by action_perms_save().
+ *
+ * @package Packages
  */
 function pausePermsSave()
 {

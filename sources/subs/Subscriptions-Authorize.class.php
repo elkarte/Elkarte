@@ -20,6 +20,8 @@ if (!defined('ELK'))
 
 /**
  * Class for returning available form data for this gateway
+ *
+ * @package Subscriptions
  */
 class authorize_display
 {
@@ -58,7 +60,8 @@ class authorize_display
 
 	/**
 	 * Returns the fields needed for the transaction.
-	 * Called from Profile-Actions.php to return a unique set of fields for the given gateway
+	 *
+	 * - Called from Profile-Actions.php to return a unique set of fields for the given gateway
 	 *
 	 * @param int $unique_id
 	 * @param mixed[] $sub_data
@@ -119,6 +122,8 @@ class authorize_display
 
 /**
  * Class of functions to validate a authorize_payment response and provide details of the payment
+ *
+ * @package Subscriptions
  */
 class authorize_payment
 {
@@ -130,7 +135,8 @@ class authorize_payment
 
 	/**
 	 * Validates that we have valid data to work with
-	 * Returns true/false for whether this gateway thinks the data is intended for it.
+	 *
+	 * - Returns true/false for whether this gateway thinks the data is intended for it.
 	 *
 	 * @return boolean
 	 */
@@ -159,7 +165,8 @@ class authorize_payment
 
 	/**
 	 * Validate this is valid for this transaction type.
-	 * If valid returns the subscription and member IDs we are going to process.
+	 *
+	 * - If valid returns the subscription and member IDs we are going to process.
 	 */
 	public function precheck()
 	{

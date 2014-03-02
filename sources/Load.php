@@ -121,14 +121,15 @@ function reloadSettings()
 
 /**
  * Load all the important user information.
+ *
  * What it does:
- *  - sets up the $user_info array
- *  - assigns $user_info['query_wanna_see_board'] for what boards the user can see.
- *  - first checks for cookie or integration validation.
- *  - uses the current session if no integration function or cookie is found.
- *  - checks password length, if member is activated and the login span isn't over.
- *    - if validation fails for the user, $id_member is set to 0.
- *    - updates the last visit time when needed.
+ * - sets up the $user_info array
+ * - assigns $user_info['query_wanna_see_board'] for what boards the user can see.
+ * - first checks for cookie or integration validation.
+ * - uses the current session if no integration function or cookie is found.
+ * - checks password length, if member is activated and the login span isn't over.
+ * - if validation fails for the user, $id_member is set to 0.
+ * - updates the last visit time when needed.
  */
 function loadUserSettings()
 {
@@ -385,6 +386,7 @@ function loadUserSettings()
 
 /**
  * Check for moderators and see if they have access to the board.
+ *
  * What it does:
  * - sets up the $board_info array for current board information.
  * - if cache is enabled, the $board_info array is stored in cache.
@@ -1099,7 +1101,8 @@ function loadMemberContext($user, $display_custom_fields = false)
 
 /**
  * Loads information about what browser the user is viewing with and places it in $context
- *  - uses the class from BrowserDetect.class.php
+ *
+ * - uses the class from BrowserDetect.class.php
  */
 function detectBrowser()
 {
@@ -1111,7 +1114,8 @@ function detectBrowser()
 /**
  * Are we using this browser?
  *
- * Wrapper function for detectBrowser
+ * - Wrapper function for detectBrowser
+ *
  * @param string $browser  the browser we are checking for.
  */
 function isBrowser($browser)
@@ -1680,8 +1684,9 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 /**
  * This loads the bare minimum data.
- * Needed by scheduled tasks, and any other code that needs language files
- * before the forum (the theme) is loaded.
+ *
+ * - Needed by scheduled tasks,
+ * - Needed by any other code that needs language files before the forum (the theme) is loaded.
  */
 function loadEssentialThemeData()
 {
@@ -1736,10 +1741,11 @@ function loadEssentialThemeData()
 
 /**
  * Load a template - if the theme doesn't include it, use the default.
- * What this function does:
- *  - loads a template file with the name template_name from the current, default, or base theme.
- *  - detects a wrong default theme directory and tries to work around it.
- *	- can be used to only load style sheets by using false as the template name
+ *
+ * What it does:
+ * - loads a template file with the name template_name from the current, default, or base theme.
+ * - detects a wrong default theme directory and tries to work around it.
+ * - can be used to only load style sheets by using false as the template name
  *
  * @uses the template_include() function to include the file.
  * @param string|false $template_name
@@ -1829,10 +1835,11 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 
 /**
  * Load a sub-template.
+ *
  * What it does:
- *  - loads the sub template specified by sub_template_name, which must be in an already-loaded template.
- *  - if ?debug is in the query string, shows administrators a marker after every sub template
- *    for debugging purposes.
+ * - loads the sub template specified by sub_template_name, which must be in an already-loaded template.
+ * - if ?debug is in the query string, shows administrators a marker after every sub template
+ * for debugging purposes.
  *
  * @todo get rid of reading $_REQUEST directly
  *
@@ -1950,18 +1957,18 @@ function loadCSSFile($filenames, $params = array(), $id = '')
 /**
  * Add a Javascript file for output later
  *
- * Can be passed an array of filenames, all which will have the same parameters applied, if you
- * need specific parameters on a per file basis, call it multiple times
+ * - Can be passed an array of filenames, all which will have the same parameters applied,
+ * - if you need specific parameters on a per file basis, call it multiple times
  *
  * @param mixed $filenames string or array of filenames to work on
  * @param mixed[] $params = array()
- *		Keys are the following:
- *			- ['local'] (true/false): define if the file is local, if file does not start with http its assumed local
- *			- ['defer'] (true/false): define if the file should load in <head> or before the closing <html> tag
- *			- ['fallback'] (true/false): if true will attempt to load the file from the default theme if not found in the current
- *							this is the default behavior if this is not supplied
- *			- ['async'] (true/false): if the script should be loaded asynchronously (HTML5)
- *			- ['stale'] (true/false/string): if true or null, use cache stale, false do not, or used a supplied string
+ * Keys are the following:
+ * - ['local'] (true/false): define if the file is local, if file does not start with http its assumed local
+ * - ['defer'] (true/false): define if the file should load in <head> or before the closing <html> tag
+ * - ['fallback'] (true/false): if true will attempt to load the file from the default theme if not found in the current
+ *	this is the default behavior if this is not supplied
+ * - ['async'] (true/false): if the script should be loaded asynchronously (HTML5)
+ * - ['stale'] (true/false/string): if true or null, use cache stale, false do not, or used a supplied string
  * @param string $id = '' optional id to use in html id=""
  */
 function loadJavascriptFile($filenames, $params = array(), $id = '')
@@ -2182,10 +2189,10 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 
 /**
  * Get all parent boards (requires first parent as parameter)
- * It finds all the parents of id_parent, and that board itself.
- * Additionally, it detects the moderators of said boards.
  *
- * Returns an array of information about the boards found.
+ * - It finds all the parents of id_parent, and that board itself.
+ * - Additionally, it detects the moderators of said boards.
+ * - Returns an array of information about the boards found.
  *
  * @param int $id_parent
  */
@@ -2324,13 +2331,13 @@ function getLanguages($use_cache = true)
 
 /**
  * Replace all vulgar words with respective proper words. (substring or whole words..)
- * What this function does:
- *  - it censors the passed string.
- *  - if the theme setting allow_no_censored is on, and the theme option
- *    show_no_censored is enabled, does not censor, unless force is also set.
- *  - it caches the list of censored words to reduce parsing.
  *
- * Returns the censored text
+ * What this function does:
+ * - it censors the passed string.
+ * - if the theme setting allow_no_censored is on, and the theme option
+ *   show_no_censored is enabled, does not censor, unless force is also set.
+ * - it caches the list of censored words to reduce parsing.
+ * - Returns the censored text
  *
  * @param string $text
  * @param bool $force = false
@@ -2375,10 +2382,11 @@ function censorText(&$text, $force = false)
 
 /**
  * Load the template/language file using eval or require? (with eval we can show an error message!)
- *  - loads the template or language file specified by filename.
- *  - uses eval unless disableTemplateEval is enabled.
- *  - outputs a parse error if the file did not exist or contained errors.
- *  - attempts to detect the error and line, and show detailed information.
+ *
+ * - loads the template or language file specified by filename.
+ * - uses eval unless disableTemplateEval is enabled.
+ * - outputs a parse error if the file did not exist or contained errors.
+ * - attempts to detect the error and line, and show detailed information.
  *
  * @param string $filename
  * @param bool $once = false, if true only includes the file once (like include_once)
@@ -2616,7 +2624,6 @@ function loadDatabase()
  * @todo this function seems more useful than expected, it should be improved. :P
  *
  * @param mixed[] $profile array containing the users profile data
- *
  * @return mixed[] $avatar
  */
 function determineAvatar($profile)
@@ -2740,6 +2747,8 @@ function detectServer()
 
 /**
  * Do some important security checks:
+ *
+ * What it does:
  * - checks the existence of critical files e.g. install.php
  * - checks for an active admin session.
  * - checks cache directory is writable.
@@ -2844,7 +2853,8 @@ function doSecurityChecks()
 
 /**
  * Returns the current server load for nix systems
- * Used to enable / disable features based on current system overhead
+ *
+ * - Used to enable / disable features based on current system overhead
  */
 function detectServerLoad()
 {

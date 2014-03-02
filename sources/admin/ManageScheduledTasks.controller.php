@@ -21,16 +21,19 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * ManageScheduledTasks admin Controller: handles the administration pages
+ * ManageScheduledTasks admin Controller: handles the scheduled task pages
  * which allow to see and edit and run the systems scheduled tasks
+ *
+ * @package ScheduledTasks
  */
 class ManageScheduledTasks_Controller extends Action_Controller
 {
 	/**
 	 * Scheduled tasks management dispatcher.
-	 * This function checks permissions and delegates to the appropriate function
+	 *
+	 * - This function checks permissions and delegates to the appropriate function
 	 * based on the sub-action.
-	 * Everything here requires admin_forum permission.
+	 * - Everything here requires admin_forum permission.
 	 *
 	 * @uses ManageScheduledTasks template file
 	 * @uses ManageScheduledTasks language file

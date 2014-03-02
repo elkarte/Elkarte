@@ -52,9 +52,11 @@ class ManageErrors_Controller extends Action_Controller
 
 	/**
 	 * View the forum's error log.
-	 * This method sets all the context up to show the error log for maintenance.
-	 * It requires the admin_forum permission.
-	 * It is accessed from ?action=admin;area=logs;sa=errorlog.
+	 *
+	 * What it does:
+	 * - This method sets all the context up to show the error log for maintenance.
+	 * - It requires the admin_forum permission.
+	 * - It is accessed from ?action=admin;area=logs;sa=errorlog.
 	 *
 	 * @uses the Errors template and error_log sub template.
 	 */
@@ -223,8 +225,8 @@ class ManageErrors_Controller extends Action_Controller
 	 *  - file must be readable,
 	 *  - full file path must be base64 encoded,
 	 *
-	 * The line number number is specified by $_REQUEST['line']...
-	 * The function will try to get the 20 lines before and after the specified line.
+	 * - The line number number is specified by $_REQUEST['line']...
+	 * - The function will try to get the 20 lines before and after the specified line.
 	 */
 	protected function action_viewfile()
 	{

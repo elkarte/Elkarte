@@ -17,6 +17,7 @@ if (!defined('ELK'))
 /**
  * Calculate the next time the passed tasks should be triggered.
  *
+ * @package ScheduledTasks
  * @param string[]|string $tasks = array() the tasks
  * @param boolean $forceUpdate
  */
@@ -95,6 +96,7 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 /**
  * Returns a time stamp of the next instance of these time parameters.
  *
+ * @package ScheduledTasks
  * @param int $regularity
  * @param string $unit
  * @param int $offset
@@ -165,6 +167,7 @@ function next_time($regularity, $unit, $offset, $immediate = false)
 /**
  * Loads a basic tasks list.
  *
+ * @package ScheduledTasks
  * @param array $tasks
  * @return array
  */
@@ -191,6 +194,7 @@ function loadTasks($tasks)
 /**
  * Logs a task.
  *
+ * @package ScheduledTasks
  * @param int $id_log the id of the log entry of the task just run. If empty it is considered a new log entry
  * @param int $task_id the id of the task run (from the table scheduled_tasks)
  * @param int $total_time How long the task took to finish. If NULL (default value) -1 will be used
@@ -228,9 +232,10 @@ function logTask($id_log, $task_id, $total_time = null)
 }
 
 /**
- * All the scheduled tasks associated with the id passed to
- * the function are enabled, while the remaining are disabled
+ * All the scheduled tasks associated with the id passed to the function are
+ * enabled, while the remaining are disabled
  *
+ * @package ScheduledTasks
  * @param integer[] $enablers array od task IDs
  */
 function updateTaskStatus($enablers)
@@ -249,6 +254,7 @@ function updateTaskStatus($enablers)
 /**
  * Sets the task status to enabled / disabled by task name (i.e. function)
  *
+ * @package ScheduledTasks
  * @param string $enabler the name (the function) of a task
  * @param bool $enable is if the tasks should be enabled or disabled
  */
@@ -270,6 +276,7 @@ function toggleTaskStatusByName($enabler, $enable = true)
 /**
  * Update the properties of a scheduled task.
  *
+ * @package ScheduledTasks
  * @param int $id_task
  * @param int $disabled
  * @param int $offset
@@ -310,6 +317,7 @@ function updateTask($id_task, $disabled = null, $offset = null, $interval = null
 /**
  * Loads the details from a given task.
  *
+ * @package ScheduledTasks
  * @param int $id_task
  * @return array
  */
@@ -354,8 +362,10 @@ function loadTaskDetails($id_task)
 
 /**
  * Returns an array of registered scheduled tasks.
- * Used also by createList() callbacks.
  *
+ * - Used also by createList() callbacks.
+ *
+ * @package ScheduledTasks
  * @return array
  */
 function scheduledTasks()
@@ -395,8 +405,10 @@ function scheduledTasks()
 
 /**
  * Return task log entries, within the passed limits.
- * Used by createList() callbacks.
  *
+ * - Used by createList() callbacks.
+ *
+ * @package ScheduledTasks
  * @param int $start
  * @param int $items_per_page
  * @param string $sort
@@ -435,8 +447,10 @@ function getTaskLogEntries($start, $items_per_page, $sort)
 
 /**
  * Return the number of task log entries.
- * Used by createList() callbacks.
  *
+ * - Used by createList() callbacks.
+ *
+ * @package ScheduledTasks
  * @return int
  */
 function countTaskLogEntries()
@@ -472,6 +486,7 @@ function emptyTaskLog()
 /**
  * Process the next tasks, one by one, and update the results.
  *
+ * @package ScheduledTasks
  * @param int $ts = 0
  */
 function processNextTasks($ts = 0)
@@ -545,8 +560,10 @@ function processNextTasks($ts = 0)
 
 /**
  * Calls the supplied task_name so that it is executed.
- * Logs that the task was executed with success or if it failed
  *
+ * - Logs that the task was executed with success or if it failed
+ *
+ * @package ScheduledTasks
  * @param int $id_task specific id of the task to run, used for logging
  * @param string $task_name name of the task, class name, function name, method in ScheduledTask.class
  */
@@ -621,6 +638,7 @@ function run_this_task($id_task, $task_name)
 /**
  * Retrieve info if there's any next task scheduled and when.
  *
+ * @package ScheduledTasks
  * @return mixed int|false
  */
 function nextTime()

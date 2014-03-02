@@ -22,7 +22,10 @@ if (!defined('ELK'))
 
 /**
  * This class is the administration mailing controller.
+ *
  * It handles mail configuration, it displays and allows to remove items from the mail queue.
+ *
+ * @package Mail
  */
 class ManageMail_Controller extends Action_Controller
 {
@@ -34,7 +37,9 @@ class ManageMail_Controller extends Action_Controller
 
 	/**
 	 * Main dispatcher.
-	 * This function checks permissions and passes control through to the relevant section.
+	 *
+	 * - This function checks permissions and passes control through to the relevant section.
+	 *
 	 * @see Action_Controller::action_index()
 	 * @uses Help and MangeMail language files
 	 */
@@ -77,6 +82,7 @@ class ManageMail_Controller extends Action_Controller
 
 	/**
 	 * Display the mail queue...
+	 *
 	 * @uses ManageMail template
 	 */
 	public function action_browse()
@@ -218,6 +224,7 @@ class ManageMail_Controller extends Action_Controller
 
 	/**
 	 * Allows to view and modify the mail settings.
+	 *
 	 * @uses show_settings sub template
 	 */
 	public function action_mailSettings_display()
@@ -320,7 +327,7 @@ class ManageMail_Controller extends Action_Controller
 	{
 		global $txt, $modSettings, $txtBirthdayEmails;
 
-		// we need $txtBirthdayEmails
+		// We need $txtBirthdayEmails
 		loadLanguage('EmailTemplates');
 
 		$body = $txtBirthdayEmails[(empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']) . '_body'];
@@ -369,8 +376,8 @@ class ManageMail_Controller extends Action_Controller
 	/**
 	 * This function clears the mail queue of all emails, and at the end redirects to browse.
 	 *
-	 * Note force clearing the queue may cause a site to exceed hosting mail limit quotas
-	 * Some hosts simple loose these excess emails, others queue them server side, up to a limit
+	 * - Note force clearing the queue may cause a site to exceed hosting mail limit quotas
+	 * - Some hosts simple loose these excess emails, others queue them server side, up to a limit
 	 */
 	public function action_clear()
 	{

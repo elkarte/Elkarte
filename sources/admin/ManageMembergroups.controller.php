@@ -22,6 +22,8 @@ if (!defined('ELK'))
 
 /**
  * ManageMembergroups controller, administration page for membergroups.
+ *
+ * @package Membergroups
  */
 class ManageMembergroups_Controller extends Action_Controller
 {
@@ -33,10 +35,12 @@ class ManageMembergroups_Controller extends Action_Controller
 
 	/**
 	 * Main dispatcher, the entrance point for all 'Manage Membergroup' actions.
-	 * It forwards to a function based on the given subaction, default being subaction 'index', or, without manage_membergroup
+	 *
+	 * What it does:
+	 * - It forwards to a function based on the given subaction, default being subaction 'index', or, without manage_membergroup
 	 * permissions, then 'settings'.
-	 * Called by ?action=admin;area=membergroups.
-	 * Requires the manage_membergroups or the admin_forum permission.
+	 * - Called by ?action=admin;area=membergroups.
+	 * - Requires the manage_membergroups or the admin_forum permission.
 	 *
 	 * @uses ManageMembergroups template.
 	 * @uses ManageMembers language file.
@@ -102,10 +106,12 @@ class ManageMembergroups_Controller extends Action_Controller
 
 	/**
 	 * Shows an overview of the current membergroups.
-	 * Called by ?action=admin;area=membergroups.
-	 * Requires the manage_membergroups permission.
-	 * Splits the membergroups in regular ones and post count based groups.
-	 * It also counts the number of members part of each membergroup.
+	 *
+	 * What it does:
+	 * - Called by ?action=admin;area=membergroups.
+	 * - Requires the manage_membergroups permission.
+	 * - Splits the membergroups in regular ones and post count based groups.
+	 * - It also counts the number of members part of each membergroup.
 	 *
 	 * @uses ManageMembergroups template, main.
 	 */
@@ -330,10 +336,12 @@ class ManageMembergroups_Controller extends Action_Controller
 
 	/**
 	 * This function handles adding a membergroup and setting some initial properties.
-	 * Called by ?action=admin;area=membergroups;sa=add.
-	 * It requires the manage_membergroups permission.
-	 * Allows to use a predefined permission profile or copy one from another group.
-	 * Redirects to action=admin;area=membergroups;sa=edit;group=x.
+	 *
+	 * What it does:
+	 * -Called by ?action=admin;area=membergroups;sa=add.
+	 * -It requires the manage_membergroups permission.
+	 * -Allows to use a predefined permission profile or copy one from another group.
+	 * -Redirects to action=admin;area=membergroups;sa=edit;group=x.
 	 *
 	 * @uses the new_group sub template of ManageMembergroups.
 	 */
@@ -465,9 +473,11 @@ class ManageMembergroups_Controller extends Action_Controller
 
 	/**
 	 * Deleting a membergroup by URL (not implemented).
-	 * Called by ?action=admin;area=membergroups;sa=delete;group=x;session_var=y.
-	 * Requires the manage_membergroups permission.
-	 * Redirects to ?action=admin;area=membergroups.
+	 *
+	 * What it does:
+	 * - Called by ?action=admin;area=membergroups;sa=delete;group=x;session_var=y.
+	 * - Requires the manage_membergroups permission.
+	 * - Redirects to ?action=admin;area=membergroups.
 	 *
 	 * @todo look at this
 	 */
@@ -484,11 +494,13 @@ class ManageMembergroups_Controller extends Action_Controller
 
 	/**
 	 * Editing a membergroup.
-	 * Screen to edit a specific membergroup.
-	 * Called by ?action=admin;area=membergroups;sa=edit;group=x.
-	 * It requires the manage_membergroups permission.
-	 * Also handles the delete button of the edit form.
-	 * Redirects to ?action=admin;area=membergroups.
+	 *
+	 * What it does:
+	 * - Screen to edit a specific membergroup.
+	 * - Called by ?action=admin;area=membergroups;sa=edit;group=x.
+	 * - It requires the manage_membergroups permission.
+	 * - Also handles the delete button of the edit form.
+	 * - Redirects to ?action=admin;area=membergroups.
 	 *
 	 * @uses the edit_group sub template of ManageMembergroups.
 	 */
@@ -751,9 +763,11 @@ class ManageMembergroups_Controller extends Action_Controller
 
 	/**
 	 * Set some general membergroup settings and permissions.
-	 * Called by ?action=admin;area=membergroups;sa=settings
-	 * Requires the admin_forum permission (and manage_permissions for changing permissions)
-	 * Redirects to itself.
+	 *
+	 * What it does:
+	 * - Called by ?action=admin;area=membergroups;sa=settings
+	 * - Requires the admin_forum permission (and manage_permissions for changing permissions)
+	 * - Redirects to itself.
 	 *
 	 * @uses membergroup_settings sub template of ManageMembergroups.
 	 */

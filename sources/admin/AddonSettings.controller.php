@@ -17,11 +17,15 @@ if (!defined('ELK'))
 /**
  * AddonSettings controller handles administration settings added
  * in the common area for all addons in admin panel.
- * Some addons will define their own areas, but for simple cases,
+ *
+ * What it does:
+ *  - Some addons will define their own areas, but for simple cases,
  * when you have only a setting or two, this area will allow you
  * to hook into it seamlessly, and your additions will be sent
  * to admin search and otherwise benefit from admin areas security,
  * checks and display.
+ *
+ * @package AddonSettings
  */
 class AddonSettings_Controller extends Action_Controller
 {
@@ -157,10 +161,10 @@ class AddonSettings_Controller extends Action_Controller
 
 	/**
 	 * This function makes sure the requested subaction does exist,
-	 *  if it doesn't, it sets a default action or.
+	 * if it doesn't, it sets a default action or.
 	 *
-	 * @param mixed[] $subActions = array() An array containing all possible subactions.
-	 * @param string $defaultAction = '' the default action to be called if no valid subaction was found.
+	 * @param mixed[] $subActions An array containing all possible subactions.
+	 * @param string $defaultAction the default action to be called if no valid subaction was found.
 	 */
 	public function loadGeneralSettingParameters($subActions = array(), $defaultAction = '')
 	{

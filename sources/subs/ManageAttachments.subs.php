@@ -26,6 +26,7 @@ if (!defined('ELK'))
 /**
  * Approve an attachment, or maybe even more - no permission check!
  *
+ * @package Attachments
  * @param int[] $attachments
  */
 function approveAttachments($attachments)
@@ -110,12 +111,14 @@ function approveAttachments($attachments)
 
 /**
  * Removes attachments or avatars based on a given query condition.
- * Called by remove avatar/attachment functions.
- * It removes attachments based that match the $condition.
- * It allows query_types 'messages' and 'members', whichever is need by the
- * $condition parameter.
- * It does no permissions check.
  *
+ * - Called by remove avatar/attachment functions.
+ * - It removes attachments based that match the $condition.
+ * - It allows query_types 'messages' and 'members', whichever is need by the
+ * $condition parameter.
+ * - It does no permissions check.
+ *
+ * @package Attachments
  * @param mixed[] $condition
  * @param string $query_type
  * @param bool $return_affected_messages = false
@@ -273,6 +276,8 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 
 /**
  * Return an array of attachments directories.
+ *
+ * @package Attachments
  * @see getAttachmentPath()
  */
 function attachmentPaths()
@@ -296,6 +301,7 @@ function attachmentPaths()
 /**
  * How many attachments we have overall.
  *
+ * @package Attachments
  * @return int
  */
 function getAttachmentCount()
@@ -322,6 +328,7 @@ function getAttachmentCount()
 /**
  * How many attachments we have in a certain folder.
  *
+ * @package Attachments
  * @param string $folder
  */
 function getFolderAttachmentCount($folder)
@@ -348,6 +355,7 @@ function getFolderAttachmentCount($folder)
 /**
  * How many avatars do we have. Need to know. :P
  *
+ * @package Attachments
  * @return int
  */
 function getAvatarCount()
@@ -372,6 +380,7 @@ function getAvatarCount()
 /**
  * Get the attachments directories, as an array.
  *
+ * @package Attachments
  * @return mixed[] the attachments directory/directories
  */
 function getAttachmentDirs()
@@ -390,10 +399,12 @@ function getAttachmentDirs()
 
 /**
  * Simple function to remove the strictly needed of orphan attachments.
- * This is used from attachments maintenance.
- * It assumes the files have no message, no member information.
- * It only removes the attachments and thumbnails from the database.
  *
+ * - This is used from attachments maintenance.
+ * - It assumes the files have no message, no member information.
+ * - It only removes the attachments and thumbnails from the database.
+ *
+ * @package Attachments
  * @param int[] $attach_ids
  */
 function removeOrphanAttachments($attach_ids)
@@ -422,6 +433,7 @@ function removeOrphanAttachments($attach_ids)
 /**
  * Set or retrieve the size of an attachment.
  *
+ * @package Attachments
  * @param int $attach_id
  * @param int|null $filesize = null
  */
@@ -464,6 +476,7 @@ function attachment_filesize($attach_id, $filesize = null)
 /**
  * Set or retrieve the ID of the folder where an attachment is stored on disk.
  *
+ * @package Attachments
  * @param int $attach_id
  * @param int|null $folder_id = null
  */
@@ -505,6 +518,8 @@ function attachment_folder($attach_id, $folder_id = null)
 
 /**
  * Get the last attachment ID without a thumbnail.
+ *
+ * @package Attachments
  */
 function maxNoThumb()
 {
@@ -526,10 +541,12 @@ function maxNoThumb()
 
 /**
  * Finds orphan thumbnails in the database
- * Checks in groups of 500
- * Called by attachment maintance
- * If $fix_errors is set to true it will attempt to remove the thumbnail from disk
  *
+ * - Checks in groups of 500
+ * - Called by attachment maintance
+ * - If $fix_errors is set to true it will attempt to remove the thumbnail from disk
+ *
+ * @package Attachments
  * @param int $start
  * @param boolean $fix_errors
  * @param string[] $to_fix
@@ -591,10 +608,12 @@ function findOrphanThumbnails($start, $fix_errors, $to_fix)
 
 /**
  * Finds parents who thing they do have thumbnails, but dont
- * Checks in groups of 500
- * Called by attachment maintance
- * If $fix_errors is set to true it will attempt to remove the thumbnail from disk
  *
+ * - Checks in groups of 500
+ * - Called by attachment maintance
+ * - If $fix_errors is set to true it will attempt to remove the thumbnail from disk
+ *
+ * @package Attachments
  * @param int $start
  * @param boolean $fix_errors
  * @param string[] $to_fix
@@ -642,10 +661,12 @@ function findParentsOrphanThumbnails($start, $fix_errors, $to_fix)
 
 /**
  * Goes thought all the attachments and checks that they exist
- * Goes in increments of 250
- * if $fix_errors is true will remove empty files, update wrong filesizes in the DB and
- * remove DB entries if the file can not be found.
  *
+ * - Goes in increments of 250
+ * - if $fix_errors is true will remove empty files, update wrong filesizes in the DB and
+ * - remove DB entries if the file can not be found.
+ *
+ * @package Attachments
  * @param int $start
  * @param boolean $fix_errors
  * @param string[] $to_fix
@@ -775,8 +796,10 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
 
 /**
  * Finds avatar files that are not assigned to any members
- * If $fix_errors is set, it will
  *
+ * - If $fix_errors is set, it will
+ *
+ * @package Attachments
  * @param int $start
  * @param boolean $fix_errors
  * @param string[] $to_fix
@@ -843,6 +866,7 @@ function findOrphanAvatars($start, $fix_errors, $to_fix)
 /**
  * Finds attachments that are not used in any message
  *
+ * @package Attachments
  * @param int $start
  * @param boolean $fix_errors
  * @param string[] $to_fix
@@ -901,6 +925,8 @@ function findOrphanAttachments($start, $fix_errors, $to_fix)
 
 /**
  * Get the max attachment ID which is a thumbnail.
+ *
+ * @package Attachments
  */
 function getMaxThumbnail()
 {
@@ -922,6 +948,8 @@ function getMaxThumbnail()
 
 /**
  * Get the max attachment ID.
+ *
+ * @package Attachments
  */
 function maxAttachment()
 {
@@ -942,6 +970,7 @@ function maxAttachment()
 /**
  * Check multiple attachments IDs against the database.
  *
+ * @package Attachments
  * @param array $attachments
  * @param string $approve_query
  */
@@ -977,6 +1006,7 @@ function validateAttachments($attachments, $approve_query)
 /**
  * Finds an attachments parent topic/message and returns the values in an array
  *
+ * @package Attachments
  * @param int $attachment
  */
 function attachmentBelongsTo($attachment)
@@ -1006,6 +1036,7 @@ function attachmentBelongsTo($attachment)
 /**
  * Checks an attachments id
  *
+ * @package Attachments
  * @param int $id_attach
  * @return boolean
  */
@@ -1030,8 +1061,10 @@ function validateAttachID($id_attach)
 
 /**
  * Callback function for action_unapproved_attachments
- * retrieve all the attachments waiting for approval the approver can approve
  *
+ * - retrieve all the attachments waiting for approval the approver can approve
+ *
+ * @package Attachments
  * @param int $start
  * @param int $items_per_page
  * @param string $sort
@@ -1115,8 +1148,10 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
 
 /**
  * Callback function for action_unapproved_attachments
- * count all the attachments waiting for approval that this approver can approve
  *
+ * - count all the attachments waiting for approval that this approver can approve
+ *
+ * @package Attachments
  * @param string $approve_query additional restrictions based on the boards the approver can see
  * @return int the number of unapproved attachments
  */
@@ -1147,7 +1182,10 @@ function list_getNumUnapprovedAttachments($approve_query)
 
 /**
  * Prepare the actual attachment directories to be displayed in the list.
- * Callback function for createList().
+ *
+ * - Callback function for createList().
+ *
+ * @package Attachments
  */
 function list_getAttachDirs()
 {
@@ -1227,9 +1265,9 @@ function list_getAttachDirs()
 
 /**
  * Checks the status of an attachment directory and returns an array
- *  of the status key, if that status key signifies an error, and
- *  the file count.
+ * of the status key, if that status key signifies an error, and the file count.
  *
+ * @package Attachments
  * @param string $dir
  * @param int $expected_files
  */
@@ -1255,7 +1293,10 @@ function attachDirStatus($dir, $expected_files)
 
 /**
  * Prepare the base directories to be displayed in a list.
- * Callback function for createList().
+ *
+ * - Callback function for createList().
+ *
+ * @package Attachments
  */
 function list_getBaseDirs()
 {
@@ -1304,9 +1345,11 @@ function list_getBaseDirs()
 
 /**
  * Return the number of files of the specified type recorded in the database.
- * (the specified type being attachments or avatars).
- * Callback function for createList()
  *
+ * - (the specified type being attachments or avatars).
+ * - Callback function for createList()
+ *
+ * @package Attachments
  * @param string $browse_type can be one of 'avatars' or not. (in which case they're attachments)
  */
 function list_getNumFiles($browse_type)
@@ -1347,8 +1390,10 @@ function list_getNumFiles($browse_type)
 /**
  * Returns the list of attachments files (avatars or not), recorded
  * in the database, per the parameters received.
- * Callback function for createList()
  *
+ * - Callback function for createList()
+ *
+ * @package Attachments
  * @param int $start
  * @param int $items_per_page
  * @param string $sort
@@ -1411,6 +1456,8 @@ function list_getFiles($start, $items_per_page, $sort, $browse_type)
 
 /**
  * Return the overall attachments size
+ *
+ * @package Attachments
  */
 function overallAttachmentsSize()
 {
@@ -1436,6 +1483,8 @@ function overallAttachmentsSize()
 
 /**
  * Get files and size from the current attachments dir
+ *
+ * @package Attachments
  */
 function currentAttachDirProperties()
 {
@@ -1446,6 +1495,8 @@ function currentAttachDirProperties()
 
 /**
  * Get files and size from the current attachments dir
+ *
+ * @package Attachments
  * @param string $dir
  */
 function attachDirProperties($dir)
@@ -1473,6 +1524,8 @@ function attachDirProperties($dir)
 
 /**
  * Move avatars to their new directory.
+ *
+ * @package Attachments
  */
 function moveAvatars()
 {
@@ -1515,6 +1568,7 @@ function moveAvatars()
 /**
  * Extend the message body with a removal message.
  *
+ * @package Attachments
  * @param int[] $messages array of message id's to update
  * @param string $notice notice to add
  */
@@ -1536,11 +1590,10 @@ function setRemovalNotice($messages, $notice)
 /**
  * Finds all the attachments of a single message.
  *
+ * @package Attachments
  * @param int $id_msg
  * @param bool $unapproved if true returns also the unapproved attachments (default false)
- *
  * @todo $unapproved may be superfluous
- *
  * @return array
  */
 function attachmentsOfMessage($id_msg, $unapproved = false)
@@ -1570,6 +1623,7 @@ function attachmentsOfMessage($id_msg, $unapproved = false)
 /**
  * Counts attachments for the given folder.
  *
+ * @package Attachments
  * @param int $id_folder
  */
 function countAttachmentsInFolders($id_folder)
@@ -1594,6 +1648,7 @@ function countAttachmentsInFolders($id_folder)
 /**
  * Changes the folder id of all the attachments in a certain folder
  *
+ * @package Attachments
  * @param int $from - the folder the attachments are in
  * @param int $to - the folder the attachments should be moved to
  */

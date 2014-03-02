@@ -23,6 +23,8 @@ if (!defined('ELK'))
 
 /**
  * ManageSearch controller admin class.
+ *
+ * @package Search
  */
 class ManageSearch_Controller extends Action_Controller
 {
@@ -34,15 +36,16 @@ class ManageSearch_Controller extends Action_Controller
 
 	/**
 	 * Main entry point for the admin search settings screen.
-	 * It checks permissions, and it forwards to the appropriate function based on
+	 *
+	 * What it does:
+	 * - It checks permissions, and it forwards to the appropriate function based on
 	 * the given sub-action.
-	 * Defaults to sub-action 'settings'.
-	 * Called by ?action=admin;area=managesearch.
-	 * Requires the admin_forum permission.
+	 * - Defaults to sub-action 'settings'.
+	 * - Called by ?action=admin;area=managesearch.
+	 * - Requires the admin_forum permission.
 	 *
 	 * @uses ManageSearch template.
 	 * @uses Search language file.
-	 *
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
@@ -97,8 +100,9 @@ class ManageSearch_Controller extends Action_Controller
 
 	/**
 	 * Edit some general settings related to the search function.
-	 * Called by ?action=admin;area=managesearch;sa=settings.
-	 * Requires the admin_forum permission.
+	 *
+	 * - Called by ?action=admin;area=managesearch;sa=settings.
+	 * - Requires the admin_forum permission.
 	 *
 	 * @uses ManageSearch template, 'modify_settings' sub-template.
 	 */
@@ -230,8 +234,9 @@ class ManageSearch_Controller extends Action_Controller
 
 	/**
 	 * Edit the relative weight of the search factors.
-	 * Called by ?action=admin;area=managesearch;sa=weights.
-	 * Requires the admin_forum permission.
+	 *
+	 * - Called by ?action=admin;area=managesearch;sa=weights.
+	 * - Requires the admin_forum permission.
 	 *
 	 * @uses ManageSearch template, 'modify_weights' sub-template.
 	 */
@@ -279,11 +284,13 @@ class ManageSearch_Controller extends Action_Controller
 
 	/**
 	 * Edit the search method and search index used.
-	 * Calculates the size of the current search indexes in use.
-	 * Allows to create and delete a fulltext index on the messages table.
-	 * Allows to delete a custom index (that action_create() created).
-	 * Called by ?action=admin;area=managesearch;sa=method.
-	 * Requires the admin_forum permission.
+	 *
+	 * What it does:
+	 * - Calculates the size of the current search indexes in use.
+	 * - Allows to create and delete a fulltext index on the messages table.
+	 * - Allows to delete a custom index (that action_create() created).
+	 * - Called by ?action=admin;area=managesearch;sa=method.
+	 * - Requires the admin_forum permission.
 	 *
 	 * @uses ManageSearch template, 'select_search_method' sub-template.
 	 */
@@ -399,13 +406,15 @@ class ManageSearch_Controller extends Action_Controller
 
 	/**
 	 * Create a custom search index for the messages table.
-	 * Called by ?action=admin;area=managesearch;sa=createmsgindex.
-	 * Linked from the action_edit screen.
-	 * Requires the admin_forum permission.
-	 * Depending on the size of the message table, the process is divided in steps.
+	 *
+	 * What it does:
+	 * - Called by ?action=admin;area=managesearch;sa=createmsgindex.
+	 * - Linked from the action_edit screen.
+	 * - Requires the admin_forum permission.
+	 * - Depending on the size of the message table, the process is divided in steps.
 	 *
 	 * @uses ManageSearch template, 'create_index', 'create_index_progress', and 'create_index_done'
-	 *  sub-templates.
+	 * sub-templates.
 	 */
 	public function action_create()
 	{
@@ -503,7 +512,8 @@ class ManageSearch_Controller extends Action_Controller
 
 	/**
 	 * Edit settings related to the sphinx or sphinxQL search function.
-	 * Called by ?action=admin;area=managesearch;sa=sphinx.
+	 *
+	 * - Called by ?action=admin;area=managesearch;sa=sphinx.
 	 */
 	public function action_managesphinx()
 	{
@@ -607,10 +617,11 @@ class ManageSearch_Controller extends Action_Controller
 
 	/**
 	 * Get the installed Search API implementations.
-	 * This function checks for patterns in comments on top of the Search-API files!
-	 * In addition to filenames pattern.
-	 * It loads the search API classes if identified.
-	 * This function is used by action_edit to list all installed API implementations.
+	 *
+	 * - This function checks for patterns in comments on top of the Search-API files!
+	 * - In addition to filenames pattern.
+	 * - It loads the search API classes if identified.
+	 * - This function is used by action_edit to list all installed API implementations.
 	 */
 	private function loadSearchAPIs()
 	{

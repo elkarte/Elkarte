@@ -21,8 +21,9 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * ManagePosts controller handles all the administration settings
- *  for topics and posts.
+ * ManagePosts controller handles all the administration settings for topics and posts.
+ *
+ * @package Posts
  */
 class ManagePosts_Controller extends Action_Controller
 {
@@ -34,12 +35,13 @@ class ManagePosts_Controller extends Action_Controller
 
 	/**
 	 * The main entrance point for the 'Posts and topics' screen.
-	 * Like all others, it checks permissions, then forwards to the right function
-	 * based on the given sub-action.
-	 * Defaults to sub-action 'posts'.
 	 *
-	 * Accessed from ?action=admin;area=postsettings.
-	 * Requires (and checks for) the admin_forum permission.
+	 * What it does:
+	 * - Like all others, it checks permissions, then forwards to the right function
+	 * based on the given sub-action.
+	 * - Defaults to sub-action 'posts'.
+	 * - Accessed from ?action=admin;area=postsettings.
+	 * - Requires (and checks for) the admin_forum permission.
 	 *
 	 * @see Action_Controller::action_index()
 	 */
@@ -104,10 +106,11 @@ class ManagePosts_Controller extends Action_Controller
 
 	/**
 	 * Shows an interface to set and test censored words.
-	 * It uses the censor_vulgar, censor_proper, censorWholeWord, and censorIgnoreCase
-	 * settings.
-	 * Requires the admin_forum permission.
-	 * Accessed from ?action=admin;area=postsettings;sa=censor.
+	 *
+	 * - It uses the censor_vulgar, censor_proper, censorWholeWord, and
+	 * censorIgnoreCase settings.
+	 * - Requires the admin_forum permission.
+	 * - Accessed from ?action=admin;area=postsettings;sa=censor.
 	 *
 	 * @uses the Admin template and the edit_censored sub template.
 	 */
@@ -200,8 +203,9 @@ class ManagePosts_Controller extends Action_Controller
 
 	/**
 	 * Modify any setting related to posts and posting.
-	 * Requires the admin_forum permission.
-	 * Accessed from ?action=admin;area=postsettings;sa=posts.
+	 *
+	 * - Requires the admin_forum permission.
+	 * - Accessed from ?action=admin;area=postsettings;sa=posts.
 	 *
 	 * @uses Admin template, edit_post_settings sub-template.
 	 */
