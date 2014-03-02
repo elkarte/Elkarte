@@ -24,6 +24,8 @@ if (!defined('ELK'))
 /**
  * SearchAPI-Sphinxql.class.php, SphinxQL API, used when an Sphinx search daemon is running
  * Access is via Sphinx's own implementation of MySQL network protocol (SphinxQL)
+ *
+ * @package Search
  */
 class Sphinxql_Search
 {

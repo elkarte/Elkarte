@@ -24,6 +24,8 @@ if (!defined('ELK'))
 /**
  * SearchAPI-Sphinx.class.php, Sphinx API, used when an Sphinx search daemon is running
  * Access is via the Sphinx native search API (SphinxAPI)
+ *
+ * @package Search
  */
 class Sphinx_Search
 {

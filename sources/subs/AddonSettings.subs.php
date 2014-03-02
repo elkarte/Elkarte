@@ -14,6 +14,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta 2
+ *
  */
 
 if (!defined('ELK'))
@@ -22,6 +23,7 @@ if (!defined('ELK'))
 /**
  * Gets all of the files in a directory and its chidren directories
  *
+ * @package AddonSettings
  * @param string $dir_path
  * @return array
  */
@@ -49,9 +51,12 @@ function get_files_recursive($dir_path)
 
 /**
  * Callback function for the integration hooks list (list_integration_hooks)
- * Gets all of the hooks in the system and their status
- * Would be better documented if Ema was not lazy
  *
+ * What it does:
+ * - Gets all of the hooks in the system and their status
+ * - Would be better documented if Ema was not lazy
+ *
+ * @package AddonSettings
  * @param int $start
  * @param int $per_page
  * @param string $sort
@@ -242,8 +247,12 @@ function list_integration_hooks_data($start, $per_page, $sort)
 
 /**
  * Simply returns the total count of integration hooks
- * (used by createList() callbacks)
  *
+ * What it does:
+ * - used by createList() as a callback to determine the number of hooks in
+ * use in the system
+ *
+ * @package AddonSettings
  * @param boolean $filter
  */
 function integration_hooks_count($filter = false)
@@ -262,8 +271,11 @@ function integration_hooks_count($filter = false)
 
 /**
  * Parses modSettings to create integration hook array
- * (used by createList() callbacks)
  *
+ * What it does:
+ * - used by createList() callbacks
+ *
+ * @package AddonSettings
  * @staticvar type $integration_hooks
  * @return array
  */

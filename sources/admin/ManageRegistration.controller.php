@@ -22,10 +22,14 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * ManageRegistration admin controller: handles the administration pages
- * which allow admins (or moderators with moderate_forum permission)
- * to register a new member, to see and edit the  registration agreement,
- * to set up reserved words for forum names.
+ * ManageRegistration admin controller: handles the registration pages
+ *
+ * - allow admins (or moderators with moderate_forum permission)
+ * to register a new member,
+ * - to see and edit the registration agreement,
+ * - to set up reserved words for forum names.
+ *
+ * @package Registration
  */
 class ManageRegistration_Controller extends Action_Controller
 {
@@ -38,12 +42,12 @@ class ManageRegistration_Controller extends Action_Controller
 	/**
 	 * Entrance point for the registration center, it checks permisions and forwards
 	 * to the right method based on the subaction.
-	 * Accessed by ?action=admin;area=regcenter.
-	 * Requires either the moderate_forum or the admin_forum permission.
+	 *
+	 * - Accessed by ?action=admin;area=regcenter.
+	 * - Requires either the moderate_forum or the admin_forum permission.
 	 *
 	 * @uses Login language file
 	 * @uses Register template.
-	 *
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
@@ -111,9 +115,10 @@ class ManageRegistration_Controller extends Action_Controller
 
 	/**
 	 * This function allows the admin to register a new member by hand.
-	 * It also allows assigning a primary group to the member being registered.
-	 * Accessed by ?action=admin;area=regcenter;sa=register
-	 * Requires the moderate_forum permission.
+	 *
+	 * - It also allows assigning a primary group to the member being registered.
+	 * - Accessed by ?action=admin;area=regcenter;sa=register
+	 * - Requires the moderate_forum permission.
 	 *
 	 * @uses Register template, admin_register sub-template.
 	 */
@@ -193,10 +198,11 @@ class ManageRegistration_Controller extends Action_Controller
 
 	/**
 	 * Allows the administrator to edit the registration agreement, and choose whether
-	 * it should be shown or not. It writes and saves the agreement to the agreement.txt
-	 * file.
-	 * Accessed by ?action=admin;area=regcenter;sa=agreement.
-	 * Requires the admin_forum permission.
+	 * it should be shown or not.
+	 *
+	 * - It writes and saves the agreement to the agreement.txt file.
+	 * - Accessed by ?action=admin;area=regcenter;sa=agreement.
+	 * - Requires the admin_forum permission.
 	 *
 	 * @uses Admin template and the edit_agreement sub template.
 	 */
@@ -252,8 +258,9 @@ class ManageRegistration_Controller extends Action_Controller
 
 	/**
 	 * Set the names under which users are not allowed to register.
-	 * Accessed by ?action=admin;area=regcenter;sa=reservednames.
-	 * Requires the admin_forum permission.
+	 *
+	 * - Accessed by ?action=admin;area=regcenter;sa=reservednames.
+	 * - Requires the admin_forum permission.
 	 *
 	 * @uses Register template, reserved_words sub-template.
 	 */
@@ -294,9 +301,10 @@ class ManageRegistration_Controller extends Action_Controller
 
 	/**
 	 * This function handles registration settings, and provides a few pretty stats too while it's at it.
-	 * General registration settings and Coppa compliance settings.
-	 * Accessed by ?action=admin;area=regcenter;sa=settings.
-	 * Requires the admin_forum permission.
+	 *
+	 * - General registration settings and Coppa compliance settings.
+	 * - Accessed by ?action=admin;area=regcenter;sa=settings.
+	 * - Requires the admin_forum permission.
 	 */
 	public function action_registerSettings_display()
 	{

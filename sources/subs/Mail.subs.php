@@ -23,8 +23,10 @@ if (!defined('ELK'))
 
 /**
  * This function sends an email to the specified recipient(s).
+ *
  * It uses the mail_type settings and webmaster_email variable.
  *
+ * @package Mail
  * @param string[]|string $to - the email(s) to send to
  * @param string $subject - email subject, expected to have entities, and slashes, but not be parsed
  * @param string $message - email body, expected to have slashes, no htmlentities
@@ -277,6 +279,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 /**
  * Add an email to the mail queue.
  *
+ * @package Mail
  * @param bool $flush = false
  * @param string[] $to_array = array()
  * @param string $subject = ''
@@ -382,14 +385,17 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
 
 /**
  * Prepare text strings for sending as email body or header.
- * In case there are higher ASCII characters in the given string, this
- * function will attempt the transport method 'quoted-printable'.
- * Otherwise the transport method '7bit' is used.
  *
+ * What it does:
+ * - In case there are higher ASCII characters in the given string, this
+ * function will attempt the transport method 'quoted-printable'.
+ * - Otherwise the transport method '7bit' is used.
+ *
+ * @package Mail
  * @param string $string
  * @param bool $with_charset = true
  * @param bool $hotmail_fix = false, with hotmail_fix set all higher ASCII
- *  characters are converted to HTML entities to assure proper display of the mail
+ * characters are converted to HTML entities to assure proper display of the mail
  * @param string $line_break
  * @param string|null $custom_charset = null, if set, it uses this character set
  * @return string[] an array containing the character set, the converted string and the transport method.
@@ -448,9 +454,11 @@ function mimespecialchars($string, $with_charset = true, $hotmail_fix = false, $
 
 /**
  * Converts out of ascii range characters in to HTML entities
- * Character codes <= 128 are left as is
- * Callback function of preg_replace_callback, used just for hotmail address
  *
+ * - Character codes <= 128 are left as is
+ * - Callback function of preg_replace_callback, used just for hotmail address
+ *
+ * @package Mail
  * @param mixed[] $match
  */
 function entityConvert($match)
@@ -474,6 +482,7 @@ function entityConvert($match)
 /**
  * Callback for the preg_replace in mimespecialchars
  *
+ * @package Mail
  * @param mixed[] $match
  */
 function mimespecialchars_callback($match)
@@ -483,9 +492,11 @@ function mimespecialchars_callback($match)
 
 /**
  * Sends mail, like mail() but over SMTP.
- * It expects no slashes or entities.
- * @internal
  *
+ * - It expects no slashes or entities.
+ *
+ * @package Mail
+ * @internal
  * @param string[] $mail_to_array - array of strings (email addresses)
  * @param string $subject email subject
  * @param string $message email message
@@ -661,10 +672,11 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 
 /**
  * Parse a message to the SMTP server.
- * Sends the specified message to the server, and checks for the
- * expected response.
- * @internal
  *
+ * - Sends the specified message to the server, and checks for the expected response.
+ *
+ * @package Mail
+ * @internal
  * @param string $message - the message to send
  * @param resource $socket - socket to send on
  * @param string $response - the expected response code
@@ -702,9 +714,11 @@ function server_parse($message, $socket, $response)
 
 /**
  * Adds the unique security key in to an email
+ *
  * - adds the key in to (each) message body section
  * - safety net for clients that strip out the message-id and in-reply-to headers
  *
+ * @package Mail
  * @param string $message
  * @param string $unq_head
  * @param string $encoded_unq_head
@@ -734,6 +748,7 @@ function mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break)
 /**
  * Load a template from EmailTemplates language file.
  *
+ * @package Mail
  * @param string $template
  * @param array $replacements = array()
  * @param string $lang = ''
@@ -796,7 +811,10 @@ function loadEmailTemplate($template, $replacements = array(), $lang = '', $load
 
 /**
  * Prepare subject and message of an email for the preview box
+ *
  * Used in action_mailingcompose and RetrievePreview (Xml.controller.php)
+ *
+ * @package Mail
  */
 function prepareMailingForPreview()
 {
@@ -862,6 +880,7 @@ function prepareMailingForPreview()
  * Callback function for load email template on subject and body
  * Uses capture group 1 in array
  *
+ * @package Mail
  * @param array $matches
  * @return string
  */
@@ -892,6 +911,7 @@ function user_info_callback($matches)
 /**
  * This function grabs the mail queue items from the database, according to the params given.
  *
+ * @package Mail
  * @param int $start
  * @param int $items_per_page
  * @param string $sort
@@ -931,6 +951,8 @@ function list_getMailQueue($start, $items_per_page, $sort)
 
 /**
  * Returns the total count of items in the mail queue.
+ *
+ * @package Mail
  * @return int
  */
 function list_getMailQueueSize()
@@ -952,6 +974,8 @@ function list_getMailQueueSize()
 
 /**
  * Deletes items from the mail queue
+ *
+ * @package Mail
  * @param array $items
  */
 function deleteMailQueueItems($items)
@@ -970,6 +994,7 @@ function deleteMailQueueItems($items)
 /**
  * Get the current mail queue status
  *
+ * @package Mail
  * @return array
  */
 function list_MailQueueStatus()
@@ -993,8 +1018,10 @@ function list_MailQueueStatus()
 
 /**
  * This function handles updates to account for failed emails.
- * It is used to keep track of failed emails attempts and next try.
  *
+ * - It is used to keep track of failed emails attempts and next try.
+ *
+ * @package Mail
  * @param array $failed_emails
  */
 function updateFailedQueue($failed_emails)
@@ -1036,7 +1063,10 @@ function updateFailedQueue($failed_emails)
 
 /**
  * Updates the failed attempts to email in the database.
- * It sets mail failed attempts value to 0.
+ *
+ * - It sets mail failed attempts value to 0.
+ *
+ * @package Mail
  */
 function updateSuccessQueue()
 {
@@ -1079,9 +1109,11 @@ function resetNextSendTime()
 
 /**
  * Update the next sending time for mail queue.
- * By default, move it 10 seconds for lower per mail_period_limits and 5 seconds for larger mail_period_limits
- * Requires an affected row
  *
+ * - By default, move it 10 seconds for lower per mail_period_limits and 5 seconds for larger mail_period_limits
+ * - Requires an affected row
+ *
+ * @package Mail
  * @return bool
  */
 function updateNextSendTime()
@@ -1113,6 +1145,7 @@ function updateNextSendTime()
 /**
  * Retrieve all details from the database on the next emails.
  *
+ * @package Mail
  * @param int $number
  * @return array
  */
@@ -1154,9 +1187,11 @@ function emailsInfo($number)
 
 /**
  * Sends a group of emails from the mail queue.
- * Allows a batch of emails to be released every 5 to 10 seconds (based on per period limits)
- * If batch size is not set, will determine a size such that it sends in 1/2 the period (buffer)
  *
+ * - Allows a batch of emails to be released every 5 to 10 seconds (based on per period limits)
+ * - If batch size is not set, will determine a size such that it sends in 1/2 the period (buffer)
+ *
+ * @package Mail
  * @param mixed $batch_size = false the number to send each loop
  * @param boolean $override_limit = false bypassing our limit flaf
  * @param boolean $force_send = false
@@ -1342,7 +1377,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
  * poster of a certain message.
  *
  * @todo very similar to mailFromMesasge
- *
+ * @package Mail
  * @param int $id_msg the id of a message
  * @param int $topic_id the topic the message belongs to
  * @return mixed[] the poster's details
@@ -1373,6 +1408,7 @@ function posterDetails($id_msg, $topic_id)
 /**
  * Little utility function to calculate how long ago a time was.
  *
+ * @package Mail
  * @param integer|double $time_diff
  * @return string
  */

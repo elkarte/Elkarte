@@ -16,7 +16,10 @@ if (!defined('ELK'))
 
 /**
  * This is the avatars administration controller class.
- * It is doing the job of maintenance and allow display and change of avatar settings.
+ *
+ * - It is doing the job of maintenance and allow display and change of avatar settings.
+ *
+ * @package Avatars
  */
 class ManageAvatars_Controller extends Action_Controller
 {
@@ -29,11 +32,12 @@ class ManageAvatars_Controller extends Action_Controller
 
 	/**
 	 * The Avatars admin area
-	 * This method is the entry point for index.php?action=admin;area=manageattachments;sa=avatars
-	 * and it calls a function based on the sub-action.
 	 *
-	 * Is called from ManageAttachments.controller.php
-	 * requires manage_attachments permissions
+	 * What it does:
+	 * - This method is the entry point for index.php?action=admin;area=manageattachments;sa=avatars
+	 * - It calls a function based on the sub-action.
+	 * - Is called from ManageAttachments.controller.php
+	 * - requires manage_attachments permissions
 	 *
 	 * @see Action_Controller::action_index()
 	 */
@@ -64,7 +68,8 @@ class ManageAvatars_Controller extends Action_Controller
 
 	/**
 	 * This action handler method displays and allows to change avatar settings.
-	 * Called by index.php?action=admin;area=manageattachments;sa=avatars.
+	 *
+	 * - Called by index.php?action=admin;area=manageattachments;sa=avatars.
 	 *
 	 * @uses 'avatars' sub-template.
 	 */
@@ -111,10 +116,10 @@ class ManageAvatars_Controller extends Action_Controller
 
 	/**
 	 * This method retrieves and returns avatar settings.
-	 * It also returns avatar-related permissions profile_server_avatar,
-	 * profile_upload_avatar, profile_remote_avatar, profile_gvatar.
 	 *
-	 * Initializes the avatarSettings form.
+	 * - It also returns avatar-related permissions profile_server_avatar,
+	 * profile_upload_avatar, profile_remote_avatar, profile_gvatar.
+	 * - Initializes the avatarSettings form.
 	 */
 	private function _initAvatarSettingsForm()
 	{

@@ -23,6 +23,7 @@ if (!defined('ELK'))
 /**
  * Prepares an array of the forum news items
  *
+ * @package News
  * @return array
  */
 function getNews()
@@ -49,9 +50,12 @@ function getNews()
 }
 
 /**
- * Get a list of all full banned users.  Use their Username and email to find them.
- * Only get the ones that can't login to turn off notification.
+ * Get a list of all full banned users.
  *
+ * - Use their Username and email to find them.
+ * - Only get the ones that can't login to turn off notification.
+ *
+ * @package News
  * @return array
  */
 function excludeBannedMembers()
@@ -120,6 +124,7 @@ function excludeBannedMembers()
 /**
  * Get a list of our local board moderators.
  *
+ * @package News
  * @return array
  */
 function getModerators()
@@ -147,6 +152,7 @@ function getModerators()
 /**
  * Lists our newsletter recipients, step by step.
  *
+ * @package News
  * @param string $sendQuery
  * @param string $sendParams
  * @param int $start
@@ -193,6 +199,7 @@ function getNewsletterRecipients($sendQuery, $sendParams, $start, $increment, $c
  * - can be seen by this user.
  * - are actually the latest posts.
  *
+ * @package News
  * @param string $query_this_board passed to query, assumed raw and instered as such
  * @param int $board
  * @param int $limit
@@ -261,6 +268,7 @@ function getXMLNews($query_this_board, $board, $limit)
 /**
  * Get the recent topics to display.
  *
+ * @package News
  * @param string $query_this_board passed to query, assumed raw and instered as such
  * @param int $board
  * @param int $limit

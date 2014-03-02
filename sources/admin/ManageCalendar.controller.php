@@ -23,6 +23,8 @@ if (!defined('ELK'))
 /**
  * This class controls execution for actions in the manage calendar area
  * of the admin panel.
+ *
+ * @package Calendar
  */
 class ManageCalendar_Controller extends Action_Controller
 {
@@ -260,7 +262,8 @@ class ManageCalendar_Controller extends Action_Controller
 
 	/**
 	 * Show and allow to modify calendar settings.
-	 * The method uses a Settings_Form to do the work.
+	 *
+	 * - The method uses a Settings_Form to do the work.
 	 */
 	public function action_calendarSettings_display()
 	{

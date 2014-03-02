@@ -22,17 +22,23 @@ if (!defined('ELK'))
 
 /**
  * Admin controller class.
- * This class handles the first general admin screens: home,
- * also admin search actions and end admin session.
+ *
+ * What it does:
+ * - This class handles the first general admin screens: home,
+ * - Handles admin area search actions and end admin session.
+ *
+ * @package Admin
  */
 class Admin_Controller extends Action_Controller
 {
 	/**
 	 * The main admin handling function.
-	 * It initialises all the basic context required for the admin center.
-	 * It passes execution onto the relevant admin section.
-	 * If the passed section is not found it shows the admin home page.
-	 * Accessed by ?action=admin.
+	 *
+	 * What it does:
+	 * - It initialises all the basic context required for the admin center.
+	 * - It passes execution onto the relevant admin section.
+	 * - If the passed section is not found it shows the admin home page.
+	 * - Accessed by ?action=admin.
 	 */
 	public function action_index()
 	{
@@ -611,14 +617,15 @@ class Admin_Controller extends Action_Controller
 
 	/**
 	 * The main administration section.
-	 * It prepares all the data necessary for the administration front page.
-	 * It uses the Admin template along with the admin sub template.
-	 * It requires the moderate_forum, manage_membergroups, manage_bans,
+	 *
+	 * What it does:
+	 * - It prepares all the data necessary for the administration front page.
+	 * - It uses the Admin template along with the admin sub template.
+	 * - It requires the moderate_forum, manage_membergroups, manage_bans,
 	 * admin_forum, manage_permissions, manage_attachments, manage_smileys,
 	 * manage_boards, edit_news, or send_mail permission.
-	 * It uses the index administrative area.
-	 *
-	 * It can be found by going to ?action=admin.
+	 * - It uses the index administrative area.
+	 * - Accessed by ?action=admin.
 	 */
 	public function action_home()
 	{
@@ -676,7 +683,10 @@ class Admin_Controller extends Action_Controller
 	/**
 	 * The credits section in admin panel.
 	 *
-	 * Accessed by ?action=admin;area=credits
+	 * What it does:
+	 * - Determines the current level of support functions from the server, such as
+	 * current level of caching engine or graphics librayrs installed.
+	 * - Accessed by ?action=admin;area=credits
 	 */
 	public function action_credits()
 	{
@@ -963,7 +973,7 @@ class Admin_Controller extends Action_Controller
 
 	/**
 	 * This file allows the user to search the wiki documentation
-	 *  for a little help.
+	 * for a little help.
 	 */
 	public function action_search_doc()
 	{

@@ -22,18 +22,22 @@ if (!defined('ELK'))
 
 /**
  * Delete one or more members.
- * Requires profile_remove_own or profile_remove_any permission for
+ *
+ * What it does:
+ * - Requires profile_remove_own or profile_remove_any permission for
  * respectively removing your own account or any account.
- * Non-admins cannot delete admins.
+ * - Non-admins cannot delete admins.
+ *
  * The function:
- *   - changes author of messages, topics and polls to guest authors.
- *   - removes all log entries concerning the deleted members, except the
+ * - changes author of messages, topics and polls to guest authors.
+ * - removes all log entries concerning the deleted members, except the
  * error logs, ban logs and moderation logs.
- *   - removes these members' personal messages (only the inbox), avatars,
+ * - removes these members' personal messages (only the inbox), avatars,
  * ban entries, theme settings, moderator positions, poll votes, and
  * karma votes.
- *   - updates member statistics afterwards.
+ * - updates member statistics afterwards.
  *
+ * @package Members
  * @param int[]|int $users
  * @param bool $check_not_admin = false
  */
@@ -431,13 +435,18 @@ function deleteMembers($users, $check_not_admin = false)
 
 /**
  * Registers a member to the forum.
- * Allows two types of interface: 'guest' and 'admin'. The first
- * includes hammering protection, the latter can perform the registration silently.
- * The strings used in the options array are assumed to be escaped.
- * Allows to perform several checks on the input, e.g. reserved names.
- * The function will adjust member statistics.
- * If an error is detected will fatal error on all errors unless return_errors is true.
  *
+ * What it does:
+ * - Allows two types of interface: 'guest' and 'admin'. The first
+ * - includes hammering protection, the latter can perform the registration silently.
+ * - The strings used in the options array are assumed to be escaped.
+ * - Allows to perform several checks on the input, e.g. reserved names.
+ * - The function will adjust member statistics.
+ * - If an error is detected will fatal error on all errors unless return_errors is true.
+ *
+ * @package Members
+ * @uses Auth.subs.php
+ * @uses Mail.subs.php
  * @param mixed[] $regOptions
  * @param string $error_context
  * @return integer the ID of the newly created member
@@ -838,13 +847,13 @@ function registerMember(&$regOptions, $error_context = 'register')
 }
 
 /**
- * Check if a name is in the reserved words list.
- * (name, current member id, name/username?.)
+ * Check if a name is in the reserved words list. (name, current member id, name/username?.)
+ *
  * - checks if name is a reserved name or username.
  * - if is_name is false, the name is assumed to be a username.
- * - the id_member variable is used to ignore duplicate matches with the
- * current member.
+ * - the id_member variable is used to ignore duplicate matches with the current member.
  *
+ * @package Members
  * @param string $name
  * @param int $current_ID_MEMBER
  * @param bool $is_name
@@ -950,9 +959,11 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 /**
  * Retrieves a list of membergroups that are allowed to do the given
  * permission. (on the given board)
- * If board_id is not null, a board permission is assumed.
- * The function takes different permission settings into account.
  *
+ * - If board_id is not null, a board permission is assumed.
+ * - The function takes different permission settings into account.
+ *
+ * @package Members
  * @param string $permission
  * @param integer|null $board_id = null
  * @return an array containing an array for the allowed membergroup ID's
@@ -1026,12 +1037,13 @@ function groupsAllowedTo($permission, $board_id = null)
 }
 
 /**
- * Retrieves a list of members that have a given permission
- * (on a given board).
- * If board_id is not null, a board permission is assumed.
- * Takes different permission settings into account.
- * Takes possible moderators (on board 'board_id') into account.
+ * Retrieves a list of members that have a given permission (on a given board).
  *
+ * - If board_id is not null, a board permission is assumed.
+ * - Takes different permission settings into account.
+ * - Takes possible moderators (on board 'board_id') into account.
+ *
+ * @package Members
  * @param string $permission
  * @param integer|null $board_id = null
  * @return an array containing member ID's.
@@ -1072,10 +1084,12 @@ function membersAllowedTo($permission, $board_id = null)
 
 /**
  * This function is used to reassociate members with relevant posts.
- * Reattribute guest posts to a specified member.
- * Does not check for any permissions.
- * If add_to_post_count is set, the member's post count is increased.
  *
+ * - Reattribute guest posts to a specified member.
+ * - Does not check for any permissions.
+ * - If add_to_post_count is set, the member's post count is increased.
+ *
+ * @package Members
  * @param int $memID
  * @param string|false $email = false
  * @param string|false $membername = false
@@ -1156,8 +1170,9 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
 }
 
 /**
- * Callback for createList().
+ * Gets a listing of members, Callback for createList().
  *
+ * @package Members
  * @param int $start
  * @param int $items_per_page
  * @param string $sort
@@ -1198,8 +1213,9 @@ function list_getMembers($start, $items_per_page, $sort, $where, $where_params =
 }
 
 /**
- * Callback for createList().
+ * Gets the number of members, Callback for createList().
  *
+ * @package Members
  * @param string $where
  * @param mixed[] $where_params
  */
@@ -1233,6 +1249,7 @@ function list_getNumMembers($where, $where_params = array())
 /**
  * Find potential duplicate registation members based on the same IP address
  *
+ * @package Members
  * @param mixed[] $members
  */
 function populateDuplicateMembers(&$members)
@@ -1352,6 +1369,7 @@ function populateDuplicateMembers(&$members)
 /**
  * Find out if there is another admin than the given user.
  *
+ * @package Members
  * @param int $memberID ID of the member, to compare with.
  */
 function isAnotherAdmin($memberID)
@@ -1378,6 +1396,7 @@ function isAnotherAdmin($memberID)
 /**
  * This function retrieves a list of member ids based on a set of conditions
  *
+ * @package Members
  * @param mixed[]|string $query can be an array of "type" of conditions,
  *              or a string used as raw query
  *				or a string that represents one of the built in conditions like member_names, not_in_group, etc
@@ -1495,6 +1514,7 @@ function membersBy($query, $query_params, $details = false, $only_active = true)
 /**
  * Counts the number of members based on conditions
  *
+ * @package Members
  * @param string[]|string $query strings used as raw query
  * @param mixed[] $query_params is an array containing the parameters to be passed to the query
  * @param boolean $only_active
@@ -1583,9 +1603,11 @@ function countMembersBy($query, $query_params, $only_active = true)
 
 /**
  * Retrieve administrators of the site.
- * The function returns basic information: name, language file.
- * It is used in personal messages reporting.
  *
+ * - The function returns basic information: name, language file.
+ * - It is used in personal messages reporting.
+ *
+ * @package Members
  * @param int $id_admin = 0 if requested, only data about a specific admin is retrieved
  */
 function admins($id_admin = 0)
@@ -1636,15 +1658,16 @@ function maxMemberID()
 /**
  * Load some basic member infos
  *
+ * @package Members
  * @param int[]|int $member_ids an array of member IDs or a single ID
  * @param mixed[] $options an array of possible little alternatives, can be:
- *                - 'add_guest' (set or not) to add a guest user to the returned array
- *                - 'limit' int if set overrides the default query limit
- *                - 'sort' (string) a column to sort the results
- *                - 'moderation' (set or not) includes member_ip, id_group, additional_groups, last_login
- *                - 'authentication' (set or not) includes secret_answer, secret_question, openid_uri,
- *                                                         is_activated, validation_code, passwd_flood
- *                - 'preferences' (set or not) includes lngfile, mod_prefs, notify_types, signature
+ * - 'add_guest' (set or not) to add a guest user to the returned array
+ * - 'limit' int if set overrides the default query limit
+ * - 'sort' (string) a column to sort the results
+ * - 'moderation' (set or not) includes member_ip, id_group, additional_groups, last_login
+ * - 'authentication' (set or not) includes secret_answer, secret_question, openid_uri,
+ *    is_activated, validation_code, passwd_flood
+ * - 'preferences' (set or not) includes lngfile, mod_prefs, notify_types, signature
  * @return array
  */
 function getBasicMemberData($member_ids, $options = array())
@@ -1707,6 +1730,8 @@ function getBasicMemberData($member_ids, $options = array())
 
 /**
  * Counts all inactive members
+ *
+ * @package Members
  * @return array $inactive_members
  */
 function countInactiveMembers()
@@ -1735,6 +1760,7 @@ function countInactiveMembers()
 /**
  * Get the member's id and group
  *
+ * @package Members
  * @param string $name
  * @param bool $flexible if true searches for both real_name and member_name (default false)
  * @return integer
@@ -1763,8 +1789,10 @@ function getMemberByName($name, $flexible = false)
 
 /**
  * Finds a member from the database using supplied string as real_name
- * Optionaly will only search/find the member in a buddy list
  *
+ * - Optionaly will only search/find the member in a buddy list
+ *
+ * @package Members
  * @param string $search string to search real_name for like finds
  * @param int[]|null $buddies
  */
@@ -1810,9 +1838,11 @@ function getMember($search, $buddies = array())
 
 /**
  * Nifty function to calculate the number of days ago a given date was.
- * Requires a unix timestamp as input, returns an integer.
- * Named in honour of Jeff Lewis, the original creator of...this function.
  *
+ * - Requires a unix timestamp as input, returns an integer.
+ * - Named in honour of Jeff Lewis, the original creator of...this function.
+ *
+ * @package Members
  * @param int $old
  * @return int the returned number of days, based on the forum time.
  */
@@ -1840,17 +1870,17 @@ function jeffsdatediff($old)
 /**
  * Retrieves MemberData based on conditions
  *
- * @param mixed[] $conditions associative array holding the conditions for the
- *               WHERE clause of the query. Possible keys:
- *                 - activated_status (boolen) must be present
- *                 - time_before (integer)
- *                 - members (array of integers)
- *                 - member_greater (integer) a member id, it will be used
- *                   to filter only members with id_member greater than this
- *                 - group_list (array) array of group IDs
- *                 - notify_announcements (integer)
- *                 - order_by (string)
- *                 - limit (int)
+ * @package Members
+ * @param mixed[] $conditions associative array holding the conditions for the WHERE clause of the query.
+ * Possible keys:
+ * - activated_status (boolen) must be present
+ * - time_before (integer)
+ * - members (array of integers)
+ * - member_greater (integer) a member id, it will be used to filter only members with id_member greater than this
+ * - group_list (array) array of group IDs
+ * - notify_announcements (integer)
+ * - order_by (string)
+ * - limit (int)
  * @return array
  */
 function retrieveMemberData($conditions)
@@ -1932,11 +1962,12 @@ function retrieveMemberData($conditions)
 /**
  * Activate members
  *
- * @param mixed[] $conditions associative array holding the conditions for the
- *               WHERE clause of the query. Possible keys:
- *                 - activated_status (boolen) must be present
- *                 - time_before (integer)
- *                 - members (array of integers)
+ * @package Members
+ * @param mixed[] $conditions associative array holding the conditions for the WHERE clause of the query.
+ * Possible keys:
+ * - activated_status (boolen) must be present
+ * - time_before (integer)
+ * - members (array of integers)
  */
 function approveMembers($conditions)
 {
@@ -1974,13 +2005,14 @@ function approveMembers($conditions)
 /**
  * Set these members for activation
  *
- * @param mixed[] $conditions associative array holding the conditions for the
- *               WHERE clause of the query. Possible keys:
- *                 - selected_member (integer) must be present
- *                 - activated_status (boolen) must be present
- *                 - validation_code (string) must be present
- *                 - members (array of integers)
- *                 - time_before (integer)
+ * @package Members
+ * @param mixed[] $conditions associative array holding the conditions for the  WHERE clause of the query.
+ * Possible keys:
+ * - selected_member (integer) must be present
+ * - activated_status (boolen) must be present
+ * - validation_code (string) must be present
+ * - members (array of integers)
+ * - time_before (integer)
  */
 function enforceReactivation($conditions)
 {
@@ -2016,6 +2048,7 @@ function enforceReactivation($conditions)
 /**
  * Count members of a given group
  *
+ * @package Members
  * @param int $id_group
  * @return int
  */
@@ -2041,6 +2074,7 @@ function countMembersInGroup($id_group = 0)
 /**
  * Get the total amount of members online.
  *
+ * @package Members
  * @param string[] $conditions
  * @return int
  */
@@ -2065,6 +2099,7 @@ function countMembersOnline($conditions)
 /**
  * Look for people online, provided they don't mind if you see they are.
  *
+ * @package Members
  * @param string[] $conditions
  * @param string $sort_method
  * @param string $sort_direction
@@ -2109,6 +2144,7 @@ function onlineMembers($conditions, $sort_method, $sort_direction, $start)
 /**
  * Check if the OpenID URI is already registered for an existing member
  *
+ * @package Members
  * @param string $url
  * @return array
  */
@@ -2133,6 +2169,7 @@ function memberExists($url)
 /**
  * Find the most recent members
  *
+ * @package Members
  * @param int $limit
  */
 function recentMembers($limit)
@@ -2162,6 +2199,7 @@ function recentMembers($limit)
 /**
  * Assign membergroups to members.
  *
+ * @package Members
  * @param int $member
  * @param int $primary_group
  * @param int[] $additional_groups
@@ -2174,6 +2212,7 @@ function assignGroupsToMember($member, $primary_group, $additional_groups)
 /**
  * Get a list of members from a membergroups request.
  *
+ * @package Members
  * @param int[] $groups
  * @param string $where
  * @return mixed
@@ -2258,6 +2297,7 @@ function getConcernedMembers($groups, $where)
 /**
  * Determine if the current user ($user_info) can contact another user ($who)
  *
+ * @package Members
  * @param int $who The id of the user to contact
  */
 function canContact($who)
@@ -2295,13 +2335,15 @@ function canContact($who)
 }
 
 /**
- * This function updates the latest member, the total member
- * count, and the number of unapproved members.
- * It also only counts approved members when approval is on,
+ * This function updates the latest member, the total membercount, and the
+ * number of unapproved members.
+ *
+ * - It also only counts approved members when approval is on,
  * but is much more efficient with it off.
  *
  * Used by updateStats('member').
  *
+ * @package Members
  * @param integer|null $id_member = null If not an integer reload from the database
  * @param string|null $real_name = null
  */
@@ -2365,6 +2407,7 @@ function updateMemberStats($id_member = null, $real_name = null)
 /**
  * Builds the 'query_see_board' element for a certain member
  *
+ * @package Members
  * @param integer $id_member a valid member id
  */
 function memberQuerySeeBoard($id_member)

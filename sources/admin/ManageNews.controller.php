@@ -22,6 +22,8 @@ if (!defined('ELK'))
 
 /**
  * ManageNews controller, for news administration screens.
+ *
+ * @package News
  */
 class ManageNews_Controller extends Action_Controller
 {
@@ -32,10 +34,12 @@ class ManageNews_Controller extends Action_Controller
 	protected $_newsSettings;
 
 	/**
-	 * The news dispatcher; doesn't do anything, just delegates.
-	 * This is the entrance point for all News and Newsletter screens.
-	 * Called by ?action=admin;area=news.
-	 * It does the permission checks, and calls the appropriate function
+	 * The news dispatcher / delegator
+	 *
+	 * What it does:
+	 * - This is the entrance point for all News and Newsletter screens.
+	 * - Called by ?action=admin;area=news.
+	 * - It does the permission checks, and calls the appropriate function
 	 * based on the requested sub-action.
 	 *
 	 * @see Action_Controller::action_index()
@@ -107,11 +111,13 @@ class ManageNews_Controller extends Action_Controller
 
 	/**
 	 * Let the administrator(s) edit the news items for the forum.
-	 * It writes an entry into the moderation log.
-	 * This function uses the edit_news administration area.
-	 * Called by ?action=admin;area=news.
-	 * Requires the edit_news permission.
-	 * Can be accessed with ?action=admin;sa=editnews.
+	 *
+	 * What it does:
+	 * - It writes an entry into the moderation log.
+	 * - This function uses the edit_news administration area.
+	 * - Called by ?action=admin;area=news.
+	 * - Requires the edit_news permission.
+	 * - Can be accessed with ?action=admin;sa=editnews.
 	 */
 	public function action_editnews()
 	{
@@ -257,9 +263,11 @@ class ManageNews_Controller extends Action_Controller
 
 	/**
 	 * This function allows a user to select the membergroups to send their mailing to.
-	 * Called by ?action=admin;area=news;sa=mailingmembers.
-	 * Requires the send_mail permission.
-	 * Form is submitted to ?action=admin;area=news;mailingcompose.
+	 *
+	 * What it does:
+	 * - Called by ?action=admin;area=news;sa=mailingmembers.
+	 * - Requires the send_mail permission.
+	 * - Form is submitted to ?action=admin;area=news;mailingcompose.
 	 *
 	 * @uses the ManageNews template and email_members sub template.
 	 */
@@ -321,9 +329,11 @@ class ManageNews_Controller extends Action_Controller
 
 	/**
 	 * Shows a form to edit a forum mailing and its recipients.
-	 * Called by ?action=admin;area=news;sa=mailingcompose.
-	 * Requires the send_mail permission.
-	 * Form is submitted to ?action=admin;area=news;sa=mailingsend.
+	 *
+	 * What it does:
+	 * - Called by ?action=admin;area=news;sa=mailingcompose.
+	 * - Requires the send_mail permission.
+	 * - Form is submitted to ?action=admin;area=news;sa=mailingsend.
 	 *
 	 * @uses ManageNews template, email_members_compose sub-template.
 	 */
@@ -458,10 +468,12 @@ class ManageNews_Controller extends Action_Controller
 
 	/**
 	 * Handles the sending of the forum mailing in batches.
-	 * Called by ?action=admin;area=news;sa=mailingsend
-	 * Requires the send_mail permission.
-	 * Redirects to itself when more batches need to be sent.
-	 * Redirects to ?action=admin after everything has been sent.
+	 *
+	 * What it does:
+	 * - Called by ?action=admin;area=news;sa=mailingsend
+	 * - Requires the send_mail permission.
+	 * - Redirects to itself when more batches need to be sent.
+	 * - Redirects to ?action=admin after everything has been sent.
 	 *
 	 * @uses the ManageNews template and email_members_send sub template.
 	 * @param bool $clean_only = false; if set, it will only clean the variables, put them in context, then return.
@@ -816,8 +828,10 @@ class ManageNews_Controller extends Action_Controller
 
 	/**
 	 * Set general news and newsletter settings and permissions.
-	 * Called by ?action=admin;area=news;sa=settings.
-	 * Requires the forum_admin permission.
+	 *
+	 * What it does:
+	 * - Called by ?action=admin;area=news;sa=settings.
+	 * - Requires the forum_admin permission.
 	 *
 	 * @uses ManageNews template, news_settings sub-template.
 	 */

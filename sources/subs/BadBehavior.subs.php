@@ -16,10 +16,13 @@ if (!defined('ELK'))
 
 /**
  * Delete all or some of the entries in the bad behavior log.
- * It applies any necessary filters to deletion.
- * It attempts to TRUNCATE the table to reset the auto_increment.
- * Redirects back to the badbehavior log when done.
  *
+ * What it does:
+ * - It applies any necessary filters to deletion.
+ * - It attempts to TRUNCATE the table to reset the auto_increment.
+ * - Redirects back to the badbehavior log when done.
+ *
+ * @package BadBehavior
  * @param string $type
  * @param mixed[] $filter
  */
@@ -66,8 +69,11 @@ function deleteBadBehavior($type, $filter)
 
 /**
  * Get the number of badbehavior log entries.
- * Will take in to acount any current filter value in its count result
  *
+ * What it does:
+ * - Will take in to acount any current filter value in its count result
+ *
+ * @package BadBehavior
  * @param mixed[] $filter
  * @return integer
  */
@@ -92,6 +98,7 @@ function getBadBehaviorLogEntryCount($filter)
 /**
  * Gets the badbehavior log entries that match the specified parameters.
  *
+ * @package BadBehavior
  * @param int $start
  * @param int $items_per_page
  * @param string $sort

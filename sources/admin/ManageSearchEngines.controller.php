@@ -21,9 +21,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * ManageSearchEngines admin controller.
- * This class handles all search engines pages in admin panel,
- *  forwards to display and allows to change options.
+ * ManageSearchEngines admin controller. This class handles all search engines
+ * pages in admin panel, forwards to display and allows to change options.
  */
 class ManageSearchEngines_Controller extends Action_Controller
 {

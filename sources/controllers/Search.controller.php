@@ -30,6 +30,8 @@ $GLOBALS['search_versions'] = array(
 
 /**
  * Search_Controller class, it handle all of the searching
+ *
+ * @package Search
  */
 class Search_Controller extends Action_Controller
 {
@@ -55,8 +57,9 @@ class Search_Controller extends Action_Controller
 
 	/**
 	 * Called before any other action method in this class.
-	 * If coming from the quick reply allows to route to the proper action
-	 * if needed (for example external search engine or members search
+	 *
+	 * - If coming from the quick reply allows to route to the proper action
+	 * - if needed (for example external search engine or members search
 	 */
 	public function pre_dispatch()
 	{
@@ -85,7 +88,8 @@ class Search_Controller extends Action_Controller
 
 	/**
 	 * Intended entry point for this class.
-	 * The default action for no sub-action is... present the search screen
+	 *
+	 * - The default action for no sub-action is... present the search screen
 	 *
 	 * @see Action_Controller::action_index()
 	 */
@@ -97,6 +101,7 @@ class Search_Controller extends Action_Controller
 
 	/**
 	 * Ask the user what they want to search for.
+	 *
 	 * What it does:
 	 * - shows the screen to search forum posts (action=search),
 	 * - uses the main sub template of the Search template.
@@ -239,6 +244,7 @@ class Search_Controller extends Action_Controller
 
 	/**
 	 * Gather the results and show them.
+	 *
 	 * What it does:
 	 * - checks user input and searches the messages table for messages matching the query.
 	 * - requires the search_posts permission.
@@ -1945,6 +1951,7 @@ class Search_Controller extends Action_Controller
 
 	/**
 	 * Used to highlight body text with strings that match the search term
+	 *
 	 * Callback function used in $body_highlighted
 	 *
 	 * @param string[] $matches
@@ -2141,6 +2148,7 @@ class Search_Controller extends Action_Controller
 
 /**
  * This function compares the length of two strings plus a little.
+ * 
  * What it does:
  * - callback function for usort used to sort the fulltext results.
  * - passes sorting duty to the current API.

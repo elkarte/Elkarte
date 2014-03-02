@@ -22,8 +22,12 @@ if (!defined('ELK'))
 
 /**
  * This class takes care of the Core Features admin screen.
- * It sets up the context, initializes the features info for display,
- * updates the settings for enabled/disabled core features as requested.
+ *
+ * What it does:
+ * - It sets up the context, initializes the features info for display
+ * - updates the settings for enabled/disabled core features as requested.
+ *
+ * @package CoreFeatures
  */
 class CoreFeatures_Controller extends Action_Controller
 {
@@ -41,15 +45,16 @@ class CoreFeatures_Controller extends Action_Controller
 	/**
 	 * This is an overall control panel enabling/disabling lots of the forums key features.
 	 *
-	 * Uses internally an array of all the features that can be enabled/disabled.
-	 *  $core_features, each option can have the following:
-	 *    title - Text title of this item (If standard string does not exist).
-	 *    desc - Description of this feature (If standard string does not exist).
-	 *    settings - Array of settings to change (For each name => value) on enable
-	 *				- reverse is done for disable. If value > 1 will not change value if set.
-	 *    setting_callback - Function that returns an array of settings to save
-	 *						- takes one parameter which is value for this feature.
-	 *    save_callback - Function called on save, takes state as parameter.
+	 * What it does:
+	 * - Uses internally an array of all the features that can be enabled/disabled.
+	 * - $core_features, each option can have the following:
+	 *    - title - Text title of this item (If standard string does not exist).
+	 *    - desc - Description of this feature (If standard string does not exist).
+	 *    - settings - Array of settings to change (For each name => value) on enable
+	 *				   reverse is done for disable. If value > 1 will not change value if set.
+	 *    - setting_callback - Function that returns an array of settings to save
+	 *						   takes one parameter which is value for this feature.
+	 *    - save_callback - Function called on save, takes state as parameter.
 	 */
 	public function action_features()
 	{
@@ -337,7 +342,8 @@ class CoreFeatures_Controller extends Action_Controller
 
 	/**
 	 * Return the array of core features in the format expected by search.
-	 * Callback for admin internal search.
+	 *
+	 * - Callback for admin internal search.
 	 *
 	 * @return mixed[] array in a config_var format
 	 */
@@ -357,7 +363,8 @@ class CoreFeatures_Controller extends Action_Controller
 	}
 
 	/**
-	 * This function makes sure the requested subaction does exists, if it doesn't, it sets a default action or.
+	 * This function makes sure the requested subaction does exists, if it
+	 * doesn't, it sets a default action.
 	 *
 	 * @param mixed[] $subActions = array() An array containing all possible subactions.
 	 * @param string $defaultAction = '' the default action to be called if no valid subaction was found.
