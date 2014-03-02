@@ -3342,6 +3342,12 @@ div.labels {
 /* ------------------------------------------------------- */
 .mentionavatar .avatar {
 	display: block;
+	max-width: 60px;
+	max-height: 60px;
+}
+.mentionavatar {
+	min-width: 60px;
+	min-height: 60px;
 }
 
 /* $STATISTICS	*/
