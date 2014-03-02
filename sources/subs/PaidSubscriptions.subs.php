@@ -949,7 +949,7 @@ function getSubscriptionStatus($log_id)
 /**
  * Somebody paid again? we need to log that.
  *
- * @param int $item
+ * @param int[] $item
  */
 function updateSubscriptionItem($item)
 {

@@ -154,7 +154,7 @@ function getModerators()
  *
  * @package News
  * @param string $sendQuery
- * @param string $sendParams
+ * @param mixed[] $sendParams
  * @param int $start
  * @param int $increment
  * @param int $counter
