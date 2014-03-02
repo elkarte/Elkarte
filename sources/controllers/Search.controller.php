@@ -2081,8 +2081,7 @@ class Search_Controller extends Action_Controller
 	/**
 	 * Fills the empty spaces in an array with the default values for search params
 	 *
-	 * @param mixed[] $matches
-	 * @return mixed[] $matches
+	 * @param mixed[] $array
 	 */
 	private function _fill_default_search_params($array)
 	{
