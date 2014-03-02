@@ -43,11 +43,11 @@ class Attachment_Controller extends Action_Controller
 			'rmattach' => array($this, 'action_rmattach'),
 		);
 
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'dlattach';
-
-		// Call the action handler
+		// Setup the action handler
 		$action = new Action();
-		$action->initialize($subActions, 'dlattach');
+		$subAction = $action->initialize($subActions, 'dlattach');
+
+		// Call the action
 		$action->dispatch($subAction);
 	}
 

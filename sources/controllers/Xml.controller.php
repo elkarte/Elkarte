@@ -42,16 +42,11 @@ class Xml_Controller extends Action_Controller
 			'parserorder' => array('controller' => $this, 'function' => 'action_parserorder', 'permission' => 'admin_forum'),
 		);
 
-		// Easy adding of xml sub actions
-		call_integration_hook('integrate_xmlhttp', array(&$subActions));
+		// Easy adding of xml sub actions with integrate_xmlhttp
+		$action = new Action('xmlhttp');
+		$subAction = $action->initialize($subActions);
 
-		$action = new Action();
-		$action->initialize($subActions);
-
-		// Valid action?
-		$subAction = !isset($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]) ? '' : $_REQUEST['sa'];
-
-		// Act a  bit special for XML, probably never see it anyway :P
+		// Act a bit special for XML, probably never see it anyway :P
 		if (empty($subAction))
 			fatal_lang_error('no_access', false);
 

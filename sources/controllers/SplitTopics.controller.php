@@ -76,10 +76,8 @@ class SplitTopics_Controller extends Action_Controller
 		);
 
 		// ?action=splittopics;sa=LETSBREAKIT won't work, sorry.
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'index';
-
 		$action = new Action();
-		$action->initialize($subActions, 'index');
+		$subAction = $action->initialize($subActions, 'index');
 		$action->dispatch($subAction);
 	}
 

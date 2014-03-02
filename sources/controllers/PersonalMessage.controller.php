@@ -186,12 +186,11 @@ class PersonalMessage_Controller extends Action_Controller
 			'inbox' => array($this, 'action_folder', 'permission' => 'pm_read'),
 		);
 
-		// Known action, go to it, otherwise the inbox for you
-		$subAction = !isset($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]) ? 'inbox' : $_REQUEST['sa'];
-
 		// Set up our action array
 		$action = new Action();
-		$action->initialize($subActions, 'inbox');
+
+		// Known action, go to it, otherwise the inbox for you
+		$subAction = $action->initialize($subActions, 'inbox');
 
 		// Set the right index bar for the action
 		if ($subAction === 'inbox')

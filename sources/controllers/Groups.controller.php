@@ -46,11 +46,9 @@ class Groups_Controller extends Action_Controller
 		);
 
 		// I don't think we know what to do... throw dies?
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'list';
-		$context['sub_action'] = $subAction;
-
 		$action = new Action();
-		$action->initialize($subActions, 'list');
+		$subAction = $action->initialize($subActions, 'list');
+		$context['sub_action'] = $subAction;
 		$action->dispatch($subAction);
 	}
 
