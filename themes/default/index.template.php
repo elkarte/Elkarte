@@ -560,9 +560,9 @@ function template_menu()
 /**
  * Generate a strip of buttons.
  *
- * @param array $button_strip
+ * @param mixed[] $button_strip
  * @param string $direction = ''
- * @param array $strip_options = array()
+ * @param string[] $strip_options = array()
  */
 function template_button_strip($button_strip, $direction = '', $strip_options = array())
 {
@@ -601,8 +601,8 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 /**
  * Generate a strip of "quick" buttons (those present next to each message)
  *
- * @param string $strip, the $context index where the strip is stored
- * @param bool[] $tests, an array of tests to determine if the button should
+ * @param string $strip - the $context index where the strip is stored
+ * @param bool[] $tests - an array of tests to determine if the button should
  *                 be displayed or not
  */
 function template_quickbutton_strip($strip, $tests = array())

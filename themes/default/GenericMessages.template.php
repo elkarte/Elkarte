@@ -263,7 +263,7 @@ function template_build_poster_div($message, $ignoring = false)
  * Formats a very simple message view (for example search results, list of
  * posts and topics in profile, unapproved, etc.)
  *
- * @param array $msg associative array contaning the data to output:
+ * @param mixed[] $msg associative array contaning the data to output:
  *            - class => a class name (mandatory)
  *            - counter => Usually a number used as counter next to the subject
  *            - title => Usually the subject of the topic (mandatory)
