@@ -61,7 +61,7 @@ function optimizeBoardsSubdivision($categories, $total_boards)
 		// Same as above, +1 for cat header
 		$diff_alternate = $diff_current - 2 * ($categories[$last_group] + 1);
 
-		if ($diff_alternate < $diff_current)
+		if (abs($diff_alternate) < $diff_current)
 			array_unshift($groups[1], $last_group);
 		else
 			$groups[0][] = $last_group;
@@ -73,8 +73,8 @@ function optimizeBoardsSubdivision($categories, $total_boards)
 		// Same as above, +1 for cat header
 		$diff_alternate = $diff_current + 2 * ($categories[$first_group] + 1);
 
-		if ($diff_alternate < abs($diff_current))
-			array_pop($groups[0], $first_group);
+		if (abs($diff_alternate) < abs($diff_current))
+			$groups[0][] = $first_group;
 		else
 			array_unshift($groups[1], $first_group);
 	}
