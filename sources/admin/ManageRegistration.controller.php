@@ -74,14 +74,6 @@ class ManageRegistration_Controller extends Action_Controller
 				'permission' => 'admin_forum'),
 		);
 
-		call_integration_hook('integrate_manage_registrations', array(&$subActions));
-
-		// Work out which to call...
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'register';
-
-		$context['page_title'] = $txt['maintain_title'];
-		$context['sub_action'] = $subAction;
-
 		// Next create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['registration_center'],
@@ -102,6 +94,16 @@ class ManageRegistration_Controller extends Action_Controller
 				)
 			)
 		);
+
+		// Give addons a way to add additonal actions and tabs
+		call_integration_hook('integrate_manage_registrations', array(&$subActions));
+
+		// Work out which to call...
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'register';
+
+		// Last bits for the template
+		$context['page_title'] = $txt['maintain_title'];
+		$context['sub_action'] = $subAction;
 
 		// Call the right function for this sub-action.
 		$action = new Action();

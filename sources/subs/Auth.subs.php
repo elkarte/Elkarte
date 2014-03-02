@@ -29,7 +29,7 @@ if (!defined('ELK'))
  * - sets the cookie and session to last the number of seconds specified by cookie_length.
  * - when logging out, if the globalCookies setting is enabled, attempts to clear the subdomain's cookie too.
  *
- * @pachage Authorization
+ * @package Authorization
  * @param int $cookie_length
  * @param int $id The id of the member
  * @param string $password = ''
@@ -125,7 +125,7 @@ function setLoginCookie($cookie_length, $id, $password = '')
  * - normally, local and global should be the localCookies and globalCookies settings, respectively.
  * - uses boardurl to determine these two things.
  *
- * @pachage Authorization
+ * @package Authorization
  * @param bool $local
  * @param bool $global
  */
@@ -166,7 +166,7 @@ function url_parts($local, $global)
  * - sends data to template so the admin is sent on to the page they
  *   wanted if their password is correct, otherwise they can try again.
  *
- * @pachage Authorization
+ * @package Authorization
  * @param string $type = 'admin'
  */
 function adminLogin($type = 'admin')
@@ -230,7 +230,7 @@ function adminLogin($type = 'admin')
  * What it does:
  *  - if 'value' is an array, the function is called recursively.
  *
- * @pachage Authorization
+ * @package Authorization
  * @param string $k key
  * @param string|boolean $v value
  * @return string 'hidden' HTML form fields, containing key-value-pairs
@@ -253,7 +253,7 @@ function adminLogin_outputPostVars($k, $v)
 /**
  * Properly urlencodes a string to be used in a query
  *
- * @pachage Authorization
+ * @package Authorization
  * @param mixed[] $get associative array from $_GET
  * @return string query string
  */
@@ -297,7 +297,7 @@ function construct_query_string($get)
  * - searches for members whose username, display name, or e-mail address match the given pattern of array names.
  * - searches only buddies if buddies_only is set.
  *
- * @pachage Authorization
+ * @package Authorization
  * @param string[]|string $names
  * @param bool $use_wildcards = false, accepts wildcards ? and * in the patern if true
  * @param bool $buddies_only = false,
@@ -392,7 +392,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
  * - mails the new password to the email address of the user.
  * - if username is not set, only a new password is generated and sent.
  *
- * @pachage Authorization
+ * @package Authorization
  * @param int $memID
  * @param string|null $username = null
  */
@@ -460,7 +460,7 @@ function resetPassword($memID, $username = null)
  *
  * - Returns null if fine
  *
- * @pachage Authorization
+ * @package Authorization
  * @param int $memID
  * @param string $username
  * @param string $error_context
@@ -505,7 +505,7 @@ function validateUsername($memID, $username, $error_context = 'register', $check
  * - if password checking is enabled, will check that none of the words in restrict_in appear in the password.
  * - returns an error identifier if the password is invalid, or null.
  *
- * @pachage Authorization
+ * @package Authorization
  * @param string $password
  * @param string $username
  * @param string[] $restrict_in = array()
@@ -548,7 +548,7 @@ function validatePassword($password, $username, $restrict_in = array())
  * - used to generate a new hash for the db, used during registration or any password changes
  * - if a non SHA256 password is sent, will generate one with SHA256(user + password) and return it in password
  *
- * @pachage Authorization
+ * @package Authorization
  * @param string $password user password if not already 64 characters long will be SHA256 with the user name
  * @param string $hash hash as generated from a SHA256 password
  * @param string $user user name only required if creating a SHA-256 password
@@ -601,7 +601,7 @@ function validateLoginPassword(&$password, $hash, $user = '', $returnhash = fals
  * - builds the moderator, group and board level querys for the user
  * - stores the information on the current users moderation powers in $user_info['mod_cache'] and $_SESSION['mc']
  *
- * @pachage Authorization
+ * @package Authorization
  */
 function rebuildModCache()
 {
@@ -678,7 +678,7 @@ function rebuildModCache()
 /**
  * The same thing as setcookie but allows for integration hook
  *
- * @pachage Authorization
+ * @package Authorization
  * @param string $name
  * @param string $value = ''
  * @param int $expire = 0
@@ -706,7 +706,7 @@ function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = ''
 /**
  * Set the passed users online or not, in the online log table
  *
- * @pachage Authorization
+ * @package Authorization
  * @param int[]|int $ids ids of the member(s) to log
  * @param bool $on = false if true, add the user(s) to online log, if false, remove 'em
  */
@@ -733,7 +733,7 @@ function logOnline($ids, $on = false)
 /**
  * Delete expired/outdated session from log_online
  *
- * @pachage Authorization
+ * @package Authorization
  * @param string $session
  */
 function deleteOnline($session)
@@ -752,7 +752,7 @@ function deleteOnline($session)
 /**
  * This functions determines whether this is the first login of the given user.
  *
- * @pachage Authorization
+ * @package Authorization
  * @param int $id_member the id of the member to check for
  */
 function isFirstLogin($id_member)
@@ -767,7 +767,7 @@ function isFirstLogin($id_member)
 /**
  * Search for a member by given criterias
  *
- * @pachage Authorization
+ * @package Authorization
  * @param string $where
  * @param mixed[] $where_params array of values to used in the where statement
  * @param bool $fatal
@@ -818,7 +818,7 @@ function findUser($where, $where_params, $fatal = true)
 /**
  * Find users by their email address.
  *
- * @pachage Authorization
+ * @package Authorization
  * @param string $email
  * @return boolean
  */
@@ -845,7 +845,7 @@ function userByEmail($email)
 /**
  * Generate a random validation code.
  *
- * @pachage Authorization
+ * @package Authorization
  */
 function generateValidationCode()
 {
@@ -868,7 +868,7 @@ function generateValidationCode()
 /**
  * This function loads many settings of a user given by name or email.
  *
- * @pachage Authorization
+ * @package Authorization
  * @param string $name
  * @param bool $is_id if true it treats $name as a member ID and try to load the data for that ID
  * @return mixed[]|false false if nothing is found

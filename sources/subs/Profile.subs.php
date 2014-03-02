@@ -127,6 +127,8 @@ function setupProfileContext($fields, $hook = '')
 				$context['profile_onsubmit_javascript'] .= $cur_field['js_submit'];
 			if (!empty($cur_field['js']))
 				$context['profile_javascript'] .= $cur_field['js'];
+			if (!empty($cur_field['js_load']))
+				loadJavascriptFile ($cur_field['js_load']);
 
 			// Any template stuff?
 			if (!empty($cur_field['prehtml']))
@@ -347,6 +349,10 @@ function loadProfileFields($force_reload = false)
 			bool $is_dummy:			If set then nothing is acted upon for this element.
 			bool $enabled:			A test to determine whether this is even available - if not is unset.
 			string $link_with:		Key which links this field to an overall set.
+
+			string $js_submit		javascript to add insisde the function checkProfileSubmit() in the template
+			string $js				javascript to add to the page in general
+			string $js_load			filename of js to be loaded with loadJavasciptFile
 
 		Note that all elements that have a custom input_validate must ensure they set the value of $cur_profile correct to enable
 		the changes to be displayed correctly on submit of the form.
