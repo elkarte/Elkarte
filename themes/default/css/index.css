@@ -1664,9 +1664,17 @@ dl.settings dt .styled-select select {
 	float: left;
 	margin-right: 5px;
 }
+.board_avatar a {
+	width: 40px;
+	height: 40px;
+	display: table-cell;
+	vertical-align: middle;
+}
 .board_avatar .avatar {
 	max-width: 40px;
 	max-height: 40px;
+	display: block;
+	margin: auto;
 }
 .lastpost_link, .board_lastposter, .board_lasttime {
 	white-space: pre;
