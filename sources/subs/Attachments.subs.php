@@ -509,13 +509,13 @@ function processAttachments($id_msg = null)
 				unlink($_FILES['attachment']['tmp_name'][$n]);
 		}
 
-		// If there's no errors to this pont. We still do need to apply some addtional checks
-		// before we are finished.
+		// If there's no errors to this pont. We still need to apply addtional checks
 		if (empty($_SESSION['temp_attachments'][$attachID]['errors']))
 			attachmentChecks($attachID);
-		else
+
+		// Sort out the errors for display and delete any associated files.
+		if (!empty($_SESSION['temp_attachments'][$attachID]['errors']))
 		{
-			// Sort out the errors for display and delete any associated files.
 			$attach_errors->addAttach($attachID, $_SESSION['temp_attachments'][$attachID]['name']);
 			$log_these = array('attachments_no_create', 'attachments_no_write', 'attach_timeout', 'ran_out_of_space', 'cant_access_upload_path', 'attach_0_byte_file');
 
@@ -657,6 +657,7 @@ function attachmentChecks($attachID)
 		if (!empty($modSettings['attachmentDirFileLimit']) && $context['dir_files'] + 2 > $modSettings['attachmentDirFileLimit']
 			|| (!empty($modSettings['attachmentDirSizeLimit']) && $context['dir_size'] > $modSettings['attachmentDirSizeLimit'] * 1024))
 		{
+			// If we are managing the directories space automatically, lets get to it
 			if (!empty($modSettings['automanage_attachments']) && $modSettings['automanage_attachments'] == 1)
 			{
 				// Move it to the new folder if we can.
@@ -668,7 +669,7 @@ function attachmentChecks($attachID)
 					$context['dir_size'] = 0;
 					$context['dir_files'] = 0;
 				}
-				// Or, let the user know that it ain't gonna happen.
+				// Or, let the user know that its not going to happen.
 				else
 				{
 					if (isset($context['dir_creation_error']))
@@ -683,11 +684,11 @@ function attachmentChecks($attachID)
 	}
 
 	// Is the file too big?
-	$context['attachments']['total_size'] += $_SESSION['temp_attachments'][$attachID]['size'];
 	if (!empty($modSettings['attachmentSizeLimit']) && $_SESSION['temp_attachments'][$attachID]['size'] > $modSettings['attachmentSizeLimit'] * 1024)
 		$_SESSION['temp_attachments'][$attachID]['errors'][] = array('file_too_big', array(comma_format($modSettings['attachmentSizeLimit'], 0)));
 
 	// Check the total upload size for this post...
+	$context['attachments']['total_size'] += $_SESSION['temp_attachments'][$attachID]['size'];
 	if (!empty($modSettings['attachmentPostLimit']) && $context['attachments']['total_size'] > $modSettings['attachmentPostLimit'] * 1024)
 		$_SESSION['temp_attachments'][$attachID]['errors'][] = array('attach_max_total_file_size', array(comma_format($modSettings['attachmentPostLimit'], 0), comma_format($modSettings['attachmentPostLimit'] - (($context['attachments']['total_size'] - $_SESSION['temp_attachments'][$attachID]['size']) / 1024), 0)));
 
