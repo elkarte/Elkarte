@@ -124,7 +124,7 @@ class Error_Context
 				$error = $error[0];
 
 			foreach ($this->_errors as $severity => $errors)
-				if (in_array($error, $errors))
+				if (array_key_exists($error, $errors))
 					unset($this->_errors[$severity][$error]);
 		}
 	}
