@@ -320,7 +320,7 @@ $.sceditor.plugins.bbcode.bbcode
 
 			if ($(element).children("cite:first").length === 1)
 			{
-				from = $(element).children("cite:first").text();
+				from = $(element).children("cite:first").text().trim();
 				$(element).attr({'from': from.php_htmlspecialchars()});
 				from = '=' + from;
 				content = '';
@@ -336,6 +336,9 @@ $.sceditor.plugins.bbcode.bbcode
 			}
 
 			return '[code' + from + ']' + content.replace('&#91;', '[') + '[/code]';
+		},
+		quoteType: function(element) {
+			return element;
 		},
 		html: function(element, attrs, content) {
 			var from = '';
