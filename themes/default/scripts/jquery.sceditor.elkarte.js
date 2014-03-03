@@ -389,6 +389,13 @@ $.sceditor.plugins.bbcode.bbcode
 				attr_author = attrs.author;
 				sAuthor = bbc_quote_from + ': ' + attr_author;
 			}
+			// Done as [quote=someone]
+			else if (typeof attrs.defaultattr !== "undefined")
+			{
+				// Convert it to an author tag
+				attr_author = attrs.defaultattr;
+				sAuthor = bbc_quote_from + ': ' + attr_author;
+			}
 
 			// Links could be in the form: link=topic=71.msg201#msg201 that would fool javascript, so we need a workaround
 			for (var key in attrs)
