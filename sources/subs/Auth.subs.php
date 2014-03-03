@@ -465,9 +465,10 @@ function resetPassword($memID, $username = null)
  * @param string $username
  * @param string $error_context
  * @param boolean $check_reserved_name
+ * @param boolean $fatal pass through to isReservedName
  * @return string
  */
-function validateUsername($memID, $username, $error_context = 'register', $check_reserved_name = true)
+function validateUsername($memID, $username, $error_context = 'register', $check_reserved_name = true, $fatal = true)
 {
 	global $txt;
 
@@ -491,7 +492,7 @@ function validateUsername($memID, $username, $error_context = 'register', $check
 	if ($check_reserved_name)
 	{
 		require_once(SUBSDIR . '/Members.subs.php');
-		if (isReservedName($username, $memID, false))
+		if (isReservedName($username, $memID, false, $fatal))
 			$errors->addError(array('name_in_use', array(htmlspecialchars($username, ENT_COMPAT, 'UTF-8'))));
 	}
 }
