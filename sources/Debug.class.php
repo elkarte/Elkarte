@@ -19,6 +19,9 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Stored debugging informations.
+ */
 class Debug
 {
 	/**
@@ -29,7 +32,7 @@ class Debug
 
 	/**
 	 * A list of known debug entities (here to preserve a kind of order)
-	 * @var array|array
+	 * @var mixed[]
 	 */
 	private $_debugs = array(
 		'templates' => array(),
@@ -44,13 +47,13 @@ class Debug
 
 	/**
 	 * Holds the output ot the getrusage php function
-	 * @var array|array
+	 * @var mixed[]
 	 */
 	private $_rusage = array();
 
 	/**
 	 * Holds All the cache hits for a page load
-	 * @var array|string
+	 * @var string[]
 	 */
 	private $_cache_hits = array();
 
@@ -62,7 +65,7 @@ class Debug
 
 	/**
 	 * All the queries executed
-	 * @var array|array
+	 * @var mixed[]
 	 */
 	private $_db_cache = array();
 
@@ -74,7 +77,7 @@ class Debug
 
 	/**
 	 * Some generic "system" debug info
-	 * @var array|string
+	 * @var string[]
 	 */
 	private $_system = array();
 
