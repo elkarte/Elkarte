@@ -149,7 +149,7 @@ class Draft_Controller extends Action_Controller
 						'text' => $txt['draft_delete'],
 						'custom' => 'onclick="return confirm(' . JavaScriptEscape($txt['draft_remove'] . '?') . ');"',
 					),
-					'reply' => array(
+					'edit' => array(
 						'href' => $scripturl . '?action=post;' . (empty($row['id_topic']) ? 'board=' . $row['id_board'] : 'topic=' . $row['id_topic']) . '.0;id_draft=' . $row['id_draft'],
 						'text' => $txt['draft_edit'],
 					),
