@@ -2243,7 +2243,7 @@ function redirectexit($setLocation = '', $refresh = false)
 
 	// Debugging.
 	if ($db_show_debug === true)
-		$_SESSION['debug_redirect'] = Debug::get_db();
+		$_SESSION['debug_redirect'] = Debug::get()->get_db();
 
 	obExit(false);
 }
@@ -2337,7 +2337,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 			// (since this is just debugging... it's okay that it's after </html>.)
 			if ($db_show_debug === true)
 				if (!isset($_REQUEST['xml']) && ((!isset($_GET['action']) || $_GET['action'] != 'viewquery') && !isset($_GET['api'])))
-				Debug::display();
+					Debug::get()->display();
 		}
 	}
 
@@ -3604,7 +3604,7 @@ function call_integration_hook($hook, $parameters = array())
 	);
 
 	if ($db_show_debug === true)
-		Debug::add('hooks', $hook);
+		Debug::get()->add('hooks', $hook);
 
 	$results = array();
 	if (empty($modSettings[$hook]))
@@ -3663,7 +3663,7 @@ function call_integration_include_hook($hook)
 	);
 
 	if ($db_show_debug === true)
-		Debug::add('hooks', $hook);
+		Debug::get()->add('hooks', $hook);
 
 	// Any file to include?
 	if (!empty($modSettings[$hook]))

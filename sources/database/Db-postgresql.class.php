@@ -389,7 +389,7 @@ class Database_PostgreSQL implements Database
 
 			if (!empty($_SESSION['debug_redirect']))
 			{
-				Debug::merge_db($_SESSION['debug_redirect']);
+				Debug::get()->merge_db($_SESSION['debug_redirect']);
 				// @todo this may be off by 1
 				$this->_query_count += count($_SESSION['debug_redirect']);
 				$_SESSION['debug_redirect'] = array();
@@ -469,7 +469,7 @@ class Database_PostgreSQL implements Database
 		if ($db_show_debug === true)
 		{
 			$db_cache['t'] = microtime(true) - $st;
-			Debug::db($db_cache);
+			Debug::get()->db($db_cache);
 		}
 
 		return $this->_db_last_result;

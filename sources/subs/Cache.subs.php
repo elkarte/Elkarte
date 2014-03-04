@@ -200,7 +200,7 @@ function cache_put_data($key, $value, $ttl = 120)
 	if ($db_show_debug === true)
 	{
 		$cache_hit['t'] = microtime(true) - $st;
-		Debug::cache($cache_hit);
+		Debug::get()->cache($cache_hit);
 	}
 }
 
@@ -291,7 +291,7 @@ function cache_get_data($key, $ttl = 120)
 	{
 		$cache_hit['t'] = microtime(true) - $st;
 		$cache_hit['s'] = isset($value) ? strlen($value) : 0;
-		Debug::cache($cache_hit);
+		Debug::get()->cache($cache_hit);
 	}
 
 	if (function_exists('call_integration_hook') && isset($value))

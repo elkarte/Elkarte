@@ -88,7 +88,7 @@ require_once(SOURCEDIR . '/Security.php');
 spl_autoload_register('elk_autoloader');
 if ($db_show_debug === true)
 {
-	Debug::rusage('start', $rusage_start);
+	Debug::get()->rusage('start', $rusage_start);
 }
 
 // Forum in extended maintenance mode? Our trip ends here with a bland message.

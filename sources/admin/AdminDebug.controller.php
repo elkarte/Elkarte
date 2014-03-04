@@ -59,7 +59,7 @@ class AdminDebug_Controller extends Action_Controller
 		// If we're just hiding/showing, do it now.
 		if (isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'hide')
 		{
-			Debug::toggleViewQueries();
+			Debug::get()->toggleViewQueries();
 
 			if (strpos($_SESSION['old_url'], 'action=viewquery') !== false)
 				redirectexit();
@@ -76,7 +76,7 @@ class AdminDebug_Controller extends Action_Controller
 		loadTemplate('Admin');
 
 		$context['sub_template'] = 'viewquery';
-		$context['queries_data'] = Debug::viewQueries($query_id);
+		$context['queries_data'] = Debug::get()->viewQueries($query_id);
 	}
 
 	/**

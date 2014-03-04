@@ -25,13 +25,13 @@ class Debug
 	 * This is used to remember if the debug is on or off
 	 * @var bool
 	 */
-	private static $_track = true;
+	private $_track = true;
 
 	/**
 	 * A list of known debug entities (here to preserve a kind of order)
 	 * @var array|array
 	 */
-	private static $_debugs = array(
+	private $_debugs = array(
 		'templates' => array(),
 		'sub_templates' => array(),
 		'language_files' => array(),
@@ -46,37 +46,43 @@ class Debug
 	 * Holds the output ot the getrusage php function
 	 * @var array|array
 	 */
-	private static $_rusage = array();
+	private $_rusage = array();
 
 	/**
 	 * Holds All the cache hits for a page load
 	 * @var array|string
 	 */
-	private static $_cache_hits = array();
+	private $_cache_hits = array();
 
 	/**
 	 * Number of times the cache has been used
 	 * @var int
 	 */
-	private static $_cache_count = 0;
+	private $_cache_count = 0;
 
 	/**
 	 * All the queries executed
 	 * @var array|array
 	 */
-	private static $_db_cache = array();
+	private $_db_cache = array();
 
 	/**
 	 * Number of queries
 	 * @var int
 	 */
-	private static $_db_count = 0;
+	private $_db_count = 0;
 
 	/**
 	 * Some generic "system" debug info
 	 * @var array|string
 	 */
-	private static $_system = array();
+	private $_system = array();
+
+	/**
+	 * The instance of the class
+	 * @var object
+	 */
+	private static $_instance = null;
 
 
 	/**
@@ -85,15 +91,15 @@ class Debug
 	 * @param string the kind of debug entry
 	 * @param string|string[] string or array of the entry to show
 	 */
-	public static function add($type, $value)
+	public function add($type, $value)
 	{
-		if (!self::$_track)
+		if (!$this->_track)
 			return;
 
 		if (is_array($value))
-			self::$_debugs[$type] = array_merge(self::$_debugs[$type], $value);
+			$this->_debugs[$type] = array_merge($this->_debugs[$type], $value);
 		else
-			self::$_debugs[$type][] = $value;
+			$this->_debugs[$type][] = $value;
 	}
 
 	/**
@@ -105,13 +111,13 @@ class Debug
 	 *         t => time taken to get/put the entry
 	 *         s => length of the serialized value
 	 */
-	public static function cache($value)
+	public function cache($value)
 	{
-		if (!self::$_track)
+		if (!$this->_track)
 			return;
 
-		self::$_cache_hits[] = $value;
-		self::$_cache_count++;
+		$this->_cache_hits[] = $value;
+		$this->_cache_count++;
 	}
 
 	/**
@@ -119,9 +125,9 @@ class Debug
 	 *
 	 * @return int
 	 */
-	public static function cache_count()
+	public function cache_count()
 	{
-		return self::$_cache_count;
+		return $this->_cache_count;
 	}
 
 	/**
@@ -134,13 +140,13 @@ class Debug
 	 *         s => seconds at which the query has been executed into the request
 	 *         t => time taken by the query
 	 */
-	public static function db($value)
+	public function db($value)
 	{
-		if (!self::$_track)
+		if (!$this->_track)
 			return;
 
-		self::$_db_cache[] = $value;
-		self::$_db_count++;
+		$this->_db_cache[] = $value;
+		$this->_db_count++;
 	}
 
 	/**
@@ -148,13 +154,13 @@ class Debug
 	 *
 	 * @param mixed[] An array of queries info, see the db method for details
 	 */
-	public static function merge_db($value)
+	public function merge_db($value)
 	{
-		if (!self::$_track)
+		if (!$this->_track)
 			return;
 
-		self::$_db_cache = array_merge($value, self::$_db_cache);
-		self::$_db_count = count(self::$_db_cache) + 1;
+		$this->_db_cache = array_merge($value, $this->_db_cache);
+		$this->_db_count = count($this->_db_cache) + 1;
 	}
 
 	/**
@@ -162,12 +168,12 @@ class Debug
 	 *
 	 * @return array
 	 */
-	public static function get_db()
+	public function get_db()
 	{
-		if (!self::$_track)
+		if (!$this->_track)
 			return;
 
-		return self::$_db_cache;
+		return $this->_db_cache;
 	}
 
 	/**
@@ -178,37 +184,37 @@ class Debug
 	 *               is called
 	 * @param string[]|null value of getrusage or null to let the method call it
 	 */
-	public static function rusage($point, $rusage = null)
+	public function rusage($point, $rusage = null)
 	{
-		if (!function_exists('getrusage') || !self::$_track)
+		if (!function_exists('getrusage') || !$this->_track)
 			return;
 
 		if ($rusage === null)
-			self::$_rusage[$point] = getrusage();
+			$this->_rusage[$point] = getrusage();
 		else
-			self::$_rusage[$point] = $rusage;
+			$this->_rusage[$point] = $rusage;
 	}
 
 	/**
 	 * Enables tracking of debug entries
 	 */
-	public static function on()
+	public function on()
 	{
-		self::$_track = true;
+		$this->_track = true;
 	}
 
 	/**
 	 * Disables tracking of debug entries
 	 */
-	public static function off()
+	public function off()
 	{
-		self::$_track = false;
+		$this->_track = false;
 	}
 
 	/**
 	 * Toggles the visibility of the queries
 	 */
-	public static function toggleViewQueries()
+	public function toggleViewQueries()
 	{
 		$_SESSION['view_queries'] = $_SESSION['view_queries'] == 1 ? 0 : 1;
 	}
@@ -217,7 +223,7 @@ class Debug
 	 * Collects some other generic system informations necessary for the
 	 * debug screen
 	 */
-	private static function _prepare_last_bits()
+	private function _prepare_last_bits()
 	{
 		global $context;
 
@@ -230,41 +236,42 @@ class Debug
 		{
 			if (file_exists($files[$i]))
 				$total_size += filesize($files[$i]);
-			Debug::add('files_included', strtr($files[$i], array(BOARDDIR => '.')));
+			$this->add('files_included', strtr($files[$i], array(BOARDDIR => '.')));
 		}
 
-		if (!empty(self::$_db_cache))
-			$_SESSION['debug'] = self::$_db_cache;
+		if (!empty($this->_db_cache))
+			$_SESSION['debug'] = $this->_db_cache;
 
 		// Compute some system info, if we can
-		self::$_system['system_type'] = php_uname();
-		self::$_system['server_load'] = detectServerLoad();
-		self::$_system['script_mem_load'] = round(memory_get_peak_usage() / 1024 / 1024, 2) . 'MB';
+		$this->_system['system_type'] = php_uname();
+		$this->_system['server_load'] = detectServerLoad();
+		$this->_system['script_mem_load'] = round(memory_get_peak_usage() / 1024 / 1024, 2) . 'MB';
 
 		// getrusage() information is CPU time, not wall clock time like microtime, *nix only
-		Debug::rusage('end');
+		$this->rusage('end');
 
-		if (!empty(self::$_rusage))
+		if (!empty($this->_rusage))
 		{
-			self::$_system['script_cpu_load'] = (self::$_rusage['end']['ru_utime.tv_sec'] - self::$_rusage['start']['ru_utime.tv_sec'] + (self::$_rusage['end']['ru_utime.tv_usec'] / 1000000))  . ' / ' . (self::$_rusage['end']['ru_stime.tv_sec'] - self::$_rusage['start']['ru_stime.tv_sec'] + (self::$_rusage['end']['ru_stime.tv_usec'] / 1000000));
+			$this->_system['script_cpu_load'] = ($this->_rusage['end']['ru_utime.tv_sec'] - $this->_rusage['start']['ru_utime.tv_sec'] + ($this->_rusage['end']['ru_utime.tv_usec'] / 1000000))  . ' / ' . ($this->_rusage['end']['ru_stime.tv_sec'] - $this->_rusage['start']['ru_stime.tv_sec'] + ($this->_rusage['end']['ru_stime.tv_usec'] / 1000000));
 		}
 
-		self::$_system['browser'] = $context['browser_body_id'] . ' <em>(' . implode('</em>, <em>', array_reverse(array_keys($context['browser'], true))) . ')</em>';
+		$this->_system['browser'] = $context['browser_body_id'] . ' <em>(' . implode('</em>, <em>', array_reverse(array_keys($context['browser'], true))) . ')</em>';
 
 		// What tokens are active?
 		if (isset($_SESSION['token']))
-			Debug::add('tokens', array_keys($_SESSION['token']));
+			$this->add('tokens', array_keys($_SESSION['token']));
 	}
 
 	/**
 	 * This function shows the debug information tracked
 	 */
-	public static function display()
+	public function display()
 	{
 		global $scripturl, $modSettings;
 		global $txt;
 
-		self::_prepare_last_bits();
+		$this->_prepare_last_bits();
+		$expand_id = array();
 
 		// Gotta have valid HTML ;).
 		$temp = ob_get_contents();
@@ -274,18 +281,19 @@ class Debug
 		<div id="debug_logging_wrapper">
 			<div id="debug_logging" class="smalltext">';
 
-		foreach (self::$_system as $key => $value)
+		foreach ($this->_system as $key => $value)
 			if (!empty($value))
 				echo '
 				', $txt['debug_' . $key], $value, '<br />';
 
 		$expandable = array('hooks', 'files_included');
 
-		foreach (self::$_debugs as $key => $value)
+		foreach ($this->_debugs as $key => $value)
 		{
 			if (in_array($key, $expandable))
 			{
-				$pre = ' (<a href="javascript:void(0);" onclick="document.getElementById(\'debug_' . $key . '\').style.display = \'inline\'; this.style.display = \'none\'; return false;">' . $txt['debug_show'] . '</a><span id="debug_' . $key . '" style="display: none;">';
+				$expand_id[] = 'debug_' . $key;
+				$pre = ' (<a id="debug_' . $key . '" href="#">' . $txt['debug_show'] . '</a><span style="display: none;">';
 				$post = '</span>)';
 			}
 			else
@@ -298,34 +306,51 @@ class Debug
 		}
 
 		// If the cache is on, how successful was it?
-		if (!empty($modSettings['cache_enable']) && !empty(self::$_cache_hits))
+		if (!empty($modSettings['cache_enable']) && !empty($this->_cache_hits))
 		{
 			$entries = array();
 			$total_t = 0;
 			$total_s = 0;
-			foreach (self::$_cache_hits as $cache_hit)
+			foreach ($this->_cache_hits as $cache_hit)
 			{
 				$entries[] = $cache_hit['d'] . ' ' . $cache_hit['k'] . ': ' . sprintf($txt['debug_cache_seconds_bytes'], comma_format($cache_hit['t'], 5), $cache_hit['s']);
 				$total_t += $cache_hit['t'];
 				$total_s += $cache_hit['s'];
 			}
+			$expand_id[] = 'debug_cache_info';
 
 			echo '
-				', $txt['debug_cache_hits'], Debug::cache_count(), ': ', sprintf($txt['debug_cache_seconds_bytes_total'], comma_format($total_t, 5), comma_format($total_s)), ' (<a href="javascript:void(0);" onclick="document.getElementById(\'debug_cache_info\').style.display = \'inline\'; this.style.display = \'none\'; return false;">', $txt['debug_show'], '</a><span id="debug_cache_info" style="display: none;"><em>', implode('</em>, <em>', $entries), '</em></span>)<br />';
+				', $txt['debug_cache_hits'], $this->cache_count(), ': ', sprintf($txt['debug_cache_seconds_bytes_total'], comma_format($total_t, 5), comma_format($total_s)), ' (<a id="debug_cache_info" href="#">', $txt['debug_show'], '</a><span style="display: none;"><em>', implode('</em>, <em>', $entries), '</em></span>)<br />';
 		}
 
 		// Want to see the querys in a new windows?
 		echo '
-				<a href="', $scripturl, '?action=viewquery" target="_blank" class="new_win">', sprintf($txt['debug_queries_used'], self::$_db_count), '</a><br />';
+				<a href="', $scripturl, '?action=viewquery" target="_blank" class="new_win">', sprintf($txt['debug_queries_used'], $this->_db_count), '</a><br />';
 
-		if ($_SESSION['view_queries'] == 1 && !empty(self::$_db_cache))
-			self::_show_queries();
+		if ($_SESSION['view_queries'] == 1 && !empty($this->_db_cache))
+			$this->_show_queries();
 
 		// Or show/hide the querys in line with all of this data
 		echo '
 				<a href="' . $scripturl . '?action=viewquery;sa=hide">', $txt['debug_' . (empty($_SESSION['view_queries']) ? 'show' : 'hide') . '_queries'], '</a>
 			</div>
-		</div>
+		</div>';
+
+		if (!empty($expand_id))
+		{
+			echo '
+			<script><!-- // --><![CDATA[
+				$(document).ready(function() {
+					$(\'#', implode(', #', $expand_id), '\').click(function(ev) {
+						ev.preventDefault();
+						$(this).next().toggle();
+						$(this).remove();
+					});
+				});
+			// ]]></script>';
+		}
+
+		echo '
 	</body></html>';
 	}
 
@@ -335,7 +360,7 @@ class Debug
 	 *
 	 * @param integer the id of the query to EXPLAIN, if -1 no queries are explained
 	 */
-	public static function viewQueries($query_id)
+	public function viewQueries($query_id)
 	{
 		$queries_data = array();
 
@@ -359,11 +384,11 @@ class Debug
 	 * Displays a list of queries executed during the current
 	 * page load
 	 */
-	private static function _show_queries()
+	private function _show_queries()
 	{
 		global $scripturl, $txt;
 
-		foreach (self::$_db_cache as $q => $qq)
+		foreach ($this->_db_cache as $q => $qq)
 		{
 			$is_select = strpos(trim($qq['q']), 'SELECT') === 0 || preg_match('~^INSERT(?: IGNORE)? INTO \w+(?:\s+\([^)]+\))?\s+SELECT .+$~s', trim($qq['q'])) != 0;
 
@@ -398,5 +423,13 @@ class Debug
 			echo '
 		<br />';
 		}
+	}
+
+	public static function get()
+	{
+		if (self::$_instance === null)
+			self::$_instance = New Debug();
+
+		return self::$_instance;
 	}
 }
