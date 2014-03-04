@@ -53,14 +53,14 @@ class Site_Combiner
 	/**
 	 * Holds the file data of the combined files
 	 *
-	 * @var string[]|string
+	 * @var string
 	 */
 	private $_cache = array();
 
 	/**
 	 * Holds the file data of pre minimized files
 	 *
-	 * @var string[]|string
+	 * @var string
 	 */
 	private $_min_cache = array();
 
@@ -308,6 +308,9 @@ class Site_Combiner
 		@unlink($this->_archive_dir . '/' . $this->_archive_name);
 		@unlink($this->_archive_dir . '/' . $this->_archive_name . '.gz');
 
+		$_cache = array();
+		$_min_cache = array();
+
 		// Read in all the data so we can process
 		foreach ($this->_combine_files as $key => $file)
 		{
@@ -324,14 +327,15 @@ class Site_Combiner
 
 			// Add the file to the correct array for processing
 			if ($file['minimized'] === false)
-				$this->_cache[] = $tempfile;
+				$_cache[] = $tempfile;
 			else
-				$this->_min_cache[] = $tempfile;
+				$_min_cache[] = $tempfile;
 		}
 
 		// Build out our combined file strings
-		$this->_cache = implode("\n", $this->_cache);
-		$this->_min_cache = implode("\n", $this->_min_cache);
+		$this->_cache = implode("\n", $_cache);
+		$this->_min_cache = implode("\n", $_min_cache);
+		unset($_cache, $_min_cache);
 	}
 
 	/**
@@ -447,7 +451,6 @@ class Site_Combiner
 	private function _closure_js_code_chunks()
 	{
 		$fetch_data = '';
-		$post_data = '';
 		$combine_files = array_values($this->_combine_files);
 
 		for ($i = 0, $filecount = count($combine_files); $i < $filecount; $i++)
