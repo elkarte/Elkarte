@@ -544,6 +544,7 @@ h2 a.collapse {
 
 /* General code for generic divs. Should make them behave. */
 /* @todo - Not keen on this. Do no-tag-names solution instead? */
+/* @todo - When sorted out take care of div.core_posts too */
 div.windowbg, div.windowbg2 {
 	overflow: auto;
 	padding: 10px 0;
@@ -1663,9 +1664,17 @@ dl.settings dt .styled-select select {
 	float: left;
 	margin-right: 5px;
 }
+.board_avatar a {
+	width: 40px;
+	height: 40px;
+	display: table-cell;
+	vertical-align: middle;
+}
 .board_avatar .avatar {
 	max-width: 40px;
 	max-height: 40px;
+	display: block;
+	margin: auto;
 }
 .lastpost_link, .board_lastposter, .board_lasttime {
 	white-space: pre;
@@ -2092,6 +2101,10 @@ img.new_posts {
 .forumposts .approvebg, .forumposts .approvebg2, .core_posts {
 	overflow: visible;
 	margin: 4px 0 0 0;
+}
+/* @todo remove the div when div.windowbg and div.windowbg2 are sorted out */
+div.core_posts {
+	padding: 0.2em 1em;
 }
 
 /* Poster details and list of items */
@@ -2754,6 +2767,10 @@ dl.merge_topic dd {
 	padding: 8px 8px 16px 8px;
 	overflow: auto;
 }
+/* @todo remove the div when div.windowbg and div.windowbg2 are sorted out */
+#profilecenter div.core_posts {
+	padding: 0.2em 1em;
+}
 #profilecenter .windowbg, #profilecenter .windowbg2,
 #profile_attachments .windowbg, #profile_attachments .windowbg2,
 #unwatched_topics .windowbg, #unwatched_topics .windowbg2 {
@@ -3325,6 +3342,12 @@ div.labels {
 /* ------------------------------------------------------- */
 .mentionavatar .avatar {
 	display: block;
+	max-width: 60px;
+	max-height: 60px;
+}
+.mentionavatar {
+	min-width: 60px;
+	min-height: 60px;
 }
 
 /* $STATISTICS	*/
@@ -3594,6 +3617,44 @@ a.help .icon {
 }
 .search_results_posts .buttons {
 	padding: 5px 12px 0 0;
+}
+.compact_view .topic_details {
+	border-bottom: 0px;
+}
+.search_results_posts .topic_details {
+	position: relative;
+	margin: 0.2em 1em 0px;
+}
+.search_results_posts .quickbuttons {
+	margin-left: 1em;
+	margin-right: 1em;
+}
+.search_results_posts .topic_body {
+	margin: 0px 1em 0px;
+	padding-top: 12px;
+}
+.search_results_posts .quick_mod {
+	position: absolute;
+	right: 0px;
+	top: 10%;
+}
+.search_results_posts .counter {
+	padding: 6px 1.5em;
+}
+.compact_view .content {
+	overflow: auto;
+}
+.compact_view .list_posts {
+	line-height: 2em;
+}
+#topicForm .pagesection,
+#topicForm .flow_auto {
+	display: inline-block;
+}
+#topicForm:after {
+	display: block;
+	clear: both;
+	content: "";
 }
 
 /* The memberlist. */

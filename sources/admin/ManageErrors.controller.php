@@ -192,7 +192,8 @@ class ManageErrors_Controller extends Action_Controller
 		// What type of errors do we have and how many do we have?
 		$context['error_types'] = array();
 		$context['error_types'] = fetchErrorsByType($filter, $sort);
-		$sum = end(array_keys($context['error_types']));
+		$tmp = array_keys($context['error_types']);
+		$sum = end($tmp);
 
 		$context['error_types']['all'] = array(
 			'label' => $txt['errortype_all'],

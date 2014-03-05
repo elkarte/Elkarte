@@ -16,6 +16,73 @@
  */
 
 /**
+ * Helper function to subdivide the boards in a number of sets with
+ * approximately the same number of boards each, but preserving the
+ * grouping in categories
+ *
+ * @param int[] $categories contains the number of boards for each category
+ * @param int $total_boards total number of boards present
+ * @return int[]
+ */
+function optimizeBoardsSubdivision($categories, $total_boards)
+{
+	$num_groups = 2;
+	$optimal_boards = round($total_boards / $num_groups);
+	$groups = array(0 => array());
+	$group_totals = array(0 => 0);
+	$current_streak = 0;
+	$current_group = 0;
+
+	foreach ($categories as $cat => $boards_count)
+	{
+		$groups[$current_group][] = $cat;
+		// The +1 here are to take in consideration category headers
+		// that visuallt account for about one additional board
+		$group_totals[$current_group] += $boards_count + 1;
+		$current_streak += $boards_count + 1;
+
+		// Start a new streak
+		if ($current_streak > $optimal_boards && $current_group < ($num_groups - 1))
+		{
+			$current_streak = 0;
+			$current_group++;
+			$groups[$current_group] = array();
+			$group_totals[$current_group] = 0;
+		}
+	}
+
+	// The current difference of elements from left and right
+	$diff_current = $group_totals[0] - $group_totals[1];
+
+	// If we have less on the right, let's try picking one from the left
+	if ($diff_current > 0)
+	{
+		$last_group = array_pop($groups[0]);
+		// Same as above, +1 for cat header
+		$diff_alternate = $diff_current - 2 * ($categories[$last_group] + 1);
+
+		if (abs($diff_alternate) < $diff_current)
+			array_unshift($groups[1], $last_group);
+		else
+			$groups[0][] = $last_group;
+	}
+	// If we have less on the left, let's try picking one from the right
+	elseif ($diff_current < 0)
+	{
+		$first_group = array_shift($groups[1]);
+		// Same as above, +1 for cat header
+		$diff_alternate = $diff_current + 2 * ($categories[$first_group] + 1);
+
+		if (abs($diff_alternate) < abs($diff_current))
+			$groups[0][] = $first_group;
+		else
+			array_unshift($groups[1], $first_group);
+	}
+
+	return $groups;
+}
+
+/**
  * Main template for displaying the list of boards
  *
  * @param int $boards
@@ -144,4 +211,102 @@ function template_list_boards($boards, $id)
 
 	echo '
 			</ul>';
+}
+
+/**
+ * A template that displays a list of boards subdivided by categories, with
+ * a checkbox to allow select them, toggle selection on the category title
+ *
+ * @param string $form_name The name of the form that contains the list
+ * @param string $input_names Name that should be assigned to the inputs
+ * @param bool $select_all if true the a "select all" option is shown
+ */
+function template_pick_boards($form_name, $input_names = 'brd', $select_all = true)
+{
+	global $context, $txt;
+
+	if ($select_all)
+		echo '
+						<h3 class="secondary_header">
+							<span id="category_toggle">&nbsp;
+								<span id="advanced_panel_toggle" class="', $context['boards_check_all'] ? 'expand' : 'collapse', '" style="display: none;" title="', $txt['hide'], '"></span>
+							</span>
+							<a href="#" id="advanced_panel_link">', $txt['choose_board'], '</a>
+						</h3>
+						<div id="advanced_panel_div"', $context['boards_check_all'] ? ' style="display: none;"' : '', '>';
+
+	// Make two nice columns of boards, link each category header to toggle select all boards in each
+	$group_cats = optimizeBoardsSubdivision($context['boards_in_category'], $context['num_boards']);
+
+	foreach ($group_cats as $groups)
+	{
+		echo '
+							<ul class="ignoreboards floatleft">';
+		foreach ($groups as $cat_id)
+		{
+			$category = $context['categories'][$cat_id];
+			echo '
+								<li class="category">
+									<a href="javascript:void(0);" onclick="selectBoards([', implode(', ', $category['child_ids']), '], \'', $form_name, '\', \'', $input_names, '\'); return false;">', $category['name'], '</a>
+									<ul>';
+
+			foreach ($category['boards'] as $board)
+			{
+				echo '
+										<li class="board" style="margin-', $context['right_to_left'] ? 'right' : 'left', ': ', $board['child_level'], 'em;">
+											<label for="', $input_names, $board['id'], '">
+												<input type="checkbox" id="', $input_names, $board['id'], '" name="', $input_names, '[', $board['id'], ']" value="', $board['id'], '"', $board['selected'] ? ' checked="checked"' : '', ' class="input_check" /> ', $board['name'], '
+											</label>
+										</li>';
+			}
+
+			echo '
+									</ul>
+								</li>';
+		}
+		echo '
+							</ul>';
+	}
+
+	// Provide an easy way to select all boards
+	if ($select_all)
+	{
+		echo '
+						</div>
+						<div class="submitbutton">
+							<span class="floatleft">
+								<input type="checkbox" name="all" id="check_all" value=""', $context['boards_check_all'] ? ' checked="checked"' : '', ' onclick="invertAll(this, this.form, \'', $input_names, '\');" class="input_check" />
+								<label for="check_all">
+									<em> ', $txt['check_all'], '</em>
+								</label>
+							</span>
+						</div>';
+
+		// And now all the JS to make this work
+		addInlineJavascript('
+		// Some javascript for the advanced board select toggling
+		var oAdvancedPanelToggle = new elk_Toggle({
+			bToggleEnabled: true,
+			bCurrentlyCollapsed: ' . ($context['boards_check_all'] ? 'true' : 'false') . ',
+			aSwappableContainers: [
+				\'advanced_panel_div\'
+			],
+			aSwapClasses: [
+				{
+					sId: \'advanced_panel_toggle\',
+					classExpanded: \'collapse\',
+					titleExpanded: ' . JavaScriptEscape($txt['hide']) . ',
+					classCollapsed: \'expand\',
+					titleCollapsed: ' . JavaScriptEscape($txt['show']) . '
+				}
+			],
+			aSwapLinks: [
+				{
+					sId: \'advanced_panel_link\',
+					msgExpanded: ' . JavaScriptEscape($txt['choose_board']) . ',
+					msgCollapsed: ' . JavaScriptEscape($txt['choose_board']) . '
+				}
+			],
+		});', true);
+	}
 }

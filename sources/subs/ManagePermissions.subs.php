@@ -1322,7 +1322,7 @@ function permProfilesInUse($profiles)
  * @package Permissions
  * @param mixed[] $groups array where the keys are the group id's
  * @param int[] $profile
- * @param string $permissions
+ * @param string[] $permissions
  */
 function deleteBoardPermissions($groups, $profile, $permissions)
 {

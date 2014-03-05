@@ -302,6 +302,9 @@ class ManageLanguages_Controller extends Action_Controller
 	{
 		global $context, $forum_version, $txt, $scripturl, $modSettings;
 
+		// @todo for the moment there is no facility to download packages, so better kill it here
+		fatal_lang_error('no_access', false);
+
 		loadLanguage('ManageSettings');
 		require_once(SUBSDIR . '/Package.subs.php');
 

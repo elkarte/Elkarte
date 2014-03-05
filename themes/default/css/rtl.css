@@ -1074,6 +1074,11 @@ div.labels {
 	padding: 5px 0 0 12px;
 }
 
+.search_results_posts .quick_mod {
+	right: auto;
+	left: 0px;
+}
+
 /* The memberlist. */
 #mlsearch_options.nojs li:nth-child(odd) {
 	float: right;

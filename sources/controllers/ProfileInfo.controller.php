@@ -539,11 +539,41 @@ class ProfileInfo_Controller extends Action_Controller
 				'html_time' => htmlTime($row['poster_time']),
 				'timestamp' => forum_time(true, $row['poster_time']),
 				'id' => $row['id_msg'],
-				'can_reply' => false,
-				'can_mark_notify' => false,
-				'can_delete' => false,
+				'tests' => array(
+					'can_reply' => false,
+					'can_mark_notify' => false,
+					'can_delete' => false,
+				),
 				'delete_possible' => ($row['id_first_msg'] != $row['id_msg'] || $row['id_last_msg'] == $row['id_msg']) && (empty($modSettings['edit_disable_time']) || $row['poster_time'] + $modSettings['edit_disable_time'] * 60 >= time()),
 				'approved' => $row['approved'],
+
+				'buttons' => array(
+					// How about... even... remove it entirely?!
+					'remove' => array(
+						'href' => $scripturl . '?action=deletemsg;msg=' . $row['id_msg'] . ';topic=' . $row['id_topic'] . ';profile;u=' . $context['member']['id'] . ';start=' . $context['start'],
+						'text' => $txt['remove'],
+						'test' => 'can_delete',
+						'custom' => 'onclick="return confirm(' . JavaScriptEscape($txt['remove_message'] . '?') . ');"',
+					),
+					// Can we request notification of topics?
+					'notify' => array(
+						'href' => $scripturl . '?action=notify;topic=' . $row['id_topic'] . '.msg' . $row['id_msg'],
+						'text' => $txt['notify'],
+						'test' => 'can_mark_notify',
+					),
+					// If they *can* reply?
+					'reply' => array(
+						'href' => $scripturl . '?action=post;topic=' . $row['id_topic'] . '.msg' . $row['id_msg'],
+						'text' => $txt['reply'],
+						'test' => 'can_reply',
+					),
+					// If they *can* quote?
+					'quote' => array(
+						'href' => $scripturl . '?action=post;topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . ';quote=' . $row['id_msg'],
+						'text' => $txt['quote'],
+						'test' => 'can_quote',
+					),
+				)
 			);
 
 			if ($user_info['id'] == $row['id_member_started'])
@@ -600,7 +630,7 @@ class ProfileInfo_Controller extends Action_Controller
 
 					// Set the permission to true ;).
 					foreach ($board_ids[$type][$board_id] as $counter)
-						$context['posts'][$counter][$allowed] = true;
+						$context['posts'][$counter]['tests'][$allowed] = true;
 				}
 			}
 		}
@@ -609,8 +639,8 @@ class ProfileInfo_Controller extends Action_Controller
 		$quote_enabled = empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC']));
 		foreach ($context['posts'] as $counter => $dummy)
 		{
-			$context['posts'][$counter]['can_delete'] &= $context['posts'][$counter]['delete_possible'];
-			$context['posts'][$counter]['can_quote'] = $context['posts'][$counter]['can_reply'] && $quote_enabled;
+			$context['posts'][$counter]['tests']['can_delete'] &= $context['posts'][$counter]['delete_possible'];
+			$context['posts'][$counter]['tests']['can_quote'] = $context['posts'][$counter]['tests']['can_reply'] && $quote_enabled;
 		}
 	}
 

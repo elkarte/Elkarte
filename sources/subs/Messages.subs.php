@@ -1002,7 +1002,7 @@ function countNewPosts($topic, $topicinfo, $timestamp)
  * @param string[] $msg_selects
  * @param string[] $msg_tables
  * @param mixed[] $msg_parameters
- * @param string $options
+ * @param mixed[] $options
  * @return array
  */
 function loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $options)
@@ -1011,13 +1011,15 @@ function loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $options
 
 	$request = $db->query('', '
 		SELECT
-			m.id_msg, m.icon, m.subject, m.poster_time, m.poster_ip, m.id_member, m.modified_time, m.modified_name, m.body,
-			m.smileys_enabled, m.poster_name, m.poster_email, m.approved,
+			m.id_msg, m.icon, m.subject, m.poster_time, m.poster_ip, m.id_member,
+			m.modified_time, m.modified_name, m.body, m.smileys_enabled,
+			m.poster_name, m.poster_email, m.approved,
 			m.id_msg_modified < {int:new_from} AS is_read
 			' . (!empty($msg_selects) ? implode(',', $msg_selects) : '') . '
 		FROM {db_prefix}messages AS m
 			' . (!empty($msg_tables) ? implode("\n\t\t\t", $msg_tables) : '') . '
 		WHERE m.id_msg IN ({array_int:message_list})
+			' . (!empty($options['additional_conditions']) ? $options['additional_conditions'] : '') . '
 		ORDER BY m.id_msg' . (empty($options['view_newest_first']) ? '' : ' DESC'),
 		$msg_parameters
 	);
