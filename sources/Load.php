@@ -1608,7 +1608,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	if (!empty($modSettings['enableCodePrettify']))
 	{
 		loadCSSFile('prettify.css');
-		loadJavascriptFile('prettify.js', array('defer' => true));
+		loadJavascriptFile('prettify.min.js', array('defer' => true));
 
 		addInlineJavascript('
 		$(document).ready(function(){
