@@ -117,6 +117,16 @@ input[disabled].input_text, input[disabled].input_password {
 	background-position: 2% 50%;
 }
 
+/* Selects don't like to behave across OS and browsers, unfortunately. */
+.styled-select {
+	background: #fff url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYAQAAAADb20ChAAAAAnRSTlMAAQGU/a4AAAApSURBVHjaY/zPgIL+MTL+aWb84c74QZ/xgT6yFJALFARKARUAlaFpBACuqxnhHOnncgAAAABJRU5ErkJggg==) 98% 50% no-repeat;
+	border: 1px solid #ccc;
+	border-radius: 2px;
+}
+.styled-select select:disabled {
+	background: #eee url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYCAQAAABZqbWHAAAAKklEQVR42mMYiqCBgDQI4pXGp6QBBWJKY8ABB+Q4ElMajxKyghqhZCgCAL3SGQGs8tZQAAAAAElFTkSuQmCC) 98% 50% no-repeat;
+}
+
 /* Common button styling. */
 /* It is being replaced with three classes: */
 /*    .button_submit is not floated    */
@@ -1580,6 +1590,10 @@ div.bbc_footnotes .meaction{
 	background: #fafafa;
 	border: 1px solid #ddd;
 	border-radius: 5px;
+}
+.search_results_posts .topic_body {
+	border-top: 1px solid #CCCCCC;
+	box-shadow: 0px 1px 0px #FFFFFF inset;
 }
 
 /*	$LOGIN		*/

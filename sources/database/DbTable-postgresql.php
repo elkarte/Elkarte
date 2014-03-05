@@ -70,6 +70,9 @@ class DbTable_PostgreSQL extends DbTable
 			'themes', 'topics');
 		foreach ($this->_reservedTables as $k => $table_name)
 			$this->_reservedTables[$k] = strtolower($db_prefix . $table_name);
+
+		// let's be sure.
+		$this->_package_log = array();
 	}
 
 	/**
@@ -881,6 +884,14 @@ class DbTable_PostgreSQL extends DbTable
 		$db->free_result($result);
 
 		return $indexes;
+	}
+
+	/**
+	 * Return a copy of this instance package log
+	 */
+	public function package_log()
+	{
+		return $this->_package_log;
 	}
 
 	/**

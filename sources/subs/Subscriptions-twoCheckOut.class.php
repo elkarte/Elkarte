@@ -17,6 +17,8 @@
 
 /**
  * The available form data for the gateway
+ *
+ * @package Subscriptions
  */
 class twocheckout_display
 {
@@ -54,8 +56,6 @@ class twocheckout_display
 	}
 
 	/**
-	 * What do we want?
-	 *
 	 * Called from Profile-Actions.php to return a unique set of fields for the given gateway
 	 * plus all the standard ones for the subscription form
 	 *
@@ -95,6 +95,8 @@ class twocheckout_display
 
 /**
  * Class of functions to validate a twocheckout payment response and provide details of the payment
+ *
+ * @package Subscriptions
  */
 class twocheckout_payment
 {
@@ -106,7 +108,8 @@ class twocheckout_payment
 
 	/**
 	 * Validates that we have valid data to work with
-	 * Returns true/false for whether this gateway thinks the data is intended for it.
+	 *
+	 * - Returns true/false for whether this gateway thinks the data is intended for it.
 	 *
 	 * @return boolean
 	 */
@@ -131,7 +134,8 @@ class twocheckout_payment
 
 	/**
 	 * Validate this is valid for this transaction type.
-	 * If valid returns the subscription and member IDs we are going to process.
+	 *
+	 * - If valid returns the subscription and member IDs we are going to process.
 	 */
 	public function precheck()
 	{

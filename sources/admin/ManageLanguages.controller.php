@@ -22,6 +22,8 @@ if (!defined('ELK'))
 
 /**
  * Manage languages controller class.
+ *
+ * @package Languages
  */
 class ManageLanguages_Controller extends Action_Controller
 {
@@ -33,8 +35,10 @@ class ManageLanguages_Controller extends Action_Controller
 
 	/**
 	 * This is the main function for the languages area.
-	 * It dispatches the requests.
-	 * Loads the ManageLanguages template. (sub-actions will use it)
+	 *
+	 * What it does:
+	 * - It dispatches the requests.
+	 * - Loads the ManageLanguages template. (sub-actions will use it)
 	 *
 	 * @uses ManageSettings language file
 	 * @see Action_Controller::action_index()
@@ -284,10 +288,12 @@ class ManageLanguages_Controller extends Action_Controller
 
 	/**
 	 * Download a language file from the website.
-	 * Requires a valid download ID ("did") in the URL.
-	 * Also handles installing language files.
-	 * Attempts to chmod things as needed.
-	 * Uses a standard list to display information about all the files and where they'll be put.
+	 *
+	 * What it does:
+	 * - Requires a valid download ID ("did") in the URL.
+	 * - Also handles installing language files.
+	 * - Attempts to chmod things as needed.
+	 * - Uses a standard list to display information about all the files and where they'll be put.
 	 *
 	 * @uses ManageLanguages template, download_language sub-template.
 	 * @uses Admin template, show_list sub-template.
@@ -295,6 +301,9 @@ class ManageLanguages_Controller extends Action_Controller
 	public function action_downloadlang()
 	{
 		global $context, $forum_version, $txt, $scripturl, $modSettings;
+
+		// @todo for the moment there is no facility to download packages, so better kill it here
+		fatal_lang_error('no_access', false);
 
 		loadLanguage('ManageSettings');
 		require_once(SUBSDIR . '/Package.subs.php');
@@ -987,9 +996,8 @@ class ManageLanguages_Controller extends Action_Controller
 	/**
 	 * Edit language related settings.
 	 *
-	 * Accessed by ?action=admin;area=languages;sa=settings
-	 *
-	 * This method handles the display, allows to edit, and saves the result
+	 * - Accessed by ?action=admin;area=languages;sa=settings
+	 * - This method handles the display, allows to edit, and saves the result
 	 * for the _languageSettings form.
 	 */
 	public function action_languageSettings_display()
@@ -1039,7 +1047,8 @@ class ManageLanguages_Controller extends Action_Controller
 
 	/**
 	 * Administration settings for languages area:
-	 *  the method will initialize the form config array with all settings.
+	 *
+	 * - the method will initialize the form config array with all settings.
 	 *
 	 * Format of the array:
 	 *  - either, variable name, description, type (constant), size/possible values, helptext.

@@ -23,6 +23,8 @@ if (!defined('ELK'))
 
 /**
  * SearchAPI-Custom.class.php, Custom Search API class .. used when custom ElkArte index is used
+ *
+ * @package Search
  */
 class Custom_Search
 {
@@ -129,7 +131,7 @@ class Custom_Search
 	}
 
 	/**
-	 * callback function for usort used to sort the fulltext results.
+	 * Callback function for usort used to sort the fulltext results.
 	 * the order of sorting is: large words, small words, large words that
 	 * are excluded from the search, small words that are excluded.
 	 *

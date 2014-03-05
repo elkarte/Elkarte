@@ -16,6 +16,8 @@ if (!defined('ELK'))
 /**
  * Drafts administration controller.
  * This class allows to modify admin drafts settings for the forum.
+ *
+ * @package Drafts
  */
 class ManageDrafts_Controller extends Action_Controller
 {
@@ -44,8 +46,9 @@ class ManageDrafts_Controller extends Action_Controller
 
 	/**
 	 * Modify any setting related to drafts.
-	 * Requires the admin_forum permission.
-	 * Accessed from ?action=admin;area=managedrafts
+	 * 
+	 * - Requires the admin_forum permission.
+	 * - Accessed from ?action=admin;area=managedrafts
 	 *
 	 * @uses Admin template, edit_topic_settings sub-template.
 	 */
@@ -92,7 +95,7 @@ class ManageDrafts_Controller extends Action_Controller
 			function toggle()
 			{
 				var select_elem = document.getElementById(\'drafts_autosave_frequency\');
-				
+
 				select_elem.disabled = !autosave.checked;
 			}', true);
 

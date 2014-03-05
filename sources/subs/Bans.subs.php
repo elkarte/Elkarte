@@ -22,14 +22,14 @@ if (!defined('ELK'))
 
 /**
  * Saves one or more ban triggers into a ban item: according to the suggestions
- * checks the $_POST variable to verify if the trigger is present
- * If
  *
+ * - Checks the $_POST variable to verify if the trigger is present
+ *
+ * @package Bans
  * @param mixed[] $suggestions  array of ban triggers to values
  * @param int $ban_group
  * @param int $member
  * @param int $ban_id
- *
  * @return mixed array with the saved triggers or false on failure
  */
 function saveTriggers($suggestions, $ban_group, $member = 0, $ban_id = 0)
@@ -75,8 +75,10 @@ function saveTriggers($suggestions, $ban_group, $member = 0, $ban_id = 0)
 
 /**
  * This function removes a bunch of triggers based on ids
- * Doesn't clean the inputs
  *
+ * - Doesn't clean the inputs
+ *
+ * @package Bans
  * @param int[]|int $items_ids
  * @param int|boolean $group_id
  * @return bool
@@ -126,8 +128,10 @@ function removeBanTriggers($items_ids = array(), $group_id = false)
 
 /**
  * This function removes a bunch of ban groups based on ids
- * Doesn't clean the inputs
  *
+ * - Doesn't clean the inputs
+ *
+ * @package Bans
  * @param int[]|int $group_ids
  * @return bool
  */
@@ -156,8 +160,10 @@ function removeBanGroups($group_ids)
 
 /**
  * Removes logs - by default truncate the table
- * Doesn't clean the inputs
  *
+ * - Doesn't clean the inputs
+ *
+ * @package Bans
  * @param int[]|int|null $ids (optional)
  * @return bool
  */
@@ -196,6 +202,7 @@ function removeBanLogs($ids = array())
 /**
  * This function validates the ban triggers
  *
+ * @package Bans
  * @param mixed[] $triggers
  */
 function validateTriggers(&$triggers)
@@ -368,6 +375,7 @@ function validateTriggers(&$triggers)
 /**
  * This function actually inserts the ban triggers into the database
  *
+ * @package Bans
  * @param int $group_id
  * @param mixed[] $triggers associative array of trigger keys and the values
  * @param mixed[] $logs
@@ -461,6 +469,7 @@ function addTriggers($group_id = 0, $triggers = array(), $logs = array())
 /**
  * This function updates an existing ban trigger into the database
  *
+ * @package Bans
  * @param int $ban_item
  * @param int $group_id
  * @param mixed[] $trigger associative array of ban trigger => value
@@ -535,10 +544,12 @@ function updateTriggers($ban_item = 0, $group_id = 0, $trigger = array(), $logs 
 /**
  * A small function to unify logging of triggers (updates and new)
  *
+ * @package Bans
  * @param mixed[] $logs an array of logs, each log contains the following keys:
- *                - bantype: a known type of ban (ip_range, hostname, email, user, main_ip)
- *                - value: the value of the bantype (e.g. the IP or the email address banned)
- * @param boolean|string $new if the trigger is new (true), an update (false), or a removal ('remove') of an existing one
+ * - bantype: a known type of ban (ip_range, hostname, email, user, main_ip)
+ * - value: the value of the bantype (e.g. the IP or the email address banned)
+ * @param boolean|string $new type of trigger
+ * - if the trigger is new (true), an update (false), or a removal ('remove') of an existing one
  */
 function logTriggersUpdates($logs, $new = true)
 {
@@ -564,8 +575,10 @@ function logTriggersUpdates($logs, $new = true)
 
 /**
  * Updates an existing ban group
+ *
  * If the name doesn't exists a new one is created
  *
+ * @package Bans
  * @param mixed[] $ban_info
  * @return nothing
  */
@@ -629,9 +642,11 @@ function updateBanGroup($ban_info = array())
 
 /**
  * Creates a new ban group
- * If a ban group with the same name already exists or the group s successfully created the ID is returned
- * On error the error code is returned or false
  *
+ * - If a ban group with the same name already exists or the group s successfully created the ID is returned
+ * - On error the error code is returned or false
+ *
+ * @package Bans
  * @param mixed[] $ban_info
  * @return int the ban group's ID
  */
@@ -693,11 +708,12 @@ function insertBanGroup($ban_info = array())
 
 /**
  * Convert a range of given IP number into a single string.
+ *
  * It's practically the reverse function of ip2range().
  *
  * @example
  * range2ip(array(10, 10, 10, 0), array(10, 10, 20, 255)) returns '10.10.10-20.*
- *
+ * @package Bans
  * @param int[] $low IPv4 format
  * @param int[] $high IPv4 format
  * @return string
@@ -748,9 +764,12 @@ function range2ip($low, $high)
 
 /**
  * Checks whether a given IP range already exists in the trigger list.
- * If yes, it returns an error message. Otherwise, it returns an array
- *  optimized for the database.
  *
+ * - If yes, it returns an error message.
+ * - Otherwise, it returns an array
+ * - optimized for the database.
+ *
+ * @package Bans
  * @param int[] $ip_array array of ip array ints
  * @param string $fullip
  * @return boolean
@@ -814,7 +833,10 @@ function checkExistingTriggerIP($ip_array, $fullip = '')
 
 /**
  * As it says... this tries to review the list of banned members, to match new bans.
- * Note: is_activated >= 10: a member is banned.
+ *
+ * - Note: is_activated >= 10: a member is banned.
+ *
+ * @package Bans
  */
 function updateBanMembers()
 {
@@ -946,8 +968,9 @@ function updateBanMembers()
 
 /**
  * Returns member data for a given member id in a suggestion format used by bans
- * @uses getBasicMemberData
  *
+ * @package Bans
+ * @uses getBasicMemberData
  * @param int $id
  */
 function getMemberData($id)
@@ -973,6 +996,7 @@ function getMemberData($id)
 /**
  * Get ban triggers for the given parameters.
  *
+ * @package Bans
  * @param int $start
  * @param int $items_per_page
  * @param string $sort
@@ -1014,8 +1038,10 @@ function list_getBanTriggers($start, $items_per_page, $sort, $trigger_type)
 
 /**
  * Used to see if a user is banned
- * Checks banning by ip, hostname, email or member id
  *
+ * - Checks banning by ip, hostname, email or member id
+ *
+ * @package Bans
  * @param int $memID
  * @param string $hostname
  * @param string $email
@@ -1099,6 +1125,7 @@ function BanCheckUser($memID, $hostname = '', $email = '')
 /**
  * This returns the total number of ban triggers of the given type.
  *
+ * @package Bans
  * @param string $trigger_type
  * @return int
  */
@@ -1129,8 +1156,10 @@ function list_getNumBanTriggers($trigger_type)
 
 /**
  * Load a list of ban log entries from the database.
- * (no permissions check)
  *
+ * - no permissions checks are done
+ *
+ * @package Bans
  * @param int $start
  * @param int $items_per_page
  * @param string $sort
@@ -1160,6 +1189,8 @@ function list_getBanLogEntries($start, $items_per_page, $sort)
 
 /**
  * This returns the total count of ban log entries.
+ *
+ * @package Bans
  */
 function list_getNumBanLogEntries()
 {
@@ -1180,6 +1211,7 @@ function list_getNumBanLogEntries()
 /**
  * Get the total number of ban from the ban group table
  *
+ * @package Bans
  * @return int
  */
 function list_getNumBans()
@@ -1201,6 +1233,7 @@ function list_getNumBans()
 /**
  * Retrieves all the ban items belonging to a certain ban group
  *
+ * @package Bans
  * @param int $start
  * @param int $items_per_page
  * @param int $sort
@@ -1306,6 +1339,7 @@ function list_getBanItems($start = 0, $items_per_page = 0, $sort = 0, $ban_group
 /**
  * Get bans, what else? For the given options.
  *
+ * @package Bans
  * @param int $start
  * @param int $items_per_page
  * @param string $sort
@@ -1340,6 +1374,7 @@ function list_getBans($start, $items_per_page, $sort)
 /**
  * Gets the number of ban items belonging to a certain ban group
  *
+ * @package Bans
  * @return int
  */
 function list_getNumBanItems()
@@ -1369,6 +1404,7 @@ function list_getNumBanItems()
 /**
  * Load other IPs the given member has used on forum while posting.
  *
+ * @package Bans
  * @param int $member_id
  */
 function banLoadAdditionalIPsMember($member_id)
@@ -1398,6 +1434,7 @@ function banLoadAdditionalIPsMember($member_id)
 /**
  * Load other IPs the given member has received errors logged while they were using them.
  *
+ * @package Bans
  * @param int $member_id
  */
 function banLoadAdditionalIPsError($member_id)
@@ -1426,6 +1463,7 @@ function banLoadAdditionalIPsError($member_id)
 /**
  * Finds additional IPs related to a certain user
  *
+ * @package Bans
  * @param int $member_id
  * @return array
  */
@@ -1449,6 +1487,7 @@ function banLoadAdditionalIPs($member_id)
 /**
  * Fetches ban details
  *
+ * @package Bans
  * @param int[]|int $ban_ids
  * @param int|false $ban_group
  */
@@ -1486,6 +1525,7 @@ function banDetails($ban_ids, $ban_group = false)
  * When removing a ban trigger, this will return the specifics of whats being
  * removed so it can be logged
  *
+ * @package Bans
  * @param mixed[] $ban_details
  */
 function banLogItems($ban_details)

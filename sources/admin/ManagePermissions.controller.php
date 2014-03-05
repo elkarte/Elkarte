@@ -23,6 +23,8 @@ if (!defined('ELK'))
 
 /**
  * ManagePermissions handles all possible permission stuff.
+ *
+ * @package Permissions
  */
 class ManagePermissions_Controller extends Action_Controller
 {
@@ -34,11 +36,11 @@ class ManagePermissions_Controller extends Action_Controller
 
 	/**
 	 * Dispaches to the right function based on the given subaction.
-	 * Checks the permissions, based on the sub-action.
-	 * Called by ?action=managepermissions.
+	 *
+	 * - Checks the permissions, based on the sub-action.
+	 * - Called by ?action=managepermissions.
 	 *
 	 * @uses ManagePermissions language file.
-	 *
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
@@ -131,8 +133,9 @@ class ManagePermissions_Controller extends Action_Controller
 
 	/**
 	 * Sets up the permissions by membergroup index page.
-	 * Called by ?action=managepermissions
-	 * Creates an array of all the groups with the number of members and permissions.
+	 *
+	 * - Called by ?action=managepermissions
+	 * - Creates an array of all the groups with the number of members and permissions.
 	 *
 	 * @uses ManagePermissions language file.
 	 * @uses ManagePermissions template file.

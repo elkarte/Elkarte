@@ -17,6 +17,7 @@ if (!defined('ELK'))
 /**
  * Fetches a list of package servers.
  *
+ * @package Packages
  * @param int|null $server
  * @return array
  */
@@ -51,6 +52,7 @@ function fetchPackageServers($server = null)
 /**
  * Delete a package server
  *
+ * @package Packages
  * @param int $id
  */
 function deletePackageServer($id)
@@ -69,6 +71,7 @@ function deletePackageServer($id)
 /**
  * Adds a new package server
  *
+ * @package Packages
  * @param string $name
  * @param string $url
  */

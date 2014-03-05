@@ -16,6 +16,14 @@
  */
 
 /**
+ * We need some trick to proprerly display things
+ */
+function template_Profile_init()
+{
+	loadTemplate('GenericMessages');
+}
+
+/**
  * Template for the profile header - goes before any other profile template.
  */
 function template_profile_above()
@@ -63,36 +71,18 @@ function template_showDrafts()
 		// For every draft to be displayed, give it its own div, and show the important details of the draft.
 		foreach ($context['drafts'] as $draft)
 		{
-			echo '
-			<div class="', $draft['alternate'] === 0 ? 'windowbg2' : 'windowbg', ' core_posts">
-				<div class="content">
-					<div class="counter">', $draft['counter'], '</div>
-					<div class="topic_details">
-						<h5><strong>', $draft['board']['link'], ' / ', $draft['topic']['link'], '</strong>&nbsp;&nbsp;';
+			$draft['title'] = '<strong>' . $draft['board']['link'] . ' / ' . $draft['topic']['link'] . '</strong>&nbsp;&nbsp;';
 
 			if (!empty($draft['sticky']))
-				echo '<img src="', $settings['images_url'], '/icons/quick_sticky.png" alt="', $txt['sticky_topic'], '" title="', $txt['sticky_topic'], '" />';
+				$draft['title'] .= '<img src="' . $settings['images_url'] . '/icons/quick_sticky.png" alt="' . $txt['sticky_topic'] . '" title="' . $txt['sticky_topic'] . '" />';
 
 			if (!empty($draft['locked']))
-				echo '<img src="', $settings['images_url'], '/icons/quick_lock.png" alt="', $txt['locked_topic'], '" title="', $txt['locked_topic'], '" />';
+				$draft['title'] .= '<img src="' . $settings['images_url'] . '/icons/quick_lock.png" alt="' . $txt['locked_topic'] . '" title="' . $txt['locked_topic'] . '" />';
 
-			echo '
-						</h5>
-						<span class="smalltext">&#171;&nbsp;<strong>', $txt['draft_saved_on'], ':</strong> ', ($draft['age'] > 0 ? sprintf($txt['draft_days_ago'], $draft['age']) : $draft['time']), (!empty($draft['remaining']) ? ', ' . sprintf($txt['draft_retain'], $draft['remaining']) : ''), '&#187;</span>
-					</div>
-					<div class="inner">
-						', $draft['body'], '
-					</div>
-					<ul class="quickbuttons">
-						<li class="listlevel1">
-							<a href="', $scripturl, '?action=profile;u=', $context['member']['id'], ';area=showdrafts;delete=', $draft['id_draft'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['draft_remove'], '?\');" class="linklevel1 remove_button">', $txt['draft_delete'], '</a>
-						</li>
-						<li class="listlevel1">
-							<a href="', $scripturl, '?action=post;', (empty($draft['topic']['id']) ? 'board=' . $draft['board']['id'] : 'topic=' . $draft['topic']['id']), '.0;id_draft=', $draft['id_draft'], '" class="linklevel1 reply_button">', $txt['draft_edit'], '</a>
-						</li>
-					</ul>
-				</div>
-			</div>';
+			$draft['date'] = '&#171;&nbsp;<strong>' . $txt['draft_saved_on'] . ':</strong> ' . ($draft['age'] > 0 ? sprintf($txt['draft_days_ago'], $draft['age']) : $draft['time']) . (!empty($draft['remaining']) ? ', ' . sprintf($txt['draft_retain'], $draft['remaining']) : '') . '&#187;';
+			$draft['class'] = $draft['alternate'] === 0 ? 'windowbg2' : 'windowbg';
+
+			template_simple_message($draft);
 		}
 	}
 

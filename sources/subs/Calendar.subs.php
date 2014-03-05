@@ -22,9 +22,12 @@ if (!defined('ELK'))
 
 /**
  * Get all birthdays within the given time range.
- * finds all the birthdays in the specified range of days.
- * works with birthdays set for no year, or any other year, and respects month and year boundaries.
  *
+ * What it does:
+ * - finds all the birthdays in the specified range of days.
+ * - works with birthdays set for no year, or any other year, and respects month and year boundaries.
+ *
+ * @package Calendar
  * @param string $low_date inclusive, YYYY-MM-DD
  * @param string $high_date inclusive, YYYY-MM-DD
  * @return mixed[] days, each of which an array of birthday information for the context
@@ -89,11 +92,13 @@ function getBirthdayRange($low_date, $high_date)
 /**
  * Get all calendar events within the given time range.
  *
+ * What it does:
  * - finds all the posted calendar events within a date range.
  * - both the earliest_date and latest_date should be in the standard YYYY-MM-DD format.
  * - censors the posted event titles.
  * - uses the current user's permissions if use_permissions is true, otherwise it does nothing "permission specific"
  *
+ * @package Calendar
  * @param string $low_date
  * @param string $high_date
  * @param bool $use_permissions = true
@@ -207,6 +212,7 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 /**
  * Get all holidays within the given time range.
  *
+ * @package Calendar
  * @param string $low_date YYYY-MM-DD
  * @param string $high_date YYYY-MM-DD
  * @return array an array of days, which are all arrays of holiday names.
@@ -254,10 +260,14 @@ function getHolidayRange($low_date, $high_date)
 
 /**
  * Does permission checks to see if an event can be linked to a board/topic.
- * checks if the current user can link the current topic to the calendar, permissions et al.
- * this requires the calendar_post permission, a forum moderator, or a topic starter.
- * expects the $topic and $board variables to be set.
- * if the user doesn't have proper permissions, an error will be shown.
+ *
+ * What it does:
+ * - checks if the current user can link the current topic to the calendar, permissions et al.
+ * - this requires the calendar_post permission, a forum moderator, or a topic starter.
+ * - expects the $topic and $board variables to be set.
+ * - if the user doesn't have proper permissions, an error will be shown.
+ *
+ * @package Calendar
  */
 function canLinkEvent()
 {
@@ -302,8 +312,11 @@ function canLinkEvent()
 
 /**
  * Returns date information about 'today' relative to the users time offset.
- * returns an array with the current date, day, month, and year.
+ *
+ * - returns an array with the current date, day, month, and year.
  * takes the users time offset into account.
+ *
+ * @package Calendar
  */
 function getTodayInfo()
 {
@@ -317,6 +330,8 @@ function getTodayInfo()
 
 /**
  * Provides information (link, month, year) about the previous and next month.
+ *
+ * @package Calendar
  * @param int $month
  * @param int $year
  * @param mixed[] $calendarOptions
@@ -473,6 +488,8 @@ function getCalendarGrid($month, $year, $calendarOptions)
 
 /**
  * Returns the information needed to show a calendar for the given week.
+ *
+ * @package Calendar
  * @param int $month
  * @param int $year
  * @param int $day
@@ -601,10 +618,13 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
 
 /**
  * Retrieve all events for the given days, independently of the users offset.
- * cache callback function used to retrieve the birthdays, holidays, and events between now and now + days_to_index.
- * widens the search range by an extra 24 hours to support time offset shifts.
- * used by the cache_getRecentEvents function to get the information needed to calculate the events taking the users time offset into account.
  *
+ * What it does:
+ * - cache callback function used to retrieve the birthdays, holidays, and events between now and now + days_to_index.
+ * - widens the search range by an extra 24 hours to support time offset shifts.
+ * - used by the cache_getRecentEvents function to get the information needed to calculate the events taking the users time offset into account.
+ *
+ * @package Calendar
  * @param int $days_to_index
  * @return array
  */
@@ -625,9 +645,13 @@ function cache_getOffsetIndependentEvents($days_to_index)
 }
 
 /**
- * cache callback function used to retrieve the upcoming birthdays, holidays, and events within the given period, taking into account the users time offset.
- * Called from the BoardIndex to display the current day's events on the board index
- * used by the board index and SSI to show the upcoming events.
+ * cache callback function used to retrieve the upcoming birthdays, holidays, and events
+ * within the given period, taking into account the users time offset.
+ *
+ * - Called from the BoardIndex to display the current day's events on the board index
+ * - used by the board index and SSI to show the upcoming events.
+ *
+ * @package Calendar
  * @param mixed[] $eventOptions
  * @return array
  */
@@ -746,6 +770,8 @@ function cache_getRecentEvents($eventOptions)
 
 /**
  * Makes sure the calendar post is valid.
+ *
+ * @package Calendar
  */
 function validateEventPost()
 {
@@ -805,6 +831,7 @@ function validateEventPost()
 /**
  * Get the event's poster.
  *
+ * @package Calendar
  * @param int $event_id
  * @return int|bool the id of the poster or false if the event was not found
  */
@@ -834,11 +861,14 @@ function getEventPoster($event_id)
 }
 
 /**
- * Consolidating the various INSERT statements into this function.
- * inserts the passed event information into the calendar table.
- * allows to either set a time span (in days) or an end_date.
- * does not check any permissions of any sort.
+ * Inserts events in to the calendar
  *
+ * - Consolidating the various INSERT statements into this function.
+ * - inserts the passed event information into the calendar table.
+ * - allows to either set a time span (in days) or an end_date.
+ * - does not check any permissions of any sort.
+ *
+ * @package Calendar
  * @param mixed[] $eventOptions
  */
 function insertEvent(&$eventOptions)
@@ -892,10 +922,12 @@ function insertEvent(&$eventOptions)
 }
 
 /**
- * modifies an event.
- * allows to either set a time span (in days) or an end_date.
- * does not check any permissions of any sort.
+ * Modifies an event.
  *
+ * - allows to either set a time span (in days) or an end_date.
+ * - does not check any permissions of any sort.
+ *
+ * @package Calendar
  * @param int $event_id
  * @param mixed[] $eventOptions
  */
@@ -952,9 +984,10 @@ function modifyEvent($event_id, &$eventOptions)
 
 /**
  * Remove an event
- * removes an event.
- * does no permission checks.
  *
+ * - does no permission checks.
+ *
+ * @package Calendar
  * @param int $event_id
  */
 function removeEvent($event_id)
@@ -979,6 +1012,7 @@ function removeEvent($event_id)
 /**
  * Gets all the events properties
  *
+ * @package Calendar
  * @param int $event_id
  * @param bool $calendar_only
  * @return array
@@ -1045,6 +1079,7 @@ function getEventProperties($event_id, $calendar_only = false)
 /**
  * Fetch and event that may be linked to a topic
  *
+ * @package Calendar
  * @param int $id_topic
  */
 function eventInfoForTopic($id_topic)
@@ -1075,6 +1110,7 @@ function eventInfoForTopic($id_topic)
 /**
  * Gets all of the holidays for the listing
  *
+ * @package Calendar
  * @param int $start
  * @param int $items_per_page
  * @param string $sort
@@ -1104,6 +1140,7 @@ function list_getHolidays($start, $items_per_page, $sort)
 /**
  * Helper function to get the total number of holidays
  *
+ * @package Calendar
  * @return int
  */
 function list_getNumHolidays()
@@ -1125,6 +1162,7 @@ function list_getNumHolidays()
 /**
  * Remove a holiday from the calendar.
  *
+ * @package Calendar
  * @param int[] $holiday_ids An array of ids for holidays.
  */
 function removeHolidays($holiday_ids)
@@ -1147,6 +1185,7 @@ function removeHolidays($holiday_ids)
 /**
  * Updates a calendar holiday
  *
+ * @package Calendar
  * @param int $holiday
  * @param int $date
  * @param string $title
@@ -1174,6 +1213,7 @@ function editHoliday($holiday, $date, $title)
 /**
  * Insert a new holiday
  *
+ * @package Calendar
  * @param int $date
  * @param string $title
  */
@@ -1200,6 +1240,7 @@ function insertHoliday($date, $title)
 /**
  * Get a specific holiday
  *
+ * @package Calendar
  * @param int $id_holiday
  * @return array
  */

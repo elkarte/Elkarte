@@ -23,12 +23,16 @@ if (!defined('ELK'))
 /**
  * Entry point class for all of the maintance ,routine, members, database,
  * attachments, topics and hooks
+ *
+ * @package Maintenance
  */
 class Maintenance_Controller extends Action_Controller
 {
 	/**
 	 * Main dispatcher, the maintenance access point.
-	 * This, as usual, checks permissions, loads language files,
+	 *
+	 * What it does:
+	 * - This, as usual, checks permissions, loads language files,
 	 * and forwards to the actual workers.
 	 *
 	 * @see Action_Controller::action_index()
@@ -179,14 +183,13 @@ class Maintenance_Controller extends Action_Controller
 		// 1500 is an estimate of the number of messages that generates a database of 1 MB (yeah I know IT'S AN ESTIMATION!!!)
 		// Why that? Because the only reliable zip package is the one sent out the first time,
 		// so when the backup takes 1/5th (just to stay on the safe side) of the memory available
-
 		$zip_limit = $memory_limit * 1500 / 5;
+
 		// Here is more tricky: it depends on many factors, but the main idea is that
 		// if it takes "too long" the backup is not reliable. So, I know that on my computer it take
 		// 20 minutes to backup 2.5 GB, of course my computer is not representative, so I'll multiply by 4 the time.
 		// I would consider "too long" 5 minutes (I know it can be a long time, but let's start with that):
 		// 80 minutes for a 2.5 GB and a 5 minutes limit means 160 MB approx
-
 		$plain_limit = 240000;
 
 		// Last thing: are we able to gain time?
@@ -336,7 +339,8 @@ class Maintenance_Controller extends Action_Controller
 
 	/**
 	 * Find and try to fix all errors on the forum.
-	 * Forwards to repair boards controller.
+	 *
+	 * - Forwards to repair boards controller.
 	 */
 	public function action_repair_display()
 	{
@@ -351,8 +355,9 @@ class Maintenance_Controller extends Action_Controller
 
 	/**
 	 * Wipes the current cache entries as best it can.
-	 * This only applies to our own cache entries, opcache and data.
-	 * This action, like other maintenance tasks, may be called automatically
+	 *
+	 * - This only applies to our own cache entries, opcache and data.
+	 * - This action, like other maintenance tasks, may be called automatically
 	 * by the task scheduler or manually by the admin in Maintenance area.
 	 */
 	public function action_cleancache_display()
@@ -372,7 +377,8 @@ class Maintenance_Controller extends Action_Controller
 
 	/**
 	 * Empties all uninmportant logs.
-	 * This action may be called periodically, by the tasks scheduler,
+	 *
+	 * - This action may be called periodically, by the tasks scheduler,
 	 * or manually by the admin in Maintenance area.
 	 */
 	public function action_logs_display()
@@ -395,13 +401,16 @@ class Maintenance_Controller extends Action_Controller
 	}
 
 	/**
-	 * Convert the column "body" of the table {db_prefix}messages from TEXT to MEDIUMTEXT and vice versa.
-	 * It requires the admin_forum permission.
+	 * Convert the column "body" of the table {db_prefix}messages from TEXT to
+	 * MEDIUMTEXT and vice versa.
 	 *
-	 * This is needed only for MySQL.
-	 * During the convertion from MEDIUMTEXT to TEXT it check if any of the posts exceed the TEXT length and if so it aborts.
-	 * This action is linked from the maintenance screen (if it's applicable).
-	 * Accessed by ?action=admin;area=maintain;sa=database;activity=convertmsgbody.
+	 * What it does:
+	 * - It requires the admin_forum permission.
+	 * - This is needed only for MySQL.
+	 * - During the convertion from MEDIUMTEXT to TEXT it check if any of the
+	 * posts exceed the TEXT length and if so it aborts.
+	 * - This action is linked from the maintenance screen (if it's applicable).
+	 * - Accessed by ?action=admin;area=maintain;sa=database;activity=convertmsgbody.
 	 *
 	 * @uses the convert_msgbody sub template of the Admin template.
 	 */
@@ -508,10 +517,12 @@ class Maintenance_Controller extends Action_Controller
 
 	/**
 	 * Optimizes all tables in the database and lists how much was saved.
-	 * It requires the admin_forum permission.
-	 * It shows as the maintain_forum admin area.
-	 * It is accessed from ?action=admin;area=maintain;sa=database;activity=optimize.
-	 * It also updates the optimize scheduled task such that the tables are not automatically optimized again too soon.
+	 *
+	 * What it does:
+	 * - It requires the admin_forum permission.
+	 * - It shows as the maintain_forum admin area.
+	 * - It is accessed from ?action=admin;area=maintain;sa=database;activity=optimize.
+	 * - It also updates the optimize scheduled task such that the tables are not automatically optimized again too soon.
 	 *
 	 * @uses the rawdata sub template (built in.)
 	 */
@@ -564,8 +575,12 @@ class Maintenance_Controller extends Action_Controller
 
 	/**
 	 * Recount many forum totals that can be recounted automatically without harm.
-	 * it requires the admin_forum permission.
-	 * It shows the maintain_forum admin area.
+	 *
+	 * What it does:
+	 * - it requires the admin_forum permission.
+	 * - It shows the maintain_forum admin area.
+	 * - The function redirects back to ?action=admin;area=maintain when complete.
+	 * - It is accessed via ?action=admin;area=maintain;sa=database;activity=recount.
 	 *
 	 * Totals recounted:
 	 * - fixes for topics with wrong num_replies.
@@ -574,9 +589,6 @@ class Maintenance_Controller extends Action_Controller
 	 * - repairs messages pointing to boards with topics pointing to other boards.
 	 * - updates the last message posted in boards and children.
 	 * - updates member count, latest member, topic count, and message count.
-	 *
-	 * The function redirects back to ?action=admin;area=maintain when complete.
-	 * It is accessed via ?action=admin;area=maintain;sa=database;activity=recount.
 	 */
 	public function action_recount_display()
 	{
@@ -816,13 +828,14 @@ class Maintenance_Controller extends Action_Controller
 
 	/**
 	 * Perform a detailed version check.  A very good thing ;).
-	 * The function parses the comment headers in all files for their version information,
-	 * and outputs that for some javascript to check with simplemachines.org.
-	 * It does not connect directly with elkarte.net, but rather expects the client to.
 	 *
-	 * It requires the admin_forum permission.
-	 * Uses the view_versions admin area.
-	 * Accessed through ?action=admin;area=maintain;sa=routine;activity=version.
+	 * What it does
+	 * - The function parses the comment headers in all files for their version information,
+	 * and outputs that for some javascript to check with simplemachines.org.
+	 * - It does not connect directly with elkarte.net, but rather expects the client to.
+	 * - It requires the admin_forum permission.
+	 * - Uses the view_versions admin area.
+	 * - Accessed through ?action=admin;area=maintain;sa=routine;activity=version.
 	 *
 	 * @uses Admin template, view_versions sub-template.
 	 */
@@ -919,8 +932,9 @@ class Maintenance_Controller extends Action_Controller
 
 	/**
 	 * Handling function for the backup stuff.
-	 * It requires an administrator and the session hash by post.
-	 * This method simply forwards to DumpDatabase2().
+	 *
+	 * - It requires an administrator and the session hash by post.
+	 * - This method simply forwards to DumpDatabase2().
 	 */
 	public function action_backup_display()
 	{
@@ -1100,8 +1114,9 @@ class Maintenance_Controller extends Action_Controller
 
 	/**
 	 * Generates a list of integration hooks for display
-	 * Accessed through ?action=admin;area=maintain;sa=hooks;
-	 * Allows for removal or disabing of selected hooks
+	 *
+	 * - Accessed through ?action=admin;area=maintain;sa=hooks;
+	 * - Allows for removal or disabing of selected hooks
 	 */
 	public function action_hooks()
 	{
@@ -1298,8 +1313,9 @@ class Maintenance_Controller extends Action_Controller
 
 	/**
 	 * Recalculate all members post counts
-	 * it requires the admin_forum permission.
 	 *
+	 * What it does:
+	 * - it requires the admin_forum permission.
 	 * - recounts all posts for members found in the message table
 	 * - updates the members post count record in the members table
 	 * - honors the boards post count flag
@@ -1307,9 +1323,8 @@ class Maintenance_Controller extends Action_Controller
 	 * - zeros post counts for all members with no posts in the message table
 	 * - runs as a delayed loop to avoid server overload
 	 * - uses the not_done template in Admin.template
-	 *
-	 * The function redirects back to action=admin;area=maintain;sa=members when complete.
-	 * It is accessed via ?action=admin;area=maintain;sa=members;activity=recountposts
+	 * - redirects back to action=admin;area=maintain;sa=members when complete.
+	 * - accessed via ?action=admin;area=maintain;sa=members;activity=recountposts
 	 */
 	public function action_recountposts_display()
 	{

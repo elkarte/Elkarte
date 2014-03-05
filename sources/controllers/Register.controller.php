@@ -994,7 +994,7 @@ class Register_Controller extends Action_Controller
 		$errors = Error_Context::context('valid_username', 0);
 
 		require_once(SUBSDIR . '/Auth.subs.php');
-		validateUsername(0, $context['checked_username'], 'valid_username');
+		validateUsername(0, $context['checked_username'], 'valid_username', true, false);
 
 		$context['valid_username'] = !$errors->hasErrors();
 	}

@@ -1082,14 +1082,15 @@ class ManageThemes_Controller extends Action_Controller
 			mkdir($theme_dir . '/scripts', 0777);
 
 			// Copy over the default non-theme files.
-			$to_copy = array('/index.php', '/index.template.php', '/css/index.css', '/css/rtl.css', '/css/admin.css', '/scripts/theme.js');
+			$to_copy = array('/index.php', '/index.template.php', '/scripts/theme.js');
 			foreach ($to_copy as $file)
 			{
 				copy($settings['default_theme_dir'] . $file, $theme_dir . $file);
 				@chmod($theme_dir . $file, 0777);
 			}
 
-			// And now the entire images directory!
+			// And now the entire css & images directories!
+			copytree($settings['default_theme_dir'] . '/css', $theme_dir . '/css');
 			copytree($settings['default_theme_dir'] . '/images', $theme_dir . '/images');
 			package_flush_cache();
 

@@ -17,6 +17,8 @@ if (!defined('ELK'))
 
 /**
  * Class to show a list of all badbehavior log entries
+ *
+ * @package BadBehavior
  */
 class BadBehavior_Controller extends Action_Controller
 {
@@ -31,9 +33,11 @@ class BadBehavior_Controller extends Action_Controller
 
 	/**
 	 * View the forum's badbehavior log.
-	 * This function sets all the context up to show the badbehavior log for review.
-	 * It requires the maintain_forum permission.
-	 * It is accessed from ?action=admin;area=logs;sa=badbehaviorlog.
+	 *
+	 * What it does:
+	 * - This function sets all the context up to show the badbehavior log for review.
+	 * - It requires the maintain_forum permission.
+	 * - It is accessed from ?action=admin;area=logs;sa=badbehaviorlog.
 	 *
 	 * @uses the BadBehavior template and badbehavior_log sub template.
 	 */

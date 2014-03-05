@@ -16,6 +16,8 @@ if (!defined('ELK'))
 
 /**
  * ManageBBC controller handles administration options for BBC tags.
+ *
+ * @package BBC
  */
 class ManageBBC_Controller extends Action_Controller
 {
@@ -28,10 +30,11 @@ class ManageBBC_Controller extends Action_Controller
 
 	/**
 	 * The BBC admin area
-	 * This method is the entry point for index.php?action=admin;area=postsettings;sa=bbc
-	 * and it calls a function based on the sub-action, here only display.
 	 *
-	 * requires admin_forum permissions
+	 * What it does:
+	 * - This method is the entry point for index.php?action=admin;area=postsettings;sa=bbc
+	 * and it calls a function based on the sub-action, here only display.
+	 * - requires admin_forum permissions
 	 *
 	 * @see Action_Controller::action_index()
 	 */
@@ -62,7 +65,8 @@ class ManageBBC_Controller extends Action_Controller
 
 	/**
 	 * Administration page in Posts and Topics > BBC.
-	 * This method handles displaying and changing which BBC tags are enabled on the forum.
+	 *
+	 * - This method handles displaying and changing which BBC tags are enabled on the forum.
 	 *
 	 * @uses Admin template, edit_bbc_settings sub-template.
 	 */

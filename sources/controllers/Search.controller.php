@@ -30,6 +30,8 @@ $GLOBALS['search_versions'] = array(
 
 /**
  * Search_Controller class, it handle all of the searching
+ *
+ * @package Search
  */
 class Search_Controller extends Action_Controller
 {
@@ -55,8 +57,9 @@ class Search_Controller extends Action_Controller
 
 	/**
 	 * Called before any other action method in this class.
-	 * If coming from the quick reply allows to route to the proper action
-	 * if needed (for example external search engine or members search
+	 *
+	 * - If coming from the quick reply allows to route to the proper action
+	 * - if needed (for example external search engine or members search
 	 */
 	public function pre_dispatch()
 	{
@@ -85,7 +88,8 @@ class Search_Controller extends Action_Controller
 
 	/**
 	 * Intended entry point for this class.
-	 * The default action for no sub-action is... present the search screen
+	 *
+	 * - The default action for no sub-action is... present the search screen
 	 *
 	 * @see Action_Controller::action_index()
 	 */
@@ -97,6 +101,7 @@ class Search_Controller extends Action_Controller
 
 	/**
 	 * Ask the user what they want to search for.
+	 *
 	 * What it does:
 	 * - shows the screen to search forum posts (action=search),
 	 * - uses the main sub template of the Search template.
@@ -205,8 +210,10 @@ class Search_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Boards.subs.php');
 		$context += getBoardList(array('not_redirection' => true));
-		foreach ($context['categories'] as &$category)
+		$context['boards_in_category'] = array();
+		foreach ($context['categories'] as $cat => &$category)
 		{
+			$context['boards_in_category'][$cat] = count($category['boards']);
 			$category['child_ids'] = array_keys($category['boards']);
 			foreach ($category['boards'] as &$board)
 				$board['selected'] = (empty($context['search_params']['brd']) && (empty($modSettings['recycle_enable']) || $board['id'] != $modSettings['recycle_board']) && !in_array($board['id'], $user_info['ignoreboards'])) || (!empty($context['search_params']['brd']) && in_array($board['id'], $context['search_params']['brd']));
@@ -233,12 +240,18 @@ class Search_Controller extends Action_Controller
 		}
 
 		$context['page_title'] = $txt['set_parameters'];
+		$context['search_params'] = $this->_fill_default_search_params($context['search_params']);
+
+		// Start guest off collapsed
+		if ($context['user']['is_guest'] && !isset($context['minmax_preferences']['asearch']))
+			$context['minmax_preferences']['asearch'] = 1;
 
 		call_integration_hook('integrate_search');
 	}
 
 	/**
 	 * Gather the results and show them.
+	 *
 	 * What it does:
 	 * - checks user input and searches the messages table for messages matching the query.
 	 * - requires the search_posts permission.
@@ -741,6 +754,12 @@ class Search_Controller extends Action_Controller
 			$context['search_params']['search'] = Util::htmlspecialchars($context['search_params']['search']);
 		if (isset($context['search_params']['userspec']))
 			$context['search_params']['userspec'] = Util::htmlspecialchars($context['search_params']['userspec']);
+		if (empty($context['search_params']['minage']))
+			$context['search_params']['minage'] = 0;
+		if (empty($context['search_params']['maxage']))
+			$context['search_params']['maxage'] = 9999;
+
+		$context['search_params'] = $this->_fill_default_search_params($context['search_params']);
 
 		// Do we have captcha enabled?
 		if ($user_info['is_guest'] && !empty($modSettings['search_enable_captcha']) && empty($_SESSION['ss_vv_passed']) && (empty($_SESSION['last_ss']) || $_SESSION['last_ss'] != $search_params['search']))
@@ -798,6 +817,10 @@ class Search_Controller extends Action_Controller
 			'url' => $scripturl . '?action=search;sa=results;params=' . $context['params'],
 			'name' => $txt['search_results']
 		);
+
+		// Start guest off collapsed
+		if ($context['user']['is_guest'] && !isset($context['minmax_preferences']['asearch']))
+			$context['minmax_preferences']['asearch'] = 1;
 
 		// *** A last error check
 		call_integration_hook('integrate_search_errors');
@@ -1821,9 +1844,11 @@ class Search_Controller extends Action_Controller
 			'posted_in' => !empty($participants[$message['id_topic']]),
 			'views' => $message['num_views'],
 			'replies' => $message['num_replies'],
-			'can_reply' => in_array($message['id_board'], $boards_can['post_reply_any']) || in_array(0, $boards_can['post_reply_any']),
-			'can_quote' => (in_array($message['id_board'], $boards_can['post_reply_any']) || in_array(0, $boards_can['post_reply_any'])) && $quote_enabled,
-			'can_mark_notify' => in_array($message['id_board'], $boards_can['mark_any_notify']) || in_array(0, $boards_can['mark_any_notify']) && !$context['user']['is_guest'],
+			'tests' => array(
+				'can_reply' => in_array($message['id_board'], $boards_can['post_reply_any']) || in_array(0, $boards_can['post_reply_any']),
+				'can_quote' => (in_array($message['id_board'], $boards_can['post_reply_any']) || in_array(0, $boards_can['post_reply_any'])) && $quote_enabled,
+				'can_mark_notify' => in_array($message['id_board'], $boards_can['mark_any_notify']) || in_array(0, $boards_can['mark_any_notify']) && !$context['user']['is_guest'],
+			),
 			'first_post' => array(
 				'id' => $message['first_msg'],
 				'time' => standardTime($message['first_poster_time']),
@@ -1938,6 +1963,30 @@ class Search_Controller extends Action_Controller
 		);
 		$counter++;
 
+		if (!$context['compact'])
+		{
+			$output['buttons'] = array(
+				// Can we request notification of topics?
+				'notify' => array(
+					'href' => $scripturl . '?action=notify;topic=' . $output['id'] . '.' . 'msg' . $message['id_msg'],
+					'text' => $txt['notify'],
+					'test' => 'can_mark_notify',
+				),
+				// If they *can* reply?
+				'reply' => array(
+					'href' => $scripturl . '?action=post;topic=' . $output['id'] . '.msg' . $message['id_msg'],
+					'text' => $txt['reply'],
+					'test' => 'can_reply',
+				),
+				// If they *can* quote?
+				'quote' => array(
+					'href' => $scripturl . '?action=post;topic=' . $output['id'] . '.msg' . $message['id_msg'] . ';quote=' . $message['id_msg'],
+					'text' => $txt['quote'],
+					'test' => 'can_quote',
+				),
+			);
+		}
+
 		call_integration_hook('integrate_search_message_context', array($counter, &$output));
 
 		return $output;
@@ -1945,6 +1994,7 @@ class Search_Controller extends Action_Controller
 
 	/**
 	 * Used to highlight body text with strings that match the search term
+	 *
 	 * Callback function used in $body_highlighted
 	 *
 	 * @param string[] $matches
@@ -2026,6 +2076,37 @@ class Search_Controller extends Action_Controller
 				$this->_weight_total += $this->_weight[$weight_factor];
 			}
 		}
+	}
+
+	/**
+	 * Fills the empty spaces in an array with the default values for search params
+	 *
+	 * @param mixed[] $array
+	 */
+	private function _fill_default_search_params($array)
+	{
+		if (empty($array['search']))
+			$array['search'] = '';
+		if (empty($array['userspec']))
+			$array['userspec'] = '*';
+		if (empty($array['searchtype']))
+			$array['searchtype'] = 0;
+		if (!isset($array['show_complete']))
+			$array['show_complete'] = 0;
+		else
+			$array['show_complete'] = (int) $array['show_complete'];
+		if (!isset($array['subject_only']))
+			$array['subject_only'] = 0;
+		else
+			$array['subject_only'] = (int) $array['subject_only'];
+		if (empty($array['minage']))
+			$array['minage'] = 0;
+		if (empty($array['maxage']))
+			$array['maxage'] = 9999;
+		if (empty($array['sort']))
+			$array['sort'] = 'relevance';
+
+		return $array;
 	}
 
 	/**
@@ -2141,6 +2222,7 @@ class Search_Controller extends Action_Controller
 
 /**
  * This function compares the length of two strings plus a little.
+ * 
  * What it does:
  * - callback function for usort used to sort the fulltext results.
  * - passes sorting duty to the current API.

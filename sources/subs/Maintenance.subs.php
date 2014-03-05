@@ -22,6 +22,7 @@ if (!defined('ELK'))
 /**
  * Counts the total number of messages
  *
+ * @package Maintenance
  * @return int
  */
 function countMessages()
@@ -42,6 +43,7 @@ function countMessages()
 /**
  * Flushes all log tables
  *
+ * @package Maintenance
  */
 function flushLogTables()
 {
@@ -80,6 +82,7 @@ function flushLogTables()
 /**
  * Gets the table columns from the messages table, just a wrapper function
  *
+ * @package Maintenance
  * @return array
  */
 function getMessageTableColumns()
@@ -93,6 +96,8 @@ function getMessageTableColumns()
 /**
  * Retrieve informations about the body column of the messages table
  * Used in action_database
+ *
+ * @package Maintenance
  */
 function fetchBodyType()
 {
@@ -109,6 +114,7 @@ function fetchBodyType()
 /**
  * Resizes the body column from the messages table
  *
+ * @package Maintenance
  * @param string $type
  */
 function resizeMessageTableBody($type)
@@ -120,6 +126,7 @@ function resizeMessageTableBody($type)
 /**
  * Detects messages, which exceed the max message size
  *
+ * @package Maintenance
  * @param int $start
  * @param int $increment
  */
@@ -148,9 +155,11 @@ function detectExceedingMessages($start, $increment)
 
 /**
  * loads messages, which exceed the lenght that will fit in the col field
- * Used by maintenance when convert the column "body" of the table from TEXT to MEDIUMTEXT
- * and vice versa.
  *
+ * - Used by maintenance when convert the column "body" of the table from TEXT
+ * to MEDIUMTEXT and vice versa.
+ *
+ * @package Maintenance
  * @param int[] $msg
  * @return array
  */
@@ -179,8 +188,10 @@ function getExceedingMessages($msg)
 
 /**
  * Lists all the tables from our ElkArte installation.
- * Additional tables from addons are also included.
  *
+ * - Additional tables from addons are also included.
+ *
+ * @package Maintenance
  * @return array
  */
 function getElkTables()
@@ -205,6 +216,7 @@ function getElkTables()
 /**
  * Wrapper function for db_optimize_table
  *
+ * @package Maintenance
  * @param string $tablename
  */
 function optimizeTable($tablename)
@@ -215,8 +227,9 @@ function optimizeTable($tablename)
 }
 
 /**
- * gets the last topics id.
+ * Gets the last topics id.
  *
+ * @package Maintenance
  * @return int
  */
 function getMaxTopicID()
@@ -238,6 +251,7 @@ function getMaxTopicID()
 /**
  * Recounts all approved messages
  *
+ * @package Maintenance
  * @param int $start
  * @param int $increment
  */
@@ -277,6 +291,7 @@ function recountApprovedMessages($start, $increment)
 /**
  * Recounts all unapproved messages
  *
+ * @package Maintenance
  * @param int $start
  * @param int $increment
  */
@@ -316,8 +331,10 @@ function recountUnapprovedMessages($start, $increment)
 /**
  * Reset the boards table's counter for posts, topics, unapproved posts and
  * unapproved topics
- * Allowed parameters: num_posts, num_topics, unapproved_posts, unapproved_topcis
  *
+ * - Allowed parameters: num_posts, num_topics, unapproved_posts, unapproved_topcis
+ *
+ * @package Maintenance
  * @param string $column
  */
 function resetBoardsCounter($column)
@@ -343,6 +360,7 @@ function resetBoardsCounter($column)
 /**
  * Recalculates the boards table's counter
  *
+ * @package Maintenance
  * @param string $type - can be 'posts', 'topic', 'unapproved_posts', 'unapproved_topics'
  * @param int $start
  * @param int $increment
@@ -468,6 +486,8 @@ function updateBoardsCounter($type, $start, $increment)
 
 /**
  * Update the personal messages counter
+ *
+ * @package Maintenance
  */
 function updatePersonalMessagesCounter()
 {
@@ -509,6 +529,7 @@ function updatePersonalMessagesCounter()
 /**
  * Fixes the column id_board from the messages table.
  *
+ * @package Maintenance
  * @param int $start
  * @param int $increment
  */
@@ -546,6 +567,8 @@ function updateMessagesBoardID($start, $increment)
 
 /**
  * Updates the latest message of each board.
+ *
+ * @package Maintenance
  */
 function updateBoardsLastMessage()
 {
@@ -615,6 +638,7 @@ function updateBoardsLastMessage()
 /**
  * Counts topics from a given board.
  *
+ * @package Maintenance
  * @param int $id_board
  * @return int
  */
@@ -639,6 +663,7 @@ function countTopicsFromBoard($id_board)
 /**
  * Gets a list of topics which should be moved to a different board.
  *
+ * @package Maintenance
  * @param int $id_board
  */
 function getTopicsToMove($id_board)
@@ -669,6 +694,7 @@ function getTopicsToMove($id_board)
 /**
  * Counts members with posts > 0, we name them contributors
  *
+ * @package Maintenance
  * @return int
  */
 function countContributors()
@@ -695,6 +721,7 @@ function countContributors()
 /**
  * Recount the members posts.
  *
+ * @package Maintenance
  * @param int $start
  * @param int $increment
  * @return int
@@ -733,8 +760,11 @@ function updateMembersPostCount($start, $increment)
 
 /**
  * Used to find members who have a post count >0 that should not.
- * Made more difficult since we don't yet support sub-selects on joins so we
+ *
+ * - Made more difficult since we don't yet support sub-selects on joins so we
  * place all members who have posts in the message table in a temp table
+ *
+ * @package Maintenance
  */
 function updateZeroPostMembers()
 {
@@ -792,6 +822,7 @@ function updateZeroPostMembers()
 /**
  * Removing old and inactive members
  *
+ * @package Maintenance
  * @param string $type
  * @param int[] $groups
  * @param int $time_limit

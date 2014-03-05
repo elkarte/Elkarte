@@ -28,6 +28,8 @@ function template_ProfileInfo_init()
 	// This setting is used to load a certain number of attachments
 	// in the user's profile summary, change it to a number if you need any
 	$settings['attachments_on_summary'] = 10;
+
+	loadTemplate('GenericMessages');
 }
 
 /**
@@ -138,57 +140,18 @@ function template_action_showPosts()
 		// For every post to be displayed, give it its own div, and show the important details of the post.
 		foreach ($context['posts'] as $post)
 		{
-			echo '
-			<div class="', $post['alternate'] == 0 ? 'windowbg2' : 'windowbg', ' core_posts">
-				<div class="content">
-					<div class="counter">', $post['counter'], '</div>
-					<div class="topic_details">
-						<h5><strong>', $post['board']['link'], ' / ', $post['topic']['link'], '</strong></h5>
-						<span class="smalltext">', $post['time'], '</span>
-					</div>
-					<div class="inner">';
+			$post['title'] = '<strong>' . $post['board']['link'] . ' / ' . $post['topic']['link'] . '</strong>';
+			$post['date'] = $post['html_time'];
+			$post['class'] = $post['alternate'] === 0 ? 'windowbg2' : 'windowbg';
 
 			if (!$post['approved'])
-				echo '
+				$post['body'] = '
 						<div class="approve_post">
-							<em>', $txt['post_awaiting_approval'], '</em>
-						</div>';
+							<em>' . $txt['post_awaiting_approval'] . '</em>
+						</div>' . '
+					' . $post['body'];
 
-			echo '
-					', $post['body'], '
-					</div>';
-
-			if ($post['can_reply'] || $post['can_mark_notify'] || $post['can_delete'])
-				echo '
-					<ul class="quickbuttons">';
-
-			// How about... even... remove it entirely?!
-			if ($post['can_delete'])
-				echo '
-						<li class="listlevel1"><a href="', $scripturl, '?action=deletemsg;msg=', $post['id'], ';topic=', $post['topic']['id'], ';profile;u=', $context['member']['id'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['remove_message'], '?\');" class="linklevel1 remove_button"><span>', $txt['remove'], '</span></a></li>';
-
-			// Can we request notification of topics?
-			if ($post['can_mark_notify'])
-				echo '
-						<li class="listlevel1"><a href="', $scripturl, '?action=notify;topic=', $post['topic']['id'], '.', $post['start'], '" class="linklevel1 notify_button">', $txt['notify'], '</a></li>';
-
-			// If they *can* reply?
-			if ($post['can_reply'])
-				echo '
-						<li class="listlevel1"><a href="', $scripturl, '?action=post;topic=', $post['topic']['id'], '.', $post['start'], '" class="linklevel1 reply_button">', $txt['reply'], '</a></li>';
-
-			// If they *can* quote?
-			if ($post['can_quote'])
-				echo '
-						<li class="listlevel1"><a href="', $scripturl . '?action=post;topic=', $post['topic']['id'], '.', $post['start'], ';quote=', $post['id'], '" class="linklevel1 quote_button">', $txt['quote'], '</a></li>';
-
-			if ($post['can_reply'] || $post['can_mark_notify'] || $post['can_delete'])
-				echo '
-					</ul>';
-
-			echo '
-				</div>
-			</div>';
+			template_simple_message($post);
 		}
 	}
 
@@ -1114,14 +1077,17 @@ function template_profile_block_buddies()
 							&nbsp;<a href="', $scripturl, '?action=pm;sa=send;u=', $data['id'], '"><img src="', $settings['images_url'], '/profile/', ($data['online']['is_online']) ? 'im_on.png' : 'im_off.png', '" alt="', $txt['profile_sendpm_short'], '" title="', $txt['profile_sendpm_short'], ' to ', $data['name'], '" class="icon"/></a>';
 
 				// Other contact info from custom profile fields?
-				$im = array();
-				foreach ($data['custom_fields'] as $key => $cpf)
-					if ($cpf['placement'] == 1)
-						$im[] = $cpf['value'];
+				if (isset($data['custom_fields']))
+				{
+					$im = array();
 
-				echo '
+					foreach ($data['custom_fields'] as $key => $cpf)
+						if ($cpf['placement'] == 1)
+							$im[] = $cpf['value'];
+
+					echo '
 							&nbsp;' . implode('&nbsp;', $im);
-
+				}
 				// Done with the contact information
 				echo '
 						</td>';

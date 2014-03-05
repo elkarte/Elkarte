@@ -22,6 +22,7 @@ if (!defined('ELK'))
 
 /**
  * Manage features and options administration page.
+ *
  * This controller handles the pages which allow the admin
  * to see and change the basic feature settings of their site.
  */
@@ -71,8 +72,8 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * This function passes control through to the relevant tab.
-	 * @see Action_Controller::action_index()
 	 *
+	 * @see Action_Controller::action_index()
 	 * @uses Help, ManageSettings languages
 	 * @uses sub_template show_settings
 	 */
@@ -180,7 +181,8 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * Config array for changing the basic forum settings
-	 * Accessed  from ?action=admin;area=featuresettings;sa=basic;
+	 *
+	 * - Accessed from ?action=admin;area=featuresettings;sa=basic;
 	 */
 	public function action_basicSettings_display()
 	{
@@ -234,7 +236,8 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * Allows modifying the global layout settings in the forum
-	 * Accessed through ?action=admin;area=featuresettings;sa=layout;
+	 *
+	 * - Accessed through ?action=admin;area=featuresettings;sa=layout;
 	 */
 	public function action_layoutSettings_display()
 	{
@@ -284,7 +287,8 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * Display configuration settings page for karma settings.
-	 * Accessed from ?action=admin;area=featuresettings;sa=karma;
+	 *
+	 * - Accessed from ?action=admin;area=featuresettings;sa=karma;
 	 */
 	public function action_karmaSettings_display()
 	{
@@ -332,7 +336,8 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * Display configuration settings page for likes settings.
-	 * Accessed from ?action=admin;area=featuresettings;sa=likes;
+	 *
+	 * - Accessed from ?action=admin;area=featuresettings;sa=likes;
 	 */
 	public function action_likesSettings_display()
 	{
@@ -380,7 +385,8 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * Initializes the mentions settings admin page.
-	 * Accessed from ?action=admin;area=featuresettings;sa=mentions;
+	 *
+	 * - Accessed from ?action=admin;area=featuresettings;sa=mentions;
 	 */
 	public function action_mentionSettings_display()
 	{
@@ -443,7 +449,8 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * Display configuration settings for signatures on forum.
-	 * Accessed from ?action=admin;area=featuresettings;sa=sig;
+	 *
+	 * - Accessed from ?action=admin;area=featuresettings;sa=sig;
 	 */
 	public function action_signatureSettings_display()
 	{
@@ -780,9 +787,9 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * Show all the custom profile fields available to the user.
-	 * Allows for drag/drop sorting of custom profile fields
 	 *
-	 * Accessed with ?action=admin;area=featuresettings;sa=profile
+	 * - Allows for drag/drop sorting of custom profile fields
+	 * - Accessed with ?action=admin;area=featuresettings;sa=profile
 	 *
 	 * @uses sub template show_custom_profile
 	 */
@@ -1053,7 +1060,8 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * Edit some profile fields?
-	 * Accessed with ?action=admin;area=featuresettings;sa=profileedit
+	 *
+	 * - Accessed with ?action=admin;area=featuresettings;sa=profileedit
 	 *
 	 * @uses sub template edit_profile_field
 	 */
@@ -1342,7 +1350,8 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * Editing personal messages settings
-	 * Accessed with ?action=admin;area=featuresettings;sa=pmsettings
+	 *
+	 * - Accessed with ?action=admin;area=featuresettings;sa=pmsettings
 	 */
 	public function action_pmsettings()
 	{
@@ -1627,7 +1636,8 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * Return signature settings.
-	 * Used in admin center search and settings form
+	 *
+	 * - Used in admin center search and settings form
 	 */
 	private function _signatureSettings()
 	{
@@ -1667,7 +1677,8 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * Return pm settings.
-	 * Used in admin center search and settings form
+	 *
+	 * - Used in admin center search and settings form
 	 */
 	private function _pmSettings()
 	{
@@ -1699,8 +1710,7 @@ class ManageFeatures_Controller extends Action_Controller
  *
  * @todo Move to subs file
  * @todo Merge with other pause functions?
- *    pausePermsSave(), pausAttachmentMaintenance()
- *    pauseRepairProcess()
+ *    pausePermsSave(), pausAttachmentMaintenance(), pauseRepairProcess()
  *
  * @param int $applied_sigs
  */

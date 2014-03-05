@@ -167,4 +167,12 @@ abstract class DbTable
 		// Only SQLite needed it.
 		return;
 	}
+
+	/**
+	 * Return a copy of this instance package log
+	 */
+	public function package_log()
+	{
+		return;
+	}
 }

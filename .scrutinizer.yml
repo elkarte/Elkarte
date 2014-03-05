@@ -14,15 +14,15 @@ filter:
         - themes/default/scripts/jquery-1.10.2.min.js
         - themes/default/scripts/jquery.atwho.js
         - themes/default/scripts/jquery.caret.js
-        - themes/default/scripts/jquery.sceditor.bbcode.js
-        - themes/default/scripts/jquery.sceditor.js
+        - themes/default/scripts/jquery.sceditor.bbcode.min.js
+        - themes/default/scripts/jquery.sceditor.min.js
         - themes/default/scripts/jqueryui-1.10.3.min.js
-        - themes/default/scripts/prettify.js
+        - themes/default/scripts/prettify.min.js
         - themes/default/scripts/sha256.js
 tools:
     js_hint:
         filter:
-            excluded_paths: ['attachments/*', 'avatars/*', 'cache/*', 'docs/*', 'packages/*', 'smileys/*', 'tests/*', 'sources/ext/*', 'ext/*', themes/default/scripts/jquery-1.10.2.min.js, themes/default/scripts/jquery.atwho.js, themes/default/scripts/jquery.caret.js, themes/default/scripts/jquery.sceditor.bbcode.js, themes/default/scripts/jquery.sceditor.js, themes/default/scripts/jqueryui-1.10.3.min.js, themes/default/scripts/prettify.js, themes/default/scripts/sha256.js]
+            excluded_paths: ['attachments/*', 'avatars/*', 'cache/*', 'docs/*', 'packages/*', 'smileys/*', 'tests/*', 'sources/ext/*', 'ext/*', themes/default/scripts/jquery-1.10.2.min.js, themes/default/scripts/jquery.atwho.js, themes/default/scripts/jquery.caret.js, themes/default/scripts/jquery.sceditor.bbcode.min.js, themes/default/scripts/jquery.sceditor.min.js, themes/default/scripts/jqueryui-1.10.3.min.js, themes/default/scripts/prettify.min.js, themes/default/scripts/sha256.js]
         config:
             predef: [elk_theme_url, elk_default_theme_url, elk_images_url, elk_smiley_url, elk_scripturl, elk_iso_case_folding, elk_charset, elk_session_id, elk_prepareScriptUrl, elk_session_var, elk_member_id, ajax_notification_text, ajax_notification_cancel_text, help_popup_heading_text, use_click_menu, todayMod, addLoadEvent, createEventListener, sendXMLDocument, reqWin, is_ie, ourVersions, elk_formSubmitted, isEmptyText, escape, sYourVersion, setOuterHTML, ourLanguageVersions, jQuery, $, _, alert, _self, base]
             global: { elk_theme_url: false, elk_default_theme_url: false, elk_images_url: false, elk_smiley_url: false, elk_scripturl: false, elk_iso_case_folding: false, elk_charset: false, elk_session_id: false, elk_prepareScriptUrl: false, elk_session_var: false, elk_member_id: false, ajax_notification_text: false, ajax_notification_cancel_text: false, help_popup_heading_text: false, use_click_menu: false, todayMod: false, addLoadEvent: false, createEventListener: false, sendXMLDocument: false, reqWin: false, is_ie: false, ourVersions: false, elk_formSubmitted: false, isEmptyText: false, escape: false, sYourVersion: false, setOuterHTML: false, ourLanguageVersions: false, jQuery: false, $: false, _: false, alert: false, _self: false, base: false }

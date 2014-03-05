@@ -25,6 +25,7 @@ if (!defined('ELK'))
  * Reads a .tar.gz file, filename, in and extracts file(s) from it.
  * essentially just a shortcut for read_tgz_data().
  *
+ * @package Packages
  * @param string $gzfilename
  * @param string $destination
  * @param bool $single_file = false
@@ -55,7 +56,7 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
 /**
  * Extracts a file or files from the .tar.gz contained in data.
  *
- * detects if the file is really a .zip file, and if so returns the result of read_zip_data
+ * - detects if the file is really a .zip file, and if so returns the result of read_zip_data
  *
  * if destination is null
  *  - returns a list of files in the archive.
@@ -65,12 +66,13 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
  *  - destination can start with * and / to signify that the file may come from any directory.
  *  - destination should not begin with a / if single_file is true.
  *
- * overwrites existing files with newer modification times if and only if overwrite is true.
- * creates the destination directory if it doesn't exist, and is is specified.
- * requires zlib support be built into PHP.
- * returns an array of the files extracted on success
- * if files_to_extract is not equal to null only extracts the files within this array.
+ * -  existing files with newer modification times if and only if overwrite is true.
+ * - creates the destination directory if it doesn't exist, and is is specified.
+ * - requires zlib support be built into PHP.
+ * - returns an array of the files extracted on success
+ * - if files_to_extract is not equal to null only extracts the files within this array.
  *
+ * @package Packages
  * @param string $data
  * @param string $destination
  * @param bool $single_file = false,
@@ -256,8 +258,11 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
 }
 
 /**
- * Extract zip data.  If destination is null, return a listing.
+ * Extract zip data.
  *
+ * - If destination is null, return a listing.
+ *
+ * @package Packages
  * @param string $data
  * @param string $destination
  * @param bool $single_file
@@ -379,6 +384,7 @@ function read_zip_data($data, $destination, $single_file = false, $overwrite = f
  * Checks the existence of a remote file since file_exists() does not do remote.
  * will return false if the file is "moved permanently" or similar.
  *
+ * @package Packages
  * @param string $url
  * @return boolean true if the remote url exists.
  */
@@ -404,10 +410,12 @@ function url_exists($url)
 
 /**
  * Loads and returns an array of installed packages.
+ *
  * - gets this information from packages/installed.list.
  * - returns the array of data.
  * - default sort order is package_installed time
  *
+ * @package Packages
  * @return array
  */
 function loadInstalledPackages()
@@ -465,11 +473,13 @@ function loadInstalledPackages()
 
 /**
  * Loads a package's information and returns a representative array.
+ *
  * - expects the file to be a package in packages/.
  * - returns a error string if the package-info is invalid.
  * - otherwise returns a basic array of id, version, filename, and similar information.
  * - an Xml_Array is available in 'xml'.
  *
+ * @package Packages
  * @param string $gzfilename
  */
 function getPackageInfo($gzfilename)
@@ -525,6 +535,7 @@ function getPackageInfo($gzfilename)
 /**
  * Create a chmod control for chmoding files.
  *
+ * @package Packages
  * @param string[] $chmodFiles
  * @param mixed[] $chmodOptions
  * @param boolean $restore_write_status
@@ -844,6 +855,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 /**
  * Use FTP functions to work with a package download/install
  *
+ * @package Packages
  * @param string $destination_url
  * @param string[]|null $files = none
  * @param bool $return = false
@@ -1040,12 +1052,14 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 /**
  * Parses the actions in package-info.xml file from packages.
  *
+ * What it does:
  * - package should be an Xml_Array with package-info as its base.
  * - testing_only should be true if the package should not actually be applied.
  * - method can be upgrade, install, or uninstall.  Its default is install.
  * - previous_version should be set to the previous installed version of this package, if any.
  * - does not handle failure terribly well; testing first is always better.
  *
+ * @package Packages
  * @param Xml_Array $packageXML
  * @param bool $testing_only = true
  * @param string $method = 'install' ('install', 'upgrade', or 'uninstall')
@@ -1488,10 +1502,12 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 
 /**
  * Checks if version matches any of the versions in versions.
+ *
  * - supports comma separated version numbers, with or without whitespace.
  * - supports lower and upper bounds. (1.0-1.2)
  * - returns true if the version matched.
  *
+ * @package Packages
  * @param string $versions
  * @param boolean $reset
  * @param string $the_version
@@ -1534,10 +1550,12 @@ function matchHighestPackageVersion($versions, $reset = false, $the_version)
 
 /**
  * Checks if the forum version matches any of the available versions from the package install xml.
+ *
  * - supports comma separated version numbers, with or without whitespace.
  * - supports lower and upper bounds. (1.0-1.2)
  * - returns true if the version matched.
  *
+ * @package Packages
  * @param string $version
  * @param string $versions
  * @return boolean
@@ -1578,10 +1596,12 @@ function matchPackageVersion($version, $versions)
 
 /**
  * Compares two versions and determines if one is newer, older or the same, returns
+ *
  * - (-1) if version1 is lower than version2
  * - (0) if version1 is equal to version2
  * - (1) if version1 is higher than version2
  *
+ * @package Packages
  * @param string $version1
  * @param string $version2
  * @return int (-1, 0, 1)
@@ -1642,6 +1662,7 @@ function compareVersions($version1, $version2)
 /**
  * Parses special identifiers out of the specified path.
  *
+ * @package Packages
  * @param string $path
  * @return string The parsed path
  */
@@ -1679,8 +1700,10 @@ function parse_path($path)
 
 /**
  * Deletes a directory, and all the files and direcories inside it.
- * requires access to delete these files.
  *
+ * - requires access to delete these files.
+ *
+ * @package Packages
  * @param string $dir
  * @param bool $delete_dir = true
  */
@@ -1754,8 +1777,10 @@ function deltree($dir, $delete_dir = true)
 
 /**
  * Creates the specified tree structure with the mode specified.
- * creates every directory in path until it finds one that already exists.
  *
+ * - creates every directory in path until it finds one that already exists.
+ *
+ * @package Packages
  * @param string $strPath
  * @param int|false $mode
  * @return boolean true if successful, false otherwise
@@ -1825,8 +1850,10 @@ function mktree($strPath, $mode)
 
 /**
  * Copies one directory structure over to another.
- * requires the destination to be writable.
  *
+ * - requires the destination to be writable.
+ *
+ * @package Packages
  * @param string $source
  * @param string $destination
  */
@@ -1876,6 +1903,7 @@ function copytree($source, $destination)
 /**
  * Create a tree listing for a given directory path
  *
+ * @package Packages
  * @param string $path
  * @param string $sub_path = ''
  * @return array
@@ -1910,6 +1938,7 @@ function listtree($path, $sub_path = '')
 /**
  * Parses a xml-style modification file (file).
  *
+ * @package Packages
  * @param string $file
  * @param bool $testing = true tells it the modifications shouldn't actually be saved.
  * @param bool $undo = false specifies that the modifications the file requests should be undone; this doesn't work with everything (regular expressions.)
@@ -2293,6 +2322,8 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 
 /**
  * Parses a boardmod-style modification file (file).
+ *
+ * @package Packages
  * @param string $file
  * @param bool $testing = true tells it the modifications shouldn't actually be saved.
  * @param bool $undo = false specifies that the modifications the file requests should be undone.
@@ -2608,6 +2639,7 @@ function parseBoardMod($file, $testing = true, $undo = false, $theme_paths = arr
 /**
  * Get the physical contents of a packages file
  *
+ * @package Packages
  * @param string $filename
  * @return string
  */
@@ -2634,10 +2666,12 @@ function package_get_contents($filename)
 
 /**
  * Writes data to a file, almost exactly like the file_put_contents() function.
- * uses FTP to create/chmod the file when necessary and available.
- * uses text mode for text mode file extensions.
- * returns the number of bytes written.
  *
+ * - uses FTP to create/chmod the file when necessary and available.
+ * - uses text mode for text mode file extensions.
+ * - returns the number of bytes written.
+ *
+ * @package Packages
  * @param string $filename
  * @param string $data
  * @param bool $testing
@@ -2699,6 +2733,7 @@ function package_put_contents($filename, $data, $testing = false)
 /**
  * Clears (removes the files) the current package cache (temp directory)
  *
+ * @package Packages
  * @param boolean $trash
  */
 function package_flush_cache($trash = false)
@@ -2756,6 +2791,7 @@ function package_flush_cache($trash = false)
 /**
  * Try to make a file writable.
  *
+ * @package Packages
  * @param string $filename
  * @param string $perm_state = 'writable'
  * @param bool $track_change = false
@@ -2891,6 +2927,7 @@ function package_chmod($filename, $perm_state = 'writable', $track_change = fals
 /**
  * Used to crypt the supplied ftp password in this session
  *
+ * @package Packages
  * @param string $pass
  * @return string The encrypted password
  */
@@ -2912,6 +2949,7 @@ function package_crypt($pass)
  * Creates a site backup before installing a package just in case things don't go
  * as planned.
  *
+ * @package Packages
  * @param string $id
  */
 function package_create_backup($id = 'backup')
@@ -3091,6 +3129,7 @@ function package_create_backup($id = 'backup')
  * - if post_data is supplied, the value and lenght is posted to the given url as form data
  * - URL must be supplied in lowercase
  *
+ * @package Packages
  * @param string $url
  * @param string $post_data = ''
  * @param bool $keep_alive = false
@@ -3267,9 +3306,11 @@ if (!function_exists('crc32_compat'))
 
 /**
  * Checks if a package is installed or not
- * If installed returns an array of themes, db changes and versions associated with
+ *
+ * - If installed returns an array of themes, db changes and versions associated with
  * the package id
  *
+ * @package Packages
  * @param string $id of package to check
  */
 function isPackageInstalled($id)
@@ -3322,6 +3363,7 @@ function isPackageInstalled($id)
 /**
  * For uninstalling action, updates the log_packages install_state state to 0 (uninstalled)
  *
+ * @package Packages
  * @param string $id package_id to update
  */
 function setPackageState($id)
@@ -3350,6 +3392,7 @@ function setPackageState($id)
 /**
  * Checks if a package is installed, and if so returns its version level
  *
+ * @package Packages
  * @param string $id
  */
 function checkPackageDependency($id)
@@ -3380,6 +3423,7 @@ function checkPackageDependency($id)
 /**
  * Adds a record to the log packages table
  *
+ * @package Packages
  * @param mixed[] $packageInfo
  * @param string $failed_step_insert
  * @param string $themes_installed
@@ -3412,6 +3456,8 @@ function addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $db
 
 /**
  * Called from action_flush, used to flag all packages as uninstalled.
+ *
+ * @package Packages
  */
 function setPackagesAsUninstalled()
 {
@@ -3430,6 +3476,7 @@ function setPackagesAsUninstalled()
 /**
  * Validates that the remote url is one of our known package servers
  *
+ * @package Packages
  * @param string $remote_url
  */
 function isAuthorizedServer($remote_url)

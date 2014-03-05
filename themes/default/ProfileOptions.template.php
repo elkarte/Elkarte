@@ -16,6 +16,15 @@
  */
 
 /**
+ * We need this template in order to look at ignored boards
+ */
+function template_ProfileOptions_init()
+{
+	loadTemplate('GenericBoards');
+}
+
+
+/**
  * Template for showing all the buddies of the current user.
  */
 function template_editBuddies()
@@ -1003,53 +1012,9 @@ function template_ignoreboards()
 		</h2>
 		<p class="description">', $txt['ignoreboards_info'], '</p>
 		<div class="windowbg2">
-			<div class="content flow_hidden">
-				<ul class="ignoreboards floatleft">';
+			<div class="content flow_hidden">';
 
-	$i = 0;
-	$limit = ceil($context['num_boards'] / 2);
-	foreach ($context['categories'] as $category)
-	{
-		if ($i == $limit)
-		{
-			echo '
-				</ul>
-				<ul class="ignoreboards floatright">';
-
-			$i++;
-		}
-
-		echo '
-					<li class="category">
-						<a href="javascript:void(0);" onclick="selectBoards([', implode(', ', $category['child_ids']), '], \'creator\'); return false;">', $category['name'], '</a>
-						<ul>';
-
-		foreach ($category['boards'] as $board)
-		{
-			if ($i == $limit)
-				echo '
-						</ul>
-					</li>
-				</ul>
-				<ul class="ignoreboards floatright">
-					<li class="category">
-						<ul>';
-
-			echo '
-							<li class="board" style="margin-', $context['right_to_left'] ? 'right' : 'left', ': ', $board['child_level'], 'em;">
-								<label for="ignore_brd', $board['id'], '"><input type="checkbox" id="ignore_brd', $board['id'], '" name="ignore_brd[', $board['id'], ']" value="', $board['id'], '"', $board['selected'] ? ' checked="checked"' : '', ' class="input_check" /> ', $board['name'], '</label>
-							</li>';
-
-			$i++;
-		}
-
-		echo '
-						</ul>
-					</li>';
-	}
-
-	echo '
-				</ul>';
+	template_pick_boards('creator', 'ignore_brd', false);
 
 	// Show the standard "Save Settings" profile button.
 	template_profile_save();
