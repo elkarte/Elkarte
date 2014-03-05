@@ -1,7 +1,7 @@
 /* INTRODUCTION
 /* This is the standard Elkarte default theme.
 /* This file contains essential layout code only.
-/* Colors, gradients, images, etc are in _variantname.css.
+/* Colors, gradients, images, etc. are in _variantname.css.
 /*
 /* All theme variants depend on this layout code for stability.
 /* It is better to copy code to a variant CSS file for testing.
@@ -19,7 +19,7 @@
 /*		$BUTTONS.............Most button strips.
 /*		$PAGELINKS...........Page navigation links.
 /*
-/*		$TABLES..............Generic tables (memberlist, error log, etc).
+/*		$TABLES..............Generic tables (memberlist, error log, etc.).
 /*		$SETTINGS............Generic lists for settings pages.
 /*		$BOARDS..............Board index, sub-boards, and message index.
 /*
@@ -99,7 +99,7 @@ p, fieldset, form, input, button, select, textarea, .editor {
 .wrapper, div.windowbg, div.windowbg2,
 .roundframe, .description, .information, .successbox, .warningbox,
 .category_header, .generic_list_wrapper, .submitbutton, .styled-select,
-.grid8, .grid20, .grid25, .grid30, .grid33, .grid50 {
+.grid8, .grid20, .grid25, .grid30, .grid33, .grid50, #description_board .generalinfo {
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
@@ -216,14 +216,12 @@ select option {
 	font-weight: normal;
 	background: transparent;
 	border: none;
-	outline: none;
 	box-shadow: none;
 	background-image: none;
-	width: 100%;
 	padding: 1px 2em 1px 2px;
 }
 
-/* Can't hide the arrow in ie<10 so we positon it off div */
+/* Can't hide the arrow in ie<10 so we position it off div */
 #ie8 .styled-select select, #ie9 .styled-select select {
 	width: 140%;
 }
@@ -644,7 +642,7 @@ div.windowbg, div.windowbg2 {
 	margin: 0;
 	padding: 10px 0 0;
 }
-/* The .information box is used by the after_title additonal row */
+/* The .information box is used by the after_title additional row */
 .generic_list_wrapper .information .additional_row {
 	border: none;
 	padding: 6px 0;
@@ -826,7 +824,7 @@ a.bbc_link {
 	cursor: pointer;
 }
 #top_section_notice .button_submit {
-	margin-top: 0px;
+	margin-top: 0;
 	vertical-align: top;
 }
 /* some help for ie8 */
@@ -1825,8 +1823,6 @@ img.new_posts {
 #description_board .generalinfo {
 	display: table;
 	width: 100%;
-	box-sizing: border-box;
-	-moz-box-sizing: border-box;
 }
 .topic_listing {
 	padding: 1px 0 0 0;
@@ -1937,7 +1933,7 @@ img.new_posts {
 	padding: 2px 2px 0 2px;
 }
 .topic_listing .warningbox {
-	margin-bottom: 0px;
+	margin-bottom: 0;
 }
 .qaction_row {
 	text-align: right;
@@ -2706,8 +2702,8 @@ dl.merge_topic dd {
 
 
 /* Styles for the $TABS	*/
-/* We can't control what jqueryui pollutes the DOM with, so deal with it */
-/* Styles for the profile summary tabs, or any jquery ui tabs */
+/* We can't control what jQueryui pollutes the DOM with, so deal with it */
+/* Styles for the profile summary tabs, or any jQuery ui tabs */
 /* ---------------------------------------------------------- */
 .ui-tabs {
 	zoom: 1;
@@ -3811,7 +3807,7 @@ a.help .icon {
 }
 
 /*floating error box*/
-/* currently used by like funcationality*/
+/* currently used by like functionality */
 .floating_error {
 	position: fixed;
 	width: 50%;
@@ -3850,7 +3846,7 @@ a.help .icon {
 /* in the available space. This is dependent not just on width in pixels,
 /* but also on the user-selected text size that is set in the browser.
 /*
-/* If, for whatever reason (eyesight, pixel pitch, workstation arrangement, etc)
+/* If, for whatever reason (eyesight, pixel pitch, workstation arrangement, etc.)
 /* a user requires text 50% larger than theme default, then their screen is
 /* effectively a lot smaller than its nominal resolution would indicate.
 /* If the break points are set in em, suddenly the media queries become equally
@@ -3876,7 +3872,7 @@ a.help .icon {
 /* given that there is supposed to be a separate phone theme.
 /* Am currently inclined to think that just having break points that correlate
 /* to 1024, 800 and 480 at standard font size is probably adequate. */
-/* using 100% = 1 em ~= 16px ~= 14pt for our em sizing .. 64em*16px = 1024 etc */
+/* using 100% = 1 em ~= 16px ~= 14pt for our em sizing .. 64em*16px = 1024 etc. */
 
 /* This one does 1024 screens at default font size. */
 @media screen and (max-width: 64em) {
@@ -4191,7 +4187,7 @@ a.help .icon {
 		margin-bottom: 2px;
 	}
 	.board_row {
-		padding: 15px 0px;
+		padding: 15px 0;
 	}
 	.board_info h3 a {
 		font-size: 1.357em;
@@ -4324,7 +4320,7 @@ a.help .icon {
 	.forumposts .windowbg, .forumposts .windowbg2 {
 		margin-bottom: 6px;
 	}
-	#moderationbuttons,  a.linklevel1.button_strip_notify,
+	#moderationbuttons, a.linklevel1.button_strip_notify,
 	a.linklevel1.button_strip_print, a.linklevel1.button_strip_send, .inline_mod_check,
 	a.linklevel1.quotetonew_button, a.linklevel1.button_strip_post_poll,
 	a.linklevel1.post_options, .keyinfo .post_subject, li.listlevel1.quickmod_select_all,
