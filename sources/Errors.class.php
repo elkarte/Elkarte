@@ -372,6 +372,19 @@ class attachment_error_context
 	}
 
 	/**
+	 * Removes an error
+	 *
+	 * @param string $error error code
+	 */
+	public function removeError($error)
+	{
+		if (empty($error))
+			return;
+
+		$this->_attachs[$this->_active_attach]['error']->removeError($error);
+	}
+
+	/**
 	 * If this error context has errors stored.
 	 *
 	 * @param string $attachID
