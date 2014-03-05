@@ -281,7 +281,7 @@ class Error_Context
 /**
  * Class Error context for attachments
  */
-class attachment_error_context
+class Attachment_Error_Context
 {
 	/**
 	 * Holds our static instance of the class
@@ -453,13 +453,13 @@ class attachment_error_context
 	}
 
 	/**
-	 * Find and return attachment_error_context instance if it exists,
+	 * Find and return Attachment_Error_Context instance if it exists,
 	 * or create it if it doesn't exist
 	 */
 	public static function context()
 	{
 		if (self::$_context === null)
-			self::$_context = new attachment_error_context();
+			self::$_context = new Attachment_Error_Context();
 
 		return self::$_context;
 	}

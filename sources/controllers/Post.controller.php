@@ -60,7 +60,7 @@ class Post_Controller extends Action_Controller
 			unset($_REQUEST['poll']);
 
 		$post_errors = Error_Context::context('post', 1);
-		$attach_errors = attachment_Error_Context::context();
+		$attach_errors = Attachment_Error_Context::context();
 		$attach_errors->activate();
 		$first_subject = '';
 
@@ -1020,7 +1020,7 @@ class Post_Controller extends Action_Controller
 
 		// No errors as yet.
 		$post_errors = Error_Context::context('post', 1);
-		$attach_errors = attachment_Error_Context::context();
+		$attach_errors = Attachment_Error_Context::context();
 
 		// If the session has timed out, let the user re-submit their form.
 		if (checkSession('post', '', false) != '')
