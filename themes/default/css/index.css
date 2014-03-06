@@ -3663,7 +3663,7 @@ a.help .icon {
 .mlist li {
 	display: table-row;
 }
-.mlist li span {
+.mlist li div {
 	display: table-cell;
 	padding: 5px 8px;
 }
@@ -3671,7 +3671,7 @@ a.help .icon {
 	height: 2em;
 	line-height: 2em;
 }
-.letter_row>div {
+.letter_row>h3 {
 	position: absolute;
 	left: 45%;
 	vertical-align: middle;

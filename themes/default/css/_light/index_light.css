@@ -1606,15 +1606,15 @@ div.bbc_footnotes .meaction{
 .mlist {
 	background: #f3f3f3;
 }
-.mlist .mlist_header span {
+.mlist .mlist_header div {
 	border-top: none;
 }
-.mlist li span {
+.mlist li div {
 	background-color: #fff;
 	border-bottom: 1px solid #ccc;
 	border-top: 1px solid #ccc;
 }
-.mlist li.alternate_row span {
+.mlist li.alternate_row div {
 	background-color: #fafafa;
 	border-bottom: 1px solid #ccc;
 	border-top: 1px solid #ccc;
