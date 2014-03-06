@@ -3654,6 +3654,29 @@ a.help .icon {
 }
 
 /* The memberlist. */
+.mlist {
+	display: table;
+	width: 100%;
+}
+.mlist li {
+	display: table-row;
+}
+.mlist li span {
+	display: table-cell;
+	padding: 5px 8px;
+}
+/* Attention: the second div is needed for emulating colspan! */
+.letter_row {
+	background-color: #ccc !important;
+}
+.letter_row>span {
+	background-color: #ccc;
+	text-align: center;
+	font-weight: bold;
+}
+.mlist_header {
+	font-weight: bold;
+}
 #memberlist {
 	margin: 6px 0 0 0;
 }
