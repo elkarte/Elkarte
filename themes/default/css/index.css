@@ -4123,6 +4123,9 @@ a.help .icon {
 	#list_mentions .listaction {
 		display: none;
 	}
+	.mlist li div:nth-child(n+6) {
+		display: none;
+	}
 }
 /* This one does 540 and smaller screens at default font size. */
 @media screen and (max-width: 33.750em) {
@@ -4475,6 +4478,9 @@ a.help .icon {
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
+	.mlist li div:nth-child(4) {
+		display: none;
+	}
 }
 /* This one does 480px screens at default font size. */
 @media screen and (max-width: 30em) {
@@ -4482,6 +4488,9 @@ a.help .icon {
 		display: none;
 	}
 	.quickbuttons .modified {
+		display: none;
+	}
+	.mlist li div:nth-child(5) {
 		display: none;
 	}
 }
