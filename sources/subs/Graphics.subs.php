@@ -366,7 +366,7 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 		elseif (!empty($preferred_format) && ($preferred_format == 1) && function_exists('imagegif'))
 			$success = imagegif($dst_img, $destName);
 		elseif (function_exists('imagejpeg'))
-			$success = imagejpeg($dst_img, $destName);
+			$success = imagejpeg($dst_img, $destName, 80);
 
 		// Free the memory.
 		imagedestroy($src_img);
