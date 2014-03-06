@@ -1226,6 +1226,26 @@ span.views_text {
 	cursor: pointer;
 }
 
+/*	$MEMBERLIST		*/
+/* ------------------------------------------------------- */
+.mlist {
+	background-color: #eee;
+}
+
+.mlist .mlist_header span {
+	border-top: none;
+}
+.mlist li span {
+	background-color: #fff;
+	border-bottom: 1px solid #ccc;
+	border-top: 1px solid #ccc;
+}
+.mlist li.alternate_row span {
+	background-color: #fafafa;
+	border-bottom: 1px solid #ccc;
+	border-top: 1px solid #ccc;
+}
+
 /*	$MEDIA		*/
 /* Experimental media queries.
 /* ------------------------------------------------------- */

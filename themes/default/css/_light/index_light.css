@@ -1596,6 +1596,29 @@ div.bbc_footnotes .meaction{
 	box-shadow: 0px 1px 0px #FFFFFF inset;
 }
 
+/*	$MEMBERLIST		*/
+/* ------------------------------------------------------- */
+.mlist_container {
+	border: 1px solid #ccc;
+	border-top: none;
+	border-bottom: none;
+}
+.mlist {
+	background: #f3f3f3;
+}
+.mlist .mlist_header span {
+	border-top: none;
+}
+.mlist li span {
+	background-color: #fff;
+	border-bottom: 1px solid #ccc;
+	border-top: 1px solid #ccc;
+}
+.mlist li.alternate_row span {
+	background-color: #fafafa;
+	border-bottom: 1px solid #ccc;
+	border-top: 1px solid #ccc;
+}
 /*	$LOGIN		*/
 /* ------------------------------------------------------- */
 

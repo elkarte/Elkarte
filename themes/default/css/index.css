@@ -3653,10 +3653,12 @@ a.help .icon {
 	content: "";
 }
 
-/* The memberlist. */
+/*	$MEMBERLIST		*/
+/* ------------------------------------------------------- */
 .mlist {
 	display: table;
 	width: 100%;
+	border-collapse: collapse;
 }
 .mlist li {
 	display: table-row;
@@ -3665,13 +3667,16 @@ a.help .icon {
 	display: table-cell;
 	padding: 5px 8px;
 }
-/* Attention: the second div is needed for emulating colspan! */
 .letter_row {
-	background-color: #ccc !important;
+	height: 2em;
+	line-height: 2em;
 }
-.letter_row>span {
-	background-color: #ccc;
-	text-align: center;
+.letter_row>div {
+	position: absolute;
+	left: 45%;
+	vertical-align: middle;
+	line-height: 2em;
+	text-transform: uppercase;
 	font-weight: bold;
 }
 .mlist_header {
