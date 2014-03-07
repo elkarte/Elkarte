@@ -82,7 +82,7 @@ class Attachment_Controller extends Action_Controller
 		{
 			loadLanguage('Post');
 
-			$attach_errors = attachment_Error_Context::context();
+			$attach_errors = Attachment_Error_Context::context();
 			$attach_errors->activate();
 
 			if ($context['attachments']['can']['post'] && empty($_POST['from_qr']))

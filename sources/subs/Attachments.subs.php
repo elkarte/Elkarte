@@ -351,7 +351,7 @@ function processAttachments($id_msg = null)
 {
 	global $context, $modSettings, $txt, $user_info, $ignore_temp, $topic, $board;
 
-	$attach_errors = attachment_Error_Context::context();
+	$attach_errors = Attachment_Error_Context::context();
 
 	// Make sure we're uploading to the right place.
 	if (!empty($modSettings['automanage_attachments']))
@@ -436,8 +436,8 @@ function processAttachments($id_msg = null)
 
 		// This is a generic error
 		$attach_errors->activate();
-		$attach_errors->addError($txt['attach_no_upload']);
-		$attach_errors->addError(is_array($attachment) ? vsprintf($txt[$attachment[0]], $attachment[1]) : $txt[$attachment]);
+		$attach_errors->addError('attach_no_upload');
+		$attach_errors->addError(is_array($attachment) ? array($attachment[0], $attachment[1]) : $attachment);
 
 		// And delete the files 'cos they ain't going nowhere.
 		foreach ($_FILES['attachment']['tmp_name'] as $n => $dummy)
@@ -523,12 +523,12 @@ function processAttachments($id_msg = null)
 			{
 				if (!is_array($error))
 				{
-					$attach_errors->addError($txt[$error]);
+					$attach_errors->addError($error);
 					if (in_array($error, $log_these))
 						log_error($_SESSION['temp_attachments'][$attachID]['name'] . ': ' . $txt[$error], 'critical');
 				}
 				else
-					$attach_errors->addError(vsprintf($txt[$error[0]], $error[1]));
+					$attach_errors->addError(array($error[0], $error[1]));
 			}
 		}
 	}
