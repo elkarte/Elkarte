@@ -895,7 +895,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	censorText($subject);
 
 	// Convert bbc [quotes] before we go to parsebbc so they are easier to plain-textify later
-	$message = preg_replace('~(\[quote)\s?author=(.*)\s?link=(.*)\s?date=([0-9]{10})(\])~seU', "'<blockquote>{$txt['email_on']}: ' . date('D M j, Y','\\4') . ' \\2 {$txt['email_wrote']}:'", $message);
+	$message = preg_replace_callback('~(\[quote)\s?author=(.*)\s?link=(.*)\s?date=([0-9]{10})(\])~sU', 'quote_callback', $message);
 	$message = preg_replace('~(\[quote\s?\])~sU', '<blockquote>', $message);
 	$message = str_replace('[/quote]', "</blockquote>\n\n", $message);
 
@@ -958,6 +958,22 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	}
 
 	return;
+}
+
+/**
+ * Replace full bbc quote tags with an html blockquote version
+ *
+ * - Callback for pbe_prepare_text
+ * - Only changes the leading [quote], the closing /quote is not changed but
+ * handled back in the main function
+ * 
+ * @param type $matches array of matches from the regex in the preg_replace
+ */
+function quote_callback($matches)
+{
+	global $txt;
+
+	return '<blockquote>' . $txt['email_on'] . ": " . date('D M j, Y', $matches[4]) . ' ' . $matches[2] . ' ' . $txt['email_wrote'] . ':';
 }
 
 /**
