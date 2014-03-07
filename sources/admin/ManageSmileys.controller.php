@@ -135,7 +135,7 @@ class ManageSmileys_Controller extends Action_Controller
 
 		$config_vars = $this->_smileySettings->settings();
 
-		call_integration_hook('integrate_modify_smiley_settings');
+		call_integration_hook('integrate_modify_smiley_settings', array(&$config_vars));
 
 		// For the basics of the settings.
 		require_once(SUBSDIR . '/Settings.class.php');

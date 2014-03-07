@@ -60,7 +60,7 @@ class ManageAvatars_Controller extends Action_Controller
 
 		// Get the sub action or set a default, call integrate_avatar_settings
 		$subAction = $action->initialize($subActions, 'display');
-		
+
 		// Final page details
 		$context['sub_action'] = $subAction;
 		$context['page_title'] = $txt['avatar_settings'];
@@ -85,7 +85,7 @@ class ManageAvatars_Controller extends Action_Controller
 
 		$config_vars = $this->_avatarSettings->settings();
 
-		call_integration_hook('integrate_modify_avatar_settings');
+		call_integration_hook('integrate_modify_avatar_settings', array(&$config_vars));
 
 		// Saving avatar settings?
 		if (isset($_GET['save']))

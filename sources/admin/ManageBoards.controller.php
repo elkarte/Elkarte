@@ -750,7 +750,11 @@ class ManageBoards_Controller extends Action_Controller
 		// Get all settings
 		$config_vars = $this->_boardSettings->settings();
 
-		call_integration_hook('integrate_modify_board_settings');
+		// Add some javascript stuff for the recycle box.
+		addInlineJavascript('
+				document.getElementById("recycle_board").disabled = !document.getElementById("recycle_enable").checked;', true);
+
+		call_integration_hook('integrate_modify_board_settings', array(&$config_vars));
 
 		// Don't let guests have these permissions.
 		$context['post_url'] = $scripturl . '?action=admin;area=manageboards;save;sa=settings';
@@ -760,10 +764,6 @@ class ManageBoards_Controller extends Action_Controller
 		loadTemplate('ManageBoards');
 		$context['page_title'] = $txt['boards_and_cats'] . ' - ' . $txt['settings'];
 		$context['sub_template'] = 'show_settings';
-
-		// Add some javascript stuff for the recycle box.
-		addInlineJavascript('
-				document.getElementById("recycle_board").disabled = !document.getElementById("recycle_enable").checked;', true);
 
 		// Warn the admin against selecting the recycle topic without selecting a board.
 		$context['force_form_onsubmit'] = 'if(document.getElementById(\'recycle_enable\').checked && document.getElementById(\'recycle_board\').value == 0) { return confirm(\'' . $txt['recycle_board_unselected_notice'] . '\');} return true;';

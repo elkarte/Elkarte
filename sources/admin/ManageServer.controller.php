@@ -393,7 +393,7 @@ class ManageServer_Controller extends Action_Controller
 			cache_type.addEventListener("change", toggleCache);
 			toggleCache();', true);
 
-		call_integration_hook('integrate_modify_cache_settings');
+		call_integration_hook('integrate_modify_cache_settings', array(&$config_vars));
 
 		// Saving again?
 		if (isset($_GET['save']))

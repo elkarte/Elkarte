@@ -218,7 +218,7 @@ class ManagePosts_Controller extends Action_Controller
 
 		$config_vars = $this->_postSettings->settings();
 
-		call_integration_hook('integrate_modify_post_settings');
+		call_integration_hook('integrate_modify_post_settings', array(&$config_vars));
 
 		// Setup the template.
 		$context['page_title'] = $txt['manageposts_settings'];

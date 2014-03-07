@@ -315,7 +315,7 @@ class ManageRegistration_Controller extends Action_Controller
 
 		$config_vars = $this->_registerSettings->settings();
 
-		call_integration_hook('integrate_modify_registration_settings');
+		call_integration_hook('integrate_modify_registration_settings', array(&$config_vars));
 
 		// Setup the template
 		$context['sub_template'] = 'show_settings';

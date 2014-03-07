@@ -847,7 +847,12 @@ class ManageNews_Controller extends Action_Controller
 
 		$config_vars = $this->_newsSettings->settings();
 
-		call_integration_hook('integrate_modify_news_settings');
+		// Add some javascript at the bottom...
+		addInlineJavascript('
+			document.getElementById("xmlnews_maxlen").disabled = !document.getElementById("xmlnews_enable").checked;
+			document.getElementById("xmlnews_limit").disabled = !document.getElementById("xmlnews_enable").checked;', true);
+
+		call_integration_hook('integrate_modify_news_settings', array(&$config_vars));
 
 		$context['page_title'] = $txt['admin_edit_news'] . ' - ' . $txt['settings'];
 		$context['sub_template'] = 'show_settings';
@@ -855,11 +860,6 @@ class ManageNews_Controller extends Action_Controller
 		// Wrap it all up nice and warm...
 		$context['post_url'] = $scripturl . '?action=admin;area=news;save;sa=settings';
 		$context['permissions_excluded'] = array(-1);
-
-		// Add some javascript at the bottom...
-		addInlineJavascript('
-			document.getElementById("xmlnews_maxlen").disabled = !document.getElementById("xmlnews_enable").checked;
-			document.getElementById("xmlnews_limit").disabled = !document.getElementById("xmlnews_enable").checked;', true);
 
 		// Saving the settings?
 		if (isset($_GET['save']))

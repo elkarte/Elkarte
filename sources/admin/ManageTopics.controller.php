@@ -73,7 +73,7 @@ class ManageTopics_Controller extends Action_Controller
 		// Retrieve the current config settings
 		$config_vars = $this->_topicSettings->settings();
 
-		call_integration_hook('integrate_modify_topic_settings');
+		call_integration_hook('integrate_modify_topic_settings', array(&$config_vars));
 
 		// Setup the template.
 		$context['sub_template'] = 'show_settings';
