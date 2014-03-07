@@ -585,7 +585,7 @@ function template_admin_register()
 							<span class="smalltext">', $txt['admin_register_email_desc'], '</span>
 						</dt>
 						<dd>
-							<input type="text" name="email" id="email_input" tabindex="', $context['tabindex']++, '" size="30" class="input_text" />
+							<input type="email" name="email" id="email_input" tabindex="', $context['tabindex']++, '" size="30" class="input_text" />
 						</dd>
 						<dt>
 							<strong><label for="password_input">', $txt['admin_register_password'], ':</label></strong>
@@ -784,7 +784,7 @@ function template_contact_form()
 						<label for="emailaddress">', $txt['admin_register_email'], '</label>
 					</dt>
 					<dd>
-						<input type="text" name="emailaddress" id="emailaddress" value="', !empty($context['emailaddress']) ? $context['emailaddress'] : '', '" tabindex="', $context['tabindex']++, '" />
+						<input type="email" name="emailaddress" id="emailaddress" value="', !empty($context['emailaddress']) ? $context['emailaddress'] : '', '" tabindex="', $context['tabindex']++, '" />
 					</dd>
 					<dt>
 						<label for="contactmessage">', $txt['contact_your_message'], '</label>
