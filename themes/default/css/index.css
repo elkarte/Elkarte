@@ -1022,6 +1022,7 @@ a.bbc_link {
 .linklevel1 {
 	display: block;
 	padding: 0 0.6em;
+	white-space: nowrap;
 }
 .listlevel1#button_profile .linklevel1 {
 	min-width: 5em;
@@ -1197,6 +1198,7 @@ a.bbc_link {
 	float: left;
 	margin: 0 0 0 4px;
 	line-height: 2.231em;
+
 }
 /* @todo - Save code by amalgamating common button background declarations. */
 .buttonlist li a {
@@ -1211,6 +1213,9 @@ a.bbc_link {
 .quickbuttons {
 	margin: 8px 0 6px 0;
 	text-align: right;
+}
+.quickbuttons li {
+	white-space: nowrap;
 }
 /* Follow ups and topic summary need it a bit different. */
 .follow_ups, #topic_summary .quickbuttons {
@@ -2336,6 +2341,7 @@ div.core_posts {
 #display_jump_to {
 	float: right;
 	padding: 6px 5px 5px 0;
+	white-space: nowrap;
 }
 
 /* The quick reply area. */
