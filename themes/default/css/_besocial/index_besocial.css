@@ -1228,9 +1228,6 @@ span.views_text {
 
 /*	$MEMBERLIST		*/
 /* ------------------------------------------------------- */
-.mlist {
-	background-color: #eee;
-}
 
 .mlist .mlist_header div {
 	border-top: none;
@@ -1245,7 +1242,18 @@ span.views_text {
 	border-bottom: 1px solid #ccc;
 	border-top: 1px solid #ccc;
 }
+.mlist li div:first-child {
+	border-left: 1px solid #ccc;
+}
+.mlist li div:last-child {
+	border-right: 1px solid #ccc;
+}
 
+.letter_row h3 {
+	border: 1px solid #ccc;
+	border-radius: 6px 6px 0 0;
+	border-bottom: none;
+}
 /*	$MEDIA		*/
 /* Experimental media queries.
 /* ------------------------------------------------------- */
@@ -1325,6 +1333,9 @@ span.views_text {
 		border-radius: 0;
 		background-color: #f6f6f6;
 		margin-bottom: 5px !important;
+	}
+	.mlist li div:nth-child(n+5) {
+		border-right: 1px solid #ccc;
 	}
 }
 /* This one does up to 540 screens. */
@@ -1459,5 +1470,13 @@ span.views_text {
 	}
 	#search_form * {
 		float: none;
+	}
+	.mlist li div:nth-child(n+4) {
+		border-right: 1px solid #ccc;
+	}
+}
+@media screen and (max-width: 30em) {
+	.mlist li div:nth-child(n+3) {
+		border-right: 1px solid #ccc;
 	}
 }

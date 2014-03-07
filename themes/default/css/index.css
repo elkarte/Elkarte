@@ -3668,16 +3668,17 @@ a.help .icon {
 	padding: 5px 8px;
 }
 .letter_row {
-	height: 2em;
-	line-height: 2em;
+	height: 3em;
+	line-height: 3em;
+	vertical-align: bottom;
 }
 .letter_row>h3 {
-	position: absolute;
-	left: 45%;
-	vertical-align: middle;
 	line-height: 2em;
 	text-transform: uppercase;
 	font-weight: bold;
+	position: relative;
+	top: 12px;
+	text-align: center;
 }
 .mlist_header {
 	font-weight: bold;
@@ -4478,7 +4479,7 @@ a.help .icon {
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
-	.mlist li div:nth-child(4) {
+	.mlist li div:nth-child(n+5) {
 		display: none;
 	}
 }
@@ -4490,7 +4491,7 @@ a.help .icon {
 	.quickbuttons .modified {
 		display: none;
 	}
-	.mlist li div:nth-child(5) {
+	.mlist li div:nth-child(n+4) {
 		display: none;
 	}
 }
