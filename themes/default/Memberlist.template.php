@@ -63,7 +63,7 @@ function template_memberlist()
 	echo '
 	<div id="memberlist">
 		<h2 class="category_header">
-				<span class="floatleft">', $txt['members_list'], '</span>';
+			<span class="floatleft">', $txt['members_list'], '</span>';
 
 	if (!isset($context['old_search']))
 		echo '
@@ -71,9 +71,9 @@ function template_memberlist()
 
 	echo '
 		</h2>
-		<table class="table_grid">
-			<thead>
-				<tr class="table_head">';
+		<div class="mlist_container">
+			<ul class="mlist">
+				<li class="mlist_header">';
 
 	$table_span = 0;
 
@@ -85,21 +85,19 @@ function template_memberlist()
 		// This is a selected column, so underline it or some such.
 		if ($column['selected'])
 			echo '
-					<th scope="col"', isset($column['class']) ? ' class="' . $column['class'] . '"' : '', ' style="width: auto; white-space: nowrap"' . (isset($column['colspan']) ? ' colspan="' . $column['colspan'] . '"' : '') . '>
+					<div ', isset($column['class']) ? ' class="' . $column['class'] . '"' : '', ' style="width: auto; white-space: nowrap">
 						<a href="' . $column['href'] . '" rel="nofollow">' . $column['label'] . '</a><img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />
-					</th>';
+					</div>';
 		// This is just some column... show the link and be done with it.
 		else
 			echo '
-					<th scope="col" ', isset($column['class']) ? ' class="' . $column['class'] . '"' : '', isset($column['width']) ? ' style="width:' . $column['width'] . '"' : '', isset($column['colspan']) ? ' colspan="' . $column['colspan'] . '"' : '', '>
+					<div ', isset($column['class']) ? ' class="' . $column['class'] . '"' : '', isset($column['width']) ? ' style="width:' . $column['width'] . '"' : '', '>
 						', $column['link'], '
-					</th>';
+					</div>';
 	}
 
 	echo '
-				</tr>
-			</thead>
-			<tbody>';
+				</li>';
 
 	// Assuming there are members loop through each one displaying their data.
 	$alternate = true;
@@ -110,15 +108,13 @@ function template_memberlist()
 			if (!empty($member['sort_letter']))
 			{
 				echo '
-				<tr class="standard_row" id="letter', $member['sort_letter'], '">
-					<th class="letterspacing" colspan="', $table_span, '">', $member['sort_letter'], '</th>
-				</tr>';
-
-				$alternate = true;
+			<li class="letter_row" id="letter', $member['sort_letter'], '">
+				<h3>', $member['sort_letter'], '</h3>
+			</li>';
 			}
 
 			echo '
-				<tr class="', $alternate ? 'alternate_' : 'standard_', 'row">';
+				<li class="', $alternate ? 'alternate_' : 'standard_', 'row">';
 
 			foreach ($context['columns'] as $column => $values)
 			{
@@ -127,31 +123,31 @@ function template_memberlist()
 					if ($column == 'online')
 					{
 						echo '
-						<td>
-							', $context['can_send_pm'] ? '<a href="' . $member['online']['href'] . '" title="' . $member['online']['text'] . '">' : '', $settings['use_image_buttons'] ? '<img src="' . $member['online']['image_href'] . '" alt="' . $member['online']['text'] . '" class="centericon" />' : $member['online']['label'], $context['can_send_pm'] ? '</a>' : '', '
-						</td>';
+					<div>
+						', $context['can_send_pm'] ? '<a href="' . $member['online']['href'] . '" title="' . $member['online']['text'] . '">' : '', $settings['use_image_buttons'] ? '<img src="' . $member['online']['image_href'] . '" alt="' . $member['online']['text'] . '" class="centericon" />' : $member['online']['label'], $context['can_send_pm'] ? '</a>' : '', '
+					</div>';
 						continue;
 					}
 					elseif ($column == 'email_address')
 					{
 						echo '
-						<td>', $member['show_email'] == 'no' ? '' : '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '" rel="nofollow"><img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $member['name'] . '" /></a>', '</td>';
+					<div>', $member['show_email'] == 'no' ? '' : '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '" rel="nofollow"><img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $member['name'] . '" /></a>', '</div>';
 						continue;
 					}
 					else
 						echo '
-						<td>', $member[$column], '</td>';
+					<div>', $member[$column], '</div>';
 				}
 				// Any custom fields on display?
 				elseif (!empty($context['custom_profile_fields']['columns']) && isset($context['custom_profile_fields']['columns'][$column]))
 				{
 					echo '
-							<td>', $member['options'][substr($column, 5)], '</td>';
+					<div>', $member['options'][substr($column, 5)], '</div>';
 				}
 			}
 
 			echo '
-					</tr>';
+				</li>';
 
 			$alternate = !$alternate;
 		}
@@ -159,13 +155,13 @@ function template_memberlist()
 	// No members?
 	else
 		echo '
-				<tr>
-					<td colspan="', $context['colspan'], '" class="standard_row">', $txt['search_no_results'], '</td>
-				</tr>';
+				<li>
+					<div class="standard_row">', $txt['search_no_results'], '</div>
+				</li>';
 
 	echo '
-			</tbody>
-		</table>';
+			</ul>
+		</div>';
 }
 
 /**
