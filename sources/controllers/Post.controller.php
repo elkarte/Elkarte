@@ -1011,6 +1011,9 @@ class Post_Controller extends Action_Controller
 		// No need!
 		$context['robot_no_index'] = true;
 
+		// We are now in post2 action
+		$context['current_action'] = 'post2';
+
 		// Previewing? Go back to start.
 		if (isset($_REQUEST['preview']))
 			return $this->action_post();
