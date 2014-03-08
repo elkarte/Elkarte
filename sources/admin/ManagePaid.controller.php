@@ -76,13 +76,8 @@ class ManagePaid_Controller extends Action_Controller
 				'permission' => 'admin_forum'),
 		);
 
-		call_integration_hook('integrate_manage_subscriptions', array(&$subActions));
-
-		// Default the sub-action to 'view subscriptions', but only if they have already set things up..
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (!empty($modSettings['paid_currency_symbol']) ? 'view' : 'settings');
-
-		$context['page_title'] = $txt['paid_subscriptions'];
-		$context['sub_action'] = $subAction;
+		// Some actions
+		$action = new Action('manage_subscriptions');
 
 		// Tabs for browsing the different subscription functions.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -99,9 +94,17 @@ class ManagePaid_Controller extends Action_Controller
 			),
 		);
 
-		// Call the right function for this sub-action.
-		$action = new Action();
+		// Default the sub-action to 'view subscriptions', but only if they have already set things up..
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (!empty($modSettings['paid_currency_symbol']) ? 'view' : 'settings');
+
+		// Load in the subActions, call integrate_manage_subscriptions
 		$action->initialize($subActions, 'settings');
+
+		// Final things for the template
+		$context['page_title'] = $txt['paid_subscriptions'];
+		$context['sub_action'] = $subAction;
+
+		// Call the right function for this sub-action.
 		$action->dispatch($subAction);
 	}
 

@@ -79,10 +79,10 @@ class ManageMaillist_Controller extends Action_Controller
 			'sortfilters' => array($this, 'action_sort_filters', 'permission' => 'admin_forum'),
 		);
 
-		// Default to sub action 'emaillist' if none was given
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) && (empty($subActions[$_REQUEST['sa']]['permission']) || allowedTo($subActions[$_REQUEST['sa']]['permission'])) ? $_REQUEST['sa'] : 'emaillist';
+		// Action Controller
+		$action = new Action('manage_maillist');
 
-		// Helper is needed in most places, so load it up front
+		// Help is needed in most places, so load it up front
 		require_once(SUBSDIR . '/Maillist.subs.php');
 
 		// Create the title area for the template.
@@ -92,12 +92,15 @@ class ManageMaillist_Controller extends Action_Controller
 			'description' => $txt['ml_configuration_desc'],
 		);
 
+		// Default to sub action 'emaillist' if none was given, call integrate_manage_maillist
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) && (empty($subActions[$_REQUEST['sa']]['permission']) || allowedTo($subActions[$_REQUEST['sa']]['permission'])) ? $_REQUEST['sa'] : 'emaillist';
+		$subAction = $action->initialize($subActions, $subAction);
+
+		// Final bits
 		$context['page_title'] = $txt['ml_admin_configuration'];
 		$context['sub_action'] = $subAction;
 
 		// If you have the permissions, then go Play
-		$action = new Action();
-		$action->initialize($subActions, 'emaillist');
 		$action->dispatch($subAction);
 	}
 

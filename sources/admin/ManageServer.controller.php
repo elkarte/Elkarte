@@ -126,13 +126,6 @@ class ManageServer_Controller extends Action_Controller
 		isAllowedTo('admin_forum');
 		checkSession('request');
 
-		// Load up all the tabs...
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['admin_server_settings'],
-			'help' => 'serversettings',
-			'description' => $txt['admin_basic_settings'],
-		);
-
 		$subActions = array(
 			'general' => array(
 				$this, 'action_generalSettings_display', 'permission' => 'admin_forum'),
@@ -148,11 +141,19 @@ class ManageServer_Controller extends Action_Controller
 				$this, 'action_phpinfo', 'permission' => 'admin_forum'),
 		);
 
-		call_integration_hook('integrate_server_settings', array(&$subActions));
+		$action = new Action('server_settings');
 
-		// By default we're editing the core settings
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'general';
+		// Load up all the tabs...
+		$context[$context['admin_menu_name']]['tab_data'] = array(
+			'title' => $txt['admin_server_settings'],
+			'help' => 'serversettings',
+			'description' => $txt['admin_basic_settings'],
+		);
 
+		// By default we're editing the core settings, call integrate_server_settings
+		$subAction = $action->initialize($subActions, 'general');
+
+		// Last things for the template
 		$context['sub_action'] = $subAction;
 		$context['page_title'] = $txt['admin_server_settings'];
 		$context['sub_template'] = 'show_settings';
@@ -182,8 +183,6 @@ class ManageServer_Controller extends Action_Controller
 		}
 
 		// Call the right function for this sub-action.
-		$action = new Action();
-		$action->initialize($subActions, 'general');
 		$action->dispatch($subAction);
 	}
 
@@ -394,7 +393,7 @@ class ManageServer_Controller extends Action_Controller
 			cache_type.addEventListener("change", toggleCache);
 			toggleCache();', true);
 
-		call_integration_hook('integrate_modify_cache_settings');
+		call_integration_hook('integrate_modify_cache_settings', array(&$config_vars));
 
 		// Saving again?
 		if (isset($_GET['save']))

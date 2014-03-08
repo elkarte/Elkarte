@@ -69,13 +69,8 @@ class Packages_Controller extends Action_Controller
 			'upload' => array('file' => 'PackageServers.controller.php', 'controller' => 'PackageServers_Controller', 'function' => 'action_upload'),
 		);
 
-		// Work out exactly who it is we are calling.
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'browse';
-
 		// Set up action/subaction stuff.
-		$action = new Action();
-		$action->initialize($subActions, 'browse');
-		$context['sub_action'] = $subAction;
+		$action = new Action('packages');
 
 		// Set up some tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -103,6 +98,12 @@ class Packages_Controller extends Action_Controller
 				),
 			),
 		);
+
+		// Work out exactly who it is we are calling. call integrate_packages
+		$subAction = $action->initialize($subActions, 'browse');
+
+		// Set up for the template
+		$context['sub_action'] = $subAction;
 
 		// Lets just do it!
 		$action->dispatch($subAction);

@@ -52,14 +52,8 @@ class ManageSearchEngines_Controller extends Action_Controller
 			'stats' => array($this, 'action_stats', 'permission' => 'admin_forum'),
 		);
 
-		call_integration_hook('integrate_manage_search_engines', array(&$subActions));
-
-		// Ensure we have a valid subaction.
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'stats';
-
-		// Some contextual data for the template.
-		$context['sub_action'] = $subAction;
-		$context['page_title'] = $txt['search_engines'];
+		// Control
+		$action = new Action('manage_search_engines');
 
 		// Some more tab data.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -67,9 +61,14 @@ class ManageSearchEngines_Controller extends Action_Controller
 			'description' => $txt['search_engines_description'],
 		);
 
+		// Ensure we have a valid subaction. call integrate_manage_search_engines
+		$subAction = $action->initialize($subActions, 'stats');
+
+		// Some contextual data for the template.
+		$context['sub_action'] = $subAction;
+		$context['page_title'] = $txt['search_engines'];
+
 		// Call the right function for this sub-action.
-		$action = new Action();
-		$action->initialize($subActions);
 		$action->dispatch($subAction);
 	}
 

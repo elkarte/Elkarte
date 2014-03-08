@@ -81,6 +81,10 @@ class ManageFeatures_Controller extends Action_Controller
 	{
 		global $context, $txt, $settings;
 
+		// Often Helpful
+		loadLanguage('Help');
+		loadLanguage('ManageSettings');
+
 		// All the actions we know about
 		$subActions = array(
 			'basic' => array(
@@ -133,17 +137,8 @@ class ManageFeatures_Controller extends Action_Controller
 			),
 		);
 
-		call_integration_hook('integrate_modify_features', array(&$subActions));
-
-		// By default do the basic settings.
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'basic';
-
-		loadLanguage('Help');
-		loadLanguage('ManageSettings');
-
-		$context['sub_template'] = 'show_settings';
-		$context['sub_action'] = $subAction;
-		$context['page_title'] = $txt['modSettings_title'];
+		// Set up the action control
+		$action = new Action('modify_features');
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -173,9 +168,15 @@ class ManageFeatures_Controller extends Action_Controller
 			),
 		);
 
+		// By default do the basic settings, call integrate_modify_features
+		$subAction = $action->initialize($subActions, 'basic');
+
+		// Some final pieces for the template
+		$context['sub_template'] = 'show_settings';
+		$context['sub_action'] = $subAction;
+		$context['page_title'] = $txt['modSettings_title'];
+
 		// Call the right function for this sub-action.
-		$action = new Action();
-		$action->initialize($subActions, 'basic');
 		$action->dispatch($subAction);
 	}
 

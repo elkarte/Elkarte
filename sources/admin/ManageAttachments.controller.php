@@ -80,14 +80,8 @@ class ManageAttachments_Controller extends Action_Controller
 			'transfer' => array($this, 'action_transfer'),
 		);
 
-		call_integration_hook('integrate_manage_attachments', array(&$subActions));
-
-		$action = new Action();
-		$action->initialize($subActions, 'browse');
-
-		// Pick the correct sub-action.
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'browse';
-		$context['sub_action'] = $subAction;
+		// Get ready for some action
+		$action = new Action('manage_attachments');
 
 		// Default page title is good.
 		$context['page_title'] = $txt['attachments_avatars'];
@@ -98,6 +92,10 @@ class ManageAttachments_Controller extends Action_Controller
 			'help' => 'manage_files',
 			'description' => $txt['attachments_desc'],
 		);
+
+		// Get the subAction, call integrate_manage_attachments
+		$subAction = $action->initialize($subActions, 'browse');
+		$context['sub_action'] = $subAction;
 
 		// Finally go to where we want to go
 		$action->dispatch($subAction);
@@ -130,7 +128,7 @@ class ManageAttachments_Controller extends Action_Controller
 	base_dir.addEventListener("change", toggleSubDir, false);
 	toggleSubDir();', true);
 
-		call_integration_hook('integrate_modify_attachment_settings');
+		call_integration_hook('integrate_modify_attachment_settings', array(&$config_vars));
 
 		// These are very likely to come in handy! (i.e. without them we're doomed!)
 		require_once(SUBSDIR . '/Settings.class.php');
@@ -1714,7 +1712,7 @@ class ManageAttachments_Controller extends Action_Controller
 
 /**
  * Function called in-between each round of attachments and avatar repairs.
- * 
+ *
  * What it does:
  * - Called by repairAttachments().
  * - If repairAttachments() has more steps added, this function needs updated!

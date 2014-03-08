@@ -49,10 +49,8 @@ class PostModeration_Controller extends Action_Controller
 		);
 
 		// Pick something valid...
-		$subAction = !isset($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]) ? 'replies' : $_REQUEST['sa'];
-
 		$action = new Action();
-		$action->initialize($subActions, 'replies');
+		$subAction = $action->initialize($subActions, 'replies');
 		$action->dispatch($subAction);
 	}
 

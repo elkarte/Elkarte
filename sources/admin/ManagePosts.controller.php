@@ -69,13 +69,8 @@ class ManagePosts_Controller extends Action_Controller
 				'permission' => 'admin_forum'),
 		);
 
-		call_integration_hook('integrate_manage_posts', array(&$subActions));
-
-		// Default the sub-action to 'posts'.
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'posts';
-
-		$context['page_title'] = $txt['manageposts_title'];
-		$context['sub_action'] = $subAction;
+		// Good old action handle
+		$action = new Action('manage_posts');
 
 		// Tabs for browsing the different post functions.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -98,9 +93,14 @@ class ManagePosts_Controller extends Action_Controller
 			),
 		);
 
+		// Default the sub-action to 'posts'. call integrate_manage_posts
+		$subAction = $action->initialize($subActions, 'posts');
+
+		// Just for the template
+		$context['page_title'] = $txt['manageposts_title'];
+		$context['sub_action'] = $subAction;
+
 		// Call the right function for this sub-action.
-		$action = new Action();
-		$action->initialize($subActions, 'posts');
 		$action->dispatch($subAction);
 	}
 
@@ -218,7 +218,7 @@ class ManagePosts_Controller extends Action_Controller
 
 		$config_vars = $this->_postSettings->settings();
 
-		call_integration_hook('integrate_modify_post_settings');
+		call_integration_hook('integrate_modify_post_settings', array(&$config_vars));
 
 		// Setup the template.
 		$context['page_title'] = $txt['manageposts_settings'];

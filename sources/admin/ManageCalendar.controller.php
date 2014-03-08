@@ -60,10 +60,6 @@ class ManageCalendar_Controller extends Action_Controller
 			'settings' => array($this, 'action_calendarSettings_display', 'permission' => 'admin_forum')
 		);
 
-		call_integration_hook('integrate_manage_calendar', array(&$subActions));
-
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'holidays';
-
 		// Set up the two tabs here...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['manage_calendar'],
@@ -78,8 +74,13 @@ class ManageCalendar_Controller extends Action_Controller
 				),
 			),
 		);
+
+		call_integration_hook('integrate_manage_calendar', array(&$subActions));
+
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'holidays';
 		$context['sub_action'] = $subAction;
 
+		// Off we go
 		$action = new Action();
 		$action->initialize($subActions, 'settings');
 		$action->dispatch($subAction);
