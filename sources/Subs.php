@@ -3909,7 +3909,7 @@ function remove_integration_function($hook, $function, $file = '')
 
 		foreach ($current_functions as $filefunc)
 		{
-			if (strpos($funcfile, '|') !== false)
+			if (strpos($filefunc, '|') !== false)
 				list($func, $inc_file) = explode('|', $filefunc);
 			else
 				$func = $filefunc;
