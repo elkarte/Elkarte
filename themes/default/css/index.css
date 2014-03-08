@@ -4033,6 +4033,7 @@ a.help .icon {
 		max-width: 95%;
 		white-space: nowrap;
 		text-overflow: ellipsis;
+		line-height: inherit;
 	}
 	.board_latest {
 		min-width: 22em;
