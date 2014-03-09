@@ -4177,9 +4177,6 @@ a.help .icon {
 	.frame {
 		min-width: 100%;
 	}
-	.board_lastpost, .board_description, .moderators {
-		display: none;
-	}
 	.topic_info {
 		display: block;
 		width: 95%;

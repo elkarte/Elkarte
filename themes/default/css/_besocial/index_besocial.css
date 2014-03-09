@@ -1343,6 +1343,30 @@ span.views_text {
 	.board_latest {
 		border-left: 0;
 	}
+	.board_row, .childboard_row {
+		border: 1px solid #ccc;
+		box-shadow: 1px 1px 3px #ccc;
+		background-color: #f9f9f9;
+	}
+	.board_row {
+		margin-top: 6px;
+	}
+	.childboard_row {
+		border-top: none;
+	}
+	.childboard_row:before {
+		content: "";
+		margin: 0;
+		position: relative;
+		top: -12px;
+		display: block;
+		height: 12px; 
+		background-color: #f9f9f9;
+	}
+	.board_lastpost {
+		border-top: 1px solid #eee;
+		margin: 3px;
+	}
 	#top_section .wrapper {
 		padding: 0;
 	}

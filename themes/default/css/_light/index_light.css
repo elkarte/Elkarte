@@ -1812,8 +1812,15 @@ div.bbc_footnotes .meaction{
 	.board_latest {
 		border-left: 0;
 	}
+	.board_row {
+		margin-top:3px;
+	}
 	.frame {
 		border-radius: 0;
+	}
+	.board_lastpost {
+		border-top: 1px solid #ccc;
+		margin: 3px;
 	}
 	.topic_listing>li {
 		border: 1px solid #aaa;
