@@ -1780,7 +1780,6 @@ dl.settings dt .styled-select select {
 .topic_sorting {
 	float: right;
 	font-size: 1.143em;
-	margin-top: -2px;
 }
 .topic_sorting>li {
 	padding: 0 3px;
