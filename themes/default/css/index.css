@@ -4213,6 +4213,9 @@ a.help .icon {
 	#whoisviewing {
 		display: none;
 	}
+	.board_row {
+		margin-top:3px;
+	}
 	.board_lastpost {
 		margin: 3px;
 	}
