@@ -56,11 +56,13 @@ class Recent_Controller extends Action_Controller
 			$_REQUEST['start'] = 95;
 
 		$query_parameters = array();
+
+		// Recent posts by category id's
 		if (!empty($_REQUEST['c']) && empty($board))
 		{
 			$categories = array_map('intval', explode(',', $_REQUEST['c']));
 
-			if (count($categories) == 1)
+			if (count($categories) === 1)
 			{
 				require_once(SUBSDIR . '/Categories.subs.php');
 				$name = categoryName($categories[0]);
@@ -74,15 +76,16 @@ class Recent_Controller extends Action_Controller
 				);
 			}
 
+			// Find the number of posts in these categorys, exclude the recycle board.
 			require_once(SUBSDIR . '/Boards.subs.php');
-
-			$boards_posts = boardsPosts(array(), $categories);
+			$boards_posts = boardsPosts(array(), $categories, false, false);
 			$total_cat_posts = array_sum($boards_posts);
 			$boards = array_keys($boards_posts);
 
 			if (empty($boards))
 				fatal_lang_error('error_no_boards_selected');
 
+			// The query for getting the messages
 			$query_this_board = 'b.id_board IN ({array_int:boards})';
 			$query_parameters['boards'] = $boards;
 
@@ -96,14 +99,15 @@ class Recent_Controller extends Action_Controller
 
 			$context['page_index'] = constructPageIndex($scripturl . '?action=recent;c=' . implode(',', $categories), $_REQUEST['start'], min(100, $total_cat_posts), 10, false);
 		}
+		// Or recent posts by board id's?
 		elseif (!empty($_REQUEST['boards']))
 		{
 			$_REQUEST['boards'] = explode(',', $_REQUEST['boards']);
 			foreach ($_REQUEST['boards'] as $i => $b)
 				$_REQUEST['boards'][$i] = (int) $b;
 
+			// Fetch the number of posts for the supplied board IDs
 			require_once(SUBSDIR . '/Boards.subs.php');
-
 			$boards_posts = boardsPosts($_REQUEST['boards'], array());
 			$total_posts = array_sum($boards_posts);
 			$boards = array_keys($boards_posts);
@@ -111,6 +115,7 @@ class Recent_Controller extends Action_Controller
 			if (empty($boards))
 				fatal_lang_error('error_no_boards_selected');
 
+			// Build the query for finding the messages
 			$query_this_board = 'b.id_board IN ({array_int:boards})';
 			$query_parameters['boards'] = $boards;
 
@@ -124,6 +129,7 @@ class Recent_Controller extends Action_Controller
 
 			$context['page_index'] = constructPageIndex($scripturl . '?action=recent;boards=' . implode(',', $_REQUEST['boards']), $_REQUEST['start'], min(100, $total_posts), 10, false);
 		}
+		// Or just the recent posts for a specific board
 		elseif (!empty($board))
 		{
 			require_once(SUBSDIR . '/Boards.subs.php');
@@ -142,16 +148,18 @@ class Recent_Controller extends Action_Controller
 
 			$context['page_index'] = constructPageIndex($scripturl . '?action=recent;board=' . $board . '.%1$d', $_REQUEST['start'], min(100, $board_data[$board]['num_posts']), 10, true);
 		}
+		// All the recent posts across boards and categories it is then
 		else
 		{
 			$query_this_board = '{query_wanna_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
-						AND b.id_board != {int:recycle_board}' : ''). '
+						AND b.id_board != {int:recycle_board}' : '') . '
 						AND m.id_msg >= {int:max_id_msg}';
 			$query_parameters['max_id_msg'] = max(0, $modSettings['maxMsgID'] - 100 - $_REQUEST['start'] * 6);
 			$query_parameters['recycle_board'] = $modSettings['recycle_board'];
 
-			// @todo This isn't accurate because we ignore the recycle bin.
-			$context['page_index'] = constructPageIndex($scripturl . '?action=recent', $_REQUEST['start'], min(100, $modSettings['totalMessages']), 10, false);
+			// Set up the pageindex
+			require_once(SUBSDIR . '/Boards.subs.php');
+			$context['page_index'] = constructPageIndex($scripturl . '?action=recent', $_REQUEST['start'], min(100, sumRecentPosts()), 10, false);
 		}
 
 		$context['linktree'][] = array(
