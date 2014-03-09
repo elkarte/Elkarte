@@ -258,7 +258,7 @@ function onDocSent(XMLDoc)
 
 	// Show a warning if the topic has been locked.
 	if (bPost)
-		document.getElementById('lock_warning').style.display = errors.getAttribute('topic_locked') === 1 ? '' : 'none';
+		document.getElementById('lock_warning').style.display = parseInt(errors.getAttribute('topic_locked')) === 1 ? '' : 'none';
 
 	// Adjust the color of captions if the given data is erroneous.
 	var captions = errors.getElementsByTagName('caption');

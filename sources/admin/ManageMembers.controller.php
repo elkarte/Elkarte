@@ -72,10 +72,10 @@ class ManageMembers_Controller extends Action_Controller
 		);
 
 		// Prepare our action control
-		$action = new Action('manage_members');
+		$action = new Action();
 
 		// Default to sub action 'all', needed for the tabs array below
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'all';
+		$subAction = $action->initialize($subActions, 'all');
 
 		// You can't pass!
 		$action->isAllowedTo($subAction);
@@ -137,8 +137,8 @@ class ManageMembers_Controller extends Action_Controller
 			),
 		);
 
-		// Default to sub action all, call integrate_manage_members
-		$action->initialize($subActions, 'all');
+		// Call integrate_manage_members
+		call_integration_hook('integrate_manage_members', array(&$subActions));
 
 		// Sort out the tabs for the ones which may not exist!
 		if (!$context['show_activate'] && ($subAction != 'browse' || $_REQUEST['type'] != 'activate'))

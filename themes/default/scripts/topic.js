@@ -617,6 +617,10 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 		// Re-Fix code blocks
 		if (typeof elk_codefix === 'function')
 			elk_codefix();
+
+		// And pretty the code
+		if (typeof prettyPrint === 'function')
+			prettyPrint();
 	}
 	else if (error)
 	{

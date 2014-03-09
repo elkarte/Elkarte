@@ -1691,12 +1691,16 @@ function getBoardProperties($idboard)
  * @param int[]|null $boards an array of board IDs
  * @param int[]|null $categories an array of category IDs
  * @param bool $wanna_see_board if true uses {query_wanna_see_board}, otherwise {query_see_board}
+ * @param bool $include_recycle if false exclues any results from the recycle board (if enabled)
  */
-function boardsPosts($boards, $categories, $wanna_see_board = false)
+function boardsPosts($boards, $categories, $wanna_see_board = false, $include_recycle = true)
 {
+	global $modSettings;
+
 	$db = database();
 
 	$clauses = array();
+	$removals = array();
 	$clauseParameters = array();
 
 	if (!empty($categories))
@@ -1711,6 +1715,12 @@ function boardsPosts($boards, $categories, $wanna_see_board = false)
 		$clauseParameters['board_list'] = $boards;
 	}
 
+	if (empty($include_recycle) && (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0))
+	{
+		$removals[] = 'id_board != {int:recycle_board}';
+		$clauseParameters['recycle_board'] = (int) $modSettings['recycle_board'];
+	}
+
 	if (empty($clauses))
 		return array();
 
@@ -1718,9 +1728,9 @@ function boardsPosts($boards, $categories, $wanna_see_board = false)
 		SELECT b.id_board, b.num_posts
 		FROM {db_prefix}boards AS b
 		WHERE ' . ($wanna_see_board ? '{query_wanna_see_board}' : '{query_see_board}') . '
-			AND b.' . implode(' OR b.', $clauses),
-		array_merge($clauseParameters, array(
-		))
+			AND b.' . implode(' OR b.', $clauses) . (!empty($removals) ? '
+			AND b.' . implode(' AND b.', $removals) : ''),
+		$clauseParameters
 	);
 	$return = array();
 	while ($row = $db->fetch_assoc($request))
@@ -1728,6 +1738,31 @@ function boardsPosts($boards, $categories, $wanna_see_board = false)
 	$db->free_result($request);
 
 	return $return;
+}
+
+/**
+ * Returns the total sum of posts in the boards defined by query_wanna_see_board
+ * Excludes the count of any boards defined as a recycle board from the sum
+ */
+function sumRecentPosts()
+{
+	$db = database();
+
+	global $modSettings;
+
+	$request = $db->query('', '
+		SELECT IFNULL(SUM(num_posts), 0)
+		FROM {db_prefix}boards
+		WHERE {query_wanna_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+			AND id_board != {int:recycle_board}' : ''),
+		array(
+			'recycle_board' => $modSettings['recycle_board']
+		)
+	);
+	$result = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $result;
 }
 
 /**
