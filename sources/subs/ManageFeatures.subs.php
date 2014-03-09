@@ -61,6 +61,7 @@ function getSignatureFromMembers($start_member)
  */
 function updateSignature($id_member, $signature)
 {
+	require_once(SUBSDIR . '/Members.subs.php');
 	updateMemberData($id_member, array('signature' => $signature));
 }
 

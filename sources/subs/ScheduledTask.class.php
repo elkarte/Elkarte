@@ -304,8 +304,11 @@ class ScheduledTask
 
 				// Have some members to change?
 				if (!empty($member_changes))
+				{
+					require_once(SUBSDIR . '/Members.subs.php');
 					foreach ($member_changes as $change)
 						updateMemberData($change['id'], array('warning' => $change['warning']));
+				}
 			}
 		}
 

@@ -97,6 +97,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 			// Apply our rules to the new PM's
 			applyRules();
+			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($user_info['id'], array('new_pm' => 0));
 
 			// Turn the new PM's status off, for the popup alert, since they have entered the PM area
@@ -218,6 +219,7 @@ class PersonalMessage_Controller extends Action_Controller
 		if (isset($_GET['view']))
 		{
 			$context['display_mode'] = $context['display_mode'] > 1 ? 0 : $context['display_mode'] + 1;
+			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($user_info['id'], array('pm_prefs' => ($user_settings['pm_prefs'] & 252) | $context['display_mode']));
 		}
 
@@ -1238,6 +1240,7 @@ class PersonalMessage_Controller extends Action_Controller
 			}
 
 			// Save the label status.
+			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($user_info['id'], array('message_labels' => implode(',', $the_labels)));
 
 			// Update all the messages currently with any label changes in them!
@@ -1349,7 +1352,10 @@ class PersonalMessage_Controller extends Action_Controller
 			saveProfileFields();
 
 			if (!empty($profile_vars))
+			{
+				require_once(SUBSDIR . '/Members.subs.php');
 				updateMemberData($user_info['id'], $profile_vars);
+			}
 
 			// Invalidate any cached data and reload so we show the saved values
 			cache_put_data('member_data-profile-' . $user_info['id'], null, 0);

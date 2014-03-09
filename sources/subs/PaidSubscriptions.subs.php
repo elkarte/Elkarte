@@ -297,6 +297,7 @@ function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTi
 	$newAddGroups = implode(',', $newAddGroups);
 
 	// Store the new settings.
+	require_once(SUBSDIR . '/Members.subs.php');
 	updateMemberData($id_member, array('id_group' => $id_group, 'additional_groups' => $newAddGroups));
 
 	// Now log the subscription - maybe we have a dorment subscription we can restore?
@@ -667,6 +668,7 @@ function deleteSubscription($id)
 		// Apply the group changes, if there are any
 		if (!empty($changes))
 		{
+			require_once(SUBSDIR . '/Members.subs.php');
 			foreach ($changes as $id_member => $new_values)
 				updateMemberData($id_member, $new_values);
 		}

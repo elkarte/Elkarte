@@ -616,6 +616,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 			// Put it all together.
 			$mod_prefs = $show_reports . '|' . $mod_blocks . '|' . $pref_binary;
+			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($user_info['id'], array('mod_prefs' => $mod_prefs));
 		}
 

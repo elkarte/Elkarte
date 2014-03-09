@@ -107,6 +107,7 @@ class OpenID_Controller extends Action_Controller
 		if (empty($member_found) && isset($_GET['sa']) && $_GET['sa'] == 'change_uri' && !empty($_SESSION['new_openid_uri']) && $_SESSION['new_openid_uri'] == $context['openid_claimed_id'])
 		{
 			// Update the member.
+			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($user_settings['id_member'], array('openid_uri' => $context['openid_claimed_id']));
 
 			unset($_SESSION['new_openid_uri']);
@@ -163,6 +164,7 @@ class OpenID_Controller extends Action_Controller
 			$user_settings['passwd'] = sha1(strtolower($user_settings['member_name']) . $secret);
 			$user_settings['password_salt'] = substr(md5(mt_rand()), 0, 4);
 
+			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($user_settings['id_member'], array('passwd' => $user_settings['passwd'], 'password_salt' => $user_settings['password_salt']));
 
 			// Cleanup on Aisle 5.

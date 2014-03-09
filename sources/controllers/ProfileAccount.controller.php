@@ -167,6 +167,7 @@ class ProfileAccount_Controller extends Action_Controller
 					logWarning($memID, $cur_profile['real_name'], $id_notice, $level_change, $_POST['warn_reason']);
 
 				// Make the change.
+				require_once(SUBSDIR . '/Members.subs.php');
 				updateMemberData($memID, array('warning' => $_POST['warning_level']));
 
 				// Leave a lovely message.
@@ -490,6 +491,7 @@ class ProfileAccount_Controller extends Action_Controller
 		elseif (!empty($modSettings['approveAccountDeletion']) && !allowedTo('moderate_forum'))
 		{
 			// Setup their account for deletion ;)
+			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($memID, array('is_activated' => 4));
 			// Another account needs approval...
 			updateSettings(array('unapprovedMembers' => true), true);
@@ -533,6 +535,7 @@ class ProfileAccount_Controller extends Action_Controller
 			call_integration_hook('integrate_activate', array($user_profile[$memID]['member_name']));
 
 			// Actually update this member now, as it guarantees the unapproved count can't get corrupted.
+			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($context['id_member'], array('is_activated' => $user_profile[$memID]['is_activated'] >= 10 ? 11 : 1, 'validation_code' => ''));
 
 			// Log what we did?
