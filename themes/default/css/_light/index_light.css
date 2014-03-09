@@ -1032,8 +1032,11 @@ div.bbc_footnotes .meaction{
 	border: 1px solid #ddd;
 	border-bottom: 1px solid #ccc;
 }
-.topic_sorting_row, .basic_row {
+.basic_row {
 	background: #fff;
+}
+.topic_sorting_row {
+	background: transparent;
 }
 .sort_by_container {
 	border: 1px solid #ccc;
@@ -1814,6 +1817,9 @@ div.bbc_footnotes .meaction{
 	}
 	.frame {
 		border-radius: 0;
+	}
+	.board_lastpost {
+		border-top: 1px solid #ccc;
 	}
 	.topic_listing>li {
 		border: 1px solid #aaa;

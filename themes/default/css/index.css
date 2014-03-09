@@ -1780,7 +1780,6 @@ dl.settings dt .styled-select select {
 .topic_sorting {
 	float: right;
 	font-size: 1.143em;
-	margin-top: -2px;
 }
 .topic_sorting>li {
 	padding: 0 3px;
@@ -4033,6 +4032,7 @@ a.help .icon {
 		max-width: 95%;
 		white-space: nowrap;
 		text-overflow: ellipsis;
+		line-height: inherit;
 	}
 	.board_latest {
 		min-width: 22em;
@@ -4176,9 +4176,6 @@ a.help .icon {
 	.frame {
 		min-width: 100%;
 	}
-	.board_lastpost, .board_description, .moderators {
-		display: none;
-	}
 	.topic_info {
 		display: block;
 		width: 95%;
@@ -4214,6 +4211,12 @@ a.help .icon {
 	}
 	#whoisviewing {
 		display: none;
+	}
+	.board_row {
+		margin-top:3px;
+	}
+	.board_lastpost {
+		margin: 3px;
 	}
 	.childboards li {
 		display: block;
