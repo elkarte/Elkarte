@@ -227,6 +227,7 @@ class MessageIndex_Controller extends Action_Controller
 		}
 
 		$context['sort_direction'] = $ascending ? 'up' : 'down';
+		$sort_title = $ascending ? $txt['sort_desc'] : $txt['sort_asc'];
 
 		// Trick
 		$txt['starter'] = $txt['started_by'];
@@ -234,7 +235,7 @@ class MessageIndex_Controller extends Action_Controller
 		foreach ($sort_methods as $key => $val)
 			$context['topics_headers'][$key] = array(
 				'url' => $scripturl . '?board=' . $context['current_board'] . '.' . $context['start'] . ';sort=' . $key . ($context['sort_by'] == $key && $context['sort_direction'] == 'up' ? ';desc' : ''),
-				'sort_dir_img' => $context['sort_by'] == $key ? '<img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '',
+				'sort_dir_img' => $context['sort_by'] == $key ? '<img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" title="' . $sort_title . '" />' : '',
 			);
 
 		// Calculate the fastest way to get the topics.

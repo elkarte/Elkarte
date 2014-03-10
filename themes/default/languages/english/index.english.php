@@ -148,12 +148,12 @@ $txt['error_occurred'] = 'An Error Has Occurred';
 $txt['send_error_occurred'] = 'An error has occurred, <a href="{href}">please click here to try again</a>.';
 $txt['require_field'] = 'This is a required field.';
 $txt['at'] = 'at';
-$txt['started_by'] = 'Started by';
+$txt['started_by'] = 'Started by author';
 $txt['topic_started_by'] = 'Started by <strong>%1$s</strong> in <em>%2$s</em>';
 $txt['replies'] = 'Replies';
 $txt['last_post'] = 'Last post';
 $txt['first_post'] = 'First post';
-$txt['last_poster'] = 'Last post by';
+$txt['last_poster'] = 'Last post author';
 //$txt['last_post_message'] = '<strong>Last post</strong> by %1$s<br />in %2$s<br />on %3$s';
 // @todo - Clean this up a bit. See notes in template.
 // Just moved a space, so the output looks better when things break to an extra line.
@@ -162,6 +162,8 @@ $txt['boardindex_total_posts'] = '%1$s Posts in %2$s Topics by %3$s Members';
 $txt['show'] = 'Show';
 $txt['hide'] = 'Hide';
 $txt['sort_by'] = 'Sort By';
+$txt['sort_asc'] = 'Sort ascending';
+$txt['sort_desc'] = 'Sort descending';
 
 $txt['admin_login'] = 'Administration Log in';
 // Use numeric entities in the below string.
