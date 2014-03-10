@@ -147,7 +147,7 @@ function template_topic_listing()
 		// If this person can approve items and we have some awaiting approval tell them.
 		if (!empty($context['unapproved_posts_message']))
 			echo '
-		<div class="warningbox">! ', $context['unapproved_posts_message'], '</div>';
+		<div class="warningbox">', $context['unapproved_posts_message'], '</div>';
 
 		echo '
 		<ul class="topic_listing" id="messageindex">
