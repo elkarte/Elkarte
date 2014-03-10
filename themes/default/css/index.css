@@ -1764,15 +1764,18 @@ dl.settings dt .styled-select select {
 }
 
 #sortby {
-	width: 8.4em;
+	width: 11em;
 }
 .topic_sorting:hover #sortby, #sortby:hover {
-	width: 8.4em;
+	width: 11em;
 	left: auto;
 	right: 0;
 }
 .sort_by_item {
 	width: 100%;
+}
+.sort_by_item .sort {
+	vertical-align: baseline;
 }
 .topic_sorting>li {
 	float: right;
