@@ -1664,7 +1664,7 @@ dl.settings dt .styled-select select {
 }
 .board_avatar {
 	float: left;
-	margin-right: 5px;
+	margin: 4px 5px 0 0;
 }
 .board_avatar a {
 	width: 40px;
@@ -1673,8 +1673,8 @@ dl.settings dt .styled-select select {
 	vertical-align: middle;
 }
 .board_avatar .avatar {
-	max-width: 40px;
-	max-height: 40px;
+	max-width: 45px;
+	max-height: 45px;
 	display: block;
 	margin: auto;
 }
@@ -1922,6 +1922,7 @@ img.new_posts {
 .board_lastpost, .topic_lastpost {
 	min-width: 21em;
 	margin-left: 1em;
+	line-height: 1.5em;
 }
 .topic_stats {
 	text-align: right;
@@ -1930,6 +1931,7 @@ img.new_posts {
 	min-width: 14em;
 	box-sizing: border-box;
 	padding: 0 16px 0 16px;
+	line-height: 1.5em;
 }
 .topic_lastpost img {
 	float: right;
