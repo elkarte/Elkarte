@@ -1453,7 +1453,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	// Output is fully XML, so no need for the index template.
 	if (isset($_REQUEST['xml']))
 	{
-		loadLanguage('index+Modifications');
+		loadLanguage('index+Addons');
 
 		// @todo added because some $settings in template_init are necessary even in xml mode. Maybe move template_init to a settings file?
 		loadTemplate('index');
@@ -1463,7 +1463,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	// These actions don't require the index template at all.
 	elseif (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], $simpleActions))
 	{
-		loadLanguage('index+Modifications');
+		loadLanguage('index+Addons');
 		Template_Layers::getInstance()->removeAll();
 	}
 	else
@@ -1479,7 +1479,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 			loadTemplate($template);
 
 		// ...and attempt to load their associated language files.
-		$required_files = implode('+', array_merge($templates, array('Modifications')));
+		$required_files = implode('+', array_merge($templates, array('Addons')));
 		loadLanguage($required_files, '', false);
 
 		// Custom template layers?
@@ -1736,7 +1736,7 @@ function loadEssentialThemeData()
 	if (!function_exists('loadLanguage'))
 		require_once(SOURCEDIR . '/Subs.php');
 
-	loadLanguage('index+Modifications');
+	loadLanguage('index+Addons');
 }
 
 /**
