@@ -188,7 +188,7 @@ $txt['approve_all'] = 'approve all';
 $txt['awaiting_approval'] = 'Awaiting Approval';
 $txt['attach_awaiting_approve'] = 'Attachments awaiting approval';
 $txt['post_awaiting_approval'] = 'Note: This message is awaiting approval by a moderator.';
-$txt['there_are_unapproved_topics'] = 'There are %1$s topics and %2$s posts awaiting approval in this board. <a href="%3$s">Click here to view them all</a>.';
+$txt['there_are_unapproved_topics'] = 'There are %1$s topics and %2$s posts awaiting approval in this board. <a href="%3$s">Click here to view them</a>.';
 $txt['send_message'] = 'Send message';
 
 $txt['msg_alert_you_have'] = 'you have'; //Deprecated
