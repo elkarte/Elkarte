@@ -22,7 +22,7 @@
  */
 function template_show_list($list_id = null)
 {
-	global $context, $settings;
+	global $context, $settings, $txt;
 
 	// Get a shortcut to the current list.
 	$list_id = $list_id === null ? $context['default_list'] : $list_id;
@@ -116,8 +116,10 @@ function template_show_list($list_id = null)
 			elseif ($i === $header_count)
 				$col_header['class'] = empty($col_header['class']) ? '' : $col_header['class'];
 
+			$sort_title = $col_header['sort_image'] === 'up' ? $txt['sort_desc'] : $txt['sort_asc'];
+
 			echo '
-					<th scope="col" id="header_', $list_id, '_', $col_header['id'], '"', empty($col_header['class']) ? '' : ' class="' . $col_header['class'] . '"', empty($col_header['style']) ? '' : ' style="' . $col_header['style'] . '"', empty($col_header['colspan']) ? '' : ' colspan="' . $col_header['colspan'] . '"', '>', empty($col_header['href']) ? '' : '<a href="' . $col_header['href'] . '" rel="nofollow">', empty($col_header['label']) ? '&nbsp;' : $col_header['label'], empty($col_header['href']) ? '' : (empty($col_header['sort_image']) ? '</a>' : ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $col_header['sort_image'] . '.png" alt="" /></a>'), '</th>';
+					<th scope="col" id="header_', $list_id, '_', $col_header['id'], '"', empty($col_header['class']) ? '' : ' class="' . $col_header['class'] . '"', empty($col_header['style']) ? '' : ' style="' . $col_header['style'] . '"', empty($col_header['colspan']) ? '' : ' colspan="' . $col_header['colspan'] . '"', '>', empty($col_header['href']) ? '' : '<a href="' . $col_header['href'] . '" rel="nofollow">', empty($col_header['label']) ? '&nbsp;' : $col_header['label'], empty($col_header['href']) ? '' : (empty($col_header['sort_image']) ? '</a>' : ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $col_header['sort_image'] . '.png" alt="" title="' . $sort_title . '" /></a>'), '</th>';
 		}
 
 		echo '

@@ -321,7 +321,7 @@ class ManagePaid_Controller extends Action_Controller
 				'pending' => array(
 					'header' => array(
 						'value' => $txt['paid_pending'],
-						'style' => 'white_space: nowrap;',
+						'class' => 'nowrap',
 					),
 					'data' => array(
 						'db_htmlsafe' => 'pending',

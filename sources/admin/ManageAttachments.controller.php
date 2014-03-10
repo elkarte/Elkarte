@@ -362,6 +362,7 @@ class ManageAttachments_Controller extends Action_Controller
 				'name' => array(
 					'header' => array(
 						'value' => $txt['attachment_name'],
+						'class' => 'grid50',
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
@@ -404,6 +405,7 @@ class ManageAttachments_Controller extends Action_Controller
 				'filesize' => array(
 					'header' => array(
 						'value' => $txt['attachment_file_size'],
+						'class' => 'nowrap',
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
@@ -420,6 +422,7 @@ class ManageAttachments_Controller extends Action_Controller
 				'member' => array(
 					'header' => array(
 						'value' => $context['browse_type'] == 'avatars' ? $txt['attachment_manager_member'] : $txt['posted_by'],
+						'class' => 'nowrap',
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
@@ -442,6 +445,7 @@ class ManageAttachments_Controller extends Action_Controller
 				'date' => array(
 					'header' => array(
 						'value' => $context['browse_type'] == 'avatars' ? $txt['attachment_manager_last_active'] : $txt['date'],
+						'class' => 'nowrap',
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
@@ -465,6 +469,7 @@ class ManageAttachments_Controller extends Action_Controller
 				'downloads' => array(
 					'header' => array(
 						'value' => $txt['downloads'],
+						'class' => 'nowrap',
 					),
 					'data' => array(
 						'db' => 'downloads',
