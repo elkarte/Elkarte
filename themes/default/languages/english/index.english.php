@@ -106,7 +106,7 @@ $txt['username_no_exist'] = 'That username does not exist.';
 $txt['no_user_with_email'] = 'There are no usernames associated with that email.';
 
 $txt['board_moderator'] = 'Board Moderator';
-$txt['remove_topic'] = 'Remove Topic';
+$txt['remove_topic'] = 'Remove';
 $txt['topics'] = 'Topics';
 $txt['modify_msg'] = 'Modify message';
 $txt['name'] = 'Name';
@@ -173,7 +173,7 @@ $txt['notify_request'] = 'Do you want a notification email if someone replies to
 // Use numeric entities in the below string.
 $txt['regards_team'] = "Regards,\nThe " . $context['forum_name'] . ' Team.';
 $txt['notify_replies'] = 'Notify of replies';
-$txt['move_topic'] = 'Move Topic';
+$txt['move_topic'] = 'Move';
 $txt['move_to'] = 'Move to';
 $txt['pages'] = 'Pages';
 $txt['users_active'] = 'Active in past %1$d minutes';
@@ -416,7 +416,7 @@ $txt['valid_email'] = 'This must be a valid email address.';
 
 $txt['info_center_title'] = '%1$s - Info Center';
 
-$txt['send_topic'] = 'Send this topic';
+$txt['send_topic'] = 'Share';
 $txt['unwatch'] = 'Unwatch';
 $txt['watch'] = 'Watch';
 
@@ -515,10 +515,10 @@ $txt['edit'] = 'Edit';
 $txt['quick_edit'] = 'Quick Edit';
 $txt['post_options'] = 'More...';
 
-$txt['set_sticky'] = 'Set topic sticky';
-$txt['set_nonsticky'] = 'Set topic non-sticky';
-$txt['set_lock'] = 'Lock topic';
-$txt['set_unlock'] = 'Unlock topic';
+$txt['set_sticky'] = 'Pin';
+$txt['set_nonsticky'] = 'Unpin';
+$txt['set_lock'] = 'Lock';
+$txt['set_unlock'] = 'Unlock';
 
 $txt['search_advanced'] = 'Show advanced options';
 $txt['search_simple'] = 'Hide advanced options';
@@ -593,8 +593,8 @@ $txt['movetopic_redirect'] = 'Redirect to the moved topic';
 $txt['movetopic_expires'] = 'Automatically remove the redirection topic';
 
 $txt['merge_to_topic_id'] = 'ID of target topic';
-$txt['split_topic'] = 'Split Topic';
-$txt['merge'] = 'Merge Topics';
+$txt['split_topic'] = 'Split';
+$txt['merge'] = 'Merge';
 $txt['subject_new_topic'] = 'Subject For New Topic';
 $txt['split_this_post'] = 'Only split this post.';
 $txt['split_after_and_this_post'] = 'Split topic after and including this post.';
