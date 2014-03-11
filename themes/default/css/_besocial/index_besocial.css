@@ -985,6 +985,16 @@ span.views_text {
 	background-color: #fff;
 }
 
+#sort_by {
+	border: 1px solid #eee;
+	border-bottom: none;
+	border-radius: 5px 5px 0 0;
+}
+#sort_by.topic_sorting_recent {
+	border: 1px solid #d1d1d1;
+	border-bottom: none;
+}
+
 /*	$TOPICS		*/
 /* ------------------------------------------------------- */
 /* The display template (topic view).
@@ -1360,7 +1370,7 @@ span.views_text {
 		position: relative;
 		top: -12px;
 		display: block;
-		height: 12px; 
+		height: 12px;
 		background-color: #f9f9f9;
 	}
 	.board_lastpost {

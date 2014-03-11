@@ -28,7 +28,7 @@ function template_Recent_init()
  */
 function template_recent()
 {
-	global $context, $txt, $scripturl;
+	global $context, $txt;
 
 	template_pagesection();
 
@@ -56,7 +56,7 @@ function template_recent()
  */
 function template_unread()
 {
-	global $context, $settings, $txt, $scripturl, $modSettings;
+	global $context, $settings, $txt, $scripturl;
 
 	if (!empty($context['topics']))
 	{
@@ -95,14 +95,13 @@ function template_unread()
 		foreach ($context['topics_headers'] as $key => $value)
 			echo '
 									<li class="listlevel2 sort_by_item" id="sort_by_item_', $key, '"><a href="', $value['url'], '" class="linklevel2">', $txt[$key], ' ', $value['sort_dir_img'], '</a></li>';
+
 		echo '
 								</ul>';
 
 		echo '
 							</li>
-						</ul>';
-
-		echo '
+						</ul>
 						<ul class="topic_listing" id="unread">';
 
 		foreach ($context['topics'] as $topic)
@@ -155,6 +154,7 @@ function template_unread()
 								<p class="topic_moderation" >
 									<input type="checkbox" name="topics[]" value="', $topic['id'], '" class="input_check" />
 								</p>';
+
 			echo '
 							</li>';
 		}
@@ -189,7 +189,7 @@ function template_unread()
  */
 function template_replies()
 {
-	global $context, $settings, $txt, $scripturl, $modSettings;
+	global $context, $settings, $txt, $scripturl;
 
 	if (!empty($context['topics']))
 	{
@@ -207,7 +207,8 @@ function template_replies()
 						<h2 class="category_header" id="unread_header">
 							', $txt['unread_replies'], '
 						</h2>
-						<ul id="sort_by" class="topic_sorting" >';
+						<ul id="sort_by" class="topic_sorting topic_sorting_recent">';
+
 		if ($context['showCheckboxes'])
 			echo '
 							<li class="listlevel1 quickmod_select_all">
@@ -223,18 +224,18 @@ function template_replies()
 		echo '
 							<li class="listlevel1 topic_sorting_row">', $txt['sort_by'], ': <a href="', $current_header['url'], '">', $txt[$context['sort_by']], '</a>
 								<ul class="menulevel2" id="sortby">';
+
 		foreach ($context['topics_headers'] as $key => $value)
 			echo '
 									<li class="listlevel2 sort_by_item" id="sort_by_item_', $key, '"><a href="', $value['url'], '" class="linklevel2">', $txt[$key], ' ', $value['sort_dir_img'], '</a></li>';
+
 		echo '
 								</ul>';
 
 		// Show a "select all" box for quick moderation?
 		echo '
 							</li>
-						</ul>';
-
-		echo '
+						</ul>
 						<ul class="topic_listing" id="unread">';
 
 		foreach ($context['topics'] as $topic)
@@ -290,6 +291,7 @@ function template_replies()
 								<p class="topic_moderation">
 									<input type="checkbox" name="topics[]" value="', $topic['id'], '" class="input_check" />
 								</p>';
+
 			echo '
 							</li>';
 		}
