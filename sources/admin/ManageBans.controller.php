@@ -51,7 +51,10 @@ class ManageBans_Controller extends Action_Controller
 		);
 
 		// Start up the controller
-		$action = new Action('manage_bans');
+		$action = new Action();
+
+		// Default the sub-action to 'view ban list'.
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'list';
 
 		// Tabs for browsing the different ban functions.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -83,14 +86,15 @@ class ManageBans_Controller extends Action_Controller
 			),
 		);
 
-		// Default the sub-action to 'view ban list', make the call to integrate-manage_bans
-		$subAction = $action->initialize($subActions, 'list');
+		// Make the call to integrate-manage_bans
+		call_integration_hook('integrate_manage_bans', array(&$subActions));
 
 		// Prepare some items for the template
 		$context['page_title'] = $txt['ban_title'];
 		$context['sub_action'] = $subAction;
 
 		// Call the right function for this sub-action.
+		$action->initialize($subActions, 'list');
 		$action->dispatch($subAction);
 	}
 
