@@ -254,7 +254,6 @@ select option {
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
 	padding: 2px 6px;
-	vertical-align: middle;
 	font-size: .857em;
 	line-height: 17px;
 	display: inline-block;
