@@ -966,8 +966,8 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
  * - Callback for pbe_prepare_text
  * - Only changes the leading [quote], the closing /quote is not changed but
  * handled back in the main function
- * 
- * @param type $matches array of matches from the regex in the preg_replace
+ *
+ * @param string[] $matches array of matches from the regex in the preg_replace
  */
 function quote_callback($matches)
 {
