@@ -1763,13 +1763,19 @@ dl.settings dt .styled-select select {
 	font-size: 0.857em;
 }
 
-#sortby {
-	width: 11em;
+#sort_by {
+	margin-bottom: -4px;
 }
-.topic_sorting:hover #sortby, #sortby:hover {
+.topic_sorting:hover #sortby, #sortby:hover, #sortby {
 	width: 11em;
 	left: auto;
-	right: 0;
+	right: -2.5em;
+}
+#sort_by.topic_sorting_recent {
+	margin: 4px 6px -1px 0;
+}
+.topic_sorting_recent:hover #sortby, .topic_sorting_recent #sortby {
+	right: -1em;
 }
 .sort_by_item {
 	width: 100%;
@@ -2093,7 +2099,7 @@ img.new_posts {
 }
 #whoisviewing, #redirectfrom {
 	font-size: 0.857em;
-	padding: 4px 0;
+	padding: 4px 0 3px 0;
 }
 #redirectfrom {
 	display: inline-block;
