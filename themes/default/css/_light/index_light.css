@@ -1038,6 +1038,14 @@ div.bbc_footnotes .meaction{
 .topic_sorting_row {
 	background: transparent;
 }
+#sort_by {
+	border: 2px solid #d1d1d1;
+	border-bottom: none;
+	border-radius: 5px 5px 0 0;
+}
+#sort_by.topic_sorting_recent {
+	border: 1px solid #d1d1d1;
+}
 .sort_by_container {
 	border: 1px solid #ccc;
 	border-radius: 2px;
