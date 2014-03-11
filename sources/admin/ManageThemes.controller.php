@@ -1487,7 +1487,7 @@ class ManageThemes_Controller extends Action_Controller
 	 */
 	private function _action_edit_submit()
 	{
-		global $context;
+		global $context, $settings;
 
 		$selectedTheme = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
 		if (empty($selectedTheme))

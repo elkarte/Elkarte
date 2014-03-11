@@ -117,7 +117,7 @@ function template_action_summary()
  */
 function template_action_showPosts()
 {
-	global $context, $scripturl, $txt;
+	global $context, $txt;
 
 	echo '
 		<div id="profilecenter">

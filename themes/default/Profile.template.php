@@ -51,7 +51,7 @@ function template_profile_above()
  */
 function template_showDrafts()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $settings, $txt;
 
 	echo '
 		<div id="profilecenter">

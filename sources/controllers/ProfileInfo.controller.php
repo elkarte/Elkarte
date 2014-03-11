@@ -940,7 +940,7 @@ class ProfileInfo_Controller extends Action_Controller
 	 */
 	public function action_showPermissions()
 	{
-		global $txt, $board, $user_profile, $context;
+		global $txt, $board, $user_profile, $context, $scripturl;
 
 		// Verify if the user has sufficient permissions.
 		isAllowedTo('manage_permissions');

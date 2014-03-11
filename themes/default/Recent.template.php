@@ -28,7 +28,7 @@ function template_Recent_init()
  */
 function template_recent()
 {
-	global $context, $txt, $scripturl;
+	global $context, $txt;
 
 	template_pagesection();
 
@@ -56,7 +56,7 @@ function template_recent()
  */
 function template_unread()
 {
-	global $context, $settings, $txt, $scripturl, $modSettings;
+	global $context, $settings, $txt, $scripturl;
 
 	if (!empty($context['topics']))
 	{
@@ -189,7 +189,7 @@ function template_unread()
  */
 function template_replies()
 {
-	global $context, $settings, $txt, $scripturl, $modSettings;
+	global $context, $settings, $txt, $scripturl;
 
 	if (!empty($context['topics']))
 	{
