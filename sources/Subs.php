@@ -233,6 +233,7 @@ function updateMemberData($members, $data)
 /**
  * Updates the settings table as well as $modSettings... only does one at a time if $update is true.
  *
+ * What it does:
  * - updates both the settings table and $modSettings array.
  * - all of changeArray's indexes and values are assumed to have escaped apostrophes (')!
  * - if a variable is already set to what you want to change it to, that
@@ -346,6 +347,7 @@ function removeSettings($toRemove)
 /**
  * Constructs a page list.
  *
+ * What it does:
  * - builds the page list, e.g. 1 ... 6 7 [8] 9 10 ... 15.
  * - flexible_start causes it to use "url.page" instead of "url;start=page".
  * - very importantly, cleans up the start value passed, and forces it to
@@ -487,6 +489,8 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 /**
  * Formats a number.
+ *
+ * What it does:
  * - uses the format of number_format to decide how to format the number.
  *   for example, it might display "1 234,50".
  * - caches the formatting data from the setting for optimization.
@@ -519,6 +523,7 @@ function comma_format($number, $override_decimal_count = false)
 /**
  * Format a time to make it look purdy.
  *
+ * What it does:
  * - returns a pretty formated version of time based on the user's format in $user_info['time_format'].
  * - applies all necessary time offsets to the timestamp, unless offset_type is set.
  * - if todayMod is set and show_today was not not specified or true, an
@@ -629,6 +634,7 @@ function htmlTime($timestamp)
 /**
  * Gets the current time with offset.
  *
+ * What it does:
  * - always applies the offset in the time_offset setting.
  *
  * @param bool $use_user_offset = true if use_user_offset is true, applies the user's offset as well
@@ -649,8 +655,8 @@ function forum_time($use_user_offset = true, $timestamp = null)
 
 /**
  * Removes special entities from strings.  Compatibility...
- * Faster than html_entity_decode
  *
+ * - Faster than html_entity_decode
  * - removes the base entities ( &amp; &quot; &#039; &lt; and &gt;. ) from text with htmlspecialchars_decode
  * - additionally converts &nbsp with str_replace
  *
@@ -668,6 +674,7 @@ function un_htmlspecialchars($string)
 /**
  * Shorten a string of text
  *
+ * What it does:
  * - shortens a text string so that it is either shorter than length, or that length plus an ellipsis.
  * - optionally attempts to break the string on a word boundary approximately at the allowed length
  * - if using cutword and the resulting length is > len plus buffer then it is truncated to length plus an ellipsis.
@@ -708,12 +715,13 @@ function shorten_text($text, $len = 384, $cutword = false, $buffer = 12)
 
 /**
  * Calculates all the possible permutations (orders) of an array.
- *	- should not be called on arrays bigger than 10 elements as this function is memory hungry
- *  - returns an array containing each permutation.
- *  - e.g. (1,2,3) returns (1,2,3), (1,3,2), (2,1,3), (2,3,1), (3,1,2), and (3,2,1)
- *  - really a combinations without repetition N! function so 3! = 6 and 10! = 4098 combinations
  *
- * Used by parse_bbc to allow bbc tag parameters to be in any order and still be
+ * What it does:
+ * - should not be called on arrays bigger than 10 elements as this function is memory hungry
+ * - returns an array containing each permutation.
+ * - e.g. (1,2,3) returns (1,2,3), (1,3,2), (2,1,3), (2,3,1), (3,1,2), and (3,2,1)
+ * - really a combinations without repetition N! function so 3! = 6 and 10! = 4098 combinations
+ * - Used by parse_bbc to allow bbc tag parameters to be in any order and still be
  * parsed properly
  *
  * @param mixed[] $array index array of values
@@ -746,13 +754,14 @@ function permute($array)
 /**
  * Parse bulletin board code in a string, as well as smileys optionally.
  *
+ * What it does:
  * - only parses bbc tags which are not disabled in disabledBBC.
  * - handles basic HTML, if enablePostHTML is on.
  * - caches the from/to replace regular expressions so as not to reload them every time a string is parsed.
  * - only parses smileys if smileys is true.
  * - does nothing if the enableBBC setting is off.
  * - uses the cache_id as a unique identifier to facilitate any caching it may do.
- *  -returns the modified message.
+ * - returns the modified message.
  *
  * @param string|false $message if false return list of enabled bbc codes
  * @param bool|string $smileys = true
@@ -2172,11 +2181,12 @@ function footnote_callback($matches)
 /**
  * Parse smileys in the passed message.
  *
- * The smiley parsing function which makes pretty faces appear :).
- * If custom smiley sets are turned off by smiley_enable, the default set of smileys will be used.
- * These are specifically not parsed in code tags [url=mailto:Dad@blah.com]
- * Caches the smileys from the database or array in memory.
- * Doesn't return anything, but rather modifies message directly.
+ * What it does:
+ * - The smiley parsing function which makes pretty faces appear :).
+ * - If custom smiley sets are turned off by smiley_enable, the default set of smileys will be used.
+ * - These are specifically not parsed in code tags [url=mailto:Dad@blah.com]
+ * - Caches the smileys from the database or array in memory.
+ * - Doesn't return anything, but rather modifies message directly.
  *
  * @param string $message
  */
@@ -2287,9 +2297,10 @@ class ParseSmileysReplacement
 /**
  * Highlight any code.
  *
- * Uses PHP's highlight_string() to highlight PHP syntax
- * does special handling to keep the tabs in the code available.
- * used to parse PHP code from inside [code] and [php] tags.
+ * What it does:
+ * - Uses PHP's highlight_string() to highlight PHP syntax
+ * - does special handling to keep the tabs in the code available.
+ * - used to parse PHP code from inside [code] and [php] tags.
  *
  * @param string $code
  * @return string the code with highlighted HTML.
@@ -2309,10 +2320,12 @@ function highlight_php_code($code)
 
 /**
  * Ends execution and redirects the user to a new location
- * Makes sure the browser doesn't come back and repost the form data.
- * Should be used whenever anything is posted.
- * Calls AddMailQueue to process any mail queue items its can
- * Calls call_integration_hook integrate_redirect before headers are sent
+ *
+ * What it does:
+ * - Makes sure the browser doesn't come back and repost the form data.
+ * - Should be used whenever anything is posted.
+ * - Calls AddMailQueue to process any mail queue items its can
+ * - Calls call_integration_hook integrate_redirect before headers are sent
  *
  * @param string $setLocation = ''
  * @param bool $refresh = false, enable to send a refresh header, default is a location header
@@ -2364,8 +2377,10 @@ function redirectexit($setLocation = '', $refresh = false)
 
 /**
  * URL fixer for redirect exit
- * Similar to the callback function used in ob_sessrewrite
- * Envoked by enabling queryless_urls for systems that support that function
+ *
+ * What it does:
+ * - Similar to the callback function used in ob_sessrewrite
+ * - Envoked by enabling queryless_urls for systems that support that function
  *
  * @param mixed[] $matches
  */
@@ -2381,8 +2396,10 @@ function redirectexit_callback($matches)
 
 /**
  * Ends execution.
- * Takes care of template loading and remembering the previous URL.
- * Calls ob_start() with ob_sessrewrite to fix URLs if necessary.
+ *
+ * What it does:
+ * - Takes care of template loading and remembering the previous URL.
+ * - Calls ob_start() with ob_sessrewrite to fix URLs if necessary.
  *
  * @param bool|null $header = null
  * @param bool|null $do_footer = null
@@ -2497,6 +2514,7 @@ function determineTopicClass(&$topic_context)
 
 /**
  * Sets up the basic theme context stuff.
+ *
  * @param bool $forceload = false
  */
 function setupThemeContext($forceload = false)
@@ -2664,6 +2682,8 @@ function setupThemeContext($forceload = false)
 
 /**
  * Helper function to set the system memory to a needed value
+ *
+ * What it does:
  * - If the needed memory is greater than current, will attempt to get more
  * - if in_use is set to true, will also try to take the current memory usage in to account
  *
@@ -2822,9 +2842,12 @@ function template_footer()
 
 /**
  * Output the Javascript files
- *  - tabbing in this function is to make the HTML source look proper
- *  - if defered is set function will output all JS (source & inline) set to load at page end
- *  - if the admin option to combine files is set, will use Combiner.class
+ *
+ * What it does:
+ * - tabbing in this function is to make the HTML source look proper
+ * - outputs jQuery/jQueryUI from the proper source (local/CDN)
+ * - if defered is set function will output all JS (source & inline) set to load at page end
+ * - if the admin option to combine files is set, will use Combiner.class
  *
  * @param bool $do_defered = false
  */
@@ -2943,6 +2966,8 @@ function template_javascript($do_defered = false)
 
 /**
  * Output the CSS files
+ *
+ * What it does:
  *  - if the admin option to combine files is set, will use Combiner.class
  */
 function template_css()
@@ -2975,8 +3000,8 @@ function template_css()
 }
 
 /**
- * I know this is becoming annoying, though this template
- * *shall* be present for security reasons, so better it stays here
+ * I know this is becoming annoying, though this template *shall* be present
+ * for security reasons, so better it stays here
  *
  * @todo rework it and merge into some other kind of general warning-box (e.g. modtask at index.template)
  */
@@ -3060,7 +3085,8 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 
 /**
  * Convert a single IP to a ranged IP.
- * internal function used to convert a user-readable format to a format suitable for the database.
+ *
+ * - internal function used to convert a user-readable format to a format suitable for the database.
  *
  * @param string $fullip
  * @return array|string 'unknown' if the ip in the input was '255.255.255.255'
@@ -3259,8 +3285,12 @@ function create_button($name, $alt, $label = '', $custom = '', $force_use = fals
 
 /**
  * Sets up all of the top menu buttons
- * Saves them in the cache if it is available and on
- * Places the results in $context
+ *
+ * What it does:
+ * - defines every master item in the menu, as well as any sub-items
+ * - ensures the chosen action is set so the menu is highlighted
+ * - Saves them in the cache if it is available and on
+ * - Places the results in $context
  */
 function setupMenuContext()
 {
@@ -3666,8 +3696,10 @@ function elk_seed_generator()
 
 /**
  * Process functions of an integration hook.
- * calls all functions of the given hook.
- * supports static class method calls.
+ *
+ * What it does:
+ * - calls all functions of the given hook.
+ * - supports static class method calls.
  *
  * @param string $hook
  * @param mixed[] $parameters = array()
@@ -3822,7 +3854,8 @@ function call_integration_buffer()
 
 /**
  * Add a function for integration hook.
- * does nothing if the function is already added.
+ *
+ * - does nothing if the function is already added.
  *
  * @param string $hook
  * @param string $function
@@ -3878,8 +3911,10 @@ function add_integration_function($hook, $function, $file = '', $permanent = tru
 
 /**
  * Remove an integration hook function.
- * Removes the given function from the given hook.
- * Does nothing if the function is not available.
+ *
+ * What it does:
+ * - Removes the given function from the given hook.
+ * - Does nothing if the function is not available.
  *
  * @param string $hook
  * @param string $function
@@ -3983,9 +4018,10 @@ function sanitizeMSCutPaste($string)
 /**
  * Decode numeric html entities to their UTF8 equivalent character.
  *
- * Callback function for preg_replace_callback in subs-members
- * Uses capture group 2 in the supplied array
- * Does basic scan to ensure characters are inside a valid range
+ * What it does:
+ * - Callback function for preg_replace_callback in subs-members
+ * - Uses capture group 2 in the supplied array
+ * - Does basic scan to ensure characters are inside a valid range
  *
  * @param mixed[] $matches matches from a preg_match_all
  * @return string $string
@@ -4026,9 +4062,10 @@ function replaceEntities__callback($matches)
 /**
  * Converts html entities to utf8 equivalents
  *
- * Callback function for preg_replace_callback
- * Uses capture group 1 in the supplied array
- * Does basic checks to keep characters inside a viewable range.
+ * What it does:
+ * - Callback function for preg_replace_callback
+ * - Uses capture group 1 in the supplied array
+ * - Does basic checks to keep characters inside a viewable range.
  *
  * @param mixed[] $matches array of matches as output from preg_match_all
  * @return string $string
@@ -4061,8 +4098,9 @@ function fixchar__callback($matches)
 /**
  * Strips out invalid html entities, replaces others with html style &#123; codes
  *
- * Callback function used of preg_replace_callback in smcFunc $ent_checks, for example
- * strpos, strlen, substr etc
+ * What it does:
+ * - Callback function used of preg_replace_callback in smcFunc $ent_checks,
+ * - for example strpos, strlen, substr etc
  *
  * @param mixed[] $matches array of matches for a preg_match_all
  * @return string
@@ -4103,7 +4141,9 @@ function prepareSearchEngines()
 
 /**
  * This function receives a request handle and attempts to retrieve the next result.
- * It is used by the controller callbacks from the template, such as
+ *
+ * What it does:
+ * - It is used by the controller callbacks from the template, such as
  * posts in topic display page, posts search results page, or personal messages.
  *
  * @param resource $messages_request holds a query result
@@ -4136,8 +4176,10 @@ function currentContext($messages_request, $reset = false)
 
 /**
  * Helper function to insert an array in to an existing array
- * Intended for addon use to allow such things as
- *  - adding in a new menu item to an existing menu array
+ *
+ * What it does:
+ * - Intended for addon use to allow such things as
+ * - adding in a new menu item to an existing menu array
  *
  * @param mixed[] $input the array we will insert to
  * @param string $key the key in the array that we are looking to find for the insert action
@@ -4171,8 +4213,11 @@ function elk_array_insert($input, $key, $insert, $where = 'before', $assoc = tru
 }
 
 /**
- * From time to time it may be necessary to fire a scheduled task ASAP
- * this function set the scheduled task to be called before any other one
+ * Run a scheduled task now
+ *
+ * What it does:
+ * - From time to time it may be necessary to fire a scheduled task ASAP
+ * - this function set the scheduled task to be called before any other one
  *
  * @param string $task the name of a scheduled task
  */

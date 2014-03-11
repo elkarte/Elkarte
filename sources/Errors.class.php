@@ -135,8 +135,8 @@ class Error_Context
 
 	/**
 	 * Return an array of errors of a certain severity.
-	 * @todo is it needed at all?
 	 *
+	 * @todo is it needed at all?
 	 * @param string|int|null $severity the severity level wanted. If null returns all the errors
 	 */
 	public function getErrors($severity = null)
@@ -202,7 +202,8 @@ class Error_Context
 
 	/**
 	 * Return an array containing the error strings
-	 * If severity is null the function returns all the errors
+	 *
+	 * - If severity is null the function returns all the errors
 	 *
 	 * @param string|null $severity the severity level wanted
 	 */
@@ -309,7 +310,8 @@ class Attachment_Error_Context
 
 	/**
 	 * Add attachment
-	 * Automatically activate the attachments added
+	 *
+	 * - Automatically activate the attachments added
 	 *
 	 * @param string $id
 	 * @param string $name
@@ -415,8 +417,9 @@ class Attachment_Error_Context
 
 	/**
 	 * Prepare the errors for display.
-	 * Return an array containing the error strings
-	 * If severity is null the function returns all the errors
+	 *
+	 * - Return an array containing the error strings
+	 * - If severity is null the function returns all the errors
 	 *
 	 * @param int $severity = null the severity level wanted
 	 */

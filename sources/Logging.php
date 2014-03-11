@@ -167,8 +167,10 @@ function writeLog($force = false)
 
 /**
  * Logs the last database error into a file.
- * Attempts to use the backup file first, to store the last database error
- * and only update db_last_error.php if the first was successful.
+ *
+ * What it does:
+ * - Attempts to use the backup file first, to store the last database error
+ * - only updates db_last_error.php if the first was successful.
  */
 function logLastDatabaseError()
 {
@@ -354,10 +356,12 @@ function displayDebug()
 
 /**
  * Track Statistics.
- * Caches statistics changes, and flushes them if you pass nothing.
- * If '+' is used as a value, it will be incremented.
- * It does not actually commit the changes until the end of the page view.
- * It depends on the trackStats setting.
+ *
+ * What it does:
+ * - Caches statistics changes, and flushes them if you pass nothing.
+ * - If '+' is used as a value, it will be incremented.
+ * - It does not actually commit the changes until the end of the page view.
+ * - It depends on the trackStats setting.
  *
  * @param mixed[] $stats = array() array of array => direction (+/-)
  * @return boolean|array
@@ -440,7 +444,9 @@ function logAction($action, $extra = array(), $log_type = 'moderate')
 
 /**
  * Log changes to the forum, such as moderation events or administrative changes.
- * This behaves just like logAction() did, except that it is designed to log multiple actions at once.
+ *
+ * - This behaves just like logAction() did, except that it is designed to
+ * log multiple actions at once.
  *
  * @param mixed[] $logs array of actions to log [] = array(action => log_type=> extra=>)
  * @return int the last logged ID
@@ -569,7 +575,8 @@ function logActions($logs)
 
 /**
  * Actualize login history, for the passed member and IPs.
- * It will log it as entry for the current time.
+ *
+ * - It will log it as entry for the current time.
  *
  * @param int $id_member
  * @param string $ip

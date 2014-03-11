@@ -21,7 +21,15 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Load the $modSettings array.
+ * Load the $modSettings array and many necessary forum settings.
+ *
+ * What it does:
+ * - load the settings from cache if available, otherwse from the database.
+ * - sets the timezone
+ * - checks the load average settings if available.
+ * - check whether post moderation is enabled.
+ * - calls add_integration_function
+ * - calls integrate_pre_include, integrate_pre_load,
  *
  * @global array $modSettings is a giant array of all of the forum-wide settings and statistics.
  */
@@ -661,6 +669,14 @@ function loadBoard()
 
 /**
  * Load this user's permissions.
+ *
+ * What it does:
+ * - If the user is an admin, validate that they have not been banned.
+ * - Attempt to load permissions from cache for cache level > 2
+ * - See if the user is possibly a robot and apply added permissions as needed
+ * - Load permissions from the general permissions table.
+ * - If inside a board load the necessary board permissions.
+ * - If the user is not a guest, identify what other boards they have access to.
  */
 function loadPermissions()
 {
@@ -935,6 +951,13 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 /**
  * Loads the user's basic values... meant for template/theme usage.
  *
+ * What it does:
+ * - Always loads the minimal values of username, name, id, href, link, email, show_email, registered, registered_timestamp
+ * - if $context['loadMemberContext_set'] is not minimal it will load in full a full set of user information
+ * - prepares signature, personal_text, location fields for display (censoring if enabled)
+ * - loads in the members custom fields if any
+ * - prepares the users buddy list, including reverse buddy flags
+ *
  * @param int $user
  * @param bool $display_custom_fields = false
  * @return boolean
@@ -1102,7 +1125,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 /**
  * Loads information about what browser the user is viewing with and places it in $context
  *
- * - uses the class from BrowserDetect.class.php
+ * @uses the class from BrowserDetect.class.php
  */
 function detectBrowser()
 {
@@ -1131,6 +1154,17 @@ function isBrowser($browser)
 
 /**
  * Load a theme, by ID.
+ *
+ * What it does:
+ * - identify the theme to be loaded.
+ * - validate that the theme is valid and that the user has permission to use it
+ * - load the users theme settings and site setttings into $options.
+ * - prepares the list of folders to search for template loading.
+ * - identify what smiley set to use.
+ * - sets up $context['user']
+ * - detects the users browser and sets a mobile friendly enviroment if needed
+ * - loads default JS variables for use in every theme
+ * - loads default JS scripts for use in every theme
  *
  * @param int $id_theme = 0
  * @param bool $initialize = true
@@ -1842,7 +1876,6 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
  * for debugging purposes.
  *
  * @todo get rid of reading $_REQUEST directly
- *
  * @param string $sub_template_name
  * @param bool|string $fatal = false, $fatal = true is for templates that shouldn't get a 'pretty' error screen
  *			'ignore' to skip
@@ -1957,6 +1990,7 @@ function loadCSSFile($filenames, $params = array(), $id = '')
 /**
  * Add a Javascript file for output later
  *
+ * What it does:
  * - Can be passed an array of filenames, all which will have the same parameters applied,
  * - if you need specific parameters on a per file basis, call it multiple times
  *
@@ -2064,6 +2098,7 @@ function addJavascriptVar($vars, $escape = false)
 /**
  * Add a block of inline Javascript code to be executed later
  *
+ * What it does:
  * - only use this if you have to, generally external JS files are better, but for very small scripts
  *   or for scripts that require help from PHP/whatever, this can be useful.
  * - all code added with this function is added to the same <script> tag so do make sure your JS is clean!
@@ -2080,7 +2115,9 @@ function addInlineJavascript($javascript, $defer = false)
 }
 
 /**
- * Load a language file.  Tries the current and default themes as well as the user and global languages.
+ * Load a language file.
+ *
+ * - Tries the current and default themes as well as the user and global languages.
  *
  * @param string $template_name
  * @param string $lang = ''
@@ -2190,6 +2227,7 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 /**
  * Get all parent boards (requires first parent as parameter)
  *
+ * What it does:
  * - It finds all the parents of id_parent, and that board itself.
  * - Additionally, it detects the moderators of said boards.
  * - Returns an array of information about the boards found.
@@ -2332,7 +2370,7 @@ function getLanguages($use_cache = true)
 /**
  * Replace all vulgar words with respective proper words. (substring or whole words..)
  *
- * What this function does:
+ * What it does:
  * - it censors the passed string.
  * - if the theme setting allow_no_censored is on, and the theme option
  *   show_no_censored is enabled, does not censor, unless force is also set.
@@ -2383,6 +2421,7 @@ function censorText(&$text, $force = false)
 /**
  * Load the template/language file using eval or require? (with eval we can show an error message!)
  *
+ * What it does:
  * - loads the template or language file specified by filename.
  * - uses eval unless disableTemplateEval is enabled.
  * - outputs a parse error if the file did not exist or contained errors.
