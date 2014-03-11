@@ -1045,6 +1045,7 @@ div.bbc_footnotes .meaction{
 }
 #sort_by.topic_sorting_recent {
 	border: 1px solid #d1d1d1;
+	border-bottom: none;
 }
 .sort_by_container {
 	border: 1px solid #ccc;
