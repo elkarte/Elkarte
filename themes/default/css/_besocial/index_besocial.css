@@ -625,6 +625,8 @@ div.bbc_footnotes .meaction{
 	line-height: 30px;
 	min-height: 35px;
 	padding: 0;
+	-webkit-backface-visibility: hidden;
+	-webkit-transform: translateZ(0);
 }
 #main_menu {
 	background: transparent !important;
@@ -1360,7 +1362,7 @@ span.views_text {
 		position: relative;
 		top: -12px;
 		display: block;
-		height: 12px; 
+		height: 12px;
 		background-color: #f9f9f9;
 	}
 	.board_lastpost {

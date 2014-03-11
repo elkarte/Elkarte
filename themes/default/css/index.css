@@ -1450,6 +1450,8 @@ a.bbc_link {
 	height: 1.5em;
 	font-size: 2em;
 	font-weight: bold;
+	-webkit-backface-visibility: hidden;
+	-webkit-transform: translateZ(0);
 }
 #gobottom {
 	top: 50%;
