@@ -13,8 +13,10 @@
 
 /**
  * Class to parse $_REQUEST for always necessary data, such as 'action', 'board', 'topic', 'start'.
- * Sanitizes the necessary data
- * Determines the origin of $_REQUEST for use in security checks
+ *
+ * What it does:
+ * - Sanitizes the necessary data
+ * - Determines the origin of $_REQUEST for use in security checks
  */
 class Request
 {
@@ -70,7 +72,8 @@ class Request
 
 	/**
 	 * Return a secondary IP, result of a deeper check for the IP
-	 * It can be identical with client IP (and many times it will be).
+	 *
+	 * - It can be identical with client IP (and many times it will be).
 	 */
 	public function ban_ip()
 	{
@@ -296,8 +299,9 @@ class Request
 
 /**
  * This handy function retrieves a Request instance and passes it on.
- * To get hold of a Request, you can use this function or directly Request::request().
- * This is for convenience, it simply delegates to Request::request().
+ *
+ * - To get hold of a Request, you can use this function or directly Request::request().
+ * - This is for convenience, it simply delegates to Request::request().
  */
 function request()
 {

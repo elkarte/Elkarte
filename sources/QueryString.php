@@ -255,6 +255,7 @@ function expandIPv6($addr, $strict_check = true)
 
 /**
  * Adds html entities to the array/variable.  Uses two underscores to guard against overloading.
+ *
  * What it does:
  * - adds entities (&quot;, &lt;, &gt;) to the array or string var.
  * - importantly, does not effect keys, only values.
@@ -278,6 +279,7 @@ function htmlspecialchars__recursive($var, $level = 0)
 
 /**
  * Trim a string including the HTML space, character 160.  Uses two underscores to guard against overloading.
+ *
  * What it does:
  * - trims a string or an the var array using html characters as well.
  * - does not effect keys, only values.
@@ -302,6 +304,7 @@ function htmltrim__recursive($var, $level = 0)
 
 /**
  * Clean up the XML to make sure it doesn't contain invalid characters.
+ *
  * What it does:
  * - removes invalid XML characters to assure the input string being
  * - parsed properly.
@@ -341,6 +344,7 @@ function JavaScriptEscape($string)
 
 /**
  * Rewrite URLs to include the session ID.
+ *
  * What it does:
  * - rewrites the URLs outputted to have the session ID, if the user
  *   is not accepting cookies and is using a standard web browser.

@@ -16,6 +16,7 @@ if (!defined('ELK'))
 /**
  * Used to combine css or js files in to a single file
  *
+ * What it does:
  * - Checks if the files have changed, and if so rebuilds the amalgamation
  * - Calls minification classes to reduce size of css and js file saving bandwidth
  * - Can creates a .gz file, be would require .htaccess or the like to use
@@ -223,6 +224,7 @@ class Site_Combiner
 	/**
 	 * Add all the file parameters to the $_combine_files array
 	 *
+	 * What it does:
 	 * - If the file has a 'stale' option defined it will be added to the
 	 * $_stales array as well to be used later
 	 * - Tags any files that are pre-minimized by filename matching .min.js
@@ -253,7 +255,8 @@ class Site_Combiner
 
 	/**
 	 * Determines if the existing combined file is stale
-	 * If any date of the files that make up the archive are newer than the archive, its considered stale
+	 *
+	 * - If any date of the files that make up the archive are newer than the archive, its considered stale
 	 */
 	private function _isStale()
 	{
@@ -296,6 +299,7 @@ class Site_Combiner
 	/**
 	 * Reads each files contents in to the _combine_files array
 	 *
+	 * What it does:
 	 * - For each file, loads its contents in to the content key
 	 * - If the file is CSS will convert some common relative links to the
 	 * location of the hive
@@ -362,12 +366,13 @@ class Site_Combiner
 	 * Takes a js file and compresses it to save space, will try several methods to
 	 * minimize the code
 	 *
-	 * 1) Attempt to use the closure-compiler API using code_url
-	 * 2) Failing that will use jsminplus
-	 * 3) Failing that it will use the closure-compiler API using js_code
+	 * What it does:
+	 * - Attempt to use the closure-compiler API using code_url
+	 * - Failing that will use jsminplus
+	 * - Failing that it will use the closure-compiler API using js_code
 	 *		a) single block if it can or
 	 *		b) as multiple calls
-	 * 4) Failing that will return original uncompressed file
+	 * - Failing that will return original uncompressed file
 	 */
 	private function _jsCompiler()
 	{
@@ -401,6 +406,7 @@ class Site_Combiner
 	/**
 	 * Makes a request to the closure compiler using the code_url syntax
 	 *
+	 * What it does:
 	 * - Allows us to make a single request and let the compiler fetch the files from us
 	 * - Best option if its available (closure can see the files)
 	 */
@@ -421,6 +427,7 @@ class Site_Combiner
 	/**
 	 * Makes a request to the closure compiler using the js_code syntax
 	 *
+	 * What it does:
 	 * - If our combined file size allows, this is done as a single post to the compiler
 	 * - If the combined string is to large, then it is processed as chunks done
 	 * to minimize the number of posts required
@@ -443,6 +450,7 @@ class Site_Combiner
 	/**
 	 * Combine files in to <200k chunks and make closure compiler requests
 	 *
+	 * What it does:
 	 * - Loads as many files as it can in to a single post request while
 	 * keeping the post size within the limits accepted by the service
 	 * - Will do multiple requests until done, combining the results

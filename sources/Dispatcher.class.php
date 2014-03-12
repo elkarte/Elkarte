@@ -27,7 +27,7 @@ if (!defined('ELK'))
  *     * filename=[action].php function=[sa]
  *     * filename=[action].controller.php method=action_[sa]
  *     * filename=[action]-Controller.php method=action_[sa]
-  - An addon files to handle custom actions will be called if they follow
+ * - An addon files to handle custom actions will be called if they follow
  * any of these patterns.
  */
 class Site_Dispatcher
@@ -62,7 +62,7 @@ class Site_Dispatcher
 	 */
 	public function __construct()
 	{
-		global $board, $topic, $modSettings, $settings, $user_info, $maintenance;
+		global $board, $topic, $modSettings, $user_info, $maintenance;
 
 		// Default action of the forum: board index
 		// Everytime we don't know what to do, we'll do this :P
