@@ -678,7 +678,6 @@ $txt['quickmod_confirm'] = 'Sind Sie sich sicher, dass Sie dies tun möchten?';
 $txt['spell_check'] = 'Rechtschreibprüfung';
 
 $txt['quick_reply'] = 'Schnellantwort';
-$txt['quick_reply_desc'] = 'Mit der <em>Schnellantwort</em> können Sie einen Beitrag verfassen, während Sie ein Thema ansehen, ohne eine neue Seite zu laden. Sie können weiterhin BBCode und Smileys wie in einem normalen Beitrag nutzen.';
 $txt['quick_reply_warning'] = 'Warnung! Dieses Thema ist zurzeit geschlossen, nur Administratoren und Moderatoren können antworten.';
 $txt['quick_reply_verification'] = 'Nach der Übertragung werden Sie auf die normale Beitragsseite weitergeleitet, um Ihren Beitrag %1$s zu überprüfen.';
 $txt['quick_reply_verification_guests'] = '(gilt für alle Gäste)';

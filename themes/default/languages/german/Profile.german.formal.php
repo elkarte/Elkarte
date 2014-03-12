@@ -97,11 +97,11 @@ $txt['openid_secret_reminder'] = 'Bitte geben Sie die Antwort auf die Frage ein.
 $txt['reminder_openid_is'] = 'Die OpenID-Identität, die mit Ihrem Benutzerkonto verknüpft ist, lautet:<br />&nbsp;&nbsp;&nbsp;&nbsp;<strong>%1$s</strong><br /><br />Bitte merken Sie sich diese für die Zukunft.';
 $txt['reminder_continue'] = 'Weiter';
 
-$txt['current_theme'] = 'Aktuelles Thema';
-$txt['change'] = '(ändern)';
-$txt['theme_preferences'] = 'Themenvoreinstellungen';
+$txt['current_theme'] = 'Aktuelles Design';
+$txt['change'] = 'Design ändern';
+$txt['theme_preferences'] = 'Designvoreinstellungen';
 $txt['theme_forum_default'] = 'Forums- oder Boardstandard';
-$txt['theme_forum_default_desc'] = 'Dies ist das Standard-Thema, das heißt, Ihr Thema wechselt mit den Einstellungen des Administrators und dem Forum, das Sie aufrufen.';
+$txt['theme_forum_default_desc'] = 'Dies ist das Standard-Design, das heißt, Ihr Design wechselt mit den Einstellungen des Administrators und dem Forum, das Sie aufrufen.';
 
 $txt['profileConfirm'] = 'Sind Sie sich sicher, dass Sie diesen Benutzer löschen möchten?';
 
