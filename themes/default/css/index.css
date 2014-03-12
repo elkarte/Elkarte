@@ -4045,7 +4045,7 @@ a.help .icon {
 	}
 	.board_latest {
 		min-width: 18em;
-		max-width: 18em;
+		max-width: 20em;
 	}
 	.board_row {
 		min-width: 20em;
