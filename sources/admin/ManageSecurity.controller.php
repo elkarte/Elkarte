@@ -72,14 +72,8 @@ class ManageSecurity_Controller extends Action_Controller
 			'moderation' => array($this, 'action_moderationSettings_display', 'enabled' => in_array('w', $context['admin_features']), 'permission' => 'admin_forum'),
 		);
 
-		call_integration_hook('integrate_modify_security', array(&$subActions));
-
-		// By default do the basic settings.
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'general';
-
-		$context['sub_action'] = $subAction;
-		$context['page_title'] = $txt['admin_security_moderation'];
-		$context['sub_template'] = 'show_settings';
+		// Action control
+		$action = new Action('modify_security');
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -100,9 +94,15 @@ class ManageSecurity_Controller extends Action_Controller
 			),
 		);
 
+		// By default do the basic settings, call integrate_modify_security
+		$subAction = $action->initialize($subActions, 'general');
+
+		// Last pieces of the puzzle
+		$context['sub_action'] = $subAction;
+		$context['page_title'] = $txt['admin_security_moderation'];
+		$context['sub_template'] = 'show_settings';
+
 		// Call the right function for this sub-action.
-		$action = new Action();
-		$action->initialize($subActions, 'general');
 		$action->dispatch($subAction);
 	}
 

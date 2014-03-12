@@ -115,12 +115,13 @@ class Maintenance_Controller extends Action_Controller
 			),
 		);
 
-		call_integration_hook('integrate_manage_maintenance', array(&$subActions));
+		// Set up the action handeler
+		$action = new Action('manage_maintenance');
 
-		// Yep, sub-action time!
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'routine';
+		// Yep, sub-action time and call integrate_manage_maintenance as well
+		$subAction = $action->initialize($subActions, 'routine');
 
-		// Doing something special?
+		// Doing something special, does it exist?
 		if (isset($_REQUEST['activity']) && isset($subActions[$subAction]['activities'][$_REQUEST['activity']]))
 			$activity = $_REQUEST['activity'];
 
@@ -130,11 +131,9 @@ class Maintenance_Controller extends Action_Controller
 		$context['sub_action'] = $subAction;
 
 		// Finally fall through to what we are doing.
-		$action = new Action();
-		$action->initialize($subActions, 'routine');
 		$action->dispatch($subAction);
 
-		// Any special activity?
+		// Any special activity defined, then go to it.
 		if (isset($activity))
 		{
 			if (method_exists($this, $subActions[$subAction]['activities'][$activity]))

@@ -80,13 +80,13 @@ class PackageServers_Controller extends Action_Controller
 			'upload2' => array($this, 'action_upload2'),
 		);
 
-		// Now let's decide where we are taking this...
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'servers';
-
 		// Set up action/subaction stuff.
-		$action = new Action();
-		$action->initialize($subActions, 'servers');
+		$action = new Action('package_servers');
 
+		// Now let's decide where we are taking this... call integrate_package_servers
+		$subAction = $action->initialize($subActions, 'servers');
+
+		// For the template
 		$context['sub_action'] = $subAction;
 
 		// Lets just do it!

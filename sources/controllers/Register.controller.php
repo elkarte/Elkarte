@@ -754,8 +754,8 @@ class Register_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Members.subs.php');
 		$member = getBasicMemberData((int) $_GET['member'], array('authentication' => true));
 
-		// If doesn't exist or pending coppa
-		if (empty($member) || $member['is_activated'] == 5)
+		// If doesn't exist or not pending coppa
+		if (empty($member) || $member['is_activated'] != 5)
 			fatal_lang_error('no_access', false);
 
 		if (isset($_GET['form']))

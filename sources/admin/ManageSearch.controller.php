@@ -66,13 +66,8 @@ class ManageSearch_Controller extends Action_Controller
 			'managesphinx' => array($this, 'action_managesphinx', 'permission' => 'admin_forum'),
 		);
 
-		call_integration_hook('integrate_manage_search', array(&$subActions));
-
-		// Default the sub-action to 'edit search settings'.
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'weights';
-
-		$context['sub_action'] = $subAction;
-		$context['page_title'] = $txt['search_settings_title'];
+		// Control for actions
+		$action = new Action();
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -92,9 +87,14 @@ class ManageSearch_Controller extends Action_Controller
 			),
 		);
 
+		// Default the sub-action to 'edit search settings'.  Call integrate_manage_search
+		$subAction = $action->initialize($subActions, 'weights');
+
+		// Final bits
+		$context['sub_action'] = $subAction;
+		$context['page_title'] = $txt['search_settings_title'];
+
 		// Call the right function for this sub-action.
-		$action = new Action();
-		$action->initialize($subActions);
 		$action->dispatch($subAction);
 	}
 

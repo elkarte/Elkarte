@@ -74,10 +74,8 @@ class ManageNews_Controller extends Action_Controller
 				'permission' => 'admin_forum'),
 		);
 
-		call_integration_hook('integrate_manage_news');
-
-		// Default to sub action 'main' or 'settings' depending on permissions.
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('edit_news') ? 'editnews' : (allowedTo('send_mail') ? 'mailingmembers' : 'settings'));
+		// Action control
+		$action = new Action('manage_news');
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -96,6 +94,13 @@ class ManageNews_Controller extends Action_Controller
 			),
 		);
 
+		// Default to sub action 'editnews' or 'mailingmembers' or 'settings' depending on permissions.
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('edit_news') ? 'editnews' : (allowedTo('send_mail') ? 'mailingmembers' : 'settings'));
+
+		// Give integration its shot via integrate_manage_news
+		$action->initialize($subActions, 'settings');
+
+		// Some bits for the tempalte
 		$context['page_title'] = $txt['news_title'];
 		$context['sub_action'] = $subAction;
 
@@ -104,8 +109,6 @@ class ManageNews_Controller extends Action_Controller
 			$context[$context['admin_menu_name']]['current_subsection'] = 'mailingmembers';
 
 		// Call the right function for this sub-action.
-		$action = new Action();
-		$action->initialize($subActions, 'settings');
 		$action->dispatch($subAction);
 	}
 
@@ -844,7 +847,12 @@ class ManageNews_Controller extends Action_Controller
 
 		$config_vars = $this->_newsSettings->settings();
 
-		call_integration_hook('integrate_modify_news_settings');
+		// Add some javascript at the bottom...
+		addInlineJavascript('
+			document.getElementById("xmlnews_maxlen").disabled = !document.getElementById("xmlnews_enable").checked;
+			document.getElementById("xmlnews_limit").disabled = !document.getElementById("xmlnews_enable").checked;', true);
+
+		call_integration_hook('integrate_modify_news_settings', array(&$config_vars));
 
 		$context['page_title'] = $txt['admin_edit_news'] . ' - ' . $txt['settings'];
 		$context['sub_template'] = 'show_settings';
@@ -852,11 +860,6 @@ class ManageNews_Controller extends Action_Controller
 		// Wrap it all up nice and warm...
 		$context['post_url'] = $scripturl . '?action=admin;area=news;save;sa=settings';
 		$context['permissions_excluded'] = array(-1);
-
-		// Add some javascript at the bottom...
-		addInlineJavascript('
-			document.getElementById("xmlnews_maxlen").disabled = !document.getElementById("xmlnews_enable").checked;
-			document.getElementById("xmlnews_limit").disabled = !document.getElementById("xmlnews_enable").checked;', true);
 
 		// Saving the settings?
 		if (isset($_GET['save']))

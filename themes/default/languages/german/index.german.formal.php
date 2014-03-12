@@ -106,7 +106,7 @@ $txt['username_no_exist'] = 'Dieser Benutzername existiert nicht.';
 $txt['no_user_with_email'] = 'Mit dieser E-Mail-Adresse sind keine Benutzernamen verbunden.';
 
 $txt['board_moderator'] = 'Boardmoderator';
-$txt['remove_topic'] = 'Thema entfernen';
+$txt['remove_topic'] = 'Entfernen';
 $txt['topics'] = 'Themen';
 $txt['modify_msg'] = 'Nachricht ändern';
 $txt['name'] = 'Name';
@@ -148,12 +148,12 @@ $txt['error_occurred'] = 'Ein Fehler ist aufgetreten';
 $txt['send_error_occurred'] = 'Ein Fehler ist aufgetreten, <a href="{href}">bitte klicken Sie hier, um es erneut zu versuchen</a>.';
 $txt['require_field'] = 'Dieses Feld wird benötigt.';
 $txt['at'] = 'um';
-$txt['started_by'] = 'Begonnen von';
+$txt['started_by'] = 'Begonnen vom Autoren'; // translator note: whyever...
 $txt['topic_started_by'] = 'Begonnen von <strong>%1$s</strong> in <em>%2$s</em>';
 $txt['replies'] = 'Antworten';
 $txt['last_post'] = 'Letzter Beitrag';
 $txt['first_post'] = 'Erster Beitrag';
-$txt['last_poster'] = 'Letzter Beitrag von';
+$txt['last_poster'] = 'Autor des letzten Beitrags';
 //$txt['last_post_message'] = '<strong>Letzter Beitrag</strong> von %1$s<br />in %2$s<br />am %3$s';
 // @todo - Clean this up a bit. See notes in template.
 // Just moved a space, so the output looks better when things break to an extra line.
@@ -162,6 +162,8 @@ $txt['boardindex_total_posts'] = '%1$s Beiträge in %2$s Themen von %3$s Mitglie
 $txt['show'] = 'Zeigen';
 $txt['hide'] = 'Verstecken';
 $txt['sort_by'] = 'Sortieren nach';
+$txt['sort_asc'] = 'Aufsteigend sortieren';
+$txt['sort_desc'] = 'Absteigend sortieren';
 
 $txt['admin_login'] = 'Administratorenanmeldung';
 // Use numeric entities in the below string.
@@ -173,7 +175,7 @@ $txt['notify_request'] = 'Möchten Sie per E-Mail benachrichtigt werden, wenn je
 // Use numeric entities in the below string.
 $txt['regards_team'] = "Grüße,\ndas " . $context['forum_name'] . '-Team.';
 $txt['notify_replies'] = 'Bei Antwort benachrichtigen';
-$txt['move_topic'] = 'Thema verschieben';
+$txt['move_topic'] = 'Verschieben';
 $txt['move_to'] = 'Verschieben nach';
 $txt['pages'] = 'Seiten';
 $txt['users_active'] = 'Aktiv in den letzten %1$d Minuten';
@@ -416,7 +418,7 @@ $txt['valid_email'] = 'Dies muss eine gültige E-Mail-Adresse sein.';
 
 $txt['info_center_title'] = '%1$s - Infozentrum';
 
-$txt['send_topic'] = 'Dieses Thema versenden';
+$txt['send_topic'] = 'Teilen';
 $txt['unwatch'] = 'Nicht mehr beobachten';
 $txt['watch'] = 'Beobachten';
 
@@ -515,10 +517,10 @@ $txt['edit'] = 'Ändern';
 $txt['quick_edit'] = 'Schnell ändern';
 $txt['post_options'] = 'Mehr...';
 
-$txt['set_sticky'] = 'Thema anheften';
-$txt['set_nonsticky'] = 'Thema nicht mehr anheften';
-$txt['set_lock'] = 'Thema sperren';
-$txt['set_unlock'] = 'Thema entsperren';
+$txt['set_sticky'] = 'Anheften';
+$txt['set_nonsticky'] = 'Nicht mehr anheften';
+$txt['set_lock'] = 'Sperren';
+$txt['set_unlock'] = 'Entsperren';
 
 $txt['search_advanced'] = 'Erweiterte Optionen anzeigen';
 $txt['search_simple'] = 'Erweiterte Optionen verstecken';
@@ -593,8 +595,8 @@ $txt['movetopic_redirect'] = 'In das verschobene Thema wechseln';
 $txt['movetopic_expires'] = 'Die Weiterleitung automatisch entfernen';
 
 $txt['merge_to_topic_id'] = 'ID des Zielthemas';
-$txt['split_topic'] = 'Thema aufteilen';
-$txt['merge'] = 'Themen zusammenführen';
+$txt['split_topic'] = 'Aufteilen';
+$txt['merge'] = 'Zusammenführen';
 $txt['subject_new_topic'] = 'Betreff des neuen Themas';
 $txt['split_this_post'] = 'Nur diesen Beitrag abtrennen.';
 $txt['split_after_and_this_post'] = 'Thema ab diesem Beitrag aufteilen.';

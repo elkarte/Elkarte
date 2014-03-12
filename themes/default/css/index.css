@@ -1022,6 +1022,7 @@ a.bbc_link {
 .linklevel1 {
 	display: block;
 	padding: 0 0.6em;
+	white-space: nowrap;
 }
 .listlevel1#button_profile .linklevel1 {
 	min-width: 5em;
@@ -1211,6 +1212,9 @@ a.bbc_link {
 .quickbuttons {
 	margin: 8px 0 6px 0;
 	text-align: right;
+}
+.quickbuttons li {
+	white-space: nowrap;
 }
 /* Follow ups and topic summary need it a bit different. */
 .follow_ups, #topic_summary .quickbuttons {
@@ -1759,16 +1763,25 @@ dl.settings dt .styled-select select {
 	font-size: 0.857em;
 }
 
-#sortby {
-	width: 8.4em;
+#sort_by {
+	margin-bottom: -4px;
 }
-.topic_sorting:hover #sortby, #sortby:hover {
-	width: 8.4em;
+.topic_sorting:hover #sortby, #sortby:hover, #sortby {
+	width: 11em;
 	left: auto;
-	right: 0;
+	right: -2.5em;
+}
+#sort_by.topic_sorting_recent {
+	margin: 4px 6px -1px 0;
+}
+.topic_sorting_recent:hover #sortby, .topic_sorting_recent #sortby {
+	right: -1em;
 }
 .sort_by_item {
 	width: 100%;
+}
+.sort_by_item .sort {
+	vertical-align: baseline;
 }
 .topic_sorting>li {
 	float: right;
@@ -1776,7 +1789,6 @@ dl.settings dt .styled-select select {
 .topic_sorting {
 	float: right;
 	font-size: 1.143em;
-	margin-top: -2px;
 }
 .topic_sorting>li {
 	padding: 0 3px;
@@ -2087,7 +2099,7 @@ img.new_posts {
 }
 #whoisviewing, #redirectfrom {
 	font-size: 0.857em;
-	padding: 4px 0;
+	padding: 4px 0 3px 0;
 }
 #redirectfrom {
 	display: inline-block;
@@ -2336,6 +2348,7 @@ div.core_posts {
 #display_jump_to {
 	float: right;
 	padding: 6px 5px 5px 0;
+	white-space: nowrap;
 }
 
 /* The quick reply area. */
@@ -3653,7 +3666,36 @@ a.help .icon {
 	content: "";
 }
 
-/* The memberlist. */
+/*	$MEMBERLIST		*/
+/* ------------------------------------------------------- */
+.mlist {
+	display: table;
+	width: 100%;
+	border-collapse: collapse;
+}
+.mlist li {
+	display: table-row;
+}
+.mlist li div {
+	display: table-cell;
+	padding: 5px 8px;
+}
+.letter_row {
+	height: 3em;
+	line-height: 3em;
+	vertical-align: bottom;
+}
+.letter_row>h3 {
+	line-height: 2em;
+	text-transform: uppercase;
+	font-weight: bold;
+	position: relative;
+	top: 12px;
+	text-align: center;
+}
+.mlist_header {
+	font-weight: bold;
+}
 #memberlist {
 	margin: 6px 0 0 0;
 }
@@ -3999,6 +4041,7 @@ a.help .icon {
 		max-width: 95%;
 		white-space: nowrap;
 		text-overflow: ellipsis;
+		line-height: inherit;
 	}
 	.board_latest {
 		min-width: 22em;
@@ -4095,6 +4138,9 @@ a.help .icon {
 	#list_mentions .listaction {
 		display: none;
 	}
+	.mlist li div:nth-child(n+6) {
+		display: none;
+	}
 }
 /* This one does 540 and smaller screens at default font size. */
 @media screen and (max-width: 33.750em) {
@@ -4139,9 +4185,6 @@ a.help .icon {
 	.frame {
 		min-width: 100%;
 	}
-	.board_lastpost, .board_description, .moderators {
-		display: none;
-	}
 	.topic_info {
 		display: block;
 		width: 95%;
@@ -4177,6 +4220,12 @@ a.help .icon {
 	}
 	#whoisviewing {
 		display: none;
+	}
+	.board_row {
+		margin-top:3px;
+	}
+	.board_lastpost {
+		margin: 3px;
 	}
 	.childboards li {
 		display: block;
@@ -4447,6 +4496,9 @@ a.help .icon {
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
+	.mlist li div:nth-child(n+5) {
+		display: none;
+	}
 }
 /* This one does 480px screens at default font size. */
 @media screen and (max-width: 30em) {
@@ -4454,6 +4506,9 @@ a.help .icon {
 		display: none;
 	}
 	.quickbuttons .modified {
+		display: none;
+	}
+	.mlist li div:nth-child(n+4) {
 		display: none;
 	}
 }

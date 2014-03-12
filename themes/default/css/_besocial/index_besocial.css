@@ -985,6 +985,16 @@ span.views_text {
 	background-color: #fff;
 }
 
+#sort_by {
+	border: 1px solid #eee;
+	border-bottom: none;
+	border-radius: 5px 5px 0 0;
+}
+#sort_by.topic_sorting_recent {
+	border: 1px solid #d1d1d1;
+	border-bottom: none;
+}
+
 /*	$TOPICS		*/
 /* ------------------------------------------------------- */
 /* The display template (topic view).
@@ -1226,6 +1236,34 @@ span.views_text {
 	cursor: pointer;
 }
 
+/*	$MEMBERLIST		*/
+/* ------------------------------------------------------- */
+
+.mlist .mlist_header div {
+	border-top: none;
+}
+.mlist li div {
+	background-color: #fff;
+	border-bottom: 1px solid #ccc;
+	border-top: 1px solid #ccc;
+}
+.mlist li.alternate_row div {
+	background-color: #fafafa;
+	border-bottom: 1px solid #ccc;
+	border-top: 1px solid #ccc;
+}
+.mlist li div:first-child {
+	border-left: 1px solid #ccc;
+}
+.mlist li div:last-child {
+	border-right: 1px solid #ccc;
+}
+
+.letter_row h3 {
+	border: 1px solid #ccc;
+	border-radius: 6px 6px 0 0;
+	border-bottom: none;
+}
 /*	$MEDIA		*/
 /* Experimental media queries.
 /* ------------------------------------------------------- */
@@ -1306,11 +1344,37 @@ span.views_text {
 		background-color: #f6f6f6;
 		margin-bottom: 5px !important;
 	}
+	.mlist li div:nth-child(n+5) {
+		border-right: 1px solid #ccc;
+	}
 }
 /* This one does up to 540 screens. */
 @media screen and (max-width: 33.750em) {
 	.board_latest {
 		border-left: 0;
+	}
+	.board_row, .childboard_row {
+		border: 1px solid #ccc;
+		box-shadow: 1px 1px 3px #ccc;
+		background-color: #f9f9f9;
+	}
+	.board_row {
+		margin-top: 6px;
+	}
+	.childboard_row {
+		border-top: none;
+	}
+	.childboard_row:before {
+		content: "";
+		margin: 0;
+		position: relative;
+		top: -12px;
+		display: block;
+		height: 12px;
+		background-color: #f9f9f9;
+	}
+	.board_lastpost {
+		border-top: 1px solid #eee;
 	}
 	#top_section .wrapper {
 		padding: 0;
@@ -1439,5 +1503,13 @@ span.views_text {
 	}
 	#search_form * {
 		float: none;
+	}
+	.mlist li div:nth-child(n+4) {
+		border-right: 1px solid #ccc;
+	}
+}
+@media screen and (max-width: 30em) {
+	.mlist li div:nth-child(n+3) {
+		border-right: 1px solid #ccc;
 	}
 }

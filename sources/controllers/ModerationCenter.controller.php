@@ -1424,8 +1424,6 @@ class ModerationCenter_Controller extends Action_Controller
 			'templates' => array($this, 'action_viewWarningTemplates', 'permission' => 'issue_warning'),
 		);
 
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'log';
-
 		// Setup the admin tabs.
 		$context[$context['moderation_menu_name']]['tab_data'] = array(
 			'title' => $txt['mc_warnings'],
@@ -1434,7 +1432,8 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// Call the right function.
 		$action = new Action();
-		$action->initialize($subActions, 'log');
+		$subAction = $action->initialize($subActions, 'log');
+		$context['sub_action'] = $subAction;
 		$action->dispatch($subAction);
 	}
 

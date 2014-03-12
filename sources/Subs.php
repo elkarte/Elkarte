@@ -3542,6 +3542,13 @@ function setupMenuContext()
 				'data-icon' => '&#xf090;',
 				'show' => $user_info['is_guest'] && $context['can_register'],
 			),
+
+			'contact' => array(
+				'title' => $txt['contact'],
+				'href' => $scripturl . '?action=contact',
+				'data-icon' => '&#xf095;',
+				'show' => $user_info['is_guest'] && !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] == 'menu',
+			),
 		);
 
 		// Allow editing menu buttons easily.
@@ -3902,7 +3909,7 @@ function remove_integration_function($hook, $function, $file = '')
 
 		foreach ($current_functions as $filefunc)
 		{
-			if (strpos($funcfile, '|') !== false)
+			if (strpos($filefunc, '|') !== false)
 				list($func, $inc_file) = explode('|', $filefunc);
 			else
 				$func = $filefunc;

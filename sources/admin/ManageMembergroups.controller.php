@@ -83,10 +83,7 @@ class ManageMembergroups_Controller extends Action_Controller
 				'permission' => 'admin_forum'),
 		);
 
-		call_integration_hook('integrate_manage_membergroups', array(&$subActions));
-
-		// Default to sub action 'index' or 'settings' depending on permissions.
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('manage_membergroups') ? 'index' : 'settings');
+		$action = new Action('manage_membergroups');
 
 		// Setup the admin tabs.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -95,12 +92,17 @@ class ManageMembergroups_Controller extends Action_Controller
 			'description' => $txt['membergroups_description'],
 		);
 
+		// Default to sub action 'index' or 'settings' depending on permissions.
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('manage_membergroups') ? 'index' : 'settings');
+
+		// Set that subaction, call integrate_manage_membergroups
+		$subAction = $action->initialize($subActions, $subAction);
+
+		// Final items for the template
 		$context['page_title'] = $txt['membergroups_title'];
 		$context['sub_action'] = $subAction;
 
 		// Call the right function.
-		$action = new Action();
-		$action->initialize($subActions, 'settings');
 		$action->dispatch($subAction);
 	}
 

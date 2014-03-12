@@ -351,7 +351,7 @@ function processAttachments($id_msg = null)
 {
 	global $context, $modSettings, $txt, $user_info, $ignore_temp, $topic, $board;
 
-	$attach_errors = attachment_Error_Context::context();
+	$attach_errors = Attachment_Error_Context::context();
 
 	// Make sure we're uploading to the right place.
 	if (!empty($modSettings['automanage_attachments']))
@@ -436,8 +436,8 @@ function processAttachments($id_msg = null)
 
 		// This is a generic error
 		$attach_errors->activate();
-		$attach_errors->addError($txt['attach_no_upload']);
-		$attach_errors->addError(is_array($attachment) ? vsprintf($txt[$attachment[0]], $attachment[1]) : $txt[$attachment]);
+		$attach_errors->addError('attach_no_upload');
+		$attach_errors->addError(is_array($attachment) ? array($attachment[0], $attachment[1]) : $attachment);
 
 		// And delete the files 'cos they ain't going nowhere.
 		foreach ($_FILES['attachment']['tmp_name'] as $n => $dummy)
@@ -456,26 +456,13 @@ function processAttachments($id_msg = null)
 			continue;
 
 		// First, let's first check for PHP upload errors.
-		$errors = array();
-		if (!empty($_FILES['attachment']['error'][$n]))
-		{
-			if ($_FILES['attachment']['error'][$n] == 2)
-				$errors[] = array('file_too_big', array($modSettings['attachmentSizeLimit']));
-			// Missing or a full a temporary directory on the server
-			elseif ($_FILES['attachment']['error'][$n] == 6)
-				log_error($_FILES['attachment']['name'][$n] . ': ' . $txt['php_upload_error_6'], 'critical');
-			// One of many errors such as exceeds the upload_max_filesize directive in php.ini
-			else
-				log_error($_FILES['attachment']['name'][$n] . ': ' . $txt['php_upload_error_' . $_FILES['attachment']['error'][$n]]);
+		$errors = attachmentUploadChecks($n);
 
-			// If we did not set an specific error to show the user, give them a generic one
-			if (empty($errors))
-				$errors[] = 'attach_php_error';
-		}
-
-		// Try to move and rename the file before doing any more checks on it.
+		// Set the names and destination for this file
 		$attachID = 'post_tmp_' . $user_info['id'] . '_' . md5(mt_rand());
 		$destName = $context['attach_dir'] . '/' . $attachID;
+
+		// If we are error free, Try to move and rename the file before doing more checks on it.
 		if (empty($errors))
 		{
 			$_SESSION['temp_attachments'][$attachID] = array(
@@ -497,6 +484,7 @@ function processAttachments($id_msg = null)
 					unlink($_FILES['attachment']['tmp_name'][$n]);
 			}
 		}
+		// Upload error(s) were detected, flag the error, remove the file
 		else
 		{
 			$_SESSION['temp_attachments'][$attachID] = array(
@@ -509,7 +497,7 @@ function processAttachments($id_msg = null)
 				unlink($_FILES['attachment']['tmp_name'][$n]);
 		}
 
-		// If there's no errors to this pont. We still need to apply addtional checks
+		// If there were no errors to this pont, we apply some addtional checks
 		if (empty($_SESSION['temp_attachments'][$attachID]['errors']))
 			attachmentChecks($attachID);
 
@@ -523,12 +511,12 @@ function processAttachments($id_msg = null)
 			{
 				if (!is_array($error))
 				{
-					$attach_errors->addError($txt[$error]);
+					$attach_errors->addError($error);
 					if (in_array($error, $log_these))
 						log_error($_SESSION['temp_attachments'][$attachID]['name'] . ': ' . $txt[$error], 'critical');
 				}
 				else
-					$attach_errors->addError(vsprintf($txt[$error[0]], $error[1]));
+					$attach_errors->addError(array($error[0], $error[1]));
 			}
 		}
 	}
@@ -544,6 +532,47 @@ function processAttachments($id_msg = null)
 	//   errors => An array of errors (use the index of the $txt variable for that error).
 	// Template changes can be done using "integrate_upload_template".
 	call_integration_hook('integrate_attachment_upload');
+}
+
+/**
+ * Checks if an uploaded file produced any appropriate error code
+ *
+ * What it does:
+ * - Checks for error codes in the error segment of the file array that is
+ * created by PHP during the file upload.
+ *
+ * @package Attachments
+ * @param int $attachID
+ */
+function attachmentUploadChecks($attachID)
+{
+	global $modSettings, $txt;
+
+	$errors = array();
+
+	// Did PHP create any errors during the upload processing of this file?
+	if (!empty($_FILES['attachment']['error'][$attachID]))
+	{
+		// The file exceeds the max_filesize directive in php.ini
+		if ($_FILES['attachment']['error'][$attachID] == 1)
+			$errors[] = array('file_too_big', array($modSettings['attachmentSizeLimit']));
+		// The uploaded file exceeds the MAX_FILE_SIZE directive in the HTML form.
+		elseif ($_FILES['attachment']['error'][$attachID] == 2)
+			$errors[] = array('file_too_big', array($modSettings['attachmentSizeLimit']));
+		// Missing or a full a temp directory on the server
+		elseif ($_FILES['attachment']['error'][$attachID] == 6)
+			log_error($_FILES['attachment']['name'][$attachID] . ': ' . $txt['php_upload_error_6'], 'critical');
+		// One of many errors such as (3)partially uploaded, (4)empty file,
+		else
+			log_error($_FILES['attachment']['name'][$attachID] . ': ' . $txt['php_upload_error_' . $_FILES['attachment']['error'][$attachID]]);
+
+		// If we did not set an user error (3,4,6,7,8) to show then give them a generic one as there is
+		// no need to provide back specifics of a server error, those are logged
+		if (empty($errors))
+			$errors[] = 'attach_php_error';
+	}
+
+	return $errors;
 }
 
 /**

@@ -1032,8 +1032,20 @@ div.bbc_footnotes .meaction{
 	border: 1px solid #ddd;
 	border-bottom: 1px solid #ccc;
 }
-.topic_sorting_row, .basic_row {
+.basic_row {
 	background: #fff;
+}
+.topic_sorting_row {
+	background: transparent;
+}
+#sort_by {
+	border: 2px solid #d1d1d1;
+	border-bottom: none;
+	border-radius: 5px 5px 0 0;
+}
+#sort_by.topic_sorting_recent {
+	border: 1px solid #d1d1d1;
+	border-bottom: none;
 }
 .sort_by_container {
 	border: 1px solid #ccc;
@@ -1596,6 +1608,31 @@ div.bbc_footnotes .meaction{
 	box-shadow: 0px 1px 0px #FFFFFF inset;
 }
 
+/*	$MEMBERLIST		*/
+/* ------------------------------------------------------- */
+.mlist .mlist_header div {
+	border-top: none;
+}
+.mlist li div {
+	background-color: #fff;
+	border-top: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+}
+.mlist li.alternate_row div {
+	background-color: #fafafa;
+	border-top: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+}
+.mlist li div:first-child {
+	border-left: 1px solid #ccc;
+}
+.mlist li div:last-child {
+	border-right: 1px solid #ccc;
+}
+.letter_row h3 {
+	border: 1px solid #ccc;
+	border-radius: 6px 6px 0 0;
+}
 /*	$LOGIN		*/
 /* ------------------------------------------------------- */
 
@@ -1778,6 +1815,9 @@ div.bbc_footnotes .meaction{
 	.listlevel1#button_profile .linklevel1 {
 		min-width: 0.5em;
 	}
+	.mlist li div:nth-child(n+5) {
+		border-right: 1px solid #ccc;
+	}
 }
 /* This one does up to 540 screens. */
 @media screen and (max-width: 33.750em) {
@@ -1786,6 +1826,9 @@ div.bbc_footnotes .meaction{
 	}
 	.frame {
 		border-radius: 0;
+	}
+	.board_lastpost {
+		border-top: 1px solid #ccc;
 	}
 	.topic_listing>li {
 		border: 1px solid #aaa;
@@ -1840,5 +1883,13 @@ div.bbc_footnotes .meaction{
 	}
 	.subsections:hover .linklevel1:after {
 		content: "";
+	}
+	.mlist li div:nth-child(n+4) {
+		border-right: 1px solid #ccc;
+	}
+}
+@media screen and (max-width: 30em) {
+	.mlist li div:nth-child(n+3) {
+		border-right: 1px solid #ccc;
 	}
 }
