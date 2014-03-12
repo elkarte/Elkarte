@@ -961,7 +961,7 @@ div.bbc_footnotes .meaction{
 	box-shadow: 1px 2px 3px #eee;
 }
 /* @todo - Clean this up, once new classes are assigned to old windowbg stuffz. */
-.board_row, .childboard_row, .forumposts>div, .forumposts>li,
+.board_row, .forumposts>div, .forumposts>li,
 .content_category>div, .content_category>li {
 	border: 1px solid #cfcfcf;
 	background: #fff;
@@ -973,7 +973,7 @@ div.bbc_footnotes .meaction{
 	border-bottom: none;
 }
 .childboard_row {
-	border-top: none;
+	margin-top: 10px;
 }
 .board_latest {
 	border-left: 1px solid #ccc;
@@ -1829,6 +1829,9 @@ div.bbc_footnotes .meaction{
 	}
 	.board_lastpost {
 		border-top: 1px solid #ccc;
+	}
+	.board_row.parent_board {
+		border: 1px solid #cfcfcf;
 	}
 	.topic_listing>li {
 		border: 1px solid #aaa;
