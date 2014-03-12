@@ -395,8 +395,20 @@ VALUES
 ---# Move existing values...
 ---{
 // We cannot do this twice
-// @todo this won't work when you upgrade from smf <= is it still true?
-if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersion'], '1.0') == -1)
+$db_table = db_table();
+$members_tbl = $db_table->db_table_structure("{db_prefix}members");
+$move_im = false;
+foreach ($members_tbl['columns'] as $members_col)
+{
+	// One spot, if there is just one we can go on and do the moving
+	if ($members_col['name'] == 'aim')
+	{
+		$move_im = true;
+		break;
+	}
+}
+
+if ($move_im)
 {
 	$request = upgrade_query("
 		SELECT id_member, aim, icq, msn, yim
