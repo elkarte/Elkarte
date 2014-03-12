@@ -230,7 +230,7 @@ function template_build_poster_div($message, $ignoring = false)
 		// The plan is to make these buttons act sensibly, and link to your own inbox in your own posts (with new PM notification).
 		// Still has a little bit of hard-coded text. This may be a place where translators should be able to write inclusive strings,
 		// instead of dealing with $txt['by'] etc in the markup. Must be brief to work, anyway. Cannot ramble on at all.
-	
+
 		// we start with their own..
 		if ($context['can_send_pm'] && $message['is_message_author'])
 		{
@@ -269,14 +269,12 @@ function template_build_poster_div($message, $ignoring = false)
  *            - title => Usually the subject of the topic (mandatory)
  *            - date => frequently the "posted on", but can be anything
  *            - body => message body (mandatory)
- *            - buttons => an associative array that allows create a 
+ *            - buttons => an associative array that allows create a
  *                         "quickbutton" strip (see template_quickbutton_strip
  *                         for details on the parameters)
  */
 function template_simple_message($msg)
 {
-	global $context, $settings, $txt;
-
 	// @todo find a better name for $msg['date']
 	echo '
 			<div class="', $msg['class'], ' core_posts">', !empty($msg['counter']) ? '

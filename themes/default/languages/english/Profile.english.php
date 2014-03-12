@@ -98,7 +98,7 @@ $txt['reminder_openid_is'] = 'The OpenID identity associated with your account i
 $txt['reminder_continue'] = 'Continue';
 
 $txt['current_theme'] = 'Current Theme';
-$txt['change'] = 'change';
+$txt['change'] = 'Change Theme';
 $txt['theme_preferences'] = 'Theme preferences';
 $txt['theme_forum_default'] = 'Forum or Board Default';
 $txt['theme_forum_default_desc'] = 'This is the default theme, which means your theme will change along with the administrator\'s settings and the board you are viewing.';

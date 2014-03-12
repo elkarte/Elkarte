@@ -97,7 +97,7 @@ class Email_Parse
 
 	/**
 	 * Message type of the key p, m or t
-	 * @var char
+	 * @var string
 	 */
 	public $message_type = null;
 

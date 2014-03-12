@@ -378,7 +378,7 @@ function template_results()
 		template_pagesection();
 
 	// Quick moderation enabled, then show an action area
-	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
+	if (!empty($context['topics']) && !empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
 	{
 		echo '
 				<div class="flow_auto floatright">

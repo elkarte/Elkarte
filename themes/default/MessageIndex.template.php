@@ -312,7 +312,7 @@ function template_topic_listing()
  */
 function template_topic_listing_below()
 {
-	global $modSettings, $context, $txt, $options, $settings;
+	global $context, $txt, $options;
 
 	if ($context['no_topic_listing'])
 		return;

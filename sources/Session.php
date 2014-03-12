@@ -102,8 +102,10 @@ function loadSession()
 }
 
 /**
- * Implementation of sessionOpen(), executed when the session is being opened with db sessions
- * It simply returns true.
+ * Implementation of sessionOpen()
+ *
+ * - executed when the session is being opened with db sessions
+ * - It simply returns true.
  *
  * @param string $save_path
  * @param string $session_name
@@ -115,8 +117,10 @@ function sessionOpen($save_path, $session_name)
 }
 
 /**
- * Implementation of sessionClose() executed after the session write callback has been called
- * It simply returns true.
+ * Implementation of sessionClose()
+ *
+ * - executed after the session write callback has been called
+ * - It simply returns true.
  *
  * @return boolean
  */
@@ -126,8 +130,11 @@ function sessionClose()
 }
 
 /**
- * Implementation of sessionRead() Called when the session starts or when session_start() is called
- * Must always return a session encoded (serialized) string, or an empty string if there is no data to read.
+ * Implementation of sessionRead()
+ *
+ * - Called when the session starts or when session_start() is called
+ * - Must always return a session encoded (serialized) string, or an empty string
+ * if there is no data to read.
  *
  * @param string $session_id
  * @return string
@@ -157,7 +164,9 @@ function sessionRead($session_id)
 }
 
 /**
- * Implementation of sessionWrite().  Called when the session needs to be saved and closed.
+ * Implementation of sessionWrite().
+ *
+ * - Called when the session needs to be saved and closed.
  *
  * @param string $session_id
  * @param string $data
@@ -196,8 +205,10 @@ function sessionWrite($session_id, $data)
 }
 
 /**
- * Implementation of sessionDestroy() This callback is executed when a session is
- * destroyed with session_destroy() or with session_regenerate_id(true).
+ * Implementation of sessionDestroy()
+ *
+ * - This callback is executed when a session is destroyed with session_destroy()
+ * or with session_regenerate_id(true).
  *
  * @param string $session_id
  * @return boolean
@@ -221,8 +232,10 @@ function sessionDestroy($session_id)
 }
 
 /**
- * Implementation of sessionGC() The garbage collector callback is invoked
- * internally by PHP periodically in order to purge old session data.
+ * Implementation of sessionGC()
+ *
+ * - The garbage collector callback is invoked internally by PHP periodically
+ * in order to purge old session data.
  *
  * @param int $max_lifetime
  * @return boolean

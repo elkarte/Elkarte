@@ -607,7 +607,7 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
  */
 function template_quickbutton_strip($strip, $tests = array())
 {
-	global $context, $options;
+	global $options;
 
 	$buttons = array();
 

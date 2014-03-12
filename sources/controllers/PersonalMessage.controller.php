@@ -1702,7 +1702,7 @@ class PersonalMessage_Controller extends Action_Controller
 	 */
 	public function action_search()
 	{
-		global $context, $txt, $scripturl, $modSettings;
+		global $context, $txt, $scripturl;
 
 		// If they provided some search parameters, we need to extract them
 		if (isset($_REQUEST['params']))

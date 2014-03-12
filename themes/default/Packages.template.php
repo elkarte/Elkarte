@@ -527,7 +527,7 @@ function template_examine()
  */
 function template_browse()
 {
-	global $context, $txt, $scripturl, $forum_version;
+	global $context, $txt;
 
 	echo '
 	<div id="admincenter">';

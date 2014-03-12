@@ -24,7 +24,8 @@ if (!defined('ELK'))
 
 /**
  * Log an error, if the error logging is enabled.
- * filename and line should be __FILE__ and __LINE__, respectively.
+ *
+ * - filename and line should be __FILE__ and __LINE__, respectively.
  *
  * Example use:
  *  die(log_error($msg));
@@ -167,12 +168,13 @@ function fatal_error($error, $log = 'general')
 /**
  * Shows a fatal error with a message stored in the language file.
  *
- * This function stops execution and displays an error message by key.
- *  - uses the string with the error_message_key key.
- *  - logs the error in the forum's default language while displaying the error
- *    message in the user's language.
- *  - uses Errors language file and applies the $sprintf information if specified.
- *  - the information is logged if log is specified.
+ * What it does:
+ * - This function stops execution and displays an error message by key.
+ * - uses the string with the error_message_key key.
+ * - logs the error in the forum's default language while displaying the error
+ * message in the user's language.
+ * - uses Errors language file and applies the $sprintf information if specified.
+ * - the information is logged if log is specified.
  *
  * @param string $error
  * @param string|boolean $log defaults to 'general' false will skip logging, true will use general
@@ -220,7 +222,8 @@ function fatal_lang_error($error, $log = 'general', $sprintf = array())
 
 /**
  * Handler for standard error messages, standard PHP error handler replacement.
- * It dies with fatal_error() if the error_level matches with error_reporting.
+ *
+ * - It dies with fatal_error() if the error_level matches with error_reporting.
  *
  * @param int $error_level
  * @param string $error_string
@@ -299,8 +302,8 @@ function error_handler($error_level, $error_string, $file, $line)
 
 /**
  * It is called by fatal_error() and fatal_lang_error().
- * @uses Errors template, fatal_error sub template
  *
+ * @uses Errors template, fatal_error sub template
  * @param string $error_message
  * @param string $error_code string or int code
  */
@@ -361,9 +364,11 @@ function setup_fatal_error_context($error_message, $error_code)
 
 /**
  * Show a message for the (full block) maintenance mode.
- * It shows a complete page independent of language files or themes.
- * It is used only if $maintenance = 2 in Settings.php.
- * It stops further execution of the script.
+ *
+ * What it does:
+ * - It shows a complete page independent of language files or themes.
+ * - It is used only if $maintenance = 2 in Settings.php.
+ * - It stops further execution of the script.
  */
 function display_maintenance_message()
 {
@@ -389,9 +394,11 @@ function display_maintenance_message()
 
 /**
  * Show an error message for the connection problems.
- * It shows a complete page independent of language files or themes.
- * It is used only if there's no way to connect to the database.
- * It stops further execution of the script.
+ *
+ * What it does:
+ * - It shows a complete page independent of language files or themes.
+ * - It is used only if there's no way to connect to the database.
+ * - It stops further execution of the script.
  */
 function display_db_error()
 {
@@ -442,9 +449,11 @@ function display_db_error()
 
 /**
  * Show an error message for load average blocking problems.
- * It shows a complete page independent of language files or themes.
- * It is used only if the load averages are too high to continue execution.
- * It stops further execution of the script.
+ *
+ * What it does:
+ * - It shows a complete page independent of language files or themes.
+ * - It is used only if the load averages are too high to continue execution.
+ * - It stops further execution of the script.
  */
 function display_loadavg_error()
 {
@@ -468,7 +477,8 @@ function display_loadavg_error()
 
 /**
  * Small utility function for fatal error pages.
- * Used by display_db_error(), display_loadavg_error(),
+ *
+ * - Used by display_db_error(), display_loadavg_error(),
  * display_maintenance_message()
  */
 function set_fatal_error_headers()

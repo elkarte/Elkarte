@@ -1752,9 +1752,9 @@ function sumRecentPosts()
 
 	$request = $db->query('', '
 		SELECT IFNULL(SUM(num_posts), 0)
-		FROM {db_prefix}boards
+		FROM {db_prefix}boards as b
 		WHERE {query_wanna_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
-			AND id_board != {int:recycle_board}' : ''),
+			AND b.id_board != {int:recycle_board}' : ''),
 		array(
 			'recycle_board' => $modSettings['recycle_board']
 		)

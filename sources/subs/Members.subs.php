@@ -32,9 +32,10 @@ if (!defined('ELK'))
  * - changes author of messages, topics and polls to guest authors.
  * - removes all log entries concerning the deleted members, except the
  * error logs, ban logs and moderation logs.
- * - removes these members' personal messages (only the inbox), avatars,
- * ban entries, theme settings, moderator positions, poll votes, and
- * karma votes.
+ * - removes these members' personal messages (only the inbox)
+ * - rmoves avatars, ban entries, theme settings, moderator positions, poll votes,
+ * drafts, likes, mentions, notifications
+ * - removes custom field data associated with them
  * - updates member statistics afterwards.
  *
  * @package Members
@@ -85,7 +86,7 @@ function deleteMembers($users, $check_not_admin = false)
 
 	// Get their names for logging purposes.
 	$request = $db->query('', '
-		SELECT id_member, member_name, CASE WHEN id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0 THEN 1 ELSE 0 END AS is_admin
+		SELECT id_member, member_name, email_address, CASE WHEN id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0 THEN 1 ELSE 0 END AS is_admin
 		FROM {db_prefix}members
 		WHERE id_member IN ({array_int:user_list})
 		LIMIT ' . count($users),
@@ -95,12 +96,14 @@ function deleteMembers($users, $check_not_admin = false)
 		)
 	);
 	$admins = array();
+	$emails = array();
 	$user_log_details = array();
 	while ($row = $db->fetch_assoc($request))
 	{
 		if ($row['is_admin'])
 			$admins[] = $row['id_member'];
 		$user_log_details[$row['id_member']] = array($row['id_member'], $row['member_name']);
+		$emails[] = $row['email_address'];
 	}
 	$db->free_result($request);
 
@@ -234,6 +237,24 @@ function deleteMembers($users, $check_not_admin = false)
 		WHERE id_member IN ({array_int:users})',
 		array(
 			'users' => $users,
+		)
+	);
+
+	// Delete any custom field data...
+	$db->query('', '
+		DELETE FROM {db_prefix}custom_fields_data
+		WHERE id_member IN ({array_int:users})',
+		array(
+			'users' => $users,
+		)
+	);
+
+	// Delete any post by email keys...
+	$db->query('', '
+		DELETE FROM {db_prefix}postby_emails
+		WHERE email_to IN ({array_string:emails})',
+		array(
+			'emails' => $emails,
 		)
 	);
 

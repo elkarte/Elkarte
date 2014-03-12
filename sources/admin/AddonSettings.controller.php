@@ -138,7 +138,6 @@ class AddonSettings_Controller extends Action_Controller
 
 	/**
 	 * Retrieve any custom admin settings for or from addons.
-	 * This method is used by admin search.
 	 */
 	private function _settings()
 	{
@@ -151,7 +150,7 @@ class AddonSettings_Controller extends Action_Controller
 	}
 
 	/**
-	 * Public method to return avatar settings for search
+	 * Public method to return admin settings for search
 	 */
 	public function settings_search()
 	{
