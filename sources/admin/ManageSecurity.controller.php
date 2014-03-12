@@ -184,6 +184,8 @@ class ManageSecurity_Controller extends Action_Controller
 		{
 			checkSession();
 
+			call_integration_hook('integratesave_moderation_settings', array(&$config_vars));
+
 			// Make sure these don't have an effect.
 			if ($modSettings['warning_settings'][0] != 1)
 			{
@@ -436,7 +438,7 @@ class ManageSecurity_Controller extends Action_Controller
 			array('select', 'warning_show', 'subtext' => $txt['setting_warning_show_note'], array($txt['setting_warning_show_mods'], $txt['setting_warning_show_user'], $txt['setting_warning_show_all'])),
 		);
 
-		call_integration_hook('integrate_moderation_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_moderation_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

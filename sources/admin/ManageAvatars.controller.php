@@ -80,12 +80,10 @@ class ManageAvatars_Controller extends Action_Controller
 	{
 		global $txt, $context, $scripturl;
 
-		// initialize the form
+		// Initialize the form
 		$this->_initAvatarSettingsForm();
 
 		$config_vars = $this->_avatarSettings->settings();
-
-		call_integration_hook('integrate_modify_avatar_settings', array(&$config_vars));
 
 		// Saving avatar settings?
 		if (isset($_GET['save']))
@@ -198,6 +196,9 @@ class ManageAvatars_Controller extends Action_Controller
 				array('text', 'custom_avatar_dir', 40, 'subtext' => $txt['custom_avatar_dir_desc'], 'invalid' => !$context['valid_custom_avatar_dir']),
 				array('text', 'custom_avatar_url', 40),
 		);
+
+		// Add new settings with a nice hook, makes them available for admin settings search as well
+		call_integration_hook('integrate_modify_avatar_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

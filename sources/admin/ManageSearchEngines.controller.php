@@ -87,9 +87,6 @@ class ManageSearchEngines_Controller extends Action_Controller
 		// Set up a message.
 		$context['settings_message'] = sprintf($txt['spider_settings_desc'], $scripturl . '?action=admin;area=logs;sa=pruning;' . $context['session_var'] . '=' . $context['session_id']);
 
-		// Notify the integration that we're preparing to mess up with search engine settings...
-		call_integration_hook('integrate_modify_search_engine_settings', array(&$config_vars));
-
 		require_once(SUBSDIR . '/SearchEngines.subs.php');
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 
@@ -184,6 +181,9 @@ class ManageSearchEngines_Controller extends Action_Controller
 			'spider_group' => array('select', 'spider_group', 'subtext' => $txt['spider_group_note'], array($txt['spider_group_none'], $txt['membergroups_members'])),
 			array('select', 'show_spider_online', array($txt['show_spider_online_no'], $txt['show_spider_online_summary'], $txt['show_spider_online_detail'], $txt['show_spider_online_detail_admin'])),
 		);
+
+		// Notify the integration that we're preparing to mess up with search engine settings...
+		call_integration_hook('integrate_modify_search_engine_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

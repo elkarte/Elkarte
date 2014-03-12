@@ -84,8 +84,6 @@ class ManageBBC_Controller extends Action_Controller
 		addInlineJavascript('
 			toggleBBCDisabled(\'disabledBBC\', ' . (empty($modSettings['enableBBC']) ? 'true' : 'false') . ');', true);
 
-		call_integration_hook('integrate_modify_bbc_settings', array(&$config_vars));
-
 		// We'll need this forprepare_db() and save_db()
 		require_once(SUBSDIR . '/Settings.class.php');
 
@@ -156,6 +154,9 @@ class ManageBBC_Controller extends Action_Controller
 			'',
 				array('bbc', 'disabledBBC'),
 		);
+
+		// Add new settings with a nice hook, makes them available for admin settings search as well
+		call_integration_hook('integrate_modify_bbc_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

@@ -206,8 +206,6 @@ class ManageServer_Controller extends Action_Controller
 		// Initialize the form
 		$this->_initGeneralSettingsForm();
 
-		call_integration_hook('integrate_general_settings');
-
 		// Setup the template stuff.
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=general;save';
 		$context['settings_title'] = $txt['general_settings'];
@@ -260,8 +258,6 @@ class ManageServer_Controller extends Action_Controller
 		// Initialize the form
 		$this->_initDatabaseSettingsForm();
 
-		call_integration_hook('integrate_database_settings');
-
 		// Setup the template stuff.
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=database;save';
 		$context['settings_title'] = $txt['database_paths_settings'];
@@ -304,8 +300,6 @@ class ManageServer_Controller extends Action_Controller
 
 		// Initialize the form
 		$this->_initCookieSettingsForm();
-
-		call_integration_hook('integrate_cookie_settings');
 
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=cookie;save';
 		$context['settings_title'] = $txt['cookies_sessions_settings'];
@@ -392,8 +386,6 @@ class ManageServer_Controller extends Action_Controller
 			createEventListener(cache_type);
 			cache_type.addEventListener("change", toggleCache);
 			toggleCache();', true);
-
-		call_integration_hook('integrate_modify_cache_settings', array(&$config_vars));
 
 		// Saving again?
 		if (isset($_GET['save']))
@@ -574,6 +566,9 @@ class ManageServer_Controller extends Action_Controller
 				array('disableHostnameLookup', $txt['disableHostnameLookup'], 'db', 'check', null, 'disableHostnameLookup'),
 		);
 
+		// Notify the integration
+		call_integration_hook('integrate_modify_general_settings', array(&$config_vars));
+
 		return $config_vars;
 	}
 
@@ -613,6 +608,9 @@ class ManageServer_Controller extends Action_Controller
 				array('cachedir', $txt['cachedir'], 'file', 'text', 36),
 		);
 
+		// Notify the integration
+		call_integration_hook('integrate_modify_database_settings', array(&$config_vars));
+
 		return $config_vars;
 	}
 
@@ -647,6 +645,9 @@ class ManageServer_Controller extends Action_Controller
 				array('databaseSession_loose', $txt['databaseSession_loose'], 'db', 'check', false, 'databaseSession_loose'),
 				array('databaseSession_lifetime', $txt['databaseSession_lifetime'], 'db', 'int', false, 'databaseSession_lifetime', 'postinput' => $txt['seconds']),
 		);
+
+		// Notify the integration
+		call_integration_hook('integrate_modify_cookie_settings', array(&$config_vars));
 
 		// Set them vars for our settings form
 		return $config_vars;
@@ -699,6 +700,9 @@ class ManageServer_Controller extends Action_Controller
 			array('cache_memcached', $txt['cache_memcached'], 'file', 'text', $txt['cache_memcached'], 'cache_memcached'),
 			array('cachedir', $txt['cachedir'], 'file', 'text', 36, 'cache_cachedir'),
 		);
+
+		// Notify the integration that we're preparing to mess up with cache settings...
+		call_integration_hook('integrate_modify_cache_settings', array(&$config_vars));
 
 		return $config_vars;
 	}
@@ -760,6 +764,9 @@ class ManageServer_Controller extends Action_Controller
 			$value = !isset($modSettings[$name]) ? $value : $modSettings[$name];
 			$config_vars[] = array('text', $name, 'value' => $value, 'disabled' => $disabled);
 		}
+
+		// Notify the integration that we're preparing to mess with balancing settings...
+		call_integration_hook('integrate_modify_loadavg_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

@@ -852,8 +852,6 @@ class ManageNews_Controller extends Action_Controller
 			document.getElementById("xmlnews_maxlen").disabled = !document.getElementById("xmlnews_enable").checked;
 			document.getElementById("xmlnews_limit").disabled = !document.getElementById("xmlnews_enable").checked;', true);
 
-		call_integration_hook('integrate_modify_news_settings', array(&$config_vars));
-
 		$context['page_title'] = $txt['admin_edit_news'] . ' - ' . $txt['settings'];
 		$context['sub_template'] = 'show_settings';
 
@@ -913,6 +911,9 @@ class ManageNews_Controller extends Action_Controller
 				array('text', 'xmlnews_maxlen', 'subtext' => $txt['xmlnews_maxlen_note'], 10),
 				array('text', 'xmlnews_limit', 'subtext' => $txt['xmlnews_limit_note'], 10),
 		);
+
+		// Add new settings with a nice hook, makes them available for admin settings search as well
+		call_integration_hook('integrate_modify_news_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

@@ -1526,7 +1526,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('check', 'timeLoadPageEnable'),
 		);
 
-		call_integration_hook('integrate_layout_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_layout_settings', array(&$config_vars));
 
 		return $config_vars;
 	}
@@ -1562,7 +1562,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('text', 'karmaSmiteLabel'),
 		);
 
-		call_integration_hook('integrate_karma_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_karma_settings', array(&$config_vars));
 
 		return $config_vars;
 	}
@@ -1596,7 +1596,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('int', 'likeDisplayLimit', 6)
 		);
 
-		call_integration_hook('integrate_likes_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_likes_settings', array(&$config_vars));
 
 		return $config_vars;
 	}
@@ -1622,7 +1622,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('check', 'mentions_dont_notify_rlike'),
 		);
 
-		call_integration_hook('integrate_mention_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_mention_settings', array(&$config_vars));
 
 		return $config_vars;
 	}
@@ -1663,7 +1663,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('bbc', 'signature_bbc'),
 		);
 
-		call_integration_hook('integrate_signature_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_signature_settings', array(&$config_vars));
 
 		return $config_vars;
 	}
@@ -1700,7 +1700,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('callback', 'pm_limits'),
 		);
 
-		call_integration_hook('integrate_pmsettings_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_pmsettings_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

@@ -158,6 +158,8 @@ class ManagePaid_Controller extends Action_Controller
 		{
 			checkSession();
 
+			call_integration_hook('integrate_save_subscription_settings', array(&$config_vars));
+
 			// Check that the entered email addresses are valid
 			if (!empty($_POST['paid_email_to']))
 			{
@@ -243,6 +245,8 @@ class ManagePaid_Controller extends Action_Controller
 				array('text', 'paid_currency_symbol', 'subtext' => $txt['paid_currency_symbol_desc'], 'size' => 8, 'force_div_id' => 'custom_currency_symbol_div'),
 				array('check', 'paidsubs_test', 'subtext' => $txt['paidsubs_test_desc'], 'onclick' => 'return document.getElementById(\'paidsubs_test\').checked ? confirm(\'' . $txt['paidsubs_test_confirm'] . '\') : true;'),
 		);
+
+		call_integration_hook('integrate_modify_subscription_settings', array(&$config_vars));
 
 		return $config_vars;
 	}
