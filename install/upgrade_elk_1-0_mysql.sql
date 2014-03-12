@@ -53,7 +53,8 @@ VALUES
 	('jquery_source', 'local'),
 	('mentions_enabled', '1'),
 	('mentions_buddy', '0'),
-	('mentions_dont_notify_rlike', '0');
+	('mentions_dont_notify_rlike', '0'),
+	('detailed-version.js', 'https://elkarte.github.io/Elkarte/site/detailed-version.js');
 ---#
 
 /******************************************************************************/
@@ -179,7 +180,7 @@ ADD COLUMN id_redirect_topic mediumint(8) unsigned NOT NULL default '0';
 ---#
 
 /******************************************************************************/
---- Adding new scheduled tasks
+--- Updating scheduled tasks
 /******************************************************************************/
 ---# Adding new scheduled tasks
 INSERT INTO {$db_prefix}scheduled_tasks
@@ -206,6 +207,14 @@ INSERT INTO {$db_prefix}scheduled_tasks
 	(next_time, time_offset, time_regularity, time_unit, disabled, task)
 VALUES
 	(0, 30, 1, 'h', 0, 'user_access_mentions');
+---#
+
+---# Remove unused scheduled tasks...
+---{
+upgrade_query("
+	DELETE FROM {$db_prefix}scheduled_tasks
+	WHERE task = 'fetchFiles'");
+---}
 ---#
 
 /******************************************************************************/

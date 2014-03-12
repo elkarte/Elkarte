@@ -819,72 +819,14 @@ class ScheduledTask
 	}
 
 	/**
-	 * This task retrieves files from the official server.
+	 * This task retrieved files from the official server.
+	 * This task is no longer used and the method remains only to avoid
+	 * "last minute" problems, it will be removed from 1.1 version
+	 *
+	 * @deprecated since 1.0 - will be removed in 1.1
 	 */
 	public function fetchFiles()
 	{
-		global $txt, $language, $forum_version, $modSettings, $context;
-
-		$db = database();
-
-		// What files do we want to get
-		$request = $db->query('', '
-			SELECT id_file, filename, path, parameters
-			FROM {db_prefix}admin_info_files',
-			array(
-			)
-		);
-
-		$js_files = array();
-		$errors = 0;
-
-		while ($row = $db->fetch_assoc($request))
-		{
-			$js_files[$row['id_file']] = array(
-				'filename' => $row['filename'],
-				'path' => $row['path'],
-				'parameters' => sprintf($row['parameters'], $language, urlencode($modSettings['time_format']), urlencode($forum_version)),
-			);
-		}
-		$db->free_result($request);
-
-		// We're gonna need fetch_web_data() to pull this off.
-		require_once(SUBSDIR . '/Package.subs.php');
-
-		// Just in case we run into a problem.
-		loadEssentialThemeData();
-		loadLanguage('Errors', $language, false);
-
-		foreach ($js_files as $ID_FILE => $file)
-		{
-			// Create the url
-			$server = empty($file['path']) || (substr($file['path'], 0, 7) != 'http://' && substr($file['path'], 0, 8) != 'https://') ? 'http://www.elkarte.net' : '';
-			$url = $server . (!empty($file['path']) ? $file['path'] : $file['path']) . $file['filename'] . (!empty($file['parameters']) ? '?' . $file['parameters'] : '');
-
-			// Get the file
-			$file_data = fetch_web_data($url);
-
-			// If we are tossing errors - give up - the site might be down.
-			if ($file_data === false && $errors++ > 2)
-			{
-				$context['scheduled_errors']['fetchFiles'][] = sprintf($txt['st_cannot_retrieve_file'], $url);
-				log_error(sprintf($txt['st_cannot_retrieve_file'], $url));
-				return false;
-			}
-			elseif ($file_data !== false)
-			{
-				// Save the update to the database
-				$db->query('substring', '
-					UPDATE {db_prefix}admin_info_files
-					SET data = SUBSTRING({string:file_data}, 1, 65534)
-					WHERE id_file = {int:id_file}',
-					array(
-						'id_file' => $ID_FILE,
-						'file_data' => $file_data,
-					)
-				);
-			}
-		}
 		return true;
 	}
 

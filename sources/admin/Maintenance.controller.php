@@ -840,7 +840,7 @@ class Maintenance_Controller extends Action_Controller
 	 */
 	public function action_version_display()
 	{
-		global $forum_version, $txt, $context;
+		global $forum_version, $txt, $context, $modSettings;
 
 		isAllowedTo('admin_forum');
 
@@ -871,6 +871,8 @@ class Maintenance_Controller extends Action_Controller
 
 		$context['sub_template'] = 'view_versions';
 		$context['page_title'] = $txt['admin_version_check'];
+		// @deprecated since 1.0 - remember to remove from 1.1 this is here just to avoid errors from not using upgrade.php
+		$context['detailed_version_url'] = !empty($modSettings['detailed-version.js']) ? $modSettings['detailed-version.js'] : 'https://elkarte.github.io/Elkarte/site/detailed-version.js';
 	}
 
 	/**

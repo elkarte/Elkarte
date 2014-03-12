@@ -325,10 +325,10 @@ function template_view_versions()
 											', $txt['admin_elkpackage'], '
 										</td>
 										<td class="windowbg">
-											<em id="installedVersion">', $context['forum_version'], '</em>
+											<em id="yourVersion">', $context['forum_version'], '</em>
 										</td>
 										<td class="windowbg">
-											<em id="latestVersion">??</em>
+											<em id="ourVersion">??</em>
 										</td>
 									</tr>';
 
@@ -379,7 +379,7 @@ function template_view_versions()
 										<td class="windowbg versionFile">
 											<a href="#" id="admin-link">', $txt['dvc_admin'], '</a>
 										</td>
-										<td class="windowbg versionNumber>
+										<td class="windowbg versionNumber">
 											<em id="youradmin">??</em>
 										</td>
 										<td class="windowbg versionNumber">
@@ -665,7 +665,7 @@ function template_view_versions()
 	  red.  It also contains the function, swapOption, that toggles showing the detailed information for each of the
 	  file categories. (sources, languages, and templates.) */
 	echo '
-						<script src="', $scripturl, '?action=viewadminfile;filename=detailed-version.js"></script>
+						<script src="', $context['detailed_version_url'], '"></script>
 						<script><!-- // --><![CDATA[
 							var oViewVersions = new elk_ViewVersions({
 								aKnownLanguages: [
