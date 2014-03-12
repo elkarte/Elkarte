@@ -16,11 +16,10 @@ if (!defined('ELK'))
 
 /**
  * Simple cURL class to fetch a web page
+ * Properly redirects even with safe mode and basedir restrictions
+ * Can provide simple post options to a page
  *
- * What it does:
- * - Properly redirects even with safe mode and basedir restrictions
- * - Can provide simple post options to a page
- *
+ * Load class
  * Initiate as
  *  - $fetch_data = new Curl_Fetch_Webdata();
  *  - optionally pass an array of cURL options and redirect count
@@ -42,7 +41,6 @@ class Curl_Fetch_Webdata
 {
 	/**
 	 * Set the default items for this class
-	 *
 	 * @var mixed[]
 	 */
 	private $default_options = array(
@@ -52,7 +50,7 @@ class Curl_Fetch_Webdata
 		CURLOPT_USERAGENT		=> 'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)', // set a normal looking useragent
 		CURLOPT_CONNECTTIMEOUT	=> 10, // Don't wait forever on a connection
 		CURLOPT_TIMEOUT			=> 10, // A page should load in this amount of time
-		CURLOPT_MAXREDIRS		=> 5, // stop after this many redirects
+		CURLOPT_MAXREDIRS		=> 3, // stop after this many redirects
 		CURLOPT_ENCODING		=> 'gzip,deflate', // accept gzip and decode it
 		CURLOPT_SSL_VERIFYPEER	=> 0, // stop cURL from verifying the peer's certificate
 		CURLOPT_SSL_VERIFYHOST	=> 0, // stop cURL from verifying the peer's host
@@ -103,7 +101,6 @@ class Curl_Fetch_Webdata
 
 	/**
 	 * Start the cURL object
-	 *
 	 * - allow for user override values
 	 *
 	 * @param mixed[] $options cURL options as an array
@@ -146,13 +143,13 @@ class Curl_Fetch_Webdata
 	/**
 	 * Makes the actual cURL call
 	 *
-	 * What it does:
+	 * What it does
 	 * - stores responses (url, code, error, headers, body) in the response array
 	 * - detects 301, 302, 307 codes and will redirect to the given response header location
 	 *
 	 * @param string $url site to fetch
 	 * @param bool $redirect flag to indicate if this was a redirect request or not
-	*/
+	 */
 	private function _curlRequest($url, $redirect = false)
 	{
 		// We do have a url I hope
@@ -204,8 +201,7 @@ class Curl_Fetch_Webdata
 
 	/**
 	 * Used if being redirected to ensure we have a fully qualified address
-	 *
-	 * - returns the new url location for the redirect
+	 * returns the new url location for the redirect
 	 *
 	 * @param string $last_url where we went to
 	 * @param string $new_url where we were redirected to
@@ -217,9 +213,9 @@ class Curl_Fetch_Webdata
 		$new_url_parse  = parse_url($new_url);
 
 		// Redirect headers are often incomplete / relative so we need to make sure they are fully qualified
+		$new_url_parse['path'] = isset($new_url_parse['path']) ? $new_url_parse['path'] : (isset($new_url_parse['host']) ? '' : $last_url_parse['path']);
 		$new_url_parse['scheme'] = isset($new_url_parse['scheme']) ? $new_url_parse['scheme'] : $last_url_parse['scheme'];
 		$new_url_parse['host'] = isset($new_url_parse['host']) ? $new_url_parse['host'] : $last_url_parse['host'];
-		$new_url_parse['path'] = isset($new_url_parse['path']) ? $new_url_parse['path'] : $last_url_parse['path'];
 		$new_url_parse['query'] = isset($new_url_parse['query']) ? $new_url_parse['query'] : '';
 
 		// Build the new URL that was in the http header
@@ -325,7 +321,7 @@ class Curl_Fetch_Webdata
 	/**
 	 * Called to initiate a redirect from a 301, 302 or 307 header
 	 *
-	 * What it does:
+	 * What it does
 	 * - resets the cURL options for the loop, sets the referrer flag
 	 *
 	 * @param string $target_url
