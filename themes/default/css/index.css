@@ -4056,11 +4056,6 @@ a.help .icon {
 	.board_lastposter {
 		display: block;
 	}
-	.board_name:after {
-		display: block;
-		clear: both;
-		content: "";
-	}
 	/* Playing silly buggers with a sidebar menu option for narrow screens. */
 	#main_container {
 		position: relative;
