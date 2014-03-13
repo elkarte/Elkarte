@@ -1019,7 +1019,6 @@ class ManageLanguages_Controller extends Action_Controller
 		{
 			checkSession();
 
-			// @todo review these hooks: do they need param and how else can we do this
 			call_integration_hook('integrate_save_language_settings', array(&$config_vars));
 
 			$this->_languageSettings->save();
@@ -1088,7 +1087,7 @@ class ManageLanguages_Controller extends Action_Controller
 			array('userLanguage', $txt['userLanguage'], 'db', 'check', null, 'userLanguage'),
 		);
 
-		call_integration_hook('integrate_language_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_language_settings', array(&$config_vars));
 
 		// Get our languages. No cache.
 		$languages = getLanguages(false);

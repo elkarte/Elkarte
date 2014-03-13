@@ -315,8 +315,6 @@ class ManageRegistration_Controller extends Action_Controller
 
 		$config_vars = $this->_registerSettings->settings();
 
-		call_integration_hook('integrate_modify_registration_settings', array(&$config_vars));
-
 		// Setup the template
 		$context['sub_template'] = 'show_settings';
 		$context['page_title'] = $txt['registration_center'];
@@ -398,6 +396,9 @@ class ManageRegistration_Controller extends Action_Controller
 				array('text', 'coppaFax'),
 				array('text', 'coppaPhone'),
 		);
+
+		// Add new settings with a nice hook, makes them available for admin settings search as well
+		call_integration_hook('integrate_modify_registration_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

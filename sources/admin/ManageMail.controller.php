@@ -249,8 +249,6 @@ class ManageMail_Controller extends Action_Controller
 
 		$config_vars = $this->_mailSettings->settings();
 
-		call_integration_hook('integrate_modify_mail_settings', array(&$config_vars));
-
 		// Saving?
 		if (isset($_GET['save']))
 		{
@@ -361,6 +359,9 @@ class ManageMail_Controller extends Action_Controller
 				'birthday_subject' => array('var_message', 'birthday_subject', 'var_message' => $processedBirthdayEmails[empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']]['subject'], 'disabled' => true, 'size' => strlen($subject) + 3),
 				'birthday_body' => array('var_message', 'birthday_body', 'var_message' => nl2br($body), 'disabled' => true, 'size' => ceil(strlen($body) / 25)),
 		);
+
+		// Add new settings with a nice hook, makes them available for admin settings search as well
+		call_integration_hook('integrate_modify_mail_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

@@ -126,7 +126,7 @@ class ManagePermissions_Controller extends Action_Controller
 
 		// Load the subactions, call integrate_manage_permissions
 		$action->initialize($subActions);
-		
+
 		// Last items needed
 		$context['page_title'] = $txt['permissions_title'];
 		$context['sub_action'] = $subAction;
@@ -882,8 +882,7 @@ class ManagePermissions_Controller extends Action_Controller
 
 		$config_vars = $this->_permSettings->settings();
 
-		call_integration_hook('integrate_modify_permission_settings', array(&$config_vars));
-
+		// Some items for the template
 		$context['page_title'] = $txt['permission_settings_title'];
 		$context['sub_template'] = 'show_settings';
 
@@ -946,6 +945,9 @@ class ManagePermissions_Controller extends Action_Controller
 				array('check', 'permission_enable_deny', 0, $txt['permission_settings_enable_deny'], 'help' => 'permissions_deny'),
 				array('check', 'permission_enable_postgroups', 0, $txt['permission_settings_enable_postgroups'], 'help' => 'permissions_postgroups'),
 		);
+
+		// Add new settings with a nice hook, makes them available for admin settings search as well
+		call_integration_hook('integrate_modify_permission_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

@@ -791,8 +791,6 @@ class ManageMembergroups_Controller extends Action_Controller
 
 		$config_vars = $this->_groupSettings->settings();
 
-		call_integration_hook('integrate_modify_membergroup_settings', array(&$config_vars));
-
 		if (isset($_REQUEST['save']))
 		{
 			checkSession();
@@ -836,6 +834,9 @@ class ManageMembergroups_Controller extends Action_Controller
 		$config_vars = array(
 			array('permissions', 'manage_membergroups'),
 		);
+
+		// Add new settings with a nice hook, makes them available for admin settings search as well
+		call_integration_hook('integrate_modify_membergroup_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

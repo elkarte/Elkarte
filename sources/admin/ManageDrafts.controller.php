@@ -46,7 +46,7 @@ class ManageDrafts_Controller extends Action_Controller
 
 	/**
 	 * Modify any setting related to drafts.
-	 * 
+	 *
 	 * - Requires the admin_forum permission.
 	 * - Accessed from ?action=admin;area=managedrafts
 	 *
@@ -77,6 +77,8 @@ class ManageDrafts_Controller extends Action_Controller
 		if (isset($_GET['save']))
 		{
 			checkSession();
+
+			call_integration_hook('integrate_save_drafts_settings', array(&$config_vars));
 
 			// Protect them from themselves.
 			$_POST['drafts_autosave_frequency'] = $_POST['drafts_autosave_frequency'] < 30 ? 30 : $_POST['drafts_autosave_frequency'];
@@ -140,6 +142,8 @@ class ManageDrafts_Controller extends Action_Controller
 				array('check', 'drafts_autosave_enabled', 'subtext' => $txt['drafts_autosave_enabled_subnote']),
 				array('int', 'drafts_autosave_frequency', 'postinput' => $txt['manageposts_seconds'], 'subtext' => $txt['drafts_autosave_frequency_subnote']),
 		);
+
+		call_integration_hook('integrate_modify_drafts_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

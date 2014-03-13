@@ -135,8 +135,6 @@ class ManageSmileys_Controller extends Action_Controller
 
 		$config_vars = $this->_smileySettings->settings();
 
-		call_integration_hook('integrate_modify_smiley_settings', array(&$config_vars));
-
 		// For the basics of the settings.
 		require_once(SUBSDIR . '/Settings.class.php');
 		require_once(SUBSDIR . '/Smileys.subs.php');
@@ -216,6 +214,8 @@ class ManageSmileys_Controller extends Action_Controller
 				// Message icons.
 				array('check', 'messageIcons_enable', 'subtext' => $txt['setting_messageIcons_enable_note']),
 		);
+
+		call_integration_hook('integrate_modify_smiley_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

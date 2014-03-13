@@ -904,6 +904,8 @@ class ManageMaillist_Controller extends Action_Controller
 		{
 			checkSession();
 
+			call_integration_hook('integrate_save_filter_settings', array(&$config_vars));
+
 			// Editing an entry?
 			$editid = (isset($_GET['edit'])) ? (int) $_GET['edit'] : -1;
 			$editname = (isset($_GET['edit'])) ? 'id_filter' : '';
@@ -991,6 +993,8 @@ class ManageMaillist_Controller extends Action_Controller
 			array('large_text', 'filter_from', 4, 'subtext' => $txt['filter_from_desc']),
 			array('text', 'filter_to', 25, 'subtext' => $txt['filter_to_desc']),
 		);
+
+		call_integration_hook('integrate_modify_maillist_filter_settings', array(&$config_vars));
 
 		return $this->_filtersSettings->settings($config_vars);
 	}
@@ -1296,6 +1300,8 @@ class ManageMaillist_Controller extends Action_Controller
 		{
 			checkSession();
 
+			call_integration_hook('integrate_save_parser_settings', array(&$config_vars));
+
 			// Editing a parser?
 			$editid = isset($_GET['edit']) ? (int) $_GET['edit'] : -1;
 			$editname = isset($_GET['edit']) ? 'id_filter' : '';
@@ -1384,6 +1390,8 @@ class ManageMaillist_Controller extends Action_Controller
 			array('large_text', 'filter_from', 4, 'subtext' => $txt['parser_from_desc']),
 		);
 
+		call_integration_hook('integrate_modify_maillist_parser_settings', array(&$config_vars));
+
 		return $this->_parsersSettings->settings($config_vars);
 	}
 
@@ -1442,6 +1450,8 @@ class ManageMaillist_Controller extends Action_Controller
 		if (isset($_GET['save']))
 		{
 			checkSession();
+
+			call_integration_hook('integrate_save_maillist_settings', array(&$config_vars));
 
 			$email_error = false;
 			$board_error = false;
@@ -1623,6 +1633,9 @@ class ManageMaillist_Controller extends Action_Controller
 						array('check', 'maillist_imap_cron', 20, 'subtext' => $txt['maillist_imap_cron_desc'], 'disabled' => !function_exists('imap_open')),
 				)
 			);
+
+		call_integration_hook('integrate_modify_maillist_settings', array(&$config_vars));
+
 
 		return $config_vars;
 	}

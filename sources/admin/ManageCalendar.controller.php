@@ -275,8 +275,6 @@ class ManageCalendar_Controller extends Action_Controller
 
 		$config_vars = $this->_calendarSettings->settings();
 
-		call_integration_hook('integrate_modify_calendar_settings', array(&$config_vars));
-
 		// Get the settings template fired up.
 		require_once(SUBSDIR . '/Settings.class.php');
 
@@ -374,6 +372,9 @@ class ManageCalendar_Controller extends Action_Controller
 				array('check', 'cal_allowspan'),
 				array('int', 'cal_maxspan', 6, 'postinput' => $txt['days_word']),
 		);
+
+		// Add new settings with a nice hook, makes them available for admin settings search as well
+		call_integration_hook('integrate_modify_calendar_settings', array(&$config_vars));
 
 		return $config_vars;
 	}
