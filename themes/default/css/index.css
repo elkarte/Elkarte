@@ -1650,8 +1650,9 @@ dl.settings dt .styled-select select {
 .board_name {
 	padding: 0 0 1px 0;
 	font-size: 1.143em;
+	max-width: 98%;
 }
-.board_description, .moderators {
+.board_name, .board_description, .moderators {
 	margin: 0 0 0 56px;
 }
 .moderators {
@@ -4045,7 +4046,8 @@ a.help .icon {
 		line-height: inherit;
 	}
 	.board_latest {
-		min-width: 22em;
+		min-width: 18em;
+		max-width: 20em;
 	}
 	.board_row {
 		min-width: 20em;
@@ -4055,14 +4057,6 @@ a.help .icon {
 	}
 	.board_lastposter {
 		display: block;
-	}
-	.board_name:after {
-		display: block;
-		clear: both;
-		content: "";
-	}
-	.board_description, .moderators, .childboards {
-		margin: 0 0 0 8px;
 	}
 	/* Playing silly buggers with a sidebar menu option for narrow screens. */
 	#main_container {
@@ -4186,9 +4180,35 @@ a.help .icon {
 	.frame {
 		min-width: 100%;
 	}
+	.board_description, .moderators {
+		display: none;
+	}
+	.board_lastpost, .childboard_row {
+		margin: 0 10px 0 30px !important;
+		max-width: 95% !important;
+		min-width: 10em;
+	}
+	.lastpost_link a:after {
+		content: url('../images/icons/last_post.png');
+		position: absolute;
+		right: 25px;
+	}
+	.board_row {
+		margin-top:3px;
+	}
+	.childboards li {
+		font-size: 1.2em;
+		display: block;
+	}
+	.childboards li:nth-child(2):before {
+		content: "- ";
+	}
+	.childboards li:nth-child(n+2) {
+		margin-left: 10px;
+	}
 	.topic_info {
 		display: block;
-		width: 95%;
+		width: 100%;
 		padding: 8px;
 	}
 	.locked_row, .sticky_row, .basic_row,.topic_listing, .topic_listing>li {
@@ -4221,16 +4241,6 @@ a.help .icon {
 	}
 	#whoisviewing {
 		display: none;
-	}
-	.board_row {
-		margin-top:3px;
-	}
-	.board_lastpost {
-		margin: 3px;
-	}
-	.childboards li {
-		display: block;
-		font-size: 1.2em;
 	}
 	.pagesection .buttonlist li {
 		white-space: nowrap;
@@ -4292,7 +4302,6 @@ a.help .icon {
 		margin: 0 5px;
 	}
 	.board_info, .board_latest {
-		width: 100%;
 		display: block;
 		box-sizing: border-box;
 		margin-bottom: 2px;

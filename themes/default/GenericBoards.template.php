@@ -167,8 +167,7 @@ function template_list_boards($boards, $id)
 		}
 
 		echo '
-					</div>
-				</li>';
+					</div>';
 
 		// Show the "Sub-boards: ". (there's a link_children but we're going to bold the new ones...)
 		if (!empty($board['children']))
@@ -196,17 +195,20 @@ function template_list_boards($boards, $id)
 			// Use h4 tag here for better a11y. Use <ul> for list of sub-boards.
 			// Having sub-board links in <li>'s will allow "tidy sub-boards" via easy CSS tweaks. ;)
 			echo '
-				<li class="childboard_row" id="board_', $board['id'], '_children">
-					<ul class="childboards">
-						<li>
-							<h4>', $txt['parent_boards'], ':</h4>
-						</li>
-						<li>
-							', implode('</li><li> - ', $children), '
-						</li>
-					</ul>
-				</li>';
+					<div class="childboard_row" id="board_', $board['id'], '_children">
+						<ul class="childboards">
+							<li>
+								<h4>', $txt['parent_boards'], ':</h4>
+							</li>
+							<li>
+								', implode('</li><li> - ', $children), '
+							</li>
+						</ul>
+					</div>';
 		}
+
+		echo '
+				</li>';
 	}
 
 	echo '
