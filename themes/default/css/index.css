@@ -1412,6 +1412,7 @@ a.bbc_link {
 /* @todo - Fix for all templates. */
 .small_pagelinks {
 	float: right;
+	margin-top: -2px;
 }
 .small_pagelinks li {
 	float: left;
