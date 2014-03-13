@@ -3154,7 +3154,7 @@ function host_from_ip($ip)
 {
 	global $modSettings;
 
-	if (($host = cache_get_data('hostlookup-' . $ip, 600)) !== null)
+	if (($host = cache_get_data('hostlookup-' . $ip, 600)) !== null || empty($ip))
 		return $host;
 	$t = microtime(true);
 
