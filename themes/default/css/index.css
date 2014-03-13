@@ -1649,8 +1649,9 @@ dl.settings dt .styled-select select {
 .board_name {
 	padding: 0 0 1px 0;
 	font-size: 1.143em;
+	max-width: 98%;
 }
-.board_description, .moderators {
+.board_name, .board_description, .moderators {
 	margin: 0 0 0 56px;
 }
 .moderators {
@@ -4300,7 +4301,6 @@ a.help .icon {
 		margin: 0 5px;
 	}
 	.board_info, .board_latest {
-		width: 100%;
 		display: block;
 		box-sizing: border-box;
 		margin-bottom: 2px;
