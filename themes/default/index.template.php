@@ -644,16 +644,16 @@ function template_quickbutton_strip($strip, $tests = array())
  */
 function template_basicicons_legend()
 {
-	global $context, $modSettings, $settings, $txt;
+	global $context, $modSettings, $txt;
 
 	echo '
 		<p class="floatleft">', !empty($modSettings['enableParticipation']) && $context['user']['is_logged'] ? '
-			<img src="' . $settings['images_url'] . '/icons/profile_sm.png" alt="" class="centericon" /> ' . $txt['participation_caption'] : '<img src="' . $settings['images_url'] . '/post/xx.png" alt="" class="centericon" /> ' . $txt['normal_topic'], '<br />
-			' . (!empty($modSettings['pollMode']) ? '<img src="' . $settings['images_url'] . '/topic/normal_poll.png" alt="" class="centericon" /> ' . $txt['poll'] : '') . '
+			<span class="topicicon img_profile" alt=""></span>' . $txt['participation_caption'] : '<span class="topicicon img_normal" alt=""> </span>' . $txt['normal_topic'], '<br />
+			' . (!empty($modSettings['pollMode']) ? '<span class="topicicon img_poll" alt=""> </span>' . $txt['poll'] : '') . '
 		</p>
 		<p>
-			<img src="' . $settings['images_url'] . '/icons/quick_lock.png" alt="" class="centericon" /> ' . $txt['locked_topic'] . '<br />' . ($modSettings['enableStickyTopics'] == '1' ? '
-			<img src="' . $settings['images_url'] . '/icons/quick_sticky.png" alt="" class="centericon" /> ' . $txt['sticky_topic'] . '<br />' : '') . '
+			<span class="topicicon img_locked" alt=""> </span>' . $txt['locked_topic'] . '<br />' . ($modSettings['enableStickyTopics'] == '1' ? '
+			<span class="topicicon img_sticky" alt=""> </span>' . $txt['sticky_topic'] . '<br />' : '') . '
 		</p>';
 }
 
