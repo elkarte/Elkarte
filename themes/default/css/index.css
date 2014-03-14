@@ -1893,9 +1893,8 @@ img.new_posts {
 }
 .fred {
 	position: absolute;
-	left: 50%;
-	top: 20px;
-	margin: 0 0 0 -2px;
+	left: 42%;
+	top: 16px;
 }
 .topic_name, .topic_starter {
 	margin: 0 0 0 50px;
@@ -1938,7 +1937,7 @@ img.new_posts {
 	box-sizing: border-box;
 	padding: 0 16px 0 16px;
 }
-.topic_lastpost img {
+.topic_lastpost .img_last_post {
 	float: right;
 	padding: 4px;
 }
@@ -1966,17 +1965,59 @@ img.new_posts {
 	max-width: 100%;
 	width: 100%;
 }
-.sticky_row .topic_info {
-	background: url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
+
+/* Message index icons as sprites
+------------------------------------------------- */
+.topicicon:before,
+.sticky_row .topic_info:before, .locked_row .topic_info:before,
+.sticky_row .topic_details:before, .locked_row .topic_details:before,
+.locked_row.sticky_row .topic_info:before {
+	background-image: url(../images/topic/topicicons.png);
+	background-repeat: no-repeat;
+	content: "";
+	display: inline-block;
+	height: 16px;
+	vertical-align: middle;
+	width: 18px;
 }
-.locked_row.sticky_row .topic_info {
-	background: url(../images/icons/quick_sticky_lock.png) no-repeat 98% 4px;
+.topicicon:before {
+	height: 18px;
 }
+/* Sprite icons for quick moderation, last post, sort etc */
+.img_last_post:before {background-position: 0 0;}
+.img_poll:before {background-position: 0 -19px;}
+.img_profile:before {background-position: 0 -37px}
+.img_locked:before {background-position: 0 -55px;}
+.img_move:before {background-position: 0 -73px;}
+.img_remove:before {background-position: 0 -91px;}
+.img_sticky:before {background-position: 0 -109px;}
+.img_sortdown:before {background-position: 0 -127px;}
+.img_sortup:before {background-position: 0 -145px;}
+.img_normal:before {background-position: 0 -163px;}
+.img_lockedsticky:before {background-position: 0 -181px;}
+/* Sprite Icons for the message icon, ? ! xx etc. */
+.img_clip:before {background-position: -18px 0;}
+.img_lamp:before {background-position: -18px -18px;}
+.img_poll:before {background-position: -18px -36px}
+.img_question:before {background-position: -18px -54px;}
+.img_xx:before {background-position: -18px -72px;}
+.img_moved:before {background-position: -18px -90px;}
+.img_exclamation:before {background-position: -18px -108px;}
+.img_thumbup:before {background-position: -18px -126px;}
+.img_thumbdown:before {background-position: -18px -144px;}
+/* sticky / locked icons for the upper right of the div */
+.sticky_row .topic_info:before, .locked_row .topic_info:before,
+.sticky_row .topic_details:before, .locked_row .topic_details:before,
+.locked_row.sticky_row .topic_info:before {
+	float: right;
+}
+.sticky_row .topic_info:before, .sticky_row .topic_details:before {background-position: 0 -108px;}
+.locked_row .topic_info:before, .locked_row .topic_details:before {background-position: 0 -54px;}
+.locked_row.sticky_row .topic_info:before{background-position: 0 -180px; width:36px;}
+
 /* @todo - Extra classes for search results, etc. See if I can clean them up. */
 
-.locked_row .topic_info, .locked_row .topic_details {
-	background: url(../images/icons/quick_lock.png) no-repeat 98% 4px;
-}
+
 /* Search results need some help as well */
 /* @todo - Sort markup so this can call above classes. *//*
 .search_results_posts .lockedbg {
@@ -4142,6 +4183,14 @@ a.help .icon {
 	.mlist li div:nth-child(n+6) {
 		display: none;
 	}
+	.sticky_row .topic_info:before, .locked_row .topic_info:before,
+	.sticky_row .topic_details:before, .locked_row .topic_details:before,
+	.locked_row.sticky_row .topic_info:before {
+		margin-right: -18px;
+	}
+	.topic_name, .topic_starter {
+		margin-right: 18px;
+	}
 }
 /* This one does 540 and smaller screens at default font size. */
 @media screen and (max-width: 33.750em) {
@@ -4193,6 +4242,11 @@ a.help .icon {
 	}
 	.locked_row, .sticky_row, .basic_row,.topic_listing, .topic_listing>li {
 		display: block;
+	}
+	.sticky_row .topic_info:before, .locked_row .topic_info:before,
+	.sticky_row .topic_details:before, .locked_row .topic_details:before,
+	.locked_row.sticky_row .topic_info:before {
+		margin-right: 0;
 	}
 	.topic_icons, .topic_moderation {
 		display: none;
