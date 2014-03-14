@@ -100,7 +100,7 @@ function list_integration_hooks_data($start, $per_page, $sort)
 							$function = $hook_name;
 						}
 
-						$function = explode(':', $function);
+						$function = explode('|', $function);
 						$function = $function[0];
 
 						if (substr($hook, -8) === '_include')
@@ -208,7 +208,7 @@ function list_integration_hooks_data($start, $per_page, $sort)
 					$function = $function[1];
 				}
 
-				$exploded = explode(':', $function);
+				$exploded = explode('|', $function);
 
 				$temp_data[] = array(
 					'id' => 'hookid_' . $id++,
