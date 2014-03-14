@@ -169,13 +169,6 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
 		$header = substr($data, $offset << 9, 512);
 		$current = unpack('a100filename/a8mode/a8uid/a8gid/a12size/a12mtime/a8checksum/a1type/a100linkname/a6magic/a2version/a32uname/a32gname/a8devmajor/a8devminor/a155path', $header);
 
-		// Blank record?  This is probably at the end of the file.
-		if (empty($current['filename']))
-		{
-			$offset += 512;
-			continue;
-		}
-
 		// Clean the header fields, convert octal ones to decimal
 		foreach ($current as $k => $v)
 		{
@@ -183,6 +176,13 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
 				$current[$k] = octdec(trim($v));
 			else
 				$current[$k] = trim($v);
+		}
+
+		// Blank record?  This is probably at the end of the file.
+		if (empty($current['filename']))
+		{
+			$offset += 512;
+			continue;
 		}
 
 		// If its a directory, lets make sure it ends in a /
