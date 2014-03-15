@@ -787,15 +787,31 @@ function registerMember(&$regOptions, $error_context = 'register')
 
 			sendmail($regOptions['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
 		}
-
-		// All admins are finished here.
-		return $memberID;
 	}
-
-	// Can post straight away - welcome them to your fantastic community...
-	if ($regOptions['require'] == 'nothing')
+	else
 	{
-		if (!empty($regOptions['send_welcome_email']))
+		// Can post straight away - welcome them to your fantastic community...
+		if ($regOptions['require'] == 'nothing')
+		{
+			if (!empty($regOptions['send_welcome_email']))
+			{
+				$replacements = array(
+					'REALNAME' => $regOptions['register_vars']['real_name'],
+					'USERNAME' => $regOptions['username'],
+					'PASSWORD' => $regOptions['password'],
+					'FORGOTPASSWORDLINK' => $scripturl . '?action=reminder',
+					'OPENID' => !empty($regOptions['openid']) ? $regOptions['openid'] : '',
+				);
+				$emaildata = loadEmailTemplate('register_' . ($regOptions['auth_method'] == 'openid' ? 'openid_' : '') . 'immediate', $replacements);
+				sendmail($regOptions['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
+			}
+
+			// Send admin their notification.
+			require_once(SUBSDIR . '/Notification.subs.php');
+			sendAdminNotifications('standard', $memberID, $regOptions['username']);
+		}
+		// Need to activate their account - or fall under COPPA.
+		elseif ($regOptions['require'] == 'activation' || $regOptions['require'] == 'coppa')
 		{
 			$replacements = array(
 				'REALNAME' => $regOptions['register_vars']['real_name'],
@@ -804,62 +820,45 @@ function registerMember(&$regOptions, $error_context = 'register')
 				'FORGOTPASSWORDLINK' => $scripturl . '?action=reminder',
 				'OPENID' => !empty($regOptions['openid']) ? $regOptions['openid'] : '',
 			);
-			$emaildata = loadEmailTemplate('register_' . ($regOptions['auth_method'] == 'openid' ? 'openid_' : '') . 'immediate', $replacements);
+
+			if ($regOptions['require'] == 'activation')
+				$replacements += array(
+					'ACTIVATIONLINK' => $scripturl . '?action=activate;u=' . $memberID . ';code=' . $validation_code,
+					'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=activate;u=' . $memberID,
+					'ACTIVATIONCODE' => $validation_code,
+				);
+			else
+				$replacements += array(
+					'COPPALINK' => $scripturl . '?action=coppa;u=' . $memberID,
+				);
+
+			$emaildata = loadEmailTemplate('register_' . ($regOptions['auth_method'] == 'openid' ? 'openid_' : '') . ($regOptions['require'] == 'activation' ? 'activate' : 'coppa'), $replacements);
+
 			sendmail($regOptions['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
 		}
-
-		// Send admin their notification.
-		require_once(SUBSDIR . '/Notification.subs.php');
-		sendAdminNotifications('standard', $memberID, $regOptions['username']);
-	}
-	// Need to activate their account - or fall under COPPA.
-	elseif ($regOptions['require'] == 'activation' || $regOptions['require'] == 'coppa')
-	{
-		$replacements = array(
-			'REALNAME' => $regOptions['register_vars']['real_name'],
-			'USERNAME' => $regOptions['username'],
-			'PASSWORD' => $regOptions['password'],
-			'FORGOTPASSWORDLINK' => $scripturl . '?action=reminder',
-			'OPENID' => !empty($regOptions['openid']) ? $regOptions['openid'] : '',
-		);
-
-		if ($regOptions['require'] == 'activation')
-			$replacements += array(
-				'ACTIVATIONLINK' => $scripturl . '?action=activate;u=' . $memberID . ';code=' . $validation_code,
-				'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=activate;u=' . $memberID,
-				'ACTIVATIONCODE' => $validation_code,
-			);
+		// Must be awaiting approval.
 		else
-			$replacements += array(
-				'COPPALINK' => $scripturl . '?action=coppa;u=' . $memberID,
+		{
+			$replacements = array(
+				'REALNAME' => $regOptions['register_vars']['real_name'],
+				'USERNAME' => $regOptions['username'],
+				'PASSWORD' => $regOptions['password'],
+				'FORGOTPASSWORDLINK' => $scripturl . '?action=reminder',
+				'OPENID' => !empty($regOptions['openid']) ? $regOptions['openid'] : '',
 			);
 
-		$emaildata = loadEmailTemplate('register_' . ($regOptions['auth_method'] == 'openid' ? 'openid_' : '') . ($regOptions['require'] == 'activation' ? 'activate' : 'coppa'), $replacements);
+			$emaildata = loadEmailTemplate('register_' . ($regOptions['auth_method'] == 'openid' ? 'openid_' : '') . 'pending', $replacements);
 
-		sendmail($regOptions['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
+			sendmail($regOptions['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
+
+			// Admin gets informed here...
+			require_once(SUBSDIR . '/Notification.subs.php');
+			sendAdminNotifications('approval', $memberID, $regOptions['username']);
+		}
+
+		// Okay, they're for sure registered... make sure the session is aware of this for security. (Just married :P!)
+		$_SESSION['just_registered'] = 1;
 	}
-	// Must be awaiting approval.
-	else
-	{
-		$replacements = array(
-			'REALNAME' => $regOptions['register_vars']['real_name'],
-			'USERNAME' => $regOptions['username'],
-			'PASSWORD' => $regOptions['password'],
-			'FORGOTPASSWORDLINK' => $scripturl . '?action=reminder',
-			'OPENID' => !empty($regOptions['openid']) ? $regOptions['openid'] : '',
-		);
-
-		$emaildata = loadEmailTemplate('register_' . ($regOptions['auth_method'] == 'openid' ? 'openid_' : '') . 'pending', $replacements);
-
-		sendmail($regOptions['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
-
-		// Admin gets informed here...
-		require_once(SUBSDIR . '/Notification.subs.php');
-		sendAdminNotifications('approval', $memberID, $regOptions['username']);
-	}
-
-	// Okay, they're for sure registered... make sure the session is aware of this for security. (Just married :P!)
-	$_SESSION['just_registered'] = 1;
 
 	// If they are for sure registered, let other people to know about it
 	call_integration_hook('integrate_register_after', array($regOptions, $memberID));

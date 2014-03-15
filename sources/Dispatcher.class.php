@@ -73,7 +73,7 @@ class Site_Dispatcher
 		);
 
 		// Reminder: hooks need to account for multiple addons setting this hook.
-		call_integration_hook('integrate_frontpage', array(&$default_action));
+		call_integration_hook('integrate_action_frontpage', array(&$default_action));
 
 		// Maintenance mode: you're out of here unless you're admin
 		if (!empty($maintenance) && !allowedTo('admin_forum'))
@@ -304,7 +304,7 @@ class Site_Dispatcher
 
 			$hook = strtolower(str_replace('_Controller', '', $this->_controller_name));
 			$hook = substr($hook, -1) == 2 ? substr($hook, 0, -1) : $hook;
-			call_integration_hook('integrate_' . $hook . '_before', array($this->_function_name));
+			call_integration_hook('integrate_action_' . $hook . '_before', array($this->_function_name));
 
 			// 3, 2, ... and go
 			if (method_exists($controller, $this->_function_name))
@@ -321,13 +321,13 @@ class Site_Dispatcher
 				// Things went pretty bad, huh?
 				// board index :P
 				require_once(CONTROLLERDIR . '/BoardIndex.controller.php');
-				call_integration_hook('integrate_boardindex_before');
+				call_integration_hook('integrate_action_boardindex_before');
 				$controller = new BoardIndex_Controller();
 				$controller->action_boardindex();
-				call_integration_hook('integrate_boardindex_after');
+				call_integration_hook('integrate_action_boardindex_after');
 			}
 
-			call_integration_hook('integrate_' . $hook . '_after', array($this->_function_name));
+			call_integration_hook('integrate_action_' . $hook . '_after', array($this->_function_name));
 		}
 		else
 		{

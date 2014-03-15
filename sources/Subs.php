@@ -3154,7 +3154,7 @@ function host_from_ip($ip)
 {
 	global $modSettings;
 
-	if (($host = cache_get_data('hostlookup-' . $ip, 600)) !== null)
+	if (($host = cache_get_data('hostlookup-' . $ip, 600)) !== null || empty($ip))
 		return $host;
 	$t = microtime(true);
 
@@ -3960,7 +3960,11 @@ function remove_integration_function($hook, $function, $file = '')
 		}
 
 		if (in_array($integration_call, $current_functions))
+		{
 			updateSettings(array($hook => implode(',', array_diff($current_functions, array($integration_call)))));
+			if (empty($modSettings[$hook]))
+				removeSettings($hook);
+		}
 	}
 
 	// Turn the function list into something usable.

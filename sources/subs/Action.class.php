@@ -92,7 +92,7 @@ class Action
 	public function initialize($subactions, $default = '')
 	{
 		if ($this->_name !== null)
-			call_integration_hook('integrate_' . $this->_name, array(&$subactions));
+			call_integration_hook('integrate_sa_' . $this->_name, array(&$subactions));
 
 		$this->_subActions = array();
 
