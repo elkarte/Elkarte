@@ -764,7 +764,11 @@ div.windowbg, div.windowbg2 {
 }
 /* Everything is same except HTML5 valid */
 .bbc_tt {
-	font-family: "dejavu sans mono", "monaco", "lucida console", "courier new", monospace;
+	font-family: "DejaVu Sans Mono", Monaco, "Lucida Console", "Courier New", monospace;
+}
+.bbc_pre {
+	font-family: "DejaVu Sans Mono", Monaco, Consolas, monospace;
+	overflow: auto;
 }
 .bbc_footnotes {
 	margin-top: 10px;
@@ -1408,6 +1412,7 @@ a.bbc_link {
 /* @todo - Fix for all templates. */
 .small_pagelinks {
 	float: right;
+	margin-top: -2px;
 }
 .small_pagelinks li {
 	float: left;

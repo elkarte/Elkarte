@@ -1145,7 +1145,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			),
 			array(
 				'tag' => 'pre',
-				'before' => '<pre>',
+				'before' => '<pre class="bbc_pre">',
 				'after' => '</pre>',
 			),
 			array(

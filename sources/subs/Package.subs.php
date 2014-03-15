@@ -1,8 +1,7 @@
 <?php
 
 /**
- * This contains functions for handling tar.gz and zip
- * files, as well as a simple xml parser to handle the xml package.
+ * This contains functions for handling tar.gz and zip files
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -66,7 +65,7 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
  *  - destination can start with * and / to signify that the file may come from any directory.
  *  - destination should not begin with a / if single_file is true.
  *
- * -  existing files with newer modification times if and only if overwrite is true.
+ * - existing files with newer modification times if and only if overwrite is true.
  * - creates the destination directory if it doesn't exist, and is is specified.
  * - requires zlib support be built into PHP.
  * - returns an array of the files extracted on success
@@ -170,16 +169,7 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
 		$header = substr($data, $offset << 9, 512);
 		$current = unpack('a100filename/a8mode/a8uid/a8gid/a12size/a12mtime/a8checksum/a1type/a100linkname/a6magic/a2version/a32uname/a32gname/a8devmajor/a8devminor/a155path', $header);
 
-		// Blank record?  This is probably at the end of the file.
-		if (empty($current['filename']))
-		{
-			$offset += 512;
-			continue;
-		}
-
-		if ($current['type'] == 5 && substr($current['filename'], -1) != '/')
-			$current['filename'] .= '/';
-
+		// Clean the header fields, convert octal ones to decimal
 		foreach ($current as $k => $v)
 		{
 			if (in_array($k, $octdec))
@@ -188,11 +178,23 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
 				$current[$k] = trim($v);
 		}
 
+		// Blank record?  This is probably at the end of the file.
+		if (empty($current['filename']))
+		{
+			$offset += 512;
+			continue;
+		}
+
+		// If its a directory, lets make sure it ends in a /
+		if ($current['type'] == 5 && substr($current['filename'], -1) != '/')
+			$current['filename'] .= '/';
+
+		// Build the checksum for this file and make sure it matches
 		$checksum = 256;
 		for ($i = 0; $i < 148; $i++)
-			$checksum += ord($header{$i});
+			$checksum += ord($header[$i]);
 		for ($i = 156; $i < 512; $i++)
-			$checksum += ord($header{$i});
+			$checksum += ord($header[$i]);
 
 		if ($current['checksum'] != $checksum)
 			break;

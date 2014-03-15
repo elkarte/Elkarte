@@ -235,9 +235,9 @@ function create_control_richedit($editorOptions)
 			'space',
 		);
 		$context['bbc_tags']['row2'] = array(
-			'bulletlist', 'orderedlist', 'horizontalrule',
+			'quote', 'code', 'table',
 			'space',
-			'table', 'code', 'quote',
+			'bulletlist', 'orderedlist', 'horizontalrule',
 			'space',
 			'spoiler', 'footnote',
 			'space',
