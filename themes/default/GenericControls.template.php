@@ -29,9 +29,11 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 	$editor_context = &$context['controls']['richedit'][$editor_id];
 
 	echo '
-		<textarea class="editor" name="', $editor_id, '" id="', $editor_id, '" tabindex="', $context['tabindex']++, '" style="width:', $editor_context['width'], ';height: ', $editor_context['height'], ';', isset($context['post_error']['no_message']) || isset($context['post_error']['long_message']) ? 'border: 1px solid red;' : '', '" required="required">', $editor_context['value'], '</textarea>
+		<textarea class="editor', isset($context['post_error']['errors']['no_message']) || isset($context['post_error']['errors']['long_message']) ? ' border_error' : '', '" name="', $editor_id, '" id="', $editor_id, '" tabindex="', $context['tabindex']++, '" style="width:', $editor_context['width'], ';height: ', $editor_context['height'], ';" required="required">', $editor_context['value'], '</textarea>
 		<input type="hidden" name="', $editor_id, '_mode" id="', $editor_id, '_mode" value="0" />
 		<script><!-- // --><![CDATA[
+			var $editor_data = {},
+				$editor_container = {};
 			$(document).ready(function(){',
 				!empty($context['bbcodes_handlers']) ? $context['bbcodes_handlers'] : '', '
 				$("#', $editor_id, '").sceditor({
@@ -131,17 +133,15 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 
 	echo '
 				});
-				$("#', $editor_id, '").data("sceditor").createPermanentDropDown();
-				$(".sceditor-container").width("100%").height("100%");', $editor_context['rich_active'] ? '' : '
-				$("#' . $editor_id . '").data("sceditor").setTextMode();';
-	// The white-space: pre is necessary to avoid the editor mess with tabs in code blocks
-	echo '
-				$("#' . $editor_id . '").data("sceditor").css(\'code {white-space: pre;}\');', '
+				$editor_data[\'', $editor_id, '\'] = $("#', $editor_id, '").data("sceditor");
+				$editor_container[\'', $editor_id, '\'] = $(".sceditor-container");
+				$editor_data[\'', $editor_id, '\'].css(\'code {white-space: pre;}\').createPermanentDropDown();
+				$editor_container[\'', $editor_id, '\'].width("100%").height("100%");', $editor_context['rich_active'] ? '' : '
+				$editor_data[\'', $editor_id, '\'].setTextMode();', '
 				if (!(is_ie || is_ff || is_opera || is_safari || is_chrome))
 					$(".sceditor-button-source").hide();
-				', isset($context['post_error']['no_message']) || isset($context['post_error']['long_message']) ? '
-				$(".sceditor-container").find("textarea").each(function() {$(this).css({border: "1px solid red"})});
-				$(".sceditor-container").find("iframe").each(function() {$(this).css({border: "1px solid red"})});' : '', '
+				', isset($context['post_error']['errors']['no_message']) || isset($context['post_error']['errors']['long_message']) ? '
+				$editor_container[\'' . $editor_id . '\'].find("textarea, iframe").addClass("border_error");' : '', '
 			});
 		// ]]></script>';
 }
