@@ -19,7 +19,7 @@
 /*		$BUTTONS.............Most button strips.
 /*		$PAGELINKS...........Page navigation links.
 /*
-/*		$TABLES..............Generic tables (memberlist, error log, etc.).
+/*		$TABLES..............Generic tables (error log, etc.).
 /*		$SETTINGS............Generic lists for settings pages.
 /*		$BOARDS..............Board index, sub-boards, and message index.
 /*
@@ -34,6 +34,7 @@
 /*
 /*		$HELP................Help pages, help icons and pop-ups, tooltips.
 /*		$SEARCH..............Search pages, including memberlist search.
+/*		$MEMBERLIST..........The memberlist table.
 /*		$LOGIN...............Login and registration, maintenance mode.
 /*
 /*		$ERRORS..............Error messages.
@@ -3749,6 +3750,13 @@ a.help .icon {
 #memberlist>.content {
 	padding: 12px 0;
 }
+#memberlist .status {
+	width: 60px;
+}
+#memberlist .selected {
+	width: auto;
+	white-space: nowrap
+}
 #memberlist_search, #memberlist>.content>.submitbutton {
 	margin: 0 auto;
 	width: 32em;
@@ -4185,15 +4193,17 @@ a.help .icon {
 	#list_mentions .listaction {
 		display: none;
 	}
-	.mlist li div:nth-child(n+6) {
+	.mlist li div:nth-child(n+6), .mlist li .email {
 		display: none;
+	}
+	.mlist li div.posts {
+		display: table-cell;
 	}
 	.sticky_row .topic_info:before, .locked_row .topic_info:before, .locked_row.sticky_row .topic_info:before {
 		margin-right: -18px;
 	}
 	.topic_name, .topic_starter {
 		margin-right: 18px;
-	}
 }
 /* This one does 540 and smaller screens at default font size. */
 @media screen and (max-width: 33.750em) {
@@ -4552,7 +4562,7 @@ a.help .icon {
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
-	.mlist li div:nth-child(n+5) {
+	.mlist li .website, .mlist li .date_registered {
 		display: none;
 	}
 }
@@ -4564,7 +4574,7 @@ a.help .icon {
 	.quickbuttons .modified {
 		display: none;
 	}
-	.mlist li div:nth-child(n+4) {
+	.mlist li div.posts {
 		display: none;
 	}
 }

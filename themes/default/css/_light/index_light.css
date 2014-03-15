@@ -33,6 +33,7 @@
 /*
 /*		$HELP................Help pages, help icons and pop-ups, tooltips.
 /*		$SEARCH..............Search pages, including memberlist search.
+/*		$MEMBERLIST..........The memberlist table.
 /*		$LOGIN...............Login and registration, maintenance mode.
 /*
 /*		$ERRORS..............Error messages.
@@ -1815,7 +1816,7 @@ div.bbc_footnotes .meaction{
 	.listlevel1#button_profile .linklevel1 {
 		min-width: 0.5em;
 	}
-	.mlist li div:nth-child(n+5) {
+	.mlist li div.posts {
 		border-right: 1px solid #ccc;
 	}
 }
@@ -1884,12 +1885,9 @@ div.bbc_footnotes .meaction{
 	.subsections:hover .linklevel1:after {
 		content: "";
 	}
-	.mlist li div:nth-child(n+4) {
-		border-right: 1px solid #ccc;
-	}
 }
 @media screen and (max-width: 30em) {
-	.mlist li div:nth-child(n+3) {
+	.mlist li .group {
 		border-right: 1px solid #ccc;
 	}
 }
