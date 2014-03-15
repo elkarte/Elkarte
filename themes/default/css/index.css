@@ -2013,7 +2013,7 @@ img.new_posts {
 }
 .sticky_row .topic_info:before, .sticky_row .topic_details:before {background-position: 0 -108px;}
 .locked_row .topic_info:before, .locked_row .topic_details:before {background-position: 0 -54px;}
-.locked_row.sticky_row .topic_info:before{background-position: 0 -180px; width:36px;}
+.locked_row.sticky_row .topic_info:before{background-position: 0 -180px; width: 30px;}
 
 /* @todo - Extra classes for search results, etc. See if I can clean them up. */
 
@@ -4183,9 +4183,7 @@ a.help .icon {
 	.mlist li div:nth-child(n+6) {
 		display: none;
 	}
-	.sticky_row .topic_info:before, .locked_row .topic_info:before,
-	.sticky_row .topic_details:before, .locked_row .topic_details:before,
-	.locked_row.sticky_row .topic_info:before {
+	.sticky_row .topic_info:before, .locked_row .topic_info:before, .locked_row.sticky_row .topic_info:before {
 		margin-right: -18px;
 	}
 	.topic_name, .topic_starter {
@@ -4243,9 +4241,7 @@ a.help .icon {
 	.locked_row, .sticky_row, .basic_row,.topic_listing, .topic_listing>li {
 		display: block;
 	}
-	.sticky_row .topic_info:before, .locked_row .topic_info:before,
-	.sticky_row .topic_details:before, .locked_row .topic_details:before,
-	.locked_row.sticky_row .topic_info:before {
+	.sticky_row .topic_info:before, .locked_row .topic_info:before,	.locked_row.sticky_row .topic_info:before {
 		margin-right: 0;
 	}
 	.topic_icons, .topic_moderation {
