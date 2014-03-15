@@ -3960,7 +3960,11 @@ function remove_integration_function($hook, $function, $file = '')
 		}
 
 		if (in_array($integration_call, $current_functions))
+		{
 			updateSettings(array($hook => implode(',', array_diff($current_functions, array($integration_call)))));
+			if (empty($modSettings[$hook]))
+				removeSettings($hook);
+		}
 	}
 
 	// Turn the function list into something usable.
