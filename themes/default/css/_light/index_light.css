@@ -36,7 +36,7 @@
 /*		$MEMBERLIST..........The memberlist table.
 /*		$LOGIN...............Login and registration, maintenance mode.
 /*
-/*		$ERRORS..............Error messages.
+/*		$BOXES...............Message boxes (error, warning, info, etc).
 /*		$PROGRESS............Nifty progress bars.
 /*		$MEDIA...............Experimental media queries.
 /* ------------------------------------------------------- */
@@ -1649,9 +1649,23 @@ div.bbc_footnotes .meaction{
 	background: #fff0f0;
 }
 
-/*	$ERRORS		*/
+/*	$BOXES		*/
 /* ------------------------------------------------------- */
-
+.warningbox {
+	border-top: 1px solid #ffd324;
+	border-bottom: 1px solid #ffd324;
+	background: #fff6ca url(../../images/profile/warning_moderate.png) 10px 50% no-repeat;
+}
+.successbox {
+	border-top: 1px solid green;
+	border-bottom: 1px solid green;
+	background: #efe url(../../images/icons/field_valid.png) 10px 50% no-repeat;
+}
+.infobox {
+	border-top: 1px solid #3a87ad;
+	border-bottom: 1px solid #3a87ad;
+	background: #d9edf7 url(../../images/icons/quick_sticky.png) 10px 50% no-repeat;
+}
 .errorbox {
 	border-top: 2px solid #c34;
 	border-bottom: 2px solid #c34;

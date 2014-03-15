@@ -37,7 +37,7 @@
 /*		$MEMBERLIST..........The memberlist table.
 /*		$LOGIN...............Login and registration, maintenance mode.
 /*
-/*		$ERRORS..............Error messages.
+/*		$BOXES...............Message boxes (error, warning, info, etc).
 /*		$PROGRESS............Nifty progress bars.
 /*		$MEDIA...............Experimental media queries.
 /* ------------------------------------------------------- */
@@ -585,41 +585,6 @@ div.windowbg, div.windowbg2 {
 .moderation_link, .moderation_link:visited {
 	color: red;
 	font-weight: bold;
-}
-
-/* Lotsa boxes. */
-.description, .information, .warningbox, .successbox, .infobox {
-	margin: 0 0 12px 0;
-	padding: 6px 12px;
-	border: 1px solid #ccc;
-	background: #fff;
-	font-size: 0.929em;
-}
-/* Information boxes. */
-.information {
-	background: #f0f6f0;
-}
-.information p {
-	padding: 12px;
-}
-/* More little boxes on a hillside. */
-.warningbox {
-	padding-left: 35px;
-	border-top: 1px solid #ffd324;
-	border-bottom: 1px solid #ffd324;
-	background: #fff6ca url(../images/profile/warning_moderate.png) 10px 50% no-repeat;
-}
-.successbox {
-	padding-left: 35px;
-	border-top: 1px solid green;
-	border-bottom: 1px solid green;
-	background: #efe url(../images/icons/field_valid.png) 10px 50% no-repeat;
-}
-.infobox {
-	padding-left: 35px;
-	border-top: 1px solid #3a87ad;
-	border-bottom: 1px solid #3a87ad;
-	background: #d9edf7 url(../images/icons/quick_sticky.png) 10px 50% no-repeat;
 }
 
 /* Used for sections that need somewhat larger corners */
@@ -3888,19 +3853,38 @@ a.help .icon {
 	padding: 12px;
 }
 
-/*	$ERRORS		*/
+/*	$BOXES		*/
 /* ------------------------------------------------------- */
+
+/* Lotsa boxes. */
+.description, .information, .warningbox, .successbox, .infobox, .errorbox {
+	margin: 0 0 12px 0;
+	padding: 6px 12px;
+	border: 1px solid #ccc;
+	background: #fff;
+	font-size: 0.929em;
+}
+/* Information boxes. */
+.information {
+	background: #f0f6f0;
+}
+.information p {
+	padding: 12px;
+}
+/* More little boxes on a hillside. */
+.warningbox, .successbox, .infobox, .errorbox {
+	padding-left: 35px;
+}
+.errorbox {
+	margin-bottom: 12px;
+	text-align: left;
+}
 
 /* Styles for (fatal) errors. */
 #fatal_error {
 	margin: auto;
 	padding-bottom: 1em;
 	width: 80%;
-}
-.errorbox {
-	margin-bottom: 12px;
-	padding: 7px 10px 7px 35px;
-	text-align: left;
 }
 .errorbox h3 {
 	margin: 0;
