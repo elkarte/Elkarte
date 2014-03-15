@@ -133,7 +133,10 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 				});
 				$("#', $editor_id, '").data("sceditor").createPermanentDropDown();
 				$(".sceditor-container").width("100%").height("100%");', $editor_context['rich_active'] ? '' : '
-				$("#' . $editor_id . '").data("sceditor").setTextMode();', '
+				$("#' . $editor_id . '").data("sceditor").setTextMode();';
+	// The white-space: pre is necessary to avoid the editor mess with tabs in code blocks
+	echo '
+				$("#' . $editor_id . '").data("sceditor").css(\'code {white-space: pre;}\');', '
 				if (!(is_ie || is_ff || is_opera || is_safari || is_chrome))
 					$(".sceditor-button-source").hide();
 				', isset($context['post_error']['no_message']) || isset($context['post_error']['long_message']) ? '
