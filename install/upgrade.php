@@ -3896,8 +3896,11 @@ function template_welcome_message()
 					return;
 				}
 
-				setLatestVer.innerHTML = latestVer.innerHTML.replace(\'ElkArte \', \'\');
-				document.getElementById(\'version_warning\').style.display = \'\';
+				if (setLatestVer !== null)
+				{
+					setLatestVer.innerHTML = latestVer.innerHTML.replace(\'ElkArte \', \'\');
+					document.getElementById(\'version_warning\').style.display = \'\';
+				}
 				document.getElementById(\'contbutt\').disabled = 0;
 			}
 			addLoadEvent(ourCurrentVersion);
