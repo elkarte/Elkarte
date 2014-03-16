@@ -1013,9 +1013,9 @@ function loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $options
 		SELECT
 			m.id_msg, m.icon, m.subject, m.poster_time, m.poster_ip, m.id_member,
 			m.modified_time, m.modified_name, m.body, m.smileys_enabled,
-			m.poster_name, m.poster_email, m.approved,
-			m.id_msg_modified < {int:new_from} AS is_read
-			' . (!empty($msg_selects) ? implode(',', $msg_selects) : '') . '
+			m.poster_name, m.poster_email, m.approved' . (isset($msg_parameters['new_from']) ? ',
+			m.id_msg_modified < {int:new_from} AS is_read' : '') . '
+			' . (!empty($msg_selects) ? ',' . implode(',', $msg_selects) : '') . '
 		FROM {db_prefix}messages AS m
 			' . (!empty($msg_tables) ? implode("\n\t\t\t", $msg_tables) : '') . '
 		WHERE m.id_msg IN ({array_int:message_list})
