@@ -3052,14 +3052,6 @@ dl.merge_topic dd {
 .topic_details {
 	padding: 0 4px 4px 4px;
 }
-.list_posts {
-	overflow: auto;
-	clear: both;
-	margin: 0;
-	padding-top: 12px;
-	word-wrap: break-word;
-	hyphens: auto;
-}
 .topic h4 {
 	margin: 3px 0;
 }
@@ -3665,9 +3657,6 @@ a.help .icon {
 }
 .compact_view .content {
 	overflow: auto;
-}
-.compact_view .list_posts {
-	line-height: 2em;
 }
 #topicForm .pagesection,
 #topicForm .flow_auto {
