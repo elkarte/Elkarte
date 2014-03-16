@@ -1633,6 +1633,9 @@ dl.settings dt .styled-select select {
 .childboard_row {
 	margin: 0;
 }
+.childboards li:nth-child(n+3):before {
+	content: " - ";
+}
 .board_info, .board_latest {
 	display: table-cell;
 	vertical-align: top;
@@ -4277,16 +4280,6 @@ a.help .icon {
 	#whoisviewing {
 		display: none;
 	}
-	.board_row {
-		margin-top:3px;
-	}
-	.board_lastpost {
-		margin: 3px;
-	}
-	.childboards li {
-		display: block;
-		font-size: 1.2em;
-	}
 	.pagesection .buttonlist li {
 		white-space: nowrap;
 		margin-bottom: 4px;
@@ -4343,8 +4336,25 @@ a.help .icon {
 	.modified {
 		display: none;
 	}
+	.board_row {
+		margin-top:3px;
+		padding: 15px 0;
+	}
+	.board_description, .moderators {
+		display: none;
+	}
+	.childboard_row {
+		padding: 0 0 0 35px;
+	}
 	.childboards {
 		margin: 0 5px;
+	}
+	.childboards li {
+		display: block;
+		font-size: 1.2em;
+	}
+	.childboards li:nth-child(n+2):before {
+		content: " - ";
 	}
 	.board_info, .board_latest {
 		width: 100%;
@@ -4352,8 +4362,19 @@ a.help .icon {
 		box-sizing: border-box;
 		margin-bottom: 2px;
 	}
-	.board_row {
-		padding: 15px 0;
+	.board_latest {
+		margin: 0 0 0 35px;
+		padding: 0 8px;
+		width: 90%;
+		max-width: 90%;
+		min-width: 90%;
+	}
+	.board_lastpost, .topic_lastpost {
+		min-width: 18em;
+	}
+	.board_lastpost {
+		padding-top: 6px;
+		margin: 3px;
 	}
 	.board_info h3 a {
 		font-size: 1.357em;
@@ -4362,18 +4383,10 @@ a.help .icon {
 	.board_name {
 		margin: 0 0 0 35px;
 	}
-	.board_latest {
-		padding: 0 8px;
-		max-width: 410px;
-		min-width: 250px;
-	}
 	.board_info:after {
 		display: block;
 		clear: both;
 		content: "";
-	}
-	.board_lastpost {
-		padding-top: 6px;
 	}
 	.topic_listing>li {
 		margin-bottom: 5px;
@@ -4384,9 +4397,9 @@ a.help .icon {
 	.icon_anchor {
 		min-width: 0;
 	}
-	.lastpost_link {
+	.lastpost_link, .board_lastposter {
 		font-size: 1.071em;
-		display: block;
+		display: inline;
 	}
 	.recentboard, .recentposter {
 		display: none;
