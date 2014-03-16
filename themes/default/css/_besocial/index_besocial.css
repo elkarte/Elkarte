@@ -1366,14 +1366,9 @@ span.views_text {
 	.childboard_row {
 		border-top: none;
 	}
-	.childboard_row:before {
-		content: "";
-		margin: 0;
+	.board_icon {
 		position: relative;
-		top: -12px;
-		display: block;
-		height: 12px;
-		background-color: #f9f9f9;
+		top: -4px;
 	}
 	.board_lastpost {
 		border-top: 1px solid #eee;

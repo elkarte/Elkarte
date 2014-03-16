@@ -202,7 +202,7 @@ function template_list_boards($boards, $id)
 							<h4>', $txt['parent_boards'], ':</h4>
 						</li>
 						<li>
-							', implode('</li><li> - ', $children), '
+							', implode('</li><li>', $children), '
 						</li>
 					</ul>
 				</li>';
