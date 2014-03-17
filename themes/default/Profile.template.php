@@ -51,14 +51,20 @@ function template_profile_above()
  */
 function template_showDrafts()
 {
-	global $context, $settings, $txt;
+	global $context, $settings, $txt, $scripturl;
+
+	if (!empty($context['drafts']))
+		template_pagesection();
 
 	echo '
 		<div id="profilecenter">
-			<h2 class="category_header">
-				', $txt['drafts'], $context['user']['is_owner'] ? '' : ' - ' . $context['member']['name'], '
-			</h2>';
-	template_pagesection();
+			<form action="', $scripturl, '?action=profile;u=' . $context['member']['id'] . ';area=showdrafts;delete" method="post" accept-charset="UTF-8" name="draftForm" id="draftForm" >
+				<h2 class="category_header">
+					<span class="floatright">
+						<input type="checkbox" onclick="invertAll(this, this.form, \'delete[]\');" class="input_check" />
+					</span>
+					', $txt['drafts'], '
+				</h2>';
 
 	// No drafts? Just show an informative message.
 	if (empty($context['drafts']))
@@ -68,7 +74,7 @@ function template_showDrafts()
 			</div>';
 	else
 	{
-		// For every draft to be displayed, give it its own div, and show the important details of the draft.
+		// For every draft to be displayed show the important details.
 		foreach ($context['drafts'] as $draft)
 		{
 			$draft['title'] = '<strong>' . $draft['board']['link'] . ' / ' . $draft['topic']['link'] . '</strong>&nbsp;&nbsp;';
@@ -79,17 +85,33 @@ function template_showDrafts()
 			if (!empty($draft['locked']))
 				$draft['title'] .= '<img src="' . $settings['images_url'] . '/icons/quick_lock.png" alt="' . $txt['locked_topic'] . '" title="' . $txt['locked_topic'] . '" />';
 
-			$draft['date'] = '&#171;&nbsp;<strong>' . $txt['draft_saved_on'] . ':</strong> ' . ($draft['age'] > 0 ? sprintf($txt['draft_days_ago'], $draft['age']) : $draft['time']) . (!empty($draft['remaining']) ? ', ' . sprintf($txt['draft_retain'], $draft['remaining']) : '') . '&#187;';
+			$draft['date'] = '&#171; <strong>' . $txt['draft_saved_on'] . ':</strong> ' . ($draft['age'] > 0 ? sprintf($txt['draft_days_ago'], $draft['age']) : $draft['time']) . (!empty($draft['remaining']) ? ', ' . sprintf($txt['draft_retain'], $draft['remaining']) : '') . ' &#187;';
 			$draft['class'] = $draft['alternate'] === 0 ? 'windowbg2' : 'windowbg';
 
 			template_simple_message($draft);
 		}
 	}
 
-	// Show page numbers.
-	template_pagesection();
+	// Show page numbers
+	if (!empty($context['drafts']))
+	{
+		echo '
+				<div class="flow_auto">
+					<div class="floatleft">';
+
+		template_pagesection();
+
+		echo '
+					</div>
+					<div class="additional_row below_table_data">
+						<input type="submit" name="delete_selected" value="' . $txt['quick_mod_remove'] . '" class="right_submit" onclick="return confirm(' . JavaScriptEscape($txt['draft_remove_selected'] . '?') . ');" />
+						<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
+					</div>
+				</div>';
+	}
 
 	echo '
+			</form>
 		</div>';
 }
 
