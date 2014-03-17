@@ -56,7 +56,9 @@ function template_recent()
  */
 function template_unread()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
+
+	$message_icon_sprite = array('clip' => '', 'lamp' => '', 'poll' => '', 'question' => '', 'xx' => '', 'moved' => '', 'exclamation' => '', 'thumbup' => '', 'thumbdown' => '');
 
 	if (!empty($context['topics']))
 	{
@@ -122,8 +124,14 @@ function template_unread()
 			echo '
 							<li class="', $color_class, '">
 								<div class="topic_info">
-									<p class="topic_icons">
-										<img src="', $topic['first_post']['icon_url'], '" alt="" /><img src="', $settings['images_url'], '/icons/profile_sm.png" alt="" class="fred" />
+									<p class="topic_icons', isset($message_icon_sprite[$topic['first_post']['icon']]) ? ' topicicon img_' . $topic['first_post']['icon'] : '', '">';
+
+							if (!isset($message_icon_sprite[$topic['first_post']['icon']]))
+								echo '
+										<img src="', $topic['first_post']['icon_url'], '" alt="" />';
+
+							echo '
+										', $topic['is_posted_in'] ? '<span class="fred topicicon img_profile" alt=""></span>' : '', '
 									</p>
 									<div class="topic_name">
 										<h4>
@@ -143,7 +151,7 @@ function template_unread()
 										', $topic['views'], ' ', $txt['views'], '
 									</p>
 									<p class="topic_lastpost">
-										<a href="', $topic['last_post']['href'], '"><img src="', $settings['images_url'], '/icons/last_post.png" alt="', $txt['last_post'], '" title="', $txt['last_post'], '" /></a>
+										<a class="topicicon img_last_post" href="', $topic['last_post']['href'], '" alt="', $txt['last_post'], '" title="', $txt['last_post'], '" /></a>
 										', $topic['last_post']['html_time'], '<br />
 										', $txt['by'], ' ', $topic['last_post']['member']['link'], '
 									</p>
@@ -189,7 +197,9 @@ function template_unread()
  */
 function template_replies()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
+
+	$message_icon_sprite = array('clip' => '', 'lamp' => '', 'poll' => '', 'question' => '', 'xx' => '', 'moved' => '', 'exclamation' => '', 'thumbup' => '', 'thumbdown' => '');
 
 	if (!empty($context['topics']))
 	{
@@ -256,8 +266,14 @@ function template_replies()
 			echo '
 							<li class="', $color_class, '">
 								<div class="topic_info">
-									<p class="topic_icons">
-										<img src="', $topic['first_post']['icon_url'], '" alt="" /><img src="', $settings['images_url'], '/icons/profile_sm.png" alt="" class="fred" />
+									<p class="topic_icons', isset($message_icon_sprite[$topic['first_post']['icon']]) ? ' topicicon img_' . $topic['first_post']['icon'] : '', '">';
+
+							if (!isset($message_icon_sprite[$topic['first_post']['icon']]))
+								echo '
+										<img src="', $topic['first_post']['icon_url'], '" alt="" />';
+
+							echo '
+										', $topic['is_posted_in'] ? '<span class="fred topicicon img_profile" alt=""></span>' : '', '
 									</p>
 									<div class="topic_name">';
 
@@ -280,7 +296,7 @@ function template_replies()
 										', $topic['views'], ' ', $txt['views'], '
 									</p>
 									<p class="topic_lastpost">
-										<a href="', $topic['last_post']['href'], '"><img src="', $settings['images_url'], '/icons/last_post.png" alt="', $txt['last_post'], '" title="', $txt['last_post'], '" /></a>
+										<a class="topicicon img_last_post" href="', $topic['last_post']['href'], 'alt="', $txt['last_post'], '" title="', $txt['last_post'], '" /></a>
 										', $topic['last_post']['html_time'], '<br />
 										', $txt['by'], ' ', $topic['last_post']['member']['link'], '
 									</p>
