@@ -264,14 +264,13 @@ function template_build_poster_div($message, $ignoring = false)
  * posts and topics in profile, unapproved, etc.)
  *
  * @param mixed[] $msg associative array contaning the data to output:
- *            - class => a class name (mandatory)
- *            - counter => Usually a number used as counter next to the subject
- *            - title => Usually the subject of the topic (mandatory)
- *            - date => frequently the "posted on", but can be anything
- *            - body => message body (mandatory)
- *            - buttons => an associative array that allows create a
- *                         "quickbutton" strip (see template_quickbutton_strip
- *                         for details on the parameters)
+ * - class => a class name (mandatory)
+ * - counter => Usually a number used as counter next to the subject
+ * - title => Usually the subject of the topic (mandatory)
+ * - date => frequently the "posted on", but can be anything
+ * - body => message body (mandatory)
+ * - buttons => an associative array that allows create a "quickbutton" strip
+ *  (see template_quickbutton_strip for details on the parameters)
  */
 function template_simple_message($msg)
 {
@@ -294,5 +293,4 @@ function template_simple_message($msg)
 
 	echo '
 			</div>';
-
 }
