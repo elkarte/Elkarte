@@ -1003,9 +1003,9 @@ function countNewPosts($topic, $topicinfo, $timestamp)
  * @param string[] $msg_tables
  * @param mixed[] $msg_parameters
  * @param mixed[] $options
- * @return array
+ * @return A request object
  */
-function loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $options)
+function loadMessageRequest($msg_selects, $msg_tables, $msg_parameters, $options = array())
 {
 	$db = database();
 
@@ -1025,6 +1025,41 @@ function loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $options
 	);
 
 	return $request;
+}
+
+/**
+ * Returns the details from a message or several messages
+ * Uses loadMessageRequest to query the database
+ *
+ * @param string[] $msg_selects
+ * @param string[] $msg_tables
+ * @param mixed[] $msg_parameters
+ * @param mixed[] $options
+ * @return array
+ */
+function loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $options = array())
+{
+	$db = database();
+
+	if (!is_array($msg_parameters['message_list']))
+	{
+		$single = true;
+		$msg_parameters['message_list'] = array($msg_parameters['message_list']);
+	}
+	else
+		$single = false;
+
+	$request = loadMessageRequest($msg_selects, $msg_tables, $msg_parameters, $options);
+
+	$return = array();
+	while ($row = $db->fetch_assoc($request))
+		$return[] = $row;
+	$db->free_result($request);
+
+	if ($single)
+		return $return[0];
+	else
+		return $return;
 }
 
 /**
