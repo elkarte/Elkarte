@@ -72,6 +72,9 @@ $(document).ready(function() {
 			return true;
 
 		$(this).css({'cursor': 'pointer'});
+
+		// Note to addon authors, if you want to enable your own click events to bbc images
+		// you can turn off this namespaced click eveent with $("img").off("click.elk_bbc")
 		$(this).on( "click.elk_bbc", function() {
 			var $this = $(this);
 
@@ -127,96 +130,4 @@ function elk_addButton(sButtonStripId, bUseImage, oOptions)
 	oNewButton.innerHTML = '<a class="linklevel1" href="' + oOptions.sUrl + '" ' + ('sCustom' in oOptions ? oOptions.sCustom : '') + '><span class="last"' + ('sId' in oOptions ? ' id="' + oOptions.sId + '_text"': '') + '>' + oOptions.sText + '</span></a>';
 
 	oButtonStripList.appendChild(oNewButton);
-}
-
-function loadAddNewPoll(button, id_board, form_name)
-{
-	if (typeof id_board == 'undefined')
-		return true;
-
-	// Find the form and add poll to the url
-	var $form = $('#post_header').closest("form");
-
-	// change the label
-	if ($(button).val() == poll_add)
-	{
-		$(button).val(poll_remove);
-
-		// We usually like to have the poll icon associated to polls,
-		// but only if the currently selected is the default one
-		if ($('#icon').val() == 'xx')
-			$('#icon').val('poll').change();
-
-		// Add poll to the form action
-		$form.attr('action', $form.attr('action') + ';poll');
-
-		// If the form already exists...just show it back and go out
-		if ($('#poll_main').length > 0)
-		{
-			$('#poll_main, #poll_options').find('input').each(function() {
-				if ($(this).data('required') == 'required')
-					$(this).attr('required', 'required');
-			});
-
-			$('#poll_main, #poll_options').toggle();
-			return false;
-		}
-	}
-	else
-	{
-		if ($('#icon').val() == 'poll')
-			$('#icon').val('xx').change();
-
-		// Remove poll to the form action
-		$form.attr('action', $form.attr('action').replace(';poll', ''));
-
-		$('#poll_main, #poll_options').hide().find('input').each(function() {
-			if ($(this).attr('required') == 'required')
-			{
-				$(this).data('required', 'required');
-				$(this).removeAttr('required');
-			}
-		});
-		$(button).val(poll_add);
-		return false;
-	}
-
-	// Retrieve the poll area
-	$.ajax({
-		url: elk_scripturl + '?action=poll;sa=interface;xml;board=' + id_board,
-		type: "GET",
-		dataType: "html",
-		beforeSend: ajax_indicator(true)
-	})
-	.done(function (data, textStatus, xhr) {
-		// Find the highest tabindex already present
-		var max_tabIndex = 0;
-		for (var i = 0, n = document.forms[form_name].elements.length; i < n; i++)
-			max_tabIndex = Math.max(max_tabIndex, document.forms[form_name].elements[i].tabIndex);
-
-		// Inject the html
-		$('#post_header').after(data);
-
-		$('#poll_main input, #poll_options input').each(function () {
-			$(this).attr('tabindex', ++max_tabIndex);
-		});
-
-		// Repeated collapse/expand of fieldsets as above
-		$('#poll_main legend, #poll_options legend').click(function(){
-			$(this).siblings().slideToggle("fast");
-			$(this).parent().toggleClass("collapsed");
-		}).each(function () {
-			if ($(this).data('collapsed'))
-			{
-				$(this).siblings().css({display: "none"});
-				$(this).parent().toggleClass("collapsed");
-			}
-		});
-	})
-	.always(function() {
-		// turn off the indicator
-		ajax_indicator(false);
-	});
-
-	return false;
 }
