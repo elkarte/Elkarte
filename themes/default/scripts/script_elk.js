@@ -612,9 +612,9 @@ function add_elk_mention(selector, oOptions)
 					return $(this).width($originals.eq(index).width()).css('display', 'inline-block');
 				});
 
-				// Next to overcome an issue where page scrolling does now work, we add the new agnostic helper
+				// Next to overcome an issue where page scrolling does not work, we add the new agnostic helper
 				// element to the body, and hide it
-				$('body').append('<div id="clone" class="' + oSettings.placeholder + '">' + $helper.html()+ '</div>');
+				$('body').append('<div id="clone" class="' + oSettings.placeholder + '">' + $helper.html() + '</div>');
 				$clone = $('#clone');
 				$clone.hide();
 
@@ -744,7 +744,7 @@ function setBoardIds() {
 	// For each category of board
 	$("[id^=category_]").each(function() {
 		var cat = $(this).attr('id').split('category_'),
-				uls = $(this).find("ul");
+			uls = $(this).find("ul");
 
 		// First up add drop zones so we can drag and drop to each level
 		if (uls.length === 1)
