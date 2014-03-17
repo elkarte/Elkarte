@@ -87,7 +87,7 @@ function template_unread()
 		$current_header = $context['topics_headers'][$context['sort_by']];
 		echo '
 							<li class="listlevel1 topic_sorting_row">
-								<a href="', $current_header['url'], '">', $current_header['sort_dir_img'], '</a>
+								<a class="sort topicicon img_sort', $context['sort_direction'], '" href="', $current_header['url'], '" title="', $context['sort_title'], '"></a>
 							</li>';
 
 		echo '
@@ -228,7 +228,7 @@ function template_replies()
 		$current_header = $context['topics_headers'][$context['sort_by']];
 		echo '
 							<li class="listlevel1 topic_sorting_row">
-								<a href="', $current_header['url'], '">', $current_header['sort_dir_img'], '</a>
+								<a class="sort topicicon img_sort', $context['sort_direction'], '" href="', $current_header['url'], '" title="', $context['sort_title'], '"></a>
 							</li>';
 
 		echo '

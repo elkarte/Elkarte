@@ -447,7 +447,7 @@ class Recent_Controller extends Action_Controller
 		}
 
 		$context['sort_direction'] = $ascending ? 'up' : 'down';
-		$sort_title = $ascending ? $txt['sort_desc'] : $txt['sort_asc'];
+		$context['sort_title'] = $ascending ? $txt['sort_desc'] : $txt['sort_asc'];
 
 		// Trick
 		$txt['starter'] = $txt['started_by'];
@@ -455,7 +455,7 @@ class Recent_Controller extends Action_Controller
 		foreach ($sort_methods as $key => $val)
 			$context['topics_headers'][$key] = array(
 				'url' => $scripturl . '?action=unread' . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], $_REQUEST['start']) . ';sort=subject' . ($context['sort_by'] == 'subject' && $context['sort_direction'] == 'up' ? ';desc' : ''),
-				'sort_dir_img' => $context['sort_by'] == $key ? '<img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" title="' . $sort_title	.'" />' : '',
+				'sort_dir_img' => $context['sort_by'] == $key ? '<img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" title="' . $context['sort_title']	.'" />' : '',
 			);
 
 		if (!empty($_REQUEST['c']) && is_array($_REQUEST['c']) && count($_REQUEST['c']) == 1)
