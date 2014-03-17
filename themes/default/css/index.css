@@ -182,12 +182,9 @@ input, button, select{
 	font-size: 0.857em;
 }
 /* Selects require browser-specific targeting too, unfortunately. */
+/* check theme.js for OSx specific targeting of select padding */
 select {
 	padding: 1px 6px;
-}
-#safari select {
-	padding-bottom: 2px;
-	padding-top: 2px;
 }
 select option {
 	padding: 0 4px;
