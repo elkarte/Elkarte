@@ -443,7 +443,7 @@ function onDocReceived(XMLDoc)
 	var text = '';
 
 	for (var i = 0, n = XMLDoc.getElementsByTagName('quote')[0].childNodes.length; i < n; i++)
-		text += XMLDoc.getElementsByTagName('quote')[0].childNodes[i].nodeValue;
+		text += XMLDoc.getElementsByTagName('quote')[0].childNodes[i].nodeValue + "\n";
 
 	$editor_data[post_box_name].insert(text);
 
