@@ -108,7 +108,7 @@ elk_AdminIndex.prototype.showCurrentVersion = function ()
 			if (adminIndex.opt.bLoadAnnouncements)
 				adminIndex.setAnnouncement(elem);
 		});
-		elkVersion = mostRecent.name;
+		elkVersion = mostRecent.name.replace(/elkarte/i, '').trim();
 
 		oElkVersionContainer.innerHTML = elkVersion;
 		if (sCurrentVersion !== elkVersion)

@@ -85,13 +85,13 @@ function template_memberlist()
 		// This is a selected column, so underline it or some such.
 		if ($column['selected'])
 			echo '
-					<div ', isset($column['class']) ? ' class="' . $column['class'] . '"' : '', ' style="width: auto; white-space: nowrap">
+					<div class="' . $column['class'] . '">
 						<a href="' . $column['href'] . '" rel="nofollow">' . $column['label'] . '</a><img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />
 					</div>';
 		// This is just some column... show the link and be done with it.
 		else
 			echo '
-					<div ', isset($column['class']) ? ' class="' . $column['class'] . '"' : '', isset($column['width']) ? ' style="width:' . $column['width'] . '"' : '', '>
+					<div class="' . $column['class'] . '">
 						', $column['link'], '
 					</div>';
 	}
@@ -120,29 +120,31 @@ function template_memberlist()
 			{
 				if (isset($member[$column]))
 				{
+					echo '
+					<div class="' . $values['class'] . '">';
+
 					if ($column == 'online')
 					{
 						echo '
-					<div>
-						', $context['can_send_pm'] ? '<a href="' . $member['online']['href'] . '" title="' . $member['online']['text'] . '">' : '', $settings['use_image_buttons'] ? '<img src="' . $member['online']['image_href'] . '" alt="' . $member['online']['text'] . '" class="centericon" />' : $member['online']['label'], $context['can_send_pm'] ? '</a>' : '', '
-					</div>';
-						continue;
+						', $context['can_send_pm'] ? '<a href="' . $member['online']['href'] . '" title="' . $member['online']['text'] . '">' : '', $settings['use_image_buttons'] ? '<img src="' . $member['online']['image_href'] . '" alt="' . $member['online']['text'] . '" class="centericon" />' : $member['online']['label'], $context['can_send_pm'] ? '</a>' : '';
 					}
 					elseif ($column == 'email_address')
 					{
 						echo '
-					<div>', $member['show_email'] == 'no' ? '' : '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '" rel="nofollow"><img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $member['name'] . '" /></a>', '</div>';
-						continue;
+					', $member['show_email'] == 'no' ? '' : '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '" rel="nofollow"><img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $member['name'] . '" /></a>';
 					}
 					else
 						echo '
-					<div>', $member[$column], '</div>';
+					', $member[$column];
+
+					echo '
+					</div>';
 				}
 				// Any custom fields on display?
 				elseif (!empty($context['custom_profile_fields']['columns']) && isset($context['custom_profile_fields']['columns'][$column]))
 				{
 					echo '
-					<div>', $member['options'][substr($column, 5)], '</div>';
+					<div class="' . $values['class'] . '">', $member['options'][substr($column, 5)], '</div>';
 				}
 			}
 

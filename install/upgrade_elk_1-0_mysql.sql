@@ -1,6 +1,113 @@
 /* ATTENTION: You don't need to run or use this file! The upgrade.php script does everything for you! */
 
 /******************************************************************************/
+--- Fixing theme directories and URLs...
+/******************************************************************************/
+
+---# Try to detect where the themes are...
+---{
+$request = upgrade_query("
+	SELECT variable, value
+	FROM {$db_prefix}themes
+	WHERE variable LIKE 'theme_dir'
+		AND id_theme = 1
+		AND id_member = 0
+	LIMIT 1");
+
+$row = $db->fetch_assoc($request);
+$db->free_result($request);
+
+// Again, the only option is to find a file we know exist, in this case script_elk.js
+$original_theme_dir = $row['value'];
+
+// There are not many options, one is the check for a file ElkArte has and SMF
+// does not have, for example GenericHelpers.template.php
+
+// If the file exists, everything is in the correct place, so go back.
+if (file_exists($original_theme_dir . '/GenericHelpers.template.php'))
+{
+	$possible_theme_dir = $original_theme_dir;
+}
+else
+{
+	// If this file is not there, we can try replacing "Themes" with "themes"
+	$possible_theme_dir = str_replace('Themes', 'themes', $original_theme_dir);
+	if (!file_exists($possible_theme_dir . '/GenericHelpers.template.php'))
+	{
+		// Last try, BOARDDIR + themes
+		$possible_theme_dir = BOARDDIR . '/themes/default';
+		// If it does not exist do not change anything
+		if (!file_exists($possible_theme_dir . '/GenericHelpers.template.php'))
+			$possible_theme_dir = '';
+	}
+}
+
+if (!empty($possible_theme_dir))
+{
+	// If you arrived here means the template exists and we have a valid directory
+	// Time to update the database.
+
+	upgrade_query("
+		UPDATE {$db_prefix}themes
+		SET value = REPLACE(value, '" . $original_theme_dir . "', '" . $possible_theme_dir . "')
+		WHERE variable LIKE '%_dir'");
+}
+---}
+---#
+
+---# Try to detect how to reach the theme...
+---{
+$request = upgrade_query("
+	SELECT variable, value
+	FROM {$db_prefix}themes
+	WHERE variable LIKE 'theme_url'
+		AND id_theme = 1
+		AND id_member = 0
+	LIMIT 1");
+
+$row = $db->fetch_assoc($request);
+$db->free_result($request);
+
+// Again, the only option is to find a file we know exist, in this case script_elk.js
+if (strpos($row['value'], 'http') !== 0)
+	$original_theme_url = $boardurl . '/' . $row['value'];
+else
+	$original_theme_url = $row['value'];
+
+// If the file exists, everything is in the correct place, so go back.
+if (fetch_web_data($original_theme_url . '/scripts/script_elk.js'))
+{
+	$possible_theme_url = $original_theme_url;
+}
+else
+{
+	// If this file is not there, we can try replacing "Themes" with "themes"
+	$possible_theme_url = str_replace('Themes', 'themes', $original_theme_url);
+
+	if (!fetch_web_data($possible_theme_url . '/scripts/script_elk.js'))
+	{
+		// Last try, $boardurl + themes
+		$possible_theme_url = $boardurl . '/themes/default';
+		// If it does not exist do not change anything
+		if (!fetch_web_data($possible_theme_url . '/scripts/script_elk.js'))
+			$possible_theme_url = '';
+	}
+}
+
+if (!empty($possible_theme_url))
+{
+	// If you arrived here means the template exists and we have a valid directory
+	// Time to update the database.
+
+	upgrade_query("
+		UPDATE {$db_prefix}themes
+		SET value = REPLACE(value, '" . $original_theme_url . "', '" . $possible_theme_url . "')
+		WHERE variable LIKE '%_url'");
+}
+---}
+---#
+
+/******************************************************************************/
 --- Adding new settings...
 /******************************************************************************/
 

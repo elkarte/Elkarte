@@ -430,7 +430,7 @@ function revalidateMentions(sForm, sInput)
 			// Was this invoked as the editor plugin?
 			if (all_elk_mentions[i].oOptions.isPlugin)
 			{
-				var $editor = $('#' + all_elk_mentions[i].selector).data("sceditor");
+				var $editor = $editor_data[all_elk_mentions[i].selector];
 
 				cached_names = $editor.opts.mentionOptions.cache.names;
 				cached_queries = $editor.opts.mentionOptions.cache.queries;
@@ -1228,7 +1228,7 @@ errorbox_handler.prototype.init = function()
 		var current_error_handler = this.opt.self;
 		$(document).ready(function() {
 			var current_error = eval(current_error_handler);
-			$('#' + current_error.opt.editor_id).data("sceditor").addEvent(current_error.opt.editor_id, 'blur', function() {
+			$editor_data[current_error.opt.editor_id].addEvent(current_error.opt.editor_id, 'blur', function() {
 				current_error.checkErrors();
 			});
 		});

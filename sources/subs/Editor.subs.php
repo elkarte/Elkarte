@@ -504,7 +504,7 @@ function create_control_richedit($editorOptions)
 		editor_id: \'' . $editorOptions['id'] . '\',
 		editor: ' . JavaScriptEscape('
 		(function () {
-			return $("#' . $editorOptions['id'] . '").data("sceditor").val();
+			return $editor_data[' . $editorOptions['id'] . '].val();
 		});') . '
 	});', true);
 	}
