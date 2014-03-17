@@ -73,6 +73,7 @@
 				tagTextEnd = "",
 				contents = base.val(),
 				editor = $(".sceditor-container").find("textarea")[0],
+				startPos = Math.min(editor.selectionEnd, contents.length),
 				endPos = Math.min(editor.selectionStart, contents.length);
 
 			// Determine what bbc tag(s) we may be inside of
@@ -83,7 +84,7 @@
 			{
 				// Traverse in reverse and build closing tags.
 				for (i = this.tagStack.length - 1; i >= 0; i--)
-					tagTextStart += '[/' + this.tagStack[i].name + "]";
+					tagTextStart += '[/' + this.tagStack[i].name + ']';
 
 				// Traverse forward and build opening tags (with attr's)
 				for (i = 0; i < this.tagStack.length; i++)
@@ -93,8 +94,12 @@
 					tagTextEnd += '[' + this.tagStack[i].name + this.tagStack[i].attributes + "]";
 				}
 
+				// Did someone select text that they expect to be wrapped in tags as well?
+				if (startPos !== endPos)
+					base.insertText(tagTextStart + tagTextEnd, tagTextStart + tagTextEnd);
 				// Insert the new close/open tags at the cursor position
-				base.insert(tagTextStart, tagTextEnd);
+				else
+					base.insertText(tagTextStart, tagTextEnd);
 			}
 		}
 	};
