@@ -627,7 +627,7 @@ function template_quickbutton_strip($strip, $tests = array())
 	{
 		if (isset($value['checkbox']))
 		{
-			if (!empty($value['checkbox']) && !empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
+			if (!empty($value['checkbox']) && ((!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1) || $value['checkbox'] === 'always'))
 				$buttons[] = '
 						<li class="listlevel1 ' . $key . '">
 							<input class="input_check ' . $key . '_check" type="checkbox" name="' . $value['name'] . '[]" value="' . $value['value'] . '" />
