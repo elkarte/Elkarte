@@ -1153,7 +1153,7 @@ class ModerationCenter_Controller extends Action_Controller
 			'additional_rows' => array(
 				$context['view_posts'] ?
 				array(
-					'position' => 'bottom_of_list',
+					'position' => 'below_table_data',
 					'value' => '
 						<input type="submit" name="delete_selected" value="' . $txt['quickmod_delete_selected'] . '" class="right_submit" />',
 				) : array(),
