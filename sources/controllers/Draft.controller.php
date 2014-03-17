@@ -67,10 +67,21 @@ class Draft_Controller extends Action_Controller
 		// If just deleting a draft, do it and then redirect back.
 		if (!empty($_REQUEST['delete']))
 		{
-			checkSession('get');
+			checkSession(empty($_POST) ? 'get' : '');
 
-			$id_delete = (int) $_REQUEST['delete'];
-			deleteDrafts($id_delete, $memID);
+			// Lets see what we have been sent, one or many to delete
+			$toDelete = array();
+			if (!is_array($_REQUEST['delete']))
+				$toDelete[] = (int) $_REQUEST['delete'];
+			else
+			{
+				foreach ($_REQUEST['delete'] as $delete_id)
+					$toDelete[] = (int) $delete_id;
+			}
+
+			if (!empty($toDelete))
+				deleteDrafts($toDelete, $memID);
+
 			redirectexit('action=profile;u=' . $memID . ';area=showdrafts;start=' . $context['start']);
 		}
 
@@ -144,6 +155,11 @@ class Draft_Controller extends Action_Controller
 				'age' => floor((time() - $row['poster_time']) / 86400),
 				'remaining' => (!empty($modSettings['drafts_keep_days']) ? round($modSettings['drafts_keep_days'] - ((time() - $row['poster_time']) / 86400)) : 0),
 				'buttons' => array(
+					'checkbox' => array(
+						'checkbox' => 'always',
+						'value' => $row['id_draft'],
+						'name' => 'delete',
+					),
 					'remove' => array(
 						'href' => $scripturl . '?action=profile;u=' . $context['member']['id'] . ';area=showdrafts;delete=' . $row['id_draft'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'],
 						'text' => $txt['draft_delete'],

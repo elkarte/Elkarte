@@ -182,12 +182,9 @@ input, button, select{
 	font-size: 0.857em;
 }
 /* Selects require browser-specific targeting too, unfortunately. */
+/* check theme.js for OSx specific targeting of select padding */
 select {
 	padding: 1px 6px;
-}
-#safari select {
-	padding-bottom: 2px;
-	padding-top: 2px;
 }
 select option {
 	padding: 0 4px;
@@ -2366,6 +2363,9 @@ div.core_posts {
 	padding: 6px 5px 5px 0;
 	white-space: nowrap;
 }
+#display_jump_to input {
+	vertical-align: baseline;
+}
 
 /* The quick reply area. */
 /* @todo - Markup and CSS could be tweaked here. */
@@ -3940,7 +3940,7 @@ a.help .icon {
 	height: 35px;
 }
 
-/*floating error box*/
+/* floating error box */
 /* currently used by like functionality */
 .floating_error {
 	position: fixed;
@@ -4059,7 +4059,7 @@ a.help .icon {
 	#main_menu .linklevel1>.pm_indicator {
 		display: none;
 	}
-	.button_title {
+	.button_title, .topic_moderation_alt {
 		display: none;
 	}
 	#collapse_button {
