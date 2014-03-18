@@ -57,20 +57,25 @@ function postbyemail_imap()
 	// Based on the type selected get/set the additional connection details
 	$connection = port_type($type);
 	$hostname .= (strpos($hostname, ':') === false) ? ':' . $connection['port'] : '';
-	$mailbox = '{' . $hostname . '/' . $connection['protocol'] . $connection['flags'] . '}' . $mailbox;
+	$server = '{' . $hostname . '/' . $connection['protocol'] . $connection['flags'] . '}';
+	$mailbox = $server .  imap_utf7_encode($mailbox);
 
-	// Connect and search for e-mail messages.
+	// Connect to the mailbox using the supplied credentials and protocol
 	$inbox = @imap_open($mailbox, $username, $password);
 	if ($inbox === false)
 		return false;
 
-	// Grab all unseen emails
-	$emails = imap_search($inbox, 'UNSEEN');
+	// If using gmail, we may need the trash bin name as well
+	if (!empty($modSettings['maillist_imap_delete']) && (strpos($hostname, '.gmail.') !== false))
+		$trash_bin = get_trash_folder($inbox, $server);
 
-	// If emails are returned, cycle through each...
+	// Grab all unseen emails, return by message ID
+	$emails = imap_search($inbox, 'UNSEEN', SE_UID);
+
+	// You've got mail,
 	if ($emails)
 	{
-		// You've got mail, so initialize Emailpost controller
+		// Initialize Emailpost controller
 		require_once(CONTROLLERDIR . '/Emailpost.controller.php');
 		$controller = new Emailpost_Controller();
 
@@ -78,13 +83,11 @@ function postbyemail_imap()
 		sort($emails);
 
 		// For every email...
-		foreach ($emails as $email_number)
+		foreach ($emails as $email_uid)
 		{
-			$email_number = (int) trim($email_number);
-
 			// Get the headers and prefetch the body as well to avoid a second request
-			$headers = imap_fetchheader($inbox, $email_number, FT_PREFETCHTEXT);
-			$message = imap_body($inbox, $email_number, 0);
+			$headers = imap_fetchheader($inbox, $email_uid, FT_PREFETCHTEXT|FT_UID);
+			$message = imap_body($inbox, $email_uid, FT_UID);
 
 			// Create the save-as email
 			if (!empty($headers) && !empty($message))
@@ -95,15 +98,19 @@ function postbyemail_imap()
 				// Mark it for deletion?
 				if (!empty($modSettings['maillist_imap_delete']))
 				{
-					maillist_imap_delete($inbox, $email_number);
+					// Gmail labels make this more complicated
+					if (strpos($hostname, '.gmail.') !== false)
+						imap_mail_move($inbox, $email_uid, $trash_bin, CP_UID);
+
+					imap_delete($inbox, $email_uid, FT_UID);
 					imap_expunge($inbox);
-					imap_close($inbox);
 				}
 			}
 		}
 
 		// Close the connection
 		imap_close($inbox);
+
 		return true;
 	}
 	else
@@ -112,6 +119,7 @@ function postbyemail_imap()
 
 /**
  * Sets port and connection flags based on the chosen protocol
+ *
  * @param string $type type of imap connection, defaults to pop3
  */
 function port_type($type)
@@ -163,4 +171,29 @@ function port_type($type)
 	}
 
 	return array('protocol' => $protocol, 'port' => $port, 'flags' => $flags);
+}
+
+/**
+ * Find and return the proper recycle bin for gmail
+ *
+ * @param object $mailbox connection object to the mailbox
+ * @param string $server server string, used to clean the imap list
+ */
+function get_trash_folder($mailbox, $server)
+{
+	// Known names for the trash bin, I'm sure there are more
+	$trashbox = array('[Google Mail]/Bin', '[Google Mail]/Trash', '[Gmail]/Bin', '[Gmail]/Trash');
+
+	// Get all the folders / labels
+	$mailboxes = imap_list($mailbox, $server, '*');
+
+	// Check the names to see if one is known as a trashbin
+	foreach($mailboxes as $mailbox)
+	{
+		$name = str_replace($server, '', $mailbox);
+		if (in_array($name, $trashbox))
+			return $name;
+	}
+
+	return 'Trash';
 }
