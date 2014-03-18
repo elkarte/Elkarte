@@ -1451,9 +1451,10 @@ function boardInfo($board_id, $topic_id = null)
  * Loads properties from non-standard groups
  *
  * @param int $curBoard
+ * @param boolean $new_board = false Whether this is a new board
  * @return array
  */
-function getOtherGroups($curBoard)
+function getOtherGroups($curBoard, $new_board = false)
 {
 	$db = database();
 
@@ -1470,9 +1471,10 @@ function getOtherGroups($curBoard)
 			'global_moderator' => 2,
 		)
 	);
+
 	while ($row = $db->fetch_assoc($request))
 	{
-		if ($_REQUEST['sa'] == 'newboard' && $row['min_posts'] == -1)
+		if ($new_board && $row['min_posts'] == -1)
 			$curBoard['member_groups'][] = $row['id_group'];
 
 		$groups[(int) $row['id_group']] = array(

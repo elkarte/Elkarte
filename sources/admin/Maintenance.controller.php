@@ -988,8 +988,36 @@ class Maintenance_Controller extends Action_Controller
 	{
 		validateToken('admin-maint');
 
+		isAllowedTo('admin_forum');
+		checkSession('post', 'admin');
+
+		// No boards at all?  Forget it then :/.
+		if (empty($_POST['boards']))
+			redirectexit('action=admin;area=maintain;sa=topics');
+
+		$boards = array_keys($_POST['boards']);
+
+		if (!isset($_POST['delete_type']) || !in_array($_POST['delete_type'], array('moved', 'nothing', 'locked')))
+		{
+			$delete_type = 'nothing';
+		}
+		else
+		{
+			$delete_type = $_POST['delete_type'];
+		}
+
+		$exclude_stickies = isset($_POST['delete_old_not_sticky']);
+
+		// @todo what is the minimum for maxdays? Maybe throw an error?
+		$older_than = time() - 3600 * 24 *  max((int) $_POST['maxdays'], 1);
+
 		require_once(SUBSDIR . '/Topic.subs.php');
-		removeOldTopics();
+		removeOldTopics($boards, $delete_type, $exclude_stickies, $older_than);
+
+		// Log an action into the moderation log.
+		logAction('pruned', array('days' => (int) $_POST['maxdays']));
+
+		redirectexit('action=admin;area=maintain;sa=topics;done=purgeold');
 	}
 
 	/**

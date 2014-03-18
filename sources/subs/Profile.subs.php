@@ -159,8 +159,9 @@ function setupProfileContext($fields, $hook = '')
  *
  * @param int $memID
  * @param string $area = 'summary'
+ * @param array $custom_fields = array()
  */
-function loadCustomFields($memID, $area = 'summary')
+function loadCustomFields($memID, $area = 'summary', array $custom_fields = array())
 {
 	global $context, $txt, $user_profile, $user_info, $settings, $scripturl;
 
@@ -203,9 +204,9 @@ function loadCustomFields($memID, $area = 'summary')
 		$value = $exists ? $user_profile[$memID]['options'][$row['col_name']] : '';
 
 		// If this was submitted already then make the value the posted version.
-		if (isset($_POST['customfield']) && isset($_POST['customfield'][$row['col_name']]))
+		if (!empty($custom_fields) && isset($custom_fields[$row['col_name']]))
 		{
-			$value = Util::htmlspecialchars($_POST['customfield'][$row['col_name']]);
+			$value = Util::htmlspecialchars($custom_fields[$row['col_name']]);
 			if (in_array($row['field_type'], array('select', 'radio')))
 				$value = ($options = explode(',', $row['field_options'])) && isset($options[$value]) ? $options[$value] : '';
 		}

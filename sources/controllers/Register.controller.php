@@ -257,6 +257,10 @@ class Register_Controller extends Action_Controller
 		// Start collecting together any errors.
 		$reg_errors = Error_Context::context('register', 0);
 
+		// Make sure they didn't just register with this session.
+		if (!empty($_SESSION['just_registered']) && empty($modSettings['disableRegisterCheck']))
+			fatal_lang_error('register_only_once', false);
+
 		// We can't validate the token and the session with OpenID enabled.
 		if(!$verifiedOpenID)
 		{
@@ -328,8 +332,8 @@ class Register_Controller extends Action_Controller
 
 		foreach ($_POST as $key => $value)
 		{
-			if (!is_array($_POST[$key]))
-				$_POST[$key] = htmltrim__recursive(str_replace(array("\n", "\r"), '', $_POST[$key]));
+			if (!is_array($value))
+				$_POST[$key] = htmltrim__recursive(str_replace(array("\n", "\r"), '', $value));
 		}
 
 		// Collect all extra registration fields someone might have filled in.
@@ -465,7 +469,7 @@ class Register_Controller extends Action_Controller
 
 		// Check whether we have fields that simply MUST be displayed?
 		require_once(SUBSDIR . '/Profile.subs.php');
-		loadCustomFields(0, 'register');
+		loadCustomFields(0, 'register', isset($_POST['customfield']) ? $_POST['customfield'] : array());
 
 		foreach ($context['custom_fields'] as $row)
 		{

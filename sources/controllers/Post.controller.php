@@ -1709,8 +1709,9 @@ class Post_Controller extends Action_Controller
 			$_REQUEST['eventid'] = (int) $_REQUEST['eventid'];
 
 			// Validate the post...
-			require_once(SUBSDIR . '/Calendar.subs.php');
-			validateEventPost();
+			require_once(CONTROLLERDIR . '/Calendar.controller.php');
+			$calendarController = new Calendar_Controller;
+			$calendarController->validateEventPost();
 
 			// If you're not allowed to edit any events, you have to be the poster.
 			if (!allowedTo('calendar_edit_any'))

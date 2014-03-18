@@ -1157,30 +1157,25 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 /**
  * So long as you are sure... all old posts will be gone.
  * Used in Maintenance.controller.php to prune old topics.
+ * 
+ * @param int[] $boards
+ * @param string $delete_type
+ * @param boolean $exclude_stickies
+ * @param int $older_than
  */
-function removeOldTopics()
+function removeOldTopics(array $boards, $delete_type, $exclude_stickies, $older_than)
 {
 	$db = database();
-
-	isAllowedTo('admin_forum');
-	checkSession('post', 'admin');
-
-	// No boards at all?  Forget it then :/.
-	if (empty($_POST['boards']))
-		redirectexit('action=admin;area=maintain;sa=topics');
-
-	// This should exist, but we can make sure.
-	$_POST['delete_type'] = isset($_POST['delete_type']) ? $_POST['delete_type'] : 'nothing';
 
 	// Custom conditions.
 	$condition = '';
 	$condition_params = array(
-		'boards' => array_keys($_POST['boards']),
-		'poster_time' => time() - 3600 * 24 * $_POST['maxdays'],
+		'boards' => $boards,
+		'poster_time' => $older_than,
 	);
 
 	// Just moved notice topics?
-	if ($_POST['delete_type'] == 'moved')
+	if ($delete_type == 'moved')
 	{
 		$condition .= '
 			AND m.icon = {string:icon}
@@ -1189,7 +1184,7 @@ function removeOldTopics()
 		$condition_params['locked'] = 1;
 	}
 	// Otherwise, maybe locked topics only?
-	elseif ($_POST['delete_type'] == 'locked')
+	elseif ($delete_type == 'locked')
 	{
 		$condition .= '
 			AND t.locked = {int:locked}';
@@ -1197,7 +1192,7 @@ function removeOldTopics()
 	}
 
 	// Exclude stickies?
-	if (isset($_POST['delete_old_not_sticky']))
+	if ($exclude_stickies)
 	{
 		$condition .= '
 			AND t.is_sticky = {int:is_sticky}';
@@ -1220,11 +1215,6 @@ function removeOldTopics()
 	$db->free_result($request);
 
 	removeTopics($topics, false, true);
-
-	// Log an action into the moderation log.
-	logAction('pruned', array('days' => $_POST['maxdays']));
-
-	redirectexit('action=admin;area=maintain;sa=topics;done=purgeold');
 }
 
 /**

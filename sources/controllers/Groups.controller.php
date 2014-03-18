@@ -475,7 +475,7 @@ class Groups_Controller extends Action_Controller
 			{
 				// Get the details of all the members concerned...
 				require_once(SUBSDIR . '/Members.subs.php');
-				$concerned = getConcernedMembers($_POST['groupr'], $where);
+				$concerned = getConcernedMembers($_POST['groupr'], $where, $_POST['req_action'] === 'approve');
 
 				// Cleanup old group requests..
 				deleteGroupRequests($_POST['groupr']);
