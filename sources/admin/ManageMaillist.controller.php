@@ -150,7 +150,7 @@ class ManageMaillist_Controller extends Action_Controller
 				'id_email' => array(
 					'header' => array(
 						'value' => $txt['id'],
-						'style' => 'white-space: nowrap;',
+						'class' => 'nowrap',
 					),
 					'data' => array(
 						'db' => 'id_email',
@@ -190,6 +190,7 @@ class ManageMaillist_Controller extends Action_Controller
 					),
 					'data' => array(
 						'db' => 'key',
+						'class' => 'breakword'
 					),
 					'sort' => array(
 						'default' => 'data_id',
