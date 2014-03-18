@@ -66,17 +66,12 @@ class ManageSmileys_Controller extends Action_Controller
 			'install' => array($this, 'action_install', 'permission' => 'manage_smileys')
 		);
 
-		call_integration_hook('integrate_manage_smileys', array(&$subActions));
+
+		// Action controller
+		$action = new Action('manage_smileys');
 
 		// Set the smiley context.
 		$this->_initSmileyContext();
-
-		// Default the sub-action to 'edit smiley settings'.
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'editsets';
-
-		// Set up template stuff
-		$context['page_title'] = $txt['smileys_manage'];
-		$context['sub_action'] = $subAction;
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -105,6 +100,13 @@ class ManageSmileys_Controller extends Action_Controller
 			),
 		);
 
+		// Default the sub-action to 'edit smiley settings'. call integrate_manage_smileys
+		$subAction = $action->initialize($subActions, 'editsets');
+
+		// Set up the template
+		$context['page_title'] = $txt['smileys_manage'];
+		$context['sub_action'] = $subAction;
+
 		// Some settings may not be enabled, disallow these from the tabs as appropriate.
 		if (empty($modSettings['messageIcons_enable']))
 			$context[$context['admin_menu_name']]['tab_data']['tabs']['editicons']['disabled'] = true;
@@ -117,8 +119,6 @@ class ManageSmileys_Controller extends Action_Controller
 		}
 
 		// Call the right function for this sub-action.
-		$action = new Action();
-		$action->initialize($subActions, 'editsets');
 		$action->dispatch($subAction);
 	}
 
@@ -134,8 +134,6 @@ class ManageSmileys_Controller extends Action_Controller
 		$this->_initSmileySettingsForm();
 
 		$config_vars = $this->_smileySettings->settings();
-
-		call_integration_hook('integrate_modify_smiley_settings');
 
 		// For the basics of the settings.
 		require_once(SUBSDIR . '/Settings.class.php');
@@ -216,6 +214,8 @@ class ManageSmileys_Controller extends Action_Controller
 				// Message icons.
 				array('check', 'messageIcons_enable', 'subtext' => $txt['setting_messageIcons_enable_note']),
 		);
+
+		call_integration_hook('integrate_modify_smiley_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

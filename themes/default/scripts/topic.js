@@ -565,6 +565,8 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 	var message = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('message')[0],
 		body = message.getElementsByTagName('body')[0],
 		error = message.getElementsByTagName('error')[0];
+	$(document.forms.quickModForm.message).removeClass('border_error');
+	$(document.forms.quickModForm.subject).removeClass('border_error');
 
 	if (body)
 	{
@@ -617,14 +619,20 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 		// Re-Fix code blocks
 		if (typeof elk_codefix === 'function')
 			elk_codefix();
+
+		// And pretty the code
+		if (typeof prettyPrint === 'function')
+			prettyPrint();
 	}
 	else if (error)
 	{
 		oErrordiv = document.getElementById('error_box');
 		oErrordiv.innerHTML = error.childNodes[0].nodeValue;
 		oErrordiv.style.display = '';
-		document.forms.quickModForm.message.style.border = error.getAttribute('in_body') === '1' ? this.opt.sErrorBorderStyle : '';
-		document.forms.quickModForm.subject.style.border = error.getAttribute('in_subject') === '1' ? this.opt.sErrorBorderStyle : '';
+		if (error.getAttribute('in_body') === '1')
+			$(document.forms.quickModForm.message).addClass('border_error');
+		if (error.getAttribute('in_subject') === '1')
+			$(document.forms.quickModForm.subject).addClass('border_error');
 	}
 };
 

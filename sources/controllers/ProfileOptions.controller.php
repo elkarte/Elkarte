@@ -842,8 +842,11 @@ class ProfileOptions_Controller extends Action_Controller
 		$context += getBoardList(array('not_redirection' => true, 'ignore' => !empty($cur_profile['ignore_boards']) ? explode(',', $cur_profile['ignore_boards']) : array()));
 
 		// Include a list of boards per category for easy toggling.
-		foreach ($context['categories'] as &$category)
+		foreach ($context['categories'] as $cat => &$category)
+		{
+			$context['boards_in_category'][$cat] = count($category['boards']);
 			$category['child_ids'] = array_keys($category['boards']);
+		}
 
 		loadThemeOptions($memID);
 	}

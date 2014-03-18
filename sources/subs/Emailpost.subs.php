@@ -16,13 +16,15 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * If the email is html based, this will convert basic html tags to bbc tags
- * If the email is plain text it will convert it to html based on markdown text
+ * Converts text / HTML to BBC
+ *
+ * - If the email is html based, this will convert basic html tags to bbc tags
+ * - If the email is plain text it will convert it to html based on markdown text
  * conventions and then that will be converted to bbc.
  *
- * requires Html2BBC.class.php for the html to bbc conversion
- * requires markdown.php for text to html conversions
- *
+ * @uses Html2BBC.class.php for the html to bbc conversion
+ * @uses markdown.php for text to html conversions
+ * @package Maillist
  * @param string $text
  * @param boolean $html
  */
@@ -97,13 +99,14 @@ function pbe_email_to_bbc($text, $html)
 
 /**
  * Prepares the email body so that it looks like a forum post
- *  - Removes extra content as defined in the ACP filters
- *  - Fixes quotes and quote levels
- *  - Re-flows (unfolds) an email using the EmailFormat.class
- *  - Attempts to remove any exposed email address
  *
- * requires: EmailFormat.class.php
+ * - Removes extra content as defined in the ACP filters
+ * - Fixes quotes and quote levels
+ * - Re-flows (unfolds) an email using the EmailFormat.class
+ * - Attempts to remove any exposed email address
  *
+ * @uses EmailFormat.class.php
+ * @package Maillist
  * @param string $body
  * @param boolean $html
  * @param string $real_name
@@ -144,11 +147,13 @@ function pbe_fix_email_body($body, $html = false, $real_name = '', $charset = 'U
 
 /**
  * Replaces a messages >'s with BBC [quote] [/quote] blocks
- *  - Uses quote depth function
- *  - Works with nested quotes of many forms >, > >, >>, >asd
- *  - Bypassed for gmail as it only block quotes the outer layer and then plain
- *    text > quotes the inner which is confusing to all
  *
+ * - Uses quote depth function
+ * - Works with nested quotes of many forms >, > >, >>, >asd
+ * - Bypassed for gmail as it only block quotes the outer layer and then plain
+ * text > quotes the inner which is confusing to all
+ *
+ * @package Maillist
  * @param string $body
  * @param boolean $html
  */
@@ -258,9 +263,11 @@ function pbe_fix_email_quotes($body, $html)
 
 /**
  * Looks for text quotes in the form of > and returns the current level for the line
- *  - If update is true (default), will strip the >'s and return the numeric level found
- *  - Called by pbe_fix_email_quotes
  *
+ * - If update is true (default), will strip the >'s and return the numeric level found
+ * - Called by pbe_fix_email_quotes
+ *
+ * @package Maillist
  * @param string $string
  * @param boolean $update
  */
@@ -298,11 +305,13 @@ function pbe_email_quote_depth(&$string, $update = true)
 
 /**
  * Splits a message at a given string, returning only the upper portion
- *  - Intended to split off the 'replied to' portion that often follows the reply
- *  - Uses parsers as defined in the ACP to do its searching
- *  - Stops after the first successful hit occurs
- *  - Goes in the order defined in the table
  *
+ * - Intended to split off the 'replied to' portion that often follows the reply
+ * - Uses parsers as defined in the ACP to do its searching
+ * - Stops after the first successful hit occurs
+ * - Goes in the order defined in the table
+ *
+ * @package Maillist
  * @param string $body
  * @return boolean on find
  */
@@ -362,10 +371,12 @@ function pbe_parse_email_message(&$body)
 
 /**
  * Searches for extraneous text and removes/replaces it
- *  - Uses filters as defined in the ACP to do the search / replace
- *  - Will apply regex filters first, then string match filters
- *  - Apply all filters to a message
  *
+ * - Uses filters as defined in the ACP to do the search / replace
+ * - Will apply regex filters first, then string match filters
+ * - Apply all filters to a message
+ *
+ * @package Maillist
  * @param string $text
  */
 function pbe_filter_email_message($text)
@@ -408,8 +419,10 @@ function pbe_filter_email_message($text)
 
 /**
  * Finds Re: Subject: FW: FWD or [$sitename] in the subject and strips it
- *  - Recursively calls itself till no more tags are found
  *
+ * - Recursively calls itself till no more tags are found
+ *
+ * @package Maillist
  * @param string $text
  * @param boolean $check if true will return if there tags were found
  */
@@ -453,9 +466,11 @@ function pbe_clean_email_subject($text, $check = false)
 
 /**
  * Used if the original email could not be removed from the message (top of post)
- *  - Tries to quote the original message instead by using a loose original message search
- *  - Looks for email client original message tags and converts them to bbc quotes
  *
+ * - Tries to quote the original message instead by using a loose original message search
+ * - Looks for email client original message tags and converts them to bbc quotes
+ *
+ * @package Maillist
  * @param string $body
  */
 function pbe_fix_client_quotes($body)
@@ -508,6 +523,7 @@ function pbe_fix_client_quotes($body)
 /**
  * Does a single replacement of the first found string in the haystack
  *
+ * @package Maillist
  * @param string $needle
  * @param string $replace
  * @param string $haystack
@@ -525,8 +541,10 @@ function pbe_str_replace_once($needle, $replace, $haystack)
 
 /**
  * Does a moderation check on a given user (global)
- *  - Removes permissions of PBE concern that a given moderated level denies
  *
+ * - Removes permissions of PBE concern that a given moderated level denies
+ *
+ * @package Maillist
  * @param mixed[] $pbe array of user values
  */
 function pbe_check_moderation(&$pbe)
@@ -575,9 +593,11 @@ function pbe_check_moderation(&$pbe)
 
 /**
  * Creates a failed email entry in the postby_emails_error table
- * - Attempts an auto-correct for common errors so the admin / moderator
- *   can choose to approve the email with the corrections
  *
+ * - Attempts an auto-correct for common errors so the admin / moderator
+ * - can choose to approve the email with the corrections
+ *
+ * @package Maillist
  * @param string $error
  * @param Email_Parse $email_message
  */
@@ -701,12 +721,14 @@ function pbe_emailError($error, $email_message)
 
 /**
  * Writes email attachments as temp names in the proper attachment directory
- *  - populates $_SESSION['temp_attachments'] with the email attachments
- *  - calls attachmentChecks to validate them
- *  - skips ones flagged with errors
- *  - adds valid ones to attachmentOptions
- *  - calls createAttachment to store them
  *
+ * - populates $_SESSION['temp_attachments'] with the email attachments
+ * - calls attachmentChecks to validate them
+ * - skips ones flagged with errors
+ * - adds valid ones to attachmentOptions
+ * - calls createAttachment to store them
+ *
+ * @package Maillist
  * @param mixed[] $pbe
  * @param Email_Parse $email_message
  */
@@ -805,9 +827,11 @@ function pbe_email_attachments($pbe, $email_message)
 
 /**
  * Used when a email attempts to start a new topic
- *  - Load the board id that a given email address is assigned to in the ACP
- *  - Returns the board number in which the new topic must go
  *
+ * - Load the board id that a given email address is assigned to in the ACP
+ * - Returns the board number in which the new topic must go
+ *
+ * @package Maillist
  * @param object $email_address
  */
 function pbe_find_board_number($email_address)
@@ -838,12 +862,14 @@ function pbe_find_board_number($email_address)
 
 /**
  * Converts a post/pm to text (markdown) for sending in an email
+ *
  * - censors everything it will send
  * - pre-converts select bbc tags to html so they can be markdowned properly
  * - uses parse-bbc to convert remaining bbc to html
  * - uses html2markdown to convert html to markdown text suitable for email
  * - if someone wants to write a direct bbc->markdown conversion tool, I'm listening!
  *
+ * @package Maillist
  * @param string $message
  * @param string $subject
  * @param string $signature
@@ -869,7 +895,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	censorText($subject);
 
 	// Convert bbc [quotes] before we go to parsebbc so they are easier to plain-textify later
-	$message = preg_replace('~(\[quote)\s?author=(.*)\s?link=(.*)\s?date=([0-9]{10})(\])~seU', "'<blockquote>{$txt['email_on']}: ' . date('D M j, Y','\\4') . ' \\2 {$txt['email_wrote']}:'", $message);
+	$message = preg_replace_callback('~(\[quote)\s?author=(.*)\s?link=(.*)\s?date=([0-9]{10})(\])~sU', 'quote_callback', $message);
 	$message = preg_replace('~(\[quote\s?\])~sU', '<blockquote>', $message);
 	$message = str_replace('[/quote]', "</blockquote>\n\n", $message);
 
@@ -935,20 +961,37 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 }
 
 /**
- * Loads up the vital user information given an email address
- *  - Similar to loadMemberData, loadPermissions, loadUserSettings, but only loads a
- *    subset of that data, enough to validate that a user can make a post to a given board.
+ * Replace full bbc quote tags with an html blockquote version
  *
- * Done this way to avoid over-writting user_info etc for those who are running
+ * - Callback for pbe_prepare_text
+ * - Only changes the leading [quote], the closing /quote is not changed but
+ * handled back in the main function
+ *
+ * @param string[] $matches array of matches from the regex in the preg_replace
+ */
+function quote_callback($matches)
+{
+	global $txt;
+
+	return '<blockquote>' . $txt['email_on'] . ": " . date('D M j, Y', $matches[4]) . ' ' . $matches[2] . ' ' . $txt['email_wrote'] . ':';
+}
+
+/**
+ * Loads up the vital user information given an email address
+ *
+ * - Similar to loadMemberData, loadPermissions, loadUserSettings, but only loads a
+ * subset of that data, enough to validate that a user can make a post to a given board.
+ * - Done this way to avoid over-writting user_info etc for those who are running
  * this function (on behalf of the email owner, simliar to profile views etc)
  *
- * Sets
- *  - pbe['profile']
- *  - pbe['profile']['options']
- *  - pbe['user_info']
- *  - pbe['user_info']['permissions']
- *  - pbe['user_info']['groups']
+ * Sets:
+ * - pbe['profile']
+ * - pbe['profile']['options']
+ * - pbe['user_info']
+ * - pbe['user_info']['permissions']
+ * - pbe['user_info']['groups']
  *
+ * @package Maillist
  * @param string $email
  */
 function query_load_user_info($email)
@@ -1027,8 +1070,10 @@ function query_load_user_info($email)
 
 /**
  * Load the users permissions either general or board specific
- *  - Similar to the functions in loadPermissions()
  *
+ * - Similar to the functions in loadPermissions()
+ *
+ * @package Maillist
  * @param string $type board to load board permissions, otherwise general permissions
  * @param mixed[] $pbe
  * @param mixed[] $topic_info
@@ -1071,9 +1116,11 @@ function query_load_permissions($type, &$pbe, $topic_info = array())
 
 /**
  * Fetches the senders email wrapper details
+ *
  * - Gets the senders signature for inclusion in the email
  * - Gets the senders email address and visibility flag
  *
+ * @package Maillist
  * @param string $from
  */
 function query_sender_wrapper($from)
@@ -1106,8 +1153,10 @@ function query_sender_wrapper($from)
 
 /**
  * Reads all the keys that have been sent to a given email id
- *  - Returns all keys sent to a user in date order
  *
+ * - Returns all keys sent to a user in date order
+ *
+ * @package Maillist
  * @param string $email email address to lookup
  */
 function query_user_keys($email)
@@ -1137,6 +1186,7 @@ function query_user_keys($email)
 /**
  * Return the email that a given key was sent to
  *
+ * @package Maillist
  * @param string $key security key
  * @return string email address the key was sent to
  */
@@ -1165,8 +1215,10 @@ function query_key_owner($key)
 
 /**
  * For a given type, t m or p, query the appropriate table for a given message id
- * If found returns the message subject
  *
+ * - If found returns the message subject
+ *
+ * @package Maillist
  * @param int $message_id
  * @param string $message_type
  * @param string $email
@@ -1255,8 +1307,10 @@ function query_load_subject($message_id, $message_type, $email)
 
 /**
  * Loads the important information for a given topic or pm ID
- *  - Returns array with the topic or PM details
  *
+ * - Returns array with the topic or PM details
+ *
+ * @package Maillist
  * @param string $message_type
  * @param int $message_id
  * @param mixed[] $pbe
@@ -1332,6 +1386,7 @@ function query_load_message($message_type, $message_id, $pbe)
 /**
  * Loads the board_id for where a given message resides
  *
+ * @package Maillist
  * @param int $message_id
  */
 function query_load_board($message_id)
@@ -1357,6 +1412,7 @@ function query_load_board($message_id)
 /**
  * Loads the basic board information for a given board id
  *
+ * @package Maillist
  * @param int $board_id
  * @param mixed[] $pbe
  */
@@ -1383,8 +1439,10 @@ function query_load_board_details($board_id, $pbe)
 
 /**
  * Loads the theme settings for the theme this user is using
- *  - Mainly used to determine a users notify settings
  *
+ * - Mainly used to determine a users notify settings
+ *
+ * @package Maillist
  * @param int $id_member
  * @param int $id_theme
  * @param mixed[] $board_info
@@ -1437,6 +1495,7 @@ function query_get_theme($id_member, $id_theme, $board_info)
 /**
  * Turn notifications on or off if the user has set auto notify 'when I reply'
  *
+ * @package Maillist
  * @param int $id_member
  * @param int $id_board
  * @param int $id_topic
@@ -1493,10 +1552,12 @@ function query_notifications($id_member, $id_board, $id_topic, $auto_notify, $pe
 
 /**
  * Called when a pm reply has been made
- *  - Marks the PM replied to as read
- *  - Marks the PM replied to as replied to
- *  - Updates the number of unread to reflect this
  *
+ * - Marks the PM replied to as read
+ * - Marks the PM replied to as replied to
+ * - Updates the number of unread to reflect this
+ *
+ * @package Maillist
  * @param Email_Parse $email_message
  * @param mixed[] $pbe
  */
@@ -1557,8 +1618,10 @@ function query_mark_pms($email_message, $pbe)
 
 /**
  * Once a key has been used it is removed and can not be used again
- * Also removes any old keys to minimize security issues
  *
+ * - Also removes any old keys to minimize security issues
+ *
+ * @package Maillist
  * @param Email_Parse $email_message
  */
 function query_key_maintenance($email_message)
@@ -1598,10 +1661,12 @@ function query_key_maintenance($email_message)
 /**
  * After a email post has been made, this updates the users information just like
  * they are on the site to perform the given action.
- *  - Updates time on line
- *  - Updates last active
- *  - Updates the who's online list with the member and action
  *
+ * - Updates time on line
+ * - Updates last active
+ * - Updates the who's online list with the member and action
+ *
+ * @package Maillist
  * @param mixed[] $pbe
  * @param Email_Parse $email_message
  * @param mixed[] $topic_info

@@ -310,7 +310,7 @@ class MarkRead_Controller extends Action_Controller
 		if (!isset($_REQUEST['unread']))
 		{
 			// Find all boards with the parents in the board list
-			$boards_to_add = accessibleBoards($boards);
+			$boards_to_add = accessibleBoards(null, $boards);
 			if (!empty($boards_to_add))
 				markBoardsRead($boards_to_add);
 

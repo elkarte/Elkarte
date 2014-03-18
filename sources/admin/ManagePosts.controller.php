@@ -21,8 +21,9 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * ManagePosts controller handles all the administration settings
- *  for topics and posts.
+ * ManagePosts controller handles all the administration settings for topics and posts.
+ *
+ * @package Posts
  */
 class ManagePosts_Controller extends Action_Controller
 {
@@ -34,12 +35,13 @@ class ManagePosts_Controller extends Action_Controller
 
 	/**
 	 * The main entrance point for the 'Posts and topics' screen.
-	 * Like all others, it checks permissions, then forwards to the right function
-	 * based on the given sub-action.
-	 * Defaults to sub-action 'posts'.
 	 *
-	 * Accessed from ?action=admin;area=postsettings.
-	 * Requires (and checks for) the admin_forum permission.
+	 * What it does:
+	 * - Like all others, it checks permissions, then forwards to the right function
+	 * based on the given sub-action.
+	 * - Defaults to sub-action 'posts'.
+	 * - Accessed from ?action=admin;area=postsettings.
+	 * - Requires (and checks for) the admin_forum permission.
 	 *
 	 * @see Action_Controller::action_index()
 	 */
@@ -67,13 +69,8 @@ class ManagePosts_Controller extends Action_Controller
 				'permission' => 'admin_forum'),
 		);
 
-		call_integration_hook('integrate_manage_posts', array(&$subActions));
-
-		// Default the sub-action to 'posts'.
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'posts';
-
-		$context['page_title'] = $txt['manageposts_title'];
-		$context['sub_action'] = $subAction;
+		// Good old action handle
+		$action = new Action('manage_posts');
 
 		// Tabs for browsing the different post functions.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -96,18 +93,24 @@ class ManagePosts_Controller extends Action_Controller
 			),
 		);
 
+		// Default the sub-action to 'posts'. call integrate_manage_posts
+		$subAction = $action->initialize($subActions, 'posts');
+
+		// Just for the template
+		$context['page_title'] = $txt['manageposts_title'];
+		$context['sub_action'] = $subAction;
+
 		// Call the right function for this sub-action.
-		$action = new Action();
-		$action->initialize($subActions, 'posts');
 		$action->dispatch($subAction);
 	}
 
 	/**
 	 * Shows an interface to set and test censored words.
-	 * It uses the censor_vulgar, censor_proper, censorWholeWord, and censorIgnoreCase
-	 * settings.
-	 * Requires the admin_forum permission.
-	 * Accessed from ?action=admin;area=postsettings;sa=censor.
+	 *
+	 * - It uses the censor_vulgar, censor_proper, censorWholeWord, and
+	 * censorIgnoreCase settings.
+	 * - Requires the admin_forum permission.
+	 * - Accessed from ?action=admin;area=postsettings;sa=censor.
 	 *
 	 * @uses the Admin template and the edit_censored sub template.
 	 */
@@ -200,8 +203,9 @@ class ManagePosts_Controller extends Action_Controller
 
 	/**
 	 * Modify any setting related to posts and posting.
-	 * Requires the admin_forum permission.
-	 * Accessed from ?action=admin;area=postsettings;sa=posts.
+	 *
+	 * - Requires the admin_forum permission.
+	 * - Accessed from ?action=admin;area=postsettings;sa=posts.
 	 *
 	 * @uses Admin template, edit_post_settings sub-template.
 	 */
@@ -213,8 +217,6 @@ class ManagePosts_Controller extends Action_Controller
 		$this->_initPostSettingsForm();
 
 		$config_vars = $this->_postSettings->settings();
-
-		call_integration_hook('integrate_modify_post_settings');
 
 		// Setup the template.
 		$context['page_title'] = $txt['manageposts_settings'];
@@ -301,6 +303,9 @@ class ManagePosts_Controller extends Action_Controller
 				array('select', 'message_index_preview', array($txt['message_index_preview_off'], $txt['message_index_preview_first'], $txt['message_index_preview_last'])),
 				array('int', 'preview_characters', 'subtext' => $txt['preview_characters_zero'], 'postinput' => $txt['preview_characters_units']),
 		);
+
+		// Add new settings with a nice hook, makes them available for admin settings search as well
+		call_integration_hook('integrate_modify_post_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

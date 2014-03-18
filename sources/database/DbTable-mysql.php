@@ -72,7 +72,7 @@ class DbTable_MySQL extends DbTable
 		foreach ($this->_reservedTables as $k => $table_name)
 			$this->_reservedTables[$k] = strtolower($db_prefix . $table_name);
 
-		// lets be sure.
+		// let's be sure.
 		$this->_package_log = array();
 	}
 

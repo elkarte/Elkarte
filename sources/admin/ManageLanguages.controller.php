@@ -22,6 +22,8 @@ if (!defined('ELK'))
 
 /**
  * Manage languages controller class.
+ *
+ * @package Languages
  */
 class ManageLanguages_Controller extends Action_Controller
 {
@@ -33,8 +35,10 @@ class ManageLanguages_Controller extends Action_Controller
 
 	/**
 	 * This is the main function for the languages area.
-	 * It dispatches the requests.
-	 * Loads the ManageLanguages template. (sub-actions will use it)
+	 *
+	 * What it does:
+	 * - It dispatches the requests.
+	 * - Loads the ManageLanguages template. (sub-actions will use it)
 	 *
 	 * @uses ManageSettings language file
 	 * @see Action_Controller::action_index()
@@ -54,13 +58,8 @@ class ManageLanguages_Controller extends Action_Controller
 			'editlang' => array($this, 'action_editlang', 'permission' => 'admin_forum'),
 		);
 
-		call_integration_hook('integrate_manage_languages', array(&$subActions));
-
-		// By default we're managing languages.
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'edit';
-		$context['sub_action'] = $subAction;
-		$context['page_title'] = $txt['edit_languages'];
-		$context['sub_template'] = 'show_settings';
+		// Get ready for action
+		$action = new Action('manage_languages');
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -68,9 +67,15 @@ class ManageLanguages_Controller extends Action_Controller
 			'description' => $txt['language_description'],
 		);
 
+		// By default we're managing languages, call integrate_manage_languages
+		$subAction = $action->initialize($subActions, 'edit');
+
+		// Some final bits
+		$context['sub_action'] = $subAction;
+		$context['page_title'] = $txt['edit_languages'];
+		$context['sub_template'] = 'show_settings';
+
 		// Call the right function for this sub-action.
-		$action = new Action();
-		$action->initialize($subActions, 'edit');
 		$action->dispatch($subAction);
 	}
 
@@ -284,10 +289,12 @@ class ManageLanguages_Controller extends Action_Controller
 
 	/**
 	 * Download a language file from the website.
-	 * Requires a valid download ID ("did") in the URL.
-	 * Also handles installing language files.
-	 * Attempts to chmod things as needed.
-	 * Uses a standard list to display information about all the files and where they'll be put.
+	 *
+	 * What it does:
+	 * - Requires a valid download ID ("did") in the URL.
+	 * - Also handles installing language files.
+	 * - Attempts to chmod things as needed.
+	 * - Uses a standard list to display information about all the files and where they'll be put.
 	 *
 	 * @uses ManageLanguages template, download_language sub-template.
 	 * @uses Admin template, show_list sub-template.
@@ -295,6 +302,9 @@ class ManageLanguages_Controller extends Action_Controller
 	public function action_downloadlang()
 	{
 		global $context, $forum_version, $txt, $scripturl, $modSettings;
+
+		// @todo for the moment there is no facility to download packages, so better kill it here
+		fatal_lang_error('no_access', false);
 
 		loadLanguage('ManageSettings');
 		require_once(SUBSDIR . '/Package.subs.php');
@@ -989,9 +999,8 @@ class ManageLanguages_Controller extends Action_Controller
 	/**
 	 * Edit language related settings.
 	 *
-	 * Accessed by ?action=admin;area=languages;sa=settings
-	 *
-	 * This method handles the display, allows to edit, and saves the result
+	 * - Accessed by ?action=admin;area=languages;sa=settings
+	 * - This method handles the display, allows to edit, and saves the result
 	 * for the _languageSettings form.
 	 */
 	public function action_languageSettings_display()
@@ -1012,7 +1021,6 @@ class ManageLanguages_Controller extends Action_Controller
 		{
 			checkSession();
 
-			// @todo review these hooks: do they need param and how else can we do this
 			call_integration_hook('integrate_save_language_settings', array(&$config_vars));
 
 			$this->_languageSettings->save();
@@ -1041,7 +1049,8 @@ class ManageLanguages_Controller extends Action_Controller
 
 	/**
 	 * Administration settings for languages area:
-	 *  the method will initialize the form config array with all settings.
+	 *
+	 * - the method will initialize the form config array with all settings.
 	 *
 	 * Format of the array:
 	 *  - either, variable name, description, type (constant), size/possible values, helptext.
@@ -1080,7 +1089,7 @@ class ManageLanguages_Controller extends Action_Controller
 			array('userLanguage', $txt['userLanguage'], 'db', 'check', null, 'userLanguage'),
 		);
 
-		call_integration_hook('integrate_language_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_language_settings', array(&$config_vars));
 
 		// Get our languages. No cache.
 		$languages = getLanguages(false);

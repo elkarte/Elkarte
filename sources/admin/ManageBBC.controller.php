@@ -16,6 +16,8 @@ if (!defined('ELK'))
 
 /**
  * ManageBBC controller handles administration options for BBC tags.
+ *
+ * @package BBC
  */
 class ManageBBC_Controller extends Action_Controller
 {
@@ -28,10 +30,11 @@ class ManageBBC_Controller extends Action_Controller
 
 	/**
 	 * The BBC admin area
-	 * This method is the entry point for index.php?action=admin;area=postsettings;sa=bbc
-	 * and it calls a function based on the sub-action, here only display.
 	 *
-	 * requires admin_forum permissions
+	 * What it does:
+	 * - This method is the entry point for index.php?action=admin;area=postsettings;sa=bbc
+	 * and it calls a function based on the sub-action, here only display.
+	 * - requires admin_forum permissions
 	 *
 	 * @see Action_Controller::action_index()
 	 */
@@ -49,20 +52,22 @@ class ManageBBC_Controller extends Action_Controller
 				'permission' => 'admin_forum')
 		);
 
-		// Only one option I'm afraid
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'display';
+		// Set up
+		$action = new Action('manage_bbc');
+
+		// Only one option I'm afraid, but integrate_manage_bbc can add more
+		$subAction = $action->initialize($subActions, 'display');
 		$context['sub_action'] = $subAction;
 		$context['page_title'] = $txt['manageposts_bbc_settings_title'];
 
-		// Initiate and call
-		$action = new Action();
-		$action->initialize($subActions, 'display');
+		// Make the call
 		$action->dispatch($subAction);
 	}
 
 	/**
 	 * Administration page in Posts and Topics > BBC.
-	 * This method handles displaying and changing which BBC tags are enabled on the forum.
+	 *
+	 * - This method handles displaying and changing which BBC tags are enabled on the forum.
 	 *
 	 * @uses Admin template, edit_bbc_settings sub-template.
 	 */
@@ -78,8 +83,6 @@ class ManageBBC_Controller extends Action_Controller
 		// Make sure a nifty javascript will enable/disable checkboxes, according to BBC globally set or not.
 		addInlineJavascript('
 			toggleBBCDisabled(\'disabledBBC\', ' . (empty($modSettings['enableBBC']) ? 'true' : 'false') . ');', true);
-
-		call_integration_hook('integrate_modify_bbc_settings', array(&$config_vars));
 
 		// We'll need this forprepare_db() and save_db()
 		require_once(SUBSDIR . '/Settings.class.php');
@@ -151,6 +154,9 @@ class ManageBBC_Controller extends Action_Controller
 			'',
 				array('bbc', 'disabledBBC'),
 		);
+
+		// Add new settings with a nice hook, makes them available for admin settings search as well
+		call_integration_hook('integrate_modify_bbc_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

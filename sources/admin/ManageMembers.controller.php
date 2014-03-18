@@ -23,18 +23,21 @@ if (!defined('ELK'))
 /**
  * ManageMembers controller deals with members administration, approval,
  * admin-visible list and search in it.
+ *
+ * @package Members
  */
 class ManageMembers_Controller extends Action_Controller
 {
 	/**
 	 * The main entrance point for the Manage Members screen.
-	 * As everyone else, it calls a function based on the given sub-action.
-	 * Called by ?action=admin;area=viewmembers.
-	 * Requires the moderate_forum permission.
+	 *
+	 * What it does:
+	 * - As everyone else, it calls a function based on the given sub-action.
+	 * - Called by ?action=admin;area=viewmembers.
+	 * - Requires the moderate_forum permission.
 	 *
 	 * @uses ManageMembers template
 	 * @uses ManageMembers language file.
-	 *
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
@@ -68,13 +71,11 @@ class ManageMembers_Controller extends Action_Controller
 				'permission' => 'moderate_forum'),
 		);
 
-		call_integration_hook('integrate_manage_members', array(&$subActions));
-
-		// Default to sub action 'all'.
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'all';
-
+		// Prepare our action control
 		$action = new Action();
-		$action->initialize($subActions, 'all');
+
+		// Default to sub action 'all', needed for the tabs array below
+		$subAction = $action->initialize($subActions, 'all');
 
 		// You can't pass!
 		$action->isAllowedTo($subAction);
@@ -136,6 +137,9 @@ class ManageMembers_Controller extends Action_Controller
 			),
 		);
 
+		// Call integrate_manage_members
+		call_integration_hook('integrate_manage_members', array(&$subActions));
+
 		// Sort out the tabs for the ones which may not exist!
 		if (!$context['show_activate'] && ($subAction != 'browse' || $_REQUEST['type'] != 'activate'))
 		{
@@ -151,18 +155,21 @@ class ManageMembers_Controller extends Action_Controller
 			unset($context['tabs']['approve']);
 		}
 
+		// Last items for the template
 		$context['page_title'] = $txt['admin_members'];
 		$context['sub_action'] = $subAction;
 
+		// Off we go
 		$action->dispatch($subAction);
 	}
 
 	/**
 	 * View all members list. It allows sorting on several columns, and deletion of
-	 * selected members. It also handles the search query sent by
-	 * ?action=admin;area=viewmembers;sa=search.
-	 * Called by ?action=admin;area=viewmembers;sa=all or ?action=admin;area=viewmembers;sa=query.
-	 * Requires the moderate_forum permission.
+	 * selected members.
+	 *
+	 * - It also handles the search query sent by ?action=admin;area=viewmembers;sa=search.
+	 * - Called by ?action=admin;area=viewmembers;sa=all or ?action=admin;area=viewmembers;sa=query.
+	 * - Requires the moderate_forum permission.
 	 *
 	 * @uses the view_members sub template of the ManageMembers template.
 	 */
@@ -611,9 +618,11 @@ class ManageMembers_Controller extends Action_Controller
 
 	/**
 	 * Search the member list, using one or more criteria.
-	 * Called by ?action=admin;area=viewmembers;sa=search.
-	 * Requires the moderate_forum permission.
-	 * form is submitted to action=admin;area=viewmembers;sa=query.
+	 *
+	 * What it does:
+	 * - Called by ?action=admin;area=viewmembers;sa=search.
+	 * - Requires the moderate_forum permission.
+	 * - form is submitted to action=admin;area=viewmembers;sa=query.
 	 *
 	 * @uses the search_members sub template of the ManageMembers template.
 	 */
@@ -635,11 +644,13 @@ class ManageMembers_Controller extends Action_Controller
 
 	/**
 	 * List all members who are awaiting approval / activation, sortable on different columns.
-	 * It allows instant approval or activation of (a selection of) members.
-	 * Called by ?action=admin;area=viewmembers;sa=browse;type=approve
-	 *   or ?action=admin;area=viewmembers;sa=browse;type=activate.
-	 * The form submits to ?action=admin;area=viewmembers;sa=approve.
-	 * Requires the moderate_forum permission.
+	 *
+	 * What it does:
+	 * - It allows instant approval or activation of (a selection of) members.
+	 * - Called by ?action=admin;area=viewmembers;sa=browse;type=approve
+	 * or ?action=admin;area=viewmembers;sa=browse;type=activate.
+	 * - The form submits to ?action=admin;area=viewmembers;sa=approve.
+	 * - Requires the moderate_forum permission.
 	 *
 	 * @uses the admin_browse sub template of the ManageMembers template.
 	 */
@@ -933,12 +944,12 @@ class ManageMembers_Controller extends Action_Controller
 				array(
 					'position' => 'below_table_data',
 					'value' => '
-						<div class="styled-select float_right">
+						<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=viewmembers;sa=browse;showdupes=' . ($context['show_duplicates'] ? 0 : 1) . ';type=' . $context['browse_type'] . (!empty($context['show_filter']) ? ';filter=' . $context['current_filter'] : '') . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . ($context['show_duplicates'] ? $txt['dont_check_for_duplicate'] : $txt['check_for_duplicate']) . '</a>
+						<div class="styled-select floatright">
 							<select name="todo" onchange="onSelectChange();">
 								' . $allowed_actions . '
 							</select>
 						</div>
-						<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=viewmembers;sa=browse;showdupes=' . ($context['show_duplicates'] ? 0 : 1) . ';type=' . $context['browse_type'] . (!empty($context['show_filter']) ? ';filter=' . $context['current_filter'] : '') . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . ($context['show_duplicates'] ? $txt['dont_check_for_duplicate'] : $txt['check_for_duplicate']) . '</a>
 						<noscript>
 							<input type="submit" value="' . $txt['go'] . '" class="right_submit" /><br class="clear_right" />
 						</noscript>
@@ -980,9 +991,11 @@ class ManageMembers_Controller extends Action_Controller
 
 	/**
 	 * This function handles the approval, rejection, activation or deletion of members.
-	 * Called by ?action=admin;area=viewmembers;sa=approve.
-	 * Requires the moderate_forum permission.
-	 * Redirects to ?action=admin;area=viewmembers;sa=browse
+	 *
+	 * What it does:
+	 * - Called by ?action=admin;area=viewmembers;sa=approve.
+	 * - Requires the moderate_forum permission.
+	 * - Redirects to ?action=admin;area=viewmembers;sa=browse
 	 * with the same parameters as the calling page.
 	 */
 	public function action_approve()

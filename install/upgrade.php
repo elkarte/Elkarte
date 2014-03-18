@@ -570,7 +570,7 @@ function action_welcomeLogin()
 		$check &= @file_exists(dirname(__FILE__) . '/upgrade_1-0.sql');
 
 	// If the db is not UTF
-	if (!isset($modSettings['elkVersion']) && ($db_type == 'mysql' || $db_type == 'mysqli') && (!isset($db_character_set) || $db_character_set !== 'utf8' || empty($modSettings['global_character_set']) || $modSettings['global_character_set'] !== 'UTF-8')
+	if (!isset($modSettings['elkVersion']) && ($db_type == 'mysql' || $db_type == 'mysqli') && (!isset($db_character_set) || $db_character_set !== 'utf8' || empty($modSettings['global_character_set']) || $modSettings['global_character_set'] !== 'UTF-8'))
 		return throw_error('The upgrader detected your database is not UTF-8. In order to be able to upgrade, please first convert your database to the UTF-8 charset.');
 
 	// Don't tell them what files exactly because it's a spot check -
@@ -3897,8 +3897,11 @@ function template_welcome_message()
 					return;
 				}
 
-				setLatestVer.innerHTML = latestVer.innerHTML.replace(\'ElkArte \', \'\');
-				document.getElementById(\'version_warning\').style.display = \'\';
+				if (setLatestVer !== null)
+				{
+					setLatestVer.innerHTML = latestVer.innerHTML.replace(\'ElkArte \', \'\');
+					document.getElementById(\'version_warning\').style.display = \'\';
+				}
 				document.getElementById(\'contbutt\').disabled = 0;
 			}
 			addLoadEvent(ourCurrentVersion);

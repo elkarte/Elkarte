@@ -244,7 +244,7 @@ function getSmileyPosition($location, $id)
 /**
  * Move a smiley to their new position.
  *
- * @param int $smiley
+ * @param int[] $smiley
  * @param int $source
  */
 function moveSmileyPosition($smiley, $source)

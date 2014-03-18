@@ -22,13 +22,18 @@ if (!defined('ELK'))
 
 /**
  * This class handles known scheduled tasks.
- * Each method implements a task, and it's called automatically for the task to run.
+ *
+ * - Each method implements a task, and
+ * - it's called automatically for the task to run.
+ *
+ * @package ScheduledTasks
  */
 class ScheduledTask
 {
 	/**
 	 * Function to sending out approval notices to moderators.
-	 * It checks who needs to receive approvals notifications and sends emails.
+	 *
+	 * - It checks who needs to receive approvals notifications and sends emails.
 	 */
 	public function approval_notification()
 	{
@@ -242,11 +247,12 @@ class ScheduledTask
 
 	/**
 	 * This function does daily cleaning up:
-	 *  - decrements warning levels if it's enabled
-	 *  - consolidate spider statistics
-	 *  - fix MySQL version
-	 *  - regenerate Diffie-Hellman keys for OpenID
-	 *  - remove obsolete login history logs
+	 *
+	 * - decrements warning levels if it's enabled
+	 * - consolidate spider statistics
+	 * - fix MySQL version
+	 * - regenerate Diffie-Hellman keys for OpenID
+	 * - remove obsolete login history logs
 	 */
 	public function daily_maintenance()
 	{
@@ -410,7 +416,8 @@ class ScheduledTask
 
 	/**
 	 * Send out a daily email of all subscribed topics, to members.
-	 * It sends notifications about replies or new topics,
+	 *
+	 * - It sends notifications about replies or new topics,
 	 * and moderation actions.
 	 */
 	public function daily_digest()
@@ -474,9 +481,8 @@ class ScheduledTask
 		if (empty($boards))
 			return true;
 
-		require_once(SUBSDIR . '/Boards.subs.php');
 		// Just get the board names.
-
+		require_once(SUBSDIR . '/Boards.subs.php');
 		$boards = fetchBoardsInfo(array('boards' => $boards), array('override_permissions' => true));
 
 		if (empty($boards))
@@ -802,9 +808,9 @@ class ScheduledTask
 
 	/**
 	 * Sends out email notifications for new/updated topics.
-	 * Like the daily stuff - just seven times less regular ;)
 	 *
-	 * This method forwards to daily_digest()
+	 * - Like the daily stuff - just seven times less regular ;)
+	 * - This method forwards to daily_digest()
 	 */
 	public function weekly_digest()
 	{
@@ -816,72 +822,14 @@ class ScheduledTask
 	}
 
 	/**
-	 * This task retrieves files from the official server.
+	 * This task retrieved files from the official server.
+	 * This task is no longer used and the method remains only to avoid
+	 * "last minute" problems, it will be removed from 1.1 version
+	 *
+	 * @deprecated since 1.0 - will be removed in 1.1
 	 */
 	public function fetchFiles()
 	{
-		global $txt, $language, $forum_version, $modSettings, $context;
-
-		$db = database();
-
-		// What files do we want to get
-		$request = $db->query('', '
-			SELECT id_file, filename, path, parameters
-			FROM {db_prefix}admin_info_files',
-			array(
-			)
-		);
-
-		$js_files = array();
-		$errors = 0;
-
-		while ($row = $db->fetch_assoc($request))
-		{
-			$js_files[$row['id_file']] = array(
-				'filename' => $row['filename'],
-				'path' => $row['path'],
-				'parameters' => sprintf($row['parameters'], $language, urlencode($modSettings['time_format']), urlencode($forum_version)),
-			);
-		}
-		$db->free_result($request);
-
-		// We're gonna need fetch_web_data() to pull this off.
-		require_once(SUBSDIR . '/Package.subs.php');
-
-		// Just in case we run into a problem.
-		loadEssentialThemeData();
-		loadLanguage('Errors', $language, false);
-
-		foreach ($js_files as $ID_FILE => $file)
-		{
-			// Create the url
-			$server = empty($file['path']) || (substr($file['path'], 0, 7) != 'http://' && substr($file['path'], 0, 8) != 'https://') ? 'http://www.elkarte.net' : '';
-			$url = $server . (!empty($file['path']) ? $file['path'] : $file['path']) . $file['filename'] . (!empty($file['parameters']) ? '?' . $file['parameters'] : '');
-
-			// Get the file
-			$file_data = fetch_web_data($url);
-
-			// If we are tossing errors - give up - the site might be down.
-			if ($file_data === false && $errors++ > 2)
-			{
-				$context['scheduled_errors']['fetchFiles'][] = sprintf($txt['st_cannot_retrieve_file'], $url);
-				log_error(sprintf($txt['st_cannot_retrieve_file'], $url));
-				return false;
-			}
-			elseif ($file_data !== false)
-			{
-				// Save the update to the database
-				$db->query('substring', '
-					UPDATE {db_prefix}admin_info_files
-					SET data = SUBSTRING({string:file_data}, 1, 65534)
-					WHERE id_file = {int:id_file}',
-					array(
-						'id_file' => $ID_FILE,
-						'file_data' => $file_data,
-					)
-				);
-			}
-		}
 		return true;
 	}
 
@@ -970,11 +918,13 @@ class ScheduledTask
 	}
 
 	/**
-	 * Weekly maintenance:
-	 *  - remove empty or temporary settings
-	 *  - prune logs
-	 *  - obsolete paid subscriptions
-	 *  - clear sessions table
+	 * Weekly maintenance taks
+	 *
+	 * What it does:
+	 * - remove empty or temporary settings
+	 * - prune logs
+	 * - obsolete paid subscriptions
+	 * - clear sessions table
 	 */
 	public function weekly_maintenance()
 	{
@@ -1174,8 +1124,9 @@ class ScheduledTask
 
 	/**
 	 * Perform the standard checks on expiring/near expiring subscriptions:
-	 *  - remove expired subscriptions
-	 *  - notify of subscriptions about to expire
+	 *
+	 * - remove expired subscriptions
+	 * - notify of subscriptions about to expire
 	 */
 	public function paid_subscriptions()
 	{
@@ -1262,7 +1213,8 @@ class ScheduledTask
 
 	/**
 	 * Check for un-posted attachments is something we can do once in a while :P
-	 * This function uses opendir cycling through all the attachments
+	 *
+	 * - This function uses opendir cycling through all the attachments
 	 */
 	public function remove_temp_attachments()
 	{
@@ -1306,7 +1258,8 @@ class ScheduledTask
 
 	/**
 	 * Check for move topic notices that have past their best by date:
-	 *  - remove them if the time has expired.
+	 *
+	 * - remove them if the time has expired.
 	 */
 	public function remove_topic_redirect()
 	{
@@ -1385,8 +1338,9 @@ class ScheduledTask
 	}
 
 	/**
-	 * If we can't run this via cron, run it as a task instead
 	 * Fetch emails from an imap box and process them
+	 *
+	 * - If we can't run this via cron, run it as a task instead
 	 */
 	public function maillist_fetch_IMAP()
 	{
@@ -1434,9 +1388,11 @@ class ScheduledTask
 	}
 
 	/**
-	 * Re-syncs if a user can access a mention, for example if they loose or gain access
-	 * to a board, this will correct the viewing of the mention table.  Since this can be
-	 * a large job it is run as a scheduled immediate task
+	 * Re-syncs if a user can access a mention,
+	 *
+	 * - for example if they loose or gain access to a board, this will correct
+	 * the viewing of the mention table.  Since this can be a large job it is run
+	 * as a scheduled immediate task
 	 */
 	public function user_access_mentions()
 	{

@@ -23,10 +23,13 @@ if (!defined('ELK'))
 
 /**
  * Check if the user is who he/she says he is.
- * This function makes sure the user is who they claim to be by requiring a password to be typed in every hour.
- * This check can be turned on and off by the securityDisable setting.
- * Uses the adminLogin() function of subs/Auth.subs.php if they need to login, which saves all request
- *  (POST and GET) data.
+ *
+ * What it does:
+ * - This function makes sure the user is who they claim to be by requiring a
+ * password to be typed in every hour.
+ * - This check can be turned on and off by the securityDisable setting.
+ * - Uses the adminLogin() function of subs/Auth.subs.php if they need to login,
+ * which saves all request (POST and GET) data.
  *
  * @param string $type = admin
  */
@@ -141,8 +144,10 @@ function validateSession($type = 'admin')
 
 /**
  * Require a user who is logged in. (not a guest.)
- * Checks if the user is currently a guest, and if so asks them to login with a message telling them why.
- * Message is what to tell them when asking them to login.
+ *
+ * What it does:
+ * - Checks if the user is currently a guest, and if so asks them to login with a message telling them why.
+ * - Message is what to tell them when asking them to login.
  *
  * @param string $message = ''
  * @param boolean $is_fatal = true
@@ -203,9 +208,11 @@ function is_not_guest($message = '', $is_fatal = true)
 
 /**
  * Apply restrictions for banned users. For example, disallow access.
- * If he user is banned, it dies with an error.
- * Caches this information for optimization purposes.
- * Forces a recheck if force_check is true.
+ *
+ * What it does:
+ * - If he user is banned, it dies with an error.
+ * - Caches this information for optimization purposes.
+ * - Forces a recheck if force_check is true.
  *
  * @param bool $forceCheck = false
  */
@@ -450,7 +457,10 @@ function is_not_banned($forceCheck = false)
 
 /**
  * Fix permissions according to ban status.
- * Applies any states of banning by removing permissions the user cannot have.
+ *
+ * What it does:
+ * - Applies any states of banning by removing permissions the user cannot have.
+ * @package Bans
  */
 function banPermissions()
 {
@@ -534,9 +544,12 @@ function banPermissions()
 
 /**
  * Log a ban in the database.
- * Log the current user in the ban logs.
- * Increment the hit counters for the specified ban ID's (if any.)
  *
+ * What it does:
+ * - Log the current user in the ban logs.
+ * - Increment the hit counters for the specified ban ID's (if any.)
+ *
+ * @package Bans
  * @param int[] $ban_ids = array()
  * @param string|null $email = null
  */
@@ -571,9 +584,12 @@ function log_ban($ban_ids = array(), $email = null)
 
 /**
  * Checks if a given email address might be banned.
- * Check if a given email is banned.
- * Performs an immediate ban if the turns turns out positive.
  *
+ * What it does:
+ * - Check if a given email is banned.
+ * - Performs an immediate ban if the turns turns out positive.
+ *
+ * @package Bans
  * @param string $email
  * @param string $restriction
  * @param string $error
@@ -640,11 +656,13 @@ function isBannedEmail($email, $restriction, $error)
 
 /**
  * Make sure the user's correct session was passed, and they came from here.
- * Checks the current session, verifying that the person is who he or she should be.
- * Also checks the referrer to make sure they didn't get sent here.
- * Depends on the disableCheckUA setting, which is usually missing.
- * Will check GET, POST, or REQUEST depending on the passed type.
- * Also optionally checks the referring action if passed. (note that the referring action must be by GET.)
+ *
+ * What it does:
+ * - Checks the current session, verifying that the person is who he or she should be.
+ * - Also checks the referrer to make sure they didn't get sent here.
+ * - Depends on the disableCheckUA setting, which is usually missing.
+ * - Will check GET, POST, or REQUEST depending on the passed type.
+ * - Also optionally checks the referring action if passed. (note that the referring action must be by GET.)
  *
  * @param string $type = 'post' (post, get, request)
  * @param string $from_action = ''
@@ -877,8 +895,10 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 
 /**
  * Removes old unused tokens from session
- * defaults to 3 hours before a token is considered expired
- * if $complete = true will remove all tokens
+ *
+ * What it does:
+ * - defaults to 3 hours before a token is considered expired
+ * - if $complete = true will remove all tokens
  *
  * @param bool $complete = false
  * @param string $suffix = false
@@ -904,11 +924,13 @@ function cleanTokens($complete = false, $suffix = '')
 
 /**
  * Check whether a form has been submitted twice.
- * Registers a sequence number for a form.
- * Checks whether a submitted sequence number is registered in the current session.
- * Depending on the value of is_fatal shows an error or returns true or false.
- * Frees a sequence number from the stack after it's been checked.
- * Frees a sequence number without checking if action == 'free'.
+ *
+ * What it does:
+ * - Registers a sequence number for a form.
+ * - Checks whether a submitted sequence number is registered in the current session.
+ * - Depending on the value of is_fatal shows an error or returns true or false.
+ * - Frees a sequence number from the stack after it's been checked.
+ * - Frees a sequence number without checking if action == 'free'.
  *
  * @param string $action
  * @param bool $is_fatal = true
@@ -951,8 +973,10 @@ function checkSubmitOnce($action, $is_fatal = true)
 
 /**
  * This function checks whether the user is allowed to do permission. (ie. post_new.)
- * If boards parameter is specified, checks those boards instead of the current one (if applicable).
- * Always returns true if the user is an administrator.
+ *
+ * What it does:
+ * - If boards parameter is specified, checks those boards instead of the current one (if applicable).
+ * - Always returns true if the user is an administrator.
  *
  * @param string[]|string $permission permission
  * @param int[]|int|null $boards array of board IDs, a single id or null
@@ -1026,10 +1050,12 @@ function allowedTo($permission, $boards = null)
 
 /**
  * This function returns fatal error if the user doesn't have the respective permission.
- * Uses allowedTo() to check if the user is allowed to do permission.
- * Checks the passed boards or current board for the permission.
- * If they are not, it loads the Errors language file and shows an error using $txt['cannot_' . $permission].
- * If they are a guest and cannot do it, this calls is_not_guest().
+ *
+ * What it does:
+ * - Uses allowedTo() to check if the user is allowed to do permission.
+ * - Checks the passed boards or current board for the permission.
+ * - If they are not, it loads the Errors language file and shows an error using $txt['cannot_' . $permission].
+ * - If they are a guest and cannot do it, this calls is_not_guest().
  *
  * @param string[]|string $permission array of or single string, of persmission to check
  * @param int[]|null $boards = null
@@ -1086,10 +1112,12 @@ function isAllowedTo($permission, $boards = null)
 
 /**
  * Return the boards a user has a certain (board) permission on. (array(0) if all.)
- *  - returns a list of boards on which the user is allowed to do the specified permission.
- *  - returns an array with only a 0 in it if the user has permission to do this on every board.
- *  - returns an empty array if he or she cannot do this on any board.
- * If check_access is true will also make sure the group has proper access to that board.
+ *
+ * What it does:
+ * - returns a list of boards on which the user is allowed to do the specified permission.
+ * - returns an array with only a 0 in it if the user has permission to do this on every board.
+ * - returns an empty array if he or she cannot do this on any board.
+ * - If check_access is true will also make sure the group has proper access to that board.
  *
  * @param string[]|string $permissions array of permission names to check access against
  * @param bool $check_access = true
@@ -1190,13 +1218,14 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 
 /**
  * Returns whether an email address should be shown and how.
- * Possible outcomes are
- *  'yes': show the full email address
- *  'yes_permission_override': show the full email address, either you
- *   are a moderator or it's your own email address.
- *  'no_through_forum': don't show the email address, but do allow
- *    things to be mailed using the built-in forum mailer.
- *  'no': keep the email address hidden.
+ *
+ * Possible outcomes are:
+ * - 'yes': show the full email address
+ * - 'yes_permission_override': show the full email address, either you
+ * are a moderator or it's your own email address.
+ * - 'no_through_forum': don't show the email address, but do allow
+ * things to be mailed using the built-in forum mailer.
+ * - 'no': keep the email address hidden.
  *
  * @param bool $userProfile_hideEmail
  * @param int $userProfile_id
@@ -1229,7 +1258,8 @@ function showEmailAddress($userProfile_hideEmail, $userProfile_id)
 
 /**
  * This function attempts to protect from spammed messages and the like.
- * The time taken depends on error_type - generally uses the modSetting.
+ *
+ * - The time taken depends on error_type - generally uses the modSetting.
  *
  * @param string $error_type used also as a $txt index. (not an actual string.)
  * @param boolean $fatal is the spam check a fatal error on failure
@@ -1370,7 +1400,8 @@ else
 
 /**
  * Helper function that puts together a ban query for a given ip
- * builds the query for ipv6, ipv4 or 255.255.255.255 depending on whats supplied
+ *
+ * - Builds the query for ipv6, ipv4 or 255.255.255.255 depending on whats supplied
  *
  * @param string $fullip An IP address either IPv6 or not
  * @return string A SQL condition
@@ -1409,6 +1440,8 @@ function constructBanQueryIP($fullip)
 
 /**
  * Decide if we are going to enable bad behavior scanning for this user
+ *
+ * What it does:
  * - Admins and Moderators get a free pass
  * - Optionally existing users with post counts over a limit are bypassed
  * - Others get a humane frisking
@@ -1445,7 +1478,8 @@ function loadBadBehavior()
 
 /**
  * This protects against brute force attacks on a member's password.
- * Importantly, even if the password was right we DON'T TELL THEM!
+ *
+ * - Importantly, even if the password was right we DON'T TELL THEM!
  *
  * @param int $id_member
  * @param string|false $password_flood_value = false or string joined on |'s
@@ -1528,11 +1562,10 @@ function frameOptionsHeader($override = null)
 /**
  * This adds additional security headers that may prevent browsers from doing something they should not
  *
- * X-XSS-Protection header - This header enables the Cross-site scripting (XSS) filter
+ * - X-XSS-Protection header - This header enables the Cross-site scripting (XSS) filter
  * built into most recent web browsers. It's usually enabled by default, so the role of this
  * header is to re-enable the filter for this particular website if it was disabled by the user.
- *
- * X-Content-Type-Options header - It prevents the browser from doing MIME-type sniffing,
+ * - X-Content-Type-Options header - It prevents the browser from doing MIME-type sniffing,
  * only IE and Chrome are honouring this header. This reduces exposure to drive-by download attacks
  * and sites serving user uploaded content that could be treated as executable or dynamic HTML files.
  *

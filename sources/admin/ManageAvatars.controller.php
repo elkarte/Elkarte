@@ -16,7 +16,10 @@ if (!defined('ELK'))
 
 /**
  * This is the avatars administration controller class.
- * It is doing the job of maintenance and allow display and change of avatar settings.
+ *
+ * - It is doing the job of maintenance and allow display and change of avatar settings.
+ *
+ * @package Avatars
  */
 class ManageAvatars_Controller extends Action_Controller
 {
@@ -29,11 +32,12 @@ class ManageAvatars_Controller extends Action_Controller
 
 	/**
 	 * The Avatars admin area
-	 * This method is the entry point for index.php?action=admin;area=manageattachments;sa=avatars
-	 * and it calls a function based on the sub-action.
 	 *
-	 * Is called from ManageAttachments.controller.php
-	 * requires manage_attachments permissions
+	 * What it does:
+	 * - This method is the entry point for index.php?action=admin;area=manageattachments;sa=avatars
+	 * - It calls a function based on the sub-action.
+	 * - Is called from ManageAttachments.controller.php
+	 * - requires manage_attachments permissions
 	 *
 	 * @see Action_Controller::action_index()
 	 */
@@ -51,20 +55,24 @@ class ManageAvatars_Controller extends Action_Controller
 			'display' => array($this, 'action_avatarSettings_display')
 		);
 
-		// Not many options
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'display';
+		// Set up for some action
+		$action = new Action('manage_avatars');
+
+		// Get the sub action or set a default, call integrate_avatar_settings
+		$subAction = $action->initialize($subActions, 'display');
+
+		// Final page details
 		$context['sub_action'] = $subAction;
 		$context['page_title'] = $txt['avatar_settings'];
 
-		// call the action handler
-		$action = new Action();
-		$action->initialize($subActions, 'display');
+		// Now go!
 		$action->dispatch($subAction);
 	}
 
 	/**
 	 * This action handler method displays and allows to change avatar settings.
-	 * Called by index.php?action=admin;area=manageattachments;sa=avatars.
+	 *
+	 * - Called by index.php?action=admin;area=manageattachments;sa=avatars.
 	 *
 	 * @uses 'avatars' sub-template.
 	 */
@@ -72,12 +80,10 @@ class ManageAvatars_Controller extends Action_Controller
 	{
 		global $txt, $context, $scripturl;
 
-		// initialize the form
+		// Initialize the form
 		$this->_initAvatarSettingsForm();
 
 		$config_vars = $this->_avatarSettings->settings();
-
-		call_integration_hook('integrate_modify_avatar_settings');
 
 		// Saving avatar settings?
 		if (isset($_GET['save']))
@@ -111,10 +117,10 @@ class ManageAvatars_Controller extends Action_Controller
 
 	/**
 	 * This method retrieves and returns avatar settings.
-	 * It also returns avatar-related permissions profile_server_avatar,
-	 * profile_upload_avatar, profile_remote_avatar, profile_gvatar.
 	 *
-	 * Initializes the avatarSettings form.
+	 * - It also returns avatar-related permissions profile_server_avatar,
+	 * profile_upload_avatar, profile_remote_avatar, profile_gvatar.
+	 * - Initializes the avatarSettings form.
 	 */
 	private function _initAvatarSettingsForm()
 	{
@@ -190,6 +196,9 @@ class ManageAvatars_Controller extends Action_Controller
 				array('text', 'custom_avatar_dir', 40, 'subtext' => $txt['custom_avatar_dir_desc'], 'invalid' => !$context['valid_custom_avatar_dir']),
 				array('text', 'custom_avatar_url', 40),
 		);
+
+		// Add new settings with a nice hook, makes them available for admin settings search as well
+		call_integration_hook('integrate_modify_avatar_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

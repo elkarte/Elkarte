@@ -24,6 +24,8 @@ if (!defined('ELK'))
 /**
  * ManageSecurity controller handles the Security and Moderation
  * pages in admin panel.
+ *
+ * @package Security
  */
 class ManageSecurity_Controller extends Action_Controller
 {
@@ -70,14 +72,8 @@ class ManageSecurity_Controller extends Action_Controller
 			'moderation' => array($this, 'action_moderationSettings_display', 'enabled' => in_array('w', $context['admin_features']), 'permission' => 'admin_forum'),
 		);
 
-		call_integration_hook('integrate_modify_security', array(&$subActions));
-
-		// By default do the basic settings.
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'general';
-
-		$context['sub_action'] = $subAction;
-		$context['page_title'] = $txt['admin_security_moderation'];
-		$context['sub_template'] = 'show_settings';
+		// Action control
+		$action = new Action('modify_security');
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -98,15 +94,22 @@ class ManageSecurity_Controller extends Action_Controller
 			),
 		);
 
+		// By default do the basic settings, call integrate_modify_security
+		$subAction = $action->initialize($subActions, 'general');
+
+		// Last pieces of the puzzle
+		$context['sub_action'] = $subAction;
+		$context['page_title'] = $txt['admin_security_moderation'];
+		$context['sub_template'] = 'show_settings';
+
 		// Call the right function for this sub-action.
-		$action = new Action();
-		$action->initialize($subActions, 'general');
 		$action->dispatch($subAction);
 	}
 
 	/**
 	 * Handle settings regarding general security of the site.
-	 * Uses a settings form for security options.
+	 *
+	 * - Uses a settings form for security options.
 	 */
 	public function action_securitySettings_display()
 	{
@@ -156,7 +159,8 @@ class ManageSecurity_Controller extends Action_Controller
 
 	/**
 	 * Allows to display and eventually change the moderation settings of the forum.
-	 * Uses the moderation settings form.
+	 *
+	 * - Uses the moderation settings form.
 	 */
 	public function action_moderationSettings_display()
 	{
@@ -179,6 +183,8 @@ class ManageSecurity_Controller extends Action_Controller
 		if (isset($_GET['save']))
 		{
 			checkSession();
+
+			call_integration_hook('integratesave_moderation_settings', array(&$config_vars));
 
 			// Make sure these don't have an effect.
 			if ($modSettings['warning_settings'][0] != 1)
@@ -237,7 +243,8 @@ class ManageSecurity_Controller extends Action_Controller
 
 	/**
 	 * Handles admin security spam settings.
-	 * Displays a page with settings and eventually allows the admin to change them.
+	 *
+	 * - Displays a page with settings and eventually allows the admin to change them.
 	 */
 	public function action_spamSettings_display()
 	{
@@ -397,7 +404,8 @@ class ManageSecurity_Controller extends Action_Controller
 
 	/**
 	 * Retrieves and returns the configuration settings for Bad Behavior.
-	 * Initializes bbSettings form.
+	 *
+	 * - Initializes bbSettings form.
 	 */
 	private function _initBBSettingsForm()
 	{
@@ -430,7 +438,7 @@ class ManageSecurity_Controller extends Action_Controller
 			array('select', 'warning_show', 'subtext' => $txt['setting_warning_show_note'], array($txt['setting_warning_show_mods'], $txt['setting_warning_show_user'], $txt['setting_warning_show_all'])),
 		);
 
-		call_integration_hook('integrate_moderation_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_moderation_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

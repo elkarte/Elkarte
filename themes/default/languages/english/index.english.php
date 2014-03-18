@@ -106,7 +106,7 @@ $txt['username_no_exist'] = 'That username does not exist.';
 $txt['no_user_with_email'] = 'There are no usernames associated with that email.';
 
 $txt['board_moderator'] = 'Board Moderator';
-$txt['remove_topic'] = 'Remove Topic';
+$txt['remove_topic'] = 'Remove';
 $txt['topics'] = 'Topics';
 $txt['modify_msg'] = 'Modify message';
 $txt['name'] = 'Name';
@@ -148,12 +148,12 @@ $txt['error_occurred'] = 'An Error Has Occurred';
 $txt['send_error_occurred'] = 'An error has occurred, <a href="{href}">please click here to try again</a>.';
 $txt['require_field'] = 'This is a required field.';
 $txt['at'] = 'at';
-$txt['started_by'] = 'Started by';
+$txt['started_by'] = 'Started by author';
 $txt['topic_started_by'] = 'Started by <strong>%1$s</strong> in <em>%2$s</em>';
 $txt['replies'] = 'Replies';
 $txt['last_post'] = 'Last post';
 $txt['first_post'] = 'First post';
-$txt['last_poster'] = 'Last post by';
+$txt['last_poster'] = 'Last post author';
 //$txt['last_post_message'] = '<strong>Last post</strong> by %1$s<br />in %2$s<br />on %3$s';
 // @todo - Clean this up a bit. See notes in template.
 // Just moved a space, so the output looks better when things break to an extra line.
@@ -162,6 +162,8 @@ $txt['boardindex_total_posts'] = '%1$s Posts in %2$s Topics by %3$s Members';
 $txt['show'] = 'Show';
 $txt['hide'] = 'Hide';
 $txt['sort_by'] = 'Sort By';
+$txt['sort_asc'] = 'Sort ascending';
+$txt['sort_desc'] = 'Sort descending';
 
 $txt['admin_login'] = 'Administration Log in';
 // Use numeric entities in the below string.
@@ -173,7 +175,7 @@ $txt['notify_request'] = 'Do you want a notification email if someone replies to
 // Use numeric entities in the below string.
 $txt['regards_team'] = "Regards,\nThe " . $context['forum_name'] . ' Team.';
 $txt['notify_replies'] = 'Notify of replies';
-$txt['move_topic'] = 'Move Topic';
+$txt['move_topic'] = 'Move';
 $txt['move_to'] = 'Move to';
 $txt['pages'] = 'Pages';
 $txt['users_active'] = 'Active in past %1$d minutes';
@@ -188,7 +190,7 @@ $txt['approve_all'] = 'approve all';
 $txt['awaiting_approval'] = 'Awaiting Approval';
 $txt['attach_awaiting_approve'] = 'Attachments awaiting approval';
 $txt['post_awaiting_approval'] = 'Note: This message is awaiting approval by a moderator.';
-$txt['there_are_unapproved_topics'] = 'There are %1$s topics and %2$s posts awaiting approval in this board. <a href="%3$s">Click here to view them all</a>.';
+$txt['there_are_unapproved_topics'] = 'There are %1$s topics and %2$s posts awaiting approval in this board. <a href="%3$s">Click here to view them</a>.';
 $txt['send_message'] = 'Send message';
 
 $txt['msg_alert_you_have'] = 'you have'; //Deprecated
@@ -416,7 +418,7 @@ $txt['valid_email'] = 'This must be a valid email address.';
 
 $txt['info_center_title'] = '%1$s - Info Center';
 
-$txt['send_topic'] = 'Send this topic';
+$txt['send_topic'] = 'Share';
 $txt['unwatch'] = 'Unwatch';
 $txt['watch'] = 'Watch';
 
@@ -515,10 +517,10 @@ $txt['edit'] = 'Edit';
 $txt['quick_edit'] = 'Quick Edit';
 $txt['post_options'] = 'More...';
 
-$txt['set_sticky'] = 'Set topic sticky';
-$txt['set_nonsticky'] = 'Set topic non-sticky';
-$txt['set_lock'] = 'Lock topic';
-$txt['set_unlock'] = 'Unlock topic';
+$txt['set_sticky'] = 'Pin';
+$txt['set_nonsticky'] = 'Unpin';
+$txt['set_lock'] = 'Lock';
+$txt['set_unlock'] = 'Unlock';
 
 $txt['search_advanced'] = 'Show advanced options';
 $txt['search_simple'] = 'Hide advanced options';
@@ -593,8 +595,8 @@ $txt['movetopic_redirect'] = 'Redirect to the moved topic';
 $txt['movetopic_expires'] = 'Automatically remove the redirection topic';
 
 $txt['merge_to_topic_id'] = 'ID of target topic';
-$txt['split_topic'] = 'Split Topic';
-$txt['merge'] = 'Merge Topics';
+$txt['split_topic'] = 'Split';
+$txt['merge'] = 'Merge';
 $txt['subject_new_topic'] = 'Subject For New Topic';
 $txt['split_this_post'] = 'Only split this post.';
 $txt['split_after_and_this_post'] = 'Split topic after and including this post.';
@@ -676,7 +678,6 @@ $txt['quickmod_confirm'] = 'Are you sure you want to do this?';
 $txt['spell_check'] = 'Spell Check';
 
 $txt['quick_reply'] = 'Quick Reply';
-$txt['quick_reply_desc'] = 'With <em>Quick-Reply</em> you can write a post when viewing a topic without loading a new page. You can still use bulletin board code and smileys as you would in a normal post.';
 $txt['quick_reply_warning'] = 'Warning! This topic is currently locked, only admins and moderators can reply.';
 $txt['quick_reply_verification'] = 'After submitting your post you will be directed to the regular post page to verify your post %1$s.';
 $txt['quick_reply_verification_guests'] = '(required for all guests)';

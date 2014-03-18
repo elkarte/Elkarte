@@ -1,7 +1,7 @@
 /* INTRODUCTION
 /* This is the standard Elkarte default theme.
 /* This file contains essential layout code only.
-/* Colors, gradients, images, etc are in _variantname.css.
+/* Colors, gradients, images, etc. are in _variantname.css.
 /*
 /* All theme variants depend on this layout code for stability.
 /* It is better to copy code to a variant CSS file for testing.
@@ -19,7 +19,7 @@
 /*		$BUTTONS.............Most button strips.
 /*		$PAGELINKS...........Page navigation links.
 /*
-/*		$TABLES..............Generic tables (memberlist, error log, etc).
+/*		$TABLES..............Generic tables (error log, etc.).
 /*		$SETTINGS............Generic lists for settings pages.
 /*		$BOARDS..............Board index, sub-boards, and message index.
 /*
@@ -34,9 +34,10 @@
 /*
 /*		$HELP................Help pages, help icons and pop-ups, tooltips.
 /*		$SEARCH..............Search pages, including memberlist search.
+/*		$MEMBERLIST..........The memberlist table.
 /*		$LOGIN...............Login and registration, maintenance mode.
 /*
-/*		$ERRORS..............Error messages.
+/*		$BOXES...............Message boxes (error, warning, info, etc).
 /*		$PROGRESS............Nifty progress bars.
 /*		$MEDIA...............Experimental media queries.
 /* ------------------------------------------------------- */
@@ -98,7 +99,8 @@ p, fieldset, form, input, button, select, textarea, .editor {
 /* Declarations for specific elements. @todo - Maybe simplify - test. */
 .wrapper, div.windowbg, div.windowbg2,
 .roundframe, .description, .information, .successbox, .warningbox,
-.category_header, .generic_list_wrapper, .submitbutton {
+.category_header, .generic_list_wrapper, .submitbutton, .styled-select,
+.grid8, .grid20, .grid25, .grid30, .grid33, .grid50, #description_board .generalinfo {
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
@@ -193,14 +195,8 @@ select option {
 
 /* Selects don't like to behave across OS and browsers, unfortunately. */
 .styled-select {
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
-	box-sizing: border-box;
 	overflow: hidden;
-	background: #fff url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYAQAAAADb20ChAAAAAnRSTlMAAQGU/a4AAAApSURBVHjaY/zPgIL+MTL+aWb84c74QZ/xgT6yFJALFARKARUAlaFpBACuqxnhHOnncgAAAABJRU5ErkJggg==) 98% 50% no-repeat;
 	display: inline-block;
-	border: 1px solid #ccc;
-	border-radius: 2px;
 	vertical-align: middle;
 }
 /* Turn off the default select arrow where we can */
@@ -221,16 +217,12 @@ select option {
 	font-weight: normal;
 	background: transparent;
 	border: none;
-	outline: none;
 	box-shadow: none;
 	background-image: none;
-	width: 100%;
 	padding: 1px 2em 1px 2px;
 }
-.styled-select select:disabled {
-	background: #eee url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYCAQAAABZqbWHAAAAKklEQVR42mMYiqCBgDQI4pXGp6QBBWJKY8ABB+Q4ElMajxKyghqhZCgCAL3SGQGs8tZQAAAAAElFTkSuQmCC) 98% 50% no-repeat;
-}
-/* Can't hide the arrow in ie<10 so we positon it off div */
+
+/* Can't hide the arrow in ie<10 so we position it off div */
 #ie8 .styled-select select, #ie9 .styled-select select {
 	width: 140%;
 }
@@ -263,7 +255,6 @@ select option {
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
 	padding: 2px 6px;
-	vertical-align: middle;
 	font-size: .857em;
 	line-height: 17px;
 	display: inline-block;
@@ -318,11 +309,11 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 /* the new "button" */
 /* @todo - Might add extra fallbacks. Possibly monospace. */
 /* @todo - Also, look at deprecating spans here. */
-.new_posts {
+.new_posts, .require_approval {
 	font-weight: bold;
 	line-height: 1.12px;
 }
-.new_posts {
+.new_posts, .require_approval {
 	display: inline;
 	padding: 1px 4px 2px 4px;
 	font-size: .643em;
@@ -365,12 +356,6 @@ em {
 	table-layout: fixed;
 	word-wrap: break-word;
 	hyphens: auto;
-}
-/* a very basic grid to control widths */
- .grid8, .grid20, .grid25, .grid30, .grid33, .grid50 {
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
-	box-sizing: border-box;
 }
 .grid8 {
 	width: 8%;
@@ -557,6 +542,7 @@ h2 a.collapse {
 
 /* General code for generic divs. Should make them behave. */
 /* @todo - Not keen on this. Do no-tag-names solution instead? */
+/* @todo - When sorted out take care of div.core_posts too */
 div.windowbg, div.windowbg2 {
 	overflow: auto;
 	padding: 10px 0;
@@ -578,7 +564,7 @@ div.windowbg, div.windowbg2 {
 	color: red;
 }
 .border_error {
-	border: 1px solid red;
+	border: 1px solid red !important;
 }
 
 /* Messages that somehow need to attract the attention. */
@@ -599,41 +585,6 @@ div.windowbg, div.windowbg2 {
 .moderation_link, .moderation_link:visited {
 	color: red;
 	font-weight: bold;
-}
-
-/* Lotsa boxes. */
-.description, .information, .warningbox, .successbox, .infobox {
-	margin: 0 0 12px 0;
-	padding: 6px 12px;
-	border: 1px solid #ccc;
-	background: #fff;
-	font-size: 0.929em;
-}
-/* Information boxes. */
-.information {
-	background: #f0f6f0;
-}
-.information p {
-	padding: 12px;
-}
-/* More little boxes on a hillside. */
-.warningbox {
-	padding-left: 35px;
-	border-top: 1px solid #ffd324;
-	border-bottom: 1px solid #ffd324;
-	background: #fff6ca url(../images/profile/warning_moderate.png) 10px 50% no-repeat;
-}
-.successbox {
-	padding-left: 35px;
-	border-top: 1px solid green;
-	border-bottom: 1px solid green;
-	background: #efe url(../images/icons/field_valid.png) 10px 50% no-repeat;
-}
-.infobox {
-	padding-left: 35px;
-	border-top: 1px solid #3a87ad;
-	border-bottom: 1px solid #3a87ad;
-	background: #d9edf7 url(../images/icons/quick_sticky.png) 10px 50% no-repeat;
 }
 
 /* Used for sections that need somewhat larger corners */
@@ -657,7 +608,7 @@ div.windowbg, div.windowbg2 {
 	margin: 0;
 	padding: 10px 0 0;
 }
-/* The .information box is used by the after_title additonal row */
+/* The .information box is used by the after_title additional row */
 .generic_list_wrapper .information .additional_row {
 	border: none;
 	padding: 6px 0;
@@ -779,7 +730,11 @@ div.windowbg, div.windowbg2 {
 }
 /* Everything is same except HTML5 valid */
 .bbc_tt {
-	font-family: "dejavu sans mono", "monaco", "lucida console", "courier new", monospace;
+	font-family: "DejaVu Sans Mono", Monaco, "Lucida Console", "Courier New", monospace;
+}
+.bbc_pre {
+	font-family: "DejaVu Sans Mono", Monaco, Consolas, monospace;
+	overflow: auto;
 }
 .bbc_footnotes {
 	margin-top: 10px;
@@ -839,7 +794,7 @@ a.bbc_link {
 	cursor: pointer;
 }
 #top_section_notice .button_submit {
-	margin-top: 0px;
+	margin-top: 0;
 	vertical-align: top;
 }
 /* some help for ie8 */
@@ -1036,6 +991,7 @@ a.bbc_link {
 .linklevel1 {
 	display: block;
 	padding: 0 0.6em;
+	white-space: nowrap;
 }
 .listlevel1#button_profile .linklevel1 {
 	min-width: 5em;
@@ -1225,6 +1181,9 @@ a.bbc_link {
 .quickbuttons {
 	margin: 8px 0 6px 0;
 	text-align: right;
+}
+.quickbuttons li {
+	white-space: nowrap;
 }
 /* Follow ups and topic summary need it a bit different. */
 .follow_ups, #topic_summary .quickbuttons {
@@ -1419,6 +1378,7 @@ a.bbc_link {
 /* @todo - Fix for all templates. */
 .small_pagelinks {
 	float: right;
+	margin-top: -2px;
 }
 .small_pagelinks li {
 	float: left;
@@ -1460,6 +1420,8 @@ a.bbc_link {
 	height: 1.5em;
 	font-size: 2em;
 	font-weight: bold;
+	-webkit-backface-visibility: hidden;
+	-webkit-transform: translateZ(0);
 }
 #gobottom {
 	top: 50%;
@@ -1637,6 +1599,9 @@ dl.settings dt .styled-select select {
 .childboard_row {
 	margin: 0;
 }
+.childboards li:nth-child(n+3):before {
+	content: " - ";
+}
 .board_info, .board_latest {
 	display: table-cell;
 	vertical-align: top;
@@ -1676,9 +1641,17 @@ dl.settings dt .styled-select select {
 	float: left;
 	margin-right: 5px;
 }
+.board_avatar a {
+	width: 40px;
+	height: 40px;
+	display: table-cell;
+	vertical-align: middle;
+}
 .board_avatar .avatar {
 	max-width: 40px;
 	max-height: 40px;
+	display: block;
+	margin: auto;
 }
 .lastpost_link, .board_lastposter, .board_lasttime {
 	white-space: pre;
@@ -1765,16 +1738,25 @@ dl.settings dt .styled-select select {
 	font-size: 0.857em;
 }
 
-#sortby {
-	width: 8.4em;
+#sort_by {
+	margin-bottom: -4px;
 }
-.topic_sorting:hover #sortby, #sortby:hover {
-	width: 8.4em;
+.topic_sorting:hover #sortby, #sortby:hover, #sortby {
+	width: 11em;
 	left: auto;
-	right: 0;
+	right: -2.5em;
+}
+#sort_by.topic_sorting_recent {
+	margin: 4px 6px -1px 0;
+}
+.topic_sorting_recent:hover #sortby, .topic_sorting_recent #sortby {
+	right: -1em;
 }
 .sort_by_item {
 	width: 100%;
+}
+.sort_by_item .sort {
+	vertical-align: baseline;
 }
 .topic_sorting>li {
 	float: right;
@@ -1782,7 +1764,6 @@ dl.settings dt .styled-select select {
 .topic_sorting {
 	float: right;
 	font-size: 1.143em;
-	margin-top: -2px;
 }
 .topic_sorting>li {
 	padding: 0 3px;
@@ -1838,8 +1819,6 @@ img.new_posts {
 #description_board .generalinfo {
 	display: table;
 	width: 100%;
-	box-sizing: border-box;
-	-moz-box-sizing: border-box;
 }
 .topic_listing {
 	padding: 1px 0 0 0;
@@ -1888,9 +1867,8 @@ img.new_posts {
 }
 .fred {
 	position: absolute;
-	left: 50%;
-	top: 20px;
-	margin: 0 0 0 -2px;
+	left: 42%;
+	top: 16px;
 }
 .topic_name, .topic_starter {
 	margin: 0 0 0 50px;
@@ -1933,7 +1911,7 @@ img.new_posts {
 	box-sizing: border-box;
 	padding: 0 16px 0 16px;
 }
-.topic_lastpost img {
+.topic_lastpost .img_last_post {
 	float: right;
 	padding: 4px;
 }
@@ -1950,7 +1928,7 @@ img.new_posts {
 	padding: 2px 2px 0 2px;
 }
 .topic_listing .warningbox {
-	margin-bottom: 0px;
+	margin-bottom: 0;
 }
 .qaction_row {
 	text-align: right;
@@ -1961,17 +1939,59 @@ img.new_posts {
 	max-width: 100%;
 	width: 100%;
 }
-.sticky_row .topic_info {
-	background: url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
+
+/* Message index icons as sprites
+------------------------------------------------- */
+.topicicon:before,
+.sticky_row .topic_info:before, .locked_row .topic_info:before,
+.sticky_row .topic_details:before, .locked_row .topic_details:before,
+.locked_row.sticky_row .topic_info:before {
+	background-image: url(../images/topic/topicicons.png);
+	background-repeat: no-repeat;
+	content: "";
+	display: inline-block;
+	height: 16px;
+	vertical-align: middle;
+	width: 18px;
 }
-.locked_row.sticky_row .topic_info {
-	background: url(../images/icons/quick_sticky_lock.png) no-repeat 98% 4px;
+.topicicon:before {
+	height: 18px;
 }
+/* Sprite icons for quick moderation, last post, sort etc */
+.img_last_post:before {background-position: 0 0;}
+.img_poll:before {background-position: 0 -19px;}
+.img_profile:before {background-position: 0 -37px}
+.img_locked:before {background-position: 0 -55px;}
+.img_move:before {background-position: 0 -73px;}
+.img_remove:before {background-position: 0 -91px;}
+.img_sticky:before {background-position: 0 -109px;}
+.img_sortdown:before {background-position: 0 -127px;}
+.img_sortup:before {background-position: 0 -145px;}
+.img_normal:before {background-position: 0 -163px;}
+.img_lockedsticky:before {background-position: 0 -181px;}
+/* Sprite Icons for the message icon, ? ! xx etc. */
+.img_clip:before {background-position: -18px 0;}
+.img_lamp:before {background-position: -18px -18px;}
+.img_poll:before {background-position: -18px -36px}
+.img_question:before {background-position: -18px -54px;}
+.img_xx:before {background-position: -18px -72px;}
+.img_moved:before {background-position: -18px -90px;}
+.img_exclamation:before {background-position: -18px -108px;}
+.img_thumbup:before {background-position: -18px -126px;}
+.img_thumbdown:before {background-position: -18px -144px;}
+/* sticky / locked icons for the upper right of the div */
+.sticky_row .topic_info:before, .locked_row .topic_info:before,
+.sticky_row .topic_details:before, .locked_row .topic_details:before,
+.locked_row.sticky_row .topic_info:before {
+	float: right;
+}
+.sticky_row .topic_info:before, .sticky_row .topic_details:before {background-position: 0 -108px;}
+.locked_row .topic_info:before, .locked_row .topic_details:before {background-position: 0 -54px;}
+.locked_row.sticky_row .topic_info:before{background-position: 0 -180px; width: 30px;}
+
 /* @todo - Extra classes for search results, etc. See if I can clean them up. */
 
-.locked_row .topic_info, .locked_row .topic_details {
-	background: url(../images/icons/quick_lock.png) no-repeat 98% 4px;
-}
+
 /* Search results need some help as well */
 /* @todo - Sort markup so this can call above classes. *//*
 .search_results_posts .lockedbg {
@@ -2095,7 +2115,7 @@ img.new_posts {
 }
 #whoisviewing, #redirectfrom {
 	font-size: 0.857em;
-	padding: 4px 0;
+	padding: 4px 0 3px 0;
 }
 #redirectfrom {
 	display: inline-block;
@@ -2105,6 +2125,10 @@ img.new_posts {
 .forumposts .approvebg, .forumposts .approvebg2, .core_posts {
 	overflow: visible;
 	margin: 4px 0 0 0;
+}
+/* @todo remove the div when div.windowbg and div.windowbg2 are sorted out */
+div.core_posts {
+	padding: 0.2em 1em;
 }
 
 /* Poster details and list of items */
@@ -2340,6 +2364,7 @@ img.new_posts {
 #display_jump_to {
 	float: right;
 	padding: 6px 5px 5px 0;
+	white-space: nowrap;
 }
 
 /* The quick reply area. */
@@ -2719,8 +2744,8 @@ dl.merge_topic dd {
 
 
 /* Styles for the $TABS	*/
-/* We can't control what jqueryui pollutes the DOM with, so deal with it */
-/* Styles for the profile summary tabs, or any jquery ui tabs */
+/* We can't control what jQueryui pollutes the DOM with, so deal with it */
+/* Styles for the profile summary tabs, or any jQuery ui tabs */
 /* ---------------------------------------------------------- */
 .ui-tabs {
 	zoom: 1;
@@ -2766,6 +2791,10 @@ dl.merge_topic dd {
 	margin: 12px 0 0 0;
 	padding: 8px 8px 16px 8px;
 	overflow: auto;
+}
+/* @todo remove the div when div.windowbg and div.windowbg2 are sorted out */
+#profilecenter div.core_posts {
+	padding: 0.2em 1em;
 }
 #profilecenter .windowbg, #profilecenter .windowbg2,
 #profile_attachments .windowbg, #profile_attachments .windowbg2,
@@ -3025,14 +3054,6 @@ dl.merge_topic dd {
 }
 .topic_details {
 	padding: 0 4px 4px 4px;
-}
-.list_posts {
-	overflow: auto;
-	clear: both;
-	margin: 0;
-	padding-top: 12px;
-	word-wrap: break-word;
-	hyphens: auto;
 }
 .topic h4 {
 	margin: 3px 0;
@@ -3338,6 +3359,12 @@ div.labels {
 /* ------------------------------------------------------- */
 .mentionavatar .avatar {
 	display: block;
+	max-width: 60px;
+	max-height: 60px;
+}
+.mentionavatar {
+	min-width: 60px;
+	min-height: 60px;
 }
 
 /* $STATISTICS	*/
@@ -3608,13 +3635,84 @@ a.help .icon {
 .search_results_posts .buttons {
 	padding: 5px 12px 0 0;
 }
+.compact_view .topic_details {
+	border-bottom: 0px;
+}
+.search_results_posts .topic_details {
+	position: relative;
+	margin: 0.2em 1em 0px;
+}
+.search_results_posts .quickbuttons {
+	margin-left: 1em;
+	margin-right: 1em;
+}
+.search_results_posts .topic_body {
+	margin: 0px 1em 0px;
+	padding-top: 12px;
+}
+.search_results_posts .quick_mod {
+	position: absolute;
+	right: 0px;
+	top: 10%;
+}
+.search_results_posts .counter {
+	padding: 6px 1.5em;
+}
+.compact_view .content {
+	overflow: auto;
+}
+#topicForm .pagesection,
+#topicForm .flow_auto {
+	display: inline-block;
+}
+#topicForm:after {
+	display: block;
+	clear: both;
+	content: "";
+}
 
-/* The memberlist. */
+/*	$MEMBERLIST		*/
+/* ------------------------------------------------------- */
+.mlist {
+	display: table;
+	width: 100%;
+	border-collapse: collapse;
+}
+.mlist li {
+	display: table-row;
+}
+.mlist li div {
+	display: table-cell;
+	padding: 5px 8px;
+}
+.letter_row {
+	height: 3em;
+	line-height: 3em;
+	vertical-align: bottom;
+}
+.letter_row>h3 {
+	line-height: 2em;
+	text-transform: uppercase;
+	font-weight: bold;
+	position: relative;
+	top: 12px;
+	text-align: center;
+}
+.mlist_header {
+	font-weight: bold;
+}
 #memberlist {
 	margin: 6px 0 0 0;
 }
 #memberlist>.content {
 	padding: 12px 0;
+}
+#memberlist .status {
+	width: 60px;
+}
+#memberlist .selected {
+	width: auto;
+	white-space: nowrap
 }
 #memberlist_search, #memberlist>.content>.submitbutton {
 	margin: 0 auto;
@@ -3747,19 +3845,38 @@ a.help .icon {
 	padding: 12px;
 }
 
-/*	$ERRORS		*/
+/*	$BOXES		*/
 /* ------------------------------------------------------- */
+
+/* Lotsa boxes. */
+.description, .information, .warningbox, .successbox, .infobox, .errorbox {
+	margin: 0 0 12px 0;
+	padding: 6px 12px;
+	border: 1px solid #ccc;
+	background: #fff;
+	font-size: 0.929em;
+}
+/* Information boxes. */
+.information {
+	background: #f0f6f0;
+}
+.information p {
+	padding: 12px;
+}
+/* More little boxes on a hillside. */
+.warningbox, .successbox, .infobox, .errorbox {
+	padding-left: 35px;
+}
+.errorbox {
+	margin-bottom: 12px;
+	text-align: left;
+}
 
 /* Styles for (fatal) errors. */
 #fatal_error {
 	margin: auto;
 	padding-bottom: 1em;
 	width: 80%;
-}
-.errorbox {
-	margin-bottom: 12px;
-	padding: 7px 10px 7px 35px;
-	text-align: left;
 }
 .errorbox h3 {
 	margin: 0;
@@ -3824,7 +3941,7 @@ a.help .icon {
 }
 
 /*floating error box*/
-/* currently used by like funcationality*/
+/* currently used by like functionality */
 .floating_error {
 	position: fixed;
 	width: 50%;
@@ -3863,7 +3980,7 @@ a.help .icon {
 /* in the available space. This is dependent not just on width in pixels,
 /* but also on the user-selected text size that is set in the browser.
 /*
-/* If, for whatever reason (eyesight, pixel pitch, workstation arrangement, etc)
+/* If, for whatever reason (eyesight, pixel pitch, workstation arrangement, etc.)
 /* a user requires text 50% larger than theme default, then their screen is
 /* effectively a lot smaller than its nominal resolution would indicate.
 /* If the break points are set in em, suddenly the media queries become equally
@@ -3889,7 +4006,7 @@ a.help .icon {
 /* given that there is supposed to be a separate phone theme.
 /* Am currently inclined to think that just having break points that correlate
 /* to 1024, 800 and 480 at standard font size is probably adequate. */
-/* using 100% = 1 em ~= 16px ~= 14pt for our em sizing .. 64em*16px = 1024 etc */
+/* using 100% = 1 em ~= 16px ~= 14pt for our em sizing .. 64em*16px = 1024 etc. */
 
 /* This one does 1024 screens at default font size. */
 @media screen and (max-width: 64em) {
@@ -3900,7 +4017,7 @@ a.help .icon {
 		min-width: 15em;
 	}
 	.board_latest {
-		min-width: 20em;
+		min-width: 22em;
 		width: 40%;
 	}
 	.lastpost_link {
@@ -3955,9 +4072,10 @@ a.help .icon {
 		max-width: 95%;
 		white-space: nowrap;
 		text-overflow: ellipsis;
+		line-height: inherit;
 	}
 	.board_latest {
-		min-width: 20em;
+		min-width: 22em;
 	}
 	.board_row {
 		min-width: 20em;
@@ -4051,6 +4169,17 @@ a.help .icon {
 	#list_mentions .listaction {
 		display: none;
 	}
+	.mlist li div:nth-child(n+6), .mlist li .email {
+		display: none;
+	}
+	.mlist li div.posts {
+		display: table-cell;
+	}
+	.sticky_row .topic_info:before, .locked_row .topic_info:before, .locked_row.sticky_row .topic_info:before {
+		margin-right: -18px;
+	}
+	.topic_name, .topic_starter {
+		margin-right: 18px;
 }
 /* This one does 540 and smaller screens at default font size. */
 @media screen and (max-width: 33.750em) {
@@ -4095,9 +4224,6 @@ a.help .icon {
 	.frame {
 		min-width: 100%;
 	}
-	.board_lastpost, .board_description, .moderators {
-		display: none;
-	}
 	.topic_info {
 		display: block;
 		width: 95%;
@@ -4105,6 +4231,9 @@ a.help .icon {
 	}
 	.locked_row, .sticky_row, .basic_row,.topic_listing, .topic_listing>li {
 		display: block;
+	}
+	.sticky_row .topic_info:before, .locked_row .topic_info:before,	.locked_row.sticky_row .topic_info:before {
+		margin-right: 0;
 	}
 	.topic_icons, .topic_moderation {
 		display: none;
@@ -4133,10 +4262,6 @@ a.help .icon {
 	}
 	#whoisviewing {
 		display: none;
-	}
-	.childboards li {
-		display: block;
-		font-size: 1.2em;
 	}
 	.pagesection .buttonlist li {
 		white-space: nowrap;
@@ -4194,8 +4319,25 @@ a.help .icon {
 	.modified {
 		display: none;
 	}
+	.board_row {
+		margin-top:3px;
+		padding: 15px 0;
+	}
+	.board_description, .moderators {
+		display: none;
+	}
+	.childboard_row {
+		padding: 0 0 0 35px;
+	}
 	.childboards {
 		margin: 0 5px;
+	}
+	.childboards li {
+		display: block;
+		font-size: 1.2em;
+	}
+	.childboards li:nth-child(n+2):before {
+		content: " - ";
 	}
 	.board_info, .board_latest {
 		width: 100%;
@@ -4203,8 +4345,19 @@ a.help .icon {
 		box-sizing: border-box;
 		margin-bottom: 2px;
 	}
-	.board_row {
-		padding: 15px 0px;
+	.board_latest {
+		margin: 0 0 0 35px;
+		padding: 0 8px;
+		width: 90%;
+		max-width: 90%;
+		min-width: 90%;
+	}
+	.board_lastpost, .topic_lastpost {
+		min-width: 18em;
+	}
+	.board_lastpost {
+		padding-top: 6px;
+		margin: 3px;
 	}
 	.board_info h3 a {
 		font-size: 1.357em;
@@ -4213,18 +4366,10 @@ a.help .icon {
 	.board_name {
 		margin: 0 0 0 35px;
 	}
-	.board_latest {
-		padding: 0 8px;
-		max-width: 410px;
-		min-width: 250px;
-	}
 	.board_info:after {
 		display: block;
 		clear: both;
 		content: "";
-	}
-	.board_lastpost {
-		padding-top: 6px;
 	}
 	.topic_listing>li {
 		margin-bottom: 5px;
@@ -4235,9 +4380,9 @@ a.help .icon {
 	.icon_anchor {
 		min-width: 0;
 	}
-	.lastpost_link {
+	.lastpost_link, .board_lastposter {
 		font-size: 1.071em;
-		display: block;
+		display: inline;
 	}
 	.recentboard, .recentposter {
 		display: none;
@@ -4337,7 +4482,7 @@ a.help .icon {
 	.forumposts .windowbg, .forumposts .windowbg2 {
 		margin-bottom: 6px;
 	}
-	#moderationbuttons,  a.linklevel1.button_strip_notify,
+	#moderationbuttons, a.linklevel1.button_strip_notify,
 	a.linklevel1.button_strip_print, a.linklevel1.button_strip_send, .inline_mod_check,
 	a.linklevel1.quotetonew_button, a.linklevel1.button_strip_post_poll,
 	a.linklevel1.post_options, .keyinfo .post_subject, li.listlevel1.quickmod_select_all,
@@ -4379,7 +4524,15 @@ a.help .icon {
 		width: 95%;
 	}
 	.poster .menulevel2 {
-		 display: none !important;
+		 float: right;
+	}
+	.poster .listlevel1:hover .menulevel2, .poster .listlevel1.sfhover .menulevel2 {
+		left: auto;
+		right: 0;
+	}
+	.poster .listlevel2 {
+		max-width: 8em;
+		width: 8em;
 	}
 	.bbc_table_container {
 		max-width: 100%;
@@ -4403,6 +4556,9 @@ a.help .icon {
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
+	.mlist li .website, .mlist li .date_registered {
+		display: none;
+	}
 }
 /* This one does 480px screens at default font size. */
 @media screen and (max-width: 30em) {
@@ -4410,6 +4566,9 @@ a.help .icon {
 		display: none;
 	}
 	.quickbuttons .modified {
+		display: none;
+	}
+	.mlist li div.posts {
 		display: none;
 	}
 }

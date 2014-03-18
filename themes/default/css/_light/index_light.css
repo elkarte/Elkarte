@@ -33,9 +33,10 @@
 /*
 /*		$HELP................Help pages, help icons and pop-ups, tooltips.
 /*		$SEARCH..............Search pages, including memberlist search.
+/*		$MEMBERLIST..........The memberlist table.
 /*		$LOGIN...............Login and registration, maintenance mode.
 /*
-/*		$ERRORS..............Error messages.
+/*		$BOXES...............Message boxes (error, warning, info, etc).
 /*		$PROGRESS............Nifty progress bars.
 /*		$MEDIA...............Experimental media queries.
 /* ------------------------------------------------------- */
@@ -117,6 +118,16 @@ input[disabled].input_text, input[disabled].input_password {
 	background-position: 2% 50%;
 }
 
+/* Selects don't like to behave across OS and browsers, unfortunately. */
+.styled-select {
+	background: #fff url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYAQAAAADb20ChAAAAAnRSTlMAAQGU/a4AAAApSURBVHjaY/zPgIL+MTL+aWb84c74QZ/xgT6yFJALFARKARUAlaFpBACuqxnhHOnncgAAAABJRU5ErkJggg==) 98% 50% no-repeat;
+	border: 1px solid #ccc;
+	border-radius: 2px;
+}
+.styled-select select:disabled {
+	background: #eee url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYCAQAAABZqbWHAAAAKklEQVR42mMYiqCBgDQI4pXGp6QBBWJKY8ABB+Q4ElMajxKyghqhZCgCAL3SGQGs8tZQAAAAAElFTkSuQmCC) 98% 50% no-repeat;
+}
+
 /* Common button styling. */
 /* It is being replaced with three classes: */
 /*    .button_submit is not floated    */
@@ -155,6 +166,12 @@ input[disabled].input_text, input[disabled].input_password {
 .new_posts, .new_posts:visited, .new_posts:link {
 	border-radius: 2px;
 	background: #5aa05e;
+	color: #fff;
+}
+/* approval indicator  */
+.require_approval {
+	border-radius: 4px;
+	background: #f3b200;
 	color: #fff;
 }
 
@@ -1016,8 +1033,20 @@ div.bbc_footnotes .meaction{
 	border: 1px solid #ddd;
 	border-bottom: 1px solid #ccc;
 }
-.topic_sorting_row, .basic_row {
+.basic_row {
 	background: #fff;
+}
+.topic_sorting_row {
+	background: transparent;
+}
+#sort_by {
+	border: 2px solid #d1d1d1;
+	border-bottom: none;
+	border-radius: 5px 5px 0 0;
+}
+#sort_by.topic_sorting_recent {
+	border: 1px solid #d1d1d1;
+	border-bottom: none;
 }
 .sort_by_container {
 	border: 1px solid #ccc;
@@ -1414,10 +1443,6 @@ div.bbc_footnotes .meaction{
 .topic_details {
 	border-bottom: 1px solid #999;
 }
-.list_posts {
-	border-top: 1px solid #ccc;
-	box-shadow: 0 1px 0 #fff inset;
-}
 
 .ignoreboards a {
 	border-bottom: 1px solid #c4c4c4;
@@ -1575,7 +1600,36 @@ div.bbc_footnotes .meaction{
 	border: 1px solid #ddd;
 	border-radius: 5px;
 }
+.search_results_posts .topic_body {
+	border-top: 1px solid #CCCCCC;
+	box-shadow: 0px 1px 0px #FFFFFF inset;
+}
 
+/*	$MEMBERLIST		*/
+/* ------------------------------------------------------- */
+.mlist .mlist_header div {
+	border-top: none;
+}
+.mlist li div {
+	background-color: #fff;
+	border-top: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+}
+.mlist li.alternate_row div {
+	background-color: #fafafa;
+	border-top: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+}
+.mlist li div:first-child {
+	border-left: 1px solid #ccc;
+}
+.mlist li div:last-child {
+	border-right: 1px solid #ccc;
+}
+.letter_row h3 {
+	border: 1px solid #ccc;
+	border-radius: 6px 6px 0 0;
+}
 /*	$LOGIN		*/
 /* ------------------------------------------------------- */
 
@@ -1591,9 +1645,23 @@ div.bbc_footnotes .meaction{
 	background: #fff0f0;
 }
 
-/*	$ERRORS		*/
+/*	$BOXES		*/
 /* ------------------------------------------------------- */
-
+.warningbox {
+	border-top: 1px solid #ffd324;
+	border-bottom: 1px solid #ffd324;
+	background: #fff6ca url(../../images/profile/warning_moderate.png) 10px 50% no-repeat;
+}
+.successbox {
+	border-top: 1px solid green;
+	border-bottom: 1px solid green;
+	background: #efe url(../../images/icons/field_valid.png) 10px 50% no-repeat;
+}
+.infobox {
+	border-top: 1px solid #3a87ad;
+	border-bottom: 1px solid #3a87ad;
+	background: #d9edf7 url(../../images/icons/quick_sticky.png) 10px 50% no-repeat;
+}
 .errorbox {
 	border-top: 2px solid #c34;
 	border-bottom: 2px solid #c34;
@@ -1758,6 +1826,9 @@ div.bbc_footnotes .meaction{
 	.listlevel1#button_profile .linklevel1 {
 		min-width: 0.5em;
 	}
+	.mlist li div.posts {
+		border-right: 1px solid #ccc;
+	}
 }
 /* This one does up to 540 screens. */
 @media screen and (max-width: 33.750em) {
@@ -1766,6 +1837,9 @@ div.bbc_footnotes .meaction{
 	}
 	.frame {
 		border-radius: 0;
+	}
+	.board_lastpost {
+		border-top: 1px solid #ccc;
 	}
 	.topic_listing>li {
 		border: 1px solid #aaa;
@@ -1820,5 +1894,10 @@ div.bbc_footnotes .meaction{
 	}
 	.subsections:hover .linklevel1:after {
 		content: "";
+	}
+}
+@media screen and (max-width: 30em) {
+	.mlist li .group {
+		border-right: 1px solid #ccc;
 	}
 }

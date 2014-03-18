@@ -16,6 +16,15 @@
  */
 
 /**
+ * We need this template in order to look at ignored boards
+ */
+function template_ProfileOptions_init()
+{
+	loadTemplate('GenericBoards');
+}
+
+
+/**
  * Template for showing all the buddies of the current user.
  */
 function template_editBuddies()
@@ -542,7 +551,7 @@ function template_profile_pm_settings()
  */
 function template_profile_theme_settings()
 {
-	global $context, $settings, $modSettings, $txt;
+	global $context, $modSettings, $txt;
 
 	echo '
 							<dt>
@@ -581,7 +590,7 @@ function template_profile_theme_settings()
 								<input type="checkbox" name="default_options[show_no_signatures]" id="show_no_signatures" value="1"', !empty($context['member']['options']['show_no_signatures']) ? ' checked="checked"' : '', ' class="input_check" />
 							</dd>';
 
-	if ($settings['allow_no_censored'])
+	if ($context['allow_no_censored'])
 		echo '
 							<dt>
 								<label for="show_no_censored">' . $txt['show_no_censored'] . '</label>
@@ -993,7 +1002,7 @@ function template_groupMembership()
  */
 function template_ignoreboards()
 {
-	global $context, $txt, $scripturl;
+	global $txt, $scripturl;
 
 	// The main containing header.
 	echo '
@@ -1003,53 +1012,9 @@ function template_ignoreboards()
 		</h2>
 		<p class="description">', $txt['ignoreboards_info'], '</p>
 		<div class="windowbg2">
-			<div class="content flow_hidden">
-				<ul class="ignoreboards floatleft">';
+			<div class="content flow_hidden">';
 
-	$i = 0;
-	$limit = ceil($context['num_boards'] / 2);
-	foreach ($context['categories'] as $category)
-	{
-		if ($i == $limit)
-		{
-			echo '
-				</ul>
-				<ul class="ignoreboards floatright">';
-
-			$i++;
-		}
-
-		echo '
-					<li class="category">
-						<a href="javascript:void(0);" onclick="selectBoards([', implode(', ', $category['child_ids']), '], \'creator\'); return false;">', $category['name'], '</a>
-						<ul>';
-
-		foreach ($category['boards'] as $board)
-		{
-			if ($i == $limit)
-				echo '
-						</ul>
-					</li>
-				</ul>
-				<ul class="ignoreboards floatright">
-					<li class="category">
-						<ul>';
-
-			echo '
-							<li class="board" style="margin-', $context['right_to_left'] ? 'right' : 'left', ': ', $board['child_level'], 'em;">
-								<label for="ignore_brd', $board['id'], '"><input type="checkbox" id="ignore_brd', $board['id'], '" name="ignore_brd[', $board['id'], ']" value="', $board['id'], '"', $board['selected'] ? ' checked="checked"' : '', ' class="input_check" /> ', $board['name'], '</label>
-							</li>';
-
-			$i++;
-		}
-
-		echo '
-						</ul>
-					</li>';
-	}
-
-	echo '
-				</ul>';
+	template_pick_boards('creator', 'ignore_brd', false);
 
 	// Show the standard "Save Settings" profile button.
 	template_profile_save();
@@ -1382,7 +1347,7 @@ function template_profile_timeoffset_modify()
 								<span>', $txt['personal_time_offset'], '</span>
 							</dt>
 							<dd>
-								<input type="text" name="time_offset" id="time_offset" size="5" maxlength="5" value="', $context['member']['time_offset'], '" class="input_text" /> ', $txt['hours'], ' [<a href="javascript:void(0);" onclick="currentDate = new Date(', $context['current_forum_time_js'], '); document.getElementById(\'time_offset\').value = autoDetectTimeOffset(currentDate); return false;">', $txt['timeoffset_autodetect'], '</a>]<br />', $txt['current_time'], ': <em>', $context['current_forum_time'], '</em>
+								<input type="text" name="time_offset" id="time_offset" size="5" maxlength="5" value="', $context['member']['time_offset'], '" class="input_text" /> ', $txt['hours'], ' <a class="linkbutton" href="javascript:void(0);" onclick="currentDate = new Date(', $context['current_forum_time_js'], '); document.getElementById(\'time_offset\').value = autoDetectTimeOffset(currentDate); return false;">', $txt['timeoffset_autodetect'], '</a><br />', $txt['current_time'], ': <em>', $context['current_forum_time'], '</em>
 							</dd>';
 }
 
@@ -1398,7 +1363,7 @@ function template_profile_theme_pick()
 								<strong>', $txt['current_theme'], ':</strong>
 							</dt>
 							<dd>
-								', $context['member']['theme']['name'], ' [<a href="', $scripturl, '?action=theme;sa=pick;u=', $context['id_member'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['change'], '</a>]
+								', $context['member']['theme']['name'], ' <a class="linkbutton" href="', $scripturl, '?action=theme;sa=pick;u=', $context['id_member'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['change'], '</a>
 							</dd>';
 }
 

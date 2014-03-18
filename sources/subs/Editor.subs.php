@@ -149,7 +149,7 @@ function create_control_richedit($editorOptions)
 		loadTemplate('GenericControls', 'jquery.sceditor');
 
 		// JS makes the editor go round
-		loadJavascriptFile(array('jquery.sceditor.js', 'jquery.sceditor.bbcode.js', 'jquery.sceditor.elkarte.js', 'post.js', 'splittag.plugin.js', 'dropAttachments.js'));
+		loadJavascriptFile(array('jquery.sceditor.min.js', 'jquery.sceditor.bbcode.min.js', 'jquery.sceditor.elkarte.js', 'post.js', 'splittag.plugin.js', 'dropAttachments.js'));
 		addJavascriptVar(array(
 			'post_box_name' => '"' . $editorOptions['id'] . '"',
 			'elk_smileys_url' => '"' . $settings['smileys_url'] . '"',
@@ -158,9 +158,9 @@ function create_control_richedit($editorOptions)
 			'bbc_search_on' => '"' . addcslashes($txt['search_on'], "'") . '"')
 		);
 
-		// editor language file
+		// Editor language file
 		if (!empty($txt['lang_locale']))
-			loadJavascriptFile($scripturl . '?action=jslocale;sa=sceditor', array(), 'sceditor_language');
+			loadJavascriptFile($scripturl . '?action=jslocale;sa=sceditor', array('defer' => true), 'sceditor_language');
 
 		// Drafts?
 		if ((!empty($context['drafts_save']) || !empty($context['drafts_pm_save'])) && !empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
@@ -223,7 +223,7 @@ function create_control_richedit($editorOptions)
 	{
 		// The below array is used to show a command button in the editor, the execution
 		// and display details of any added buttons must be defined in the javascript files
-		// see  jquery.sceditor.elkarte.js under teh $.sceditor.plugins.bbcode.bbcode area
+		// see  jquery.sceditor.elkarte.js under the $.sceditor.plugins.bbcode.bbcode area
 		// for examples of how to use the .set command to add codes.  Include your new
 		// JS with addInlineJavascript() or loadJavascriptFile()
 		$context['bbc_tags']['row1'] = array(
@@ -235,9 +235,9 @@ function create_control_richedit($editorOptions)
 			'space',
 		);
 		$context['bbc_tags']['row2'] = array(
-			'bulletlist', 'orderedlist', 'horizontalrule',
+			'quote', 'code', 'table',
 			'space',
-			'table', 'code', 'quote',
+			'bulletlist', 'orderedlist', 'horizontalrule',
 			'space',
 			'spoiler', 'footnote',
 			'space',
@@ -504,7 +504,7 @@ function create_control_richedit($editorOptions)
 		editor_id: \'' . $editorOptions['id'] . '\',
 		editor: ' . JavaScriptEscape('
 		(function () {
-			return $("#' . $editorOptions['id'] . '").data("sceditor").val();
+			return $editor_data[' . $editorOptions['id'] . '].val();
 		});') . '
 	});', true);
 	}

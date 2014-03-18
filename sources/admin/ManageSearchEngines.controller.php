@@ -21,9 +21,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * ManageSearchEngines admin controller.
- * This class handles all search engines pages in admin panel,
- *  forwards to display and allows to change options.
+ * ManageSearchEngines admin controller. This class handles all search engines
+ * pages in admin panel, forwards to display and allows to change options.
  */
 class ManageSearchEngines_Controller extends Action_Controller
 {
@@ -53,14 +52,8 @@ class ManageSearchEngines_Controller extends Action_Controller
 			'stats' => array($this, 'action_stats', 'permission' => 'admin_forum'),
 		);
 
-		call_integration_hook('integrate_manage_search_engines', array(&$subActions));
-
-		// Ensure we have a valid subaction.
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'stats';
-
-		// Some contextual data for the template.
-		$context['sub_action'] = $subAction;
-		$context['page_title'] = $txt['search_engines'];
+		// Control
+		$action = new Action('manage_search_engines');
 
 		// Some more tab data.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -68,9 +61,14 @@ class ManageSearchEngines_Controller extends Action_Controller
 			'description' => $txt['search_engines_description'],
 		);
 
+		// Ensure we have a valid subaction. call integrate_manage_search_engines
+		$subAction = $action->initialize($subActions, 'stats');
+
+		// Some contextual data for the template.
+		$context['sub_action'] = $subAction;
+		$context['page_title'] = $txt['search_engines'];
+
 		// Call the right function for this sub-action.
-		$action = new Action();
-		$action->initialize($subActions);
 		$action->dispatch($subAction);
 	}
 
@@ -88,9 +86,6 @@ class ManageSearchEngines_Controller extends Action_Controller
 
 		// Set up a message.
 		$context['settings_message'] = sprintf($txt['spider_settings_desc'], $scripturl . '?action=admin;area=logs;sa=pruning;' . $context['session_var'] . '=' . $context['session_id']);
-
-		// Notify the integration that we're preparing to mess up with search engine settings...
-		call_integration_hook('integrate_modify_search_engine_settings', array(&$config_vars));
 
 		require_once(SUBSDIR . '/SearchEngines.subs.php');
 		require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -186,6 +181,9 @@ class ManageSearchEngines_Controller extends Action_Controller
 			'spider_group' => array('select', 'spider_group', 'subtext' => $txt['spider_group_note'], array($txt['spider_group_none'], $txt['membergroups_members'])),
 			array('select', 'show_spider_online', array($txt['show_spider_online_no'], $txt['show_spider_online_summary'], $txt['show_spider_online_detail'], $txt['show_spider_online_detail_admin'])),
 		);
+
+		// Notify the integration that we're preparing to mess up with search engine settings...
+		call_integration_hook('integrate_modify_search_engine_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

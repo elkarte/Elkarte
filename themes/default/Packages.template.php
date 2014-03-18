@@ -99,8 +99,10 @@ function template_view_package()
 			<br />';
 	}
 
+	if (!empty($context['post_url']))
+		echo '
+		<form action="', $context['post_url'], '" onsubmit="submitonce(this);" method="post" accept-charset="UTF-8">';
 	echo '
-		<form action="', $context['post_url'], '" onsubmit="submitonce(this);" method="post" accept-charset="UTF-8">
 			<h3 class="category_header">
 				', $context['uninstalling'] ? $txt['package_uninstall_actions'] : $txt['package_install_actions'], ' &quot;', $context['package_name'], '&quot;
 			</h3>';
@@ -334,10 +336,12 @@ function template_view_package()
 			</div>';
 	}
 
-	echo '
+	if (!empty($context['post_url']))
+		echo '
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />', (isset($context['form_sequence_number']) && !$context['ftp_needed']) ? '
 			<input type="hidden" name="seqnum" value="' . $context['form_sequence_number'] . '" />' : '', '
-		</form>
+		</form>';
+	echo '
 	</div>';
 
 	// Toggle options.
@@ -527,7 +531,7 @@ function template_examine()
  */
 function template_browse()
 {
-	global $context, $txt, $scripturl, $forum_version;
+	global $context, $txt;
 
 	echo '
 	<div id="admincenter">';

@@ -50,7 +50,7 @@ class Curl_Fetch_Webdata
 		CURLOPT_USERAGENT		=> 'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)', // set a normal looking useragent
 		CURLOPT_CONNECTTIMEOUT	=> 10, // Don't wait forever on a connection
 		CURLOPT_TIMEOUT			=> 10, // A page should load in this amount of time
-		CURLOPT_MAXREDIRS		=> 5, // stop after this many redirects
+		CURLOPT_MAXREDIRS		=> 3, // stop after this many redirects
 		CURLOPT_ENCODING		=> 'gzip,deflate', // accept gzip and decode it
 		CURLOPT_SSL_VERIFYPEER	=> 0, // stop cURL from verifying the peer's certificate
 		CURLOPT_SSL_VERIFYHOST	=> 0, // stop cURL from verifying the peer's host
@@ -114,11 +114,13 @@ class Curl_Fetch_Webdata
 	}
 
 	/**
-	 * Main calling function,
-	 *  - will request the page data from a given $url
-	 *  - optionally will post data to the page form if post data is supplied
-	 *  - passed arrays will be converted to a post string joined with &'s
-	 *  - calls _setOptions to set the curl opts array values based on the defaults and user input
+	 * Main calling function
+	 *
+	 * What it does:
+	 * - will request the page data from a given $url
+	 * - optionally will post data to the page form if post data is supplied
+	 * - passed arrays will be converted to a post string joined with &'s
+	 * - calls _setOptions to set the curl opts array values based on the defaults and user input
 	 *
 	 * @param string $url the site we are going to fetch
 	 * @param mixed[]|string $post_data data to send in the curl request as post data
@@ -140,12 +142,14 @@ class Curl_Fetch_Webdata
 
 	/**
 	 * Makes the actual cURL call
-	 *  - stores responses (url, code, error, headers, body) in the response array
-	 *  - detects 301, 302, 307 codes and will redirect to the given response header location
+	 *
+	 * What it does
+	 * - stores responses (url, code, error, headers, body) in the response array
+	 * - detects 301, 302, 307 codes and will redirect to the given response header location
 	 *
 	 * @param string $url site to fetch
 	 * @param bool $redirect flag to indicate if this was a redirect request or not
-	*/
+	 */
 	private function _curlRequest($url, $redirect = false)
 	{
 		// We do have a url I hope
@@ -209,9 +213,9 @@ class Curl_Fetch_Webdata
 		$new_url_parse  = parse_url($new_url);
 
 		// Redirect headers are often incomplete / relative so we need to make sure they are fully qualified
+		$new_url_parse['path'] = isset($new_url_parse['path']) ? $new_url_parse['path'] : (isset($new_url_parse['host']) ? '' : $last_url_parse['path']);
 		$new_url_parse['scheme'] = isset($new_url_parse['scheme']) ? $new_url_parse['scheme'] : $last_url_parse['scheme'];
 		$new_url_parse['host'] = isset($new_url_parse['host']) ? $new_url_parse['host'] : $last_url_parse['host'];
-		$new_url_parse['path'] = isset($new_url_parse['path']) ? $new_url_parse['path'] : $last_url_parse['path'];
 		$new_url_parse['query'] = isset($new_url_parse['query']) ? $new_url_parse['query'] : '';
 
 		// Build the new URL that was in the http header
@@ -220,8 +224,10 @@ class Curl_Fetch_Webdata
 
 	/**
 	 * Used to return the results to the calling program
-	 *  - called as ->result() will return the full final array
-	 *  - called as ->result('body') to just return the page source of the result
+	 *
+	 * What it does:
+	 * - called as ->result() will return the full final array
+	 * - called as ->result('body') to just return the page source of the result
 	 *
 	 * @param string $area used to return an area such as body, header, error
 	 */
@@ -238,8 +244,10 @@ class Curl_Fetch_Webdata
 
 	/**
 	 * Will return all results from all loops (redirects)
-	 *  - Can be called as ->result_raw(x) where x is a specific loop results.
-	 *  - Call as ->result_raw() for everything.
+	 *
+	 * What it does:
+	 * - Can be called as ->result_raw(x) where x is a specific loop results.
+	 * - Call as ->result_raw() for everything.
 	 *
 	 * @param int|string $response_number
 	 */
@@ -256,8 +264,10 @@ class Curl_Fetch_Webdata
 
 	/**
 	 * Takes supplied POST data and url encodes it
-	 *  - forms the date (for post) in to a string var=xyz&var2=abc&var3=123
-	 *  - drops vars with @ since we don't support sending files (uploading)
+	 *
+	 * What it does:
+	 * - forms the date (for post) in to a string var=xyz&var2=abc&var3=123
+	 * - drops vars with @ since we don't support sending files (uploading)
 	 *
 	 * @param mixed[] $post_data
 	*/
@@ -280,8 +290,10 @@ class Curl_Fetch_Webdata
 
 	/**
 	 * Sets the final cURL options for the current call
-	 *  - overwrites our default values with user supplied ones or appends new user ones to what we have
-	 *  - sets the callback function now that $this exists
+	 *
+	 * What it does:
+	 * - overwrites our default values with user supplied ones or appends new user ones to what we have
+	 * - sets the callback function now that $this exists
 	 */
 	private function _setOptions()
 	{
@@ -308,7 +320,9 @@ class Curl_Fetch_Webdata
 
 	/**
 	 * Called to initiate a redirect from a 301, 302 or 307 header
-	 *  - resets the cURL options for the loop, sets the referrer flag
+	 *
+	 * What it does
+	 * - resets the cURL options for the loop, sets the referrer flag
 	 *
 	 * @param string $target_url
 	 * @param string $referer_url
@@ -323,7 +337,9 @@ class Curl_Fetch_Webdata
 
 	/**
 	 * Callback function to parse returned headers
-	 *  - lowercases everything to make it consistent
+	 *
+	 * What it does:
+	 * - lowercases everything to make it consistent
 	 *
 	 * @param object $cr
 	 * @param string $header

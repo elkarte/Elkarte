@@ -21,7 +21,15 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Load the $modSettings array.
+ * Load the $modSettings array and many necessary forum settings.
+ *
+ * What it does:
+ * - load the settings from cache if available, otherwse from the database.
+ * - sets the timezone
+ * - checks the load average settings if available.
+ * - check whether post moderation is enabled.
+ * - calls add_integration_function
+ * - calls integrate_pre_include, integrate_pre_load,
  *
  * @global array $modSettings is a giant array of all of the forum-wide settings and statistics.
  */
@@ -121,14 +129,15 @@ function reloadSettings()
 
 /**
  * Load all the important user information.
+ *
  * What it does:
- *  - sets up the $user_info array
- *  - assigns $user_info['query_wanna_see_board'] for what boards the user can see.
- *  - first checks for cookie or integration validation.
- *  - uses the current session if no integration function or cookie is found.
- *  - checks password length, if member is activated and the login span isn't over.
- *    - if validation fails for the user, $id_member is set to 0.
- *    - updates the last visit time when needed.
+ * - sets up the $user_info array
+ * - assigns $user_info['query_wanna_see_board'] for what boards the user can see.
+ * - first checks for cookie or integration validation.
+ * - uses the current session if no integration function or cookie is found.
+ * - checks password length, if member is activated and the login span isn't over.
+ * - if validation fails for the user, $id_member is set to 0.
+ * - updates the last visit time when needed.
  */
 function loadUserSettings()
 {
@@ -386,6 +395,7 @@ function loadUserSettings()
 
 /**
  * Check for moderators and see if they have access to the board.
+ *
  * What it does:
  * - sets up the $board_info array for current board information.
  * - if cache is enabled, the $board_info array is stored in cache.
@@ -660,6 +670,14 @@ function loadBoard()
 
 /**
  * Load this user's permissions.
+ *
+ * What it does:
+ * - If the user is an admin, validate that they have not been banned.
+ * - Attempt to load permissions from cache for cache level > 2
+ * - See if the user is possibly a robot and apply added permissions as needed
+ * - Load permissions from the general permissions table.
+ * - If inside a board load the necessary board permissions.
+ * - If the user is not a guest, identify what other boards they have access to.
  */
 function loadPermissions()
 {
@@ -934,6 +952,13 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 /**
  * Loads the user's basic values... meant for template/theme usage.
  *
+ * What it does:
+ * - Always loads the minimal values of username, name, id, href, link, email, show_email, registered, registered_timestamp
+ * - if $context['loadMemberContext_set'] is not minimal it will load in full a full set of user information
+ * - prepares signature, personal_text, location fields for display (censoring if enabled)
+ * - loads in the members custom fields if any
+ * - prepares the users buddy list, including reverse buddy flags
+ *
  * @param int $user
  * @param bool $display_custom_fields = false
  * @return boolean
@@ -1100,7 +1125,8 @@ function loadMemberContext($user, $display_custom_fields = false)
 
 /**
  * Loads information about what browser the user is viewing with and places it in $context
- *  - uses the class from BrowserDetect.class.php
+ *
+ * @uses the class from BrowserDetect.class.php
  */
 function detectBrowser()
 {
@@ -1112,7 +1138,8 @@ function detectBrowser()
 /**
  * Are we using this browser?
  *
- * Wrapper function for detectBrowser
+ * - Wrapper function for detectBrowser
+ *
  * @param string $browser  the browser we are checking for.
  */
 function isBrowser($browser)
@@ -1128,6 +1155,17 @@ function isBrowser($browser)
 
 /**
  * Load a theme, by ID.
+ *
+ * What it does:
+ * - identify the theme to be loaded.
+ * - validate that the theme is valid and that the user has permission to use it
+ * - load the users theme settings and site setttings into $options.
+ * - prepares the list of folders to search for template loading.
+ * - identify what smiley set to use.
+ * - sets up $context['user']
+ * - detects the users browser and sets a mobile friendly enviroment if needed
+ * - loads default JS variables for use in every theme
+ * - loads default JS scripts for use in every theme
  *
  * @param int $id_theme = 0
  * @param bool $initialize = true
@@ -1450,7 +1488,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	// Output is fully XML, so no need for the index template.
 	if (isset($_REQUEST['xml']))
 	{
-		loadLanguage('index+Modifications');
+		loadLanguage('index+Addons');
 
 		// @todo added because some $settings in template_init are necessary even in xml mode. Maybe move template_init to a settings file?
 		loadTemplate('index');
@@ -1460,7 +1498,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	// These actions don't require the index template at all.
 	elseif (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], $simpleActions))
 	{
-		loadLanguage('index+Modifications');
+		loadLanguage('index+Addons');
 		Template_Layers::getInstance()->removeAll();
 	}
 	else
@@ -1476,7 +1514,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 			loadTemplate($template);
 
 		// ...and attempt to load their associated language files.
-		$required_files = implode('+', array_merge($templates, array('Modifications')));
+		$required_files = implode('+', array_merge($templates, array('Addons')));
 		loadLanguage($required_files, '', false);
 
 		// Custom template layers?
@@ -1605,7 +1643,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	if (!empty($modSettings['enableCodePrettify']))
 	{
 		loadCSSFile('prettify.css');
-		loadJavascriptFile('prettify.js', array('defer' => true));
+		loadJavascriptFile('prettify.min.js', array('defer' => true));
 
 		addInlineJavascript('
 		$(document).ready(function(){
@@ -1681,8 +1719,9 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 /**
  * This loads the bare minimum data.
- * Needed by scheduled tasks, and any other code that needs language files
- * before the forum (the theme) is loaded.
+ *
+ * - Needed by scheduled tasks,
+ * - Needed by any other code that needs language files before the forum (the theme) is loaded.
  */
 function loadEssentialThemeData()
 {
@@ -1732,15 +1771,16 @@ function loadEssentialThemeData()
 	if (!function_exists('loadLanguage'))
 		require_once(SOURCEDIR . '/Subs.php');
 
-	loadLanguage('index+Modifications');
+	loadLanguage('index+Addons');
 }
 
 /**
  * Load a template - if the theme doesn't include it, use the default.
- * What this function does:
- *  - loads a template file with the name template_name from the current, default, or base theme.
- *  - detects a wrong default theme directory and tries to work around it.
- *	- can be used to only load style sheets by using false as the template name
+ *
+ * What it does:
+ * - loads a template file with the name template_name from the current, default, or base theme.
+ * - detects a wrong default theme directory and tries to work around it.
+ * - can be used to only load style sheets by using false as the template name
  *
  * @uses the template_include() function to include the file.
  * @param string|false $template_name
@@ -1830,13 +1870,13 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 
 /**
  * Load a sub-template.
+ *
  * What it does:
- *  - loads the sub template specified by sub_template_name, which must be in an already-loaded template.
- *  - if ?debug is in the query string, shows administrators a marker after every sub template
- *    for debugging purposes.
+ * - loads the sub template specified by sub_template_name, which must be in an already-loaded template.
+ * - if ?debug is in the query string, shows administrators a marker after every sub template
+ * for debugging purposes.
  *
  * @todo get rid of reading $_REQUEST directly
- *
  * @param string $sub_template_name
  * @param bool|string $fatal = false, $fatal = true is for templates that shouldn't get a 'pretty' error screen
  *			'ignore' to skip
@@ -1951,18 +1991,19 @@ function loadCSSFile($filenames, $params = array(), $id = '')
 /**
  * Add a Javascript file for output later
  *
- * Can be passed an array of filenames, all which will have the same parameters applied, if you
- * need specific parameters on a per file basis, call it multiple times
+ * What it does:
+ * - Can be passed an array of filenames, all which will have the same parameters applied,
+ * - if you need specific parameters on a per file basis, call it multiple times
  *
  * @param mixed $filenames string or array of filenames to work on
  * @param mixed[] $params = array()
- *		Keys are the following:
- *			- ['local'] (true/false): define if the file is local, if file does not start with http its assumed local
- *			- ['defer'] (true/false): define if the file should load in <head> or before the closing <html> tag
- *			- ['fallback'] (true/false): if true will attempt to load the file from the default theme if not found in the current
- *							this is the default behavior if this is not supplied
- *			- ['async'] (true/false): if the script should be loaded asynchronously (HTML5)
- *			- ['stale'] (true/false/string): if true or null, use cache stale, false do not, or used a supplied string
+ * Keys are the following:
+ * - ['local'] (true/false): define if the file is local, if file does not start with http its assumed local
+ * - ['defer'] (true/false): define if the file should load in <head> or before the closing <html> tag
+ * - ['fallback'] (true/false): if true will attempt to load the file from the default theme if not found in the current
+ *	this is the default behavior if this is not supplied
+ * - ['async'] (true/false): if the script should be loaded asynchronously (HTML5)
+ * - ['stale'] (true/false/string): if true or null, use cache stale, false do not, or used a supplied string
  * @param string $id = '' optional id to use in html id=""
  */
 function loadJavascriptFile($filenames, $params = array(), $id = '')
@@ -2058,6 +2099,7 @@ function addJavascriptVar($vars, $escape = false)
 /**
  * Add a block of inline Javascript code to be executed later
  *
+ * What it does:
  * - only use this if you have to, generally external JS files are better, but for very small scripts
  *   or for scripts that require help from PHP/whatever, this can be useful.
  * - all code added with this function is added to the same <script> tag so do make sure your JS is clean!
@@ -2074,7 +2116,9 @@ function addInlineJavascript($javascript, $defer = false)
 }
 
 /**
- * Load a language file.  Tries the current and default themes as well as the user and global languages.
+ * Load a language file.
+ *
+ * - Tries the current and default themes as well as the user and global languages.
  *
  * @param string $template_name
  * @param string $lang = ''
@@ -2183,10 +2227,11 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 
 /**
  * Get all parent boards (requires first parent as parameter)
- * It finds all the parents of id_parent, and that board itself.
- * Additionally, it detects the moderators of said boards.
  *
- * Returns an array of information about the boards found.
+ * What it does:
+ * - It finds all the parents of id_parent, and that board itself.
+ * - Additionally, it detects the moderators of said boards.
+ * - Returns an array of information about the boards found.
  *
  * @param int $id_parent
  */
@@ -2325,13 +2370,13 @@ function getLanguages($use_cache = true)
 
 /**
  * Replace all vulgar words with respective proper words. (substring or whole words..)
- * What this function does:
- *  - it censors the passed string.
- *  - if the theme setting allow_no_censored is on, and the theme option
- *    show_no_censored is enabled, does not censor, unless force is also set.
- *  - it caches the list of censored words to reduce parsing.
  *
- * Returns the censored text
+ * What it does:
+ * - it censors the passed string.
+ * - if the theme setting allow_no_censored is on, and the theme option
+ *   show_no_censored is enabled, does not censor, unless force is also set.
+ * - it caches the list of censored words to reduce parsing.
+ * - Returns the censored text
  *
  * @param string $text
  * @param bool $force = false
@@ -2376,10 +2421,12 @@ function censorText(&$text, $force = false)
 
 /**
  * Load the template/language file using eval or require? (with eval we can show an error message!)
- *  - loads the template or language file specified by filename.
- *  - uses eval unless disableTemplateEval is enabled.
- *  - outputs a parse error if the file did not exist or contained errors.
- *  - attempts to detect the error and line, and show detailed information.
+ *
+ * What it does:
+ * - loads the template or language file specified by filename.
+ * - uses eval unless disableTemplateEval is enabled.
+ * - outputs a parse error if the file did not exist or contained errors.
+ * - attempts to detect the error and line, and show detailed information.
  *
  * @param string $filename
  * @param bool $once = false, if true only includes the file once (like include_once)
@@ -2617,7 +2664,6 @@ function loadDatabase()
  * @todo this function seems more useful than expected, it should be improved. :P
  *
  * @param mixed[] $profile array containing the users profile data
- *
  * @return mixed[] $avatar
  */
 function determineAvatar($profile)
@@ -2741,6 +2787,8 @@ function detectServer()
 
 /**
  * Do some important security checks:
+ *
+ * What it does:
  * - checks the existence of critical files e.g. install.php
  * - checks for an active admin session.
  * - checks cache directory is writable.
@@ -2845,7 +2893,8 @@ function doSecurityChecks()
 
 /**
  * Returns the current server load for nix systems
- * Used to enable / disable features based on current system overhead
+ *
+ * - Used to enable / disable features based on current system overhead
  */
 function detectServerLoad()
 {

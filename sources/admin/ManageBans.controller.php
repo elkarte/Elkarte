@@ -17,16 +17,20 @@ if (!defined('ELK'))
 /**
  * This class controls execution for admin actions in the bans area
  * of the admin panel.
+ *
+ * @package Bans
  */
 class ManageBans_Controller extends Action_Controller
 {
 	/**
 	 * Ban center. The main entrance point for all ban center functions.
-	 * It is accesssed by ?action=admin;area=ban.
-	 * It choses a function based on the 'sa' parameter, like many others.
-	 * The default sub-action is action_list().
-	 * It requires the ban_members permission.
-	 * It initializes the admin tabs.
+	 *
+	 * What it does:
+	 * - It is accesssed by ?action=admin;area=ban.
+	 * - It choses a function based on the 'sa' parameter, like many others.
+	 * - The default sub-action is action_list().
+	 * - It requires the ban_members permission.
+	 * - It initializes the admin tabs.
 	 *
 	 * @uses ManageBans template.
 	 */
@@ -46,14 +50,11 @@ class ManageBans_Controller extends Action_Controller
 			'log' => array($this, 'action_log', 'permission' => 'manage_bans'),
 		);
 
-		call_integration_hook('integrate_manage_bans', array(&$subActions));
+		// Start up the controller
+		$action = new Action();
 
 		// Default the sub-action to 'view ban list'.
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'list';
-
-		// Prepare some items for the template
-		$context['page_title'] = $txt['ban_title'];
-		$context['sub_action'] = $subAction;
 
 		// Tabs for browsing the different ban functions.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -85,18 +86,26 @@ class ManageBans_Controller extends Action_Controller
 			),
 		);
 
+		// Make the call to integrate-manage_bans
+		call_integration_hook('integrate_manage_bans', array(&$subActions));
+
+		// Prepare some items for the template
+		$context['page_title'] = $txt['ban_title'];
+		$context['sub_action'] = $subAction;
+
 		// Call the right function for this sub-action.
-		$action = new Action();
 		$action->initialize($subActions, 'list');
 		$action->dispatch($subAction);
 	}
 
 	/**
 	 * Shows a list of bans currently set.
-	 * It is accesssed by ?action=admin;area=ban;sa=list.
-	 * It removes expired bans.
-	 * It allows sorting on different criteria.
-	 * It also handles removal of selected ban items.
+	 *
+	 * What it does:
+	 * - It is accesssed by ?action=admin;area=ban;sa=list.
+	 * - It removes expired bans.
+	 * - It allows sorting on different criteria.
+	 * - It also handles removal of selected ban items.
 	 *
 	 * @uses the main ManageBans template.
 	 */
@@ -284,6 +293,7 @@ class ManageBans_Controller extends Action_Controller
 
 	/**
 	 * This function is behind the screen for adding new bans and modifying existing ones.
+	 *
 	 * Adding new bans:
 	 *  - is accesssed by ?action=admin;area=ban;sa=add.
 	 *  - uses the ban_edit sub template of the ManageBans template.
@@ -504,12 +514,12 @@ class ManageBans_Controller extends Action_Controller
 
 	/**
 	 * This handles the listing of ban log entries, and allows their deletion.
-	 * Shows a list of logged access attempts by banned users.
-	 * It is accessed by ?action=admin;area=ban;sa=log.
 	 *
-	 * How it works:
-	 *  - allows sorting of several columns.
-	 *  - also handles deletion of (a selection of) log entries.
+	 * What it does:
+	 * - Shows a list of logged access attempts by banned users.
+	 * - It is accessed by ?action=admin;area=ban;sa=log.
+	 * - allows sorting of several columns.
+	 * - also handles deletion of (a selection of) log entries.
 	 */
 	public function action_log()
 	{
@@ -743,13 +753,13 @@ class ManageBans_Controller extends Action_Controller
 	 * This function handles the ins and outs of the screen for adding new ban
 	 * triggers or modifying existing ones.
 	 *
-	 * Adding new ban triggers:
-	 *  - is accessed by ?action=admin;area=ban;sa=edittrigger;bg=x
-	 *  - uses the ban_edit_trigger sub template of ManageBans.
+	 * - Adding new ban triggers:
+	 *   - is accessed by ?action=admin;area=ban;sa=edittrigger;bg=x
+	 *   - uses the ban_edit_trigger sub template of ManageBans.
 	 *
-	 * Editing existing ban triggers:
-	 *  - is accessed by ?action=admin;area=ban;sa=edittrigger;bg=x;bi=y
-	 *  - uses the ban_edit_trigger sub template of ManageBans.
+	 * - Editing existing ban triggers:
+	 *   - is accessed by ?action=admin;area=ban;sa=edittrigger;bg=x;bi=y
+	 *   - uses the ban_edit_trigger sub template of ManageBans.
 	 *
 	 * @uses sub template ban_edit_trigger
 	 */
@@ -858,8 +868,10 @@ class ManageBans_Controller extends Action_Controller
 
 	/**
 	 * This handles the screen for showing the banned entities
-	 * It is accessed by ?action=admin;area=ban;sa=browse
-	 * It uses sub-tabs for browsing by IP, hostname, email or username.
+	 *
+	 * What it does:
+	 * - It is accessed by ?action=admin;area=ban;sa=browse
+	 * - It uses sub-tabs for browsing by IP, hostname, email or username.
 	 *
 	 * @uses ManageBans template, browse_triggers sub template.
 	 */

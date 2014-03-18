@@ -84,6 +84,9 @@ class ManageThemes_Controller extends Action_Controller
 			'browse' => array($this, 'action_browse', 'permission' => 'admin_forum'),
 		);
 
+		// Action controller
+		$action = new Action('manage_themes');
+
 		// @todo Layout Settings?
 		if (!empty($context['admin_menu_name']))
 		{
@@ -114,16 +117,14 @@ class ManageThemes_Controller extends Action_Controller
 			);
 		}
 
-		// Follow the sa or just go to administration.
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'admin';
+		// Follow the sa or just go to administration, call integrate_manage_themes
+		$subAction = $action->initialize($subActions, 'admin');
 
 		// Default the page title to Theme Administration by default.
 		$context['page_title'] = $txt['themeadmin_title'];
 		$context['sub_action'] = $subAction;
 
 		// Go to the action, if you have permissions
-		$action = new Action();
-		$action->initialize($subActions, 'admin');
 		$action->dispatch($subAction);
 	}
 
@@ -1088,14 +1089,15 @@ class ManageThemes_Controller extends Action_Controller
 			mkdir($theme_dir . '/scripts', 0777);
 
 			// Copy over the default non-theme files.
-			$to_copy = array('/index.php', '/index.template.php', '/css/index.css', '/css/rtl.css', '/css/admin.css', '/scripts/theme.js');
+			$to_copy = array('/index.php', '/index.template.php', '/scripts/theme.js');
 			foreach ($to_copy as $file)
 			{
 				copy($settings['default_theme_dir'] . $file, $theme_dir . $file);
 				@chmod($theme_dir . $file, 0777);
 			}
 
-			// And now the entire images directory!
+			// And now the entire css & images directories!
+			copytree($settings['default_theme_dir'] . '/css', $theme_dir . '/css');
 			copytree($settings['default_theme_dir'] . '/images', $theme_dir . '/images');
 			package_flush_cache();
 
@@ -1491,7 +1493,7 @@ class ManageThemes_Controller extends Action_Controller
 	 */
 	private function _action_edit_submit()
 	{
-		global $context;
+		global $context, $settings;
 
 		$selectedTheme = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
 		if (empty($selectedTheme))

@@ -1,6 +1,113 @@
 /* ATTENTION: You don't need to run or use this file! The upgrade.php script does everything for you! */
 
 /******************************************************************************/
+--- Fixing theme directories and URLs...
+/******************************************************************************/
+
+---# Try to detect where the themes are...
+---{
+$request = upgrade_query("
+	SELECT variable, value
+	FROM {$db_prefix}themes
+	WHERE variable LIKE 'theme_dir'
+		AND id_theme = 1
+		AND id_member = 0
+	LIMIT 1");
+
+$row = $db->fetch_assoc($request);
+$db->free_result($request);
+
+// Again, the only option is to find a file we know exist, in this case script_elk.js
+$original_theme_dir = $row['value'];
+
+// There are not many options, one is the check for a file ElkArte has and SMF
+// does not have, for example GenericHelpers.template.php
+
+// If the file exists, everything is in the correct place, so go back.
+if (file_exists($original_theme_dir . '/GenericHelpers.template.php'))
+{
+	$possible_theme_dir = $original_theme_dir;
+}
+else
+{
+	// If this file is not there, we can try replacing "Themes" with "themes"
+	$possible_theme_dir = str_replace('Themes', 'themes', $original_theme_dir);
+	if (!file_exists($possible_theme_dir . '/GenericHelpers.template.php'))
+	{
+		// Last try, BOARDDIR + themes
+		$possible_theme_dir = BOARDDIR . '/themes/default';
+		// If it does not exist do not change anything
+		if (!file_exists($possible_theme_dir . '/GenericHelpers.template.php'))
+			$possible_theme_dir = '';
+	}
+}
+
+if (!empty($possible_theme_dir))
+{
+	// If you arrived here means the template exists and we have a valid directory
+	// Time to update the database.
+
+	upgrade_query("
+		UPDATE {$db_prefix}themes
+		SET value = REPLACE(value, '" . $original_theme_dir . "', '" . $possible_theme_dir . "')
+		WHERE variable LIKE '%_dir'");
+}
+---}
+---#
+
+---# Try to detect how to reach the theme...
+---{
+$request = upgrade_query("
+	SELECT variable, value
+	FROM {$db_prefix}themes
+	WHERE variable LIKE 'theme_url'
+		AND id_theme = 1
+		AND id_member = 0
+	LIMIT 1");
+
+$row = $db->fetch_assoc($request);
+$db->free_result($request);
+
+// Again, the only option is to find a file we know exist, in this case script_elk.js
+if (strpos($row['value'], 'http') !== 0)
+	$original_theme_url = $boardurl . '/' . $row['value'];
+else
+	$original_theme_url = $row['value'];
+
+// If the file exists, everything is in the correct place, so go back.
+if (fetch_web_data($original_theme_url . '/scripts/script_elk.js'))
+{
+	$possible_theme_url = $original_theme_url;
+}
+else
+{
+	// If this file is not there, we can try replacing "Themes" with "themes"
+	$possible_theme_url = str_replace('Themes', 'themes', $original_theme_url);
+
+	if (!fetch_web_data($possible_theme_url . '/scripts/script_elk.js'))
+	{
+		// Last try, $boardurl + themes
+		$possible_theme_url = $boardurl . '/themes/default';
+		// If it does not exist do not change anything
+		if (!fetch_web_data($possible_theme_url . '/scripts/script_elk.js'))
+			$possible_theme_url = '';
+	}
+}
+
+if (!empty($possible_theme_url))
+{
+	// If you arrived here means the template exists and we have a valid directory
+	// Time to update the database.
+
+	upgrade_query("
+		UPDATE {$db_prefix}themes
+		SET value = REPLACE(value, '" . $original_theme_url . "', '" . $possible_theme_url . "')
+		WHERE variable LIKE '%_url'");
+}
+---}
+---#
+
+/******************************************************************************/
 --- Adding new settings...
 /******************************************************************************/
 
@@ -83,6 +190,10 @@ INSERT IGNORE INTO {$db_prefix}settings
 	(variable, value)
 VALUES
 	('mentions_dont_notify_rlike', '0');
+INSERT IGNORE INTO {$db_prefix}settings
+	(variable, value)
+VALUES
+	('detailed-version.js', 'https://elkarte.github.io/Elkarte/site/detailed-version.js');
 ---#
 
 /******************************************************************************/
@@ -259,7 +370,7 @@ upgrade_query("
 ---#
 
 /******************************************************************************/
---- Adding new scheduled tasks
+--- Updating scheduled tasks
 /******************************************************************************/
 ---# Adding new scheduled tasks
 INSERT INTO {$db_prefix}scheduled_tasks
@@ -286,6 +397,14 @@ INSERT INTO {$db_prefix}scheduled_tasks
 	(next_time, time_offset, time_regularity, time_unit, disabled, task)
 VALUES
 	(0, 30, 1, 'h', 0, 'user_access_mentions');
+---#
+
+---# Remove unused scheduled tasks...
+---{
+upgrade_query("
+	DELETE FROM {$db_prefix}scheduled_tasks
+	WHERE task = 'fetchFiles'");
+---}
 ---#
 
 /******************************************************************************/
@@ -501,8 +620,20 @@ VALUES
 ---# Move existing values...
 ---{
 // We cannot do this twice
-// @todo this won't work when you upgrade from smf <= is it still true?
-if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersion'], '1.0') == -1)
+$db_table = db_table();
+$members_tbl = $db_table->db_table_structure("{db_prefix}members");
+$move_im = false;
+foreach ($members_tbl['columns'] as $members_col)
+{
+	// One spot, if there is just one we can go on and do the moving
+	if ($members_col['name'] == 'aim')
+	{
+		$move_im = true;
+		break;
+	}
+}
+
+if ($move_im)
 {
 	$request = upgrade_query("
 		SELECT id_member, aim, icq, msn, yim
