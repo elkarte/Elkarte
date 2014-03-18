@@ -57,77 +57,71 @@ function template_topic_listing_above()
 
 	template_pagesection('normal_buttons', 'right');
 
-	if (!empty($context['description']) || !empty($context['moderators']))
-	{
-		echo '
+	echo '
 		<div id="description_board">
 			<h2 class="category_header">', $context['name'];
 
-		if (!empty($context['moderators']))
-			echo '
+
+	if (!empty($context['moderators']))
+		echo '
 				<span class="moderators">(', count($context['moderators']) === 1 ? $txt['moderator'] : $txt['moderators'], ': ', implode(', ', $context['link_moderators']), '.)</span>';
 
-		echo '
-			</h2>';
-
-		echo '
+	echo '
+			</h2>
 			<div class="generalinfo">';
 
-		// Show the board description
-		if (!empty($context['description']))
-			echo '
+	// Show the board description
+	if (!empty($context['description']))
+		echo '
 				<div id="boarddescription">
 					', $context['description'], '
 				</div>';
 
-		echo '
+	echo '
 				<div id="whoisviewing">';
 
-		// If we are showing who is viewing this topic, build it out
-		if (!empty($settings['display_who_viewing']))
-		{
-			if ($settings['display_who_viewing'] == 1)
-				echo count($context['view_members']), ' ', count($context['view_members']) === 1 ? $txt['who_member'] : $txt['members'];
-			else
-				echo empty($context['view_members_list']) ? '0 ' . $txt['members'] : implode(', ', $context['view_members_list']) . (empty($context['view_num_hidden']) || $context['can_moderate_forum'] ? '' : ' (+ ' . $context['view_num_hidden'] . ' ' . $txt['hidden'] . ')');
+	// If we are showing who is viewing this topic, build it out
+	if (!empty($settings['display_who_viewing']))
+	{
+		if ($settings['display_who_viewing'] == 1)
+			echo count($context['view_members']), ' ', count($context['view_members']) === 1 ? $txt['who_member'] : $txt['members'];
+		else
+			echo empty($context['view_members_list']) ? '0 ' . $txt['members'] : implode(', ', $context['view_members_list']) . (empty($context['view_num_hidden']) || $context['can_moderate_forum'] ? '' : ' (+ ' . $context['view_num_hidden'] . ' ' . $txt['hidden'] . ')');
 
-			echo $txt['who_and'], $context['view_num_guests'], ' ', $context['view_num_guests'] == 1 ? $txt['guest'] : $txt['guests'], $txt['who_viewing_board'];
-		}
+		echo $txt['who_and'], $context['view_num_guests'], ' ', $context['view_num_guests'] == 1 ? $txt['guest'] : $txt['guests'], $txt['who_viewing_board'];
+	}
 
-		// Sort topics mumbo-jumbo
-		echo '
+	// Sort topics mumbo-jumbo
+	echo '
 					<ul id="sort_by" class="topic_sorting">';
 
-		if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1)
-			echo '
+	if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1)
+		echo '
 						<li class="listlevel1 quickmod_select_all">
 							<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" class="input_check" />
 						</li>';
 
-		$current_header = $context['topics_headers'][$context['sort_by']];
-		echo '
+	$current_header = $context['topics_headers'][$context['sort_by']];
+	echo '
 						<li class="listlevel1 topic_sorting_row">
 							<a class="sort topicicon img_sort', $context['sort_direction'], '" href="', $current_header['url'], '" title="', $context['sort_title'], '"></a>
 						</li>';
 
-		echo '
+	echo '
 						<li class="listlevel1 topic_sorting_row">', $txt['sort_by'], ': <a href="', $current_header['url'], '">', $txt[$context['sort_by']], '</a>
 							<ul class="menulevel2" id="sortby">';
 
-		foreach ($context['topics_headers'] as $key => $value)
-			echo '
+	foreach ($context['topics_headers'] as $key => $value)
+		echo '
 								<li class="listlevel2 sort_by_item" id="sort_by_item_', $key, '"><a href="', $value['url'], '" class="linklevel2">', $txt[$key], ' ', $value['sort_dir_img'], '</a></li>';
 
-		echo '
+	echo '
 							</ul>
 						</li>
-					</ul>';
-
-		echo '
+					</ul>
 				</div>
 			</div>
 		</div>';
-	}
 }
 
 /**
