@@ -761,20 +761,20 @@ function ssi_topTopics($type = 'replies', $num_topics = 10, $output_method = 'ec
 		return $topics;
 
 	echo '
-		<table class="ssi_table">
+		<table class="top_topic ssi_table">
 			<tr>
-				<th class="lefttext"></th>
-				<th class="righttext">', $txt['views'], '</th>
-				<th class="righttext">', $txt['replies'], '</th>
+				<th class="link"></th>
+				<th class="views">', $txt['views'], '</th>
+				<th class="num_replies">', $txt['replies'], '</th>
 			</tr>';
 	foreach ($topics as $topic)
 		echo '
 			<tr>
-				<td class="lefttext">
+				<td class="link">
 					', $topic['link'], '
 				</td>
-				<td class="righttext">', $topic['num_views'], '</td>
-				<td class="righttext">', $topic['num_replies'], '</td>
+				<td class="views">', $topic['num_views'], '</td>
+				<td class="num_replies">', $topic['num_replies'], '</td>
 			</tr>';
 	echo '
 		</table>';
