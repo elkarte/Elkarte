@@ -1354,6 +1354,13 @@ span.views_text {
 }
 /* This one does up to 540 screens. */
 @media screen and (max-width: 33.750em) {
+	#gotop, #gobottom {
+		border-radius: 0px 0px 0px;
+		border-top: 0px;
+	}
+	#gotop {
+		border-radius: 8px 0px 0px;
+	}
 	.board_latest {
 		border-left: 0;
 	}

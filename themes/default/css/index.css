@@ -4407,8 +4407,16 @@ dl.no_members {
 	.views_text, .nextlinks {
 		display: none !important;
 	}
-	#top, #gotop, #gobottom {
-		display: none;
+	#gotop, #gobottom {
+		bottom: 0%;
+		padding: 0.2em 0.1em;
+		height: 1em;
+		width: 1.2em;
+		top: auto;
+		text-align: center;
+	}
+	#gotop {
+		margin-right: 1.4em;
 	}
 	.admin_menu li {
 		float: left;
