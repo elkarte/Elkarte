@@ -1729,7 +1729,6 @@ dl.settings dt .styled-select select {
 }
 .topic_sorting:hover #sortby, #sortby:hover, #sortby {
 	width: 11em;
-	left: auto;
 	right: -2.5em;
 }
 #sort_by.topic_sorting_recent {
