@@ -16,11 +16,19 @@
  */
 
 /**
+ * We need some help to proprerly display things
+ */
+function template_Recent_init()
+{
+	loadTemplate('GenericMessages');
+}
+
+/**
  * Recent posts page.
  */
 function template_recent()
 {
-	global $context, $txt, $scripturl;
+	global $context, $txt;
 
 	template_pagesection();
 
@@ -28,50 +36,13 @@ function template_recent()
 		<div id="recentposts" class="forumposts">
 			<h3 class="category_header hdicon cat_img_posts">', $txt['recent_posts'], '</h3>';
 
-	// @todo - I'm sure markup could be cleaned up a bit more here. CSS needs a bit of a tweak too.
 	foreach ($context['posts'] as $post)
 	{
-		echo '
-			<div class="', $post['alternate'] == 0 ? 'windowbg' : 'windowbg2', ' core_posts">
-				<div class="content">
-					<div class="counter">', $post['counter'], '</div>
-					<div class="topic_details">
-						<h5>', $post['board']['link'], ' / ', $post['link'], '</h5>
-						<span class="smalltext">', $txt['last_post'], ' ', $txt['by'], ' <strong>', $post['poster']['link'], ' </strong> - ', $post['html_time'], '</span>
-					</div>
-					<div class="inner">', $post['message'], '</div>';
+		$post['class'] = $post['alternate'] == 0 ? 'windowbg' : 'windowbg2';
+		$post['title'] = $post['board']['link'] . ' / ' . $post['link'];
+		$post['date'] = $txt['last_post'] . ' ' . $txt['by'] . ' <strong>' . $post['poster']['link'] . ' </strong> - ' . $post['html_time'];
 
-		if ($post['can_reply'] || $post['can_mark_notify'] || $post['can_delete'])
-			echo '
-					<ul class="quickbuttons">';
-
-		// How about... even... remove it entirely?!
-		if ($post['can_delete'])
-			echo '
-						<li class="listlevel1"><a href="', $scripturl, '?action=deletemsg;msg=', $post['id'], ';topic=', $post['topic'], ';recent;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['remove_message'], '?\');" class="linklevel1 remove_button">', $txt['remove'], '</a></li>';
-
-		// Can we request notification of topics?
-		if ($post['can_mark_notify'])
-			echo '
-						<li class="listlevel1"><a href="', $scripturl, '?action=notify;topic=', $post['topic'], '.', $post['start'], '" class="linklevel1 notify_button">', $txt['notify'], '</a></li>';
-
-		// If they *can* reply?
-		if ($post['can_reply'])
-			echo '
-						<li class="listlevel1"><a href="', $scripturl, '?action=post;topic=', $post['topic'], '.', $post['start'], '" class="linklevel1 reply_button">', $txt['reply'], '</a></li>';
-
-		// If they *can* quote?
-		if ($post['can_quote'])
-			echo '
-						<li class="listlevel1"><a href="', $scripturl, '?action=post;topic=', $post['topic'], '.', $post['start'], ';quote=', $post['id'], '" class="linklevel1 quote_button">', $txt['quote'], '</a></li>';
-
-		if ($post['can_reply'] || $post['can_mark_notify'] || $post['can_delete'])
-			echo '
-					</ul>';
-
-		echo '
-				</div>
-			</div>';
+		template_simple_message($post);
 	}
 
 	echo '
@@ -85,7 +56,7 @@ function template_recent()
  */
 function template_unread()
 {
-	global $context, $settings, $txt, $scripturl, $modSettings;
+	global $context, $settings, $txt, $scripturl;
 
 	if (!empty($context['topics']))
 	{
@@ -124,14 +95,13 @@ function template_unread()
 		foreach ($context['topics_headers'] as $key => $value)
 			echo '
 									<li class="listlevel2 sort_by_item" id="sort_by_item_', $key, '"><a href="', $value['url'], '" class="linklevel2">', $txt[$key], ' ', $value['sort_dir_img'], '</a></li>';
+
 		echo '
 								</ul>';
 
 		echo '
 							</li>
-						</ul>';
-
-		echo '
+						</ul>
 						<ul class="topic_listing" id="unread">';
 
 		foreach ($context['topics'] as $topic)
@@ -184,6 +154,7 @@ function template_unread()
 								<p class="topic_moderation" >
 									<input type="checkbox" name="topics[]" value="', $topic['id'], '" class="input_check" />
 								</p>';
+
 			echo '
 							</li>';
 		}
@@ -198,15 +169,7 @@ function template_unread()
 		template_pagesection('recent_buttons', 'right');
 
 		echo '
-					<div id="topic_icons" class="description">
-						<p class="floatleft">', !empty($modSettings['enableParticipation']) && $context['user']['is_logged'] ? '
-							<img src="' . $settings['images_url'] . '/icons/profile_sm.png" alt="" class="centericon" /> ' . $txt['participation_caption'] : '<img src="' . $settings['images_url'] . '/post/xx.png" alt="" class="centericon" /> ' . $txt['normal_topic'], '<br />
-							' . (!empty($modSettings['pollMode']) ? '<img src="' . $settings['images_url'] . '/topic/normal_poll.png" alt="" class="centericon" /> ' . $txt['poll'] : '') . '
-						</p>
-						<p>
-							<img src="' . $settings['images_url'] . '/icons/quick_lock.png" alt="" class="centericon" /> ' . $txt['locked_topic'] . '<br />' . ($modSettings['enableStickyTopics'] == '1' ? '
-							<img src="' . $settings['images_url'] . '/icons/quick_sticky.png" alt="" class="centericon" /> ' . $txt['sticky_topic'] . '<br />' : '') . '
-						</p>
+					<div id="topic_icons" class="description">', template_basicicons_legend(), '
 					</div>';
 	}
 	else
@@ -226,7 +189,7 @@ function template_unread()
  */
 function template_replies()
 {
-	global $context, $settings, $txt, $scripturl, $modSettings;
+	global $context, $settings, $txt, $scripturl;
 
 	if (!empty($context['topics']))
 	{
@@ -244,7 +207,8 @@ function template_replies()
 						<h2 class="category_header" id="unread_header">
 							', $txt['unread_replies'], '
 						</h2>
-						<ul id="sort_by" class="topic_sorting" >';
+						<ul id="sort_by" class="topic_sorting topic_sorting_recent">';
+
 		if ($context['showCheckboxes'])
 			echo '
 							<li class="listlevel1 quickmod_select_all">
@@ -260,18 +224,18 @@ function template_replies()
 		echo '
 							<li class="listlevel1 topic_sorting_row">', $txt['sort_by'], ': <a href="', $current_header['url'], '">', $txt[$context['sort_by']], '</a>
 								<ul class="menulevel2" id="sortby">';
+
 		foreach ($context['topics_headers'] as $key => $value)
 			echo '
 									<li class="listlevel2 sort_by_item" id="sort_by_item_', $key, '"><a href="', $value['url'], '" class="linklevel2">', $txt[$key], ' ', $value['sort_dir_img'], '</a></li>';
+
 		echo '
 								</ul>';
 
 		// Show a "select all" box for quick moderation?
 		echo '
 							</li>
-						</ul>';
-
-		echo '
+						</ul>
 						<ul class="topic_listing" id="unread">';
 
 		foreach ($context['topics'] as $topic)
@@ -327,6 +291,7 @@ function template_replies()
 								<p class="topic_moderation">
 									<input type="checkbox" name="topics[]" value="', $topic['id'], '" class="input_check" />
 								</p>';
+
 			echo '
 							</li>';
 		}
@@ -341,15 +306,7 @@ function template_replies()
 		template_pagesection('recent_buttons', 'right');
 
 		echo '
-					<div id="topic_icons" class="description">
-						<p class="floatleft">', !empty($modSettings['enableParticipation']) && $context['user']['is_logged'] ? '
-							<img src="' . $settings['images_url'] . '/icons/profile_sm.png" alt="" class="centericon" /> ' . $txt['participation_caption'] : '<img src="' . $settings['images_url'] . '/post/xx.png" alt="" class="centericon" /> ' . $txt['normal_topic'], '<br />
-							' . (!empty($modSettings['pollMode']) ? '<img src="' . $settings['images_url'] . '/topic/normal_poll.png" alt="" class="centericon" /> ' . $txt['poll'] : '') . '
-						</p>
-						<p>
-							<img src="' . $settings['images_url'] . '/icons/quick_lock.png" alt="" class="centericon" /> ' . $txt['locked_topic'] . '<br />' . ($modSettings['enableStickyTopics'] == '1' ? '
-							<img src="' . $settings['images_url'] . '/icons/quick_sticky.png" alt="" class="centericon" /> ' . $txt['sticky_topic'] . '<br />' : '') . '
-						</p>
+					<div id="topic_icons" class="description">', template_basicicons_legend(), '
 					</div>';
 	}
 	else

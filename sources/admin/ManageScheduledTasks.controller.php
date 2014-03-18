@@ -21,16 +21,19 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * ManageScheduledTasks admin Controller: handles the administration pages
+ * ManageScheduledTasks admin Controller: handles the scheduled task pages
  * which allow to see and edit and run the systems scheduled tasks
+ *
+ * @package ScheduledTasks
  */
 class ManageScheduledTasks_Controller extends Action_Controller
 {
 	/**
 	 * Scheduled tasks management dispatcher.
-	 * This function checks permissions and delegates to the appropriate function
+	 *
+	 * - This function checks permissions and delegates to the appropriate function
 	 * based on the sub-action.
-	 * Everything here requires admin_forum permission.
+	 * - Everything here requires admin_forum permission.
 	 *
 	 * @uses ManageScheduledTasks template file
 	 * @uses ManageScheduledTasks language file
@@ -50,13 +53,8 @@ class ManageScheduledTasks_Controller extends Action_Controller
 			'tasks' => array($this, 'action_tasks', 'permission' => 'admin_forum'),
 		);
 
-		call_integration_hook('integrate_manage_scheduled_tasks', array(&$subActions));
-
-		// We need to find what's the action.
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'tasks';
-
-		$context['page_title'] = $txt['maintain_info'];
-		$context['sub_action'] = $subAction;
+		// Control those actions
+		$action = new Action('manage_scheduled_tasks');
 
 		// Now for the lovely tabs. That we all love.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -73,9 +71,14 @@ class ManageScheduledTasks_Controller extends Action_Controller
 			),
 		);
 
+		// We need to find what's the action. call integrate_manage_scheduled_tasks
+		$subAction = $action->initialize($subActions, 'tasks');
+
+		// Page details
+		$context['page_title'] = $txt['maintain_info'];
+		$context['sub_action'] = $subAction;
+
 		// Call the right function for this sub-action.
-		$action = new Action();
-		$action->initialize($subActions, 'tasks');
 		$action->dispatch($subAction);
 	}
 

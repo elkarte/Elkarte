@@ -57,6 +57,7 @@ function ml_CustomProfile()
 		// Load the standard column info
 		$context['custom_profile_fields']['columns'][$curField] = array(
 			'label' => $row['field_name'],
+			'class' => $row['field_name'],
 			'type' => $row['field_type'],
 			'bbc' => !empty($row['bbc']),
 			'enclose' => $row['enclose'],

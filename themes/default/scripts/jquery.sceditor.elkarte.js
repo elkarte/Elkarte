@@ -320,7 +320,7 @@ $.sceditor.plugins.bbcode.bbcode
 
 			if ($(element).children("cite:first").length === 1)
 			{
-				from = $(element).children("cite:first").text();
+				from = $(element).children("cite:first").text().trim();
 				$(element).attr({'from': from.php_htmlspecialchars()});
 				from = '=' + from;
 				content = '';
@@ -336,6 +336,9 @@ $.sceditor.plugins.bbcode.bbcode
 			}
 
 			return '[code' + from + ']' + content.replace('&#91;', '[') + '[/code]';
+		},
+		quoteType: function(element) {
+			return element;
 		},
 		html: function(element, attrs, content) {
 			var from = '';
@@ -384,6 +387,13 @@ $.sceditor.plugins.bbcode.bbcode
 			if (typeof attrs.author !== "undefined")
 			{
 				attr_author = attrs.author;
+				sAuthor = bbc_quote_from + ': ' + attr_author;
+			}
+			// Done as [quote=someone]
+			else if (typeof attrs.defaultattr !== "undefined")
+			{
+				// Convert it to an author tag
+				attr_author = attrs.defaultattr;
 				sAuthor = bbc_quote_from + ': ' + attr_author;
 			}
 

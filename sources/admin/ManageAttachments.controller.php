@@ -23,6 +23,8 @@ if (!defined('ELK'))
 /**
  * This is the attachments and avatars controller class.
  * It is doing the job of attachments and avatars maintenance and management.
+ *
+ * @package Attachments
  */
 class ManageAttachments_Controller extends Action_Controller
 {
@@ -34,9 +36,11 @@ class ManageAttachments_Controller extends Action_Controller
 
 	/**
 	 * The main 'Attachments and Avatars' admin.
-	 * This method is the entry point for index.php?action=admin;area=manageattachments
+	 *
+	 * What it does:
+	 * - This method is the entry point for index.php?action=admin;area=manageattachments
 	 * and it calls a function based on the sub-action.
-	 * It requires the manage_attachments permission.
+	 * - It requires the manage_attachments permission.
 	 *
 	 * @uses ManageAttachments template.
 	 * @uses Admin language file.
@@ -76,14 +80,8 @@ class ManageAttachments_Controller extends Action_Controller
 			'transfer' => array($this, 'action_transfer'),
 		);
 
-		call_integration_hook('integrate_manage_attachments', array(&$subActions));
-
-		$action = new Action();
-		$action->initialize($subActions, 'browse');
-
-		// Pick the correct sub-action.
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'browse';
-		$context['sub_action'] = $subAction;
+		// Get ready for some action
+		$action = new Action('manage_attachments');
 
 		// Default page title is good.
 		$context['page_title'] = $txt['attachments_avatars'];
@@ -95,14 +93,19 @@ class ManageAttachments_Controller extends Action_Controller
 			'description' => $txt['attachments_desc'],
 		);
 
+		// Get the subAction, call integrate_manage_attachments
+		$subAction = $action->initialize($subActions, 'browse');
+		$context['sub_action'] = $subAction;
+
 		// Finally go to where we want to go
 		$action->dispatch($subAction);
 	}
 
 	/**
 	 * Allows to show/change attachment settings.
-	 * This is the default sub-action of the 'Attachments and Avatars' center.
-	 * Called by index.php?action=admin;area=manageattachments;sa=attachments.
+	 *
+	 * - This is the default sub-action of the 'Attachments and Avatars' center.
+	 * - Called by index.php?action=admin;area=manageattachments;sa=attachments.
 	 *
 	 * @uses 'attachments' sub template.
 	 */
@@ -124,8 +127,6 @@ class ManageAttachments_Controller extends Action_Controller
 	createEventListener(base_dir)
 	base_dir.addEventListener("change", toggleSubDir, false);
 	toggleSubDir();', true);
-
-		call_integration_hook('integrate_modify_attachment_settings');
 
 		// These are very likely to come in handy! (i.e. without them we're doomed!)
 		require_once(SUBSDIR . '/Settings.class.php');
@@ -196,14 +197,15 @@ class ManageAttachments_Controller extends Action_Controller
 
 	/**
 	 * Initialize attachmentForm.
-	 * Retrieve and return the administration settings for attachments.
+	 *
+	 * - Retrieve and return the administration settings for attachments.
 	 */
 	private function _initAttachSettingsForm()
 	{
-		// instantiate the form
+		// Instantiate the form
 		$this->_attachSettingsForm = new Settings_Form();
 
-		// initialize settings
+		// Initialize settings
 		$config_vars = $this->_settings();
 
 		return $this->_attachSettingsForm->settings($config_vars);
@@ -303,6 +305,9 @@ class ManageAttachments_Controller extends Action_Controller
 				array('int', 'max_image_height', 'subtext' => $txt['zero_for_no_limit']),
 		);
 
+		// Add new settings with a nice hook, makes them available for admin settings search as well
+		call_integration_hook('integrate_modify_attachment_settings', array(&$config_vars));
+
 		return $config_vars;
 	}
 
@@ -316,10 +321,11 @@ class ManageAttachments_Controller extends Action_Controller
 
 	/**
 	 * Show a list of attachment or avatar files.
-	 * Called by ?action=admin;area=manageattachments;sa=browse for attachments
-	 *  and ?action=admin;area=manageattachments;sa=browse;avatars for avatars.
-	 * Allows sorting by name, date, size and member.
-	 * Paginates results.
+	 *
+	 * - Called by ?action=admin;area=manageattachments;sa=browse for attachments
+	 * and ?action=admin;area=manageattachments;sa=browse;avatars for avatars.
+	 * - Allows sorting by name, date, size and member.
+	 * - Paginates results.
 	 *
 	 *  @uses the 'browse' sub template
 	 */
@@ -357,6 +363,7 @@ class ManageAttachments_Controller extends Action_Controller
 				'name' => array(
 					'header' => array(
 						'value' => $txt['attachment_name'],
+						'class' => 'grid50',
 					),
 					'data' => array(
 						'function' => function ($rowData) {
@@ -399,6 +406,7 @@ class ManageAttachments_Controller extends Action_Controller
 				'filesize' => array(
 					'header' => array(
 						'value' => $txt['attachment_file_size'],
+						'class' => 'nowrap',
 					),
 					'data' => array(
 						'function' => function ($rowData) {
@@ -415,6 +423,7 @@ class ManageAttachments_Controller extends Action_Controller
 				'member' => array(
 					'header' => array(
 						'value' => $context['browse_type'] == 'avatars' ? $txt['attachment_manager_member'] : $txt['posted_by'],
+						'class' => 'nowrap',
 					),
 					'data' => array(
 						'function' => function ($rowData) {
@@ -437,6 +446,7 @@ class ManageAttachments_Controller extends Action_Controller
 				'date' => array(
 					'header' => array(
 						'value' => $context['browse_type'] == 'avatars' ? $txt['attachment_manager_last_active'] : $txt['date'],
+						'class' => 'nowrap',
 					),
 					'data' => array(
 						'function' => function ($rowData) {
@@ -460,6 +470,7 @@ class ManageAttachments_Controller extends Action_Controller
 				'downloads' => array(
 					'header' => array(
 						'value' => $txt['downloads'],
+						'class' => 'nowrap',
 					),
 					'data' => array(
 						'db' => 'downloads',
@@ -529,8 +540,10 @@ class ManageAttachments_Controller extends Action_Controller
 
 	/**
 	 * Show several file maintenance options.
-	 * Called by ?action=admin;area=manageattachments;sa=maintain.
-	 * Calculates file statistics (total file size, number of attachments,
+	 *
+	 * What it does:
+	 * - Called by ?action=admin;area=manageattachments;sa=maintain.
+	 * - Calculates file statistics (total file size, number of attachments,
 	 * number of avatars, attachment space available).
 	 *
 	 * @uses the 'maintenance' sub template.
@@ -545,7 +558,7 @@ class ManageAttachments_Controller extends Action_Controller
 		// We're working with them attachments here!
 		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
-		// we need our attachments directories...
+		// We need our attachments directories...
 		$attach_dirs = getAttachmentDirs();
 
 		// Get the number of attachments...
@@ -582,7 +595,8 @@ class ManageAttachments_Controller extends Action_Controller
 
 	/**
 	 * Move avatars from their current location, to the custom_avatar_dir folder.
-	 * Called from the maintenance screen by ?action=admin;area=manageattachments;sa=action_moveAvatars.
+	 *
+	 * - Called from the maintenance screen by ?action=admin;area=manageattachments;sa=action_moveAvatars.
 	 */
 	public function action_moveAvatars()
 	{
@@ -608,11 +622,10 @@ class ManageAttachments_Controller extends Action_Controller
 
 	/**
 	 * Remove attachments older than a given age.
-	 * Called from the maintenance screen by
-	 *   ?action=admin;area=manageattachments;sa=byAge.
-	 * It optionally adds a certain text to the messages the attachments
-	 *  were removed from.
-	 *  @todo refactor this silly superglobals use...
+	 *
+	 * - Called from the maintenance screen by ?action=admin;area=manageattachments;sa=byAge.
+	 * - It optionally adds a certain text to the messages the attachments were removed from.
+	 * @todo refactor this silly superglobals use...
 	 */
 	public function action_byAge()
 	{
@@ -643,10 +656,9 @@ class ManageAttachments_Controller extends Action_Controller
 
 	/**
 	 * Remove attachments larger than a given size.
-	 * Called from the maintenance screen by
-	 *  ?action=admin;area=manageattachments;sa=bySize.
-	 * Optionally adds a certain text to the messages the attachments were
-	 *  removed from.
+	 *
+	 * - Called from the maintenance screen by ?action=admin;area=manageattachments;sa=bySize.
+	 * - Optionally adds a certain text to the messages the attachments were removed from.
 	 */
 	public function action_bySize()
 	{
@@ -667,8 +679,8 @@ class ManageAttachments_Controller extends Action_Controller
 
 	/**
 	 * Remove a selection of attachments or avatars.
-	 * Called from the browse screen as submitted form by
-	 *  ?action=admin;area=manageattachments;sa=remove
+	 *
+	 * - Called from the browse screen as submitted form by ?action=admin;area=manageattachments;sa=remove
 	 */
 	public function action_remove()
 	{
@@ -681,8 +693,8 @@ class ManageAttachments_Controller extends Action_Controller
 			// we'll need this
 			require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
-			$attachments = array();
 			// There must be a quicker way to pass this safety test??
+			$attachments = array();
 			foreach ($_POST['remove'] as $removeID => $dummy)
 				$attachments[] = (int) $removeID;
 
@@ -708,8 +720,8 @@ class ManageAttachments_Controller extends Action_Controller
 
 	/**
 	 * Removes all attachments in a single click
-	 * Called from the maintenance screen by
-	 *  ?action=admin;area=manageattachments;sa=removeall.
+	 *
+	 * - Called from the maintenance screen by ?action=admin;area=manageattachments;sa=removeall.
 	 */
 	public function action_removeall()
 	{
@@ -733,17 +745,19 @@ class ManageAttachments_Controller extends Action_Controller
 
 	/**
 	 * This function will performs many attachment checks and provides ways to fix them
-	 * Checks for the following common issues
-	 *  - Orphan Thumbnails
-	 *  - Attachments that have no thumbnails
-	 *  - Attachments that list thumbnails, but actually, don't have any
-	 *  - Attachments list in the wrong_folder
-	 *  - Attachments that dont exists on disk anylonger
-	 *  - Attachments that are zero size
-	 *  - Attachments that file size does not match the DB size
-	 *  - Attachments that no longer have a message
-	 *  - Avatars with no members associated with them.
-	 *  - Attachments that are in the attachment folder, but not listed in the DB
+	 *
+	 * What it does:
+	 * - Checks for the following common issues
+	 *   - Orphan Thumbnails
+	 *   - Attachments that have no thumbnails
+	 *   - Attachments that list thumbnails, but actually, don't have any
+	 *   - Attachments list in the wrong_folder
+	 *   - Attachments that dont exists on disk anylonger
+	 *   - Attachments that are zero size
+	 *   - Attachments that file size does not match the DB size
+	 *   - Attachments that no longer have a message
+	 *   - Avatars with no members associated with them.
+	 *   - Attachments that are in the attachment folder, but not listed in the DB
 	 */
 	public function action_repair()
 	{
@@ -1019,6 +1033,7 @@ class ManageAttachments_Controller extends Action_Controller
 					continue;
 
 				$real_path = rtrim(trim($path), DIRECTORY_SEPARATOR);
+
 				// If it doesn't look like a directory, probably is not a directory
 				if (preg_match('~[/\\\\]~', $real_path) !== 1)
 					$real_path = realpath(BOARDDIR . DIRECTORY_SEPARATOR . ltrim($real_path, DIRECTORY_SEPARATOR));
@@ -1499,6 +1514,7 @@ class ManageAttachments_Controller extends Action_Controller
 
 	/**
 	 * Maintance function to move attachments from one directory to another
+	 *
 	 * @todo Move db queries to ManageAttachments.subs.php
 	 */
 	public function action_transfer()
@@ -1702,9 +1718,12 @@ class ManageAttachments_Controller extends Action_Controller
 
 /**
  * Function called in-between each round of attachments and avatar repairs.
- * Called by repairAttachments().
- * If repairAttachments() has more steps added, this function needs updated!
  *
+ * What it does:
+ * - Called by repairAttachments().
+ * - If repairAttachments() has more steps added, this function needs updated!
+ *
+ * @package Attachments
  * @param mixed[] $to_fix attachments to fix
  * @param int $max_substep = 0
  * @todo Move to ManageAttachments.subs.php

@@ -23,6 +23,8 @@ if (!defined('ELK'))
 /**
  * Checks if the message table already has a fulltext index created and returns the key name
  * Determines if a db is capable of creating a fulltext index
+ *
+ * @package Search
  */
 function detectFulltextIndex()
 {
@@ -79,6 +81,8 @@ function detectFulltextIndex()
 
 /**
  * Creates and outputs the Sphinx configuration file
+ *
+ * @package Search
  */
 function createSphinxConfig()
 {
@@ -234,6 +238,7 @@ searchd
 /**
  * Drop one or more indexes from a table and adds them back if specified
  *
+ * @package Search
  * @param string $table
  * @param string[]|string $indexes
  * @param boolean $add
@@ -270,6 +275,7 @@ function alterFullTextIndex($table, $indexes, $add = false)
 /**
  * Creates a custom search index
  *
+ * @package Search
  * @param int $start
  * @param int $messages_per_batch
  * @param string $column_size_definition
@@ -388,6 +394,7 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
 /**
  * Removes common stop words from the index as they inhibit search performance
  *
+ * @package Search
  * @param int $start
  * @param mixed[] $column_definition
  */
@@ -444,6 +451,8 @@ function removeCommonWordsFromIndex($start, $column_definition)
 
 /**
  * Drops the log search words table(s)
+ *
+ * @package Search
  */
 function drop_log_search_words()
 {

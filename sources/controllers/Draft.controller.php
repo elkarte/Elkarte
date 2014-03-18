@@ -143,6 +143,17 @@ class Draft_Controller extends Action_Controller
 				'sticky' => $row['is_sticky'],
 				'age' => floor((time() - $row['poster_time']) / 86400),
 				'remaining' => (!empty($modSettings['drafts_keep_days']) ? round($modSettings['drafts_keep_days'] - ((time() - $row['poster_time']) / 86400)) : 0),
+				'buttons' => array(
+					'remove' => array(
+						'href' => $scripturl . '?action=profile;u=' . $context['member']['id'] . ';area=showdrafts;delete=' . $row['id_draft'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+						'text' => $txt['draft_delete'],
+						'custom' => 'onclick="return confirm(' . JavaScriptEscape($txt['draft_remove'] . '?') . ');"',
+					),
+					'edit' => array(
+						'href' => $scripturl . '?action=post;' . (empty($row['id_topic']) ? 'board=' . $row['id_board'] : 'topic=' . $row['id_topic']) . '.0;id_draft=' . $row['id_draft'],
+						'text' => $txt['draft_edit'],
+					),
+				)
 			);
 		}
 

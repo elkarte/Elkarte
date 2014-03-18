@@ -487,7 +487,27 @@ class ModerationCenter_Controller extends Action_Controller
 				'body' => parse_bbc($row['body']),
 				'num_reports' => $row['num_reports'],
 				'closed' => $row['closed'],
-				'ignore' => $row['ignore_all']
+				'ignore' => $row['ignore_all'],
+				'buttons' => array(
+					'quickmod_check' => array(
+						'checkbox' => !$context['view_closed'],
+						'name' => 'close',
+						'value' => $row['id_report'],
+					),
+					'details' => array(
+						'href' => $scripturl . '?action=moderate;area=reports;report=' . $row['id_report'],
+						'text' => $txt['mc_reportedp_details'],
+					),
+					'ignore' => array(
+						'href' => $scripturl . '?action=moderate;area=reports' . ($context['view_closed'] ? ';sa=closed' : '') . ';ignore=' . ((int) !$row['ignore_all']) . ';rid=' . $row['id_report'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+						'text' => $row['ignore_all'] ? $txt['mc_reportedp_unignore'] : $txt['mc_reportedp_ignore'],
+						'custom' => $row['ignore_all'] ? '' : 'onclick="return confirm(' . JavaScriptEscape($txt['mc_reportedp_ignore_confirm']) . ');"',
+					),
+					'close' => array(
+						'href' => $scripturl . '?action=moderate;area=reports' . ($context['view_closed'] ? ';sa=closed' : '') . ';close=' . ((int) !$row['closed']) . ';rid=' . $row['id_report'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+						'text' => $context['view_closed'] ? $txt['mc_reportedp_open'] : $txt['mc_reportedp_close'],
+					),
+				),
 			);
 			$report_boards_ids[] = $row['id_board'];
 		}
@@ -1405,8 +1425,6 @@ class ModerationCenter_Controller extends Action_Controller
 			'templates' => array($this, 'action_viewWarningTemplates', 'permission' => 'issue_warning'),
 		);
 
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'log';
-
 		// Setup the admin tabs.
 		$context[$context['moderation_menu_name']]['tab_data'] = array(
 			'title' => $txt['mc_warnings'],
@@ -1415,7 +1433,8 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// Call the right function.
 		$action = new Action();
-		$action->initialize($subActions, 'log');
+		$subAction = $action->initialize($subActions, 'log');
+		$context['sub_action'] = $subAction;
 		$action->dispatch($subAction);
 	}
 

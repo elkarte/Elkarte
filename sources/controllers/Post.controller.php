@@ -60,7 +60,7 @@ class Post_Controller extends Action_Controller
 			unset($_REQUEST['poll']);
 
 		$post_errors = Error_Context::context('post', 1);
-		$attach_errors = attachment_Error_Context::context();
+		$attach_errors = Attachment_Error_Context::context();
 		$attach_errors->activate();
 		$first_subject = '';
 
@@ -680,16 +680,21 @@ class Post_Controller extends Action_Controller
 
 				foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 				{
+					// Skipping over these
 					if (isset($context['ignore_temp_attachments']) || isset($_SESSION['temp_attachments']['post']['files']))
 						break;
 
+					// Initial errors (such as missing directory), we can recover
 					if ($attachID != 'initial_error' && strpos($attachID, 'post_tmp_' . $user_info['id']) === false)
 						continue;
 
 					if ($attachID == 'initial_error')
 					{
-						$txt['error_attach_initial_error'] = $txt['attach_no_upload'] . '<div class="attachmenterrors">' . (is_array($attachment) ? vsprintf($txt[$attachment[0]], $attachment[1]) : $txt[$attachment]) . '</div>';
-						$attach_errors->addError('attach_initial_error');
+						if ($context['current_action'] != 'post2')
+						{
+							$txt['error_attach_initial_error'] = $txt['attach_no_upload'] . '<div class="attachmenterrors">' . (is_array($attachment) ? vsprintf($txt[$attachment[0]], $attachment[1]) : $txt[$attachment]) . '</div>';
+							$attach_errors->addError('attach_initial_error');
+						}
 						unset($_SESSION['temp_attachments']);
 						break;
 					}
@@ -697,12 +702,15 @@ class Post_Controller extends Action_Controller
 					// Show any errors which might have occurred.
 					if (!empty($attachment['errors']))
 					{
-						$txt['error_attach_errors'] = empty($txt['error_attach_errors']) ? '<br />' : '';
-						$txt['error_attach_errors'] .= vsprintf($txt['attach_warning'], $attachment['name']) . '<div class="attachmenterrors">';
-						foreach ($attachment['errors'] as $error)
-							$txt['error_attach_errors'] .= (is_array($error) ? vsprintf($txt[$error[0]], $error[1]) : $txt[$error]) . '<br  />';
-						$txt['error_attach_errors'] .= '</div>';
-						$attach_errors->addError('attach_errors');
+						if ($context['current_action'] != 'post2')
+						{
+							$txt['error_attach_errors'] = empty($txt['error_attach_errors']) ? '<br />' : '';
+							$txt['error_attach_errors'] .= vsprintf($txt['attach_warning'], $attachment['name']) . '<div class="attachmenterrors">';
+							foreach ($attachment['errors'] as $error)
+								$txt['error_attach_errors'] .= (is_array($error) ? vsprintf($txt[$error[0]], $error[1]) : $txt[$error]) . '<br  />';
+							$txt['error_attach_errors'] .= '</div>';
+							$attach_errors->addError('attach_errors');
+						}
 
 						// Take out the trash.
 						unset($_SESSION['temp_attachments'][$attachID]);
@@ -969,6 +977,7 @@ class Post_Controller extends Action_Controller
 		$context['is_new_topic'] = empty($topic);
 		$context['is_new_post'] = !isset($_REQUEST['msg']);
 		$context['is_first_post'] = $context['is_new_topic'] || (isset($_REQUEST['msg']) && $_REQUEST['msg'] == $id_first_msg);
+		$context['current_action'] = 'post';
 
 		// WYSIWYG only works if BBC is enabled
 		$modSettings['disable_wysiwyg'] = !empty($modSettings['disable_wysiwyg']) || empty($modSettings['enableBBC']);
@@ -1011,6 +1020,9 @@ class Post_Controller extends Action_Controller
 		// No need!
 		$context['robot_no_index'] = true;
 
+		// We are now in post2 action
+		$context['current_action'] = 'post2';
+
 		// Previewing? Go back to start.
 		if (isset($_REQUEST['preview']))
 			return $this->action_post();
@@ -1020,7 +1032,7 @@ class Post_Controller extends Action_Controller
 
 		// No errors as yet.
 		$post_errors = Error_Context::context('post', 1);
-		$attach_errors = attachment_Error_Context::context();
+		$attach_errors = Attachment_Error_Context::context();
 
 		// If the session has timed out, let the user re-submit their form.
 		if (checkSession('post', '', false) != '')

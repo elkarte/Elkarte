@@ -230,7 +230,7 @@ function template_build_poster_div($message, $ignoring = false)
 		// The plan is to make these buttons act sensibly, and link to your own inbox in your own posts (with new PM notification).
 		// Still has a little bit of hard-coded text. This may be a place where translators should be able to write inclusive strings,
 		// instead of dealing with $txt['by'] etc in the markup. Must be brief to work, anyway. Cannot ramble on at all.
-	
+
 		// we start with their own..
 		if ($context['can_send_pm'] && $message['is_message_author'])
 		{
@@ -257,4 +257,42 @@ function template_build_poster_div($message, $ignoring = false)
 	}
 
 	return $poster_div;
+}
+
+/**
+ * Formats a very simple message view (for example search results, list of
+ * posts and topics in profile, unapproved, etc.)
+ *
+ * @param mixed[] $msg associative array contaning the data to output:
+ *            - class => a class name (mandatory)
+ *            - counter => Usually a number used as counter next to the subject
+ *            - title => Usually the subject of the topic (mandatory)
+ *            - date => frequently the "posted on", but can be anything
+ *            - body => message body (mandatory)
+ *            - buttons => an associative array that allows create a
+ *                         "quickbutton" strip (see template_quickbutton_strip
+ *                         for details on the parameters)
+ */
+function template_simple_message($msg)
+{
+	// @todo find a better name for $msg['date']
+	echo '
+			<div class="', $msg['class'], ' core_posts">', !empty($msg['counter']) ? '
+				<div class="counter">' . $msg['counter'] . '</div>' : '', '
+				<div class="topic_details">
+					<h5>
+						', $msg['title'], '
+					</h5>', !empty($msg['date']) ? '
+					<span class="smalltext">' . $msg['date'] . '</span>' : '', '
+				</div>
+				<div class="inner">
+					', $msg['body'], '
+				</div>';
+
+	if (!empty($msg['buttons']))
+		template_quickbutton_strip($msg['buttons'], !empty($msg['tests']) ? $msg['tests'] : array());
+
+	echo '
+			</div>';
+
 }

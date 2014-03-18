@@ -162,7 +162,7 @@ elkRegister.prototype.refreshMainPassword = function(called_from_verify)
 		// Any reserved fields?
 		for (var i in this.verificationFields)
 		{
-			if (this.verificationFields.i[4] === 'reserved' && this.verificationFields.i[1].value && curPass.indexOf(this.verificationFields.i[1].value) !== -1)
+			if (this.verificationFields[i][4] === 'reserved' && this.verificationFields[i][1].value && curPass.indexOf(this.verificationFields[i][1].value) !== -1)
 				stringIndex = 'password_reserved';
 		}
 
@@ -201,7 +201,7 @@ elkRegister.prototype.refreshVerifyPassword = function()
 
 	// Check and set valid status!
 	var isValid = this.verificationFields.pwmain[1].value === this.verificationFields.pwverify[1].value && this.refreshMainPassword(true),
-			alt = this.textStrings[isValid === 1 ? 'password_valid' : 'password_no_match'] ? this.textStrings[isValid === 1 ? 'password_valid' : 'password_no_match'] : '';
+		alt = this.textStrings[isValid === 1 ? 'password_valid' : 'password_no_match'] ? this.textStrings[isValid === 1 ? 'password_valid' : 'password_no_match'] : '';
 
 	this.setVerificationImage(this.verificationFields.pwverify[2], isValid, alt);
 	this.verificationFields.pwverify[1].className = this.verificationFields.pwverify[5] + ' ' + (isValid ? 'valid_input' : 'invalid_input');

@@ -22,6 +22,8 @@ if (!defined('ELK'))
 
 /**
  * SearchAPI-Standard.class.php, Standard non full index, non custom index search
+ *
+ * @package Search
  */
 class Standard_Search
 {

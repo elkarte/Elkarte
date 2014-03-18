@@ -23,6 +23,8 @@ if (!defined('ELK'))
 
 /**
  * ManagePermissions handles all possible permission stuff.
+ *
+ * @package Permissions
  */
 class ManagePermissions_Controller extends Action_Controller
 {
@@ -34,11 +36,11 @@ class ManagePermissions_Controller extends Action_Controller
 
 	/**
 	 * Dispaches to the right function based on the given subaction.
-	 * Checks the permissions, based on the sub-action.
-	 * Called by ?action=managepermissions.
+	 *
+	 * - Checks the permissions, based on the sub-action.
+	 * - Called by ?action=managepermissions.
 	 *
 	 * @uses ManagePermissions language file.
-	 *
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
@@ -92,12 +94,8 @@ class ManagePermissions_Controller extends Action_Controller
 				'permission' => 'admin_forum'),
 		);
 
-		call_integration_hook('integrate_manage_permissions', array(&$subActions));
-
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) && empty($subActions[$_REQUEST['sa']]['disabled']) ? $_REQUEST['sa'] : (allowedTo('manage_permissions') ? 'index' : 'settings');
-
-		$context['page_title'] = $txt['permissions_title'];
-		$context['sub_action'] = $subAction;
+		// Action controller
+		$action = new Action('manage_permissions');
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -123,16 +121,25 @@ class ManagePermissions_Controller extends Action_Controller
 			),
 		);
 
-		// Call the right function for this sub-action.
-		$action = new Action();
+		// Set the subAction, taking permissions in to account
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) && empty($subActions[$_REQUEST['sa']]['disabled']) ? $_REQUEST['sa'] : (allowedTo('manage_permissions') ? 'index' : 'settings');
+
+		// Load the subactions, call integrate_manage_permissions
 		$action->initialize($subActions);
+
+		// Last items needed
+		$context['page_title'] = $txt['permissions_title'];
+		$context['sub_action'] = $subAction;
+
+		// Call the right function for this sub-action.
 		$action->dispatch($subAction);
 	}
 
 	/**
 	 * Sets up the permissions by membergroup index page.
-	 * Called by ?action=managepermissions
-	 * Creates an array of all the groups with the number of members and permissions.
+	 *
+	 * - Called by ?action=managepermissions
+	 * - Creates an array of all the groups with the number of members and permissions.
 	 *
 	 * @uses ManagePermissions language file.
 	 * @uses ManagePermissions template file.
@@ -875,8 +882,7 @@ class ManagePermissions_Controller extends Action_Controller
 
 		$config_vars = $this->_permSettings->settings();
 
-		call_integration_hook('integrate_modify_permission_settings', array(&$config_vars));
-
+		// Some items for the template
 		$context['page_title'] = $txt['permission_settings_title'];
 		$context['sub_template'] = 'show_settings';
 
@@ -939,6 +945,9 @@ class ManagePermissions_Controller extends Action_Controller
 				array('check', 'permission_enable_deny', 0, $txt['permission_settings_enable_deny'], 'help' => 'permissions_deny'),
 				array('check', 'permission_enable_postgroups', 0, $txt['permission_settings_enable_postgroups'], 'help' => 'permissions_postgroups'),
 		);
+
+		// Add new settings with a nice hook, makes them available for admin settings search as well
+		call_integration_hook('integrate_modify_permission_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

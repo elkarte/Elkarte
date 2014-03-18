@@ -22,7 +22,10 @@ if (!defined('ELK'))
 
 /**
  * This class is the administration mailing controller.
+ *
  * It handles mail configuration, it displays and allows to remove items from the mail queue.
+ *
+ * @package Mail
  */
 class ManageMail_Controller extends Action_Controller
 {
@@ -34,7 +37,9 @@ class ManageMail_Controller extends Action_Controller
 
 	/**
 	 * Main dispatcher.
-	 * This function checks permissions and passes control through to the relevant section.
+	 *
+	 * - This function checks permissions and passes control through to the relevant section.
+	 *
 	 * @see Action_Controller::action_index()
 	 * @uses Help and MangeMail language files
 	 */
@@ -54,13 +59,8 @@ class ManageMail_Controller extends Action_Controller
 			'settings' => array($this, 'action_mailSettings_display', 'permission' => 'admin_forum'),
 		);
 
-		call_integration_hook('integrate_manage_mail', array(&$subActions));
-
-		// By default we want to browse
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'browse';
-
-		$context['sub_action'] = $subAction;
-		$context['page_title'] = $txt['mailqueue_title'];
+		// Action control
+		$action = new Action('manage_mail');
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -69,14 +69,20 @@ class ManageMail_Controller extends Action_Controller
 			'description' => $txt['mailqueue_desc'],
 		);
 
+		// By default we want to browse, call integrate_manage_mail
+		$subAction = $action->initialize($subActions, 'browse');
+
+		// Final bits
+		$context['sub_action'] = $subAction;
+		$context['page_title'] = $txt['mailqueue_title'];
+
 		// Call the right function for this sub-action.
-		$action = new Action();
-		$action->initialize($subActions, 'browse');
 		$action->dispatch($subAction);
 	}
 
 	/**
 	 * Display the mail queue...
+	 *
 	 * @uses ManageMail template
 	 */
 	public function action_browse()
@@ -218,6 +224,7 @@ class ManageMail_Controller extends Action_Controller
 
 	/**
 	 * Allows to view and modify the mail settings.
+	 *
 	 * @uses show_settings sub template
 	 */
 	public function action_mailSettings_display()
@@ -241,8 +248,6 @@ class ManageMail_Controller extends Action_Controller
 		}
 
 		$config_vars = $this->_mailSettings->settings();
-
-		call_integration_hook('integrate_modify_mail_settings', array(&$config_vars));
 
 		// Saving?
 		if (isset($_GET['save']))
@@ -320,7 +325,7 @@ class ManageMail_Controller extends Action_Controller
 	{
 		global $txt, $modSettings, $txtBirthdayEmails;
 
-		// we need $txtBirthdayEmails
+		// We need $txtBirthdayEmails
 		loadLanguage('EmailTemplates');
 
 		$body = $txtBirthdayEmails[(empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']) . '_body'];
@@ -355,6 +360,9 @@ class ManageMail_Controller extends Action_Controller
 				'birthday_body' => array('var_message', 'birthday_body', 'var_message' => nl2br($body), 'disabled' => true, 'size' => ceil(strlen($body) / 25)),
 		);
 
+		// Add new settings with a nice hook, makes them available for admin settings search as well
+		call_integration_hook('integrate_modify_mail_settings', array(&$config_vars));
+
 		return $config_vars;
 	}
 
@@ -369,8 +377,8 @@ class ManageMail_Controller extends Action_Controller
 	/**
 	 * This function clears the mail queue of all emails, and at the end redirects to browse.
 	 *
-	 * Note force clearing the queue may cause a site to exceed hosting mail limit quotas
-	 * Some hosts simple loose these excess emails, others queue them server side, up to a limit
+	 * - Note force clearing the queue may cause a site to exceed hosting mail limit quotas
+	 * - Some hosts simple loose these excess emails, others queue them server side, up to a limit
 	 */
 	public function action_clear()
 	{

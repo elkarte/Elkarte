@@ -124,15 +124,19 @@ class Error_Context
 				$error = $error[0];
 
 			foreach ($this->_errors as $severity => $errors)
-				if (in_array($error, $errors))
+			{
+				if (array_key_exists($error, $errors))
 					unset($this->_errors[$severity][$error]);
+				if (empty($this->_errors[$severity]))
+					unset($this->_errors[$severity]);
+			}
 		}
 	}
 
 	/**
 	 * Return an array of errors of a certain severity.
-	 * @todo is it needed at all?
 	 *
+	 * @todo is it needed at all?
 	 * @param string|int|null $severity the severity level wanted. If null returns all the errors
 	 */
 	public function getErrors($severity = null)
@@ -198,7 +202,8 @@ class Error_Context
 
 	/**
 	 * Return an array containing the error strings
-	 * If severity is null the function returns all the errors
+	 *
+	 * - If severity is null the function returns all the errors
 	 *
 	 * @param string|null $severity the severity level wanted
 	 */
@@ -277,7 +282,7 @@ class Error_Context
 /**
  * Class Error context for attachments
  */
-class attachment_error_context
+class Attachment_Error_Context
 {
 	/**
 	 * Holds our static instance of the class
@@ -305,7 +310,8 @@ class attachment_error_context
 
 	/**
 	 * Add attachment
-	 * Automatically activate the attachments added
+	 *
+	 * - Automatically activate the attachments added
 	 *
 	 * @param string $id
 	 * @param string $name
@@ -336,7 +342,7 @@ class attachment_error_context
 	 */
 	public function activate($id = null)
 	{
-		if (empty($id) || isset($this->_attachs[$id]))
+		if (empty($id) || !isset($this->_attachs[$id]))
 			$this->_active_attach = 'generic';
 		else
 			$this->_active_attach = $id;
@@ -365,6 +371,19 @@ class attachment_error_context
 		}
 
 		$this->_attachs[$this->_active_attach]['error']->addError($error, $lang_file);
+	}
+
+	/**
+	 * Removes an error
+	 *
+	 * @param string $error error code
+	 */
+	public function removeError($error)
+	{
+		if (empty($error))
+			return;
+
+		$this->_attachs[$this->_active_attach]['error']->removeError($error);
 	}
 
 	/**
@@ -398,8 +417,9 @@ class attachment_error_context
 
 	/**
 	 * Prepare the errors for display.
-	 * Return an array containing the error strings
-	 * If severity is null the function returns all the errors
+	 *
+	 * - Return an array containing the error strings
+	 * - If severity is null the function returns all the errors
 	 *
 	 * @param int $severity = null the severity level wanted
 	 */
@@ -436,13 +456,13 @@ class attachment_error_context
 	}
 
 	/**
-	 * Find and return attachment_error_context instance if it exists,
+	 * Find and return Attachment_Error_Context instance if it exists,
 	 * or create it if it doesn't exist
 	 */
 	public static function context()
 	{
 		if (self::$_context === null)
-			self::$_context = new attachment_error_context();
+			self::$_context = new Attachment_Error_Context();
 
 		return self::$_context;
 	}

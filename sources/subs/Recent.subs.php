@@ -206,10 +206,13 @@ function getRecentPosts($messages, $start)
 				'href' => empty($row['id_member']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member'],
 				'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['poster_name'] . '</a>'
 			),
+			'body' => $row['body'],
 			'message' => $row['body'],
-			'can_reply' => false,
-			'can_mark_notify' => false,
-			'can_delete' => false,
+			'tests' => array(
+				'can_reply' => false,
+				'can_mark_notify' => false,
+				'can_delete' => false,
+			),
 			'delete_possible' => ($row['id_first_msg'] != $row['id_msg'] || $row['id_last_msg'] == $row['id_msg']) && (empty($modSettings['edit_disable_time']) || $row['poster_time'] + $modSettings['edit_disable_time'] * 60 >= time()),
 		);
 

@@ -22,6 +22,8 @@ if (!defined('ELK'))
 
 /**
  * ManageNews controller, for news administration screens.
+ *
+ * @package News
  */
 class ManageNews_Controller extends Action_Controller
 {
@@ -32,10 +34,12 @@ class ManageNews_Controller extends Action_Controller
 	protected $_newsSettings;
 
 	/**
-	 * The news dispatcher; doesn't do anything, just delegates.
-	 * This is the entrance point for all News and Newsletter screens.
-	 * Called by ?action=admin;area=news.
-	 * It does the permission checks, and calls the appropriate function
+	 * The news dispatcher / delegator
+	 *
+	 * What it does:
+	 * - This is the entrance point for all News and Newsletter screens.
+	 * - Called by ?action=admin;area=news.
+	 * - It does the permission checks, and calls the appropriate function
 	 * based on the requested sub-action.
 	 *
 	 * @see Action_Controller::action_index()
@@ -70,10 +74,8 @@ class ManageNews_Controller extends Action_Controller
 				'permission' => 'admin_forum'),
 		);
 
-		call_integration_hook('integrate_manage_news');
-
-		// Default to sub action 'main' or 'settings' depending on permissions.
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('edit_news') ? 'editnews' : (allowedTo('send_mail') ? 'mailingmembers' : 'settings'));
+		// Action control
+		$action = new Action('manage_news');
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -92,6 +94,13 @@ class ManageNews_Controller extends Action_Controller
 			),
 		);
 
+		// Default to sub action 'editnews' or 'mailingmembers' or 'settings' depending on permissions.
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('edit_news') ? 'editnews' : (allowedTo('send_mail') ? 'mailingmembers' : 'settings'));
+
+		// Give integration its shot via integrate_manage_news
+		$action->initialize($subActions, 'settings');
+
+		// Some bits for the tempalte
 		$context['page_title'] = $txt['news_title'];
 		$context['sub_action'] = $subAction;
 
@@ -100,18 +109,18 @@ class ManageNews_Controller extends Action_Controller
 			$context[$context['admin_menu_name']]['current_subsection'] = 'mailingmembers';
 
 		// Call the right function for this sub-action.
-		$action = new Action();
-		$action->initialize($subActions, 'settings');
 		$action->dispatch($subAction);
 	}
 
 	/**
 	 * Let the administrator(s) edit the news items for the forum.
-	 * It writes an entry into the moderation log.
-	 * This function uses the edit_news administration area.
-	 * Called by ?action=admin;area=news.
-	 * Requires the edit_news permission.
-	 * Can be accessed with ?action=admin;sa=editnews.
+	 *
+	 * What it does:
+	 * - It writes an entry into the moderation log.
+	 * - This function uses the edit_news administration area.
+	 * - Called by ?action=admin;area=news.
+	 * - Requires the edit_news permission.
+	 * - Can be accessed with ?action=admin;sa=editnews.
 	 */
 	public function action_editnews()
 	{
@@ -257,9 +266,11 @@ class ManageNews_Controller extends Action_Controller
 
 	/**
 	 * This function allows a user to select the membergroups to send their mailing to.
-	 * Called by ?action=admin;area=news;sa=mailingmembers.
-	 * Requires the send_mail permission.
-	 * Form is submitted to ?action=admin;area=news;mailingcompose.
+	 *
+	 * What it does:
+	 * - Called by ?action=admin;area=news;sa=mailingmembers.
+	 * - Requires the send_mail permission.
+	 * - Form is submitted to ?action=admin;area=news;mailingcompose.
 	 *
 	 * @uses the ManageNews template and email_members sub template.
 	 */
@@ -321,9 +332,11 @@ class ManageNews_Controller extends Action_Controller
 
 	/**
 	 * Shows a form to edit a forum mailing and its recipients.
-	 * Called by ?action=admin;area=news;sa=mailingcompose.
-	 * Requires the send_mail permission.
-	 * Form is submitted to ?action=admin;area=news;sa=mailingsend.
+	 *
+	 * What it does:
+	 * - Called by ?action=admin;area=news;sa=mailingcompose.
+	 * - Requires the send_mail permission.
+	 * - Form is submitted to ?action=admin;area=news;sa=mailingsend.
 	 *
 	 * @uses ManageNews template, email_members_compose sub-template.
 	 */
@@ -458,10 +471,12 @@ class ManageNews_Controller extends Action_Controller
 
 	/**
 	 * Handles the sending of the forum mailing in batches.
-	 * Called by ?action=admin;area=news;sa=mailingsend
-	 * Requires the send_mail permission.
-	 * Redirects to itself when more batches need to be sent.
-	 * Redirects to ?action=admin after everything has been sent.
+	 *
+	 * What it does:
+	 * - Called by ?action=admin;area=news;sa=mailingsend
+	 * - Requires the send_mail permission.
+	 * - Redirects to itself when more batches need to be sent.
+	 * - Redirects to ?action=admin after everything has been sent.
 	 *
 	 * @uses the ManageNews template and email_members_send sub template.
 	 * @param bool $clean_only = false; if set, it will only clean the variables, put them in context, then return.
@@ -816,8 +831,10 @@ class ManageNews_Controller extends Action_Controller
 
 	/**
 	 * Set general news and newsletter settings and permissions.
-	 * Called by ?action=admin;area=news;sa=settings.
-	 * Requires the forum_admin permission.
+	 *
+	 * What it does:
+	 * - Called by ?action=admin;area=news;sa=settings.
+	 * - Requires the forum_admin permission.
 	 *
 	 * @uses ManageNews template, news_settings sub-template.
 	 */
@@ -830,7 +847,10 @@ class ManageNews_Controller extends Action_Controller
 
 		$config_vars = $this->_newsSettings->settings();
 
-		call_integration_hook('integrate_modify_news_settings');
+		// Add some javascript at the bottom...
+		addInlineJavascript('
+			document.getElementById("xmlnews_maxlen").disabled = !document.getElementById("xmlnews_enable").checked;
+			document.getElementById("xmlnews_limit").disabled = !document.getElementById("xmlnews_enable").checked;', true);
 
 		$context['page_title'] = $txt['admin_edit_news'] . ' - ' . $txt['settings'];
 		$context['sub_template'] = 'show_settings';
@@ -838,11 +858,6 @@ class ManageNews_Controller extends Action_Controller
 		// Wrap it all up nice and warm...
 		$context['post_url'] = $scripturl . '?action=admin;area=news;save;sa=settings';
 		$context['permissions_excluded'] = array(-1);
-
-		// Add some javascript at the bottom...
-		addInlineJavascript('
-			document.getElementById("xmlnews_maxlen").disabled = !document.getElementById("xmlnews_enable").checked;
-			document.getElementById("xmlnews_limit").disabled = !document.getElementById("xmlnews_enable").checked;', true);
 
 		// Saving the settings?
 		if (isset($_GET['save']))
@@ -896,6 +911,9 @@ class ManageNews_Controller extends Action_Controller
 				array('text', 'xmlnews_maxlen', 'subtext' => $txt['xmlnews_maxlen_note'], 10),
 				array('text', 'xmlnews_limit', 'subtext' => $txt['xmlnews_limit_note'], 10),
 		);
+
+		// Add new settings with a nice hook, makes them available for admin settings search as well
+		call_integration_hook('integrate_modify_news_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

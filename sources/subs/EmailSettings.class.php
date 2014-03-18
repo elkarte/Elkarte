@@ -18,11 +18,14 @@ if (!defined('ELK'))
 
 /**
  * Similar in construction to saveDBSettings,
+ *
  * - Saves the config_vars to a specified table instead of a file
  * - Var names are considered the table col names,
  * - Values are cast per config vars
  * - If editing a row, the primary col index and existing index value must be
  *   supplied (editid and editname), otherwise a new row will be added
+ *
+ * @package Maillist
  */
 class MaillistSettingsClass extends Settings_Form
 {

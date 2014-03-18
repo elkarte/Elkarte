@@ -49,10 +49,8 @@ class PostModeration_Controller extends Action_Controller
 		);
 
 		// Pick something valid...
-		$subAction = !isset($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]) ? 'replies' : $_REQUEST['sa'];
-
 		$action = new Action();
-		$action->initialize($subActions, 'replies');
+		$subAction = $action->initialize($subActions, 'replies');
 		$action->dispatch($subAction);
 	}
 
@@ -62,8 +60,6 @@ class PostModeration_Controller extends Action_Controller
 	public function action_unapproved()
 	{
 		global $txt, $scripturl, $context, $user_info;
-
-		$db = database();
 
 		$context['current_view'] = isset($_GET['sa']) && $_GET['sa'] == 'topics' ? 'topics' : 'replies';
 		$context['page_title'] = $txt['mc_unapproved_posts'];
@@ -126,27 +122,31 @@ class PostModeration_Controller extends Action_Controller
 			checkSession('request');
 
 			require_once(SUBSDIR . '/Topic.subs.php');
+			require_once(SUBSDIR . '/Messages.subs.php');
 
 			// Handy shortcut.
 			$any_array = $curAction == 'approve' ? $approve_boards : $delete_any_boards;
 
 			// Now for each message work out whether it's actually a topic, and what board it's on.
-			$request = $db->query('', '
-				SELECT m.id_msg, m.id_member, m.id_board, m.subject, t.id_topic, t.id_first_msg, t.id_member_started
-				FROM {db_prefix}messages AS m
-					INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
-				LEFT JOIN {db_prefix}boards AS b ON (t.id_board = b.id_board)
-				WHERE m.id_msg IN ({array_int:message_list})
-					AND m.approved = {int:not_approved}
-					AND {query_see_board}',
+			$request = loadMessageDetails(
+				array('m.id_board', 't.id_topic', 't.id_first_msg', 't.id_member_started'),
+				array(
+					'INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)',
+					'LEFT JOIN {db_prefix}boards AS b ON (t.id_board = b.id_board)'
+				),
 				array(
 					'message_list' => $toAction,
 					'not_approved' => 0,
+				),
+				array(
+					'additional_conditions' => '
+					AND m.approved = {int:not_approved}
+					AND {query_see_board}'
 				)
 			);
 			$toAction = array();
 			$details = array();
-			while ($row = $db->fetch_assoc($request))
+			foreach ($request as $row)
 			{
 				// If it's not within what our view is ignore it...
 				if (($row['id_msg'] == $row['id_first_msg'] && $context['current_view'] != 'topics') || ($row['id_msg'] != $row['id_first_msg'] && $context['current_view'] != 'replies'))
@@ -182,7 +182,6 @@ class PostModeration_Controller extends Action_Controller
 				$details[$anItem]["member"] = ($context['current_view'] == 'topics') ? $row['id_member_started'] : $row['id_member'];
 				$details[$anItem]["board"] = $row['id_board'];
 			}
-			$db->free_result($request);
 
 			// If we have anything left we can actually do the approving (etc).
 			if (!empty($toAction))
@@ -225,73 +224,34 @@ class PostModeration_Controller extends Action_Controller
 		}
 
 		// Get all unapproved posts.
-		$request = $db->query('', '
-			SELECT m.id_msg, m.id_topic, m.id_board, m.subject, m.body, m.id_member,
-				IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.smileys_enabled,
-				t.id_member_started, t.id_first_msg, b.name AS board_name, c.id_cat, c.name AS cat_name
-			FROM {db_prefix}messages AS m
-				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
-				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
-				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-				LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)
-			WHERE m.approved = {int:not_approved}
-				AND t.id_first_msg ' . ($context['current_view'] == 'topics' ? '=' : '!=') . ' m.id_msg
-				AND {query_see_board}
-				' . $approve_query . '
-			LIMIT ' . $context['start'] . ', 10',
-			array(
-				'not_approved' => 0,
-			)
-		);
-		$context['unapproved_items'] = array();
-		for ($i = 1; $row = $db->fetch_assoc($request); $i++)
-		{
-			// Can delete is complicated, let's solve it first... is it their own post?
-			if ($row['id_member'] == $user_info['id'] && ($delete_own_boards == array(0) || in_array($row['id_board'], $delete_own_boards)))
-				$can_delete = true;
-			// Is it a reply to their own topic?
-			elseif ($row['id_member'] == $row['id_member_started'] && $row['id_msg'] != $row['id_first_msg'] && ($delete_own_replies == array(0) || in_array($row['id_board'], $delete_own_replies)))
-				$can_delete = true;
-			// Someone elses?
-			elseif ($row['id_member'] != $user_info['id'] && ($delete_any_boards == array(0) || in_array($row['id_board'], $delete_any_boards)))
-				$can_delete = true;
-			else
-				$can_delete = false;
+		$context['unapproved_items'] = getUnapprovedPosts($approve_query, $context['current_view'], array(
+			'delete_own_boards' => $delete_own_boards,
+			'delete_any_boards' => $delete_any_boards,
+			'delete_own_replies' => $delete_own_replies,
+		), $context['start'], 10);
 
-			$context['unapproved_items'][] = array(
-				'id' => $row['id_msg'],
-				'alternate' => $i % 2,
-				'counter' => $context['start'] + $i,
-				'href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
-				'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
-				'subject' => $row['subject'],
-				'body' => parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']),
-				'time' => standardTime($row['poster_time']),
-				'html_time' => htmlTime($row['poster_time']),
-				'timestamp' => forum_time(true, $row['poster_time']),
-				'poster' => array(
-					'id' => $row['id_member'],
-					'name' => $row['poster_name'],
-					'link' => $row['id_member'] ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['poster_name'] . '</a>' : $row['poster_name'],
-					'href' => $scripturl . '?action=profile;u=' . $row['id_member'],
+		foreach ($context['unapproved_items'] as $key => $item)
+		{
+			$context['unapproved_items'][$key]['buttons'] = array(
+				'quickmod_check' => array(
+					'checkbox' => true,
+					'name' => 'item',
+					'value' => $item['id'],
 				),
-				'topic' => array(
-					'id' => $row['id_topic'],
-				),
-				'board' => array(
-					'id' => $row['id_board'],
-					'name' => $row['board_name'],
-					'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['board_name'] . '</a>',
-				),
-				'category' => array(
-					'id' => $row['id_cat'],
-					'name' => $row['cat_name'],
-					'link' => '<a href="' . $scripturl . '#c' . $row['id_cat'] . '">' . $row['cat_name'] . '</a>',
-				),
-				'can_delete' => $can_delete,
+					'approve' => array(
+						'href' => $scripturl . '?action=moderate;area=postmod;sa=' . $context['current_view'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';approve=' . $item['id'],
+						'text' => $txt['approve'],
+					),
+					'unapprove' => array(
+						'href' => $scripturl . '?action=moderate;area=postmod;sa=' . $context['current_view'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';delete=' . $item['id'],
+						'text' => $txt['remove'],
+						'test' => 'can_delete',
+					),
+			);
+			$context['unapproved_items'][$key]['tests'] = array(
+				'can_delete' => $item['can_delete']
 			);
 		}
-		$db->free_result($request);
 
 		$context['sub_template'] = 'unapproved_posts';
 	}

@@ -34,6 +34,7 @@ if (!defined('ELK'))
  * Make the call, accepts a string of data and returns it formatted
  * - $body = $formatter->reflow($body, '', $html);
  *
+ * @package Maillist
  */
 class Email_Format
 {
@@ -45,7 +46,7 @@ class Email_Format
 
 	/**
 	 * The full message section broken in to parts
-	 * @var mixe[]
+	 * @var mixed[]
 	 */
 	private $_body_array = array();
 
@@ -126,7 +127,8 @@ class Email_Format
 
 	/**
 	 * Main routine, calls the need functions in the order needed
-	 * Returns a formated string
+	 *
+	 * - Returns a formated string
 	 *
 	 * @param string $data
 	 * @param boolean $html
@@ -152,7 +154,8 @@ class Email_Format
 
 	/**
 	 * Takes a string of data and creates a line by line array broken on newlines
-	 * Builds all needed details for each array element, including length, if its
+	 *
+	 * - Builds all needed details for each array element, including length, if its
 	 * in a quote (&depth) code (&depth) or list (bbc or plain) etc.
 	 *
 	 * @param string $data
@@ -198,7 +201,7 @@ class Email_Format
 	 * Goes through the message array and only inserts line feeds (breaks) where
 	 * they are needed, allowing all other text to flow in one line.
 	 *
-	 * Insets breaks at blank lines, around bbc quote/code/list, text lists,
+	 * - Insets breaks at blank lines, around bbc quote/code/list, text lists,
 	 * signature lines and end of paragraphs ... all assuming it can figure or
 	 * best guess those areas.
 	 */
@@ -364,7 +367,8 @@ class Email_Format
 
 	/**
 	 * Checks if a string is the start or end of a bbc [quote] line
-	 * Keeps track of the tag depth
+	 *
+	 * - Keeps track of the tag depth
 	 *
 	 * @param string $var
 	 */
@@ -400,7 +404,8 @@ class Email_Format
 
 	/**
 	 * Checks if a string is the start or end of a bbc [code] tag
-	 * Keeps track of the tag depth
+	 *
+	 * - Keeps track of the tag depth
 	 *
 	 * @param string $var
 	 */
@@ -419,7 +424,8 @@ class Email_Format
 
 	/**
 	 * Checks if a string is the start or end of a bbc [list] tag
-	 * Keeps track of the tag depth
+	 *
+	 * - Keeps track of the tag depth
 	 *
 	 * @param string $var
 	 */
@@ -451,9 +457,9 @@ class Email_Format
 	}
 
 	/**
-	 * Callback function for array_walk
+	 * Callback function for array_walk to remove spaces
 	 *
-	 * &nbsp; can be translated to 0xA0, or in UTF8 as chr(0xC2).chr(0xA0)
+	 * - &nbsp; can be translated to 0xA0, or in UTF8 as chr(0xC2).chr(0xA0)
 	 * this function looks to remove all of those in any form.  Needed because
 	 * email is often has its character set mangled.
 	 *

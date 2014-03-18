@@ -16,6 +16,8 @@ if (!defined('ELK'))
 /**
  * Drafts administration controller.
  * This class allows to modify admin drafts settings for the forum.
+ *
+ * @package Drafts
  */
 class ManageDrafts_Controller extends Action_Controller
 {
@@ -44,8 +46,9 @@ class ManageDrafts_Controller extends Action_Controller
 
 	/**
 	 * Modify any setting related to drafts.
-	 * Requires the admin_forum permission.
-	 * Accessed from ?action=admin;area=managedrafts
+	 *
+	 * - Requires the admin_forum permission.
+	 * - Accessed from ?action=admin;area=managedrafts
 	 *
 	 * @uses Admin template, edit_topic_settings sub-template.
 	 */
@@ -75,6 +78,8 @@ class ManageDrafts_Controller extends Action_Controller
 		{
 			checkSession();
 
+			call_integration_hook('integrate_save_drafts_settings', array(&$config_vars));
+
 			// Protect them from themselves.
 			$_POST['drafts_autosave_frequency'] = $_POST['drafts_autosave_frequency'] < 30 ? 30 : $_POST['drafts_autosave_frequency'];
 			Settings_Form::save_db($config_vars);
@@ -92,7 +97,7 @@ class ManageDrafts_Controller extends Action_Controller
 			function toggle()
 			{
 				var select_elem = document.getElementById(\'drafts_autosave_frequency\');
-				
+
 				select_elem.disabled = !autosave.checked;
 			}', true);
 
@@ -137,6 +142,8 @@ class ManageDrafts_Controller extends Action_Controller
 				array('check', 'drafts_autosave_enabled', 'subtext' => $txt['drafts_autosave_enabled_subnote']),
 				array('int', 'drafts_autosave_frequency', 'postinput' => $txt['manageposts_seconds'], 'subtext' => $txt['drafts_autosave_frequency_subnote']),
 		);
+
+		call_integration_hook('integrate_modify_drafts_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

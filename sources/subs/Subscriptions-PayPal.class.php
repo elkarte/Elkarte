@@ -20,6 +20,8 @@ if (!defined('ELK'))
 
 /**
  * Class for returning available form data for this gateway
+ *
+ * @package Subscriptions
  */
 class paypal_display
 {
@@ -61,8 +63,6 @@ class paypal_display
 	}
 
 	/**
-	 * What do we want?
-	 *
 	 * Called from Profile-Actions.php to return a unique set of fields for the given gateway
 	 * plus all the standard ones for the subscription form
 	 *
@@ -135,6 +135,8 @@ class paypal_display
 
 /**
  * Class of functions to validate a IPN response and provide details of the payment
+ *
+ * @package Subscriptions
  */
 class paypal_payment
 {
@@ -173,11 +175,11 @@ class paypal_payment
 
 	/**
 	 * Post the IPN data received back to paypal for validation
-	 * Sends the complete unaltered message back to PayPal. The message must contain the same fields
-	 * in the same order and be encoded in the same way as the original message
-	 * PayPal will respond back with a single word, which is either VERIFIED if the message originated with PayPal or INVALID
 	 *
-	 * If valid returns the subscription and member IDs we are going to process if it passes
+	 * - Sends the complete unaltered message back to PayPal.
+	 * - The message must contain the same fields in the same order and be encoded in the same way as the original message
+	 * - PayPal will respond back with a single word, which is either VERIFIED if the message originated with PayPal or INVALID
+	 * - If valid returns the subscription and member IDs we are going to process if it passes
 	 *
 	 * @return string
 	 */

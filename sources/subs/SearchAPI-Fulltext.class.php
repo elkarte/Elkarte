@@ -22,6 +22,8 @@ if (!defined('ELK'))
 
 /**
  * SearchAPI-Fulltext.class.php, Fulltext API, used when an SQL fulltext index is used
+ *
+ * @package Search
  */
 class Fulltext_Search
 {
@@ -137,7 +139,7 @@ class Fulltext_Search
 	}
 
 	/**
-	 * callback function for usort used to sort the fulltext results.
+	 * Callback function for usort used to sort the fulltext results.
 	 * the order of sorting is: large words, small words, large words that
 	 * are excluded from the search, small words that are excluded.
 	 *

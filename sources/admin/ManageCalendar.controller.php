@@ -23,6 +23,8 @@ if (!defined('ELK'))
 /**
  * This class controls execution for actions in the manage calendar area
  * of the admin panel.
+ *
+ * @package Calendar
  */
 class ManageCalendar_Controller extends Action_Controller
 {
@@ -58,10 +60,6 @@ class ManageCalendar_Controller extends Action_Controller
 			'settings' => array($this, 'action_calendarSettings_display', 'permission' => 'admin_forum')
 		);
 
-		call_integration_hook('integrate_manage_calendar', array(&$subActions));
-
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'holidays';
-
 		// Set up the two tabs here...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['manage_calendar'],
@@ -76,8 +74,13 @@ class ManageCalendar_Controller extends Action_Controller
 				),
 			),
 		);
+
+		call_integration_hook('integrate_manage_calendar', array(&$subActions));
+
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'holidays';
 		$context['sub_action'] = $subAction;
 
+		// Off we go
 		$action = new Action();
 		$action->initialize($subActions, 'settings');
 		$action->dispatch($subAction);
@@ -260,7 +263,8 @@ class ManageCalendar_Controller extends Action_Controller
 
 	/**
 	 * Show and allow to modify calendar settings.
-	 * The method uses a Settings_Form to do the work.
+	 *
+	 * - The method uses a Settings_Form to do the work.
 	 */
 	public function action_calendarSettings_display()
 	{
@@ -270,8 +274,6 @@ class ManageCalendar_Controller extends Action_Controller
 		$this->_initCalendarSettingsForm();
 
 		$config_vars = $this->_calendarSettings->settings();
-
-		call_integration_hook('integrate_modify_calendar_settings', array(&$config_vars));
 
 		// Get the settings template fired up.
 		require_once(SUBSDIR . '/Settings.class.php');
@@ -370,6 +372,9 @@ class ManageCalendar_Controller extends Action_Controller
 				array('check', 'cal_allowspan'),
 				array('int', 'cal_maxspan', 6, 'postinput' => $txt['days_word']),
 		);
+
+		// Add new settings with a nice hook, makes them available for admin settings search as well
+		call_integration_hook('integrate_modify_calendar_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

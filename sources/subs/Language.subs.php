@@ -16,6 +16,8 @@ if (!defined('ELK'))
 
 /**
  * Removes the given language from all members..
+ *
+ * @package Languages
  * @param int $lang_id
  */
 function removeLanguageFromMember($lang_id)
@@ -35,7 +37,10 @@ function removeLanguageFromMember($lang_id)
 
 /**
  * How many languages?
- * Callback for the list in action_edit().
+ *
+ * - Callback for the list in action_edit().
+ *
+ * @package Languages
  */
 function list_getNumLanguages()
 {
@@ -44,9 +49,13 @@ function list_getNumLanguages()
 
 /**
  * Fetch the actual language information.
- * Callback for $listOptions['get_items']['function'] in action_edit.
- * Determines which languages are available by looking for the "index.{language}.php" file.
- * Also figures out how many users are using a particular language.
+ *
+ * What it does:
+ * - Callback for $listOptions['get_items']['function'] in action_edit.
+ * - Determines which languages are available by looking for the "index.{language}.php" file.
+ * - Also figures out how many users are using a particular language.
+ *
+ * @package Languages
  */
 function list_getLanguages()
 {
@@ -118,6 +127,7 @@ function list_getLanguages()
 /**
  * This function cleans language entries to/from display.
  *
+ * @package Languages
  * @param string $string
  * @param boolean $to_display
  */
@@ -326,8 +336,10 @@ function cleanLangString($string, $to_display = true)
 
 /**
  * Gets a list of available languages from the mother ship
- * Will return a subset if searching, otherwise all available
  *
+ * - Will return a subset if searching, otherwise all available
+ *
+ * @package Languages
  * @return string
  */
 function list_getLanguagesList()

@@ -17,11 +17,15 @@ if (!defined('ELK'))
 /**
  * AddonSettings controller handles administration settings added
  * in the common area for all addons in admin panel.
- * Some addons will define their own areas, but for simple cases,
+ *
+ * What it does:
+ *  - Some addons will define their own areas, but for simple cases,
  * when you have only a setting or two, this area will allow you
  * to hook into it seamlessly, and your additions will be sent
  * to admin search and otherwise benefit from admin areas security,
  * checks and display.
+ *
+ * @package AddonSettings
  */
 class AddonSettings_Controller extends Action_Controller
 {
@@ -43,21 +47,15 @@ class AddonSettings_Controller extends Action_Controller
 		loadLanguage('Help');
 		loadLanguage('ManageSettings');
 
+		// Our tidy subActions array
 		$subActions = array(
 			'general' => array($this, 'action_addonSettings_display', 'permission' => 'admin_forum'),
 		);
-
-		// Make it easier for addons to add new areas.
-		call_integration_hook('integrate_modify_modifications', array(&$subActions));
-
-		// Pick the correct sub-action.
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'general';
 
 		// @FIXME
 		// $this->loadGeneralSettingParameters($subActions, 'general');
 		$context['page_title'] = $txt['admin_modifications'];
 		$context['sub_template'] = 'show_settings';
-		$context['sub_action'] = $subAction;
 		// END $this->loadGeneralSettingParameters();
 
 		// Load up all the tabs...
@@ -71,9 +69,14 @@ class AddonSettings_Controller extends Action_Controller
 			),
 		);
 
+		// Set up the action controller
+		$action = new Action('modify_modifications');
+
+		// Pick the correct sub-action, call integrate_modify_modifications
+		$subAction = $action->initialize($subActions, 'general');
+		$context['sub_action'] = $subAction;
+
 		// Call the right function for this sub-action.
-		$action = new Action();
-		$action->initialize($subActions, 'general');
 		$action->dispatch($subAction);
 	}
 
@@ -135,7 +138,6 @@ class AddonSettings_Controller extends Action_Controller
 
 	/**
 	 * Retrieve any custom admin settings for or from addons.
-	 * This method is used by admin search.
 	 */
 	private function _settings()
 	{
@@ -148,7 +150,7 @@ class AddonSettings_Controller extends Action_Controller
 	}
 
 	/**
-	 * Public method to return avatar settings for search
+	 * Public method to return admin settings for search
 	 */
 	public function settings_search()
 	{
@@ -157,10 +159,10 @@ class AddonSettings_Controller extends Action_Controller
 
 	/**
 	 * This function makes sure the requested subaction does exist,
-	 *  if it doesn't, it sets a default action or.
+	 * if it doesn't, it sets a default action or.
 	 *
-	 * @param mixed[] $subActions = array() An array containing all possible subactions.
-	 * @param string $defaultAction = '' the default action to be called if no valid subaction was found.
+	 * @param mixed[] $subActions An array containing all possible subactions.
+	 * @param string $defaultAction the default action to be called if no valid subaction was found.
 	 */
 	public function loadGeneralSettingParameters($subActions = array(), $defaultAction = '')
 	{

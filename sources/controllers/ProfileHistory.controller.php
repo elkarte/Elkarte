@@ -52,13 +52,6 @@ class ProfileHistory_Controller extends Action_Controller
 			'logins' => array('controller' => $this, 'function' => 'action_tracklogin', 'label' => $txt['trackLogins']),
 		);
 
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'activity';
-
-		// Set up action/subaction stuff.
-		$action = new Action();
-		$action->initialize($subActions, 'activity');
-		$context['sub_action'] = $subAction;
-
 		// Create the tabs for the template.
 		$context[$context['profile_menu_name']]['tab_data'] = array(
 			'title' => $txt['history'],
@@ -70,6 +63,11 @@ class ProfileHistory_Controller extends Action_Controller
 				'edits' => array(),
 			),
 		);
+
+		// Set up action/subaction stuff.
+		$action = new Action();
+		$subAction = $action->initialize($subActions, 'activity');
+		$context['sub_action'] = $subAction;
 
 		// Moderation must be on to track edits.
 		if (empty($modSettings['modlog_enabled']))

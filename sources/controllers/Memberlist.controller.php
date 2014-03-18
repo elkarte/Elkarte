@@ -71,7 +71,7 @@ class Memberlist_Controller extends Action_Controller
 		$context['columns'] = array(
 			'online' => array(
 				'label' => $txt['status'],
-				'width' => 60,
+				'class' => 'status',
 				'sort' => array(
 					'down' => allowedTo('moderate_forum') ? 'IFNULL(lo.log_time, 1) ASC, real_name ASC' : 'CASE WHEN mem.show_online THEN IFNULL(lo.log_time, 1) ELSE 1 END ASC, real_name ASC',
 					'up' => allowedTo('moderate_forum') ? 'IFNULL(lo.log_time, 1) DESC, real_name DESC' : 'CASE WHEN mem.show_online THEN IFNULL(lo.log_time, 1) ELSE 1 END DESC, real_name DESC'
@@ -79,7 +79,7 @@ class Memberlist_Controller extends Action_Controller
 			),
 			'real_name' => array(
 				'label' => $txt['username'],
-				'class' => "lefttext",
+				'class' => 'lefttext username',
 				'sort' => array(
 					'down' => 'mem.real_name DESC',
 					'up' => 'mem.real_name ASC'
@@ -87,6 +87,7 @@ class Memberlist_Controller extends Action_Controller
 			),
 			'email_address' => array(
 				'label' => $txt['email'],
+				'class' => 'email',
 				'sort' => array(
 					'down' => allowedTo('moderate_forum') ? 'mem.email_address DESC' : 'mem.hide_email DESC, mem.email_address DESC',
 					'up' => allowedTo('moderate_forum') ? 'mem.email_address ASC' : 'mem.hide_email ASC, mem.email_address ASC'
@@ -94,6 +95,7 @@ class Memberlist_Controller extends Action_Controller
 			),
 			'website_url' => array(
 				'label' => $txt['website'],
+				'class' => 'website',
 				'link_with' => 'website',
 				'sort' => array(
 					'down' => 'LENGTH(mem.website_url) > 0 ASC, IFNULL(mem.website_url, 1=1) DESC, mem.website_url DESC',
@@ -102,7 +104,7 @@ class Memberlist_Controller extends Action_Controller
 			),
 			'id_group' => array(
 				'label' => $txt['position'],
-				'class' => "lefttext",
+				'class' => 'lefttext group',
 				'sort' => array(
 					'down' => 'IFNULL(mg.group_name, 1=1) DESC, mg.group_name DESC',
 					'up' => 'IFNULL(mg.group_name, 1=1) ASC, mg.group_name ASC'
@@ -110,7 +112,7 @@ class Memberlist_Controller extends Action_Controller
 			),
 			'date_registered' => array(
 				'label' => $txt['date_registered'],
-				'class' => "lefttext",
+				'class' => 'lefttext date_registered',
 				'sort' => array(
 					'down' => 'mem.date_registered DESC',
 					'up' => 'mem.date_registered ASC'
@@ -118,6 +120,7 @@ class Memberlist_Controller extends Action_Controller
 			),
 			'posts' => array(
 				'label' => $txt['posts'],
+				'class' => 'posts',
 				'default_sort_rev' => true,
 				'sort' => array(
 					'down' => 'mem.posts DESC',
@@ -257,6 +260,8 @@ class Memberlist_Controller extends Action_Controller
 
 			$context['columns'][$col]['link'] = '<a href="' . $context['columns'][$col]['href'] . '" rel="nofollow">' . $context['columns'][$col]['label'] . '</a>';
 			$context['columns'][$col]['selected'] = $_REQUEST['sort'] == $col;
+			if ($context['columns'][$col]['selected'])
+				$context['columns'][$col]['class'] .= ' selected';
 		}
 
 		// Are we sorting the results

@@ -108,7 +108,7 @@ elk_AdminIndex.prototype.showCurrentVersion = function ()
 			if (adminIndex.opt.bLoadAnnouncements)
 				adminIndex.setAnnouncement(elem);
 		});
-		elkVersion = mostRecent.name;
+		elkVersion = mostRecent.name.replace(/elkarte/i, '').trim();
 
 		oElkVersionContainer.innerHTML = elkVersion;
 		if (sCurrentVersion !== elkVersion)
@@ -920,7 +920,7 @@ function testFTPResults(oXMLDoc)
 	// Results show we were a success
 	if (results.length > 0)
 	{
-		if (results[0].getAttribute('success') === 1)
+		if (parseInt(results[0].getAttribute('success')) === 1)
 			wasSuccess = true;
 		message = results[0].firstChild.nodeValue;
 	}
