@@ -394,12 +394,6 @@ h2 a.collapse {
 	left: auto;
 	right: 3px;
 }
-/* Quick edit is a special case. */
-.quickbuttons .quick_edit img {
-	left: auto;
-	right: 0;
-	padding: 40px 4px 40px 5em;
-}
 /* Quickbutton and follow ups drop menus. */
 .quickbuttons .menulevel2, .follow_ups  .menulevel2 {
 	text-align: right;

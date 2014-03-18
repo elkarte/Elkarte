@@ -1269,8 +1269,9 @@ a.bbc_link {
 .like_button:before {background-position: 0 -384px;}
 .unlike_button:before {background-position: 0 -408px;}
 .likes_button:before {background-position: 0 -432px;}
+.quick_edit:before {background-position: 0 -456px;}
 /* No icon here. */
-.quick_edit .linklevel1:before, .linklevel1.post_options:before,
+.linklevel1.post_options:before,
 .follow_ups .linklevel1:before {
 	display: none;
 }
@@ -1281,18 +1282,6 @@ a.bbc_link {
 /* Follow ups gets custom padding (no icon). */
 .follow_ups .linklevel1 {
 	padding: 1px 6px 0 6px;
-}
-/* Quick edit is a special case. */
-.quickbuttons .quick_edit .linklevel1 {
-	position: relative;
-	overflow: hidden;
-}
-.quickbuttons .quick_edit img {
-	position: absolute;
-	top: 50%;
-	left: 0;
-	margin-top: -48px;
-	padding: 40px 5em 40px 4px;
 }
 /* Quickbutton and follow ups drop menus. */
 .quickbuttons .menulevel2, .follow_ups  .menulevel2 {
