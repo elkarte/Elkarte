@@ -47,7 +47,6 @@ $txt['ml_admin_configuration'] = 'Maillist Configuration';
 $txt['ml_configuration_desc'] = 'This section allows you to set some preferences for all posting by email related activities';
 $txt['ml_email'] = 'Post by Email';
 $txt['ml_emailerror_none'] = 'There are no failed entries requiring moderation';
-$txt['ml_email_desc'] = 'This section allows you to set some preferences for post by email related activities'; // redundant? s.a.
 $txt['ml_site_settings'] = 'Site Email Details';
 $txt['ml_emailerror'] = 'Failed Emails';
 $txt['ml_emailfilters'] = 'Filters';
@@ -86,7 +85,7 @@ $txt['maillist_mail_from_post'] = 'e.g. noreply@yourdomain.com';
 // Imap settings
 $txt['maillist_imap'] = 'IMAP Settings';
 $txt['maillist_imap_host'] = 'Mailbox Server Name';
-$txt['maillist_imap_host_desc'] = 'Enter a server name, optional port. For example: imap.gmail.com:993';
+$txt['maillist_imap_host_desc'] = 'Enter a server name and :optional port. For example: imap.gmail.com';
 $txt['maillist_imap_mailbox'] = 'Mailbox Name';
 $txt['maillist_imap_mailbox_desc'] = 'Enter a mailbox name on the server. For example: INBOX';
 $txt['maillist_imap_uid'] = 'Mailbox Username';
