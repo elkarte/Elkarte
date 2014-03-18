@@ -55,7 +55,9 @@ $txt['mc_reportedp_open'] = 'Öffnen';
 $txt['mc_reportedp_ignore'] = 'Verwerfen';
 $txt['mc_reportedp_unignore'] = 'Erneut öffnen';
 // Do not use numeric entries in the below string.
-$txt['mc_reportedp_ignore_confirm'] = 'Sind Sie sich sicher, dass Sie weitere Meldungen zu dieser Nachricht verwerfen und ignorieren möchten?\\n\\nDies wird für alle Moderatoren dieses Forums gelten.';
+$txt['mc_reportedp_ignore_confirm'] = 'Sind Sie sich sicher, dass Sie weitere Meldungen zu dieser Nachricht verwerfen und ignorieren möchten?
+
+Dies wird für alle Moderatoren dieses Forums gelten.';
 $txt['mc_reportedp_close_selected'] = 'Ausgewählte schließen';
 
 $txt['mc_groupr_group'] = 'Benutzergruppen';

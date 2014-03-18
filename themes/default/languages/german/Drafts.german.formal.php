@@ -20,6 +20,7 @@ $txt['draft_saved_on'] = 'Entwurf zuletzt gespeichert';
 $txt['draft_days_ago'] = 'vor %s Tagen';
 $txt['draft_retain'] = 'dies wird noch %s Tage behalten';
 $txt['draft_remove'] = 'Diesen Entwurf löschen';
+$txt['draft_remove_selected'] = 'Alle ausgewählten Entwürfe löschen?';
 $txt['draft_saved'] = 'Der Inhalt wurde als Entwurf gespeichert und wird im <a href="%1$s">Entwurfsbereich</a> Ihres Profils abrufbar sein.';
 $txt['draft_pm_saved'] = 'Der Inhalt wurde als Entwurf gespeichert und wird im <a href="%1$s">Entwurfsbereich</a> Ihres Nachrichtenzentrums abrufbar sein.';
 

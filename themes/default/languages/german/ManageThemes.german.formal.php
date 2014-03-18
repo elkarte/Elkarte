@@ -1,6 +1,5 @@
 <?php
-// Version: 1.0; Themes
-// translator note: ewww...
+// Version: 1.0; ManageThemes
 
 $txt['themeadmin_explain'] = 'Designs sind die verschiedenen Oberflächen Ihres Forums. Diese Einstellungen beeinflussen Aussehen und Auswahl von Designs für Gäste und Mitglieder.';
 

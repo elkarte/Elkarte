@@ -1,4 +1,5 @@
 <?php
+// Version: 1.0; Maillist
 
 // Email posting errors
 $txt['error_locked'] = 'Dieses Thema wurde gesperrt, es können keine weiteren Antworten geschrieben werden';
