@@ -26,6 +26,7 @@ var ua = navigator.userAgent.toLowerCase(),
 	is_chrome = !!window.chrome, // Chrome 1+, Opera 15+
 	is_ie = !!document.documentMode, // IE8+
 	is_webkit = ua.indexOf('applewebkit') !== -1;
+	is_osx = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
 
 // Versions of ie < 9 do not have this built in
 if (!('getElementsByClassName' in document))

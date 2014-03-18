@@ -218,8 +218,6 @@ class ManagePosts_Controller extends Action_Controller
 
 		$config_vars = $this->_postSettings->settings();
 
-		call_integration_hook('integrate_modify_post_settings', array(&$config_vars));
-
 		// Setup the template.
 		$context['page_title'] = $txt['manageposts_settings'];
 		$context['sub_template'] = 'show_settings';
@@ -305,6 +303,9 @@ class ManagePosts_Controller extends Action_Controller
 				array('select', 'message_index_preview', array($txt['message_index_preview_off'], $txt['message_index_preview_first'], $txt['message_index_preview_last'])),
 				array('int', 'preview_characters', 'subtext' => $txt['preview_characters_zero'], 'postinput' => $txt['preview_characters_units']),
 		);
+
+		// Add new settings with a nice hook, makes them available for admin settings search as well
+		call_integration_hook('integrate_modify_post_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

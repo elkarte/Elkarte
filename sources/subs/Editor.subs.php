@@ -235,9 +235,9 @@ function create_control_richedit($editorOptions)
 			'space',
 		);
 		$context['bbc_tags']['row2'] = array(
-			'bulletlist', 'orderedlist', 'horizontalrule',
+			'quote', 'code', 'table',
 			'space',
-			'table', 'code', 'quote',
+			'bulletlist', 'orderedlist', 'horizontalrule',
 			'space',
 			'spoiler', 'footnote',
 			'space',
@@ -504,7 +504,7 @@ function create_control_richedit($editorOptions)
 		editor_id: \'' . $editorOptions['id'] . '\',
 		editor: ' . JavaScriptEscape('
 		(function () {
-			return $("#' . $editorOptions['id'] . '").data("sceditor").val();
+			return $editor_data[' . $editorOptions['id'] . '].val();
 		});') . '
 	});', true);
 	}

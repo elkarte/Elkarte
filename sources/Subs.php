@@ -1145,7 +1145,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			),
 			array(
 				'tag' => 'pre',
-				'before' => '<pre>',
+				'before' => '<pre class="bbc_pre">',
 				'after' => '</pre>',
 			),
 			array(
@@ -1334,10 +1334,10 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			'@' => 'disc',
 			'+' => 'square',
 			'x' => 'square',
-			'#' => 'square',
+			'#' => 'decimal',
+			'0' => 'decimal',
 			'o' => 'circle',
 			'O' => 'circle',
-			'0' => 'circle',
 		);
 		if (!isset($disabled['li']) && !isset($disabled['list']))
 		{
@@ -1810,7 +1810,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 					'require_children' => array('li'),
 					'disallow_children' => isset($inside['disallow_children']) ? $inside['disallow_children'] : null,
 				);
-				$code = '<ul class="bbc_list">';
+				$code = '<ul' . ($tag == '' ? '' : ' style="list-style-type: ' . $tag . '"') . ' class="bbc_list">';
 			}
 			// We're in a list item already: another itemcode?  Close it first.
 			elseif ($inside['tag'] == 'li')
@@ -1831,7 +1831,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			);
 
 			// First, open the tag...
-			$code .= '<li' . ($tag == '' ? '' : ' type="' . $tag . '"') . '>';
+			$code .= '<li>';
 			$message = substr($message, 0, $pos) . "\n" . $code . "\n" . substr($message, $pos + 3);
 			$pos += strlen($code) - 1 + 2;
 
@@ -3154,7 +3154,7 @@ function host_from_ip($ip)
 {
 	global $modSettings;
 
-	if (($host = cache_get_data('hostlookup-' . $ip, 600)) !== null)
+	if (($host = cache_get_data('hostlookup-' . $ip, 600)) !== null || empty($ip))
 		return $host;
 	$t = microtime(true);
 
@@ -3960,7 +3960,11 @@ function remove_integration_function($hook, $function, $file = '')
 		}
 
 		if (in_array($integration_call, $current_functions))
+		{
 			updateSettings(array($hook => implode(',', array_diff($current_functions, array($integration_call)))));
+			if (empty($modSettings[$hook]))
+				removeSettings($hook);
+		}
 	}
 
 	// Turn the function list into something usable.

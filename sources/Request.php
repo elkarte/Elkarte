@@ -63,7 +63,7 @@ class Request
 	private static $_req = null;
 
 	/**
-	 * Retrieves client ip
+	 * Retrieves client IP
 	 */
 	public function client_ip()
 	{
@@ -74,10 +74,11 @@ class Request
 	 * Return a secondary IP, result of a deeper check for the IP
 	 *
 	 * - It can be identical with client IP (and many times it will be).
+	 * - If the secondary IP is empty, then the client IP is returned
 	 */
 	public function ban_ip()
 	{
-		return $this->_ban_ip;
+		return !empty($this->_ban_ip) ? $this->_ban_ip : $this->client_ip();
 	}
 
 	/**
@@ -118,6 +119,9 @@ class Request
 	 */
 	private function __construct()
 	{
+		// This is the pattern of a local (or unknown) IP address in both IPv4 and IPv6
+		$local_ip_pattern = '((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown|::1|fe80::|fc00::)';
+
 		// Client IP: REMOTE_ADDR, unless missing
 		if (!isset($_SERVER['REMOTE_ADDR']))
 		{
@@ -141,7 +145,7 @@ class Request
 		$this->_ban_ip = $this->_client_ip;
 
 		// Forwarded, maybe?
-		if (!empty($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_CLIENT_IP']) && (preg_match('~^((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown|::1|fe80::|fc00::)~', $_SERVER['HTTP_CLIENT_IP']) == 0 || preg_match('~^((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown|::1|fe80::|fc00::)~', $this->_client_ip) != 0))
+		if (!empty($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_CLIENT_IP']) && (preg_match('~^' . $local_ip_pattern . '~', $_SERVER['HTTP_CLIENT_IP']) == 0 || preg_match('~^' . $local_ip_pattern . '~', $this->_client_ip) != 0))
 		{
 			// check the first forwarded for as the block - only switch if it's better that way.
 			if (strtok($_SERVER['HTTP_X_FORWARDED_FOR'], '.') != strtok($_SERVER['HTTP_CLIENT_IP'], '.') && '.' . strtok($_SERVER['HTTP_X_FORWARDED_FOR'], '.') == strrchr($_SERVER['HTTP_CLIENT_IP'], '.') && (preg_match('~^((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown)~', $_SERVER['HTTP_X_FORWARDED_FOR']) == 0 || preg_match('~^((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown)~', $this->_client_ip) != 0))
@@ -150,7 +154,7 @@ class Request
 				$this->_ban_ip = $_SERVER['HTTP_CLIENT_IP'];
 		}
 
-		if (!empty($_SERVER['HTTP_CLIENT_IP']) && (preg_match('~^((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown|::1|fe80::|fc00::)~', $_SERVER['HTTP_CLIENT_IP']) == 0 || preg_match('~^((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown|::1|fe80::|fc00::)~', $this->_client_ip) != 0))
+		if (!empty($_SERVER['HTTP_CLIENT_IP']) && (preg_match('~^' . $local_ip_pattern . '~', $_SERVER['HTTP_CLIENT_IP']) == 0 || preg_match('~^' . $local_ip_pattern . '~', $this->_client_ip) != 0))
 		{
 			// Since they are in different blocks, it's probably reversed.
 			if (strtok($this->_client_ip, '.') != strtok($_SERVER['HTTP_CLIENT_IP'], '.'))
@@ -169,7 +173,7 @@ class Request
 				foreach ($ips as $i => $ip)
 				{
 					// Make sure it's in a valid range...
-					if (preg_match('~^((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown|::1|fe80::|fc00::)~', $ip) != 0 && preg_match('~^((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown|::1|fe80::|fc00::)~', $this->_client_ip) == 0)
+					if (preg_match('~^' . $local_ip_pattern . '~', $ip) != 0 && preg_match('~^' . $local_ip_pattern . '~', $this->_client_ip) == 0)
 						continue;
 
 					// Otherwise, we've got an IP!
@@ -178,12 +182,12 @@ class Request
 				}
 			}
 			// Otherwise just use the only one.
-			elseif (preg_match('~^((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown|::1|fe80::|fc00::)~', $_SERVER['HTTP_X_FORWARDED_FOR']) == 0 || preg_match('~^((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown|::1|fe80::|fc00::)~', $this->_client_ip) != 0)
+			elseif (preg_match('~^' . $local_ip_pattern . '~', $_SERVER['HTTP_X_FORWARDED_FOR']) == 0 || preg_match('~^' . $local_ip_pattern . '~', $this->_client_ip) != 0)
 				$this->_ban_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
 		}
 
 		// Some final checking.
-		if (preg_match('~^((([1]?\d)?\d|2[0-4]\d|25[0-5])\.){3}(([1]?\d)?\d|2[0-4]\d|25[0-5])$~', $this->_ban_ip) === 0 || !isValidIPv6($this->_ban_ip))
+		if (preg_match('~^((([1]?\d)?\d|2[0-4]\d|25[0-5])\.){3}(([1]?\d)?\d|2[0-4]\d|25[0-5])$~', $this->_ban_ip) === 0 && !isValidIPv6($this->_ban_ip))
 			$this->_ban_ip = '';
 
 		if ($this->_client_ip == 'unknown')

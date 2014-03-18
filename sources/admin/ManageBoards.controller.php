@@ -754,8 +754,6 @@ class ManageBoards_Controller extends Action_Controller
 		addInlineJavascript('
 				document.getElementById("recycle_board").disabled = !document.getElementById("recycle_enable").checked;', true);
 
-		call_integration_hook('integrate_modify_board_settings', array(&$config_vars));
-
 		// Don't let guests have these permissions.
 		$context['post_url'] = $scripturl . '?action=admin;area=manageboards;save;sa=settings';
 		$context['permissions_excluded'] = array(-1);
@@ -832,7 +830,8 @@ class ManageBoards_Controller extends Action_Controller
 				array('check', 'deny_boards_access'),
 		);
 
-		call_integration_hook('integrate_boards_settings', array(&$config_vars));
+		// Add new settings with a nice hook, makes them available for admin settings search as well
+		call_integration_hook('integrate_modify_board_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

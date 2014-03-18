@@ -20,6 +20,7 @@ class TestRequest extends UnitTestCase
 
 		// and include our class. Kinda difficult without it.
 		require_once(TESTDIR . '../sources/Request.php');
+		require_once(TESTDIR . '../sources/QueryString.php');
 
 		// clean slate please.
 		$_REQUEST = array();

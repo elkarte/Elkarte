@@ -156,10 +156,10 @@ function getFields(textFields, numericFields, checkboxFields, form_name)
 		if (textFields[i] in document.forms[form_name])
 		{
 			// Handle the editor.
-			if (textFields[i] == post_box_name && $('#' + post_box_name).data('sceditor') !== undefined)
+			if (textFields[i] == post_box_name && $editor_data[post_box_name] !== undefined)
 			{
-				fields[fields.length] = textFields[i] + '=' + $('#' + post_box_name).data('sceditor').getText().replace(/&#/g, '&#38;#').php_to8bit().php_urlencode();
-				fields[fields.length] = 'message_mode=' + $("#message").data("sceditor").inSourceMode();
+				fields[fields.length] = textFields[i] + '=' + $editor_data[post_box_name].getText().replace(/&#/g, '&#38;#').php_to8bit().php_urlencode();
+				fields[fields.length] = 'message_mode=' + $editor_data[post_box_name].inSourceMode();
 			}
 			else
 				fields[fields.length] = textFields[i] + '=' + document.forms[form_name][textFields[i]].value.replace(/&#/g, '&#38;#').php_to8bit().php_urlencode();
@@ -232,13 +232,16 @@ function onDocSent(XMLDoc)
 		errorList = '',
 		errorCode = '',
 		error_area = 'post_error',
-		error_list = error_area + '_list';
+		error_list = error_area + '_list',
+		error_post = false;
 
 	// @todo: this should stay together with the rest of the error handling or
 	// should use errorbox_handler (at the moment it cannot be used because is not enough generic)
 	for (i = 0, numErrors = errors.getElementsByTagName('error').length; i < numErrors; i++)
 	{
 		errorCode = errors.getElementsByTagName('error')[i].attributes.getNamedItem("code").value;
+		if (errorCode == 'no_message' || errorCode == 'long_message')
+			error_post = true;
 		errorList += '<li id="' + error_area + '_' + errorCode + '" class="error">' + errors.getElementsByTagName('error')[i].firstChild.nodeValue + '</li>';
 	}
 
@@ -268,15 +271,15 @@ function onDocSent(XMLDoc)
 			document.getElementById('caption_' + captions[i].getAttribute('name')).className = captions[i].getAttribute('class');
 	}
 
-	if (errors.getElementsByTagName('post_error').length === 1)
-		document.forms[form_name][post_box_name].style.border = '1px solid red';
-	else if (document.forms[form_name][post_box_name].style.borderColor === 'red' || document.forms[form_name][post_box_name].style.borderColor === 'red red red red')
-	{
-		if ('runtimeStyle' in document.forms[form_name][post_box_name])
-			document.forms[form_name][post_box_name].style.borderColor = '';
-		else
-			document.forms[form_name][post_box_name].style.border = null;
-	}
+	if (typeof $editor_container[post_box_name] !== 'undefined')
+		var $editor = $editor_container[post_box_name];
+	else
+		var $editor = $(document.forms[form_name][post_box_name]);
+
+	if (error_post)
+		$editor.find("textarea, iframe").addClass('border_error');
+	else
+		$editor.find("textarea, iframe").removeClass('border_error');
 
 	// If this is a post preview, then we have some extra work to do
 	if (bPost)
@@ -440,9 +443,9 @@ function onDocReceived(XMLDoc)
 	var text = '';
 
 	for (var i = 0, n = XMLDoc.getElementsByTagName('quote')[0].childNodes.length; i < n; i++)
-		text += XMLDoc.getElementsByTagName('quote')[0].childNodes[i].nodeValue;
+		text += XMLDoc.getElementsByTagName('quote')[0].childNodes[i].nodeValue + "\n";
 
-	$('#' + post_box_name).data("sceditor").insert(text);
+	$editor_data[post_box_name].insert(text);
 
 	ajax_indicator(false);
 }
@@ -454,7 +457,7 @@ function onDocReceived(XMLDoc)
  */
 function onReceiveOpener(text)
 {
-	$('#' + post_box_name).data("sceditor").insert(text);
+	$editor_data[post_box_name].insert(text);
 }
 
 /**

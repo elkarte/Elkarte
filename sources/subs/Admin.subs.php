@@ -296,22 +296,31 @@ function getFileVersions(&$versionOptions)
 
 	// Load up all the files in the default language directory and sort by language.
 	$this_dir = dir($lang_dir);
-	while ($entry = $this_dir->read())
+	while ($path = $this_dir->read())
 	{
-		if (substr($entry, -4) == '.php' && $entry != 'index.php' && !is_dir($lang_dir . '/' . $entry))
+		if (is_dir($lang_dir . '/' . $path))
 		{
-			// Read the first 768 bytes from the file.... enough for the header.
-			$header = file_get_contents($lang_dir . '/' . $entry, false, null, 0, 768);
+			$language = $path;
+			$this_lang_path = $lang_dir . '/' . $language;
+			$this_lang = dir($this_lang_path);
+			while ($entry = $this_lang->read())
+			{
+				if (substr($entry, -4) == '.php' && $entry != 'index.php' && !is_dir($this_lang_path . '/' . $entry))
+				{
+					// Read the first 768 bytes from the file.... enough for the header.
+					$header = file_get_contents($this_lang_path . '/' . $entry, false, null, 0, 768);
 
-			// Split the file name off into useful bits.
-			list ($name, $language) = explode('.', $entry);
+					// Split the file name off into useful bits.
+					list ($name, $language) = explode('.', $entry);
 
-			// Look for the version comment in the file header.
-			if (preg_match('~(?://|/\*)\s*Version:\s+(.+?);\s*' . preg_quote($name, '~') . '(?:[\s]{2}|\*/)~i', $header, $match) == 1)
-				$version_info['default_language_versions'][$language][$name] = $match[1];
-			// It wasn't found, but the file was... show a '??'.
-			else
-				$version_info['default_language_versions'][$language][$name] = $unknown_version;
+					// Look for the version comment in the file header.
+					if (preg_match('~(?://|/\*)\s*Version:\s+(.+?);\s*' . preg_quote($name, '~') . '(?:[\s]{2}|\*/)~i', $header, $match) == 1)
+						$version_info['default_language_versions'][$language][$name] = $match[1];
+					// It wasn't found, but the file was... show a '??'.
+					else
+						$version_info['default_language_versions'][$language][$name] = $unknown_version;
+				}
+			}
 		}
 	}
 	$this_dir->close();

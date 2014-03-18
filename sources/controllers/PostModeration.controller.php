@@ -412,17 +412,16 @@ class PostModeration_Controller extends Action_Controller
 				),
 				'action' => array(
 					'header' => array(
-						'value' => '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" checked="checked" />',
-						'style' => 'width: 4%;text-align: center',
+						'value' => '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" />',
+						'style' => 'width: 4%',
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<input type="checkbox" name="item[]" value="%1$d" checked="checked" class="input_check" />',
+							'format' => '<input type="checkbox" name="item[]" value="%1$d" class="input_check" />',
 							'params' => array(
 								'id' => false,
 							),
 						),
-						'class' => 'centertext',
 					),
 				),
 			),

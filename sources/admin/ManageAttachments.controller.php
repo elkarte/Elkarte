@@ -128,8 +128,6 @@ class ManageAttachments_Controller extends Action_Controller
 	base_dir.addEventListener("change", toggleSubDir, false);
 	toggleSubDir();', true);
 
-		call_integration_hook('integrate_modify_attachment_settings', array(&$config_vars));
-
 		// These are very likely to come in handy! (i.e. without them we're doomed!)
 		require_once(SUBSDIR . '/Settings.class.php');
 		require_once(SUBSDIR . '/Attachments.subs.php');
@@ -204,10 +202,10 @@ class ManageAttachments_Controller extends Action_Controller
 	 */
 	private function _initAttachSettingsForm()
 	{
-		// instantiate the form
+		// Instantiate the form
 		$this->_attachSettingsForm = new Settings_Form();
 
-		// initialize settings
+		// Initialize settings
 		$config_vars = $this->_settings();
 
 		return $this->_attachSettingsForm->settings($config_vars);
@@ -306,6 +304,9 @@ class ManageAttachments_Controller extends Action_Controller
 				array('int', 'max_image_width', 'subtext' => $txt['zero_for_no_limit']),
 				array('int', 'max_image_height', 'subtext' => $txt['zero_for_no_limit']),
 		);
+
+		// Add new settings with a nice hook, makes them available for admin settings search as well
+		call_integration_hook('integrate_modify_attachment_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

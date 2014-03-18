@@ -37,9 +37,10 @@
 /*
 /*		$HELP................Help pages, help icons and pop-ups, tooltips.
 /*		$SEARCH..............Search pages, including memberlist search.
+/*		$MEMBERLIST..........The memberlist table.
 /*		$LOGIN...............Login and registration, maintenance mode.
 /*
-/*		$ERRORS..............Error messages.
+/*		$BOXES...............Message boxes (error, warning, info, etc).
 /*		$PROGRESS............Nifty progress bars.
 /*		$MEDIA...............Experimental media queries.
 /* ------------------------------------------------------- */
@@ -258,32 +259,6 @@ strong {
 	border: 1px solid #c5c5c5;
 	border-radius: 7px;
 	background: #f5f5f5;
-}
-
-/* More little boxes on a hillside. */
-.warningbox {
-	padding: 6px 12px;
-	border: 1px solid #ffd324;
-	border-left: 5px solid #ffd324;
-	background: #fff6ca;
-}
-.successbox {
-	padding: 6px 12px;
-	border: 1px solid #9ece9e;
-	border-left: 5px solid #9ece9e;
-	background: #e8f5df;
-}
-.infobox {
-	padding: 6px 12px;
-	border: 1px solid #3a87ad;
-	border-left: 5px solid #3a87ad;
-	background: #d9edf7;
-}
-.errorbox {
-	padding: 6px 12px;
-	border: 1px solid #ce9e9e;
-	border-left: 5px solid #ce9e9e;
-	background: #f5dfdf;
 }
 
 /* The generic wrapper thingy.  */
@@ -1045,6 +1020,32 @@ span.views_text {
 	color: #ff0000;
 }
 
+/*	$BOXES	*/
+/* More little boxes on a hillside. */
+.warningbox {
+	padding: 6px 12px;
+	border: 1px solid #ffd324;
+	border-left: 5px solid #ffd324;
+	background: #fff6ca;
+}
+.successbox {
+	padding: 6px 12px;
+	border: 1px solid #9ece9e;
+	border-left: 5px solid #9ece9e;
+	background: #e8f5df;
+}
+.infobox {
+	padding: 6px 12px;
+	border: 1px solid #3a87ad;
+	border-left: 5px solid #3a87ad;
+	background: #d9edf7;
+}
+.errorbox {
+	padding: 6px 12px;
+	border: 1px solid #ce9e9e;
+	border-left: 5px solid #ce9e9e;
+	background: #f5dfdf;
+}
 
 /*	$PROGRESS	*/
 /* ------------------------------------------------------- */
@@ -1346,7 +1347,7 @@ span.views_text {
 		background-color: #f6f6f6;
 		margin-bottom: 5px !important;
 	}
-	.mlist li div:nth-child(n+5) {
+	.mlist li div.posts {
 		border-right: 1px solid #ccc;
 	}
 }
@@ -1366,14 +1367,9 @@ span.views_text {
 	.childboard_row {
 		border-top: none;
 	}
-	.childboard_row:before {
-		content: "";
-		margin: 0;
+	.board_icon {
 		position: relative;
-		top: -12px;
-		display: block;
-		height: 12px;
-		background-color: #f9f9f9;
+		top: -4px;
 	}
 	.board_lastpost {
 		border-top: 1px solid #eee;
@@ -1506,12 +1502,9 @@ span.views_text {
 	#search_form * {
 		float: none;
 	}
-	.mlist li div:nth-child(n+4) {
-		border-right: 1px solid #ccc;
-	}
 }
 @media screen and (max-width: 30em) {
-	.mlist li div:nth-child(n+3) {
+	.mlist li .group {
 		border-right: 1px solid #ccc;
 	}
 }

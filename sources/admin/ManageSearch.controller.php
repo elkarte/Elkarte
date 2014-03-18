@@ -118,8 +118,6 @@ class ManageSearch_Controller extends Action_Controller
 		if (!isset($context['settings_post_javascript']))
 			$context['settings_post_javascript'] = '';
 
-		call_integration_hook('integrate_modify_search_settings', array(&$config_vars));
-
 		// Perhaps the search method wants to add some settings?
 		require_once(SUBSDIR . '/Search.subs.php');
 		$searchAPI = findSearchAPI();
@@ -220,6 +218,9 @@ class ManageSearch_Controller extends Action_Controller
 				array('title', 'additional_search_engines'),
 				array('callback', 'external_search_engines'),
 		);
+
+		// Add new settings with a nice hook, makes them available for admin settings search as well
+		call_integration_hook('integrate_modify_search_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

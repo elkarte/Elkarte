@@ -1,5 +1,5 @@
 <?php
-// Version: 1.0; Themes
+// Version: 1.0; ManageThemes
 
 $txt['themeadmin_explain'] = 'Themes are the different looks and feels of your forum. These settings affect the selection of themes and which themes guests and other members use.';
 
