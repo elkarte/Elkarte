@@ -1671,6 +1671,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 			years : ' . JavaScriptEscape($txt['rt_years']) . ',
 		});
 		updateRelativeTime();', true);
+		$context['using_relative_time'] = true;
 	}
 
 	// Queue our Javascript

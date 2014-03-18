@@ -215,7 +215,7 @@ function template_topic_listing()
 						<ul class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '" role="menubar">' . $topic['pages'] . '</ul>' : '', '
 					</div>
 				</div>
-				<div class="topic_latest', (!empty($modSettings['todayMod']) && $modSettings['todayMod'] > 2) ? ' relative' : ' dd', '">
+				<div class="topic_latest">
 					<p class="topic_stats">
 					', $topic['replies'], ' ', $txt['replies'], '<br />
 					', $topic['views'], ' ', $txt['views'];
@@ -339,6 +339,10 @@ function template_topic_listing_below()
 
 	echo '
 			<script><!-- // --><![CDATA[';
+
+	if (!empty($context['using_relative_time']))
+		echo '
+				$(\'.topic_latest\').addClass(\'relative\');';
 
 	if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1 && !empty($context['topics']) && $context['can_move'])
 		echo '
