@@ -660,12 +660,12 @@ function template_basicicons_legend()
 
 	echo '
 		<p class="floatleft">', !empty($modSettings['enableParticipation']) && $context['user']['is_logged'] ? '
-			<span class="topicicon img_profile" alt=""></span>' . $txt['participation_caption'] : '<span class="topicicon img_normal" alt=""> </span>' . $txt['normal_topic'], '<br />
-			' . (!empty($modSettings['pollMode']) ? '<span class="topicicon img_poll" alt=""> </span>' . $txt['poll'] : '') . '
+			<span class="topicicon img_profile"></span>' . $txt['participation_caption'] : '<span class="topicicon img_normal"> </span>' . $txt['normal_topic'], '<br />
+			' . (!empty($modSettings['pollMode']) ? '<span class="topicicon img_poll"> </span>' . $txt['poll'] : '') . '
 		</p>
 		<p>
-			<span class="topicicon img_locked" alt=""> </span>' . $txt['locked_topic'] . '<br />' . ($modSettings['enableStickyTopics'] == '1' ? '
-			<span class="topicicon img_sticky" alt=""> </span>' . $txt['sticky_topic'] . '<br />' : '') . '
+			<span class="topicicon img_locked"> </span>' . $txt['locked_topic'] . '<br />' . ($modSettings['enableStickyTopics'] == '1' ? '
+			<span class="topicicon img_sticky"> </span>' . $txt['sticky_topic'] . '<br />' : '') . '
 		</p>';
 }
 
