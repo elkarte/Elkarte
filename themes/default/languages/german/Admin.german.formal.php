@@ -325,7 +325,7 @@ $txt['support_resources_p1'] = 'Unser <a href="%1$s">Dokumentationswiki</a> stel
 $txt['support_resources_p2'] = 'Falls Sie die Antworten auf Ihre Fragen im Wiki nicht finden können, möchten Sie möglicherweise unsere <a href="%1$s">Supportcommunity</a> durchsuchen oder in unserem Supportforum nach Hilfe fragen. Die ElkArte-Supportcommunity kann für <a href="%2$s">Unterstützung</a>, <a href="%3$s">Anpassungen</a> und vieles mehr, etwa Diskussionen über ElkArte, die Suche nach einem Hoster und Plaudern mit anderen Forenadministratoren, in Anspruch genommen werden.'; // translator note again: ewww, denglish :/ any suggestions? a consistent wording would be ok...
 
 $txt['support_latest'] = 'Allgemeine Unterstützung &amp; Probleme';
-$txt['support_latest_fetch'] = 'Rufe Supportnformationen ab...';
+$txt['support_latest_fetch'] = 'Rufe Supportinformationen ab...';
 
 $txt['edit_permissions_info'] = 'Ändern Sie Beschränkungen und verfügbare Funktionen, global oder in einzelnen Foren.';
 $txt['membergroups_members'] = 'Normale Mitglieder';
