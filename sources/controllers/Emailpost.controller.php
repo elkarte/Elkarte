@@ -95,7 +95,7 @@ class Emailpost_Controller extends Action_Controller
 		$key_owner = query_key_owner($email_message->message_key_id);
 
 		// Can't find this key in the database, either
-		//   a) spam attempt or b) replying with an expired/consumed key
+		// a) spam attempt or b) replying with an expired/consumed key
 		if (empty($key_owner))
 			return pbe_emailError('error_' . ($email_message->message_type === 'p' ? 'pm_' : '') . 'not_find_entry', $email_message);
 
@@ -166,7 +166,7 @@ class Emailpost_Controller extends Action_Controller
 			$result = pbe_create_post($pbe, $email_message, $topic_info);
 		// Must be a PM then
 		elseif ($email_message->message_type === 'p')
-			$result = pbe_create_pm($pbe, $email_message);
+			$result = pbe_create_pm($pbe, $email_message, $pm_info);
 
 		if (!empty($result))
 		{
@@ -265,9 +265,11 @@ class Emailpost_Controller extends Action_Controller
 
 	/**
 	 * Used to preview a failed email from the ACP
-	 *  - Called from ManageMaillist.controller, which checks topic/message permission for viewing
-	 *  - Calls pbe_load_text to prepare text for the preview
-	 *  - Returns an array of values for use in the template
+	 *
+	 * What it does:
+	 * - Called from ManageMaillist.controller, which checks topic/message permission for viewing
+	 * - Calls pbe_load_text to prepare text for the preview
+	 * - Returns an array of values for use in the template
 	 *
 	 * @param string $data raw email string, including headers
 	 * @return boolean
@@ -319,10 +321,13 @@ class Emailpost_Controller extends Action_Controller
 
 /**
  * Attempts to create a reply post on the forum
- *  - Checks if the user has permissions to post/reply/postby email
- *  - Calls pbe_load_text to prepare text for the post
- *  - returns true if successful or false for any number of failures
  *
+ * What it does:
+ * - Checks if the user has permissions to post/reply/postby email
+ * - Calls pbe_load_text to prepare text for the post
+ * - returns true if successful or false for any number of failures
+ *
+ * @package Maillist
  * @param mixed[] $pbe array of all pbe user_info values
  * @param Email_Parse $email_message
  * @param mixed[] $topic_info
@@ -415,16 +420,20 @@ function pbe_create_post($pbe, $email_message, $topic_info)
 
 /**
  * Attempts to create a PM (reply) on the forum
- *  - Checks if the user has permissions
- *  - Calls pbe_load_text to prepare text for the pm
- *  - Calls query_mark_pms to mark things as read
- *  - Uses sendpm to do the actual "sending"
- *  - Returns true if successful or false for any number of failures
  *
+ * What it does
+ * - Checks if the user has permissions
+ * - Calls pbe_load_text to prepare text for the pm
+ * - Calls query_mark_pms to mark things as read
+ * - Uses sendpm to do the actual "sending"
+ * - Returns true if successful or false for any number of failures
+ *
+ * @package Maillist
  * @param mixed[] $pbe array of pbe 'user_info' values
  * @param Email_Parse $email_message
+ * @param mixed[] $pm_info
  */
-function pbe_create_pm($pbe, $email_message)
+function pbe_create_pm($pbe, $email_message, $pm_info)
 {
 	global $modSettings, $txt;
 
@@ -463,16 +472,19 @@ function pbe_create_pm($pbe, $email_message)
 }
 
 /**
- * Called by
- *  - pbe_topic to create a new topic
- *  - pbe_main to create a new topic via a subject change
- * Checks posting permissions, but requires email validation checks are complete
- *  - Calls pbe_load_text to prepare text for the post
- *  - Uses createPost to do the actual "posting"
- *  - Calls sendNotifications to announce the new post
- *  - Calls query_update_member_stats to show they did something
- * Requires pbe and email_message to be populated.
+ * Create a new topic by email
  *
+ * What it does:
+ * - Called by pbe_topic to create a new topic or by
+ * pbe_main to create a new topic via a subject change
+ * - checks posting permissions, but requires all email validation checks are complete
+ * - Calls pbe_load_text to prepare text for the post
+ * - Uses createPost to do the actual "posting"
+ * - Calls sendNotifications to announce the new post
+ * - Calls query_update_member_stats to show they did something
+ * - Requires the pbe, email_message and board_info arrays to be populated.
+ *
+ * @package Maillist
  * @param mixed[] $pbe array of pbe 'user_info' values
  * @param Email_Parse $email_message
  * @param mixed[] $board_info
@@ -579,11 +591,10 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 /**
  * Calls the necessary functions to extract and format the message so its ready for posting
  *
+ * @package Maillist
  * @param boolean $html
  * @param Email_Parse $email_message
  * @param mixed[] $pbe
- *
- * @return string
  */
 function pbe_load_text(&$html, $email_message, $pbe)
 {
