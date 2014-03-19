@@ -3704,6 +3704,9 @@ a.help .icon {
 .whos_online dt {
 	font-weight: bold;
 }
+dl.no_members {
+	display: none;
+}
 .online_member {
 	min-width: 40%;
 }

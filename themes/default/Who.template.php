@@ -56,7 +56,7 @@ function template_whos_online()
 
 	echo '
 			<div id="mlist">
-				<dl class="whos_online table_grid">
+				<dl class="whos_online', empty($context['members']) ? ' no_members' : '', '">
 					<dt class="table_head">
 						<div class="online_member">
 							<a href="', $scripturl, '?action=who;start=', $context['start'], ';show=', $context['show_by'], ';sort=user', $context['sort_direction'] != 'down' && $context['sort_by'] == 'user' ? '' : ';asc', '" rel="nofollow">', $txt['who_user'], $context['sort_by'] == 'user' ? '<img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
@@ -89,19 +89,17 @@ function template_whos_online()
 					</dd>';
 	}
 
-	// No members?
+	echo '
+				</dl>';
+	
+// No members?
 	if (empty($context['members']))
-	{
 		echo '
-					<dd class="windowbg2">
-						<span class="centertext" style="display: block;">
-						', $txt['who_no_online_' . ($context['show_by'] == 'guests' || $context['show_by'] == 'spiders' ? $context['show_by'] : 'members')], '
-						</span>
-					</dd>';
-	}
+				<div class="centertext">
+					', $txt['who_no_online_' . ($context['show_by'] == 'guests' || $context['show_by'] == 'spiders' ? $context['show_by'] : 'members')], '
+				</div>';
 
 	echo '
-				</dl>
 			</div>';
 }
 
