@@ -1615,7 +1615,7 @@ div.bbc_footnotes .meaction{
 	border-top: 1px solid #ccc;
 	border-bottom: 1px solid #ccc;
 }
-.mlist li.alternate_row div, .whos_online dd:nth-child(even) div{
+.mlist li.alternate_row div, .whos_online dd:nth-child(even) div {
 	background-color: #fafafa;
 	border-top: 1px solid #ccc;
 	border-bottom: 1px solid #ccc;
