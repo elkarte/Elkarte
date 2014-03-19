@@ -4,6 +4,7 @@
 global $settings, $scripturl;
 
 $txt['admin_boards'] = 'Foren';
+$txt['admin_back_to'] = 'Zurück zum Adminzentrum';
 $txt['admin_users'] = 'Benutzer';
 $txt['admin_newsletters'] = 'Rundbriefe';
 $txt['include_these'] = 'Einzuschließende Benutzer';
