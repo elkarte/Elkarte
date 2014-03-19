@@ -3673,15 +3673,15 @@ a.help .icon {
 
 /*	$MEMBERLIST		*/
 /* ------------------------------------------------------- */
-.mlist {
+.mlist, .whos_online {
 	display: table;
 	width: 100%;
 	border-collapse: collapse;
 }
-.mlist li {
+.mlist li, .whos_online dt, .whos_online dd {
 	display: table-row;
 }
-.mlist li div {
+.mlist li div, .whos_online dt div, .whos_online dd div {
 	display: table-cell;
 	padding: 5px 8px;
 }
@@ -3700,6 +3700,21 @@ a.help .icon {
 }
 .mlist_header {
 	font-weight: bold;
+}
+.whos_online dt {
+	font-weight: bold;
+}
+dl.no_members {
+	display: none;
+}
+.online_member {
+	min-width: 40%;
+}
+.track_ip:before {
+	content: "(";
+}
+.track_ip:after {
+	content: ")";
 }
 #memberlist {
 	margin: 6px 0 0 0;
@@ -4183,6 +4198,7 @@ a.help .icon {
 	}
 	.topic_name, .topic_starter {
 		margin-right: 18px;
+	}
 }
 /* This one does 540 and smaller screens at default font size. */
 @media screen and (max-width: 33.750em) {
@@ -4561,6 +4577,12 @@ a.help .icon {
 	}
 	.mlist li .website, .mlist li .date_registered {
 		display: none;
+	}
+	.whos_online dt {
+		display: none;
+	}
+	.whos online dd, .whos_online dd div {
+		display: block;
 	}
 }
 /* This one does 480px screens at default font size. */
