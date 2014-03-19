@@ -4124,10 +4124,13 @@ a.help .icon {
 		display: none;
 	}
 	.poster {
-		min-width: 10em;
+		min-width: 7em;
+	}
+	.poster .poster_online {
+		display: none;
 	}
 	.postarea {
-		margin: 0 0 0 8em;
+		margin: 0 0 0 7em;
 	}
 	.quickbuttons .modified {
 		display: block;
