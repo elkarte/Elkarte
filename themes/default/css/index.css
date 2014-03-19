@@ -145,14 +145,14 @@ a img {
 /* ALSO: This is still not quite pixel perfect everywhere for all browsers,
 /* in particular not for Internet Explorer. They can live with it. */
 /*
-	.button_submit	-	covers input[type=submit], input[type=button],
-						button[type=submit] and button[type=button]
-	.linkbutton		-	covers links, to make them look like a submit button.
-	.button_reset	-	covers input[type=reset] and button[type=reset]
-	.input_check	-	covers input[type=checkbox]
-	.input_radio	-	covers input[type=radio]
-	.input_text		-	covers input[type=text]
-	.input_file		-	covers input[type=file]
+	.button_submit - covers input[type=submit], input[type=button],
+	                 button[type=submit] and button[type=button]
+	.linkbutton    - covers links, to make them look like a submit button.
+	.button_reset  - covers input[type=reset] and button[type=reset]
+	.input_check   - covers input[type=checkbox]
+	.input_radio   - covers input[type=radio]
+	.input_text    - covers input[type=text]
+	.input_file    - covers input[type=file]
 */
 input, button, select, textarea, .editor {
 	font: 83.33%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", Arial, sans-serif;
@@ -4239,7 +4239,7 @@ dl.no_members {
 	.locked_row, .sticky_row, .basic_row,.topic_listing, .topic_listing>li {
 		display: block;
 	}
-	.sticky_row .topic_info:before, .locked_row .topic_info:before,	.locked_row.sticky_row .topic_info:before {
+	.sticky_row .topic_info:before, .locked_row .topic_info:before, .locked_row.sticky_row .topic_info:before {
 		margin-right: 0;
 	}
 	.topic_icons, .topic_moderation {

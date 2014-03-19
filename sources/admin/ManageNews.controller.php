@@ -900,7 +900,7 @@ class ManageNews_Controller extends Action_Controller
 	{
 		global $txt;
 
-		$config_vars = 	array(
+		$config_vars = array(
 			array('title', 'settings'),
 				// Inline permissions.
 				array('permissions', 'edit_news', 'help' => ''),

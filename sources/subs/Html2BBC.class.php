@@ -408,7 +408,7 @@ class Convert_BBC
 	 * Converts <abbr> tags to bbc
 	 *
 	 * html: <abbr title="Hyper Text Markup Language">HTML</abbr>
-	 * bbc:	[abbr=Hyper Text Markup Language]HTML[/abbr]
+	 * bbc:  [abbr=Hyper Text Markup Language]HTML[/abbr]
 	 *
 	 * @param object $node
 	 */
@@ -861,7 +861,8 @@ class Convert_BBC
 		if (preg_match_all('~.*?:.*?(;|$)~', $style, $matches, PREG_SET_ORDER))
 		{
 			foreach ($matches as $match)
-			{	if (strpos($match[0], ':'))
+			{
+				if (strpos($match[0], ':'))
 				{
 					list ($key, $value) = explode(':', trim($match[0], ';'));
 					$key = trim($key);

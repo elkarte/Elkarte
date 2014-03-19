@@ -33,7 +33,7 @@ class TestDataValidator extends UnitTestCase
 			'without'       => 'without[1,2,3]',
 			'min_len_csv'   => 'min_length[4]',
 			'min_len_array' => 'min_length[4]',
-			'limits'		=> 'limits[0,10]',
+			'limits'        => 'limits[0,10]',
 		);
 
 		$this->invalid_data = array(
@@ -57,7 +57,7 @@ class TestDataValidator extends UnitTestCase
 			'without'       => '1 way 2 do this',
 			'min_len_csv'   => '1234,12345, 123',
 			'min_len_array' => array('1234', '12345', '123'),
-			'limits'		=> 11,
+			'limits'        => 11,
 		);
 
 		$this->valid_data = array(
@@ -81,7 +81,7 @@ class TestDataValidator extends UnitTestCase
 			'without'       => 'this does not have one or two',
 			'min_len_csv'   => '1234,12345,123456',
 			'min_len_array' => array('1234', '12345', '123456'),
-			'limits'		=> 9,
+			'limits'        => 9,
 		);
 	}
 

@@ -893,8 +893,8 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
  * @param int[]|int $group_ids the IDs of the groups.
  * @param integer $limit = 1 the number of results returned (default 1, if null/false/0 returns all).
  * @param bool $detailed = false if true then it returns more fields (default false).
- *		false returns: id_group, group_name, group_type.
- *		true adds to above: description, min_posts, online_color, max_messages, icons, hidden, id_parent.
+ *     false returns: id_group, group_name, group_type.
+ *     true adds to above: description, min_posts, online_color, max_messages, icons, hidden, id_parent.
  * @param bool $assignable = false determine if the group is assignable or not and return that information.
  * @return array|false
  */

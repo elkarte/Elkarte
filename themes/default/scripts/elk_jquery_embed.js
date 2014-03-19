@@ -225,7 +225,7 @@
 			links = $('[id^=msg_] a');
 
 		// Create the show/hide button
-		var	showhideBtn = $('<a class="floatright" title="' + oSettings.hide_video + '"><img src="' + elk_images_url + '/selected.png"></a>').click(function() {
+		var showhideBtn = $('<a class="floatright" title="' + oSettings.hide_video + '"><img src="' + elk_images_url + '/selected.png"></a>').click(function() {
 				var $img = $(this).find("img"),
 					$vid = $(this).parent().next();
 

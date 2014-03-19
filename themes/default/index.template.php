@@ -675,7 +675,7 @@ function template_basicicons_legend()
  *
  * Looks for the display infomration in the $context[$error_id] array
  * Keys of array are 'type'
- *	- empty or success for successbox
+ *  - empty or success for successbox
  *  - serious for error box
  *  - warning for warning box
  * 'title' - optional value to place above list
