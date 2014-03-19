@@ -1245,12 +1245,12 @@ span.views_text {
 .mlist .mlist_header div {
 	border-top: none;
 }
-.mlist li div {
+.mlist li div, .whos_online dd:nth-child(odd) div {
 	background-color: #fff;
 	border-bottom: 1px solid #ccc;
 	border-top: 1px solid #ccc;
 }
-.mlist li.alternate_row div {
+.mlist li.alternate_row div, .whos_online dd:nth-child(even) div {
 	background-color: #fafafa;
 	border-bottom: 1px solid #ccc;
 	border-top: 1px solid #ccc;
@@ -1501,6 +1501,30 @@ span.views_text {
 	}
 	#search_form * {
 		float: none;
+	}
+	.whos_online dd div {
+		border-bottom: none !important;
+		border-top: none !important;
+	}
+	.whos_online dd:nth-child(even), .whos_online dd:nth-child(odd) {
+		margin-top: 1px;
+		border-top: 1px solid #ccc;
+	}
+	.whos_online dd:last-child {
+		border-bottom: 1px solid #ccc;
+	}
+	.online_member {
+		font-size: 1.6em;
+	}
+	.track_ip {
+		float: right;
+		font-size: 0.7em;
+	}
+	.track_ip:before {
+		content: "";
+	}
+	.track_ip:after {
+		content: "";
 	}
 }
 @media screen and (max-width: 30em) {
