@@ -182,14 +182,14 @@ class Email_Parse
 	/**
 	 * Loads an email message from stdin, file or from a supplied string
 	 *
-	 * @param string $data optional
+	 * @param string $data optional, if supplied must be a full headers+body email string
 	 * @param string $location optional, used for debug
 	 */
 	public function read_data($data = '', $location = '')
 	{
 		// Supplied a string of data, use it
-		if ($data)
-			$this->raw_message = $data;
+		if ($data !== null)
+			$this->raw_message = !empty($data) ? $data : false;
 		elseif (!defined('STDIN'))
 		{
 			// Called from the ACP, you must have approve permissions

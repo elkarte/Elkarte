@@ -27,20 +27,22 @@ class Emailpost_Controller extends Action_Controller
 	public function action_index()
 	{
 		// default, default, by default... preview
-		$this->action_pbe_preview(' ');
+		$this->action_pbe_preview('');
 	}
 
 	/**
 	 * Main email posting controller, reads, parses, checks and posts an email message or PM
-	 * Allows a user to reply to a topic on the board by emailing a reply to a
+	 *
+	 * What it does:
+	 * - Allows a user to reply to a topic on the board by emailing a reply to a
 	 * notification message.
 	 * - It must have the security key in the email or it will be rejected
 	 * - It must be from the email of a registered user
 	 * - The key must have been sent to that user
 	 * - Keys are used once and then discarded
-	 * Accessed by email imap cron script, and ManageMaillist.controller.php.
+	 * - Accessed by email imap cron script, and ManageMaillist.controller.php.
 	 *
-	 * @param string|null $data used to supply a full body+headers email
+	 * @param string|null $data used to supply a full headers+body email
 	 * @param boolean $force used to override common failure errors
 	 * @param string|null $key used to supply a lost key
 	 */
@@ -475,8 +477,7 @@ function pbe_create_pm($pbe, $email_message, $pm_info)
  * Create a new topic by email
  *
  * What it does:
- * - Called by pbe_topic to create a new topic or by
- * pbe_main to create a new topic via a subject change
+ * - Called by pbe_topic to create a new topic or by pbe_main to create a new topic via a subject change
  * - checks posting permissions, but requires all email validation checks are complete
  * - Calls pbe_load_text to prepare text for the post
  * - Uses createPost to do the actual "posting"
@@ -590,6 +591,10 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 
 /**
  * Calls the necessary functions to extract and format the message so its ready for posting
+ *
+ * What it does:
+ * - Converts an email response (text or html) to a BBC equivalant via pbe_Email_to_bbc
+ * - Formats the email response so it looks structured and not chopped up (via pbe_fix_email_body)
  *
  * @package Maillist
  * @param boolean $html
