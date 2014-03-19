@@ -148,7 +148,7 @@ class Emailpost_Controller extends Action_Controller
 		}
 
 		// Allow for new topics to be started via a email subject change
-		if (!empty($modSettings['maillist_newtopic_change']))
+		if (!empty($modSettings['maillist_newtopic_change']) && ($email_message->message_type === 'm'))
 		{
 			$subject = str_replace($pbe['response_prefix'], '', pbe_clean_email_subject($email_message->subject));
 			$current_subject = str_replace($pbe['response_prefix'], '', $topic_info['subject']);
