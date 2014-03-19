@@ -4074,9 +4074,6 @@ a.help .icon {
 		text-overflow: ellipsis;
 		line-height: inherit;
 	}
-	.board_latest {
-		min-width: 22em;
-	}
 	.board_row {
 		min-width: 20em;
 	}
@@ -4085,6 +4082,9 @@ a.help .icon {
 	}
 	.board_lastposter {
 		display: block;
+	}
+	.board_lastpost, .board_latest {
+		min-width: 14em;
 	}
 	.board_name:after {
 		display: block;
@@ -4124,10 +4124,13 @@ a.help .icon {
 		display: none;
 	}
 	.poster {
-		min-width: 10em;
+		min-width: 7em;
+	}
+	.poster .poster_online {
+		display: none;
 	}
 	.postarea {
-		margin: 0 0 0 8em;
+		margin: 0 0 0 7em;
 	}
 	.quickbuttons .modified {
 		display: block;

@@ -921,6 +921,7 @@ span.views_text {
 }
 .topic_listing li {
 	border-bottom: 1px solid #eee;
+	border-top: 1px solid #eee;
 }
 .topic_listing li.sticky_row {
 	border-bottom: 1px solid #fff;
