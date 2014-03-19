@@ -190,7 +190,7 @@ class ManageMaillist_Controller extends Action_Controller
 					),
 					'data' => array(
 						'db' => 'key',
-						'class' => 'breakword'
+						'class' => 'wordbreak'
 					),
 					'sort' => array(
 						'default' => 'data_id',

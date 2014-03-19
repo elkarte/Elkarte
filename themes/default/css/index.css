@@ -444,8 +444,8 @@ em {
 .nowrap {
 	white-space: nowrap;
 }
-.breakword {
-	word-break: break-all
+.wordbreak {
+	word-break: break-all;
 }
 /* Styles for main headers. */
 .category_header, .forum_category .category_header {
