@@ -271,153 +271,7 @@ class MessageIndex_Controller extends Action_Controller
 
 		$topics_info = messageIndexTopics($board, $user_info['id'], $start, $maxindex, $context['sort_by'], $sort_column, $indexOptions);
 
-		// Prepare for links to guests (for search engines)
-		$context['pageindex_multiplier'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
-
-		// Begin 'printing' the message index for current board.
-		foreach ($topics_info as $row)
-		{
-			$topic_ids[] = $row['id_topic'];
-
-			// Does the theme support message previews?
-			if (!empty($modSettings['message_index_preview']))
-			{
-				// Limit them to $modSettings['preview_characters'] characters
-				$row['first_body'] = strip_tags(strtr(parse_bbc($row['first_body'], $row['first_smileys'], $row['id_first_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
-				$row['first_body'] = shorten_text($row['first_body'], !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128, true);
-
-				$row['last_body'] = strip_tags(strtr(parse_bbc($row['last_body'], $row['last_smileys'], $row['id_last_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
-				$row['last_body'] = shorten_text($row['last_body'], !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128, true);
-
-				// Censor the subject and message preview.
-				censorText($row['first_subject']);
-				censorText($row['first_body']);
-
-				// Don't censor them twice!
-				if ($row['id_first_msg'] == $row['id_last_msg'])
-				{
-					$row['last_subject'] = $row['first_subject'];
-					$row['last_body'] = $row['first_body'];
-				}
-				else
-				{
-					censorText($row['last_subject']);
-					censorText($row['last_body']);
-				}
-			}
-			else
-			{
-				$row['first_body'] = '';
-				$row['last_body'] = '';
-				censorText($row['first_subject']);
-
-				if ($row['id_first_msg'] == $row['id_last_msg'])
-					$row['last_subject'] = $row['first_subject'];
-				else
-					censorText($row['last_subject']);
-			}
-
-			// Decide how many pages the topic should have.
-			if ($row['num_replies'] + 1 > $context['messages_per_page'])
-			{
-				// We can't pass start by reference.
-				$start = -1;
-				$pages = constructPageIndex($scripturl . '?topic=' . $row['id_topic'] . '.%1$d', $start, $row['num_replies'] + 1, $context['messages_per_page'], true, array('prev_next' => false));
-
-				// If we can use all, show all.
-				if (!empty($modSettings['enableAllMessages']) && $row['num_replies'] + 1 < $modSettings['enableAllMessages'])
-					$pages .= ' &nbsp;<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0;all">' . $txt['all'] . '</a>';
-			}
-			else
-				$pages = '';
-
-			// We need to check the topic icons exist...
-			if (!empty($modSettings['messageIconChecks_enable']))
-			{
-				if (!isset($context['icon_sources'][$row['first_icon']]))
-					$context['icon_sources'][$row['first_icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $row['first_icon'] . '.png') ? 'images_url' : 'default_images_url';
-
-				if (!isset($context['icon_sources'][$row['last_icon']]))
-					$context['icon_sources'][$row['last_icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $row['last_icon'] . '.png') ? 'images_url' : 'default_images_url';
-			}
-			else
-			{
-				if (!isset($context['icon_sources'][$row['first_icon']]))
-					$context['icon_sources'][$row['first_icon']] = 'images_url';
-
-				if (!isset($context['icon_sources'][$row['last_icon']]))
-					$context['icon_sources'][$row['last_icon']] = 'images_url';
-			}
-
-			// 'Print' the topic info.
-			$context['topics'][$row['id_topic']] = array(
-				'id' => $row['id_topic'],
-				'first_post' => array(
-					'id' => $row['id_first_msg'],
-					'member' => array(
-						'username' => $row['first_member_name'],
-						'name' => $row['first_display_name'],
-						'id' => $row['first_id_member'],
-						'href' => !empty($row['first_id_member']) ? $scripturl . '?action=profile;u=' . $row['first_id_member'] : '',
-						'link' => !empty($row['first_id_member']) ? '<a href="' . $scripturl . '?action=profile;u=' . $row['first_id_member'] . '" title="' . $txt['profile_of'] . ' ' . $row['first_display_name'] . '" class="preview">' . $row['first_display_name'] . '</a>' : $row['first_display_name']
-					),
-					'time' => standardTime($row['first_poster_time']),
-					'html_time' => htmlTime($row['first_poster_time']),
-					'timestamp' => forum_time(true, $row['first_poster_time']),
-					'subject' => $row['first_subject'],
-					'preview' => trim($row['first_body']),
-					'icon' => $row['first_icon'],
-					'icon_url' => $settings[$context['icon_sources'][$row['first_icon']]] . '/post/' . $row['first_icon'] . '.png',
-					'href' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
-					'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $row['first_subject'] . '</a>'
-				),
-				'last_post' => array(
-					'id' => $row['id_last_msg'],
-					'member' => array(
-						'username' => $row['last_member_name'],
-						'name' => $row['last_display_name'],
-						'id' => $row['last_id_member'],
-						'href' => !empty($row['last_id_member']) ? $scripturl . '?action=profile;u=' . $row['last_id_member'] : '',
-						'link' => !empty($row['last_id_member']) ? '<a href="' . $scripturl . '?action=profile;u=' . $row['last_id_member'] . '">' . $row['last_display_name'] . '</a>' : $row['last_display_name']
-					),
-					'time' => standardTime($row['last_poster_time']),
-					'html_time' => htmlTime($row['last_poster_time']),
-					'timestamp' => forum_time(true, $row['last_poster_time']),
-					'subject' => $row['last_subject'],
-					'preview' => trim($row['last_body']),
-					'icon' => $row['last_icon'],
-					'icon_url' => $settings[$context['icon_sources'][$row['last_icon']]] . '/post/' . $row['last_icon'] . '.png',
-					'href' => $scripturl . '?topic=' . $row['id_topic'] . ($user_info['is_guest'] ? ('.' . (!empty($options['view_newest_first']) ? 0 : ((int) (($row['num_replies']) / $context['pageindex_multiplier'])) * $context['pageindex_multiplier']) . '#msg' . $row['id_last_msg']) : (($row['num_replies'] == 0 ? '.0' : '.msg' . $row['id_last_msg']) . '#new')),
-					'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . ($user_info['is_guest'] ? ('.' . (!empty($options['view_newest_first']) ? 0 : ((int) (($row['num_replies']) / $context['pageindex_multiplier'])) * $context['pageindex_multiplier']) . '#msg' . $row['id_last_msg']) : (($row['num_replies'] == 0 ? '.0' : '.msg' . $row['id_last_msg']) . '#new')) . '" ' . ($row['num_replies'] == 0 ? '' : 'rel="nofollow"') . '>' . $row['last_subject'] . '</a>'
-				),
-				'default_preview' => trim($row[!empty($modSettings['message_index_preview']) && $modSettings['message_index_preview'] == 2 ? 'last_body' : 'first_body']),
-				'is_sticky' => !empty($modSettings['enableStickyTopics']) && !empty($row['is_sticky']),
-				'is_locked' => !empty($row['locked']),
-				'is_poll' => !empty($modSettings['pollMode']) && $row['id_poll'] > 0,
-				'is_hot' => !empty($modSettings['useLikesNotViews']) ? $row['num_likes'] >= $modSettings['hotTopicPosts'] : $row['num_replies'] >= $modSettings['hotTopicPosts'],
-				'is_very_hot' => !empty($modSettings['useLikesNotViews']) ? $row['num_likes'] >= $modSettings['hotTopicVeryPosts'] : $row['num_replies'] >= $modSettings['hotTopicVeryPosts'],
-				'is_posted_in' => false,
-				'icon' => $row['first_icon'],
-				'icon_url' => $settings[$context['icon_sources'][$row['first_icon']]] . '/post/' . $row['first_icon'] . '.png',
-				'subject' => $row['first_subject'],
-				'new' => $row['new_from'] <= $row['id_msg_modified'],
-				'new_from' => $row['new_from'],
-				'newtime' => $row['new_from'],
-				'new_href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['new_from'] . '#new',
-				'redir_href' => !empty($row['id_redirect_topic']) ? $scripturl . '?topic=' . $row['id_topic'] . '.0;noredir' : '',
-				'pages' => $pages,
-				'replies' => comma_format($row['num_replies']),
-				'views' => comma_format($row['num_views']),
-				'likes' => comma_format($row['num_likes']),
-				'approved' => $row['approved'],
-				'unapproved_posts' => $row['unapproved_posts'],
-			);
-
-			if (!empty($settings['avatars_on_indexes']))
-				$context['topics'][$row['id_topic']]['last_post']['member']['avatar'] = determineAvatar($row);
-
-			determineTopicClass($context['topics'][$row['id_topic']]);
-		}
+		$context['topics'] = processMessageIndexTopicList($topics_info);
 
 		// Allow addons to add to the $context['topics']
 		call_integration_hook('integrate_messageindex_listing', array($topics_info));
@@ -425,6 +279,8 @@ class MessageIndex_Controller extends Action_Controller
 		// Fix the sequence of topics if they were retrieved in the wrong order. (for speed reasons...)
 		if ($fake_ascending)
 			$context['topics'] = array_reverse($context['topics'], true);
+
+		$topic_ids = array_keys($context['topics']);
 
 		if (!empty($modSettings['enableParticipation']) && !$user_info['is_guest'] && !empty($topic_ids))
 		{

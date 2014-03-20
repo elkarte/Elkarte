@@ -140,7 +140,7 @@ function template_unread()
 										</h4>
 									</div>
 									<div class="topic_starter">
-										', $txt['started_by'], ' ', $topic['first_post']['member']['link'], !empty($topic['pages']) ? '
+										', sprintf($txt['topic_started_by'], $topic['first_post']['member']['link'], $topic['board']['link']), !empty($topic['pages']) ? '
 										<ul class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '" role="menubar">' . $topic['pages'] . '</ul>' : '', '
 									</div>
 								</div>
@@ -285,7 +285,7 @@ function template_replies()
 										</h4>
 									</div>
 									<div class="topic_starter">
-										', $topic['first_post']['started_by'], !empty($topic['pages']) ? '
+										', sprintf($txt['topic_started_by'], $topic['first_post']['member']['link'], $topic['board']['link']), !empty($topic['pages']) ? '
 										<ul class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '" role="menubar">' . $topic['pages'] . '</ul>' : '', '
 									</div>
 								</div>

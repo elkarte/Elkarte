@@ -27,7 +27,7 @@ class Recent_Controller extends Action_Controller
 {
 	private $_have_temp_table = false;
 	private $_query_this_board = '';
-	private $_select_clause = '';
+	private $_preview_bodies = 0;
 	private $_boards = array();
 	private $_is_topics = false;
 	private $_ascending = false;
@@ -275,7 +275,7 @@ class Recent_Controller extends Action_Controller
 	 */
 	public function action_unread()
 	{
-		global $board, $scripturl, $context, $modSettings;
+		global $board, $scripturl, $context, $modSettings, $settings;
 
 		$this->_entering_unread();
 
@@ -324,7 +324,7 @@ class Recent_Controller extends Action_Controller
 			else
 				$min_message = (int) $min_message;
 
-			$context['topics'] = getUnreadTopics($this->_query_parameters, $this->_select_clause, 'message', $this->_query_this_board, $this->_have_temp_table, $min_message, $this->_sort_query, $this->_ascending, $_REQUEST['start'], $context['topics_per_page']);
+			$context['topics'] = getUnreadTopics($this->_query_parameters, $this->_preview_bodies, 'message', $this->_query_this_board, $this->_have_temp_table, $min_message, $this->_sort_query, $this->_ascending, $_REQUEST['start'], $context['topics_per_page'], !empty($settings['avatars_on_indexes']));
 		}
 		// New posts with or without temp table
 		elseif ($this->_is_topics)
@@ -365,7 +365,7 @@ class Recent_Controller extends Action_Controller
 			else
 				$min_message = (int) $min_message;
 
-			$context['topics'] = getUnreadTopics($this->_query_parameters, $this->_select_clause, 'topics', $this->_query_this_board, $this->_have_temp_table, $min_message, $this->_sort_query, $this->_ascending, $_REQUEST['start'], $context['topics_per_page']);
+			$context['topics'] = getUnreadTopics($this->_query_parameters, $this->_preview_bodies, 'topics', $this->_query_this_board, $this->_have_temp_table, $min_message, $this->_sort_query, $this->_ascending, $_REQUEST['start'], $context['topics_per_page'], !empty($settings['avatars_on_indexes']));
 		}
 		// Does it make sense?... Dunno.
 		else
@@ -380,7 +380,7 @@ class Recent_Controller extends Action_Controller
 	 */
 	public function action_unreadreplies()
 	{
-		global $board, $scripturl, $context, $modSettings;
+		global $board, $scripturl, $context, $modSettings, $settings;
 
 		$this->_entering_unread();
 
@@ -415,7 +415,7 @@ class Recent_Controller extends Action_Controller
 			return;
 		}
 
-		$context['topics'] = getUnreadReplies($this->_query_parameters, $this->_select_clause, $this->_query_this_board, $this->_have_temp_table, $min_message, $this->_sort_query, $this->_ascending, $_REQUEST['start'], $context['topics_per_page']);
+		$context['topics'] = getUnreadReplies($this->_query_parameters, $this->_preview_bodies, $this->_query_this_board, $this->_have_temp_table, $min_message, $this->_sort_query, $this->_ascending, $_REQUEST['start'], $context['topics_per_page'], !empty($settings['avatars_on_indexes']));
 
 		if ($context['topics'] === false)
 		{
@@ -570,7 +570,7 @@ class Recent_Controller extends Action_Controller
 		}
 
 		$context['sort_direction'] = $this->_ascending ? 'up' : 'down';
-		$context['sort_title'] = $ascending ? $txt['sort_desc'] : $txt['sort_asc'];
+		$context['sort_title'] = $this->_ascending ? $txt['sort_desc'] : $txt['sort_asc'];
 
 		// Trick
 		$txt['starter'] = $txt['started_by'];
@@ -615,24 +615,13 @@ class Recent_Controller extends Action_Controller
 
 		// If empty, no preview at all
 		if (empty($modSettings['message_index_preview']))
-			$preview_bodies = '';
+			$this->_preview_bodies = 0;
 		// If 0 means everything
 		elseif (empty($modSettings['preview_characters']))
-			$preview_bodies = 'ml.body AS last_body, ms.body AS first_body,';
+			$this->_preview_bodies = 'all';
 		// Default: a SUBSTRING
 		else
-			$preview_bodies = 'SUBSTRING(ml.body, 1, ' . ($modSettings['preview_characters'] + 256) . ') AS last_body, SUBSTRING(ms.body, 1, ' . ($modSettings['preview_characters'] + 256) . ') AS first_body,';
-
-		// This part is the same for each query.
-		$this->_select_clause = '
-					ms.subject AS first_subject, ms.poster_time AS first_poster_time, ms.id_topic, t.id_board, b.name AS bname,
-					t.num_replies, t.num_views, t.num_likes, ms.id_member AS id_first_member, ml.id_member AS id_last_member,
-					ml.poster_time AS last_poster_time, IFNULL(mems.real_name, ms.poster_name) AS first_poster_name,
-					IFNULL(meml.real_name, ml.poster_name) AS last_poster_name, ml.subject AS last_subject,
-					ml.icon AS last_icon, ms.icon AS first_icon, t.id_poll, t.is_sticky, t.locked, ml.modified_time AS last_modified_time,
-					IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1 AS new_from,
-					' . $preview_bodies . '
-					ml.smileys_enabled AS last_smileys, ms.smileys_enabled AS first_smileys, t.id_first_msg, t.id_last_msg';
+			$this->_preview_bodies = $modSettings['preview_characters'];
 	}
 
 	private function _exiting_unread()

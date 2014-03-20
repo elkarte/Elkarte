@@ -141,8 +141,8 @@ function getRecentPosts($messages, $start)
 	$request = $db->query('', '
 		SELECT
 			m.id_msg, m.subject, m.smileys_enabled, m.poster_time, m.body, m.id_topic, t.id_board, b.id_cat,
-			b.name AS bname, c.name AS cname, t.num_replies, m.id_member, m2.id_member AS id_first_member,
-			IFNULL(mem2.real_name, m2.poster_name) AS first_poster_name, t.id_first_msg,
+			b.name AS bname, c.name AS cname, t.num_replies, m.id_member, m2.id_member AS first_id_member,
+			IFNULL(mem2.real_name, m2.poster_name) AS first_display_name, t.id_first_msg,
 			IFNULL(mem.real_name, m.poster_name) AS poster_name, t.id_last_msg
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
@@ -196,10 +196,10 @@ function getRecentPosts($messages, $start)
 			'html_time' => htmlTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'first_poster' => array(
-				'id' => $row['id_first_member'],
-				'name' => $row['first_poster_name'],
-				'href' => empty($row['id_first_member']) ? '' : $scripturl . '?action=profile;u=' . $row['id_first_member'],
-				'link' => empty($row['id_first_member']) ? $row['first_poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_first_member'] . '">' . $row['first_poster_name'] . '</a>'
+				'id' => $row['first_id_member'],
+				'name' => $row['first_display_name'],
+				'href' => empty($row['first_id_member']) ? '' : $scripturl . '?action=profile;u=' . $row['first_id_member'],
+				'link' => empty($row['first_id_member']) ? $row['first_display_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['first_id_member'] . '">' . $row['first_display_name'] . '</a>'
 			),
 			'poster' => array(
 				'id' => $row['id_member'],
@@ -217,7 +217,7 @@ function getRecentPosts($messages, $start)
 			'delete_possible' => ($row['id_first_msg'] != $row['id_msg'] || $row['id_last_msg'] == $row['id_msg']) && (empty($modSettings['edit_disable_time']) || $row['poster_time'] + $modSettings['edit_disable_time'] * 60 >= time()),
 		);
 
-		if ($user_info['id'] == $row['id_first_member'])
+		if ($user_info['id'] == $row['first_id_member'])
 			$board_ids['own'][$row['id_board']][] = $row['id_msg'];
 		$board_ids['any'][$row['id_board']][] = $row['id_msg'];
 	}
@@ -365,14 +365,37 @@ function countRecentTopics($query_parameters, $showing_all_topics, $have_temp_ta
 	return array($num_topics, $min_message);
 }
 
-function getUnreadTopics($query_parameters, $select_clause, $join, $query_this_board, $have_temp_table, $min_message, $sort, $ascending, $start, $limit)
+function getUnreadTopics($query_parameters, $preview_bodies, $join, $query_this_board, $have_temp_table, $min_message, $sort, $ascending, $start, $limit, $include_avatars = false)
 {
 	global $modSettings, $user_info;
 
 	$db = database();
 
+	if ($preview_bodies == 'all')
+		$body_query = 'ml.body AS last_body, ms.body AS first_body,';
+	else
+	{
+		$preview_bodies = (int) $preview_bodies;
+
+		// If empty, no preview at all
+		if (empty($preview_bodies))
+			$body_query = '';
+		// Default: a SUBSTRING
+		else
+			$body_query = 'SUBSTRING(ml.body, 1, ' . ($preview_bodies + 256) . ') AS last_body, SUBSTRING(ms.body, 1, ' . ($preview_bodies + 256) . ') AS first_body,';
+	}
+
 	$request = $db->query('substring', '
-		SELECT ' . $select_clause . '
+		SELECT
+			ms.subject AS first_subject, ms.poster_time AS first_poster_time, ms.id_topic, t.id_board, b.name AS bname,
+			t.num_replies, t.num_views, t.num_likes, ms.id_member AS first_id_member, ml.id_member AS last_id_member,
+			ml.poster_time AS last_poster_time, IFNULL(mems.real_name, ms.poster_name) AS first_display_name,
+			IFNULL(meml.real_name, ml.poster_name) AS last_display_name, ml.subject AS last_subject,
+			ml.icon AS last_icon, ms.icon AS first_icon, t.id_poll, t.is_sticky, t.locked, ml.modified_time AS last_modified_time,
+			IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1 AS new_from,
+			' . $body_query . '
+			' . ($include_avatars ? ' meml.avatar ,IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type, meml.email_address, ' : '') . '
+			ml.smileys_enabled AS last_smileys, ms.smileys_enabled AS first_smileys, t.id_first_msg, t.id_last_msg
 		FROM {db_prefix}messages AS ms
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ms.id_topic AND t.id_first_msg = ms.id_msg)
 			INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)' . ($join == 'topics' ? '
@@ -381,7 +404,8 @@ function getUnreadTopics($query_parameters, $select_clause, $join, $query_this_b
 			LEFT JOIN {db_prefix}members AS mems ON (mems.id_member = ms.id_member)
 			LEFT JOIN {db_prefix}members AS meml ON (meml.id_member = ml.id_member)' . (!empty($have_temp_table) ? '
 			LEFT JOIN {db_prefix}log_topics_unread AS lt ON (lt.id_topic = t.id_topic)' : '
-			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})') . '
+			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})') . ($include_avatars ? '
+			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = ml.id_member AND a.id_member != 0)' : '') . '
 			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
 		WHERE t.' . $query_this_board . '
 			AND t.id_last_msg >= {int:min_message}
@@ -400,21 +424,28 @@ function getUnreadTopics($query_parameters, $select_clause, $join, $query_this_b
 		))
 	);
 
-	return processUnreadQuery($request);
+	$topics = array();
+	while ($row = $db->fetch_assoc($request))
+		$topics[] = $row;
+	$db->free_result($request);
+
+	return processRecentTopicList($topics);
 }
 
-function processUnreadQuery($request)
+function processRecentTopicList($topics_info, $topicseen = false)
 {
 	global $modSettings, $options, $scripturl, $context, $txt, $settings;
 
-	$db = database();
-
 	$topics = array();
-	while ($row = $db->fetch_assoc($request))
+	$messages_per_page = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
+	$topicseen = $topicseen ? ';topicseen' : '';
+
+	foreach ($topics_info as $row)
 	{
+		// is message previews enabled?
 		if (!empty($modSettings['message_index_preview']))
 		{
-			// Limit them to 128 characters - do this FIRST because it's a lot of wasted censoring otherwise.
+			// Limit them to $modSettings['preview_characters'] characters - do this FIRST because it's a lot of wasted censoring otherwise.
 			$row['first_body'] = strip_tags(strtr(parse_bbc($row['first_body'], $row['first_smileys'], $row['id_first_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
 			$row['first_body'] = shorten_text($row['first_body'], !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128, true);
 
@@ -451,11 +482,11 @@ function processUnreadQuery($request)
 
 		// Decide how many pages the topic should have.
 		$topic_length = $row['num_replies'] + 1;
-		$messages_per_page = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
 		if ($topic_length > $messages_per_page)
 		{
+			// We can't pass start by reference.
 			$start = -1;
-			$pages = constructPageIndex($scripturl . '?topic=' . $row['id_topic'] . '.%1$d;topicseen', $start, $topic_length, $messages_per_page, true, array('prev_next' => false));
+			$pages = constructPageIndex($scripturl . '?topic=' . $row['id_topic'] . '.%1$d' . $topicseen, $start, $topic_length, $messages_per_page, true, array('prev_next' => false));
 
 			// If we can use all, show it.
 			if (!empty($modSettings['enableAllMessages']) && $topic_length < $modSettings['enableAllMessages'])
@@ -475,6 +506,14 @@ function processUnreadQuery($request)
 			if (!isset($context['icon_sources'][$row['last_icon']]))
 				$context['icon_sources'][$row['last_icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $row['last_icon'] . '.png') ? 'images_url' : 'default_images_url';
 		}
+		else
+		{
+			if (!isset($context['icon_sources'][$row['first_icon']]))
+				$context['icon_sources'][$row['first_icon']] = 'images_url';
+
+			if (!isset($context['icon_sources'][$row['last_icon']]))
+				$context['icon_sources'][$row['last_icon']] = 'images_url';
+		}
 
 		// And build the array.
 		$topics[$row['id_topic']] = array(
@@ -482,44 +521,40 @@ function processUnreadQuery($request)
 			'first_post' => array(
 				'id' => $row['id_first_msg'],
 				'member' => array(
-					'name' => $row['first_poster_name'],
-					'id' => $row['id_first_member'],
-					'href' => $scripturl . '?action=profile;u=' . $row['id_first_member'],
-					'link' => !empty($row['id_first_member']) ? '<a class="preview" href="' . $scripturl . '?action=profile;u=' . $row['id_first_member'] . '" title="' . $txt['profile_of'] . ' ' . $row['first_poster_name'] . '">' . $row['first_poster_name'] . '</a>' : $row['first_poster_name']
+					'name' => $row['first_display_name'],
+					'id' => $row['first_id_member'],
+					'href' => !empty($row['first_id_member']) ? $scripturl . '?action=profile;u=' . $row['first_id_member'] : '',
+					'link' => !empty($row['first_id_member']) ? '<a href="' . $scripturl . '?action=profile;u=' . $row['first_id_member'] . '" title="' . $txt['profile_of'] . ' ' . $row['first_display_name'] . '" class="preview">' . $row['first_display_name'] . '</a>' : $row['first_display_name']
 				),
 				'time' => standardTime($row['first_poster_time']),
 				'html_time' => htmlTime($row['first_poster_time']),
 				'timestamp' => forum_time(true, $row['first_poster_time']),
 				'subject' => $row['first_subject'],
-				'preview' => $row['first_body'],
+				'preview' => trim($row['first_body']),
 				'icon' => $row['first_icon'],
 				'icon_url' => $settings[$context['icon_sources'][$row['first_icon']]] . '/post/' . $row['first_icon'] . '.png',
-				'href' => $scripturl . '?topic=' . $row['id_topic'] . '.0;topicseen',
-				'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0;topicseen">' . $row['first_subject'] . '</a>'
+				'href' => $scripturl . '?topic=' . $row['id_topic'] . '.0' . $topicseen,
+				'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0' . $topicseen . '">' . $row['first_subject'] . '</a>'
 			),
 			'last_post' => array(
 				'id' => $row['id_last_msg'],
 				'member' => array(
-					'name' => $row['last_poster_name'],
-					'id' => $row['id_last_member'],
-					'href' => $scripturl . '?action=profile;u=' . $row['id_last_member'],
-					'link' => !empty($row['id_last_member']) ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_last_member'] . '">' . $row['last_poster_name'] . '</a>' : $row['last_poster_name']
+					'name' => $row['last_display_name'],
+					'id' => $row['last_id_member'],
+					'href' => !empty($row['last_id_member']) ? $scripturl . '?action=profile;u=' . $row['last_id_member'] : '',
+					'link' => !empty($row['last_id_member']) ? '<a href="' . $scripturl . '?action=profile;u=' . $row['last_id_member'] . '">' . $row['last_display_name'] . '</a>' : $row['last_display_name']
 				),
 				'time' => standardTime($row['last_poster_time']),
 				'html_time' => htmlTime($row['last_poster_time']),
 				'timestamp' => forum_time(true, $row['last_poster_time']),
 				'subject' => $row['last_subject'],
-				'preview' => $row['last_body'],
+				'preview' => trim($row['last_body']),
 				'icon' => $row['last_icon'],
 				'icon_url' => $settings[$context['icon_sources'][$row['last_icon']]] . '/post/' . $row['last_icon'] . '.png',
-				'href' => $scripturl . '?topic=' . $row['id_topic'] . ($row['num_replies'] == 0 ? '.0' : '.msg' . $row['id_last_msg']) . ';topicseen#msg' . $row['id_last_msg'],
-				'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . ($row['num_replies'] == 0 ? '.0' : '.msg' . $row['id_last_msg']) . ';topicseen#msg' . $row['id_last_msg'] . '" rel="nofollow">' . $row['last_subject'] . '</a>'
+				'href' => $scripturl . '?topic=' . $row['id_topic'] . ($row['num_replies'] == 0 ? '.0' : '.msg' . $row['id_last_msg']) . $topicseen . '#msg' . $row['id_last_msg'],
+				'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . ($row['num_replies'] == 0 ? '.0' : '.msg' . $row['id_last_msg']) . $topicseen . '#msg' . $row['id_last_msg'] . '" rel="nofollow">' . $row['last_subject'] . '</a>'
 			),
 			'default_preview' => trim($row[!empty($modSettings['message_index_preview']) && $modSettings['message_index_preview'] == 2 ? 'last_body' : 'first_body']),
-			'new_from' => $row['new_from'],
-			'new_href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['new_from'] . ';topicseen#new',
-			'href' => $scripturl . '?topic=' . $row['id_topic'] . ($row['num_replies'] == 0 ? '.0' : '.msg' . $row['new_from']) . ';topicseen' . ($row['num_replies'] == 0 ? '' : 'new'),
-			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . ($row['num_replies'] == 0 ? '.0' : '.msg' . $row['new_from']) . ';topicseen#msg' . $row['new_from'] . '" rel="nofollow">' . $row['first_subject'] . '</a>',
 			'is_sticky' => !empty($modSettings['enableStickyTopics']) && !empty($row['is_sticky']),
 			'is_locked' => !empty($row['locked']),
 			'is_poll' => !empty($modSettings['pollMode']) && $row['id_poll'] > 0,
@@ -529,27 +564,36 @@ function processUnreadQuery($request)
 			'icon' => $row['first_icon'],
 			'icon_url' => $settings[$context['icon_sources'][$row['first_icon']]] . '/post/' . $row['first_icon'] . '.png',
 			'subject' => $row['first_subject'],
+			'new' => !empty($row['id_msg_modified']) && $row['new_from'] <= $row['id_msg_modified'],
+			'new_from' => $row['new_from'],
+			'newtime' => $row['new_from'],
+			'new_href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['new_from'] . $topicseen . '#new',
+			'href' => $scripturl . '?topic=' . $row['id_topic'] . ($row['num_replies'] == 0 ? '.0' : '.msg' . $row['new_from']) . $topicseen . ($row['num_replies'] == 0 ? '' : 'new'),
+			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . ($row['num_replies'] == 0 ? '.0' : '.msg' . $row['new_from']) . $topicseen . '#msg' . $row['new_from'] . '" rel="nofollow">' . $row['first_subject'] . '</a>',
 			'pages' => $pages,
 			'replies' => comma_format($row['num_replies']),
 			'views' => comma_format($row['num_views']),
 			'likes' => comma_format($row['num_likes']),
-			'board' => array(
+		);
+
+		if (!empty($row['id_board']))
+			$topics[$row['id_topic']]['board'] = array(
 				'id' => $row['id_board'],
 				'name' => $row['bname'],
 				'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
 				'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['bname'] . '</a>'
-			)
-		);
+			);
 
-		$topics[$row['id_topic']]['first_post']['started_by'] = sprintf($txt['topic_started_by'], $topics[$row['id_topic']]['first_post']['member']['link'], $topics[$row['id_topic']]['board']['link']);
+		if (!empty($settings['avatars_on_indexes']))
+			$topics[$row['id_topic']]['last_post']['member']['avatar'] = determineAvatar($row);
+
 		determineTopicClass($topics[$row['id_topic']]);
 	}
-	$db->free_result($request);
 
 	return $topics;
 }
 
-function getUnreadReplies($query_parameters, $select_clause, $query_this_board, $have_temp_table, $min_message, $sort, $ascending, $start, $limit)
+function getUnreadReplies($query_parameters, $preview_bodies, $query_this_board, $have_temp_table, $min_message, $sort, $ascending, $start, $limit, $include_avatars = false)
 {
 	global $modSettings, $user_info;
 
@@ -609,8 +653,31 @@ function getUnreadReplies($query_parameters, $select_clause, $query_this_board, 
 	if (empty($topics))
 		return false;
 
+	if ($preview_bodies == 'all')
+		$body_query = 'ml.body AS last_body, ms.body AS first_body,';
+	else
+	{
+		$preview_bodies = (int) $preview_bodies;
+
+		// If empty, no preview at all
+		if (empty($preview_bodies))
+			$body_query = '';
+		// Default: a SUBSTRING
+		else
+			$body_query = 'SUBSTRING(ml.body, 1, ' . ($preview_bodies + 256) . ') AS last_body, SUBSTRING(ms.body, 1, ' . ($preview_bodies + 256) . ') AS first_body,';
+	}
+
 	$request = $db->query('substring', '
-		SELECT ' . $select_clause . '
+		SELECT
+			ms.subject AS first_subject, ms.poster_time AS first_poster_time, ms.id_topic, t.id_board, b.name AS bname,
+			t.num_replies, t.num_views, t.num_likes, ms.id_member AS first_id_member, ml.id_member AS last_id_member,
+			ml.poster_time AS last_poster_time, IFNULL(mems.real_name, ms.poster_name) AS first_display_name,
+			IFNULL(meml.real_name, ml.poster_name) AS last_display_name, ml.subject AS last_subject,
+			ml.icon AS last_icon, ms.icon AS first_icon, t.id_poll, t.is_sticky, t.locked, ml.modified_time AS last_modified_time,
+			IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1 AS new_from,
+			' . $body_query . '
+			' . ($include_avatars ? ' meml.avatar, IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type, meml.email_address, ' : '') . '
+			ml.smileys_enabled AS last_smileys, ms.smileys_enabled AS first_smileys, t.id_first_msg, t.id_last_msg
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS ms ON (ms.id_topic = t.id_topic AND ms.id_msg = t.id_first_msg)
 			INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
@@ -618,7 +685,8 @@ function getUnreadReplies($query_parameters, $select_clause, $query_this_board, 
 			LEFT JOIN {db_prefix}members AS mems ON (mems.id_member = ms.id_member)
 			LEFT JOIN {db_prefix}members AS meml ON (meml.id_member = ml.id_member)
 			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
-			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
+			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})' . ($include_avatars ? '
+			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = ml.id_member AND a.id_member != 0)' : '') . '
 		WHERE t.id_topic IN ({array_int:topic_list})
 		ORDER BY {raw:order}
 		LIMIT {int:limit}',
@@ -630,7 +698,12 @@ function getUnreadReplies($query_parameters, $select_clause, $query_this_board, 
 		)
 	);
 
-	return processUnreadQuery($request);
+	$return = array();
+	while ($row = $db->fetch_assoc($request))
+		$return[] = $row;
+	$db->free_result($request);
+
+	return processRecentTopicList($return);
 }
 
 function unreadreplies_tempTable($board_id, $sort)
