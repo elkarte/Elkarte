@@ -3927,7 +3927,7 @@ function remove_integration_function($hook, $function, $file = '')
 	global $modSettings;
 
 	$db = database();
-	$integration_call = '';
+	$integration_call = (!empty($file) && $file !== true) ? $function . '|' . $file : $function;
 
 	// Get the permanent functions.
 	$request = $db->query('', '
@@ -3945,21 +3945,6 @@ function remove_integration_function($hook, $function, $file = '')
 	if (!empty($current_functions))
 	{
 		$current_functions = explode(',', $current_functions);
-
-		// Find the specific hook / function combination and remove it
-		foreach ($current_functions as $filefunc)
-		{
-			if (strpos($filefunc, '|') !== false)
-				list($func, $inc_file) = explode('|', $filefunc);
-			else
-				$func = $filefunc;
-
-			if ($func == $function && (empty($file) || (!empty($file) && !empty($inc_file) && $file == $inc_file)))
-			{
-				$integration_call = $filefunc;
-				break;
-			}
-		}
 
 		if (in_array($integration_call, $current_functions))
 		{
