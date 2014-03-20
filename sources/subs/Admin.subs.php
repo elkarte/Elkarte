@@ -212,31 +212,13 @@ function getFileVersions(&$versionOptions)
 		'default_language_versions' => array(),
 	);
 
-	// The comment looks rougly like... that.
-	$version_regex = '~\*\s@version\s+(.+)[\s]{2}~i';
-	$unknown_version = '??';
-
 	// Find the version in SSI.php's file header.
 	if (!empty($versionOptions['include_ssi']) && file_exists(BOARDDIR . '/SSI.php'))
-	{
-		$header = file_get_contents(BOARDDIR . '/SSI.php', false, null, 0, 768);
-		if (preg_match($version_regex, $header, $match) == 1)
-			$version_info['file_versions']['SSI.php'] = $match[1];
-		// Not found!  This is bad.
-		else
-			$version_info['file_versions']['SSI.php'] = $unknown_version;
-	}
+		readFileVersions($version_info, array('file_versions' => BOARDDIR), 'SSI.php');
 
 	// Do the paid subscriptions handler?
 	if (!empty($versionOptions['include_subscriptions']) && file_exists(BOARDDIR . '/subscriptions.php'))
-	{
-		$header = file_get_contents(BOARDDIR . '/subscriptions.php', false, null, 0, 768);
-		if (preg_match($version_regex, $header, $match) == 1)
-			$version_info['file_versions']['subscriptions.php'] = $match[1];
-		// If we haven't how do we all get paid?
-		else
-			$version_info['file_versions']['subscriptions.php'] = $unknown_version;
-	}
+		readFileVersions($version_info, array('file_versions' => BOARDDIR), 'subscriptions.php');
 
 	// Load all the files in the sources and its sub directorys
 	$directories = array(
@@ -247,52 +229,13 @@ function getFileVersions(&$versionOptions)
 		'file_versions_subs' => SUBSDIR,
 		'file_versions_lib' => EXTDIR
 	);
-	foreach ($directories as $area => $dir)
-	{
-		$sources_dir = dir($dir);
-		while ($entry = $sources_dir->read())
-		{
-			if (substr($entry, -4) === '.php' && !is_dir($dir . '/' . $entry) && $entry !== 'index.php' && $entry !== 'sphinxapi.php')
-			{
-				// Read the first 4k from the file.... enough for the header.
-				$header = file_get_contents($dir . '/' . $entry, false, null, 0, 768);
-
-				// Look for the version comment in the file header.
-				if (preg_match($version_regex, $header, $match))
-					$version_info[$area][$entry] = $match[1];
-				// It wasn't found, but the file was... show a $unknown_version.
-				else
-					$version_info[$area][$entry] = '??';
-			}
-		}
-		$sources_dir->close();
-	}
+	readFileVersions($version_info, $directories, '.php');
 
 	// Load all the files in the default template directory - and the current theme if applicable.
 	$directories = array('default_template_versions' => $settings['default_theme_dir']);
 	if ($settings['theme_id'] != 1)
 		$directories += array('template_versions' => $settings['theme_dir']);
-
-	foreach ($directories as $type => $dirname)
-	{
-		$this_dir = dir($dirname);
-		while ($entry = $this_dir->read())
-		{
-			if (substr($entry, -12) == 'template.php' && !is_dir($dirname . '/' . $entry))
-			{
-				// Read the first 768 bytes from the file.... enough for the header.
-				$header = file_get_contents($dirname . '/' . $entry, false, null, 0, 768);
-
-				// Look for the version comment in the file header.
-				if (preg_match($version_regex, $header, $match) == 1)
-					$version_info[$type][$entry] = $match[1];
-				// It wasn't found, but the file was... show a '??'.
-				else
-					$version_info[$type][$entry] = $unknown_version;
-			}
-		}
-		$this_dir->close();
-	}
+	readFileVersions($version_info, $directories, 'template.php');
 
 	// Load up all the files in the default language directory and sort by language.
 	$this_dir = dir($lang_dir);
@@ -343,6 +286,43 @@ function getFileVersions(&$versionOptions)
 	}
 
 	return $version_info;
+}
+
+/**
+ * Read a directory searching for files with a certain pattern in the name
+ *
+ * @param mixed[] $version_info - 
+ * @param string[] $directories - an array of directories to loop
+ * @param string $pattern - how the name of the files should end
+ */
+function readFileVersions(&$version_info, $directories, $pattern)
+{
+	// The comment looks rougly like... that.
+	$version_regex = '~\*\s@version\s+(.+)[\s]{2}~i';
+	$unknown_version = '??';
+
+	$ext_offset = -strlen($pattern);
+
+	foreach ($directories as $type => $dirname)
+	{
+		$this_dir = dir($dirname);
+		while ($entry = $this_dir->read())
+		{
+			if (substr($entry, $ext_offset) == $pattern && !is_dir($dirname . '/' . $entry))
+			{
+				// Read the first 768 bytes from the file.... enough for the header.
+				$header = file_get_contents($dirname . '/' . $entry, false, null, 0, 768);
+
+				// Look for the version comment in the file header.
+				if (preg_match($version_regex, $header, $match) == 1)
+					$version_info[$type][$entry] = $match[1];
+				// It wasn't found, but the file was... show a $unknown_version.
+				else
+					$version_info[$type][$entry] = $unknown_version;
+			}
+		}
+		$this_dir->close();
+	}
 }
 
 /**
