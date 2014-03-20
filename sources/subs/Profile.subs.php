@@ -161,7 +161,7 @@ function setupProfileContext($fields, $hook = '')
  *
  * @param int $memID
  * @param string $area = 'summary'
- * @param array $custom_fields = array()
+ * @param mixed[] $custom_fields = array()
  */
 function loadCustomFields($memID, $area = 'summary', array $custom_fields = array())
 {
@@ -656,8 +656,6 @@ function loadProfileFields($force_reload = false)
 			// Note this will only work if passwrd2 also exists!
 			'input_validate' => function (&$value) {
 				global $user_info, $cur_profile;
-
-				$db = database();
 
 				// If we didn't try it then ignore it!
 				if ($value == '')
