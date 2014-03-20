@@ -213,7 +213,7 @@ class Convert_BBC
 	 */
 	private function _convert_childNodes($node)
 	{
-		if (self::_has_parent_code($node, $this->_parser))
+		if (empty($node) || self::_has_parent_code($node, $this->_parser))
 			return;
 
 		// Keep traversing till we are at the base of this node
