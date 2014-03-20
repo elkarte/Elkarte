@@ -1228,7 +1228,7 @@ errorbox_handler.prototype.init = function()
 		var current_error_handler = this.opt.self;
 		$(document).ready(function() {
 			var current_error = eval(current_error_handler);
-			$editor_data[current_error.opt.editor_id].addEvent(current_error.opt.editor_id, 'blur', function() {
+			$editor_data[current_error.opt.editor_id].addEvent(current_error.opt.editor_id, 'keyup', function() {
 				current_error.checkErrors();
 			});
 		});

@@ -489,8 +489,8 @@ function create_control_richedit($editorOptions)
 		check_id: "post_subject"
 	});
 
-	var body_err = new errorbox_handler({
-		self: \'body_err\',
+	var body_err_' . $editorOptions['id'] . ' = new errorbox_handler({
+		self: \'body_err_' . $editorOptions['id'] . '\',
 		error_box_id: \'post_error\',
 		error_checks: [{
 			code: \'no_message\',
@@ -504,7 +504,7 @@ function create_control_richedit($editorOptions)
 		editor_id: \'' . $editorOptions['id'] . '\',
 		editor: ' . JavaScriptEscape('
 		(function () {
-			return $editor_data[' . $editorOptions['id'] . '].val();
+			return $editor_data[\'' . $editorOptions['id'] . '\'].val();
 		});') . '
 	});', true);
 	}

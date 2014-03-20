@@ -882,9 +882,7 @@ class Post_Controller extends Action_Controller
 			'height' => '275px',
 			'width' => '100%',
 			// We do XML preview here.
-			'preview_type' => 2,
-			// Live errors - try or die
-			'live_errors' => true
+			'preview_type' => 2
 		);
 		create_control_richedit($editorOptions);
 
