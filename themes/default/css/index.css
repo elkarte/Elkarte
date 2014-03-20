@@ -1400,7 +1400,7 @@ a.bbc_link {
 #gotop, #gobottom {
 	position: fixed;
 	bottom: 50%;
-	right: 0;
+	left: 0;
 	z-index: 9;
 	padding: 1.3em 0.1em 0 0.1em;
 	height: 1.5em;
@@ -4292,7 +4292,7 @@ dl.no_members {
 		padding-right: 2px;
 	}
 	#gobottom, #gotop {
-		padding-left: 0.25em;
+		padding-right: 0.25em;
 	}
 	#message_index_jump_to {
 		display: block;
@@ -4416,7 +4416,7 @@ dl.no_members {
 		text-align: center;
 	}
 	#gotop {
-		margin-right: 1.4em;
+		margin-left: 1.45em;
 	}
 	.admin_menu li {
 		float: left;
