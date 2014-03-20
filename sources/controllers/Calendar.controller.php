@@ -206,7 +206,7 @@ class Calendar_Controller extends Action_Controller
 
 			// Validate the post...
 			if (!isset($_POST['link_to_board']))
-				validateEventPost();
+				$this->validateEventPost();
 
 			// If you're not allowed to edit any events, you have to be the poster.
 			if ($event_id > 0 && !allowedTo('calendar_edit_any'))
