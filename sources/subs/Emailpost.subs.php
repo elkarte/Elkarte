@@ -18,6 +18,9 @@ if (!defined('ELK'))
 /**
  * Converts text / HTML to BBC
  *
+ * What it does:
+ * - protects certain tags from conversion
+ * - strips original message from the reply if possible
  * - If the email is html based, this will convert basic html tags to bbc tags
  * - If the email is plain text it will convert it to html based on markdown text
  * conventions and then that will be converted to bbc.
@@ -100,6 +103,7 @@ function pbe_email_to_bbc($text, $html)
 /**
  * Prepares the email body so that it looks like a forum post
  *
+ * What it does:
  * - Removes extra content as defined in the ACP filters
  * - Fixes quotes and quote levels
  * - Re-flows (unfolds) an email using the EmailFormat.class

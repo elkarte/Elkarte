@@ -176,7 +176,7 @@ function port_type($type)
 /**
  * Find and return the proper recycle bin for gmail
  *
- * @param object $mailbox connection object to the mailbox
+ * @param imap_open $mailbox connection object to the mailbox
  * @param string $server server string, used to clean the imap list
  */
 function get_trash_folder($mailbox, $server)

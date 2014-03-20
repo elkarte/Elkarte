@@ -85,7 +85,7 @@ $txt['maillist_mail_from_post'] = 'e.g. noreply@yourdomain.com';
 // Imap settings
 $txt['maillist_imap'] = 'IMAP Settings';
 $txt['maillist_imap_host'] = 'Mailbox Server Name';
-$txt['maillist_imap_host_desc'] = 'Enter a server name and :optional port. For example: imap.gmail.com';
+$txt['maillist_imap_host_desc'] = 'Enter a mail server host name and optional :port number. e.g. imap.gmail.com or imap.gmail.com:993';
 $txt['maillist_imap_mailbox'] = 'Mailbox Name';
 $txt['maillist_imap_mailbox_desc'] = 'Enter a mailbox name on the server. For example: INBOX';
 $txt['maillist_imap_uid'] = 'Mailbox Username';
@@ -106,7 +106,7 @@ $txt['maillist_imap_reason'] = 'The following should be left BLANK if you intend
 $txt['maillist_imap_missing'] = 'IMAP functions are not installed on your system, no settings are available';
 $txt['maillist_imap_cron'] = 'Fake-Cron (scheduled task)';
 $txt['maillist_imap_cron_desc'] = 'If you can\'t run a cron job on your system, as a last resort check this to instead run this as an ElkArte scheduled task';
-$txt['scheduled_task_desc_pbeIMAP'] = 'Runs the post by email IMAP mailbox program to read new email from the designated inbox';
+$txt['scheduled_task_desc_pbeIMAP'] = 'Runs the post by email IMAP mailbox program to read new email from the designated mailbox';
 
 // General Receiving Settings
 $txt['maillist_inbound'] = 'General Receiving Settings';

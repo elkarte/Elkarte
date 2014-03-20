@@ -184,10 +184,12 @@ class Emailpost_Controller extends Action_Controller
 
 	/**
 	 * New Topic posting controller, reads, parses, checks and posts a new topic
+	 *
+	 * What it does:
 	 * - New topics do not have security keys in them so they are subject to spoofing
 	 * - It must be from the email of a registered user
 	 * - It must have been sent to an email ID that has been set to post new topics
-	 * Accessed through emailtopic.
+	 * - Accessed through emailtopic.
 	 *
 	 * @param string|null $data used to supply a full body+headers email
 	 */
