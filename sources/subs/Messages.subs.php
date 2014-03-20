@@ -1023,7 +1023,7 @@ function loadMessageRequest($msg_selects, $msg_tables, $msg_parameters, $options
 			' . (!empty($msg_tables) ? implode("\n\t\t\t", $msg_tables) : '') . '
 		WHERE m.id_msg IN ({array_int:message_list})
 			' . (!empty($options['additional_conditions']) ? $options['additional_conditions'] : '') . '
-		ORDER BY m.id_msg' . (empty($options['view_newest_first']) ? '' : ' DESC'),
+		ORDER BY m.id_msg',
 		$msg_parameters
 	);
 

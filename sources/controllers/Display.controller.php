@@ -163,12 +163,12 @@ class Display_Controller
 		{
 			$myUnapprovedPosts = unapprovedPosts($topic, $user_info['id']);
 
-			$context['total_visible_posts'] = $context['num_replies'] + $myUnapprovedPosts + ($topicinfo['approved'] ? 1 : 0);
+			$total_visible_posts = $context['num_replies'] + $myUnapprovedPosts + ($topicinfo['approved'] ? 1 : 0);
 		}
 		elseif ($user_info['is_guest'])
-			$context['total_visible_posts'] = $context['num_replies'] + ($topicinfo['approved'] ? 1 : 0);
+			$total_visible_posts = $context['num_replies'] + ($topicinfo['approved'] ? 1 : 0);
 		else
-			$context['total_visible_posts'] = $context['num_replies'] + $topicinfo['unapproved_posts'] + ($topicinfo['approved'] ? 1 : 0);
+			$total_visible_posts = $context['num_replies'] + $topicinfo['unapproved_posts'] + ($topicinfo['approved'] ? 1 : 0);
 
 		// When was the last time this topic was replied to?  Should we warn them about it?
 		require_once(SUBSDIR . '/Messages.subs.php');
@@ -184,8 +184,8 @@ class Display_Controller
 				// Guests automatically go to the last post.
 				if ($user_info['is_guest'])
 				{
-					$context['start_from'] = $context['total_visible_posts'] - 1;
-					$_REQUEST['start'] = empty($options['view_newest_first']) ? $context['start_from'] : 0;
+					$context['start_from'] = $total_visible_posts - 1;
+					$_REQUEST['start'] = $context['start_from'];
 				}
 				else
 				{
@@ -204,8 +204,7 @@ class Display_Controller
 				{
 					// Find the number of messages posted before said time...
 					$context['start_from'] = countNewPosts($topic, $topicinfo, $timestamp);
-					// Handle view_newest_first options, and get the correct start value.
-					$_REQUEST['start'] = empty($options['view_newest_first']) ? $context['start_from'] : $context['total_visible_posts'] - $context['start_from'] - 1;
+					$_REQUEST['start'] = $context['start_from'];
 				}
 			}
 			// Link to a message...
@@ -213,7 +212,7 @@ class Display_Controller
 			{
 				$virtual_msg = (int) substr($_REQUEST['start'], 3);
 				if (!$topicinfo['unapproved_posts'] && $virtual_msg >= $topicinfo['id_last_msg'])
-					$context['start_from'] = $context['total_visible_posts'] - 1;
+					$context['start_from'] = $total_visible_posts - 1;
 				elseif (!$topicinfo['unapproved_posts'] && $virtual_msg <= $topicinfo['id_first_msg'])
 					$context['start_from'] = 0;
 				else
@@ -223,7 +222,7 @@ class Display_Controller
 				}
 
 				// We need to reverse the start as well in this case.
-				$_REQUEST['start'] = empty($options['view_newest_first']) ? $context['start_from'] : $context['total_visible_posts'] - $context['start_from'] - 1;
+				$_REQUEST['start'] = $context['start_from'];
 			}
 		}
 
@@ -296,7 +295,7 @@ class Display_Controller
 		}
 
 		// If all is set, but not allowed... just unset it.
-		$can_show_all = !empty($modSettings['enableAllMessages']) && $context['total_visible_posts'] > $context['messages_per_page'] && $context['total_visible_posts'] < $modSettings['enableAllMessages'];
+		$can_show_all = !empty($modSettings['enableAllMessages']) && $total_visible_posts > $context['messages_per_page'] && $total_visible_posts < $modSettings['enableAllMessages'];
 		if (isset($_REQUEST['all']) && !$can_show_all)
 			unset($_REQUEST['all']);
 		// Otherwise, it must be allowed... so pretend start was -1.
@@ -304,19 +303,19 @@ class Display_Controller
 			$_REQUEST['start'] = -1;
 
 		// Construct the page index, allowing for the .START method...
-		$context['page_index'] = constructPageIndex($scripturl . '?topic=' . $topic . '.%1$d', $_REQUEST['start'], $context['total_visible_posts'], $context['messages_per_page'], true, array('all' => $can_show_all, 'all_selected' => isset($_REQUEST['all'])));
+		$context['page_index'] = constructPageIndex($scripturl . '?topic=' . $topic . '.%1$d', $_REQUEST['start'], $total_visible_posts, $context['messages_per_page'], true, array('all' => $can_show_all, 'all_selected' => isset($_REQUEST['all'])));
 		$context['start'] = $_REQUEST['start'];
 
 		// This is information about which page is current, and which page we're on - in case you don't like the constructed page index. (again, wireles..)
 		$context['page_info'] = array(
 			'current_page' => $_REQUEST['start'] / $context['messages_per_page'] + 1,
-			'num_pages' => floor(($context['total_visible_posts'] - 1) / $context['messages_per_page']) + 1,
+			'num_pages' => floor(($total_visible_posts - 1) / $context['messages_per_page']) + 1,
 		);
 
 		// Figure out all the link to the next/prev
 		$context['links'] += array(
 			'prev' => $_REQUEST['start'] >= $context['messages_per_page'] ? $scripturl . '?topic=' . $topic . '.' . ($_REQUEST['start'] - $context['messages_per_page']) : '',
-			'next' => $_REQUEST['start'] + $context['messages_per_page'] < $context['total_visible_posts'] ? $scripturl . '?topic=' . $topic. '.' . ($_REQUEST['start'] + $context['messages_per_page']) : '',
+			'next' => $_REQUEST['start'] + $context['messages_per_page'] < $total_visible_posts ? $scripturl . '?topic=' . $topic. '.' . ($_REQUEST['start'] + $context['messages_per_page']) : '',
 		);
 
 		// If they are viewing all the posts, show all the posts, otherwise limit the number.
@@ -454,15 +453,15 @@ class Display_Controller
 		}
 
 		// Calculate the fastest way to get the messages!
-		$ascending = empty($options['view_newest_first']);
+		$ascending = true;
 		$start = $_REQUEST['start'];
 		$limit = $context['messages_per_page'];
 		$firstIndex = 0;
-		if ($start >= $context['total_visible_posts'] / 2 && $context['messages_per_page'] != -1)
+		if ($start >= $total_visible_posts / 2 && $context['messages_per_page'] != -1)
 		{
 			$ascending = !$ascending;
-			$limit = $context['total_visible_posts'] <= $start + $limit ? $context['total_visible_posts'] - $start : $limit;
-			$start = $context['total_visible_posts'] <= $start + $limit ? 0 : $context['total_visible_posts'] - $start - $limit;
+			$limit = $total_visible_posts <= $start + $limit ? $total_visible_posts - $start : $limit;
+			$start = $total_visible_posts <= $start + $limit ? 0 : $total_visible_posts - $start - $limit;
 			$firstIndex = $limit - 1;
 		}
 
@@ -589,10 +588,7 @@ class Display_Controller
 
 			// Since the anchor information is needed on the top of the page we load these variables beforehand.
 			$context['first_message'] = isset($messages[$firstIndex]) ? $messages[$firstIndex] : $messages[0];
-			if (empty($options['view_newest_first']))
-				$context['first_new_message'] = isset($context['start_from']) && $_REQUEST['start'] == $context['start_from'];
-			else
-				$context['first_new_message'] = isset($context['start_from']) && $_REQUEST['start'] == $topicinfo['num_replies'] - $context['start_from'];
+			$context['first_new_message'] = isset($context['start_from']) && $_REQUEST['start'] == $context['start_from'];
 		}
 		else
 		{
@@ -888,7 +884,7 @@ class Display_Controller
 
 		// Remember which message this is.  (ie. reply #83)
 		if ($counter === null || $reset)
-			$counter = empty($options['view_newest_first']) ? $context['start'] : $context['total_visible_posts'] - $context['start'];
+			$counter = $context['start'];
 
 		// Start from the beginning...
 		if ($reset)
@@ -1008,10 +1004,7 @@ class Display_Controller
 
 		call_integration_hook('integrate_prepare_display_context', array(&$output, &$message));
 
-		if (empty($options['view_newest_first']))
-			$counter++;
-		else
-			$counter--;
+		$counter++;
 
 		return $output;
 	}
