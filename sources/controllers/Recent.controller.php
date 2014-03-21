@@ -657,7 +657,7 @@ class Recent_Controller extends Action_Controller
 		);
 
 		$context['querystring_board_limits'] = sprintf($context['querystring_board_limits'], $_REQUEST['start']);
-		$context['topics_to_mark'] = implode('-', $topic_ids);
+		$topics_to_mark = implode('-', $topic_ids);
 
 		if ($settings['show_mark_read'])
 		{
@@ -679,10 +679,10 @@ class Recent_Controller extends Action_Controller
 				if (!empty($context['topics']) && !$context['showing_all_topics'])
 					$context['recent_buttons']['readall'] = array('text' => 'unread_topics_all', 'image' => 'markreadall.png', 'lang' => true, 'url' => $scripturl . '?action=unread;all' . $context['querystring_board_limits'], 'active' => true);
 			}
-			elseif (!$this->_is_topics && isset($context['topics_to_mark']))
+			elseif (!$this->_is_topics && isset($topics_to_mark))
 			{
 				$context['recent_buttons'] = array(
-					'markread' => array('text' => 'mark_as_read', 'image' => 'markread.png', 'lang' => true, 'url' => $scripturl . '?action=markasread;sa=unreadreplies;topics=' . $context['topics_to_mark'] . ';' . $context['session_var'] . '=' . $context['session_id']),
+					'markread' => array('text' => 'mark_as_read', 'image' => 'markread.png', 'lang' => true, 'url' => $scripturl . '?action=markasread;sa=unreadreplies;topics=' . $topics_to_mark . ';' . $context['session_var'] . '=' . $context['session_id']),
 				);
 
 				if ($context['showCheckboxes'])
