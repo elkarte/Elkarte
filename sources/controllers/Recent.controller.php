@@ -600,7 +600,8 @@ class Recent_Controller extends Action_Controller
 			$txt['unread_topics_visit_none'] = strtr($txt['unread_topics_visit_none'], array('?action=unread;all' => '?action=unread;all' . sprintf($context['querystring_board_limits'], 0) . $context['querystring_sort_limits']));
 
 		loadTemplate('Recent');
-		$context['sub_template'] = $_REQUEST['action'] == 'unread' ? 'unread' : 'replies';
+		$context['sub_template'] = 'unread';
+		$context['unread_header_title'] = $_REQUEST['action'] == 'unread' ? ($context['showing_all_topics'] ? $txt['unread_topics_all'] : $txt['unread_topics_visit']) : $txt['unread_replies'];
 
 		// Setup the default topic icons... for checking they exist and the like ;)
 		require_once(SUBSDIR . '/MessageIndex.subs.php');
@@ -681,6 +682,8 @@ class Recent_Controller extends Action_Controller
 			// Allow mods to add additional buttons here
 			call_integration_hook('integrate_recent_buttons');
 		}
+
+		$context['querystring_board_limits'] = 'action=' . ($_REQUEST['action'] == 'unread' ? 'unread' : 'unreadreplies') . (!empty($context['showing_all_topics']) ? ';all' : '') . $context['querystring_board_limits'];
 
 		// Allow helpdesks and bug trackers and what not to add their own unread data (just add a template_layer to show custom stuff in the template!)
 		call_integration_hook('integrate_unread_list');
