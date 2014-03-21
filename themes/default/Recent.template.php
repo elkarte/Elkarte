@@ -151,7 +151,7 @@ function template_unread()
 										', $topic['views'], ' ', $txt['views'], '
 									</p>
 									<p class="topic_lastpost">
-										<a class="topicicon img_last_post" href="', $topic['last_post']['href'], '" title="', $txt['last_post'], '" /></a>
+										<a class="topicicon img_last_post" href="', $topic['last_post']['href'], '" title="', $txt['last_post'], '"></a>
 										', $topic['last_post']['html_time'], '<br />
 										', $txt['by'], ' ', $topic['last_post']['member']['link'], '
 									</p>
