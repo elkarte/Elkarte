@@ -221,6 +221,14 @@ function MessageTopicIcons()
 	return $icon_sources;
 }
 
+/**
+ * Prepares the array with topics info useable in MessageIndex
+ * to fill the template
+ *
+ * @param mixed[] $topics_info - array of data regarding a topic, usually the
+ *                output of messageIndexTopics
+ * @param bool $topicseen - if add or not the ";topicseen" param to the url
+ */
 function processMessageIndexTopicList($topics_info, $topicseen = false)
 {
 	global $modSettings, $options, $scripturl, $context, $txt, $settings;
