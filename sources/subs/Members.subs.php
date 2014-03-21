@@ -1338,23 +1338,17 @@ function isAnotherAdmin($memberID)
  * This function retrieves a list of member ids based on a set of conditions
  *
  * @package Members
- * @param mixed[]|string $query can be an array of "type" of conditions,
- *             or a string used as raw query
- *             or a string that represents one of the built-in conditions
- *             like member_names, not_in_group, etc
- * @param mixed[] $query_params is an array containing the parameters passed to the query
- *             'start' and 'limit' used in LIMIT
- *             'order' used raw in ORDER BY
- *             others passed as query params
+ * @param mixed[]|string $query see prepareMembersByQuery
+ * @param mixed[] $query_params see prepareMembersByQuery
  * @param bool $details if true returns additional member details (name, email, ip, etc.)
  *             false will only return an array of member id's that match the conditions
- * @param bool $only_active only fetch active members
+ * @param bool $only_active see prepareMembersByQuery
  */
 function membersBy($query, $query_params, $details = false, $only_active = true)
 {
 	$db = database();
 
-	$query_where = prepareMembersByQuery($query, $query_params);
+	$query_where = prepareMembersByQuery($query, $query_params, $only_active);
 
 	// Lets see who we can find that meets the built up conditions
 	$members = array();
@@ -1389,15 +1383,15 @@ function membersBy($query, $query_params, $details = false, $only_active = true)
  * Counts the number of members based on conditions
  *
  * @package Members
- * @param string[]|string $query strings used as raw query
- * @param mixed[] $query_params is an array containing the parameters to be passed to the query
- * @param boolean $only_active
+ * @param string[]|string $query see prepareMembersByQuery
+ * @param mixed[] $query_params see prepareMembersByQuery
+ * @param boolean $only_active see prepareMembersByQuery
  */
 function countMembersBy($query, $query_params, $only_active = true)
 {
 	$db = database();
 
-	$query_where = prepareMembersByQuery($query, $query_params);
+	$query_where = prepareMembersByQuery($query, $query_params, $only_active);
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
@@ -1412,7 +1406,21 @@ function countMembersBy($query, $query_params, $only_active = true)
 	return $num_members;
 }
 
-function prepareMembersByQuery($query, &$query_params)
+/**
+ * Builds the WHERE clause for the functions countMembersBy and membersBy
+ *
+ * @package Members
+ * @param mixed[]|string $query can be an array of "type" of conditions,
+ *             or a string used as raw query
+ *             or a string that represents one of the built-in conditions
+ *             like member_names, not_in_group, etc
+ * @param mixed[] $query_params is an array containing the parameters passed to the query
+ *             'start' and 'limit' used in LIMIT
+ *             'order' used raw in ORDER BY
+ *             others passed as query params
+ * @param bool $only_active only fetch active members
+ */
+function prepareMembersByQuery($query, &$query_params, $only_active = true)
 {
 	$allowed_conditions = array(
 		'member_ids'   => 'id_member IN ({array_int:member_ids})',

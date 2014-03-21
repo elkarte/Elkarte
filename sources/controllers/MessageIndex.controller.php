@@ -253,7 +253,6 @@ class MessageIndex_Controller extends Action_Controller
 		// Setup the default topic icons...
 		$context['icon_sources'] = MessageTopicIcons();
 
-		$topic_ids = array();
 		$context['topics'] = array();
 
 		// Set up the query options

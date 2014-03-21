@@ -822,7 +822,7 @@ function findUser($where, $where_params, $fatal = true)
  *
  * @package Authorization
  * @param string $email
- * @param string $username
+ * @param string|null $username
  * @return boolean
  */
 function userByEmail($email, $username = null)
