@@ -34,12 +34,12 @@
 			 * public function, accessible with prototype chain
 			 * @param {object} params
 			 *
-			 *		allowedExtensions - types of attachments allowed
-			 *		totalSizeAllowed - maximum size of total attachments allowed
-			 *		individualSizeAllowed - maximum individual file size allowed
-			 *		numOfAttachmentAllowed - number of files that can be attached in a post
-			 *		totalAttachSizeUploaded - total size of already attached files(modifying post)
-			 *		numAttachUploaded - number of already attached files(modifying post)
+			 *    allowedExtensions - types of attachments allowed
+			 *    totalSizeAllowed - maximum size of total attachments allowed
+			 *    individualSizeAllowed - maximum individual file size allowed
+			 *    numOfAttachmentAllowed - number of files that can be attached in a post
+			 *    totalAttachSizeUploaded - total size of already attached files(modifying post)
+			 *    numAttachUploaded - number of already attached files(modifying post)
 			 */
 			init = function(params)
 			{
@@ -178,11 +178,11 @@
 			 * Creates the status UI for each file dropped
 			 * Initialte as new createStatusbar
 			 * Has the following methods availble to it
-			 *	- setFileNameSize
-			 *	- setProgress
-			 *	- setAbort
-			 *	- setServerFail
-			 *	- onUploadSuccess
+			 *  - setFileNameSize
+			 *  - setProgress
+			 *  - setAbort
+			 *  - setServerFail
+			 *  - onUploadSuccess
 			 * @param {object} obj options
 			 */
 			createStatusbar = function(obj)
@@ -357,9 +357,9 @@
 			 * Populates the warning box when something does not go as expected
 			 *
 			 * @param {object} params
-			 *		error messages to show
-			 *		file names having extension error
-			 *		file names having size error
+			 *    error messages to show
+			 *    file names having extension error
+			 *    file names having size error
 			 */
 			populateErrors = function(params) {
 				$('.drop_attachments_error').html('');

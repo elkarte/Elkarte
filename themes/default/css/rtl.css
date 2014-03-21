@@ -394,12 +394,6 @@ h2 a.collapse {
 	left: auto;
 	right: 3px;
 }
-/* Quick edit is a special case. */
-.quickbuttons .quick_edit img {
-	left: auto;
-	right: 0;
-	padding: 40px 4px 40px 5em;
-}
 /* Quickbutton and follow ups drop menus. */
 .quickbuttons .menulevel2, .follow_ups  .menulevel2 {
 	text-align: right;
@@ -458,8 +452,8 @@ h2 a.collapse {
 }
 /* Globally accessible top/bottom links. */
 #gotop, #gobottom {
-	right: auto;
-	left: 0;
+	left: auto;
+	right: 0;
 }
 /* Skip navigation link. */
 #top {
@@ -1222,9 +1216,8 @@ div.labels {
 		padding-left: 2px;
 		padding-right: 2px;
 	}
-	#gobottom, #gotop {
-		padding-left: 0;
-		padding-right: 0.25em;
+	#gotop {
+		margin-right: 1.45em;
 	}
 	#message_index_jump_to {
 		float: none;

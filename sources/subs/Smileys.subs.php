@@ -385,7 +385,7 @@ function isSmileySetInstalled($set)
 		ORDER BY time_installed DESC
 		LIMIT 1',
 		array(
-			'not_installed'	=> 0,
+			'not_installed' => 0,
 			'current_package' => $set,
 		)
 	);

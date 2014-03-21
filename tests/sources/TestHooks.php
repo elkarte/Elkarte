@@ -14,11 +14,34 @@ class TestHooks extends UnitTestCase
 	private $_hook_name = 'integrate_testing_hook';
 
 	/**
+	 * Array holding all the test hooks
+	 */
+	private $_tests = array();
+
+	/**
 	 * prepare what is necessary to use in these tests.
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
 	function setUp()
 	{
+		$this->_tests = array(
+			// A simple one, just the function, default (i.e. in theory permanent)
+			array('call' => 'testing_hook', 'perm' => true),
+			// Something a bit more complex: function + file
+			array('call' => 'testing_hook2', 'file' => 'SOURCEDIR/Testing.php', 'perm' => true),
+			// Static method + file
+			array('call' => 'testing_class::hook', 'file' => 'SOURCEDIR/Testing.php', 'perm' => true),
+			// Simple, just the function, non permanent
+			array('call' => 'testing_hook_np', 'perm' => false),
+			// Non permanent, function + file
+			array('call' => 'testing_hook_np2', 'file' => 'SOURCEDIR/Testing_np.php', 'perm' => false),
+			// Non permanent, static method + file
+			array('call' => 'testing_class_np::hook', 'file' => 'SOURCEDIR/Testing.php', 'perm' => false),
+		);
+
+		foreach ($this->_tests as $key => $test)
+			if (!isset($test['file']))
+				$this->_tests[$key]['file'] = '';
 	}
 
 	/**
@@ -34,21 +57,23 @@ class TestHooks extends UnitTestCase
 	 */
 	function testAddHooks()
 	{
-		// A simple one, just the function, default (i.e. in theory permanent)
-		add_integration_function($this->_hook_name, 'testing_hook');
-		$this->assertTrue($this->_hook_exists(array('call' => 'testing_hook'), true));
+	global $modSettings;
+		foreach ($this->_tests as $test)
+		{
+			add_integration_function($this->_hook_name, $test['call'], $test['file'], $test['perm']);
+			$this->assertTrue($this->_hook_exists($test, $test['perm']));
+		}
+	}
 
-		// Something a bit more complex: function + file
-		add_integration_function($this->_hook_name, 'testing_hook2', 'SOURCEDIR/Testing.php');
-		$this->assertTrue($this->_hook_exists(array('call' => 'testing_hook2', 'file' => 'SOURCEDIR/Testing.php'), true));
+	/**
+	 * We want to see if they are called
+	 */
+	function testCallHooks()
+	{
+		$call = call_integration_hook($this->_hook_name);
 
-		// Simple, just the function, non permanent
-		add_integration_function($this->_hook_name, 'testing_hook_np', '', false);
-		$this->assertTrue($this->_hook_exists(array('call' => 'testing_hook_np'), false));
-
-		// Non permanent, function + file
-		add_integration_function($this->_hook_name, 'testing_hook_np2', 'SOURCEDIR/Testing_np.php', false);
-		$this->assertTrue($this->_hook_exists(array('call' => 'testing_hook_np2', 'file' => 'SOURCEDIR/Testing_np.php'), false));
+		foreach ($this->_tests as $test)
+			$this->assertTrue($this->_is_hook_called($call, $test['call'] . (!empty($test['file']) ? '|' . $test['file'] : '')));
 	}
 
 	/**
@@ -56,21 +81,11 @@ class TestHooks extends UnitTestCase
 	 */
 	function testRemoveHooks()
 	{
-		// A simple one, just the function, default (i.e. in theory permanent)
-		remove_integration_function($this->_hook_name, 'testing_hook');
-		$this->assertFalse($this->_hook_exists(array('call' => 'testing_hook'), true));
-
-		// Something a bit more complex: function + file
-		remove_integration_function($this->_hook_name, 'testing_hook2', 'SOURCEDIR/Testing.php');
-		$this->assertFalse($this->_hook_exists(array('call' => 'testing_hook2', 'file' => 'SOURCEDIR/Testing.php'), true));
-
-		// Simple, just the function, non permanent
-		remove_integration_function($this->_hook_name, 'testing_hook_np', false);
-		$this->assertFalse($this->_hook_exists(array('call' => 'testing_hook_np'), false));
-
-		// Non permanent, function + file
-		remove_integration_function($this->_hook_name, 'testing_hook_np2', 'SOURCEDIR/Testing_np.php', false);
-		$this->assertFalse($this->_hook_exists(array('call' => 'testing_hook_np2', 'file' => 'SOURCEDIR/Testing_np.php'), false));
+		foreach ($this->_tests as $test)
+		{
+			remove_integration_function($this->_hook_name, $test['call'], $test['file']);
+			$this->assertFalse($this->_hook_exists($test, $test['perm']));
+		}
 	}
 
 	/**
@@ -97,6 +112,7 @@ class TestHooks extends UnitTestCase
 		$db->free_result($request);
 
 		$db_hooks = $this->_parse_hooks($db_hook_string);
+
 		// If it is permanent and the system doesn't know anything about it: bad
 		if ($permanent && !$this->_find_hook($expected_hook, $db_hooks))
 			return false;
@@ -156,5 +172,87 @@ class TestHooks extends UnitTestCase
 				return true;
 		}
 		return false;
+	}
+
+	/**
+	 * Determines if the hook has been executed by checking the returned value
+	 *
+	 * @param mixed[] $return - the return of call_integration_hook
+	 * @param string $hook_string - the function/method called + file with the hook
+	 * @return bool
+	 */
+	private function _is_hook_called($return, $hook_string)
+	{
+		if (strpos($hook_string, '|') !== false)
+		{
+			$temp = explode('|', $hook_string);
+			$function = $temp[0];
+		}
+		else
+			$function = $hook_string;
+
+		if (strpos($function, '::') !== false)
+			$call = explode('::', $function);
+		else
+			$call = $function;
+
+		$result = call_user_func_array($call, array());
+
+		return $result === $return[$hook_string];
+	}
+}
+
+/**
+ * A dummy function to test if hooks are called
+ */
+function testing_hook()
+{
+	return 'testing_hook_called';
+}
+/**
+ * A dummy function to test if hooks are called
+ */
+function testing_hook2()
+{
+	return 'testing_hook2_called';
+}
+/**
+ * A dummy function to test if hooks are called
+ */
+function testing_hook_np()
+{
+	return 'testing_hook_np_called';
+}
+/**
+ * A dummy function to test if hooks are called
+ */
+function testing_hook_np2()
+{
+	return 'testing_hook_np2_called';
+}
+/**
+ * A dummy class to test if hooks are called
+ */
+class testing_class
+{
+	/**
+	 * Dummy function
+	 */
+	static public function hook()
+	{
+		return 'testing_class::hook';
+	}
+}
+/**
+ * A dummy class to test if hooks are called
+ */
+class testing_class_np
+{
+	/**
+	 * Dummy function
+	 */
+	static public function hook()
+	{
+		return 'testing_class_np::hook';
 	}
 }

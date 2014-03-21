@@ -315,10 +315,10 @@ legend {
 
 /* Globally accessible top/bottom links. */
 #gotop, #gobottom {
-	border-radius: 0 20px 0 0;
+	border-radius: 20px 0 0 0;
 }
 #gobottom {
-	border-radius: 0 0 20px 0;
+	border-radius: 0 0 0 20px;
 }
 
 /*	$TABLES		*/
@@ -540,6 +540,12 @@ legend {
 }
 /* This one does up to 540 screens. */
 @media screen and (max-width: 33.750em) {
+	#gobottom {
+		border-radius: 0;
+	}
+	#gotop {
+		border-radius: 8px 0 0 0;
+	}
 	.board_latest {
 		border-left: auto;
 		border-right: 0;

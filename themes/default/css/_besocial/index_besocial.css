@@ -772,14 +772,14 @@ a.active {
 #gotop, #gobottom {
 	border: 1px solid #222;
 	border-bottom: none;
-	border-radius: 20px 0 0 0;
+	border-radius: 0 20px 0 0;
 	background: #111;
 	color: #eee;
 	opacity: 0.2;
 }
 #gobottom {
 	border-top: none;
-	border-radius: 0 0 0 20px;
+	border-radius: 0 0 20px 0;
 }
 #gotop:hover, #gobottom:hover {
 	color: #444;
@@ -1354,6 +1354,13 @@ span.views_text {
 }
 /* This one does up to 540 screens. */
 @media screen and (max-width: 33.750em) {
+	#gotop, #gobottom {
+		border-radius: 0px 0px 0px;
+		border-top: 0px;
+	}
+	#gotop {
+		border-radius: 0px 8px 0px 0px;
+	}
 	.board_latest {
 		border-left: 0;
 	}

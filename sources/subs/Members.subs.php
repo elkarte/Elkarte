@@ -1418,14 +1418,15 @@ function isAnotherAdmin($memberID)
  *
  * @package Members
  * @param mixed[]|string $query can be an array of "type" of conditions,
- *              or a string used as raw query
- *				or a string that represents one of the built in conditions like member_names, not_in_group, etc
- * @param mixed[] $query_params is an array containing the parameters to be passed to the query
- *				'start' and 'limit' used in LIMIT
- *				'order' used raw in ORDER BY
- *				others passed as query params
+ *             or a string used as raw query
+ *             or a string that represents one of the built-in conditions
+ *             like member_names, not_in_group, etc
+ * @param mixed[] $query_params is an array containing the parameters passed to the query
+ *             'start' and 'limit' used in LIMIT
+ *             'order' used raw in ORDER BY
+ *             others passed as query params
  * @param bool $details if true returns additional member details (name, email, ip, etc.)
- *				false will only return an array of member id's that match the conditions
+ *             false will only return an array of member id's that match the conditions
  * @param bool $only_active only fetch active members
  */
 function membersBy($query, $query_params, $details = false, $only_active = true)

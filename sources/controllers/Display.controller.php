@@ -575,7 +575,7 @@ class Display_Controller
 				});', true);
 			}
 
-			$messages_request = loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $options);
+			$messages_request = loadMessageRequest($msg_selects, $msg_tables, $msg_parameters);
 
 			if (!empty($modSettings['enableFollowup']))
 			{

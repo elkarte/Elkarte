@@ -1722,11 +1722,13 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 						$quote_alt = !$quote_alt;
 				}
 				// Add a class to the quote to style alternating blockquotes
-				// @todo - Frankly it makes little sense to allow alternate blockquote styling without also catering
-				// for alternate quoteheader styling.
-				// I do remember coding that some time back, but it seems to have gotten lost somewhere in the Elk processes.
-				// Come to think of it, it may be better to append a second class rather than alter the standard one.
-				//	- Example: class="bbc_quote" and class="bbc_quote alt_quote".
+				// @todo - Frankly it makes little sense to allow alternate blockquote
+				// styling without also catering for alternate quoteheader styling.
+				// I do remember coding that some time back, but it seems to have gotten
+				// lost somewhere in the Elk processes.
+				// Come to think of it, it may be better to append a second class rather
+				// than alter the standard one.
+				//  - Example: class="bbc_quote" and class="bbc_quote alt_quote".
 				// This would mean simpler CSS for themes (like default) which do not use the alternate styling,
 				// but would still allow it for themes that want it.
 				$possible['before'] = strtr($possible['before'], array('<blockquote>' => '<blockquote class="bbc_' . ($quote_alt ? 'alternate' : 'standard') . '_quote">'));
@@ -3204,8 +3206,8 @@ function host_from_ip($ip)
  *
  * @param string $text
  * @param int|null $max_chars = 20
- *		- if encrypt = true this is the maximum number of bytes to use in integer hashes (for searching)
- *		- if encrypt = false this is the maximum number of letters in each word
+ *     - if encrypt = true this is the maximum number of bytes to use in integer hashes (for searching)
+ *     - if encrypt = false this is the maximum number of letters in each word
  * @param bool $encrypt = false Used for custom search indexes to return an array of ints representing the words
  */
 function text2words($text, $max_chars = 20, $encrypt = false)
@@ -3925,7 +3927,7 @@ function remove_integration_function($hook, $function, $file = '')
 	global $modSettings;
 
 	$db = database();
-	$integration_call = '';
+	$integration_call = (!empty($file) && $file !== true) ? $function . '|' . $file : $function;
 
 	// Get the permanent functions.
 	$request = $db->query('', '
@@ -3943,21 +3945,6 @@ function remove_integration_function($hook, $function, $file = '')
 	if (!empty($current_functions))
 	{
 		$current_functions = explode(',', $current_functions);
-
-		// Find the specific hook / function combination and remove it
-		foreach ($current_functions as $filefunc)
-		{
-			if (strpos($filefunc, '|') !== false)
-				list($func, $inc_file) = explode('|', $filefunc);
-			else
-				$func = $filefunc;
-
-			if ($func == $function && (empty($file) || (!empty($file) && !empty($inc_file) && $file == $inc_file)))
-			{
-				$integration_call = $filefunc;
-				break;
-			}
-		}
 
 		if (in_array($integration_call, $current_functions))
 		{
@@ -3994,28 +3981,28 @@ function sanitizeMSCutPaste($string)
 
 	// UTF-8 occurences of MS special characters
 	$findchars_utf8 = array(
-		"\xe2\x80\x9a",	// single low-9 quotation mark
-		"\xe2\x80\x9e",	// double low-9 quotation mark
-		"\xe2\x80\xa6",	// horizontal ellipsis
-		"\xe2\x80\x98",	// left single curly quote
-		"\xe2\x80\x99",	// right single curly quote
-		"\xe2\x80\x9c",	// left double curly quote
-		"\xe2\x80\x9d",	// right double curly quote
-		"\xe2\x80\x93",	// en dash
-		"\xe2\x80\x94",	// em dash
+		"\xe2\x80\x9a", // single low-9 quotation mark
+		"\xe2\x80\x9e", // double low-9 quotation mark
+		"\xe2\x80\xa6", // horizontal ellipsis
+		"\xe2\x80\x98", // left single curly quote
+		"\xe2\x80\x99", // right single curly quote
+		"\xe2\x80\x9c", // left double curly quote
+		"\xe2\x80\x9d", // right double curly quote
+		"\xe2\x80\x93", // en dash
+		"\xe2\x80\x94", // em dash
 	);
 
 	// safe replacements
 	$replacechars = array(
-		',',	// &sbquo;
-		',,',	// &bdquo;
-		'...',	// &hellip;
-		"'",	// &lsquo;
-		"'",	// &rsquo;
-		'"',	// &ldquo;
-		'"',	// &rdquo;
-		'-',	// &ndash;
-		'--',	// &mdash;
+		',',   // &sbquo;
+		',,',  // &bdquo;
+		'...', // &hellip;
+		"'",   // &lsquo;
+		"'",   // &rsquo;
+		'"',   // &ldquo;
+		'"',   // &rdquo;
+		'-',   // &ndash;
+		'--',  // &mdash;
 	);
 
 	$string = str_replace($findchars_utf8, $replacechars, $string);

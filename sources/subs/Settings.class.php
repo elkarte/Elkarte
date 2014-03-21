@@ -30,24 +30,24 @@
  * Here's a quick explanation of how to add a new item:
  *
  * - A text input box.  For textual values.
- *			array('text', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
+ *     array('text', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
  * - A text input box.  For numerical values.
- *			array('int', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
+ *     array('int', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
  * - A text input box.  For floating point values.
- *			array('float', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
+ *     array('float', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
  * - A large text input box. Used for textual values spanning multiple lines.
- *			array('large_text', 'nameInModSettingsAndSQL', 'OptionalNumberOfRows'),
+ *     array('large_text', 'nameInModSettingsAndSQL', 'OptionalNumberOfRows'),
  * - A check box.  Either one or zero. (boolean)
- *			array('check', 'nameInModSettingsAndSQL'),
+ *     array('check', 'nameInModSettingsAndSQL'),
  * - A selection box.  Used for the selection of something from a list.
- *			array('select', 'nameInModSettingsAndSQL', array('valueForSQL' => $txt['displayedValue'])),
- *			Note that just saying array('first', 'second') will put 0 in the SQL for 'first'.
+ *     array('select', 'nameInModSettingsAndSQL', array('valueForSQL' => $txt['displayedValue'])),
+ *     Note that just saying array('first', 'second') will put 0 in the SQL for 'first'.
  * - A password input box. Used for passwords, no less!
- *			array('password', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
+ *     array('password', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
  * - A permission - for picking groups who have a permission.
- *			array('permissions', 'manage_groups'),
+ *     array('permissions', 'manage_groups'),
  * - A BBC selection box.
- *			array('bbc', 'sig_bbc'),
+ *     array('bbc', 'sig_bbc'),
  *
  * For each option:
  *  - type (see above), variable name, size/possible values.
@@ -90,8 +90,9 @@ class Settings_Form
 	 *  )
 	 *
 	 * the following named keys are also permitted
-	 *	'disabled' => 'postinput' => 'preinput' =>
-	 *
+	 *  'disabled' =>
+	 *  'postinput' =>
+	 *  'preinput' =>
 	 */
 	public function prepare_file()
 	{

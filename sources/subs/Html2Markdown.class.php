@@ -327,8 +327,8 @@ class Convert_Md
 					$markdown = $this->_escape_text($markdown);
 				break;
 			//case '#text':
-			//	$markdown = $this->_escape_text($this->_get_value($node));
-			//	break;
+			//  $markdown = $this->_escape_text($this->_get_value($node));
+			//  break;
 			case 'title':
 				$markdown = '# ' . $this->_get_value($node) . $this->line_break;
 				break;
@@ -373,7 +373,7 @@ class Convert_Md
 	 * Converts <abbr> tags to markdown (extra)
 	 *
 	 * html: <abbr title="Hyper Text Markup Language">HTML</abbr>
-	 * md:	*[HTML]: Hyper Text Markup Language
+	 * md:   *[HTML]: Hyper Text Markup Language
 	 *
 	 * @param object $node
 	 */

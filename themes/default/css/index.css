@@ -145,14 +145,14 @@ a img {
 /* ALSO: This is still not quite pixel perfect everywhere for all browsers,
 /* in particular not for Internet Explorer. They can live with it. */
 /*
-	.button_submit	-	covers input[type=submit], input[type=button],
-						button[type=submit] and button[type=button]
-	.linkbutton		-	covers links, to make them look like a submit button.
-	.button_reset	-	covers input[type=reset] and button[type=reset]
-	.input_check	-	covers input[type=checkbox]
-	.input_radio	-	covers input[type=radio]
-	.input_text		-	covers input[type=text]
-	.input_file		-	covers input[type=file]
+	.button_submit - covers input[type=submit], input[type=button],
+	                 button[type=submit] and button[type=button]
+	.linkbutton    - covers links, to make them look like a submit button.
+	.button_reset  - covers input[type=reset] and button[type=reset]
+	.input_check   - covers input[type=checkbox]
+	.input_radio   - covers input[type=radio]
+	.input_text    - covers input[type=text]
+	.input_file    - covers input[type=file]
 */
 input, button, select, textarea, .editor {
 	font: 83.33%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", Arial, sans-serif;
@@ -1272,8 +1272,9 @@ a.bbc_link {
 .like_button:before {background-position: 0 -384px;}
 .unlike_button:before {background-position: 0 -408px;}
 .likes_button:before {background-position: 0 -432px;}
+.quick_edit:before {background-position: 0 -456px;}
 /* No icon here. */
-.quick_edit .linklevel1:before, .linklevel1.post_options:before,
+.linklevel1.post_options:before,
 .follow_ups .linklevel1:before {
 	display: none;
 }
@@ -1284,18 +1285,6 @@ a.bbc_link {
 /* Follow ups gets custom padding (no icon). */
 .follow_ups .linklevel1 {
 	padding: 1px 6px 0 6px;
-}
-/* Quick edit is a special case. */
-.quickbuttons .quick_edit .linklevel1 {
-	position: relative;
-	overflow: hidden;
-}
-.quickbuttons .quick_edit img {
-	position: absolute;
-	top: 50%;
-	left: 0;
-	margin-top: -48px;
-	padding: 40px 5em 40px 4px;
 }
 /* Quickbutton and follow ups drop menus. */
 .quickbuttons .menulevel2, .follow_ups  .menulevel2 {
@@ -1414,7 +1403,7 @@ a.bbc_link {
 #gotop, #gobottom {
 	position: fixed;
 	bottom: 50%;
-	right: 0;
+	left: 0;
 	z-index: 9;
 	padding: 1.3em 0.1em 0 0.1em;
 	height: 1.5em;
@@ -1743,7 +1732,6 @@ dl.settings dt .styled-select select {
 }
 .topic_sorting:hover #sortby, #sortby:hover, #sortby {
 	width: 11em;
-	left: auto;
 	right: -2.5em;
 }
 #sort_by.topic_sorting_recent {
@@ -4254,7 +4242,7 @@ dl.no_members {
 	.locked_row, .sticky_row, .basic_row,.topic_listing, .topic_listing>li {
 		display: block;
 	}
-	.sticky_row .topic_info:before, .locked_row .topic_info:before,	.locked_row.sticky_row .topic_info:before {
+	.sticky_row .topic_info:before, .locked_row .topic_info:before, .locked_row.sticky_row .topic_info:before {
 		margin-right: 0;
 	}
 	.topic_icons, .topic_moderation {
@@ -4307,7 +4295,7 @@ dl.no_members {
 		padding-right: 2px;
 	}
 	#gobottom, #gotop {
-		padding-left: 0.25em;
+		padding-right: 0.25em;
 	}
 	#message_index_jump_to {
 		display: block;
@@ -4422,8 +4410,16 @@ dl.no_members {
 	.views_text, .nextlinks {
 		display: none !important;
 	}
-	#top, #gotop, #gobottom {
-		display: none;
+	#gotop, #gobottom {
+		bottom: 0%;
+		padding: 0.2em 0.1em;
+		height: 1em;
+		width: 1.2em;
+		top: auto;
+		text-align: center;
+	}
+	#gotop {
+		margin-left: 1.45em;
 	}
 	.admin_menu li {
 		float: left;

@@ -44,35 +44,36 @@ function createMenu($menuData, $menuOptions = array())
 	// Work out where we should get our images from.
 	$context['menu_image_path'] = file_exists($settings['theme_dir'] . '/images/admin/change_menu.png') ? $settings['images_url'] . '/admin' : $settings['default_images_url'] . '/admin';
 
-	/* Note menuData is array of form:
+	/**
+	 * Note menuData is array of form:
+	 *
+	 * Possible fields:
+	 *  For Section:
+	 *    string $title:     Section title.
+	 *    bool $enabled:     Should section be shown?
+	 *    array $areas:      Array of areas within this section.
+	 *    array $permission: Permission required to access the whole section.
 
-		Possible fields:
-			For Section:
-				string $title:		Section title.
-				bool $enabled:		Should section be shown?
-				array $areas:		Array of areas within this section.
-				array $permission:	Permission required to access the whole section.
-
-			For Areas:
-				array $permission:	Array of permissions to determine who can access this area.
-				string $label:		Optional text string for link (Otherwise $txt[$index] will be used)
-				string $file:		Name of source file required for this area.
-				string $function:	Function to call when area is selected.
-				string $custom_url:	URL to use for this menu item.
-				string $icon:		File name of an icon to use on the menu, if using the sprite class, set as transparent.png
-	 			string $class:		Class name to apply to the icon img, used to apply a sprite icon
-				bool $enabled:		Should this area even be accessible?
-				bool $hidden:		Should this area be visible?
-				string $select:		If set this item will not be displayed - instead the item indexed here shall be.
-				array $subsections:	Array of subsections from this area.
-
-			For Subsections:
-				string 0:		Text label for this subsection.
-				array 1:		Array of permissions to check for this subsection.
-				bool 2:			Is this the default subaction - if not set for any will default to first...
-				bool enabled:	Bool to say whether this should be enabled or not.
-				array active:	Set the button active for other subsections.
-	*/
+	 *  For Areas:
+	 *    array $permission:  Array of permissions to determine who can access this area.
+	 *    string $label:      Optional text string for link (Otherwise $txt[$index] will be used)
+	 *    string $file:       Name of source file required for this area.
+	 *    string $function:   Function to call when area is selected.
+	 *    string $custom_url: URL to use for this menu item.
+	 *    string $icon:       File name of an icon to use on the menu, if using the sprite class, set as transparent.png
+	 *    string $class:      Class name to apply to the icon img, used to apply a sprite icon
+	 *    bool $enabled:      Should this area even be accessible?
+	 *    bool $hidden:       Should this area be visible?
+	 *    string $select:     If set this item will not be displayed - instead the item indexed here shall be.
+	 *    array $subsections: Array of subsections from this area.
+	 *
+	 *  For Subsections:
+	 *    string 0:     Text label for this subsection.
+	 *    array 1:      Array of permissions to check for this subsection.
+	 *    bool 2:       Is this the default subaction - if not set for any will default to first...
+	 *    bool enabled: Bool to say whether this should be enabled or not.
+	 *    array active: Set the button active for other subsections.
+	 */
 
 	// Every menu gets a unique ID, these are shown in first in, first out order.
 	$context['max_menu_id'] = isset($context['max_menu_id']) ? $context['max_menu_id'] + 1 : 1;
