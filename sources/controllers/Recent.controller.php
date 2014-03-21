@@ -286,12 +286,12 @@ class Recent_Controller extends Action_Controller
 		// @todo Add modified_time in for log_time check?
 		// Let's copy things out of the log_topics table, to reduce searching.
 		if ($modSettings['totalMessages'] > 100000 && $context['showing_all_topics'])
-			$this->_have_temp_table = recent_log_topics_unread_tempTable($this->_query_parameters, $this->_query_this_board, $earliest_msg);
+			$this->_have_temp_table = recent_log_topics_unread_tempTable($this->_query_parameters, $earliest_msg);
 
 		// All unread replies with temp table
 		if ($context['showing_all_topics'] && $this->_have_temp_table)
 		{
-			list ($num_topics, $min_message) = countRecentTopics($this->_query_parameters, $context['showing_all_topics'], true, false, $earliest_msg, $this->_query_this_board);
+			list ($num_topics, $min_message) = countRecentTopics($this->_query_parameters, $context['showing_all_topics'], true, false, $earliest_msg);
 
 			// Make sure the starting place makes sense and construct the page index.
 			$context['page_index'] = constructPageIndex($scripturl . '?action=' . $_REQUEST['action'] . ($context['showing_all_topics'] ? ';all' : '') . $context['querystring_board_limits'] . $context['querystring_sort_limits'], $_REQUEST['start'], $num_topics, $context['topics_per_page'], true);
@@ -324,12 +324,12 @@ class Recent_Controller extends Action_Controller
 			else
 				$min_message = (int) $min_message;
 
-			$context['topics'] = getUnreadTopics($this->_query_parameters, $this->_preview_bodies, 'message', $this->_query_this_board, $this->_have_temp_table, $min_message, $this->_sort_query, $this->_ascending, $_REQUEST['start'], $context['topics_per_page'], !empty($settings['avatars_on_indexes']));
+			$context['topics'] = getUnreadTopics($this->_query_parameters, $this->_preview_bodies, 'message', $this->_have_temp_table, $min_message, $this->_sort_query, $this->_ascending, $_REQUEST['start'], $context['topics_per_page'], !empty($settings['avatars_on_indexes']));
 		}
 		// New posts with or without temp table
 		elseif ($this->_is_topics)
 		{
-			list ($num_topics, $min_message) = countRecentTopics($this->_query_parameters, $context['showing_all_topics'], $this->_have_temp_table, empty($_SESSION['first_login']), $earliest_msg, $this->_query_this_board, $_SESSION['id_msg_last_visit']);
+			list ($num_topics, $min_message) = countRecentTopics($this->_query_parameters, $context['showing_all_topics'], $this->_have_temp_table, empty($_SESSION['first_login']), $earliest_msg, $_SESSION['id_msg_last_visit']);
 
 			// Make sure the starting place makes sense and construct the page index.
 			$context['page_index'] = constructPageIndex($scripturl . '?action=' . $_REQUEST['action'] . ($context['showing_all_topics'] ? ';all' : '') . $context['querystring_board_limits'] . $context['querystring_sort_limits'], $_REQUEST['start'], $num_topics, $context['topics_per_page'], true);
@@ -365,7 +365,7 @@ class Recent_Controller extends Action_Controller
 			else
 				$min_message = (int) $min_message;
 
-			$context['topics'] = getUnreadTopics($this->_query_parameters, $this->_preview_bodies, 'topics', $this->_query_this_board, $this->_have_temp_table, $min_message, $this->_sort_query, $this->_ascending, $_REQUEST['start'], $context['topics_per_page'], !empty($settings['avatars_on_indexes']));
+			$context['topics'] = getUnreadTopics($this->_query_parameters, $this->_preview_bodies, 'topics', $this->_have_temp_table, $min_message, $this->_sort_query, $this->_ascending, $_REQUEST['start'], $context['topics_per_page'], !empty($settings['avatars_on_indexes']));
 		}
 		// Does it make sense?... Dunno.
 		else
@@ -387,7 +387,7 @@ class Recent_Controller extends Action_Controller
 		if ($modSettings['totalMessages'] > 100000)
 			$this->_have_temp_table = unreadreplies_tempTable(!empty($board) ? $board : 0, $this->_sort_query);
 
-		list ($num_topics, $min_message) = countUnreadReplies($this->_query_parameters, $this->_query_this_board, $this->_have_temp_table);
+		list ($num_topics, $min_message) = countUnreadReplies($this->_query_parameters, $this->_have_temp_table);
 
 		// Make sure the starting place makes sense and construct the page index.
 		$context['page_index'] = constructPageIndex($scripturl . '?action=' . $_REQUEST['action'] . $context['querystring_board_limits'] . $context['querystring_sort_limits'], $_REQUEST['start'], $num_topics, $context['topics_per_page'], true);
@@ -415,7 +415,7 @@ class Recent_Controller extends Action_Controller
 			return;
 		}
 
-		$context['topics'] = getUnreadReplies($this->_query_parameters, $this->_preview_bodies, $this->_query_this_board, $this->_have_temp_table, $min_message, $this->_sort_query, $this->_ascending, $_REQUEST['start'], $context['topics_per_page'], !empty($settings['avatars_on_indexes']));
+		$context['topics'] = getUnreadReplies($this->_query_parameters, $this->_preview_bodies, $this->_have_temp_table, $min_message, $this->_sort_query, $this->_ascending, $_REQUEST['start'], $context['topics_per_page'], !empty($settings['avatars_on_indexes']));
 
 		if ($context['topics'] === false)
 		{
@@ -489,14 +489,12 @@ class Recent_Controller extends Action_Controller
 			if (empty($this->_boards))
 				fatal_lang_error('error_no_boards_selected');
 
-			$this->_query_this_board = 'id_board IN ({array_int:boards})';
 			$this->_query_parameters['boards'] = $this->_boards;
 			$context['querystring_board_limits'] = ';boards=' . implode(',', $this->_boards) . ';start=%d';
 		}
 		elseif (!empty($board))
 		{
-			$this->_query_this_board = 'id_board = {int:board}';
-			$this->_query_parameters['board'] = $board;
+			$this->_query_parameters['boards'] = array($board);
 			$context['querystring_board_limits'] = ';board=' . $board . '.%1$d';
 		}
 		elseif (!empty($_REQUEST['boards']))
@@ -508,7 +506,6 @@ class Recent_Controller extends Action_Controller
 			if (empty($this->_boards))
 				fatal_lang_error('error_no_boards_selected');
 
-			$this->_query_this_board = 'id_board IN ({array_int:boards})';
 			$this->_query_parameters['boards'] = $this->_boards;
 			$context['querystring_board_limits'] = ';boards=' . implode(',', $this->_boards) . ';start=%1$d';
 		}
@@ -521,7 +518,6 @@ class Recent_Controller extends Action_Controller
 			if (empty($this->_boards))
 				fatal_lang_error('error_no_boards_selected');
 
-			$this->_query_this_board = 'id_board IN ({array_int:boards})';
 			$this->_query_parameters['boards'] = $this->_boards;
 			$context['querystring_board_limits'] = ';c=' . $_REQUEST['c'] . ';start=%1$d';
 		}
@@ -535,7 +531,6 @@ class Recent_Controller extends Action_Controller
 			if (empty($this->_boards))
 				fatal_lang_error('error_no_boards_selected');
 
-			$this->_query_this_board = 'id_board IN ({array_int:boards})';
 			$this->_query_parameters['boards'] = $this->_boards;
 			$context['querystring_board_limits'] = ';start=%1$d';
 			$context['no_board_limits'] = true;

@@ -304,11 +304,10 @@ function earliest_msg()
  * Creates a temporary table for logging of unread topics
  *
  * @param mixed[] $query_parameters - 
- * @param string $query_this_board - query string of the list of boards to search in
  * @param int $earliest_msg - id of the earliest message to consider
  * @return bool - if the table has been created ot not
  */
-function recent_log_topics_unread_tempTable($query_parameters, $query_this_board, $earliest_msg)
+function recent_log_topics_unread_tempTable($query_parameters, $earliest_msg)
 {
 	global $modSettings, $user_info;
 
@@ -329,7 +328,7 @@ function recent_log_topics_unread_tempTable($query_parameters, $query_this_board
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic)
 		WHERE lt.id_member = {int:current_member}
-			AND t.' . $query_this_board . (empty($earliest_msg) ? '' : '
+			AND t.id_board IN ({array_int:boards})' . (empty($earliest_msg) ? '' : '
 			AND t.id_last_msg > {int:earliest_msg}') . ($modSettings['postmod_active'] ? '
 			AND t.approved = {int:is_approved}' : '') . ($modSettings['enable_unwatch'] ? '
 			AND lt.unwatched != 1' : ''),
@@ -353,10 +352,9 @@ function recent_log_topics_unread_tempTable($query_parameters, $query_this_board
  * @param bool $is_first_login - if the member has already logged in at least
  *             once, then there is an $id_msg_last_visit
  * @param int $earliest_msg - id of the earliest message to consider
- * @param string $query_this_board - query string of the list of boards to search in
  * @param int $id_msg_last_visit - highest id_msg found during the last visit
  */
-function countRecentTopics($query_parameters, $showing_all_topics, $have_temp_table, $is_first_login, $earliest_msg, $query_this_board, $id_msg_last_visit = 0)
+function countRecentTopics($query_parameters, $showing_all_topics, $have_temp_table, $is_first_login, $earliest_msg, $id_msg_last_visit = 0)
 {
 	global $modSettings, $user_info;
 
@@ -368,7 +366,7 @@ function countRecentTopics($query_parameters, $showing_all_topics, $have_temp_ta
 			LEFT JOIN {db_prefix}log_topics_unread AS lt ON (lt.id_topic = t.id_topic)' : '
 			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})') . '
 			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
-		WHERE t.' . $query_this_board . ($showing_all_topics && !empty($earliest_msg) ? '
+		WHERE t.id_board IN ({array_int:boards})' . ($showing_all_topics && !empty($earliest_msg) ? '
 			AND t.id_last_msg > {int:earliest_msg}' : (!$showing_all_topics && $is_first_login ? '
 			AND t.id_last_msg > {int:id_msg_last_visit}' : '')) . '
 			AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' .
@@ -401,7 +399,6 @@ function countRecentTopics($query_parameters, $showing_all_topics, $have_temp_ta
  * @param string $join - kind of "JOIN" to execute. If 'topic' JOINs boards on
  *                       the topics table, otherwise ('message') the JOIN is on
  *                       the messages table
- * @param string $query_this_board - query string of the list of boards to search in
  * @param bool $have_temp_table - if use the temp table or not
  * @param int $min_message - id of the earliest message to consider
  * @param string $sort - sorting order (query)
@@ -411,7 +408,7 @@ function countRecentTopics($query_parameters, $showing_all_topics, $have_temp_ta
  * @param bool $include_avatars - if avatars should be retrieved as well
  * @return processRecentTopicList
  */
-function getUnreadTopics($query_parameters, $preview_bodies, $join, $query_this_board, $have_temp_table, $min_message, $sort, $ascending, $start, $limit, $include_avatars = false)
+function getUnreadTopics($query_parameters, $preview_bodies, $join, $have_temp_table, $min_message, $sort, $ascending, $start, $limit, $include_avatars = false)
 {
 	global $modSettings, $user_info;
 
@@ -453,7 +450,7 @@ function getUnreadTopics($query_parameters, $preview_bodies, $join, $query_this_
 			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})') . ($include_avatars ? '
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = ml.id_member AND a.id_member != 0)' : '') . '
 			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
-		WHERE t.' . $query_this_board . '
+		WHERE t.id_board IN ({array_int:boards})
 			AND t.id_last_msg >= {int:min_message}
 			AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < ml.id_msg' .
 			($modSettings['postmod_active'] ? ' AND ms.approved = {int:is_approved}' : '') .
@@ -659,7 +656,6 @@ function processRecentTopicList($topics_info, $topicseen = false)
  *                         - a number representing the number of chars the
  *                           to include in the preview,
  *                         - 0/false no body retrieved
- * @param string $query_this_board - query string of the list of boards to search in
  * @param bool $have_temp_table - if use the temp table or not
  * @param int $min_message - id of the earliest message to consider
  * @param string $sort - sorting order (query)
@@ -669,7 +665,7 @@ function processRecentTopicList($topics_info, $topicseen = false)
  * @param bool $include_avatars - if avatars should be retrieved as well
  * @return processRecentTopicList
  */
-function getUnreadReplies($query_parameters, $preview_bodies, $query_this_board, $have_temp_table, $min_message, $sort, $ascending, $start, $limit, $include_avatars = false)
+function getUnreadReplies($query_parameters, $preview_bodies, $have_temp_table, $min_message, $sort, $ascending, $start, $limit, $include_avatars = false)
 {
 	global $modSettings, $user_info;
 
@@ -681,7 +677,7 @@ function getUnreadReplies($query_parameters, $preview_bodies, $query_this_board,
 			SELECT t.id_topic
 			FROM {db_prefix}topics_posted_in AS t
 				LEFT JOIN {db_prefix}log_topics_posted_in AS lt ON (lt.id_topic = t.id_topic)
-			WHERE t.' . $query_this_board . '
+			WHERE t.id_board IN ({array_int:boards})
 				AND IFNULL(lt.id_msg, t.id_msg) < t.id_last_msg
 			ORDER BY {raw:order}
 			LIMIT {int:offset}, {int:limit}',
@@ -702,7 +698,7 @@ function getUnreadReplies($query_parameters, $preview_bodies, $query_this_board,
 				LEFT JOIN {db_prefix}members AS mems ON (mems.id_member = ms.id_member)') . '
 				LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
 				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
-			WHERE t.' . $query_this_board . '
+			WHERE t.id_board IN ({array_int:boards})
 				AND t.id_last_msg >= {int:min_message}
 				AND (IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0))) < t.id_last_msg' .
 				($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
@@ -868,10 +864,9 @@ function unreadreplies_tempTable($board_id, $sort)
  * Counts unread replies
  *
  * @param mixed[] $query_parameters - 
- * @param string $query_this_board - query string of the list of boards to search in
  * @param bool $have_temp_table - if use the temp table or not
  */
-function countUnreadReplies($query_parameters, $query_this_board, $have_temp_table)
+function countUnreadReplies($query_parameters, $have_temp_table)
 {
 	global $modSettings, $user_info;
 
@@ -883,7 +878,7 @@ function countUnreadReplies($query_parameters, $query_this_board, $have_temp_tab
 			SELECT COUNT(*)
 			FROM {db_prefix}topics_posted_in AS pi
 				LEFT JOIN {db_prefix}log_topics_posted_in AS lt ON (lt.id_topic = pi.id_topic)
-			WHERE pi.' . $query_this_board . '
+			WHERE pi.id_board IN ({array_int:boards})
 				AND IFNULL(lt.id_msg, pi.id_msg) < pi.id_last_msg',
 			array_merge($query_parameters, array(
 			))
@@ -900,7 +895,7 @@ function countUnreadReplies($query_parameters, $query_this_board, $have_temp_tab
 				INNER JOIN {db_prefix}messages AS m ON (m.id_topic = t.id_topic)
 				LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
 				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
-			WHERE t.' . $query_this_board . '
+			WHERE t.id_board IN ({array_int:boards})
 				AND m.id_member = {int:current_member}
 				AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' . ($modSettings['postmod_active'] ? '
 				AND t.approved = {int:is_approved}' : '') . ($modSettings['enable_unwatch'] ? '
