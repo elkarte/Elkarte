@@ -601,9 +601,21 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 /**
  * Generate a strip of "quick" buttons (those present next to each message)
  *
+ * What it does:
+ * - Create a quick button, pass an array of the button name with key values
+ * - array('somename' => array(href => text => custom => test =>))
+ *		- href => link to call when button is pressed
+ *		- text => text to display in the button
+ *		- custom => custom action to perform, generally used to add 'onclick' events (optional)
+ *		- test => key to check in the $tests array before showing the button (optional)
+ *	- checkboxes can be shown as well as buttons, use array('check' => array(checkbox => (true | always), name => value =>)
+ *		- if true follows show moderation as checkbox setting, always will always show
+ *		- name => name of the checkbox array, like delete, will have [] added for the form
+ *		- value => value for the checkbox to return in the post
+ *
  * @param string $strip - the $context index where the strip is stored
  * @param bool[] $tests - an array of tests to determine if the button should
- *                 be displayed or not
+ * be displayed or not
  */
 function template_quickbutton_strip($strip, $tests = array())
 {
@@ -615,10 +627,10 @@ function template_quickbutton_strip($strip, $tests = array())
 	{
 		if (isset($value['checkbox']))
 		{
-			if (!empty($value['checkbox']) && !empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
+			if (!empty($value['checkbox']) && ((!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1) || $value['checkbox'] === 'always'))
 				$buttons[] = '
 						<li class="listlevel1 ' . $key . '">
-							<input class="input_check" type="checkbox" name="' . $value['name'] . '[]" value="' . $value['value'] . '" />
+							<input class="input_check ' . $key . '_check" type="checkbox" name="' . $value['name'] . '[]" value="' . $value['value'] . '" />
 						</li>';
 		}
 		elseif (!isset($value['test']) || !empty($tests[$value['test']]))
@@ -648,12 +660,12 @@ function template_basicicons_legend()
 
 	echo '
 		<p class="floatleft">', !empty($modSettings['enableParticipation']) && $context['user']['is_logged'] ? '
-			<span class="topicicon img_profile" alt=""></span>' . $txt['participation_caption'] : '<span class="topicicon img_normal" alt=""> </span>' . $txt['normal_topic'], '<br />
-			' . (!empty($modSettings['pollMode']) ? '<span class="topicicon img_poll" alt=""> </span>' . $txt['poll'] : '') . '
+			<span class="topicicon img_profile"></span>' . $txt['participation_caption'] : '<span class="topicicon img_normal"> </span>' . $txt['normal_topic'], '<br />
+			' . (!empty($modSettings['pollMode']) ? '<span class="topicicon img_poll"> </span>' . $txt['poll'] : '') . '
 		</p>
 		<p>
-			<span class="topicicon img_locked" alt=""> </span>' . $txt['locked_topic'] . '<br />' . ($modSettings['enableStickyTopics'] == '1' ? '
-			<span class="topicicon img_sticky" alt=""> </span>' . $txt['sticky_topic'] . '<br />' : '') . '
+			<span class="topicicon img_locked"> </span>' . $txt['locked_topic'] . '<br />' . ($modSettings['enableStickyTopics'] == '1' ? '
+			<span class="topicicon img_sticky"> </span>' . $txt['sticky_topic'] . '<br />' : '') . '
 		</p>';
 }
 
@@ -663,7 +675,7 @@ function template_basicicons_legend()
  *
  * Looks for the display infomration in the $context[$error_id] array
  * Keys of array are 'type'
- *	- empty or success for successbox
+ *  - empty or success for successbox
  *  - serious for error box
  *  - warning for warning box
  * 'title' - optional value to place above list

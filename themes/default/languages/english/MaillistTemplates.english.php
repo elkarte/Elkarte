@@ -28,14 +28,16 @@ $txt['pbe_notify_boards_once_body_body'] = 'A new topic, \'{TOPICSUBJECT}\', has
 
 
 ------------------------------------
-Posting Information: More topics may be posted, but you won\'t receive more email notifications (on this topic) until you return to the board and read some of them.
+Posting Information:
+More topics may be posted, but you won\'t receive more email notifications (on this topic) until you return to the board and read some of them.
+You can reply to this email and have it posted as a topic reply.
 
 {FORUMNAMESHORT} Links:
 
 <*> To visit {FORUMNAMESHORT} on the web, go to:
     {FORUMURL}
 
-<*> You can see this message with attachments and/or images (if any) by using this link:
+<*> You can see this message by using this link:
     {TOPICLINK}
 
 <*> Unsubscribe to this by using this link:
@@ -61,7 +63,8 @@ You can see it at
 
 
 ------------------------------------
-Posting Information: More topics may be posted, but you won\'t receive more email notifications (on this topic) until you return to the board and read some of them.
+Posting Information:
+More topics may be posted, but you won\'t receive more email notifications (on this topic) until you return to the board and read some of them.
 
 {FORUMNAMESHORT} Links:
 
@@ -94,17 +97,19 @@ $txt['pbe_notify_boards_body_body'] = '
 
 
 ------------------------------------
-Posting Information: {POSTERNAME} started the topic \'{TOPICSUBJECT}\' on the \'{BOARDNAME}\' Board.
+Posting Information:
+{POSTERNAME} started the topic \'{TOPICSUBJECT}\' on the \'{BOARDNAME}\' Board.
+You can reply to this email and have it posted as a topic reply.
 
 {FORUMNAMESHORT} Links:
 
 <*> To visit {FORUMNAMESHORT} on the web, go to:
     {FORUMURL}
 
-<*> You can see this message with attachments and/or images (if any) by using this link:
+<*> You can see this message by using this link:
     {TOPICLINK}
 
-<*> You can go to your first unread message in the thread by using this link:
+<*> You can go to your first unread message by using this link:
     {TOPICLINKNEW}
 
 <*> Unsubscribe to this by using this link:
@@ -135,7 +140,7 @@ You can see it at:
 <*> To visit {FORUMNAMESHORT} on the web, go to:
     {FORUMURL}
 
-<*> You can go to your first unread message in the thread by using this link:
+<*> You can go to your first unread message by using this link:
     {TOPICLINKNEW}
 
 <*> Unsubscribe to this by using this link:
@@ -164,17 +169,19 @@ $txt['pbe_notification_reply_body_body'] = '
 
 
 ------------------------------------
-Posting Information: {POSTERNAME} replied to the topic \'{TOPICSUBJECT}\' on the \'{BOARDNAME}\' Board.
+Posting Information:
+{POSTERNAME} replied to the topic \'{TOPICSUBJECT}\' on the \'{BOARDNAME}\' Board.
+You can reply to this email and have it posted as a topic reply.
 
 {FORUMNAMESHORT} Links:
 
 <*> To visit {FORUMNAMESHORT} on the web, go to:
     {FORUMURL}
 
-<*> You can see this message with attachments and/or images (if any) by using this link:
+<*> You can see this message by using this link:
     {TOPICLINK}
 
-<*> You can go to your first unread message in the thread by using this link:
+<*> You can go to your first unread message by using this link:
     {TOPICLINKNEW}
 
 <*> Unsubscribe to this by using this link:
@@ -199,14 +206,16 @@ View the reply with attachments and/or images (if any) at:
     {TOPICLINK}
 
 ------------------------------------
-Posting Information: More replies may be posted, but you won\'t receive any more notifications until you read the topic.
+Posting Information:
+More replies may be posted, but you won\'t receive any more notifications until you read the topic.
+You can reply to this email and have it posted as a topic reply.
 
 {FORUMNAMESHORT} Links:
 
 <*> To visit {FORUMNAMESHORT} on the web, go to:
     {FORUMURL}
 
-<*> You can go to your first unread message in the thread by using this link:
+<*> You can go to your first unread message by using this link:
     {TOPICLINKNEW}
 
 <*> Unsubscribe to this by using this link:
@@ -235,18 +244,20 @@ $txt['pbe_notification_reply_body_once_body'] = '
 
 
 ------------------------------------
-Posting Information: {POSTERNAME} replied to the topic \'{TOPICSUBJECT}\' on the \'{BOARDNAME}\' Board.
+Posting Information:
+{POSTERNAME} replied to the topic \'{TOPICSUBJECT}\' on the \'{BOARDNAME}\' Board.
 More replies may be posted, but you won\'t receive any more notifications until you read the topic.
+You can reply to this email and have it posted as a reply.
 
 {FORUMNAMESHORT} Links:
 
 <*> To visit {FORUMNAMESHORT} on the web, go to:
     {FORUMURL}
 
-<*> You can see this message with attachments and/or images (if any) by using this link:
+<*> You can see this message by using this link:
     {TOPICLINK}
 
-<*> You can go to your first unread message in the thread by using this link:
+<*> You can go to your first unread message by using this link:
     {TOPICLINKNEW}
 
 <*> Unsubscribe to this by using this link:
@@ -270,12 +281,15 @@ The message they sent you is:
 {MESSAGE}
 
 ------------------------------------
+Posting Information:
+You can reply to this email and have it sent as a PM response to {SENDER}
+
 {FORUMNAMESHORT} Links:
 
 <*> To visit {FORUMNAMESHORT} on the web, go to:
     {FORUMURL}
 
-<*> Reply to this Personal Message here::
+<*> Reply to this Personal Message here:
     {REPLYLINK}
 
 {EMAILREGARDS}';

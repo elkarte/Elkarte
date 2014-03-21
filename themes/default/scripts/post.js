@@ -204,7 +204,8 @@ function onDocSent(XMLDoc)
 	var i = 0,
 		n = 0,
 		numErrors = 0,
-		numCaptions = 0;
+		numCaptions = 0,
+		$editor;
 
 	if (!XMLDoc || !XMLDoc.getElementsByTagName('elk')[0])
 	{
@@ -272,9 +273,9 @@ function onDocSent(XMLDoc)
 	}
 
 	if (typeof $editor_container[post_box_name] !== 'undefined')
-		var $editor = $editor_container[post_box_name];
+		$editor = $editor_container[post_box_name];
 	else
-		var $editor = $(document.forms[form_name][post_box_name]);
+		$editor = $(document.forms[form_name][post_box_name]);
 
 	if (error_post)
 		$editor.find("textarea, iframe").addClass('border_error');
@@ -443,7 +444,7 @@ function onDocReceived(XMLDoc)
 	var text = '';
 
 	for (var i = 0, n = XMLDoc.getElementsByTagName('quote')[0].childNodes.length; i < n; i++)
-		text += XMLDoc.getElementsByTagName('quote')[0].childNodes[i].nodeValue;
+		text += XMLDoc.getElementsByTagName('quote')[0].childNodes[i].nodeValue + "\n";
 
 	$editor_data[post_box_name].insert(text);
 

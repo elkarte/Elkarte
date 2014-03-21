@@ -812,9 +812,9 @@ function fixChildren($parent, $newLevel, $newParent)
  * Load a lot of useful information regarding the boards and categories.
  *
  * - The information retrieved is stored in globals:
- *   $boards		properties of each board.
- *   $boardList		a list of boards grouped by category ID.
- *   $cat_tree		properties of each category.
+ *   $boards:    properties of each board.
+ *   $boardList: a list of boards grouped by category ID.
+ *   $cat_tree:  properties of each category.
  *
  * @package Boards
  */

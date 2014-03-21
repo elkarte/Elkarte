@@ -51,9 +51,9 @@ class CoreFeatures_Controller extends Action_Controller
 	 *    - title - Text title of this item (If standard string does not exist).
 	 *    - desc - Description of this feature (If standard string does not exist).
 	 *    - settings - Array of settings to change (For each name => value) on enable
-	 *				   reverse is done for disable. If value > 1 will not change value if set.
+	 *      reverse is done for disable. If value > 1 will not change value if set.
 	 *    - setting_callback - Function that returns an array of settings to save
-	 *						   takes one parameter which is value for this feature.
+	 *      takes one parameter which is value for this feature.
 	 *    - save_callback - Function called on save, takes state as parameter.
 	 */
 	public function action_features()

@@ -1672,6 +1672,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 			years : ' . JavaScriptEscape($txt['rt_years']) . ',
 		});
 		updateRelativeTime();', true);
+		$context['using_relative_time'] = true;
 	}
 
 	// Queue our Javascript
@@ -1878,8 +1879,8 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
  *
  * @todo get rid of reading $_REQUEST directly
  * @param string $sub_template_name
- * @param bool|string $fatal = false, $fatal = true is for templates that shouldn't get a 'pretty' error screen
- *			'ignore' to skip
+ * @param bool|string $fatal = false, $fatal = true is for templates that
+ *                 shouldn't get a 'pretty' error screen 'ignore' to skip
  */
 function loadSubTemplate($sub_template_name, $fatal = false)
 {
@@ -1911,11 +1912,12 @@ function loadSubTemplate($sub_template_name, $fatal = false)
  *
  * @param mixed $filenames string or array of filenames to work on
  * @param mixed[] $params = array()
- *		Keys are the following:
- *			- ['local'] (true/false): define if the file is local
- *			- ['fallback'] (true/false): if false  will attempt to load the file from the default theme
- *				if not found in the current theme
- *			- ['stale'] (true/false/string): if true or null, use cache stale, false do not, or used a supplied string
+ *         Keys are the following:
+ *         - ['local'] (true/false): define if the file is local
+ *         - ['fallback'] (true/false): if false  will attempt to load the file
+ *             from the default theme if not found in the current theme
+ *         - ['stale'] (true/false/string): if true or null, use cache stale, 
+ *             false do not, or used a supplied string
  * @param string $id optional id to use in html id=""
  */
 function loadCSSFile($filenames, $params = array(), $id = '')
@@ -1998,12 +2000,16 @@ function loadCSSFile($filenames, $params = array(), $id = '')
  * @param mixed $filenames string or array of filenames to work on
  * @param mixed[] $params = array()
  * Keys are the following:
- * - ['local'] (true/false): define if the file is local, if file does not start with http its assumed local
- * - ['defer'] (true/false): define if the file should load in <head> or before the closing <html> tag
- * - ['fallback'] (true/false): if true will attempt to load the file from the default theme if not found in the current
- *	this is the default behavior if this is not supplied
+ * - ['local'] (true/false): define if the file is local, if file does not
+ *     start with http its assumed local
+ * - ['defer'] (true/false): define if the file should load in <head> or before
+ *     the closing <html> tag
+ * - ['fallback'] (true/false): if true will attempt to load the file from the
+ *     default theme if not found in the current this is the default behavior
+ *     if this is not supplied
  * - ['async'] (true/false): if the script should be loaded asynchronously (HTML5)
- * - ['stale'] (true/false/string): if true or null, use cache stale, false do not, or used a supplied string
+ * - ['stale'] (true/false/string): if true or null, use cache stale, false do
+ *     not, or used a supplied string
  * @param string $id = '' optional id to use in html id=""
  */
 function loadJavascriptFile($filenames, $params = array(), $id = '')

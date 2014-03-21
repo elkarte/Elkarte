@@ -79,7 +79,7 @@ class Memberlist_Controller extends Action_Controller
 			),
 			'real_name' => array(
 				'label' => $txt['username'],
-				'class' => 'lefttext username',
+				'class' => 'username',
 				'sort' => array(
 					'down' => 'mem.real_name DESC',
 					'up' => 'mem.real_name ASC'
@@ -104,7 +104,7 @@ class Memberlist_Controller extends Action_Controller
 			),
 			'id_group' => array(
 				'label' => $txt['position'],
-				'class' => 'lefttext group',
+				'class' => 'group',
 				'sort' => array(
 					'down' => 'IFNULL(mg.group_name, 1=1) DESC, mg.group_name DESC',
 					'up' => 'IFNULL(mg.group_name, 1=1) ASC, mg.group_name ASC'
@@ -112,7 +112,7 @@ class Memberlist_Controller extends Action_Controller
 			),
 			'date_registered' => array(
 				'label' => $txt['date_registered'],
-				'class' => 'lefttext date_registered',
+				'class' => 'date_registered',
 				'sort' => array(
 					'down' => 'mem.date_registered DESC',
 					'up' => 'mem.date_registered ASC'

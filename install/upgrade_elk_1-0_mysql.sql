@@ -472,8 +472,7 @@ $request = upgrade_query("
 	WHERE SUBSTRING(variable, 1, 5) = 'cust_'");
 
 // remove the moved rows from themes
-// @TODO this is broken because upgrade_query returns only true or false
-if ($db->num_rows($request) != 0)
+if ($db->affected_rows() != 0)
 {
 	upgrade_query("
 		DELETE FROM {$db_prefix}themes

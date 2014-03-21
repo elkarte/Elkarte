@@ -79,11 +79,12 @@ DEFINE('SUBSDIR', $sourcedir . '/subs');
 unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir);
 
 $ssi_error_reporting = error_reporting(E_ALL | E_STRICT);
-/* Set this to one of three values depending on what you want to happen in the case of a fatal error.
-	false:	Default, will just load the error sub template and die - not putting any theme layers around it.
-	true:	Will load the error sub template AND put the template layers around it (Not useful if on total custom pages).
-	string:	Name of a callback function to call in the event of an error to allow you to define your own methods. Will die after function returns.
-*/
+/**
+ * Set this to one of three values depending on what you want to happen in the case of a fatal error.
+ *  - false: Default, will just load the error sub template and die - not putting any theme layers around it.
+ *  - true: Will load the error sub template AND put the template layers around it (Not useful if on total custom pages).
+ *  - string: Name of a callback function to call in the event of an error to allow you to define your own methods. Will die after function returns.
+ */
 $ssi_on_error_method = false;
 
 // Don't do john didley if the forum's been shut down competely.
@@ -313,7 +314,7 @@ function ssi_logout($redirect_to = '', $output_method = 'echo')
 
 /**
  * Recent post list:
- *  [board] Subject by Poster	Date
+ *  [board] Subject by Poster Date
  *
  * @todo this may use getLastPosts with some modification
  *
@@ -512,7 +513,7 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 
 /**
  * Recent topic list:
- *  [board] Subject by Poster	Date
+ *  [board] Subject by Poster Date
  *
  * @param int $num_recent
  * @param int[]|null $exclude_boards
@@ -761,20 +762,20 @@ function ssi_topTopics($type = 'replies', $num_topics = 10, $output_method = 'ec
 		return $topics;
 
 	echo '
-		<table class="ssi_table">
+		<table class="top_topic ssi_table">
 			<tr>
-				<th class="lefttext"></th>
-				<th class="righttext">', $txt['views'], '</th>
-				<th class="righttext">', $txt['replies'], '</th>
+				<th class="link"></th>
+				<th class="views">', $txt['views'], '</th>
+				<th class="num_replies">', $txt['replies'], '</th>
 			</tr>';
 	foreach ($topics as $topic)
 		echo '
 			<tr>
-				<td class="lefttext">
+				<td class="link">
 					', $topic['link'], '
 				</td>
-				<td class="righttext">', $topic['num_views'], '</td>
-				<td class="righttext">', $topic['num_replies'], '</td>
+				<td class="views">', $topic['num_views'], '</td>
+				<td class="num_replies">', $topic['num_replies'], '</td>
 			</tr>';
 	echo '
 		</table>';

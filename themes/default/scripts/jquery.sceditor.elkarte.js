@@ -66,7 +66,7 @@
 						title: emoticon.tooltip || emoticon
 					})
 					.click(function (e) {
-						var	start = '',
+						var start = '',
 							end = '';
 
 						if (base.opts.emoticonsCompat)
@@ -189,7 +189,7 @@
  *
  * tooltip - the hover text, this is the name in the editors.xxxx.php file
  * txtExec - this is the text to insert before and after the cursor or seleted text
- *			when in the plain text part of the editor
+ *           when in the plain text part of the editor
  * exec - this is called when in the wizzy part of the editor to insert text or html tags
  * state - this is used to determine if a button should be shown as active or not
  *
@@ -436,7 +436,7 @@ $.sceditor.plugins.bbcode.bbcode
 		allowsEmpty: true,
 		quoteType: $.sceditor.BBCodeParser.QuoteType.never,
 		format: function(element, content) {
-			var	attribs = '',
+			var attribs = '',
 				style = function(name) {
 					return element.style ? element.style[name] : null;
 				};
@@ -454,7 +454,7 @@ $.sceditor.plugins.bbcode.bbcode
 			return '[img' + attribs + ']' + element.attr('src') + '[/img]';
 		},
 		html: function(token, attrs, content) {
-			var	parts,
+			var parts,
 				attribs = '';
 
 			// handle [img width=340 height=240]url[/img]

@@ -756,7 +756,7 @@ function template_action_notification()
 							<input type="checkbox" id="notify_announcements" name="notify_announcements"', !empty($context['member']['notify_announcements']) ? ' checked="checked"' : '', ' class="input_check" />
 						</dd>';
 
-	// More notification options.
+	// Auto notification when you reply / start a topic?
 	echo '
 						<dt>
 							<label for="auto_notify">', $txt['auto_notify'], '</label>
@@ -764,20 +764,22 @@ function template_action_notification()
 						<dd>
 							<input type="hidden" name="default_options[auto_notify]" value="0" />
 							<input type="checkbox" id="auto_notify" name="default_options[auto_notify]" value="1"', !empty($context['member']['options']['auto_notify']) ? ' checked="checked"' : '', ' class="input_check" />
+							', (!empty($modSettings['maillist_enabled']) ? $txt['auto_notify_pbe_post'] : ''), '
 						</dd>';
 
-	// Can the body of the post be sent
+	// Can the body of the post be sent, PBE will ensure it can
 	if (empty($modSettings['disallow_sendBody']))
 		echo '
 						<dt>
-							<label for="notify_send_body">', $txt['notify_send_body'], '</label>
+							<label for="notify_send_body">', $txt['notify_send_body' . (!empty($modSettings['maillist_enabled']) ? '_pbe' : '')], '</label>
 						</dt>
 						<dd>
 							<input type="hidden" name="notify_send_body" value="0" />
 							<input type="checkbox" id="notify_send_body" name="notify_send_body"', !empty($context['member']['notify_send_body']) ? ' checked="checked"' : '', ' class="input_check" />
+							', (!empty($modSettings['maillist_enabled']) ? $txt['notify_send_body_pbe_post'] : ''), '
 						</dd>';
 
-	// How often do you want to hear from us
+	// How often do you want to hear from us, instant, daily, weekly?
 	echo '
 						<dt>
 							<label for="notify_regularity">', $txt['notify_regularity'], ':</label>
@@ -808,7 +810,7 @@ function template_action_notification()
 	}
 
 	echo '
-									<option value="3"', $context['member']['notify_types'] == 3 ? ' selected="selected"' : '', '>', $txt['notify_send_type_only_replies'], '</option>
+									<option value="3"', $context['member']['notify_types'] == 3 ? ' selected="selected"' : '', '>', $txt['notify_send_type_only_replies' . ($modSettings['maillist_enabled'] ? '_pbe' : '')], '</option>
 									<option value="4"', $context['member']['notify_types'] == 4 ? ' selected="selected"' : '', '>', $txt['notify_send_type_nothing'], '</option>
 								</select>
 							</div>

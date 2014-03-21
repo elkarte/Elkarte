@@ -585,6 +585,12 @@ function template_ssi_above()
 			.ssi_table>th.centertext, .ssi_table>td.centertext {
 				text-align: center;
 			}
+			.top_topic .link {
+				text-align: left;
+			}
+			.top_topic .views, .top_topic .num_replies {
+				text-align: right;
+			}
 		</style>
 		<script><!-- // --><![CDATA[
 			var elk_scripturl = "', $scripturl, '",

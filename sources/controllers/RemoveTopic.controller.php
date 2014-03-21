@@ -103,6 +103,7 @@ class RemoveTopic_Controller extends Action_Controller
 
 		// This has some handy functions for topics
 		require_once(SUBSDIR . '/Topic.subs.php');
+		require_once(SUBSDIR . '/Messages.subs.php');
 
 		$_REQUEST['msg'] = (int) $_REQUEST['msg'];
 
@@ -112,10 +113,10 @@ class RemoveTopic_Controller extends Action_Controller
 
 		$this->removeDeleteConcurrence();
 
-		$topic_info = getTopicInfo($topic, 'message');
+		$topic_info = loadMessageDetails(array('t.id_member_started'), array('LEFT JOIN {db_prefix}topics AS t ON (m.id_topic = t.id_topic)'), array('message_list' => $_REQUEST['msg']));
 
 		// Verify they can see this!
-		if ($modSettings['postmod_active'] && !$topic_info['msg_approved'] && !empty($topic_info['id_member']) && $topic_info['id_member'] != $user_info['id'])
+		if ($modSettings['postmod_active'] && !$topic_info['approved'] && !empty($topic_info['id_member']) && $topic_info['id_member'] != $user_info['id'])
 			isAllowedTo('approve_posts');
 
 		if ($topic_info['id_member'] == $user_info['id'])

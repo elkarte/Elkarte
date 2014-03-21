@@ -1090,10 +1090,10 @@ function setTopicWatch($id_member, $topic, $on = false)
  *
  * @param mixed[]|int $topic_parameters can also accept a int value for a topic
  * @param string $full defines the values returned by the function:
- *		- if empty returns only the data from {db_prefix}topics
- *		- if 'message' returns also informations about the message (subject, body, etc.)
- *		- if 'starter' returns also informations about the topic starter (id_member and poster_name)
- *		- if 'all' returns additional infos about the read/unwatched status
+ *    - if empty returns only the data from {db_prefix}topics
+ *    - if 'message' returns also informations about the message (subject, body, etc.)
+ *    - if 'starter' returns also informations about the topic starter (id_member and poster_name)
+ *    - if 'all' returns additional infos about the read/unwatched status
  * @param string[] $selects (optional from integation)
  * @param string[] $tables (optional from integation)
  */

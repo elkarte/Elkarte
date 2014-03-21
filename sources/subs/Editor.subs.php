@@ -105,18 +105,18 @@ function getMessageIcons($board_id)
 /**
  * Creates a box that can be used for richedit stuff like BBC, Smileys etc.
  * @param mixed[] $editorOptions associative array of options => value
- *	must contain
- *		id => unique id for the css
- *		value => text for the editor or blank
- * Optionaly
- *		height => height of the intial box
- * 		width => width of the box (100%)
- *		force_rich => force wysiwyg to be enabled
- *		disable_smiley_box => boolean to turn off the smiley box
- * 		labels => array(
- * 			'post_button' => $txt['for post button'],
- * 		),
- * 		preview_type => 2 how to act on preview click, see template_control_richedit_buttons
+ *  must contain:
+ *   - id => unique id for the css
+ *   - value => text for the editor or blank
+ *  Optionaly
+ *   - height => height of the intial box
+ *   - width => width of the box (100%)
+ *   - force_rich => force wysiwyg to be enabled
+ *   - disable_smiley_box => boolean to turn off the smiley box
+ *   - labels => array(
+ *       - 'post_button' => $txt['for post button'],
+ *     ),
+ *   - preview_type => 2 how to act on preview click, see template_control_richedit_buttons
  */
 function create_control_richedit($editorOptions)
 {
@@ -489,8 +489,8 @@ function create_control_richedit($editorOptions)
 		check_id: "post_subject"
 	});
 
-	var body_err = new errorbox_handler({
-		self: \'body_err\',
+	var body_err_' . $editorOptions['id'] . ' = new errorbox_handler({
+		self: \'body_err_' . $editorOptions['id'] . '\',
 		error_box_id: \'post_error\',
 		error_checks: [{
 			code: \'no_message\',
@@ -504,7 +504,7 @@ function create_control_richedit($editorOptions)
 		editor_id: \'' . $editorOptions['id'] . '\',
 		editor: ' . JavaScriptEscape('
 		(function () {
-			return $editor_data[' . $editorOptions['id'] . '].val();
+			return $editor_data[\'' . $editorOptions['id'] . '\'].val();
 		});') . '
 	});', true);
 	}

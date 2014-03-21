@@ -679,7 +679,7 @@ function checkLogin()
 		if (empty($_POST['user']))
 			$_POST['user'] = 'Administrator';
 
-		// Before 2.0 these column names were different!
+		// Before SMF 2.0 these column names were different!
 		$oldDB = false;
 		if (empty($db_type) || $db_type == 'mysql')
 		{
@@ -3623,7 +3623,7 @@ function template_upgrade_below()
 
 	if (!empty($upcontext['continue']))
 		echo '
-									<input type="submit" id="contbutt" disabled="disabled" name="contbutt" value="', $txt['upgrade_continue'], '"', $upcontext['continue'] == 2 ? ' disabled="disabled"' : '', ' class="button_submit" />';
+									<input type="submit" id="contbutt" name="contbutt" value="', $txt['upgrade_continue'], '"', $upcontext['continue'] == 2 ? ' disabled="disabled"' : '', ' class="button_submit" />';
 	if (!empty($upcontext['skip']))
 		echo '
 									<input type="submit" id="skip" name="skip" value="', $txt['upgrade_skip'], '" onclick="dontSubmit = true; document.getElementById(\'contbutt\').disabled = \'disabled\'; return true;" class="button_submit" />';

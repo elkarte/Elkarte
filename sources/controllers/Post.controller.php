@@ -882,9 +882,7 @@ class Post_Controller extends Action_Controller
 			'height' => '275px',
 			'width' => '100%',
 			// We do XML preview here.
-			'preview_type' => 2,
-			// Live errors - try or die
-			'live_errors' => true
+			'preview_type' => 2
 		);
 		create_control_richedit($editorOptions);
 
@@ -1920,7 +1918,7 @@ class Post_Controller extends Action_Controller
 				$row['body'] = preg_replace(array('~\n?\[quote.*?\].+?\[/quote\]\n?~is', '~^\n~', '~\[/quote\]~'), '', $row['body']);
 
 			// Add a quote string on the front and end.
-			$context['quote']['xml'] = '[quote author=' . $row['poster_name'] . ' link=topic=' . $row['id_topic'] . '.msg' . (int) $_REQUEST['quote'] . '#msg' . (int) $_REQUEST['quote'] . ' date=' . $row['poster_time'] . ']' . $row['body'] . '[/quote]';
+			$context['quote']['xml'] = '[quote author=' . $row['poster_name'] . ' link=topic=' . $row['id_topic'] . '.msg' . (int) $_REQUEST['quote'] . '#msg' . (int) $_REQUEST['quote'] . ' date=' . $row['poster_time'] . "]\n" . $row['body'] . "\n[/quote]";
 			$context['quote']['text'] = strtr(un_htmlspecialchars($context['quote']['xml']), array('\'' => '\\\'', '\\' => '\\\\', "\n" => '\\n', '</script>' => '</\' + \'script>'));
 			$context['quote']['xml'] = strtr($context['quote']['xml'], array('&nbsp;' => '&#160;', '<' => '&lt;', '>' => '&gt;'));
 

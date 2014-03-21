@@ -1146,7 +1146,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 				if ($action->exists('@lang'))
 				{
 					// Auto-select the language based on either request variable or current language.
-					if ((isset($_REQUEST['readme']) && $action->fetch('@lang') == $_REQUEST['readme']) || (isset($_REQUEST['license']) && $action->fetch('@lang') == $_REQUEST['license']) || (!isset($_REQUEST['readme']) && $action->fetch('@lang') == $language)	|| (!isset($_REQUEST['license']) && $action->fetch('@lang') == $language))
+					if ((isset($_REQUEST['readme']) && $action->fetch('@lang') == $_REQUEST['readme']) || (isset($_REQUEST['license']) && $action->fetch('@lang') == $_REQUEST['license']) || (!isset($_REQUEST['readme']) && $action->fetch('@lang') == $language) || (!isset($_REQUEST['license']) && $action->fetch('@lang') == $language))
 					{
 						// In case the user put the blocks in the wrong order.
 						if (isset($context[$type]['selected']) && $context[$type]['selected'] == 'default')

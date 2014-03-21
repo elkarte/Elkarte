@@ -517,7 +517,7 @@ if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersio
 	if (!empty($inserts))
 		upgrade_query("
 			INSERT IGNORE INTO {$db_prefix}board_permissions
-				(id_group, id_board, permission, add_deny)
+				(id_group, id_profile, permission, add_deny)
 			VALUES
 				" . implode(',', $inserts));
 
@@ -570,7 +570,7 @@ $request = upgrade_query("
 	WHERE SUBSTRING(variable, 1, 5) = 'cust_'");
 
 // remove the moved rows from themes
-if ($db->num_rows($request) != 0)
+if ($db->affected_rows() != 0)
 {
 	upgrade_query("
 		DELETE FROM {$db_prefix}themes

@@ -315,49 +315,51 @@ function loadProfileFields($force_reload = false)
 	if (!empty($profile_fields) && !$force_reload)
 		return;
 
-	/* This horrific array defines all the profile fields in the whole world!
-		In general each "field" has one array - the key of which is the database column name associated with said field. Each item
-		can have the following attributes:
-
-			string $type:		The type of field this is - valid types are:
-				- callback:		This is a field which has its own callback mechanism for templating.
-				- check:		A simple checkbox.
-				- hidden:		This doesn't have any visual aspects but may have some validity.
-				- password:		A password box.
-				- select:		A select box.
-				- text:			A string of some description.
-
-			string $label:			The label for this item - default will be $txt[$key] if this isn't set.
-			string $subtext:		The subtext (Small label) for this item.
-			int $size:				Optional size for a text area.
-			array $input_attr:		An array of text strings to be added to the input box for this item.
-			string $value:			The value of the item. If not set $cur_profile[$key] is assumed.
-			string $permission:		Permission required for this item (Excluded _any/_own subfix which is applied automatically).
-			func $input_validate:	A runtime function which validates the element before going to the database. It is passed
-									the relevant $_POST element if it exists and should be treated like a reference.
-
-			Return types:
-				- true:				Element can be stored.
-				- false:			Skip this element.
-				- a text string:	An error occurred - this is the error message.
-
-			function $preload:		A function that is used to load data required for this element to be displayed. Must return
-									true to be displayed at all.
-
-			string $cast_type:		If set casts the element to a certain type. Valid types (bool, int, float).
-			string $save_key:		If the index of this element isn't the database column name it can be overriden
-									with this string.
-			bool $is_dummy:			If set then nothing is acted upon for this element.
-			bool $enabled:			A test to determine whether this is even available - if not is unset.
-			string $link_with:		Key which links this field to an overall set.
-
-			string $js_submit		javascript to add insisde the function checkProfileSubmit() in the template
-			string $js				javascript to add to the page in general
-			string $js_load			filename of js to be loaded with loadJavasciptFile
-
-		Note that all elements that have a custom input_validate must ensure they set the value of $cur_profile correct to enable
-		the changes to be displayed correctly on submit of the form.
-	*/
+	/**
+	 * This horrific array defines all the profile fields in the whole world!
+	 * In general each "field" has one array - the key of which is the database
+	 * column name associated with said field.
+	 *
+	 * Each item can have the following attributes:
+	 *
+	 * string $type: The type of field this is - valid types are:
+	 *   - callback: This is a field which has its own callback mechanism for templating.
+	 *   - check:    A simple checkbox.
+	 *   - hidden:   This doesn't have any visual aspects but may have some validity.
+	 *   - password: A password box.
+	 *   - select:   A select box.
+	 *   - text:     A string of some description.
+	 *
+	 * string $label:       The label for this item - default will be $txt[$key] if this isn't set.
+	 * string $subtext:     The subtext (Small label) for this item.
+	 * int $size:           Optional size for a text area.
+	 * array $input_attr:   An array of text strings to be added to the input box for this item.
+	 * string $value:       The value of the item. If not set $cur_profile[$key] is assumed.
+	 * string $permission:  Permission required for this item (Excluded _any/_own subfix which is applied automatically).
+	 * func $input_validate: A runtime function which validates the element before going to the database. It is passed
+	 *                       the relevant $_POST element if it exists and should be treated like a reference.
+	 *
+	 * Return types:
+	 *   - true:          Element can be stored.
+	 *   - false:         Skip this element.
+	 *   - a text string: An error occurred - this is the error message.
+	 *
+	 * function $preload: A function that is used to load data required for this element to be displayed. Must return
+	 *                    true to be displayed at all.
+	 *
+	 * string $cast_type: If set casts the element to a certain type. Valid types (bool, int, float).
+	 * string $save_key:  If the index of this element isn't the database column name it can be overriden with this string.
+	 * bool $is_dummy:    If set then nothing is acted upon for this element.
+	 * bool $enabled:     A test to determine whether this is even available - if not is unset.
+	 * string $link_with: Key which links this field to an overall set.
+	 *
+	 * string $js_submit: javascript to add insisde the function checkProfileSubmit() in the template
+	 * string $js:        javascript to add to the page in general
+	 * string $js_load:   filename of js to be loaded with loadJavasciptFile
+	 *
+	 * Note that all elements that have a custom input_validate must ensure they set the value of $cur_profile correct to enable
+	 * the changes to be displayed correctly on submit of the form.
+	 */
 
 	$profile_fields = array(
 		'avatar_choice' => array(

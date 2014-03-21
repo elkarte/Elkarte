@@ -161,9 +161,6 @@ fieldset dl {
 #quick_search .styled-select select {
 	margin: 0 0 0 4px;
 }
-#quick_log_search .button_submit {
-	margin: -2px 1px 0 2px;
-}
 
 /* @todo - The welcome thingy. */
 #admincenter .roundframe, #modcenter .roundframe {
