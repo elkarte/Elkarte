@@ -643,13 +643,14 @@ class Recent_Controller extends Action_Controller
 			}
 		}
 
+		$all = $context['showing_all_topics'] ? ';all' : '';
 		// Make sure the starting place makes sense and construct the page index.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=' . $_REQUEST['action'] . ($context['showing_all_topics'] ? ';all' : '') . $context['querystring_board_limits'] . $context['querystring_sort_limits'], $_REQUEST['start'], $this->_num_topics, $context['topics_per_page'], true);
+		$context['page_index'] = constructPageIndex($scripturl . '?action=' . $_REQUEST['action'] . $all . $context['querystring_board_limits'] . $context['querystring_sort_limits'], $_REQUEST['start'], $this->_num_topics, $context['topics_per_page'], true);
 		$context['current_page'] = (int) $_REQUEST['start'] / $context['topics_per_page'];
 
 		$context['links'] += array(
-			'prev' => $_REQUEST['start'] >= $context['topics_per_page'] ? $scripturl . '?action=' . $_REQUEST['action'] . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], $_REQUEST['start'] - $context['topics_per_page']) . $context['querystring_sort_limits'] : '',
-			'next' => $_REQUEST['start'] + $context['topics_per_page'] < $this->_num_topics ? $scripturl . '?action=' . $_REQUEST['action'] . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], $_REQUEST['start'] + $context['topics_per_page']) . $context['querystring_sort_limits'] : '',
+			'prev' => $_REQUEST['start'] >= $context['topics_per_page'] ? $scripturl . '?action=' . $_REQUEST['action'] . $all . sprintf($context['querystring_board_limits'], $_REQUEST['start'] - $context['topics_per_page']) . $context['querystring_sort_limits'] : '',
+			'next' => $_REQUEST['start'] + $context['topics_per_page'] < $this->_num_topics ? $scripturl . '?action=' . $_REQUEST['action'] . $all . sprintf($context['querystring_board_limits'], $_REQUEST['start'] + $context['topics_per_page']) . $context['querystring_sort_limits'] : '',
 		);
 		$context['page_info'] = array(
 			'current_page' => $_REQUEST['start'] / $context['topics_per_page'] + 1,
@@ -698,7 +699,7 @@ class Recent_Controller extends Action_Controller
 			call_integration_hook('integrate_recent_buttons');
 		}
 
-		$context['querystring_board_limits'] = 'action=' . ($_REQUEST['action'] == 'unread' ? 'unread' : 'unreadreplies') . (!empty($context['showing_all_topics']) ? ';all' : '') . $context['querystring_board_limits'];
+		$context['querystring_board_limits'] = 'action=' . ($_REQUEST['action'] == 'unread' ? 'unread' : 'unreadreplies') . $all . $context['querystring_board_limits'];
 
 		// Allow helpdesks and bug trackers and what not to add their own unread data (just add a template_layer to show custom stuff in the template!)
 		call_integration_hook('integrate_unread_list');
