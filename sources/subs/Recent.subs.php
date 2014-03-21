@@ -919,7 +919,8 @@ function countUnreadReplies($query_parameters, $have_temp_table)
  * @param mixed[] $query_parameters - 
  * @param string $query_this_board - query string holding the conditions
  *               for filtering the messages based on boards and other limits
- * @param bool $have_temp_table - if use the temp table or not
+ * @param int $start - position to start the query
+ * @param int $limit - number of entries to grab
  */
 function findRecentMessages($query_parameters, $query_this_board, $start, $limit = 10)
 {
