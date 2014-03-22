@@ -38,6 +38,10 @@ class Recent_Controller extends Action_Controller
 	 * Parameters for the main query.
 	 */
 	private $_query_parameters = array();
+	/**
+	 * The object that will retrieve the data
+	 */
+	private $_grabber = null;
 
 	/**
 	 * Called before any other action method in this class.
@@ -81,12 +85,14 @@ class Recent_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $user_info, $context, $modSettings, $board;
 
+		require_once(SUBSDIR . '/Recent.class.php');
+		$this->_grabber = new Recent_Class();
+
 		loadTemplate('Recent');
 		$context['page_title'] = $txt['recent_posts'];
 		$context['sub_template'] = 'recent';
 
-		if (isset($_REQUEST['start']) && $_REQUEST['start'] > 95)
-			$_REQUEST['start'] = 95;
+		$this->_grabber->setStart(isset($_REQUEST['start']) ? $_REQUEST['start'] : 0);
 
 		$query_parameters = array();
 
@@ -118,18 +124,13 @@ class Recent_Controller extends Action_Controller
 				fatal_lang_error('error_no_boards_selected');
 
 			// The query for getting the messages
-			$query_this_board = 'b.id_board IN ({array_int:boards})';
-			$query_parameters['boards'] = $boards;
+			$this->_grabber->setBoards($boards);
 
 			// If this category has a significant number of posts in it...
 			if ($total_posts > 100 && $total_posts > $modSettings['totalMessages'] / 15)
-			{
-				$query_this_board .= '
-						AND m.id_msg >= {int:max_id_msg}';
-				$query_parameters['max_id_msg'] = max(0, $modSettings['maxMsgID'] - 400 - $_REQUEST['start'] * 7);
-			}
+				$maxMsgID = array(400, 7);
 
-			$context['page_index'] = constructPageIndex($scripturl . '?action=recent;c=' . implode(',', $categories), $_REQUEST['start'], min(100, $total_posts), 10, false);
+			$base_url = $scripturl . '?action=recent;c=' . implode(',', $categories);
 		}
 		// Or recent posts by board id's?
 		elseif (!empty($_REQUEST['boards']))
@@ -147,18 +148,13 @@ class Recent_Controller extends Action_Controller
 				fatal_lang_error('error_no_boards_selected');
 
 			// Build the query for finding the messages
-			$query_this_board = 'b.id_board IN ({array_int:boards})';
-			$query_parameters['boards'] = $boards;
+			$this->_grabber->setBoards($boards);
 
 			// If these boards have a significant number of posts in them...
 			if ($total_posts > 100 && $total_posts > $modSettings['totalMessages'] / 12)
-			{
-				$query_this_board .= '
-						AND m.id_msg >= {int:max_id_msg}';
-				$query_parameters['max_id_msg'] = max(0, $modSettings['maxMsgID'] - 500 - $_REQUEST['start'] * 9);
-			}
+				$maxMsgID = array(500, 9);
 
-			$context['page_index'] = constructPageIndex($scripturl . '?action=recent;boards=' . implode(',', $_REQUEST['boards']), $_REQUEST['start'], min(100, $total_posts), 10, false);
+			$base_url = $scripturl . '?action=recent;boards=' . implode(',', $_REQUEST['boards']);
 		}
 		// Or just the recent posts for a specific board
 		elseif (!empty($board))
@@ -166,49 +162,44 @@ class Recent_Controller extends Action_Controller
 			$board_data = fetchBoardsInfo(array('boards' => $board), array('selects' => 'posts'));
 			$total_posts = $board_data[$board]['num_posts'];
 
-			$query_this_board = 'b.id_board = {int:board}';
-			$query_parameters['board'] = $board;
+			$this->_grabber->setBoards($board);
 
 			// If this board has a significant number of posts in it...
 			if ($total_posts > 80 && $total_posts > $modSettings['totalMessages'] / 10)
-			{
-				$query_this_board .= '
-						AND m.id_msg >= {int:max_id_msg}';
-				$query_parameters['max_id_msg'] = max(0, $modSettings['maxMsgID'] - 600 - $_REQUEST['start'] * 10);
-			}
+				$maxMsgID = array(600, 10);
 
-			$context['page_index'] = constructPageIndex($scripturl . '?action=recent;board=' . $board . '.%1$d', $_REQUEST['start'], min(100, $total_posts), 10, true);
+			$base_url = $scripturl . '?action=recent;board=' . $board . '.%1$d';
+			$flex_start = true;
 		}
 		// All the recent posts across boards and categories it is then
 		else
 		{
 			$total_posts = sumRecentPosts();
 
-			$query_this_board = '{query_wanna_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
-						AND b.id_board != {int:recycle_board}' : '') . '
-						AND m.id_msg >= {int:max_id_msg}';
-			$query_parameters['max_id_msg'] = max(0, $modSettings['maxMsgID'] - 100 - $_REQUEST['start'] * 6);
-			$query_parameters['recycle_board'] = $modSettings['recycle_board'];
+			$this->_grabber->setVisibleBoards(max(0, $modSettings['maxMsgID'] - 100 - $this->_grabber->getStart() * 6), !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? $modSettings['recycle_board'] : 0);
 
 			// Set up the pageindex
-			$context['page_index'] = constructPageIndex($scripturl . '?action=recent', $_REQUEST['start'], min(100, $total_posts), 10, false);
+			$base_url = $scripturl . '?action=recent';
 		}
+
+		if (!empty($maxMsgID))
+			$this->_grabber->setMaxMsgId(max(0, $modSettings['maxMsgID'] - $maxMsgID[0] - $this->_grabber->getStart() * $maxMsgID[1]));
+
+		// Set up the pageindex
+		$start = $this->_grabber->getStart();
+		$context['page_index'] = constructPageIndex($base_url, $start, min(100, $total_posts), 10, !empty($flex_start));
 
 		$context['linktree'][] = array(
 			'url' => $scripturl . '?action=recent' . (empty($board) ? (empty($categories) ? '' : ';c=' . implode(',', $categories)) : ';board=' . $board . '.0'),
 			'name' => $context['page_title']
 		);
 
-		$messages = findRecentMessages($query_parameters, $query_this_board, (int) $_REQUEST['start'], 10);
-
 		// Nothing here... Or at least, nothing you can see...
-		if (empty($messages))
+		if (!$this->_grabber->findRecentMessages(10))
 		{
 			$context['posts'] = array();
 			return;
 		}
-
-		list ($context['posts'], $board_ids) = getRecentPosts($messages, $_REQUEST['start']);
 
 		// There might be - and are - different permissions between any and own.
 		$permissions = array(
@@ -222,33 +213,7 @@ class Recent_Controller extends Action_Controller
 				'delete_any' => 'can_delete',
 			)
 		);
-
-		// Now go through all the permissions, looking for boards they can do it on.
-		foreach ($permissions as $type => $list)
-		{
-			foreach ($list as $permission => $allowed)
-			{
-				// They can do it on these boards...
-				$boards = boardsAllowedTo($permission);
-
-				// If 0 is the only thing in the array, they can do it everywhere!
-				if (!empty($boards) && $boards[0] == 0)
-					$boards = array_keys($board_ids[$type]);
-
-				// Go through the boards, and look for posts they can do this on.
-				foreach ($boards as $board_id)
-				{
-					// Hmm, they have permission, but there are no topics from that board on this page.
-					if (!isset($board_ids[$type][$board_id]))
-						continue;
-
-					// Okay, looks like they can do it for these posts.
-					foreach ($board_ids[$type][$board_id] as $counter)
-						if ($type == 'any' || $context['posts'][$counter]['poster']['id'] == $user_info['id'])
-							$context['posts'][$counter]['tests'][$allowed] = true;
-				}
-			}
-		}
+		$context['posts'] = $this->_grabber->getRecentPosts($permissions);
 
 		$quote_enabled = empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC']));
 		foreach ($context['posts'] as $counter => $post)
