@@ -292,7 +292,7 @@ class Request
 	 *
 	 * @return Request
 	 */
-	public static function request()
+	public static function instance()
 	{
 		if (self::$_req === null)
 			self::$_req = new Request();
@@ -304,10 +304,10 @@ class Request
 /**
  * This handy function retrieves a Request instance and passes it on.
  *
- * - To get hold of a Request, you can use this function or directly Request::request().
- * - This is for convenience, it simply delegates to Request::request().
+ * - To get hold of a Request, you can use this function or directly Request::instance().
+ * - This is for convenience, it simply delegates to Request::instance().
  */
 function request()
 {
-	return Request::request();
+	return Request::instance();
 }
