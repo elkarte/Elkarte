@@ -1890,6 +1890,9 @@ function addChildBoards(&$boards)
 {
 	$db = database();
 
+	if (empty($boards))
+		return;
+
 	if (!is_array($boards))
 		$boards = array($boards);
 
