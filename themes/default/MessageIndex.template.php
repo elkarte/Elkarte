@@ -261,7 +261,7 @@ function template_topic_listing()
 					if ($topic['quick_mod']['move'])
 						echo '<a class="topicicon img_move" href="', $scripturl, '?action=movetopic;current_board=', $context['current_board'], ';board=', $context['current_board'], '.', $context['start'], ';topic=', $topic['id'], '.0" title="', $txt['move_topic'], '"></a>';
 				}
-i
+
 				echo '
 				</p>';
 			}
