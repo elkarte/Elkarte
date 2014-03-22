@@ -1461,15 +1461,15 @@ function membersBy($query, $query_params, $details = false, $only_active = true)
 				foreach ($query_conditions as $condition => $query_condition)
 				{
 					if ($query_condition == 'member_names')
-						$query_parts[$condition === 'or' ? 'or' : 'and'] = $allowed_conditions[$query_condition]($query_params);
+						$query_parts[$condition === 'or' ? 'or' : 'and'][] = $allowed_conditions[$query_condition]($query_params);
 					else
-						$query_parts[$condition === 'or' ? 'or' : 'and'] = isset($allowed_conditions[$query_condition]) ? $allowed_conditions[$query_condition] : $query_condition;
+						$query_parts[$condition === 'or' ? 'or' : 'and'][] = isset($allowed_conditions[$query_condition]) ? $allowed_conditions[$query_condition] : $query_condition;
 				}
 			}
 			elseif ($query == 'member_names')
-				$query_parts[$condition === 'or' ? 'or' : 'and'] = $allowed_conditions[$query]($query_params);
+				$query_parts[$condition === 'or' ? 'or' : 'and'][] = $allowed_conditions[$query]($query_params);
 			else
-				$query_parts['and'] = isset($allowed_conditions[$query]) ? $allowed_conditions[$query] : $query;
+				$query_parts['and'][] = isset($allowed_conditions[$query]) ? $allowed_conditions[$query] : $query;
 		}
 
 		if (!empty($query_parts['or']))
@@ -1571,15 +1571,15 @@ function countMembersBy($query, $query_params, $only_active = true)
 				foreach ($query_conditions as $condition => $query_condition)
 				{
 					if ($query_condition == 'member_names')
-						$query_parts[$condition === 'or' ? 'or' : 'and'] = $allowed_conditions[$query_condition]($query_params);
+						$query_parts[$condition === 'or' ? 'or' : 'and'][] = $allowed_conditions[$query_condition]($query_params);
 					else
-						$query_parts[$condition === 'or' ? 'or' : 'and'] = isset($allowed_conditions[$query_condition]) ? $allowed_conditions[$query_condition] : $query_condition;
+						$query_parts[$condition === 'or' ? 'or' : 'and'][] = isset($allowed_conditions[$query_condition]) ? $allowed_conditions[$query_condition] : $query_condition;
 				}
 			}
 			elseif ($query == 'member_names')
-				$query_parts[$condition === 'or' ? 'or' : 'and'] = $allowed_conditions[$query]($query_params);
+				$query_parts[$condition === 'or' ? 'or' : 'and'][] = $allowed_conditions[$query]($query_params);
 			else
-				$query_parts['and'] = isset($allowed_conditions[$query]) ? $allowed_conditions[$query] : $query;
+				$query_parts['and'][] = isset($allowed_conditions[$query]) ? $allowed_conditions[$query] : $query;
 		}
 
 		if (!empty($query_parts['or']))
