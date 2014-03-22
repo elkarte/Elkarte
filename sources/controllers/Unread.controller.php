@@ -25,17 +25,16 @@ if (!defined('ELK'))
  */
 class Unread_Controller extends Action_Controller
 {
-	private $_have_temp_table = false;
-	private $_query_this_board = '';
-	private $_preview_bodies = 0;
 	private $_boards = array();
+
 	private $_is_topics = false;
-	private $_ascending = false;
-	private $_sort_query = '';
+
 	private $_num_topics = 0;
 
 	private $_action = 'unread';
+
 	private $_action_unread = false;
+
 	private $_action_unreadreplies = false;
 
 	/**

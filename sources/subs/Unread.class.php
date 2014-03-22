@@ -29,11 +29,11 @@ class Unread_Class
 	const UNREADREPLIES = 1;
 
 	private $_have_temp_table = false;
-	private $_query_this_board = '';
-	private $_boards = array();
-	private $_is_topics = false;
+
 	private $_ascending = false;
+
 	private $_sort_query = '';
+
 	private $_num_topics = 0;
 
 	private $_min_message = 0;
