@@ -20,14 +20,6 @@
 if (!defined('ELK'))
 	die('No access...');
 
-// This defines two version types for checking the API's are compatible with this version of the software.
-$GLOBALS['search_versions'] = array(
-	// This is the forum version but is repeated due to some people rewriting $forum_version.
-	'forum_version' => 'ElkArte 1.0 Beta 2',
-	// This is the minimum version of ElkArte that an API could have been written for to work. (strtr to stop accidentally updating version on release)
-	'search_version' => strtr('ElkArte 1+0=Alpha', array('+' => '.', '=' => ' ')),
-);
-
 /**
  * Search_Controller class, it handle all of the searching
  *
@@ -853,7 +845,6 @@ class Search_Controller extends Action_Controller
 			$searchArray = array();
 			$num_results = $searchAPI->searchQuery($query_params, $searchWords, $excludedIndexWords, $participants, $searchArray);
 		}
-
 		// Update the cache if the current search term is not yet cached.
 		else
 		{
@@ -862,8 +853,10 @@ class Search_Controller extends Action_Controller
 			{
 				// Increase the pointer...
 				$modSettings['search_pointer'] = empty($modSettings['search_pointer']) ? 0 : (int) $modSettings['search_pointer'];
+
 				// ...and store it right off.
 				updateSettings(array('search_pointer' => $modSettings['search_pointer'] >= 255 ? 0 : $modSettings['search_pointer'] + 1));
+
 				// As long as you don't change the parameters, the cache result is yours.
 				$_SESSION['search_cache'] = array(
 					'id_search' => $modSettings['search_pointer'],
@@ -921,9 +914,8 @@ class Search_Controller extends Action_Controller
 						if (!empty($userQuery))
 						{
 							if ($subject_query['from'] != '{db_prefix}messages AS m')
-							{
 								$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_topic = t.id_topic)';
-							}
+
 							$subject_query['where'][] = $userQuery;
 						}
 						if (!empty($search_params['topic']))
@@ -937,9 +929,7 @@ class Search_Controller extends Action_Controller
 						if (!empty($excludedPhrases))
 						{
 							if ($subject_query['from'] != '{db_prefix}messages AS m')
-							{
 								$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)';
-							}
 
 							$count = 0;
 							foreach ($excludedPhrases as $phrase)
@@ -1358,6 +1348,7 @@ class Search_Controller extends Action_Controller
 						{
 							$context['search_errors']['query_not_specific_enough'] = true;
 							$_REQUEST['params'] = $context['params'];
+
 							return $this->action_search();
 						}
 						elseif (!empty($indexedResults))
@@ -2222,7 +2213,7 @@ class Search_Controller extends Action_Controller
 
 /**
  * This function compares the length of two strings plus a little.
- * 
+ *
  * What it does:
  * - callback function for usort used to sort the fulltext results.
  * - passes sorting duty to the current API.
