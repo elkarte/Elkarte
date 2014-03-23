@@ -746,7 +746,7 @@ class Search_Controller extends Action_Controller
 
 		// *** Spell checking?
 		if (!empty($modSettings['enableSpellChecking']) && function_exists('pspell_new'))
-			$this->_load_suggestions($searchArray);
+			$this->_load_suggestions($search_params, $searchArray);
 
 		// Let the user adjust the search query, should they wish?
 		$context['search_params'] = $search_params;
@@ -2112,9 +2112,10 @@ class Search_Controller extends Action_Controller
 	/**
 	 * Setup spellchecking suggestions and load them into $context
 	 *
+	 * @param string[] $search_params the search parameters
 	 * @param string[] $searchArray an array of terms
 	 */
-	private function _load_suggestions($searchArray = array())
+	private function _load_suggestions($search_params, $searchArray = array())
 	{
 		global $txt, $context;
 
@@ -2206,13 +2207,12 @@ class Search_Controller extends Action_Controller
 			$did_you_mean['search'] = array_merge($did_you_mean['search'], $temp_excluded['search']);
 			$did_you_mean['display'] = array_merge($did_you_mean['display'], $temp_excluded['display']);
 
-			$temp_params = $search_params;
-			$temp_params['search'] = implode(' ', $did_you_mean['search']);
-			if (isset($temp_params['brd']))
-				$temp_params['brd'] = implode(',', $temp_params['brd']);
+			$search_params['search'] = implode(' ', $did_you_mean['search']);
+			if (isset($search_params['brd']))
+				$search_params['brd'] = implode(',', $search_params['brd']);
 
 			$context['params'] = array();
-			foreach ($temp_params as $k => $v)
+			foreach ($search_params as $k => $v)
 				$context['did_you_mean_params'][] = $k . '|\'|' . $v;
 			$context['did_you_mean_params'] = base64_encode(implode('|"|', $context['did_you_mean_params']));
 			$context['did_you_mean'] = implode(' ', $did_you_mean['display']);
