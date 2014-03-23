@@ -168,7 +168,7 @@ class Recent_Controller extends Action_Controller
 		}
 
 		if (!empty($maxMsgID))
-			$this->_grabber->setMaxMsgId(max(0, $modSettings['maxMsgID'] - $maxMsgID[0] - $start * $maxMsgID[1]));
+			$this->_grabber->setEarliestMsg(max(0, $modSettings['maxMsgID'] - $maxMsgID[0] - $start * $maxMsgID[1]));
 
 		// Set up the pageindex
 		$context['page_index'] = constructPageIndex($base_url, $start, min(100, $total_posts), 10, !empty($flex_start));
@@ -197,7 +197,7 @@ class Recent_Controller extends Action_Controller
 				'delete_any' => 'can_delete',
 			)
 		);
-		$context['posts'] = $this->_grabber->getRecentPosts($permissions);
+		$context['posts'] = $this->_grabber->getRecentPosts($start, $permissions);
 
 		$quote_enabled = empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC']));
 		foreach ($context['posts'] as $counter => $post)

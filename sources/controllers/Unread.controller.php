@@ -78,7 +78,7 @@ class Unread_Controller extends Action_Controller
 		$context['showCheckboxes'] = !empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $settings['show_mark_read'];
 		$context['showing_all_topics'] = isset($_GET['all']);
 		$context['start'] = (int) $_REQUEST['start'];
-		$context['topics_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['topics_per_page']) ? $options['topics_per_page'] : $modSettings['defaultMaxTopics'];
+		$context['topics_per_page'] = (int) (empty($modSettings['disableCustomPerPage']) && !empty($options['topics_per_page']) ? $options['topics_per_page'] : $modSettings['defaultMaxTopics']);
 
 		$this->_grabber = new Unread_Class($user_info['id'], $modSettings['postmod_active'], $modSettings['enable_unwatch'], $context['showing_all_topics']);
 
@@ -424,6 +424,9 @@ class Unread_Controller extends Action_Controller
 
 	/**
 	 * Build the recent button array.
+	 *
+	 * @param string $topics_to_mark - An array of topic ids properly formatted
+	 *               into a string to use in an URL
 	 */
 	private function _buttonsArray($topics_to_mark)
 	{
