@@ -140,12 +140,7 @@ class MessageIndex_Controller extends Action_Controller
 		if (!$user_info['is_guest'])
 		{
 			// We can't know they read it if we allow prefetches.
-			if (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch')
-			{
-				ob_end_clean();
-				header('HTTP/1.1 403 Prefetch Forbidden');
-				die;
-			}
+			stop_prefetching();
 
 			// Mark the board as read, and its parents.
 			if (!empty($board_info['parent_boards']))

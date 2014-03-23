@@ -62,12 +62,7 @@ class Display_Controller
 		require_once(SUBSDIR . '/Topic.subs.php');
 
 		// Not only does a prefetch make things slower for the server, but it makes it impossible to know if they read it.
-		if (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch')
-		{
-			ob_end_clean();
-			header('HTTP/1.1 403 Prefetch Forbidden');
-			die;
-		}
+		stop_prefetching();
 
 		// How much are we sticking on each page?
 		$context['messages_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
