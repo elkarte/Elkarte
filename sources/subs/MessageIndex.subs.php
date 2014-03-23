@@ -231,7 +231,7 @@ function MessageTopicIcons()
  */
 function processMessageIndexTopicList($topics_info, $topicseen = false)
 {
-	global $modSettings, $options, $scripturl, $context, $txt, $settings;
+	global $modSettings, $options, $scripturl, $context, $txt, $settings, $user_info;
 
 	$topics = array();
 	$messages_per_page = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
