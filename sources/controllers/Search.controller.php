@@ -853,7 +853,6 @@ class Search_Controller extends Action_Controller
 			$searchArray = array();
 			$num_results = $searchAPI->searchQuery($query_params, $searchWords, $excludedIndexWords, $participants, $searchArray);
 		}
-
 		// Update the cache if the current search term is not yet cached.
 		else
 		{
@@ -862,8 +861,10 @@ class Search_Controller extends Action_Controller
 			{
 				// Increase the pointer...
 				$modSettings['search_pointer'] = empty($modSettings['search_pointer']) ? 0 : (int) $modSettings['search_pointer'];
+
 				// ...and store it right off.
 				updateSettings(array('search_pointer' => $modSettings['search_pointer'] >= 255 ? 0 : $modSettings['search_pointer'] + 1));
+
 				// As long as you don't change the parameters, the cache result is yours.
 				$_SESSION['search_cache'] = array(
 					'id_search' => $modSettings['search_pointer'],
@@ -921,9 +922,8 @@ class Search_Controller extends Action_Controller
 						if (!empty($userQuery))
 						{
 							if ($subject_query['from'] != '{db_prefix}messages AS m')
-							{
 								$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_topic = t.id_topic)';
-							}
+
 							$subject_query['where'][] = $userQuery;
 						}
 						if (!empty($search_params['topic']))
@@ -937,9 +937,7 @@ class Search_Controller extends Action_Controller
 						if (!empty($excludedPhrases))
 						{
 							if ($subject_query['from'] != '{db_prefix}messages AS m')
-							{
 								$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)';
-							}
 
 							$count = 0;
 							foreach ($excludedPhrases as $phrase)
@@ -1358,6 +1356,7 @@ class Search_Controller extends Action_Controller
 						{
 							$context['search_errors']['query_not_specific_enough'] = true;
 							$_REQUEST['params'] = $context['params'];
+
 							return $this->action_search();
 						}
 						elseif (!empty($indexedResults))
@@ -2222,7 +2221,7 @@ class Search_Controller extends Action_Controller
 
 /**
  * This function compares the length of two strings plus a little.
- * 
+ *
  * What it does:
  * - callback function for usort used to sort the fulltext results.
  * - passes sorting duty to the current API.
