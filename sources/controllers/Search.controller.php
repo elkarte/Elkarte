@@ -20,14 +20,6 @@
 if (!defined('ELK'))
 	die('No access...');
 
-// This defines two version types for checking the API's are compatible with this version of the software.
-$GLOBALS['search_versions'] = array(
-	// This is the forum version but is repeated due to some people rewriting $forum_version.
-	'forum_version' => 'ElkArte 1.0 Beta 2',
-	// This is the minimum version of ElkArte that an API could have been written for to work. (strtr to stop accidentally updating version on release)
-	'search_version' => strtr('ElkArte 1+0=Alpha', array('+' => '.', '=' => ' ')),
-);
-
 /**
  * Search_Controller class, it handle all of the searching
  *
