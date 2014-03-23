@@ -65,7 +65,7 @@ class Unread_Class
 	 * @param int $user - ID of the user
 	 * @param bool|int $post_mod - if post moderation is active or not
 	 * @param bool|int $unwatch - if unwatch topics is active or not
-	 * @param bool $showing_all_topics - Is the user looking at all the unread
+	 * @param bool|int $showing_all_topics - Is the user looking at all the unread
 	 *             replies, or the recent topics?
 	 */
 	public function __construct($user, $post_mod, $unwatch, $showing_all_topics = false)
