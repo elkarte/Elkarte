@@ -1275,6 +1275,7 @@ function spamProtection($error_type, $fatal = true)
 		'login' => 2,
 		'register' => 2,
 		'remind' => 30,
+		'contact' => 30,
 		'sendtopic' => $modSettings['spamWaitTime'] * 4,
 		'sendmail' => $modSettings['spamWaitTime'] * 5,
 		'reporttm' => $modSettings['spamWaitTime'] * 4,

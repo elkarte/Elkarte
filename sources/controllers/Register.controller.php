@@ -891,12 +891,12 @@ class Register_Controller extends Action_Controller
 
 		loadLanguage('Login');
 		loadTemplate('Register');
-		spamProtection('contact');
 
 		if (isset($_REQUEST['send']))
 		{
 			checkSession('post');
 			validateToken('contact');
+			spamProtection('contact');
 
 			// No errors, yet.
 			$context['errors'] = array();
