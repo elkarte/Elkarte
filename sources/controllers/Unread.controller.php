@@ -54,7 +54,7 @@ class Unread_Controller extends Action_Controller
 	 */
 	public function pre_dispatch()
 	{
-		global $txt, $scripturl, $context, $settings, $modSettings, $options;
+		global $txt, $scripturl, $context, $settings, $modSettings, $options, $user_info;
 
 		// Guests can't have unread things, we don't know anything about them.
 		is_not_guest();
@@ -80,7 +80,7 @@ class Unread_Controller extends Action_Controller
 		$context['start'] = (int) $_REQUEST['start'];
 		$context['topics_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['topics_per_page']) ? $options['topics_per_page'] : $modSettings['defaultMaxTopics'];
 
-		$this->_grabber = new Unread_Class($context['showing_all_topics']);
+		$this->_grabber = new Unread_Class($user_info['id'], $modSettings['postmod_active'], $modSettings['enable_unwatch'], $context['showing_all_topics']);
 
 		if ($this->_action_unread)
 			$context['page_title'] = $context['showing_all_topics'] ? $txt['unread_topics_all'] : $txt['unread_topics_visit'];
@@ -340,7 +340,7 @@ class Unread_Controller extends Action_Controller
 			$context['sort_by'] = 'last_post';
 			$this->_grabber->setSorting('t.id_last_msg', isset($_REQUEST['asc']));
 
-			$context['querystring_sort_limits'] = $this->_grabber->sortAsc() ? ';asc' : '';
+			$context['querystring_sort_limits'] = $this->_grabber->isSortAsc() ? ';asc' : '';
 		}
 		// But, for other methods the default sort is ascending.
 		else
@@ -348,11 +348,11 @@ class Unread_Controller extends Action_Controller
 			$context['sort_by'] = $_REQUEST['sort'];
 			$this->_grabber->setSorting($sort_methods[$_REQUEST['sort']], !isset($_REQUEST['desc']));
 
-			$context['querystring_sort_limits'] = ';sort=' . $context['sort_by'] . ($this->_grabber->sortAsc() ? '' : ';desc');
+			$context['querystring_sort_limits'] = ';sort=' . $context['sort_by'] . ($this->_grabber->isSortAsc() ? '' : ';desc');
 		}
 
-		$context['sort_direction'] = $this->_grabber->sortAsc() ? 'up' : 'down';
-		$context['sort_title'] = $this->_grabber->sortAsc() ? $txt['sort_desc'] : $txt['sort_asc'];
+		$context['sort_direction'] = $this->_grabber->isSortAsc() ? 'up' : 'down';
+		$context['sort_title'] = $this->_grabber->isSortAsc() ? $txt['sort_desc'] : $txt['sort_asc'];
 
 		// Trick
 		$txt['starter'] = $txt['started_by'];

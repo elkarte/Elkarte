@@ -70,16 +70,16 @@ class Recent_Controller extends Action_Controller
 	 */
 	public function action_recent()
 	{
-		global $txt, $scripturl, $context, $modSettings, $board;
+		global $txt, $scripturl, $context, $modSettings, $board, $user_info;
 
 		require_once(SUBSDIR . '/Recent.class.php');
-		$this->_grabber = new Recent_Class();
+		$this->_grabber = new Recent_Class($user_info['id']);
 
 		loadTemplate('Recent');
 		$context['page_title'] = $txt['recent_posts'];
 		$context['sub_template'] = 'recent';
 
-		$this->_grabber->setStart(isset($_REQUEST['start']) ? $_REQUEST['start'] : 0);
+		$start = isset($_REQUEST['start']) ? $_REQUEST['start'] : 0;
 
 		// Recent posts by category id's
 		if (!empty($_REQUEST['c']) && empty($board))
@@ -161,17 +161,16 @@ class Recent_Controller extends Action_Controller
 		{
 			$total_posts = sumRecentPosts();
 
-			$this->_grabber->setVisibleBoards(max(0, $modSettings['maxMsgID'] - 100 - $this->_grabber->getStart() * 6), !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? $modSettings['recycle_board'] : 0);
+			$this->_grabber->setVisibleBoards(max(0, $modSettings['maxMsgID'] - 100 - $start * 6), !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? $modSettings['recycle_board'] : 0);
 
 			// Set up the pageindex
 			$base_url = $scripturl . '?action=recent';
 		}
 
 		if (!empty($maxMsgID))
-			$this->_grabber->setMaxMsgId(max(0, $modSettings['maxMsgID'] - $maxMsgID[0] - $this->_grabber->getStart() * $maxMsgID[1]));
+			$this->_grabber->setMaxMsgId(max(0, $modSettings['maxMsgID'] - $maxMsgID[0] - $start * $maxMsgID[1]));
 
 		// Set up the pageindex
-		$start = $this->_grabber->getStart();
 		$context['page_index'] = constructPageIndex($base_url, $start, min(100, $total_posts), 10, !empty($flex_start));
 
 		$context['linktree'][] = array(
@@ -180,7 +179,7 @@ class Recent_Controller extends Action_Controller
 		);
 
 		// Nothing here... Or at least, nothing you can see...
-		if (!$this->_grabber->findRecentMessages(10))
+		if (!$this->_grabber->findRecentMessages($start, 10))
 		{
 			$context['posts'] = array();
 			return;
