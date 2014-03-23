@@ -132,19 +132,19 @@ class Recent_Class
 	 * Find the most recent messages in the forum.
 	 *
 	 * @param int $start - position to start the query
-	 * @param int $permissions - An array of boards permissions the members have.
-	 *            Used to define the buttons a member can see next to a message.
-	 *            Format of the array is:
-	 *            array(
-	 *              'own' => array(
-	 *                'permission_name' => 'test_name'
-	 *                ...
-	 *              ),
-	 *              'any' => array(
-	 *                'permission_name' => 'test_name'
-	 *                ...
-	 *              )
-	 *            )
+	 * @param string[] $permissions - An array of boards permissions the members have.
+	 *                 Used to define the buttons a member can see next to a message.
+	 *                 Format of the array is:
+	 *                 array(
+	 *                   'own' => array(
+	 *                     'permission_name' => 'test_name'
+	 *                     ...
+	 *                   ),
+	 *                   'any' => array(
+	 *                     'permission_name' => 'test_name'
+	 *                     ...
+	 *                   )
+	 *                 )
 	 */
 	public function getRecentPosts($start, $permissions)
 	{
