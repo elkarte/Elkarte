@@ -1230,8 +1230,8 @@ function confirmMoveTopics(confirmText)
 
 	if (from.options[from.selectedIndex].disabled || from.options[to.selectedIndex].disabled)
 		return false;
-
-	return confirm(confirmText.replace(/%board_from%/, from.options[from.selectedIndex].text.replace(/^=+&gt;&nbsp;/, '')).replace(/%board_to%/, to.options[to.selectedIndex].text.replace(/^=+&gt;&nbsp;/, '')));
+	
+	return confirm(confirmText.replace(/%board_from%/, from.options[from.selectedIndex].text.replace(/^\u2003+\u27A4/, '')).replace(/%board_to%/, to.options[to.selectedIndex].text.replace(/^\u2003+\u27A4/, '')));
 }
 
 /**

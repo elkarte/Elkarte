@@ -1266,9 +1266,6 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
  *	iTopicId:
  *	sAction:
  *	sLabelIconList:
- *	sSessionId:
- *	sSessionVar:
- *	sScriptUrl:
  *
  * The following are style elements that can be passed
  *	sBoxBackground:
@@ -1295,10 +1292,6 @@ function IconList(oOptions)
 	this.funcParent = this;
 	this.iCurMessageId = 0;
 	this.iCurTimeout = 0;
-
-	// Add backwards compatibility with old themes.
-	if (!('sSessionVar' in this.opt))
-		this.opt.sSessionVar = 'sesc';
 
 	// Set a default Action
 	if (!('sAction' in this.opt) || this.opt.sAction === null)
