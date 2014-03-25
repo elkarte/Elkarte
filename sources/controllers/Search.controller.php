@@ -289,6 +289,8 @@ class Search_Controller extends Action_Controller
 
 		$this->_search = new Search_Class();
 
+		$this->_search->setWeights($this->_weight_factors, $this->_weight, $this->_weight_total);
+
 		// Load up the search API we are going to use.
 		$searchAPI = $this->_search->findSearchAPI();
 

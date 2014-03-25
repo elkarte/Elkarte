@@ -85,6 +85,12 @@ class Search_Class
 
 	private $_userQuery = '';
 
+	private $_weight_factors = array();
+
+	private $_weight = array();
+
+	private $_weight_total = 0;
+
 	public function __construct()
 	{
 		$this->_search_version = strtr('ElkArte 1+0=Beta', array('+' => '.', '=' => ' '));
@@ -154,6 +160,15 @@ class Search_Class
 	public function getExcludedIndexWords()
 	{
 		return $this->_excludedIndexWords;
+	}
+
+	public function setWeights($weight_factors, $weight, $weight_total)
+	{
+		$this->_weight_factors = $weight_factors;
+
+		$this->_weight = $weight;
+
+		$this->_weight_total = $weight_total;
 	}
 
 	public function noRegexp()
@@ -736,7 +751,7 @@ class Search_Class
 
 		// We do this to try and avoid duplicate keys on databases not supporting INSERT IGNORE.
 		$inserts = array();
-		foreach ($this->searchWords() as $words)
+		foreach ($this->_searchWords as $words)
 		{
 			$subject_query_params = array();
 			$subject_query = array(
