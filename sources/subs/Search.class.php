@@ -793,8 +793,8 @@ class Search_Class
 				}
 				$subject_query['where'][] = $this->_userQuery;
 			}
-			if (!empty($this->param('topic')))
-				$subject_query['where'][] = 't.id_topic = ' . $this->param('topic');
+			if (!empty($this->_search_params['topic']))
+				$subject_query['where'][] = 't.id_topic = ' . $this->_search_params['topic'];
 			if (!empty($this->_minMsgID))
 				$subject_query['where'][] = 't.id_first_msg >= ' . $this->_minMsgID;
 			if (!empty($this->_maxMsgID))
@@ -921,7 +921,7 @@ class Search_Class
 			),
 		);
 
-		if (empty($this->param('topic')) && empty($this->param('show_complete')))
+		if (empty($this->_search_params['topic']) && empty($this->_search_params['show_complete']))
 		{
 			$main_query['select']['id_topic'] = 't.id_topic';
 			$main_query['select']['id_msg'] = 'MAX(m.id_msg) AS id_msg';
@@ -945,19 +945,19 @@ class Search_Class
 				),
 			);
 
-			if (!empty($this->param('topic')))
+			if (!empty($this->_search_params['topic']))
 			{
 				$main_query['where'][] = 't.id_topic = {int:topic}';
 				$main_query['parameters']['topic'] = $this->param('topic');
 			}
 
-			if (!empty($this->param('show_complete')))
+			if (!empty($this->_search_params['show_complete']))
 				$main_query['group_by'][] = 'm.id_msg, t.id_first_msg, t.id_last_msg';
 		}
 
 		// *** Get the subject results.
 		$numSubjectResults = 0;
-		if (empty($this->param('topic')))
+		if (empty($this->_search_params['topic']))
 		{
 			$inserts = array();
 			// Create a temporary table to store some preliminary results in.
@@ -1037,7 +1037,7 @@ class Search_Class
 					$subject_query['where'][] = '{raw:user_query}';
 					$subject_query['params']['user_query'] = $this->_userQuery;
 				}
-				if (!empty($this->param('topic')))
+				if (!empty($this->_search_params['topic']))
 				{
 					$subject_query['where'][] = 't.id_topic = {int:topic}';
 					$subject_query['params']['topic'] = $this->param('topic');
@@ -1183,7 +1183,7 @@ class Search_Class
 							'excluded_words' => $this->_excludedWords,
 							'user_query' => !empty($this->_userQuery) ? $this->_userQuery : '',
 							'board_query' => !empty($this->_boardQuery) ? $this->_boardQuery : '',
-							'topic' => !empty($this->param('topic')) ? $this->param('topic') : 0,
+							'topic' => !empty($this->_search_params['topic']) ? $this->param('topic') : 0,
 							'min_msg_id' => (int) $this->_minMsgID,
 							'max_msg_id' => (int) $this->_maxMsgID,
 							'excluded_phrases' => $this->_excludedPhrases,
@@ -1266,7 +1266,7 @@ class Search_Class
 				$main_query['where'][] = '{raw:user_query}';
 				$main_query['parameters']['user_query'] = $this->_userQuery;
 			}
-			if (!empty($this->param('topic')))
+			if (!empty($this->_search_params['topic']))
 			{
 				$main_query['where'][] = 'm.id_topic = {int:topic}';
 				$main_query['parameters']['topic'] = $this->param('topic');
@@ -1434,7 +1434,7 @@ class Search_Class
 		// *** Retrieve the results to be shown on the page
 		$participants = array();
 		$request = $this->_db_search->search_query('', '
-			SELECT ' . (empty($this->param('topic')) ? 'lsr.id_topic' : $this->param('topic') . ' AS id_topic') . ', lsr.id_msg, lsr.relevance, lsr.num_matches
+			SELECT ' . (empty($this->_search_params['topic']) ? 'lsr.id_topic' : $this->param('topic') . ' AS id_topic') . ', lsr.id_msg, lsr.relevance, lsr.num_matches
 			FROM {db_prefix}log_search_results AS lsr' . ($this->param('sort') == 'num_replies' ? '
 				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = lsr.id_topic)' : '') . '
 			WHERE lsr.id_search = {int:id_search}
