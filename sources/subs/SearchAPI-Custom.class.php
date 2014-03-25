@@ -26,7 +26,7 @@ if (!defined('ELK'))
  *
  * @package Search
  */
-class Custom_Search
+class Custom_Search extends SearchAPI
 {
 	/**
 	 *This is the last version of ElkArte that this was tested on, to protect against API changes.
@@ -63,6 +63,12 @@ class Custom_Search
 	 * @var int
 	 */
 	protected $min_word_length = null;
+
+	/**
+	 * Any word excluded from the search?
+	 * @var array
+	 */
+	protected $_excludedWords = array();
 
 	/**
 	 * What databases support the custom index?
@@ -106,6 +112,7 @@ class Custom_Search
 		{
 			case 'isValid':
 			case 'searchSort':
+			case 'setExcludedWords':
 			case 'prepareIndexes':
 			case 'indexedWordQuery':
 			case 'postCreated':
@@ -141,12 +148,20 @@ class Custom_Search
 	 */
 	public function searchSort($a, $b)
 	{
-		global $excludedWords;
-
-		$x = strlen($a) - (in_array($a, $excludedWords) ? 1000 : 0);
-		$y = strlen($b) - (in_array($b, $excludedWords) ? 1000 : 0);
+		$x = strlen($a) - (in_array($a, $this->_excludedWords) ? 1000 : 0);
+		$y = strlen($b) - (in_array($b, $this->_excludedWords) ? 1000 : 0);
 
 		return $y < $x ? 1 : ($y > $x ? -1 : 0);
+	}
+
+	/**
+	 * Adds the excluded words list
+	 *
+	 * @param string[] $words An array of words
+	 */
+	public function setExcludedWords($words)
+	{
+		$this->_excludedWords = $words;
 	}
 
 	/**

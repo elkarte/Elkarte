@@ -25,7 +25,7 @@ if (!defined('ELK'))
  *
  * @package Search
  */
-class Fulltext_Search
+class Fulltext_Search extends SearchAPI
 {
 	/**
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
@@ -56,6 +56,12 @@ class Fulltext_Search
 	 * @var int
 	 */
 	protected $min_word_length = 4;
+
+	/**
+	 * Any word excluded from the search?
+	 * @var array
+	 */
+	protected $_excludedWords = array();
 
 	/**
 	 * What databases support the fulltext index?
@@ -94,6 +100,7 @@ class Fulltext_Search
 		switch ($methodName)
 		{
 			case 'searchSort':
+			case 'setExcludedWords':
 			case 'prepareIndexes':
 			case 'indexedWordQuery':
 				return true;
@@ -149,12 +156,20 @@ class Fulltext_Search
 	 */
 	public function searchSort($a, $b)
 	{
-		global $excludedWords;
-
-		$x = Util::strlen($a) - (in_array($a, $excludedWords) ? 1000 : 0);
-		$y = Util::strlen($b) - (in_array($b, $excludedWords) ? 1000 : 0);
+		$x = Util::strlen($a) - (in_array($a, $this->_excludedWords) ? 1000 : 0);
+		$y = Util::strlen($b) - (in_array($b, $this->_excludedWords) ? 1000 : 0);
 
 		return $x < $y ? 1 : ($x > $y ? -1 : 0);
+	}
+
+	/**
+	 * Adds the excluded words list
+	 *
+	 * @param string[] $words An array of words
+	 */
+	public function setExcludedWords($words)
+	{
+		$this->_excludedWords = $words;
 	}
 
 	/**
