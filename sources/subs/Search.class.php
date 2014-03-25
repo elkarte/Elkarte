@@ -266,7 +266,7 @@ class Search_Class
 		$this->_searchWords = array();
 
 		// All words/sentences must match.
-		if (!empty($this->_searchArray) && empty($this->param('searchtype')))
+		if (!empty($this->_searchArray) && empty($this->_search_params['searchtype']))
 			$orParts[0] = $this->_searchArray;
 		// Any word/sentence must match.
 		else

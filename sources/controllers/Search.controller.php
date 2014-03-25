@@ -942,7 +942,7 @@ class Search_Controller extends Action_Controller
 	 */
 	private function _load_suggestions($search_params, $searchArray = array())
 	{
-		$this->_search->loadSuggestions($searchArray = array());
+		$this->_search->loadSuggestions($searchArray);
 	}
 
 	private function _increase_pointer()
