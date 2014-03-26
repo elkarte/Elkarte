@@ -30,6 +30,9 @@ $GLOBALS['search_versions'] = array(
 	'search_version' => strtr('ElkArte 1+0=Beta', array('+' => '.', '=' => ' ')),
 );
 
+/**
+ * Actually do the searches
+ */
 class Search_Class
 {
 	/**
@@ -91,6 +94,12 @@ class Search_Class
 
 	private $_weight_total = 0;
 
+	/**
+	 * Constructor.
+	 * Easy enough, initialize the database objects (generic db and search db)
+	 *
+	 * @package Search
+	 */
 	public function __construct()
 	{
 		$this->_search_version = strtr('ElkArte 1+0=Beta', array('+' => '.', '=' => ' '));
@@ -100,8 +109,6 @@ class Search_Class
 
 	/**
 	 * Creates a search API and returns the object.
-	 *
-	 * @package Search
 	 */
 	public function findSearchAPI()
 	{
@@ -135,6 +142,12 @@ class Search_Class
 		return $searchAPI;
 	}
 
+	/**
+	 * Returns a search parameter.
+	 *
+	 * @param string $name - name of the search parameters
+	 * @return bool|mixed - the value of the parameter
+	 */
 	public function param($name)
 	{
 		if (isset($this->_search_params[$name]))
@@ -143,6 +156,11 @@ class Search_Class
 			return false;
 	}
 
+	/**
+	 * Returns all the search parameters.
+	 *
+	 * @return mixed[]
+	 */
 	public function getParams()
 	{
 		return array_merge($this->_search_params, array(
@@ -152,16 +170,29 @@ class Search_Class
 		));
 	}
 
+	/**
+	 * Returns the ignored words
+	 */
 	public function getIgnored()
 	{
 		return $this->_ignored;
 	}
 
+	/**
+	 * Returns words excluded from indexes
+	 */
 	public function getExcludedIndexWords()
 	{
 		return $this->_excludedIndexWords;
 	}
 
+	/**
+	 * Set the weight factors
+	 *
+	 * @param mixed[] $weight_factors
+	 * @param mixed[] $weight - weight for each factor
+	 * @param int $weight_total - som of all the weights
+	 */
 	public function setWeights($weight_factors, $weight, $weight_total)
 	{
 		$this->_weight_factors = $weight_factors;
@@ -171,16 +202,31 @@ class Search_Class
 		$this->_weight_total = $weight_total;
 	}
 
+	/**
+	 * If the query uses regexp or not
+	 *
+	 * @return bool
+	 */
 	public function noRegexp()
 	{
 		return $this->_no_regexp;
 	}
 
+	/**
+	 * If any black-listed word has been found
+	 *
+	 * @return bool
+	 */
 	public function foundBlackListedWords()
 	{
 		return $this->_foundBlackListedWords;
 	}
 
+	/**
+	 * Builds the search array
+	 *
+	 * @param bool - Force splitting of strings enclosed in double quotes
+	 */
 	public function searchArray($search_simple_fulltext = false)
 	{
 		// Change non-word characters into spaces.
@@ -255,6 +301,11 @@ class Search_Class
 		return $this->_searchArray;
 	}
 
+	/**
+	 * Builds the array of words for the query
+	 *
+	 * @param object $searchAPI - The search API object
+	 */
 	public function searchWords($searchAPI)
 	{
 		global $modSettings;
@@ -338,6 +389,11 @@ class Search_Class
 		return $this->_searchWords;
 	}
 
+	/**
+	 * Encodes search params ($this->_search_params) in an URL-compatible way
+	 *
+	 * @return string - the encoded string to be appended to the URL
+	 */
 	public function compileURLparams()
 	{
 		$temp_params = $this->_search_params;
@@ -370,6 +426,11 @@ class Search_Class
 		return $encoded;
 	}
 
+	/**
+	 * Extract search parames from a string
+	 *
+	 * @param string $string - the string containing encoded search params
+	 */
 	public function searchParamsFromString($string)
 	{
 		// Due to IE's 2083 character limit, we have to compress long search strings
@@ -389,6 +450,16 @@ class Search_Class
 			$this->_search_params['brd'] = empty($this->_search_params['brd']) ? array() : explode(',', $this->_search_params['brd']);
 	}
 
+	/**
+	 * Merge search params extracted with Search_Class::searchParamsFromString
+	 * with those present in the $param array (usually $_REQUEST['params'])
+	 *
+	 * @param mixed[] $params - An array of search parameters
+	 * @param int $recentPercentage - A coefficient to calculate the lowest
+	 *            message id to start search from
+	 * @param int $maxMembersToSearch - The maximum number of members to consider
+	 *            when multiple are found
+	 */
 	public function mergeSearchParams($params, $recentPercentage, $maxMembersToSearch)
 	{
 		global $user_info, $modSettings;
@@ -734,6 +805,11 @@ class Search_Class
 		}
 	}
 
+	/**
+	 * Delete logs of previous searches
+	 *
+	 * @param int $id_search - the id of the search to delete from logs
+	 */
 	public function clearCacheResults($id_search)
 	{
 		$this->_db_search->search_query('delete_log_search_results', '
@@ -745,6 +821,14 @@ class Search_Class
 		);
 	}
 
+	/**
+	 * Grabs results when the search is performed only within the subject
+	 *
+	 * @param int $id_search - the id of the search
+	 * @param int $humungousTopicPosts - Message length used to tweak messages
+	 *            relevance of the results.
+	 * @return int - number of results otherwise
+	 */
 	public function getSubjectResults($id_search, $humungousTopicPosts)
 	{
 		global $modSettings;
@@ -894,6 +978,16 @@ class Search_Class
 		return $numSubjectResults;
 	}
 
+	/**
+	 * Grabs results when the search is performed in subjects and bodies
+	 *
+	 * @param int $id_search - the id of the search
+	 * @param int $humungousTopicPosts - Message length used to tweak messages
+	 *            relevance of the results.
+	 * @param int $maxMessageResults - Maximum number of results
+	 * @param object $searchAPI - The search API object
+	 * @return bool|int - boolean (false) in case of errors, number of results otherwise
+	 */
 	public function getResults($id_search, $humungousTopicPosts, $maxMessageResults, $searchAPI)
 	{
 		global $modSettings;
@@ -1429,6 +1523,15 @@ class Search_Class
 		return $num_results;
 	}
 
+	/**
+	 * Determines and add the relevance to the results
+	 *
+	 * @param mixed[] $topics - The search results (passed by reference)
+	 * @param int $id_search - the id of the search
+	 * @param int $start - Results are shown starting from here
+	 * @param int $limit - No more results than this
+	 * @return bool[]
+	 */
 	public function addRelevance(&$topics, $id_search, $start, $limit)
 	{
 		// *** Retrieve the results to be shown on the page
@@ -1463,6 +1566,13 @@ class Search_Class
 		return $participants;
 	}
 
+	/**
+	 * Finds the posters of the messages
+	 *
+	 * @param int[] $msg_list - All the messages we want to find the posters
+	 * @param int $limit - There are only so much topics
+	 * @return int[] - array of members id
+	 */
 	public function loadPosters($msg_list, $limit)
 	{
 		// Load the posters...
@@ -1486,6 +1596,13 @@ class Search_Class
 		return $posters;
 	}
 
+	/**
+	 * Finds the posters of the messages
+	 *
+	 * @param int[] $msg_list - All the messages we want to find the posters
+	 * @param int $limit - There are only so much topics
+	 * @return resource
+	 */
 	public function loadMessagesRequest($msg_list, $limit)
 	{
 		global $modSettings;
@@ -1523,6 +1640,12 @@ class Search_Class
 		return $request;
 	}
 
+	/**
+	 * Did the user find any message at all?
+	 *
+	 * @param resource $messages_request holds a query result
+	 * @return boolean
+	 */
 	public function noMessages($messages_request)
 	{
 		return $this->_db->num_rows($messages_request) == 0;
