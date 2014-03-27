@@ -1218,6 +1218,22 @@ function swapRot()
 }
 
 /**
+ * Enable/disable fields when transfering attachments
+ * 
+ * @returns {undefined}
+ */
+function transferAttachOptions()
+{
+	var autoSelect = document.getElementById("auto"),
+		autoValue = parseInt(autoSelect.options[autoSelect.selectedIndex].value, 10),
+		toSelect = document.getElementById("to"),
+		toValue = parseInt(toSelect.options[toSelect.selectedIndex].value, 10);
+
+		toSelect.disabled = autoValue !== 0 ? true : false;
+		autoSelect.disabled = toValue !== 0 ?  true : false;
+}
+
+/**
  * Updates the move confirmation text so its descriptive for the current items
  * being moved.
  *
@@ -1230,7 +1246,7 @@ function confirmMoveTopics(confirmText)
 
 	if (from.options[from.selectedIndex].disabled || from.options[to.selectedIndex].disabled)
 		return false;
-	
+
 	return confirm(confirmText.replace(/%board_from%/, from.options[from.selectedIndex].text.replace(/^\u2003+\u27A4/, '')).replace(/%board_to%/, to.options[to.selectedIndex].text.replace(/^\u2003+\u27A4/, '')));
 }
 

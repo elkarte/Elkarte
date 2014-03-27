@@ -102,13 +102,16 @@ function template_maintenance()
 			</div>
 		</div>';
 
+	// Transfer Attachments section
 	echo '
 		<h3 id="transfer" class="category_header">', $txt['attachment_transfer'], '</h3>';
 
+	// Any results to show
 	if (!empty($context['results']))
 		echo '
 		<div class="successbox">', $context['results'], '</div>';
 
+	// Lots-o-options
 	echo '
 		<div class="windowbg">
 			<div class="content">
@@ -132,7 +135,7 @@ function template_maintenance()
 						<dt><label for="auto">', $txt['attachment_transfer_auto'], '</label></dt>
 						<dd>
 							<div class="styled-select">
-								<select id="auto" name="auto">
+								<select id="auto" name="auto" onchange="transferAttachOptions();">
 									<option value="0">', $txt['attachment_transfer_auto_select'], '</option>
 									<option value="-1">', $txt['attachment_transfer_forum_root'], '</option>';
 
@@ -151,7 +154,7 @@ function template_maintenance()
 						<dt><label for="to">', $txt['attachment_transfer_to'], '</label></dt>
 						<dd>
 							<div class="styled-select">
-								<select id="to" name="to">
+								<select id="to" name="to" onchange="transferAttachOptions();" >
 									<option value="0">', $txt['attachment_transfer_select'], '</option>';
 
 	foreach ($context['attach_dirs'] as $id => $dir)
@@ -163,10 +166,12 @@ function template_maintenance()
 							</div>
 						</dd>';
 
+	// If there are directory limits to impose, give the option to enforce it
 	if (!empty($modSettings['attachmentDirFileLimit']))
 		echo '
-						<dt>', $txt['attachment_transfer_empty'], '</dt>
+						<dt><a href="' . $scripturl . '?action=quickhelp;help=attachment_transfer_empty" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" class="icon" alt="' . $txt['help'] . '" /></a>', $txt['attachment_transfer_empty'], '</a></dt>
 						<dd><input type="checkbox" name="empty_it"', $context['checked'] ? ' checked="checked"' : '', ' /></dd>';
+
 	echo '
 					</dl>
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
