@@ -91,21 +91,6 @@ tools:
     sensiolabs_security_checker:
         filter:
             excluded_paths: ['attachments/*', 'avatars/*', 'cache/*', 'docs/*', 'packages/*', 'smileys/*', 'tests/*']
-    php_cpd:
-        excluded_dirs:
-            - attachments
-            - avatars
-            - cache
-            - docs
-            - packages
-            - smileys
-            - tests
-            - ext
-            - sources/ext
-            - install
-        min_lines: '20'
-        filter:
-            excluded_paths: ['attachments/*', 'avatars/*', 'cache/*', 'docs/*', 'packages/*', 'smileys/*', 'tests/*', 'ext/*', 'sources/ext/*', 'install/*']
     php_loc:
         names:
             - 'sources/*.php'
@@ -122,3 +107,10 @@ tools:
             - ext
             - install
             - languages
+    php_mess_detector:
+        config:
+            code_size_rules: { cyclomatic_complexity: true, npath_complexity: true, excessive_parameter_list: true, too_many_methods: true, excessive_class_complexity: true }
+            unused_code_rules: { unused_local_variable: true, unused_private_method: true, unused_formal_parameter: true }
+            naming_rules: { boolean_method_name: true }
+            controversial_rules: { superglobals: false }
+    php_sim: true
