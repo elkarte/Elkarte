@@ -3522,9 +3522,10 @@ a.help .icon {
 }
 
 /* The actual pop-up wrapper. */
-.popup_window {
+.popup_container .popup_window {
 	margin: 12% auto;
 	width: 480px;
+	font-size: 1em;
 }
 
 /* What it says. ;) */
@@ -3541,12 +3542,6 @@ a.help .icon {
 	width: 16px;
 	height: 2em;
 	background: url(../images/buttons/delete.png) 0 50% no-repeat;
-}
-
-/* Just a font-size reset. */
-/* @todo - Remove description class? */
-.popup_window.description {
-	font-size: 1em;
 }
 
 /* The text content, hopefully helpful. */

@@ -953,7 +953,7 @@ class ManageAttachments_Controller extends Action_Controller
 									}
 								}
 							}
-							elseif ($file != 'index.php')
+							elseif ($file != 'index.php' && !is_dir($attach_dir . '/' . $file))
 							{
 								if ($fix_errors && in_array('files_without_attachment', $to_fix))
 									@unlink($attach_dir . '/' . $file);
@@ -982,6 +982,7 @@ class ManageAttachments_Controller extends Action_Controller
 
 		// What stage are we at?
 		$context['completed'] = $fix_errors ? true : false;
+		$context['errors_found'] = false;
 		foreach ($context['repair_errors'] as $number)
 			if (!empty($number))
 			{
