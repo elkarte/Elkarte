@@ -114,3 +114,4 @@ tools:
             naming_rules: { boolean_method_name: true }
             controversial_rules: { superglobals: false }
     php_sim: true
+        min_mass: 30
