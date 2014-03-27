@@ -934,17 +934,10 @@ class Search_Controller extends Action_Controller
 	}
 
 	/**
-	 * Dummy backward compatibility
-	 *
-	 * @param string[] $search_params the search parameters
-	 * @param string[] $searchArray an array of terms
-	 * @deprecated since 1.1
+	 * Increase the search pointer by 1.
+	 * The maximum value is 255, so when it becomes bigger, the pointer is reset
+	 * to 0.
 	 */
-	private function _load_suggestions($search_params, $searchArray = array())
-	{
-		$this->_search->loadSuggestions($searchArray);
-	}
-
 	private function _increase_pointer()
 	{
 		global $modSettings, $context;
