@@ -52,6 +52,8 @@ class Search_Class
 
 	private $_searchArray = array();
 
+	private $_searchAPI = null;
+
 	private $_db = null;
 
 	private $_db_search = null;
@@ -126,20 +128,20 @@ class Search_Class
 
 		// Create an instance of the search API and check it is valid for this version of the software.
 		$search_class_name = $modSettings['search_index'] . '_search';
-		$searchAPI = new $search_class_name();
+		$this->_searchAPI = new $search_class_name();
 
 		// An invalid Search API.
-		if (!$searchAPI || (!$searchAPI->isValid()) || !matchPackageVersion($search_versions['forum_version'], $searchAPI->min_elk_version . '-' . $searchAPI->version_compatible))
+		if (!$this->_searchAPI || (!$this->_searchAPI->isValid()) || !matchPackageVersion($search_versions['forum_version'], $this->_searchAPI->min_elk_version . '-' . $this->_searchAPI->version_compatible))
 		{
 			// Log the error.
 			loadLanguage('Errors');
 			log_error(sprintf($txt['search_api_not_compatible'], 'SearchAPI-' . ucwords($modSettings['search_index']) . '.class.php'), 'critical');
 
 			require_once(SUBSDIR . '/SearchAPI-Standard.class.php');
-			$searchAPI = new Standard_Search();
+			$this->_searchAPI = new Standard_Search();
 		}
 
-		return $searchAPI;
+		return $this->_searchAPI;
 	}
 
 	/**
@@ -303,10 +305,8 @@ class Search_Class
 
 	/**
 	 * Builds the array of words for the query
-	 *
-	 * @param object $searchAPI - The search API object
 	 */
-	public function searchWords($searchAPI)
+	public function searchWords()
 	{
 		global $modSettings;
 
@@ -341,10 +341,10 @@ class Search_Class
 			);
 
 			// Sort the indexed words (large words -> small words -> excluded words).
-			if ($searchAPI->supportsMethod('searchSort'))
+			if ($this->_searchAPI->supportsMethod('searchSort'))
 			{
-				$searchAPI->setExcludedWords($this->_excludedWords);
-				usort($orParts[$orIndex], array($searchAPI, 'searchSort'));
+				$this->_searchAPI->setExcludedWords($this->_excludedWords);
+				usort($orParts[$orIndex], array($this->_searchAPI, 'searchSort'));
 			}
 
 			foreach ($orParts[$orIndex] as $word)
@@ -362,8 +362,8 @@ class Search_Class
 					$this->_excludedPhrases[] = $word;
 
 				// Have we got indexes to prepare?
-				if ($searchAPI->supportsMethod('prepareIndexes'))
-					$searchAPI->prepareIndexes($word, $this->_searchWords[$orIndex], $this->_excludedIndexWords, $is_excluded);
+				if ($this->_searchAPI->supportsMethod('prepareIndexes'))
+					$this->_searchAPI->prepareIndexes($word, $this->_searchWords[$orIndex], $this->_excludedIndexWords, $is_excluded);
 			}
 
 			// Search_force_index requires all AND parts to have at least one fulltext word.
@@ -979,10 +979,9 @@ class Search_Class
 	 * @param int $humungousTopicPosts - Message length used to tweak messages
 	 *            relevance of the results.
 	 * @param int $maxMessageResults - Maximum number of results
-	 * @param object $searchAPI - The search API object
 	 * @return bool|int - boolean (false) in case of errors, number of results otherwise
 	 */
-	public function getResults($id_search, $humungousTopicPosts, $maxMessageResults, $searchAPI)
+	public function getResults($id_search, $humungousTopicPosts, $maxMessageResults)
 	{
 		global $modSettings;
 
@@ -1213,7 +1212,7 @@ class Search_Class
 		$indexedResults = 0;
 
 		// We building an index?
-		if ($searchAPI->supportsMethod('indexedWordQuery', $this->getParams()))
+		if ($this->_searchAPI->supportsMethod('indexedWordQuery', $this->getParams()))
 		{
 			$inserts = array();
 			$this->_db_search->search_query('drop_tmp_log_search_messages', '
@@ -1269,7 +1268,7 @@ class Search_Class
 						),
 					);
 
-					$ignoreRequest = $searchAPI->indexedWordQuery($words, $search_data);
+					$ignoreRequest = $this->_searchAPI->indexedWordQuery($words, $search_data);
 
 					if (!$this->_db->support_ignore())
 					{
@@ -1367,7 +1366,7 @@ class Search_Class
 		call_integration_hook('integrate_main_search_query', array(&$main_query));
 
 		// Did we either get some indexed results, or otherwise did not do an indexed query?
-		if (!empty($indexedResults) || !$searchAPI->supportsMethod('indexedWordQuery', $this->getParams()))
+		if (!empty($indexedResults) || !$this->_searchAPI->supportsMethod('indexedWordQuery', $this->getParams()))
 		{
 			$relevance = '1000 * (';
 			$new_weight_total = 0;

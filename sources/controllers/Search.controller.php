@@ -334,7 +334,7 @@ class Search_Controller extends Action_Controller
 				unset($context['search_errors']['invalid_search_string']);
 		}
 
-		$searchWords = $this->_search->searchWords($searchAPI);
+		$searchWords = $this->_search->searchWords();
 
 		// *** Spell checking?
 		if (!empty($modSettings['enableSpellChecking']) && function_exists('pspell_new'))
@@ -438,7 +438,7 @@ class Search_Controller extends Action_Controller
 					$_SESSION['search_cache']['num_results'] = $this->_search->getSubjectResults($_SESSION['search_cache']['id_search'], $humungousTopicPosts);
 				else
 				{
-					$num_res = $this->_search->getResults($_SESSION['search_cache']['id_search'], $humungousTopicPosts, $maxMessageResults, $searchAPI);
+					$num_res = $this->_search->getResults($_SESSION['search_cache']['id_search'], $humungousTopicPosts, $maxMessageResults);
 					if ($num_res === false)
 					{
 						$context['search_errors']['query_not_specific_enough'] = true;
