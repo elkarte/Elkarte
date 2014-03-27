@@ -893,69 +893,31 @@ class Search_Class
 					$subject_query_params['excluded_phrases_' . $count++] = $this->_searchAPI->prepareWord($phrase, $this->noRegexp());
 				}
 			}
-			call_integration_hook('integrate_subject_only_search_query', array(&$subject_query, &$subject_query_params));
-
 			// Build the search relevance query
 			$relevance = $this->_build_relevance();
 
-			$ignoreRequest = $this->_db_search->search_query('insert_log_search_results_subject',
-				($this->_db->support_ignore() ? '
-				INSERT IGNORE INTO {db_prefix}log_search_results
-					(id_search, id_topic, relevance, id_msg, num_matches)' : '') . '
-				SELECT
-					{int:id_search},
-					t.id_topic,
-					' . $relevance . ',
-					' . (empty($this->_userQuery) ? 't.id_first_msg' : 'm.id_msg') . ',
-					1
-				FROM ' . $subject_query['from'] . (empty($subject_query['inner_join']) ? '' : '
-					INNER JOIN ' . implode('
-					INNER JOIN ', array_unique($subject_query['inner_join']))) . (empty($subject_query['left_join']) ? '' : '
-					LEFT JOIN ' . implode('
-					LEFT JOIN ', array_unique($subject_query['left_join']))) . '
-				WHERE ' . implode('
-					AND ', array_unique($subject_query['where'])) . (empty($modSettings['search_max_results']) ? '' : '
-				LIMIT ' . ($modSettings['search_max_results'] - $numSubjectResults)),
-				array_merge($subject_query_params, array(
-					'id_search' => $id_search,
-					'min_msg' => $this->_minMsg,
-					'recent_message' => $this->_recentMsg,
-					'huge_topic_posts' => $humungousTopicPosts,
-					'is_approved' => 1,
-				))
+			$subject_query['select'] = array(
+				'id_search' => '{int:id_search}',
+				'id_topic' => 't.id_topic',
+				'relevance' => $relevance,
+				'id_msg' => empty($this->_userQuery) ? 't.id_first_msg' : 'm.id_msg',
+				'num_matches' => 1,
 			);
+			$subject_query['parameters'] = array_merge($subject_query_params, array(
+				'id_search' => $id_search,
+				'min_msg' => $this->_minMsg,
+				'recent_message' => $this->_recentMsg,
+				'huge_topic_posts' => $humungousTopicPosts,
+				'is_approved' => 1,
+				'limit' => empty($modSettings['search_max_results']) ? 0 : $modSettings['search_max_results'] - $numSubjectResults,
+			));
 
-			// If the database doesn't support IGNORE to make this fast we need to do some tracking.
-			if (!$this->_db->support_ignore())
-			{
-				while ($row = $this->_db->fetch_row($ignoreRequest))
-				{
-					// No duplicates!
-					if (isset($inserts[$row[1]]))
-						continue;
+			call_integration_hook('integrate_subject_only_search_query', array(&$subject_query, &$subject_query_params));
 
-					foreach ($row as $key => $value)
-						$inserts[$row[1]][] = (int) $row[$key];
-				}
-				$this->_db->free_result($ignoreRequest);
-				$numSubjectResults = count($inserts);
-			}
-			else
-				$numSubjectResults += $this->_db->affected_rows();
+			$numSubjectResults += $this->_build_search_results_log($subject_query, 'insert_log_search_results_subject');
 
 			if (!empty($modSettings['search_max_results']) && $numSubjectResults >= $modSettings['search_max_results'])
 				break;
-		}
-
-		// If there's data to be inserted for non-IGNORE databases do it here!
-		if (!empty($inserts))
-		{
-			$this->_db->insert('',
-				'{db_prefix}log_search_results',
-				array('id_search' => 'int', 'id_topic' => 'int', 'relevance' => 'int', 'id_msg' => 'int', 'num_matches' => 'int'),
-				$inserts,
-				array('id_search', 'id_topic')
-			);
 		}
 
 		return $numSubjectResults;
@@ -1116,115 +1078,38 @@ class Search_Class
 		{
 			$relevance = $this->_build_relevance($main_query['weights']);
 
-			$ignoreRequest = $this->_db_search->search_query('insert_log_search_results_no_index', ($this->_db->support_ignore() ? ( '
-				INSERT IGNORE INTO ' . '{db_prefix}log_search_results
-					(' . implode(', ', array_keys($main_query['select'])) . ')') : '') . '
-				SELECT
-					' . implode(',
-					', $main_query['select']) . '
-				FROM ' . $main_query['from'] . (!empty($main_query['inner_join']) ? '
-					INNER JOIN ' . implode('
-					INNER JOIN ', $main_query['inner_join']) : '') . (!empty($main_query['left_join']) ? '
-					LEFT JOIN ' . implode('
-					LEFT JOIN ', $main_query['left_join']) : '') . (!empty($main_query['where']) ? '
-				WHERE ' : '') . implode('
-					AND ', $main_query['where']) . (!empty($main_query['group_by']) ? '
-				GROUP BY ' . implode(', ', $main_query['group_by']) : '') . (!empty($main_query['parameters']['limit']) ? '
-				LIMIT {int:limit}' : ''),
-				$main_query['parameters']
-			);
-
-			// We love to handle non-good databases that don't support our ignore!
-			if (!$this->_db->support_ignore())
-			{
-				$inserts = array();
-				while ($row = $this->_db->fetch_row($ignoreRequest))
-				{
-					// No duplicates!
-					if (isset($inserts[$row[2]]))
-						continue;
-
-					foreach ($row as $key => $value)
-						$inserts[$row[2]][] = (int) $row[$key];
-				}
-				$this->_db->free_result($ignoreRequest);
-
-				// Now put them in!
-				if (!empty($inserts))
-				{
-					$query_columns = array();
-					foreach ($main_query['select'] as $k => $v)
-						$query_columns[$k] = 'int';
-
-					$this->_db->insert('',
-						'{db_prefix}log_search_results',
-						$query_columns,
-						$inserts,
-						array('id_search', 'id_topic')
-					);
-				}
-				$num_results += count($inserts);
-			}
-			else
-				$num_results = $this->_db->affected_rows();
+			$num_results += $this->_build_search_results_log($main_query, 'insert_log_search_results_no_index');
 		}
 
 		// Insert subject-only matches.
 		if ($num_results < $modSettings['search_max_results'] && $numSubjectResults !== 0)
 		{
 			$relevance = $this->_build_relevance();
-
-			$usedIDs = array_flip(empty($inserts) ? array() : array_keys($inserts));
-			$ignoreRequest = $this->_db_search->search_query('insert_log_search_results_sub_only', ($this->_db->support_ignore() ? ( '
-				INSERT IGNORE INTO {db_prefix}log_search_results
-					(id_search, id_topic, relevance, id_msg, num_matches)') : '') . '
-				SELECT
-					{int:id_search},
-					t.id_topic,
-					' . $relevance . ',
-					t.id_first_msg,
-					1
-				FROM {db_prefix}topics AS t
-					INNER JOIN {db_prefix}' . ($createTemporary ? 'tmp_' : '') . 'log_search_topics AS lst ON (lst.id_topic = t.id_topic)'
-				. ($createTemporary ? '' : ' WHERE lst.id_search = {int:id_search}')
-				. (empty($modSettings['search_max_results']) ? '' : '
-				LIMIT ' . ($modSettings['search_max_results'] - $num_results)),
-				array(
+			$subject_query = array(
+				'select' => array(
+					'id_search' => '{int:id_search}',
+					'id_topic' => 't.id_topic',
+					'relevance' => $relevance,
+					'id_msg' => 't.id_first_msg',
+					'num_matches' => 1,
+				),
+				'from' => '{db_prefix}topics AS t',
+				'inner_join' => array(
+					($createTemporary ? 'tmp_' : '') . 'log_search_topics AS lst ON (lst.id_topic = t.id_topic)'
+				),
+				'where' => array(
+					$createTemporary ? '' : 'lst.id_search = {int:id_search}',
+				),
+				'parameters' => array(
 					'id_search' => $id_search,
 					'min_msg' => $this->_minMsg,
 					'recent_message' => $this->_recentMsg,
 					'huge_topic_posts' => $humungousTopicPosts,
-				)
+					'limit' => empty($modSettings['search_max_results']) ? 0 : $modSettings['search_max_results'] - $num_results,
+				),
 			);
-			// Once again need to do the inserts if the database don't support ignore!
-			if (!$this->_db->support_ignore())
-			{
-				$inserts = array();
-				while ($row = $this->_db->fetch_row($ignoreRequest))
-				{
-					// No duplicates!
-					if (isset($usedIDs[$row[1]]))
-						continue;
 
-					$usedIDs[$row[1]] = true;
-					$inserts[] = $row;
-				}
-				$this->_db->free_result($ignoreRequest);
-
-				// Now put them in!
-				if (!empty($inserts))
-				{
-					$this->_db->insert('',
-						'{db_prefix}log_search_results',
-						array('id_search' => 'int', 'id_topic' => 'int', 'relevance' => 'float', 'id_msg' => 'int', 'num_matches' => 'int'),
-						$inserts,
-						array('id_search', 'id_topic')
-					);
-				}
-				$num_results += count($inserts);
-			}
-			else
-				$num_results += $this->_db->affected_rows();
+			$num_results += $this->_build_search_results_log($subject_query, 'insert_log_search_results_sub_only', true);
 		}
 		elseif ($num_results == -1)
 			$num_results = 0;
@@ -1675,5 +1560,92 @@ class Search_Class
 		$relevance = substr($relevance, 0, -3) . ') / ' . $weight_total . ' AS relevance';
 
 		return $relevance;
+	}
+
+	/**
+	 * Inserts the data into log_search_results
+	 *
+	 * @param mixed[] $main_query - An array holding all the query parts.
+	 *                Structure:
+	 *                'select' => string[] - the select columns
+	 *                'from' => string - the table for the FROM clause
+	 *                'inner_join' => string[] - any INNER JOIN
+	 *                'left_join' => string[] - any LEFT JOIN
+	 *                'where' => string[] - the conditions
+	 *                'group_by' => string[] - the fields to group by
+	 *                'parameters' => mixed[] - any parameter required by the query
+	 * @param string $query_identifier - a string to identify the query
+	 * @param bool $use_old_ids - if true the topic ids retrieved by a previous
+	 *             call to this function will be used to identify duplicates
+	 * @return int - the number of rows affected by the query
+	 */
+	private function _build_search_results_log($main_query, $query_identifier, $use_old_ids = false)
+	{
+		static $usedIDs;
+
+		$ignoreRequest = $this->_db_search->search_query($query_identifier, ($this->_db->support_ignore() ? ( '
+			INSERT IGNORE INTO ' . '{db_prefix}log_search_results
+				(' . implode(', ', array_keys($main_query['select'])) . ')') : '') . '
+			SELECT
+				' . implode(',
+				', $main_query['select']) . '
+			FROM ' . $main_query['from'] . (!empty($main_query['inner_join']) ? '
+				INNER JOIN ' . implode('
+				INNER JOIN ', array_unique($main_query['inner_join'])) : '') . (!empty($main_query['left_join']) ? '
+				LEFT JOIN ' . implode('
+				LEFT JOIN ', array_unique($main_query['left_join'])) : '') . (!empty($main_query['where']) ? '
+			WHERE ' : '') . implode('
+				AND ', array_unique($main_query['where'])) . (!empty($main_query['group_by']) ? '
+			GROUP BY ' . implode(', ', array_unique($main_query['group_by'])) : '') . (!empty($main_query['parameters']['limit']) ? '
+			LIMIT {int:limit}' : ''),
+			$main_query['parameters']
+		);
+
+		// If the database doesn't support IGNORE to make this fast we need to do some tracking.
+		if (!$this->_db->support_ignore())
+		{
+			$inserts = array();
+
+			while ($row = $this->_db->fetch_assoc($ignoreRequest))
+			{
+				// No duplicates!
+				if ($use_old_ids)
+				{
+					if (isset($usedIDs[$row['id_topic']]))
+						continue;
+				}
+				else
+				{
+					if (isset($inserts[$row['id_topic']]))
+						continue;
+				}
+
+				$usedIDs[$row['id_topic']] = true;
+				foreach ($row as $key => $value)
+					$inserts[$row['id_topic']][] = (int) $row[$key];
+			}
+
+			// Now put them in!
+			if (!empty($inserts))
+			{
+				$query_columns = array();
+				foreach ($main_query['select'] as $k => $v)
+					$query_columns[$k] = 'int';
+
+				$this->_db->insert('',
+					'{db_prefix}log_search_results',
+					$query_columns,
+					$inserts,
+					array('id_search', 'id_topic')
+				);
+			}
+			$num_results = count($inserts);
+		}
+		else
+			$num_results = $this->_db->affected_rows();
+
+		$this->_db->free_result($ignoreRequest);
+
+		return $num_results;
 	}
 }
