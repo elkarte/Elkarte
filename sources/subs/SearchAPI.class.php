@@ -56,4 +56,11 @@ abstract class SearchAPI
 		// Always fall back to the standard search method.
 		return true;
 	}
+
+	public function prepareWord($phrase, $no_regexp)
+	{
+		global $modSettings;
+
+		return empty($modSettings['search_match_words']) || $no_regexp ? '%' . strtr($phrase, array('_' => '\\_', '%' => '\\%')) . '%' : '[[:<:]]' . addcslashes(preg_replace(array('/([\[\]$.+*?|{}()])/'), array('[$1]'), $phrase), '\\\'') . '[[:>:]]';
+	}
 }

@@ -890,7 +890,7 @@ class Search_Class
 				foreach ($this->_excludedPhrases as $phrase)
 				{
 					$subject_query['where'][] = 'm.subject NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:excluded_phrases_' . $count . '}';
-					$subject_query_params['excluded_phrases_' . $count++] = empty($modSettings['search_match_words']) || $this->noRegexp() ? '%' . strtr($phrase, array('_' => '\\_', '%' => '\\%')) . '%' : '[[:<:]]' . addcslashes(preg_replace(array('/([\[\]$.+*?|{}()])/'), array('[$1]'), $phrase), '\\\'') . '[[:>:]]';
+					$subject_query_params['excluded_phrases_' . $count++] = $this->_searchAPI($phrase, $this->noRegexp());
 				}
 			}
 			call_integration_hook('integrate_subject_only_search_query', array(&$subject_query, &$subject_query_params));
@@ -1043,264 +1043,20 @@ class Search_Class
 		}
 
 		// *** Get the subject results.
-		$numSubjectResults = 0;
-		if (empty($this->_search_params['topic']))
+		list ($numSubjectResults, $createTemporary) = $this->_log_search_subjects($id_search);
+
+		if ($numSubjectResults !== 0)
 		{
-			$inserts = array();
-			// Create a temporary table to store some preliminary results in.
-			$this->_db_search->search_query('drop_tmp_log_search_topics', '
-				DROP TABLE IF EXISTS {db_prefix}tmp_log_search_topics',
-				array(
-					'db_error_skip' => true,
-				)
-			);
-			$createTemporary = $this->_db_search->search_query('create_tmp_log_search_topics', '
-				CREATE TEMPORARY TABLE {db_prefix}tmp_log_search_topics (
-					id_topic mediumint(8) unsigned NOT NULL default {string:string_zero},
-					PRIMARY KEY (id_topic)
-				) ENGINE=MEMORY',
-				array(
-					'string_zero' => '0',
-					'db_error_skip' => true,
-				)
-			) !== false;
-
-			// Clean up some previous cache.
+			$main_query['weights']['subject']['search'] = 'CASE WHEN MAX(lst.id_topic) IS NULL THEN 0 ELSE 1 END';
+			$main_query['left_join'][] = '{db_prefix}' . ($createTemporary ? 'tmp_' : '') . 'log_search_topics AS lst ON (' . ($createTemporary ? '' : 'lst.id_search = {int:id_search} AND ') . 'lst.id_topic = t.id_topic)';
 			if (!$createTemporary)
-				$this->_db_search->search_query('delete_log_search_topics', '
-					DELETE FROM {db_prefix}log_search_topics
-					WHERE id_search = {int:search_id}',
-					array(
-						'search_id' => $id_search,
-					)
-				);
-
-			foreach ($this->_searchWords as $orIndex => $words)
-			{
-				$subject_query = array(
-					'from' => '{db_prefix}topics AS t',
-					'inner_join' => array(),
-					'left_join' => array(),
-					'where' => array(),
-					'params' => array(),
-				);
-
-				$numTables = 0;
-				$prev_join = 0;
-				$count = 0;
-				foreach ($words['subject_words'] as $subjectWord)
-				{
-					$numTables++;
-					if (in_array($subjectWord, $this->_excludedSubjectWords))
-					{
-						$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)';
-						$subject_query['left_join'][] = '{db_prefix}log_search_subjects AS subj' . $numTables . ' ON (subj' . $numTables . '.word ' . (empty($modSettings['search_match_words']) ? 'LIKE {string:subject_not_' . $count . '}' : '= {string:subject_not_' . $count . '}') . ' AND subj' . $numTables . '.id_topic = t.id_topic)';
-						$subject_query['params']['subject_not_' . $count] = empty($modSettings['search_match_words']) ? '%' . $subjectWord . '%' : $subjectWord;
-
-						$subject_query['where'][] = '(subj' . $numTables . '.word IS NULL)';
-						$subject_query['where'][] = 'm.body NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:body_not_' . $count . '}';
-						$subject_query['params']['body_not_' . $count++] = empty($modSettings['search_match_words']) || $this->noRegexp() ? '%' . strtr($subjectWord, array('_' => '\\_', '%' => '\\%')) . '%' : '[[:<:]]' . addcslashes(preg_replace(array('/([\[\]$.+*?|{}()])/'), array('[$1]'), $subjectWord), '\\\'') . '[[:>:]]';
-					}
-					else
-					{
-						$subject_query['inner_join'][] = '{db_prefix}log_search_subjects AS subj' . $numTables . ' ON (subj' . $numTables . '.id_topic = ' . ($prev_join === 0 ? 't' : 'subj' . $prev_join) . '.id_topic)';
-						$subject_query['where'][] = 'subj' . $numTables . '.word LIKE {string:subject_like_' . $count . '}';
-						$subject_query['params']['subject_like_' . $count++] = empty($modSettings['search_match_words']) ? '%' . $subjectWord . '%' : $subjectWord;
-						$prev_join = $numTables;
-					}
-				}
-
-				if (!empty($this->_userQuery))
-				{
-					$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)';
-					$subject_query['where'][] = '{raw:user_query}';
-					$subject_query['params']['user_query'] = $this->_userQuery;
-				}
-				if (!empty($this->_search_params['topic']))
-				{
-					$subject_query['where'][] = 't.id_topic = {int:topic}';
-					$subject_query['params']['topic'] = $this->param('topic');
-				}
-				if (!empty($this->_minMsgID))
-				{
-					$subject_query['where'][] = 't.id_first_msg >= {int:min_msg_id}';
-					$subject_query['params']['min_msg_id'] = $this->_minMsgID;
-				}
-				if (!empty($this->_maxMsgID))
-				{
-					$subject_query['where'][] = 't.id_last_msg <= {int:max_msg_id}';
-					$subject_query['params']['max_msg_id'] = $this->_maxMsgID;
-				}
-				if (!empty($this->_boardQuery))
-				{
-					$subject_query['where'][] = 't.id_board {raw:board_query}';
-					$subject_query['params']['board_query'] = $this->_boardQuery;
-				}
-				if (!empty($this->_excludedPhrases))
-				{
-					$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)';
-					$count = 0;
-					foreach ($this->_excludedPhrases as $phrase)
-					{
-						$subject_query['where'][] = 'm.subject NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:exclude_phrase_' . $count . '}';
-						$subject_query['where'][] = 'm.body NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:exclude_phrase_' . $count . '}';
-						$subject_query['params']['exclude_phrase_' . $count++] = empty($modSettings['search_match_words']) || $this->noRegexp() ? '%' . strtr($phrase, array('_' => '\\_', '%' => '\\%')) . '%' : '[[:<:]]' . addcslashes(preg_replace(array('/([\[\]$.+*?|{}()])/'), array('[$1]'), $phrase), '\\\'') . '[[:>:]]';
-					}
-				}
-				call_integration_hook('integrate_subject_search_query', array(&$subject_query));
-
-				// Nothing to search for?
-				if (empty($subject_query['where']))
-					continue;
-
-				$ignoreRequest = $this->_db_search->search_query('insert_log_search_topics', ($this->_db->support_ignore() ? ( '
-					INSERT IGNORE INTO {db_prefix}' . ($createTemporary ? 'tmp_' : '') . 'log_search_topics
-						(' . ($createTemporary ? '' : 'id_search, ') . 'id_topic)') : '') . '
-					SELECT ' . ($createTemporary ? '' : $id_search . ', ') . 't.id_topic
-					FROM ' . $subject_query['from'] . (empty($subject_query['inner_join']) ? '' : '
-						INNER JOIN ' . implode('
-						INNER JOIN ', array_unique($subject_query['inner_join']))) . (empty($subject_query['left_join']) ? '' : '
-						LEFT JOIN ' . implode('
-						LEFT JOIN ', array_unique($subject_query['left_join']))) . '
-					WHERE ' . implode('
-						AND ', array_unique($subject_query['where'])) . (empty($modSettings['search_max_results']) ? '' : '
-					LIMIT ' . ($modSettings['search_max_results'] - $numSubjectResults)),
-					$subject_query['params']
-				);
-				// Don't do INSERT IGNORE? Manually fix this up!
-				if (!$this->_db->support_ignore())
-				{
-					while ($row = $this->_db->fetch_row($ignoreRequest))
-					{
-						$ind = $createTemporary ? 0 : 1;
-						// No duplicates!
-						if (isset($inserts[$row[$ind]]))
-							continue;
-
-						$inserts[$row[$ind]] = $row;
-					}
-					$this->_db->free_result($ignoreRequest);
-					$numSubjectResults = count($inserts);
-				}
-				else
-					$numSubjectResults += $this->_db->affected_rows();
-
-				if (!empty($modSettings['search_max_results']) && $numSubjectResults >= $modSettings['search_max_results'])
-					break;
-			}
-
-			// Got some non-MySQL data to plonk in?
-			if (!empty($inserts))
-			{
-				$this->_db->insert('',
-					('{db_prefix}' . ($createTemporary ? 'tmp_' : '') . 'log_search_topics'),
-					$createTemporary ? array('id_topic' => 'int') : array('id_search' => 'int', 'id_topic' => 'int'),
-					$inserts,
-					$createTemporary ? array('id_topic') : array('id_search', 'id_topic')
-				);
-			}
-
-			if ($numSubjectResults !== 0)
-			{
-				$main_query['weights']['subject']['search'] = 'CASE WHEN MAX(lst.id_topic) IS NULL THEN 0 ELSE 1 END';
-				$main_query['left_join'][] = '{db_prefix}' . ($createTemporary ? 'tmp_' : '') . 'log_search_topics AS lst ON (' . ($createTemporary ? '' : 'lst.id_search = {int:id_search} AND ') . 'lst.id_topic = t.id_topic)';
-				if (!$createTemporary)
-					$main_query['parameters']['id_search'] = $id_search;
-			}
+				$main_query['parameters']['id_search'] = $id_search;
 		}
-
-		$indexedResults = 0;
 
 		// We building an index?
 		if ($this->_searchAPI->supportsMethod('indexedWordQuery', $this->getParams()))
 		{
-			$inserts = array();
-			$this->_db_search->search_query('drop_tmp_log_search_messages', '
-				DROP TABLE IF EXISTS {db_prefix}tmp_log_search_messages',
-				array(
-					'db_error_skip' => true,
-				)
-			);
-
-			$createTemporary = $this->_db_search->search_query('create_tmp_log_search_messages', '
-				CREATE TEMPORARY TABLE {db_prefix}tmp_log_search_messages (
-					id_msg int(10) unsigned NOT NULL default {string:string_zero},
-					PRIMARY KEY (id_msg)
-				) ENGINE=MEMORY',
-				array(
-					'string_zero' => '0',
-					'db_error_skip' => true,
-				)
-			) !== false;
-
-			// Clear, all clear!
-			if (!$createTemporary)
-				$this->_db_search->search_query('delete_log_search_messages', '
-					DELETE FROM {db_prefix}log_search_messages
-					WHERE id_search = {int:id_search}',
-					array(
-						'id_search' => $id_search,
-					)
-				);
-
-			foreach ($this->_searchWords as $orIndex => $words)
-			{
-				// Search for this word, assuming we have some words!
-				if (!empty($words['indexed_words']))
-				{
-					// Variables required for the search.
-					$search_data = array(
-						'insert_into' => ($createTemporary ? 'tmp_' : '') . 'log_search_messages',
-						'no_regexp' => $this->noRegexp(),
-						'max_results' => $maxMessageResults,
-						'indexed_results' => $indexedResults,
-						'params' => array(
-							'id_search' => !$createTemporary ? $id_search : 0,
-							'excluded_words' => $this->_excludedWords,
-							'user_query' => !empty($this->_userQuery) ? $this->_userQuery : '',
-							'board_query' => !empty($this->_boardQuery) ? $this->_boardQuery : '',
-							'topic' => !empty($this->_search_params['topic']) ? $this->param('topic') : 0,
-							'min_msg_id' => (int) $this->_minMsgID,
-							'max_msg_id' => (int) $this->_maxMsgID,
-							'excluded_phrases' => $this->_excludedPhrases,
-							'excluded_index_words' => $this->_excludedIndexWords,
-							'excluded_subject_words' => $this->_excludedSubjectWords,
-						),
-					);
-
-					$ignoreRequest = $this->_searchAPI->indexedWordQuery($words, $search_data);
-
-					if (!$this->_db->support_ignore())
-					{
-						while ($row = $this->_db->fetch_row($ignoreRequest))
-						{
-							// No duplicates!
-							if (isset($inserts[$row[0]]))
-								continue;
-
-							$inserts[$row[0]] = $row;
-						}
-						$this->_db->free_result($ignoreRequest);
-						$indexedResults = count($inserts);
-					}
-					else
-						$indexedResults += $this->_db->affected_rows();
-
-					if (!empty($maxMessageResults) && $indexedResults >= $maxMessageResults)
-						break;
-				}
-			}
-
-			// More non-MySQL stuff needed?
-			if (!empty($inserts))
-			{
-				$this->_db->insert('',
-					'{db_prefix}' . ($createTemporary ? 'tmp_' : '') . 'log_search_messages',
-					$createTemporary ? array('id_msg' => 'int') : array('id_msg' => 'int', 'id_search' => 'int'),
-					$inserts,
-					$createTemporary ? array('id_msg') : array('id_msg', 'id_search')
-				);
-			}
+			$indexedResults = $this->_prepare_word_index($id_search, $maxMessageResults);
 
 			if (empty($indexedResults) && empty($numSubjectResults) && !empty($modSettings['search_force_index']))
 			{
@@ -1321,7 +1077,7 @@ class Search_Class
 		{
 			$orWhere = array();
 			$count = 0;
-			foreach ($this->_searchWords as $orIndex => $words)
+			foreach ($this->_searchWords as $words)
 			{
 				$where = array();
 				foreach ($words['all_words'] as $regularWord)
@@ -1329,7 +1085,7 @@ class Search_Class
 					$where[] = 'm.body' . (in_array($regularWord, $this->_excludedWords) ? ' NOT' : '') . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:all_word_body_' . $count . '}';
 					if (in_array($regularWord, $this->_excludedWords))
 						$where[] = 'm.subject NOT' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:all_word_body_' . $count . '}';
-					$main_query['parameters']['all_word_body_' . $count++] = empty($modSettings['search_match_words']) || $this->noRegexp() ? '%' . strtr($regularWord, array('_' => '\\_', '%' => '\\%')) . '%' : '[[:<:]]' . addcslashes(preg_replace(array('/([\[\]$.+*?|{}()])/'), array('[$1]'), $regularWord), '\\\'') . '[[:>:]]';
+					$main_query['parameters']['all_word_body_' . $count++] = $this->_searchAPI($regularWord, $this->noRegexp());
 				}
 				if (!empty($where))
 					$orWhere[] = count($where) > 1 ? '(' . implode(' AND ', $where) . ')' : $where[0];
@@ -1631,5 +1387,280 @@ class Search_Class
 	public function noMessages($messages_request)
 	{
 		return $this->_db->num_rows($messages_request) == 0;
+	}
+
+	/**
+	 * If searching in topics only (?), inserts results in log_search_topics
+	 *
+	 * @param int $id_search - the id of the search to delete from logs
+	 * @return array<int|bool> - the number of search results and if a
+	 *                           temporary table has been created
+	 */
+	private function _log_search_subjects($id_search)
+	{
+		global $modSettings;
+
+		if (empty($this->_search_params['topic']))
+			return array(0, false);
+
+		$inserts = array();
+		$numSubjectResults = 0;
+
+		// Create a temporary table to store some preliminary results in.
+		$this->_db_search->search_query('drop_tmp_log_search_topics', '
+			DROP TABLE IF EXISTS {db_prefix}tmp_log_search_topics',
+			array(
+				'db_error_skip' => true,
+			)
+		);
+		$createTemporary = $this->_db_search->search_query('create_tmp_log_search_topics', '
+			CREATE TEMPORARY TABLE {db_prefix}tmp_log_search_topics (
+				id_topic mediumint(8) unsigned NOT NULL default {string:string_zero},
+				PRIMARY KEY (id_topic)
+			) ENGINE=MEMORY',
+			array(
+				'string_zero' => '0',
+				'db_error_skip' => true,
+			)
+		) !== false;
+
+		// Clean up some previous cache.
+		if (!$createTemporary)
+			$this->_db_search->search_query('delete_log_search_topics', '
+				DELETE FROM {db_prefix}log_search_topics
+				WHERE id_search = {int:search_id}',
+				array(
+					'search_id' => $id_search,
+				)
+			);
+
+		foreach ($this->_searchWords as $words)
+		{
+			$subject_query = array(
+				'from' => '{db_prefix}topics AS t',
+				'inner_join' => array(),
+				'left_join' => array(),
+				'where' => array(),
+				'params' => array(),
+			);
+
+			$numTables = 0;
+			$prev_join = 0;
+			$count = 0;
+			foreach ($words['subject_words'] as $subjectWord)
+			{
+				$numTables++;
+				if (in_array($subjectWord, $this->_excludedSubjectWords))
+				{
+					$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)';
+					$subject_query['left_join'][] = '{db_prefix}log_search_subjects AS subj' . $numTables . ' ON (subj' . $numTables . '.word ' . (empty($modSettings['search_match_words']) ? 'LIKE {string:subject_not_' . $count . '}' : '= {string:subject_not_' . $count . '}') . ' AND subj' . $numTables . '.id_topic = t.id_topic)';
+					$subject_query['params']['subject_not_' . $count] = empty($modSettings['search_match_words']) ? '%' . $subjectWord . '%' : $subjectWord;
+
+					$subject_query['where'][] = '(subj' . $numTables . '.word IS NULL)';
+					$subject_query['where'][] = 'm.body NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:body_not_' . $count . '}';
+					$subject_query['params']['body_not_' . $count++] = $this->_searchAPI($subjectWord, $this->noRegexp());
+				}
+				else
+				{
+					$subject_query['inner_join'][] = '{db_prefix}log_search_subjects AS subj' . $numTables . ' ON (subj' . $numTables . '.id_topic = ' . ($prev_join === 0 ? 't' : 'subj' . $prev_join) . '.id_topic)';
+					$subject_query['where'][] = 'subj' . $numTables . '.word LIKE {string:subject_like_' . $count . '}';
+					$subject_query['params']['subject_like_' . $count++] = empty($modSettings['search_match_words']) ? '%' . $subjectWord . '%' : $subjectWord;
+					$prev_join = $numTables;
+				}
+			}
+
+			if (!empty($this->_userQuery))
+			{
+				$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)';
+				$subject_query['where'][] = '{raw:user_query}';
+				$subject_query['params']['user_query'] = $this->_userQuery;
+			}
+			if (!empty($this->_search_params['topic']))
+			{
+				$subject_query['where'][] = 't.id_topic = {int:topic}';
+				$subject_query['params']['topic'] = $this->param('topic');
+			}
+			if (!empty($this->_minMsgID))
+			{
+				$subject_query['where'][] = 't.id_first_msg >= {int:min_msg_id}';
+				$subject_query['params']['min_msg_id'] = $this->_minMsgID;
+			}
+			if (!empty($this->_maxMsgID))
+			{
+				$subject_query['where'][] = 't.id_last_msg <= {int:max_msg_id}';
+				$subject_query['params']['max_msg_id'] = $this->_maxMsgID;
+			}
+			if (!empty($this->_boardQuery))
+			{
+				$subject_query['where'][] = 't.id_board {raw:board_query}';
+				$subject_query['params']['board_query'] = $this->_boardQuery;
+			}
+			if (!empty($this->_excludedPhrases))
+			{
+				$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)';
+				$count = 0;
+				foreach ($this->_excludedPhrases as $phrase)
+				{
+					$subject_query['where'][] = 'm.subject NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:exclude_phrase_' . $count . '}';
+					$subject_query['where'][] = 'm.body NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:exclude_phrase_' . $count . '}';
+					$subject_query['params']['exclude_phrase_' . $count++] = $this->_searchAPI($phrase, $this->noRegexp());
+				}
+			}
+			call_integration_hook('integrate_subject_search_query', array(&$subject_query));
+
+			// Nothing to search for?
+			if (empty($subject_query['where']))
+				continue;
+
+			$ignoreRequest = $this->_db_search->search_query('insert_log_search_topics', ($this->_db->support_ignore() ? ( '
+				INSERT IGNORE INTO {db_prefix}' . ($createTemporary ? 'tmp_' : '') . 'log_search_topics
+					(' . ($createTemporary ? '' : 'id_search, ') . 'id_topic)') : '') . '
+				SELECT ' . ($createTemporary ? '' : $id_search . ', ') . 't.id_topic
+				FROM ' . $subject_query['from'] . (empty($subject_query['inner_join']) ? '' : '
+					INNER JOIN ' . implode('
+					INNER JOIN ', array_unique($subject_query['inner_join']))) . (empty($subject_query['left_join']) ? '' : '
+					LEFT JOIN ' . implode('
+					LEFT JOIN ', array_unique($subject_query['left_join']))) . '
+				WHERE ' . implode('
+					AND ', array_unique($subject_query['where'])) . (empty($modSettings['search_max_results']) ? '' : '
+				LIMIT ' . ($modSettings['search_max_results'] - $numSubjectResults)),
+				$subject_query['params']
+			);
+			// Don't do INSERT IGNORE? Manually fix this up!
+			if (!$this->_db->support_ignore())
+			{
+				while ($row = $this->_db->fetch_row($ignoreRequest))
+				{
+					$ind = $createTemporary ? 0 : 1;
+					// No duplicates!
+					if (isset($inserts[$row[$ind]]))
+						continue;
+
+					$inserts[$row[$ind]] = $row;
+				}
+				$this->_db->free_result($ignoreRequest);
+				$numSubjectResults = count($inserts);
+			}
+			else
+				$numSubjectResults += $this->_db->affected_rows();
+
+			if (!empty($modSettings['search_max_results']) && $numSubjectResults >= $modSettings['search_max_results'])
+				break;
+		}
+
+		// Got some non-MySQL data to plonk in?
+		if (!empty($inserts))
+		{
+			$this->_db->insert('',
+				('{db_prefix}' . ($createTemporary ? 'tmp_' : '') . 'log_search_topics'),
+				$createTemporary ? array('id_topic' => 'int') : array('id_search' => 'int', 'id_topic' => 'int'),
+				$inserts,
+				$createTemporary ? array('id_topic') : array('id_search', 'id_topic')
+			);
+		}
+
+		return array($numSubjectResults, $createTemporary);
+	}
+
+	/**
+	 * Populates log_search_messages
+	 *
+	 * @param int $id_search - the id of the search to delete from logs
+	 * @param int $maxMessageResults - the maximum number of messages to index
+	 * @return int - the number of indexed results 
+	 */
+	private function _prepare_word_index($id_search, $maxMessageResults)
+	{
+		$indexedResults = 0;
+		$inserts = array();
+
+		$this->_db_search->search_query('drop_tmp_log_search_messages', '
+			DROP TABLE IF EXISTS {db_prefix}tmp_log_search_messages',
+			array(
+				'db_error_skip' => true,
+			)
+		);
+
+		$createTemporary = $this->_db_search->search_query('create_tmp_log_search_messages', '
+			CREATE TEMPORARY TABLE {db_prefix}tmp_log_search_messages (
+				id_msg int(10) unsigned NOT NULL default {string:string_zero},
+				PRIMARY KEY (id_msg)
+			) ENGINE=MEMORY',
+			array(
+				'string_zero' => '0',
+				'db_error_skip' => true,
+			)
+		) !== false;
+
+		// Clear, all clear!
+		if (!$createTemporary)
+			$this->_db_search->search_query('delete_log_search_messages', '
+				DELETE FROM {db_prefix}log_search_messages
+				WHERE id_search = {int:id_search}',
+				array(
+					'id_search' => $id_search,
+				)
+			);
+
+		foreach ($this->_searchWords as $words)
+		{
+			// Search for this word, assuming we have some words!
+			if (!empty($words['indexed_words']))
+			{
+				// Variables required for the search.
+				$search_data = array(
+					'insert_into' => ($createTemporary ? 'tmp_' : '') . 'log_search_messages',
+					'no_regexp' => $this->noRegexp(),
+					'max_results' => $maxMessageResults,
+					'indexed_results' => $indexedResults,
+					'params' => array(
+						'id_search' => !$createTemporary ? $id_search : 0,
+						'excluded_words' => $this->_excludedWords,
+						'user_query' => !empty($this->_userQuery) ? $this->_userQuery : '',
+						'board_query' => !empty($this->_boardQuery) ? $this->_boardQuery : '',
+						'topic' => !empty($this->_search_params['topic']) ? $this->param('topic') : 0,
+						'min_msg_id' => (int) $this->_minMsgID,
+						'max_msg_id' => (int) $this->_maxMsgID,
+						'excluded_phrases' => $this->_excludedPhrases,
+						'excluded_index_words' => $this->_excludedIndexWords,
+						'excluded_subject_words' => $this->_excludedSubjectWords,
+					),
+				);
+
+				$ignoreRequest = $this->_searchAPI->indexedWordQuery($words, $search_data);
+
+				if (!$this->_db->support_ignore())
+				{
+					while ($row = $this->_db->fetch_row($ignoreRequest))
+					{
+						// No duplicates!
+						if (isset($inserts[$row[0]]))
+							continue;
+
+						$inserts[$row[0]] = $row;
+					}
+					$this->_db->free_result($ignoreRequest);
+					$indexedResults = count($inserts);
+				}
+				else
+					$indexedResults += $this->_db->affected_rows();
+
+				if (!empty($maxMessageResults) && $indexedResults >= $maxMessageResults)
+					break;
+			}
+		}
+
+		// More non-MySQL stuff needed?
+		if (!empty($inserts))
+		{
+			$this->_db->insert('',
+				'{db_prefix}' . ($createTemporary ? 'tmp_' : '') . 'log_search_messages',
+				$createTemporary ? array('id_msg' => 'int') : array('id_msg' => 'int', 'id_search' => 'int'),
+				$inserts,
+				$createTemporary ? array('id_msg') : array('id_msg', 'id_search')
+			);
+		}
+
+		return $indexedResults;
 	}
 }
