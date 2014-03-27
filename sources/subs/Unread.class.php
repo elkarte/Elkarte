@@ -157,7 +157,7 @@ class Unread_Class
 	 *                 If true it will return the entire body,
 	 *                 if 0 no preview will be generated.
 	 */
-	public function bodyPreview($chars = 0)
+	public function bodyPreview($chars)
 	{
 		if ($chars === true)
 			$this->_preview_bodies = 'all';
@@ -197,7 +197,7 @@ class Unread_Class
 	 * @param int $start - position to start the query
 	 * @param int $limit - number of entries to grab
 	 * @param bool $include_avatars - if avatars should be retrieved as well
-	 * @return processRecentTopicList
+	 * @return mixed[] - processRecentTopicList
 	 */
 	public function getUnreads($join, $start, $limit, $include_avatars)
 	{

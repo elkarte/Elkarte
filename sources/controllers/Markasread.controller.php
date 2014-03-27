@@ -272,7 +272,7 @@ class MarkRead_Controller extends Action_Controller
 		if (isset($_REQUEST['children']) && !empty($boards))
 		{
 			// Mark all children of the boards we got (selected by the user).
-			addChildBoards($boards);
+			$boards = addChildBoards($boards);
 		}
 
 		$boards = array_keys(boardsPosts($boards, $categories));

@@ -38,10 +38,6 @@ class Unread_Controller extends Action_Controller
 	private $_action_unreadreplies = false;
 
 	/**
-	 * Parameters for the main query.
-	 */
-	private $_query_parameters = array();
-	/**
 	 * The object that will retrieve the data
 	 */
 	private $_grabber = null;
@@ -271,7 +267,7 @@ class Unread_Controller extends Action_Controller
 
 			// The easiest thing is to just get all the boards they can see,
 			// but since we've specified the top of tree we ignore some of them
-			addChildBoards($this->_boards);
+			$this->_boards = addChildBoards($this->_boards);
 
 			$context['querystring_board_limits'] = ';boards=' . implode(',', $this->_boards) . ';start=%d';
 		}

@@ -29,10 +29,6 @@ class Recent_Class
 {
 	private $_query_this_board = '';
 
-	private $_start = 0;
-
-	private $_boards = array();
-
 	private $_messages = array();
 
 	private $_board_ids = array();
@@ -132,7 +128,7 @@ class Recent_Class
 	 * Find the most recent messages in the forum.
 	 *
 	 * @param int $start - position to start the query
-	 * @param string[] $permissions - An array of boards permissions the members have.
+	 * @param string[]|mixed[] $permissions - An array of boards permissions the members have.
 	 *                 Used to define the buttons a member can see next to a message.
 	 *                 Format of the array is:
 	 *                 array(
