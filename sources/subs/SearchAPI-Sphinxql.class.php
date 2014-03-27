@@ -99,7 +99,6 @@ class Sphinxql_Search
 			case 'isValid':
 			case 'searchSort':
 			case 'prepareIndexes':
-			case 'indexedWordQuery':
 			case 'searchQuery':
 				return true;
 			break;
