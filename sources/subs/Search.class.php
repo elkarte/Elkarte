@@ -896,18 +896,7 @@ class Search_Class
 			call_integration_hook('integrate_subject_only_search_query', array(&$subject_query, &$subject_query_params));
 
 			// Build the search relevance query
-			$relevance = '1000 * (';
-			foreach ($this->_weight_factors as $type => $value)
-			{
-				if (isset($value['results']))
-				{
-					$relevance .= $this->_weight[$type];
-					if (!empty($value['results']))
-						$relevance .= ' * ' . $value['results'];
-					$relevance .= ' + ';
-				}
-			}
-			$relevance = substr($relevance, 0, -3) . ') / ' . $this->_weight_total . ' AS relevance';
+			$relevance = $this->_build_relevance();
 
 			$ignoreRequest = $this->_db_search->search_query('insert_log_search_results_subject',
 				($this->_db->support_ignore() ? '
@@ -1005,6 +994,7 @@ class Search_Class
 				'recent_message' => $this->_recentMsg,
 				'huge_topic_posts' => $humungousTopicPosts,
 				'is_approved' => 1,
+				'limit' => $modSettings['search_max_results'],
 			),
 		);
 
@@ -1124,17 +1114,7 @@ class Search_Class
 		// Did we either get some indexed results, or otherwise did not do an indexed query?
 		if (!empty($indexedResults) || !$this->_searchAPI->supportsMethod('indexedWordQuery', $this->getParams()))
 		{
-			$relevance = '1000 * (';
-			$new_weight_total = 0;
-			foreach ($main_query['weights'] as $type => $value)
-			{
-				$relevance .= $this->_weight[$type];
-				if (!empty($value['search']))
-					$relevance .= ' * ' . $value['search'];
-				$relevance .= ' + ';
-				$new_weight_total += $this->_weight[$type];
-			}
-			$main_query['select']['relevance'] = substr($relevance, 0, -3) . ') / ' . $new_weight_total . ' AS relevance';
+			$relevance = $this->_build_relevance($main_query['weights']);
 
 			$ignoreRequest = $this->_db_search->search_query('insert_log_search_results_no_index', ($this->_db->support_ignore() ? ( '
 				INSERT IGNORE INTO ' . '{db_prefix}log_search_results
@@ -1142,15 +1122,15 @@ class Search_Class
 				SELECT
 					' . implode(',
 					', $main_query['select']) . '
-				FROM ' . $main_query['from'] . (empty($main_query['inner_join']) ? '' : '
+				FROM ' . $main_query['from'] . (!empty($main_query['inner_join']) ? '
 					INNER JOIN ' . implode('
-					INNER JOIN ', $main_query['inner_join'])) . (empty($main_query['left_join']) ? '' : '
+					INNER JOIN ', $main_query['inner_join']) : '') . (!empty($main_query['left_join']) ? '
 					LEFT JOIN ' . implode('
-					LEFT JOIN ', $main_query['left_join'])) . (!empty($main_query['where']) ? '
+					LEFT JOIN ', $main_query['left_join']) : '') . (!empty($main_query['where']) ? '
 				WHERE ' : '') . implode('
-					AND ', $main_query['where']) . (empty($main_query['group_by']) ? '' : '
-				GROUP BY ' . implode(', ', $main_query['group_by'])) . (empty($modSettings['search_max_results']) ? '' : '
-				LIMIT ' . $modSettings['search_max_results']),
+					AND ', $main_query['where']) . (!empty($main_query['group_by']) ? '
+				GROUP BY ' . implode(', ', $main_query['group_by']) : '') . (!empty($main_query['parameters']['limit']) ? '
+				LIMIT {int:limit}' : ''),
 				$main_query['parameters']
 			);
 
@@ -1192,16 +1172,7 @@ class Search_Class
 		// Insert subject-only matches.
 		if ($num_results < $modSettings['search_max_results'] && $numSubjectResults !== 0)
 		{
-			$relevance = '1000 * (';
-			foreach ($this->_weight_factors as $type => $value)
-				if (isset($value['results']))
-				{
-					$relevance .= $this->_weight[$type];
-					if (!empty($value['results']))
-						$relevance .= ' * ' . $value['results'];
-					$relevance .= ' + ';
-				}
-			$relevance = substr($relevance, 0, -3) . ') / ' . $this->_weight_total . ' AS relevance';
+			$relevance = $this->_build_relevance();
 
 			$usedIDs = array_flip(empty($inserts) ? array() : array_keys($inserts));
 			$ignoreRequest = $this->_db_search->search_query('insert_log_search_results_sub_only', ($this->_db->support_ignore() ? ( '
@@ -1662,5 +1633,47 @@ class Search_Class
 		}
 
 		return $indexedResults;
+	}
+
+	/**
+	 * Build the search relevance query
+	 *
+	 * @param null|int[] $factors - is factors are specified that array will
+	 *                   be used to build the relevance value, otherwise the
+	 *                   function will use $this->_weight_factors
+	 * @return string
+	 */
+	private function _build_relevance($factors = null)
+	{
+		$relevance = '1000 * (';
+		if ($factors !== null && is_array($factors))
+		{
+			$weight_total = 0;
+			foreach ($factors as $type => $value)
+			{
+				$relevance .= $this->_weight[$type];
+				if (!empty($value['search']))
+					$relevance .= ' * ' . $value['search'];
+				$relevance .= ' + ';
+				$weight_total += $this->_weight[$type];
+			}
+		}
+		else
+		{
+			$weight_total = $this->_weight_total;
+			foreach ($this->_weight_factors as $type => $value)
+			{
+				if (isset($value['results']))
+				{
+					$relevance .= $this->_weight[$type];
+					if (!empty($value['results']))
+						$relevance .= ' * ' . $value['results'];
+					$relevance .= ' + ';
+				}
+			}
+		}
+		$relevance = substr($relevance, 0, -3) . ') / ' . $weight_total . ' AS relevance';
+
+		return $relevance;
 	}
 }

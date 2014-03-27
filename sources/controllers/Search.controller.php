@@ -829,7 +829,7 @@ class Search_Controller extends Action_Controller
 	}
 
 	/**
-	 * Prepares the weighting factors and
+	 * Prepares the weighting factors
 	 */
 	private function _setup_weight_factors()
 	{
@@ -864,21 +864,17 @@ class Search_Controller extends Action_Controller
 		// These are fallback weights in case of errors somewhere.
 		// Not intended to be passed to the hook
 		$default_weights = array(
-			'search_weight_frequency' => '30',
-			'search_weight_age' => '25',
-			'search_weight_length' => '20',
-			'search_weight_subject' => '15',
-			'search_weight_first_message' => '10',
+			'search_weight_frequency' => 30,
+			'search_weight_age' => 25,
+			'search_weight_length' => 20,
+			'search_weight_subject' => 15,
+			'search_weight_first_message' => 10,
 		);
 
 		call_integration_hook('integrate_search_weights', array(&$this->_weight_factors));
 
 		// Set the weight factors for each area (frequency, age, etc) as defined in the ACP
-		foreach ($this->_weight_factors as $weight_factor => $value)
-		{
-			$this->_weight[$weight_factor] = empty($modSettings['search_weight_' . $weight_factor]) ? 0 : (int) $modSettings['search_weight_' . $weight_factor];
-			$this->_weight_total += $this->_weight[$weight_factor];
-		}
+		$this->_calculate_weights($this->_weight_factors, $modSettings);
 
 		// Zero weight.  Weightless :P.
 		if (empty($this->_weight_total))
@@ -894,11 +890,25 @@ class Search_Controller extends Action_Controller
 			// using our defaults.
 			// Using a different variable here because it may be the hook is screwing
 			// things up
-			foreach ($default_factors as $weight_factor => $value)
-			{
-				$this->_weight[$weight_factor] = empty($default_weights['search_weight_' . $weight_factor]) ? 0 : (int) $default_weights['search_weight_' . $weight_factor];
-				$this->_weight_total += $this->_weight[$weight_factor];
-			}
+			$this->_calculate_weights($default_factors, $default_weights);
+		}
+	}
+
+	/**
+	 * Fill the $_weight variable and calculate the total weight
+	 *
+	 * @param mixed[] $factors
+	 * @param int[] $weights
+	 */
+	private function _calculate_weights($factors, $weights)
+	{
+		$this->_weight = array();
+		$this->_weight_total = 0;
+
+		foreach ($factors as $weight_factor => $value)
+		{
+			$this->_weight[$weight_factor] = empty($weights['search_weight_' . $weight_factor]) ? 0 : (int) $weights['search_weight_' . $weight_factor];
+			$this->_weight_total += $this->_weight[$weight_factor];
 		}
 	}
 
