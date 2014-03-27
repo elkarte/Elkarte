@@ -1026,25 +1026,25 @@ span.views_text {
 .warningbox {
 	padding: 6px 12px;
 	border: 1px solid #ffd324;
-	border-left: 5px solid #ffd324;
+	border-left-width: 5px;
 	background: #fff6ca;
 }
 .successbox {
 	padding: 6px 12px;
 	border: 1px solid #9ece9e;
-	border-left: 5px solid #9ece9e;
+	border-left-width: 5px;
 	background: #e8f5df;
 }
 .infobox {
 	padding: 6px 12px;
 	border: 1px solid #3a87ad;
-	border-left: 5px solid #3a87ad;
+	border-left-width: 5px;
 	background: #d9edf7;
 }
 .errorbox {
 	padding: 6px 12px;
 	border: 1px solid #ce9e9e;
-	border-left: 5px solid #ce9e9e;
+	border-left-width: 5px;
 	background: #f5dfdf;
 }
 
