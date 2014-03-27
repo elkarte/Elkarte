@@ -1604,7 +1604,6 @@ class ManageAttachments_Controller extends Action_Controller
 
 				// Find some attachments to move
 				list ($tomove_count, $tomove) = findAttachmentsToMove($_POST['from'], $start, $limit);
-				$tomove_count = count($tomove);
 
 				// Nothing found to move
 				if ($tomove_count === 0)

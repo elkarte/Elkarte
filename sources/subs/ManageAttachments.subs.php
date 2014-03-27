@@ -1579,7 +1579,6 @@ function findAttachmentsToMove($from, $start, $limit)
 {
 	$db = database();
 	$attachments = array();
-	$number = 0;
 
 	// Find some attachments to move
 	$request = $db->query('', '
@@ -1606,8 +1605,8 @@ function findAttachmentsToMove($from, $start, $limit)
 /**
  * Update the database to reflect the new directory of an array of attachments
  *
- * @param type $moved integer array of attachment ids
- * @param type $new_dir new directory string
+ * @param int[] $moved integer array of attachment ids
+ * @param string $new_dir new directory string
  */
 function moveAttachments($moved, $new_dir)
 {
