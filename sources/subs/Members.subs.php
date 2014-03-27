@@ -1338,6 +1338,78 @@ function isAnotherAdmin($memberID)
  * This function retrieves a list of member ids based on a set of conditions
  *
  * @package Members
+ * @param mixed[]|string $query see prepareMembersByQuery
+ * @param mixed[] $query_params see prepareMembersByQuery
+ * @param bool $details if true returns additional member details (name, email, ip, etc.)
+ *             false will only return an array of member id's that match the conditions
+ * @param bool $only_active see prepareMembersByQuery
+ */
+function membersBy($query, $query_params, $details = false, $only_active = true)
+{
+	$db = database();
+
+	$query_where = prepareMembersByQuery($query, $query_params, $only_active);
+
+	// Lets see who we can find that meets the built up conditions
+	$members = array();
+	$request = $db->query('', '
+		SELECT id_member' . ($details ? ', member_name, real_name, email_address, member_ip, date_registered, last_login,
+				hide_email, posts, is_activated, real_name' : '') . '
+		FROM {db_prefix}members
+		WHERE ' . $query_where . (isset($query_params['start']) ? '
+		LIMIT {int:start}, {int:limit}' : '') . (!empty($query_params['order']) ? '
+		ORDER BY {raw:order}' : ''),
+		$query_params
+	);
+
+	// Return all the details for each member found
+	if ($details)
+	{
+		while ($row = $db->fetch_assoc($request))
+			$members[$row['id_member']] = $row;
+	}
+	// Or just a int[] of found member id's
+	else
+	{
+		while ($row = $db->fetch_assoc($request))
+			$members[] = $row['id_member'];
+	}
+	$db->free_result($request);
+
+	return $members;
+}
+
+/**
+ * Counts the number of members based on conditions
+ *
+ * @package Members
+ * @param string[]|string $query see prepareMembersByQuery
+ * @param mixed[] $query_params see prepareMembersByQuery
+ * @param boolean $only_active see prepareMembersByQuery
+ */
+function countMembersBy($query, $query_params, $only_active = true)
+{
+	$db = database();
+
+	$query_where = prepareMembersByQuery($query, $query_params, $only_active);
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}members
+		WHERE ' . $query_where,
+		$query_params
+	);
+
+	list ($num_members) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $num_members;
+}
+
+/**
+ * Builds the WHERE clause for the functions countMembersBy and membersBy
+ *
+ * @package Members
  * @param mixed[]|string $query can be an array of "type" of conditions,
  *             or a string used as raw query
  *             or a string that represents one of the built-in conditions
@@ -1346,15 +1418,13 @@ function isAnotherAdmin($memberID)
  *             'start' and 'limit' used in LIMIT
  *             'order' used raw in ORDER BY
  *             others passed as query params
- * @param bool $details if true returns additional member details (name, email, ip, etc.)
- *             false will only return an array of member id's that match the conditions
  * @param bool $only_active only fetch active members
  */
-function membersBy($query, $query_params, $details = false, $only_active = true)
+function prepareMembersByQuery($query, &$query_params, $only_active = true)
 {
 	$allowed_conditions = array(
-		'member_ids'       => 'id_member IN ({array_int:member_ids})',
-		'member_names'     => function (&$members) {
+		'member_ids'   => 'id_member IN ({array_int:member_ids})',
+		'member_names' => function (&$members) {
 			$mem_query = array();
 
 			foreach ($members['member_names'] as $key => $param)
@@ -1422,125 +1492,7 @@ function membersBy($query, $query_params, $details = false, $only_active = true)
 		$query_params['is_activated'] = 1;
 	}
 
-	$db = database();
-
-	// Lets see who we can find that meets the built up conditions
-	$members = array();
-	$request = $db->query('', '
-		SELECT id_member' . ($details ? ', member_name, real_name, email_address, member_ip, date_registered, last_login,
-				hide_email, posts, is_activated, real_name' : '') . '
-		FROM {db_prefix}members
-		WHERE ' . $query_where . (isset($query_params['start']) ? '
-		LIMIT {int:start}, {int:limit}' : '') . (!empty($query_params['order']) ? '
-		ORDER BY {raw:order}' : ''),
-		$query_params
-	);
-
-	// Return all the details for each member found
-	if ($details)
-	{
-		while ($row = $db->fetch_assoc($request))
-			$members[$row['id_member']] = $row;
-	}
-	// Or just a int[] of found member id's
-	else
-	{
-		while ($row = $db->fetch_assoc($request))
-			$members[] = $row['id_member'];
-	}
-	$db->free_result($request);
-
-	return $members;
-}
-
-/**
- * Counts the number of members based on conditions
- *
- * @package Members
- * @param string[]|string $query strings used as raw query
- * @param mixed[] $query_params is an array containing the parameters to be passed to the query
- * @param boolean $only_active
- */
-function countMembersBy($query, $query_params, $only_active = true)
-{
-	$allowed_conditions = array(
-		'member_ids' => 'id_member IN ({array_int:member_ids})',
-		'member_names' => function (&$members) {
-			$mem_query = array();
-
-			foreach ($members['member_names'] as $key => $param)
-			{
-				$mem_query[] = 'LOWER(real_name) LIKE {string:member_names_' . $key . '}';
-				$members['member_names_' . $key] = $param;
-			}
-			return implode("\n\t\t\tOR ", $mem_query);
-		},
-		'not_in_group' => '(id_group != {int:not_in_group} AND FIND_IN_SET({int:not_in_group}, additional_groups) = 0)',
-		'in_group' => '(id_group = {int:in_group} OR FIND_IN_SET({int:in_group}, additional_groups) != 0)',
-		'in_group_primary' => 'id_group = {int:in_group_primary}',
-		'in_post_group' => 'id_post_group = {int:in_post_group}',
-		'in_group_no_add' => '(id_group = {int:in_group_no_add} AND FIND_IN_SET({int:in_group_no_add}, additional_groups) = 0)',
-	);
-
-	if (is_array($query))
-	{
-		$query_parts = array('or' => array(), 'and' => array());
-		foreach ($query as $type => $query_conditions)
-		{
-			if (is_array($query_conditions))
-			{
-				foreach ($query_conditions as $condition => $query_condition)
-				{
-					if ($query_condition == 'member_names')
-						$query_parts[$condition === 'or' ? 'or' : 'and'] = $allowed_conditions[$query_condition]($query_params);
-					else
-						$query_parts[$condition === 'or' ? 'or' : 'and'] = isset($allowed_conditions[$query_condition]) ? $allowed_conditions[$query_condition] : $query_condition;
-				}
-			}
-			elseif ($query == 'member_names')
-				$query_parts[$condition === 'or' ? 'or' : 'and'] = $allowed_conditions[$query]($query_params);
-			else
-				$query_parts['and'] = isset($allowed_conditions[$query]) ? $allowed_conditions[$query] : $query;
-		}
-
-		if (!empty($query_parts['or']))
-			$query_parts['and'][] = implode("\n\t\t\tOR ", $query_parts['or']);
-
-		$query_where = implode("\n\t\t\tAND ", $query_parts['and']);
-	}
-	elseif (isset($allowed_conditions[$query]))
-	{
-		if ($query == 'member_names')
-			$query_where = $allowed_conditions[$query]($query_params);
-		else
-			$query_where = $allowed_conditions[$query];
-	}
-	else
-		$query_where = $query;
-
-	if (empty($query_where))
-		return false;
-
-	if ($only_active)
-	{
-		$query_where .= '
-			AND is_activated = {int:is_activated}';
-		$query_params['is_activated'] = 1;
-	}
-
-	$db = database();
-
-	$request = $db->query('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}members
-		WHERE ' . $query_where,
-		$query_params
-	);
-
-	list ($num_members) = $db->fetch_row($request);
-	$db->free_result($request);
-
-	return $num_members;
+	return $query_where;
 }
 
 /**

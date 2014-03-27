@@ -376,7 +376,7 @@ function comma_format($number, $override_decimal_count = false)
  *
  * @param int $log_time
  * @param string|bool $show_today = true
- * @param string|false $offset_type = false
+ * @param string|bool $offset_type = false
  */
 function standardTime($log_time, $show_today = true, $offset_type = false)
 {

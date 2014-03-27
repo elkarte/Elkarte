@@ -271,12 +271,7 @@ class Search_Controller extends Action_Controller
 		$db_search = db_search();
 
 		// No, no, no... this is a bit hard on the server, so don't you go prefetching it!
-		if (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch')
-		{
-			ob_end_clean();
-			header('HTTP/1.1 403 Forbidden');
-			die;
-		}
+		stop_prefetching();
 
 		$this->_setup_weight_factors();
 

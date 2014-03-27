@@ -1885,8 +1885,14 @@ function fetchBoardsInfo($conditions = 'all', $params = array())
  * Retrieve the all the sub-boards of an array of boards and add the ids to the same array
  *
  * @package Boards
- * @param int[]|int $boards an array of board IDs (it accepts a single board too
- *              The param is passed by ref and the result it returned through the param itself
+ * @param int[]|int $boards an array of board IDs (it accepts a single board
+ *              too).
+ * @deprecated since 1.1 - The param is passed by ref in 1.0 and the result
+ *                         is returned through the param itself, starting from
+ *                         1.1 the expected behaviour is that the result is
+ *                         returned.
+ *                         The pass-by-ref is kept for backward compatibility.
+ * @return int[]
  */
 function addChildBoards(&$boards)
 {
@@ -1912,6 +1918,8 @@ function addChildBoards(&$boards)
 		if (in_array($row['id_parent'], $boards))
 			$boards[] = $row['id_board'];
 	$db->free_result($request);
+
+	return $boards;
 }
 
 /**
