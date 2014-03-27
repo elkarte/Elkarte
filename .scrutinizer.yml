@@ -113,5 +113,5 @@ tools:
             unused_code_rules: { unused_local_variable: true, unused_private_method: true, unused_formal_parameter: true }
             naming_rules: { boolean_method_name: true }
             controversial_rules: { superglobals: false }
-    php_sim: true
+    php_sim:
         min_mass: 30
