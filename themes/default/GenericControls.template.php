@@ -153,7 +153,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
  */
 function template_control_richedit_buttons($editor_id)
 {
-	global $context, $settings, $options, $txt;
+	global $context, $options, $txt;
 
 	$editor_context = &$context['controls']['richedit'][$editor_id];
 
@@ -161,7 +161,7 @@ function template_control_richedit_buttons($editor_id)
 	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
 		echo '
 		<span class="draftautosave smalltext">
-			<span id="throbber" style="display:none"><img src="' . $settings['images_url'] . '/loading_sm.gif" alt="" class="centericon" />&nbsp;</span>
+			<span id="throbber" style="display:none"><i class="fa fa-spinner fa-spin" alt="loading"></i>&nbsp;</span>
 			<span id="draft_lastautosave" ></span>
 		</span>';
 
