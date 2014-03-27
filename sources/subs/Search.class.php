@@ -871,10 +871,7 @@ class Search_Class
 
 			if (!empty($this->_userQuery))
 			{
-				if ($subject_query['from'] != '{db_prefix}messages AS m')
-				{
-					$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_topic = t.id_topic)';
-				}
+				$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_topic = t.id_topic)';
 				$subject_query['where'][] = $this->_userQuery;
 			}
 			if (!empty($this->_search_params['topic']))
@@ -887,10 +884,7 @@ class Search_Class
 				$subject_query['where'][] = 't.id_board ' . $this->_boardQuery;
 			if (!empty($this->_excludedPhrases))
 			{
-				if ($subject_query['from'] != '{db_prefix}messages AS m')
-				{
-					$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)';
-				}
+				$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)';
 
 				$count = 0;
 				foreach ($this->_excludedPhrases as $phrase)
@@ -927,11 +921,11 @@ class Search_Class
 					1
 				FROM ' . $subject_query['from'] . (empty($subject_query['inner_join']) ? '' : '
 					INNER JOIN ' . implode('
-					INNER JOIN ', $subject_query['inner_join'])) . (empty($subject_query['left_join']) ? '' : '
+					INNER JOIN ', array_unique($subject_query['inner_join']))) . (empty($subject_query['left_join']) ? '' : '
 					LEFT JOIN ' . implode('
-					LEFT JOIN ', $subject_query['left_join'])) . '
+					LEFT JOIN ', array_unique($subject_query['left_join']))) . '
 				WHERE ' . implode('
-					AND ', $subject_query['where']) . (empty($modSettings['search_max_results']) ? '' : '
+					AND ', array_unique($subject_query['where'])) . (empty($modSettings['search_max_results']) ? '' : '
 				LIMIT ' . ($modSettings['search_max_results'] - $numSubjectResults)),
 				array_merge($subject_query_params, array(
 					'id_search' => $id_search,
@@ -1095,17 +1089,12 @@ class Search_Class
 				$numTables = 0;
 				$prev_join = 0;
 				$count = 0;
-				$excluded = false;
 				foreach ($words['subject_words'] as $subjectWord)
 				{
 					$numTables++;
 					if (in_array($subjectWord, $this->_excludedSubjectWords))
 					{
-						if (($subject_query['from'] != '{db_prefix}messages AS m') && !$excluded)
-						{
-							$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)';
-							$excluded = true;
-						}
+						$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)';
 						$subject_query['left_join'][] = '{db_prefix}log_search_subjects AS subj' . $numTables . ' ON (subj' . $numTables . '.word ' . (empty($modSettings['search_match_words']) ? 'LIKE {string:subject_not_' . $count . '}' : '= {string:subject_not_' . $count . '}') . ' AND subj' . $numTables . '.id_topic = t.id_topic)';
 						$subject_query['params']['subject_not_' . $count] = empty($modSettings['search_match_words']) ? '%' . $subjectWord . '%' : $subjectWord;
 
@@ -1124,10 +1113,7 @@ class Search_Class
 
 				if (!empty($this->_userQuery))
 				{
-					if ($subject_query['from'] != '{db_prefix}messages AS m')
-					{
-						$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)';
-					}
+					$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)';
 					$subject_query['where'][] = '{raw:user_query}';
 					$subject_query['params']['user_query'] = $this->_userQuery;
 				}
@@ -1153,10 +1139,7 @@ class Search_Class
 				}
 				if (!empty($this->_excludedPhrases))
 				{
-					if ($subject_query['from'] != '{db_prefix}messages AS m')
-					{
-						$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)';
-					}
+					$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)';
 					$count = 0;
 					foreach ($this->_excludedPhrases as $phrase)
 					{
@@ -1177,11 +1160,11 @@ class Search_Class
 					SELECT ' . ($createTemporary ? '' : $id_search . ', ') . 't.id_topic
 					FROM ' . $subject_query['from'] . (empty($subject_query['inner_join']) ? '' : '
 						INNER JOIN ' . implode('
-						INNER JOIN ', $subject_query['inner_join'])) . (empty($subject_query['left_join']) ? '' : '
+						INNER JOIN ', array_unique($subject_query['inner_join']))) . (empty($subject_query['left_join']) ? '' : '
 						LEFT JOIN ' . implode('
-						LEFT JOIN ', $subject_query['left_join'])) . '
+						LEFT JOIN ', array_unique($subject_query['left_join']))) . '
 					WHERE ' . implode('
-						AND ', $subject_query['where']) . (empty($modSettings['search_max_results']) ? '' : '
+						AND ', array_unique($subject_query['where'])) . (empty($modSettings['search_max_results']) ? '' : '
 					LIMIT ' . ($modSettings['search_max_results'] - $numSubjectResults)),
 					$subject_query['params']
 				);
