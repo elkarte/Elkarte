@@ -151,7 +151,7 @@ class DbTable_MySQL extends DbTable
 
 			// Is it the primary?
 			if (isset($index['type']) && $index['type'] == 'primary')
-				$table_query .= "\n\t" . 'PRIMARY KEY (' . implode(',', $index['columns']) . '),';
+				$table_query .= "\n\t" . 'PRIMARY KEY (' . $columns . '),';
 			else
 			{
 				if (empty($index['name']))

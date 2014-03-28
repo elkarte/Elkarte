@@ -182,7 +182,7 @@ class DbTable_PostgreSQL extends DbTable
 
 			// Primary goes in the table...
 			if (isset($index['type']) && $index['type'] == 'primary')
-				$table_query .= "\n\t" . 'PRIMARY KEY (' . implode(',', $index['columns']) . '),';
+				$table_query .= "\n\t" . 'PRIMARY KEY (' . $columns . '),';
 			else
 			{
 				if (empty($index['name']))
