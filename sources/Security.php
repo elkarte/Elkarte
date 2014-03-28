@@ -1548,7 +1548,7 @@ function frameOptionsHeader($override = null)
 
 	if (is_null($override) && !empty($modSettings['frame_security']))
 		$option = $modSettings['frame_security'];
-	elseif (in_array($override, array('SAMEORIGIN', 'DENY', 'SAMEORIGIN')))
+	elseif (in_array($override, array('SAMEORIGIN', 'DENY')))
 		$option = $override;
 
 	// Don't bother setting the header if we have disabled it.
