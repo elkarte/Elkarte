@@ -373,21 +373,6 @@ class Calendar_Controller extends Action_Controller
 	{
 		global $modSettings;
 
-		if (!isset($_POST['deleteevent']))
-		{
-			// No month?  No year?
-			if (!isset($_POST['month']))
-				fatal_lang_error('event_month_missing', false);
-			if (!isset($_POST['year']))
-				fatal_lang_error('event_year_missing', false);
-
-			// Check the month and year...
-			if ($_POST['month'] < 1 || $_POST['month'] > 12)
-				fatal_lang_error('invalid_month', false);
-			if ($_POST['year'] < $modSettings['cal_minyear'] || $_POST['year'] > $modSettings['cal_maxyear'])
-				fatal_lang_error('invalid_year', false);
-		}
-
 		// Make sure they're allowed to post...
 		isAllowedTo('calendar_post');
 
@@ -403,6 +388,18 @@ class Calendar_Controller extends Action_Controller
 		// There is no need to validate the following values if we are just deleting the event.
 		if (!isset($_POST['deleteevent']))
 		{
+			// No month?  No year?
+			if (!isset($_POST['month']))
+				fatal_lang_error('event_month_missing', false);
+			if (!isset($_POST['year']))
+				fatal_lang_error('event_year_missing', false);
+
+			// Check the month and year...
+			if ($_POST['month'] < 1 || $_POST['month'] > 12)
+				fatal_lang_error('invalid_month', false);
+			if ($_POST['year'] < $modSettings['cal_minyear'] || $_POST['year'] > $modSettings['cal_maxyear'])
+				fatal_lang_error('invalid_year', false);
+
 			// No day?
 			if (!isset($_POST['day']))
 				fatal_lang_error('event_day_missing', false);
