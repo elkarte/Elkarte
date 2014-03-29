@@ -94,9 +94,7 @@ class Calendar_Controller extends Action_Controller
 		// If we have a day clean that too.
 		if ($context['view_week'])
 		{
-			// Note $isValid is -1 < PHP 5.1
-			$isValid = mktime(0, 0, 0, $curPage['month'], $curPage['day'], $curPage['year']);
-			if ($curPage['day'] > 31 || !$isValid || $isValid == -1)
+			if ($curPage['day'] > 31 || !mktime(0, 0, 0, $curPage['month'], $curPage['day'], $curPage['year']))
 				fatal_lang_error('invalid_day', false);
 		}
 
