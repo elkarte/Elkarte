@@ -175,4 +175,19 @@ abstract class DbTable
 	{
 		return;
 	}
+
+	/**
+	 * Checks if a table exists
+	 *
+	 * @param string $table_name
+	 * @return bool
+	 */
+	public function table_exists($table_name)
+	{
+		// Grab ourselves one o'these.
+		$db = database();
+
+		$filter = $db->db_list_tables(false, $table_name);
+		return !empty($filter);
+	}
 }

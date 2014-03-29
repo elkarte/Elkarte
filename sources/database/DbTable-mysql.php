@@ -129,8 +129,7 @@ class DbTable_MySQL extends DbTable
 		$db = database();
 
 		// Slightly easier on MySQL than the others...
-		$tables = $db->db_list_tables();
-		if (in_array($full_table_name, $tables))
+		if ($this->table_exists($full_table_name))
 		{
 			// This is a sad day... drop the table? If not, return false (error) by default.
 			if ($if_exists == 'overwrite')
@@ -202,7 +201,7 @@ class DbTable_MySQL extends DbTable
 			return false;
 
 		// Does it exist?
-		if (in_array($full_table_name, $db->db_list_tables()))
+		if ($this->table_exists($full_table_name))
 		{
 			$query = 'DROP TABLE ' . $table_name;
 			$db->query('',

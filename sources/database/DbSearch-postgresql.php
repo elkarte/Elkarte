@@ -114,10 +114,9 @@ class DbSearch_PostgreSQL implements DbSearch
 		$table_info = array();
 
 		// In order to report the sizes correctly we need to perform vacuum (optimize) on the tables we will be using.
-		$temp_tables = $db->db_list_tables();
-		foreach ($temp_tables as $table)
-			if ($table == $db_prefix. 'messages' || $table == $db_prefix. 'log_search_words')
-				$db->db_optimize_table($table);
+		$db->db_optimize_table('{db_prefix}messages');
+		if ($db->table_exists('{db_prefix}log_search_words'))
+			$db->db_optimize_table('{db_prefix}log_search_words');
 
 		// PostGreSql has some hidden sizes.
 		$request = $db->query('', '

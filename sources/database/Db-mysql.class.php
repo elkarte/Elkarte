@@ -1161,26 +1161,22 @@ class Database_MySQL implements Database
 	}
 
 	/**
-	 * Backup $table to $backup_table.
+	 * Backup $table_name to $backup_table.
 	 *
-	 * @param string $table
+	 * @param string $table_name
 	 * @param string $backup_table
 	 *
 	 * @return resource - the request handle to the table creation query
 	 */
-	public function db_backup_table($table, $backup_table)
+	public function db_backup_table($table_name, $backup_table)
 	{
 		global $db_prefix;
 
-		$table = str_replace('{db_prefix}', $db_prefix, $table);
+		$table = str_replace('{db_prefix}', $db_prefix, $table_name);
 
 		// First, get rid of the old table.
-		$this->query('', '
-			DROP TABLE IF EXISTS {raw:backup_table}',
-			array(
-				'backup_table' => $backup_table,
-			)
-		);
+		$db_table = db_table();
+		$db_table->db_drop_table($backup_table);
 
 		// Can we do this the quick way?
 		$result = $this->query('', '
