@@ -75,17 +75,8 @@ class OpenID_Controller extends Action_Controller
 		if ($assoc === null)
 			fatal_lang_error('openid_no_assoc');
 
-		$secret = base64_decode($assoc['secret']);
-		$signed = explode(',', $_GET['openid_signed']);
-		$verify_str = '';
-
-		foreach ($signed as $sign)
-			$verify_str .= $sign . ':' . strtr($_GET['openid_' . str_replace('.', '_', $sign)], array('&amp;' => '&')) . "\n";
-
-		$verify_str = base64_encode(hash_hmac('sha1', $verify_str, $secret, true));
-
 		// Verify the OpenID signature.
-		if ($verify_str != $_GET['openid_sig'])
+		if (!$this->_verify_string($assoc['secret']))
 			fatal_lang_error('openid_sig_invalid', 'critical');
 
 		if (!isset($_SESSION['openid']['saved_data'][$_GET['t']]))
@@ -182,6 +173,26 @@ class OpenID_Controller extends Action_Controller
 			// Finally do the login.
 			doLogin();
 		}
+	}
+
+	/**
+	 * Compares the association with the signatures received from the server
+	 *
+	 * @param string $raw_secret - The association stored in the database
+	 */
+	private function _verify_string($raw_secret)
+	{
+		$secret = base64_decode($raw_secret);
+		$signed = explode(',', $_GET['openid_signed']);
+		$verify_str = '';
+
+		foreach ($signed as $sign)
+			$verify_str .= $sign . ':' . strtr($_GET['openid_' . str_replace('.', '_', $sign)], array('&amp;' => '&')) . "\n";
+
+		$verify_str = base64_encode(hash_hmac('sha1', $verify_str, $secret, true));
+
+		// Verify the OpenID signature.
+		return $verify_str == $_GET['openid_sig'];
 	}
 
 	/**
