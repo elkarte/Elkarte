@@ -206,7 +206,7 @@ function template_messages()
 		// Maybe they can modify the post (this is the more button)
 		if ($message['can_modify'] || ($context['can_report_moderator']))
 			echo '
-							<li class="listlevel1 subsections" aria-haspopup="true"><a class="linklevel1 post_options">', $txt['post_options'], '</a>';
+							<li class="listlevel1 subsections" aria-haspopup="true"><a href="#" onclick="return false;" class="linklevel1 post_options">', $txt['post_options'], '</a>';
 
 		if ($message['can_modify'] || $message['can_remove'] || $context['can_follow_up'] || ($context['can_split'] && !empty($context['real_num_replies'])) || $context['can_restore_msg'] || $message['can_approve'] || $message['can_unapprove'] || $context['can_report_moderator'])
 		{
@@ -279,13 +279,13 @@ function template_messages()
 			// Or just view the count
 			else
 				echo '
-							<li class="listlevel1"><a href="#" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 likes_button">', !empty($message['like_counter']) ? '&nbsp;' . $message['like_counter'] . '&nbsp;' . $txt['likes'] : '&nbsp;', '</a></li>';
+							<li class="listlevel1"><a href="javascript:void(0)" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 likes_button">', !empty($message['like_counter']) ? '&nbsp;' . $message['like_counter'] . '&nbsp;' . $txt['likes'] : '&nbsp;', '</a></li>';
 		}
 
 		// Can the user quick modify the contents of this post?  Show the quick (inline) modify button.
 		if ($message['can_modify'])
 			echo '
-							<li class="listlevel1 quick_edit" id="modify_button_', $message['id'], '" style="display: none"><a class="linklevel1"><img src="', $settings['images_url'], '/icons/modify_inline.png" alt="', $txt['modify_msg'], '" title="" class="modifybutton" onclick="oQuickModify.modifyMsg(\'', $message['id'], '\')" />', $txt['quick_edit'], '</a></li>';
+							<li class="listlevel1 quick_edit" id="modify_button_', $message['id'], '" style="display: none"><a class="linklevel1 quick_edit" onclick="oQuickModify.modifyMsg(\'', $message['id'], '\')">', $txt['quick_edit'], '</a></li>';
 
 		// Can they reply? Have they turned on quick reply?
 		if ($context['can_quote'] && !empty($options['display_quick_reply']))
@@ -450,7 +450,7 @@ function template_quickreply_below()
 
 			if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
 				echo '
-								<div class="clear"><span id="throbber" style="display:none"><img src="' . $settings['images_url'] . '/loading_sm.gif" alt="" class="centericon" />&nbsp;</span><span id="draft_lastautosave"></span></div>';
+								<div class="clear"><span id="throbber" style="display:none"><i class="fa fa-spinner fa-spin" alt="loading"></i>&nbsp;</span><span id="draft_lastautosave"></span></div>';
 		}
 
 		echo '

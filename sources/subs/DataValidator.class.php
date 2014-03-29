@@ -637,7 +637,7 @@ class Data_Validator
 	 * Usage: '[key]' => 'limits[min, max]'
 	 * >= min and <= max
 	 * Limits may be specified one sided
-	 * 	- limits[,10] means <=10 with no lower bound check
+	 *  - limits[,10] means <=10 with no lower bound check
 	 *  - limits[10,] means >= 10 with no upper bound
 	 *
 	 * @param string $field

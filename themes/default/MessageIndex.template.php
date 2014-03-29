@@ -57,77 +57,71 @@ function template_topic_listing_above()
 
 	template_pagesection('normal_buttons', 'right');
 
-	if (!empty($context['description']) || !empty($context['moderators']))
-	{
-		echo '
+	echo '
 		<div id="description_board">
 			<h2 class="category_header">', $context['name'];
 
-		if (!empty($context['moderators']))
-			echo '
+
+	if (!empty($context['moderators']))
+		echo '
 				<span class="moderators">(', count($context['moderators']) === 1 ? $txt['moderator'] : $txt['moderators'], ': ', implode(', ', $context['link_moderators']), '.)</span>';
 
-		echo '
-			</h2>';
-
-		echo '
+	echo '
+			</h2>
 			<div class="generalinfo">';
 
-		// Show the board description
-		if (!empty($context['description']))
-			echo '
+	// Show the board description
+	if (!empty($context['description']))
+		echo '
 				<div id="boarddescription">
 					', $context['description'], '
 				</div>';
 
-		echo '
+	echo '
 				<div id="whoisviewing">';
 
-		// If we are showing who is viewing this topic, build it out
-		if (!empty($settings['display_who_viewing']))
-		{
-			if ($settings['display_who_viewing'] == 1)
-				echo count($context['view_members']), ' ', count($context['view_members']) === 1 ? $txt['who_member'] : $txt['members'];
-			else
-				echo empty($context['view_members_list']) ? '0 ' . $txt['members'] : implode(', ', $context['view_members_list']) . (empty($context['view_num_hidden']) || $context['can_moderate_forum'] ? '' : ' (+ ' . $context['view_num_hidden'] . ' ' . $txt['hidden'] . ')');
+	// If we are showing who is viewing this topic, build it out
+	if (!empty($settings['display_who_viewing']))
+	{
+		if ($settings['display_who_viewing'] == 1)
+			echo count($context['view_members']), ' ', count($context['view_members']) === 1 ? $txt['who_member'] : $txt['members'];
+		else
+			echo empty($context['view_members_list']) ? '0 ' . $txt['members'] : implode(', ', $context['view_members_list']) . (empty($context['view_num_hidden']) || $context['can_moderate_forum'] ? '' : ' (+ ' . $context['view_num_hidden'] . ' ' . $txt['hidden'] . ')');
 
-			echo $txt['who_and'], $context['view_num_guests'], ' ', $context['view_num_guests'] == 1 ? $txt['guest'] : $txt['guests'], $txt['who_viewing_board'];
-		}
+		echo $txt['who_and'], $context['view_num_guests'], ' ', $context['view_num_guests'] == 1 ? $txt['guest'] : $txt['guests'], $txt['who_viewing_board'];
+	}
 
-		// Sort topics mumbo-jumbo
-		echo '
+	// Sort topics mumbo-jumbo
+	echo '
 					<ul id="sort_by" class="topic_sorting">';
 
-		if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1)
-			echo '
+	if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1)
+		echo '
 						<li class="listlevel1 quickmod_select_all">
 							<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" class="input_check" />
 						</li>';
 
-		$current_header = $context['topics_headers'][$context['sort_by']];
-		echo '
+	$current_header = $context['topics_headers'][$context['sort_by']];
+	echo '
 						<li class="listlevel1 topic_sorting_row">
 							<a class="sort topicicon img_sort', $context['sort_direction'], '" href="', $current_header['url'], '" title="', $context['sort_title'], '"></a>
 						</li>';
 
-		echo '
+	echo '
 						<li class="listlevel1 topic_sorting_row">', $txt['sort_by'], ': <a href="', $current_header['url'], '">', $txt[$context['sort_by']], '</a>
 							<ul class="menulevel2" id="sortby">';
 
-		foreach ($context['topics_headers'] as $key => $value)
-			echo '
+	foreach ($context['topics_headers'] as $key => $value)
+		echo '
 								<li class="listlevel2 sort_by_item" id="sort_by_item_', $key, '"><a href="', $value['url'], '" class="linklevel2">', $txt[$key], ' ', $value['sort_dir_img'], '</a></li>';
 
-		echo '
+	echo '
 							</ul>
 						</li>
-					</ul>';
-
-		echo '
+					</ul>
 				</div>
 			</div>
 		</div>';
-	}
 }
 
 /**
@@ -192,7 +186,7 @@ function template_topic_listing()
 						<img src="', $topic['first_post']['icon_url'], '" alt="" />';
 
 			echo '
-						', $topic['is_posted_in'] ? '<span class="fred topicicon img_profile" alt=""></span>' : '', '
+						', $topic['is_posted_in'] ? '<span class="fred topicicon img_profile"></span>' : '', '
 					</p>
 					<div class="topic_name" ', (!empty($topic['quick_mod']['modify']) ? 'id="topic_' . $topic['first_post']['id'] . '"  ondblclick="oQuickModifyTopic.modify_topic(\'' . $topic['id'] . '\', \'' . $topic['first_post']['id'] . '\');"' : ''), '>
 						<h4>';
@@ -215,7 +209,7 @@ function template_topic_listing()
 						<ul class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '" role="menubar">' . $topic['pages'] . '</ul>' : '', '
 					</div>
 				</div>
-				<div class="topic_latest', (!empty($modSettings['todayMod']) && $modSettings['todayMod'] > 2) ? ' relative' : ' dd', '">
+				<div class="topic_latest">
 					<p class="topic_stats">
 					', $topic['replies'], ' ', $txt['replies'], '<br />
 					', $topic['views'], ' ', $txt['views'];
@@ -234,7 +228,7 @@ function template_topic_listing()
 						<span class="board_avatar"><a href="', $topic['last_post']['member']['href'], '">', $topic['last_post']['member']['avatar']['image'], '</a></span>';
 
 			echo '
-						<a class="topicicon img_last_post', $context['right_to_left'] ? '_rtl' : '', '" href="', $topic['last_post']['href'], '" alt="', $txt['last_post'], '" title="', $txt['last_post'], '"></a>
+						<a class="topicicon img_last_post', $context['right_to_left'] ? '_rtl' : '', '" href="', $topic['last_post']['href'], '" title="', $txt['last_post'], '"></a>
 						', $topic['last_post']['html_time'], '<br />
 						', $txt['by'], ' ', $topic['last_post']['member']['link'], '
 					</p>
@@ -253,19 +247,19 @@ function template_topic_listing()
 				{
 					// Check permissions on each and show only the ones they are allowed to use.
 					if ($topic['quick_mod']['remove'])
-						echo '<a class="topicicon img_remove" href="', $scripturl, '?action=quickmod;board=', $context['current_board'], '.', $context['start'], ';actions[', $topic['id'], ']=remove;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');"	alt="', $txt['remove_topic'], '" title="', $txt['remove_topic'], '" /></a>';
+						echo '<a class="topicicon img_remove" href="', $scripturl, '?action=quickmod;board=', $context['current_board'], '.', $context['start'], ';actions[', $topic['id'], ']=remove;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');" title="', $txt['remove_topic'], '"></a>';
 
 					if ($topic['quick_mod']['lock'])
-						echo '<a class="topicicon img_locked" href="', $scripturl, '?action=quickmod;board=', $context['current_board'], '.', $context['start'], ';actions[', $topic['id'], ']=lock;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');" alt="', $txt['set_lock'], '" title="', $txt['set_lock'], '" /></a>';
+						echo '<a class="topicicon img_locked" href="', $scripturl, '?action=quickmod;board=', $context['current_board'], '.', $context['start'], ';actions[', $topic['id'], ']=lock;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');" title="', $txt['set_lock'], '"></a>';
 
 					if ($topic['quick_mod']['lock'] || $topic['quick_mod']['remove'])
 						echo '<br />';
 
 					if ($topic['quick_mod']['sticky'])
-						echo '<a class="topicicon img_sticky" href="', $scripturl, '?action=quickmod;board=', $context['current_board'], '.', $context['start'], ';actions[', $topic['id'], ']=sticky;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');" alt="', $txt['set_sticky'], '" title="', $txt['set_sticky'], '" /></a>';
+						echo '<a class="topicicon img_sticky" href="', $scripturl, '?action=quickmod;board=', $context['current_board'], '.', $context['start'], ';actions[', $topic['id'], ']=sticky;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');" title="', $txt['set_sticky'], '"></a>';
 
 					if ($topic['quick_mod']['move'])
-						echo '<a class="topicicon img_move" href="', $scripturl, '?action=movetopic;current_board=', $context['current_board'], ';board=', $context['current_board'], '.', $context['start'], ';topic=', $topic['id'], '.0" alt="', $txt['move_topic'], '" title="', $txt['move_topic'], '" /></a>';
+						echo '<a class="topicicon img_move" href="', $scripturl, '?action=movetopic;current_board=', $context['current_board'], ';board=', $context['current_board'], '.', $context['start'], ';topic=', $topic['id'], '.0" title="', $txt['move_topic'], '"></a>';
 				}
 
 				echo '
@@ -339,6 +333,10 @@ function template_topic_listing_below()
 
 	echo '
 			<script><!-- // --><![CDATA[';
+
+	if (!empty($context['using_relative_time']))
+		echo '
+				$(\'.topic_latest\').addClass(\'relative\');';
 
 	if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1 && !empty($context['topics']) && $context['can_move'])
 		echo '

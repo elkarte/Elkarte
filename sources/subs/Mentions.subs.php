@@ -192,7 +192,7 @@ function addMentions($member_from, $members_to, $msg, $type, $time = null, $stat
  * @param int[] $members_to an array of ids of the members mentioned
  * @param int $msg the id of the message involved in the mention
  * @param int $newstatus status to change the mention to if found as unread,
- *		- default is to set it as read (status = 1)
+ *             - default is to set it as read (status = 1)
  */
 function rlikeMentions($member_from, $members_to, $msg, $newstatus = 1)
 {
@@ -231,7 +231,7 @@ function rlikeMentions($member_from, $members_to, $msg, $newstatus = 1)
  *
  * @package Mentions
  * @param int $id_mention the mention id in the db
- * @param int $status status to update, 'new' => 0,	'read' => 1, 'deleted' => 2, 'unapproved' => 3
+ * @param int $status status to update, 'new' => 0, 'read' => 1, 'deleted' => 2, 'unapproved' => 3
  */
 function changeMentionStatus($id_mention, $status = 1)
 {

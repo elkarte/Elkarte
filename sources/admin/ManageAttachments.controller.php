@@ -269,7 +269,7 @@ class ManageAttachments_Controller extends Action_Controller
 				array('select', 'automanage_attachments', array(0 => $txt['attachments_normal'], 1 => $txt['attachments_auto_space'], 2 => $txt['attachments_auto_years'], 3 => $txt['attachments_auto_months'], 4 => $txt['attachments_auto_16'])),
 				array('check', 'use_subdirectories_for_attachments', 'subtext' => $txt['use_subdirectories_for_attachments_note']),
 				(empty($modSettings['attachment_basedirectories']) ? array('text', 'basedirectory_for_attachments', 40,) : array('var_message', 'basedirectory_for_attachments', 'message' => 'basedirectory_for_attachments_path', 'invalid' => empty($context['valid_basedirectory']), 'text_label' => (!empty($context['valid_basedirectory']) ? $txt['basedirectory_for_attachments_current'] : $txt['basedirectory_for_attachments_warning']))),
-				empty($modSettings['attachment_basedirectories']) && $modSettings['currentAttachmentUploadDir'] == 1 && count($modSettings['attachmentUploadDir']) == 1	? array('text', 'attachmentUploadDir', 'subtext' => $txt['attachmentUploadDir_multiple_configure'], 40, 'invalid' => !$context['valid_upload_dir']) : array('var_message', 'attach_current_directory', 'subtext' => $txt['attachmentUploadDir_multiple_configure'], 'message' => 'attachment_path', 'invalid' => empty($context['valid_upload_dir']), 'text_label' => (!empty($context['valid_upload_dir']) ? $txt['attach_current_dir'] : $txt['attach_current_dir_warning'])),
+				empty($modSettings['attachment_basedirectories']) && $modSettings['currentAttachmentUploadDir'] == 1 && count($modSettings['attachmentUploadDir']) == 1 ? array('text', 'attachmentUploadDir', 'subtext' => $txt['attachmentUploadDir_multiple_configure'], 40, 'invalid' => !$context['valid_upload_dir']) : array('var_message', 'attach_current_directory', 'subtext' => $txt['attachmentUploadDir_multiple_configure'], 'message' => 'attachment_path', 'invalid' => empty($context['valid_upload_dir']), 'text_label' => (!empty($context['valid_upload_dir']) ? $txt['attach_current_dir'] : $txt['attach_current_dir_warning'])),
 				array('int', 'attachmentDirFileLimit', 'subtext' => $txt['zero_for_no_limit'], 6),
 				array('int', 'attachmentDirSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
 			'',
@@ -953,7 +953,7 @@ class ManageAttachments_Controller extends Action_Controller
 									}
 								}
 							}
-							elseif ($file != 'index.php')
+							elseif ($file != 'index.php' && !is_dir($attach_dir . '/' . $file))
 							{
 								if ($fix_errors && in_array('files_without_attachment', $to_fix))
 									@unlink($attach_dir . '/' . $file);
@@ -982,6 +982,7 @@ class ManageAttachments_Controller extends Action_Controller
 
 		// What stage are we at?
 		$context['completed'] = $fix_errors ? true : false;
+		$context['errors_found'] = false;
 		foreach ($context['repair_errors'] as $number)
 			if (!empty($number))
 			{

@@ -123,8 +123,9 @@ function cache_getLastPosts($latestPostOptions)
 /**
  * For a supplied list of message id's, loads the posting details for each.
  *  - Intended to get all the most recent posts.
- *  - Tracks the posts made by this user (from the supplied message list) and loads the id's in to the 'own'
- * 	  or 'any' array.  Reminder The controller needs to check permissions
+ *  - Tracks the posts made by this user (from the supplied message list) and
+ *    loads the id's in to the 'own' or 'any' array.
+ *    Reminder The controller needs to check permissions
  *  - Returns two arrays, one of the posts one of any/own
  *
  * @param int[] $messages

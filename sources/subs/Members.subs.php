@@ -1418,14 +1418,15 @@ function isAnotherAdmin($memberID)
  *
  * @package Members
  * @param mixed[]|string $query can be an array of "type" of conditions,
- *              or a string used as raw query
- *				or a string that represents one of the built in conditions like member_names, not_in_group, etc
- * @param mixed[] $query_params is an array containing the parameters to be passed to the query
- *				'start' and 'limit' used in LIMIT
- *				'order' used raw in ORDER BY
- *				others passed as query params
+ *             or a string used as raw query
+ *             or a string that represents one of the built-in conditions
+ *             like member_names, not_in_group, etc
+ * @param mixed[] $query_params is an array containing the parameters passed to the query
+ *             'start' and 'limit' used in LIMIT
+ *             'order' used raw in ORDER BY
+ *             others passed as query params
  * @param bool $details if true returns additional member details (name, email, ip, etc.)
- *				false will only return an array of member id's that match the conditions
+ *             false will only return an array of member id's that match the conditions
  * @param bool $only_active only fetch active members
  */
 function membersBy($query, $query_params, $details = false, $only_active = true)
@@ -1460,15 +1461,15 @@ function membersBy($query, $query_params, $details = false, $only_active = true)
 				foreach ($query_conditions as $condition => $query_condition)
 				{
 					if ($query_condition == 'member_names')
-						$query_parts[$condition === 'or' ? 'or' : 'and'] = $allowed_conditions[$query_condition]($query_params);
+						$query_parts[$condition === 'or' ? 'or' : 'and'][] = $allowed_conditions[$query_condition]($query_params);
 					else
-						$query_parts[$condition === 'or' ? 'or' : 'and'] = isset($allowed_conditions[$query_condition]) ? $allowed_conditions[$query_condition] : $query_condition;
+						$query_parts[$condition === 'or' ? 'or' : 'and'][] = isset($allowed_conditions[$query_condition]) ? $allowed_conditions[$query_condition] : $query_condition;
 				}
 			}
 			elseif ($query == 'member_names')
-				$query_parts[$condition === 'or' ? 'or' : 'and'] = $allowed_conditions[$query]($query_params);
+				$query_parts[$condition === 'or' ? 'or' : 'and'][] = $allowed_conditions[$query]($query_params);
 			else
-				$query_parts['and'] = isset($allowed_conditions[$query]) ? $allowed_conditions[$query] : $query;
+				$query_parts['and'][] = isset($allowed_conditions[$query]) ? $allowed_conditions[$query] : $query;
 		}
 
 		if (!empty($query_parts['or']))
@@ -1570,15 +1571,15 @@ function countMembersBy($query, $query_params, $only_active = true)
 				foreach ($query_conditions as $condition => $query_condition)
 				{
 					if ($query_condition == 'member_names')
-						$query_parts[$condition === 'or' ? 'or' : 'and'] = $allowed_conditions[$query_condition]($query_params);
+						$query_parts[$condition === 'or' ? 'or' : 'and'][] = $allowed_conditions[$query_condition]($query_params);
 					else
-						$query_parts[$condition === 'or' ? 'or' : 'and'] = isset($allowed_conditions[$query_condition]) ? $allowed_conditions[$query_condition] : $query_condition;
+						$query_parts[$condition === 'or' ? 'or' : 'and'][] = isset($allowed_conditions[$query_condition]) ? $allowed_conditions[$query_condition] : $query_condition;
 				}
 			}
 			elseif ($query == 'member_names')
-				$query_parts[$condition === 'or' ? 'or' : 'and'] = $allowed_conditions[$query]($query_params);
+				$query_parts[$condition === 'or' ? 'or' : 'and'][] = $allowed_conditions[$query]($query_params);
 			else
-				$query_parts['and'] = isset($allowed_conditions[$query]) ? $allowed_conditions[$query] : $query;
+				$query_parts['and'][] = isset($allowed_conditions[$query]) ? $allowed_conditions[$query] : $query;
 		}
 
 		if (!empty($query_parts['or']))

@@ -63,25 +63,28 @@ class Profile_Controller extends Action_Controller
 		// Is this the profile of the user himself or herself?
 		$context['user']['is_owner'] = $memID == $user_info['id'];
 
-		/* Define all the sections within the profile area!
-			We start by defining the permission required - then we take this and turn it into the relevant context ;)
-			Possible fields:
-				For Section:
-					string $title:		Section title.
-					array $areas:		Array of areas within this section.
-
-				For Areas:
-					string $label:		Text string that will be used to show the area in the menu.
-					string $file:		Optional text string that may contain a file name that's needed for inclusion in order to display the area properly.
-					string $custom_url:	Optional href for area.
-					string $function:	Function to execute for this section.
-					bool $enabled:		Should area be shown?
-					string $sc:			Session check validation to do on save - note without this save will get unset - if set.
-					bool $hidden:		Does this not actually appear on the menu?
-					bool $password:		Whether to require the user's password in order to save the data in the area.
-					array $subsections:	Array of subsections, in order of appearance.
-					array $permission:	Array of permissions to determine who can access this area. Should contain arrays $own and $any.
-		*/
+		/**
+		 * Define all the sections within the profile area!
+		 * We start by defining the permission required - then we take this and turn
+		 * it into the relevant context ;)
+		 *
+		 * Possible fields:
+		 *   For Section:
+		 *    - string $title: Section title.
+		 *    - array $areas:  Array of areas within this section.
+		 *
+		 *   For Areas:
+		 *    - string $label:      Text string that will be used to show the area in the menu.
+		 *    - string $file:       Optional text string that may contain a file name that's needed for inclusion in order to display the area properly.
+		 *    - string $custom_url: Optional href for area.
+		 *    - string $function:   Function to execute for this section.
+		 *    - bool $enabled:      Should area be shown?
+		 *    - string $sc:         Session check validation to do on save - note without this save will get unset - if set.
+		 *    - bool $hidden:       Does this not actually appear on the menu?
+		 *    - bool $password:     Whether to require the user's password in order to save the data in the area.
+		 *    - array $subsections: Array of subsections, in order of appearance.
+		 *    - array $permission:  Array of permissions to determine who can access this area. Should contain arrays $own and $any.
+		 */
 		$profile_areas = array(
 			'info' => array(
 				'title' => $txt['profileInfo'],

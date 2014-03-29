@@ -29,6 +29,7 @@ $txt['pbe_notify_boards_once_body_body'] = 'Ein neues Thema, \'{TOPICSUBJECT}\',
 
 ------------------------------------
 Informationen: Es könnten weitere Themen eröffnet worden sein, aber Sie werden keine weiteren Benachrichtigungen hierzu erhalten, bevor Sie nicht einige von ihnen gelesen haben.
+Sie können auf diese E-Mail antworten und die Antwort direkt im Thema veröffentlichen.
 
 Weiterführende Verweise zu {FORUMNAMESHORT}:
 
@@ -96,6 +97,7 @@ $txt['pbe_notify_boards_body_body'] = '
 
 ------------------------------------
 Informationen: {POSTERNAME} hat das Thema \'{TOPICSUBJECT}\' im Forum \'{BOARDNAME}\' eröffnet.
+Sie können auf diese E-Mail antworten und die Antwort direkt im Thema veröffentlichen.
 
 Weiterführende Verweise zu {FORUMNAMESHORT}:
 
@@ -167,6 +169,7 @@ $txt['pbe_notification_reply_body_body'] = '
 
 ------------------------------------
 Informationen: {POSTERNAME} hat auf das Thema \'{TOPICSUBJECT}\' im Forum \'{BOARDNAME}\' geantwortet.
+Sie können auf diese E-Mail antworten und die Antwort direkt im Thema veröffentlichen.
 
 Weiterführende Verweise zu {FORUMNAMESHORT}:
 
@@ -202,6 +205,7 @@ Sie können die Antwort mit Anhängen und/oder Bildern (falls vorhanden) mittels
 
 ------------------------------------
 Informationen: Es könnte weitere Antworten geben, aber Sie werden keine weiteren Benachrichtigungen hierzu erhalten, bevor Sie sie nicht gelesen haben.
+Sie können auf diese E-Mail antworten und die Antwort direkt im Thema veröffentlichen.
 
 Weiterführende Verweise zu {FORUMNAMESHORT}:
 
@@ -239,6 +243,7 @@ $txt['pbe_notification_reply_body_once_body'] = '
 ------------------------------------
 Informationen: {POSTERNAME} hat auf das Thema \'{TOPICSUBJECT}\' im Forum \'{BOARDNAME}\' geantwortet.
 Es könnte weitere Antworten geben, aber Sie werden keine weiteren Benachrichtigungen hierzu erhalten, bevor Sie sie nicht gelesen haben.
+Sie können auf diese E-Mail antworten und die Antwort direkt im Thema veröffentlichen.
 
 Weiterführende Verweise zu {FORUMNAMESHORT}:
 
@@ -266,13 +271,16 @@ Weiterführende Verweise zu {FORUMNAMESHORT}:
 	@description: A notification email sent to the receivers of a personal message
 */
 $txt['pbe_new_pm_body_subject'] = 'Neue private Nachricht: {SUBJECT}';
-$txt['pbe_new_pm_body_body'] = 'Sie haben in {FORUMNAMESHORT} eine private Nachricht von {SENDER} erhalten
+$txt['pbe_new_pm_body_body'] = 'Sie haben in {FORUMNAMESHORT} eine private Nachricht von {SENDER} erhalten.
 
 Die Nachricht lautet:
 
 {MESSAGE}
 
 ------------------------------------
+Informationen:
+Sie können auf diese E-Mail antworten und die Antwort als PN direkt an {SENDER} senden.
+
 Weiterführende Verweise zu {FORUMNAMESHORT}:
 
 <*> Um {FORUMNAMESHORT} im Netz aufzurufen, gehen Sie auf:

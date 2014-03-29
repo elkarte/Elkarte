@@ -363,15 +363,15 @@ class Site_Combiner
 	}
 
 	/**
-	 * Takes a js file and compresses it to save space, will try several methods to
-	 * minimize the code
+	 * Takes a js file and compresses it to save space, will try several methods
+	 * to minimize the code
 	 *
 	 * What it does:
 	 * - Attempt to use the closure-compiler API using code_url
 	 * - Failing that will use jsminplus
 	 * - Failing that it will use the closure-compiler API using js_code
-	 *		a) single block if it can or
-	 *		b) as multiple calls
+	 *    a) single block if it can or
+	 *    b) as multiple calls
 	 * - Failing that will return original uncompressed file
 	 */
 	private function _jsCompiler()

@@ -131,7 +131,7 @@ function template_unread()
 										<img src="', $topic['first_post']['icon_url'], '" alt="" />';
 
 							echo '
-										', $topic['is_posted_in'] ? '<span class="fred topicicon img_profile" alt=""></span>' : '', '
+										', $topic['is_posted_in'] ? '<span class="fred topicicon img_profile"></span>' : '', '
 									</p>
 									<div class="topic_name">
 										<h4>
@@ -151,7 +151,7 @@ function template_unread()
 										', $topic['views'], ' ', $txt['views'], '
 									</p>
 									<p class="topic_lastpost">
-										<a class="topicicon img_last_post" href="', $topic['last_post']['href'], '" alt="', $txt['last_post'], '" title="', $txt['last_post'], '" /></a>
+										<a class="topicicon img_last_post" href="', $topic['last_post']['href'], '" title="', $txt['last_post'], '"></a>
 										', $topic['last_post']['html_time'], '<br />
 										', $txt['by'], ' ', $topic['last_post']['member']['link'], '
 									</p>
@@ -273,7 +273,7 @@ function template_replies()
 										<img src="', $topic['first_post']['icon_url'], '" alt="" />';
 
 							echo '
-										', $topic['is_posted_in'] ? '<span class="fred topicicon img_profile" alt=""></span>' : '', '
+										', $topic['is_posted_in'] ? '<span class="fred topicicon img_profile"></span>' : '', '
 									</p>
 									<div class="topic_name">';
 
@@ -281,7 +281,7 @@ function template_replies()
 			echo '
 										<h4>
 											<a class="new_posts" href="', $topic['new_href'], '" id="newicon', $topic['first_post']['id'], '">' . $txt['new'] . '</a>
-											', $topic['is_sticky'] ? '<strong>' : '', '<span title="', $topic['default_preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
+											', $topic['is_sticky'] ? '<strong>' : '', '<span class="preview" title="', $topic['default_preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
 										</h4>
 									</div>
 									<div class="topic_starter">
@@ -296,7 +296,7 @@ function template_replies()
 										', $topic['views'], ' ', $txt['views'], '
 									</p>
 									<p class="topic_lastpost">
-										<a class="topicicon img_last_post" href="', $topic['last_post']['href'], 'alt="', $txt['last_post'], '" title="', $txt['last_post'], '" /></a>
+										<a class="topicicon img_last_post" href="', $topic['last_post']['href'], ' title="', $txt['last_post'], '"></a>
 										', $topic['last_post']['html_time'], '<br />
 										', $txt['by'], ' ', $topic['last_post']['member']['link'], '
 									</p>

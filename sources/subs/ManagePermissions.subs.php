@@ -1096,7 +1096,7 @@ function deleteAllBoardPermissions($id_group, $id_profile)
 	$db->query('', '
 		DELETE FROM {db_prefix}board_permissions
 		WHERE id_group = {int:current_group}
-		AND	id_profile = {int:current_profile}',
+		AND id_profile = {int:current_profile}',
 		array(
 			'current_group' => $id_group,
 			'current_profile' => $id_profile,

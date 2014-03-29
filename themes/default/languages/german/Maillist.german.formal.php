@@ -47,7 +47,6 @@ $txt['ml_admin_configuration'] = 'Mailbeitragskonfiguration';
 $txt['ml_configuration_desc'] = 'Dieser Bereich erlaubt es Ihnen, einige Einstellungen rund um das Veröffentlichen von Beiträgen per E-Mail vorzunehmen';
 $txt['ml_email'] = 'Per E-Mail veröffentlichen';
 $txt['ml_emailerror_none'] = 'Es gibt keine fehlgeschlagenen Einträge, die Moderation benötigen';
-$txt['ml_email_desc'] = 'Dieser Bereich erlaubt es Ihnen, einige Einstellungen rund um das Veröffentlichen von Beiträgen per E-Mail vorzunehmen';
 $txt['ml_site_settings'] = 'Site-E-Mail-Daten';
 $txt['ml_emailerror'] = 'Fehlgeschlagene E-Mails';
 $txt['ml_emailfilters'] = 'Filter';

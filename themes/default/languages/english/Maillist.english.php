@@ -47,7 +47,6 @@ $txt['ml_admin_configuration'] = 'Maillist Configuration';
 $txt['ml_configuration_desc'] = 'This section allows you to set some preferences for all posting by email related activities';
 $txt['ml_email'] = 'Post by Email';
 $txt['ml_emailerror_none'] = 'There are no failed entries requiring moderation';
-$txt['ml_email_desc'] = 'This section allows you to set some preferences for post by email related activities'; // redundant? s.a.
 $txt['ml_site_settings'] = 'Site Email Details';
 $txt['ml_emailerror'] = 'Failed Emails';
 $txt['ml_emailfilters'] = 'Filters';
@@ -86,7 +85,7 @@ $txt['maillist_mail_from_post'] = 'e.g. noreply@yourdomain.com';
 // Imap settings
 $txt['maillist_imap'] = 'IMAP Settings';
 $txt['maillist_imap_host'] = 'Mailbox Server Name';
-$txt['maillist_imap_host_desc'] = 'Enter a server name, optional port. For example: imap.gmail.com:993';
+$txt['maillist_imap_host_desc'] = 'Enter a mail server host name and optional :port number. e.g. imap.gmail.com or imap.gmail.com:993';
 $txt['maillist_imap_mailbox'] = 'Mailbox Name';
 $txt['maillist_imap_mailbox_desc'] = 'Enter a mailbox name on the server. For example: INBOX';
 $txt['maillist_imap_uid'] = 'Mailbox Username';
@@ -107,7 +106,7 @@ $txt['maillist_imap_reason'] = 'The following should be left BLANK if you intend
 $txt['maillist_imap_missing'] = 'IMAP functions are not installed on your system, no settings are available';
 $txt['maillist_imap_cron'] = 'Fake-Cron (scheduled task)';
 $txt['maillist_imap_cron_desc'] = 'If you can\'t run a cron job on your system, as a last resort check this to instead run this as an ElkArte scheduled task';
-$txt['scheduled_task_desc_pbeIMAP'] = 'Runs the post by email IMAP mailbox program to read new email from the designated inbox';
+$txt['scheduled_task_desc_pbeIMAP'] = 'Runs the post by email IMAP mailbox program to read new email from the designated mailbox';
 
 // General Receiving Settings
 $txt['maillist_inbound'] = 'General Receiving Settings';

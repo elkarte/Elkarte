@@ -145,14 +145,14 @@ a img {
 /* ALSO: This is still not quite pixel perfect everywhere for all browsers,
 /* in particular not for Internet Explorer. They can live with it. */
 /*
-	.button_submit	-	covers input[type=submit], input[type=button],
-						button[type=submit] and button[type=button]
-	.linkbutton		-	covers links, to make them look like a submit button.
-	.button_reset	-	covers input[type=reset] and button[type=reset]
-	.input_check	-	covers input[type=checkbox]
-	.input_radio	-	covers input[type=radio]
-	.input_text		-	covers input[type=text]
-	.input_file		-	covers input[type=file]
+	.button_submit - covers input[type=submit], input[type=button],
+	                 button[type=submit] and button[type=button]
+	.linkbutton    - covers links, to make them look like a submit button.
+	.button_reset  - covers input[type=reset] and button[type=reset]
+	.input_check   - covers input[type=checkbox]
+	.input_radio   - covers input[type=radio]
+	.input_text    - covers input[type=text]
+	.input_file    - covers input[type=file]
 */
 input, button, select, textarea, .editor {
 	font: 83.33%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", Arial, sans-serif;
@@ -443,6 +443,9 @@ em {
 }
 .nowrap {
 	white-space: nowrap;
+}
+.wordbreak {
+	word-break: break-all;
 }
 /* Styles for main headers. */
 .category_header, .forum_category .category_header {
@@ -1269,8 +1272,9 @@ a.bbc_link {
 .like_button:before {background-position: 0 -384px;}
 .unlike_button:before {background-position: 0 -408px;}
 .likes_button:before {background-position: 0 -432px;}
+.quick_edit:before {background-position: 0 -456px;}
 /* No icon here. */
-.quick_edit .linklevel1:before, .linklevel1.post_options:before,
+.linklevel1.post_options:before,
 .follow_ups .linklevel1:before {
 	display: none;
 }
@@ -1281,18 +1285,6 @@ a.bbc_link {
 /* Follow ups gets custom padding (no icon). */
 .follow_ups .linklevel1 {
 	padding: 1px 6px 0 6px;
-}
-/* Quick edit is a special case. */
-.quickbuttons .quick_edit .linklevel1 {
-	position: relative;
-	overflow: hidden;
-}
-.quickbuttons .quick_edit img {
-	position: absolute;
-	top: 50%;
-	left: 0;
-	margin-top: -48px;
-	padding: 40px 5em 40px 4px;
 }
 /* Quickbutton and follow ups drop menus. */
 .quickbuttons .menulevel2, .follow_ups  .menulevel2 {
@@ -1411,7 +1403,7 @@ a.bbc_link {
 #gotop, #gobottom {
 	position: fixed;
 	bottom: 50%;
-	right: 0;
+	left: 0;
 	z-index: 9;
 	padding: 1.3em 0.1em 0 0.1em;
 	height: 1.5em;
@@ -1740,7 +1732,6 @@ dl.settings dt .styled-select select {
 }
 .topic_sorting:hover #sortby, #sortby:hover, #sortby {
 	width: 11em;
-	left: auto;
 	right: -2.5em;
 }
 #sort_by.topic_sorting_recent {
@@ -3531,9 +3522,10 @@ a.help .icon {
 }
 
 /* The actual pop-up wrapper. */
-.popup_window {
+.popup_container .popup_window {
 	margin: 12% auto;
 	width: 480px;
+	font-size: 1em;
 }
 
 /* What it says. ;) */
@@ -3550,12 +3542,6 @@ a.help .icon {
 	width: 16px;
 	height: 2em;
 	background: url(../images/buttons/delete.png) 0 50% no-repeat;
-}
-
-/* Just a font-size reset. */
-/* @todo - Remove description class? */
-.popup_window.description {
-	font-size: 1em;
 }
 
 /* The text content, hopefully helpful. */
@@ -3602,7 +3588,6 @@ a.help .icon {
 	width: 600px;
 }
 #search_options .styled-select {
-	width: 14em;
 	margin: 0 0 3px;
 }
 #advanced_search dt {
@@ -3673,15 +3658,15 @@ a.help .icon {
 
 /*	$MEMBERLIST		*/
 /* ------------------------------------------------------- */
-.mlist {
+.mlist, .whos_online {
 	display: table;
 	width: 100%;
 	border-collapse: collapse;
 }
-.mlist li {
+.mlist li, .whos_online dt, .whos_online dd {
 	display: table-row;
 }
-.mlist li div {
+.mlist li div, .whos_online dt div, .whos_online dd div {
 	display: table-cell;
 	padding: 5px 8px;
 }
@@ -3700,6 +3685,21 @@ a.help .icon {
 }
 .mlist_header {
 	font-weight: bold;
+}
+.whos_online dt {
+	font-weight: bold;
+}
+dl.no_members {
+	display: none;
+}
+.online_member {
+	min-width: 40%;
+}
+.track_ip:before {
+	content: "(";
+}
+.track_ip:after {
+	content: ")";
 }
 #memberlist {
 	margin: 6px 0 0 0;
@@ -4074,9 +4074,6 @@ a.help .icon {
 		text-overflow: ellipsis;
 		line-height: inherit;
 	}
-	.board_latest {
-		min-width: 22em;
-	}
 	.board_row {
 		min-width: 20em;
 	}
@@ -4085,6 +4082,9 @@ a.help .icon {
 	}
 	.board_lastposter {
 		display: block;
+	}
+	.board_lastpost, .board_latest {
+		min-width: 14em;
 	}
 	.board_name:after {
 		display: block;
@@ -4124,10 +4124,13 @@ a.help .icon {
 		display: none;
 	}
 	.poster {
-		min-width: 10em;
+		min-width: 7em;
+	}
+	.poster .poster_online {
+		display: none;
 	}
 	.postarea {
-		margin: 0 0 0 8em;
+		margin: 0 0 0 7em;
 	}
 	.quickbuttons .modified {
 		display: block;
@@ -4180,6 +4183,7 @@ a.help .icon {
 	}
 	.topic_name, .topic_starter {
 		margin-right: 18px;
+	}
 }
 /* This one does 540 and smaller screens at default font size. */
 @media screen and (max-width: 33.750em) {
@@ -4232,7 +4236,7 @@ a.help .icon {
 	.locked_row, .sticky_row, .basic_row,.topic_listing, .topic_listing>li {
 		display: block;
 	}
-	.sticky_row .topic_info:before, .locked_row .topic_info:before,	.locked_row.sticky_row .topic_info:before {
+	.sticky_row .topic_info:before, .locked_row .topic_info:before, .locked_row.sticky_row .topic_info:before {
 		margin-right: 0;
 	}
 	.topic_icons, .topic_moderation {
@@ -4285,7 +4289,7 @@ a.help .icon {
 		padding-right: 2px;
 	}
 	#gobottom, #gotop {
-		padding-left: 0.25em;
+		padding-right: 0.25em;
 	}
 	#message_index_jump_to {
 		display: block;
@@ -4374,9 +4378,6 @@ a.help .icon {
 	.topic_listing>li {
 		margin-bottom: 5px;
 	}
-	.topic_name h4 {
-		font-size: 1.786em;
-	}
 	.icon_anchor {
 		min-width: 0;
 	}
@@ -4400,8 +4401,16 @@ a.help .icon {
 	.views_text, .nextlinks {
 		display: none !important;
 	}
-	#top, #gotop, #gobottom {
-		display: none;
+	#gotop, #gobottom {
+		bottom: 0%;
+		padding: 0.2em 0.1em;
+		height: 1em;
+		width: 1.2em;
+		top: auto;
+		text-align: center;
+	}
+	#gotop {
+		margin-left: 1.45em;
 	}
 	.admin_menu li {
 		float: left;
@@ -4558,6 +4567,12 @@ a.help .icon {
 	}
 	.mlist li .website, .mlist li .date_registered {
 		display: none;
+	}
+	.whos_online dt {
+		display: none;
+	}
+	.whos online dd, .whos_online dd div {
+		display: block;
 	}
 }
 /* This one does 480px screens at default font size. */

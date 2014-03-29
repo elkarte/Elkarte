@@ -180,7 +180,7 @@ function template_maintenance()
 					}
 
 					function show_msg() {
-						$(\'#progress_msg\').html(\'<div><img  class="loading" src="', $settings['actual_images_url'], '/loading.gif" alt="loading.gif" />&nbsp; ', $txt['attachment_transfer_progress'], '<\/div>\');
+						$(\'#progress_msg\').html(\'<div><i class="fa fa-spinner fa-spin" alt="loading"></i>&nbsp;', $txt['attachment_transfer_progress'], '<\/div>\');
 						show_progress();
 					}
 

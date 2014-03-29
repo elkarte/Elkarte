@@ -772,14 +772,14 @@ a.active {
 #gotop, #gobottom {
 	border: 1px solid #222;
 	border-bottom: none;
-	border-radius: 20px 0 0 0;
+	border-radius: 0 20px 0 0;
 	background: #111;
 	color: #eee;
 	opacity: 0.2;
 }
 #gobottom {
 	border-top: none;
-	border-radius: 0 0 0 20px;
+	border-radius: 0 0 20px 0;
 }
 #gotop:hover, #gobottom:hover {
 	color: #444;
@@ -921,6 +921,7 @@ span.views_text {
 }
 .topic_listing li {
 	border-bottom: 1px solid #eee;
+	border-top: 1px solid #eee;
 }
 .topic_listing li.sticky_row {
 	border-bottom: 1px solid #fff;
@@ -1025,25 +1026,25 @@ span.views_text {
 .warningbox {
 	padding: 6px 12px;
 	border: 1px solid #ffd324;
-	border-left: 5px solid #ffd324;
+	border-left-width: 5px;
 	background: #fff6ca;
 }
 .successbox {
 	padding: 6px 12px;
 	border: 1px solid #9ece9e;
-	border-left: 5px solid #9ece9e;
+	border-left-width: 5px;
 	background: #e8f5df;
 }
 .infobox {
 	padding: 6px 12px;
 	border: 1px solid #3a87ad;
-	border-left: 5px solid #3a87ad;
+	border-left-width: 5px;
 	background: #d9edf7;
 }
 .errorbox {
 	padding: 6px 12px;
 	border: 1px solid #ce9e9e;
-	border-left: 5px solid #ce9e9e;
+	border-left-width: 5px;
 	background: #f5dfdf;
 }
 
@@ -1245,12 +1246,12 @@ span.views_text {
 .mlist .mlist_header div {
 	border-top: none;
 }
-.mlist li div {
+.mlist li div, .whos_online dd:nth-child(odd) div {
 	background-color: #fff;
 	border-bottom: 1px solid #ccc;
 	border-top: 1px solid #ccc;
 }
-.mlist li.alternate_row div {
+.mlist li.alternate_row div, .whos_online dd:nth-child(even) div {
 	background-color: #fafafa;
 	border-bottom: 1px solid #ccc;
 	border-top: 1px solid #ccc;
@@ -1353,6 +1354,13 @@ span.views_text {
 }
 /* This one does up to 540 screens. */
 @media screen and (max-width: 33.750em) {
+	#gotop, #gobottom {
+		border-radius: 0px 0px 0px;
+		border-top: 0px;
+	}
+	#gotop {
+		border-radius: 0px 8px 0px 0px;
+	}
 	.board_latest {
 		border-left: 0;
 	}
@@ -1501,6 +1509,30 @@ span.views_text {
 	}
 	#search_form * {
 		float: none;
+	}
+	.whos_online dd div {
+		border-bottom: none !important;
+		border-top: none !important;
+	}
+	.whos_online dd:nth-child(even), .whos_online dd:nth-child(odd) {
+		margin-top: 1px;
+		border-top: 1px solid #ccc;
+	}
+	.whos_online dd:last-child {
+		border-bottom: 1px solid #ccc;
+	}
+	.online_member {
+		font-size: 1.6em;
+	}
+	.track_ip {
+		float: right;
+		font-size: 0.7em;
+	}
+	.track_ip:before {
+		content: "";
+	}
+	.track_ip:after {
+		content: "";
 	}
 }
 @media screen and (max-width: 30em) {

@@ -190,10 +190,7 @@ $txt['ban_not_found'] = 'Ban not found';
 $txt['ban_unknown_restriction_type'] = 'Restriction type unknown';
 $txt['ban_name_empty'] = 'The name of the ban was left empty';
 $txt['ban_id_empty'] = 'Dang, sorry. We tried to find this ban ID, but it can\'t be found.';
-<<<<<<< HEAD
-=======
 $txt['ban_group_id_empty'] = 'A ban group needs a group ID, and this group didn\'t have any.';
->>>>>>> upstream/master
 $txt['ban_no_triggers'] = 'Did you forget to select ban triggers? We need at least one, and we haven\'t got any.';
 $txt['ban_ban_item_empty'] = 'Ban trigger not found';
 $txt['impossible_insert_new_bangroup'] = 'An error occurred while inserting the new ban';
@@ -226,6 +223,7 @@ $txt['sendtopic_WaitTime_broken'] = 'The last topic sent from your IP was less t
 $txt['sendmail_WaitTime_broken'] = 'The last email sent from your IP was less than %1$d seconds ago. Please try again later.';
 $txt['search_WaitTime_broken'] = 'Your last search was less than %1$d seconds ago. Please try again later.';
 $txt['remind_WaitTime_broken'] = 'Your last reminder was less than %1$d seconds ago. Please try again later.';
+$txt['contact_WaitTime_broken'] = 'The last time you tried to use the contact form was less than %1$d seconds ago. Please try again later.';
 
 $txt['email_missing_data'] = 'We need something in both the subject and message boxes.';
 

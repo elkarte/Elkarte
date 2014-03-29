@@ -86,7 +86,7 @@ function detectFulltextIndex()
  */
 function createSphinxConfig()
 {
-	global $context, $db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_character_set, $modSettings;
+	global $context, $db_server, $db_name, $db_user, $db_passwd, $db_prefix, $modSettings;
 
 	// set up to ouput a file to the users browser
 	ob_end_clean();
@@ -145,9 +145,10 @@ source elkarte_source
 	sql_user			= ', $db_user, '
 	sql_pass			= ', $db_passwd, '
 	sql_db				= ', $db_name, '
-	sql_port			= 3306', empty($db_character_set) ? '' : '
-	sql_query_pre		= SET NAMES ' . $db_character_set, '
-	sql_query_pre		=	\
+	sql_port			= 3306
+	sql_query_pre		= SET NAMES utf8
+	sql_query_pre		= SET SESSION query_cache_type=OFF
+	sql_query_pre		= \
 		REPLACE INTO ', $db_prefix, 'settings (variable, value) \
 		SELECT \'sphinx_indexed_msg_until\', MAX(id_msg) \
 		FROM ', $db_prefix, 'messages
@@ -183,7 +184,8 @@ source elkarte_source
 
 source elkarte_delta_source : elkarte_source
 {
-	sql_query_pre	= ', isset($db_character_set) ? 'SET NAMES ' . $db_character_set : '', '
+	sql_query_pre = SET NAMES utf8
+	sql_query_pre = SET SESSION query_cache_type=OFF
 	sql_query_range	= \
 		SELECT s1.value, s2.value \
 		FROM ', $db_prefix, 'settings AS s1, ', $db_prefix, 'settings AS s2 \

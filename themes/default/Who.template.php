@@ -55,62 +55,51 @@ function template_whos_online()
 	global $context, $settings, $scripturl, $txt;
 
 	echo '
-			<div class="topic_table" id="mlist">
-				<table class="table_grid" >
-					<thead>
-						<tr class="table_head">
-							<th scope="col" class="lefttext" style="width:40%">
-								<a href="', $scripturl, '?action=who;start=', $context['start'], ';show=', $context['show_by'], ';sort=user', $context['sort_direction'] != 'down' && $context['sort_by'] == 'user' ? '' : ';asc', '" rel="nofollow">', $txt['who_user'], $context['sort_by'] == 'user' ? '<img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
-							</th>
-							<th scope="col" class="lefttext" style="width:10%">
-								<a href="', $scripturl, '?action=who;start=', $context['start'], ';show=', $context['show_by'], ';sort=time', $context['sort_direction'] == 'down' && $context['sort_by'] == 'time' ? ';asc' : '', '" rel="nofollow">', $txt['who_time'], $context['sort_by'] == 'time' ? '<img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
-							</th>
-							<th scope="col" class="lefttext" style="width:50%">', $txt['who_action'], '</th>
-						</tr>
-					</thead>
-					<tbody>';
+			<div id="mlist">
+				<dl class="whos_online', empty($context['members']) ? ' no_members' : '', '">
+					<dt class="table_head">
+						<div class="online_member">
+							<a href="', $scripturl, '?action=who;start=', $context['start'], ';show=', $context['show_by'], ';sort=user', $context['sort_direction'] != 'down' && $context['sort_by'] == 'user' ? '' : ';asc', '" rel="nofollow">', $txt['who_user'], $context['sort_by'] == 'user' ? '<img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
+						</div>
+						<div class="online_time">
+							<a href="', $scripturl, '?action=who;start=', $context['start'], ';show=', $context['show_by'], ';sort=time', $context['sort_direction'] == 'down' && $context['sort_by'] == 'time' ? ';asc' : '', '" rel="nofollow">', $txt['who_time'], $context['sort_by'] == 'time' ? '<img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
+						</div>
+						<div class="online_action">', $txt['who_action'], '</div>
+					</dt>';
 
 	// For every member display their name, time and action (and more for admin).
-	$alternate = 0;
-
 	foreach ($context['members'] as $member)
 	{
 		// $alternate will either be true or false. If it's true, use "windowbg2" and otherwise use "windowbg".
 		echo '
-						<tr class="windowbg', $alternate ? '2' : '', '">
-							<td>
-								<span class="member', $member['is_hidden'] ? ' hidden' : '', '">
-									', $member['is_guest'] ? $member['name'] : '<a href="' . $member['href'] . '" title="' . $txt['profile_of'] . ' ' . $member['name'] . '"' . (empty($member['color']) ? '' : ' style="color: ' . $member['color'] . '"') . '>' . $member['name'] . '</a>', '
-								</span>';
+					<dd class="online_row">
+						<div class="online_member">
+							<span class="member', $member['is_hidden'] ? ' hidden' : '', '">
+								', $member['is_guest'] ? $member['name'] : '<a href="' . $member['href'] . '" title="' . $txt['profile_of'] . ' ' . $member['name'] . '"' . (empty($member['color']) ? '' : ' style="color: ' . $member['color'] . '"') . '>' . $member['name'] . '</a>', '
+							</span>';
 
 		if (!empty($member['ip']))
 			echo '
-								(<a href="' . $scripturl . '?action=', ($member['is_guest'] ? 'trackip' : 'profile;area=history;sa=ip;u=' . $member['id']), ';searchip=' . $member['ip'] . '">' . $member['ip'] . '</a>)';
+							<a class="track_ip" href="' . $scripturl . '?action=', ($member['is_guest'] ? 'trackip' : 'profile;area=history;sa=ip;u=' . $member['id']), ';searchip=' . $member['ip'] . '">' . $member['ip'] . '</a>';
 
 		echo '
-							</td>
-							<td>', $member['time'], '</td>
-							<td>', $member['action'], '</td>
-						</tr>';
-
-		// Switch alternate to whatever it wasn't this time. (true -> false -> true -> false, etc.)
-		$alternate = !$alternate;
-	}
-
-	// No members?
-	if (empty($context['members']))
-	{
-		echo '
-						<tr class="windowbg2">
-							<td colspan="3" class="centertext">
-							', $txt['who_no_online_' . ($context['show_by'] == 'guests' || $context['show_by'] == 'spiders' ? $context['show_by'] : 'members')], '
-							</td>
-						</tr>';
+						</div>
+						<div class="online_time">', $member['time'], '</div>
+						<div class="online_action">', $member['action'], '</div>
+					</dd>';
 	}
 
 	echo '
-					</tbody>
-				</table>
+				</dl>';
+	
+// No members?
+	if (empty($context['members']))
+		echo '
+				<div class="centertext">
+					', $txt['who_no_online_' . ($context['show_by'] == 'guests' || $context['show_by'] == 'spiders' ? $context['show_by'] : 'members')], '
+				</div>';
+
+	echo '
 			</div>';
 }
 

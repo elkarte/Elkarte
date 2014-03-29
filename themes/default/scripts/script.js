@@ -273,7 +273,7 @@ function reqWin(desktopURL, alternateWidth, alternateHeight, noScrollbars)
 function reqOverlayDiv(desktopURL, sHeader, sIcon)
 {
 	// Set up our div details
-	var sAjax_indicator = '<div class="centertext"><img src="' + elk_images_url + '/loading.gif" ></div>';
+	var sAjax_indicator = '<div class="centertext"><i class="fa fa-spinner fa-spin fa-2x" alt="loading"></i></div>';
 
 	sIcon = elk_images_url + '/' + (typeof(sIcon) === 'string' ? sIcon : 'helptopics.png');
 	sHeader = typeof(sHeader) === 'string' ? sHeader : help_popup_heading_text;
@@ -1266,9 +1266,6 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
  *	iTopicId:
  *	sAction:
  *	sLabelIconList:
- *	sSessionId:
- *	sSessionVar:
- *	sScriptUrl:
  *
  * The following are style elements that can be passed
  *	sBoxBackground:
@@ -1295,10 +1292,6 @@ function IconList(oOptions)
 	this.funcParent = this;
 	this.iCurMessageId = 0;
 	this.iCurTimeout = 0;
-
-	// Add backwards compatibility with old themes.
-	if (!('sSessionVar' in this.opt))
-		this.opt.sSessionVar = 'sesc';
 
 	// Set a default Action
 	if (!('sAction' in this.opt) || this.opt.sAction === null)

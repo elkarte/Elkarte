@@ -41,6 +41,7 @@ $txt['search_settings_desc'] = 'Hier können Sie grundlegende Einstellungen für
 $txt['search_settings_title'] = 'Sucheinstellungen';
 
 $txt['search_weights_desc'] = 'Hier können Sie die individuelle Gewichtung einzelner Suchkriterien festlegen.';
+$txt['search_weights_none'] = 'Gewichtungsfaktoren werden nicht benötigt, wenn Sphinx verwendet wird, das auf interne Methoden auf Basis von Begriffsnäherung und Schlüsselworthäufigkeit zurückgreift.';
 $txt['search_weights_title'] = 'Suche - Gewichtungen';
 $txt['search_weights_total'] = 'Gesamt';
 $txt['search_weights_save'] = 'Speichern';

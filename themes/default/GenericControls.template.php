@@ -137,7 +137,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 				$editor_container[\'', $editor_id, '\'] = $(".sceditor-container");
 				$editor_data[\'', $editor_id, '\'].css(\'code {white-space: pre;}\').createPermanentDropDown();
 				$editor_container[\'', $editor_id, '\'].width("100%").height("100%");', $editor_context['rich_active'] ? '' : '
-				$editor_data[\'', $editor_id, '\'].setTextMode();', '
+				$editor_data[\'' . $editor_id . '\'].setTextMode();', '
 				if (!(is_ie || is_ff || is_opera || is_safari || is_chrome))
 					$(".sceditor-button-source").hide();
 				', isset($context['post_error']['errors']['no_message']) || isset($context['post_error']['errors']['long_message']) ? '
@@ -153,7 +153,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
  */
 function template_control_richedit_buttons($editor_id)
 {
-	global $context, $settings, $options, $txt;
+	global $context, $options, $txt;
 
 	$editor_context = &$context['controls']['richedit'][$editor_id];
 
@@ -161,7 +161,7 @@ function template_control_richedit_buttons($editor_id)
 	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
 		echo '
 		<span class="draftautosave smalltext">
-			<span id="throbber" style="display:none"><img src="' . $settings['images_url'] . '/loading_sm.gif" alt="" class="centericon" />&nbsp;</span>
+			<span id="throbber" style="display:none"><i class="fa fa-spinner fa-spin" alt="loading"></i>&nbsp;</span>
 			<span id="draft_lastautosave" ></span>
 		</span>';
 

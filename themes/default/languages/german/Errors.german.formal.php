@@ -190,6 +190,7 @@ $txt['ban_not_found'] = 'Sperre nicht gefunden';
 $txt['ban_unknown_restriction_type'] = 'Beschränkungstyp unbekannt';
 $txt['ban_name_empty'] = 'Der Name der Sperre wurde leer gelassen';
 $txt['ban_id_empty'] = 'Verdammt, Entschuldigung. Wir haben versucht, diese Sperr-ID zu finden, aber hatten keinen Erfolg.';
+$txt['ban_group_id_empty'] = 'Eine Sperrgruppe benötigt eine Gruppen-ID, und diese Gruppe hatte keine.';
 $txt['ban_no_triggers'] = 'Haben Sie vergessen, Auslöser für die Sperre auszuwählen? Wir brauchen mindestens einen, haben aber keinen.';
 $txt['ban_ban_item_empty'] = 'Sperrauslöser nicht gefunden';
 $txt['impossible_insert_new_bangroup'] = 'Ein Fehler ist beim Einfügen der neuen Sperre aufgetreten';
@@ -222,6 +223,7 @@ $txt['sendtopic_WaitTime_broken'] = 'Das letzte Thema wurde von Ihrer IP vor wen
 $txt['sendmail_WaitTime_broken'] = 'Die letzte E-Mail wurde von Ihrer IP vor weniger als %1$d Sekunden versandt. Bitte versuchen Sie es später erneut.';
 $txt['search_WaitTime_broken'] = 'Ihre letzte Suche erfolgte vor weniger als %1$d Sekunden. Bitte versuchen Sie es später erneut.';
 $txt['remind_WaitTime_broken'] = 'Ihre letzte Erinnerung erfolgte vor weniger als %1$d Sekunden. Bitte versuchen Sie es später erneut.';
+$txt['contact_WaitTime_broken'] = 'Ihr letzter Versuch, das Kontaktformular zu nutzen, fand vor weniger als %1$d Sekunden statt. Bitte versuchen Sie es später erneut.';
 
 $txt['email_missing_data'] = 'Wir brauchen sowohl in der Betreffzeile als auch im Nachrichtenfeld etwas Text.';
 

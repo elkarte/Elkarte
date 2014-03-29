@@ -455,7 +455,7 @@ class Recent_Controller extends Action_Controller
 		foreach ($sort_methods as $key => $val)
 			$context['topics_headers'][$key] = array(
 				'url' => $scripturl . '?action=unread' . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], $_REQUEST['start']) . ';sort=subject' . ($context['sort_by'] == 'subject' && $context['sort_direction'] == 'up' ? ';desc' : ''),
-				'sort_dir_img' => $context['sort_by'] == $key ? '<img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" title="' . $context['sort_title']	.'" />' : '',
+				'sort_dir_img' => $context['sort_by'] == $key ? '<img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" title="' . $context['sort_title'] .'" />' : '',
 			);
 
 		if (!empty($_REQUEST['c']) && is_array($_REQUEST['c']) && count($_REQUEST['c']) == 1)
@@ -747,12 +747,13 @@ class Recent_Controller extends Action_Controller
 					)
 					SELECT t.id_topic, t.id_board, t.id_last_msg, IFNULL(lmr.id_msg, 0) AS id_msg' . (!in_array($_REQUEST['sort'], array('t.id_last_msg', 't.id_topic')) ? ', ' . $_REQUEST['sort'] . ' AS sort_key' : '') . '
 					FROM {db_prefix}messages AS m
-						INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
+						INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)' . ($modSettings['enable_unwatch'] ? '
+						LEFT JOIN {db_prefix}log_topics AS lt ON (t.id_topic = lt.id_topic AND lt.id_member = {int:current_member})' : '') . '
 						LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})' . (isset($sortKey_joins[$_REQUEST['sort']]) ? $sortKey_joins[$_REQUEST['sort']] : '') . '
 					WHERE m.id_member = {int:current_member}' . (!empty($board) ? '
-						AND t.id_board = {int:current_board}' : '') .
-						($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
-						($modSettings['enable_unwatch'] ? ' AND IFNULL(lt.unwatched, 0) != 1' : '') . '
+						AND t.id_board = {int:current_board}' : '') . ($modSettings['postmod_active'] ? '
+						AND t.approved = {int:is_approved}' : '') . ($modSettings['enable_unwatch'] ? '
+						AND IFNULL(lt.unwatched, 0) != 1' : '') . '
 					GROUP BY m.id_topic',
 					array(
 						'current_board' => $board,
@@ -793,6 +794,7 @@ class Recent_Controller extends Action_Controller
 				);
 				list ($num_topics) = $db->fetch_row($request);
 				$db->free_result($request);
+				$min_message = 0;
 			}
 			else
 			{

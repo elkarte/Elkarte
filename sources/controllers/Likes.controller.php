@@ -319,7 +319,6 @@ class Likes_Controller extends Action_Controller
 				'subject' => array(
 					'header' => array(
 						'value' => $txt['subject'],
-						'class' => 'lefttext',
 					),
 					'data' => array(
 						'db' => 'subject',
@@ -332,7 +331,6 @@ class Likes_Controller extends Action_Controller
 				'name' => array(
 					'header' => array(
 						'value' => $txt['board'],
-						'class' => 'lefttext',
 					),
 					'data' => array(
 						'db' => 'name',
@@ -345,7 +343,6 @@ class Likes_Controller extends Action_Controller
 				'poster_name' => array(
 					'header' => array(
 						'value' => $txt['username'],
-						'class' => 'lefttext',
 					),
 					'data' => array(
 						'db' => 'poster_name',
@@ -424,7 +421,6 @@ class Likes_Controller extends Action_Controller
 				'subject' => array(
 					'header' => array(
 						'value' => $txt['subject'],
-						'class' => 'lefttext',
 					),
 					'data' => array(
 						'db' => 'subject',
@@ -437,7 +433,6 @@ class Likes_Controller extends Action_Controller
 				'name' => array(
 					'header' => array(
 						'value' => $txt['board'],
-						'class' => 'lefttext',
 					),
 					'data' => array(
 						'db' => 'name',
@@ -450,7 +445,6 @@ class Likes_Controller extends Action_Controller
 				'likes' => array(
 					'header' => array(
 						'value' => $txt['likes'],
-						'class' => 'lefttext',
 					),
 					'data' => array(
 						'db' => 'likes',

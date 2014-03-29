@@ -52,7 +52,7 @@
  *
  * For each option:
  *  - type (see above), variable name, size/possible values.
- *		OR make type '' for an empty string for a horizontal rule.
+ *    OR make type '' for an empty string for a horizontal rule.
  *  - SET preinput - to put some HTML prior to the input box.
  *  - SET postinput - to put some HTML following the input box.
  *  - SET invalid - to mark the data as invalid.
