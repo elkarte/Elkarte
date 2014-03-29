@@ -730,7 +730,7 @@ class ManageBans_Controller extends Action_Controller
 			if (!empty($context['ban_suggestions']['member']['id']))
 				$context['ban_suggestions']['other_ips'] = banLoadAdditionalIPs($context['ban_suggestions']['member']['id']);
 
-			return action_edit();
+			return $this->action_edit();
 		}
 
 		if (isset($_POST['ban_items']))
