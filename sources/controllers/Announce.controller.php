@@ -166,9 +166,41 @@ class Announce_Controller extends Action_Controller
 				redirectexit('board=' . $board . '.0');
 		}
 
+		$this->_send_announcement($data['member_info'], $topic_info);
+
+		// Provide an overall indication of progress, this is not strictly correct
+		if ($data['member_count'] < $conditions['limit'])
+			$context['percentage_done'] = 100;
+		else
+			$context['percentage_done'] = round(100 * $context['start'] / $modSettings['latestMember'], 1);
+
+		// Prepare for the template
+		$context['move'] = empty($_REQUEST['move']) ? 0 : 1;
+		$context['go_back'] = empty($_REQUEST['goback']) ? 0 : 1;
+		$context['membergroups'] = implode(',', $who);
+		$context['topic_subject'] = $topic_info['subject'];
+		$context['sub_template'] = 'announcement_send';
+
+		// Go back to the correct language for the user ;)
+		if (!empty($modSettings['userLanguage']))
+			loadLanguage('Post');
+	}
+
+	/**
+	 * Handles the sending of an announcement.
+	 *
+	 * @param mixed[] $member_info - An array of members' data, in particular:
+	 *                 - language
+	 *                 - id
+	 *                 - email
+	 */
+	private function _send_announcement($member_info, $topic_info)
+	{
+		global $modSettings, $language, $scripturl, $context, $topic;
+
 		// Loop through all members that'll receive an announcement in this batch.
 		$announcements = array();
-		foreach ($data['member_info'] as $row)
+		foreach ($member_info as $row)
 		{
 			$cur_language = empty($row['language']) || empty($modSettings['userLanguage']) ? $language : $row['language'];
 
@@ -195,24 +227,7 @@ class Announce_Controller extends Action_Controller
 		}
 
 		// For each language send a different mail - low priority...
-		foreach ($announcements as $lang => $mail)
+		foreach ($announcements as $mail)
 			sendmail($mail['recipients'], $mail['subject'], $mail['body'], null, null, false, 5);
-
-		// Provide an overall indication of progress, this is not strictly correct
-		if ($data['member_count'] < $conditions['limit'])
-			$context['percentage_done'] = 100;
-		else
-			$context['percentage_done'] = round(100 * $context['start'] / $modSettings['latestMember'], 1);
-
-		// Prepare for the template
-		$context['move'] = empty($_REQUEST['move']) ? 0 : 1;
-		$context['go_back'] = empty($_REQUEST['goback']) ? 0 : 1;
-		$context['membergroups'] = implode(',', $who);
-		$context['topic_subject'] = $topic_info['subject'];
-		$context['sub_template'] = 'announcement_send';
-
-		// Go back to the correct language for the user ;)
-		if (!empty($modSettings['userLanguage']))
-			loadLanguage('Post');
 	}
 }
