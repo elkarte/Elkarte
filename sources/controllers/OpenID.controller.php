@@ -140,7 +140,7 @@ class OpenID_Controller extends Action_Controller
 			{
 				require_once(CONTROLLERDIR . '/Register.controller.php');
 				$controller = new Register_Controller();
-				return $controller->action_register2(true);
+				return $controller->do_register(true);
 			}
 			else
 				redirectexit('action=register');
