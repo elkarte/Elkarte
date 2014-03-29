@@ -218,39 +218,8 @@ class Calendar_Controller extends Action_Controller
 				$controller = new Post_Controller();
 				return $controller->action_post();
 			}
-			// New...
-			elseif ($event_id == -1)
-			{
-				$eventOptions = array(
-					'id_board' => 0,
-					'id_topic' => 0,
-					'title' => Util::substr($_REQUEST['evtitle'], 0, 100),
-					'member' => $user_info['id'],
-					'start_date' => sprintf('%04d-%02d-%02d', $_POST['year'], $_POST['month'], $_POST['day']),
-					'span' => isset($_POST['span']) && $_POST['span'] > 0 ? min((int) $modSettings['cal_maxspan'], (int) $_POST['span'] - 1) : 0,
-				);
-				insertEvent($eventOptions);
-			}
-			// Deleting...
-			elseif (isset($_REQUEST['deleteevent']))
-				removeEvent($event_id);
-			// ... or just update it?
-			else
-			{
-				// There could be already a topic you are not allowed to modify
-				if (!allowedTo('post_new') && empty($modSettings['disableNoPostingCalendarEdits']))
-					$eventProperties = getEventProperties($event_id, true);
 
-				$eventOptions = array(
-					'title' => Util::substr($_REQUEST['evtitle'], 0, 100),
-					'span' => empty($modSettings['cal_allowspan']) || empty($_POST['span']) || $_POST['span'] == 1 || empty($modSettings['cal_maxspan']) || $_POST['span'] > $modSettings['cal_maxspan'] ? 0 : min((int) $modSettings['cal_maxspan'], (int) $_POST['span'] - 1),
-					'start_date' => strftime('%Y-%m-%d', mktime(0, 0, 0, (int) $_REQUEST['month'], (int) $_REQUEST['day'], (int) $_REQUEST['year'])),
-					'id_board' => isset($eventProperties['id_board']) ? (int) $eventProperties['id_board'] : 0,
-					'id_topic' => isset($eventProperties['id_topic']) ? (int) $eventProperties['id_topic'] : 0,
-				);
-
-				modifyEvent($event_id, $eventOptions);
-			}
+			$this->_action_save($event_id);
 
 			// No point hanging around here now...
 			redirectexit($scripturl . '?action=calendar;month=' . $_POST['month'] . ';year=' . $_POST['year']);
@@ -343,7 +312,7 @@ class Calendar_Controller extends Action_Controller
 	 */
 	public function action_ical()
 	{
-		global $forum_version, $modSettings, $webmaster_email, $mbname;
+		global $modSettings;
 
 		// What do you think you export?
 		isAllowedTo('calendar_view');
@@ -365,50 +334,7 @@ class Calendar_Controller extends Action_Controller
 		if ($event === false)
 			fatal_lang_error('no_access', false);
 
-		// Check the title isn't too long - iCal requires some formatting if so.
-		$title = str_split($event['title'], 30);
-		foreach ($title as $id => $line)
-		{
-			if ($id != 0)
-				$title[$id] = ' ' . $title[$id];
-			$title[$id] .= "\n";
-		}
-
-		// Format the dates.
-		$datestamp = date('Ymd\THis\Z', time());
-		$datestart = $event['year'] . ($event['month'] < 10 ? '0' . $event['month'] : $event['month']) . ($event['day'] < 10 ? '0' . $event['day'] : $event['day']);
-
-		// Do we have a event that spans several days?
-		if ($event['span'] > 1)
-		{
-			$dateend = strtotime($event['year'] . '-' . ($event['month'] < 10 ? '0' . $event['month'] : $event['month']) . '-' . ($event['day'] < 10 ? '0' . $event['day'] : $event['day']));
-			$dateend += ($event['span'] - 1) * 86400;
-			$dateend = date('Ymd', $dateend);
-		}
-
-		// This is what we will be sending later
-		$filecontents = '';
-		$filecontents .= 'BEGIN:VCALENDAR' . "\n";
-		$filecontents .= 'METHOD:PUBLISH' . "\n";
-		$filecontents .= 'PRODID:-//ElkArteCommunity//ElkArte ' . (empty($forum_version) ? 2.0 : strtr($forum_version, array('ElkArte ' => ''))) . '//EN' . "\n";
-		$filecontents .= 'VERSION:2.0' . "\n";
-		$filecontents .= 'BEGIN:VEVENT' . "\n";
-		$filecontents .= 'ORGANIZER;CN="' . $event['realname'] . '":MAILTO:' . $webmaster_email . "\n";
-		$filecontents .= 'DTSTAMP:' . $datestamp . "\n";
-		$filecontents .= 'DTSTART;VALUE=DATE:' . $datestart . "\n";
-
-		// more than one day
-		if ($event['span'] > 1)
-			$filecontents .= 'DTEND;VALUE=DATE:' . $dateend . "\n";
-
-		// event has changed? advance the sequence for this UID
-		if ($event['sequence'] > 0)
-			$filecontents .= 'SEQUENCE:' . $event['sequence'] . "\n";
-
-		$filecontents .= 'SUMMARY:' . implode('', $title);
-		$filecontents .= 'UID:' . $event['eventid'] . '@' . str_replace(' ', '-', $mbname) . "\n";
-		$filecontents .= 'END:VEVENT' . "\n";
-		$filecontents .= 'END:VCALENDAR';
+		$filecontents = build_ical_content($event);
 
 		// Send some standard headers.
 		ob_end_clean();
@@ -495,6 +421,50 @@ class Calendar_Controller extends Action_Controller
 			if (Util::strlen($_POST['evtitle']) > 100)
 				$_POST['evtitle'] = Util::substr($_POST['evtitle'], 0, 100);
 			$_POST['evtitle'] = str_replace(';', '', $_POST['evtitle']);
+		}
+	}
+
+	/**
+	 * Does the save of an event
+	 *
+	 * @param int $event_id - the id of the event being saved (if -1 is a new event)
+	 */
+	private function _action_save($event_id)
+	{
+		global $user_info, $modSettings;
+
+		// New...
+		if ($event_id == -1)
+		{
+			$eventOptions = array(
+				'id_board' => 0,
+				'id_topic' => 0,
+				'title' => Util::substr($_REQUEST['evtitle'], 0, 100),
+				'member' => $user_info['id'],
+				'start_date' => sprintf('%04d-%02d-%02d', $_POST['year'], $_POST['month'], $_POST['day']),
+				'span' => isset($_POST['span']) && $_POST['span'] > 0 ? min((int) $modSettings['cal_maxspan'], (int) $_POST['span'] - 1) : 0,
+			);
+			insertEvent($eventOptions);
+		}
+		// Deleting...
+		elseif (isset($_REQUEST['deleteevent']))
+			removeEvent($event_id);
+		// ... or just update it?
+		else
+		{
+			// There could be already a topic you are not allowed to modify
+			if (!allowedTo('post_new') && empty($modSettings['disableNoPostingCalendarEdits']))
+				$eventProperties = getEventProperties($event_id, true);
+
+			$eventOptions = array(
+				'title' => Util::substr($_REQUEST['evtitle'], 0, 100),
+				'span' => empty($modSettings['cal_allowspan']) || empty($_POST['span']) || $_POST['span'] == 1 || empty($modSettings['cal_maxspan']) || $_POST['span'] > $modSettings['cal_maxspan'] ? 0 : min((int) $modSettings['cal_maxspan'], (int) $_POST['span'] - 1),
+				'start_date' => strftime('%Y-%m-%d', mktime(0, 0, 0, (int) $_REQUEST['month'], (int) $_REQUEST['day'], (int) $_REQUEST['year'])),
+				'id_board' => isset($eventProperties['id_board']) ? (int) $eventProperties['id_board'] : 0,
+				'id_topic' => isset($eventProperties['id_topic']) ? (int) $eventProperties['id_topic'] : 0,
+			);
+
+			modifyEvent($event_id, $eventOptions);
 		}
 	}
 }
