@@ -1566,6 +1566,65 @@ function moveAvatars()
 }
 
 /**
+ * Select a group of attachments to move to a new destination
+ *
+ * Used by maintenance transfer attachments
+ * Returns number found and array of details
+ *
+ * @param string $from source location
+ * @param int $start
+ * @param int $limit
+ */
+function findAttachmentsToMove($from, $start, $limit)
+{
+	$db = database();
+	$attachments = array();
+
+	// Find some attachments to move
+	$request = $db->query('', '
+		SELECT id_attach, filename, id_folder, file_hash, size
+		FROM {db_prefix}attachments
+		WHERE id_folder = {int:folder}
+			AND attachment_type != {int:attachment_type}
+		LIMIT {int:start}, {int:limit}',
+		array(
+			'folder' => $from,
+			'attachment_type' => 1,
+			'start' => $start,
+			'limit' => $limit,
+		)
+	);
+	$number = (int) $db->num_rows($request);
+	while ($row = $db->fetch_assoc($request))
+		$attachments[] = $row;
+	$db->free_result($request);
+
+	return array($number, $attachments);
+}
+
+/**
+ * Update the database to reflect the new directory of an array of attachments
+ *
+ * @param int[] $moved integer array of attachment ids
+ * @param string $new_dir new directory string
+ */
+function moveAttachments($moved, $new_dir)
+{
+	$db = database();
+
+	// Update the database
+	$db->query('', '
+		UPDATE {db_prefix}attachments
+		SET id_folder = {int:new}
+		WHERE id_attach IN ({array_int:attachments})',
+		array(
+			'attachments' => $moved,
+			'new' => $new_dir,
+		)
+	);
+}
+
+/**
  * Extend the message body with a removal message.
  *
  * @package Attachments

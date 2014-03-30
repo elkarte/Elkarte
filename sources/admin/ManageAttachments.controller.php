@@ -748,16 +748,16 @@ class ManageAttachments_Controller extends Action_Controller
 	 *
 	 * What it does:
 	 * - Checks for the following common issues
-	 *   - Orphan Thumbnails
-	 *   - Attachments that have no thumbnails
-	 *   - Attachments that list thumbnails, but actually, don't have any
-	 *   - Attachments list in the wrong_folder
-	 *   - Attachments that dont exists on disk anylonger
-	 *   - Attachments that are zero size
-	 *   - Attachments that file size does not match the DB size
-	 *   - Attachments that no longer have a message
-	 *   - Avatars with no members associated with them.
-	 *   - Attachments that are in the attachment folder, but not listed in the DB
+	 * - Orphan Thumbnails
+	 * - Attachments that have no thumbnails
+	 * - Attachments that list thumbnails, but actually, don't have any
+	 * - Attachments list in the wrong_folder
+	 * - Attachments that don't exists on disk any longer
+	 * - Attachments that are zero size
+	 * - Attachments that file size does not match the DB size
+	 * - Attachments that no longer have a message
+	 * - Avatars with no members associated with them.
+	 * - Attachments that are in the attachment folder, but not listed in the DB
 	 */
 	public function action_repair()
 	{
@@ -1514,15 +1514,11 @@ class ManageAttachments_Controller extends Action_Controller
 	}
 
 	/**
-	 * Maintance function to move attachments from one directory to another
-	 *
-	 * @todo Move db queries to ManageAttachments.subs.php
+	 * Maintenance function to move attachments from one directory to another
 	 */
 	public function action_transfer()
 	{
 		global $modSettings, $txt;
-
-		$db = database();
 
 		checkSession();
 
@@ -1530,17 +1526,21 @@ class ManageAttachments_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Attachments.subs.php');
 		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
+		// The list(s) of directory's that are available.
 		$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
 		if (!empty($modSettings['attachment_basedirectories']))
 			$modSettings['attachment_basedirectories'] = unserialize($modSettings['attachment_basedirectories']);
 		else
 			$modSettings['basedirectory_for_attachments'] = array();
 
+		// Clean the inputs
 		$_POST['from'] = (int) $_POST['from'];
 		$_POST['auto'] = !empty($_POST['auto']) ? (int) $_POST['auto'] : 0;
 		$_POST['to'] = (int) $_POST['to'];
 		$start = !empty($_POST['empty_it']) ? 0 : $modSettings['attachmentDirFileLimit'];
 		$_SESSION['checked'] = !empty($_POST['empty_it']) ? true : false;
+
+		// Prepare for the moving
 		$limit = 501;
 		$results = array();
 		$dir_files = 0;
@@ -1548,12 +1548,15 @@ class ManageAttachments_Controller extends Action_Controller
 		$total_moved = 0;
 		$total_not_moved = 0;
 
+		// Need to know where we are moving things from
 		if (empty($_POST['from']) || (empty($_POST['auto']) && empty($_POST['to'])))
 			$results[] = $txt['attachment_transfer_no_dir'];
 
+		// Same location, that's easy
 		if ($_POST['from'] == $_POST['to'])
 			$results[] = $txt['attachment_transfer_same_dir'];
 
+		// No errors so determine how many we may have to move
 		if (empty($results))
 		{
 			// Get the total file count for the progress bar.
@@ -1564,25 +1567,29 @@ class ManageAttachments_Controller extends Action_Controller
 				$results[] = $txt['attachment_transfer_no_find'];
 		}
 
+		// Nothing to move (no files in source or below the max limit)
 		if (empty($results))
 		{
-			// Where are they going?
+			// Moving them automaticaly?
 			if (!empty($_POST['auto']))
 			{
 				$modSettings['automanage_attachments'] = 1;
+
+				// Create sub directroys off the root or from an attachment directory?
 				$modSettings['use_subdirectories_for_attachments'] = $_POST['auto'] == -1 ? 0 : 1;
 				$modSettings['basedirectory_for_attachments'] = $_POST['auto'] > 0 ? $modSettings['attachmentUploadDir'][$_POST['auto']] : $modSettings['basedirectory_for_attachments'];
 
+				// Finaly, where do they need to go
 				automanage_attachments_check_directory();
 				$new_dir = $modSettings['currentAttachmentUploadDir'];
 			}
+			// Or to a specified directory
 			else
 				$new_dir = $_POST['to'];
 
 			$modSettings['currentAttachmentUploadDir'] = $new_dir;
-
 			$break = false;
-			while ($break == false)
+			while ($break === false)
 			{
 				@set_time_limit(300);
 				if (function_exists('apache_reset_timeout'))
@@ -1590,36 +1597,30 @@ class ManageAttachments_Controller extends Action_Controller
 
 				// If limits are set, get the file count and size for the destination folder
 				if ($dir_files <= 0 && (!empty($modSettings['attachmentDirSizeLimit']) || !empty($modSettings['attachmentDirFileLimit'])))
-					list ($dir_files, $dir_size) = attachDirProperties($new_dir);
+				{
+					$current_dir = attachDirProperties($new_dir);
+					$dir_files = $current_dir['files'];
+					$dir_size = $current_dir['size'];
+				}
 
 				// Find some attachments to move
-				$request = $db->query('', '
-					SELECT id_attach, filename, id_folder, file_hash, size
-					FROM {db_prefix}attachments
-					WHERE id_folder = {int:folder}
-						AND attachment_type != {int:attachment_type}
-					LIMIT {int:start}, {int:limit}',
-					array(
-						'folder' => $_POST['from'],
-						'attachment_type' => 1,
-						'start' => $start,
-						'limit' => $limit,
-					)
-				);
+				list ($tomove_count, $tomove) = findAttachmentsToMove($_POST['from'], $start, $limit);
 
-				if ($db->num_rows($request) === 0)
+				// Nothing found to move
+				if ($tomove_count === 0)
 				{
 					if (empty($current_progress))
 						$results[] = $txt['attachment_transfer_no_find'];
 					break;
 				}
 
-				if ($db->num_rows($request) < $limit)
+				// No more to move after this batch then set the finished flag.
+				if ($tomove_count < $limit)
 					$break = true;
 
 				// Move them
 				$moved = array();
-				while ($row = $db->fetch_assoc($request))
+				foreach ($tomove as $row)
 				{
 					$source = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
 					$dest = $modSettings['attachmentUploadDir'][$new_dir] . '/' . basename($source);
@@ -1630,12 +1631,12 @@ class ManageAttachments_Controller extends Action_Controller
 						$dir_files++;
 						$dir_size += !empty($row['size']) ? $row['size'] : filesize($source);
 
-						// If we've reached a limit. Do something.
+						// If we've reached a directory limit. Do something if we are in auto mode, otherwise set an error.
 						if (!empty($modSettings['attachmentDirSizeLimit']) && $dir_size > $modSettings['attachmentDirSizeLimit'] * 1024 || (!empty($modSettings['attachmentDirFileLimit']) && $dir_files > $modSettings['attachmentDirFileLimit']))
 						{
+							// Since we're in auto mode. Create a new folder and reset the counters.
 							if (!empty($_POST['auto']))
 							{
-								// Since we're in auto mode. Create a new folder and reset the counters.
 								automanage_attachments_by_space();
 
 								$results[] = sprintf($txt['attachments_transfered'], $total_moved, $modSettings['attachmentUploadDir'][$new_dir]);
@@ -1649,9 +1650,9 @@ class ManageAttachments_Controller extends Action_Controller
 								$break = false;
 								break;
 							}
+							// Hmm, not in auto. Time to bail out then...
 							else
 							{
-								// Hmm, not in auto. Time to bail out then...
 								$results[] = $txt['attachment_transfer_no_room'];
 								$break = true;
 								break;
@@ -1659,6 +1660,7 @@ class ManageAttachments_Controller extends Action_Controller
 						}
 					}
 
+					// Actually move the file
 					if (@rename($source, $dest))
 					{
 						$total_moved++;
@@ -1668,25 +1670,15 @@ class ManageAttachments_Controller extends Action_Controller
 					else
 						$total_not_moved++;
 				}
-				$db->free_result($request);
 
+				// Update the database to reflect the new file location
 				if (!empty($moved))
-				{
-					// Update the database
-					$db->query('', '
-						UPDATE {db_prefix}attachments
-						SET id_folder = {int:new}
-						WHERE id_attach IN ({array_int:attachments})',
-						array(
-							'attachments' => $moved,
-							'new' => $new_dir,
-						)
-					);
-				}
+					moveAttachments($moved, $new_dir);
 
 				$new_dir = $modSettings['currentAttachmentUploadDir'];
 
-				// Create the progress bar.
+				// Create / update the progress bar.
+				// @todo why was this done this way?
 				if (!$break)
 				{
 					$percent_done = min(round($current_progress / $total_progress * 100, 0), 100);
@@ -1709,6 +1701,7 @@ class ManageAttachments_Controller extends Action_Controller
 				$results[] = sprintf($txt['attachments_not_transfered'], $total_not_moved);
 		}
 
+		// All done, time to clean up
 		$_SESSION['results'] = $results;
 		if (file_exists(BOARDDIR . '/progress.php'))
 			unlink(BOARDDIR . '/progress.php');
