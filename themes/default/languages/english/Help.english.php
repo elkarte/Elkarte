@@ -249,7 +249,6 @@ $helptxt['trackStats'] = 'Stats:<br />This will allow users to see the latest po
 $helptxt['enable_unwatch'] = 'Enabling this option will allow users to selectively turn off new reply notifications for topics in which they had previously posted.';
 $helptxt['titlesEnable'] = 'Switching Custom Titles on will allow members with the relevant permission to create a special title for themselves.
 		This will be shown underneath the name.<br /><em>Example:</em><br />Jeff<br />Cool Guy';
-$helptxt['topbottomEnable'] = 'This will add go up and go down buttons, so that members can go to the top and bottom of a page without scrolling.';
 $helptxt['onlineEnable'] = 'This will show an image to indicate whether the member is online or offline';
 $helptxt['todayMod'] = 'This will format &quot;Today&quot; or &quot;Yesterday&quot; in a variety of formats instead of the full date.<br /><br />
 		<strong>Examples:</strong><br /><br />
