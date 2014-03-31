@@ -1569,7 +1569,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	}
 
 	// A bit lonely maybe, though I think it should be set up *after* teh theme variants detection
-	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? $settings['images_url'] . (!empty($context['theme_variant']) ? '/' . $context['theme_variant'] : '') .  '/logo_elk.png' : Util::htmlspecialchars($settings['header_logo_url']);
+	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? $settings['images_url'] . '/' . $context['theme_variant_url'] .  'logo_elk.png' : Util::htmlspecialchars($settings['header_logo_url']);
 
 	// Allow overriding the board wide time/number formats.
 	if (empty($user_settings['time_format']) && !empty($txt['time_format']))

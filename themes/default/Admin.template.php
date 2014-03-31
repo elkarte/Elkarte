@@ -158,7 +158,7 @@ function template_credits()
 					<div id="admincenter">
 						<div id="support_credits">
 							<h3 class="category_header">
-								', $txt['support_title'], ' <img src="', $settings['images_url'], (!empty($context['theme_variant']) ? '/' . $context['theme_variant'] . '/logo_elk.png' : '/logo_elk.png' ), '" id="credits_logo" alt="" />
+								', $txt['support_title'], ' <img src="', $settings['images_url'], '/', $context['theme_variant_url'], 'logo_elk.png" id="credits_logo" alt="" />
 							</h3>
 							<div class="windowbg">
 								<div class="content">
