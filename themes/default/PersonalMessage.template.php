@@ -942,16 +942,6 @@ function template_send()
 						</dd>
 					</dl>';
 
-	// Showing BBC?
-	if ($context['show_bbc'])
-		echo '
-					<div id="bbcBox_message"></div>';
-
-	// What about smileys?
-	if (!empty($context['smileys']['postform']) || !empty($context['smileys']['popup']))
-		echo '
-					<div id="smileyBox_message"></div>';
-
 	// Show BBC buttons, smileys and textbox.
 	echo '
 					', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');

@@ -419,16 +419,6 @@ function template_quickreply_below()
 		}
 		else
 		{
-			// Show the actual posting area...
-			if ($context['show_bbc'])
-				echo '
-							<div id="bbcBox_message"></div>';
-
-			// What about smileys?
-			if (!empty($context['smileys']['postform']) || !empty($context['smileys']['popup']))
-				echo '
-							<div id="smileyBox_message"></div>';
-
 			echo '
 							', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
 		}
