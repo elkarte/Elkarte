@@ -286,7 +286,7 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 	width: 100%;
 }
 #post_confirm_buttons {
-	padding: 0 0 1em 0;
+	padding: 0;
 }
 
 /* @todo - Test this out some more. */
@@ -2540,12 +2540,10 @@ ul.post_options li {
 	padding: 0 1em;
 }
 .draftautosave {
-	display: block;
+	font-size: 0.857em;
 	text-align: right;
-}
-.draftautosave #draft_lastautosave {
-	display: inline-block;
-	min-height: 1em;
+	height: 1.5em;
+	overflow: hidden;
 }
 #postDraftOptions .settings dd, #postDraftOptions .settings dt{
 	margin: 0;
