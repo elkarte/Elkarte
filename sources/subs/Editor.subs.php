@@ -121,6 +121,7 @@ function getMessageIcons($board_id)
 function create_control_richedit($editorOptions)
 {
 	global $txt, $modSettings, $options, $context, $settings, $user_info, $scripturl;
+	static $bbc_tags;
 
 	$db = database();
 
@@ -218,36 +219,30 @@ function create_control_richedit($editorOptions)
 		$settings['theme_dir'] = $settings['default_theme_dir'];
 	}
 
-	if (empty($context['bbc_tags']))
+	if (empty($bbc_tags))
 	{
 		// The below array is used to show a command button in the editor, the execution
 		// and display details of any added buttons must be defined in the javascript files
 		// see  jquery.sceditor.elkarte.js under the $.sceditor.plugins.bbcode.bbcode area
 		// for examples of how to use the .set command to add codes.  Include your new
 		// JS with addInlineJavascript() or loadJavascriptFile()
-		$context['bbc_tags']['row1'] = array(
-			'bold', 'italic', 'underline', 'strike', 'superscript', 'subscript',
-			'space',
-			'left', 'center', 'right', 'pre', 'tt',
-			'space',
-			'font', 'size', 'color',
-			'space',
+		$bbc_tags['row1'] = array(
+			array('bold', 'italic', 'underline', 'strike', 'superscript', 'subscript'),
+			array('left', 'center', 'right', 'pre', 'tt'),
+			array('font', 'size', 'color'),
 		);
-		$context['bbc_tags']['row2'] = array(
-			'quote', 'code', 'table',
-			'space',
-			'bulletlist', 'orderedlist', 'horizontalrule',
-			'space',
-			'spoiler', 'footnote',
-			'space',
-			'image', 'link', 'email',
-			'space',
-			'removeformat', 'source',
-			'space',
+		$bbc_tags['row2'] = array(
+			array('quote', 'code', 'table'),
+			array('bulletlist', 'orderedlist', 'horizontalrule'),
+			array('spoiler', 'footnote'),
+			array('image', 'link', 'email'),
 		);
 
 		// Allow mods to add BBC buttons to the toolbar, actions are defined in the JS
 		call_integration_hook('integrate_bbc_buttons');
+
+		// Show the wysiwyg format and toggle buttons?
+		$bbc_tags['row2'][] = array('removeformat', 'source');
 
 		// Generate a list of buttons that shouldn't be shown
 		$disabled_tags = array();
@@ -275,7 +270,7 @@ function create_control_richedit($editorOptions)
 
 		// Build our toolbar, taking in to account any bbc codes from integration
 		$context['bbc_toolbar'] = array();
-		foreach ($context['bbc_tags'] as $row => $tagRow)
+		foreach ($bbc_tags as $row => $tagRow)
 		{
 			if (!isset($context['bbc_toolbar'][$row]))
 				$context['bbc_toolbar'][$row] = array();
@@ -283,11 +278,18 @@ function create_control_richedit($editorOptions)
 			$tagsRow = array();
 
 			// For each row of buttons defined, lets build our tags
-			foreach ($tagRow as $tag)
+			foreach ($tagRow as $tags)
 			{
-				// Just add this code in the existing grouping
-				if (!isset($context['disabled_tags'][$tag]))
-					$tagsRow[] = $tag;
+				foreach ($tags as $tag)
+				{
+					// Just add this code in the existing grouping
+					if (!isset($context['disabled_tags'][$tag]))
+						$tagsRow[] = $tag;
+				}
+
+				// If the row is not empty, and the last added tag is not a space, add a space.
+				if (!empty($tagsRow) && $tagsRow[count($tagsRow) - 1] != 'space')
+					$tagsRow[] = 'space';
 			}
 
 			// Build that beautiful button row
