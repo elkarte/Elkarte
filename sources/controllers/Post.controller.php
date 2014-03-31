@@ -977,9 +977,6 @@ class Post_Controller extends Action_Controller
 		$context['is_first_post'] = $context['is_new_topic'] || (isset($_REQUEST['msg']) && $_REQUEST['msg'] == $id_first_msg);
 		$context['current_action'] = 'post';
 
-		// WYSIWYG only works if BBC is enabled
-		$modSettings['disable_wysiwyg'] = !empty($modSettings['disable_wysiwyg']) || empty($modSettings['enableBBC']);
-
 		// Register this form in the session variables.
 		checkSubmitOnce('register');
 

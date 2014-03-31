@@ -622,11 +622,7 @@ function template_profile_theme_settings()
 							<dd>
 								<input type="hidden" name="default_options[view_newest_first]" value="0" />
 								<input type="checkbox" name="default_options[view_newest_first]" id="view_newest_first" value="1"', !empty($context['member']['options']['view_newest_first']) ? ' checked="checked"' : '', ' class="input_check" />
-							</dd>';
-
-	// Choose WYSIWYG settings?
-	if (empty($modSettings['disable_wysiwyg']))
-		echo '
+							</dd>
 							<dt>
 								<label for="wysiwyg_default">', $txt['wysiwyg_default'], '</label>
 							</dt>

@@ -668,7 +668,6 @@ class PersonalMessage_Controller extends Action_Controller
 		}
 
 		// Needed for the editor.
-		$modSettings['disable_wysiwyg'] = !empty($modSettings['disable_wysiwyg']) || empty($modSettings['enableBBC']);
 		require_once(SUBSDIR . '/Editor.subs.php');
 
 		// Now create the editor.

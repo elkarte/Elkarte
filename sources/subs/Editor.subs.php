@@ -192,8 +192,7 @@ function create_control_richedit($editorOptions)
 	$context['controls']['richedit'][$editorOptions['id']] = array(
 		'id' => $editorOptions['id'],
 		'value' => $editorOptions['value'],
-		'rich_value' => $editorOptions['value'], // 2.0 editor compatibility
-		'rich_active' => empty($modSettings['disable_wysiwyg']) && (!empty($options['wysiwyg_default']) || !empty($editorOptions['force_rich']) || !empty($_REQUEST[$editorOptions['id'] . '_mode'])),
+		'rich_active' => !empty($options['wysiwyg_default']) || !empty($editorOptions['force_rich']) || !empty($_REQUEST[$editorOptions['id'] . '_mode']),
 		'disable_smiley_box' => !empty($editorOptions['disable_smiley_box']),
 		'columns' => isset($editorOptions['columns']) ? $editorOptions['columns'] : 60,
 		'rows' => isset($editorOptions['rows']) ? $editorOptions['rows'] : 18,
@@ -243,20 +242,12 @@ function create_control_richedit($editorOptions)
 			'space',
 			'image', 'link', 'email',
 			'space',
+			'removeformat', 'source',
+			'space',
 		);
 
 		// Allow mods to add BBC buttons to the toolbar, actions are defined in the JS
 		call_integration_hook('integrate_bbc_buttons');
-
-		// Show the wysiwyg format and toggle buttons?
-		if (empty($modSettings['disable_wysiwyg']))
-		{
-			$context['bbc_tags']['row2'] = array_merge($context['bbc_tags']['row2'], array(
-				'removeformat',
-				'source',
-				'space',
-			));
-		}
 
 		// Generate a list of buttons that shouldn't be shown
 		$disabled_tags = array();
