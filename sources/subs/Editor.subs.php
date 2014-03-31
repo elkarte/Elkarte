@@ -239,7 +239,7 @@ function create_control_richedit($editorOptions)
 		);
 
 		// Allow mods to add BBC buttons to the toolbar, actions are defined in the JS
-		call_integration_hook('integrate_bbc_buttons');
+		call_integration_hook('integrate_bbc_buttons', array(&$bbc_tags));
 
 		// Show the wysiwyg format and toggle buttons?
 		$bbc_tags['row2'][] = array('removeformat', 'source');
