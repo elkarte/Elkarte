@@ -291,6 +291,7 @@ $txt['censor_test'] = 'Test censored words';
 $txt['censor_test_save'] = 'Test';
 $txt['censor_case'] = 'Ignore case when censoring';
 $txt['censor_whole_words'] = 'Check only whole words';
+$txt['censor_allow'] = 'Allow users to turn off word censoring';
 
 $txt['admin_confirm_password'] = '(confirm)';
 $txt['admin_incorrect_password'] = 'Incorrect Password';

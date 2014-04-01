@@ -1713,7 +1713,9 @@ function toggleCurrencyOther()
 	}
 }
 
-// Used to ajax-ively preview the templates of bounced emails (template_bounce_template)
+/**
+ * Used to ajax-ively preview the templates of bounced emails (template_bounce_template)
+ */
 function ajax_getTemplatePreview()
 {
 	$.ajax({
@@ -1727,7 +1729,7 @@ function ajax_getTemplatePreview()
 		context: document.body
 	})
 	.done(function(request) {
-		// Show the preivew section, populated with the resonse
+		// Show the preivew section, populated with the response
 		$("#preview_section").css({display: ""});
 		$("#template_preview").html($(request).find('body').text());
 		$("#preview_subject").html($(request).find('subject').text());
@@ -1757,6 +1759,36 @@ function ajax_getTemplatePreview()
 		}
 
 		return false;
+	});
+
+	return false;
+}
+
+/**
+ * Used to ajax-ively preview a word censor
+ * Does no checking, it either gets a result or does nothing
+ */
+function ajax_getCensorPreview()
+{
+	$.ajax({
+		type: 'POST',
+		dataType: 'json',
+		url: elk_scripturl + "?action=admin;area=postsettings;sa=censor;xml",
+		data: {
+			censortest: $("#censortest").val()
+		}
+	})
+	.done(function(request) {
+		if (request.result === true) {
+			// Show the censored text section, populated with the response
+			$("#censor_result").css({display: ""}).html(request.censor);
+
+			// Update the token
+			$("#token").attr({name:request.token_val, value:request.token});
+
+			// Clear the box
+			$('#censortest').attr({value:''}).val('');
+		}
 	});
 
 	return false;
