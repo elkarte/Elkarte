@@ -429,20 +429,14 @@ class Register_Controller extends Action_Controller
 			// We only care for text fields as the others are valid to be empty.
 			if (!in_array($row['type'], array('check', 'select', 'radio')))
 			{
-				// Is it too long?
-				if ($row['field_length'] && $row['field_length'] < Util::strlen($value))
-					$reg_errors->addError(array('custom_field_too_long', array($row['name'], $row['field_length'])));
-
-				// Any masks to apply?
-				if ($row['type'] == 'text' && !empty($row['mask']) && $row['mask'] != 'none')
+				$is_valid = isCustomFieldValid($row, $value);
+				if ($is_valid !== true)
 				{
-					// @todo We never error on this - just ignore it at the moment...
-					if ($row['mask'] == 'email' && (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $value) === 0 || strlen($value) > 255))
-						$reg_errors->addError(array('custom_field_invalid_email', array($row['name'])));
-					elseif ($row['mask'] == 'number' && preg_match('~[^\d]~', $value))
-						$reg_errors->addError(array('custom_field_not_number', array($row['name'])));
-					elseif (substr($row['mask'], 0, 5) == 'regex' && trim($value) !== '' && preg_match(substr($row['mask'], 5), $value) === 0)
-						$reg_errors->addError(array('custom_field_inproper_format', array($row['name'])));
+					$err_params = array($row['name']);
+					if ($is_valid == 'custom_field_not_number')
+						$err_params[] = $row['field_length'];
+
+					$reg_errors->addError(array($is_valid, $err_params));
 				}
 			}
 

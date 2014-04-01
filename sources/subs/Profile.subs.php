@@ -1490,20 +1490,24 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 		else
 		{
 			$value = isset($_POST['customfield'][$row['col_name']]) ? $_POST['customfield'][$row['col_name']] : '';
-			if ($row['field_length'])
-				$value = Util::substr($value, 0, $row['field_length']);
+			$is_valid = isCustomFieldValid($row, $value);
 
-			// Any masks?
-			if ($row['field_type'] == 'text' && !empty($row['mask']) && $row['mask'] != 'none')
+			if ($is_valid !== true)
 			{
-				// @todo We never error on this - just ignore it at the moment...
-				if ($row['mask'] == 'email' && (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $value) === 0 || strlen($value) > 255))
-					$value = '';
-				elseif ($row['mask'] == 'number')
-					$value = (int) $value;
-				elseif (substr($row['mask'], 0, 5) == 'regex' && trim($value) != '' && preg_match(substr($row['mask'], 5), $value) === 0)
-					$value = '';
+				switch ($is_valid)
+				{
+					case 'custom_field_too_long':
+						$value = Util::substr($value, 0, $row['field_length']);
+						break;
+					case 'custom_field_invalid_email':
+					case 'custom_field_inproper_format':
+						$value = '';
+						break;
+				}
 			}
+
+			if ($row['mask'] == 'number')
+				$value = (int) $value;
 		}
 
 		// Did it change?
@@ -1541,6 +1545,39 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 		if (!empty($log_changes) && !empty($modSettings['modlog_enabled']))
 			logActions($log_changes);
 	}
+}
+
+/**
+ * Validates the value of a custom field
+ *
+ * @param mixed[] $field - An array describing the field. It consists of the
+ *                indexes:
+ *                  - type; if different from 'text', only the length is checked
+ *                  - mask; if empty or equal to 'none', only the length is
+ *                          checked, possible masks are: email, number, regex
+ *                  - field_length; maximum length of the field
+ * @param string|int $value - The value that we want to validate
+ * @return string|bool - A string representing the type of error, or true
+ */
+function isCustomFieldValid($field, $value)
+{
+	// Is it too long?
+	if ($field['field_length'] && $field['field_length'] < Util::strlen($value))
+		return 'custom_field_too_long';
+
+	// Any masks to apply?
+	if ($field['type'] == 'text' && !empty($field['mask']) && $field['mask'] != 'none')
+	{
+		// @todo We never error on this - just ignore it at the moment...
+		if ($field['mask'] == 'email' && (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $value) === 0 || strlen($value) > 255))
+			return 'custom_field_invalid_email';
+		elseif ($field['mask'] == 'number' && preg_match('~[^\d]~', $value))
+			return 'custom_field_not_number';
+		elseif (substr($field['mask'], 0, 5) == 'regex' && trim($value) !== '' && preg_match(substr($field['mask'], 5), $value) === 0)
+			return 'custom_field_inproper_format';
+	}
+
+	return true;
 }
 
 /**
