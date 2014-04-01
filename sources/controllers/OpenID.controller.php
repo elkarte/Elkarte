@@ -23,6 +23,7 @@ if (!defined('ELK'))
  */
 class OpenID_Controller extends Action_Controller
 {
+	private $_secret = '';
 	/**
 	 * Forward to the right action.
 	 *
@@ -159,7 +160,7 @@ class OpenID_Controller extends Action_Controller
 			$user_settings = $member_found;
 
 			// @Todo: this seems outdated?
-			$user_settings['passwd'] = sha1(strtolower($user_settings['member_name']) . $secret);
+			$user_settings['passwd'] = sha1(strtolower($user_settings['member_name']) . $this->_secret);
 			$user_settings['password_salt'] = substr(md5(mt_rand()), 0, 4);
 
 			require_once(SUBSDIR . '/Members.subs.php');
@@ -189,14 +190,14 @@ class OpenID_Controller extends Action_Controller
 	 */
 	private function _verify_string($raw_secret)
 	{
-		$secret = base64_decode($raw_secret);
+		$this->_secret = base64_decode($raw_secret);
 		$signed = explode(',', $_GET['openid_signed']);
 		$verify_str = '';
 
 		foreach ($signed as $sign)
 			$verify_str .= $sign . ':' . strtr($_GET['openid_' . str_replace('.', '_', $sign)], array('&amp;' => '&')) . "\n";
 
-		$verify_str = base64_encode(hash_hmac('sha1', $verify_str, $secret, true));
+		$verify_str = base64_encode(hash_hmac('sha1', $verify_str, $this->_secret, true));
 
 		// Verify the OpenID signature.
 		return $verify_str == $_GET['openid_sig'];
