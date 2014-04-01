@@ -958,6 +958,8 @@ class Register_Controller extends Action_Controller
 	 */
 	private function _extra_vars($has_real_name)
 	{
+		global $modSettings;
+
 		$possible_strings = array(
 			'birthdate',
 			'time_format',
