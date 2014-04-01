@@ -346,30 +346,6 @@ class Register_Controller extends Action_Controller
 				$_POST[$key] = htmltrim__recursive(str_replace(array("\n", "\r"), '', $value));
 		}
 
-		// Collect all extra registration fields someone might have filled in.
-		$possible_strings = array(
-			'birthdate',
-			'time_format',
-			'buddy_list',
-			'pm_ignore_list',
-			'smiley_set',
-			'personal_text', 'avatar',
-			'lngfile',
-			'secret_question', 'secret_answer',
-		);
-		$possible_ints = array(
-			'pm_email_notify',
-			'notify_types',
-			'id_theme',
-		);
-		$possible_floats = array(
-			'time_offset',
-		);
-		$possible_bools = array(
-			'notify_announcements', 'notify_regularity', 'notify_send_body',
-			'hide_email', 'show_online',
-		);
-
 		if (isset($_POST['secret_answer']) && $_POST['secret_answer'] != '')
 			$_POST['secret_answer'] = md5($_POST['secret_answer']);
 
@@ -380,9 +356,10 @@ class Register_Controller extends Action_Controller
 		if (isset($_POST['real_name']) && (!empty($modSettings['allow_editDisplayName']) || allowedTo('moderate_forum')))
 		{
 			$_POST['real_name'] = trim(preg_replace('~[\t\n\r \x0B\0\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}]+~u', ' ', $_POST['real_name']));
-			if (trim($_POST['real_name']) != '' && !isReservedName($_POST['real_name']) && Util::strlen($_POST['real_name']) < 60)
-				$possible_strings[] = 'real_name';
+			$has_real_name = true;
 		}
+		else
+			$has_real_name = false;
 
 		// Handle a string as a birthdate...
 		if (isset($_POST['birthdate']) && $_POST['birthdate'] != '')
@@ -409,30 +386,6 @@ class Register_Controller extends Action_Controller
 		else
 			unset($_POST['lngfile']);
 
-		// Some of these fields we may not want.
-		if (!empty($modSettings['registration_fields']))
-		{
-			// But we might want some of them if the admin asks for them.
-			$standard_fields = array('location', 'gender');
-			$reg_fields = explode(',', $modSettings['registration_fields']);
-
-			$exclude_fields = array_diff($standard_fields, $reg_fields);
-
-			// Website is a little different
-			if (!in_array('website', $reg_fields))
-				$exclude_fields = array_merge($exclude_fields, array('website_url', 'website_title'));
-
-			// We used to accept signature on registration but it's being abused by spammers these days, so no more.
-			$exclude_fields[] = 'signature';
-		}
-		else
-			$exclude_fields = array('signature', 'location', 'gender', 'website_url', 'website_title');
-
-		$possible_strings = array_diff($possible_strings, $exclude_fields);
-		$possible_ints = array_diff($possible_ints, $exclude_fields);
-		$possible_floats = array_diff($possible_floats, $exclude_fields);
-		$possible_bools = array_diff($possible_bools, $exclude_fields);
-
 		// Set the options needed for registration.
 		$regOptions = array(
 			'interface' => 'guest',
@@ -447,26 +400,9 @@ class Register_Controller extends Action_Controller
 			'check_email_ban' => true,
 			'send_welcome_email' => !empty($modSettings['send_welcomeEmail']),
 			'require' => !empty($modSettings['coppaAge']) && !$verifiedOpenID && empty($_SESSION['skip_coppa']) ? 'coppa' : (empty($modSettings['registration_method']) ? 'nothing' : ($modSettings['registration_method'] == 1 ? 'activation' : 'approval')),
-			'extra_register_vars' => array(),
+			'extra_register_vars' => $this->_extra_vars($has_real_name),
 			'theme_vars' => array(),
 		);
-
-		// Include the additional options that might have been filled in.
-		foreach ($possible_strings as $var)
-			if (isset($_POST[$var]))
-				$regOptions['extra_register_vars'][$var] = Util::htmlspecialchars($_POST[$var], ENT_QUOTES);
-
-		foreach ($possible_ints as $var)
-			if (isset($_POST[$var]))
-				$regOptions['extra_register_vars'][$var] = (int) $_POST[$var];
-
-		foreach ($possible_floats as $var)
-			if (isset($_POST[$var]))
-				$regOptions['extra_register_vars'][$var] = (float) $_POST[$var];
-
-		foreach ($possible_bools as $var)
-			if (isset($_POST[$var]))
-				$regOptions['extra_register_vars'][$var] = empty($_POST[$var]) ? 0 : 1;
 
 		// Registration options are always default options...
 		if (isset($_POST['default_options']))
@@ -1013,5 +949,84 @@ class Register_Controller extends Action_Controller
 		validateUsername(0, $context['checked_username'], 'valid_username', true, false);
 
 		$context['valid_username'] = !$errors->hasErrors();
+	}
+
+	/**
+	 * Collect all extra registration fields someone might have filled in.
+	 *
+	 * @param bool $has_real_name - if true adds 'real_name' as well
+	 */
+	private function _extra_vars($has_real_name)
+	{
+		$possible_strings = array(
+			'birthdate',
+			'time_format',
+			'buddy_list',
+			'pm_ignore_list',
+			'smiley_set',
+			'personal_text', 'avatar',
+			'lngfile',
+			'secret_question', 'secret_answer',
+		);
+		$possible_ints = array(
+			'pm_email_notify',
+			'notify_types',
+			'id_theme',
+		);
+		$possible_floats = array(
+			'time_offset',
+		);
+		$possible_bools = array(
+			'notify_announcements', 'notify_regularity', 'notify_send_body',
+			'hide_email', 'show_online',
+		);
+
+		if ($has_real_name && trim($_POST['real_name']) != '' && !isReservedName($_POST['real_name']) && Util::strlen($_POST['real_name']) < 60)
+			$possible_strings[] = 'real_name';
+
+		// Some of these fields we may not want.
+		if (!empty($modSettings['registration_fields']))
+		{
+			// But we might want some of them if the admin asks for them.
+			$standard_fields = array('location', 'gender');
+			$reg_fields = explode(',', $modSettings['registration_fields']);
+
+			$exclude_fields = array_diff($standard_fields, $reg_fields);
+
+			// Website is a little different
+			if (!in_array('website', $reg_fields))
+				$exclude_fields = array_merge($exclude_fields, array('website_url', 'website_title'));
+
+			// We used to accept signature on registration but it's being abused by spammers these days, so no more.
+			$exclude_fields[] = 'signature';
+		}
+		else
+			$exclude_fields = array('signature', 'location', 'gender', 'website_url', 'website_title');
+
+		$possible_strings = array_diff($possible_strings, $exclude_fields);
+		$possible_ints = array_diff($possible_ints, $exclude_fields);
+		$possible_floats = array_diff($possible_floats, $exclude_fields);
+		$possible_bools = array_diff($possible_bools, $exclude_fields);
+
+		$extra_register_vars = array();
+
+		// Include the additional options that might have been filled in.
+		foreach ($possible_strings as $var)
+			if (isset($_POST[$var]))
+				$extra_register_vars[$var] = Util::htmlspecialchars($_POST[$var], ENT_QUOTES);
+
+		foreach ($possible_ints as $var)
+			if (isset($_POST[$var]))
+				$extra_register_vars[$var] = (int) $_POST[$var];
+
+		foreach ($possible_floats as $var)
+			if (isset($_POST[$var]))
+				$extra_register_vars[$var] = (float) $_POST[$var];
+
+		foreach ($possible_bools as $var)
+			if (isset($_POST[$var]))
+				$extra_register_vars[$var] = empty($_POST[$var]) ? 0 : 1;
+
+		return $extra_register_vars;
 	}
 }
