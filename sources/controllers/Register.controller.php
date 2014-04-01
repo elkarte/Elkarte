@@ -340,13 +340,6 @@ class Register_Controller extends Action_Controller
 		if ($verifiedOpenID)
 			$this->_can_register();
 
-		// Did we save some open ID fields?
-		if ($verifiedOpenID && !empty($context['openid_save_fields']))
-		{
-			foreach ($context['openid_save_fields'] as $id => $value)
-				$_POST[$id] = $value;
-		}
-
 		foreach ($_POST as $key => $value)
 		{
 			if (!is_array($value))

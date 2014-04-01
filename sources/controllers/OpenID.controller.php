@@ -89,7 +89,7 @@ class OpenID_Controller extends Action_Controller
 			fatal_lang_error('openid_load_data');
 
 		// Any save fields to restore?
-		$context['openid_save_fields'] = isset($_GET['sf']) ? unserialize(base64_decode($_GET['sf'])) : array();
+		$openid_save_fields = isset($_GET['sf']) ? unserialize(base64_decode($_GET['sf'])) : array();
 		$context['openid_claimed_id'] = $_GET['openid_claimed_id'];
 
 		// Is there a user with this OpenID_uri?
@@ -129,6 +129,13 @@ class OpenID_Controller extends Action_Controller
 			// Were we just verifying the registration state?
 			if (isset($_GET['sa']) && $_GET['sa'] == 'register2')
 			{
+				// Did we save some open ID fields?
+				if (!empty($openid_save_fields))
+				{
+					foreach ($openid_save_fields as $id => $value)
+						$_POST[$id] = $value;
+				}
+
 				require_once(CONTROLLERDIR . '/Register.controller.php');
 				$controller = new Register_Controller();
 				return $controller->do_register(true);
