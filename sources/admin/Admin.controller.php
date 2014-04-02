@@ -1045,6 +1045,8 @@ class Admin_Controller extends Action_Controller
 				if (!empty($var[1]) && !in_array($var[0], array('permissions', 'switch', 'warning')))
 					$settings[] = array($var[(isset($var[2]) && in_array($var[2], array('file', 'db'))) ? 0 : 1], $setting_area[1]);
 		}
+
+		return $settings;
 	}
 
 	/**
