@@ -66,24 +66,7 @@ class Draft_Controller extends Action_Controller
 
 		// If just deleting a draft, do it and then redirect back.
 		if (!empty($_REQUEST['delete']))
-		{
-			checkSession(empty($_POST) ? 'get' : '');
-
-			// Lets see what we have been sent, one or many to delete
-			$toDelete = array();
-			if (!is_array($_REQUEST['delete']))
-				$toDelete[] = (int) $_REQUEST['delete'];
-			else
-			{
-				foreach ($_REQUEST['delete'] as $delete_id)
-					$toDelete[] = (int) $delete_id;
-			}
-
-			if (!empty($toDelete))
-				deleteDrafts($toDelete, $memID);
-
-			redirectexit('action=profile;u=' . $memID . ';area=showdrafts;start=' . $context['start']);
-		}
+			return $this->_action_delete('action=profile;u=' . $memID . ';area=showdrafts;start=' . $context['start']);
 
 		// Default to 10.
 		if (empty($_REQUEST['viewscount']) || !is_numeric($_REQUEST['viewscount']))
@@ -210,13 +193,7 @@ class Draft_Controller extends Action_Controller
 
 		// If just deleting a draft, do it and then redirect back.
 		if (!empty($_REQUEST['delete']))
-		{
-			checkSession('get');
-
-			$id_delete = (int) $_REQUEST['delete'];
-			deleteDrafts($id_delete, $memID);
-			redirectexit('action=pm;sa=showpmdrafts;start=' . $context['start']);
-		}
+			return $this->_action_delete('action=pm;sa=showpmdrafts;start=' . $context['start']);
 
 		// Perhaps a draft was selected for editing? if so pass this off
 		if (!empty($_REQUEST['id_draft']) && !empty($context['drafts_pm_save']))
@@ -316,5 +293,32 @@ class Draft_Controller extends Action_Controller
 			'url' => $scripturl . '?action=pm;sa=showpmdrafts',
 			'name' => $txt['drafts'],
 		);
+	}
+
+	/**
+	 * Deletes drafts stored in the $_REQUEST['delete'] index.
+	 * The function redirects to a selected location.
+	 *
+	 * @param string $redirect - The url to redirect to after the drafts have
+	 *               been deleted
+	 */
+	private function _action_delete($redirect = '')
+	{
+		checkSession(empty($_POST) ? 'get' : '');
+
+		// Lets see what we have been sent, one or many to delete
+		$toDelete = array();
+		if (!is_array($_REQUEST['delete']))
+			$toDelete[] = (int) $_REQUEST['delete'];
+		else
+		{
+			foreach ($_REQUEST['delete'] as $delete_id)
+				$toDelete[] = (int) $delete_id;
+		}
+
+		if (!empty($toDelete))
+			deleteDrafts($toDelete, $memID);
+
+		redirectexit($redirect);
 	}
 }
