@@ -68,10 +68,6 @@ class Draft_Controller extends Action_Controller
 		if (!empty($_REQUEST['delete']))
 			return $this->_action_delete('action=profile;u=' . $memID . ';area=showdrafts;start=' . $context['start']);
 
-		// Default to 10.
-		if (empty($_REQUEST['viewscount']) || !is_numeric($_REQUEST['viewscount']))
-			$_REQUEST['viewscount'] = 10;
-
 		// Get things started
 		$msgCount = draftsCount($memID, 0);
 		$maxIndex = (int) $modSettings['defaultMaxMessages'];
@@ -205,10 +201,6 @@ class Draft_Controller extends Action_Controller
 
 		// Init
 		$maxIndex = (int) $modSettings['defaultMaxMessages'];
-
-		// Default to 10.
-		if (empty($_REQUEST['viewscount']) || !is_numeric($_REQUEST['viewscount']))
-			$_REQUEST['viewscount'] = 10;
 
 		// Get the count of applicable drafts
 		$msgCount = draftsCount($memID, 1);

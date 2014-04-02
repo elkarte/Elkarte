@@ -455,10 +455,6 @@ class ProfileInfo_Controller extends Action_Controller
 			redirectexit('action=profile;u=' . $memID . ';area=showposts;start=' . $_GET['start']);
 		}
 
-		// Default to 10.
-		if (empty($_REQUEST['viewscount']) || !is_numeric($_REQUEST['viewscount']))
-			$_REQUEST['viewscount'] = '10';
-
 		if ($context['is_topics'])
 			$msgCount = count_user_topics($memID, $board);
 		else
