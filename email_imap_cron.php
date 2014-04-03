@@ -31,8 +31,9 @@ else
 /**
  * postbyemail_imap()
  *
- * Grabs unread messages from an imap account and saves them as .eml files
- * Passes any new messages found to the postby email function for processing
+ * Starts the posting of new messages found in the imap account
+ * or the .eml file
+ *
  * Called by a scheduled task or cronjob
  */
 function postbyemail_imap()
@@ -43,157 +44,273 @@ function postbyemail_imap()
 	if (!function_exists('imap_open'))
 		return false;
 
-	// Values used for the connection
-	$hostname = !empty($modSettings['maillist_imap_host']) ? $modSettings['maillist_imap_host'] : '';
-	$username = !empty($modSettings['maillist_imap_uid']) ? $modSettings['maillist_imap_uid'] : '';
-	$password = !empty($modSettings['maillist_imap_pass']) ? $modSettings['maillist_imap_pass'] : '';
-	$mailbox = !empty($modSettings['maillist_imap_mailbox']) ? $modSettings['maillist_imap_mailbox'] : 'INBOX';
-	$type = !empty($modSettings['maillist_imap_connection']) ? $modSettings['maillist_imap_connection'] : '';
+	$pbe = new PBE_IMAP($modSettings);
 
-	// I suppose that without these informations we can't do anything.
-	if (empty($hostname) || empty($username) || empty($password))
-		return;
-
-	// Based on the type selected get/set the additional connection details
-	$connection = port_type($type);
-	$hostname .= (strpos($hostname, ':') === false) ? ':' . $connection['port'] : '';
-	$server = '{' . $hostname . '/' . $connection['protocol'] . $connection['flags'] . '}';
-	$mailbox = $server .  imap_utf7_encode($mailbox);
-
-	// Connect to the mailbox using the supplied credentials and protocol
-	$inbox = @imap_open($mailbox, $username, $password);
-	if ($inbox === false)
-		return false;
-
-	// If using gmail, we may need the trash bin name as well
-	if (!empty($modSettings['maillist_imap_delete']) && (strpos($hostname, '.gmail.') !== false))
-		$trash_bin = get_trash_folder($inbox, $server);
-
-	// Grab all unseen emails, return by message ID
-	$emails = imap_search($inbox, 'UNSEEN', SE_UID);
-
-	// You've got mail,
-	if ($emails)
-	{
-		// Initialize Emailpost controller
-		require_once(CONTROLLERDIR . '/Emailpost.controller.php');
-		$controller = new Emailpost_Controller();
-
-		// Make sure we work from the oldest to the newest message
-		sort($emails);
-
-		// For every email...
-		foreach ($emails as $email_uid)
-		{
-			// Get the headers and prefetch the body as well to avoid a second request
-			$headers = imap_fetchheader($inbox, $email_uid, FT_PREFETCHTEXT|FT_UID);
-			$message = imap_body($inbox, $email_uid, FT_UID);
-
-			// Create the save-as email
-			if (!empty($headers) && !empty($message))
-			{
-				$email = $headers . "\n" . $message;
-				$controller->action_pbe_post($email);
-
-				// Mark it for deletion?
-				if (!empty($modSettings['maillist_imap_delete']))
-				{
-					// Gmail labels make this more complicated
-					if (strpos($hostname, '.gmail.') !== false)
-						imap_mail_move($inbox, $email_uid, $trash_bin, CP_UID);
-
-					imap_delete($inbox, $email_uid, FT_UID);
-					imap_expunge($inbox);
-				}
-			}
-		}
-
-		// Close the connection
-		imap_close($inbox);
-
-		return true;
-	}
+	if ($pbe !== false)
+		return $pbe->process();
 	else
 		return false;
 }
 
 /**
- * Sets port and connection flags based on the chosen protocol
- *
- * @param string $type type of imap connection, defaults to pop3
+ * Grabs unread messages from an imap account and saves them as .eml files
+ * Passes any new messages found to the postby email function for processing
  */
-function port_type($type)
+class PBE_IMAP
 {
-	switch ($type)
+	/**
+	 * The name of the imap host
+	 */
+	protected $_hostname = '';
+
+	/**
+	 * The username to access the imap account
+	 */
+	protected $_username = '';
+
+	/**
+	 * The password of the imap account
+	 */
+	protected $_password = '';
+
+	/**
+	 * The name of the folder where messages are stored
+	 */
+	protected $_mailbox = 'INBOX';
+
+	/**
+	 * Type of connection: pop3, pop3tls, pop3ssl, imap, imaptls, imapssl
+	 */
+	protected $_type = '';
+
+	/**
+	 * If the host is gmail.
+	 * Gmail requires some more processing when deleting emails
+	 */
+	protected $_is_gmail = false;
+
+	/**
+	 * The inbox object
+	 */
+	protected $_inbox = null;
+
+	/**
+	 * imap_open $mailbox string
+	 */
+	protected $_imap_server = '';
+
+	/**
+	 * The constructor, prepares few variables.
+	 *
+	 * @param mixed[] $modSettings - May contain few settings:
+	 *                 - maillist_imap_host
+	 *                 - maillist_imap_uid
+	 *                 - maillist_imap_pass
+	 *                 - maillist_imap_mailbox
+	 *                 - maillist_imap_connection
+	 *                 - maillist_imap_delete
+	 */
+	public function __construct($modSettings)
 	{
-		case 'pop3':
-			// Standard POP3 mailbox.
-			$protocol = 'POP3';
-			$port = 110;
-			$flags = '/novalidate-cert';
-			break;
-		case 'pop3tls':
-			// POP3, TLS mode.
-			$protocol = 'POP3';
-			$port = 110;
-			$flags = '/tls/novalidate-cert';
-			break;
-		case 'pop3ssl':
-			// POP3, SSL mode.
-			$protocol = 'POP3SSL';
-			$port = 995;
-			$flags = '/ssl/novalidate-cert';
-			break;
-		case 'imap':
-			// Standard IMAP mailbox.
-			$protocol = 'IMAP';
-			$port = 143;
-			$flags = '/novalidate-cert';
-			break;
-		case 'imaptls':
-			// IMAP in TLS mode.
-			$protocol = 'IMAPTLS';
-			$port = 143;
-			$flags = '/tls/novalidate-cert';
-			break;
-		case 'imapssl':
-			// IMAP in SSL mode.
-			$protocol = 'IMAP';
-			$port = 993;
-			$flags = '/ssl/novalidate-cert';
-			break;
-		default:
-			// Somethings wrong, so use a standard POP3 mailbox.
-			$protocol = 'POP3';
-			$port = 110;
-			$flags = '/novalidate-cert';
-			break;
+		// Values used for the connection
+		if (!empty($modSettings['maillist_imap_host']))
+			$this->_hostname = $modSettings['maillist_imap_host'];
+		if (!empty($modSettings['maillist_imap_uid']))
+			$this->_username = $modSettings['maillist_imap_uid'];
+		if (!empty($modSettings['maillist_imap_pass']))
+			$this->_password = $modSettings['maillist_imap_pass'];
+		if (!empty($modSettings['maillist_imap_mailbox']))
+			$this->_mailbox = $modSettings['maillist_imap_mailbox'];
+		if (!empty($modSettings['maillist_imap_connection']))
+			$this->_type = $modSettings['maillist_imap_connection'];
+
+		$this->_delete = !empty($modSettings['maillist_imap_delete']);
+		$this->_is_gmail = strpos($this->_hostname, '.gmail.') !== false;
+
+		// I suppose that without these informations we can't do anything.
+		if (empty($this->_hostname) || empty($this->_username) || empty($this->_password))
+			return false;
+		else
+			return $this;
 	}
 
-	return array('protocol' => $protocol, 'port' => $port, 'flags' => $flags);
-}
-
-/**
- * Find and return the proper recycle bin for gmail
- *
- * @param imap_open $mailbox connection object to the mailbox
- * @param string $server server string, used to clean the imap list
- */
-function get_trash_folder($mailbox, $server)
-{
-	// Known names for the trash bin, I'm sure there are more
-	$trashbox = array('[Google Mail]/Bin', '[Google Mail]/Trash', '[Gmail]/Bin', '[Gmail]/Trash');
-
-	// Get all the folders / labels
-	$mailboxes = imap_list($mailbox, $server, '*');
-
-	// Check the names to see if one is known as a trashbin
-	foreach($mailboxes as $mailbox)
+	/**
+	 * Do the actual processing of the inbox posting new emails as needed
+	 */
+	public function process()
 	{
-		$name = str_replace($server, '', $mailbox);
-		if (in_array($name, $trashbox))
-			return $name;
+		$this->_get_inbox();
+
+		if ($this->_inbox === false)
+			return false;
+
+		// Grab all unseen emails, return by message ID
+		$emails = imap_search($this->_inbox, 'UNSEEN', SE_UID);
+
+		// You've got mail,
+		if ($emails)
+		{
+			// Initialize Emailpost controller
+			require_once(CONTROLLERDIR . '/Emailpost.controller.php');
+			$controller = new Emailpost_Controller();
+
+			// Make sure we work from the oldest to the newest message
+			sort($emails);
+
+			// For every email...
+			foreach ($emails as $email_uid)
+			{
+				$email = $this->_fetch_email($email_uid);
+
+				// Create the save-as email
+				if (!empty($email))
+				{
+					$controller->action_pbe_post($email);
+
+					// Mark it for deletion?
+					if ($this->_delete)
+						$this->_delete_email($email_uid);
+				}
+			}
+		}
+
+		// Close the connection
+		imap_close($this->_inbox);
+
+		return !empty($emails);
 	}
 
-	return 'Trash';
+	/**
+	 * Finds the inbox of the email
+	 */
+	protected function _get_inbox()
+	{
+		// Based on the type selected get/set the additional connection details
+		$connection = _port_type($this->_type);
+		$this->_hostname .= (strpos($this->_hostname, ':') === false) ? ':' . $connection['port'] : '';
+		$this->_imap_server = '{' . $this->_hostname . '/' . $connection['protocol'] . $connection['flags'] . '}';
+		$this->_mailbox = $this->_imap_server .  imap_utf7_encode($this->_mailbox);
+
+		// Connect to the mailbox using the supplied credentials and protocol
+		$this->_inbox = @imap_open($this->_mailbox, $username, $password);
+	}
+
+	/**
+	 * Retrieves and composes and email (headers+message) from and imap inbox
+	 *
+	 * @param int $email_uid - The email id
+	 */
+	protected function _fetch_email($email_uid)
+	{
+		// Get the headers and prefetch the body as well to avoid a second request
+		$headers = imap_fetchheader($this->_inbox, $email_uid, FT_PREFETCHTEXT|FT_UID);
+		$message = imap_body($this->_inbox, $email_uid, FT_UID);
+
+		// Create the save-as email
+		if (!empty($headers) && !empty($message))
+			$email = $headers . "\n" . $message;
+		else
+			$email = '';
+
+		return $email;
+	}
+
+	/**
+	 * Deletes an email from and imap inbox
+	 *
+	 * @param int $email_uid - The email id
+	 */
+	protected function _delete_email($email_uid)
+	{
+		// Gmail labels make this more complicated
+		if ($this->_is_gmail)
+		{
+			// If using gmail, we may need the trash bin name as well
+			$trash_bin = _get_trash_folder();
+			imap_mail_move($this->_inbox, $email_uid, $trash_bin, CP_UID);
+		}
+
+		imap_delete($this->_inbox, $email_uid, FT_UID);
+		imap_expunge($this->_inbox);
+	}
+
+	/**
+	 * Sets port and connection flags based on the chosen protocol
+	 */
+	protected function _port_type()
+	{
+		switch ($this->_type)
+		{
+			case 'pop3':
+				// Standard POP3 mailbox.
+				$protocol = 'POP3';
+				$port = 110;
+				$flags = '/novalidate-cert';
+				break;
+			case 'pop3tls':
+				// POP3, TLS mode.
+				$protocol = 'POP3';
+				$port = 110;
+				$flags = '/tls/novalidate-cert';
+				break;
+			case 'pop3ssl':
+				// POP3, SSL mode.
+				$protocol = 'POP3SSL';
+				$port = 995;
+				$flags = '/ssl/novalidate-cert';
+				break;
+			case 'imap':
+				// Standard IMAP mailbox.
+				$protocol = 'IMAP';
+				$port = 143;
+				$flags = '/novalidate-cert';
+				break;
+			case 'imaptls':
+				// IMAP in TLS mode.
+				$protocol = 'IMAPTLS';
+				$port = 143;
+				$flags = '/tls/novalidate-cert';
+				break;
+			case 'imapssl':
+				// IMAP in SSL mode.
+				$protocol = 'IMAP';
+				$port = 993;
+				$flags = '/ssl/novalidate-cert';
+				break;
+			default:
+				// Somethings wrong, so use a standard POP3 mailbox.
+				$protocol = 'POP3';
+				$port = 110;
+				$flags = '/novalidate-cert';
+				break;
+		}
+
+		return array('protocol' => $protocol, 'port' => $port, 'flags' => $flags);
+	}
+
+	/**
+	 * Find and return the proper recycle bin for gmail
+	 *
+	 * @return string
+	 */
+	protected function __get_trash_folder()
+	{
+		// Known names for the trash bin, I'm sure there are more
+		$trashbox = array('[Google Mail]/Bin', '[Google Mail]/Trash', '[Gmail]/Bin', '[Gmail]/Trash');
+
+		call_integration_hook('integrate_imap_trash_folders', array(&$trashbox));
+
+		// Get all the folders / labels
+		$mailboxes = imap_list($this->_inbox, $this->_imap_server, '*');
+
+		// Check the names to see if one is known as a trashbin
+		foreach($mailboxes as $mailbox)
+		{
+			$name = str_replace($this->_imap_server, '', $mailbox);
+			if (in_array($name, $trashbox))
+				return $name;
+		}
+
+		return 'Trash';
+	}
 }
