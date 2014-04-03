@@ -43,9 +43,7 @@ class BadBehavior_Controller extends Action_Controller
 	 */
 	public function action_log()
 	{
-		global $scripturl, $txt, $context, $modSettings, $user_profile, $filter;
-
-		$db = database();
+		global $scripturl, $txt, $context, $modSettings;
 
 		// Check for the administrative permission to do this.
 		isAllowedTo('admin_forum');
@@ -57,30 +55,14 @@ class BadBehavior_Controller extends Action_Controller
 		// Functions we will need
 		require_once(SUBSDIR . '/BadBehavior.subs.php');
 
-		// You can filter by any of the following columns:
-		$filters = array(
-			'id_member' => $txt['badbehaviorlog_username'],
-			'ip' => $txt['badbehaviorlog_ip'],
-			'session' => $txt['badbehaviorlog_session'],
-			'valid' => $txt['badbehaviorlog_key'],
-			'request_uri' => $txt['badbehaviorlog_request'],
-			'user_agent' => $txt['badbehaviorlog_agent'],
-		);
-
 		// Set up the filtering...
 		$filter = array();
-		if (isset($_GET['value'], $_GET['filter']) && isset($filters[$_GET['filter']]))
+		if (isset($_GET['value'], $_GET['filter']))
 		{
-			$filter = array(
-				'variable' => $_GET['filter'] == 'useragent' ? 'user_agent' : $_GET['filter'],
-				'value' => array(
-					'sql' => in_array($_GET['filter'], array('request_uri', 'user_agent')) ? base64_decode(strtr($_GET['value'], array(' ' => '+'))) : $db->escape_wildcard_string($_GET['value']),
-				),
-				'href' => ';filter=' . $_GET['filter'] . ';value=' . $_GET['value'],
-				'entity' => $filters[$_GET['filter']]
-			);
+			$filter = $this->_setFilter();
 		}
-		elseif (isset($_GET['filter']) || isset($_GET['value']))
+
+		if (empty($filter))
 		{
 			// Bad filter or something else going on, back to the start you go
 			unset($_GET['filter'], $_GET['value']);
@@ -89,21 +71,7 @@ class BadBehavior_Controller extends Action_Controller
 
 		// Deleting or just doing a little weeding?
 		if (isset($_POST['delall']) || isset($_POST['delete']))
-		{
-			$type = isset($_POST['delall']) ? 'delall' : 'delete';
-			// Make sure the session exists and the token is correct
-			checkSession();
-			validateToken('admin-bbl');
-
-			$redirect = deleteBadBehavior($type, $filter);
-			if ($redirect === 'delete')
-			{
-				$start = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
-				// Go back to where we were.
-				redirectexit('action=admin;area=logs;sa=badbehaviorlog' . (isset($_REQUEST['desc']) ? ';desc' : '') . ';start=' . $start . (!empty($filter) ? ';filter=' . $_GET['filter'] . ';value=' . $_GET['value'] : ''));
-			}
-			redirectexit('action=admin;area=logs;sa=badbehaviorlog' . (isset($_REQUEST['desc']) ? ';desc' : ''));
-		}
+			$this->_action_delete($filter);
 
 		// Just how many entries are there?
 		$num_errors = getBadBehaviorLogEntryCount($filter);
@@ -147,28 +115,7 @@ class BadBehavior_Controller extends Action_Controller
 
 		// Filtering?
 		if (!empty($filter))
-		{
-			$context['filter'] = $filter;
-
-			// Set the filtering context.
-			if ($filter['variable'] === 'id_member')
-			{
-				$id = $filter['value']['sql'];
-				loadMemberData($id, false, 'minimal');
-				$context['filter']['value']['html'] = '<a href="' . $scripturl . '?action=profile;u=' . $id . '">' . $user_profile[$id]['real_name'] . '</a>';
-			}
-			elseif ($filter['variable'] === 'url')
-			{
-				$context['filter']['value']['html'] = '\'' . strtr(htmlspecialchars((substr($filter['value']['sql'], 0, 1) === '?' ? $scripturl : '') . $filter['value']['sql'], ENT_COMPAT, 'UTF-8'), array('\_' => '_')) . '\'';
-			}
-			elseif ($filter['variable'] === 'headers')
-			{
-				$context['filter']['value']['html'] = '\'' . strtr(htmlspecialchars($filter['value']['sql'], ENT_COMPAT, 'UTF-8'), array("\n" => '<br />', '&lt;br /&gt;' => '<br />', "\t" => '&nbsp;&nbsp;&nbsp;', '\_' => '_', '\\%' => '%', '\\\\' => '\\')) . '\'';
-				$context['filter']['value']['html'] = preg_replace('~&amp;lt;span class=&amp;quot;remove&amp;quot;&amp;gt;(.+?)&amp;lt;/span&amp;gt;~', '$1', $context['filter']['value']['html']);
-			}
-			else
-				$context['filter']['value']['html'] = $filter['value']['sql'];
-		}
+			$this->_prepareFilters($filter);
 
 		// And the standard template goodies
 		$context['page_title'] = $txt['badbehaviorlog_log'];
@@ -179,4 +126,88 @@ class BadBehavior_Controller extends Action_Controller
 
 		createToken('admin-bbl');
 	}
+
+	/**
+	 * Prepares the filter index of the $context variable
+	 *
+	 * @param string[] $filter - an array describing the current filter
+	 */
+	protected function _prepareFilters($filter)
+	{
+		global $context, $scripturl, $user_profile;
+
+		$context['filter'] = $filter;
+
+		// Set the filtering context.
+		if ($filter['variable'] === 'id_member')
+		{
+			$id = $filter['value']['sql'];
+			loadMemberData($id, false, 'minimal');
+			$context['filter']['value']['html'] = '<a href="' . $scripturl . '?action=profile;u=' . $id . '">' . $user_profile[$id]['real_name'] . '</a>';
+		}
+		elseif ($filter['variable'] === 'url')
+		{
+			$context['filter']['value']['html'] = '\'' . strtr(htmlspecialchars((substr($filter['value']['sql'], 0, 1) === '?' ? $scripturl : '') . $filter['value']['sql'], ENT_COMPAT, 'UTF-8'), array('\_' => '_')) . '\'';
+		}
+		elseif ($filter['variable'] === 'headers')
+		{
+			$context['filter']['value']['html'] = '\'' . strtr(htmlspecialchars($filter['value']['sql'], ENT_COMPAT, 'UTF-8'), array("\n" => '<br />', '&lt;br /&gt;' => '<br />', "\t" => '&nbsp;&nbsp;&nbsp;', '\_' => '_', '\\%' => '%', '\\\\' => '\\')) . '\'';
+			$context['filter']['value']['html'] = preg_replace('~&amp;lt;span class=&amp;quot;remove&amp;quot;&amp;gt;(.+?)&amp;lt;/span&amp;gt;~', '$1', $context['filter']['value']['html']);
+		}
+		else
+			$context['filter']['value']['html'] = $filter['value']['sql'];
+	}
+
+	/**
+	 * Populates the $filter array with data from $_GET
+	 */
+	protected function _setFilter()
+	{
+		$db = database();
+
+		// You can filter by any of the following columns:
+		$filters = array(
+			'id_member' => $txt['badbehaviorlog_username'],
+			'ip' => $txt['badbehaviorlog_ip'],
+			'session' => $txt['badbehaviorlog_session'],
+			'valid' => $txt['badbehaviorlog_key'],
+			'request_uri' => $txt['badbehaviorlog_request'],
+			'user_agent' => $txt['badbehaviorlog_agent'],
+		);
+
+		if (!isset($filters[$_GET['filter']]))
+			return false;
+
+		return array(
+			'variable' => $_GET['filter'] == 'useragent' ? 'user_agent' : $_GET['filter'],
+			'value' => array(
+				'sql' => in_array($_GET['filter'], array('request_uri', 'user_agent')) ? base64_decode(strtr($_GET['value'], array(' ' => '+'))) : $db->escape_wildcard_string($_GET['value']),
+			),
+			'href' => ';filter=' . $_GET['filter'] . ';value=' . $_GET['value'],
+			'entity' => $filters[$_GET['filter']]
+		);
+	}
+
+	/**
+	 * Performs the removal of one or multiple log entries
+	 *
+	 * @param string[] $filter - an array describing the current filter
+	 */
+	protected function _action_delete($filter)
+	{
+		$type = isset($_POST['delall']) ? 'delall' : 'delete';
+		// Make sure the session exists and the token is correct
+		checkSession();
+		validateToken('admin-bbl');
+
+		$redirect = deleteBadBehavior($type, $filter);
+		if ($redirect === 'delete')
+		{
+			$start = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
+			// Go back to where we were.
+			redirectexit('action=admin;area=logs;sa=badbehaviorlog' . (isset($_REQUEST['desc']) ? ';desc' : '') . ';start=' . $start . (!empty($filter) ? ';filter=' . $_GET['filter'] . ';value=' . $_GET['value'] : ''));
+		}
+		redirectexit('action=admin;area=logs;sa=badbehaviorlog' . (isset($_REQUEST['desc']) ? ';desc' : ''));
+	}
+
 }
