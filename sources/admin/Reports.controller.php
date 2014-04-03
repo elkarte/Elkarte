@@ -380,10 +380,6 @@ class Reports_Controller extends Action_Controller
 						$curData[$id_group] = '<span class="success">' . $txt['board_perms_allow'] . '</span>';
 					else
 						$curData[$id_group] = 'x';
-
-					// Embolden those permissions different from global (makes it a lot easier!)
-					if (@$board_permissions[0][$id_group][$ID_PERM] != @$group_permissions[$ID_PERM])
-						$curData[$id_group] = '<strong>' . $curData[$id_group] . '</strong>';
 				}
 
 				// Now add the data for this permission.

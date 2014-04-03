@@ -23,7 +23,18 @@ function template_modify_weights()
 {
 	global $context, $settings, $scripturl, $txt, $modSettings;
 
-	echo '
+	if (!empty($modSettings['search_index']) && ($modSettings['search_index'] === 'sphinx' || $modSettings['search_index'] === 'sphinxql'))
+		echo '
+	<h2 class="category_header">', $txt['search_weights'], '</h2>
+		<div class="windowbg">
+			<div class="content">
+				<div class="infobox">',
+					$txt['search_weights_none'], '
+				</div>
+			</div>
+		</div>';
+	else
+		echo '
 	<div id="admincenter">
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=managesearch;sa=weights" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $txt['search_weights'], '</h2>

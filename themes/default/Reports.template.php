@@ -120,12 +120,12 @@ function template_generate_report()
 				// Shaded?
 				if ($column_number == 0 && !empty($table['shading']['left']))
 					echo '
-					<td class="table_caption" style="text-align:', $table['align']['shaded'], $table['width']['shaded'] != 'auto' ? ';width:' . $table['width']['shaded'] . '"' : '"', '>
+					<td class="table_caption" style="text-align:', $table['align']['shaded'], $table['width']['shaded'] != 'auto' ? ';width:' . $table['width']['shaded'] . 'px"' : '"', '>
 						', $data['v'] == $table['default_value'] ? '' : ($data['v'] . (empty($data['v']) ? '' : ':')), '
 					</td>';
 				else
 					echo '
-					<td class="smalltext" style="text-align:', $table['align']['normal'], $table['width']['normal'] != 'auto' ? ';width:' . $table['width']['normal'] . '' : '', !empty($data['style']) ? ';' . $data['style'] . '"' : '"', '>
+					<td style="text-align:', $table['align']['normal'], $table['width']['normal'] != 'auto' ? ';width:' . $table['width']['normal'] . '' : '', !empty($data['style']) ? ';' . $data['style'] . '"' : '"', '>
 						', $data['v'], '
 					</td>';
 

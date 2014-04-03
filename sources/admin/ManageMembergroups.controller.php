@@ -571,7 +571,6 @@ class ManageMembergroups_Controller extends Action_Controller
 			$validator->validation_rules(array(
 				'boardaccess' => 'contains[allow,ignore,deny]',
 			));
-
 			$validator->validate($_POST);
 
 			// Can they really inherit from this group?
@@ -593,7 +592,7 @@ class ManageMembergroups_Controller extends Action_Controller
 				'current_group' => $current_group['id_group'],
 				'group_name' => $validator->group_name,
 				'online_color' => $validator->online_color,
-				'icons' => $validator->icon_count <= 0 ? '' : min($validator->icon_count, 99) . '#' . $validator->icon_image,
+				'icons' => $validator->icon_count <= 0 ? '' : min($validator->icon_count, 10) . '#' . $validator->icon_image,
 				// /me wonders why admin is *so* special
 				'description' => $current_group['id_group'] == 1 || $validator->group_type != -1 ? $validator->group_desc : '',
 			);

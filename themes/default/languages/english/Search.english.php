@@ -37,10 +37,11 @@ $txt['search_weight_subject'] = 'Relative search weight for a matching subject';
 $txt['search_weight_first_message'] = 'Relative search weight for a first message match';
 $txt['search_weight_sticky'] = 'Relative search weight for a sticky topic';
 
-$txt['search_settings_desc'] = 'Here you can changes the basic settings of the search function.';
+$txt['search_settings_desc'] = 'Here you can change the basic settings of the search function.';
 $txt['search_settings_title'] = 'Search Settings';
 
-$txt['search_weights_desc'] = 'Here you can change the individual components of the relevance rating. ';
+$txt['search_weights_desc'] = 'Here you can change the individual components of the relevance rating.';
+$txt['search_weights_none'] = 'Weight factors are not needed when using Sphinx wich uses internal methods based on phrase proximity and keyword frequencies.';
 $txt['search_weights_title'] = 'Search - weights';
 $txt['search_weights_total'] = 'Total';
 $txt['search_weights_save'] = 'Save';

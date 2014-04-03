@@ -98,7 +98,7 @@ function template_manage_boards()
 
 			echo '
 						<li id="cbp_' . $category['id'] . ',' . $board['id'] . '"', ' class="windowbg', $alternate ? '' : '2', (!empty($modSettings['recycle_board']) && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board['id'] ? ' recycle_board' : ''), '" style="', $board['move'] ? ';color: red;' : '', '">
-							<span class="floatleft"><a href="', $scripturl, '?board=', $board['id'], '">', $board['name'], '</a>', !empty($modSettings['recycle_board']) && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board['id'] ? '<a href="' . $scripturl . '?action=admin;area=manageboards;sa=settings"> <img src="' . $settings['images_url'] . '/post/recycled.png" alt="' . $txt['recycle_board'] . '" /></a></span>' : '</span>', '
+							<span class="floatleft"><a href="', $scripturl, '?board=', $board['id'], '">', $board['name'], '</a>', !empty($modSettings['recycle_board']) && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board['id'] ? '&nbsp;<a href="' . $scripturl . '?action=admin;area=manageboards;sa=settings"><img src="' . $settings['images_url'] . '/post/recycled.png" alt="' . $txt['recycle_board'] . '" /></a></span>' : '</span>', '
 							<span class="floatright">', $context['can_manage_permissions'] ? '<span class="modify_boards"><a href="' . $scripturl . '?action=admin;area=permissions;sa=index;pid=' . $board['permission_profile'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['mboards_permissions'] . '</a></span>' : '', '
 							<span class="modify_boards"><a href="', $scripturl, '?action=admin;area=manageboards;move=', $board['id'], '">', $txt['mboards_move'], '</a></span>
 							<span class="modify_boards"><a href="', $scripturl, '?action=admin;area=manageboards;sa=board;boardid=', $board['id'], '">', $txt['mboards_modify'], '</a></span></span><br style="clear: right;" />';
@@ -544,7 +544,7 @@ function template_modify_board()
 
 	if (!empty($context['board']['is_recycle']))
 		echo '
-					<div class="infobox">', $txt['mboards_redirect_disabled_recycle'], '</div>';
+					<div class="infobox">', $txt['mboards_redirect_disabled_recycle'], '<br />',$txt['mboards_recycle_disabled_delete'] ,'</div>';
 
 	if (empty($context['board']['is_recycle']) && !empty($context['board']['topics']))
 		echo '
@@ -631,9 +631,6 @@ function template_modify_board()
 							</dd>
 						</dl>
 					</div>';
-
-	if (!empty($context['board']['is_recycle']))
-		echo '<div class="information">', $txt['mboards_recycle_disabled_delete'], '</div>';
 
 	echo '
 					<div class="submitbutton">

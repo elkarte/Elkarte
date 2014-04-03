@@ -547,7 +547,7 @@ class Register_Controller extends Action_Controller
 
 		// If there are "important" errors and you are not an admin: log the first error
 		// Otherwise grab all of them and don't log anything
-		if ($reg_errors->hasErrors(1) && !$user_info['is_admin']);
+		if ($reg_errors->hasErrors(1) && !$user_info['is_admin'])
 			foreach ($reg_errors->prepareErrors(1) as $error)
 				fatal_error($error, 'general');
 
@@ -897,12 +897,12 @@ class Register_Controller extends Action_Controller
 
 		loadLanguage('Login');
 		loadTemplate('Register');
-		spamProtection('contact');
 
 		if (isset($_REQUEST['send']))
 		{
 			checkSession('post');
 			validateToken('contact');
+			spamProtection('contact');
 
 			// No errors, yet.
 			$context['errors'] = array();

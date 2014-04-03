@@ -663,7 +663,7 @@ function countTopicsFromBoard($id_board)
 }
 
 /**
- * Gets a list of topics which should be moved to a different board.
+ * Gets a list of the next 10 topics which should be moved to a different board.
  *
  * @package Maintenance
  * @param int $id_board

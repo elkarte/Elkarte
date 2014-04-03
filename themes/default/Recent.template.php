@@ -129,7 +129,7 @@ function template_unread()
 										<img src="', $topic['first_post']['icon_url'], '" alt="" />';
 
 							echo '
-										', $topic['is_posted_in'] ? '<span class="fred topicicon img_profile" alt=""></span>' : '', '
+										', $topic['is_posted_in'] ? '<span class="fred topicicon img_profile"></span>' : '', '
 									</p>
 									<div class="topic_name">';
 

@@ -434,27 +434,33 @@ function template_quickreply_below()
 		}
 
 		echo '
-							<div class="submitbutton">
+							<div id="post_confirm_buttons" class="submitbutton">
 								<input type="submit" name="post" value="', $txt['post'], '" onclick="return submitThisOnce(this);" accesskey="s" tabindex="', $context['tabindex']++, '" class="button_submit" />
 								<input type="submit" name="preview" value="', $txt['preview'], '" onclick="return submitThisOnce(this);" accesskey="p" tabindex="', $context['tabindex']++, '" class="button_submit" />';
 
+		// Spellcheck button?
 		if ($context['show_spellchecking'])
 			echo '
 								<input type="button" value="', $txt['spell_check'], '" onclick="spellCheck(\'postmodify\', \'message\', ', (empty($options['use_editor_quick_reply']) ? 'false' : 'true'), ')" tabindex="', $context['tabindex']++, '" class="button_submit" />';
 
-		if ($context['drafts_save'] && !empty($options['display_quick_reply']))
-		{
+		// Draft save button?
+		if (!empty($context['drafts_save']))
 			echo '
 								<input type="submit" name="save_draft" value="', $txt['draft_save'], '" onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d" tabindex="', $context['tabindex']++, '" class="button_submit" />
 								<input type="hidden" id="id_draft" name="id_draft" value="', empty($context['id_draft']) ? 0 : $context['id_draft'], '" />';
 
-			if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
-				echo '
-								<div class="clear"><span id="throbber" style="display:none"><img src="' . $settings['images_url'] . '/loading_sm.gif" alt="" class="centericon" />&nbsp;</span><span id="draft_lastautosave"></span></div>';
-		}
+		echo '
+							</div>';
+
+		// Show the draft last saved on area
+		if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
+			echo '
+							<div class="draftautosave">
+								<span id="throbber" style="display:none"><i class="fa fa-spinner fa-spin" alt="loading"></i>&nbsp;</span>
+								<span id="draft_lastautosave"></span>
+							</div>';
 
 		echo '
-							</div>
 						</form>
 					</div>
 				</div>

@@ -299,7 +299,7 @@ function template_edit_group()
 						<label for="icon_count_input"><strong>', $txt['membergroups_icon_count'], ':</strong></label>
 					</dt>
 					<dd>
-						<input type="text" name="icon_count" id="icon_count_input" value="', $context['group']['icon_count'], '" size="4" onkeyup="if (this.value.length > 2) this.value = 99;" onkeydown="this.onkeyup();" onchange="if (this.value != 0) this.form.icon_image.onchange();" class="input_text" />
+						<input type="number" min="0" max="10" step="1" name="icon_count" id="icon_count_input" value="', $context['group']['icon_count'], '" size="4" onkeyup="if (parseInt(this.value, 10) > 10) this.value = 10;" onchange="this.value = Math.floor(this.value);this.form.icon_image.onchange();" class="input_text" />
 					</dd>
 					<dt>
 						<label for="icon_image_input"><strong>', $txt['membergroups_icon_image'], ':</strong></label>
@@ -309,7 +309,7 @@ function template_edit_group()
 					<dd>
 						<span class="floatleft">
 							', $txt['membergroups_images_url'], '
-							<input type="text" name="icon_image" id="icon_image_input" value="', $context['group']['icon_image'], '" onchange="if (this.value &amp;&amp; this.form.icon_count.value === 0) this.form.icon_count.value = 1;else if (!this.value) this.form.icon_count.value = 0; document.getElementById(\'msg_icon_0\').src = elk_images_url + \'/group_icons/\' + (this.value &amp;&amp; this.form.icon_count.value > 0 ? this.value : \'blank.png\')" size="20" class="input_text" />
+							<input type="text" name="icon_image" id="icon_image_input" value="', $context['group']['icon_image'], '" onchange="if (this.value &amp;&amp; this.form.icon_count.value == 0) this.form.icon_count.value = 1;else if (!this.value) this.form.icon_count.value = 0; document.getElementById(\'msg_icon_0\').src = elk_images_url + \'/group_icons/\' + (this.value &amp;&amp; this.form.icon_count.value > 0 ? this.value : \'blank.png\')" size="20" class="input_text" />
 						</span>
 						<span id="messageicon_0" class="groupicon">
 							<img id="msg_icon_0" src="', $settings['images_url'], '/group_icons/', $context['group']['icon_image'] == '' ? 'blank.png' : $context['group']['icon_image'], '" alt="*" />
@@ -354,15 +354,12 @@ function template_edit_group()
 		aIconLists[aIconLists.length] = new IconList({
 			sBackReference: "aIconLists[" + aIconLists.length + "]",
 			sIconIdPrefix: "msg_icon_",
-			sScriptUrl: elk_scripturl,
 			bShowModify: false,
-			sSessionId: elk_session_id,
-			sSessionVar: elk_session_var,
 			sAction: "groupicons",
 			sLabelIconList: ' . JavaScriptEscape($txt['membergroups_icons']) . ',
 			sLabelIconBox: "icon_image_input",
 			sBoxBackground: "transparent",
-			sBoxBackgroundHover: "#FFF",
+			sBoxBackgroundHover: "#fff",
 			iBoxBorderWidthHover: 1,
 			sBoxBorderColorHover: "#adadad",
 			sContainerBackground: "#fff",

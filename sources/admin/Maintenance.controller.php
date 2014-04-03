@@ -1064,13 +1064,13 @@ class Maintenance_Controller extends Action_Controller
 	 */
 	public function action_massmove_display()
 	{
-		global $context, $txt;
+		global $context, $txt, $time_start;
 
 		// Only admins.
 		isAllowedTo('admin_forum');
 
-		checkSession('request');
-		validateToken('admin-maint');
+		// And valid requests
+		checkSession();
 
 		// Set up to the context.
 		$context['page_title'] = $txt['not_done_title'];
@@ -1079,7 +1079,6 @@ class Maintenance_Controller extends Action_Controller
 		$context['continue_get_data'] = '';
 		$context['sub_template'] = 'not_done';
 		$context['start'] = empty($_REQUEST['start']) ? 0 : (int) $_REQUEST['start'];
-		$context['start_time'] = time();
 
 		// First time we do this?
 		$id_board_from = isset($_POST['id_board_from']) ? (int) $_POST['id_board_from'] : (int) $_REQUEST['id_board_from'];
@@ -1089,44 +1088,50 @@ class Maintenance_Controller extends Action_Controller
 		if (empty($id_board_from) || empty($id_board_to))
 			return;
 
-		// How many topics are we converting?
+		// These will be needed
+		require_once(SUBSDIR . '/Maintenance.subs.php');
+		require_once(SUBSDIR . '/Topic.subs.php');
+
+		// How many topics are we moving?
 		if (!isset($_REQUEST['totaltopics']))
 			$total_topics = countTopicsFromBoard($id_board_from);
 		else
+		{
 			$total_topics = (int) $_REQUEST['totaltopics'];
-
-		// Seems like we need this here.
-		$context['continue_get_data'] = '?action=admin;area=maintain;sa=topics;activity=massmove;id_board_from=' . $id_board_from . ';id_board_to=' . $id_board_to . ';totaltopics=' . $total_topics . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'];
+			validateToken('admin_movetopics');
+		}
 
 		// We have topics to move so start the process.
 		if (!empty($total_topics))
 		{
 			while ($context['start'] <= $total_topics)
 			{
-				// Lets get the topics.
+				// Lets get the next 10 topics.
 				$topics = getTopicsToMove($id_board_from);
 
 				// Just return if we don't have any topics left to move.
 				if (empty($topics))
-				{
-					cache_put_data('board-' . $id_board_from, null, 120);
-					cache_put_data('board-' . $id_board_to, null, 120);
-					redirectexit('action=admin;area=maintain;sa=topics;done=massmove');
-				}
+					break;
 
 				// Lets move them.
-				require_once(SUBSDIR . '/Topic.subs.php');
 				moveTopics($topics, $id_board_to);
 
-				// We've done at least ten more topics.
+				// Increase the counter
 				$context['start'] += 10;
 
-				// Lets wait a while.
-				if (time() - $context['start_time'] > 3)
+				// If this is really taking some time, show the pause screen
+				if (microtime(true) - $time_start > 3)
 				{
+					createToken('admin_movetopics');
+
 					// What's the percent?
 					$context['continue_percent'] = round(100 * ($context['start'] / $total_topics), 1);
-					$context['continue_get_data'] = '?action=admin;area=maintain;sa=topics;activity=massmove;id_board_from=' . $id_board_from . ';id_board_to=' . $id_board_to . ';totaltopics=' . $total_topics . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'];
+
+					// Set up for the form
+					$context['continue_get_data'] = '?action=admin;area=maintain;sa=topics;activity=massmove;id_board_from=' . $id_board_from . ';id_board_to=' . $id_board_to . ';totaltopics=' . $total_topics . ';start=' . $context['start'];
+					$context['continue_post_data'] = '
+						<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
+						<input type="hidden" name="' . $context['admin_movetopics_token_var'] . '" value="' . $context['admin_movetopics_token'] . '" />';
 
 					// Let the template system do it's thang.
 					return;

@@ -128,8 +128,6 @@ h3 a.help .icon {
 }
 
 .table_caption, tr.table_caption td {
-	color: #000;
-	font-size: .714em;
 	font-weight: bold;
 }
 .additional_row div.floatleft {

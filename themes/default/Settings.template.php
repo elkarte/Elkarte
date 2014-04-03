@@ -12,7 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta 2
- * 
+ *
  */
 
 /**
@@ -192,10 +192,6 @@ function template_settings()
 		array(
 			'id' => 'show_mark_read',
 			'label' => $txt['enable_mark_as_read'],
-		),
-		array(
-			'id' => 'allow_no_censored',
-			'label' => $txt['allow_no_censored'],
 		),
 		array(
 			'id' => 'enable_news',

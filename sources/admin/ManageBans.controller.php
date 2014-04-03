@@ -121,11 +121,11 @@ class ManageBans_Controller extends Action_Controller
 			checkSession();
 
 			// Make sure every entry is a proper integer.
-			array_map('intval', $_POST['remove']);
+			$to_remove = array_map('intval', $_POST['remove']);
 
 			// Unban them all!
-			removeBanGroups($_POST['remove']);
-			removeBanTriggers($_POST['remove']);
+			removeBanGroups($to_remove);
+			removeBanTriggers($to_remove);
 
 			// No more caching this ban!
 			updateSettings(array('banLastUpdated' => time()));
@@ -539,8 +539,8 @@ class ManageBans_Controller extends Action_Controller
 			// 'Delete selection' button was pressed.
 			else
 			{
-				array_map('intval', $_POST['remove']);
-				removeBanLogs($_POST['remove']);
+				$to_remove = array_map('intval', $_POST['remove']);
+				removeBanLogs($to_remove);
 			}
 		}
 
@@ -736,9 +736,9 @@ class ManageBans_Controller extends Action_Controller
 		if (isset($_POST['ban_items']))
 		{
 			$ban_group_id = isset($_REQUEST['bg']) ? (int) $_REQUEST['bg'] : 0;
-			array_map('intval', $_POST['ban_items']);
+			$ban_items = array_map('intval', $_POST['ban_items']);
 
-			removeBanTriggers($_POST['ban_items'], $ban_group_id);
+			removeBanTriggers($ban_items, $ban_group_id);
 		}
 
 		// Register the last modified date.
@@ -886,9 +886,9 @@ class ManageBans_Controller extends Action_Controller
 			checkSession();
 
 			// Make sure every entry is a proper integer.
-			array_map('intval', $_POST['remove']);
+			$to_remove = array_map('intval', $_POST['remove']);
 
-			removeBanTriggers($_POST['remove']);
+			removeBanTriggers($to_remove);
 
 			// Rehabilitate some members.
 			if ($_REQUEST['entity'] == 'member')

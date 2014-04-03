@@ -750,6 +750,13 @@ function registerMember(&$regOptions, $error_context = 'register')
 		{
 			if (!empty($regOptions['send_welcome_email']))
 			{
+				$replacements = array(
+					'REALNAME' => $regOptions['register_vars']['real_name'],
+					'USERNAME' => $regOptions['username'],
+					'PASSWORD' => $regOptions['password'],
+					'FORGOTPASSWORDLINK' => $scripturl . '?action=reminder',
+					'OPENID' => !empty($regOptions['openid']) ? $regOptions['openid'] : '',
+				);
 				$emaildata = loadEmailTemplate('register_' . ($regOptions['auth_method'] == 'openid' ? 'openid_' : '') . 'immediate', $replacements);
 				sendmail($regOptions['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
 			}
@@ -761,6 +768,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 		// Need to activate their account - or fall under COPPA.
 		elseif ($regOptions['require'] == 'activation' || $regOptions['require'] == 'coppa')
 		{
+
 			$emaildata = loadEmailTemplate('register_' . ($regOptions['auth_method'] == 'openid' ? 'openid_' : '') . ($regOptions['require'] == 'activation' ? 'activate' : 'coppa'), $replacements);
 
 			sendmail($regOptions['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
@@ -768,6 +776,14 @@ function registerMember(&$regOptions, $error_context = 'register')
 		// Must be awaiting approval.
 		else
 		{
+			$replacements = array(
+				'REALNAME' => $regOptions['register_vars']['real_name'],
+				'USERNAME' => $regOptions['username'],
+				'PASSWORD' => $regOptions['password'],
+				'FORGOTPASSWORDLINK' => $scripturl . '?action=reminder',
+				'OPENID' => !empty($regOptions['openid']) ? $regOptions['openid'] : '',
+			);
+
 			$emaildata = loadEmailTemplate('register_' . ($regOptions['auth_method'] == 'openid' ? 'openid_' : '') . 'pending', $replacements);
 
 			sendmail($regOptions['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
@@ -1452,15 +1468,15 @@ function prepareMembersByQuery($query, &$query_params, $only_active = true)
 				foreach ($query_conditions as $condition => $query_condition)
 				{
 					if ($query_condition == 'member_names')
-						$query_parts[$condition === 'or' ? 'or' : 'and'] = $allowed_conditions[$query_condition]($query_params);
+						$query_parts[$condition === 'or' ? 'or' : 'and'][] = $allowed_conditions[$query_condition]($query_params);
 					else
-						$query_parts[$condition === 'or' ? 'or' : 'and'] = isset($allowed_conditions[$query_condition]) ? $allowed_conditions[$query_condition] : $query_condition;
+						$query_parts[$condition === 'or' ? 'or' : 'and'][] = isset($allowed_conditions[$query_condition]) ? $allowed_conditions[$query_condition] : $query_condition;
 				}
 			}
 			elseif ($query == 'member_names')
-				$query_parts[$condition === 'or' ? 'or' : 'and'] = $allowed_conditions[$query]($query_params);
+				$query_parts[$condition === 'or' ? 'or' : 'and'][] = $allowed_conditions[$query]($query_params);
 			else
-				$query_parts['and'] = isset($allowed_conditions[$query]) ? $allowed_conditions[$query] : $query;
+				$query_parts['and'][] = isset($allowed_conditions[$query]) ? $allowed_conditions[$query] : $query;
 		}
 
 		if (!empty($query_parts['or']))

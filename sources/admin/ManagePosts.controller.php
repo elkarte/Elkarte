@@ -168,11 +168,13 @@ class ManagePosts_Controller extends Action_Controller
 			updateSettings($updates);
 		}
 
+		// Testing a word to see how it will be censored?
 		if (isset($_POST['censortest']))
 		{
 			require_once(SUBSDIR . '/Post.subs.php');
 			$censorText = htmlspecialchars($_POST['censortest'], ENT_QUOTES, 'UTF-8');
 			preparsecode($censorText);
+			$pre_censor = $censorText;
 			$context['censor_test'] = strtr(censorText($censorText), array('"' => '&quot;'));
 		}
 
@@ -194,11 +196,30 @@ class ManagePosts_Controller extends Action_Controller
 		}
 
 		call_integration_hook('integrate_censors');
-
-		$context['sub_template'] = 'edit_censored';
-		$context['page_title'] = $txt['admin_censored_words'];
-
 		createToken('admin-censor');
+
+		// Using ajax?
+		if (isset($_REQUEST['xml']))
+		{
+			// Clear the templates
+			$template_layers = Template_Layers::getInstance();
+			$template_layers->removeAll();
+
+			// Send back a response
+			loadTemplate('Json');
+			$context['sub_template'] = 'send_json';
+			$context['json_data'] = array(
+				'result' => true,
+				'censor' => $pre_censor . ' <i class="fa fa-arrow-circle-right"></i> ' . $context['censor_test'],
+				'token_val' => 	$context['admin-censor_token_var'],
+				'token' => $context['admin-censor_token'],
+			);
+		}
+		else
+		{
+			$context['sub_template'] = 'edit_censored';
+			$context['page_title'] = $txt['admin_censored_words'];
+		}
 	}
 
 	/**

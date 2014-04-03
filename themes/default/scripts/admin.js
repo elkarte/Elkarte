@@ -1218,6 +1218,22 @@ function swapRot()
 }
 
 /**
+ * Enable/disable fields when transfering attachments
+ * 
+ * @returns {undefined}
+ */
+function transferAttachOptions()
+{
+	var autoSelect = document.getElementById("auto"),
+		autoValue = parseInt(autoSelect.options[autoSelect.selectedIndex].value, 10),
+		toSelect = document.getElementById("to"),
+		toValue = parseInt(toSelect.options[toSelect.selectedIndex].value, 10);
+
+		toSelect.disabled = autoValue !== 0 ? true : false;
+		autoSelect.disabled = toValue !== 0 ?  true : false;
+}
+
+/**
  * Updates the move confirmation text so its descriptive for the current items
  * being moved.
  *
@@ -1231,7 +1247,7 @@ function confirmMoveTopics(confirmText)
 	if (from.options[from.selectedIndex].disabled || from.options[to.selectedIndex].disabled)
 		return false;
 
-	return confirm(confirmText.replace(/%board_from%/, from.options[from.selectedIndex].text.replace(/^=+&gt;&nbsp;/, '')).replace(/%board_to%/, to.options[to.selectedIndex].text.replace(/^=+&gt;&nbsp;/, '')));
+	return confirm(confirmText.replace(/%board_from%/, from.options[from.selectedIndex].text.replace(/^\u2003+\u27A4/, '')).replace(/%board_to%/, to.options[to.selectedIndex].text.replace(/^\u2003+\u27A4/, '')));
 }
 
 /**
@@ -1697,7 +1713,9 @@ function toggleCurrencyOther()
 	}
 }
 
-// Used to ajax-ively preview the templates of bounced emails (template_bounce_template)
+/**
+ * Used to ajax-ively preview the templates of bounced emails (template_bounce_template)
+ */
 function ajax_getTemplatePreview()
 {
 	$.ajax({
@@ -1711,7 +1729,7 @@ function ajax_getTemplatePreview()
 		context: document.body
 	})
 	.done(function(request) {
-		// Show the preivew section, populated with the resonse
+		// Show the preivew section, populated with the response
 		$("#preview_section").css({display: ""});
 		$("#template_preview").html($(request).find('body').text());
 		$("#preview_subject").html($(request).find('subject').text());
@@ -1741,6 +1759,36 @@ function ajax_getTemplatePreview()
 		}
 
 		return false;
+	});
+
+	return false;
+}
+
+/**
+ * Used to ajax-ively preview a word censor
+ * Does no checking, it either gets a result or does nothing
+ */
+function ajax_getCensorPreview()
+{
+	$.ajax({
+		type: 'POST',
+		dataType: 'json',
+		url: elk_scripturl + "?action=admin;area=postsettings;sa=censor;xml",
+		data: {
+			censortest: $("#censortest").val()
+		}
+	})
+	.done(function(request) {
+		if (request.result === true) {
+			// Show the censored text section, populated with the response
+			$("#censor_result").css({display: ""}).html(request.censor);
+
+			// Update the token
+			$("#token").attr({name:request.token_val, value:request.token});
+
+			// Clear the box
+			$('#censortest').attr({value:''}).val('');
+		}
 	});
 
 	return false;

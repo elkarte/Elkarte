@@ -1275,6 +1275,7 @@ function spamProtection($error_type, $fatal = true)
 		'login' => 2,
 		'register' => 2,
 		'remind' => 30,
+		'contact' => 30,
 		'sendtopic' => $modSettings['spamWaitTime'] * 4,
 		'sendmail' => $modSettings['spamWaitTime'] * 5,
 		'reporttm' => $modSettings['spamWaitTime'] * 4,
@@ -1548,7 +1549,7 @@ function frameOptionsHeader($override = null)
 
 	if (is_null($override) && !empty($modSettings['frame_security']))
 		$option = $modSettings['frame_security'];
-	elseif (in_array($override, array('SAMEORIGIN', 'DENY', 'SAMEORIGIN')))
+	elseif (in_array($override, array('SAMEORIGIN', 'DENY')))
 		$option = $override;
 
 	// Don't bother setting the header if we have disabled it.
