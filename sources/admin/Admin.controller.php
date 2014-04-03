@@ -797,6 +797,8 @@ class Admin_Controller extends Action_Controller
 		// Try to get some more memory.
 		setMemoryLimit('128M');
 
+		require_once(SUBSDIR . '/Settings_Search.class.php');
+
 		// Load a lot of language files.
 		$language_files = array(
 			'Help', 'ManageMail', 'ManageSettings', 'ManageCalendar', 'ManageBoards', 'ManagePaid', 'ManagePermissions', 'Search',
@@ -860,32 +862,17 @@ class Admin_Controller extends Action_Controller
 
 		call_integration_hook('integrate_admin_search', array(&$language_files, &$include_files, &$settings_search));
 
-		loadLanguage(implode('+', $language_files));
-
-		foreach ($include_files as $file)
-			require_once(ADMINDIR . '/' . $file . '.php');
-
-		/* This is the huge array that defines everything ... it's items are formatted as follows:
-			0 = Language index (Can be array of indexes) to search through for this setting.
-			1 = URL for this indexes page.
-			2 = Help index for help associated with this item (If different from 0)
-		*/
-
-		$search_data = array(
-			// All the major sections of the forum.
-			'sections' => $this->_load_search_sections(),
-			'settings' => array_merge(array(
-				array('COPPA', 'area=regcenter;sa=settings'),
-				array('CAPTCHA', 'area=securitysettings;sa=spam'),
-			), $this->_load_all_settings($settings_search)),
-		);
-
-		$context['page_title'] = $txt['admin_search_results'];
-		$context['search_results'] = array();
-
 		// Go through all the search data trying to find this text!
 		$search_term = strtolower(un_htmlspecialchars($context['search_term']));
-		$context['search_results'] = $this->_do_admin_search($search_data, $search_term);
+
+		$search = new Settings_Search($language_files, $include_files, $settings_search);
+		$search->initSeach($context['admin_menu_name'], array(
+			array('COPPA', 'area=regcenter;sa=settings'),
+			array('CAPTCHA', 'area=securitysettings;sa=spam'),
+		));
+
+		$context['page_title'] = $txt['admin_search_results'];
+		$context['search_results'] = $search->doSearch($search_term);
 	}
 
 	/**
@@ -978,132 +965,5 @@ class Admin_Controller extends Action_Controller
 			redirectexit($_SERVER['HTTP_REFERER']);
 		else
 			redirectexit();
-	}
-
-	/**
-	 * Loads all the admin sections
-	 *
-	 * @todo move to subs?
-	 */
-	private function _load_search_sections()
-	{
-		global $context;
-
-		$sections = array();
-
-		// Go through the admin menu structure trying to find suitably named areas!
-		foreach ($context[$context['admin_menu_name']]['sections'] as $section)
-		{
-			foreach ($section['areas'] as $menu_key => $menu_item)
-			{
-				$sections[] = array($menu_item['label'], 'area=' . $menu_key);
-				if (!empty($menu_item['subsections']))
-					foreach ($menu_item['subsections'] as $key => $sublabel)
-					{
-						if (isset($sublabel['label']))
-							$sections[] = array($sublabel['label'], 'area=' . $menu_key . ';sa=' . $key);
-					}
-			}
-		}
-
-		return $sections;
-	}
-
-	/**
-	 * Loads all the admin settings
-	 *
-	 * @param mixed[] $settings_search - An array that defines where to look
-	 *                for settings. The structure is:
-	 *                array(
-	 *                  method name
-	 *                  url
-	 *                  controller name
-	 *                )
-	 *
-	 * @todo move to subs?
-	 */
-	private function _load_all_settings($settings_search)
-	{
-		$settings = array();
-
-		foreach ($settings_search as $setting_area)
-		{
-			// Get a list of their variables.
-			if (isset($setting_area[2]))
-			{
-				// an OOP controller: get the settings from the settings method.
-				$controller = new $setting_area[2]();
-				$config_vars = $controller->{$setting_area[0]}();
-			}
-			else
-			{
-				// a good ole' procedural controller: get the settings from the function.
-				$config_vars = $setting_area[0](true);
-			}
-
-			foreach ($config_vars as $var)
-				if (!empty($var[1]) && !in_array($var[0], array('permissions', 'switch', 'warning')))
-					$settings[] = array($var[(isset($var[2]) && in_array($var[2], array('file', 'db'))) ? 0 : 1], $setting_area[1]);
-		}
-
-		return $settings;
-	}
-
-	/**
-	 * Actually searches the term into the array of data previously loaded
-	 *
-	 * @param mixed[] $search_data - huge array that contains all the sections
-	 *                and settings. It is firstly subdivided in two sub-arrays:
-	 *                  - sections
-	 *                  - settings
-	 *                each of which contains the following information:
-	 *                 0 = Language index (Can be array of indexes) to search
-	 *                     through for this setting.
-	 *                 1 = URL for this indexes page.
-	 *                 2 = Help index for help associated with this item (If
-	 *                     different from 0)
-	 *
-	 * @todo move to subs?
-	 */
-	private function _do_admin_search($search_data, $search_term)
-	{
-		global $txt, $scripturl, $context, $helptxt;
-
-		$search_results = array();
-
-		foreach ($search_data as $section => $data)
-		{
-			foreach ($data as $item)
-			{
-				$found = false;
-				if (!is_array($item[0]))
-					$item[0] = array($item[0]);
-				foreach ($item[0] as $term)
-				{
-					if (stripos($term, $search_term) !== false || (isset($txt[$term]) && stripos($txt[$term], $search_term) !== false) || (isset($txt['setting_' . $term]) && stripos($txt['setting_' . $term], $search_term) !== false))
-					{
-						$found = $term;
-						break;
-					}
-				}
-
-				if ($found)
-				{
-					// Format the name - and remove any descriptions the entry may have.
-					$name = isset($txt[$found]) ? $txt[$found] : (isset($txt['setting_' . $found]) ? $txt['setting_' . $found] : $found);
-					$name = preg_replace('~<(?:div|span)\sclass="smalltext">.+?</(?:div|span)>~', '', $name);
-
-					if (!empty($name))
-						$search_results[] = array(
-							'url' => (substr($item[1], 0, 4) == 'area' ? $scripturl . '?action=admin;' . $item[1] : $item[1]) . ';' . $context['session_var'] . '=' . $context['session_id'] . ((substr($item[1], 0, 4) == 'area' && $section == 'settings' ? '#' . $item[0][0] : '')),
-							'name' => $name,
-							'type' => $section,
-							'help' => shorten_text(isset($item[2]) ? strip_tags($helptxt[$item[2]]) : (isset($helptxt[$found]) ? strip_tags($helptxt[$found]) : ''), 255),
-						);
-				}
-			}
-		}
-
-		return $search_results;
 	}
 }
