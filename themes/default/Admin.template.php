@@ -1511,3 +1511,50 @@ function template_callback_pm_limits()
 				<input type="text" id="id_group_', $group_id, '" name="group[', $group_id, ']" value="', $group['max_messages'], '" size="6" class="input_text" />
 			</dd>';
 }
+
+/**
+ * Template used to show the queries run in the previous page load
+ */
+function template_viewquery()
+{
+	global $context, $scripturl;
+
+	foreach ($context['queries_data'] as $q => $query_data)
+	{
+		echo '
+	<div id="qq', $q, '" style="margin-bottom: 2ex;">
+		<a ', $query_data['is_select'] ? 'href="' . $scripturl . '?action=viewquery;qq=' . ($q + 1) . '#qq' . $q . '"' : '', 'style="font-weight: bold; text-decoration: none;">
+			', $query_data['text'], '
+		</a><br />', $query_data['position_time'], '
+	</div>';
+
+		if (!empty($query_data['explain']['is_error']))
+		{
+			echo '
+	<table border="1" cellpadding="4" cellspacing="0" style="empty-cells: show; font-family: serif; margin-bottom: 2ex;">
+		<tr><td>', $query_data['explain']['error_text'], '</td></tr>
+	</table>';
+		}
+		elseif (!empty($query_data['explain']['headers']))
+		{
+			echo '
+	<table border="1" rules="all" cellpadding="4" cellspacing="0" style="empty-cells: show; font-family: serif; margin-bottom: 2ex;">
+		<tr>
+			<th>' . implode('</th>
+			<th>', array_keys($query_data['explain']['headers'])) . '</th>
+		</tr>';
+
+			foreach ($query_data['explain']['body'] as $row)
+			{
+				echo '
+		<tr>
+			<td>' . implode('</td>
+			<td>', $row) . '</td>
+		</tr>';
+			}
+
+			echo '
+	</table>';
+		}
+	}
+}

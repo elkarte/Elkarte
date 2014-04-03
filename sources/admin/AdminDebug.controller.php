@@ -47,7 +47,7 @@ class AdminDebug_Controller extends Action_Controller
 	 */
 	public function action_viewquery()
 	{
-		global $scripturl, $settings, $context, $txt, $db_show_debug;
+		global $context, $txt, $db_show_debug;
 
 		// We should have debug mode enabled, as well as something to display!
 		if (!isset($db_show_debug) || $db_show_debug !== true || !isset($_SESSION['debug']))
@@ -69,142 +69,158 @@ class AdminDebug_Controller extends Action_Controller
 
 		$query_id = isset($_REQUEST['qq']) ? (int) $_REQUEST['qq'] - 1 : -1;
 
-		echo '<!DOCTYPE html>
-<html', $context['right_to_left'] ? 'dir="rtl"' : '', '>
-	<head>
-		<title>', $context['forum_name_html_safe'], '</title>
-		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css', CACHE_STALE, '" />
-		<style>
-			body {
-				margin: 1ex;
-				color: #bbb;
-				background: #222;
-			}
-			body, td, th, .normaltext {
-				font-size: small;
-			}
-			.smalltext {
-				font-size: xx-small;
-			}
-		</style>
-	</head>
-	<body id="help_popup">
-		<div class="windowbg description">';
+		// Just to stay on the safe side, better remove any layer and add back only html
+		$layers = Template_Layers::getInstance();
+		$layers->removeAll();
+		$layers->add('html');
+		loadTemplate('Admin');
 
-		// db work...
-		$db = database();
+		$context['sub_template'] = 'viewquery';
+		$context['queries_data'] = array();
 
 		foreach ($_SESSION['debug'] as $q => $query_data)
 		{
 			// Fix the indentation....
-			$query_data['q'] = ltrim(str_replace("\r", '', $query_data['q']), "\n");
-			$query = explode("\n", $query_data['q']);
-			$min_indent = 0;
-			foreach ($query as $line)
-			{
-				preg_match('/^(\t*)/', $line, $temp);
-				if (strlen($temp[0]) < $min_indent || $min_indent == 0)
-					$min_indent = strlen($temp[0]);
-			}
-			foreach ($query as $l => $dummy)
-				$query[$l] = substr($dummy, $min_indent);
-			$query_data['q'] = implode("\n", $query);
+			$query_data['q'] = $this->_normalize_query_indent($query_data['q']);
 
 			// Make the filenames look a bit better.
 			if (isset($query_data['f']))
 				$query_data['f'] = preg_replace('~^' . preg_quote(BOARDDIR, '~') . '~', '...', $query_data['f']);
 
-			$is_select_query = substr(trim($query_data['q']), 0, 6) == 'SELECT';
-			if ($is_select_query)
-				$select = $query_data['q'];
-			elseif (preg_match('~^INSERT(?: IGNORE)? INTO \w+(?:\s+\([^)]+\))?\s+(SELECT .+)$~s', trim($query_data['q']), $matches) != 0)
-			{
-				$is_select_query = true;
-				$select = $matches[1];
-			}
-			elseif (preg_match('~^CREATE TEMPORARY TABLE .+?(SELECT .+)$~s', trim($query_data['q']), $matches) != 0)
-			{
-				$is_select_query = true;
-				$select = $matches[1];
-			}
-			// Temporary tables created in earlier queries are not explainable.
-			if ($is_select_query)
-			{
-				foreach (array('log_topics_unread', 'topics_posted_in', 'tmp_log_search_topics', 'tmp_log_search_messages') as $tmp)
-					if (strpos($select, $tmp) !== false)
-					{
-						$is_select_query = false;
-						break;
-					}
-			}
-
-			echo '
-		<div id="qq', $q, '" style="margin-bottom: 2ex;">
-			<a', $is_select_query ? ' href="' . $scripturl . '?action=viewquery;qq=' . ($q + 1) . '#qq' . $q . '"' : '', ' style="font-weight: bold; text-decoration: none;">
-				', nl2br(str_replace("\t", '&nbsp;&nbsp;&nbsp;', htmlspecialchars($query_data['q'], ENT_COMPAT, 'UTF-8'))), '
-			</a><br />';
+			$select_query = $this->_is_select_query($query_data['q']);
+			$context['queries_data'][$q] = array(
+				'text' => nl2br(str_replace("\t", '&nbsp;&nbsp;&nbsp;', htmlspecialchars($query_data['q'], ENT_COMPAT, 'UTF-8'))),
+				'is_select' => !empty($select_query),
+				'position_time' => '',
+				'explain' => array(),
+			);
 
 			if (!empty($query_data['f']) && !empty($query_data['l']))
-				echo sprintf($txt['debug_query_in_line'], $query_data['f'], $query_data['l']);
+				$context['queries_data'][$q]['position_time'] = sprintf($txt['debug_query_in_line'], $query_data['f'], $query_data['l']);
 
 			if (isset($query_data['s'], $query_data['t']) && isset($txt['debug_query_which_took_at']))
-				echo sprintf($txt['debug_query_which_took_at'], round($query_data['t'], 8), round($query_data['s'], 8));
+				$context['queries_data'][$q]['position_time'] .= sprintf($txt['debug_query_which_took_at'], round($query_data['t'], 8), round($query_data['s'], 8));
 			else
-				echo sprintf($txt['debug_query_which_took'], round($query_data['t'], 8));
-
-			echo '
-		</div>';
+				$context['queries_data'][$q]['position_time'] .= sprintf($txt['debug_query_which_took'], round($query_data['t'], 8));
 
 			// Explain the query.
-			if ($query_id == $q && $is_select_query)
+			if ($query_id == $q && $select_query)
 			{
-				$result = $db->query('', '
-					EXPLAIN ' . $select,
-					array(
-					)
-				);
-				if ($result === false)
-				{
-					echo '
-		<table border="1" cellpadding="4" cellspacing="0" style="empty-cells: show; font-family: serif; margin-bottom: 2ex;">
-			<tr><td>', $db->last_error($db->connection()), '</td></tr>
-		</table>';
-					continue;
-				}
-
-				echo '
-		<table border="1" rules="all" cellpadding="4" cellspacing="0" style="empty-cells: show; font-family: serif; margin-bottom: 2ex;">';
-
-				$row = $db->fetch_assoc($result);
-
-				echo '
-			<tr>
-				<th>' . implode('</th>
-				<th>', array_keys($row)) . '</th>
-			</tr>';
-
-				$db->data_seek($result, 0);
-				while ($row = $db->fetch_assoc($result))
-				{
-					echo '
-			<tr>
-				<td>' . implode('</td>
-				<td>', $row) . '</td>
-			</tr>';
-				}
-				$db->free_result($result);
-
-				echo '
-		</table>';
+				$context['queries_data'][$q]['explain'] = $this->_explain_query($select_query);
 			}
 		}
+	}
 
-		echo '
-		</div>
-	</body>
-</html>';
+	/**
+	 * Fix query indentation
+	 *
+	 * @param string $query_data - The query string
+	 */
+	protected function _normalize_query_indent($query_data)
+	{
+		$query_data = ltrim(str_replace("\r", '', $query_data), "\n");
+		$query = explode("\n", $query_data);
+		$min_indent = 0;
+		foreach ($query as $line)
+		{
+			preg_match('/^(\t*)/', $line, $temp);
+			if (strlen($temp[0]) < $min_indent || $min_indent == 0)
+				$min_indent = strlen($temp[0]);
+		}
+		foreach ($query as $l => $dummy)
+			$query[$l] = substr($dummy, $min_indent);
+		return implode("\n", $query);
+	}
 
-		obExit(false);
+	/**
+	 * Determines is the query has a SELECT statement and if so it is returned
+	 *
+	 * @param string $query_data - The query string
+	 * @return false|string false if the query doesn't have a SELECT, otherwise
+	 *                      returnes the SELECT itself
+	 */
+	protected function _is_select_query($query_data)
+	{
+		$is_select_query = substr(trim($query_data), 0, 6) == 'SELECT';
+		$select = false;
+
+		if ($is_select_query)
+			$select = $query_data;
+		elseif (preg_match('~^INSERT(?: IGNORE)? INTO \w+(?:\s+\([^)]+\))?\s+(SELECT .+)$~s', trim($query_data), $matches) != 0)
+		{
+			$is_select_query = true;
+			$select = $matches[1];
+		}
+		elseif (preg_match('~^CREATE TEMPORARY TABLE .+?(SELECT .+)$~s', trim($query_data), $matches) != 0)
+		{
+			$is_select_query = true;
+			$select = $matches[1];
+		}
+		// Temporary tables created in earlier queries are not explainable.
+		if ($is_select_query)
+		{
+			foreach (array('log_topics_unread', 'topics_posted_in', 'tmp_log_search_topics', 'tmp_log_search_messages') as $tmp)
+				if (strpos($select, $tmp) !== false)
+				{
+					$is_select_query = false;
+					break;
+				}
+		}
+
+		return $select;
+	}
+
+	/**
+	 * Does the EXPLAIN of a query
+	 *
+	 * @param string $query_data - The query string
+	 * @return string[] an array with the results of the EXPLAIN with two
+	 *                  possible structures depending if the EXPLAIN is
+	 *                  successful or fails.
+	 *                  If successful:
+	 *                  array(
+	 *                    'headers' => array( ..list of headers.. )
+	 *                    'body' => array(
+	 *                      array( ..cells.. ) // one row
+	 *                    )
+	 *                  )
+	 *                  If th EXPLAIN fails:
+	 *                  array(
+	 *                    'is_error' => true
+	 *                    'error_text' => the error message
+	 *                  )
+	 */
+	protected function _explain_query($select_query)
+	{
+		// db work...
+		$db = database();
+
+		$result = $db->query('', '
+			EXPLAIN ' . $select_query,
+			array(
+			)
+		);
+		if ($result === false)
+		{
+			$explain = array(
+				'is_error' => true,
+				'error_text' => $db->last_error($db->connection()),
+			);
+		}
+		else
+		{
+			$row = $db->fetch_assoc($result);
+			$explain = array(
+				'headers' => array_keys($row),
+				'body' => array()
+			);
+
+			$db->data_seek($result, 0);
+			while ($row = $db->fetch_assoc($result))
+				$explain['body'][] = $row;
+		}
+
+		return $explain;
 	}
 
 	/**
