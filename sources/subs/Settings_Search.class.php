@@ -100,7 +100,7 @@ class Settings_Search
 	 */
 	public function doSearch($search_term)
 	{
-		global $txt, $scripturl, $context, $helptxt;
+		global $scripturl, $context;
 
 		$search_results = array();
 
@@ -108,21 +108,17 @@ class Settings_Search
 		{
 			foreach ($data as $item)
 			{
-				$found = $this->_find_term($search_term, $item);
+				$search_result = $this->_find_term($search_term, $item);
 
-				if ($found)
+				if (!empty($search_result))
 				{
-					// Format the name - and remove any descriptions the entry may have.
-					$name = isset($txt[$found]) ? $txt[$found] : (isset($txt['setting_' . $found]) ? $txt['setting_' . $found] : $found);
-					$name = preg_replace('~<(?:div|span)\sclass="smalltext">.+?</(?:div|span)>~', '', $name);
+					$search_result['type'] = $section;
+					$search_result['url'] = $item[1] . ';' . $context['session_var'] . '=' . $context['session_id'];
 
-					if (!empty($name))
-						$search_results[] = array(
-							'url' => (substr($item[1], 0, 4) == 'area' ? $scripturl . '?action=admin;' . $item[1] : $item[1]) . ';' . $context['session_var'] . '=' . $context['session_id'] . ((substr($item[1], 0, 4) == 'area' && $section == 'settings' ? '#' . $item[0][0] : '')),
-							'name' => $name,
-							'type' => $section,
-							'help' => shorten_text(isset($item[2]) ? strip_tags($helptxt[$item[2]]) : (isset($helptxt[$found]) ? strip_tags($helptxt[$found]) : ''), 255),
-						);
+					if (substr($item[1], 0, 4) == 'area')
+						$search_result['url'] = $scripturl . '?action=admin;' . $search_result['url'] . ($section == 'settings' ? '#' . $item[0][0] : '');
+
+					$search_results[] = $search_result;
 				}
 			}
 		}
@@ -137,28 +133,49 @@ class Settings_Search
 	 * @param string|string[] $item - A string or array of strings that may be
 	 *                        standalone strings, index for $txt, partial index
 	 *                        for $txt['setting_' . $item]
-	 * @return false|string - False if $search_term is not found, the $item (or
-	 *                        or one of its temrs if an array) in which it has
-	 *                        been found
+	 * @return string[] - An empty array if $search_term is not found, otherwise
+	 *                    part of the serch_result array (consisting of 'name'
+	 *                    and 'help') of the term the result was found
 	 */
 	protected function _find_term($search_term, $item)
 	{
-		global $txt;
+		global $txt, $helptxt;
 
 		$found = false;
+		$name = false;
+		$return = array();
 
 		if (!is_array($item[0]))
 			$item[0] = array($item[0]);
+
 		foreach ($item[0] as $term)
 		{
-			if (stripos($term, $search_term) !== false || (isset($txt[$term]) && stripos($txt[$term], $search_term) !== false) || (isset($txt['setting_' . $term]) && stripos($txt['setting_' . $term], $search_term) !== false))
+			if (isset($txt[$term]) && stripos($txt[$term], $search_term) !== false)
+			{
+				$found = $txt[$term];
+			}
+			elseif (isset($txt['setting_' . $term]) && stripos($txt['setting_' . $term], $search_term) !== false)
+			{
+				$found = $txt['setting_' . $term];
+			}
+			elseif (stripos($term, $search_term) !== false)
 			{
 				$found = $term;
-				break;
 			}
 		}
 
-		return $found;
+		// Format the name - and remove any descriptions the entry may have.
+		if ($found !== false)
+		{
+			$name = preg_replace('~<(?:div|span)\sclass="smalltext">.+?</(?:div|span)>~', '', $found);
+
+			$return = array(
+				'name' => $name,
+				'help' => shorten_text(isset($item[2]) ? strip_tags($helptxt[$item[2]]) : (isset($helptxt[$found]) ? strip_tags($helptxt[$found]) : ''), 255),
+			);
+		}
+
+		return $return;
 	}
 
 	/**
