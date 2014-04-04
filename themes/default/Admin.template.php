@@ -1522,8 +1522,8 @@ function template_viewquery()
 	foreach ($context['queries_data'] as $q => $query_data)
 	{
 		echo '
-	<div id="qq', $q, '" style="margin-bottom: 2ex;">
-		<a ', $query_data['is_select'] ? 'href="' . $scripturl . '?action=viewquery;qq=' . ($q + 1) . '#qq' . $q . '"' : '', 'style="font-weight: bold; text-decoration: none;">
+	<div id="qq', $q, '" class="query">
+		<a ', $query_data['is_select'] ? 'href="' . $scripturl . '?action=viewquery;qq=' . ($q + 1) . '#qq' . $q . '"' : '', '>
 			', $query_data['text'], '
 		</a><br />', $query_data['position_time'], '
 	</div>';
@@ -1531,14 +1531,14 @@ function template_viewquery()
 		if (!empty($query_data['explain']['is_error']))
 		{
 			echo '
-	<table border="1" cellpadding="4" cellspacing="0" style="empty-cells: show; font-family: serif; margin-bottom: 2ex;">
+	<table class="explain">
 		<tr><td>', $query_data['explain']['error_text'], '</td></tr>
 	</table>';
 		}
 		elseif (!empty($query_data['explain']['headers']))
 		{
 			echo '
-	<table border="1" rules="all" cellpadding="4" cellspacing="0" style="empty-cells: show; font-family: serif; margin-bottom: 2ex;">
+	<table class="explain">
 		<tr>
 			<th>' . implode('</th>
 			<th>', array_keys($query_data['explain']['headers'])) . '</th>

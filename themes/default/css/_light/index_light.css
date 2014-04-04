@@ -492,6 +492,7 @@ div.bbc_footnotes .meaction{
 	color: #bbb;
 }
 
+.action_viewquery a, .action_viewquery strong,
 #debug_logging a, #debug_logging strong {
 	color: yellow;
 }
@@ -505,7 +506,31 @@ div.bbc_footnotes .meaction{
 #debug_logging_wrapper {
 	background: #222;
 }
-
+.action_viewquery {
+	color: #BBBBBB;
+	background: #222222;
+}
+.action_viewquery a {
+	font-weight: bold;
+	text-decoration: none;
+}
+.action_viewquery .explain {
+	/*border="1" cellpadding="4" cellspacing="0"*/
+	empty-cells: show;
+	font-family: serif;
+	margin-bottom: 1em;
+	border-collapse:collapse;
+}
+.action_viewquery .explain th,
+.action_viewquery .explain td {
+	border-width: 1px;
+	padding: 2px;
+	border-style: solid;
+	border-color: gray;
+}
+.action_viewquery .query {
+	margin: 1em;
+}
 
 /*	$MENUS		*/
 /* ------------------------------------------------------- */

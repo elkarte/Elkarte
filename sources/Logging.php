@@ -311,41 +311,20 @@ function displayDebug()
 			<a href="', $scripturl, '?action=viewquery" target="_blank" class="new_win">', $warnings == 0 ? sprintf($txt['debug_queries_used'], (int) $db_count) : sprintf($txt['debug_queries_used_and_warnings'], (int) $db_count, $warnings), '</a><br />';
 
 	if ($_SESSION['view_queries'] == 1 && !empty($db_cache))
+	{
+		require_once(SUBSDIR . '/QueryAnalysis.class.php');
+		$query_analysis = new Query_Analysis();
+
 		foreach ($db_cache as $q => $qq)
 		{
-			$is_select = strpos(trim($qq['q']), 'SELECT') === 0 || preg_match('~^INSERT(?: IGNORE)? INTO \w+(?:\s+\([^)]+\))?\s+SELECT .+$~s', trim($qq['q'])) != 0;
-
-			// Temporary tables created in earlier queries are not explainable.
-			if ($is_select)
-			{
-				foreach (array('log_topics_unread', 'topics_posted_in', 'tmp_log_search_topics', 'tmp_log_search_messages') as $tmp)
-					if (strpos(trim($qq['q']), $tmp) !== false)
-					{
-						$is_select = false;
-						break;
-					}
-			}
-			// But actual creation of the temporary tables are.
-			elseif (preg_match('~^CREATE TEMPORARY TABLE .+?SELECT .+$~s', trim($qq['q'])) != 0)
-				$is_select = true;
-
-			// Make the filenames look a bit better.
-			if (isset($qq['f']))
-				$qq['f'] = preg_replace('~^' . preg_quote(BOARDDIR, '~') . '~', '...', $qq['f']);
+			$query_info = $query_analysis->extractInfo($qq);
 
 			echo '
-	<strong>', $is_select ? '<a href="' . $scripturl . '?action=viewquery;qq=' . ($q + 1) . '#qq' . $q . '" target="_blank" class="new_win" style="text-decoration: none;">' : '', nl2br(str_replace("\t", '&nbsp;&nbsp;&nbsp;', htmlspecialchars(ltrim($qq['q'], "\n\r"), ENT_COMPAT, 'UTF-8'))) . ($is_select ? '</a></strong>' : '</strong>') . '<br />
-	&nbsp;&nbsp;&nbsp;';
-			if (!empty($qq['f']) && !empty($qq['l']))
-				echo sprintf($txt['debug_query_in_line'], $qq['f'], $qq['l']);
-
-			if (isset($qq['s'], $qq['t']) && isset($txt['debug_query_which_took_at']))
-				echo sprintf($txt['debug_query_which_took_at'], round($qq['t'], 8), round($qq['s'], 8)) . '<br />';
-			elseif (isset($qq['t']))
-				echo sprintf($txt['debug_query_which_took'], round($qq['t'], 8)) . '<br />';
-			echo '
+	<strong>', $query_info['is_select'] ? '<a href="' . $scripturl . '?action=viewquery;qq=' . ($q + 1) . '#qq' . $q . '" target="_blank" class="new_win" style="text-decoration: none;">' : '', $query_info['text'] . ($query_info['is_select'] ? '</a></strong>' : '</strong>') . '<br />
+	&nbsp;&nbsp;&nbsp;', $query_info['position_time'], '<br />
 	<br />';
 		}
+	}
 
 	// Or show/hide the querys in line with all of this data
 	echo '
