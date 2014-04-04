@@ -58,7 +58,7 @@ class CoreFeatures_Controller extends Action_Controller
 	 */
 	public function action_features()
 	{
-		global $txt, $scripturl, $context, $settings, $modSettings;
+		global $txt, $context, $modSettings;
 
 		require_once(SUBSDIR . '/Admin.subs.php');
 
@@ -90,16 +90,7 @@ class CoreFeatures_Controller extends Action_Controller
 		}
 
 		// Put them in context.
-		$context['features'] = array();
-		foreach ($core_features as $id => $feature)
-			$context['features'][$id] = array(
-				'title' => isset($feature['title']) ? $feature['title'] : $txt['core_settings_item_' . $id],
-				'desc' => isset($feature['desc']) ? $feature['desc'] : $txt['core_settings_item_' . $id . '_desc'],
-				'enabled' => in_array($id, $context['admin_features']),
-				'state' => in_array($id, $context['admin_features']) ? 'on' : 'off',
-				'url' => !empty($feature['url']) ? $scripturl . '?' . $feature['url'] . ';' . $context['session_var'] . '=' . $context['session_id'] : '',
-				'image' => (file_exists($settings['theme_dir'] . '/images/admin/feature_' . $id . '.png') ? $settings['images_url'] : $settings['default_images_url']) . '/admin/feature_' . $id . '.png',
-			);
+		$context['features'] = $this->_prepare_corefeatures($core_features);
 
 		// Are they a new user?
 		$context['is_new_install'] = !isset($modSettings['admin_features']);
@@ -404,5 +395,31 @@ class CoreFeatures_Controller extends Action_Controller
 			if (isset($feature['save_callback']))
 				$feature['save_callback'](!empty($_POST['feature_' . $id]));
 		}
+	}
+
+	/**
+	 * Puts the core features data into a format usable by the template
+	 *
+	 * @param mixed[] $core_features - The array of all the core features, as
+	 *                returned by $this->settings()
+	 */
+	protected function _prepare_corefeatures($core_features)
+	{
+		global $context, $txt, $settings, $scripturl;
+
+		$features = array();
+		foreach ($core_features as $id => $feature)
+		{
+			$features[$id] = array(
+				'title' => isset($feature['title']) ? $feature['title'] : $txt['core_settings_item_' . $id],
+				'desc' => isset($feature['desc']) ? $feature['desc'] : $txt['core_settings_item_' . $id . '_desc'],
+				'enabled' => in_array($id, $context['admin_features']),
+				'state' => in_array($id, $context['admin_features']) ? 'on' : 'off',
+				'url' => !empty($feature['url']) ? $scripturl . '?' . $feature['url'] . ';' . $context['session_var'] . '=' . $context['session_id'] : '',
+				'image' => (file_exists($settings['theme_dir'] . '/images/admin/feature_' . $id . '.png') ? $settings['images_url'] : $settings['default_images_url']) . '/admin/feature_' . $id . '.png',
+			);
+		}
+
+		return $features;
 	}
 }
