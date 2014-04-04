@@ -286,7 +286,7 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 	width: 100%;
 }
 #post_confirm_buttons {
-	padding: 0 0 1em 0;
+	padding: 0;
 }
 
 /* @todo - Test this out some more. */
@@ -2540,12 +2540,10 @@ ul.post_options li {
 	padding: 0 1em;
 }
 .draftautosave {
-	display: block;
+	font-size: 0.857em;
 	text-align: right;
-}
-.draftautosave #draft_lastautosave {
-	display: inline-block;
-	min-height: 1em;
+	height: 1.5em;
+	overflow: hidden;
 }
 #postDraftOptions .settings dd, #postDraftOptions .settings dt{
 	margin: 0;
@@ -3522,9 +3520,10 @@ a.help .icon {
 }
 
 /* The actual pop-up wrapper. */
-.popup_window {
+.popup_container .popup_window {
 	margin: 12% auto;
 	width: 480px;
+	font-size: 1em;
 }
 
 /* What it says. ;) */
@@ -3541,12 +3540,6 @@ a.help .icon {
 	width: 16px;
 	height: 2em;
 	background: url(../images/buttons/delete.png) 0 50% no-repeat;
-}
-
-/* Just a font-size reset. */
-/* @todo - Remove description class? */
-.popup_window.description {
-	font-size: 1em;
 }
 
 /* The text content, hopefully helpful. */
@@ -3593,7 +3586,6 @@ a.help .icon {
 	width: 600px;
 }
 #search_options .styled-select {
-	width: 14em;
 	margin: 0 0 3px;
 }
 #advanced_search dt {
@@ -4383,9 +4375,6 @@ dl.no_members {
 	}
 	.topic_listing>li {
 		margin-bottom: 5px;
-	}
-	.topic_name h4 {
-		font-size: 1.786em;
 	}
 	.icon_anchor {
 		min-width: 0;

@@ -867,6 +867,7 @@ function loadProfileFields($force_reload = false)
 
 				loadLanguage('Settings');
 
+				// Can they disable censoring?
 				$context['allow_no_censored'] = false;
 				if ($user_info['is_admin'] || $context['user']['is_owner'])
 					$context['allow_no_censored'] = allowedTo('disable_censor');

@@ -153,18 +153,11 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
  */
 function template_control_richedit_buttons($editor_id)
 {
-	global $context, $settings, $options, $txt;
+	global $context, $options, $txt;
 
 	$editor_context = &$context['controls']['richedit'][$editor_id];
 
-	// Create an area to show the draft last saved on
-	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
-		echo '
-		<span class="draftautosave smalltext">
-			<span id="throbber" style="display:none"><img src="' . $settings['images_url'] . '/loading_sm.gif" alt="" class="centericon" />&nbsp;</span>
-			<span id="draft_lastautosave" ></span>
-		</span>';
-
+	// Show the helpful shortcut text
 	echo '
 		<span class="smalltext floatleft">
 			', $context['shortcuts_text'], '
@@ -175,23 +168,32 @@ function template_control_richedit_buttons($editor_id)
 		echo '
 		<input type="submit" name="preview" value="', isset($editor_context['labels']['preview_button']) ? $editor_context['labels']['preview_button'] : $txt['preview'], '" tabindex="', $context['tabindex']++, '" onclick="', $editor_context['preview_type'] == 2 ? 'return event.ctrlKey || previewControl();' : 'return submitThisOnce(this);', '" accesskey="p" class="button_submit" />';
 
+	// Show the spellcheck button?
 	if ($context['show_spellchecking'])
 		echo '
 		<input type="button" value="', $txt['spell_check'], '" tabindex="', $context['tabindex']++, '" onclick="spellCheckStart();" class="button_submit" />';
 
+	// Maybe drafts are enabled?
 	if (!empty($context['drafts_save']))
 	{
-		// Show the save draft button
 		echo '
 		<input type="submit" name="save_draft" value="', $txt['draft_save'], '" tabindex="', $context['tabindex']++, '" onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d" class="button_submit" />
 		<input type="hidden" id="id_draft" name="id_draft" value="', empty($context['id_draft']) ? 0 : $context['id_draft'], '" />';
 	}
 
+	// The PM draft save button
 	if (!empty($context['drafts_pm_save']))
 	{
-		// The PM draft save button
 		echo '
 		<input type="submit" name="save_draft" value="', $txt['draft_save'], '" tabindex="', $context['tabindex']++, '" onclick="submitThisOnce(this);" accesskey="d" class="button_submit" />
 		<input type="hidden" id="id_pm_draft" name="id_pm_draft" value="', empty($context['id_pm_draft']) ? 0 : $context['id_pm_draft'], '" />';
 	}
+
+	// Create an area to show the draft last saved on text
+	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
+		echo '
+		<div class="draftautosave">
+			<span id="throbber" style="display:none"><i class="fa fa-spinner fa-spin" alt="loading"></i>&nbsp;</span>
+			<span id="draft_lastautosave"></span>
+		</div>';
 }

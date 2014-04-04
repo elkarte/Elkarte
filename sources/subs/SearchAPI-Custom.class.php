@@ -325,7 +325,7 @@ class Custom_Search
 			$stopwords = empty($modSettings['search_stopwords']) ? array() : explode(',', $modSettings['search_stopwords']);
 			$old_body = isset($msgOptions['old_body']) ? $msgOptions['old_body'] : '';
 
-			// Create thew new and old index
+			// Create the new and old index
 			$old_index = text2words($old_body, $customIndexSettings['bytes_per_word'], true);
 			$new_index = text2words($msgOptions['body'], $customIndexSettings['bytes_per_word'], true);
 

@@ -161,7 +161,7 @@
 						});
 
 						// Allow the smiley window to be moved about
-						$('.sceditor-smileyPopup').draggable();
+						$('.sceditor-smileyPopup').draggable({handle: '.sceditor-popup-grip'});
 
 						// stop clicks within the dropdown from being handled
 						$dropdown.click(function (e) {

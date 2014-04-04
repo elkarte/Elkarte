@@ -22,8 +22,12 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * SearchAPI-Sphinxql.class.php, SphinxQL API, used when an Sphinx search daemon is running
- * Access is via Sphinx's own implementation of MySQL network protocol (SphinxQL)
+ * SearchAPI-Sphinxql.class.php, SphinxQL API,
+ *
+ * What it does:
+ * - used when an Sphinx search daemon is running
+ * - Access is via Sphinx's own implementation of MySQL network protocol (SphinxQL)
+ * - requires Sphinx 2 or higher
  *
  * @package Search
  */
@@ -95,7 +99,6 @@ class Sphinxql_Search
 			case 'isValid':
 			case 'searchSort':
 			case 'prepareIndexes':
-			case 'indexedWordQuery':
 			case 'searchQuery':
 				return true;
 			break;
@@ -171,16 +174,16 @@ class Sphinxql_Search
 		if (($cached_results = cache_get_data('searchql_results_' . md5($user_info['query_see_board'] . '_' . $context['params']))) === null)
 		{
 			// Create an instance of the sphinx client and set a few options.
-			$mySphinx = mysql_connect(($modSettings['sphinx_searchd_server'] == 'localhost' ? '127.0.0.1' : $modSettings['sphinx_searchd_server']) . ':' . (int) $modSettings['sphinxql_searchd_port']);
+			$mySphinx = mysql_connect(($modSettings['sphinx_searchd_server'] === 'localhost' ? '127.0.0.1' : $modSettings['sphinx_searchd_server']) . ':' . (int) $modSettings['sphinxql_searchd_port']);
 
 			// Compile different options for our query
-			$query = 'SELECT * FROM elkarte_index';
+			$query = 'SELECT *' . (empty($search_params['topic']) ? ', COUNT(*) num' : '') . ' FROM elkarte_index';
 
-			// Construct the (binary mode) query.
+			// Construct the (binary mode & |) query.
 			$where_match = $this->_constructQuery($search_params['search']);
 
 			// Nothing to search, return zero results
-			if (trim($where_match) == '')
+			if (trim($where_match) === '')
 				return 0;
 
 			if ($search_params['subject_only'])
@@ -191,7 +194,7 @@ class Sphinxql_Search
 			// Set the limits based on the search parameters.
 			$extra_where = array();
 			if (!empty($search_params['min_msg_id']) || !empty($search_params['max_msg_id']))
-				$extra_where[] = '@id >= ' . $search_params['min_msg_id'] . ' AND @id <= ' . (empty($search_params['max_msg_id']) ? (int) $modSettings['maxMsgID'] : $search_params['max_msg_id']);
+				$extra_where[] = 'id >= ' . $search_params['min_msg_id'] . ' AND id <= ' . (empty($search_params['max_msg_id']) ? (int) $modSettings['maxMsgID'] : $search_params['max_msg_id']);
 			if (!empty($search_params['topic']))
 				$extra_where[] = 'id_topic = ' . (int) $search_params['topic'];
 			if (!empty($search_params['brd']))
@@ -201,15 +204,17 @@ class Sphinxql_Search
 			if (!empty($extra_where))
 				$query .= ' AND ' . implode(' AND ', $extra_where);
 
-			// Put together a sort string; besides the main column sort (relevance, id_topic, or num_replies), add secondary
-			// sorting based on relevance value (if not the main sort method) and age
-			$sphinx_sort = ($search_params['sort'] === 'id_msg' ? 'id_topic' : $search_params['sort']) . ' ' . strtoupper($search_params['sort_dir']) . ($search_params['sort'] === 'relevance' ? '' : ', relevance desc') . ', poster_time DESC';
+			// Put together a sort string; besides the main column sort (relevance, id_topic, or num_replies)
+			$sphinx_sort = $search_params['sort'] === 'id_msg' ? 'id_topic' : $search_params['sort'];
+
+			// Add secondary sorting based on relevance value (if not the main sort method) and age
+			$sphinx_sort .= ' ' . strtoupper($search_params['sort_dir']) . ($search_params['sort'] === 'relevance' ? '' : ', relevance DESC') . ', poster_time DESC';
 
 			// Grouping by topic id makes it return only one result per topic, so don't set that for in-topic searches
 			if (empty($search_params['topic']))
 				$query .= ' GROUP BY id_topic WITHIN GROUP ORDER BY ' . $sphinx_sort;
-			$query .= ' ORDER BY ' . $sphinx_sort;
 
+			$query .= ' ORDER BY ' . $sphinx_sort;
 			$query .= ' LIMIT 0,' . (int) $modSettings['sphinx_max_results'];
 
 			// Execute the search query.
@@ -221,6 +226,7 @@ class Sphinxql_Search
 				// Just log the error.
 				if (mysql_error($mySphinx))
 					log_error(mysql_error($mySphinx));
+
 				fatal_lang_error('error_no_search_daemon');
 			}
 
@@ -231,13 +237,17 @@ class Sphinxql_Search
 			);
 
 			if (mysql_num_rows($request) != 0)
+			{
 				while ($match = mysql_fetch_assoc($request))
+				{
 					$cached_results['matches'][$match['id']] = array(
 						'id' => $match['id_topic'],
 						'relevance' => round($match['relevance'] / 10000, 1) . '%',
-						'num_matches' => empty($search_params['topic']) ? $match['@count'] : 0,
+						'num_matches' => empty($search_params['topic']) ? $match['num'] : 0,
 						'matches' => array(),
 					);
+				}
+			}
 			mysql_free_result($request);
 			mysql_close($mySphinx);
 

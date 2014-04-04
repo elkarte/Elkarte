@@ -223,6 +223,7 @@ $txt['sendtopic_WaitTime_broken'] = 'The last topic sent from your IP was less t
 $txt['sendmail_WaitTime_broken'] = 'The last email sent from your IP was less than %1$d seconds ago. Please try again later.';
 $txt['search_WaitTime_broken'] = 'Your last search was less than %1$d seconds ago. Please try again later.';
 $txt['remind_WaitTime_broken'] = 'Your last reminder was less than %1$d seconds ago. Please try again later.';
+$txt['contact_WaitTime_broken'] = 'The last time you tried to use the contact form was less than %1$d seconds ago. Please try again later.';
 
 $txt['email_missing_data'] = 'We need something in both the subject and message boxes.';
 

@@ -118,7 +118,7 @@ function template_merge()
 	foreach ($context['topics'] as $topic)
 		echo '
 						<li>
-							<a href="', $scripturl, '?action=mergetopics;sa=options;board=', $context['current_board'], '.0;from=', $context['origin_topic'], ';to=', $topic['id'], ';', $context['session_var'], '=', $context['session_id'], '"><img src="', $settings['images_url'], '/buttons/merge.png" alt="Merge Topics"  /></a>&nbsp;
+							<a href="', $scripturl, '?action=mergetopics;sa=options;board=', $context['current_board'], '.0;from=', $context['origin_topic'], ';to=', $topic['id'], ';', $context['session_var'], '=', $context['session_id'], '"><img src="', $settings['images_url'], '/buttons/merge.png" alt="', $txt['merge'], '"  /></a>&nbsp;
 							<a href="', $scripturl, '?topic=', $topic['id'], '.0" target="_blank" class="new_win">', $topic['subject'], '</a> ', $txt['started_by'], ' ', $topic['poster']['link'], '
 						</li>';
 

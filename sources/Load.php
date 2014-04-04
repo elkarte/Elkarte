@@ -1595,6 +1595,12 @@ function loadTheme($id_theme = 0, $initialize = true)
 	if (!empty($context['theme_variant']) && $context['right_to_left'])
 		loadCSSFile($context['theme_variant'] . '/rtl' . $context['theme_variant'] . '.css');
 
+	// Load a custom CSS file?
+	if (file_exists($settings['theme_dir'] . '/css/custom.css'))
+		loadCSSFile('custom.css');
+	if (!empty($context['theme_variant']) && file_exists($settings['theme_dir'] . '/css/' . $context['theme_variant'] . '/custom' . $context['theme_variant'] . '.css'))
+		loadCSSFile($context['theme_variant'] . '/custom' . $context['theme_variant'] . '.css');
+
 	// Compatibility.
 	if (!isset($settings['theme_version']))
 		$modSettings['memberCount'] = $modSettings['totalMembers'];
@@ -1814,10 +1820,6 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 		loadCSSFile($sheets);
 	}
 
-	// Load a custom CSS file?
-	if (!empty($context['theme_variant']) && file_exists($settings['theme_dir'] . '/css/' . $context['theme_variant'] . '/custom' . $context['theme_variant'] . '.css'))
-		 loadCSSFile($context['theme_variant'] . '/custom' . $context['theme_variant'] . '.css');
-
 	// No template to load?
 	if ($template_name === false)
 		return true;
@@ -1914,7 +1916,7 @@ function loadSubTemplate($sub_template_name, $fatal = false)
  *         - ['local'] (true/false): define if the file is local
  *         - ['fallback'] (true/false): if false  will attempt to load the file
  *             from the default theme if not found in the current theme
- *         - ['stale'] (true/false/string): if true or null, use cache stale, 
+ *         - ['stale'] (true/false/string): if true or null, use cache stale,
  *             false do not, or used a supplied string
  * @param string $id optional id to use in html id=""
  */
@@ -2377,8 +2379,9 @@ function getLanguages($use_cache = true)
  *
  * What it does:
  * - it censors the passed string.
- * - if the theme setting allow_no_censored is on, and the theme option
- *   show_no_censored is enabled, does not censor, unless force is also set.
+ * - if the admin setting allow_no_censored is on it does not censor unless force is also set.
+ * - if the admin setting allow_no_censored is off will censor words unless the user has set
+ * it to not censor in their profile and force is off
  * - it caches the list of censored words to reduce parsing.
  * - Returns the censored text
  *
@@ -2387,10 +2390,11 @@ function getLanguages($use_cache = true)
  */
 function censorText(&$text, $force = false)
 {
-	global $modSettings, $options, $settings;
+	global $modSettings, $options;
 	static $censor_vulgar = null, $censor_proper = null;
 
-	if ((!empty($options['show_no_censored']) && $settings['allow_no_censored'] && !$force) || empty($modSettings['censor_vulgar']) || trim($text) === '')
+	// Are we going to censor this string
+	if ((!empty($options['show_no_censored']) && $modSettings['allow_no_censored'] && !$force) || empty($modSettings['censor_vulgar']) || trim($text) === '')
 		return $text;
 
 	// If they haven't yet been loaded, load them.

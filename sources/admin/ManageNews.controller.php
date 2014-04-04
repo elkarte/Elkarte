@@ -908,8 +908,8 @@ class ManageNews_Controller extends Action_Controller
 			'',
 				// Just the remaining settings.
 				array('check', 'xmlnews_enable', 'onclick' => 'document.getElementById(\'xmlnews_maxlen\').disabled = !this.checked;document.getElementById(\'xmlnews_limit\').disabled = !this.checked;'),
-				array('text', 'xmlnews_maxlen', 'subtext' => $txt['xmlnews_maxlen_note'], 10),
-				array('text', 'xmlnews_limit', 'subtext' => $txt['xmlnews_limit_note'], 10),
+				array('int', 'xmlnews_maxlen', 'subtext' => $txt['xmlnews_maxlen_note'], 10),
+				array('int', 'xmlnews_limit', 'subtext' => $txt['xmlnews_limit_note'], 10),
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well

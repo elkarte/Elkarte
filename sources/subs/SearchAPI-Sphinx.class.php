@@ -22,8 +22,12 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * SearchAPI-Sphinx.class.php, Sphinx API, used when an Sphinx search daemon is running
- * Access is via the Sphinx native search API (SphinxAPI)
+ * SearchAPI-Sphinx.class.php, Sphinx API,
+ *
+ * What it does:
+ * - used when a Sphinx search daemon is running
+ * - Access is via the Sphinx native search API (SphinxAPI)
+ * - sphinxapi.php is part of the Sphinx package, the file must be addded to SOURCDIR
  *
  * @package Search
  */
@@ -95,7 +99,6 @@ class Sphinx_Search
 			case 'isValid':
 			case 'searchSort':
 			case 'prepareIndexes':
-			case 'indexedWordQuery':
 				return true;
 			break;
 			case 'searchQuery':
@@ -177,14 +180,20 @@ class Sphinx_Search
 			$mySphinx = new SphinxClient();
 			$mySphinx->SetServer($modSettings['sphinx_searchd_server'], (int) $modSettings['sphinx_searchd_port']);
 			$mySphinx->SetLimits(0, (int) $modSettings['sphinx_max_results'], (int) $modSettings['sphinx_max_results']);
+
+			// This is the default mode.  Note MatchMode is depreciated
 			$mySphinx->SetMatchMode(SPH_MATCH_EXTENDED);
 
-			// Put together a sort string; besides the main column sort (relevance, id_topic, or num_replies), add secondary sorting based on relevance value (if not the main sort method) and age
-			$sphinx_sort = ($search_params['sort'] === 'id_msg' ? 'id_topic' : $search_params['sort']) . ' ' . $search_params['sort_dir'] . ($search_params['sort'] === 'relevance' ? '' : ', relevance desc') . ', poster_time desc';
+			// Put together a sort string; besides the main column sort (relevance, id_topic, or num_replies),
+			$sphinx_sort = $search_params['sort'] === 'id_msg' ? 'id_topic' : $search_params['sort'];
+
+			// Add secondary sorting based on relevance value (if not the main sort method) and age
+			$sphinx_sort .= ' ' . $search_params['sort_dir'] . ($search_params['sort'] === 'relevance' ? '' : ', relevance DESC') . ', poster_time DESC';
 
 			// Grouping by topic id makes it return only one result per topic, so don't set that for in-topic searches
 			if (empty($search_params['topic']) && empty($search_params['show_complete']))
 				$mySphinx->SetGroupBy('id_topic', SPH_GROUPBY_ATTR, $sphinx_sort);
+
 			$mySphinx->SetSortMode(SPH_SORT_EXTENDED, $sphinx_sort);
 
 			// Set the limits based on the search parameters.
@@ -200,7 +209,7 @@ class Sphinx_Search
 			if (!empty($search_params['memberlist']))
 				$mySphinx->SetFilter('id_member', $search_params['memberlist']);
 
-			// Construct the (binary mode) query.
+			// Construct the (binary mode & |) query while accounting for excluded words
 			$orResults = array();
 			$inc_words = array();
 			foreach ($search_words as $orIndex => $words)
@@ -212,10 +221,12 @@ class Sphinx_Search
 				$orResults[] = substr($andResult, 0, -3);
 			}
 
-			// If no search terms are left after comparing against excluded words (i.e. "test -test" or "test last -test -last"), sending that to Sphinx would result in a fatal error
+			// If no search terms are left after comparing against excluded words (i.e. "test -test" or "test last -test -last"),
+			// sending that to Sphinx would result in a fatal error
 			if (!count(array_diff($inc_words, $excluded_words)))
 				// Instead, fail gracefully (return "no results")
 				return 0;
+
 			$query = count($orResults) === 1 ? $orResults[0] : '(' . implode(') | (', $orResults) . ')';
 
 			// Subject only searches need to be specified.
@@ -231,6 +242,7 @@ class Sphinx_Search
 				// Just log the error.
 				if ($mySphinx->GetLastError())
 					log_error($mySphinx->GetLastError());
+
 				fatal_lang_error('error_no_search_daemon');
 			}
 

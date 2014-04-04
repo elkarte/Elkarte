@@ -2,7 +2,7 @@
 
 /**
  * The admin screen to change the search settings.  Aloows for the creation \
- * of seach indexes and search weights
+ * of search indexes and search weights
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -75,11 +75,11 @@ class ManageSearch_Controller extends Action_Controller
 			'help' => 'search',
 			'description' => $txt['search_settings_desc'],
 			'tabs' => array(
-				'weights' => array(
-					'description' => $txt['search_weights_desc'],
-				),
 				'method' => array(
 					'description' => $txt['search_method_desc'],
+				),
+				'weights' => array(
+					'description' => $txt['search_weights_desc'],
 				),
 				'settings' => array(
 					'description' => $txt['search_settings_desc'],
@@ -87,8 +87,8 @@ class ManageSearch_Controller extends Action_Controller
 			),
 		);
 
-		// Default the sub-action to 'edit search settings'.  Call integrate_manage_search
-		$subAction = $action->initialize($subActions, 'weights');
+		// Default the sub-action to 'edit search method'.  Call integrate_manage_search
+		$subAction = $action->initialize($subActions, 'method');
 
 		// Final bits
 		$context['sub_action'] = $subAction;

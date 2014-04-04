@@ -249,7 +249,6 @@ $helptxt['trackStats'] = 'Stats:<br />This will allow users to see the latest po
 $helptxt['enable_unwatch'] = 'Enabling this option will allow users to selectively turn off new reply notifications for topics in which they had previously posted.';
 $helptxt['titlesEnable'] = 'Switching Custom Titles on will allow members with the relevant permission to create a special title for themselves.
 		This will be shown underneath the name.<br /><em>Example:</em><br />Jeff<br />Cool Guy';
-$helptxt['topbottomEnable'] = 'This will add go up and go down buttons, so that members can go to the top and bottom of a page without scrolling.';
 $helptxt['onlineEnable'] = 'This will show an image to indicate whether the member is online or offline';
 $helptxt['todayMod'] = 'This will format &quot;Today&quot; or &quot;Yesterday&quot; in a variety of formats instead of the full date.<br /><br />
 		<strong>Examples:</strong><br /><br />
@@ -298,7 +297,6 @@ $helptxt['max_image_width'] = 'This allows you to set a maximum size for posted 
 $helptxt['mail_type'] = 'This setting allows you to choose either PHP\'s default settings, or to override those settings with SMTP.  PHP doesn\'t support using authentication with SMTP (which many hosts require now) so if you want that you should select SMTP.  Please note that SMTP can be slower, and some servers will not take user names and passwords.<br /><br />You don\'t need to fill in the SMTP settings if this is set to PHP\'s default.';
 $helptxt['mail_batch_size'] = 'This setting determines how many emails will be sent per page load and can not be set greater than the maximum allowed per minute.<br />Leaving this as 0, the system will automatically determine a batch size to evenly spread the load and fill the quota.<br />If you want to set your own values, setting this to the same value as your limit is a good option for low per minute limits, or 1/6 of the limit for higher per minute limits.';
 
-$helptxt['attachment_manager_settings'] = 'Here you can configure your attachment settings with information such as choosing a location to store the uploaded files, the maximum visible sizes and limiting the usage of file extensions.';
 $helptxt['attachmentEnable'] = 'Enable/Disable the attachment system or disable only new attachments leaving old one available.';
 $helptxt['attachmentRecodeLineEndings'] = 'Enabling this will re-code line endings of text based files (txt, css, html, php, xml) based on your server (Windows, Mac or Unix).';
 $helptxt['automanage_attachments'] = 'This will create a directory structure based on the selected option.  This can be post date (subdividing attachments by year, or by year and month or by year, month and day) or simply adding a new directory when the space limit is reached.  Each directory created will have the same file count and total size restrictions.  This will help prevent directories from reaching a file or size limit.';
@@ -321,7 +319,7 @@ $helptxt['attachment_thumb_memory'] = 'The larger the source image (size & width
 $helptxt['max_image_height'] = 'The maximum displayed height of an attached image.';
 $helptxt['max_image_width'] = 'The maximum displayed width of an attached image.';
 $helptxt['attachmentUploadDir'] = 'Select where you want the files uploaded to be stored on your server. This can be located outside your public html directory for additional security.';
-
+$helptxt['attachment_transfer_empty'] = 'Enabling this will move all the files from the source directory to the new location. Disabled only the count of files in excess of the maximum allowed per directory setting will be moved.';
 $helptxt['avatar_paranoid'] = 'Selecting this option will enable very strict security checks on avatars. Warning! These extensive checks can fail on valid images too. It is strongly recommended to only use this option together with avatars re-encoding, in order to have ElkArte try to resample the images which fail the security checks: if successful, they will be sanitized and uploaded. Otherwise, if re-encoding of avatars is not enabled, all avatars failing checks will be rejected.';
 $helptxt['avatar_reencode'] = 'Selecting this option will enable trying to re-encode the uploaded avatars. Image re-encoding offers better security. Note however that image re-encoding also renders all animated images static. <br /> This feature is only possible if the GD module is installed on your server.';
 $helptxt['karmaMode'] = 'Karma is a feature that shows the popularity of a member. Members, if allowed, can
@@ -554,7 +552,7 @@ $helptxt['posts_and_topics'] = '
 			Modify the settings related to topics. The number of topics per page, whether sticky topics are enabled or not, the number of messages needed for a topic to be hot, etc.
 		</li>
 	</ul>';
-
+$helptxt['allow_no_censored'] = 'Global setting to allow users to optionaly turn off censoring in thier look and layout settings.  Users ablility to do this is still limited by thier permission profile.';
 $helptxt['spider_mode'] = 'Sets the logging level.<br />
 Standard - Logs minimal spider activity.<br />
 Moderate - Provides more accurate statistics.<br />
