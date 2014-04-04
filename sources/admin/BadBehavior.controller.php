@@ -163,6 +163,8 @@ class BadBehavior_Controller extends Action_Controller
 	 */
 	protected function _setFilter()
 	{
+		global $txt;
+
 		$db = database();
 
 		// You can filter by any of the following columns:
@@ -201,13 +203,15 @@ class BadBehavior_Controller extends Action_Controller
 		validateToken('admin-bbl');
 
 		$redirect = deleteBadBehavior($type, $filter);
+		$redirect_path = 'action=admin;area=logs;sa=badbehaviorlog' . (isset($_REQUEST['desc']) ? ';desc' : '');
+
 		if ($redirect === 'delete')
 		{
 			$start = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
 			// Go back to where we were.
-			redirectexit('action=admin;area=logs;sa=badbehaviorlog' . (isset($_REQUEST['desc']) ? ';desc' : '') . ';start=' . $start . (!empty($filter) ? ';filter=' . $_GET['filter'] . ';value=' . $_GET['value'] : ''));
+			redirectexit($redirect_path . ';start=' . $start . (!empty($filter) ? $filter['href'] : ''));
 		}
-		redirectexit('action=admin;area=logs;sa=badbehaviorlog' . (isset($_REQUEST['desc']) ? ';desc' : ''));
+		redirectexit($redirect_path);
 	}
 
 }
