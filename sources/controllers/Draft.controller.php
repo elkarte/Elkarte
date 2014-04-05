@@ -22,6 +22,11 @@ if (!defined('ELK'))
 class Draft_Controller extends Action_Controller
 {
 	/**
+	 * The id of the member
+	 */
+	private $_memID = 0;
+
+	/**
 	 * Default method, just forwards, if we ever get here.
 	 *
 	 * @see Action_Controller::action_index()
@@ -41,6 +46,8 @@ class Draft_Controller extends Action_Controller
 		// Language and helper functions
 		loadLanguage('Drafts');
 		require_once(SUBSDIR . '/Drafts.subs.php');
+
+		$this->_memID = currentMemberID();
 	}
 
 	/**
@@ -52,83 +59,37 @@ class Draft_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $modSettings, $context, $user_info;
 
-		$memID = currentMemberID();
-
 		// Safe is safe.
-		if ($memID != $user_info['id'])
+		if ($this->_memID != $user_info['id'])
 			fatal_lang_error('no_access', false);
 
 		require_once(SUBSDIR . '/Drafts.subs.php');
 
 		// Some initial context.
 		$context['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
-		$context['current_member'] = $memID;
+		$context['current_member'] = $this->_memID;
 
 		// If just deleting a draft, do it and then redirect back.
 		if (!empty($_REQUEST['delete']))
-		{
-			checkSession(empty($_POST) ? 'get' : '');
-
-			// Lets see what we have been sent, one or many to delete
-			$toDelete = array();
-			if (!is_array($_REQUEST['delete']))
-				$toDelete[] = (int) $_REQUEST['delete'];
-			else
-			{
-				foreach ($_REQUEST['delete'] as $delete_id)
-					$toDelete[] = (int) $delete_id;
-			}
-
-			if (!empty($toDelete))
-				deleteDrafts($toDelete, $memID);
-
-			redirectexit('action=profile;u=' . $memID . ';area=showdrafts;start=' . $context['start']);
-		}
-
-		// Default to 10.
-		if (empty($_REQUEST['viewscount']) || !is_numeric($_REQUEST['viewscount']))
-			$_REQUEST['viewscount'] = 10;
+			return $this->_action_delete('action=profile;u=' . $this->_memID . ';area=showdrafts;start=' . $context['start']);
 
 		// Get things started
-		$msgCount = draftsCount($memID, 0);
+		$msgCount = draftsCount($this->_memID, 0);
 		$maxIndex = (int) $modSettings['defaultMaxMessages'];
 
 		// Make sure the starting place makes sense and construct our friend the page index.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=profile;u=' . $memID . ';area=showdrafts', $context['start'], $msgCount, $maxIndex);
+		$context['page_index'] = constructPageIndex($scripturl . '?action=profile;u=' . $this->_memID . ';area=showdrafts', $context['start'], $msgCount, $maxIndex);
 		$context['current_page'] = $context['start'] / $maxIndex;
 
-		// Reverse the query if we're past 50% of the pages for better performance.
-		$start = $context['start'];
-		$reverse = $start > $msgCount / 2;
-		if ($reverse)
-		{
-			$maxIndex = $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] + 1 && $msgCount > $context['start'] ? $msgCount - $context['start'] : (int) $modSettings['defaultMaxMessages'];
-			$start = $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] + 1 || $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] ? 0 : $msgCount - $context['start'] - $modSettings['defaultMaxMessages'];
-		}
-
-		// Find this user's drafts
-		$limit = $start . ', ' . $maxIndex;
-		$order = 'ud.id_draft ' . ($reverse ? 'ASC' : 'DESC');
-		$user_drafts = load_user_drafts($memID, 0, false, $order, $limit);
+		list ($maxIndex, $reverse, $limit, $order) = $this->_query_limits($msgCount, $maxIndex);
+		$user_drafts = load_user_drafts($this->_memID, 0, false, $order, $limit);
 
 		// Start counting at the number of the first message displayed.
 		$counter = $reverse ? $context['start'] + $maxIndex + 1 : $context['start'];
 		$context['posts'] = array();
 		foreach ($user_drafts as $row)
 		{
-			// Censor....
-			if (empty($row['body']))
-				$row['body'] = '';
-
-			$row['subject'] = Util::htmltrim($row['subject']);
-			if (empty($row['subject']))
-				$row['subject'] = $txt['drafts_none'];
-
-			censorText($row['body']);
-			censorText($row['subject']);
-
-			// BBC-ilize the message.
-			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], 'draft' . $row['id_draft']);
+			$this->_prepare_body_subject($row['body'], $row['subject'], $row['id_draft'], $txt['drafts_none'], $row['smileys_enabled']);
 
 			// And the array...
 			$context['drafts'][$counter += $reverse ? -1 : 1] = array(
@@ -198,10 +159,9 @@ class Draft_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Profile.subs.php');
 		require_once(SUBSDIR . '/Drafts.subs.php');
-		$memID = currentMemberID();
 
 		// Quick check how we got here.
-		if ($memID != $user_info['id'])
+		if ($this->_memID != $user_info['id'])
 			// empty($modSettings['drafts_enabled']) || empty($modSettings['drafts_pm_enabled']))
 			fatal_lang_error('no_access', false);
 
@@ -210,13 +170,7 @@ class Draft_Controller extends Action_Controller
 
 		// If just deleting a draft, do it and then redirect back.
 		if (!empty($_REQUEST['delete']))
-		{
-			checkSession('get');
-
-			$id_delete = (int) $_REQUEST['delete'];
-			deleteDrafts($id_delete, $memID);
-			redirectexit('action=pm;sa=showpmdrafts;start=' . $context['start']);
-		}
+			return $this->_action_delete('action=pm;sa=showpmdrafts;start=' . $context['start']);
 
 		// Perhaps a draft was selected for editing? if so pass this off
 		if (!empty($_REQUEST['id_draft']) && !empty($context['drafts_pm_save']))
@@ -226,52 +180,23 @@ class Draft_Controller extends Action_Controller
 			redirectexit('action=pm;sa=send;id_draft=' . $id_draft);
 		}
 
-		// Init
-		$maxIndex = (int) $modSettings['defaultMaxMessages'];
-
-		// Default to 10.
-		if (empty($_REQUEST['viewscount']) || !is_numeric($_REQUEST['viewscount']))
-			$_REQUEST['viewscount'] = 10;
-
 		// Get the count of applicable drafts
-		$msgCount = draftsCount($memID, 1);
+		$msgCount = draftsCount($this->_memID, 1);
+		$maxIndex = (int) $modSettings['defaultMaxMessages'];
 
 		// Make sure the starting place makes sense and construct our friend the page index.
 		$context['page_index'] = constructPageIndex($scripturl . '?action=pm;sa=showpmdrafts', $context['start'], $msgCount, $maxIndex);
 		$context['current_page'] = $context['start'] / $maxIndex;
 
-		// Reverse the query if we're past 50% of the total for better performance.
-		$start = $context['start'];
-		$reverse = $start > $msgCount / 2;
-		if ($reverse)
-		{
-			$maxIndex = $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] + 1 && $msgCount > $context['start'] ? $msgCount - $context['start'] : (int) $modSettings['defaultMaxMessages'];
-			$start = $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] + 1 || $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] ? 0 : $msgCount - $context['start'] - $modSettings['defaultMaxMessages'];
-		}
-
-		// Go get em'
-		$order = 'ud.id_draft ' . ($reverse ? 'ASC' : 'DESC');
-		$limit = $start . ', ' . $maxIndex;
-		$user_drafts = load_user_drafts($memID, 1, false, $order, $limit);
+		list ($maxIndex, $reverse, $limit, $order) = $this->_query_limits($msgCount, $maxIndex);
+		$user_drafts = load_user_drafts($this->_memID, 1, false, $order, $limit);
 
 		// Start counting at the number of the first message displayed.
 		$counter = $reverse ? $context['start'] + $maxIndex + 1 : $context['start'];
 		$context['posts'] = array();
 		foreach ($user_drafts as $row)
 		{
-			// Censor....
-			if (empty($row['body']))
-				$row['body'] = '';
-
-			$row['subject'] = Util::htmltrim($row['subject']);
-			if (empty($row['subject']))
-				$row['subject'] = $txt['no_subject'];
-
-			censorText($row['body']);
-			censorText($row['subject']);
-
-			// BBC-ilize the message.
-			$row['body'] = parse_bbc($row['body'], true, 'draft' . $row['id_draft']);
+			$this->_prepare_body_subject($row['body'], $row['subject'], $row['id_draft'], $txt['no_subject'], true);
 
 			// Have they provided who this will go to?
 			$recipients = array(
@@ -316,5 +241,88 @@ class Draft_Controller extends Action_Controller
 			'url' => $scripturl . '?action=pm;sa=showpmdrafts',
 			'name' => $txt['drafts'],
 		);
+	}
+
+	/**
+	 * Deletes drafts stored in the $_REQUEST['delete'] index.
+	 * The function redirects to a selected location.
+	 *
+	 * @param string $redirect - The url to redirect to after the drafts have
+	 *               been deleted
+	 */
+	private function _action_delete($redirect = '')
+	{
+		checkSession(empty($_POST) ? 'get' : '');
+
+		// Lets see what we have been sent, one or many to delete
+		$toDelete = array();
+		if (!is_array($_REQUEST['delete']))
+			$toDelete[] = (int) $_REQUEST['delete'];
+		else
+		{
+			foreach ($_REQUEST['delete'] as $delete_id)
+				$toDelete[] = (int) $delete_id;
+		}
+
+		if (!empty($toDelete))
+			deleteDrafts($toDelete, $this->_memID);
+
+		redirectexit($redirect);
+	}
+
+	/**
+	 * Calculates start and limit for the query, maxIndex for the counter and
+	 * if the query is reversed or not
+	 *
+	 * @param int $msgCount - Total number of drafts
+	 * @param int $maxIndex - The maximum number of messages
+	 *
+	 * @return mixed[] - an array consisting of: $maxIndex, $reverse, $limit, $order
+	 */
+	private function _query_limits($msgCount, $maxIndex)
+	{
+		global $context, $modSettings;
+
+		// Reverse the query if we're past 50% of the total for better performance.
+		$start = $context['start'];
+		$reverse = $start > $msgCount / 2;
+		if ($reverse)
+		{
+			$maxIndex = $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] + 1 && $msgCount > $context['start'] ? $msgCount - $context['start'] : (int) $modSettings['defaultMaxMessages'];
+			$start = $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] + 1 || $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] ? 0 : $msgCount - $context['start'] - $modSettings['defaultMaxMessages'];
+		}
+
+		// Find this user's drafts
+		$limit = $start . ', ' . $maxIndex;
+		$order = 'ud.id_draft ' . ($reverse ? 'ASC' : 'DESC');
+
+		return array($maxIndex, $reverse, $limit, $order);
+	}
+
+	/**
+	 * Prepares the body and the subject of the draft
+	 *
+	 * @param string $body - The body of the message, passed by-ref
+	 * @param string $subject - The subject, passed by-ref
+	 * @param int $id_draft - The id of the draft, used for caching the parsed body
+	 * @param string $default_subject - The default subject if $subject is empty
+	 * @param string $smiley_enabled - Is the smiley are enabled or not
+	 */
+	private function _prepare_body_subject(&$body, &$subject, $id_draft, $default_subject, $smiley_enabled = true)
+	{
+		// Cleanup...
+		if (empty($body))
+			$body = '';
+
+		$subject = Util::htmltrim($subject);
+		if (empty($subject))
+			$subject = $default_subject;
+
+		// Censor...
+		censorText($body);
+		censorText($subject);
+
+		// BBC-ilize the message.
+		$body = parse_bbc($body, $smiley_enabled, 'draft' . $id_draft);
 	}
 }

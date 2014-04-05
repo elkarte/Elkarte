@@ -58,7 +58,7 @@ class CoreFeatures_Controller extends Action_Controller
 	 */
 	public function action_features()
 	{
-		global $txt, $scripturl, $context, $settings, $modSettings;
+		global $txt, $context, $modSettings;
 
 		require_once(SUBSDIR . '/Admin.subs.php');
 
@@ -83,71 +83,14 @@ class CoreFeatures_Controller extends Action_Controller
 			else
 				validateToken('admin-core');
 
-			$setting_changes = array('admin_features' => array());
-
-			// Cycle each feature and change things as required!
-			foreach ($core_features as $id => $feature)
-			{
-				// Enabled?
-				if (!empty($_POST['feature_' . $id]))
-					$setting_changes['admin_features'][] = $id;
-
-				// Setting values to change?
-				if (isset($feature['settings']))
-				{
-					foreach ($feature['settings'] as $key => $value)
-					{
-						if (empty($_POST['feature_' . $id]) || (!empty($_POST['feature_' . $id]) && ($value < 2 || empty($modSettings[$key]))))
-							$setting_changes[$key] = !empty($_POST['feature_' . $id]) ? $value : !$value;
-					}
-				}
-
-				// Is there a call back for settings?
-				if (isset($feature['setting_callback']))
-				{
-					$returned_settings = $feature['setting_callback'](!empty($_POST['feature_' . $id]));
-					if (!empty($returned_settings))
-						$setting_changes = array_merge($setting_changes, $returned_settings);
-				}
-
-				// Standard save callback?
-				if (isset($feature['on_save']))
-					$feature['on_save']();
-			}
-
-			// Make sure this one setting is a string!
-			$setting_changes['admin_features'] = implode(',', $setting_changes['admin_features']);
-
-			// Make any setting changes!
-			updateSettings($setting_changes);
-
-			// This is needed to let menus appear if cache > 2
-			if ($modSettings['cache_enable'] > 2)
-				clean_cache('data');
-
-			// Any post save things?
-			foreach ($core_features as $id => $feature)
-			{
-				// Standard save callback?
-				if (isset($feature['save_callback']))
-					$feature['save_callback'](!empty($_POST['feature_' . $id]));
-			}
+			$this->_save_core_features($core_features);
 
 			if (!isset($_REQUEST['xml']))
 				redirectexit('action=admin;area=corefeatures;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
 		// Put them in context.
-		$context['features'] = array();
-		foreach ($core_features as $id => $feature)
-			$context['features'][$id] = array(
-				'title' => isset($feature['title']) ? $feature['title'] : $txt['core_settings_item_' . $id],
-				'desc' => isset($feature['desc']) ? $feature['desc'] : $txt['core_settings_item_' . $id . '_desc'],
-				'enabled' => in_array($id, $context['admin_features']),
-				'state' => in_array($id, $context['admin_features']) ? 'on' : 'off',
-				'url' => !empty($feature['url']) ? $scripturl . '?' . $feature['url'] . ';' . $context['session_var'] . '=' . $context['session_id'] : '',
-				'image' => (file_exists($settings['theme_dir'] . '/images/admin/feature_' . $id . '.png') ? $settings['images_url'] : $settings['default_images_url']) . '/admin/feature_' . $id . '.png',
-			);
+		$context['features'] = $this->_prepare_corefeatures($core_features);
 
 		// Are they a new user?
 		$context['is_new_install'] = !isset($modSettings['admin_features']);
@@ -391,5 +334,92 @@ class CoreFeatures_Controller extends Action_Controller
 			$context['sub_action'] = $defaultAction;
 		else
 			$context['sub_action'] = array_pop($temp = array_keys($subActions));
+	}
+
+	/**
+	 * Takes care os saving the core features status (enabled/disabled)
+	 *
+	 * @param mixed[] $core_features - The array of all the core features, as
+	 *                returned by $this->settings()
+	 */
+	private function _save_core_features($core_features)
+	{
+		global $modSettings;
+
+		$setting_changes = array('admin_features' => array());
+
+		// Cycle each feature and change things as required!
+		foreach ($core_features as $id => $feature)
+		{
+			// Enabled?
+			if (!empty($_POST['feature_' . $id]))
+				$setting_changes['admin_features'][] = $id;
+
+			// Setting values to change?
+			if (isset($feature['settings']))
+			{
+				foreach ($feature['settings'] as $key => $value)
+				{
+					if (empty($_POST['feature_' . $id]) || (!empty($_POST['feature_' . $id]) && ($value < 2 || empty($modSettings[$key]))))
+						$setting_changes[$key] = !empty($_POST['feature_' . $id]) ? $value : !$value;
+				}
+			}
+
+			// Is there a call back for settings?
+			if (isset($feature['setting_callback']))
+			{
+				$returned_settings = $feature['setting_callback'](!empty($_POST['feature_' . $id]));
+				if (!empty($returned_settings))
+					$setting_changes = array_merge($setting_changes, $returned_settings);
+			}
+
+			// Standard save callback?
+			if (isset($feature['on_save']))
+				$feature['on_save']();
+		}
+
+		// Make sure this one setting is a string!
+		$setting_changes['admin_features'] = implode(',', $setting_changes['admin_features']);
+
+		// Make any setting changes!
+		updateSettings($setting_changes);
+
+		// This is needed to let menus appear if cache > 2
+		if ($modSettings['cache_enable'] > 2)
+			clean_cache('data');
+
+		// Any post save things?
+		foreach ($core_features as $id => $feature)
+		{
+			// Standard save callback?
+			if (isset($feature['save_callback']))
+				$feature['save_callback'](!empty($_POST['feature_' . $id]));
+		}
+	}
+
+	/**
+	 * Puts the core features data into a format usable by the template
+	 *
+	 * @param mixed[] $core_features - The array of all the core features, as
+	 *                returned by $this->settings()
+	 */
+	protected function _prepare_corefeatures($core_features)
+	{
+		global $context, $txt, $settings, $scripturl;
+
+		$features = array();
+		foreach ($core_features as $id => $feature)
+		{
+			$features[$id] = array(
+				'title' => isset($feature['title']) ? $feature['title'] : $txt['core_settings_item_' . $id],
+				'desc' => isset($feature['desc']) ? $feature['desc'] : $txt['core_settings_item_' . $id . '_desc'],
+				'enabled' => in_array($id, $context['admin_features']),
+				'state' => in_array($id, $context['admin_features']) ? 'on' : 'off',
+				'url' => !empty($feature['url']) ? $scripturl . '?' . $feature['url'] . ';' . $context['session_var'] . '=' . $context['session_id'] : '',
+				'image' => (file_exists($settings['theme_dir'] . '/images/admin/feature_' . $id . '.png') ? $settings['images_url'] : $settings['default_images_url']) . '/admin/feature_' . $id . '.png',
+			);
+		}
+
+		return $features;
 	}
 }

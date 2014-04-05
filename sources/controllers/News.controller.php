@@ -207,7 +207,10 @@ class News_Controller extends Action_Controller
 				cache_put_data('xmlfeed-' . $xml_format . ':' . ($user_info['is_guest'] ? '' : $user_info['id'] . '-') . $cachekey, $xml, 240);
 		}
 
-		$feed_title = htmlspecialchars(strip_tags($context['forum_name']), ENT_COMPAT, 'UTF-8') . (isset($feed_title) ? $feed_title : '');
+		$context['feed_title'] = htmlspecialchars(strip_tags($context['forum_name']), ENT_COMPAT, 'UTF-8') . (isset($feed_title) ? $feed_title : '');
+		// We send a feed with recent posts, and alerts for PMs for logged in users
+		$context['recent_posts_data'] = $xml;
+		$context['xml_format'] = $xml_format;
 
 		// This is an xml file....
 		ob_end_clean();
@@ -225,62 +228,19 @@ class News_Controller extends Action_Controller
 		elseif ($xml_format == 'rdf')
 			header('Content-Type: ' . (isBrowser('ie') ? 'text/xml' : 'application/rdf+xml') . '; charset=UTF-8');
 
-		// First, output the xml header.
-		echo '<?xml version="1.0" encoding="UTF-8"?' . '>';
+		loadTemplate('Xml');
+		Template_Layers::getInstance()->removeAll();
 
 		// Are we outputting an rss feed or one with more information?
 		if ($xml_format == 'rss' || $xml_format == 'rss2')
 		{
-			// Start with an RSS 2.0 header.
-			echo '
-	<rss version=', $xml_format == 'rss2' ? '"2.0" xmlns:dc="http://purl.org/dc/elements/1.1/"' : '"0.92"', ' xml:lang="', strtr($txt['lang_locale'], '_', '-'), '">
-		<channel>
-			<title>', $feed_title, '</title>
-			<link>', $scripturl, '</link>
-			<description><![CDATA[', strip_tags($txt['xml_rss_desc']), ']]></description>
-			<generator>ElkArte</generator>
-			<ttl>30</ttl>
-			<image>
-				<url>', $settings['default_theme_dir'], '/images/logo.png</url>
-				<title>', $feed_title, '</title>
-				<link>', $scripturl, '</link>
-			</image>';
-
-			// Output all of the associative array, start indenting with 2 tabs, and name everything "item".
-			dumpTags($xml, 2, 'item', $xml_format);
-
-			// Output the footer of the xml.
-			echo '
-		</channel>
-	</rss>';
+			$context['sub_template'] = 'feedrss';
 		}
 		elseif ($xml_format == 'webslice')
 		{
-			// Format specification http://msdn.microsoft.com/en-us/library/cc304073%28VS.85%29.aspx
-			// Known browsers to support webslices: IE8, IE9, Firefox with Webchunks addon.
-			// It uses RSS 2.
-
-			// We send a feed with recent posts, and alerts for PMs for logged in users
-			$context['recent_posts_data'] = $xml;
 			$context['can_pm_read'] = allowedTo('pm_read');
 
-			// This always has RSS 2
-			echo '
-	<rss version="2.0" xmlns:mon="http://www.microsoft.com/schemas/rss/monitoring/2007" xml:lang="', strtr($txt['lang_locale'], '_', '-'), '">
-		<channel>
-			<title>', $feed_title, ' - ', $txt['recent_posts'], '</title>
-			<link>', $scripturl, '?action=recent</link>
-			<description><![CDATA[', strip_tags($txt['xml_rss_desc']), ']]></description>
-			<item>
-				<title>', $feed_title, ' - ', $txt['recent_posts'], '</title>
-				<link>', $scripturl, '?action=recent</link>
-				<description><![CDATA[
-					', template_webslice_header_above(), '
-					', template_webslice_recent_posts(), '
-				]]></description>
-			</item>
-		</channel>
-	</rss>';
+			$context['sub_template'] = 'webslice';
 		}
 		elseif ($xml_format == 'atom')
 		{
@@ -288,55 +248,14 @@ class News_Controller extends Action_Controller
 				if (isset($_REQUEST[$var]))
 					$url_parts[] = $var . '=' . (is_array($_REQUEST[$var]) ? implode(',', $_REQUEST[$var]) : $_REQUEST[$var]);
 
-			echo '
-	<feed xmlns="http://www.w3.org/2005/Atom">
-		<title>', $feed_title, '</title>
-		<link rel="alternate" type="text/html" href="', $scripturl, '" />
-		<link rel="self" type="application/rss+xml" href="', $scripturl, '?type=atom;action=.xml', !empty($url_parts) ? ';' . implode(';', $url_parts) : '', '" />
-		<id>', $scripturl, '</id>
-		<icon>', $boardurl, '/favicon.ico</icon>
-
-		<updated>', gmstrftime('%Y-%m-%dT%H:%M:%SZ'), '</updated>
-		<subtitle><![CDATA[', strip_tags($txt['xml_rss_desc']), ']]></subtitle>
-		<generator uri="http://www.elkarte.net" version="', strtr($forum_version, array('ElkArte' => '')), '">ElkArte</generator>
-		<author>
-			<name>', strip_tags($context['forum_name']), '</name>
-		</author>';
-
-			dumpTags($xml, 2, 'entry', $xml_format);
-
-			echo '
-	</feed>';
+			$context['url_parts'] = !empty($url_parts) ? implode(';', $url_parts) : '';
+			$context['sub_template'] = 'feedatom';
 		}
 		// rdf by default
 		else
 		{
-			echo '
-	<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://purl.org/rss/1.0/">
-		<channel rdf:about="', $scripturl, '">
-			<title>', $feed_title, '</title>
-			<link>', $scripturl, '</link>
-			<description><![CDATA[', strip_tags($txt['xml_rss_desc']), ']]></description>
-			<items>
-				<rdf:Seq>';
-
-			foreach ($xml as $item)
-				echo '
-					<rdf:li rdf:resource="', $item['link'], '" />';
-
-			echo '
-				</rdf:Seq>
-			</items>
-		</channel>
-	';
-
-			dumpTags($xml, 1, 'item', $xml_format);
-
-			echo '
-	</rdf:RDF>';
+			$context['sub_template'] = 'rdf';
 		}
-
-		obExit(false);
 	}
 
 	/**
@@ -850,7 +769,9 @@ function cdata_parse($data, $ns = '')
  * Formats data retrieved in other functions into xml format.
  * Additionally formats data based on the specific format passed.
  * This function is recursively called to handle sub arrays of data.
-
+ *
+ * @deprecated since 1.1 - use template_xml_news instead
+ *
  * @param mixed[] $data the array to output as xml data
  * @param int $i the amount of indentation to use.
  * @param string|null $tag if specified, it will be used instead of the keys of data.
@@ -858,57 +779,6 @@ function cdata_parse($data, $ns = '')
  */
 function dumpTags($data, $i, $tag = null, $xml_format = 'rss')
 {
-	// For every array in the data...
-	foreach ($data as $key => $val)
-	{
-		// Skip it, it's been set to null.
-		if ($val === null)
-			continue;
-
-		// If a tag was passed, use it instead of the key.
-		$key = isset($tag) ? $tag : $key;
-
-		// First let's indent!
-		echo "\n", str_repeat("\t", $i);
-
-		// Grr, I hate kludges... almost worth doing it properly, here, but not quite.
-		if ($xml_format == 'atom' && $key == 'link')
-		{
-			echo '<link rel="alternate" type="text/html" href="', fix_possible_url($val), '" />';
-			continue;
-		}
-
-		// If it's empty/0/nothing simply output an empty tag.
-		if ($val == '')
-			echo '<', $key, ' />';
-		elseif ($xml_format == 'atom' && $key == 'category')
-			echo '<', $key, ' term="', $val, '" />';
-		else
-		{
-			// Beginning tag.
-			if ($xml_format == 'rdf' && $key == 'item' && isset($val['link']))
-			{
-				echo '<', $key, ' rdf:about="', fix_possible_url($val['link']), '">';
-				echo "\n", str_repeat("\t", $i + 1);
-				echo '<dc:format>text/html</dc:format>';
-			}
-			elseif ($xml_format == 'atom' && $key == 'summary')
-				echo '<', $key, ' type="html">';
-			else
-				echo '<', $key, '>';
-
-			if (is_array($val))
-			{
-				// An array.  Dump it, and then indent the tag.
-				dumpTags($val, $i + 1, null, $xml_format);
-				echo "\n", str_repeat("\t", $i), '</', $key, '>';
-			}
-			// A string with returns in it.... show this as a multiline element.
-			elseif (strpos($val, "\n") !== false || strpos($val, '<br />') !== false)
-				echo "\n", fix_possible_url($val), "\n", str_repeat("\t", $i), '</', $key, '>';
-			// A simple string.
-			else
-				echo fix_possible_url($val), '</', $key, '>';
-		}
-	}
+	loadTemplate('Xml');
+	template_xml_news($data, $i, $tag, $xml_format);
 }

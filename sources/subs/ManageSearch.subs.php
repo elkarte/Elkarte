@@ -458,18 +458,7 @@ function removeCommonWordsFromIndex($start, $column_definition)
  */
 function drop_log_search_words()
 {
-	global $db_prefix;
+	$db_table = db_table();
 
-	$db = database();
-	$db_search = db_search();
-
-	$tables = $db->db_list_tables(false, $db_prefix . 'log_search_words');
-	if (!empty($tables))
-	{
-		$db_search->search_query('drop_words_table', '
-			DROP TABLE {db_prefix}log_search_words',
-			array(
-			)
-		);
-	}
+	$db_table->db_drop_table('{db_prefix}log_search_words');
 }

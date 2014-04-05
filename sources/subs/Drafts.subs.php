@@ -296,8 +296,10 @@ function deleteDrafts($id_draft, $member_id = -1, $check = true)
 	$db = database();
 
 	// Only a single draft.
-	if (is_numeric($id_draft))
+	if (!is_array($id_draft))
 		$id_draft = array($id_draft);
+
+	$id_draft = array_map('intval', $id_draft);
 
 	// Can't delete nothing
 	if (empty($id_draft))

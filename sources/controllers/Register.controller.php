@@ -243,122 +243,108 @@ class Register_Controller extends Action_Controller
 	}
 
 	/**
+	 * Handles the registration process for members using ElkArte registration
+	 * and not (for example) OpenID.
+	 */
+	public function action_register2()
+	{
+		global $modSettings, $context;
+
+		// Start collecting together any errors.
+		$reg_errors = Error_Context::context('register', 0);
+
+		$this->_can_register();
+
+		checkSession();
+		if (!validateToken('register', 'post', true, false))
+			$reg_errors->addError('token_verification');
+
+		// Well, if you don't agree, you can't register.
+		if (!empty($modSettings['requireAgreement']) && empty($_SESSION['registration_agreed']))
+			redirectexit();
+
+		// Make sure they came from *somewhere*, have a session.
+		if (!isset($_SESSION['old_url']))
+			redirectexit('action=register');
+
+		// If we don't require an agreement, we need a extra check for coppa.
+		if (empty($modSettings['requireAgreement']) && !empty($modSettings['coppaAge']))
+			$_SESSION['skip_coppa'] = !empty($_POST['accept_agreement']);
+
+		// Are they under age, and under age users are banned?
+		if (!empty($modSettings['coppaAge']) && empty($modSettings['coppaType']) && empty($_SESSION['skip_coppa']))
+		{
+			loadLanguage('Login');
+			fatal_lang_error('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
+		}
+
+		// Check the time gate for miscreants. First make sure they came from somewhere that actually set it up.
+		if (empty($_SESSION['register']['timenow']) || empty($_SESSION['register']['limit']))
+			redirectexit('action=register');
+
+		// Failing that, check the time limit for exessive speed.
+		if (time() - $_SESSION['register']['timenow'] < $_SESSION['register']['limit'])
+		{
+			loadLanguage('Login');
+			$reg_errors->addError('too_quickly');
+		}
+
+		// Check whether the visual verification code was entered correctly.
+		if (!empty($modSettings['reg_verification']))
+		{
+			require_once(SUBSDIR . '/VerificationControls.class.php');
+			$verificationOptions = array(
+				'id' => 'register',
+			);
+			$context['visual_verification'] = create_control_verification($verificationOptions, true);
+
+			if (is_array($context['visual_verification']))
+			{
+				foreach ($context['visual_verification'] as $error)
+					$reg_errors->addError($error);
+			}
+		}
+
+		$this->do_register(false);
+	}
+
+	/**
+	 * Checks if registrations are enabled and the user didn't just register
+	 */
+	private function _can_register()
+	{
+		global $modSettings;
+
+		// You can't register if it's disabled.
+		if (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 3)
+			fatal_lang_error('registration_disabled', false);
+
+		// Make sure they didn't just register with this session.
+		if (!empty($_SESSION['just_registered']) && empty($modSettings['disableRegisterCheck']))
+			fatal_lang_error('register_only_once', false);
+	}
+
+	/**
 	 * Actually register the member.
-	 * @todo split this function in two functions:
-	 *  - a function that handles action=register2, which needs no parameter;
-	 *  - a function that processes the case of OpenID verification.
 	 *
 	 * @param bool $verifiedOpenID = false
 	 */
-	public function action_register2($verifiedOpenID = false)
+	public function do_register($verifiedOpenID = false)
 	{
 		global $txt, $modSettings, $context, $user_info;
 
 		// Start collecting together any errors.
 		$reg_errors = Error_Context::context('register', 0);
 
-		// Make sure they didn't just register with this session.
-		if (!empty($_SESSION['just_registered']) && empty($modSettings['disableRegisterCheck']))
-			fatal_lang_error('register_only_once', false);
-
-		// We can't validate the token and the session with OpenID enabled.
-		if(!$verifiedOpenID)
-		{
-			checkSession();
-			if (!validateToken('register', 'post', true, false))
-				$reg_errors->addError('token_verification');
-		}
-
-		// Did we save some open ID fields?
-		if ($verifiedOpenID && !empty($context['openid_save_fields']))
-		{
-			foreach ($context['openid_save_fields'] as $id => $value)
-				$_POST[$id] = $value;
-		}
-
-		// You can't register if it's disabled.
-		if (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 3)
-			fatal_lang_error('registration_disabled', false);
-
-		// Things we don't do for people who have already confirmed their OpenID allegances via register.
-		if (!$verifiedOpenID)
-		{
-			// Well, if you don't agree, you can't register.
-			if (!empty($modSettings['requireAgreement']) && empty($_SESSION['registration_agreed']))
-				redirectexit();
-
-			// Make sure they came from *somewhere*, have a session.
-			if (!isset($_SESSION['old_url']))
-				redirectexit('action=register');
-
-			// If we don't require an agreement, we need a extra check for coppa.
-			if (empty($modSettings['requireAgreement']) && !empty($modSettings['coppaAge']))
-				$_SESSION['skip_coppa'] = !empty($_POST['accept_agreement']);
-
-			// Are they under age, and under age users are banned?
-			if (!empty($modSettings['coppaAge']) && empty($modSettings['coppaType']) && empty($_SESSION['skip_coppa']))
-			{
-				loadLanguage('Login');
-				fatal_lang_error('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
-			}
-
-			// Check the time gate for miscreants. First make sure they came from somewhere that actually set it up.
-			if (empty($_SESSION['register']['timenow']) || empty($_SESSION['register']['limit']))
-				redirectexit('action=register');
-
-			// Failing that, check the time limit for exessive speed.
-			if (time() - $_SESSION['register']['timenow'] < $_SESSION['register']['limit'])
-			{
-				loadLanguage('Login');
-				$reg_errors->addError('too_quickly');
-			}
-
-			// Check whether the visual verification code was entered correctly.
-			if (!empty($modSettings['reg_verification']))
-			{
-				require_once(SUBSDIR . '/VerificationControls.class.php');
-				$verificationOptions = array(
-					'id' => 'register',
-				);
-				$context['visual_verification'] = create_control_verification($verificationOptions, true);
-
-				if (is_array($context['visual_verification']))
-				{
-					foreach ($context['visual_verification'] as $error)
-						$reg_errors->addError($error);
-				}
-			}
-		}
+		// Checks already done if coming from the action
+		if ($verifiedOpenID)
+			$this->_can_register();
 
 		foreach ($_POST as $key => $value)
 		{
 			if (!is_array($value))
 				$_POST[$key] = htmltrim__recursive(str_replace(array("\n", "\r"), '', $value));
 		}
-
-		// Collect all extra registration fields someone might have filled in.
-		$possible_strings = array(
-			'birthdate',
-			'time_format',
-			'buddy_list',
-			'pm_ignore_list',
-			'smiley_set',
-			'personal_text', 'avatar',
-			'lngfile',
-			'secret_question', 'secret_answer',
-		);
-		$possible_ints = array(
-			'pm_email_notify',
-			'notify_types',
-			'id_theme',
-		);
-		$possible_floats = array(
-			'time_offset',
-		);
-		$possible_bools = array(
-			'notify_announcements', 'notify_regularity', 'notify_send_body',
-			'hide_email', 'show_online',
-		);
 
 		if (isset($_POST['secret_answer']) && $_POST['secret_answer'] != '')
 			$_POST['secret_answer'] = md5($_POST['secret_answer']);
@@ -370,9 +356,10 @@ class Register_Controller extends Action_Controller
 		if (isset($_POST['real_name']) && (!empty($modSettings['allow_editDisplayName']) || allowedTo('moderate_forum')))
 		{
 			$_POST['real_name'] = trim(preg_replace('~[\t\n\r \x0B\0\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}]+~u', ' ', $_POST['real_name']));
-			if (trim($_POST['real_name']) != '' && !isReservedName($_POST['real_name']) && Util::strlen($_POST['real_name']) < 60)
-				$possible_strings[] = 'real_name';
+			$has_real_name = true;
 		}
+		else
+			$has_real_name = false;
 
 		// Handle a string as a birthdate...
 		if (isset($_POST['birthdate']) && $_POST['birthdate'] != '')
@@ -399,30 +386,6 @@ class Register_Controller extends Action_Controller
 		else
 			unset($_POST['lngfile']);
 
-		// Some of these fields we may not want.
-		if (!empty($modSettings['registration_fields']))
-		{
-			// But we might want some of them if the admin asks for them.
-			$standard_fields = array('location', 'gender');
-			$reg_fields = explode(',', $modSettings['registration_fields']);
-
-			$exclude_fields = array_diff($standard_fields, $reg_fields);
-
-			// Website is a little different
-			if (!in_array('website', $reg_fields))
-				$exclude_fields = array_merge($exclude_fields, array('website_url', 'website_title'));
-
-			// We used to accept signature on registration but it's being abused by spammers these days, so no more.
-			$exclude_fields[] = 'signature';
-		}
-		else
-			$exclude_fields = array('signature', 'location', 'gender', 'website_url', 'website_title');
-
-		$possible_strings = array_diff($possible_strings, $exclude_fields);
-		$possible_ints = array_diff($possible_ints, $exclude_fields);
-		$possible_floats = array_diff($possible_floats, $exclude_fields);
-		$possible_bools = array_diff($possible_bools, $exclude_fields);
-
 		// Set the options needed for registration.
 		$regOptions = array(
 			'interface' => 'guest',
@@ -437,26 +400,9 @@ class Register_Controller extends Action_Controller
 			'check_email_ban' => true,
 			'send_welcome_email' => !empty($modSettings['send_welcomeEmail']),
 			'require' => !empty($modSettings['coppaAge']) && !$verifiedOpenID && empty($_SESSION['skip_coppa']) ? 'coppa' : (empty($modSettings['registration_method']) ? 'nothing' : ($modSettings['registration_method'] == 1 ? 'activation' : 'approval')),
-			'extra_register_vars' => array(),
+			'extra_register_vars' => $this->_extra_vars($has_real_name),
 			'theme_vars' => array(),
 		);
-
-		// Include the additional options that might have been filled in.
-		foreach ($possible_strings as $var)
-			if (isset($_POST[$var]))
-				$regOptions['extra_register_vars'][$var] = Util::htmlspecialchars($_POST[$var], ENT_QUOTES);
-
-		foreach ($possible_ints as $var)
-			if (isset($_POST[$var]))
-				$regOptions['extra_register_vars'][$var] = (int) $_POST[$var];
-
-		foreach ($possible_floats as $var)
-			if (isset($_POST[$var]))
-				$regOptions['extra_register_vars'][$var] = (float) $_POST[$var];
-
-		foreach ($possible_bools as $var)
-			if (isset($_POST[$var]))
-				$regOptions['extra_register_vars'][$var] = empty($_POST[$var]) ? 0 : 1;
 
 		// Registration options are always default options...
 		if (isset($_POST['default_options']))
@@ -483,20 +429,14 @@ class Register_Controller extends Action_Controller
 			// We only care for text fields as the others are valid to be empty.
 			if (!in_array($row['type'], array('check', 'select', 'radio')))
 			{
-				// Is it too long?
-				if ($row['field_length'] && $row['field_length'] < Util::strlen($value))
-					$reg_errors->addError(array('custom_field_too_long', array($row['name'], $row['field_length'])));
-
-				// Any masks to apply?
-				if ($row['type'] == 'text' && !empty($row['mask']) && $row['mask'] != 'none')
+				$is_valid = isCustomFieldValid($row, $value);
+				if ($is_valid !== true)
 				{
-					// @todo We never error on this - just ignore it at the moment...
-					if ($row['mask'] == 'email' && (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $value) === 0 || strlen($value) > 255))
-						$reg_errors->addError(array('custom_field_invalid_email', array($row['name'])));
-					elseif ($row['mask'] == 'number' && preg_match('~[^\d]~', $value))
-						$reg_errors->addError(array('custom_field_not_number', array($row['name'])));
-					elseif (substr($row['mask'], 0, 5) == 'regex' && trim($value) !== '' && preg_match(substr($row['mask'], 5), $value) === 0)
-						$reg_errors->addError(array('custom_field_inproper_format', array($row['name'])));
+					$err_params = array($row['name']);
+					if ($is_valid == 'custom_field_not_number')
+						$err_params[] = $row['field_length'];
+
+					$reg_errors->addError(array($is_valid, $err_params));
 				}
 			}
 
@@ -1003,5 +943,86 @@ class Register_Controller extends Action_Controller
 		validateUsername(0, $context['checked_username'], 'valid_username', true, false);
 
 		$context['valid_username'] = !$errors->hasErrors();
+	}
+
+	/**
+	 * Collect all extra registration fields someone might have filled in.
+	 *
+	 * @param bool $has_real_name - if true adds 'real_name' as well
+	 */
+	private function _extra_vars($has_real_name)
+	{
+		global $modSettings;
+
+		$possible_strings = array(
+			'birthdate',
+			'time_format',
+			'buddy_list',
+			'pm_ignore_list',
+			'smiley_set',
+			'personal_text', 'avatar',
+			'lngfile',
+			'secret_question', 'secret_answer',
+		);
+		$possible_ints = array(
+			'pm_email_notify',
+			'notify_types',
+			'id_theme',
+		);
+		$possible_floats = array(
+			'time_offset',
+		);
+		$possible_bools = array(
+			'notify_announcements', 'notify_regularity', 'notify_send_body',
+			'hide_email', 'show_online',
+		);
+
+		if ($has_real_name && trim($_POST['real_name']) != '' && !isReservedName($_POST['real_name']) && Util::strlen($_POST['real_name']) < 60)
+			$possible_strings[] = 'real_name';
+
+		// Some of these fields we may not want.
+		if (!empty($modSettings['registration_fields']))
+		{
+			// But we might want some of them if the admin asks for them.
+			$standard_fields = array('location', 'gender');
+			$reg_fields = explode(',', $modSettings['registration_fields']);
+
+			$exclude_fields = array_diff($standard_fields, $reg_fields);
+
+			// Website is a little different
+			if (!in_array('website', $reg_fields))
+				$exclude_fields = array_merge($exclude_fields, array('website_url', 'website_title'));
+
+			// We used to accept signature on registration but it's being abused by spammers these days, so no more.
+			$exclude_fields[] = 'signature';
+		}
+		else
+			$exclude_fields = array('signature', 'location', 'gender', 'website_url', 'website_title');
+
+		$possible_strings = array_diff($possible_strings, $exclude_fields);
+		$possible_ints = array_diff($possible_ints, $exclude_fields);
+		$possible_floats = array_diff($possible_floats, $exclude_fields);
+		$possible_bools = array_diff($possible_bools, $exclude_fields);
+
+		$extra_register_vars = array();
+
+		// Include the additional options that might have been filled in.
+		foreach ($possible_strings as $var)
+			if (isset($_POST[$var]))
+				$extra_register_vars[$var] = Util::htmlspecialchars($_POST[$var], ENT_QUOTES);
+
+		foreach ($possible_ints as $var)
+			if (isset($_POST[$var]))
+				$extra_register_vars[$var] = (int) $_POST[$var];
+
+		foreach ($possible_floats as $var)
+			if (isset($_POST[$var]))
+				$extra_register_vars[$var] = (float) $_POST[$var];
+
+		foreach ($possible_bools as $var)
+			if (isset($_POST[$var]))
+				$extra_register_vars[$var] = empty($_POST[$var]) ? 0 : 1;
+
+		return $extra_register_vars;
 	}
 }

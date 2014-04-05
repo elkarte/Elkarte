@@ -23,6 +23,7 @@ if (!defined('ELK'))
  */
 class OpenID_Controller extends Action_Controller
 {
+	private $_secret = '';
 	/**
 	 * Forward to the right action.
 	 *
@@ -75,17 +76,8 @@ class OpenID_Controller extends Action_Controller
 		if ($assoc === null)
 			fatal_lang_error('openid_no_assoc');
 
-		$secret = base64_decode($assoc['secret']);
-		$signed = explode(',', $_GET['openid_signed']);
-		$verify_str = '';
-
-		foreach ($signed as $sign)
-			$verify_str .= $sign . ':' . strtr($_GET['openid_' . str_replace('.', '_', $sign)], array('&amp;' => '&')) . "\n";
-
-		$verify_str = base64_encode(hash_hmac('sha1', $verify_str, $secret, true));
-
 		// Verify the OpenID signature.
-		if ($verify_str != $_GET['openid_sig'])
+		if (!$this->_verify_string($assoc['secret']))
 			fatal_lang_error('openid_sig_invalid', 'critical');
 
 		if (!isset($_SESSION['openid']['saved_data'][$_GET['t']]))
@@ -98,7 +90,7 @@ class OpenID_Controller extends Action_Controller
 			fatal_lang_error('openid_load_data');
 
 		// Any save fields to restore?
-		$context['openid_save_fields'] = isset($_GET['sf']) ? unserialize(base64_decode($_GET['sf'])) : array();
+		$openid_save_fields = isset($_GET['sf']) ? unserialize(base64_decode($_GET['sf'])) : array();
 		$context['openid_claimed_id'] = $_GET['openid_claimed_id'];
 
 		// Is there a user with this OpenID_uri?
@@ -138,9 +130,16 @@ class OpenID_Controller extends Action_Controller
 			// Were we just verifying the registration state?
 			if (isset($_GET['sa']) && $_GET['sa'] == 'register2')
 			{
+				// Did we save some open ID fields?
+				if (!empty($openid_save_fields))
+				{
+					foreach ($openid_save_fields as $id => $value)
+						$_POST[$id] = $value;
+				}
+
 				require_once(CONTROLLERDIR . '/Register.controller.php');
 				$controller = new Register_Controller();
-				return $controller->action_register2(true);
+				return $controller->do_register(true);
 			}
 			else
 				redirectexit('action=register');
@@ -161,7 +160,7 @@ class OpenID_Controller extends Action_Controller
 			$user_settings = $member_found;
 
 			// @Todo: this seems outdated?
-			$user_settings['passwd'] = sha1(strtolower($user_settings['member_name']) . $secret);
+			$user_settings['passwd'] = sha1(strtolower($user_settings['member_name']) . $this->_secret);
 			$user_settings['password_salt'] = substr(md5(mt_rand()), 0, 4);
 
 			require_once(SUBSDIR . '/Members.subs.php');
@@ -182,6 +181,26 @@ class OpenID_Controller extends Action_Controller
 			// Finally do the login.
 			doLogin();
 		}
+	}
+
+	/**
+	 * Compares the association with the signatures received from the server
+	 *
+	 * @param string $raw_secret - The association stored in the database
+	 */
+	private function _verify_string($raw_secret)
+	{
+		$this->_secret = base64_decode($raw_secret);
+		$signed = explode(',', $_GET['openid_signed']);
+		$verify_str = '';
+
+		foreach ($signed as $sign)
+			$verify_str .= $sign . ':' . strtr($_GET['openid_' . str_replace('.', '_', $sign)], array('&amp;' => '&')) . "\n";
+
+		$verify_str = base64_encode(hash_hmac('sha1', $verify_str, $this->_secret, true));
+
+		// Verify the OpenID signature.
+		return $verify_str == $_GET['openid_sig'];
 	}
 
 	/**

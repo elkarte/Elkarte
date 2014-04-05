@@ -1455,7 +1455,6 @@ class ManageSmileys_Controller extends Action_Controller
 		{
 			$base_name = strtr(basename($_REQUEST['set_gz']), ':/', '-_');
 			$name = Util::htmlspecialchars(strtok(basename($_REQUEST['set_gz']), '.'));
-			$name_pr = preg_replace(array('/\s/', '/\.[\.]+/', '/[^\w_\.\-]/'), array('_', '.', ''), $name);
 			$context['filename'] = $base_name;
 
 			// Check that the smiley is from simplemachines.org, for now... maybe add mirroring later.
@@ -1475,7 +1474,6 @@ class ManageSmileys_Controller extends Action_Controller
 		{
 			$base_name = basename($_REQUEST['package']);
 			$name = Util::htmlspecialchars(strtok(basename($_REQUEST['package']), '.'));
-			$name_pr = preg_replace(array('/\s/', '/\.[\.]+/', '/[^\w_\.\-]/'), array('_', '.', ''), $name);
 			$context['filename'] = $base_name;
 
 			$destination = BOARDDIR . '/packages/' . basename($_REQUEST['package']);

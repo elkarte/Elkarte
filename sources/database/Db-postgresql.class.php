@@ -1141,14 +1141,8 @@ class Database_PostgreSQL implements Database
 		$table = str_replace('{db_prefix}', $db_prefix, $table);
 
 		// Do we need to drop it first?
-		$tables = $this->db_list_tables(false, $backup_table);
-		if (!empty($tables))
-			$this->query('', '
-				DROP TABLE {raw:backup_table}',
-				array(
-					'backup_table' => $backup_table,
-				)
-			);
+		$db_table = db_table();
+		$db_table->db_drop_table($backup_table);
 
 		// @todo Should we create backups of sequences as well?
 		$this->query('', '

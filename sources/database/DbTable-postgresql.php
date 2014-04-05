@@ -128,8 +128,7 @@ class DbTable_PostgreSQL extends DbTable
 		$db = database();
 
 		// This... my friends... is a function in a half - let's start by checking if the table exists!
-		$tables = $db->db_list_tables();
-		if (in_array($full_table_name, $tables))
+		if ($this->table_exists($full_table_name))
 		{
 			// This is a sad day... drop the table? If not, return false (error) by default.
 			if ($if_exists == 'overwrite')
@@ -182,7 +181,7 @@ class DbTable_PostgreSQL extends DbTable
 
 			// Primary goes in the table...
 			if (isset($index['type']) && $index['type'] == 'primary')
-				$table_query .= "\n\t" . 'PRIMARY KEY (' . implode(',', $index['columns']) . '),';
+				$table_query .= "\n\t" . 'PRIMARY KEY (' . $columns . '),';
 			else
 			{
 				if (empty($index['name']))
@@ -243,7 +242,7 @@ class DbTable_PostgreSQL extends DbTable
 		$db = database();
 
 		// Does it exist?
-		if (in_array($full_table_name, $db->db_list_tables()))
+		if ($this->table_exists($full_table_name))
 		{
 			// We can then drop the table.
 			$db->db_transaction('begin');
