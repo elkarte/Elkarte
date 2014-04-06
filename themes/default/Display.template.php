@@ -572,19 +572,6 @@ function template_quickreply_below()
 					sFormRemoveAccessKeys: \'postmodify\'' : '', '
 				});
 
-				aJumpTo[aJumpTo.length] = new JumpTo({
-					sContainerId: "display_jump_to",
-					sJumpToTemplate: "<label class=\"smalltext\" for=\"%select_id%\">', $context['jump_to']['label'], ':<" + "/label> %dropdown_list%",
-					iCurBoardId: ', $context['current_board'], ',
-					iCurBoardChildLevel: ', $context['jump_to']['child_level'], ',
-					sCurBoardName: "', $context['jump_to']['board_name'], '",
-					sBoardChildLevelIndicator: "&#8195;",
-					sBoardPrefix: "', isBrowser('ie8') ? '&#187; ' : '&#10148; ', '",
-					sCatClass: "jump_to_header",
-					sCatPrefix: "",
-					sGoButtonLabel: "', $txt['go'], '"
-				});
-
 				aIconLists[aIconLists.length] = new IconList({
 					sBackReference: "aIconLists[" + aIconLists.length + "]",
 					sIconIdPrefix: "msg_icon_",
@@ -756,7 +743,7 @@ function template_pages_and_buttons_above()
  */
 function template_pages_and_buttons_below()
 {
-	global $context;
+	global $context, $txt;
 
 	// Show the page index... "Pages: [1]".
 	template_pagesection('normal_buttons', 'right');
@@ -769,7 +756,21 @@ function template_pages_and_buttons_below()
 
 	// Show the jump-to box, or actually...let Javascript do it.
 	echo '
-			<div id="display_jump_to">&nbsp;</div>';
+			<div id="display_jump_to">&nbsp;</div>
+			<script><!-- // --><![CDATA[
+				aJumpTo[aJumpTo.length] = new JumpTo({
+					sContainerId: "display_jump_to",
+					sJumpToTemplate: "<label class=\"smalltext\" for=\"%select_id%\">', $context['jump_to']['label'], ':<" + "/label> %dropdown_list%",
+					iCurBoardId: ', $context['current_board'], ',
+					iCurBoardChildLevel: ', $context['jump_to']['child_level'], ',
+					sCurBoardName: "', $context['jump_to']['board_name'], '",
+					sBoardChildLevelIndicator: "&#8195;",
+					sBoardPrefix: "', isBrowser('ie8') ? '&#187; ' : '&#10148; ', '",
+					sCatClass: "jump_to_header",
+					sCatPrefix: "",
+					sGoButtonLabel: "', $txt['go'], '"
+				});
+			// ]]></script>';
 }
 
 /**
