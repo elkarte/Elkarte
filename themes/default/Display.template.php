@@ -400,9 +400,14 @@ function template_quickreply_below()
 		// Guests just need more.
 		if ($context['user']['is_guest'])
 			echo '
-							<strong><label for="guestname">', $txt['name'], '</label>:</strong> <input type="text" name="guestname" id="guestname" value="', $context['name'], '" size="25" class="input_text" tabindex="', $context['tabindex']++, '" />
-							<strong><label for="email">', $txt['email'], '</label>:</strong> <input type="text" name="email" id="email" value="', $context['email'], '" size="25" class="input_text" tabindex="', $context['tabindex']++, '" />
-							<br />';
+							<dl>
+								<dt>
+									<strong><label for="guestname">', $txt['name'], '</label>:</strong> <input type="text" name="guestname" id="guestname" value="', $context['name'], '" size="25" class="input_text" tabindex="', $context['tabindex']++, '" />
+								</dd>
+								<dt>
+									<strong><label for="email">', $txt['email'], '</label>:</strong> <input type="text" name="email" id="email" value="', $context['email'], '" size="25" class="input_text" tabindex="', $context['tabindex']++, '" />
+								</dd>
+							</dl>';
 
 		// Is visual verification enabled?
 		if ($context['require_verification'])
@@ -419,16 +424,6 @@ function template_quickreply_below()
 		}
 		else
 		{
-			// Show the actual posting area...
-			if ($context['show_bbc'])
-				echo '
-							<div id="bbcBox_message"></div>';
-
-			// What about smileys?
-			if (!empty($context['smileys']['postform']) || !empty($context['smileys']['popup']))
-				echo '
-							<div id="smileyBox_message"></div>';
-
 			echo '
 							', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
 		}
@@ -522,12 +517,6 @@ function template_quickreply_below()
 				<input type="hidden" name="fulleditor" value="" />
 			</form>';
 
-	// Tooltips for likes
-	echo '
-			<script><!-- // --><![CDATA[
-				$(".like_button, .unlike_button").SiteTooltip({hoverIntent: {sensitivity: 10, interval: 150, timeout: 50}});
-			// ]]></script>';
-
 	// Quick moderation options
 	echo '
 			<script><!-- // --><![CDATA[';
@@ -586,19 +575,6 @@ function template_quickreply_below()
 					sTemplateTopSubject: ', JavaScriptEscape($txt['topic'] . ': %subject% &nbsp;(' . $context['num_views_text'] . ')'), ',
 					sTemplateInfoNormal: ', JavaScriptEscape('<a href="' . $scripturl . '?topic=' . $context['current_topic'] . '.msg%msg_id%#msg%msg_id%" rel="nofollow">%subject%</a><span class="smalltext modified" id="modified_%msg_id%"></span>'), ($context['can_reply'] && !empty($options['display_quick_reply'])) ? ',
 					sFormRemoveAccessKeys: \'postmodify\'' : '', '
-				});
-
-				aJumpTo[aJumpTo.length] = new JumpTo({
-					sContainerId: "display_jump_to",
-					sJumpToTemplate: "<label class=\"smalltext\" for=\"%select_id%\">', $context['jump_to']['label'], ':<" + "/label> %dropdown_list%",
-					iCurBoardId: ', $context['current_board'], ',
-					iCurBoardChildLevel: ', $context['jump_to']['child_level'], ',
-					sCurBoardName: "', $context['jump_to']['board_name'], '",
-					sBoardChildLevelIndicator: "&#8195;",
-					sBoardPrefix: "', isBrowser('ie8') ? '&#187; ' : '&#10148; ', '",
-					sCatClass: "jump_to_header",
-					sCatPrefix: "",
-					sGoButtonLabel: "', $txt['go'], '"
 				});
 
 				aIconLists[aIconLists.length] = new IconList({
@@ -772,7 +748,7 @@ function template_pages_and_buttons_above()
  */
 function template_pages_and_buttons_below()
 {
-	global $context;
+	global $context, $txt;
 
 	// Show the page index... "Pages: [1]".
 	template_pagesection('normal_buttons', 'right');
@@ -785,7 +761,27 @@ function template_pages_and_buttons_below()
 
 	// Show the jump-to box, or actually...let Javascript do it.
 	echo '
-			<div id="display_jump_to">&nbsp;</div>';
+			<div id="display_jump_to">&nbsp;</div>
+			<script><!-- // --><![CDATA[
+				aJumpTo[aJumpTo.length] = new JumpTo({
+					sContainerId: "display_jump_to",
+					sJumpToTemplate: "<label class=\"smalltext\" for=\"%select_id%\">', $context['jump_to']['label'], ':<" + "/label> %dropdown_list%",
+					iCurBoardId: ', $context['current_board'], ',
+					iCurBoardChildLevel: ', $context['jump_to']['child_level'], ',
+					sCurBoardName: "', $context['jump_to']['board_name'], '",
+					sBoardChildLevelIndicator: "&#8195;",
+					sBoardPrefix: "', isBrowser('ie8') ? '&#187; ' : '&#10148; ', '",
+					sCatClass: "jump_to_header",
+					sCatPrefix: "",
+					sGoButtonLabel: "', $txt['go'], '"
+				});
+			// ]]></script>';
+
+	// Tooltips for likes
+	echo '
+			<script><!-- // --><![CDATA[
+				$(".like_button, .unlike_button").SiteTooltip({hoverIntent: {sensitivity: 10, interval: 150, timeout: 50}});
+			// ]]></script>';
 }
 
 /**

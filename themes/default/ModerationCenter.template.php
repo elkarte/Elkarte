@@ -568,7 +568,7 @@ function template_show_notice()
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<title>', $context['page_title'], '</title>
 		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index.css', CACHE_STALE, '" />
-		<link rel="stylesheet" href="', $settings['theme_url'], '/css/', $context['theme_variant'], '/index', $context['theme_variant'], '.css', CACHE_STALE, '" />
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/', $context['theme_variant_url'], 'index', $context['theme_variant'], '.css', CACHE_STALE, '" />
 	</head>
 	<body>
 		<h2 class="category_header">', $txt['show_notice'], '</h2>

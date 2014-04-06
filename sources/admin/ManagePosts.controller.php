@@ -309,7 +309,6 @@ class ManagePosts_Controller extends Action_Controller
 				array('check', 'enableCodePrettify'),
 				// Note show the warning as read if pspell not installed!
 				array('check', 'enableSpellChecking', 'postinput' => (function_exists('pspell_new') ? $txt['enableSpellChecking_warning'] : '<span class="error">' . $txt['enableSpellChecking_error'] . '</span>')),
-				array('check', 'disable_wysiwyg'),
 			'',
 				// Posting limits...
 				array('int', 'max_messageLength', 'subtext' => $txt['max_messageLength_zero'], 'postinput' => $txt['manageposts_characters']),
