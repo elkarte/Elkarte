@@ -511,12 +511,6 @@ function template_quickreply_below()
 				<input type="hidden" name="fulleditor" value="" />
 			</form>';
 
-	// Tooltips for likes
-	echo '
-			<script><!-- // --><![CDATA[
-				$(".like_button, .unlike_button").SiteTooltip({hoverIntent: {sensitivity: 10, interval: 150, timeout: 50}});
-			// ]]></script>';
-
 	// Quick moderation options
 	echo '
 			<script><!-- // --><![CDATA[';
@@ -775,6 +769,12 @@ function template_pages_and_buttons_below()
 					sCatPrefix: "",
 					sGoButtonLabel: "', $txt['go'], '"
 				});
+			// ]]></script>';
+
+	// Tooltips for likes
+	echo '
+			<script><!-- // --><![CDATA[
+				$(".like_button, .unlike_button").SiteTooltip({hoverIntent: {sensitivity: 10, interval: 150, timeout: 50}});
 			// ]]></script>';
 }
 
