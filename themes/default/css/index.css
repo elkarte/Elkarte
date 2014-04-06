@@ -400,7 +400,8 @@ em {
 .floatright {
 	float: right;
 }
-.floatleft {
+
+	float: left; {
 	float: left;
 }
 .flow_auto {
@@ -2470,6 +2471,13 @@ ul.post_options li {
 #postAdditionalOptionsNC {
 	margin: 0 0 1em 0;
 	overflow: auto;
+}
+.shortcuts {
+	font-size: 0.857em;
+	float: left;
+}
+#mobile .shortcuts {
+	display: none;
 }
 
 /*	$DRAG-N-DROP		*/
@@ -4573,6 +4581,9 @@ dl.no_members {
 		display: none;
 	}
 	.mlist li div.posts {
+		display: none;
+	}
+	.shortcuts {
 		display: none;
 	}
 }
