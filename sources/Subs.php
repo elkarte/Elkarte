@@ -2680,6 +2680,12 @@ function setupThemeContext($forceload = false)
 	// Set some specific vars.
 	$context['page_title_html_safe'] = Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
 	$context['meta_keywords'] = !empty($modSettings['meta_keywords']) ? Util::htmlspecialchars($modSettings['meta_keywords']) : '';
+
+	// Load a custom CSS file?
+	if (file_exists($settings['theme_dir'] . '/css/custom.css'))
+		loadCSSFile('custom.css');
+	if (!empty($context['theme_variant']) && file_exists($settings['theme_dir'] . '/css/' . $context['theme_variant'] . '/custom' . $context['theme_variant'] . '.css'))
+		loadCSSFile($context['theme_variant'] . '/custom' . $context['theme_variant'] . '.css');
 }
 
 /**
