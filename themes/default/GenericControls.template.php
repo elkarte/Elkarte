@@ -37,7 +37,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 			$(document).ready(function(){',
 				!empty($context['bbcodes_handlers']) ? $context['bbcodes_handlers'] : '', '
 				$("#', $editor_id, '").sceditor({
-					style: "', $settings['default_theme_url'], '/css/', $context['theme_variant_url'], 'jquery.sceditor.elk_wiz', $context['theme_variant'], '.css",
+					style: "', $settings['theme_url'], '/css/', $context['theme_variant_url'], 'jquery.sceditor.elk_wiz', $context['theme_variant'], '.css",
 					width: "100%",
 					height: "100%",
 					resizeWidth: false,
