@@ -811,6 +811,7 @@ $txt['preview_title'] = 'Preview post';
 $txt['preview_fetch'] = 'Fetching preview...';
 $txt['preview_new'] = 'New message';
 $txt['pm_error_while_submitting'] = 'The following error or errors occurred while sending this personal message:';
+$txt['warning_while_submitting'] = 'Something happened, review it here:';
 $txt['error_while_submitting'] = 'The message has the following error or errors that must be corrected before continuing:';
 $txt['error_old_topic'] = 'Warning: this topic has not been posted in for at least %1$d days.<br />Unless you\'re sure you want to reply, please consider starting a new topic.';
 

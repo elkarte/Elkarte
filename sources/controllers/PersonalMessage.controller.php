@@ -877,7 +877,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 			if (is_array($context['require_verification']))
 				foreach ($context['require_verification'] as $error)
-					$post_errors->addError($error, 0);
+					$post_errors->addError($error);
 		}
 
 		// If they made any errors, give them a chance to make amends.
