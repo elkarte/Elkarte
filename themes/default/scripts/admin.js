@@ -1732,7 +1732,7 @@ function toggleCurrencyOther()
 /**
  * Used to ajax-ively preview the templates of bounced emails (template_bounce_template)
  */
-function ajax_getTemplatePreview()
+function ajax_getEmailTemplatePreview()
 {
 	$.ajax({
 		type: "POST",

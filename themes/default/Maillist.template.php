@@ -313,7 +313,7 @@ function template_bounce_template()
 	<script><!-- // --><![CDATA[
 		$(document).ready(function() {
 			$("#preview_button").click(function() {
-				return ajax_getTemplatePreview();
+				return ajax_getEmailTemplatePreview();
 			});
 		});
 	// ]]></script>';
