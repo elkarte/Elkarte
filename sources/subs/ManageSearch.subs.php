@@ -233,6 +233,7 @@ searchd
 	query_log				= ', $modSettings['sphinx_log_path'], '/query.log
 	read_timeout			= 5
 	max_children			= 30
+	compat_sphinxql_magics	= 1
 	pid_file				= ', $modSettings['sphinx_data_path'], '/searchd.pid
 	max_matches				= ', (empty($modSettings['sphinx_max_results']) ? 3312 : (int) $modSettings['sphinx_max_results']), '
 }
