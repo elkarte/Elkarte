@@ -23,21 +23,22 @@ function template_modify_weights()
 {
 	global $context, $settings, $scripturl, $txt, $modSettings;
 
+	echo '
+	<div id="admincenter">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=managesearch;sa=weights" method="post" accept-charset="UTF-8">
+			<h2 class="category_header">', $txt['search_weights'], '</h2>';
+
 	if (!empty($modSettings['search_index']) && ($modSettings['search_index'] === 'sphinx' || $modSettings['search_index'] === 'sphinxql'))
 		echo '
-	<h2 class="category_header">', $txt['search_weights'], '</h2>
 		<div class="windowbg">
 			<div class="content">
 				<div class="infobox">',
-					$txt['search_weights_none'], '
+					$txt['search_weights_sphinx'], '
 				</div>
 			</div>
 		</div>';
-	else
-		echo '
-	<div id="admincenter">
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=managesearch;sa=weights" method="post" accept-charset="UTF-8">
-			<h2 class="category_header">', $txt['search_weights'], '</h2>
+
+	echo '
 			<div class="windowbg">
 				<div class="content">
 					<dl class="settings">
@@ -146,7 +147,7 @@ function template_select_search_method()
 					</dl>
 					', $context['double_index'] ? '<div class="warningbox">
 					' . $txt['search_double_index'] . '</div>' : '', '
-					<fieldset class="search_settings">
+					<fieldset id="search_index" class="search_settings">
 						<legend>', $txt['search_index'], '</legend>
 						<dl>
 							<dt><input type="radio" id="search_index_none" name="search_index" value="none"', empty($modSettings['search_index']) ? ' checked="checked"' : '', ' class="input_radio" />
@@ -163,6 +164,7 @@ function template_select_search_method()
 							<dd>
 
 								<span class="smalltext">';
+
 		if (empty($context['fulltext_index']) && empty($context['cannot_create_fulltext']))
 			echo '
 									<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_no_index_exists'], ' [<a href="', $scripturl, '?action=admin;area=managesearch;sa=createfulltext;', $context['session_var'], '=', $context['session_id'], ';', $context['admin-msm_token_var'], '=', $context['admin-msm_token'], '">', $txt['search_method_fulltext_create'], '</a>]';
@@ -186,6 +188,7 @@ function template_select_search_method()
 							</dt>
 							<dd>
 								<span class="smalltext">';
+
 	if ($context['custom_index'])
 		echo '
 									<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_index_already_exists'], ' [<a href="', $scripturl, '?action=admin;area=managesearch;sa=removecustom;', $context['session_var'], '=', $context['session_id'], ';', $context['admin-msm_token_var'], '=', $context['admin-msm_token'], '">', $txt['search_index_custom_remove'], '</a>]<br />
@@ -224,7 +227,7 @@ function template_select_search_method()
 	echo '
 						</dl>
 					</fieldset>
-					<fieldset class="search_settings">
+					<fieldset id="search_method" class="search_settings">
 					<legend>', $txt['search_method'], '</legend>
 						<input type="checkbox" name="search_force_index" id="search_force_index_check" value="1"', empty($modSettings['search_force_index']) ? '' : ' checked="checked"', ' class="input_check" /><label for="search_force_index_check">', $txt['search_force_index'], '</label><br />
 						<input type="checkbox" name="search_match_words" id="search_match_words_check" value="1"', empty($modSettings['search_match_words']) ? '' : ' checked="checked"', ' class="input_check" /><label for="search_match_words_check">', $txt['search_match_words'], '</label>
@@ -237,7 +240,14 @@ function template_select_search_method()
 				</div>
 			</div>
 		</form>
-	</div>';
+	</div>
+	<script><!-- // --><![CDATA[
+		showhideSearchMethod();
+		
+		$("#search_index input").change(function() {
+			showhideSearchMethod();
+		});
+   // ]]></script>';
 }
 
 /**
