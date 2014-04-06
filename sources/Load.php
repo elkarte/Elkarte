@@ -2029,7 +2029,16 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 		{
 			// Account for shorthand like admin.ext?xyz11 filenames
 			$has_cache_staler = strpos($filename, '.' . $params['extension'] . '?');
-			$params['basename'] = $has_cache_staler ? substr($filename, 0, $has_cache_staler + strlen($params['extension']) + 1) : $filename;
+			if ($has_cache_staler)
+			{
+				$cache_staler = $params['stale'];
+				$params['basename'] = substr($filename, 0, $has_cache_staler + strlen($params['extension']) + 1);
+			}
+			else
+			{
+				$cache_staler = '';
+				$params['basename'] = $filename;
+			}
 			$this_id = empty($id) ? strtr(basename($filename), '?', '_') : $id;
 
 			// Is this a local file?
@@ -2045,7 +2054,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 					// Can't find it in this theme, how about the default?
 					if (file_exists($settings['default_theme_dir'] . $dir . $filename))
 					{
-						$filename = $settings['default_theme_url'] . $dir . $filename . ($has_cache_staler ? '' : $params['stale']);
+						$filename = $settings['default_theme_url'] . $dir . $filename . $cache_staler;
 						$params['dir'] = $settings['default_theme_dir'] . $dir;
 						$params['url'] = $settings['default_theme_url'];
 					}
@@ -2053,7 +2062,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 						$filename = false;
 				}
 				else
-					$filename = $settings['theme_url'] . $dir . $filename . ($has_cache_staler ? '' : $params['stale']);
+					$filename = $settings['theme_url'] . $dir . $filename . $cache_staler;
 			}
 
 			// Add it to the array for use in the template
