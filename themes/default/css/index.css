@@ -4187,6 +4187,14 @@ dl.no_members {
 		display: inline !important;
 		width: auto !important;
 	}
+	dd .styled-select {
+		width: 90% !important;
+		max-width: 90% !important;
+	}
+	dd .styled-select select {
+		width: 100% !important;
+		max-width: 100% !important;
+	}
 	#search_options {
 		width: 100%;
 	}
