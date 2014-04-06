@@ -483,10 +483,10 @@ function template_menu()
 			echo '
 							<ul class="menulevel2">';
 
-			foreach ($button['sub_buttons'] as $childbutton)
+			foreach ($button['sub_buttons'] as $childact => $childbutton)
 			{
 				echo '
-								<li class="listlevel2', !empty($childbutton['sub_buttons']) ? ' subsections" aria-haspopup="true"' : '"', '>
+								<li id="button_', $childact, '" class="listlevel2', !empty($childbutton['sub_buttons']) ? ' subsections" aria-haspopup="true"' : '"', '>
 									<a class="linklevel2" href="', $childbutton['href'], '" ', isset($childbutton['target']) ? 'target="' . $childbutton['target'] . '"' : '', '>', $childbutton['title'], '</a>';
 
 				// 3rd level menus :)
@@ -495,9 +495,9 @@ function template_menu()
 					echo '
 									<ul class="menulevel3">';
 
-					foreach ($childbutton['sub_buttons'] as $grandchildbutton)
+					foreach ($childbutton['sub_buttons'] as $grandchildact => $grandchildbutton)
 						echo '
-										<li class="listlevel3">
+										<li id="button_', $grandchildact, '" class="listlevel3">
 											<a class="linklevel3" href="', $grandchildbutton['href'], '" ', isset($grandchildbutton['target']) ? 'target="' . $grandchildbutton['target'] . '"' : '', '>', $grandchildbutton['title'], '</a>
 										</li>';
 
