@@ -148,6 +148,8 @@ function create_control_richedit($editorOptions)
 
 		// This really has some WYSIWYG stuff.
 		loadTemplate('GenericControls', 'jquery.sceditor');
+		if (!empty($context['theme_variant']) && file_exists($settings['theme_dir'] . '/css/' . $context['theme_variant'] . '/jquery.sceditor.elk' . $context['theme_variant'] . '.css'))
+			loadCSSFile($context['theme_variant'] . '/jquery.sceditor.elk' . $context['theme_variant'] . '.css');
 
 		// JS makes the editor go round
 		loadJavascriptFile(array('jquery.sceditor.min.js', 'jquery.sceditor.bbcode.min.js', 'jquery.sceditor.elkarte.js', 'post.js', 'splittag.plugin.js', 'dropAttachments.js'));
