@@ -2913,11 +2913,18 @@ function template_javascript($do_defered = false)
 			require_once(SOURCEDIR . '/Combine.class.php');
 			$combiner = new Site_Combiner(CACHEDIR, $boardurl . '/cache');
 			$combine_name = $combiner->site_js_combine($context['javascript_files'], $do_defered);
-		}
 
-		if (!empty($combine_name))
-			echo '
+			if (!empty($combine_name))
+				echo '
 	<script src="', $combine_name, '" id="jscombined', $do_defered ? 'bottom' : 'top', '"></script>';
+			// While we have Javascript files to place in the template
+			foreach ($combiner->getSpares() as $id => $js_file)
+			{
+				if ((!$do_defered && empty($js_file['options']['defer'])) || ($do_defered && !empty($js_file['options']['defer'])))
+					echo '
+	<script src="', $js_file['filename'], '" id="', $id, '"', !empty($js_file['options']['async']) ? ' async="async"' : '', '></script>';
+			}
+		}
 		else
 		{
 			// While we have Javascript files to place in the template
@@ -2993,11 +3000,15 @@ function template_css()
 			require_once(SOURCEDIR . '/Combine.class.php');
 			$combiner = new Site_Combiner(CACHEDIR, $boardurl . '/cache');
 			$combine_name = $combiner->site_css_combine($context['css_files']);
-		}
 
-		if (!empty($combine_name))
-			echo '
+			if (!empty($combine_name))
+				echo '
 	<link rel="stylesheet" href="', $combine_name, '" id="csscombined" />';
+
+			foreach ($combiner->getSpares() as $id => $file)
+				echo '
+	<link rel="stylesheet" href="', $file['filename'], '" id="', $id,'" />';
+		}
 		else
 		{
 			foreach ($context['css_files'] as $id => $file)
