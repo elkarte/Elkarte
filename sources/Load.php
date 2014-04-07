@@ -538,15 +538,15 @@ function loadBoard()
 
 			do
 			{
-				if (!empty($row2['id_moderator']))
-					$board_info['moderators'][$row2['id_moderator']] = array(
-						'id' => $row2['id_moderator'],
-						'name' => $row2['real_name'],
-						'href' => $scripturl . '?action=profile;u=' . $row2['id_moderator'],
-						'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row2['id_moderator'] . '">' . $row2['real_name'] . '</a>'
+				if (!empty($row['id_moderator']))
+					$board_info['moderators'][$row['id_moderator']] = array(
+						'id' => $row['id_moderator'],
+						'name' => $row['real_name'],
+						'href' => $scripturl . '?action=profile;u=' . $row['id_moderator'],
+						'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_moderator'] . '">' . $row['real_name'] . '</a>'
 					);
 			}
-			while ($row2 = $db->fetch_assoc($request));
+			while ($row = $db->fetch_assoc($request));
 
 			// If the board only contains unapproved posts and the user isn't an approver then they can't see any topics.
 			// If that is the case do an additional check to see if they have any topics waiting to be approved.
