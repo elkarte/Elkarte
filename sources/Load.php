@@ -1986,7 +1986,10 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
  * - ['debug_index'] (string): the index that holds the array of loaded
  *     files for debugging debug
  * - ['local'] (true/false): define if the file is local, if file does not
- *     start with http its assumed local
+ *     start with http or // (schema-less URLs) its assumed local.
+ *     The parameter is in fact useful only for files whose name starts with
+ *     http, in any other case (e.g. passing a local URL) the parameter would
+ *     fail in properly adding the file to the list.
  * - ['defer'] (true/false): define if the file should load in <head> or before
  *     the closing <html> tag
  * - ['fallback'] (true/false): if true will attempt to load the file from the
@@ -2049,7 +2052,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 			$this_id = empty($id) ? strtr(basename($filename), '?', '_') : $id;
 
 			// Is this a local file?
-			if (substr($filename, 0, 4) !== 'http' && substr($filename, 0, 2) !== '//')
+			if (!empty($params['local']) || (substr($filename, 0, 4) !== 'http' && substr($filename, 0, 2) !== '//'))
 			{
 				$params['local'] = true;
 				$params['dir'] = $settings['theme_dir'] . $dir;
