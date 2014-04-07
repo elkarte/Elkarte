@@ -2042,7 +2042,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 			$this_id = empty($id) ? strtr(basename($filename), '?', '_') : $id;
 
 			// Is this a local file?
-			if (substr($filename, 0, 4) !== 'http' || !empty($params['local']))
+			if (substr($filename, 0, 4) !== 'http' && substr($filename, 0, 2) !== '//')
 			{
 				$params['local'] = true;
 				$params['dir'] = $settings['theme_dir'] . $dir;
