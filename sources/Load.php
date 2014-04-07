@@ -2008,8 +2008,14 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 		$filenames = array($filenames);
 
 	// Static values for all these settings
-	$params['stale'] = (!isset($params['stale']) || $params['stale'] === true) ? CACHE_STALE : (is_string($params['stale']) ? ($params['stale'] = $params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']) : '');
-	$params['fallback'] = (!empty($params['fallback']) && ($params['fallback'] === false)) ? false : true;
+	if (!isset($params['stale']) || $params['stale'] === true)
+		$staler_string = CACHE_STALE;
+	elseif (is_string($params['stale']))
+		$staler_string = ($params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale'])
+	else
+		$staler_string = '';
+
+	$fallback = (!empty($params['fallback']) && ($params['fallback'] === false)) ? false : true;
 	$dir = '/' . $params['subdir'] . '/';
 
 	// Whoa ... we've done this before yes?
@@ -2031,7 +2037,8 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 			$has_cache_staler = strpos($filename, '.' . $params['extension'] . '?');
 			if ($has_cache_staler)
 			{
-				$cache_staler = $params['stale'];
+				$cache_staler = $staler_string;
+
 				$params['basename'] = substr($filename, 0, $has_cache_staler + strlen($params['extension']) + 1);
 			}
 			else
@@ -2049,7 +2056,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 				$params['url'] = $settings['theme_url'];
 
 				// Fallback if we are not already in the default theme
-				if ($params['fallback'] && ($settings['theme_dir'] !== $settings['default_theme_dir']) && !file_exists($settings['theme_dir'] . $dir . $filename))
+				if ($fallback && ($settings['theme_dir'] !== $settings['default_theme_dir']) && !file_exists($settings['theme_dir'] . $dir . $filename))
 				{
 					// Can't find it in this theme, how about the default?
 					if (file_exists($settings['default_theme_dir'] . $dir . $filename))
