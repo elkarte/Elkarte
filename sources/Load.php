@@ -1917,8 +1917,6 @@ function loadSubTemplate($sub_template_name, $fatal = false)
  */
 function loadCSSFile($filenames, $params = array(), $id = '')
 {
-	global $settings, $context, $db_show_debug;
-
 	if (empty($filenames))
 		return;
 
@@ -1955,8 +1953,6 @@ function loadCSSFile($filenames, $params = array(), $id = '')
  */
 function loadJavascriptFile($filenames, $params = array(), $id = '')
 {
-	global $settings, $context, $db_show_debug;
-
 	if (empty($filenames))
 		return;
 

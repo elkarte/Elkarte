@@ -2410,7 +2410,7 @@ function redirectexit_callback($matches)
  */
 function obExit($header = null, $do_footer = null, $from_index = false, $from_fatal_error = false)
 {
-	global $context, $settings, $modSettings, $txt;
+	global $context, $txt;
 
 	static $header_done = false, $footer_done = false, $level = 0, $has_fatal_error = false;
 
@@ -3026,7 +3026,7 @@ function template_css()
  */
 function template_admin_warning_above()
 {
-	global $context, $user_info, $scripturl, $txt;
+	global $context;
 
 	if (!empty($context['security_controls']))
 	{
