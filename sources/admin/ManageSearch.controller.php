@@ -583,7 +583,7 @@ class ManageSearch_Controller extends Action_Controller
 			{
 				if (!empty($modSettings['sphinx_searchd_server']) && !empty($modSettings['sphinxql_searchd_port']))
 				{
-					$result = mysql_connect(($modSettings['sphinx_searchd_server'] === 'localhost' ? '127.0.0.1' : $modSettings['sphinx_searchd_server']) . ':' . (int) $modSettings['sphinxql_searchd_port']);
+					$result = @mysql_connect(($modSettings['sphinx_searchd_server'] === 'localhost' ? '127.0.0.1' : $modSettings['sphinx_searchd_server']) . ':' . (int) $modSettings['sphinxql_searchd_port']);
 					if ($result === false)
 					{
 						$context['settings_message'][] = $txt['sphinxql_test_connect_failed'];
