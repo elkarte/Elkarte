@@ -242,13 +242,7 @@ function template_email_members_compose()
 							<input type="text" id="subject" name="subject" value="', $context['subject'], '" tabindex="', $context['tabindex']++, '" size="60" maxlength="60"', isset($context['post_error']['no_subject']) ? ' class="error"' : ' class="input_text"', '/>
 						</dd>
 					</dl>
-					<hr class="clear" />
-					<div id="bbcBox_message"></div>';
-
-	// What about smileys?
-	if (!empty($context['smileys']['postform']) || !empty($context['smileys']['popup']))
-		echo '
-					<div id="smileyBox_message"></div>';
+					<hr class="clear" />';
 
 	// Show BBC buttons, smileys and textbox.
 	echo '

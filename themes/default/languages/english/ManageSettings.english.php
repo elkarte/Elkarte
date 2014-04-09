@@ -91,7 +91,6 @@ $txt['today_disabled'] = 'Disabled';
 $txt['today_only'] = 'Only Today';
 $txt['yesterday_today'] = 'Today &amp; Yesterday';
 $txt['relative_time'] = 'Relative Time';
-$txt['topbottomEnable'] = 'Enable Go Up/Go Down buttons';
 $txt['onlineEnable'] = 'Show online/offline in posts and PMs';
 $txt['enableVBStyleLogin'] = 'Show a quick login on every page';
 $txt['defaultMaxMembers'] = 'Members per page in member list';

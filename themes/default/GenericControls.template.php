@@ -37,7 +37,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 			$(document).ready(function(){',
 				!empty($context['bbcodes_handlers']) ? $context['bbcodes_handlers'] : '', '
 				$("#', $editor_id, '").sceditor({
-					style: "', $settings['default_theme_url'], '/css/jquery.sceditor.elk.css",
+					style: "', $settings['theme_url'], '/css/', $context['theme_variant_url'], 'jquery.sceditor.elk_wiz', $context['theme_variant'], '.css",
 					width: "100%",
 					height: "100%",
 					resizeWidth: false,
@@ -157,16 +157,9 @@ function template_control_richedit_buttons($editor_id)
 
 	$editor_context = &$context['controls']['richedit'][$editor_id];
 
-	// Create an area to show the draft last saved on
-	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
-		echo '
-		<span class="draftautosave smalltext">
-			<span id="throbber" style="display:none"><i class="fa fa-spinner fa-spin" alt="loading"></i>&nbsp;</span>
-			<span id="draft_lastautosave" ></span>
-		</span>';
-
+	// Show the helpful shortcut text
 	echo '
-		<span class="smalltext floatleft">
+		<span class="shortcuts">
 			', $context['shortcuts_text'], '
 		</span>
 		<input type="submit" value="', isset($editor_context['labels']['post_button']) ? $editor_context['labels']['post_button'] : $txt['post'], '" tabindex="', $context['tabindex']++, '" onclick="return submitThisOnce(this);" accesskey="s" class="button_submit" />';
@@ -175,23 +168,32 @@ function template_control_richedit_buttons($editor_id)
 		echo '
 		<input type="submit" name="preview" value="', isset($editor_context['labels']['preview_button']) ? $editor_context['labels']['preview_button'] : $txt['preview'], '" tabindex="', $context['tabindex']++, '" onclick="', $editor_context['preview_type'] == 2 ? 'return event.ctrlKey || previewControl();' : 'return submitThisOnce(this);', '" accesskey="p" class="button_submit" />';
 
+	// Show the spellcheck button?
 	if ($context['show_spellchecking'])
 		echo '
 		<input type="button" value="', $txt['spell_check'], '" tabindex="', $context['tabindex']++, '" onclick="spellCheckStart();" class="button_submit" />';
 
+	// Maybe drafts are enabled?
 	if (!empty($context['drafts_save']))
 	{
-		// Show the save draft button
 		echo '
 		<input type="submit" name="save_draft" value="', $txt['draft_save'], '" tabindex="', $context['tabindex']++, '" onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d" class="button_submit" />
 		<input type="hidden" id="id_draft" name="id_draft" value="', empty($context['id_draft']) ? 0 : $context['id_draft'], '" />';
 	}
 
+	// The PM draft save button
 	if (!empty($context['drafts_pm_save']))
 	{
-		// The PM draft save button
 		echo '
 		<input type="submit" name="save_draft" value="', $txt['draft_save'], '" tabindex="', $context['tabindex']++, '" onclick="submitThisOnce(this);" accesskey="d" class="button_submit" />
 		<input type="hidden" id="id_pm_draft" name="id_pm_draft" value="', empty($context['id_pm_draft']) ? 0 : $context['id_pm_draft'], '" />';
 	}
+
+	// Create an area to show the draft last saved on text
+	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
+		echo '
+		<div class="draftautosave">
+			<span id="throbber" style="display:none"><i class="fa fa-spinner fa-spin" alt="loading"></i>&nbsp;</span>
+			<span id="draft_lastautosave"></span>
+		</div>';
 }

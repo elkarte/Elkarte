@@ -91,7 +91,6 @@ $txt['today_disabled'] = 'Deaktiviert';
 $txt['today_only'] = 'Nur heute';
 $txt['yesterday_today'] = 'Heute &amp; gestern';
 $txt['relative_time'] = 'Relative Zeitstempel';
-$txt['topbottomEnable'] = '&quot;Nach oben&quot;/&quot;Nach unten&quot; anzeigen';
 $txt['onlineEnable'] = '&quot;Online&quot;/&quot;Offline&quot; in Beiträgen und Nachrichten anzeigen';
 $txt['enableVBStyleLogin'] = 'Schnellanmeldung auf jeder Seite anzeigen';
 $txt['defaultMaxMembers'] = 'Mitglieder pro Seite in Mitgliederliste';

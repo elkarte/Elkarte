@@ -75,7 +75,6 @@ $txt['enable_news_desc'] = '<strong>Aus</strong>: keine Neuigkeiten angezeigt
 <br /><strong>Einblenden</strong>: alle Neuigkeiten werden nacheinander angezeigt';
 $txt['show_group_key'] = 'Gruppenschlüssel auf der Startseite anzeigen'; // ? :)
 $txt['additional_options_collapsible'] = 'Ausklappbare weitere Beitragsoptionen aktivieren';
-$txt['allow_no_censored'] = 'Benutzern das Abschalten der Wortzensur erlauben';
 $txt['who_display_viewing'] = 'Anzeigen, wer die Startseite und Beiträge ansieht';
 $txt['who_display_viewing_off'] = 'Nicht anzeigen';
 $txt['who_display_viewing_numbers'] = 'Nur Zahlen anzeigen';

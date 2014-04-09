@@ -27,7 +27,7 @@ if (!defined('ELK'))
  */
 function loadSession()
 {
-	global $modSettings, $boardurl, $sc;
+	global $modSettings, $boardurl, $sc, $cache_accelerator;
 
 	// Attempt to change a few PHP settings.
 	@ini_set('session.use_cookies', true);
@@ -84,7 +84,13 @@ function loadSession()
 				eaccelerator_set_session_handlers();
 		}
 
+		// Start the session
 		session_start();
+
+		// APC destroys static class members before sessions can be written.  To work around this we
+		// explicitly call session_write_close on script end/exit bugs.php.net/bug.php?id=60657
+		if (!empty($modSettings['cache_enable']) && $cache_accelerator === 'apc')
+			register_shutdown_function('session_write_close');
 
 		// Change it so the cache settings are a little looser than default.
 		if (!empty($modSettings['databaseSession_loose']))

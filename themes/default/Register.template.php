@@ -520,7 +520,7 @@ function template_verification_sound()
 		<title>', $txt['visual_verification_sound'], '</title>
 		<meta name="robots" content="noindex" />
 		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index.css', CACHE_STALE, '" />
-		<link rel="stylesheet" href="', $settings['theme_url'], '/css/', $context['theme_variant'], '/index', $context['theme_variant'], '.css', CACHE_STALE, '" />';
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/', $context['theme_variant_url'], 'index', $context['theme_variant'], '.css', CACHE_STALE, '" />';
 
 	// Just show the help text and a "close window" link.
 	echo '

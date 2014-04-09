@@ -431,7 +431,7 @@ class News_Controller extends Action_Controller
 					'title' => cdata_parse($row['subject']),
 					'link' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
 					'description' => cdata_parse($row['body']),
-					'author' => in_array(showEmailAddress(!empty($row['hide_email']), $row['id_member']), array('yes', 'yes_permission_override')) ? $row['posterEmail'] . ' ('.$row['posterName'].')' : null,
+					'author' => in_array(showEmailAddress(!empty($row['hide_email']), $row['id_member']), array('yes', 'yes_permission_override')) ? $row['poster_email'] . ' ('.$row['poster_name'].')' : null,
 					'comments' => $scripturl . '?action=post;topic=' . $row['id_topic'] . '.0',
 					'category' => '<![CDATA[' . $row['bname'] . ']]>',
 					'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $row['poster_time']),

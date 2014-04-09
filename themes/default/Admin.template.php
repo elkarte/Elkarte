@@ -158,7 +158,7 @@ function template_credits()
 					<div id="admincenter">
 						<div id="support_credits">
 							<h3 class="category_header">
-								', $txt['support_title'], ' <img src="', $settings['images_url'], (!empty($context['theme_variant']) ? '/' . $context['theme_variant'] . '/logo_elk.png' : '/logo_elk.png' ), '" id="credits_logo" alt="" />
+								', $txt['support_title'], ' <img src="', $settings['images_url'], '/', $context['theme_variant_url'], 'logo_elk.png" id="credits_logo" alt="" />
 							</h3>
 							<div class="windowbg">
 								<div class="content">
@@ -691,7 +691,7 @@ function template_view_versions()
  */
 function template_edit_censored()
 {
-	global $context, $scripturl, $txt, $modSettings;
+	global $context, $scripturl, $txt, $modSettings, $settings;
 
 	// First section is for adding/removing words from the censored list.
 	echo '
@@ -704,7 +704,7 @@ function template_edit_censored()
 				<div class="content">
 					<p>', $txt['admin_censored_where'], '</p>';
 
-	// Show text boxes for censoring [bad   ] => [good  ].
+	// Show text boxes for censoring [bad] => [good].
 	foreach ($context['censored_words'] as $vulgar => $proper)
 		echo '
 					<div class="censorWords">
@@ -725,16 +725,22 @@ function template_edit_censored()
 					<hr class="clear" />
 					<dl class="settings">
 						<dt>
-							<strong><label for="censorWholeWord_check">', $txt['censor_whole_words'], ':</label></strong>
+							<label for="censorWholeWord_check">', $txt['censor_whole_words'], ':</label>
 						</dt>
 						<dd>
 							<input type="checkbox" name="censorWholeWord" value="1" id="censorWholeWord_check"', empty($modSettings['censorWholeWord']) ? '' : ' checked="checked"', ' class="input_check" />
 						</dd>
 						<dt>
-							<strong><label for="censorIgnoreCase_check">', $txt['censor_case'], ':</label></strong>
+							<label for="censorIgnoreCase_check">', $txt['censor_case'], ':</label>
 						</dt>
 						<dd>
 							<input type="checkbox" name="censorIgnoreCase" value="1" id="censorIgnoreCase_check"', empty($modSettings['censorIgnoreCase']) ? '' : ' checked="checked"', ' class="input_check" />
+						</dd>
+						<dt>
+							<a href="' . $scripturl . '?action=quickhelp;help=allow_no_censored" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" class="icon" alt="' . $txt['help'] . '" /></a><label for="allow_no_censored">', $txt['censor_allow'], ':</label></a></dt>
+						</dt>
+						<dd>
+							<input type="checkbox" name="censorAllow" value="1" id="allow_no_censored"', empty($modSettings['allow_no_censored']) ? '' : ' checked="checked"', ' class="input_check" />
 						</dd>
 					</dl>
 					<input type="submit" name="save_censor" value="', $txt['save'], '" class="right_submit" />
@@ -742,22 +748,27 @@ function template_edit_censored()
 			</div>
 			<br />';
 
-	// This table lets you test out your filters by typing in rude words and seeing what comes out.
+	// This lets you test out your filters by typing in rude words and seeing what comes out.
 	echo '
 			<h3 class="category_header">', $txt['censor_test'], '</h3>
-			<div class="windowbg">
-				<div class="content">
-					<div class="centertext">
-						<input type="text" name="censortest" value="', empty($context['censor_test']) ? '' : $context['censor_test'], '" class="input_text" />
-						<input type="submit" value="', $txt['censor_test_save'], '" class="button_submit" />
-					</div>
+			<div class="content">
+				<div class="centertext">
+					<p id="censor_result" style="display:none" class="infobox">', empty($context['censor_test']) ? '' : $context['censor_test'], '</p>
+					<input id="censortest" type="text" name="censortest" value="', empty($context['censor_test']) ? '' : $context['censor_test'], '" class="input_text" />
+					<input id="preview_button" type="submit" value="', $txt['censor_test_save'], '" class="button_submit" />
 				</div>
 			</div>
-
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-			<input type="hidden" name="', $context['admin-censor_token_var'], '" value="', $context['admin-censor_token'], '" />
+			<input id="token" type="hidden" name="', $context['admin-censor_token_var'], '" value="', $context['admin-censor_token'], '" />
 		</form>
-	</div>';
+	</div>
+	<script><!-- // --><![CDATA[
+		$(document).ready(function() {
+			$("#preview_button").click(function() {
+				return ajax_getCensorPreview();
+			});
+		});
+	// ]]></script>';
 }
 
 /**

@@ -811,6 +811,7 @@ $txt['preview_title'] = 'Beitragsvorschau';
 $txt['preview_fetch'] = 'Hole Vorschau...';
 $txt['preview_new'] = 'Neue Nachricht';
 $txt['pm_error_while_submitting'] = 'Folgende Fehler traten beim Versand dieser privaten Nachricht auf:';
+$txt['warning_while_submitting'] = 'Etwas ist geschehen, und zwar:';
 $txt['error_while_submitting'] = 'Die Nachricht hat folgende Fehler, die vor dem Versand korrigiert werden müssen:';
 $txt['error_old_topic'] = 'Warnung: In diesem Thema wurde seit %1$d Tagen nichts geschrieben.<br />Falls Sie sich nicht sicher sind, ob Sie hier antworten müssen, ziehen Sie bitte in Erwägung, ein neues Thema zu eröffnen.';
 

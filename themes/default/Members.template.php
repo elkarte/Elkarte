@@ -30,7 +30,7 @@ function template_find_members()
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="robots" content="noindex" />
 		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css', CACHE_STALE, '" />
-		<link rel="stylesheet" href="', $settings['theme_url'], '/css/', $context['theme_variant'], '/index', $context['theme_variant'], '.css', CACHE_STALE, '" />
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/', $context['theme_variant_url'], 'index', $context['theme_variant'], '.css', CACHE_STALE, '" />
 		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 		<script><!-- // --><![CDATA[
 			var membersAdded = [];
