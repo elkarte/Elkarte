@@ -2010,7 +2010,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 	if (!isset($params['stale']) || $params['stale'] === true)
 		$staler_string = CACHE_STALE;
 	elseif (is_string($params['stale']))
-		$staler_string = ($params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale'])
+		$staler_string = ($params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']);
 	else
 		$staler_string = '';
 
