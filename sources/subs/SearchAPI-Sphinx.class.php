@@ -181,20 +181,25 @@ class Sphinx_Search
 			$mySphinx->SetServer($modSettings['sphinx_searchd_server'], (int) $modSettings['sphinx_searchd_port']);
 			$mySphinx->SetLimits(0, (int) $modSettings['sphinx_max_results'], (int) $modSettings['sphinx_max_results']);
 
-			// This is the default mode.  Note MatchMode is depreciated
-			$mySphinx->SetMatchMode(SPH_MATCH_EXTENDED);
-
 			// Put together a sort string; besides the main column sort (relevance, id_topic, or num_replies),
+			$search_params['sort_dir'] = strtoupper($search_params['sort_dir']);
 			$sphinx_sort = $search_params['sort'] === 'id_msg' ? 'id_topic' : $search_params['sort'];
 
 			// Add secondary sorting based on relevance value (if not the main sort method) and age
 			$sphinx_sort .= ' ' . $search_params['sort_dir'] . ($search_params['sort'] === 'relevance' ? '' : ', relevance DESC') . ', poster_time DESC';
 
+			// Include the engines weight values in the group sort
+			$sphinx_sort = str_replace('relevance ', '@weight ' . $search_params['sort_dir'] . ', relevance ', $sphinx_sort);
+
 			// Grouping by topic id makes it return only one result per topic, so don't set that for in-topic searches
-			if (empty($search_params['topic']) && empty($search_params['show_complete']))
+			if (empty($search_params['topic']) )
 				$mySphinx->SetGroupBy('id_topic', SPH_GROUPBY_ATTR, $sphinx_sort);
 
-			$mySphinx->SetSortMode(SPH_SORT_EXTENDED, $sphinx_sort);
+			// Set up the sort expresssion
+			$mySphinx->SetSortMode(SPH_SORT_EXPR, '(@weight + (relevance / 1000))');
+
+			// Update the field weights for subject vs body
+			$mySphinx->SetFieldWeights(array('subject' => !empty($modSettings['search_weight_subject']) ? $modSettings['search_weight_subject'] * 200 : 1000, 'body' => 1000));
 
 			// Set the limits based on the search parameters.
 			if (!empty($search_params['min_msg_id']) || !empty($search_params['max_msg_id']))
@@ -233,6 +238,19 @@ class Sphinx_Search
 			if ($search_params['subject_only'])
 				$query = '@(subject) ' . $query;
 
+			// Choose an appropriate matching mode
+			$mode = SPH_MATCH_ALL;
+
+			// Over two words and searching for any (since we build a binary string, this will never get set)
+			if (substr_count($query, ' ') > 1 && (!empty($search_params['searchtype']) && $search_params['searchtype'] == 2))
+				   $mode = SPH_MATCH_ANY;
+			// Binary search?
+			if (preg_match('~[\|\(\)\^\$\?"\/=-]~', $query))
+				$mode = SPH_MATCH_EXTENDED;
+
+			// Set the matching mode
+			$mySphinx->SetMatchMode($mode);
+
 			// Execute the search query.
 			$request = $mySphinx->Query($query, 'elkarte_index');
 
@@ -257,7 +275,7 @@ class Sphinx_Search
 				foreach ($request['matches'] as $msgID => $match)
 					$cached_results['matches'][$msgID] = array(
 						'id' => $match['attrs']['id_topic'],
-						'relevance' => round($match['attrs']['relevance'] / 10000, 1) . '%',
+						'relevance' => round($match['attrs']['@count'] + $match['attrs']['relevance'] / 10000, 1) . '%',
 						'num_matches' => empty($search_params['topic']) ? $match['attrs']['@count'] : 0,
 						'matches' => array(),
 					);

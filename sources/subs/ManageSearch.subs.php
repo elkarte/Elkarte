@@ -88,8 +88,11 @@ function createSphinxConfig()
 {
 	global $context, $db_server, $db_name, $db_user, $db_passwd, $db_prefix, $modSettings;
 
-	// set up to ouput a file to the users browser
-	ob_end_clean();
+	// Set up to ouput a file to the users browser
+	while (ob_get_level() > 0)
+		@ob_end_clean();
+
+	header('Content-Encoding: none');
 	header('Pragma: ');
 	if (!$context['browser']['is_gecko'])
 		header('Content-Transfer-Encoding: binary');
@@ -112,7 +115,7 @@ function createSphinxConfig()
 		$weight_total += $weight[$weight_factor];
 	}
 
-	// weightless, then use defaults
+	// Weightless, then use defaults
 	if ($weight_total === 0)
 	{
 		$weight = array(
@@ -124,11 +127,11 @@ function createSphinxConfig()
 		$weight_total = 100;
 	}
 
-	// check paths are set, if not use some defaults
+	// Check paths are set, if not use some defaults
 	$modSettings['sphinx_data_path'] = empty($modSettings['sphinx_data_path']) ? '/var/sphinx/data' : $modSettings['sphinx_data_path'];
 	$modSettings['sphinx_log_path'] = empty($modSettings['sphinx_log_path']) ? '/var/sphinx/log' : $modSettings['sphinx_log_path'];
 
-	// output our minimal configuration file to get them started
+	// Output our minimal configuration file to get them started
 	echo '#
 # Sphinx configuration file (sphinx.conf), configured for ElkArte
 #
@@ -141,7 +144,7 @@ function createSphinxConfig()
 source elkarte_source
 {
 	type				= mysql
-	sql_host 			= ', $db_server, '
+	sql_host			= ', $db_server, '
 	sql_user			= ', $db_user, '
 	sql_pass			= ', $db_passwd, '
 	sql_db				= ', $db_name, '
@@ -155,7 +158,7 @@ source elkarte_source
 	sql_query_range		= \
 		SELECT 1, value \
 		FROM ', $db_prefix, 'settings \
-		WHERE variable = \'sphinx_indexed_msg_until\'
+		WHERE variable	= \'sphinx_indexed_msg_until\'
 	sql_range_step		= 1000
 	sql_query			= \
 		SELECT \
@@ -195,19 +198,19 @@ source elkarte_delta_source : elkarte_source
 
 index elkarte_base_index
 {
-	html_strip 		= 1
-	source 			= elkarte_source
-	path 			= ', $modSettings['sphinx_data_path'], '/elkarte_sphinx_base.index', empty($modSettings['sphinx_stopword_path']) ? '' : '
-	stopwords 		= ' . $modSettings['sphinx_stopword_path'], '
-	min_word_len 	= 2
-	charset_type 	= utf-8
-	charset_table 	= 0..9, A..Z->a..z, _, a..z
+	html_strip		= 1
+	source			= elkarte_source
+	path			= ', $modSettings['sphinx_data_path'], '/elkarte_sphinx_base.index', empty($modSettings['sphinx_stopword_path']) ? '' : '
+	stopwords		= ' . $modSettings['sphinx_stopword_path'], '
+	min_word_len	= 2
+	charset_type	= utf-8
+	charset_table	= 0..9, A..Z->a..z, _, a..z
 }
 
 index elkarte_delta_index : elkarte_base_index
 {
-	source 			= elkarte_delta_source
-	path 			= ', $modSettings['sphinx_data_path'], '/elkarte_sphinx_delta.index
+	source			= elkarte_delta_source
+	path			= ', $modSettings['sphinx_data_path'], '/elkarte_sphinx_delta.index
 }
 
 index elkarte_index
@@ -219,19 +222,20 @@ index elkarte_index
 
 indexer
 {
-	mem_limit 		= ', (empty($modSettings['sphinx_indexer_mem']) ? 32 : (int) $modSettings['sphinx_indexer_mem']), 'M
+	mem_limit		= ', (empty($modSettings['sphinx_indexer_mem']) ? 32 : (int) $modSettings['sphinx_indexer_mem']), 'M
 }
 
 searchd
 {
-	listen 			= ', (empty($modSettings['sphinx_searchd_port']) ? 3312 : (int) $modSettings['sphinx_searchd_port']), '
-	listen 			= ', (empty($modSettings['sphinxql_searchd_port']) ? 3313 : (int) $modSettings['sphinxql_searchd_port']), ':mysql41
-	log 			= ', $modSettings['sphinx_log_path'], '/searchd.log
-	query_log 		= ', $modSettings['sphinx_log_path'], '/query.log
-	read_timeout 	= 5
-	max_children 	= 30
-	pid_file 		= ', $modSettings['sphinx_data_path'], '/searchd.pid
-	max_matches 	= ', (empty($modSettings['sphinx_max_results']) ? 3312 : (int) $modSettings['sphinx_max_results']), '
+	listen					= ', (empty($modSettings['sphinx_searchd_port']) ? 3312 : (int) $modSettings['sphinx_searchd_port']), '
+	listen					= ', (empty($modSettings['sphinxql_searchd_port']) ? 3313 : (int) $modSettings['sphinxql_searchd_port']), ':mysql41
+	log						= ', $modSettings['sphinx_log_path'], '/searchd.log
+	query_log				= ', $modSettings['sphinx_log_path'], '/query.log
+	read_timeout			= 5
+	max_children			= 30
+	compat_sphinxql_magics	= 1
+	pid_file				= ', $modSettings['sphinx_data_path'], '/searchd.pid
+	max_matches				= ', (empty($modSettings['sphinx_max_results']) ? 3312 : (int) $modSettings['sphinx_max_results']), '
 }
 ';
 	obExit(false, false);

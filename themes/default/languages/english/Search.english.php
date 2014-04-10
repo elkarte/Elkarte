@@ -41,7 +41,7 @@ $txt['search_settings_desc'] = 'Here you can change the basic settings of the se
 $txt['search_settings_title'] = 'Search Settings';
 
 $txt['search_weights_desc'] = 'Here you can change the individual components of the relevance rating.';
-$txt['search_weights_none'] = 'Weight factors are not needed when using Sphinx wich uses internal methods based on phrase proximity and keyword frequencies.';
+$txt['search_weights_sphinx'] = 'To update weight factors with Sphinx, you must generate and install a new sphinx.conf file.';
 $txt['search_weights_title'] = 'Search - weights';
 $txt['search_weights_total'] = 'Total';
 $txt['search_weights_save'] = 'Save';

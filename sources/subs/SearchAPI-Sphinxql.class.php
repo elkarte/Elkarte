@@ -174,10 +174,10 @@ class Sphinxql_Search
 		if (($cached_results = cache_get_data('searchql_results_' . md5($user_info['query_see_board'] . '_' . $context['params']))) === null)
 		{
 			// Create an instance of the sphinx client and set a few options.
-			$mySphinx = mysql_connect(($modSettings['sphinx_searchd_server'] === 'localhost' ? '127.0.0.1' : $modSettings['sphinx_searchd_server']) . ':' . (int) $modSettings['sphinxql_searchd_port']);
+			$mySphinx = @mysql_connect(($modSettings['sphinx_searchd_server'] === 'localhost' ? '127.0.0.1' : $modSettings['sphinx_searchd_server']) . ':' . (int) $modSettings['sphinxql_searchd_port']);
 
 			// Compile different options for our query
-			$query = 'SELECT *' . (empty($search_params['topic']) ? ', COUNT(*) num' : '') . ' FROM elkarte_index';
+			$query = 'SELECT *' . (empty($search_params['topic']) ? ', COUNT(*) num' : '') . ', (weight() + (relevance/1000)) rank FROM elkarte_index';
 
 			// Construct the (binary mode & |) query.
 			$where_match = $this->_constructQuery($search_params['search']);
@@ -205,10 +205,14 @@ class Sphinxql_Search
 				$query .= ' AND ' . implode(' AND ', $extra_where);
 
 			// Put together a sort string; besides the main column sort (relevance, id_topic, or num_replies)
+			$search_params['sort_dir'] = strtoupper($search_params['sort_dir']);
 			$sphinx_sort = $search_params['sort'] === 'id_msg' ? 'id_topic' : $search_params['sort'];
 
 			// Add secondary sorting based on relevance value (if not the main sort method) and age
-			$sphinx_sort .= ' ' . strtoupper($search_params['sort_dir']) . ($search_params['sort'] === 'relevance' ? '' : ', relevance DESC') . ', poster_time DESC';
+			$sphinx_sort .= ' ' . $search_params['sort_dir'] . ($search_params['sort'] === 'relevance' ? '' : ', relevance DESC') . ', poster_time DESC';
+
+			// Replace relevance with the returned rank value, rank uses sphinx weight + our own computed field weight relevance
+			$sphinx_sort = str_replace('relevance ', 'rank ', $sphinx_sort);
 
 			// Grouping by topic id makes it return only one result per topic, so don't set that for in-topic searches
 			if (empty($search_params['topic']))
@@ -216,6 +220,9 @@ class Sphinxql_Search
 
 			$query .= ' ORDER BY ' . $sphinx_sort;
 			$query .= ' LIMIT 0,' . (int) $modSettings['sphinx_max_results'];
+
+			// Set any options needed, like field weights
+			$query .= ' OPTION field_weights=(subject=' . (!empty($modSettings['search_weight_subject']) ? $modSettings['search_weight_subject'] * 200 : 1000) . ',body=1000)';
 
 			// Execute the search query.
 			$request = mysql_query($query, $mySphinx);
