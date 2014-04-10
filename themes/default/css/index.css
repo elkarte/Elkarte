@@ -2124,6 +2124,7 @@ div.core_posts {
 	display: table-cell;
 	vertical-align: top;
 	min-width: 15em;
+	width: 15em;
 	word-wrap: break-word;
 	word-break: break-all;
 	hyphens: auto;
@@ -2149,6 +2150,7 @@ div.core_posts {
 	text-align: center;
 	font-weight: bold;
 	font-size: 1.357em;
+	text-overflow: ellipsis;
 }
 .poster.poster2 .name {
 	margin-top: 0;
