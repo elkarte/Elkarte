@@ -520,6 +520,8 @@ class Post_Controller extends Action_Controller
 
 				prepareMessageContext($message);
 			}
+			elseif (isset($_REQUEST['last_msg']))
+				list ($form_subject, $form_message) = getFormMsgSubject(false, $topic, $first_subject);
 
 			// No check is needed, since nothing is really posted.
 			checkSubmitOnce('free');
