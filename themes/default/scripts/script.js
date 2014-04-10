@@ -424,15 +424,19 @@ function submitonce(theform)
 	elk_formSubmitted = true;
 }
 
-function submitThisOnce(oControl)
+function submitThisOnce(oControl, bReadOnly)
 {
 	// oControl might also be a form.
 	var oForm = 'form' in oControl ? oControl.form : oControl,
 		aTextareas = oForm.getElementsByTagName('textarea');
 
+	bReadOnly = typeof bReadOnly == 'undefined' ? true : bReadOnly;
 	for (var i = 0, n = aTextareas.length; i < n; i++)
-		aTextareas[i].readOnly = true;
+		aTextareas[i].readOnly = bReadOnly;
 
+	// If in a second the form is not gone, there may be a problem somewhere
+	// (e.g. HTML5 required attribute), so release the textareas
+	window.setTimeout(function() {submitThisOnce(oControl, false);}, 1000);
 	return !elk_formSubmitted;
 }
 
