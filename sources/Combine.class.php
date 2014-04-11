@@ -376,7 +376,7 @@ class Site_Combiner
 
 		// And now the compressed version, just uncomment the below
 		/*
-		$fp = gzopen($this->_archive_dir . $this->_archive_name . '.gz', 'w9');
+		$fp = gzopen($this->_archive_dir . '/' . $this->_archive_name . '.gz', 'w9');
 		gzwrite ($fp, $this->_minified_cache);
 		gzclose($fp);
 		*/
