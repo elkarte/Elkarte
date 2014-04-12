@@ -797,127 +797,6 @@ function setBoardIds() {
  */
 ;(function($) {
 	$.fn.expand_pages = function() {
-		var $container,
-			lastPositions = [];
-
-		// Hovering over an ... we expand it as much as we can
-		function hover_expand($element)
-		{
-			var $expanded_pages_li = $element,
-				baseurl = eval($element.data('baseurl')),
-				perpage = $element.data('perpage'),
-				firstpage = $element.data('firstpage'),
-				lastpage = $element.data('lastpage'),
-				$exp_pages = $('<li id="expanded_pages" />'),
-				pages = 0,
-				container_width = $element.outerWidth() * 2,
-				width_elements = 3,
-				$scroll_left = null,
-				$scroll_right = null;
-
-			var aModel = $element.closest('.linavPages').prev().find('a').clone();
-
-			if (typeof(lastPositions[firstpage]) === 'undefined')
-				lastPositions[firstpage] = 0;
-
-			$container = $('<ul id="expanded_pages_container">');
-
-			for (var i = firstpage; i < lastpage; i += perpage)
-			{
-				pages++;
-				var bElem = aModel.clone();
-
-				bElem.attr('href', baseurl.replace('%1$d', i)).text(i / perpage + 1);
-				$exp_pages.append(bElem);
-			}
-
-			if (pages > width_elements)
-			{
-				$container.append($('<li />').append(aModel.clone()
-				.attr('id', 'pages_scroll_left')
-				.attr('href', '#').text('<').click(function(ev) {
-					ev.stopPropagation();
-					ev.preventDefault();
-				}).hover(
-					function() {
-						$exp_pages.animate({
-							'margin-left': 0
-						}, 200 * pages);
-					},
-					function() {
-						$exp_pages.stop();
-						lastPositions[firstpage] = $exp_pages.css('margin-left');
-					}
-				)));
-			}
-
-			$container.append($exp_pages);
-			$element.parent().superfish({
-				delay: 300,
-				speed: 175,
-				speedOut: 50,
-				onHide: function () {
-					$container.remove();
-				}
-			});
-
-			$element.append($container);
-
-			if (pages > width_elements)
-			{
-				$container.append($('<li />').append(aModel.clone()
-				.attr('id', 'pages_scroll_right')
-				.attr('href', '#').text('>').click(function(ev) {
-					ev.stopPropagation();
-					ev.preventDefault();
-				}).hover(
-					function() {
-						var $pages = $exp_pages.find('a'),
-							move = 0;
-
-						for (var i = 0, count = $exp_pages.find('a').length; i < count; i++)
-							move += $($pages[i]).outerWidth(true);
-
-						move = (move + $container.find('#pages_scroll_left').outerWidth()) - ($container.outerWidth() - $container.find('#pages_scroll_right').outerWidth());
-
-						$exp_pages.animate({
-							'margin-left': -move
-						}, 200 * pages);
-					},
-					function() {
-						$exp_pages.stop();
-						lastPositions[firstpage] = $exp_pages.css('margin-left');
-					}
-				)));
-			}
-
-			// @todo this seems broken
-			$exp_pages.find('a').each(function() {
-				if (width_elements > -1)
-					container_width += $element.outerWidth();
-
-				if (width_elements <= 0 || pages >= width_elements)
-				{
-					$container.css({
-						'margin-left': -container_width / 2
-					}).width(container_width);
-				}
-
-				if (width_elements < 0)
-					return false;
-
-				width_elements--;
-			}).click(function (ev) {
-				$expanded_pages_li.attr('onclick', '').off('click');
-			});
-
-			$exp_pages.css({
-				'height': $element.outerHeight(),
-				'padding-left': $container.find('#pages_scroll_left').outerWidth(),
-				'margin-left': lastPositions[firstpage]
-			});
-		}
-
 		// Used when the user clicks on the ... to expand instead of just a hover expand
 		function expand_pages($element)
 		{
@@ -993,11 +872,6 @@ function setBoardIds() {
 			e.preventDefault();
 
 			expand_pages($zhis);
-
-			$zhis.off('mouseenter focus');
-		})
-		.on('mouseenter focus', function() {
-			hover_expand($(this));
 		});
 	};
 })(jQuery);

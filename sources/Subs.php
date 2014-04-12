@@ -1178,7 +1178,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'parameters' => array(
 					'author' => array('match' => '([^<>]{1,192}?)'),
 					'link' => array('match' => '(?:board=\d+;)?((?:topic|threadid)=[\dmsg#\./]{1,40}(?:;start=[\dmsg#\./]{1,40})?|action=profile;u=\d+)'),
-					'date' => array('match' => '(\d+)', 'validate' => 'standardTime'),
+					'date' => array('match' => '(\d+)', 'validate' => 'htmlTime'),
 				),
 				'before' => '<div class="quoteheader"><a href="' . $scripturl . '?{link}">' . $txt['quote_from'] . ': {author} ' . ($modSettings['todayMod'] == 3 ? ' - ' : $txt['search_on']) . ' {date}</a></div><blockquote>',
 				'after' => '</blockquote>',
@@ -2410,7 +2410,7 @@ function redirectexit_callback($matches)
  */
 function obExit($header = null, $do_footer = null, $from_index = false, $from_fatal_error = false)
 {
-	global $context, $settings, $modSettings, $txt;
+	global $context, $txt;
 
 	static $header_done = false, $footer_done = false, $level = 0, $has_fatal_error = false;
 
@@ -2913,11 +2913,18 @@ function template_javascript($do_defered = false)
 			require_once(SOURCEDIR . '/Combine.class.php');
 			$combiner = new Site_Combiner(CACHEDIR, $boardurl . '/cache');
 			$combine_name = $combiner->site_js_combine($context['javascript_files'], $do_defered);
-		}
 
-		if (!empty($combine_name))
-			echo '
+			if (!empty($combine_name))
+				echo '
 	<script src="', $combine_name, '" id="jscombined', $do_defered ? 'bottom' : 'top', '"></script>';
+			// While we have Javascript files to place in the template
+			foreach ($combiner->getSpares() as $id => $js_file)
+			{
+				if ((!$do_defered && empty($js_file['options']['defer'])) || ($do_defered && !empty($js_file['options']['defer'])))
+					echo '
+	<script src="', $js_file['filename'], '" id="', $id, '"', !empty($js_file['options']['async']) ? ' async="async"' : '', '></script>';
+			}
+		}
 		else
 		{
 			// While we have Javascript files to place in the template
@@ -2993,11 +3000,15 @@ function template_css()
 			require_once(SOURCEDIR . '/Combine.class.php');
 			$combiner = new Site_Combiner(CACHEDIR, $boardurl . '/cache');
 			$combine_name = $combiner->site_css_combine($context['css_files']);
-		}
 
-		if (!empty($combine_name))
-			echo '
+			if (!empty($combine_name))
+				echo '
 	<link rel="stylesheet" href="', $combine_name, '" id="csscombined" />';
+
+			foreach ($combiner->getSpares() as $id => $file)
+				echo '
+	<link rel="stylesheet" href="', $file['filename'], '" id="', $id,'" />';
+		}
 		else
 		{
 			foreach ($context['css_files'] as $id => $file)
@@ -3015,7 +3026,7 @@ function template_css()
  */
 function template_admin_warning_above()
 {
-	global $context, $user_info, $scripturl, $txt;
+	global $context;
 
 	if (!empty($context['security_controls']))
 	{
