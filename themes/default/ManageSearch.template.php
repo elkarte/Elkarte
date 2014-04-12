@@ -243,7 +243,7 @@ function template_select_search_method()
 	</div>
 	<script><!-- // --><![CDATA[
 		showhideSearchMethod();
-		
+
 		$("#search_index input").change(function() {
 			showhideSearchMethod();
 		});
@@ -268,13 +268,11 @@ function template_create_index()
 							<label for="predefine_select">', $txt['search_predefined'], ':</label>
 						</dt>
 						<dd>
-							<div class="styled-select">
-								<select name="bytes_per_word" id="predefine_select">
-									<option value="2">', $txt['search_predefined_small'], '</option>
-									<option value="4" selected="selected">', $txt['search_predefined_moderate'], '</option>
-									<option value="5">', $txt['search_predefined_large'], '</option>
-								</select>
-							</div>
+							<select name="bytes_per_word" id="predefine_select">
+								<option value="2">', $txt['search_predefined_small'], '</option>
+								<option value="4" selected="selected">', $txt['search_predefined_moderate'], '</option>
+								<option value="5">', $txt['search_predefined_large'], '</option>
+							</select>
 						</dd>
 					</dl>
 					<hr />

@@ -74,12 +74,10 @@ function template_searchform()
 									', $txt['search_match'], ':</label>
 								</dt>
 								<dd>
-									<div class="styled-select">
-										<select name="searchtype" id="searchtype">
-											<option value="1"', empty($context['search_params']['searchtype']) ? ' selected="selected"' : '', '>', $txt['all_words'], '</option>
-											<option value="2"', !empty($context['search_params']['searchtype']) ? ' selected="selected"' : '', '>', $txt['any_words'], '</option>
-										</select>
-									</div>
+									<select name="searchtype" id="searchtype">
+										<option value="1"', empty($context['search_params']['searchtype']) ? ' selected="selected"' : '', '>', $txt['all_words'], '</option>
+										<option value="2"', !empty($context['search_params']['searchtype']) ? ' selected="selected"' : '', '>', $txt['any_words'], '</option>
+									</select>
 								</dd>
 								<dt class="righttext">
 									<label for="userspec">', $txt['by_user'], ':</label>
@@ -91,15 +89,13 @@ function template_searchform()
 									<label for="sort">', $txt['search_order'], ':</label>
 								</dt>
 								<dd>
-									<div class="styled-select">
-										<select id="sort" name="sort">
-											<option value="relevance|desc">', $txt['search_orderby_relevant_first'], '</option>
-											<option value="num_replies|desc">', $txt['search_orderby_large_first'], '</option>
-											<option value="num_replies|asc">', $txt['search_orderby_small_first'], '</option>
-											<option value="id_msg|desc">', $txt['search_orderby_recent_first'], '</option>
-											<option value="id_msg|asc">', $txt['search_orderby_old_first'], '</option>
-										</select>
-									</div>
+									<select id="sort" name="sort">
+										<option value="relevance|desc">', $txt['search_orderby_relevant_first'], '</option>
+										<option value="num_replies|desc">', $txt['search_orderby_large_first'], '</option>
+										<option value="num_replies|asc">', $txt['search_orderby_small_first'], '</option>
+										<option value="id_msg|desc">', $txt['search_orderby_recent_first'], '</option>
+										<option value="id_msg|asc">', $txt['search_orderby_old_first'], '</option>
+									</select>
 								</dd>
 								<dt class="righttext options">
 									', $txt['search_options'], ':
@@ -383,18 +379,16 @@ function template_results()
 		echo '
 				<div class="flow_auto floatright">
 					<div class="additional_row">
-						<div class="styled-select">
-							<select class="qaction" name="qaction"', $context['can_move'] ? ' onchange="this.form.move_to.disabled = (this.options[this.selectedIndex].value != \'move\');"' : '', '>
-								<option value="">&nbsp;</option>';
+						<select class="qaction" name="qaction"', $context['can_move'] ? ' onchange="this.form.move_to.disabled = (this.options[this.selectedIndex].value != \'move\');"' : '', '>
+							<option value="">&nbsp;</option>';
 
 		foreach ($context['qmod_actions'] as $qmod_action)
 			if ($context['can_' . $qmod_action])
 				echo '
-								<option value="' . $qmod_action . '">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;', $txt['quick_mod_' . $qmod_action] . '</option>';
+							<option value="' . $qmod_action . '">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;', $txt['quick_mod_' . $qmod_action] . '</option>';
 
 		echo '
-							</select>
-						</div>';
+						</select>';
 
 		// Show a list of boards they can move the topic to.
 		if ($context['can_move'])

@@ -85,16 +85,14 @@ function template_modifyset()
 	else
 	{
 		echo '
-							<div class="styled-select">
-								<select name="smiley_sets_path" id="smiley_sets_path">';
+							<select name="smiley_sets_path" id="smiley_sets_path">';
 
 		foreach ($context['smiley_set_dirs'] as $smiley_set_dir)
 			echo '
-									<option value="', $smiley_set_dir['id'], '"', $smiley_set_dir['current'] ? ' selected="selected"' : '', $smiley_set_dir['selectable'] ? '' : ' disabled="disabled"', '>', $smiley_set_dir['id'], '</option>';
+								<option value="', $smiley_set_dir['id'], '"', $smiley_set_dir['current'] ? ' selected="selected"' : '', $smiley_set_dir['selectable'] ? '' : ' disabled="disabled"', '>', $smiley_set_dir['id'], '</option>';
 
 		echo '
-								</select>
-							</div>';
+							</select>';
 	}
 
 	echo '
@@ -148,14 +146,14 @@ function template_modifysmiley()
 							<strong>', $txt['smiley_preview'], ': </strong>
 						</dt>
 						<dd>
-							<img src="', $modSettings['smileys_url'], '/', $modSettings['smiley_sets_default'], '/', $context['current_smiley']['filename'], '" id="preview" alt="" /> (', $txt['smiley_preview_using'], ': <div class="styled-select"><select name="set" onchange="updatePreview();">';
+							<img src="', $modSettings['smileys_url'], '/', $modSettings['smiley_sets_default'], '/', $context['current_smiley']['filename'], '" id="preview" alt="" /> (', $txt['smiley_preview_using'], ': <select name="set" onchange="updatePreview();">';
 
 	foreach ($context['smiley_sets'] as $smiley_set)
 		echo '
-							<option value="', $smiley_set['path'], '"', $context['selected_set'] == $smiley_set['path'] ? ' selected="selected"' : '', '>', $smiley_set['name'], '</option>';
+								<option value="', $smiley_set['path'], '"', $context['selected_set'] == $smiley_set['path'] ? ' selected="selected"' : '', '>', $smiley_set['name'], '</option>';
 
 	echo '
-							</select></div>)
+							</select>)
 						</dd>
 						<dt>
 							<strong><label for="smiley_code">', $txt['smileys_code'], '</label>: </strong>
@@ -174,7 +172,6 @@ function template_modifysmiley()
 	else
 	{
 		echo '
-							<div class="styled-select">
 								<select name="smiley_filename" id="smiley_filename" onchange="updatePreview();">';
 
 		foreach ($context['filenames'] as $filename)
@@ -182,8 +179,7 @@ function template_modifysmiley()
 									<option value="', $filename['id'], '"', $filename['selected'] ? ' selected="selected"' : '', '>', $filename['id'], '</option>';
 
 		echo '
-								</select>
-							</div>';
+								</select>';
 	}
 
 	echo '
@@ -198,19 +194,17 @@ function template_modifysmiley()
 							<strong><label for="smiley_location">', $txt['smileys_location'], '</label>: </strong>
 						</dt>
 						<dd>
-							<div class="styled-select">
-								<select name="smiley_location" id="smiley_location">
-									<option value="0"', $context['current_smiley']['location'] == 0 ? ' selected="selected"' : '', '>
-										', $txt['smileys_location_form'], '
-									</option>
-									<option value="1"', $context['current_smiley']['location'] == 1 ? ' selected="selected"' : '', '>
-										', $txt['smileys_location_hidden'], '
-									</option>
-									<option value="2"', $context['current_smiley']['location'] == 2 ? ' selected="selected"' : '', '>
-										', $txt['smileys_location_popup'], '
-									</option>
-								</select>
-							</div>
+							<select name="smiley_location" id="smiley_location">
+								<option value="0"', $context['current_smiley']['location'] == 0 ? ' selected="selected"' : '', '>
+									', $txt['smileys_location_form'], '
+								</option>
+								<option value="1"', $context['current_smiley']['location'] == 1 ? ' selected="selected"' : '', '>
+									', $txt['smileys_location_hidden'], '
+								</option>
+								<option value="2"', $context['current_smiley']['location'] == 2 ? ' selected="selected"' : '', '>
+									', $txt['smileys_location_popup'], '
+								</option>
+							</select>
 						</dd>
 					</dl>
 					<hr />
@@ -262,17 +256,16 @@ function template_addsmiley()
 								<img src="', $modSettings['smileys_url'], '/', $modSettings['smiley_sets_default'], '/', $context['filenames'][0]['id'], '" id="preview" alt="" />
 							</dt>
 							<dd>
-								', $txt['smiley_preview_using'], ': <div class="styled-select"><select name="set" onchange="updatePreview();selectMethod(\'existing\');">
+								', $txt['smiley_preview_using'], ': <select name="set" onchange="updatePreview();selectMethod(\'existing\');">
 
 							';
 
 	foreach ($context['smiley_sets'] as $smiley_set)
 		echo '
-									<option value="', $smiley_set['path'], '"', $context['selected_set'] == $smiley_set['path'] ? ' selected="selected"' : '', '>', $smiley_set['name'], '</option>';
+										<option value="', $smiley_set['path'], '"', $context['selected_set'] == $smiley_set['path'] ? ' selected="selected"' : '', '>', $smiley_set['name'], '</option>';
 
 	echo '
-									</select>
-								</div>
+								</select>
 							</dd>
 							<dt>
 								<strong><label for="smiley_filename">', $txt['smileys_filename'], '</label>: </strong>
@@ -285,16 +278,14 @@ function template_addsmiley()
 	else
 	{
 		echo '
-									<div class="styled-select">
-										<select name="smiley_filename" id="smiley_filename" onchange="updatePreview();selectMethod(\'existing\');">';
+									<select name="smiley_filename" id="smiley_filename" onchange="updatePreview();selectMethod(\'existing\');">';
 
 		foreach ($context['filenames'] as $filename)
 			echo '
-											<option value="', $filename['id'], '"', $filename['selected'] ? ' selected="selected"' : '', '>', $filename['id'], '</option>';
+										<option value="', $filename['id'], '"', $filename['selected'] ? ' selected="selected"' : '', '>', $filename['id'], '</option>';
 
 		echo '
-										</select>
-									</div>';
+									</select>';
 	}
 
 	echo '
@@ -354,19 +345,17 @@ function template_addsmiley()
 							<strong><label for="smiley_location">', $txt['smileys_location'], '</label>: </strong>
 						</dt>
 						<dd>
-							<div class="styled-select">
-								<select name="smiley_location" id="smiley_location">
-									<option value="0" selected="selected">
-										', $txt['smileys_location_form'], '
-									</option>
-									<option value="1">
-										', $txt['smileys_location_hidden'], '
-									</option>
-									<option value="2">
-										', $txt['smileys_location_popup'], '
-									</option>
-								</select>
-							</div>
+							<select name="smiley_location" id="smiley_location">
+								<option value="0" selected="selected">
+									', $txt['smileys_location_form'], '
+								</option>
+								<option value="1">
+									', $txt['smileys_location_hidden'], '
+								</option>
+								<option value="2">
+									', $txt['smileys_location_popup'], '
+								</option>
+							</select>
 						</dd>
 					</dl>
 					<hr />
@@ -507,19 +496,17 @@ function template_editicon()
 							<strong><label for="icon_location">', $txt['smileys_location'], '</label>: </strong>
 						</dt>
 						<dd>
-							<div class="styled-select">
-								<select name="icon_location" id="icon_location">
-									<option value="0"', empty($context['icon']['after']) ? ' selected="selected"' : '', '>', $txt['icons_location_first_icon'], '</option>';
+							<select name="icon_location" id="icon_location">
+								<option value="0"', empty($context['icon']['after']) ? ' selected="selected"' : '', '>', $txt['icons_location_first_icon'], '</option>';
 
 	// Print the list of all the icons it can be put after...
 	foreach ($context['icons'] as $id => $data)
 		if (empty($context['icon']['id']) || $id != $context['icon']['id'])
 			echo '
-									<option value="', $id, '"', !empty($context['icon']['after']) && $id == $context['icon']['after'] ? ' selected="selected"' : '', '>', $txt['icons_location_after'], ': ', $data['title'], '</option>';
+								<option value="', $id, '"', !empty($context['icon']['after']) && $id == $context['icon']['after'] ? ' selected="selected"' : '', '>', $txt['icons_location_after'], ': ', $data['title'], '</option>';
 
 	echo '
-								</select>
-							</div>
+							</select>
 						</dd>
 					</dl>';
 

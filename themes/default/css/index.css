@@ -99,8 +99,7 @@ p, fieldset, form, input, button, select, textarea, .editor {
 /* Declarations for specific elements. @todo - Maybe simplify - test. */
 .wrapper, div.windowbg, div.windowbg2,
 .roundframe, .description, .information, .successbox, .warningbox,
-.category_header, .generic_list_wrapper, .submitbutton, .styled-select,
-.grid8, .grid20, .grid25, .grid30, .grid33, .grid50, #description_board .generalinfo {
+.category_header, .generic_list_wrapper, .submitbutton {
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
@@ -162,7 +161,6 @@ input, button, select, textarea, .editor {
 textarea, .editor {
 	border-radius: 4px;
 	font-size: 1em;
-	padding: 2px 4px;
 }
 .sceditor-container {
 	margin: 0 0 6px 0;
@@ -182,54 +180,14 @@ input, button, select{
 	font-size: 0.857em;
 }
 /* Selects require browser-specific targeting too, unfortunately. */
-/* check theme.js for OSx specific targeting of select padding */
 select {
-	padding: 1px 6px;
+	padding: 1px;
+}
+#chrome select {
+	padding: 2px;
 }
 select option {
 	padding: 0 4px;
-}
-
-/* Selects don't like to behave across OS and browsers, unfortunately. */
-.styled-select {
-	overflow: hidden;
-	display: inline-block;
-	vertical-align: middle;
-}
-/* Turn off the default select arrow where we can */
-.styled-select select {
-	 appearance: button;
-	-webkit-appearance: button;
-	-moz-appearance: button;
-	-ms-appearance: button;
-	text-indent: 0.01px;
-	text-overflow: '';
-}
-.styled-select select::-ms-expand {
-	display: none;
-}
-/* A div to hold the select */
-.styled-select select {
-	font-size: 0.857em;
-	font-weight: normal;
-	background: transparent;
-	border: none;
-	box-shadow: none;
-	background-image: none;
-	padding: 1px 2em 1px 2px;
-}
-
-/* Can't hide the arrow in ie<10 so we position it off div */
-#ie8 .styled-select select, #ie9 .styled-select select {
-	width: 140%;
-}
-#ie8 .styled-select, #ie9 .styled-select {
-	min-width: 7.25em;
-	padding-right: 0;
-}
-.styled-select select:hover, .styled-select select:focus {
-	outline: none;
-	border: none;
 }
 
 /* No borders around checkboxes or radio buttons, and middle aligned. */
@@ -784,7 +742,7 @@ a.bbc_link {
 #top_section_notice {
 	float: left;
 	margin: 0;
-	padding: 12px 8px 0 8px;
+	padding: 14px 8px 0 8px;
 	line-height: 1.3em;
 	min-width: 38%;
 	/* @todo - See me grumblez in Issue #552. ;) */
@@ -792,14 +750,6 @@ a.bbc_link {
 #top_section_notice .toggle_login {
 	display: inline;
 	cursor: pointer;
-}
-#top_section_notice .button_submit {
-	margin-top: 0;
-	vertical-align: top;
-}
-/* some help for ie8 */
-#ie8 #top_section_notice .button_submit, #ie8 #search_form .button_submit {
-	padding: 1px 6px;
 }
 #top_section_notice form {
 	white-space: nowrap;
@@ -1491,10 +1441,7 @@ a.bbc_link {
 .additional_row {
 	padding: 6px 0;
 }
-.styled-select .additional_row  {
-	float: right;
-	margin-left: 2px;
-}
+
 .sort_by_item .sort, .sort {
 	margin: 0 0 -4px 4px;
 }
@@ -1561,9 +1508,6 @@ dl.settings textarea {
 }
 dl.settings label {
 	vertical-align: top;
-}
-dl.settings dt .styled-select select {
-	width: 170%;
 }
 
 
@@ -3123,9 +3067,7 @@ dl.merge_topic dd {
 #paid_subscription dl.settings dd, #paid_subscription dl.settings dt {
 	margin-bottom: 4px;
 }
-#fixed_area .styled-select {
-	vertical-align: top;
-}
+
 
 /* Pick theme */
 #pick_theme {
@@ -3578,9 +3520,7 @@ a.help .icon {
 	padding-top: 12px;
 	width: 600px;
 }
-#search_options .styled-select {
-	margin: 0 0 3px;
-}
+
 #advanced_search dt {
 	float: left;
 	clear: both;
@@ -3594,10 +3534,7 @@ a.help .icon {
 	width: 65%;
 	text-align: left;
 }
-#search_options .styled-select option {
-	border-right: 1px solid #666;
-	outline: none;
-}
+
 
 /* The search results page.
 /* The search results page. @todo - Duplicated in the .table_grid code? */
@@ -4017,9 +3954,6 @@ dl.no_members {
 	.board_stats, .topic_stats {
 		display: none;
 	}
-	#password_login .styled-select {
-		display: none;
-	}
 	.bbc_img, .elk_video {
 		max-width: 100%;
 	}
@@ -4196,14 +4130,6 @@ dl.no_members {
 	dd .input_check, dd .input_radio {
 		display: inline !important;
 		width: auto !important;
-	}
-	dd .styled-select {
-		width: 90% !important;
-		max-width: 90% !important;
-	}
-	dd .styled-select select {
-		width: 100% !important;
-		max-width: 100% !important;
 	}
 	#search_options {
 		width: 100%;

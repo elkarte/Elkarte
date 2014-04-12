@@ -636,15 +636,13 @@ class Groups_Controller extends Action_Controller
 				array(
 					'position' => 'bottom_of_list',
 					'value' => '
-						<div class="styled-select">
-							<select name="req_action" onchange="if (this.value != 0 &amp;&amp; (this.value == \'reason\' || confirm(\'' . $txt['mc_groupr_warning'] . '\'))) this.form.submit();">
-								<option value="0">' . $txt['with_selected'] . ':</option>
-								<option value="0" disabled="disabled">' . str_repeat('&#8212;', strlen($txt['mc_groupr_approve'])) . '</option>
-								<option value="approve">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $txt['mc_groupr_approve'] . '</option>
-								<option value="reject">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $txt['mc_groupr_reject'] . '</option>
-								<option value="reason">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $txt['mc_groupr_reject_w_reason'] . '</option>
-							</select>
-						</div>
+						<select name="req_action" onchange="if (this.value != 0 &amp;&amp; (this.value == \'reason\' || confirm(\'' . $txt['mc_groupr_warning'] . '\'))) this.form.submit();">
+							<option value="0">' . $txt['with_selected'] . ':</option>
+							<option value="0" disabled="disabled">' . str_repeat('&#8212;', strlen($txt['mc_groupr_approve'])) . '</option>
+							<option value="approve">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $txt['mc_groupr_approve'] . '</option>
+							<option value="reject">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $txt['mc_groupr_reject'] . '</option>
+							<option value="reason">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $txt['mc_groupr_reject_w_reason'] . '</option>
+						</select>
 						<input type="submit" name="go" value="' . $txt['go'] . '" onclick="var sel = document.getElementById(\'req_action\'); if (sel.value != 0 &amp;&amp; sel.value != \'reason\' &amp;&amp; !confirm(\'' . $txt['mc_groupr_warning'] . '\')) return false;" class="right_submit" />',
 					'class' => 'floatright',
 				),

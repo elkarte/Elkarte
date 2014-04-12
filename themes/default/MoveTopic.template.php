@@ -74,16 +74,14 @@ function template_move_topic()
 									<label for="redirect_expires">', $txt['movetopic_expires'], '</label>
 								</dt>
 								<dd>
-									<div class="styled-select">
-										<select id="redirect_expires" name="redirect_expires">
-											<option value="0"', empty($context['redirect_expires']) ? ' selected="selected"' : '', '>', $txt['never'], '</option>
-											<option value="1440"', !empty($context['redirect_expires']) && $context['redirect_expires'] == 1440 ? ' selected="selected"' : '', '>', $txt['one_day'], '</option>
-											<option value="10080"', !empty($context['redirect_expires']) && $context['redirect_expires'] == 10080 ? ' selected="selected"' : '', '>', $txt['one_week'], '</option>
-											<option value="20160"', !empty($context['redirect_expires']) && $context['redirect_expires'] == 20160 ? ' selected="selected"' : '', '>', $txt['two_weeks'], '</option>
-											<option value="43200"', !empty($context['redirect_expires']) && $context['redirect_expires'] == 43200 ? ' selected="selected"' : '', '>', $txt['one_month'], '</option>
-											<option value="86400"', !empty($context['redirect_expires']) && $context['redirect_expires'] == 86400 ? ' selected="selected"' : '', '>', $txt['two_months'], '</option>
-										</select>
-									</div>
+									<select id="redirect_expires" name="redirect_expires">
+										<option value="0"', empty($context['redirect_expires']) ? ' selected="selected"' : '', '>', $txt['never'], '</option>
+										<option value="1440"', !empty($context['redirect_expires']) && $context['redirect_expires'] == 1440 ? ' selected="selected"' : '', '>', $txt['one_day'], '</option>
+										<option value="10080"', !empty($context['redirect_expires']) && $context['redirect_expires'] == 10080 ? ' selected="selected"' : '', '>', $txt['one_week'], '</option>
+										<option value="20160"', !empty($context['redirect_expires']) && $context['redirect_expires'] == 20160 ? ' selected="selected"' : '', '>', $txt['two_weeks'], '</option>
+										<option value="43200"', !empty($context['redirect_expires']) && $context['redirect_expires'] == 43200 ? ' selected="selected"' : '', '>', $txt['one_month'], '</option>
+										<option value="86400"', !empty($context['redirect_expires']) && $context['redirect_expires'] == 86400 ? ' selected="selected"' : '', '>', $txt['two_months'], '</option>
+									</select>
 								</dd>
 							</dl>
 						</fieldset>

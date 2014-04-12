@@ -381,7 +381,7 @@ function addCriteriaOption()
 	for (index in groups)
 		group_option += '<option value="' + index + '">' + groups[index] + '</option>';
 
-	setOuterHTML(document.getElementById("criteriaAddHere"), '<br /><div class="styled-select"><select name="ruletype[' + criteriaNum + ']" id="ruletype' + criteriaNum + '" data-optnum="' + criteriaNum + '"><option value="">' + txt_pm_rule_criteria_pick + ':</option>' + rules_option + '</select></div>&nbsp;<span id="defdiv' + criteriaNum + '" style="display: none;"><input type="text" name="ruledef[' + criteriaNum + ']" id="ruledef' + criteriaNum + '" value="" class="input_text" /></span><span id="defseldiv' + criteriaNum + '" style="display: none;"><div class="styled-select"><select name="ruledefgroup[' + criteriaNum + ']" id="ruledefgroup' + criteriaNum + '"><option value="">' + txt_pm_rule_sel_group + '</option>' + group_option + '</select></div></span><span id="criteriaAddHere"></span>');
+	setOuterHTML(document.getElementById("criteriaAddHere"), '<br /><select name="ruletype[' + criteriaNum + ']" id="ruletype' + criteriaNum + '" data-optnum="' + criteriaNum + '"><option value="">' + txt_pm_rule_criteria_pick + ':</option>' + rules_option + '</select>&nbsp;<span id="defdiv' + criteriaNum + '" style="display: none;"><input type="text" name="ruledef[' + criteriaNum + ']" id="ruledef' + criteriaNum + '" value="" class="input_text" /></span><span id="defseldiv' + criteriaNum + '" style="display: none;"><select name="ruledefgroup[' + criteriaNum + ']" id="ruledefgroup' + criteriaNum + '"><option value="">' + txt_pm_rule_sel_group + '</option>' + group_option + '</select></span><span id="criteriaAddHere"></span>');
 
 	return false;
 }
@@ -404,5 +404,5 @@ function addActionOption()
 	for (var index in labels)
 		label_option += '<option value="' + index + '">' + labels[index] + '</option>';
 
-	setOuterHTML(document.getElementById("actionAddHere"), '<br /><div class="styled-select"><select name="acttype[' + actionNum + ']" id="acttype' + actionNum + '" data-actnum="' + actionNum + '"><option value="">' + txt_pm_rule_sel_action + ':</option><option value="lab">' + txt_pm_rule_label + '</option><option value="del">' + txt_pm_rule_delete + '</option></select></div>&nbsp;<span id="labdiv' + actionNum + '" style="display: none;"><div class="styled-select"><select name="labdef[' + actionNum + ']" id="labdef' + actionNum + '"><option value="">' + txt_pm_rule_sel_label + '</option>' + label_option + '</select></div></span><span id="actionAddHere"></span>');
+	setOuterHTML(document.getElementById("actionAddHere"), '<br /><select name="acttype[' + actionNum + ']" id="acttype' + actionNum + '" data-actnum="' + actionNum + '"><option value="">' + txt_pm_rule_sel_action + ':</option><option value="lab">' + txt_pm_rule_label + '</option><option value="del">' + txt_pm_rule_delete + '</option></select>&nbsp;<span id="labdiv' + actionNum + '" style="display: none;"><select name="labdef[' + actionNum + ']" id="labdef' + actionNum + '"><option value="">' + txt_pm_rule_sel_label + '</option>' + label_option + '</select></span><span id="actionAddHere"></span>');
 }

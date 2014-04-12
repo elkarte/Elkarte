@@ -37,75 +37,65 @@ function template_search_members()
 							<dl class="settings right">
 								<dt class="righttext">
 									<strong><label for="mem_id">', $txt['member_id'], ':</label></strong>
-									<div class="styled-select">
-										<select name="types[mem_id]">
-											<option value="--">&lt;</option>
-											<option value="-">&lt;=</option>
-											<option value="=" selected="selected">=</option>
-											<option value="+">&gt;=</option>
-											<option value="++">&gt;</option>
-										</select>
-									</div>
+									<select name="types[mem_id]">
+										<option value="--">&lt;</option>
+										<option value="-">&lt;=</option>
+										<option value="=" selected="selected">=</option>
+										<option value="+">&gt;=</option>
+										<option value="++">&gt;</option>
+									</select>
 								</dt>
 								<dd>
 									<input type="text" name="mem_id" id="mem_id" value="" size="6" class="input_text" />
 								</dd>
 								<dt class="righttext">
 									<strong><label for="age">', $txt['age'], ':</label></strong>
-									<div class="styled-select">
-										<select name="types[age]">
-											<option value="--">&lt;</option>
-											<option value="-">&lt;=</option>
-											<option value="=" selected="selected">=</option>
-											<option value="+">&gt;=</option>
-											<option value="++">&gt;</option>
-										</select>
-									</div>
+									<select name="types[age]">
+										<option value="--">&lt;</option>
+										<option value="-">&lt;=</option>
+										<option value="=" selected="selected">=</option>
+										<option value="+">&gt;=</option>
+										<option value="++">&gt;</option>
+									</select>
 								</dt>
 								<dd>
 									<input type="text" name="age" id="age" value="" size="6" class="input_text" />
 								</dd>
 								<dt class="righttext">
 									<strong><label for="posts">', $txt['member_postcount'], ':</label></strong>
-									<div class="styled-select">
-										<select name="types[posts]">
-											<option value="--">&lt;</option>
-											<option value="-">&lt;=</option>
-											<option value="=" selected="selected">=</option>
-											<option value="+">&gt;=</option>
-											<option value="++">&gt;</option>
-										</select>
-									</div>
+									<select name="types[posts]">
+										<option value="--">&lt;</option>
+										<option value="-">&lt;=</option>
+										<option value="=" selected="selected">=</option>
+										<option value="+">&gt;=</option>
+										<option value="++">&gt;</option>
+									</select>
 								</dt>
 								<dd>
 									<input type="text" name="posts" id="posts" value="" size="6" class="input_text" />
 								</dd>
 								<dt class="righttext">
 									<strong><label for="reg_date">', $txt['date_registered'], ':</label></strong>
-									<div class="styled-select">
-										<select name="types[reg_date]">
-											<option value="--">&lt;</option>
-											<option value="-">&lt;=</option>
-											<option value="=" selected="selected">=</option>
-											<option value="+">&gt;=</option>
-											<option value="++">&gt;</option>
-										</select>
-									</div>
+									<select name="types[reg_date]">
+										<option value="--">&lt;</option>
+										<option value="-">&lt;=</option>
+										<option value="=" selected="selected">=</option>
+										<option value="+">&gt;=</option>
+										<option value="++">&gt;</option>
+									</select>
 								</dt>
 								<dd>
 									<input type="text" name="reg_date" id="reg_date" value="" size="10" class="input_text" /><span class="smalltext">', $txt['date_format'], '</span>
 								</dd>
 								<dt class="righttext">
 									<strong><label for="last_online">', $txt['viewmembers_online'], ':</label></strong>
-									<div class="styled-select">
-										<select name="types[last_online]">
-											<option value="--">&lt;</option>
-											<option value="-">&lt;=</option>
-											<option value="=" selected="selected">=</option>
-											<option value="+">&gt;=</option>
-											<option value="++">&gt;</option>
-										</select>
-									</div>
+									<select name="types[last_online]">
+										<option value="--">&lt;</option>
+										<option value="-">&lt;=</option>
+										<option value="=" selected="selected">=</option>
+										<option value="+">&gt;=</option>
+										<option value="++">&gt;</option>
+									</select>
 								</dt>
 								<dd>
 									<input type="text" name="last_online" id="last_online" value="" size="10" class="input_text" /><span class="smalltext">', $txt['date_format'], '</span>
@@ -301,19 +291,17 @@ function template_admin_browse()
 							<label for="todo">', $txt['admin_browse_outstanding_perform'], '</label>:
 						</dt>
 						<dd>
-							<div class="styled-select">
-								<select id="todo" name="todo">
-									', $context['browse_type'] == 'activate' ? '
-									<option value="ok">' . $txt['admin_browse_w_activate'] . '</option>' : '', '
-									<option value="okemail">', $context['browse_type'] == 'approve' ? $txt['admin_browse_w_approve'] : $txt['admin_browse_w_activate'], ' ', $txt['admin_browse_w_email'], '</option>', $context['browse_type'] == 'activate' ? '' : '
-									<option value="require_activation">' . $txt['admin_browse_w_approve_require_activate'] . '</option>', '
-									<option value="reject">', $txt['admin_browse_w_reject'], '</option>
-									<option value="rejectemail">', $txt['admin_browse_w_reject'], ' ', $txt['admin_browse_w_email'], '</option>
-									<option value="delete">', $txt['admin_browse_w_delete'], '</option>
-									<option value="deleteemail">', $txt['admin_browse_w_delete'], ' ', $txt['admin_browse_w_email'], '</option>', $context['browse_type'] == 'activate' ? '
-									<option value="remind">' . $txt['admin_browse_w_remind'] . '</option>' : '', '
-								</select>
-							</div>
+							<select id="todo" name="todo">
+								', $context['browse_type'] == 'activate' ? '
+								<option value="ok">' . $txt['admin_browse_w_activate'] . '</option>' : '', '
+								<option value="okemail">', $context['browse_type'] == 'approve' ? $txt['admin_browse_w_approve'] : $txt['admin_browse_w_activate'], ' ', $txt['admin_browse_w_email'], '</option>', $context['browse_type'] == 'activate' ? '' : '
+								<option value="require_activation">' . $txt['admin_browse_w_approve_require_activate'] . '</option>', '
+								<option value="reject">', $txt['admin_browse_w_reject'], '</option>
+								<option value="rejectemail">', $txt['admin_browse_w_reject'], ' ', $txt['admin_browse_w_email'], '</option>
+								<option value="delete">', $txt['admin_browse_w_delete'], '</option>
+								<option value="deleteemail">', $txt['admin_browse_w_delete'], ' ', $txt['admin_browse_w_email'], '</option>', $context['browse_type'] == 'activate' ? '
+								<option value="remind">' . $txt['admin_browse_w_remind'] . '</option>' : '', '
+							</select>
 						</dd>
 					</dl>
 					<input type="submit" value="', $txt['admin_browse_outstanding_go'], '" class="right_submit" />

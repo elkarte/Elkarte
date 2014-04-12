@@ -242,22 +242,21 @@ function template_folder()
 				if (!empty($context['currently_using_labels']))
 				{
 					echo '
-									<div class="styled-select">
-										<select name="pm_actions[', $message['id'], ']" onchange="if (this.options[this.selectedIndex].value) form.submit();">
-											<option value="">', $txt['pm_msg_label_title'], ':</option>
-											<option value="" disabled="disabled">' . str_repeat('&#8212;', strlen($txt['pm_msg_label_title'])) . '</option>';
+									<select name="pm_actions[', $message['id'], ']" onchange="if (this.options[this.selectedIndex].value) form.submit();">
+										<option value="">', $txt['pm_msg_label_title'], ':</option>
+										<option value="" disabled="disabled">' . str_repeat('&#8212;', strlen($txt['pm_msg_label_title'])) . '</option>';
 
 					// Are there any labels which can be added to this?
 					if (!$message['fully_labeled'])
 					{
 						echo '
-											<option value="" disabled="disabled">', $txt['pm_msg_label_apply'], ':</option>';
+										<option value="" disabled="disabled">', $txt['pm_msg_label_apply'], ':</option>';
 
 						foreach ($context['labels'] as $label)
 						{
 							if (!isset($message['labels'][$label['id']]))
 								echo '
-											<option value="', $label['id'], '">&nbsp;', $label['name'], '</option>';
+										<option value="', $label['id'], '">&nbsp;', $label['name'], '</option>';
 						}
 					}
 
@@ -265,16 +264,15 @@ function template_folder()
 					if (!empty($message['labels']) && (count($message['labels']) > 1 || !isset($message['labels'][-1])))
 					{
 						echo '
-											<option value="" disabled="disabled">', $txt['pm_msg_label_remove'], ':</option>';
+										<option value="" disabled="disabled">', $txt['pm_msg_label_remove'], ':</option>';
 
 						foreach ($message['labels'] as $label)
 							echo '
-											<option value="', $label['id'], '">&nbsp;', $label['name'], '</option>';
+										<option value="', $label['id'], '">&nbsp;', $label['name'], '</option>';
 					}
 
 					echo '
-										</select>
-									</div>
+									</select>
 									<noscript>
 										<input type="submit" value="', $txt['pm_apply'], '" class="button_submit" />
 									</noscript>';
@@ -482,33 +480,31 @@ function template_subject_list()
 		{
 			$extra .= '
 						<li>
-							<div class="styled-select">
-								<select name="pm_action" onchange="if (this.options[this.selectedIndex].value) this.form.submit();" onfocus="loadLabelChoices();">
-									<option value="">' . $txt['pm_sel_label_title'] . ':</option>
-									<option value="" disabled="disabled">' . str_repeat('&#8212;', strlen($txt['pm_sel_label_title'])) . '</option>';
+							<select name="pm_action" onchange="if (this.options[this.selectedIndex].value) this.form.submit();" onfocus="loadLabelChoices();">
+								<option value="">' . $txt['pm_sel_label_title'] . ':</option>
+								<option value="" disabled="disabled">' . str_repeat('&#8212;', strlen($txt['pm_sel_label_title'])) . '</option>';
 
 			$extra .= '
-									<option value="" disabled="disabled">' . $txt['pm_msg_label_apply'] . ':</option>';
+								<option value="" disabled="disabled">' . $txt['pm_msg_label_apply'] . ':</option>';
 
 			foreach ($context['labels'] as $label)
 			{
 				if ($label['id'] != $context['current_label_id'])
 					$extra .= '
-									<option value="add_' . $label['id'] . '">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $label['name'] . '</option>';
+								<option value="add_' . $label['id'] . '">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $label['name'] . '</option>';
 			}
 
 			$extra .= '
-									<option value="" disabled="disabled">' . $txt['pm_msg_label_remove'] . ':</option>';
+								<option value="" disabled="disabled">' . $txt['pm_msg_label_remove'] . ':</option>';
 
 			foreach ($context['labels'] as $label)
 			{
 				$extra .= '
-									<option value="rem_' . $label['id'] . '">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $label['name'] . '</option>';
+								<option value="rem_' . $label['id'] . '">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $label['name'] . '</option>';
 			}
 
 			$extra .= '
-								</select>
-							</div>
+							</select>
 							<noscript>
 								<input type="submit" value="' . $txt['pm_apply'] . '" class="right_submit" />
 							</noscript>
@@ -560,12 +556,10 @@ function template_search()
 						', $txt['search_match'], ':</label>
 					</dt>
 					<dd>
-						<div class="styled-select">
-							<select name="searchtype">
-								<option value="1"', empty($context['search_params']['searchtype']) ? ' selected="selected"' : '', '>', $txt['pm_search_match_all'], '</option>
-								<option value="2"', !empty($context['search_params']['searchtype']) ? ' selected="selected"' : '', '>', $txt['pm_search_match_any'], '</option>
-							</select>
-						</div>
+						<select name="searchtype">
+							<option value="1"', empty($context['search_params']['searchtype']) ? ' selected="selected"' : '', '>', $txt['pm_search_match_all'], '</option>
+							<option value="2"', !empty($context['search_params']['searchtype']) ? ' selected="selected"' : '', '>', $txt['pm_search_match_any'], '</option>
+						</select>
 					</dd>
 					<dt>
 						<label for="userspec">', $txt['pm_search_user'], ':</label>
@@ -577,13 +571,11 @@ function template_search()
 						<label for="sort">', $txt['pm_search_order'], ':</label>
 					</dt>
 					<dd>
-						<div class="styled-select">
-							<select name="sort" id="sort">
-								<option value="relevance|desc">', $txt['pm_search_orderby_relevant_first'], '</option>
-								<option value="id_pm|desc">', $txt['pm_search_orderby_recent_first'], '</option>
-								<option value="id_pm|asc">', $txt['pm_search_orderby_old_first'], '</option>
-							</select>
-						</div>
+						<select name="sort" id="sort">
+							<option value="relevance|desc">', $txt['pm_search_orderby_relevant_first'], '</option>
+							<option value="id_pm|desc">', $txt['pm_search_orderby_recent_first'], '</option>
+							<option value="id_pm|asc">', $txt['pm_search_orderby_old_first'], '</option>
+						</select>
 					</dd>
 					<dt class="options">
 						', $txt['pm_search_options'], ':
@@ -1259,17 +1251,15 @@ function template_report_message()
 						', $txt['pm_report_admins'], ':
 					</dt>
 					<dd>
-						<div class="styled-select">
-							<select name="id_admin">
-								<option value="0">', $txt['pm_report_all_admins'], '</option>';
+						<select name="id_admin">
+							<option value="0">', $txt['pm_report_all_admins'], '</option>';
 
 		foreach ($context['admins'] as $id => $details)
 			echo '
-								<option value="', $id, '">', $details[0], !empty($details[1]) ? ' (' . $details[1] . ')' : '', '</option>';
+							<option value="', $id, '">', $details[0], !empty($details[1]) ? ' (' . $details[1] . ')' : '', '</option>';
 
 		echo '
-							</select>
-						</div>
+						</select>
 					</dd>';
 	}
 
@@ -1416,32 +1406,28 @@ function template_add_rule()
 			echo '<br />';
 
 		echo '
-					<div class="styled-select">
-						<select name="ruletype[', $k, ']" id="ruletype', $k, '" data-optnum="', $k, '">
-							<option value="">', $txt['pm_rule_criteria_pick'], ':</option>';
+					<select name="ruletype[', $k, ']" id="ruletype', $k, '" data-optnum="', $k, '">
+						<option value="">', $txt['pm_rule_criteria_pick'], ':</option>';
 
 		foreach ($context['known_rules'] as $rule)
 			echo '
-							<option value="', $rule, '" ', $criteria['t'] == $rule ? 'selected="selected"' : '', '>', $txt['pm_rule_' . $rule], '</option>';
+						<option value="', $rule, '" ', $criteria['t'] == $rule ? 'selected="selected"' : '', '>', $txt['pm_rule_' . $rule], '</option>';
 
 		echo '
-						</select>
-					</div>
+					</select>
 					<span id="defdiv', $k, '" ', !in_array($criteria['t'], array('gid', 'bud')) ? '' : 'style="display: none;"', '>
 						<input type="text" name="ruledef[', $k, ']" id="ruledef', $k, '" value="', in_array($criteria['t'], array('mid', 'sub', 'msg')) ? $criteria['v'] : '', '" class="input_text" />
 					</span>
 					<span id="defseldiv', $k, '" ', $criteria['t'] == 'gid' ? '' : 'style="display: none;"', '>
-						<div class="styled-select">
-							<select class="criteria" name="ruledefgroup[', $k, ']" id="ruledefgroup', $k, '">
-								<option value="">', $txt['pm_rule_sel_group'], '</option>';
+						<select class="criteria" name="ruledefgroup[', $k, ']" id="ruledefgroup', $k, '">
+							<option value="">', $txt['pm_rule_sel_group'], '</option>';
 
 		foreach ($context['groups'] as $id => $group)
 			echo '
-								<option value="', $id, '" ', $criteria['t'] == 'gid' && $criteria['v'] == $id ? 'selected="selected"' : '', '>', $group, '</option>';
+							<option value="', $id, '" ', $criteria['t'] == 'gid' && $criteria['v'] == $id ? 'selected="selected"' : '', '>', $group, '</option>';
 
 		echo '
-							</select>
-						</div>
+						</select>
 					</span>';
 
 		// If this is the dummy we add a means to hide for non js users.
@@ -1456,12 +1442,10 @@ function template_add_rule()
 					<a id="addonjs1" class="linkbutton" href="#" onclick="addCriteriaOption(); return false;" style="display: none;">', $txt['pm_rule_criteria_add'], '</a>
 					<br /><br />
 					', $txt['pm_rule_logic'], ':
-					<div class="styled-select">
-						<select name="rule_logic" id="logic"">
-							<option value="and" ', $context['rule']['logic'] == 'and' ? 'selected="selected"' : '', '>', $txt['pm_rule_logic_and'], '</option>
-							<option value="or" ', $context['rule']['logic'] == 'or' ? 'selected="selected"' : '', '>', $txt['pm_rule_logic_or'], '</option>
-						</select>
-					</div>
+					<select name="rule_logic" id="logic"">
+						<option value="and" ', $context['rule']['logic'] == 'and' ? 'selected="selected"' : '', '>', $txt['pm_rule_logic_and'], '</option>
+						<option value="or" ', $context['rule']['logic'] == 'or' ? 'selected="selected"' : '', '>', $txt['pm_rule_logic_or'], '</option>
+					</select>
 				</fieldset>
 				<fieldset id="actions">
 					<legend>', $txt['pm_rule_actions'], '</legend>';
@@ -1479,26 +1463,22 @@ function template_add_rule()
 			echo '<br />';
 
 		echo '
-					<div class="styled-select">
-						<select name="acttype[', $k, ']" id="acttype', $k, '" data-actnum="', $k, '">
-							<option value="">', $txt['pm_rule_sel_action'], ':</option>
-							<option value="lab" ', $action['t'] == 'lab' ? 'selected="selected"' : '', '>', $txt['pm_rule_label'], '</option>
-							<option value="del" ', $action['t'] == 'del' ? 'selected="selected"' : '', '>', $txt['pm_rule_delete'], '</option>
-						</select>
-					</div>
+					<select name="acttype[', $k, ']" id="acttype', $k, '" data-actnum="', $k, '">
+						<option value="">', $txt['pm_rule_sel_action'], ':</option>
+						<option value="lab" ', $action['t'] == 'lab' ? 'selected="selected"' : '', '>', $txt['pm_rule_label'], '</option>
+						<option value="del" ', $action['t'] == 'del' ? 'selected="selected"' : '', '>', $txt['pm_rule_delete'], '</option>
+					</select>
 					<span id="labdiv', $k, '">
-						<div class="styled-select">
-							<select name="labdef[', $k, ']" id="labdef', $k, '">
-								<option value="">', $txt['pm_rule_sel_label'], '</option>';
+						<select name="labdef[', $k, ']" id="labdef', $k, '">
+							<option value="">', $txt['pm_rule_sel_label'], '</option>';
 
 		foreach ($context['labels'] as $label)
 			if ($label['id'] != -1)
 				echo '
-								<option value="', ($label['id'] + 1), '" ', $action['t'] == 'lab' && $action['v'] == $label['id'] ? 'selected="selected"' : '', '>', $label['name'], '</option>';
+							<option value="', ($label['id'] + 1), '" ', $action['t'] == 'lab' && $action['v'] == $label['id'] ? 'selected="selected"' : '', '>', $label['name'], '</option>';
 
 		echo '
-							</select>
-						</div>
+						</select>
 					</span>';
 
 		if ($isFirst)
