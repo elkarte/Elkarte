@@ -2123,7 +2123,6 @@ div.core_posts {
 .poster {
 	display: table-cell;
 	vertical-align: top;
-	min-width: 15em;
 	width: 15em;
 	word-wrap: break-word;
 	word-break: break-all;
@@ -2157,6 +2156,10 @@ div.core_posts {
 	padding: 0 8px 0 0;
 	text-align: left;
 	font-size: 1.143em;
+}
+.poster .name {
+	white-space: normal;
+	word-break: normal;
 }
 /* Drop menu for the poster info. */
 .poster .listlevel1.sfhover .menulevel2, .poster .listlevel1:hover .menulevel2 {
@@ -4112,7 +4115,7 @@ dl.no_members {
 		display: none;
 	}
 	.poster {
-		min-width: 7em;
+		width: 7em;
 	}
 	.poster .poster_online {
 		display: none;
@@ -4443,6 +4446,10 @@ dl.no_members {
 	}
 	.poster {
 		float: none;
+		width: auto;
+	}
+	.poster .name {
+		white-space: nowrap;
 	}
 	.poster .listlevel1 {
 		float: left;
@@ -4455,7 +4462,7 @@ dl.no_members {
 		float: left;
 	}
 	.poster .subsections {
-		max-width: 120px;
+		max-width: 200px;
 		max-height: 1.5em;
 		float: right;
 		text-align: right;
