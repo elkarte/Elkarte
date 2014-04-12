@@ -118,16 +118,6 @@ input[disabled].input_text, input[disabled].input_password {
 	background-position: 2% 50%;
 }
 
-/* Selects don't like to behave across OS and browsers, unfortunately. */
-.styled-select {
-	background: #fff url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYAQAAAADb20ChAAAAAnRSTlMAAQGU/a4AAAApSURBVHjaY/zPgIL+MTL+aWb84c74QZ/xgT6yFJALFARKARUAlaFpBACuqxnhHOnncgAAAABJRU5ErkJggg==) 98% 50% no-repeat;
-	border: 1px solid #ccc;
-	border-radius: 2px;
-}
-.styled-select select:disabled {
-	background: #eee url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYCAQAAABZqbWHAAAAKklEQVR42mMYiqCBgDQI4pXGp6QBBWJKY8ABB+Q4ElMajxKyghqhZCgCAL3SGQGs8tZQAAAAAElFTkSuQmCC) 98% 50% no-repeat;
-}
-
 /* Common button styling. */
 /* It is being replaced with three classes: */
 /*    .button_submit is not floated    */
@@ -431,9 +421,14 @@ div.bbc_footnotes .meaction{
 	color: #333;
 }
 #search_form select {
+	padding-right: 4px;
+	border: 1px solid #bbb;
+	border-right: none;
 	opacity: 0.8;
 }
 #search_form select:focus {
+	border: 1px solid #999;
+	border-right: none;
 	opacity: 1;
 }
 .forumtitle>a {

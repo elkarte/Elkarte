@@ -48,10 +48,6 @@ $(document).ready(function() {
 	if (typeof elk_codefix === 'function')
 		elk_codefix();
 
-	// OSx needs help when it comes to select padding
-	if (is_osx)
-		$('select').css({'padding-top' : '2px', 'padding-bottom' : '2px'});
-
 	// Enable the ... page expansion
 	$('.expand_pages').expand_pages();
 

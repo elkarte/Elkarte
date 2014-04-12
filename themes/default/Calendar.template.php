@@ -47,28 +47,24 @@ function template_show_calendar()
 	template_button_strip($context['calendar_buttons'], 'right');
 
 	echo '
-					<div class="styled-select">
-						<select name="month">';
+					<select name="month">';
 
 	// Show a select box with all the months.
 	foreach ($txt['months'] as $number => $month)
 		echo '
-							<option value="', $number, '"', $number == $context['current_month'] ? ' selected="selected"' : '', '>', $month, '</option>';
+						<option value="', $number, '"', $number == $context['current_month'] ? ' selected="selected"' : '', '>', $month, '</option>';
 
 	echo '
-						</select>
-					</div>
-					<div class="styled-select">
-						<select name="year">';
+					</select>
+					<select name="year">';
 
 	// Show a link for every year.....
 	for ($year = $modSettings['cal_minyear']; $year <= $modSettings['cal_maxyear']; $year++)
 		echo '
-							<option value="', $year, '"', $year == $context['current_year'] ? ' selected="selected"' : '', '>', $year, '</option>';
+						<option value="', $year, '"', $year == $context['current_year'] ? ' selected="selected"' : '', '>', $year, '</option>';
 
 	echo '
-						</select>
-					</div>
+					</select>
 					<input type="submit" class="button_submit" value="', $txt['view'], '" />
 				</form>
 			</div>
@@ -116,29 +112,25 @@ function template_unlinked_event_post()
 					<input type="text" id="evtitle" name="evtitle" maxlength="255" size="55" value="', $context['event']['title'], '" tabindex="', $context['tabindex']++, '" class="input_text" />
 					<div class="smalltext" id="datepicker">
 						<input type="hidden" name="calendar" value="1" /><label for="year">', $txt['calendar_year'], '</label>
-						<div class="styled-select">
-							<select name="year" id="year" tabindex="', $context['tabindex']++, '" onchange="generateDays();">';
+						<select name="year" id="year" tabindex="', $context['tabindex']++, '" onchange="generateDays();">';
 
 	// Show a list of all the years we allow...
 	for ($year = $modSettings['cal_minyear']; $year <= $modSettings['cal_maxyear']; $year++)
 		echo '
-								<option value="', $year, '"', $year == $context['event']['year'] ? ' selected="selected"' : '', '>', $year, '</option>';
+							<option value="', $year, '"', $year == $context['event']['year'] ? ' selected="selected"' : '', '>', $year, '</option>';
 
 	echo '
-							</select>
-						</div>
+						</select>
 						<label for="month">', $txt['calendar_month'], '</label>
-						<div class="styled-select">
-							<select name="month" id="month" onchange="generateDays();">';
+						<select name="month" id="month" onchange="generateDays();">';
 
 	// There are 12 months per year - ensure that they all get listed.
 	for ($month = 1; $month <= 12; $month++)
 		echo '
-								<option value="', $month, '"', $month == $context['event']['month'] ? ' selected="selected"' : '', '>', $txt['months'][$month], '</option>';
+							<option value="', $month, '"', $month == $context['event']['month'] ? ' selected="selected"' : '', '>', $txt['months'][$month], '</option>';
 
 	echo '
-							</select>
-						</div>
+						</select>
 						<label for="day">', $txt['calendar_day'], '</label>
 						<select name="day" id="day">';
 
@@ -161,16 +153,14 @@ function template_unlinked_event_post()
 		echo '
 						<li>
 							<label for="span">', $txt['calendar_numb_days'], '</label>
-							<div class="styled-select">
-								<select id="span" name="span">';
+							<select id="span" name="span">';
 
 		for ($days = 1; $days <= $modSettings['cal_maxspan']; $days++)
 			echo '
-									<option value="', $days, '"', $context['event']['span'] == $days ? ' selected="selected"' : '', '>', $days, '</option>';
+								<option value="', $days, '"', $context['event']['span'] == $days ? ' selected="selected"' : '', '>', $days, '</option>';
 
 		echo '
-								</select>
-							</div>
+							</select>
 						</li>';
 	}
 

@@ -154,18 +154,16 @@ function template_issueWarning()
 					</dt>
 					<dd>
 						<div class="padding">
-							<div class="styled-select">
-								<select name="warn_temp" id="warn_temp" disabled="disabled" onchange="populateNotifyTemplate();">
-									<option value="-1">', $txt['profile_warning_notify_template'], '</option>
-									<option value="-1" disabled="disabled">', str_repeat('&#8212;', strlen($txt['profile_warning_notify_template'])), '</option>';
+							<select name="warn_temp" id="warn_temp" disabled="disabled" onchange="populateNotifyTemplate();">
+								<option value="-1">', $txt['profile_warning_notify_template'], '</option>
+								<option value="-1" disabled="disabled">', str_repeat('&#8212;', strlen($txt['profile_warning_notify_template'])), '</option>';
 
 		foreach ($context['notification_templates'] as $id_template => $template)
 			echo '
-									<option value="', $id_template, '">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;', $template['title'], '</option>';
+								<option value="', $id_template, '">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;', $template['title'], '</option>';
 
 		echo '
-								</select>
-							</div>
+							</select>
 							<span id="new_template_link" style="display: none;"><a class="linkbutton new_win" href="', $scripturl, '?action=moderate;area=warnings;sa=templateedit;tid=0" target="_blank">', $txt['profile_warning_new_template'], '</a></span>
 						</div>
 						<textarea name="warn_body" id="warn_body" cols="40" rows="8" style="min-width: 50%; max-width: 99%;">', $context['warning_data']['notify_body'], '</textarea>
@@ -269,13 +267,11 @@ function template_deleteAccount()
 						<label for="remove_type">', $txt['deleteAccount_posts'], '</label>:
 					</dt>
 					<dd>
-						<div class="styled-select">
-							<select id="remove_type" name="remove_type">
-								<option value="none">', $txt['deleteAccount_none'], '</option>
-								<option value="posts">', $txt['deleteAccount_all_posts'], '</option>
-								<option value="topics">', $txt['deleteAccount_topics'], '</option>
-							</select>
-						</div>
+						<select id="remove_type" name="remove_type">
+							<option value="none">', $txt['deleteAccount_none'], '</option>
+							<option value="posts">', $txt['deleteAccount_all_posts'], '</option>
+							<option value="topics">', $txt['deleteAccount_topics'], '</option>
+						</select>
 					</dd>';
 
 		echo '
