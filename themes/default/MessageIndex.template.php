@@ -147,15 +147,19 @@ function template_topic_listing()
 		<div class="warningbox">', $context['unapproved_posts_message'], '</div>';
 
 		echo '
-		<ul class="topic_listing" id="messageindex">
-			<li class="topic_sorting_row">';
+		<ul class="topic_listing" id="messageindex">';
 
 		// No topics.... just say, "sorry bub".
 		if (empty($context['topics']))
 			echo '
-				<strong>', $txt['topic_alert_none'], '</strong>';
-
-		echo '
+			<li class="basic_row">
+				<div class="topic_info">
+					<div class="topic_name">
+						<h4>
+							<strong>', $txt['topic_alert_none'], '</strong>
+						</h4>
+					</div>
+				</div>
 			</li>';
 
 		foreach ($context['topics'] as $topic)

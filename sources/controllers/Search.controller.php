@@ -2181,17 +2181,20 @@ class Search_Controller extends Action_Controller
 		{
 			// Don't spell check excluded words, but add them still...
 			$temp_excluded = array('search' => array(), 'display' => array());
-			foreach ($excludedWords as $word)
+			if (!empty($excludedWords))
 			{
-				if (preg_match('~^\w+$~', $word) == 0)
+				foreach ($excludedWords as $word)
 				{
-					$temp_excluded['search'][] = '-"' . $word . '"';
-					$temp_excluded['display'][] = '-&quot;' . Util::htmlspecialchars($word) . '&quot;';
-				}
-				else
-				{
-					$temp_excluded['search'][] = '-' . $word;
-					$temp_excluded['display'][] = '-' . Util::htmlspecialchars($word);
+					if (preg_match('~^\w+$~', $word) == 0)
+					{
+						$temp_excluded['search'][] = '-"' . $word . '"';
+						$temp_excluded['display'][] = '-&quot;' . Util::htmlspecialchars($word) . '&quot;';
+					}
+					else
+					{
+						$temp_excluded['search'][] = '-' . $word;
+						$temp_excluded['display'][] = '-' . Util::htmlspecialchars($word);
+					}
 				}
 			}
 
