@@ -61,7 +61,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 			'description' => $txt['search_engines_description'],
 		);
 
-		// Ensure we have a valid subaction. call integrate_manage_search_engines
+		// Ensure we have a valid subaction. call integrate_sa_manage_search_engines
 		$subAction = $action->initialize($subActions, 'stats');
 
 		// Some contextual data for the template.

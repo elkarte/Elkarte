@@ -83,7 +83,7 @@ class PackageServers_Controller extends Action_Controller
 		// Set up action/subaction stuff.
 		$action = new Action('package_servers');
 
-		// Now let's decide where we are taking this... call integrate_package_servers
+		// Now let's decide where we are taking this... call integrate_sa_package_servers
 		$subAction = $action->initialize($subActions, 'servers');
 
 		// For the template

@@ -94,7 +94,7 @@ class ManageSecurity_Controller extends Action_Controller
 			),
 		);
 
-		// By default do the basic settings, call integrate_modify_security
+		// By default do the basic settings, call integrate_sa_modify_security
 		$subAction = $action->initialize($subActions, 'general');
 
 		// Last pieces of the puzzle

@@ -58,7 +58,7 @@ class ManageAvatars_Controller extends Action_Controller
 		// Set up for some action
 		$action = new Action('manage_avatars');
 
-		// Get the sub action or set a default, call integrate_avatar_settings
+		// Get the sub action or set a default, call integrate_sa_avatar_settings
 		$subAction = $action->initialize($subActions, 'display');
 
 		// Final page details

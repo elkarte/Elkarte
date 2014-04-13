@@ -87,7 +87,7 @@ class ManageSearch_Controller extends Action_Controller
 			),
 		);
 
-		// Default the sub-action to 'edit search method'.  Call integrate_manage_search
+		// Default the sub-action to 'edit search method'.  Call integrate_sa_manage_search
 		$subAction = $action->initialize($subActions, 'method');
 
 		// Final bits
