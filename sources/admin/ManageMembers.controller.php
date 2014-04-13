@@ -538,19 +538,7 @@ class ManageMembers_Controller extends Action_Controller
 								$difference = $txt[\'never\'];
 							else
 							{
-								$num_days_difference = jeffsdatediff($rowData[\'last_login\']);
-
-								// Today.
-								if (empty($num_days_difference))
-									$difference = $txt[\'viewmembers_today\'];
-
-								// Yesterday.
-								elseif ($num_days_difference == 1)
-									$difference = sprintf(\'1 %1$s\', $txt[\'viewmembers_day_ago\']);
-
-								// X days ago.
-								else
-									$difference = sprintf(\'%1$d %2$s\', $num_days_difference, $txt[\'viewmembers_days_ago\']);
+								$difference = htmlTime($rowData[\'last_login\']);
 							}
 
 							// Show it in italics if they\'re not activated...
