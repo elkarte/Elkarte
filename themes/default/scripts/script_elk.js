@@ -571,15 +571,14 @@ function add_elk_mention(selector, oOptions)
 
 		// Divs to hold our responses
 		var ajax_infobar = document.createElement('div'),
-			ajax_errorbox = document.createElement('div');
+			ajax_errorbox = $("<div id='errorContainer'><div/>").appendTo('body');
 
 		// Prepare the infobar and errorbox divs to confirm valid responses or show an error
 		$(ajax_infobar).css({'position': 'fixed', 'top': '0', 'left': '0', 'width': '100%'});
 		$("body").append(ajax_infobar);
 		$(ajax_infobar).slideUp();
 
-		$(ajax_errorbox).css({'display': 'none'});
-		$("body").append(ajax_errorbox).attr('id', 'errorContainer');
+		$('#errorContainer').css({'display': 'none'});
 
 		// Find all oSettings.tag and attach the UI sortable action
 		$(oSettings.tag).sortable({
