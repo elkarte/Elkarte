@@ -69,7 +69,7 @@ class ManageMail_Controller extends Action_Controller
 			'description' => $txt['mailqueue_desc'],
 		);
 
-		// By default we want to browse, call integrate_manage_mail
+		// By default we want to browse, call integrate_sa_manage_mail
 		$subAction = $action->initialize($subActions, 'browse');
 
 		// Final bits

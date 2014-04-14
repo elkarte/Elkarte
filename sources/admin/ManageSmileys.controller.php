@@ -100,7 +100,7 @@ class ManageSmileys_Controller extends Action_Controller
 			),
 		);
 
-		// Default the sub-action to 'edit smiley settings'. call integrate_manage_smileys
+		// Default the sub-action to 'edit smiley settings'. call integrate_sa_manage_smileys
 		$subAction = $action->initialize($subActions, 'editsets');
 
 		// Set up the template

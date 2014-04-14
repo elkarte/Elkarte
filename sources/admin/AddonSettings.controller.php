@@ -72,7 +72,7 @@ class AddonSettings_Controller extends Action_Controller
 		// Set up the action controller
 		$action = new Action('modify_modifications');
 
-		// Pick the correct sub-action, call integrate_modify_modifications
+		// Pick the correct sub-action, call integrate_sa_modify_modifications
 		$subAction = $action->initialize($subActions, 'general');
 		$context['sub_action'] = $subAction;
 

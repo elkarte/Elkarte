@@ -93,7 +93,7 @@ class ManageAttachments_Controller extends Action_Controller
 			'description' => $txt['attachments_desc'],
 		);
 
-		// Get the subAction, call integrate_manage_attachments
+		// Get the subAction, call integrate_sa_manage_attachments
 		$subAction = $action->initialize($subActions, 'browse');
 		$context['sub_action'] = $subAction;
 

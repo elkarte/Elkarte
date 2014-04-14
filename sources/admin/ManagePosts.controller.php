@@ -93,7 +93,7 @@ class ManagePosts_Controller extends Action_Controller
 			),
 		);
 
-		// Default the sub-action to 'posts'. call integrate_manage_posts
+		// Default the sub-action to 'posts'. call integrate_sa_manage_posts
 		$subAction = $action->initialize($subActions, 'posts');
 
 		// Just for the template

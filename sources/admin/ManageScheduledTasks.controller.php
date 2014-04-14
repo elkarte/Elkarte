@@ -71,7 +71,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 			),
 		);
 
-		// We need to find what's the action. call integrate_manage_scheduled_tasks
+		// We need to find what's the action. call integrate_sa_manage_scheduled_tasks
 		$subAction = $action->initialize($subActions, 'tasks');
 
 		// Page details

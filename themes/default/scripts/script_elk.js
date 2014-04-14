@@ -723,7 +723,7 @@ function add_elk_mention(selector, oOptions)
 					}
 				})
 				.always(function(data, textStatus, jqXHR) {
-					if (textStatus === 'success' && $(data).find("elk > tokens > token").length !== 0)
+					if ($(data).find("elk > tokens > token").length !== 0)
 					{
 						// Reset the token
 						oSettings.token.token_id = $(data).find("tokens").find('[type="token"]').text();

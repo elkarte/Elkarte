@@ -99,7 +99,8 @@ p, fieldset, form, input, button, select, textarea, .editor {
 /* Declarations for specific elements. @todo - Maybe simplify - test. */
 .wrapper, div.windowbg, div.windowbg2,
 .roundframe, .description, .information, .successbox, .warningbox,
-.category_header, .generic_list_wrapper, .submitbutton {
+.category_header, .generic_list_wrapper, .submitbutton,
+.grid8, .grid20, .grid25, .grid30, .grid33, .grid50, #description_board .generalinfo {
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
@@ -3158,6 +3159,7 @@ div.labels {
 }
 .label_pms {
 	float: right;
+	margin-top: 5px;
 }
 .label_pms li {
 	display: inline-block;

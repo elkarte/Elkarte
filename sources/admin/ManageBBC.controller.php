@@ -55,7 +55,7 @@ class ManageBBC_Controller extends Action_Controller
 		// Set up
 		$action = new Action('manage_bbc');
 
-		// Only one option I'm afraid, but integrate_manage_bbc can add more
+		// Only one option I'm afraid, but integrate_sa_manage_bbc can add more
 		$subAction = $action->initialize($subActions, 'display');
 		$context['sub_action'] = $subAction;
 		$context['page_title'] = $txt['manageposts_bbc_settings_title'];
