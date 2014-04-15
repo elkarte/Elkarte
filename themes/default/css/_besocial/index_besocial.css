@@ -95,6 +95,9 @@ input, button, select, textarea, .editor {
 	background: #fff;
 	color: #666;
 }
+input, button, select, textarea, .editor {
+	font: 90%/130% Helvetica, Arial, "Nimbus Sans L", sans-serif;
+}
 
 input:hover, textarea:hover, button:hover, select:hover {
 	border: 1px solid #999;
@@ -227,10 +230,6 @@ strong {
 ::selection {
 	background: #7bb128;
 	color: white
-}
-#top_section_notice .button_submit {
-	position: relative;
-	top: -1.5px;
 }
 /* Other highlighted text, such as search results. */
 .highlight {
