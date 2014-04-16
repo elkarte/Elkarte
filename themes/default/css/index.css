@@ -155,7 +155,7 @@ a img {
 	.input_file    - covers input[type=file]
 */
 input, button, select, textarea, .editor {
-	font: 83.33%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", Arial, sans-serif;
+	font: 87.5%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", "Trebuchet MS", Arial, sans-serif;
 }
 /* The following is necessary. */
 /* @todo - Chase down SCEditor colours n stuff. Bleh. :P */
@@ -175,7 +175,7 @@ select::-moz-focus-inner {
 	padding: 0;
 }
 /* Apply the font only to these elements, and top align them. */
-input, button, select{
+input, button, select {
 	padding: 2px 6px;
 	vertical-align: top;
 	font-size: 0.857em;
@@ -186,6 +186,7 @@ select {
 }
 #chrome select {
 	padding: 2px;
+	height:  1.923em;
 }
 select option {
 	padding: 0 4px;
@@ -212,7 +213,6 @@ select option {
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
 	padding: 2px 6px;
 	font-size: .857em;
-	line-height: 17px;
 	display: inline-block;
 }
 .left_submit, .linkbutton_left {
@@ -257,8 +257,10 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 .button_submit.submitgo {
 	margin-bottom: 4px;
 }
-/* May not keep this. Sick of IE silliness. :P */
-#ie #search_form .button_submit, #ie #guest_form .button_submit {
+/* IE has its own padding needs for buttons */
+#ie .button_submit, #ie .button_submit, #ie .right_submit, #ie .left_submit, #ie .button_reset,
+#ie8 .button_submit, #ie8 .button_submit, #ie8 .right_submit, #ie8 .left_submit, #ie8 .button_reset,
+#ie9 .button_submit, #ie9 .button_submit, #ie9 .right_submit, #ie9 .left_submit, #ie9 .button_reset {
 	padding: 1px 6px;
 }
 
@@ -744,9 +746,8 @@ a.bbc_link {
 	float: left;
 	margin: 0;
 	padding: 14px 8px 0 8px;
-	line-height: 1.3em;
+	line-height: 1.286em;
 	min-width: 38%;
-	/* @todo - See me grumblez in Issue #552. ;) */
 }
 #top_section_notice .toggle_login {
 	display: inline;
@@ -757,12 +758,13 @@ a.bbc_link {
 	width: 100%;
 }
 .top_button {
-	line-height: 1.3em;
+	line-height: 1.286em;
 	padding: 2px;
 	margin-left: 1px;
 }
 .top_button img {
 	vertical-align: middle;
+	padding: 2px;
 }
 #password_login {
 	display: inline-block;
@@ -778,9 +780,6 @@ a.bbc_link {
 	border-radius: 0;
 	/* Webkit (bleh) fix. */
 	float: left;
-}
-#chrome #search_form .button_submit {
-	font-size: 1em;
 }
 /* The logo and slogan. */
 #header {
@@ -1356,7 +1355,7 @@ a.bbc_link {
 	bottom: 50%;
 	left: 0;
 	z-index: 9;
-	padding: 1.3em 0.1em 0 0.1em;
+	padding: 1.286em 0.1em 0 0.1em;
 	height: 1.5em;
 	font-size: 2em;
 	font-weight: bold;
@@ -2147,6 +2146,9 @@ div.core_posts {
 }
 .listlevel2>ol>li img, .listlevel2.warning img, .listlevel2.poster_ip img {
 	padding: 0 4px;
+}
+.listlevel2.poster_ip .linklevel2 {
+	display: inline;
 }
 .avatar {
 	width: auto;
@@ -3119,7 +3121,7 @@ dl.merge_topic dd {
 	height: 12px;
 }
 #personal_messages .reportlinks {
-	padding: 6px 1.3em;
+	padding: 6px 1.286em;
 }
 .pm_icon, .pm_quickmod {
 	width: 4%;
@@ -3258,7 +3260,7 @@ div.labels {
 #calendar_navigation select {
 	margin-top: 2px;
 }
-/* See, I told you there was wombatz here. */
+/* See, I told you there was deranged wombatz here. */
 /*
 			   ,.--""""--.._
 			 ."     .'      `-.
@@ -3270,9 +3272,9 @@ div.labels {
 	   ;|\'    :      `./|) \  ;/
 	   ;| \"  -,-   "-./ |;  ).;
 	   /\/              \/   );
-	  :                 \    ;
-	  :     _      _     ;   )
-	  `.   \;\    /;/    ;  /
+	  :     _            \    ;
+	  :    \0\_    _     ;   )
+	  `.          /o/    ;  /
 		!    :   :     ,/  ;
 		 (`. : _ : ,/""   ;
 		  \\\`"^" ` :    ;
