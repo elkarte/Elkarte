@@ -131,11 +131,6 @@ function template_build_poster_div($message, $ignoring = false)
 				$poster_div .= '
 											<li><a href="' . $scripturl . '?action=emailuser;sa=email;msg=' . $message['id'] . '" rel="nofollow">' . ($settings['use_image_buttons'] ? '<img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . '" />' : $txt['email']) . '</a></li>';
 
-			// Want to send them a PM, can you? @todo - This seems to be broken and IMO should be dropped anyway, at least if poster div is not hidden.
-			if ($context['can_send_pm'] && !$message['is_message_author'] && !empty($modSettings['onlineEnable']))
-				$poster_div .= '
-											<li><a href="' . $scripturl . '?action=pm;sa=send;u=' . $message['member']['id'] . '" title="' . $message['member']['online']['member_online_text'] . '"><img src="' . $message['member']['online']['image_href'] . '" alt="" /></a></li>';
-
 			$poster_div .= '
 										</ol>
 									</li>';
