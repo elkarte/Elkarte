@@ -2147,6 +2147,9 @@ div.core_posts {
 .listlevel2>ol>li img, .listlevel2.warning img, .listlevel2.poster_ip img {
 	padding: 0 4px;
 }
+.listlevel2.poster_ip .linklevel2 {
+	display: inline;
+}
 .avatar {
 	width: auto;
 	height: auto;

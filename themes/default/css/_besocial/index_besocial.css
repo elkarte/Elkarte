@@ -357,7 +357,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	color: #50aa3a;
 	font-weight: bold;
 }
-div.bbc_footnotes .meaction{
+div.bbc_footnotes .meaction {
 	display: inline-block;
 }
 
@@ -522,9 +522,6 @@ div.bbc_footnotes .meaction{
 	content: "\f0d7";
 	margin: 0 0 0 10px;
 	color: #ccc;
-}
-.poster_ip a {
-	display: inline;
 }
 .poster .linklevel2, .poster .linklevel2:hover {
 	border: 1px solid transparent !important;

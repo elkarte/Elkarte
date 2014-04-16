@@ -180,15 +180,22 @@ function template_build_poster_div($message, $ignoring = false)
 	// Show the IP to this user for this post - because you can moderate?
 	if (!empty($context['can_moderate_forum']) && !empty($message['member']['ip']))
 		$poster_div .= '
-									<li class="listlevel2 poster_ip"><a class="linklevel2 help" href="' . $scripturl . '?action=' . (!empty($message['member']['is_guest']) ? 'trackip' : 'profile;area=history;sa=ip;u=' . $message['member']['id'] . ';searchip=' . $message['member']['ip']) . '"><img src="' . $settings['images_url'] . '/ip.png" alt="" /> ' . $message['member']['ip'] . '</a><a href="' . $scripturl . '?action=quickhelp;help=see_admin_ip" onclick="return reqOverlayDiv(this.href);"><img src="' . $settings['images_url'] . '/helptopics.png" alt="(?)" /></a></li>';
+									<li class="listlevel2 poster_ip">
+										<a class="linklevel2 help" href="' . $scripturl . '?action=' . (!empty($message['member']['is_guest']) ? 'trackip' : 'profile;area=history;sa=ip;u=' . $message['member']['id'] . ';searchip=' . $message['member']['ip']) . '"><img src="' . $settings['images_url'] . '/ip.png" alt="" /> ' . $message['member']['ip'] . '</a>
+										<a class="linklevel2 help" href="' . $scripturl . '?action=quickhelp;help=see_admin_ip" onclick="return reqOverlayDiv(this.href);"><img src="' . $settings['images_url'] . '/helptopics.png" alt="(?)" /></a>
+									</li>';
 	// Or, should we show it because this is you?
 	elseif ($message['can_see_ip'] && !empty($message['member']['ip']))
 		$poster_div .= '
-									<li class="listlevel2 poster_ip"><a class="linklevel2 help" href="' . $scripturl . '?action=quickhelp;help=see_member_ip" onclick="return reqOverlayDiv(this.href);"><img src="' . $settings['images_url'] . '/ip.png" alt="" /> ' . $message['member']['ip'] . '</a></li>';
+									<li class="listlevel2 poster_ip">
+										<a class="linklevel2 help" href="' . $scripturl . '?action=quickhelp;help=see_member_ip" onclick="return reqOverlayDiv(this.href);"><img src="' . $settings['images_url'] . '/ip.png" alt="" /> ' . $message['member']['ip'] . '</a>
+									</li>';
 	// Okay, are you at least logged in?  Then we can show something about why IPs are logged...
 	elseif (!$context['user']['is_guest'])
 		$poster_div .= '
-									<li class="listlevel2 poster_ip"><a class="linklevel2 help" href="' . $scripturl . '?action=quickhelp;help=see_member_ip" onclick="return reqOverlayDiv(this.href);">' . $txt['logged'] . '</a></li>';
+									<li class="listlevel2 poster_ip">
+										<a class="linklevel2 help" href="' . $scripturl . '?action=quickhelp;help=see_member_ip" onclick="return reqOverlayDiv(this.href);">' . $txt['logged'] . '</a>
+									</li>';
 	// Otherwise, you see NOTHING!
 	else
 		$poster_div .= '
