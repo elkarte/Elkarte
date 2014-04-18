@@ -912,3 +912,4 @@ function dumpTags($data, $i, $tag = null, $xml_format = 'rss')
 		}
 	}
 }
+
