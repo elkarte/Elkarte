@@ -3508,7 +3508,7 @@ function setupMenuContext()
 						'href' => $scripturl . '?action=profile;area=account',
 						'show' => allowedTo(array('profile_identity_any', 'profile_identity_own', 'manage_membergroups')),
 					),
-					'profile' => array(
+					'forumprofile' => array(
 						'title' => $txt['forumprofile'],
 						'href' => $scripturl . '?action=profile;area=forumprofile',
 						'show' => allowedTo(array('profile_extra_any', 'profile_extra_own')),
