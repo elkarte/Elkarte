@@ -34,7 +34,8 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 		<script><!-- // --><![CDATA[
 			var $editor_data = {},
 				$editor_container = {};
-			$(document).ready(function(){',
+
+			function elk_editor() {',
 				!empty($context['bbcodes_handlers']) ? $context['bbcodes_handlers'] : '', '
 				$("#', $editor_id, '").sceditor({
 					style: "', $settings['theme_url'], '/css/', $context['theme_variant_url'], 'jquery.sceditor.elk_wiz', $context['theme_variant'], '.css",
@@ -141,7 +142,12 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					$(".sceditor-button-source").hide();
 				', isset($context['post_error']['errors']['no_message']) || isset($context['post_error']['errors']['long_message']) ? '
 				$editor_container[\'' . $editor_id . '\'].find("textarea, iframe").addClass("border_error");' : '', '
-			});
+		}
+
+		$(document).ready(function(){
+			elk_editor();
+		});
+
 		// ]]></script>';
 }
 
