@@ -4497,7 +4497,7 @@ dl.no_members {
 	}
 	ul.navigate_section li:not(:first-child):not(:last-child) a {
 		width: 3em;
-		display: inline-block;
+		display: block;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
