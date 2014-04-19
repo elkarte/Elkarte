@@ -294,7 +294,7 @@ function template_credits()
  */
 function template_view_versions()
 {
-	global $context, $scripturl, $txt;
+	global $context, $txt;
 
 	echo '
 					<div id="admincenter">
