@@ -3749,6 +3749,9 @@ dl.no_members {
 	padding: 12px 0;
 	text-align: center;
 }
+#confirm_buttons .button_submit {
+	white-space: normal;
+}
 .coppa_contact {
 	margin-left: 5ex;
 	padding: 4px;
