@@ -4003,7 +4003,6 @@ dl.no_members {
 		max-width: 95%;
 		white-space: nowrap;
 		text-overflow: ellipsis;
-		line-height: inherit;
 	}
 	.board_row {
 		min-width: 20em;
