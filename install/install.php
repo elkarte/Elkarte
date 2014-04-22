@@ -2174,9 +2174,9 @@ function template_install_above()
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="robots" content="noindex" />
 		<title>', $txt['installer'], '</title>
-		<link rel="stylesheet" href="themes/default/css/index.css?beta10" />
-		<link rel="stylesheet" href="themes/default/css/_light/index_light.css?beta10" />
-		<link rel="stylesheet" href="themes/default/css/install.css?beta10" />
+		<link rel="stylesheet" href="themes/default/css/index.css?10RC1" />
+		<link rel="stylesheet" href="themes/default/css/_light/index_light.css?10RC1" />
+		<link rel="stylesheet" href="themes/default/css/install.css?10RC1" />
 		<script src="themes/default/scripts/script.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" id="jquery"></script>
 		<script><!-- // --><![CDATA[

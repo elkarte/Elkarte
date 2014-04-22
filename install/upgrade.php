@@ -3485,9 +3485,9 @@ function template_upgrade_above()
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="robots" content="noindex" />
 		<title>', $txt['upgrade_upgrade_utility'], '</title>
-		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css?beta10" />
-		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/_light/index_light.css?beta10" />
-		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/install.css?beta10" />
+		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css?10RC1" />
+		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/_light/index_light.css?10RC1" />
+		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/install.css?10RC1" />
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" id="jquery"></script>
 		<script><!-- // --><![CDATA[
 			window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-1.11.1.min.js"><\/script>\');
