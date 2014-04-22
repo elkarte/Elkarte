@@ -11,11 +11,11 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
-define('CURRENT_VERSION', '1.0 Beta 2');
+define('CURRENT_VERSION', '1.0 RC 1');
 define('DB_SCRIPT_VERSION', '1-0');
 
 $GLOBALS['required_php_version'] = '5.2.0';
