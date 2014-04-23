@@ -67,49 +67,42 @@ function template_permission_index()
 								<a class="help" href="', $scripturl, '?action=quickhelp;help=permissions_quickgroups" onclick="return reqOverlayDiv(this.href);"><img class="icon" src="' . $settings['images_url'] . '/helptopics.png" alt="' . $txt['help'] . '" /></a>', $txt['permissions_apply_pre_defined'], ':
 							</dt>
 							<dd>
-								<div class="styled-select">
-									<select name="predefined">
-										<option value="">(', $txt['permissions_select_pre_defined'], ')</option>
-										<option value="restrict">', $txt['permitgroups_restrict'], '</option>
-										<option value="standard">', $txt['permitgroups_standard'], '</option>
-										<option value="moderator">', $txt['permitgroups_moderator'], '</option>
-										<option value="maintenance">', $txt['permitgroups_maintenance'], '</option>
-									</select>
-								</div>
+								<select name="predefined">
+									<option value="">(', $txt['permissions_select_pre_defined'], ')</option>
+									<option value="restrict">', $txt['permitgroups_restrict'], '</option>
+									<option value="standard">', $txt['permitgroups_standard'], '</option>
+									<option value="moderator">', $txt['permitgroups_moderator'], '</option>
+									<option value="maintenance">', $txt['permitgroups_maintenance'], '</option>
+								</select>
 							</dd>
 							<dt>
 								', $txt['permissions_like_group'], ':
 							</dt>
 							<dd>
-								<div class="styled-select">
-									<select name="copy_from">
-										<option value="empty">(', $txt['permissions_select_membergroup'], ')</option>';
+								<select name="copy_from">
+									<option value="empty">(', $txt['permissions_select_membergroup'], ')</option>';
 		foreach ($context['groups'] as $group_id => $group_name)
 			echo '
-										<option value="', $group_id, '">', $group_name, '</option>';
+									<option value="', $group_id, '">', $group_name, '</option>';
 
 		echo '
-									</select>
-								</div>
+								</select>
 							</dd>
 							<dt>
-								<div class="styled-select">
-									<select name="add_remove">
-										<option value="add">', $txt['permissions_add'], '...</option>
-										<option value="clear">', $txt['permissions_remove'], '...</option>';
+								<select name="add_remove">
+									<option value="add">', $txt['permissions_add'], '...</option>
+									<option value="clear">', $txt['permissions_remove'], '...</option>';
 
 		if (!empty($modSettings['permission_enable_deny']))
 			echo '
-										<option value="deny">', $txt['permissions_deny'], '...</option>';
+									<option value="deny">', $txt['permissions_deny'], '...</option>';
 
 		echo '
-									</select>
-								</div>
+								</select>
 							</dt>
 							<dd style="overflow:auto;">
-								<div class="styled-select">
-									<select name="permissions">
-										<option value="">(', $txt['permissions_select_permission'], ')</option>';
+								<select name="permissions">
+									<option value="">(', $txt['permissions_select_permission'], ')</option>';
 
 		foreach ($context['permissions'] as $permissionType)
 		{
@@ -124,7 +117,7 @@ function template_permission_index()
 						continue;
 
 					echo '
-										<option value="" disabled="disabled">[', $permissionGroup['name'], ']</option>';
+									<option value="" disabled="disabled">[', $permissionGroup['name'], ']</option>';
 					foreach ($permissionGroup['permissions'] as $perm)
 					{
 						if ($perm['hidden'])
@@ -132,19 +125,18 @@ function template_permission_index()
 
 						if ($perm['has_own_any'])
 							echo '
-										<option value="', $permissionType['id'], '/', $perm['own']['id'], '">&nbsp;&nbsp;&nbsp;', $perm['name'], ' (', $perm['own']['name'], ')</option>
-										<option value="', $permissionType['id'], '/', $perm['any']['id'], '">&nbsp;&nbsp;&nbsp;', $perm['name'], ' (', $perm['any']['name'], ')</option>';
+									<option value="', $permissionType['id'], '/', $perm['own']['id'], '">&nbsp;&nbsp;&nbsp;', $perm['name'], ' (', $perm['own']['name'], ')</option>
+									<option value="', $permissionType['id'], '/', $perm['any']['id'], '">&nbsp;&nbsp;&nbsp;', $perm['name'], ' (', $perm['any']['name'], ')</option>';
 						else
 							echo '
-										<option value="', $permissionType['id'], '/', $perm['id'], '">&nbsp;&nbsp;&nbsp;', $perm['name'], '</option>';
+									<option value="', $permissionType['id'], '/', $perm['id'], '">&nbsp;&nbsp;&nbsp;', $perm['name'], '</option>';
 					}
 				}
 			}
 		}
 
 		echo '
-									</select>
-								</div>
+								</select>
 							</dd>
 						</dl>
 					</fieldset>
@@ -276,16 +268,14 @@ function template_by_board()
 			if ($context['edit_all'])
 			{
 				echo '
-								<div class="styled-select">
-									<select name="boardprofile[', $board['id'], ']">';
+								<select name="boardprofile[', $board['id'], ']">';
 
 				foreach ($context['profiles'] as $id => $profile)
 					echo '
-										<option value="', $id, '" ', $id == $board['profile'] ? 'selected="selected"' : '', '>', $profile['name'], '</option>';
+									<option value="', $id, '" ', $id == $board['profile'] ? 'selected="selected"' : '', '>', $profile['name'], '</option>';
 
 				echo '
-									</select>
-								</div>
+								</select>
 							</span>';
 			}
 			else
@@ -404,16 +394,14 @@ function template_edit_profiles()
 							<strong><label for="copy_from">', $txt['permissions_profile_copy_from'], '</label>:</strong>
 						</dt>
 						<dd>
-							<div class="styled-select">
-								<select id="copy_from" name="copy_from">';
+							<select id="copy_from" name="copy_from">';
 
 	foreach ($context['profiles'] as $id => $profile)
 		echo '
-									<option value="', $id, '">', $profile['name'], '</option>';
+								<option value="', $id, '">', $profile['name'], '</option>';
 
 	echo '
-								</select>
-							</div>
+							</select>
 						</dd>
 					</dl>
 					<hr />
@@ -800,17 +788,15 @@ function template_postmod_permissions()
 	echo '
 				<div class="submitbutton">
 					', $txt['permissions_post_moderation_select'], ':
-					<div class="styled-select">
-						<select name="pid" onchange="document.forms.postmodForm.submit();">';
+					<select name="pid" onchange="document.forms.postmodForm.submit();">';
 
 	foreach ($context['profiles'] as $profile)
 		if ($profile['can_modify'])
 			echo '
-							<option value="', $profile['id'], '" ', $profile['id'] == $context['current_profile'] ? 'selected="selected"' : '', '>', $profile['name'], '</option>';
+						<option value="', $profile['id'], '" ', $profile['id'] == $context['current_profile'] ? 'selected="selected"' : '', '>', $profile['name'], '</option>';
 
 	echo '
-						</select>
-					</div>
+					</select>
 					<input type="submit" value="', $txt['go'], '" class="button_submit" />
 				</div>
 				<table class="table_grid">

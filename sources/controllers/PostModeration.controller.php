@@ -438,14 +438,12 @@ class PostModeration_Controller extends Action_Controller
 				array(
 					'position' => 'bottom_of_list',
 					'value' => '
-						<div class="styled-select">
-							<select name="do" onchange="if (this.value != 0 &amp;&amp; confirm(\'' . $txt['mc_unapproved_sure'] . '\')) submit();">
-								<option value="0">' . $txt['with_selected'] . ':</option>
-								<option value="0" disabled="disabled">' . str_repeat('&#8212;', strlen($txt['approve'])) . '</option>
-								<option value="approve">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $txt['approve'] . '</option>
-								<option value="delete">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $txt['delete'] . '</option>
-							</select>
-						</div>
+						<select name="do" onchange="if (this.value != 0 &amp;&amp; confirm(\'' . $txt['mc_unapproved_sure'] . '\')) submit();">
+							<option value="0">' . $txt['with_selected'] . ':</option>
+							<option value="0" disabled="disabled">' . str_repeat('&#8212;', strlen($txt['approve'])) . '</option>
+							<option value="approve">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $txt['approve'] . '</option>
+							<option value="delete">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $txt['delete'] . '</option>
+						</select>
 						<noscript><input type="submit" name="ml_go" value="' . $txt['go'] . '" class="right_submit" /></noscript>',
 					'class' => 'floatright',
 				),

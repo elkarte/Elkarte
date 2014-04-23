@@ -53,7 +53,6 @@ template_ssi_above();
 <p>Need more information on using SSI.php? Check out <a href="https://github.com/elkarte/Elkarte/wiki/SSI">Using SSI.php article</a> or <a href="http://www.elkarte.net/index.php">ask on the forum</a>.</p>
 
 <div id="sidenav" class="windowbg">
-	<span class="topslice"><span></span></span>
 	<div class="content">
 		<h2 id="functionlist">Function List</h2>
 		<h3>Recent Items</h3>
@@ -139,11 +138,9 @@ template_ssi_above();
 					return false;">Hide all examples</a></li>
 		</ul>
 	</div>
-	<span class="botslice"><span></span></span>
 </div>
 
 <div id="preview" class="windowbg2">
-	<span class="topslice"><span></span></span>
 	<div class="content">
 
 		<!-- RECENT ITEMS -->
@@ -485,7 +482,6 @@ flush();
 			<iframe src="?view=home1" style="width: 99%; height: 300px;"></iframe>
 		</div>
 	</div>
-	<span class="botslice"><span></span></span>
 </div>
 
 <?php

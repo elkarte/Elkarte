@@ -181,12 +181,10 @@ function list_integration_hooks_data($start, $per_page, $sort)
 		addInlineJavascript('
 			var hook_name_header = document.getElementById(\'header_list_integration_hooks_hook_name\');
 			hook_name_header.innerHTML += ' . JavaScriptEscape('
-				<div class="styled-select">
-					<select onchange="window.location = \'' . $scripturl . '?action=admin;area=maintain;sa=hooks\' + (this.value ? \';filter=\' + this.value : \'\');">
-						<option>---</option>
-						<option value="">' . $txt['hooks_reset_filter'] . '</option>' . implode('', $hooks_filters) . '</select>' . '
-					</select>
-				</div>') . ';', true);
+				<select onchange="window.location = \'' . $scripturl . '?action=admin;area=maintain;sa=hooks\' + (this.value ? \';filter=\' + this.value : \'\');">
+					<option>---</option>
+					<option value="">' . $txt['hooks_reset_filter'] . '</option>' . implode('', $hooks_filters) . '</select>' . '
+				</select>') . ';', true);
 
 	$temp_data = array();
 	$id = 0;

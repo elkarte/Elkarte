@@ -1858,37 +1858,6 @@ function getMember($search, $buddies = array())
 }
 
 /**
- * Nifty function to calculate the number of days ago a given date was.
- *
- * - Requires a unix timestamp as input, returns an integer.
- * - Named in honour of Jeff Lewis, the original creator of...this function.
- *
- * @package Members
- * @param int $old
- * @return int the returned number of days, based on the forum time.
- */
-function jeffsdatediff($old)
-{
-	// Get the current time as the user would see it...
-	$forumTime = forum_time();
-
-	// Calculate the seconds that have passed since midnight.
-	$sinceMidnight = date('H', $forumTime) * 60 * 60 + date('i', $forumTime) * 60 + date('s', $forumTime);
-
-	// Take the difference between the two times.
-	$dis = time() - $old;
-
-	// Before midnight?
-	if ($dis < $sinceMidnight)
-		return 0;
-	else
-		$dis -= $sinceMidnight;
-
-	// Divide out the seconds in a day to get the number of days.
-	return ceil($dis / (24 * 60 * 60));
-}
-
-/**
  * Retrieves MemberData based on conditions
  *
  * @package Members

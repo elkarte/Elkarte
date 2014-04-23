@@ -120,50 +120,44 @@ function template_maintenance()
 					<dl class="settings">
 						<dt><label for="from">', $txt['attachment_transfer_from'], '</label></dt>
 						<dd>
-							<div class="styled-select">
-								<select id="from" name="from">
-									<option value="0">', $txt['attachment_transfer_select'], '</option>';
+							<select id="from" name="from">
+								<option value="0">', $txt['attachment_transfer_select'], '</option>';
 
 	foreach ($context['attach_dirs'] as $id => $dir)
 		echo '
-									<option value="', $id, '">', $dir, '</option>';
+								<option value="', $id, '">', $dir, '</option>';
 
 	echo '
-								</select>
-							</div>
+							</select>
 						</dd>
 						<dt><label for="auto">', $txt['attachment_transfer_auto'], '</label></dt>
 						<dd>
-							<div class="styled-select">
-								<select id="auto" name="auto" onchange="transferAttachOptions();">
-									<option value="0">', $txt['attachment_transfer_auto_select'], '</option>
-									<option value="-1">', $txt['attachment_transfer_forum_root'], '</option>';
+							<select id="auto" name="auto" onchange="transferAttachOptions();">
+								<option value="0">', $txt['attachment_transfer_auto_select'], '</option>
+								<option value="-1">', $txt['attachment_transfer_forum_root'], '</option>';
 
 	if (!empty($context['base_dirs']))
 		foreach ($context['base_dirs'] as $id => $dir)
 			echo '
-									<option value="', $id, '">', $dir, '</option>';
+								<option value="', $id, '">', $dir, '</option>';
 	else
 		echo '
-									<option value="0" disabled="disabled">', $txt['attachment_transfer_no_base'], '</option>';
+								<option value="0" disabled="disabled">', $txt['attachment_transfer_no_base'], '</option>';
 
 	echo '
-								</select>
-							</div>
+							</select>
 						</dd>
 						<dt><label for="to">', $txt['attachment_transfer_to'], '</label></dt>
 						<dd>
-							<div class="styled-select">
-								<select id="to" name="to" onchange="transferAttachOptions();" >
-									<option value="0">', $txt['attachment_transfer_select'], '</option>';
+							<select id="to" name="to" onchange="transferAttachOptions();" >
+								<option value="0">', $txt['attachment_transfer_select'], '</option>';
 
 	foreach ($context['attach_dirs'] as $id => $dir)
 		echo '
-									<option value="', $id, '">', $dir, '</option>';
+								<option value="', $id, '">', $dir, '</option>';
 
 	echo '
-								</select>
-							</div>
+							</select>
 						</dd>';
 
 	// If there are directory limits to impose, give the option to enforce it

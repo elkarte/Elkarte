@@ -241,7 +241,7 @@ class News_Controller extends Action_Controller
 			<generator>ElkArte</generator>
 			<ttl>30</ttl>
 			<image>
-				<url>', $settings['default_theme_dir'], '/images/logo.png</url>
+				<url>', $settings['default_theme_url'], '/images/logo.png</url>
 				<title>', $feed_title, '</title>
 				<link>', $scripturl, '</link>
 			</image>';
@@ -912,3 +912,4 @@ function dumpTags($data, $i, $tag = null, $xml_format = 'rss')
 		}
 	}
 }
+

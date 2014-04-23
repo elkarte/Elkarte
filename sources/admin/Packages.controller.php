@@ -99,7 +99,7 @@ class Packages_Controller extends Action_Controller
 			),
 		);
 
-		// Work out exactly who it is we are calling. call integrate_packages
+		// Work out exactly who it is we are calling. call integrate_sa_packages
 		$subAction = $action->initialize($subActions, 'browse');
 
 		// Set up for the template

@@ -420,19 +420,6 @@ class Xml_Controller extends Action_Controller
 				else
 					$errors[] = array('value' => $txt['mboards_board_error']);
 			}
-
-			// New generic token for use
-			createToken('admin-sort', 'post');
-			$tokens = array(
-				array(
-					'value' => $context['admin-sort_token'],
-					'attributes' => array('type' => 'token'),
-				),
-				array(
-					'value' => $context['admin-sort_token_var'],
-					'attributes' => array('type' => 'token_var'),
-				),
-			);
 		}
 		// Failed validation, extra work for you I'm afraid
 		else
@@ -443,6 +430,19 @@ class Xml_Controller extends Action_Controller
 			if (empty($validation_token))
 				$errors[] = array('value' => $txt['token_verify_fail']);
 		}
+		
+		// New generic token for use
+		createToken('admin-sort', 'post');
+		$tokens = array(
+			array(
+				'value' => $context['admin-sort_token'],
+				'attributes' => array('type' => 'token'),
+			),
+			array(
+				'value' => $context['admin-sort_token_var'],
+				'attributes' => array('type' => 'token_var'),
+			),
+		);
 
 		// Return the response
 		$context['sub_template'] = 'generic_xml';
