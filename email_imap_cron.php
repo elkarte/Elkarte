@@ -90,6 +90,11 @@ class PBE_IMAP
 	protected $_is_gmail = false;
 
 	/**
+	 * Are we going to delete the emails once read?
+	 */
+	protected $_delete = false;
+
+	/**
 	 * The inbox object
 	 */
 	protected $_inbox = null;
