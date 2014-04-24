@@ -53,7 +53,7 @@ class DbTable_MySQL extends DbTable
 	/**
 	 * DbTable_MySQL::construct
 	 */
-	private function __construct()
+	private function __construct($_db)
 	{
 		global $db_prefix;
 
@@ -74,6 +74,9 @@ class DbTable_MySQL extends DbTable
 
 		// let's be sure.
 		$this->_package_log = array();
+
+		// This executes queries and things
+		$this->_db = $_db;
 	}
 
 	/**
@@ -125,9 +128,6 @@ class DbTable_MySQL extends DbTable
 		// Log that we'll want to remove this on uninstall.
 		$this->_package_log[] = array('remove_table', $table_name);
 
-		// Grab ourselves one o'these.
-		$db = database();
-
 		// Slightly easier on MySQL than the others...
 		if ($this->table_exists($full_table_name))
 		{
@@ -166,7 +166,7 @@ class DbTable_MySQL extends DbTable
 		$table_query .= ') ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci';
 
 		// Create the table!
-		$db->query('', $table_query,
+		$this->_db->query('', $table_query,
 			array(
 				'security_override' => true,
 			)
@@ -186,9 +186,6 @@ class DbTable_MySQL extends DbTable
 	{
 		global $db_prefix;
 
-		// working hard with the db!
-		$db = database();
-
 		// After stripping away the database name, this is what's left.
 		$real_prefix = preg_match('~^(`?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
 
@@ -204,7 +201,7 @@ class DbTable_MySQL extends DbTable
 		if ($this->table_exists($full_table_name))
 		{
 			$query = 'DROP TABLE ' . $table_name;
-			$db->query('',
+			$this->_db->query('',
 				$query,
 				array(
 					'security_override' => true,
@@ -231,9 +228,6 @@ class DbTable_MySQL extends DbTable
 	{
 		global $db_prefix;
 
-		// working hard with the db!
-		$db = database();
-
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
 		// Log that we will want to uninstall this!
@@ -256,7 +250,7 @@ class DbTable_MySQL extends DbTable
 			ALTER TABLE ' . $table_name . '
 			ADD ' . $this->_db_create_query_column($column_info) . (empty($column_info['auto']) ? '' : ' primary key');
 
-		$db->query('', $query,
+		$this->_db->query('', $query,
 			array(
 				'security_override' => true,
 			)
@@ -277,9 +271,6 @@ class DbTable_MySQL extends DbTable
 	{
 		global $db_prefix;
 
-		// need this thing
-		$db = database();
-
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
 		// Does it exist?
@@ -287,7 +278,7 @@ class DbTable_MySQL extends DbTable
 		foreach ($columns as $column)
 			if ($column['name'] == $column_name)
 			{
-				$db->query('', '
+				$this->_db->query('', '
 					ALTER TABLE ' . $table_name . '
 					DROP COLUMN ' . $column_name,
 					array(
@@ -314,9 +305,6 @@ class DbTable_MySQL extends DbTable
 	public function db_change_column($table_name, $old_column, $column_info, $parameters = array(), $error = 'fatal')
 	{
 		global $db_prefix;
-
-		// need this thing
-		$db = database();
 
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
@@ -347,7 +335,7 @@ class DbTable_MySQL extends DbTable
 		if (!isset($column_info['unsigned']) || !in_array($column_info['type'], array('int', 'tinyint', 'smallint', 'mediumint', 'bigint')))
 			$column_info['unsigned'] = '';
 
-		$db->query('', '
+		$this->_db->query('', '
 			ALTER TABLE ' . $table_name . '
 			CHANGE COLUMN `' . $old_column . '` ' . $this->_db_create_query_column($column_info),
 			array(
@@ -368,9 +356,6 @@ class DbTable_MySQL extends DbTable
 	public function db_add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
 	{
 		global $db_prefix;
-
-		// need this thing
-		$db = database();
 
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
@@ -413,7 +398,7 @@ class DbTable_MySQL extends DbTable
 		// If we're here we know we don't have the index - so just add it.
 		if (!empty($index_info['type']) && $index_info['type'] == 'primary')
 		{
-			$db->query('', '
+			$this->_db->query('', '
 				ALTER TABLE ' . $table_name . '
 				ADD PRIMARY KEY (' . $columns . ')',
 				array(
@@ -423,7 +408,7 @@ class DbTable_MySQL extends DbTable
 		}
 		else
 		{
-			$db->query('', '
+			$this->_db->query('', '
 				ALTER TABLE ' . $table_name . '
 				ADD ' . (isset($index_info['type']) && $index_info['type'] == 'unique' ? 'UNIQUE' : 'INDEX') . ' ' . $index_info['name'] . ' (' . $columns . ')',
 				array(
@@ -445,9 +430,6 @@ class DbTable_MySQL extends DbTable
 	{
 		global $db_prefix;
 
-		// Need this
-		$db = database();
-
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
 		// Better exist!
@@ -459,7 +441,7 @@ class DbTable_MySQL extends DbTable
 			if ($index['type'] == 'primary' && $index_name == 'primary')
 			{
 				// Dropping primary key?
-				$db->query('', '
+				$this->_db->query('', '
 					ALTER TABLE ' . $table_name . '
 					DROP PRIMARY KEY',
 					array(
@@ -473,7 +455,7 @@ class DbTable_MySQL extends DbTable
 			if ($index['name'] == $index_name)
 			{
 				// Drop the bugger...
-				$db->query('', '
+				$this->_db->query('', '
 					ALTER TABLE ' . $table_name . '
 					DROP INDEX ' . $index_name,
 					array(
@@ -533,12 +515,9 @@ class DbTable_MySQL extends DbTable
 	{
 		global $db_prefix;
 
-		// make sure db is available
-		$db = database();
-
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
-		$result = $db->query('', '
+		$result = $this->_db->query('', '
 			SHOW FIELDS
 			FROM {raw:table_name}',
 			array(
@@ -546,7 +525,7 @@ class DbTable_MySQL extends DbTable
 			)
 		);
 		$columns = array();
-		while ($row = $db->fetch_assoc($result))
+		while ($row = $this->_db->fetch_assoc($result))
 		{
 			if (!$detail)
 			{
@@ -587,7 +566,7 @@ class DbTable_MySQL extends DbTable
 				}
 			}
 		}
-		$db->free_result($result);
+		$this->_db->free_result($result);
 
 		return $columns;
 	}
@@ -604,12 +583,9 @@ class DbTable_MySQL extends DbTable
 	{
 		global $db_prefix;
 
-		// make sure db is available
-		$db = database();
-
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
-		$result = $db->query('', '
+		$result = $this->_db->query('', '
 			SHOW KEYS
 			FROM {raw:table_name}',
 			array(
@@ -617,7 +593,7 @@ class DbTable_MySQL extends DbTable
 			)
 		);
 		$indexes = array();
-		while ($row = $db->fetch_assoc($result))
+		while ($row = $this->_db->fetch_assoc($result))
 		{
 			if (!$detail)
 				$indexes[] = $row['Key_name'];
@@ -650,7 +626,7 @@ class DbTable_MySQL extends DbTable
 					$indexes[$row['Key_name']]['columns'][] = $row['Column_name'];
 			}
 		}
-		$db->free_result($result);
+		$this->_db->free_result($result);
 
 		return $indexes;
 	}
@@ -662,16 +638,13 @@ class DbTable_MySQL extends DbTable
 	 */
 	private function _db_create_query_column($column)
 	{
-		// make sure db is available
-		$db = database();
-
 		// Auto increment is easy here!
 		if (!empty($column['auto']))
 		{
 			$default = 'auto_increment';
 		}
 		elseif (isset($column['default']) && $column['default'] !== null)
-			$default = 'default \'' . $db->escape_string($column['default']) . '\'';
+			$default = 'default \'' . $this->_db->escape_string($column['default']) . '\'';
 		else
 			$default = '';
 
@@ -687,6 +660,54 @@ class DbTable_MySQL extends DbTable
 
 		// Now just put it together!
 		return '`' .$column['name'] . '` ' . $type . ' ' . (!empty($unsigned) ? $unsigned : '') . (!empty($column['null']) ? '' : 'NOT NULL') . ' ' . $default;
+	}
+
+	/**
+	 * This function optimizes a table.
+	 *
+	 * @param string $table - the table to be optimized
+	 *
+	 * @return int how much it was gained
+	 */
+	public function optimize($table)
+	{
+		global $db_prefix;
+
+		$table = str_replace('{db_prefix}', $db_prefix, $table);
+
+		// Get how much overhead there is.
+		$request = $this->_db->query('', '
+			SHOW TABLE STATUS LIKE {string:table_name}',
+			array(
+				'table_name' => str_replace('_', '\_', $table),
+			)
+		);
+		$row = $this->_db->fetch_assoc($request);
+		$this->_db->free_result($request);
+
+		$data_before = isset($row['Data_free']) ? $row['Data_free'] : 0;
+		$request = $this->_db->query('', '
+			OPTIMIZE TABLE `{raw:table}`',
+			array(
+				'table' => $table,
+			)
+		);
+		if (!$request)
+			return -1;
+
+		// How much left?
+		$request = $this->_db->query('', '
+			SHOW TABLE STATUS LIKE {string:table}',
+			array(
+				'table' => str_replace('_', '\_', $table),
+			)
+		);
+		$row = $this->_db->fetch_assoc($request);
+		$this->_db->free_result($request);
+
+		$total_change = isset($row['Data_free']) && $data_before > $row['Data_free'] ? $data_before / 1024 : 0;
+
+		return $total_change;
 	}
 
 	/**

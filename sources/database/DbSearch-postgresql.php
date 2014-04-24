@@ -110,13 +110,14 @@ class DbSearch_PostgreSQL implements DbSearch
 		global $db_prefix, $txt;
 
 		$db = database();
+		$db_table = db_table();
 
 		$table_info = array();
 
 		// In order to report the sizes correctly we need to perform vacuum (optimize) on the tables we will be using.
-		$db->db_optimize_table('{db_prefix}messages');
-		if ($db->table_exists('{db_prefix}log_search_words'))
-			$db->db_optimize_table('{db_prefix}log_search_words');
+		$db_table->optimize('{db_prefix}messages');
+		if ($db_table->table_exists('{db_prefix}log_search_words'))
+			$db_table->optimize('{db_prefix}log_search_words');
 
 		// PostGreSql has some hidden sizes.
 		$request = $db->query('', '

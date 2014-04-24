@@ -23,6 +23,13 @@ if (!defined('ELK'))
  */
 abstract class DbTable
 {
+
+	/**
+	 * We need a way to interact with the database
+	 * @var Database
+	 */
+	protected $_db = null;
+
 	/**
 	 * This function can be used to create a table without worrying about schema
 	 *  compatabilities across supported database systems.

@@ -1117,47 +1117,15 @@ class Database_MySQL implements Database
 	 *
 	 * @param string $table - the table to be optimized
 	 *
+	 * @deprecated since 1.1 - the function was moved to DbTable class
+	 *
 	 * @return int how much it was gained
 	 */
 	public function db_optimize_table($table)
 	{
-		global $db_prefix;
+		$db_table = db_table();
 
-		$table = str_replace('{db_prefix}', $db_prefix, $table);
-
-		// Get how much overhead there is.
-		$request = $this->query('', '
-			SHOW TABLE STATUS LIKE {string:table_name}',
-			array(
-				'table_name' => str_replace('_', '\_', $table),
-			)
-		);
-		$row = $this->fetch_assoc($request);
-		$this->free_result($request);
-
-		$data_before = isset($row['Data_free']) ? $row['Data_free'] : 0;
-		$request = $this->query('', '
-			OPTIMIZE TABLE `{raw:table}`',
-			array(
-				'table' => $table,
-			)
-		);
-		if (!$request)
-			return -1;
-
-		// How much left?
-		$request = $this->query('', '
-			SHOW TABLE STATUS LIKE {string:table}',
-			array(
-				'table' => str_replace('_', '\_', $table),
-			)
-		);
-		$row = $this->fetch_assoc($request);
-		$this->free_result($request);
-
-		$total_change = isset($row['Data_free']) && $data_before > $row['Data_free'] ? $data_before / 1024 : 0;
-
-		return $total_change;
+		return $db_table->optimize($table);
 	}
 
 	/**

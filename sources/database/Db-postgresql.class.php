@@ -1102,30 +1102,16 @@ class Database_PostgreSQL implements Database
 	 * This function optimizes a table.
 	 *
 	 * @param string $table - the table to be optimized
+	 *
+	 * @deprecated since 1.1 - the function was moved to DbTable class
+	 *
 	 * @return int how much it was gained
 	 */
 	public function db_optimize_table($table)
 	{
-		global $db_prefix;
+		$db_table = db_table();
 
-		$table = str_replace('{db_prefix}', $db_prefix, $table);
-
-		$request = $this->query('', '
-			VACUUM ANALYZE {raw:table}',
-			array(
-				'table' => $table,
-			)
-		);
-		if (!$request)
-			return -1;
-
-		$row = $this->fetch_assoc($request);
-		$this->free_result($request);
-
-		if (isset($row['Data_free']))
-			return $row['Data_free'] / 1024;
-		else
-			return 0;
+		return $db_table->optimize($table);
 	}
 
 	/**
