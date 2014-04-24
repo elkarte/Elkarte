@@ -57,6 +57,14 @@ abstract class SearchAPI
 		return true;
 	}
 
+	/**
+	 * Escape words passed by the client
+	 *
+	 * @param string $phrase - The string to escape
+	 * @param bool $no_regexp - If true or $modSettings['search_match_words']
+	 *              is empty, uses % at the beginning and end of the string,
+	 *              otherwise returns a regular expression
+	 */
 	public function prepareWord($phrase, $no_regexp)
 	{
 		global $modSettings;
