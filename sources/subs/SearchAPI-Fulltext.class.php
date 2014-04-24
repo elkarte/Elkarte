@@ -25,7 +25,7 @@ if (!defined('ELK'))
  *
  * @package Search
  */
-class Fulltext_Search
+class Fulltext_Search extends SearchAPI
 {
 	/**
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
@@ -56,6 +56,12 @@ class Fulltext_Search
 	 * @var int
 	 */
 	protected $min_word_length = 4;
+
+	/**
+	 * Any word excluded from the search?
+	 * @var array
+	 */
+	protected $_excludedWords = array();
 
 	/**
 	 * What databases support the fulltext index?
@@ -94,6 +100,7 @@ class Fulltext_Search
 		switch ($methodName)
 		{
 			case 'searchSort':
+			case 'setExcludedWords':
 			case 'prepareIndexes':
 			case 'indexedWordQuery':
 				return true;
@@ -149,12 +156,20 @@ class Fulltext_Search
 	 */
 	public function searchSort($a, $b)
 	{
-		global $excludedWords;
-
-		$x = Util::strlen($a) - (in_array($a, $excludedWords) ? 1000 : 0);
-		$y = Util::strlen($b) - (in_array($b, $excludedWords) ? 1000 : 0);
+		$x = Util::strlen($a) - (in_array($a, $this->_excludedWords) ? 1000 : 0);
+		$y = Util::strlen($b) - (in_array($b, $this->_excludedWords) ? 1000 : 0);
 
 		return $x < $y ? 1 : ($x > $y ? -1 : 0);
+	}
+
+	/**
+	 * Adds the excluded words list
+	 *
+	 * @param string[] $words An array of words
+	 */
+	public function setExcludedWords($words)
+	{
+		$this->_excludedWords = $words;
 	}
 
 	/**
@@ -231,7 +246,7 @@ class Fulltext_Search
 			foreach ($words['words'] as $regularWord)
 			{
 				$query_where[] = 'm.body' . (in_array($regularWord, $query_params['excluded_words']) ? ' NOT' : '') . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' LIKE ' : 'RLIKE') . '{string:complex_body_' . $count . '}';
-				$query_params['complex_body_' . $count++] = empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? '%' . strtr($regularWord, array('_' => '\\_', '%' => '\\%')) . '%' : '[[:<:]]' . addcslashes(preg_replace(array('/([\[\]$.+*?|{}()])/'), array('[$1]'), $regularWord), '\\\'') . '[[:>:]]';
+				$query_params['complex_body_' . $count++] = $this->prepareWord($regularWord, $search_data['no_regexp']);
 			}
 
 		if ($query_params['user_query'])
@@ -250,14 +265,14 @@ class Fulltext_Search
 			foreach ($query_params['excluded_phrases'] as $phrase)
 			{
 				$query_where[] = 'subject NOT ' . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' LIKE ' : 'RLIKE') . '{string:exclude_subject_phrase_' . $count . '}';
-				$query_params['exclude_subject_phrase_' . $count++] = empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? '%' . strtr($phrase, array('_' => '\\_', '%' => '\\%')) . '%' : '[[:<:]]' . addcslashes(preg_replace(array('/([\[\]$.+*?|{}()])/'), array('[$1]'), $phrase), '\\\'') . '[[:>:]]';
+				$query_params['exclude_subject_phrase_' . $count++] = $this->prepareWord($phrase, $search_data['no_regexp']);
 			}
 		$count = 0;
 		if (!empty($query_params['excluded_subject_words']) && empty($modSettings['search_force_index']))
 			foreach ($query_params['excluded_subject_words'] as $excludedWord)
 			{
 				$query_where[] = 'subject NOT ' . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' LIKE ' : 'RLIKE') . '{string:exclude_subject_words_' . $count . '}';
-				$query_params['exclude_subject_words_' . $count++] = empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? '%' . strtr($excludedWord, array('_' => '\\_', '%' => '\\%')) . '%' : '[[:<:]]' . addcslashes(preg_replace(array('/([\[\]$.+*?|{}()])/'), array('[$1]'), $excludedWord), '\\\'') . '[[:>:]]';
+				$query_params['exclude_subject_words_' . $count++] = $this->prepareWord($excludedWord, $search_data['no_regexp']);
 			}
 
 		if (!empty($modSettings['search_simple_fulltext']))

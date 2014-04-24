@@ -25,7 +25,7 @@ if (!defined('ELK'))
  *
  * @package Search
  */
-class Standard_Search
+class Standard_Search extends SearchAPI
 {
 	/**
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.

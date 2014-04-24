@@ -31,7 +31,7 @@ if (!defined('ELK'))
  *
  * @package Search
  */
-class Sphinx_Search
+class Sphinx_Search extends SearchAPI
 {
 	/**
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
@@ -62,6 +62,12 @@ class Sphinx_Search
 	 * @var int
 	 */
 	protected $min_word_length = 4;
+
+	/**
+	 * Any word excluded from the search?
+	 * @var array
+	 */
+	protected $_excludedWords = array();
 
 	/**
 	 * What databases are supported?
@@ -98,6 +104,7 @@ class Sphinx_Search
 		{
 			case 'isValid':
 			case 'searchSort':
+			case 'setExcludedWords':
 			case 'prepareIndexes':
 				return true;
 			break;
@@ -131,12 +138,20 @@ class Sphinx_Search
 	 */
 	public function searchSort($a, $b)
 	{
-		global $excludedWords;
-
-		$x = strlen($a) - (in_array($a, $excludedWords) ? 1000 : 0);
-		$y = strlen($b) - (in_array($b, $excludedWords) ? 1000 : 0);
+		$x = strlen($a) - (in_array($a, $this->_excludedWords) ? 1000 : 0);
+		$y = strlen($b) - (in_array($b, $this->_excludedWords) ? 1000 : 0);
 
 		return $x < $y ? 1 : ($x > $y ? -1 : 0);
+	}
+
+	/**
+	 * Adds the excluded words list
+	 *
+	 * @param string[] $words An array of words
+	 */
+	public function setExcludedWords($words)
+	{
+		$this->_excludedWords = $words;
 	}
 
 	/**
