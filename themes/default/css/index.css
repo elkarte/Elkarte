@@ -3977,6 +3977,7 @@ dl.no_members {
 	}
 	.topic_latest {
 		min-width: 15em;
+		display: block;
 	}
 	.board_avatar {
 		display: none;
@@ -3996,6 +3997,11 @@ dl.no_members {
 	.button_title, .topic_moderation_alt {
 		display: none;
 	}
+	.topic_moderation {
+		display: inline-block;
+		float: right;
+		width: auto;
+	}
 	#collapse_button {
 		display: none;
 	}
@@ -4006,6 +4012,12 @@ dl.no_members {
 		max-width: 95%;
 		white-space: nowrap;
 		text-overflow: ellipsis;
+	}
+	.topic_lastpost {
+		min-width: 18em;
+	}
+	.topic_latest.relative .topic_lastpost {
+		min-width: 16em;
 	}
 	.board_row {
 		min-width: 20em;
