@@ -330,12 +330,13 @@ class Database_MySQL implements Database
 		// Debugging.
 		if ($db_show_debug === true)
 		{
+			$debug = Debug::get();
 			// Get the file and line number this function was called.
 			list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);
 
 			if (!empty($_SESSION['debug_redirect']))
 			{
-				Debug::get()->merge_db($_SESSION['debug_redirect']);
+				$debug->merge_db($_SESSION['debug_redirect']);
 				// @todo this may be off by 1
 				$this->_query_count += count($_SESSION['debug_redirect']);
 				$_SESSION['debug_redirect'] = array();
@@ -409,7 +410,7 @@ class Database_MySQL implements Database
 		if ($db_show_debug === true)
 		{
 			$db_cache['t'] = microtime(true) - $st;
-			Debug::get()->db($db_cache);
+			$debug->db($db_cache);
 		}
 
 		return $ret;

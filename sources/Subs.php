@@ -3698,6 +3698,10 @@ function call_integration_buffer()
 		'CONTROLLERDIR' => CONTROLLERDIR,
 		'SUBSDIR' => SUBSDIR,
 	);
+
+	if ($db_show_debug === true)
+		Debug::get()->add('hooks', 'integrate_buffer');
+
 	if (!empty($settings['theme_dir']))
 		$path_replacements['$themedir'] = $settings['theme_dir'];
 

@@ -56,10 +56,11 @@ class AdminDebug_Controller extends Action_Controller
 		// Don't allow except for administrators.
 		isAllowedTo('admin_forum');
 
+		$debug = Debug::get();
 		// If we're just hiding/showing, do it now.
 		if (isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'hide')
 		{
-			Debug::get()->toggleViewQueries();
+			$debug->toggleViewQueries();
 
 			if (strpos($_SESSION['old_url'], 'action=viewquery') !== false)
 				redirectexit();
@@ -76,7 +77,7 @@ class AdminDebug_Controller extends Action_Controller
 		loadTemplate('Admin');
 
 		$context['sub_template'] = 'viewquery';
-		$context['queries_data'] = Debug::get()->viewQueries($query_id);
+		$context['queries_data'] = $debug->viewQueries($query_id);
 	}
 
 	/**
