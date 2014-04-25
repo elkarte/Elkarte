@@ -97,7 +97,7 @@ class ManagePaid_Controller extends Action_Controller
 		// Default the sub-action to 'view subscriptions', but only if they have already set things up..
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (!empty($modSettings['paid_currency_symbol']) ? 'view' : 'settings');
 
-		// Load in the subActions, call integrate_manage_subscriptions
+		// Load in the subActions, call integrate_sa_manage_subscriptions
 		$action->initialize($subActions, 'settings');
 
 		// Final things for the template

@@ -100,7 +100,7 @@ class ManageSmileys_Controller extends Action_Controller
 			),
 		);
 
-		// Default the sub-action to 'edit smiley settings'. call integrate_manage_smileys
+		// Default the sub-action to 'edit smiley settings'. call integrate_sa_manage_smileys
 		$subAction = $action->initialize($subActions, 'editsets');
 
 		// Set up the template
@@ -855,14 +855,12 @@ class ManageSmileys_Controller extends Action_Controller
 
 			// Create a list of options for selecting smiley sets.
 			$smileyset_option_list = '
-				<div class="styled-select">
-					<select name="set" onchange="changeSet(this.options[this.selectedIndex].value);">';
+				<select name="set" onchange="changeSet(this.options[this.selectedIndex].value);">';
 			foreach ($context['smiley_sets'] as $smiley_set)
 				$smileyset_option_list .= '
-						<option value="' . $smiley_set['path'] . '"' . ($modSettings['smiley_sets_default'] == $smiley_set['path'] ? ' selected="selected"' : '') . '>' . $smiley_set['name'] . '</option>';
+					<option value="' . $smiley_set['path'] . '"' . ($modSettings['smiley_sets_default'] == $smiley_set['path'] ? ' selected="selected"' : '') . '>' . $smiley_set['name'] . '</option>';
 			$smileyset_option_list .= '
-					</select>
-				</div>';
+				</select>';
 
 			$listOptions = array(
 				'id' => 'smiley_list',
@@ -1010,16 +1008,14 @@ class ManageSmileys_Controller extends Action_Controller
 					array(
 						'position' => 'below_table_data',
 						'value' => '
-							<div class="styled-select">
-								<select name="smiley_action" onchange="makeChanges(this.value);">
-									<option value="-1">' . $txt['smileys_with_selected'] . ':</option>
-									<option value="-1">--------------</option>
-									<option value="hidden">' . $txt['smileys_make_hidden'] . '</option>
-									<option value="post">' . $txt['smileys_show_on_post'] . '</option>
-									<option value="popup">' . $txt['smileys_show_on_popup'] . '</option>
-									<option value="delete">' . $txt['smileys_remove'] . '</option>
-								</select>
-							</div>
+							<select name="smiley_action" onchange="makeChanges(this.value);">
+								<option value="-1">' . $txt['smileys_with_selected'] . ':</option>
+								<option value="-1">--------------</option>
+								<option value="hidden">' . $txt['smileys_make_hidden'] . '</option>
+								<option value="post">' . $txt['smileys_show_on_post'] . '</option>
+								<option value="popup">' . $txt['smileys_show_on_popup'] . '</option>
+								<option value="delete">' . $txt['smileys_remove'] . '</option>
+							</select>
 							<noscript>
 								<input type="submit" name="perform_action" value="' . $txt['go'] . '" class="right_submit" />
 							</noscript>',

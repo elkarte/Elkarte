@@ -538,19 +538,7 @@ class ManageMembers_Controller extends Action_Controller
 								$difference = $txt['never'];
 							else
 							{
-								$num_days_difference = jeffsdatediff($rowData['last_login']);
-
-								// Today.
-								if (empty($num_days_difference))
-									$difference = $txt['viewmembers_today'];
-
-								// Yesterday.
-								elseif ($num_days_difference == 1)
-									$difference = sprintf('1 %1$s', $txt['viewmembers_day_ago']);
-
-								// X days ago.
-								else
-									$difference = sprintf('%1$d %2$s', $num_days_difference, $txt['viewmembers_days_ago']);
+								$difference = htmlTime($rowData['last_login']);
 							}
 
 							// Show it in italics if they're not activated...
@@ -944,16 +932,15 @@ class ManageMembers_Controller extends Action_Controller
 				array(
 					'position' => 'below_table_data',
 					'value' => '
-						<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=viewmembers;sa=browse;showdupes=' . ($context['show_duplicates'] ? 0 : 1) . ';type=' . $context['browse_type'] . (!empty($context['show_filter']) ? ';filter=' . $context['current_filter'] : '') . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . ($context['show_duplicates'] ? $txt['dont_check_for_duplicate'] : $txt['check_for_duplicate']) . '</a>
-						<div class="styled-select floatright">
-							<select name="todo" onchange="onSelectChange();">
-								' . $allowed_actions . '
-							</select>
-						</div>
+						<a class="linkbutton" href="' . $scripturl . '?action=admin;area=viewmembers;sa=browse;showdupes=' . ($context['show_duplicates'] ? 0 : 1) . ';type=' . $context['browse_type'] . (!empty($context['show_filter']) ? ';filter=' . $context['current_filter'] : '') . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . ($context['show_duplicates'] ? $txt['dont_check_for_duplicate'] : $txt['check_for_duplicate']) . '</a>
+						<select name="todo" onchange="onSelectChange();">
+							' . $allowed_actions . '
+						</select>
 						<noscript>
 							<input type="submit" value="' . $txt['go'] . '" class="right_submit" /><br class="clear_right" />
 						</noscript>
 					',
+					'class' => 'floatright',
 				),
 			),
 		);

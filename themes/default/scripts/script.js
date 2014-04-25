@@ -424,15 +424,19 @@ function submitonce(theform)
 	elk_formSubmitted = true;
 }
 
-function submitThisOnce(oControl)
+function submitThisOnce(oControl, bReadOnly)
 {
 	// oControl might also be a form.
 	var oForm = 'form' in oControl ? oControl.form : oControl,
 		aTextareas = oForm.getElementsByTagName('textarea');
 
+	bReadOnly = typeof bReadOnly == 'undefined' ? true : bReadOnly;
 	for (var i = 0, n = aTextareas.length; i < n; i++)
-		aTextareas[i].readOnly = true;
+		aTextareas[i].readOnly = bReadOnly;
 
+	// If in a second the form is not gone, there may be a problem somewhere
+	// (e.g. HTML5 required attribute), so release the textareas
+	window.setTimeout(function() {submitThisOnce(oControl, false);}, 1000);
 	return !elk_formSubmitted;
 }
 
@@ -1165,7 +1169,7 @@ JumpTo.prototype.showSelect = function ()
 	if (sChildLevelPrefix !== '')
 		sChildLevelPrefix = sChildLevelPrefix + this.opt.sBoardPrefix;
 
-	document.getElementById(this.opt.sContainerId).innerHTML = this.opt.sJumpToTemplate.replace(/%select_id%/, this.opt.sContainerId + '_select').replace(/%dropdown_list%/, '<div class="styled-select"><select ' + (this.opt.bDisabled === true ? 'disabled="disabled" ' : 0) + (this.opt.sClassName !== undefined ? 'class="' + this.opt.sClassName + '" ' : '') + 'name="' + (this.opt.sCustomName !== undefined ? this.opt.sCustomName : this.opt.sContainerId + '_select') + '" id="' + this.opt.sContainerId + '_select" ' + ('implementation' in document ? '' : 'onmouseover="grabJumpToContent(this);" ') + ('onbeforeactivate' in document ? 'onbeforeactivate' : 'onfocus') + '="grabJumpToContent(this);"><option value="' + (this.opt.bNoRedirect !== undefined && this.opt.bNoRedirect === true ? this.opt.iCurBoardId : '?board=' + this.opt.iCurBoardId + '.0') + '">' + sChildLevelPrefix + this.opt.sCurBoardName.removeEntities() + '</option></select></div>&nbsp;' + (this.opt.sGoButtonLabel !== undefined ? '<input type="button" class="button_submit" value="' + this.opt.sGoButtonLabel + '" onclick="window.location.href = \'' + elk_prepareScriptUrl(elk_scripturl) + 'board=' + this.opt.iCurBoardId + '.0\';" />' : ''));
+	document.getElementById(this.opt.sContainerId).innerHTML = this.opt.sJumpToTemplate.replace(/%select_id%/, this.opt.sContainerId + '_select').replace(/%dropdown_list%/, '<select ' + (this.opt.bDisabled === true ? 'disabled="disabled" ' : 0) + (this.opt.sClassName !== undefined ? 'class="' + this.opt.sClassName + '" ' : '') + 'name="' + (this.opt.sCustomName !== undefined ? this.opt.sCustomName : this.opt.sContainerId + '_select') + '" id="' + this.opt.sContainerId + '_select" ' + ('implementation' in document ? '' : 'onmouseover="grabJumpToContent(this);" ') + ('onbeforeactivate' in document ? 'onbeforeactivate' : 'onfocus') + '="grabJumpToContent(this);"><option value="' + (this.opt.bNoRedirect !== undefined && this.opt.bNoRedirect === true ? this.opt.iCurBoardId : '?board=' + this.opt.iCurBoardId + '.0') + '">' + sChildLevelPrefix + this.opt.sCurBoardName.removeEntities() + '</option></select>&nbsp;' + (this.opt.sGoButtonLabel !== undefined ? '<input type="button" class="button_submit" value="' + this.opt.sGoButtonLabel + '" onclick="window.location.href = \'' + elk_prepareScriptUrl(elk_scripturl) + 'board=' + this.opt.iCurBoardId + '.0\';" />' : ''));
 	this.dropdownList = document.getElementById(this.opt.sContainerId + '_select');
 };
 

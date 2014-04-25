@@ -99,7 +99,7 @@ p, fieldset, form, input, button, select, textarea, .editor {
 /* Declarations for specific elements. @todo - Maybe simplify - test. */
 .wrapper, div.windowbg, div.windowbg2,
 .roundframe, .description, .information, .successbox, .warningbox,
-.category_header, .generic_list_wrapper, .submitbutton, .styled-select,
+.category_header, .generic_list_wrapper, .submitbutton,
 .grid8, .grid20, .grid25, .grid30, .grid33, .grid50, #description_board .generalinfo {
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
@@ -155,14 +155,13 @@ a img {
 	.input_file    - covers input[type=file]
 */
 input, button, select, textarea, .editor {
-	font: 83.33%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", Arial, sans-serif;
+	font: 87.5%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", "Trebuchet MS", Arial, sans-serif;
 }
 /* The following is necessary. */
 /* @todo - Chase down SCEditor colours n stuff. Bleh. :P */
 textarea, .editor {
 	border-radius: 4px;
 	font-size: 1em;
-	padding: 2px 4px;
 }
 .sceditor-container {
 	margin: 0 0 6px 0;
@@ -176,60 +175,21 @@ select::-moz-focus-inner {
 	padding: 0;
 }
 /* Apply the font only to these elements, and top align them. */
-input, button, select{
+input, button, select {
 	padding: 2px 6px;
 	vertical-align: top;
 	font-size: 0.857em;
 }
 /* Selects require browser-specific targeting too, unfortunately. */
-/* check theme.js for OSx specific targeting of select padding */
 select {
-	padding: 1px 6px;
+	padding: 1px;
+}
+#chrome select {
+	padding: 2px;
+	height:  1.923em;
 }
 select option {
 	padding: 0 4px;
-}
-
-/* Selects don't like to behave across OS and browsers, unfortunately. */
-.styled-select {
-	overflow: hidden;
-	display: inline-block;
-	vertical-align: middle;
-}
-/* Turn off the default select arrow where we can */
-.styled-select select {
-	 appearance: button;
-	-webkit-appearance: button;
-	-moz-appearance: button;
-	-ms-appearance: button;
-	text-indent: 0.01px;
-	text-overflow: '';
-}
-.styled-select select::-ms-expand {
-	display: none;
-}
-/* A div to hold the select */
-.styled-select select {
-	font-size: 0.857em;
-	font-weight: normal;
-	background: transparent;
-	border: none;
-	box-shadow: none;
-	background-image: none;
-	padding: 1px 2em 1px 2px;
-}
-
-/* Can't hide the arrow in ie<10 so we position it off div */
-#ie8 .styled-select select, #ie9 .styled-select select {
-	width: 140%;
-}
-#ie8 .styled-select, #ie9 .styled-select {
-	min-width: 7.25em;
-	padding-right: 0;
-}
-.styled-select select:hover, .styled-select select:focus {
-	outline: none;
-	border: none;
 }
 
 /* No borders around checkboxes or radio buttons, and middle aligned. */
@@ -253,7 +213,6 @@ select option {
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
 	padding: 2px 6px;
 	font-size: .857em;
-	line-height: 17px;
 	display: inline-block;
 }
 .left_submit, .linkbutton_left {
@@ -298,8 +257,10 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 .button_submit.submitgo {
 	margin-bottom: 4px;
 }
-/* May not keep this. Sick of IE silliness. :P */
-#ie #search_form .button_submit, #ie #guest_form .button_submit {
+/* IE has its own padding needs for buttons */
+#ie .button_submit, #ie .button_submit, #ie .right_submit, #ie .left_submit, #ie .button_reset,
+#ie8 .button_submit, #ie8 .button_submit, #ie8 .right_submit, #ie8 .left_submit, #ie8 .button_reset,
+#ie9 .button_submit, #ie9 .button_submit, #ie9 .right_submit, #ie9 .left_submit, #ie9 .button_reset {
 	padding: 1px 6px;
 }
 
@@ -533,6 +494,7 @@ h2 a.collapse {
 	overflow: hidden;
 	position: relative;
 	padding: 0;
+	margin-right: 1px;
 }
 .collapse {background-position: 0 -25px;}
 .expand {background-position: -116px -25px;}
@@ -784,34 +746,26 @@ a.bbc_link {
 #top_section_notice {
 	float: left;
 	margin: 0;
-	padding: 12px 8px 0 8px;
-	line-height: 1.3em;
+	padding: 14px 8px 0 8px;
+	line-height: 1.286em;
 	min-width: 38%;
-	/* @todo - See me grumblez in Issue #552. ;) */
 }
 #top_section_notice .toggle_login {
 	display: inline;
 	cursor: pointer;
-}
-#top_section_notice .button_submit {
-	margin-top: 0;
-	vertical-align: top;
-}
-/* some help for ie8 */
-#ie8 #top_section_notice .button_submit, #ie8 #search_form .button_submit {
-	padding: 1px 6px;
 }
 #top_section_notice form {
 	white-space: nowrap;
 	width: 100%;
 }
 .top_button {
-	line-height: 1.3em;
+	line-height: 1.286em;
 	padding: 2px;
 	margin-left: 1px;
 }
 .top_button img {
 	vertical-align: middle;
+	padding: 2px;
 }
 #password_login {
 	display: inline-block;
@@ -819,7 +773,7 @@ a.bbc_link {
 	-webkit-appearance: caps-lock-indicator;
 }
 #search_form {
-	padding: 12px 0 4px 8px;
+	padding: 12px 3px 4px 8px;
 	float: right;
 }
 #search_form  * {
@@ -828,9 +782,6 @@ a.bbc_link {
 	/* Webkit (bleh) fix. */
 	float: left;
 }
-#chrome #search_form .button_submit {
-	font-size: 1em;
-}
 /* The logo and slogan. */
 #header {
 	padding: 2px 2px 0 2px;
@@ -838,7 +789,7 @@ a.bbc_link {
 /* The main title. */
 #forumtitle, .rightheader #forumtitle {
 	float: left;
-	padding: 10px 10px 6px 8px;
+	padding: 10px 10px 6px 13px;
 	font-size: 2.357em;
 	line-height: 1.455em;
 }
@@ -889,6 +840,7 @@ a.bbc_link {
 #news {
 	vertical-align: top;
 	padding: 0 0 1em 0;
+	margin-left: -1px;
 }
 #news .bbc_link {
 	display: inline;
@@ -1405,7 +1357,7 @@ a.bbc_link {
 	bottom: 50%;
 	left: 0;
 	z-index: 9;
-	padding: 1.3em 0.1em 0 0.1em;
+	padding: 1.286em 0.1em 0 0.1em;
 	height: 1.5em;
 	font-size: 2em;
 	font-weight: bold;
@@ -1491,10 +1443,7 @@ a.bbc_link {
 .additional_row {
 	padding: 6px 0;
 }
-.styled-select .additional_row  {
-	float: right;
-	margin-left: 2px;
-}
+
 .sort_by_item .sort, .sort {
 	margin: 0 0 -4px 4px;
 }
@@ -1561,9 +1510,6 @@ dl.settings textarea {
 }
 dl.settings label {
 	vertical-align: top;
-}
-dl.settings dt .styled-select select {
-	width: 170%;
 }
 
 
@@ -1664,7 +1610,7 @@ dl.settings dt .styled-select select {
 }
 /* The posting icons and mark read button. */
 #posting_icons {
-	margin: 0 4px 20px 4px;
+	margin: 0 0 20px 4px;
 }
 #posting_icons p {
 	display: table-cell;
@@ -2123,7 +2069,7 @@ div.core_posts {
 .poster {
 	display: table-cell;
 	vertical-align: top;
-	min-width: 15em;
+	width: 15em;
 	word-wrap: break-word;
 	word-break: break-all;
 	hyphens: auto;
@@ -2149,12 +2095,17 @@ div.core_posts {
 	text-align: center;
 	font-weight: bold;
 	font-size: 1.357em;
+	text-overflow: ellipsis;
 }
 .poster.poster2 .name {
 	margin-top: 0;
 	padding: 0 8px 0 0;
 	text-align: left;
 	font-size: 1.143em;
+}
+.poster .name {
+	white-space: normal;
+	word-break: normal;
 }
 /* Drop menu for the poster info. */
 .poster .listlevel1.sfhover .menulevel2, .poster .listlevel1:hover .menulevel2 {
@@ -2197,6 +2148,9 @@ div.core_posts {
 }
 .listlevel2>ol>li img, .listlevel2.warning img, .listlevel2.poster_ip img {
 	padding: 0 4px;
+}
+.listlevel2.poster_ip .linklevel2 {
+	display: inline;
 }
 .avatar {
 	width: auto;
@@ -2471,6 +2425,13 @@ ul.post_options li {
 	margin: 0 0 1em 0;
 	overflow: auto;
 }
+.shortcuts {
+	font-size: 0.857em;
+	float: left;
+}
+#mobile .shortcuts {
+	display: none;
+}
 
 /*	$DRAG-N-DROP		*/
 /* ------------------------------------------------------- */
@@ -2568,25 +2529,6 @@ ul.post_options li {
 }
 .verification_control_valid {
 	display: none;
-}
-/* The BBC buttons */
-#bbcBox_message {
-	margin: 10px 6px;
-}
-#bbcBox_message div {
-	margin: 2px 0;
-	vertical-align: top;
-}
-#bbcBox_message div img {
-	margin: 0 1px 0 0;
-	vertical-align: top;
-}
-#bbcBox_message select {
-	margin: 0 2px;
-}
-/* The smiley strip */
-#smileyBox_message {
-	margin: 6px;
 }
 
 /* The event editor section. */
@@ -3130,9 +3072,7 @@ dl.merge_topic dd {
 #paid_subscription dl.settings dd, #paid_subscription dl.settings dt {
 	margin-bottom: 4px;
 }
-#fixed_area .styled-select {
-	vertical-align: top;
-}
+
 
 /* Pick theme */
 #pick_theme {
@@ -3183,7 +3123,7 @@ dl.merge_topic dd {
 	height: 12px;
 }
 #personal_messages .reportlinks {
-	padding: 6px 1.3em;
+	padding: 6px 1.286em;
 }
 .pm_icon, .pm_quickmod {
 	width: 4%;
@@ -3223,6 +3163,7 @@ div.labels {
 }
 .label_pms {
 	float: right;
+	margin-top: 5px;
 }
 .label_pms li {
 	display: inline-block;
@@ -3321,7 +3262,7 @@ div.labels {
 #calendar_navigation select {
 	margin-top: 2px;
 }
-/* See, I told you there was wombatz here. */
+/* See, I told you there was deranged wombatz here. */
 /*
 			   ,.--""""--.._
 			 ."     .'      `-.
@@ -3333,9 +3274,9 @@ div.labels {
 	   ;|\'    :      `./|) \  ;/
 	   ;| \"  -,-   "-./ |;  ).;
 	   /\/              \/   );
-	  :                 \    ;
-	  :     _      _     ;   )
-	  `.   \;\    /;/    ;  /
+	  :     _            \    ;
+	  :    \0\_    _     ;   )
+	  `.          /o/    ;  /
 		!    :   :     ,/  ;
 		 (`. : _ : ,/""   ;
 		  \\\`"^" ` :    ;
@@ -3585,9 +3526,7 @@ a.help .icon {
 	padding-top: 12px;
 	width: 600px;
 }
-#search_options .styled-select {
-	margin: 0 0 3px;
-}
+
 #advanced_search dt {
 	float: left;
 	clear: both;
@@ -3601,10 +3540,7 @@ a.help .icon {
 	width: 65%;
 	text-align: left;
 }
-#search_options .styled-select option {
-	border-right: 1px solid #666;
-	outline: none;
-}
+
 
 /* The search results page.
 /* The search results page. @todo - Duplicated in the .table_grid code? */
@@ -4024,9 +3960,6 @@ dl.no_members {
 	.board_stats, .topic_stats {
 		display: none;
 	}
-	#password_login .styled-select {
-		display: none;
-	}
 	.bbc_img, .elk_video {
 		max-width: 100%;
 	}
@@ -4122,7 +4055,7 @@ dl.no_members {
 		display: none;
 	}
 	.poster {
-		min-width: 7em;
+		width: 7em;
 	}
 	.poster .poster_online {
 		display: none;
@@ -4445,6 +4378,10 @@ dl.no_members {
 	}
 	.poster {
 		float: none;
+		width: auto;
+	}
+	.poster .name {
+		white-space: nowrap;
 	}
 	.poster .listlevel1 {
 		float: left;
@@ -4457,7 +4394,7 @@ dl.no_members {
 		float: left;
 	}
 	.poster .subsections {
-		max-width: 120px;
+		max-width: 200px;
 		max-height: 1.5em;
 		float: right;
 		text-align: right;
@@ -4493,7 +4430,7 @@ dl.no_members {
 	a.linklevel1.button_strip_print, a.linklevel1.button_strip_send, .inline_mod_check,
 	a.linklevel1.quotetonew_button, a.linklevel1.button_strip_post_poll,
 	a.linklevel1.post_options, .keyinfo .post_subject, li.listlevel1.quickmod_select_all,
-	#collapse_button, p.inline.membergroups, #message_index_jump_to {
+	#collapse_button, p.inline.membergroups {
 		display: none !important;
 	}
 	#display_jump_to {
@@ -4582,6 +4519,9 @@ dl.no_members {
 		display: none;
 	}
 	.mlist li div.posts {
+		display: none;
+	}
+	.shortcuts {
 		display: none;
 	}
 }

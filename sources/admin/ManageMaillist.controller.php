@@ -92,7 +92,7 @@ class ManageMaillist_Controller extends Action_Controller
 			'description' => $txt['ml_configuration_desc'],
 		);
 
-		// Default to sub action 'emaillist' if none was given, call integrate_manage_maillist
+		// Default to sub action 'emaillist' if none was given, call integrate_sa_manage_maillist
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) && (empty($subActions[$_REQUEST['sa']]['permission']) || allowedTo($subActions[$_REQUEST['sa']]['permission'])) ? $_REQUEST['sa'] : 'emaillist';
 		$subAction = $action->initialize($subActions, $subAction);
 

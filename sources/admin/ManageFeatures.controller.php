@@ -168,7 +168,7 @@ class ManageFeatures_Controller extends Action_Controller
 			),
 		);
 
-		// By default do the basic settings, call integrate_modify_features
+		// By default do the basic settings, call integrate_sa_modify_features
 		$subAction = $action->initialize($subActions, 'basic');
 
 		// Some final pieces for the template

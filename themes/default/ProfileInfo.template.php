@@ -254,22 +254,20 @@ function template_action_showPermissions()
 				<form action="' . $scripturl . '?action=profile;u=', $context['id_member'], ';area=permissions#board_permissions" method="post" accept-charset="UTF-8">
 					<h4 class="category_header">
 						<a id="board_permissions"></a>', $txt['showPermissions_select'], ':
-						<div class="styled-select">
-							<select name="board" onchange="if (this.options[this.selectedIndex].value) this.form.submit();">
-								<option value="0"', $context['board'] == 0 ? ' selected="selected"' : '', '>', $txt['showPermissions_global'], '&nbsp;</option>';
+						<select name="board" onchange="if (this.options[this.selectedIndex].value) this.form.submit();">
+							<option value="0"', $context['board'] == 0 ? ' selected="selected"' : '', '>', $txt['showPermissions_global'], '&nbsp;</option>';
 
 		if (!empty($context['boards']))
 			echo '
-								<option value="" disabled="disabled">', str_repeat('&#8212;', strlen($txt['showPermissions_global'])), '</option>';
+							<option value="" disabled="disabled">', str_repeat('&#8212;', strlen($txt['showPermissions_global'])), '</option>';
 
 		// Fill the box with any local permission boards.
 		foreach ($context['boards'] as $board)
 			echo '
-								<option value="', $board['id'], '"', $board['selected'] ? ' selected="selected"' : '', '>', $board['name'], ' (', $board['profile_name'], ')</option>';
+							<option value="', $board['id'], '"', $board['selected'] ? ' selected="selected"' : '', '>', $board['name'], ' (', $board['profile_name'], ')</option>';
 
 		echo '
-							</select>
-						<div>
+						</select>
 					</h4>
 				</form>';
 

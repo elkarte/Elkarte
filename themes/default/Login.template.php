@@ -151,7 +151,7 @@ function template_kick_guest()
 				<dl>
 					<dt><label for="openid_identifier">', $txt['openid'], '</label>:</dt>
 					<dd>
-						<input type="text" name="openid_identifier" class="input_text openid_login" size="17" />
+						<input id="openid_identifier" type="text" name="openid_identifier" class="input_text openid_login" size="17" />
 					</dd>
 				</dl>
 				<hr />

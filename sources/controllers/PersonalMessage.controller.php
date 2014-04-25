@@ -670,7 +670,6 @@ class PersonalMessage_Controller extends Action_Controller
 		}
 
 		// Needed for the editor.
-		$modSettings['disable_wysiwyg'] = !empty($modSettings['disable_wysiwyg']) || empty($modSettings['enableBBC']);
 		require_once(SUBSDIR . '/Editor.subs.php');
 
 		// Now create the editor.
@@ -880,7 +879,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 			if (is_array($context['require_verification']))
 				foreach ($context['require_verification'] as $error)
-					$post_errors->addError($error, 0);
+					$post_errors->addError($error);
 		}
 
 		// If they made any errors, give them a chance to make amends.

@@ -477,7 +477,7 @@ class Post_Controller extends Action_Controller
 				// Any errors we should tell them about?
 				if ($form_subject === '')
 				{
-					$post_errors->addError('no_subject', 0);
+					$post_errors->addError('no_subject');
 					$context['preview_subject'] = '<em>' . $txt['no_subject'] . '</em>';
 				}
 
@@ -520,6 +520,8 @@ class Post_Controller extends Action_Controller
 
 				prepareMessageContext($message);
 			}
+			elseif (isset($_REQUEST['last_msg']))
+				list ($form_subject,) = getFormMsgSubject(false, $topic, $first_subject);
 
 			// No check is needed, since nothing is really posted.
 			checkSubmitOnce('free');
@@ -757,13 +759,13 @@ class Post_Controller extends Action_Controller
 
 		// If they came from quick reply, and have to enter verification details, give them some notice.
 		if (!empty($_REQUEST['from_qr']) && !empty($context['require_verification']))
-			$post_errors->addError('need_qr_verification', 0);
+			$post_errors->addError('need_qr_verification');
 
 		// Any errors occurred?
 		$context['post_error'] = array(
 			'errors' => $post_errors->prepareErrors(),
 			'type' => $post_errors->getErrorType() == 0 ? 'minor' : 'serious',
-			'title' => $txt['error_while_submitting'],
+			'title' => $post_errors->getErrorType() == 0 ? $txt['warning_while_submitting'] : $txt['error_while_submitting'],
 		);
 
 		// If there are attachment errors. Let's show a list to the user.
@@ -976,9 +978,6 @@ class Post_Controller extends Action_Controller
 		$context['is_new_post'] = !isset($_REQUEST['msg']);
 		$context['is_first_post'] = $context['is_new_topic'] || (isset($_REQUEST['msg']) && $_REQUEST['msg'] == $id_first_msg);
 		$context['current_action'] = 'post';
-
-		// WYSIWYG only works if BBC is enabled
-		$modSettings['disable_wysiwyg'] = !empty($modSettings['disable_wysiwyg']) || empty($modSettings['enableBBC']);
 
 		// Register this form in the session variables.
 		checkSubmitOnce('register');
@@ -1365,7 +1364,7 @@ class Post_Controller extends Action_Controller
 
 		// Check the subject and message.
 		if (!isset($_POST['subject']) || Util::htmltrim(Util::htmlspecialchars($_POST['subject'])) === '')
-			$post_errors->addError('no_subject', 0);
+			$post_errors->addError('no_subject');
 
 		if (!isset($_POST['message']) || Util::htmltrim(Util::htmlspecialchars($_POST['message'], ENT_QUOTES)) === '')
 			$post_errors->addError('no_message');
@@ -2023,7 +2022,7 @@ class Post_Controller extends Action_Controller
 		}
 		elseif (isset($_POST['subject']))
 		{
-			$post_errors->addError('no_subject', 0);
+			$post_errors->addError('no_subject');
 			unset($_POST['subject']);
 		}
 

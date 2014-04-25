@@ -141,17 +141,15 @@ function template_postarea_above()
 								<label for="icon">', $txt['message_icon'], '</label>:
 							</dt>
 							<dd>
-								<div class="styled-select">
-									<select name="icon" id="icon" onchange="showimage()">';
+								<select name="icon" id="icon" onchange="showimage()">';
 
 	// Loop through each message icon allowed, adding it to the drop down list.
 	foreach ($context['icons'] as $icon)
 		echo '
-										<option value="', $icon['value'], '"', $icon['value'] == $context['icon'] ? ' selected="selected"' : '', '>', $icon['name'], '</option>';
+									<option value="', $icon['value'], '"', $icon['value'] == $context['icon'] ? ' selected="selected"' : '', '>', $icon['name'], '</option>';
 
 	echo '
-									</select>
-								</div>
+								</select>
 								<img src="', $context['icon_url'], '" id="icons" alt="" />
 							</dd>';
 
@@ -199,41 +197,35 @@ function template_make_event_above()
 							<input type="text" id="evtitle" name="evtitle" maxlength="255" size="55" value="', $context['event']['title'], '" tabindex="', $context['tabindex']++, '" class="input_text" />
 							<div class="smalltext" id="datepicker">
 								<input type="hidden" name="calendar" value="1" /><label for="year">', $txt['calendar_year'], '</label>
-								<div class="styled-select">
-									<select name="year" id="year" tabindex="', $context['tabindex']++, '" onchange="generateDays();">';
+								<select name="year" id="year" tabindex="', $context['tabindex']++, '" onchange="generateDays();">';
 
 	// Show a list of all the years we allow...
 	for ($year = $modSettings['cal_minyear']; $year <= $modSettings['cal_maxyear']; $year++)
 		echo '
-										<option value="', $year, '"', $year == $context['event']['year'] ? ' selected="selected"' : '', '>', $year, '&nbsp;</option>';
+									<option value="', $year, '"', $year == $context['event']['year'] ? ' selected="selected"' : '', '>', $year, '&nbsp;</option>';
 
 	echo '
-									</select>
-								</div>
+								</select>
 								<label for="month">', $txt['calendar_month'], '</label>
-								<div class="styled-select">
-									<select name="month" id="month" onchange="generateDays();">';
+								<select name="month" id="month" onchange="generateDays();">';
 
 	// There are 12 months per year - ensure that they all get listed.
 	for ($month = 1; $month <= 12; $month++)
 		echo '
-										<option value="', $month, '"', $month == $context['event']['month'] ? ' selected="selected"' : '', '>', $txt['months'][$month], '&nbsp;</option>';
+									<option value="', $month, '"', $month == $context['event']['month'] ? ' selected="selected"' : '', '>', $txt['months'][$month], '&nbsp;</option>';
 
 	echo '
-									</select>
-								</div>
+								</select>
 								<label for="day">', $txt['calendar_day'], '</label>
-								<div class="styled-select">
-									<select name="day" id="day">';
+								<select name="day" id="day">';
 
 	// This prints out all the days in the current month - this changes dynamically as we switch months.
 	for ($day = 1; $day <= $context['event']['last_day']; $day++)
 		echo '
-										<option value="', $day, '"', $day == $context['event']['day'] ? ' selected="selected"' : '', '>', $day, '&nbsp;</option>';
+									<option value="', $day, '"', $day == $context['event']['day'] ? ' selected="selected"' : '', '>', $day, '&nbsp;</option>';
 
 	echo '
-									</select>
-								</div>
+								</select>
 							</div>';
 
 	if (!empty($modSettings['cal_allowspan']) || ($context['event']['new'] && $context['is_new_post']))
@@ -247,16 +239,14 @@ function template_make_event_above()
 			echo '
 								<li>
 									<label for="span">', $txt['calendar_numb_days'], '</label>
-									<div class="styled-select">
-										<select id="span" name="span">';
+									<select id="span" name="span">';
 
 			for ($days = 1; $days <= $modSettings['cal_maxspan']; $days++)
 				echo '
-											<option value="', $days, '"', $days == $context['event']['span'] ? ' selected="selected"' : '', '>', $days, '&nbsp;</option>';
+										<option value="', $days, '"', $days == $context['event']['span'] ? ' selected="selected"' : '', '>', $days, '&nbsp;</option>';
 
 			echo '
-										</select>
-									</div>
+									</select>
 								</li>';
 		}
 
@@ -750,7 +740,7 @@ function template_spellcheck()
 		<title>', $txt['spell_check'], '</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index.css', CACHE_STALE, '" />
-		<link rel="stylesheet" href="', $settings['theme_url'], '/css/', $context['theme_variant'], '/index', $context['theme_variant'], '.css', CACHE_STALE, '" />
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/', $context['theme_variant_url'], 'index', $context['theme_variant'], '.css', CACHE_STALE, '" />
 		<style>
 			body, td {
 				font-size: small;
@@ -798,10 +788,8 @@ function template_spellcheck()
 					</td>
 					<td style="width:50%">
 						', $txt['spellcheck_suggest'], '<br />
-						<div class="styled-select">
 							<select name="suggestions" style="width: 98%;" size="5" onclick="if (this.selectedIndex != -1) this.form.changeto.value = this.options[this.selectedIndex].text;" ondblclick="replaceWord();">
 							</select>
-						</div>
 					</td>
 				</tr>
 			</table>

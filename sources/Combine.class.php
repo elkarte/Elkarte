@@ -101,6 +101,13 @@ class Site_Combiner
 	private $_stales = array();
 
 	/**
+	 * All files that was not possible to combine
+	 *
+	 * @var string[]
+	 */
+	private $_spares = array();
+
+	/**
 	 * Location of the closure compiler
 	 * @var string
 	 */
@@ -137,16 +144,15 @@ class Site_Combiner
 		if (empty($files) || !file_exists($this->_archive_dir) || !is_writable($this->_archive_dir))
 			return false;
 
+		$this->_spares = array();
+
 		// Get the filenames and last modified time for this batch
 		foreach ($files as $id => $file)
 		{
+			$load = (!$do_defered && empty($file['options']['defer'])) || ($do_defered && !empty($file['options']['defer']));
 			// Get the ones that we would load locally so we can merge them
-			if (!empty($file['options']['local']) && (!$do_defered && empty($file['options']['defer'])) || ($do_defered && !empty($file['options']['defer']) && !empty($file['options']['local'])))
-				$this->_addFile($file['options']);
-			// One off's get output now
-			elseif ((!$do_defered && empty($file['options']['defer'])) || ($do_defered && !empty($file['options']['defer'])))
-				echo '
-	<script src="', $file['filename'], '" id="', $id,'"' , !empty($file['options']['async']) ? ' async="async"' : '' ,'></script>';
+			if ($load && (empty($file['options']['local']) || !$this->_addFile($file['options'])))
+				$this->_spares[$id] = $file;
 		}
 
 		// Nothing to do, then we are done
@@ -192,8 +198,9 @@ class Site_Combiner
 		foreach ($files as $id => $file)
 		{
 			// Get the ones that we would load locally so we can merge them
-			if (!empty($file['options']['local']))
-				$this->_addFile($file['options']);
+			if (empty($file['options']['local']) || !$this->_addFile($file['options']))
+				$this->_spares[$id] = $file;
+
 		}
 
 		// Nothing to do so return
@@ -222,11 +229,21 @@ class Site_Combiner
 	}
 
 	/**
+	 * Returns the info of the files that were not combined
+	 *
+	 * @return string[]
+	 */
+	public function getSpares()
+	{
+		return $this->_spares;
+	}
+
+	/**
 	 * Add all the file parameters to the $_combine_files array
 	 *
 	 * What it does:
 	 * - If the file has a 'stale' option defined it will be added to the
-	 * $_stales array as well to be used later
+	 *   $_stales array as well to be used later
 	 * - Tags any files that are pre-minimized by filename matching .min.js
 	 *
 	 * @param string[] $options An array with all the passed file options:
@@ -250,7 +267,10 @@ class Site_Combiner
 			);
 
 			$this->_stales[] = $this->_combine_files[$options['basename']]['filemtime'];
+
+			return true;
 		}
+		return false;
 	}
 
 	/**
@@ -356,7 +376,7 @@ class Site_Combiner
 
 		// And now the compressed version, just uncomment the below
 		/*
-		$fp = gzopen($this->_archive_dir . $this->_archive_name . '.gz', 'w9');
+		$fp = gzopen($this->_archive_dir . '/' . $this->_archive_name . '.gz', 'w9');
 		gzwrite ($fp, $this->_minified_cache);
 		gzclose($fp);
 		*/

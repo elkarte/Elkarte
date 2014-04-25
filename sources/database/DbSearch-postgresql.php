@@ -61,7 +61,7 @@ class DbSearch_PostgreSQL implements DbSearch
 				'~ENGINE=MEMORY~i' => '',
 			),
 			'create_tmp_log_search_messages' => array(
-				'~mediumint\(\d\)' => 'int',
+				'~mediumint\(\d\)~i' => 'int',
 				'~unsigned~i' => '',
 				'~ENGINE=MEMORY~i' => '',
 			),

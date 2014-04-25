@@ -58,16 +58,14 @@ function template_view_package()
 				<div class="content">
 					', $context['package_readme'], '
 					<span class="floatright">', $txt['package_available_readme_language'], '
-						<div class="styled-select">
-							<select name="readme_language" id="readme_language" onchange="if (this.options[this.selectedIndex].value) window.location.href = elk_prepareScriptUrl(elk_scripturl + \'', '?action=admin;area=packages;sa=', $context['uninstalling'] ? 'uninstall' : 'install', ';package=', $context['filename'], ';readme=\' + this.options[this.selectedIndex].value + \';license=\' + get_selected(\'license_language\'));">';
+						<select name="readme_language" id="readme_language" onchange="if (this.options[this.selectedIndex].value) window.location.href = elk_prepareScriptUrl(elk_scripturl + \'', '?action=admin;area=packages;sa=', $context['uninstalling'] ? 'uninstall' : 'install', ';package=', $context['filename'], ';readme=\' + this.options[this.selectedIndex].value + \';license=\' + get_selected(\'license_language\'));">';
 
 		foreach ($context['readmes'] as $a => $b)
 			echo '
-								<option value="', $b, '"', $a === 'selected' ? ' selected="selected"' : '', '>', $b == 'default' ? $txt['package_readme_default'] : ucfirst($b), '</option>';
+							<option value="', $b, '"', $a === 'selected' ? ' selected="selected"' : '', '>', $b == 'default' ? $txt['package_readme_default'] : ucfirst($b), '</option>';
 
 		echo '
-							</select>
-						</div>
+						</select>
 					</span>
 				</div>
 			</div>
@@ -83,16 +81,14 @@ function template_view_package()
 				<div class="content">
 					', $context['package_license'], '
 					<span class="floatright">', $txt['package_available_license_language'], '
-						<div class="styled-select">
-							<select name="license_language" id="license_language" onchange="if (this.options[this.selectedIndex].value) window.location.href = elk_prepareScriptUrl(elk_scripturl + \'', '?action=admin;area=packages;sa=install', ';package=', $context['filename'], ';license=\' + this.options[this.selectedIndex].value + \';readme=\' + get_selected(\'readme_language\'));">';
+						<select name="license_language" id="license_language" onchange="if (this.options[this.selectedIndex].value) window.location.href = elk_prepareScriptUrl(elk_scripturl + \'', '?action=admin;area=packages;sa=install', ';package=', $context['filename'], ';license=\' + this.options[this.selectedIndex].value + \';readme=\' + get_selected(\'readme_language\'));">';
 
 		foreach ($context['licenses'] as $a => $b)
 			echo '
-								<option value="', $b, '"', $a === 'selected' ? ' selected="selected"' : '', '>', $b == 'default' ? $txt['package_license_default'] : ucfirst($b), '</option>';
+							<option value="', $b, '"', $a === 'selected' ? ' selected="selected"' : '', '>', $b == 'default' ? $txt['package_license_default'] : ucfirst($b), '</option>';
 
 		echo '
-							</select>
-						</div>
+						</select>
 					</span>
 				</div>
 			</div>
@@ -741,7 +737,7 @@ function template_view_operations()
 		<title>', $txt['operation_title'], '</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<link rel="stylesheet" href="', $settings['theme_url'], '/css/admin.css', CACHE_STALE, '" />
-		<link rel="stylesheet" href="', $settings['theme_url'], '/css/', $context['theme_variant'], '/index', $context['theme_variant'], '.css', CACHE_STALE, '" />
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/', $context['theme_variant_url'], 'index', $context['theme_variant'], '.css', CACHE_STALE, '" />
 		<script src="', $settings['default_theme_url'], '/scripts/script.js', CACHE_STALE, '"></script>
 		<script src="', $settings['default_theme_url'], '/scripts/theme.js', CACHE_STALE, '"></script>
 	</head>
@@ -1047,13 +1043,11 @@ function template_file_permissions()
 						<dt>
 							<input type="radio" name="method" value="predefined" id="method_predefined" class="input_radio" />
 							<label for="method_predefined"><strong>', $txt['package_file_perms_predefined'], ':</strong></label>
-							<div class="styled-select">
-								<select name="predefined" onchange="document.getElementById(\'method_predefined\').checked = \'checked\';">
-									<option value="restricted" selected="selected">', $txt['package_file_perms_pre_restricted'], '</option>
-									<option value="standard">', $txt['package_file_perms_pre_standard'], '</option>
-									<option value="free">', $txt['package_file_perms_pre_free'], '</option>
-								</select>
-							</div>
+							<select name="predefined" onchange="document.getElementById(\'method_predefined\').checked = \'checked\';">
+								<option value="restricted" selected="selected">', $txt['package_file_perms_pre_restricted'], '</option>
+								<option value="standard">', $txt['package_file_perms_pre_standard'], '</option>
+								<option value="free">', $txt['package_file_perms_pre_free'], '</option>
+							</select>
 						</dt>
 						<dd>
 							<em class="smalltext">', $txt['package_file_perms_predefined_note'], '</em>

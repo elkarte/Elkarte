@@ -40,42 +40,36 @@ function template_edit_holiday()
 							<strong><label for="year">', $txt['calendar_year'], '</label></strong>
 						</dt>
 						<dd class="small_caption">
-							<div class="styled-select">
-								<select name="year" id="year" onchange="generateDays();">
-									<option value="0000"', $context['holiday']['year'] == '0000' ? ' selected="selected"' : '', '>', $txt['every_year'], '</option>';
+							<select name="year" id="year" onchange="generateDays();">
+								<option value="0000"', $context['holiday']['year'] == '0000' ? ' selected="selected"' : '', '>', $txt['every_year'], '</option>';
 
 	// Show a list of all the years we allow...
 	for ($year = $modSettings['cal_minyear']; $year <= $modSettings['cal_maxyear']; $year++)
 		echo '
-									<option value="', $year, '"', $year == $context['holiday']['year'] ? ' selected="selected"' : '', '>', $year, '</option>';
+								<option value="', $year, '"', $year == $context['holiday']['year'] ? ' selected="selected"' : '', '>', $year, '</option>';
 
 	echo '
-								</select>
-							</div>
+							</select>
 							<strong>&nbsp;<label for="month">', $txt['calendar_month'], '</label></strong>
-							<div class="styled-select">
-								<select name="month" id="month" onchange="generateDays();">';
+							<select name="month" id="month" onchange="generateDays();">';
 
 	// There are 12 months per year - ensure that they all get listed.
 	for ($month = 1; $month <= 12; $month++)
 		echo '
-									<option value="', $month, '"', $month == $context['holiday']['month'] ? ' selected="selected"' : '', '>', $txt['months'][$month], '</option>';
+								<option value="', $month, '"', $month == $context['holiday']['month'] ? ' selected="selected"' : '', '>', $txt['months'][$month], '</option>';
 
 	echo '
-								</select>
-							</div>
+							</select>
 							<strong>&nbsp;<label for="day">', $txt['calendar_day'], '</label></strong>
-							<div class="styled-select">
-								<select name="day" id="day" onchange="generateDays();">';
+							<select name="day" id="day" onchange="generateDays();">';
 
 	// This prints out all the days in the current month - this changes dynamically as we switch months.
 	for ($day = 1; $day <= $context['holiday']['last_day']; $day++)
 		echo '
-									<option value="', $day, '"', $day == $context['holiday']['day'] ? ' selected="selected"' : '', '>', $day, '</option>';
+								<option value="', $day, '"', $day == $context['holiday']['day'] ? ' selected="selected"' : '', '>', $day, '</option>';
 
 	echo '
-								</select>
-							</div>
+							</select>
 						</dd>
 					</dl>
 					<hr />
