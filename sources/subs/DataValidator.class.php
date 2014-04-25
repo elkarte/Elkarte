@@ -338,8 +338,7 @@ class Data_Validator
 					// Maybe even a function?
 					elseif (function_exists($validation_function))
 						$result = call_user_func_array($validation_function, array_merge((array) $input[$field], $validation_parameters_function));
-
-					if (!isset($result))
+					else
 						$result = array(
 							'field' => $validation_method,
 							'input' => $input[$field],
