@@ -274,7 +274,7 @@ class ManagePermissions_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							global $scripturl;
+							global $scripturl, $txt;
 
 							if ($rowData['id_group'] != 1)
 								return '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_group'] . '' . (isset($_REQUEST['pid']) ? ';pid=' . $_REQUEST['pid'] : '') . '">' . $txt['membergroups_modify'] . '</a>';
