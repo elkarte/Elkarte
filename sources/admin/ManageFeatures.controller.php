@@ -1557,8 +1557,8 @@ class ManageFeatures_Controller extends Action_Controller
 			'',
 				// What does it look like?  [smite]?
 				array('text', 'karmaLabel'),
-				array('text', 'karmaApplaudLabel'),
-				array('text', 'karmaSmiteLabel'),
+				array('text', 'karmaApplaudLabel', 'mask' => 'nohtml'),
+				array('text', 'karmaSmiteLabel', 'mask' => 'nohtml'),
 		);
 
 		call_integration_hook('integrate_modify_karma_settings', array(&$config_vars));
