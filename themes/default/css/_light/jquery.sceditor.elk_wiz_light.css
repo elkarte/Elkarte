@@ -48,41 +48,33 @@ code cite {
 	padding-left: 3em;
 }
 blockquote {
-	position: relative;
-	background: #ebf4f8;
-	margin: .25em 0;
+	overflow: auto;
+	margin: 0 0 1em 0;
 	padding: 6px 10px;
-	text-indent: 12px;
-	background: url(../images/theme/quote.png) 2px 3px no-repeat;
-	border: 1px solid #d6dfe2;
-	border-left: 2px solid #aaa;
-	border-right: 2px solid #aaa;
-}
-blockquote blockquote {
-	font-size: .9em;
+	box-shadow: 2px 2px 2px #ddd;
+	border: 1px solid #ccc;
+	background: #fff;
 }
 blockquote cite, code cite {
-	font-style: normal;
+	border-bottom: none;
+	background: #fff;
+	color: #555;
+	font-size: 0.786em;
+    padding: 0 0 4px;
 	display: block;
-	font-size: .9em;
-	border-bottom: 1px solid #fff;
-	box-shadow: 0 -1px 0 #ccc inset;
-	margin: 0 -4px;
-	padding: 0 0 4px 0;
 }
 /* Will correctly colour down to seventh level of nested quotes in editor. Can be extended easily enough. */
-body>blockquote>blockquote, body>blockquote>blockquote>blockquote>blockquote,
+body>blockquote, body>blockquote>blockquote, body>blockquote>blockquote>blockquote>blockquote,
 body>blockquote>blockquote>blockquote>blockquote>blockquote>blockquote {
-	background: #e0e6f6;
+	background: #fff;
 }
 body>blockquote>blockquote>cite, body>blockquote>blockquote>blockquote>blockquote>cite,
 body>blockquote>blockquote>blockquote>blockquote>blockquote>blockquote>cite {
-	border-bottom: 1px solid #f0f0f0;
-	box-shadow: 0 -1px 0 #c0c0c0 inset;
+	background: #fff;
 }
 blockquote cite a:link, blockquote cite a:visited {
 	text-decoration: none;
-	color: #346;
+	color: #555;
 }
 div {
 	min-height: 1em; /*height:auto !important; height: 1em;*/
