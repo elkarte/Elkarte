@@ -155,10 +155,9 @@ Class Elk_Testing_Setup
 		updateMemberStats();
 		require_once(SUBSDIR . '/Messages.subs.php');
 		updateMessageStats();
-		require_once(SUBSDIR . '/Topics.subs.php');
+		require_once(SUBSDIR . '/Topic.subs.php');
 		updateTopicStats();
 		loadLanguage('Install');
-		require_once(SUBSDIR . '/Topics.subs.php');
 		updateSubjectStats(1, htmlspecialchars($txt['default_topic_subject']));
 	}
 
