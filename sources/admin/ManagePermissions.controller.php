@@ -124,7 +124,7 @@ class ManagePermissions_Controller extends Action_Controller
 		// Set the subAction, taking permissions in to account
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) && empty($subActions[$_REQUEST['sa']]['disabled']) ? $_REQUEST['sa'] : (allowedTo('manage_permissions') ? 'index' : 'settings');
 
-		// Load the subactions, call integrate_manage_permissions
+		// Load the subactions, call integrate_sa_manage_permissions
 		$action->initialize($subActions);
 
 		// Last items needed

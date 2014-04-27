@@ -106,7 +106,7 @@ class ManageRegistration_Controller extends Action_Controller
 			)
 		);
 
-		// Work out which to call... call integrate_manage_registrations
+		// Work out which to call... call integrate_sa_manage_registrations
 		$subAction = $action->initialize($subActions, 'register');
 
 		// Final bits

@@ -593,7 +593,6 @@ $txt['enableSpellChecking_warning'] = 'this does not work on all servers.';
 $txt['enableSpellChecking_error'] = 'this does not work on your server.';
 $txt['enableVideoEmbeding'] = 'Enable auto-embedding of video links.';
 $txt['enableCodePrettify'] = 'Enable prettifying of code tags';
-$txt['disable_wysiwyg'] = 'Disable WYSIWYG editor';
 $txt['max_messageLength'] = 'Maximum allowed post size';
 $txt['max_messageLength_zero'] = '0 for no max.';
 $txt['convert_to_mediumtext'] = 'Your database is not setup to accept messages longer than 65535 characters. Please use the <a href="%1$s">database maintenance</a> page to convert the database and then come back to increase the maximum allowed post size.';
@@ -618,7 +617,7 @@ $txt['bbcTagsToUse'] = 'Enabled BBC tags';
 $txt['bbcTagsToUse_select'] = 'Select the tags allowed to be used';
 $txt['bbcTagsToUse_select_all'] = 'Select all tags';
 
-$txt['enableStickyTopics'] = 'Enable sticky topics';
+$txt['enableStickyTopics'] = 'Enable pinned topics';
 $txt['enableParticipation'] = 'Enable participation icons';
 $txt['enableFollowup'] = 'Enable followups';
 $txt['oldTopicDays'] = 'Time before topic is warned as old on reply';

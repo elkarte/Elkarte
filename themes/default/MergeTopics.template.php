@@ -74,16 +74,14 @@ function template_merge()
 						<dd>
 							<form action="' . $scripturl . '?action=mergetopics;from=', $context['origin_topic'] . ';targetboard=' . $context['target_board'], ';board=', $context['current_board'], '.0" method="post" accept-charset="UTF-8">
 								<input type="hidden" name="from" value="' . $context['origin_topic'] . '" />
-								<div class="styled-select">
-									<select name="targetboard" onchange="this.form.submit();">';
+								<select name="targetboard" onchange="this.form.submit();">';
 
 		foreach ($context['boards'] as $board)
 			echo '
-										<option value="', $board['id'], '"', $board['id'] == $context['target_board'] ? ' selected="selected"' : '', '>', $board['category'], ' - ', $board['name'], '</option>';
+									<option value="', $board['id'], '"', $board['id'] == $context['target_board'] ? ' selected="selected"' : '', '>', $board['category'], ' - ', $board['name'], '</option>';
 
 		echo '
-									</select>
-								</div>
+								</select>
 								<input type="submit" value="', $txt['go'], '" class="button_submit submitgo" />
 							</form>
 						</dd>';
@@ -184,17 +182,15 @@ function template_merge_extra_options()
 	echo '
 					<fieldset id="merge_subject" class="merge_options">
 						<legend>', $txt['merge_select_subject'], '</legend>
-						<div class="styled-select">
-							<select name="subject" onchange="this.form.custom_subject.style.display = (this.options[this.selectedIndex].value != 0) ? \'none\': \'\' ;">';
+						<select name="subject" onchange="this.form.custom_subject.style.display = (this.options[this.selectedIndex].value != 0) ? \'none\': \'\' ;">';
 
 	foreach ($context['topics'] as $topic)
 		echo '
-								<option value="', $topic['id'], '"' . ($topic['selected'] ? ' selected="selected"' : '') . '>', $topic['subject'], '</option>';
+							<option value="', $topic['id'], '"' . ($topic['selected'] ? ' selected="selected"' : '') . '>', $topic['subject'], '</option>';
 
 	echo '
-								<option value="0">', $txt['merge_custom_subject'], ':</option>
-							</select>
-						</div>
+							<option value="0">', $txt['merge_custom_subject'], ':</option>
+						</select>
 						<br /><input type="text" name="custom_subject" size="60" id="custom_subject" class="input_text custom_subject" style="display: none;" />
 						<br />
 						<label for="enforce_subject"><input type="checkbox" class="input_check" name="enforce_subject" id="enforce_subject" value="1" /> ', $txt['merge_enforce_subject'], '</label>

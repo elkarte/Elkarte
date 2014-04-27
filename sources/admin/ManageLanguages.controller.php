@@ -67,7 +67,7 @@ class ManageLanguages_Controller extends Action_Controller
 			'description' => $txt['language_description'],
 		);
 
-		// By default we're managing languages, call integrate_manage_languages
+		// By default we're managing languages, call integrate_sa_manage_languages
 		$subAction = $action->initialize($subActions, 'edit');
 
 		// Some final bits

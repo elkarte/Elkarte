@@ -84,7 +84,7 @@ class BoardIndex_Controller extends Action_Controller
 
 		// Track most online statistics? (subs/Members.subs.phpOnline.php)
 		if (!empty($modSettings['trackStats']))
-			trackStatsUsersOnline($context['num_guests'] + $context['num_spiders'] + $context['num_users_online']);
+			trackStatsUsersOnline($context['num_guests'] + $context['num_users_online']);
 
 		// Retrieve the latest posts if the theme settings require it.
 		if (isset($settings['number_recent_posts']) && $settings['number_recent_posts'] > 1)

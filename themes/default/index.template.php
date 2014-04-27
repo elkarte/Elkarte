@@ -230,15 +230,13 @@ function template_body_above()
 					<div id="password_login">
 						<input type="text" name="user" size="10" class="input_text" placeholder="', $txt['username'], '" />
 						<input type="password" name="passwrd" size="10" class="input_password" placeholder="', $txt['password'], '" />
-						<div class="styled-select">
-							<select name="cookielength">
-								<option value="60">', $txt['one_hour'], '</option>
-								<option value="1440">', $txt['one_day'], '</option>
-								<option value="10080">', $txt['one_week'], '</option>
-								<option value="43200">', $txt['one_month'], '</option>
-								<option value="-1" selected="selected">', $txt['forever'], '</option>
-							</select>
-						</div>
+						<select name="cookielength">
+							<option value="60">', $txt['one_hour'], '</option>
+							<option value="1440">', $txt['one_day'], '</option>
+							<option value="10080">', $txt['one_week'], '</option>
+							<option value="43200">', $txt['one_month'], '</option>
+							<option value="-1" selected="selected">', $txt['forever'], '</option>
+						</select>
 						<input type="submit" value="', $txt['login'], '" class="button_submit" />
 					</div>
 					<input type="hidden" name="hash_passwrd" value="" />
@@ -266,29 +264,27 @@ function template_body_above()
 			$selected = !empty($context['current_topic']) ? 'current_topic' : (!empty($context['current_board']) ? 'current_board' : 'all');
 
 			echo '
-				<div class="styled-select">
-					<select name="search_selection" id="search_selection">
-						<option value="all"', ($selected == 'all' ? ' selected="selected"' : ''), '>', $txt['search_entireforum'], ' </option>';
+				<select name="search_selection" id="search_selection">
+					<option value="all"', ($selected == 'all' ? ' selected="selected"' : ''), '>', $txt['search_entireforum'], ' </option>';
 
 			// Can't limit it to a specific topic if we are not in one
 			if (!empty($context['current_topic']))
 				echo '
-						<option value="topic"', ($selected == 'current_topic' ? ' selected="selected"' : ''), '>', $txt['search_thistopic'], '</option>';
+					<option value="topic"', ($selected == 'current_topic' ? ' selected="selected"' : ''), '>', $txt['search_thistopic'], '</option>';
 
 			// Can't limit it to a specific board if we are not in one
 			if (!empty($context['current_board']))
 				echo '
-						<option value="board"', ($selected == 'current_board' ? ' selected="selected"' : ''), '>', $txt['search_thisbrd'], '</option>';
+					<option value="board"', ($selected == 'current_board' ? ' selected="selected"' : ''), '>', $txt['search_thisbrd'], '</option>';
 
 			if (!empty($context['additional_dropdown_search']))
 				foreach ($context['additional_dropdown_search'] as $name => $engine)
 					echo '
-						<option value="', $name, '">', $engine['name'], '</option>';
+					<option value="', $name, '">', $engine['name'], '</option>';
 
 			echo '
-						<option value="members"', ($selected == 'members' ? ' selected="selected"' : ''), '>', $txt['search_members'], ' </option>
-					</select>
-				</div>';
+					<option value="members"', ($selected == 'members' ? ' selected="selected"' : ''), '>', $txt['search_members'], ' </option>
+				</select>';
 		}
 
 		// Search within current topic?
@@ -483,10 +479,10 @@ function template_menu()
 			echo '
 							<ul class="menulevel2">';
 
-			foreach ($button['sub_buttons'] as $childbutton)
+			foreach ($button['sub_buttons'] as $childact => $childbutton)
 			{
 				echo '
-								<li class="listlevel2', !empty($childbutton['sub_buttons']) ? ' subsections" aria-haspopup="true"' : '"', '>
+								<li id="button_', $childact, '" class="listlevel2', !empty($childbutton['sub_buttons']) ? ' subsections" aria-haspopup="true"' : '"', '>
 									<a class="linklevel2" href="', $childbutton['href'], '" ', isset($childbutton['target']) ? 'target="' . $childbutton['target'] . '"' : '', '>', $childbutton['title'], '</a>';
 
 				// 3rd level menus :)
@@ -495,9 +491,9 @@ function template_menu()
 					echo '
 									<ul class="menulevel3">';
 
-					foreach ($childbutton['sub_buttons'] as $grandchildbutton)
+					foreach ($childbutton['sub_buttons'] as $grandchildact => $grandchildbutton)
 						echo '
-										<li class="listlevel3">
+										<li id="button_', $grandchildact, '" class="listlevel3">
 											<a class="linklevel3" href="', $grandchildbutton['href'], '" ', isset($grandchildbutton['target']) ? 'target="' . $grandchildbutton['target'] . '"' : '', '>', $grandchildbutton['title'], '</a>
 										</li>';
 

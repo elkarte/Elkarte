@@ -150,7 +150,7 @@ class ManageServer_Controller extends Action_Controller
 			'description' => $txt['admin_basic_settings'],
 		);
 
-		// By default we're editing the core settings, call integrate_server_settings
+		// By default we're editing the core settings, call integrate_sa_server_settings
 		$subAction = $action->initialize($subActions, 'general');
 
 		// Last things for the template

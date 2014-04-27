@@ -117,7 +117,7 @@ class ManageThemes_Controller extends Action_Controller
 			);
 		}
 
-		// Follow the sa or just go to administration, call integrate_manage_themes
+		// Follow the sa or just go to administration, call integrate_sa_manage_themes
 		$subAction = $action->initialize($subActions, 'admin');
 
 		// Default the page title to Theme Administration by default.

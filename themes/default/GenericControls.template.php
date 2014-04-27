@@ -29,17 +29,19 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 	$editor_context = &$context['controls']['richedit'][$editor_id];
 
 	echo '
+		<div id="editor_toolbar_container"></div>
 		<textarea class="editor', isset($context['post_error']['errors']['no_message']) || isset($context['post_error']['errors']['long_message']) ? ' border_error' : '', '" name="', $editor_id, '" id="', $editor_id, '" tabindex="', $context['tabindex']++, '" style="width:', $editor_context['width'], ';height: ', $editor_context['height'], ';" required="required">', $editor_context['value'], '</textarea>
 		<input type="hidden" name="', $editor_id, '_mode" id="', $editor_id, '_mode" value="0" />
 		<script><!-- // --><![CDATA[
 			var $editor_data = {},
 				$editor_container = {};
-			$(document).ready(function(){',
+
+			function elk_editor() {',
 				!empty($context['bbcodes_handlers']) ? $context['bbcodes_handlers'] : '', '
 				$("#', $editor_id, '").sceditor({
-					style: "', $settings['default_theme_url'], '/css/jquery.sceditor.elk.css",
+					style: "', $settings['theme_url'], '/css/', $context['theme_variant_url'], 'jquery.sceditor.elk_wiz', $context['theme_variant'], '.css",
 					width: "100%",
-					height: "100%",
+					toolbarContainer: $("#editor_toolbar_container"),
 					resizeWidth: false,
 					resizeMaxHeight: -1,
 					emoticonsCompat: true,
@@ -142,7 +144,12 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					$(".sceditor-button-source").hide();
 				', isset($context['post_error']['errors']['no_message']) || isset($context['post_error']['errors']['long_message']) ? '
 				$editor_container[\'' . $editor_id . '\'].find("textarea, iframe").addClass("border_error");' : '', '
-			});
+		}
+
+		$(document).ready(function(){
+			elk_editor();
+		});
+
 		// ]]></script>';
 }
 
@@ -159,7 +166,7 @@ function template_control_richedit_buttons($editor_id)
 
 	// Show the helpful shortcut text
 	echo '
-		<span class="smalltext floatleft">
+		<span class="shortcuts">
 			', $context['shortcuts_text'], '
 		</span>
 		<input type="submit" value="', isset($editor_context['labels']['post_button']) ? $editor_context['labels']['post_button'] : $txt['post'], '" tabindex="', $context['tabindex']++, '" onclick="return submitThisOnce(this);" accesskey="s" class="button_submit" />';

@@ -170,6 +170,12 @@ class Settings_Form
 	public static function prepare_db(&$config_vars)
 	{
 		global $txt, $helptxt, $context, $modSettings;
+		static $known_rules = null;
+
+		if ($known_rules === null)
+			$known_rules = array(
+				'nohtml' => 'htmlspecialchars_decode[' . ENT_NOQUOTES . ']',
+			);
 
 		loadLanguage('Help');
 
@@ -233,6 +239,34 @@ class Settings_Form
 							$context['config_vars'][$config_var[1]]['data'][] = array($key, $item);
 					}
 				}
+
+					// Revert masks if necessary
+					if (isset($config_var['mask']))
+					{
+						$rules = array();
+
+						if (!is_array($config_var['mask']))
+							$config_var['mask'] = array($config_var['mask']);
+						foreach ($config_var['mask'] as $key => $mask)
+						{
+							if (isset($known_rules[$mask]))
+								$rules[$config_var[1]][] = $known_rules[$mask];
+							elseif ($key == 'custom' && isset($mask['revert']))
+								$rules[$config_var[1]][] = $mask['revert'];
+						}
+
+						if (!empty($rules))
+						{
+							$rules[$config_var[1]] = implode('|', $rules[$config_var[1]]);
+
+							require_once(SUBSDIR . '/DataValidator.class.php');
+							$validator = new Data_Validator();
+							$validator->sanitation_rules($rules);
+							$validator->validate(array($config_var[1] => $context['config_vars'][$config_var[1]]['value']));
+
+							$context['config_vars'][$config_var[1]]['value'] = $validator->{$config_var[1]};
+						}
+					}
 
 				// Finally allow overrides - and some final cleanups.
 				foreach ($config_var as $k => $v)
@@ -434,6 +468,15 @@ class Settings_Form
 	 */
 	public static function save_db(&$config_vars)
 	{
+		static $known_rules = null;
+
+		if ($known_rules === null)
+			$known_rules = array(
+				'nohtml' => 'Util::htmlspecialchars[' . ENT_QUOTES . ']',
+				'email' => 'valid_email',
+				'url' => 'valid_url',
+			);
+
 		validateToken('admin-dbsc');
 
 		$inlinePermissions = array();
@@ -466,7 +509,36 @@ class Settings_Form
 				$setArray[$var[1]] = (float) $_POST[$var[1]];
 			// Text!
 			elseif ($var[0] == 'text' || $var[0] == 'large_text')
-				$setArray[$var[1]] = $_POST[$var[1]];
+			{
+				if (isset($var['mask']))
+				{
+					$rules = array();
+
+					if (!is_array($var['mask']))
+						$var['mask'] = array($var['mask']);
+					foreach ($var['mask'] as $key => $mask)
+					{
+						if (isset($known_rules[$mask]))
+							$rules[$var[1]][] = $known_rules[$mask];
+						elseif ($key == 'custom' && isset($mask['apply']))
+							$rules[$var[1]][] = $mask['apply'];
+					}
+
+					if (!empty($rules))
+					{
+						$rules[$var[1]] = implode('|', $rules[$var[1]]);
+
+						require_once(SUBSDIR . '/DataValidator.class.php');
+						$validator = new Data_Validator();
+						$validator->sanitation_rules($rules);
+						$validator->validate($_POST);
+
+						$setArray[$var[1]] = $validator->{$var[1]};
+					}
+				}
+				else
+					$setArray[$var[1]] = $_POST[$var[1]];
+			}
 			// Passwords!
 			elseif ($var[0] == 'password')
 			{

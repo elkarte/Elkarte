@@ -45,21 +45,6 @@
 /*	$GENERAL	*/
 /* ------------------------------------------------------- */
 /* Selects don't like to behave across OS and browsers, unfortunately. */
-.styled-select {
-	background: #fff url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYAQAAAADb20ChAAAAAnRSTlMAAQGU/a4AAAApSURBVHjaY/zPgIL+MTL+aWb84c74QZ/xgT6yFJALFARKARUAlaFpBACuqxnhHOnncgAAAABJRU5ErkJggg==) 2% 50% no-repeat;
-}
-/* A div to hold the select */
-.styled-select select {
-	padding: 1px 2px 1px 2em;
-}
-.styled-select select:disabled {
-	background: #eee url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYCAQAAABZqbWHAAAAKklEQVR42mMYiqCBgDQI4pXGp6QBBWJKY8ABB+Q4ElMajxKyghqhZCgCAL3SGQGs8tZQAAAAAElFTkSuQmCC) 2% 50% no-repeat;
-}
-#ie8 .styled-select, #ie9 .styled-select {
-	min-width: 7.25em;
-	padding-left: 0;
-}
-
 .left_submit, .linkbutton_left {
 	float: right;
 }
@@ -127,6 +112,11 @@ h2 a.collapse {
 	margin-right: -42px;
 	margin-left: 0;
 }
+/* Upshrink image in the page top for the header collapse */
+#collapse_button .linklevel1 {
+	margin-right: 0;
+	margin-left: 1px;
+}
 
 /* More little boxes on a hillside. */
 .warningbox {
@@ -182,7 +172,7 @@ h2 a.collapse {
 	margin-left: 0;
 }
 #search_form {
-	padding: 12px 8px 4px 0;
+	padding: 12px 8px 4px 3px;
 	float: left;
 }
 #search_form  * {
@@ -192,7 +182,7 @@ h2 a.collapse {
 /* The main title. */
 #forumtitle, .rightheader #forumtitle {
 	float: right;
-	padding: 10px 8px 6px 10px;
+	padding: 10px 13px 6px 10px;
 }
 .rightheader #forumtitle {
 	float: left;
@@ -211,6 +201,11 @@ h2 a.collapse {
 }
 .rightheader #logo {
 	margin: 0 8px 0 0;
+}
+/* The user info, news, etc.*/
+#news {
+	margin-left: 0;
+	margin-right: -1px;
 }
 /* Main forum area. */
 /* The footer with copyright links etc. */
@@ -469,11 +464,6 @@ h2 a.collapse {
 	text-align: right;
 }
 /* GenericList */
-.styled-select .additional_row {
-	float: left;
-	margin-right: 2px;
-	margin-left: 0;
-}
 .sort_by_item .sort, .sort {
 	margin: 0 4px -4px 0;
 }
@@ -525,6 +515,10 @@ dl.settings img {
 }
 .childboards>li {
 	padding: 6px 0 4px 0.3em;
+}
+/* The posting icons and mark read button. */
+#posting_icons {
+	margin: 0 4px 20px 0;
 }
 /* Icons for info centre title bars. */
 #ic_recentposts td, #ic_recentposts th, #ps_recentposts td, #ps_recentposts th, #ps_recenttopics td, #ps_recenttopics th {
@@ -730,10 +724,6 @@ ul.post_options li {
 }
 .post_verification #verification_control {
 	margin: 4px 12px 4px 0;
-}
-/* The BBC buttons */
-#bbcBox_message div img {
-	margin: 0 0 0 1px;
 }
 
 /* The event editor section. */

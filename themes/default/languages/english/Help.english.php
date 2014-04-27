@@ -239,8 +239,8 @@ $helptxt['manage_files'] = '
 
 $helptxt['topicSummaryPosts'] = 'This allows you to set the number of previous posts shown in the topic summary at the reply screen.';
 $helptxt['enableAllMessages'] = 'Set this to the <em>maximum</em> number of posts a topic can have to show the all link.  Setting this lower than &quot;Maximum messages to display in a topic page&quot; will simply mean it never gets shown, and setting it too high could slow down your forum.';
-$helptxt['enableStickyTopics'] = 'Stickies are topics that remain on top of the topic list. They are mostly used for important
-		messages. Although you can change this with permissions, by default only moderators and administrators can make topics sticky.';
+$helptxt['enableStickyTopics'] = 'Pinned are topics that remain on top of the topic list. They are mostly used for important
+		messages. Although you can change this with permissions, by default only moderators and administrators can pin topics.';
 $helptxt['allow_guestAccess'] = 'Unchecking this box will stop guests from doing anything but very basic actions - login, register, password reminder, etc. - on your forum.  This is not the same as disallowing guest access to boards.';
 $helptxt['userLanguage'] = 'Turning this option on will allow users to select which language file they use. It will not affect the default selection.';
 $helptxt['trackStats'] = 'Stats:<br />This will allow users to see the latest posts and the most popular topics on your forum.
@@ -392,7 +392,6 @@ $helptxt['edit_disable_time'] = 'Number of minutes allowed to pass before a user
 $helptxt['preview_characters'] = 'This option sets the number of available characters for the first and last message of the topic preview.  <strong>Note</strong> this only makes the information available to the theme, the theme must support the &quot;Show post previews on the message index&quot; setting';
 $helptxt['posts_require_captcha'] = 'This setting will force users to pass anti-spam bot verification each time they make a post to a board. Only users with a post count below the number set will need to enter the code - this should help combat automated spamming scripts.';
 $helptxt['enableSpellChecking'] = 'Enable spell checking. You MUST have the pspell library installed on your server and your PHP configuration set up to use the pspell library. Your server ' . (function_exists('pspell_new') ? 'DOES' : 'DOES NOT') . ' appear to have this set up.';
-$helptxt['disable_wysiwyg'] = 'This setting disallows all users from using the WYSIWYG (&quot;What You See Is What You Get&quot;) editor on the post page.';
 $helptxt['lastActive'] = 'Set the number of minutes since their last activity to display people as active on the board index. Default is 15 minutes.';
 
 $helptxt['customoptions'] = 'This section defines the options that a user may choose from a drop down list. There are a few key points to note in this section:
@@ -425,7 +424,7 @@ $helptxt['max_pm_recipients'] = 'This option allows you to set the maximum amoun
 $helptxt['pm_posts_verification'] = 'This setting will force users to enter a code shown on a verification image each time they are sending a personal message. Only users with a post count below the number set will need to enter the code - this should help combat automated spamming scripts.';
 $helptxt['pm_posts_per_hour'] = 'This will limit the number of personal messages which may be sent by a user in a one hour period. This does not affect admins or moderators.';
 
-$helptxt['default_personal_text'] = 'Sets the default text a new user will have as their &quot;personal text.&quot; This option is not available when personal text is disabled, or when users can set personal text on registration for themselves.';
+$helptxt['default_personal_text'] = 'Sets the default text a new user will have as their &quot;personal text.&quot; This option is not available when personal text is disabled, or when users can set their personal text on registration for themselves.';
 
 $helptxt['modlog_enabled'] = 'Logs all moderation actions.';
 
@@ -442,23 +441,23 @@ $helptxt['registration_method'] = 'This option determines what method of registr
 				When this option is enabled any members registering with the forum will have an activation link emailed to them which they must click before they can become full members.<br />
 		</li><li>
 			<strong>Admin Approval</strong><br />
-				This option will make it so all new members registering to your forum will need to be approved by the admin before they become members.
+				This option will make it so that all new members registering with the forum will need to be approved by an admin before they become full members.
 		</li>
 	</ul>';
 $helptxt['register_openid'] = '<strong>Authenticate with OpenID</strong><br />
-	OpenID is a means of using one username across different websites, to simplify the online experience. To use OpenID you first need to create an OpenID account - a list of providers can be found on the <a href="http://openid.net/" target="_blank">OpenID Official Site</a><br /><br />
-	Once you have an OpenID account simply enter your unique identification URL into the OpenID input box and submit. You will then be taken to your providers site to verify your identity before being passed back to this site.<br /><br />
-	On your first visit to this site you will be asked to confirm a couple of details before you will be recognized, after which you can login to this site and change your profile settings using just your OpenID.<br /><br />
+	OpenID allows you to use the same user credentials across different websites to simplify your online experience. To use OpenID you first need to create an OpenID account - a list of providers can be found on the <a href="http://openid.net/" target="_blank">OpenID Official Site</a><br /><br />
+	Once you have an OpenID account simply enter your unique identification URL into the OpenID input box and submit. You will then be taken to your provider\'s site to verify your identity before being passed back to this site.<br /><br />
+	On your first visit to this site you will be asked to supply a couple of details before you will be recognized, after which you can login to this site and change your profile settings using just your OpenID.<br /><br />
 	For more information please visit the <a href="http://openid.net/" target="_blank">OpenID Official Site</a>';
 
-$helptxt['send_validation_onChange'] = 'When this option is checked all members who change their email address in their profile will have to reactivate their account from an email sent to that address';
+$helptxt['send_validation_onChange'] = 'When this option is checked all members who change their email address in their profile will have to reactivate their account from an email sent to the new address';
 $helptxt['send_welcomeEmail'] = 'When this option is enabled all new members will be sent an email welcoming them to your community';
-$helptxt['password_strength'] = 'This setting determines the strength required for passwords selected by your forum users. The stronger the password, the harder it should be to compromise member\'s accounts.
+$helptxt['password_strength'] = 'This setting determines the strength required for passwords selected by your forum users. The stronger the password, the harder it should be to compromise the member\'s account.
 	Its possible options are:
 	<ul class="normallist">
 		<li><strong>Low:</strong> The password must be at least four characters long.</li>
-		<li><strong>Medium:</strong> The password must be at least eight characters long, and can not be part of a users name or email address.</li>
-		<li><strong>High:</strong> As for medium, except the password must also contain a mixture of upper and lower case letters, and at least one number.</li>
+		<li><strong>Medium:</strong> The password must be at least eight characters long, and can not be part of a user name or email address.</li>
+		<li><strong>High:</strong> As for medium, except the password must also contain a mixture of upper and lower case letters, and at least one digit.</li>
 	</ul>';
 $helptxt['enable_password_conversion'] = 'By enabling this setting, ElkArte will attempt to detect passwords stored in other formats and convert them for use in this software.  Typically this is used for converted forums, but may have other uses as well.  Disabling this prevents a user from logging in using their password after a conversion and would need to reset their password.';
 
@@ -476,11 +475,11 @@ $helptxt['coppaType'] = 'If age restrictions are enabled, then this setting will
 				They will also be presented with the forum contact details entered on the settings page, so they can send the form to the administrator by mail or fax.
 		</li>
 	</ul>';
-$helptxt['coppaPost'] = 'The contact boxes are required so that forms granting permission for underage registration can be sent to the forum administrator. These details will be shown to all new minors, and are required for parent/guardian approval. At the very least a postal address or fax number must be provided.';
+$helptxt['coppaPost'] = 'The contact boxes are required so that forms granting permission for underage registration can be sent to the forum administrator. These details will be shown to all new minors, they are required for parent/guardian approval. At the very least a postal address or fax number must be provided.';
 
-$helptxt['allow_hideOnline'] = 'With this option enabled all members will be able to hide their online status from other users (except administrators). If disabled only users who can moderate the forum can hide their presence. Note that disabling this option will not change any existing member\'s status - it just stops them from hiding themselves in the future.';
-$helptxt['make_email_viewable'] = 'If this option is enabled instead of users email addresses being hidden to normal members and guests they will be publicly viewable on the forum. Enabling this will put your users at greater risk of being victims of spam as a result of email harvesters visiting your forum. Note this setting does not override the user setting for hiding their email address from users. Enabling this setting is <strong>not</strong> recommended.';
-$helptxt['meta_keywords'] = 'These keywords are sent in the output of every page to indicate to search engines (etc) the key content of your site. They should be a comma separated list of words, and should not use HTML.';
+$helptxt['allow_hideOnline'] = 'With this option enabled all members will be able to hide their online status from other users (except administrators). If disabled only users who can moderate the forum can hide their presence. Note that disabling this option will not change any member\'s current status - it just stops them from hiding themselves in the future.';
+$helptxt['make_email_viewable'] = 'If this option is enabled, it will be possible to send an e-mail to other users. No e-mail addresses will be publicly available, so your users won\'t suffer from a greater risk of being victims of spam as a result of email harvesters visiting your forum. Note this setting does not override the user setting for accepting e-mails from users.';
+$helptxt['meta_keywords'] = 'These keywords are sent in the output of every page to indicate the key content of your site to search engines etc. They should be a comma separated list of words, and should not contain HTML code.';
 
 $helptxt['latest_support'] = 'This panel shows you some of the most common problems and questions on your server configuration. Don\'t worry, this information isn\'t logged or anything.<br /><br />If this stays as &quot;Retrieving support information...&quot;, your computer probably cannot connect to the website.';
 $helptxt['latest_packages'] = 'Here you can see some of the most popular and some random packages, with quick and easy installations.<br /><br />If this section doesn\'t show up, your computer probably cannot connect to <a href="http://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>.';
@@ -526,7 +525,7 @@ $helptxt['search_weight_age'] = 'Weight factors are used to determine the releva
 $helptxt['search_weight_length'] = 'Weight factors are used to determine the relevancy of a search result. Change these weight factors to match the things that are specifically important for your forum. For instance, a forum of a news site, might want a relatively high value for \'age of last matching message\'. All values are relative in relation to each other and should be positive integers.<br /><br />This factor is based on the topic size. The more messages are within the topic, the higher the score.';
 $helptxt['search_weight_subject'] = 'Weight factors are used to determine the relevancy of a search result. Change these weight factors to match the things that are specifically important for your forum. For instance, a forum of a news site, might want a relatively high value for \'age of last matching message\'. All values are relative in relation to each other and should be positive integers.<br /><br />This factor looks whether a search term can be found within the subject of a topic.';
 $helptxt['search_weight_first_message'] = 'Weight factors are used to determine the relevancy of a search result. Change these weight factors to match the things that are specifically important for your forum. For instance, a forum of a news site, might want a relatively high value for \'age of last matching message\'. All values are relative in relation to each other and should be positive integers.<br /><br />This factor looks whether a match can be found in the first message of a topic.';
-$helptxt['search_weight_sticky'] = 'Weight factors are used to determine the relevancy of a search result. Change these weight factors to match the things that are specifically important for your forum. For instance, a forum of a news site, might want a relatively high value for \'age of last matching message\'. All values are relative in relation to each other and should be positive integers.<br /><br />This factor looks whether a topic is sticky and increases the relevancy score if it is.';
+$helptxt['search_weight_sticky'] = 'Weight factors are used to determine the relevancy of a search result. Change these weight factors to match the things that are specifically important for your forum. For instance, a forum of a news site, might want a relatively high value for \'age of last matching message\'. All values are relative in relation to each other and should be positive integers.<br /><br />This factor looks whether a topic is pinned and increases the relevancy score if it is.';
 $helptxt['search'] = 'Adjust all settings for the search function here.';
 $helptxt['search_why_use_index'] = 'A search index can greatly improve the performance of searches on your forum. Especially when the number of messages on a forum grows bigger, searching without an index can take a long time and increase the pressure on your database. If your forum is bigger than 50,000 messages, you should consider creating a search index to assure peak performance of your forum.<br /><br />Note that a search index can take up quite some space. A fulltext index is a built-in index of the database. It\'s relatively compact (approximately the same size as the message table), but a lot of common words aren\'t indexed and it can, in some wildcard queries, turn out to be slow. The custom index is bigger (depending on your configuration it can be up to 3 times the size of the messages table) but its performance is often better than fulltext and indexes most words.';
 
@@ -549,7 +548,7 @@ $helptxt['posts_and_topics'] = '
 			In order to keep the language on your forum under control, you can censor certain words. This function allows you to convert forbidden words into innocent versions.
 		</li><li>
 			<strong>Topic Settings</strong>
-			Modify the settings related to topics. The number of topics per page, whether sticky topics are enabled or not, the number of messages needed for a topic to be hot, etc.
+			Modify the settings related to topics. The number of topics per page, whether pinned topics are enabled or not, the number of messages needed for a topic to be hot, etc.
 		</li>
 	</ul>';
 $helptxt['allow_no_censored'] = 'Global setting to allow users to optionaly turn off censoring in thier look and layout settings.  Users ablility to do this is still limited by thier permission profile.';

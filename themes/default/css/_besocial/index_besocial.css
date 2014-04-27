@@ -95,6 +95,9 @@ input, button, select, textarea, .editor {
 	background: #fff;
 	color: #666;
 }
+input, button, select, textarea, .editor {
+	font: 90%/130% Helvetica, Arial, "Nimbus Sans L", sans-serif;
+}
 
 input:hover, textarea:hover, button:hover, select:hover {
 	border: 1px solid #999;
@@ -115,16 +118,6 @@ input[disabled].input_text {
 	padding-left: 20px;
 	background: white url(../../images/openid.png) no-repeat;
 	background-position: 2% 50%;
-}
-
-/* Selects don't like to behave across OS and browsers, unfortunately. */
-.styled-select {
-	background: #fff url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYAQAAAADb20ChAAAAAnRSTlMAAQGU/a4AAAApSURBVHjaY/zPgIL+MTL+aWb84c74QZ/xgT6yFJALFARKARUAlaFpBACuqxnhHOnncgAAAABJRU5ErkJggg==) 98% 50% no-repeat;
-	border: 1px solid #ccc;
-	border-radius: 2px;
-}
-.styled-select select:disabled {
-	background: #eee url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYCAQAAABZqbWHAAAAKklEQVR42mMYiqCBgDQI4pXGp6QBBWJKY8ABB+Q4ElMajxKyghqhZCgCAL3SGQGs8tZQAAAAAElFTkSuQmCC) 98% 50% no-repeat;
 }
 
 /* Common button styling. */
@@ -237,10 +230,6 @@ strong {
 ::selection {
 	background: #7bb128;
 	color: white
-}
-#top_section_notice .button_submit {
-	position: relative;
-	top: -1.5px;
 }
 /* Other highlighted text, such as search results. */
 .highlight {
@@ -368,7 +357,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	color: #50aa3a;
 	font-weight: bold;
 }
-div.bbc_footnotes .meaction{
+div.bbc_footnotes .meaction {
 	display: inline-block;
 }
 
@@ -533,9 +522,6 @@ div.bbc_footnotes .meaction{
 	content: "\f0d7";
 	margin: 0 0 0 10px;
 	color: #ccc;
-}
-.poster_ip a {
-	display: inline;
 }
 .poster .linklevel2, .poster .linklevel2:hover {
 	border: 1px solid transparent !important;

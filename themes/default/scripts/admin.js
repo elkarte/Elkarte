@@ -1219,7 +1219,7 @@ function swapRot()
 
 /**
  * Enable/disable fields when transfering attachments
- * 
+ *
  * @returns {undefined}
  */
 function transferAttachOptions()
@@ -1248,6 +1248,22 @@ function confirmMoveTopics(confirmText)
 		return false;
 
 	return confirm(confirmText.replace(/%board_from%/, from.options[from.selectedIndex].text.replace(/^\u2003+\u27A4/, '')).replace(/%board_to%/, to.options[to.selectedIndex].text.replace(/^\u2003+\u27A4/, '')));
+}
+
+/**
+ * Hide the search methods area if using sphinx(ql) search
+ */
+function showhideSearchMethod()
+{
+	var searchSphinxQl = document.getElementById('search_index_sphinxql').checked,
+		searchSphinx = document.getElementById('search_index_sphinx').checked,
+		searchhide = searchSphinxQl || searchSphinx,
+		searchMethod = $('#search_method');
+
+	if (searchhide)
+		searchMethod.slideUp();
+	else
+		searchMethod.slideDown();
 }
 
 /**
@@ -1716,7 +1732,7 @@ function toggleCurrencyOther()
 /**
  * Used to ajax-ively preview the templates of bounced emails (template_bounce_template)
  */
-function ajax_getTemplatePreview()
+function ajax_getEmailTemplatePreview()
 {
 	$.ajax({
 		type: "POST",

@@ -474,7 +474,7 @@ class PersonalMessage_Controller extends Action_Controller
 					'text' => 'delete_conversation',
 					'image' => 'delete.png',
 					'lang' => true,
-					'url' => $scripturl . '?action=pm;sa=pmactions;pm_actions[' . $context['current_pm'] . ']=delete;conversation;f=' . $context['folder'] . ';start=' . $context['start'] . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '') . ';' . $context['session_var'] . '=' . $context['session_id'],
+					'url' => $scripturl . '?action=pm;sa=pmactions;pm_actions%5B' . $context['current_pm'] . '%5D=delete;conversation;f=' . $context['folder'] . ';start=' . $context['start'] . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '') . ';' . $context['session_var'] . '=' . $context['session_id'],
 					'custom' => 'onclick="return confirm(\'' . addslashes($txt['remove_message']) . '?\');"'
 				),
 			);
@@ -670,7 +670,6 @@ class PersonalMessage_Controller extends Action_Controller
 		}
 
 		// Needed for the editor.
-		$modSettings['disable_wysiwyg'] = !empty($modSettings['disable_wysiwyg']) || empty($modSettings['enableBBC']);
 		require_once(SUBSDIR . '/Editor.subs.php');
 
 		// Now create the editor.
@@ -880,7 +879,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 			if (is_array($context['require_verification']))
 				foreach ($context['require_verification'] as $error)
-					$post_errors->addError($error, 0);
+					$post_errors->addError($error);
 		}
 
 		// If they made any errors, give them a chance to make amends.

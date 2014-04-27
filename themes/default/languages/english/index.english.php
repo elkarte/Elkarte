@@ -492,7 +492,7 @@ $txt['moved'] = 'MOVED';
 $txt['moved_why'] = 'Please enter a brief description as to<br />why this topic is being moved.';
 $txt['board'] = 'Board';
 $txt['in'] = 'in';
-$txt['sticky_topic'] = 'Sticky Topic';
+$txt['sticky_topic'] = 'Pinned Topic';
 $txt['split'] = 'SPLIT';
 
 $txt['delete'] = 'Delete';
@@ -668,7 +668,7 @@ $txt['poll_cannot_see'] = 'You cannot see the results of this poll at the moment
 $txt['quick_mod_approve'] = 'Approve selected';
 $txt['quick_mod_remove'] = 'Remove selected';
 $txt['quick_mod_lock'] = 'Lock/Unlock selected';
-$txt['quick_mod_sticky'] = 'Sticky/Unsticky selected';
+$txt['quick_mod_sticky'] = 'Pin/Unpin selected';
 $txt['quick_mod_move'] = 'Move selected to';
 $txt['quick_mod_merge'] = 'Merge selected';
 $txt['quick_mod_markread'] = 'Mark selected read';
@@ -811,6 +811,7 @@ $txt['preview_title'] = 'Preview post';
 $txt['preview_fetch'] = 'Fetching preview...';
 $txt['preview_new'] = 'New message';
 $txt['pm_error_while_submitting'] = 'The following error or errors occurred while sending this personal message:';
+$txt['warning_while_submitting'] = 'Something happened, review it here:';
 $txt['error_while_submitting'] = 'The message has the following error or errors that must be corrected before continuing:';
 $txt['error_old_topic'] = 'Warning: this topic has not been posted in for at least %1$d days.<br />Unless you\'re sure you want to reply, please consider starting a new topic.';
 

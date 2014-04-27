@@ -95,7 +95,7 @@ class ManageMembergroups_Controller extends Action_Controller
 		// Default to sub action 'index' or 'settings' depending on permissions.
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('manage_membergroups') ? 'index' : 'settings');
 
-		// Set that subaction, call integrate_manage_membergroups
+		// Set that subaction, call integrate_sa_manage_membergroups
 		$subAction = $action->initialize($subActions, $subAction);
 
 		// Final items for the template

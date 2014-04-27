@@ -82,7 +82,7 @@ $txt['whotopic_poll_remove'] = 'Removing the poll in &quot;<a href="' . $scriptu
 $txt['whotopic_removetopic2'] = 'Removing the topic <a href="' . $scripturl . '?topic=%1$d.0">%2$s</a>.';
 $txt['whotopic_sendtopic'] = 'Sending the topic &quot;<a href="' . $scripturl . '?topic=%1$d.0">%2$s</a>&quot; to a friend.';
 $txt['whotopic_splittopics'] = 'Splitting the topic &quot;<a href="' . $scripturl . '?topic=%1$d.0">%2$s</a>&quot; into two topics.';
-$txt['whotopic_sticky'] = 'Setting the topic &quot;<a href="' . $scripturl . '?topic=%1$d.0">%2$s</a>&quot; as sticky.';
+$txt['whotopic_sticky'] = 'Pinned the topic &quot;<a href="' . $scripturl . '?topic=%1$d.0">%2$s</a>&quot;.';
 $txt['whotopic_vote'] = 'Voting in <a href="' . $scripturl . '?topic=%1$d.0">%2$s</a>.';
 $txt['whotopic_watch'] = 'Started watching a topic.';
 $txt['whotopic_unwatch'] = 'Stopped watching a topic.';
