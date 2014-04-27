@@ -2,7 +2,8 @@
 
 /**
  * Contains all the functionality required to be able to edit the core server settings.
- * This includes anything from which an error may result in the forum destroying itself in a firey fury.
+ * This includes anything from which an error may result in the forum destroying
+ * itself in a firey fury.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -16,48 +17,6 @@
  *
  * @version 1.0 Beta 2
  *
- *
- * Adding options to one of the setting screens isn't hard.
- * Call prepareDBSettingsContext;
- * The basic format for a checkbox is:
- *     array('check', 'nameInModSettingsAndSQL'),
- * And for a text box:
- *     array('text', 'nameInModSettingsAndSQL')
- * (NOTE: You have to add an entry for this at the bottom!)
- *
- * In these cases, it will look for $txt['nameInModSettingsAndSQL'] as the description,
- * and $helptxt['nameInModSettingsAndSQL'] as the (?) help popup description.
- *
- * Here's a quick explanation of how to add a new item:
- *
- * - A text input box.  For textual values.
- *     array('text', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
- * - A text input box.  For numerical values.
- *     array('int', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
- * - A text input box.  For floating point values.
- *     array('float', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
- * - A large text input box. Used for textual values spanning multiple lines.
- *     array('large_text', 'nameInModSettingsAndSQL', 'OptionalNumberOfRows'),
- * - A check box.  Either one or zero. (boolean)
- *     array('check', 'nameInModSettingsAndSQL'),
- * - A selection box.  Used for the selection of something from a list.
- *     array('select', 'nameInModSettingsAndSQL', array('valueForSQL' => $txt['displayedValue'])),
- *     Note that just saying array('first', 'second') will put 0 in the SQL for 'first'.
- * - A password input box. Used for passwords, no less!
- *     array('password', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
- * - A permission - for picking groups who have a permission.
- *     array('permissions', 'manage_groups'),
- * - A BBC selection box.
- *     array('bbc', 'sig_bbc'),
- *
- * For each option:
- *  - type (see above), variable name, size/possible values.
- *    OR make type '' for an empty string for a horizontal rule.
- *  - SET preinput - to put some HTML prior to the input box.
- *  - SET postinput - to put some HTML following the input box.
- *  - SET invalid - to mark the data as invalid.
- *  - PLUS you can override label and help parameters by forcing their keys in the array, for example:
- *    array('text', 'invalidlabel', 3, 'label' => 'Actual Label')
  */
 
 if (!defined('ELK'))
@@ -65,6 +24,7 @@ if (!defined('ELK'))
 
 /**
  * ManageServer administration pages controller.
+ *
  * This handles several screens, with low-level essential settings such as
  * database settings, cache, general forum settings, and others.
  * It sends the data for display, and it allows the admin to change it.
@@ -105,11 +65,11 @@ class ManageServer_Controller extends Action_Controller
 	 * This is the main dispatcher. Sets up all the available sub-actions, all the tabs and selects
 	 * the appropriate one based on the sub-action.
 	 *
-	 * Requires the admin_forum permission.
-	 * Redirects to the appropriate function based on the sub-action.
+	 * What it does:
+	 * - Requires the admin_forum permission.
+	 * - Redirects to the appropriate function based on the sub-action.
 	 *
 	 * @uses edit_settings adminIndex.
-	 *
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
@@ -188,16 +148,16 @@ class ManageServer_Controller extends Action_Controller
 
 	/**
 	 * General forum settings - forum name, maintenance mode, etc.
-	 * Practically, this shows an interface for the settings in Settings.php to be changed.
 	 *
-	 * - It uses the rawdata sub-template (not theme-able.)
+	 * Practically, this shows an interface for the settings in Settings.php to
+	 * be changed. The method handles the display, allows to edit, and saves
+	 * the result for generalSettings form.
+	 *
+	 * What it does:
 	 * - Requires the admin_forum permission.
 	 * - Uses the edit_settings administration area.
 	 * - Contains the actual array of settings to show from Settings.php.
 	 * - Accessed from ?action=admin;area=serversettings;sa=general.
-	 *
-	 * This method handles the display, allows to edit, and saves the result
-	 * for generalSettings form.
 	 */
 	public function action_generalSettings_display()
 	{
@@ -241,15 +201,15 @@ class ManageServer_Controller extends Action_Controller
 	/**
 	 * Basic database and paths settings - database name, host, etc.
 	 *
+	 * This method handles the display, allows to edit, and saves the results
+	 * for _databaseSettings.
+	 *
+	 * What it does:
 	 * - It shows an interface for the settings in Settings.php to be changed.
 	 * - It contains the actual array of settings to show from Settings.php.
-	 * - It uses the rawdata sub-template (not theme-able.)
 	 * - Requires the admin_forum permission.
 	 * - Uses the edit_settings administration area.
 	 * - Accessed from ?action=admin;area=serversettings;sa=database.
-	 *
-	 * This method handles the display, allows to edit, and saves the result
-	 * for _databaseSettings form.
 	 */
 	public function action_databaseSettings_display()
 	{
@@ -291,6 +251,7 @@ class ManageServer_Controller extends Action_Controller
 
 	/**
 	 * Modify cookies settings.
+	 *
 	 * This method handles the display, allows to edit, and saves the result
 	 * for the _cookieSettings form.
 	 */
@@ -369,6 +330,7 @@ class ManageServer_Controller extends Action_Controller
 
 	/**
 	 * Cache settings editing and submission.
+	 *
 	 * This method handles the display, allows to edit, and saves the result
 	 * for _cacheSettings form.
 	 */
@@ -376,10 +338,10 @@ class ManageServer_Controller extends Action_Controller
 	{
 		global $context, $scripturl, $txt;
 
-		// initialize the form
+		// Initialize the form
 		$this->_initCacheSettingsForm();
 
-		// some javascript to enable / disable certain settings if the option is not selected
+		// Some javascript to enable / disable certain settings if the option is not selected
 		addInlineJavascript('
 			var cache_type = document.getElementById(\'cache_accelerator\');
 
@@ -497,8 +459,11 @@ class ManageServer_Controller extends Action_Controller
 	/**
 	 * Allows us to see the servers php settings
 	 *
+	 * What it does:
 	 * - loads the settings into an array for display in a template
 	 * - drops cookie values just in case
+	 *
+	 * @uses sub-template php_info
 	 */
 	public function action_phpinfo()
 	{
@@ -726,7 +691,7 @@ class ManageServer_Controller extends Action_Controller
 		$disabled = true;
 		$context['settings_message'] = $txt['loadavg_disabled_conf'];
 
-		// don't say you're using that win-thing, no cookies for you :P
+		// Don't say you're using that win-thing, no cookies for you :P
 		if (stripos(PHP_OS, 'win') === 0)
 			$context['settings_message'] = $txt['loadavg_disabled_windows'];
 		else

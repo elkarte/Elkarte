@@ -522,8 +522,6 @@ class Maintenance_Controller extends Action_Controller
 	 * - It shows as the maintain_forum admin area.
 	 * - It is accessed from ?action=admin;area=maintain;sa=database;activity=optimize.
 	 * - It also updates the optimize scheduled task such that the tables are not automatically optimized again too soon.
-	 *
-	 * @uses the rawdata sub template (built in.)
 	 */
 	public function action_optimize_display()
 	{
