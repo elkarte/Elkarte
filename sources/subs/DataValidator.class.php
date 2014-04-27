@@ -310,26 +310,34 @@ class Data_Validator
 				foreach ($rules as $rule)
 				{
 					$validation_parameters = null;
+					$validation_parameters_function = array();
 
 					// Were any parameters provided for the rule, e.g. min_length[6]
 					if (preg_match('~(.*)\[(.*)\]~', $rule, $match))
 					{
 						$validation_method = '_validate_' . $match[1];
 						$validation_parameters = $match[2];
+						$validation_function = $match[1];
+						$validation_parameters_function = explode(',', $match[2]);
 					}
 					// Or just a predefined rule e.g. valid_email
 					else
+					{
 						$validation_method = '_validate_' . $rule;
+						$validation_function = $rule;
+					}
 
 					// Defined method to use?
 					if (is_callable(array($this, $validation_method)))
 						$result = $this->$validation_method($field, $input, $validation_parameters);
 					// One of our static methods
-					elseif (strpos($rule, '::') !== false && is_callable($rule))
-						$result = call_user_func($rule, $input[$field], $validation_parameters);
+					elseif (strpos($validation_function, '::') !== false && is_callable($validation_function))
+					{
+						$result = call_user_func_array($validation_method, array_merge((array) $input[$field], $validation_parameters_function));
+					}
 					// Maybe even a function?
-					elseif (function_exists($rule))
-						$result = $rule($input[$field], $validation_parameters);
+					elseif (function_exists($validation_function))
+						$result = call_user_func_array($validation_function, array_merge((array) $input[$field], $validation_parameters_function));
 					else
 						$result = array(
 							'field' => $validation_method,
@@ -434,31 +442,37 @@ class Data_Validator
 				foreach ($rules as $rule)
 				{
 					$sanitation_parameters = null;
+					$sanitation_parameters_function = array();
 
 					// Were any parameters provided for the rule, e.g. Util::htmlspecialchars[ENT_QUOTES]
 					if (preg_match('~(.*)\[(.*)\]~', $rule, $match))
 					{
 						$sanitation_method = '_sanitation_' . $match[1];
 						$sanitation_parameters = $match[2];
+						$sanitation_function = $match[1];
+						$sanitation_parameters_function = explode(',', $match[2]);
 					}
 					// Or just a predefined rule e.g. trim
 					else
+					{
 						$sanitation_method = '_sanitation_' . $rule;
+						$sanitation_function = $rule;
+					}
 
 					// Defined method to use?
 					if (is_callable(array($this, $sanitation_method)))
 						$input[$field] = $this->$sanitation_method($input[$field], $sanitation_parameters);
 					// One of our static methods
-					elseif (strpos($rule, '::') !== false && is_callable($rule))
-						$input[$field] = call_user_func($rule, $input[$field], $sanitation_parameters);
+					elseif (strpos($sanitation_function, '::') !== false && is_callable($sanitation_function))
+						$input[$field] = call_user_func_array($sanitation_function, array_merge((array) $input[$field], $sanitation_parameters_function));
 					// Maybe even a built in php function like strtoupper, intval, etc?
-					elseif (function_exists($rule))
-						$input[$field] = $rule($input[$field]);
+					elseif (function_exists($sanitation_function))
+						$input[$field] = call_user_func_array($sanitation_function, array_merge((array) $input[$field], $sanitation_parameters_function));
 					// Or even a language construct?
-					elseif (in_array($rule, array('empty', 'array', 'isset')))
+					elseif (in_array($sanitation_function, array('empty', 'array', 'isset')))
 					{
 						// could be done as methods instead ...
-						switch ($rule)
+						switch ($sanitation_function)
 						{
 							case 'empty':
 								$input[$field] = empty($input[$field]);

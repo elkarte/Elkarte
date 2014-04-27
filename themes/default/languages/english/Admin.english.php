@@ -617,7 +617,7 @@ $txt['bbcTagsToUse'] = 'Enabled BBC tags';
 $txt['bbcTagsToUse_select'] = 'Select the tags allowed to be used';
 $txt['bbcTagsToUse_select_all'] = 'Select all tags';
 
-$txt['enableStickyTopics'] = 'Enable sticky topics';
+$txt['enableStickyTopics'] = 'Enable pinned topics';
 $txt['enableParticipation'] = 'Enable participation icons';
 $txt['enableFollowup'] = 'Enable followups';
 $txt['oldTopicDays'] = 'Time before topic is warned as old on reply';

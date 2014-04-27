@@ -900,7 +900,7 @@ class DbTable_PostgreSQL extends DbTable
 	public static function db_table()
 	{
 		if (is_null(self::$_tbl))
-			self::$_tbl = new DbTable_MySQL();
+			self::$_tbl = new DbTable_PostgreSQL();
 		return self::$_tbl;
 	}
 }

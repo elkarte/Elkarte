@@ -414,7 +414,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 		// The "all" button
 		if ($show['all'])
 		{
-			if ($show['all_selected'])
+			if (!empty($show['all_selected']))
 				$pageindex .= sprintf($settings['page_index_template']['current_page'], $txt['all']);
 			else
 				$pageindex .= sprintf(str_replace('.%1$d', '.%1$s', $base_link), '0;all', str_replace('{all_txt}', $txt['all'], $settings['page_index_template']['all']));
@@ -477,7 +477,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 		// The "all" button
 		if ($show['all'])
 		{
-			if ($show['all_selected'])
+			if (!empty($show['all_selected']))
 				$pageindex .= sprintf($settings['page_index_template']['current_page'], $txt['all']);
 			else
 				$pageindex .= sprintf(str_replace('.%1$d', '.%1$s', $base_link), '0;all', str_replace('{all_txt}', $txt['all'], $settings['page_index_template']['all']));

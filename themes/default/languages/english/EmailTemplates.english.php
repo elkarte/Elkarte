@@ -731,8 +731,8 @@ More replies may be posted, but you won\'t receive any more notifications until 
 	@additional_params: notification_sticky
 	@description:
 */
-$txt['notification_sticky_subject'] = 'Topic stickied: {TOPICSUBJECT}';
-$txt['notification_sticky_body'] = 'A topic you are watching has been marked as a sticky topic by {POSTERNAME}.
+$txt['notification_sticky_subject'] = 'Topic pinned: {TOPICSUBJECT}';
+$txt['notification_sticky_body'] = 'A topic you are watching has been pinned by {POSTERNAME}.
 
 View the topic at: {TOPICLINK}
 
