@@ -1907,23 +1907,6 @@ div.bbc_footnotes .meaction{
 		border-radius: 3px;
 		margin-top: 8px;
 	}
-	.navigate_section, .linktree, .linktree:before, .linktree:after, .linktree_last,
-	.linktree_last:before, .linktree_last:after {
-		border: none !important;
-		background: none !important;
-	}
-	.navigate_section *, .linktree, .linktree_last, linktree:hover {
-		line-height: 1.7em;
-		height: 2.2em;
-	}
-	.linktree:after {
-		content: ">";
-		line-height: 1.7em;
-	}
-	.linktree:hover, .linktree>a:hover, .linktree_last, .linktree_last>a,
-	.linktree_last>a:hover, .linktree_last strong {
-		color: #666 !important;
-	}
 	.forum_category, .forumposts, .content_category {
 		background: #fff;
 		border: none;

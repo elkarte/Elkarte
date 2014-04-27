@@ -474,7 +474,7 @@ class PersonalMessage_Controller extends Action_Controller
 					'text' => 'delete_conversation',
 					'image' => 'delete.png',
 					'lang' => true,
-					'url' => $scripturl . '?action=pm;sa=pmactions;pm_actions[' . $context['current_pm'] . ']=delete;conversation;f=' . $context['folder'] . ';start=' . $context['start'] . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '') . ';' . $context['session_var'] . '=' . $context['session_id'],
+					'url' => $scripturl . '?action=pm;sa=pmactions;pm_actions%5B' . $context['current_pm'] . '%5D=delete;conversation;f=' . $context['folder'] . ';start=' . $context['start'] . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '') . ';' . $context['session_var'] . '=' . $context['session_id'],
 					'custom' => 'onclick="return confirm(\'' . addslashes($txt['remove_message']) . '?\');"'
 				),
 			);

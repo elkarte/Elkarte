@@ -29,6 +29,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 	$editor_context = &$context['controls']['richedit'][$editor_id];
 
 	echo '
+		<div id="editor_toolbar_container"></div>
 		<textarea class="editor', isset($context['post_error']['errors']['no_message']) || isset($context['post_error']['errors']['long_message']) ? ' border_error' : '', '" name="', $editor_id, '" id="', $editor_id, '" tabindex="', $context['tabindex']++, '" style="width:', $editor_context['width'], ';height: ', $editor_context['height'], ';" required="required">', $editor_context['value'], '</textarea>
 		<input type="hidden" name="', $editor_id, '_mode" id="', $editor_id, '_mode" value="0" />
 		<script><!-- // --><![CDATA[
@@ -40,6 +41,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 				$("#', $editor_id, '").sceditor({
 					style: "', $settings['theme_url'], '/css/', $context['theme_variant_url'], 'jquery.sceditor.elk_wiz', $context['theme_variant'], '.css",
 					width: "100%",
+					toolbarContainer: $("#editor_toolbar_container"),
 					resizeWidth: false,
 					resizeMaxHeight: -1,
 					emoticonsCompat: true,
