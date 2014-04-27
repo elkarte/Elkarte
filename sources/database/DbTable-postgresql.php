@@ -52,8 +52,10 @@ class DbTable_PostgreSQL extends DbTable
 
 	/**
 	 * DbTable_PostgreSQL::construct
+	 *
+	 * @param object $db - A Database_PostgreSQL object
 	 */
-	private function __construct($_db)
+	private function __construct($db)
 	{
 		global $db_prefix;
 
@@ -75,7 +77,7 @@ class DbTable_PostgreSQL extends DbTable
 		$this->_package_log = array();
 
 		// This executes queries and things
-		$this->_db = $_db;
+		$this->_db = $db;
 	}
 
 	/**
@@ -901,11 +903,13 @@ class DbTable_PostgreSQL extends DbTable
 
 	/**
 	 * Static method that allows to retrieve or create an instance of this class.
+	 * @param object $_db - A Database_PostgreSQL object
+	 * @return object - A DbTable_PostgreSQL object
 	 */
-	public static function db_table()
+	public static function db_table($db)
 	{
 		if (is_null(self::$_tbl))
-			self::$_tbl = new DbTable_PostgreSQL();
+			self::$_tbl = new DbTable_PostgreSQL($db);
 		return self::$_tbl;
 	}
 }

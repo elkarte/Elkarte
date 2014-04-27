@@ -52,8 +52,10 @@ class DbTable_MySQL extends DbTable
 
 	/**
 	 * DbTable_MySQL::construct
+	 *
+	 * @param object $db - A Database_MySQL object
 	 */
-	private function __construct($_db)
+	private function __construct($db)
 	{
 		global $db_prefix;
 
@@ -76,7 +78,7 @@ class DbTable_MySQL extends DbTable
 		$this->_package_log = array();
 
 		// This executes queries and things
-		$this->_db = $_db;
+		$this->_db = $db;
 	}
 
 	/**
@@ -720,11 +722,14 @@ class DbTable_MySQL extends DbTable
 
 	/**
 	 * Static method that allows to retrieve or create an instance of this class.
+	 *
+	 * @param object $_db - A Database_MySQL object
+	 * @return object - A DbTable_MySQL object
 	 */
-	public static function db_table()
+	public static function db_table($db)
 	{
 		if (is_null(self::$_tbl))
-			self::$_tbl = new DbTable_MySQL();
+			self::$_tbl = new DbTable_MySQL($db);
 		return self::$_tbl;
 	}
 }
