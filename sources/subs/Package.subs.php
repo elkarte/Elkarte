@@ -1672,6 +1672,9 @@ function parse_path($path)
 {
 	global $modSettings, $settings, $temp_path;
 
+	if (empty($path))
+		return;
+
 	$dirs = array(
 		'\\' => '/',
 		'BOARDDIR' => BOARDDIR,

@@ -105,7 +105,7 @@ function list_integration_hooks_data($start, $per_page, $sort)
 
 						if (substr($hook, -8) === '_include')
 						{
-							$hook_status[$hook][$function]['exists'] = file_exists(parse_path(trim($function)));
+							$hook_status[$hook][$hook_name]['exists'] = true;
 
 							// I need to know if there is at least one function called in this file.
 							$temp_data['include'][basename($function)] = array('hook' => $hook, 'function' => $function);
