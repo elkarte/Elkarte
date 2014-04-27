@@ -312,6 +312,7 @@ class ManageBans_Controller extends Action_Controller
 
 		$ban_errors = Error_Context::context('ban', 1);
 
+		// Saving a new or edited ban?
 		if ((isset($_POST['add_ban']) || isset($_POST['modify_ban']) || isset($_POST['remove_selection'])) && !$ban_errors->hasErrors())
 			$this->action_edit2();
 
@@ -421,17 +422,11 @@ class ManageBans_Controller extends Action_Controller
 						array(
 							'position' => 'below_table_data',
 							'value' => '
-							<div class="submitbutton">
-								<input type="submit" name="remove_selection" value="' . $txt['ban_remove_selected_triggers'] . '" class="button_submit" />
-								<a class="linkbutton" href="' . $scripturl . '?action=admin;area=ban;sa=edittrigger;bg=' . $ban_group_id . '">' . $txt['ban_add_trigger'] . '</a>
-							</div>',
-						),
-						array(
-							'position' => 'below_table_data',
-							'value' => '
-							<input type="hidden" name="bg" value="' . $ban_group_id . '" />
-							<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
-							<input type="hidden" name="' . $context['admin-bet_token_var'] . '" value="' . $context['admin-bet_token'] . '" />',
+								<input type="submit" name="remove_selection" value="' . $txt['ban_remove_selected_triggers'] . '" class="right_submit" />
+								<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=ban;sa=edittrigger;bg=' . $ban_group_id . '">' . $txt['ban_add_trigger'] . '</a>
+								<input type="hidden" name="bg" value="' . $ban_group_id . '" />
+								<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
+								<input type="hidden" name="' . $context['admin-bet_token_var'] . '" value="' . $context['admin-bet_token'] . '" />',
 						),
 					),
 				);
@@ -499,8 +494,7 @@ class ManageBans_Controller extends Action_Controller
 			}
 		}
 
-		// Template needs this to show errors using javascript
-		loadLanguage('Errors');
+		// Set the right template
 		$context['sub_template'] = 'ban_edit';
 
 		// A couple of text strings we *may* need
@@ -671,6 +665,7 @@ class ManageBans_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Bans.subs.php');
 
+		// Check with security first
 		checkSession();
 		validateToken('admin-bet');
 
@@ -714,24 +709,34 @@ class ManageBans_Controller extends Action_Controller
 			$context['ban'] = $ban_info;
 		}
 
+		// Update the triggers associated with this ban
 		if (isset($_POST['ban_suggestions']))
 		{
 			$saved_triggers = saveTriggers($_POST['ban_suggestions'], $ban_info['id'], isset($_REQUEST['u']) ? (int) $_REQUEST['u'] : 0, isset($_REQUEST['bi']) ? (int) $_REQUEST['bi'] : 0);
 			$context['ban_suggestions']['saved_triggers'] = $saved_triggers;
 		}
 
-		// Something went wrong somewhere... Oh well, let's go back.
+		// Something went wrong somewhere, ban info or triggers, ... Oh well, let's go back.
 		if ($ban_errors->hasErrors())
 		{
 			$context['ban_suggestions'] = $saved_triggers;
 			$context['ban']['from_user'] = true;
-			$context['ban_suggestions'] = array_merge($context['ban_suggestions'], getMemberData((int) $_REQUEST['u']));
+
+			// They may have entered a name not using the member select box
+			if (isset($_REQUEST['u']))
+				$context['ban_suggestions'] = array_merge($context['ban_suggestions'], getMemberData((int) $_REQUEST['u']));
+			elseif (isset($_REQUEST['user']))
+			{
+				$context['ban']['from_user'] = false;
+				$context['use_autosuggest'] = true;
+				$context['ban_suggestions']['member']['name'] = $_REQUEST['user'];
+			}
 
 			// Not strictly necessary, but it's nice
 			if (!empty($context['ban_suggestions']['member']['id']))
 				$context['ban_suggestions']['other_ips'] = banLoadAdditionalIPs($context['ban_suggestions']['member']['id']);
 
-			return action_edit();
+			return $this->action_edit();
 		}
 
 		if (isset($_POST['ban_items']))
@@ -747,7 +752,9 @@ class ManageBans_Controller extends Action_Controller
 
 		// Update the member table to represent the new ban situation.
 		updateBanMembers();
-		redirectexit('action=admin;area=ban;sa=edit;bg=' . $ban_group_id);
+
+		// Go back to an appropriate spot
+		redirectexit('action=admin;area=ban;sa=' . isset($_POST['add_ban']) ? 'list' : 'edit' . ';bg=' . $ban_group_id);
 	}
 
 	/**
