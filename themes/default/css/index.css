@@ -215,6 +215,10 @@ select option {
 	font-size: .857em;
 	display: inline-block;
 }
+.linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
+.linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
+	padding: 0 6px;
+}
 .left_submit, .linkbutton_left {
 	float: left;
 }
