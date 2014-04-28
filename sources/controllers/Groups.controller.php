@@ -212,13 +212,15 @@ class Groups_Controller extends Action_Controller
 
 	/**
 	 * Display members of a group, and allow adding of members to a group.
-	 * It can be called from ManageMembergroups if it needs templating within the admin environment.
-	 * It shows a list of members that are part of a given membergroup.
-	 * It is called by ?action=moderate;area=viewgroups;sa=members;group=x
-	 * It requires the manage_membergroups permission.
-	 * It allows to add and remove members from the selected membergroup.
-	 * It allows sorting on several columns.
-	 * It redirects to itself.
+	 *
+	 * What it does:
+	 * - It can be called from ManageMembergroups if it needs templating within the admin environment.
+	 * - It shows a list of members that are part of a given membergroup.
+	 * - It is called by ?action=moderate;area=viewgroups;sa=members;group=x
+	 * - It requires the manage_membergroups permission.
+	 * - It allows to add and remove members from the selected membergroup.
+	 * - It allows sorting on several columns.
+	 * - It redirects to itself.
 	 * @uses ManageMembergroups template, group_members sub template.
 	 */
 	public function action_members()
