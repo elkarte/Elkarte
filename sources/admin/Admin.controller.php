@@ -963,12 +963,13 @@ class Admin_Controller extends Action_Controller
 		global $context;
 
 		require_once(ADMINDIR . '/ManageMembers.controller.php');
-		$_REQUEST['sa'] = 'query';
 
+		$_REQUEST['sa'] = 'query';
 		$_POST['membername'] = un_htmlspecialchars($context['search_term']);
 		$_POST['types'] = '';
 
-		action_index();
+		$managemembers = new ManageMembers_Controller();
+		$managemembers->action_index();
 	}
 
 	/**
