@@ -1799,7 +1799,7 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 
 	if ($default_loaded === false)
 	{
-		loadCSSFile(array('index.css'));
+		loadCSSFile('index.css');
 		$default_loaded = true;
 	}
 

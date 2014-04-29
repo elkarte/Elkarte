@@ -41,6 +41,7 @@ function template_manage_themes()
 								<label for="options-theme_allow"> ', $txt['theme_allow'], '</label>
 							</dt>
 							<dd>
+								<input type="hidden" value="0" name="options[theme_allow]">
 								<input type="checkbox" name="options[theme_allow]" id="options-theme_allow" value="1"', !empty($modSettings['theme_allow']) ? ' checked="checked"' : '', ' class="input_check" />
 							</dd>
 							<dt>

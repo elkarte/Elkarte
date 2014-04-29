@@ -430,7 +430,7 @@ class Xml_Controller extends Action_Controller
 			if (empty($validation_token))
 				$errors[] = array('value' => $txt['token_verify_fail']);
 		}
-		
+
 		// New generic token for use
 		createToken('admin-sort', 'post');
 		$tokens = array(

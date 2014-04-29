@@ -215,6 +215,10 @@ select option {
 	font-size: .857em;
 	display: inline-block;
 }
+.linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
+.linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
+	padding: 0 6px;
+}
 .left_submit, .linkbutton_left {
 	float: left;
 }
@@ -3258,9 +3262,6 @@ div.labels {
 /* Cheat and match this to the submit button. */
 #calendar_navigation .buttonlist {
 	padding: 0 6px;
-}
-#calendar_navigation select {
-	margin-top: 2px;
 }
 /* See, I told you there was deranged wombatz here. */
 /*

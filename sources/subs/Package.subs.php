@@ -1672,6 +1672,9 @@ function parse_path($path)
 {
 	global $modSettings, $settings, $temp_path;
 
+	if (empty($path))
+		return;
+
 	$dirs = array(
 		'\\' => '/',
 		'BOARDDIR' => BOARDDIR,
@@ -1683,7 +1686,6 @@ function parse_path($path)
 		'$avatars_dir' => $modSettings['avatar_directory'],
 		'$themedir' => $settings['default_theme_dir'],
 		'$imagesdir' => $settings['default_theme_dir'] . '/' . basename($settings['default_images_url']),
-		'$themes_dir' => BOARDDIR . '/themes',
 		'LANGUAGEDIR' => $settings['default_theme_dir'] . '/languages',
 		'$languages_dir' => $settings['default_theme_dir'] . '/languages',
 		'$smileysdir' => $modSettings['smileys_dir'],

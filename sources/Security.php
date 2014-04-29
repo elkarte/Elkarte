@@ -210,7 +210,7 @@ function is_not_guest($message = '', $is_fatal = true)
  * Apply restrictions for banned users. For example, disallow access.
  *
  * What it does:
- * - If he user is banned, it dies with an error.
+ * - If the user is banned, it dies with an error.
  * - Caches this information for optimization purposes.
  * - Forces a recheck if force_check is true.
  *
@@ -218,8 +218,7 @@ function is_not_guest($message = '', $is_fatal = true)
  */
 function is_not_banned($forceCheck = false)
 {
-	global $txt, $modSettings, $context, $user_info;
-	global $cookiename, $user_settings;
+	global $txt, $modSettings, $context, $user_info, $cookiename, $user_settings;
 
 	$db = database();
 
@@ -249,6 +248,7 @@ function is_not_banned($forceCheck = false)
 			if ($ip_number == 'ip2' && $user_info['ip2'] == $user_info['ip'])
 				continue;
 			$ban_query[] = constructBanQueryIP($user_info[$ip_number]);
+
 			// IP was valid, maybe there's also a hostname...
 			if (empty($modSettings['disableHostnameLookup']) && $user_info[$ip_number] != 'unknown')
 			{
@@ -330,6 +330,7 @@ function is_not_banned($forceCheck = false)
 		$bans = explode(',', $_COOKIE[$cookiename . '_']);
 		foreach ($bans as $key => $value)
 			$bans[$key] = (int) $value;
+
 		$request = $db->query('', '
 			SELECT bi.id_ban, bg.reason
 			FROM {db_prefix}ban_items AS bi
@@ -367,7 +368,11 @@ function is_not_banned($forceCheck = false)
 
 		// We don't wanna see you!
 		if (!$user_info['is_guest'])
-			logOnline($user_info['id'], false);
+		{
+			require_once(CONTROLLERDIR . '/Auth.controller.php');
+			$controller = new Auth_Controller();
+			$controller->action_logout(true, false);
+		}
 
 		// 'Log' the user out.  Can't have any funny business... (save the name!)
 		$old_name = isset($user_info['name']) && $user_info['name'] != '' ? $user_info['name'] : $txt['guest_title'];
@@ -443,10 +448,12 @@ function is_not_banned($forceCheck = false)
 		$_GET['topic'] = '';
 		writeLog(true);
 
+		// Log them out
 		require_once(CONTROLLERDIR . '/Auth.controller.php');
 		$controller = new Auth_Controller();
 		$controller->action_logout(true, false);
 
+		// Tell them thanks
 		fatal_error(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_login']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_login']['reason']) . '<br />' . (!empty($_SESSION['ban']['expire_time']) ? sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) : $txt['your_ban_expires_never']) . '<br />' . $txt['ban_continue_browse'], 'user');
 	}
 

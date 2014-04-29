@@ -797,7 +797,7 @@ function template_postmod_permissions()
 
 	echo '
 					</select>
-					<input type="submit" value="', $txt['go'], '" class="button_submit" />
+					<input type="submit" value="', $txt['go'], '" class="right_submit" />
 				</div>
 				<table class="table_grid">
 				<thead>
