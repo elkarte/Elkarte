@@ -460,8 +460,6 @@ class ManageSecurity_Controller extends Action_Controller
 
 		// Set up the config array for use
 		$config_vars = array(
-				array('check', 'make_email_viewable'),
-			'',
 				array('int', 'failed_login_threshold'),
 				array('int', 'loginHistoryDays'),
 			'',

@@ -78,7 +78,7 @@ function validateSession($type = 'admin')
 	require_once(SUBSDIR . '/Auth.subs.php');
 
 	// Comming from the login screen
-	if (isset($_POST[$type. '_pass']) || isset($_POST[$type . '_hash_pass']))
+	if (isset($_POST[$type . '_pass']) || isset($_POST[$type . '_hash_pass']))
 	{
 		checkSession();
 		validateToken('admin-login');
@@ -1240,25 +1240,24 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
  */
 function showEmailAddress($userProfile_hideEmail, $userProfile_id)
 {
-	global $modSettings, $user_info;
+	global $user_info;
 
 	// Should this user's email address be shown?
-	// If you're guest and the forum is set to hide email for guests: no.
+	// If you're guest: no.
 	// If the user is post-banned: no.
-	// If it's your own profile and you've set your address hidden: yes_permission_override.
+	// If it's your own profile and you've not set your address hidden: yes_permission_override.
 	// If you're a moderator with sufficient permissions: yes_permission_override.
-	// If the user has set their email address to be hidden: no.
-	// If the forum is set to show full email addresses: yes.
-	// Otherwise: no_through_forum.
+	// If the user has set their profile to do not email me: no.
+	// Otherwise: no_through_forum. (don't show it but allow emailing the member)
 
 	if ($user_info['is_guest'] || isset($_SESSION['ban']['cannot_post']))
 		return 'no';
-	elseif ((!$user_info['is_guest'] && $user_info['id'] == $userProfile_id && !$userProfile_hideEmail) || allowedTo('moderate_forum'))
+	elseif ((!$user_info['is_guest'] && $user_info['id'] == $userProfile_id && !$userProfile_hideEmail))
+		return 'yes_permission_override';
+	elseif (allowedTo('moderate_forum'))
 		return 'yes_permission_override';
 	elseif ($userProfile_hideEmail)
 		return 'no';
-	elseif (!empty($modSettings['make_email_viewable']) )
-		return 'yes';
 	else
 		return 'no_through_forum';
 }
