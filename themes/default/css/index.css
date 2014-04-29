@@ -213,11 +213,8 @@ select option {
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
 	padding: 2px 6px;
 	font-size: .857em;
+	line-height: 17px;
 	display: inline-block;
-}
-.linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
-.linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
-	padding: 0 6px;
 }
 .left_submit, .linkbutton_left {
 	float: left;
