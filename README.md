@@ -23,7 +23,7 @@ Please see our [How to contribute](https://github.com/elkarte/Elkarte/blob/maste
 [![Build Status](https://travis-ci.org/elkarte/Elkarte.png?branch=master)](https://travis-ci.org/elkarte/Elkarte)
 
 ## Class / Method / Function documentation
-ElkArte utilizes inline docblocks to provide descriptions for all of its classes, methods and functions.  This [API Documentation(http://elkarte.github.io/Doc/) is availble online for viewing and searching.   
+ElkArte utilizes inline docblocks to provide descriptions for all of its classes, methods and functions.  This [API Documentation](http://elkarte.github.io/Doc/) is availble online for viewing and searching.   
 
 ## Site and IRC
 
