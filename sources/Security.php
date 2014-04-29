@@ -1007,20 +1007,16 @@ function allowedTo($permission, $boards = null)
 	if ($user_info['is_admin'])
 		return true;
 
+	// Make sure permission is a valid array
+	if (!is_array($permission))
+		$permission = array($permission);
+
 	// Are we checking the _current_ board, or some other boards?
 	if ($boards === null)
-	{
-		// Check if they can do it.
-		if (!is_array($permission) && in_array($permission, $user_info['permissions']))
-			return true;
-		// Search for any of a list of permissions.
-		elseif (is_array($permission) && count(array_intersect($permission, $user_info['permissions'])) != 0)
-			return true;
-		// You aren't allowed, by default.
-		else
-			return false;
-	}
-	elseif (!is_array($boards))
+		// Check if they can do it, you aren't allowed, by default.
+		return count(array_intersect($permission, $user_info['permissions'])) !== 0 ? true : false;
+
+	if (!is_array($boards))
 		$boards = array($boards);
 
 	$request = $db->query('', '
@@ -1030,7 +1026,7 @@ function allowedTo($permission, $boards = null)
 			LEFT JOIN {db_prefix}moderators AS mods ON (mods.id_board = b.id_board AND mods.id_member = {int:current_member})
 		WHERE b.id_board IN ({array_int:board_list})
 			AND bp.id_group IN ({array_int:group_list}, {int:moderator_group})
-			AND bp.permission {raw:permission_list}
+			AND bp.permission IN ({array_string:permission_list})
 			AND (mods.id_member IS NOT NULL OR bp.id_group != {int:moderator_group})
 		GROUP BY b.id_board',
 		array(
@@ -1038,7 +1034,7 @@ function allowedTo($permission, $boards = null)
 			'board_list' => $boards,
 			'group_list' => $user_info['groups'],
 			'moderator_group' => 3,
-			'permission_list' => (is_array($permission) ? 'IN (\'' . implode('\', \'', $permission) . '\')' : ' = \'' . $permission . '\''),
+			'permission_list' => $permission,
 		)
 	);
 
