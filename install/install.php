@@ -27,6 +27,7 @@ $GLOBALS['required_php_version'] = '5.2.0';
 $databases = array(
 	'mysql' => array(
 		'name' => 'MySQL',
+		'extension' => 'MySQL Improved (MySQLi)',
 		'version' => '5.0.19',
 		'version_check' => 'return min(mysqli_get_server_info($db_connection), mysqli_get_client_info($db_connection));',
 		'supported' => function_exists('mysqli_connect'),
@@ -46,6 +47,7 @@ $databases = array(
 	),
 	'postgresql' => array(
 		'name' => 'PostgreSQL',
+		'extension' => 'PostgreSQL (PgSQL)',
 		'version' => '8.3',
 		'function_check' => 'pg_connect',
 		'version_check' => '$request = pg_query(\'SELECT version()\'); list ($version) = pg_fetch_row($request); list ($pgl, $version) = explode(" ", $version); return $version;',
@@ -364,6 +366,7 @@ function action_welcome()
 
 	// Is some database support even compiled in?
 	$incontext['supported_databases'] = array();
+	$db_missing = array();
 	foreach ($databases as $key => $db)
 	{
 		if ($db['supported'])
@@ -380,9 +383,13 @@ function action_welcome()
 				$incontext['supported_databases'][] = $db;
 			}
 		}
+		else
+			$db_missing[] = $db['extension'];
 	}
 
-	if (empty($incontext['supported_databases']))
+	if (!empty($db_missing))
+		$incontext['error'] = sprintf($txt['error_db_missing'], implode(', ', $db_missing));
+	elseif (empty($incontext['supported_databases']))
 		$error = empty($notFoundSQLFile) ? 'error_db_missing' : 'error_db_script_missing';
 	// How about session support?  Some crazy sysadmin remove it?
 	elseif (!function_exists('session_start'))
