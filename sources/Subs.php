@@ -3019,14 +3019,12 @@ function template_css()
 }
 
 /**
- * I know this is becoming annoying, though this template *shall* be present
- * for security reasons, so better it stays here
- *
- * @todo rework it and merge into some other kind of general warning-box (e.g. modtask at index.template)
+ * Calls on template_show_error from index.template.php to show warnings
+ * and security errors for admins
  */
 function template_admin_warning_above()
 {
-	global $context;
+	global $context, $txt;
 
 	if (!empty($context['security_controls_files']))
 	{
@@ -3050,7 +3048,7 @@ function template_admin_warning_above()
 	if (!empty($context['warning_controls']))
 	{
 		$context['warning_controls']['errors'] = $context['warning_controls'];
-		$context['warning_controls']['title'] = 'Warning';
+		$context['warning_controls']['title'] = $txt['admin_warning_title'];
 		$context['warning_controls']['type'] = 'warning';
 		template_show_error('warning_controls');
 	}
