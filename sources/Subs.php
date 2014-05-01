@@ -3028,36 +3028,31 @@ function template_admin_warning_above()
 {
 	global $context;
 
-	if (!empty($context['security_controls']))
+	if (!empty($context['security_controls_files']))
 	{
-		foreach ($context['security_controls'] as $error)
-		{
-			echo '
-	<div class="errorbox">
-		<h3>', $error['title'], '</h3>
-		<ul>';
+		$context['security_controls_files']['type'] = 'serious';
+		template_show_error('security_controls_files');
+	}
 
-			foreach ($error['messages'] as $text)
-			{
-				echo '
-			<li class="listlevel1">', $text, '</li>';
-			}
+	if (!empty($context['security_controls_query']))
+	{
+		$context['security_controls_query']['type'] = 'serious';
+		template_show_error('security_controls_query');
+	}
 
-			echo '
-		</ul>
-	</div>';
-		}
+	if (!empty($context['security_controls_ban']))
+	{
+		$context['security_controls_ban']['type'] = 'serious';
+		template_show_error('security_controls_ban');
 	}
 
 	// Any special notices to remind the admin about?
 	if (!empty($context['warning_controls']))
 	{
-		echo '
-	<div class="warningbox">
-		<ul>
-			<li class="listlevel1">', implode('</li><li class="listlevel1">', $context['warning_controls']), '</li>
-		</ul>
-	</div>';
+		$context['warning_controls']['errors'] = $context['warning_controls'];
+		$context['warning_controls']['title'] = 'Warning';
+		$context['warning_controls']['type'] = 'warning';
+		template_show_error('warning_controls');
 	}
 }
 
