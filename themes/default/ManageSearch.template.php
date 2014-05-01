@@ -309,6 +309,7 @@ function template_create_index_progress()
 				</div>
 			</div>
 			<input type="hidden" name="step" value="', $context['step'], '" />
+			<input type="hidden" name="resume" value="1" />
 			<input type="hidden" name="start" value="', $context['start'], '" />
 			<input type="hidden" name="bytes_per_word" value="', $context['index_settings']['bytes_per_word'], '" />
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
