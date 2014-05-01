@@ -912,3 +912,6 @@ $txt['dailymotion'] = 'Dailymotion video:';
 $txt['spoiler'] = 'Spoiler (click to show/hide)';
 
 $txt['ok_uppercase'] = 'OK';
+
+// Title of box for warnings that admins should see
+$txt['admin_warning_title'] = 'Warning';

@@ -10,3 +10,4 @@ Packages/temp
 .settings/
 /site
 nbproject/*
+.*.swp
