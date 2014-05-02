@@ -1193,7 +1193,7 @@ function template_profile_block_posts()
 	// The posts block
 	echo '
 	<h3 class="category_header hdicon cat_img_posts">
-		<a href="', $scripturl, '?action=profile;area=showposts;sa=messages;u=', $context['member']['id'], '">', $txt['profile_posts'], '</a>
+		<a href="', $scripturl, '?action=profile;area=showposts;sa=messages;u=', $context['member']['id'], '">', $txt['profile_recent_posts'], '</a>
 	</h3>
 	<div class="windowbg">
 		<div class="content">
