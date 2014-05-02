@@ -1054,7 +1054,7 @@ class Recent_Controller extends Action_Controller
 				)
 			);
 
-			$context['topics'][$row['id_topic']]['first_post']['started_by'] = sprintf($txt['topic_started_by'], $context['topics'][$row['id_topic']]['first_post']['member']['link'], $context['topics'][$row['id_topic']]['board']['link']);
+			$context['topics'][$row['id_topic']]['first_post']['started_by'] = sprintf($txt['topic_started_by_in'], '<strong>' . $context['topics'][$row['id_topic']]['first_post']['member']['link'] . '</strong>', '<em>' . $context['topics'][$row['id_topic']]['board']['link'] . '</em>');
 			determineTopicClass($context['topics'][$row['id_topic']]);
 		}
 		$db->free_result($request);
