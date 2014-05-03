@@ -227,7 +227,7 @@ class paypal_payment
 			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 1);
 			curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
 			curl_setopt($curl, CURLOPT_FORBID_REUSE, 1);
-+
+
 			// Set TCP timeout to 30 seconds
 			curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 30);
 
@@ -337,6 +337,24 @@ class paypal_payment
 	public function isPayment()
 	{
 		return ($_POST['payment_status'] === 'Completed' && $_POST['txn_type'] === 'web_accept');
+	}
+
+	/**
+	 * Is this a cancellation?
+	 *
+	 * @return boolean
+	 */
+	public function isCancellation()
+	{
+		// subscr_cancel: This IPN response (txn_type) is sent only when the subscriber cancels his/her
+		// current subscription or the merchant cancels the subscribers subscription. In this event according
+		// to Paypal rules the subscr_eot (End of Term) IPN response is NEVER sent, and it is up to you to
+		// keep the subscription of the subscriber active for remaining days of subscription should they cancel
+		// their subscription in the middle of the subscription period.
+		//
+		// subscr_eot: This IPN response (txn_type) is sent ONLY when the subscription ends naturally/expires
+		//
+		return (substr($_POST['txn_type'], 0, 13) === 'subscr_cancel' || substr($_POST['txn_type'], 0, 10) === 'subscr_eot');
 	}
 
 	/**
