@@ -219,7 +219,7 @@ function preparsecode(&$message, $previewing = false)
  * - Although it prevents markup error, it can mess-up the intended (abiet wrong) layout
  * driving the post author in to a furious rage
  *
- * @param type $message
+ * @param string $message
  */
 function preparsetable($message)
 {
