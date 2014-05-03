@@ -151,10 +151,7 @@ class authorize_payment
 			return false;
 
 		// And a response?
-		if (empty($_POST['x_response_code']))
-			return false;
-
-		return true;
+		return !empty($_POST['x_response_code']);
 	}
 
 	/**
