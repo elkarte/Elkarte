@@ -95,5 +95,3 @@ $txt['icons_filename_all_png'] = 'All files must be &quot;png&quot; files';
 $txt['icons_no_entries'] = 'There are currently no message icons configured.';
 $txt['icons_reordered'] = 'Message Icons successfully reordered';
 $txt['icons_reorder_note'] = 'You can change the message icon order by dragging and dropping an item to a new location in the list.';
-
-

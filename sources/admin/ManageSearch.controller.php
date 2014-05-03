@@ -616,7 +616,6 @@ class ManageSearch_Controller extends Action_Controller
 		createToken('admin-mssphinx');
 	}
 
-
 	/**
 	 * Get the installed Search API implementations.
 	 *

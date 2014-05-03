@@ -740,7 +740,6 @@ class Xml_Controller extends Action_Controller
 				$view_order = 0;
 				$iconInsert = array();
 
-
 				// The field ids arrive in 1-n view order, so we simply build an update array
 				foreach ($_POST['list_message_icon_list'] as $id)
 				{

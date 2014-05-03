@@ -118,7 +118,7 @@ class MergeTopics_Controller extends Action_Controller
 			$boardListOptions['included_boards'] = $merge_boards;
 		$boards_list = getBoardList($boardListOptions, true);
 		$context['boards'] = array();
-		
+
 		foreach ($boards_list as $board)
 		{
 			$context['boards'][] = array(

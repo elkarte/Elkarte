@@ -61,7 +61,6 @@ function template_topic_listing_above()
 		<div id="description_board">
 			<h2 class="category_header">', $context['name'];
 
-
 	if (!empty($context['moderators']))
 		echo '
 				<span class="moderators">(', count($context['moderators']) === 1 ? $txt['moderator'] : $txt['moderators'], ': ', implode(', ', $context['link_moderators']), '.)</span>';
@@ -301,7 +300,6 @@ function template_topic_listing()
 				<input type="submit" value="', $txt['quick_mod_go'], '" onclick="return document.forms.quickModForm.qaction.value != \'\' &amp;&amp; confirm(\'', $txt['quickmod_confirm'], '\');" class="button_submit" />
 			</div>';
 		}
-
 
 		// Finish off the form - again.
 		if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] > 0 && !empty($context['topics']))

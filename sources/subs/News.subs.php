@@ -191,7 +191,6 @@ function getNewsletterRecipients($sendQuery, $sendParams, $start, $increment, $c
 	return $recipients;
 }
 
-
 /**
  * Find the latest posts that:
  * - are the first post in their topic.

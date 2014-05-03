@@ -117,7 +117,7 @@ class AdminLog_Controller extends Action_Controller
 		call_integration_hook('integrate_manage_logs', array(&$log_functions));
 
 		$sub_action = isset($_REQUEST['sa']) && isset($log_functions[$_REQUEST['sa']]) && empty($log_functions[$_REQUEST['sa']]['disabled']) ? $_REQUEST['sa'] : 'errorlog';
-		
+
 		// If it's not got a sa set it must have come here for first time, pretend error log should be reversed.
 		if (!isset($_REQUEST['sa']))
 			$_REQUEST['desc'] = true;

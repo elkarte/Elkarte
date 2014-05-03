@@ -110,7 +110,6 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 	return $mentions;
 }
 
-
 /**
  * Inserts a new mention
  * Checks if the mention already exists (in any status) to prevent any duplicates
