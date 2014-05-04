@@ -707,7 +707,7 @@ function shorten_text($text, $len = 384, $cutword = false, $buffer = 12)
 		else
 			$text = Util::substr($text, 0, $len) . '...';
 
-		$text = Util::htmlspecialchars($text);
+		$text = strtr(Util::htmlspecialchars($text), array('&lt;' => '<', '&gt;' => '>'));
 	}
 
 	return $text;
