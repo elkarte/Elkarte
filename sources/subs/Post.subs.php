@@ -806,14 +806,10 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			);
 
 		if ($topicOptions['lock_mode'] !== null)
-			$topics_columns = array(
-				'locked = {int:locked}',
-			);
+			$topics_columns[] = 'locked = {int:locked}';
 
 		if ($topicOptions['sticky_mode'] !== null)
-			$topics_columns = array(
-				'is_sticky = {int:is_sticky}',
-			);
+			$topics_columns[] = 'is_sticky = {int:locked}';
 
 		call_integration_hook('integrate_before_modify_topic', array(&$topics_columns, &$update_parameters, &$msgOptions, &$topicOptions, &$posterOptions));
 
