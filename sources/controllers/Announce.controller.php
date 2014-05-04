@@ -193,10 +193,14 @@ class Announce_Controller extends Action_Controller
 	 *                 - language
 	 *                 - id
 	 *                 - email
+	 * @param mixed[] $topic_info - Some basic information about the topic.
+	 *                 It must contain:
+	 *                  - subject: the subject of the topic
+	 *                  - body: the body of the topic
 	 */
 	private function _send_announcement($member_info, $topic_info)
 	{
-		global $modSettings, $language, $scripturl, $context, $topic;
+		global $modSettings, $language, $scripturl, $context;
 
 		// Loop through all members that'll receive an announcement in this batch.
 		$announcements = array();
@@ -210,7 +214,7 @@ class Announce_Controller extends Action_Controller
 				$replacements = array(
 					'TOPICSUBJECT' => $topic_info['subject'],
 					'MESSAGE' => $topic_info['body'],
-					'TOPICLINK' => $scripturl . '?topic=' . $topic . '.0',
+					'TOPICLINK' => $scripturl . '?topic=' . $topic_info['id_topic'] . '.0',
 				);
 
 				$emaildata = loadEmailTemplate('new_announcement', $replacements, $cur_language);

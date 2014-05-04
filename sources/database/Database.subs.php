@@ -56,16 +56,20 @@ function database()
  * This function retrieves an existing instance of DbTable
  * and returns it.
  *
+ * @param object|null $db - A database object (e.g. Database_MySQL or Database_PostgreSQL)
  * @return DbTable
  */
-function db_table()
+function db_table($db = null)
 {
 	global $db_type;
+
+	if ($db === null)
+		$db = database();
 
 	require_once(SOURCEDIR . '/database/DbTable.class.php');
 	require_once(SOURCEDIR . '/database/DbTable-' . $db_type . '.php');
 
-	return call_user_func(array('DbTable_' . DB_TYPE, 'db_table'));
+	return call_user_func(array('DbTable_' . DB_TYPE, 'db_table'), $db);
 }
 
 /**

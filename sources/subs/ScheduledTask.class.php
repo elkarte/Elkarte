@@ -376,6 +376,7 @@ class ScheduledTask
 
 		// we're working with them databases but we shouldn't :P
 		$db = database();
+		$db_table = db_table();
 
 		// By default do it now!
 		$delay = false;
@@ -408,7 +409,7 @@ class ScheduledTask
 		$tables = $db->db_list_tables(false, $db_prefix . '%');
 
 		foreach ($tables as $table)
-			$db->db_optimize_table($table);
+			$db_table->optimize($table);
 
 		// Return for the log...
 		return true;

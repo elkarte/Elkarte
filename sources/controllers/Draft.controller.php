@@ -306,7 +306,7 @@ class Draft_Controller extends Action_Controller
 	 * @param string $subject - The subject, passed by-ref
 	 * @param int $id_draft - The id of the draft, used for caching the parsed body
 	 * @param string $default_subject - The default subject if $subject is empty
-	 * @param string $smiley_enabled - Is the smiley are enabled or not
+	 * @param bool|string $smiley_enabled - Is the smiley are enabled or not
 	 */
 	private function _prepare_body_subject(&$body, &$subject, $id_draft, $default_subject, $smiley_enabled = true)
 	{

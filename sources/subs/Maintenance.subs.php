@@ -221,9 +221,9 @@ function getElkTables()
  */
 function optimizeTable($tablename)
 {
-	$db = database();
+	$db_table = db_table();
 
-	$db->db_optimize_table($tablename);
+	$db_table->optimize($tablename);
 }
 
 /**

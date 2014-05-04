@@ -1107,11 +1107,10 @@ function action_databasePopulation()
 
 	// Let's optimize those new tables.
 	$tables = $db->db_list_tables($db_name, $db_prefix . '%');
+	$db_table = db_table();
 	foreach ($tables as $table)
 	{
-		$db->db_optimize_table($table) != -1 or $db_messed = true;
-
-		if (!empty($db_messed))
+		if ($db_table->optimize($table) == -1)
 		{
 			$incontext['failures'][-1] = $db->last_error();
 			break;
