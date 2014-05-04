@@ -518,7 +518,7 @@ function template_set_settings()
 		{
 			echo '
 						<dt id="dt_', $setting['id'], '">
-							<label for="', $setting['id'], '">', $setting['label'], '</label>:';
+							<label for="', $setting['id'], '">', $setting['label'], '</label>';
 
 			if (isset($setting['description']))
 				echo '<br />
@@ -536,7 +536,7 @@ function template_set_settings()
 		{
 			echo '
 						<dt id="dt_', $setting['id'], '">
-							<label for="', $setting['id'], '">', $setting['label'], '</label>:';
+							<label for="', $setting['id'], '">', $setting['label'], '</label>';
 
 			if (isset($setting['description']))
 				echo '<br />
@@ -652,7 +652,7 @@ function template_pick()
 		if (!empty($theme['variants']))
 		{
 			echo '
-					<label for="variant', $theme['id'], '"><strong>', $theme['pick_label'], '</strong></label>:
+					<label for="variant', $theme['id'], '"><strong>', $theme['pick_label'], '</strong></label>
 					<select id="variant', $theme['id'], '" name="vrt[', $theme['id'], ']" onchange="changeVariant', $theme['id'], '(this.value);">';
 
 			foreach ($theme['variants'] as $key => $variant)
@@ -963,7 +963,7 @@ function template_edit_template()
 
 	foreach ($context['file_parts'] as $part)
 		echo '
-					<label for="on_line', $part['line'], '">', $txt['themeadmin_edit_on_line'], ' ', $part['line'], '</label>:<br />
+					<label for="on_line', $part['line'], '">', $txt['themeadmin_edit_on_line'], ' ', $part['line'], '</label><br />
 					<div class="centertext">
 						<textarea id="on_line', $part['line'], '" name="entire_file[]" cols="80" rows="', $part['lines'] > 14 ? '14' : $part['lines'], '" class="edit_file">', $part['data'], '</textarea>
 					</div>';
