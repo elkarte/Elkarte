@@ -827,6 +827,8 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	}
 
 	// Creating is modifying...in a way.
+	// @todo id_msg_modified needs to be set when you create a post, now this query is
+	// the only place it does get set for post creation.  Why not set it on the insert?
 	$db->query('', '
 		UPDATE {db_prefix}messages
 		SET id_msg_modified = {int:id_msg}
