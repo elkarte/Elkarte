@@ -186,63 +186,11 @@ function preparsecode(&$message, $previewing = false)
 			for ($j = 0; $j < 3; $j++)
 				$parts[$i] = preg_replace(array_keys($mistake_fixes), $mistake_fixes, $parts[$i]);
 
-			// Now we're going to do full scale table checking...
-			$table_check = $parts[$i];
-			$table_offset = 0;
-			$table_array = array();
-			$table_order = array(
-				'table' => 'td',
-				'table' => 'th',
-				'tr' => 'table',
-				'td' => 'tr',
-				'th' => 'tr',
-			);
-			while (preg_match('~\[(/)*(table|tr|td|th)\]~', $table_check, $matches) != false)
-			{
-				// Keep track of where this is.
-				$offset = strpos($table_check, $matches[0]);
-				$remove_tag = false;
-
-				// Is it opening?
-				if ($matches[1] != '/')
-				{
-					// If the previous table tag isn't correct simply remove it.
-					if ((!empty($table_array) && $table_array[0] != $table_order[$matches[2]]) || (empty($table_array) && $matches[2] != 'table'))
-						$remove_tag = true;
-					// Record this was the last tag.
-					else
-						array_unshift($table_array, $matches[2]);
-				}
-				// Otherwise is closed!
-				else
-				{
-					// Only keep the tag if it's closing the right thing.
-					if (empty($table_array) || ($table_array[0] != $matches[2]))
-						$remove_tag = true;
-					else
-						array_shift($table_array);
-				}
-
-				// Removing?
-				if ($remove_tag)
-				{
-					$parts[$i] = substr($parts[$i], 0, $table_offset + $offset) . substr($parts[$i], $table_offset + strlen($matches[0]) + $offset);
-					// We've lost some data.
-					$table_offset -= strlen($matches[0]);
-				}
-
-				// Remove everything up to here.
-				$table_offset += $offset + strlen($matches[0]);
-				$table_check = substr($table_check, $offset + strlen($matches[0]));
-			}
-
-			// Close any remaining table tags.
-			foreach ($table_array as $tag)
-				$parts[$i] .= '[/' . $tag . ']';
-
 			// Remove empty bbc from the sections outside the code tags
 			$parts[$i] = preg_replace('~\[[bisu]\]\s*\[/[bisu]\]~', '', $parts[$i]);
 			$parts[$i] = preg_replace('~\[quote\]\s*\[/quote\]~', '', $parts[$i]);
+
+			// Fix color tags of many forms so they parse properly
 			$parts[$i] = preg_replace('~\[color=(?:#[\da-fA-F]{3}|#[\da-fA-F]{6}|[A-Za-z]{1,20}|rgb\(\d{1,3}, ?\d{1,3}, ?\d{1,3}\))\]\s*\[/color\]~', '', $parts[$i]);
 		}
 
@@ -255,8 +203,85 @@ function preparsecode(&$message, $previewing = false)
 	else
 		$message = strtr(implode('', $parts), array('  ' => '&nbsp; ', "\xC2\xA0" => '&nbsp;'));
 
+	// Now we're going to do full scale table checking...
+	$message = preparsetable($message);
+
 	// Now let's quickly clean up things that will slow our parser (which are common in posted code.)
 	$message = strtr($message, array('[]' => '&#91;]', '[&#039;' => '&#91;&#039;'));
+}
+
+/**
+ * Validates and corrects table structure
+ *
+ * What it does
+ * - Checks tables for correct tag order / nesting
+ * - Adds in missing closing tags, removes excess closing tags
+ * - Although it prevents markup error, it can mess-up the intended (abiet wrong) layout
+ * driving the post author in to a furious rage
+ *
+ * @param string $message
+ */
+function preparsetable($message)
+{
+	$table_check = $message;
+	$table_offset = 0;
+	$table_array = array();
+
+	// Define the allowable tags after a give tag
+	$table_order = array(
+		'table' => 'td',
+		'table' => 'th',
+		'tr' => 'table',
+		'td' => 'tr',
+		'th' => 'tr',
+	);
+
+	// Find all closing tags (/table /tr /td etc)
+	while (preg_match('~\[(/)*(table|tr|td|th)\]~', $table_check, $matches) != false)
+	{
+		// Keep track of where this is.
+		$offset = strpos($table_check, $matches[0]);
+		$remove_tag = false;
+
+		// Is it opening?
+		if ($matches[1] != '/')
+		{
+			// If the previous table tag isn't correct simply remove it.
+			if ((!empty($table_array) && $table_array[0] != $table_order[$matches[2]]) || (empty($table_array) && $matches[2] != 'table'))
+				$remove_tag = true;
+			// Record this was the last tag.
+			else
+				array_unshift($table_array, $matches[2]);
+		}
+		// Otherwise is closed!
+		else
+		{
+			// Only keep the tag if it's closing the right thing.
+			if (empty($table_array) || ($table_array[0] != $matches[2]))
+				$remove_tag = true;
+			else
+				array_shift($table_array);
+		}
+
+		// Removing?
+		if ($remove_tag)
+		{
+			$message = substr($message, 0, $table_offset + $offset) . substr($message, $table_offset + strlen($matches[0]) + $offset);
+
+			// We've lost some data.
+			$table_offset -= strlen($matches[0]);
+		}
+
+		// Remove everything up to here.
+		$table_offset += $offset + strlen($matches[0]);
+		$table_check = substr($table_check, $offset + strlen($matches[0]));
+	}
+
+	// Close any remaining table tags.
+	foreach ($table_array as $tag)
+		$message .= '[/' . $tag . ']';
+
+	return $message;
 }
 
 /**
@@ -781,14 +806,10 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			);
 
 		if ($topicOptions['lock_mode'] !== null)
-			$topics_columns = array(
-				'locked = {int:locked}',
-			);
+			$topics_columns[] = 'locked = {int:locked}';
 
 		if ($topicOptions['sticky_mode'] !== null)
-			$topics_columns = array(
-				'is_sticky = {int:is_sticky}',
-			);
+			$topics_columns[] = 'is_sticky = {int:locked}';
 
 		call_integration_hook('integrate_before_modify_topic', array(&$topics_columns, &$update_parameters, &$msgOptions, &$topicOptions, &$posterOptions));
 
@@ -806,6 +827,8 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	}
 
 	// Creating is modifying...in a way.
+	// @todo id_msg_modified needs to be set when you create a post, now this query is
+	// the only place it does get set for post creation.  Why not set it on the insert?
 	$db->query('', '
 		UPDATE {db_prefix}messages
 		SET id_msg_modified = {int:id_msg}

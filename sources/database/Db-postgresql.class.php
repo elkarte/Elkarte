@@ -298,9 +298,6 @@ class Database_PostgreSQL implements Database
 			'consolidate_spider_stats' => array(
 				'~MONTH\(log_time\), DAYOFMONTH\(log_time\)~' => 'MONTH(CAST(CAST(log_time AS abstime) AS timestamp)), DAYOFMONTH(CAST(CAST(log_time AS abstime) AS timestamp))',
 			),
-			'delete_subscription' => array(
-				'~LIMIT 1~' => '',
-			),
 			'display_get_post_poster' => array(
 				'~GROUP BY id_msg\s+HAVING~' => 'AND',
 			),

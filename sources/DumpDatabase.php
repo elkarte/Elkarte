@@ -96,13 +96,6 @@ function DumpDatabase2()
 	// This should turn off the session URL parser.
 	$scripturl = '';
 
-	// If this database is flat file and has a handler function pass it to that.
-	if (method_exists($database, 'db_get_backup'))
-	{
-		$database->db_get_backup();
-		exit;
-	}
-
 	// Send the proper headers to let them download this file.
 	header('Content-Disposition: attachment; filename="' . $db_name . '-' . (empty($_REQUEST['struct']) ? 'data' : (empty($_REQUEST['data']) ? 'structure' : 'complete')) . '_' . strftime('%Y-%m-%d') . $extension . '"');
 	header('Cache-Control: private');

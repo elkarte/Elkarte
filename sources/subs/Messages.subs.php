@@ -196,7 +196,6 @@ function prepareMessageContext($message)
 		$context['show_approval'] = allowedTo('approve_posts');
 }
 
-
 /**
  * This function removes all the messages of a certain user that are *not*
  * first messages of a topic

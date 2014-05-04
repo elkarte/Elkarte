@@ -285,7 +285,6 @@ function template_generic_menu_tabs(&$menu_context)
 				echo '
 						<span class="hdicon cat_img_', !empty($selected_tab['class']) ? $selected_tab['class'] : $tab_context['class'], '"></span>';
 
-
 			if (!empty($selected_tab['help']) || !empty($tab_context['help']))
 				echo '
 						<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=', !empty($selected_tab['help']) ? $selected_tab['help'] : $tab_context['help'], '" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a>';

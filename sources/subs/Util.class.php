@@ -44,9 +44,9 @@ class Util
 		global $modSettings;
 
 		if (empty($modSettings['disableEntityCheck']))
-			$check = preg_replace_callback('~(&amp;#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', htmlspecialchars($string, $quote_style, 'UTF-8'));
+			$check = preg_replace_callback('~(&amp;#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', htmlspecialchars($string, $quote_style, 'UTF-8', false));
 		else
-			$check = htmlspecialchars($string, $quote_style, 'UTF-8');
+			$check = htmlspecialchars($string, $quote_style, 'UTF-8', false);
 
 		return $check;
 	}

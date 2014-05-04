@@ -128,12 +128,6 @@ class authorize_display
 class authorize_payment
 {
 	/**
-	 * Holds our return results
-	 * @var array
-	 */
-	private $return_data;
-
-	/**
 	 * Validates that we have valid data to work with
 	 *
 	 * - Returns true/false for whether this gateway thinks the data is intended for it.
@@ -157,10 +151,7 @@ class authorize_payment
 			return false;
 
 		// And a response?
-		if (empty($_POST['x_response_code']))
-			return false;
-
-		return true;
+		return !empty($_POST['x_response_code']);
 	}
 
 	/**
@@ -208,11 +199,26 @@ class authorize_payment
 	}
 
 	/**
-	 * Returns if this is a normal payment.
+	 * Returns if this is a normal valid approved payment.
+	 *
+	 * If a transaction is approved x_response_code will contain a value of 1.
+	 * If the card is declined x_response_code will contain a value of 2.
+	 * If there was an error the card is expired x_response_code will contain a value of 3.
+	 * If the transaction is held for review x_response_code will contain a value of 4.
 	 */
 	public function isPayment()
 	{
 		return $_POST['x_response_code'] == 1;
+	}
+
+	/**
+	 * Returns if this is this is a cancellation transaction
+	 *
+	 * @return boolean
+	 */
+	public function isCancellation()
+	{
+		return false;
 	}
 
 	/**

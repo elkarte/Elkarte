@@ -1206,7 +1206,7 @@ class Data_Validator
 			$result = @eval('
 				if (false)
 				{
-					' . preg_replace('~^(?:\s*<\\?(?:php)?|\\?>\s*$)~', '', $input[$field]) . '
+					' . preg_replace('~^(?:\s*<\\?(?:php)?|\\?>\s*$)~u', '', $input[$field]) . '
 				}
 			');
 			error_reporting($errorReporting);

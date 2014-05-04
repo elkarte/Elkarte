@@ -157,7 +157,7 @@ function template_list_boards($boards, $id)
 		{
 			echo '
 						<p class="board_lastpost">';
-			
+
 			if (!empty($settings['avatars_on_indexes']))
 				echo '
 							<span class="board_avatar"><a href="', $board['last_post']['member']['href'], '">', $board['last_post']['member']['avatar']['image'], '</a></span>';
