@@ -12,7 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta 2
- * 
+ *
  */
 
 /**
@@ -34,15 +34,15 @@
  */
 function template_send_topic()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	template_show_error('sendtopic_error');
 
 	echo '
 	<div id="send_topic">
 		<form action="', $scripturl, '?action=emailuser;sa=sendtopic;topic=', $context['current_topic'], '.', $context['start'], '" method="post" accept-charset="UTF-8">
-			<h2 class="category_header">
-				<img src="', $settings['images_url'], '/profile/email_sm.png" alt="" class="icon" />', $context['page_title'], '
+			<h2 class="category_header hdicon cat_img_mail">
+				', $context['page_title'], '
 			</h2>
 			<div class="windowbg2">
 				<div class="content">
@@ -99,15 +99,15 @@ function template_send_topic()
  */
 function template_custom_email()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	template_show_error('sendemail_error');
 
 	echo '
 	<div id="send_topic">
 		<form action="', $scripturl, '?action=emailuser;sa=email" method="post" accept-charset="UTF-8">
-			<h2 class="category_header">
-				<img src="', $settings['images_url'], '/profile/email_sm.png" alt="" class="icon" />', $context['page_title'], '
+			<h2 class="category_header hdicon cat_img_mail">
+				', $context['page_title'], '
 			</h2>
 			<div class="windowbg">
 				<div class="content">

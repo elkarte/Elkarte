@@ -264,11 +264,11 @@ class Mentions_Controller extends Action_Controller
 							$opts = \'\';
 
 							if (empty($row[\'status\']))
-								$opts = \'<a href="?action=mentions;sa=updatestatus;mark=read;item=\' . $row[\'id_mention\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img title="\' . $txt[\'mentions_markread\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/mark_read.png" alt="*" /></a>&nbsp;\';
+								$opts = \'<a href="' . $scripturl . '?action=mentions;sa=updatestatus;mark=read;item=\' . $row[\'id_mention\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img title="\' . $txt[\'mentions_markread\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/mark_read.png" alt="*" /></a>&nbsp;\';
 							else
-								$opts = \'<a href="?action=mentions;sa=updatestatus;mark=unread;item=\' . $row[\'id_mention\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img title="\' . $txt[\'mentions_markunread\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/mark_unread.png" alt="*" /></a>&nbsp;\';
+								$opts = \'<a href="' . $scripturl . '?action=mentions;sa=updatestatus;mark=unread;item=\' . $row[\'id_mention\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img title="\' . $txt[\'mentions_markunread\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/mark_unread.png" alt="*" /></a>&nbsp;\';
 
-							return $opts . \'<a href="?action=mentions;sa=updatestatus;mark=delete;item=\' . $row[\'id_mention\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img title="\' . $txt[\'delete\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/delete.png" alt="*" /></a>\';
+							return $opts . \'<a href="' . $scripturl . '?action=mentions;sa=updatestatus;mark=delete;item=\' . $row[\'id_mention\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img title="\' . $txt[\'delete\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/delete.png" alt="*" /></a>\';
 						'),
 						'class' => 'listaction',
 					),

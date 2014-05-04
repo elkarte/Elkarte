@@ -112,6 +112,11 @@ h2 a.collapse {
 	margin-right: -42px;
 	margin-left: 0;
 }
+/* Upshrink image in the page top for the header collapse */
+#collapse_button .linklevel1 {
+	margin-right: 0;
+	margin-left: 1px;
+}
 
 /* More little boxes on a hillside. */
 .warningbox {
@@ -167,7 +172,7 @@ h2 a.collapse {
 	margin-left: 0;
 }
 #search_form {
-	padding: 12px 8px 4px 0;
+	padding: 12px 8px 4px 3px;
 	float: left;
 }
 #search_form  * {
@@ -177,7 +182,7 @@ h2 a.collapse {
 /* The main title. */
 #forumtitle, .rightheader #forumtitle {
 	float: right;
-	padding: 10px 8px 6px 10px;
+	padding: 10px 13px 6px 10px;
 }
 .rightheader #forumtitle {
 	float: left;
@@ -196,6 +201,11 @@ h2 a.collapse {
 }
 .rightheader #logo {
 	margin: 0 8px 0 0;
+}
+/* The user info, news, etc.*/
+#news {
+	margin-left: 0;
+	margin-right: -1px;
 }
 /* Main forum area. */
 /* The footer with copyright links etc. */
@@ -505,6 +515,10 @@ dl.settings img {
 }
 .childboards>li {
 	padding: 6px 0 4px 0.3em;
+}
+/* The posting icons and mark read button. */
+#posting_icons {
+	margin: 0 4px 20px 0;
 }
 /* Icons for info centre title bars. */
 #ic_recentposts td, #ic_recentposts th, #ps_recentposts td, #ps_recentposts th, #ps_recenttopics td, #ps_recenttopics th {

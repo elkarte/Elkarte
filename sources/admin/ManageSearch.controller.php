@@ -67,7 +67,7 @@ class ManageSearch_Controller extends Action_Controller
 		);
 
 		// Control for actions
-		$action = new Action();
+		$action = new Action('manage_search');
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -448,6 +448,7 @@ class ManageSearch_Controller extends Action_Controller
 			),
 		);
 
+		// Resume building an index that was not completed
 		if (isset($_REQUEST['resume']) && !empty($modSettings['search_custom_index_resume']))
 		{
 			$context['index_settings'] = unserialize($modSettings['search_custom_index_resume']);
@@ -463,7 +464,7 @@ class ManageSearch_Controller extends Action_Controller
 			$context['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
 			$context['step'] = isset($_REQUEST['step']) ? (int) $_REQUEST['step'] : 0;
 
-			// admin timeouts are painful when building these long indexes
+			// Admin timeouts are painful when building these long indexes
 			if ($_SESSION['admin_time'] + 3300 < time() && $context['step'] >= 1)
 				$_SESSION['admin_time'] = time();
 		}

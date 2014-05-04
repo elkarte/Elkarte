@@ -147,9 +147,9 @@ $txt['post'] = 'Post';
 $txt['error_occurred'] = 'An Error Has Occurred';
 $txt['send_error_occurred'] = 'An error has occurred, <a href="{href}">please click here to try again</a>.';
 $txt['require_field'] = 'This is a required field.';
-$txt['at'] = 'at';
 $txt['started_by'] = 'Started by author';
-$txt['topic_started_by'] = 'Started by <strong>%1$s</strong> in <em>%2$s</em>';
+$txt['topic_started_by'] = 'Started by %1$s';
+$txt['topic_started_by_in'] = 'Started by %1$s in %2$s';
 $txt['replies'] = 'Replies';
 $txt['last_post'] = 'Last post';
 $txt['first_post'] = 'First post';
@@ -492,7 +492,7 @@ $txt['moved'] = 'MOVED';
 $txt['moved_why'] = 'Please enter a brief description as to<br />why this topic is being moved.';
 $txt['board'] = 'Board';
 $txt['in'] = 'in';
-$txt['sticky_topic'] = 'Sticky Topic';
+$txt['sticky_topic'] = 'Pinned Topic';
 $txt['split'] = 'SPLIT';
 
 $txt['delete'] = 'Delete';
@@ -668,7 +668,7 @@ $txt['poll_cannot_see'] = 'You cannot see the results of this poll at the moment
 $txt['quick_mod_approve'] = 'Approve selected';
 $txt['quick_mod_remove'] = 'Remove selected';
 $txt['quick_mod_lock'] = 'Lock/Unlock selected';
-$txt['quick_mod_sticky'] = 'Sticky/Unsticky selected';
+$txt['quick_mod_sticky'] = 'Pin/Unpin selected';
 $txt['quick_mod_move'] = 'Move selected to';
 $txt['quick_mod_merge'] = 'Merge selected';
 $txt['quick_mod_markread'] = 'Mark selected read';
@@ -912,3 +912,6 @@ $txt['dailymotion'] = 'Dailymotion video:';
 $txt['spoiler'] = 'Spoiler (click to show/hide)';
 
 $txt['ok_uppercase'] = 'OK';
+
+// Title of box for warnings that admins should see
+$txt['admin_warning_title'] = 'Warning';

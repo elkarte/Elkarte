@@ -553,6 +553,7 @@ function add_elk_mention(selector, oOptions)
 			scroll: true,
 			containment: 'parent',
 			delay: 150,
+			handle: '', // Restricts sort start click to the specified element, like category_header
 			href: '', // If an error occurs redirect here
 			tolerance: 'intersect', // mode to use for testing whether the item is hovering over another item.
 			setorder: 'serialize', // how to return the data, really only supports serialize and inorder
@@ -574,7 +575,7 @@ function add_elk_mention(selector, oOptions)
 			ajax_errorbox = $("<div id='errorContainer'><div/>").appendTo('body');
 
 		// Prepare the infobar and errorbox divs to confirm valid responses or show an error
-		$(ajax_infobar).css({'position': 'fixed', 'top': '0', 'left': '0', 'width': '100%'});
+		$(ajax_infobar).css({'position': 'fixed', 'top': '0', 'left': '0', 'width': '100%', 'z-index': '100'});
 		$("body").append(ajax_infobar);
 		$(ajax_infobar).slideUp();
 
@@ -585,6 +586,7 @@ function add_elk_mention(selector, oOptions)
 			opacity: oSettings.opacity,
 			cursor: oSettings.cursor,
 			axis: oSettings.axis,
+			handle: oSettings.handle,
 			containment: oSettings.containment,
 			connectWith: oSettings.connect,
 			placeholder: oSettings.placeholder,

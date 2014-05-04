@@ -361,7 +361,7 @@ function template_subject_list_above()
 {
 	global $context;
 
-	// If we are not in single display mode show the subjects on the top! @todo - Horrible markup here.
+	// If we are not in single display mode show the subjects on the top!
 	if ($context['display_mode'] != 1)
 	{
 		template_subject_list();
@@ -395,7 +395,6 @@ function template_subject_list()
 {
 	global $context, $settings, $txt, $scripturl;
 
-	// @todo - Should really get rid of some of the inline CSS in this table.
 	echo '
 					<table class="table_grid">
 						<thead>
@@ -725,15 +724,14 @@ function template_search_results()
 			</h2>';
 
 	// complete results ?
-	// @todo - Should really get rid of some of the inline CSS in this table.
 	if (empty($context['search_params']['show_complete']) && !empty($context['personal_messages']))
 		echo '
 			<table class="table_grid">
 				<thead>
 					<tr class="table_head">
-						<th class="lefttext" style="width:30%">', $txt['date'], '</th>
-						<th class="lefttext" style="width:50%">', $txt['subject'], '</th>
-						<th class="lefttext" style="width:20%">', $txt['from'], '</th>
+						<th class="lefttext grid30">', $txt['date'], '</th>
+						<th class="lefttext grid50">', $txt['subject'], '</th>
+						<th class="lefttext grid20">', $txt['from'], '</th>
 					</tr>
 				</thead>
 				<tbody>';
@@ -1181,7 +1179,7 @@ function template_labels()
 				<td>
 					<input type="text" name="label_name[', $label['id'], ']" value="', $label['name'], '" size="30" maxlength="30" class="input_text" />
 				</td>
-				<td class="centertext" style="width:4%">
+				<td style="width:4%">
 					<input type="checkbox" class="input_check" name="delete_label[', $label['id'], ']" />
 				</td>
 			</tr>';
@@ -1345,7 +1343,7 @@ function template_rules()
 				<td>
 					<a href="', $scripturl, '?action=pm;sa=manrules;add;rid=', $rule['id'], '">', $rule['name'], '</a>
 				</td>
-				<td class="centertext" style="width:4%">
+				<td style="width:4%">
 					<input type="checkbox" name="delrule[', $rule['id'], ']" class="input_check" />
 				</td>
 			</tr>';
@@ -1365,7 +1363,7 @@ function template_rules()
 	if (!empty($context['rules']))
 		echo '
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-			<input type="submit" name="delselected" value="', $txt['pm_delete_selected_rule'], '" onclick="return confirm(\'', $txt['pm_js_delete_rule_confirm'], '\');" class="button_submit smalltext" />';
+			<input type="submit" name="delselected" value="', $txt['pm_delete_selected_rule'], '" onclick="return confirm(\'', $txt['pm_js_delete_rule_confirm'], '\');" class="button_submit" />';
 
 	echo '
 		</div>

@@ -1799,7 +1799,7 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 
 	if ($default_loaded === false)
 	{
-		loadCSSFile(array('index.css'));
+		loadCSSFile('index.css');
 		$default_loaded = true;
 	}
 
@@ -1848,9 +1848,9 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 		if (!empty($context['user']['is_admin']) && !isset($_GET['th']))
 		{
 			loadLanguage('Errors');
-			if (!isset($context['security_controls']['files']['title']))
-				$context['security_controls']['files']['title'] = $txt['generic_warning'];
-			$context['security_controls']['files']['messages']['theme_dir'] = '<a href="' . $scripturl . '?action=admin;area=theme;sa=list;th=1;' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['theme_dir_wrong'] . '</a>';
+			if (!isset($context['security_controls_files']['title']))
+				$context['security_controls_files']['title'] = $txt['generic_warning'];
+			$context['security_controls_files']['errors']['theme_dir'] = '<a href="' . $scripturl . '?action=admin;area=theme;sa=list;th=1;' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['theme_dir_wrong'] . '</a>';
 		}
 
 		loadTemplate($template_name);
@@ -2813,15 +2813,15 @@ function doSecurityChecks()
 		// If agreement is enabled, at least the english version shall exists
 		if ($modSettings['requireAgreement'] && !file_exists(BOARDDIR . '/agreement.txt'))
 		{
-			$context['security_controls']['files']['title'] = $txt['generic_warning'];
-			$context['security_controls']['files']['messages']['agreement'] = $txt['agreement_missing'];
+			$context['security_controls_files']['title'] = $txt['generic_warning'];
+			$context['security_controls_files']['errors']['agreement'] = $txt['agreement_missing'];
 		}
 
 		// Cache directory writeable?
 		if (!empty($modSettings['cache_enable']) && !is_writable(CACHEDIR))
 		{
-			$context['security_controls']['files']['title'] = $txt['generic_warning'];
-			$context['security_controls']['files']['messages']['cache'] = $txt['cache_writable'];
+			$context['security_controls_files']['title'] = $txt['generic_warning'];
+			$context['security_controls_files']['errors']['cache'] = $txt['cache_writable'];
 		}
 
 		// @todo add a hook here
@@ -2830,12 +2830,12 @@ function doSecurityChecks()
 		{
 			if (file_exists(BOARDDIR . '/' . $securityFile))
 			{
-				$context['security_controls']['files']['title'] = $txt['security_risk'];
-				$context['security_controls']['files']['messages'][$securityFile] = sprintf($txt['not_removed'], $securityFile);
+				$context['security_controls_files']['title'] = $txt['security_risk'];
+				$context['security_controls_files']['errors'][$securityFile] = sprintf($txt['not_removed'], $securityFile);
 
 				if ($securityFile == 'Settings.php~' || $securityFile == 'Settings_bak.php~')
 				{
-					$context['security_controls']['files']['messages'][$securityFile] .= '<span class="smalltext">' . sprintf($txt['not_removed_extra'], $securityFile, substr($securityFile, 0, -1)) . '</span>';
+					$context['security_controls_files']['errors'][$securityFile] .= '<span class="smalltext">' . sprintf($txt['not_removed_extra'], $securityFile, substr($securityFile, 0, -1)) . '</span>';
 				}
 			}
 		}
@@ -2860,15 +2860,15 @@ function doSecurityChecks()
 	{
 		if ($user_info['is_admin'])
 		{
-			$context['security_controls']['query']['title'] = $txt['query_command_denied'];
+			$context['security_controls_query']['title'] = $txt['query_command_denied'];
 			foreach ($_SESSION['query_command_denied'] as $command => $error)
-				$context['security_controls']['query']['messages'][$command] = '<pre>' . Util::htmlspecialchars($error) . '</pre>';
+				$context['security_controls_query']['errors'][$command] = '<pre>' . Util::htmlspecialchars($error) . '</pre>';
 		}
 		else
 		{
-			$context['security_controls']['query']['title'] = $txt['query_command_denied_guests'];
+			$context['security_controls_query']['title'] = $txt['query_command_denied_guests'];
 			foreach ($_SESSION['query_command_denied'] as $command => $error)
-				$context['security_controls']['query']['messages'][$command] = '<pre>' . sprintf($txt['query_command_denied_guests_msg'], Util::htmlspecialchars($command)) . '</pre>';
+				$context['security_controls_query']['errors'][$command] = '<pre>' . sprintf($txt['query_command_denied_guests_msg'], Util::htmlspecialchars($command)) . '</pre>';
 		}
 	}
 
@@ -2882,17 +2882,17 @@ function doSecurityChecks()
 	if (isset($_SESSION['ban']['cannot_post']))
 	{
 		// An admin cannot be banned (technically he could), and if it is better he knows.
-		$context['security_controls']['ban']['title'] = sprintf($txt['you_are_post_banned'], $user_info['is_guest'] ? $txt['guest_title'] : $user_info['name']);
+		$context['security_controls_ban']['title'] = sprintf($txt['you_are_post_banned'], $user_info['is_guest'] ? $txt['guest_title'] : $user_info['name']);
 
-		$context['security_controls']['ban']['messages']['reason'] = '';
+		$context['security_controls_ban']['errors']['reason'] = '';
 
 		if (!empty($_SESSION['ban']['cannot_post']['reason']))
-			$context['security_controls']['ban']['messages']['reason'] = $_SESSION['ban']['cannot_post']['reason'];
+			$context['security_controls_ban']['errors']['reason'] = $_SESSION['ban']['cannot_post']['reason'];
 
 		if (!empty($_SESSION['ban']['expire_time']))
-			$context['security_controls']['ban']['messages']['reason'] .= '<span class="smalltext">' . sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) . '</span>';
+			$context['security_controls_ban']['errors']['reason'] .= '<span class="smalltext">' . sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) . '</span>';
 		else
-			$context['security_controls']['ban']['messages']['reason'] .= '<span class="smalltext">' . $txt['your_ban_expires_never'] . '</span>';
+			$context['security_controls_ban']['errors']['reason'] .= '<span class="smalltext">' . $txt['your_ban_expires_never'] . '</span>';
 	}
 
 	// Finally, let's show the layer.

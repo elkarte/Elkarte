@@ -147,9 +147,9 @@ $txt['post'] = 'Beitrag';
 $txt['error_occurred'] = 'Ein Fehler ist aufgetreten';
 $txt['send_error_occurred'] = 'Ein Fehler ist aufgetreten, <a href="{href}">bitte klicken Sie hier, um es erneut zu versuchen</a>.';
 $txt['require_field'] = 'Dieses Feld wird benötigt.';
-$txt['at'] = 'um';
 $txt['started_by'] = 'Begonnen vom Autoren'; // translator note: whyever...
-$txt['topic_started_by'] = 'Begonnen von <strong>%1$s</strong> in <em>%2$s</em>';
+$txt['topic_started_by'] = 'Begonnen von %1$s';
+$txt['topic_started_by_in'] = 'Begonnen von %1$s in %2$s';
 $txt['replies'] = 'Antworten';
 $txt['last_post'] = 'Letzter Beitrag';
 $txt['first_post'] = 'Erster Beitrag';

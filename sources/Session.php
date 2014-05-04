@@ -2,6 +2,7 @@
 
 /**
  * Implementation of PHP's session API.
+ * 
  * What it does:
  *  - it handles the session data in the database (more scalable.)
  *  - it uses the databaseSession_lifetime setting for garbage collection.

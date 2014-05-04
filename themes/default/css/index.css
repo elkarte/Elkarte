@@ -213,6 +213,7 @@ select option {
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
 	padding: 2px 6px;
 	font-size: .857em;
+	line-height: 17px;
 	display: inline-block;
 }
 .left_submit, .linkbutton_left {
@@ -3259,9 +3260,6 @@ div.labels {
 #calendar_navigation .buttonlist {
 	padding: 0 6px;
 }
-#calendar_navigation select {
-	margin-top: 2px;
-}
 /* See, I told you there was deranged wombatz here. */
 /*
 			   ,.--""""--.._
@@ -3749,6 +3747,9 @@ dl.no_members {
 	padding: 12px 0;
 	text-align: center;
 }
+#confirm_buttons .button_submit {
+	white-space: normal;
+}
 .coppa_contact {
 	margin-left: 5ex;
 	padding: 4px;
@@ -3974,6 +3975,7 @@ dl.no_members {
 	}
 	.topic_latest {
 		min-width: 15em;
+		display: block;
 	}
 	.board_avatar {
 		display: none;
@@ -3993,6 +3995,11 @@ dl.no_members {
 	.button_title, .topic_moderation_alt {
 		display: none;
 	}
+	.topic_moderation {
+		display: inline-block;
+		float: right;
+		width: auto;
+	}
 	#collapse_button {
 		display: none;
 	}
@@ -4003,7 +4010,12 @@ dl.no_members {
 		max-width: 95%;
 		white-space: nowrap;
 		text-overflow: ellipsis;
-		line-height: inherit;
+	}
+	.topic_lastpost {
+		min-width: 18em;
+	}
+	.topic_latest.relative .topic_lastpost {
+		min-width: 16em;
 	}
 	.board_row {
 		min-width: 20em;
@@ -4495,7 +4507,7 @@ dl.no_members {
 	}
 	ul.navigate_section li:not(:first-child):not(:last-child) a {
 		width: 3em;
-		display: inline-block;
+		display: block;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;

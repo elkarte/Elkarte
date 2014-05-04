@@ -414,7 +414,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 		// The "all" button
 		if ($show['all'])
 		{
-			if ($show['all_selected'])
+			if (!empty($show['all_selected']))
 				$pageindex .= sprintf($settings['page_index_template']['current_page'], $txt['all']);
 			else
 				$pageindex .= sprintf(str_replace('.%1$d', '.%1$s', $base_link), '0;all', str_replace('{all_txt}', $txt['all'], $settings['page_index_template']['all']));
@@ -477,7 +477,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 		// The "all" button
 		if ($show['all'])
 		{
-			if ($show['all_selected'])
+			if (!empty($show['all_selected']))
 				$pageindex .= sprintf($settings['page_index_template']['current_page'], $txt['all']);
 			else
 				$pageindex .= sprintf(str_replace('.%1$d', '.%1$s', $base_link), '0;all', str_replace('{all_txt}', $txt['all'], $settings['page_index_template']['all']));
@@ -2463,7 +2463,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 			template_footer();
 
 			// (since this is just debugging... it's okay that it's after </html>.)
-			if (!isset($_REQUEST['xml']))
+			if (!isset($_REQUEST['xml']) && !isset($_REQUEST['resume']) && !isset($_REQUEST['start']))
 				displayDebug();
 		}
 	}
@@ -3019,45 +3019,38 @@ function template_css()
 }
 
 /**
- * I know this is becoming annoying, though this template *shall* be present
- * for security reasons, so better it stays here
- *
- * @todo rework it and merge into some other kind of general warning-box (e.g. modtask at index.template)
+ * Calls on template_show_error from index.template.php to show warnings
+ * and security errors for admins
  */
 function template_admin_warning_above()
 {
-	global $context;
+	global $context, $txt;
 
-	if (!empty($context['security_controls']))
+	if (!empty($context['security_controls_files']))
 	{
-		foreach ($context['security_controls'] as $error)
-		{
-			echo '
-	<div class="errorbox">
-		<h3>', $error['title'], '</h3>
-		<ul>';
+		$context['security_controls_files']['type'] = 'serious';
+		template_show_error('security_controls_files');
+	}
 
-			foreach ($error['messages'] as $text)
-			{
-				echo '
-			<li class="listlevel1">', $text, '</li>';
-			}
+	if (!empty($context['security_controls_query']))
+	{
+		$context['security_controls_query']['type'] = 'serious';
+		template_show_error('security_controls_query');
+	}
 
-			echo '
-		</ul>
-	</div>';
-		}
+	if (!empty($context['security_controls_ban']))
+	{
+		$context['security_controls_ban']['type'] = 'serious';
+		template_show_error('security_controls_ban');
 	}
 
 	// Any special notices to remind the admin about?
 	if (!empty($context['warning_controls']))
 	{
-		echo '
-	<div class="warningbox">
-		<ul>
-			<li class="listlevel1">', implode('</li><li class="listlevel1">', $context['warning_controls']), '</li>
-		</ul>
-	</div>';
+		$context['warning_controls']['errors'] = $context['warning_controls'];
+		$context['warning_controls']['title'] = $txt['admin_warning_title'];
+		$context['warning_controls']['type'] = 'warning';
+		template_show_error('warning_controls');
 	}
 }
 

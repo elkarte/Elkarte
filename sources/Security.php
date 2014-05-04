@@ -78,7 +78,7 @@ function validateSession($type = 'admin')
 	require_once(SUBSDIR . '/Auth.subs.php');
 
 	// Comming from the login screen
-	if (isset($_POST[$type. '_pass']) || isset($_POST[$type . '_hash_pass']))
+	if (isset($_POST[$type . '_pass']) || isset($_POST[$type . '_hash_pass']))
 	{
 		checkSession();
 		validateToken('admin-login');
@@ -210,7 +210,7 @@ function is_not_guest($message = '', $is_fatal = true)
  * Apply restrictions for banned users. For example, disallow access.
  *
  * What it does:
- * - If he user is banned, it dies with an error.
+ * - If the user is banned, it dies with an error.
  * - Caches this information for optimization purposes.
  * - Forces a recheck if force_check is true.
  *
@@ -218,8 +218,7 @@ function is_not_guest($message = '', $is_fatal = true)
  */
 function is_not_banned($forceCheck = false)
 {
-	global $txt, $modSettings, $context, $user_info;
-	global $cookiename, $user_settings;
+	global $txt, $modSettings, $context, $user_info, $cookiename, $user_settings;
 
 	$db = database();
 
@@ -249,6 +248,7 @@ function is_not_banned($forceCheck = false)
 			if ($ip_number == 'ip2' && $user_info['ip2'] == $user_info['ip'])
 				continue;
 			$ban_query[] = constructBanQueryIP($user_info[$ip_number]);
+
 			// IP was valid, maybe there's also a hostname...
 			if (empty($modSettings['disableHostnameLookup']) && $user_info[$ip_number] != 'unknown')
 			{
@@ -330,6 +330,7 @@ function is_not_banned($forceCheck = false)
 		$bans = explode(',', $_COOKIE[$cookiename . '_']);
 		foreach ($bans as $key => $value)
 			$bans[$key] = (int) $value;
+
 		$request = $db->query('', '
 			SELECT bi.id_ban, bg.reason
 			FROM {db_prefix}ban_items AS bi
@@ -367,7 +368,11 @@ function is_not_banned($forceCheck = false)
 
 		// We don't wanna see you!
 		if (!$user_info['is_guest'])
-			logOnline($user_info['id'], false);
+		{
+			require_once(CONTROLLERDIR . '/Auth.controller.php');
+			$controller = new Auth_Controller();
+			$controller->action_logout(true, false);
+		}
 
 		// 'Log' the user out.  Can't have any funny business... (save the name!)
 		$old_name = isset($user_info['name']) && $user_info['name'] != '' ? $user_info['name'] : $txt['guest_title'];
@@ -443,10 +448,12 @@ function is_not_banned($forceCheck = false)
 		$_GET['topic'] = '';
 		writeLog(true);
 
+		// Log them out
 		require_once(CONTROLLERDIR . '/Auth.controller.php');
 		$controller = new Auth_Controller();
 		$controller->action_logout(true, false);
 
+		// Tell them thanks
 		fatal_error(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_login']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_login']['reason']) . '<br />' . (!empty($_SESSION['ban']['expire_time']) ? sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) : $txt['your_ban_expires_never']) . '<br />' . $txt['ban_continue_browse'], 'user');
 	}
 
@@ -1000,20 +1007,16 @@ function allowedTo($permission, $boards = null)
 	if ($user_info['is_admin'])
 		return true;
 
+	// Make sure permission is a valid array
+	if (!is_array($permission))
+		$permission = array($permission);
+
 	// Are we checking the _current_ board, or some other boards?
 	if ($boards === null)
-	{
-		// Check if they can do it.
-		if (!is_array($permission) && in_array($permission, $user_info['permissions']))
-			return true;
-		// Search for any of a list of permissions.
-		elseif (is_array($permission) && count(array_intersect($permission, $user_info['permissions'])) != 0)
-			return true;
-		// You aren't allowed, by default.
-		else
-			return false;
-	}
-	elseif (!is_array($boards))
+		// Check if they can do it, you aren't allowed, by default.
+		return count(array_intersect($permission, $user_info['permissions'])) !== 0 ? true : false;
+
+	if (!is_array($boards))
 		$boards = array($boards);
 
 	$request = $db->query('', '
@@ -1023,7 +1026,7 @@ function allowedTo($permission, $boards = null)
 			LEFT JOIN {db_prefix}moderators AS mods ON (mods.id_board = b.id_board AND mods.id_member = {int:current_member})
 		WHERE b.id_board IN ({array_int:board_list})
 			AND bp.id_group IN ({array_int:group_list}, {int:moderator_group})
-			AND bp.permission {raw:permission_list}
+			AND bp.permission IN ({array_string:permission_list})
 			AND (mods.id_member IS NOT NULL OR bp.id_group != {int:moderator_group})
 		GROUP BY b.id_board',
 		array(
@@ -1031,7 +1034,7 @@ function allowedTo($permission, $boards = null)
 			'board_list' => $boards,
 			'group_list' => $user_info['groups'],
 			'moderator_group' => 3,
-			'permission_list' => (is_array($permission) ? 'IN (\'' . implode('\', \'', $permission) . '\')' : ' = \'' . $permission . '\''),
+			'permission_list' => $permission,
 		)
 	);
 
@@ -1233,25 +1236,24 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
  */
 function showEmailAddress($userProfile_hideEmail, $userProfile_id)
 {
-	global $modSettings, $user_info;
+	global $user_info;
 
 	// Should this user's email address be shown?
-	// If you're guest and the forum is set to hide email for guests: no.
+	// If you're guest: no.
 	// If the user is post-banned: no.
-	// If it's your own profile and you've set your address hidden: yes_permission_override.
+	// If it's your own profile and you've not set your address hidden: yes_permission_override.
 	// If you're a moderator with sufficient permissions: yes_permission_override.
-	// If the user has set their email address to be hidden: no.
-	// If the forum is set to show full email addresses: yes.
-	// Otherwise: no_through_forum.
+	// If the user has set their profile to do not email me: no.
+	// Otherwise: no_through_forum. (don't show it but allow emailing the member)
 
 	if ($user_info['is_guest'] || isset($_SESSION['ban']['cannot_post']))
 		return 'no';
-	elseif ((!$user_info['is_guest'] && $user_info['id'] == $userProfile_id && !$userProfile_hideEmail) || allowedTo('moderate_forum'))
+	elseif ((!$user_info['is_guest'] && $user_info['id'] == $userProfile_id && !$userProfile_hideEmail))
+		return 'yes_permission_override';
+	elseif (allowedTo('moderate_forum'))
 		return 'yes_permission_override';
 	elseif ($userProfile_hideEmail)
 		return 'no';
-	elseif (!empty($modSettings['make_email_viewable']) )
-		return 'yes';
 	else
 		return 'no_through_forum';
 }

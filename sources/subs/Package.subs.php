@@ -1672,6 +1672,9 @@ function parse_path($path)
 {
 	global $modSettings, $settings, $temp_path;
 
+	if (empty($path))
+		return;
+
 	$dirs = array(
 		'\\' => '/',
 		'BOARDDIR' => BOARDDIR,
@@ -1683,7 +1686,6 @@ function parse_path($path)
 		'$avatars_dir' => $modSettings['avatar_directory'],
 		'$themedir' => $settings['default_theme_dir'],
 		'$imagesdir' => $settings['default_theme_dir'] . '/' . basename($settings['default_images_url']),
-		'$themes_dir' => BOARDDIR . '/themes',
 		'LANGUAGEDIR' => $settings['default_theme_dir'] . '/languages',
 		'$languages_dir' => $settings['default_theme_dir'] . '/languages',
 		'$smileysdir' => $modSettings['smileys_dir'],
@@ -1701,9 +1703,12 @@ function parse_path($path)
 }
 
 /**
- * Deletes a directory, and all the files and direcories inside it.
+ * Deletes all the files in a directory, and all the files in sub direcories inside it.
  *
+ * What it does:
  * - requires access to delete these files.
+ * - recursivly goes in to all sub directories looking for files to delete
+ * - optioinaly removes the directory as well, otherwise will leave an empty tree behind
  *
  * @package Packages
  * @param string $dir
@@ -1719,6 +1724,7 @@ function deltree($dir, $delete_dir = true)
 	$current_dir = @opendir($dir);
 	if ($current_dir == false)
 	{
+		// Can't open the directory for reading, try FTP to remove it before quiting
 		if ($delete_dir && isset($package_ftp))
 		{
 			$ftp_file = strtr($dir, array($_SESSION['pack_ftp']['root'] => ''));
@@ -1730,13 +1736,16 @@ function deltree($dir, $delete_dir = true)
 		return;
 	}
 
+	// Read all the files in the directory
 	while ($entryname = readdir($current_dir))
 	{
 		if (in_array($entryname, array('.', '..')))
 			continue;
 
+		// Recursivly dive in to each directory looking for files to delete
 		if (is_dir($dir . '/' . $entryname))
 			deltree($dir . '/' . $entryname);
+		// A file, delete it by any means necessary
 		else
 		{
 			// Here, 755 doesn't really matter since we're deleting it anyway.
@@ -1752,13 +1761,14 @@ function deltree($dir, $delete_dir = true)
 			{
 				if (!is_writable($dir . '/' . $entryname))
 					@chmod($dir . '/' . $entryname, 0777);
-				unlink($dir . '/' . $entryname);
+				@unlink($dir . '/' . $entryname);
 			}
 		}
 	}
 
 	closedir($current_dir);
 
+	// Remove the directory entry as well?
 	if ($delete_dir)
 	{
 		if (isset($package_ftp))

@@ -56,16 +56,16 @@ fwrite($handle, "\n\t'Version': '{$forum_version}',\n");
 
 foreach (array('admin', 'controllers', 'database', 'subs') as $type)
 	foreach ($version_info['file_versions_' . $type] as $file => $ver)
-		fwrite($handle, "\t'{$type}{$file}': '{$ver}',\n"); 
+		fwrite($handle, "\t'{$type}{$file}': '{$ver}',\n");
 
 foreach ($version_info['file_versions'] as $file => $ver)
-	fwrite($handle, "\t'sources{$file}': '{$ver}',\n"); 
+	fwrite($handle, "\t'sources{$file}': '{$ver}',\n");
 
 foreach ($version_info['default_template_versions'] as $file => $ver)
-	fwrite($handle, "\t'default{$file}': '{$ver}',\n"); 
+	fwrite($handle, "\t'default{$file}': '{$ver}',\n");
 
 foreach ($version_info['default_template_versions'] as $file => $ver)
-	fwrite($handle, "\t'default{$file}': '{$ver}',\n"); 
+	fwrite($handle, "\t'default{$file}': '{$ver}',\n");
 
 // Let's close the "core" files and start the language files
 fwrite($handle, '};');

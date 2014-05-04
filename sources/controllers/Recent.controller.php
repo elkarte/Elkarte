@@ -972,11 +972,7 @@ class Recent_Controller extends Action_Controller
 			if ($topic_length > $messages_per_page)
 			{
 				$start = -1;
-				$pages = constructPageIndex($scripturl . '?topic=' . $row['id_topic'] . '.%1$d;topicseen', $start, $topic_length, $messages_per_page, true, array('prev_next' => false));
-
-				// If we can use all, show it.
-				if (!empty($modSettings['enableAllMessages']) && $topic_length < $modSettings['enableAllMessages'])
-					$pages .= ' &nbsp;<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0;all">' . $txt['all'] . '</a>';
+				$pages = constructPageIndex($scripturl . '?topic=' . $row['id_topic'] . '.%1$d;topicseen', $start, $topic_length, $messages_per_page, true, array('prev_next' => false, 'all' => !empty($modSettings['enableAllMessages']) && $topic_length < $modSettings['enableAllMessages']));
 			}
 			else
 				$pages = '';
@@ -1058,7 +1054,7 @@ class Recent_Controller extends Action_Controller
 				)
 			);
 
-			$context['topics'][$row['id_topic']]['first_post']['started_by'] = sprintf($txt['topic_started_by'], $context['topics'][$row['id_topic']]['first_post']['member']['link'], $context['topics'][$row['id_topic']]['board']['link']);
+			$context['topics'][$row['id_topic']]['first_post']['started_by'] = sprintf($txt['topic_started_by_in'], '<strong>' . $context['topics'][$row['id_topic']]['first_post']['member']['link'] . '</strong>', '<em>' . $context['topics'][$row['id_topic']]['board']['link'] . '</em>');
 			determineTopicClass($context['topics'][$row['id_topic']]);
 		}
 		$db->free_result($request);

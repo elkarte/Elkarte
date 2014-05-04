@@ -35,7 +35,7 @@ $txt['search_weight_age'] = 'Relative search weight for the age of last matching
 $txt['search_weight_length'] = 'Relative search weight for a topic length';
 $txt['search_weight_subject'] = 'Relative search weight for a matching subject';
 $txt['search_weight_first_message'] = 'Relative search weight for a first message match';
-$txt['search_weight_sticky'] = 'Relative search weight for a sticky topic';
+$txt['search_weight_sticky'] = 'Relative search weight for a pinned topic';
 
 $txt['search_settings_desc'] = 'Here you can change the basic settings of the search function.';
 $txt['search_settings_title'] = 'Search Settings';
