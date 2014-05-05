@@ -45,7 +45,7 @@ function template_manage_themes()
 								<input type="checkbox" name="options[theme_allow]" id="options-theme_allow" value="1"', !empty($modSettings['theme_allow']) ? ' checked="checked"' : '', ' class="input_check" />
 							</dd>
 							<dt>
-								<label for="known_themes_list">', $txt['themeadmin_selectable'], '</label>:
+								<label for="known_themes_list">', $txt['themeadmin_selectable'], '</label>
 							</dt>
 							<dd>
 								<fieldset id="known_themes_list">
@@ -63,7 +63,7 @@ function template_manage_themes()
 								</fieldset>
 							</dd>
 							<dt>
-								<label for="theme_guests">', $txt['theme_guests'], ':</label>
+								<label for="theme_guests">', $txt['theme_guests'], '</label>
 							</dt>
 							<dd>
 								<select name="options[theme_guests]" id="theme_guests">';
@@ -78,7 +78,7 @@ function template_manage_themes()
 								<span class="smalltext pick_theme"><a href="', $scripturl, '?action=theme;sa=pick;u=-1;', $context['session_var'], '=', $context['session_id'], '">', $txt['theme_select'], '</a></span>
 							</dd>
 							<dt>
-								<label for="theme_reset">', $txt['theme_reset'], '</label>:
+								<label for="theme_reset">', $txt['theme_reset'], '</label>
 							</dt>
 							<dd>
 								<select name="theme_reset" id="theme_reset">
@@ -120,7 +120,7 @@ function template_manage_themes()
 	if ($context['can_create_new'])
 		echo '
 							<dt>
-								<label for="theme_gz">', $txt['theme_install_file'], '</label>:
+								<label for="theme_gz">', $txt['theme_install_file'], '</label>
 							</dt>
 							<dd>
 								<input type="file" name="theme_gz" id="theme_gz" value="theme_gz" size="40" onchange="this.form.copy.disabled = this.value != \'\'; this.form.theme_dir.disabled = this.value != \'\';" class="input_file" />
@@ -128,7 +128,7 @@ function template_manage_themes()
 
 	echo '
 							<dt>
-								<label for="theme_dir">', $txt['theme_install_dir'], '</label>:
+								<label for="theme_dir">', $txt['theme_install_dir'], '</label>
 							</dt>
 							<dd>
 								<input type="text" name="theme_dir" id="theme_dir" value="', $context['new_theme_dir'], '" size="40" style="width: 70%;" class="input_text" />
@@ -137,7 +137,7 @@ function template_manage_themes()
 	if ($context['can_create_new'])
 		echo '
 							<dt>
-								<label for="copy">', $txt['theme_install_new'], ':</label>
+								<label for="copy">', $txt['theme_install_new'], '</label>
 							</dt>
 							<dd>
 								<input type="text" name="copy" id="copy" value="', $context['new_theme_name'], '" size="40" class="input_text" />
@@ -197,11 +197,11 @@ function template_list_themes()
 				<div class="content">
 					<dl class="settings themes_list">
 						<dt><a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=list" class="linkbutton floatleft">', $txt['theme_edit_settings'], '</a></dt>
-						<dt>', $txt['themeadmin_list_theme_dir'], ':</dt>
+						<dt>', $txt['themeadmin_list_theme_dir'], '</dt>
 						<dd', $theme['valid_path'] ? '' : ' class="error"', '>', $theme['theme_dir'], $theme['valid_path'] ? '' : ' ' . $txt['themeadmin_list_invalid'], '</dd>
-						<dt>', $txt['themeadmin_list_theme_url'], ':</dt>
+						<dt>', $txt['themeadmin_list_theme_url'], '</dt>
 						<dd>', $theme['theme_url'], '</dd>
-						<dt>', $txt['themeadmin_list_images_url'], ':</dt>
+						<dt>', $txt['themeadmin_list_images_url'], '</dt>
 						<dd>', $theme['images_url'], '</dd>
 					</dl>
 				</div>
@@ -214,13 +214,13 @@ function template_list_themes()
 				<div class="content">
 					<dl class="settings">
 						<dt>
-							<label for="reset_dir">', $txt['themeadmin_list_reset_dir'], '</label>:
+							<label for="reset_dir">', $txt['themeadmin_list_reset_dir'], '</label>
 						</dt>
 						<dd>
 							<input type="text" name="reset_dir" id="reset_dir" value="', $context['reset_dir'], '" size="40" style="width: 80%;" class="input_text" />
 						</dd>
 						<dt>
-							<label for="reset_url">', $txt['themeadmin_list_reset_url'], '</label>:
+							<label for="reset_url">', $txt['themeadmin_list_reset_url'], '</label>
 						</dt>
 						<dd>
 							<input type="text" name="reset_url" id="reset_url" value="', $context['reset_url'], '" size="40" style="width: 80%;" class="input_text" />
@@ -470,7 +470,7 @@ function template_set_settings()
 				<div class="content">
 					<dl class="settings">
 						<dt>
-							<label for="variant">', $txt['theme_variants_default'], '</label>:
+							<label for="variant">', $txt['theme_variants_default'], '</label>
 						</dt>
 						<dd>
 							<select id="variant" name="options[default_variant]" onchange="changeVariant(this.value)">';
@@ -483,7 +483,7 @@ function template_set_settings()
 							</select>
 						</dd>
 						<dt>
-							<label for="disable_user_variant">', $txt['theme_variants_user_disable'], '</label>:
+							<label for="disable_user_variant">', $txt['theme_variants_user_disable'], '</label>
 						</dt>
 						<dd>
 							<input type="hidden" name="options[disable_user_variant]" value="0" />
@@ -518,7 +518,7 @@ function template_set_settings()
 		{
 			echo '
 						<dt id="dt_', $setting['id'], '">
-							<label for="', $setting['id'], '">', $setting['label'], '</label>:';
+							<label for="', $setting['id'], '">', $setting['label'], '</label>';
 
 			if (isset($setting['description']))
 				echo '<br />
@@ -536,7 +536,7 @@ function template_set_settings()
 		{
 			echo '
 						<dt id="dt_', $setting['id'], '">
-							<label for="', $setting['id'], '">', $setting['label'], '</label>:';
+							<label for="', $setting['id'], '">', $setting['label'], '</label>';
 
 			if (isset($setting['description']))
 				echo '<br />
@@ -553,7 +553,7 @@ function template_set_settings()
 		{
 			echo '
 						<dt id="dt_', $setting['id'], '">
-							<label for="', $setting['id'], '">', $setting['label'], '</label>:';
+							<label for="', $setting['id'], '">', $setting['label'], '</label>';
 
 			if (isset($setting['description']))
 				echo '<br />
@@ -577,7 +577,7 @@ function template_set_settings()
 		{
 			echo '
 						<dt id="dt_', $setting['id'], '">
-							<label for="', $setting['id'], '">', $setting['label'], '</label>:';
+							<label for="', $setting['id'], '">', $setting['label'], '</label>';
 
 			if (isset($setting['description']))
 				echo '<br />
@@ -652,7 +652,7 @@ function template_pick()
 		if (!empty($theme['variants']))
 		{
 			echo '
-					<label for="variant', $theme['id'], '"><strong>', $theme['pick_label'], '</strong></label>:
+					<label for="variant', $theme['id'], '"><strong>', $theme['pick_label'], '</strong></label>
 					<select id="variant', $theme['id'], '" name="vrt[', $theme['id'], ']" onchange="changeVariant', $theme['id'], '(this.value);">';
 
 			foreach ($theme['variants'] as $key => $variant)
@@ -963,7 +963,7 @@ function template_edit_template()
 
 	foreach ($context['file_parts'] as $part)
 		echo '
-					<label for="on_line', $part['line'], '">', $txt['themeadmin_edit_on_line'], ' ', $part['line'], '</label>:<br />
+					<label for="on_line', $part['line'], '">', $txt['themeadmin_edit_on_line'], ' ', $part['line'], '</label><br />
 					<div class="centertext">
 						<textarea id="on_line', $part['line'], '" name="entire_file[]" cols="80" rows="', $part['lines'] > 14 ? '14' : $part['lines'], '" class="edit_file">', $part['data'], '</textarea>
 					</div>';
