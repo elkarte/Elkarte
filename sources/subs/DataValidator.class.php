@@ -333,11 +333,11 @@ class Data_Validator
 					// One of our static methods
 					elseif (strpos($validation_function, '::') !== false && is_callable($validation_function))
 					{
-						$result = call_user_func_array($validation_method, array_merge((array) $input[$field], $validation_parameters_function));
+						$result = call_user_func_array($validation_method, array($field,  $input, $validation_parameters_function));
 					}
 					// Maybe even a function?
 					elseif (function_exists($validation_function))
-						$result = call_user_func_array($validation_function, array_merge((array) $input[$field], $validation_parameters_function));
+						$result = call_user_func_array($validation_function, array($field, $input, $validation_parameters_function));
 					else
 						$result = array(
 							'field' => $validation_method,
@@ -464,10 +464,10 @@ class Data_Validator
 						$input[$field] = $this->$sanitation_method($input[$field], $sanitation_parameters);
 					// One of our static methods
 					elseif (strpos($sanitation_function, '::') !== false && is_callable($sanitation_function))
-						$input[$field] = call_user_func_array($sanitation_function, array_merge((array) $input[$field], $sanitation_parameters_function));
+						$input[$field] = call_user_func_array($sanitation_function, array( $input[$field], $sanitation_parameters_function));
 					// Maybe even a built in php function like strtoupper, intval, etc?
 					elseif (function_exists($sanitation_function))
-						$input[$field] = call_user_func_array($sanitation_function, array_merge((array) $input[$field], $sanitation_parameters_function));
+						$input[$field] = call_user_func_array($sanitation_function, array( $input[$field], $sanitation_parameters_function));
 					// Or even a language construct?
 					elseif (in_array($sanitation_function, array('empty', 'array', 'isset')))
 					{
