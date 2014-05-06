@@ -2463,7 +2463,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 			template_footer();
 
 			// (since this is just debugging... it's okay that it's after </html>.)
-			if (!isset($_REQUEST['xml']) && !isset($_REQUEST['resume']) && !isset($_REQUEST['start']))
+			if (!isset($_REQUEST['xml']))
 				displayDebug();
 		}
 	}
