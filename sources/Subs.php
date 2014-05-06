@@ -705,9 +705,9 @@ function shorten_text($text, $len = 384, $cutword = false, $buffer = 12)
 			$text = rtrim($matches[1]) . ' ...';
 		}
 		else
-			$text = Util::substr($text, 0, $len) . '...';
+			$text = Util::substr($text, 0, $len - 3) . '...';
 
-		$text = strtr(Util::htmlspecialchars($text), array('&lt;' => '<', '&gt;' => '>'));
+		$text = Util::htmlspecialchars($text);
 	}
 
 	return $text;
