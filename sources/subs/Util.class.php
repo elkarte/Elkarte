@@ -38,15 +38,16 @@ class Util
 	 * @param string $string
 	 * @param string $quote_style
 	 * @param string $charset only UTF-8 allowed
+	 * @param bool $double true will allow double encoding, false will not encode existing html entities,
 	 */
-	public static function htmlspecialchars($string, $quote_style = ENT_COMPAT, $charset = 'UTF-8')
+	public static function htmlspecialchars($string, $quote_style = ENT_COMPAT, $charset = 'UTF-8', $double = false)
 	{
 		global $modSettings;
 
 		if (empty($modSettings['disableEntityCheck']))
-			$check = preg_replace_callback('~(&amp;#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', htmlspecialchars($string, $quote_style, 'UTF-8', false));
+			$check = preg_replace_callback('~(&amp;#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', htmlspecialchars($string, $quote_style, $charset, $double));
 		else
-			$check = htmlspecialchars($string, $quote_style, 'UTF-8', false);
+			$check = htmlspecialchars($string, $quote_style, $charset, $double);
 
 		return $check;
 	}
