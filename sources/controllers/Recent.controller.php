@@ -932,11 +932,17 @@ class Recent_Controller extends Action_Controller
 			if (!empty($modSettings['message_index_preview']))
 			{
 				// Limit them to 128 characters - do this FIRST because it's a lot of wasted censoring otherwise.
-				$row['first_body'] = strip_tags(strtr(parse_bbc($row['first_body'], $row['first_smileys'], $row['id_first_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
+				$row['first_body'] = strip_tags(strtr(parse_bbc($row['first_body'], false, $row['id_first_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
 				$row['first_body'] = shorten_text($row['first_body'], !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128, true);
 
-				$row['last_body'] = strip_tags(strtr(parse_bbc($row['last_body'], $row['last_smileys'], $row['id_last_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
-				$row['last_body'] = shorten_text($row['last_body'], !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128, true);
+				// No reply then they are the same, no need to process it again
+				if ($row['num_replies'] == 0)
+					$row['last_body'] == $row['first_body'];
+				else
+				{
+					$row['last_body'] = strip_tags(strtr(parse_bbc($row['last_body'], false, $row['id_last_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
+					$row['last_body'] = shorten_text($row['last_body'], !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128, true);
+				}
 
 				// Censor the subject and message preview.
 				censorText($row['first_subject']);
