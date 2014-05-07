@@ -540,6 +540,9 @@ class PersonalMessage_Controller extends Action_Controller
 			censorText($row_quoted['subject']);
 			censorText($row_quoted['body']);
 
+			// Lets make sure we mark this one as read
+			markMessages($pmsg);
+
 			// Figure out which flavor or 'Re: ' to use
 			if (!isset($context['response_prefix']) && !($context['response_prefix'] = cache_get_data('response_prefix')))
 			{
