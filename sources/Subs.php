@@ -691,10 +691,10 @@ function shorten_text($text, $len = 384, $cutword = false, $buffer = 12)
 	// If its to long, cut it down to size
 	if (Util::strlen($text) > $len)
 	{
-		$text = html_entity_decode($text, ENT_QUOTES, 'UTF-8');
-
 		if ($cutword)
 		{
+			$text = html_entity_decode($text, ENT_QUOTES, 'UTF-8');
+
 			// Look for len - buffer characters and cut on first word boundary after
 			preg_match('~(.{' . max(1, ($len - $buffer)) . '}.*?)\b~su', $text, $matches);
 
@@ -703,11 +703,10 @@ function shorten_text($text, $len = 384, $cutword = false, $buffer = 12)
 				$matches[1] = Util::substr($matches[1], 0, $len);
 
 			$text = rtrim($matches[1]) . ' ...';
+			$text = Util::htmlspecialchars($text);
 		}
 		else
-			$text = Util::substr($text, 0, $len) . '...';
-
-		$text = strtr(Util::htmlspecialchars($text), array('&lt;' => '<', '&gt;' => '>'));
+			$text = Util::substr($text, 0, $len - 3) . '...';
 	}
 
 	return $text;

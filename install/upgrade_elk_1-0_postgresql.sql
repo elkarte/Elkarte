@@ -444,7 +444,7 @@ ADD COLUMN vieworder smallint NOT NULL default '0';
 /******************************************************************************/
 --- Fixing mail queue for long messages
 /******************************************************************************/
----# Altering mil_queue table...
+---# Altering mail_queue table...
 ALTER TABLE {$db_prefix}mail_queue
 CHANGE body body mediumtext NOT NULL;
 ---#
@@ -844,7 +844,7 @@ ADD COLUMN email smallint NOT NULL DEFAULT '0';
 
 ---# Adding new columns to mail_queue...
 ALTER TABLE {$db_prefix}mail_queue
-ADD COLUMN message_id int NOT NULL DEFAULT '0';
+ADD COLUMN message_id varchar(12) NOT NULL DEFAULT '';
 ---#
 
 ---# Updating board profiles...
