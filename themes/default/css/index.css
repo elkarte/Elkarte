@@ -1513,6 +1513,10 @@ dl.settings textarea {
 dl.settings label {
 	vertical-align: top;
 }
+.settings .smalldescription {
+	padding-left: 1em;
+	display: inline-block;
+}
 
 
 /*	$BOARDS		*/
