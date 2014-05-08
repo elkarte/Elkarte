@@ -115,13 +115,9 @@ function DumpDatabase2()
 		$crlf;
 
 	// Get all tables in the database....
-	if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) != 0)
-		$dbp = str_replace('_', '\_', $match[2]);
-	else
-		$dbp = $db_prefix;
+	$tables = $database->db_list_tables(false, $db_prefix . '%');
 
 	// Dump each table.
-	$tables = $database->db_list_tables(false, $db_prefix . '%');
 	foreach ($tables as $tableName)
 	{
 		// Are we dumping the structures?
