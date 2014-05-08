@@ -34,7 +34,7 @@ function template_manage_themes()
 		<div id="admin_form_wrapper">
 			<form action="', $scripturl, '?action=admin;area=theme;sa=admin" method="post" accept-charset="UTF-8">
 				<h3 class="category_header">
-					<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=initial_theme_settings" onclick="return reqOverlayDiv(this.href);" id="initial_theme_settings" title="', $txt['help'], '"></a> ', $txt['initial_theme_settings'], '
+					<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=theme_forum_theme" onclick="return reqOverlayDiv(this.href);" id="theme_forum_theme" title="', $txt['help'], '"></a> ', $txt['theme_forum_theme'], '
 				</h3>
 				<div class="windowbg2">
 					<div class="content">
@@ -65,7 +65,7 @@ function template_manage_themes()
 								</fieldset>
 							</dd>
 							<dt>
-								<label for="theme_guests">', $txt['theme_guests'], ':</label>
+								<label for="theme_guests">', $txt['theme_guests'], '</label>
 							</dt>
 							<dd>
 								<select name="options[theme_guests]" id="theme_guests">';
@@ -558,8 +558,24 @@ function template_set_settings()
 							<label for="', $setting['id'], '">', $setting['label'], '</label>:';
 
 			if (isset($setting['description']))
-				echo '<br />
+			{
+				if (is_array($setting['description']))
+				{
+					echo '
+							<div class="smalldescription">', $setting['description']['main'], '
+								<dl>';
+					foreach ($setting['description']['options'] as $option)
+						echo '
+									<dt><strong>', $txt[$option[0]], '</strong></dt>
+									<dd>', $txt[$option[1]], '</dd>';
+					echo '
+								</dl>
+							</div>';
+				}
+				else
+					echo '<br />
 							<span class="smalldescription">', $setting['description'], '</span>';
+			}
 
 			echo '
 						</dt>
