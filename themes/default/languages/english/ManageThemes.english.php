@@ -1,12 +1,13 @@
 <?php
 // Version: 1.0; ManageThemes
 
-$txt['themeadmin_explain'] = 'Themes are the different looks and feels of your forum. These settings affect the selection of themes and which themes guests and other members use.';
+$txt['themeadmin_explain'] = 'The Initial Theme Settings section permits the site administration to select a theme for the site default theme. Admins can also enable members to select any installed theme for their use and to enable selectable themes. The Install a New Theme section is how the site administration installs a theme.';
 
+$txt['initial_theme_settings'] = 'Initial Theme Settings';
 $txt['theme_allow'] = 'Allow members to select their own themes.';
-$txt['theme_guests'] = 'Overall forum default';
+$txt['theme_guests'] = 'Overall forum default theme';
 $txt['theme_select'] = 'choose...';
-$txt['theme_reset'] = 'Reset everyone to';
+$txt['theme_reset'] = 'Reset all members to this theme:';
 $txt['theme_nochange'] = 'No change';
 $txt['theme_forum_default'] = 'Forum Default';
 
@@ -14,12 +15,12 @@ $txt['theme_remove'] = 'Uninstall';
 $txt['theme_remove_confirm'] = 'Are you sure you want to uninstall this theme?';
 
 $txt['theme_install'] = 'Install a New Theme';
-$txt['theme_install_file'] = 'From an archive (e.g. .zip, .tar.gz)';
-$txt['theme_install_dir'] = 'From a directory on the server';
+$txt['theme_install_file'] = 'From a local archive: (e.g. .zip or .tar.gz)';
+$txt['theme_install_dir'] = 'From a directory on the host server:';
 $txt['theme_install_error'] = 'That theme directory doesn\'t exist, or doesn\'t contain a theme.';
 $txt['theme_install_write_error'] = 'The themes directory must be writable to continue.';
 $txt['theme_install_go'] = 'Install';
-$txt['theme_install_new'] = 'Create a copy of default theme named';
+$txt['theme_install_new'] = 'Create a copy of the ElkArte default theme named:';
 $txt['theme_install_new_confirm'] = 'Are you sure you want to install this new theme?';
 $txt['theme_install_writable'] = 'Warning - you cannot create or install a new theme as your themes directory is not currently writable.';
 $txt['theme_install_general'] = 'The theme doesn\'t seem to be where it should, please double check the information you provided.';
@@ -31,7 +32,7 @@ $txt['theme_preview'] = 'Preview theme';
 $txt['theme_set'] = 'Use this theme';
 $txt['theme_user'] = 'person is using this theme.';
 $txt['theme_users'] = 'people are using this theme.';
-$txt['theme_pick_variant'] = 'Select Variant';
+$txt['theme_pick_variant'] = 'Select Variant:';
 
 $txt['theme_edit'] = 'Edit Theme';
 $txt['theme_edit_style'] = 'Modify the stylesheets. (colors, fonts, etc.)';
@@ -103,9 +104,9 @@ $txt['hide_post_group_desc'] = 'Enabling this will not display a member\'s post 
 $txt['theme_options_defaults'] = 'These are the default values for some member specific settings.  Changing these will only affect new members and guests.';
 $txt['theme_options_title'] = 'Change or reset default options';
 
-$txt['themeadmin_title'] = 'Themes and Layout Settings';
+$txt['themeadmin_title'] = 'Theme Management and Options';
 $txt['themeadmin_description'] = 'Here you can modify the settings for your themes, update theme selections, reset member options, and the like.';
-$txt['themeadmin_admin_desc'] = 'This page allows you to change the default theme, reset members to all use a certain theme, and choose other settings related to theme selection.  You are also able to install themes from here.<br /><br />Don\'t forget to look at the theme settings for your themes for layout options.';
+$txt['themeadmin_admin_desc'] = 'Themes provide the different \'look and feel\' of your forum. Theme Management and Options allow you to install new site themes, change the default theme, reset all members to use a certain theme, and choose other settings related to theme selection. Remember to look at the theme settings for your different themes for their individual layout options.';
 $txt['themeadmin_list_desc'] = 'From here you can view the list of themes you currently have installed, change their paths and settings, and uninstall them.';
 $txt['themeadmin_reset_desc'] = 'Below you will see an interface to change the current theme-specific options for all your members.  You will only see those themes that have their own set of settings.';
 $txt['themeadmin_edit_desc'] = 'Modify the stylesheet and source code of your installed themes.  Please consult the documentation for more information.';
@@ -151,8 +152,8 @@ $txt['themeadmin_edit_kilobytes'] = 'KiB';
 $txt['themeadmin_edit_error'] = 'The file you tried to save generated the following error:';
 $txt['themeadmin_edit_on_line'] = 'Beginning on line';
 $txt['themeadmin_edit_preview'] = 'Preview';
-$txt['themeadmin_selectable'] = 'Themes that the user is able to select';
-$txt['themeadmin_themelist_link'] = 'Show the list of themes';
+$txt['themeadmin_selectable'] = 'Themes the user is permitted to select';
+$txt['themeadmin_themelist_link'] = 'Show the list of installed themes';
 
 // Strings for the variants
 $txt['variant_light'] = 'ElkArte Light';
