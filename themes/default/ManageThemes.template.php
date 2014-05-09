@@ -24,10 +24,7 @@ function template_manage_themes()
 
 	echo '
 	<div id="admincenter">
-		<h2 class="category_header">
-			<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=themes" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a>
-			', $txt['themeadmin_title'], '
-		</h2>
+		<h2 class="category_header">', $txt['themeadmin_manage'], '</h2>
 		<div class="information">
 			', $txt['themeadmin_explain'], '
 		</div>
