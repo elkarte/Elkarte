@@ -2,7 +2,7 @@
 // Version: 1.0; ManageThemes
 
 $txt['themeadmin_explain'] = 'Themes are the different looks and feels of your forum. The Global Theme Settings section permits the site administration to select a theme for the site default theme. Admins can also enable members to select any installed theme for their use and to enable selectable themes. The Install a New Theme section is how the site administration installs a theme.';
-
+$txt['themeadmin_manage'] = 'Manage and Install';
 $txt['theme_forum_theme'] = 'Global Theme Settings';
 $txt['theme_allow'] = 'Allow members to select their own themes:';
 $txt['theme_guests'] = 'Overall forum default theme:';
