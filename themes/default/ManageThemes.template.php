@@ -168,16 +168,14 @@ function template_list_themes()
 			', $txt['themeadmin_list_tip'], '
 		</div>
 
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=theme;', $context['session_var'], '=', $context['session_id'], ';sa=list" method="post" accept-charset="UTF-8">
-			<h3 class="category_header">', $txt['theme_settings'], '</h3>
-			<br />';
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=theme;', $context['session_var'], '=', $context['session_id'], ';sa=list" method="post" accept-charset="UTF-8"> ';
 
 	// Show each theme.... with X for delete and a link to settings.
 	foreach ($context['themes'] as $theme)
 	{
 		echo '
 			<div class="theme_', $theme['id'], '">
-				<h3 class="category_header">
+				<h3 class="category_header"> <a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=themeadmin_delete_help" onclick="return reqOverlayDiv(this.href);" id="themeadmin_delete_help" title="', $txt['help'], '"></a> ', '
 					', $theme['name'], '', !empty($theme['version']) ? ' <em>(' . $theme['version'] . ')</em>' : '';
 
 		// You *cannot* delete the default theme. It's important!
@@ -196,11 +194,11 @@ function template_list_themes()
 				<div class="content">
 					<dl class="settings themes_list">
 						<dt><a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=list" class="linkbutton floatleft">', $txt['theme_edit_settings'], '</a></dt>
-						<dt>', $txt['themeadmin_list_theme_dir'], ':</dt>
+						<dt>', $txt['themeadmin_list_theme_dir'], '</dt>
 						<dd', $theme['valid_path'] ? '' : ' class="error"', '>', $theme['theme_dir'], $theme['valid_path'] ? '' : ' ' . $txt['themeadmin_list_invalid'], '</dd>
-						<dt>', $txt['themeadmin_list_theme_url'], ':</dt>
+						<dt>', $txt['themeadmin_list_theme_url'], '</dt>
 						<dd>', $theme['theme_url'], '</dd>
-						<dt>', $txt['themeadmin_list_images_url'], ':</dt>
+						<dt>', $txt['themeadmin_list_images_url'], '</dt>
 						<dd>', $theme['images_url'], '</dd>
 					</dl>
 				</div>
@@ -208,18 +206,20 @@ function template_list_themes()
 	}
 
 	echo '
-			<h3 class="category_header">', $txt['themeadmin_list_reset'], '</h3>
-			<div class="windowbg">
+			<h3 class="category_header">
+				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=themeadmin_list_reset" onclick="return reqOverlayDiv(this.href);" id="themeadmin_list_reset" title="', $txt['help'], '"></a> ', $txt['themeadmin_list_reset'], '
+			</h3>
+				<div class="windowbg">
 				<div class="content">
 					<dl class="settings">
 						<dt>
-							<label for="reset_dir">', $txt['themeadmin_list_reset_dir'], '</label>:
+							<label for="reset_dir">', $txt['themeadmin_list_reset_dir'], '</label>
 						</dt>
 						<dd>
 							<input type="text" name="reset_dir" id="reset_dir" value="', $context['reset_dir'], '" size="40" style="width: 80%;" class="input_text" />
 						</dd>
 						<dt>
-							<label for="reset_url">', $txt['themeadmin_list_reset_url'], '</label>:
+							<label for="reset_url">', $txt['themeadmin_list_reset_url'], '</label>
 						</dt>
 						<dd>
 							<input type="text" name="reset_url" id="reset_url" value="', $context['reset_url'], '" size="40" style="width: 80%;" class="input_text" />
