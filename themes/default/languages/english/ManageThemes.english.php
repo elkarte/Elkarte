@@ -107,19 +107,19 @@ $txt['theme_options_title'] = 'Change or reset default options';
 $txt['themeadmin_title'] = 'Theme Management and Options';
 $txt['themeadmin_description'] = 'Here you can modify the settings for your themes, update theme selections, reset member options, and the like.';
 $txt['themeadmin_admin_desc'] = 'Themes provide the different \'look and feel\' of your forum. Theme Management and Options allow you to install new site themes, change the default theme, reset all members to use a certain theme, and choose other settings related to theme selection. Remember to look at the theme settings for your different themes for their individual layout options.';
-$txt['themeadmin_list_desc'] = 'From here you can view the list of themes you currently have installed, change their paths and settings, and uninstall them.';
+$txt['themeadmin_list_desc'] = 'In the Theme Settings area you can view the list of themes that you have installed, change their directory paths and settings, and uninstall them.';
 $txt['themeadmin_reset_desc'] = 'Below you will see an interface to change the current theme-specific options for all your members.  You will only see those themes that have their own set of settings.';
 $txt['themeadmin_edit_desc'] = 'Modify the stylesheet and source code of your installed themes.  Please consult the documentation for more information.';
 
-$txt['themeadmin_list_heading'] = 'Theme Settings Overview';
-$txt['themeadmin_list_tip'] = 'Remember that the layout settings may be different between one theme and another.  Click on the theme\'s names below to set their options, change their directory or URL settings, or to find other options.';
-$txt['themeadmin_list_theme_dir'] = 'Theme directory (templates)';
+$txt['themeadmin_list_heading'] = 'Theme Settings';
+$txt['themeadmin_list_tip'] = 'The layout settings may be different for each installed theme. Edit the installed themes to set their individual options, change their directory or URL settings, or to find other options.';
+$txt['themeadmin_list_theme_dir'] = 'Theme directory: (templates)';
 $txt['themeadmin_list_invalid'] = '(Warning! this path is not correct.)';
-$txt['themeadmin_list_theme_url'] = 'URL to above directory';
-$txt['themeadmin_list_images_url'] = 'URL to images directory';
+$txt['themeadmin_list_theme_url'] = 'URL to above directory:';
+$txt['themeadmin_list_images_url'] = 'URL to images directory:';
 $txt['themeadmin_list_reset'] = 'Reset Theme URLs and Directories';
-$txt['themeadmin_list_reset_dir'] = 'Base path to Themes directory';
-$txt['themeadmin_list_reset_url'] = 'Base URL to the same directory';
+$txt['themeadmin_list_reset_dir'] = 'Base path to Themes directory:';
+$txt['themeadmin_list_reset_url'] = 'Base URL to the same directory:';
 $txt['themeadmin_list_reset_go'] = 'Attempt to reset all themes';
 
 $txt['themeadmin_reset_tip'] = 'Each theme may have its own custom options for selection by your members.  These include things like &quot;quick reply&quot;, avatars and signatures, layout options, and other similar options.  Here you can change the defaults or reset everyone\'s options.<br /><br />Please note that some themes may use the default options, in which case they will not have their own options.';
