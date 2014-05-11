@@ -173,6 +173,14 @@ strong {
 	font-weight: bold;
 }
 
+/* need some vertical space between lines in admin section */
+dl.settings dd {
+	float: right;
+    overflow: auto;
+    width: 55%;
+	padding: 1px 0px 0px 4px;
+}
+
 /* @todo - Test this everywhere. */
 .standard_category {
 	border-radius: 4px 4px 0 0;
@@ -391,15 +399,31 @@ div.bbc_footnotes .meaction {
 	color: #a80000;
 }
 
+#quick_search {
+	font-size: 0.857em;
+	padding-top: 6px;
+}
+
+#search_form .input_text {
+	border-radius: 2px 0 0 2px;
+	border-right: none;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	color: #000;
+}
 #search_form .button_submit {
+	border-radius: 0 2px 2px 0;
 	font-variant: small-caps;
 	color: #333;
 }
 #search_form select {
+	padding-right: 4px;
+	border: 1px solid #afafaf;
 	border-right: none;
 	opacity: 0.8;
 }
 #search_form select:focus {
+	border: 1px solid #999;
 	border-right: none;
 	opacity: 1;
 }
