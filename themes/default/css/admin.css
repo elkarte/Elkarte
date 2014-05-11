@@ -146,6 +146,7 @@ fieldset dl {
 /* @todo - Admin quick search bar, and results page. */
 #quick_search {
 	font-size: 0.857em;
+	padding: 4px 0px 0px 4px;
 }
 #quick_search .icon {
 	float: left;

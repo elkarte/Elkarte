@@ -750,10 +750,13 @@ function template_themelist()
 {
 	global $context, $scripturl, $txt;
 
-	echo '
-	<div id="admin_form_wrapper">
-		<h3 class="category_header">', $txt['themeadmin_edit_title'], '</h3>
-		<br />';
+echo '
+	<div id="admincenter">
+		<h2 class="category_header">', $txt['themeadmin_edit_title'], '</h2>
+		<div class="information">
+			', $txt['themeadmin_modify_styles'], '
+		</div>
+		<div id="admin_form_wrapper">';
 
 	$alternate = false;
 
@@ -778,6 +781,7 @@ function template_themelist()
 	}
 
 	echo '
+		</div>
 	</div>';
 }
 
