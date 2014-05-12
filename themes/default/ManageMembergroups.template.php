@@ -666,8 +666,6 @@ function template_group_members()
 		echo '
 					<input type="submit" name="remove" value="', $txt['membergroups_members_remove'], '" class="button_submit " />';
 
-
-
 	echo '
 				</div>
 			</div>';

@@ -703,7 +703,7 @@ ADD COLUMN email smallint(5) unsigned NOT NULL DEFAULT '0';
 
 ---# Adding new columns to mail_queue...
 ALTER TABLE {$db_prefix}mail_queue
-ADD COLUMN message_id int(10) NOT NULL DEFAULT '0';
+ADD COLUMN message_id varchar(12) NOT NULL DEFAULT '';
 ---#
 
 ---# Updating board profiles...

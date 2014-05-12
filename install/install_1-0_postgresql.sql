@@ -1715,7 +1715,7 @@ CREATE TABLE {$db_prefix}mail_queue (
   send_html smallint NOT NULL default '0',
   priority smallint NOT NULL default '1',
   private smallint NOT NULL default '0',
-  message_id int NOT NULL default '0',
+  message_id varchar(12) NOT NULL default '',
   PRIMARY KEY (id_mail)
 );
 

@@ -96,13 +96,6 @@ function DumpDatabase2()
 	// This should turn off the session URL parser.
 	$scripturl = '';
 
-	// If this database is flat file and has a handler function pass it to that.
-	if (method_exists($database, 'db_get_backup'))
-	{
-		$database->db_get_backup();
-		exit;
-	}
-
 	// Send the proper headers to let them download this file.
 	header('Content-Disposition: attachment; filename="' . $db_name . '-' . (empty($_REQUEST['struct']) ? 'data' : (empty($_REQUEST['data']) ? 'structure' : 'complete')) . '_' . strftime('%Y-%m-%d') . $extension . '"');
 	header('Cache-Control: private');
@@ -122,13 +115,9 @@ function DumpDatabase2()
 		$crlf;
 
 	// Get all tables in the database....
-	if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) != 0)
-		$dbp = str_replace('_', '\_', $match[2]);
-	else
-		$dbp = $db_prefix;
+	$tables = $database->db_list_tables(false, $db_prefix . '%');
 
 	// Dump each table.
-	$tables = $database->db_list_tables(false, $db_prefix . '%');
 	foreach ($tables as $tableName)
 	{
 		// Are we dumping the structures?

@@ -66,7 +66,6 @@ class ManageSmileys_Controller extends Action_Controller
 			'install' => array($this, 'action_install', 'permission' => 'manage_smileys')
 		);
 
-
 		// Action controller
 		$action = new Action('manage_smileys');
 

@@ -331,17 +331,15 @@ class Data_Validator
 					if (is_callable(array($this, $validation_method)))
 						$result = $this->$validation_method($field, $input, $validation_parameters);
 					// One of our static methods
-					elseif (strpos($validation_function, '::') !== false && is_callable($validation_function))
-					{
+					elseif (strpos($validation_function, '::') !== false && is_callable($validation_function) && isset($input[$field]))
 						$result = call_user_func_array($validation_method, array_merge((array) $input[$field], $validation_parameters_function));
-					}
 					// Maybe even a function?
-					elseif (function_exists($validation_function))
+					elseif (function_exists($validation_function) && isset($input[$field]))
 						$result = call_user_func_array($validation_function, array_merge((array) $input[$field], $validation_parameters_function));
 					else
 						$result = array(
 							'field' => $validation_method,
-							'input' => $input[$field],
+							'input' => isset($input[$field]) ? $input[$field] : null,
 							'function' => '_validate_invalid_function',
 							'param' => $validation_parameters
 						);
@@ -1206,7 +1204,7 @@ class Data_Validator
 			$result = @eval('
 				if (false)
 				{
-					' . preg_replace('~^(?:\s*<\\?(?:php)?|\\?>\s*$)~', '', $input[$field]) . '
+					' . preg_replace('~^(?:\s*<\\?(?:php)?|\\?>\s*$)~u', '', $input[$field]) . '
 				}
 			');
 			error_reporting($errorReporting);

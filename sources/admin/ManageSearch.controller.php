@@ -478,6 +478,10 @@ class ManageSearch_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/ManageSearch.subs.php');
 
+		// Logging may cause session issues with many queries
+		$old_db_show_debug = $db_show_debug;
+		$db_show_debug = false;
+
 		// Step 1: insert all the words.
 		if ($context['step'] === 1)
 		{
@@ -501,6 +505,9 @@ class ManageSearch_Controller extends Action_Controller
 				$context['percentage'] = 80 + round($context['start'] / $index_properties[$context['index_settings']['bytes_per_word']]['max_size'], 3) * 20;
 			}
 		}
+
+		// Restore previous debug state
+		$db_show_debug = $old_db_show_debug;
 
 		// Step 3: everything done.
 		if ($context['step'] === 3)
@@ -615,7 +622,6 @@ class ManageSearch_Controller extends Action_Controller
 		$context['sub_template'] = 'manage_sphinx';
 		createToken('admin-mssphinx');
 	}
-
 
 	/**
 	 * Get the installed Search API implementations.

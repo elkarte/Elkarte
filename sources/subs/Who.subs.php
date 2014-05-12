@@ -488,7 +488,7 @@ function prepareCreditsData()
 	$credits['credits_addons'] = addonsCredits();
 
 	// An alternative for addons credits is to use a hook.
-	call_integration_hook('integrate_credits');
+	call_integration_hook('integrate_credits', array(&$credits));
 
 	// Copyright information
 	$credits['copyrights']['elkarte'] = '&copy; 2012 - 2014 ElkArte Forum contributors';

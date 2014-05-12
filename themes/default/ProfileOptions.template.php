@@ -23,7 +23,6 @@ function template_ProfileOptions_init()
 	loadTemplate('GenericBoards');
 }
 
-
 /**
  * Template for showing all the buddies of the current user.
  */
@@ -265,7 +264,6 @@ function template_edit_options()
 	if (!empty($context['profile_prehtml']))
 		echo '
 					<div>', $context['profile_prehtml'], '</div>';
-
 
 	if (!empty($context['profile_fields']))
 		echo '

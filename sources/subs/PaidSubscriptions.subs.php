@@ -673,7 +673,7 @@ function deleteSubscription($id)
 	}
 
 	// Remove the subscription as well
-	$db->query('delete_subscription', '
+	$db->query('', '
 		DELETE FROM {db_prefix}subscriptions
 		WHERE id_subscribe = {int:current_subscription}',
 		array(

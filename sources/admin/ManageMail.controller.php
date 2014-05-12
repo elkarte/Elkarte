@@ -23,7 +23,8 @@ if (!defined('ELK'))
 /**
  * This class is the administration mailing controller.
  *
- * It handles mail configuration, it displays and allows to remove items from the mail queue.
+ * - It handles mail configuration,
+ * - It displays and allows to remove items from the mail queue.
  *
  * @package Mail
  */
@@ -126,9 +127,8 @@ class ManageMail_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							return Util::strlen($rowData[\'subject\']) > 50 ? sprintf(\'%1$s...\', Util::htmlspecialchars(Util::substr($rowData[\'subject\'], 0, 47))) : Util::htmlspecialchars($rowData[\'subject\']);
+							return shorten_text(Util::htmlspecialchars($rowData[\'subject\'], 50));
 						'),
-						'class' => 'smalltext',
 					),
 					'sort' => array(
 						'default' => 'subject',
@@ -146,7 +146,6 @@ class ManageMail_Controller extends Action_Controller
 								'recipient' => true,
 							),
 						),
-						'class' => 'smalltext',
 					),
 					'sort' => array(
 						'default' => 'recipient',
@@ -168,7 +167,7 @@ class ManageMail_Controller extends Action_Controller
 							// But if not, revert to priority 0.
 							return isset($txt[$txtKey]) ? $txt[$txtKey] : $txt[\'mq_mpriority_1\'];
 						'),
-						'class' => 'centertext smalltext',
+						'class' => 'centertext',
 					),
 					'sort' => array(
 						'default' => 'priority',
@@ -183,7 +182,6 @@ class ManageMail_Controller extends Action_Controller
 						'function' => create_function('$rowData', '
 							return time_since(time() - $rowData[\'time_sent\']);
 						'),
-						'class' => 'smalltext',
 					),
 					'sort' => array(
 						'default' => 'time_sent',
@@ -193,13 +191,11 @@ class ManageMail_Controller extends Action_Controller
 				'check' => array(
 					'header' => array(
 						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
-						'class' => 'centertext',
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
 							return \'<input type="checkbox" name="delete[]" value="\' . $rowData[\'id_mail\'] . \'" class="input_check" />\';
 						'),
-						'class' => 'centertext',
 					),
 				),
 			),

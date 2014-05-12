@@ -48,7 +48,7 @@ class RepairBoards_Controller extends Action_Controller
 	 */
 	public function action_repairboards()
 	{
-		global $txt, $context, $salvageBoardID;
+		global $txt, $context, $salvageBoardID, $db_show_debug;
 
 		isAllowedTo('admin_forum');
 
@@ -86,7 +86,15 @@ class RepairBoards_Controller extends Action_Controller
 		{
 			$context['error_search'] = true;
 			$context['repair_errors'] = array();
+
+			// Logging may cause session issues with many queries
+			$old_db_show_debug = $db_show_debug;
+			$db_show_debug = false;
+
 			$context['to_fix'] = findForumErrors();
+
+			// Restore previous debug state
+			$db_show_debug = $old_db_show_debug;
 
 			if (!empty($context['to_fix']))
 			{
@@ -104,8 +112,15 @@ class RepairBoards_Controller extends Action_Controller
 
 			require_once(SUBSDIR . '/Boards.subs.php');
 
+			// Logging may cause session issues with many queries
+			$old_db_show_debug = $db_show_debug;
+			$db_show_debug = false;
+
 			// Actually do the fix.
 			findForumErrors(true);
+
+			// Restore previous debug state
+			$db_show_debug = $old_db_show_debug;
 
 			// Note that we've changed everything possible ;)
 			updateSettings(array(

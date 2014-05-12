@@ -33,7 +33,9 @@ function template_manage_themes()
 		</div>
 		<div id="admin_form_wrapper">
 			<form action="', $scripturl, '?action=admin;area=theme;sa=admin" method="post" accept-charset="UTF-8">
-				<h3 class="category_header">', $txt['settings'], '</h3>
+				<h3 class="category_header">
+					<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=initial_theme_settings" onclick="return reqOverlayDiv(this.href);" id="initial_theme_settings" title="', $txt['help'], '"></a> ', $txt['initial_theme_settings'], '
+				</h3>
 				<div class="windowbg2">
 					<div class="content">
 						<dl class="settings">
@@ -78,7 +80,7 @@ function template_manage_themes()
 								<span class="smalltext pick_theme"><a href="', $scripturl, '?action=theme;sa=pick;u=-1;', $context['session_var'], '=', $context['session_id'], '">', $txt['theme_select'], '</a></span>
 							</dd>
 							<dt>
-								<label for="theme_reset">', $txt['theme_reset'], '</label>:
+								<label for="theme_reset">', $txt['theme_reset'], '</label>
 							</dt>
 							<dd>
 								<select name="theme_reset" id="theme_reset">
@@ -120,7 +122,7 @@ function template_manage_themes()
 	if ($context['can_create_new'])
 		echo '
 							<dt>
-								<label for="theme_gz">', $txt['theme_install_file'], '</label>:
+								<label for="theme_gz">', $txt['theme_install_file'], '</label>
 							</dt>
 							<dd>
 								<input type="file" name="theme_gz" id="theme_gz" value="theme_gz" size="40" onchange="this.form.copy.disabled = this.value != \'\'; this.form.theme_dir.disabled = this.value != \'\';" class="input_file" />
@@ -128,7 +130,7 @@ function template_manage_themes()
 
 	echo '
 							<dt>
-								<label for="theme_dir">', $txt['theme_install_dir'], '</label>:
+								<label for="theme_dir">', $txt['theme_install_dir'], '</label>
 							</dt>
 							<dd>
 								<input type="text" name="theme_dir" id="theme_dir" value="', $context['new_theme_dir'], '" size="40" style="width: 70%;" class="input_text" />
@@ -137,7 +139,7 @@ function template_manage_themes()
 	if ($context['can_create_new'])
 		echo '
 							<dt>
-								<label for="copy">', $txt['theme_install_new'], ':</label>
+								<label for="copy">', $txt['theme_install_new'], '</label>
 							</dt>
 							<dd>
 								<input type="text" name="copy" id="copy" value="', $context['new_theme_name'], '" size="40" class="input_text" />
@@ -652,7 +654,7 @@ function template_pick()
 		if (!empty($theme['variants']))
 		{
 			echo '
-					<label for="variant', $theme['id'], '"><strong>', $theme['pick_label'], '</strong></label>:
+					<label for="variant', $theme['id'], '"><strong>', $theme['pick_label'], '</strong>&nbsp;</label>
 					<select id="variant', $theme['id'], '" name="vrt[', $theme['id'], ']" onchange="changeVariant', $theme['id'], '(this.value);">';
 
 			foreach ($theme['variants'] as $key => $variant)

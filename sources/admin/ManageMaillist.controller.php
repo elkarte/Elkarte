@@ -1637,7 +1637,6 @@ class ManageMaillist_Controller extends Action_Controller
 
 		call_integration_hook('integrate_modify_maillist_settings', array(&$config_vars));
 
-
 		return $config_vars;
 	}
 

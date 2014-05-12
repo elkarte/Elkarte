@@ -691,10 +691,10 @@ function shorten_text($text, $len = 384, $cutword = false, $buffer = 12)
 	// If its to long, cut it down to size
 	if (Util::strlen($text) > $len)
 	{
-		$text = html_entity_decode($text, ENT_QUOTES, 'UTF-8');
-
 		if ($cutword)
 		{
+			$text = html_entity_decode($text, ENT_QUOTES, 'UTF-8');
+
 			// Look for len - buffer characters and cut on first word boundary after
 			preg_match('~(.{' . max(1, ($len - $buffer)) . '}.*?)\b~su', $text, $matches);
 
@@ -703,11 +703,10 @@ function shorten_text($text, $len = 384, $cutword = false, $buffer = 12)
 				$matches[1] = Util::substr($matches[1], 0, $len);
 
 			$text = rtrim($matches[1]) . ' ...';
+			$text = Util::htmlspecialchars($text);
 		}
 		else
-			$text = Util::substr($text, 0, $len) . '...';
-
-		$text = Util::htmlspecialchars($text);
+			$text = Util::substr($text, 0, $len - 3) . '...';
 	}
 
 	return $text;
@@ -1510,9 +1509,9 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 
 						// Only do this if the preg survives.
 						if (is_string($result = preg_replace(array(
-							'~(?<=[\s>\.(;\'"]|^)((?:http|https)://[\w\-_%@:|]+(?:\.[\w\-_%]+)*(?::\d+)?(?:/[\w\-_\~%\.@!,\?&;=#(){}+:\'\\\\]*)*[/\w\-_\~%@\?;=#}\\\\]?)~i',
+							'~(?<=[\s>\.(;\'"]|^)((?:http|https)://[\w\-_%@:|]+(?:\.[\w\-_%]+)*(?::\d+)?(?:/[\p{L}\w\-_\~%\.@!,\?&;=#(){}+:\'\\\\]*)*[/\w\-_\~%@\?;=#}\\\\]?)~ui',
 							'~(?<=[\s>\.(;\'"]|^)((?:ftp|ftps)://[\w\-_%@:|]+(?:\.[\w\-_%]+)*(?::\d+)?(?:/[\w\-_\~%\.@,\?&;=#(){}+:\'\\\\]*)*[/\w\-_\~%@\?;=#}\\\\]?)~i',
-							'~(?<=[\s>(\'<]|^)(www(?:\.[\w\-_]+)+(?::\d+)?(?:/[\w\-_\~%\.@!,\?&;=#(){}+:\'\\\\]*)*[/\w\-_\~%@\?;=#}\\\\])~i'
+							'~(?<=[\s>(\'<]|^)(www(?:\.[\w\-_]+)+(?::\d+)?(?:/[\p{L}\w\-_\~%\.@!,\?&;=#(){}+:\'\\\\]*)*[/\w\-_\~%@\?;=#}\\\\])~ui'
 						), array(
 							'[url]$1[/url]',
 							'[ftp]$1[/ftp]',
@@ -2463,7 +2462,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 			template_footer();
 
 			// (since this is just debugging... it's okay that it's after </html>.)
-			if (!isset($_REQUEST['xml']) && !isset($_REQUEST['resume']) && !isset($_REQUEST['start']))
+			if (!isset($_REQUEST['xml']))
 				displayDebug();
 		}
 	}
