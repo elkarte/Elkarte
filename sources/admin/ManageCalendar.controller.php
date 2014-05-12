@@ -185,8 +185,9 @@ class ManageCalendar_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'below_table_data',
+					'class' => 'submitbutton',
 					'value' => '<input type="submit" name="delete" value="' . $txt['quickmod_delete_selected'] . '" class="right_submit" />
-					<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=managecalendar;sa=editholiday">' . $txt['holidays_add'] . '</a>',
+					<a class="linkbutton" href="' . $scripturl . '?action=admin;area=managecalendar;sa=editholiday">' . $txt['holidays_add'] . '</a>',
 				),
 			),
 		);

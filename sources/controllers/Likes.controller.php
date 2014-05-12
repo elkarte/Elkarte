@@ -544,7 +544,8 @@ class Likes_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'below_table_data',
-					'value' => '<a class="linkbutton_right" href="javascript:history.go(-1)">' . $txt['back'] . '</a>',
+					'class' => 'submitbutton',
+					'value' => '<a class="linkbutton" href="javascript:history.go(-1)">' . $txt['back'] . '</a>',
 				),
 			),
 		);

@@ -296,14 +296,14 @@ function template_by_board()
 	}
 
 	echo '
-			<div class="content">';
+			<div class="content submitbutton">';
 
 	if ($context['edit_all'])
 		echo '
 				<input type="submit" name="save_changes" value="', $txt['save'], '" class="right_submit" />';
 	else
 		echo '
-				<a class="edit_all_board_profiles linkbutton_right" href="', $scripturl, '?action=admin;area=permissions;sa=board;edit;', $context['session_var'], '=', $context['session_id'], '">', $txt['permissions_board_all'], '</a>
+				<a class="edit_all_board_profiles linkbutton" href="', $scripturl, '?action=admin;area=permissions;sa=board;edit;', $context['session_var'], '=', $context['session_id'], '">', $txt['permissions_board_all'], '</a>
 				<script><!-- // --><![CDATA[
 					initEditProfileBoards();
 				// ]]></script>';
