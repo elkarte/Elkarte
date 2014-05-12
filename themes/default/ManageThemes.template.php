@@ -301,6 +301,10 @@ function template_set_options()
 			</div>
 			<div class="windowbg2">
 				<div class="content">';
+	echo '
+			<div id="admin_form_wrapper">
+				<h2 class="category_header">', $context['theme_settings']['name'],'
+				</h2> <br />';
 
 	echo '
 					<dl class="settings">';
@@ -308,7 +312,7 @@ function template_set_options()
 	foreach ($context['options'] as $setting)
 	{
 		echo '
-						<dt ', $context['theme_options_reset'] ? 'style="width:50%"' : '', '>';
+						<dt ', $context['theme_options_reset'] ? 'style="width:55%"' : '', '>';
 
 		// Show the change option box ?
 		if ($context['theme_options_reset'])
@@ -386,6 +390,7 @@ function template_set_options()
 				</div>
 			</div>
 		</form>
+			</div>
 	</div>';
 }
 
@@ -854,6 +859,7 @@ function template_browse()
 
 	echo '
 	<div id="admincenter">
+		<div id="admin_form_wrapper">
 		<table class="table_grid">
 		<thead>
 			<tr class="table_head">
@@ -891,6 +897,7 @@ function template_browse()
 	echo '
 		</tbody>
 		</table>
+		</div>
 	</div>';
 }
 
@@ -982,7 +989,7 @@ function template_edit_template()
 
 	foreach ($context['file_parts'] as $part)
 		echo '
-					<label for="on_line', $part['line'], '">', $txt['themeadmin_edit_on_line'], ' ', $part['line'], '</label>:<br />
+					<label for="on_line', $part['line'], '">', $txt['themeadmin_edit_on_line'], ' ', $part['line'], '</label><br />
 					<div class="centertext">
 						<textarea id="on_line', $part['line'], '" name="entire_file[]" cols="80" rows="', $part['lines'] > 14 ? '14' : $part['lines'], '" class="edit_file">', $part['data'], '</textarea>
 					</div>';
