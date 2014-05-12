@@ -1,7 +1,7 @@
 <?php
 // Version: 1.0; ManageThemes
 
-$txt['themeadmin_explain'] = 'Themes create the different look and feel of your forum. The Global Theme Settings section permits the site administration to select a theme for the site default theme. Admins can also enable members to select any installed theme for their use and to enable selectable themes. The Install a New Theme section is how the site administration installs a theme.';
+$txt['themeadmin_explain'] = 'Themes create the different look and feel of your forum. The Global Theme Settings section permits any site administrator to select a theme for the site default theme. Admins can also enable members to select any installed theme for their use and to enable selectable themes. The Install a New Theme section is how the site administration installs a theme.';
 $txt['themeadmin_manage'] = 'Manage and Install';
 $txt['theme_forum_theme'] = 'Global Theme Settings';
 $txt['theme_allow'] = 'Allow members to select their own themes.';
@@ -112,7 +112,7 @@ $txt['theme_options_title'] = 'Change or reset default options';
 
 $txt['themeadmin_title'] = 'Theme Management and Options';
 $txt['themeadmin_description'] = 'Here you can modify the settings for your themes, update theme selections, reset member options, and the like.';
-$txt['themeadmin_admin_desc'] = 'Themes provide the different \'look and feel\' of your forum. Theme Management and Options allow you to install new site themes, change the default theme, reset all members to use a certain theme, and choose other settings related to theme selection. Remember to look at the theme settings for your different themes for their individual layout options.';
+$txt['themeadmin_admin_desc'] = 'Themes provide the different \'looks and feels\' of your forum. Theme Management and Options allow you to install new site themes, change the default theme, reset all members to use a certain theme, and choose other settings related to theme selection. Remember to look at the theme settings for your different themes for their individual layout options.';
 $txt['themeadmin_list_desc'] = 'In the Theme Settings area you can view the list of themes that you have installed, change their directory paths and settings, and uninstall them.';
 $txt['themeadmin_reset_desc'] = 'In the Member Options area you have the ability to change theme-specific options that affect all members. You will only see those themes that have their own set of option settings.';
 $txt['themeadmin_edit_desc'] = 'In the Modify Themes area you can alter the stylesheet and source code of your installed themes. You will need a basic understanding of CSS and PHP to effectively change a theme and not break your forum at the same time.';
