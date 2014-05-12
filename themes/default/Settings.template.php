@@ -215,7 +215,7 @@ function template_settings()
 			),
 			'type' => 'number',
 			'description' => array(
-				'main' => $txt['enable_news_desc'],
+				'main' => '',
 				'options' => array(
 					0 => array('enable_news_off_name', 'enable_news_off_desc'),
 					1 => array('enable_news_random_name', 'enable_news_random_desc'),
