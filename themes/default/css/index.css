@@ -187,7 +187,7 @@ select {
 }
 #chrome select {
 	padding: 2px;
-	height:  1.923em;
+	height: 1.923em;
 }
 select option {
 	padding: 0 4px;
@@ -286,8 +286,8 @@ del .bbc_link:link, del .bbc_link:visited {
 	text-decoration: line-through;
 }
 .childboards .new_posts {
-    font-size: 0.857em;
-    padding: 1px 3px 2px;
+	font-size: 0.857em;
+	padding: 1px 3px 2px;
 }
 
 /* Standard horizontal rule.. ([hr], etc.) */
@@ -778,7 +778,7 @@ a.bbc_link {
 	padding: 12px 3px 4px 8px;
 	float: right;
 }
-#search_form  * {
+#search_form * {
 	margin: 0;
 	border-radius: 0;
 	/* Webkit (bleh) fix. */
@@ -1036,8 +1036,8 @@ a.bbc_link {
 	float: none;
 	padding: 1px 0;
 }
-#menu_sidebar  .listlevel1:hover .menulevel2,
-#menu_sidebar  .listlevel1.sfhover .menulevel2 {
+#menu_sidebar .listlevel1:hover .menulevel2,
+#menu_sidebar .listlevel1.sfhover .menulevel2 {
 	top: 0.35em;
 	left: 170px;
 }
@@ -1241,7 +1241,7 @@ a.bbc_link {
 	padding: 1px 6px 0 6px;
 }
 /* Quickbutton and follow ups drop menus. */
-.quickbuttons .menulevel2, .follow_ups  .menulevel2 {
+.quickbuttons .menulevel2, .follow_ups .menulevel2 {
 	padding: 0.5em;
 	width: auto;
 	text-align: left;
@@ -1298,7 +1298,7 @@ a.bbc_link {
 	padding: 1px 5px;
 }
 
-.pagelinks .current_page  {
+.pagelinks .current_page {
 	display: block;
 	float: left;
 	padding: 1px 8px 1px 8px;
@@ -1432,13 +1432,13 @@ a.bbc_link {
 	background: #fff;
 }
 
-.table_grid  textarea {
+.table_grid textarea {
 	width: 100%;
 }
 .table_grid .statsbar div {
 	display: none;
 }
-.table_grid  textarea {
+.table_grid textarea {
 	width: 100%;
 }
 /* GenericList */
@@ -1574,7 +1574,7 @@ dl.settings label {
 }
 .board_stats {
 	text-align: right;
-	padding: 1px  0 1px 6px;
+	padding: 1px 0 1px 6px;
 	float: right;
 	min-width: 8.4em;
 }
@@ -1935,10 +1935,10 @@ img.new_posts {
 /* Search results need some help as well */
 /* @todo - Sort markup so this can call above classes. *//*
 .search_results_posts .lockedbg {
-	background:  #efefef url(../images/icons/quick_lock.png) no-repeat 95% 15px;
+	background: #efefef url(../images/icons/quick_lock.png) no-repeat 95% 15px;
 }
 .search_results_posts .stickybg, .search_results_posts .locked_stickybg {
-	background:  #fffee2 url(../images/icons/quick_sticky_lock.png) no-repeat 95% 15px;
+	background: #fffee2 url(../images/icons/quick_sticky_lock.png) no-repeat 95% 15px;
 }*/
 
 #quick_mod_jump_to {
@@ -2165,7 +2165,7 @@ div.core_posts {
 	max-height: 20em;
 }
 /* The visible stuff below the avatar. */
-.poster  .membergroup {
+.poster .membergroup {
 	font-weight: bold;
 }
 /* @todo - Save code by amalgamating common button background declarations. */
@@ -3518,7 +3518,7 @@ a.help .icon {
 	margin: 0 0 10px;
 	font-size: 1.071em;
 }
-#search_term_input .button_submit  {
+#search_term_input .button_submit {
 	margin: 0 0 2px;
 }
 
@@ -3990,7 +3990,7 @@ dl.no_members {
 		box-shadow: none;
 		border: 1px solid transparent;
 	}
-	#main_menu .linklevel1, #main_menu .linklevel1 a  {
+	#main_menu .linklevel1, #main_menu .linklevel1 a {
 		margin: 0;
 		padding: 0;
 	}

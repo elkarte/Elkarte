@@ -1451,16 +1451,16 @@ function initEditPermissionProfiles()
 				$cancel = $('<a class="js-ed-rm linkbutton" />').click(function(ev) {
 					ev.preventDefault();
 
-					// js-ed is again a class introduced by this function only
+					// js-ed is hopefully a class introduced by this function only
 					// Any element with this class will be restored when cancel is clicked
 					$('.js-ed').show();
 
-					// js-ed-rm is hopefully a class introduced but this function
+					// js-ed-rm is again a class introduced by this function
 					// Any element with this class will be removed when cancelling
 					$('.js-ed-rm').remove();
 
 					// The cancel button is removed as well,
-					// so we ned to generate it again later (if we need it again)
+					// so we need to generate it again later (if we need it again)
 					run_once = false;
 
 					$('#rename').val(txt_permissions_profile_rename);
