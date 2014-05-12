@@ -95,5 +95,3 @@ $txt['icons_filename_all_png'] = 'Alle Dateien müssen &quot;png&quot;-Dateien s
 $txt['icons_no_entries'] = 'Derzeit sind keine Nachrichtensymbole konfiguriert.';
 $txt['icons_reordered'] = 'Nachrichtensymbole erfolgreich neu sortiert';
 $txt['icons_reorder_note'] = 'Sie können die Reihenfolge der Nachrichtensymbole ändern, indem Sie ein Element in der Liste an eine andere Stelle ziehen.';
-
-

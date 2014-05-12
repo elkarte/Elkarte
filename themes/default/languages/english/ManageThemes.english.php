@@ -1,7 +1,7 @@
 <?php
 // Version: 1.0; ManageThemes
 
-$txt['themeadmin_explain'] = 'The Initial Theme Settings section permits the site administration to select a theme for the site default theme. Admins can also enable members to select any installed theme for their use and to enable selectable themes. The Install a New Theme section is how the site administration installs a theme.';
+$txt['themeadmin_explain'] = 'The Initial Theme Settings section permits any site administrators to make a theme the site\'s default theme. Admins can also enable members to select any installed theme for their use and to enable selectable themes. The Install a New Theme section is where the site administration installs a theme.';
 
 $txt['initial_theme_settings'] = 'Initial Theme Settings';
 $txt['theme_allow'] = 'Allow members to select their own themes.';
@@ -106,7 +106,7 @@ $txt['theme_options_title'] = 'Change or reset default options';
 
 $txt['themeadmin_title'] = 'Theme Management and Options';
 $txt['themeadmin_description'] = 'Here you can modify the settings for your themes, update theme selections, reset member options, and the like.';
-$txt['themeadmin_admin_desc'] = 'Themes provide the different \'look and feel\' of your forum. Theme Management and Options allow you to install new site themes, change the default theme, reset all members to use a certain theme, and choose other settings related to theme selection. Remember to look at the theme settings for your different themes for their individual layout options.';
+$txt['themeadmin_admin_desc'] = 'Themes provide the different \'looks and feels\' of your forum. Theme Management and Options allow you to install new site themes, change the default theme, reset all members to use a certain theme, and choose other settings related to theme selection. Remember to look at the theme settings for your different themes for their individual layout options.';
 $txt['themeadmin_list_desc'] = 'From here you can view the list of themes you currently have installed, change their paths and settings, and uninstall them.';
 $txt['themeadmin_reset_desc'] = 'Below you will see an interface to change the current theme-specific options for all your members.  You will only see those themes that have their own set of settings.';
 $txt['themeadmin_edit_desc'] = 'Modify the stylesheet and source code of your installed themes.  Please consult the documentation for more information.';

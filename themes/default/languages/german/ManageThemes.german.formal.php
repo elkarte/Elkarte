@@ -1,12 +1,13 @@
 <?php
 // Version: 1.0; ManageThemes
 
-$txt['themeadmin_explain'] = 'Designs sind die verschiedenen Oberflächen Ihres Forums. Diese Einstellungen beeinflussen Aussehen und Auswahl von Designs für Gäste und Mitglieder.';
+$txt['themeadmin_explain'] = 'Der Bereich für die anfänglichen Designeinstellungen erlaubt es allen Administratoren, ein Design zum Standarddesign des Forums zu machen. Admins können auch Mitgliedern erlauben, jegliches installierte Design zur Verwendung auszuwählen und zu aktivieren. Der Bereich "Ein neues Design installieren" dient der Installation neuer Designs.';
 
+$txt['initial_theme_settings'] = 'Anfängliche Designeinstellungen';
 $txt['theme_allow'] = 'Mitgliedern die Auswahl eigener Designs erlauben.';
-$txt['theme_guests'] = 'Globale Einstellung';
+$txt['theme_guests'] = 'Globales Standarddesign';
 $txt['theme_select'] = 'auswählen...';
-$txt['theme_reset'] = 'Alle zurücksetzen auf';
+$txt['theme_reset'] = 'Alle auf dieses Design zurücksetzen:';
 $txt['theme_nochange'] = 'Keine Änderung';
 $txt['theme_forum_default'] = 'Forumsstandard';
 
@@ -14,12 +15,12 @@ $txt['theme_remove'] = 'Deinstallieren';
 $txt['theme_remove_confirm'] = 'Sind Sie sich sicher, dass Sie dieses Design deinstallieren möchten?';
 
 $txt['theme_install'] = 'Ein neues Design installieren';
-$txt['theme_install_file'] = 'Aus einem Archiv (z. B. .zip, .tar.gz)';
+$txt['theme_install_file'] = 'Aus einem lokalen Archiv (z. B. .zip, .tar.gz)';
 $txt['theme_install_dir'] = 'Aus einem Verzeichnis auf dem Server';
 $txt['theme_install_error'] = 'Dieses Designsverzeichnis existiert nicht oder beinhaltet kein Design.';
 $txt['theme_install_write_error'] = 'Das Designsverzeichnis muss zum Fortfahren beschreibbar sein.';
 $txt['theme_install_go'] = 'Installieren';
-$txt['theme_install_new'] = 'Erzeuge eine Kopie des aktuellen Designs namens';
+$txt['theme_install_new'] = 'Erzeuge eine Kopie des ElkArte-Standarddesigns namens';
 $txt['theme_install_new_confirm'] = 'Sind Sie sich sicher, dass Sie dieses neue Design installieren möchten?';
 $txt['theme_install_writable'] = 'Warnung: Sie können derzeit kein neues Design erzeugen oder installieren, da Ihr Designsverzeichnis nicht beschreibbar ist.';
 $txt['theme_install_general'] = 'Das Design scheint sich nicht dort zu befinden, wo es sollte; bitte überprüfen Sie nochmals die angegebenen Informationen.';
@@ -31,7 +32,7 @@ $txt['theme_preview'] = 'Designsvorschau';
 $txt['theme_set'] = 'Dieses Design verwenden';
 $txt['theme_user'] = 'Person verwendet dieses Design.';
 $txt['theme_users'] = 'Personen verwenden dieses Design.';
-$txt['theme_pick_variant'] = 'Wählen Sie eine Variante aus';
+$txt['theme_pick_variant'] = 'Wählen Sie eine Variante aus:';
 
 $txt['theme_edit'] = 'Design ändern';
 $txt['theme_edit_style'] = 'Die Stylesheets ändern. (Farben, Schriften usw.)';
@@ -102,9 +103,9 @@ $txt['hide_post_group_desc'] = 'Wenn Sie dies aktivieren, wird der Titel der Bei
 $txt['theme_options_defaults'] = 'Dies sind die Standardwerte für einige mitgliedsbezogene Einstellungen.  Änderungen werden nur auf neue Mitglieder und Gäste angewandt.';
 $txt['theme_options_title'] = 'Standardoptionen ändern oder zurücksetzen';
 
-$txt['themeadmin_title'] = 'Designs- und Darstellungseinstellungen';
+$txt['themeadmin_title'] = 'Designeinstellungen und -optionen';
 $txt['themeadmin_description'] = 'Hier können Sie die Einstellungen Ihrer Designs ändern, die Designsauswahö anpassen, Mitgliederoptionen zurücksetzen und dergleichen.';
-$txt['themeadmin_admin_desc'] = 'Diese Seite ermöglicht es Ihnen, das StandardDesign zu ändern, Mitgliedern ein bestimmtes Design zuzuweisen und weitere Einstellungen bezüglich der Designsauswahl vorzunehmen.  Sie können von hier aus außerdem weitere Designs installieren.<br /><br />Vergessen Sie nicht, in den Einstellungen Ihrer Designs die Darstellung anzupassen.';
+$txt['themeadmin_admin_desc'] = 'Designs stellen die verschiedenen Aussehen Ihres Forums bereit. Designeinstellungen und -optionen erlauben es Ihnen, neue Designs zu installieren, das Standarddesign zu ändern, alle Mitglieder auf ein bestimmtes Design zurückzusetzen und weitere Einstellungen hinsichtlich der Designauswahl vorzunehmen. Denken Sie daran, die Designeinstellungen Ihrer verschiedenen Designs auf ihre jeweiligen Darstellungsoptionen zu prüfen.';
 $txt['themeadmin_list_desc'] = 'Von hier aus können Sie die Liste installierter Designs einsehen, deren Pfade und Einstellungen ändern und sie deinstallieren.';
 $txt['themeadmin_reset_desc'] = 'Unten haben Sie die Möglichkeit, die aktuellen Designsspezifischen Optionen für all Ihre Mitglieder zu übernehmen.  Sie sehen nur die Designs, die eigene Einstellungsmöglichkeiten besitzen.';
 $txt['themeadmin_edit_desc'] = 'Ändern Sie den Stil und den Quellcode Ihrer installierten Designs.  Bitte ziehen Sie für weitere Informationen die Dokumentation zu Rate.';
@@ -150,8 +151,8 @@ $txt['themeadmin_edit_kilobytes'] = 'KiB';
 $txt['themeadmin_edit_error'] = 'Die Datei, die Sie zu speichern versuchten, erzeugte folgenden Fehler:';
 $txt['themeadmin_edit_on_line'] = 'Ab Zeile';
 $txt['themeadmin_edit_preview'] = 'Vorschau';
-$txt['themeadmin_selectable'] = 'Designs, aus denen ein Benutzer auswählen kann';
-$txt['themeadmin_themelist_link'] = 'Liste der Designs anzeigen';
+$txt['themeadmin_selectable'] = 'Designs, aus denen ein Benutzer auswählen darf';
+$txt['themeadmin_themelist_link'] = 'Liste der installierten Designs anzeigen';
 
 // Strings for the variants
 $txt['variant_light'] = 'ElkArte hell';
