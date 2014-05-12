@@ -548,7 +548,7 @@ $helptxt['posts_and_topics'] = '
 			Modify the settings related to the posting of messages and the way messages are shown. You can also enable the spell check here.
 		</li><li>
 			<strong>Bulletin Board Code</strong><br />
-			Enable the code that shows forum messages in the right layout. Also adjust which codes are allowed and which aren\'t.
+			Enable the code that allows to format forum messages. Also adjust which BBCodes are allowed and which aren\'t.
 		</li><li>
 			<strong>Censored Words</strong>
 			In order to keep the language on your forum under control, you can censor certain words. This function allows you to convert forbidden words into innocent versions.
