@@ -192,8 +192,8 @@ $txt['trackLogins'] = 'Logins';
 
 $txt['likes_show'] = 'Show Likes';
 $txt['likes_given'] = 'Posts you liked';
-$txt['likes_profile_received'] = 'Likes received';
-$txt['likes_profile_given'] = 'Likes given';
+$txt['likes_profile_received'] = 'received';
+$txt['likes_profile_given'] = 'given';
 $txt['likes_received'] = 'Your posts liked by others';
 $txt['likes_none_given'] = 'You have not liked any posts';
 $txt['likes_none_received'] = 'No one has liked any of your posts :\'(';
