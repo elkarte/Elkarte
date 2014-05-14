@@ -301,6 +301,10 @@ function template_set_options()
 			</div>
 			<div class="windowbg2">
 				<div class="content">';
+	echo '
+			<div id="admin_form_wrapper">
+				<h2 class="category_header">', $context['theme_settings']['name'],'
+				</h2> <br />';
 
 	echo '
 					<dl class="settings">';
@@ -386,6 +390,7 @@ function template_set_options()
 				</div>
 			</div>
 		</form>
+			</div>
 	</div>';
 }
 
@@ -750,10 +755,13 @@ function template_themelist()
 {
 	global $context, $scripturl, $txt;
 
-	echo '
-	<div id="admin_form_wrapper">
-		<h3 class="category_header">', $txt['themeadmin_edit_title'], '</h3>
-		<br />';
+echo '
+	<div id="admincenter">
+		<h2 class="category_header">', $txt['themeadmin_edit_title'], '</h2>
+		<div class="information">
+			', $txt['themeadmin_modify_styles'], '
+		</div>
+		<div id="admin_form_wrapper">';
 
 	$alternate = false;
 
@@ -778,6 +786,7 @@ function template_themelist()
 	}
 
 	echo '
+		</div>
 	</div>';
 }
 
@@ -834,6 +843,7 @@ function template_browse()
 
 	echo '
 	<div id="admincenter">
+		<div id="admin_form_wrapper">
 		<table class="table_grid">
 		<thead>
 			<tr class="table_head">
@@ -871,6 +881,7 @@ function template_browse()
 	echo '
 		</tbody>
 		</table>
+		</div>
 	</div>';
 }
 
@@ -962,7 +973,7 @@ function template_edit_template()
 
 	foreach ($context['file_parts'] as $part)
 		echo '
-					<label for="on_line', $part['line'], '">', $txt['themeadmin_edit_on_line'], ' ', $part['line'], '</label>:<br />
+					<label for="on_line', $part['line'], '">', $txt['themeadmin_edit_on_line'], ' ', $part['line'], '</label><br />
 					<div class="centertext">
 						<textarea id="on_line', $part['line'], '" name="entire_file[]" cols="80" rows="', $part['lines'] > 14 ? '14' : $part['lines'], '" class="edit_file">', $part['data'], '</textarea>
 					</div>';

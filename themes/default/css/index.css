@@ -190,7 +190,7 @@ select {
 	height:  1.923em;
 }
 select option {
-	padding: 0 4px;
+	padding: 0px 4px;
 }
 
 /* No borders around checkboxes or radio buttons, and middle aligned. */
@@ -198,7 +198,7 @@ select option {
 	border: none;
 	background: none;
 	vertical-align: middle;
-	margin: 0 2px 4px;
+	margin-top: 0 2px 4px;
 }
 
 /* Common button styling. */
