@@ -87,14 +87,14 @@ function messageDetails($id_msg, $id_topic = 0, $attachment_type = 0)
 /**
  * Get some basic info of a certain message
  * Will use query_see_board unless $override_permissions is set to true
- * Will return additional topic information if $topic_basics is set to true
+ * Will return additional topic information if $detailed is set to true
  * Returns an associative array of the results or false on error
  *
  * @param int $id_msg
  * @param boolean $override_permissions
- * @param boolean $topic_basics
+ * @param boolean $detailed
  */
-function basicMessageInfo($id_msg, $override_permissions = false, $topic_basics = false)
+function basicMessageInfo($id_msg, $override_permissions = false, $detailed = false)
 {
 	global $modSettings;
 
@@ -106,10 +106,10 @@ function basicMessageInfo($id_msg, $override_permissions = false, $topic_basics 
 	$request = $db->query('', '
 		SELECT
 			m.id_member, m.id_topic, m.id_board, m.id_msg, m.body, m.subject,
-			m.poster_name, m.poster_email, m.poster_time, m.approved' . ($topic_basics === false ? '' : ',
+			m.poster_name, m.poster_email, m.poster_time, m.approved' . ($detailed === false ? '' : ',
 			t.id_first_msg, t.num_replies, t.unapproved_posts, t.id_last_msg, t.id_member_started, t.approved AS topic_approved') . '
 		FROM {db_prefix}messages AS m' . ($override_permissions === true ? '' : '
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})') . ($topic_basics === false ? '' : '
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})') . ($detailed === false ? '' : '
 			LEFT JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)') . '
 		WHERE id_msg = {int:message}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
 			AND m.approved = 1') . '
