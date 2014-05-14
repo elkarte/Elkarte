@@ -107,7 +107,7 @@ function basicMessageInfo($id_msg, $override_permissions = false, $topic_basics 
 		SELECT
 			m.id_member, m.id_topic, m.id_board, m.id_msg, m.body, m.subject,
 			m.poster_name, m.poster_email, m.poster_time, m.approved' . ($topic_basics === false ? '' : ',
-			t.id_first_msg, t.num_replies, t.unapproved_posts, t.id_first_msg, t.id_member_started, t.approved AS topic_approved') . '
+			t.id_first_msg, t.num_replies, t.unapproved_posts, t.id_last_msg, t.id_member_started, t.approved AS topic_approved') . '
 		FROM {db_prefix}messages AS m' . ($override_permissions === true ? '' : '
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})') . ($topic_basics === false ? '' : '
 			LEFT JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)') . '
