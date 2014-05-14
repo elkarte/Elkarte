@@ -95,8 +95,12 @@ input, button, select, textarea, .editor {
 	background: #fff;
 	color: #666;
 }
-input, button, select, textarea, .editor {
-	font: 90%/130% Helvetica, Arial, "Nimbus Sans L", sans-serif;
+select, input {
+	font: 87.5%/130% Helvetica, Arial, "Nimbus Sans L", sans-serif;
+	height: 23px;
+}
+#chrome select {
+	padding: 3px 2px;
 }
 
 input:hover, textarea:hover, button:hover, select:hover {

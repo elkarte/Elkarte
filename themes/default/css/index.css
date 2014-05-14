@@ -181,13 +181,16 @@ input, button, select {
 	font-size: 0.857em;
 	height: 23px;
 }
+input[type="file"] {
+	height: auto;
+}
 /* Selects require browser-specific targeting too, unfortunately. */
 select {
-	padding: 1px;
+	padding: 2px;
 }
 #chrome select {
 	padding: 2px;
-	height: 1.923em;
+	height: 23px;
 }
 select option {
 	padding: 0 4px;
@@ -213,8 +216,6 @@ select option {
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
 	padding: 2px 6px;
-	font-size: .857em;
-	line-height: 17px;
 	display: inline-block;
 }
 .left_submit, .linkbutton_left {
@@ -235,6 +236,10 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 	border-top: 1px solid #cfcfcf;
 	border-left: 1px solid #bfbfbf;
 	box-shadow: 1px 1px 2px #e5e5e5;
+}
+.linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
+.linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
+	line-height: 17px;
 }
 
 /* @todo - A common, tag-agnostic class to hold submit buttons, etc. */
