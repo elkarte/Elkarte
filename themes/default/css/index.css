@@ -162,6 +162,7 @@ input, button, select, textarea, .editor {
 textarea, .editor {
 	border-radius: 4px;
 	font-size: 1em;
+	padding: 2px 4px;
 }
 .sceditor-container {
 	margin: 0 0 6px 0;
@@ -176,21 +177,19 @@ select::-moz-focus-inner {
 }
 /* Apply the font only to these elements, and top align them. */
 input, button, select {
-	padding: 2px 6px;
-	vertical-align: top;
 	font-size: 0.857em;
-	height: 23px;
+	height: none;
 }
 /* Selects require browser-specific targeting too, unfortunately. */
 select {
-	padding: 1px;
+	padding: 1px 1px;
 }
 #chrome select {
 	padding: 2px;
 	height:  1.923em;
 }
 select option {
-	padding: 0 4px;
+	padding: 0px 4px;
 }
 
 /* No borders around checkboxes or radio buttons, and middle aligned. */
@@ -198,7 +197,7 @@ select option {
 	border: none;
 	background: none;
 	vertical-align: middle;
-	margin: 0 2px 4px;
+	margin-top: 0 2px 4px;
 }
 
 /* Common button styling. */
@@ -775,7 +774,7 @@ a.bbc_link {
 	-webkit-appearance: caps-lock-indicator;
 }
 #search_form {
-	padding: 12px 3px 4px 8px;
+	padding: 12px 0 4px 8px;
 	float: right;
 }
 #search_form  * {
@@ -1471,9 +1470,9 @@ dl.settings {
 dl.settings dt {
 	float: left;
 	clear: both;
-	margin: 0 0 10px 0;
+	margin: 1px 10px 2px 1px;
 	padding: 0;
-	width: 40%;
+	width: 43%;
 }
 dl.settings .settings_title {
 	float: none;
@@ -1494,7 +1493,6 @@ dl.settings dt.windowbg {
 dl.settings dd {
 	float: right;
 	overflow: auto;
-	margin: 0 0 3px 0;
 	padding: 0;
 	width: 55%;
 }

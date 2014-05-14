@@ -414,6 +414,8 @@ div.bbc_footnotes .meaction{
 #search_form .input_text {
 	border-radius: 2px 0 0 2px;
 	border-right: none;
+	padding-top: 4px;
+	color: #000;
 }
 #search_form .button_submit {
 	border-radius: 0 2px 2px 0;
