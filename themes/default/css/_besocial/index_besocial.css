@@ -97,10 +97,10 @@ input, button, select, textarea, .editor {
 }
 select, input {
 	font: 87.5%/130% Helvetica, Arial, "Nimbus Sans L", sans-serif;
-	height: 23px;
+	height: 26px;
 }
 #chrome select {
-	padding: 3px 2px;
+	padding: 2px 2px;
 }
 
 input:hover, textarea:hover, button:hover, select:hover {

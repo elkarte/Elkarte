@@ -179,21 +179,21 @@ input, button, select {
 	padding: 2px 6px;
 	vertical-align: top;
 	font-size: 0.857em;
-	height: 23px;
+	height: 26px;
 }
 input[type="file"] {
 	height: auto;
 }
 /* Selects require browser-specific targeting too, unfortunately. */
 select {
-	padding: 2px;
+	padding: 0.25em;
 }
 #chrome select {
 	padding: 2px;
-	height: 23px;
+	height: 26px;
 }
 select option {
-	padding: 0px 4px;
+	padding: 0 4px;
 }
 
 /* No borders around checkboxes or radio buttons, and middle aligned. */
@@ -201,7 +201,7 @@ select option {
 	border: none;
 	background: none;
 	vertical-align: middle;
-	margin-top: 0 2px 4px;
+	margin: 0 2px 4px;
 }
 
 /* Common button styling. */
@@ -239,7 +239,8 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 }
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
-	line-height: 17px;
+	line-height: 20px;
+	font-size: 0.857em;
 }
 
 /* @todo - A common, tag-agnostic class to hold submit buttons, etc. */
@@ -1480,7 +1481,7 @@ dl.settings dt {
 	clear: both;
 	margin: 0 0 10px 0;
 	padding: 0;
-	width: 43%;
+	width: 40%;
 }
 dl.settings .settings_title {
 	float: none;

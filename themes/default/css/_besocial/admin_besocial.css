@@ -4,8 +4,8 @@
     border: 1px solid #CCCCCC;
     border-radius: 7px;
     box-shadow: 0 -2px 2px rgba(0, 0, 0, 0.1);
+	padding: 8px;
 }
-
 .description, .information {
 	margin-top: 4px;
 }
@@ -54,4 +54,17 @@
 .ui-widget-overlay {
 	background-color: #000;
 	opacity: 0.3;
+}
+
+/* Styles for the quick search bar */
+#quick_search {
+	font-size: 0.786em;
+	height: 26px;
+}
+#quick_search .input_text, #quick_search select, #quick_search .button_submit {
+	height: 26px;
+	margin: 7px 0 0 4px;
+}
+#quick_search .icon {
+	margin: 12px 0 0 4px;
 }

@@ -214,3 +214,9 @@ ul.moderation_notes li {
 	background-color: #000;
 	opacity: 0.3;
 }
+
+/* Styles for the admin quick search bar */
+#quick_search .input_text, #quick_search select, #quick_search .button_submit {
+	height: 26px;
+	margin: 2px 0 0 4px;
+}
