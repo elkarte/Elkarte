@@ -312,7 +312,7 @@ function template_set_options()
 	foreach ($context['options'] as $setting)
 	{
 		echo '
-						<dt ', $context['theme_options_reset'] ? 'style="width:50%"' : '', '>';
+						<dt ', $context['theme_options_reset'] ? 'style="width:55%"' : '', '>';
 
 		// Show the change option box ?
 		if ($context['theme_options_reset'])

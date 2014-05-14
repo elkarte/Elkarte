@@ -173,6 +173,14 @@ strong {
 	font-weight: bold;
 }
 
+/* need some vertical space between lines in admin section */
+dl.settings dd {
+	float: right;
+    overflow: auto;
+    width: 55%;
+	padding: 1px 0px 0px 4px;
+}
+
 /* @todo - Test this everywhere. */
 .standard_category {
 	border-radius: 4px 4px 0 0;
@@ -390,6 +398,7 @@ div.bbc_footnotes .meaction {
 	font-weight: bold;
 	color: #a80000;
 }
+
 #search_form .button_submit {
 	font-variant: small-caps;
 	color: #333;
@@ -399,7 +408,7 @@ div.bbc_footnotes .meaction {
 	opacity: 0.8;
 }
 #search_form select:focus {
-	border-right: none;
+	border: 1px solid #999;
 	opacity: 1;
 }
 

@@ -146,15 +146,27 @@ fieldset dl {
 /* @todo - Admin quick search bar, and results page. */
 #quick_search {
 	font-size: 0.857em;
-}
-/* Chrome fix. */
-#quick_search .icon, #quick_search .input_text,
-#quick_search select, #quick_search .button_submit {
-	float: left;
-	margin: 2px 0 0 4px;
+	padding: 4px 0px 0px 4px;
 }
 #quick_search .icon {
-	margin: 8px 0 0 0;
+	float: left;
+	margin: 6px 4px;
+}
+
+#quick_search .input_text {
+	float: left;
+	padding-top: 4px;
+	padding-bottom: 1px;
+}
+#quick_search .button_submit {
+	float: right;
+	margin: 0 0 4px;
+	padding-top: 3px;
+}
+
+#quick_search select {
+	float: right;
+	margin: 1px 0 0 4px;
 }
 /* @todo - The welcome thingy. */
 #admincenter .roundframe, #modcenter .roundframe {
