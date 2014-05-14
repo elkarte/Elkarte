@@ -431,7 +431,6 @@ class Recent_Controller extends Action_Controller
 		if (!isset($_REQUEST['sort']) || !isset($sort_methods[$_REQUEST['sort']]))
 		{
 			$context['sort_by'] = 'last_post';
-			$_REQUEST['sort'] = 't.id_last_msg';
 			$ascending = isset($_REQUEST['asc']);
 
 			$context['querystring_sort_limits'] = $ascending ? ';asc' : '';
@@ -440,11 +439,11 @@ class Recent_Controller extends Action_Controller
 		else
 		{
 			$context['sort_by'] = $_REQUEST['sort'];
-			$_REQUEST['sort'] = $sort_methods[$_REQUEST['sort']];
 			$ascending = !isset($_REQUEST['desc']);
 
 			$context['querystring_sort_limits'] = ';sort=' . $context['sort_by'] . ($ascending ? '' : ';desc');
 		}
+		$_REQUEST['sort'] = $sort_methods[$context['sort_by']];
 
 		$context['sort_direction'] = $ascending ? 'up' : 'down';
 		$context['sort_title'] = $ascending ? $txt['sort_desc'] : $txt['sort_asc'];

@@ -215,16 +215,15 @@ class MessageIndex_Controller extends Action_Controller
 		if (!isset($_REQUEST['sort']) || !isset($sort_methods[$_REQUEST['sort']]))
 		{
 			$context['sort_by'] = 'last_post';
-			$sort_column = 'id_last_msg';
 			$ascending = isset($_REQUEST['asc']);
 		}
 		// Otherwise default to ascending.
 		else
 		{
 			$context['sort_by'] = $_REQUEST['sort'];
-			$sort_column = $sort_methods[$_REQUEST['sort']];
 			$ascending = !isset($_REQUEST['desc']);
 		}
+		$sort_column = $sort_methods[$context['sort_by']];
 
 		$context['sort_direction'] = $ascending ? 'up' : 'down';
 		$context['sort_title'] = $ascending ? $txt['sort_desc'] : $txt['sort_asc'];
