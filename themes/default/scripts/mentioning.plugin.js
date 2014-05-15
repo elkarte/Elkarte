@@ -31,7 +31,6 @@ var disableDrafts = false;
 		$element.atwho({
 			at: "@",
 			limit: 7,
-			cWindow: oIframeWindow,
 			tpl: "<li data-value='${atwho-at}${name}' data-id='${id}'>${name}</li>",
 			callbacks: {
 				filter: function (query, items, search_key) {
