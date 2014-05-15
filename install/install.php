@@ -2068,9 +2068,9 @@ function template_install_above()
 		<link rel="stylesheet" href="themes/default/css/_light/index_light.css?beta10" />
 		<link rel="stylesheet" href="themes/default/css/install.css?beta10" />
 		<script src="themes/default/scripts/script.js"></script>
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" id="jquery"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" id="jquery"></script>
 		<script><!-- // --><![CDATA[
-			window.jQuery || document.write(\'<script src="themes/default/scripts/jquery-1.10.2.min.js"><\/script>\');
+			window.jQuery || document.write(\'<script src="themes/default/scripts/jquery-1.11.1.min.js"><\/script>\');
 		// ]]></script>
 
 	</head>

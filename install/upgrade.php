@@ -3477,9 +3477,9 @@ function template_upgrade_above()
 		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css?beta10" />
 		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/_light/index_light.css?beta10" />
 		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/install.css?beta10" />
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" id="jquery"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" id="jquery"></script>
 		<script><!-- // --><![CDATA[
-			window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-1.10.2.min.js"><\/script>\');
+			window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-1.11.1.min.js"><\/script>\');
 		// ]]></script>
 		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 		<script><!-- // --><![CDATA[
