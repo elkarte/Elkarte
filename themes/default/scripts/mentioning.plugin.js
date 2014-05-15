@@ -8,6 +8,7 @@
  * This file contains javascript associated with the atwho function as it
  * relates to an sceditor invocation
  */
+var disableDrafts = false;
 
 (function($, window, document) {
 	'use strict';
@@ -107,6 +108,12 @@
 					});
 				}
 			}
+		});
+		$(oIframeWindow).on("shown.atwho", function(event, offset) {
+			disableDrafts = true;
+		});
+		$(oIframeWindow).on("hidden.atwho", function(event, offset) {
+			disableDrafts = false;
 		});
 	};
 
