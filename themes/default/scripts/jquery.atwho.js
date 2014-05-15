@@ -363,8 +363,8 @@ Controller = (function() {
       $inputor.val(text);
       $inputor.caret('pos', start_str.length + content.length + 1);
     } else if (range = this.range) {
-      pos = range.startOffset - (this.query.end_pos - this.query.head_pos) - this.at.length;
-      range.setStart(range.endContainer, Math.max(pos, 0));
+      pos = range.startOffset - (this.query.end_pos - this.query.head_pos);
+      range.setStart(range.endContainer, Math.max(pos - 1, 0));
       range.setEnd(range.endContainer, range.endOffset);
       range.deleteContents();
       range.insertNode($insert_node[0]);
