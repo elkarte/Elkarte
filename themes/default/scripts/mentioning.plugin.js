@@ -77,10 +77,6 @@
 				before_insert: function(value, $li) {
 					oMentions.addUID($li.data('id'), $li.data('value'));
 
-					// Opera apparently doesn't remove the @ before value is inserted, so...let's remove it here
-					if (is_opera && !base.inSourceMode())
-						return value.replace($li.data('value'), $li.data('value').substring(1));
-
 					return value;
 				},
 				matcher: function(flag, subtext, should_start_with_space) {
