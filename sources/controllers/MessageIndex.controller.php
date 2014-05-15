@@ -100,9 +100,10 @@ class MessageIndex_Controller extends Action_Controller
 
 		// Make sure the starting place makes sense and construct the page index.
 		if (isset($_REQUEST['sort']))
-			$context['page_index'] = constructPageIndex($scripturl . '?board=' . $board . '.%1$d;sort=' . $_REQUEST['sort'] . (isset($_REQUEST['desc']) ? ';desc' : ''), $_REQUEST['start'], $board_info['total_topics'], $maxindex, true);
+			$sort_string = ';sort=' . $_REQUEST['sort'] . (isset($_REQUEST['desc']) ? ';desc' : '')
 		else
-			$context['page_index'] = constructPageIndex($scripturl . '?board=' . $board . '.%1$d', $_REQUEST['start'], $board_info['total_topics'], $maxindex, true);
+			$sort_string = '';
+		$context['page_index'] = constructPageIndex($scripturl . '?board=' . $board . '.%1$d' . $sort_string, $_REQUEST['start'], $board_info['total_topics'], $maxindex, true);
 
 		$context['start'] = &$_REQUEST['start'];
 
