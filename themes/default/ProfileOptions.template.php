@@ -871,7 +871,7 @@ function template_groupMembership()
 			if ($context['can_edit_primary'])
 				echo '
 						<td style="width:4%">
-							<input type="radio" name="primary" id="primary_', $group['id'], '" value="', $group['id'], '" ', $group['is_primary'] ? 'checked="checked"' : '', ' onclick="highlightSelected(\'primdiv_' . $group['id'] . '\');" ', $group['can_be_primary'] ? '' : 'disabled="disabled"', ' class="input_radio" />
+							<input type="radio" name="primary" id="primary_', $group['id'], '" value="', $group['id'], '" ', $group['is_primary'] ? 'checked="checked" ' : '', $group['can_be_primary'] ? '' : 'disabled="disabled" ', ' class="input_radio" />
 						</td>';
 
 			echo '
@@ -924,7 +924,7 @@ function template_groupMembership()
 						<td>
 							<strong>', (empty($group['color']) ? $group['name'] : '<span style="color: ' . $group['color'] . '">' . $group['name'] . '</span>'), '</strong>', (!empty($group['desc']) ? '<br /><span class="smalltext">' . $group['desc'] . '</span>' : ''), '
 						</td>
-						<td style="width:15%" class="lefttext">';
+						<td class="lefttext">';
 
 				if ($group['type'] == 3)
 					echo '
@@ -957,7 +957,7 @@ function template_groupMembership()
 
 		if (isset($context['groups']['member'][$context['primary_group']]))
 			echo '
-			highlightSelected("primdiv_' . $context['primary_group'] . '");';
+			initHighlightSelection("primdiv_' . $context['primary_group'] . '");';
 
 		echo '
 		// ]]></script>';

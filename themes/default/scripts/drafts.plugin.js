@@ -26,7 +26,7 @@
 	 */
 	elk_Drafts.prototype.draftSave = function() {
 		// No change since the last save, or form submitted
-		if (!this.opts._bCheckDraft || elk_formSubmitted)
+		if (!this.opts._bCheckDraft || elk_formSubmitted || (typeof disableDrafts !== undefined && disableDrafts))
 			return false;
 
 		// Still saving the last one or other?
@@ -233,7 +233,7 @@
 
 		/**
 		 * If the user has pressed a key since the last save
-		 * @type {String}
+		 * @type {Boolean}
 		 */
 		_bCheckDraft: false
 	};

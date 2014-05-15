@@ -207,9 +207,10 @@ class ManageMail_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'bottom_of_list',
+					'class' => 'submitbutton',
 					'value' => '
 						<input type="submit" name="delete_redirects" value="' . $txt['quickmod_delete_selected'] . '" onclick="return confirm(\'' . $txt['quickmod_confirm'] . '\');" class="right_submit" />
-						<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=mailqueue;sa=clear;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['mailqueue_clear_list_warning'] . '\');">' . $txt['mailqueue_clear_list'] . '</a> ',
+						<a class="linkbutton" href="' . $scripturl . '?action=admin;area=mailqueue;sa=clear;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['mailqueue_clear_list_warning'] . '\');">' . $txt['mailqueue_clear_list'] . '</a> ',
 				),
 			),
 		);

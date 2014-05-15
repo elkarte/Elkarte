@@ -1015,6 +1015,28 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'after' => '</span>',
 			),
 			array(
+				'tag' => 'ftp',
+				'type' => 'unparsed_content',
+				'content' => '<a href="$1" class="bbc_ftp new_win" target="_blank">$1</a>',
+				'validate' => create_function('&$tag, &$data, $disabled', '
+					$data = strtr($data, array(\'<br />\' => \'\'));
+					if (strpos($data, \'ftp://\') !== 0 && strpos($data, \'ftps://\') !== 0)
+						$data = \'ftp://\' . $data;
+				'),
+			),
+			array(
+				'tag' => 'ftp',
+				'type' => 'unparsed_equals',
+				'before' => '<a href="$1" class="bbc_ftp new_win" target="_blank">',
+				'after' => '</a>',
+				'validate' => create_function('&$tag, &$data, $disabled', '
+					if (strpos($data, \'ftp://\') !== 0 && strpos($data, \'ftps://\') !== 0)
+						$data = \'ftp://\' . $data;
+				'),
+				'disallow_children' => array('email', 'ftp', 'url', 'iurl'),
+				'disabled_after' => ' ($1)',
+			),
+			array(
 				'tag' => 'html',
 				'type' => 'unparsed_content',
 				'content' => '$1',

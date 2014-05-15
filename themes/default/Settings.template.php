@@ -173,7 +173,14 @@ function template_settings()
 				1 => $txt['header_layout_logo_only'],
 				2 => $txt['header_layout_inverted'],
 			),
-			'description' => $txt['header_layout_desc'],
+			'description' => array(
+				'main' => $txt['header_layout_desc'],
+				'options' => array(
+					0 => array('header_layout_default_name', 'header_layout_default_desc'),
+					1 => array('header_layout_logo_only_name', 'header_layout_logo_only_desc'),
+					2 => array('header_layout_inverted_name', 'header_layout_inverted_desc'),
+				)
+			),
 			'type' => 'select',
 		),
 		array(
@@ -207,7 +214,14 @@ function template_settings()
 				2 => $txt['enable_news_fader'],
 			),
 			'type' => 'number',
-			'description' => $txt['enable_news_desc'],
+			'description' => array(
+				'main' => '',
+				'options' => array(
+					0 => array('enable_news_off_name', 'enable_news_off_desc'),
+					1 => array('enable_news_random_name', 'enable_news_random_desc'),
+					2 => array('enable_news_fader_name', 'enable_news_fader_desc'),
+				)
+			),
 		),
 		array(
 			'id' => 'newsfader_time',

@@ -755,7 +755,7 @@ ul.pending_payments {
 	margin: 0 0 0.6em 0;
 }
 .perm_boards li {
-	padding: 0.2em;
+	padding: 0.3em 0.5em;
 	margin: 1px;
 }
 .perm_classic {

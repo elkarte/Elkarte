@@ -421,9 +421,10 @@ class ManageBans_Controller extends Action_Controller
 					'additional_rows' => array(
 						array(
 							'position' => 'below_table_data',
+							'class' => 'submitbutton',
 							'value' => '
 								<input type="submit" name="remove_selection" value="' . $txt['ban_remove_selected_triggers'] . '" class="right_submit" />
-								<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=ban;sa=edittrigger;bg=' . $ban_group_id . '">' . $txt['ban_add_trigger'] . '</a>
+								<a class="linkbutton" href="' . $scripturl . '?action=admin;area=ban;sa=edittrigger;bg=' . $ban_group_id . '">' . $txt['ban_add_trigger'] . '</a>
 								<input type="hidden" name="bg" value="' . $ban_group_id . '" />
 								<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
 								<input type="hidden" name="' . $context['admin-bet_token_var'] . '" value="' . $context['admin-bet_token'] . '" />',

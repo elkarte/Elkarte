@@ -1,13 +1,13 @@
 <?php
 // Version: 1.0; ManageThemes
 
-$txt['themeadmin_explain'] = 'The Initial Theme Settings section permits the site administration to select a theme for the site default theme. Admins can also enable members to select any installed theme for their use and to enable selectable themes. The Install a New Theme section is how the site administration installs a theme.';
+$txt['themeadmin_explain'] = 'Themes are the different looks and feels of your forum. The Global Theme Settings section permits the site administration to select a theme for the site default theme. Admins can also enable members to select any installed theme for their use and to enable selectable themes. The Install a New Theme section is how the site administration installs a theme.';
 
-$txt['initial_theme_settings'] = 'Initial Theme Settings';
-$txt['theme_allow'] = 'Allow members to select their own themes.';
-$txt['theme_guests'] = 'Overall forum default theme';
+$txt['theme_forum_theme'] = 'Global Theme Settings';
+$txt['theme_allow'] = 'Allow members to select their own themes:';
+$txt['theme_guests'] = 'Overall forum default theme:';
 $txt['theme_select'] = 'choose...';
-$txt['theme_reset'] = 'Reset all members to this theme:';
+$txt['theme_reset'] = 'Reset all members to the following theme:';
 $txt['theme_nochange'] = 'No change';
 $txt['theme_forum_default'] = 'Forum Default';
 
@@ -52,29 +52,35 @@ $txt['actual_theme_url'] = 'This theme\'s URL: ';
 $txt['actual_images_url'] = 'This theme\'s images URL: ';
 $txt['current_theme_style'] = 'This theme\'s style: ';
 
-$txt['theme_variants_default'] = 'Default theme variant';
-$txt['theme_variants_user_disable'] = 'Disable user variant selection';
+$txt['theme_variants_default'] = 'Default theme variant:';
+$txt['theme_variants_user_disable'] = 'Disable user variant selection:';
 
 $txt['site_slogan'] = 'Site slogan';
 $txt['site_slogan_desc'] = 'Add your own text for a slogan here. It will replace the default logo.';
 $txt['header_layout'] = 'Header layout';
-$txt['header_layout_desc'] = 'This setting allows you to select one of three layouts for the header.
-<br /><strong>Default</strong>: the logo is placed on the right and the name of the community on the left
-<br /><strong>Only logo</strong>: only the logo is displayed, in a centered position
-<br /><strong>Logo on the left</strong>: similar to Default, but with logo and name inverted (i.e. name on the right, logo on the left)';
+$txt['header_layout_desc'] = 'This setting allows you to select one of three layouts for the header:';
+$txt['header_layout_default_name'] = 'Default:';
+$txt['header_layout_default_desc'] = 'the logo is placed on the right and the name of the community on the left.';
+$txt['header_layout_logo_only_name'] = 'Only logo:';
+$txt['header_layout_logo_only_desc'] = 'only the logo is displayed, in a centered position';
+$txt['header_layout_inverted_name'] = 'Logo on the left:';
+$txt['header_layout_inverted_desc'] = 'similar to Default, but with logo and name inverted (i.e. name on the right, logo on the left)';
 $txt['header_layout_default'] = 'Default';
 $txt['header_layout_logo_only'] = 'Only logo';
 $txt['header_layout_inverted'] = 'Logo on the left';
-$txt['forum_width'] = 'Forum width';
+$txt['forum_width'] = 'Forum width:';
 $txt['forum_width_desc'] = 'Set the forum width. Examples: 950px, 80%, 1240px.';
 
 $txt['enable_news'] = 'News line in the forum header';
 $txt['enable_news_off'] = 'Off';
 $txt['enable_news_random'] = 'Random';
 $txt['enable_news_fader'] = 'Fader';
-$txt['enable_news_desc'] = '<strong>Off</strong>: no news shown
-<br /><strong>Random</strong>: one news shown chosen at random
-<br /><strong>Fader</strong>: all the news are displayed sequentially';
+$txt['enable_news_off_name'] = 'Off:';
+$txt['enable_news_off_desc'] = 'no news shown';
+$txt['enable_news_random_name'] = 'Random:';
+$txt['enable_news_random_desc'] = 'one news shown chosen at random';
+$txt['enable_news_fader_name'] = 'Fader:';
+$txt['enable_news_fader_desc'] = 'all the news are displayed sequentially';
 $txt['show_group_key'] = 'Show group key on board index';
 $txt['additional_options_collapsible'] = 'Enable collapsible additional post options';
 $txt['who_display_viewing'] = 'Show who is viewing the board index and posts';
