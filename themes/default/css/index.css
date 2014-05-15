@@ -1233,8 +1233,9 @@ a.bbc_link {
 .quotetonew_button:before {background-position: 0 -360px;}
 .like_button:before {background-position: 0 -384px;}
 .unlike_button:before {background-position: 0 -408px;}
-.likes_button:before {background-position: 0 -432px;}
+.star_button:before {background-position: 0 -432px;}
 .quick_edit:before {background-position: 0 -456px;}
+.likes_button:before {background-position: 0 -480px;}
 /* No icon here. */
 .linklevel1.post_options:before,
 .follow_ups .linklevel1:before {
@@ -1269,8 +1270,9 @@ a.bbc_link {
 	padding: 0 6px 0 26px;
 	line-height: 2.1em;
 }
-
-
+.listlevel1.liked a {
+	border-color: green;
+}
 /*	$PAGELINKS	*/
 /* ------------------------------------------------------- */
 
