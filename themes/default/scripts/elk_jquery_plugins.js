@@ -127,7 +127,7 @@
     };
 })(jQuery);
 
-/*
+/**
  * jQuery Superfish Menu Plugin
  * Copyright (c) 2013 Joel Birch
  *

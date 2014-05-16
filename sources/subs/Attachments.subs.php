@@ -148,14 +148,14 @@ function automanage_attachments_create_directory($updir)
 	$tree = get_directory_tree_elements($updir);
 	$count = count($tree);
 
-	$directory = attachments_init_dir($tree, $count);
+	$directory = !empty($tree) ? attachments_init_dir($tree, $count) : false;
 	if ($directory === false)
 	{
 		// Maybe it's just the folder name
 		$tree = get_directory_tree_elements(BOARDDIR . DIRECTORY_SEPARATOR . $updir);
 		$count = count($tree);
 
-		$directory = attachments_init_dir($tree, $count);
+		$directory = !empty($tree) ? attachments_init_dir($tree, $count) : false;
 		if ($directory === false)
 			return false;
 	}
@@ -312,15 +312,12 @@ function get_directory_tree_elements($directory)
  * - Gets the directory w/o drive letter for windows
  *
  * @package Attachments
- * @param string[]|boolean $tree
+ * @param string[] $tree
  * @param int $count
  */
 function attachments_init_dir(&$tree, &$count)
 {
 	$directory = '';
-
-	if (empty($tree))
-		return false;
 
 	// If on Windows servers the first part of the path is the drive (e.g. "C:")
 	if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
