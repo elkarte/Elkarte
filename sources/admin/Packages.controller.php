@@ -1259,7 +1259,7 @@ class Packages_Controller extends Action_Controller
 		$context['page_title'] .= ' - ' . $txt['browse_packages'];
 		$context['forum_version'] = $forum_version;
 		$installed = $context['sub_action'] == 'installed' ? true : false;
-		$context['package_types'] = $installed ? array('modification') : array('modification', 'avatar', 'language', 'unknown');
+		$context['package_types'] = $installed ? array('modification') : array('modification', 'avatar', 'language', 'smiley', 'unknown');
 
 		foreach ($context['package_types'] as $type)
 		{
@@ -2181,8 +2181,10 @@ class Packages_Controller extends Action_Controller
 			$sort_id = array(
 				'mod' => 1,
 				'modification' => 1,
+				'addon' => 1,
 				'avatar' => 1,
 				'language' => 1,
+				'smiley' => 1,
 				'unknown' => 1,
 			);
 			while ($package = readdir($dir))
@@ -2225,7 +2227,7 @@ class Packages_Controller extends Action_Controller
 				if (!empty($packageInfo))
 				{
 					$packageInfo['installed_id'] = isset($installed_adds[$packageInfo['id']]) ? $installed_adds[$packageInfo['id']]['id'] : 0;
-					$packageInfo['sort_id'] = $sort_id[$packageInfo['type']];
+					$packageInfo['sort_id'] = isset($sort_id[$packageInfo['type']]) ? $sort_id[$packageInfo['type']] : $sort_id['unknown'];
 					$packageInfo['is_installed'] = isset($installed_adds[$packageInfo['id']]);
 					$packageInfo['is_current'] = $packageInfo['is_installed'] && ($installed_adds[$packageInfo['id']]['version'] == $packageInfo['version']);
 					$packageInfo['is_newer'] = $packageInfo['is_installed'] && ($installed_adds[$packageInfo['id']]['version'] > $packageInfo['version']);
@@ -2295,7 +2297,7 @@ class Packages_Controller extends Action_Controller
 							}
 						}
 
-						// no uninstall found for this version, lets see if one exists for another
+						// No uninstall found for this version, lets see if one exists for another
 						if ($packageInfo['can_uninstall'] === false && $uninstall->exists('@for') && empty($_SESSION['version_emulate']))
 						{
 							$reset = true;
@@ -2309,8 +2311,8 @@ class Packages_Controller extends Action_Controller
 						}
 					}
 
-					// Modification.
-					if ($packageInfo['type'] == 'modification' || $packageInfo['type'] == 'mod')
+					// Add-on / Modification
+					if ($packageInfo['type'] == 'addon' || $packageInfo['type'] == 'modification' || $packageInfo['type'] == 'mod')
 					{
 						$sort_id['modification']++;
 						$sort_id['mod']++;
@@ -2334,6 +2336,13 @@ class Packages_Controller extends Action_Controller
 						$sort_id[$packageInfo['type']]++;
 						$packages['avatar'][strtolower($packageInfo[$sort])] = md5($package);
 						$context['available_avatar'][md5($package)] = $packageInfo;
+					}
+					// Smiley package.
+					elseif ($packageInfo['type'] == 'smiley')
+					{
+						$sort_id[$packageInfo['type']]++;
+						$packages['smiley'][strtolower($packageInfo[$sort])] = md5($package);
+						$context['available_smiley'][md5($package)] = $packageInfo;
 					}
 					// Language package.
 					elseif ($packageInfo['type'] == 'language')
