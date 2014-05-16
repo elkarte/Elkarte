@@ -312,12 +312,15 @@ function get_directory_tree_elements($directory)
  * - Gets the directory w/o drive letter for windows
  *
  * @package Attachments
- * @param string[] $tree
+ * @param string[]|boolean $tree
  * @param int $count
  */
 function attachments_init_dir(&$tree, &$count)
 {
 	$directory = '';
+
+	if (empty($tree))
+		return false;
 
 	// If on Windows servers the first part of the path is the drive (e.g. "C:")
 	if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
