@@ -250,14 +250,13 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 	text-align: right;
 	padding: 6px 0;
 	overflow: auto;
-	width: 100%;
 }
 #post_confirm_buttons {
 	padding: 0;
 }
 
 /* @todo - Test this out some more. */
-.submitbutton .button_submit, .submitbutton .linkbutton {
+.submitbutton .button_submit, .submitbutton .linkbutton, .submitbutton .right_submit {
 	padding: 2px 6px;
 	vertical-align: middle;
 	margin-right: 0.4em;
