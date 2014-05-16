@@ -1342,6 +1342,7 @@ class ModerationCenter_Controller extends Action_Controller
 			),
 			'additional_rows' => array(
 				array(
+					'class' => 'submitbutton',
 					'position' => 'below_table_data',
 					'value' => '
 						<div id="quick_log_search">
@@ -1349,7 +1350,6 @@ class ModerationCenter_Controller extends Action_Controller
 							<input type="text" name="search" size="18" value="' . Util::htmlspecialchars($context['search']['string']) . '" class="input_text" />
 							<input type="submit" name="is_search" value="' . $txt['modlog_go'] . '" class="button_submit" />
 						</div>',
-					'class' => 'floatright',
 				),
 			),
 		);
