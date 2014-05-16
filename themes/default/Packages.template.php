@@ -544,7 +544,7 @@ function template_browse()
 
 	if (!$adds_available)
 		echo '
-		<div class="information">', $context['sub_action'] == 'browse' ? $txt['no_packages'] : $txt['no_adds_installed'], '</div>';
+		<div class="infobox">', $context['sub_action'] == 'browse' ? $txt['no_packages'] : $txt['no_adds_installed'], '</div>';
 
 	echo '
 	</div>';
@@ -673,7 +673,7 @@ function template_control_chmod()
 
 	if (empty($context['package_ftp']['form_elements_only']))
 		echo '
-					<div class="righttext">
+					<div class="submitbutton">
 						<span id="test_ftp_placeholder_full"></span>
 						<input type="submit" value="', $txt['package_proceed'], '" class="right_submit" />
 					</div>';
@@ -1065,7 +1065,7 @@ function template_file_permissions()
 				<div class="information">', $txt['package_file_perms_ftp_retain'], '</div>';
 
 	echo '
-				<span id="test_ftp_placeholder_full"></span>
+				<span id="test_ftp_placeholder_full" class="submitbutton"></span>
 				<input type="hidden" name="action_changes" value="1" />
 				<input type="submit" value="', $txt['package_file_perms_go'], '" name="go" class="right_submit" />
 			</div>
