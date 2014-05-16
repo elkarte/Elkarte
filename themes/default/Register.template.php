@@ -568,6 +568,7 @@ function template_admin_register()
 					</div>';
 
 	echo '
+					<div class="flow_auto">
 					<dl class="register_form" id="admin_register_form">
 						<dt>
 							<strong><label for="user_input">', $txt['admin_register_username'], ':</label></strong>
@@ -625,8 +626,9 @@ function template_admin_register()
 							<input type="checkbox" name="emailActivate" id="emailActivate_check" tabindex="', $context['tabindex']++, '"', !empty($modSettings['registration_method']) && $modSettings['registration_method'] == 1 ? ' checked="checked"' : '', ' onclick="onCheckChange();" class="input_check" />
 						</dd>
 					</dl>
+					</div>
 					<div class="submitbutton">
-						<input type="submit" name="regSubmit" value="', $txt['register'], '" tabindex="', $context['tabindex']++, '" class="button_submit" />
+						<input type="submit" name="regSubmit" value="', $txt['register'], '" tabindex="', $context['tabindex']++, '" class="right_submit" />
 						<input type="hidden" name="sa" value="register" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						<input type="hidden" name="', $context['admin-regc_token_var'], '" value="', $context['admin-regc_token'], '" />
