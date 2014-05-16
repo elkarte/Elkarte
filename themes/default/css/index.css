@@ -894,7 +894,17 @@ a.bbc_link {
 	padding-right: 5px;
 }
 #footer_section .copyright {
-	display: block;
+	display: inline;
+	visibility: visible;
+	font-family: Verdana, Arial, sans-serif;
+	font-size: 0.857em;
+}
+#footer_section .rssfeeds {
+	float: right;
+	padding-top: 2px;
+	width: 21px;
+	margin: auto;
+	text-align: center;
 }
 
 
@@ -2554,6 +2564,9 @@ ul.post_options li {
 }
 .verification_control_valid {
 	display: none;
+}
+.verification_control .smalltext {
+	margin: 4px 0 8px 0;
 }
 
 /* The event editor section. */

@@ -693,7 +693,7 @@ class Display_Controller
 
 			// Just using the plain text quick reply and not the editor
 			if (empty($options['use_editor_quick_reply']))
-				loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.js', 'mentioning.js'));
+				loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.min.js', 'mentioning.js'));
 
 			loadCSSFile('jquery.atwho.css');
 

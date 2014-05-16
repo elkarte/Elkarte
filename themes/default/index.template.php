@@ -157,10 +157,10 @@ function template_html_above()
 	<link rel="search" href="' . $scripturl . '?action=search" />' : '');
 
 	// If RSS feeds are enabled, advertise the presence of one.
-	if (!empty($modSettings['xmlnews_enable']) && (!empty($modSettings['allow_guestAccess']) || $context['user']['is_logged']))
+	if (!empty($context['newsfeed_urls']))
 		echo '
-	<link rel="alternate" type="application/rss+xml" title="', $context['forum_name_html_safe'], ' - ', $txt['rss'], '" href="', $scripturl, '?type=rss2;action=.xml" />
-	<link rel="alternate" type="application/rss+xml" title="', $context['forum_name_html_safe'], ' - ', $txt['atom'], '" href="', $scripturl, '?type=atom;action=.xml" />';
+	<link rel="alternate" type="application/rss+xml" title="', $context['forum_name_html_safe'], ' - ', $txt['rss'], '" href="', $context['newsfeed_urls']['rss'], '" />
+	<link rel="alternate" type="application/rss+xml" title="', $context['forum_name_html_safe'], ' - ', $txt['atom'], '" href="', $context['newsfeed_urls']['atom'], '" />';
 
 	// If we're viewing a topic, these should be the previous and next topics, respectively.
 	if (!empty($context['links']['next']))
@@ -369,17 +369,15 @@ function template_body_below()
 				<li class="copyright">',
 					theme_copyright(), '
 				</li>',
-				!empty($modSettings['xmlnews_enable']) && (!empty($modSettings['allow_guestAccess']) || $context['user']['is_logged']) ? '<li><a id="button_rss" href="' . $scripturl . '?action=.xml;type=rss;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5) . '" class="new_win"><span>' . $txt['rss'] . '</span></a></li>' : '',
+				!empty($context['newsfeed_urls']['rss']) ? '<li>
+					<a id="button_rss" href="' . $context['newsfeed_urls']['rss'] . '" class="rssfeeds new_win"><i class="largetext fa fa-rss"></i></a>
+				</li>' : '',
 			'</ul>';
 
 	// Show the load time?
 	if ($context['show_load_time'])
 		echo '
 			<p>', sprintf($txt['page_created_full'], $context['load_time'], $context['load_queries']), '</p>';
-
-	echo '
-		</div>
-	</div>';
 }
 
 /**
@@ -388,6 +386,10 @@ function template_body_below()
 function template_html_below()
 {
 	global $context;
+
+	echo '
+		</div>
+	</div>';
 
 	// load in any javascript that could be deferred to the end of the page
 	template_javascript(true);

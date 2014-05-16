@@ -700,10 +700,8 @@ function template_control_chmod()
 	// ]]></script>';
 
 	// Make sure the button gets generated last.
-	$context['insert_after_template'] .= '
-	<script><!-- // --><![CDATA[
-		generateFTPTest();
-	// ]]></script>';
+	addInlineJavascript('
+		generateFTPTest();', true);
 }
 
 /**
