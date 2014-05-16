@@ -376,10 +376,6 @@ function template_body_below()
 	if ($context['show_load_time'])
 		echo '
 			<p>', sprintf($txt['page_created_full'], $context['load_time'], $context['load_queries']), '</p>';
-
-	echo '
-		</div>
-	</div>';
 }
 
 /**
@@ -388,6 +384,10 @@ function template_body_below()
 function template_html_below()
 {
 	global $context;
+
+	echo '
+		</div>
+	</div>';
 
 	// load in any javascript that could be deferred to the end of the page
 	template_javascript(true);
