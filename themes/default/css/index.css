@@ -884,7 +884,10 @@ a.bbc_link {
 	padding-right: 5px;
 }
 #footer_section .copyright {
-	display: block;
+	display: inline;
+	visibility: visible;
+	font-family: Verdana, Arial, sans-serif;
+	font-size: 0.857em;
 }
 
 

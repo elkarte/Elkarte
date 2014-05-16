@@ -2837,12 +2837,10 @@ function theme_copyright()
 		return;
 
 	// Put in the version...
-	// @todo - No necessity for inline CSS in the copyright, and better without it.
-	$forum_copyright = sprintf($forum_copyright, ucfirst(strtolower($forum_version)));
+	$forum_copyright = sprintf($forum_copyright, $forum_version);
 
 	echo '
-					<span class="smalltext" style="display: inline; visibility: visible; font-family: Verdana, Arial, sans-serif;">', $forum_copyright, '
-					</span>';
+					', $forum_copyright;
 }
 
 /**
