@@ -167,10 +167,8 @@ class paypal_payment
 		if (!isset($_POST['business']))
 			$_POST['business'] = $_POST['receiver_email'];
 
-		if ($modSettings['paypal_email'] !== $_POST['business'] && (empty($modSettings['paypal_additional_emails']) || !in_array($_POST['business'], explode(',', $modSettings['paypal_additional_emails']))))
-			return false;
-
-		return true;
+		// Return true or false if the data is intended for this
+		return !($modSettings['paypal_email'] !== $_POST['business'] && (empty($modSettings['paypal_additional_emails']) || !in_array($_POST['business'], explode(',', $modSettings['paypal_additional_emails']))));
 	}
 
 	/**
