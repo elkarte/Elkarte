@@ -1905,7 +1905,7 @@ function loadSubTemplate($sub_template_name, $fatal = false)
 /**
  * Add a CSS file for output later
  *
- * @param string[] $filenames string or array of filenames to work on
+ * @param string[]|string $filenames string or array of filenames to work on
  * @param mixed[] $params = array()
  * Keys are the following:
  * - ['local'] (true/false): define if the file is local
@@ -1936,7 +1936,7 @@ function loadCSSFile($filenames, $params = array(), $id = '')
  *   parameters applied,
  * - if you need specific parameters on a per file basis, call it multiple times
  *
- * @param string[] $filenames string or array of filenames to work on
+ * @param string[]|string $filenames string or array of filenames to work on
  * @param mixed[] $params = array()
  * Keys are the following:
  * - ['local'] (true/false): define if the file is local, if file does not
@@ -1972,7 +1972,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
  *   parameters applied,
  * - if you need specific parameters on a per file basis, call it multiple times
  *
- * @param string[] $filenames string or array of filenames to work on
+ * @param string[]|string $filenames string or array of filenames to work on
  * @param mixed[] $params = array()
  * Keys are the following:
  * - ['subdir'] (string): the subdirectory of the theme dir the file is in
