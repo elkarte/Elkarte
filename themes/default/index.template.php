@@ -774,28 +774,8 @@ function template_news_fader()
 			<li>
 				', $settings['enable_news'] == 2 ? implode('</li><li>', $context['news_lines']) : $context['random_news_line'], '
 			</li>
-		</ul>
-	<script><!-- // --><![CDATA[
-		var newsFaderStarted = false;
+		</ul>';
 
-		function startNewsFader()
-		{
-			if (newsFaderStarted)
-				return;
-
-			// Create a news fader object.
-			var oNewsFader = new elk_NewsFader({
-				sFaderControlId: \'elkFadeScroller\',
-				sItemTemplate: ', JavaScriptEscape('%1$s'), ',
-				iFadeDelay: ', empty($settings['newsfader_time']) ? 5000 : $settings['newsfader_time'], '
-			});
-			newsFaderStarted = true;
-		}';
-
-	if ($settings['enable_news'] == 2 && empty($context['minmax_preferences']['upshrink']))
-		echo '
-		startNewsFader();';
-
-	echo '
-	// ]]></script>';
+	addInlineJavascript('
+		$(\'#elkFadeScroller\').Elk_NewsFader();', true);
 }
