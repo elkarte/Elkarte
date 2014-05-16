@@ -281,7 +281,10 @@ class Control_Verification_Captcha implements Control_Verifications
 	 */
 	public function __construct($verificationOptions = null)
 	{
+		global $modSettings;
+
 		$this->_use_graphic_library = in_array('gd', get_loaded_extensions());
+		$this->_num_chars = $modSettings['visual_verification_num_chars'];
 
 		// Skip I, J, L, O, Q, S and Z.
 		$this->_standard_captcha_range = array_merge(range('A', 'H'), array('K', 'M', 'N', 'P', 'R'), range('T', 'Y'));
@@ -335,8 +338,6 @@ class Control_Verification_Captcha implements Control_Verifications
 	 */
 	public function createTest($refresh = true)
 	{
-		global $modSettings;
-
 		if (!$this->_show_captcha)
 			return;
 
@@ -347,7 +348,7 @@ class Control_Verification_Captcha implements Control_Verifications
 			// Are we overriding the range?
 			$character_range = !empty($this->_options['override_range']) ? $this->_options['override_range'] : $this->_standard_captcha_range;
 
-			for ($i = 0; $i < $modSettings['visual_verification_num_chars']; $i++)
+			for ($i = 0; $i < $this->_num_chars; $i++)
 				$_SESSION[$this->_options['id'] . '_vv']['code'] .= $character_range[array_rand($character_range)];
 		}
 		else
@@ -365,6 +366,7 @@ class Control_Verification_Captcha implements Control_Verifications
 				'image_href' => $this->_image_href,
 				'text_value' => $this->_text_value,
 				'use_graphic_library' => $this->_use_graphic_library,
+				'chars_number' => $this->_num_chars,
 				'is_error' => $this->_tested && !$this->_verifyCode(),
 			)
 		);
@@ -423,7 +425,7 @@ class Control_Verification_Captcha implements Control_Verifications
 		}
 
 		$_SESSION['visual_verification_code'] = '';
-		for ($i = 0; $i < $modSettings['visual_verification_num_chars']; $i++)
+		for ($i = 0; $i < $this->_num_chars; $i++)
 			$_SESSION['visual_verification_code'] .= $this->_standard_captcha_range[array_rand($this->_standard_captcha_range)];
 
 		// Some javascript for CAPTCHA.
