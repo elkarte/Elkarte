@@ -181,9 +181,14 @@ input, button, select {
 	font-size: 0.857em;
 	height: 26px;
 }
+/* Special form elements need to be addressed */
 input[type="file"] {
 	height: auto;
 }
+input[type="number"] {
+	padding: 0 0 0 6px;
+}
+
 /* Selects require browser-specific targeting too, unfortunately. */
 select {
 	padding: 0.25em;
