@@ -120,10 +120,7 @@ class twocheckout_payment
 			return false;
 
 		// Do we have an invoice number?
-		if (empty($_POST['x_invoice_num']))
-			return false;
-
-		return true;
+		 return !empty($_POST['x_invoice_num']);
 	}
 
 	/**

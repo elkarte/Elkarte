@@ -1338,8 +1338,16 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			),
 		);
 
+		// Inside these tags autolink is not recommendable.
+		$no_autolink_tags = array(
+			'url',
+			'iurl',
+			'ftp',
+			'email',
+		);
+
 		// Let addons add new BBC without hassle.
-		call_integration_hook('integrate_bbc_codes', array(&$codes));
+		call_integration_hook('integrate_bbc_codes', array(&$codes, &$no_autolink_tags));
 
 		// This is mainly for the bbc manager, so it's easy to add tags above.  Custom BBC should be added above this line.
 		if ($message === false)
@@ -1365,14 +1373,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			foreach ($itemcodes as $c => $dummy)
 				$bbc_codes[$c] = array();
 		}
-
-		// Inside these tags autolink is not recommendable.
-		$no_autolink_tags = array(
-			'url',
-			'iurl',
-			'ftp',
-			'email',
-		);
 
 		foreach ($codes as $code)
 		{
@@ -2887,9 +2887,9 @@ function template_javascript($do_defered = false)
 	// First up, load jQuery and jQuery UI
 	if (isset($modSettings['jquery_source']) && !$do_defered)
 	{
-		// Using a specified version of jquery or what was shipped 1.10.2 and 1.10.3
-		$jquery_version = (!empty($modSettings['jquery_default']) && !empty($modSettings['jquery_version'])) ? $modSettings['jquery_version'] : '1.10.2';
-		$jqueryui_version = (!empty($modSettings['jqueryui_default']) && !empty($modSettings['jqueryui_version'])) ? $modSettings['jqueryui_version'] : '1.10.3';
+		// Using a specified version of jquery or what was shipped 1.11.1  / 1.10.4
+		$jquery_version = (!empty($modSettings['jquery_default']) && !empty($modSettings['jquery_version'])) ? $modSettings['jquery_version'] : '1.11.1';
+		$jqueryui_version = (!empty($modSettings['jqueryui_default']) && !empty($modSettings['jqueryui_version'])) ? $modSettings['jqueryui_version'] : '1.10.4';
 
 		switch ($modSettings['jquery_source'])
 		{

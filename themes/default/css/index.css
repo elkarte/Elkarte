@@ -179,15 +179,23 @@ input, button, select {
 	padding: 2px 6px;
 	vertical-align: top;
 	font-size: 0.857em;
-	height: 23px;
+	height: 26px;
 }
+/* Special form elements need to be addressed */
+input[type="file"] {
+	height: auto;
+}
+input[type="number"] {
+	padding: 0 0 0 6px;
+}
+
 /* Selects require browser-specific targeting too, unfortunately. */
 select {
-	padding: 1px;
+	padding: 0.25em;
 }
 #chrome select {
 	padding: 2px;
-	height: 1.923em;
+	height: 26px;
 }
 select option {
 	padding: 0 4px;
@@ -213,8 +221,6 @@ select option {
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
 	padding: 2px 6px;
-	font-size: .857em;
-	line-height: 17px;
 	display: inline-block;
 }
 .left_submit, .linkbutton_left {
@@ -236,6 +242,11 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 	border-left: 1px solid #bfbfbf;
 	box-shadow: 1px 1px 2px #e5e5e5;
 }
+.linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
+.linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
+	line-height: 20px;
+	font-size: 0.857em;
+}
 
 /* @todo - A common, tag-agnostic class to hold submit buttons, etc. */
 /* Old markup had crud like <div class="smalltext righttext padding ffs zomg"> */
@@ -244,14 +255,13 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 	text-align: right;
 	padding: 6px 0;
 	overflow: auto;
-	width: 100%;
 }
 #post_confirm_buttons {
 	padding: 0;
 }
 
 /* @todo - Test this out some more. */
-.submitbutton .button_submit, .submitbutton .linkbutton {
+.submitbutton .button_submit, .submitbutton .linkbutton, .submitbutton .right_submit {
 	padding: 2px 6px;
 	vertical-align: middle;
 	margin-right: 0.4em;
@@ -1227,8 +1237,9 @@ a.bbc_link {
 .quotetonew_button:before {background-position: 0 -360px;}
 .like_button:before {background-position: 0 -384px;}
 .unlike_button:before {background-position: 0 -408px;}
-.likes_button:before {background-position: 0 -432px;}
+.star_button:before {background-position: 0 -432px;}
 .quick_edit:before {background-position: 0 -456px;}
+.likes_button:before {background-position: 0 -480px;}
 /* No icon here. */
 .linklevel1.post_options:before,
 .follow_ups .linklevel1:before {
@@ -1263,8 +1274,9 @@ a.bbc_link {
 	padding: 0 6px 0 26px;
 	line-height: 2.1em;
 }
-
-
+.listlevel1.liked a {
+	border-color: green;
+}
 /*	$PAGELINKS	*/
 /* ------------------------------------------------------- */
 
@@ -1499,6 +1511,11 @@ dl.settings dd {
 	margin: 0 0 3px 0;
 	padding: 0;
 	width: 55%;
+}
+/* I'm a tad leary of these setting new margins, but this line is here to compress     */
+/* listings in fieldset, like a permissions radio listing, from taking up excess space */
+.settings dd>fieldset dd, .settings dd>fieldset dt {
+	margin: 0;
 }
 dl.settings img {
 	margin: 0 10px 0 0;

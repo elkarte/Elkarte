@@ -750,7 +750,7 @@ function mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break)
  *
  * @package Mail
  * @param string $template
- * @param array $replacements = array()
+ * @param mixed[] $replacements
  * @param string $lang = ''
  * @param bool $loadLang = true
  */
@@ -881,7 +881,7 @@ function prepareMailingForPreview()
  * Uses capture group 1 in array
  *
  * @package Mail
- * @param array $matches
+ * @param mixed[] $matches
  * @return string
  */
 function user_info_callback($matches)
@@ -976,7 +976,7 @@ function list_getMailQueueSize()
  * Deletes items from the mail queue
  *
  * @package Mail
- * @param array $items
+ * @param int[] $items
  */
 function deleteMailQueueItems($items)
 {
@@ -995,7 +995,6 @@ function deleteMailQueueItems($items)
  * Get the current mail queue status
  *
  * @package Mail
- * @return array
  */
 function list_MailQueueStatus()
 {
@@ -1022,7 +1021,7 @@ function list_MailQueueStatus()
  * - It is used to keep track of failed emails attempts and next try.
  *
  * @package Mail
- * @param array $failed_emails
+ * @param mixed[] $failed_emails
  */
 function updateFailedQueue($failed_emails)
 {

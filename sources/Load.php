@@ -117,7 +117,7 @@ function reloadSettings()
 	{
 		$integration_settings = unserialize(ELK_INTEGRATION_SETTINGS);
 		foreach ($integration_settings as $hook => $function)
-			add_integration_function($hook, $function, false);
+			add_integration_function($hook, $function);
 	}
 
 	// Any files to pre include?
@@ -1041,7 +1041,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'posts' => comma_format($profile['posts']),
 			'avatar' => determineAvatar($profile),
 			'last_login' => empty($profile['last_login']) ? $txt['never'] : standardTime($profile['last_login']),
-			'last_login_timestamp' => empty($profile['last_login']) ? 0 : forum_time(0, $profile['last_login']),
+			'last_login_timestamp' => empty($profile['last_login']) ? 0 : forum_time(false, $profile['last_login']),
 			'karma' => array(
 				'good' => $profile['karma_good'],
 				'bad' => $profile['karma_bad'],
@@ -1905,14 +1905,14 @@ function loadSubTemplate($sub_template_name, $fatal = false)
 /**
  * Add a CSS file for output later
  *
- * @param mixed $filenames string or array of filenames to work on
+ * @param string[]|string $filenames string or array of filenames to work on
  * @param mixed[] $params = array()
- *         Keys are the following:
- *         - ['local'] (true/false): define if the file is local
- *         - ['fallback'] (true/false): if false  will attempt to load the file
- *             from the default theme if not found in the current theme
- *         - ['stale'] (true/false/string): if true or null, use cache stale,
- *             false do not, or used a supplied string
+ * Keys are the following:
+ * - ['local'] (true/false): define if the file is local
+ * - ['fallback'] (true/false): if false  will attempt to load the file
+ *   from the default theme if not found in the current theme
+ * - ['stale'] (true/false/string): if true or null, use cache stale,
+ *   false do not, or used a supplied string
  * @param string $id optional id to use in html id=""
  */
 function loadCSSFile($filenames, $params = array(), $id = '')
@@ -1936,7 +1936,7 @@ function loadCSSFile($filenames, $params = array(), $id = '')
  *   parameters applied,
  * - if you need specific parameters on a per file basis, call it multiple times
  *
- * @param mixed $filenames string or array of filenames to work on
+ * @param string[]|string $filenames string or array of filenames to work on
  * @param mixed[] $params = array()
  * Keys are the following:
  * - ['local'] (true/false): define if the file is local, if file does not
@@ -1972,7 +1972,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
  *   parameters applied,
  * - if you need specific parameters on a per file basis, call it multiple times
  *
- * @param mixed $filenames string or array of filenames to work on
+ * @param string[]|string $filenames string or array of filenames to work on
  * @param mixed[] $params = array()
  * Keys are the following:
  * - ['subdir'] (string): the subdirectory of the theme dir the file is in
