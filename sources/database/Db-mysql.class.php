@@ -1135,27 +1135,35 @@ class Database_MySQL implements Database
 		$row = $this->fetch_assoc($request);
 		$this->free_result($request);
 
-		$data_before = isset($row['Data_free']) ? $row['Data_free'] : 0;
-		$request = $this->query('', '
-			OPTIMIZE TABLE `{raw:table}`',
-			array(
-				'table' => $table,
-			)
-		);
-		if (!$request)
-			return -1;
+		// Optimize tables that will benefit from this operation.  We don't know what users may
+		// have "tweaked" in their installation nor what addons may have installed we simply check
+		if (isset($row['Engine']) && $row['Engine'] === 'MyISAM')
+		{
+			$data_before = isset($row['Data_free']) ? $row['Data_free'] : 0;
+			$request = $this->query('', '
+				OPTIMIZE TABLE `{raw:table}`',
+				array(
+					'table' => $table,
+				)
+			);
+			if (!$request)
+				return -1;
 
-		// How much left?
-		$request = $this->query('', '
-			SHOW TABLE STATUS LIKE {string:table}',
-			array(
-				'table' => str_replace('_', '\_', $table),
-			)
-		);
-		$row = $this->fetch_assoc($request);
-		$this->free_result($request);
+			// Check again to see what we have saved
+			$request = $this->query('', '
+				SHOW TABLE STATUS LIKE {string:table}',
+				array(
+					'table' => str_replace('_', '\_', $table),
+				)
+			);
+			$row = $this->fetch_assoc($request);
+			$this->free_result($request);
 
-		$total_change = isset($row['Data_free']) && $data_before > $row['Data_free'] ? $data_before / 1024 : 0;
+			// Savings for this table
+			$total_change = isset($row['Data_free']) && $data_before > $row['Data_free'] ? $data_before / 1024 : 0;
+		}
+		else
+			$total_change = 0;
 
 		return $total_change;
 	}
