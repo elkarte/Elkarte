@@ -818,7 +818,7 @@ function createAttachment(&$attachmentOptions)
 
 	// Get the hash if no hash has been given yet.
 	if (empty($attachmentOptions['file_hash']))
-		$attachmentOptions['file_hash'] = getAttachmentFilename($attachmentOptions['name'], false, null, true);
+		$attachmentOptions['file_hash'] = getAttachmentFilename($attachmentOptions['name'], 0, null, true);
 
 	// Assuming no-one set the extension let's take a look at it.
 	if (empty($attachmentOptions['fileext']))
@@ -887,7 +887,7 @@ function createAttachment(&$attachmentOptions)
 
 			$thumb_filename = $attachmentOptions['name'] . '_thumb';
 			$thumb_size = filesize($attachmentOptions['destination'] . '_thumb');
-			$thumb_file_hash = getAttachmentFilename($thumb_filename, false, null, true);
+			$thumb_file_hash = getAttachmentFilename($thumb_filename, 0, null, true);
 			$thumb_path = $attachmentOptions['destination'] . '_thumb';
 
 			// We should check the file size and count here since thumbs are added to the existing totals.
@@ -1090,7 +1090,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 	removeAttachments(array('id_member' => $memID));
 
 	$id_folder = getAttachmentPathID();
-	$avatar_hash = empty($modSettings['custom_avatar_enabled']) ? getAttachmentFilename($destName, false, null, true) : '';
+	$avatar_hash = empty($modSettings['custom_avatar_enabled']) ? getAttachmentFilename($destName, 0, null, true) : '';
 	$db->insert('',
 		'{db_prefix}attachments',
 		array(
@@ -1540,7 +1540,7 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 			$thumb_mime = 'image/' . $thumb_ext;
 
 		$thumb_filename = $filename . '_thumb';
-		$thumb_hash = getAttachmentFilename($thumb_filename, false, null, true);
+		$thumb_hash = getAttachmentFilename($thumb_filename, 0, null, true);
 
 		$db = database();
 
