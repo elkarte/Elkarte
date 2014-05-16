@@ -486,6 +486,12 @@ div.bbc_footnotes .meaction{
 #footer_section p, #footer_section a {
 	color: #bbb;
 }
+#footer_section .rssfeeds {
+	color: orange;
+	background-color: white;
+	border-radius: 0.3em;
+	text-shadow: 1px 1px 0px #000;
+}
 
 #debug_logging a, #debug_logging strong {
 	color: yellow;

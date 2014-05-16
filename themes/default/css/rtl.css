@@ -213,6 +213,9 @@ h2 a.collapse {
 	padding-left: 5px;
 	padding-right: 0;
 }
+#footer_section .rssfeeds {
+	float: left;
+}
 
 /*	$MENUS	*/
 /* This section contains code for the main forum menu (#main_menu),
