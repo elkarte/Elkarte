@@ -369,7 +369,9 @@ function template_body_below()
 				<li class="copyright">',
 					theme_copyright(), '
 				</li>',
-				!empty($modSettings['xmlnews_enable']) && (!empty($modSettings['allow_guestAccess']) || $context['user']['is_logged']) ? '<li><a id="button_rss" href="' . $scripturl . '?action=.xml;type=rss;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5) . '" class="new_win"><span>' . $txt['rss'] . '</span></a></li>' : '',
+				!empty($context['newsfeed_urls']['rss']) ? '<li>
+					<a id="button_rss" href="' . $context['newsfeed_urls']['rss'] . '" class="rssfeeds new_win"><i class="largetext fa fa-rss"></i></a>
+				</li>' : '',
 			'</ul>';
 
 	// Show the load time?

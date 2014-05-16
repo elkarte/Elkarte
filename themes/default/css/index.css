@@ -889,6 +889,17 @@ a.bbc_link {
 	font-family: Verdana, Arial, sans-serif;
 	font-size: 0.857em;
 }
+#footer_section .rssfeeds {
+	float: right;
+	color: orange !important;
+	background-color: white;
+	padding-top: 2px;
+	border-radius: 0.3em;
+	text-shadow: 1px 1px 0px #000;
+	width: 21px;
+	margin: auto;
+	text-align: center;
+}
 
 
 /*	$MENUS	*/

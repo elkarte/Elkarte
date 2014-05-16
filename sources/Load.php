@@ -1603,6 +1603,11 @@ function loadTheme($id_theme = 0, $initialize = true)
 	// This allows us to change the way things look for the admin.
 	$context['admin_features'] = isset($modSettings['admin_features']) ? explode(',', $modSettings['admin_features']) : array('cd,cp,k,w,rg,ml,pm');
 
+	if (!empty($modSettings['xmlnews_enable']) && (!empty($modSettings['allow_guestAccess']) || $context['user']['is_logged']))
+		$context['newsfeed_urls'] = array(
+			'rss' => $scripturl . '?action=.xml;type=rss;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5),
+			'atom' => $scripturl . '?action=.xml;type=atom;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5)
+		);
 	// Default JS variables for use in every theme
 	addJavascriptVar(array(
 		'elk_theme_url' => '"' . $settings['theme_url'] . '"',
