@@ -1507,6 +1507,11 @@ dl.settings dd {
 	padding: 0;
 	width: 55%;
 }
+/* I'm a tad leary of these setting new margins, but this line is here to compress     */
+/* listings in fieldset, like a permissions radio listing, from taking up excess space */
+.settings dd>fieldset dd, .settings dd>fieldset dt {
+	margin: 0;
+}
 dl.settings img {
 	margin: 0 10px 0 0;
 	vertical-align: middle;
