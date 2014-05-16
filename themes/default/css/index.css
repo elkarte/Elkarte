@@ -2538,6 +2538,9 @@ ul.post_options li {
 .verification_control_valid {
 	display: none;
 }
+.verification_control .smalltext {
+	margin: 4px 0 8px 0;
+}
 
 /* The event editor section. */
 #event_main, #poll_options, #poll_main {

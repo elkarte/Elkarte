@@ -304,7 +304,7 @@ class Control_Verification_Captcha implements Control_Verifications
 		if (!empty($this->_options['override_visual']) || (!empty($modSettings['visual_verification_type']) && !isset($this->_options['override_visual'])) && empty($context['captcha_js_loaded']))
 		{
 			loadTemplate('VerificationControls');
-			loadJavascriptFile('captcha.js');
+			loadJavascriptFile('jquery.captcha.js');
 			$context['captcha_js_loaded'] = true;
 		}
 
@@ -319,9 +319,6 @@ class Control_Verification_Captcha implements Control_Verifications
 			{
 				$this->_text_value = '';
 				$this->_image_href = $scripturl . '?action=verificationcode;vid=' . $this->_options['id'] . ';rand=' . md5(mt_rand());
-
-				addInlineJavascript('
-					var verification' . $this->_options['id'] . 'Handle = new elkCaptcha("' . $this->_image_href . '", "' . $this->_options['id'] . '", ' . ($this->_use_graphic_library ? 1 : 0) . ');', true);
 			}
 		}
 
@@ -415,7 +412,7 @@ class Control_Verification_Captcha implements Control_Verifications
 			array('int', 'visual_verification_num_chars'),
 			'vv' => array('select', 'visual_verification_type',
 				array($txt['setting_image_verification_off'], $txt['setting_image_verification_vsimple'], $txt['setting_image_verification_simple'], $txt['setting_image_verification_medium'], $txt['setting_image_verification_high'], $txt['setting_image_verification_extreme']),
-				'subtext'=> $txt['setting_visual_verification_type_desc'], 'onchange' => $this->_use_graphic_library ? 'refreshImages();' : ''),
+				'subtext'=> $txt['setting_visual_verification_type_desc']),
 		);
 
 		// Save it
@@ -431,12 +428,17 @@ class Control_Verification_Captcha implements Control_Verifications
 
 		// Some javascript for CAPTCHA.
 		if ($this->_use_graphic_library)
+		{
+			loadJavascriptFile('jquery.captcha.js');
 			addInlineJavascript('
-			function refreshImages()
-			{
-				var imageType = document.getElementById(\'visual_verification_type\').value;
-				document.getElementById(\'verification_image\').src = \'' . $verification_image . ';type=\' + imageType;
-			}', true);
+		$(\'#visual_verification_type\').Elk_Captcha({
+			\'imageURL\': ' . JavaScriptEscape($verification_image) . ',
+			\'useLibrary\': true,
+			\'letterCount\': ' . $this->_num_chars . ',
+			\'refreshevent\': \'change\',
+			\'admin\': true
+		});', true);
+		}
 
 		// Show the image itself, or text saying we can't.
 		if ($this->_use_graphic_library)
