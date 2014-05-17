@@ -289,12 +289,12 @@ function template_set_options()
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=theme;th=', $context['theme_settings']['theme_id'], ';sa=reset" method="post" accept-charset="UTF-8">
 			<input type="hidden" name="who" value="', $context['theme_options_reset'] ? 1 : 0, '" />
 			<h3 class="category_header">', $context['theme_settings']['name'],'</h3>
-			<dl class="settings windowbg content">';
+			<dl class="settings windowbg content', $context['theme_options_reset'] ? ' theme_options' : '', '">';
 
 	foreach ($context['options'] as $setting)
 	{
 		echo '
-				<dt', $context['theme_options_reset'] ? ' style="width:55%"' : '', '>';
+				<dt>';
 
 		// Show the change option box ?
 		if ($context['theme_options_reset'])
@@ -316,7 +316,7 @@ function template_set_options()
 
 			echo '
 				</dt>
-				<dd ', $context['theme_options_reset'] ? 'style="width:40%"' : '', '>
+				<dd>
 					<input type="hidden" name="' . (!empty($setting['default']) ? 'default_' : '') . 'options[' . $setting['id'] . ']" value="0" />
 					<input type="checkbox" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="options_', $setting['id'], '"', !empty($setting['value']) ? ' checked="checked"' : '', $context['theme_options_reset'] ? ' disabled="disabled"' : '', ' value="1" class="input_check floatleft" />';
 		}
@@ -332,7 +332,7 @@ function template_set_options()
 
 			echo '
 				</dt>
-				<dd ', $context['theme_options_reset'] ? 'style="width:40%"' : '', '>
+				<dd>
 					<select class="floatleft" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="options_', $setting['id'], '"', $context['theme_options_reset'] ? ' disabled="disabled"' : '', '>';
 
 			foreach ($setting['options'] as $value => $label)
@@ -354,7 +354,7 @@ function template_set_options()
 
 			echo '
 				</dt>
-				<dd ', $context['theme_options_reset'] ? 'style="width:40%"' : '', '>
+				<dd>
 					<input type="text" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="options_', $setting['id'], '" value="', $setting['value'], '"', $setting['type'] == 'number' ? ' size="5"' : '', $context['theme_options_reset'] ? ' disabled="disabled"' : '', ' class="input_text" />';
 		}
 
@@ -404,7 +404,7 @@ function template_set_settings()
 			<h3 class="category_header hdicon cat_img_config">
 				', $txt['theme_url_config'], '
 			</h3>
-			<div class="windowbg2 content">
+			<div class="windowbg2 content theme_settings">
 				<dl class="settings">
 					<dt>
 						<label for="theme_name">', $txt['actual_theme_name'], '</label>
@@ -416,19 +416,19 @@ function template_set_settings()
 						<label for="theme_url">', $txt['actual_theme_url'], '</label>
 					</dt>
 					<dd>
-						<input type="text" id="theme_url" name="options[theme_url]" value="', $context['theme_settings']['actual_theme_url'], '" size="50" style="max-width: 100%; width: 50ex;" class="input_text" />
+						<input type="text" id="theme_url" name="options[theme_url]" value="', $context['theme_settings']['actual_theme_url'], '" size="50" class="input_text" />
 					</dd>
 					<dt>
 						<label for="images_url">', $txt['actual_images_url'], '</label>
 					</dt>
 					<dd>
-						<input type="text" id="images_url" name="options[images_url]" value="', $context['theme_settings']['actual_images_url'], '" size="50" style="max-width: 100%; width: 50ex;" class="input_text" />
+						<input type="text" id="images_url" name="options[images_url]" value="', $context['theme_settings']['actual_images_url'], '" size="50" class="input_text" />
 					</dd>
 					<dt>
 						<label for="theme_dir">', $txt['actual_theme_dir'], '</label>
 					</dt>
 					<dd>
-						<input type="text" id="theme_dir" name="options[theme_dir]" value="', $context['theme_settings']['actual_theme_dir'], '" size="50" style="max-width: 100%; width: 50ex;" class="input_text" />
+						<input type="text" id="theme_dir" name="options[theme_dir]" value="', $context['theme_settings']['actual_theme_dir'], '" size="50" class="input_text" />
 					</dd>
 				</dl>
 			</div>';
@@ -752,18 +752,22 @@ echo '
 		$alternate = !$alternate;
 
 		echo '
-		<h3 class="category_header">
-			<a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=browse">', $theme['name'], '</a>', !empty($theme['version']) ? '
-			<em>(' . $theme['version'] . ')</em>' : '', '
-		</h3>
-		<div class="windowbg', $alternate ? '' : '2', '">
-			<div class="content">
-				<ul>
-					<li><a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=browse">', $txt['themeadmin_edit_browse'], '</a></li>', $theme['can_edit_style'] ? '
-					<li><a href="' . $scripturl . '?action=admin;area=theme;th=' . $theme['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=browse;directory=css">' . $txt['themeadmin_edit_style'] . '</a></li>' : '', '
-					<li><a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=copy">', $txt['themeadmin_edit_copy_template'], '</a></li>
-				</ul>
-			</div>
+		<div>
+			<h3 class="category_header">
+				<a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=browse">', $theme['name'], '</a>', !empty($theme['version']) ? '
+				<em>(' . $theme['version'] . ')</em>' : '', '
+			</h3>
+			<ul class="windowbg2 content">
+				<li>
+					<a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=browse">', $txt['themeadmin_edit_browse'], '</a>
+				</li>', $theme['can_edit_style'] ? '
+				<li>
+					<a href="' . $scripturl . '?action=admin;area=theme;th=' . $theme['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=browse;directory=css">' . $txt['themeadmin_edit_style'] . '</a>
+				</li>' : '', '
+				<li>
+					<a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=copy">', $txt['themeadmin_edit_copy_template'], '</a>
+				</li>
+			</ul>
 		</div>';
 	}
 
@@ -785,9 +789,7 @@ function template_copy_template()
 		<div class="information">
 			', $txt['themeadmin_edit_copy_warning'], '
 		</div>
-		<div class="windowbg">
-			<div class="content">
-				<ul class="theme_options">';
+		<ul id="admin_form_wrapper" class="windowbg content theme_options">';
 
 	$alternate = false;
 	foreach ($context['available_templates'] as $template)
@@ -795,9 +797,9 @@ function template_copy_template()
 		$alternate = !$alternate;
 
 		echo '
-					<li class="flow_hidden windowbg', $alternate ? '2' : '', '">
-						<span class="floatleft">', $template['filename'], $template['already_exists'] ? ' <span class="error">(' . $txt['themeadmin_edit_exists'] . ')</span>' : '', '</span>
-						<span class="floatright">';
+			<li class="flow_hidden windowbg', $alternate ? '2' : '', '">
+				<span class="floatleft">', $template['filename'], $template['already_exists'] ? ' <span class="error">(' . $txt['themeadmin_edit_exists'] . ')</span>' : '', '</span>
+				<span class="floatright">';
 
 		if ($template['can_copy'])
 			echo '<a href="', $scripturl, '?action=admin;area=theme;th=', $context['theme_id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=copy;template=', $template['value'], '" onclick="return confirm(\'', $template['already_exists'] ? $txt['themeadmin_edit_overwrite_confirm'] : $txt['themeadmin_edit_copy_confirm'], '\');">', $txt['themeadmin_edit_do_copy'], '</a>';
@@ -805,14 +807,12 @@ function template_copy_template()
 			echo $txt['themeadmin_edit_no_copy'];
 
 		echo '
-						</span>
-					</li>';
+				</span>
+			</li>';
 	}
 
 	echo '
-				</ul>
-			</div>
-		</div>
+		</ul>
 	</div>';
 }
 
@@ -829,9 +829,9 @@ function template_browse()
 		<table class="table_grid">
 		<thead>
 			<tr class="table_head">
-				<th scope="col" class="lefttext" style="width:50%">', $txt['themeadmin_edit_filename'], '</th>
-				<th scope="col" style="width:35%">', $txt['themeadmin_edit_modified'], '</th>
-				<th scope="col" style="width:15%">', $txt['themeadmin_edit_size'], '</th>
+				<th scope="col" class="lefttext grid50">', $txt['themeadmin_edit_filename'], '</th>
+				<th scope="col" class="grid33">', $txt['themeadmin_edit_modified'], '</th>
+				<th scope="col" class="grid17">', $txt['themeadmin_edit_size'], '</th>
 			</tr>
 		</thead>
 		<tbody>';

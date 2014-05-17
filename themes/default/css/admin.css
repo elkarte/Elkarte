@@ -824,6 +824,16 @@ dl.themes_list dd {
 	font-style: italic;
 	white-space: nowrap;
 }
+.theme_options dt {
+	width: 55%;
+}
+.theme_options dd {
+	width: 40%
+}
+.theme_settings .input_text {
+	max-width: 100%;
+	width: 30em;
+}
 
 /* Styles for the registration center.
 ------------------------------------------------- */
