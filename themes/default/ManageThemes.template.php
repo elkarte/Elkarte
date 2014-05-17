@@ -250,22 +250,20 @@ function template_reset_list()
 		$alternate = !$alternate;
 
 		echo '
-			<h3 class="secondary_header">', $theme['name'], '</h3>
-			<div class="windowbg', $alternate ? '' : '2', '">
-				<div class="content">
-					<ul>
-						<li>
-							<a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=reset">', $txt['themeadmin_reset_defaults'], '</a> <em class="smalltext">(', $theme['num_default_options'], ' ', $txt['themeadmin_reset_defaults_current'], ')</em>
-						</li>
-						<li>
-							<a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=reset;who=1">', $txt['themeadmin_reset_members'], '</a>
-						</li>
-						<li>
-							<a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=reset;who=2;', $context['admin-stor_token_var'], '=', $context['admin-stor_token'], '" onclick="return confirm(\'', $txt['themeadmin_reset_remove_confirm'], '\');">', $txt['themeadmin_reset_remove'], '</a>
-							<em class="smalltext">(', $theme['num_members'], ' ', $txt['themeadmin_reset_remove_current'], ')</em>
-						</li>
-					</ul>
-				</div>
+			<div class="theme_', $theme['id'], '">
+				<h3 class="secondary_header">', $theme['name'], '</h3>
+				<ul class="windowbg content">
+					<li>
+						<a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=reset">', $txt['themeadmin_reset_defaults'], '</a> <em class="smalltext">(', $theme['num_default_options'], ' ', $txt['themeadmin_reset_defaults_current'], ')</em>
+					</li>
+					<li>
+						<a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=reset;who=1">', $txt['themeadmin_reset_members'], '</a>
+					</li>
+					<li>
+						<a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=reset;who=2;', $context['admin-stor_token_var'], '=', $context['admin-stor_token'], '" onclick="return confirm(\'', $txt['themeadmin_reset_remove_confirm'], '\');">', $txt['themeadmin_reset_remove'], '</a>
+						<em class="smalltext">(', $theme['num_members'], ' ', $txt['themeadmin_reset_remove_current'], ')</em>
+					</li>
+				</ul>
 			</div>';
 	}
 
@@ -283,104 +281,95 @@ function template_set_options()
 
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=theme;th=', $context['theme_settings']['theme_id'], ';sa=reset" method="post" accept-charset="UTF-8">
+		<h2 class="category_header">', $txt['theme_options_title'], ' - ', $context['theme_settings']['name'], '</h2>
+		<div class="information">
+			', $context['theme_options_reset'] ? $txt['themeadmin_reset_options_info'] : $txt['theme_options_defaults'], '
+		</div>';
+	echo '
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=theme;th=', $context['theme_settings']['theme_id'], ';sa=reset" method="post" accept-charset="UTF-8">
 			<input type="hidden" name="who" value="', $context['theme_options_reset'] ? 1 : 0, '" />
-			<h2 class="category_header">', $txt['theme_options_title'], ' - ', $context['theme_settings']['name'], '</h2>
-			<div class="information">
-				', $context['theme_options_reset'] ? $txt['themeadmin_reset_options_info'] : $txt['theme_options_defaults'], '
-			</div>
-			<div class="windowbg2">
-				<div class="content">';
-	echo '
-			<div id="admin_form_wrapper">
-				<h2 class="category_header">', $context['theme_settings']['name'],'
-				</h2> <br />';
-
-	echo '
-					<dl class="settings">';
+			<h3 class="category_header">', $context['theme_settings']['name'],'</h3>
+			<dl class="settings windowbg content">';
 
 	foreach ($context['options'] as $setting)
 	{
 		echo '
-						<dt ', $context['theme_options_reset'] ? 'style="width:55%"' : '', '>';
+				<dt', $context['theme_options_reset'] ? ' style="width:55%"' : '', '>';
 
 		// Show the change option box ?
 		if ($context['theme_options_reset'])
 			echo '
-							<select name="', !empty($setting['default']) ? 'default_' : '', 'options_master[', $setting['id'], ']" onchange="this.form.options_', $setting['id'], '.disabled = this.selectedIndex != 1;">
-								<option value="0" selected="selected">', $txt['themeadmin_reset_options_none'], '</option>
-								<option value="1">', $txt['themeadmin_reset_options_change'], '</option>
-								<option value="2">', $txt['themeadmin_reset_options_default'], '</option>
-							</select>';
+					<select name="', !empty($setting['default']) ? 'default_' : '', 'options_master[', $setting['id'], ']" onchange="this.form.options_', $setting['id'], '.disabled = this.selectedIndex != 1;">
+						<option value="0" selected="selected">', $txt['themeadmin_reset_options_none'], '</option>
+						<option value="1">', $txt['themeadmin_reset_options_change'], '</option>
+						<option value="2">', $txt['themeadmin_reset_options_default'], '</option>
+					</select>';
 
 		// Display checkbox options
 		if ($setting['type'] == 'checkbox')
 		{
 			echo '
-							<label for="options_', $setting['id'], '">', $setting['label'], '</label>';
+					<label for="options_', $setting['id'], '">', $setting['label'], '</label>';
 			if (isset($setting['description']))
 				echo '
-							<br /><span class="smalltext">', $setting['description'], '</span>';
+					<br /><span class="smalltext">', $setting['description'], '</span>';
 
 			echo '
-						</dt>
-						<dd ', $context['theme_options_reset'] ? 'style="width:40%"' : '', '>
-							<input type="hidden" name="' . (!empty($setting['default']) ? 'default_' : '') . 'options[' . $setting['id'] . ']" value="0" />
-							<input type="checkbox" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="options_', $setting['id'], '"', !empty($setting['value']) ? ' checked="checked"' : '', $context['theme_options_reset'] ? ' disabled="disabled"' : '', ' value="1" class="input_check floatleft" />';
+				</dt>
+				<dd ', $context['theme_options_reset'] ? 'style="width:40%"' : '', '>
+					<input type="hidden" name="' . (!empty($setting['default']) ? 'default_' : '') . 'options[' . $setting['id'] . ']" value="0" />
+					<input type="checkbox" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="options_', $setting['id'], '"', !empty($setting['value']) ? ' checked="checked"' : '', $context['theme_options_reset'] ? ' disabled="disabled"' : '', ' value="1" class="input_check floatleft" />';
 		}
 		// How about selection lists, we all love them
 		elseif ($setting['type'] == 'list')
 		{
 			echo '
-							<label for="options_', $setting['id'], '">', $setting['label'], '</label>';
+					<label for="options_', $setting['id'], '">', $setting['label'], '</label>';
 
 			if (isset($setting['description']))
 				echo '
-							<br /><span class="smalltext">', $setting['description'], '</span>';
+					<br /><span class="smalltext">', $setting['description'], '</span>';
 
 			echo '
-						</dt>
-						<dd ', $context['theme_options_reset'] ? 'style="width:40%"' : '', '>
-							<select class="floatleft" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="options_', $setting['id'], '"', $context['theme_options_reset'] ? ' disabled="disabled"' : '', '>';
+				</dt>
+				<dd ', $context['theme_options_reset'] ? 'style="width:40%"' : '', '>
+					<select class="floatleft" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="options_', $setting['id'], '"', $context['theme_options_reset'] ? ' disabled="disabled"' : '', '>';
 
 			foreach ($setting['options'] as $value => $label)
 				echo '
-								<option value="', $value, '"', $value == $setting['value'] ? ' selected="selected"' : '', '>', $label, '</option>';
+						<option value="', $value, '"', $value == $setting['value'] ? ' selected="selected"' : '', '>', $label, '</option>';
 
 			echo '
-							</select>';
+					</select>';
 		}
 		// a textbox it is then
 		else
 		{
 			echo '
-							<label for="options_', $setting['id'], '">', $setting['label'], '</label>';
+					<label for="options_', $setting['id'], '">', $setting['label'], '</label>';
 
 			if (isset($setting['description']))
 				echo '
-							<br /><span class="smalltext">', $setting['description'], '</span>';
+					<br /><span class="smalltext">', $setting['description'], '</span>';
 
 			echo '
-						</dt>
-						<dd ', $context['theme_options_reset'] ? 'style="width:40%"' : '', '>
-							<input type="text" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="options_', $setting['id'], '" value="', $setting['value'], '"', $setting['type'] == 'number' ? ' size="5"' : '', $context['theme_options_reset'] ? ' disabled="disabled"' : '', ' class="input_text" />';
+				</dt>
+				<dd ', $context['theme_options_reset'] ? 'style="width:40%"' : '', '>
+					<input type="text" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="options_', $setting['id'], '" value="', $setting['value'], '"', $setting['type'] == 'number' ? ' size="5"' : '', $context['theme_options_reset'] ? ' disabled="disabled"' : '', ' class="input_text" />';
 		}
 
 		// End of this defintion
 		echo '
-						</dd>';
+				</dd>';
 	}
 
 	// Close the option page up
 	echo '
-					</dl>
-					<input type="submit" name="submit" value="', $txt['save'], '" class="right_submit" />
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-sto_token_var'], '" value="', $context['admin-sto_token'], '" />
-				</div>
-			</div>
+			</dl>
+			<input type="submit" name="submit" value="', $txt['save'], '" class="right_submit" />
+			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+			<input type="hidden" name="', $context['admin-sto_token_var'], '" value="', $context['admin-sto_token'], '" />
 		</form>
-			</div>
 	</div>';
 }
 
