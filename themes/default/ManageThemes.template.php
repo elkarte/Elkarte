@@ -166,7 +166,7 @@ function template_list_themes()
 			', $txt['themeadmin_list_tip'], '
 		</div>
 
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=theme;', $context['session_var'], '=', $context['session_id'], ';sa=list" method="post" accept-charset="UTF-8"> ';
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=theme;', $context['session_var'], '=', $context['session_id'], ';sa=list" method="post" accept-charset="UTF-8">';
 
 	// Show each theme.... with X for delete and a link to settings.
 	foreach ($context['themes'] as $theme)
@@ -179,27 +179,21 @@ function template_list_themes()
 		// You *cannot* delete the default theme. It's important!
 		if ($theme['id'] != 1)
 			echo '
-					<span class="floatright">
 						<a class="delete_theme" data-theme_id="', $theme['id'], '" href="', $scripturl, '?action=admin;area=theme;sa=remove;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';', $context['admin-tr_token_var'], '=', $context['admin-tr_token'], '">
 							<img src="', $settings['images_url'], '/icons/delete.png" alt="', $txt['theme_remove'], '" title="', $txt['theme_remove'], '" />
-						</a>
-					</span>';
+						</a>';
 
 		echo '
 				</h3>
-			</div>
-			<div class="theme_', $theme['id'], ' windowbg">
-				<div class="content">
-					<dl class="settings themes_list">
-						<dt><a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=list" class="linkbutton floatleft">', $txt['theme_edit_settings'], '</a></dt>
-						<dt>', $txt['themeadmin_list_theme_dir'], '</dt>
-						<dd', $theme['valid_path'] ? '' : ' class="error"', '>', $theme['theme_dir'], $theme['valid_path'] ? '' : ' ' . $txt['themeadmin_list_invalid'], '</dd>
-						<dt>', $txt['themeadmin_list_theme_url'], '</dt>
-						<dd>', $theme['theme_url'], '</dd>
-						<dt>', $txt['themeadmin_list_images_url'], '</dt>
-						<dd>', $theme['images_url'], '</dd>
-					</dl>
-				</div>
+				<dl class="content settings themes_list">
+					<dt><a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=list" class="linkbutton floatleft">', $txt['theme_edit_settings'], '</a></dt>
+					<dt>', $txt['themeadmin_list_theme_dir'], '</dt>
+					<dd', $theme['valid_path'] ? '' : ' class="error"', '>', $theme['theme_dir'], $theme['valid_path'] ? '' : ' ' . $txt['themeadmin_list_invalid'], '</dd>
+					<dt>', $txt['themeadmin_list_theme_url'], '</dt>
+					<dd>', $theme['theme_url'], '</dd>
+					<dt>', $txt['themeadmin_list_images_url'], '</dt>
+					<dd>', $theme['images_url'], '</dd>
+				</dl>
 			</div>';
 	}
 
@@ -207,32 +201,27 @@ function template_list_themes()
 			<h3 class="category_header">
 				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=themeadmin_list_reset" onclick="return reqOverlayDiv(this.href);" id="themeadmin_list_reset" title="', $txt['help'], '"></a> ', $txt['themeadmin_list_reset'], '
 			</h3>
-				<div class="windowbg">
-				<div class="content">
-					<dl class="settings">
-						<dt>
-							<label for="reset_dir">', $txt['themeadmin_list_reset_dir'], '</label>
-						</dt>
-						<dd>
-							<input type="text" name="reset_dir" id="reset_dir" value="', $context['reset_dir'], '" size="40" style="width: 80%;" class="input_text" />
-						</dd>
-						<dt>
-							<label for="reset_url">', $txt['themeadmin_list_reset_url'], '</label>
-						</dt>
-						<dd>
-							<input type="text" name="reset_url" id="reset_url" value="', $context['reset_url'], '" size="40" style="width: 80%;" class="input_text" />
-						</dd>
-					</dl>
-					<input type="submit" name="save" value="', $txt['themeadmin_list_reset_go'], '" class="right_submit" />
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-tl_token_var'], '" value="', $context['admin-tl_token'], '" />
-				</div>
-			</div>
-			<script><!-- // --><![CDATA[
-				initDeleteThemes();
-			// ]]></script>
+			<dl class="content settings themes_list">
+				<dt>
+					<label for="reset_dir">', $txt['themeadmin_list_reset_dir'], '</label>
+				</dt>
+				<dd>
+					<input type="text" name="reset_dir" id="reset_dir" value="', $context['reset_dir'], '" size="40" style="width: 80%;" class="input_text" />
+				</dd>
+				<dt>
+					<label for="reset_url">', $txt['themeadmin_list_reset_url'], '</label>
+				</dt>
+				<dd>
+					<input type="text" name="reset_url" id="reset_url" value="', $context['reset_url'], '" size="40" style="width: 80%;" class="input_text" />
+				</dd>
+			</dl>
+			<input type="submit" name="save" value="', $txt['themeadmin_list_reset_go'], '" class="right_submit" />
+			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+			<input type="hidden" name="', $context['admin-tl_token_var'], '" value="', $context['admin-tl_token'], '" />
 		</form>
 	</div>';
+	addInlineJavascript('
+		initDeleteThemes();', true);
 }
 
 /**
