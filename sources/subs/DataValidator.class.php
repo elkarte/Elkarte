@@ -330,12 +330,9 @@ class Data_Validator
 					// Defined method to use?
 					if (is_callable(array($this, $validation_method)))
 						$result = $this->$validation_method($field, $input, $validation_parameters);
-					// One of our static methods
-					elseif (strpos($validation_function, '::') !== false && is_callable($validation_function) && isset($input[$field]))
-						$result = call_user_func_array($validation_method, array_merge((array) $input[$field], $validation_parameters_function));
-					// Maybe even a function?
-					elseif (function_exists($validation_function) && isset($input[$field]))
-						$result = call_user_func_array($validation_function, array_merge((array) $input[$field], $validation_parameters_function));
+					// Maybe even a custom function set up like a defined one, addons can do this.
+					elseif (is_callable($validation_function) && strpos($validation_function, 'validate_') === 0 && isset($input[$field]))
+						$result = call_user_func_array($validation_function, array_merge((array) $field, (array) $input[$field], $validation_parameters_function));
 					else
 						$result = array(
 							'field' => $validation_method,
@@ -460,11 +457,8 @@ class Data_Validator
 					// Defined method to use?
 					if (is_callable(array($this, $sanitation_method)))
 						$input[$field] = $this->$sanitation_method($input[$field], $sanitation_parameters);
-					// One of our static methods
-					elseif (strpos($sanitation_function, '::') !== false && is_callable($sanitation_function))
-						$input[$field] = call_user_func_array($sanitation_function, array_merge((array) $input[$field], $sanitation_parameters_function));
-					// Maybe even a built in php function like strtoupper, intval, etc?
-					elseif (function_exists($sanitation_function))
+					// One of our static methods or even a built in php function like strtoupper, intval, etc?
+					elseif (is_callable($sanitation_function))
 						$input[$field] = call_user_func_array($sanitation_function, array_merge((array) $input[$field], $sanitation_parameters_function));
 					// Or even a language construct?
 					elseif (in_array($sanitation_function, array('empty', 'array', 'isset')))
