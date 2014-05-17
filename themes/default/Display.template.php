@@ -784,7 +784,7 @@ function template_pages_and_buttons_below()
 	// Tooltips for likes
 	echo '
 			<script><!-- // --><![CDATA[
-				$(".like_button, .unlike_button").SiteTooltip({hoverIntent: {sensitivity: 10, interval: 150, timeout: 50}});
+				$(".like_button, .unlike_button, .likes_button").SiteTooltip({hoverIntent: {sensitivity: 10, interval: 150, timeout: 50}});
 			// ]]></script>';
 }
 
