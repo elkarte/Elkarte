@@ -96,11 +96,9 @@
 				$(params.elem).html('&nbsp;' + params.text);
 				$(params.elem).attr('title', params.title);
 
-				// The parent button class, to control border color etc
-				if (params.action === 'unlikepost' && params.count === 0)
-					$(params.elem).parent().removeClass('liked');
-				else if (params.action === 'likepost' && params.count === 1)
-					$(params.elem).parent().addClass('liked');
+				// Update the count bubble if needed
+				if (params.count !== 0)
+					$(params.elem).html('<span class="likes_indicator">' + params.count + '</span>&nbsp;' + params.text);
 
 				// Changed the title text, update the tooltips
 				$("." + nextClass).SiteTooltip({

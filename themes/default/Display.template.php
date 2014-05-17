@@ -271,14 +271,19 @@ function template_messages()
 			if ($message['can_like'] || $message['can_unlike'])
 				echo '
 							<li class="listlevel1', !empty($message['like_counter']) ? ' liked"' : '"' ,'>
-								<a class="linklevel1 ', $message['can_unlike'] ? 'unlike_button' : 'like_button', '" href="javascript:void(0)" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" onclick="likePosts.prototype.likeUnlikePosts(event,', $message['id'],', ',$context['current_topic'],'); return false;">', !empty($message['like_counter']) ? '&nbsp;' . $message['like_counter'] . '&nbsp;' . $txt['likes'] : $txt['like_post'], '
+								<a class="linklevel1 ', $message['can_unlike'] ? 'unlike_button' : 'like_button', '" href="javascript:void(0)" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" onclick="likePosts.prototype.likeUnlikePosts(event,', $message['id'],', ',$context['current_topic'],'); return false;">',
+									!empty($message['like_counter']) ? '<span class="likes_indicator">' . $message['like_counter'] . '</span>' . $txt['likes'] : $txt['like_post'], '
 								</a>
 							</li>';
 
 			// Or just view the count
 			else
 				echo '
-							<li class="listlevel1', !empty($message['like_counter']) ? ' liked"' : '"', '><a href="javascript:void(0)" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 likes_button">', !empty($message['like_counter']) ? '&nbsp;' . $message['like_counter'] . '&nbsp;' . $txt['likes'] : '&nbsp;', '</a></li>';
+							<li class="listlevel1', !empty($message['like_counter']) ? ' liked"' : '"', '>
+								<a href="javascript:void(0)" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 likes_button">',
+									!empty($message['like_counter']) ? '<span class="likes_indicator">' . $message['like_counter'] . '</span>' . $txt['likes'] : '&nbsp;', '
+								</a>
+							</li>';
 		}
 
 		// Can the user quick modify the contents of this post?  Show the quick (inline) modify button.
