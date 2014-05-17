@@ -2400,7 +2400,7 @@ function censorText(&$text, $force = false)
 	static $censor_vulgar = null, $censor_proper = null;
 
 	// Are we going to censor this string
-	if ((!empty($options['show_no_censored']) && $modSettings['allow_no_censored'] && !$force) || empty($modSettings['censor_vulgar']) || trim($text) === '')
+	if ((!empty($options['show_no_censored']) && !empty($modSettings['allow_no_censored']) && !$force) || empty($modSettings['censor_vulgar']) || trim($text) === '')
 		return $text;
 
 	// If they haven't yet been loaded, load them.
