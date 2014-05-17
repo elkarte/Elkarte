@@ -708,9 +708,9 @@ function template_show_error($error_id)
 		echo '
 								<ul', (isset($error['type']) ? ' class="error"' : ''), ' id="', $error_id, '_list">';
 
-		foreach ($error['errors'] as $key => $error)
+		foreach ($error['errors'] as $key => $err)
 			echo '
-									<li id="', $error_id, '_', $key, '">', $error, '</li>';
+									<li id="', $error_id, '_', $key, '">', $err, '</li>';
 		echo '
 								</ul>';
 	}
