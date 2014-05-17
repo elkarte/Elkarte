@@ -95,8 +95,12 @@ input, button, select, textarea, .editor {
 	background: #fff;
 	color: #666;
 }
-input, button, select, textarea, .editor {
-	font: 90%/130% Helvetica, Arial, "Nimbus Sans L", sans-serif;
+select, input {
+	font: 87.5%/130% Helvetica, Arial, "Nimbus Sans L", sans-serif;
+	height: 26px;
+}
+#chrome select {
+	padding: 2px 2px;
 }
 
 input:hover, textarea:hover, button:hover, select:hover {
@@ -390,7 +394,6 @@ div.bbc_footnotes .meaction {
 	font-weight: bold;
 	color: #a80000;
 }
-
 #search_form .button_submit {
 	font-variant: small-caps;
 	color: #333;
@@ -437,6 +440,12 @@ div.bbc_footnotes .meaction {
 }
 #footer_section a {
 	color: #fff;
+}
+#footer_section .rssfeeds {
+	color: orange;
+	background-color: white;
+	border-radius: 0.3em;
+	text-shadow: 1px 1px 0px #000;
 }
 
 /*	$MENUS		*/

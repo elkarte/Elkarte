@@ -127,8 +127,8 @@ $txt['manage_search'] = 'Suchen';
 $txt['smileys_manage'] = 'Smileys und Nachrichtensymbole';
 $txt['smileys_manage_info'] = 'Installieren Sie neue Smileysätze, fügen Sie neue Smileys zu bestehenden hinzu oder verwalten Sie Ihre Nachrichtensymbole.';
 $txt['package_info'] = 'Installieren Sie mittels dieser Oberfläche neue Funktionen oder verwalten Sie die vorhandenen.';
-$txt['theme_admin'] = 'Themen und Aufbau';
-$txt['theme_admin_info'] = 'Richten Sie neue Themen ein, verwalten Sie sie und legen Sie Ihre Optionen fest oder setzen Sie sie zurück.';
+$txt['theme_admin'] = 'Designeinstellungen';
+$txt['theme_admin_info'] = 'Richten Sie neue Designs ein, verwalten Sie sie und legen Sie Ihre Optionen fest oder setzen Sie sie zurück.';
 $txt['registration_center'] = 'Registrierung';
 $txt['member_center_info'] = 'Betrachten Sie die Mitgliederliste, suchen Sie nach Mitgliedern oder verwalten Sie Freischaltungen und Aktivierungen.';
 

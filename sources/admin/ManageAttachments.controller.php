@@ -1394,12 +1394,10 @@ class ManageAttachments_Controller extends Action_Controller
 				'status' => array(
 					'header' => array(
 						'value' => $txt['attach_dir_status'],
-						'class' => 'centertext',
 					),
 					'data' => array(
 						'db' => 'status',
 						'style' => 'width: 25%;',
-						'class' => 'centertext',
 					),
 				),
 			),
@@ -1408,6 +1406,7 @@ class ManageAttachments_Controller extends Action_Controller
 			),
 			'additional_rows' => array(
 				array(
+					'class' => 'submitbutton',
 					'position' => 'below_table_data',
 					'value' => '
 					<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
@@ -1478,7 +1477,6 @@ class ManageAttachments_Controller extends Action_Controller
 						'data' => array(
 							'db' => 'status',
 							'style' => 'width: 15%;',
-							'class' => 'centertext',
 						),
 					),
 				),
@@ -1487,6 +1485,7 @@ class ManageAttachments_Controller extends Action_Controller
 				),
 				'additional_rows' => array(
 					array(
+						'class' => 'submitbutton',
 						'position' => 'below_table_data',
 						'value' => '<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
 						<input type="submit" name="save2" value="' . $txt['save'] . '" class="right_submit" />

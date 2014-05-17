@@ -179,15 +179,23 @@ input, button, select {
 	padding: 2px 6px;
 	vertical-align: top;
 	font-size: 0.857em;
-	height: 23px;
+	height: 26px;
 }
+/* Special form elements need to be addressed */
+input[type="file"] {
+	height: auto;
+}
+input[type="number"] {
+	padding: 0 0 0 6px;
+}
+
 /* Selects require browser-specific targeting too, unfortunately. */
 select {
-	padding: 1px;
+	padding: 0.25em;
 }
 #chrome select {
 	padding: 2px;
-	height:  1.923em;
+	height: 26px;
 }
 select option {
 	padding: 0 4px;
@@ -213,8 +221,6 @@ select option {
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
 	padding: 2px 6px;
-	font-size: .857em;
-	line-height: 17px;
 	display: inline-block;
 }
 .left_submit, .linkbutton_left {
@@ -236,6 +242,11 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 	border-left: 1px solid #bfbfbf;
 	box-shadow: 1px 1px 2px #e5e5e5;
 }
+.linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
+.linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
+	line-height: 20px;
+	font-size: 0.857em;
+}
 
 /* @todo - A common, tag-agnostic class to hold submit buttons, etc. */
 /* Old markup had crud like <div class="smalltext righttext padding ffs zomg"> */
@@ -244,16 +255,17 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 	text-align: right;
 	padding: 6px 0;
 	overflow: auto;
-	width: 100%;
 }
 #post_confirm_buttons {
 	padding: 0;
 }
 
 /* @todo - Test this out some more. */
-.submitbutton .button_submit, .submitbutton .linkbutton {
+.submitbutton .button_submit, .submitbutton .linkbutton, .submitbutton .right_submit {
 	padding: 2px 6px;
 	vertical-align: middle;
+	margin-right: 0.4em;
+	margin-left: 0.4em;
 }
 /* @todo mostly for those go buttons that don't have a form id */
 .button_submit.submitgo {
@@ -286,8 +298,8 @@ del .bbc_link:link, del .bbc_link:visited {
 	text-decoration: line-through;
 }
 .childboards .new_posts {
-    font-size: 0.857em;
-    padding: 1px 3px 2px;
+	font-size: 0.857em;
+	padding: 1px 3px 2px;
 }
 
 /* Standard horizontal rule.. ([hr], etc.) */
@@ -778,7 +790,7 @@ a.bbc_link {
 	padding: 12px 3px 4px 8px;
 	float: right;
 }
-#search_form  * {
+#search_form * {
 	margin: 0;
 	border-radius: 0;
 	/* Webkit (bleh) fix. */
@@ -882,7 +894,17 @@ a.bbc_link {
 	padding-right: 5px;
 }
 #footer_section .copyright {
-	display: block;
+	display: inline;
+	visibility: visible;
+	font-family: Verdana, Arial, sans-serif;
+	font-size: 0.857em;
+}
+#footer_section .rssfeeds {
+	float: right;
+	padding-top: 2px;
+	width: 21px;
+	margin: auto;
+	text-align: center;
 }
 
 
@@ -1036,8 +1058,8 @@ a.bbc_link {
 	float: none;
 	padding: 1px 0;
 }
-#menu_sidebar  .listlevel1:hover .menulevel2,
-#menu_sidebar  .listlevel1.sfhover .menulevel2 {
+#menu_sidebar .listlevel1:hover .menulevel2,
+#menu_sidebar .listlevel1.sfhover .menulevel2 {
 	top: 0.35em;
 	left: 170px;
 }
@@ -1225,8 +1247,9 @@ a.bbc_link {
 .quotetonew_button:before {background-position: 0 -360px;}
 .like_button:before {background-position: 0 -384px;}
 .unlike_button:before {background-position: 0 -408px;}
-.likes_button:before {background-position: 0 -432px;}
+.star_button:before {background-position: 0 -432px;}
 .quick_edit:before {background-position: 0 -456px;}
+.likes_button:before {background-position: 0 -480px;}
 /* No icon here. */
 .linklevel1.post_options:before,
 .follow_ups .linklevel1:before {
@@ -1241,7 +1264,7 @@ a.bbc_link {
 	padding: 1px 6px 0 6px;
 }
 /* Quickbutton and follow ups drop menus. */
-.quickbuttons .menulevel2, .follow_ups  .menulevel2 {
+.quickbuttons .menulevel2, .follow_ups .menulevel2 {
 	padding: 0.5em;
 	width: auto;
 	text-align: left;
@@ -1261,8 +1284,9 @@ a.bbc_link {
 	padding: 0 6px 0 26px;
 	line-height: 2.1em;
 }
-
-
+.listlevel1.liked a {
+	border-color: green;
+}
 /*	$PAGELINKS	*/
 /* ------------------------------------------------------- */
 
@@ -1298,7 +1322,7 @@ a.bbc_link {
 	padding: 1px 5px;
 }
 
-.pagelinks .current_page  {
+.pagelinks .current_page {
 	display: block;
 	float: left;
 	padding: 1px 8px 1px 8px;
@@ -1432,13 +1456,13 @@ a.bbc_link {
 	background: #fff;
 }
 
-.table_grid  textarea {
+.table_grid textarea {
 	width: 100%;
 }
 .table_grid .statsbar div {
 	display: none;
 }
-.table_grid  textarea {
+.table_grid textarea {
 	width: 100%;
 }
 /* GenericList */
@@ -1498,6 +1522,11 @@ dl.settings dd {
 	padding: 0;
 	width: 55%;
 }
+/* I'm a tad leary of these setting new margins, but this line is here to compress     */
+/* listings in fieldset, like a permissions radio listing, from taking up excess space */
+.settings dd>fieldset dd, .settings dd>fieldset dt {
+	margin: 0;
+}
 dl.settings img {
 	margin: 0 10px 0 0;
 	vertical-align: middle;
@@ -1512,6 +1541,10 @@ dl.settings textarea {
 }
 dl.settings label {
 	vertical-align: top;
+}
+.settings .smalldescription {
+	padding-left: 1em;
+	display: inline-block;
 }
 
 
@@ -1570,7 +1603,7 @@ dl.settings label {
 }
 .board_stats {
 	text-align: right;
-	padding: 1px  0 1px 6px;
+	padding: 1px 0 1px 6px;
 	float: right;
 	min-width: 8.4em;
 }
@@ -1931,10 +1964,10 @@ img.new_posts {
 /* Search results need some help as well */
 /* @todo - Sort markup so this can call above classes. *//*
 .search_results_posts .lockedbg {
-	background:  #efefef url(../images/icons/quick_lock.png) no-repeat 95% 15px;
+	background: #efefef url(../images/icons/quick_lock.png) no-repeat 95% 15px;
 }
 .search_results_posts .stickybg, .search_results_posts .locked_stickybg {
-	background:  #fffee2 url(../images/icons/quick_sticky_lock.png) no-repeat 95% 15px;
+	background: #fffee2 url(../images/icons/quick_sticky_lock.png) no-repeat 95% 15px;
 }*/
 
 #quick_mod_jump_to {
@@ -2161,7 +2194,7 @@ div.core_posts {
 	max-height: 20em;
 }
 /* The visible stuff below the avatar. */
-.poster  .membergroup {
+.poster .membergroup {
 	font-weight: bold;
 }
 /* @todo - Save code by amalgamating common button background declarations. */
@@ -2531,6 +2564,9 @@ ul.post_options li {
 }
 .verification_control_valid {
 	display: none;
+}
+.verification_control .smalltext {
+	margin: 4px 0 8px 0;
 }
 
 /* The event editor section. */
@@ -3514,7 +3550,7 @@ a.help .icon {
 	margin: 0 0 10px;
 	font-size: 1.071em;
 }
-#search_term_input .button_submit  {
+#search_term_input .button_submit {
 	margin: 0 0 2px;
 }
 
@@ -3986,7 +4022,7 @@ dl.no_members {
 		box-shadow: none;
 		border: 1px solid transparent;
 	}
-	#main_menu .linklevel1, #main_menu .linklevel1 a  {
+	#main_menu .linklevel1, #main_menu .linklevel1 a {
 		margin: 0;
 		padding: 0;
 	}

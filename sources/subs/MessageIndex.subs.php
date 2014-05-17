@@ -123,7 +123,7 @@ function messageIndexTopics($id_board, $id_member, $start, $per_page, $sort_by, 
 
 		// Lets take the results
 		while ($row = $db->fetch_assoc($request))
-			$topics[] = $row;
+			$topics[$row['id_topic']] = $row;
 
 		$db->free_result($request);
 	}

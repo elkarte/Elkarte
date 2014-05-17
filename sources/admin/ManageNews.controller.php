@@ -231,11 +231,12 @@ class ManageNews_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'bottom_of_list',
+					'class' => 'submitbutton',
 					'value' => '
 					<input type="submit" name="save_items" value="' . $txt['save'] . '" class="right_submit" />
 					<input type="submit" name="delete_selection" value="' . $txt['editnews_remove_selected'] . '" onclick="return confirm(\'' . $txt['editnews_remove_confirm'] . '\');" class="right_submit" />
 					<span id="moreNewsItems_link" style="display: none;">
-						<a class="linkbutton_right" href="javascript:void(0);" onclick="addAnotherNews(); return false;">' . $txt['editnews_clickadd'] . '</a>
+						<a class="linkbutton" href="javascript:void(0);" onclick="addAnotherNews(); return false;">' . $txt['editnews_clickadd'] . '</a>
 					</span>',
 				),
 			),

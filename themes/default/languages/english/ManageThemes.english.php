@@ -1,13 +1,14 @@
 <?php
 // Version: 1.0; ManageThemes
 
-$txt['themeadmin_explain'] = 'The Initial Theme Settings section permits any site administrators to make a theme the site\'s default theme. Admins can also enable members to select any installed theme for their use and to enable selectable themes. The Install a New Theme section is where the site administration installs a theme.';
 
-$txt['initial_theme_settings'] = 'Initial Theme Settings';
-$txt['theme_allow'] = 'Allow members to select their own themes.';
-$txt['theme_guests'] = 'Overall forum default theme';
+$txt['themeadmin_explain'] = 'Themes are the different looks and feels of your forum. The Global Theme Settings section permits the site administration to select a theme for the site default theme. Admins can also enable members to select any installed theme for their use and to enable selectable themes. The Install a New Theme section is where the site administration installs a theme.';
+$txt['themeadmin_manage'] = 'Manage and Install';
+$txt['theme_forum_theme'] = 'Global Theme Settings';
+$txt['theme_allow'] = 'Allow members to select their own themes:';
+$txt['theme_guests'] = 'Overall forum default theme:';
 $txt['theme_select'] = 'choose...';
-$txt['theme_reset'] = 'Reset all members to this theme:';
+$txt['theme_reset'] = 'Reset all members to the following theme:';
 $txt['theme_nochange'] = 'No change';
 $txt['theme_forum_default'] = 'Forum Default';
 
@@ -52,29 +53,35 @@ $txt['actual_theme_url'] = 'This theme\'s URL: ';
 $txt['actual_images_url'] = 'This theme\'s images URL: ';
 $txt['current_theme_style'] = 'This theme\'s style: ';
 
-$txt['theme_variants_default'] = 'Default theme variant';
-$txt['theme_variants_user_disable'] = 'Disable user variant selection';
+$txt['theme_variants_default'] = 'Default theme variant:';
+$txt['theme_variants_user_disable'] = 'Disable user variant selection:';
 
 $txt['site_slogan'] = 'Site slogan';
 $txt['site_slogan_desc'] = 'Add your own text for a slogan here. It will replace the default logo.';
 $txt['header_layout'] = 'Header layout';
-$txt['header_layout_desc'] = 'This setting allows you to select one of three layouts for the header.
-<br /><strong>Default</strong>: the logo is placed on the right and the name of the community on the left
-<br /><strong>Only logo</strong>: only the logo is displayed, in a centered position
-<br /><strong>Logo on the left</strong>: similar to Default, but with logo and name inverted (i.e. name on the right, logo on the left)';
+$txt['header_layout_desc'] = 'This setting allows you to select one of three layouts for the header:';
+$txt['header_layout_default_name'] = 'Default:';
+$txt['header_layout_default_desc'] = 'the logo is placed on the right and the name of the community on the left.';
+$txt['header_layout_logo_only_name'] = 'Only logo:';
+$txt['header_layout_logo_only_desc'] = 'only the logo is displayed, in a centered position';
+$txt['header_layout_inverted_name'] = 'Logo on the left:';
+$txt['header_layout_inverted_desc'] = 'similar to Default, but with logo and name inverted (i.e. name on the right, logo on the left)';
 $txt['header_layout_default'] = 'Default';
 $txt['header_layout_logo_only'] = 'Only logo';
 $txt['header_layout_inverted'] = 'Logo on the left';
-$txt['forum_width'] = 'Forum width';
+$txt['forum_width'] = 'Forum width:';
 $txt['forum_width_desc'] = 'Set the forum width. Examples: 950px, 80%, 1240px.';
 
 $txt['enable_news'] = 'News line in the forum header';
 $txt['enable_news_off'] = 'Off';
 $txt['enable_news_random'] = 'Random';
 $txt['enable_news_fader'] = 'Fader';
-$txt['enable_news_desc'] = '<strong>Off</strong>: no news shown
-<br /><strong>Random</strong>: one news shown chosen at random
-<br /><strong>Fader</strong>: all the news are displayed sequentially';
+$txt['enable_news_off_name'] = 'Off:';
+$txt['enable_news_off_desc'] = 'no news shown';
+$txt['enable_news_random_name'] = 'Random:';
+$txt['enable_news_random_desc'] = 'one news shown chosen at random';
+$txt['enable_news_fader_name'] = 'Fader:';
+$txt['enable_news_fader_desc'] = 'all the news are displayed sequentially';
 $txt['show_group_key'] = 'Show group key on board index';
 $txt['additional_options_collapsible'] = 'Enable collapsible additional post options';
 $txt['who_display_viewing'] = 'Show who is viewing the board index and posts';
@@ -106,23 +113,24 @@ $txt['theme_options_title'] = 'Change or reset default options';
 
 $txt['themeadmin_title'] = 'Theme Management and Options';
 $txt['themeadmin_description'] = 'Here you can modify the settings for your themes, update theme selections, reset member options, and the like.';
-$txt['themeadmin_admin_desc'] = 'Themes provide the different \'looks and feels\' of your forum. Theme Management and Options allow you to install new site themes, change the default theme, reset all members to use a certain theme, and choose other settings related to theme selection. Remember to look at the theme settings for your different themes for their individual layout options.';
-$txt['themeadmin_list_desc'] = 'From here you can view the list of themes you currently have installed, change their paths and settings, and uninstall them.';
-$txt['themeadmin_reset_desc'] = 'Below you will see an interface to change the current theme-specific options for all your members.  You will only see those themes that have their own set of settings.';
-$txt['themeadmin_edit_desc'] = 'Modify the stylesheet and source code of your installed themes.  Please consult the documentation for more information.';
+$txt['themeadmin_admin_desc'] = 'Themes provide the different \'look and feel\' of your forum. Theme Management and Options allow you to install new site themes, change the default theme, reset all members to use a certain theme, and choose other settings related to theme selection. Remember to look at the theme settings for your different themes for their individual layout options.';
+$txt['themeadmin_list_desc'] = 'In the Theme Settings area you can view the list of themes that you have installed, change their directory paths and settings, and uninstall them.';
+$txt['themeadmin_reset_desc'] = 'In the Member Options area you have the ability to change theme-specific options that affect all members. You will only see those themes that have their own set of option settings.';
+$txt['themeadmin_edit_desc'] = 'In the Modify Themes area you can alter the stylesheet and source code of your installed themes. You will need a basic understanding of CSS and PHP to effectively change a theme and not break your forum at the same time.';
+$txt['themeadmin_modify_styles'] = 'Changing a theme\'s style is risky so be certain of what you are doing. Always have a backup copy of the theme directory that you are working in to use to recover your design from an error. For help with this before you start, visit the <a href="http://www.elkarte.net/index.php" target="_blank" class="new_win">ElkArte Community</a>.';
 
-$txt['themeadmin_list_heading'] = 'Theme Settings Overview';
-$txt['themeadmin_list_tip'] = 'Remember that the layout settings may be different between one theme and another.  Click on the theme\'s names below to set their options, change their directory or URL settings, or to find other options.';
-$txt['themeadmin_list_theme_dir'] = 'Theme directory (templates)';
+$txt['themeadmin_list_heading'] = 'Theme Settings';
+$txt['themeadmin_list_tip'] = 'The layout settings may be different for each installed theme. Edit the installed themes to set their individual options, change their directory or URL settings, or to find other options.';
+$txt['themeadmin_list_theme_dir'] = 'Theme directory: (templates)';
 $txt['themeadmin_list_invalid'] = '(Warning! this path is not correct.)';
-$txt['themeadmin_list_theme_url'] = 'URL to above directory';
-$txt['themeadmin_list_images_url'] = 'URL to images directory';
+$txt['themeadmin_list_theme_url'] = 'URL to above directory:';
+$txt['themeadmin_list_images_url'] = 'URL to images directory:';
 $txt['themeadmin_list_reset'] = 'Reset Theme URLs and Directories';
-$txt['themeadmin_list_reset_dir'] = 'Base path to Themes directory';
-$txt['themeadmin_list_reset_url'] = 'Base URL to the same directory';
+$txt['themeadmin_list_reset_dir'] = 'Base path to Themes directory:';
+$txt['themeadmin_list_reset_url'] = 'Base URL to the same directory:';
 $txt['themeadmin_list_reset_go'] = 'Attempt to reset all themes';
 
-$txt['themeadmin_reset_tip'] = 'Each theme may have its own custom options for selection by your members.  These include things like &quot;quick reply&quot;, avatars and signatures, layout options, and other similar options.  Here you can change the defaults or reset everyone\'s options.<br /><br />Please note that some themes may use the default options, in which case they will not have their own options.';
+$txt['themeadmin_reset_tip'] = 'Each theme may have custom options available for selection by your members. These include options like &quot;quick reply&quot;, avatars, signatures, layout options and other similar options.  This is where you can change the defaults or reset everyone\'s options.<br /><br />Remember: A theme may be designed with some settings as the default in which case you will not see a setting for those options.';
 $txt['themeadmin_reset_defaults'] = 'Configure guest and new user options for this theme';
 $txt['themeadmin_reset_defaults_current'] = 'options currently set.';
 $txt['themeadmin_reset_members'] = 'Change current options for all members using this theme';
@@ -150,7 +158,7 @@ $txt['themeadmin_edit_size'] = 'Size';
 $txt['themeadmin_edit_bytes'] = 'B';
 $txt['themeadmin_edit_kilobytes'] = 'KiB';
 $txt['themeadmin_edit_error'] = 'The file you tried to save generated the following error:';
-$txt['themeadmin_edit_on_line'] = 'Beginning on line';
+$txt['themeadmin_edit_on_line'] = 'Beginning on line:';
 $txt['themeadmin_edit_preview'] = 'Preview';
 $txt['themeadmin_selectable'] = 'Themes the user is permitted to select';
 $txt['themeadmin_themelist_link'] = 'Show the list of installed themes';

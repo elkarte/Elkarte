@@ -171,7 +171,7 @@ function create_control_richedit($editorOptions)
 
 		// Mentions?
 		if (!empty($context['mentions_enabled']))
-			loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.js', 'mentioning.plugin.js'));
+			loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.min.js', 'mentioning.plugin.js'));
 
 		// Our not so concise shortcut line
 		$context['shortcuts_text'] = $txt['shortcuts' . (!empty($context['drafts_save']) ? '_drafts' : '') . (isBrowser('is_firefox') ? '_firefox' : '')];

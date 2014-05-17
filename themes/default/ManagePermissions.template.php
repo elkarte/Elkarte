@@ -232,18 +232,13 @@ function template_by_board()
 			<h2 class="category_header">', $txt['permissions_boards'], '</h2>
 			<div class="information">
 				', $txt['permissions_boards_desc'], '
-			</div>
-
-			<h3 id="board_permissions" class="category_header flow_hidden">
-				<span class="perm_name floatleft">', $txt['board_name'], '</span>
-				<span class="perm_profile floatleft">', $txt['permission_profile'], '</span>';
+			</div>';
 
 	if (!$context['edit_all'])
 		echo '
-				<a class="edit_all_board_profiles floatright" href="', $scripturl, '?action=admin;area=permissions;sa=board;edit;', $context['session_var'], '=', $context['session_id'], '">', $txt['permissions_board_all'], '</a>';
-
-	echo '
-			</h3>';
+			<div class="content submitbutton">
+				<a class="edit_all_board_profiles linkbutton" href="', $scripturl, '?action=admin;area=permissions;sa=board;edit;', $context['session_var'], '=', $context['session_id'], '">', $txt['permissions_board_all'], '</a>
+			</div>';
 
 	foreach ($context['categories'] as $category)
 	{
@@ -254,7 +249,11 @@ function template_by_board()
 			echo '
 			<div class="windowbg">
 				<div class="content">
-					<ul class="perm_boards flow_hidden">';
+					<ul class="perm_boards flow_hidden">
+						<li class="flow_hidden windowbg">
+				<span class="perm_name floatleft">', $txt['board_name'], '</span>
+				<span class="perm_profile floatleft">', $txt['permission_profile'], '</span>
+						</li>';
 
 		foreach ($category['boards'] as $board)
 		{
@@ -296,14 +295,14 @@ function template_by_board()
 	}
 
 	echo '
-			<div class="content">';
+			<div class="content submitbutton">';
 
 	if ($context['edit_all'])
 		echo '
 				<input type="submit" name="save_changes" value="', $txt['save'], '" class="right_submit" />';
 	else
 		echo '
-				<a class="edit_all_board_profiles linkbutton_right" href="', $scripturl, '?action=admin;area=permissions;sa=board;edit;', $context['session_var'], '=', $context['session_id'], '">', $txt['permissions_board_all'], '</a>
+				<a class="edit_all_board_profiles linkbutton" href="', $scripturl, '?action=admin;area=permissions;sa=board;edit;', $context['session_var'], '=', $context['session_id'], '">', $txt['permissions_board_all'], '</a>
 				<script><!-- // --><![CDATA[
 					initEditProfileBoards();
 				// ]]></script>';

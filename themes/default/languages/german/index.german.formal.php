@@ -692,8 +692,8 @@ $txt['notification_disable_topic'] = 'Sind Sie sich sicher, dass Sie die Benachr
 $txt['report_to_mod'] = 'Beitrag melden';
 $txt['issue_warning_post'] = 'Eine Verwarnung aufgrund dieses Beitrags aussprechen';
 
-$txt['like_post'] = 'Beitrag gefällt mir';
-$txt['unlike_post'] = 'Beitrag gefällt mir nicht mehr';
+$txt['like_post'] = 'Gefällt mir';
+$txt['unlike_post'] = 'Gefällt mir nicht mehr';
 $txt['likes'] = 'gefällt\'s'; // ? :-)
 $txt['liked_by'] = 'Gefällt diesen Benutzern:';
 $txt['liked_you'] = 'Ihnen';

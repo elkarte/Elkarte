@@ -278,6 +278,7 @@ class Modlog_Controller extends Action_Controller
 			),
 			'additional_rows' => array(
 				array(
+					'class' => 'submitbutton',
 					'position' => 'below_table_data',
 					'value' => '
 						<div id="quick_log_search">
@@ -288,7 +289,6 @@ class Modlog_Controller extends Action_Controller
 							<input type="submit" name="remove" value="' . $txt['modlog_remove'] . '" onclick="return confirm(\'' . $txt['modlog_remove_selected_confirm'] . '\');" class="right_submit" />
 							<input type="submit" name="removeall" value="' . $txt['modlog_removeall'] . '" onclick="return confirm(\'' . $txt['modlog_remove_all_confirm'] . '\');" class="right_submit" />' : '') . '
 						</div>',
-					'class' => 'floatright',
 				),
 			),
 		);

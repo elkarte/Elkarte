@@ -1,13 +1,14 @@
 <?php
 // Version: 1.0; ManageThemes
 
-$txt['themeadmin_explain'] = 'Der Bereich für die anfänglichen Designeinstellungen erlaubt es allen Administratoren, ein Design zum Standarddesign des Forums zu machen. Admins können auch Mitgliedern erlauben, jegliches installierte Design zur Verwendung auszuwählen und zu aktivieren. Der Bereich "Ein neues Design installieren" dient der Installation neuer Designs.';
 
-$txt['initial_theme_settings'] = 'Anfängliche Designeinstellungen';
-$txt['theme_allow'] = 'Mitgliedern die Auswahl eigener Designs erlauben.';
-$txt['theme_guests'] = 'Globales Standarddesign';
+$txt['themeadmin_explain'] = 'Die globalen Designeinstellungen erlauben es allen Administratoren, ein Design zum Standarddesign des Forums zu machen. Admins können auch Mitgliedern erlauben, jegliches installierte Design zur Verwendung auszuwählen und zu aktivieren. Der Bereich "Ein neues Design installieren" dient der Installation neuer Designs.';
+$txt['themeadmin_manage'] = 'Verwalten und installieren';
+$txt['theme_forum_theme'] = 'Globale Designeinstellungen';
+$txt['theme_allow'] = 'Mitgliedern die Auswahl eigener Designs erlauben:';
+$txt['theme_guests'] = 'Globales Standarddesign:';
 $txt['theme_select'] = 'auswählen...';
-$txt['theme_reset'] = 'Alle auf dieses Design zurücksetzen:';
+$txt['theme_reset'] = 'Alle auf folgendes Design zurücksetzen:';
 $txt['theme_nochange'] = 'Keine Änderung';
 $txt['theme_forum_default'] = 'Forumsstandard';
 
@@ -51,29 +52,36 @@ $txt['actual_theme_url'] = 'URL des Designs: ';
 $txt['actual_images_url'] = 'Grafiken-URL des Designs: ';
 $txt['current_theme_style'] = 'Stil des Designs: ';
 
-$txt['theme_variants_default'] = 'StandardDesignsvariante';
-$txt['theme_variants_user_disable'] = 'Benutzerseitige Auswahl der Varianten deaktivieren';
+$txt['theme_variants_default'] = 'Standarddesignvariante:';
+$txt['theme_variants_user_disable'] = 'Benutzerseitige Auswahl der Varianten deaktivieren:';
 
 $txt['site_slogan'] = 'Seitenmotto'; // ? :)
 $txt['site_slogan_desc'] = 'Fügen Sie hier Ihren eigenen Text als Motto ein. Er wird das Standardlogo ersetzen.';
+
 $txt['header_layout'] = 'Kopfzeilenaufteilung';
-$txt['header_layout_desc'] = 'Diese Einstellung ermöglicht es Ihnen, eine von drei Aufteilungen für die Kopfzeile auszuwählen.
-<br /><strong>Standard</strong>: das Logo wird rechts und der Name des Forums links platziert
-<br /><strong>Nur Logo</strong>: nur das Logo wird angezeigt und mittig angeordnet
-<br /><strong>Logo links</strong>: ähnlich dem Standard, aber umgekehrte Reihenfolge (also Logo links, Name rechts)';
+$txt['header_layout_desc'] = 'Diese Einstellung ermöglicht es Ihnen, eine von drei Aufteilungen für die Kopfzeile auszuwählen:';
+$txt['header_layout_default_name'] = 'Standard:';
+$txt['header_layout_default_desc'] = 'das Logo wird rechts und der Name des Forums links platziert.';
+$txt['header_layout_logo_only_name'] = 'Nur Logo:';
+$txt['header_layout_logo_only_desc'] = 'nur das Logo wird angezeigt und mittig angeordnet';
+$txt['header_layout_inverted_name'] = 'Logo links:';
+$txt['header_layout_inverted_desc'] = 'ähnlich dem Standard, aber umgekehrte Reihenfolge (also Logo links, Name rechts)';
 $txt['header_layout_default'] = 'Standard';
 $txt['header_layout_logo_only'] = 'Nur Logo';
 $txt['header_layout_inverted'] = 'Logo links';
-$txt['forum_width'] = 'Breite des Forums';
+$txt['forum_width'] = 'Breite des Forums:';
 $txt['forum_width_desc'] = 'Legt die Breite des Forums fest. Beispiele: 950px, 80%, 1240px.';
 
 $txt['enable_news'] = 'Neuigkeiten in der Kopfzeile';
 $txt['enable_news_off'] = 'Aus';
 $txt['enable_news_random'] = 'Zufällig';
 $txt['enable_news_fader'] = 'Einblenden';
-$txt['enable_news_desc'] = '<strong>Aus</strong>: keine Neuigkeiten angezeigt
-<br /><strong>Zufällig</strong>: es wird eine zufällig ausgewählte Neuigkeit angezeigt
-<br /><strong>Einblenden</strong>: alle Neuigkeiten werden nacheinander angezeigt';
+$txt['enable_news_off_name'] = 'Aus:';
+$txt['enable_news_off_desc'] = 'keine Neuigkeiten angezeigt';
+$txt['enable_news_random_name'] = 'Zufällig:';
+$txt['enable_news_random_desc'] = 'es wird eine zufällig ausgewählte Neuigkeit angezeigt';
+$txt['enable_news_fader_name'] = 'Einblenden:';
+$txt['enable_news_fader_desc'] = 'alle Neuigkeiten werden nacheinander angezeigt';
 $txt['show_group_key'] = 'Gruppenschlüssel auf der Startseite anzeigen'; // ? :)
 $txt['additional_options_collapsible'] = 'Ausklappbare weitere Beitragsoptionen aktivieren';
 $txt['who_display_viewing'] = 'Anzeigen, wer die Startseite und Beiträge ansieht';
@@ -106,22 +114,23 @@ $txt['theme_options_title'] = 'Standardoptionen ändern oder zurücksetzen';
 $txt['themeadmin_title'] = 'Designeinstellungen und -optionen';
 $txt['themeadmin_description'] = 'Hier können Sie die Einstellungen Ihrer Designs ändern, die Designsauswahö anpassen, Mitgliederoptionen zurücksetzen und dergleichen.';
 $txt['themeadmin_admin_desc'] = 'Designs stellen die verschiedenen Aussehen Ihres Forums bereit. Designeinstellungen und -optionen erlauben es Ihnen, neue Designs zu installieren, das Standarddesign zu ändern, alle Mitglieder auf ein bestimmtes Design zurückzusetzen und weitere Einstellungen hinsichtlich der Designauswahl vorzunehmen. Denken Sie daran, die Designeinstellungen Ihrer verschiedenen Designs auf ihre jeweiligen Darstellungsoptionen zu prüfen.';
-$txt['themeadmin_list_desc'] = 'Von hier aus können Sie die Liste installierter Designs einsehen, deren Pfade und Einstellungen ändern und sie deinstallieren.';
-$txt['themeadmin_reset_desc'] = 'Unten haben Sie die Möglichkeit, die aktuellen Designsspezifischen Optionen für all Ihre Mitglieder zu übernehmen.  Sie sehen nur die Designs, die eigene Einstellungsmöglichkeiten besitzen.';
-$txt['themeadmin_edit_desc'] = 'Ändern Sie den Stil und den Quellcode Ihrer installierten Designs.  Bitte ziehen Sie für weitere Informationen die Dokumentation zu Rate.';
+$txt['themeadmin_list_desc'] = 'In den Designeinstellungen können Sie die Liste installierter Designs einsehen, deren Pfade und Einstellungen ändern und sie deinstallieren.';
+$txt['themeadmin_reset_desc'] = 'In den Mitgliederoptionen haben Sie die Möglichkeit, die aktuellen designspezifischen Optionen für all Ihre Mitglieder zu übernehmen.  Sie sehen nur die Designs, die eigene Einstellungsmöglichkeiten besitzen.';
+$txt['themeadmin_edit_desc'] = 'Im Bereich zum Anpassen des Designs können Sie den Stil und den Quellcode Ihrer installierten Designs ändern. Sie werden ein grundlegendes Verständnis von CSS und PHP benötigen, um ein Design wirksam zu ändern und dabei nicht Ihr Forum kaputtzumachen.';
+$txt['themeadmin_modify_styles'] = 'Es ist riskant, den Stil eines Designs zu ändern, seien Sie sich daher im Klaren darüber, was Sie tun. Halten Sie stets eine Sicherheitskopie des Designverzeichnisses, in dem Sie arbeiten, parat, um mithilfe ihrer einen Fehler rückgängig zu machen. Für Hilfe hierbei besuchen Sie bitte die <a href="http://www.elkarte.net/index.php" target="_blank" class="new_win">ElkArte-Gemeinschaft</a>, bevor Sie anfangen.';
 
-$txt['themeadmin_list_heading'] = 'Designseinstellungen - Übersicht';
-$txt['themeadmin_list_tip'] = 'Denken Sie daran, dass die Darstellungseinstellungen zwischen verschiedenen Designs variieren können.  Klicken Sie unten auf den Namen eines Designs, um sein Verzeichnis oder seine URL-Einstellungen zu ändern oder weitere Optionen zu sehen.';
-$txt['themeadmin_list_theme_dir'] = 'Designsverzeichnis (Vorlagen)';
+$txt['themeadmin_list_heading'] = 'Designeinstellungen';
+$txt['themeadmin_list_tip'] = 'Die Darstellungseinstellungen können zwischen verschiedenen Designs variieren. Bearbeiten Sie ein installiertes Design, um sein Verzeichnis oder seine URL-Einstellungen zu ändern oder weitere Optionen zu sehen.';
+$txt['themeadmin_list_theme_dir'] = 'Designsverzeichnis: (Vorlagen)';
 $txt['themeadmin_list_invalid'] = '(Warnung: Dieser Pfad ist nicht korrekt!)';
-$txt['themeadmin_list_theme_url'] = 'URL zu obigem Verzeichnis';
-$txt['themeadmin_list_images_url'] = 'URL zum Grafikverzeichnis';
+$txt['themeadmin_list_theme_url'] = 'URL zu obigem Verzeichnis:';
+$txt['themeadmin_list_images_url'] = 'URL zum Grafikverzeichnis:';
 $txt['themeadmin_list_reset'] = 'Designs-URLs und -verzeichnisse zurücksetzen';
-$txt['themeadmin_list_reset_dir'] = 'Basispfad zum Designsverzeichnis';
-$txt['themeadmin_list_reset_url'] = 'Basis-URL zu demselben Verzeichnis';
+$txt['themeadmin_list_reset_dir'] = 'Basispfad zum Designsverzeichnis:';
+$txt['themeadmin_list_reset_url'] = 'Basis-URL zu demselben Verzeichnis:';
 $txt['themeadmin_list_reset_go'] = 'Alle Designs zurücksetzen';
 
-$txt['themeadmin_reset_tip'] = 'Jedes Design kann seine eigenen Optionen haben, die von Mitglieder geändert werden können.  Dazu gehören Dinge wie &quot;Schnellantwort&quot;, Avatare und Signaturen, Darstellungs- und ähnliche Optionen.  Hier können Sie die Standardwerte ändern oder die Optionen aller Benutzer zurücksetzen.<br /><br />Bitte beachten Sie, dass einige Designs die Standardoptionen nutzen könnten, weshalb sie keine eigenen Optionen besitzen.';
+$txt['themeadmin_reset_tip'] = 'Jedes Design kann seine eigenen Optionen haben, die von Mitglieder geändert werden können.  Dazu gehören Dinge wie &quot;Schnellantwort&quot;, Avatare, Signaturen, Darstellungs- und ähnliche Optionen.  Hier können Sie die Standardwerte ändern oder die Optionen aller Benutzer zurücksetzen.<br /><br />Denken Sie daran: Ein Design könnte einige Standardeinstellungen haben; in diesem Fall sehen Sie keine Einstellung für diese Optionen.';
 $txt['themeadmin_reset_defaults'] = 'Dieses Design für Gäste und neue Mitglieder einstellen.';
 $txt['themeadmin_reset_defaults_current'] = 'Optionen derzeit gesetzt.'; // ?
 $txt['themeadmin_reset_members'] = 'Aktuelle Optionen für alle Benutzer einstellen, die dieses Design verwenden';
@@ -149,7 +158,7 @@ $txt['themeadmin_edit_size'] = 'Größe';
 $txt['themeadmin_edit_bytes'] = 'B';
 $txt['themeadmin_edit_kilobytes'] = 'KiB';
 $txt['themeadmin_edit_error'] = 'Die Datei, die Sie zu speichern versuchten, erzeugte folgenden Fehler:';
-$txt['themeadmin_edit_on_line'] = 'Ab Zeile';
+$txt['themeadmin_edit_on_line'] = 'Ab Zeile:';
 $txt['themeadmin_edit_preview'] = 'Vorschau';
 $txt['themeadmin_selectable'] = 'Designs, aus denen ein Benutzer auswählen darf';
 $txt['themeadmin_themelist_link'] = 'Liste der installierten Designs anzeigen';

@@ -421,7 +421,6 @@ div.bbc_footnotes .meaction{
 	color: #333;
 }
 #search_form select {
-	padding-right: 4px;
 	border: 1px solid #afafaf;
 	border-right: none;
 	opacity: 0.8;
@@ -485,6 +484,12 @@ div.bbc_footnotes .meaction{
 }
 #footer_section p, #footer_section a {
 	color: #bbb;
+}
+#footer_section .rssfeeds {
+	color: orange;
+	background-color: white;
+	border-radius: 0.3em;
+	text-shadow: 1px 1px 0px #000;
 }
 
 #debug_logging a, #debug_logging strong {

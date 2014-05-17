@@ -692,8 +692,8 @@ $txt['notification_disable_topic'] = 'Are you sure you wish to disable notificat
 $txt['report_to_mod'] = 'Report Post';
 $txt['issue_warning_post'] = 'Issue a warning because of this message';
 
-$txt['like_post'] = 'Like Post';
-$txt['unlike_post'] = 'Unlike Post';
+$txt['like_post'] = 'Like';
+$txt['unlike_post'] = 'Unlike';
 $txt['likes'] = 'Likes';
 $txt['liked_by'] = 'Liked by:';
 $txt['liked_you'] = 'You';

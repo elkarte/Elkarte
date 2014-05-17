@@ -1035,6 +1035,7 @@ class ManageFeatures_Controller extends Action_Controller
 			),
 			'additional_rows' => array(
 				array(
+					'class' => 'submitbutton',
 					'position' => 'below_table_data',
 					'value' => '<input type="submit" name="onoff" value="' . $txt['save'] . '" class="right_submit" />
 					<input type="submit" name="new" value="' . $txt['custom_profile_make_new'] . '" class="right_submit" />',

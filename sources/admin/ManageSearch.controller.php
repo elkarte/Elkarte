@@ -419,7 +419,7 @@ class ManageSearch_Controller extends Action_Controller
 	 */
 	public function action_create()
 	{
-		global $modSettings, $context, $txt;
+		global $modSettings, $context, $txt, $db_show_debug;
 
 		// Scotty, we need more time...
 		@set_time_limit(600);

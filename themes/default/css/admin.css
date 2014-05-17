@@ -147,16 +147,14 @@ fieldset dl {
 #quick_search {
 	font-size: 0.857em;
 }
-/* Chrome fix. */
 #quick_search .icon, #quick_search .input_text,
 #quick_search select, #quick_search .button_submit {
 	float: left;
-	margin: 2px 0 0 4px;
+	margin: 3px 0 0 4px;
 }
 #quick_search .icon {
 	margin: 8px 0 0 0;
 }
-
 /* @todo - The welcome thingy. */
 #admincenter .roundframe, #modcenter .roundframe {
 	background: none;
@@ -755,7 +753,7 @@ ul.pending_payments {
 	margin: 0 0 0.6em 0;
 }
 .perm_boards li {
-	padding: 0.2em;
+	padding: 0.3em 0.5em;
 	margin: 1px;
 }
 .perm_classic {

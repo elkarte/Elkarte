@@ -1729,7 +1729,7 @@ function getBasicMemberData($member_ids, $options = array())
 		FROM {db_prefix}members
 		WHERE id_member IN ({array_int:member_list})
 		' . (isset($options['sort']) ? '
-		ORDER BY {string:sort}' : '') . '
+		ORDER BY {raw:sort}' : '') . '
 		LIMIT {int:limit}',
 		array(
 			'member_list' => $member_ids,

@@ -1475,8 +1475,6 @@ class ScheduledTask
 		}
 		else
 		{
-			$start = !empty($modSettings['user_access_mentions']) ? $modSettings['user_access_mentions'] : 0;
-
 			// Checks 10 users at a time, the scheduled task is set to run once per hour, so 240 users a day
 			// @todo <= I know you like it Spuds! :P It may be necessary to set it to something higher.
 			$limit = 10;
