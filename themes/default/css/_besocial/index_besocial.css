@@ -659,6 +659,19 @@ a.active {
 	top: -5px;
 	left: -1px;
 }
+.likes_indicator {
+	position: absolute;
+	top: -1em;
+	right: -0.5em;
+	background: #f3b200;
+	color: #fff;
+	padding: 0 0.6em;
+	border-radius: 4px;
+	box-shadow: 1px 1px 1px #444;
+	font-weight: bold;
+	font-size: 0.786em;
+	line-height: 1.4em;
+}
 
 /* Levels 2 and 3: drop menu wrapper. */
 .menulevel2, .menulevel3 {
