@@ -61,7 +61,7 @@ if (!defined('ELK'))
  * Current validation can be one or a combination of:
  *    max_length[x], min_length[x], length[x],
  *    alpha, alpha_numeric, alpha_dash
- *    numeric, integer, boolean, float, notequal[x,y,z], is_array, limits[min,max]
+ *    numeric, integer, boolean, float, notequal[x,y,z], isarray, limits[min,max]
  *    valid_url, valid_ip, valid_ipv6, valid_email, valid_color
  *    php_syntax, contains[x,y,x], required, without[x,y,z]
  */
@@ -750,58 +750,12 @@ class Data_Validator
 			return;
 
 		$valid = true;
-		$at_index = strrpos($input[$field], '@');
 
-		// No @ in the email
-		if ($at_index === false)
+		// Quick check, no @ in the email
+		if (strrpos($input[$field], '@') === false)
 			$valid = false;
 		else
-		{
-			// Time to do some checking on the local@domain parts
-			// http://www.linuxjournal.com/article/9585
-			$local = substr($input[$field], 0, $at_index);
-			$local_len = strlen($local);
-
-			$domain = substr($input[$field], $at_index + 1);
-			$domain_len = strlen($domain);
-
-			/* Some RFC 2822 email "rules" ...
-			 * - Uppercase and lowercase English letters (a–z, A–Z)
-			 * - Digits 0 to 9
-			 * - Characters !#$%&'*+-/=?^_`{|}~
-			 * - Character . provided that it is not the first/last and that it does not appear two or more times consecutively
-			 * - Special characters Space "(),:;<>@[\] provided they are contained between quotation marks, and that 2 of them, the
-			 *   backslash \ and quotation mark ", must also be preceded by a backslash \ (e.g. "\\\"").
-			 */
-
-			// local part length problems (RFC 2821)
-			if ($local_len === 0 || $local_len > 64)
-				$valid = false;
-			// local part starts or ends with a '.' (RFC 2822)
-			elseif ($local[0] === '.' || $local[$local_len - 1] === '.')
-				$valid = false;
-			// local part has two consecutive dots (RFC 2822)
-			elseif (preg_match('~\\.\\.~', $local))
-				$valid = false;
-			// domain part length problems (RFC 2821)
-			elseif ($domain_len === 0 || $domain_len > 255)
-				$valid = false;
-			// domain does not have a least two parts
-			elseif (strpos($domain, '.') === false)
-				$valid = false;
-			// character not valid in domain part (RFC 1035)
-			elseif (!preg_match('~^[A-Za-z0-9\\-\\.]+$~', $domain))
-				$valid = false;
-			// domain part has two consecutive dots (RFC 1035)
-			elseif (preg_match('~\\.\\.~', $domain))
-				$valid = false;
-			// character not valid in local part unless local part is quoted (RFC 2822)
-			elseif (!preg_match('/^(\\\\.|[A-Za-z0-9!#%&`_=\\/$\'*+?^{}|~.-])+$/', str_replace("\\\\", "", $local)))
-			{
-				if (!preg_match('/^"(\\\\"|[^"])+"$/', str_replace("\\\\", "", $local)))
-					$valid = false;
-			}
-		}
+			$valid = filter_var($input[$field], FILTER_VALIDATE_EMAIL) !== false;
 
 		if ($valid)
 			return;
@@ -1131,7 +1085,7 @@ class Data_Validator
 		if (!isset($input[$field]))
 			return;
 
-		if (preg_match('~^((([0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){6}:[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){5}:([0-9A-Fa-f]{1,4}:)?[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){4}:([0-9A-Fa-f]{1,4}:){0,2}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){3}:([0-9A-Fa-f]{1,4}:){0,3}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){2}:([0-9A-Fa-f]{1,4}:){0,4}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){6}((\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b)\.){3}(\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b))|(([0-9A-Fa-f]{1,4}:){0,5}:((\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b)\.){3}(\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b))|(::([0-9A-Fa-f]{1,4}:){0,5}((\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b)\.){3}(\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b))|([0-9A-Fa-f]{1,4}::([0-9A-Fa-f]{1,4}:){0,5}[0-9A-Fa-f]{1,4})|(::([0-9A-Fa-f]{1,4}:){0,6}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){1,7}:))$~', $input[$field]) === 0)
+		if (filter_var($input[$field], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === false)
 		{
 			return array(
 				'field' => $field,
@@ -1156,7 +1110,7 @@ class Data_Validator
 		if (!isset($input[$field]))
 			return;
 
-		if (preg_match('~^((([1]?\d)?\d|2[0-4]\d|25[0-5])\.){3}(([1]?\d)?\d|2[0-4]\d|25[0-5])$~', $input[$field]) === 0)
+		if (filter_var($input[$field], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false)
 		{
 			return array(
 				'field' => $field,
