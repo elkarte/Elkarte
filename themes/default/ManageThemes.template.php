@@ -33,121 +33,119 @@ function template_manage_themes()
 				<h3 class="category_header">
 					<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=theme_forum_theme" onclick="return reqOverlayDiv(this.href);" id="theme_forum_theme" title="', $txt['help'], '"></a> ', $txt['theme_forum_theme'], '
 				</h3>
-				<div class="windowbg2">
-					<div class="content">
-						<dl class="settings">
-							<dt>
-								<label for="options-theme_allow"> ', $txt['theme_allow'], '</label>
-							</dt>
-							<dd>
-								<input type="hidden" value="0" name="options[theme_allow]">
-								<input type="checkbox" name="options[theme_allow]" id="options-theme_allow" value="1"', !empty($modSettings['theme_allow']) ? ' checked="checked"' : '', ' class="input_check" />
-							</dd>
-							<dt>
-								<label for="known_themes_list">', $txt['themeadmin_selectable'], '</label>:
-							</dt>
-							<dd>
-								<fieldset id="known_themes_list">
-									<legend data-collapsed="true">', $txt['themeadmin_themelist_link'], '</legend>
-									<ul id="known_themes_list_ul">';
+				<div class="windowbg2 content">
+					<dl class="settings">
+						<dt>
+							<label for="options-theme_allow"> ', $txt['theme_allow'], '</label>
+						</dt>
+						<dd>
+							<input type="hidden" value="0" name="options[theme_allow]">
+							<input type="checkbox" name="options[theme_allow]" id="options-theme_allow" value="1"', !empty($modSettings['theme_allow']) ? ' checked="checked"' : '', ' class="input_check" />
+						</dd>
+						<dt>
+							<label for="known_themes_list">', $txt['themeadmin_selectable'], '</label>:
+						</dt>
+						<dd>
+							<fieldset id="known_themes_list">
+								<legend data-collapsed="true">', $txt['themeadmin_themelist_link'], '</legend>
+								<ul id="known_themes_list_ul">';
 
 	foreach ($context['themes'] as $theme)
 		echo '
-										<li>
-											<label for="options-known_themes_', $theme['id'], '"><input type="checkbox" name="options[known_themes][]" id="options-known_themes_', $theme['id'], '" value="', $theme['id'], '"', $theme['known'] ? ' checked="checked"' : '', ' class="input_check" /> ', $theme['name'], '</label>
-										</li>';
+									<li>
+										<label for="options-known_themes_', $theme['id'], '"><input type="checkbox" name="options[known_themes][]" id="options-known_themes_', $theme['id'], '" value="', $theme['id'], '"', $theme['known'] ? ' checked="checked"' : '', ' class="input_check" /> ', $theme['name'], '</label>
+									</li>';
 
 	echo '
-									</ul>
-								</fieldset>
-							</dd>
-							<dt>
-								<label for="theme_guests">', $txt['theme_guests'], '</label>
-							</dt>
-							<dd>
-								<select name="options[theme_guests]" id="theme_guests">';
+								</ul>
+							</fieldset>
+						</dd>
+						<dt>
+							<label for="theme_guests">', $txt['theme_guests'], '</label>
+						</dt>
+						<dd>
+							<select name="options[theme_guests]" id="theme_guests">';
 
 	// Put an option for each theme in the select box.
 	foreach ($context['themes'] as $theme)
 		echo '
-									<option value="', $theme['id'], '"', $modSettings['theme_guests'] == $theme['id'] ? ' selected="selected"' : '', '>', $theme['name'], '</option>';
+								<option value="', $theme['id'], '"', $modSettings['theme_guests'] == $theme['id'] ? ' selected="selected"' : '', '>', $theme['name'], '</option>';
 
 	echo '
-								</select>
-								<span class="smalltext pick_theme"><a href="', $scripturl, '?action=theme;sa=pick;u=-1;', $context['session_var'], '=', $context['session_id'], '">', $txt['theme_select'], '</a></span>
-							</dd>
-							<dt>
-								<label for="theme_reset">', $txt['theme_reset'], '</label>
-							</dt>
-							<dd>
-								<select name="theme_reset" id="theme_reset">
-									<option value="-1" selected="selected">', $txt['theme_nochange'], '</option>
-									<option value="0">', $txt['theme_forum_default'], '</option>';
+							</select>
+							<span class="smalltext pick_theme"><a href="', $scripturl, '?action=theme;sa=pick;u=-1;', $context['session_var'], '=', $context['session_id'], '">', $txt['theme_select'], '</a></span>
+						</dd>
+						<dt>
+							<label for="theme_reset">', $txt['theme_reset'], '</label>
+						</dt>
+						<dd>
+							<select name="theme_reset" id="theme_reset">
+								<option value="-1" selected="selected">', $txt['theme_nochange'], '</option>
+								<option value="0">', $txt['theme_forum_default'], '</option>';
 
 	// Same thing, this time for changing the theme of everyone.
 	foreach ($context['themes'] as $theme)
 		echo '
-									<option value="', $theme['id'], '">', $theme['name'], '</option>';
+								<option value="', $theme['id'], '">', $theme['name'], '</option>';
 
 	echo '
-								</select>
-								<span class="smalltext pick_theme"><a href="', $scripturl, '?action=theme;sa=pick;u=0;', $context['session_var'], '=', $context['session_id'], '">', $txt['theme_select'], '</a></span>
-							</dd>
-						</dl>
-						<input type="submit" name="save" value="' . $txt['save'] . '" class="right_submit" />
-						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						<input type="hidden" name="', $context['admin-tm_token_var'], '" value="', $context['admin-tm_token'], '" />
-					</div>
+							</select>
+							<span class="smalltext pick_theme"><a href="', $scripturl, '?action=theme;sa=pick;u=0;', $context['session_var'], '=', $context['session_id'], '">', $txt['theme_select'], '</a></span>
+						</dd>
+					</dl>
+					<input type="submit" name="save" value="' . $txt['save'] . '" class="right_submit" />
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					<input type="hidden" name="', $context['admin-tm_token_var'], '" value="', $context['admin-tm_token'], '" />
 				</div>
 			</form>';
-
-	// Warn them if theme creation isn't possible!
-	if (!$context['can_create_new'])
-		echo '
-			<div class="errorbox">', $txt['theme_install_writable'], '</div>';
 
 	echo '
 			<h3 class="category_header">
 				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=theme_install" onclick="return reqOverlayDiv(this.href);" id="theme_install" title="', $txt['help'], '"></a> ', $txt['theme_install'], '
 			</h3>
 			<form action="', $scripturl, '?action=admin;area=theme;sa=install" method="post" accept-charset="UTF-8" enctype="multipart/form-data" onsubmit="return confirm(\'', $txt['theme_install_new_confirm'], '\');">
-				<div class="windowbg">
-					<div class="content">
-						<dl class="settings">';
+				<div class="windowbg2 content">';
+
+	// Warn them if theme creation isn't possible!
+	if (!$context['can_create_new'])
+		echo '
+					<div class="errorbox">', $txt['theme_install_writable'], '</div>';
+
+	echo '
+					<dl class="settings">';
 
 	// Here's a little box for installing a new theme.
 	if ($context['can_create_new'])
 		echo '
-							<dt>
-								<label for="theme_gz">', $txt['theme_install_file'], '</label>
-							</dt>
-							<dd>
-								<input type="file" name="theme_gz" id="theme_gz" value="theme_gz" size="40" onchange="this.form.copy.disabled = this.value != \'\'; this.form.theme_dir.disabled = this.value != \'\';" class="input_file" />
-							</dd>';
+						<dt>
+							<label for="theme_gz">', $txt['theme_install_file'], '</label>
+						</dt>
+						<dd>
+							<input type="file" name="theme_gz" id="theme_gz" value="theme_gz" size="40" onchange="this.form.copy.disabled = this.value != \'\'; this.form.theme_dir.disabled = this.value != \'\';" class="input_file" />
+						</dd>';
 
 	echo '
-							<dt>
-								<label for="theme_dir">', $txt['theme_install_dir'], '</label>
-							</dt>
-							<dd>
-								<input type="text" name="theme_dir" id="theme_dir" value="', $context['new_theme_dir'], '" size="40" style="width: 70%;" class="input_text" />
-							</dd>';
+						<dt>
+							<label for="theme_dir">', $txt['theme_install_dir'], '</label>
+						</dt>
+						<dd>
+							<input type="text" name="theme_dir" id="theme_dir" value="', $context['new_theme_dir'], '" size="40" style="width: 70%;" class="input_text" />
+						</dd>';
 
 	if ($context['can_create_new'])
 		echo '
-							<dt>
-								<label for="copy">', $txt['theme_install_new'], '</label>
-							</dt>
-							<dd>
-								<input type="text" name="copy" id="copy" value="', $context['new_theme_name'], '" size="40" class="input_text" />
-							</dd>';
+						<dt>
+							<label for="copy">', $txt['theme_install_new'], '</label>
+						</dt>
+						<dd>
+							<input type="text" name="copy" id="copy" value="', $context['new_theme_name'], '" size="40" class="input_text" />
+						</dd>';
 
 	echo '
-						</dl>
-						<input type="submit" name="save" value="', $txt['theme_install_go'], '" class="right_submit" />
-						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						<input type="hidden" name="', $context['admin-tm_token_var'], '" value="', $context['admin-tm_token'], '" />
-					</div>
+					</dl>
+					<input type="submit" name="save" value="', $txt['theme_install_go'], '" class="right_submit" />
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					<input type="hidden" name="', $context['admin-tm_token_var'], '" value="', $context['admin-tm_token'], '" />
 				</div>
 			</form>
 		</div>
