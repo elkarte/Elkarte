@@ -506,7 +506,6 @@ dl.settings dd.questions input {
 
 /* Styles for the manage boards section.
 ------------------------------------------------- */
-
 #manage_boards .windowbg {
 	margin: 0;
 	padding: 0;
@@ -582,13 +581,9 @@ dl.settings dd.questions input {
 #manage_boards .post_group, #manage_boards .regular_members {
 	cursor: help;
 }
-.select_category, .select_all_box {
-	font-style: italic;
-	border-top: 1px dashed #CCCCCC;
-	border-bottom: 1px dashed #CCCCCC;
-}
 .select_all_box {
 	margin-top: 0.5em;
+	padding: 2px 2px 5px 2px;
 }
 .visible_boards .board label,
 .select_all_box label,
@@ -613,12 +608,11 @@ dl.settings dd.questions input {
 /* Styles for the manage smiley section.
 ------------------------------------------------- */
 #smiley_list .imagecolumn {
-padding: 7px 10px;
+	padding: 7px 10px;
 }
 
 /* Styles for the manage members section.
 ------------------------------------------------- */
-
 .msearch_details {
 	display: block;
 	width: 49%;
@@ -736,7 +730,7 @@ dl.settings dd.large_caption {
 #fixed_area {
 	width: 97%;
 }
-ul.pending_payments {
+.pending_payments {
 	margin: 0;
 	padding: 0;
 	line-height: 2em;

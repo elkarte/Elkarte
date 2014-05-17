@@ -128,7 +128,7 @@
 			/**
 			 * private function
 			 *
-			 * Removes the file from the server that was sucesfully uploaded
+			 * Removes the file from the server that was successfully uploaded
 			 *
 			 * @param {object} options
 			 */
@@ -176,8 +176,8 @@
 			 * private function
 			 *
 			 * Creates the status UI for each file dropped
-			 * Initialte as new createStatusbar
-			 * Has the following methods availble to it
+			 * Initiate as new createStatusbar
+			 * Has the following methods available to it
 			 *  - setFileNameSize
 			 *  - setProgress
 			 *  - setAbort
