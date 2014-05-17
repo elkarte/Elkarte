@@ -381,65 +381,56 @@ function template_set_settings()
 	global $context, $scripturl, $txt;
 
 	echo '
-	<div id="admin_form_wrapper">
-		<form action="', $scripturl, '?action=admin;area=theme;sa=list;th=', $context['theme_settings']['theme_id'], '" method="post" accept-charset="UTF-8">
-			<h2 class="category_header">
-				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=theme_settings" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['theme_settings'], ' - ', $context['theme_settings']['name'], '
-			</h2>
-			<br />';
+	<div id="admincenter">
+		<h2 class="category_header">
+			<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=theme_settings" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['theme_settings'], ' - ', $context['theme_settings']['name'], '
+		</h2>
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=theme;sa=list;th=', $context['theme_settings']['theme_id'], '" method="post" accept-charset="UTF-8">';
 
-	// @todo Why can't I edit the default theme popup.
-	if ($context['theme_settings']['theme_id'] != 1)
-		echo '
+	echo '
 			<h3 class="category_header hdicon cat_img_config">
 				', $txt['theme_edit'], '
 			</h3>
-			<div class="windowbg">
-				<div class="content">
-					<ul>
-						<li>
-							<a href="', $scripturl, '?action=admin;area=theme;th=', $context['theme_settings']['theme_id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=edit;filename=index.template.php">', $txt['theme_edit_index'], '</a>
-						</li>
-						<li>
-							<a href="', $scripturl, '?action=admin;area=theme;th=', $context['theme_settings']['theme_id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=browse;directory=css">', $txt['theme_edit_style'], '</a>
-						</li>
-					</ul>
-				</div>
-			</div>';
+			<ul class="windowbg content">
+				<li>
+					<a href="', $scripturl, '?action=admin;area=theme;th=', $context['theme_settings']['theme_id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=edit;filename=index.template.php">', $txt['theme_edit_index'], '</a>
+				</li>
+				<li>
+					<a href="', $scripturl, '?action=admin;area=theme;th=', $context['theme_settings']['theme_id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=browse;directory=css">', $txt['theme_edit_style'], '</a>
+				</li>
+			</ul>';
 
 	echo '
 			<h3 class="category_header hdicon cat_img_config">
 				', $txt['theme_url_config'], '
 			</h3>
-			<div class="windowbg2">
-				<div class="content">
-					<dl class="settings">
-						<dt>
-							<label for="theme_name">', $txt['actual_theme_name'], '</label>
-						</dt>
-						<dd>
-							<input type="text" id="theme_name" name="options[name]" value="', $context['theme_settings']['name'], '" size="32" class="input_text" />
-						</dd>
-						<dt>
-							<label for="theme_url">', $txt['actual_theme_url'], '</label>
-						</dt>
-						<dd>
-							<input type="text" id="theme_url" name="options[theme_url]" value="', $context['theme_settings']['actual_theme_url'], '" size="50" style="max-width: 100%; width: 50ex;" class="input_text" />
-						</dd>
-						<dt>
-							<label for="images_url">', $txt['actual_images_url'], '</label>
-						</dt>
-						<dd>
-							<input type="text" id="images_url" name="options[images_url]" value="', $context['theme_settings']['actual_images_url'], '" size="50" style="max-width: 100%; width: 50ex;" class="input_text" />
-						</dd>
-						<dt>
-							<label for="theme_dir">', $txt['actual_theme_dir'], '</label>
-						</dt>
-						<dd>
-							<input type="text" id="theme_dir" name="options[theme_dir]" value="', $context['theme_settings']['actual_theme_dir'], '" size="50" style="max-width: 100%; width: 50ex;" class="input_text" />
-						</dd>
-					</dl>
-				</div>
+			<div class="windowbg2 content">
+				<dl class="settings">
+					<dt>
+						<label for="theme_name">', $txt['actual_theme_name'], '</label>
+					</dt>
+					<dd>
+						<input type="text" id="theme_name" name="options[name]" value="', $context['theme_settings']['name'], '" size="32" class="input_text" />
+					</dd>
+					<dt>
+						<label for="theme_url">', $txt['actual_theme_url'], '</label>
+					</dt>
+					<dd>
+						<input type="text" id="theme_url" name="options[theme_url]" value="', $context['theme_settings']['actual_theme_url'], '" size="50" style="max-width: 100%; width: 50ex;" class="input_text" />
+					</dd>
+					<dt>
+						<label for="images_url">', $txt['actual_images_url'], '</label>
+					</dt>
+					<dd>
+						<input type="text" id="images_url" name="options[images_url]" value="', $context['theme_settings']['actual_images_url'], '" size="50" style="max-width: 100%; width: 50ex;" class="input_text" />
+					</dd>
+					<dt>
+						<label for="theme_dir">', $txt['actual_theme_dir'], '</label>
+					</dt>
+					<dd>
+						<input type="text" id="theme_dir" name="options[theme_dir]" value="', $context['theme_settings']['actual_theme_dir'], '" size="50" style="max-width: 100%; width: 50ex;" class="input_text" />
+					</dd>
+				</dl>
 			</div>';
 
 	// Do we allow theme variants?
@@ -449,32 +440,30 @@ function template_set_settings()
 			<h3 class="category_header hdicon cat_img_config">
 				', $txt['theme_variants'], '
 			</h3>
-			<div class="windowbg2">
-				<div class="content">
-					<dl class="settings">
-						<dt>
-							<label for="variant">', $txt['theme_variants_default'], '</label>:
-						</dt>
-						<dd>
-							<select id="variant" name="options[default_variant]" onchange="changeVariant(this.value)">';
+			<div class="windowbg2 content">
+				<dl class="settings">
+					<dt>
+						<label for="variant">', $txt['theme_variants_default'], '</label>:
+					</dt>
+					<dd>
+						<select id="variant" name="options[default_variant]" onchange="changeVariant(this.value)">';
 
 		foreach ($context['theme_variants'] as $key => $variant)
 			echo '
-								<option value="', $key, '" ', $context['default_variant'] == $key ? 'selected="selected"' : '', '>', $variant['label'], '</option>';
+							<option value="', $key, '" ', $context['default_variant'] == $key ? 'selected="selected"' : '', '>', $variant['label'], '</option>';
 
 		echo '
-							</select>
-						</dd>
-						<dt>
-							<label for="disable_user_variant">', $txt['theme_variants_user_disable'], '</label>:
-						</dt>
-						<dd>
-							<input type="hidden" name="options[disable_user_variant]" value="0" />
-							<input type="checkbox" name="options[disable_user_variant]" id="disable_user_variant"', !empty($context['theme_settings']['disable_user_variant']) ? ' checked="checked"' : '', ' value="1" class="input_check" />
-						</dd>
-					</dl>
-					<img src="', $context['theme_variants'][$context['default_variant']]['thumbnail'], '" id="variant_preview" alt="" />
-				</div>
+						</select>
+					</dd>
+					<dt>
+						<label for="disable_user_variant">', $txt['theme_variants_user_disable'], '</label>:
+					</dt>
+					<dd>
+						<input type="hidden" name="options[disable_user_variant]" value="0" />
+						<input type="checkbox" name="options[disable_user_variant]" id="disable_user_variant"', !empty($context['theme_settings']['disable_user_variant']) ? ' checked="checked"' : '', ' value="1" class="input_check" />
+					</dd>
+				</dl>
+				<img src="', $context['theme_variants'][$context['default_variant']]['thumbnail'], '" id="variant_preview" alt="" />
 			</div>';
 	}
 
@@ -482,9 +471,8 @@ function template_set_settings()
 			<h3 class="category_header hdicon cat_img_config">
 				', $txt['theme_options'], '
 			</h3>
-			<div class="windowbg">
-				<div class="content">
-					<dl class="settings">';
+			<div class="windowbg2 content">
+				<dl class="settings">';
 
 	foreach ($context['settings'] as $setting)
 	{
@@ -492,110 +480,109 @@ function template_set_settings()
 		if (empty($setting))
 		{
 			echo '
-					</dl>
-					<hr />
-					<dl class="settings">';
+				</dl>
+				<hr />
+				<dl class="settings">';
 		}
 		// A checkbox?
 		elseif ($setting['type'] == 'checkbox')
 		{
 			echo '
-						<dt id="dt_', $setting['id'], '">
-							<label for="', $setting['id'], '">', $setting['label'], '</label>:';
+					<dt id="dt_', $setting['id'], '">
+						<label for="', $setting['id'], '">', $setting['label'], '</label>:';
 
 			if (isset($setting['description']))
-				echo '<br />
-							<span class="smalldescription">', $setting['description'], '</span>';
+				echo '
+						<br /><span class="smalldescription">', $setting['description'], '</span>';
 
 			echo '
-						</dt>
-						<dd id="dd_', $setting['id'], '">
-							<input type="hidden" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" value="0" />
-							<input type="checkbox" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="', $setting['id'], '"', !empty($setting['value']) ? ' checked="checked"' : '', ' value="1" class="input_check" />
-						</dd>';
+					</dt>
+					<dd id="dd_', $setting['id'], '">
+						<input type="hidden" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" value="0" />
+						<input type="checkbox" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="', $setting['id'], '"', !empty($setting['value']) ? ' checked="checked"' : '', ' value="1" class="input_check" />
+					</dd>';
 		}
 		// A textarea?
 		elseif ($setting['type'] == 'textarea')
 		{
 			echo '
-						<dt id="dt_', $setting['id'], '">
-							<label for="', $setting['id'], '">', $setting['label'], '</label>:';
+					<dt id="dt_', $setting['id'], '">
+						<label for="', $setting['id'], '">', $setting['label'], '</label>:';
 
 			if (isset($setting['description']))
-				echo '<br />
-							<span class="smalldescription">', $setting['description'], '</span>';
+				echo '
+						<br /><span class="smalldescription">', $setting['description'], '</span>';
 
 			echo '
-						</dt>
-						<dd id="dd_', $setting['id'], '">
-							<textarea name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="', $setting['id'], '"class="input_textarea">', $setting['value'], '</textarea>
-						</dd>';
+					</dt>
+					<dd id="dd_', $setting['id'], '">
+						<textarea name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="', $setting['id'], '"class="input_textarea">', $setting['value'], '</textarea>
+					</dd>';
 		}
 		// A list with options?
 		elseif ($setting['type'] == 'list')
 		{
 			echo '
-						<dt id="dt_', $setting['id'], '">
-							<label for="', $setting['id'], '">', $setting['label'], '</label>:';
+					<dt id="dt_', $setting['id'], '">
+						<label for="', $setting['id'], '">', $setting['label'], '</label>:';
 
 			if (isset($setting['description']))
 			{
 				if (is_array($setting['description']))
 				{
 					echo '
-							<div class="smalldescription">', $setting['description']['main'], '
-								<dl>';
+						<div class="smalldescription">', $setting['description']['main'], '
+							<dl>';
 					foreach ($setting['description']['options'] as $option)
 						echo '
-									<dt><strong>', $txt[$option[0]], '</strong></dt>
-									<dd>', $txt[$option[1]], '</dd>';
+								<dt><strong>', $txt[$option[0]], '</strong></dt>
+								<dd>', $txt[$option[1]], '</dd>';
 					echo '
-								</dl>
-							</div>';
+							</dl>
+						</div>';
 				}
 				else
-					echo '<br />
-							<span class="smalldescription">', $setting['description'], '</span>';
+					echo '
+						<br /><span class="smalldescription">', $setting['description'], '</span>';
 			}
 
 			echo '
-						</dt>
-						<dd id="dd_', $setting['id'], '">
-							<select name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="', $setting['id'], '">';
+					</dt>
+					<dd id="dd_', $setting['id'], '">
+						<select name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="', $setting['id'], '">';
 
 			foreach ($setting['options'] as $value => $label)
 				echo '
-								<option value="', $value, '"', $value == $setting['value'] ? ' selected="selected"' : '', '>', $label, '</option>';
+							<option value="', $value, '"', $value == $setting['value'] ? ' selected="selected"' : '', '>', $label, '</option>';
 
 			echo '
-							</select>
-						</dd>';
+						</select>
+					</dd>';
 		}
 		// A regular input box, then?
 		else
 		{
 			echo '
-						<dt id="dt_', $setting['id'], '">
-							<label for="', $setting['id'], '">', $setting['label'], '</label>:';
+					<dt id="dt_', $setting['id'], '">
+						<label for="', $setting['id'], '">', $setting['label'], '</label>:';
 
 			if (isset($setting['description']))
-				echo '<br />
-							<span class="smalldescription">', $setting['description'], '</span>';
+				echo '
+						<br /><span class="smalldescription">', $setting['description'], '</span>';
 
 			echo '
-						</dt>
-						<dd id="dd_', $setting['id'], '">
-							<input type="text" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="', $setting['id'], '" value="', $setting['value'], '"', $setting['type'] == 'number' ? ' size="5"' : (empty($setting['size']) ? ' size="40"' : ' size="' . $setting['size'] . '"'), ' class="input_text" />
-						</dd>';
+					</dt>
+					<dd id="dd_', $setting['id'], '">
+						<input type="text" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="', $setting['id'], '" value="', $setting['value'], '"', $setting['type'] == 'number' ? ' size="5"' : (empty($setting['size']) ? ' size="40"' : ' size="' . $setting['size'] . '"'), ' class="input_text" />
+					</dd>';
 		}
 	}
 
 	echo '
-					</dl>
-					<input type="submit" name="save" value="', $txt['save'], '" class="right_submit" />
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-sts_token_var'], '" value="', $context['admin-sts_token'], '" />
-				</div>
+				</dl>
+				<input type="submit" name="save" value="', $txt['save'], '" class="right_submit" />
+				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+				<input type="hidden" name="', $context['admin-sts_token_var'], '" value="', $context['admin-sts_token'], '" />
 			</div>
 		</form>
 	</div>';
