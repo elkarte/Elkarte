@@ -172,15 +172,17 @@ class PostModeration_Controller extends Action_Controller
 				}
 
 				if ($can_add)
+				{
 					$anItem = $context['current_view'] == 'topics' ? $row['id_topic'] : $row['id_msg'];
-				$toAction[] = $anItem;
+					$toAction[] = $anItem;
 
-				// All clear. What have we got now, what, what?
-				$details[$anItem] = array();
-				$details[$anItem]["subject"] = $row['subject'];
-				$details[$anItem]["topic"] = $row['id_topic'];
-				$details[$anItem]["member"] = ($context['current_view'] == 'topics') ? $row['id_member_started'] : $row['id_member'];
-				$details[$anItem]["board"] = $row['id_board'];
+					// All clear. What have we got now, what, what?
+					$details[$anItem] = array();
+					$details[$anItem]["subject"] = $row['subject'];
+					$details[$anItem]["topic"] = $row['id_topic'];
+					$details[$anItem]["member"] = ($context['current_view'] == 'topics') ? $row['id_member_started'] : $row['id_member'];
+					$details[$anItem]["board"] = $row['id_board'];
+				}
 			}
 
 			// If we have anything left we can actually do the approving (etc).
