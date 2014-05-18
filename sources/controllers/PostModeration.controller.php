@@ -42,10 +42,10 @@ class PostModeration_Controller extends Action_Controller
 
 		// Allowed sub-actions, you know the drill by now!
 		$subActions = array(
-			'approve' =>  array($this, 'action_approve'),
-			'attachments' =>  array($this, 'action_unapproved_attachments'),
-			'replies' =>  array($this, 'action_unapproved'),
-			'topics' =>  array($this, 'action_unapproved'),
+			'approve' => array($this, 'action_approve'),
+			'attachments' => array($this, 'action_unapproved_attachments'),
+			'replies' => array($this, 'action_unapproved'),
+			'topics' => array($this, 'action_unapproved'),
 		);
 
 		// Pick something valid...
@@ -178,10 +178,10 @@ class PostModeration_Controller extends Action_Controller
 
 					// All clear. What have we got now, what, what?
 					$details[$anItem] = array();
-					$details[$anItem]["subject"] = $row['subject'];
-					$details[$anItem]["topic"] = $row['id_topic'];
-					$details[$anItem]["member"] = ($context['current_view'] == 'topics') ? $row['id_member_started'] : $row['id_member'];
-					$details[$anItem]["board"] = $row['id_board'];
+					$details[$anItem]['subject'] = $row['subject'];
+					$details[$anItem]['topic'] = $row['id_topic'];
+					$details[$anItem]['member'] = ($context['current_view'] == 'topics') ? $row['id_member_started'] : $row['id_member'];
+					$details[$anItem]['board'] = $row['id_board'];
 				}
 			}
 

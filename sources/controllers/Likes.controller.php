@@ -365,8 +365,8 @@ class Likes_Controller extends Action_Controller
 
 							return $result;'
 						),
-						'class' => "centertext",
-						'style' => "width: 10%",
+						'class' => 'centertext',
+						'style' => 'width: 10%',
 					),
 				),
 			),
@@ -467,8 +467,8 @@ class Likes_Controller extends Action_Controller
 
 							return $result;'
 						),
-						'class' => "centertext",
-						'style' => "width: 10%",
+						'class' => 'centertext',
+						'style' => 'width: 10%',
 					),
 				),
 			),

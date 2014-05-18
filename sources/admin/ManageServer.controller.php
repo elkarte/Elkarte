@@ -478,7 +478,7 @@ class ManageServer_Controller extends Action_Controller
 
 		// We only want it for its body, pigs that we are
 		$info_lines = preg_replace('~^.*<body>(.*)</body>.*$~', '$1', ob_get_contents());
-		$info_lines = explode("\n", strip_tags($info_lines, "<tr><td><h2>"));
+		$info_lines = explode("\n", strip_tags($info_lines, '<tr><td><h2>'));
 		ob_end_clean();
 
 		// Remove things that could be considered sensitive
