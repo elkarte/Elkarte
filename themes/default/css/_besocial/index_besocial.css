@@ -176,6 +176,14 @@ strong {
 	font-weight: bold;
 }
 
+/* need some vertical space between lines in admin section */
+dl.settings dd {
+	float: right;
+    overflow: auto;
+    width: 55%;
+	padding: 1px 0px 0px 4px;
+}
+
 /* @todo - Test this everywhere. */
 .standard_category {
 	border-radius: 4px 4px 0 0;
@@ -243,6 +251,24 @@ strong {
 .table_grid .standard_row.highlight2 {
 	background: #d1e1ef;
 	color: #555;
+}
+
+/* need to squeeze some vertical space in Themes Management
+ * this turned out to be so much more versatile in Themes Management */
+.infobox_theme {
+	padding: 6px 12px;
+	border: 1px solid #ccc;
+	background: #f0f6f0;
+	font-size: 0.938em;
+}
+/* default windowbgs just was not working well in Themes Management 
+ * this is much more versatile. Themers will rejoice ... maybe */
+/* used in Modify Themes and Member Options*/
+.theme_windowbg2 {
+	background-color: #fcfcfc;
+}
+.theme_windowbg {
+	background-color: #f6f6f6;
 }
 
 /* Used for sections that need somewhat larger corners */

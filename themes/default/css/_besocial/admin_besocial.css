@@ -9,17 +9,43 @@
 .description, .information {
 	margin-top: 4px;
 }
+
+/* need to squeeze some vertical space in Themes Management
+ * this turned out to be so much more versatile in Themes Management */
+.infobox_theme {
+	max-height: 15em;
+	overflow: auto;
+	margin: 4px 0 4px 0;
+}
+/* just to be safe */
+#infobox_theme_content {
+	margin: 0;
+	padding: 0;
+}
+/* default windowbgs just was not working well in Themes Management 
+ * this is much more versatile. Themers will rejoice ... maybe */
+/* used in Modify Themes and Member Options*/
+.theme_windowbg2 {
+	margin: 6px 6px;
+}
+.theme_windowbg {
+	margin: 6px 6px;
+}
+
 .popup_window.description {
     margin: 12% auto;
 }
 #support_resources, #credits_sections {
 	margin: 0;
 }
-#manage_boards, #admincenter, h3 + .infobox {
+#manage_boards, h3 + .infobox {
 	margin-top: 12px;
 }
 #admincenter>#admin_form_wrapper {
 	margin-top: 0;
+}
+#admincenter {
+	margin-top: 1px;
 }
 
 /* Styles for the manage boards section.
