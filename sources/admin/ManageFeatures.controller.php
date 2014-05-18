@@ -814,6 +814,8 @@ class ManageFeatures_Controller extends Action_Controller
 			checkSession();
 			validateToken('admin-scp');
 
+			$changes = array();
+
 			// Do the active ones first.
 			$disable_fields = array_flip($standard_fields);
 			if (!empty($_POST['active']))

@@ -676,6 +676,8 @@ class ManageBans_Controller extends Action_Controller
 		// Adding or editing a ban group
 		if (isset($_POST['add_ban']) || isset($_POST['modify_ban']))
 		{
+			$ban_info = array();
+
 			// Let's collect all the information we need
 			$ban_info['id'] = isset($_REQUEST['bg']) ? (int) $_REQUEST['bg'] : 0;
 			$ban_info['is_new'] = empty($ban_info['id']);
@@ -756,7 +758,7 @@ class ManageBans_Controller extends Action_Controller
 		updateBanMembers();
 
 		// Go back to an appropriate spot
-		redirectexit('action=admin;area=ban;sa=' . isset($_POST['add_ban']) ? 'list' : 'edit' . ';bg=' . $ban_group_id);
+		redirectexit('action=admin;area=ban;sa=' . isset($_POST['add_ban']) ? 'list' : 'edit;bg=' . $ban_group_id);
 	}
 
 	/**

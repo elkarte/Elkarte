@@ -653,6 +653,7 @@ class ManageLanguages_Controller extends Action_Controller
 
 		// This will be where we look
 		$lang_dirs = array();
+		$images_dirs = array();
 
 		// Check we have themes with a path and a name - just in case - and add the path.
 		foreach ($themes as $id => $data)
