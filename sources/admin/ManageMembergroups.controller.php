@@ -370,7 +370,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			require_once(SUBSDIR . '/Permission.subs.php');
 
 			loadIllegalPermissions();
-			$id_group = getMaxGroupID() +1;
+			$id_group = getMaxGroupID() + 1;
 			$minposts = !empty($_POST['min_posts']) ? (int) $_POST['min_posts'] : '-1';
 
 			addMembergroup($id_group, $_POST['group_name'], $minposts, $_POST['group_type']);

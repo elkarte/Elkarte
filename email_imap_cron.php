@@ -87,7 +87,7 @@ function postbyemail_imap()
 		foreach ($emails as $email_uid)
 		{
 			// Get the headers and prefetch the body as well to avoid a second request
-			$headers = imap_fetchheader($inbox, $email_uid, FT_PREFETCHTEXT|FT_UID);
+			$headers = imap_fetchheader($inbox, $email_uid, FT_PREFETCHTEXT | FT_UID);
 			$message = imap_body($inbox, $email_uid, FT_UID);
 
 			// Create the save-as email

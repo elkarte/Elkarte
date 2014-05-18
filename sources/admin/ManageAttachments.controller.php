@@ -1172,7 +1172,7 @@ class ManageAttachments_Controller extends Action_Controller
 			}
 
 			// If the user wishes to go back, update the last_dir array
-			if ($_POST['current_dir'] != $modSettings['currentAttachmentUploadDir']&& !empty($modSettings['last_attachments_directory']) && (isset($modSettings['last_attachments_directory'][$_POST['current_dir']]) || isset($modSettings['last_attachments_directory'][0])))
+			if ($_POST['current_dir'] != $modSettings['currentAttachmentUploadDir'] && !empty($modSettings['last_attachments_directory']) && (isset($modSettings['last_attachments_directory'][$_POST['current_dir']]) || isset($modSettings['last_attachments_directory'][0])))
 			{
 				if (!is_array($modSettings['last_attachments_directory']))
 					$modSettings['last_attachments_directory'] = unserialize($modSettings['last_attachments_directory']);
@@ -1688,7 +1688,7 @@ class ManageAttachments_Controller extends Action_Controller
 						</div>';
 
 					// Write it to a file so it can be displayed
-					$fp = fopen(BOARDDIR . '/progress.php', "w");
+					$fp = fopen(BOARDDIR . '/progress.php', 'w');
 					fwrite($fp, $prog_bar);
 					fclose($fp);
 					usleep(500000);

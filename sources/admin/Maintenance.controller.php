@@ -1202,7 +1202,7 @@ class Maintenance_Controller extends Action_Controller
 					'data' => array(
 						'db' => 'hook_name',
 					),
-					'sort' =>  array(
+					'sort' => array(
 						'default' => 'hook_name',
 						'reverse' => 'hook_name DESC',
 					),
@@ -1221,7 +1221,7 @@ class Maintenance_Controller extends Action_Controller
 								return $data[\'real_function\'];
 						'),
 					),
-					'sort' =>  array(
+					'sort' => array(
 						'default' => 'function_name',
 						'reverse' => 'function_name DESC',
 					),
@@ -1233,7 +1233,7 @@ class Maintenance_Controller extends Action_Controller
 					'data' => array(
 						'db' => 'file_name',
 					),
-					'sort' =>  array(
+					'sort' => array(
 						'default' => 'file_name',
 						'reverse' => 'file_name DESC',
 					),
@@ -1257,7 +1257,7 @@ class Maintenance_Controller extends Action_Controller
 						'),
 						'class' => 'centertext',
 					),
-					'sort' =>  array(
+					'sort' => array(
 						'default' => 'status',
 						'reverse' => 'status DESC',
 					),
