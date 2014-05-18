@@ -1277,6 +1277,16 @@ a.bbc_link {
 	right: -1px;
 	left: auto;
 }
+/* Show appropriate like/unlike action */
+.like_button:before, .likes_button:before, .unlike_button:before {
+	background-position: 0 -480px;
+}
+.unlike_button:hover:before {
+	background-position: 0 -408px;
+}
+.like_button:hover:before {
+	background-position: 0 -384px;
+}
 .quickbuttons .listlevel2 {
 	width: 12em;
 }

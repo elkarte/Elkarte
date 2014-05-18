@@ -600,7 +600,7 @@ class Mentions_Controller extends Action_Controller
 		);
 		$validation = array(
 			'id_mention' => 'validate_ownmention',
-			'mark' => 'trim|contains[read,unread,delete]',
+			'mark' => 'contains[read,unread,delete]',
 		);
 
 		$this->_validator->sanitation_rules($sanitization);
