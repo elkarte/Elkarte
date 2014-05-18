@@ -425,8 +425,13 @@ class Maintenance_Controller extends Action_Controller
 
 		$colData = getMessageTableColumns();
 		foreach ($colData as $column)
+		{
 			if ($column['name'] == 'body')
+			{
 				$body_type = $column['type'];
+				break;
+			}
+		}
 
 		$context['convert_to'] = $body_type == 'text' ? 'mediumtext' : 'text';
 
