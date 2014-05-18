@@ -731,9 +731,14 @@ class ManageLanguages_Controller extends Action_Controller
 				unlink(BOARDDIR . '/agreement.' . $context['lang_id'] . '.txt');
 
 			// Fourth, a related images folder?
-			foreach ($images_dirs as $curPath)
-				if (is_dir($curPath))
-					deltree($curPath);
+			if (!empty($images_dirs))
+			{
+				foreach ($images_dirs as $curPath)
+				{
+					if (is_dir($curPath))
+						deltree($curPath);
+				}
+			}
 
 			// Members can no longer use this language.
 			removeLanguageFromMember($context['lang_id']);
