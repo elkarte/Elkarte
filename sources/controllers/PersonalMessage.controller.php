@@ -1527,7 +1527,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Editing a specific rule?
 		if (isset($_GET['add']))
 		{
-			$context['rid'] = isset($_GET['rid']) && isset($context['rules'][$_GET['rid']])? (int) $_GET['rid'] : 0;
+			$context['rid'] = isset($_GET['rid']) && isset($context['rules'][$_GET['rid']]) ? (int) $_GET['rid'] : 0;
 			$context['sub_template'] = 'add_rule';
 
 			// Any known rule
@@ -1612,7 +1612,7 @@ class PersonalMessage_Controller extends Action_Controller
 		elseif (isset($_GET['save']))
 		{
 			checkSession('post');
-			$context['rid'] = isset($_GET['rid']) && isset($context['rules'][$_GET['rid']])? (int) $_GET['rid'] : 0;
+			$context['rid'] = isset($_GET['rid']) && isset($context['rules'][$_GET['rid']]) ? (int) $_GET['rid'] : 0;
 
 			// Name is easy!
 			$ruleName = Util::htmlspecialchars(trim($_POST['rule_name']));
@@ -2156,7 +2156,7 @@ class PersonalMessage_Controller extends Action_Controller
 				{
 					// Fix the international characters in the keyword too.
 					$query = un_htmlspecialchars($query);
-					$query = trim($query, "\*+");
+					$query = trim($query, '\*+');
 					$query = strtr(Util::htmlspecialchars($query), array('\\\'' => '\''));
 
 					$body_highlighted = preg_replace_callback('/((<[^>]*)|' . preg_quote(strtr($query, array('\'' => '&#039;')), '/') . ')/iu', array($this, '_highlighted_callback'), $row['body']);
