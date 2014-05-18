@@ -199,7 +199,7 @@ class ManagePosts_Controller extends Action_Controller
 		createToken('admin-censor');
 
 		// Using ajax?
-		if (isset($_REQUEST['xml']))
+		if (isset($_REQUEST['xml'], $_POST['censortest']))
 		{
 			// Clear the templates
 			$template_layers = Template_Layers::getInstance();

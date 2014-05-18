@@ -66,6 +66,7 @@ function postbyemail_imap()
 		return false;
 
 	// If using gmail, we may need the trash bin name as well
+	$trash_bin = '';
 	if (!empty($modSettings['maillist_imap_delete']) && (strpos($hostname, '.gmail.') !== false))
 		$trash_bin = get_trash_folder($inbox, $server);
 

@@ -630,7 +630,7 @@ class PersonalMessage_Controller extends Action_Controller
 				}
 
 				// Now to get all the others.
-				$context['recipients']['to'] = array_merge($context['recipients']['to'], loadPMRecipientsAll($pmsg));
+				$context['recipients']['to'] = array_merge($context['recipients']['to'], isset($pmsg) ? loadPMRecipientsAll($pmsg) : array());
 			}
 			else
 			{
@@ -2150,6 +2150,8 @@ class PersonalMessage_Controller extends Action_Controller
 				$row['body'] = parse_bbc($row['body'], true, 'pm' . $row['id_pm']);
 
 				// Highlight the hits
+				$body_highlighted = '';
+				$subject_highlighted = '';
 				foreach ($searchArray as $query)
 				{
 					// Fix the international characters in the keyword too.

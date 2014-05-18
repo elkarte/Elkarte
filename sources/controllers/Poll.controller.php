@@ -86,7 +86,7 @@ class Poll_Controller extends Action_Controller
 				}
 
 				// Has the poll been reset since guest voted?
-				if ($row['reset_poll'] > $guestvoted[1])
+				if (isset($guestvoted[1]) && $row['reset_poll'] > $guestvoted[1])
 				{
 					// Remove the poll info from the cookie to allow guest to vote again
 					unset($guestinfo[$i]);
