@@ -52,7 +52,7 @@
 	border-bottom: 1px solid #ddd;
 	border-radius: 0;
 	background: #fff;
-	box-shadow:  0 2px 2px rgba(255,255,255,0.5), 0 -1px 2px rgba(0,0,0,0.1);
+	box-shadow: 0 2px 2px rgba(255,255,255,0.5), 0 -1px 2px rgba(0,0,0,0.1);
 }
 
 #live_news div.content dl {
@@ -75,7 +75,7 @@
 #quick_tasks li:first-child, #quick_tasks li:nth-child(2) {
 	border-top: none;
 }
-#quick_tasks li:last-child,  #quick_tasks li:nth-child(7){
+#quick_tasks li:last-child, #quick_tasks li:nth-child(7){
 	border-bottom: none;
 }
 
@@ -160,7 +160,7 @@
 	border-radius: 5px 5px 0 0;
 	box-shadow: 1px 2px 3px #eee;
 }
-#modcenter .windowbg, #modcenter .windowbg2, #modcenter .generic_list_wrapper  {
+#modcenter .windowbg, #modcenter .windowbg2, #modcenter .generic_list_wrapper {
 	border: 1px solid #ddd;
 	border-bottom: 1px solid #ccc;
 	background: #fff;
@@ -171,7 +171,7 @@
 	border-bottom: 1px solid #ddd;
 	border-radius: 0;
 	background: #fff;
-	box-shadow:  0 2px 2px rgba(255,255,255,0.5), 0 -1px 2px rgba(0,0,0,0.1);
+	box-shadow: 0 2px 2px rgba(255,255,255,0.5), 0 -1px 2px rgba(0,0,0,0.1);
 }
 .moderation_notes li {
 	border-bottom: 1px solid #ccc;
