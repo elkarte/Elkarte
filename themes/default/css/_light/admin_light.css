@@ -1,13 +1,37 @@
 /* Common admin center classes.
 ------------------------------------------------------- */
 
+/* need to squeeze some vertical space in Themes Management
+ * this turned out to be so much more versatile in Themes Management */
+.infobox_theme {
+	max-height: 15em;
+	overflow: auto;
+	margin-bottom: 1px;
+}
+/* just to be safe */
+#infobox_theme_content {
+	margin: 0;
+	padding: 0;
+}
+/* default windowbgs just was not working well in Themes Management 
+ * this is much more versatile. Themers will rejoice ... maybe */
+/* used in Modify Themes and Member Options*/
+.theme_windowbg2 {
+	overflow: auto;
+	margin: 6px 6px;
+}
+.theme_windowbg {
+	overflow: auto;
+	margin: 6px 6px;
+}
+
 .action_admin .generic_list_wrapper .information {
 	border: 1px solid #ccc;
 	border-radius: 2px;
 	box-shadow: 0 2px 2px rgba(0,0,0,0.1);
 }
 
-#admin_main_section, .quick_tasks, #mod_main_section,
+#admin_main_section, div.quick_tasks, #mod_main_section,
 #support_credits, #admin_newsletters,
 #core_features, #generate_reports_type,
 #groupForm, #mailqueue_stats, #manage_maintenance,
