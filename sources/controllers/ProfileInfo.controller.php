@@ -533,7 +533,7 @@ class ProfileInfo_Controller extends Action_Controller
 				),
 				'topic' => array(
 					'id' => $row['id_topic'],
-					'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.' . 'msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
+					'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
 				),
 				'subject' => $row['subject'],
 				'start' => 'msg' . $row['id_msg'],
