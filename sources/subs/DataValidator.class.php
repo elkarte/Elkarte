@@ -743,8 +743,6 @@ class Data_Validator
 		if (!isset($input[$field]))
 			return;
 
-		$valid = true;
-
 		// Quick check, no @ in the email
 		if (strrpos($input[$field], '@') === false)
 			$valid = false;
