@@ -1,13 +1,13 @@
 <?php
 // Version: 1.0; ManageThemes
 
-$txt['themeadmin_explain'] = 'Themes are the different looks and feels of your forum. The Global Theme Settings section permits the site administration to select a theme for the site default theme. Admins can also enable members to select any installed theme for their use and to enable selectable themes. The Install a New Theme section is how the site administration installs a theme.';
+$txt['themeadmin_explain'] = 'The Initial Theme Settings section permits the site administration to select a theme for the site default theme. Admins can also enable members to select any installed theme for their use and to enable selectable themes. The Install a New Theme section is how the site administration installs a theme.';
 $txt['themeadmin_manage'] = 'Manage and Install';
-$txt['theme_forum_theme'] = 'Global Theme Settings';
-$txt['theme_allow'] = 'Allow members to select their own themes:';
+$txt['initial_theme_settings'] = 'Initial Theme Settings';
+$txt['theme_allow'] = 'Allow members to select their own themes.';
 $txt['theme_guests'] = 'Overall forum default theme:';
 $txt['theme_select'] = 'choose...';
-$txt['theme_reset'] = 'Reset all members to the following theme:';
+$txt['theme_reset'] = 'Reset all members to this theme:';
 $txt['theme_nochange'] = 'No change';
 $txt['theme_forum_default'] = 'Forum Default';
 
@@ -53,62 +53,56 @@ $txt['actual_images_url'] = 'This theme\'s images URL: ';
 $txt['current_theme_style'] = 'This theme\'s style: ';
 
 $txt['theme_variants_default'] = 'Default theme variant:';
-$txt['theme_variants_user_disable'] = 'Disable user variant selection:';
+$txt['theme_variants_user_disable'] = 'Disable user variant selection.';
 
-$txt['site_slogan'] = 'Site slogan';
-$txt['site_slogan_desc'] = 'Add your own text for a slogan here. It will replace the default logo.';
-$txt['header_layout'] = 'Header layout';
-$txt['header_layout_desc'] = 'This setting allows you to select one of three layouts for the header:';
-$txt['header_layout_default_name'] = 'Default:';
-$txt['header_layout_default_desc'] = 'the logo is placed on the right and the name of the community on the left.';
-$txt['header_layout_logo_only_name'] = 'Only logo:';
-$txt['header_layout_logo_only_desc'] = 'only the logo is displayed, in a centered position';
-$txt['header_layout_inverted_name'] = 'Logo on the left:';
-$txt['header_layout_inverted_desc'] = 'similar to Default, but with logo and name inverted (i.e. name on the right, logo on the left)';
+$txt['site_slogan'] = 'Site slogan:';
+$txt['site_slogan_desc'] = '(Add your own text for a slogan here. It will replace the default logo.)';
+$txt['header_layout'] = 'Header layout:';
+$txt['header_layout_desc'] = '(This setting allows you to select one of three layouts for the header.)
+<br /><strong>Default</strong>: Logo to the right and site name on the left.
+<br /><strong>Only logo</strong>: Logo only is displayed, in a centered position.
+<br /><strong>Logo on the left</strong>: Logo to the left and site name on the right.';
 $txt['header_layout_default'] = 'Default';
 $txt['header_layout_logo_only'] = 'Only logo';
 $txt['header_layout_inverted'] = 'Logo on the left';
 $txt['forum_width'] = 'Forum width:';
-$txt['forum_width_desc'] = 'Set the forum width. Examples: 950px, 80%, 1240px.';
+$txt['forum_width_desc'] = '(Sets the forum width. Examples: 950px, 80%, 1240px.)';
 
-$txt['enable_news'] = 'News line in the forum header';
+$txt['enable_news'] = 'News line in the forum header:';
 $txt['enable_news_off'] = 'Off';
 $txt['enable_news_random'] = 'Random';
 $txt['enable_news_fader'] = 'Fader';
-$txt['enable_news_off_name'] = 'Off:';
-$txt['enable_news_off_desc'] = 'no news shown';
-$txt['enable_news_random_name'] = 'Random:';
-$txt['enable_news_random_desc'] = 'one news shown chosen at random';
-$txt['enable_news_fader_name'] = 'Fader:';
-$txt['enable_news_fader_desc'] = 'all the news are displayed sequentially';
-$txt['show_group_key'] = 'Show group key on board index';
-$txt['additional_options_collapsible'] = 'Enable collapsible additional post options';
-$txt['who_display_viewing'] = 'Show who is viewing the board index and posts';
+$txt['enable_news_desc'] = '<strong>Off</strong>: No news shown.
+<br /><strong>Random</strong>: One news shown chosen at random.
+<br /><strong>Fader</strong>: All the news are displayed sequentially.';
+$txt['show_group_key'] = 'Show group key on board index.';
+$txt['additional_options_collapsible'] = 'Enable collapsible additional post options.';
+$txt['who_display_viewing'] = 'Show who is viewing the board index and posts:';
 $txt['who_display_viewing_off'] = 'Don\'t show';
 $txt['who_display_viewing_numbers'] = 'Show only numbers';
 $txt['who_display_viewing_names'] = 'Show member names';
 $txt['disable_recent_posts'] = 'Disable recent posts';
 $txt['enable_single_post'] = 'Enable single post';
 $txt['enable_multiple_posts'] = 'Enable multiple posts';
-$txt['show_stats_index'] = 'Show statistics on board index';
-$txt['latest_members'] = 'Show latest member on board index';
-$txt['last_modification'] = 'Show last modification date on modified posts';
-$txt['user_avatars'] = 'Show user avatars in message view';
+$txt['show_stats_index'] = 'Show statistics on board index.';
+$txt['latest_members'] = 'Show latest member on board index.';
+$txt['last_modification'] = 'Show last modification date on modified posts.';
+$txt['user_avatars'] = 'Show user avatars in message view.';
 $txt['user_text'] = 'Show personal text in message view';
-$txt['gender_images'] = 'Show gender images in message view';
+$txt['gender_images'] = 'Show gender images in message view.';
 $txt['member_list_bar'] = 'Show members list bar on board index';
-$txt['current_pos_text_img'] = 'Show current position in forum as link instead of text';
-$txt['show_view_profile_button'] = 'Show view profile button under post';
-$txt['enable_mark_as_read'] = 'Enable and show \'Mark as Read\' buttons';
-$txt['header_logo_url'] = 'Logo image URL';
-$txt['header_logo_url_desc'] = '(leave blank to show forum name or default logo.)';
-$txt['number_recent_posts'] = 'Number of recent posts to display on board index';
-$txt['number_recent_posts_desc'] = 'To disable the recent posts bar set this value to zero.';
-$txt['hide_post_group'] = 'Hide post group titles for grouped members';
-$txt['hide_post_group_desc'] = 'Enabling this will not display a member\'s post group title on the message view if they are assigned to a non-post based group.';
+$txt['current_pos_text_img'] = 'Show current position in forum as link instead of text.';
+$txt['show_view_profile_button'] = 'Show view profile button under post.';
+$txt['enable_mark_as_read'] = 'Enable and show \'Mark as Read\' buttons.';
+$txt['header_logo_url'] = 'Logo image URL:';
+$txt['header_logo_url_desc'] = '(Leave blank to show forum name or default logo.)';
+$txt['number_recent_posts'] = 'Number of recent posts to display on board index:';
+$txt['number_recent_posts_desc'] = '(To disable the recent posts bar set this value to zero.)';
+$txt['hide_post_group'] = 'Hide post group titles for grouped members.';
+$txt['hide_post_group_desc'] = '(Enabling this will not display a member\'s post group title on the message view if they are assigned to a non-post based group.)';
 
 $txt['theme_options_defaults'] = 'These are the default values for some member specific settings.  Changing these will only affect new members and guests.';
-$txt['theme_options_title'] = 'Change or reset default options';
+$txt['theme_options_title'] = 'Change or reset default options for the';
 
 $txt['themeadmin_title'] = 'Theme Management and Options';
 $txt['themeadmin_description'] = 'Here you can modify the settings for your themes, update theme selections, reset member options, and the like.';
@@ -151,7 +145,7 @@ $txt['themeadmin_edit_copy_warning'] = 'When the system needs a template or lang
 $txt['themeadmin_edit_copy_confirm'] = 'Are you sure you want to copy this template?';
 $txt['themeadmin_edit_overwrite_confirm'] = 'Are you sure you want to copy this template over the one that already exists?\nThis will OVERWRITE any changes you\\\'ve made';
 $txt['themeadmin_edit_no_copy'] = '<em>(can\'t copy)</em>';
-$txt['themeadmin_edit_filename'] = 'Filename';
+$txt['themeadmin_edit_filename'] = 'Template Files';
 $txt['themeadmin_edit_modified'] = 'Last Modified';
 $txt['themeadmin_edit_size'] = 'Size';
 $txt['themeadmin_edit_bytes'] = 'B';
@@ -159,7 +153,7 @@ $txt['themeadmin_edit_kilobytes'] = 'KiB';
 $txt['themeadmin_edit_error'] = 'The file you tried to save generated the following error:';
 $txt['themeadmin_edit_on_line'] = 'Beginning on line:';
 $txt['themeadmin_edit_preview'] = 'Preview';
-$txt['themeadmin_selectable'] = 'Themes the user is permitted to select';
+$txt['themeadmin_selectable'] = 'Themes the user is permitted to select.';
 $txt['themeadmin_themelist_link'] = 'Show the list of installed themes';
 
 // Strings for the variants
