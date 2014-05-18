@@ -39,6 +39,7 @@ class ProfileInfo_Controller extends Action_Controller
 
 	/**
 	 * View the user profile summary.
+	 *
 	 * @uses ProfileInfo template
 	 */
 	public function action_summary()
@@ -329,14 +330,15 @@ class ProfileInfo_Controller extends Action_Controller
 			else
 			{
 				// Set up to get the last 10 topics of this member
-				$msgCount = count_user_topics($memID);
+				$topicCount = count_user_topics($memID);
 				$range_limit = '';
 				$maxIndex = 10;
 
-				// If they are a frequent topic starter, we guess the range to help the query
-				if ($msgCount > 1000)
+				// If they are a frequent topic starter we guess the range to help the query
+				if ($topicCount > 1000)
 				{
-					$margin = floor(($max_msg_member - $min_msg_member) * (($start + $modSettings['defaultMaxMessages']) / $msgCount) + .1 * ($max_msg_member - $min_msg_member));
+					list ($min_topic_member, $max_topic_member) = findMinMaxUserTopic($memID);
+					$margin = floor(($max_topic_member - $min_topic_member) * (($start + $modSettings['defaultMaxMessages']) / $topicCount) + .1 * ($max_topic_member - $min_topic_member));
 					$margin *= 5;
 					$range_limit = 't.id_first_msg > ' . ($max_msg_member - $margin);
 				}
