@@ -1964,6 +1964,7 @@ img.new_posts {
 .sticky_row .topic_details:before, .locked_row .topic_details:before,
 .locked_row.sticky_row .topic_info:before {
 	float: right;
+	margin-right: -16px;
 }
 .sticky_row .topic_info:before, .sticky_row .topic_details:before {background-position: 0 -108px;}
 .locked_row .topic_info:before, .locked_row .topic_details:before {background-position: 0 -54px;}
@@ -3613,6 +3614,7 @@ a.help .icon {
 }
 .search_results_posts .topic_body {
 	margin: 0px 1em 0px;
+	padding-bottom: 12px;
 	padding-top: 12px;
 }
 .search_results_posts .quick_mod {
