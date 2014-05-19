@@ -59,18 +59,19 @@
 				$this.on(settings.refreshevent, function(e) {
 					e.preventDefault();
 
-					var uniqueID = settings.uniqueID ? '_' + settings.uniqueID : '';
+					var uniqueID = settings.uniqueID ? '_' + settings.uniqueID : '',
+						new_url = '';
 
 					// The admin area is a bit different unfortunately
 					if (settings.admin)
 					{
 						settings.imageURL = $('#verification_image' + uniqueID).attr('src').replace(/.$/, '') + $this.val();
-						var new_url = String(settings.imageURL);
+						new_url = String(settings.imageURL);
 					}
 					else
 					{
 						// Make sure we are using a new rand code.
-						var new_url = String(settings.imageURL);
+						new_url = String(settings.imageURL);
 						new_url = new_url.substr(0, new_url.indexOf("rand=") + 5);
 
 						// Quick and dirty way of converting decimal to hex
@@ -85,7 +86,7 @@
 					}
 					else if (document.getElementById("verification_image" + uniqueID))
 					{
-						for (i = 1; i <= settings.letterCount; i++)
+						for (var i = 1; i <= settings.letterCount; i++)
 							if (document.getElementById("verification_image" + uniqueID + "_" + i))
 								document.getElementById("verification_image" + uniqueID + "_" + i).src = new_url + ";letter=" + i;
 					}
