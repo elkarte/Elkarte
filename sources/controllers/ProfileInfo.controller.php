@@ -340,7 +340,7 @@ class ProfileInfo_Controller extends Action_Controller
 					list ($min_topic_member, $max_topic_member) = findMinMaxUserTopic($memID);
 					$margin = floor(($max_topic_member - $min_topic_member) * (($start + $modSettings['defaultMaxMessages']) / $topicCount) + .1 * ($max_topic_member - $min_topic_member));
 					$margin *= 5;
-					$range_limit = 't.id_first_msg > ' . ($max_msg_member - $margin);
+					$range_limit = 't.id_first_msg > ' . ($max_topic_member - $margin);
 				}
 
 				// Find this user's most recent topics
