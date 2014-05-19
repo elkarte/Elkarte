@@ -409,8 +409,8 @@ function clean_cache($type = '')
 				// Xcache may need auth credentials, depending on how its been set up
 				if (!empty($cache_uid) && !empty($cache_password))
 				{
-					$_SERVER["PHP_AUTH_USER"] = $cache_uid;
-					$_SERVER["PHP_AUTH_PW"] = $cache_password;
+					$_SERVER['PHP_AUTH_USER'] = $cache_uid;
+					$_SERVER['PHP_AUTH_PW'] = $cache_password;
 				}
 
 				// Get the counts so we clear each instance

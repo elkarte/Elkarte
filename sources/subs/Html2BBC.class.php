@@ -53,7 +53,7 @@ class Convert_BBC
 	 * Line break character
 	 * @var string
 	 */
-	public $line_break = "[br]";
+	public $line_break = '[br]';
 
 	/**
 	 * Font numbers to pt size
@@ -135,7 +135,7 @@ class Convert_BBC
 	public function get_bbc()
 	{
 		// For this html node, find all child elements and convert
-		$body = ($this->_parser) ? $this->doc->getElementsByTagName("body")->item(0) : $this->doc->root;
+		$body = ($this->_parser) ? $this->doc->getElementsByTagName('body')->item(0) : $this->doc->root;
 
 		// Convert all the nodes that we know how to
 		$this->_convert_childNodes($body);
@@ -447,7 +447,7 @@ class Convert_BBC
 		elseif (!empty($href) && $href[0] === '#')
 			$bbc = '[url=' . $href . ']' . $value . '[/url]';
 		// Maybe an email link
-		elseif (substr($href, 0, 7) === "mailto:")
+		elseif (substr($href, 0, 7) === 'mailto:')
 		{
 			if ($href != 'mailto:' . (isset($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : ''))
 				$href = substr($href, 7);

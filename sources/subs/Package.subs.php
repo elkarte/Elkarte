@@ -303,7 +303,7 @@ function read_zip_data($data, $destination, $single_file = false, $overwrite = f
 	foreach ($file_sections as $data)
 	{
 		// Get all the important file information.
-		$file_info = unpack("vversion/vgeneral_purpose/vcompress_method/vfile_time/vfile_date/Vcrc/Vcompressed_size/Vsize/vfilename_length/vextrafield_length", $data);
+		$file_info = unpack('vversion/vgeneral_purpose/vcompress_method/vfile_time/vfile_date/Vcrc/Vcompressed_size/Vsize/vfilename_length/vextrafield_length', $data);
 		$file_info['filename'] = substr($data, 26, $file_info['filename_length']);
 		$file_info['dir'] = $destination . '/' . dirname($file_info['filename']);
 
@@ -311,7 +311,7 @@ function read_zip_data($data, $destination, $single_file = false, $overwrite = f
 		// In this case the CRC and size are instead appended in a 12-byte structure immediately after the compressed data
 		if ($file_info['general_purpose'] & 0x0008)
 		{
-			$unzipped2 = unpack("Vcrc/Vcompressed_size/Vsize", substr($$data, -12));
+			$unzipped2 = unpack('Vcrc/Vcompressed_size/Vsize', substr($$data, -12));
 			$file_info['crc'] = $unzipped2['crc'];
 			$file_info['compressed_size'] = $unzipped2['compressed_size'];
 			$file_info['size'] = $unzipped2['size'];

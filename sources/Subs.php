@@ -444,7 +444,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 			if ($start >= $num_per_page * $nCont)
 			{
 				$tmpStart = $start - $num_per_page * $nCont;
-				$pageindex.= sprintf($base_link, $tmpStart, $tmpStart / $num_per_page + 1);
+				$pageindex .= sprintf($base_link, $tmpStart, $tmpStart / $num_per_page + 1);
 			}
 
 		// Show the current page. (prev page 1 ... 6 7 >[8]< 9 10 ... 15 next page)
@@ -2196,9 +2196,9 @@ function footnote_callback($matches)
 	global $fn_num, $fn_content, $fn_count;
 
 	$fn_num++;
-	$fn_content[] = '<div class="target" id="fn' . $fn_num . '_' . $fn_count . '"><sup>' . $fn_num . '&nbsp;</sup>' . $matches[2] . '<a class="footnote_return" href="#ref' . $fn_num . "_" . $fn_count . '">&crarr;</a></div>';
+	$fn_content[] = '<div class="target" id="fn' . $fn_num . '_' . $fn_count . '"><sup>' . $fn_num . '&nbsp;</sup>' . $matches[2] . '<a class="footnote_return" href="#ref' . $fn_num . '_' . $fn_count . '">&crarr;</a></div>';
 
-	return '<a class="target" href="#fn' . $fn_num . '_' . $fn_count . '" id="ref' . $fn_num . "_" . $fn_count . '">[' . $fn_num . ']</a>';
+	return '<a class="target" href="#fn' . $fn_num . '_' . $fn_count . '" id="ref' . $fn_num . '_' . $fn_count . '">[' . $fn_num . ']</a>';
 }
 
 /**
@@ -2768,7 +2768,7 @@ function memoryReturnBytes($val)
 		case 'k':
 			$num *= 1024;
 	}
-	
+
 	return $num;
 }
 

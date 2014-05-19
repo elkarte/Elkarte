@@ -78,7 +78,7 @@ class Database_MySQL implements Database
 		if (empty($db_options['dont_select_db']))
 			$connection = @mysqli_connect((!empty($db_options['persist']) ? 'p:' : '') . $db_server, $db_user, $db_passwd, $db_name, $db_port);
 		else
-			$connection = @mysqli_connect((!empty($db_options['persist']) ? 'p:' : '') . $db_server, $db_user, $db_passwd, "", $db_port);
+			$connection = @mysqli_connect((!empty($db_options['persist']) ? 'p:' : '') . $db_server, $db_user, $db_passwd, '', $db_port);
 
 		// Something's wrong, show an error if its fatal (which we assume it is)
 		if (!$connection)
