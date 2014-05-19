@@ -1446,6 +1446,8 @@ class ManageSmileys_Controller extends Action_Controller
 
 		// Installing unless proven otherwise
 		$testing = false;
+		$destination = '';
+		$name = '';
 
 		if (isset($_REQUEST['set_gz']))
 		{

@@ -1054,7 +1054,7 @@ class Email_Parse
 			if (function_exists('mb_convert_encoding'))
 			{
 				// Replace unknown characters with a space
-				@ini_set('mbstring.substitute_character', "32");
+				@ini_set('mbstring.substitute_character', '32');
 				$string = @mb_convert_encoding($string, $to, $from);
 			}
 			elseif (function_exists('recode_string'))

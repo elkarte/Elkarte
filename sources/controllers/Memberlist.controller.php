@@ -157,7 +157,7 @@ class Memberlist_Controller extends Action_Controller
 
 		// Build the memberlist button array.
 		$context['memberlist_buttons'] = array(
-			'view_all_members' => array('text' => 'view_all_members', 'image' => 'mlist.png', 'lang' => true, 'url' => $scripturl . '?action=memberlist;sa=all', 'active'=> true),
+			'view_all_members' => array('text' => 'view_all_members', 'image' => 'mlist.png', 'lang' => true, 'url' => $scripturl . '?action=memberlist;sa=all', 'active' => true),
 		);
 
 		// Are there custom fields they can search?

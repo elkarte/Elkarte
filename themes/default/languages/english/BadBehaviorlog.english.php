@@ -20,7 +20,7 @@ $txt['badbehaviorlog_error_valid_explaination'] = 'HTTP Reason';
 $txt['badbehaviorlog_error_valid_log'] = 'Details';
 $txt['badbehaviorlog_log'] = 'BadBehavior Log';
 $txt['badbehaviorlog_desc'] = 'Below is a list of all the bad behavior entries that have been logged';
-$txt['badbehaviorlog_details'] = "Additional Details";
+$txt['badbehaviorlog_details'] = 'Additional Details';
 $txt['badbehaviorlog_no_entries_found'] = 'There are currently no bad behavior log entries.';
 
 $txt['badbehaviorlog_remove_selection'] = 'Remove Selected';

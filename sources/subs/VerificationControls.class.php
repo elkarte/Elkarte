@@ -245,6 +245,13 @@ class Control_Verification_Captcha implements Control_Verifications
 	private $_text_value = null;
 
 	/**
+	 * The number of characters to generate
+	 *
+	 * @var int
+	 */
+	private $_num_chars = null;
+
+	/**
 	 * The url to the created image
 	 *
 	 * @var string
@@ -414,7 +421,7 @@ class Control_Verification_Captcha implements Control_Verifications
 			array('int', 'visual_verification_num_chars'),
 			'vv' => array('select', 'visual_verification_type',
 				array($txt['setting_image_verification_off'], $txt['setting_image_verification_vsimple'], $txt['setting_image_verification_simple'], $txt['setting_image_verification_medium'], $txt['setting_image_verification_high'], $txt['setting_image_verification_extreme']),
-				'subtext'=> $txt['setting_visual_verification_type_desc']),
+				'subtext' => $txt['setting_visual_verification_type_desc']),
 		);
 
 		// Save it
@@ -890,7 +897,7 @@ class Control_Verification_Questions implements Control_Verifications
 	/**
 	 * Adds the questions to the db
 	 *
-	 * @param mixed $questions
+	 * @param mixed[] $questions
 	 */
 	private function _insert($questions)
 	{

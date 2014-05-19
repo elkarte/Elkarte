@@ -276,8 +276,8 @@ class Email_Format
 				// If this line is longer than the line above it we need to do some extra checks
 				if (($i > 0) && ($this->_body_array[$i - 1]['length'] > $this->_maillist_short_line) && !$this->_found_sig && !$this->_in_code && !$this->_in_bbclist)
 				{
-					// If the previous short line did not end in a period or it did and the next line does not start with a capital and passes para check
-					// then it wraps
+					// If the previous short line did not end in a period or it did and the next line does not start
+					// with a capital and passes para check then it wraps
 					if ((substr($this->_body_array[$i - 1]['content'], -1) !== '.') || (substr($this->_body_array[$i - 1]['content'], -1) === '.' && $para_check < $this->_para_check && ($this->_body_array[$i]['content'][0] !== strtoupper($this->_body_array[$i]['content'][0]))))
 						$this->_body_array[$i]['content'] = $this->_body_array[$i]['content'];
 					else
@@ -298,6 +298,7 @@ class Email_Format
 			$this->_body_array[$i + $quotes] = '[/quote]';
 
 		// Join the message back together while dropping null index's
+		$temp = array();
 		foreach ($this->_body_array as $key => $values)
 			$temp[] = $values['content'];
 		$this->_body = trim(implode(' ', array_values($temp)));

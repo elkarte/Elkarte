@@ -1571,7 +1571,7 @@ function frameOptionsHeader($override = null)
  * only IE and Chrome are honouring this header. This reduces exposure to drive-by download attacks
  * and sites serving user uploaded content that could be treated as executable or dynamic HTML files.
  *
- * @param boolean $override
+ * @param boolean|null $override
  */
 function securityOptionsHeader($override = null)
 {

@@ -1366,7 +1366,7 @@ function insertBoardPermission($new_permissions)
  * @package Permissions
  * @param int[] $group
  * @param int $profile
- * @param array $permissions
+ * @param string[] $permissions
  * @return array
  */
 function getPermission($group, $profile, $permissions)

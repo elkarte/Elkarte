@@ -706,7 +706,7 @@ class Settings_Form
 		else
 			$tmp_cache = CACHEDIR;
 
-		$test_fp = @fopen($tmp_cache . '/settings_update.tmp', "w+");
+		$test_fp = @fopen($tmp_cache . '/settings_update.tmp', 'w+');
 		if ($test_fp)
 		{
 			fclose($test_fp);

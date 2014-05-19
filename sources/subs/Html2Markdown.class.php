@@ -121,11 +121,11 @@ class Convert_Md
 	public function get_markdown()
 	{
 		// If there is nothing to parse, its quite easy
-		if (($this->_parser && $this->doc->getElementsByTagName("body")->item(0) === null) || (!$this->_parser && $this->doc === false))
+		if (($this->_parser && $this->doc->getElementsByTagName('body')->item(0) === null) || (!$this->_parser && $this->doc === false))
 			return '';
 
 		// For this html node, find all child elements and convert
-		$body = ($this->_parser) ? $this->doc->getElementsByTagName("body")->item(0) : $this->doc->root;
+		$body = ($this->_parser) ? $this->doc->getElementsByTagName('body')->item(0) : $this->doc->root;
 		$this->_convert_childNodes($body);
 
 		// Done replacing HTML elements, now get the converted DOM tree back into a string
@@ -602,7 +602,8 @@ class Convert_Md
 
 	/**
 	 * Converts tables tags to markdown extra table syntax
-	 * Have to build top down vs normal inside out due to needing col numbers and widths
+	 *
+	 * - Have to build top down vs normal inside out due to needing col numbers and widths
 	 *
 	 * @param object $node
 	 */
@@ -614,11 +615,20 @@ class Convert_Md
 
 		$th_parent = ($table_heading) ? ($this->_parser ? $this->_get_item($table_heading, 0)->parentNode->nodeName : $this->_get_item($table_heading, 0)->parentNode()->nodeName()) : false;
 
+		// Set up for a markdown table, then storm the castle
+		$align = array();
+		$value = array();
+		$width = array();
+		$max = array();
+		$header = array();
+		$rows = array();
+
 		// We only markdown well formed tables ...
 		if ($table_heading && $th_parent === 'tr')
 		{
 			// Find out how many columns we are dealing with
 			$th_num = $this->_get_length($table_heading);
+
 			for ($col = 0; $col < $th_num; $col++)
 			{
 				// Get the align and text for each th (html5 this is no longer valid)
@@ -749,7 +759,8 @@ class Convert_Md
 
 	/**
 	 * Helper function for creating ol's
-	 * Returns the absolute number of an <li> inside an <ol>
+	 *
+	 * - Returns the absolute number of an <li> inside an <ol>
 	 *
 	 * @param object $node
 	 */
@@ -773,7 +784,9 @@ class Convert_Md
 	}
 
 	/**
-	 * Helper function for table creation, builds td's to a give width, aligned as needed
+	 * Helper function for table creation
+	 *
+	 * - Builds td's to a give width, aligned as needed
 	 *
 	 * @param string $align
 	 * @param int $width
@@ -824,6 +837,7 @@ class Convert_Md
 
 	/**
 	 * Escapes markup looking text in html to prevent accidental assignment
+	 *
 	 * <p>*stuff*</p> should not convert to *stuff* but \*stuff\* since its not to
 	 * be converted by md to html as <strong>stuff</strong>
 	 *
@@ -877,8 +891,9 @@ class Convert_Md
 
 	/**
 	 * Breaks a string up so its no more than width characters long
-	 *  - Will break at word boundaries
-	 *  - If no natural space is found will break mid-word
+	 *
+	 * - Will break at word boundaries
+	 * - If no natural space is found will break mid-word
 	 *
 	 * @param string $string
 	 * @param int $width

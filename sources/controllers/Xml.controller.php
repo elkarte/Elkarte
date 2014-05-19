@@ -326,6 +326,7 @@ class Xml_Controller extends Action_Controller
 			if (isset($_POST['order']) && $_POST['order'] === 'reorder' && isset($_POST['moved']))
 			{
 				$list_order = 0;
+				$moved_key = 0;
 
 				// What board was drag and dropped?
 				list (, $board_moved,) = explode(',', $_POST['moved']);
@@ -509,6 +510,9 @@ class Xml_Controller extends Action_Controller
 				{
 					// Read the new ordering, remember where the moved smiley is in the stack
 					$list_order = 0;
+					$moved_key = 0;
+					$smiley_tree = array();
+
 					foreach ($_POST['smile'] as $smile_id)
 					{
 						$smiley_tree[] = $smile_id;

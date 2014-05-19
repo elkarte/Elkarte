@@ -351,10 +351,10 @@ class ManageMaillist_Controller extends Action_Controller
 		// Prep and show the template with what we found
 		$context['body'] = parse_bbc($text);
 		$context['to'] = $txt['to'] . ' ' . (isset($email_to) ? $email_to : '');
-		$context['notice_subject'] = (isset($temp_email[0]['subject']) ? $txt['subject'] . ': ' . $temp_email[0]['subject'] : '');
-		$context['notice_from'] = (isset($temp_email[0]['from']) ? $txt['from'] . ': ' . $temp_email[0]['from'] : '');
+		$context['notice_subject'] = isset($temp_email[0]['subject']) ? $txt['subject'] . ': ' . $temp_email[0]['subject'] : '';
+		$context['notice_from'] = isset($temp_email[0]['from']) ? $txt['from'] . ': ' . $temp_email[0]['from'] : '';
 		$context['page_title'] = $txt['show_notice'];
-		$context['error_code'] = $txt[$temp_email[0]['error_code']];
+		$context['error_code'] = isset($txt[$temp_email[0]['error_code']]) ? $txt[$temp_email[0]['error_code']] : '';
 		$context['sub_template'] = 'show_email';
 	}
 
@@ -561,7 +561,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$context['warning_data'] = array('notify' => '', 'notify_subject' => '', 'notify_body' => '');
 		$context['body'] = parse_bbc($fullerrortext);
 		$context['item'] = isset($_POST['item']) ? $_POST['item'] : '';
-		$context['notice_to'] = $txt['to'] . ' ' . $temp_email[0]['from'];
+		$context['notice_to'] = $txt['to'] . ' ' . isset($temp_email[0]['from']) ? $temp_email[0]['from'] : '';
 		$context['page_title'] = $txt['bounce_title'];
 		$context['sub_template'] = 'bounce_email';
 	}
@@ -1458,6 +1458,7 @@ class ManageMaillist_Controller extends Action_Controller
 
 			$email_error = false;
 			$board_error = false;
+			$maillist_receiving_address = array();
 
 			// Basic checking of the email addresses
 			require_once(SUBSDIR . '/DataValidator.class.php');
@@ -1475,7 +1476,6 @@ class ManageMaillist_Controller extends Action_Controller
 				$boards = maillist_board_list();
 
 				// Check the receiving emails and the board id as well
-				$maillist_receiving_address = array();
 				$boardtocheck = !empty($_POST['boardto']) ? $_POST['boardto'] : array();
 				$addresstocheck = !empty($_POST['emailfrom']) ? $_POST['emailfrom'] : array();
 

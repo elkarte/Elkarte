@@ -352,7 +352,8 @@ class Data_Validator
 
 	/**
 	 * Used when a field contains csv or array of data
-	 * Will convert field to individual elements and run a separate validation on that group
+	 *
+	 * -Will convert field to individual elements and run a separate validation on that group
 	 * using the rules defined to the parent node
 	 *
 	 * @param mixed[] $input
@@ -364,8 +365,12 @@ class Data_Validator
 		if (!isset($input[$field]))
 			return;
 
+		// Start a new instance of the validtor to work on this sub data (csv/array)
 		$sub_validator = new Data_Validator();
+
 		$fields = array();
+		$validation_rules = array();
+
 		if ($this->_datatype[$field] === 'array')
 		{
 			// Convert the array to individual values, they all use the same rules
@@ -499,8 +504,12 @@ class Data_Validator
 	 */
 	private function _sanitize_recursive($input, $field, $rules)
 	{
+		// create a new instance to run against this sub data
 		$validator = new Data_Validator();
+
 		$fields = array();
+		$sanitation_rules = array();
+
 		if ($this->_datatype[$field] === 'array')
 		{
 			// Convert the array to individual values, they all use the same rules

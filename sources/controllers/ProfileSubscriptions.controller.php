@@ -136,7 +136,7 @@ class ProfileSubscriptions_Controller extends Action_Controller
 			fatal_lang_error('paid_sub_not_active');
 
 		// Simplify...
-		$order= $context['subscriptions'][$id_sub];
+		$order = $context['subscriptions'][$id_sub];
 
 		$period = 'xx';
 		if ($order['flexible'])

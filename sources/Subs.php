@@ -42,8 +42,8 @@ if (!defined('ELK'))
  *  post-based membergroups in the database (restricted by parameter1).
  *
  * @param string $type Stat type - can be 'member', 'message', 'topic', 'subject' or 'postgroups'
- * @param int|string|false|mixed[]|null $parameter1 pass through value
- * @param int|string|false|mixed[]|null $parameter2 pass through value
+ * @param int|string|boolean|mixed[]|null $parameter1 pass through value
+ * @param int|string|boolean|mixed[]|null $parameter2 pass through value
  */
 function updateStats($type, $parameter1 = null, $parameter2 = null)
 {
@@ -444,7 +444,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 			if ($start >= $num_per_page * $nCont)
 			{
 				$tmpStart = $start - $num_per_page * $nCont;
-				$pageindex.= sprintf($base_link, $tmpStart, $tmpStart / $num_per_page + 1);
+				$pageindex .= sprintf($base_link, $tmpStart, $tmpStart / $num_per_page + 1);
 			}
 
 		// Show the current page. (prev page 1 ... 6 7 >[8]< 9 10 ... 15 next page)
@@ -532,7 +532,7 @@ function comma_format($number, $override_decimal_count = false)
  *
  * @param int $log_time
  * @param string|bool $show_today = true
- * @param string|false $offset_type = false
+ * @param string|bool $offset_type = false
  */
 function standardTime($log_time, $show_today = true, $offset_type = false)
 {
@@ -2196,9 +2196,9 @@ function footnote_callback($matches)
 	global $fn_num, $fn_content, $fn_count;
 
 	$fn_num++;
-	$fn_content[] = '<div class="target" id="fn' . $fn_num . '_' . $fn_count . '"><sup>' . $fn_num . '&nbsp;</sup>' . $matches[2] . '<a class="footnote_return" href="#ref' . $fn_num . "_" . $fn_count . '">&crarr;</a></div>';
+	$fn_content[] = '<div class="target" id="fn' . $fn_num . '_' . $fn_count . '"><sup>' . $fn_num . '&nbsp;</sup>' . $matches[2] . '<a class="footnote_return" href="#ref' . $fn_num . '_' . $fn_count . '">&crarr;</a></div>';
 
-	return '<a class="target" href="#fn' . $fn_num . '_' . $fn_count . '" id="ref' . $fn_num . "_" . $fn_count . '">[' . $fn_num . ']</a>';
+	return '<a class="target" href="#fn' . $fn_num . '_' . $fn_count . '" id="ref' . $fn_num . '_' . $fn_count . '">[' . $fn_num . ']</a>';
 }
 
 /**
@@ -2759,13 +2759,16 @@ function memoryReturnBytes($val)
 	// Convert to bytes
 	switch ($last)
 	{
+		// fall through select g = 1024*1024*1024
 		case 'g':
 			$num *= 1024;
+		// fall through select m = 1024*1024
 		case 'm':
 			$num *= 1024;
 		case 'k':
 			$num *= 1024;
 	}
+
 	return $num;
 }
 
@@ -2900,7 +2903,7 @@ function template_javascript($do_defered = false)
 				echo '
 	<script src="', $settings['default_theme_url'], '/scripts/jquery-' . $jquery_version . '.min.js" id="jquery"></script>',
 	(!empty($modSettings['jquery_include_ui']) ? '
-	<script src="' . $settings['default_theme_url'] . '/scripts/jqueryui-' . $jqueryui_version . '.min.js" id="jqueryui"></script>' : '');
+	<script src="' . $settings['default_theme_url'] . '/scripts/jquery-ui-' . $jqueryui_version . '.min.js" id="jqueryui"></script>' : '');
 				break;
 			// CDN with local fallback
 			case 'auto':
@@ -2912,7 +2915,7 @@ function template_javascript($do_defered = false)
 	<script><!-- // --><![CDATA[
 		window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-' . $jquery_version . '.min.js"><\/script>\');',
 		(!empty($modSettings['jquery_include_ui']) ? '
-		window.jQuery.ui || document.write(\'<script src="' . $settings['default_theme_url'] . '/scripts/jqueryui-' . $jqueryui_version . '.min.js"><\/script>\')' : ''), '
+		window.jQuery.ui || document.write(\'<script src="' . $settings['default_theme_url'] . '/scripts/jquery-ui-' . $jqueryui_version . '.min.js"><\/script>\')' : ''), '
 	// ]]></script>';
 				break;
 		}
@@ -4238,7 +4241,7 @@ function elk_array_insert($input, $key, $insert, $where = 'before', $assoc = tru
  *
  * What it does:
  * - From time to time it may be necessary to fire a scheduled task ASAP
- * - this function set the scheduled task to be called before any other one
+ * - This function sets the scheduled task to be called before any other one
  *
  * @param string $task the name of a scheduled task
  */
@@ -4251,6 +4254,7 @@ function scheduleTaskImmediate($task)
 	else
 		$scheduleTaskImmediate = unserialize($modSettings['scheduleTaskImmediate']);
 
+	// If it has not been scheduled, the do so now
 	if (!isset($scheduleTaskImmediate[$task]))
 	{
 		$scheduleTaskImmediate[$task] = 0;
@@ -4277,16 +4281,19 @@ function removeScheduleTaskImmediate($task, $calculateNextTrigger = true)
 {
 	global $modSettings;
 
+	// Not on, bail
 	if (!isset($modSettings['scheduleTaskImmediate']))
 		return;
 	else
 		$scheduleTaskImmediate = unserialize($modSettings['scheduleTaskImmediate']);
 
+	// Clear / remove the task if it was set
 	if (isset($scheduleTaskImmediate[$task]))
 	{
 		unset($scheduleTaskImmediate[$task]);
 		updateSettings(array('scheduleTaskImmediate' => serialize($scheduleTaskImmediate)));
 
+		// Recalculate the next task to execute
 		if ($calculateNextTrigger)
 		{
 			require_once(SUBSDIR . '/ScheduledTasks.subs.php');

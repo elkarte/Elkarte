@@ -20,7 +20,7 @@
  * @param string $db_user
  * @param string $db_passwd
  * @param string $db_prefix
- * @param array $db_options
+ * @param mixed[] $db_options
  * @param string $db_type
  * @return null
  */

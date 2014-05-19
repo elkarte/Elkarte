@@ -269,8 +269,6 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	{
 		$customIndexSettings = unserialize($modSettings['search_custom_index_config']);
 
-		$words = array();
-		$messages = array();
 		$request = $db->query('', '
 			SELECT id_msg, body
 			FROM {db_prefix}messages
@@ -279,6 +277,8 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 				'topics' => $topics,
 			)
 		);
+		$words = array();
+		$messages = array();
 		while ($row = $db->fetch_assoc($request))
 		{
 			if (function_exists('apache_reset_timeout'))
@@ -1281,6 +1281,7 @@ function messagesSince($id_topic, $id_msg, $include_current = false, $only_appro
 			'approved' => 1,
 		)
 	);
+	$messages = array();
 	while ($row = $db->fetch_assoc($request))
 		$messages[] = $row['id_msg'];
 	$db->free_result($request);
@@ -2724,7 +2725,6 @@ function messagesInTopics($topics)
 	$db = database();
 
 	// Obtain all the message ids we are going to affect.
-	$messages = array();
 	$request = $db->query('', '
 		SELECT id_msg
 		FROM {db_prefix}messages
@@ -2732,6 +2732,7 @@ function messagesInTopics($topics)
 		array(
 			'topic_list' => $topics,
 	));
+	$messages = array();
 	while ($row = $db->fetch_assoc($request))
 		$messages[] = $row['id_msg'];
 	$db->free_result($request);
@@ -2774,7 +2775,7 @@ function topicsPosters($topics)
  * @param int $target_board id of the target board where the topic will resides
  * @param string $target_subject subject of the new topic
  * @param string $enforce_subject if not empty all the messages will be set to the same subject
- * @param array $notifications array of topics with active notifications
+ * @param int[] $notifications array of topics with active notifications
  */
 function fixMergedTopics($first_msg, $topics, $id_topic, $target_board, $target_subject, $enforce_subject, $notifications)
 {
