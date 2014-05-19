@@ -60,7 +60,8 @@
 					e.preventDefault();
 
 					var uniqueID = settings.uniqueID ? '_' + settings.uniqueID : '',
-						new_url = '';
+						new_url = '',
+						i = 0;
 
 					// The admin area is a bit different unfortunately
 					if (settings.admin)
@@ -76,7 +77,7 @@
 
 						// Quick and dirty way of converting decimal to hex
 						var hexstr = "0123456789abcdef";
-						for (var i = 0; i < 32; i++)
+						for (i = 0; i < 32; i++)
 							new_url = new_url + hexstr.substr(Math.floor(Math.random() * 16), 1);
 					}
 
@@ -86,13 +87,12 @@
 					}
 					else if (document.getElementById("verification_image" + uniqueID))
 					{
-						for (var i = 1; i <= settings.letterCount; i++)
+						for (i = 1; i <= settings.letterCount; i++)
 							if (document.getElementById("verification_image" + uniqueID + "_" + i))
 								document.getElementById("verification_image" + uniqueID + "_" + i).src = new_url + ";letter=" + i;
 					}
 				});
 			}
 		});
-
 	};
 })( jQuery );
