@@ -198,7 +198,7 @@ class ManageLanguages_Controller extends Action_Controller
 			'base_href' => $scripturl . '?action=admin;area=languages',
 			'title' => $txt['edit_languages'],
 			'data_check' => array(
-				'class'=> create_function('$rowData', '
+				'class' => create_function('$rowData', '
 					if ($rowData[\'default\'])
 						return \'highlight2\';
 					else
