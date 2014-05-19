@@ -4238,7 +4238,7 @@ function elk_array_insert($input, $key, $insert, $where = 'before', $assoc = tru
  *
  * What it does:
  * - From time to time it may be necessary to fire a scheduled task ASAP
- * - this function set the scheduled task to be called before any other one
+ * - This function sets the scheduled task to be called before any other one
  *
  * @param string $task the name of a scheduled task
  */
@@ -4251,6 +4251,7 @@ function scheduleTaskImmediate($task)
 	else
 		$scheduleTaskImmediate = unserialize($modSettings['scheduleTaskImmediate']);
 
+	// If it has not been scheduled, the do so now
 	if (!isset($scheduleTaskImmediate[$task]))
 	{
 		$scheduleTaskImmediate[$task] = 0;
@@ -4277,16 +4278,19 @@ function removeScheduleTaskImmediate($task, $calculateNextTrigger = true)
 {
 	global $modSettings;
 
+	// Not on, bail
 	if (!isset($modSettings['scheduleTaskImmediate']))
 		return;
 	else
 		$scheduleTaskImmediate = unserialize($modSettings['scheduleTaskImmediate']);
 
+	// Clear / remove the task if it was set
 	if (isset($scheduleTaskImmediate[$task]))
 	{
 		unset($scheduleTaskImmediate[$task]);
 		updateSettings(array('scheduleTaskImmediate' => serialize($scheduleTaskImmediate)));
 
+		// Recalculate the next task to execute
 		if ($calculateNextTrigger)
 		{
 			require_once(SUBSDIR . '/ScheduledTasks.subs.php');

@@ -160,7 +160,7 @@ function getPMCount($descending = false, $pmID = null, $labelQuery = '')
  * @package PersonalMessage
  * @param int[]|null $personal_messages array of pm ids
  * @param string|null $folder = null
- * @param int|null $owner = null
+ * @param int|int[]|null $owner = null
  */
 function deleteMessages($personal_messages, $folder = null, $owner = null)
 {

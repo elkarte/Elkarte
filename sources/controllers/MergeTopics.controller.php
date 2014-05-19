@@ -151,7 +151,8 @@ class MergeTopics_Controller extends Action_Controller
 	 * * logs the action in the moderation log.
 	 * * sends a notification is sent to all users monitoring this topic.
 	 * * redirects to ?action=mergetopics;sa=done.
-	 * @param array $topics = array()
+	 *
+	 * @param int[] $topics = array() of topic ids
 	 */
 	public function action_mergeExecute($topics = array())
 	{

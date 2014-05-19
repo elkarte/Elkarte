@@ -45,7 +45,7 @@ interface Database
 	 *
 	 * @param string $db_string
 	 * @param mixed[] $db_values
-	 * @param resource $connection = null
+	 * @param resource|null $connection = null
 	 * @return string
 	 */
 	public function quote($db_string, $db_values, $connection = null);
@@ -56,7 +56,7 @@ interface Database
 	 * @param string $identifier
 	 * @param string $db_string
 	 * @param mixed[] $db_values = array()
-	 * @param resource $connection = null
+	 * @param resource|null $connection = null
 	 */
 	public function query($identifier, $db_string, $db_values = array(), $connection = null);
 
@@ -190,7 +190,7 @@ interface Database
 	/**
 	 * Return last error string from the database server
 	 *
-	 * @param resource $connection = null
+	 * @param resource|null $connection = null
 	 * @return string
 	 */
 	public function last_error($connection = null);

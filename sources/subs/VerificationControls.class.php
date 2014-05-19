@@ -245,6 +245,13 @@ class Control_Verification_Captcha implements Control_Verifications
 	private $_text_value = null;
 
 	/**
+	 * The number of characters to generate
+	 *
+	 * @var int
+	 */
+	private $_num_chars = null;
+
+	/**
 	 * The url to the created image
 	 *
 	 * @var string
@@ -890,7 +897,7 @@ class Control_Verification_Questions implements Control_Verifications
 	/**
 	 * Adds the questions to the db
 	 *
-	 * @param mixed $questions
+	 * @param mixed[] $questions
 	 */
 	private function _insert($questions)
 	{
