@@ -2759,13 +2759,16 @@ function memoryReturnBytes($val)
 	// Convert to bytes
 	switch ($last)
 	{
+		// fall through select g = 1024*1024*1024
 		case 'g':
 			$num *= 1024;
+		// fall through select m = 1024*1024
 		case 'm':
 			$num *= 1024;
 		case 'k':
 			$num *= 1024;
 	}
+	
 	return $num;
 }
 

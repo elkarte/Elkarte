@@ -715,6 +715,7 @@ class Convert_BBC
 						break;
 					case 'color':
 							$bbc = '[color=' . $value . ']' . $bbc . '[/color]';
+					// These tags all mean the same thing as far as BBC is concerned
 					case 'float':
 					case 'text-align':
 					case 'align':
