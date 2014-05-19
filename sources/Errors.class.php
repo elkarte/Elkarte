@@ -338,7 +338,7 @@ class Attachment_Error_Context
 	/**
 	 * Sets the active attach (errors are "attached" to that)
 	 *
-	 * @param int $id|null A valid attachment, if invalid it defaults to 'generic'
+	 * @param int|null $id A valid attachment, if invalid it defaults to 'generic'
 	 */
 	public function activate($id = null)
 	{
