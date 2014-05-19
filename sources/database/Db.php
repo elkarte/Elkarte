@@ -64,7 +64,7 @@ interface Database
 	 * Fetch next result as association.
 	 *
 	 * @param resource $request
-	 * @param mixed $counter = false
+	 * @param int|boolean $counter = false
 	 */
 	public function fetch_assoc($request, $counter = false);
 
@@ -115,7 +115,7 @@ interface Database
 	 * Last insert id
 	 *
 	 * @param string $table
-	 * @param string $field = null
+	 * @param string|null $field = null
 	 * @param resource|null $connection = null
 	 */
 	public function insert_id($table, $field = null, $connection = null);
@@ -228,7 +228,7 @@ interface Database
 	/**
 	 * Select database.
 	 *
-	 * @param string $dbName = null
+	 * @param string|null $dbName = null
 	 * @param resource|null $connection = null
 	 */
 	public function select_db($dbName = null, $connection = null);

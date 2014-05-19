@@ -1191,7 +1191,7 @@ function emailsInfo($number)
  * - If batch size is not set, will determine a size such that it sends in 1/2 the period (buffer)
  *
  * @package Mail
- * @param mixed $batch_size = false the number to send each loop
+ * @param int|false $batch_size = false the number to send each loop
  * @param boolean $override_limit = false bypassing our limit flaf
  * @param boolean $force_send = false
  * @return boolean

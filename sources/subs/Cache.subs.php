@@ -82,7 +82,7 @@ function cache_quick_get($key, $file, $function, $params, $level = 1)
  *     Zend: http://files.zend.com/help/Zend-Platform/zend_cache_functions.htm
  *
  * @param string $key
- * @param mixed $value
+ * @param string|int|mixed[]|null $value
  * @param int $ttl = 120
  */
 function cache_put_data($key, $value, $ttl = 120)

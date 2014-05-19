@@ -278,7 +278,7 @@ function toggleTaskStatusByName($enabler, $enable = true)
  *
  * @package ScheduledTasks
  * @param int $id_task
- * @param int $disabled
+ * @param int|null $disabled
  * @param int|null $offset
  * @param int|null $interval
  * @param string|null $unit

@@ -42,8 +42,8 @@ if (!defined('ELK'))
  *  post-based membergroups in the database (restricted by parameter1).
  *
  * @param string $type Stat type - can be 'member', 'message', 'topic', 'subject' or 'postgroups'
- * @param int|string|false|mixed[]|null $parameter1 pass through value
- * @param int|string|false|mixed[]|null $parameter2 pass through value
+ * @param int|string|boolean|mixed[]|null $parameter1 pass through value
+ * @param int|string|boolean|mixed[]|null $parameter2 pass through value
  */
 function updateStats($type, $parameter1 = null, $parameter2 = null)
 {
@@ -532,7 +532,7 @@ function comma_format($number, $override_decimal_count = false)
  *
  * @param int $log_time
  * @param string|bool $show_today = true
- * @param string|false $offset_type = false
+ * @param string|bool $offset_type = false
  */
 function standardTime($log_time, $show_today = true, $offset_type = false)
 {

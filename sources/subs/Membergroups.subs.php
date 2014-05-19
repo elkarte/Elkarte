@@ -214,7 +214,7 @@ function deleteMembergroups($groups)
  *
  * @package Membergroups
  * @param int[]|int $members
- * @param integer $groups
+ * @param integer|null $groups
  * @param bool $permissionCheckDone = false
  *
  * @return boolean
