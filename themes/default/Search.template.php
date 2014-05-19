@@ -203,69 +203,63 @@ function template_results()
 	// Let them know if we ignored a word in the search
 	if (!empty($context['search_ignored']))
 		echo '
-			<div id="search_results">
-				<h3 class="category_header">
-					', $txt['generic_warning'], '
-				</h3>
-				<p class="warningbox">', $txt['search_warning_ignored_word' . (count($context['search_ignored']) == 1 ? '' : 's')], ': ', implode(', ', $context['search_ignored']), '</p>
-			</div>';
+		<div id="search_results">
+			<h3 class="category_header">
+				', $txt['generic_warning'], '
+			</h3>
+			<p class="warningbox">', $txt['search_warning_ignored_word' . (count($context['search_ignored']) == 1 ? '' : 's')], ': ', implode(', ', $context['search_ignored']), '</p>
+		</div>';
 
 	// Or perhaps they made a spelling error, lets give them a hint
 	if (isset($context['did_you_mean']) || empty($context['topics']))
 	{
 		echo '
-				<div id="search_results">
-					<h2 class="category_header">', $txt['search_adjust_query'], '</h2>
-					<div class="roundframe">';
+			<div id="search_results">
+				<h2 class="category_header">', $txt['search_adjust_query'], '</h2>
+				<div class="roundframe">';
 
 		// Did they make any typos or mistakes, perhaps?
 		if (isset($context['did_you_mean']))
 			echo '
-						<p>', $txt['search_did_you_mean'], ' <a href="', $scripturl, '?action=search;sa=results;params=', $context['did_you_mean_params'], '">', $context['did_you_mean'], '</a>.</p>';
+					<p>', $txt['search_did_you_mean'], ' <a href="', $scripturl, '?action=search;sa=results;params=', $context['did_you_mean_params'], '">', $context['did_you_mean'], '</a>.</p>';
 
 		echo '
-						<form action="', $scripturl, '?action=search;sa=results" method="post" accept-charset="UTF-8">
-							<dl class="settings">
-								<dt class="righttext">
-									<label for="search"><strong>', $txt['search_for'], ':</strong></label>
-								</dt>
-								<dd>
-									<input type="text" id="search" name="search" value="', $context['search_params']['search'], '" maxlength="', $context['search_string_limit'], '" size="40" class="input_text" />
-								</dd>
-							</dl>
-							<div class="submitbutton" >
-								<input type="submit" name="edit_search" value="', $txt['search_adjust_submit'], '" class="button_submit" />
-								<input type="hidden" name="searchtype" value="', $context['search_params']['searchtype'], '" />
-								<input type="hidden" name="userspec" value="', $context['search_params']['userspec'], '" />
-								<input type="hidden" name="show_complete" value="', $context['search_params']['show_complete'], '" />
-								<input type="hidden" name="subject_only" value="', $context['search_params']['subject_only'], '" />
-								<input type="hidden" name="minage" value="', $context['search_params']['minage'], '" />
-								<input type="hidden" name="maxage" value="', $context['search_params']['maxage'], '" />
-								<input type="hidden" name="sort" value="', $context['search_params']['sort'], '" />
-							</div>';
+					<form action="', $scripturl, '?action=search;sa=results" method="post" accept-charset="UTF-8">
+						<dl class="settings">
+							<dt class="righttext">
+								<label for="search"><strong>', $txt['search_for'], ':</strong></label>
+							</dt>
+							<dd>
+								<input type="text" id="search" name="search" value="', $context['search_params']['search'], '" maxlength="', $context['search_string_limit'], '" size="40" class="input_text" />
+							</dd>
+						</dl>
+						<div class="submitbutton" >
+							<input type="submit" name="edit_search" value="', $txt['search_adjust_submit'], '" class="button_submit" />
+							<input type="hidden" name="searchtype" value="', $context['search_params']['searchtype'], '" />
+							<input type="hidden" name="userspec" value="', $context['search_params']['userspec'], '" />
+							<input type="hidden" name="show_complete" value="', $context['search_params']['show_complete'], '" />
+							<input type="hidden" name="subject_only" value="', $context['search_params']['subject_only'], '" />
+							<input type="hidden" name="minage" value="', $context['search_params']['minage'], '" />
+							<input type="hidden" name="maxage" value="', $context['search_params']['maxage'], '" />
+							<input type="hidden" name="sort" value="', $context['search_params']['sort'], '" />
+						</div>';
 
 		if (!empty($context['search_params']['brd']))
 			foreach ($context['search_params']['brd'] as $board_id)
 				echo '
-							<input type="hidden" name="brd[', $board_id, ']" value="', $board_id, '" />';
+						<input type="hidden" name="brd[', $board_id, ']" value="', $board_id, '" />';
 
 		echo '
-						</form>
-					</div>
+					</form>
 				</div>
-				<br />';
+			</div>
+			<br />';
 	}
 
 	// Quick moderation set to checkboxes? Oh, how fun :/.
 	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
 		echo '
 			<form action="', $scripturl, '?action=quickmod" method="post" accept-charset="UTF-8" name="topicForm" id="topicForm" class="search_results_posts', $context['compact'] ? ' compact_view' : '', '">';
-	elseif ($context['compact'])
-		echo '
-			<div id="topicForm" class="compact_view search_results_posts">';
-	else
-		echo '
-			<div id="topicForm" class="search_results_posts">';
 
 	echo '
 				<h3 class="category_header hdicon cat_img_search">
@@ -286,6 +280,13 @@ function template_results()
 	else
 		echo '
 				<div class="roundframe">', $txt['find_no_results'], '</div>';
+
+	if ($context['compact'])
+		echo '
+				<ul id="topicForm" class="topic_listing compact_view search_results_posts">';
+	else
+		echo '
+				<ul id="topicForm" class="topic_listing search_results_posts">';
 
 	// While we have results to show ...
 	$controller = $context['get_topics'][0];
@@ -312,16 +313,25 @@ function template_results()
 		foreach ($topic['matches'] as $message)
 		{
 			echo '
-				<div class="', $color_class, ' core_posts">
-					<div class="topic_details">
-						<div class="counter">', $message['counter'], '</div>
-						<h5>', $topic['board']['link'], ' / <a href="', $scripturl, '?topic=', $topic['id'], '.msg', $message['id'], '#msg', $message['id'], '">', $message['subject_highlighted'], '</a></h5>
-						<span class="smalltext">&#171;&nbsp;', $txt['by'], '&nbsp;<strong>', $message['member']['link'], '</strong> ', $txt['on'], '&nbsp;<em>', $message['time'], '</em>&nbsp;&#187;</span>';
+					<li class="', $color_class, '">
+						<div class="topic_details">
+							<div class="counter">', $message['counter'], '</div>
+							<h5>', $topic['board']['link'], ' / <a href="', $scripturl, '?topic=', $topic['id'], '.msg', $message['id'], '#msg', $message['id'], '">', $message['subject_highlighted'], '</a></h5>
+							<span class="smalltext">&#171;&nbsp;', $txt['by'], '&nbsp;<strong>', $message['member']['link'], '</strong> ', $txt['on'], '&nbsp;<em>', $message['time'], '</em>&nbsp;&#187;</span>';
+			echo '
+						</div>';
+
+			if (!$context['compact'] || $message['body_highlighted'] != '')
+				echo '
+						<div class="topic_body">', $message['body_highlighted'], '</div>';
+
+			if (!empty($topic['buttons']))
+				template_quickbutton_strip($topic['buttons'], $topic['tests']);
 
 			if (!empty($options['display_quick_mod']))
 			{
 				echo '
-						<div class="quick_mod">';
+						<p class="topic_moderation">';
 
 				if ($options['display_quick_mod'] == 1)
 				{
@@ -352,22 +362,16 @@ function template_results()
 				}
 
 				echo '
-						</div>';
+						</p>';
 			}
-			echo '
-					</div>';
-
-			if (!$context['compact'] || $message['body_highlighted'] != '')
-				echo '
-					<div class="topic_body">', $message['body_highlighted'], '</div>';
-
-			if (!empty($topic['buttons']))
-				template_quickbutton_strip($topic['buttons'], $topic['tests']);
 
 		echo '
-				</div>';
+					</li>';
 		}
 	}
+
+	echo '
+				</ul>';
 
 	// If we have results show a page index
 	if (!empty($context['topics']))
@@ -406,13 +410,10 @@ function template_results()
 				<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
 			</form>';
 	}
-	else
-		echo '
-			</div>';
 
 	// Show a jump to box for easy navigation.
 	echo '
-				<div class="floatright" id="search_jump_to">&nbsp;</div>';
+			<div class="floatright" id="search_jump_to">&nbsp;</div>';
 
 	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && !empty($context['topics']) && $context['can_move'])
 		addInlineJavascript('

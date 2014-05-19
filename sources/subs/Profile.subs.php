@@ -507,7 +507,7 @@ function loadProfileFields($force_reload = false)
 			'type' => 'callback',
 			'callback_func' => 'theme_pick',
 			'permission' => 'profile_extra',
-			'enabled' => !$settings['disable_user_variant'] || $modSettings['theme_allow'] || allowedTo('admin_forum'),
+			'enabled' => empty($settings['disable_user_variant']) || !empty($modSettings['theme_allow']) || allowedTo('admin_forum'),
 			'preload' => create_function('', '
 				global $context, $cur_profile, $txt;
 
