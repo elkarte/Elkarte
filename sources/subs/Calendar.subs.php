@@ -851,12 +851,13 @@ function getEventPoster($event_id)
 	);
 
 	// No results, return false.
-	if ($db->num_rows === 0)
+	if ($db->num_rows($request) === 0)
 		return false;
 
 	// Grab the results and return.
 	list ($poster) = $db->fetch_row($request);
 	$db->free_result($request);
+
 	return (int) $poster;
 }
 
