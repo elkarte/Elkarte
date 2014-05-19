@@ -597,6 +597,7 @@ class Post_Controller extends Action_Controller
 		if ($context['attachments']['can']['post'])
 		{
 			// If there are attachments, calculate the total size and how many.
+			$attachments = array();
 			$attachments['total_size'] = 0;
 			$attachments['quantity'] = 0;
 
@@ -1480,6 +1481,7 @@ class Post_Controller extends Action_Controller
 
 		if (!empty($modSettings['mentions_enabled']) && !empty($_REQUEST['uid']))
 		{
+			$query_params = array();
 			$query_params['member_ids'] = array_unique(array_map('intval', $_REQUEST['uid']));
 			require_once(SUBSDIR . '/Members.subs.php');
 			$mentioned_members = membersBy('member_ids', $query_params, true);
