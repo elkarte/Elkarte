@@ -1811,6 +1811,7 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 	// Any specific template style sheets to load?
 	if (!empty($style_sheets))
 	{
+		$sheets = array();
 		foreach ($style_sheets as $sheet)
 		{
 			$sheets[] = stripos('.css', $sheet) !== false ? $sheet : $sheet . '.css';

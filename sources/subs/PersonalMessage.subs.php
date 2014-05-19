@@ -1488,6 +1488,7 @@ function updateLabelsToPM($searchArray, $new_labels, $user_id)
 			'find_label_implode' => '\'' . implode('\', labels) != 0 OR FIND_IN_SET(\'', $searchArray) . '\'',
 		)
 	);
+	$to_update = array();
 	while ($row = $db->fetch_assoc($request))
 	{
 		// Do the long task of updating them...

@@ -759,6 +759,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 	if (substr($sort, 0, 1) == '1' || strpos($sort, ', 1') !== false)
 	{
 		$sort_ascending = strpos($sort, 'DESC') === false;
+		$sort_array = array();
 
 		foreach ($groups as $group)
 			$sort_array[] = $group['id_group'] != 3 ? (int) $group['num_members'] : -1;

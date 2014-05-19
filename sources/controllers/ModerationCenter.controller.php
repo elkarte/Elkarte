@@ -312,6 +312,9 @@ class ModerationCenter_Controller extends Action_Controller
 		$context['page_title'] = $txt['moderation_center'];
 		$context['sub_template'] = 'moderation_center';
 
+		// Start off with no blocks
+		$valid_blocks = array();
+
 		// Load what blocks the user actually can see...
 		$valid_blocks['p'] = 'notes';
 

@@ -423,6 +423,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			}
 
 			// Make sure all boards selected are stored in a proper array.
+			$changed_boards = array();
 			$accesses = empty($_POST['boardaccess']) || !is_array($_POST['boardaccess']) ? array() : $_POST['boardaccess'];
 			$changed_boards['allow'] = array();
 			$changed_boards['deny'] = array();
@@ -605,6 +606,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			// Time to update the boards this membergroup has access to.
 			if ($current_group['id_group'] == 2 || $current_group['id_group'] > 3)
 			{
+				$changed_boards = array();
 				$changed_boards['allow'] = array();
 				$changed_boards['deny'] = array();
 				$changed_boards['ignore'] = array();

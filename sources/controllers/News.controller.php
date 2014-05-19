@@ -286,6 +286,7 @@ class News_Controller extends Action_Controller
 		}
 		elseif ($xml_format == 'atom')
 		{
+			$url_parts = array();
 			foreach (array('board', 'boards', 'c') as $var)
 				if (isset($_REQUEST[$var]))
 					$url_parts[] = $var . '=' . (is_array($_REQUEST[$var]) ? implode(',', $_REQUEST[$var]) : $_REQUEST[$var]);
@@ -359,7 +360,9 @@ class News_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Members.subs.php');
 		$members = recentMembers((int) $this->_limit);
 
+		// No data yet
 		$data = array();
+
 		foreach ($members as $member)
 		{
 			// Make the data look rss-ish.
@@ -629,6 +632,9 @@ class News_Controller extends Action_Controller
 			return array();
 
 		$profile = &$memberContext[$uid];
+
+		// No feed data yet
+		$data = array();
 
 		if ($xml_format == 'rss' || $xml_format == 'rss2')
 			$data = array(array(

@@ -184,6 +184,7 @@ function loadTasks($tasks)
 			'tasks' => $tasks,
 		)
 	);
+	$task = array();
 	while ($row = $db->fetch_assoc($request))
 		$task[$row['id_task']] = $row['task'];
 	$db->free_result($request);

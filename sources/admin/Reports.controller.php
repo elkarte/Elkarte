@@ -272,6 +272,9 @@ class Reports_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Boards.subs.php');
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 
+		// Lets get started
+		$query_boards = array();
+
 		if (isset($_REQUEST['boards']))
 		{
 			if (!is_array($_REQUEST['boards']))
@@ -720,6 +723,7 @@ function addData($inc_data, $custom_table = null)
 		$table = $context['current_table'];
 
 	// If we have keys, sanitise the data...
+	$data = array();
 	if (!empty($context['keys']))
 	{
 		// Basically, check every key exists!

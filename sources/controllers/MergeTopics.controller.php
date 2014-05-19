@@ -209,6 +209,7 @@ class MergeTopics_Controller extends Action_Controller
 		$num_views = 0;
 		$is_sticky = 0;
 		$boardTotals = array();
+		$topic_data = array();
 		$boards = array();
 		$polls = array();
 		$firstTopic = 0;

@@ -511,7 +511,8 @@ class Xml_Controller extends Action_Controller
 					// Read the new ordering, remember where the moved smiley is in the stack
 					$list_order = 0;
 					$moved_key = 0;
-					
+					$smiley_tree = array();
+
 					foreach ($_POST['smile'] as $smile_id)
 					{
 						$smiley_tree[] = $smile_id;
