@@ -84,5 +84,18 @@ tools:
             - sources/ext
             - install
             - languages
-    php_sim:
-        min_mass: '60'
+    php_cpd:
+        excluded_dirs:
+            - attachments
+            - avatars
+            - cache
+            - docs
+            - packages
+            - smileys
+            - tests
+            - ext
+            - sources/ext
+            - install
+        min_lines: '20'
+        filter:
+            excluded_paths: ['attachments/*', 'avatars/*', 'cache/*', 'docs/*', 'packages/*', 'smileys/*', 'tests/*', 'ext/*', 'sources/ext/*', 'install/*']
