@@ -85,4 +85,4 @@ tools:
             - install
             - languages
     php_sim:
-        min_mass: '30'
+        min_mass: '60'
