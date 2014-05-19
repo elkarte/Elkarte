@@ -267,7 +267,7 @@ class Database_MySQL implements Database
 	 *
 	 * @param string $identifier
 	 * @param string $db_string
-	 * @param mixed[] $db_values = array()
+	 * @param mixed[]|false $db_values = array()
 	 * @param resource|false|null $connection = null
 	 */
 	public function query($identifier, $db_string, $db_values = array(), $connection = null)
@@ -1058,7 +1058,7 @@ class Database_MySQL implements Database
 			// Ensure the columns are in proper order.
 			ksort($columns);
 
-			$schema_create .= ',' . $crlf . ' ' . $keyname . ' (' . implode($columns, ', ') . ')';
+			$schema_create .= ',' . $crlf . ' ' . $keyname . ' (' . implode(', ', $columns) . ')';
 		}
 
 		// Now just get the comment and type... (MyISAM, etc.)
