@@ -3733,7 +3733,8 @@ dl.no_members {
 	float: right;
 }
 #mlsearch_options .mlsearch_option .input_check {
-	margin-left: 0.5em;
+	margin: 0 0 0 0.5em;
+	float: right;
 }
 #mlsearch_options .mlsearch_option {
 	padding: 0.2em 0;
