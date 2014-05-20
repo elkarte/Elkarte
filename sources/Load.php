@@ -914,6 +914,10 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 		$db->free_result($request);
 	}
 
+	// Anthing else integration may want to add to the user_profile array
+	if (!empty($new_loaded_ids))
+		call_integration_hook('integrate_add_member_data', array($new_loaded_ids, $set));
+
 	if (!empty($new_loaded_ids) && !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 3)
 	{
 		for ($i = 0, $n = count($new_loaded_ids); $i < $n; $i++)
