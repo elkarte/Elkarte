@@ -2316,6 +2316,7 @@ class Packages_Controller extends Action_Controller
 					{
 						$sort_id['modification']++;
 						$sort_id['mod']++;
+						$sort_id['addon']++;
 						if ($installed)
 						{
 							if (!empty($context['available_modification'][$packageInfo['id']]))
