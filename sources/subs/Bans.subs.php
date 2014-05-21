@@ -741,13 +741,14 @@ function insertBanGroup($ban_info = array())
  */
 function range2ip($low, $high)
 {
+	$ip = array();
+
 	// IPv6 check.
 	if (!empty($high[4]) || !empty($high[5]) || !empty($high[6]) || !empty($high[7]))
 	{
 		if (count($low) != 8 || count($high) != 8)
 			return '';
 
-		$ip = array();
 		for ($i = 0; $i < 8; $i++)
 		{
 			if ($low[$i] == $high[$i])

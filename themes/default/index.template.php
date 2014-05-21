@@ -256,7 +256,9 @@ function template_body_above()
 	{
 		echo '
 			<form id="search_form" action="', $scripturl, '?action=search;sa=results" method="post" accept-charset="UTF-8">
-				<input type="text" name="search" value="" class="input_text" placeholder="', $txt['search'], '" />';
+				<label for="search">
+					<input type="text" name="search" value="" class="input_text" placeholder="', $txt['search'], '" />
+				</label>';
 
 		// Using the quick search dropdown?
 		if (!empty($modSettings['search_dropdown']))
@@ -264,6 +266,7 @@ function template_body_above()
 			$selected = !empty($context['current_topic']) ? 'current_topic' : (!empty($context['current_board']) ? 'current_board' : 'all');
 
 			echo '
+				<label for="search_selection">
 				<select name="search_selection" id="search_selection">
 					<option value="all"', ($selected == 'all' ? ' selected="selected"' : ''), '>', $txt['search_entireforum'], ' </option>';
 
@@ -284,7 +287,8 @@ function template_body_above()
 
 			echo '
 					<option value="members"', ($selected == 'members' ? ' selected="selected"' : ''), '>', $txt['search_members'], ' </option>
-				</select>';
+				</select>
+				</label>';
 		}
 
 		// Search within current topic?
@@ -457,7 +461,7 @@ function template_menu()
 
 	// WAI-ARIA a11y tweaks have been applied here.
 	echo '
-					<ul id="main_menu" class="wrapper">';
+					<ul id="main_menu" class="wrapper" role="menubar">';
 
 	// The upshrink image, right-floated.
 	echo '
@@ -472,30 +476,30 @@ function template_menu()
 	foreach ($context['menu_buttons'] as $act => $button)
 	{
 		echo '
-						<li id="button_', $act, '" class="listlevel1', !empty($button['sub_buttons']) ? ' subsections" aria-haspopup="true"' : '"', '>
+						<li id="button_', $act, '" class="listlevel1', !empty($button['sub_buttons']) ? ' subsections" aria-haspopup="true"' : '"', ' role="menuitem">
 							<a ', (!empty($button['data-icon']) ? 'data-icon="' . $button['data-icon'] . '" ' : ''), 'class="linklevel1', !empty($button['active_button']) ? ' active' : '', (!empty($button['indicator']) ? ' indicator' : '' ), '" href="', $button['href'], '" ', isset($button['target']) ? 'target="' . $button['target'] . '"' : '', '><span class="button_title">', $button['title'], '</span></a>';
 
 		// Any 2nd level menus?
 		if (!empty($button['sub_buttons']))
 		{
 			echo '
-							<ul class="menulevel2">';
+							<ul class="menulevel2" role="menu">';
 
 			foreach ($button['sub_buttons'] as $childact => $childbutton)
 			{
 				echo '
-								<li id="button_', $childact, '" class="listlevel2', !empty($childbutton['sub_buttons']) ? ' subsections" aria-haspopup="true"' : '"', '>
+								<li id="button_', $childact, '" class="listlevel2', !empty($childbutton['sub_buttons']) ? ' subsections" aria-haspopup="true"' : '"', ' role="menuitem">
 									<a class="linklevel2" href="', $childbutton['href'], '" ', isset($childbutton['target']) ? 'target="' . $childbutton['target'] . '"' : '', '>', $childbutton['title'], '</a>';
 
 				// 3rd level menus :)
 				if (!empty($childbutton['sub_buttons']))
 				{
 					echo '
-									<ul class="menulevel3">';
+									<ul class="menulevel3" role="menu">';
 
 					foreach ($childbutton['sub_buttons'] as $grandchildact => $grandchildbutton)
 						echo '
-										<li id="button_', $grandchildact, '" class="listlevel3">
+										<li id="button_', $grandchildact, '" class="listlevel3" role="menuitem">
 											<a class="linklevel3" href="', $grandchildbutton['href'], '" ', isset($grandchildbutton['target']) ? 'target="' . $grandchildbutton['target'] . '"' : '', '>', $grandchildbutton['title'], '</a>
 										</li>';
 
@@ -708,9 +712,9 @@ function template_show_error($error_id)
 		echo '
 								<ul', (isset($error['type']) ? ' class="error"' : ''), ' id="', $error_id, '_list">';
 
-		foreach ($error['errors'] as $key => $error)
+		foreach ($error['errors'] as $key => $err)
 			echo '
-									<li id="', $error_id, '_', $key, '">', $error, '</li>';
+									<li id="', $error_id, '_', $key, '">', $err, '</li>';
 		echo '
 								</ul>';
 	}
@@ -755,7 +759,7 @@ function template_pagesection($button_strip = false, $strip_direction = '', $opt
 		$options['extra'] = '';
 
 	echo '
-			<div class="pagesection">
+			<div class="pagesection" role="application">
 				', $pages, '
 				', !empty($button_strip) && !empty($context[$button_strip]) ? template_button_strip($context[$button_strip], $strip_direction) : '',
 	$options['extra'], '
@@ -774,28 +778,8 @@ function template_news_fader()
 			<li>
 				', $settings['enable_news'] == 2 ? implode('</li><li>', $context['news_lines']) : $context['random_news_line'], '
 			</li>
-		</ul>
-	<script><!-- // --><![CDATA[
-		var newsFaderStarted = false;
+		</ul>';
 
-		function startNewsFader()
-		{
-			if (newsFaderStarted)
-				return;
-
-			// Create a news fader object.
-			var oNewsFader = new elk_NewsFader({
-				sFaderControlId: \'elkFadeScroller\',
-				sItemTemplate: ', JavaScriptEscape('%1$s'), ',
-				iFadeDelay: ', empty($settings['newsfader_time']) ? 5000 : $settings['newsfader_time'], '
-			});
-			newsFaderStarted = true;
-		}';
-
-	if ($settings['enable_news'] == 2 && empty($context['minmax_preferences']['upshrink']))
-		echo '
-		startNewsFader();';
-
-	echo '
-	// ]]></script>';
+	addInlineJavascript('
+		$(\'#elkFadeScroller\').Elk_NewsFader();', true);
 }

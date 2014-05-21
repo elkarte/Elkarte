@@ -78,7 +78,7 @@ class Attachment_Controller extends Action_Controller
 		}
 
 		// We should have files, otherwise why are we here?
-		if (isset($_FILES["attachment"]))
+		if (isset($_FILES['attachment']))
 		{
 			loadLanguage('Post');
 

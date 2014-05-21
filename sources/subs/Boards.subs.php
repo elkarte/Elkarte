@@ -2084,7 +2084,7 @@ function boardNotifications($start, $items_per_page, $sort, $memID)
  * Count boards all or specific depending on argument, redirect boards excluded by default.
  *
  * @package Boards
- * @param mixed[] $conditions is an associative array that holds the board or the cat IDs
+ * @param mixed[]|string $conditions is an associative array that holds the board or the cat IDs
  *              'categories' => an array of category IDs (it accepts a single ID too)
  *              'boards' => an array of board IDs (it accepts a single ID too)
  *              if conditions is set to 'all' (not an array) all the boards are queried

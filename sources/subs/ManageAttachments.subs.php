@@ -971,7 +971,7 @@ function maxAttachment()
  * Check multiple attachments IDs against the database.
  *
  * @package Attachments
- * @param array $attachments
+ * @param int[] $attachments
  * @param string $approve_query
  */
 function validateAttachments($attachments, $approve_query)

@@ -198,7 +198,7 @@ class ManageLanguages_Controller extends Action_Controller
 			'base_href' => $scripturl . '?action=admin;area=languages',
 			'title' => $txt['edit_languages'],
 			'data_check' => array(
-				'class'=> create_function('$rowData', '
+				'class' => create_function('$rowData', '
 					if ($rowData[\'default\'])
 						return \'highlight2\';
 					else
@@ -653,6 +653,7 @@ class ManageLanguages_Controller extends Action_Controller
 
 		// This will be where we look
 		$lang_dirs = array();
+		$images_dirs = array();
 
 		// Check we have themes with a path and a name - just in case - and add the path.
 		foreach ($themes as $id => $data)
@@ -731,9 +732,14 @@ class ManageLanguages_Controller extends Action_Controller
 				unlink(BOARDDIR . '/agreement.' . $context['lang_id'] . '.txt');
 
 			// Fourth, a related images folder?
-			foreach ($images_dirs as $curPath)
-				if (is_dir($curPath))
-					deltree($curPath);
+			if (!empty($images_dirs))
+			{
+				foreach ($images_dirs as $curPath)
+				{
+					if (is_dir($curPath))
+						deltree($curPath);
+				}
+			}
 
 			// Members can no longer use this language.
 			removeLanguageFromMember($context['lang_id']);

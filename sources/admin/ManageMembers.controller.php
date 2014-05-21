@@ -186,6 +186,7 @@ class ManageMembers_Controller extends Action_Controller
 			checkSession();
 
 			// Clean the input.
+			$delete = array();
 			foreach ($_POST['delete'] as $key => $value)
 			{
 				// Don't delete yourself, idiot.
@@ -997,6 +998,9 @@ class ManageMembers_Controller extends Action_Controller
 
 		// We also need to the login languages here - for emails.
 		loadLanguage('Login');
+
+		// Start off clean
+		$conditions = array();
 
 		// Sort out where we are going...
 		$current_filter = $conditions['activated_status'] = (int) $_REQUEST['orig_filter'];

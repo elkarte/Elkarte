@@ -1921,7 +1921,7 @@ class Search_Controller extends Action_Controller
 		{
 			// Fix the international characters in the keyword too.
 			$query = un_htmlspecialchars($query);
-			$query = trim($query, "\*+");
+			$query = trim($query, '\*+');
 			$query = strtr(Util::htmlspecialchars($query), array('\\\'' => '\''));
 
 			$body_highlighted = preg_replace_callback('/((<[^>]*)|' . preg_quote(strtr($query, array('\'' => '&#039;')), '/') . ')/iu', array($this, '_highlighted_callback'), $body_highlighted);
@@ -1959,7 +1959,7 @@ class Search_Controller extends Action_Controller
 			$output['buttons'] = array(
 				// Can we request notification of topics?
 				'notify' => array(
-					'href' => $scripturl . '?action=notify;topic=' . $output['id'] . '.' . 'msg' . $message['id_msg'],
+					'href' => $scripturl . '?action=notify;topic=' . $output['id'] . '.msg' . $message['id_msg'],
 					'text' => $txt['notify'],
 					'test' => 'can_mark_notify',
 				),

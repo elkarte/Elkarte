@@ -165,7 +165,7 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
  * Fetches errors and group them by error type
  *
  * @param mixed[]|null $filter
- * @param string $sort
+ * @param string|null $sort
  */
 function fetchErrorsByType($filter = null, $sort = null)
 {

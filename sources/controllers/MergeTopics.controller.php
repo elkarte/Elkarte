@@ -151,7 +151,8 @@ class MergeTopics_Controller extends Action_Controller
 	 * * logs the action in the moderation log.
 	 * * sends a notification is sent to all users monitoring this topic.
 	 * * redirects to ?action=mergetopics;sa=done.
-	 * @param array $topics = array()
+	 *
+	 * @param int[] $topics = array() of topic ids
 	 */
 	public function action_mergeExecute($topics = array())
 	{
@@ -208,6 +209,7 @@ class MergeTopics_Controller extends Action_Controller
 		$num_views = 0;
 		$is_sticky = 0;
 		$boardTotals = array();
+		$topic_data = array();
 		$boards = array();
 		$polls = array();
 		$firstTopic = 0;
@@ -490,7 +492,7 @@ class MergeTopics_Controller extends Action_Controller
 			cache_put_data('response_prefix', $context['response_prefix'], 600);
 		}
 
-		$enforce_subject = isset($_POST['enforce_subject']) ? Util::htmlspecialchars(trim($_POST['enforce_subject'])): '';
+		$enforce_subject = isset($_POST['enforce_subject']) ? Util::htmlspecialchars(trim($_POST['enforce_subject'])) : '';
 
 		// Merge topic notifications.
 		$notifications = isset($_POST['notifications']) && is_array($_POST['notifications']) ? array_intersect($topics, $_POST['notifications']) : array();

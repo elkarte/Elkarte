@@ -160,7 +160,7 @@ function getPMCount($descending = false, $pmID = null, $labelQuery = '')
  * @package PersonalMessage
  * @param int[]|null $personal_messages array of pm ids
  * @param string|null $folder = null
- * @param int|null $owner = null
+ * @param int|int[]|null $owner = null
  */
 function deleteMessages($personal_messages, $folder = null, $owner = null)
 {
@@ -1488,6 +1488,7 @@ function updateLabelsToPM($searchArray, $new_labels, $user_id)
 			'find_label_implode' => '\'' . implode('\', labels) != 0 OR FIND_IN_SET(\'', $searchArray) . '\'',
 		)
 	);
+	$to_update = array();
 	while ($row = $db->fetch_assoc($request))
 	{
 		// Do the long task of updating them...

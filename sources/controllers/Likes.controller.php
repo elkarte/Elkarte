@@ -220,7 +220,7 @@ class Likes_Controller extends Action_Controller
 		{
 			$details = loadLikes($this->_id_liked, true);
 			$count = empty($details) ? 0 : $details[$this->_id_liked]['count'];
-			$text = $count !== 0 ? $count . ' ' . $txt['likes'] : $txt['like_post'];
+			$text = $count !== 0 ? $txt['likes'] : $txt['like_post'];
 			$title = empty($details) ? '' : $txt['liked_by'] . ' ' . implode(', ', $details[$this->_id_liked]['member']);
 			$this->_likes_response = array(
 				'result' => true,
@@ -365,8 +365,8 @@ class Likes_Controller extends Action_Controller
 
 							return $result;'
 						),
-						'class' => "centertext",
-						'style' => "width: 10%",
+						'class' => 'centertext',
+						'style' => 'width: 10%',
 					),
 				),
 			),
@@ -467,8 +467,8 @@ class Likes_Controller extends Action_Controller
 
 							return $result;'
 						),
-						'class' => "centertext",
-						'style' => "width: 10%",
+						'class' => 'centertext',
+						'style' => 'width: 10%',
 					),
 				),
 			),

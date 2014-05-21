@@ -59,23 +59,25 @@
 				$this.on(settings.refreshevent, function(e) {
 					e.preventDefault();
 
-					var uniqueID = settings.uniqueID ? '_' + settings.uniqueID : '';
+					var uniqueID = settings.uniqueID ? '_' + settings.uniqueID : '',
+						new_url = '',
+						i = 0;
 
 					// The admin area is a bit different unfortunately
 					if (settings.admin)
 					{
 						settings.imageURL = $('#verification_image' + uniqueID).attr('src').replace(/.$/, '') + $this.val();
-						var new_url = String(settings.imageURL);
+						new_url = String(settings.imageURL);
 					}
 					else
 					{
 						// Make sure we are using a new rand code.
-						var new_url = String(settings.imageURL);
+						new_url = String(settings.imageURL);
 						new_url = new_url.substr(0, new_url.indexOf("rand=") + 5);
 
 						// Quick and dirty way of converting decimal to hex
 						var hexstr = "0123456789abcdef";
-						for (var i = 0; i < 32; i++)
+						for (i = 0; i < 32; i++)
 							new_url = new_url + hexstr.substr(Math.floor(Math.random() * 16), 1);
 					}
 
@@ -92,6 +94,5 @@
 				});
 			}
 		});
-
 	};
 })( jQuery );

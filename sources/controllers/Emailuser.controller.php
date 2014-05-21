@@ -302,8 +302,8 @@ class Emailuser_Controller extends Action_Controller
 			$context['form_hidden_vars']['msg'] = (int) $_REQUEST['msg'];
 		}
 
-		// Are you sure you got the address?
-		if (empty($row['email_address']))
+		// Are you sure you got the address or any data?
+		if (empty($row['email_address']) || empty($row))
 			fatal_lang_error('cant_find_user_email');
 
 		// Can they actually do this?

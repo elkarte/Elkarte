@@ -66,6 +66,7 @@ function postbyemail_imap()
 		return false;
 
 	// If using gmail, we may need the trash bin name as well
+	$trash_bin = '';
 	if (!empty($modSettings['maillist_imap_delete']) && (strpos($hostname, '.gmail.') !== false))
 		$trash_bin = get_trash_folder($inbox, $server);
 
@@ -86,7 +87,7 @@ function postbyemail_imap()
 		foreach ($emails as $email_uid)
 		{
 			// Get the headers and prefetch the body as well to avoid a second request
-			$headers = imap_fetchheader($inbox, $email_uid, FT_PREFETCHTEXT|FT_UID);
+			$headers = imap_fetchheader($inbox, $email_uid, FT_PREFETCHTEXT | FT_UID);
 			$message = imap_body($inbox, $email_uid, FT_UID);
 
 			// Create the save-as email

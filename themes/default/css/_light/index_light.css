@@ -570,7 +570,7 @@ div.bbc_footnotes .meaction{
 }
 /* Level 1 active buttons. */
 .linklevel1.active, .listlevel1:hover .active,
-#collapse_button .linklevel1, .pm_indicator {
+#collapse_button .linklevel1, .pm_indicator, .likes_indicator {
 	border: 1px solid #38642e;
 	border-left: 1px solid #38642d;
 	border-top: 1px solid #4b863c;
@@ -643,7 +643,7 @@ div.bbc_footnotes .meaction{
 }
 /* Tricky PM indicator. Define it carefully,
 /* just in case someone tries to use this class elsewhere. */
-.pm_indicator {
+.pm_indicator, .likes_indicator {
 	position: absolute;
 	top: -1.5em;
 	right: -0.5em;
@@ -658,6 +658,14 @@ div.bbc_footnotes .meaction{
 }
 .poster .pm_indicator {
 	font-size: 1em;
+}
+.likes_indicator {
+	font-size: .857em;
+	border-radius: 4px 4px 4px 0;
+	box-shadow: 2px 2px 2px rgba(0,0,0,0.25);
+	border-radius: 6px 6px 6px 0;
+	line-height: 1.5em;
+	top: -1.2em;
 }
 /* Levels 2 and 3 drop menus: link or button. */
 .linklevel2:link, .linklevel2:visited, .linklevel3:link, .linklevel3:visited {

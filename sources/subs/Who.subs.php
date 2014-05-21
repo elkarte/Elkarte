@@ -432,12 +432,15 @@ function determineActions($urls, $preferred_prefix = false)
 
 /**
  * Prepare credits for display.
- * This is a helper function, used by admin panel for credits and support page, and by the credits page.
+ *
+ * - This is a helper function, used by admin panel for credits and support page, and by the credits page.
  */
 function prepareCreditsData()
 {
 	global $txt;
 
+	$credits = array();
+	
 	// Don't blink. Don't even blink. Blink and you're dead.
 	$credits['credits'] = array(
 		array(

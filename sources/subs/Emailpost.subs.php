@@ -913,7 +913,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	$message = parse_bbc($message, false);
 
 	// Change list style to something standard to make text conversion easier
-	$message = preg_replace('~<ul class=\"bbc_list\" style=\"list-style-type: decimal;\">(.*?)</ul>~si', "<ol>\\1</ol>", $message);
+	$message = preg_replace('~<ul class=\"bbc_list\" style=\"list-style-type: decimal;\">(.*?)</ul>~si', '<ol>\\1</ol>', $message);
 
 	// Do we have any tables? if so we add in th's based on the number of cols.
 	$table_content = array();
@@ -977,7 +977,7 @@ function quote_callback($matches)
 {
 	global $txt;
 
-	return '<blockquote>' . $txt['email_on'] . ": " . date('D M j, Y', $matches[4]) . ' ' . $matches[2] . ' ' . $txt['email_wrote'] . ':';
+	return '<blockquote>' . $txt['email_on'] . ': ' . date('D M j, Y', $matches[4]) . ' ' . $matches[2] . ' ' . $txt['email_wrote'] . ':';
 }
 
 /**

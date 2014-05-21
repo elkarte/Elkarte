@@ -84,8 +84,8 @@ function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
 
 		// Sender details we can use
 		$temp = query_load_user_info($row['email_from']);
-		$postemail[$i]['name'] = !empty($temp['user_info']['name']) ? $temp['user_info']['name']: '';
-		$postemail[$i]['language'] = !empty($temp['user_info']['language']) ? $temp['user_info']['language']: '';
+		$postemail[$i]['name'] = !empty($temp['user_info']['name']) ? $temp['user_info']['name'] : '';
+		$postemail[$i]['language'] = !empty($temp['user_info']['language']) ? $temp['user_info']['language'] : '';
 
 		// Build a link to the topic or message in case someone wants to take a look at that thread
 		if ($row['message_type'] === 't')

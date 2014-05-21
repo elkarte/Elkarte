@@ -1350,6 +1350,8 @@ function updateLastMessages($setboards, $id_msg = 0)
 	if (!is_array($setboards))
 		$setboards = array($setboards);
 
+	$lastMsg = array();
+
 	// If we don't know the id_msg we need to find it.
 	if (!$id_msg)
 	{
@@ -1365,7 +1367,6 @@ function updateLastMessages($setboards, $id_msg = 0)
 				'approved' => 1,
 			)
 		);
-		$lastMsg = array();
 		while ($row = $db->fetch_assoc($request))
 			$lastMsg[$row['id_board']] = $row['id_msg'];
 		$db->free_result($request);

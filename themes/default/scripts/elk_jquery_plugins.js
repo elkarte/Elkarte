@@ -601,3 +601,44 @@
 	};
 
 })(jQuery);
+
+
+/*
+ * ElkArte news fader
+ * Copyright (c) ElkArte Forum contributors
+ *
+ * Inspired by Paul Mason's tutorial:
+ * http://paulmason.name/item/simple-jquery-carousel-slider-tutorial
+ *
+ * Licensed under the MIT license:
+ * http://www.opensource.org/licenses/mit-license.php
+ */
+;(function($) {
+	$.fn.Elk_NewsFader = function(options) {
+		var settings = {
+			'iFadeDelay': 5000,
+			'iFadeSpeed': 1000
+		},
+		iFadeIndex = 0,
+		$news = $(this).find('li');
+
+		$.extend(settings, options);
+		$news.each(function() {
+			$(this).fadeOut();
+		});
+		$news.eq(0).fadeIn(settings.iFadeSpeed);
+
+		setInterval(function() {
+			$($news[iFadeIndex]).fadeOut(settings.iFadeSpeed, function() {
+				iFadeIndex++;
+
+				if (iFadeIndex == $news.length)
+					iFadeIndex = 0;
+
+				$($news[iFadeIndex]).fadeIn(settings.iFadeSpeed);
+			});
+		}, settings.iFadeSpeed + settings.iFadeDelay);
+
+		return this;
+	};
+})(jQuery);

@@ -109,7 +109,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 		$headers = 'From: ' . $from_name . ' <' . $from_wrapper . '>' . $line_break;
 		$headers .= 'Reply-To: "' . (!empty($modSettings['maillist_sitename']) ? $modSettings['maillist_sitename'] : $context['forum_name']) . '" <' . (!empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'])) . '>' . $line_break;
 		if ($reference !== null)
-			$headers .= 'References: <' . $reference . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . ">" . $line_break;
+			$headers .= 'References: <' . $reference . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>' . $line_break;
 	}
 	else
 	{
@@ -224,7 +224,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 			{
 				$unq_head = md5($boardurl . microtime() . rand()) . '-' . $message_id;
 				$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
-				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . ">";
+				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
 				$message = mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break);
 			}
 			elseif (empty($modSettings['mail_no_message_id']))
@@ -602,7 +602,7 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 		{
 			$unq_head = md5($scripturl . microtime() . rand()) . '-' . $message_id;
 			$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
-			$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . ">";
+			$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
 			$message = mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break);
 		}
 
@@ -1191,7 +1191,7 @@ function emailsInfo($number)
  * - If batch size is not set, will determine a size such that it sends in 1/2 the period (buffer)
  *
  * @package Mail
- * @param mixed $batch_size = false the number to send each loop
+ * @param int|false $batch_size = false the number to send each loop
  * @param boolean $override_limit = false bypassing our limit flaf
  * @param boolean $force_send = false
  * @return boolean
@@ -1319,7 +1319,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 			{
 				$unq_head = md5($scripturl . microtime() . rand()) . '-' . $email['message_id'];
 				$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
-				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . ">";
+				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
 				$email['body'] = mail_insert_key($email['body'], $unq_head, $encoded_unq_head, $line_break);
 			}
 			elseif ($email['message_id'] !== null && empty($modSettings['mail_no_message_id']))

@@ -100,7 +100,7 @@ p, fieldset, form, input, button, select, textarea, .editor {
 .wrapper, div.windowbg, div.windowbg2,
 .roundframe, .description, .information, .successbox, .warningbox,
 .category_header, .generic_list_wrapper, .submitbutton,
-.grid8, .grid20, .grid25, .grid30, .grid33, .grid50, #description_board .generalinfo {
+.grid8, .grid17, .grid20, .grid25, .grid30, .grid33, .grid50, #description_board .generalinfo {
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
@@ -331,6 +331,9 @@ em {
 }
 .grid8 {
 	width: 8%;
+}
+.grid17 {
+	width: 17%;
 }
 .grid20 {
 	width: 20%;
@@ -1274,6 +1277,16 @@ a.bbc_link {
 	right: -1px;
 	left: auto;
 }
+/* Show appropriate like/unlike action */
+.like_button:before, .likes_button:before, .unlike_button:before {
+	background-position: 0 -480px;
+}
+.unlike_button:hover:before {
+	background-position: 0 -408px;
+}
+.like_button:hover:before {
+	background-position: 0 -384px;
+}
 .quickbuttons .listlevel2 {
 	width: 12em;
 }
@@ -1284,9 +1297,7 @@ a.bbc_link {
 	padding: 0 6px 0 26px;
 	line-height: 2.1em;
 }
-.listlevel1.liked a {
-	border-color: green;
-}
+
 /*	$PAGELINKS	*/
 /* ------------------------------------------------------- */
 
@@ -1953,6 +1964,7 @@ img.new_posts {
 .sticky_row .topic_details:before, .locked_row .topic_details:before,
 .locked_row.sticky_row .topic_info:before {
 	float: right;
+	margin-right: -16px;
 }
 .sticky_row .topic_info:before, .sticky_row .topic_details:before {background-position: 0 -108px;}
 .locked_row .topic_info:before, .locked_row .topic_details:before {background-position: 0 -54px;}
@@ -3602,6 +3614,7 @@ a.help .icon {
 }
 .search_results_posts .topic_body {
 	margin: 0px 1em 0px;
+	padding-bottom: 12px;
 	padding-top: 12px;
 }
 .search_results_posts .quick_mod {

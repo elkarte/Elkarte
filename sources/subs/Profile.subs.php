@@ -507,7 +507,7 @@ function loadProfileFields($force_reload = false)
 			'type' => 'callback',
 			'callback_func' => 'theme_pick',
 			'permission' => 'profile_extra',
-			'enabled' => !$settings['disable_user_variant'] || $modSettings['theme_allow'] || allowedTo('admin_forum'),
+			'enabled' => empty($settings['disable_user_variant']) || !empty($modSettings['theme_allow']) || allowedTo('admin_forum'),
 			'preload' => create_function('', '
 				global $context, $cur_profile, $txt;
 
@@ -2677,7 +2677,8 @@ function getNumUnwatchedBy($memID)
 
 /**
  * Returns the total number of posts a user has made
- * Counts all posts or just the posts made on a particular board
+ *
+ * - Counts all posts or just the posts made on a particular board
  *
  * @param int $memID
  * @param int|null $board
@@ -2713,7 +2714,8 @@ function count_user_posts($memID, $board = null)
 
 /**
  * Returns the total number of new topics a user has made
- * Counts all posts or just the topics made on a particular board
+ *
+ * - Counts all posts or just the topics made on a particular board
  *
  * @param int $memID
  * @param int|null $board
@@ -2749,8 +2751,9 @@ function count_user_topics($memID, $board = null)
 
 /**
  * Gets a members minimum and maximum message id
- * Can limit the results to a particular board
- * Used to help limit queries by proving start/stop points
+ *
+ * - Can limit the results to a particular board
+ * - Used to help limit queries by proving start/stop points
  *
  * @param int $memID
  * @param int|null $board
@@ -2782,9 +2785,45 @@ function findMinMaxUserMessage($memID, $board = null)
 }
 
 /**
+ * Determins a members minimum and maximum topic id
+ *
+ * - Can limit the results to a particular board
+ * - Used to help limit queries by proving start/stop points
+ *
+ * @param int $memID
+ * @param int|null $board
+ */
+function findMinMaxUserTopic($memID, $board = null)
+{
+	global $modSettings, $user_info;
+
+	$db = database();
+
+	$is_owner = $memID == $user_info['id'];
+
+	$request = $db->query('', '
+		SELECT MIN(id_topic), MAX(id_topic)
+		FROM {db_prefix}topics AS t
+		WHERE t.id_member_started = {int:current_member}' . (!empty($board) ? '
+			AND t.id_board = {int:board}' : '') . (!$modSettings['postmod_active'] || $is_owner ? '' : '
+			AND t.approved = {int:is_approved}'),
+		array(
+			'current_member' => $memID,
+			'is_approved' => 1,
+			'board' => $board,
+		)
+	);
+	$minmax = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return empty($minmax) ? array(0, 0) : $minmax;
+}
+
+/**
  * Used to load all the posts of a user
- * Can limit to just the posts of a particular board
- * If range_limit is supplied, will check if count results were returned, if not
+ *
+ * - Can limit to just the posts of a particular board
+ * - If range_limit is supplied, will check if count results were returned, if not
  * will drop the limit and try again
  *
  * @param int $memID
@@ -2803,14 +2842,15 @@ function load_user_posts($memID, $start, $count, $range_limit = '', $reverse = f
 	$is_owner = $memID == $user_info['id'];
 	$user_posts = array();
 
-	// Find this user's posts.  The left join on categories somehow makes this faster, weird as it looks.
+	// Find this user's posts. The left join on categories somehow makes this faster, weird as it looks.
 	for ($i = 0; $i < 2; $i++)
 	{
 		$request = $db->query('', '
 			SELECT
-				b.id_board, b.name AS bname, c.id_cat, c.name AS cname, m.id_topic, m.id_msg,
-				t.id_member_started, t.id_first_msg, t.id_last_msg, m.body, m.smileys_enabled,
-				m.subject, m.poster_time, m.approved
+				b.id_board, b.name AS bname,
+				c.id_cat, c.name AS cname,
+				m.id_topic, m.id_msg, m.body, m.smileys_enabled, m.subject, m.poster_time, m.approved,
+				t.id_member_started, t.id_first_msg, t.id_last_msg
 			FROM {db_prefix}messages AS m
 				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
@@ -2845,9 +2885,10 @@ function load_user_posts($memID, $start, $count, $range_limit = '', $reverse = f
 }
 
 /**
- * Used to load all the posts of a user
- * Can limit to just the posts of a particular board
- * If range_limit 'guess' is supplied, will check if count results were returned, if not
+ * Used to load all the topics of a user
+ *
+ * - Can limit to just the posts of a particular board
+ * - If range_limit 'guess' is supplied, will check if count results were returned, if not
  * it will drop the guessed limit and try again.
  *
  * @param int $memID
@@ -2871,8 +2912,10 @@ function load_user_topics($memID, $start, $count, $range_limit = '', $reverse = 
 	{
 		$request = $db->query('', '
 			SELECT
-				b.id_board, b.name AS bname, c.id_cat, c.name AS cname, t.id_member_started, t.id_first_msg, t.id_last_msg,
-				t.approved, m.body, m.smileys_enabled, m.subject, m.poster_time, m.id_topic, m.id_msg
+				b.id_board, b.name AS bname,
+				c.id_cat, c.name AS cname,
+				t.id_member_started, t.id_first_msg, t.id_last_msg, t.approved,
+				m.body, m.smileys_enabled, m.subject, m.poster_time, m.id_topic, m.id_msg
 			FROM {db_prefix}topics AS t
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
 				LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)

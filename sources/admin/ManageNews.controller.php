@@ -292,8 +292,11 @@ class ManageNews_Controller extends Action_Controller
 		$groups = $allgroups['groups'];
 
 		// All of the members in post based and member based groups
+		$pg = array();
 		foreach ($allgroups['postgroups'] as $postgroup)
 			$pg[] = $postgroup['id'];
+
+		$mg = array();
 		foreach ($allgroups['membergroups'] as $membergroup)
 			$mg[] = $membergroup['id'];
 

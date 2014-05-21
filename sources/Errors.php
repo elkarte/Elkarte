@@ -126,7 +126,7 @@ function log_error($error_message, $error_type = 'general', $file = null, $line 
  *
  * @param string $error
  * @param string $error_type = 'general'
- * @param string $sprintf = array()
+ * @param string|mixed[] $sprintf = array()
  * @param string|null $file = null
  * @param int|null $line = null
  */

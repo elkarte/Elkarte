@@ -168,7 +168,7 @@ function next_time($regularity, $unit, $offset, $immediate = false)
  * Loads a basic tasks list.
  *
  * @package ScheduledTasks
- * @param array $tasks
+ * @param int[] $tasks
  * @return array
  */
 function loadTasks($tasks)
@@ -184,6 +184,7 @@ function loadTasks($tasks)
 			'tasks' => $tasks,
 		)
 	);
+	$task = array();
 	while ($row = $db->fetch_assoc($request))
 		$task[$row['id_task']] = $row['task'];
 	$db->free_result($request);
@@ -197,7 +198,7 @@ function loadTasks($tasks)
  * @package ScheduledTasks
  * @param int $id_log the id of the log entry of the task just run. If empty it is considered a new log entry
  * @param int $task_id the id of the task run (from the table scheduled_tasks)
- * @param int $total_time How long the task took to finish. If NULL (default value) -1 will be used
+ * @param int|null $total_time How long the task took to finish. If NULL (default value) -1 will be used
  * @return int the id_log value
  */
 function logTask($id_log, $task_id, $total_time = null)
@@ -278,10 +279,10 @@ function toggleTaskStatusByName($enabler, $enable = true)
  *
  * @package ScheduledTasks
  * @param int $id_task
- * @param int $disabled
- * @param int $offset
- * @param int $interval
- * @param string $unit
+ * @param int|null $disabled
+ * @param int|null $offset
+ * @param int|null $interval
+ * @param string|null $unit
  */
 function updateTask($id_task, $disabled = null, $offset = null, $interval = null, $unit = null)
 {

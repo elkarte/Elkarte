@@ -452,6 +452,7 @@ class ScheduledTask
 		$members = array();
 		$langs = array();
 		$notify = array();
+		$boards = array();
 		while ($row = $db->fetch_assoc($request))
 		{
 			if (!isset($members[$row['id_member']]))

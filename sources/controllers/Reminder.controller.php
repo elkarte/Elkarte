@@ -69,6 +69,9 @@ class Reminder_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Auth.subs.php');
 
+		// No where params just yet
+		$where_params = array();
+
 		// Coming with a known ID?
 		if (!empty($_REQUEST['uid']))
 		{
