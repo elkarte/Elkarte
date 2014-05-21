@@ -43,7 +43,7 @@ function template_manage_themes()
 							<input type="checkbox" name="options[theme_allow]" id="options-theme_allow" value="1"', !empty($modSettings['theme_allow']) ? ' checked="checked"' : '', ' class="input_check" />
 						</dd>
 						<dt>
-							<label for="known_themes_list">', $txt['themeadmin_selectable'], '</label>:
+							<label for="known_themes_list">', $txt['themeadmin_selectable'], '</label>
 						</dt>
 						<dd>
 							<fieldset id="known_themes_list">
@@ -443,7 +443,7 @@ function template_set_settings()
 			<div class="windowbg2 content">
 				<dl class="settings">
 					<dt>
-						<label for="variant">', $txt['theme_variants_default'], '</label>:
+						<label for="variant">', $txt['theme_variants_default'], '</label>
 					</dt>
 					<dd>
 						<select id="variant" name="options[default_variant]" onchange="changeVariant(this.value)">';
@@ -456,7 +456,7 @@ function template_set_settings()
 						</select>
 					</dd>
 					<dt>
-						<label for="disable_user_variant">', $txt['theme_variants_user_disable'], '</label>:
+						<label for="disable_user_variant">', $txt['theme_variants_user_disable'], '</label>
 					</dt>
 					<dd>
 						<input type="hidden" name="options[disable_user_variant]" value="0" />
@@ -489,7 +489,7 @@ function template_set_settings()
 		{
 			echo '
 					<dt id="dt_', $setting['id'], '">
-						<label for="', $setting['id'], '">', $setting['label'], '</label>:';
+						<label for="', $setting['id'], '">', $setting['label'], '</label>';
 
 			if (isset($setting['description']))
 				echo '
@@ -507,7 +507,7 @@ function template_set_settings()
 		{
 			echo '
 					<dt id="dt_', $setting['id'], '">
-						<label for="', $setting['id'], '">', $setting['label'], '</label>:';
+						<label for="', $setting['id'], '">', $setting['label'], '</label>';
 
 			if (isset($setting['description']))
 				echo '
@@ -524,7 +524,7 @@ function template_set_settings()
 		{
 			echo '
 					<dt id="dt_', $setting['id'], '">
-						<label for="', $setting['id'], '">', $setting['label'], '</label>:';
+						<label for="', $setting['id'], '">', $setting['label'], '</label>';
 
 			if (isset($setting['description']))
 			{
@@ -564,7 +564,7 @@ function template_set_settings()
 		{
 			echo '
 					<dt id="dt_', $setting['id'], '">
-						<label for="', $setting['id'], '">', $setting['label'], '</label>:';
+						<label for="', $setting['id'], '">', $setting['label'], '</label>';
 
 			if (isset($setting['description']))
 				echo '
