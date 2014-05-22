@@ -120,11 +120,6 @@ function template_options()
 		array(
 			'id' => 'display_quick_reply',
 			'label' => $txt['display_quick_reply'],
-			'options' => array(
-				0 => $txt['display_quick_reply1'],
-				1 => $txt['display_quick_reply2'],
-				2 => $txt['display_quick_reply3'],
-			),
 			'default' => true,
 		),
 		array(

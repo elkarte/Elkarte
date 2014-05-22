@@ -294,11 +294,15 @@ function template_messages()
 		// Can they reply? Have they turned on quick reply?
 		if ($context['can_quote'] && !empty($options['display_quick_reply']))
 			echo '
-							<li class="listlevel1"><a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" onclick="return oQuickReply.quote(', $message['id'], ');" class="linklevel1 quote_button">', $txt['quote'], '</a></li>';
+							<li class="listlevel1">
+								<a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" onclick="return oQuickReply.quote(', $message['id'], ');" class="linklevel1 quote_button">', $txt['quote'], '</a>
+							</li>';
 		// So... quick reply is off, but they *can* reply?
 		elseif ($context['can_quote'])
 			echo '
-							<li class="listlevel1"><a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" class="linklevel1 quote_button">', $txt['quote'], '</a></li>';
+							<li class="listlevel1">
+								<a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" class="linklevel1 quote_button">', $txt['quote'], '</a>
+							</li>';
 
 		// Anything else added by mods for example?
 		if (!empty($context['additional_quick_buttons']))
@@ -378,12 +382,12 @@ function template_quickreply_below()
 				<h2 class="category_header">
 					<span id="category_toggle">&nbsp;
 						<a href="javascript:oQuickReply.swap();">
-							<span id="quickReplyExpand" class="', $options['display_quick_reply'] > 1 ? 'collapse' : 'expand', '" title="', $txt['hide'], '"></span>
+							<span id="quickReplyExpand" class="', empty($context['minmax_preferences']['qreply']) ? 'collapse' : 'expand', '" title="', $txt['hide'], '"></span>
 						</a>
 					</span>
 					<a href="javascript:oQuickReply.swap();">', $txt['quick_reply'], '</a>
 				</h2>
-				<div id="quickReplyOptions" class="windowbg"', $options['display_quick_reply'] > 1 ? '' : ' style="display: none"', '>
+				<div id="quickReplyOptions" class="windowbg"', empty($context['minmax_preferences']['qreply']) ? '' : ' style="display: none"', '>
 					<div class="editor_wrapper">
 						', $context['is_locked'] ? '<p class="alert smalltext">' . $txt['quick_reply_warning'] . '</p>' : '',
 						$context['oldTopicError'] ? '<p class="alert smalltext">' . sprintf($txt['error_old_topic'], $modSettings['oldTopicDays']) . '</p>' : '', '
@@ -496,7 +500,7 @@ function template_quickreply_below()
 	echo '
 		<script><!-- // --><![CDATA[
 			var oQuickReply = new QuickReply({
-				bDefaultCollapsed: ', !empty($options['display_quick_reply']) && $options['display_quick_reply'] > 1 ? 'false' : 'true', ',
+				bDefaultCollapsed: ', empty($context['minmax_preferences']['qreply']) ? 'false' : 'true', ',
 				iTopicId: ', $context['current_topic'], ',
 				iStart: ', $context['start'], ',
 				sScriptUrl: elk_scripturl,
@@ -509,7 +513,18 @@ function template_quickreply_below()
 				sTitleExpanded: ', JavaScriptEscape($txt['hide']), ',
 				sJumpAnchor: "quickreply",
 				bIsFull: ', !empty($options['use_editor_quick_reply']) ? 'true,
-				sEditorId: ' . $options['use_editor_quick_reply'] : 'false', '
+				sEditorId: ' . $options['use_editor_quick_reply']  : 'false', ',
+				oThemeOptions: {
+					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
+					sOptionName: \'minmax_preferences\',
+					sSessionId: elk_session_id,
+					sSessionVar: elk_session_var,
+					sAdditionalVars: \';minmax_key=qreply\'
+				},
+				oCookieOptions: {
+					bUseCookie: ', $context['user']['is_guest'] ? 'true' : 'false', ',
+					sCookieName: \'elk_qreply\'
+				}
 			});
 		// ]]></script>';
 

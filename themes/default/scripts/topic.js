@@ -263,36 +263,37 @@ function QuickReply(oOptions)
 	this.opt = oOptions;
 	this.bCollapsed = this.opt.bDefaultCollapsed;
 	this.bIsFull = this.opt.bIsFull;
+
+	// If the initial state is to be collapsed, collapse it.
+	if (this.bCollapsed)
+		this.swap(true);
 }
 
 // When a user presses quote, put it in the quick reply box (if expanded).
 QuickReply.prototype.quote = function (iMessageId, xDeprecated)
 {
-	// Compatibility with older templates.
-	if (typeof(xDeprecated) !== 'undefined')
-		return true;
+	ajax_indicator(true);
 
+	// Collapsed on a quote, expand it but don't update the user setting
 	if (this.bCollapsed)
 	{
-		window.location.href = elk_prepareScriptUrl(this.opt.sScriptUrl) + 'action=post;quote=' + iMessageId + ';topic=' + this.opt.iTopicId + '.' + this.opt.iStart;
-		return false;
+		this.bCollapsed = !this.bCollapsed;
+		this.swap(false, false);
 	}
+
+	// Insert the quote
+	if (this.bIsFull)
+		insertQuoteFast(iMessageId);
 	else
-	{
-		ajax_indicator(true);
-		if (this.bIsFull)
-			insertQuoteFast(iMessageId);
-		else
-			getXMLDocument(elk_prepareScriptUrl(this.opt.sScriptUrl) + 'action=quotefast;quote=' + iMessageId + ';xml', this.onQuoteReceived);
+		getXMLDocument(elk_prepareScriptUrl(this.opt.sScriptUrl) + 'action=quotefast;quote=' + iMessageId + ';xml', this.onQuoteReceived);
 
-		// Move the view to the quick reply box.
-		if (navigator.appName === 'Microsoft Internet Explorer')
-			window.location.hash = this.opt.sJumpAnchor;
-		else
-			window.location.hash = '#' + this.opt.sJumpAnchor;
+	// Move the view to the quick reply box.
+	if (navigator.appName === 'Microsoft Internet Explorer')
+		window.location.hash = this.opt.sJumpAnchor;
+	else
+		window.location.hash = '#' + this.opt.sJumpAnchor;
 
-		return false;
-	}
+	return false;
 };
 
 // This is the callback function used after the XMLhttp request.
@@ -308,24 +309,46 @@ QuickReply.prototype.onQuoteReceived = function (oXMLDoc)
 	ajax_indicator(false);
 };
 
-// The function handling the swapping of the quick reply.
-QuickReply.prototype.swap = function ()
+// The function handling the swapping of the quick reply area
+QuickReply.prototype.swap = function (bInit, bSavestate)
 {
 	var oQuickReplyContainer = document.getElementById(this.opt.sClassId),
 		sEditorId = this.opt.sContainerId,
 		bIsFull = this.opt.bIsFull;
 
-	// Swap the class on the image sprite
-	oQuickReplyContainer.className = this.bCollapsed ? this.opt.sClassCollapsed : this.opt.sClassExpanded;
-	$('#' + this.opt.sContainerId).slideToggle(function() {
-		if (bIsFull && $(this).is(':visible'))
+	// Default bInit to false and bSavestate to true
+	bInit = typeof(bInit) === 'undefined' ? false : true;
+	bSavestate = typeof(bSavestate) === 'undefined' ? true : false;
+
+	// Flip our current state if not responding to an intial loading
+	if (!bInit)
+		this.bCollapsed = !this.bCollapsed;
+
+	// Swap the class on the expcol image as needed
+	var sTargetClass = !this.bCollapsed ? this.opt.sClassCollapsed : this.opt.sClassExpanded;
+	if (oQuickReplyContainer.className !== sTargetClass)
+		oQuickReplyContainer.className = sTargetClass;
+
+	// And show the new title
+	oQuickReplyContainer.title = oQuickReplyContainer.title = this.bCollapsed ? this.opt.sTitleCollapsed : this.opt.sTitleExpanded;this.opt.sTitleCollapsed
+
+	// Show or hide away
+	if (this.bCollapsed)
+		$('#' + this.opt.sContainerId).slideUp();
+	else
+	{
+		$('#' + this.opt.sContainerId).slideDown();
+		if (bIsFull)
 			$('#' + sEditorId).resize();
-	});
+	}
 
-	// Give it a new title as well
-	oQuickReplyContainer.title = this.bCollapsed ? this.opt.sTitleExpanded : this.opt.sTitleCollapsed;
+	// Using a cookie for guests?
+	if (bSavestate && 'oCookieOptions' in this.opt && this.opt.oCookieOptions.bUseCookie)
+		this.oCookie.set(this.opt.oCookieOptions.sCookieName, this.bCollapsed ? '1' : '0');
 
-	this.bCollapsed = !this.bCollapsed;
+	// Save the expand /collapse preferance
+	if (!bInit && bSavestate && 'oThemeOptions' in this.opt && this.opt.oThemeOptions.bUseThemeSettings)
+		elk_setThemeOption(this.opt.oThemeOptions.sOptionName, this.bCollapsed ? '1' : '0', 'sThemeId' in this.opt.oThemeOptions ? this.opt.oThemeOptions.sThemeId : null, 'sAdditionalVars' in this.opt.oThemeOptions ? this.opt.oThemeOptions.sAdditionalVars : null);
 };
 
 /**
