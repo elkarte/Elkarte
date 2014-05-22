@@ -85,7 +85,7 @@ legend {
 	margin-left: 15px;
 }
 .collapsed legend {
-	background:  url(../../images/selected.png) no-repeat scroll left center transparent;
+	background: url(../../images/selected.png) no-repeat scroll left center transparent;
 }
 
 input, button, select, textarea, .editor {
@@ -125,9 +125,9 @@ input[disabled].input_text {
 
 /* Common button styling. */
 /* It is being replaced with three classes: */
-/*    .button_submit is not floated    */
-/*    .right_submit is right floated   */
-/*    .left_submit is left floated     */
+/*    .button_submit is not floated */
+/*    .right_submit is right floated */
+/*    .left_submit is left floated */
 /* The button_reset class may need attention too. */
 .button_submit, .right_submit, .left_submit, .button_reset,
 /* Anchors styled to look like buttons. */
@@ -158,7 +158,7 @@ input[disabled].input_text {
 	background: #7bb128;
 	color: #fff;
 }
-/* approval indicator  */
+/* approval indicator */
 .require_approval {
 	border-radius: 4px;
 	background: #f3b200;
@@ -253,7 +253,7 @@ strong {
 	background: #f5f5f5;
 }
 
-/* The generic wrapper thingy.  */
+/* The generic wrapper thingy. */
 .generic_list_wrapper {
 	border: 1px solid #ccc;
 	border-radius: 7px;
@@ -544,9 +544,9 @@ div.bbc_footnotes .meaction {
 }
 /* Common button styling. */
 /* It is being replaced with three classes: */
-/*    .button_submit is not floated    */
-/*    .right_submit is right floated   */
-/*    .left_submit is left floated     */
+/*    .button_submit is not floated */
+/*    .right_submit is right floated */
+/*    .left_submit is left floated */
 /* The button_reset class may need attention too. */
 .button_submit, .right_submit, .left_submit, .button_reset,
 /* Anchors styled to look like buttons. */
@@ -754,7 +754,7 @@ a.active {
 	color: #555;
 	margin: 0 2px;
 }
-.pagelinks .navPages:hover, .pagelinks .current_page  {
+.pagelinks .navPages:hover, .pagelinks .current_page {
 	background: #7bb128;
 	color: white;
 	border-radius: 8px;
@@ -955,7 +955,7 @@ a.active {
 }
 .board_stats {
 	text-align: left;
-	padding: 1px  6px 1px 0;
+	padding: 1px 6px 1px 0;
 	float: left;
 }
 .small_pagelinks li {

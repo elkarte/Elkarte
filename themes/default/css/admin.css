@@ -44,7 +44,7 @@ div.quick_tasks {
 }
 #admin_form_wrapper div.windowbg, #support_credits div.windowbg,
 #generate_reports_type div.windowbg, #new_group div.windowbg,
-#view_group  div.windowbg, #admin_newsletters .windowbg {
+#view_group div.windowbg, #admin_newsletters .windowbg {
 	background: none;
 	padding: 0;
 	margin: 0 4px;
@@ -226,11 +226,11 @@ fieldset dl {
 #admin_search_box {
 	padding: 0.5em 0;
 }
-#live_news div.content, #supportVersionsTable  div.content {
+#live_news div.content, #supportVersionsTable div.content {
 	padding: 0 4px;
 	font-size: 0.929em;
 }
-#supportVersionsTable  div.content {
+#supportVersionsTable div.content {
 	padding: 0 8px;
 }
 #live_news div.content dl {
@@ -275,14 +275,14 @@ div.quick_tasks {
 	height: 7em;
 	overflow: auto;
 }
-#quick_tasks  li a  {
+#quick_tasks li a {
 	line-height: 1.6em;
 }
 .home_image {
 	float: left;
 	margin: 2px 10px;
 }
-#quick_tasks  li span {
+#quick_tasks li span {
 	display: block;
 	margin: 0 0 0 70px;
 }
@@ -333,7 +333,7 @@ div.quick_tasks {
 }
 
 /* Styles for the core features screen.
-/* Cleaned up a  bit for clarity.
+/* Cleaned up a bit for clarity.
 ------------------------------------------------------- */
 #core_features {
 	padding: 20px 0;
@@ -625,7 +625,7 @@ dl.settings dd.questions input {
 ------------------------------------------------- */
 #manage_maintenance div.windowbg, #manage_maintenance div.windowbg2 {
 	padding: 0;
-	margin:  0 0 4px 0;
+	margin: 0 0 4px 0;
 }
 #manage_maintenance .button_submit{
 	margin: 4px 10px 10px 10px;
@@ -843,7 +843,7 @@ dl.themes_list dd {
 	display: block;
 	width: 100%;
 }
-#modcenter .windowbg, #modcenter .windowbg2, #modcenter .generic_list_wrapper  {
+#modcenter .windowbg, #modcenter .windowbg2, #modcenter .generic_list_wrapper {
 	overflow: visible;
 	margin: 4px 0 0 0;
 }
