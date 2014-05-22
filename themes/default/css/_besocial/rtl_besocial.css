@@ -57,7 +57,7 @@ legend {
 	margin-right: 15px;
 }
 .collapsed legend {
-	background:  url(../../images/selected.png) no-repeat scroll right center transparent;
+	background: url(../../images/selected.png) no-repeat scroll right center transparent;
 }
 
 /* The OpenID login form */
@@ -151,9 +151,9 @@ legend {
 }
 /* Common button styling. */
 /* It is being replaced with three classes: */
-/*    .button_submit is not floated    */
-/*    .right_submit is right floated   */
-/*    .left_submit is left floated     */
+/*    .button_submit is not floated */
+/*    .right_submit is right floated */
+/*    .left_submit is left floated */
 /* The button_reset class may need attention too. */
 .button_submit, .right_submit, .left_submit, .button_reset,
 /* Anchors styled to look like buttons. */

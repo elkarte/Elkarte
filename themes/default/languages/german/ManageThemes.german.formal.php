@@ -1,11 +1,10 @@
 <?php
 // Version: 1.0; ManageThemes
 
-
 $txt['themeadmin_explain'] = 'Die globalen Designeinstellungen erlauben es allen Administratoren, ein Design zum Standarddesign des Forums zu machen. Admins können auch Mitgliedern erlauben, jegliches installierte Design zur Verwendung auszuwählen und zu aktivieren. Der Bereich "Ein neues Design installieren" dient der Installation neuer Designs.';
 $txt['themeadmin_manage'] = 'Verwalten und installieren';
 $txt['theme_forum_theme'] = 'Globale Designeinstellungen';
-$txt['theme_allow'] = 'Mitgliedern die Auswahl eigener Designs erlauben:';
+$txt['theme_allow'] = 'Mitgliedern die Auswahl eigener Designs erlauben.';
 $txt['theme_guests'] = 'Globales Standarddesign:';
 $txt['theme_select'] = 'auswählen...';
 $txt['theme_reset'] = 'Alle auf folgendes Design zurücksetzen:';
@@ -53,60 +52,59 @@ $txt['actual_images_url'] = 'Grafiken-URL des Designs: ';
 $txt['current_theme_style'] = 'Stil des Designs: ';
 
 $txt['theme_variants_default'] = 'Standarddesignvariante:';
-$txt['theme_variants_user_disable'] = 'Benutzerseitige Auswahl der Varianten deaktivieren:';
+$txt['theme_variants_user_disable'] = 'Benutzerseitige Auswahl der Varianten deaktivieren.';
 
-$txt['site_slogan'] = 'Seitenmotto'; // ? :)
-$txt['site_slogan_desc'] = 'Fügen Sie hier Ihren eigenen Text als Motto ein. Er wird das Standardlogo ersetzen.';
-
-$txt['header_layout'] = 'Kopfzeilenaufteilung';
-$txt['header_layout_desc'] = 'Diese Einstellung ermöglicht es Ihnen, eine von drei Aufteilungen für die Kopfzeile auszuwählen:';
+$txt['site_slogan'] = 'Seitenmotto:';
+$txt['site_slogan_desc'] = '(Fügen Sie hier Ihren eigenen Text als Motto ein. Er wird das Standardlogo ersetzen.)';
+$txt['header_layout'] = 'Kopfzeilenaufteilung:';
+$txt['header_layout_desc'] = '(Diese Einstellung ermöglicht es Ihnen, eine von drei Aufteilungen für die Kopfzeile auszuwählen.)';
 $txt['header_layout_default_name'] = 'Standard:';
-$txt['header_layout_default_desc'] = 'das Logo wird rechts und der Name des Forums links platziert.';
+$txt['header_layout_default_desc'] = 'Das Logo wird rechts und der Name des Forums links platziert.';
 $txt['header_layout_logo_only_name'] = 'Nur Logo:';
-$txt['header_layout_logo_only_desc'] = 'nur das Logo wird angezeigt und mittig angeordnet';
+$txt['header_layout_logo_only_desc'] = 'Nur das Logo wird angezeigt und mittig angeordnet';
 $txt['header_layout_inverted_name'] = 'Logo links:';
-$txt['header_layout_inverted_desc'] = 'ähnlich dem Standard, aber umgekehrte Reihenfolge (also Logo links, Name rechts)';
+$txt['header_layout_inverted_desc'] = 'Ähnlich dem Standard, aber umgekehrte Reihenfolge (also Logo links, Name rechts)';
 $txt['header_layout_default'] = 'Standard';
 $txt['header_layout_logo_only'] = 'Nur Logo';
 $txt['header_layout_inverted'] = 'Logo links';
 $txt['forum_width'] = 'Breite des Forums:';
-$txt['forum_width_desc'] = 'Legt die Breite des Forums fest. Beispiele: 950px, 80%, 1240px.';
+$txt['forum_width_desc'] = '(Legt die Breite des Forums fest. Beispiele: 950px, 80%, 1240px.)';
 
-$txt['enable_news'] = 'Neuigkeiten in der Kopfzeile';
+$txt['enable_news'] = 'Neuigkeiten in der Kopfzeile:';
 $txt['enable_news_off'] = 'Aus';
 $txt['enable_news_random'] = 'Zufällig';
 $txt['enable_news_fader'] = 'Einblenden';
 $txt['enable_news_off_name'] = 'Aus:';
-$txt['enable_news_off_desc'] = 'keine Neuigkeiten angezeigt';
+$txt['enable_news_off_desc'] = 'Keine Neuigkeiten angezeigt.';
 $txt['enable_news_random_name'] = 'Zufällig:';
-$txt['enable_news_random_desc'] = 'es wird eine zufällig ausgewählte Neuigkeit angezeigt';
+$txt['enable_news_random_desc'] = 'Es wird eine zufällig ausgewählte Neuigkeit angezeigt.';
 $txt['enable_news_fader_name'] = 'Einblenden:';
-$txt['enable_news_fader_desc'] = 'alle Neuigkeiten werden nacheinander angezeigt';
-$txt['show_group_key'] = 'Gruppenschlüssel auf der Startseite anzeigen'; // ? :)
-$txt['additional_options_collapsible'] = 'Ausklappbare weitere Beitragsoptionen aktivieren';
-$txt['who_display_viewing'] = 'Anzeigen, wer die Startseite und Beiträge ansieht';
+$txt['enable_news_fader_desc'] = 'Alle Neuigkeiten werden nacheinander angezeigt.';
+$txt['show_group_key'] = 'Gruppenschlüssel auf der Startseite anzeigen.'; // ? :)
+$txt['additional_options_collapsible'] = 'Ausklappbare weitere Beitragsoptionen aktivieren.';
+$txt['who_display_viewing'] = 'Anzeigen, wer die Startseite und Beiträge ansieht:';
 $txt['who_display_viewing_off'] = 'Nicht anzeigen';
 $txt['who_display_viewing_numbers'] = 'Nur Zahlen anzeigen';
 $txt['who_display_viewing_names'] = 'Mitgliedsnamen anzeigen';
 $txt['disable_recent_posts'] = 'Letzte Beiträge deaktivieren';
 $txt['enable_single_post'] = 'Einzelnen Beitrag aktivieren';
 $txt['enable_multiple_posts'] = 'Mehrfachbeiträge aktivieren';
-$txt['show_stats_index'] = 'Statistiken auf der Startseite anzeigen';
-$txt['latest_members'] = 'Neuestes Mitglied auf der Startseite anzeigen';
-$txt['last_modification'] = 'Datum der letzten Änderung in geänderten Beiträgen anzeigen';
-$txt['user_avatars'] = 'Benutzeravatare in Nachrichtenansicht anzeigen';
-$txt['user_text'] = 'Persönlichen Text in Nachrichtenansicht anzeigen';
-$txt['gender_images'] = 'Geschlecht in Nachrichtenansicht anzeigen';
+$txt['show_stats_index'] = 'Statistiken auf der Startseite anzeigen.';
+$txt['latest_members'] = 'Neuestes Mitglied auf der Startseite anzeigen.';
+$txt['last_modification'] = 'Datum der letzten Änderung in geänderten Beiträgen anzeigen.';
+$txt['user_avatars'] = 'Benutzeravatare in Nachrichtenansicht anzeigen.';
+$txt['user_text'] = 'Persönlichen Text in Nachrichtenansicht anzeigen.';
+$txt['gender_images'] = 'Geschlecht in Nachrichtenansicht anzeigen.';
 $txt['member_list_bar'] = 'Mitgliederlistenleiste auf Startseite anzeigen';
-$txt['current_pos_text_img'] = 'Aktuelle Position im Forum als Link statt als Text anzeigen';
-$txt['show_view_profile_button'] = 'Link zum Profil unter Beiträgen anzeigen';
-$txt['enable_mark_as_read'] = '\'Als gelesen markieren\'-Schaltflächen aktivieren und anzeigen';
-$txt['header_logo_url'] = 'Logografik-URL';
-$txt['header_logo_url_desc'] = '(leer lassen für den Namen des Forums oder das Standardlogo.)';
-$txt['number_recent_posts'] = 'Anzahl der neuesten Beiträge auf der Startseite';
-$txt['number_recent_posts_desc'] = 'Um die Anzeige der neuesten Beiträge abzuschalten, setzen Sie diesen Wert auf 0.';
-$txt['hide_post_group'] = 'Gruppentitel für Mitglieder mit Benutzergruppe verstecken';
-$txt['hide_post_group_desc'] = 'Wenn Sie dies aktivieren, wird der Titel der Beitragsgruppe eines Mitglieds nicht in der Beitragsansicht angezeigt, sofern sie einer nicht beitragsbasierten Gruppe zugewiesen sind.'; // translator note: huh? (actually: WHAT?!)
+$txt['current_pos_text_img'] = 'Aktuelle Position im Forum als Link statt als Text anzeigen.';
+$txt['show_view_profile_button'] = 'Link zum Profil unter Beiträgen anzeigen.';
+$txt['enable_mark_as_read'] = '\'Als gelesen markieren\'-Schaltflächen aktivieren und anzeigen.';
+$txt['header_logo_url'] = 'Logografik-URL:';
+$txt['header_logo_url_desc'] = '(Leer lassen für den Namen des Forums oder das Standardlogo.)';
+$txt['number_recent_posts'] = 'Anzahl der neuesten Beiträge auf der Startseite.';
+$txt['number_recent_posts_desc'] = '(Um die Anzeige der neuesten Beiträge abzuschalten, setzen Sie diesen Wert auf 0.)';
+$txt['hide_post_group'] = 'Gruppentitel für Mitglieder mit Benutzergruppe verstecken.';
+$txt['hide_post_group_desc'] = '(Wenn Sie dies aktivieren, wird der Titel der Beitragsgruppe eines Mitglieds nicht in der Beitragsansicht angezeigt, sofern sie einer nicht beitragsbasierten Gruppe zugewiesen sind.)'; // translator note: huh? (actually: WHAT?!)
 
 $txt['theme_options_defaults'] = 'Dies sind die Standardwerte für einige mitgliedsbezogene Einstellungen.  Änderungen werden nur auf neue Mitglieder und Gäste angewandt.';
 $txt['theme_options_title'] = 'Standardoptionen ändern oder zurücksetzen';
@@ -160,7 +158,7 @@ $txt['themeadmin_edit_kilobytes'] = 'KiB';
 $txt['themeadmin_edit_error'] = 'Die Datei, die Sie zu speichern versuchten, erzeugte folgenden Fehler:';
 $txt['themeadmin_edit_on_line'] = 'Ab Zeile:';
 $txt['themeadmin_edit_preview'] = 'Vorschau';
-$txt['themeadmin_selectable'] = 'Designs, aus denen ein Benutzer auswählen darf';
+$txt['themeadmin_selectable'] = 'Designs, aus denen ein Benutzer auswählen darf:';
 $txt['themeadmin_themelist_link'] = 'Liste der installierten Designs anzeigen';
 
 // Strings for the variants

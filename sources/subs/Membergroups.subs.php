@@ -1810,6 +1810,7 @@ function loadGroups($id_member, $show_hidden = false, $min_posts = -1)
  * Returns the groups that the current user can see.
  *
  * - uses $user_info and allowedTo().
+ * - does not include post count based groups
  *
  * @package Membergroups
  * @return array

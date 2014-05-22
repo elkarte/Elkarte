@@ -77,7 +77,7 @@ function template_show_list($list_id = null)
 		template_create_list_menu($cur_list['list_menu']);
 	}
 
-		// Show the page index (if this list doesn't intend to show all items). @todo - Needs old top/bottom stuff cleaned up.
+	// Show the page index (if this list doesn't intend to show all items). @todo - Needs old top/bottom stuff cleaned up.
 	if (!empty($cur_list['items_per_page']) && !empty($cur_list['page_index']))
 	{
 		if (!$close_div)

@@ -60,7 +60,7 @@ blockquote cite, code cite {
 	background: #fff;
 	color: #555;
 	font-size: 0.786em;
-    padding: 0 0 4px;
+	padding: 0 0 4px;
 	display: block;
 }
 /* Will correctly colour down to seventh level of nested quotes in editor. Can be extended easily enough. */

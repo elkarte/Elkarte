@@ -120,11 +120,6 @@ function template_options()
 		array(
 			'id' => 'display_quick_reply',
 			'label' => $txt['display_quick_reply'],
-			'options' => array(
-				0 => $txt['display_quick_reply1'],
-				1 => $txt['display_quick_reply2'],
-				2 => $txt['display_quick_reply3'],
-			),
 			'default' => true,
 		),
 		array(
@@ -295,15 +290,22 @@ function template_settings()
 	);
 
 	addInlineJavascript('
+		// Hide the option first
+		$("#dt_newsfader_time, #dd_newsfader_time").hide();
+
+		// Update visablity based on the select value
+		toggleNewsFaderTime($("#enable_news").val());
+
+		// Set up the onchange event
+		$("#enable_news").on("change", function() {
+			toggleNewsFaderTime($(this).val());
+		});
+
 		function toggleNewsFaderTime(val)
 		{
 			if (val == 2)
 				$("#dt_newsfader_time, #dd_newsfader_time").fadeIn();
 			else
 				$("#dt_newsfader_time, #dd_newsfader_time").fadeOut();
-		}
-		toggleNewsFaderTime($("#enable_news").val());
-		$("#enable_news").on("change", function() {
-			toggleNewsFaderTime($(this).val());
-		});', true);
+		}', true);
 }

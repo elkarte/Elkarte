@@ -64,7 +64,7 @@ $txt['admin_check_user'] = 'Benutzernamen prüfen.';
 $txt['admin_check_display'] = 'Anzeigenamen prüfen.';
 $txt['admin_newsletter_send'] = 'Sie können von dieser Seite aus jedem eine E-Mail schreiben. Die E-Mail-Adressen der ausgewählten Benutzergruppen sollten unten erscheinen, aber Sie können beliebige E-Mail-Adressen entfernen und ergänzen. Stellen Sie sicher, dass jede Adresse folgendermaßen getrennt ist: \'adresse1; adresse2\'.';
 $txt['admin_fader_delay'] = 'Blenddauer zwischen den Neuigkeiten';
-$txt['admin_bbc'] = 'BBCode-Schaltflächen auf Beitrags- und Nachrichtenseiten anzeigen';
+$txt['admin_bbc'] = 'BBCode-Schaltflächen auf Beitrags- und Nachrichtenseiten anzeigen.';
 $txt['zero_for_no_limit'] = '(0 für keine Beschränkung)';
 $txt['zero_to_disable'] = '(0 zum Deaktivieren)';
 
@@ -268,9 +268,9 @@ $txt['maintenance_message'] = 'Nachricht für Anzeige';
 $txt['errlog_desc'] = 'Das Fehlerprotokoll verfolgt jeden Fehler, der in Ihrem Forum auftritt.  Um jegliche Fehler aus der Datenbank zu entfernen, aktivieren Sie das Auswahlfeld und klicken Sie unten auf der Seite auf die %1$s-Schaltfläche.';
 $txt['errlog_no_entries'] = 'Derzeit gibt es keine Einträge im Fehlerprotokoll.';
 
-$txt['theme_settings'] = 'Themeneinstellungen';
-$txt['theme_edit_settings'] = 'Die Einstellungen dieses Themas ändern';
-$txt['theme_current_settings'] = 'Derzeitiges Thema';
+$txt['theme_settings'] = 'Designeinstellungen';
+$txt['theme_edit_settings'] = 'Die Einstellungen dieses Designs ändern';
+$txt['theme_current_settings'] = 'Derzeitiges Design';
 
 $txt['dvc_your'] = 'Ihre Version';
 $txt['dvc_current'] = 'Aktuelle Version';
@@ -283,8 +283,8 @@ $txt['dvc_default'] = 'Standardvorlagen';
 $txt['dvc_templates'] = 'Aktuelle Vorlagen';
 $txt['dvc_languages'] = 'Sprachdateien';
 
-$txt['smileys_default_set_for_theme'] = 'Wählen Sie einen Standardsmileysatz für dieses Thema aus';
-$txt['smileys_no_default'] = '(globalen Standard verwenden)';
+$txt['smileys_default_set_for_theme'] = 'Wählen Sie einen Standardsmileysatz für dieses Design aus:';
+$txt['smileys_no_default'] = 'Standardsmileysatz verwenden';
 
 $txt['censor_test'] = 'Wortzensur testen';
 $txt['censor_test_save'] = 'Testen';

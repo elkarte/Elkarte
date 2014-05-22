@@ -220,6 +220,9 @@ function determineActions($urls, $preferred_prefix = false)
 		'viewmembers' => array('moderate_forum'),
 	);
 
+	// Provide integration a way to add to the allowed action array
+	call_integration_hook('integrate_whos_online_allowed', array(&$allowedActions));
+
 	if (!is_array($urls))
 		$url_list = array(array($urls, $user_info['id']));
 	else
@@ -440,7 +443,7 @@ function prepareCreditsData()
 	global $txt;
 
 	$credits = array();
-	
+
 	// Don't blink. Don't even blink. Blink and you're dead.
 	$credits['credits'] = array(
 		array(

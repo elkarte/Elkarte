@@ -211,9 +211,9 @@ select option {
 
 /* Common button styling. */
 /* It is being replaced with three classes: */
-/*    .button_submit is not floated    */
-/*    .right_submit is right floated   */
-/*    .left_submit is left floated     */
+/*    .button_submit is not floated */
+/*    .right_submit is right floated */
+/*    .left_submit is left floated */
 /* The button_reset class may need attention too. */
 .button_submit, .right_submit, .left_submit, .button_reset,
 /* Anchors styled to look like buttons. */
@@ -3733,7 +3733,8 @@ dl.no_members {
 	float: right;
 }
 #mlsearch_options .mlsearch_option .input_check {
-	margin-left: 0.5em;
+	margin: 0 0 0 0.5em;
+	float: right;
 }
 #mlsearch_options .mlsearch_option {
 	padding: 0.2em 0;

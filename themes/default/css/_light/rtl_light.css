@@ -60,7 +60,7 @@ legend {
 	margin-right: 15px;
 }
 .collapsed legend {
-	background:  url(../../images/selected_rtl.png) no-repeat scroll right center transparent;
+	background: url(../../images/selected_rtl.png) no-repeat scroll right center transparent;
 }
 
 /* The OpenID login form */
@@ -72,9 +72,9 @@ legend {
 
 /* Common button styling. */
 /* It is being replaced with three classes: */
-/*    .button_submit is not floated    */
-/*    .right_submit is right floated   */
-/*    .left_submit is left floated     */
+/*    .button_submit is not floated */
+/*    .right_submit is right floated */
+/*    .left_submit is left floated */
 /* The button_reset class may need attention too. */
 .button_submit, .right_submit, .left_submit, .button_reset,
 /* Anchors styled to look like buttons. */
@@ -292,12 +292,12 @@ legend {
 
 /*	$PAGELINKS	*/
 /* ------------------------------------------------------- */
-.pagelinks .navPages:hover, .pagelinks .current_page  {
+.pagelinks .navPages:hover, .pagelinks .current_page {
 	border-left: 1px solid #ccc;
 	border-right: 1px solid #afafaf;
 	box-shadow: -2px 1px 1px rgba(0,0,0,0.07) inset;
 }
-.pagelinks  :first-child {
+.pagelinks :first-child {
 	border-radius: 0 2px 2px 0;
 }
 .pagelinks :last-child {
@@ -327,8 +327,8 @@ legend {
 /*	$BOARDS		*/
 /* ------------------------------------------------------- */
 /* Set up some general framing classes. @todo */
-/*    .forum_category for board index/sub-boards.             */
-/*    .forumposts for thread pages and recent posts, etc.       */
+/*    .forum_category for board index/sub-boards. */
+/*    .forumposts for thread pages and recent posts, etc. */
 /*    .content_category for general divisions around the place. */
 /* All styled the same in default variant, but available for fun and games. */
 

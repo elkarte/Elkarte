@@ -358,7 +358,7 @@ function template_body_above()
  */
 function template_body_below()
 {
-	global $context, $scripturl, $txt, $modSettings;
+	global $context, $txt;
 
 	echo '
 		</div>

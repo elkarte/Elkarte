@@ -64,7 +64,7 @@ $txt['admin_check_user'] = 'Check user name.';
 $txt['admin_check_display'] = 'Check display name.';
 $txt['admin_newsletter_send'] = 'You can email anyone from this page. The email addresses of the selected member groups should appear below, but you may remove or add any email addresses you wish. Be sure that each address is separated in this fashion: \'address1; address2\'.';
 $txt['admin_fader_delay'] = 'Fading delay between items for the news fader';
-$txt['admin_bbc'] = 'Show BBC Buttons on Posting and PM Send Pages';
+$txt['admin_bbc'] = 'Show BBC Buttons on Posting and PM Send Pages.';
 $txt['zero_for_no_limit'] = '(0 for no limit)';
 $txt['zero_to_disable'] = '(0 to disable)';
 
@@ -284,8 +284,8 @@ $txt['dvc_default'] = 'Default Templates';
 $txt['dvc_templates'] = 'Current Templates';
 $txt['dvc_languages'] = 'Language Files';
 
-$txt['smileys_default_set_for_theme'] = 'Select default smiley set for this theme';
-$txt['smileys_no_default'] = '(use global default smiley set)';
+$txt['smileys_default_set_for_theme'] = 'Select default smiley set for this theme:';
+$txt['smileys_no_default'] = 'Use default smiley set';
 
 $txt['censor_test'] = 'Test censored words';
 $txt['censor_test_save'] = 'Test';
