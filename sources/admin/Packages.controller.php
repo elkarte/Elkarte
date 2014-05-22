@@ -912,7 +912,7 @@ class Packages_Controller extends Action_Controller
 		$context['install_finished'] = false;
 
 		// We're gonna be needing the table db functions! ...Sometimes.
-		$table = db_table();
+		$table_installer = db_table();
 
 		// @todo Make a log of any errors that occurred and output them?
 		if (!empty($install_log))
@@ -1028,7 +1028,7 @@ class Packages_Controller extends Action_Controller
 			if (!$context['uninstalling'])
 			{
 				// Any db changes from older version?
-				$table_log = $table->package_log();
+				$table_log = $table_installer->package_log();
 				if (!empty($old_db_changes))
 					$db_package_log = empty($table_log) ? $old_db_changes : array_merge($old_db_changes, $table_log);
 
@@ -1074,11 +1074,11 @@ class Packages_Controller extends Action_Controller
 			foreach ($package_installed['db_changes'] as $change)
 			{
 				if ($change[0] == 'remove_table' && isset($change[1]))
-					$table->db_drop_table($change[1]);
+					$table_installer->db_drop_table($change[1]);
 				elseif ($change[0] == 'remove_column' && isset($change[2]))
-					$table->db_remove_column($change[1], $change[2]);
+					$table_installer->db_remove_column($change[1], $change[2]);
 				elseif ($change[0] == 'remove_index' && isset($change[2]))
-					$table->db_remove_index($change[1], $change[2]);
+					$table_installer->db_remove_index($change[1], $change[2]);
 			}
 		}
 
@@ -2316,6 +2316,7 @@ class Packages_Controller extends Action_Controller
 					{
 						$sort_id['modification']++;
 						$sort_id['mod']++;
+						$sort_id['addon']++;
 						if ($installed)
 						{
 							if (!empty($context['available_modification'][$packageInfo['id']]))

@@ -238,6 +238,7 @@ strong {
 .highlight {
 	color: #ff7200;
 }
+
 /* Legacy highlight color, for selected membergroups etc. */
 /* Used by JS to show a selected item. Still used in manage languages */
 .table_grid .standard_row.highlight2 {
@@ -1110,6 +1111,10 @@ a.active {
 	border: 1px solid #ccc;
 	border-radius: 7px;
 	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
+}
+
+a.help .icon {
+	padding: 1px 4px 0 0;
 }
 
 /* Styles for the tooltips. */
