@@ -14,6 +14,7 @@
 /**
  * Remove old karma from the log
  *
+ * @package Karma
  * @param int $karmaWaitTime
  */
 function clearKarma($karmaWaitTime)
@@ -34,6 +35,7 @@ function clearKarma($karmaWaitTime)
 /**
  * Last action this user has done
  *
+ * @package Karma
  * @param int $id_executor
  * @param int $id_target
  */
@@ -63,6 +65,7 @@ function lastActionOn($id_executor, $id_target)
 /**
  * Add a karma action, from executor to target.
  *
+ * @package Karma
  * @param int $id_executor
  * @param int $id_target
  * @param int $direction - options: -1 or 1
@@ -86,6 +89,7 @@ function addKarma($id_executor, $id_target, $direction)
 /**
  * Update a former karma action from executor to target.
  *
+ * @package Karma
  * @param int $id_executor
  * @param int $id_target
  * @param int $direction - options: -1 or 1

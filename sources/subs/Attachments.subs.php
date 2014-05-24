@@ -1627,7 +1627,7 @@ function attachmentsSizeForMessage($id_msg, $include_count = true)
  * This loads an attachment's contextual data including, most importantly, its size if it is an image.
  *
  * What it does:
- *  - Pre-condition: $attachments array to have been filled with the proper attachment data, as Display() does.
+ * - Pre-condition: $attachments array to have been filled with the proper attachment data, as Display() does.
  * - It requires the view_attachments permission to calculate image size.
  * - It attempts to keep the "aspect ratio" of the posted image in line, even if it has to be resized by
  * the max_image_width and max_image_height settings.
