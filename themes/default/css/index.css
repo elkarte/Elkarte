@@ -4545,6 +4545,11 @@ dl.no_members {
 		max-width: 100%;
 		overflow: auto;
 	}
+	.pm_from {
+		text-align: left;
+		max-width: 6em;
+		word-wrap: break-word;
+	}
 	#month_grid {
 		display: none;
 	}
