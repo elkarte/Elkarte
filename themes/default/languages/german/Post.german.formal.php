@@ -115,7 +115,6 @@ $txt['more_smileys'] = 'mehr';
 $txt['more_smileys_title'] = 'Weitere Smileys';
 $txt['more_smileys_pick'] = 'Wählen Sie einen Smiley aus';
 $txt['more_smileys_close_window'] = 'Fenster schließen';
-
 $txt['error_new_reply'] = 'während Sie den Beitrag verfassten, wurde eine neue Antwort veröffentlicht. Möglicherweise möchten Sie Ihren Beitrag anpassen.';
 $txt['error_new_replies'] = 'während Sie den Beitrag verfassten, wurden %1$d neue Antworten veröffentlicht. Möglicherweise möchten Sie Ihren Beitrag anpassen.';
 $txt['error_new_reply_reading'] = 'während Sie das Thema gelesen haben, wurde eine neue Antwort veröffentlicht. Möglicherweise möchten Sie Ihren Beitrag anpassen.';

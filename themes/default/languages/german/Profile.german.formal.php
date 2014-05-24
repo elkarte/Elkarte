@@ -118,12 +118,16 @@ $txt['notify_regularity_first_only'] = 'Sofort - nur zur ersten ungelesenen Antw
 $txt['notify_regularity_daily'] = 'Täglich';
 $txt['notify_regularity_weekly'] = 'Wöchentlich';
 $txt['auto_notify'] = 'Benachrichtigung einschalten, wenn Sie einen Beitrag oder eine Antwort schreiben';
+$txt['auto_notify_pbe_post'] = 'Dies wird <strong>NICHT</strong> empfohlen, wenn Sie "Forums"benachrichtigungen aktiviert haben.';
 $txt['notify_send_types'] = 'Benachrichtige mich bei abonnierten Themen';
 $txt['notify_send_type_everything'] = 'Über alles, was passiert';
 $txt['notify_send_type_everything_own'] = 'Über alles, wenn ich das Thema gestartet habe';
 $txt['notify_send_type_only_replies'] = 'Nur über neue Antworten';
+$txt['notify_send_type_only_replies_pbe'] = 'Alle Nachrichten';
 $txt['notify_send_type_nothing'] = 'Gar nicht';
 $txt['notify_send_body'] = 'Beim Senden von Benachrichtigungen über neue Antworten auf ein Thema diese in die E-Mail einfügen (aber bitte antworten Sie nicht auf diese E-Mails.)';
+$txt['notify_send_body_pbe'] = 'Beim Versand von E-Mail-Benachrichtigungen den vollständigen Text des Beitrags in der E-Mail senden';
+$txt['notify_send_body_pbe_post'] = '<strong>NICHT</strong> in der täglichen/wöchentlichen Zusammenfassung verfügbar';
 
 $txt['notifications_topics'] = 'Aktuelle Themenbenachrichtigungen';
 $txt['notifications_topics_list'] = 'Sie sind über Antworten auf folgendes Thema benachrichtigt worden';

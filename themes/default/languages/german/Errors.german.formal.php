@@ -287,7 +287,7 @@ $txt['smileys_upload_error_blank'] = 'Alle Smileysätze müssen ein Bild haben.'
 $txt['smileys_upload_error_name'] = 'Alle Smileys müssen denselben Dateinamen tragen.';
 $txt['smileys_upload_error_illegal'] = 'Ungültiger Typ.';
 
-$txt['search_invalid_weights'] = 'Die Suchgewichtungen wurden nicht richtig konfiguriert. Mindestens eine Gewichtung sollte nicht 0 sein.';
+$txt['search_invalid_weights'] = 'Die Suchgewichtungen wurden nicht richtig konfiguriert. Mindestens eine Gewichtung sollte nicht 0 sein. Bitte melden Sie diesen Fehler einem Administrator.';
 $txt['unable_to_create_temporary'] = 'Die Suchfunktion konnte keine temporären Tabellen anlegen.  Bitte versuchen Sie es erneut.';
 
 $txt['package_no_file'] = 'Konnte Paketdatei nicht finden!';

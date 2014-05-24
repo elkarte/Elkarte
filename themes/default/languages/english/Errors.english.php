@@ -287,11 +287,7 @@ $txt['smileys_upload_error_blank'] = 'All smiley sets must have an image.';
 $txt['smileys_upload_error_name'] = 'All smileys must have the same file name.'; // TODO: rephrase this. can be misunderstood.
 $txt['smileys_upload_error_illegal'] = 'Illegal Type.';
 
-<<<<<<< HEAD
-$txt['search_invalid_weights'] = 'Search weights are not configured properly. At least one weight should be configured to be non-zero.';
-=======
 $txt['search_invalid_weights'] = 'Search weights are not configured properly. At least one weight should be configured to be non-zero. Please report this error to an administrator.';
->>>>>>> upstream/master
 $txt['unable_to_create_temporary'] = 'The search function was unable to create temporary tables.  Please try again.';
 
 $txt['package_no_file'] = 'Unable to find package file!';

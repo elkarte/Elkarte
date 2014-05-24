@@ -39,6 +39,7 @@ $txt['theme_edit_style'] = 'Die Stylesheets ändern. (Farben, Schriften usw.)';
 $txt['theme_edit_index'] = 'Die Indexvorlage ändern. (Hauptvorlage)';
 $txt['theme_edit_no_save'] = 'Diese Datei kann nicht gespeichert werden, da sie nicht beschreibbar ist.  Bitte stellen Sie sicher, dass folgende Datei den Modus 777 oder vergleichbare Berechtigungen besitzt';
 $txt['theme_edit_save'] = 'Änderungen speichern';
+$txt['theme_edit_not_writable'] = 'Nicht beschreibbar';
 
 $txt['theme_global_description'] = 'Dies ist das StandardDesign, was bedeutet, dass es sich anhand der administrativen Einstellungen und dem betrachteten Forum ändern kann.';
 
@@ -100,7 +101,7 @@ $txt['current_pos_text_img'] = 'Aktuelle Position im Forum als Link statt als Te
 $txt['show_view_profile_button'] = 'Link zum Profil unter Beiträgen anzeigen.';
 $txt['enable_mark_as_read'] = '\'Als gelesen markieren\'-Schaltflächen aktivieren und anzeigen.';
 $txt['header_logo_url'] = 'Logografik-URL:';
-$txt['header_logo_url_desc'] = '(Leer lassen für den Namen des Forums oder das Standardlogo.)';
+$txt['header_logo_url_desc'] = '(Leer lassen für den Namen des Forums oder das Standardlogo.)'
 $txt['number_recent_posts'] = 'Anzahl der neuesten Beiträge auf der Startseite.';
 $txt['number_recent_posts_desc'] = '(Um die Anzeige der neuesten Beiträge abzuschalten, setzen Sie diesen Wert auf 0.)';
 $txt['hide_post_group'] = 'Gruppentitel für Mitglieder mit Benutzergruppe verstecken.';
