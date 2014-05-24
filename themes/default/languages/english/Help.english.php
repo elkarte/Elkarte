@@ -586,21 +586,21 @@ $helptxt['pm_bcc'] = 'When sending a personal message you can choose to add a re
 
 $helptxt['move_topics_maintenance'] = 'This will allow you to move all the posts from one board to another board.';
 $helptxt['maintain_reattribute_posts'] = 'You can use this function to attribute guest posts on your board to a registered member. This is useful if, for example, a user deleted their account and changed their mind and wished to have their old posts associated with their account.';
-$helptxt['chmod_flags'] = 'You can manually set the permissions you wish to set the selected files to. To do this enter the chmod value as a numeric (octet) value. Note - these flags will have no effect on Microsoft Windows operating systems.';
+$helptxt['chmod_flags'] = 'You can manually set the permissions you wish to set the selected files to. To do this enter the chmod value as a numeric (octet) value. Note that these flags will have no effect on Microsoft Windows operating systems.';
 
 $helptxt['postmod'] = 'This section allows members of the moderation team (with sufficient permissions) to approve any posts and topics before they are shown.';
 
-$helptxt['field_show_enclosed'] = 'Encloses the user input between some text or html.  This will allow you to add more instant message providers, images or an embed etc. For example:<br /><br />
+$helptxt['field_show_enclosed'] = 'Encloses the user input between some text or HTML code.  This will allow you to add more instant message providers, images or an embed, etc. For example:<br /><br />
 		&lt;a href="http://website.com/{INPUT}"&gt;&lt;img src="{DEFAULT_IMAGES_URL}/icon.png" alt="{INPUT}" /&gt;&lt;/a&gt;<br /><br />
-		Note that you can use the following variables:<br />
+		You can use the following variables:<br />
 		<ul class="normallist">
 			<li>{INPUT} - The input specified by the user.</li>
 			<li>{SCRIPTURL} - Web address of forum.</li>
-			<li>{IMAGES_URL} - Url to images directory in the users current theme.</li>
-			<li>{DEFAULT_IMAGES_URL} - Url to the images directory in the default theme.</li>
+			<li>{IMAGES_URL} - URI of the images directory of the user\'s current theme.</li>
+			<li>{DEFAULT_IMAGES_URL} - URI of the images directory of the default theme.</li>
 		</ul>';
 
-$helptxt['custom_mask'] = 'The input mask is important for your forum\'s security. Validating the input from a user can help ensure that data is not used in a way you do not expect. We have provided some simple regular expressions as hints.<br /><br />
+$helptxt['custom_mask'] = 'The input mask is important for your forum\'s security. Validating the input from a user can help to ensure that data is not used in a way you do not expect. We have provided some simple regular expressions as hints.<br /><br />
 	<div class="smalltext custom_mask">
 		&quot;~[A-Za-z]+~&quot; - Match all upper and lower case alphabet characters.<br />
 		&quot;~[0-9]+~&quot; - Match all numeric characters.<br />
@@ -613,9 +613,9 @@ $helptxt['custom_mask'] = 'The input mask is important for your forum\'s securit
 		? - None or one match of previous expression.<br />
 		+ - One or more of previous expression.<br />
 		* - None or more of previous expression.<br />
-		{xx} - An exact number from previous expression.<br />
-		{xx,} - An exact number or more from previous expression.<br />
-		{,xx} - An exact number or less from previous expression.<br />
+		{xx} - An exact number of the previous expression.<br />
+		{xx,} - An exact number or more of the previous expression.<br />
+		{,xx} - An exact number or less of the previous expression.<br />
 		{xx,yy} - An exact match between the two numbers from previous expression.<br />
 		^ - Start of string.<br />
 		$ - End of string.<br />
@@ -623,7 +623,7 @@ $helptxt['custom_mask'] = 'The input mask is important for your forum\'s securit
 	</div><br /><br />
 	More information and advanced techniques may be found on the internet.';
 
-$helptxt['badbehavior_reverse_proxy_addresses'] = 'In some server farm configurations, Bad Behavior may be unable to determine whether a remote request originated from your reverse proxy/load balancer or arrived directly. In this case, you should add all of the internal IP addresses for your reverse proxy/load balancer servers, as seen from the origin server. These can usually be omitted; however if you have a configuration where some requests can bypass the reverse proxy/load balancer and connect to the origin server directly, then you should use this option. You should also use this option when incoming requests pass through two or more reverse proxies before reaching the origin server.<br /><br />Enter each IP address or CIDR netblocks separated by a | (1.2.3.4|5.4.3.2/27)';
+$helptxt['badbehavior_reverse_proxy_addresses'] = 'In some server farm configurations, Bad Behavior may be unable to determine whether a remote request originated from your reverse proxy/load balancer or arrived directly. In this case you should add all of the internal IP addresses for your reverse proxy/load balancer servers as seen from the origin server. These can usually be omitted; however if you have a configuration where some requests can bypass the reverse proxy/load balancer and connect to the origin server directly, then you should use this option. You should also use this option when incoming requests pass through two or more reverse proxies before reaching the origin server.<br /><br />Enter each IP address or CIDR netblocks separated by a | (1.2.3.4|5.4.3.2/27)';
 $helptxt['badbehavior_reverse_proxy_header'] = 'When a reverse proxy is in use, Bad Behavior looks at this HTTP header to determine the actual source IP address for each web request. Your reverse proxy or load balancer must add an HTTP header containing the remote IP address where the connection originated. Most do this by default; check the configuration for your reverse proxy or load balancer to ensure that this header is sent.<br /><br />If you use the CloudFlare service, you should change this option to CF-Connecting-IP.';
 $helptxt['badbehavior_reverse_proxy'] = 'When enabled, Bad Behavior will assume it is receiving a connection from a reverse proxy, when a specific HTTP header is received.';
 $helptxt['badbehavior_eucookie'] = 'Set this option on if you believe Bad Behavior\'s site security cookie is not exempt from the 2012 EU cookie regulation.</a>';
