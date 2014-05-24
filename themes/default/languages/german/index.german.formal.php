@@ -552,7 +552,7 @@ $txt['skip_nav'] = 'Zum Hauptinhalt springen';
 $txt['go_up'] = 'Nach oben';
 $txt['go_down'] = 'Nach unten';
 
-$forum_copyright = '<a href="' . $scripturl . '?action=who;sa=credits" title="ElkArte-Forum" target="_blank" class="new_win">%1$s</a> | <a href="https://github.com/elkarte/ElkArte/blob/master/license.md" title="Lizenz" target="_blank" class="new_win">ElkArte &copy; 2012 &ndash; 2014</a>';
+$forum_copyright = '<a href="http://www.elkarte.net" title="ElkArte-Forum" target="_blank" class="new_win">läuft mit %1$s</a> | <a href="' . $scripturl . '?action=who;sa=credits" title="Danksagungen" target="_blank" class="new_win">Danksagungen</a>';
 
 $txt['birthdays'] = 'Geburtstage:';
 $txt['events'] = 'Ereignisse:';
