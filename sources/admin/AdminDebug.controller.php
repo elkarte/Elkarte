@@ -220,7 +220,7 @@ class AdminDebug_Controller extends Action_Controller
 		// Don't allow non-administrators.
 		isAllowedTo('admin_forum');
 
-		setMemoryLimit('32M');
+		setMemoryLimit('128M');
 
 		if (empty($_REQUEST['filename']) || !is_string($_REQUEST['filename']))
 			fatal_lang_error('no_access', false);

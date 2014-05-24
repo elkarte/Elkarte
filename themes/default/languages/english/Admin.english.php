@@ -69,7 +69,7 @@ $txt['zero_for_no_limit'] = '(0 for no limit)';
 $txt['zero_to_disable'] = '(0 to disable)';
 
 $txt['admin_backup_fail'] = 'Failed to make backup of Settings.php - make sure Settings_bak.php exists and is writable.';
-$txt['modSettings_info'] = 'Change or set options that control how this forum operates.';
+$txt['modSettings_info'] = 'Settings for General features, Karma, Signatures, Likes and much more that control how this forum operates.';
 $txt['database_server'] = 'Database Server';
 $txt['database_user'] = 'Database User';
 $txt['database_password'] = 'Database Password';
@@ -125,10 +125,10 @@ $txt['manage_calendar'] = 'Calendar';
 $txt['manage_search'] = 'Search';
 
 $txt['smileys_manage'] = 'Smileys and Message Icons';
-$txt['smileys_manage_info'] = 'Install new smiley sets, add smileys to existing ones, or manage your message icons.';
-$txt['package_info'] = 'Install new features or modify existing ones with this interface.';
+$txt['smileys_manage_info'] = 'Install new smiley sets, add smileys to existing sets or manage your message icons.';
+$txt['package_info'] = 'Install, download and upload Modification packages; check File Permissions and FTP settings.';
 $txt['theme_admin'] = 'Theme Management';
-$txt['theme_admin_info'] = 'Setup and manage your themes, and set or reset theme options.';
+$txt['theme_admin_info'] = 'Install new themes, select themes that are available for your users and set or reset theme options.';
 $txt['registration_center'] = 'Registration';
 $txt['member_center_info'] = 'View the member list, search for members, or manage account approvals and activations.';
 
@@ -230,7 +230,7 @@ $txt['ban_no_triggers'] = 'There are currently no ban triggers.';
 $txt['settings_not_writable'] = 'These settings cannot be changed because Settings.php is read only.';
 
 $txt['maintain_title'] = 'Forum Maintenance';
-$txt['maintain_info'] = 'Optimize tables, make backups, check for errors, and prune boards with these tools.';
+$txt['maintain_info'] = 'Basic forum backups, Database error checking, Clearing the Cache, Integration Hooks and more.';
 $txt['maintain_sub_database'] = 'Database';
 $txt['maintain_sub_routine'] = 'Routine';
 $txt['maintain_sub_members'] = 'Members';
@@ -313,7 +313,7 @@ $txt['membergroups'] = 'Member groups';
 $txt['confirm_delete_members'] = 'Are you sure you want to delete the selected members?';
 
 $txt['support_credits_title'] = 'Support &amp; Credits';
-$txt['support_credits_info'] = 'Links to support for common issues, and version information to give if you have problems.';
+$txt['support_credits_info'] = 'Support links for most common issues, the relevant forum version information you will be asked for when you request help and a list of contributors to the ElkArte project.';
 $txt['support_title'] = 'Support Information';
 $txt['support_versions_current'] = 'Current version';
 $txt['support_versions_forum'] = 'This version';
@@ -330,7 +330,7 @@ $txt['support_resources_p2'] = 'If you can\'t find the answers to your questions
 $txt['support_latest'] = 'Common support &amp; issues';
 $txt['support_latest_fetch'] = 'Retrieving support information...';
 
-$txt['edit_permissions_info'] = 'Change restrictions and available features, globally or in specific boards.';
+$txt['edit_permissions_info'] = 'Use permission settings to manage global and specific board features and to specify what actions guest, members and moderators can do.';
 $txt['membergroups_members'] = 'Regular Members';
 $txt['membergroups_guests'] = 'Guests';
 $txt['membergroups_add_group'] = 'Add group';

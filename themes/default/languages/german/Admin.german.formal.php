@@ -69,7 +69,7 @@ $txt['zero_for_no_limit'] = '(0 für keine Beschränkung)';
 $txt['zero_to_disable'] = '(0 zum Deaktivieren)';
 
 $txt['admin_backup_fail'] = 'Konnte keine Sicherungskopie von Settings.php anlegen - stellen Sie sicher, dass Settings_bak.php vorhanden und beschreibbar ist.';
-$txt['modSettings_info'] = 'Optionen ändern oder setzen, die steuern, wie dieses Forum funktioniert.';
+$txt['modSettings_info'] = 'Einstellungen für allgemeine Funktionen, Karma, Signaturen, Gefällt mir und vieles mehr.';
 $txt['database_server'] = 'Datenbankserver';
 $txt['database_user'] = 'Datenbankbenutzer';
 $txt['database_password'] = 'Datenbankpasswort';
@@ -126,9 +126,9 @@ $txt['manage_search'] = 'Suchen';
 
 $txt['smileys_manage'] = 'Smileys und Nachrichtensymbole';
 $txt['smileys_manage_info'] = 'Installieren Sie neue Smileysätze, fügen Sie neue Smileys zu bestehenden hinzu oder verwalten Sie Ihre Nachrichtensymbole.';
-$txt['package_info'] = 'Installieren Sie mittels dieser Oberfläche neue Funktionen oder verwalten Sie die vorhandenen.';
+$txt['package_info'] = 'Installieren Sie mittels dieser Oberfläche neue Funktionen oder verwalten Sie die vorhandenen; überprüfen Sie Dateibefugnisse und FTP-Einstellungen.';
 $txt['theme_admin'] = 'Designeinstellungen';
-$txt['theme_admin_info'] = 'Richten Sie neue Designs ein, verwalten Sie sie und legen Sie Ihre Optionen fest oder setzen Sie sie zurück.';
+$txt['theme_admin_info'] = 'Richten Sie neue Designs ein, wählen Sie aus, welche verfügbar sein sollen, oder setzen Sie sie zurück.';
 $txt['registration_center'] = 'Registrierung';
 $txt['member_center_info'] = 'Betrachten Sie die Mitgliederliste, suchen Sie nach Mitgliedern oder verwalten Sie Freischaltungen und Aktivierungen.';
 
@@ -154,6 +154,7 @@ $txt['email_force'] = 'Auch an Mitglieder senden, die keine Ankündigungen erhal
 $txt['email_as_pms'] = 'Folgenden Gruppen als private Nachricht senden.';
 $txt['email_continue'] = 'Fortfahren';
 $txt['email_done'] = 'erledigt.';
+$txt['email_members_succeeded'] = 'Sie haben Ihre Rundmail erfolgreich versandt!';
 
 $txt['ban_title'] = 'Sperrliste';
 $txt['ban_ip'] = 'IP-Adressen sperren: (z. B. 192.168.12.213 oder 128.0.*.*) - ein Eintrag pro Zeile';
@@ -229,7 +230,7 @@ $txt['ban_no_triggers'] = 'Derzeit sind keine Sperrauslöser aktiv.';
 $txt['settings_not_writable'] = 'Diese Einstellungen können nicht geändert werden, weil die Datei Settings.php schreibgeschützt ist.';
 
 $txt['maintain_title'] = 'Wartungsaufgaben';
-$txt['maintain_info'] = 'Optimieren Sie mit diesen Werkzeugen Tabellen, legen Sie Sicherungskopien an, suchen Sie nach Fehlern und räumen Sie Foren auf.';
+$txt['maintain_info'] = 'Grundlegende Forumssicherungen, Datenbankfehlerprüfung, Leerung des Zwischenspeichers, Einschubmethoden und mehr.';
 $txt['maintain_sub_database'] = 'Datenbank';
 $txt['maintain_sub_routine'] = 'Routine';
 $txt['maintain_sub_members'] = 'Mitglieder';
@@ -290,6 +291,7 @@ $txt['censor_test'] = 'Wortzensur testen';
 $txt['censor_test_save'] = 'Testen';
 $txt['censor_case'] = 'Groß- und Kleinschreibung ignorieren';
 $txt['censor_whole_words'] = 'Nur ganze Wörter prüfen';
+$txt['censor_allow'] = 'Benutzern die Abschaltung der Wortzensur erlauben';
 
 $txt['admin_confirm_password'] = '(bestätigen)';
 $txt['admin_incorrect_password'] = 'Falsches Passwort';
@@ -311,7 +313,7 @@ $txt['membergroups'] = 'Benutzergruppen';
 $txt['confirm_delete_members'] = 'Sind Sie sich sicher, dass Sie die ausgewählten Mitglieder löschen möchten?';
 
 $txt['support_credits_title'] = 'Unterstützung und Danksagungen';
-$txt['support_credits_info'] = 'Verweise auf Hilfestellung bei allgemeinen Problemen und Versionsinformationen, die bei der Problemlösung hilfreich sein könnten.';
+$txt['support_credits_info'] = 'Verweise auf Hilfestellung bei allgemeinen Problemen, Versionsinformationen, die bei der Problemlösung hilfreich sein könnten, sowie eine Liste derer, die zu ElkArte beigetragen haben.';
 $txt['support_title'] = 'Supportinformationen';
 $txt['support_versions_current'] = 'Aktuelle Version';
 $txt['support_versions_forum'] = 'Diese Version';
@@ -328,7 +330,7 @@ $txt['support_resources_p2'] = 'Falls Sie die Antworten auf Ihre Fragen im Wiki 
 $txt['support_latest'] = 'Allgemeine Unterstützung &amp; Probleme';
 $txt['support_latest_fetch'] = 'Rufe Supportinformationen ab...';
 
-$txt['edit_permissions_info'] = 'Ändern Sie Beschränkungen und verfügbare Funktionen, global oder in einzelnen Foren.';
+$txt['edit_permissions_info'] = 'Verwenden Sie Befugniseinstellungen, um globale und lokale Forumsfunktionen zu verwalten und was Gäste, Mitglieder und Moderatoren tun können.';
 $txt['membergroups_members'] = 'Normale Mitglieder';
 $txt['membergroups_guests'] = 'Gäste';
 $txt['membergroups_add_group'] = 'Gruppe hinzufügen';
@@ -360,7 +362,6 @@ $txt['attachment_manager_settings'] = 'Einstellungen für Dateianhänge';
 $txt['attachment_manager_avatar_settings'] = 'Einstellungen für Avatare';
 $txt['attachment_manager_browse'] = 'Dateien durchsuchen';
 $txt['attachment_manager_maintenance'] = 'Dateiwartung';
-
 $txt['attachmentEnable'] = 'Anhangsmodus';
 $txt['attachmentEnable_deactivate'] = 'Dateianhänge deaktivieren';
 $txt['attachmentEnable_enable_all'] = 'Alle Anhänge aktivieren';
