@@ -2818,6 +2818,8 @@ function doSecurityChecks()
 {
 	global $modSettings, $context, $maintenance, $user_info, $txt, $scripturl, $user_settings;
 
+	$show_warnings = false;
+
 	if (allowedTo('admin_forum') && !$user_info['is_guest'])
 	{
 		// If agreement is enabled, at least the english version shall exists
@@ -2825,6 +2827,7 @@ function doSecurityChecks()
 		{
 			$context['security_controls_files']['title'] = $txt['generic_warning'];
 			$context['security_controls_files']['errors']['agreement'] = $txt['agreement_missing'];
+			$show_warnings = true;
 		}
 
 		// Cache directory writeable?
@@ -2832,6 +2835,7 @@ function doSecurityChecks()
 		{
 			$context['security_controls_files']['title'] = $txt['generic_warning'];
 			$context['security_controls_files']['errors']['cache'] = $txt['cache_writable'];
+			$show_warnings = true;
 		}
 
 		// @todo add a hook here
@@ -2842,6 +2846,7 @@ function doSecurityChecks()
 			{
 				$context['security_controls_files']['title'] = $txt['security_risk'];
 				$context['security_controls_files']['errors'][$securityFile] = sprintf($txt['not_removed'], $securityFile);
+				$show_warnings = true;
 
 				if ($securityFile == 'Settings.php~' || $securityFile == 'Settings_bak.php~')
 				{
@@ -2871,6 +2876,7 @@ function doSecurityChecks()
 		if ($user_info['is_admin'])
 		{
 			$context['security_controls_query']['title'] = $txt['query_command_denied'];
+			$show_warnings = true;
 			foreach ($_SESSION['query_command_denied'] as $command => $error)
 				$context['security_controls_query']['errors'][$command] = '<pre>' . Util::htmlspecialchars($error) . '</pre>';
 		}
@@ -2893,6 +2899,7 @@ function doSecurityChecks()
 	{
 		// An admin cannot be banned (technically he could), and if it is better he knows.
 		$context['security_controls_ban']['title'] = sprintf($txt['you_are_post_banned'], $user_info['is_guest'] ? $txt['guest_title'] : $user_info['name']);
+		$show_warnings = true;
 
 		$context['security_controls_ban']['errors']['reason'] = '';
 
@@ -2906,7 +2913,7 @@ function doSecurityChecks()
 	}
 
 	// Finally, let's show the layer.
-	if (!empty($context['security_controls']) || !empty($context['warning_controls']))
+	if ($show_warnings || !empty($context['warning_controls']))
 		Template_Layers::getInstance()->addAfter('admin_warning', 'body');
 }
 
