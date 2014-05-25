@@ -2786,7 +2786,6 @@ function deleteUpgrader()
 	@unlink(dirname(__FILE__) . '/upgrade_1-1.sql');
 	@unlink(dirname(__FILE__) . '/upgrade_2-0_' . $db_type . '.sql');
 	@unlink(dirname(__FILE__) . '/upgrade_2-1_' . $db_type . '.sql');
-	@unlink(dirname(__FILE__) . '/webinstall.php');
 
 	$dh = opendir(dirname(__FILE__));
 	while ($file = readdir($dh))

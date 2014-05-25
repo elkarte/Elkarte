@@ -25,7 +25,7 @@ if (!defined('ELK'))
  * SearchAPI-Sphinxql.class.php, SphinxQL API,
  *
  * What it does:
- * - used when an Sphinx search daemon is running
+ * - Used when an Sphinx search daemon is running
  * - Access is via Sphinx's own implementation of MySQL network protocol (SphinxQL)
  * - requires Sphinx 2 or higher
  *
@@ -176,6 +176,10 @@ class Sphinxql_Search
 			// Create an instance of the sphinx client and set a few options.
 			$mySphinx = @mysql_connect(($modSettings['sphinx_searchd_server'] === 'localhost' ? '127.0.0.1' : $modSettings['sphinx_searchd_server']) . ':' . (int) $modSettings['sphinxql_searchd_port']);
 
+			// No connection, daemon not running?  log the error
+			if ($mySphinx === false)
+				fatal_lang_error('error_no_search_daemon');
+
 			// Compile different options for our query
 			$query = 'SELECT *' . (empty($search_params['topic']) ? ', COUNT(*) num' : '') . ', (weight() + (relevance/1000)) rank FROM elkarte_index';
 
@@ -247,10 +251,13 @@ class Sphinxql_Search
 			{
 				while ($match = mysql_fetch_assoc($request))
 				{
+					if (empty($search_params['topic']))
+						$num = isset($match['num']) ? $match['num'] : (isset($match['@count']) ? $match['@count'] : 0);
+
 					$cached_results['matches'][$match['id']] = array(
 						'id' => $match['id_topic'],
 						'relevance' => round($match['relevance'] / 10000, 1) . '%',
-						'num_matches' => empty($search_params['topic']) ? $match['num'] : 0,
+						'num_matches' => empty($search_params['topic']) ? $num : 0,
 						'matches' => array(),
 					);
 				}

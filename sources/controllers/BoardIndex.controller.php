@@ -38,9 +38,11 @@ class BoardIndex_Controller extends Action_Controller
 
 	/**
 	 * This function shows the board index.
-	 * It uses the BoardIndex template, and main sub template.
-	 * It updates the most online statistics.
-	 * It is accessed by ?action=boardindex.
+	 *
+	 * What it does:
+	 * - It uses the BoardIndex template, and main sub template.
+	 * - It updates the most online statistics.
+	 * - It is accessed by ?action=boardindex.
 	 */
 	public function action_boardindex()
 	{
@@ -148,7 +150,8 @@ class BoardIndex_Controller extends Action_Controller
 
 	/**
 	 * Collapse or expand a category
-	 * ?action=collapse
+	 *
+	 * - accessed by ?action=collapse
 	 */
 	public function action_collapse()
 	{

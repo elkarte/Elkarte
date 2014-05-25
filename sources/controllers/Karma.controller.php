@@ -22,6 +22,8 @@ if (!defined('ELK'))
 
 /**
  * Karma_Controller class, can give good or bad karma so watch out!
+ *
+ * @package Karma
  */
 class Karma_Controller extends Action_Controller
 {

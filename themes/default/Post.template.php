@@ -195,7 +195,7 @@ function template_make_event_above()
 							<legend>', $txt['calendar_event_options'], '</legend>
 							<label for="evtitle"', isset($context['post_error']['no_event']) ? ' class="error"' : '', ' id="caption_evtitle">', $txt['calendar_event_title'], ':</label>
 							<input type="text" id="evtitle" name="evtitle" maxlength="255" size="55" value="', $context['event']['title'], '" tabindex="', $context['tabindex']++, '" class="input_text" />
-							<div class="smalltext" id="datepicker">
+							<div id="datepicker">
 								<input type="hidden" name="calendar" value="1" /><label for="year">', $txt['calendar_year'], '</label>
 								<select name="year" id="year" tabindex="', $context['tabindex']++, '" onchange="generateDays();">';
 

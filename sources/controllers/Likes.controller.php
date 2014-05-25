@@ -16,6 +16,8 @@ if (!defined('ELK'))
 
 /**
  * This class contains one likable use, which allows members to like a post
+ *
+ * @package Likes
  */
 class Likes_Controller extends Action_Controller
 {

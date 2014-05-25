@@ -37,12 +37,14 @@ class Display_Controller
 
 	/**
 	 * The central part of the board - topic display.
-	 * This function loads the posts in a topic up so they can be displayed.
-	 * It uses the main sub template of the Display template.
-	 * It requires a topic, and can go to the previous or next topic from it.
-	 * It jumps to the correct post depending on a number/time/IS_MSG passed.
-	 * It depends on the messages_per_page, defaultMaxMessages and enableAllMessages settings.
-	 * It is accessed by ?topic=id_topic.START.
+	 *
+	 * What it does:
+	 * - This function loads the posts in a topic up so they can be displayed.
+	 * - It uses the main sub template of the Display template.
+	 * - It requires a topic, and can go to the previous or next topic from it.
+	 * - It jumps to the correct post depending on a number/time/IS_MSG passed.
+	 * - It depends on the messages_per_page, defaultMaxMessages and enableAllMessages settings.
+	 * - It is accessed by ?topic=id_topic.START.
 	 */
 	public function action_display()
 	{
