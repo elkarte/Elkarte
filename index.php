@@ -122,7 +122,7 @@ if (!empty($modSettings['enableCompressedOutput']) && !headers_sent())
 		$modSettings['enableCompressedOutput'] = 0;
 	else
 	{
-		ob_end_clean();
+		@ob_end_clean();
 		ob_start('ob_gzhandler');
 	}
 }

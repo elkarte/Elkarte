@@ -2231,7 +2231,7 @@ class Post_Controller extends Action_Controller
 			$pspell_link = pspell_new('en', '', '', '', PSPELL_FAST | PSPELL_RUN_TOGETHER);
 
 		error_reporting($old);
-		ob_end_clean();
+		@ob_end_clean();
 
 		if (!isset($_POST['spellstring']) || !$pspell_link)
 			die;

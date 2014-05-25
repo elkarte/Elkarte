@@ -650,7 +650,7 @@ function loadBoard()
 		// If it's a prefetching agent or we're requesting an attachment.
 		if ((isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch') || (!empty($_REQUEST['action']) && $_REQUEST['action'] === 'dlattach'))
 		{
-			ob_end_clean();
+			@ob_end_clean();
 			header('HTTP/1.1 403 Forbidden');
 			die;
 		}
@@ -2484,7 +2484,7 @@ function template_include($filename, $once = false)
 
 	if ($file_found !== true)
 	{
-		ob_end_clean();
+		@ob_end_clean();
 		if (!empty($modSettings['enableCompressedOutput']))
 			ob_start('ob_gzhandler');
 		else

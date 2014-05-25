@@ -256,7 +256,7 @@ class Attachment_Controller extends Action_Controller
 			list ($modified_since) = explode(';', $_SERVER['HTTP_IF_MODIFIED_SINCE']);
 			if (strtotime($modified_since) >= filemtime($filename))
 			{
-				ob_end_clean();
+				@ob_end_clean();
 
 				// Answer the question - no, it hasn't been modified ;).
 				header('HTTP/1.1 304 Not Modified');
@@ -268,7 +268,7 @@ class Attachment_Controller extends Action_Controller
 		$eTag = '"' . substr($id_attach . $real_filename . filemtime($filename), 0, 64) . '"';
 		if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && strpos($_SERVER['HTTP_IF_NONE_MATCH'], $eTag) !== false)
 		{
-			ob_end_clean();
+			@ob_end_clean();
 
 			header('HTTP/1.1 304 Not Modified');
 			exit;

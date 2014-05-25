@@ -265,7 +265,7 @@ class Search_Controller extends Action_Controller
 		// No, no, no... this is a bit hard on the server, so don't you go prefetching it!
 		if (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch')
 		{
-			ob_end_clean();
+			@ob_end_clean();
 			header('HTTP/1.1 403 Forbidden');
 			die;
 		}
@@ -2121,7 +2121,7 @@ class Search_Controller extends Action_Controller
 			$pspell_link = pspell_new('en', '', '', '', PSPELL_FAST | PSPELL_RUN_TOGETHER);
 
 		error_reporting($old);
-		ob_end_clean();
+		@ob_end_clean();
 
 		$did_you_mean = array('search' => array(), 'display' => array());
 		$found_misspelling = false;

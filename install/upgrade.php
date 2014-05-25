@@ -2426,7 +2426,7 @@ function cmdStep0()
 
 	$start_time = time();
 
-	ob_end_clean();
+	@ob_end_clean();
 	ob_implicit_flush(true);
 	@set_time_limit(600);
 

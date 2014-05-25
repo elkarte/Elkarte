@@ -1163,7 +1163,7 @@ class Data_Validator
 				}
 			');
 			error_reporting($errorReporting);
-			ob_end_clean();
+			@ob_end_clean();
 		}
 
 		if ($result === false)

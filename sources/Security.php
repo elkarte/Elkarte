@@ -713,7 +713,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	// Make sure a page with session check requirement is not being prefetched.
 	if (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch')
 	{
-		ob_end_clean();
+		@ob_end_clean();
 		header('HTTP/1.1 403 Forbidden');
 		die;
 	}
@@ -769,7 +769,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	{
 		if (isset($_GET['xml']) || isset($_REQUEST['api']))
 		{
-			ob_end_clean();
+			@ob_end_clean();
 			header('HTTP/1.1 403 Forbidden - Session timeout');
 			die;
 		}

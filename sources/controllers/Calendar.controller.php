@@ -413,7 +413,7 @@ class Calendar_Controller extends Action_Controller
 		$filecontents .= 'END:VCALENDAR';
 
 		// Send some standard headers.
-		ob_end_clean();
+		@ob_end_clean();
 		if (!empty($modSettings['enableCompressedOutput']))
 			ob_start('ob_gzhandler');
 		else
