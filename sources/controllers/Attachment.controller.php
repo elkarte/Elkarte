@@ -231,7 +231,7 @@ class Attachment_Controller extends Action_Controller
 			@ob_end_clean();
 
 		if (!empty($modSettings['enableCompressedOutput']) && @filesize($filename) <= 4194304 && in_array($file_ext, array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java')))
-			@ob_start('ob_gzhandler');
+			ob_start('ob_gzhandler');
 		else
 		{
 			ob_start();

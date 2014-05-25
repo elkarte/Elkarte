@@ -214,7 +214,7 @@ class News_Controller extends Action_Controller
 		// This is an xml file....
 		ob_end_clean();
 		if (!empty($modSettings['enableCompressedOutput']))
-			@ob_start('ob_gzhandler');
+			ob_start('ob_gzhandler');
 		else
 			ob_start();
 
