@@ -2606,7 +2606,7 @@ ul.post_options li {
 #event_main #datepicker, #event_main #caption_evtitle {
 	display: inline-block;
 	padding-left: 1em;
-	padding-top: 0.5em;
+	padding-top: 0.4em;
 }
 #event_main #evtitle {
 	margin-top: 0.5em;
@@ -3253,7 +3253,7 @@ div.labels {
 	float: left;
 	display: block;
 	margin: -0.1em 0 0 0;
-	font-size: 1.5em;
+	font-size: 0.6em;
 }
 .next_month {
 	float: right;

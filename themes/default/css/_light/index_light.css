@@ -1531,8 +1531,8 @@ div.bbc_footnotes .meaction{
 	background: #ebffd8;
 }
 #main_grid .weeks {
-	font-weight: bold;
-	font-size: 1.786em;
+	font-weight: normal;
+	font-size: 1em;
 }
 #main_grid .weeks a:hover {
 	text-decoration: none;
@@ -1547,8 +1547,8 @@ div.bbc_footnotes .meaction{
 	border: 1px solid #ddd;
 	background: #fff;
 }
-.weeklist h4 {
-	border-right: 2px solid #ddd;
+.weekdays {
+	border-left: 2px solid #ddd;
 }
 .weeklist h4 a:hover {
 	text-decoration: none;
