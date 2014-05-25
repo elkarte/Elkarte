@@ -552,7 +552,7 @@ function removeTempAttachById($attach_id)
 			if (file_exists($attach['tmp_name']))
 			{
 				@unlink($attach['tmp_name']);
-				unset($_SESSION['temp_attachments'][$id]);
+				unset($_SESSION['temp_attachments'][$attachID]);
 
 				return true;
 			}
