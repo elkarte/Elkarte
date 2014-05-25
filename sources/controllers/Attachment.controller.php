@@ -112,12 +112,11 @@ class Attachment_Controller extends Action_Controller
 				foreach ($_SESSION['temp_attachments'] as $key => $val)
 				{
 					// We need to grab the name anyhow
-					if (!empty($val['name']) || !empty($val['tmp_name']))
+					if (!empty($val['unique_id']))
 					{
 						$resp_data = array(
 							'name' => $val['name'],
-							'temp_name' => $key,
-							'temp_path' => $val['tmp_name'],
+							'uniqueid' => $val['unique_id'],
 							'size' => $val['size']
 						);
 					}
@@ -139,7 +138,7 @@ class Attachment_Controller extends Action_Controller
 	 */
 	public function action_rmattach()
 	{
-		global $context;
+		global $context, $txt;
 
 		// Prepare the template so we can respond with json
 		$template_layers = Template_Layers::getInstance();
@@ -150,27 +149,30 @@ class Attachment_Controller extends Action_Controller
 		// Make sure the session is valid
 		if (checkSession('request', '', false) !== '')
 		{
-			$context['json_data'] = array('result' => false, 'data' => 'session timeout');
+			loadLanguage('Errors');
+			$context['json_data'] = array('result' => false, 'data' => $txt['session_timeout']);
+
 			return false;
 		}
 
 		// We need a filename and path or we are not going any further
-		if (isset($_REQUEST['filename']) && $_REQUEST['filepath'])
+		if (isset($_REQUEST['uniqueid']))
 		{
-			// This file does exist, so lets terminate it!
-			if (file_exists($_REQUEST['filepath']))
-			{
-				@unlink($_REQUEST['filepath']);
-				unset($_SESSION['temp_attachments'][$_REQUEST['filename']]);
-
+			require_once(SUBSDIR . '/Attachments.subs.php');
+			$result = removeTempAttachById($_REQUEST['uniqueid']);
+			if ($result === true)
 				$context['json_data'] = array('result' => true);
-			}
-			// Nope can't delete it if we can't find it
 			else
-				$context['json_data'] = array('result' => false, 'data' => 'files not there');
+			{
+				loadLanguage('Errors');
+				$context['json_data'] = array('result' => false, 'data' => $txt[$result]);
+			}
 		}
 		else
-			$context['json_data'] = array('result' => false, 'data' => 'No file name provided');
+		{
+			loadLanguage('Errors');
+			$context['json_data'] = array('result' => false, 'data' => $txt['attachment_not_found']);
+		}
 	}
 
 	/**

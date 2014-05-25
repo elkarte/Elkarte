@@ -143,8 +143,7 @@
 					cache: false,
 					dataType: 'json',
 					data: {
-						'filename': dataToSend.temp_name,
-						'filepath': dataToSend.temp_path
+						'uniqueid': dataToSend.uniqueid
 					}
 				})
 				.done(function(resp) {
@@ -159,8 +158,8 @@
 						numAttachUploaded--;
 
 						// Done with this one, so remove it from existence
-						$('#' + dataToSend.temp_name).unbind();
-						$('#' + dataToSend.temp_name).remove();
+						$('#' + dataToSend.uniqueid).unbind();
+						$('#' + dataToSend.uniqueid).remove();
 					}
 					else
 						console.log('error success');
@@ -238,7 +237,7 @@
 
 					// Update the uploaded file with its ID
 					$(this.str).find('.remove').attr('id', data.curFileNum);
-					$(this.str).attr('id', data.temp_name);
+					$(this.str).attr('id', data.uniqueid);
 					$(this.str).attr('data-size', data.size);
 
 					// Provide a way to remove a file that has been sent by mistake
