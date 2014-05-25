@@ -1822,7 +1822,6 @@ div.bbc_footnotes .meaction{
 		font-size: 2em;
 		color: #666;
 		content: attr(data-icon);
-		speak: none;
 	}
 	.indicator[data-icon]:before {
 		color: #5ba048;

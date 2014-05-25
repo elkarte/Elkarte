@@ -2739,9 +2739,6 @@ dl.merge_topic dd {
 /* We can't control what jQueryui pollutes the DOM with, so deal with it */
 /* Styles for the profile summary tabs, or any jQuery ui tabs */
 /* ---------------------------------------------------------- */
-.ui-tabs {
-	zoom: 1;
-}
 .ui-tabs .ui-tabs-nav {
 	list-style: none;
 	position: relative;
