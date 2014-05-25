@@ -111,7 +111,31 @@
 					}
 					// The server was unable to process the file, show it as not sent
 					else
+					{
+						var errorMsgs = {},
+							serverErrorFiles = [];
+						for (var err in resp.data) 
+						{
+							if (resp.data.hasOwnProperty(err))
+							{
+								errorMsgs.individualServerErr = resp.data[err].title + '<br />';
+
+								for (var errMsg in resp.data[err].errors)
+								{
+									if (resp.data[err].errors.hasOwnProperty(errMsg))
+										serverErrorFiles.push(resp.data[err].errors[errMsg]);
+								}
+							}
+
+							numAttachUploaded--;
+
+							populateErrors({
+								'errorMsgs': errorMsgs,
+								'serverErrorFiles': serverErrorFiles
+							});
+						}
 						status.setServerFail(0);
+					}
 				})
 				.fail(function(jqXHR, textStatus, errorThrown) {
 					console.log(jqXHR);
@@ -381,6 +405,9 @@
 								break;
 							case 'individualSizeErr':
 								errorMsg = wrapper + params.sizeErrorFiles.join(', ') + ' : ' + params.errorMsgs[err] + '</p>';
+								break;
+							case 'individualServerErr':
+								errorMsg = wrapper + params.serverErrorFiles.join(', ') + ' : ' + params.errorMsgs[err] + '</p>';
 								break;
 							default:
 								errorMsg = wrapper + params.errorMsgs[err] + '</p>';
