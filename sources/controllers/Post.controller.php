@@ -621,8 +621,7 @@ class Post_Controller extends Action_Controller
 					foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 					{
 						if (strpos($attachID, 'post_tmp_' . $user_info['id']) !== false)
-							if (file_exists($attachment['tmp_name']))
-								unlink($attachment['tmp_name']);
+							@unlink($attachment['tmp_name']);
 					}
 					$attach_errors->addError('temp_attachments_gone');
 					$_SESSION['temp_attachments'] = array();
@@ -717,8 +716,8 @@ class Post_Controller extends Action_Controller
 
 						// Take out the trash.
 						unset($_SESSION['temp_attachments'][$attachID]);
-						if (file_exists($attachment['tmp_name']))
-							unlink($attachment['tmp_name']);
+						@unlink($attachment['tmp_name']);
+
 						continue;
 					}
 
@@ -1079,7 +1078,7 @@ class Post_Controller extends Action_Controller
 						continue;
 
 					unset($_SESSION['temp_attachments'][$attachID]);
-					unlink($attachment['tmp_name']);
+					@unlink($attachment['tmp_name']);
 				}
 			}
 
@@ -1600,10 +1599,7 @@ class Post_Controller extends Action_Controller
 				}
 				// We have errors on this file, build out the issues for display to the user
 				else
-				{
-					if (file_exists($attachment['tmp_name']))
-						unlink($attachment['tmp_name']);
-				}
+					@unlink($attachment['tmp_name']);
 			}
 			unset($_SESSION['temp_attachments']);
 		}
