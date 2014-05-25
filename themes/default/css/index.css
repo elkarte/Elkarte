@@ -191,7 +191,12 @@ input[type="number"] {
 
 /* Selects require browser-specific targeting too, unfortunately. */
 select {
-	padding: 0.25em;
+	padding: 2px;
+}
+/* You may think, ZOMG, but this is trade off to look normal/same on *nix and windows */
+/* If you don't care about *nix, remove this selector and go with the above padding   */
+#firefox select {
+	padding: .25em 2px;
 }
 #chrome select {
 	padding: 2px;
