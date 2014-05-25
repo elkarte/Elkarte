@@ -468,10 +468,10 @@ function processAttachments($id_msg = null)
 			$_SESSION['temp_attachments'][$attachID] = array(
 				'name' => htmlspecialchars(basename($_FILES['attachment']['name'][$n]), ENT_COMPAT, 'UTF-8'),
 				'tmp_name' => $destName,
+				'attachid' => $attachID,
 				'size' => $_FILES['attachment']['size'][$n],
 				'type' => $_FILES['attachment']['type'][$n],
 				'id_folder' => $modSettings['currentAttachmentUploadDir'],
-				'unique_id' => md5(basename($_FILES['attachment']['name'][$n]) . $modSettings['currentAttachmentUploadDir']),
 				'errors' => array(),
 			);
 
@@ -539,14 +539,14 @@ function processAttachments($id_msg = null)
  * Deletes a temporary attachment from the $_SESSION (and the filesystem)
  *
  * @package Attachments
- * @param string $unique_id a string generated when a file is uploaded and
- *               added to $_SESSION to help identify the attachment itself
+ * @param string $attach_id the temporary name generated when a file is uploaded
+ *               and used in $_SESSION to help identify the attachment itself
  */
-function removeTempAttachById($unique_id)
+function removeTempAttachById($attach_id)
 {
-	foreach ($_SESSION['temp_attachments'] as $id => $attach)
+	foreach ($_SESSION['temp_attachments'] as $attachID => $attach)
 	{
-		if (!empty($attach['unique_id']) && $attach['unique_id'] === $unique_id)
+		if ($attachID === $attach_id)
 		{
 			// This file does exist, so lets terminate it!
 			if (file_exists($attach['tmp_name']))

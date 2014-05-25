@@ -109,15 +109,14 @@ class Attachment_Controller extends Action_Controller
 			// No errors, lets get the details of what we have for our response back
 			else
 			{
-				foreach ($_SESSION['temp_attachments'] as $key => $val)
+				foreach ($_SESSION['temp_attachments'] as $attachID => $val)
 				{
 					// We need to grab the name anyhow
-					if (!empty($val['unique_id']))
+					if (!empty($val['tmp_name']))
 					{
 						$resp_data = array(
 							'name' => $val['name'],
-							'temp_name' => $key,
-							'uniqueid' => $val['unique_id'],
+							'attachid' => $attachID,
 							'size' => $val['size']
 						);
 					}
@@ -157,10 +156,10 @@ class Attachment_Controller extends Action_Controller
 		}
 
 		// We need a filename and path or we are not going any further
-		if (isset($_REQUEST['uniqueid']))
+		if (isset($_REQUEST['attachid']))
 		{
 			require_once(SUBSDIR . '/Attachments.subs.php');
-			$result = removeTempAttachById($_REQUEST['uniqueid']);
+			$result = removeTempAttachById($_REQUEST['attachid']);
 			if ($result === true)
 				$context['json_data'] = array('result' => true);
 			else

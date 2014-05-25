@@ -143,7 +143,7 @@
 					cache: false,
 					dataType: 'json',
 					data: {
-						'uniqueid': dataToSend.uniqueid
+						'attachid': dataToSend.attachid
 					}
 				})
 				.done(function(resp) {
@@ -158,8 +158,8 @@
 						numAttachUploaded--;
 
 						// Done with this one, so remove it from existence
-						$('#' + dataToSend.uniqueid).unbind();
-						$('#' + dataToSend.uniqueid).remove();
+						$('#' + dataToSend.attachid).unbind();
+						$('#' + dataToSend.attachid).remove();
 					}
 					else
 						console.log('error success');
@@ -237,14 +237,14 @@
 
 					// Update the uploaded file with its ID
 					$(this.str).find('.remove').attr('id', data.curFileNum);
-					$(this.str).attr('id', data.uniqueid);
+					$(this.str).attr('id', data.attachid);
 					$(this.str).attr('data-size', data.size);
 
 					// We need to tell Elk that the file should not be deleted
 					$(this.str).find('.remove').after($('<input />')
 						.attr('type', 'hidden')
 						.attr('name', 'attach_del[]')
-						.attr('value', data.temp_name));
+						.attr('value', data.attachid));
 
 					// Provide a way to remove a file that has been sent by mistake
 					$(this.str).find('.remove').bind('click', function(e) {
