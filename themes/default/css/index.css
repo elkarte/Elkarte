@@ -332,7 +332,9 @@ em {
 .table_grid_perms {
 	table-layout: fixed;
 	word-wrap: break-word;
-	hyphens: auto;
+	-webkit-hyphens: auto;
+	-moz-hyphens: auto;
+	-ms-hyphens: auto;
 }
 .grid8 {
 	width: 8%;
@@ -2124,7 +2126,9 @@ div.core_posts {
 	width: 15em;
 	word-wrap: break-word;
 	word-break: break-all;
-	hyphens: auto;
+	-webkit-hyphens: auto;
+	-moz-hyphens: auto;
+	-ms-hyphens: auto;
 	font-size: 0.857em;
 }
 .poster.poster2 {
@@ -2289,7 +2293,9 @@ div.core_posts {
 	padding: 7px 8px 2px 2px;
 	min-height: 70px;
 	word-wrap: break-word;
-	hyphens: auto;
+	-webkit-hyphens: auto;
+	-moz-hyphens: auto;
+	-ms-hyphens: auto;
 }
 #topic_summary .inner {
 	clear: both;
