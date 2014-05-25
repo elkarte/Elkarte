@@ -240,6 +240,12 @@
 					$(this.str).attr('id', data.uniqueid);
 					$(this.str).attr('data-size', data.size);
 
+					// We need to tell Elk that the file should not be deleted
+					$(this.str).find('.remove').after($('<input />')
+						.attr('type', 'hidden')
+						.attr('name', 'attach_del[]')
+						.attr('value', data.temp_name));
+
 					// Provide a way to remove a file that has been sent by mistake
 					$(this.str).find('.remove').bind('click', function(e) {
 						e.preventDefault();

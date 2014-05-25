@@ -116,6 +116,7 @@ class Attachment_Controller extends Action_Controller
 					{
 						$resp_data = array(
 							'name' => $val['name'],
+							'temp_name' => $key,
 							'uniqueid' => $val['unique_id'],
 							'size' => $val['size']
 						);
