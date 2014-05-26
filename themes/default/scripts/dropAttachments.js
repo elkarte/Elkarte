@@ -438,6 +438,7 @@
 
 		// All clear, show the drop zone
 		obj.toggle();
+		$('.drop_attachments_no_js').hide();
 
 		// Entering the dropzone, show it
 		obj.on('dragenter', function(e) {
@@ -465,6 +466,14 @@
 		obj.on('dragexit', function(e) {
 			e.preventDefault();
 			$(this).css('opacity', '0.6');
+		});
+
+		// Rather click and select?
+		obj.find('#attachment_click').change(function(e) {
+			e.preventDefault();
+			var files = $(this)[0].files;
+			console.log(JSON.stringify(files));
+			dragDropAttachment.prototype.handleFileUpload(files, obj);
 		});
 	});
 
