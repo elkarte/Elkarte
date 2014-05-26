@@ -2503,15 +2503,10 @@ ul.post_options li {
 }
 .drop_area_fileselect {
     cursor: pointer;
-    margin-left: 440px;
+    margin-left: -190px;
     opacity: 0.0001;
-    padding: 5px;
     position: absolute;
-    width: 160px;
-}
-input.drop_area_fileselect {
-	height: 26px;
-	text-decoration: underline;
+    width: 220px;
 }
 
 #postAttachment >dd.progress_tracker {
