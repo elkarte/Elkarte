@@ -188,7 +188,7 @@ function template_list_themes()
 
 		echo '
 				</h3>
-				<dl class="content settings themes_list">
+				<dl class="windowbg2 content settings themes_list">
 					<dt><a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=list" class="linkbutton floatleft">', $txt['theme_edit_settings'], '</a></dt>
 					<dt>', $txt['themeadmin_list_theme_dir'], '</dt>
 					<dd', $theme['valid_path'] ? '' : ' class="error"', '>', $theme['theme_dir'], $theme['valid_path'] ? '' : ' ' . $txt['themeadmin_list_invalid'], '</dd>
@@ -252,7 +252,7 @@ function template_reset_list()
 		echo '
 			<div class="theme_', $theme['id'], '">
 				<h3 class="secondary_header">', $theme['name'], '</h3>
-				<ul class="windowbg content">
+				<ul class="windowbg2 content">
 					<li>
 						<a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=reset">', $txt['themeadmin_reset_defaults'], '</a> <em class="smalltext">(', $theme['num_default_options'], ' ', $txt['themeadmin_reset_defaults_current'], ')</em>
 					</li>
@@ -289,7 +289,7 @@ function template_set_options()
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=theme;th=', $context['theme_settings']['theme_id'], ';sa=reset" method="post" accept-charset="UTF-8">
 			<input type="hidden" name="who" value="', $context['theme_options_reset'] ? 1 : 0, '" />
 			<h3 class="category_header">', $context['theme_settings']['name'],'</h3>
-			<dl class="settings windowbg content', $context['theme_options_reset'] ? ' theme_options' : '', '">';
+			<dl class="settings windowbg2 content', $context['theme_options_reset'] ? ' theme_options' : '', '">';
 
 	foreach ($context['options'] as $setting)
 	{
