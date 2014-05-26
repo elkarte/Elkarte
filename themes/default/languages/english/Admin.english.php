@@ -116,7 +116,7 @@ $txt['remove_all'] = 'Clear Log';
 $txt['approve_new_members'] = 'Admin must approve all new members';
 $txt['agreement_not_writable'] = 'Warning - agreement.txt is not writable, any changes you make will NOT be saved.';
 
-$txt['version_check_desc'] = 'This shows you the versions of your installation\'s files versus those of the latest version. If any of these files are out of date, you should download and upgrade to the latest version at our <a href="https://github.com/elkarte/Elkarte//wiki/downloads" target="_blank" class="new_win">ElkArte Site</a>.';
+$txt['version_check_desc'] = 'This shows you the versions of your installation\'s files versus those of the latest version. If any of these files are out of date, you should download and upgrade to the latest version at our <a href="https://github.com/elkarte/Elkarte/wiki/downloads" target="_blank" class="new_win">ElkArte Site</a>.';
 $txt['version_check_more'] = '(more detailed)';
 
 $txt['lfyi'] = 'You are unable to connect to ElkArte\'s latest news file.';
@@ -324,8 +324,8 @@ $txt['support_versions_gd'] = 'GD version';
 $txt['support_versions_imagick'] = 'Imagick version';
 $txt['support_versions'] = 'Version Information';
 $txt['support_resources'] = 'Support Resources';
-$txt['support_resources_p1'] = 'Our <a href="%1$s">Documentation Wiki</a> provides the main documentation for ElkArte. The ElkArte Online Manual has many documents to help answer support questions and explain <a href="%2$s">Features</a>, <a href="%3$s">Settings</a>, <a href="%4$s">Themes</a>, <a href="%5$s">Packages</a>, etc. The Online Manual documents each area of ElkArte thoroughly and should answer most questions quickly.';
-$txt['support_resources_p2'] = 'If you can\'t find the answers to your questions in the Documentation Wiki, you may want to search our <a href="%1$s">Support Community</a> or ask for assistance in our support boards. The ElkArte Support Community can be used for <a href="%2$s">support</a>, <a href="%3$s">customization</a>, and many other things such as discussing ElkArte, finding a host, and discussing administrative issues with other forum administrators.';
+$txt['support_resources_p1'] = 'Our <a href="%1$s" target="_blank" class="new_win">Documentation Wiki</a> provides the main documentation for ElkArte. The ElkArte Online Manual has many documents to help answer support questions and explain <a href="%2$s" target="_blank" class="new_win">Features</a>, <a href="%3$s" target="_blank" class="new_win">Settings</a>, <a href="%4$s" target="_blank" class="new_win">Themes</a>, <a href="%5$s" target="_blank" class="new_win">Packages</a>, etc. The Online Manual documents each area of ElkArte thoroughly and should answer most questions quickly.';
+$txt['support_resources_p2'] = 'If you can\'t find the answers to your questions in the Documentation Wiki, you may want to search our <a href="%1$s" target="_blank" class="new_win">Support Community</a> or ask for assistance in our support boards. The ElkArte Support Community can be used for <a href="%2$s" target="_blank" class="new_win">support</a>, <a href="%3$s" target="_blank" class="new_win">customization</a>, and many other things such as discussing ElkArte, finding a host, and discussing administrative issues with other forum administrators.';
 
 $txt['support_latest'] = 'Common support &amp; issues';
 $txt['support_latest_fetch'] = 'Retrieving support information...';
