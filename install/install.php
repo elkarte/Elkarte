@@ -1484,22 +1484,64 @@ function action_deleteInstall()
  */
 class Ftp_Connection
 {
-	var $connection = 'no_connection', $error = false, $last_message, $pasv = array();
+	/**
+	 * holds the connection response
+	 * @var resource
+	 */
+	public $connection;
 
-	// Create a new FTP connection...
-	function ftp_connection($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@yourdomain.org')
+	/**
+	 * holds any errors
+	 * @var string|boolean
+	 */
+	public $error;
+
+	/**
+	 * holds last message from the server
+	 * @var string
+	 */
+	public $last_message;
+
+	/**
+	 * Passive connection
+	 * @var mixed[]
+	 */
+	public $pasv;
+
+	/**
+	 * Create a new FTP connection...
+	 *
+	 * @param string $ftp_server
+	 * @param int $ftp_port
+	 * @param string $ftp_user
+	 * @param string $ftp_pass
+	 */
+	public function __construct($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@yourdomain.org')
 	{
+		// Initialize variables.
+		$this->connection = 'no_connection';
+		$this->error = false;
+		$this->pasv = array();
+
 		if ($ftp_server !== null)
 			$this->connect($ftp_server, $ftp_port, $ftp_user, $ftp_pass);
 	}
 
-	function connect($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@yourdomain.org')
+	/**
+	 * Connects to a server
+	 *
+	 * @param string $ftp_server
+	 * @param int $ftp_port
+	 * @param string $ftp_user
+	 * @param string $ftp_pass
+	 */
+	public function connect($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@yourdomain.org')
 	{
-		if (substr($ftp_server, 0, 6) == 'ftp://')
+		if (strpos($ftp_server, 'ftp://') === 0)
 			$ftp_server = substr($ftp_server, 6);
-		elseif (substr($ftp_server, 0, 7) == 'ftps://')
+		elseif (strpos($ftp_server, 'ftps://') === 0)
 			$ftp_server = 'ssl://' . substr($ftp_server, 7);
-		if (substr($ftp_server, 0, 7) == 'http://')
+		if (strpos($ftp_server, 'http://') === 0)
 			$ftp_server = substr($ftp_server, 7);
 		$ftp_server = strtr($ftp_server, array('/' => '', ':' => '', '@' => ''));
 
@@ -1535,13 +1577,19 @@ class Ftp_Connection
 		}
 	}
 
-	function chdir($ftp_path)
+	/**
+	 * Changes to a directory (chdir) via the ftp connection
+	 *
+	 * @param string $ftp_path
+	 * @return boolean
+	 */
+	public function chdir($ftp_path)
 	{
 		if (!is_resource($this->connection))
 			return false;
 
 		// No slash on the end, please...
-		if (substr($ftp_path, -1) == '/')
+		if ($ftp_path !== '/' && substr($ftp_path, -1) === '/')
 			$ftp_path = substr($ftp_path, 0, -1);
 
 		fwrite($this->connection, 'CWD ' . $ftp_path . "\r\n");
@@ -1554,12 +1602,22 @@ class Ftp_Connection
 		return true;
 	}
 
-	function chmod($ftp_file, $chmod)
+	/**
+	 * Changes a files atrributes (chmod)
+	 *
+	 * @param string $ftp_file
+	 * @param int $chmod
+	 * @return boolean
+	 */
+	public function chmod($ftp_file, $chmod)
 	{
 		if (!is_resource($this->connection))
 			return false;
 
-		// Convert the chmod value from octal (0777) to text ("777")
+		if ($ftp_file == '')
+			$ftp_file = '.';
+
+		// Convert the chmod value from octal (0777) to text ("777").
 		fwrite($this->connection, 'SITE CHMOD ' . decoct($chmod) . ' ' . $ftp_file . "\r\n");
 		if (!$this->check_response(200))
 		{
@@ -1570,7 +1628,13 @@ class Ftp_Connection
 		return true;
 	}
 
-	function unlink($ftp_file)
+	/**
+	 * Deletes a file
+	 *
+	 * @param string $ftp_file
+	 * @return boolean
+	 */
+	public function unlink($ftp_file)
 	{
 		// We are actually connected, right?
 		if (!is_resource($this->connection))
@@ -1593,33 +1657,43 @@ class Ftp_Connection
 		return true;
 	}
 
-	function check_response($desired)
+	/**
+	 * Reads the response to the command from the server
+	 *
+	 * @param string[]|string $desired string or array of acceptable return values
+	 */
+	public function check_response($desired)
 	{
 		// Wait for a response that isn't continued with -, but don't wait too long.
 		$time = time();
 		do
 			$this->last_message = fgets($this->connection, 1024);
-		while (substr($this->last_message, 3, 1) != ' ' && time() - $time < 5);
+		while ((strlen($this->last_message) < 4 || strpos($this->last_message, ' ') === 0 || strpos($this->last_message, ' ', 3) !== 3) && time() - $time < 5);
 
 		// Was the desired response returned?
 		return is_array($desired) ? in_array(substr($this->last_message, 0, 3), $desired) : substr($this->last_message, 0, 3) == $desired;
 	}
 
-	function passive()
+	/**
+	 * Used to create a passive connection
+	 *
+	 * @return boolean
+	 */
+	public function passive()
 	{
 		// We can't create a passive data connection without a primary one first being there.
 		if (!is_resource($this->connection))
 			return false;
 
 		// Request a passive connection - this means, we'll talk to you, you don't talk to us.
-		@fwrite($this->connection, "PASV\r\n");
+		@fwrite($this->connection, 'PASV' . "\r\n");
 		$time = time();
 		do
 			$response = fgets($this->connection, 1024);
-		while (substr($response, 3, 1) != ' ' && time() - $time < 5);
+		while (substr($response, 3, 1) !== ' ' && time() - $time < 5);
 
 		// If it's not 227, we weren't given an IP and port, which means it failed.
-		if (substr($response, 0, 4) != '227 ')
+		if (strpos($response, '227 ') !== 0)
 		{
 			$this->error = 'bad_response';
 			return false;
@@ -1632,13 +1706,19 @@ class Ftp_Connection
 			return false;
 		}
 
-		// This is pretty simple - store it for later use ;)
+		// This is pretty simple - store it for later use ;).
 		$this->pasv = array('ip' => $match[1] . '.' . $match[2] . '.' . $match[3] . '.' . $match[4], 'port' => $match[5] * 256 + $match[6]);
 
 		return true;
 	}
 
-	function create_file($ftp_file)
+	/**
+	 * Creates a new file on the server
+	 *
+	 * @param string $ftp_file
+	 * @return boolean
+	 */
+	public function create_file($ftp_file)
 	{
 		// First, we have to be connected... very important.
 		if (!is_resource($this->connection))
@@ -1671,7 +1751,14 @@ class Ftp_Connection
 		return true;
 	}
 
-	function list_dir($ftp_path = '', $search = false)
+	/**
+	 * Generates a direcotry listing for the current directory
+	 *
+	 * @param string $ftp_path
+	 * @param string|boolean $search
+	 * @return false|string
+	 */
+	public function list_dir($ftp_path = '', $search = false)
 	{
 		// Are we even connected...?
 		if (!is_resource($this->connection))
@@ -1709,17 +1796,24 @@ class Ftp_Connection
 		return $data;
 	}
 
-	function locate($file, $listing = null)
+	/**
+	 * Determins the current dirctory we are in
+	 *
+	 * @param string $file
+	 * @param string|null $listing
+	 * @return string|false
+	 */
+	public function locate($file, $listing = null)
 	{
 		if ($listing === null)
 			$listing = $this->list_dir('', true);
 		$listing = explode("\n", $listing);
 
-		@fwrite($this->connection, "PWD\r\n");
+		@fwrite($this->connection, 'PWD' . "\r\n");
 		$time = time();
 		do
 			$response = fgets($this->connection, 1024);
-		while (substr($response, 3, 1) != ' ' && time() - $time < 5);
+		while (substr($response, 3, 1) !== ' ' && time() - $time < 5);
 
 		// Check for 257!
 		if (preg_match('~^257 "(.+?)" ~', $response, $match) != 0)
@@ -1738,7 +1832,7 @@ class Ftp_Connection
 			// Okay, this file's name is:
 			$listing[$i] = $current_dir . '/' . trim(strlen($listing[$i]) > 30 ? strrchr($listing[$i], ' ') : $listing[$i]);
 
-			if (substr($file, 0, 1) == '*' && substr($listing[$i], -(strlen($file) - 1)) == substr($file, 1))
+			if ($file[0] == '*' && substr($listing[$i], -(strlen($file) - 1)) == substr($file, 1))
 				return $listing[$i];
 			if (substr($file, -1) == '*' && substr($listing[$i], 0, strlen($file) - 1) == substr($file, 0, -1))
 				return $listing[$i];
@@ -1749,7 +1843,13 @@ class Ftp_Connection
 		return false;
 	}
 
-	function create_dir($ftp_dir)
+	/**
+	 * Creates a new directory on the server
+	 *
+	 * @param string $ftp_dir
+	 * @return boolean
+	 */
+	public function create_dir($ftp_dir)
 	{
 		// We must be connected to the server to do something.
 		if (!is_resource($this->connection))
@@ -1766,7 +1866,14 @@ class Ftp_Connection
 		return true;
 	}
 
-	function detect_path($filesystem_path, $lookup_file = null)
+	/**
+	 * Detects the current path
+	 *
+	 * @param string $filesystem_path
+	 * @param string|null $lookup_file
+	 * @return string[] $username, $path, found_path
+	 */
+	public function detect_path($filesystem_path, $lookup_file = null)
 	{
 		$username = '';
 
@@ -1784,7 +1891,7 @@ class Ftp_Connection
 				if (strlen(dirname($_SERVER['PHP_SELF'])) > 1)
 					$path .= dirname($_SERVER['PHP_SELF']);
 			}
-			elseif (substr($filesystem_path, 0, 9) == '/var/www/')
+			elseif (strpos($filesystem_path, '/var/www/') === 0)
 				$path = substr($filesystem_path, 8);
 			else
 				$path = strtr(strtr($filesystem_path, array('\\' => '/')), array($_SERVER['DOCUMENT_ROOT'] => ''));
@@ -1811,10 +1918,15 @@ class Ftp_Connection
 		return array($username, $path, isset($found_path));
 	}
 
-	function close()
+	/**
+	 * Close the ftp connection
+	 *
+	 * @return boolean
+	 */
+	public function close()
 	{
 		// Goodbye!
-		fwrite($this->connection, "QUIT\r\n");
+		fwrite($this->connection, 'QUIT' . "\r\n");
 		fclose($this->connection);
 
 		return true;
