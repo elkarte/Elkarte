@@ -417,8 +417,8 @@ function template_add_new_attachments()
 	{
 		echo '
 							<dt class="drop_area">
-								<input class="drop_area_fileselect" type="file" multiple="multiple" name="attachment[]" id="attachment_click" class="input_file" />
-								<i class="fa fa-upload"></i> ', $txt['attach_drop_files'], '<a class="drop_area_fileselect_text" href="#"> ', $txt['attach_select_files'], '</a>
+								<i class="fa fa-upload"></i> ', $txt['attach_drop_files'], '
+								<input class="drop_area_fileselect" type="file" multiple="multiple" name="attachment_click[]" id="attachment_click" class="input_file" />
 							</dt>
 							<dd class="progress_tracker"></dd>
 							<dd class="drop_attachments_error"></dd>
