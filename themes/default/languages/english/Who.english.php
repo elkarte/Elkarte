@@ -135,7 +135,7 @@ $txt['who_pm_byemail'] = 'Sending a personal message by email.';
 
 // Credits text
 $txt['credits'] = 'Credits';
-$txt['credits_intro'] = 'ElkArte is 100% free and open-source. We encourage and support an active, open community that accepts contributions from the public.  We want to thank everyone who supported the project by providing code, feedback, bug reports, and opinions, as none of this would have been possible without you.  We also want to specially acknowledge <a href="https://github.com/SimpleMachines">SMF</a>, the project that ElkArte was born from.';
+$txt['credits_intro'] = 'ElkArte is 100% free and open-source. We encourage and support an active, open community that accepts contributions from the public.  We want to thank everyone who supported the project by providing code, feedback, bug reports, and opinions, as none of this would have been possible without you.  We also want to specially acknowledge <a href="https://github.com/SimpleMachines" target="_blank" class="new_win">SMF</a>, the project that ElkArte was born from.';
 $txt['credits_contributors'] = 'Contributors';
 $txt['credits_and'] = 'and';
 $txt['credits_copyright'] = 'Copyrights';
