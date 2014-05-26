@@ -740,10 +740,14 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 		require_once(SUBSDIR . '/FTPConnection.class.php');
 
 		$package_ftp = new Ftp_Connection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
+
+		// Check for a valid connection
+		if ($package_ftp->error !== false)
+			unset($package_ftp, $_SESSION['pack_ftp']);
 	}
 
 	// Just got a submission did we?
-	if (empty($package_ftp) && isset($_POST['ftp_username']))
+	if ((empty($package_ftp) || ($package_ftp->error !== false)) && isset($_POST['ftp_username']))
 	{
 		require_once(SUBSDIR . '/FTPConnection.class.php');
 		$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
