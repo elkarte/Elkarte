@@ -782,7 +782,7 @@ class Admin_Controller extends Action_Controller
 		else
 		{
 			$action = new Action();
-			$action->initialize($subActions, 'log');
+			$subAction = $action->initialize($subActions, 'internal');
 			$action->dispatch($subAction);
 		}
 	}

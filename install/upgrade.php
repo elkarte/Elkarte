@@ -2426,7 +2426,7 @@ function cmdStep0()
 
 	$start_time = time();
 
-	ob_end_clean();
+	@ob_end_clean();
 	ob_implicit_flush(true);
 	@set_time_limit(600);
 
@@ -2786,7 +2786,6 @@ function deleteUpgrader()
 	@unlink(dirname(__FILE__) . '/upgrade_1-1.sql');
 	@unlink(dirname(__FILE__) . '/upgrade_2-0_' . $db_type . '.sql');
 	@unlink(dirname(__FILE__) . '/upgrade_2-1_' . $db_type . '.sql');
-	@unlink(dirname(__FILE__) . '/webinstall.php');
 
 	$dh = opendir(dirname(__FILE__));
 	while ($file = readdir($dh))

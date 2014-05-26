@@ -54,8 +54,9 @@ class Groups_Controller extends Action_Controller
 
 	/**
 	 * Set up templates and pre-requisites for any request processed by this class.
-	 * Called automagically before any action_() call.
-	 * It handles permission checks, and puts the moderation bar on as required.
+	 *
+	 * - Called automagically before any action_() call.
+	 * - It handles permission checks, and puts the moderation bar on as required.
 	 */
 	public function pre_dispatch()
 	{

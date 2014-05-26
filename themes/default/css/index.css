@@ -191,7 +191,12 @@ input[type="number"] {
 
 /* Selects require browser-specific targeting too, unfortunately. */
 select {
-	padding: 0.25em;
+	padding: 2px;
+}
+/* You may think, ZOMG, but this is trade off to look normal/same on *nix and windows */
+/* If you don't care about *nix, remove this selector and go with the above padding   */
+#firefox select {
+	padding: .25em 2px;
 }
 #chrome select {
 	padding: 2px;
@@ -327,7 +332,9 @@ em {
 .table_grid_perms {
 	table-layout: fixed;
 	word-wrap: break-word;
-	hyphens: auto;
+	-webkit-hyphens: auto;
+	-moz-hyphens: auto;
+	-ms-hyphens: auto;
 }
 .grid8 {
 	width: 8%;
@@ -2119,7 +2126,9 @@ div.core_posts {
 	width: 15em;
 	word-wrap: break-word;
 	word-break: break-all;
-	hyphens: auto;
+	-webkit-hyphens: auto;
+	-moz-hyphens: auto;
+	-ms-hyphens: auto;
 	font-size: 0.857em;
 }
 .poster.poster2 {
@@ -2284,7 +2293,9 @@ div.core_posts {
 	padding: 7px 8px 2px 2px;
 	min-height: 70px;
 	word-wrap: break-word;
-	hyphens: auto;
+	-webkit-hyphens: auto;
+	-moz-hyphens: auto;
+	-ms-hyphens: auto;
 }
 #topic_summary .inner {
 	clear: both;
@@ -2595,7 +2606,7 @@ ul.post_options li {
 #event_main #datepicker, #event_main #caption_evtitle {
 	display: inline-block;
 	padding-left: 1em;
-	padding-top: 0.5em;
+	padding-top: 0.4em;
 }
 #event_main #evtitle {
 	margin-top: 0.5em;
@@ -2728,9 +2739,6 @@ dl.merge_topic dd {
 /* We can't control what jQueryui pollutes the DOM with, so deal with it */
 /* Styles for the profile summary tabs, or any jQuery ui tabs */
 /* ---------------------------------------------------------- */
-.ui-tabs {
-	zoom: 1;
-}
 .ui-tabs .ui-tabs-nav {
 	list-style: none;
 	position: relative;
@@ -3245,7 +3253,7 @@ div.labels {
 	float: left;
 	display: block;
 	margin: -0.1em 0 0 0;
-	font-size: 1.5em;
+	font-size: 0.6em;
 }
 .next_month {
 	float: right;

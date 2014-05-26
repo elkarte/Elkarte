@@ -122,7 +122,7 @@ if (!empty($modSettings['enableCompressedOutput']) && !headers_sent())
 		$modSettings['enableCompressedOutput'] = 0;
 	else
 	{
-		ob_end_clean();
+		@ob_end_clean();
 		ob_start('ob_gzhandler');
 	}
 }
@@ -152,7 +152,7 @@ obExit(null, null, true);
  */
 function elk_main()
 {
-	global $modSettings, $user_info, $topic, $board_info;
+	global $modSettings, $user_info, $topic, $board_info, $context;
 
 	// Special case: session keep-alive, output a transparent pixel.
 	if (isset($_GET['action']) && $_GET['action'] == 'keepalive')
@@ -209,5 +209,8 @@ function elk_main()
 	// What shall we do?
 	require_once(SOURCEDIR . '/Dispatcher.class.php');
 	$dispatcher = new Site_Dispatcher();
+
+	// Show where we came from, and go
+	$context['site_action'] = $dispatcher->site_action();
 	$dispatcher->dispatch();
 }

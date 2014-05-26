@@ -1346,7 +1346,6 @@ a.help .icon {
 		font-size: 2.071em;
 		color: #43a8da;
 		content: attr(data-icon);
-		speak: none;
 	}
 	.indicator[data-icon]:before {
 		color: orange;
