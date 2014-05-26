@@ -2493,15 +2493,27 @@ ul.post_options li {
 
 /*	$DRAG-N-DROP		*/
 /* ------------------------------------------------------- */
-#postAttachment2 .drop_area {
-	font-size: 1.857em;
+.drop_area {
+	font-size: 1.643em;
 	font-weight: normal;
-	height: 60px;
-	line-height: 60px;
 	text-align: center;
 	opacity: 0.6;
 	display: none;
+	padding: 1em 0;
 }
+.drop_area_fileselect {
+    cursor: pointer;
+    margin-left: 440px;
+    opacity: 0.0001;
+    padding: 5px;
+    position: absolute;
+    width: 160px;
+}
+input.drop_area_fileselect {
+	height: 26px;
+	text-decoration: underline;
+}
+
 #postAttachment >dd.progress_tracker {
 	margin:0;
 }
