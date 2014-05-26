@@ -146,7 +146,7 @@ $txt['credits_software'] = 'Software';
 $txt['credits_graphics'] = 'Graphics';
 $txt['credits_fonts'] = 'Fonts';
 $txt['credits_groups_contrib'] = 'Contributors';
-$txt['credits_contrib_list'] = 'For a complete list of the many individuals that contributed to the design and implementation of Elkarte, please refer to the official GitHub <a href="https://github.com/elkarte/Elkarte/graphs/contributors">list of contributors.</a>';
+$txt['credits_contrib_list'] = 'For a complete list of the many individuals that contributed to the design and implementation of Elkarte, please refer to the official GitHub <a href="https://github.com/elkarte/Elkarte/graphs/contributors" target="_blank" class="new_win">list of contributors.</a>';
 $txt['credits_license'] = 'License';
 $txt['credits_copyright'] = 'Copyright';
 $txt['credits_version'] = 'Version';
