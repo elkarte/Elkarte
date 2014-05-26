@@ -65,3 +65,12 @@
 #quick_search .icon {
 	margin: 12px 0 0 4px;
 }
+
+/* alternate row colors on Modify Themes,Copy a template */
+.theme_options .windowbg2 {
+	background: #fcfcfc;
+	border: 1px solid #cccccc;
+}
+.theme_options .windowbg {
+	border: 1px solid #cccccc;
+}
