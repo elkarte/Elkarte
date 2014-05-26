@@ -468,6 +468,7 @@ function processAttachments($id_msg = null)
 			$_SESSION['temp_attachments'][$attachID] = array(
 				'name' => htmlspecialchars(basename($_FILES['attachment']['name'][$n]), ENT_COMPAT, 'UTF-8'),
 				'tmp_name' => $destName,
+				'attachid' => $attachID,
 				'size' => $_FILES['attachment']['size'][$n],
 				'type' => $_FILES['attachment']['type'][$n],
 				'id_folder' => $modSettings['currentAttachmentUploadDir'],
@@ -532,6 +533,36 @@ function processAttachments($id_msg = null)
 	//   errors => An array of errors (use the index of the $txt variable for that error).
 	// Template changes can be done using "integrate_upload_template".
 	call_integration_hook('integrate_attachment_upload');
+}
+
+/**
+ * Deletes a temporary attachment from the $_SESSION (and the filesystem)
+ *
+ * @package Attachments
+ * @param string $attach_id the temporary name generated when a file is uploaded
+ *               and used in $_SESSION to help identify the attachment itself
+ */
+function removeTempAttachById($attach_id)
+{
+	foreach ($_SESSION['temp_attachments'] as $attachID => $attach)
+	{
+		if ($attachID === $attach_id)
+		{
+			// This file does exist, so lets terminate it!
+			if (file_exists($attach['tmp_name']))
+			{
+				@unlink($attach['tmp_name']);
+				unset($_SESSION['temp_attachments'][$attachID]);
+
+				return true;
+			}
+			// Nope can't delete it if we can't find it
+			else
+				return 'attachment_not_found';
+		}
+	}
+
+	return 'attachment_not_found';
 }
 
 /**

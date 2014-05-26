@@ -66,7 +66,7 @@ class Display_Controller
 		// Not only does a prefetch make things slower for the server, but it makes it impossible to know if they read it.
 		if (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch')
 		{
-			ob_end_clean();
+			@ob_end_clean();
 			header('HTTP/1.1 403 Prefetch Forbidden');
 			die;
 		}

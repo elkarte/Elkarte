@@ -212,9 +212,9 @@ class News_Controller extends Action_Controller
 		$feed_title = htmlspecialchars(strip_tags($context['forum_name']), ENT_COMPAT, 'UTF-8') . (isset($feed_title) ? $feed_title : '');
 
 		// This is an xml file....
-		ob_end_clean();
+		@ob_end_clean();
 		if (!empty($modSettings['enableCompressedOutput']))
-			@ob_start('ob_gzhandler');
+			ob_start('ob_gzhandler');
 		else
 			ob_start();
 
