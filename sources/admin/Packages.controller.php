@@ -136,6 +136,7 @@ class Packages_Controller extends Action_Controller
 		if (file_exists(BOARDDIR . '/packages/temp'))
 			deltree(BOARDDIR . '/packages/temp', false);
 
+		// Attempt to create the temp directory
 		if (!mktree(BOARDDIR . '/packages/temp', 0755))
 		{
 			deltree(BOARDDIR . '/packages/temp', false);

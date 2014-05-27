@@ -2895,35 +2895,35 @@ function loadEssentialFunctions()
 	{
 		/**
 		 * holds the connection response
-		 * @var type
+		 * @var resource
 		 */
 		public $connection;
 
 		/**
 		 * holds any errors
-		 * @var type
+		 * @var string|boolean
 		 */
 		public $error;
 
 		/**
 		 * holds last message from the server
-		 * @var type
+		 * @var string
 		 */
 		public $last_message;
 
 		/**
 		 * Passive connection
-		 * @var type
+		 * @var mixed[]
 		 */
 		public $pasv;
 
 		/**
 		 * Create a new FTP connection...
 		 *
-		 * @param type $ftp_server
-		 * @param type $ftp_port
-		 * @param type $ftp_user
-		 * @param type $ftp_pass
+		 * @param string $ftp_server
+		 * @param int $ftp_port
+		 * @param string $ftp_user
+		 * @param string $ftp_pass
 		 */
 		public function __construct($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@yourdomain.org')
 		{
@@ -2939,10 +2939,10 @@ function loadEssentialFunctions()
 		/**
 		 * Connects to a server
 		 *
-		 * @param type $ftp_server
-		 * @param type $ftp_port
-		 * @param type $ftp_user
-		 * @param type $ftp_pass
+		 * @param string $ftp_server
+		 * @param int $ftp_port
+		 * @param string $ftp_user
+		 * @param string $ftp_pass
 		 */
 		public function connect($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@yourdomain.org')
 		{
@@ -2989,7 +2989,8 @@ function loadEssentialFunctions()
 		/**
 		 * Changes to a directory (chdir) via the ftp connection
 		 *
-		 * @param type $ftp_path
+		 * @param string $ftp_path
+		 * @return boolean
 		 */
 		public function chdir($ftp_path)
 		{
@@ -3014,7 +3015,8 @@ function loadEssentialFunctions()
 		 * Changes a files atrributes (chmod)
 		 *
 		 * @param string $ftp_file
-		 * @param type $chmod
+		 * @param int $chmod
+		 * @return boolean
 		 */
 		public function chmod($ftp_file, $chmod)
 		{
@@ -3038,7 +3040,8 @@ function loadEssentialFunctions()
 		/**
 		 * Deletes a file
 		 *
-		 * @param type $ftp_file
+		 * @param string $ftp_file
+		 * @return boolean
 		 */
 		public function unlink($ftp_file)
 		{
@@ -3066,7 +3069,7 @@ function loadEssentialFunctions()
 		/**
 		 * Reads the response to the command from the server
 		 *
-		 * @param type $desired
+		 * @param string[]|string $desired string or array of acceptable return values
 		 */
 		public function check_response($desired)
 		{
@@ -3082,6 +3085,8 @@ function loadEssentialFunctions()
 
 		/**
 		 * Used to create a passive connection
+		 *
+		 * @return boolean
 		 */
 		public function passive()
 		{
@@ -3094,7 +3099,7 @@ function loadEssentialFunctions()
 			$time = time();
 			do
 				$response = fgets($this->connection, 1024);
-			while (strpos($response, ' ', 3) !== 3 && time() - $time < 5);
+			while (substr($response, 3, 1) !== ' ' && time() - $time < 5);
 
 			// If it's not 227, we weren't given an IP and port, which means it failed.
 			if (strpos($response, '227 ') !== 0)
@@ -3119,7 +3124,8 @@ function loadEssentialFunctions()
 		/**
 		 * Creates a new file on the server
 		 *
-		 * @param type $ftp_file
+		 * @param string $ftp_file
+		 * @return boolean
 		 */
 		public function create_file($ftp_file)
 		{
@@ -3155,10 +3161,11 @@ function loadEssentialFunctions()
 		}
 
 		/**
-		 * Generates a directory listing for the current directory
+		 * Generates a direcotry listing for the current directory
 		 *
-		 * @param type $ftp_path
-		 * @param type $search
+		 * @param string $ftp_path
+		 * @param string|boolean $search
+		 * @return false|string
 		 */
 		public function list_dir($ftp_path = '', $search = false)
 		{
@@ -3199,10 +3206,11 @@ function loadEssentialFunctions()
 		}
 
 		/**
-		 * Determines the current directory we are in
+		 * Determins the current dirctory we are in
 		 *
-		 * @param type $file
-		 * @param type $listing
+		 * @param string $file
+		 * @param string|null $listing
+		 * @return string|false
 		 */
 		public function locate($file, $listing = null)
 		{
@@ -3214,7 +3222,7 @@ function loadEssentialFunctions()
 			$time = time();
 			do
 				$response = fgets($this->connection, 1024);
-			while ($response[3] != ' ' && time() - $time < 5);
+			while (substr($response, 3, 1) !== ' ' && time() - $time < 5);
 
 			// Check for 257!
 			if (preg_match('~^257 "(.+?)" ~', $response, $match) != 0)
@@ -3247,7 +3255,8 @@ function loadEssentialFunctions()
 		/**
 		 * Creates a new directory on the server
 		 *
-		 * @param type $ftp_dir
+		 * @param string $ftp_dir
+		 * @return boolean
 		 */
 		public function create_dir($ftp_dir)
 		{
@@ -3269,8 +3278,9 @@ function loadEssentialFunctions()
 		/**
 		 * Detects the current path
 		 *
-		 * @param type $filesystem_path
-		 * @param type $lookup_file
+		 * @param string $filesystem_path
+		 * @param string|null $lookup_file
+		 * @return string[] $username, $path, found_path
 		 */
 		public function detect_path($filesystem_path, $lookup_file = null)
 		{
@@ -3319,6 +3329,8 @@ function loadEssentialFunctions()
 
 		/**
 		 * Close the ftp connection
+		 *
+		 * @return boolean
 		 */
 		public function close()
 		{
