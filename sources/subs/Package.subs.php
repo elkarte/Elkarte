@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This contains functions for handling tar.gz and zip files
+ * This contains functions for handling tar.gz and .zip files
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -34,6 +34,7 @@ if (!defined('ELK'))
  */
 function read_tgz_file($gzfilename, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
+	// From a web site
 	if (substr($gzfilename, 0, 7) == 'http://' || substr($gzfilename, 0, 8) == 'https://')
 	{
 		$data = fetch_web_data($gzfilename);
@@ -41,6 +42,7 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
 		if ($data === false)
 			return false;
 	}
+	// Or a file on the system
 	else
 	{
 		$data = @file_get_contents($gzfilename);
@@ -55,15 +57,15 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
 /**
  * Extracts a file or files from the .tar.gz contained in data.
  *
- * - detects if the file is really a .zip file, and if so returns the result of read_zip_data
+ * - Detects if the file is really a .zip file, and if so returns the result of read_zip_data
  *
  * if destination is null
- *  - returns a list of files in the archive.
+ * - returns a list of files in the archive.
  *
  * if single_file is true
- *  - returns the contents of the file specified by destination, if it exists, or false.
- *  - destination can start with * and / to signify that the file may come from any directory.
- *  - destination should not begin with a / if single_file is true.
+ * - returns the contents of the file specified by destination, if it exists, or false.
+ * - destination can start with * and / to signify that the file may come from any directory.
+ * - destination should not begin with a / if single_file is true.
  *
  * - existing files with newer modification times if and only if overwrite is true.
  * - creates the destination directory if it doesn't exist, and is is specified.
@@ -363,6 +365,7 @@ function read_zip_data($data, $destination, $single_file = false, $overwrite = f
 			package_put_contents($destination . '/' . $file_info['filename'], $file_info['data']);
 		}
 
+		// Not a directory, add it to our results
 		if (substr($file_info['filename'], -1, 1) != '/')
 			$return[] = array(
 				'filename' => $file_info['filename'],
@@ -400,22 +403,26 @@ function url_exists($url)
 	// Attempt to connect...
 	$temp = '';
 	$fid = fsockopen($a_url['host'], !isset($a_url['port']) ? 80 : $a_url['port'], $temp, $temp, 8);
+
+	// Can't make a connection
 	if (!$fid)
 		return false;
 
+	// See if the file is where its supposed to be
 	fputs($fid, 'HEAD ' . $a_url['path'] . ' HTTP/1.0' . "\r\n" . 'Host: ' . $a_url['host'] . "\r\n\r\n");
 	$head = fread($fid, 1024);
 	fclose($fid);
 
+	// Check for a return code that shows the file was there
 	return preg_match('~^HTTP/.+\s+(20[01]|30[127])~i', $head) == 1;
 }
 
 /**
  * Loads and returns an array of installed packages.
  *
- * - gets this information from packages/installed.list.
- * - returns the array of data.
- * - default sort order is package_installed time
+ * - Gets this information from packages/installed.list.
+ * - Returns the array of data.
+ * - Default sort order is package_installed time
  *
  * @package Packages
  * @return array
@@ -476,10 +483,10 @@ function loadInstalledPackages()
 /**
  * Loads a package's information and returns a representative array.
  *
- * - expects the file to be a package in packages/.
- * - returns a error string if the package-info is invalid.
- * - otherwise returns a basic array of id, version, filename, and similar information.
- * - an Xml_Array is available in 'xml'.
+ * - Expects the file to be a package in packages/.
+ * - Returns a error string if the package-info is invalid.
+ * - Otherwise returns a basic array of id, version, filename, and similar information.
+ * - An Xml_Array is available in 'xml'.
  *
  * @package Packages
  * @param string $gzfilename
@@ -491,9 +498,11 @@ function getPackageInfo($gzfilename)
 		$packageInfo = read_tgz_data(fetch_web_data($gzfilename, '', true), '*/package-info.xml', true);
 	else
 	{
+		// It must be in the package directory then
 		if (!file_exists(BOARDDIR . '/packages/' . $gzfilename))
 			return 'package_get_error_not_found';
 
+		// Make sure an package.xml file is available
 		if (is_file(BOARDDIR . '/packages/' . $gzfilename))
 			$packageInfo = read_tgz_file(BOARDDIR . '/packages/' . $gzfilename, '*/package-info.xml', true);
 		elseif (file_exists(BOARDDIR . '/packages/' . $gzfilename . '/package-info.xml'))
@@ -954,8 +963,11 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 				$package_ftp->chmod($ftp_file, 0755);
 			}
 
+			// Still not writable, true full permissions
 			if (!@is_writable($file))
 				$package_ftp->chmod($ftp_file, 0777);
+
+			// Directory not writable, try to chmod to 777 then
 			if (!@is_writable(dirname($file)))
 				$package_ftp->chmod(dirname($ftp_file), 0777);
 
@@ -975,6 +987,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 	}
 	elseif (isset($_POST['ftp_username']))
 	{
+		// Attempt to make a new FTP connection
 		require_once(SUBSDIR . '/FTPConnection.class.php');
 		$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
 
@@ -1059,11 +1072,11 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
  * Parses the actions in package-info.xml file from packages.
  *
  * What it does:
- * - package should be an Xml_Array with package-info as its base.
- * - testing_only should be true if the package should not actually be applied.
- * - method can be upgrade, install, or uninstall.  Its default is install.
- * - previous_version should be set to the previous installed version of this package, if any.
- * - does not handle failure terribly well; testing first is always better.
+ * - Package should be an Xml_Array with package-info as its base.
+ * - Testing_only should be true if the package should not actually be applied.
+ * - Method can be upgrade, install, or uninstall.  Its default is install.
+ * - Previous_version should be set to the previous installed version of this package, if any.
+ * - Does not handle failure terribly well; testing first is always better.
  *
  * @package Packages
  * @param Xml_Array $packageXML
@@ -1284,6 +1297,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 			// Check if these things can be done. (chmod's etc.)
 			if ($actionType == 'create-dir')
 			{
+				// Try to create a directory
 				if (!mktree($this_action['destination'], false))
 				{
 					$temp = $this_action['destination'];
@@ -1298,6 +1312,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 			}
 			elseif ($actionType == 'create-file')
 			{
+				// Try to create a file in a known location
 				if (!mktree(dirname($this_action['destination']), false))
 				{
 					$temp = dirname($this_action['destination']);
@@ -1509,9 +1524,9 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 /**
  * Checks if version matches any of the versions in versions.
  *
- * - supports comma separated version numbers, with or without whitespace.
- * - supports lower and upper bounds. (1.0-1.2)
- * - returns true if the version matched.
+ * - Supports comma separated version numbers, with or without whitespace.
+ * - Supports lower and upper bounds. (1.0-1.2)
+ * - Returns true if the version matched.
  *
  * @package Packages
  * @param string $versions
@@ -1557,9 +1572,9 @@ function matchHighestPackageVersion($versions, $reset = false, $the_version)
 /**
  * Checks if the forum version matches any of the available versions from the package install xml.
  *
- * - supports comma separated version numbers, with or without whitespace.
- * - supports lower and upper bounds. (1.0-1.2)
- * - returns true if the version matched.
+ * - Supports comma separated version numbers, with or without whitespace.
+ * - Supports lower and upper bounds. (1.0-1.2)
+ * - Returns true if the version matched.
  *
  * @package Packages
  * @param string $version
@@ -1693,12 +1708,16 @@ function parse_path($path)
 		'SMILEYDIR' => $modSettings['smileys_dir'],
 	);
 
-	// do we parse in a package directory?
+	// Do we parse in a package directory?
 	if (!empty($temp_path))
 		$dirs['$package'] = $temp_path;
 
 	if (strlen($path) == 0)
 		trigger_error('parse_path(): There should never be an empty filename', E_USER_ERROR);
+
+	// Check if they are using some old software install paths
+	if (strpos($path, '$') === 0 && isset($dirs[strtoupper(substr($path, 1))]))
+		$path = strtoupper(substr($path, 1));
 
 	return strtr($path, $dirs);
 }
@@ -1707,9 +1726,9 @@ function parse_path($path)
  * Deletes all the files in a directory, and all the files in sub direcories inside it.
  *
  * What it does:
- * - requires access to delete these files.
- * - recursivly goes in to all sub directories looking for files to delete
- * - optioinaly removes the directory as well, otherwise will leave an empty tree behind
+ * - Requires access to delete these files.
+ * - Recursivly goes in to all sub directories looking for files to delete
+ * - Optioinaly removes the directory as well, otherwise will leave an empty tree behind
  *
  * @package Packages
  * @param string $dir
@@ -1791,7 +1810,7 @@ function deltree($dir, $delete_dir = true)
 /**
  * Creates the specified tree structure with the mode specified.
  *
- * - creates every directory in path until it finds one that already exists.
+ * - Creates every directory in path until it finds one that already exists.
  *
  * @package Packages
  * @param string $strPath
@@ -1802,8 +1821,10 @@ function mktree($strPath, $mode)
 {
 	global $package_ftp;
 
+	// If its already a directory
 	if (is_dir($strPath))
 	{
+		// Not writable, try to make it so with FTP or not
 		if (!is_writable($strPath) && $mode !== false)
 		{
 			if (isset($package_ftp))
@@ -1812,6 +1833,7 @@ function mktree($strPath, $mode)
 				@chmod($strPath, $mode);
 		}
 
+		// See if we can open it for access, return the result
 		$test = @opendir($strPath);
 		if ($test)
 		{
@@ -1826,6 +1848,7 @@ function mktree($strPath, $mode)
 	if ($strPath == dirname($strPath) || !mktree(dirname($strPath), $mode))
 		return false;
 
+	// Is the dir writable and do we have permission to attempt to make it so
 	if (!is_writable(dirname($strPath)) && $mode !== false)
 	{
 		if (isset($package_ftp))
@@ -1834,8 +1857,10 @@ function mktree($strPath, $mode)
 			@chmod(dirname($strPath), $mode);
 	}
 
+	// Return an ftp control if using FTP
 	if ($mode !== false && isset($package_ftp))
 		return $package_ftp->create_dir(strtr($strPath, array($_SESSION['pack_ftp']['root'] => '')));
+	// Can't change the mode so just return the current availability
 	elseif ($mode === false)
 	{
 		$test = @opendir(dirname($strPath));
@@ -1847,9 +1872,12 @@ function mktree($strPath, $mode)
 		else
 			return false;
 	}
+	// Only one choice left and thats to try and make a directory
 	else
 	{
 		@mkdir($strPath, $mode);
+
+		// Check and retrun if we were successful
 		$test = @opendir($strPath);
 		if ($test)
 		{
@@ -1864,7 +1892,7 @@ function mktree($strPath, $mode)
 /**
  * Copies one directory structure over to another.
  *
- * - requires the destination to be writable.
+ * - Requires the destination to be writable.
  *
  * @package Packages
  * @param string $source
