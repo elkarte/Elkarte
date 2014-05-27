@@ -1324,7 +1324,7 @@ div.bbc_footnotes .meaction{
 }
 .drop_area {
 	-webkit-font-smoothing: antialiased;
-	color: rgb(21, 125, 251);
+	color: #444444;
 	background-color: rgb(230, 230, 230);
 	border: dashed 1px #ccc;
 }

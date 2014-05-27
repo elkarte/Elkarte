@@ -416,13 +416,16 @@ function template_add_new_attachments()
 	if ($context['attachments']['num_allowed'] > 0 || !empty($context['dont_show_them']))
 	{
 		echo '
-							<dt class="drop_area">', $txt['attach_drop_files'], ' <i class="fa fa-upload"></i></dt>
+							<dt class="drop_area">
+								<i class="fa fa-upload"></i> ', $txt['attach_drop_files'], '
+								<input class="drop_area_fileselect" type="file" multiple="multiple" name="attachment_click[]" id="attachment_click" class="input_file" />
+							</dt>
 							<dd class="progress_tracker"></dd>
 							<dd class="drop_attachments_error"></dd>
-							<dt>
+							<dt class="drop_attachments_no_js">
 								', $txt['attach'], ':
 							</dt>
-							<dd class="smalltext">
+							<dd class="smalltext drop_attachments_no_js">
 								', empty($modSettings['attachmentSizeLimit']) ? '' : ('<input type="hidden" name="MAX_FILE_SIZE" value="' . $modSettings['attachmentSizeLimit'] * 1028 . '" />'), '
 								<input type="file" multiple="multiple" name="attachment[]" id="attachment1" class="input_file" /> (<a href="javascript:void(0);" onclick="cleanFileInput(\'attachment1\');">', $txt['clean_attach'], '</a>)';
 
@@ -437,7 +440,7 @@ function template_add_new_attachments()
 										txt_clean_attach = "', $txt['clean_attach'], '";
 								// ]]></script>
 							</dd>
-							<dd class="smalltext" id="moreAttachments"><a href="#" onclick="addAttachment(); return false;">(', $txt['more_attachments'], ')</a></dd>';
+							<dd class="smalltext drop_attachments_no_js" id="moreAttachments"><a href="#" onclick="addAttachment(); return false;">(', $txt['more_attachments'], ')</a></dd>';
 		else
 			echo '
 							</dd>';
