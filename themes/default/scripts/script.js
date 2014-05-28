@@ -1253,6 +1253,14 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 			if (this.selectedIndex > 0 && this.options[this.selectedIndex].value)
 				window.location.href = elk_scripturl + this.options[this.selectedIndex].value.substr(elk_scripturl.indexOf('?') === -1 || this.options[this.selectedIndex].value.substr(0, 1) !== '?' ? 0 : 1);
 		};
+
+	// Handle custom function hook before showing the new select.
+	if ('funcOnAfterFill' in this.opt)
+	{
+		this.tmpMethod = this.opt.funcOnBeforeCollapse;
+		this.tmpMethod(this);
+		delete this.tmpMethod;
+	}
 };
 
 /**
