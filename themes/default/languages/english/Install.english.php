@@ -32,7 +32,7 @@ $txt['user_refresh_install'] = 'Forum Refreshed';
 $txt['user_refresh_install_desc'] = 'While installing, the installer found that (with the details you provided) one or more of the tables this installer might create already existed.<br />Any missing tables in your installation have been recreated with the default data, but no data was deleted from existing tables.';
 
 $txt['default_topic_subject'] = 'Welcome to ElkArte!';
-$txt['default_topic_message'] = 'Welcome to ElkArte!<br /><br />We hope you enjoy using this software and building your community.&nbsp; If you have any problems, please feel free to <a href="http://www.elkarte.net/index.php" target="_blank" class="new_win">ask us for assistance.<br /><br />Thanks!<br />The ElkArte Community.';
+$txt['default_topic_message'] = 'Welcome to ElkArte!<br /><br />We hope you enjoy using this software and building your community.&nbsp; If you have any problems, please feel free to [url=http://www.elkarte.net/index.php]ask us for assistance[/url].<br /><br />Thanks!<br />The ElkArte Community.';
 $txt['default_board_name'] = 'General Discussion';
 $txt['default_board_description'] = 'Feel free to talk about anything and everything in this board.';
 $txt['default_category_name'] = 'General Category';
