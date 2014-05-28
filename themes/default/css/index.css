@@ -1613,7 +1613,7 @@ dl.settings label {
 	padding: 0 0 1px 0;
 	font-size: 1.143em;
 }
-.board_description, .moderators {
+.board_info .board_description, .board_info .moderators {
 	margin: 0 0 0 56px;
 }
 .moderators {
@@ -1791,10 +1791,6 @@ img.new_posts {
 /* The board description and who-is-viewing stuff. */
 #description_board {
 	margin: 10px 0 0 0;
-}
-#description_board .moderators {
-	margin: 0;
-	font-size: 0.786em;
 }
 #description_board .generalinfo, #forumposts .generalinfo {
 	margin-top: 2px;
@@ -4100,7 +4096,7 @@ dl.no_members {
 		clear: both;
 		content: "";
 	}
-	.board_description, .moderators, .childboards {
+	.board_info .board_description, .board_info .moderators, .childboards {
 		margin: 0 0 0 8px;
 	}
 	/* Playing silly buggers with a sidebar menu option for narrow screens. */
@@ -4336,7 +4332,7 @@ dl.no_members {
 		margin-top:3px;
 		padding: 15px 0;
 	}
-	.board_description, .moderators {
+	.board_info .board_description, .board_info .moderators {
 		display: none;
 	}
 	.childboard_row {
