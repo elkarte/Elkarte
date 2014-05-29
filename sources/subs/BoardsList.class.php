@@ -87,6 +87,12 @@ class Boards_List
 	private $_subject_length = 24;
 
 	/**
+	 * The id of the recycle board (0 for none or not enabled)
+	 * @var int
+	 */
+	private $_recycle_board = 0;
+
+	/**
 	 * The database!
 	 * @var object
 	 */
@@ -95,7 +101,13 @@ class Boards_List
 	/**
 	 * Initialize the class
 	 *
-	 * @param mixed[] $options
+	 * @param mixed[] $options - Available options and corresponding defaults are:
+	 *       'include_categories' => false
+	 *       'countChildPosts' => false
+	 *       'base_level' => false
+	 *       'parent_id' => 0
+	 *       'set_latest_post' => false
+	 *       'get_moderators' => true
 	 */
 	public function __construct($options)
 	{
@@ -137,6 +149,9 @@ class Boards_List
 		// For performance, track the latest post while going through the boards.
 		if (!empty($this->_options['set_latest_post']))
 			$this->_latest_post = array('timestamp' => 0);
+
+		if (!empty($modSettings['recycle_enable']))
+			$this->_recycle_board = $modSettings['recycle_board'];
 	}
 
 	/**
@@ -152,7 +167,7 @@ class Boards_List
 	 */
 	public function getBoards()
 	{
-		global $modSettings, $txt;
+		global $txt;
 
 		// Find all boards and categories, as well as related information.
 		$result_boards = $this->_db->query('boardindex_fetch_boards', '
@@ -215,7 +230,7 @@ class Boards_List
 				}
 
 				// If this board has new posts in it (and isn't the recycle bin!) then the category is new.
-				if (empty($modSettings['recycle_enable']) || $modSettings['recycle_board'] != $row_board['id_board'])
+				if ($this->_recycle_board != $row_board['id_board'])
 					$this->_categories[$row_board['id_cat']]['new'] |= empty($row_board['is_read']) && $row_board['poster_name'] != '';
 
 				// Avoid showing category unread link where it only has redirection boards.
@@ -395,6 +410,11 @@ class Boards_List
 		return $this->_options['include_categories'] ? $this->_categories : $this->_current_boards;
 	}
 
+	/**
+	 * Returns the array containing the "latest post" informations
+	 *
+	 * @return array
+	 */
 	public function getLatestPost()
 	{
 		if (empty($this->_latest_post))
@@ -403,6 +423,9 @@ class Boards_List
 			return $this->_latest_post;
 	}
 
+	/**
+	 * Fetches and adds to the results the board moderators for the current boards
+	 */
 	private function _getBoardModerators()
 	{
 		global $txt;
