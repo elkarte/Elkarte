@@ -403,7 +403,7 @@ class Boards_List
 		}
 		$this->_db->free_result($result_boards);
 
-		if ($this->_options['get_moderators'])
+		if ($this->_options['get_moderators'] && !empty($this->_boards))
 			$this->_getBoardModerators();
 
 		return $this->_options['include_categories'] ? $this->_categories : $this->_current_boards;
