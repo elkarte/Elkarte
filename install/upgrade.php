@@ -489,7 +489,7 @@ function loadEssentialData()
 	// If they don't have the file, they're going to get a warning anyway so we won't need to clean request vars.
 	if (file_exists(SOURCEDIR . '/QueryString.php'))
 	{
-		// require_once(SUBSDIR . '/Util.class.php');
+		require_once(SUBSDIR . '/Util.class.php');
 		require_once(SOURCEDIR . '/Subs.php');
 		require_once(SOURCEDIR . '/QueryString.php');
 		cleanRequest();
@@ -1290,7 +1290,7 @@ function action_deleteUpgrade()
 		$forum_version = CURRENT_VERSION;
 
 		// Now go get those files!
-		// require_once(SUBSDIR . '/ScheduledTask.class.php');
+		require_once(SUBSDIR . '/ScheduledTask.class.php');
 		$task = new Scheduled_Task();
 		$task->fetchFiles();
 	}

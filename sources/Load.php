@@ -1700,7 +1700,6 @@ function loadTheme($id_theme = 0, $initialize = true)
 		if (isBrowser('possibly_robot'))
 		{
 			// @todo Maybe move this somewhere better?!
-			require_once(CONTROLLERDIR . '/ScheduledTasks.controller.php');
 			$controller = new ScheduledTasks_Controller();
 
 			// What to do, what to do?!

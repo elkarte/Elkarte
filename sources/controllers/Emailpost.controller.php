@@ -58,7 +58,6 @@ class Emailpost_Controller extends Action_Controller
 			return;
 
 		// Our mail parser and our main subs
-		// require_once(SUBSDIR . '/EmailParse.class.php');
 		require_once(SUBSDIR . '/Emailpost.subs.php');
 
 		// Init
@@ -205,7 +204,6 @@ class Emailpost_Controller extends Action_Controller
 			return;
 
 		// Our mail parser and our main subs
-		// require_once(SUBSDIR . '/EmailParse.class.php');
 		require_once(SUBSDIR . '/Emailpost.subs.php');
 
 		// Init
@@ -286,7 +284,6 @@ class Emailpost_Controller extends Action_Controller
 		global $txt, $modSettings;
 
 		// Our mail parser and our main subs
-		// require_once(SUBSDIR . '/EmailParse.class.php');
 		require_once(SUBSDIR . '/Emailpost.subs.php');
 
 		// Init

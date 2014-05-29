@@ -1135,7 +1135,6 @@ function profileValidateEmail($email, $memID = 0)
 	$db = database();
 
 	// Check the name and email for validity.
-	// require_once(SUBSDIR . '/DataValidator.class.php');
 	$check['email'] = strtr($email, array('&#039;' => '\''));
 	if (Data_Validator::is_valid($check, array('email' => 'valid_email|required'), array('email' => 'trim')))
 		$email = $check['email'];

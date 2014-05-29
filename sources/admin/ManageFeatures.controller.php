@@ -223,9 +223,6 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	private function _initBasicSettingsForm()
 	{
-		// We need some settings! ..ok, some work with our settings :P
-		// require_once(SUBSDIR . '/SettingsForm.class.php');
-
 		// Instantiate the form
 		$this->_basicSettings = new Settings_Form();
 
@@ -274,9 +271,6 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	private function _initLayoutSettingsForm()
 	{
-		// We're working with them settings.
-		// require_once(SUBSDIR . '/SettingsForm.class.php');
-
 		// Instantiate the form
 		$this->_layoutSettings = new Settings_Form();
 
@@ -323,9 +317,6 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	private function _initKarmaSettingsForm()
 	{
-		// We're working with them settings.
-		// require_once(SUBSDIR . '/SettingsForm.class.php');
-
 		// Instantiate the form
 		$this->_karmaSettings = new Settings_Form();
 
@@ -372,9 +363,6 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	private function _initLikesSettingsForm()
 	{
-		// We're working with them settings.
-		// require_once(SUBSDIR . '/SettingsForm.class.php');
-
 		// Instantiate the form
 		$this->_likesSettings = new Settings_Form();
 
@@ -429,9 +417,6 @@ class ManageFeatures_Controller extends Action_Controller
 	private function _initMentionSettingsForm()
 	{
 		global $txt, $context;
-
-		// We're working with them settings.
-		// require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		loadLanguage('Mentions');
 
@@ -721,9 +706,6 @@ class ManageFeatures_Controller extends Action_Controller
 		// Make sure we check the right tags!
 		$modSettings['bbc_disabled_signature_bbc'] = $disabledTags;
 
-		// We're working with them settings.
-		// require_once(SUBSDIR . '/SettingsForm.class.php');
-
 		// Saving?
 		if (isset($_GET['save']))
 		{
@@ -774,9 +756,6 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	private function _initSignatureSettingsForm()
 	{
-		// We're working with them settings.
-		// require_once(SUBSDIR . '/SettingsForm.class.php');
-
 		// Instantiate the form
 		$this->_signatureSettings = new Settings_Form();
 
@@ -846,7 +825,6 @@ class ManageFeatures_Controller extends Action_Controller
 
 		createToken('admin-scp');
 
-		// require_once(SUBSDIR . '/GenericList.class.php');
 		require_once(SUBSDIR . '/ManageFeatures.subs.php');
 
 		// Create a listing for all our standard fields
@@ -1405,9 +1383,6 @@ class ManageFeatures_Controller extends Action_Controller
 	private function _initPMSettingsForm()
 	{
 		global $context;
-
-		// We're working with them settings.
-		// require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		$context['permissions_excluded'] = array(-1);
 

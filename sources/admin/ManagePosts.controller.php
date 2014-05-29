@@ -49,9 +49,6 @@ class ManagePosts_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		// We're working with them settings here.
-		// require_once(SUBSDIR . '/SettingsForm.class.php');
-
 		$subActions = array(
 			'posts' => array(
 				$this, 'action_postSettings_display', 'permission' => 'admin_forum'),

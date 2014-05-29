@@ -43,7 +43,6 @@ class ProfileHistory_Controller extends Action_Controller
 		global $context, $txt, $modSettings, $user_profile;
 
 		$this->memID = currentMemberID();
-		// require_once(SUBSDIR . '/Action.class.php');
 
 		$subActions = array(
 			'activity' => array('controller' => $this, 'function' => 'action_trackactivity', 'label' => $txt['trackActivity']),
@@ -178,7 +177,6 @@ class ProfileHistory_Controller extends Action_Controller
 		);
 
 		// Create the list for viewing.
-		// require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		// Get all IP addresses this user has used for his messages.
@@ -265,9 +263,6 @@ class ProfileHistory_Controller extends Action_Controller
 		$db->free_result($request);
 
 		ksort($context['ips']);
-
-		// Gonna want this for the list.
-		// require_once(SUBSDIR . '/GenericList.class.php');
 
 		// Start with the user messages.
 		$listOptions = array(
@@ -505,9 +500,6 @@ class ProfileHistory_Controller extends Action_Controller
 
 		$memID = $this->memID;
 
-		// Gonna want this for the list.
-		// require_once(SUBSDIR . '/GenericList.class.php');
-
 		if ($memID == 0)
 			$context['base_url'] = $scripturl . '?action=trackip';
 		else
@@ -583,8 +575,6 @@ class ProfileHistory_Controller extends Action_Controller
 
 		$db = database();
 		$memID = $this->memID;
-
-		// require_once(SUBSDIR . '/GenericList.class.php');
 
 		// Get the names of any custom fields.
 		$request = $db->query('', '

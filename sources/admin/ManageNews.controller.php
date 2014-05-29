@@ -170,7 +170,6 @@ class ManageNews_Controller extends Action_Controller
 		}
 
 		// We're going to want this for making our list.
-		// require_once(SUBSDIR . '/GenericList.class.php');
 		require_once(SUBSDIR . '/News.subs.php');
 
 		$context['page_title'] = $txt['admin_edit_news'];
@@ -885,9 +884,6 @@ class ManageNews_Controller extends Action_Controller
 	 */
 	private function _initNewsSettingsForm()
 	{
-		// We're working with them settings here.
-		// require_once(SUBSDIR . '/SettingsForm.class.php');
-
 		// Instantiate the form
 		$this->_newsSettings = new Settings_Form();
 

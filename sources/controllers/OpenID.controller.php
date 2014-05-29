@@ -137,7 +137,6 @@ class OpenID_Controller extends Action_Controller
 						$_POST[$id] = $value;
 				}
 
-				require_once(CONTROLLERDIR . '/Register.controller.php');
 				$controller = new Register_Controller();
 				return $controller->do_register(true);
 			}
@@ -171,8 +170,6 @@ class OpenID_Controller extends Action_Controller
 				'verified' => true,
 				'openid_uri' => $context['openid_claimed_id'],
 			);
-
-			require_once(CONTROLLERDIR . '/Auth.controller.php');
 
 			// Activation required?
 			if (!checkActivation())

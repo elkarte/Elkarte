@@ -129,7 +129,6 @@ class ManageScheduledTasks_Controller extends Action_Controller
 			$nextTasks = loadTasks($tasks);
 
 			// Lets get it on!
-			// require_once(SUBSDIR . '/ScheduledTask.class.php');
 			call_integration_include_hook('integrate_autotask_include');
 
 			ignore_user_abort(true);
@@ -241,7 +240,6 @@ class ManageScheduledTasks_Controller extends Action_Controller
 			),
 		);
 
-		// require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'view_scheduled_tasks';
@@ -435,7 +433,6 @@ class ManageScheduledTasks_Controller extends Action_Controller
 
 		createToken('admin-tl');
 
-		// require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';

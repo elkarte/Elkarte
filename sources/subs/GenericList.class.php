@@ -359,17 +359,3 @@ class Generic_List
 		}
 	}
 }
-
-/**
- * This function creates a new GenericList from all the passed options.
- *
- * @param mixed[] $listOptions associative array of option => value
- */
-function createList($listOptions)
-{
-	call_integration_hook('integrate_list_' . $listOptions['id'], array(&$listOptions));
-
-	$list = new Generic_List($listOptions);
-
-	$list->buildList();
-}

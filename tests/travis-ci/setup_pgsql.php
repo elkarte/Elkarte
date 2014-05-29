@@ -4,7 +4,7 @@ define('BOARDDIR', dirname(__FILE__) . '/../..');
 define('ELK', 1);
 
 require_once(TESTDIR . '/setup.php');
-// require_once(BOARDDIR . '/sources/database/Db-postgresql.class.php');
+require_once(BOARDDIR . '/sources/database/Db-postgresql.class.php');
 
 Class Elk_Testing_psql extends Elk_Testing_Setup
 {

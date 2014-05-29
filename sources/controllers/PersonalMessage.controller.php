@@ -172,8 +172,6 @@ class PersonalMessage_Controller extends Action_Controller
 	{
 		global $context;
 
-		// require_once(SUBSDIR . '/Action.class.php');
-
 		// Finally all the things we know how to do
 		$subActions = array(
 			'manlabels' => array($this, 'action_manlabels', 'permission' => 'pm_read'),
@@ -1370,7 +1368,6 @@ class PersonalMessage_Controller extends Action_Controller
 		}
 
 		// Load up the fields.
-		require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
 		$controller = new ProfileOptions_Controller();
 		$controller->action_pmprefs();
 	}

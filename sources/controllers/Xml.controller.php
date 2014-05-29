@@ -28,7 +28,6 @@ class Xml_Controller extends Action_Controller
 	public function action_index()
 	{
 		loadTemplate('Xml');
-		// require_once(SUBSDIR . '/Action.class.php');
 
 		$subActions = array(
 			'jumpto' => array('controller' => $this, 'function' => 'action_jumpto'),
@@ -150,7 +149,6 @@ class Xml_Controller extends Action_Controller
 		$validation = validateSession();
 		if (empty($validation))
 		{
-			require_once(ADMINDIR . '/CoreFeatures.controller.php');
 			$controller = new CoreFeatures_Controller();
 			$result = $controller->action_index();
 

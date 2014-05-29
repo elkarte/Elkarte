@@ -113,7 +113,6 @@ class Likes_Controller extends Action_Controller
 					// Lets add in a mention to the member that just had their post liked
 					if (!empty($modSettings['mentions_enabled']))
 					{
-						require_once(CONTROLLERDIR . '/Mentions.controller.php');
 						$mentions = new Mentions_Controller();
 						$mentions->setData(array(
 							'id_member' => $liked_message['id_member'],
@@ -167,7 +166,6 @@ class Likes_Controller extends Action_Controller
 					// Oh noes, taking the like back, let them know so they can complain
 					if (!empty($modSettings['mentions_enabled']))
 					{
-						require_once(CONTROLLERDIR . '/Mentions.controller.php');
 						$mentions = new Mentions_Controller();
 						$mentions->setData(array(
 							'id_member' => $liked_message['id_member'],
@@ -274,7 +272,6 @@ class Likes_Controller extends Action_Controller
 	public function action_showProfileLikes()
 	{
 		// Load in our helper functions
-		// require_once(SUBSDIR . '/GenericList.class.php');
 		require_once(SUBSDIR . '/Likes.subs.php');
 
 		if (isset($_REQUEST['sa']) && $_REQUEST['sa'] === 'received')
@@ -497,7 +494,6 @@ class Likes_Controller extends Action_Controller
 	{
 		global $context, $txt, $scripturl;
 
-		// require_once(SUBSDIR . '/GenericList.class.php');
 		require_once(SUBSDIR . '/Likes.subs.php');
 		loadLanguage('Profile');
 

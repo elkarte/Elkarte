@@ -229,7 +229,6 @@ class ManageMembergroups_Controller extends Action_Controller
 			),
 		);
 
-		// require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		// The second list shows the post count based groups.
@@ -555,7 +554,6 @@ class ManageMembergroups_Controller extends Action_Controller
 			if (empty($current_group_id))
 				fatal_lang_error('membergroup_does_not_exist', false);
 
-			// require_once(SUBSDIR . '/DataValidator.class.php');
 			$validator = new Data_Validator();
 
 			// Cleanup the inputs! :D
@@ -786,9 +784,6 @@ class ManageMembergroups_Controller extends Action_Controller
 
 		$context['sub_template'] = 'show_settings';
 		$context['page_title'] = $txt['membergroups_settings'];
-
-		// Needed for the settings functions.
-		// require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// initialize the form
 		$this->_initGroupSettingsForm();

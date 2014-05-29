@@ -113,9 +113,6 @@ class AddonSettings_Controller extends Action_Controller
 	{
 		global $context, $txt, $scripturl;
 
-		// We're working with them settings.
-		// require_once(SUBSDIR . '/SettingsForm.class.php');
-
 		// instantiate the form
 		$this->_addonSettings = new Settings_Form();
 

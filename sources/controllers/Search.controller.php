@@ -283,7 +283,6 @@ class Search_Controller extends Action_Controller
 		// Are you allowed?
 		isAllowedTo('search_posts');
 
-		require_once(CONTROLLERDIR . '/Display.controller.php');
 		require_once(SUBSDIR . '/Package.subs.php');
 		require_once(SUBSDIR . '/Search.class.php');
 

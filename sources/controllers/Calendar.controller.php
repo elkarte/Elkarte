@@ -214,7 +214,6 @@ class Calendar_Controller extends Action_Controller
 			if ($event_id == -1 && isset($_POST['link_to_board']))
 			{
 				$_REQUEST['calendar'] = 1;
-				require_once(CONTROLLERDIR . '/Post.controller.php');
 				$controller = new Post_Controller();
 				return $controller->action_post();
 			}
@@ -229,7 +228,6 @@ class Calendar_Controller extends Action_Controller
 		if (empty($modSettings['cal_allow_unlinked']) && empty($event_id))
 		{
 			$_REQUEST['calendar'] = 1;
-			require_once(CONTROLLERDIR . '/Post.controller.php');
 			$controller = new Post_Controller();
 			return $controller->action_post();
 		}

@@ -1147,9 +1147,9 @@ class Scheduled_Task
 				'time_now' => time(),
 			)
 		);
+		require_once(SUBSDIR . '/PaidSubsciptions.subs.php');
 		while ($row = $db->fetch_assoc($request))
 		{
-			require_once(ADMINDIR . '/ManagePaid.controller.php');
 			removeSubscription($row['id_subscribe'], $row['id_member']);
 		}
 		$db->free_result($request);

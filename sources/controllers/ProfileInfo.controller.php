@@ -660,8 +660,6 @@ class ProfileInfo_Controller extends Action_Controller
 
 		$memID = currentMemberID();
 
-		// require_once(SUBSDIR . '/GenericList.class.php');
-
 		// This is all the information required to list attachments.
 		$listOptions = array(
 			'id' => 'profile_attachments',
@@ -768,8 +766,6 @@ class ProfileInfo_Controller extends Action_Controller
 		// Only the owner can see the list (if the function is enabled of course)
 		if ($user_info['id'] != $memID || !$modSettings['enable_unwatch'])
 			return;
-
-		// require_once(SUBSDIR . '/GenericList.class.php');
 
 		// And here they are: the topics you don't like
 		$listOptions = array(
@@ -1038,12 +1034,10 @@ class ProfileInfo_Controller extends Action_Controller
 		$modSettings['warning_moderate'] = !empty($modSettings['warning_moderate']) && !empty($modSettings['postmod_active']) ? $modSettings['warning_moderate'] : 110;
 		$modSettings['warning_mute'] = !empty($modSettings['warning_mute']) ? $modSettings['warning_mute'] : 110;
 
-		// Let's use a generic list to get all the current warnings
-		// and use the issue warnings grab-a-granny thing.
-		// require_once(SUBSDIR . '/GenericList.class.php');
-
 		$memID = currentMemberID();
 
+		// Let's use a generic list to get all the current warnings
+		// and use the issue warnings grab-a-granny thing.
 		$listOptions = array(
 			'id' => 'view_warnings',
 			'title' => $txt['profile_viewwarning_previous_warnings'],

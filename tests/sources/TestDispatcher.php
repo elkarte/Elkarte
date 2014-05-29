@@ -2,7 +2,6 @@
 
 require_once(TESTDIR . 'simpletest/autorun.php');
 require_once(TESTDIR . '../SSI.php');
-// require_once(SOURCEDIR . '/SiteDispatcher.class.php');
 
 /**
  * TestCase class for dispatching.

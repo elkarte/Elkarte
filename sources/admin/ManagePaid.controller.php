@@ -163,7 +163,6 @@ class ManagePaid_Controller extends Action_Controller
 			// Check that the entered email addresses are valid
 			if (!empty($_POST['paid_email_to']))
 			{
-				// require_once(SUBSDIR . '/DataValidator.class.php');
 				$validator = new Data_Validator();
 
 				// Some cleaning and some rules
@@ -211,9 +210,6 @@ class ManagePaid_Controller extends Action_Controller
 	 */
 	private function _init_paidSettingsForm()
 	{
-		// We're working with them settings here.
-		// require_once(SUBSDIR . '/SettingsForm.class.php');
-
 		// Instantiate the form
 		$this->_paidSettings = new Settings_Form();
 
@@ -410,7 +406,6 @@ class ManagePaid_Controller extends Action_Controller
 			),
 		);
 
-		// require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';
@@ -757,7 +752,6 @@ class ManagePaid_Controller extends Action_Controller
 			),
 		);
 
-		// require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';

@@ -51,9 +51,6 @@ class ManageBoards_Controller extends Action_Controller
 		// Everything's gonna need this.
 		loadLanguage('ManageBoards');
 
-		// We're working with them settings here.
-		// require_once(SUBSDIR . '/SettingsForm.class.php');
-
 		// Format: 'sub-action' => array('controller', 'function', 'permission'=>'need')
 		$subActions = array(
 			'board' => array(

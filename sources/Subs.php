@@ -2780,7 +2780,6 @@ function template_javascript($do_defered = false)
 	{
 		if (!empty($modSettings['minify_css_js']))
 		{
-			// require_once(SOURCEDIR . '/SiteCombiner.class.php');
 			$combiner = new Site_Combiner(CACHEDIR, $boardurl . '/cache');
 			$combine_name = $combiner->site_js_combine($context['javascript_files'], $do_defered);
 
@@ -2867,7 +2866,6 @@ function template_css()
 	{
 		if (!empty($modSettings['minify_css_js']))
 		{
-			// require_once(SOURCEDIR . '/SiteCombiner.class.php');
 			$combiner = new Site_Combiner(CACHEDIR, $boardurl . '/cache');
 			$combine_name = $combiner->site_css_combine($context['css_files']);
 
@@ -4251,5 +4249,18 @@ function elk_autoloader($class)
 	}
 	if (!empty($file_name))
 		require_once($file_name);
->>>>>>> Quick and dirty custom autoloader
+}
+
+/**
+ * This function creates a new GenericList from all the passed options.
+ *
+ * @param mixed[] $listOptions associative array of option => value
+ */
+function createList($listOptions)
+{
+	call_integration_hook('integrate_list_' . $listOptions['id'], array($listOptions));
+
+	$list = new Generic_List($listOptions);
+
+	$list->buildList();
 }

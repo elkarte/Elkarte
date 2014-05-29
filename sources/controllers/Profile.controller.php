@@ -563,7 +563,6 @@ class Profile_Controller extends Action_Controller
 			{
 				if (empty($post_errors))
 				{
-					require_once(CONTROLLERDIR . '/ProfileAccount.controller.php');
 					$controller = new ProfileAccount_Controller();
 					$controller->action_activateaccount();
 				}
@@ -572,7 +571,6 @@ class Profile_Controller extends Action_Controller
 			{
 				if (empty($post_errors))
 				{
-					require_once(CONTROLLERDIR . '/ProfileAccount.controller.php');
 					$controller = new ProfileAccount_Controller();
 					$controller->action_deleteaccount2();
 					redirectexit();
@@ -580,7 +578,6 @@ class Profile_Controller extends Action_Controller
 			}
 			elseif ($current_area == 'groupmembership' && empty($post_errors))
 			{
-				require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
 				$controller = new Profileoptions_Controller();
 				$msg = $controller->action_groupMembership2();
 
@@ -590,7 +587,6 @@ class Profile_Controller extends Action_Controller
 			// Authentication changes?
 			elseif ($current_area == 'authentication')
 			{
-				require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
 				$controller = new ProfileOptions_Controller();
 				$controller->action_authentication(true);
 			}

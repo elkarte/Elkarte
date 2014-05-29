@@ -226,7 +226,6 @@ class ProfileAccount_Controller extends Action_Controller
 		$context['page_title'] = $txt['profile_issue_warning'];
 
 		// Let's use a generic list to get all the current warnings
-		// require_once(SUBSDIR . '/GenericList.class.php');
 		require_once(SUBSDIR . '/Profile.subs.php');
 
 		// Work our the various levels.
@@ -501,7 +500,6 @@ class ProfileAccount_Controller extends Action_Controller
 		{
 			deleteMembers($memID);
 
-			require_once(CONTROLLERDIR . '/Auth.controller.php');
 			$controller = new Auth_Controller();
 			$controller->action_logout(true);
 

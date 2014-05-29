@@ -51,9 +51,6 @@ class ManageMail_Controller extends Action_Controller
 		loadLanguage('Help');
 		loadLanguage('ManageMail');
 
-		// We'll need the utility functions from here.
-		// require_once(SUBSDIR . '/SettingsForm.class.php');
-
 		$subActions = array(
 			'browse' => array($this, 'action_browse', 'permission' => 'admin_forum'),
 			'clear' => array($this, 'action_clear', 'permission' => 'admin_forum'),
@@ -222,7 +219,6 @@ class ManageMail_Controller extends Action_Controller
 			),
 		);
 
-		// require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 	}
 

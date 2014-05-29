@@ -38,9 +38,6 @@ class ManageDrafts_Controller extends Action_Controller
 		isAllowedTo('admin_forum');
 		loadLanguage('Drafts');
 
-		// We're working with them settings here.
-		// require_once(SUBSDIR . '/SettingsForm.class.php');
-
 		$this->action_draftSettings_display();
 	}
 

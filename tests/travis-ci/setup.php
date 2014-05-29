@@ -106,7 +106,7 @@ Class Elk_Testing_Setup
 		require(BOARDDIR . '/Settings.php');
 		require(BOARDDIR . '/sources/Subs.php');
 		require(BOARDDIR . '/sources/Load.php');
-		// require_once(SUBSDIR . '/Util.class.php');
+		require_once(SUBSDIR . '/Util.class.php');
 
 		$settings['theme_dir'] = $settings['default_theme_dir'] = BOARDDIR . '/Themes/default';
 		$settings['theme_url'] = $settings['default_theme_url'] = $boardurl . '/themes/default';
