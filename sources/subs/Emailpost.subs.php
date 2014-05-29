@@ -950,8 +950,8 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	);
 
 	// Convert this to text (markdown)
-	require_once(SUBSDIR . '/Html2Markdown.class.php');
-	$mark_down = new Convert_Md($message);
+	require_once(SUBSDIR . '/Html2Md.class.php');
+	$mark_down = new Html_2_Md($message);
 	$message = $mark_down->get_markdown();
 
 	// Finally the sig, its goes as just plain text
