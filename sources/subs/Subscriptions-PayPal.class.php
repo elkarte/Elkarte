@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Payment Gateway: paypal
+ * Payment Gateway: PayPal
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -23,7 +23,7 @@ if (!defined('ELK'))
  *
  * @package Subscriptions
  */
-class paypal_display
+class PayPal_Display
 {
 	/**
 	 * Name of this payment gateway
@@ -138,7 +138,7 @@ class paypal_display
  *
  * @package Subscriptions
  */
-class paypal_payment
+class PayPal_Payment
 {
 	/**
 	 * Holds the IPN response data
