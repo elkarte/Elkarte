@@ -240,7 +240,7 @@ $txt['digest_unread_reply_link'] = "\n\n     <*> See your unread replies to this
 $txt['message_attachments'] = '<*> This message has (%d) images/files associated with it.' . "\n" . '<*> To see them please follow this link: %s';
 
 // Help
-$txt['maillist_help'] = 'For help in setting up the maillist feature, please visit the maillist section on the <a href="https://github.com/elkarte/Elkarte/wiki/Maillist-Feature">ElkArte Wiki</a>';
+$txt['maillist_help'] = 'For help in setting up the maillist feature, please visit the maillist section on the <a href="https://github.com/elkarte/Elkarte/wiki/Maillist-Feature" target="_blank" class="new_win">ElkArte Wiki</a>';
 
 // Email bounce templates
 $txt['ml_bounce_templates_title'] = 'Custom bounce email templates';
