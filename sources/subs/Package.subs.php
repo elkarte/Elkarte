@@ -3221,7 +3221,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 	elseif (isset($match[1]) && $match[1] === 'http' && function_exists('curl_init'))
 	{
 		// Include the file containing the Curl_Fetch_Webdata class.
-		require_once(SOURCEDIR . '/CurlFetchWeb.class.php');
+		require_once(SOURCEDIR . '/CurlFetchWebdata.class.php');
 
 		$fetch_data = new Curl_Fetch_Webdata();
 		$fetch_data->get_url_data($url, $post_data);
