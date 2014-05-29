@@ -174,7 +174,7 @@ function template_print_page()
 
 			foreach ($context['printattach'][$post['id_msg']] as $attach)
 				echo '
-					<img style="width:' . $attach['width'] . 'px; height:' . $attach['height'] . 'px" src="', $scripturl . '?action=dlattach;topic=' . $topic . '.0;attach=' . $attach['id_attach'] . '" alt="" />';
+					<img style="width:' . $attach['width'] . 'px; height:' . $attach['height'] . 'px;" src="', $scripturl . '?action=dlattach;topic=' . $topic . '.0;attach=' . $attach['id_attach'] . '" alt="" />';
 		}
 
 		echo '

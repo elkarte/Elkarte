@@ -212,8 +212,8 @@ function template_action_showPermissions()
 					<table class="table_grid">
 						<thead>
 							<tr class="table_head">
-								<th scope="col" class="lefttext" style="width:50%">', $txt['showPermissions_permission'], '</th>
-								<th scope="col" class="lefttext" style="width:50%">', $txt['showPermissions_status'], '</th>
+								<th scope="col" class="lefttext" style="width: 50%;">', $txt['showPermissions_permission'], '</th>
+								<th scope="col" class="lefttext" style="width: 50%;">', $txt['showPermissions_status'], '</th>
 							</tr>
 						</thead>
 						<tbody>';
@@ -277,8 +277,8 @@ function template_action_showPermissions()
 				<table class="table_grid">
 					<thead>
 						<tr class="table_head">
-							<th scope="col" class="lefttext" style="width:50%">', $txt['showPermissions_permission'], '</th>
-							<th scope="col" class="lefttext" style="width:50%">', $txt['showPermissions_status'], '</th>
+							<th scope="col" class="lefttext" style="width: 50%;">', $txt['showPermissions_permission'], '</th>
+							<th scope="col" class="lefttext" style="width: 50%;">', $txt['showPermissions_status'], '</th>
 						</tr>
 					</thead>
 					<tbody>';
@@ -1045,7 +1045,7 @@ function template_profile_block_buddies()
 			<a href="', $scripturl, '?action=profile;area=lists;sa=buddies;u=', $context['member']['id'], '">', $txt['buddies'], '</a>
 		</h3>
 		<div class="windowbg">
-			<div class="content flow_auto" ', (isset($div_height) ? 'style="max-height: ' . $div_height . 'px"' : ''), '>
+			<div class="content flow_auto" ', (isset($div_height) ? 'style="max-height: ' . $div_height . 'px;"' : ''), '>
 				<table class="profile_attachments">';
 
 		// Now show them all

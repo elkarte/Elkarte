@@ -83,7 +83,7 @@ function template_modify_weights()
 							<span id="weight5" class="search_weight">', $context['relative_weights']['search_weight_first_message'], '%</span>
 						</dd>
 						<dt class="large_caption">
-							<a href="', $scripturl, '?action=quickhelp;help=search_weight_sticky" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" style="vertical-align:top" /></a><label for="weight6_val">
+							<a href="', $scripturl, '?action=quickhelp;help=search_weight_sticky" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" style="vertical-align: top;" /></a><label for="weight6_val">
 							', $txt['search_weight_sticky'], ':</label>
 						</dt>
 						<dd class="large_caption">

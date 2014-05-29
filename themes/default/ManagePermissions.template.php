@@ -523,7 +523,7 @@ function template_modify_group_classic($type)
 	foreach ($permission_type['columns'] as $column)
 	{
 		echo '
-						<table style="width:49%" class="table_grid perm_classic floatleft">';
+						<table style="width: 49%;" class="table_grid perm_classic floatleft">';
 
 		foreach ($column as $permissionGroup)
 		{
@@ -543,7 +543,7 @@ function template_modify_group_classic($type)
 				{
 					echo '
 							<tr class="table_head">
-								<th class="lefttext" colspan="2" style="width:100%">
+								<th class="lefttext" colspan="2" style="width: 100%;">
 									<strong class="smalltext">', $permissionGroup['name'], '</strong>
 								</th>';
 
@@ -593,14 +593,14 @@ function template_modify_group_classic($type)
 				{
 					echo '
 							<tr class="', $alternate ? 'windowbg' : 'windowbg2', '">
-								<td style="width:10px">
+								<td style="width: 10px;">
 									', $permission['show_help'] ? '<a href="' . $scripturl . '?action=quickhelp;help=permissionhelp_' . $permission['id'] . '" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" alt="' . $txt['help'] . '" /></a>' : '', '
 								</td>';
 
 					if ($permission['has_own_any'])
 					{
 						echo '
-								<td class="lefttext" colspan="4" style="width:100%">', $permission['name'], '</td>
+								<td class="lefttext" colspan="4" style="width: 100%;">', $permission['name'], '</td>
 							</tr>
 							<tr class="', $alternate ? 'windowbg' : 'windowbg2', '">';
 
@@ -609,7 +609,7 @@ function template_modify_group_classic($type)
 						{
 							echo '
 								<td></td>
-								<td class="smalltext righttext" style="width:100%">', $permission['own']['name'], ':</td>';
+								<td class="smalltext righttext" style="width: 100%;">', $permission['own']['name'], ':</td>';
 
 							if (empty($modSettings['permission_enable_deny']))
 								echo '
@@ -618,13 +618,13 @@ function template_modify_group_classic($type)
 								</td>';
 							else
 								echo '
-								<td style="width:10px">
+								<td style="width: 10px;">
 									<input type="radio" name="perm[', $permission_type['id'], '][', $permission['own']['id'], ']"', $permission['own']['select'] == 'on' ? ' checked="checked"' : '', ' value="on" id="', $permission['own']['id'], '_on" class="input_radio" ', $disable_field, '/>
 								</td>
-								<td style="width:10px">
+								<td style="width: 10px;">
 									<input type="radio" name="perm[', $permission_type['id'], '][', $permission['own']['id'], ']"', $permission['own']['select'] == 'off' ? ' checked="checked"' : '', ' value="off" class="input_radio" ', $disable_field, '/>
 								</td>
-								<td style="width:10px">
+								<td style="width: 10px;">
 									<input type="radio" name="perm[', $permission_type['id'], '][', $permission['own']['id'], ']"', $permission['own']['select'] == 'denied' ? ' checked="checked"' : '', ' value="deny" class="input_radio" ', $disable_field, '/>
 								</td>';
 
@@ -635,7 +635,7 @@ function template_modify_group_classic($type)
 
 						echo '
 								<td></td>
-								<td class="smalltext righttext" style="width:100%">', $permission['any']['name'], ':</td>';
+								<td class="smalltext righttext" style="width: 100%;">', $permission['any']['name'], ':</td>';
 
 						if (empty($modSettings['permission_enable_deny']) || $context['group']['id'] == -1)
 							echo '
@@ -660,7 +660,7 @@ function template_modify_group_classic($type)
 					else
 					{
 						echo '
-								<td class="lefttext" style="width:100%">', $permission['name'], '</td>';
+								<td class="lefttext" style="width: 100%;">', $permission['name'], '</td>';
 
 						if (empty($modSettings['permission_enable_deny']) || $context['group']['id'] == -1)
 							echo '
@@ -689,7 +689,7 @@ function template_modify_group_classic($type)
 			if (!$permissionGroup['hidden'] && $has_display_content)
 				echo '
 							<tr class="windowbg2">
-								<td colspan="5" style="width:100%"><!--separator--></td>
+								<td colspan="5" style="width: 100%;"><!--separator--></td>
 							</tr>';
 		}
 		echo '
@@ -816,7 +816,7 @@ function template_postmod_permissions()
 						</th>
 					</tr>
 					<tr class="secondary_header">
-						<th style="width:30%">
+						<th style="width: 30%;">
 							', $txt['permissions_post_moderation_group'], '
 						</th>
 						<th><img src="', $settings['default_images_url'], '/admin/post_moderation_allow.png" alt="', $txt['permissions_post_moderation_allow'], '" title="', $txt['permissions_post_moderation_allow'], '" /></th>
@@ -839,7 +839,7 @@ function template_postmod_permissions()
 	{
 		echo '
 					<tr>
-						<td style="width:40%" class="windowbg">
+						<td style="width: 40%;" class="windowbg">
 							<span ', ($group['color'] ? 'style="color: ' . $group['color'] . '"' : ''), '>', $group['name'], '</span>';
 
 		if (!empty($group['children']))

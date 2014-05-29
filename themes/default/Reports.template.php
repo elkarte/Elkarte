@@ -100,7 +100,7 @@ function template_generate_report()
 				<tr class="windowbg table_caption">';
 			else
 				echo '
-				<tr class="', !empty($row[0]['separator']) ? 'category_header' : ($alternate ? 'windowbg' : 'windowbg2'), '" style="vertical-align:top">';
+				<tr class="', !empty($row[0]['separator']) ? 'category_header' : ($alternate ? 'windowbg' : 'windowbg2'), '" style="vertical-align: top;">';
 
 			// Now do each column.
 			$column_number = 0;
@@ -120,7 +120,7 @@ function template_generate_report()
 				// Shaded?
 				if ($column_number == 0 && !empty($table['shading']['left']))
 					echo '
-					<td class="table_caption" style="text-align:', $table['align']['shaded'], $table['width']['shaded'] != 'auto' ? ';width:' . $table['width']['shaded'] . 'px"' : '"', '>
+					<td class="table_caption" style="text-align:', $table['align']['shaded'], $table['width']['shaded'] != 'auto' ? ';width:' . $table['width']['shaded'] . 'px;"' : '"', '>
 						', $data['v'] == $table['default_value'] ? '' : ($data['v'] . (empty($data['v']) ? '' : ':')), '
 					</td>';
 				else
@@ -196,10 +196,10 @@ function template_print()
 		{
 			if ($row_number == 0 && !empty($table['shading']['top']))
 				echo '
-				<tr class="secondary_header" style="vertical-align:top">';
+				<tr class="secondary_header" style="vertical-align: top;">';
 			else
 				echo '
-				<tr class="', $alternate ? 'windowbg' : 'windowbg2', '" style="vertical-align:top">';
+				<tr class="', $alternate ? 'windowbg' : 'windowbg2', '" style="vertical-align: top;">';
 
 			// Now do each column!!
 			$column_number = 0;
