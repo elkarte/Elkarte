@@ -1537,6 +1537,9 @@ function loadTheme($id_theme = 0, $initialize = true)
 	if (function_exists('template_init'))
 		$settings = array_merge($settings, template_init());
 
+	// Call initialization theme integration functions.
+	call_integration_hook('integrate_init_theme');
+
 	// Guests may still need a name.
 	if ($context['user']['is_guest'] && empty($context['user']['name']))
 		$context['user']['name'] = $txt['guest_title'];
