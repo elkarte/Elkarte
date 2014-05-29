@@ -4524,6 +4524,9 @@ dl.no_members {
 		float: none;
 		text-align: center;
 	}
+	#search_jump_to, .search_controls {
+		display: none;
+	}
 	.small_pagelinks, .sort_by_container {
 		display: none;
 	}
@@ -4575,6 +4578,9 @@ dl.no_members {
 	.mentionavatar .avatar {
 		max-width: 40px;
 		max-height: 40px;
+	}
+	#list_mentions thead, .mention_log_time {
+		display: none;
 	}
 	ul.navigate_section li:not(:first-child):not(:last-child) a {
 		width: 3em;
