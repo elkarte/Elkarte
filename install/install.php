@@ -11,11 +11,11 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
-define('CURRENT_VERSION', '1.0 Beta 2');
+define('CURRENT_VERSION', '1.0 RC 1');
 define('DB_SCRIPT_VERSION', '1-0');
 
 $GLOBALS['required_php_version'] = '5.2.0';
@@ -2174,9 +2174,9 @@ function template_install_above()
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="robots" content="noindex" />
 		<title>', $txt['installer'], '</title>
-		<link rel="stylesheet" href="themes/default/css/index.css?beta10" />
-		<link rel="stylesheet" href="themes/default/css/_light/index_light.css?beta10" />
-		<link rel="stylesheet" href="themes/default/css/install.css?beta10" />
+		<link rel="stylesheet" href="themes/default/css/index.css?10RC1" />
+		<link rel="stylesheet" href="themes/default/css/_light/index_light.css?10RC1" />
+		<link rel="stylesheet" href="themes/default/css/install.css?10RC1" />
 		<script src="themes/default/scripts/script.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" id="jquery"></script>
 		<script><!-- // --><![CDATA[

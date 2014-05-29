@@ -10,7 +10,7 @@ Contributions to documentation are licensed under [CC-by-SA 3](http://creativeco
 
 ## Setting up an ElkArte Forum:
 
-If you're not here to play with the open source code, but instead would like to set up an ElkArte forum, see our Install Guide. Be warned, however, that ElkArte is still very much beta software, and you will run in to bugs and install problems.  You may even need a background as a developer to set it up successfully.  The system requirements are PHP(5.1+) and a database engine, both MySQL and PostgreSQL are supported.
+If you're not here to play with the open source code, but instead would like to set up an ElkArte forum, see our Install Guide. Be warned, however, that ElkArte is still very much beta software, and you will run in to bugs and install problems.  You may even need a background as a developer to set it up successfully.  The system requirements are PHP(5.2+) and a database engine, both MySQL and PostgreSQL are supported.
 
 ## Contributing:
 
