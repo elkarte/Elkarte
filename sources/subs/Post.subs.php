@@ -1513,7 +1513,7 @@ function lastPost()
 	return array(
 		'topic' => $row['id_topic'],
 		'subject' => $row['subject'],
-		'short_subject' => shorten_text($row['subject'], !empty($modSettings['subject_length']) ? $modSettings['subject_length'] : 24),
+		'short_subject' => shorten_text($row['subject'], $modSettings['subject_length']),
 		'preview' => $row['body'],
 		'time' => standardTime($row['poster_time']),
 		'html_time' => htmlTime($row['poster_time']),

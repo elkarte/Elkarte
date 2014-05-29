@@ -62,6 +62,8 @@ function reloadSettings()
 			$modSettings['defaultMaxMessages'] = 15;
 		if (empty($modSettings['defaultMaxMembers']) || $modSettings['defaultMaxMembers'] <= 0 || $modSettings['defaultMaxMembers'] > 999)
 			$modSettings['defaultMaxMembers'] = 30;
+		if (empty($modSettings['subject_length']))
+			$modSettings['subject_length'] = 24;
 
 		$modSettings['warning_enable'] = $modSettings['warning_settings'][0];
 

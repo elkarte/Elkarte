@@ -128,8 +128,7 @@ class Boards_List
 		$this->_scripturl = $scripturl;
 		$this->_session_url = $context['session_var'] . '=' . $context['session_id'];
 
-		if (!empty($modSettings['subject_length']))
-			$this->_subject_length = $modSettings['subject_length'];
+		$this->_subject_length = $modSettings['subject_length'];
 
 		$this->_user = array(
 			'id' => $user_info['id'],
