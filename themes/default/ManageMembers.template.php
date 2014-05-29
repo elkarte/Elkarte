@@ -159,7 +159,7 @@ function template_search_members()
 			</div>
 			<h3 class="category_header">', $txt['member_part_of_these_membergroups'], '</h3>
 			<div class="flow_hidden">
-				<table style="width: 49%" class="table_grid floatleft">
+				<table style="width: 49%;" class="table_grid floatleft">
 					<thead>
 						<tr class="table_head">
 							<th scope="col">', $txt['membergroups'], '</th>
