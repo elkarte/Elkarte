@@ -4579,6 +4579,9 @@ dl.no_members {
 		max-width: 40px;
 		max-height: 40px;
 	}
+	#list_mentions thead, .mention_log_time {
+		display: none;
+	}
 	ul.navigate_section li:not(:first-child):not(:last-child) a {
 		width: 3em;
 		display: block;

@@ -242,10 +242,12 @@ class Mentions_Controller extends Action_Controller
 				'log_time' => array(
 					'header' => array(
 						'value' => $txt['mentions_when'],
+						'class' => 'mention_log_time',
 					),
 					'data' => array(
 						'db' => 'log_time',
 						'timeformat' => 'html_time',
+						'class' => 'mention_log_time',
 					),
 					'sort' => array(
 						'default' => 'mtn.log_time DESC',
