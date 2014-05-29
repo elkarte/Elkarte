@@ -82,6 +82,7 @@ class Attachment_Controller extends Action_Controller
 		{
 			loadLanguage('Post');
 
+			require_once(SOURCEDIR . '/AttachmentErrorContext.class.php');
 			$attach_errors = Attachment_Error_Context::context();
 			$attach_errors->activate();
 
