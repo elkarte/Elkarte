@@ -28,7 +28,7 @@ if (!defined('ELK'))
  *
  * @package ScheduledTasks
  */
-class ScheduledTask
+class Scheduled_Task
 {
 	/**
 	 * Function to sending out approval notices to moderators.

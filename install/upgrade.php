@@ -1290,7 +1290,7 @@ function action_deleteUpgrade()
 
 		// Now go get those files!
 		require_once(SUBSDIR . '/ScheduledTask.class.php');
-		$task = new ScheduledTask();
+		$task = new Scheduled_Task();
 		$task->fetchFiles();
 	}
 
