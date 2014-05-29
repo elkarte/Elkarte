@@ -1159,7 +1159,7 @@ function action_adminAccount()
 
 	// These files may be or may not be already included, better safe than sorry for now
 	require_once(SOURCEDIR . '/Subs.php');
-	require_once(SUBSDIR . '/Util.class.php');
+	// require_once(SUBSDIR . '/Util.class.php');
 
 	$db = load_database();
 
@@ -1353,7 +1353,7 @@ function action_deleteInstall()
 	require_once(SUBSDIR . '/Cache.subs.php');
 	require_once(SOURCEDIR . '/Security.php');
 	require_once(SUBSDIR . '/Auth.subs.php');
-	require_once(SUBSDIR . '/Util.class.php');
+	// require_once(SUBSDIR . '/Util.class.php');
 
 	// Bring a warning over.
 	if (!empty($incontext['account_existed']))
@@ -1449,7 +1449,7 @@ function action_deleteInstall()
 	$db->free_result($request);
 
 	// Now is the perfect time to fetch remote files.
-	require_once(SUBSDIR . '/ScheduledTask.class.php');
+	// require_once(SUBSDIR . '/ScheduledTask.class.php');
 
 	// Sanity check that they loaded earlier!
 	if (isset($modSettings['recycle_board']))

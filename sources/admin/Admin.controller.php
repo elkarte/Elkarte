@@ -60,7 +60,7 @@ class Admin_Controller extends Action_Controller
 
 		// Need these to do much
 		require_once(SUBSDIR . '/Menu.subs.php');
-		require_once(SUBSDIR . '/Action.class.php');
+		// require_once(SUBSDIR . '/Action.class.php');
 
 		// Define the menu structure - see subs/Menu.subs.php for details!
 		$admin_areas = array(
@@ -927,7 +927,7 @@ class Admin_Controller extends Action_Controller
 
 		// Otherwise we simply walk through the XML and stick it in context for display.
 		$context['search_results'] = array();
-		require_once(SUBSDIR . '/XmlArray.class.php');
+		// require_once(SUBSDIR . '/XmlArray.class.php');
 
 		// Get the results loaded into an array for processing!
 		$results = new Xml_Array($search_results, false);

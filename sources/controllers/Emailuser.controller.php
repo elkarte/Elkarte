@@ -209,7 +209,7 @@ class Emailuser_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Mail.subs.php');
 
 		// Time to check and clean what was placed in the form
-		require_once(SUBSDIR . '/DataValidator.class.php');
+		// require_once(SUBSDIR . '/DataValidator.class.php');
 		$validator = new Data_Validator();
 		$validator->sanitation_rules(array(
 			'y_name' => 'trim',
@@ -344,7 +344,7 @@ class Emailuser_Controller extends Action_Controller
 			spamProtection('sendmail');
 
 			require_once(SUBSDIR . '/Mail.subs.php');
-			require_once(SUBSDIR . '/DataValidator.class.php');
+			// require_once(SUBSDIR . '/DataValidator.class.php');
 
 			// We will need to do some data checking
 			$validator = new Data_Validator();
@@ -551,7 +551,7 @@ class Emailuser_Controller extends Action_Controller
 		// Guests need to provide their address!
 		if ($user_info['is_guest'])
 		{
-			require_once(SUBSDIR . '/DataValidator.class.php');
+			// require_once(SUBSDIR . '/DataValidator.class.php');
 			if (!Data_Validator::is_valid($_POST, array('email' => 'valid_email'), array('email' => 'trim')))
 				empty($_POST['email']) ? $report_errors->addError('no_email') : $report_errors->addError('bad_email');
 

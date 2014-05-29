@@ -40,7 +40,7 @@ class AdminLog_Controller extends Action_Controller
 		global $context, $txt, $scripturl, $modSettings;
 
 		// We're working with them settings here.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
+		// require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// These are the logs they can load.
 		$log_functions = array(

@@ -263,7 +263,7 @@ class Settings_Form
 					{
 						$rules[$config_var[1]] = implode('|', $rules[$config_var[1]]);
 
-						require_once(SUBSDIR . '/DataValidator.class.php');
+						// require_once(SUBSDIR . '/DataValidator.class.php');
 						$validator = new Data_Validator();
 						$validator->sanitation_rules($rules);
 						$validator->validate(array($config_var[1] => $context['config_vars'][$config_var[1]]['value']));
@@ -534,7 +534,7 @@ class Settings_Form
 					{
 						$rules[$var[1]] = implode('|', $rules[$var[1]]);
 
-						require_once(SUBSDIR . '/DataValidator.class.php');
+						// require_once(SUBSDIR . '/DataValidator.class.php');
 						$validator = new Data_Validator();
 						$validator->sanitation_rules($rules);
 						$validator->validate($_POST);

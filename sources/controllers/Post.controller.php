@@ -54,7 +54,7 @@ class Post_Controller extends Action_Controller
 		global $txt, $scripturl, $topic, $modSettings, $board, $user_info, $context, $options, $language;
 
 		loadLanguage('Post');
-		require_once(SOURCEDIR . '/AttachmentErrorContext.class.php');
+		// require_once(SOURCEDIR . '/AttachmentErrorContext.class.php');
 
 		// You can't reply with a poll... hacker.
 		if (isset($_REQUEST['poll']) && !empty($topic) && !isset($_REQUEST['msg']))
@@ -1028,7 +1028,7 @@ class Post_Controller extends Action_Controller
 		// Prevent double submission of this form.
 		checkSubmitOnce('check');
 
-		require_once(SOURCEDIR . '/AttachmentErrorContext.class.php');
+		// require_once(SOURCEDIR . '/AttachmentErrorContext.class.php');
 
 		// No errors as yet.
 		$post_errors = Error_Context::context('post', 1);
@@ -1348,7 +1348,7 @@ class Post_Controller extends Action_Controller
 				// Only check if they changed it!
 				if (!isset($msgInfo) || $msgInfo['poster_email'] != $_POST['email'])
 				{
-					require_once(SUBSDIR . '/DataValidator.class.php');
+					// require_once(SUBSDIR . '/DataValidator.class.php');
 					if (!allowedTo('moderate_forum') && !Data_Validator::is_valid($_POST, array('email' => 'valid_email|required'), array('email' => 'trim')))
 						empty($_POST['email']) ? $post_errors->addError('no_email') : $post_errors->addError('bad_email');
 				}

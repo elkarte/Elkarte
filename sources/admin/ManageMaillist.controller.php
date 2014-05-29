@@ -292,7 +292,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$context['default_list'] = 'view_email_errors';
 
 		// Create the list.
-		require_once(SUBSDIR . '/GenericList.class.php');
+		// require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 	}
 
@@ -700,7 +700,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$context['default_list'] = 'email_filter';
 
 		// Create the list.
-		require_once(SUBSDIR . '/GenericList.class.php');
+		// require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 	}
 
@@ -815,7 +815,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$context[$context['admin_menu_name']]['current_subsection'] = 'emailfilters';
 
 		// Create the list.
-		require_once(SUBSDIR . '/GenericList.class.php');
+		// require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 	}
 
@@ -971,10 +971,10 @@ class ManageMaillist_Controller extends Action_Controller
 		global $txt;
 
 		// We need some setting options for our maillist
-		require_once(SUBSDIR . '/SettingsForm.class.php');
+		// require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// We don't save values in settings but in our filters table so we extend the class with our jazz
-		require_once(SUBSDIR . '/EmailSettings.class.php');
+		// require_once(SUBSDIR . '/EmailSettings.class.php');
 
 		// Instantiate the extended parser form
 		$this->_filtersSettings = new Email_Settings();
@@ -1138,7 +1138,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$context['default_list'] = 'email_parser';
 
 		// Create the list.
-		require_once(SUBSDIR . '/GenericList.class.php');
+		// require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 	}
 
@@ -1244,7 +1244,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$context[$context['admin_menu_name']]['current_subsection'] = 'emailparser';
 
 		// Create the list.
-		require_once(SUBSDIR . '/GenericList.class.php');
+		// require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 	}
 
@@ -1369,10 +1369,10 @@ class ManageMaillist_Controller extends Action_Controller
 		global $txt;
 
 		// We need some setting options for our maillist
-		require_once(SUBSDIR . '/SettingsForm.class.php');
+		// require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// We don't save values in settings but in our filters table so we extend the class with our jazz
-		require_once(SUBSDIR . '/EmailSettings.class.php');
+		// require_once(SUBSDIR . '/EmailSettings.class.php');
 
 		// Instantiate the extended parser form
 		$this->_parsersSettings = new Email_Settings();
@@ -1457,7 +1457,7 @@ class ManageMaillist_Controller extends Action_Controller
 			$maillist_receiving_address = array();
 
 			// Basic checking of the email addresses
-			require_once(SUBSDIR . '/DataValidator.class.php');
+			// require_once(SUBSDIR . '/DataValidator.class.php');
 			if (!Data_Validator::is_valid($_POST, array('maillist_sitename_address' => 'valid_email'), array('maillist_sitename_address' => 'trim')))
 				$email_error = $_POST['maillist_sitename_address'];
 			if (!Data_Validator::is_valid($_POST, array('maillist_sitename_help' => 'valid_email'), array('maillist_sitename_help' => 'trim')))
@@ -1554,7 +1554,7 @@ class ManageMaillist_Controller extends Action_Controller
 	private function _initMaillistSettingsForm()
 	{
 		// We need some settings! ..ok, some work with our settings :P
-		require_once(SUBSDIR . '/SettingsForm.class.php');
+		// require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Instantiate the form
 		$this->_maillistSettings = new Settings_Form();
@@ -1763,7 +1763,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$context['page_title'] = $txt['ml_bounce_templates_title'];
 		createToken('mod-mlt');
 
-		require_once(SUBSDIR . '/GenericList.class.php');
+		// require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		// Show the list

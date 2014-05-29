@@ -287,7 +287,7 @@ class ManageBans_Controller extends Action_Controller
 			),
 		);
 
-		require_once(SUBSDIR . '/GenericList.class.php');
+		// require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 	}
 
@@ -337,7 +337,7 @@ class ManageBans_Controller extends Action_Controller
 				$context['ban_group_id'] = $ban_group_id;
 
 				// We're going to want this for making our list.
-				require_once(SUBSDIR . '/GenericList.class.php');
+				// require_once(SUBSDIR . '/GenericList.class.php');
 
 				// Setup for a createlist
 				$listOptions = array(
@@ -651,7 +651,7 @@ class ManageBans_Controller extends Action_Controller
 		createToken('admin-bl');
 
 		// Build the list
-		require_once(SUBSDIR . '/GenericList.class.php');
+		// require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		$context['page_title'] = $txt['ban_log'];
@@ -1093,7 +1093,7 @@ class ManageBans_Controller extends Action_Controller
 		}
 
 		// Create the list.
-		require_once(SUBSDIR . '/GenericList.class.php');
+		// require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 	}
 }

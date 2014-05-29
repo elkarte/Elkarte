@@ -38,7 +38,7 @@ $GLOBALS['search_versions'] = array(
  */
 function findSearchAPI()
 {
-	require_once(SUBSDIR . '/Search.class.php');
+// 	require_once(SUBSDIR . '/Search.class.php');
 
 	$search = new Search_Class();
 	return $search->findSearchAPI();

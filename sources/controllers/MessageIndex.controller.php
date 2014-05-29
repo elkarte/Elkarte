@@ -182,7 +182,7 @@ class MessageIndex_Controller extends Action_Controller
 		$context['can_approve_posts'] = allowedTo('approve_posts');
 
 		// Prepare sub-boards for display.
-		require_once(SUBSDIR . '/BoardsList.class.php');
+		// require_once(SUBSDIR . '/BoardsList.class.php');
 		$boardIndexOptions = array(
 			'include_categories' => false,
 			'base_level' => $board_info['child_level'] + 1,

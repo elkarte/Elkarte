@@ -274,7 +274,7 @@ class Likes_Controller extends Action_Controller
 	public function action_showProfileLikes()
 	{
 		// Load in our helper functions
-		require_once(SUBSDIR . '/GenericList.class.php');
+		// require_once(SUBSDIR . '/GenericList.class.php');
 		require_once(SUBSDIR . '/Likes.subs.php');
 
 		if (isset($_REQUEST['sa']) && $_REQUEST['sa'] === 'received')
@@ -497,7 +497,7 @@ class Likes_Controller extends Action_Controller
 	{
 		global $context, $txt, $scripturl;
 
-		require_once(SUBSDIR . '/GenericList.class.php');
+		// require_once(SUBSDIR . '/GenericList.class.php');
 		require_once(SUBSDIR . '/Likes.subs.php');
 		loadLanguage('Profile');
 

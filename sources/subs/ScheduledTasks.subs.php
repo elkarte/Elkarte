@@ -495,7 +495,7 @@ function processNextTasks($ts = 0)
 	$db = database();
 
 	// We'll run tasks, or so we hope.
-	require_once(SUBSDIR . '/ScheduledTask.class.php');
+	// require_once(SUBSDIR . '/ScheduledTask.class.php');
 
 	// Select the next task to do.
 	$request = $db->query('', '

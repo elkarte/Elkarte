@@ -59,7 +59,7 @@ class BoardIndex_Controller extends Action_Controller
 			$context['robot_no_index'] = true;
 
 		// Retrieve the categories and boards.
-		require_once(SUBSDIR . '/BoardsList.class.php');
+		// require_once(SUBSDIR . '/BoardsList.class.php');
 		$boardIndexOptions = array(
 			'include_categories' => true,
 			'base_level' => 0,

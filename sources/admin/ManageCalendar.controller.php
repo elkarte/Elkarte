@@ -48,7 +48,7 @@ class ManageCalendar_Controller extends Action_Controller
 		loadLanguage('ManageCalendar');
 
 		// We're working with them settings here.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
+		// require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Default text.
 		$context['explain_text'] = $txt['calendar_desc'];
@@ -192,7 +192,7 @@ class ManageCalendar_Controller extends Action_Controller
 			),
 		);
 
-		require_once(SUBSDIR . '/GenericList.class.php');
+		// require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		$context['page_title'] = $txt['manage_holidays'];
@@ -277,7 +277,7 @@ class ManageCalendar_Controller extends Action_Controller
 		$config_vars = $this->_calendarSettings->settings();
 
 		// Get the settings template fired up.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
+		// require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Get the final touches in place.
 		$context['post_url'] = $scripturl . '?action=admin;area=managecalendar;save;sa=settings';

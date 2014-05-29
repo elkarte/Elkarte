@@ -2,7 +2,7 @@
 
 require_once(TESTDIR . 'simpletest/autorun.php');
 require_once(TESTDIR . '../SSI.php');
-require_once(SOURCEDIR . '/ErrorContext.class.php');
+// require_once(SOURCEDIR . '/ErrorContext.class.php');
 
 /**
  * TestCase class for Error_Context class.

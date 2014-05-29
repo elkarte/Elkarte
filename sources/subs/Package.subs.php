@@ -523,7 +523,7 @@ function getPackageInfo($gzfilename)
 	}
 
 	// Parse package-info.xml into an Xml_Array.
-	require_once(SUBSDIR . '/XmlArray.class.php');
+	// require_once(SUBSDIR . '/XmlArray.class.php');
 	$packageInfo = new Xml_Array($packageInfo);
 
 	// @todo Error message of some sort?
@@ -723,7 +723,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 		}
 
 		// Create the list for display.
-		require_once(SUBSDIR . '/GenericList.class.php');
+		// require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		// If we just restored permissions then whereever we are, we are now done and dusted.
@@ -746,7 +746,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 	if (!empty($_SESSION['pack_ftp']['connected']))
 	{
 		// Load the file containing the Ftp_Connection class.
-		require_once(SUBSDIR . '/FtpConnection.class.php');
+		// require_once(SUBSDIR . '/FtpConnection.class.php');
 
 		$package_ftp = new Ftp_Connection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
 
@@ -758,7 +758,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 	// Just got a submission did we?
 	if ((empty($package_ftp) || ($package_ftp->error !== false)) && isset($_POST['ftp_username']))
 	{
-		require_once(SUBSDIR . '/FtpConnection.class.php');
+		// require_once(SUBSDIR . '/FtpConnection.class.php');
 		$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
 
 		// We're connected, jolly good!
@@ -824,7 +824,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 		{
 			if (!isset($ftp))
 			{
-				require_once(SUBSDIR . '/FtpConnection.class.php');
+				// require_once(SUBSDIR . '/FtpConnection.class.php');
 				$ftp = new Ftp_Connection(null);
 			}
 			elseif ($ftp->error !== false && !isset($ftp_error))
@@ -944,7 +944,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 	elseif (isset($_SESSION['pack_ftp']))
 	{
 		// Load the file containing the Ftp_Connection class.
-		require_once(SUBSDIR . '/FtpConnection.class.php');
+		// require_once(SUBSDIR . '/FtpConnection.class.php');
 
 		$package_ftp = new Ftp_Connection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
 
@@ -988,7 +988,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 	elseif (isset($_POST['ftp_username']))
 	{
 		// Attempt to make a new FTP connection
-		require_once(SUBSDIR . '/FtpConnection.class.php');
+		// require_once(SUBSDIR . '/FtpConnection.class.php');
 		$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
 
 		if ($ftp->error === false)
@@ -1006,7 +1006,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 	{
 		if (!isset($ftp))
 		{
-			require_once(SUBSDIR . '/FtpConnection.class.php');
+			// require_once(SUBSDIR . '/FtpConnection.class.php');
 			$ftp = new Ftp_Connection(null);
 		}
 		elseif ($ftp->error !== false && !isset($ftp_error))
@@ -1992,7 +1992,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 
 	@set_time_limit(600);
 
-	require_once(SUBSDIR . '/XmlArray.class.php');
+	// require_once(SUBSDIR . '/XmlArray.class.php');
 	$xml = new Xml_Array(strtr($file, array("\r" => '')));
 	$actions = array();
 	$everything_found = true;
@@ -3190,7 +3190,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 	elseif ($match[1] == 'ftp')
 	{
 		// Include the file containing the Ftp_Connection class.
-		require_once(SOURCEDIR . '/FtpConnection.class.php');
+		// require_once(SOURCEDIR . '/FtpConnection.class.php');
 
 		// Establish a connection and attempt to enable passive mode.
 		$ftp = new Ftp_Connection(($match[2] ? 'ssl://' : '') . $match[3], empty($match[5]) ? 21 : $match[5], 'anonymous', $webmaster_email);
@@ -3221,7 +3221,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 	elseif (isset($match[1]) && $match[1] === 'http' && function_exists('curl_init'))
 	{
 		// Include the file containing the Curl_Fetch_Webdata class.
-		require_once(SOURCEDIR . '/CurlFetchWebdata.class.php');
+		// require_once(SOURCEDIR . '/CurlFetchWebdata.class.php');
 
 		$fetch_data = new Curl_Fetch_Webdata();
 		$fetch_data->get_url_data($url, $post_data);

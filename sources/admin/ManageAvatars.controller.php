@@ -49,7 +49,7 @@ class ManageAvatars_Controller extends Action_Controller
 		isAllowedTo('manage_attachments');
 
 		// We're working with them settings here.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
+		// require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		$subActions = array(
 			'display' => array($this, 'action_avatarSettings_display')

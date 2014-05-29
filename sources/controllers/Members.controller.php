@@ -34,7 +34,7 @@ class Members_Controller extends Action_Controller
 	{
 		global $context;
 
-		require_once(SUBSDIR . '/Action.class.php');
+		// require_once(SUBSDIR . '/Action.class.php');
 
 		// Little short on the list here
 		$subActions = array(

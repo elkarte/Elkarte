@@ -34,7 +34,7 @@ class Attachment_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		require_once(SUBSDIR . '/Action.class.php');
+		// require_once(SUBSDIR . '/Action.class.php');
 
 		// add an subaction array to act accordingly
 		$subActions = array(
@@ -82,7 +82,7 @@ class Attachment_Controller extends Action_Controller
 		{
 			loadLanguage('Post');
 
-			require_once(SOURCEDIR . '/AttachmentErrorContext.class.php');
+			// require_once(SOURCEDIR . '/AttachmentErrorContext.class.php');
 			$attach_errors = Attachment_Error_Context::context();
 			$attach_errors->activate();
 

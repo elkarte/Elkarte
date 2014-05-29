@@ -863,7 +863,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// What have the other moderators done to this message?
 		require_once(SUBSDIR . '/Modlog.subs.php');
-		require_once(SUBSDIR . '/GenericList.class.php');
+		// require_once(SUBSDIR . '/GenericList.class.php');
 		loadLanguage('Modlog');
 
 		// This is all the information from the moderation log.
@@ -1040,7 +1040,7 @@ class ModerationCenter_Controller extends Action_Controller
 				$approve_query = ' AND 1=0';
 		}
 
-		require_once(SUBSDIR . '/GenericList.class.php');
+		// require_once(SUBSDIR . '/GenericList.class.php');
 
 		// This is all the information required for a watched user listing.
 		$listOptions = array(
@@ -1195,7 +1195,7 @@ class ModerationCenter_Controller extends Action_Controller
 		// Setup context as always.
 		$context['page_title'] = $txt['mc_warning_log_title'];
 
-		require_once(SUBSDIR . '/GenericList.class.php');
+		// require_once(SUBSDIR . '/GenericList.class.php');
 		require_once(SUBSDIR . '/Moderation.subs.php');
 		loadLanguage('Modlog');
 
@@ -1391,7 +1391,7 @@ class ModerationCenter_Controller extends Action_Controller
 		// Setup context as always.
 		$context['page_title'] = $txt['mc_warning_templates_title'];
 
-		require_once(SUBSDIR . '/GenericList.class.php');
+		// require_once(SUBSDIR . '/GenericList.class.php');
 
 		// This is all the information required for a watched user listing.
 		$listOptions = array(
@@ -1493,7 +1493,7 @@ class ModerationCenter_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		require_once(SUBSDIR . '/Action.class.php');
+		// require_once(SUBSDIR . '/Action.class.php');
 
 		// Some of this stuff is overseas, so to speak.
 		loadTemplate('ModerationCenter');

@@ -39,7 +39,7 @@ class ManageDrafts_Controller extends Action_Controller
 		loadLanguage('Drafts');
 
 		// We're working with them settings here.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
+		// require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		$this->action_draftSettings_display();
 	}

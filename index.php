@@ -81,11 +81,13 @@ require_once(SOURCEDIR . '/Logging.php');
 require_once(SOURCEDIR . '/Load.php');
 require_once(SUBSDIR . '/Cache.subs.php');
 require_once(SOURCEDIR . '/Security.php');
-require_once(SOURCEDIR . '/BrowserDetector.class.php');
-require_once(SOURCEDIR . '/ErrorContext.class.php');
-require_once(SUBSDIR . '/Util.class.php');
-require_once(SUBSDIR . '/TemplateLayers.class.php');
+// require_once(SOURCEDIR . '/BrowserDetector.class.php');
+// require_once(SOURCEDIR . '/ErrorContext.class.php');
+// require_once(SUBSDIR . '/Util.class.php');
+// require_once(SUBSDIR . '/TemplateLayers.class.php');
 require_once(SOURCEDIR . '/Action.controller.php');
+
+spl_autoload_register('elk_autoloader');
 
 // Forum in extended maintenance mode? Our trip ends here with a bland message.
 if (!empty($maintenance) && $maintenance == 2)
@@ -207,7 +209,7 @@ function elk_main()
 	unset($no_stat_actions);
 
 	// What shall we do?
-	require_once(SOURCEDIR . '/SiteDispatcher.class.php');
+	// require_once(SOURCEDIR . '/SiteDispatcher.class.php');
 	$dispatcher = new Site_Dispatcher();
 
 	// Show where we came from, and go

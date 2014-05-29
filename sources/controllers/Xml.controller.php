@@ -28,7 +28,7 @@ class Xml_Controller extends Action_Controller
 	public function action_index()
 	{
 		loadTemplate('Xml');
-		require_once(SUBSDIR . '/Action.class.php');
+		// require_once(SUBSDIR . '/Action.class.php');
 
 		$subActions = array(
 			'jumpto' => array('controller' => $this, 'function' => 'action_jumpto'),

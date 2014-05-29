@@ -172,7 +172,7 @@ class PersonalMessage_Controller extends Action_Controller
 	{
 		global $context;
 
-		require_once(SUBSDIR . '/Action.class.php');
+		// require_once(SUBSDIR . '/Action.class.php');
 
 		// Finally all the things we know how to do
 		$subActions = array(

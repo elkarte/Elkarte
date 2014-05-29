@@ -59,7 +59,7 @@ class ManageAttachments_Controller extends Action_Controller
 		loadTemplate('ManageAttachments');
 
 		// We're working with them settings here.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
+		// require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// If they want to delete attachment(s), delete them. (otherwise fall through..)
 		$subActions = array(
@@ -129,7 +129,7 @@ class ManageAttachments_Controller extends Action_Controller
 	toggleSubDir();', true);
 
 		// These are very likely to come in handy! (i.e. without them we're doomed!)
-		require_once(SUBSDIR . '/SettingsForm.class.php');
+		// require_once(SUBSDIR . '/SettingsForm.class.php');
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// Saving settings?
@@ -537,7 +537,7 @@ class ManageAttachments_Controller extends Action_Controller
 		);
 
 		// Create the list.
-		require_once(SUBSDIR . '/GenericList.class.php');
+		// require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 	}
 
@@ -1429,7 +1429,7 @@ class ManageAttachments_Controller extends Action_Controller
 				),
 			),
 		);
-		require_once(SUBSDIR . '/GenericList.class.php');
+		// require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		if (!empty($modSettings['attachment_basedirectories']))

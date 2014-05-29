@@ -146,7 +146,7 @@ class ManageSecurity_Controller extends Action_Controller
 	private function _initSecuritySettingsForm()
 	{
 		// We're working with them settings.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
+		// require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Instantiate the form
 		$this->_securitySettings = new Settings_Form();
@@ -177,7 +177,7 @@ class ManageSecurity_Controller extends Action_Controller
 			unset($config_vars['moderate']);
 
 		// We're working with them settings.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
+		// require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Saving?
 		if (isset($_GET['save']))
@@ -229,7 +229,7 @@ class ManageSecurity_Controller extends Action_Controller
 	private function _initModerationSettingsForm()
 	{
 		// We're working with them settings.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
+		// require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Instantiate the form
 		$this->_moderationSettings = new Settings_Form();
@@ -301,8 +301,8 @@ class ManageSecurity_Controller extends Action_Controller
 	private function _initSpamSettingsForm()
 	{
 		// We're working with them settings.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
-		require_once(SUBSDIR . '/VerificationControls.class.php');
+		// require_once(SUBSDIR . '/SettingsForm.class.php');
+		// require_once(SUBSDIR . '/VerificationControls.class.php');
 
 		// Instantiate the form
 		$this->_spamSettings = new Settings_Form();
@@ -408,7 +408,7 @@ class ManageSecurity_Controller extends Action_Controller
 	private function _initBBSettingsForm()
 	{
 		// We're working with them settings.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
+		// require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Instantiate the form
 		$this->_bbSettings = new Settings_Form();
@@ -500,7 +500,7 @@ class ManageSecurity_Controller extends Action_Controller
 	{
 		global $txt;
 
-		require_once(SUBSDIR . '/VerificationControls.class.php');
+		// require_once(SUBSDIR . '/VerificationControls.class.php');
 
 		// Build up our options array
 		$config_vars = array(
