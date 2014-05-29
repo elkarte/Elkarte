@@ -639,7 +639,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 		ORDER BY {raw:sort}',
 		array(
 			'current_member' => $user_id,
-			'min_posts' => ($membergroup_type === 'post_count' ? '!= ' : '= ') . -1,
+			'min_posts' => ($membergroup_type === 'post_count' ? '!= -1' : '= -1'),
 			'mod_group' => 3,
 			'is_protected' => 1,
 			'sort' => $sort,

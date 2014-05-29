@@ -233,7 +233,7 @@ function updateLike($id_liker, $liked_message, $direction)
 		updateMemberData($liked_message['id_member'], array('likes_received' => '+'));
 	}
 	// Or you are just being fickle?
-	elseif ($count !==0 && $direction === '-')
+	elseif ($count !== 0 && $direction === '-')
 	{
 		$db->query('', '
 			DELETE FROM {db_prefix}message_likes
@@ -362,7 +362,7 @@ function likesPostsGiven($start, $items_per_page, $sort, $memberID)
 			'subject' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
 			'poster_name' => $row['poster_name'],
 			'name' => $row['name'],
-			'delete' =>  $scripturl . '?action=likes;sa=unlikepost;profile;msg=' . $row['id_msg'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+			'delete' => $scripturl . '?action=likes;sa=unlikepost;profile;msg=' . $row['id_msg'] . ';' . $context['session_var'] . '=' . $context['session_id'],
 		);
 	}
 
@@ -412,7 +412,7 @@ function likesPostsReceived($start, $items_per_page, $sort, $memberID)
 		$likes[] = array(
 			'subject' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
 			'name' => $row['name'],
-			'who' =>  $scripturl . '?action=likes;sa=showWhoLiked;msg=' . $row['id_msg'],
+			'who' => $scripturl . '?action=likes;sa=showWhoLiked;msg=' . $row['id_msg'],
 			'likes' => $row['likes']
 		);
 	}

@@ -370,7 +370,7 @@ function get_file_listing($path, $relative)
 			else
 				$size = comma_format($size) . ' ' . $txt['themeadmin_edit_bytes'];
 
-			$writable =  is_writable($path . '/' . $entry);
+			$writable = is_writable($path . '/' . $entry);
 
 			$listing2[] = array(
 				'filename' => $entry,

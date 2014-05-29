@@ -349,7 +349,7 @@ function template_unapproved_posts()
 	{
 		$item['class'] = $item['alternate'] == 0 ? 'windowbg2' : 'windowbg';
 		$item['title'] = '<h5><strong>' . $item['category']['link'] . ' / ' . $item['board']['link'] . ' / ' . $item['link'] . '</strong></h5>';
-		$item['date'] = $txt['mc_unapproved_by'] . ' <strong>' . $item['poster']['link'] . '</strong> ' . ': ' . $item['time'];
+		$item['date'] = $txt['mc_unapproved_by'] . ' <strong>' . $item['poster']['link'] . '</strong> : ' . $item['time'];
 
 		template_simple_message($item);
 	}
