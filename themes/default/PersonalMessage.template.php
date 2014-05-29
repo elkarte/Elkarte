@@ -1149,7 +1149,7 @@ function template_labels()
 				<th class="lefttext">
 					', $txt['pm_label_name'], '
 				</th>
-				<th style="width:4%">';
+				<th style="width: 4%;">';
 
 	if (count($context['labels']) > 2)
 		echo '
@@ -1179,7 +1179,7 @@ function template_labels()
 				<td>
 					<input type="text" name="label_name[', $label['id'], ']" value="', $label['name'], '" size="30" maxlength="30" class="input_text" />
 				</td>
-				<td style="width:4%">
+				<td style="width: 4%;">
 					<input type="checkbox" class="input_check" name="delete_label[', $label['id'], ']" />
 				</td>
 			</tr>';
@@ -1315,7 +1315,7 @@ function template_rules()
 				<th class="lefttext">
 					', $txt['pm_rule_title'], '
 				</th>
-				<th style="width:4%">';
+				<th style="width: 4%;">';
 
 	if (!empty($context['rules']))
 		echo '
@@ -1343,7 +1343,7 @@ function template_rules()
 				<td>
 					<a href="', $scripturl, '?action=pm;sa=manrules;add;rid=', $rule['id'], '">', $rule['name'], '</a>
 				</td>
-				<td style="width:4%">
+				<td style="width: 4%;">
 					<input type="checkbox" name="delrule[', $rule['id'], ']" class="input_check" />
 				</td>
 			</tr>';

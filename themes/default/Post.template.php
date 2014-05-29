@@ -785,11 +785,11 @@ function template_spellcheck()
 			<div id="spellview">&nbsp;</div>
 			<table class="table_grid">
 				<tr class="windowbg">
-					<td style="width:50%;vertical-align:top">
+					<td style="width: 50%;vertical-align:top">
 						<label for="changeto">', $txt['spellcheck_change_to'], '</label><br />
 						<input type="text" id="changeto" name="changeto" style="width: 98%;" class="input_text" />
 					</td>
-					<td style="width:50%">
+					<td style="width: 50%;">
 						', $txt['spellcheck_suggest'], '<br />
 							<select name="suggestions" style="width: 98%;" size="5" onclick="if (this.selectedIndex != -1) this.form.changeto.value = this.options[this.selectedIndex].text;" ondblclick="replaceWord();">
 							</select>
