@@ -3437,26 +3437,26 @@ function template_chmod()
 	echo '
 		<table style="width: 520px; margin: 1em 0; border-collapse:collapse; border-spacing: 0; padding: 0; text-align:center;">
 			<tr>
-				<td style="width: 26%; vertical-align:top" class="textbox"><label for="ftp_server">', $txt['ftp_server'], ':</label></td>
+				<td style="width: 26%; vertical-align: top;" class="textbox"><label for="ftp_server">', $txt['ftp_server'], ':</label></td>
 				<td>
 					<div style="float: right; margin-right: 1px;"><label for="ftp_port" class="textbox"><strong>', $txt['ftp_port'], ':&nbsp;</strong></label> <input type="text" size="3" name="ftp_port" id="ftp_port" value="', isset($upcontext['chmod']['port']) ? $upcontext['chmod']['port'] : '21', '" class="input_text" /></div>
 					<input type="text" size="30" name="ftp_server" id="ftp_server" value="', isset($upcontext['chmod']['server']) ? $upcontext['chmod']['server'] : 'localhost', '" style="width: 70%;" class="input_text" />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['ftp_server_info'], '</div>
 				</td>
 			</tr><tr>
-				<td style="width: 26%; vertical-align:top" class="textbox"><label for="ftp_username">', $txt['ftp_username'], ':</label></td>
+				<td style="width: 26%; vertical-align: top;" class="textbox"><label for="ftp_username">', $txt['ftp_username'], ':</label></td>
 				<td>
 					<input type="text" size="50" name="ftp_username" id="ftp_username" value="', isset($upcontext['chmod']['username']) ? $upcontext['chmod']['username'] : '', '" style="width: 99%;" class="input_text" />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['ftp_username_info'], '</div>
 				</td>
 			</tr><tr>
-				<td style="width: 26%; vertical-align:top" class="textbox"><label for="ftp_password">', $txt['ftp_password'], ':</label></td>
+				<td style="width: 26%; vertical-align: top;" class="textbox"><label for="ftp_password">', $txt['ftp_password'], ':</label></td>
 				<td>
 					<input type="password" size="50" name="ftp_password" id="ftp_password" style="width: 99%;" class="input_password" />
 					<div style="font-size: smaller; margin-bottom: 3ex;">', $txt['ftp_password_info'], '</div>
 				</td>
 			</tr><tr>
-				<td style="width: 26%; vertical-align:top" class="textbox"><label for="ftp_path">', $txt['ftp_path'], ':</label></td>
+				<td style="width: 26%; vertical-align: top;" class="textbox"><label for="ftp_path">', $txt['ftp_path'], ':</label></td>
 				<td style="padding-bottom: 1ex;">
 					<input type="text" size="50" name="ftp_path" id="ftp_path" value="', isset($upcontext['chmod']['path']) ? $upcontext['chmod']['path'] : '', '" style="width: 99%;" class="input_text" />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', !empty($upcontext['chmod']['path']) ? $txt['ftp_path_found_info'] : $txt['ftp_path_info'], '</div>
@@ -3829,7 +3829,7 @@ function template_welcome_message()
 			<strong>Admin Login: ', $disable_security ? '(DISABLED)' : '', '</strong>
 			<h3>For security purposes please login with your admin account to proceed with the upgrade.</h3>
 			<table>
-				<tr style="vertical-align:top">
+				<tr style="vertical-align: top;">
 					<td><strong ', $disable_security ? 'style="color: lightgray;"' : '', '>Username:</strong></td>
 					<td>
 						<input type="text" name="user" value="', !empty($upcontext['username']) ? $upcontext['username'] : '', '" ', $disable_security ? 'disabled="disabled"' : '', ' class="input_text" />';
@@ -3841,7 +3841,7 @@ function template_welcome_message()
 	echo '
 					</td>
 				</tr>
-				<tr style="vertical-align:top">
+				<tr style="vertical-align: top;">
 					<td><strong ', $disable_security ? 'style="color: lightgray;"' : '', '>Password:</strong></td>
 					<td>
 						<input type="password" name="passwrd" value=""', $disable_security ? ' disabled="disabled"' : '', ' class="input_password" />
@@ -3947,7 +3947,7 @@ function template_upgrade_options()
 
 	echo '
 				<table style="border-collapse:collapse; border-spacing: 1; padding: 2px;">
-					<tr style="vertical-align:top">
+					<tr style="vertical-align: top;">
 						<td style="width: 2%;">
 							<input type="checkbox" name="backup" id="backup" value="1"', $db_type != 'mysql' && $db_type != 'postgresql' ? ' disabled="disabled"' : '', ' class="input_check" />
 						</td>
@@ -3955,7 +3955,7 @@ function template_upgrade_options()
 							<label for="backup">Backup tables in your database with the prefix &quot;backup_' . $db_prefix . '&quot;.</label>', isset($modSettings['elkVersion']) ? '' : ' (recommended!)', '
 						</td>
 					</tr>
-					<tr style="vertical-align:top">
+					<tr style="vertical-align: top;">
 						<td style="width: 2%;">
 							<input type="checkbox" name="maint" id="maint" value="1" checked="checked" class="input_check" />
 						</td>
@@ -3969,7 +3969,7 @@ function template_upgrade_options()
 							</div>
 						</td>
 					</tr>
-					<tr style="vertical-align:top">
+					<tr style="vertical-align: top;">
 						<td style="width: 2%;">
 							<input type="checkbox" name="debug" id="debug" value="1" class="input_check" />
 						</td>
@@ -3977,7 +3977,7 @@ function template_upgrade_options()
 							<label for="debug">Output extra debugging information</label>
 						</td>
 					</tr>
-					<tr style="vertical-align:top">
+					<tr style="vertical-align: top;">
 						<td style="width: 2%;">
 							<input type="checkbox" name="empty_error" id="empty_error" value="1" class="input_check" />
 						</td>

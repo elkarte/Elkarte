@@ -795,7 +795,7 @@ function template_search_results()
 		{
 			// @todo No context at all of the search?
 			echo '
-			<tr class="', $alternate ? 'windowbg' : 'windowbg2', '" style="vertical-align:top">
+			<tr class="', $alternate ? 'windowbg' : 'windowbg2', '" style="vertical-align: top;">
 				<td>', $message['time'], '</td>
 				<td>', $message['link'], '</td>
 				<td>', $message['member']['link'], '</td>
