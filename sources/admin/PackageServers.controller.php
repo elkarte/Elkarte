@@ -777,7 +777,7 @@ class PackageServers_Controller extends Action_Controller
 			// Are they connecting to their FTP account already?
 			if (isset($_POST['ftp_username']))
 			{
-				require_once(SUBSDIR . '/FTPConnection.class.php');
+				require_once(SUBSDIR . '/FtpConnection.class.php');
 				$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
 
 				if ($ftp->error === false)
@@ -797,7 +797,7 @@ class PackageServers_Controller extends Action_Controller
 				// Maybe we didn't even try yet
 				if (!isset($ftp))
 				{
-					require_once(SUBSDIR . '/FTPConnection.class.php');
+					require_once(SUBSDIR . '/FtpConnection.class.php');
 					$ftp = new Ftp_Connection(null);
 				}
 				// ...or we failed
