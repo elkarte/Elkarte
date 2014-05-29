@@ -33,6 +33,12 @@ class Boards_List
 	private $_options = array();
 
 	/**
+	 * Some data regarding the current user
+	 * @var mixed[]
+	 */
+	private $_user = array();
+
+	/**
 	 * Holds the info about the latest post of the series
 	 * @var mixed[]
 	 */
@@ -67,6 +73,12 @@ class Boards_List
 	 * @var string
 	 */
 	private $_scripturl = '';
+
+	/**
+	 * A string with session data to be user in urls
+	 * @var string
+	 */
+	private $_session_url = '';
 
 	/**
 	 * Cut the subject at this number of chars
@@ -115,6 +127,16 @@ class Boards_List
 		);
 
 		$this->_db = database();
+
+		// Start with an empty array.
+		if ($this->_options['include_categories'])
+			$this->_categories = array();
+		else
+			$this->_current_boards = array();
+
+		// For performance, track the latest post while going through the boards.
+		if (!empty($this->_options['set_latest_post']))
+			$this->_latest_post = array('timestamp' => 0);
 	}
 
 	/**
@@ -131,10 +153,6 @@ class Boards_List
 	public function getBoards()
 	{
 		global $modSettings, $txt;
-
-		// For performance, track the latest post while going through the boards.
-		if (!empty($this->_options['set_latest_post']))
-			$this->_latest_post = array('timestamp' => 0);
 
 		// Find all boards and categories, as well as related information.
 		$result_boards = $this->_db->query('boardindex_fetch_boards', '
@@ -168,18 +186,14 @@ class Boards_List
 			)
 		);
 
-		// Start with an empty array.
-		if ($this->_options['include_categories'])
-			$this->_categories = array();
-		else
-			$this->_current_boards = array();
-
 		// Run through the categories and boards (or only boards)....
 		while ($row_board = $this->_db->fetch_assoc($result_boards))
 		{
 			// Perhaps we are ignoring this board?
 			$ignoreThisBoard = in_array($row_board['id_board'], $this->_user['ignoreboards']);
 			$row_board['is_read'] = !empty($row_board['is_read']) || $ignoreThisBoard ? '1' : '0';
+			// Not a child.
+			$isChild = false;
 
 			if ($this->_options['include_categories'])
 			{
@@ -221,8 +235,6 @@ class Boards_List
 				// Is this a new board, or just another moderator?
 				if (!isset($this->_current_boards[$row_board['id_board']]))
 				{
-					// Not a child.
-					$isChild = false;
 
 					$this->_current_boards[$row_board['id_board']] = array(
 						'new' => empty($row_board['is_read']),
