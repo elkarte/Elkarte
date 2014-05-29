@@ -938,7 +938,7 @@ function template_send()
 
 	// Require an image to be typed to save spamming?
 	if ($context['require_verification'])
-		template_control_verification($context['visual_verification_id'], '
+		template_verification_controls($context['visual_verification_id'], '
 					<div class="post_verification">
 						<strong>' . $txt['pm_visual_verification_label'] . ':</strong>
 						', '

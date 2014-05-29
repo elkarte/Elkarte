@@ -523,7 +523,7 @@ class ManageSecurity_Controller extends Action_Controller
 
 		foreach ($known_verifications as $verification)
 		{
-			$class_name = 'Control_Verification_' . ucfirst($verification);
+			$class_name = 'Verification_Controls_' . ucfirst($verification);
 			$current_instance = new $class_name();
 
 			$new_settings = $current_instance->settings();

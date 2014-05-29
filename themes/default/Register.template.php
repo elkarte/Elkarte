@@ -350,7 +350,7 @@ function template_registration_form()
 
 	if ($context['visual_verification'])
 	{
-		template_control_verification($context['visual_verification_id'], '
+		template_verification_controls($context['visual_verification_id'], '
 			<h3 class="category_header">' . $txt['verification'] . '</h3>
 			<div class="windowbg2">
 				<fieldset class="content centertext">
@@ -789,7 +789,7 @@ function template_contact_form()
 
 	if ($context['require_verification'])
 	{
-		template_control_verification($context['visual_verification_id'], '
+		template_verification_controls($context['visual_verification_id'], '
 					<dt>
 							' . $txt['verification'] . ':
 					</dt>

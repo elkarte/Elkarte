@@ -634,7 +634,7 @@ function template_postarea_below()
 	// Is visual verification enabled?
 	if ($context['require_verification'])
 	{
-		template_control_verification($context['visual_verification_id'], '
+		template_verification_controls($context['visual_verification_id'], '
 						<div class="post_verification">
 							<span' . (!empty($context['post_error']['need_qr_verification']) ? ' class="error"' : '') . '>
 								<strong>' . $txt['verification'] . ':</strong>

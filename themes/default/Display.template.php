@@ -419,7 +419,7 @@ function template_quickreply_below()
 
 		// Is visual verification enabled?
 		if ($context['require_verification'])
-			template_control_verification($context['visual_verification_id'], '
+			template_verification_controls($context['visual_verification_id'], '
 							<strong>' . $txt['verification'] . ':</strong>', '<br />');
 
 		// Using the full editor or a plain text box?

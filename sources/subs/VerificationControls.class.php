@@ -75,7 +75,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 
 		foreach ($known_verifications as $verification)
 		{
-			$class_name = 'Control_Verification_' . ucfirst($verification);
+			$class_name = 'Verification_Controls_' . ucfirst($verification);
 			$current_instance = new $class_name($verificationOptions);
 
 			// If there is anything to show, otherwise forget it
