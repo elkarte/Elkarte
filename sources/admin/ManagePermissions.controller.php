@@ -51,7 +51,7 @@ class ManagePermissions_Controller extends Action_Controller
 		loadTemplate('ManagePermissions');
 
 		// We're working with them settings here.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Format: 'sub-action' => array('function_to_call', 'permission_needed'),
 		$subActions = array(

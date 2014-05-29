@@ -886,7 +886,7 @@ class ManageNews_Controller extends Action_Controller
 	private function _initNewsSettingsForm()
 	{
 		// We're working with them settings here.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Instantiate the form
 		$this->_newsSettings = new Settings_Form();

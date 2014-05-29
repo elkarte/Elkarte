@@ -784,7 +784,7 @@ class ManageMembergroups_Controller extends Action_Controller
 		$context['page_title'] = $txt['membergroups_settings'];
 
 		// Needed for the settings functions.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// initialize the form
 		$this->_initGroupSettingsForm();

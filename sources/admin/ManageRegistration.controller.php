@@ -366,7 +366,7 @@ class ManageRegistration_Controller extends Action_Controller
 	private function _init_registerSettingsForm()
 	{
 		// This is really quite wanting.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Instantiate the form
 		$this->_registerSettings = new Settings_Form();

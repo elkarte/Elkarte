@@ -135,7 +135,7 @@ class ManageSmileys_Controller extends Action_Controller
 		$config_vars = $this->_smileySettings->settings();
 
 		// For the basics of the settings.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 		require_once(SUBSDIR . '/Smileys.subs.php');
 		$context['sub_template'] = 'show_settings';
 
@@ -176,7 +176,7 @@ class ManageSmileys_Controller extends Action_Controller
 	private function _initSmileySettingsForm()
 	{
 		// This is really quite wanting.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Instantiate the form
 		$this->_smileySettings = new Settings_Form();

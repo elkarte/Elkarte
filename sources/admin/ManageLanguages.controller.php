@@ -183,7 +183,7 @@ class ManageLanguages_Controller extends Action_Controller
 
 			if ($_POST['def_language'] != $language && $lang_exists)
 			{
-				require_once(SUBSDIR . '/Settings.class.php');
+				require_once(SUBSDIR . '/SettingsForm.class.php');
 				Settings_Form::save_file(array('language' => '\'' . $_POST['def_language'] . '\''));
 				$language = $_POST['def_language'];
 			}
@@ -751,7 +751,7 @@ class ManageLanguages_Controller extends Action_Controller
 			// Sixth, if we deleted the default language, set us back to english?
 			if ($context['lang_id'] == $language)
 			{
-				require_once(SUBSDIR . '/Settings.class.php');
+				require_once(SUBSDIR . '/SettingsForm.class.php');
 				$language = 'english';
 				Settings_Form::save_file(array('language' => '\'' . $language . '\''));
 			}
@@ -1066,7 +1066,7 @@ class ManageLanguages_Controller extends Action_Controller
 	private function _initLanguageSettingsForm()
 	{
 		// We'll want to use them someday. That is, right now.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Make it happen!
 		$this->_languageSettings = new Settings_Form();

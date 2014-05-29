@@ -972,7 +972,7 @@ class ManageMaillist_Controller extends Action_Controller
 		global $txt;
 
 		// We need some setting options for our maillist
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// We don't save values in settings but in our filters table so we extend the class with our jazz
 		require_once(SUBSDIR . '/EmailSettings.class.php');
@@ -1370,7 +1370,7 @@ class ManageMaillist_Controller extends Action_Controller
 		global $txt;
 
 		// We need some setting options for our maillist
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// We don't save values in settings but in our filters table so we extend the class with our jazz
 		require_once(SUBSDIR . '/EmailSettings.class.php');
@@ -1555,7 +1555,7 @@ class ManageMaillist_Controller extends Action_Controller
 	private function _initMaillistSettingsForm()
 	{
 		// We need some settings! ..ok, some work with our settings :P
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Instantiate the form
 		$this->_maillistSettings = new Settings_Form();

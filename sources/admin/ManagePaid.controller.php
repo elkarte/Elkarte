@@ -212,7 +212,7 @@ class ManagePaid_Controller extends Action_Controller
 	private function _init_paidSettingsForm()
 	{
 		// We're working with them settings here.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Instantiate the form
 		$this->_paidSettings = new Settings_Form();
