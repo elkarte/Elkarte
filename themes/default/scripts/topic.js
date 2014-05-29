@@ -330,7 +330,7 @@ QuickReply.prototype.swap = function (bInit, bSavestate)
 		oQuickReplyContainer.className = sTargetClass;
 
 	// And show the new title
-	oQuickReplyContainer.title = oQuickReplyContainer.title = this.bCollapsed ? this.opt.sTitleCollapsed : this.opt.sTitleExpanded;this.opt.sTitleCollapsed
+	oQuickReplyContainer.title = oQuickReplyContainer.title = this.bCollapsed ? this.opt.sTitleCollapsed : this.opt.sTitleExpanded;
 
 	// Show or hide away
 	if (this.bCollapsed)
