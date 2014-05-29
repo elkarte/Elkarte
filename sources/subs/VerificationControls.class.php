@@ -168,7 +168,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
  * A simple interface that defines all the methods any "Control_Verification"
  * class MUST have because they are used in the process of creating the verification
  */
-interface Control_Verifications
+interface Verification_Controls
 {
 	/**
 	 * Used to build the control and return if it should be shown or not
@@ -221,7 +221,7 @@ interface Control_Verifications
 /**
  * Class to manage, create, show and validate captcha images
  */
-class Control_Verification_Captcha implements Control_Verifications
+class Verification_Controls_Captcha implements Verification_Controls
 {
 	/**
 	 * Holds the $verificationOptions passed to the constuctor
@@ -471,7 +471,7 @@ class Control_Verification_Captcha implements Control_Verifications
 /**
  * Class to manage, prepare, show, and validate question -> answer verifications
  */
-class Control_Verification_Questions implements Control_Verifications
+class Verification_Controls_Questions implements Verification_Controls
 {
 	/**
 	 * Holds any options passed to the class
@@ -919,7 +919,7 @@ class Control_Verification_Questions implements Control_Verifications
  *
  * Adding additional catch terms is recommended to keep bots from learning
  */
-class Control_Verification_EmptyField implements Control_Verifications
+class Verification_Controls_EmptyField implements Verification_Controls
 {
 	/**
 	 * Hold the options passed to the class
