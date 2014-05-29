@@ -245,6 +245,7 @@ class Reminder_Controller extends Action_Controller
 		call_integration_hook('integrate_reset_pass', array($member['member_name'], $member['member_name'], $_POST['passwrd1']));
 
 		loadTemplate('Login');
+		loadJavascriptFile('sha256.js', array('defer' => true));
 		$context += array(
 			'page_title' => $txt['reminder_password_set'],
 			'sub_template' => 'login',
@@ -319,6 +320,7 @@ class Reminder_Controller extends Action_Controller
 
 		// Tell them it went fine.
 		loadTemplate('Login');
+		loadJavascriptFile('sha256.js', array('defer' => true));
 		$context += array(
 			'page_title' => $txt['reminder_password_set'],
 			'sub_template' => 'login',

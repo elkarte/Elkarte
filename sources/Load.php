@@ -1447,7 +1447,11 @@ function loadTheme($id_theme = 0, $initialize = true)
 	$context['can_register'] = empty($modSettings['registration_method']) || $modSettings['registration_method'] != 3;
 
 	// Set some permission related settings.
-	$context['show_login_bar'] = $user_info['is_guest'] && !empty($modSettings['enableVBStyleLogin']);
+	if ($user_info['is_guest'] && !empty($modSettings['enableVBStyleLogin']))
+	{
+		$context['show_login_bar'] = true;
+		loadJavascriptFile('sha256.js', array('defer' => true));
+	}
 
 	// This determines the server... not used in many places, except for login fixing.
 	detectServer();

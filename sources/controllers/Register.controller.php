@@ -605,6 +605,7 @@ class Register_Controller extends Action_Controller
 
 		loadLanguage('Login');
 		loadTemplate('Login');
+		loadJavascriptFile('sha256.js', array('defer' => true));
 
 		if (empty($_REQUEST['u']) && empty($_POST['user']))
 		{
