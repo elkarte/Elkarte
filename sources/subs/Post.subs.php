@@ -1532,7 +1532,7 @@ function lastPost()
  *
  * @package Posts
  * @param boolean $editing
- * @param int|null $topic
+ * @param int|null|false $topic
  * @param string $first_subject
  */
 function getFormMsgSubject($editing, $topic, $first_subject = '')
