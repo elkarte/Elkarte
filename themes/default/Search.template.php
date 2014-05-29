@@ -381,7 +381,7 @@ function template_results()
 	if (!empty($context['topics']) && !empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
 	{
 		echo '
-				<div class="flow_auto floatright">
+				<div class="search_controls floatright">
 					<div class="additional_row">
 						<select class="qaction" name="qaction"', $context['can_move'] ? ' onchange="this.form.move_to.disabled = (this.options[this.selectedIndex].value != \'move\');"' : '', '>
 							<option value="">&nbsp;</option>';

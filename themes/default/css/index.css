@@ -4524,6 +4524,9 @@ dl.no_members {
 		float: none;
 		text-align: center;
 	}
+	#search_jump_to, .search_controls {
+		display: none;
+	}
 	.small_pagelinks, .sort_by_container {
 		display: none;
 	}
