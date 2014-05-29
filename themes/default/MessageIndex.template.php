@@ -59,14 +59,7 @@ function template_topic_listing_above()
 
 	echo '
 		<div id="description_board">
-			<h2 class="category_header">', $context['name'];
-
-	if (!empty($context['moderators']))
-		echo '
-				<span class="moderators">(', count($context['moderators']) === 1 ? $txt['moderator'] : $txt['moderators'], ': ', implode(', ', $context['link_moderators']), '.)</span>';
-
-	echo '
-			</h2>
+			<h2 class="category_header">', $context['name'], '</h2>
 			<div class="generalinfo">';
 
 	// Show the board description
@@ -75,6 +68,10 @@ function template_topic_listing_above()
 				<div id="boarddescription">
 					', $context['description'], '
 				</div>';
+
+	if (!empty($context['moderators']))
+		echo '
+				<div class="moderators">', count($context['moderators']) === 1 ? $txt['moderator'] : $txt['moderators'], ': ', implode(', ', $context['link_moderators']), '.</div>';
 
 	echo '
 				<div id="whoisviewing">';

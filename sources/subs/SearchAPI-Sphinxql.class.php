@@ -253,11 +253,13 @@ class Sphinxql_Search
 				{
 					if (empty($search_params['topic']))
 						$num = isset($match['num']) ? $match['num'] : (isset($match['@count']) ? $match['@count'] : 0);
+					else
+						$num = 0;
 
 					$cached_results['matches'][$match['id']] = array(
 						'id' => $match['id_topic'],
 						'relevance' => round($match['relevance'] / 10000, 1) . '%',
-						'num_matches' => empty($search_params['topic']) ? $num : 0,
+						'num_matches' => $num,
 						'matches' => array(),
 					);
 				}

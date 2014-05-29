@@ -192,6 +192,7 @@ function is_not_guest($message = '', $is_fatal = true)
 	else
 	{
 		loadTemplate('Login');
+		loadJavascriptFile('sha256.js', array('defer' => true));
 		$context['sub_template'] = 'kick_guest';
 		$context['robot_no_index'] = true;
 	}

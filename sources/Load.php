@@ -62,6 +62,8 @@ function reloadSettings()
 			$modSettings['defaultMaxMessages'] = 15;
 		if (empty($modSettings['defaultMaxMembers']) || $modSettings['defaultMaxMembers'] <= 0 || $modSettings['defaultMaxMembers'] > 999)
 			$modSettings['defaultMaxMembers'] = 30;
+		if (empty($modSettings['subject_length']))
+			$modSettings['subject_length'] = 24;
 
 		$modSettings['warning_enable'] = $modSettings['warning_settings'][0];
 
@@ -1445,7 +1447,11 @@ function loadTheme($id_theme = 0, $initialize = true)
 	$context['can_register'] = empty($modSettings['registration_method']) || $modSettings['registration_method'] != 3;
 
 	// Set some permission related settings.
-	$context['show_login_bar'] = $user_info['is_guest'] && !empty($modSettings['enableVBStyleLogin']);
+	if ($user_info['is_guest'] && !empty($modSettings['enableVBStyleLogin']))
+	{
+		$context['show_login_bar'] = true;
+		loadJavascriptFile('sha256.js', array('defer' => true));
+	}
 
 	// This determines the server... not used in many places, except for login fixing.
 	detectServer();
@@ -1534,6 +1540,9 @@ function loadTheme($id_theme = 0, $initialize = true)
 	// Initialize the theme.
 	if (function_exists('template_init'))
 		$settings = array_merge($settings, template_init());
+
+	// Call initialization theme integration functions.
+	call_integration_hook('integrate_init_theme');
 
 	// Guests may still need a name.
 	if ($context['user']['is_guest'] && empty($context['user']['name']))

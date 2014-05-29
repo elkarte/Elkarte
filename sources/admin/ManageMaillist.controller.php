@@ -135,16 +135,13 @@ class ManageMaillist_Controller extends Action_Controller
 			'base_href' => $scripturl . '?action=admin;area=maillist',
 			'default_sort_col' => 'id_email',
 			'get_items' => array(
-				'function' => 'list_maillist_unapproved',
+				'function' => array($this, 'list_maillist_unapproved'),
 				'params' => array(
 					$id,
 				),
 			),
 			'get_count' => array(
 				'function' => 'list_maillist_count_unapproved',
-				'params' => array(
-					$id,
-				),
 			),
 			'columns' => array(
 				'id_email' => array(
@@ -319,7 +316,7 @@ class ManageMaillist_Controller extends Action_Controller
 		if (!empty($id))
 		{
 			// Load up the email details, no funny biz ;)
-			$temp_email = list_maillist_unapproved('', '', '', $id);
+			$temp_email = list_maillist_unapproved($id);
 
 			if (!empty($temp_email))
 			{
@@ -354,7 +351,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$context['notice_subject'] = isset($temp_email[0]['subject']) ? $txt['subject'] . ': ' . $temp_email[0]['subject'] : '';
 		$context['notice_from'] = isset($temp_email[0]['from']) ? $txt['from'] . ': ' . $temp_email[0]['from'] : '';
 		$context['page_title'] = $txt['show_notice'];
-		$context['error_code'] = isset($txt[$temp_email[0]['error_code']]) ? $txt[$temp_email[0]['error_code']] : '';
+		$context['error_code'] = isset($temp_email[0]['error_code']) && isset($txt[$temp_email[0]['error_code']]) ? $txt[$temp_email[0]['error_code']] : '';
 		$context['sub_template'] = 'show_email';
 	}
 
@@ -407,7 +404,7 @@ class ManageMaillist_Controller extends Action_Controller
 		if (!empty($id) && $id !== -1)
 		{
 			// Load up the email data
-			$temp_email = list_maillist_unapproved('', '', '', $id);
+			$temp_email = list_maillist_unapproved($id);
 			if (!empty($temp_email))
 			{
 				// Do we have the needed data to approve this, after all it failed for a reason yes?
@@ -488,7 +485,7 @@ class ManageMaillist_Controller extends Action_Controller
 			$id = (int) $_REQUEST['item'];
 
 			// Load up the email details, no funny biz yall ;)
-			$temp_email = list_maillist_unapproved(null, null, null, $id);
+			$temp_email = list_maillist_unapproved($id);
 
 			if (!empty($temp_email))
 			{
@@ -531,7 +528,7 @@ class ManageMaillist_Controller extends Action_Controller
 			$context['settings_message'] = $txt['badid'];
 
 		// Check if they are sending the notice
-		if (isset($_REQUEST['bounce']))
+		if (isset($_REQUEST['bounce']) && isset($temp_email))
 		{
 			checkSession('post');
 			validateToken('admin-ml');
@@ -559,7 +556,7 @@ class ManageMaillist_Controller extends Action_Controller
 		// Prepare and show the template
 		createToken('admin-ml');
 		$context['warning_data'] = array('notify' => '', 'notify_subject' => '', 'notify_body' => '');
-		$context['body'] = parse_bbc($fullerrortext);
+		$context['body'] = isset($fullerrortext) ? parse_bbc($fullerrortext) : '';
 		$context['item'] = isset($_POST['item']) ? $_POST['item'] : '';
 		$context['notice_to'] = $txt['to'] . ' ' . isset($temp_email[0]['from']) ? $temp_email[0]['from'] : '';
 		$context['page_title'] = $txt['bounce_title'];
@@ -1895,10 +1892,20 @@ class ManageMaillist_Controller extends Action_Controller
 	/**
 	 * Get the number of bounce templates in the system
 	 *
-	 * - Callback for createList() to
+	 * - Callback for createList() to warningTemplateCount
 	 */
 	public function list_getBounceTemplateCount()
 	{
 		return warningTemplateCount('bnctpl');
+	}
+
+	/**
+	 * Get the number of unapproved emails
+	 *
+	 * - Callback for createList() to list_maillist_unapproved
+	 */
+	protected function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
+	{
+		return list_maillist_unapproved($id, $start, $chunk_size, $sort);
 	}
 }

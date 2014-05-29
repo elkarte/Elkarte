@@ -21,12 +21,12 @@ if (!defined('ELK'))
  * - If supplied a specific ID will load only that failed email
  *
  * @package Maillist
+ * @param int $id
  * @param int $start
  * @param int $chunk_size
  * @param string $sort
- * @param int $id
  */
-function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
+function list_maillist_unapproved($id = 0, $start = 0, $chunk_size = 0, $sort = '')
 {
 	global $txt, $boardurl, $user_info;
 

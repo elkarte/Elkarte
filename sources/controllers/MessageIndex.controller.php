@@ -133,8 +133,6 @@ class MessageIndex_Controller extends Action_Controller
 		{
 			foreach ($board_info['moderators'] as $mod)
 				$context['link_moderators'][] = '<a href="' . $scripturl . '?action=profile;u=' . $mod['id'] . '" title="' . $txt['board_moderator'] . '">' . $mod['name'] . '</a>';
-
-			$context['linktree'][count($context['linktree']) - 1]['extra_after'] = '<span class="board_moderators"> (' . (count($context['link_moderators']) == 1 ? $txt['moderator'] : $txt['moderators']) . ': ' . implode(', ', $context['link_moderators']) . ')</span>';
 		}
 
 		// Mark current and parent boards as seen.
@@ -189,7 +187,7 @@ class MessageIndex_Controller extends Action_Controller
 		$context['can_approve_posts'] = allowedTo('approve_posts');
 
 		// Prepare sub-boards for display.
-		require_once(SUBSDIR . '/BoardIndex.subs.php');
+		require_once(SUBSDIR . '/BoardsList.class.php');
 		$boardIndexOptions = array(
 			'include_categories' => false,
 			'base_level' => $board_info['child_level'] + 1,
@@ -197,7 +195,8 @@ class MessageIndex_Controller extends Action_Controller
 			'set_latest_post' => false,
 			'countChildPosts' => !empty($modSettings['countChildPosts']),
 		);
-		$context['boards'] = getBoardIndex($boardIndexOptions);
+		$boardlist = new Boards_List($boardIndexOptions);
+		$context['boards'] = $boardlist->getBoards();
 
 		// Nosey, nosey - who's viewing this board?
 		if (!empty($settings['display_who_viewing']))

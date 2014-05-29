@@ -175,6 +175,7 @@ function adminLogin($type = 'admin')
 
 	loadLanguage('Admin');
 	loadTemplate('Login');
+	loadJavascriptFile('sha256.js', array('defer' => true));
 
 	// Validate what type of session check this is.
 	$types = array();
