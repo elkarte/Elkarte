@@ -21,7 +21,7 @@ if (!defined('ELK'))
 /**
  * This class implements a standard way of displaying lists.
  */
-class Generic_List
+class List
 {
 	/**
 	 * List options, an array with the format:
@@ -369,7 +369,7 @@ function createList($listOptions)
 {
 	call_integration_hook('integrate_list_' . $listOptions['id'], array($listOptions));
 
-	$list = new Generic_List($listOptions);
+	$list = new List($listOptions);
 
 	$list->buildList();
 }
