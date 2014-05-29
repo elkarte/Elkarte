@@ -938,7 +938,7 @@ class ManageMaillist_Controller extends Action_Controller
 				$config_vars[] = array('text', 'filter_style');
 				$_POST['filter_style'] = 'filter';
 
-				MaillistSettingsClass::saveTableSettings($config_vars, 'postby_emails_filters', array(), $editid, $editname);
+				Email_Settings::saveTableSettings($config_vars, 'postby_emails_filters', array(), $editid, $editname);
 				writeLog();
 				redirectexit('action=admin;area=maillist;sa=emailfilters;saved');
 			}
@@ -959,7 +959,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$context[$context['admin_menu_name']]['current_subsection'] = 'emailfilters';
 
 		// Load and show
-		MaillistSettingsClass::prepare_db($config_vars);
+		Email_Settings::prepare_db($config_vars);
 		loadTemplate('Admin', 'admin');
 		$context['sub_template'] = 'show_settings';
 	}
@@ -978,7 +978,7 @@ class ManageMaillist_Controller extends Action_Controller
 		require_once(SUBSDIR . '/EmailSettings.class.php');
 
 		// Instantiate the extended parser form
-		$this->_filtersSettings = new MaillistSettingsClass();
+		$this->_filtersSettings = new Email_Settings();
 
 		// Set up the config_vars for the form
 		$config_vars = array(
@@ -1336,7 +1336,7 @@ class ManageMaillist_Controller extends Action_Controller
 				$_POST['filter_style'] = 'parser';
 
 				// Save, log, show
-				MaillistSettingsClass::saveTableSettings($config_vars, 'postby_emails_filters', array(), $editid, $editname);
+				Email_Settings::saveTableSettings($config_vars, 'postby_emails_filters', array(), $editid, $editname);
 				writeLog();
 				redirectexit('action=admin;area=maillist;sa=emailparser;saved');
 			}
@@ -1357,7 +1357,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$context[$context['admin_menu_name']]['current_subsection'] = 'emailparser';
 
 		// prep it, load it, show it
-		MaillistSettingsClass::prepare_db($config_vars);
+		Email_Settings::prepare_db($config_vars);
 		loadTemplate('Admin', 'admin');
 		$context['sub_template'] = 'show_settings';
 	}
@@ -1376,7 +1376,7 @@ class ManageMaillist_Controller extends Action_Controller
 		require_once(SUBSDIR . '/EmailSettings.class.php');
 
 		// Instantiate the extended parser form
-		$this->_parsersSettings = new MaillistSettingsClass();
+		$this->_parsersSettings = new Email_Settings();
 
 		// Define the menu array
 		$config_vars = array(
