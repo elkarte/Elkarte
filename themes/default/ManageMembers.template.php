@@ -196,7 +196,7 @@ function template_search_members()
 					</tbody>
 				</table>
 
-				<table style="width: 49%" class="table_grid floatright">
+				<table style="width: 49%;" class="table_grid floatright">
 					<thead>
 						<tr class="table_head">
 							<th scope="col">
