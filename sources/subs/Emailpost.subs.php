@@ -202,7 +202,7 @@ function pbe_fix_email_quotes($body, $html)
 
 			// A line between two = quote or descending quote levels,
 			// probably an email break so join (wrap) it back up and continue
-			if (($level_prev !==0) && ($level_prev >= $level_next && $level_next !== 0))
+			if (($level_prev !== 0) && ($level_prev >= $level_next && $level_next !== 0))
 			{
 				$body_array[$i - 1] .= ' ' . $body_array[$i];
 				unset($body_array[$i]);
@@ -1066,7 +1066,7 @@ function query_load_user_info($email)
 		$pbe['user_info']['username'] = isset($pbe['profile']['member_name']) ? $pbe['profile']['member_name'] : '';
 		$pbe['user_info']['name'] = isset($pbe['profile']['real_name']) ? $pbe['profile']['real_name'] : '';
 		$pbe['user_info']['email'] = isset($pbe['profile']['email_address']) ? $pbe['profile']['email_address'] : '';
-		$pbe['user_info']['language'] = empty($pbe['profile']['lngfile']) || empty($modSettings['userLanguage']) ? $language :$pbe['profile']['lngfile'];
+		$pbe['user_info']['language'] = empty($pbe['profile']['lngfile']) || empty($modSettings['userLanguage']) ? $language : $pbe['profile']['lngfile'];
 	}
 
 	return !empty($pbe) ? $pbe : false;
