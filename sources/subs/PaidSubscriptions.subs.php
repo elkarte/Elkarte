@@ -1238,6 +1238,7 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 	// These variables will be handy, honest ;)
 	$removals = array();
 	$allowed = array();
+	$member = array();
 	$member['id_group'] = 0;
 	$new_id_group = -1;
 	while ($row = $db->fetch_assoc($request))
