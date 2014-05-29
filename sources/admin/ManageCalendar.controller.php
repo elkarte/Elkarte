@@ -192,7 +192,7 @@ class ManageCalendar_Controller extends Action_Controller
 			),
 		);
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		$context['page_title'] = $txt['manage_holidays'];

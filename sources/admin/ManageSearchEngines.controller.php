@@ -338,7 +338,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 			),
 		);
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';
@@ -496,7 +496,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 
 		createToken('admin-sl');
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		// Now determine the actions of the URLs.
@@ -655,7 +655,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 
 		createToken('admin-ss');
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_spider_stats';

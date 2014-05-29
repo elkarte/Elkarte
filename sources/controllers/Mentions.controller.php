@@ -171,7 +171,7 @@ class Mentions_Controller extends Action_Controller
 		is_not_guest();
 
 		require_once(SUBSDIR . '/Mentions.subs.php');
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		loadLanguage('Mentions');
 
 		$this->_buildUrl();

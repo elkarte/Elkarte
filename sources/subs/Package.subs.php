@@ -723,7 +723,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 		}
 
 		// Create the list for display.
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		// If we just restored permissions then whereever we are, we are now done and dusted.

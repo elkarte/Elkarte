@@ -534,7 +534,7 @@ class ManageAttachments_Controller extends Action_Controller
 		);
 
 		// Create the list.
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 	}
 
@@ -1426,7 +1426,7 @@ class ManageAttachments_Controller extends Action_Controller
 				),
 			),
 		);
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		if (!empty($modSettings['attachment_basedirectories']))

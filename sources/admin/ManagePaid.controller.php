@@ -410,7 +410,7 @@ class ManagePaid_Controller extends Action_Controller
 			),
 		);
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';
@@ -757,7 +757,7 @@ class ManagePaid_Controller extends Action_Controller
 			),
 		);
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';

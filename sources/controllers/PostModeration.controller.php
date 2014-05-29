@@ -318,7 +318,7 @@ class PostModeration_Controller extends Action_Controller
 			}
 		}
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		$listOptions = array(

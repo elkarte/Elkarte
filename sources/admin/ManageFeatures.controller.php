@@ -846,7 +846,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 		createToken('admin-scp');
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		require_once(SUBSDIR . '/ManageFeatures.subs.php');
 
 		// Create a listing for all our standard fields

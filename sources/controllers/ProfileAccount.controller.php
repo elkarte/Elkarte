@@ -225,7 +225,7 @@ class ProfileAccount_Controller extends Action_Controller
 		$context['page_title'] = $txt['profile_issue_warning'];
 
 		// Let's use a generic list to get all the current warnings
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		require_once(SUBSDIR . '/Profile.subs.php');
 
 		// Work our the various levels.

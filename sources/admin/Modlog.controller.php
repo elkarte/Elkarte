@@ -156,7 +156,7 @@ class Modlog_Controller extends Action_Controller
 			}
 		}
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 
 		// This is all the information required for a moderation/admin log listing.
 		$listOptions = array(

@@ -148,7 +148,7 @@ class ManageLanguages_Controller extends Action_Controller
 				),
 			);
 
-			require_once(SUBSDIR . '/List.class.php');
+			require_once(SUBSDIR . '/GenericList.class.php');
 			createList($listOptions);
 		}
 
@@ -280,7 +280,7 @@ class ManageLanguages_Controller extends Action_Controller
 				'class' => 'smalltext alert',
 			);
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';
@@ -619,7 +619,7 @@ class ManageLanguages_Controller extends Action_Controller
 		if (!empty($modSettings['cache_enable']))
 			cache_put_data('known_languages', null, !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600);
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		createToken('admin-dlang');
