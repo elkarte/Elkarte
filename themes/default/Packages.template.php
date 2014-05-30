@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -143,11 +143,11 @@ function template_view_package()
 			<table class="table_grid">
 			<thead>
 				<tr class="table_head">
-					<th scope="col" style="width:20px"></th>
-					<th scope="col" style="width:30px"></th>
+					<th scope="col" style="width: 20px;"></th>
+					<th scope="col" style="width: 30px;"></th>
 					<th scope="col" class="lefttext">', $txt['package_install_type'], '</th>
-					<th scope="col" class="lefttext" style="width:50%">', $txt['package_install_action'], '</th>
-					<th scope="col" class="lefttext" style="width:20%">', $txt['package_install_desc'], '</th>
+					<th scope="col" class="lefttext" style="width: 50%;">', $txt['package_install_action'], '</th>
+					<th scope="col" class="lefttext" style="width: 20%;">', $txt['package_install_desc'], '</th>
 				</tr>
 			</thead>
 			<tbody>';
@@ -188,12 +188,12 @@ function template_view_package()
 
 					echo '
 							<tr class="windowbg', $alternate2 ? '' : '2', '">
-								<td style="width:0"></td>
-								<td style="width:30px" class="smalltext"><a href="' . $scripturl . '?action=admin;area=packages;sa=showoperations;operation_key=', $operation['operation_key'], ';package=', $context['filename'], ';filename=', $operation['filename'], ($operation['is_boardmod'] ? ';boardmod' : ''), (!empty($context['uninstalling']) ? ';reverse' : ''), '" onclick="return reqWin(this.href, 680, 400, false);"><img src="', $settings['default_images_url'], '/admin/package_ops.png" alt="" /></a></td>
-								<td style="width:30px" class="smalltext">', $operation_num, '.</td>
-								<td style="width:23%" class="smalltext">', $txt[$operation_text], '</td>
-								<td style="width:50%" class="smalltext">', $operation['action'], '</td>
-								<td style="width:20%" class="smalltext">', $operation['description'], !empty($operation['ignore_failure']) ? ' (' . $txt['operation_ignore'] . ')' : '', '</td>
+								<td style="width:0;"></td>
+								<td style="width: 30px;" class="smalltext"><a href="' . $scripturl . '?action=admin;area=packages;sa=showoperations;operation_key=', $operation['operation_key'], ';package=', $context['filename'], ';filename=', $operation['filename'], ($operation['is_boardmod'] ? ';boardmod' : ''), (!empty($context['uninstalling']) ? ';reverse' : ''), '" onclick="return reqWin(this.href, 680, 400, false);"><img src="', $settings['default_images_url'], '/admin/package_ops.png" alt="" /></a></td>
+								<td style="width: 30px;" class="smalltext">', $operation_num, '.</td>
+								<td style="width: 23%;" class="smalltext">', $txt[$operation_text], '</td>
+								<td style="width: 50%;" class="smalltext">', $operation['action'], '</td>
+								<td style="width: 20%;" class="smalltext">', $operation['description'], !empty($operation['ignore_failure']) ? ' (' . $txt['operation_ignore'] . ')' : '', '</td>
 							</tr>';
 
 					$operation_num++;
@@ -258,12 +258,12 @@ function template_view_package()
 					echo '
 					<tr class="windowbg', $alternate ? '' : '2', '">
 						<td>', isset($packageaction['operations']) ? '<img id="operation_img_' . $action_num . '" src="' . $settings['images_url'] . '/selected_open.png" alt="*" style="display: none;" />' : '', '</td>
-						<td class="centertext" style="width:30px">
+						<td class="centertext" style="width: 30px;">
 							<input type="checkbox" name="theme_changes[]" value="', !empty($action['value']) ? $action['value'] : '', '" id="dummy_theme_', $id, '" class="input_check" ', (!empty($action['not_mod']) ? '' : 'disabled="disabled"'), ' ', !empty($context['themes_locked']) ? 'checked="checked"' : '', '/>
 						</td>
 						<td>', $action['type'], '</td>
-						<td style="width:50%">', $action['action'], '</td>
-						<td style="width:20%"><strong>', $action['description'], '</strong></td>
+						<td style="width: 50%;">', $action['action'], '</td>
+						<td style="width: 20%;"><strong>', $action['description'], '</strong></td>
 					</tr>';
 
 					// Is there water on the knee? Operation!
@@ -284,11 +284,11 @@ function template_view_package()
 							echo '
 								<tr class="windowbg', $alternate2 ? '' : '2', '">
 									<td style="width:0"></td>
-									<td style="width:30px" class="smalltext"><a href="' . $scripturl . '?action=admin;area=packages;sa=showoperations;operation_key=', $operation['operation_key'], ';package=', $context['filename'], ';filename=', $operation['filename'], ($operation['is_boardmod'] ? ';boardmod' : ''), (!empty($context['uninstalling']) ? ';reverse' : ''), '" onclick="return reqWin(this.href, 600, 400, false);"><img src="', $settings['default_images_url'], '/admin/package_ops.png" alt="" /></a></td>
-									<td style="width:30px" class="smalltext">', $operation_num, '.</td>
-									<td style="width:23%" class="smalltext">', $txt[$operation_text], '</td>
-									<td style="width:50%" class="smalltext">', $operation['action'], '</td>
-									<td style="width:20%" class="smalltext">', $operation['description'], !empty($operation['ignore_failure']) ? ' (' . $txt['operation_ignore'] . ')' : '', '</td>
+									<td style="width: 30px;" class="smalltext"><a href="' . $scripturl . '?action=admin;area=packages;sa=showoperations;operation_key=', $operation['operation_key'], ';package=', $context['filename'], ';filename=', $operation['filename'], ($operation['is_boardmod'] ? ';boardmod' : ''), (!empty($context['uninstalling']) ? ';reverse' : ''), '" onclick="return reqWin(this.href, 600, 400, false);"><img src="', $settings['default_images_url'], '/admin/package_ops.png" alt="" /></a></td>
+									<td style="width: 30px;" class="smalltext">', $operation_num, '.</td>
+									<td style="width: 23%;" class="smalltext">', $txt[$operation_text], '</td>
+									<td style="width: 50%;" class="smalltext">', $operation['action'], '</td>
+									<td style="width: 20%;" class="smalltext">', $operation['description'], !empty($operation['ignore_failure']) ? ' (' . $txt['operation_ignore'] . ')' : '', '</td>
 								</tr>';
 							$operation_num++;
 							$alternate2 = !$alternate2;
@@ -544,7 +544,7 @@ function template_browse()
 
 	if (!$adds_available)
 		echo '
-		<div class="information">', $context['sub_action'] == 'browse' ? $txt['no_packages'] : $txt['no_adds_installed'], '</div>';
+		<div class="infobox">', $context['sub_action'] == 'browse' ? $txt['no_packages'] : $txt['no_adds_installed'], '</div>';
 
 	echo '
 	</div>';
@@ -673,7 +673,7 @@ function template_control_chmod()
 
 	if (empty($context['package_ftp']['form_elements_only']))
 		echo '
-					<div class="righttext">
+					<div class="submitbutton">
 						<span id="test_ftp_placeholder_full"></span>
 						<input type="submit" value="', $txt['package_proceed'], '" class="right_submit" />
 					</div>';
@@ -700,10 +700,8 @@ function template_control_chmod()
 	// ]]></script>';
 
 	// Make sure the button gets generated last.
-	$context['insert_after_template'] .= '
-	<script><!-- // --><![CDATA[
-		generateFTPTest();
-	// ]]></script>';
+	addInlineJavascript('
+		generateFTPTest();', true);
 }
 
 /**
@@ -1065,7 +1063,7 @@ function template_file_permissions()
 				<div class="information">', $txt['package_file_perms_ftp_retain'], '</div>';
 
 	echo '
-				<span id="test_ftp_placeholder_full"></span>
+				<span id="test_ftp_placeholder_full" class="submitbutton"></span>
 				<input type="hidden" name="action_changes" value="1" />
 				<input type="submit" value="', $txt['package_file_perms_go'], '" name="go" class="right_submit" />
 			</div>
@@ -1145,7 +1143,7 @@ function template_permission_show_contents($ident, $contents, $level, $has_more 
 	if ($has_more)
 		echo '
 	<tr class="windowbg" id="content_', $js_ident, '_more">
-		<td class="smalltext" style="width:40%">' . str_repeat('&nbsp;', $level * 5), '
+		<td class="smalltext" style="width: 40%;">' . str_repeat('&nbsp;', $level * 5), '
 			&#171; <a href="' . $scripturl . '?action=admin;area=packages;sa=perms;find=' . base64_encode($ident) . ';fileoffset=', ($context['file_offset'] + $context['file_limit']), ';' . $context['session_var'] . '=' . $context['session_id'] . '#fol_' . preg_replace('~[^A-Za-z0-9_\-=:]~', ':-:', $ident) . '">', $txt['package_file_perms_more_files'], '</a> &#187;
 		</td>
 		<td colspan="6"></td>

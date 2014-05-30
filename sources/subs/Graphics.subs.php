@@ -17,7 +17,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -113,7 +113,7 @@ function checkImageContents($fileName, $extensiveCheck = false)
 		if (!empty($extensiveCheck))
 		{
 			// Paranoid check. Some like it that way.
-			if (preg_match('~(iframe|\\<\\?|\\<%|html|eval|body|script\W|[CF]WS[\x01-\x0C])~i', $prev_chunk . $cur_chunk) === 1)
+			if (preg_match('~(iframe|\\<\\?|\\<%|html|eval|body|script\W|(?-i)[CFZ]WS[\x01-\x0E])~i', $prev_chunk . $cur_chunk) === 1)
 			{
 				fclose($fp);
 				return false;
@@ -122,7 +122,7 @@ function checkImageContents($fileName, $extensiveCheck = false)
 		else
 		{
 			// Check for potential infection
-			if (preg_match('~(iframe|(?<!cellTextIs)html|eval|body|script\W|[CF]WS[\x01-\x0C])~i', $prev_chunk . $cur_chunk) === 1)
+			if (preg_match('~(iframe|(?<!cellTextIs)html|eval|body|script\W|(?-i)[CFZ]WS[\x01-\x0E])~i', $prev_chunk . $cur_chunk) === 1)
 			{
 				fclose($fp);
 				return false;
@@ -479,6 +479,7 @@ if (!function_exists('imagecreatefrombmp'))
 	 * It is set only if it doesn't already exist (for forwards compatiblity.)
 	 *
 	 * - It only supports uncompressed bitmaps.
+	 * - It only supports standard windows bitmaps (no os/2 varients)
 	 * - Returns an image identifier representing the bitmap image
 	 * obtained from the given filename.
 	 *
@@ -494,33 +495,41 @@ if (!function_exists('imagecreatefrombmp'))
 
 		$errors = error_reporting(0);
 
+		// Unpack the general information about the Bitmap Image File, first 14 Bytes
 		$header = unpack('vtype/Vsize/Vreserved/Voffset', fread($fp, 14));
+
+		// Upack the DIB header, it stores detailed information about the bitmap image the pixel format, 40 Bytes long
 		$info = unpack('Vsize/Vwidth/Vheight/vplanes/vbits/Vcompression/Vimagesize/Vxres/Vyres/Vncolor/Vcolorimportant', fread($fp, 40));
 
-		// Not a bitmap, bail out
+		// Not a standard bitmap, bail out
 		if ($header['type'] != 0x4D42)
-			false;
+			return false;
 
-		// Which method shall we use
+		// Create our image canvas with the given WxH
 		if ($gd2)
 			$dst_img = imagecreatetruecolor($info['width'], $info['height']);
 		else
 			$dst_img = imagecreate($info['width'], $info['height']);
 
-		$palette_size = $header['offset'] - 54;
-		$info['ncolor'] = $palette_size / 4;
-
-		$palette = array();
-
-		$palettedata = fread($fp, $palette_size);
-		$n = 0;
-		for ($j = 0; $j < $palette_size; $j++)
+		// Color bitCounts 1,4,8 have palette information we use
+		if ($info['bits'] == 1 || $info['bits'] == 4 || $info['bits'] == 8)
 		{
-			$b = ord($palettedata[$j++]);
-			$g = ord($palettedata[$j++]);
-			$r = ord($palettedata[$j++]);
+			$palette_size = $header['offset'] - 54;
 
-			$palette[$n++] = imagecolorallocate($dst_img, $r, $g, $b);
+			// Read the palette data
+			$palettedata = fread($fp, $palette_size);
+
+			// Create the rgb color array
+			$palette = array();
+			$n = 0;
+			for ($j = 0; $j < $palette_size; $j++)
+			{
+				$b = ord($palettedata[$j++]);
+				$g = ord($palettedata[$j++]);
+				$r = ord($palettedata[$j++]);
+
+				$palette[$n++] = imagecolorallocate($dst_img, $r, $g, $b);
+			}
 		}
 
 		$scan_line_size = ($info['bits'] * $info['width'] + 7) >> 3;
@@ -617,6 +626,7 @@ if (!function_exists('imagecreatefrombmp'))
 				for ($j = 0; $j < $scan_line_size; $x++)
 					imagesetpixel($dst_img, $x, $y, $palette[ord($scan_line[$j++])]);
 			}
+			// 4 bits per pixel
 			elseif ($info['bits'] == 4)
 			{
 				$x = 0;
@@ -629,7 +639,7 @@ if (!function_exists('imagecreatefrombmp'))
 						imagesetpixel($dst_img, $x, $y, $palette[$byte & 15]);
 				}
 			}
-			// 1 bit, b/w
+			// 1 bit
 			elseif ($info['bits'] == 1)
 			{
 				$x = 0;
@@ -820,7 +830,8 @@ function showCodeImage($code)
 		$foreground_color[$i] = mt_rand(max($foreground_color[$i] - 3, 0), min($foreground_color[$i] + 3, 255));
 	$fg_color = imagecolorallocate($code_image, $foreground_color[0], $foreground_color[1], $foreground_color[2]);
 
-	// Color for the dots.
+	// Color for the noise dots.
+	$dotbgcolor = array();
 	for ($i = 0; $i < 3; $i++)
 		$dotbgcolor[$i] = $background_color[$i] < $foreground_color[$i] ? mt_rand(0, max($foreground_color[$i] - 20, 0)) : mt_rand(min($foreground_color[$i] + 20, 255), 255);
 	$randomness_color = imagecolorallocate($code_image, $dotbgcolor[0], $dotbgcolor[1], $dotbgcolor[2]);

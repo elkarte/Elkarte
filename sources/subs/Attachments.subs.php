@@ -16,7 +16,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -148,14 +148,14 @@ function automanage_attachments_create_directory($updir)
 	$tree = get_directory_tree_elements($updir);
 	$count = count($tree);
 
-	$directory = attachments_init_dir($tree, $count);
+	$directory = !empty($tree) ? attachments_init_dir($tree, $count) : false;
 	if ($directory === false)
 	{
 		// Maybe it's just the folder name
 		$tree = get_directory_tree_elements(BOARDDIR . DIRECTORY_SEPARATOR . $updir);
 		$count = count($tree);
 
-		$directory = attachments_init_dir($tree, $count);
+		$directory = !empty($tree) ? attachments_init_dir($tree, $count) : false;
 		if ($directory === false)
 			return false;
 	}
@@ -468,6 +468,7 @@ function processAttachments($id_msg = null)
 			$_SESSION['temp_attachments'][$attachID] = array(
 				'name' => htmlspecialchars(basename($_FILES['attachment']['name'][$n]), ENT_COMPAT, 'UTF-8'),
 				'tmp_name' => $destName,
+				'attachid' => $attachID,
 				'size' => $_FILES['attachment']['size'][$n],
 				'type' => $_FILES['attachment']['type'][$n],
 				'id_folder' => $modSettings['currentAttachmentUploadDir'],
@@ -532,6 +533,36 @@ function processAttachments($id_msg = null)
 	//   errors => An array of errors (use the index of the $txt variable for that error).
 	// Template changes can be done using "integrate_upload_template".
 	call_integration_hook('integrate_attachment_upload');
+}
+
+/**
+ * Deletes a temporary attachment from the $_SESSION (and the filesystem)
+ *
+ * @package Attachments
+ * @param string $attach_id the temporary name generated when a file is uploaded
+ *               and used in $_SESSION to help identify the attachment itself
+ */
+function removeTempAttachById($attach_id)
+{
+	foreach ($_SESSION['temp_attachments'] as $attachID => $attach)
+	{
+		if ($attachID === $attach_id)
+		{
+			// This file does exist, so lets terminate it!
+			if (file_exists($attach['tmp_name']))
+			{
+				@unlink($attach['tmp_name']);
+				unset($_SESSION['temp_attachments'][$attachID]);
+
+				return true;
+			}
+			// Nope can't delete it if we can't find it
+			else
+				return 'attachment_not_found';
+		}
+	}
+
+	return 'attachment_not_found';
 }
 
 /**
@@ -818,7 +849,7 @@ function createAttachment(&$attachmentOptions)
 
 	// Get the hash if no hash has been given yet.
 	if (empty($attachmentOptions['file_hash']))
-		$attachmentOptions['file_hash'] = getAttachmentFilename($attachmentOptions['name'], false, null, true);
+		$attachmentOptions['file_hash'] = getAttachmentFilename($attachmentOptions['name'], 0, null, true);
 
 	// Assuming no-one set the extension let's take a look at it.
 	if (empty($attachmentOptions['fileext']))
@@ -887,7 +918,7 @@ function createAttachment(&$attachmentOptions)
 
 			$thumb_filename = $attachmentOptions['name'] . '_thumb';
 			$thumb_size = filesize($attachmentOptions['destination'] . '_thumb');
-			$thumb_file_hash = getAttachmentFilename($thumb_filename, false, null, true);
+			$thumb_file_hash = getAttachmentFilename($thumb_filename, 0, null, true);
 			$thumb_path = $attachmentOptions['destination'] . '_thumb';
 
 			// We should check the file size and count here since thumbs are added to the existing totals.
@@ -1090,7 +1121,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 	removeAttachments(array('id_member' => $memID));
 
 	$id_folder = getAttachmentPathID();
-	$avatar_hash = empty($modSettings['custom_avatar_enabled']) ? getAttachmentFilename($destName, false, null, true) : '';
+	$avatar_hash = empty($modSettings['custom_avatar_enabled']) ? getAttachmentFilename($destName, 0, null, true) : '';
 	$db->insert('',
 		'{db_prefix}attachments',
 		array(
@@ -1540,7 +1571,7 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 			$thumb_mime = 'image/' . $thumb_ext;
 
 		$thumb_filename = $filename . '_thumb';
-		$thumb_hash = getAttachmentFilename($thumb_filename, false, null, true);
+		$thumb_hash = getAttachmentFilename($thumb_filename, 0, null, true);
 
 		$db = database();
 
@@ -1627,7 +1658,7 @@ function attachmentsSizeForMessage($id_msg, $include_count = true)
  * This loads an attachment's contextual data including, most importantly, its size if it is an image.
  *
  * What it does:
- *  - Pre-condition: $attachments array to have been filled with the proper attachment data, as Display() does.
+ * - Pre-condition: $attachments array to have been filled with the proper attachment data, as Display() does.
  * - It requires the view_attachments permission to calculate image size.
  * - It attempts to keep the "aspect ratio" of the posted image in line, even if it has to be resized by
  * the max_image_width and max_image_height settings.

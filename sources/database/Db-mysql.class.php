@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -78,7 +78,7 @@ class Database_MySQL implements Database
 		if (empty($db_options['dont_select_db']))
 			$connection = @mysqli_connect((!empty($db_options['persist']) ? 'p:' : '') . $db_server, $db_user, $db_passwd, $db_name, $db_port);
 		else
-			$connection = @mysqli_connect((!empty($db_options['persist']) ? 'p:' : '') . $db_server, $db_user, $db_passwd, "", $db_port);
+			$connection = @mysqli_connect((!empty($db_options['persist']) ? 'p:' : '') . $db_server, $db_user, $db_passwd, '', $db_port);
 
 		// Something's wrong, show an error if its fatal (which we assume it is)
 		if (!$connection)
@@ -267,7 +267,7 @@ class Database_MySQL implements Database
 	 *
 	 * @param string $identifier
 	 * @param string $db_string
-	 * @param mixed[] $db_values = array()
+	 * @param mixed[]|false $db_values = array()
 	 * @param resource|false|null $connection = null
 	 */
 	public function query($identifier, $db_string, $db_values = array(), $connection = null)
@@ -1058,7 +1058,7 @@ class Database_MySQL implements Database
 			// Ensure the columns are in proper order.
 			ksort($columns);
 
-			$schema_create .= ',' . $crlf . ' ' . $keyname . ' (' . implode($columns, ', ') . ')';
+			$schema_create .= ',' . $crlf . ' ' . $keyname . ' (' . implode(', ', $columns) . ')';
 		}
 
 		// Now just get the comment and type... (MyISAM, etc.)

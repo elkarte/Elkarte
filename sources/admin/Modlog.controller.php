@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -93,7 +93,7 @@ class Modlog_Controller extends Action_Controller
 
 		// Do the column stuff!
 		$sort_types = array(
-			'action' =>'lm.action',
+			'action' => 'lm.action',
 			'time' => 'lm.log_time',
 			'member' => 'mem.real_name',
 			'group' => 'mg.group_name',
@@ -156,7 +156,7 @@ class Modlog_Controller extends Action_Controller
 			}
 		}
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 
 		// This is all the information required for a moderation/admin log listing.
 		$listOptions = array(
@@ -278,6 +278,7 @@ class Modlog_Controller extends Action_Controller
 			),
 			'additional_rows' => array(
 				array(
+					'class' => 'submitbutton',
 					'position' => 'below_table_data',
 					'value' => '
 						<div id="quick_log_search">
@@ -288,7 +289,6 @@ class Modlog_Controller extends Action_Controller
 							<input type="submit" name="remove" value="' . $txt['modlog_remove'] . '" onclick="return confirm(\'' . $txt['modlog_remove_selected_confirm'] . '\');" class="right_submit" />
 							<input type="submit" name="removeall" value="' . $txt['modlog_removeall'] . '" onclick="return confirm(\'' . $txt['modlog_remove_all_confirm'] . '\');" class="right_submit" />' : '') . '
 						</div>',
-					'class' => 'floatright',
 				),
 			),
 		);

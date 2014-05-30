@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Payment Gateway: authorize
+ * Payment Gateway: Authorize
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -23,7 +23,7 @@ if (!defined('ELK'))
  *
  * @package Subscriptions
  */
-class authorize_display
+class Authorize_Display
 {
 	/**
 	 * Title of this payment gateway
@@ -125,14 +125,8 @@ class authorize_display
  *
  * @package Subscriptions
  */
-class authorize_payment
+class Authorize_Payment
 {
-	/**
-	 * Holds our return results
-	 * @var array
-	 */
-	private $return_data;
-
 	/**
 	 * Validates that we have valid data to work with
 	 *
@@ -157,10 +151,7 @@ class authorize_payment
 			return false;
 
 		// And a response?
-		if (empty($_POST['x_response_code']))
-			return false;
-
-		return true;
+		return !empty($_POST['x_response_code']);
 	}
 
 	/**
@@ -208,11 +199,26 @@ class authorize_payment
 	}
 
 	/**
-	 * Returns if this is a normal payment.
+	 * Returns if this is a normal valid approved payment.
+	 *
+	 * If a transaction is approved x_response_code will contain a value of 1.
+	 * If the card is declined x_response_code will contain a value of 2.
+	 * If there was an error the card is expired x_response_code will contain a value of 3.
+	 * If the transaction is held for review x_response_code will contain a value of 4.
 	 */
 	public function isPayment()
 	{
 		return $_POST['x_response_code'] == 1;
+	}
+
+	/**
+	 * Returns if this is this is a cancellation transaction
+	 *
+	 * @return boolean
+	 */
+	public function isCancellation()
+	{
+		return false;
 	}
 
 	/**

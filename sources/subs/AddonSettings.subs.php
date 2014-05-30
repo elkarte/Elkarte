@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -105,7 +105,12 @@ function list_integration_hooks_data($start, $per_page, $sort)
 
 						if (substr($hook, -8) === '_include')
 						{
-							$hook_status[$hook][$function]['exists'] = file_exists(parse_path(trim($function)));
+							$real_path = parse_path(trim($hook_name));
+
+							if ($real_path == $hook_name)
+								$hook_status[$hook][$hook_name]['exists'] = false;
+							else
+								$hook_status[$hook][$hook_name]['exists'] = file_exists(parse_path(ltrim($real_path, '|')));
 
 							// I need to know if there is at least one function called in this file.
 							$temp_data['include'][basename($function)] = array('hook' => $hook, 'function' => $function);

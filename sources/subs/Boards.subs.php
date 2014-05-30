@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -2094,7 +2094,7 @@ function boardNotifications($start, $items_per_page, $sort, $memID)
  * Count boards all or specific depending on argument, redirect boards excluded by default.
  *
  * @package Boards
- * @param mixed[] $conditions is an associative array that holds the board or the cat IDs
+ * @param mixed[]|string $conditions is an associative array that holds the board or the cat IDs
  *              'categories' => an array of category IDs (it accepts a single ID too)
  *              'boards' => an array of board IDs (it accepts a single ID too)
  *              if conditions is set to 'all' (not an array) all the boards are queried

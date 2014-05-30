@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -170,7 +170,7 @@ class ManageNews_Controller extends Action_Controller
 		}
 
 		// We're going to want this for making our list.
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		require_once(SUBSDIR . '/News.subs.php');
 
 		$context['page_title'] = $txt['admin_edit_news'];
@@ -231,11 +231,12 @@ class ManageNews_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'bottom_of_list',
+					'class' => 'submitbutton',
 					'value' => '
 					<input type="submit" name="save_items" value="' . $txt['save'] . '" class="right_submit" />
 					<input type="submit" name="delete_selection" value="' . $txt['editnews_remove_selected'] . '" onclick="return confirm(\'' . $txt['editnews_remove_confirm'] . '\');" class="right_submit" />
 					<span id="moreNewsItems_link" style="display: none;">
-						<a class="linkbutton_right" href="javascript:void(0);" onclick="addAnotherNews(); return false;">' . $txt['editnews_clickadd'] . '</a>
+						<a class="linkbutton" href="javascript:void(0);" onclick="addAnotherNews(); return false;">' . $txt['editnews_clickadd'] . '</a>
 					</span>',
 				),
 			),
@@ -291,8 +292,11 @@ class ManageNews_Controller extends Action_Controller
 		$groups = $allgroups['groups'];
 
 		// All of the members in post based and member based groups
+		$pg = array();
 		foreach ($allgroups['postgroups'] as $postgroup)
 			$pg[] = $postgroup['id'];
+
+		$mg = array();
 		foreach ($allgroups['membergroups'] as $membergroup)
 			$mg[] = $membergroup['id'];
 
@@ -882,7 +886,7 @@ class ManageNews_Controller extends Action_Controller
 	private function _initNewsSettingsForm()
 	{
 		// We're working with them settings here.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Instantiate the form
 		$this->_newsSettings = new Settings_Form();

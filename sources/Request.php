@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -135,7 +135,7 @@ class Request
 
 			// Just incase we have a legacy IPv4 address.
 			// @ TODO: Convert to IPv6.
-			if (preg_match('~^((([1]?\d)?\d|2[0-4]\d|25[0-5])\.){3}(([1]?\d)?\d|2[0-4]\d|25[0-5])$~', $this->_client_ip) === 0)
+			if (filter_var($this->_client_ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false)
 				$this->_client_ip = 'unknown';
 		}
 		else
@@ -187,7 +187,7 @@ class Request
 		}
 
 		// Some final checking.
-		if (preg_match('~^((([1]?\d)?\d|2[0-4]\d|25[0-5])\.){3}(([1]?\d)?\d|2[0-4]\d|25[0-5])$~', $this->_ban_ip) === 0 && !isValidIPv6($this->_ban_ip))
+		if (filter_var($this->_ban_ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false && !isValidIPv6($this->_ban_ip))
 			$this->_ban_ip = '';
 
 		if ($this->_client_ip == 'unknown')

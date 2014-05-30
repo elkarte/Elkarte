@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -549,6 +549,7 @@ class Register_Controller extends Action_Controller
 
 		loadLanguage('Login');
 		loadTemplate('Login');
+		loadJavascriptFile('sha256.js', array('defer' => true));
 
 		if (empty($_REQUEST['u']) && empty($_POST['user']))
 		{

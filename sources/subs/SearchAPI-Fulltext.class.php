@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -31,7 +31,7 @@ class Fulltext_Search extends SearchAPI
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
 	 * @var string
 	 */
-	public $version_compatible = 'ElkArte 1.0 Beta 2';
+	public $version_compatible = 'ElkArte 1.0 RC 1';
 
 	/**
 	 * This won't work with versions of ElkArte less than this.
@@ -198,14 +198,14 @@ class Fulltext_Search extends SearchAPI
 				// short which would also be ignored
 				if ((Util::strlen(current($subwords)) < $this->min_word_length) && (Util::strlen(next($subwords)) < $this->min_word_length))
 				{
-					$wordsSearch['words'][] = trim($word, "/*- ");
+					$wordsSearch['words'][] = trim($word, '/*- ');
 					$wordsSearch['complex_words'][] = count($subwords) === 1 ? $word : '"' . $word . '"';
 				}
 			}
-			elseif (Util::strlen(trim($word, "/*- ")) < $this->min_word_length)
+			elseif (Util::strlen(trim($word, '/*- ')) < $this->min_word_length)
 			{
 				// Short words have feelings too
-				$wordsSearch['words'][] = trim($word, "/*- ");
+				$wordsSearch['words'][] = trim($word, '/*- ');
 				$wordsSearch['complex_words'][] = count($subwords) === 1 ? $word : '"' . $word . '"';
 			}
 		}

@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -40,7 +40,7 @@ class AdminLog_Controller extends Action_Controller
 		global $context, $txt, $scripturl, $modSettings;
 
 		// We're working with them settings here.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// These are the logs they can load.
 		$log_functions = array(
@@ -117,7 +117,7 @@ class AdminLog_Controller extends Action_Controller
 		call_integration_hook('integrate_manage_logs', array(&$log_functions));
 
 		$sub_action = isset($_REQUEST['sa']) && isset($log_functions[$_REQUEST['sa']]) && empty($log_functions[$_REQUEST['sa']]['disabled']) ? $_REQUEST['sa'] : 'errorlog';
-		
+
 		// If it's not got a sa set it must have come here for first time, pretend error log should be reversed.
 		if (!isset($_REQUEST['sa']))
 			$_REQUEST['desc'] = true;

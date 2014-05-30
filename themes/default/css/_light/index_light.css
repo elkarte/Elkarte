@@ -87,7 +87,7 @@ legend {
 	margin-left: 15px;
 }
 .collapsed legend {
-	background:  url(../../images/selected.png) no-repeat scroll left center transparent;
+	background: url(../../images/selected.png) no-repeat scroll left center transparent;
 }
 
 input, button, select, textarea, .editor {
@@ -120,9 +120,9 @@ input[disabled].input_text, input[disabled].input_password {
 
 /* Common button styling. */
 /* It is being replaced with three classes: */
-/*    .button_submit is not floated    */
-/*    .right_submit is right floated   */
-/*    .left_submit is left floated     */
+/*    .button_submit is not floated */
+/*    .right_submit is right floated */
+/*    .left_submit is left floated */
 /* The button_reset class may need attention too. */
 .button_submit, .right_submit, .left_submit, .button_reset,
 /* Anchors styled to look like buttons. */
@@ -158,7 +158,7 @@ input[disabled].input_text, input[disabled].input_password {
 	background: #5aa05e;
 	color: #fff;
 }
-/* approval indicator  */
+/* approval indicator */
 .require_approval {
 	border-radius: 4px;
 	background: #f3b200;
@@ -268,7 +268,7 @@ strong {
 	background: #f5f5f5;
 }
 
-/* The generic wrapper thingy.  */
+/* The generic wrapper thingy. */
 .generic_list_wrapper {
 	border: 1px solid #ccc;
 	border-radius: 7px;
@@ -421,7 +421,6 @@ div.bbc_footnotes .meaction{
 	color: #333;
 }
 #search_form select {
-	padding-right: 4px;
 	border: 1px solid #afafaf;
 	border-right: none;
 	opacity: 0.8;
@@ -485,6 +484,12 @@ div.bbc_footnotes .meaction{
 }
 #footer_section p, #footer_section a {
 	color: #bbb;
+}
+#footer_section .rssfeeds {
+	color: orange;
+	background-color: white;
+	border-radius: 0.3em;
+	text-shadow: 1px 1px 0px #000;
 }
 
 .action_viewquery a, .action_viewquery strong,
@@ -590,7 +595,7 @@ div.bbc_footnotes .meaction{
 }
 /* Level 1 active buttons. */
 .linklevel1.active, .listlevel1:hover .active,
-#collapse_button .linklevel1, .pm_indicator {
+#collapse_button .linklevel1, .pm_indicator, .likes_indicator {
 	border: 1px solid #38642e;
 	border-left: 1px solid #38642d;
 	border-top: 1px solid #4b863c;
@@ -622,7 +627,7 @@ div.bbc_footnotes .meaction{
 	color: #eee;
 	text-shadow: 0 4px 0 #3d6e32;
 }
-.admin_menu  .subsections:hover .linklevel1:after {
+.admin_menu .subsections:hover .linklevel1:after {
 	top: 72%;
 	color: #3d6e32;
 	font-size: 1.214em;
@@ -663,7 +668,7 @@ div.bbc_footnotes .meaction{
 }
 /* Tricky PM indicator. Define it carefully,
 /* just in case someone tries to use this class elsewhere. */
-.pm_indicator {
+.pm_indicator, .likes_indicator {
 	position: absolute;
 	top: -1.5em;
 	right: -0.5em;
@@ -678,6 +683,14 @@ div.bbc_footnotes .meaction{
 }
 .poster .pm_indicator {
 	font-size: 1em;
+}
+.likes_indicator {
+	font-size: .857em;
+	border-radius: 4px 4px 4px 0;
+	box-shadow: 2px 2px 2px rgba(0,0,0,0.25);
+	border-radius: 6px 6px 6px 0;
+	line-height: 1.5em;
+	top: -1.2em;
 }
 /* Levels 2 and 3 drop menus: link or button. */
 .linklevel2:link, .linklevel2:visited, .linklevel3:link, .linklevel3:visited {
@@ -880,7 +893,7 @@ div.bbc_footnotes .meaction{
 	background-image: linear-gradient(to bottom, #fcfcfc 0%, #e5e5e5 100%);
 	color: #555;
 }
-.pagelinks .navPages:hover, .pagelinks .current_page  {
+.pagelinks .navPages:hover, .pagelinks .current_page {
 	border: 1px solid #ccc;
 	border-top: 1px solid #afafaf;
 	border-left: 1px solid #afafaf;
@@ -890,7 +903,7 @@ div.bbc_footnotes .meaction{
 	color: #555;
 	text-decoration: none;
 }
-.pagelinks  :first-child {
+.pagelinks :first-child {
 	border-radius: 2px 0 0 2px;
 }
 .pagelinks :last-child {
@@ -973,8 +986,8 @@ div.bbc_footnotes .meaction{
 /*	$BOARDS		*/
 /* ------------------------------------------------------- */
 /* Set up some general framing classes. @todo */
-/*    .forum_category for board index/sub-boards.             */
-/*    .forumposts for thread pages and recent posts, etc.       */
+/*    .forum_category for board index/sub-boards. */
+/*    .forumposts for thread pages and recent posts, etc. */
 /*    .content_category for general divisions around the place. */
 /* All styled the same in default variant, but available for fun and games. */
 
@@ -1127,7 +1140,7 @@ div.bbc_footnotes .meaction{
 /*
 .board_stats {
 	text-align: left;
-	padding: 1px  6px 1px 0;
+	padding: 1px 6px 1px 0;
 	float: left;
 }
 */
@@ -1336,7 +1349,7 @@ div.bbc_footnotes .meaction{
 }
 .drop_area {
 	-webkit-font-smoothing: antialiased;
-	color: rgb(21, 125, 251);
+	color: #444444;
 	background-color: rgb(230, 230, 230);
 	border: dashed 1px #ccc;
 }
@@ -1543,8 +1556,8 @@ div.bbc_footnotes .meaction{
 	background: #ebffd8;
 }
 #main_grid .weeks {
-	font-weight: bold;
-	font-size: 1.786em;
+	font-weight: normal;
+	font-size: 1em;
 }
 #main_grid .weeks a:hover {
 	text-decoration: none;
@@ -1559,8 +1572,8 @@ div.bbc_footnotes .meaction{
 	border: 1px solid #ddd;
 	background: #fff;
 }
-.weeklist h4 {
-	border-right: 2px solid #ddd;
+.weekdays {
+	border-left: 2px solid #ddd;
 }
 .weeklist h4 a:hover {
 	text-decoration: none;
@@ -1789,6 +1802,15 @@ div.bbc_footnotes .meaction{
 	cursor: pointer;
 }
 
+/* alternating window colors */
+.windowbg {
+	background-color: #fcfcfc;
+}
+.windowbg2 {
+	background-color: #efefef;
+}
+
+
 /*	$MEDIA		*/
 /* Experimental media queries.
 /* ------------------------------------------------------- */
@@ -1834,7 +1856,6 @@ div.bbc_footnotes .meaction{
 		font-size: 2em;
 		color: #666;
 		content: attr(data-icon);
-		speak: none;
 	}
 	.indicator[data-icon]:before {
 		color: #5ba048;

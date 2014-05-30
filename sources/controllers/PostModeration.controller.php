@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -42,10 +42,10 @@ class PostModeration_Controller extends Action_Controller
 
 		// Allowed sub-actions, you know the drill by now!
 		$subActions = array(
-			'approve' =>  array($this, 'action_approve'),
-			'attachments' =>  array($this, 'action_unapproved_attachments'),
-			'replies' =>  array($this, 'action_unapproved'),
-			'topics' =>  array($this, 'action_unapproved'),
+			'approve' => array($this, 'action_approve'),
+			'attachments' => array($this, 'action_unapproved_attachments'),
+			'replies' => array($this, 'action_unapproved'),
+			'topics' => array($this, 'action_unapproved'),
 		);
 
 		// Pick something valid...
@@ -172,15 +172,17 @@ class PostModeration_Controller extends Action_Controller
 				}
 
 				if ($can_add)
+				{
 					$anItem = $context['current_view'] == 'topics' ? $row['id_topic'] : $row['id_msg'];
-				$toAction[] = $anItem;
+					$toAction[] = $anItem;
 
-				// All clear. What have we got now, what, what?
-				$details[$anItem] = array();
-				$details[$anItem]["subject"] = $row['subject'];
-				$details[$anItem]["topic"] = $row['id_topic'];
-				$details[$anItem]["member"] = ($context['current_view'] == 'topics') ? $row['id_member_started'] : $row['id_member'];
-				$details[$anItem]["board"] = $row['id_board'];
+					// All clear. What have we got now, what, what?
+					$details[$anItem] = array();
+					$details[$anItem]['subject'] = $row['subject'];
+					$details[$anItem]['topic'] = $row['id_topic'];
+					$details[$anItem]['member'] = ($context['current_view'] == 'topics') ? $row['id_member_started'] : $row['id_member'];
+					$details[$anItem]['board'] = $row['id_board'];
+				}
 			}
 
 			// If we have anything left we can actually do the approving (etc).
@@ -316,7 +318,7 @@ class PostModeration_Controller extends Action_Controller
 			}
 		}
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		$listOptions = array(

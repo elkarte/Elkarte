@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -287,7 +287,7 @@ class ManageBans_Controller extends Action_Controller
 			),
 		);
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 	}
 
@@ -311,6 +311,7 @@ class ManageBans_Controller extends Action_Controller
 
 		$ban_errors = Error_Context::context('ban', 1);
 
+		// Saving a new or edited ban?
 		if ((isset($_POST['add_ban']) || isset($_POST['modify_ban']) || isset($_POST['remove_selection'])) && !$ban_errors->hasErrors())
 			$this->action_edit2();
 
@@ -336,7 +337,7 @@ class ManageBans_Controller extends Action_Controller
 				$context['ban_group_id'] = $ban_group_id;
 
 				// We're going to want this for making our list.
-				require_once(SUBSDIR . '/List.class.php');
+				require_once(SUBSDIR . '/GenericList.class.php');
 
 				// Setup for a createlist
 				$listOptions = array(
@@ -419,18 +420,13 @@ class ManageBans_Controller extends Action_Controller
 					'additional_rows' => array(
 						array(
 							'position' => 'below_table_data',
+							'class' => 'submitbutton',
 							'value' => '
-							<div class="submitbutton">
-								<input type="submit" name="remove_selection" value="' . $txt['ban_remove_selected_triggers'] . '" class="button_submit" />
+								<input type="submit" name="remove_selection" value="' . $txt['ban_remove_selected_triggers'] . '" class="right_submit" />
 								<a class="linkbutton" href="' . $scripturl . '?action=admin;area=ban;sa=edittrigger;bg=' . $ban_group_id . '">' . $txt['ban_add_trigger'] . '</a>
-							</div>',
-						),
-						array(
-							'position' => 'below_table_data',
-							'value' => '
-							<input type="hidden" name="bg" value="' . $ban_group_id . '" />
-							<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
-							<input type="hidden" name="' . $context['admin-bet_token_var'] . '" value="' . $context['admin-bet_token'] . '" />',
+								<input type="hidden" name="bg" value="' . $ban_group_id . '" />
+								<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
+								<input type="hidden" name="' . $context['admin-bet_token_var'] . '" value="' . $context['admin-bet_token'] . '" />',
 						),
 					),
 				);
@@ -498,8 +494,7 @@ class ManageBans_Controller extends Action_Controller
 			}
 		}
 
-		// Template needs this to show errors using javascript
-		loadLanguage('Errors');
+		// Set the right template
 		$context['sub_template'] = 'ban_edit';
 
 		// A couple of text strings we *may* need
@@ -644,6 +639,7 @@ class ManageBans_Controller extends Action_Controller
 			),
 			'additional_rows' => array(
 				array(
+					'class' => 'submitbutton',
 					'position' => 'bottom_of_list',
 					'value' => '
 						<input type="submit" name="removeSelected" value="' . $txt['ban_log_remove_selected'] . '" onclick="return confirm(\'' . $txt['ban_log_remove_selected_confirm'] . '\');" class="right_submit" />
@@ -655,7 +651,7 @@ class ManageBans_Controller extends Action_Controller
 		createToken('admin-bl');
 
 		// Build the list
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		$context['page_title'] = $txt['ban_log'];
@@ -670,6 +666,7 @@ class ManageBans_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Bans.subs.php');
 
+		// Check with security first
 		checkSession();
 		validateToken('admin-bet');
 
@@ -678,6 +675,8 @@ class ManageBans_Controller extends Action_Controller
 		// Adding or editing a ban group
 		if (isset($_POST['add_ban']) || isset($_POST['modify_ban']))
 		{
+			$ban_info = array();
+
 			// Let's collect all the information we need
 			$ban_info['id'] = isset($_REQUEST['bg']) ? (int) $_REQUEST['bg'] : 0;
 			$ban_info['is_new'] = empty($ban_info['id']);
@@ -713,18 +712,28 @@ class ManageBans_Controller extends Action_Controller
 			$context['ban'] = $ban_info;
 		}
 
+		// Update the triggers associated with this ban
 		if (isset($_POST['ban_suggestions']))
 		{
 			$saved_triggers = saveTriggers($_POST['ban_suggestions'], $ban_info['id'], isset($_REQUEST['u']) ? (int) $_REQUEST['u'] : 0, isset($_REQUEST['bi']) ? (int) $_REQUEST['bi'] : 0);
 			$context['ban_suggestions']['saved_triggers'] = $saved_triggers;
 		}
 
-		// Something went wrong somewhere... Oh well, let's go back.
+		// Something went wrong somewhere, ban info or triggers, ... Oh well, let's go back.
 		if ($ban_errors->hasErrors())
 		{
 			$context['ban_suggestions'] = $saved_triggers;
 			$context['ban']['from_user'] = true;
-			$context['ban_suggestions'] = array_merge($context['ban_suggestions'], getMemberData((int) $_REQUEST['u']));
+
+			// They may have entered a name not using the member select box
+			if (isset($_REQUEST['u']))
+				$context['ban_suggestions'] = array_merge($context['ban_suggestions'], getMemberData((int) $_REQUEST['u']));
+			elseif (isset($_REQUEST['user']))
+			{
+				$context['ban']['from_user'] = false;
+				$context['use_autosuggest'] = true;
+				$context['ban_suggestions']['member']['name'] = $_REQUEST['user'];
+			}
 
 			// Not strictly necessary, but it's nice
 			if (!empty($context['ban_suggestions']['member']['id']))
@@ -746,7 +755,9 @@ class ManageBans_Controller extends Action_Controller
 
 		// Update the member table to represent the new ban situation.
 		updateBanMembers();
-		redirectexit('action=admin;area=ban;sa=edit;bg=' . $ban_group_id);
+
+		// Go back to an appropriate spot
+		redirectexit('action=admin;area=ban;sa=' . isset($_POST['add_ban']) ? 'list' : 'edit;bg=' . $ban_group_id);
 	}
 
 	/**
@@ -1082,7 +1093,7 @@ class ManageBans_Controller extends Action_Controller
 		}
 
 		// Create the list.
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 	}
 }

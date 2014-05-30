@@ -147,9 +147,9 @@ $txt['post'] = 'Post';
 $txt['error_occurred'] = 'An Error Has Occurred';
 $txt['send_error_occurred'] = 'An error has occurred, <a href="{href}">please click here to try again</a>.';
 $txt['require_field'] = 'This is a required field.';
-$txt['at'] = 'at';
 $txt['started_by'] = 'Started by author';
-$txt['topic_started_by'] = 'Started by <strong>%1$s</strong> in <em>%2$s</em>';
+$txt['topic_started_by'] = 'Started by %1$s';
+$txt['topic_started_by_in'] = 'Started by %1$s in %2$s';
 $txt['replies'] = 'Replies';
 $txt['last_post'] = 'Last post';
 $txt['first_post'] = 'First post';
@@ -552,7 +552,7 @@ $txt['skip_nav'] = 'Skip to main content';
 $txt['go_up'] = 'Go Up';
 $txt['go_down'] = 'Go Down';
 
-$forum_copyright = '<a href="' . $scripturl . '?action=who;sa=credits" title="ElkArte Forum" target="_blank" class="new_win">%1$s</a> | <a href="https://github.com/elkarte/ElkArte/blob/master/license.md" title="License" target="_blank" class="new_win">ElkArte &copy; 2012 - 2014</a>';
+$forum_copyright = '<a href="http://www.elkarte.net" title="ElkArte Forum" target="_blank" class="new_win">powered by %1$s</a> | <a href="' . $scripturl . '?action=who;sa=credits" title="Credits" target="_blank" class="new_win">credits</a>';
 
 $txt['birthdays'] = 'Birthdays:';
 $txt['events'] = 'Events:';
@@ -692,8 +692,8 @@ $txt['notification_disable_topic'] = 'Are you sure you wish to disable notificat
 $txt['report_to_mod'] = 'Report Post';
 $txt['issue_warning_post'] = 'Issue a warning because of this message';
 
-$txt['like_post'] = 'Like Post';
-$txt['unlike_post'] = 'Unlike Post';
+$txt['like_post'] = 'Like';
+$txt['unlike_post'] = 'Unlike';
 $txt['likes'] = 'Likes';
 $txt['liked_by'] = 'Liked by:';
 $txt['liked_you'] = 'You';
@@ -912,3 +912,6 @@ $txt['dailymotion'] = 'Dailymotion video:';
 $txt['spoiler'] = 'Spoiler (click to show/hide)';
 
 $txt['ok_uppercase'] = 'OK';
+
+// Title of box for warnings that admins should see
+$txt['admin_warning_title'] = 'Warning';

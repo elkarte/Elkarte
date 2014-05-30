@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -219,7 +219,6 @@ class Xml_Controller extends Action_Controller
 		$context['xml_data'] = array();
 		$errors = array();
 		$order = array();
-		$tokens = array();
 
 		// Chances are
 		loadLanguage('Errors');
@@ -255,19 +254,6 @@ class Xml_Controller extends Action_Controller
 			$order[] = array(
 				'value' => $txt['custom_profile_reordered'],
 			);
-
-			// New generic token for use
-			createToken('admin-sort', 'post');
-			$tokens = array(
-				array(
-					'value' => $context['admin-sort_token'],
-					'attributes' => array('type' => 'token'),
-				),
-				array(
-					'value' => $context['admin-sort_token_var'],
-					'attributes' => array('type' => 'token_var'),
-				),
-			);
 		}
 		// Failed validation, tough to be you
 		else
@@ -278,6 +264,19 @@ class Xml_Controller extends Action_Controller
 			if (empty($validation_token))
 				$errors[] = array('value' => $txt['token_verify_fail']);
 		}
+
+		// New generic token for use
+		createToken('admin-sort', 'post');
+		$tokens = array(
+			array(
+				'value' => $context['admin-sort_token'],
+				'attributes' => array('type' => 'token'),
+			),
+			array(
+				'value' => $context['admin-sort_token_var'],
+				'attributes' => array('type' => 'token_var'),
+			),
+		);
 
 		// Return the response
 		$context['sub_template'] = 'generic_xml';
@@ -308,7 +307,6 @@ class Xml_Controller extends Action_Controller
 		$context['xml_data'] = array();
 		$errors = array();
 		$order = array();
-		$tokens = array();
 		$board_tree = array();
 		$board_moved = null;
 
@@ -328,7 +326,7 @@ class Xml_Controller extends Action_Controller
 			if (isset($_POST['order']) && $_POST['order'] === 'reorder' && isset($_POST['moved']))
 			{
 				$list_order = 0;
-				$order = array();
+				$moved_key = 0;
 
 				// What board was drag and dropped?
 				list (, $board_moved,) = explode(',', $_POST['moved']);
@@ -394,7 +392,7 @@ class Xml_Controller extends Action_Controller
 					);
 					$order[] = array('value' => $board_current['name'] . ' ' . $txt['mboards_order_after'] . ' ' . $boards[$board_previous_sibling['id']]['name']);
 				}
-				// no sibling, maybe a new child
+				// No sibling, maybe a new child
 				elseif (isset($board_previous))
 				{
 					$boardOptions = array(
@@ -404,7 +402,7 @@ class Xml_Controller extends Action_Controller
 					);
 					$order[] = array('value' => $board_current['name'] . ' ' . $txt['mboards_order_child_of'] . ' ' . $boards[$board_previous['id']]['name']);
 				}
-				// nothing before this board at all, move to the top of the cat
+				// Nothing before this board at all, move to the top of the cat
 				elseif (!isset($board_previous))
 				{
 					$boardOptions = array(
@@ -430,7 +428,7 @@ class Xml_Controller extends Action_Controller
 			if (empty($validation_token))
 				$errors[] = array('value' => $txt['token_verify_fail']);
 		}
-		
+
 		// New generic token for use
 		createToken('admin-sort', 'post');
 		$tokens = array(
@@ -475,7 +473,6 @@ class Xml_Controller extends Action_Controller
 		$context['xml_data'] = array();
 		$errors = array();
 		$order = array();
-		$tokens = array();
 
 		// Chances are I wear a silly ;D
 		loadLanguage('Errors');
@@ -513,6 +510,9 @@ class Xml_Controller extends Action_Controller
 				{
 					// Read the new ordering, remember where the moved smiley is in the stack
 					$list_order = 0;
+					$moved_key = 0;
+					$smiley_tree = array();
+
 					foreach ($_POST['smile'] as $smile_id)
 					{
 						$smiley_tree[] = $smile_id;
@@ -574,19 +574,6 @@ class Xml_Controller extends Action_Controller
 			}
 			else
 				$errors[] = array('value' => $txt['smileys_moved_fail']);
-
-			// New generic token for use
-			createToken('admin-sort', 'post');
-			$tokens = array(
-				array(
-					'value' => $context['admin-sort_token'],
-					'attributes' => array('type' => 'token'),
-				),
-				array(
-					'value' => $context['admin-sort_token_var'],
-					'attributes' => array('type' => 'token_var'),
-				),
-			);
 		}
 		// Failed validation :'(
 		else
@@ -597,6 +584,19 @@ class Xml_Controller extends Action_Controller
 			if (empty($validation_token))
 				$errors[] = array('value' => $txt['token_verify_fail']);
 		}
+
+		// New generic token for use
+		createToken('admin-sort', 'post');
+		$tokens = array(
+			array(
+				'value' => $context['admin-sort_token'],
+				'attributes' => array('type' => 'token'),
+			),
+			array(
+				'value' => $context['admin-sort_token_var'],
+				'attributes' => array('type' => 'token_var'),
+			),
+		);
 
 		// Return the response, whatever it is
 		$context['sub_template'] = 'generic_xml';
@@ -627,7 +627,6 @@ class Xml_Controller extends Action_Controller
 		$context['xml_data'] = array();
 		$errors = array();
 		$order = array();
-		$tokens = array();
 
 		// Chances are
 		loadLanguage('Errors');
@@ -665,19 +664,6 @@ class Xml_Controller extends Action_Controller
 			$order[] = array(
 				'value' => $txt['parser_reordered'],
 			);
-
-			// New generic token for use
-			createToken('admin-sort', 'post');
-			$tokens = array(
-				array(
-					'value' => $context['admin-sort_token'],
-					'attributes' => array('type' => 'token'),
-				),
-				array(
-					'value' => $context['admin-sort_token_var'],
-					'attributes' => array('type' => 'token_var'),
-				),
-			);
 		}
 		// Failed validation, tough to be you
 		else
@@ -688,6 +674,19 @@ class Xml_Controller extends Action_Controller
 			if (empty($validation_token))
 				$errors[] = array('value' => $txt['token_verify_fail']);
 		}
+
+		// New generic token for use
+		createToken('admin-sort', 'post');
+		$tokens = array(
+			array(
+				'value' => $context['admin-sort_token'],
+				'attributes' => array('type' => 'token'),
+			),
+			array(
+				'value' => $context['admin-sort_token_var'],
+				'attributes' => array('type' => 'token_var'),
+			),
+		);
 
 		// Return the response
 		$context['sub_template'] = 'generic_xml';
@@ -718,7 +717,6 @@ class Xml_Controller extends Action_Controller
 		$context['xml_data'] = array();
 		$errors = array();
 		$order = array();
-		$tokens = array();
 
 		// Seems these will be needed
 		loadLanguage('Errors');
@@ -740,7 +738,6 @@ class Xml_Controller extends Action_Controller
 				$view_order = 0;
 				$iconInsert = array();
 
-
 				// The field ids arrive in 1-n view order, so we simply build an update array
 				foreach ($_POST['list_message_icon_list'] as $id)
 				{
@@ -761,19 +758,6 @@ class Xml_Controller extends Action_Controller
 			$order[] = array(
 				'value' => $txt['icons_reordered'],
 			);
-
-			// New generic token for use
-			createToken('admin-sort', 'post');
-			$tokens = array(
-				array(
-					'value' => $context['admin-sort_token'],
-					'attributes' => array('type' => 'token'),
-				),
-				array(
-					'value' => $context['admin-sort_token_var'],
-					'attributes' => array('type' => 'token_var'),
-				),
-			);
 		}
 		// Failed validation, tough to be you
 		else
@@ -784,6 +768,19 @@ class Xml_Controller extends Action_Controller
 			if (empty($validation_token))
 				$errors[] = array('value' => $txt['token_verify_fail']);
 		}
+
+		// New generic token for use
+		createToken('admin-sort', 'post');
+		$tokens = array(
+			array(
+				'value' => $context['admin-sort_token'],
+				'attributes' => array('type' => 'token'),
+			),
+			array(
+				'value' => $context['admin-sort_token_var'],
+				'attributes' => array('type' => 'token_var'),
+			),
+		);
 
 		// Return the response
 		$context['sub_template'] = 'generic_xml';

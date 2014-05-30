@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -110,7 +110,7 @@ function template_unlinked_event_post()
 				<div id="event_main" class="roundframe">
 					<label for="evtitle"', isset($context['post_error']['no_event']) ? ' class="error"' : '', ' id="caption_evtitle">', $txt['calendar_event_title'], '</label>
 					<input type="text" id="evtitle" name="evtitle" maxlength="255" size="55" value="', $context['event']['title'], '" tabindex="', $context['tabindex']++, '" class="input_text" />
-					<div class="smalltext" id="datepicker">
+					<div id="datepicker">
 						<input type="hidden" name="calendar" value="1" /><label for="year">', $txt['calendar_year'], '</label>
 						<select name="year" id="year" tabindex="', $context['tabindex']++, '" onchange="generateDays();">';
 
@@ -219,23 +219,30 @@ function template_show_month_grid($grid_name)
 
 		if (empty($calendar_data['previous_calendar']['disabled']) && $calendar_data['show_next_prev'])
 			echo '
-					<a href="', $calendar_data['previous_calendar']['href'], '" class="previous_month">&#171;</a>';
+					<a href="', $calendar_data['previous_calendar']['href'], '" class="previous_month">
+						<span class="fa-stack"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-chevron-left fa-stack-1x"></i></span>
+					</a>';
 
 		if (empty($calendar_data['next_calendar']['disabled']) && $calendar_data['show_next_prev'])
 			echo '
-					<a href="', $calendar_data['next_calendar']['href'], '" class="next_month">&#187;</a>';
+					<a href="', $calendar_data['next_calendar']['href'], '" class="next_month">
+						<span class="fa-stack"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-chevron-right fa-stack-1x"></i></span>
+					</a>';
 
 		if ($calendar_data['show_next_prev'])
 			echo '
 					', $txt['months_titles'][$calendar_data['current_month']], ' ', $calendar_data['current_year'];
 		else
 			echo '
-					<a href="', $scripturl, '?action=calendar;year=', $calendar_data['current_year'], ';month=', $calendar_data['current_month'], '">', $txt['months_titles'][$calendar_data['current_month']], ' ', $calendar_data['current_year'], '</a>';
+					<a href="', $scripturl, '?action=calendar;year=', $calendar_data['current_year'], ';month=', $calendar_data['current_month'], '">
+						<i class="fa fa-calendar-o"></i> ', $txt['months_titles'][$calendar_data['current_month']], ' ', $calendar_data['current_year'], '
+					</a>';
 
 		echo '
 				</h2>';
 	}
 
+	// Show the sidebar months
 	echo '
 				<table class="calendar_table">';
 
@@ -267,7 +274,7 @@ function template_show_month_grid($grid_name)
 		if (!empty($calendar_data['show_week_links']))
 			echo '
 						<td class="windowbg2 weeks">
-							<a href="', $scripturl, '?action=calendar;viewweek;year=', $calendar_data['current_year'], ';month=', $calendar_data['current_month'], ';day=', $week['days'][0]['day'], '">&#187;</a>
+							<a href="', $scripturl, '?action=calendar;viewweek;year=', $calendar_data['current_year'], ';month=', $calendar_data['current_month'], ';day=', $week['days'][0]['day'], '"><i class="fa fa-angle-double-right fa-lg"></i></a>
 						</td>';
 
 		// Every day has the following:
@@ -394,11 +401,19 @@ function template_show_week_grid($grid_name)
 
 		if (empty($calendar_data['previous_calendar']['disabled']) && $calendar_data['show_next_prev'] && empty($done_title))
 			echo '
-					<span class="previous_month"><a href="', $calendar_data['previous_week']['href'], '">&#171;</a></span>';
+					<span class="previous_month">
+						<a href="', $calendar_data['previous_week']['href'], '">
+							<span class="fa-stack"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-chevron-left fa-stack-1x"></i></span>
+						</a>
+					</span>';
 
 		if (empty($calendar_data['next_calendar']['disabled']) && $calendar_data['show_next_prev'] && empty($done_title))
 			echo '
-					<span class="next_month"><a href="', $calendar_data['next_week']['href'], '">&#187;</a></span>';
+					<span class="next_month">
+						<a href="', $calendar_data['next_week']['href'], '">
+							<span class="fa-stack"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-chevron-right fa-stack-1x"></i></span>
+						</a>
+					</span>';
 
 		echo '
 					<a href="', $scripturl, '?action=calendar;month=', $month_data['current_month'], ';year=', $month_data['current_year'], '">', $txt['months_titles'][$month_data['current_month']], ' ', $month_data['current_year'], '</a>', empty($done_title) && !empty($calendar_data['week_number']) ? (' - ' . $txt['calendar_week'] . ' ' . $calendar_data['week_number']) : '', '

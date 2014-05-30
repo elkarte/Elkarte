@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -284,7 +284,6 @@ function template_generic_menu_tabs(&$menu_context)
 			elseif (!empty($selected_tab['class']) || !empty($tab_context['class']))
 				echo '
 						<span class="hdicon cat_img_', !empty($selected_tab['class']) ? $selected_tab['class'] : $tab_context['class'], '"></span>';
-
 
 			if (!empty($selected_tab['help']) || !empty($tab_context['help']))
 				echo '

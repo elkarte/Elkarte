@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  */
 
 if (!defined('ELK'))
@@ -165,7 +165,7 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
  * Fetches errors and group them by error type
  *
  * @param mixed[]|null $filter
- * @param string $sort
+ * @param string|null $sort
  */
 function fetchErrorsByType($filter = null, $sort = null)
 {

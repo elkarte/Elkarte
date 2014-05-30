@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Payment Gateway: paypal
+ * Payment Gateway: PayPal
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -23,7 +23,7 @@ if (!defined('ELK'))
  *
  * @package Subscriptions
  */
-class paypal_display
+class PayPal_Display
 {
 	/**
 	 * Name of this payment gateway
@@ -138,7 +138,7 @@ class paypal_display
  *
  * @package Subscriptions
  */
-class paypal_payment
+class PayPal_Payment
 {
 	/**
 	 * Holds the IPN response data
@@ -167,10 +167,8 @@ class paypal_payment
 		if (!isset($_POST['business']))
 			$_POST['business'] = $_POST['receiver_email'];
 
-		if ($modSettings['paypal_email'] !== $_POST['business'] && (empty($modSettings['paypal_additional_emails']) || !in_array($_POST['business'], explode(',', $modSettings['paypal_additional_emails']))))
-			return false;
-
-		return true;
+		// Return true or false if the data is intended for this
+		return !($modSettings['paypal_email'] !== $_POST['business'] && (empty($modSettings['paypal_additional_emails']) || !in_array($_POST['business'], explode(',', $modSettings['paypal_additional_emails']))));
 	}
 
 	/**
@@ -227,7 +225,7 @@ class paypal_payment
 			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 1);
 			curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
 			curl_setopt($curl, CURLOPT_FORBID_REUSE, 1);
-+
+
 			// Set TCP timeout to 30 seconds
 			curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 30);
 
@@ -337,6 +335,24 @@ class paypal_payment
 	public function isPayment()
 	{
 		return ($_POST['payment_status'] === 'Completed' && $_POST['txn_type'] === 'web_accept');
+	}
+
+	/**
+	 * Is this a cancellation?
+	 *
+	 * @return boolean
+	 */
+	public function isCancellation()
+	{
+		// subscr_cancel: This IPN response (txn_type) is sent only when the subscriber cancels his/her
+		// current subscription or the merchant cancels the subscribers subscription. In this event according
+		// to Paypal rules the subscr_eot (End of Term) IPN response is NEVER sent, and it is up to you to
+		// keep the subscription of the subscriber active for remaining days of subscription should they cancel
+		// their subscription in the middle of the subscription period.
+		//
+		// subscr_eot: This IPN response (txn_type) is sent ONLY when the subscription ends naturally/expires
+		//
+		return (substr($_POST['txn_type'], 0, 13) === 'subscr_cancel' || substr($_POST['txn_type'], 0, 10) === 'subscr_eot');
 	}
 
 	/**

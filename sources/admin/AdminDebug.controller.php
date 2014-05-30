@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -106,7 +106,7 @@ class AdminDebug_Controller extends Action_Controller
 		// Don't allow non-administrators.
 		isAllowedTo('admin_forum');
 
-		setMemoryLimit('32M');
+		setMemoryLimit('128M');
 
 		if (empty($_REQUEST['filename']) || !is_string($_REQUEST['filename']))
 			fatal_lang_error('no_access', false);
@@ -126,9 +126,9 @@ if (!(\'elkForum_sessionvar\' in window))
 		// Lets make sure we aren't going to output anything nasty.
 		@ob_end_clean();
 		if (!empty($modSettings['enableCompressedOutput']))
-			@ob_start('ob_gzhandler');
+			ob_start('ob_gzhandler');
 		else
-			@ob_start();
+			ob_start();
 
 		// Make sure they know what type of file we are.
 		header('Content-Type: ' . $file['filetype']);

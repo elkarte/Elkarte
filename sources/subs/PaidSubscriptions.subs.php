@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -395,7 +395,7 @@ function loadPaymentGateways()
 				$header = fread($fp, 4096);
 				fclose($fp);
 
-				if (strpos($header, 'Payment Gateway: ' . strtolower($matches[1])) !== false)
+				if (strpos($header, 'Payment Gateway: ' . $matches[1]) !== false)
 				{
 					require_once(SUBSDIR . '/' . $file);
 
@@ -403,9 +403,9 @@ function loadPaymentGateways()
 						'filename' => $file,
 						'code' => strtolower($matches[1]),
 						// Don't need anything snazzier than this yet.
-						'valid_version' => class_exists(strtolower($matches[1]) . '_payment') && class_exists(strtolower($matches[1]) . '_display'),
-						'payment_class' => strtolower($matches[1]) . '_payment',
-						'display_class' => strtolower($matches[1]) . '_display',
+						'valid_version' => class_exists($matches[1] . '_Payment') && class_exists($matches[1] . '_Display'),
+						'payment_class' => $matches[1] . '_Payment',
+						'display_class' => $matches[1] . '_Display',
 					);
 				}
 			}
@@ -675,7 +675,7 @@ function deleteSubscription($id)
 	}
 
 	// Remove the subscription as well
-	$db->query('delete_subscription', '
+	$db->query('', '
 		DELETE FROM {db_prefix}subscriptions
 		WHERE id_subscribe = {int:current_subscription}',
 		array(
@@ -1240,6 +1240,7 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 	// These variables will be handy, honest ;)
 	$removals = array();
 	$allowed = array();
+	$member = array();
 	$member['id_group'] = 0;
 	$new_id_group = -1;
 	while ($row = $db->fetch_assoc($request))

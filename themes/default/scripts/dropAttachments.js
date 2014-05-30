@@ -3,7 +3,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  * This file contains javascript associated with the drag drop of files functionality
  * while posting
@@ -111,7 +111,31 @@
 					}
 					// The server was unable to process the file, show it as not sent
 					else
+					{
+						var errorMsgs = {},
+							serverErrorFiles = [];
+						for (var err in resp.data) 
+						{
+							if (resp.data.hasOwnProperty(err))
+							{
+								errorMsgs.individualServerErr = resp.data[err].title + '<br />';
+
+								for (var errMsg in resp.data[err].errors)
+								{
+									if (resp.data[err].errors.hasOwnProperty(errMsg))
+										serverErrorFiles.push(resp.data[err].errors[errMsg]);
+								}
+							}
+
+							numAttachUploaded--;
+
+							populateErrors({
+								'errorMsgs': errorMsgs,
+								'serverErrorFiles': serverErrorFiles
+							});
+						}
 						status.setServerFail(0);
+					}
 				})
 				.fail(function(jqXHR, textStatus, errorThrown) {
 					console.log(jqXHR);
@@ -128,7 +152,7 @@
 			/**
 			 * private function
 			 *
-			 * Removes the file from the server that was sucesfully uploaded
+			 * Removes the file from the server that was successfully uploaded
 			 *
 			 * @param {object} options
 			 */
@@ -143,8 +167,7 @@
 					cache: false,
 					dataType: 'json',
 					data: {
-						'filename': dataToSend.temp_name,
-						'filepath': dataToSend.temp_path
+						'attachid': dataToSend.attachid
 					}
 				})
 				.done(function(resp) {
@@ -159,8 +182,8 @@
 						numAttachUploaded--;
 
 						// Done with this one, so remove it from existence
-						$('#' + dataToSend.temp_name).unbind();
-						$('#' + dataToSend.temp_name).remove();
+						$('#' + dataToSend.attachid).unbind();
+						$('#' + dataToSend.attachid).remove();
 					}
 					else
 						console.log('error success');
@@ -176,8 +199,8 @@
 			 * private function
 			 *
 			 * Creates the status UI for each file dropped
-			 * Initialte as new createStatusbar
-			 * Has the following methods availble to it
+			 * Initiate as new createStatusbar
+			 * Has the following methods available to it
 			 *  - setFileNameSize
 			 *  - setProgress
 			 *  - setAbort
@@ -238,8 +261,14 @@
 
 					// Update the uploaded file with its ID
 					$(this.str).find('.remove').attr('id', data.curFileNum);
-					$(this.str).attr('id', data.temp_name);
+					$(this.str).attr('id', data.attachid);
 					$(this.str).attr('data-size', data.size);
+
+					// We need to tell Elk that the file should not be deleted
+					$(this.str).find('.remove').after($('<input />')
+						.attr('type', 'hidden')
+						.attr('name', 'attach_del[]')
+						.attr('value', data.attachid));
 
 					// Provide a way to remove a file that has been sent by mistake
 					$(this.str).find('.remove').bind('click', function(e) {
@@ -377,6 +406,9 @@
 							case 'individualSizeErr':
 								errorMsg = wrapper + params.sizeErrorFiles.join(', ') + ' : ' + params.errorMsgs[err] + '</p>';
 								break;
+							case 'individualServerErr':
+								errorMsg = wrapper + params.serverErrorFiles.join(', ') + ' : ' + params.errorMsgs[err] + '</p>';
+								break;
 							default:
 								errorMsg = wrapper + params.errorMsgs[err] + '</p>';
 								break;
@@ -438,6 +470,7 @@
 
 		// All clear, show the drop zone
 		obj.toggle();
+		$('.drop_attachments_no_js').hide();
 
 		// Entering the dropzone, show it
 		obj.on('dragenter', function(e) {
@@ -465,6 +498,14 @@
 		obj.on('dragexit', function(e) {
 			e.preventDefault();
 			$(this).css('opacity', '0.6');
+		});
+
+		// Rather click and select?
+		obj.find('#attachment_click').change(function(e) {
+			e.preventDefault();
+			var files = $(this)[0].files;
+			console.log(JSON.stringify(files));
+			dragDropAttachment.prototype.handleFileUpload(files, obj);
 		});
 	});
 

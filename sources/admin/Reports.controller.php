@@ -17,7 +17,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -271,6 +271,9 @@ class Reports_Controller extends Action_Controller
 		// Boards, first.
 		require_once(SUBSDIR . '/Boards.subs.php');
 		require_once(SUBSDIR . '/Membergroups.subs.php');
+
+		// Lets get started
+		$query_boards = array();
 
 		if (isset($_REQUEST['boards']))
 		{
@@ -720,6 +723,7 @@ function addData($inc_data, $custom_table = null)
 		$table = $context['current_table'];
 
 	// If we have keys, sanitise the data...
+	$data = array();
 	if (!empty($context['keys']))
 	{
 		// Basically, check every key exists!

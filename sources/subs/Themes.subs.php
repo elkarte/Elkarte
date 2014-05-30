@@ -10,7 +10,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -370,7 +370,7 @@ function get_file_listing($path, $relative)
 			else
 				$size = comma_format($size) . ' ' . $txt['themeadmin_edit_bytes'];
 
-			$writable =  is_writable($path . '/' . $entry);
+			$writable = is_writable($path . '/' . $entry);
 
 			$listing2[] = array(
 				'filename' => $entry,

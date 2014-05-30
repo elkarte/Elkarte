@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -42,8 +42,8 @@ if (!defined('ELK'))
  *  post-based membergroups in the database (restricted by parameter1).
  *
  * @param string $type Stat type - can be 'member', 'message', 'topic', 'subject' or 'postgroups'
- * @param int|string|false|mixed[]|null $parameter1 pass through value
- * @param int|string|false|mixed[]|null $parameter2 pass through value
+ * @param int|string|boolean|mixed[]|null $parameter1 pass through value
+ * @param int|string|boolean|mixed[]|null $parameter2 pass through value
  */
 function updateStats($type, $parameter1 = null, $parameter2 = null)
 {
@@ -288,7 +288,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 			if ($start >= $num_per_page * $nCont)
 			{
 				$tmpStart = $start - $num_per_page * $nCont;
-				$pageindex.= sprintf($base_link, $tmpStart, $tmpStart / $num_per_page + 1);
+				$pageindex .= sprintf($base_link, $tmpStart, $tmpStart / $num_per_page + 1);
 			}
 
 		// Show the current page. (prev page 1 ... 6 7 >[8]< 9 10 ... 15 next page)
@@ -535,10 +535,10 @@ function shorten_text($text, $len = 384, $cutword = false, $buffer = 12)
 	// If its to long, cut it down to size
 	if (Util::strlen($text) > $len)
 	{
-		$text = html_entity_decode($text, ENT_QUOTES, 'UTF-8');
-
 		if ($cutword)
 		{
+			$text = html_entity_decode($text, ENT_QUOTES, 'UTF-8');
+
 			// Look for len - buffer characters and cut on first word boundary after
 			preg_match('~(.{' . max(1, ($len - $buffer)) . '}.*?)\b~su', $text, $matches);
 
@@ -547,11 +547,10 @@ function shorten_text($text, $len = 384, $cutword = false, $buffer = 12)
 				$matches[1] = Util::substr($matches[1], 0, $len);
 
 			$text = rtrim($matches[1]) . ' ...';
+			$text = Util::htmlspecialchars($text);
 		}
 		else
-			$text = Util::substr($text, 0, $len) . '...';
-
-		$text = Util::htmlspecialchars($text);
+			$text = Util::substr($text, 0, $len - 3) . '...';
 	}
 
 	return $text;
@@ -864,6 +863,28 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'after' => '</span>',
 			),
 			array(
+				'tag' => 'ftp',
+				'type' => 'unparsed_content',
+				'content' => '<a href="$1" class="bbc_ftp new_win" target="_blank">$1</a>',
+				'validate' => create_function('&$tag, &$data, $disabled', '
+					$data = strtr($data, array(\'<br />\' => \'\'));
+					if (strpos($data, \'ftp://\') !== 0 && strpos($data, \'ftps://\') !== 0)
+						$data = \'ftp://\' . $data;
+				'),
+			),
+			array(
+				'tag' => 'ftp',
+				'type' => 'unparsed_equals',
+				'before' => '<a href="$1" class="bbc_ftp new_win" target="_blank">',
+				'after' => '</a>',
+				'validate' => create_function('&$tag, &$data, $disabled', '
+					if (strpos($data, \'ftp://\') !== 0 && strpos($data, \'ftps://\') !== 0)
+						$data = \'ftp://\' . $data;
+				'),
+				'disallow_children' => array('email', 'ftp', 'url', 'iurl'),
+				'disabled_after' => ' ($1)',
+			),
+			array(
 				'tag' => 'html',
 				'type' => 'unparsed_content',
 				'content' => '$1',
@@ -1165,8 +1186,16 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			),
 		);
 
+		// Inside these tags autolink is not recommendable.
+		$no_autolink_tags = array(
+			'url',
+			'iurl',
+			'ftp',
+			'email',
+		);
+
 		// Let addons add new BBC without hassle.
-		call_integration_hook('integrate_bbc_codes', array(&$codes));
+		call_integration_hook('integrate_bbc_codes', array(&$codes, &$no_autolink_tags));
 
 		// This is mainly for the bbc manager, so it's easy to add tags above.  Custom BBC should be added above this line.
 		if ($message === false)
@@ -1192,14 +1221,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			foreach ($itemcodes as $c => $dummy)
 				$bbc_codes[$c] = array();
 		}
-
-		// Inside these tags autolink is not recommendable.
-		$no_autolink_tags = array(
-			'url',
-			'iurl',
-			'ftp',
-			'email',
-		);
 
 		foreach ($codes as $code)
 		{
@@ -1358,9 +1379,9 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 
 						// Only do this if the preg survives.
 						if (is_string($result = preg_replace(array(
-							'~(?<=[\s>\.(;\'"]|^)((?:http|https)://[\w\-_%@:|]+(?:\.[\w\-_%]+)*(?::\d+)?(?:/[\w\-_\~%\.@!,\?&;=#(){}+:\'\\\\]*)*[/\w\-_\~%@\?;=#}\\\\]?)~i',
+							'~(?<=[\s>\.(;\'"]|^)((?:http|https)://[\w\-_%@:|]+(?:\.[\w\-_%]+)*(?::\d+)?(?:/[\p{L}\w\-_\~%\.@!,\?&;=#(){}+:\'\\\\]*)*[/\w\-_\~%@\?;=#}\\\\]?)~ui',
 							'~(?<=[\s>\.(;\'"]|^)((?:ftp|ftps)://[\w\-_%@:|]+(?:\.[\w\-_%]+)*(?::\d+)?(?:/[\w\-_\~%\.@,\?&;=#(){}+:\'\\\\]*)*[/\w\-_\~%@\?;=#}\\\\]?)~i',
-							'~(?<=[\s>(\'<]|^)(www(?:\.[\w\-_]+)+(?::\d+)?(?:/[\w\-_\~%\.@!,\?&;=#(){}+:\'\\\\]*)*[/\w\-_\~%@\?;=#}\\\\])~i'
+							'~(?<=[\s>(\'<]|^)(www(?:\.[\w\-_]+)+(?::\d+)?(?:/[\p{L}\w\-_\~%\.@!,\?&;=#(){}+:\'\\\\]*)*[/\w\-_\~%@\?;=#}\\\\])~ui'
 						), array(
 							'[url]$1[/url]',
 							'[ftp]$1[/ftp]',
@@ -2023,9 +2044,9 @@ function footnote_callback($matches)
 	global $fn_num, $fn_content, $fn_count;
 
 	$fn_num++;
-	$fn_content[] = '<div class="target" id="fn' . $fn_num . '_' . $fn_count . '"><sup>' . $fn_num . '&nbsp;</sup>' . $matches[2] . '<a class="footnote_return" href="#ref' . $fn_num . "_" . $fn_count . '">&crarr;</a></div>';
+	$fn_content[] = '<div class="target" id="fn' . $fn_num . '_' . $fn_count . '"><sup>' . $fn_num . '&nbsp;</sup>' . $matches[2] . '<a class="footnote_return" href="#ref' . $fn_num . '_' . $fn_count . '">&crarr;</a></div>';
 
-	return '<a class="target" href="#fn' . $fn_num . '_' . $fn_count . '" id="ref' . $fn_num . "_" . $fn_count . '">[' . $fn_num . ']</a>';
+	return '<a class="target" href="#fn' . $fn_num . '_' . $fn_count . '" id="ref' . $fn_num . '_' . $fn_count . '">[' . $fn_num . ']</a>';
 }
 
 /**
@@ -2399,9 +2420,6 @@ function setupThemeContext($forceload = false)
 	if (!empty($context['news_lines']))
 		$context['random_news_line'] = $context['news_lines'][mt_rand(0, count($context['news_lines']) - 1)];
 
-	if (!empty($settings['enable_news']) && !empty($context['random_news_line']))
-		loadJavascriptFile ('fader.js');
-
 	if (!$user_info['is_guest'])
 	{
 		$context['user']['messages'] = &$user_info['messages'];
@@ -2589,13 +2607,16 @@ function memoryReturnBytes($val)
 	// Convert to bytes
 	switch ($last)
 	{
+		// fall through select g = 1024*1024*1024
 		case 'g':
 			$num *= 1024;
+		// fall through select m = 1024*1024
 		case 'm':
 			$num *= 1024;
 		case 'k':
 			$num *= 1024;
 	}
+
 	return $num;
 }
 
@@ -2664,12 +2685,10 @@ function theme_copyright()
 		return;
 
 	// Put in the version...
-	// @todo - No necessity for inline CSS in the copyright, and better without it.
-	$forum_copyright = sprintf($forum_copyright, ucfirst(strtolower($forum_version)));
+	$forum_copyright = sprintf($forum_copyright, $forum_version);
 
 	echo '
-					<span class="smalltext" style="display: inline; visibility: visible; font-family: Verdana, Arial, sans-serif;">', $forum_copyright, '
-					</span>';
+					', $forum_copyright;
 }
 
 /**
@@ -2714,9 +2733,9 @@ function template_javascript($do_defered = false)
 	// First up, load jQuery and jQuery UI
 	if (isset($modSettings['jquery_source']) && !$do_defered)
 	{
-		// Using a specified version of jquery or what was shipped 1.10.2 and 1.10.3
-		$jquery_version = (!empty($modSettings['jquery_default']) && !empty($modSettings['jquery_version'])) ? $modSettings['jquery_version'] : '1.10.2';
-		$jqueryui_version = (!empty($modSettings['jqueryui_default']) && !empty($modSettings['jqueryui_version'])) ? $modSettings['jqueryui_version'] : '1.10.3';
+		// Using a specified version of jquery or what was shipped 1.11.1  / 1.10.4
+		$jquery_version = (!empty($modSettings['jquery_default']) && !empty($modSettings['jquery_version'])) ? $modSettings['jquery_version'] : '1.11.1';
+		$jqueryui_version = (!empty($modSettings['jqueryui_default']) && !empty($modSettings['jqueryui_version'])) ? $modSettings['jqueryui_version'] : '1.10.4';
 
 		switch ($modSettings['jquery_source'])
 		{
@@ -2732,7 +2751,7 @@ function template_javascript($do_defered = false)
 				echo '
 	<script src="', $settings['default_theme_url'], '/scripts/jquery-' . $jquery_version . '.min.js" id="jquery"></script>',
 	(!empty($modSettings['jquery_include_ui']) ? '
-	<script src="' . $settings['default_theme_url'] . '/scripts/jqueryui-' . $jqueryui_version . '.min.js" id="jqueryui"></script>' : '');
+	<script src="' . $settings['default_theme_url'] . '/scripts/jquery-ui-' . $jqueryui_version . '.min.js" id="jqueryui"></script>' : '');
 				break;
 			// CDN with local fallback
 			case 'auto':
@@ -2744,7 +2763,7 @@ function template_javascript($do_defered = false)
 	<script><!-- // --><![CDATA[
 		window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-' . $jquery_version . '.min.js"><\/script>\');',
 		(!empty($modSettings['jquery_include_ui']) ? '
-		window.jQuery.ui || document.write(\'<script src="' . $settings['default_theme_url'] . '/scripts/jqueryui-' . $jqueryui_version . '.min.js"><\/script>\')' : ''), '
+		window.jQuery.ui || document.write(\'<script src="' . $settings['default_theme_url'] . '/scripts/jquery-ui-' . $jqueryui_version . '.min.js"><\/script>\')' : ''), '
 	// ]]></script>';
 				break;
 		}
@@ -2758,7 +2777,7 @@ function template_javascript($do_defered = false)
 	{
 		if (!empty($modSettings['minify_css_js']))
 		{
-			require_once(SOURCEDIR . '/Combine.class.php');
+			require_once(SOURCEDIR . '/SiteCombiner.class.php');
 			$combiner = new Site_Combiner(CACHEDIR, $boardurl . '/cache');
 			$combine_name = $combiner->site_js_combine($context['javascript_files'], $do_defered);
 
@@ -2845,7 +2864,7 @@ function template_css()
 	{
 		if (!empty($modSettings['minify_css_js']))
 		{
-			require_once(SOURCEDIR . '/Combine.class.php');
+			require_once(SOURCEDIR . '/SiteCombiner.class.php');
 			$combiner = new Site_Combiner(CACHEDIR, $boardurl . '/cache');
 			$combine_name = $combiner->site_css_combine($context['css_files']);
 
@@ -2867,45 +2886,38 @@ function template_css()
 }
 
 /**
- * I know this is becoming annoying, though this template *shall* be present
- * for security reasons, so better it stays here
- *
- * @todo rework it and merge into some other kind of general warning-box (e.g. modtask at index.template)
+ * Calls on template_show_error from index.template.php to show warnings
+ * and security errors for admins
  */
 function template_admin_warning_above()
 {
-	global $context;
+	global $context, $txt;
 
-	if (!empty($context['security_controls']))
+	if (!empty($context['security_controls_files']))
 	{
-		foreach ($context['security_controls'] as $error)
-		{
-			echo '
-	<div class="errorbox">
-		<h3>', $error['title'], '</h3>
-		<ul>';
+		$context['security_controls_files']['type'] = 'serious';
+		template_show_error('security_controls_files');
+	}
 
-			foreach ($error['messages'] as $text)
-			{
-				echo '
-			<li class="listlevel1">', $text, '</li>';
-			}
+	if (!empty($context['security_controls_query']))
+	{
+		$context['security_controls_query']['type'] = 'serious';
+		template_show_error('security_controls_query');
+	}
 
-			echo '
-		</ul>
-	</div>';
-		}
+	if (!empty($context['security_controls_ban']))
+	{
+		$context['security_controls_ban']['type'] = 'serious';
+		template_show_error('security_controls_ban');
 	}
 
 	// Any special notices to remind the admin about?
 	if (!empty($context['warning_controls']))
 	{
-		echo '
-	<div class="warningbox">
-		<ul>
-			<li class="listlevel1">', implode('</li><li class="listlevel1">', $context['warning_controls']), '</li>
-		</ul>
-	</div>';
+		$context['warning_controls']['errors'] = $context['warning_controls'];
+		$context['warning_controls']['title'] = $txt['admin_warning_title'];
+		$context['warning_controls']['type'] = 'warning';
+		template_show_error('warning_controls');
 	}
 }
 
@@ -4077,7 +4089,7 @@ function elk_array_insert($input, $key, $insert, $where = 'before', $assoc = tru
  *
  * What it does:
  * - From time to time it may be necessary to fire a scheduled task ASAP
- * - this function set the scheduled task to be called before any other one
+ * - This function sets the scheduled task to be called before any other one
  *
  * @param string $task the name of a scheduled task
  */
@@ -4090,6 +4102,7 @@ function scheduleTaskImmediate($task)
 	else
 		$scheduleTaskImmediate = unserialize($modSettings['scheduleTaskImmediate']);
 
+	// If it has not been scheduled, the do so now
 	if (!isset($scheduleTaskImmediate[$task]))
 	{
 		$scheduleTaskImmediate[$task] = 0;
@@ -4116,16 +4129,19 @@ function removeScheduleTaskImmediate($task, $calculateNextTrigger = true)
 {
 	global $modSettings;
 
+	// Not on, bail
 	if (!isset($modSettings['scheduleTaskImmediate']))
 		return;
 	else
 		$scheduleTaskImmediate = unserialize($modSettings['scheduleTaskImmediate']);
 
+	// Clear / remove the task if it was set
 	if (isset($scheduleTaskImmediate[$task]))
 	{
 		unset($scheduleTaskImmediate[$task]);
 		updateSettings(array('scheduleTaskImmediate' => serialize($scheduleTaskImmediate)));
 
+		// Recalculate the next task to execute
 		if ($calculateNextTrigger)
 		{
 			require_once(SUBSDIR . '/ScheduledTasks.subs.php');

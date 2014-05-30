@@ -10,7 +10,7 @@ Contributions to documentation are licensed under [CC-by-SA 3](http://creativeco
 
 ## Setting up an ElkArte Forum:
 
-If you're not here to play with the open source code, but instead would like to set up an ElkArte forum, see our Install Guide. Be warned, however, that ElkArte is still very much beta software, and you will run in to bugs and install problems.  You may even need a background as a developer to set it up successfully.  The system requirements are PHP(5.1+) and a database engine, both MySQL and PostgreSQL are supported.
+If you're not here to play with the open source code, but instead would like to set up an ElkArte forum, see our Install Guide. Be warned, however, that ElkArte is still very much beta software, and you will run in to bugs and install problems.  You may even need a background as a developer to set it up successfully.  The system requirements are PHP(5.2+) and a database engine, both MySQL and PostgreSQL are supported.
 
 ## Contributing:
 
@@ -21,6 +21,9 @@ Please see the [Developer's Certificate of Origin](https://github.com/elkarte/El
 Please see our [How to contribute](https://github.com/elkarte/Elkarte/blob/master/CONTRIBUTING.md) section for information on how to contribute to the ElkArte Project.
 
 [![Build Status](https://travis-ci.org/elkarte/Elkarte.png?branch=master)](https://travis-ci.org/elkarte/Elkarte)
+
+## Class / Method / Function documentation
+ElkArte utilizes inline docblocks to provide descriptions for all of its classes, methods and functions.  This [API Documentation](http://elkarte.github.io/Doc/) is availble online for viewing and searching.   
 
 ## Site and IRC
 

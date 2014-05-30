@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -78,10 +78,11 @@ class Attachment_Controller extends Action_Controller
 		}
 
 		// We should have files, otherwise why are we here?
-		if (isset($_FILES["attachment"]))
+		if (isset($_FILES['attachment']))
 		{
 			loadLanguage('Post');
 
+			require_once(SOURCEDIR . '/AttachmentErrorContext.class.php');
 			$attach_errors = Attachment_Error_Context::context();
 			$attach_errors->activate();
 
@@ -109,15 +110,14 @@ class Attachment_Controller extends Action_Controller
 			// No errors, lets get the details of what we have for our response back
 			else
 			{
-				foreach ($_SESSION['temp_attachments'] as $key => $val)
+				foreach ($_SESSION['temp_attachments'] as $attachID => $val)
 				{
 					// We need to grab the name anyhow
-					if (!empty($val['name']) || !empty($val['tmp_name']))
+					if (!empty($val['tmp_name']))
 					{
 						$resp_data = array(
 							'name' => $val['name'],
-							'temp_name' => $key,
-							'temp_path' => $val['tmp_name'],
+							'attachid' => $attachID,
 							'size' => $val['size']
 						);
 					}
@@ -139,7 +139,7 @@ class Attachment_Controller extends Action_Controller
 	 */
 	public function action_rmattach()
 	{
-		global $context;
+		global $context, $txt;
 
 		// Prepare the template so we can respond with json
 		$template_layers = Template_Layers::getInstance();
@@ -150,27 +150,30 @@ class Attachment_Controller extends Action_Controller
 		// Make sure the session is valid
 		if (checkSession('request', '', false) !== '')
 		{
-			$context['json_data'] = array('result' => false, 'data' => 'session timeout');
+			loadLanguage('Errors');
+			$context['json_data'] = array('result' => false, 'data' => $txt['session_timeout']);
+
 			return false;
 		}
 
 		// We need a filename and path or we are not going any further
-		if (isset($_REQUEST['filename']) && $_REQUEST['filepath'])
+		if (isset($_REQUEST['attachid']))
 		{
-			// This file does exist, so lets terminate it!
-			if (file_exists($_REQUEST['filepath']))
-			{
-				@unlink($_REQUEST['filepath']);
-				unset($_SESSION['temp_attachments'][$_REQUEST['filename']]);
-
+			require_once(SUBSDIR . '/Attachments.subs.php');
+			$result = removeTempAttachById($_REQUEST['attachid']);
+			if ($result === true)
 				$context['json_data'] = array('result' => true);
-			}
-			// Nope can't delete it if we can't find it
 			else
-				$context['json_data'] = array('result' => false, 'data' => 'files not there');
+			{
+				loadLanguage('Errors');
+				$context['json_data'] = array('result' => false, 'data' => $txt[$result]);
+			}
 		}
 		else
-			$context['json_data'] = array('result' => false, 'data' => 'No file name provided');
+		{
+			loadLanguage('Errors');
+			$context['json_data'] = array('result' => false, 'data' => $txt['attachment_not_found']);
+		}
 	}
 
 	/**
@@ -229,7 +232,7 @@ class Attachment_Controller extends Action_Controller
 			@ob_end_clean();
 
 		if (!empty($modSettings['enableCompressedOutput']) && @filesize($filename) <= 4194304 && in_array($file_ext, array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java')))
-			@ob_start('ob_gzhandler');
+			ob_start('ob_gzhandler');
 		else
 		{
 			ob_start();
@@ -254,7 +257,7 @@ class Attachment_Controller extends Action_Controller
 			list ($modified_since) = explode(';', $_SERVER['HTTP_IF_MODIFIED_SINCE']);
 			if (strtotime($modified_since) >= filemtime($filename))
 			{
-				ob_end_clean();
+				@ob_end_clean();
 
 				// Answer the question - no, it hasn't been modified ;).
 				header('HTTP/1.1 304 Not Modified');
@@ -266,7 +269,7 @@ class Attachment_Controller extends Action_Controller
 		$eTag = '"' . substr($id_attach . $real_filename . filemtime($filename), 0, 64) . '"';
 		if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && strpos($_SERVER['HTTP_IF_NONE_MATCH'], $eTag) !== false)
 		{
-			ob_end_clean();
+			@ob_end_clean();
 
 			header('HTTP/1.1 304 Not Modified');
 			exit;

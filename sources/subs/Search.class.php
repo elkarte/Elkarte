@@ -723,7 +723,7 @@ class Search_Class
 			$pspell_link = pspell_new('en', '', '', '', PSPELL_FAST | PSPELL_RUN_TOGETHER);
 
 		error_reporting($old);
-		ob_end_clean();
+		@ob_end_clean();
 
 		$did_you_mean = array('search' => array(), 'display' => array());
 		$found_misspelling = false;

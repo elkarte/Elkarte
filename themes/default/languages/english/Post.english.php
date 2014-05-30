@@ -19,7 +19,7 @@ $txt['posted_on'] = 'Posted on';
 $txt['standard'] = 'Standard';
 $txt['thumbs_up'] = 'Thumb Up';
 $txt['thumbs_down'] = 'Thumb Down';
-$txt['excamation_point'] = 'Exclamation point';
+$txt['exclamation_point'] = 'Exclamation point';
 $txt['question_mark'] = 'Question mark';
 $txt['icon_poll'] = 'Poll';
 $txt['lamp'] = 'Lamp';
@@ -68,7 +68,7 @@ $txt['reported_by'] = 'has been reported by';
 $txt['board_moderate'] = 'on a board you moderate';
 $txt['report_comment'] = 'The reporter has made the following comment';
 
-$txt['attach_drop_files'] = 'Drag and Drop files here';
+$txt['attach_drop_files'] = 'Add files by dragging & dropping or <a class="drop_area_fileselect_text" href="#">selecting them</a>';
 $txt['attach_restrict_attachmentPostLimit'] = 'maximum total size %1$s KB';
 $txt['attach_restrict_attachmentSizeLimit'] = 'maximum individual size %1$s KB';
 $txt['attach_restrict_attachmentNumPerPostLimit'] = '%1$d per post';

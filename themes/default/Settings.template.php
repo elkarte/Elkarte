@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -115,11 +115,6 @@ function template_options()
 		array(
 			'id' => 'display_quick_reply',
 			'label' => $txt['display_quick_reply'],
-			'options' => array(
-				0 => $txt['display_quick_reply1'],
-				1 => $txt['display_quick_reply2'],
-				2 => $txt['display_quick_reply3'],
-			),
 			'default' => true,
 		),
 		array(
@@ -168,7 +163,14 @@ function template_settings()
 				1 => $txt['header_layout_logo_only'],
 				2 => $txt['header_layout_inverted'],
 			),
-			'description' => $txt['header_layout_desc'],
+			'description' => array(
+				'main' => $txt['header_layout_desc'],
+				'options' => array(
+					0 => array('header_layout_default_name', 'header_layout_default_desc'),
+					1 => array('header_layout_logo_only_name', 'header_layout_logo_only_desc'),
+					2 => array('header_layout_inverted_name', 'header_layout_inverted_desc'),
+				)
+			),
 			'type' => 'select',
 		),
 		array(
@@ -202,7 +204,14 @@ function template_settings()
 				2 => $txt['enable_news_fader'],
 			),
 			'type' => 'number',
-			'description' => $txt['enable_news_desc'],
+			'description' => array(
+				'main' => '',
+				'options' => array(
+					0 => array('enable_news_off_name', 'enable_news_off_desc'),
+					1 => array('enable_news_random_name', 'enable_news_random_desc'),
+					2 => array('enable_news_fader_name', 'enable_news_fader_desc'),
+				)
+			),
 		),
 		array(
 			'id' => 'newsfader_time',
@@ -276,15 +285,22 @@ function template_settings()
 	);
 
 	addInlineJavascript('
+		// Hide the option first
+		$("#dt_newsfader_time, #dd_newsfader_time").hide();
+
+		// Update visablity based on the select value
+		toggleNewsFaderTime($("#enable_news").val());
+
+		// Set up the onchange event
+		$("#enable_news").on("change", function() {
+			toggleNewsFaderTime($(this).val());
+		});
+
 		function toggleNewsFaderTime(val)
 		{
 			if (val == 2)
 				$("#dt_newsfader_time, #dd_newsfader_time").fadeIn();
 			else
 				$("#dt_newsfader_time, #dd_newsfader_time").fadeOut();
-		}
-		toggleNewsFaderTime($("#enable_news").val());
-		$("#enable_news").on("change", function() {
-			toggleNewsFaderTime($(this).val());
-		});', true);
+		}', true);
 }

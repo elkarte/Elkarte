@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -54,8 +54,9 @@ class Groups_Controller extends Action_Controller
 
 	/**
 	 * Set up templates and pre-requisites for any request processed by this class.
-	 * Called automagically before any action_() call.
-	 * It handles permission checks, and puts the moderation bar on as required.
+	 *
+	 * - Called automagically before any action_() call.
+	 * - It handles permission checks, and puts the moderation bar on as required.
 	 */
 	public function pre_dispatch()
 	{
@@ -103,7 +104,7 @@ class Groups_Controller extends Action_Controller
 		$base_url = $scripturl . (isset($context['admin_menu_name']) ? '?action=admin;area=membergroups;sa=members' : (isset($context['moderation_menu_name']) ? '?action=moderate;area=viewgroups;sa=members' : '?action=groups;sa=members'));
 
 		// Making a list is not hard with this beauty.
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 
 		// Use the standard templates for showing this.
 		$listOptions = array(
@@ -212,13 +213,15 @@ class Groups_Controller extends Action_Controller
 
 	/**
 	 * Display members of a group, and allow adding of members to a group.
-	 * It can be called from ManageMembergroups if it needs templating within the admin environment.
-	 * It shows a list of members that are part of a given membergroup.
-	 * It is called by ?action=moderate;area=viewgroups;sa=members;group=x
-	 * It requires the manage_membergroups permission.
-	 * It allows to add and remove members from the selected membergroup.
-	 * It allows sorting on several columns.
-	 * It redirects to itself.
+	 *
+	 * What it does:
+	 * - It can be called from ManageMembergroups if it needs templating within the admin environment.
+	 * - It shows a list of members that are part of a given membergroup.
+	 * - It is called by ?action=moderate;area=viewgroups;sa=members;group=x
+	 * - It requires the manage_membergroups permission.
+	 * - It allows to add and remove members from the selected membergroup.
+	 * - It allows sorting on several columns.
+	 * - It redirects to itself.
 	 * @uses ManageMembergroups template, group_members sub template.
 	 */
 	public function action_members()
@@ -540,7 +543,7 @@ class Groups_Controller extends Action_Controller
 		}
 
 		// We're going to want this for making our list.
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 
 		// This is all the information required for a group listing.

@@ -62,7 +62,7 @@ class TestFiles extends UnitTestCase
 					}
 				');
 				error_reporting($errorReporting);
-				ob_end_clean();
+				@ob_end_clean();
 
 				$syntax_valid = $result !== false;
 				if (!$syntax_valid)

@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -339,5 +339,21 @@ class Site_Dispatcher
 			// It must be a good ole' function
 			call_user_func($this->_function_name);
 		}
+	}
+
+	/**
+	 * Returns the current action for the system
+	 *
+	 * @return string
+	 */
+	public function site_action()
+	{
+		if (!empty($this->_controller_name))
+		{
+			$action  = strtolower(str_replace('_Controller', '', $this->_controller_name));
+			$action = substr($action, -1) == 2 ? substr($action, 0, -1) : $action;
+		}
+
+		return isset($action) ? $action : '';
 	}
 }

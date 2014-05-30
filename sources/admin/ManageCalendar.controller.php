@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -48,7 +48,7 @@ class ManageCalendar_Controller extends Action_Controller
 		loadLanguage('ManageCalendar');
 
 		// We're working with them settings here.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Default text.
 		$context['explain_text'] = $txt['calendar_desc'];
@@ -59,6 +59,9 @@ class ManageCalendar_Controller extends Action_Controller
 			'holidays' => array($this, 'action_holidays', 'permission' => 'admin_forum'),
 			'settings' => array($this, 'action_calendarSettings_display', 'permission' => 'admin_forum')
 		);
+
+		// Action control
+		$action = new Action('manage_calendar');
 
 		// Set up the two tabs here...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -75,14 +78,11 @@ class ManageCalendar_Controller extends Action_Controller
 			),
 		);
 
-		call_integration_hook('integrate_manage_calendar', array(&$subActions));
-
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'holidays';
+		// Set up the default subaction, call integrate_sa_manage_calendar
+		$subAction = $action->initialize($subActions, 'settings');
 		$context['sub_action'] = $subAction;
 
 		// Off we go
-		$action = new Action();
-		$action->initialize($subActions, 'settings');
 		$action->dispatch($subAction);
 	}
 
@@ -185,13 +185,14 @@ class ManageCalendar_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'below_table_data',
+					'class' => 'submitbutton',
 					'value' => '<input type="submit" name="delete" value="' . $txt['quickmod_delete_selected'] . '" class="right_submit" />
-					<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=managecalendar;sa=editholiday">' . $txt['holidays_add'] . '</a>',
+					<a class="linkbutton" href="' . $scripturl . '?action=admin;area=managecalendar;sa=editholiday">' . $txt['holidays_add'] . '</a>',
 				),
 			),
 		);
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		$context['page_title'] = $txt['manage_holidays'];
@@ -276,7 +277,7 @@ class ManageCalendar_Controller extends Action_Controller
 		$config_vars = $this->_calendarSettings->settings();
 
 		// Get the settings template fired up.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Get the final touches in place.
 		$context['post_url'] = $scripturl . '?action=admin;area=managecalendar;save;sa=settings';

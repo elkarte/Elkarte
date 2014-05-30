@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -25,13 +25,17 @@ if (!defined('ELK'))
 /**
  * Personal Message Controller, It allows viewing, sending, deleting, and
  * marking personal messages
+ *
+ * @package PersonalMessage
  */
 class PersonalMessage_Controller extends Action_Controller
 {
 	/**
-	 * This method is executed before any other in this file
-	 * (when the class is loaded by the dispatcher).
-	 * It sets the context, load templates and language file(s), as necessary
+	 * This method is executed before any other in this file (when the class is
+	 * loaded by the dispatcher).
+	 *
+	 * What it does:
+	 * - It sets the context, load templates and language file(s), as necessary
 	 * for the function that will be called.
 	 */
 	public function pre_dispatch()
@@ -156,9 +160,11 @@ class PersonalMessage_Controller extends Action_Controller
 
 	/**
 	 * This is the main function of personal messages, called before the action handler.
-	 * PersonalMessages is a menu-based controller.
-	 * It sets up the menu.
-	 * Calls from the menu the appropriate method/function for the current area.
+	 *
+	 * What it does:
+	 * - PersonalMessages is a menu-based controller.
+	 * - It sets up the menu.
+	 * - Calls from the menu the appropriate method/function for the current area.
 	 *
 	 * @see Action_Controller::action_index()
 	 */
@@ -536,6 +542,9 @@ class PersonalMessage_Controller extends Action_Controller
 			censorText($row_quoted['subject']);
 			censorText($row_quoted['body']);
 
+			// Lets make sure we mark this one as read
+			markMessages($pmsg);
+
 			// Figure out which flavor or 'Re: ' to use
 			if (!isset($context['response_prefix']) && !($context['response_prefix'] = cache_get_data('response_prefix')))
 			{
@@ -623,7 +632,7 @@ class PersonalMessage_Controller extends Action_Controller
 				}
 
 				// Now to get all the others.
-				$context['recipients']['to'] = array_merge($context['recipients']['to'], loadPMRecipientsAll($pmsg));
+				$context['recipients']['to'] = array_merge($context['recipients']['to'], isset($pmsg) ? loadPMRecipientsAll($pmsg) : array());
 			}
 			else
 			{
@@ -927,7 +936,6 @@ class PersonalMessage_Controller extends Action_Controller
 			savePMDraft($recipientList);
 			return messagePostError($namedRecipientList, $recipientList);
 		}
-
 		// Before we send the PM, let's make sure we don't have an abuse of numbers.
 		elseif (!empty($modSettings['max_pm_recipients']) && count($recipientList['to']) + count($recipientList['bcc']) > $modSettings['max_pm_recipients'] && !allowedTo(array('moderate_forum', 'send_mail', 'admin_forum')))
 		{
@@ -983,8 +991,8 @@ class PersonalMessage_Controller extends Action_Controller
 	}
 
 	/**
-	 * This function performs all additional actions
-	 * including the deleting and labeling of PM's
+	 * This function performs all additional actions including the deleting
+	 * and labeling of PM's
 	 */
 	public function action_pmactions()
 	{
@@ -1370,6 +1378,7 @@ class PersonalMessage_Controller extends Action_Controller
 	/**
 	 * Allows the user to report a personal message to an administrator.
 	 *
+	 * What it does:
 	 * - In the first instance requires that the ID of the message to report is passed through $_GET.
 	 * - It allows the user to report to either a particular administrator - or the whole admin team.
 	 * - It will forward on a copy of the original message without allowing the reporter to make changes.
@@ -1482,6 +1491,8 @@ class PersonalMessage_Controller extends Action_Controller
 
 	/**
 	 * List and allow adding/entering all man rules, such as
+	 *
+	 * What it does:
 	 * - If it itches, it will be scratched.
 	 * - Yes or No are perfectly acceptable answers to almost every question.
 	 * - Men see in only 16 colors, Peach, for example, is a fruit, not a color.
@@ -1522,7 +1533,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Editing a specific rule?
 		if (isset($_GET['add']))
 		{
-			$context['rid'] = isset($_GET['rid']) && isset($context['rules'][$_GET['rid']])? (int) $_GET['rid'] : 0;
+			$context['rid'] = isset($_GET['rid']) && isset($context['rules'][$_GET['rid']]) ? (int) $_GET['rid'] : 0;
 			$context['sub_template'] = 'add_rule';
 
 			// Any known rule
@@ -1607,7 +1618,7 @@ class PersonalMessage_Controller extends Action_Controller
 		elseif (isset($_GET['save']))
 		{
 			checkSession('post');
-			$context['rid'] = isset($_GET['rid']) && isset($context['rules'][$_GET['rid']])? (int) $_GET['rid'] : 0;
+			$context['rid'] = isset($_GET['rid']) && isset($context['rules'][$_GET['rid']]) ? (int) $_GET['rid'] : 0;
 
 			// Name is easy!
 			$ruleName = Util::htmlspecialchars(trim($_POST['rule_name']));
@@ -1696,8 +1707,9 @@ class PersonalMessage_Controller extends Action_Controller
 
 	/**
 	 * Allows to search through personal messages.
-	 * ?action=pm;sa=search
+	 *
 	 * What it does:
+	 * - accessed with ?action=pm;sa=search
 	 * - shows the screen to search pm's (?action=pm;sa=search)
 	 * - uses the search sub template of the PersonalMessage template.
 	 * - decodes and loads search parameters given in the URL (if any).
@@ -1783,8 +1795,9 @@ class PersonalMessage_Controller extends Action_Controller
 
 	/**
 	 * Actually do the search of personal messages and show the results
-	 * ?action=pm;sa=search2
+	 *
 	 * What it does:
+	 * - accessed with ?action=pm;sa=search2
 	 * - checks user input and searches the pm table for messages matching the query.
 	 * - uses the search_results sub template of the PersonalMessage template.
 	 * - show the results of the search query.
@@ -2143,11 +2156,13 @@ class PersonalMessage_Controller extends Action_Controller
 				$row['body'] = parse_bbc($row['body'], true, 'pm' . $row['id_pm']);
 
 				// Highlight the hits
+				$body_highlighted = '';
+				$subject_highlighted = '';
 				foreach ($searchArray as $query)
 				{
 					// Fix the international characters in the keyword too.
 					$query = un_htmlspecialchars($query);
-					$query = trim($query, "\*+");
+					$query = trim($query, '\*+');
 					$query = strtr(Util::htmlspecialchars($query), array('\\\'' => '\''));
 
 					$body_highlighted = preg_replace_callback('/((<[^>]*)|' . preg_quote(strtr($query, array('\'' => '&#039;')), '/') . ')/iu', array($this, '_highlighted_callback'), $row['body']);
@@ -2188,7 +2203,8 @@ class PersonalMessage_Controller extends Action_Controller
 
 	/**
 	 * Used to highlight body text with strings that match the search term
-	 * Callback function used in $body_highlighted
+	 *
+	 * - Callback function used in $body_highlighted
 	 *
 	 * @param string[] $matches
 	 */
@@ -2381,7 +2397,8 @@ function messageIndexBar($area)
 
 /**
  * Get a personal message for the template. (used to save memory.)
- * This is a callback function that will fetch the actual results, as needed, of a previously run
+ *
+ * - This is a callback function that will fetch the actual results, as needed, of a previously run
  * subject (loadPMSubjectRequest) or message (loadPMMessageRequest) query.
  *
  * @param string $type
@@ -2690,9 +2707,11 @@ function messagePostError($named_recipients, $recipient_ids = array())
 
 /**
  * Loads in a group of PM drafts for the user.
- * Loads a specific draft for current use in pm editing box if selected.
- * Used in the posting screens to allow draft selection
- * Will load a draft if selected is supplied via post
+ *
+ * What it does:
+ * - Loads a specific draft for current use in pm editing box if selected.
+ * - Used in the posting screens to allow draft selection
+ * - Will load a draft if selected is supplied via post
  *
  * @param int $member_id
  * @param int|false $id_pm = false if set, it will try to load drafts for this id

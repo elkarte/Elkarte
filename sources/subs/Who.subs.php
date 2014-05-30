@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -160,7 +160,7 @@ function addonsCredits()
 
 			// build this one out and stash it away
 			$name = empty($credit_info['url']) ? $title : '<a href="' . $credit_info['url'] . '">' . $title . '</a>';
-			$credits[] = $name . (!empty($license) ? ' | ' . $license  : '') . (!empty($copyright) ? ' | ' . $copyright  : '');
+			$credits[] = $name . (!empty($license) ? ' | ' . $license : '') . (!empty($copyright) ? ' | ' . $copyright : '');
 		}
 		cache_put_data('addons_credits', $credits, 86400);
 	}
@@ -173,15 +173,14 @@ function addonsCredits()
  *
  * Adding actions to the Who's Online list:
  * Adding actions to this list is actually relatively easy...
- *  - for actions anyone should be able to see, just add a string named whoall_ACTION.
- *    (where ACTION is the action used in index.php.)
- *  - for actions that have a subaction which should be represented differently, use whoall_ACTION_SUBACTION.
- *  - for actions that include a topic, and should be restricted, use whotopic_ACTION.
- *  - for actions that use a message, by msg or quote, use whopost_ACTION.
- *  - for administrator-only actions, use whoadmin_ACTION.
- *  - for actions that should be viewable only with certain permissions,
- *    use whoallow_ACTION and add a list of possible permissions to the
- *    $allowedActions array, using ACTION as the key.
+ * - for actions anyone should be able to see, just add a string named whoall_ACTION.
+ *   (where ACTION is the action used in index.php.)
+ * - for actions that have a subaction which should be represented differently, use whoall_ACTION_SUBACTION.
+ * - for actions that include a topic, and should be restricted, use whotopic_ACTION.
+ * - for actions that use a message, by msg or quote, use whopost_ACTION.
+ * - for administrator-only actions, use whoadmin_ACTION.
+ * - for actions that should be viewable only with certain permissions, use whoallow_ACTION and
+ * add a list of possible permissions to the $allowedActions array, using ACTION as the key.
  *
  * @param mixed[]|string $urls a single url (string) or an array of arrays, each inner array being (serialized request data, id_member)
  * @param string|false $preferred_prefix = false
@@ -214,7 +213,6 @@ function determineActions($urls, $preferred_prefix = false)
 		'optimizetables' => array('admin_forum'),
 		'repairboards' => array('admin_forum'),
 		'search' => array('search_posts'),
-// 		'search2' => array('search_posts'),
 		'setcensor' => array('moderate_forum'),
 		'setreserve' => array('moderate_forum'),
 		'stats' => array('view_stats'),
@@ -222,12 +220,15 @@ function determineActions($urls, $preferred_prefix = false)
 		'viewmembers' => array('moderate_forum'),
 	);
 
+	// Provide integration a way to add to the allowed action array
+	call_integration_hook('integrate_whos_online_allowed', array(&$allowedActions));
+
 	if (!is_array($urls))
 		$url_list = array(array($urls, $user_info['id']));
 	else
 		$url_list = $urls;
 
-	// These are done to later query these in large chunks. (instead of one by one.)
+	// These are done to query these in large chunks. (instead of one by one.)
 	$topic_ids = array();
 	$profile_ids = array();
 	$board_ids = array();
@@ -281,6 +282,7 @@ function determineActions($urls, $preferred_prefix = false)
 				$data[$k] = $txt['who_hidden'];
 				$profile_ids[(int) $actions['u']][$k] = $actions['action'] == 'profile' ? $txt['who_viewprofile'] : $txt['who_profile'];
 			}
+			// Trying to post
 			elseif (($actions['action'] == 'post' || $actions['action'] == 'post2') && empty($actions['topic']) && isset($actions['board']))
 			{
 				$data[$k] = $txt['who_hidden'];
@@ -356,8 +358,10 @@ function determineActions($urls, $preferred_prefix = false)
 				else
 					$data[$k] = $txt['who_hidden'];
 			}
+			// Something we don't have details about, but it is an action, maybe an addon
 			elseif (!empty($actions['action']))
 				$data[$k] = sprintf($txt['who_generic'], $actions['action']);
+			// We just don't know
 			else
 				$data[$k] = $txt['who_unknown'];
 		}
@@ -365,10 +369,12 @@ function determineActions($urls, $preferred_prefix = false)
 		// Maybe the action is integrated into another system?
 		if (count($integrate_actions = call_integration_hook('integrate_whos_online', array($actions))) > 0)
 		{
+			// Try each integraion hook with this url and see if they can fill in the details
 			foreach ($integrate_actions as $integrate_action)
 			{
 				if (!empty($integrate_action))
 				{
+					// Found it, all done then
 					$data[$k] = $integrate_action;
 					break;
 				}
@@ -429,11 +435,14 @@ function determineActions($urls, $preferred_prefix = false)
 
 /**
  * Prepare credits for display.
- * This is a helper function, used by admin panel for credits and support page, and by the credits page.
+ *
+ * - This is a helper function, used by admin panel for credits and support page, and by the credits page.
  */
 function prepareCreditsData()
 {
 	global $txt;
+
+	$credits = array();
 
 	// Don't blink. Don't even blink. Blink and you're dead.
 	$credits['credits'] = array(
@@ -488,7 +497,7 @@ function prepareCreditsData()
 	$credits['credits_addons'] = addonsCredits();
 
 	// An alternative for addons credits is to use a hook.
-	call_integration_hook('integrate_credits');
+	call_integration_hook('integrate_credits', array(&$credits));
 
 	// Copyright information
 	$credits['copyrights']['elkarte'] = '&copy; 2012 - 2014 ElkArte Forum contributors';

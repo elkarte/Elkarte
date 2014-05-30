@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -40,10 +40,11 @@ class Stats_Controller extends Action_Controller
 	/**
 	 * Display some useful/interesting board statistics.
 	 *
-	 * gets all the statistics in order and puts them in.
-	 * uses the Stats template and language file. (and main sub template.)
-	 * requires the view_stats permission.
-	 * accessed from ?action=stats.
+	 * What it does:
+	 * - Gets all the statistics in order and puts them in.
+	 * - Uses the Stats template and language file. (and main sub template.)
+	 * - Requires the view_stats permission.
+	 * - Accessed from ?action=stats.
 	 *
 	 * @uses Stats language file
 	 * @uses Stats template, statistics sub template
@@ -52,6 +53,7 @@ class Stats_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $modSettings, $context;
 
+		// You have to be able to see these
 		isAllowedTo('view_stats');
 
 		// Page disabled - redirect them out
@@ -97,17 +99,20 @@ class Stats_Controller extends Action_Controller
 			return;
 		}
 
+		// Stats it is
 		loadLanguage('Stats');
 		loadTemplate('Stats');
+		loadJavascriptFile('stats.js');
 
 		// Build the link tree......
 		$context['linktree'][] = array(
 			'url' => $scripturl . '?action=stats',
 			'name' => $txt['stats_center']
 		);
+
+		// Prepare some things for the template page
 		$context['page_title'] = $context['forum_name'] . ' - ' . $txt['stats_center'];
 		$context['sub_template'] = 'statistics';
-		loadJavascriptFile('stats.js');
 
 		// These are the templates that will be used to render the statistics
 		$context['statistics_callbacks'] = array(
@@ -115,6 +120,7 @@ class Stats_Controller extends Action_Controller
 			'top_statistics',
 		);
 
+		// Call each area of statics to load our friend $context
 		$this->loadGeneralStatistics();
 		$this->loadTopStatistics();
 		$this->loadMontlyActivity();
@@ -134,37 +140,12 @@ class Stats_Controller extends Action_Controller
 
 		// Get averages...
 		$averages = getAverages();
+
 		// This would be the amount of time the forum has been up... in days...
 		$total_days_up = ceil((time() - strtotime($averages['date'])) / (60 * 60 * 24));
 		$date = strftime('%Y-%m-%d', forum_time(false));
-		$disabled_fields = !empty($modSettings['disabled_profile_fields']) ? array_map('trim', explode(',', $modSettings['disabled_profile_fields'])) : array();
 
-		// Male vs. female ratio - let's calculate this only every four minutes.
-		if (!in_array('gender', $disabled_fields) && ($context['gender'] = cache_get_data('stats_gender', 240)) == null)
-		{
-			$context['gender'] = genderRatio();
-
-			// Set these two zero if the didn't get set at all.
-			if (empty($context['gender']['males']))
-				$context['gender']['males'] = 0;
-			if (empty($context['gender']['females']))
-				$context['gender']['females'] = 0;
-
-			// Try and come up with some "sensible" default states in case of a non-mixed board.
-			if ($context['gender']['males'] == $context['gender']['females'])
-				$context['gender']['ratio'] = '1:1';
-			elseif ($context['gender']['males'] == 0)
-				$context['gender']['ratio'] = '0:1';
-			elseif ($context['gender']['females'] == 0)
-				$context['gender']['ratio'] = '1:0';
-			elseif ($context['gender']['males'] > $context['gender']['females'])
-				$context['gender']['ratio'] = round($context['gender']['males'] / $context['gender']['females'], 1) . ':1';
-			elseif ($context['gender']['females'] > $context['gender']['males'])
-				$context['gender']['ratio'] = '1:' . round($context['gender']['females'] / $context['gender']['males'], 1);
-
-			cache_put_data('stats_gender', $context['gender'], 240);
-		}
-
+		// General forum stats
 		$context['general_statistics']['left'] = array(
 			'total_members' => allowedTo('view_mlist') ? '<a href="' . $scripturl . '?action=memberlist">' . comma_format($modSettings['totalMembers']) . '</a>' : comma_format($modSettings['totalMembers']),
 			'total_posts' => comma_format($modSettings['totalMessages']),
@@ -193,9 +174,8 @@ class Stats_Controller extends Action_Controller
 			'total_boards' => comma_format(countBoards('all', array('include_redirects' => false))),
 			'latest_member' => &$context['common_stats']['latest_member'],
 			'average_online' => comma_format(round($averages['most_on'] / $total_days_up, 2)),
+			'emails_sent' => comma_format(round($averages['email'] / $total_days_up, 2))
 		);
-		if (!in_array('gender', $disabled_fields))
-			$context['general_statistics']['right']['gender_ratio'] = $context['gender']['ratio'];
 
 		if (!empty($modSettings['hitStats']))
 			$context['general_statistics']['right'] += array(
@@ -245,6 +225,7 @@ class Stats_Controller extends Action_Controller
 			// This gets rid of the filesort on the query ;).
 			krsort($context['yearly'][$year]['months']);
 
+			// Yearly stats, topics, posts, members, etc
 			$context['yearly'][$year]['new_topics'] = comma_format($data['new_topics']);
 			$context['yearly'][$year]['new_posts'] = comma_format($data['new_posts']);
 			$context['yearly'][$year]['new_members'] = comma_format($data['new_members']);
@@ -256,6 +237,7 @@ class Stats_Controller extends Action_Controller
 				$context['collapsed_years'][] = $year;
 		}
 
+		// Want to expand out the yearly stats
 		if (empty($_SESSION['expanded_stats']))
 			return;
 

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -195,7 +195,7 @@ function template_make_event_above()
 							<legend>', $txt['calendar_event_options'], '</legend>
 							<label for="evtitle"', isset($context['post_error']['no_event']) ? ' class="error"' : '', ' id="caption_evtitle">', $txt['calendar_event_title'], ':</label>
 							<input type="text" id="evtitle" name="evtitle" maxlength="255" size="55" value="', $context['event']['title'], '" tabindex="', $context['tabindex']++, '" class="input_text" />
-							<div class="smalltext" id="datepicker">
+							<div id="datepicker">
 								<input type="hidden" name="calendar" value="1" /><label for="year">', $txt['calendar_year'], '</label>
 								<select name="year" id="year" tabindex="', $context['tabindex']++, '" onchange="generateDays();">';
 
@@ -416,13 +416,16 @@ function template_add_new_attachments()
 	if ($context['attachments']['num_allowed'] > 0 || !empty($context['dont_show_them']))
 	{
 		echo '
-							<dt class="drop_area">', $txt['attach_drop_files'], ' <i class="fa fa-upload"></i></dt>
+							<dt class="drop_area">
+								<i class="fa fa-upload"></i> ', $txt['attach_drop_files'], '
+								<input class="drop_area_fileselect" type="file" multiple="multiple" name="attachment_click[]" id="attachment_click" class="input_file" />
+							</dt>
 							<dd class="progress_tracker"></dd>
 							<dd class="drop_attachments_error"></dd>
-							<dt>
+							<dt class="drop_attachments_no_js">
 								', $txt['attach'], ':
 							</dt>
-							<dd class="smalltext">
+							<dd class="smalltext drop_attachments_no_js">
 								', empty($modSettings['attachmentSizeLimit']) ? '' : ('<input type="hidden" name="MAX_FILE_SIZE" value="' . $modSettings['attachmentSizeLimit'] * 1028 . '" />'), '
 								<input type="file" multiple="multiple" name="attachment[]" id="attachment1" class="input_file" /> (<a href="javascript:void(0);" onclick="cleanFileInput(\'attachment1\');">', $txt['clean_attach'], '</a>)';
 
@@ -437,7 +440,7 @@ function template_add_new_attachments()
 										txt_clean_attach = "', $txt['clean_attach'], '";
 								// ]]></script>
 							</dd>
-							<dd class="smalltext" id="moreAttachments"><a href="#" onclick="addAttachment(); return false;">(', $txt['more_attachments'], ')</a></dd>';
+							<dd class="smalltext drop_attachments_no_js" id="moreAttachments"><a href="#" onclick="addAttachment(); return false;">(', $txt['more_attachments'], ')</a></dd>';
 		else
 			echo '
 							</dd>';
@@ -631,7 +634,7 @@ function template_postarea_below()
 	// Is visual verification enabled?
 	if ($context['require_verification'])
 	{
-		template_control_verification($context['visual_verification_id'], '
+		template_verification_controls($context['visual_verification_id'], '
 						<div class="post_verification">
 							<span' . (!empty($context['post_error']['need_qr_verification']) ? ' class="error"' : '') . '>
 								<strong>' . $txt['verification'] . ':</strong>
@@ -782,11 +785,11 @@ function template_spellcheck()
 			<div id="spellview">&nbsp;</div>
 			<table class="table_grid">
 				<tr class="windowbg">
-					<td style="width:50%;vertical-align:top">
+					<td style="width: 50%;vertical-align: top;">
 						<label for="changeto">', $txt['spellcheck_change_to'], '</label><br />
 						<input type="text" id="changeto" name="changeto" style="width: 98%;" class="input_text" />
 					</td>
-					<td style="width:50%">
+					<td style="width: 50%;">
 						', $txt['spellcheck_suggest'], '<br />
 							<select name="suggestions" style="width: 98%;" size="5" onclick="if (this.selectedIndex != -1) this.form.changeto.value = this.options[this.selectedIndex].text;" ondblclick="replaceWord();">
 							</select>

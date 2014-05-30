@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -233,7 +233,7 @@ class Ftp_Connection
 		$time = time();
 		do
 			$response = fgets($this->connection, 1024);
-		while (strpos($response, ' ', 3) !== 3 && time() - $time < 5);
+		while (substr($response, 3, 1) !== ' ' && time() - $time < 5);
 
 		// If it's not 227, we weren't given an IP and port, which means it failed.
 		if (strpos($response, '227 ') !== 0)
@@ -356,7 +356,7 @@ class Ftp_Connection
 		$time = time();
 		do
 			$response = fgets($this->connection, 1024);
-		while ($response[3] != ' ' && time() - $time < 5);
+		while (substr($response, 3, 1) !== ' ' && time() - $time < 5);
 
 		// Check for 257!
 		if (preg_match('~^257 "(.+?)" ~', $response, $match) != 0)

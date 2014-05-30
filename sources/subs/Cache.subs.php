@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -82,7 +82,7 @@ function cache_quick_get($key, $file, $function, $params, $level = 1)
  *     Zend: http://files.zend.com/help/Zend-Platform/zend_cache_functions.htm
  *
  * @param string $key
- * @param mixed $value
+ * @param string|int|mixed[]|null $value
  * @param int $ttl = 120
  */
 function cache_put_data($key, $value, $ttl = 120)
@@ -409,8 +409,8 @@ function clean_cache($type = '')
 				// Xcache may need auth credentials, depending on how its been set up
 				if (!empty($cache_uid) && !empty($cache_password))
 				{
-					$_SERVER["PHP_AUTH_USER"] = $cache_uid;
-					$_SERVER["PHP_AUTH_PW"] = $cache_password;
+					$_SERVER['PHP_AUTH_USER'] = $cache_uid;
+					$_SERVER['PHP_AUTH_PW'] = $cache_password;
 				}
 
 				// Get the counts so we clear each instance

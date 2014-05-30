@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  *
  */
@@ -51,16 +51,18 @@ class News_Controller extends Action_Controller
 
 	/**
 	 * Outputs xml data representing recent information or a profile.
-	 * Can be passed 4 subactions which decide what is output:
-	 *  'recent' for recent posts,
-	 *  'news' for news topics,
-	 *  'members' for recently registered members,
-	 *  'profile' for a member's profile.
-	 * To display a member's profile, a user id has to be given. (;u=1)
-	 * Outputs an rss feed instead of a proprietary one if the 'type' $_GET
+	 *
+	 * What it does:
+	 * - Can be passed 4 subactions which decide what is output:
+	 *   'recent' for recent posts,
+	 *   'news' for news topics,
+	 *   'members' for recently registered members,
+	 *   'profile' for a member's profile.
+	 * - To display a member's profile, a user id has to be given. (;u=1) e.g. ?action=.xml;sa=profile;u=1;type=atom
+	 * - Outputs an rss feed instead of a proprietary one if the 'type' $_GET
 	 * parameter is 'rss' or 'rss2'.
-	 * Accessed via ?action=.xml.
-	 * Does not use any templates, sub templates, or template layers.
+	 * - Accessed via ?action=.xml
+	 * - Does not use any templates, sub templates, or template layers.
 	 *
 	 * @uses Stats language file.
 	 */
@@ -213,9 +215,9 @@ class News_Controller extends Action_Controller
 		$context['xml_format'] = $xml_format;
 
 		// This is an xml file....
-		ob_end_clean();
+		@ob_end_clean();
 		if (!empty($modSettings['enableCompressedOutput']))
-			@ob_start('ob_gzhandler');
+			ob_start('ob_gzhandler');
 		else
 			ob_start();
 
@@ -244,6 +246,7 @@ class News_Controller extends Action_Controller
 		}
 		elseif ($xml_format == 'atom')
 		{
+			$url_parts = array();
 			foreach (array('board', 'boards', 'c') as $var)
 				if (isset($_REQUEST[$var]))
 					$url_parts[] = $var . '=' . (is_array($_REQUEST[$var]) ? implode(',', $_REQUEST[$var]) : $_REQUEST[$var]);
@@ -276,7 +279,9 @@ class News_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Members.subs.php');
 		$members = recentMembers((int) $this->_limit);
 
+		// No data yet
 		$data = array();
+
 		foreach ($members as $member)
 		{
 			// Make the data look rss-ish.
@@ -350,7 +355,7 @@ class News_Controller extends Action_Controller
 					'title' => cdata_parse($row['subject']),
 					'link' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
 					'description' => cdata_parse($row['body']),
-					'author' => in_array(showEmailAddress(!empty($row['hide_email']), $row['id_member']), array('yes', 'yes_permission_override')) ? $row['poster_email'] . ' ('.$row['poster_name'].')' : null,
+					'author' => in_array(showEmailAddress(!empty($row['hide_email']), $row['id_member']), array('yes', 'yes_permission_override')) ? $row['poster_email'] . ' (' . $row['poster_name'] . ')' : $row['poster_name'],
 					'comments' => $scripturl . '?action=post;topic=' . $row['id_topic'] . '.0',
 					'category' => '<![CDATA[' . $row['bname'] . ']]>',
 					'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $row['poster_time']),
@@ -451,7 +456,7 @@ class News_Controller extends Action_Controller
 					'title' => $row['subject'],
 					'link' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
 					'description' => cdata_parse($row['body']),
-					'author' => in_array(showEmailAddress(!empty($row['hide_email']), $row['id_member']), array('yes', 'yes_permission_override')) ? $row['poster_email'] : null,
+					'author' => in_array(showEmailAddress(!empty($row['hide_email']), $row['id_member']), array('yes', 'yes_permission_override')) ? $row['poster_email'] : $row['poster_name'],
 					'category' => cdata_parse($row['bname']),
 					'comments' => $scripturl . '?action=post;topic=' . $row['id_topic'] . '.0',
 					'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $row['poster_time']),
@@ -546,6 +551,9 @@ class News_Controller extends Action_Controller
 			return array();
 
 		$profile = &$memberContext[$uid];
+
+		// No feed data yet
+		$data = array();
 
 		if ($xml_format == 'rss' || $xml_format == 'rss2')
 			$data = array(array(

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -428,17 +428,17 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 
 		if (!empty($deny))
 			echo '
-										<li class="select_category">
+										<li class="board select_category">
 											', $txt['all_boards_in_cat'], ':
 											<span class="floatright">
-												<label for="all_', $category['id'], '">
-													<input type="radio" onchange="select_in_category(\'allow\', [', implode(',', array_keys($category['boards'])), ']);" id="all_', $category['id'], '" class="input_check" /> ', $txt['board_perms_allow'], '
+												<label for="all_sel_', $category['id'], '">
+													<input type="radio" onchange="select_in_category(\'allow\', [', implode(',', array_keys($category['boards'])), ']);" id="all_sel_', $category['id'], '" name="all_', $category['id'], '" class="input_check" /> ', $txt['board_perms_allow'], '
 												</label>
-												<label for="all_', $category['id'], '">
-													<input type="radio" onchange="select_in_category(\'ignore\', [', implode(',', array_keys($category['boards'])), ']);" id="all_', $category['id'], '" class="input_check" /> ', $txt['board_perms_ignore'], '
+												<label for="all_ign_', $category['id'], '">
+													<input type="radio" onchange="select_in_category(\'ignore\', [', implode(',', array_keys($category['boards'])), ']);" id="all_ign_', $category['id'], '" name="all_', $category['id'], '" class="input_check" /> ', $txt['board_perms_ignore'], '
 												</label>
-												<label for="all_', $category['id'], '">
-													<input type="radio" onchange="select_in_category(\'deny\', [', implode(',', array_keys($category['boards'])), ']);" id="all_', $category['id'], '" class="input_check" /> ', $txt['board_perms_deny'], '
+												<label for="all_den_', $category['id'], '">
+													<input type="radio" onchange="select_in_category(\'deny\', [', implode(',', array_keys($category['boards'])), ']);" id="all_den_', $category['id'], '" name="all_', $category['id'], '" class="input_check" /> ', $txt['board_perms_deny'], '
 												</label>
 											</span>
 										</li>';
@@ -588,7 +588,7 @@ function template_group_members()
 
 	if (!empty($context['group']['assignable']))
 		echo '
-						<th style="width:4%"><input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" /></th>';
+						<th style="width: 4%;"><input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" /></th>';
 
 	echo '
 					</tr>
@@ -642,7 +642,7 @@ function template_group_members()
 
 		if (!empty($context['group']['assignable']))
 			echo '
-						<td class="centertext" style="width:4%">
+						<td class="centertext" style="width: 4%;">
 							<input type="checkbox" name="rem[]" value="', $member['id'], '" class="input_check" ', ($context['user']['id'] == $member['id'] && $context['group']['id'] == 1 ? 'onclick="if (this.checked) return confirm(\'' . $txt['membergroups_members_deadmin_confirm'] . '\')" ' : ''), '/>
 						</td>';
 
@@ -665,8 +665,6 @@ function template_group_members()
 	if (!empty($context['group']['assignable']))
 		echo '
 					<input type="submit" name="remove" value="', $txt['membergroups_members_remove'], '" class="button_submit " />';
-
-
 
 	echo '
 				</div>

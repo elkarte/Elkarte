@@ -11,12 +11,12 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
 // Version information...
-define('CURRENT_VERSION', '1.0 Beta 2');
+define('CURRENT_VERSION', '1.0 RC 1');
 define('CURRENT_LANG_VERSION', '1.0');
 define('REQUIRED_PHP_VERSION', '5.2.0');
 
@@ -1291,7 +1291,7 @@ function action_deleteUpgrade()
 
 		// Now go get those files!
 		require_once(SUBSDIR . '/ScheduledTask.class.php');
-		$task = new ScheduledTask();
+		$task = new Scheduled_Task();
 		$task->fetchFiles();
 	}
 
@@ -2427,7 +2427,7 @@ function cmdStep0()
 
 	$start_time = time();
 
-	ob_end_clean();
+	@ob_end_clean();
 	ob_implicit_flush(true);
 	@set_time_limit(600);
 
@@ -2787,7 +2787,6 @@ function deleteUpgrader()
 	@unlink(dirname(__FILE__) . '/upgrade_1-1.sql');
 	@unlink(dirname(__FILE__) . '/upgrade_2-0_' . $db_type . '.sql');
 	@unlink(dirname(__FILE__) . '/upgrade_2-1_' . $db_type . '.sql');
-	@unlink(dirname(__FILE__) . '/webinstall.php');
 
 	$dh = opendir(dirname(__FILE__));
 	while ($file = readdir($dh))
@@ -2897,35 +2896,35 @@ function loadEssentialFunctions()
 	{
 		/**
 		 * holds the connection response
-		 * @var type
+		 * @var resource
 		 */
 		public $connection;
 
 		/**
 		 * holds any errors
-		 * @var type
+		 * @var string|boolean
 		 */
 		public $error;
 
 		/**
 		 * holds last message from the server
-		 * @var type
+		 * @var string
 		 */
 		public $last_message;
 
 		/**
 		 * Passive connection
-		 * @var type
+		 * @var mixed[]
 		 */
 		public $pasv;
 
 		/**
 		 * Create a new FTP connection...
 		 *
-		 * @param type $ftp_server
-		 * @param type $ftp_port
-		 * @param type $ftp_user
-		 * @param type $ftp_pass
+		 * @param string $ftp_server
+		 * @param int $ftp_port
+		 * @param string $ftp_user
+		 * @param string $ftp_pass
 		 */
 		public function __construct($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@yourdomain.org')
 		{
@@ -2941,10 +2940,10 @@ function loadEssentialFunctions()
 		/**
 		 * Connects to a server
 		 *
-		 * @param type $ftp_server
-		 * @param type $ftp_port
-		 * @param type $ftp_user
-		 * @param type $ftp_pass
+		 * @param string $ftp_server
+		 * @param int $ftp_port
+		 * @param string $ftp_user
+		 * @param string $ftp_pass
 		 */
 		public function connect($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@yourdomain.org')
 		{
@@ -2991,7 +2990,8 @@ function loadEssentialFunctions()
 		/**
 		 * Changes to a directory (chdir) via the ftp connection
 		 *
-		 * @param type $ftp_path
+		 * @param string $ftp_path
+		 * @return boolean
 		 */
 		public function chdir($ftp_path)
 		{
@@ -3016,7 +3016,8 @@ function loadEssentialFunctions()
 		 * Changes a files atrributes (chmod)
 		 *
 		 * @param string $ftp_file
-		 * @param type $chmod
+		 * @param int $chmod
+		 * @return boolean
 		 */
 		public function chmod($ftp_file, $chmod)
 		{
@@ -3040,7 +3041,8 @@ function loadEssentialFunctions()
 		/**
 		 * Deletes a file
 		 *
-		 * @param type $ftp_file
+		 * @param string $ftp_file
+		 * @return boolean
 		 */
 		public function unlink($ftp_file)
 		{
@@ -3068,7 +3070,7 @@ function loadEssentialFunctions()
 		/**
 		 * Reads the response to the command from the server
 		 *
-		 * @param type $desired
+		 * @param string[]|string $desired string or array of acceptable return values
 		 */
 		public function check_response($desired)
 		{
@@ -3084,6 +3086,8 @@ function loadEssentialFunctions()
 
 		/**
 		 * Used to create a passive connection
+		 *
+		 * @return boolean
 		 */
 		public function passive()
 		{
@@ -3096,7 +3100,7 @@ function loadEssentialFunctions()
 			$time = time();
 			do
 				$response = fgets($this->connection, 1024);
-			while (strpos($response, ' ', 3) !== 3 && time() - $time < 5);
+			while (substr($response, 3, 1) !== ' ' && time() - $time < 5);
 
 			// If it's not 227, we weren't given an IP and port, which means it failed.
 			if (strpos($response, '227 ') !== 0)
@@ -3121,7 +3125,8 @@ function loadEssentialFunctions()
 		/**
 		 * Creates a new file on the server
 		 *
-		 * @param type $ftp_file
+		 * @param string $ftp_file
+		 * @return boolean
 		 */
 		public function create_file($ftp_file)
 		{
@@ -3157,10 +3162,11 @@ function loadEssentialFunctions()
 		}
 
 		/**
-		 * Generates a directory listing for the current directory
+		 * Generates a direcotry listing for the current directory
 		 *
-		 * @param type $ftp_path
-		 * @param type $search
+		 * @param string $ftp_path
+		 * @param string|boolean $search
+		 * @return false|string
 		 */
 		public function list_dir($ftp_path = '', $search = false)
 		{
@@ -3201,10 +3207,11 @@ function loadEssentialFunctions()
 		}
 
 		/**
-		 * Determines the current directory we are in
+		 * Determins the current dirctory we are in
 		 *
-		 * @param type $file
-		 * @param type $listing
+		 * @param string $file
+		 * @param string|null $listing
+		 * @return string|false
 		 */
 		public function locate($file, $listing = null)
 		{
@@ -3216,7 +3223,7 @@ function loadEssentialFunctions()
 			$time = time();
 			do
 				$response = fgets($this->connection, 1024);
-			while ($response[3] != ' ' && time() - $time < 5);
+			while (substr($response, 3, 1) !== ' ' && time() - $time < 5);
 
 			// Check for 257!
 			if (preg_match('~^257 "(.+?)" ~', $response, $match) != 0)
@@ -3249,7 +3256,8 @@ function loadEssentialFunctions()
 		/**
 		 * Creates a new directory on the server
 		 *
-		 * @param type $ftp_dir
+		 * @param string $ftp_dir
+		 * @return boolean
 		 */
 		public function create_dir($ftp_dir)
 		{
@@ -3271,8 +3279,9 @@ function loadEssentialFunctions()
 		/**
 		 * Detects the current path
 		 *
-		 * @param type $filesystem_path
-		 * @param type $lookup_file
+		 * @param string $filesystem_path
+		 * @param string|null $lookup_file
+		 * @return string[] $username, $path, found_path
 		 */
 		public function detect_path($filesystem_path, $lookup_file = null)
 		{
@@ -3321,6 +3330,8 @@ function loadEssentialFunctions()
 
 		/**
 		 * Close the ftp connection
+		 *
+		 * @return boolean
 		 */
 		public function close()
 		{
@@ -3427,26 +3438,26 @@ function template_chmod()
 	echo '
 		<table style="width: 520px; margin: 1em 0; border-collapse:collapse; border-spacing: 0; padding: 0; text-align:center;">
 			<tr>
-				<td style="width:26%; vertical-align:top" class="textbox"><label for="ftp_server">', $txt['ftp_server'], ':</label></td>
+				<td style="width: 26%; vertical-align: top;" class="textbox"><label for="ftp_server">', $txt['ftp_server'], ':</label></td>
 				<td>
 					<div style="float: right; margin-right: 1px;"><label for="ftp_port" class="textbox"><strong>', $txt['ftp_port'], ':&nbsp;</strong></label> <input type="text" size="3" name="ftp_port" id="ftp_port" value="', isset($upcontext['chmod']['port']) ? $upcontext['chmod']['port'] : '21', '" class="input_text" /></div>
 					<input type="text" size="30" name="ftp_server" id="ftp_server" value="', isset($upcontext['chmod']['server']) ? $upcontext['chmod']['server'] : 'localhost', '" style="width: 70%;" class="input_text" />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['ftp_server_info'], '</div>
 				</td>
 			</tr><tr>
-				<td style="width:26%; vertical-align:top" class="textbox"><label for="ftp_username">', $txt['ftp_username'], ':</label></td>
+				<td style="width: 26%; vertical-align: top;" class="textbox"><label for="ftp_username">', $txt['ftp_username'], ':</label></td>
 				<td>
 					<input type="text" size="50" name="ftp_username" id="ftp_username" value="', isset($upcontext['chmod']['username']) ? $upcontext['chmod']['username'] : '', '" style="width: 99%;" class="input_text" />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['ftp_username_info'], '</div>
 				</td>
 			</tr><tr>
-				<td style="width:26%; vertical-align:top" class="textbox"><label for="ftp_password">', $txt['ftp_password'], ':</label></td>
+				<td style="width: 26%; vertical-align: top;" class="textbox"><label for="ftp_password">', $txt['ftp_password'], ':</label></td>
 				<td>
 					<input type="password" size="50" name="ftp_password" id="ftp_password" style="width: 99%;" class="input_password" />
 					<div style="font-size: smaller; margin-bottom: 3ex;">', $txt['ftp_password_info'], '</div>
 				</td>
 			</tr><tr>
-				<td style="width:26%; vertical-align:top" class="textbox"><label for="ftp_path">', $txt['ftp_path'], ':</label></td>
+				<td style="width: 26%; vertical-align: top;" class="textbox"><label for="ftp_path">', $txt['ftp_path'], ':</label></td>
 				<td style="padding-bottom: 1ex;">
 					<input type="text" size="50" name="ftp_path" id="ftp_path" value="', isset($upcontext['chmod']['path']) ? $upcontext['chmod']['path'] : '', '" style="width: 99%;" class="input_text" />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', !empty($upcontext['chmod']['path']) ? $txt['ftp_path_found_info'] : $txt['ftp_path_info'], '</div>
@@ -3475,12 +3486,12 @@ function template_upgrade_above()
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="robots" content="noindex" />
 		<title>', $txt['upgrade_upgrade_utility'], '</title>
-		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css?beta10" />
-		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/_light/index_light.css?beta10" />
-		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/install.css?beta10" />
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" id="jquery"></script>
+		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css?10RC1" />
+		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/_light/index_light.css?10RC1" />
+		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/install.css?10RC1" />
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" id="jquery"></script>
 		<script><!-- // --><![CDATA[
-			window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-1.10.2.min.js"><\/script>\');
+			window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-1.11.1.min.js"><\/script>\');
 		// ]]></script>
 		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 		<script><!-- // --><![CDATA[
@@ -3819,7 +3830,7 @@ function template_welcome_message()
 			<strong>Admin Login: ', $disable_security ? '(DISABLED)' : '', '</strong>
 			<h3>For security purposes please login with your admin account to proceed with the upgrade.</h3>
 			<table>
-				<tr style="vertical-align:top">
+				<tr style="vertical-align: top;">
 					<td><strong ', $disable_security ? 'style="color: lightgray;"' : '', '>Username:</strong></td>
 					<td>
 						<input type="text" name="user" value="', !empty($upcontext['username']) ? $upcontext['username'] : '', '" ', $disable_security ? 'disabled="disabled"' : '', ' class="input_text" />';
@@ -3831,7 +3842,7 @@ function template_welcome_message()
 	echo '
 					</td>
 				</tr>
-				<tr style="vertical-align:top">
+				<tr style="vertical-align: top;">
 					<td><strong ', $disable_security ? 'style="color: lightgray;"' : '', '>Password:</strong></td>
 					<td>
 						<input type="password" name="passwrd" value=""', $disable_security ? ' disabled="disabled"' : '', ' class="input_password" />
@@ -3936,20 +3947,20 @@ function template_upgrade_options()
 		</div>';
 
 	echo '
-				<table style="border-collapse:collapse; border-spacing: 1; padding: 2px">
-					<tr style="vertical-align:top">
-						<td style="width:2%">
+				<table style="border-collapse:collapse; border-spacing: 1; padding: 2px;">
+					<tr style="vertical-align: top;">
+						<td style="width: 2%;">
 							<input type="checkbox" name="backup" id="backup" value="1"', $db_type != 'mysql' && $db_type != 'postgresql' ? ' disabled="disabled"' : '', ' class="input_check" />
 						</td>
-						<td style="width:100%">
+						<td style="width: 100%;">
 							<label for="backup">Backup tables in your database with the prefix &quot;backup_' . $db_prefix . '&quot;.</label>', isset($modSettings['elkVersion']) ? '' : ' (recommended!)', '
 						</td>
 					</tr>
-					<tr style="vertical-align:top">
-						<td style="width:2%">
+					<tr style="vertical-align: top;">
+						<td style="width: 2%;">
 							<input type="checkbox" name="maint" id="maint" value="1" checked="checked" class="input_check" />
 						</td>
-						<td style="width:100%">
+						<td style="width: 100%;">
 							<label for="maint">Put the forum into maintenance mode during upgrade.</label> <span class="smalltext">(<a href="#" onclick="document.getElementById(\'mainmess\').style.display = document.getElementById(\'mainmess\').style.display == \'\' ? \'none\' : \'\'">Customize</a>)</span>
 							<div id="mainmess" style="display: none;">
 								<strong class="smalltext">Maintenance Title: </strong><br />
@@ -3959,19 +3970,19 @@ function template_upgrade_options()
 							</div>
 						</td>
 					</tr>
-					<tr style="vertical-align:top">
-						<td style="width:2%">
+					<tr style="vertical-align: top;">
+						<td style="width: 2%;">
 							<input type="checkbox" name="debug" id="debug" value="1" class="input_check" />
 						</td>
-						<td style="width:100%">
+						<td style="width: 100%;">
 							<label for="debug">Output extra debugging information</label>
 						</td>
 					</tr>
-					<tr style="vertical-align:top">
-						<td style="width:2%">
+					<tr style="vertical-align: top;">
+						<td style="width: 2%;">
 							<input type="checkbox" name="empty_error" id="empty_error" value="1" class="input_check" />
 						</td>
-						<td style="width:100%">
+						<td style="width: 100%;">
 							<label for="empty_error">Empty error log before upgrading</label>
 						</td>
 					</tr>

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  */
 
 /**
@@ -52,7 +52,9 @@ function template_maintain_database()
 			</div>
 		</div>
 		<h3 class="category_header">
-			<a href="', $scripturl, '?action=quickhelp;help=maintenance_backup" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['maintain_backup'], '
+			<a href="', $scripturl, '?action=quickhelp;help=maintenance_backup" onclick="return reqOverlayDiv(this.href);" class="help">
+				<img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" />
+			</a> ', $txt['maintain_backup'], '
 		</h3>
 		<div class="windowbg">
 			<div class="content">
@@ -339,7 +341,9 @@ function template_maintain_topics()
 		// Display a checkbox with every board.
 		foreach ($category['boards'] as $board)
 			echo '
-									<li style="margin-', $context['right_to_left'] ? 'right' : 'left', ': ', $board['child_level'] * 1.5, 'em;"><label for="boards_', $board['id'], '"><input type="checkbox" name="boards[', $board['id'], ']" id="boards_', $board['id'], '" checked="checked" class="input_check" />', $board['name'], '</label></li>';
+									<li style="margin-', $context['right_to_left'] ? 'right' : 'left', ': ', $board['child_level'] * 1.5, 'em;">
+										<label for="boards_', $board['id'], '"><input type="checkbox" name="boards[', $board['id'], ']" id="boards_', $board['id'], '" checked="checked" class="input_check" />', $board['name'], '</label>
+									</li>';
 
 		echo '
 								</ul>
@@ -367,7 +371,9 @@ function template_maintain_topics()
 		<div class="windowbg">
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=topics;activity=olddrafts" method="post" accept-charset="UTF-8">
-					<p><label for="draftdays">', sprintf($txt['maintain_old_drafts_days'], ' <input type="text" id="draftdays" name="draftdays" value="' . (!empty($modSettings['drafts_keep_days']) ? $modSettings['drafts_keep_days'] : 30) . '" size="3" /> '), '</label></p>
+					<p>
+						<label for="draftdays">', sprintf($txt['maintain_old_drafts_days'], ' <input type="text" id="draftdays" name="draftdays" value="' . (!empty($modSettings['drafts_keep_days']) ? $modSettings['drafts_keep_days'] : 30) . '" size="3" /> '), '</label>
+					</p>
 					<div class="submitbutton">
 						<input type="submit" value="', $txt['maintain_old_remove'], '" onclick="return confirm(\'', $txt['maintain_old_drafts_confirm'], '\');" class="button_submit" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

@@ -3,11 +3,12 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  * This file contains javascript associated with the atwho function as it
  * relates to an sceditor invocation
  */
+var disableDrafts = false;
 
 (function($, window, document) {
 	'use strict';
@@ -30,7 +31,6 @@
 		$element.atwho({
 			at: "@",
 			limit: 7,
-			cWindow: oIframeWindow,
 			tpl: "<li data-value='${atwho-at}${name}' data-id='${id}'>${name}</li>",
 			callbacks: {
 				filter: function (query, items, search_key) {
@@ -77,10 +77,6 @@
 				before_insert: function(value, $li) {
 					oMentions.addUID($li.data('id'), $li.data('value'));
 
-					// Opera apparently doesn't remove the @ before value is inserted, so...let's remove it here
-					if (is_opera && !base.inSourceMode())
-						return value.replace($li.data('value'), $li.data('value').substring(1));
-
 					return value;
 				},
 				matcher: function(flag, subtext, should_start_with_space) {
@@ -112,51 +108,11 @@
 				}
 			}
 		});
-
-		// This hook is triggered when atWho places a slection list on the screen, we use
-		// it to properly place it next to the @text
-		$(oIframeWindow).on("reposition.atwho", function(event, offset) {
-			// We only need this for the wysiwyg window
-			if (base.inSourceMode())
-				return;
-
-			// offset contains the top left values of the offset to the iframe
-			// we need to convert that to main window coordinates
-			var oIframe = $('#' + oMentions.opts.editor_id).parent().find('iframe').offset(),
-				iLeft = oIframe.left + offset.left,
-				iTop = oIframe.top,
-				select_height = 0;
-
-			// atWho adds 3 select areas, presumably for different positing on screen (above below etc)
-			// This finds the active one and gets the container height
-			// @todo find something better than this
-			// @todo 64 is the character code @
-			$('#at-view-64.atwho-view').each(function(index, element) {
-				if ($(this).outerHeight() > 0)
-					select_height += $(this).height() + 10;
-			});
-
-			// Now should we show the selection box above or below?
-			var iWindowHeight = $(window).height(),
-				iDocViewTop = $(window).scrollTop(),
-				iSelectionPosition = iTop + offset.top - $(window).scrollTop(),
-				iAvailableSpace = iWindowHeight - (iSelectionPosition - iDocViewTop);
-
-			if (iAvailableSpace >= select_height)
-			{
-				// Enough space below
-				iTop = iTop + offset.top + select_height - $(window).scrollTop();
-			}
-			else
-			{
-				// Place it above instead
-				// @todo should check if this is more space than below
-				iTop= iTop + offset.top - $(window).scrollTop();
-			}
-
-			// Move the select box
-			offset = {left: iLeft, top: iTop};
-			$('#at-view-64.atwho-view').offset(offset);
+		$(oIframeWindow).on("shown.atwho", function(event, offset) {
+			disableDrafts = true;
+		});
+		$(oIframeWindow).on("hidden.atwho", function(event, offset) {
+			disableDrafts = false;
 		});
 	};
 

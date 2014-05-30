@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -147,7 +147,7 @@ class ManageErrors_Controller extends Action_Controller
 		if (!empty($members))
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
-			$members = getBasicMemberData($members, array('add_guest'=> true));
+			$members = getBasicMemberData($members, array('add_guest' => true));
 
 			// Go through each error and tack the data on.
 			foreach ($context['errors'] as $id => $dummy)

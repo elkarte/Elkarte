@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -1038,17 +1038,33 @@ class Email_Parse
 	{
 		// Lets assume we have one of the functions available to us
 		$this->_converted_utf8 = true;
+		$string_save = $string;
 
+		// Use iconv if its available
 		if (function_exists('iconv'))
-			return @iconv($from, $to . '//TRANSLIT//IGNORE', $string);
-		elseif (function_exists('mb_convert_encoding'))
-			return @mb_convert_encoding($string, $to, $from);
-		elseif (function_exists('recode_string'))
-			return @recode_string($from . '..' . $to, $string);
-		else
+			$string = @iconv($from, $to . '//TRANSLIT//IGNORE', $string);
+
+		// No iconv or a false response from it
+		if (!function_exists('iconv') || ($string == false))
 		{
-			$this->_converted_utf8 = false;
-			return $string;
+			// PHP (some 5.4 versions) mishandles //TRANSLIT//IGNORE and returns false: see https://bugs.php.net/bug.php?id=61484
+			if ($string == false)
+				$string = $string_save;
+
+			if (function_exists('mb_convert_encoding'))
+			{
+				// Replace unknown characters with a space
+				@ini_set('mbstring.substitute_character', '32');
+				$string = @mb_convert_encoding($string, $to, $from);
+			}
+			elseif (function_exists('recode_string'))
+				$string = @recode_string($from . '..' . $to, $string);
+			else
+				$this->_converted_utf8 = false;
 		}
+
+		unset($string_save);
+
+		return $string;
 	}
 }

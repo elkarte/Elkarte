@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -215,7 +215,7 @@ function deleteMembergroups($groups)
  *
  * @package Membergroups
  * @param int[]|int $members
- * @param integer $groups
+ * @param integer|null $groups
  * @param bool $permissionCheckDone = false
  *
  * @return boolean
@@ -641,7 +641,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 		ORDER BY {raw:sort}',
 		array(
 			'current_member' => $user_id,
-			'min_posts' => ($membergroup_type === 'post_count' ? '!= ' : '= ') . -1,
+			'min_posts' => ($membergroup_type === 'post_count' ? '!= -1' : '= -1'),
 			'mod_group' => 3,
 			'is_protected' => 1,
 			'sort' => $sort,
@@ -761,6 +761,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 	if (substr($sort, 0, 1) == '1' || strpos($sort, ', 1') !== false)
 	{
 		$sort_ascending = strpos($sort, 'DESC') === false;
+		$sort_array = array();
 
 		foreach ($groups as $group)
 			$sort_array[] = $group['id_group'] != 3 ? (int) $group['num_members'] : -1;
@@ -1813,6 +1814,7 @@ function loadGroups($id_member, $show_hidden = false, $min_posts = -1)
  * Returns the groups that the current user can see.
  *
  * - uses $user_info and allowedTo().
+ * - does not include post count based groups
  *
  * @package Membergroups
  * @return array

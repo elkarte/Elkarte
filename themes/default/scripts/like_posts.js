@@ -3,7 +3,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  * Functions to provide ajax capability to the like / unlike button
  * Makes the appropriate call in the background and updates the button text
@@ -95,6 +95,10 @@
 				$(params.elem).removeClass(currentClass).addClass(nextClass);
 				$(params.elem).html('&nbsp;' + params.text);
 				$(params.elem).attr('title', params.title);
+
+				// Update the count bubble if needed
+				if (params.count !== 0)
+					$(params.elem).html('<span class="likes_indicator">' + params.count + '</span>&nbsp;' + params.text);
 
 				// Changed the title text, update the tooltips
 				$("." + nextClass).SiteTooltip({
