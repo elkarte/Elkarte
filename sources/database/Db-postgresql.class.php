@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -297,9 +297,6 @@ class Database_PostgreSQL implements Database
 			),
 			'consolidate_spider_stats' => array(
 				'~MONTH\(log_time\), DAYOFMONTH\(log_time\)~' => 'MONTH(CAST(CAST(log_time AS abstime) AS timestamp)), DAYOFMONTH(CAST(CAST(log_time AS abstime) AS timestamp))',
-			),
-			'delete_subscription' => array(
-				'~LIMIT 1~' => '',
 			),
 			'display_get_post_poster' => array(
 				'~GROUP BY id_msg\s+HAVING~' => 'AND',
@@ -1100,6 +1097,11 @@ class Database_PostgreSQL implements Database
 
 	/**
 	 * This function optimizes a table.
+	 *
+	 * - reclaims storage occupied by dead tuples. In normal PostgreSQL operation, tuples
+	 * that are deleted or obsoleted by an update are not physically removed from their table;
+	 * they remain present until a VACUUM is done. Therefore it's necessary to do VACUUM periodically,
+	 * especially on frequently-updated tables.
 	 *
 	 * @param string $table - the table to be optimized
 	 *

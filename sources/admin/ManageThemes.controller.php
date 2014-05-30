@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  *
  * @todo Update this for the new package manager?
@@ -92,7 +92,6 @@ class ManageThemes_Controller extends Action_Controller
 		{
 			$context[$context['admin_menu_name']]['tab_data'] = array(
 				'title' => $txt['themeadmin_title'],
-				'help' => 'themes',
 				'description' => $txt['themeadmin_description'],
 				'tabs' => array(
 					'admin' => array(
@@ -1135,13 +1134,13 @@ class ManageThemes_Controller extends Action_Controller
 			$theme_dir = BOARDDIR . '/themes/' . $theme_name;
 
 			if (isset($_FILES['theme_gz']) && is_uploaded_file($_FILES['theme_gz']['tmp_name']) && (ini_get('open_basedir') != '' || file_exists($_FILES['theme_gz']['tmp_name'])))
-				$extracted = read_tgz_file($_FILES['theme_gz']['tmp_name'], BOARDDIR . '/themes/' . $theme_name, false, true);
+				read_tgz_file($_FILES['theme_gz']['tmp_name'], BOARDDIR . '/themes/' . $theme_name, false, true);
 			elseif (isset($_REQUEST['theme_gz']))
 			{
 				if (!isAuthorizedServer($_REQUEST['theme_gz']))
 					fatal_lang_error('not_valid_server');
 
-				$extracted = read_tgz_file($_REQUEST['theme_gz'], BOARDDIR . '/themes/' . $theme_name, false, true);
+				read_tgz_file($_REQUEST['theme_gz'], BOARDDIR . '/themes/' . $theme_name, false, true);
 			}
 			else
 				redirectexit('action=admin;area=theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id']);

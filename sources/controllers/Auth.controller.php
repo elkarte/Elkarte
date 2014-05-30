@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -62,6 +62,7 @@ class Auth_Controller extends Action_Controller
 		// Load the Login template/language file.
 		loadLanguage('Login');
 		loadTemplate('Login');
+		loadJavascriptFile('sha256.js', array('defer' => true));
 		$context['sub_template'] = 'login';
 
 		// Get the template ready.... not really much else to do.
@@ -134,6 +135,7 @@ class Auth_Controller extends Action_Controller
 
 		// Load the template stuff
 		loadTemplate('Login');
+		loadJavascriptFile('sha256.js', array('defer' => true));
 		$context['sub_template'] = 'login';
 
 		// Set up the default/fallback stuff.
@@ -425,6 +427,7 @@ class Auth_Controller extends Action_Controller
 
 		loadLanguage('Login');
 		loadTemplate('Login');
+		loadJavascriptFile('sha256.js', array('defer' => true));
 		createToken('login');
 
 		// Never redirect to an attachment
@@ -448,6 +451,7 @@ class Auth_Controller extends Action_Controller
 
 		loadLanguage('Login');
 		loadTemplate('Login');
+		loadJavascriptFile('sha256.js', array('defer' => true));
 		createToken('login');
 
 		// Send a 503 header, so search engines don't bother indexing while we're in maintenance mode.

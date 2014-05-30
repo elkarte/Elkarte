@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -20,11 +20,11 @@
  */
 function template_notification_settings()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
-		<h3 class="category_header">
-			<img src="', $settings['images_url'], '/profile/email_sm.png" alt="" class="icon" />', $txt['notify'], '
+		<h3 class="category_header hdicon cat_img_mail">
+			', $txt['notify'], '
 		</h3>
 		<div class="roundframe centertext">
 			<p>', $context['notification_set'] ? $txt['notify_deactivate'] : $txt['notify_request'], '</p>
@@ -39,11 +39,11 @@ function template_notification_settings()
  */
 function template_notify_board()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
-		<h3 class="category_header">
-			<img src="', $settings['images_url'], '/profile/email_sm.png" alt="" class="icon" />', $txt['notify'], '
+		<h3 class="category_header hdicon cat_img_mail">
+			', $txt['notify'], '
 		</h3>
 		<div class="roundframe centertext">
 			<p>', $context['notification_set'] ? $txt['notifyboard_turnoff'] : $txt['notifyboard_turnon'], '</p>

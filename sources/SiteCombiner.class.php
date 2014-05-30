@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  */
 
 if (!defined('ELK'))
@@ -407,7 +407,7 @@ class Site_Combiner
 			// To prevent a stack overflow segmentation fault, which silently kills Apache, we need to limit
 			// recursion on windows.  This may cause jsminplus to fail, but at least its then catchable.
 			if ($context['server']['is_windows'])
-				@ini_set("pcre.recursion_limit", "524");
+				@ini_set('pcre.recursion_limit', '524');
 
 			$fetch_data = JSMinPlus::minify($this->_cache);
 		}

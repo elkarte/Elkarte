@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -22,7 +22,7 @@
  * @param string $before
  * @param string $after
  */
-function template_control_verification($verify_id, $before = '', $after = '')
+function template_verification_controls($verify_id, $before = '', $after = '')
 {
 	global $context;
 
@@ -42,7 +42,7 @@ function template_control_verification($verify_id, $before = '', $after = '')
 		echo '
 			<div id="verification_control_', $i, '" class="verification_control">';
 
-		call_user_func('template_control_verification_' . $verification['template'], $verify_id, $verification['values']);
+		call_user_func('template_verification_control_' . $verification['template'], $verify_id, $verification['values']);
 
 		echo '
 			</div>';
@@ -58,9 +58,9 @@ function template_control_verification($verify_id, $before = '', $after = '')
  * Used to show a verification question
  *
  * @param int $verify_id
- * @param array $verify_context
+ * @param mixed[] $verify_context
  */
-function template_control_verification_questions($verify_id, $verify_context)
+function template_verification_control_questions($verify_id, $verify_context)
 {
 	global $context;
 
@@ -76,9 +76,9 @@ function template_control_verification_questions($verify_id, $verify_context)
  * Used to show one of those easy for robot, hard for human captcha's
  *
  * @param int $verify_id
- * @param array $verify_context
+ * @param mixed[] $verify_context
  */
-function template_control_verification_captcha($verify_id, $verify_context)
+function template_verification_control_captcha($verify_id, $verify_context)
 {
 	global $context, $txt;
 
@@ -86,35 +86,39 @@ function template_control_verification_captcha($verify_id, $verify_context)
 		echo '
 				<img src="', $verify_context['image_href'], '" alt="', $txt['visual_verification_description'], '" id="verification_image_', $verify_id, '" />';
 	else
-		echo '
-				<img src="', $verify_context['image_href'], ';letter=1" alt="', $txt['visual_verification_description'], '" id="verification_image_', $verify_id, '_1" />
-				<img src="', $verify_context['image_href'], ';letter=2" alt="', $txt['visual_verification_description'], '" id="verification_image_', $verify_id, '_2" />
-				<img src="', $verify_context['image_href'], ';letter=3" alt="', $txt['visual_verification_description'], '" id="verification_image_', $verify_id, '_3" />
-				<img src="', $verify_context['image_href'], ';letter=4" alt="', $txt['visual_verification_description'], '" id="verification_image_', $verify_id, '_4" />
-				<img src="', $verify_context['image_href'], ';letter=5" alt="', $txt['visual_verification_description'], '" id="verification_image_', $verify_id, '_5" />
-				<img src="', $verify_context['image_href'], ';letter=6" alt="', $txt['visual_verification_description'], '" id="verification_image_', $verify_id, '_6" />';
+		for($i = 0; $i < $verify_context['chars_number']; $i++)
+			echo '
+				<img src="', $verify_context['image_href'], ';letter=', $i, '" alt="', $txt['visual_verification_description'], '" id="verification_image_', $verify_id, '_', $i, '" />';
 
 	echo '
-				<div class="smalltext" style="margin: 4px 0 8px 0;">
-					<a href="', $verify_context['image_href'], ';sound" id="visual_verification_', $verify_id, '_sound" rel="nofollow">', $txt['visual_verification_sound'], '</a> / <a href="#visual_verification_', $verify_id, '_refresh" id="visual_verification_', $verify_id, '_refresh">', $txt['visual_verification_request_new'], '</a><br /><br />
+				<div class="smalltext">
+					<a href="', $verify_context['image_href'], ';sound" id="visual_verification_', $verify_id, '_sound" data-type="sound" class="playsound" rel="nofollow">', $txt['visual_verification_sound'], '</a> / <a href="#visual_verification_', $verify_id, '_refresh" id="visual_verification_', $verify_id, '_refresh" class="refreshimage">', $txt['visual_verification_request_new'], '</a><br /><br />
 					<label for="', $verify_id, '_vv[code]">', $txt['visual_verification_description'], '</label>:
 					<input type="text" id="', $verify_id, '_vv[code]" name="', $verify_id, '_vv[code]" value="', !empty($verify_context['text_value']) ? $verify_context['text_value'] : '', '" size="30" tabindex="', $context['tabindex']++, '" class="', $verify_context['is_error'] ? 'border_error ' : '', 'input_text" />
 				</div>';
+
+	addInlineJavascript('
+		$(\'.playsound, .refreshimage\').Elk_Captcha({
+			\'uniqueID\': ' . JavaScriptEscape($verify_id) . ',
+			\'imageURL\': ' . JavaScriptEscape($verify_context['image_href']) . ',
+			\'useLibrary\': ' . ($verify_context['use_graphic_library'] ? 'true' : 'false') . ',
+			\'letterCount\': ' . $verify_context['chars_number'] . '
+		});', true);
 }
 
 /**
  * Display the empty field verification
  *
  * @param int $verify_id
- * @param array $verify_context
+ * @param mixed[] $verify_context
  */
-function template_control_verification_emptyfield($verify_id, $verify_context)
+function template_verification_control_emptyfield($verify_id, $verify_context)
 {
 	global $context, $txt;
 
 	// Display an empty field verification
 	echo '
-			<div class="smalltext verification_control_valid">
+			<div class="verification_control_valid">
 				<label for="', $verify_context['field_name'], '">', $txt['visual_verification_hidden'], '</label>:
 				<input type="text" id="', $verify_context['field_name'], '" name="', $verify_context['field_name'], '" autocomplete="off" size="30" value="', (!empty($verify_context['user_value']) ? $verify_context['user_value'] : '' ), '" tabindex="', $context['tabindex']++, '" class="', $verify_context['is_error'] ? 'border_error ' : '', 'input_text" />
 			</div>';

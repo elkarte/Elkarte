@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -92,7 +92,7 @@ function allMembergroups($group_clause, $query_groups = array())
 /**
  * Boards profiles and related permissions
  *
- * @param array $profiles a list of board profile ids
+ * @param int[] $profiles a list of board profile ids
  * @param string $group_clause a string used as WHERE cluase in the query
  * @param int[] $query_groups an array of group ids
  */

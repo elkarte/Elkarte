@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -361,7 +361,7 @@ function template_subject_list_above()
 {
 	global $context;
 
-	// If we are not in single display mode show the subjects on the top! @todo - Horrible markup here.
+	// If we are not in single display mode show the subjects on the top!
 	if ($context['display_mode'] != 1)
 	{
 		template_subject_list();
@@ -395,7 +395,6 @@ function template_subject_list()
 {
 	global $context, $settings, $txt, $scripturl;
 
-	// @todo - Should really get rid of some of the inline CSS in this table.
 	echo '
 					<table class="table_grid">
 						<thead>
@@ -412,7 +411,7 @@ function template_subject_list()
 								<th class="pm_from">
 									<a href="', $scripturl, '?action=pm;f=', $context['folder'], ';start=', $context['start'], ';sort=name', $context['sort_by'] == 'name' && $context['sort_direction'] == 'up' ? ';desc' : '', $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', '">', ($context['from_or_to'] == 'from' ? $txt['from'] : $txt['to']), $context['sort_by'] == 'name' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
 								</th>
-								<th class="pm_qickmod">
+								<th class="pm_quickmod">
 									<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />
 								</th>
 							</tr>
@@ -461,7 +460,7 @@ function template_subject_list()
 								<td class="pm_from">
 									', ($context['from_or_to'] == 'from' ? $message['member']['link'] : (empty($message['recipients']['to']) ? '' : implode(', ', $message['recipients']['to']))), '
 								</td>
-								<td class="pm_qiuckmod">
+								<td class="pm_quickmod">
 									<input type="checkbox" name="pms[]" id="deletelisting', $message['id'], '" value="', $message['id'], '"', $message['is_selected'] ? ' checked="checked"' : '', ' onclick="if (document.getElementById(\'deletedisplay', $message['id'], '\')) document.getElementById(\'deletedisplay', $message['id'], '\').checked = this.checked;" class="input_check" />
 								</td>
 							</tr>';
@@ -725,15 +724,14 @@ function template_search_results()
 			</h2>';
 
 	// complete results ?
-	// @todo - Should really get rid of some of the inline CSS in this table.
 	if (empty($context['search_params']['show_complete']) && !empty($context['personal_messages']))
 		echo '
 			<table class="table_grid">
 				<thead>
 					<tr class="table_head">
-						<th class="lefttext" style="width:30%">', $txt['date'], '</th>
-						<th class="lefttext" style="width:50%">', $txt['subject'], '</th>
-						<th class="lefttext" style="width:20%">', $txt['from'], '</th>
+						<th class="lefttext grid30">', $txt['date'], '</th>
+						<th class="lefttext grid50">', $txt['subject'], '</th>
+						<th class="lefttext grid20">', $txt['from'], '</th>
 					</tr>
 				</thead>
 				<tbody>';
@@ -797,7 +795,7 @@ function template_search_results()
 		{
 			// @todo No context at all of the search?
 			echo '
-			<tr class="', $alternate ? 'windowbg' : 'windowbg2', '" style="vertical-align:top">
+			<tr class="', $alternate ? 'windowbg' : 'windowbg2', '" style="vertical-align: top;">
 				<td>', $message['time'], '</td>
 				<td>', $message['link'], '</td>
 				<td>', $message['member']['link'], '</td>
@@ -940,7 +938,7 @@ function template_send()
 
 	// Require an image to be typed to save spamming?
 	if ($context['require_verification'])
-		template_control_verification($context['visual_verification_id'], '
+		template_verification_controls($context['visual_verification_id'], '
 					<div class="post_verification">
 						<strong>' . $txt['pm_visual_verification_label'] . ':</strong>
 						', '
@@ -1151,7 +1149,7 @@ function template_labels()
 				<th class="lefttext">
 					', $txt['pm_label_name'], '
 				</th>
-				<th style="width:4%">';
+				<th style="width: 4%;">';
 
 	if (count($context['labels']) > 2)
 		echo '
@@ -1181,7 +1179,7 @@ function template_labels()
 				<td>
 					<input type="text" name="label_name[', $label['id'], ']" value="', $label['name'], '" size="30" maxlength="30" class="input_text" />
 				</td>
-				<td class="centertext" style="width:4%">
+				<td style="width: 4%;">
 					<input type="checkbox" class="input_check" name="delete_label[', $label['id'], ']" />
 				</td>
 			</tr>';
@@ -1317,7 +1315,7 @@ function template_rules()
 				<th class="lefttext">
 					', $txt['pm_rule_title'], '
 				</th>
-				<th style="width:4%">';
+				<th style="width: 4%;">';
 
 	if (!empty($context['rules']))
 		echo '
@@ -1345,7 +1343,7 @@ function template_rules()
 				<td>
 					<a href="', $scripturl, '?action=pm;sa=manrules;add;rid=', $rule['id'], '">', $rule['name'], '</a>
 				</td>
-				<td class="centertext" style="width:4%">
+				<td style="width: 4%;">
 					<input type="checkbox" name="delrule[', $rule['id'], ']" class="input_check" />
 				</td>
 			</tr>';
@@ -1365,7 +1363,7 @@ function template_rules()
 	if (!empty($context['rules']))
 		echo '
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-			<input type="submit" name="delselected" value="', $txt['pm_delete_selected_rule'], '" onclick="return confirm(\'', $txt['pm_js_delete_rule_confirm'], '\');" class="button_submit smalltext" />';
+			<input type="submit" name="delselected" value="', $txt['pm_delete_selected_rule'], '" onclick="return confirm(\'', $txt['pm_js_delete_rule_confirm'], '\');" class="button_submit" />';
 
 	echo '
 		</div>

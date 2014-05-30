@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -157,10 +157,10 @@ function template_html_above()
 	<link rel="search" href="' . $scripturl . '?action=search" />' : '');
 
 	// If RSS feeds are enabled, advertise the presence of one.
-	if (!empty($modSettings['xmlnews_enable']) && (!empty($modSettings['allow_guestAccess']) || $context['user']['is_logged']))
+	if (!empty($context['newsfeed_urls']))
 		echo '
-	<link rel="alternate" type="application/rss+xml" title="', $context['forum_name_html_safe'], ' - ', $txt['rss'], '" href="', $scripturl, '?type=rss2;action=.xml" />
-	<link rel="alternate" type="application/rss+xml" title="', $context['forum_name_html_safe'], ' - ', $txt['atom'], '" href="', $scripturl, '?type=atom;action=.xml" />';
+	<link rel="alternate" type="application/rss+xml" title="', $context['forum_name_html_safe'], ' - ', $txt['rss'], '" href="', $context['newsfeed_urls']['rss'], '" />
+	<link rel="alternate" type="application/rss+xml" title="', $context['forum_name_html_safe'], ' - ', $txt['atom'], '" href="', $context['newsfeed_urls']['atom'], '" />';
 
 	// If we're viewing a topic, these should be the previous and next topics, respectively.
 	if (!empty($context['links']['next']))
@@ -225,7 +225,6 @@ function template_body_above()
 	{
 		echo '
 			<div id="top_section_notice" class="user">
-				<script src="', $settings['default_theme_url'], '/scripts/sha256.js"></script>
 				<form action="', $scripturl, '?action=login2;quicklogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', '>
 					<div id="password_login">
 						<input type="text" name="user" size="10" class="input_text" placeholder="', $txt['username'], '" />
@@ -256,7 +255,9 @@ function template_body_above()
 	{
 		echo '
 			<form id="search_form" action="', $scripturl, '?action=search;sa=results" method="post" accept-charset="UTF-8">
-				<input type="text" name="search" value="" class="input_text" placeholder="', $txt['search'], '" />';
+				<label for="search">
+					<input type="text" name="search" value="" class="input_text" placeholder="', $txt['search'], '" />
+				</label>';
 
 		// Using the quick search dropdown?
 		if (!empty($modSettings['search_dropdown']))
@@ -264,6 +265,7 @@ function template_body_above()
 			$selected = !empty($context['current_topic']) ? 'current_topic' : (!empty($context['current_board']) ? 'current_board' : 'all');
 
 			echo '
+				<label for="search_selection">
 				<select name="search_selection" id="search_selection">
 					<option value="all"', ($selected == 'all' ? ' selected="selected"' : ''), '>', $txt['search_entireforum'], ' </option>';
 
@@ -284,7 +286,8 @@ function template_body_above()
 
 			echo '
 					<option value="members"', ($selected == 'members' ? ' selected="selected"' : ''), '>', $txt['search_members'], ' </option>
-				</select>';
+				</select>
+				</label>';
 		}
 
 		// Search within current topic?
@@ -354,7 +357,7 @@ function template_body_above()
  */
 function template_body_below()
 {
-	global $context, $scripturl, $txt, $modSettings;
+	global $context, $txt;
 
 	echo '
 		</div>
@@ -369,17 +372,15 @@ function template_body_below()
 				<li class="copyright">',
 					theme_copyright(), '
 				</li>',
-				!empty($modSettings['xmlnews_enable']) && (!empty($modSettings['allow_guestAccess']) || $context['user']['is_logged']) ? '<li><a id="button_rss" href="' . $scripturl . '?action=.xml;type=rss;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5) . '" class="new_win"><span>' . $txt['rss'] . '</span></a></li>' : '',
+				!empty($context['newsfeed_urls']['rss']) ? '<li>
+					<a id="button_rss" href="' . $context['newsfeed_urls']['rss'] . '" class="rssfeeds new_win"><i class="largetext fa fa-rss"></i></a>
+				</li>' : '',
 			'</ul>';
 
 	// Show the load time?
 	if ($context['show_load_time'])
 		echo '
 			<p>', sprintf($txt['page_created_full'], $context['load_time'], $context['load_queries']), '</p>';
-
-	echo '
-		</div>
-	</div>';
 }
 
 /**
@@ -388,6 +389,10 @@ function template_body_below()
 function template_html_below()
 {
 	global $context;
+
+	echo '
+		</div>
+	</div>';
 
 	// load in any javascript that could be deferred to the end of the page
 	template_javascript(true);
@@ -455,7 +460,7 @@ function template_menu()
 
 	// WAI-ARIA a11y tweaks have been applied here.
 	echo '
-					<ul id="main_menu" class="wrapper">';
+					<ul id="main_menu" class="wrapper" role="menubar">';
 
 	// The upshrink image, right-floated.
 	echo '
@@ -470,30 +475,30 @@ function template_menu()
 	foreach ($context['menu_buttons'] as $act => $button)
 	{
 		echo '
-						<li id="button_', $act, '" class="listlevel1', !empty($button['sub_buttons']) ? ' subsections" aria-haspopup="true"' : '"', '>
+						<li id="button_', $act, '" class="listlevel1', !empty($button['sub_buttons']) ? ' subsections" aria-haspopup="true"' : '"', ' role="menuitem">
 							<a ', (!empty($button['data-icon']) ? 'data-icon="' . $button['data-icon'] . '" ' : ''), 'class="linklevel1', !empty($button['active_button']) ? ' active' : '', (!empty($button['indicator']) ? ' indicator' : '' ), '" href="', $button['href'], '" ', isset($button['target']) ? 'target="' . $button['target'] . '"' : '', '><span class="button_title">', $button['title'], '</span></a>';
 
 		// Any 2nd level menus?
 		if (!empty($button['sub_buttons']))
 		{
 			echo '
-							<ul class="menulevel2">';
+							<ul class="menulevel2" role="menu">';
 
 			foreach ($button['sub_buttons'] as $childact => $childbutton)
 			{
 				echo '
-								<li id="button_', $childact, '" class="listlevel2', !empty($childbutton['sub_buttons']) ? ' subsections" aria-haspopup="true"' : '"', '>
+								<li id="button_', $childact, '" class="listlevel2', !empty($childbutton['sub_buttons']) ? ' subsections" aria-haspopup="true"' : '"', ' role="menuitem">
 									<a class="linklevel2" href="', $childbutton['href'], '" ', isset($childbutton['target']) ? 'target="' . $childbutton['target'] . '"' : '', '>', $childbutton['title'], '</a>';
 
 				// 3rd level menus :)
 				if (!empty($childbutton['sub_buttons']))
 				{
 					echo '
-									<ul class="menulevel3">';
+									<ul class="menulevel3" role="menu">';
 
 					foreach ($childbutton['sub_buttons'] as $grandchildact => $grandchildbutton)
 						echo '
-										<li id="button_', $grandchildact, '" class="listlevel3">
+										<li id="button_', $grandchildact, '" class="listlevel3" role="menuitem">
 											<a class="linklevel3" href="', $grandchildbutton['href'], '" ', isset($grandchildbutton['target']) ? 'target="' . $grandchildbutton['target'] . '"' : '', '>', $grandchildbutton['title'], '</a>
 										</li>';
 
@@ -544,10 +549,6 @@ function template_menu()
 						oCookieOptions: {
 							bUseCookie: elk_member_id == 0 ? true : false,
 							sCookieName: \'upshrink\'
-						},
-						funcOnBeforeExpand: function () {
-							if (window.startNewsFader)
-								startNewsFader();
 						}
 					});
 				// ]]></script>';
@@ -689,7 +690,7 @@ function template_show_error($error_id)
 	$error = isset($context[$error_id]) ? $context[$error_id] : array();
 
 	echo '
-					<div id="', $error_id, '" class="', (!isset($error['type']) ? 'successbox' : ($error['type'] !== 'serious' ? 'warningbox' : 'errorbox')), '" ', empty($error['errors']) ? ' style="display: none"' : '', '>';
+					<div id="', $error_id, '" class="', (isset($error['type']) ? ($error['type'] === 'serious' ? 'errorbox' : 'warningbox') : 'successbox'), '" ', empty($error['errors']) ? ' style="display: none"' : '', '>';
 
 	// Optional title for our results
 	if (!empty($error['title']))
@@ -706,9 +707,9 @@ function template_show_error($error_id)
 		echo '
 								<ul', (isset($error['type']) ? ' class="error"' : ''), ' id="', $error_id, '_list">';
 
-		foreach ($error['errors'] as $key => $error)
+		foreach ($error['errors'] as $key => $err)
 			echo '
-									<li id="', $error_id, '_', $key, '">', $error, '</li>';
+									<li id="', $error_id, '_', $key, '">', $err, '</li>';
 		echo '
 								</ul>';
 	}
@@ -753,7 +754,7 @@ function template_pagesection($button_strip = false, $strip_direction = '', $opt
 		$options['extra'] = '';
 
 	echo '
-			<div class="pagesection">
+			<div class="pagesection" role="application">
 				', $pages, '
 				', !empty($button_strip) && !empty($context[$button_strip]) ? template_button_strip($context[$button_strip], $strip_direction) : '',
 	$options['extra'], '
@@ -772,28 +773,8 @@ function template_news_fader()
 			<li>
 				', $settings['enable_news'] == 2 ? implode('</li><li>', $context['news_lines']) : $context['random_news_line'], '
 			</li>
-		</ul>
-	<script><!-- // --><![CDATA[
-		var newsFaderStarted = false;
+		</ul>';
 
-		function startNewsFader()
-		{
-			if (newsFaderStarted)
-				return;
-
-			// Create a news fader object.
-			var oNewsFader = new elk_NewsFader({
-				sFaderControlId: \'elkFadeScroller\',
-				sItemTemplate: ', JavaScriptEscape('%1$s'), ',
-				iFadeDelay: ', empty($settings['newsfader_time']) ? 5000 : $settings['newsfader_time'], '
-			});
-			newsFaderStarted = true;
-		}';
-
-	if ($settings['enable_news'] == 2 && empty($context['minmax_preferences']['upshrink']))
-		echo '
-		startNewsFader();';
-
-	echo '
-	// ]]></script>';
+	addInlineJavascript('
+		$(\'#elkFadeScroller\').Elk_NewsFader();', true);
 }

@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -47,7 +47,7 @@ function pbe_email_to_bbc($text, $html)
 		// Convert the email-HTML to BBC
 		$text = preg_replace(array_keys($tags), array_values($tags), $text);
 		require_once(SUBSDIR . '/Html2BBC.class.php');
-		$bbc_converter = new Convert_BBC($text);
+		$bbc_converter = new Html_2_BBC($text);
 		$text = $bbc_converter->get_bbc();
 
 		// Run our parsers, as defined in the ACP,  to remove the original "replied to" message
@@ -85,7 +85,7 @@ function pbe_email_to_bbc($text, $html)
 
 		// Convert any resulting HTML created by markup style text in the email to BBC
 		require_once(SUBSDIR . '/Html2BBC.class.php');
-		$bbc_converter = new Convert_BBC($text, false);
+		$bbc_converter = new Html_2_BBC($text, false);
 		$text = $bbc_converter->get_bbc();
 	}
 
@@ -202,7 +202,7 @@ function pbe_fix_email_quotes($body, $html)
 
 			// A line between two = quote or descending quote levels,
 			// probably an email break so join (wrap) it back up and continue
-			if (($level_prev !==0) && ($level_prev >= $level_next && $level_next !== 0))
+			if (($level_prev !== 0) && ($level_prev >= $level_next && $level_next !== 0))
 			{
 				$body_array[$i - 1] .= ' ' . $body_array[$i];
 				unset($body_array[$i]);
@@ -913,7 +913,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	$message = parse_bbc($message, false);
 
 	// Change list style to something standard to make text conversion easier
-	$message = preg_replace('~<ul class=\"bbc_list\" style=\"list-style-type: decimal;\">(.*?)</ul>~si', "<ol>\\1</ol>", $message);
+	$message = preg_replace('~<ul class=\"bbc_list\" style=\"list-style-type: decimal;\">(.*?)</ul>~si', '<ol>\\1</ol>', $message);
 
 	// Do we have any tables? if so we add in th's based on the number of cols.
 	$table_content = array();
@@ -950,8 +950,8 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	);
 
 	// Convert this to text (markdown)
-	require_once(SUBSDIR . '/Html2Markdown.class.php');
-	$mark_down = new Convert_Md($message);
+	require_once(SUBSDIR . '/Html2Md.class.php');
+	$mark_down = new Html_2_Md($message);
 	$message = $mark_down->get_markdown();
 
 	// Finally the sig, its goes as just plain text
@@ -977,7 +977,7 @@ function quote_callback($matches)
 {
 	global $txt;
 
-	return '<blockquote>' . $txt['email_on'] . ": " . date('D M j, Y', $matches[4]) . ' ' . $matches[2] . ' ' . $txt['email_wrote'] . ':';
+	return '<blockquote>' . $txt['email_on'] . ': ' . date('D M j, Y', $matches[4]) . ' ' . $matches[2] . ' ' . $txt['email_wrote'] . ':';
 }
 
 /**
@@ -1066,7 +1066,7 @@ function query_load_user_info($email)
 		$pbe['user_info']['username'] = isset($pbe['profile']['member_name']) ? $pbe['profile']['member_name'] : '';
 		$pbe['user_info']['name'] = isset($pbe['profile']['real_name']) ? $pbe['profile']['real_name'] : '';
 		$pbe['user_info']['email'] = isset($pbe['profile']['email_address']) ? $pbe['profile']['email_address'] : '';
-		$pbe['user_info']['language'] = empty($pbe['profile']['lngfile']) || empty($modSettings['userLanguage']) ? $language :$pbe['profile']['lngfile'];
+		$pbe['user_info']['language'] = empty($pbe['profile']['lngfile']) || empty($modSettings['userLanguage']) ? $language : $pbe['profile']['lngfile'];
 	}
 
 	return !empty($pbe) ? $pbe : false;

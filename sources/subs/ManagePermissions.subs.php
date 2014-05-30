@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -1368,7 +1368,7 @@ function insertBoardPermission($new_permissions)
  * @package Permissions
  * @param int[] $group
  * @param int $profile
- * @param array $permissions
+ * @param string[] $permissions
  * @return array
  */
 function getPermission($group, $profile, $permissions)

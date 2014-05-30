@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -186,6 +186,7 @@ class ManageMembers_Controller extends Action_Controller
 			checkSession();
 
 			// Clean the input.
+			$delete = array();
 			foreach ($_POST['delete'] as $key => $value)
 			{
 				// Don't delete yourself, idiot.
@@ -597,7 +598,7 @@ class ManageMembers_Controller extends Action_Controller
 		if (!allowedTo('profile_remove_any'))
 			unset($listOptions['cols']['check'], $listOptions['form'], $listOptions['additional_rows']);
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';
@@ -972,7 +973,7 @@ class ManageMembers_Controller extends Action_Controller
 		}
 
 		// Now that we have all the options, create the list.
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 	}
 
@@ -997,6 +998,9 @@ class ManageMembers_Controller extends Action_Controller
 
 		// We also need to the login languages here - for emails.
 		loadLanguage('Login');
+
+		// Start off clean
+		$conditions = array();
 
 		// Sort out where we are going...
 		$current_filter = $conditions['activated_status'] = (int) $_REQUEST['orig_filter'];

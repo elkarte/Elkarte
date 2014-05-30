@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -100,9 +100,10 @@ class MessageIndex_Controller extends Action_Controller
 
 		// Make sure the starting place makes sense and construct the page index.
 		if (isset($_REQUEST['sort']))
-			$context['page_index'] = constructPageIndex($scripturl . '?board=' . $board . '.%1$d;sort=' . $_REQUEST['sort'] . (isset($_REQUEST['desc']) ? ';desc' : ''), $_REQUEST['start'], $board_info['total_topics'], $maxindex, true);
+			$sort_string = ';sort=' . $_REQUEST['sort'] . (isset($_REQUEST['desc']) ? ';desc' : '');
 		else
-			$context['page_index'] = constructPageIndex($scripturl . '?board=' . $board . '.%1$d', $_REQUEST['start'], $board_info['total_topics'], $maxindex, true);
+			$sort_string = '';
+		$context['page_index'] = constructPageIndex($scripturl . '?board=' . $board . '.%1$d' . $sort_string, $_REQUEST['start'], $board_info['total_topics'], $maxindex, true);
 
 		$context['start'] = &$_REQUEST['start'];
 
@@ -132,8 +133,6 @@ class MessageIndex_Controller extends Action_Controller
 		{
 			foreach ($board_info['moderators'] as $mod)
 				$context['link_moderators'][] = '<a href="' . $scripturl . '?action=profile;u=' . $mod['id'] . '" title="' . $txt['board_moderator'] . '">' . $mod['name'] . '</a>';
-
-			$context['linktree'][count($context['linktree']) - 1]['extra_after'] = '<span class="board_moderators"> (' . (count($context['link_moderators']) == 1 ? $txt['moderator'] : $txt['moderators']) . ': ' . implode(', ', $context['link_moderators']) . ')</span>';
 		}
 
 		// Mark current and parent boards as seen.
@@ -183,7 +182,7 @@ class MessageIndex_Controller extends Action_Controller
 		$context['can_approve_posts'] = allowedTo('approve_posts');
 
 		// Prepare sub-boards for display.
-		require_once(SUBSDIR . '/BoardIndex.subs.php');
+		require_once(SUBSDIR . '/BoardsList.class.php');
 		$boardIndexOptions = array(
 			'include_categories' => false,
 			'base_level' => $board_info['child_level'] + 1,
@@ -191,7 +190,8 @@ class MessageIndex_Controller extends Action_Controller
 			'set_latest_post' => false,
 			'countChildPosts' => !empty($modSettings['countChildPosts']),
 		);
-		$context['boards'] = getBoardIndex($boardIndexOptions);
+		$boardlist = new Boards_List($boardIndexOptions);
+		$context['boards'] = $boardlist->getBoards();
 
 		// Nosey, nosey - who's viewing this board?
 		if (!empty($settings['display_who_viewing']))
@@ -210,16 +210,15 @@ class MessageIndex_Controller extends Action_Controller
 		if (!isset($_REQUEST['sort']) || !isset($sort_methods[$_REQUEST['sort']]))
 		{
 			$context['sort_by'] = 'last_post';
-			$sort_column = 'id_last_msg';
 			$ascending = isset($_REQUEST['asc']);
 		}
 		// Otherwise default to ascending.
 		else
 		{
 			$context['sort_by'] = $_REQUEST['sort'];
-			$sort_column = $sort_methods[$_REQUEST['sort']];
 			$ascending = !isset($_REQUEST['desc']);
 		}
+		$sort_column = $sort_methods[$context['sort_by']];
 
 		$context['sort_direction'] = $ascending ? 'up' : 'down';
 		$context['sort_title'] = $ascending ? $txt['sort_desc'] : $txt['sort_asc'];

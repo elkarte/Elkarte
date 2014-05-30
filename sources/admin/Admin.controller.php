@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -782,7 +782,7 @@ class Admin_Controller extends Action_Controller
 		else
 		{
 			$action = new Action();
-			$action->initialize($subActions, 'log');
+			$subAction = $action->initialize($subActions, 'internal');
 			$action->dispatch($subAction);
 		}
 	}
@@ -883,12 +883,13 @@ class Admin_Controller extends Action_Controller
 		global $context;
 
 		require_once(ADMINDIR . '/ManageMembers.controller.php');
-		$_REQUEST['sa'] = 'query';
 
+		$_REQUEST['sa'] = 'query';
 		$_POST['membername'] = un_htmlspecialchars($context['search_term']);
 		$_POST['types'] = '';
 
-		action_index();
+		$managemembers = new ManageMembers_Controller();
+		$managemembers->action_index();
 	}
 
 	/**

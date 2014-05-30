@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Payment Gateway: twocheckout
+ * Payment Gateway: twoCheckOut
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -20,7 +20,7 @@
  *
  * @package Subscriptions
  */
-class twocheckout_display
+class twoCheckOut_Display
 {
 	/**
 	 * Name of this payment gateway
@@ -98,14 +98,8 @@ class twocheckout_display
  *
  * @package Subscriptions
  */
-class twocheckout_payment
+class twoCheckOut_Payment
 {
-	/**
-	 * Holds our return results
-	 * @var array
-	 */
-	private $return_data;
-
 	/**
 	 * Validates that we have valid data to work with
 	 *
@@ -126,10 +120,7 @@ class twocheckout_payment
 			return false;
 
 		// Do we have an invoice number?
-		if (empty($_POST['x_invoice_num']))
-			return false;
-
-		return true;
+		 return !empty($_POST['x_invoice_num']);
 	}
 
 	/**
@@ -142,7 +133,7 @@ class twocheckout_payment
 		global $modSettings, $txt;
 
 		// Is this the right hash?
-		if (empty($modSettings['2co_password']) || $_POST['x_MD5_Hash'] != strtoupper(md5($modSettings['2co_password'] . $modSettings['2co_id'] . $_POST['x_trans_id'] . $_POST['x_amount'])))
+		if (empty($modSettings['2co_password']) || $_POST['x_MD5_Hash'] !== strtoupper(md5($modSettings['2co_password'] . $modSettings['2co_id'] . $_POST['x_trans_id'] . $_POST['x_amount'])))
 			generateSubscriptionError($txt['2co_password_wrong']);
 
 		// Verify the currency
@@ -179,6 +170,16 @@ class twocheckout_payment
 	{
 		// We have to assume so?
 		return true;
+	}
+
+	/**
+	 * Returns if is this is a cancellation transaction
+	 *
+	 * @return boolean
+	 */
+	public function isCancellation()
+	{
+		return false;
 	}
 
 	/**

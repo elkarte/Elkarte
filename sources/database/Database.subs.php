@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -20,7 +20,7 @@
  * @param string $db_user
  * @param string $db_passwd
  * @param string $db_prefix
- * @param array $db_options
+ * @param mixed[] $db_options
  * @param string $db_type
  * @return null
  */

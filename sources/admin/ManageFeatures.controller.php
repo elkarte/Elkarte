@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -224,7 +224,7 @@ class ManageFeatures_Controller extends Action_Controller
 	private function _initBasicSettingsForm()
 	{
 		// We need some settings! ..ok, some work with our settings :P
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Instantiate the form
 		$this->_basicSettings = new Settings_Form();
@@ -275,7 +275,7 @@ class ManageFeatures_Controller extends Action_Controller
 	private function _initLayoutSettingsForm()
 	{
 		// We're working with them settings.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Instantiate the form
 		$this->_layoutSettings = new Settings_Form();
@@ -324,7 +324,7 @@ class ManageFeatures_Controller extends Action_Controller
 	private function _initKarmaSettingsForm()
 	{
 		// We're working with them settings.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Instantiate the form
 		$this->_karmaSettings = new Settings_Form();
@@ -373,7 +373,7 @@ class ManageFeatures_Controller extends Action_Controller
 	private function _initLikesSettingsForm()
 	{
 		// We're working with them settings.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Instantiate the form
 		$this->_likesSettings = new Settings_Form();
@@ -431,7 +431,7 @@ class ManageFeatures_Controller extends Action_Controller
 		global $txt, $context;
 
 		// We're working with them settings.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		loadLanguage('Mentions');
 
@@ -722,7 +722,7 @@ class ManageFeatures_Controller extends Action_Controller
 		$modSettings['bbc_disabled_signature_bbc'] = $disabledTags;
 
 		// We're working with them settings.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Saving?
 		if (isset($_GET['save']))
@@ -775,7 +775,7 @@ class ManageFeatures_Controller extends Action_Controller
 	private function _initSignatureSettingsForm()
 	{
 		// We're working with them settings.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Instantiate the form
 		$this->_signatureSettings = new Settings_Form();
@@ -814,6 +814,8 @@ class ManageFeatures_Controller extends Action_Controller
 			checkSession();
 			validateToken('admin-scp');
 
+			$changes = array();
+
 			// Do the active ones first.
 			$disable_fields = array_flip($standard_fields);
 			if (!empty($_POST['active']))
@@ -844,7 +846,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 		createToken('admin-scp');
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		require_once(SUBSDIR . '/ManageFeatures.subs.php');
 
 		// Create a listing for all our standard fields
@@ -1035,6 +1037,7 @@ class ManageFeatures_Controller extends Action_Controller
 			),
 			'additional_rows' => array(
 				array(
+					'class' => 'submitbutton',
 					'position' => 'below_table_data',
 					'value' => '<input type="submit" name="onoff" value="' . $txt['save'] . '" class="right_submit" />
 					<input type="submit" name="new" value="' . $txt['custom_profile_make_new'] . '" class="right_submit" />',
@@ -1404,7 +1407,7 @@ class ManageFeatures_Controller extends Action_Controller
 		global $context;
 
 		// We're working with them settings.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		$context['permissions_excluded'] = array(-1);
 

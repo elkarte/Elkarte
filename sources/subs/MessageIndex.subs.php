@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -123,7 +123,7 @@ function messageIndexTopics($id_board, $id_member, $start, $per_page, $sort_by, 
 
 		// Lets take the results
 		while ($row = $db->fetch_assoc($request))
-			$topics[] = $row;
+			$topics[$row['id_topic']] = $row;
 
 		$db->free_result($request);
 	}
@@ -243,11 +243,16 @@ function processMessageIndexTopicList($topics_info, $topicseen = false)
 		if (!empty($modSettings['message_index_preview']))
 		{
 			// Limit them to $modSettings['preview_characters'] characters - do this FIRST because it's a lot of wasted censoring otherwise.
-			$row['first_body'] = strip_tags(strtr(parse_bbc($row['first_body'], $row['first_smileys'], $row['id_first_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
+			$row['first_body'] = strip_tags(strtr(parse_bbc($row['first_body'], false, $row['id_first_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
 			$row['first_body'] = shorten_text($row['first_body'], !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128, true);
 
-			$row['last_body'] = strip_tags(strtr(parse_bbc($row['last_body'], $row['last_smileys'], $row['id_last_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
-			$row['last_body'] = shorten_text($row['last_body'], !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128, true);
+			if ($row['num_replies'] == 0)
+				$row['last_body'] == $row['first_body'];
+			else
+			{
+				$row['last_body'] = strip_tags(strtr(parse_bbc($row['last_body'], false, $row['id_last_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
+				$row['last_body'] = shorten_text($row['last_body'], !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128, true);
+			}
 
 			// Censor the subject and message preview.
 			censorText($row['first_subject']);
@@ -284,10 +289,6 @@ function processMessageIndexTopicList($topics_info, $topicseen = false)
 			// We can't pass start by reference.
 			$start = -1;
 			$pages = constructPageIndex($scripturl . '?topic=' . $row['id_topic'] . '.%1$d' . $topicseen, $start, $topic_length, $messages_per_page, true, array('prev_next' => false, 'all' => !empty($modSettings['enableAllMessages']) && $row['num_replies'] + 1 < $modSettings['enableAllMessages']));
-
-			// If we can use all, show it.
-			if (!empty($modSettings['enableAllMessages']) && $topic_length < $modSettings['enableAllMessages'])
-				$pages .= ' &nbsp;<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0;all">' . $txt['all'] . '</a>';
 		}
 		else
 			$pages = '';
@@ -318,6 +319,7 @@ function processMessageIndexTopicList($topics_info, $topicseen = false)
 			'first_post' => array(
 				'id' => $row['id_first_msg'],
 				'member' => array(
+					'username' => $row['first_member_name'],
 					'name' => $row['first_display_name'],
 					'id' => $row['first_id_member'],
 					'href' => !empty($row['first_id_member']) ? $scripturl . '?action=profile;u=' . $row['first_id_member'] : '',
@@ -336,6 +338,7 @@ function processMessageIndexTopicList($topics_info, $topicseen = false)
 			'last_post' => array(
 				'id' => $row['id_last_msg'],
 				'member' => array(
+					'username' => $row['last_member_name'],
 					'name' => $row['last_display_name'],
 					'id' => $row['last_id_member'],
 					'href' => !empty($row['last_id_member']) ? $scripturl . '?action=profile;u=' . $row['last_id_member'] : '',

@@ -11,7 +11,7 @@
  * copyright:	2012 Simple Machines Forum contributors (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -210,9 +210,9 @@ class OpenID_Controller extends Action_Controller
 	{
 		global $scripturl, $modSettings;
 
-		ob_end_clean();
+		@ob_end_clean();
 		if (!empty($modSettings['enableCompressedOutput']))
-			@ob_start('ob_gzhandler');
+			ob_start('ob_gzhandler');
 		else
 			ob_start();
 

@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -293,7 +293,9 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
 
 	$db = database();
 	$db_search = db_search();
+	$step = 1;
 
+	// Starting a new index we set up for the run
 	if ($start === 0)
 	{
 		drop_log_search_words();
@@ -325,12 +327,14 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
 	while ($row = $db->fetch_assoc($request))
 		$num_messages[empty($row['todo']) ? 'done' : 'todo'] = $row['num_messages'];
 
+	// Done with indexing the messages, on to the next step
 	if (empty($num_messages['todo']))
 	{
 		$step = 2;
 		$percentage = 80;
 		$start = 0;
 	}
+	// Still on step one, inserting all the indexed words.
 	else
 	{
 		// Number of seconds before the next step.
@@ -362,9 +366,7 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
 
 				$number_processed++;
 				foreach (text2words($row['body'], $index_settings['bytes_per_word'], true) as $id_word)
-				{
 					$inserts[] = array($id_word, $row['id_msg']);
-				}
 			}
 			$num_messages['done'] += $number_processed;
 			$num_messages['todo'] -= $number_processed;
@@ -380,6 +382,7 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
 					array('id_word', 'id_msg')
 				);
 
+			// Done then set up for the next step, set up for the next loop.
 			if ($num_messages['todo'] === 0)
 			{
 				$step = 2;
@@ -390,7 +393,7 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
 				updateSettings(array('search_custom_index_resume' => serialize(array_merge($index_settings, array('resume_at' => $start)))));
 		}
 
-		// Since there are still two steps to go, 80% is the maximum here.
+		// Since there are still steps to go, 80% is the maximum here.
 		$percentage = round($num_messages['done'] / ($num_messages['done'] + $num_messages['todo']), 3) * 80;
 	}
 

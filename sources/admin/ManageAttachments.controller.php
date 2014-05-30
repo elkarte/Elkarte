@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -59,7 +59,7 @@ class ManageAttachments_Controller extends Action_Controller
 		loadTemplate('ManageAttachments');
 
 		// We're working with them settings here.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// If they want to delete attachment(s), delete them. (otherwise fall through..)
 		$subActions = array(
@@ -129,7 +129,7 @@ class ManageAttachments_Controller extends Action_Controller
 	toggleSubDir();', true);
 
 		// These are very likely to come in handy! (i.e. without them we're doomed!)
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// Saving settings?
@@ -534,7 +534,7 @@ class ManageAttachments_Controller extends Action_Controller
 		);
 
 		// Create the list.
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 	}
 
@@ -1172,7 +1172,7 @@ class ManageAttachments_Controller extends Action_Controller
 			}
 
 			// If the user wishes to go back, update the last_dir array
-			if ($_POST['current_dir'] != $modSettings['currentAttachmentUploadDir']&& !empty($modSettings['last_attachments_directory']) && (isset($modSettings['last_attachments_directory'][$_POST['current_dir']]) || isset($modSettings['last_attachments_directory'][0])))
+			if ($_POST['current_dir'] != $modSettings['currentAttachmentUploadDir'] && !empty($modSettings['last_attachments_directory']) && (isset($modSettings['last_attachments_directory'][$_POST['current_dir']]) || isset($modSettings['last_attachments_directory'][0])))
 			{
 				if (!is_array($modSettings['last_attachments_directory']))
 					$modSettings['last_attachments_directory'] = unserialize($modSettings['last_attachments_directory']);
@@ -1394,12 +1394,10 @@ class ManageAttachments_Controller extends Action_Controller
 				'status' => array(
 					'header' => array(
 						'value' => $txt['attach_dir_status'],
-						'class' => 'centertext',
 					),
 					'data' => array(
 						'db' => 'status',
 						'style' => 'width: 25%;',
-						'class' => 'centertext',
 					),
 				),
 			),
@@ -1408,6 +1406,7 @@ class ManageAttachments_Controller extends Action_Controller
 			),
 			'additional_rows' => array(
 				array(
+					'class' => 'submitbutton',
 					'position' => 'below_table_data',
 					'value' => '
 					<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
@@ -1427,7 +1426,7 @@ class ManageAttachments_Controller extends Action_Controller
 				),
 			),
 		);
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		if (!empty($modSettings['attachment_basedirectories']))
@@ -1478,7 +1477,6 @@ class ManageAttachments_Controller extends Action_Controller
 						'data' => array(
 							'db' => 'status',
 							'style' => 'width: 15%;',
-							'class' => 'centertext',
 						),
 					),
 				),
@@ -1487,6 +1485,7 @@ class ManageAttachments_Controller extends Action_Controller
 				),
 				'additional_rows' => array(
 					array(
+						'class' => 'submitbutton',
 						'position' => 'below_table_data',
 						'value' => '<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
 						<input type="submit" name="save2" value="' . $txt['save'] . '" class="right_submit" />
@@ -1689,7 +1688,7 @@ class ManageAttachments_Controller extends Action_Controller
 						</div>';
 
 					// Write it to a file so it can be displayed
-					$fp = fopen(BOARDDIR . '/progress.php', "w");
+					$fp = fopen(BOARDDIR . '/progress.php', 'w');
 					fwrite($fp, $prog_bar);
 					fclose($fp);
 					usleep(500000);

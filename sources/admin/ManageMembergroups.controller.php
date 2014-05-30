@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -223,12 +223,13 @@ class ManageMembergroups_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'below_table_data',
-					'value' => '<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=membergroups;sa=add;generalgroup">' . $txt['membergroups_add_group'] . '</a>',
+					'class' => 'submitbutton',
+					'value' => '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=membergroups;sa=add;generalgroup">' . $txt['membergroups_add_group'] . '</a>',
 				),
 			),
 		);
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		// The second list shows the post count based groups.
@@ -328,7 +329,8 @@ class ManageMembergroups_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'below_table_data',
-					'value' => '<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=membergroups;sa=add;postgroup">' . $txt['membergroups_add_group'] . '</a>',
+					'class' => 'submitbutton',
+					'value' => '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=membergroups;sa=add;postgroup">' . $txt['membergroups_add_group'] . '</a>',
 				),
 			),
 		);
@@ -368,7 +370,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			require_once(SUBSDIR . '/Permission.subs.php');
 
 			loadIllegalPermissions();
-			$id_group = getMaxGroupID() +1;
+			$id_group = getMaxGroupID() + 1;
 			$minposts = !empty($_POST['min_posts']) ? (int) $_POST['min_posts'] : '-1';
 
 			addMembergroup($id_group, $_POST['group_name'], $minposts, $_POST['group_type']);
@@ -421,6 +423,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			}
 
 			// Make sure all boards selected are stored in a proper array.
+			$changed_boards = array();
 			$accesses = empty($_POST['boardaccess']) || !is_array($_POST['boardaccess']) ? array() : $_POST['boardaccess'];
 			$changed_boards['allow'] = array();
 			$changed_boards['deny'] = array();
@@ -603,6 +606,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			// Time to update the boards this membergroup has access to.
 			if ($current_group['id_group'] == 2 || $current_group['id_group'] > 3)
 			{
+				$changed_boards = array();
 				$changed_boards['allow'] = array();
 				$changed_boards['deny'] = array();
 				$changed_boards['ignore'] = array();
@@ -780,7 +784,7 @@ class ManageMembergroups_Controller extends Action_Controller
 		$context['page_title'] = $txt['membergroups_settings'];
 
 		// Needed for the settings functions.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// initialize the form
 		$this->_initGroupSettingsForm();

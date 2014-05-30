@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -211,7 +211,6 @@ function template_build_poster_div($message, $ignoring = false)
 									' . $message['member']['avatar']['image'] . '
 								</a>
 							</li>';
-
 
 		// Show the post group icons, but not for guests.
 		if (!$message['member']['is_guest'])

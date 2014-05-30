@@ -11,14 +11,14 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
 /**
  * Template used to show a list created with createlist
  *
- * @param string $list_id
+ * @param string|null $list_id
  */
 function template_show_list($list_id = null)
 {
@@ -77,7 +77,7 @@ function template_show_list($list_id = null)
 		template_create_list_menu($cur_list['list_menu']);
 	}
 
-		// Show the page index (if this list doesn't intend to show all items). @todo - Needs old top/bottom stuff cleaned up.
+	// Show the page index (if this list doesn't intend to show all items). @todo - Needs old top/bottom stuff cleaned up.
 	if (!empty($cur_list['items_per_page']) && !empty($cur_list['page_index']))
 	{
 		if (!$close_div)
@@ -206,7 +206,7 @@ function template_show_list($list_id = null)
  * Generic template used to show additional rows of data (above/below)
  *
  * @param int $row_position
- * @param array $cur_list
+ * @param mixed[] $cur_list
  */
 function template_additional_rows($row_position, $cur_list)
 {
@@ -235,7 +235,7 @@ function template_additional_rows($row_position, $cur_list)
  *    ),
  * );
  *
- * @param array $list_menu
+ * @param mixed[] $list_menu
  */
 function template_create_list_menu($list_menu)
 {

@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -53,10 +53,12 @@ class Emailuser_Controller extends Action_Controller
 
 	/**
 	 * Send a topic to a friend.
-	 * Uses the Emailuser template, with the main sub template.
-	 * Requires the send_topic permission.
-	 * Redirects back to the first page of the topic when done.
-	 * Is accessed via ?action=emailuser;sa=sendtopic.
+	 *
+	 * What it does:
+	 * - Uses the Emailuser template, with the main sub template.
+	 * - Requires the send_topic permission.
+	 * - Redirects back to the first page of the topic when done.
+	 * - Is accessed via ?action=emailuser;sa=sendtopic.
 	 */
 	public function action_sendtopic()
 	{
@@ -269,10 +271,11 @@ class Emailuser_Controller extends Action_Controller
 
 	/**
 	 * Allow a user to send an email.
-	 * Send an email to the user - allow the sender to write the message.
-	 * Can either be passed a user ID as uid or a message id as msg.
-	 * Does not check permissions for a message ID as there is no information disclosed.
-	 * ?action=emailuser;sa=email
+	 *
+	 * - Send an email to the user - allow the sender to write the message.
+	 * - Can either be passed a user ID as uid or a message id as msg.
+	 * - Does not check permissions for a message ID as there is no information disclosed.
+	 * - accessed by ?action=emailuser;sa=email
 	 */
 	public function action_email()
 	{
@@ -302,8 +305,8 @@ class Emailuser_Controller extends Action_Controller
 			$context['form_hidden_vars']['msg'] = (int) $_REQUEST['msg'];
 		}
 
-		// Are you sure you got the address?
-		if (empty($row['email_address']))
+		// Are you sure you got the address or any data?
+		if (empty($row['email_address']) || empty($row))
 			fatal_lang_error('cant_find_user_email');
 
 		// Can they actually do this?
@@ -423,11 +426,13 @@ class Emailuser_Controller extends Action_Controller
 
 	/**
 	 * Report a post to the moderator... ask for a comment.
-	 * Gathers data from the user to report abuse to the moderator(s).
-	 * Uses the ReportToModerator template, main sub template.
-	 * Requires the report_any permission.
-	 * Uses action_reporttm2() if post data was sent.
-	 * Accessed through ?action=reporttm.
+	 *
+	 * what is does:
+	 * - Gathers data from the user to report abuse to the moderator(s).
+	 * - Uses the ReportToModerator template, main sub template.
+	 * - Requires the report_any permission.
+	 * - Uses action_reporttm2() if post data was sent.
+	 * - Accessed through ?action=reporttm.
 	 */
 	public function action_reporttm()
 	{
@@ -510,10 +515,11 @@ class Emailuser_Controller extends Action_Controller
 
 	/**
 	 * Send the emails.
-	 * Sends off emails to all the moderators.
-	 * Sends to administrators and global moderators. (1 and 2)
-	 * Called by action_reporttm(), and thus has the same permission and setting requirements as it does.
-	 * Accessed through ?action=reporttm when posting.
+	 *
+	 * - Sends off emails to all the moderators.
+	 * - Sends to administrators and global moderators. (1 and 2)
+	 * - Called by action_reporttm(), and thus has the same permission and setting requirements as it does.
+	 * - Accessed through ?action=reporttm when posting.
 	 */
 	public function action_reporttm2()
 	{

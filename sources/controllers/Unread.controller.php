@@ -233,7 +233,7 @@ class Unread_Controller extends Action_Controller
 
 		if ($context['topics'] === false)
 		{
-				$context['topics'] = array();
+			$context['topics'] = array();
 			if ($context['querystring_board_limits'] == ';start=%1$d')
 				$context['querystring_board_limits'] = '';
 			else
@@ -329,21 +329,22 @@ class Unread_Controller extends Action_Controller
 		if (!isset($_REQUEST['sort']) || !isset($sort_methods[$_REQUEST['sort']]))
 		{
 			$context['sort_by'] = 'last_post';
-			$this->_grabber->setSorting('t.id_last_msg', isset($_REQUEST['asc']));
+			$ascending = isset($_REQUEST['asc']);
 
-			$context['querystring_sort_limits'] = $this->_grabber->isSortAsc() ? ';asc' : '';
+			$context['querystring_sort_limits'] = $ascending ? ';asc' : '';
 		}
 		// But, for other methods the default sort is ascending.
 		else
 		{
 			$context['sort_by'] = $_REQUEST['sort'];
-			$this->_grabber->setSorting($sort_methods[$_REQUEST['sort']], !isset($_REQUEST['desc']));
+			$ascending = !isset($_REQUEST['desc']);
 
-			$context['querystring_sort_limits'] = ';sort=' . $context['sort_by'] . ($this->_grabber->isSortAsc() ? '' : ';desc');
+			$context['querystring_sort_limits'] = ';sort=' . $context['sort_by'] . ($ascending ? '' : ';desc');
 		}
+		$this->_grabber->setSorting($sort_methods[$context['sort_by']], $ascending);
 
-		$context['sort_direction'] = $this->_grabber->isSortAsc() ? 'up' : 'down';
-		$context['sort_title'] = $this->_grabber->isSortAsc() ? $txt['sort_desc'] : $txt['sort_asc'];
+		$context['sort_direction'] = $ascending ? 'up' : 'down';
+		$context['sort_title'] = $ascending ? $txt['sort_desc'] : $txt['sort_asc'];
 
 		// Trick
 		$txt['starter'] = $txt['started_by'];
@@ -459,7 +460,7 @@ class Unread_Controller extends Action_Controller
 		/**
 		 * @deprecated in order to maintain backward compatibility the buttons are
 		 * loaded into $context.
-		 * Starting from 2.0 this shall be changed to a local variable
+		 * Starting from 2.0 this should be changed to a local variable and passed to the hook
 		 */
 		call_integration_hook('integrate_recent_buttons', array(&$context['recent_buttons']));
 

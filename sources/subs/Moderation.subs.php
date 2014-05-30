@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -508,13 +508,17 @@ function warningTemplateCount($template_type = 'warntpl')
 }
 
 /**
- * Get all issued warnings in the system.
+ * Get all issued warnings in the system given the specified query parameters
+ *
+ * Callback for createList() in ModerationCenter_Controller::action_viewWarningLog().
  *
  * @param int $start
  * @param int $items_per_page
  * @param string $sort
+ * @param string|null $query_string
+ * @param mixed[] $query_params
  */
-function warnings($start, $items_per_page, $sort)
+function warnings($start, $items_per_page, $sort, $query_string = '', $query_params = array())
 {
 	global $scripturl;
 
@@ -527,12 +531,13 @@ function warnings($start, $items_per_page, $sort)
 		FROM {db_prefix}log_comments AS lc
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lc.id_member)
 			LEFT JOIN {db_prefix}members AS mem2 ON (mem2.id_member = lc.id_recipient)
-		WHERE lc.comment_type = {string:warning}
+		WHERE lc.comment_type = {string:warning}' . (!empty($query_string) ? '
+			AND ' . $query_string : '') . '
 		ORDER BY ' . $sort . '
 		LIMIT ' . $start . ', ' . $items_per_page,
-		array(
+		array_merge($query_params, array(
 			'warning' => 'warning',
-		)
+		))
 	);
 	$warnings = array();
 	while ($row = $db->fetch_assoc($request))
@@ -554,21 +559,29 @@ function warnings($start, $items_per_page, $sort)
 }
 
 /**
- * Get the total count of all current warnings.
+ * Get the count of all current warnings.
+ *
+ * Callback for createList() in ModerationCenter_Controller::action_viewWarningLog().
+ *
+ * @param string|null $query_string
+ * @param mixed[] $query_params
  *
  * @return int
  */
-function warningCount()
+function warningCount($query_string = '', $query_params = array())
 {
 	$db = database();
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
-		FROM {db_prefix}log_comments
-		WHERE comment_type = {string:warning}',
-		array(
+		FROM {db_prefix}log_comments AS lc
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lc.id_member)
+			LEFT JOIN {db_prefix}members AS mem2 ON (mem2.id_member = lc.id_recipient)
+		WHERE comment_type = {string:warning}' . (!empty($query_string) ? '
+			AND ' . $query_string : ''),
+		array_merge($query_params, array(
 			'warning' => 'warning',
-		)
+		))
 	);
 	list ($totalWarns) = $db->fetch_row($request);
 	$db->free_result($request);

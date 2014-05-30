@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -54,6 +54,7 @@ class Post_Controller extends Action_Controller
 		global $txt, $scripturl, $topic, $modSettings, $board, $user_info, $context, $options, $language;
 
 		loadLanguage('Post');
+		require_once(SOURCEDIR . '/AttachmentErrorContext.class.php');
 
 		// You can't reply with a poll... hacker.
 		if (isset($_REQUEST['poll']) && !empty($topic) && !isset($_REQUEST['msg']))
@@ -597,6 +598,7 @@ class Post_Controller extends Action_Controller
 		if ($context['attachments']['can']['post'])
 		{
 			// If there are attachments, calculate the total size and how many.
+			$attachments = array();
 			$attachments['total_size'] = 0;
 			$attachments['quantity'] = 0;
 
@@ -620,8 +622,7 @@ class Post_Controller extends Action_Controller
 					foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 					{
 						if (strpos($attachID, 'post_tmp_' . $user_info['id']) !== false)
-							if (file_exists($attachment['tmp_name']))
-								unlink($attachment['tmp_name']);
+							@unlink($attachment['tmp_name']);
 					}
 					$attach_errors->addError('temp_attachments_gone');
 					$_SESSION['temp_attachments'] = array();
@@ -716,8 +717,8 @@ class Post_Controller extends Action_Controller
 
 						// Take out the trash.
 						unset($_SESSION['temp_attachments'][$attachID]);
-						if (file_exists($attachment['tmp_name']))
-							unlink($attachment['tmp_name']);
+						@unlink($attachment['tmp_name']);
+
 						continue;
 					}
 
@@ -1027,6 +1028,8 @@ class Post_Controller extends Action_Controller
 		// Prevent double submission of this form.
 		checkSubmitOnce('check');
 
+		require_once(SOURCEDIR . '/AttachmentErrorContext.class.php');
+
 		// No errors as yet.
 		$post_errors = Error_Context::context('post', 1);
 		$attach_errors = Attachment_Error_Context::context();
@@ -1078,7 +1081,7 @@ class Post_Controller extends Action_Controller
 						continue;
 
 					unset($_SESSION['temp_attachments'][$attachID]);
-					unlink($attachment['tmp_name']);
+					@unlink($attachment['tmp_name']);
 				}
 			}
 
@@ -1480,6 +1483,7 @@ class Post_Controller extends Action_Controller
 
 		if (!empty($modSettings['mentions_enabled']) && !empty($_REQUEST['uid']))
 		{
+			$query_params = array();
 			$query_params['member_ids'] = array_unique(array_map('intval', $_REQUEST['uid']));
 			require_once(SUBSDIR . '/Members.subs.php');
 			$mentioned_members = membersBy('member_ids', $query_params, true);
@@ -1598,10 +1602,7 @@ class Post_Controller extends Action_Controller
 				}
 				// We have errors on this file, build out the issues for display to the user
 				else
-				{
-					if (file_exists($attachment['tmp_name']))
-						unlink($attachment['tmp_name']);
-				}
+					@unlink($attachment['tmp_name']);
 			}
 			unset($_SESSION['temp_attachments']);
 		}
@@ -1777,7 +1778,7 @@ class Post_Controller extends Action_Controller
 			logAction(empty($_POST['lock']) ? 'unlock' : 'lock', array('topic' => $topicOptions['id'], 'board' => $topicOptions['board']));
 
 		if (isset($_POST['sticky']) && !empty($modSettings['enableStickyTopics']))
-			logAction('sticky', array('topic' => $topicOptions['id'], 'board' => $topicOptions['board']));
+			logAction(empty($_POST['sticky']) ? 'unsticky' : 'sticky', array('topic' => $topicOptions['id'], 'board' => $topicOptions['board']));
 
 		// Notify any members who have notification turned on for this topic/board - only do this if it's going to be approved(!)
 		if ($becomesApproved)
@@ -2234,7 +2235,7 @@ class Post_Controller extends Action_Controller
 			$pspell_link = pspell_new('en', '', '', '', PSPELL_FAST | PSPELL_RUN_TOGETHER);
 
 		error_reporting($old);
-		ob_end_clean();
+		@ob_end_clean();
 
 		if (!isset($_POST['spellstring']) || !$pspell_link)
 			die;

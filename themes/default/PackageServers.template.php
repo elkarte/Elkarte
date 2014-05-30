@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -308,19 +308,22 @@ function template_downloaded()
 	global $context, $txt, $scripturl;
 
 	echo '
-	<div id="admincenter">
+	<div id="admin_form_wrapper">
 		<h2 class="category_header">', $context['page_title'], '</h2>
+		<p class="infobox">', (empty($context['package_server']) ? $txt['package_uploaded_successfully'] : $txt['package_downloaded_successfully']), '</p>
 		<div class="windowbg">
-			<div class="content">
-				<p>', (empty($context['package_server']) ? $txt['package_uploaded_successfully'] : $txt['package_downloaded_successfully']), '</p>
+			<div class="content flow_auto">
 				<ul>
-					<li><span class="floatleft"><strong>', $context['package']['name'], '</strong></span>
+					<li>
+						<span class="floatleft"><strong>', $context['package']['name'], '</strong></span>
 						<span class="package_server floatright">', $context['package']['list_files']['link'], '</span>
 						<span class="package_server floatright">', $context['package']['install']['link'], '</span>
 					</li>
 				</ul>
-				<br /><br />
-				<p><a href="', $scripturl, '?action=admin;area=packageservers', (isset($context['package_server']) ? ';sa=browse;server=' . $context['package_server'] : ''), '">[ ', $txt['back'], ' ]</a></p>
+			</div>
+			<div class="submitbutton">
+				<hr />
+				<a class="linkbutton" href="', $scripturl, '?action=admin;', (!empty($context['package_server']) ? 'area=packageservers;sa=browse;server=' . $context['package_server'] : 'area=packages;sa=browse'), '">', $txt['back'], '</a>
 			</div>
 		</div>
 	</div>';
@@ -335,20 +338,20 @@ function template_upload()
 
 	if (!empty($context['package_ftp']['error']))
 		echo '
-					<div class="errorbox">
-						<span class="tt">', $context['package_ftp']['error'], '</span>
-					</div>';
+	<div class="errorbox">
+		', $context['package_ftp']['error'], '
+	</div>';
 
 	echo '
 	<div id="admin_form_wrapper">
-		<h3 class="category_header">', $txt['upload_new_package'], '</h3>';
+		<h2 class="category_header">', $txt['upload_new_package'], '</h2>';
 
 	if ($context['package_download_broken'])
 	{
 		template_ftp_form_required();
 
 		echo '
-			<h3 class="category_header">' . $txt['package_upload_title'] . '</h3>';
+			<h2 class="category_header">' . $txt['package_upload_title'] . '</h2>';
 	}
 
 	echo '
@@ -364,8 +367,10 @@ function template_upload()
 						</dd>
 					</dl>
 					<hr />
-					<input type="submit" value="' . $txt['package_upload'] . '" class="right_submit" />
-					<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
+					<div class="submitbutton">
+						<input type="submit" value="' . $txt['package_upload'] . '" class="button_submit" />
+						<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
+					</div>
 				</form>
 			</div>
 		</div>

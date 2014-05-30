@@ -11,12 +11,12 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
 /**
- * Template to edit bans
+ * Template to edit and add bans
  */
 function template_ban_edit()
 {
@@ -40,7 +40,7 @@ function template_ban_edit()
 			<div class="content">
 				<dl class="settings">
 					<dt id="ban_name_label">
-						<strong><label for="ban_name">', $txt['ban_name'], '</label>:</strong>
+						<label for="ban_name">', $txt['ban_name'], '</label>:
 					</dt>
 					<dd>
 						<input type="text" id="ban_name" name="ban_name" value="', $context['ban']['name'], '" size="45" maxlength="60" class="input_text" />
@@ -49,7 +49,7 @@ function template_ban_edit()
 	if (isset($context['ban']['reason']))
 		echo '
 				<dt>
-					<strong><label for="reason">', $txt['ban_reason'], ':</label></strong><br />
+					<label for="reason">', $txt['ban_reason'], ':</label><br />
 					<span class="smalltext">', $txt['ban_reason_desc'], '</span>
 				</dt>
 				<dd>
@@ -59,7 +59,7 @@ function template_ban_edit()
 	if (isset($context['ban']['notes']))
 		echo '
 				<dt>
-					<strong><label for="ban_notes">', $txt['ban_notes'], ':</label></strong><br />
+					<label for="ban_notes">', $txt['ban_notes'], ':</label><br />
 					<span class="smalltext">', $txt['ban_notes_desc'], '</span>
 				</dt>
 				<dd>
@@ -127,7 +127,7 @@ function template_ban_edit()
 							<label for="user_check">', $txt['ban_on_username'], '</label>:
 						</dt>
 						<dd>
-							<input type="text" ', isset($context['ban']['from_user']) ? 'readonly="readonly" value="' . $context['ban_suggestions']['member']['name'] . '"' : ' value=""', ' name="user" id="user" size="44" class="input_text" />
+							<input type="text" ', !empty($context['ban']['from_user']) ? 'readonly="readonly" value="' . $context['ban_suggestions']['member']['name'] . '"' : ' value="' . (isset($context['ban_suggestions']['member']['name']) ? $context['ban_suggestions']['member']['name'] : '') . '"', ' name="user" id="user" size="44" class="input_text" />
 						</dd>
 					</dl>';
 

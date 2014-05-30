@@ -16,7 +16,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -971,7 +971,7 @@ function maxAttachment()
  * Check multiple attachments IDs against the database.
  *
  * @package Attachments
- * @param array $attachments
+ * @param int[] $attachments
  * @param string $approve_query
  */
 function validateAttachments($attachments, $approve_query)

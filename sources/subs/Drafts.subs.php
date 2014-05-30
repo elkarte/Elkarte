@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -460,16 +460,18 @@ function saveDraft()
 	$post_errors = Error_Context::context('post', 1);
 
 	// Prepare and clean the data, load the draft array
-	$draft['id_draft'] = $id_draft;
-	$draft['topic_id'] = empty($_REQUEST['topic']) ? 0 : (int) $_REQUEST['topic'];
-	$draft['board'] = $board;
-	$draft['icon'] = empty($_POST['icon']) ? 'xx' : preg_replace('~[\./\\\\*:"\'<>]~', '', $_POST['icon']);
-	$draft['smileys_enabled'] = isset($_POST['ns']) ? 0 : 1;
-	$draft['locked'] = isset($_POST['lock']) ? (int) $_POST['lock'] : 0;
-	$draft['sticky'] = isset($_POST['sticky']) && !empty($modSettings['enableStickyTopics']) ? (int) $_POST['sticky'] : 0;
-	$draft['subject'] = strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
-	$draft['body'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES);
-	$draft['id_member'] = $user_info['id'];
+	$draft = array(
+		'id_draft' => $id_draft,
+		'topic_id' => empty($_REQUEST['topic']) ? 0 : (int) $_REQUEST['topic'],
+		'board' => $board,
+		'icon' => empty($_POST['icon']) ? 'xx' : preg_replace('~[\./\\\\*:"\'<>]~', '', $_POST['icon']),
+		'smileys_enabled' => isset($_POST['ns']) ? 0 : 1,
+		'locked' => isset($_POST['lock']) ? (int) $_POST['lock'] : 0,
+		'sticky' => isset($_POST['sticky']) && !empty($modSettings['enableStickyTopics']) ? (int) $_POST['sticky'] : 0,
+		'subject' => strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => '')),
+		'body' => Util::htmlspecialchars($_POST['message'], ENT_QUOTES),
+		'id_member' => $user_info['id'],
+	);
 
 	// The message and subject still need a bit more work
 	preparsecode($draft['body']);
@@ -568,11 +570,13 @@ function savePMDraft($recipientList)
 		$recipientList = unserialize($draft_info['to_list']);
 
 	// Prepare the data
-	$draft['id_pm_draft'] = $id_pm_draft;
-	$draft['reply_id'] = empty($_POST['replied_to']) ? 0 : (int) $_POST['replied_to'];
-	$draft['body'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES);
-	$draft['subject'] = strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
-	$draft['id_member'] = $user_info['id'];
+	$draft = array(
+		'id_pm_draft' => $id_pm_draft,
+		'reply_id' => empty($_POST['replied_to']) ? 0 : (int) $_POST['replied_to'],
+		'body' => Util::htmlspecialchars($_POST['message'], ENT_QUOTES),
+		'subject' => strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => '')),
+		'id_member' => $user_info['id'],
+	);
 
 	// message and subject always need a bit more work
 	preparsecode($draft['body']);

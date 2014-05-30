@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -86,7 +86,7 @@ class Poll_Controller extends Action_Controller
 				}
 
 				// Has the poll been reset since guest voted?
-				if ($row['reset_poll'] > $guestvoted[1])
+				if (isset($guestvoted[1]) && $row['reset_poll'] > $guestvoted[1])
 				{
 					// Remove the poll info from the cookie to allow guest to vote again
 					unset($guestinfo[$i]);

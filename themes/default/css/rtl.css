@@ -148,7 +148,7 @@ h2 a.collapse {
 	text-align: right;
 }
 .bbc_footnotes {
-	padding: 4px 0 4px  8px;
+	padding: 4px 0 4px 8px;
 }
 
 /*	$AJAX		*/
@@ -175,7 +175,7 @@ h2 a.collapse {
 	padding: 12px 8px 4px 3px;
 	float: left;
 }
-#search_form  * {
+#search_form * {
 	/* Webkit (bleh) fix. */
 	float: right;
 }
@@ -212,6 +212,9 @@ h2 a.collapse {
 #footer_section li {
 	padding-left: 5px;
 	padding-right: 0;
+}
+#footer_section .rssfeeds {
+	float: left;
 }
 
 /*	$MENUS	*/
@@ -291,8 +294,8 @@ h2 a.collapse {
 	padding: 0 0 1em 10px;
 }
 /* Same styling for Level 1 and Level 2. */
-#menu_sidebar  .listlevel1:hover .menulevel2,
-#menu_sidebar  .listlevel1.sfhover .menulevel2 {
+#menu_sidebar .listlevel1:hover .menulevel2,
+#menu_sidebar .listlevel1.sfhover .menulevel2 {
 	left: auto;
 	right: 170px;
 }
@@ -390,7 +393,7 @@ h2 a.collapse {
 	right: 3px;
 }
 /* Quickbutton and follow ups drop menus. */
-.quickbuttons .menulevel2, .follow_ups  .menulevel2 {
+.quickbuttons .menulevel2, .follow_ups .menulevel2 {
 	text-align: right;
 }
 .quickbuttons .listlevel1:hover .menulevel2,
@@ -419,7 +422,7 @@ h2 a.collapse {
 	float: right;
 }
 
-.pagelinks .current_page  {
+.pagelinks .current_page {
 	float: right;
 }
 .expand_pages {
@@ -502,7 +505,7 @@ dl.settings img {
 }
 .board_stats {
 	text-align: left;
-	padding: 1px  6px 1px 0;
+	padding: 1px 6px 1px 0;
 	float: left;
 }
 .board_avatar {
@@ -587,10 +590,10 @@ dl.settings img {
 /* Search results need some help as well */
 /* @todo - Sort markup so this can call above classes. *//*
 .search_results_posts .lockedbg {
-	background:  #efefef url(../images/icons/quick_lock.png) no-repeat 5% 15px;
+	background: #efefef url(../images/icons/quick_lock.png) no-repeat 5% 15px;
 }
 .search_results_posts .stickybg, .search_results_posts .locked_stickybg {
-	background:  #fffee2 url(../images/icons/quick_sticky_lock.png) no-repeat 5% 15px;
+	background: #fffee2 url(../images/icons/quick_sticky_lock.png) no-repeat 5% 15px;
 }*/
 
 #topic_icons {

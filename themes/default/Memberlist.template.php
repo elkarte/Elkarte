@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -33,9 +33,11 @@ function template_mlsearch_above()
 	foreach ($context['search_fields'] as $id => $title)
 	{
 		$extra .= '
-				<li class="mlsearch_option">
-					<label for="fields-' . $id . '"><input type="checkbox" name="fields[]" id="fields-' . $id . '" value="' . $id . '" ' . (in_array($id, $context['search_defaults']) ? 'checked="checked"' : '') . ' class="input_check floatright" />' . $title . '</label>
-				</li>';
+					<li class="mlsearch_option">
+						<label for="fields-' . $id . '">
+							<input type="checkbox" name="fields[]" id="fields-' . $id . '" value="' . $id . '" ' . (in_array($id, $context['search_defaults']) ? 'checked="checked"' : '') . ' class="input_check" />' . $title . '
+						</label>
+					</li>';
 	}
 
 	$extra .= '

@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -39,6 +39,7 @@ class ProfileInfo_Controller extends Action_Controller
 
 	/**
 	 * View the user profile summary.
+	 *
 	 * @uses ProfileInfo template
 	 */
 	public function action_summary()
@@ -329,16 +330,17 @@ class ProfileInfo_Controller extends Action_Controller
 			else
 			{
 				// Set up to get the last 10 topics of this member
-				$msgCount = count_user_topics($memID);
+				$topicCount = count_user_topics($memID);
 				$range_limit = '';
 				$maxIndex = 10;
 
-				// If they are a frequent topic starter, we guess the range to help the query
-				if ($msgCount > 1000)
+				// If they are a frequent topic starter we guess the range to help the query
+				if ($topicCount > 1000)
 				{
-					$margin = floor(($max_msg_member - $min_msg_member) * (($start + $modSettings['defaultMaxMessages']) / $msgCount) + .1 * ($max_msg_member - $min_msg_member));
+					list ($min_topic_member, $max_topic_member) = findMinMaxUserTopic($memID);
+					$margin = floor(($max_topic_member - $min_topic_member) * (($start + $modSettings['defaultMaxMessages']) / $topicCount) + .1 * ($max_topic_member - $min_topic_member));
 					$margin *= 5;
-					$range_limit = 't.id_first_msg > ' . ($max_msg_member - $margin);
+					$range_limit = 't.id_first_msg > ' . ($max_topic_member - $margin);
 				}
 
 				// Find this user's most recent topics
@@ -527,7 +529,7 @@ class ProfileInfo_Controller extends Action_Controller
 				),
 				'topic' => array(
 					'id' => $row['id_topic'],
-					'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.' . 'msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
+					'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
 				),
 				'subject' => $row['subject'],
 				'start' => 'msg' . $row['id_msg'],
@@ -656,7 +658,7 @@ class ProfileInfo_Controller extends Action_Controller
 
 		$memID = currentMemberID();
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 
 		// This is all the information required to list attachments.
 		$listOptions = array(
@@ -765,7 +767,7 @@ class ProfileInfo_Controller extends Action_Controller
 		if ($user_info['id'] != $memID || !$modSettings['enable_unwatch'])
 			return;
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 
 		// And here they are: the topics you don't like
 		$listOptions = array(
@@ -1036,7 +1038,7 @@ class ProfileInfo_Controller extends Action_Controller
 
 		// Let's use a generic list to get all the current warnings
 		// and use the issue warnings grab-a-granny thing.
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 
 		$memID = currentMemberID();
 

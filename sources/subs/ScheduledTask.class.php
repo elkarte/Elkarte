@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -28,7 +28,7 @@ if (!defined('ELK'))
  *
  * @package ScheduledTasks
  */
-class ScheduledTask
+class Scheduled_Task
 {
 	/**
 	 * Function to sending out approval notices to moderators.
@@ -456,6 +456,7 @@ class ScheduledTask
 		$members = array();
 		$langs = array();
 		$notify = array();
+		$boards = array();
 		while ($row = $db->fetch_assoc($request))
 		{
 			if (!isset($members[$row['id_member']]))
@@ -1479,8 +1480,6 @@ class ScheduledTask
 		}
 		else
 		{
-			$start = !empty($modSettings['user_access_mentions']) ? $modSettings['user_access_mentions'] : 0;
-
 			// Checks 10 users at a time, the scheduled task is set to run once per hour, so 240 users a day
 			// @todo <= I know you like it Spuds! :P It may be necessary to set it to something higher.
 			$limit = 10;

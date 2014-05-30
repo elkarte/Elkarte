@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -45,7 +45,7 @@ interface Database
 	 *
 	 * @param string $db_string
 	 * @param mixed[] $db_values
-	 * @param resource $connection = null
+	 * @param resource|null $connection = null
 	 * @return string
 	 */
 	public function quote($db_string, $db_values, $connection = null);
@@ -56,7 +56,7 @@ interface Database
 	 * @param string $identifier
 	 * @param string $db_string
 	 * @param mixed[] $db_values = array()
-	 * @param resource $connection = null
+	 * @param resource|null $connection = null
 	 */
 	public function query($identifier, $db_string, $db_values = array(), $connection = null);
 
@@ -64,7 +64,7 @@ interface Database
 	 * Fetch next result as association.
 	 *
 	 * @param resource $request
-	 * @param mixed $counter = false
+	 * @param int|boolean $counter = false
 	 */
 	public function fetch_assoc($request, $counter = false);
 
@@ -115,7 +115,7 @@ interface Database
 	 * Last insert id
 	 *
 	 * @param string $table
-	 * @param string $field = null
+	 * @param string|null $field = null
 	 * @param resource|null $connection = null
 	 */
 	public function insert_id($table, $field = null, $connection = null);
@@ -190,7 +190,7 @@ interface Database
 	/**
 	 * Return last error string from the database server
 	 *
-	 * @param resource $connection = null
+	 * @param resource|null $connection = null
 	 * @return string
 	 */
 	public function last_error($connection = null);
@@ -228,7 +228,7 @@ interface Database
 	/**
 	 * Select database.
 	 *
-	 * @param string $dbName = null
+	 * @param string|null $dbName = null
 	 * @param resource|null $connection = null
 	 */
 	public function select_db($dbName = null, $connection = null);

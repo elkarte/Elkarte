@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -67,7 +67,7 @@ class ManageSearch_Controller extends Action_Controller
 		);
 
 		// Control for actions
-		$action = new Action();
+		$action = new Action('manage_search');
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -186,7 +186,7 @@ class ManageSearch_Controller extends Action_Controller
 	private function _initSearchSettingsForm()
 	{
 		// This is really quite wanting.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Instantiate the form
 		$this->_searchSettings = new Settings_Form();
@@ -419,7 +419,7 @@ class ManageSearch_Controller extends Action_Controller
 	 */
 	public function action_create()
 	{
-		global $modSettings, $context, $txt;
+		global $modSettings, $context, $txt, $db_show_debug;
 
 		// Scotty, we need more time...
 		@set_time_limit(600);
@@ -448,6 +448,7 @@ class ManageSearch_Controller extends Action_Controller
 			),
 		);
 
+		// Resume building an index that was not completed
 		if (isset($_REQUEST['resume']) && !empty($modSettings['search_custom_index_resume']))
 		{
 			$context['index_settings'] = unserialize($modSettings['search_custom_index_resume']);
@@ -463,7 +464,7 @@ class ManageSearch_Controller extends Action_Controller
 			$context['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
 			$context['step'] = isset($_REQUEST['step']) ? (int) $_REQUEST['step'] : 0;
 
-			// admin timeouts are painful when building these long indexes
+			// Admin timeouts are painful when building these long indexes
 			if ($_SESSION['admin_time'] + 3300 < time() && $context['step'] >= 1)
 				$_SESSION['admin_time'] = time();
 		}
@@ -476,6 +477,10 @@ class ManageSearch_Controller extends Action_Controller
 			$context['sub_template'] = 'create_index';
 
 		require_once(SUBSDIR . '/ManageSearch.subs.php');
+
+		// Logging may cause session issues with many queries
+		$old_db_show_debug = $db_show_debug;
+		$db_show_debug = false;
 
 		// Step 1: insert all the words.
 		if ($context['step'] === 1)
@@ -500,6 +505,9 @@ class ManageSearch_Controller extends Action_Controller
 				$context['percentage'] = 80 + round($context['start'] / $index_properties[$context['index_settings']['bytes_per_word']]['max_size'], 3) * 20;
 			}
 		}
+
+		// Restore previous debug state
+		$db_show_debug = $old_db_show_debug;
 
 		// Step 3: everything done.
 		if ($context['step'] === 3)
@@ -614,7 +622,6 @@ class ManageSearch_Controller extends Action_Controller
 		$context['sub_template'] = 'manage_sphinx';
 		createToken('admin-mssphinx');
 	}
-
 
 	/**
 	 * Get the installed Search API implementations.

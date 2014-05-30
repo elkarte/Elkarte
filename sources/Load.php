@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -62,6 +62,8 @@ function reloadSettings()
 			$modSettings['defaultMaxMessages'] = 15;
 		if (empty($modSettings['defaultMaxMembers']) || $modSettings['defaultMaxMembers'] <= 0 || $modSettings['defaultMaxMembers'] > 999)
 			$modSettings['defaultMaxMembers'] = 30;
+		if (empty($modSettings['subject_length']))
+			$modSettings['subject_length'] = 24;
 
 		$modSettings['warning_enable'] = $modSettings['warning_settings'][0];
 
@@ -117,7 +119,7 @@ function reloadSettings()
 	{
 		$integration_settings = unserialize(ELK_INTEGRATION_SETTINGS);
 		foreach ($integration_settings as $hook => $function)
-			add_integration_function($hook, $function, false);
+			add_integration_function($hook, $function);
 	}
 
 	// Any files to pre include?
@@ -346,7 +348,7 @@ function loadUserSettings()
 		), determineAvatar($user_settings)),
 		'smiley_set' => isset($user_settings['smiley_set']) ? $user_settings['smiley_set'] : '',
 		'messages' => empty($user_settings['personal_messages']) ? 0 : $user_settings['personal_messages'],
-		'mentions' => empty($user_settings['mentions']) ? 0 : $user_settings['mentions'],
+		'mentions' => empty($user_settings['mentions']) ? 0 : max(0, $user_settings['mentions']),
 		'unread_messages' => empty($user_settings['unread_messages']) ? 0 : $user_settings['unread_messages'],
 		'total_time_logged_in' => empty($user_settings['total_time_logged_in']) ? 0 : $user_settings['total_time_logged_in'],
 		'buddies' => !empty($modSettings['enable_buddylist']) && !empty($user_settings['buddy_list']) ? explode(',', $user_settings['buddy_list']) : array(),
@@ -913,6 +915,10 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 		$db->free_result($request);
 	}
 
+	// Anthing else integration may want to add to the user_profile array
+	if (!empty($new_loaded_ids))
+		call_integration_hook('integrate_add_member_data', array($new_loaded_ids, $set));
+
 	if (!empty($new_loaded_ids) && !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 3)
 	{
 		for ($i = 0, $n = count($new_loaded_ids); $i < $n; $i++)
@@ -1040,7 +1046,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'posts' => comma_format($profile['posts']),
 			'avatar' => determineAvatar($profile),
 			'last_login' => empty($profile['last_login']) ? $txt['never'] : standardTime($profile['last_login']),
-			'last_login_timestamp' => empty($profile['last_login']) ? 0 : forum_time(0, $profile['last_login']),
+			'last_login_timestamp' => empty($profile['last_login']) ? 0 : forum_time(false, $profile['last_login']),
 			'karma' => array(
 				'good' => $profile['karma_good'],
 				'bad' => $profile['karma_bad'],
@@ -1440,7 +1446,11 @@ function loadTheme($id_theme = 0, $initialize = true)
 	$context['can_register'] = empty($modSettings['registration_method']) || $modSettings['registration_method'] != 3;
 
 	// Set some permission related settings.
-	$context['show_login_bar'] = $user_info['is_guest'] && !empty($modSettings['enableVBStyleLogin']);
+	if ($user_info['is_guest'] && !empty($modSettings['enableVBStyleLogin']))
+	{
+		$context['show_login_bar'] = true;
+		loadJavascriptFile('sha256.js', array('defer' => true));
+	}
 
 	// This determines the server... not used in many places, except for login fixing.
 	detectServer();
@@ -1530,6 +1540,9 @@ function loadTheme($id_theme = 0, $initialize = true)
 	if (function_exists('template_init'))
 		$settings = array_merge($settings, template_init());
 
+	// Call initialization theme integration functions.
+	call_integration_hook('integrate_init_theme');
+
 	// Guests may still need a name.
 	if ($context['user']['is_guest'] && empty($context['user']['name']))
 		$context['user']['name'] = $txt['guest_title'];
@@ -1602,6 +1615,11 @@ function loadTheme($id_theme = 0, $initialize = true)
 	// This allows us to change the way things look for the admin.
 	$context['admin_features'] = isset($modSettings['admin_features']) ? explode(',', $modSettings['admin_features']) : array('cd,cp,k,w,rg,ml,pm');
 
+	if (!empty($modSettings['xmlnews_enable']) && (!empty($modSettings['allow_guestAccess']) || $context['user']['is_logged']))
+		$context['newsfeed_urls'] = array(
+			'rss' => $scripturl . '?action=.xml;type=rss2;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5),
+			'atom' => $scripturl . '?action=.xml;type=atom;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5)
+		);
 	// Default JS variables for use in every theme
 	addJavascriptVar(array(
 		'elk_theme_url' => '"' . $settings['theme_url'] . '"',
@@ -1798,13 +1816,14 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 
 	if ($default_loaded === false)
 	{
-		loadCSSFile(array('index.css'));
+		loadCSSFile('index.css');
 		$default_loaded = true;
 	}
 
 	// Any specific template style sheets to load?
 	if (!empty($style_sheets))
 	{
+		$sheets = array();
 		foreach ($style_sheets as $sheet)
 		{
 			$sheets[] = stripos('.css', $sheet) !== false ? $sheet : $sheet . '.css';
@@ -1847,9 +1866,9 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 		if (!empty($context['user']['is_admin']) && !isset($_GET['th']))
 		{
 			loadLanguage('Errors');
-			if (!isset($context['security_controls']['files']['title']))
-				$context['security_controls']['files']['title'] = $txt['generic_warning'];
-			$context['security_controls']['files']['messages']['theme_dir'] = '<a href="' . $scripturl . '?action=admin;area=theme;sa=list;th=1;' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['theme_dir_wrong'] . '</a>';
+			if (!isset($context['security_controls_files']['title']))
+				$context['security_controls_files']['title'] = $txt['generic_warning'];
+			$context['security_controls_files']['errors']['theme_dir'] = '<a href="' . $scripturl . '?action=admin;area=theme;sa=list;th=1;' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['theme_dir_wrong'] . '</a>';
 		}
 
 		loadTemplate($template_name);
@@ -1904,14 +1923,14 @@ function loadSubTemplate($sub_template_name, $fatal = false)
 /**
  * Add a CSS file for output later
  *
- * @param mixed $filenames string or array of filenames to work on
+ * @param string[]|string $filenames string or array of filenames to work on
  * @param mixed[] $params = array()
- *         Keys are the following:
- *         - ['local'] (true/false): define if the file is local
- *         - ['fallback'] (true/false): if false  will attempt to load the file
- *             from the default theme if not found in the current theme
- *         - ['stale'] (true/false/string): if true or null, use cache stale,
- *             false do not, or used a supplied string
+ * Keys are the following:
+ * - ['local'] (true/false): define if the file is local
+ * - ['fallback'] (true/false): if false  will attempt to load the file
+ *   from the default theme if not found in the current theme
+ * - ['stale'] (true/false/string): if true or null, use cache stale,
+ *   false do not, or used a supplied string
  * @param string $id optional id to use in html id=""
  */
 function loadCSSFile($filenames, $params = array(), $id = '')
@@ -1935,7 +1954,7 @@ function loadCSSFile($filenames, $params = array(), $id = '')
  *   parameters applied,
  * - if you need specific parameters on a per file basis, call it multiple times
  *
- * @param mixed $filenames string or array of filenames to work on
+ * @param string[]|string $filenames string or array of filenames to work on
  * @param mixed[] $params = array()
  * Keys are the following:
  * - ['local'] (true/false): define if the file is local, if file does not
@@ -1971,7 +1990,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
  *   parameters applied,
  * - if you need specific parameters on a per file basis, call it multiple times
  *
- * @param mixed $filenames string or array of filenames to work on
+ * @param string[]|string $filenames string or array of filenames to work on
  * @param mixed[] $params = array()
  * Keys are the following:
  * - ['subdir'] (string): the subdirectory of the theme dir the file is in
@@ -2394,7 +2413,7 @@ function censorText(&$text, $force = false)
 	static $censor_vulgar = null, $censor_proper = null;
 
 	// Are we going to censor this string
-	if ((!empty($options['show_no_censored']) && $modSettings['allow_no_censored'] && !$force) || empty($modSettings['censor_vulgar']) || trim($text) === '')
+	if ((!empty($options['show_no_censored']) && !empty($modSettings['allow_no_censored']) && !$force) || empty($modSettings['censor_vulgar']) || trim($text) === '')
 		return $text;
 
 	// If they haven't yet been loaded, load them.
@@ -2473,9 +2492,9 @@ function template_include($filename, $once = false)
 
 	if ($file_found !== true)
 	{
-		ob_end_clean();
+		@ob_end_clean();
 		if (!empty($modSettings['enableCompressedOutput']))
-			@ob_start('ob_gzhandler');
+			ob_start('ob_gzhandler');
 		else
 			ob_start();
 
@@ -2807,34 +2826,39 @@ function doSecurityChecks()
 {
 	global $modSettings, $context, $maintenance, $user_info, $txt, $scripturl, $user_settings;
 
+	$show_warnings = false;
+
 	if (allowedTo('admin_forum') && !$user_info['is_guest'])
 	{
 		// If agreement is enabled, at least the english version shall exists
 		if ($modSettings['requireAgreement'] && !file_exists(BOARDDIR . '/agreement.txt'))
 		{
-			$context['security_controls']['files']['title'] = $txt['generic_warning'];
-			$context['security_controls']['files']['messages']['agreement'] = $txt['agreement_missing'];
+			$context['security_controls_files']['title'] = $txt['generic_warning'];
+			$context['security_controls_files']['errors']['agreement'] = $txt['agreement_missing'];
+			$show_warnings = true;
 		}
 
 		// Cache directory writeable?
 		if (!empty($modSettings['cache_enable']) && !is_writable(CACHEDIR))
 		{
-			$context['security_controls']['files']['title'] = $txt['generic_warning'];
-			$context['security_controls']['files']['messages']['cache'] = $txt['cache_writable'];
+			$context['security_controls_files']['title'] = $txt['generic_warning'];
+			$context['security_controls_files']['errors']['cache'] = $txt['cache_writable'];
+			$show_warnings = true;
 		}
 
 		// @todo add a hook here
-		$securityFiles = array('install.php', 'webinstall.php', 'upgrade.php', 'convert.php', 'repair_paths.php', 'repair_settings.php', 'Settings.php~', 'Settings_bak.php~');
+		$securityFiles = array('install.php', 'upgrade.php', 'convert.php', 'repair_paths.php', 'repair_settings.php', 'Settings.php~', 'Settings_bak.php~');
 		foreach ($securityFiles as $securityFile)
 		{
 			if (file_exists(BOARDDIR . '/' . $securityFile))
 			{
-				$context['security_controls']['files']['title'] = $txt['security_risk'];
-				$context['security_controls']['files']['messages'][$securityFile] = sprintf($txt['not_removed'], $securityFile);
+				$context['security_controls_files']['title'] = $txt['security_risk'];
+				$context['security_controls_files']['errors'][$securityFile] = sprintf($txt['not_removed'], $securityFile);
+				$show_warnings = true;
 
 				if ($securityFile == 'Settings.php~' || $securityFile == 'Settings_bak.php~')
 				{
-					$context['security_controls']['files']['messages'][$securityFile] .= '<span class="smalltext">' . sprintf($txt['not_removed_extra'], $securityFile, substr($securityFile, 0, -1)) . '</span>';
+					$context['security_controls_files']['errors'][$securityFile] .= '<span class="smalltext">' . sprintf($txt['not_removed_extra'], $securityFile, substr($securityFile, 0, -1)) . '</span>';
 				}
 			}
 		}
@@ -2859,15 +2883,16 @@ function doSecurityChecks()
 	{
 		if ($user_info['is_admin'])
 		{
-			$context['security_controls']['query']['title'] = $txt['query_command_denied'];
+			$context['security_controls_query']['title'] = $txt['query_command_denied'];
+			$show_warnings = true;
 			foreach ($_SESSION['query_command_denied'] as $command => $error)
-				$context['security_controls']['query']['messages'][$command] = '<pre>' . Util::htmlspecialchars($error) . '</pre>';
+				$context['security_controls_query']['errors'][$command] = '<pre>' . Util::htmlspecialchars($error) . '</pre>';
 		}
 		else
 		{
-			$context['security_controls']['query']['title'] = $txt['query_command_denied_guests'];
+			$context['security_controls_query']['title'] = $txt['query_command_denied_guests'];
 			foreach ($_SESSION['query_command_denied'] as $command => $error)
-				$context['security_controls']['query']['messages'][$command] = '<pre>' . sprintf($txt['query_command_denied_guests_msg'], Util::htmlspecialchars($command)) . '</pre>';
+				$context['security_controls_query']['errors'][$command] = '<pre>' . sprintf($txt['query_command_denied_guests_msg'], Util::htmlspecialchars($command)) . '</pre>';
 		}
 	}
 
@@ -2881,21 +2906,22 @@ function doSecurityChecks()
 	if (isset($_SESSION['ban']['cannot_post']))
 	{
 		// An admin cannot be banned (technically he could), and if it is better he knows.
-		$context['security_controls']['ban']['title'] = sprintf($txt['you_are_post_banned'], $user_info['is_guest'] ? $txt['guest_title'] : $user_info['name']);
+		$context['security_controls_ban']['title'] = sprintf($txt['you_are_post_banned'], $user_info['is_guest'] ? $txt['guest_title'] : $user_info['name']);
+		$show_warnings = true;
 
-		$context['security_controls']['ban']['messages']['reason'] = '';
+		$context['security_controls_ban']['errors']['reason'] = '';
 
 		if (!empty($_SESSION['ban']['cannot_post']['reason']))
-			$context['security_controls']['ban']['messages']['reason'] = $_SESSION['ban']['cannot_post']['reason'];
+			$context['security_controls_ban']['errors']['reason'] = $_SESSION['ban']['cannot_post']['reason'];
 
 		if (!empty($_SESSION['ban']['expire_time']))
-			$context['security_controls']['ban']['messages']['reason'] .= '<span class="smalltext">' . sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) . '</span>';
+			$context['security_controls_ban']['errors']['reason'] .= '<span class="smalltext">' . sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) . '</span>';
 		else
-			$context['security_controls']['ban']['messages']['reason'] .= '<span class="smalltext">' . $txt['your_ban_expires_never'] . '</span>';
+			$context['security_controls_ban']['errors']['reason'] .= '<span class="smalltext">' . $txt['your_ban_expires_never'] . '</span>';
 	}
 
 	// Finally, let's show the layer.
-	if (!empty($context['security_controls']) || !empty($context['warning_controls']))
+	if ($show_warnings || !empty($context['warning_controls']))
 		Template_Layers::getInstance()->addAfter('admin_warning', 'body');
 }
 

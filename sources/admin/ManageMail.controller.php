@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -23,7 +23,8 @@ if (!defined('ELK'))
 /**
  * This class is the administration mailing controller.
  *
- * It handles mail configuration, it displays and allows to remove items from the mail queue.
+ * - It handles mail configuration,
+ * - It displays and allows to remove items from the mail queue.
  *
  * @package Mail
  */
@@ -51,7 +52,7 @@ class ManageMail_Controller extends Action_Controller
 		loadLanguage('ManageMail');
 
 		// We'll need the utility functions from here.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		$subActions = array(
 			'browse' => array($this, 'action_browse', 'permission' => 'admin_forum'),
@@ -128,6 +129,7 @@ class ManageMail_Controller extends Action_Controller
 						'function' => function ($rowData) {
 							return Util::strlen($rowData['subject']) > 50 ? sprintf('%1$s...', Util::htmlspecialchars(Util::substr($rowData['subject'], 0, 47))) : Util::htmlspecialchars($rowData['subject']);
 						},
+						// @todo class popped out while merging
 						'class' => 'smalltext',
 					),
 					'sort' => array(
@@ -146,7 +148,6 @@ class ManageMail_Controller extends Action_Controller
 								'recipient' => true,
 							),
 						),
-						'class' => 'smalltext',
 					),
 					'sort' => array(
 						'default' => 'recipient',
@@ -168,6 +169,7 @@ class ManageMail_Controller extends Action_Controller
 							// But if not, revert to priority 0.
 							return isset($txt[$txtKey]) ? $txt[$txtKey] : $txt['mq_mpriority_1'];
 						},
+						// @todo class popped out while merging
 						'class' => 'centertext smalltext',
 					),
 					'sort' => array(
@@ -183,6 +185,7 @@ class ManageMail_Controller extends Action_Controller
 						'function' => function ($rowData) {
 							return time_since(time() - $rowData['time_sent']);
 						},
+						// @todo class popped out while merging
 						'class' => 'smalltext',
 					),
 					'sort' => array(
@@ -193,12 +196,12 @@ class ManageMail_Controller extends Action_Controller
 				'check' => array(
 					'header' => array(
 						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
-						'class' => 'centertext',
 					),
 					'data' => array(
 						'function' => function ($rowData) {
 							return '<input type="checkbox" name="delete[]" value="' . $rowData['id_mail'] . '" class="input_check" />';
 						},
+						// @todo class popped out while merging
 						'class' => 'centertext',
 					),
 				),
@@ -211,14 +214,15 @@ class ManageMail_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'bottom_of_list',
+					'class' => 'submitbutton',
 					'value' => '
 						<input type="submit" name="delete_redirects" value="' . $txt['quickmod_delete_selected'] . '" onclick="return confirm(\'' . $txt['quickmod_confirm'] . '\');" class="right_submit" />
-						<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=mailqueue;sa=clear;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['mailqueue_clear_list_warning'] . '\');">' . $txt['mailqueue_clear_list'] . '</a> ',
+						<a class="linkbutton" href="' . $scripturl . '?action=admin;area=mailqueue;sa=clear;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['mailqueue_clear_list_warning'] . '\');">' . $txt['mailqueue_clear_list'] . '</a> ',
 				),
 			),
 		);
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 	}
 

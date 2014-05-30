@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -15,6 +15,7 @@
  * Updates the like value for a post/member combo if there are no problems with
  * the request, such as being a narcissist
  *
+ * @package Likes
  * @param int $id_liker - user_id of the liker/disliker
  * @param mixed[] $liked_message - message array that is being worked on
  * @param string $direction - + for like - for unlike a previous liked one
@@ -42,6 +43,7 @@ function likePost($id_liker, $liked_message, $direction)
  * Returns an array of message_id to members who liked that post
  * If prepare is true, will also prep the array for template use
  *
+ * @package Likes
  * @param int[]|int $messages
  * @param bool $prepare
  */
@@ -88,6 +90,7 @@ function loadLikes($messages, $prepare = true)
  * Replaces the current member id with 'You' if they like a post and makes it first
  * Truncates the like list at a given number and adds in +x others
  *
+ * @package Likes
  * @param int[] $likes array of like ids to process
  * @return integer[]
  */
@@ -131,6 +134,7 @@ function prepareLikes($likes)
 /**
  * Clear the likes log of older actions ... used to prevent a like love fest
  *
+ * @package Likes
  * @param int $likeWaitTime
  */
 function clearLikes($likeWaitTime)
@@ -150,11 +154,13 @@ function clearLikes($likeWaitTime)
 
 /**
  * Checks if the member has exceeded the number of like actions they are
- * allowed in a given time period.  The log is maintained to the time period
- * by the clearLikes function so the count is always current.
+ * allowed in a given time period.
  *
- * returns true if they can like again, or false if they have to wait a bit
+ * - The log is maintained to the time period by the clearLikes function so
+ * the count is always current.
+ * - returns true if they can like again, or false if they have to wait a bit
  *
+ * @package Likes
  * @param int $id_liker
  */
 function lastLikeOn($id_liker)
@@ -183,6 +189,7 @@ function lastLikeOn($id_liker)
 /**
  * Perform a like action, either + or -
  *
+ * @package Likes
  * @param int $id_liker
  * @param int[] $liked_message
  * @param int $direction - options: - or +
@@ -227,7 +234,7 @@ function updateLike($id_liker, $liked_message, $direction)
 		updateMemberData($liked_message['id_member'], array('likes_received' => '+'));
 	}
 	// Or you are just being fickle?
-	elseif ($count !==0 && $direction === '-')
+	elseif ($count !== 0 && $direction === '-')
 	{
 		$db->query('', '
 			DELETE FROM {db_prefix}message_likes
@@ -261,6 +268,7 @@ function updateLike($id_liker, $liked_message, $direction)
 /**
  * Increase the number of likes for this topic.
  *
+ * @package Likes
  * @param int $id_topic - the topic
  * @param string $direction +/- liking or unliking
  */
@@ -282,6 +290,7 @@ function increaseTopicLikes($id_topic, $direction)
  * Return how many likes a user has given or the count of thier posts that
  * have received a like (not the total likes received)
  *
+ * @package Likes
  * @param int $memberID
  * @param boolean $given
  */
@@ -317,6 +326,7 @@ function likesCount($memberID, $given = true)
  *
  * Used for action=profile;area=showlikes;sa=given
  *
+ * @package Likes
  * @param int $start
  * @param int $items_per_page
  * @param string $sort
@@ -354,7 +364,7 @@ function likesPostsGiven($start, $items_per_page, $sort, $memberID)
 			'subject' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
 			'poster_name' => $row['poster_name'],
 			'name' => $row['name'],
-			'delete' =>  $scripturl . '?action=likes;sa=unlikepost;profile;msg=' . $row['id_msg'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+			'delete' => $scripturl . '?action=likes;sa=unlikepost;profile;msg=' . $row['id_msg'] . ';' . $context['session_var'] . '=' . $context['session_id'],
 		);
 	}
 
@@ -367,6 +377,7 @@ function likesPostsGiven($start, $items_per_page, $sort, $memberID)
  *
  * Used by action=profile;area=showlikes;sa=received
  *
+ * @package Likes
  * @param int $start
  * @param int $items_per_page
  * @param string $sort
@@ -403,7 +414,7 @@ function likesPostsReceived($start, $items_per_page, $sort, $memberID)
 		$likes[] = array(
 			'subject' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
 			'name' => $row['name'],
-			'who' =>  $scripturl . '?action=likes;sa=showWhoLiked;msg=' . $row['id_msg'],
+			'who' => $scripturl . '?action=likes;sa=showWhoLiked;msg=' . $row['id_msg'],
 			'likes' => $row['likes']
 		);
 	}
@@ -414,6 +425,7 @@ function likesPostsReceived($start, $items_per_page, $sort, $memberID)
 /**
  * Function to load all of the likers of a message
  *
+ * @package Likes
  * @param int $start
  * @param int $items_per_page
  * @param string $sort
@@ -462,6 +474,7 @@ function postLikers($start, $items_per_page, $sort, $messageID)
 /**
  * Function to get the number of likes for a message
  *
+ * @package Likes
  * @param int $message
  */
 function messageLikeCount($message)

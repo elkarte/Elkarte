@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -1096,17 +1096,14 @@ function template_admin_search_results()
 	global $context, $txt, $settings, $scripturl;
 
 	echo '
-					<div>
-						<h3 class="category_header">
-							<object id="quick_search">
-								<form action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="UTF-8" class="floatright">
-									<input type="text" name="search_term" value="', $context['search_term'], '" class="input_text" />
-									<input type="hidden" name="search_type" value="', $context['search_type'], '" />
-									<input type="submit" name="search_go" value="', $txt['admin_search_results_again'], '" class="button_submit" />
-								</form>
-							</object>
-							<img class="icon" src="' . $settings['images_url'] . '/buttons/search.png" alt="" />&nbsp;', sprintf($txt['admin_search_results_desc'], $context['search_term']), '
-						</h3>
+					<div class="category_header">
+						<h3 class="floatleft hdicon cat_img_search">', sprintf($txt['admin_search_results_desc'], $context['search_term']), '</h3>
+						<form id="quick_search" class="floatright" action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="UTF-8">
+							<img class="icon" src="', $settings['images_url'], '/filter.png" alt="" />
+							<input type="text" name="search_term" value="', $context['search_term'], '" class="input_text" />
+							<input type="hidden" name="search_type" value="', $context['search_type'], '" />
+							<input type="submit" name="search_go" value="', $txt['admin_search_results_again'], '" class="button_submit" />
+						</form>
 					</div>
 					<div class="windowbg2 generic_list_wrapper">
 						<div class="content">';

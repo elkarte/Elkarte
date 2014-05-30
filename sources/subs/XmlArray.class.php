@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -58,7 +58,7 @@ class Xml_Array
 	public function __construct($data, $auto_trim = false, $level = null, $is_clone = false)
 	{
 		// If we're using this try to get some more memory.
-		setMemoryLimit('32M');
+		setMemoryLimit('128M');
 
 		// Set the debug level.
 		$this->debug_level = $level !== null ? $level : error_reporting();

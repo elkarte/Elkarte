@@ -44,7 +44,7 @@ div.quick_tasks {
 }
 #admin_form_wrapper div.windowbg, #support_credits div.windowbg,
 #generate_reports_type div.windowbg, #new_group div.windowbg,
-#view_group  div.windowbg, #admin_newsletters .windowbg {
+#view_group div.windowbg, #admin_newsletters .windowbg {
 	background: none;
 	padding: 0;
 	margin: 0 4px;
@@ -147,16 +147,14 @@ fieldset dl {
 #quick_search {
 	font-size: 0.857em;
 }
-/* Chrome fix. */
 #quick_search .icon, #quick_search .input_text,
 #quick_search select, #quick_search .button_submit {
 	float: left;
-	margin: 2px 0 0 4px;
+	margin: 3px 0 0 4px;
 }
 #quick_search .icon {
 	margin: 8px 0 0 0;
 }
-
 /* @todo - The welcome thingy. */
 #admincenter .roundframe, #modcenter .roundframe {
 	background: none;
@@ -228,11 +226,11 @@ fieldset dl {
 #admin_search_box {
 	padding: 0.5em 0;
 }
-#live_news div.content, #supportVersionsTable  div.content {
+#live_news div.content, #supportVersionsTable div.content {
 	padding: 0 4px;
 	font-size: 0.929em;
 }
-#supportVersionsTable  div.content {
+#supportVersionsTable div.content {
 	padding: 0 8px;
 }
 #live_news div.content dl {
@@ -277,14 +275,14 @@ div.quick_tasks {
 	height: 7em;
 	overflow: auto;
 }
-#quick_tasks  li a  {
+#quick_tasks li a {
 	line-height: 1.6em;
 }
 .home_image {
 	float: left;
 	margin: 2px 10px;
 }
-#quick_tasks  li span {
+#quick_tasks li span {
 	display: block;
 	margin: 0 0 0 70px;
 }
@@ -335,7 +333,7 @@ div.quick_tasks {
 }
 
 /* Styles for the core features screen.
-/* Cleaned up a  bit for clarity.
+/* Cleaned up a bit for clarity.
 ------------------------------------------------------- */
 #core_features {
 	padding: 20px 0;
@@ -508,7 +506,6 @@ dl.settings dd.questions input {
 
 /* Styles for the manage boards section.
 ------------------------------------------------- */
-
 #manage_boards .windowbg {
 	margin: 0;
 	padding: 0;
@@ -584,13 +581,9 @@ dl.settings dd.questions input {
 #manage_boards .post_group, #manage_boards .regular_members {
 	cursor: help;
 }
-.select_category, .select_all_box {
-	font-style: italic;
-	border-top: 1px dashed #CCCCCC;
-	border-bottom: 1px dashed #CCCCCC;
-}
 .select_all_box {
 	margin-top: 0.5em;
+	padding: 2px 2px 5px 2px;
 }
 .visible_boards .board label,
 .select_all_box label,
@@ -615,12 +608,11 @@ dl.settings dd.questions input {
 /* Styles for the manage smiley section.
 ------------------------------------------------- */
 #smiley_list .imagecolumn {
-padding: 7px 10px;
+	padding: 7px 10px;
 }
 
 /* Styles for the manage members section.
 ------------------------------------------------- */
-
 .msearch_details {
 	display: block;
 	width: 49%;
@@ -633,7 +625,7 @@ padding: 7px 10px;
 ------------------------------------------------- */
 #manage_maintenance div.windowbg, #manage_maintenance div.windowbg2 {
 	padding: 0;
-	margin:  0 0 4px 0;
+	margin: 0 0 4px 0;
 }
 #manage_maintenance .button_submit{
 	margin: 4px 10px 10px 10px;
@@ -695,7 +687,9 @@ dl.admin_permissions dd {
 .file_permissions .table_grid {
 	table-layout: fixed;
 	word-wrap: break-word;
-	hyphens: auto;
+	-webkit-hyphens: auto;
+	-moz-hyphens: auto;
+	-ms-hyphens: auto;
 }
 
 /* Styles for the manage search section.
@@ -738,7 +732,7 @@ dl.settings dd.large_caption {
 #fixed_area {
 	width: 97%;
 }
-ul.pending_payments {
+.pending_payments {
 	margin: 0;
 	padding: 0;
 	line-height: 2em;
@@ -755,7 +749,7 @@ ul.pending_payments {
 	margin: 0 0 0.6em 0;
 }
 .perm_boards li {
-	padding: 0.2em;
+	padding: 0.3em 0.5em;
 	margin: 1px;
 }
 .perm_classic {
@@ -767,7 +761,6 @@ ul.pending_payments {
 }
 .permission_groups li {
 	list-style-type: none;
-	padding: 0.2em;
 	margin: 1px;
 }
 .perms {
@@ -826,6 +819,16 @@ dl.themes_list dd {
 	font-style: italic;
 	white-space: nowrap;
 }
+.theme_options dt {
+	width: 55%;
+}
+.theme_options dd {
+	width: 40%
+}
+.theme_settings .input_text {
+	max-width: 100%;
+	width: 30em;
+}
 
 /* Styles for the registration center.
 ------------------------------------------------- */
@@ -842,7 +845,7 @@ dl.themes_list dd {
 	display: block;
 	width: 100%;
 }
-#modcenter .windowbg, #modcenter .windowbg2, #modcenter .generic_list_wrapper  {
+#modcenter .windowbg, #modcenter .windowbg2, #modcenter .generic_list_wrapper {
 	overflow: visible;
 	margin: 4px 0 0 0;
 }
@@ -910,7 +913,9 @@ ul.moderation_notes li {
 	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 	/* The next bits should fix https://github.com/elkarte/Elkarte/issues/567 */
 	word-wrap: break-word;
-	hyphens: auto;
+	-webkit-hyphens: auto;
+	-moz-hyphens: auto;
+	-ms-hyphens: auto;
 }
 #error_log .error_who, #error_log .error_type {
 	float: left;

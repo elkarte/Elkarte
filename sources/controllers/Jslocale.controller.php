@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -81,9 +81,9 @@ class Jslocale_Controller extends Action_Controller
 		// Lets make sure we aren't going to output anything nasty.
 		@ob_end_clean();
 		if (!empty($modSettings['enableCompressedOutput']))
-			@ob_start('ob_gzhandler');
+			ob_start('ob_gzhandler');
 		else
-			@ob_start();
+			ob_start();
 	}
 
 	/**

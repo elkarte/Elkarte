@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -425,8 +425,13 @@ class Maintenance_Controller extends Action_Controller
 
 		$colData = getMessageTableColumns();
 		foreach ($colData as $column)
+		{
 			if ($column['name'] == 'body')
+			{
 				$body_type = $column['type'];
+				break;
+			}
+		}
 
 		$context['convert_to'] = $body_type == 'text' ? 'mediumtext' : 'text';
 
@@ -522,8 +527,6 @@ class Maintenance_Controller extends Action_Controller
 	 * - It shows as the maintain_forum admin area.
 	 * - It is accessed from ?action=admin;area=maintain;sa=database;activity=optimize.
 	 * - It also updates the optimize scheduled task such that the tables are not automatically optimized again too soon.
-	 *
-	 * @uses the rawdata sub template (built in.)
 	 */
 	public function action_optimize_display()
 	{
@@ -1227,7 +1230,7 @@ class Maintenance_Controller extends Action_Controller
 					'data' => array(
 						'db' => 'hook_name',
 					),
-					'sort' =>  array(
+					'sort' => array(
 						'default' => 'hook_name',
 						'reverse' => 'hook_name DESC',
 					),
@@ -1246,7 +1249,7 @@ class Maintenance_Controller extends Action_Controller
 								return $data['real_function'];
 						},
 					),
-					'sort' =>  array(
+					'sort' => array(
 						'default' => 'function_name',
 						'reverse' => 'function_name DESC',
 					),
@@ -1258,7 +1261,7 @@ class Maintenance_Controller extends Action_Controller
 					'data' => array(
 						'db' => 'file_name',
 					),
-					'sort' =>  array(
+					'sort' => array(
 						'default' => 'file_name',
 						'reverse' => 'file_name DESC',
 					),
@@ -1282,7 +1285,7 @@ class Maintenance_Controller extends Action_Controller
 						},
 						'class' => 'centertext',
 					),
-					'sort' =>  array(
+					'sort' => array(
 						'default' => 'status',
 						'reverse' => 'status DESC',
 					),
@@ -1337,7 +1340,7 @@ class Maintenance_Controller extends Action_Controller
 			);
 		}
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($list_options);
 
 		$context['page_title'] = $txt['maintain_sub_hooks_list'];

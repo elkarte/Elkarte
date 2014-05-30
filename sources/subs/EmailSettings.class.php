@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  * Handles saving of config vars in another table than settings
  */
@@ -27,7 +27,7 @@ if (!defined('ELK'))
  *
  * @package Maillist
  */
-class MaillistSettingsClass extends Settings_Form
+class Email_Settings extends Settings_Form
 {
 	/**
 	 * static function saveTableSettings, now part of the Settings Form class

@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -22,6 +22,8 @@ if (!defined('ELK'))
 
 /**
  * Karma_Controller class, can give good or bad karma so watch out!
+ *
+ * @package Karma
  */
 class Karma_Controller extends Action_Controller
 {

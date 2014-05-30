@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -16,6 +16,8 @@ if (!defined('ELK'))
 
 /**
  * This class contains one likable use, which allows members to like a post
+ *
+ * @package Likes
  */
 class Likes_Controller extends Action_Controller
 {
@@ -220,7 +222,7 @@ class Likes_Controller extends Action_Controller
 		{
 			$details = loadLikes($this->_id_liked, true);
 			$count = empty($details) ? 0 : $details[$this->_id_liked]['count'];
-			$text = $count !== 0 ? $count . ' ' . $txt['likes'] : $txt['like_post'];
+			$text = $count !== 0 ? $txt['likes'] : $txt['like_post'];
 			$title = empty($details) ? '' : $txt['liked_by'] . ' ' . implode(', ', $details[$this->_id_liked]['member']);
 			$this->_likes_response = array(
 				'result' => true,
@@ -276,7 +278,7 @@ class Likes_Controller extends Action_Controller
 	public function action_showProfileLikes()
 	{
 		// Load in our helper functions
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		require_once(SUBSDIR . '/Likes.subs.php');
 
 		if (isset($_REQUEST['sa']) && $_REQUEST['sa'] === 'received')
@@ -365,8 +367,8 @@ class Likes_Controller extends Action_Controller
 
 							return $result;
 						},
-						'class' => "centertext",
-						'style' => "width: 10%",
+						'class' => 'centertext',
+						'style' => 'width: 10%',
 					),
 				),
 			),
@@ -467,8 +469,8 @@ class Likes_Controller extends Action_Controller
 
 							return $result;
 						},
-						'class' => "centertext",
-						'style' => "width: 10%",
+						'class' => 'centertext',
+						'style' => 'width: 10%',
 					),
 				),
 			),
@@ -499,7 +501,7 @@ class Likes_Controller extends Action_Controller
 	{
 		global $context, $txt, $scripturl;
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		require_once(SUBSDIR . '/Likes.subs.php');
 		loadLanguage('Profile');
 
@@ -544,7 +546,8 @@ class Likes_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'below_table_data',
-					'value' => '<a class="linkbutton_right" href="javascript:history.go(-1)">' . $txt['back'] . '</a>',
+					'class' => 'submitbutton',
+					'value' => '<a class="linkbutton" href="javascript:history.go(-1)">' . $txt['back'] . '</a>',
 				),
 			),
 		);

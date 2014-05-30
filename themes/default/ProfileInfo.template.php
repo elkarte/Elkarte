@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -212,8 +212,8 @@ function template_action_showPermissions()
 					<table class="table_grid">
 						<thead>
 							<tr class="table_head">
-								<th scope="col" class="lefttext" style="width:50%">', $txt['showPermissions_permission'], '</th>
-								<th scope="col" class="lefttext" style="width:50%">', $txt['showPermissions_status'], '</th>
+								<th scope="col" class="lefttext" style="width: 50%;">', $txt['showPermissions_permission'], '</th>
+								<th scope="col" class="lefttext" style="width: 50%;">', $txt['showPermissions_status'], '</th>
 							</tr>
 						</thead>
 						<tbody>';
@@ -277,8 +277,8 @@ function template_action_showPermissions()
 				<table class="table_grid">
 					<thead>
 						<tr class="table_head">
-							<th scope="col" class="lefttext" style="width:50%">', $txt['showPermissions_permission'], '</th>
-							<th scope="col" class="lefttext" style="width:50%">', $txt['showPermissions_status'], '</th>
+							<th scope="col" class="lefttext" style="width: 50%;">', $txt['showPermissions_permission'], '</th>
+							<th scope="col" class="lefttext" style="width: 50%;">', $txt['showPermissions_status'], '</th>
 						</tr>
 					</thead>
 					<tbody>';
@@ -1045,7 +1045,7 @@ function template_profile_block_buddies()
 			<a href="', $scripturl, '?action=profile;area=lists;sa=buddies;u=', $context['member']['id'], '">', $txt['buddies'], '</a>
 		</h3>
 		<div class="windowbg">
-			<div class="content flow_auto" ', (isset($div_height) ? 'style="max-height: ' . $div_height . 'px"' : ''), '>
+			<div class="content flow_auto" ', (isset($div_height) ? 'style="max-height: ' . $div_height . 'px;"' : ''), '>
 				<table class="profile_attachments">';
 
 		// Now show them all
@@ -1193,7 +1193,7 @@ function template_profile_block_posts()
 	// The posts block
 	echo '
 	<h3 class="category_header hdicon cat_img_posts">
-		<a href="', $scripturl, '?action=profile;area=showposts;sa=messages;u=', $context['member']['id'], '">', $txt['profile_posts'], '</a>
+		<a href="', $scripturl, '?action=profile;area=showposts;sa=messages;u=', $context['member']['id'], '">', $txt['profile_recent_posts'], '</a>
 	</h3>
 	<div class="windowbg">
 		<div class="content">

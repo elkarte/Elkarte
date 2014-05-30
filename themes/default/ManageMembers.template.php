@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -159,7 +159,7 @@ function template_search_members()
 			</div>
 			<h3 class="category_header">', $txt['member_part_of_these_membergroups'], '</h3>
 			<div class="flow_hidden">
-				<table style="width:49%" class="table_grid floatleft">
+				<table style="width: 49%;" class="table_grid floatleft">
 					<thead>
 						<tr class="table_head">
 							<th scope="col">', $txt['membergroups'], '</th>
@@ -196,7 +196,7 @@ function template_search_members()
 					</tbody>
 				</table>
 
-				<table style="width:49%" class="table_grid floatright">
+				<table style="width: 49%;" class="table_grid floatright">
 					<thead>
 						<tr class="table_head">
 							<th scope="col">
@@ -213,7 +213,7 @@ function template_search_members()
 							<td>
 								', $postgroup['name'], '
 							</td>
-							<td style="width:40px" class="centertext">
+							<td style="width: 40px;" class="centertext">
 								<input type="checkbox" name="postgroups[]" value="', $postgroup['id'], '" checked="checked" class="input_check" />
 							</td>
 						</tr>';

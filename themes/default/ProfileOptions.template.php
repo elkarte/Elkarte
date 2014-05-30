@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -22,7 +22,6 @@ function template_ProfileOptions_init()
 {
 	loadTemplate('GenericBoards');
 }
-
 
 /**
  * Template for showing all the buddies of the current user.
@@ -38,7 +37,7 @@ function template_editBuddies()
 		</h2>
 		<table class="table_grid">
 			<tr class="table_head">
-				<th scope="col" style="width:20%">', $txt['name'], '</th>
+				<th scope="col" style="width: 20%;">', $txt['name'], '</th>
 				<th scope="col">', $txt['status'], '</th>';
 
 	if ($context['can_send_email'])
@@ -148,7 +147,7 @@ function template_editIgnoreList()
 		</h2>
 		<table class="table_grid">
 			<tr class="table_head">
-				<th scope="col" style="width:20%">', $txt['name'], '</th>
+				<th scope="col" style="width: 20%;">', $txt['name'], '</th>
 				<th scope="col">', $txt['status'], '</th>';
 
 	if ($context['can_send_email'])
@@ -265,7 +264,6 @@ function template_edit_options()
 	if (!empty($context['profile_prehtml']))
 		echo '
 					<div>', $context['profile_prehtml'], '</div>';
-
 
 	if (!empty($context['profile_fields']))
 		echo '
@@ -667,18 +665,15 @@ function template_profile_theme_settings()
 								<label for="display_quick_reply">', $txt['display_quick_reply'], '</label>
 							</dt>
 							<dd>
-								<select name="default_options[display_quick_reply]" id="display_quick_reply">
-									<option value="0"', empty($context['member']['options']['display_quick_reply']) ? ' selected="selected"' : '', '>', $txt['display_quick_reply1'], '</option>
-									<option value="1"', !empty($context['member']['options']['display_quick_reply']) && $context['member']['options']['display_quick_reply'] == 1 ? ' selected="selected"' : '', '>', $txt['display_quick_reply2'], '</option>
-									<option value="2"', !empty($context['member']['options']['display_quick_reply']) && $context['member']['options']['display_quick_reply'] == 2 ? ' selected="selected"' : '', '>', $txt['display_quick_reply3'], '</option>
-								</select>
+								<input type="hidden" name="default_options[display_quick_reply]" value="0" />
+								<input type="checkbox" name="default_options[display_quick_reply]" id="display_quick_reply" value="1"', !empty($context['member']['options']['display_quick_reply']) ? ' checked="checked"' : '', ' class="input_check" />
 							</dd>
 							<dt>
 								<label for="use_editor_quick_reply">', $txt['use_editor_quick_reply'], '</label>
 							</dt>
 							<dd>
 								<input type="hidden" name="default_options[use_editor_quick_reply]" value="0" />
-								<label for="use_editor_quick_reply"><input type="checkbox" name="default_options[use_editor_quick_reply]" id="use_editor_quick_reply" value="1"', !empty($context['member']['options']['use_editor_quick_reply']) ? ' checked="checked"' : '', ' class="input_check" /></label>
+								<input type="checkbox" name="default_options[use_editor_quick_reply]" id="use_editor_quick_reply" value="1"', !empty($context['member']['options']['use_editor_quick_reply']) ? ' checked="checked"' : '', ' class="input_check" />
 							</dd>
 							<dt>
 								<label for="display_quick_mod">', $txt['display_quick_mod'], '</label>
@@ -857,15 +852,15 @@ function template_groupMembership()
 
 			if ($context['can_edit_primary'])
 				echo '
-						<td style="width:4%">
-							<input type="radio" name="primary" id="primary_', $group['id'], '" value="', $group['id'], '" ', $group['is_primary'] ? 'checked="checked"' : '', ' onclick="highlightSelected(\'primdiv_' . $group['id'] . '\');" ', $group['can_be_primary'] ? '' : 'disabled="disabled"', ' class="input_radio" />
+						<td style="width: 4%;">
+							<input type="radio" name="primary" id="primary_', $group['id'], '" value="', $group['id'], '" ', $group['is_primary'] ? 'checked="checked" ' : '', $group['can_be_primary'] ? '' : 'disabled="disabled" ', ' class="input_radio" />
 						</td>';
 
 			echo '
 						<td>
 							<label for="primary_', $group['id'], '"><strong>', (empty($group['color']) ? $group['name'] : '<span style="color: ' . $group['color'] . '">' . $group['name'] . '</span>'), '</strong>', (!empty($group['desc']) ? '<br /><span class="smalltext">' . $group['desc'] . '</span>' : ''), '</label>
 						</td>
-						<td style="width:15%" class="righttext">';
+						<td style="width: 15%" class="righttext">';
 
 			// Can they leave their group?
 			if ($group['can_leave'])
@@ -911,7 +906,7 @@ function template_groupMembership()
 						<td>
 							<strong>', (empty($group['color']) ? $group['name'] : '<span style="color: ' . $group['color'] . '">' . $group['name'] . '</span>'), '</strong>', (!empty($group['desc']) ? '<br /><span class="smalltext">' . $group['desc'] . '</span>' : ''), '
 						</td>
-						<td style="width:15%" class="lefttext">';
+						<td class="lefttext">';
 
 				if ($group['type'] == 3)
 					echo '
@@ -944,7 +939,7 @@ function template_groupMembership()
 
 		if (isset($context['groups']['member'][$context['primary_group']]))
 			echo '
-			highlightSelected("primdiv_' . $context['primary_group'] . '");';
+			initHighlightSelection("primdiv_' . $context['primary_group'] . '");';
 
 		echo '
 		// ]]></script>';

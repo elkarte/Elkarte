@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -157,7 +157,7 @@ function template_list_boards($boards, $id)
 		{
 			echo '
 						<p class="board_lastpost">';
-			
+
 			if (!empty($settings['avatars_on_indexes']))
 				echo '
 							<span class="board_avatar"><a href="', $board['last_post']['member']['href'], '">', $board['last_post']['member']['avatar']['image'], '</a></span>';

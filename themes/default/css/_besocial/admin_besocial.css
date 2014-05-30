@@ -1,8 +1,13 @@
+/* nice wrapper for the Modify Themes section */
+#admin_form_wrapper {
+	border: 1px solid #CCCCCC;
+	border-radius: 7px;
+}
 .description, .information {
 	margin-top: 4px;
 }
 .popup_window.description {
-    margin: 12% auto;
+	margin: 12% auto;
 }
 #support_resources, #credits_sections {
 	margin: 0;
@@ -35,7 +40,7 @@
 ------------------------------------------------- */
 .ui-dialog {
 	border: 1px solid #999;
-	box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.3);
+	box-shadow: 0 0 16px rgba(0, 0, 0, 0.3);
 	background-color: #f5f5f5;
 	border-radius: 4px 4px 0 0;
 }
@@ -46,4 +51,28 @@
 .ui-widget-overlay {
 	background-color: #000;
 	opacity: 0.3;
+}
+
+/* Styles for the quick search bar */
+#quick_search {
+	font-size: 0.786em;
+	height: 26px;
+}
+#quick_search .input_text, #quick_search select, #quick_search .button_submit {
+	height: 26px;
+	margin: 7px 0 0 4px;
+}
+#quick_search .icon {
+	margin: 12px 0 0 4px;
+}
+
+/* alternate row colors on Modify Themes,Copy a template */
+.theme_options .windowbg2 {
+	background: #fcfcfc;
+	border-top: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+}
+.theme_options .windowbg {
+	border-top: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;	
 }

@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -136,7 +136,7 @@ class Profile_Controller extends Action_Controller
 						'enabled' => !empty($modSettings['drafts_enabled']) && $context['user']['is_owner'],
 						'permission' => array(
 							'own' => 'profile_view_own',
-							'any' =>  array(),
+							'any' => array(),
 						),
 					),
 					'showlikes' => array(
@@ -151,7 +151,7 @@ class Profile_Controller extends Action_Controller
 						),
 						'permission' => array(
 							'own' => 'profile_view_own',
-							'any' =>  array(),
+							'any' => array(),
 						),
 					),
 					'permissions' => array(

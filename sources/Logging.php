@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -403,11 +403,10 @@ function trackStats($stats = array())
 }
 
 /**
- * This function logs an action in the respective log. (database log)
- * You should use {@link logActions()} instead.
- * @example logAction('remove', array('starter' => $id_member_started));
+ * This function logs a single action in the respective log. (database log)
  *
- * @deprecated since 1.0
+ * - You should use {@link logActions()} instead if you have multiple entries to add
+ * @example logAction('remove', array('starter' => $id_member_started));
  *
  * @param string $action
  * @param string[] $extra = array()
@@ -415,6 +414,7 @@ function trackStats($stats = array())
  */
 function logAction($action, $extra = array(), $log_type = 'moderate')
 {
+	// Set up the array and pass through to logActions
 	return logActions(array(array(
 		'action' => $action,
 		'log_type' => $log_type,

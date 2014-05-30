@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -136,7 +136,7 @@ class ProfileSubscriptions_Controller extends Action_Controller
 			fatal_lang_error('paid_sub_not_active');
 
 		// Simplify...
-		$order= $context['subscriptions'][$id_sub];
+		$order = $context['subscriptions'][$id_sub];
 
 		$period = 'xx';
 		if ($order['flexible'])

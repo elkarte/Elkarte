@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -18,7 +18,7 @@ if (!defined('ELK'))
  * Converts a string of HTML to BBC
  *
  * Initiate
- *    $bbc_converter = new Convert_BBC($html);
+ *    $bbc_converter = new Html_2_BBC($html);
  *    where $html is a string of html we want to convert to bbc
  *
  * Override
@@ -29,7 +29,7 @@ if (!defined('ELK'))
  *    $bbc = $bbc_converter->get_bbc();
  *
  */
-class Convert_BBC
+class Html_2_BBC
 {
 	/**
 	 * The value that will hold our dom object
@@ -53,7 +53,7 @@ class Convert_BBC
 	 * Line break character
 	 * @var string
 	 */
-	public $line_break = "[br]";
+	public $line_break = '[br]';
 
 	/**
 	 * Font numbers to pt size
@@ -135,7 +135,7 @@ class Convert_BBC
 	public function get_bbc()
 	{
 		// For this html node, find all child elements and convert
-		$body = ($this->_parser) ? $this->doc->getElementsByTagName("body")->item(0) : $this->doc->root;
+		$body = ($this->_parser) ? $this->doc->getElementsByTagName('body')->item(0) : $this->doc->root;
 
 		// Convert all the nodes that we know how to
 		$this->_convert_childNodes($body);
@@ -447,7 +447,7 @@ class Convert_BBC
 		elseif (!empty($href) && $href[0] === '#')
 			$bbc = '[url=' . $href . ']' . $value . '[/url]';
 		// Maybe an email link
-		elseif (substr($href, 0, 7) === "mailto:")
+		elseif (substr($href, 0, 7) === 'mailto:')
 		{
 			if ($href != 'mailto:' . (isset($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : ''))
 				$href = substr($href, 7);
@@ -715,6 +715,7 @@ class Convert_BBC
 						break;
 					case 'color':
 							$bbc = '[color=' . $value . ']' . $bbc . '[/color]';
+					// These tags all mean the same thing as far as BBC is concerned
 					case 'float':
 					case 'text-align':
 					case 'align':

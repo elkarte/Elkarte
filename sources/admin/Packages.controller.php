@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -136,6 +136,7 @@ class Packages_Controller extends Action_Controller
 		if (file_exists(BOARDDIR . '/packages/temp'))
 			deltree(BOARDDIR . '/packages/temp', false);
 
+		// Attempt to create the temp directory
 		if (!mktree(BOARDDIR . '/packages/temp', 0755))
 		{
 			deltree(BOARDDIR . '/packages/temp', false);
@@ -912,7 +913,7 @@ class Packages_Controller extends Action_Controller
 		$context['install_finished'] = false;
 
 		// We're gonna be needing the table db functions! ...Sometimes.
-		$table = db_table();
+		$table_installer = db_table();
 
 		// @todo Make a log of any errors that occurred and output them?
 		if (!empty($install_log))
@@ -1028,7 +1029,7 @@ class Packages_Controller extends Action_Controller
 			if (!$context['uninstalling'])
 			{
 				// Any db changes from older version?
-				$table_log = $table->package_log();
+				$table_log = $table_installer->package_log();
 				if (!empty($old_db_changes))
 					$db_package_log = empty($table_log) ? $old_db_changes : array_merge($old_db_changes, $table_log);
 
@@ -1074,11 +1075,11 @@ class Packages_Controller extends Action_Controller
 			foreach ($package_installed['db_changes'] as $change)
 			{
 				if ($change[0] == 'remove_table' && isset($change[1]))
-					$table->db_drop_table($change[1]);
+					$table_installer->db_drop_table($change[1]);
 				elseif ($change[0] == 'remove_column' && isset($change[2]))
-					$table->db_remove_column($change[1], $change[2]);
+					$table_installer->db_remove_column($change[1], $change[2]);
 				elseif ($change[0] == 'remove_index' && isset($change[2]))
-					$table->db_remove_index($change[1], $change[2]);
+					$table_installer->db_remove_index($change[1], $change[2]);
 			}
 		}
 
@@ -1254,12 +1255,12 @@ class Packages_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context, $forum_version, $settings;
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 
 		$context['page_title'] .= ' - ' . $txt['browse_packages'];
 		$context['forum_version'] = $forum_version;
 		$installed = $context['sub_action'] == 'installed' ? true : false;
-		$context['package_types'] = $installed ? array('modification') : array('modification', 'avatar', 'language', 'unknown');
+		$context['package_types'] = $installed ? array('modification') : array('modification', 'avatar', 'language', 'smiley', 'unknown');
 
 		foreach ($context['package_types'] as $type)
 		{
@@ -1371,7 +1372,8 @@ class Packages_Controller extends Action_Controller
 				'additional_rows' => array(
 					array(
 						'position' => 'bottom_of_list',
-						'value' => ($context['sub_action'] == 'browse' ? '<div class="smalltext">' . $txt['package_installed_key'] . '<img src="' . $settings['images_url'] . '/icons/package_installed.png" alt="" class="centericon" /> ' . $txt['package_installed_current'] . '<img src="' . $settings['images_url'] . '/icons/package_old.png" alt="" class="centericon" /> ' . $txt['package_installed_old'] . '</div>' : '<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=packages;sa=flush;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['package_delete_list_warning'] . '\');">' . $txt['delete_list'] . '</a>'),
+						'class' => 'submitbutton',
+						'value' => ($context['sub_action'] == 'browse' ? '<div class="smalltext">' . $txt['package_installed_key'] . '<img src="' . $settings['images_url'] . '/icons/package_installed.png" alt="" class="centericon" /> ' . $txt['package_installed_current'] . '<img src="' . $settings['images_url'] . '/icons/package_old.png" alt="" class="centericon" /> ' . $txt['package_installed_old'] . '</div>' : '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=flush;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['package_delete_list_warning'] . '\');">' . $txt['delete_list'] . '</a>'),
 					),
 				),
 			);
@@ -1569,7 +1571,7 @@ class Packages_Controller extends Action_Controller
 
 		if (empty($package_ftp) && !isset($_POST['skip_ftp']))
 		{
-			require_once(SUBSDIR . '/FTPConnection.class.php');
+			require_once(SUBSDIR . '/FtpConnection.class.php');
 			$ftp = new Ftp_Connection(null);
 			list ($username, $detect_path, $found_path) = $ftp->detect_path(BOARDDIR);
 
@@ -2180,8 +2182,10 @@ class Packages_Controller extends Action_Controller
 			$sort_id = array(
 				'mod' => 1,
 				'modification' => 1,
+				'addon' => 1,
 				'avatar' => 1,
 				'language' => 1,
+				'smiley' => 1,
 				'unknown' => 1,
 			);
 			while ($package = readdir($dir))
@@ -2224,7 +2228,7 @@ class Packages_Controller extends Action_Controller
 				if (!empty($packageInfo))
 				{
 					$packageInfo['installed_id'] = isset($installed_adds[$packageInfo['id']]) ? $installed_adds[$packageInfo['id']]['id'] : 0;
-					$packageInfo['sort_id'] = $sort_id[$packageInfo['type']];
+					$packageInfo['sort_id'] = isset($sort_id[$packageInfo['type']]) ? $sort_id[$packageInfo['type']] : $sort_id['unknown'];
 					$packageInfo['is_installed'] = isset($installed_adds[$packageInfo['id']]);
 					$packageInfo['is_current'] = $packageInfo['is_installed'] && ($installed_adds[$packageInfo['id']]['version'] == $packageInfo['version']);
 					$packageInfo['is_newer'] = $packageInfo['is_installed'] && ($installed_adds[$packageInfo['id']]['version'] > $packageInfo['version']);
@@ -2294,7 +2298,7 @@ class Packages_Controller extends Action_Controller
 							}
 						}
 
-						// no uninstall found for this version, lets see if one exists for another
+						// No uninstall found for this version, lets see if one exists for another
 						if ($packageInfo['can_uninstall'] === false && $uninstall->exists('@for') && empty($_SESSION['version_emulate']))
 						{
 							$reset = true;
@@ -2308,11 +2312,12 @@ class Packages_Controller extends Action_Controller
 						}
 					}
 
-					// Modification.
-					if ($packageInfo['type'] == 'modification' || $packageInfo['type'] == 'mod')
+					// Add-on / Modification
+					if ($packageInfo['type'] == 'addon' || $packageInfo['type'] == 'modification' || $packageInfo['type'] == 'mod')
 					{
 						$sort_id['modification']++;
 						$sort_id['mod']++;
+						$sort_id['addon']++;
 						if ($installed)
 						{
 							if (!empty($context['available_modification'][$packageInfo['id']]))
@@ -2333,6 +2338,13 @@ class Packages_Controller extends Action_Controller
 						$sort_id[$packageInfo['type']]++;
 						$packages['avatar'][strtolower($packageInfo[$sort])] = md5($package);
 						$context['available_avatar'][md5($package)] = $packageInfo;
+					}
+					// Smiley package.
+					elseif ($packageInfo['type'] == 'smiley')
+					{
+						$sort_id[$packageInfo['type']]++;
+						$packages['smiley'][strtolower($packageInfo[$sort])] = md5($package);
+						$context['available_smiley'][md5($package)] = $packageInfo;
 					}
 					// Language package.
 					elseif ($packageInfo['type'] == 'language')

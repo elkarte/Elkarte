@@ -15,17 +15,17 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
-$forum_version = 'ElkArte 1.0 Beta 2';
+$forum_version = 'ElkArte 1.0 RC 1';
 
 // First things first, but not necessarily in that order.
 define('ELK', 1);
 
 // Shortcut for the browser cache stale
-define('CACHE_STALE', '?10beta2');
+define('CACHE_STALE', '?10RC1');
 
 if (function_exists('set_magic_quotes_runtime'))
 	@set_magic_quotes_runtime(0);
@@ -50,7 +50,7 @@ if (!empty($db_show_debug) && function_exists('getrusage'))
 // Make sure the paths are correct... at least try to fix them.
 if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt'))
 	$boarddir = dirname(__FILE__);
-if (!file_exists($sourcedir . '/Dispatcher.class.php') && file_exists($boarddir . '/sources'))
+if (!file_exists($sourcedir . '/SiteDispatcher.class.php') && file_exists($boarddir . '/sources'))
 	$sourcedir = $boarddir . '/sources';
 
 // Check that directories which didn't exist in past releases are initialized.
@@ -81,8 +81,8 @@ require_once(SOURCEDIR . '/Logging.php');
 require_once(SOURCEDIR . '/Load.php');
 require_once(SUBSDIR . '/Cache.subs.php');
 require_once(SOURCEDIR . '/Security.php');
-require_once(SOURCEDIR . '/BrowserDetect.class.php');
-require_once(SOURCEDIR . '/Errors.class.php');
+require_once(SOURCEDIR . '/BrowserDetector.class.php');
+require_once(SOURCEDIR . '/ErrorContext.class.php');
 require_once(SUBSDIR . '/Util.class.php');
 require_once(SUBSDIR . '/TemplateLayers.class.php');
 require_once(SOURCEDIR . '/Action.controller.php');
@@ -122,7 +122,7 @@ if (!empty($modSettings['enableCompressedOutput']) && !headers_sent())
 		$modSettings['enableCompressedOutput'] = 0;
 	else
 	{
-		ob_end_clean();
+		@ob_end_clean();
 		ob_start('ob_gzhandler');
 	}
 }
@@ -152,7 +152,7 @@ obExit(null, null, true);
  */
 function elk_main()
 {
-	global $modSettings, $user_info, $topic, $board_info;
+	global $modSettings, $user_info, $topic, $board_info, $context;
 
 	// Special case: session keep-alive, output a transparent pixel.
 	if (isset($_GET['action']) && $_GET['action'] == 'keepalive')
@@ -207,7 +207,10 @@ function elk_main()
 	unset($no_stat_actions);
 
 	// What shall we do?
-	require_once(SOURCEDIR . '/Dispatcher.class.php');
+	require_once(SOURCEDIR . '/SiteDispatcher.class.php');
 	$dispatcher = new Site_Dispatcher();
+
+	// Show where we came from, and go
+	$context['site_action'] = $dispatcher->site_action();
 	$dispatcher->dispatch();
 }

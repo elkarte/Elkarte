@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -65,7 +65,6 @@ class ManageSmileys_Controller extends Action_Controller
 			'settings' => array($this, 'action_smileySettings_display', 'permission' => 'manage_smileys'),
 			'install' => array($this, 'action_install', 'permission' => 'manage_smileys')
 		);
-
 
 		// Action controller
 		$action = new Action('manage_smileys');
@@ -136,7 +135,7 @@ class ManageSmileys_Controller extends Action_Controller
 		$config_vars = $this->_smileySettings->settings();
 
 		// For the basics of the settings.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 		require_once(SUBSDIR . '/Smileys.subs.php');
 		$context['sub_template'] = 'show_settings';
 
@@ -177,7 +176,7 @@ class ManageSmileys_Controller extends Action_Controller
 	private function _initSmileySettingsForm()
 	{
 		// This is really quite wanting.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Instantiate the form
 		$this->_smileySettings = new Settings_Form();
@@ -503,14 +502,15 @@ class ManageSmileys_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'below_table_data',
+					'class' => 'submitbutton',
 					'value' => '
 						<input type="submit" name="delete_set" value="' . $txt['smiley_sets_delete'] . '" onclick="return confirm(\'' . $txt['smiley_sets_confirm'] . '\');" class="right_submit" />
-						<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=smileys;sa=modifyset">' . $txt['smiley_sets_add'] . '</a> ',
+						<a class="linkbutton" href="' . $scripturl . '?action=admin;area=smileys;sa=modifyset">' . $txt['smiley_sets_add'] . '</a> ',
 				),
 			),
 		);
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 	}
 
@@ -1055,7 +1055,7 @@ class ManageSmileys_Controller extends Action_Controller
 					}',
 			);
 
-			require_once(SUBSDIR . '/List.class.php');
+			require_once(SUBSDIR . '/GenericList.class.php');
 			createList($listOptions);
 
 			// The list is the only thing to show, so make it the main template.
@@ -1303,9 +1303,10 @@ class ManageSmileys_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'below_table_data',
+					'class' => 'submitbutton',
 					'value' => '
 						<input type="submit" name="delete" value="' . $txt['quickmod_delete_selected'] . '" class="right_submit" />
-						<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=smileys;sa=editicon">' . $txt['icons_add_new'] . '</a>',
+						<a class="linkbutton" href="' . $scripturl . '?action=admin;area=smileys;sa=editicon">' . $txt['icons_add_new'] . '</a>',
 				),
 				array(
 					'position' => 'after_title',
@@ -1324,7 +1325,7 @@ class ManageSmileys_Controller extends Action_Controller
 			',
 		);
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		// If we're adding/editing an icon we'll need a list of boards
@@ -1446,6 +1447,8 @@ class ManageSmileys_Controller extends Action_Controller
 
 		// Installing unless proven otherwise
 		$testing = false;
+		$destination = '';
+		$name = '';
 
 		if (isset($_REQUEST['set_gz']))
 		{
@@ -1498,15 +1501,22 @@ class ManageSmileys_Controller extends Action_Controller
 		}
 
 		$extracted = read_tgz_file($destination, BOARDDIR . '/packages/temp');
-		if (!$extracted) // @todo needs to change the URL in the next line ;)
+
+		// @todo needs to change the URL in the next line ;)
+		if (!$extracted)
 			fatal_lang_error('packageget_unable', false, array('http://custom.elkarte.net/index.php?action=search;type=12;basic_search=' . $name));
+
 		if ($extracted && !file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
+		{
 			foreach ($extracted as $file)
+			{
 				if (basename($file['filename']) == 'package-info.xml')
 				{
 					$base_path = dirname($file['filename']) . '/';
 					break;
 				}
+			}
+		}
 
 		if (!isset($base_path))
 			$base_path = '';
@@ -1522,7 +1532,7 @@ class ManageSmileys_Controller extends Action_Controller
 		if (isSmileySetInstalled($smileyInfo['id']))
 			fata_lang_error('package_installed_warning1');
 
-		// Everything is fine, now it's time to do something
+		// Everything is fine, now it's time to do something, first we test
 		$actions = parsePackageInfo($smileyInfo['xml'], true, 'install');
 
 		$context['post_url'] = $scripturl . '?action=admin;area=smileys;sa=install;package=' . $base_name;

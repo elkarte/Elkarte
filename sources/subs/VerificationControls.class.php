@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -75,7 +75,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 
 		foreach ($known_verifications as $verification)
 		{
-			$class_name = 'Control_Verification_' . ucfirst($verification);
+			$class_name = 'Verification_Controls_' . ucfirst($verification);
 			$current_instance = new $class_name($verificationOptions);
 
 			// If there is anything to show, otherwise forget it
@@ -168,7 +168,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
  * A simple interface that defines all the methods any "Control_Verification"
  * class MUST have because they are used in the process of creating the verification
  */
-interface Control_Verifications
+interface Verification_Controls
 {
 	/**
 	 * Used to build the control and return if it should be shown or not
@@ -221,7 +221,7 @@ interface Control_Verifications
 /**
  * Class to manage, create, show and validate captcha images
  */
-class Control_Verification_Captcha implements Control_Verifications
+class Verification_Controls_Captcha implements Verification_Controls
 {
 	/**
 	 * Holds the $verificationOptions passed to the constuctor
@@ -243,6 +243,13 @@ class Control_Verification_Captcha implements Control_Verifications
 	 * @var string
 	 */
 	private $_text_value = null;
+
+	/**
+	 * The number of characters to generate
+	 *
+	 * @var int
+	 */
+	private $_num_chars = null;
 
 	/**
 	 * The url to the created image
@@ -281,7 +288,10 @@ class Control_Verification_Captcha implements Control_Verifications
 	 */
 	public function __construct($verificationOptions = null)
 	{
+		global $modSettings;
+
 		$this->_use_graphic_library = in_array('gd', get_loaded_extensions());
+		$this->_num_chars = $modSettings['visual_verification_num_chars'];
 
 		// Skip I, J, L, O, Q, S and Z.
 		$this->_standard_captcha_range = array_merge(range('A', 'H'), array('K', 'M', 'N', 'P', 'R'), range('T', 'Y'));
@@ -304,7 +314,7 @@ class Control_Verification_Captcha implements Control_Verifications
 		if (!empty($this->_options['override_visual']) || (!empty($modSettings['visual_verification_type']) && !isset($this->_options['override_visual'])) && empty($context['captcha_js_loaded']))
 		{
 			loadTemplate('VerificationControls');
-			loadJavascriptFile('captcha.js');
+			loadJavascriptFile('jquery.captcha.js');
 			$context['captcha_js_loaded'] = true;
 		}
 
@@ -319,9 +329,6 @@ class Control_Verification_Captcha implements Control_Verifications
 			{
 				$this->_text_value = '';
 				$this->_image_href = $scripturl . '?action=verificationcode;vid=' . $this->_options['id'] . ';rand=' . md5(mt_rand());
-
-				addInlineJavascript('
-					var verification' . $this->_options['id'] . 'Handle = new elkCaptcha("' . $this->_image_href . '", "' . $this->_options['id'] . '", ' . ($this->_use_graphic_library ? 1 : 0) . ');', true);
 			}
 		}
 
@@ -338,8 +345,6 @@ class Control_Verification_Captcha implements Control_Verifications
 	 */
 	public function createTest($refresh = true)
 	{
-		global $modSettings;
-
 		if (!$this->_show_captcha)
 			return;
 
@@ -350,7 +355,7 @@ class Control_Verification_Captcha implements Control_Verifications
 			// Are we overriding the range?
 			$character_range = !empty($this->_options['override_range']) ? $this->_options['override_range'] : $this->_standard_captcha_range;
 
-			for ($i = 0; $i < $modSettings['visual_verification_num_chars']; $i++)
+			for ($i = 0; $i < $this->_num_chars; $i++)
 				$_SESSION[$this->_options['id'] . '_vv']['code'] .= $character_range[array_rand($character_range)];
 		}
 		else
@@ -368,6 +373,7 @@ class Control_Verification_Captcha implements Control_Verifications
 				'image_href' => $this->_image_href,
 				'text_value' => $this->_text_value,
 				'use_graphic_library' => $this->_use_graphic_library,
+				'chars_number' => $this->_num_chars,
 				'is_error' => $this->_tested && !$this->_verifyCode(),
 			)
 		);
@@ -415,7 +421,7 @@ class Control_Verification_Captcha implements Control_Verifications
 			array('int', 'visual_verification_num_chars'),
 			'vv' => array('select', 'visual_verification_type',
 				array($txt['setting_image_verification_off'], $txt['setting_image_verification_vsimple'], $txt['setting_image_verification_simple'], $txt['setting_image_verification_medium'], $txt['setting_image_verification_high'], $txt['setting_image_verification_extreme']),
-				'subtext'=> $txt['setting_visual_verification_type_desc'], 'onchange' => $this->_use_graphic_library ? 'refreshImages();' : ''),
+				'subtext' => $txt['setting_visual_verification_type_desc']),
 		);
 
 		// Save it
@@ -426,17 +432,22 @@ class Control_Verification_Captcha implements Control_Verifications
 		}
 
 		$_SESSION['visual_verification_code'] = '';
-		for ($i = 0; $i < $modSettings['visual_verification_num_chars']; $i++)
+		for ($i = 0; $i < $this->_num_chars; $i++)
 			$_SESSION['visual_verification_code'] .= $this->_standard_captcha_range[array_rand($this->_standard_captcha_range)];
 
 		// Some javascript for CAPTCHA.
 		if ($this->_use_graphic_library)
+		{
+			loadJavascriptFile('jquery.captcha.js');
 			addInlineJavascript('
-			function refreshImages()
-			{
-				var imageType = document.getElementById(\'visual_verification_type\').value;
-				document.getElementById(\'verification_image\').src = \'' . $verification_image . ';type=\' + imageType;
-			}', true);
+		$(\'#visual_verification_type\').Elk_Captcha({
+			\'imageURL\': ' . JavaScriptEscape($verification_image) . ',
+			\'useLibrary\': true,
+			\'letterCount\': ' . $this->_num_chars . ',
+			\'refreshevent\': \'change\',
+			\'admin\': true
+		});', true);
+		}
 
 		// Show the image itself, or text saying we can't.
 		if ($this->_use_graphic_library)
@@ -460,7 +471,7 @@ class Control_Verification_Captcha implements Control_Verifications
 /**
  * Class to manage, prepare, show, and validate question -> answer verifications
  */
-class Control_Verification_Questions implements Control_Verifications
+class Verification_Controls_Questions implements Verification_Controls
 {
 	/**
 	 * Holds any options passed to the class
@@ -886,7 +897,7 @@ class Control_Verification_Questions implements Control_Verifications
 	/**
 	 * Adds the questions to the db
 	 *
-	 * @param mixed $questions
+	 * @param mixed[] $questions
 	 */
 	private function _insert($questions)
 	{
@@ -908,7 +919,7 @@ class Control_Verification_Questions implements Control_Verifications
  *
  * Adding additional catch terms is recommended to keep bots from learning
  */
-class Control_Verification_EmptyField implements Control_Verifications
+class Verification_Controls_EmptyField implements Verification_Controls
 {
 	/**
 	 * Hold the options passed to the class

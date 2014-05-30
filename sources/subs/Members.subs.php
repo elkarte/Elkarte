@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -1618,7 +1618,7 @@ function getBasicMemberData($member_ids, $options = array())
 		FROM {db_prefix}members
 		WHERE id_member IN ({array_int:member_list})
 		' . (isset($options['sort']) ? '
-		ORDER BY {string:sort}' : '') . '
+		ORDER BY {raw:sort}' : '') . '
 		LIMIT {int:limit}',
 		array(
 			'member_list' => $member_ids,

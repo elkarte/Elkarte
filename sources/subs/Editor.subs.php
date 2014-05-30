@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -45,7 +45,7 @@ function getMessageIcons($board_id)
 			array('value' => 'xx', 'name' => $txt['standard']),
 			array('value' => 'thumbup', 'name' => $txt['thumbs_up']),
 			array('value' => 'thumbdown', 'name' => $txt['thumbs_down']),
-			array('value' => 'exclamation', 'name' => $txt['excamation_point']),
+			array('value' => 'exclamation', 'name' => $txt['exclamation_point']),
 			array('value' => 'question', 'name' => $txt['question_mark']),
 			array('value' => 'lamp', 'name' => $txt['lamp']),
 			array('value' => 'smiley', 'name' => $txt['icon_smiley']),
@@ -171,7 +171,7 @@ function create_control_richedit($editorOptions)
 
 		// Mentions?
 		if (!empty($context['mentions_enabled']))
-			loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.js', 'mentioning.plugin.js'));
+			loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.min.js', 'mentioning.plugin.js'));
 
 		// Our not so concise shortcut line
 		$context['shortcuts_text'] = $txt['shortcuts' . (!empty($context['drafts_save']) ? '_drafts' : '') . (isBrowser('is_firefox') ? '_firefox' : '')];

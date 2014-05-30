@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -126,7 +126,7 @@ function log_error($error_message, $error_type = 'general', $file = null, $line 
  *
  * @param string $error
  * @param string $error_type = 'general'
- * @param string $sprintf = array()
+ * @param string|mixed[] $sprintf = array()
  * @param string|null $file = null
  * @param int|null $line = null
  */

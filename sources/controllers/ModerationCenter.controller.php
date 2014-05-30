@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -311,6 +311,9 @@ class ModerationCenter_Controller extends Action_Controller
 
 		$context['page_title'] = $txt['moderation_center'];
 		$context['sub_template'] = 'moderation_center';
+
+		// Start off with no blocks
+		$valid_blocks = array();
 
 		// Load what blocks the user actually can see...
 		$valid_blocks['p'] = 'notes';
@@ -860,7 +863,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// What have the other moderators done to this message?
 		require_once(SUBSDIR . '/Modlog.subs.php');
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		loadLanguage('Modlog');
 
 		// This is all the information from the moderation log.
@@ -1037,7 +1040,7 @@ class ModerationCenter_Controller extends Action_Controller
 				$approve_query = ' AND 1=0';
 		}
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 
 		// This is all the information required for a watched user listing.
 		$listOptions = array(
@@ -1192,8 +1195,56 @@ class ModerationCenter_Controller extends Action_Controller
 		// Setup context as always.
 		$context['page_title'] = $txt['mc_warning_log_title'];
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		require_once(SUBSDIR . '/Moderation.subs.php');
+		loadLanguage('Modlog');
+
+		// Do the column stuff!
+		$sort_types = array(
+			'member' => 'mem.real_name',
+			'recipient' => 'recipient_name',
+		);
+
+		// Setup the direction stuff...
+		$context['order'] = isset($_REQUEST['sort']) && isset($sort_types[$_REQUEST['sort']]) ? $_REQUEST['sort'] : 'member';
+		$context['url_start'] = '?action=moderate;area=warnings;sa=log;sort='.  $context['order'];
+
+		// If we're coming in from a search, get the variables.
+		if (!empty($_REQUEST['params']) && empty($_REQUEST['is_search']))
+		{
+			$search_params = base64_decode(strtr($_REQUEST['params'], array(' ' => '+')));
+			$search_params = @unserialize($search_params);
+		}
+
+		// This array houses all the valid search types.
+		$searchTypes = array(
+			'member' => array('sql' => 'mem.real_name', 'label' => $txt['profile_warning_previous_issued']),
+			'recipient' => array('sql' => 'recipient_name', 'label' => $txt['mc_warnings_recipient']),
+		);
+
+		if (!isset($search_params['string']) || (!empty($_REQUEST['search']) && $search_params['string'] != $_REQUEST['search']))
+			$search_params_string = empty($_REQUEST['search']) ? '' : $_REQUEST['search'];
+		else
+			$search_params_string = $search_params['string'];
+
+		if (isset($_REQUEST['search_type']) || empty($search_params['type']) || !isset($searchTypes[$search_params['type']]))
+			$search_params_type = isset($_REQUEST['search_type']) && isset($searchTypes[$_REQUEST['search_type']]) ? $_REQUEST['search_type'] : (isset($searchTypes[$context['order']]) ? $context['order'] : 'member');
+		else
+			$search_params_type = $search_params['type'];
+
+		$search_params_column = $searchTypes[$search_params_type]['sql'];
+		$search_params = array(
+			'string' => $search_params_string,
+			'type' => $search_params_type,
+		);
+
+		// Setup the search context.
+		$context['search_params'] = empty($search_params['string']) ? '' : base64_encode(serialize($search_params));
+		$context['search'] = array(
+			'string' => $search_params['string'],
+			'type' => $search_params['type'],
+			'label' => $searchTypes[$search_params_type]['label'],
+		);
 
 		// This is all the information required for a watched user listing.
 		$listOptions = array(
@@ -1205,9 +1256,17 @@ class ModerationCenter_Controller extends Action_Controller
 			'default_sort_col' => 'time',
 			'get_items' => array(
 				'function' => array($this, 'list_getWarnings'),
+				'params' => array(
+					(!empty($search_params['string']) ? ' INSTR({raw:sql_type}, {string:search_string})' : ''),
+					array('sql_type' => $search_params_column, 'search_string' => $search_params['string']),
+				),
 			),
 			'get_count' => array(
 				'function' => array($this, 'list_getWarningCount'),
+				'params' => array(
+					(!empty($search_params['string']) ? ' INSTR({raw:sql_type}, {string:search_string})' : ''),
+					array('sql_type' => $search_params_column, 'search_string' => $search_params['string']),
+				),
 			),
 			// This assumes we are viewing by user.
 			'columns' => array(
@@ -1276,6 +1335,27 @@ class ModerationCenter_Controller extends Action_Controller
 					),
 				),
 			),
+			'form' => array(
+				'href' => $scripturl . $context['url_start'],
+				'include_sort' => true,
+				'include_start' => true,
+				'hidden_fields' => array(
+					$context['session_var'] => $context['session_id'],
+					'params' => $context['search_params']
+				),
+			),
+			'additional_rows' => array(
+				array(
+					'class' => 'submitbutton',
+					'position' => 'below_table_data',
+					'value' => '
+						<div id="quick_log_search">
+							' . $txt['modlog_search'] . ' (' . $txt['modlog_by'] . ': ' . $context['search']['label'] . '):
+							<input type="text" name="search" size="18" value="' . Util::htmlspecialchars($context['search']['string']) . '" class="input_text" />
+							<input type="submit" name="is_search" value="' . $txt['modlog_go'] . '" class="button_submit" />
+						</div>',
+				),
+			),
 		);
 
 		// Create the watched user list.
@@ -1311,7 +1391,7 @@ class ModerationCenter_Controller extends Action_Controller
 		// Setup context as always.
 		$context['page_title'] = $txt['mc_warning_templates_title'];
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 
 		// This is all the information required for a watched user listing.
 		$listOptions = array(
@@ -1516,23 +1596,32 @@ class ModerationCenter_Controller extends Action_Controller
 	}
 
 	/**
-	 * Callback for createList() to get all issued warnings in the system
+	 * Callback for createList()
+	 * Used to get all issued warnings in the system
+	 * Uses warnings function in moderation.subs
 	 *
 	 * @param int $start
 	 * @param int $items_per_page
 	 * @param string $sort
+	 * @param string $query_string
+	 * @param mixed[] $query_params
 	 */
-	public function list_getWarnings($start, $items_per_page, $sort)
+	public function list_getWarnings($start, $items_per_page, $sort, $query_string, $query_params)
 	{
-		return warnings($start, $items_per_page, $sort);
+		return warnings($start, $items_per_page, $sort, $query_string, $query_params);
 	}
 
 	/**
-	 * Callback for createList(), get the total count of all current warnings
+	 * Callback for createList()
+	 * Get the total count of all current warnings
+	 * Uses warningCount function in moderation.subs
+	 *
+	 * @param string $query_string
+	 * @param mixed[] $query_params
 	 */
-	public function list_getWarningCount()
+	public function list_getWarningCount($query_string, $query_params)
 	{
-		return warningCount();
+		return warningCount($query_string, $query_params);
 	}
 
 	/**

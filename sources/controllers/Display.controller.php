@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -37,12 +37,14 @@ class Display_Controller
 
 	/**
 	 * The central part of the board - topic display.
-	 * This function loads the posts in a topic up so they can be displayed.
-	 * It uses the main sub template of the Display template.
-	 * It requires a topic, and can go to the previous or next topic from it.
-	 * It jumps to the correct post depending on a number/time/IS_MSG passed.
-	 * It depends on the messages_per_page, defaultMaxMessages and enableAllMessages settings.
-	 * It is accessed by ?topic=id_topic.START.
+	 *
+	 * What it does:
+	 * - This function loads the posts in a topic up so they can be displayed.
+	 * - It uses the main sub template of the Display template.
+	 * - It requires a topic, and can go to the previous or next topic from it.
+	 * - It jumps to the correct post depending on a number/time/IS_MSG passed.
+	 * - It depends on the messages_per_page, defaultMaxMessages and enableAllMessages settings.
+	 * - It is accessed by ?topic=id_topic.START.
 	 */
 	public function action_display()
 	{
@@ -684,7 +686,7 @@ class Display_Controller
 
 			// Just using the plain text quick reply and not the editor
 			if (empty($options['use_editor_quick_reply']))
-				loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.js', 'mentioning.js'));
+				loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.min.js', 'mentioning.js'));
 
 			loadCSSFile('jquery.atwho.css');
 
