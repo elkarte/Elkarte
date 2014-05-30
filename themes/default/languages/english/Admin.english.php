@@ -17,7 +17,7 @@ $txt['admin_members'] = 'Manage Members';
 $txt['admin_members_list'] = 'Below is a listing of all the members currently registered with your forum.';
 $txt['admin_next'] = 'Next';
 $txt['admin_censored_words'] = 'Censored Words';
-$txt['admin_censored_where'] = 'Put the word to be censored on the left, and what to change it to on the right.';
+$txt['admin_censored_where'] = 'Enter the word to be censored into the left box and the word to change it to, into the right box. Then select if you want to check the whole word and the case. When finished with each word you then click Save. Multiple entries can be made prior to saving by clicking the \'Add another word\' button.';
 $txt['admin_censored_desc'] = 'Due to the public nature of forums there may be some words that you wish to prohibit being posted by users of your forum. You can enter any words below that you wish to be censored whenever used by a member.<br />Clear a box to remove that word from the censor.';
 $txt['admin_reserved_names'] = 'Reserved Names';
 $txt['admin_template_edit'] = 'Edit your forum template';
@@ -287,11 +287,11 @@ $txt['dvc_languages'] = 'Language Files';
 $txt['smileys_default_set_for_theme'] = 'Select default smiley set for this theme:';
 $txt['smileys_no_default'] = 'Use default smiley set';
 
-$txt['censor_test'] = 'Test censored words';
+$txt['censor_test'] = 'Test Censored Words';
 $txt['censor_test_save'] = 'Test';
-$txt['censor_case'] = 'Ignore case when censoring';
-$txt['censor_whole_words'] = 'Check only whole words';
-$txt['censor_allow'] = 'Allow users to turn off word censoring';
+$txt['censor_case'] = 'Ignore case when censoring.';
+$txt['censor_whole_words'] = 'Check only whole words.';
+$txt['censor_allow'] = 'Allow users to turn off word censoring.';
 
 $txt['admin_confirm_password'] = '(confirm)';
 $txt['admin_incorrect_password'] = 'Incorrect Password';
