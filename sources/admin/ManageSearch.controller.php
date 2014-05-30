@@ -648,8 +648,6 @@ class ManageSearch_Controller extends Action_Controller
 
 					if (strpos($header, '* SearchAPI-' . $matches[1] . '.class.php') !== false)
 					{
-						require_once(SUBSDIR . '/' . $file);
-
 						$index_name = strtolower($matches[1]);
 						$search_class_name = $index_name . '_search';
 						$searchAPI = new $search_class_name();

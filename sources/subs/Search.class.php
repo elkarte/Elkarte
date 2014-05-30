@@ -33,7 +33,7 @@ $GLOBALS['search_versions'] = array(
 /**
  * Actually do the searches
  */
-class Search_Class
+class Search
 {
 	/**
 	 * This is the minimum version of ElkArte that an API could have been written
@@ -447,7 +447,7 @@ class Search_Class
 	}
 
 	/**
-	 * Merge search params extracted with Search_Class::searchParamsFromString
+	 * Merge search params extracted with Search::searchParamsFromString
 	 * with those present in the $param array (usually $_REQUEST['params'])
 	 *
 	 * @param mixed[] $params - An array of search parameters

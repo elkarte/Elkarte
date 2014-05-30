@@ -1714,7 +1714,6 @@ class Post_Controller extends Action_Controller
 			$_REQUEST['eventid'] = (int) $_REQUEST['eventid'];
 
 			// Validate the post...
-			require_once(CONTROLLERDIR . '/Calendar.controller.php');
 			$calendarController = new Calendar_Controller;
 			$calendarController->validateEventPost();
 

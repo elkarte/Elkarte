@@ -60,7 +60,6 @@ class Unread_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Recent.subs.php');
 		require_once(SUBSDIR . '/Boards.subs.php');
-		require_once(SUBSDIR . '/Unread.class.php');
 
 		$this->_action = !isset($_REQUEST['action']) && $_REQUEST['action'] === 'unreadreplies' ? $_REQUEST['action'] : 'unread';
 		$this->_action_unread = $this->_action === 'unread';
