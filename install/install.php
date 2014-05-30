@@ -1455,7 +1455,7 @@ function action_deleteInstall()
 		// The variable is usually defined in index.php so lets just use our variable to do it for us.
 		$forum_version = $current_version;
 		// Now go get those files!
-		$task = new ScheduledTask();
+		$task = new Scheduled_Task();
 		$task->fetchFiles();
 		// We've just installed!
 		$user_info['ip'] = $_SERVER['REMOTE_ADDR'];
@@ -2079,7 +2079,7 @@ function definePaths()
 	// Make sure the paths are correct... at least try to fix them.
 	if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt'))
 		$boarddir = dirname(__FILE__);
-	if (!file_exists($sourcedir . '/Dispatcher.class.php') && file_exists($boarddir . '/sources'))
+	if (!file_exists($sourcedir . '/SiteDispatcher.class.php') && file_exists($boarddir . '/sources'))
 		$sourcedir = $boarddir . '/sources';
 
 	// Check that directories which didn't exist in past releases are initialized.

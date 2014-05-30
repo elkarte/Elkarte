@@ -1255,7 +1255,7 @@ class Packages_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context, $forum_version, $settings;
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 
 		$context['page_title'] .= ' - ' . $txt['browse_packages'];
 		$context['forum_version'] = $forum_version;
@@ -1571,7 +1571,7 @@ class Packages_Controller extends Action_Controller
 
 		if (empty($package_ftp) && !isset($_POST['skip_ftp']))
 		{
-			require_once(SUBSDIR . '/FTPConnection.class.php');
+			require_once(SUBSDIR . '/FtpConnection.class.php');
 			$ftp = new Ftp_Connection(null);
 			list ($username, $detect_path, $found_path) = $ftp->detect_path(BOARDDIR);
 

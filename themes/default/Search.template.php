@@ -59,7 +59,7 @@ function template_searchform()
 	// Does the search require a visual verification screen to annoy them?
 	if ($context['require_verification'])
 	{
-			template_control_verification($context['visual_verification_id'], '
+			template_verification_controls($context['visual_verification_id'], '
 						<div class="verification">
 							<strong>' . $txt['search_visual_verification_label'] . ':</strong>
 							<br />', '

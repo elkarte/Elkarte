@@ -77,7 +77,7 @@ class ManageServer_Controller extends Action_Controller
 		global $context, $txt;
 
 		// We're working with them settings here.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// The settings are in here, I swear!
 		loadLanguage('ManageSettings');

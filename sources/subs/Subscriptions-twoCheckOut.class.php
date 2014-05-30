@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Payment Gateway: twocheckout
+ * Payment Gateway: twoCheckOut
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -20,7 +20,7 @@
  *
  * @package Subscriptions
  */
-class twocheckout_display
+class twoCheckOut_Display
 {
 	/**
 	 * Name of this payment gateway
@@ -98,7 +98,7 @@ class twocheckout_display
  *
  * @package Subscriptions
  */
-class twocheckout_payment
+class twoCheckOut_Payment
 {
 	/**
 	 * Validates that we have valid data to work with

@@ -2929,7 +2929,7 @@ function template_javascript($do_defered = false)
 	{
 		if (!empty($modSettings['minify_css_js']))
 		{
-			require_once(SOURCEDIR . '/Combine.class.php');
+			require_once(SOURCEDIR . '/SiteCombiner.class.php');
 			$combiner = new Site_Combiner(CACHEDIR, $boardurl . '/cache');
 			$combine_name = $combiner->site_js_combine($context['javascript_files'], $do_defered);
 
@@ -3016,7 +3016,7 @@ function template_css()
 	{
 		if (!empty($modSettings['minify_css_js']))
 		{
-			require_once(SOURCEDIR . '/Combine.class.php');
+			require_once(SOURCEDIR . '/SiteCombiner.class.php');
 			$combiner = new Site_Combiner(CACHEDIR, $boardurl . '/cache');
 			$combine_name = $combiner->site_css_combine($context['css_files']);
 

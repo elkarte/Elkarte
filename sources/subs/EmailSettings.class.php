@@ -27,7 +27,7 @@ if (!defined('ELK'))
  *
  * @package Maillist
  */
-class MaillistSettingsClass extends Settings_Form
+class Email_Settings extends Settings_Form
 {
 	/**
 	 * static function saveTableSettings, now part of the Settings Form class

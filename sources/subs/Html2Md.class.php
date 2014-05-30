@@ -17,7 +17,7 @@ if (!defined('ELK'))
 /**
  * Converts HTML to Markdown text
  */
-class Convert_Md
+class Html_2_Md
 {
 	/**
 	 * The value that will hold our dom object

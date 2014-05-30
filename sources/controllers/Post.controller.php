@@ -54,6 +54,7 @@ class Post_Controller extends Action_Controller
 		global $txt, $scripturl, $topic, $modSettings, $board, $user_info, $context, $options, $language;
 
 		loadLanguage('Post');
+		require_once(SOURCEDIR . '/AttachmentErrorContext.class.php');
 
 		// You can't reply with a poll... hacker.
 		if (isset($_REQUEST['poll']) && !empty($topic) && !isset($_REQUEST['msg']))
@@ -1026,6 +1027,8 @@ class Post_Controller extends Action_Controller
 
 		// Prevent double submission of this form.
 		checkSubmitOnce('check');
+
+		require_once(SOURCEDIR . '/AttachmentErrorContext.class.php');
 
 		// No errors as yet.
 		$post_errors = Error_Context::context('post', 1);

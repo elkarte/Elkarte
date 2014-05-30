@@ -50,7 +50,7 @@ if (!empty($db_show_debug) && function_exists('getrusage'))
 // Make sure the paths are correct... at least try to fix them.
 if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt'))
 	$boarddir = dirname(__FILE__);
-if (!file_exists($sourcedir . '/Dispatcher.class.php') && file_exists($boarddir . '/sources'))
+if (!file_exists($sourcedir . '/SiteDispatcher.class.php') && file_exists($boarddir . '/sources'))
 	$sourcedir = $boarddir . '/sources';
 
 // Check that directories which didn't exist in past releases are initialized.
@@ -81,8 +81,8 @@ require_once(SOURCEDIR . '/Logging.php');
 require_once(SOURCEDIR . '/Load.php');
 require_once(SUBSDIR . '/Cache.subs.php');
 require_once(SOURCEDIR . '/Security.php');
-require_once(SOURCEDIR . '/BrowserDetect.class.php');
-require_once(SOURCEDIR . '/Errors.class.php');
+require_once(SOURCEDIR . '/BrowserDetector.class.php');
+require_once(SOURCEDIR . '/ErrorContext.class.php');
 require_once(SUBSDIR . '/Util.class.php');
 require_once(SUBSDIR . '/TemplateLayers.class.php');
 require_once(SOURCEDIR . '/Action.controller.php');
@@ -207,7 +207,7 @@ function elk_main()
 	unset($no_stat_actions);
 
 	// What shall we do?
-	require_once(SOURCEDIR . '/Dispatcher.class.php');
+	require_once(SOURCEDIR . '/SiteDispatcher.class.php');
 	$dispatcher = new Site_Dispatcher();
 
 	// Show where we came from, and go

@@ -1312,7 +1312,7 @@ class Maintenance_Controller extends Action_Controller
 			);
 		}
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($list_options);
 
 		$context['page_title'] = $txt['maintain_sub_hooks_list'];

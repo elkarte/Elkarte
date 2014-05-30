@@ -47,7 +47,7 @@ function pbe_email_to_bbc($text, $html)
 		// Convert the email-HTML to BBC
 		$text = preg_replace(array_keys($tags), array_values($tags), $text);
 		require_once(SUBSDIR . '/Html2BBC.class.php');
-		$bbc_converter = new Convert_BBC($text);
+		$bbc_converter = new Html_2_BBC($text);
 		$text = $bbc_converter->get_bbc();
 
 		// Run our parsers, as defined in the ACP,  to remove the original "replied to" message
@@ -85,7 +85,7 @@ function pbe_email_to_bbc($text, $html)
 
 		// Convert any resulting HTML created by markup style text in the email to BBC
 		require_once(SUBSDIR . '/Html2BBC.class.php');
-		$bbc_converter = new Convert_BBC($text, false);
+		$bbc_converter = new Html_2_BBC($text, false);
 		$text = $bbc_converter->get_bbc();
 	}
 
@@ -950,8 +950,8 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	);
 
 	// Convert this to text (markdown)
-	require_once(SUBSDIR . '/Html2Markdown.class.php');
-	$mark_down = new Convert_Md($message);
+	require_once(SUBSDIR . '/Html2Md.class.php');
+	$mark_down = new Html_2_Md($message);
 	$message = $mark_down->get_markdown();
 
 	// Finally the sig, its goes as just plain text

@@ -240,7 +240,7 @@ function template_report()
 
 	if ($context['require_verification'])
 	{
-		template_control_verification($context['visual_verification_id'], '
+		template_verification_controls($context['visual_verification_id'], '
 							<dt>
 								' . $txt['verification'] . ':
 							</dt>

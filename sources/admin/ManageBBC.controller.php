@@ -43,7 +43,7 @@ class ManageBBC_Controller extends Action_Controller
 		global $context, $txt;
 
 		// We're working with them settings here.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		$subActions = array(
 			'display' => array(
@@ -85,7 +85,7 @@ class ManageBBC_Controller extends Action_Controller
 			toggleBBCDisabled(\'disabledBBC\', ' . (empty($modSettings['enableBBC']) ? 'true' : 'false') . ');', true);
 
 		// We'll need this forprepare_db() and save_db()
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Make sure we check the right tags!
 		$modSettings['bbc_disabled_disabledBBC'] = empty($modSettings['disabledBBC']) ? array() : explode(',', $modSettings['disabledBBC']);

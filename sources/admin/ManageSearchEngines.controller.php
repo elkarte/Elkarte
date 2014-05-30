@@ -99,7 +99,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 			$_POST['spider_group'] = 0;
 
 		// We'll want this for our easy save.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Setup the template.
 		$context['page_title'] = $txt['settings'];
@@ -157,7 +157,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 	private function _initEngineSettingsForm()
 	{
 		// This is really quite wanting.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Instantiate the form
 		$this->_engineSettings = new Settings_Form();
@@ -338,7 +338,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 			),
 		);
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';
@@ -496,7 +496,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 
 		createToken('admin-sl');
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		// Now determine the actions of the URLs.
@@ -655,7 +655,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 
 		createToken('admin-ss');
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_spider_stats';

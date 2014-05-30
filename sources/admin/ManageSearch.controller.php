@@ -186,7 +186,7 @@ class ManageSearch_Controller extends Action_Controller
 	private function _initSearchSettingsForm()
 	{
 		// This is really quite wanting.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Instantiate the form
 		$this->_searchSettings = new Settings_Form();

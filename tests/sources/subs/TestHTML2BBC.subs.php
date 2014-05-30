@@ -56,7 +56,7 @@ class TestHTML2BBC extends UnitTestCase
 			$test = $testcase[1];
 			$expected = $testcase[2];
 
-			$parser = new Convert_BBC($test);
+			$parser = new Html_2_BBC($test);
 
 			// Convert the html to bbc
 			$result = $parser->get_bbc();
