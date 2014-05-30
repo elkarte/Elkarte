@@ -117,17 +117,14 @@ class Search_Class
 		global $modSettings, $search_versions, $txt;
 
 		require_once(SUBSDIR . '/Package.subs.php');
-		require_once(SUBSDIR . '/SearchAPI.class.php');
 
 		// Load up the search API we are going to use.
 		$modSettings['search_index'] = empty($modSettings['search_index']) ? 'standard' : $modSettings['search_index'];
 		if (!file_exists(SUBSDIR . '/SearchAPI-' . ucwords($modSettings['search_index']) . '.class.php'))
 			fatal_lang_error('search_api_missing');
 
-		require_once(SUBSDIR . '/SearchAPI-' . ucwords($modSettings['search_index']) . '.class.php');
-
 		// Create an instance of the search API and check it is valid for this version of the software.
-		$search_class_name = $modSettings['search_index'] . '_search';
+		$search_class_name = ucwords($modSettings['search_index']) . '_Search';
 		$this->_searchAPI = new $search_class_name();
 
 		// An invalid Search API.
@@ -137,7 +134,6 @@ class Search_Class
 			loadLanguage('Errors');
 			log_error(sprintf($txt['search_api_not_compatible'], 'SearchAPI-' . ucwords($modSettings['search_index']) . '.class.php'), 'critical');
 
-			require_once(SUBSDIR . '/SearchAPI-Standard.class.php');
 			$this->_searchAPI = new Standard_Search();
 		}
 
