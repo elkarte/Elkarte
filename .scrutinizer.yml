@@ -72,8 +72,6 @@ tools:
             - 'sources/*.php'
             - 'themes/*.php'
             - '*.php'
-<<<<<<< HEAD
-=======
         excluded_dirs:
             - attachments
             - avatars
@@ -87,7 +85,6 @@ tools:
             - install
             - languages
     php_cpd:
->>>>>>> master
         excluded_dirs:
             - attachments
             - avatars
@@ -99,7 +96,6 @@ tools:
             - ext
             - sources/ext
             - install
-<<<<<<< HEAD
             - languages
     php_mess_detector:
         config:
@@ -109,8 +105,6 @@ tools:
             controversial_rules: { superglobals: false }
     php_sim:
         min_mass: 30
-=======
         min_lines: '20'
         filter:
             excluded_paths: ['attachments/*', 'avatars/*', 'cache/*', 'docs/*', 'packages/*', 'smileys/*', 'tests/*', 'ext/*', 'sources/ext/*', 'install/*']
->>>>>>> master
