@@ -651,8 +651,6 @@ class Search
 		$this->_search_params['show_complete'] = !empty($this->_search_params['show_complete']) || !empty($params['show_complete']);
 		$this->_search_params['subject_only'] = !empty($this->_search_params['subject_only']) || !empty($params['subject_only']);
 
-		$context['compact'] = !$this->_search_params['show_complete'];
-
 		// Get the sorting parameters right. Default to sort by relevance descending.
 		$sort_columns = array(
 			'relevance',
@@ -694,6 +692,14 @@ class Search
 			else
 				$this->_search_params['search'] = '';
 		}
+	}
+
+	/**
+	 * Tell me, do I want to see the full message or just a piece?
+	 */
+	public function isCompact()
+	{
+		return empty($this->_search_params['show_complete']);
 	}
 
 	/**
@@ -1580,7 +1586,7 @@ class Search
 		static $usedIDs;
 
 		$ignoreRequest = $this->_db_search->search_query($query_identifier, ($this->_db->support_ignore() ? ( '
-			INSERT IGNORE INTO ' . '{db_prefix}log_search_results
+			INSERT IGNORE INTO {db_prefix}log_search_results
 				(' . implode(', ', array_keys($main_query['select'])) . ')') : '') . '
 			SELECT
 				' . implode(',
@@ -1620,6 +1626,7 @@ class Search
 				foreach ($row as $key => $value)
 					$inserts[$row['id_topic']][] = (int) $row[$key];
 			}
+			$this->_db->free_result($ignoreRequest);
 
 			// Now put them in!
 			if (!empty($inserts))
@@ -1639,8 +1646,6 @@ class Search
 		}
 		else
 			$num_results = $this->_db->affected_rows();
-
-		$this->_db->free_result($ignoreRequest);
 
 		return $num_results;
 	}
