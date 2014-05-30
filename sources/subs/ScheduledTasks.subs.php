@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -598,7 +598,7 @@ function run_this_task($id_task, $task_name)
 		// Otherwise we try with the ScheduledTask class
 		else
 		{
-			$task_object = new ScheduledTask();
+			$task_object = new Scheduled_Task();
 			$method = $task_name;
 		}
 

@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -40,7 +40,7 @@ class AdminLog_Controller extends Action_Controller
 		global $context, $txt, $scripturl, $modSettings;
 
 		// We're working with them settings here.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// These are the logs they can load.
 		$log_functions = array(

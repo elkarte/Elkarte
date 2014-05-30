@@ -11,8 +11,8 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
- *
+ * @version 1.0 Release Candidate 1
+ * 
  */
 
 /**
@@ -240,7 +240,7 @@ function template_report()
 
 	if ($context['require_verification'])
 	{
-		template_control_verification($context['visual_verification_id'], '
+		template_verification_controls($context['visual_verification_id'], '
 							<dt>
 								' . $txt['verification'] . ':
 							</dt>

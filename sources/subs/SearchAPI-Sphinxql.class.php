@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -37,7 +37,7 @@ class Sphinxql_Search
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
 	 * @var string
 	 */
-	public $version_compatible = 'ElkArte 1.0 Beta 2';
+	public $version_compatible = 'ElkArte 1.0 RC 1';
 
 	/**
 	 * This won't work with versions of ElkArte less than this.
@@ -253,11 +253,13 @@ class Sphinxql_Search
 				{
 					if (empty($search_params['topic']))
 						$num = isset($match['num']) ? $match['num'] : (isset($match['@count']) ? $match['@count'] : 0);
+					else
+						$num = 0;
 
 					$cached_results['matches'][$match['id']] = array(
 						'id' => $match['id_topic'],
 						'relevance' => round($match['relevance'] / 10000, 1) . '%',
-						'num_matches' => empty($search_params['topic']) ? $num : 0,
+						'num_matches' => $num,
 						'matches' => array(),
 					);
 				}

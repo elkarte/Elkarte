@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -192,6 +192,7 @@ function is_not_guest($message = '', $is_fatal = true)
 	else
 	{
 		loadTemplate('Login');
+		loadJavascriptFile('sha256.js', array('defer' => true));
 		$context['sub_template'] = 'kick_guest';
 		$context['robot_no_index'] = true;
 	}

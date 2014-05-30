@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -73,13 +73,13 @@ function template_download_language()
 						<th scope="col">
 							', $txt['languages_download_filename'], '
 						</th>
-						<th scope="col" style="width:100">
+						<th scope="col" style="width: 100px;">
 							', $txt['languages_download_writable'], '
 						</th>
-						<th scope="col" style="width:100">
+						<th scope="col" style="width: 100px;">
 							', $txt['languages_download_exists'], '
 						</th>
-						<th scope="col" style="width:4%">
+						<th scope="col" style="width: 4%;">
 							', $txt['languages_download_copy'], '
 						</th>
 					</tr>

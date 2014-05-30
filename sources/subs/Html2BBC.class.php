@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -18,7 +18,7 @@ if (!defined('ELK'))
  * Converts a string of HTML to BBC
  *
  * Initiate
- *    $bbc_converter = new Convert_BBC($html);
+ *    $bbc_converter = new Html_2_BBC($html);
  *    where $html is a string of html we want to convert to bbc
  *
  * Override
@@ -29,7 +29,7 @@ if (!defined('ELK'))
  *    $bbc = $bbc_converter->get_bbc();
  *
  */
-class Convert_BBC
+class Html_2_BBC
 {
 	/**
 	 * The value that will hold our dom object

@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -136,6 +136,7 @@ class Packages_Controller extends Action_Controller
 		if (file_exists(BOARDDIR . '/packages/temp'))
 			deltree(BOARDDIR . '/packages/temp', false);
 
+		// Attempt to create the temp directory
 		if (!mktree(BOARDDIR . '/packages/temp', 0755))
 		{
 			deltree(BOARDDIR . '/packages/temp', false);
@@ -1254,7 +1255,7 @@ class Packages_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context, $forum_version, $settings;
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 
 		$context['page_title'] .= ' - ' . $txt['browse_packages'];
 		$context['forum_version'] = $forum_version;
@@ -1570,7 +1571,7 @@ class Packages_Controller extends Action_Controller
 
 		if (empty($package_ftp) && !isset($_POST['skip_ftp']))
 		{
-			require_once(SUBSDIR . '/FTPConnection.class.php');
+			require_once(SUBSDIR . '/FtpConnection.class.php');
 			$ftp = new Ftp_Connection(null);
 			list ($username, $detect_path, $found_path) = $ftp->detect_path(BOARDDIR);
 

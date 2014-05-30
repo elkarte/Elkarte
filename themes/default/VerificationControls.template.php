@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -22,7 +22,7 @@
  * @param string $before
  * @param string $after
  */
-function template_control_verification($verify_id, $before = '', $after = '')
+function template_verification_controls($verify_id, $before = '', $after = '')
 {
 	global $context;
 
@@ -42,7 +42,7 @@ function template_control_verification($verify_id, $before = '', $after = '')
 		echo '
 			<div id="verification_control_', $i, '" class="verification_control">';
 
-		call_user_func('template_control_verification_' . $verification['template'], $verify_id, $verification['values']);
+		call_user_func('template_verification_control_' . $verification['template'], $verify_id, $verification['values']);
 
 		echo '
 			</div>';
@@ -58,9 +58,9 @@ function template_control_verification($verify_id, $before = '', $after = '')
  * Used to show a verification question
  *
  * @param int $verify_id
- * @param array $verify_context
+ * @param mixed[] $verify_context
  */
-function template_control_verification_questions($verify_id, $verify_context)
+function template_verification_control_questions($verify_id, $verify_context)
 {
 	global $context;
 
@@ -76,9 +76,9 @@ function template_control_verification_questions($verify_id, $verify_context)
  * Used to show one of those easy for robot, hard for human captcha's
  *
  * @param int $verify_id
- * @param array $verify_context
+ * @param mixed[] $verify_context
  */
-function template_control_verification_captcha($verify_id, $verify_context)
+function template_verification_control_captcha($verify_id, $verify_context)
 {
 	global $context, $txt;
 
@@ -110,9 +110,9 @@ function template_control_verification_captcha($verify_id, $verify_context)
  * Display the empty field verification
  *
  * @param int $verify_id
- * @param array $verify_context
+ * @param mixed[] $verify_context
  */
-function template_control_verification_emptyfield($verify_id, $verify_context)
+function template_verification_control_emptyfield($verify_id, $verify_context)
 {
 	global $context, $txt;
 

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -588,7 +588,7 @@ function template_group_members()
 
 	if (!empty($context['group']['assignable']))
 		echo '
-						<th style="width:4%"><input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" /></th>';
+						<th style="width: 4%;"><input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" /></th>';
 
 	echo '
 					</tr>
@@ -642,7 +642,7 @@ function template_group_members()
 
 		if (!empty($context['group']['assignable']))
 			echo '
-						<td class="centertext" style="width:4%">
+						<td class="centertext" style="width: 4%;">
 							<input type="checkbox" name="rem[]" value="', $member['id'], '" class="input_check" ', ($context['user']['id'] == $member['id'] && $context['group']['id'] == 1 ? 'onclick="if (this.checked) return confirm(\'' . $txt['membergroups_members_deadmin_confirm'] . '\')" ' : ''), '/>
 						</td>';
 

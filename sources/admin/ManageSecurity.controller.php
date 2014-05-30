@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -146,7 +146,7 @@ class ManageSecurity_Controller extends Action_Controller
 	private function _initSecuritySettingsForm()
 	{
 		// We're working with them settings.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Instantiate the form
 		$this->_securitySettings = new Settings_Form();
@@ -177,7 +177,7 @@ class ManageSecurity_Controller extends Action_Controller
 			unset($config_vars['moderate']);
 
 		// We're working with them settings.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Saving?
 		if (isset($_GET['save']))
@@ -230,7 +230,7 @@ class ManageSecurity_Controller extends Action_Controller
 	private function _initModerationSettingsForm()
 	{
 		// We're working with them settings.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Instantiate the form
 		$this->_moderationSettings = new Settings_Form();
@@ -303,7 +303,7 @@ class ManageSecurity_Controller extends Action_Controller
 	private function _initSpamSettingsForm()
 	{
 		// We're working with them settings.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 		require_once(SUBSDIR . '/VerificationControls.class.php');
 
 		// Instantiate the form
@@ -410,7 +410,7 @@ class ManageSecurity_Controller extends Action_Controller
 	private function _initBBSettingsForm()
 	{
 		// We're working with them settings.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Instantiate the form
 		$this->_bbSettings = new Settings_Form();
@@ -523,7 +523,7 @@ class ManageSecurity_Controller extends Action_Controller
 
 		foreach ($known_verifications as $verification)
 		{
-			$class_name = 'Control_Verification_' . ucfirst($verification);
+			$class_name = 'Verification_Controls_' . ucfirst($verification);
 			$current_instance = new $class_name();
 
 			$new_settings = $current_instance->settings();

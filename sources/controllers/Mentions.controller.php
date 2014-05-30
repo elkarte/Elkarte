@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -171,7 +171,7 @@ class Mentions_Controller extends Action_Controller
 		is_not_guest();
 
 		require_once(SUBSDIR . '/Mentions.subs.php');
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		loadLanguage('Mentions');
 
 		$this->_buildUrl();
@@ -242,10 +242,12 @@ class Mentions_Controller extends Action_Controller
 				'log_time' => array(
 					'header' => array(
 						'value' => $txt['mentions_when'],
+						'class' => 'mention_log_time',
 					),
 					'data' => array(
 						'db' => 'log_time',
 						'timeformat' => 'html_time',
+						'class' => 'mention_log_time',
 					),
 					'sort' => array(
 						'default' => 'mtn.log_time DESC',

@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  * This file contains functions for dealing with polls.
  *
@@ -973,7 +973,7 @@ function loadPollContext($poll_id)
 			'percent' => $bar,
 			'votes' => $option['votes'],
 			'voted_this' => $option['voted_this'] != -1,
-			'bar' => '<span style="white-space: nowrap;"><img src="' . $settings['images_url'] . '/poll_' . ($context['right_to_left'] ? 'right' : 'left') . '.png" alt="" /><img src="' . $settings['images_url'] . '/poll_middle.png" style="width:' . $barWide . 'px; height: 12px" alt="-" /><img src="' . $settings['images_url'] . '/poll_' . ($context['right_to_left'] ? 'left' : 'right') . '.png" alt="" /></span>',
+			'bar' => '<span style="white-space: nowrap;"><img src="' . $settings['images_url'] . '/poll_' . ($context['right_to_left'] ? 'right' : 'left') . '.png" alt="" /><img src="' . $settings['images_url'] . '/poll_middle.png" style="width:' . $barWide . 'px; height: 12px;" alt="-" /><img src="' . $settings['images_url'] . '/poll_' . ($context['right_to_left'] ? 'left' : 'right') . '.png" alt="" /></span>',
 			// Note: IE < 8 requires us to set a width on the container, too.
 			'bar_ndt' => $bar > 0 ? '<div class="bar" style="width: ' . $bar . '%;"><div style="width: ' . $bar . '%;"></div></div>' : '<div class="bar"></div>',
 			'bar_width' => $barWide,

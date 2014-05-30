@@ -1324,7 +1324,7 @@ div.bbc_footnotes .meaction{
 }
 .drop_area {
 	-webkit-font-smoothing: antialiased;
-	color: rgb(21, 125, 251);
+	color: #444444;
 	background-color: rgb(230, 230, 230);
 	border: dashed 1px #ccc;
 }
@@ -1776,6 +1776,15 @@ div.bbc_footnotes .meaction{
 .floating_error .error_btn:hover {
 	cursor: pointer;
 }
+
+/* alternating window colors */
+.windowbg {
+	background-color: #fcfcfc;
+}
+.windowbg2 {
+	background-color: #efefef;
+}
+
 
 /*	$MEDIA		*/
 /* Experimental media queries.

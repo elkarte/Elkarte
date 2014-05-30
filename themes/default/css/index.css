@@ -1613,7 +1613,7 @@ dl.settings label {
 	padding: 0 0 1px 0;
 	font-size: 1.143em;
 }
-.board_description, .moderators {
+.board_info .board_description, .board_info .moderators {
 	margin: 0 0 0 56px;
 }
 .moderators {
@@ -1791,10 +1791,6 @@ img.new_posts {
 /* The board description and who-is-viewing stuff. */
 #description_board {
 	margin: 10px 0 0 0;
-}
-#description_board .moderators {
-	margin: 0;
-	font-size: 0.786em;
 }
 #description_board .generalinfo, #forumposts .generalinfo {
 	margin-top: 2px;
@@ -2493,15 +2489,22 @@ ul.post_options li {
 
 /*	$DRAG-N-DROP		*/
 /* ------------------------------------------------------- */
-#postAttachment2 .drop_area {
-	font-size: 1.857em;
+.drop_area {
+	font-size: 1.643em;
 	font-weight: normal;
-	height: 60px;
-	line-height: 60px;
 	text-align: center;
 	opacity: 0.6;
 	display: none;
+	padding: 1em 0;
 }
+.drop_area_fileselect {
+    cursor: pointer;
+    margin-left: -190px;
+    opacity: 0.0001;
+    position: absolute;
+    width: 220px;
+}
+
 #postAttachment >dd.progress_tracker {
 	margin:0;
 }
@@ -4093,7 +4096,7 @@ dl.no_members {
 		clear: both;
 		content: "";
 	}
-	.board_description, .moderators, .childboards {
+	.board_info .board_description, .board_info .moderators, .childboards {
 		margin: 0 0 0 8px;
 	}
 	/* Playing silly buggers with a sidebar menu option for narrow screens. */
@@ -4329,7 +4332,7 @@ dl.no_members {
 		margin-top:3px;
 		padding: 15px 0;
 	}
-	.board_description, .moderators {
+	.board_info .board_description, .board_info .moderators {
 		display: none;
 	}
 	.childboard_row {
@@ -4517,6 +4520,9 @@ dl.no_members {
 		float: none;
 		text-align: center;
 	}
+	#search_jump_to, .search_controls {
+		display: none;
+	}
 	.small_pagelinks, .sort_by_container {
 		display: none;
 	}
@@ -4568,6 +4574,9 @@ dl.no_members {
 	.mentionavatar .avatar {
 		max-width: 40px;
 		max-height: 40px;
+	}
+	#list_mentions thead, .mention_log_time {
+		display: none;
 	}
 	ul.navigate_section li:not(:first-child):not(:last-child) a {
 		width: 3em;

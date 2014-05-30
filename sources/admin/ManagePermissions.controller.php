@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -51,7 +51,7 @@ class ManagePermissions_Controller extends Action_Controller
 		loadTemplate('ManagePermissions');
 
 		// We're working with them settings here.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Format: 'sub-action' => array('function_to_call', 'permission_needed'),
 		$subActions = array(
@@ -298,7 +298,7 @@ class ManagePermissions_Controller extends Action_Controller
 			),
 		);
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		// The second list shows the post count based groups...if enabled

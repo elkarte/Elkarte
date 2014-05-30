@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  * This file contains javascript associated with the topic viewing including
  * Quick Modify, Quick Reply, In Topic Moderation, thumbnail expansion etc
@@ -330,7 +330,7 @@ QuickReply.prototype.swap = function (bInit, bSavestate)
 		oQuickReplyContainer.className = sTargetClass;
 
 	// And show the new title
-	oQuickReplyContainer.title = oQuickReplyContainer.title = this.bCollapsed ? this.opt.sTitleCollapsed : this.opt.sTitleExpanded;this.opt.sTitleCollapsed
+	oQuickReplyContainer.title = oQuickReplyContainer.title = this.bCollapsed ? this.opt.sTitleCollapsed : this.opt.sTitleExpanded;
 
 	// Show or hide away
 	if (this.bCollapsed)

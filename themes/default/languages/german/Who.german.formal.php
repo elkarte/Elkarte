@@ -134,7 +134,7 @@ $txt['who_pm_byemail'] = 'Versendet eine private Nachricht per E-Mail.';
 
 // Credits text
 $txt['credits'] = 'Danksagungen';
-$txt['credits_intro'] = 'ElkArte möchte sich bei allen bedanken, die dazu beigetragen haben, es zu dem zu machen, was es heute ist.  Ohne euch wäre das nicht möglich gewesen. Danke für die Installation und Benutzung unserer Software wie auch wertvolle Rückmeldungen, Fehlerberichte und Anregungen.';
+$txt['credits_intro'] = 'ElkArte ist vollständig frei und quelloffen. Wir ermuntern und unterstützen eine aktive, offene Gemeinschaft, die Beiträge von Dritten annimmt.  Wir möchten allen danken, die das Projekt durch das Beisteuern von Code, Rückmeldungen, Fehlermeldungen und Meinungen unterstützt haben, da nichts hiervon ohne Sie möglich gewesen wäre.  Auch möchten wir insbesondere <a href="https://github.com/SimpleMachines" target="_blank" class="new_win">SMF</a> hervorheben, das Projekt, aus dem ElkArte geboren wurde.';
 $txt['credits_contributors'] = 'Beitragende';
 $txt['credits_and'] = 'und';
 $txt['credits_copyright'] = 'Urheberrechte';
@@ -144,7 +144,8 @@ $txt['credits_software_graphics'] = 'Software/Grafiken';
 $txt['credits_software'] = 'Software';
 $txt['credits_graphics'] = 'Grafiken';
 $txt['credits_fonts'] = 'Schriftarten';
-$txt['credits_groups_dev'] = 'Entwickler';
+$txt['credits_groups_contrib'] = 'Beitragende';
+$txt['credits_contrib_list'] = 'Für eine vollständige Liste derer, die zur Gestaltung und Umsetzung von ElkArte beigetragen haben, beachten Sie bitte die offizielle <a href="https://github.com/elkarte/Elkarte/graphs/contributors" target="_blank" class="new_win">Liste der Beitragenden</a> auf GitHub.';
 $txt['credits_license'] = 'Lizenz';
 $txt['credits_copyright'] = 'Copyright'; // hm, this is not even valid in Germany...
 $txt['credits_version'] = 'Version';

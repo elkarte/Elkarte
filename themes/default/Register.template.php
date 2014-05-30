@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -350,7 +350,7 @@ function template_registration_form()
 
 	if ($context['visual_verification'])
 	{
-		template_control_verification($context['visual_verification_id'], '
+		template_verification_controls($context['visual_verification_id'], '
 			<h3 class="category_header">' . $txt['verification'] . '</h3>
 			<div class="windowbg2">
 				<fieldset class="content centertext">
@@ -789,7 +789,7 @@ function template_contact_form()
 
 	if ($context['require_verification'])
 	{
-		template_control_verification($context['visual_verification_id'], '
+		template_verification_controls($context['visual_verification_id'], '
 					<dt>
 							' . $txt['verification'] . ':
 					</dt>

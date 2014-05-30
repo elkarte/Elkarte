@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -1513,7 +1513,7 @@ function lastPost()
 	return array(
 		'topic' => $row['id_topic'],
 		'subject' => $row['subject'],
-		'short_subject' => shorten_text($row['subject'], !empty($modSettings['subject_length']) ? $modSettings['subject_length'] : 24),
+		'short_subject' => shorten_text($row['subject'], $modSettings['subject_length']),
 		'preview' => $row['body'],
 		'time' => standardTime($row['poster_time']),
 		'html_time' => htmlTime($row['poster_time']),
@@ -1532,7 +1532,7 @@ function lastPost()
  *
  * @package Posts
  * @param boolean $editing
- * @param int $topic
+ * @param int|null|false $topic
  * @param string $first_subject
  */
 function getFormMsgSubject($editing, $topic, $first_subject = '')

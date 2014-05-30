@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -37,7 +37,7 @@ function template_editBuddies()
 		</h2>
 		<table class="table_grid">
 			<tr class="table_head">
-				<th scope="col" style="width:20%">', $txt['name'], '</th>
+				<th scope="col" style="width: 20%;">', $txt['name'], '</th>
 				<th scope="col">', $txt['status'], '</th>';
 
 	if ($context['can_send_email'])
@@ -147,7 +147,7 @@ function template_editIgnoreList()
 		</h2>
 		<table class="table_grid">
 			<tr class="table_head">
-				<th scope="col" style="width:20%">', $txt['name'], '</th>
+				<th scope="col" style="width: 20%;">', $txt['name'], '</th>
 				<th scope="col">', $txt['status'], '</th>';
 
 	if ($context['can_send_email'])
@@ -867,7 +867,7 @@ function template_groupMembership()
 
 			if ($context['can_edit_primary'])
 				echo '
-						<td style="width:4%">
+						<td style="width: 4%;">
 							<input type="radio" name="primary" id="primary_', $group['id'], '" value="', $group['id'], '" ', $group['is_primary'] ? 'checked="checked" ' : '', $group['can_be_primary'] ? '' : 'disabled="disabled" ', ' class="input_radio" />
 						</td>';
 
@@ -875,7 +875,7 @@ function template_groupMembership()
 						<td>
 							<label for="primary_', $group['id'], '"><strong>', (empty($group['color']) ? $group['name'] : '<span style="color: ' . $group['color'] . '">' . $group['name'] . '</span>'), '</strong>', (!empty($group['desc']) ? '<br /><span class="smalltext">' . $group['desc'] . '</span>' : ''), '</label>
 						</td>
-						<td style="width:15%" class="righttext">';
+						<td style="width: 15%" class="righttext">';
 
 			// Can they leave their group?
 			if ($group['can_leave'])

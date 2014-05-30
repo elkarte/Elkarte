@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -82,6 +82,7 @@ class Attachment_Controller extends Action_Controller
 		{
 			loadLanguage('Post');
 
+			require_once(SOURCEDIR . '/AttachmentErrorContext.class.php');
 			$attach_errors = Attachment_Error_Context::context();
 			$attach_errors->activate();
 

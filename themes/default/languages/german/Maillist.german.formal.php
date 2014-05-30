@@ -240,7 +240,7 @@ $txt['digest_unread_reply_link'] = "\n\n     <*> Sie können ungelesene Antworte
 $txt['message_attachments'] = '<*> Diese Nachricht enthält %d Verknüpfungen mit Bildern/Dateien.' . "\n" . '<*> Um Sie anzusehen, folgen Sie bitte diesem Verweis: %s';
 
 // Help
-$txt['maillist_help'] = 'Für Hilfe bei der Einrichtung dieser Funktionen besuchen Sie bitte den maillist-Bereich im <a href="https://github.com/elkarte/Elkarte/wiki/Maillist-Feature">ElkArte-Wiki</a>';
+$txt['maillist_help'] = 'Für Hilfe bei der Einrichtung dieser Funktionen besuchen Sie bitte den maillist-Bereich im <a href="https://github.com/elkarte/Elkarte/wiki/Maillist-Feature" target="_blank" class="new_win">ElkArte-Wiki</a>';
 
 // Email bounce templates
 $txt['ml_bounce_templates_title'] = 'Eigene Abweisungs-E-Mail-Vorlagen';

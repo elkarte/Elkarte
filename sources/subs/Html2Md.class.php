@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -17,7 +17,7 @@ if (!defined('ELK'))
 /**
  * Converts HTML to Markdown text
  */
-class Convert_Md
+class Html_2_Md
 {
 	/**
 	 * The value that will hold our dom object

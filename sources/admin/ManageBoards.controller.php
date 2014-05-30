@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -52,7 +52,7 @@ class ManageBoards_Controller extends Action_Controller
 		loadLanguage('ManageBoards');
 
 		// We're working with them settings here.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Format: 'sub-action' => array('controller', 'function', 'permission'=>'need')
 		$subActions = array(

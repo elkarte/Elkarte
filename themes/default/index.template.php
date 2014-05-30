@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -225,7 +225,6 @@ function template_body_above()
 	{
 		echo '
 			<div id="top_section_notice" class="user">
-				<script src="', $settings['default_theme_url'], '/scripts/sha256.js"></script>
 				<form action="', $scripturl, '?action=login2;quicklogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', '>
 					<div id="password_login">
 						<input type="text" name="user" size="10" class="input_text" placeholder="', $txt['username'], '" />

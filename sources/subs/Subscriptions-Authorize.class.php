@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Payment Gateway: authorize
+ * Payment Gateway: Authorize
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -23,7 +23,7 @@ if (!defined('ELK'))
  *
  * @package Subscriptions
  */
-class authorize_display
+class Authorize_Display
 {
 	/**
 	 * Title of this payment gateway
@@ -125,7 +125,7 @@ class authorize_display
  *
  * @package Subscriptions
  */
-class authorize_payment
+class Authorize_Payment
 {
 	/**
 	 * Validates that we have valid data to work with

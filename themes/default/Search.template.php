@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -59,7 +59,7 @@ function template_searchform()
 	// Does the search require a visual verification screen to annoy them?
 	if ($context['require_verification'])
 	{
-			template_control_verification($context['visual_verification_id'], '
+			template_verification_controls($context['visual_verification_id'], '
 						<div class="verification">
 							<strong>' . $txt['search_visual_verification_label'] . ':</strong>
 							<br />', '
@@ -342,11 +342,11 @@ function template_results()
 				{
 					if ($topic['quick_mod']['remove'])
 						echo '
-							<a href="', $scripturl, '?action=quickmod;actions%5B', $topic['id'], '%5D=remove;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');"><img src="', $settings['images_url'], '/icons/quick_remove.png" style="width:16px" alt="', $txt['remove_topic'], '" title="', $txt['remove_topic'], '" /></a>';
+							<a href="', $scripturl, '?action=quickmod;actions%5B', $topic['id'], '%5D=remove;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');"><img src="', $settings['images_url'], '/icons/quick_remove.png" style="width: 16px;" alt="', $txt['remove_topic'], '" title="', $txt['remove_topic'], '" /></a>';
 
 					if ($topic['quick_mod']['lock'])
 						echo '
-							<a href="', $scripturl, '?action=quickmod;actions%5B', $topic['id'], '%5D=lock;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');"><img src="', $settings['images_url'], '/icons/quick_lock.png" style="width:16px" alt="', $txt['set_lock'], '" title="', $txt['set_lock'], '" /></a>';
+							<a href="', $scripturl, '?action=quickmod;actions%5B', $topic['id'], '%5D=lock;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');"><img src="', $settings['images_url'], '/icons/quick_lock.png" style="width: 16px;" alt="', $txt['set_lock'], '" title="', $txt['set_lock'], '" /></a>';
 
 					if ($topic['quick_mod']['lock'] || $topic['quick_mod']['remove'])
 						echo '
@@ -354,11 +354,11 @@ function template_results()
 
 					if ($topic['quick_mod']['sticky'])
 						echo '
-							<a href="', $scripturl, '?action=quickmod;actions%5B', $topic['id'], '%5D=sticky;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');"><img src="', $settings['images_url'], '/icons/quick_sticky.png" style="width:16px" alt="', $txt['set_sticky'], '" title="', $txt['set_sticky'], '" /></a>';
+							<a href="', $scripturl, '?action=quickmod;actions%5B', $topic['id'], '%5D=sticky;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');"><img src="', $settings['images_url'], '/icons/quick_sticky.png" style="width: 16px;" alt="', $txt['set_sticky'], '" title="', $txt['set_sticky'], '" /></a>';
 
 					if ($topic['quick_mod']['move'])
 						echo '
-							<a href="', $scripturl, '?action=movetopic;topic=', $topic['id'], '.0"><img src="', $settings['images_url'], '/icons/quick_move.png" style="width:16px" alt="', $txt['move_topic'], '" title="', $txt['move_topic'], '" /></a>';
+							<a href="', $scripturl, '?action=movetopic;topic=', $topic['id'], '.0"><img src="', $settings['images_url'], '/icons/quick_move.png" style="width: 16px;" alt="', $txt['move_topic'], '" title="', $txt['move_topic'], '" /></a>';
 				}
 
 				echo '
@@ -381,7 +381,7 @@ function template_results()
 	if (!empty($context['topics']) && !empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
 	{
 		echo '
-				<div class="flow_auto floatright">
+				<div class="search_controls floatright">
 					<div class="additional_row">
 						<select class="qaction" name="qaction"', $context['can_move'] ? ' onchange="this.form.move_to.disabled = (this.options[this.selectedIndex].value != \'move\');"' : '', '>
 							<option value="">&nbsp;</option>';

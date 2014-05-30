@@ -11,11 +11,11 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
-define('CURRENT_VERSION', '1.0 Beta 2');
+define('CURRENT_VERSION', '1.0 RC 1');
 define('DB_SCRIPT_VERSION', '1-0');
 
 $GLOBALS['required_php_version'] = '5.2.0';
@@ -1455,7 +1455,7 @@ function action_deleteInstall()
 		// The variable is usually defined in index.php so lets just use our variable to do it for us.
 		$forum_version = $current_version;
 		// Now go get those files!
-		$task = new ScheduledTask();
+		$task = new Scheduled_Task();
 		$task->fetchFiles();
 		// We've just installed!
 		$user_info['ip'] = $_SERVER['REMOTE_ADDR'];
@@ -1484,22 +1484,64 @@ function action_deleteInstall()
  */
 class Ftp_Connection
 {
-	var $connection = 'no_connection', $error = false, $last_message, $pasv = array();
+	/**
+	 * holds the connection response
+	 * @var resource
+	 */
+	public $connection;
 
-	// Create a new FTP connection...
-	function ftp_connection($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@yourdomain.org')
+	/**
+	 * holds any errors
+	 * @var string|boolean
+	 */
+	public $error;
+
+	/**
+	 * holds last message from the server
+	 * @var string
+	 */
+	public $last_message;
+
+	/**
+	 * Passive connection
+	 * @var mixed[]
+	 */
+	public $pasv;
+
+	/**
+	 * Create a new FTP connection...
+	 *
+	 * @param string $ftp_server
+	 * @param int $ftp_port
+	 * @param string $ftp_user
+	 * @param string $ftp_pass
+	 */
+	public function __construct($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@yourdomain.org')
 	{
+		// Initialize variables.
+		$this->connection = 'no_connection';
+		$this->error = false;
+		$this->pasv = array();
+
 		if ($ftp_server !== null)
 			$this->connect($ftp_server, $ftp_port, $ftp_user, $ftp_pass);
 	}
 
-	function connect($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@yourdomain.org')
+	/**
+	 * Connects to a server
+	 *
+	 * @param string $ftp_server
+	 * @param int $ftp_port
+	 * @param string $ftp_user
+	 * @param string $ftp_pass
+	 */
+	public function connect($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@yourdomain.org')
 	{
-		if (substr($ftp_server, 0, 6) == 'ftp://')
+		if (strpos($ftp_server, 'ftp://') === 0)
 			$ftp_server = substr($ftp_server, 6);
-		elseif (substr($ftp_server, 0, 7) == 'ftps://')
+		elseif (strpos($ftp_server, 'ftps://') === 0)
 			$ftp_server = 'ssl://' . substr($ftp_server, 7);
-		if (substr($ftp_server, 0, 7) == 'http://')
+		if (strpos($ftp_server, 'http://') === 0)
 			$ftp_server = substr($ftp_server, 7);
 		$ftp_server = strtr($ftp_server, array('/' => '', ':' => '', '@' => ''));
 
@@ -1535,13 +1577,19 @@ class Ftp_Connection
 		}
 	}
 
-	function chdir($ftp_path)
+	/**
+	 * Changes to a directory (chdir) via the ftp connection
+	 *
+	 * @param string $ftp_path
+	 * @return boolean
+	 */
+	public function chdir($ftp_path)
 	{
 		if (!is_resource($this->connection))
 			return false;
 
 		// No slash on the end, please...
-		if (substr($ftp_path, -1) == '/')
+		if ($ftp_path !== '/' && substr($ftp_path, -1) === '/')
 			$ftp_path = substr($ftp_path, 0, -1);
 
 		fwrite($this->connection, 'CWD ' . $ftp_path . "\r\n");
@@ -1554,12 +1602,22 @@ class Ftp_Connection
 		return true;
 	}
 
-	function chmod($ftp_file, $chmod)
+	/**
+	 * Changes a files atrributes (chmod)
+	 *
+	 * @param string $ftp_file
+	 * @param int $chmod
+	 * @return boolean
+	 */
+	public function chmod($ftp_file, $chmod)
 	{
 		if (!is_resource($this->connection))
 			return false;
 
-		// Convert the chmod value from octal (0777) to text ("777")
+		if ($ftp_file == '')
+			$ftp_file = '.';
+
+		// Convert the chmod value from octal (0777) to text ("777").
 		fwrite($this->connection, 'SITE CHMOD ' . decoct($chmod) . ' ' . $ftp_file . "\r\n");
 		if (!$this->check_response(200))
 		{
@@ -1570,7 +1628,13 @@ class Ftp_Connection
 		return true;
 	}
 
-	function unlink($ftp_file)
+	/**
+	 * Deletes a file
+	 *
+	 * @param string $ftp_file
+	 * @return boolean
+	 */
+	public function unlink($ftp_file)
 	{
 		// We are actually connected, right?
 		if (!is_resource($this->connection))
@@ -1593,33 +1657,43 @@ class Ftp_Connection
 		return true;
 	}
 
-	function check_response($desired)
+	/**
+	 * Reads the response to the command from the server
+	 *
+	 * @param string[]|string $desired string or array of acceptable return values
+	 */
+	public function check_response($desired)
 	{
 		// Wait for a response that isn't continued with -, but don't wait too long.
 		$time = time();
 		do
 			$this->last_message = fgets($this->connection, 1024);
-		while (substr($this->last_message, 3, 1) != ' ' && time() - $time < 5);
+		while ((strlen($this->last_message) < 4 || strpos($this->last_message, ' ') === 0 || strpos($this->last_message, ' ', 3) !== 3) && time() - $time < 5);
 
 		// Was the desired response returned?
 		return is_array($desired) ? in_array(substr($this->last_message, 0, 3), $desired) : substr($this->last_message, 0, 3) == $desired;
 	}
 
-	function passive()
+	/**
+	 * Used to create a passive connection
+	 *
+	 * @return boolean
+	 */
+	public function passive()
 	{
 		// We can't create a passive data connection without a primary one first being there.
 		if (!is_resource($this->connection))
 			return false;
 
 		// Request a passive connection - this means, we'll talk to you, you don't talk to us.
-		@fwrite($this->connection, "PASV\r\n");
+		@fwrite($this->connection, 'PASV' . "\r\n");
 		$time = time();
 		do
 			$response = fgets($this->connection, 1024);
-		while (substr($response, 3, 1) != ' ' && time() - $time < 5);
+		while (substr($response, 3, 1) !== ' ' && time() - $time < 5);
 
 		// If it's not 227, we weren't given an IP and port, which means it failed.
-		if (substr($response, 0, 4) != '227 ')
+		if (strpos($response, '227 ') !== 0)
 		{
 			$this->error = 'bad_response';
 			return false;
@@ -1632,13 +1706,19 @@ class Ftp_Connection
 			return false;
 		}
 
-		// This is pretty simple - store it for later use ;)
+		// This is pretty simple - store it for later use ;).
 		$this->pasv = array('ip' => $match[1] . '.' . $match[2] . '.' . $match[3] . '.' . $match[4], 'port' => $match[5] * 256 + $match[6]);
 
 		return true;
 	}
 
-	function create_file($ftp_file)
+	/**
+	 * Creates a new file on the server
+	 *
+	 * @param string $ftp_file
+	 * @return boolean
+	 */
+	public function create_file($ftp_file)
 	{
 		// First, we have to be connected... very important.
 		if (!is_resource($this->connection))
@@ -1671,7 +1751,14 @@ class Ftp_Connection
 		return true;
 	}
 
-	function list_dir($ftp_path = '', $search = false)
+	/**
+	 * Generates a direcotry listing for the current directory
+	 *
+	 * @param string $ftp_path
+	 * @param string|boolean $search
+	 * @return false|string
+	 */
+	public function list_dir($ftp_path = '', $search = false)
 	{
 		// Are we even connected...?
 		if (!is_resource($this->connection))
@@ -1709,17 +1796,24 @@ class Ftp_Connection
 		return $data;
 	}
 
-	function locate($file, $listing = null)
+	/**
+	 * Determins the current dirctory we are in
+	 *
+	 * @param string $file
+	 * @param string|null $listing
+	 * @return string|false
+	 */
+	public function locate($file, $listing = null)
 	{
 		if ($listing === null)
 			$listing = $this->list_dir('', true);
 		$listing = explode("\n", $listing);
 
-		@fwrite($this->connection, "PWD\r\n");
+		@fwrite($this->connection, 'PWD' . "\r\n");
 		$time = time();
 		do
 			$response = fgets($this->connection, 1024);
-		while (substr($response, 3, 1) != ' ' && time() - $time < 5);
+		while (substr($response, 3, 1) !== ' ' && time() - $time < 5);
 
 		// Check for 257!
 		if (preg_match('~^257 "(.+?)" ~', $response, $match) != 0)
@@ -1738,7 +1832,7 @@ class Ftp_Connection
 			// Okay, this file's name is:
 			$listing[$i] = $current_dir . '/' . trim(strlen($listing[$i]) > 30 ? strrchr($listing[$i], ' ') : $listing[$i]);
 
-			if (substr($file, 0, 1) == '*' && substr($listing[$i], -(strlen($file) - 1)) == substr($file, 1))
+			if ($file[0] == '*' && substr($listing[$i], -(strlen($file) - 1)) == substr($file, 1))
 				return $listing[$i];
 			if (substr($file, -1) == '*' && substr($listing[$i], 0, strlen($file) - 1) == substr($file, 0, -1))
 				return $listing[$i];
@@ -1749,7 +1843,13 @@ class Ftp_Connection
 		return false;
 	}
 
-	function create_dir($ftp_dir)
+	/**
+	 * Creates a new directory on the server
+	 *
+	 * @param string $ftp_dir
+	 * @return boolean
+	 */
+	public function create_dir($ftp_dir)
 	{
 		// We must be connected to the server to do something.
 		if (!is_resource($this->connection))
@@ -1766,7 +1866,14 @@ class Ftp_Connection
 		return true;
 	}
 
-	function detect_path($filesystem_path, $lookup_file = null)
+	/**
+	 * Detects the current path
+	 *
+	 * @param string $filesystem_path
+	 * @param string|null $lookup_file
+	 * @return string[] $username, $path, found_path
+	 */
+	public function detect_path($filesystem_path, $lookup_file = null)
 	{
 		$username = '';
 
@@ -1784,7 +1891,7 @@ class Ftp_Connection
 				if (strlen(dirname($_SERVER['PHP_SELF'])) > 1)
 					$path .= dirname($_SERVER['PHP_SELF']);
 			}
-			elseif (substr($filesystem_path, 0, 9) == '/var/www/')
+			elseif (strpos($filesystem_path, '/var/www/') === 0)
 				$path = substr($filesystem_path, 8);
 			else
 				$path = strtr(strtr($filesystem_path, array('\\' => '/')), array($_SERVER['DOCUMENT_ROOT'] => ''));
@@ -1811,10 +1918,15 @@ class Ftp_Connection
 		return array($username, $path, isset($found_path));
 	}
 
-	function close()
+	/**
+	 * Close the ftp connection
+	 *
+	 * @return boolean
+	 */
+	public function close()
 	{
 		// Goodbye!
-		fwrite($this->connection, "QUIT\r\n");
+		fwrite($this->connection, 'QUIT' . "\r\n");
 		fclose($this->connection);
 
 		return true;
@@ -1967,7 +2079,7 @@ function definePaths()
 	// Make sure the paths are correct... at least try to fix them.
 	if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt'))
 		$boarddir = dirname(__FILE__);
-	if (!file_exists($sourcedir . '/Dispatcher.class.php') && file_exists($boarddir . '/sources'))
+	if (!file_exists($sourcedir . '/SiteDispatcher.class.php') && file_exists($boarddir . '/sources'))
 		$sourcedir = $boarddir . '/sources';
 
 	// Check that directories which didn't exist in past releases are initialized.
@@ -2062,9 +2174,9 @@ function template_install_above()
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="robots" content="noindex" />
 		<title>', $txt['installer'], '</title>
-		<link rel="stylesheet" href="themes/default/css/index.css?beta10" />
-		<link rel="stylesheet" href="themes/default/css/_light/index_light.css?beta10" />
-		<link rel="stylesheet" href="themes/default/css/install.css?beta10" />
+		<link rel="stylesheet" href="themes/default/css/index.css?10RC1" />
+		<link rel="stylesheet" href="themes/default/css/_light/index_light.css?10RC1" />
+		<link rel="stylesheet" href="themes/default/css/install.css?10RC1" />
 		<script src="themes/default/scripts/script.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" id="jquery"></script>
 		<script><!-- // --><![CDATA[
@@ -2306,26 +2418,26 @@ function template_chmod_files()
 		<form action="', $incontext['form_url'], '" method="post">
 			<table style="width: 520px; margin: 1em 0; border-collapse:collapse; border-spacing: 0; padding: 0">
 				<tr>
-					<td style="width:26%; vertical-align:top" class="textbox"><label for="ftp_server">', $txt['ftp_server'], ':</label></td>
+					<td style="width: 26%; vertical-align: top;" class="textbox"><label for="ftp_server">', $txt['ftp_server'], ':</label></td>
 					<td>
 						<div style="float: ', empty($txt['lang_rtl']) ? 'right' : 'left', '; margin-', empty($txt['lang_rtl']) ? 'right' : 'left', ': 1px;"><label for="ftp_port" class="textbox"><strong>', $txt['ftp_port'], ':&nbsp;</strong></label> <input type="text" size="3" name="ftp_port" id="ftp_port" value="', $incontext['ftp']['port'], '" class="input_text" /></div>
 						<input type="text" size="30" name="ftp_server" id="ftp_server" value="', $incontext['ftp']['server'], '" style="width: 70%;" class="input_text" />
 						<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['ftp_server_info'], '</div>
 					</td>
 				</tr><tr>
-					<td style="width:26%; vertical-align:top" class="textbox"><label for="ftp_username">', $txt['ftp_username'], ':</label></td>
+					<td style="width: 26%; vertical-align: top;" class="textbox"><label for="ftp_username">', $txt['ftp_username'], ':</label></td>
 					<td>
 						<input type="text" size="50" name="ftp_username" id="ftp_username" value="', $incontext['ftp']['username'], '" style="width: 99%;" class="input_text" />
 						<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['ftp_username_info'], '</div>
 					</td>
 				</tr><tr>
-					<td style="width:26%; vertical-align:top" class="textbox"><label for="ftp_password">', $txt['ftp_password'], ':</label></td>
+					<td style="width: 26%; vertical-align: top;" class="textbox"><label for="ftp_password">', $txt['ftp_password'], ':</label></td>
 					<td>
 						<input type="password" size="50" name="ftp_password" id="ftp_password" style="width: 99%;" class="input_password" />
 						<div style="font-size: smaller; margin-bottom: 3ex;">', $txt['ftp_password_info'], '</div>
 					</td>
 				</tr><tr>
-					<td style="width:26%; vertical-align:top" class="textbox"><label for="ftp_path">', $txt['ftp_path'], ':</label></td>
+					<td style="width: 26%; vertical-align: top;" class="textbox"><label for="ftp_path">', $txt['ftp_path'], ':</label></td>
 					<td style="padding-bottom: 1ex;">
 						<input type="text" size="50" name="ftp_path" id="ftp_path" value="', $incontext['ftp']['path'], '" style="width: 99%;" class="input_text" />
 						<div style="font-size: smaller; margin-bottom: 2ex;">', $incontext['ftp']['path_msg'], '</div>
@@ -2358,7 +2470,7 @@ function template_database_settings()
 	{
 		echo '
 			<tr>
-				<td style="width:20%; vertical-align:top" class="textbox"><label for="db_type_input">', $txt['db_settings_type'], ':</label></td>
+				<td style="width: 20%; vertical-align: top;" class="textbox"><label for="db_type_input">', $txt['db_settings_type'], ':</label></td>
 				<td>
 					<select name="db_type" id="db_type_input" onchange="toggleDBInput();">';
 
@@ -2384,25 +2496,25 @@ function template_database_settings()
 
 	echo '
 			<tr id="db_server_contain">
-				<td style="width:20%; vertical-align:top" class="textbox"><label for="db_server_input">', $txt['db_settings_server'], ':</label></td>
+				<td style="width: 20%; vertical-align: top;" class="textbox"><label for="db_server_input">', $txt['db_settings_server'], ':</label></td>
 				<td>
 					<input type="text" name="db_server" id="db_server_input" value="', $incontext['db']['server'], '" size="30" class="input_text" /><br />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['db_settings_server_info'], '</div>
 				</td>
 			</tr><tr id="db_user_contain">
-				<td style="vertical-align:top" class="textbox"><label for="db_user_input">', $txt['db_settings_username'], ':</label></td>
+				<td style="vertical-align: top;" class="textbox"><label for="db_user_input">', $txt['db_settings_username'], ':</label></td>
 				<td>
 					<input type="text" name="db_user" id="db_user_input" value="', $incontext['db']['user'], '" size="30" class="input_text" /><br />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['db_settings_username_info'], '</div>
 				</td>
 			</tr><tr id="db_passwd_contain">
-				<td style="vertical-align:top" class="textbox"><label for="db_passwd_input">', $txt['db_settings_password'], ':</label></td>
+				<td style="vertical-align: top;" class="textbox"><label for="db_passwd_input">', $txt['db_settings_password'], ':</label></td>
 				<td>
 					<input type="password" name="db_passwd" id="db_passwd_input" value="', $incontext['db']['pass'], '" size="30" class="input_password" /><br />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['db_settings_password_info'], '</div>
 				</td>
 			</tr><tr id="db_name_contain">
-				<td style="vertical-align:top" class="textbox"><label for="db_name_input">', $txt['db_settings_database'], ':</label></td>
+				<td style="vertical-align: top;" class="textbox"><label for="db_name_input">', $txt['db_settings_database'], ':</label></td>
 				<td>
 					<input type="text" name="db_name" id="db_name_input" value="', empty($incontext['db']['name']) ? 'elkarte' : $incontext['db']['name'], '" size="30" class="input_text" /><br />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['db_settings_database_info'], '
@@ -2410,7 +2522,7 @@ function template_database_settings()
 				</td>
 			</tr>
 			</tr><tr>
-				<td style="vertical-align:top" class="textbox"><label for="db_prefix_input">', $txt['db_settings_prefix'], ':</label></td>
+				<td style="vertical-align: top;" class="textbox"><label for="db_prefix_input">', $txt['db_settings_prefix'], ':</label></td>
 				<td>
 					<input type="text" name="db_prefix" id="db_prefix_input" value="', $incontext['db']['prefix'], '" size="30" class="input_text" /><br />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['db_settings_prefix_info'], '</div>
@@ -2450,28 +2562,28 @@ function template_forum_settings()
 	echo '
 		<table style="width: 100%; margin: 1em 0; border-collapse:collapse; border-spacing: 0; padding: 0;">
 			<tr>
-				<td style="width:20%; vertical-align:top" class="textbox"><label for="mbname_input">', $txt['install_settings_name'], ':</label></td>
+				<td style="width: 20%; vertical-align: top;" class="textbox"><label for="mbname_input">', $txt['install_settings_name'], ':</label></td>
 				<td>
 					<input type="text" name="mbname" id="mbname_input" value="', $txt['install_settings_name_default'], '" size="65" class="input_text" />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['install_settings_name_info'], '</div>
 				</td>
 			</tr>
 			<tr>
-				<td style="vertical-align:top" class="textbox"><label for="boardurl_input">', $txt['install_settings_url'], ':</label></td>
+				<td style="vertical-align: top;" class="textbox"><label for="boardurl_input">', $txt['install_settings_url'], ':</label></td>
 				<td>
 					<input type="text" name="boardurl" id="boardurl_input" value="', $incontext['detected_url'], '" size="65" class="input_text" /><br />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['install_settings_url_info'], '</div>
 				</td>
 			</tr>
 			<tr>
-				<td style="vertical-align:top" class="textbox">', $txt['install_settings_compress'], ':</td>
+				<td style="vertical-align: top;" class="textbox">', $txt['install_settings_compress'], ':</td>
 				<td>
 					<input type="checkbox" name="compress" id="compress_check" checked="checked" class="input_check" /> <label for="compress_check">', $txt['install_settings_compress_title'], '</label><br />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['install_settings_compress_info'], '</div>
 				</td>
 			</tr>
 			<tr>
-				<td style="vertical-align:top" class="textbox">', $txt['install_settings_dbsession'], ':</td>
+				<td style="vertical-align: top;" class="textbox">', $txt['install_settings_dbsession'], ':</td>
 				<td>
 					<input type="checkbox" name="dbsession" id="dbsession_check" checked="checked" class="input_check" /> <label for="dbsession_check">', $txt['install_settings_dbsession_title'], '</label><br />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $incontext['test_dbsession'] ? $txt['install_settings_dbsession_info1'] : $txt['install_settings_dbsession_info2'], '</div>
@@ -2539,25 +2651,25 @@ function template_admin_account()
 	echo '
 		<table style="width: 100%; margin: 2em 0; border-collapse:collapse; border-spacing: 0; padding: 0">
 			<tr>
-				<td style="width:18%; vertical-align:top" class="textbox"><label for="username">', $txt['user_settings_username'], ':</label></td>
+				<td style="width: 18%; vertical-align: top;" class="textbox"><label for="username">', $txt['user_settings_username'], ':</label></td>
 				<td>
 					<input type="text" name="username" id="username" value="', $incontext['username'], '" size="40" class="input_text" />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['user_settings_username_info'], '</div>
 				</td>
 			</tr><tr>
-				<td style="vertical-align:top" class="textbox"><label for="password1">', $txt['user_settings_password'], ':</label></td>
+				<td style="vertical-align: top;" class="textbox"><label for="password1">', $txt['user_settings_password'], ':</label></td>
 				<td>
 					<input type="password" name="password1" id="password1" size="40" class="input_password" />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['user_settings_password_info'], '</div>
 				</td>
 			</tr><tr>
-				<td style="vertical-align:top" class="textbox"><label for="password2">', $txt['user_settings_again'], ':</label></td>
+				<td style="vertical-align: top;" class="textbox"><label for="password2">', $txt['user_settings_again'], ':</label></td>
 				<td>
 					<input type="password" name="password2" id="password2" size="40" class="input_password" />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['user_settings_again_info'], '</div>
 				</td>
 			</tr><tr>
-				<td style="vertical-align:top" class="textbox"><label for="email">', $txt['user_settings_email'], ':</label></td>
+				<td style="vertical-align: top;" class="textbox"><label for="email">', $txt['user_settings_email'], ':</label></td>
 				<td>
 					<input type="text" name="email" id="email" value="', $incontext['email'], '" size="40" class="input_text" />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['user_settings_email_info'], '</div>

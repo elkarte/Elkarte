@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -639,7 +639,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 		ORDER BY {raw:sort}',
 		array(
 			'current_member' => $user_id,
-			'min_posts' => ($membergroup_type === 'post_count' ? '!= ' : '= ') . -1,
+			'min_posts' => ($membergroup_type === 'post_count' ? '!= -1' : '= -1'),
 			'mod_group' => 3,
 			'is_protected' => 1,
 			'sort' => $sort,

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Payment Gateway: paypal
+ * Payment Gateway: PayPal
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -23,7 +23,7 @@ if (!defined('ELK'))
  *
  * @package Subscriptions
  */
-class paypal_display
+class PayPal_Display
 {
 	/**
 	 * Name of this payment gateway
@@ -138,7 +138,7 @@ class paypal_display
  *
  * @package Subscriptions
  */
-class paypal_payment
+class PayPal_Payment
 {
 	/**
 	 * Holds the IPN response data

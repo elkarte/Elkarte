@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -53,7 +53,7 @@ function template_messages_informations_above()
 				<span class="nextlinks">',
 					!empty($context['links']['go_prev']) ? '<a href="' . $context['links']['go_prev'] . '">' . $txt['previous_next_back'] . '</a>' : '',
 					!empty($context['links']['go_next']) ? ' - <a href="' . $context['links']['go_next'] . '">' . $txt['previous_next_forward'] . '</a>' : '',
-					!empty($context['links']['derived_from']) ? ' - <a href="' . $context['links']['derived_from'] . '">' . sprintf($txt['topic_derived_from'], '<em>' . shorten_text($context['topic_derived_from']['subject'], !empty($modSettings['subject_length']) ? $modSettings['subject_length'] : 24)) . '</em></a>' : '',
+					!empty($context['links']['derived_from']) ? ' - <a href="' . $context['links']['derived_from'] . '">' . sprintf($txt['topic_derived_from'], '<em>' . shorten_text($context['topic_derived_from']['subject'], $modSettings['subject_length'])) . '</em></a>' : '',
 				'</span>
 			</h2>';
 
@@ -419,7 +419,7 @@ function template_quickreply_below()
 
 		// Is visual verification enabled?
 		if ($context['require_verification'])
-			template_control_verification($context['visual_verification_id'], '
+			template_verification_controls($context['visual_verification_id'], '
 							<strong>' . $txt['verification'] . ':</strong>', '<br />');
 
 		// Using the full editor or a plain text box?
@@ -578,7 +578,7 @@ function template_quickreply_below()
 					bShowModify: ', $settings['show_modify'] ? 'true' : 'false', ',
 					iTopicId: ', $context['current_topic'], ',
 					sTemplateBodyEdit: ', JavaScriptEscape('
-						<div id="quick_edit_body_container" style="width: 90%">
+						<div id="quick_edit_body_container" style="width: 90%;">
 							<div id="error_box" class="errorbox" style="display:none;"></div>
 							<textarea class="editor" name="message" rows="12" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 100%; min-width: 100%' : 'width: 100%') . '; margin-bottom: 10px;" tabindex="' . $context['tabindex']++ . '">%body%</textarea><br />
 							<input type="hidden" name="\' + elk_session_var + \'" value="\' + elk_session_id + \'" />
@@ -851,7 +851,7 @@ function template_display_attachments($message, $ignoring)
 											<a href="', $attachment['href'], ';image" id="link_', $attachment['id'], '" onclick="', $attachment['thumbnail']['javascript'], '"><img src="', $attachment['thumbnail']['href'], '" alt="" id="thumb_', $attachment['id'], '" /></a>';
 			else
 				echo '
-											<img src="' . $attachment['href'] . ';image" alt="" style="width:' . $attachment['width'] . 'px; height:' . $attachment['height'] . 'px"/>';
+											<img src="' . $attachment['href'] . ';image" alt="" style="width:' . $attachment['width'] . 'px; height:' . $attachment['height'] . 'px;"/>';
 
 			echo '
 										</div>';

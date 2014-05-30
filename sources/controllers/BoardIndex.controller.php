@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -59,7 +59,7 @@ class BoardIndex_Controller extends Action_Controller
 			$context['robot_no_index'] = true;
 
 		// Retrieve the categories and boards.
-		require_once(SUBSDIR . '/BoardIndex.subs.php');
+		require_once(SUBSDIR . '/BoardsList.class.php');
 		$boardIndexOptions = array(
 			'include_categories' => true,
 			'base_level' => 0,
@@ -67,7 +67,9 @@ class BoardIndex_Controller extends Action_Controller
 			'set_latest_post' => true,
 			'countChildPosts' => !empty($modSettings['countChildPosts']),
 		);
-		$context['categories'] = getBoardIndex($boardIndexOptions);
+		$boardlist = new Boards_List($boardIndexOptions);
+		$context['categories'] = $boardlist->getBoards();
+		$context['latest_post'] = $boardlist->getLatestPost();
 
 		// Get the user online list.
 		require_once(SUBSDIR . '/MembersOnline.subs.php');

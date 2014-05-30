@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -135,7 +135,7 @@ class ManageSmileys_Controller extends Action_Controller
 		$config_vars = $this->_smileySettings->settings();
 
 		// For the basics of the settings.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 		require_once(SUBSDIR . '/Smileys.subs.php');
 		$context['sub_template'] = 'show_settings';
 
@@ -176,7 +176,7 @@ class ManageSmileys_Controller extends Action_Controller
 	private function _initSmileySettingsForm()
 	{
 		// This is really quite wanting.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Instantiate the form
 		$this->_smileySettings = new Settings_Form();
@@ -510,7 +510,7 @@ class ManageSmileys_Controller extends Action_Controller
 			),
 		);
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 	}
 
@@ -1054,7 +1054,7 @@ class ManageSmileys_Controller extends Action_Controller
 					}',
 			);
 
-			require_once(SUBSDIR . '/List.class.php');
+			require_once(SUBSDIR . '/GenericList.class.php');
 			createList($listOptions);
 
 			// The list is the only thing to show, so make it the main template.
@@ -1324,7 +1324,7 @@ class ManageSmileys_Controller extends Action_Controller
 			',
 		);
 
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		// If we're adding/editing an icon we'll need a list of boards
