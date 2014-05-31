@@ -577,7 +577,7 @@ $helptxt['posts_and_topics'] = '
 			Ändern Sie themenbezogene Einstellungen; die Anzahl an Themen pro Seite, ob angeheftete Themen aktiviert sind oder nicht, die Anzahl an Beiträgen, die nötig sind, damit ein Thema heiß wird, und so weiter.
 		</li>
 	</ul>';
-
+$helptxt['allow_no_censored'] = 'Wenn aktiviert, erlaubt diese globale Einstellung Ihren Mitgliedern, die Wortzensur in ihrem Benutzerprofil über die Designeinstellungen abzuschalten. Ihre Fähigkeit, die Wortzensur zu deaktivieren, wird weiterhin über ihr Befugnisprofil beschränkt.';
 $helptxt['spider_mode'] = 'Legt die Protokollierungsstufe fest.<br />
 Standard - Protokolliert minimale Suchmaschinenaktivität.<br />
 Moderat - Stellt genauere Statistiken zur Verfügung.<br />
