@@ -880,7 +880,7 @@ function pbe_find_board_number($email_address)
  */
 function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 {
-	global $txt, $context;
+	global $context;
 
 	loadLanguage('Maillist');
 
@@ -900,7 +900,8 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 
 	// Convert bbc [quotes] before we go to parsebbc so they are easier to plain-textify later
 	$message = preg_replace_callback('~(\[quote)\s?author=(.*)\s?link=(.*)\s?date=([0-9]{10})(\])~sU', 'quote_callback', $message);
-	$message = preg_replace('~(\[quote\s?\])~sU', '<blockquote>', $message);
+	$message = preg_replace_callback('~(\[quote)\s?author=(.*)\s?date=([0-9]{10})\s?link=(.*)(\])~sU', 'quote_callback_2', $message);
+	$message = preg_replace('~(\[quote\s?\])~sU', "\n" . '<blockquote>', $message);
 	$message = str_replace('[/quote]', "</blockquote>\n\n", $message);
 
 	// Prevent img tags from getting linked
@@ -977,7 +978,23 @@ function quote_callback($matches)
 {
 	global $txt;
 
-	return '<blockquote>' . $txt['email_on'] . ': ' . date('D M j, Y', $matches[4]) . ' ' . $matches[2] . ' ' . $txt['email_wrote'] . ':';
+	return "\n" . '<blockquote>' . $txt['email_on'] . ': ' . date('D M j, Y', $matches[4]) . ' ' . $matches[2] . ' ' . $txt['email_wrote'] . ': ';
+}
+
+/**
+ * Replace full bbc quote tags with an html blockquote version
+ *
+ * - Callback for pbe_prepare_text
+ * - Only changes the leading [quote], the closing /quote is not changed but
+ * handled back in the main function
+ *
+ * @param string[] $matches array of matches from the regex in the preg_replace
+ */
+function quote_callback_2($matches)
+{
+	global $txt;
+
+	return "\n" . '<blockquote>' . $txt['email_on'] . ': ' . date('D M j, Y', $matches[3]) . ' ' . $matches[2] . ' ' . $txt['email_wrote'] . ': ';
 }
 
 /**
