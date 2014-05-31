@@ -750,7 +750,7 @@ function updateSubscription($update, $ignore_active)
 	$db->query('substring', '
 		UPDATE {db_prefix}subscriptions
 			SET name = SUBSTRING({string:name}, 1, 60), description = SUBSTRING({string:description}, 1, 255), active = {int:is_active},
-			length = SUBSTRING({string:length}, 1, 4), cost = {string:cost}' . ($ignore_active  ? '' : ', id_group = {int:id_group},
+			length = SUBSTRING({string:length}, 1, 4), cost = {string:cost}' . ($ignore_active ? '' : ', id_group = {int:id_group},
 			add_groups = {string:additional_groups}') . ', repeatable = {int:repeatable}, allow_partial = {int:allow_partial},
 			email_complete = {string:email_complete}, reminder = {int:reminder}
 		WHERE id_subscribe = {int:current_subscription}',

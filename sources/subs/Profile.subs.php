@@ -1391,7 +1391,7 @@ function makeNotificationChanges($memID)
 				WHERE id_board IN ({array_int:board_list})
 					AND id_member = {int:selected_member}',
 				array(
-					'board_list' =>$notification_deletes,
+					'board_list' => $notification_deletes,
 					'selected_member' => $memID,
 				)
 			);

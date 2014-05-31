@@ -91,7 +91,7 @@ class Database_MySQL implements Database
 
 		// This makes it possible to automatically change the sql_mode and autocommit if needed.
 		if (isset($mysql_set_mode) && $mysql_set_mode === true)
-			$this->query('', 'SET sql_mode = \'\', AUTOCOMMIT = 1',
+			self::$_db->query('', 'SET sql_mode = \'\', AUTOCOMMIT = 1',
 			array(),
 			false
 		);
