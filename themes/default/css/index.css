@@ -205,7 +205,9 @@ select {
 select option {
 	padding: 0 4px;
 }
-
+select#cat, select#suggestions, select#file {
+	height: auto;
+}
 /* No borders around checkboxes or radio buttons, and middle aligned. */
 .input_check, .input_radio {
 	border: none;
