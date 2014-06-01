@@ -702,8 +702,10 @@ function deleteBoards($boards_to_remove, $moveChildrenTo = null)
 	);
 
 	// Latest message/topic might not be there anymore.
-	updateStats('message');
-	updateStats('topic');
+	require_once(SUBSDIR . '/Messages.subs.php');
+	updateMessageStats();
+	require_once(SUBSDIR . '/Topic.subs.php');
+	updateTopicStats();
 	updateSettings(array(
 		'calendar_updated' => time(),
 	));

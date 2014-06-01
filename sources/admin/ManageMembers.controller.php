@@ -1155,16 +1155,20 @@ class ManageMembers_Controller extends Action_Controller
 				logAction($log_action, array('member' => $member['id']), 'admin');
 		}
 
-		// Although updateStats *may* catch this, best to do it manually just in case (Doesn't always sort out unapprovedMembers).
+		// Although updateMemberStats *may* catch this, best to do it manually just in case (Doesn't always sort out unapprovedMembers).
 		if (in_array($current_filter, array(3, 4)))
 			updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > $data['member_count'] ? $modSettings['unapprovedMembers'] - $data['member_count'] : 0)));
 
 		// Update the member's stats. (but, we know the member didn't change their name.)
-		updateStats('member', false);
+		require_once(SUBSDIR . '/Members.subs.php');
+		updateMemberStats();
 
 		// If they haven't been deleted, update the post group statistics on them...
 		if (!in_array($_POST['todo'], array('delete', 'deleteemail', 'reject', 'rejectemail', 'remind')))
-			updateStats('postgroups', $conditions['members']);
+		{
+			require_once(SUBSDIR . '/Membergroups.subs.php');
+			updatePostGroupStats($conditions['members']);
+		}
 
 		redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $_REQUEST['type'] . ';sort=' . $_REQUEST['sort'] . ';filter=' . $current_filter . ';start=' . $_REQUEST['start']);
 	}

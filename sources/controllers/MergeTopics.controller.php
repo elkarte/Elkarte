@@ -546,8 +546,10 @@ class MergeTopics_Controller extends Action_Controller
 		$id_board = $topic_info['id_board'];
 
 		// Update all the statistics.
-		updateStats('topic');
-		updateStats('subject', $id_topic, $target_subject);
+		require_once(SUBSDIR . '/Topic.subs.php');
+		updateTopicStats();
+		require_once(SUBSDIR . '/Messages.subs.php');
+		updateSubjectStats($id_topic, $target_subject);
 		updateLastMessages($boards);
 
 		logAction('merge', array('topic' => $id_topic, 'board' => $id_board));

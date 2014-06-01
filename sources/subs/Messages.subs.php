@@ -674,7 +674,8 @@ function removeMessage($message, $decreasePostCount = true)
 
 	// Update the pesky statistics.
 	updateMessageStats();
-	updateStats('topic');
+	require_once(SUBSDIR . '/Topic.subs.php');
+	updateTopicStats();
 	updateSettings(array(
 		'calendar_updated' => time(),
 	));
@@ -1168,7 +1169,6 @@ function mailFromMesasge($id_msg)
  * This function changes the total number of messages,
  * and the highest message id by id_msg - which can be
  * parameters 1 and 2, respectively.
- * Used by updateStats('message').
  *
  * @param bool|null $increment = null If true and $max_msg_id != null, then increment the total messages by one, otherwise recount all messages and get the max message id
  * @param int|null $max_msg_id = null, Only used if $increment === true
@@ -1208,7 +1208,6 @@ function updateMessageStats($increment = null, $max_msg_id = null)
  * This function updates the log_search_subjects in the event of a topic being
  * moved, removed or split. It is being sent the topic id, and optionally
  * the new subject.
- * Used by updateStats('subject').
  *
  * @param int $id_topic
  * @param string|null $subject

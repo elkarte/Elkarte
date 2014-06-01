@@ -1427,9 +1427,12 @@ function action_deleteInstall()
 		);
 	}
 
-	updateStats('member');
-	updateStats('message');
-	updateStats('topic');
+	require_once(SUBSDIR . '/Members.subs.php');
+	updateMemberStats();
+	require_once(SUBSDIR . '/Messages.subs.php');
+	updateMessageStats();
+	require_once(SUBSDIR . '/Topics.subs.php');
+	updateTopicStats();
 
 	$request = $db->query('', '
 		SELECT id_msg

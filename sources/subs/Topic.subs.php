@@ -386,7 +386,8 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	call_integration_hook('integrate_remove_topics', array($topics));
 
 	// Update the totals...
-	updateStats('message');
+	require_once(SUBSDIR . '/Messages.subs.php');
+	updateMessageStats();
 	updateTopicStats();
 	updateSettings(array(
 		'calendar_updated' => time(),
@@ -707,7 +708,8 @@ function moveTopics($topics, $toBoard)
 
 	// Update 'em pesky stats.
 	updateTopicStats();
-	updateStats('message');
+	require_once(SUBSDIR . '/Messages.subs.php');
+	updateMessageStats();
 	updateSettings(array(
 		'calendar_updated' => time(),
 	));
@@ -2308,7 +2310,8 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		);
 
 		// Cache the new topics subject... we can do it now as all the subjects are the same!
-		updateStats('subject', $split2_ID_TOPIC, $new_subject);
+		require_once(SUBSDIR . '/Messages.subs.php');
+		updateSubjectStats($split2_ID_TOPIC, $new_subject);
 	}
 
 	// Any associated reported posts better follow...
@@ -2956,7 +2959,6 @@ function getSubject($id_topic)
 /**
  * This function updates the total number of topics,
  * or if parameter $increment is true it simply increments them.
- * Used by updateStats('topic').
  *
  * @param bool|null $increment = null if true, increment + 1 the total topics, otherwise recount all topics
  */

@@ -842,8 +842,10 @@ class MessageIndex_Controller extends Action_Controller
 			sendNotifications($topic, 'sticky');
 		}
 
-		updateStats('topic');
-		updateStats('message');
+		require_once(SUBSDIR . '/Topic.subs.php');
+		updateTopicStats();
+		require_once(SUBSDIR . '/Messages.subs.php');
+			updateMessageStats();
 		updateSettings(array(
 			'calendar_updated' => time(),
 		));

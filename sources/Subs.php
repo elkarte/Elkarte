@@ -23,6 +23,8 @@ if (!defined('ELK'))
 /**
  * Update some basic statistics.
  *
+ * @deprecated since 1.1 - use directly the update{Statistic}Stats functions instead
+ *
  * 'member' statistic updates the latest member, the total member
  *  count, and the number of unapproved members.
  * 'member' also only counts approved members when approval is on, but

@@ -2222,8 +2222,6 @@ function canContact($who)
  * - It also only counts approved members when approval is on,
  * but is much more efficient with it off.
  *
- * Used by updateStats('member').
- *
  * @package Members
  * @param integer|null $id_member = null If not an integer reload from the database
  * @param string|null $real_name = null
@@ -2450,7 +2448,8 @@ function updateMemberData($members, $data)
 		$parameters
 	);
 
-	updateStats('postgroups', $members, array_keys($data));
+	require_once(SUBSDIR . '/Membergroups.subs.php');
+	updatePostGroupStats($members, array_keys($data));
 
 	// Clear any caching?
 	if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2 && !empty($members))

@@ -379,7 +379,10 @@ class ManageMembergroups_Controller extends Action_Controller
 
 			// Update the post groups now, if this is a post group!
 			if (isset($_POST['min_posts']))
-				updateStats('postgroups');
+			{
+				require_once(SUBSDIR . '/Membergroups.subs.php');
+				updatePostGroupStats();
+			}
 
 			// You cannot set permissions for post groups if they are disabled.
 			if ($postCountBasedGroup && empty($modSettings['permission_enable_postgroups']))
@@ -692,7 +695,8 @@ class ManageMembergroups_Controller extends Action_Controller
 			}
 
 			// There might have been some post group changes.
-			updateStats('postgroups');
+			require_once(SUBSDIR . '/Membergroups.subs.php');
+			updatePostGroupStats();
 
 			// We've definitely changed some group stuff.
 			updateSettings(array(
