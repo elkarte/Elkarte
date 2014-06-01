@@ -410,17 +410,17 @@ function template_quickreply_below()
 			echo '
 							<dl>
 								<dt>
-									<strong><label for="guestname">', $txt['name'], '</label>:</strong> <input type="text" name="guestname" id="guestname" value="', $context['name'], '" size="25" class="input_text" tabindex="', $context['tabindex']++, '" />
+									<strong><label for="guestname">', $txt['name'], '</label></strong> <input type="text" name="guestname" id="guestname" value="', $context['name'], '" size="25" class="input_text" tabindex="', $context['tabindex']++, '" />
 								</dd>
 								<dt>
-									<strong><label for="email">', $txt['email'], '</label>:</strong> <input type="text" name="email" id="email" value="', $context['email'], '" size="25" class="input_text" tabindex="', $context['tabindex']++, '" />
+									<strong><label for="email">', $txt['email'], '</label></strong> <input type="text" name="email" id="email" value="', $context['email'], '" size="25" class="input_text" tabindex="', $context['tabindex']++, '" />
 								</dd>
 							</dl>';
 
 		// Is visual verification enabled?
 		if ($context['require_verification'])
 			template_verification_controls($context['visual_verification_id'], '
-							<strong>' . $txt['verification'] . ':</strong>', '<br />');
+							<strong>' . $txt['verification'] . '</strong>', '<br />');
 
 		// Using the full editor or a plain text box?
 		if (empty($options['use_editor_quick_reply']))
