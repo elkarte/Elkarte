@@ -773,8 +773,10 @@ $txt['board_perms_ignore'] = 'Ignore';
 $txt['board_perms_deny'] = 'Deny';
 $txt['all_boards_in_cat'] = 'All boards in this category';
 
-$txt['url'] = 'URL';
-$txt['words_sep'] = 'Words separator';
+$txt['url'] = 'URL:';
+$txt['words_sep'] = 'Words separator:';
+// this prevents double colons in the 'Add another search engine section'
+$txt['words_sep_no_colon']= 'Words separator';
 
 $txt['admin_order_title'] = 'Ordering Error';
 $txt['admin_order_error'] = 'An unknown error occurred while processing your request';

@@ -1476,18 +1476,18 @@ function template_callback_external_search_engines()
 		foreach ($context['search_engines'] as $data)
 			echo '
 			<dt>
-				<label for="">', $txt['name'], ': <input type="text" name="engine_name[]" value="', $data['name'], '" size="50" class="input_text verification_question" /></label>
+				<label for="">', $txt['name'], ' <input type="text" name="engine_name[]" value="', $data['name'], '" size="50" class="input_text verification_question" /></label>
 			</dt>
 			<dd>
-				<label for="">', $txt['url'], ': <input type="text" name="engine_url[]" value="', $data['url'], '" size="35" class="input_text verification_answer" /></label><br />
-				<label for="">', $txt['words_sep'], ': <input type="text" name="engine_separator[]" value="', $data['separator'], '" size="5" class="input_text verification_answer" /></label>
+				<label for="">', $txt['url'], ' <input type="text" name="engine_url[]" value="', $data['url'], '" size="35" class="input_text verification_answer" /></label><br />
+				<label for="">', $txt['words_sep'], ' <input type="text" name="engine_separator[]" value="', $data['separator'], '" size="5" class="input_text verification_answer" /></label>
 			</dd>';
 
 	echo '
 		<dt id="add_more_searches" style="display: none;"></dt>
 		<dd></dd>
 		<dt id="add_more_link_div" style="display: none;">
-			<a class="linkbutton" href="#" onclick="addAnotherSearch(', JavaScriptEscape($txt['name']), ', ', JavaScriptEscape($txt['url']), ', ', JavaScriptEscape($txt['words_sep']), '); return false;">', $txt['setup_search_engine_add_more'], '</a>
+			<a class="linkbutton" href="#" onclick="addAnotherSearch(', JavaScriptEscape($txt['name_no_colon']), ', ', JavaScriptEscape($txt['url_no_colon']), ', ', JavaScriptEscape($txt['words_sep_no_colon']), '); return false;">', $txt['setup_search_engine_add_more'], '</a>
 		</dt>
 		<dd></dd>';
 

@@ -109,8 +109,8 @@ $txt['board_moderator'] = 'Board Moderator';
 $txt['remove_topic'] = 'Remove';
 $txt['topics'] = 'Topics';
 $txt['modify_msg'] = 'Modify message';
-$txt['name'] = 'Name';
-$txt['email'] = 'Email';
+$txt['name'] = 'Name:';
+$txt['email'] = 'Email:&nbsp;';
 $txt['user_email_address'] = 'Email Address';
 $txt['subject'] = 'Subject';
 $txt['message'] = 'Message';
@@ -831,7 +831,7 @@ $txt['ajax_in_progress'] = 'Loading...';
 $txt['mod_reports_waiting'] = 'There are currently %1$d moderator reports open.';
 
 $txt['new_posts_in_category'] = 'Click to see the new posts in %1$s';
-$txt['verification'] = 'Verification';
+$txt['verification'] = 'Verification Image';
 $txt['visual_verification_hidden'] = 'Please leave this box empty';
 $txt['visual_verification_description'] = 'Type the letters shown in the picture';
 $txt['visual_verification_sound'] = 'Listen to the letters';
@@ -915,3 +915,9 @@ $txt['ok_uppercase'] = 'OK';
 
 // Title of box for warnings that admins should see
 $txt['admin_warning_title'] = 'Warning';
+
+// this prevents a double colon in the 'Add another search engine section'
+// and anywhere you need to these without the colon
+$txt['name_no_colon'] = 'Name';
+$txt['email_no_colon'] = 'Email';
+$txt['url_no_colon'] = 'URL';

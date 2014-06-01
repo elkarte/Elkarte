@@ -37,12 +37,12 @@ function template_editBuddies()
 		</h2>
 		<table class="table_grid">
 			<tr class="table_head">
-				<th scope="col" style="width: 20%;">', $txt['name'], '</th>
+				<th scope="col" style="width: 20%;">', $txt['name_no_colon'], '</th>
 				<th scope="col">', $txt['status'], '</th>';
 
 	if ($context['can_send_email'])
 		echo '
-				<th scope="col">', $txt['email'], '</th>';
+				<th scope="col">', $txt['email_no_colon'], '</th>';
 
 	echo '
 				<th scope="col">', $txt['profile_contact'], '</th>
@@ -147,12 +147,12 @@ function template_editIgnoreList()
 		</h2>
 		<table class="table_grid">
 			<tr class="table_head">
-				<th scope="col" style="width: 20%;">', $txt['name'], '</th>
+				<th scope="col" style="width: 20%;">', $txt['name_no_colon'], '</th>
 				<th scope="col">', $txt['status'], '</th>';
 
 	if ($context['can_send_email'])
 		echo '
-				<th scope="col">', $txt['email'], '</th>';
+				<th scope="col">', $txt['email_no_colon'], '</th>';
 
 	echo '
 				<th scope="col"></th>
