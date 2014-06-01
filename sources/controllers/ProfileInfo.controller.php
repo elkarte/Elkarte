@@ -992,7 +992,7 @@ class ProfileInfo_Controller extends Action_Controller
 				$context['boards'][$row['id_board']] = array(
 					'id' => $row['id_board'],
 					'name' => $row['board_name'],
-					'url' => $scripturl, '?board=', $row['id'], '.0',
+					'url' => $scripturl, '?board=', $row['id_board'], '.0',
 					'selected' => $board == $row['id_board'],
 					'profile' => $row['id_profile'],
 					'profile_name' => $context['profiles'][$row['id_profile']]['name'],
