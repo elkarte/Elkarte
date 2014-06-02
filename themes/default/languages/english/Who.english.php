@@ -37,7 +37,6 @@ $txt['whoall_auth'] = 'Logging into the forum.';
 $txt['whoall_login'] = 'Viewing the login page.';
 $txt['whoall_login2'] = 'Viewing the login page.';
 $txt['whoall_logout'] = 'Logging out of the forum.';
-$txt['whoall_auth'] = 'Viewing the login page.';
 $txt['whoall_markasread'] = 'Marking topics read or unread.';
 $txt['whoall_modifykarma_applaud'] = 'Applauding a member.';
 $txt['whoall_modifykarma_smite'] = 'Smiting a member.';
