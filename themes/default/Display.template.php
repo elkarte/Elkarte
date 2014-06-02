@@ -817,7 +817,6 @@ function template_display_attachments($message, $ignoring)
 							<div id="msg_', $message['id'], '_footer" class="attachments"', $ignoring ? ' style="display:none;"' : '', '>';
 
 	$last_approved_state = 1;
-	$attachments_per_line = 4;
 	$i = 0;
 
 	foreach ($message['attachment'] as $attachment)
@@ -870,11 +869,6 @@ function template_display_attachments($message, $ignoring)
 
 		echo '
 									</div>';
-
-		// Next attachment line ?
-		if (++$i % $attachments_per_line === 0)
-			echo '
-									<hr />';
 	}
 
 	// If we had unapproved attachments clean up.
