@@ -733,7 +733,7 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
 				if (!empty($row['file_hash']))
 				{
 					// It may be without the elk extension (something wrong during upgrade/conversion)
-					$attachment_name =  $row['id_attach'] . '_' . $row['file_hash'];
+					$attachment_name = $row['id_attach'] . '_' . $row['file_hash'];
 
 					if (!is_array($modSettings['attachmentUploadDir']))
 						$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);

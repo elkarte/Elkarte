@@ -1902,6 +1902,10 @@ class ManageMaillist_Controller extends Action_Controller
 	/**
 	 * Get the number of unapproved emails
 	 *
+	 * @param int $start
+	 * @param int $chunk_size
+	 * @param string $sort
+	 * @param int $id
 	 * - Callback for createList() to list_maillist_unapproved
 	 */
 	protected function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
