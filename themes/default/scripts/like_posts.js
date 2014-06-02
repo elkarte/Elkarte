@@ -38,6 +38,9 @@
 					subAction = '',
 					check = $(e.target).attr('class');
 
+				if (e.target.nodeName.toLowerCase() !== 'a')
+					return false;
+
 				// Set the subAction to what they are doing
 				if (check.indexOf('unlike_button') >= 0)
 					subAction = 'unlikepost';
