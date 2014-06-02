@@ -513,7 +513,7 @@ function template_quickreply_below()
 				sTitleExpanded: ', JavaScriptEscape($txt['hide']), ',
 				sJumpAnchor: "quickreply",
 				bIsFull: ', !empty($options['use_editor_quick_reply']) ? 'true,
-				sEditorId: ' . $options['use_editor_quick_reply']  : 'false', ',
+				sEditorId: ' . $options['use_editor_quick_reply'] : 'false', ',
 				oThemeOptions: {
 					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
 					sOptionName: \'minmax_preferences\',
