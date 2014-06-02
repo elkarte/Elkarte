@@ -844,7 +844,7 @@ function template_display_attachments($message, $ignoring)
 		if ($attachment['is_image'])
 		{
 			echo '
-										<div class="attachments_top">';
+										<div class="attachment_thumb">';
 
 			if ($attachment['thumbnail']['has_thumb'])
 				echo '
@@ -858,7 +858,7 @@ function template_display_attachments($message, $ignoring)
 		}
 
 		echo '
-										<div class="attachments_bot">
+										<div class="attachment_name">
 											<a href="' . $attachment['href'] . '"><img src="' . $settings['images_url'] . '/icons/clip.png" class="centericon" alt="*" />&nbsp;' . $attachment['name'] . '</a> ';
 
 		if (!$attachment['is_approved'] && $context['can_approve'])

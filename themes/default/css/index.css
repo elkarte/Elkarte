@@ -109,7 +109,7 @@ p, fieldset, form, input, button, select, textarea, .editor {
 /* Collection of pseudo element clearfixes. */
 .category_header:after, .wrapper:after,
 #main_content_section:after, #main_container:after,
-.attachments_bot:after, .editor_wrapper:after {
+.attachment_name:after, .editor_wrapper:after {
 	display: block;
 	clear: both;
 	content: "";
@@ -2315,7 +2315,7 @@ div.core_posts {
 	display: inline-block;
 	min-width: 22%;
 }
-.attachments_top {
+.attachment_thumb {
 	margin: 0 auto;
 	text-align: center;
 }
