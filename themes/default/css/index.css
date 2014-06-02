@@ -2310,8 +2310,10 @@ div.core_posts {
 .attachments {
 	margin: 20px 0 0 0;
 }
-.attachments .floatleft {
-	padding: 0 6px 8px 6px;
+.attachments .attachment {
+	padding: 6px 8px;
+	display: inline-block;
+	min-width: 22%;
 }
 .attachments_top {
 	margin: 0 auto;
