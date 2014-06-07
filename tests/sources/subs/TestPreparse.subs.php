@@ -2,6 +2,7 @@
 
 require_once(TESTDIR . 'simpletest/autorun.php');
 require_once(TESTDIR . '../SSI.php');
+require_once(SUBSDIR . '/Post.subs.php');
 
 class TestBBC extends UnitTestCase
 {
