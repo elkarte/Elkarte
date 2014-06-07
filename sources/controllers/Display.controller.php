@@ -192,7 +192,7 @@ class Display_Controller
 				if ($user_info['is_guest'])
 				{
 					$context['start_from'] = $context['total_visible_posts'] - 1;
-					$_REQUEST['start'] = empty($options['view_newest_first']) ? $context['start_from'] : 0;
+					$_REQUEST['start'] = $context['start_from'];
 				}
 				else
 				{
@@ -211,8 +211,7 @@ class Display_Controller
 				{
 					// Find the number of messages posted before said time...
 					$context['start_from'] = countNewPosts($topic, $topicinfo, $timestamp);
-					// Handle view_newest_first options, and get the correct start value.
-					$_REQUEST['start'] = empty($options['view_newest_first']) ? $context['start_from'] : $context['total_visible_posts'] - $context['start_from'] - 1;
+					$_REQUEST['start'] = $context['start_from'];
 				}
 			}
 			// Link to a message...
@@ -230,7 +229,7 @@ class Display_Controller
 				}
 
 				// We need to reverse the start as well in this case.
-				$_REQUEST['start'] = empty($options['view_newest_first']) ? $context['start_from'] : $context['total_visible_posts'] - $context['start_from'] - 1;
+				$_REQUEST['start'] = $context['start_from'];
 			}
 		}
 
@@ -461,7 +460,7 @@ class Display_Controller
 		}
 
 		// Calculate the fastest way to get the messages!
-		$ascending = empty($options['view_newest_first']);
+		$ascending = true;
 		$start = $_REQUEST['start'];
 		$limit = $context['messages_per_page'];
 		$firstIndex = 0;
@@ -596,10 +595,7 @@ class Display_Controller
 
 			// Since the anchor information is needed on the top of the page we load these variables beforehand.
 			$context['first_message'] = isset($messages[$firstIndex]) ? $messages[$firstIndex] : $messages[0];
-			if (empty($options['view_newest_first']))
-				$context['first_new_message'] = isset($context['start_from']) && $_REQUEST['start'] == $context['start_from'];
-			else
-				$context['first_new_message'] = isset($context['start_from']) && $_REQUEST['start'] == $topicinfo['num_replies'] - $context['start_from'];
+			$context['first_new_message'] = isset($context['start_from']) && $_REQUEST['start'] == $context['start_from'];
 		}
 		else
 		{
@@ -895,7 +891,7 @@ class Display_Controller
 
 		// Remember which message this is.  (ie. reply #83)
 		if ($counter === null || $reset)
-			$counter = empty($options['view_newest_first']) ? $context['start'] : $context['total_visible_posts'] - $context['start'];
+			$counter = $context['start'];
 
 		// Start from the beginning...
 		if ($reset)
@@ -1015,10 +1011,7 @@ class Display_Controller
 
 		call_integration_hook('integrate_prepare_display_context', array(&$output, &$message));
 
-		if (empty($options['view_newest_first']))
-			$counter++;
-		else
-			$counter--;
+		$counter++;
 
 		return $output;
 	}
