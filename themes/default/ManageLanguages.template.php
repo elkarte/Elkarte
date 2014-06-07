@@ -284,11 +284,11 @@ function template_modify_language_entries()
 						<input type="submit" name="save_main" value="', $txt['save'], '"', $context['lang_file_not_writable_message'] || !empty($context['file_entries']) ? ' disabled="disabled"' : '', ' class="button_submit" />';
 
 	// Allow deleting entries.
-	if ($context['lang_id'] != 'english')
+	if (!empty($context['langpack_uninstall_link']))
 	{
 		// English can't be deleted though.
 		echo '
-						<input type="submit" name="delete_main" value="', $txt['delete'], '"', $context['lang_file_not_writable_message'] || !empty($context['file_entries']) ? ' disabled="disabled"' : '', ' onclick="return confirm(\'', $txt['languages_delete_confirm'], '\');" class="button_submit" />';
+						<a href="', $context['langpack_uninstall_link'], '" class="linkbutton">' . $txt['delete'] . '</a>';
 	}
 
 	echo '
