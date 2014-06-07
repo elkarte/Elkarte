@@ -299,7 +299,6 @@ $txt['show_online'] = 'Show others my online status';
 
 $txt['return_to_post'] = 'Return to topics after posting by default.';
 $txt['no_new_reply_warning'] = 'Don\'t warn on new replies made while posting.';
-$txt['recent_posts_at_top'] = 'Show most recent posts at the top.';
 $txt['recent_pms_at_top'] = 'Show most recent personal messages at top.';
 $txt['wysiwyg_default'] = 'Show WYSIWYG editor on post page by default.';
 

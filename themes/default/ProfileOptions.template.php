@@ -607,14 +607,6 @@ function template_profile_theme_settings()
 								<input type="hidden" name="default_options[no_new_reply_warning]" value="0" />
 								<input type="checkbox" name="default_options[no_new_reply_warning]" id="no_new_reply_warning" value="1"', !empty($context['member']['options']['no_new_reply_warning']) ? ' checked="checked"' : '', ' class="input_check" />
 							</dd>
-
-							<dt>
-								<label for="view_newest_first">', $txt['recent_posts_at_top'], '</label>
-							</dt>
-							<dd>
-								<input type="hidden" name="default_options[view_newest_first]" value="0" />
-								<input type="checkbox" name="default_options[view_newest_first]" id="view_newest_first" value="1"', !empty($context['member']['options']['view_newest_first']) ? ' checked="checked"' : '', ' class="input_check" />
-							</dd>
 							<dt>
 								<label for="wysiwyg_default">', $txt['wysiwyg_default'], '</label>
 							</dt>
