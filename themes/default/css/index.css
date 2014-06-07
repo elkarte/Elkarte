@@ -109,7 +109,7 @@ p, fieldset, form, input, button, select, textarea, .editor {
 /* Collection of pseudo element clearfixes. */
 .category_header:after, .wrapper:after,
 #main_content_section:after, #main_container:after,
-.attachments_bot:after, .editor_wrapper:after {
+.attachment_name:after, .editor_wrapper:after {
 	display: block;
 	clear: both;
 	content: "";
@@ -2305,10 +2305,12 @@ div.core_posts {
 .attachments {
 	margin: 20px 0 0 0;
 }
-.attachments .floatleft {
-	padding: 0 6px 8px 6px;
+.attachments .attachment {
+	padding: 6px 8px;
+	display: inline-block;
+	min-width: 22%;
 }
-.attachments_top {
+.attachment_thumb {
 	margin: 0 auto;
 	text-align: center;
 }

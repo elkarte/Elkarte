@@ -3,7 +3,7 @@
 
 global $scripturl, $context;
 
-$txt['who_hidden'] = '<em>Nothing, or nothing you can see...</em>';
+$txt['who_hidden'] = '<em>hmm... no idea, sorry</em>';
 $txt['who_admin'] = 'Viewing the admin portal';
 $txt['who_moderate'] = 'Viewing the moderator portal';
 $txt['who_generic'] = 'Viewing the %1$s';
