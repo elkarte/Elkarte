@@ -164,7 +164,7 @@ class ProfileInfo_Controller extends Action_Controller
 		else
 			$context['can_see_ip'] = false;
 
-		if (!empty($modSettings['who_enabled']))
+		if (!empty($modSettings['who_enabled']) && $context['member']['online']['is_online'])
 		{
 			include_once(SUBSDIR . '/Who.subs.php');
 			$action = determineActions($user_profile[$memID]['url']);
