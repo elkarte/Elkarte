@@ -1,7 +1,7 @@
 <?php
 // Version: 1.0; index
 
-global $forum_copyright, $context;
+global $forum_copyright;
 
 // Locale (strftime, pspell_new) and spelling. (pspell_new, can be left as '' normally.)
 // For more information see:
@@ -173,7 +173,7 @@ $txt['notify'] = 'Notify';
 $txt['unnotify'] = 'Unnotify';
 $txt['notify_request'] = 'Do you want a notification email if someone replies to this topic?';
 // Use numeric entities in the below string.
-$txt['regards_team'] = "Regards,\nThe " . $context['forum_name'] . ' Team.';
+$txt['regards_team'] = "Regards,\nThe {forum_name} Team.";
 $txt['notify_replies'] = 'Notify of replies';
 $txt['move_topic'] = 'Move';
 $txt['move_to'] = 'Move to';

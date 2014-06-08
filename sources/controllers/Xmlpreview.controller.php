@@ -242,7 +242,7 @@ class XmlPreview_Controller extends Action_Controller
 					$user_info['name'],
 					$mbname,
 					$scripturl,
-					$txt['regards_team'],
+					replaceBasicActionUrl($txt['regards_team']),
 				);
 				$warning_body = str_replace($find, $replace, $warning_body);
 			}
@@ -314,7 +314,7 @@ class XmlPreview_Controller extends Action_Controller
 					$mbname,
 					(!empty($modSettings['maillist_sitename']) ? $modSettings['maillist_sitename'] : $mbname),
 					$scripturl,
-					$txt['regards_team'],
+					replaceBasicActionUrl($txt['regards_team']),
 					(!empty($modSettings['maillist_sitename_regards']) ? $modSettings['maillist_sitename_regards'] : '')
 				);
 				$body = str_replace($find, $replace, $body);
