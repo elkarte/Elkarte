@@ -1,7 +1,7 @@
 <?php
 // Version: 1.0; Who
 
-global $scripturl, $context;
+global $scripturl;
 
 $txt['who_hidden'] = '<em>hmm... no idea, sorry</em>';
 $txt['who_admin'] = 'Viewing the admin portal';
@@ -30,7 +30,7 @@ $txt['whoall_coppa'] = 'Filling out parent/guardian consent form.';
 $txt['whoall_credits'] = 'Viewing credits page.';
 $txt['whoall_emailuser'] = 'Sending email to another member.';
 $txt['whoall_groups'] = 'Viewing the member groups page.';
-$txt['whoall_help'] = 'Viewing the <a href="' . $scripturl . '?action=help">help page</a>.';
+$txt['whoall_help'] = 'Viewing the <a href="{help_url}">help page</a>.';
 $txt['whoall_quickhelp'] = 'Viewing a help popup.';
 $txt['whoall_pm'] = 'Viewing their messages.';
 $txt['whoall_auth'] = 'Logging into the forum.';
@@ -45,7 +45,7 @@ $txt['whoall_notify'] = 'Changing their notification settings.';
 $txt['whoall_notifyboard'] = 'Changing their notification settings.';
 $txt['whoall_openidreturn'] = 'Logging in using OpenID.';
 $txt['whoall_quickmod'] = 'Moderating a board.';
-$txt['whoall_recent'] = 'Viewing a <a href="' . $scripturl . '?action=recent">list of recent topics</a>.';
+$txt['whoall_recent'] = 'Viewing a <a href="{recent_url}">list of recent topics</a>.';
 $txt['whoall_register'] = 'Registering for an account on the forum.';
 $txt['whoall_register2'] = 'Registering for an account on the forum.';
 $txt['whoall_reminder'] = 'Requesting a password reminder.';
@@ -53,7 +53,7 @@ $txt['whoall_reporttm'] = 'Reporting a topic to a moderator.';
 $txt['whoall_spellcheck'] = 'Using the spellchecker';
 $txt['whoall_unread'] = 'Viewing unread topics since their last visit.';
 $txt['whoall_unreadreplies'] = 'Viewing unread replies since their last visit.';
-$txt['whoall_who'] = 'Viewing <a href="' . $scripturl . '?action=who">Who\'s Online</a>.';
+$txt['whoall_who'] = 'Viewing <a href="{who_url}">Who\'s Online</a>.';
 
 $txt['whoall_collapse_collapse'] = 'Collapsing a category.';
 $txt['whoall_collapse_expand'] = 'Expanding a category.';
@@ -100,31 +100,31 @@ $txt['whoadmin_theme'] = 'Editing the theme settings.';
 $txt['whoadmin_trackip'] = 'Tracking an IP address.';
 
 $txt['whoallow_manageboards'] = 'Editing the board and category settings.';
-$txt['whoallow_admin'] = 'Viewing the <a href="' . $scripturl . '?action=admin">administration center</a>.';
+$txt['whoallow_admin'] = 'Viewing the <a href="{admin_url}">administration center</a>.';
 $txt['whoallow_ban'] = 'Editing the ban list.';
 $txt['whoallow_boardrecount'] = 'Recounting the forum totals.';
-$txt['whoallow_calendar'] = 'Viewing the <a href="' . $scripturl . '?action=calendar">calendar</a>.';
+$txt['whoallow_calendar'] = 'Viewing the <a href="{calendar_url}">calendar</a>.';
 $txt['whoallow_editnews'] = 'Editing the news.';
 $txt['whoallow_mailing'] = 'Sending a forum email.';
 $txt['whoallow_maintain'] = 'Performing routine forum maintenance.';
 $txt['whoallow_manageattachments'] = 'Managing the attachments.';
-$txt['whoallow_moderate'] = 'Viewing the <a href="' . $scripturl . '?action=moderate">Moderation Center</a>.';
-$txt['whoallow_memberlist'] = 'Viewing the <a href="' . $scripturl . '?action=memberlist">memberlist</a>.';
+$txt['whoallow_moderate'] = 'Viewing the <a href="{moderate_url}">Moderation Center</a>.';
+$txt['whoallow_memberlist'] = 'Viewing the <a href="{memberlist_url}">memberlist</a>.';
 $txt['whoallow_optimizetables'] = 'Optimizing the database tables.';
 $txt['whoallow_repairboards'] = 'Repairing the database tables.';
-$txt['whoallow_search'] = '<a href="' . $scripturl . '?action=search">Searching</a> the forum.';
+$txt['whoallow_search'] = '<a href="{search_url}">Searching</a> the forum.';
 $txt['whoallow_search_results'] = 'Viewing the results of a search.';
 $txt['whoallow_setcensor'] = 'Editing the censor text.';
 $txt['whoallow_setreserve'] = 'Editing the reserved names.';
-$txt['whoallow_stats'] = 'Viewing the <a href="' . $scripturl . '?action=stats">forum stats</a>.';
+$txt['whoallow_stats'] = 'Viewing the <a href="{stats_url}">forum stats</a>.';
 $txt['whoallow_viewErrorLog'] = 'Viewing the error log.';
 $txt['whoallow_viewmembers'] = 'Viewing a list of members.';
 
-$txt['who_topic'] = 'Viewing the topic <a href="' . $scripturl . '?topic=%1$d.0">%2$s</a>.';
-$txt['who_board'] = 'Viewing the board <a href="' . $scripturl . '?board=%1$d.0">%2$s</a>.';
-$txt['who_index'] = 'Viewing the board index of <a href="' . $scripturl . '">' . $context['forum_name'] . '</a>.';
-$txt['who_viewprofile'] = 'Viewing <a href="' . $scripturl . '?action=profile;u=%1$d">%2$s</a>\'s profile.';
-$txt['who_profile'] = 'Editing the profile of <a href="' . $scripturl . '?action=profile;u=%1$d">%2$s</a>.';
+$txt['who_topic'] = 'Viewing the topic <a href="%1$s">%2$s</a>.';
+$txt['who_board'] = 'Viewing the board <a href="%1$s">%2$s</a>.';
+$txt['who_index'] = 'Viewing the board index of <a href="{script_url}">{forum_name}</a>.';
+$txt['who_viewprofile'] = 'Viewing <a href="%1$s">%2$s</a>\'s profile.';
+$txt['who_profile'] = 'Editing the profile of <a href="%1$s">%2$s</a>.';
 $txt['who_post'] = 'Posting a new topic in <a href="' . $scripturl . '?board=%1$d.0">%2$s</a>.';
 $txt['who_poll'] = 'Posting a new poll in <a href="' . $scripturl . '?board=%1$d.0">%2$s</a>.';
 

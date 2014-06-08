@@ -4326,7 +4326,14 @@ function replaceBasicActionUrl($string)
 			'{activate_url}',
 			'{help_url}',
 			'{admin_url}',
+			'{moderate_url}',
+			'{recent_url}',
+			'{search_url}',
+			'{who_url}',
 			'{credits_url}',
+			'{calendar_url}',
+			'{memberlist_url}',
+			'{stats_url}',
 		);
 		$replace = array(
 			$context['forum_name'],
@@ -4337,7 +4344,14 @@ function replaceBasicActionUrl($string)
 			$scripturl . '?action=activate',
 			$scripturl . '?action=help',
 			$scripturl . '?action=admin',
+			$scripturl . '?action=moderate',
+			$scripturl . '?action=recent',
+			$scripturl . '?action=search',
+			$scripturl . '?action=who',
 			$scripturl . '?action=who;sa=credits',
+			$scripturl . '?action=calendar',
+			$scripturl . '?action=memberlist',
+			$scripturl . '?action=stats',
 		);
 		call_integration_hook('integrate_basic_url_replacement', array(&$find, &$replace));
 	}
