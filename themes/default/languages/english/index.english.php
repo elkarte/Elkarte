@@ -915,3 +915,10 @@ $txt['ok_uppercase'] = 'OK';
 
 // Title of box for warnings that admins should see
 $txt['admin_warning_title'] = 'Warning';
+
+// Global strings that require colons or other characters
+$txt['name_colon'] = 'Name:';
+$txt['email_colon'] = 'Email:';
+$txt['url_colon'] = 'URL:';
+$txt['words_sep_colon'] = 'Words separator:';
+

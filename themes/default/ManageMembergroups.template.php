@@ -526,7 +526,7 @@ function template_group_members()
 				<div class="content">
 					<dl class="settings">
 						<dt>
-							<strong>', $txt['name'], ':</strong>
+							<strong>', $txt['name_colon'], '</strong>
 						</dt>
 						<dd>
 							<span ', $context['group']['online_color'] ? 'style="color: ' . $context['group']['online_color'] . ';"' : '', '>', $context['group']['name'], '</span> ', $context['group']['icons'], '

@@ -113,7 +113,7 @@ function template_postarea_above()
 	{
 		echo '
 							<dt>
-								<label for="guestname"', isset($context['post_error']['long_name']) || isset($context['post_error']['no_name']) || isset($context['post_error']['bad_name']) ? ' class="error"' : '', ' id="caption_guestname">', $txt['name'], ':</label>
+								<label for="guestname"', isset($context['post_error']['long_name']) || isset($context['post_error']['no_name']) || isset($context['post_error']['bad_name']) ? ' class="error"' : '', ' id="caption_guestname">', $txt['name_colon'], '</label>
 							</dt>
 							<dd>
 								<input type="text" id="guestname" name="guestname" size="25" value="', $context['name'], '" tabindex="', $context['tabindex']++, '" class="input_text" required="required" />
@@ -122,7 +122,7 @@ function template_postarea_above()
 		if (empty($modSettings['guest_post_no_email']))
 			echo '
 							<dt>
-								<label for="email"', isset($context['post_error']['no_email']) || isset($context['post_error']['bad_email']) ? ' class="error"' : '', ' id="caption_email">', $txt['email'], ':</label>
+								<label for="email"', isset($context['post_error']['no_email']) || isset($context['post_error']['bad_email']) ? ' class="error"' : '', ' id="caption_email">', $txt['email_colon'], '</label>
 							</dt>
 							<dd>
 								<input type="email" id="email" name="email" size="25" value="', $context['email'], '" tabindex="', $context['tabindex']++, '" class="input_text" required="required" />

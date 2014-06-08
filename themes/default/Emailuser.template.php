@@ -223,7 +223,7 @@ function template_report()
 	{
 		echo '
 							<dt>
-								<label for="email_address">', $txt['email'], '</label>:
+								<label for="email_address">', $txt['email_colon'], '</label>
 							</dt>
 							<dd>
 								<input type="text" id="email_address" name="email" value="', $context['email_address'], '" size="25" maxlength="255" />
