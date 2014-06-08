@@ -4312,7 +4312,7 @@ function removeScheduleTaskImmediate($task, $calculateNextTrigger = true)
  */
 function replaceBasicActionUrl($string)
 {
-	global $scripturl, $context;
+	global $scripturl, $context, $boardurl;
 	static $find = null, $replace = null;
 
 	if ($find === null)
@@ -4321,6 +4321,7 @@ function replaceBasicActionUrl($string)
 			'{forum_name}',
 			'{forum_name_html_safe}',
 			'{script_url}',
+			'{board_url}',
 			'{login_url}',
 			'{register_url}',
 			'{activate_url}',
@@ -4339,6 +4340,7 @@ function replaceBasicActionUrl($string)
 			$context['forum_name'],
 			$context['forum_name_html_safe'],
 			$scripturl,
+			$boardurl,
 			$scripturl . '?action=login',
 			$scripturl . '?action=register',
 			$scripturl . '?action=activate',
