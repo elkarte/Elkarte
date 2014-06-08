@@ -1,7 +1,7 @@
 <?php
 // Version: 1.0; Errors
 
-global $scripturl, $modSettings;
+global $scripturl;
 
 $txt['no_access'] = 'Sorry, we can\'t let you access this section. We can\'t even tell you if it exists. You\'re welcome to visit the main page and choose your way from there.';
 $txt['not_guests'] = 'Sorry, this action is not available to guests.';
@@ -340,7 +340,7 @@ $txt['profile_error_no_password'] = 'You did not enter your password';
 $txt['profile_error_bad_new_password'] = 'The new passwords you entered do not match';
 $txt['profile_error_bad_password'] = 'The password you entered was not correct';
 $txt['profile_error_bad_avatar'] = 'The avatar you have selected is either too large or not an avatar';
-$txt['profile_error_password_short'] = 'Your password must be at least ' . (empty($modSettings['password_strength']) ? 4 : 8) . ' characters long.';
+$txt['profile_error_password_short'] = 'Your password must be at least %1$s characters long.';
 $txt['profile_error_password_restricted_words'] = 'Your password must not contain your user name, email address or other commonly used words.';
 $txt['profile_error_password_chars'] = 'Your password must contain a mix of upper and lower case letters, as well as digits.';
 $txt['profile_error_already_requested_group'] = 'You already have an outstanding request for this group!';
