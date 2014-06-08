@@ -1425,7 +1425,7 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	private function _basicSettings()
 	{
-		global $txt, $modSettings;
+		global $txt, $modSettings, $context;
 
 		// We need to know if personal text is enabled, and if it's in the registration fields option.
 		// If admins have set it up as an on-registration thing, they can't set a default value (because it'll never be used)
@@ -1455,7 +1455,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('check', 'minify_css_js'),
 			'',
 				// SEO stuff
-				array('check', 'queryless_urls', 'subtext' => '<strong>' . $txt['queryless_urls_note'] . '</strong>'),
+				array('check', 'queryless_urls', 'subtext' => '<strong>' . $txt['queryless_urls_note'] . '</strong><br />' . ($context['server']['is_apache'] || $context['server']['is_lighttpd'] ? $txt['queryless_urls_work'] : '<span class="error">' . $txt['queryless_urls_notwork'] . '</span>')),
 				array('text', 'meta_keywords', 'subtext' => $txt['meta_keywords_note'], 'size' => 50),
 			'',
 				// Number formatting, timezones.
