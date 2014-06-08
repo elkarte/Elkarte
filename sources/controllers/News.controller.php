@@ -76,6 +76,7 @@ class News_Controller extends Action_Controller
 			obExit(false);
 
 		loadLanguage('Stats');
+		$txt['xml_rss_desc'] = replaceBasicActionUrl($txt['xml_rss_desc']);
 
 		// Default to latest 5.  No more than whats defined in the ACP or 255
 		$limit = empty($modSettings['xmlnews_limit']) ? 5 : min($modSettings['xmlnews_limit'], 255);
