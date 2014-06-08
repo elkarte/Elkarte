@@ -1,8 +1,6 @@
 <?php
 // Version: 1.0; ModerationCenter
 
-global $scripturl;
-
 $txt['moderation_center'] = 'Moderation Center';
 $txt['mc_main'] = 'Main';
 $txt['mc_logs'] = 'Logs';
@@ -11,7 +9,7 @@ $txt['mc_groups'] = 'Members and groups';
 
 $txt['mc_view_groups'] = 'View Membergroups';
 
-$txt['mc_description'] = '<strong>%1$s %2$s!</strong><br />This is your &quot;Moderation Center&quot;. From here you can perform all the moderation actions assigned to yourself by the Administrator. This home page contains a summary of all the latest happenings in your community. You can <a href="' . $scripturl . '?action=moderate;area=settings">personalize the layout by clicking here</a>.';
+$txt['mc_description'] = '<strong>Welcome, %1$s!</strong><br />This is your &quot;Moderation Center&quot;. From here you can perform all the moderation actions assigned to yourself by the Administrator. This home page contains a summary of all the latest happenings in your community. You can <a href="%2$s">personalize the layout by clicking here</a>.';
 $txt['mc_group_requests'] = 'Membergroup Requests';
 $txt['mc_member_requests'] = 'Member Requests';
 $txt['mc_unapproved_posts'] = 'Unapproved Posts';
