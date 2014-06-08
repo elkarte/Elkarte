@@ -382,7 +382,7 @@ class ProfileOptions_Controller extends Action_Controller
 			loadCustomFields($memID, 'forumprofile');
 
 		$context['sub_template'] = 'edit_options';
-		$context['page_desc'] = $txt['forumProfile_info'];
+		$context['page_desc'] = replaceBasicActionUrl($txt['forumProfile_info']);
 		$context['show_preview_button'] = true;
 
 		setupProfileContext(

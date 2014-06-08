@@ -1,8 +1,6 @@
 <?php
 // Version: 1.0; Profile
 
-global $context;
-
 $txt['no_profile_edit'] = 'You are not allowed to change this person\'s profile.';
 $txt['website_title'] = 'Website title';
 $txt['website_url'] = 'Website URL';
@@ -206,7 +204,7 @@ $txt['change_authentication'] = 'From this section you can change how you login 
 
 $txt['profileEdit'] = 'Modify Profile';
 $txt['account_info'] = 'These are your account settings. This page holds all critical information that identifies you on this forum. For security reasons, you will need to enter your (current) password to make changes to this information.';
-$txt['forumProfile_info'] = 'You can change your personal information on this page. This information will be displayed throughout ' . $context['forum_name_html_safe'] . '. If you aren\'t comfortable with sharing some information, simply skip it - nothing here is required.';
+$txt['forumProfile_info'] = 'You can change your personal information on this page. This information will be displayed throughout {forum_name_html_safe}. If you aren\'t comfortable with sharing some information, simply skip it - nothing here is required.';
 $txt['theme_info'] = 'This section allows you to customize the look and layout of the forum.';
 $txt['notifications'] = 'Notifications';
 $txt['notification_info'] = 'This allows you to be notified of replies to posts, newly posted topics, and forum announcements. You can change those settings here, or oversee the topics and boards you are currently receiving notifications for.';
