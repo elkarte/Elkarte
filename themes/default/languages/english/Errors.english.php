@@ -1,8 +1,6 @@
 <?php
 // Version: 1.0; Errors
 
-global $scripturl;
-
 $txt['no_access'] = 'Sorry, we can\'t let you access this section. We can\'t even tell you if it exists. You\'re welcome to visit the main page and choose your way from there.';
 $txt['not_guests'] = 'Sorry, this action is not available to guests.';
 
@@ -13,7 +11,6 @@ $txt['topic_locked'] = 'This topic is locked, you are not allowed to post or mod
 $txt['no_password'] = 'Password field empty';
 $txt['already_a_user'] = 'The user name you tried to use already exists.';
 $txt['cant_move'] = 'You are not allowed to move topics...';
-$txt['login_to_post'] = 'To post you must be logged in. If you don\'t have an account yet, please <a href="' . $scripturl . '?action=register">register</a>.';
 $txt['passwords_dont_match'] = 'Passwords aren\'t the same.';
 $txt['register_to_use'] = 'Sorry, you must register before using this feature.';
 $txt['password_invalid_character'] = 'Invalid character used in password.';
