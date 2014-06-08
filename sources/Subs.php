@@ -4312,6 +4312,7 @@ function replaceBasicActionUrl($string)
 	{
 		$find = array(
 			'{forum_name}',
+			'{forum_name_html_safe}',
 			'{login_url}',
 			'{register_url}',
 			'{activate_url}',
@@ -4321,6 +4322,7 @@ function replaceBasicActionUrl($string)
 		);
 		$replace = array(
 			$context['forum_name'],
+			$context['forum_name_html_safe'],
 			$scripturl . '?action=login',
 			$scripturl . '?action=register',
 			$scripturl . '?action=activate',

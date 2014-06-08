@@ -1462,7 +1462,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	// Set the top level linktree up.
 	array_unshift($context['linktree'], array(
 		'url' => $scripturl,
-		'name' => $context['forum_name_html_safe']
+		'name' => $context['forum_name']
 	));
 
 	// This allows sticking some HTML on the page output - useful for controls.
