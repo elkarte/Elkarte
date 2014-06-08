@@ -332,7 +332,7 @@ function determineActions($urls, $preferred_prefix = false)
 					)
 				);
 				list ($id_topic, $subject) = $db->fetch_row($result);
-				$data[$k] = sprintf($txt['whopost_' . $actions['action']], $id_topic, $subject);
+				$data[$k] = sprintf($txt['whopost_' . $actions['action']], $scripturl . '?topic=' . $id_topic . '.0', $subject);
 				$db->free_result($result);
 
 				if (empty($id_topic))
