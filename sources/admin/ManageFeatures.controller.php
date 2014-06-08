@@ -79,7 +79,7 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		global $context, $txt, $settings;
+		global $context, $txt, $settings, $scripturl;
 
 		// Often Helpful
 		loadLanguage('Help');
@@ -144,7 +144,7 @@ class ManageFeatures_Controller extends Action_Controller
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['modSettings_title'],
 			'help' => 'featuresettings',
-			'description' => sprintf($txt['modSettings_desc'], $settings['theme_id'], $context['session_id'], $context['session_var']),
+			'description' => sprintf($txt['modSettings_desc'], $scripturl . '?action=admin;area=theme;sa=list;th=' . $settings['theme_id'] . ';' . $context['session_id'] . '=' . $context['session_var']),
 			'tabs' => array(
 				'basic' => array(
 				),
@@ -764,7 +764,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=sig';
 		$context['settings_title'] = $txt['signature_settings'];
-		$context['settings_message'] = !empty($settings_applied) ? $txt['signature_settings_applied'] : sprintf($txt['signature_settings_warning'], $context['session_id'], $context['session_var']);
+		$context['settings_message'] = !empty($settings_applied) ? $txt['signature_settings_applied'] : sprintf($txt['signature_settings_warning'], $scripturl . '?action=admin;area=featuresettings;sa=sig;apply;' . $context['session_id'] . '=' . $context['session_var']);
 
 		Settings_Form::prepare_db($config_vars);
 	}
