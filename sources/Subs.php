@@ -4303,6 +4303,13 @@ function removeScheduleTaskImmediate($task, $calculateNextTrigger = true)
 	}
 }
 
+/**
+ * Helper function to replace commonly used urls in text strings
+ *
+ * @param string $string the string to inject URLs into
+ * @return string the input string with the place-holders replaced with
+ *           the correct URLs
+ */
 function replaceBasicActionUrl($string)
 {
 	global $scripturl, $context;
@@ -4313,6 +4320,7 @@ function replaceBasicActionUrl($string)
 		$find = array(
 			'{forum_name}',
 			'{forum_name_html_safe}',
+			'{script_url}',
 			'{login_url}',
 			'{register_url}',
 			'{activate_url}',
@@ -4323,6 +4331,7 @@ function replaceBasicActionUrl($string)
 		$replace = array(
 			$context['forum_name'],
 			$context['forum_name_html_safe'],
+			$scripturl,
 			$scripturl . '?action=login',
 			$scripturl . '?action=register',
 			$scripturl . '?action=activate',
