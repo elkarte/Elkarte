@@ -4331,5 +4331,5 @@ function replaceBasicActionUrl($string)
 		call_integration_hook('integrate_basic_url_replacement', array(&$find, &$replace));
 	}
 
-	return str_repalce($find, $replace, $string);
+	return str_replace($find, $replace, $string);
 }
