@@ -557,7 +557,7 @@ $helptxt['posts_and_topics'] = '
 			Modify the settings related to topics. The number of topics per page, whether pinned topics are enabled or not, the number of messages needed for a topic to be hot, etc.
 		</li>
 	</ul>';
-$helptxt['allow_no_censored'] = 'This global setting when checked, allows members to disable word censoring in their User Profile through the Look and Layout settings. The members ablility to disable word censoring is still limited by their permission profile.';
+$helptxt['allow_no_censored'] = 'When checked, this global setting allows members to disable word censoring in their User Profile through the Look and Layout settings. The members\' ablility to disable word censoring is still limited by their permission profile.';
 $helptxt['spider_mode'] = 'Sets the logging level.<br />
 Standard - Logs minimal spider activity.<br />
 Moderate - Provides more accurate statistics.<br />
