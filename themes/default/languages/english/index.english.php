@@ -257,14 +257,13 @@ $txt['female'] = 'Female';
 
 $txt['error_invalid_characters_username'] = 'Invalid character used in user name.';
 
-$txt['welcome_guest'] = 'Welcome, <strong>%1$s</strong>. Please <a href="%2$s">login</a>.';
+$txt['welcome_guest'] = 'Welcome, <strong>Guest</strong>. Please <a href="{login_url}">login</a>.';
 
-//$txt['welcome_guest_register'] = 'Welcome, <strong>%1$s</strong>. Please <a href="' . $scripturl . '?action=login">login</a> or <a href="' . $scripturl . '?action=register">register</a>.';
-$txt['welcome_guest_register'] = 'Welcome to <strong>'. $context['forum_name']. '</strong>. Please <a href="' . $scripturl . '?action=login">login</a> or <a href="' . $scripturl . '?action=register">register</a>.';
+$txt['welcome_guest_register'] = 'Welcome to <strong>{forum_name}</strong>. Please <a href="{login_url}">login</a> or <a href="{register_url}">register</a>.';
 
-$txt['please_login'] = 'Please <a href="' . $scripturl . '?action=login">login</a>.';
-$txt['login_or_register'] = 'Please <a href="' . $scripturl . '?action=login">login</a> or <a href="' . $scripturl . '?action=register">register</a>.';
-$txt['welcome_guest_activate'] = '<br />Did you miss your <a href="' . $scripturl . '?action=activate">activation email</a>?';
+$txt['please_login'] = 'Please <a href="{login_url}">login</a>.';
+$txt['login_or_register'] = 'Please <a href="{login_url}">login</a> or <a href="{register_url}">register</a>.';
+$txt['welcome_guest_activate'] = '<br />Did you miss your <a href="{activate_url}">activation email</a>?';
 // @todo the following to sprintf
 $txt['hello_member'] = 'Hey,';
 // Use numeric entities in the below string.
@@ -552,7 +551,7 @@ $txt['skip_nav'] = 'Skip to main content';
 $txt['go_up'] = 'Go Up';
 $txt['go_down'] = 'Go Down';
 
-$forum_copyright = '<a href="http://www.elkarte.net" title="ElkArte Forum" target="_blank" class="new_win">powered by %1$s</a> | <a href="' . $scripturl . '?action=who;sa=credits" title="Credits" target="_blank" class="new_win">credits</a>';
+$forum_copyright = '<a href="http://www.elkarte.net" title="ElkArte Forum" target="_blank" class="new_win">powered by %1$s</a> | <a href="{credits_url}" title="Credits" target="_blank" class="new_win">credits</a>';
 
 $txt['birthdays'] = 'Birthdays:';
 $txt['events'] = 'Events:';
