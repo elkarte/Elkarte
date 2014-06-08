@@ -1,8 +1,6 @@
 <?php
 // Version: 1.0; Who
 
-global $scripturl;
-
 $txt['who_hidden'] = '<em>hmm... no idea, sorry</em>';
 $txt['who_admin'] = 'Viewing the admin portal';
 $txt['who_moderate'] = 'Viewing the moderator portal';
@@ -127,9 +125,9 @@ $txt['who_viewprofile'] = 'Viewing <a href="%1$s">%2$s</a>\'s profile.';
 $txt['who_profile'] = 'Editing the profile of <a href="%1$s">%2$s</a>.';
 $txt['who_post'] = 'Posting a new topic in <a href="%1$s">%2$s</a>.';
 $txt['who_poll'] = 'Posting a new poll in <a href="%1$s">%2$s</a>.';
+$txt['who_topicbyemail'] = 'Email starting a new topic in <a href="%1$s">%2$s</a>.';
 
-$txt['whotopic_topicbyemail'] = 'Email starting a new topic in <a href="' . $scripturl . '?board=%1$d.0">%2$s</a>.';
-$txt['whotopic_postbyemail'] = 'Email posting in <a href="' . $scripturl . '?topic=%1$d.0">%2$s</a>.';
+$txt['whotopic_postbyemail'] = 'Email posting in <a href="%1$s">%2$s</a>.';
 $txt['who_pm_byemail'] = 'Sending a personal message by email.';
 
 // Credits text

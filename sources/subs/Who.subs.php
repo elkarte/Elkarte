@@ -283,10 +283,13 @@ function determineActions($urls, $preferred_prefix = false)
 				$profile_ids[(int) $actions['u']][$k] = $actions['action'] == 'profile' ? $txt['who_viewprofile'] : $txt['who_profile'];
 			}
 			// Trying to post
-			elseif (($actions['action'] == 'post' || $actions['action'] == 'post2') && empty($actions['topic']) && isset($actions['board']))
+			elseif (($actions['action'] == 'post' || $actions['action'] == 'post2' || $actions['action'] == 'topicbyemail') && empty($actions['topic']) && isset($actions['board']))
 			{
 				$data[$k] = $txt['who_hidden'];
-				$board_ids[(int) $actions['board']][$k] = isset($actions['poll']) ? $txt['who_poll'] : $txt['who_post'];
+				if ($actions['action'] == 'topicbyemail')
+					$board_ids[(int) $actions['board']][$k] = $txt['who_topicbyemail'];
+				else
+					$board_ids[(int) $actions['board']][$k] = isset($actions['poll']) ? $txt['who_poll'] : $txt['who_post'];
 			}
 			// A subaction anyone can view... if the language string is there, show it.
 			elseif (isset($actions['sa']) && isset($txt['whoall_' . $actions['action'] . '_' . $actions['sa']]))
