@@ -1476,11 +1476,11 @@ function template_callback_external_search_engines()
 		foreach ($context['search_engines'] as $data)
 			echo '
 			<dt>
-				<label for="">', $txt['name'], ': <input type="text" name="engine_name[]" value="', $data['name'], '" size="50" class="input_text verification_question" /></label>
+				<label for="">', $txt['name_colon'], ' <input type="text" name="engine_name[]" value="', $data['name'], '" size="50" class="input_text verification_question" /></label>
 			</dt>
 			<dd>
-				<label for="">', $txt['url'], ': <input type="text" name="engine_url[]" value="', $data['url'], '" size="35" class="input_text verification_answer" /></label><br />
-				<label for="">', $txt['words_sep'], ': <input type="text" name="engine_separator[]" value="', $data['separator'], '" size="5" class="input_text verification_answer" /></label>
+				<label for="">', $txt['url_colon'], ' <input type="text" name="engine_url[]" value="', $data['url'], '" size="35" class="input_text verification_answer" /></label><br />
+				<label for="">', $txt['words_sep_colon'], ' <input type="text" name="engine_separator[]" value="', $data['separator'], '" size="5" class="input_text verification_answer" /></label>
 			</dd>';
 
 	echo '

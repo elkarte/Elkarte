@@ -831,7 +831,7 @@ $txt['ajax_in_progress'] = 'Loading...';
 $txt['mod_reports_waiting'] = 'There are currently %1$d moderator reports open.';
 
 $txt['new_posts_in_category'] = 'Click to see the new posts in %1$s';
-$txt['verification'] = 'Verification';
+$txt['verification'] = 'Verification Image';
 $txt['visual_verification_hidden'] = 'Please leave this box empty';
 $txt['visual_verification_description'] = 'Type the letters shown in the picture';
 $txt['visual_verification_sound'] = 'Listen to the letters';
@@ -915,3 +915,10 @@ $txt['ok_uppercase'] = 'OK';
 
 // Title of box for warnings that admins should see
 $txt['admin_warning_title'] = 'Warning';
+
+// Global strings that require colons or other characters
+$txt['name_colon'] = 'Name:';
+$txt['email_colon'] = 'Email:';
+$txt['url_colon'] = 'URL:';
+$txt['words_sep_colon'] = 'Words separator:';
+
