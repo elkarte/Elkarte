@@ -158,7 +158,7 @@ class ManagePaid_Controller extends Action_Controller
 		{
 			checkSession();
 
-			call_integration_hook('integrate_save_subscription_settings', array(&$config_vars));
+			call_integration_hook('integrate_save_subscription_settings');
 
 			// Check that the entered email addresses are valid
 			if (!empty($_POST['paid_email_to']))
