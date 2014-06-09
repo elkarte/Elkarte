@@ -510,7 +510,7 @@ div.bbc_footnotes .meaction{
 /*	$MENUS		*/
 /* ------------------------------------------------------- */
 /* Level 1 Menu bar: link or button. General styling. */
-.linklevel1, .linklevel1:link, .linklevel1:visited {
+.linklevel1, .inline_mod_check, .linklevel1:link, .linklevel1:visited {
 	border-radius: 2px;
 	border: 1px solid #afafaf;
 	border-top: 1px solid #cfcfcf;
@@ -519,6 +519,10 @@ div.bbc_footnotes .meaction{
 	background-image: linear-gradient(to bottom, #fff, #e4e4e4);
 	box-shadow: 1px 1px 2px #e5e5e5;
 	color: #566e4b;
+}
+.inline_mod_check {
+	border-radius: 0 2px 2px 0;
+	border-left: none;
 }
 /* Level 1 button hover and focus effects. */
 .linklevel1:hover, .listlevel1:hover .linklevel1,

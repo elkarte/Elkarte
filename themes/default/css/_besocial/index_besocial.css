@@ -451,7 +451,7 @@ div.bbc_footnotes .meaction {
 /*	$MENUS		*/
 /* ------------------------------------------------------- */
 /* Level 1 Menu bar: link or button. General styling. */
-.linklevel1, .linklevel1:link, .linklevel1:visited {
+.linklevel1, .inline_mod_check, .linklevel1:link, .linklevel1:visited {
 	border-radius: 2px;
 	border: 1px solid #afafaf;
 	border-top: 1px solid #cfcfcf;
@@ -461,6 +461,10 @@ div.bbc_footnotes .meaction {
 	box-shadow: 1px 1px 2px #e5e5e5;
 	color: #666;
 	font-size: 0.929em;
+}
+.inline_mod_check {
+	border-radius: 0 2px 2px 0;
+	border-left: none;
 }
 .quickbuttons .listlevel1 {
 	font-size: 0.929em;
