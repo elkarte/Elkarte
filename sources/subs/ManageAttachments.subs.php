@@ -1189,7 +1189,7 @@ function list_getNumUnapprovedAttachments($approve_query)
  */
 function list_getAttachDirs()
 {
-	global $modSettings, $context, $txt;
+	global $modSettings, $context, $txt, $scripturl;
 
 	$db = database();
 

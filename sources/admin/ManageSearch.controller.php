@@ -634,7 +634,7 @@ class ManageSearch_Controller extends Action_Controller
 	 */
 	private function loadSearchAPIs()
 	{
-		global $txt;
+		global $txt, $scripturl;
 
 		$apis = array();
 		$dh = opendir(SUBSDIR);
