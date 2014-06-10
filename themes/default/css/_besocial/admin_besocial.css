@@ -74,5 +74,12 @@
 }
 .theme_options .windowbg {
 	border-top: 1px solid #ccc;
-	border-bottom: 1px solid #ccc;	
+	border-bottom: 1px solid #ccc;
+}
+
+/* the help ? icon in various spots */
+a.help .icon {
+	margin: 0;
+	padding: 0 6px 2px 0;
+	vertical-align: middle;
 }
