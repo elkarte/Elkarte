@@ -1,8 +1,6 @@
 <?php
 // Version: 1.0; ManagePaid
 
-global $boardurl;
-
 // Symbols.
 $txt['usd_symbol'] = '$%1.2f';
 $txt['eur_symbol'] = '&euro;%1.2f';
@@ -58,7 +56,7 @@ $txt['nochex_email_desc'] = 'E-Mail-Adresse Ihres Verkäuferkontos auf Nochex. L
 $txt['paid_note'] = '<strong class="alert">Hinweis:</strong><br />Damit Abonnements für Ihre Benutzer automatisch verlängert werden
 	können, müssen Sie für jede Ihrer Bezahlmethoden einen Rückkehr-URL einrichten. Für alle Bezahlmethoden sollte dieser URL eingestellt
 	werden auf:<br /><br />
-	&nbsp;&nbsp;&bull;&nbsp;&nbsp;<strong>' . $boardurl . '/subscriptions.php</strong><br /><br />
+	&nbsp;&nbsp;&bull;&nbsp;&nbsp;<strong>{board_url}/subscriptions.php</strong><br /><br />
 	Sie können den Link für PayPal direkt ändern, <a href="https://www.paypal.com/us/cgi-bin/webscr?cmd=_profile-ipn-notify" target="_blank">indem Sie hier klicken</a>.<br />
 	Bei den übrigen Anbietern finden Sie diese normalerweise in Ihrem Kundenbereich, meist unter dem Begriff &quot;Callback-URL&quot; oder einem ähnlichen.';
 

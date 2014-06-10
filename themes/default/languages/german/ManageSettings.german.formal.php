@@ -1,9 +1,7 @@
 <?php
 // Version: 1.0; ManageSettings
 
-global $scripturl;
-
-$txt['modSettings_desc'] = 'Diese Seite ermöglicht es Ihnen, Einstellungen von Funktionen vorzunehmen und grundlegende Optionen Ihres Forums festzulegen.  Bitte beachten Sie für weitere Einstellungen auch die <a href="' . $scripturl . '?action=admin;area=theme;sa=list;th=%1$s;%3$s=%2$s">Designeinstellungen</a>  Für weitere Informationen über eine Einstellung klicken Sie auf das jeweilige Hilfe-Symbol.';
+$txt['modSettings_desc'] = 'Diese Seite ermöglicht es Ihnen, Einstellungen von Funktionen vorzunehmen und grundlegende Optionen Ihres Forums festzulegen.  Bitte beachten Sie für weitere Einstellungen auch die <a href="%1$s">Designeinstellungen</a>  Für weitere Informationen über eine Einstellung klicken Sie auf das jeweilige Hilfe-Symbol.';
 $txt['security_settings_desc'] = 'Diese Seite erlaubt es Ihnen, Einstellungen vorzunehmen, die insbesondere mit der Sicherheit und Moderation Ihres Forums zu tun haben, einschließlich Anti-Spam-Optionen.';
 $txt['modification_settings_desc'] = 'Diese Seite beinhaltet Einstellungen, die durch jegliche Modfikationen an Ihrem Forum hinzugefügt wurden';
 
@@ -264,7 +262,7 @@ $txt['setting_warning_show_all'] = 'Alle Benutzer';
 
 $txt['signature_settings'] = 'Signatureinstellungen';
 $txt['signature_settings_desc'] = 'Verwenden Sie die Einstellungen auf dieser Seite, um festzulegen, wie mit Mitgliedssignaturen umgegangen werden soll.';
-$txt['signature_settings_warning'] = 'Beachten Sie, dass Änderungen standardmäßig nicht auf bereits vorhandene Signaturen angewandt werden.<br /><a class="button_submit" href="' . $scripturl . '?action=admin;area=featuresettings;sa=sig;apply;%2$s=%1$s">Diesen Vorgang nun durchführen</a>';
+$txt['signature_settings_warning'] = 'Beachten Sie, dass Änderungen standardmäßig nicht auf bereits vorhandene Signaturen angewandt werden.<br /><a class="button_submit" href="%1$s">Diesen Vorgang nun durchführen</a>';
 $txt['signature_settings_applied'] = 'Die aktualisierten Regeln wurden auf die vorhandenen Signaturen angewandt.';
 $txt['signature_enable'] = 'Signaturen aktivieren';
 $txt['signature_max_length'] = 'Maximal erlaubte Zeichen';

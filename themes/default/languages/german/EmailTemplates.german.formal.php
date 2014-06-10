@@ -9,7 +9,7 @@
 
 // Do not use block comments in this file, they will have special meaning.
 
-global $context, $txtBirthdayEmails;
+global $txtBirthdayEmails;
 
 $txt['scheduled_approval_email_topic'] = 'Folgende Themen warten auf Genehmigung:';
 $txt['scheduled_approval_email_msg'] = 'Folgende Beiträge warten auf Genehmigung:';

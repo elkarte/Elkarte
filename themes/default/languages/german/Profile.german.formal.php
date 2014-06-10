@@ -1,8 +1,6 @@
 <?php
 // Version: 1.0; Profile
 
-global $scripturl, $context;
-
 $txt['no_profile_edit'] = 'Sie haben keine Berechtigung, dieses Profil zu ändern.';
 $txt['website_title'] = 'Titel der Webseite';
 $txt['website_url'] = 'URL der Webseite';
@@ -83,7 +81,6 @@ $txt['secret_ask'] = 'Stelle mir die geheime Frage';
 $txt['cant_retrieve'] = 'Sie haben keine Möglichkeit, Ihr Passwort abzufragen! Sie können aber ein neues festlegen, indem Sie dem Link folgen, der Ihnen per E-Mail zugeschickt werden kann. Beantworten Sie Ihre geheime Frage, so können Sie gleich ein neues Passwort festlegen.';
 $txt['incorrect_answer'] = 'Sie haben keine gültige Kombination aus Geheimfrage und -antwort im Benutzerprofil angegeben. Bitte klicken Sie auf die Schaltfläche \'Zurück\' und benutzen die Standardmethode, um Ihr Passwort zu erlangen.';
 $txt['enter_new_password'] = 'Bitte geben Sie die Antwort auf Ihre geheime Frage und das gewünschte Passwort ein. Das Passwort wird danach geändert - vorausgesetzt, Sie haben die Frage richtig beantwortet.';
-$txt['password_success'] = 'Ihr Passwort wurde erfolgreich geändert.<br />Zur Anmeldung <a href="' . $scripturl . '?action=login">hier</a> klicken.';
 $txt['secret_why_blank'] = 'Warum ist dieses Feld leer?';
 
 $txt['authentication_reminder'] = 'Authentifizierungserinnerung';
@@ -207,7 +204,7 @@ $txt['change_authentication'] = 'Hier können Sie auswählen, wie Sie sich im Foru
 
 $txt['profileEdit'] = 'Profil ändern';
 $txt['account_info'] = 'Dies sind Ihre Kontoeinstellungen. Hier können Sie alle wichtigen Informationen ändern, die Sie im Forum identifizieren. Aus Sicherheitsgründen müssen Sie Ihr (aktuelles) Passwort eingeben, wenn Sie diese Angaben ändern.';
-$txt['forumProfile_info'] = 'Hier können Sie Ihre persönlichen Informationen ändern. Diese Informationen werden überall im Forum ' . $context['forum_name_html_safe'] . ' angezeigt werden. Wenn Sie bestimmte Informationen nicht preisgeben möchten, lassen Sie die entsprechenden Felder einfach leer.';
+$txt['forumProfile_info'] = 'Hier können Sie Ihre persönlichen Informationen ändern. Diese Informationen werden überall im Forum {forum_name_html_safe} angezeigt werden. Wenn Sie bestimmte Informationen nicht preisgeben möchten, lassen Sie die entsprechenden Felder einfach leer.';
 $txt['theme_info'] = 'Hier können Sie das Design und Layout des Forums ändern.';
 $txt['notification'] = 'Benachrichtigungen &amp; E-Mail';
 $txt['notification_info'] = 'Dies erlaubt es Ihnen, über Antworten auf Beiträge, neu eröffnete Themen und Forumsankündigungen benacrichtigt zu werden. Hier können Sie die abonnierten Themen und Foren anschauen sowie die entsprechenden Einstellungen ändern.';
@@ -262,8 +259,6 @@ $txt['to_ask_password'] = 'um nach dem Passwort zu fragen';
 $txt['user_email'] = 'Benutzername/E-Mail';
 
 // Use numeric entities in the below two strings.
-$txt['reminder_subject'] = 'Neues Passwort für ' . $context['forum_name'];
-$txt['reminder_mail'] = 'Diese E-Mail wurde gesendet, weil Sie die \'Passwort vergessen\'-Funktion benutzt haben. Um ein neues Passwort einzugeben, klicken Sie bitte auf folgenden Link';
 $txt['reminder_sent'] = 'Eine E-Mail wurde an Ihre Adresse geschickt. Klicken Sie auf den dortigen Link, um ein neues Passwort einzugeben.';
 $txt['reminder_openid_sent'] = 'Ihre aktuelle OpenID-Identität wurde an Ihre E-Mail-Adresse gesendet.';
 $txt['reminder_set_password'] = 'Passwort eingeben';
@@ -437,8 +432,19 @@ $txt['profile_warning_notify_subject'] = 'Betreff der Benachrichtigung';
 $txt['profile_warning_notify_body'] = 'Text der Benachrichtigung';
 $txt['profile_warning_notify_template_subject'] = 'Sie haben eine Verwarnung erhalten';
 // Use numeric entities in below string.
-$txt['profile_warning_notify_template_outline'] = '%1$s,' . "\n\n" . 'Sie haben eine Verwarnung wegen %2$s erhalten. Bitte stellen Sie diese Aktivitäten ein und halten Sie sich ich an die Forenregeln, da wir sonst weitere Maßnahmen ergreifen müssen.' . "\n\n" . $txt['regards_team'];
-$txt['profile_warning_notify_template_outline_post'] = '%1$s,' . "\n\n" . 'Sie haben eine Verwarnung wegen %2$s aufgrund [url=' . $scripturl . '?msg=%3$s]dieses Beitrags[/url]. Bitte unterlassen Sie dieses Verhalten in Zukunft und befolgen Sie die Forenregeln, da sonst weitere Schritte eingeleitet werden.' . "\n\n" . $txt['regards_team'];
+$txt['profile_warning_notify_template_outline'] = '{MEMBER},
+
+Sie haben eine Verwarnung wegen %1$s erhalten. Bitte stellen Sie diese Aktivitäten ein und halten Sie sich ich an die Forenregeln, da wir sonst weitere Maßnahmen ergreifen müssen.
+
+{REGARDS}';
+$txt['profile_warning_notify_template_outline_post'] = '{MEMBER},
+
+Sie haben eine Verwarnung wegen %1$s aufgrund:
+{MESSAGE}.
+
+Bitte unterlassen Sie dieses Verhalten in Zukunft und befolgen Sie die Forenregeln, da sonst weitere Schritte eingeleitet werden.
+
+{REGARDS}';
 $txt['profile_warning_notify_for_spamming'] = 'Spam';
 $txt['profile_warning_notify_title_spamming'] = 'Spam';
 $txt['profile_warning_notify_for_offence'] = 'Beleidigung'; // translator note: it can all be so easy

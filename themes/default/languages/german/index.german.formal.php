@@ -1,7 +1,7 @@
 <?php
 // Version: 1.0; index
 
-global $forum_copyright, $forum_version, $webmaster_email, $scripturl, $context, $boardurl;
+global $forum_copyright;
 
 // Locale (strftime, pspell_new) and spelling. (pspell_new, can be left as '' normally.)
 // For more information see:
@@ -173,7 +173,7 @@ $txt['notify'] = 'Benachrichtigen';
 $txt['unnotify'] = 'Nicht mehr benachrichtigen';
 $txt['notify_request'] = 'Möchten Sie per E-Mail benachrichtigt werden, wenn jemand auf dieses Thema antwortet?';
 // Use numeric entities in the below string.
-$txt['regards_team'] = "Grüße,\ndas " . $context['forum_name'] . '-Team.';
+$txt['regards_team'] = "Grüße,\ndas {forum_name}-Team.";
 $txt['notify_replies'] = 'Bei Antwort benachrichtigen';
 $txt['move_topic'] = 'Verschieben';
 $txt['move_to'] = 'Verschieben nach';
@@ -259,12 +259,12 @@ $txt['error_invalid_characters_username'] = 'Ungültiges Zeichen im Benutzername
 
 $txt['welcome_guest'] = 'Willkommen, <strong>%1$s</strong>. Bitte <a href="%2$s">melden Sie sich an</a>.';
 
-//$txt['welcome_guest_register'] = 'Willkommen, <strong>%1$s</strong>. Bitte <a href="' . $scripturl . '?action=login">melden Sie sich an</a> oder <a href="' . $scripturl . '?action=register">registrieren Sie sich</a>.';
-$txt['welcome_guest_register'] = 'Willkommen, <strong>'.$context["forum_name"].'</strong>. Bitte <a href="' . $scripturl . '?action=login">melden Sie sich an</a> oder <a href="' . $scripturl . '?action=register">registrieren Sie sich</a>.';
+//$txt['welcome_guest_register'] = 'Willkommen, <strong>%1$s</strong>. Bitte <a href="{login_url}">melden Sie sich an</a> oder <a href="{register_url}">registrieren Sie sich</a>.';
+$txt['welcome_guest_register'] = 'Willkommen, <strong>{forum_name}</strong>. Bitte <a href="{login_url}">melden Sie sich an</a> oder <a href="{register_url}">registrieren Sie sich</a>.';
 
-$txt['please_login'] = 'Bitte <a href="' . $scripturl . '?action=login">melden Sie sich an</a>.';
-$txt['login_or_register'] = 'Bitte <a href="' . $scripturl . '?action=login">melden Sie sich an</a> oder <a href="' . $scripturl . '?action=register">registrieren Sie sich</a>.';
-$txt['welcome_guest_activate'] = '<br />Haben Sie Ihre <a href="' . $scripturl . '?action=activate">Aktivierungs-E-Mail</a> übersehen?';
+$txt['please_login'] = 'Bitte <a href="{login_url}">melden Sie sich an</a>.';
+$txt['login_or_register'] = 'Bitte <a href="{login_url}">melden Sie sich an</a> oder <a href="{register_url}">registrieren Sie sich</a>.';
+$txt['welcome_guest_activate'] = '<br />Haben Sie Ihre <a href="{activate_url}">Aktivierungs-E-Mail</a> übersehen?';
 // @todo the following to sprintf
 $txt['hello_member'] = 'Hey,';
 // Use numeric entities in the below string.
@@ -444,7 +444,7 @@ $txt['tried_to_repair'] = 'ElkArte hat einen Fehler in Ihrer Datenbank entdeckt 
 $txt['database_error_versions'] = '<strong>Hinweis:</strong> Ihre Datenbankversion ist %1$s.';
 $txt['template_parse_error'] = 'Vorlagenverarbeitungsfehler!';
 $txt['template_parse_error_message'] = 'Anscheinend ist etwas mit dem Vorlagensystem nicht in Ordnung.  Dieses Problem sollte nur vorübergehend bestehen, kommen Sie also bitte später wieder und versuchen Sie es erneut.  Wenn Sie diese Nachricht weiterhin zu Gesicht bekommen, kontaktieren Sie bitte einen Administrator.<br /><br />Sie können auch versuchen, <a href="javascript:location.reload();">diese Seite neu zu laden</a>.';
-$txt['template_parse_error_details'] = 'Ein Problem ist beim Laden der Vorlage oder Sprachdatei <span class="tt"><strong>%1$s</strong></span> aufgetreten.  Bitte überprüfen Sie die Syntax und versuchen Sie es erneut - denken Sie daran, dass einfache Anführungszeichen (<span class="tt">\'</span>) oft mit einem umgekehrten Schrägstrich (<span class="tt">\\</span>) markiert werden müssen.  Um spezifischere Fehlerinformationen von PHP einzusehen, versuchen Sie <a href="' . $boardurl . '%1$s">die Datei direkt zu öffnen</a>.<br /><br />Möglicherweise möchten Sie <a href="javascript:location.reload();">diese Seite neu laden</a> oder <a href="' . $scripturl . '?theme=1">das Standarddesign verwenden</a>.';
+$txt['template_parse_error_details'] = 'Ein Problem ist beim Laden der Vorlage oder Sprachdatei <span class="tt"><strong>%1$s</strong></span> aufgetreten.  Bitte überprüfen Sie die Syntax und versuchen Sie es erneut - denken Sie daran, dass einfache Anführungszeichen (<span class="tt">\'</span>) oft mit einem umgekehrten Schrägstrich (<span class="tt">\\</span>) markiert werden müssen.  Um spezifischere Fehlerinformationen von PHP einzusehen, versuchen Sie <a href="%2$s%1$s">die Datei direkt zu öffnen</a>.<br /><br />Möglicherweise möchten Sie <a href="javascript:location.reload();">diese Seite neu laden</a> oder <a href="%3$s">das Standarddesign verwenden</a>.';
 $txt['template_parse_undefined'] = 'Ein unbekannter Fehler ist bei der Verarbeitung dieser Vorlage aufgetreten';
 
 $txt['today'] = 'Heute um ';
@@ -552,7 +552,7 @@ $txt['skip_nav'] = 'Zum Hauptinhalt springen';
 $txt['go_up'] = 'Nach oben';
 $txt['go_down'] = 'Nach unten';
 
-$forum_copyright = '<a href="http://www.elkarte.net" title="ElkArte-Forum" target="_blank" class="new_win">läuft mit %1$s</a> | <a href="' . $scripturl . '?action=who;sa=credits" title="Danksagungen" target="_blank" class="new_win">Danksagungen</a>';
+$forum_copyright = '<a href="http://www.elkarte.net" title="ElkArte-Forum" target="_blank" class="new_win">läuft mit %1$s</a> | <a href="{credits_url}" title="Danksagungen" target="_blank" class="new_win">Danksagungen</a>';
 
 $txt['birthdays'] = 'Geburtstage:';
 $txt['events'] = 'Ereignisse:';
@@ -590,7 +590,9 @@ $txt['moveTopic4'] = 'Den Betreff jeder Nachricht ändern';
 $txt['move_topic_unapproved_js'] = 'Warnung! Dieses Thema wurde noch nicht freigeschaltet.\\n\\nEs wird nicht empfohlen, dass Sie eine Weiterleitung erstellen, sofern Sie nicht sofort danach den Beitrag freigeben möchten.';
 $txt['movetopic_auto_board'] = '[BOARD]';
 $txt['movetopic_auto_topic'] = '[TOPIC LINK]';
-$txt['movetopic_default'] = 'Dieses Thema wurde verschoben nach ' . $txt['movetopic_auto_board'] . ".\n\n" . $txt['movetopic_auto_topic'];
+$txt['movetopic_default'] = 'Dieses Thema wurde verschoben nach [BOARD]
+
+[TOPIC LINK]';
 $txt['movetopic_redirect'] = 'In das verschobene Thema wechseln';
 $txt['movetopic_expires'] = 'Die Weiterleitung automatisch entfernen';
 
@@ -603,7 +605,9 @@ $txt['split_after_and_this_post'] = 'Thema ab diesem Beitrag aufteilen.';
 $txt['select_split_posts'] = 'Beiträge zum Abtrennen auswählen.';
 
 $txt['splittopic_notification'] = 'Eine Nachricht schreiben, wenn das Thema aufgeteilt wird';
-$txt['splittopic_default'] = 'Eine oder mehr Nachrichten in diesem Thema wurden nach ' . $txt['movetopic_auto_board'] . " verschoben.\n\n" . $txt['movetopic_auto_topic'];
+$txt['splittopic_default'] = 'Eine oder mehr Nachrichten in diesem Thema wurden nach [BOARD] verschoben.
+
+[TOPIC LINK]';
 $txt['splittopic_move'] = 'Das neue Thema in ein anderes Forum verschieben';
 
 $txt['new_topic'] = 'Neues Thema';
@@ -700,7 +704,7 @@ $txt['liked_you'] = 'Ihnen';
 $txt['liked_more'] = 'mehr';
 
 $txt['unread_topics_visit'] = 'Neue ungelesene Themen';
-$txt['unread_topics_visit_none'] = 'Es wurden keine seit Ihrem letzten Besuch ungelesenen Themen gefunden. <a href="' . $scripturl . '?action=unread;all" class="linkbutton">Klicken Sie hier, um alle ungelesenen Themen anzuzeigen</a>';
+$txt['unread_topics_visit_none'] = 'Es wurden keine seit Ihrem letzten Besuch ungelesenen Themen gefunden. <a href="{unread_all_url}" class="linkbutton">Klicken Sie hier, um alle ungelesenen Themen anzuzeigen</a>';
 $txt['unread_topics_all'] = 'Alle ungelesenen Themen';
 $txt['unread_replies'] = 'Aktualisierte Themen';
 

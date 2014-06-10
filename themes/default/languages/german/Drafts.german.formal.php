@@ -1,8 +1,6 @@
 <?php
 // Version: 1.0; Drafts
 
-global $scripturl, $context;
-
 // profile
 $txt['drafts_show'] = 'Entwürfe anzeigen';
 $txt['drafts_show_desc'] = 'Dieser Bereich zeigt alle Entwürfe an, die Sie derzeit gespeichert haben. Von hier aus können Sie sie vor dem Veröffentlichen ändern oder löschen';

@@ -1,8 +1,6 @@
 <?php
 // Version: 1.0; Admin
 
-global $settings, $scripturl;
-
 $txt['admin_boards'] = 'Foren';
 $txt['admin_back_to'] = 'Zurück zum Adminzentrum';
 $txt['admin_users'] = 'Benutzer';
@@ -53,7 +51,7 @@ $txt['admin_agreement_select_language'] = 'Zu ändernde Sprache';
 $txt['admin_agreement_select_language_change'] = 'Ändern';
 $txt['admin_delete_members'] = 'Ausgewählte Mitglieder löschen';
 $txt['admin_repair'] = 'Alle Foren und Themen reparieren';
-$txt['admin_main_welcome'] = 'Dies ist Ihr &quot;%1$s&quot;.  Hier können Sie Einstellungen ändern, Ihr Forum warten, Protokolle ansehen, Pakete installieren, Themen verwalten und vieles mehr.<br /><br />Bei Problemen schauen Sie bitte auf die Seite &quot;Unterstützung und Danksagungen&quot;.  Falls die dortigen Informationen Ihnen nicht weiterhelfen, bitten Sie einfach <a href="http://www.elkarte.net/index.php" target="_blank" class="new_win">uns um Hilfe</a> bei Ihrem Problem.<br />Möglicherweise finden Sie Antworten auf Ihre Fragen zu einzelnen Funktionen oder Probleme mit diesen auch per Klick auf die <img src="' . $settings['images_url'] . '/helptopics.png" alt="%2$s" title="%3$s" />-Symbole.';
+$txt['admin_main_welcome'] = 'Dies ist Ihr &quot;%1$s&quot;.  Hier können Sie Einstellungen ändern, Ihr Forum warten, Protokolle ansehen, Pakete installieren, Themen verwalten und vieles mehr.<br /><br />Bei Problemen schauen Sie bitte auf die Seite &quot;Unterstützung und Danksagungen&quot;.  Falls die dortigen Informationen Ihnen nicht weiterhelfen, bitten Sie einfach <a href="http://www.elkarte.net/index.php" target="_blank" class="new_win">uns um Hilfe</a> bei Ihrem Problem.<br />Möglicherweise finden Sie Antworten auf Ihre Fragen zu einzelnen Funktionen oder Probleme mit diesen auch per Klick auf die <img src="%3$s/helptopics.png" alt="%2$s" title="%3$s" />-Symbole.';
 $txt['admin_news_desc'] = 'Bitte fügen Sie eine Neuigkeit pro Block ein. BBCode-Tags wie <span>[b]</span>, <span>[i]</span> und <span>[u]</span> sind in Ihren Neuigkeiten ebenso erlaubt wie Smileys. Leeren Sie ein Feld einer Neuigkeit, um sie zu entfernen.';
 $txt['administrators'] = 'Forumsadministratoren';
 $txt['admin_reserved_desc'] = 'Reservierte Namen werden Mitglieder davon abhalten, bestimmte Benutzernamen zu registrieren oder als Anzeigenamen zu verwenden. Wählen Sie vor dem Absenden unten Ihre Optionen aus.';
@@ -149,7 +147,7 @@ $txt['security_wrong'] = 'Administratoren-Loginversuch!' . "\n" . 'Herkunft: %1$
 $txt['email_preview_warning'] = 'Diese Vorschau ist nicht zu 100 Prozent genau. Um die Funktionalität der Seite nicht zu beeinträchtigen, werden nur grundlegende HTML-Tags ausgewertet';
 $txt['email_as_html'] = 'Im HTML-Format senden.  (hiermit können Sie in der E-Mail normalen HTML-Code verwenden.)';
 $txt['email_parsed_html'] = '&lt;br /&gt;s und &amp;nbsp;s zu dieser Nachricht hinzufügen.';
-$txt['email_variables'] = 'In dieser Nachricht können Sie ein paar &quot;Variablen&quot; verwenden. <a href="' . $scripturl . '?action=quickhelp;help=emailmembers" onclick="return reqOverlayDiv(this.href);" class="help">Klicken Sie hier für weitere Informationen</a>.';
+$txt['email_variables'] = 'In dieser Nachricht können Sie ein paar &quot;Variablen&quot; verwenden. <a href="{help_emailmembers}" onclick="return reqOverlayDiv(this.href);" class="help">Klicken Sie hier für weitere Informationen</a>.';
 $txt['email_force'] = 'Auch an Mitglieder senden, die keine Ankündigungen erhalten möchten.';
 $txt['email_as_pms'] = 'Folgenden Gruppen als private Nachricht senden.';
 $txt['email_continue'] = 'Fortfahren';
@@ -395,7 +393,7 @@ $txt['attachment_security_settings'] = 'Anhangssicherheitseinstellungen';
 
 $txt['attach_dir_does_not_exist'] = 'nicht vorhanden';
 $txt['attach_dir_not_writable'] = 'nicht beschreibbar';
-$txt['attach_dir_files_missing'] = 'Dateien fehlen (<a href="' . $scripturl . '?action=admin;area=manageattachments;sa=repair;%2$s=%1$s">Reparieren</a>)';
+$txt['attach_dir_files_missing'] = 'Dateien fehlen (<a href="{repair_url}">Reparieren</a>)';
 $txt['attach_dir_unused'] = 'Ungenutzt';
 $txt['attach_dir_empty'] = 'Leer';
 $txt['attach_dir_ok'] = 'OK'; // ? :)
@@ -448,8 +446,8 @@ $txt['use_subdirectories_for_attachments'] = 'Neue Verzeichnisse innerhalb des B
 $txt['use_subdirectories_for_attachments_note'] = 'Ansonsten werden alle neuen Verzeichnisse im Hauptverzeichnis des Forums erzeugt.';
 $txt['basedirectory_for_attachments'] = 'Legen Sie ein Basisverzeichnis für Anhänge fest';
 $txt['basedirectory_for_attachments_current'] = 'Derzeitiges Basisverzeichnis';
-$txt['basedirectory_for_attachments_warning'] = '<div class="smalltext">Bitte beachten Sie, dass das Verzeichnis falsch ist. <br />(<a href="' . $scripturl . '?action=admin;area=manageattachments;sa=attachpaths">Versuchen zu korrigieren</a>)</div>';
-$txt['attach_current_dir_warning'] = '<div class="smalltext">Es scheint ein Problem mit diesem Verzeichnis zu geben. <br />(<a href="' . $scripturl . '?action=admin;area=manageattachments;sa=attachpaths">Versuchen zu korrigieren</a>)</div>';
+$txt['basedirectory_for_attachments_warning'] = '<div class="smalltext">Bitte beachten Sie, dass das Verzeichnis falsch ist. <br />(<a href="{attach_repair_url}">Versuchen zu korrigieren</a>)</div>';
+$txt['attach_current_dir_warning'] = '<div class="smalltext">Es scheint ein Problem mit diesem Verzeichnis zu geben. <br />(<a href="{attach_repair_url}">Versuchen zu korrigieren</a>)</div>';
 
 $txt['attachment_transfer'] = 'Anhänge übertragen';
 $txt['attachment_transfer_desc'] = 'Dateien zwischen Verzeichnissen verschieben.';

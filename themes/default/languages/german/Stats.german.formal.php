@@ -1,8 +1,6 @@
 <?php
 // Version: 1.0; Stats
 
-global $context;
-
 $txt['most_online'] = 'Am meisten online';
 
 $txt['stats_center'] = 'Statistikzentrum';
@@ -38,4 +36,4 @@ $txt['ssi_comment'] = 'Kommentar';
 $txt['ssi_comments'] = 'Kommentare';
 $txt['ssi_write_comment'] = 'Kommentar verfassen';
 $txt['ssi_no_guests'] = 'Sie können kein Forum angeben, das keine Gäste erlaubt.  Bitte überprüfen Sie die ID des Forums und versuchen Sie es erneut.';
-$txt['xml_rss_desc'] = 'Liveinformationen aus ' . $context['forum_name'];
+$txt['xml_rss_desc'] = 'Liveinformationen aus {forum_name}';

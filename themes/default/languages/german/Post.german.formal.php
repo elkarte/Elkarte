@@ -1,8 +1,6 @@
 <?php
 // Version: 1.0; Post
 
-global $context;
-
 $txt['post_reply'] = 'Antwort schreiben';
 $txt['message_icon'] = 'Nachrichtensymbol';
 $txt['post_in_board'] = 'Schreibe ins Forum';
