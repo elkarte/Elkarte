@@ -174,10 +174,10 @@ select::-moz-focus-inner {
 	border: 0;
 	padding: 0;
 }
-/* Apply the font only to these elements, and top align them. */
+/* Apply the font only to these elements */
 input, button, select {
 	padding: 2px 6px;
-	vertical-align: top;
+	vertical-align: middle;
 	font-size: 0.857em;
 	height: 26px;
 }
@@ -3478,21 +3478,16 @@ div.labels {
 .help {
 	cursor: help;
 }
-
 .help .icon, .hdicon.help {
 	margin: 0;
 	opacity: 0.8;
 	cursor: help;
 }
-
 .help .icon:hover, .hdicon.help:hover {
 	opacity: 1;
 }
-
 a.help .icon {
 	padding: 4px 0 0;
-	position: relative;
-	vertical-align: top;
 }
 
 /* Styles for the tooltips. */
@@ -3591,7 +3586,7 @@ a.help .icon {
 #advanced_search dt {
 	float: left;
 	clear: both;
-	padding: 2px 4px;
+	padding: 5px 4px 0 4px;
 	width: 35%;
 	text-align: right;
 }
@@ -3807,6 +3802,9 @@ dl.no_members {
 	float: left;
 	margin: 6px 0 0 0;
 	width: 49%;
+}
+.register_form img {
+	vertical-align: middle;
 }
 #confirm_buttons {
 	padding: 12px 0;
