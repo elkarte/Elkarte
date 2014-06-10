@@ -783,6 +783,7 @@ a.bbc_link {
 	line-height: 1.286em;
 	padding: 2px;
 	margin-left: 1px;
+	vertical-align: top;
 }
 .top_button img {
 	vertical-align: middle;
@@ -3779,6 +3780,12 @@ dl.no_members {
 	width: 54%;
 	text-align: left;
 }
+.login dl:nth-of-type(2) dt {
+	padding-top: 3px;
+}
+.login dl:nth-of-type(2) dd img {
+	vertical-align: top;
+}
 .login p {
 	text-align: center;
 }
@@ -3841,6 +3848,10 @@ dl.no_members {
 }
 #admin_login {
 	padding: 12px;
+}
+#admin_login img {
+	vertical-align: middle;
+	padding: 2px;
 }
 
 /*	$BOXES		*/
