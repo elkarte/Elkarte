@@ -194,7 +194,7 @@ function template_action_showPermissions()
 
 			foreach ($context['no_access_boards'] as $no_access_board)
 				echo '
-						<a href="', $no_access_board['url'], '">', $no_access_board['name'], '</a>', $no_access_board['is_last'] ? '' : ', ';
+						', $no_access_board['name'], $no_access_board['is_last'] ? '' : ', ';
 
 			echo '
 					</div>

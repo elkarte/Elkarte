@@ -1,8 +1,6 @@
 <?php
 // Version: 1.0; Login
 
-global $context;
-
 // Registration agreement page.
 $txt['registration_agreement'] = 'Nutzungsbedingungen';
 $txt['agreement_agree'] = 'Ich stimme den Nutzungsbedingungen zu.';
@@ -121,7 +119,7 @@ $txt['admin_register_done'] = 'Mitglied %1$s wurde erfolgreich registriert!';
 
 // translator note: some more informalities follow. :)
 $txt['coppa_title'] = 'Altersbeschränktes Forum';
-$txt['coppa_after_registration'] = 'Danke, dass du dich auf ' . $context['forum_name_html_safe'] . ' registriert hast.<br /><br />Weil du jünger als {MINIMUM_AGE} Jahre bist, sind wir verpflichtet, die Erlaubnis deiner Eltern oder Erziehungsberechtigten einzuholen, bevor du das Forum benutzen darfst.  Um alles Nötige in die Wege zu leiten, drucke bitte unten stehendes Formular aus:';
+$txt['coppa_after_registration'] = 'Danke, dass du dich auf {forum_name_html_safe} registriert hast.<br /><br />Weil du jünger als {MINIMUM_AGE} Jahre bist, sind wir verpflichtet, die Erlaubnis deiner Eltern oder Erziehungsberechtigten einzuholen, bevor du das Forum benutzen darfst.  Um alles Nötige in die Wege zu leiten, drucke bitte unten stehendes Formular aus:';
 $txt['coppa_form_link_popup'] = 'Formular in neuem Fenster öffnen';
 $txt['coppa_form_link_download'] = 'Formular als Textdatei herunterladen';
 $txt['coppa_send_to_one_option'] = 'Dann bitte deine Eltern/Erziehungsberechtigten darum, das ausgefüllte Formular folgendermaßen abzusenden:';
@@ -130,10 +128,10 @@ $txt['coppa_send_by_post'] = 'per Post an folgende Adresse:';
 $txt['coppa_send_by_fax'] = 'per Fax an folgende Nummer:';
 $txt['coppa_send_by_phone'] = 'Sie können stattdessen auch einen Administrator unter {PHONE_NUMBER} anrufen.';
 
-$txt['coppa_form_title'] = 'Erlaubnis zur Registrierung auf ' . $context['forum_name_html_safe'];
+$txt['coppa_form_title'] = 'Erlaubnis zur Registrierung auf {forum_name_html_safe}';
 $txt['coppa_form_address'] = 'Adresse';
 $txt['coppa_form_date'] = 'Datum';
-$txt['coppa_form_body'] = 'Ich, {PARENT_NAME},<br /><br />erteile {CHILD_NAME} (Name des Kindes) die Erlaubnis, ein registriertes Mitglied des Forums ' . $context['forum_name_html_safe'] . 'unter dem Benutzernamen {USER_NAME} zu werden.<br /><br />Mir ist bekannt, dass einzelne persönliche Informationen, die von {USER_NAME} veröffentlicht werden, anderen Benutzern des Forums angezeigt werden könnten.<br /><br />Gezeichnet:<br />{PARENT_NAME} (Elternteil/Erziehungsberechtigter).';
+$txt['coppa_form_body'] = 'Ich, {PARENT_NAME},<br /><br />erteile {CHILD_NAME} (Name des Kindes) die Erlaubnis, ein registriertes Mitglied des Forums {forum_name_html_safe}unter dem Benutzernamen {USER_NAME} zu werden.<br /><br />Mir ist bekannt, dass einzelne persönliche Informationen, die von {USER_NAME} veröffentlicht werden, anderen Benutzern des Forums angezeigt werden könnten.<br /><br />Gezeichnet:<br />{PARENT_NAME} (Elternteil/Erziehungsberechtigter).';
 
 $txt['visual_verification_sound_again'] = 'Nochmals abspielen';
 $txt['visual_verification_sound_close'] = 'Fenster schließen';

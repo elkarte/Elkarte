@@ -64,6 +64,7 @@ class ManageSearch_Controller extends Action_Controller
 			'removefulltext' => array($this, 'action_edit', 'permission' => 'admin_forum'),
 			'createmsgindex' => array($this, 'action_create', 'permission' => 'admin_forum'),
 			'managesphinx' => array($this, 'action_managesphinx', 'permission' => 'admin_forum'),
+			'managesphinxql' => array($this, 'action_managesphinx', 'permission' => 'admin_forum'),
 		);
 
 		// Control for actions
@@ -633,7 +634,7 @@ class ManageSearch_Controller extends Action_Controller
 	 */
 	private function loadSearchAPIs()
 	{
-		global $txt;
+		global $txt, $scripturl;
 
 		$apis = array();
 		$dh = opendir(SUBSDIR);
@@ -664,8 +665,8 @@ class ManageSearch_Controller extends Action_Controller
 							'filename' => $file,
 							'setting_index' => $index_name,
 							'has_template' => in_array($index_name, array('custom', 'fulltext', 'standard')),
-							'label' => $index_name && isset($txt['search_index_' . $index_name]) ? $txt['search_index_' . $index_name] : '',
-							'desc' => $index_name && isset($txt['search_index_' . $index_name . '_desc']) ? $txt['search_index_' . $index_name . '_desc'] : '',
+							'label' => $index_name && isset($txt['search_index_' . $index_name]) ? str_replace('{managesearch_url}', $scripturl . '?action=admin;area=managesearch;sa=manage' . $index_name, $txt['search_index_' . $index_name]) : '',
+							'desc' => $index_name && isset($txt['search_index_' . $index_name . '_desc']) ? str_replace('{managesearch_url}', $scripturl . '?action=admin;area=managesearch;sa=manage' . $index_name, $txt['search_index_' . $index_name . '_desc']) : '',
 						);
 					}
 				}

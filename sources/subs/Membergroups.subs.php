@@ -386,7 +386,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 	$db->free_result($request);
 
 	foreach ($updates as $additional_groups => $memberArray)
-		updateMemberData($memberArray, array('additional_groups' => array_diff(explode(',', $additional_groups), $groups)));
+		updateMemberData($memberArray, array('additional_groups' => implode(',', array_diff(explode(',', $additional_groups), $groups))));
 
 	// Their post groups may have changed now...
 	updatePostgroupStats($members);
@@ -1406,8 +1406,8 @@ function detachGroupFromBoards($id_group, $boards, $access_list)
 			array(
 				'current_board' => $row['id_board'],
 				'member_group_access' => implode(',', array_diff(explode(',', $row['member_groups']), array($id_group))),
-				'column' =>$access_list == 'allow' ? 'member_groups' : 'deny_member_groups',
-				)
+				'column' => $access_list == 'allow' ? 'member_groups' : 'deny_member_groups',
+			)
 		);
 	$db->free_result($request);
 }

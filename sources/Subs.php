@@ -2632,6 +2632,7 @@ function setupThemeContext($forceload = false)
 
 		if (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 1)
 			$txt['welcome_guest'] .= $txt['welcome_guest_activate'];
+		$txt['welcome_guest'] = replaceBasicActionUrl($txt['welcome_guest']);
 
 		// If we've upgraded recently, go easy on the passwords.
 		if (!empty($modSettings['enable_password_conversion']))
@@ -2837,7 +2838,7 @@ function theme_copyright()
 		return;
 
 	// Put in the version...
-	$forum_copyright = sprintf($forum_copyright, $forum_version);
+	$forum_copyright = replaceBasicActionUrl(sprintf($forum_copyright, $forum_version));
 
 	echo '
 					', $forum_copyright;
@@ -4300,4 +4301,62 @@ function removeScheduleTaskImmediate($task, $calculateNextTrigger = true)
 			calculateNextTrigger($task);
 		}
 	}
+}
+
+/**
+ * Helper function to replace commonly used urls in text strings
+ *
+ * @param string $string the string to inject URLs into
+ * @return string the input string with the place-holders replaced with
+ *           the correct URLs
+ */
+function replaceBasicActionUrl($string)
+{
+	global $scripturl, $context, $boardurl;
+	static $find = null, $replace = null;
+
+	if ($find === null)
+	{
+		$find = array(
+			'{forum_name}',
+			'{forum_name_html_safe}',
+			'{script_url}',
+			'{board_url}',
+			'{login_url}',
+			'{register_url}',
+			'{activate_url}',
+			'{help_url}',
+			'{admin_url}',
+			'{moderate_url}',
+			'{recent_url}',
+			'{search_url}',
+			'{who_url}',
+			'{credits_url}',
+			'{calendar_url}',
+			'{memberlist_url}',
+			'{stats_url}',
+		);
+		$replace = array(
+			$context['forum_name'],
+			$context['forum_name_html_safe'],
+			$scripturl,
+			$boardurl,
+			$scripturl . '?action=login',
+			$scripturl . '?action=register',
+			$scripturl . '?action=activate',
+			$scripturl . '?action=help',
+			$scripturl . '?action=admin',
+			$scripturl . '?action=moderate',
+			$scripturl . '?action=recent',
+			$scripturl . '?action=search',
+			$scripturl . '?action=who',
+			$scripturl . '?action=who;sa=credits',
+			$scripturl . '?action=calendar',
+			$scripturl . '?action=memberlist',
+			$scripturl . '?action=stats',
+		);
+		call_integration_hook('integrate_basic_url_replacement', array(&$find, &$replace));
+	}
+
+	return str_replace($find, $replace, $string);
 }

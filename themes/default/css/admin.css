@@ -454,6 +454,7 @@ ul.package_servers li {
 }
 .strings_edit textarea {
 	width: 96%;
+	display: block;
 }
 
 /* Styles for the file permissions section.

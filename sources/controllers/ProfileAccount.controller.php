@@ -383,7 +383,7 @@ class ProfileAccount_Controller extends Action_Controller
 					'{MESSAGE}' => '[url=' . $scripturl . '?msg=' . $warning_for_message . ']' . un_htmlspecialchars($warned_message_subject) . '[/url]',
 					'{SCRIPTURL}' => $scripturl,
 					'{FORUMNAME}' => $mbname,
-					'{REGARDS}' => $txt['regards_team']
+					'{REGARDS}' => replaceBasicActionUrl($txt['regards_team'])
 				)
 			);
 	}

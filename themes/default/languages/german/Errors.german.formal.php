@@ -1,8 +1,6 @@
 <?php
 // Version: 1.0; Errors
 
-global $scripturl, $modSettings;
-
 $txt['no_access'] = 'Verzeihung, aber wir können Ihnen keinen Zugriff auf diesen Bereich gewähren. Wir dürften Ihnen nicht einmal verraten, dass er existiert. Sie sind aber herzlich dazu eingeladen, die Hauptseite zu besuchen und sich von dort aus auf den Weg zu machen.';
 $txt['not_guests'] = 'Pardon, diese Aktion ist Gästen momentan nicht gestattet.';
 
@@ -13,7 +11,6 @@ $txt['topic_locked'] = 'Dieses Thema ist gesperrt, Sie können keine Beiträge h
 $txt['no_password'] = 'Passwortfeld leer';
 $txt['already_a_user'] = 'Der Benutzername, den Sie zu verwenden versuchten, existiert bereits.';
 $txt['cant_move'] = 'Sie dürfen keine Themen verschieben...';
-$txt['login_to_post'] = 'Um einen Beitrag zu erstellen, müssen Sie angemeldet sein. Sofern Sie noch kein Konto besitzen, <a href="' . $scripturl . '?action=register">registrieren Sie sich</a> bitte.';
 $txt['passwords_dont_match'] = 'Die Passwörter stimmen nicht überein.';
 $txt['register_to_use'] = 'Pardon, Sie müssen sich registrieren, bevor Sie Gebrauch von dieser Funktion machen können.';
 $txt['password_invalid_character'] = 'Ungültiges Zeichen im Passwort.';
@@ -340,7 +337,7 @@ $txt['profile_error_no_password'] = 'Sie haben Ihr Passwort nicht eingegeben';
 $txt['profile_error_bad_new_password'] = 'Die neuen Passwörter, die Sie eingegeebn haben, stimmen nicht überein';
 $txt['profile_error_bad_password'] = 'Das eingegebene Passwort ist nicht korrekt';
 $txt['profile_error_bad_avatar'] = 'Der Avatar, den Sie ausgewählt haben, ist entweder zu groß oder kein Avatar';
-$txt['profile_error_password_short'] = 'Ihr Passwort muss mindestens ' . (empty($modSettings['password_strength']) ? 4 : 8) . ' Zeichen lang sein.';
+$txt['profile_error_password_short'] = 'Ihr Passwort muss mindestens %1$s Zeichen lang sein.';
 $txt['profile_error_password_restricted_words'] = 'Ihr Passwort darf Ihren Benutzernamen, Ihre E-Mail-Adresse oder andere allgemeine Begriffe nicht enthalten.';
 $txt['profile_error_password_chars'] = 'Ihr Passwort muss sowohl Groß- als auch Kleinbuchstaben sowie Ziffern enthalten.';
 $txt['profile_error_already_requested_group'] = 'Sie haben bereits eine Anfrage für diese Gruppe gestellt!';
