@@ -71,7 +71,7 @@ function list_maillist_unapproved($id = 0, $start = 0, $chunk_size = 0, $sort = 
 	{
 		$postemail[$i] = array(
 			'id_email' => $row['id_email'],
-			'error' =>  $txt[$row['error'] . '_short'],
+			'error' => $txt[$row['error'] . '_short'],
 			'error_code' => $row['error'],
 			'key' => $row['data_id'],
 			'subject' => $row['subject'],

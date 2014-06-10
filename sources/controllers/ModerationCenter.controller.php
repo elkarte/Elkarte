@@ -272,7 +272,7 @@ class ModerationCenter_Controller extends Action_Controller
 		$context[$context['moderation_menu_name']]['tab_data'] = array(
 			'title' => $txt['moderation_center'],
 			'help' => '',
-			'description' => sprintf($txt['mc_description'], $txt['hello_guest'], $context['user']['name']));
+			'description' => sprintf($txt['mc_description'], $context['user']['name'], $scripturl . '?action=moderate;area=settings'));
 
 		// What a pleasant shortcut - even tho we're not *really* on the admin screen who cares...
 		$context['admin_area'] = $mod_include_data['current_area'];

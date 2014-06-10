@@ -201,7 +201,7 @@ function template_email_members_compose()
 				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=email_members" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['admin_newsletters'], '
 			</h3>
 			<div class="information">
-				', $txt['email_variables'], '
+				', str_replace('{help_emailmembers}', $scripturl . '?action=quickhelp;help=emailmembers" onclick="return reqOverlayDiv(this.href);', $txt['email_variables']), '
 			</div>';
 
 	// The preview section

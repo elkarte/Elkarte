@@ -733,7 +733,7 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
 				if (!empty($row['file_hash']))
 				{
 					// It may be without the elk extension (something wrong during upgrade/conversion)
-					$attachment_name =  $row['id_attach'] . '_' . $row['file_hash'];
+					$attachment_name = $row['id_attach'] . '_' . $row['file_hash'];
 
 					if (!is_array($modSettings['attachmentUploadDir']))
 						$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
@@ -1189,7 +1189,7 @@ function list_getNumUnapprovedAttachments($approve_query)
  */
 function list_getAttachDirs()
 {
-	global $modSettings, $context, $txt;
+	global $modSettings, $context, $txt, $scripturl;
 
 	$db = database();
 
@@ -1245,7 +1245,7 @@ function list_getAttachDirs()
 			'path' => $dir,
 			'current_size' => !empty($expected_size[$id]) ? comma_format($expected_size[$id] / 1024, 0) : 0,
 			'num_files' => comma_format($expected_files[$id] - $sub_dirs, 0) . ($sub_dirs > 0 ? ' (' . $sub_dirs . ')' : ''),
-			'status' => ($is_base_dir ? $txt['attach_dir_basedir'] . '<br />' : '') . ($error ? '<div class="error">' : '') . sprintf($txt['attach_dir_' . $status], $context['session_id'], $context['session_var']) . ($error ? '</div>' : ''),
+			'status' => ($is_base_dir ? $txt['attach_dir_basedir'] . '<br />' : '') . ($error ? '<div class="error">' : '') . str_replace('{repair_url}', $scripturl . '?action=admin;area=manageattachments;sa=repair;' . $context['session_var'] . '=' . $context['session_id'], $txt['attach_dir_' . $status]) . ($error ? '</div>' : ''),
 		);
 	}
 

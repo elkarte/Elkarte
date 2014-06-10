@@ -96,13 +96,13 @@ class Help_Controller extends Action_Controller
 		if (!isset($helptxt))
 			$helptxt = array();
 
-		$help = Util::htmlspecialchars($_GET['help']);
+		$help_str = Util::htmlspecialchars($_GET['help']);
 
 		// Load the admin help language file and template.
 		loadLanguage('Help');
 
 		// Load permission specific help
-		if (substr($help, 0, 14) == 'permissionhelp')
+		if (substr($help_str, 0, 14) == 'permissionhelp')
 			loadLanguage('ManagePermissions');
 
 		// Load our template
@@ -118,14 +118,20 @@ class Help_Controller extends Action_Controller
 		Template_Layers::getInstance()->removeAll();
 		$context['sub_template'] = 'popup';
 
+		$helps = explode('+', $help_str);
+		$context['help_text'] = '';
+
 		// Find what to display: the string will be in $helptxt['help'] or in $txt['help]
-		if (isset($helptxt[$help]))
-			$context['help_text'] = $helptxt[$help];
-		elseif (isset($txt[$help]))
-			$context['help_text'] = $txt[$help];
-		else
-			// nothing :(
-			$context['help_text'] = $help;
+		foreach ($helps as $help)
+		{
+			if (isset($helptxt[$help]))
+				$context['help_text'] .= $helptxt[$help];
+			elseif (isset($txt[$help]))
+				$context['help_text'] .= $txt[$help];
+			else
+				// nothing :(
+				$context['help_text'] .= $help;
+		}
 
 		// Link to the forum URL, and include session id.
 		if (preg_match('~%([0-9]+\$)?s\?~', $context['help_text'], $match))

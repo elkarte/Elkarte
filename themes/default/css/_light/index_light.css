@@ -1777,15 +1777,6 @@ div.bbc_footnotes .meaction{
 	cursor: pointer;
 }
 
-/* alternating window colors */
-.windowbg {
-	background-color: #fcfcfc;
-}
-.windowbg2 {
-	background-color: #efefef;
-}
-
-
 /*	$MEDIA		*/
 /* Experimental media queries.
 /* ------------------------------------------------------- */

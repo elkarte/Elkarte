@@ -109,7 +109,7 @@ p, fieldset, form, input, button, select, textarea, .editor {
 /* Collection of pseudo element clearfixes. */
 .category_header:after, .wrapper:after,
 #main_content_section:after, #main_container:after,
-.attachments_bot:after, .editor_wrapper:after {
+.attachment_name:after, .editor_wrapper:after {
 	display: block;
 	clear: both;
 	content: "";
@@ -193,11 +193,6 @@ input[type="number"] {
 select {
 	padding: 2px;
 }
-/* You may think, ZOMG, but this is trade off to look normal/same on *nix and windows */
-/* If you don't care about *nix, remove this selector and go with the above padding   */
-#firefox select {
-	padding: .25em 2px;
-}
 #chrome select {
 	padding: 2px;
 	height: 26px;
@@ -205,7 +200,9 @@ select {
 select option {
 	padding: 0 4px;
 }
-
+select#cat, select#suggestions, select#file {
+	height: auto;
+}
 /* No borders around checkboxes or radio buttons, and middle aligned. */
 .input_check, .input_radio {
 	border: none;
@@ -2308,10 +2305,12 @@ div.core_posts {
 .attachments {
 	margin: 20px 0 0 0;
 }
-.attachments .floatleft {
-	padding: 0 6px 8px 6px;
+.attachments .attachment {
+	padding: 6px 8px;
+	display: inline-block;
+	min-width: 22%;
 }
-.attachments_top {
+.attachment_thumb {
 	margin: 0 auto;
 	text-align: center;
 }
