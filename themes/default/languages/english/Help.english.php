@@ -557,7 +557,7 @@ $helptxt['posts_and_topics'] = '
 			Modify the settings related to topics. The number of topics per page, whether pinned topics are enabled or not, the number of messages needed for a topic to be hot, etc.
 		</li>
 	</ul>';
-$helptxt['allow_no_censored'] = 'This global setting when checked, allows members to disable word censoring in their User Profile through the Look and Layout settings. The members ablility to disable word censoring is still limited by their permission profile.';
+$helptxt['allow_no_censored'] = 'When checked, this global setting allows members to disable word censoring in their User Profile through the Look and Layout settings. The members\' ablility to disable word censoring is still limited by their permission profile.';
 $helptxt['spider_mode'] = 'Sets the logging level.<br />
 Standard - Logs minimal spider activity.<br />
 Moderate - Provides more accurate statistics.<br />
@@ -586,21 +586,21 @@ $helptxt['pm_bcc'] = 'When sending a personal message you can choose to add a re
 
 $helptxt['move_topics_maintenance'] = 'This will allow you to move all the posts from one board to another board.';
 $helptxt['maintain_reattribute_posts'] = 'You can use this function to attribute guest posts on your board to a registered member. This is useful if, for example, a user deleted their account and changed their mind and wished to have their old posts associated with their account.';
-$helptxt['chmod_flags'] = 'You can manually set the permissions you wish to set the selected files to. To do this enter the chmod value as a numeric (octet) value. Note - these flags will have no effect on Microsoft Windows operating systems.';
+$helptxt['chmod_flags'] = 'You can manually set the permissions you wish to set the selected files to. To do this enter the chmod value as a numeric (octet) value. Note that these flags will have no effect on Microsoft Windows operating systems.';
 
 $helptxt['postmod'] = 'This section allows members of the moderation team (with sufficient permissions) to approve any posts and topics before they are shown.';
 
-$helptxt['field_show_enclosed'] = 'Encloses the user input between some text or html.  This will allow you to add more instant message providers, images or an embed etc. For example:<br /><br />
+$helptxt['field_show_enclosed'] = 'Encloses the user input between some text or HTML code.  This will allow you to add more instant message providers, images or an embed, etc. For example:<br /><br />
 		&lt;a href="http://website.com/{INPUT}"&gt;&lt;img src="{DEFAULT_IMAGES_URL}/icon.png" alt="{INPUT}" /&gt;&lt;/a&gt;<br /><br />
-		Note that you can use the following variables:<br />
+		You can use the following variables:<br />
 		<ul class="normallist">
 			<li>{INPUT} - The input specified by the user.</li>
 			<li>{SCRIPTURL} - Web address of forum.</li>
-			<li>{IMAGES_URL} - Url to images directory in the users current theme.</li>
-			<li>{DEFAULT_IMAGES_URL} - Url to the images directory in the default theme.</li>
+			<li>{IMAGES_URL} - URI of the images directory of the user\'s current theme.</li>
+			<li>{DEFAULT_IMAGES_URL} - URI of the images directory of the default theme.</li>
 		</ul>';
 
-$helptxt['custom_mask'] = 'The input mask is important for your forum\'s security. Validating the input from a user can help ensure that data is not used in a way you do not expect. We have provided some simple regular expressions as hints.<br /><br />
+$helptxt['custom_mask'] = 'The input mask is important for your forum\'s security. Validating the input from a user can help to ensure that data is not used in a way you do not expect. We have provided some simple regular expressions as hints.<br /><br />
 	<div class="smalltext custom_mask">
 		&quot;~[A-Za-z]+~&quot; - Match all upper and lower case alphabet characters.<br />
 		&quot;~[0-9]+~&quot; - Match all numeric characters.<br />
@@ -613,9 +613,9 @@ $helptxt['custom_mask'] = 'The input mask is important for your forum\'s securit
 		? - None or one match of previous expression.<br />
 		+ - One or more of previous expression.<br />
 		* - None or more of previous expression.<br />
-		{xx} - An exact number from previous expression.<br />
-		{xx,} - An exact number or more from previous expression.<br />
-		{,xx} - An exact number or less from previous expression.<br />
+		{xx} - An exact number of the previous expression.<br />
+		{xx,} - An exact number or more of the previous expression.<br />
+		{,xx} - An exact number or less of the previous expression.<br />
 		{xx,yy} - An exact match between the two numbers from previous expression.<br />
 		^ - Start of string.<br />
 		$ - End of string.<br />
@@ -623,7 +623,7 @@ $helptxt['custom_mask'] = 'The input mask is important for your forum\'s securit
 	</div><br /><br />
 	More information and advanced techniques may be found on the internet.';
 
-$helptxt['badbehavior_reverse_proxy_addresses'] = 'In some server farm configurations, Bad Behavior may be unable to determine whether a remote request originated from your reverse proxy/load balancer or arrived directly. In this case, you should add all of the internal IP addresses for your reverse proxy/load balancer servers, as seen from the origin server. These can usually be omitted; however if you have a configuration where some requests can bypass the reverse proxy/load balancer and connect to the origin server directly, then you should use this option. You should also use this option when incoming requests pass through two or more reverse proxies before reaching the origin server.<br /><br />Enter each IP address or CIDR netblocks separated by a | (1.2.3.4|5.4.3.2/27)';
+$helptxt['badbehavior_reverse_proxy_addresses'] = 'In some server farm configurations, Bad Behavior may be unable to determine whether a remote request originated from your reverse proxy/load balancer or arrived directly. In this case you should add all of the internal IP addresses for your reverse proxy/load balancer servers as seen from the origin server. These can usually be omitted; however if you have a configuration where some requests can bypass the reverse proxy/load balancer and connect to the origin server directly, then you should use this option. You should also use this option when incoming requests pass through two or more reverse proxies before reaching the origin server.<br /><br />Enter each IP address or CIDR netblocks separated by a | (1.2.3.4|5.4.3.2/27)';
 $helptxt['badbehavior_reverse_proxy_header'] = 'When a reverse proxy is in use, Bad Behavior looks at this HTTP header to determine the actual source IP address for each web request. Your reverse proxy or load balancer must add an HTTP header containing the remote IP address where the connection originated. Most do this by default; check the configuration for your reverse proxy or load balancer to ensure that this header is sent.<br /><br />If you use the CloudFlare service, you should change this option to CF-Connecting-IP.';
 $helptxt['badbehavior_reverse_proxy'] = 'When enabled, Bad Behavior will assume it is receiving a connection from a reverse proxy, when a specific HTTP header is received.';
 $helptxt['badbehavior_eucookie'] = 'Set this option on if you believe Bad Behavior\'s site security cookie is not exempt from the 2012 EU cookie regulation.</a>';
@@ -633,21 +633,21 @@ $helptxt['badbehavior_httpbl_key'] = 'Bad Behavior is capable of using data from
 $helptxt['badbehavior_verbose'] = 'Enabling verbose mode causes all HTTP requests to be logged. When verbose mode is off, only blocked requests and suspicious requests are logged.<br /><br />Verbose mode is off by default. Using verbose mode is not recommended as it can significantly slow down your site; it exists to capture data from live spammers which are not being blocked.';
 $helptxt['badbehavior_logging'] = 'Should Bad Behavior keep a log of requests? On by default, and it is not recommended to disable it, since it will cause additional spam to get through.';
 $helptxt['badbehavior_strict'] = 'Bad Behavior operates in two blocking modes: normal and strict.<br />When strict mode is enabled, additional checks for (old) software which have been spam sources are enabled, but occasional legitimate users using the same software may be blocked as well.';
-$helptxt['badbehavior_offsite_forms'] = 'Bad Behavior normally prevents your site from receiving data posted from forms on other web sites. This prevents spammers from, e.g., using a Google cached version of your web site to send you spam. However, some web applications such as OpenID require that your site be able to receive form data in this way. If you are running OpenID, enable this option.';
-$helptxt['badbehavior_postcount_wl'] = 'This allows you to bypass bad behavior checks for users over a certain post count.<br />-1 will bypass all registered users, including those with no posts<br />0 will disable bypassing and scan everyone regardless of post count<br />A post count number greater than zero under which users will be checked.';
+$helptxt['badbehavior_offsite_forms'] = 'Bad Behavior normally prevents your site from receiving data posted from forms on other websites. This prevents spammers from, e.g., using a Google cached version of your website to send you spam. However, some web applications such as OpenID require that your site be able to receive form data in this way. If you are running OpenID, enable this option.';
+$helptxt['badbehavior_postcount_wl'] = 'This allows you to bypass bad behavior checks for users over a certain post count.<br />-1 will bypass all registered users, including those with no posts<br />0 will disable bypassing and scan everyone regardless of post count<br />Any number greater than zero sets the post count under which users will be checked.';
 $helptxt['badbehavior_ip_wl'] = 'IP address ranges use the CIDR format.  To remove an address just leave it blank and then save';
 $helptxt['badbehavior_useragent_wl'] = 'User agents are matched by exact match only.';
 $helptxt['badbehavior_url_wl'] = 'URLs are matched from the first / after the server name up to, but not including, the ? (if any). The URL to be whitelisted is a URL on YOUR site. A partial URL match is permitted, so URL whitelist entries should be as specific as possible, but no more specific than necessary.<br />For instance, /example would match /example.php and /example/address';
 
-$helptxt['filter_to'] = 'Replace the found text with this, leave blank to replace with found text with nothing i.e. remove it';
+$helptxt['filter_to'] = 'Replace the found text with this, leave blank to replace with found text with nothing (i.e. remove it)';
 $helptxt['filter_from'] = 'Enter the text you want to find/replace.  If type is set to regex then this must be a valid regular expression, including delimiters.  If not regex it will do a simple text match and replace it with the replacement text';
-$helptxt['filter_type'] = 'Standard will find the exact phase and replace it with the text in the replace field.  Regular Expression is a wildcard option, but it must in in a valid regex format.';
+$helptxt['filter_type'] = 'Standard will find the exact phrase and replace it with the text in the replace field.  Regular Expression is a wildcard option, but it must be in a valid regex format.';
 $helptxt['pbe_post_enabled'] = 'Enable this to allow users to respond to email notifications and have them post as a reply.  They are still required to have posting permissions.';
 $helptxt['pbe_pm_enabled'] = 'Enable this to allow users to reply by email to PM notifications.  They are still required to have PM permissions, this setting only allows them to receive and reply to notifications';
-$helptxt['maillist_group_mode'] = 'If enabled outbound post/topic emails will come from the posters Display Name, otherwise it will come from the Site Name.  This is simply a envelope, affecting only how the "From name" appears in the receiving mailbox, the actual from email address is unchanged.';
+$helptxt['maillist_group_mode'] = 'If enabled outbound post/topic emails will come from the poster\'s display name, otherwise it will come from the site name.  This is simply a envelope, affecting only how the "From name" appears in the receiving mailbox, the actual from email address is unchanged.';
 $helptxt['maillist_newtopic_change'] = 'This will allow a user to change the subject of a email notification and have it post as a new topic.  The new topic will be started on the same board as the reply was going to.';
-$helptxt['maillist_sitename_address'] = 'This must be the address that is piped to the emailpost.php file or the address of the imap mailbox';
-$helptxt['maillist_help_short'] = 'This feature allows users of your forum to reply to the sites email notifications and have those replies post on the forum.  Please visit the Wiki for full instructions';
+$helptxt['maillist_sitename_address'] = 'This must be the address that is piped to the emailpost.php file or the address of the IMAP mailbox';
+$helptxt['maillist_help_short'] = 'This feature allows users of your forum to reply to the site\'s email notifications and have those replies post on the forum.  Please visit the Wiki for full instructions';
 
 $helptxt['frame_security'] = 'The X-Frame-Options HTTP response header can be used to indicate whether or not a browser should be allowed to render a page in a frame or an iframe. You can use this additional security restriction on your site against attempts at clickjacking attacks, by ensuring that the content of your site is not embedded into other sites.
 	<br />
