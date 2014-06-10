@@ -263,7 +263,7 @@ $txt['welcome_guest_register'] = 'Welcome to <strong>{forum_name}</strong>. Plea
 
 $txt['please_login'] = 'Please <a href="{login_url}">login</a>.';
 $txt['login_or_register'] = 'Please <a href="{login_url}">login</a> or <a href="{register_url}">register</a>.';
-$txt['welcome_guest_activate'] = '<br />Did you miss your <a href="{activate_url}">activation email</a>?';
+$txt['welcome_guest_activate'] = '<br />Did you miss your <a href="{activate_url}">activation e-mail</a>?';
 // @todo the following to sprintf
 $txt['hello_member'] = 'Hey,';
 // Use numeric entities in the below string.

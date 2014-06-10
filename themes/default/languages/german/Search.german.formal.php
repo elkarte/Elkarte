@@ -75,9 +75,9 @@ $txt['search_index_create_custom'] = 'eigenen Index erzeugen';
 $txt['search_index_custom_remove'] = 'eigenen Index entfernen';
 
 $txt['search_index_sphinx'] = 'Sphinx';
-$txt['search_index_sphinx_desc'] = 'Um die Sphinx-Einstellungen anzupassen, verwenden Sie [<a href="' . $scripturl . '?action=admin;area=managesearch;sa=managesphinx">Sphinx konfigurieren</a>]';
+$txt['search_index_sphinx_desc'] = 'Um die Sphinx-Einstellungen anzupassen, verwenden Sie [<a href="{managesearch_url}">Sphinx konfigurieren</a>]';
 $txt['search_index_sphinxql'] = 'SphinxQL';
-$txt['search_index_sphinxql_desc'] = 'Um die SphinxQL-Einstellungen anzupassen, verwenden Sie [<a href="' . $scripturl . '?action=admin;area=managesearch;sa=managesphinx">Sphinx konfigurieren</a>]';
+$txt['search_index_sphinxql_desc'] = 'Um die SphinxQL-Einstellungen anzupassen, verwenden Sie [<a href="{managesearch_url}">Sphinx konfigurieren</a>]';
 
 $txt['search_force_index'] = 'Suchindex erzwingen';
 $txt['search_match_words'] = 'Nur ganze Wörter'; // translator note: well that's maybe a bit short...?

@@ -1,8 +1,6 @@
 <?php
 // Version: 1.0; ManageMembers
 
-global $context;
-
 $txt['groups'] = 'Gruppen';
 $txt['viewing_groups'] = 'Betrachtet Benutzergruppen'; // ? :)
 

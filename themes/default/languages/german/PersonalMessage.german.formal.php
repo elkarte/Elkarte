@@ -1,8 +1,6 @@
 <?php
 // Version: 1.0; PersonalMessage
 
-global $context;
-
 $txt['pm_inbox'] = 'Private Nachrichten - Posteingang';
 $txt['send_message'] = 'Nachricht senden';
 $txt['pm_add'] = 'Hinzufügen';

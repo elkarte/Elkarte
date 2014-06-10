@@ -435,7 +435,7 @@ $helptxt['enableFollowup'] = 'Dies erlaubt es Mitgliedern, neue Themen mit einem
 $helptxt['db_persist'] = 'Hält die Verbindung aufrecht, um die Geschwindigkeit zu erhöhen.  Wenn Sie nicht auf einem eigenen Server sind, könnte dies Probleme mit Ihrem Anbieter verursachen.';
 $helptxt['ssi_db_user'] = 'Optionale Einstellung zur Verwendung anderer Datenbankzugangsdaten, wenn Sie SSI.php benutzen.';
 
-$helptxt['queryless_urls'] = 'Dies ändert das Format von URLs ein wenig, so dass Suchmaschinen sie lieber mögen.  Sie werden etwa wie index.php/topic,1.0.html aussehen.<br /><br />Diese Funktion wird auf Ihrem Server ' . ($context['server']['is_apache'] || $context['server']['is_lighttpd'] ? '' : 'nicht') . ' funktionieren.';
+$helptxt['queryless_urls'] = 'Dies ändert das Format von URLs ein wenig, so dass Suchmaschinen sie lieber mögen.  Sie werden etwa wie index.php/topic,1.0.html aussehen.';
 $helptxt['countChildPosts'] = 'Die Aktivierung dieser Option bedeutet, dass Beiträge und Themen in einem Unterforum auf der Startseite zu denen des Elternforums addiert werden.<br /><br />Dies wird die Dinge merklich verlangsamen, bedeutet aber, dass ein Elternforum ohne enthaltene Beiträge nicht \'0\' anzeigen wird.';
 $helptxt['allow_ignore_boards'] = 'Die Aktivierung dieser Option wird es Benutzern erlauben, Foren auszuwählen, die sie ignorieren möchten.';
 $helptxt['deny_boards_access'] = 'Die Aktivierung dieser Option wird es Ihnen erlauben, den Zugriff auf bestimmte Foren basierend auf dem Benutzergruppenzugriff zu verweigern';
@@ -546,12 +546,12 @@ $helptxt['custom_avatar_enabled'] = 'Es wird empfohlen, dass Sie dies zwecks hö
 $helptxt['disableHostnameLookup'] = 'Dies deaktiviert das Nachschlagen von Hostnamen, das auf manchen Servern sehr langsam ist.  Beachten Sie, dass dies Sperrungen weniger effizient macht.';
 
 $helptxt['search_weight_commonheader'] = 'Gewichtungsfaktoren werden verwendet, um die Relevanz eines Suchergebnisses festzulegen. Ändern Sie diese Faktoren anhand der Dinge, die für Ihr Forum besodners wichtig sind. Das Forum einer Nachrichtensite könnte zum Beispiel einen relativ hohen Wert für das Alter des neuesten passenden Beitrags verwenden wollen. Alle Werte sind relativ zueinander und sollten positive Ganzzahlen sein.<br /><br />';
-$helptxt['search_weight_frequency'] = $helptxt['search_weight_commonheader'] . 'Dieser Faktor zählt die Menge passender Beiträge und teilt sie durch die Gesamtzahl an Beiträgen in einem Thema.';
-$helptxt['search_weight_age'] = $helptxt['search_weight_commonheader'] . 'Dieser Faktor bewertet das Alter des letzten passenden Beitrags in einem Thema. Je neuer der Beitrag ist, desto höher sein Wert.';
-$helptxt['search_weight_length'] = $helptxt['search_weight_commonheader'] . 'Dieser Faktor basiert auf der Größe eines Themas. Je mehr Beiträge es enthält, desto höher sein Wert.';
-$helptxt['search_weight_subject'] = $helptxt['search_weight_commonheader'] . 'Dieser Faktor schaut nach, ob ein Suchbegriff innerhalb eines Thementitels gefunden werden kann.';
-$helptxt['search_weight_first_message'] = $helptxt['search_weight_commonheader'] . 'Dieser Faktor schaut nach, ob ein Treffer im ersten Beitrag eines Themas gefunden werden kann.';
-$helptxt['search_weight_sticky'] = $helptxt['search_weight_commonheader'] . 'Dieser Faktor schaut nach, ob ein Thema angeheftet ist, und erhöht dessen Relevanz, wenn es das ist.';
+$helptxt['search_weight_frequency'] = 'Dieser Faktor zählt die Menge passender Beiträge und teilt sie durch die Gesamtzahl an Beiträgen in einem Thema.';
+$helptxt['search_weight_age'] = 'Dieser Faktor bewertet das Alter des letzten passenden Beitrags in einem Thema. Je neuer der Beitrag ist, desto höher sein Wert.';
+$helptxt['search_weight_length'] = 'Dieser Faktor basiert auf der Größe eines Themas. Je mehr Beiträge es enthält, desto höher sein Wert.';
+$helptxt['search_weight_subject'] = 'Dieser Faktor schaut nach, ob ein Suchbegriff innerhalb eines Thementitels gefunden werden kann.';
+$helptxt['search_weight_first_message'] = 'Dieser Faktor schaut nach, ob ein Treffer im ersten Beitrag eines Themas gefunden werden kann.';
+$helptxt['search_weight_sticky'] = 'Dieser Faktor schaut nach, ob ein Thema angeheftet ist, und erhöht dessen Relevanz, wenn es das ist.';
 $helptxt['search'] = 'Nehmen Sie hier alle Einstellungen für die Suchfunktion vor.';
 $helptxt['search_why_use_index'] = 'Ein Suchindex kann die Geschwindigkeit von Suchanfragen in Ihrem Forum nennenswert verbessern. Besonders dann, wenn die Anzahl an Beiträgen in einem Forum größer wird, kann das Suchen ohne einen Index lange dauern und die Last auf Ihrer Datenbank vergrößern. Wenn Ihr Forum mehr als 50.000 Beiträge hat, sollten Sie in Erwägung ziehen, einen Suchindex zu erstellen, um eine dauerhaft hohe Geschwindigkeit Ihres Forums sicherzustellen.<br /><br />Beachten Sie, dass ein Suchindex ein wenig Speicherplatz belegen kann. Ein Volltextindex ist ein eingebauter Index der Datenbank. Er ist vergleichsweise klein (ungefähr so groß wie die Beitragstabelle), aber viele allgemeine Begriffe werden nicht indiziert und er kann sich bei komplexen Abfragen als langsam herausstellen. Der eigene Index ist größer (abhängig von Ihrer Konfiguration kann er bis zu dreimal so groß wie die Beitragstabelle werden), aber seine Geschwindigkeit ist oft besser als die des Volltextindexes und er indiziert die meisten Begriffe.';
 

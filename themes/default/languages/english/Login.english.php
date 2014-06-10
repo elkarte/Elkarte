@@ -116,8 +116,7 @@ $txt['admin_register_group_none'] = '(no primary member group)';
 $txt['admin_register_done'] = 'Member %1$s has been registered successfully!';
 
 $txt['coppa_title'] = 'Age Restricted Forum';
-$txt['coppa_after_registration'] = 'Thank you for registering with {forum_name_html_safe}.<br /><br />Because you fall under the age of {MINIMUM_AGE}, it is a legal requirement
-	to obtain your parent or guardian\'s permission before you may begin to use your account.  To arrange for account activation please print off the form below:';
+$txt['coppa_after_registration'] = 'Thank you for registering with {forum_name_html_safe}.<br /><br />Because you fall under the age of {MINIMUM_AGE}, it is a legal requirement to obtain your parent or guardian\'s permission before you may begin to use your account.  To arrange for account activation please print off the form below:';
 $txt['coppa_form_link_popup'] = 'Load Form In New Window';
 $txt['coppa_form_link_download'] = 'Download Form as Text File';
 $txt['coppa_send_to_one_option'] = 'Then arrange for your parent/guardian to send the completed form by:';
@@ -129,7 +128,7 @@ $txt['coppa_send_by_phone'] = 'Alternatively, arrange for them to phone the admi
 $txt['coppa_form_title'] = 'Permission form for registration at {forum_name_html_safe}';
 $txt['coppa_form_address'] = 'Address';
 $txt['coppa_form_date'] = 'Date';
-$txt['coppa_form_body'] = 'I {PARENT_NAME},<br /><br />Give permission for {CHILD_NAME} (child name) to become a fully registered member of the forum: {forum_name_html_safe}, with the username: {USER_NAME}.<br /><br />I understand that certain personal information entered by {USER_NAME} may be shown to other users of the forum.<br /><br />Signed:<br />{PARENT_NAME} (Parent/Guardian).';
+$txt['coppa_form_body'] = 'I {PARENT_NAME},<br /><br />give permission for {CHILD_NAME} (child name) to become a fully registered member of the forum: {forum_name_html_safe}, with the user name: {USER_NAME}.<br /><br />I understand that certain personal information entered by {USER_NAME} may be shown to other users of the forum.<br /><br />Signed:<br />{PARENT_NAME} (Parent/Guardian).';
 
 $txt['visual_verification_sound_again'] = 'Play again';
 $txt['visual_verification_sound_close'] = 'Close window';

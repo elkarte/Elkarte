@@ -143,7 +143,7 @@ $txt['member_id'] = 'ID';
 
 $txt['unknown'] = 'unknown';
 $txt['security_wrong'] = 'Administration login attempt!
-Referer: %1$s
+Referrer: %1$s
 User agent: %2$s
 IP: %3$s';
 

@@ -107,7 +107,7 @@ $txt['whoallow_mailing'] = 'Sending a forum e-mail.';
 $txt['whoallow_maintain'] = 'Performing routine forum maintenance.';
 $txt['whoallow_manageattachments'] = 'Managing the attachments.';
 $txt['whoallow_moderate'] = 'Viewing the <a href="{moderate_url}">Moderation Center</a>.';
-$txt['whoallow_memberlist'] = 'Viewing the <a href="{memberlist_url}">memberlist</a>.';
+$txt['whoallow_memberlist'] = 'Viewing the <a href="{memberlist_url}">member list</a>.';
 $txt['whoallow_optimizetables'] = 'Optimizing the database tables.';
 $txt['whoallow_repairboards'] = 'Repairing the database tables.';
 $txt['whoallow_search'] = '<a href="{search_url}">Searching</a> the forum.';
@@ -125,9 +125,10 @@ $txt['who_viewprofile'] = 'Viewing <a href="%1$s">%2$s</a>\'s profile.';
 $txt['who_profile'] = 'Editing the profile of <a href="%1$s">%2$s</a>.';
 $txt['who_post'] = 'Posting a new topic in <a href="%1$s">%2$s</a>.';
 $txt['who_poll'] = 'Posting a new poll in <a href="%1$s">%2$s</a>.';
-$txt['who_topicbyemail'] = 'Email starting a new topic in <a href="%1$s">%2$s</a>.';
-$txt['whotopic_postbyemail'] = 'Email posting in <a href="%1$s">%2$s</a>.';
-$txt['who_pm_byemail'] = 'Sending a personal message by email.';
+$txt['who_topicbyemail'] = 'E-mail starting a new topic in <a href="%1$s">%2$s</a>.';
+
+$txt['whotopic_postbyemail'] = 'E-mail posting in <a href="%1$s">%2$s</a>.';
+$txt['who_pm_byemail'] = 'Sending a personal message by e-mail.';
 
 // Credits text
 $txt['credits'] = 'Credits';

@@ -56,8 +56,8 @@ $txt['nochex_email_desc'] = 'E-mail of a merchant account at Nochex. Leave blank
 $txt['paid_note'] = '<strong class="alert">Note:</strong><br />For subscriptions to be automatically updated for your users, you
 	will need to setup a return URL for each of your payment methods. For all payment types, this return URL should be set as:<br /><br />
 	&nbsp;&nbsp;&bull;&nbsp;&nbsp;<strong>{board_url}/subscriptions.php</strong><br /><br />
-	You can edit the link for paypal directly, <a href="https://www.paypal.com/us/cgi-bin/webscr?cmd=_profile-ipn-notify" target="_blank">by clicking here</a>.<br />
-	For the other gateways (If installed) you can normally find it in your customer panels, usually under the term &quot;Return URL&quot; or &quot;Callback URL&quot;.';
+	You can edit the link for PayPal directly <a href="https://www.paypal.com/us/cgi-bin/webscr?cmd=_profile-ipn-notify" target="_blank">by clicking here</a>.<br />
+	For the other gateways (if installed) you can normally find it in your customer panels, usually under the term &quot;Return URL&quot; or &quot;Callback URL&quot;.';
 
 // View subscription strings.
 $txt['paid_name'] = 'Name';
