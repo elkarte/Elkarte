@@ -142,7 +142,10 @@ $txt['ip_address'] = 'IP-Adresse';
 $txt['member_id'] = 'ID';
 
 $txt['unknown'] = 'unbekannt';
-$txt['security_wrong'] = 'Administratoren-Loginversuch!' . "\n" . 'Herkunft: %1$s' . "\n" . 'Browserstring: %2$s' . "\n" . 'IP: %3$s';
+$txt['security_wrong'] = 'Administratoren-Loginversuch!
+Referrer: %1$s
+Useragent: %2$s
+IP: %3$s';
 
 $txt['email_preview_warning'] = 'Diese Vorschau ist nicht zu 100 Prozent genau. Um die Funktionalität der Seite nicht zu beeinträchtigen, werden nur grundlegende HTML-Tags ausgewertet';
 $txt['email_as_html'] = 'Im HTML-Format senden.  (hiermit können Sie in der E-Mail normalen HTML-Code verwenden.)';
