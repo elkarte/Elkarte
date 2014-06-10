@@ -768,7 +768,7 @@ function loadEmailTemplate($template, $replacements = array(), $lang = '', $load
 		'THEMEURL' => $settings['theme_url'],
 		'IMAGESURL' => $settings['images_url'],
 		'DEFAULT_THEMEURL' => $settings['default_theme_url'],
-		'REGARDS' => $txt['regards_team'],
+		'REGARDS' => replaceBasicActionUrl($txt['regards_team']),
 	);
 
 	// Split the replacements up into two arrays, for use with str_replace

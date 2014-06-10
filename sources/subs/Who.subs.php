@@ -188,7 +188,7 @@ function addonsCredits()
  */
 function determineActions($urls, $preferred_prefix = false)
 {
-	global $txt, $user_info, $modSettings;
+	global $txt, $user_info, $modSettings, $scripturl;
 
 	$db = database();
 
@@ -264,11 +264,11 @@ function determineActions($urls, $preferred_prefix = false)
 			}
 			// It's the board index!!  It must be!
 			else
-				$data[$k] = $txt['who_index'];
+				$data[$k] = replaceBasicActionUrl($txt['who_index']);
 		}
 		// Probably an error or some goon?
 		elseif ($actions['action'] == '')
-			$data[$k] = $txt['who_index'];
+			$data[$k] = replaceBasicActionUrl($txt['who_index']);
 		// Some other normal action...?
 		else
 		{
@@ -283,17 +283,20 @@ function determineActions($urls, $preferred_prefix = false)
 				$profile_ids[(int) $actions['u']][$k] = $actions['action'] == 'profile' ? $txt['who_viewprofile'] : $txt['who_profile'];
 			}
 			// Trying to post
-			elseif (($actions['action'] == 'post' || $actions['action'] == 'post2') && empty($actions['topic']) && isset($actions['board']))
+			elseif (($actions['action'] == 'post' || $actions['action'] == 'post2' || $actions['action'] == 'topicbyemail') && empty($actions['topic']) && isset($actions['board']))
 			{
 				$data[$k] = $txt['who_hidden'];
-				$board_ids[(int) $actions['board']][$k] = isset($actions['poll']) ? $txt['who_poll'] : $txt['who_post'];
+				if ($actions['action'] == 'topicbyemail')
+					$board_ids[(int) $actions['board']][$k] = $txt['who_topicbyemail'];
+				else
+					$board_ids[(int) $actions['board']][$k] = isset($actions['poll']) ? $txt['who_poll'] : $txt['who_post'];
 			}
 			// A subaction anyone can view... if the language string is there, show it.
 			elseif (isset($actions['sa']) && isset($txt['whoall_' . $actions['action'] . '_' . $actions['sa']]))
 				$data[$k] = $preferred_prefix && isset($txt[$preferred_prefix . $actions['action'] . '_' . $actions['sa']]) ? $txt[$preferred_prefix . $actions['action'] . '_' . $actions['sa']] : $txt['whoall_' . $actions['action'] . '_' . $actions['sa']];
-			// An action any old fellow can look at. (if ['whoall_' . $action] exists, we know everyone can see it.)
+			// An action any old fellow can look at. (if $txt['whoall_' . $action] exists, we know everyone can see it.)
 			elseif (isset($txt['whoall_' . $actions['action']]))
-				$data[$k] = $preferred_prefix && isset($txt[$preferred_prefix . $actions['action']]) ? $txt[$preferred_prefix . $actions['action']] : $txt['whoall_' . $actions['action']];
+				$data[$k] = $preferred_prefix && isset($txt[$preferred_prefix . $actions['action']]) ? $txt[$preferred_prefix . $actions['action']] : replaceBasicActionUrl($txt['whoall_' . $actions['action']]);
 			// Viewable if and only if they can see the board...
 			elseif (isset($txt['whotopic_' . $actions['action']]))
 			{
@@ -332,7 +335,7 @@ function determineActions($urls, $preferred_prefix = false)
 					)
 				);
 				list ($id_topic, $subject) = $db->fetch_row($result);
-				$data[$k] = sprintf($txt['whopost_' . $actions['action']], $id_topic, $subject);
+				$data[$k] = sprintf($txt['whopost_' . $actions['action']], $scripturl . '?topic=' . $id_topic . '.0', $subject);
 				$db->free_result($result);
 
 				if (empty($id_topic))
@@ -347,9 +350,9 @@ function determineActions($urls, $preferred_prefix = false)
 				if (allowedTo($allowedActions[$actions['action']]))
 				{
 					if (isset($actions['sa']) && isset($txt['whoallow_' . $actions['action'] . '_' . $actions['sa']]))
-						$data[$k] = $txt['whoallow_' . $actions['action'] . '_' . $actions['sa']];
+						$data[$k] = replaceBasicActionUrl($txt['whoallow_' . $actions['action'] . '_' . $actions['sa']]);
 					else
-						$data[$k] = $txt['whoallow_' . $actions['action']];
+						$data[$k] = replaceBasicActionUrl($txt['whoallow_' . $actions['action']]);
 				}
 				elseif (in_array('moderate_forum', $allowedActions[$actions['action']]))
 					$data[$k] = $txt['who_moderate'];
@@ -392,7 +395,7 @@ function determineActions($urls, $preferred_prefix = false)
 		{
 			// Show the topic's subject for each of the members looking at this...
 			foreach ($topic_ids[$topic['id_topic']] as $k => $session_text)
-				$data[$k] = sprintf($session_text, $topic['id_topic'], $topic['subject']);
+				$data[$k] = sprintf($session_text, $scripturl . '?topic=' . $topic['id_topic'] . '.0', $topic['subject']);
 		}
 	}
 
@@ -406,7 +409,7 @@ function determineActions($urls, $preferred_prefix = false)
 		{
 			// Put the board name into the string for each member...
 			foreach ($board_ids[$board['id_board']] as $k => $session_text)
-				$data[$k] = sprintf($session_text, $board['id_board'], $board['board_name']);
+				$data[$k] = sprintf($session_text, $scripturl . '?board=' . $board['id_board'] . '.0', $board['board_name']);
 		}
 	}
 
@@ -423,7 +426,7 @@ function determineActions($urls, $preferred_prefix = false)
 
 			// Set their action on each - session/text to sprintf.
 			foreach ($profile_ids[$row['id_member']] as $k => $session_text)
-				$data[$k] = sprintf($session_text, $row['id_member'], $row['real_name']);
+				$data[$k] = sprintf($session_text, $scripturl . '?action=profile;u=' . $row['id_member'], $row['real_name']);
 		}
 	}
 

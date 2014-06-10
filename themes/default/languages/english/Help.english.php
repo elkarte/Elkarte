@@ -416,7 +416,7 @@ $helptxt['enableFollowup'] = 'This allows members to start new topics quoting th
 $helptxt['db_persist'] = 'Keeps the connection active to increase performance.  If you aren\'t on a dedicated server, this may cause you problems with your host.';
 $helptxt['ssi_db_user'] = 'Optional setting to use a different database user and password when you are using SSI.php.';
 
-$helptxt['queryless_urls'] = 'This changes the format of URLs a little so search engines will like them better.  They will look like index.php/topic,1.0.html.<br /><br />This feature will ' . ($context['server']['is_apache'] || $context['server']['is_lighttpd'] ? '' : 'not') . ' work on your server.';
+$helptxt['queryless_urls'] = 'This changes the format of URLs a little so search engines will like them better.  They will look like index.php/topic,1.0.html.';
 $helptxt['countChildPosts'] = 'Checking this option will mean that posts and topics in a board\'s sub-board will count toward its totals on the index page.<br /><br />This will make things notably slower, but means that a parent with no posts in it won\'t show \'0\'.';
 $helptxt['allow_ignore_boards'] = 'Checking this option will allow users to select boards they wish to ignore.';
 $helptxt['deny_boards_access'] = 'Checking this option will allow you to deny access to certain boards based on membergroup access';
@@ -526,12 +526,12 @@ $helptxt['custom_avatar_enabled'] = 'It is recommended that you enable this for 
 $helptxt['disableHostnameLookup'] = 'This disables host name lookups, which on some servers are very slow.  Note that this will make banning less effective.';
 
 $helptxt['search_weight_commonheader'] = 'Weight factors are used to determine the relevancy of a search result. Change these weight factors to match the things that are specifically important for your forum. For instance, a forum of a news site might want a relatively high value for \'age of last matching message\'. All values are relative in relation to each other and should be positive integers.<br /><br />';
-$helptxt['search_weight_frequency'] = $helptxt['search_weight_commonheader'] . 'This factor counts the amount of matching messages and divides them by the total number of messages within a topic.';
-$helptxt['search_weight_age'] = $helptxt['search_weight_commonheader'] . 'This factor rates the age of the last matching message within a topic. The more recent this message is, the higher the score.';
-$helptxt['search_weight_length'] = $helptxt['search_weight_commonheader'] . 'This factor is based on the topic size. The more messages are within the topic, the higher the score.';
-$helptxt['search_weight_subject'] = $helptxt['search_weight_commonheader'] . 'This factor looks whether a search term can be found within the subject of a topic.';
-$helptxt['search_weight_first_message'] = $helptxt['search_weight_commonheader'] . 'This factor looks whether a match can be found in the first message of a topic.';
-$helptxt['search_weight_sticky'] = $helptxt['search_weight_commonheader'] . 'This factor looks whether a topic is pinned and increases the relevancy score if it is.';
+$helptxt['search_weight_frequency'] = 'This factor counts the amount of matching messages and divides them by the total number of messages within a topic.';
+$helptxt['search_weight_age'] = 'This factor rates the age of the last matching message within a topic. The more recent this message is, the higher the score.';
+$helptxt['search_weight_length'] = 'This factor is based on the topic size. The more messages are within the topic, the higher the score.';
+$helptxt['search_weight_subject'] = 'This factor looks whether a search term can be found within the subject of a topic.';
+$helptxt['search_weight_first_message'] = 'This factor looks whether a match can be found in the first message of a topic.';
+$helptxt['search_weight_sticky'] = 'This factor looks whether a topic is pinned and increases the relevancy score if it is.';
 $helptxt['search'] = 'Adjust all settings for the search function here.';
 $helptxt['search_why_use_index'] = 'A search index can greatly improve the performance of searches on your forum. Especially when the number of messages on a forum grows bigger, searching without an index can take a long time and increase the pressure on your database. If your forum is bigger than 50,000 messages, you should consider creating a search index to assure peak performance of your forum.<br /><br />Note that a search index can take up quite some space. A fulltext index is a built-in index of the database. It\'s relatively compact (approximately the same size as the message table), but a lot of common words aren\'t indexed and it can, in some wildcard queries, turn out to be slow. The custom index is bigger (depending on your configuration it can be up to 3 times the size of the messages table) but its performance is often better than fulltext and indexes most words.';
 

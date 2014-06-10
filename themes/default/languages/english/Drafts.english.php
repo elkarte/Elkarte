@@ -1,8 +1,6 @@
 <?php
 // Version: 1.0; Drafts
 
-global $scripturl, $context;
-
 // profile
 $txt['drafts_show'] = 'Show Drafts';
 $txt['drafts_show_desc'] = 'This area shows all the drafts you currently have saved. From here you can edit them before posting, or you can delete them';

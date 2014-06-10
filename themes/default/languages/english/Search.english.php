@@ -74,9 +74,9 @@ $txt['search_index_create_custom'] = 'create custom index';
 $txt['search_index_custom_remove'] = 'remove custom index';
 
 $txt['search_index_sphinx'] = 'Sphinx';
-$txt['search_index_sphinx_desc'] = 'To adjust Sphinx settings, use [<a href="' . $scripturl . '?action=admin;area=managesearch;sa=managesphinx">Configure Sphinx</a>]';
+$txt['search_index_sphinx_desc'] = 'To adjust Sphinx settings, use [<a href="{managesearch_url}">Configure Sphinx</a>]';
 $txt['search_index_sphinxql'] = 'SphinxQL';
-$txt['search_index_sphinxql_desc'] = 'To adjust SphinxQL settings, use [<a href="' . $scripturl . '?action=admin;area=managesearch;sa=managesphinx">Configure Sphinx</a>]';
+$txt['search_index_sphinxql_desc'] = 'To adjust SphinxQL settings, use [<a href="{managesearch_url}">Configure Sphinx</a>]';
 
 $txt['search_force_index'] = 'Force the use of a search index';
 $txt['search_match_words'] = 'Match whole words only';

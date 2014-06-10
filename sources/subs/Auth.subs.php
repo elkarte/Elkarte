@@ -515,11 +515,14 @@ function validateUsername($memID, $username, $error_context = 'register', $check
  */
 function validatePassword($password, $username, $restrict_in = array())
 {
-	global $modSettings;
+	global $modSettings, $txt;
 
 	// Perform basic requirements first.
 	if (Util::strlen($password) < (empty($modSettings['password_strength']) ? 4 : 8))
+	{
+		$txt['profile_error_password_short'] = sprintf($txt['profile_error_password_short'], empty($modSettings['password_strength']) ? 4 : 8);
 		return 'short';
+	}
 
 	// Is this enough?
 	if (empty($modSettings['password_strength']))
