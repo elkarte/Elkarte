@@ -1,8 +1,6 @@
 <?php
 // Version: 1.0; Profile
 
-global $scripturl, $context;
-
 $txt['no_profile_edit'] = 'You are not allowed to change this person\'s profile.';
 $txt['website_title'] = 'Website title';
 $txt['website_url'] = 'Website URL';
@@ -83,7 +81,6 @@ $txt['secret_ask'] = 'Ask me my question';
 $txt['cant_retrieve'] = 'You can\'t retrieve your password, but you can set a new one by following a link sent to you by email.  You also have the option of setting a new password by answering your secret question.';
 $txt['incorrect_answer'] = 'Sorry, but you did not specify a valid combination of Secret Question and Answer in your profile.  Please click on the back button, and use the default method of obtaining your password.';
 $txt['enter_new_password'] = 'Please enter the answer to your question, and the password you would like to use.  Your password will be changed to the one you select provided you answer the question correctly.';
-$txt['password_success'] = 'Your password was changed successfully.<br /><a href="' . $scripturl . '?action=login">Click here to login</a>.';
 $txt['secret_why_blank'] = 'why is this blank?';
 
 $txt['authentication_reminder'] = 'Authentication Reminder';
@@ -207,7 +204,7 @@ $txt['change_authentication'] = 'From this section you can change how you login 
 
 $txt['profileEdit'] = 'Modify Profile';
 $txt['account_info'] = 'These are your account settings. This page holds all critical information that identifies you on this forum. For security reasons, you will need to enter your (current) password to make changes to this information.';
-$txt['forumProfile_info'] = 'You can change your personal information on this page. This information will be displayed throughout ' . $context['forum_name_html_safe'] . '. If you aren\'t comfortable with sharing some information, simply skip it - nothing here is required.';
+$txt['forumProfile_info'] = 'You can change your personal information on this page. This information will be displayed throughout {forum_name_html_safe}. If you aren\'t comfortable with sharing some information, simply skip it - nothing here is required.';
 $txt['theme_info'] = 'This section allows you to customize the look and layout of the forum.';
 $txt['notifications'] = 'Notifications';
 $txt['notification_info'] = 'This allows you to be notified of replies to posts, newly posted topics, and forum announcements. You can change those settings here, or oversee the topics and boards you are currently receiving notifications for.';
@@ -262,8 +259,6 @@ $txt['to_ask_password'] = 'to ask for your authentication details';
 $txt['user_email'] = 'Username/Email';
 
 // Use numeric entities in the below two strings.
-$txt['reminder_subject'] = 'New password for ' . $context['forum_name'];
-$txt['reminder_mail'] = 'This mail was sent because the \'forgot password\' function has been applied to your account. To set a new password, click the following link';
 $txt['reminder_sent'] = 'A mail has been sent to your email address. Click the link in that mail to set a new password.';
 $txt['reminder_openid_sent'] = 'Your current OpenID identity has been sent to your email address.';
 $txt['reminder_set_password'] = 'Set Password';
@@ -299,7 +294,6 @@ $txt['show_online'] = 'Show others my online status';
 
 $txt['return_to_post'] = 'Return to topics after posting by default.';
 $txt['no_new_reply_warning'] = 'Don\'t warn on new replies made while posting.';
-$txt['recent_posts_at_top'] = 'Show most recent posts at the top.';
 $txt['recent_pms_at_top'] = 'Show most recent personal messages at top.';
 $txt['wysiwyg_default'] = 'Show WYSIWYG editor on post page by default.';
 
@@ -437,8 +431,19 @@ $txt['profile_warning_notify_subject'] = 'Notification Subject';
 $txt['profile_warning_notify_body'] = 'Notification Message';
 $txt['profile_warning_notify_template_subject'] = 'You have received a warning';
 // Use numeric entities in below string.
-$txt['profile_warning_notify_template_outline'] = '{MEMBER},' . "\n\n" . 'You have received a warning for %1$s. Please cease these activities and abide by the forum rules otherwise we will take further action.' . "\n\n" . '{REGARDS}';
-$txt['profile_warning_notify_template_outline_post'] = '{MEMBER},' . "\n\n" . 'You have received a warning for %1$s in regards to the message:' . "\n" . '{MESSAGE}.' . "\n\n" . 'Please cease these activities and abide by the forum rules otherwise we will take further action.' . "\n\n" . '{REGARDS}';
+$txt['profile_warning_notify_template_outline'] = '{MEMBER},
+
+You have received a warning for %1$s. Please cease these activities and abide by the forum rules otherwise we will take further action.
+
+{REGARDS}';
+$txt['profile_warning_notify_template_outline_post'] = '{MEMBER},
+
+You have received a warning for %1$s in regards to the message:
+{MESSAGE}.
+
+Please cease these activities and abide by the forum rules otherwise we will take further action.
+
+{REGARDS}';
 $txt['profile_warning_notify_for_spamming'] = 'spamming';
 $txt['profile_warning_notify_title_spamming'] = 'Spamming';
 $txt['profile_warning_notify_for_offence'] = 'posting offensive material';

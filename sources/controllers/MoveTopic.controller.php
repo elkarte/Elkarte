@@ -259,7 +259,7 @@ class MoveTopic_Controller extends Action_Controller
 
 			// And remember the last expiry period too.
 			$_SESSION['move_to_topic']['redirect_topic'] = $redirect_topic;
-			$_SESSION['move_to_topic']['redirect_expires'] = (int) $_POST['redirect_expires'];
+			$_SESSION['move_to_topic']['redirect_expires'] = $redirect_expires;
 
 			$msgOptions = array(
 				'subject' => $txt['moved'] . ': ' . $board_info['subject'],

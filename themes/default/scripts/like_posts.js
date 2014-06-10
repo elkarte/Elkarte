@@ -38,6 +38,9 @@
 					subAction = '',
 					check = $(e.target).attr('class');
 
+				if (e.target.nodeName.toLowerCase() !== 'a')
+					return false;
+
 				// Set the subAction to what they are doing
 				if (check.indexOf('unlike_button') >= 0)
 					subAction = 'unlikepost';
@@ -52,7 +55,7 @@
 
 				// Make the ajax call to the likes system
 				$.ajax({
-					url: elk_scripturl + '?action=likes;sa=' + subAction + ';api;' + elk_session_var + '=' + elk_session_id,
+					url: elk_scripturl + '?action=likes;sa=' + subAction + ';xml;api=json;' + elk_session_var + '=' + elk_session_id,
 					type: 'POST',
 					dataType: 'json',
 					data: values,

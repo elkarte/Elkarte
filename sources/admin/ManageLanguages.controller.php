@@ -630,7 +630,7 @@ class ManageLanguages_Controller extends Action_Controller
 	 */
 	public function action_editlang()
 	{
-		global $settings, $context, $txt, $modSettings, $language;
+		global $settings, $context, $txt, $modSettings, $language, $scripturl;
 
 		require_once(SUBSDIR . '/Language.subs.php');
 		loadLanguage('ManageSettings');
@@ -699,7 +699,19 @@ class ManageLanguages_Controller extends Action_Controller
 			usort($context['possible_files'][$theme]['files'], create_function('$val1, $val2', 'return strcmp($val1[\'name\'], $val2[\'name\']);'));
 		}
 
+		if ($context['lang_id'] != 'english')
+		{
+			$possiblePackage = findPossiblePackages($context['lang_id']);
+			if ($possiblePackage !== false)
+			{
+				$context['langpack_uninstall_link'] = $scripturl . '?action=admin;area=packages;sa=uninstall;package=' . $possiblePackage[1] . ';pid=' . $possiblePackage[0];
+			}
+		}
+
 		// We no longer wish to speak this language.
+		// @todo - languages have been moved to packages
+		// this may or may not be used in the future, for now it's not used at all
+		// @deprecated since 1.0
 		if (!empty($_POST['delete_main']) && $context['lang_id'] != 'english')
 		{
 			checkSession();

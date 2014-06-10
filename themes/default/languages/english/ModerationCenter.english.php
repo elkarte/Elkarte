@@ -1,8 +1,6 @@
 <?php
 // Version: 1.0; ModerationCenter
 
-global $scripturl;
-
 $txt['moderation_center'] = 'Moderation Center';
 $txt['mc_main'] = 'Main';
 $txt['mc_logs'] = 'Logs';
@@ -11,7 +9,7 @@ $txt['mc_groups'] = 'Members and groups';
 
 $txt['mc_view_groups'] = 'View Membergroups';
 
-$txt['mc_description'] = '<strong>%1$s %2$s!</strong><br />This is your &quot;Moderation Center&quot;. From here you can perform all the moderation actions assigned to yourself by the Administrator. This home page contains a summary of all the latest happenings in your community. You can <a href="' . $scripturl . '?action=moderate;area=settings">personalize the layout by clicking here</a>.';
+$txt['mc_description'] = '<strong>Welcome, %1$s!</strong><br />This is your &quot;Moderation Center&quot;. From here you can perform all the moderation actions assigned to yourself by the Administrator. This home page contains a summary of all the latest happenings in your community. You can <a href="%2$s">personalize the layout by clicking here</a>.';
 $txt['mc_group_requests'] = 'Membergroup Requests';
 $txt['mc_member_requests'] = 'Member Requests';
 $txt['mc_unapproved_posts'] = 'Unapproved Posts';
@@ -133,7 +131,11 @@ $txt['mc_warning_template_delete_confirm'] = 'Are you sure you want to delete th
 $txt['mc_warning_template_desc'] = 'Use this page to fill in the details of the template. Note that the subject for the email is not part of the template. Note that as the notification is sent by PM you can use BBC within the template. If you use the {MESSAGE} variable then this template will not be available when issuing a generic warning (i.e. A warning not linked to a post).';
 $txt['mc_warning_template_title'] = 'Template Title';
 $txt['mc_warning_template_body_desc'] = 'The content of the notification message. You can use the following shortcuts in this template.<ul style="margin-top: 0px;"><li>{MEMBER} - Member Name.</li><li>{MESSAGE} - Link to Offending Post. (If Applicable)</li><li>{FORUMNAME} - Forum Name.</li><li>{SCRIPTURL} - Web address of the forum.</li><li>{REGARDS} - Standard email sign-off.</li></ul>';
-$txt['mc_warning_template_body_default'] = '{MEMBER},' . "\n\n" . 'You have received a warning for inappropriate activity. Please cease these activities and abide by the forum rules otherwise we will take further action.' . "\n\n" . '{REGARDS}';
+$txt['mc_warning_template_body_default'] = '{MEMBER},
+
+You have received a warning for inappropriate activity. Please cease these activities and abide by the forum rules otherwise we will take further action.
+
+{REGARDS}';
 $txt['mc_warning_template_personal'] = 'Personal Template';
 $txt['mc_warning_template_personal_desc'] = 'If you select this option only you will be able to see, edit and use this template. If not selected all moderators will be able to use this template.';
 $txt['mc_warning_template_error_no_title'] = 'You must set the title.';

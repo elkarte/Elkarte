@@ -44,8 +44,6 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 {
 	global $webmaster_email, $context, $modSettings, $txt, $scripturl, $boardurl;
 
-	$db = database();
-
 	// Use sendmail if it's set or if no SMTP server is set.
 	$use_sendmail = empty($modSettings['mail_type']) || $modSettings['smtp_host'] == '';
 
@@ -124,7 +122,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	$headers .= 'X-Mailer: ELK' . $line_break;
 
 	// Using the maillist functions?
-	$maillist = !empty($modSettings['maillist_enabled']) && $from_wrapper !== null &&$message_id !== null && $priority < 4 && empty($modSettings['mail_no_message_id']);
+	$maillist = !empty($modSettings['maillist_enabled']) && $from_wrapper !== null && $message_id !== null && $priority < 4 && empty($modSettings['mail_no_message_id']);
 	if ($maillist)
 	{
 		// Lets try to avoid auto replies
@@ -770,7 +768,7 @@ function loadEmailTemplate($template, $replacements = array(), $lang = '', $load
 		'THEMEURL' => $settings['theme_url'],
 		'IMAGESURL' => $settings['images_url'],
 		'DEFAULT_THEMEURL' => $settings['default_theme_url'],
-		'REGARDS' => $txt['regards_team'],
+		'REGARDS' => replaceBasicActionUrl($txt['regards_team']),
 	);
 
 	// Split the replacements up into two arrays, for use with str_replace

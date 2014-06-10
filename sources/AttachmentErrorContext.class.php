@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This does the job of handling attachment related errors 
+ * This does the job of handling attachment related errors
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -33,7 +33,7 @@ class Attachment_Error_Context
 
 	/**
 	 * Holds any errors found
-	 * @var array
+	 * @var Error_Context|null
 	 */
 	private $_generic_error = null;
 

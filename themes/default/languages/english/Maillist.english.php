@@ -237,7 +237,8 @@ $txt['digest_preview'] = "\n     <*> Topic Preview:\n     ";
 $txt['digest_see_full'] = "\n\n     <*> See the full Topic at the following link:\n     <*> ";
 $txt['digest_reply_preview'] = "\n     <*> Latest Reply Preview:\n     ";
 $txt['digest_unread_reply_link'] = "\n\n     <*> See your unread replies to this topic at the following link:\n     <*> ";
-$txt['message_attachments'] = '<*> This message has %d images/files associated with it.' . "\n" . '<*> To see them please follow this link: %s';
+$txt['message_attachments'] = '<*> This message has (%d) images/files associated with it.
+<*> To see them please follow this link: %s';
 
 // Help
 $txt['maillist_help'] = 'For help in setting up the maillist feature, please visit the maillist section on the <a href="https://github.com/elkarte/Elkarte/wiki/Maillist-Feature" target="_blank" class="new_win">ElkArte Wiki</a>';
@@ -270,9 +271,31 @@ $txt['ml_bounce'] = 'Email Templates';
 $txt['ml_bounce_description'] = 'From this section you can add and modify the email bounce templates used when rejecting a post by email.';
 $txt['ml_bounce_title'] = 'Bounce';
 $txt['ml_bounce_subject'] = 'Your email could not be posted';
-$txt['ml_bounce_body'] = 'Hi. This is the post-by-email program at {FORUMNAMESHORT}' . "\n\n" . 'I\'m afraid I wasn\'t able to deliver and/or post your message with the title of: {SUBJECT}.' . "\n\n" . 'The error I received while trying was: {ERROR}' . "\n\n" . 'This is a permanent error; I\'ve given up. Sorry it didn\'t work out.' . "\n\n" . '{EMAILREGARDS}';
+$txt['ml_bounce_body'] = 'Hi. This is the post-by-email program at {FORUMNAMESHORT}
+
+I\'m afraid I wasn\'t able to deliver and/or post your message with the title of: {SUBJECT}.
+
+The error I received while trying was: {ERROR}
+
+This is a permanent error; I\'ve given up. Sorry it didn\'t work out.
+
+{EMAILREGARDS}';
 $txt['ml_inform_title'] = 'Notify';
 $txt['ml_inform_subject'] = 'There was a problem with your email';
-$txt['ml_inform_body'] = '{MEMBER},' . "\n\n" . 'The email that you sent to {FORUMNAMESHORT} generated an error which caused delays in its posting.  The error was: {ERROR}' . "\n\n" . 'To prevent future delays in posting you should fix this error.' . "\n\n" . '{EMAILREGARDS}';
-$txt['ml_bounce_template_body_default'] = 'Hi. This is the post-by-email program at {FORUMNAMESHORT}' . "\n\n" . 'I\'m afraid I wasn\'t able to deliver and/or post your message with the title of: {SUBJECT}.' . "\n\n" . 'The error I received while trying was: {ERROR}' . "\n\n" . 'This is a permanent error; I\'ve given up. Sorry it didn\'t work out.' . "\n\n" . '{EMAILREGARDS}'; // redundant?
+$txt['ml_inform_body'] = '{MEMBER},
+
+The email that you sent to {FORUMNAMESHORT} generated an error which caused delays in its posting.  The error was: {ERROR}
+
+To prevent future delays in posting you should fix this error.
+
+{EMAILREGARDS}';
+$txt['ml_bounce_template_body_default'] = 'Hi. This is the post-by-email program at {FORUMNAMESHORT}
+
+I\'m afraid I wasn\'t able to deliver and/or post your message with the title of: {SUBJECT}.
+
+The error I received while trying was: {ERROR}
+
+This is a permanent error; I\'ve given up. Sorry it didn\'t work out.
+
+{EMAILREGARDS}'; // redundant?
 $txt['ml_bounce_template_subject_default'] = 'There was an error processing your email';

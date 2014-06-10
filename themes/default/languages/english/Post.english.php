@@ -1,8 +1,6 @@
 <?php
 // Version: 1.0; Post
 
-global $context;
-
 $txt['post_reply'] = 'Post reply';
 $txt['message_icon'] = 'Message icon';
 $txt['post_in_board'] = 'Post in the board';

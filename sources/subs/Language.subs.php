@@ -385,3 +385,30 @@ function list_getLanguagesList()
 			return $languages;
 	}
 }
+
+function findPossiblePackages($lang)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT id_install, filename
+		FROM {db_prefix}log_packages
+		WHERE package_id LIKE {string:contains_lang}
+			AND install_state = {int:installed}',
+		array(
+			'contains_lang' => 'elk_' . $lang . '_contribs:elk_' . $lang . '',
+			'installed' => 1,
+		)
+	);
+
+	if ($db->num_rows($request) > 0)
+	{
+		list ($pid, $file_name) = $db->fetch_row($request);
+	}
+	$db->free_result($request);
+
+	if (!empty($pid))
+		return array($pid, $file_name);
+	else
+		return false;
+}

@@ -1,15 +1,13 @@
 <?php
 // Version: 1.0; Admin
 
-global $settings, $scripturl;
-
 $txt['admin_boards'] = 'Boards';
 $txt['admin_back_to'] = 'Back to admin panel';
 $txt['admin_users'] = 'Members';
 $txt['admin_newsletters'] = 'Newsletters';
 $txt['include_these'] = 'Members to include';
 $txt['exclude_these'] = 'Members to exclude';
-$txt['admin_newsletters_select_groups'] = 'Groups to receive';
+$txt['admin_newsletters_select_groups'] = 'Groups to include';
 $txt['admin_newsletters_exclude_groups'] = 'Groups to exclude';
 $txt['admin_edit_news'] = 'News';
 $txt['admin_groups'] = 'Member groups';
@@ -53,7 +51,7 @@ $txt['admin_agreement_select_language'] = 'Language to edit';
 $txt['admin_agreement_select_language_change'] = 'Change';
 $txt['admin_delete_members'] = 'Delete Selected Members';
 $txt['admin_repair'] = 'Repair All boards and topics';
-$txt['admin_main_welcome'] = 'This is your &quot;%1$s&quot;.  From here, you can edit settings, maintain your forum, view logs, install packages, manage themes, and many other things.<br /><br />If you have any trouble, please look at the &quot;Support &amp; Credits&quot; page.  If the information there doesn\'t help you, feel free to <a href="http://www.elkarte.net/index.php" target="_blank" class="new_win">look to us for help</a> with the problem.<br />You may also find answers to your questions or problems by clicking the <img src="' . $settings['images_url'] . '/helptopics.png" alt="%2$s" title="%3$s" /> symbols for more information on the related functions.';
+$txt['admin_main_welcome'] = 'This is your &quot;%1$s&quot;.  From here, you can edit settings, maintain your forum, view logs, install packages, manage themes, and many other things.<br /><br />If you have any trouble, please look at the &quot;Support &amp; Credits&quot; page.  If the information there doesn\'t help you, feel free to <a href="http://www.elkarte.net/index.php" target="_blank" class="new_win">look to us for help</a> with the problem.<br />You may also find answers to your questions or problems by clicking the <img src="%3$s/helptopics.png" alt="%2$s" title="%2$s" /> symbols for more information on the related functions.';
 $txt['admin_news_desc'] = 'Please place one news item per box. BBC tags, such as <span>[b]</span>, <span>[i]</span> and <span>[u]</span> are allowed in your news, as well as smileys. Clear a news item\'s text box to remove it.';
 $txt['administrators'] = 'Forum Administrators';
 $txt['admin_reserved_desc'] = 'Reserved names will keep members from registering certain user names or using these words in their displayed names. Choose the options you wish to use from the bottom before submitting.';
@@ -144,12 +142,15 @@ $txt['ip_address'] = 'IP address';
 $txt['member_id'] = 'ID';
 
 $txt['unknown'] = 'unknown';
-$txt['security_wrong'] = 'Administration login attempt!' . "\n" . 'Referrer: %1$s' . "\n" . 'User agent: %2$s' . "\n" . 'IP: %3$s';
+$txt['security_wrong'] = 'Administration login attempt!
+Referer: %1$s
+User agent: %2$s
+IP: %3$s';
 
 $txt['email_preview_warning'] = 'The preview is not 100% accurate. In order to preserve the functionality of the page only the basic html tags are represented';
 $txt['email_as_html'] = 'Send in HTML format.  (with this you can put normal HTML in the email.)';
 $txt['email_parsed_html'] = 'Add &lt;br /&gt;s and &amp;nbsp;s to this message.';
-$txt['email_variables'] = 'In this message you can use a few &quot;variables&quot;.<a href="' . $scripturl . '?action=quickhelp;help=emailmembers" onclick="return reqOverlayDiv(this.href);" class="help"> Click here for more information</a>.';
+$txt['email_variables'] = 'In this message you can use a few &quot;variables&quot;.<a href="{help_emailmembers}" class="help"> Click here for more information</a>.';
 $txt['email_force'] = 'Send this to members even if they have chosen not to receive announcements.';
 $txt['email_as_pms'] = 'Send this to these groups using personal messages.';
 $txt['email_continue'] = 'Continue';
@@ -395,7 +396,7 @@ $txt['attachment_security_settings'] = 'Attachment security settings';
 
 $txt['attach_dir_does_not_exist'] = 'Does Not Exist';
 $txt['attach_dir_not_writable'] = 'Not Writable';
-$txt['attach_dir_files_missing'] = 'Files Missing (<a href="' . $scripturl . '?action=admin;area=manageattachments;sa=repair;%2$s=%1$s">Repair</a>)';
+$txt['attach_dir_files_missing'] = 'Files Missing (<a href="{repair_url}">Repair</a>)';
 $txt['attach_dir_unused'] = 'Unused';
 $txt['attach_dir_empty'] = 'Empty';
 $txt['attach_dir_ok'] = 'OK';
@@ -448,8 +449,8 @@ $txt['use_subdirectories_for_attachments'] = 'Create new directories within a ba
 $txt['use_subdirectories_for_attachments_note'] = 'Otherwise any new directories will be created within the forum\'s main directory.';
 $txt['basedirectory_for_attachments'] = 'Set a base directory for attachments';
 $txt['basedirectory_for_attachments_current'] = 'Current base directory';
-$txt['basedirectory_for_attachments_warning'] = '<div class="smalltext">Please note that the directory is wrong. <br />(<a href="' . $scripturl . '?action=admin;area=manageattachments;sa=attachpaths">Attempt to correct</a>)</div>';
-$txt['attach_current_dir_warning'] = '<div class="smalltext">There seems to be a problem with this directory. <br />(<a href="' . $scripturl . '?action=admin;area=manageattachments;sa=attachpaths">Attempt to correct</a>)</div>';
+$txt['basedirectory_for_attachments_warning'] = '<div class="smalltext">Please note that the directory is wrong. <br />(<a href="{attach_repair_url}">Attempt to correct</a>)</div>';
+$txt['attach_current_dir_warning'] = '<div class="smalltext">There seems to be a problem with this directory. <br />(<a href="{attach_repair_url}">Attempt to correct</a>)</div>';
 
 $txt['attachment_transfer'] = 'Transfer Attachments';
 $txt['attachment_transfer_desc'] = 'Transfer files between directories.';
