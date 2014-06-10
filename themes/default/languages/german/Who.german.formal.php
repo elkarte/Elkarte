@@ -31,8 +31,9 @@ $txt['whoall_groups'] = 'Betrachtet die Benutzergruppen.';
 $txt['whoall_help'] = 'Betrachtet die <a href="{help_url}">Hilfeseite</a>.';
 $txt['whoall_quickhelp'] = 'Betrachtet ein Hilfefenster.';
 $txt['whoall_pm'] = 'Liest seine Nachrichten.';
-$txt['whoall_login'] = 'Meldet sich im Forum an.';
-$txt['whoall_login2'] = 'Meldet sich im Forum an.';
+$txt['whoall_auth'] = 'Meldet sich im Forum an.';
+$txt['whoall_login'] = 'Betrachtet die Anmeldeseite.';
+$txt['whoall_login2'] = 'Betrachtet die Anmeldeseite.';
 $txt['whoall_logout'] = 'Meldet sich vom Forum ab.';
 $txt['whoall_markasread'] = 'Markiert Themen als gelesen oder ungelesen.';
 $txt['whoall_modifykarma_applaud'] = 'Applaudiert einem Mitglied.';
@@ -74,12 +75,14 @@ $txt['whotopic_post'] = 'Verfasst einen Beitrag in <a href="%1$s">%2$s</a>.';
 $txt['whotopic_post2'] = 'Verfasst einen Beitrag in <a href="%1$s">%2$s</a>.';
 $txt['whotopic_printpage'] = 'Druckt das Thema &quot;<a href="%1$s">%2$s</a>&quot;.';
 $txt['whotopic_quickmod2'] = 'Moderiert das Thema <a href="%1$s">%2$s</a>.';
-$txt['whotopic_removepoll'] = 'Entfernt die Umfrage in &quot;<a href="%1$s">%2$s</a>&quot;.';
+$txt['whotopic_poll_remove'] = 'Entfernt die Umfrage in &quot;<a href="%1$s">%2$s</a>&quot;.';
 $txt['whotopic_removetopic2'] = 'Entfernt das Thema <a href="%1$s">%2$s</a>.';
 $txt['whotopic_sendtopic'] = 'Sendet das Thema &quot;<a href="%1$s">%2$s</a>&quot; einem Freund.';
 $txt['whotopic_splittopics'] = 'Teilt das Thema &quot;<a href="%1$s">%2$s</a>&quot; in zwei Themen auf.';
 $txt['whotopic_sticky'] = 'Heftet das Thema &quot;<a href="%1$s">%2$s</a>&quot; an.';
 $txt['whotopic_vote'] = 'Stimmt in <a href="%1$s">%2$s</a> ab.';
+$txt['whotopic_watch'] = 'Hat ein Thema abonniert.';
+$txt['whotopic_unwatch'] = 'Hat ein Thema abbestellt.';
 
 $txt['whopost_quotefast'] = 'Zitiert einen Beitrag aus &quot;<a href="%1$s">%2$s</a>&quot;.';
 
@@ -125,8 +128,8 @@ $txt['who_viewprofile'] = 'Betrachtet <a href="%1$s">%2$s</a>'. ((mb_substr($str
 $txt['who_profile'] = 'Ändert das Profil von <a href="%1$s">%2$s</a>.';
 $txt['who_post'] = 'Erstellt ein neues Thema in in <a href="%1$s">%2$s</a>.';
 $txt['who_poll'] = 'Erstellt eine neue Umfrage in in <a href="%1$s">%2$s</a>.';
-
 $txt['whotopic_topicbyemail'] = 'Erstellt ein neues Thema (per E-Mail) in <a href="%1$s">%2$s</a>.';
+
 $txt['whotopic_postbyemail'] = 'Verfasst einen Beitrag (per E-Mail) in <a href="%1$s">%2$s</a>.';
 $txt['who_pm_byemail'] = 'Versendet eine private Nachricht per E-Mail.';
 

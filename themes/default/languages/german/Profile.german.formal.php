@@ -294,7 +294,6 @@ $txt['show_online'] = 'Anderen Benutzern Ihren Onlinestatus anzeigen';
 
 $txt['return_to_post'] = 'Nach dem Schreiben zum Thema zurückkehren';
 $txt['no_new_reply_warning'] = 'Beim Schreiben nicht bezüglich neuer Antworten warnen';
-$txt['recent_posts_at_top'] = 'Die neuesten Beiträge am Anfang anzeigen';
 $txt['recent_pms_at_top'] = 'Die neuesten privaten Nachrichten am Anfang anzeigen';
 $txt['wysiwyg_default'] = 'WYSIWYG-Editor standardmäßig auf Antwortseiten anzeigen.';
 
@@ -434,15 +433,15 @@ $txt['profile_warning_notify_template_subject'] = 'Sie haben eine Verwarnung erh
 // Use numeric entities in below string.
 $txt['profile_warning_notify_template_outline'] = '{MEMBER},
 
-Sie haben eine Verwarnung wegen %1$s erhalten. Bitte stellen Sie diese Aktivitäten ein und halten Sie sich ich an die Forenregeln, da wir sonst weitere Maßnahmen ergreifen müssen.
+Sie haben eine Verwarnung wegen %1$s erhalten. Bitte stellen Sie diese Aktivitäten ein und halten Sie sich an die Forenregeln, da wir sonst weitere Maßnahmen ergreifen müssen.
 
 {REGARDS}';
 $txt['profile_warning_notify_template_outline_post'] = '{MEMBER},
 
-Sie haben eine Verwarnung wegen %1$s aufgrund:
+Sie haben eine Verwarnung wegen %1$s aufgrund dieser Nachricht erhalten:
 {MESSAGE}.
 
-Bitte unterlassen Sie dieses Verhalten in Zukunft und befolgen Sie die Forenregeln, da sonst weitere Schritte eingeleitet werden.
+Bitte unterlassen Sie dieses Verhalten in Zukunft und halten Sie sich an die Forenregeln, da wir sonst weitere Maßnahmen ergreifen müssen.
 
 {REGARDS}';
 $txt['profile_warning_notify_for_spamming'] = 'Spam';
