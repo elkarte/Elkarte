@@ -435,7 +435,7 @@ $helptxt['enableFollowup'] = 'Dies erlaubt es Mitgliedern, neue Themen mit einem
 $helptxt['db_persist'] = 'Hält die Verbindung aufrecht, um die Geschwindigkeit zu erhöhen.  Wenn Sie nicht auf einem eigenen Server sind, könnte dies Probleme mit Ihrem Anbieter verursachen.';
 $helptxt['ssi_db_user'] = 'Optionale Einstellung zur Verwendung anderer Datenbankzugangsdaten, wenn Sie SSI.php benutzen.';
 
-$helptxt['queryless_urls'] = 'Dies ändert das Format von URLs ein wenig, so dass Suchmaschinen sie lieber mögen.  Sie werden etwa wie index.php/topic,1.0.html aussehen.<br /><br />Diese Funktion wird auf Ihrem Server ' . ($context['server']['is_apache'] || $context['server']['is_lighttpd'] ? '' : 'nicht') . ' funktionieren.';
+$helptxt['queryless_urls'] = 'Dies ändert das Format von URLs ein wenig, so dass Suchmaschinen sie lieber mögen.  Sie werden etwa wie index.php/topic,1.0.html aussehen.';
 $helptxt['countChildPosts'] = 'Die Aktivierung dieser Option bedeutet, dass Beiträge und Themen in einem Unterforum auf der Startseite zu denen des Elternforums addiert werden.<br /><br />Dies wird die Dinge merklich verlangsamen, bedeutet aber, dass ein Elternforum ohne enthaltene Beiträge nicht \'0\' anzeigen wird.';
 $helptxt['allow_ignore_boards'] = 'Die Aktivierung dieser Option wird es Benutzern erlauben, Foren auszuwählen, die sie ignorieren möchten.';
 $helptxt['deny_boards_access'] = 'Die Aktivierung dieser Option wird es Ihnen erlauben, den Zugriff auf bestimmte Foren basierend auf dem Benutzergruppenzugriff zu verweigern';
