@@ -96,12 +96,19 @@ input, button, select, textarea, .editor {
 }
 select, input {
 	font: 87.5%/130% Helvetica, Arial, "Nimbus Sans L", sans-serif;
-	height: 26px;
+	height: 24px;
 }
 #chrome select {
 	padding: 2px 2px;
+	height: 24px;
 }
-
+.linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
+.linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
+	line-height: 18px;
+}
+.hdicon:before {
+	margin: 2px 0;
+}
 input:hover, textarea:hover, button:hover, select:hover {
 	border: 1px solid #999;
 }
@@ -451,7 +458,7 @@ div.bbc_footnotes .meaction {
 /*	$MENUS		*/
 /* ------------------------------------------------------- */
 /* Level 1 Menu bar: link or button. General styling. */
-.linklevel1, .inline_mod_check, .linklevel1:link, .linklevel1:visited {
+.linklevel1, .linklevel1:link, .linklevel1:visited {
 	border-radius: 2px;
 	border: 1px solid #afafaf;
 	border-top: 1px solid #cfcfcf;
@@ -461,10 +468,6 @@ div.bbc_footnotes .meaction {
 	box-shadow: 1px 1px 2px #e5e5e5;
 	color: #666;
 	font-size: 0.929em;
-}
-.inline_mod_check {
-	border-radius: 0 2px 2px 0;
-	border-left: none;
 }
 .quickbuttons .listlevel1 {
 	font-size: 0.929em;
@@ -1118,7 +1121,8 @@ a.active {
 }
 
 a.help .icon {
-	padding: 1px 4px 0 0;
+	padding: 0 4px 2px 0;
+	vertical-align: middle;
 }
 
 /* Styles for the tooltips. */
