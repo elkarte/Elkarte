@@ -10,7 +10,7 @@ global $forum_copyright;
 // Again, SPELLING SHOULD BE '' 99% OF THE TIME!!  Please read this!
 $txt['lang_locale'] = 'de_DE';
 $txt['lang_dictionary'] = 'de';
-$txt['lang_spelling'] = 'german';
+$txt['lang_spelling'] = '';
 
 // Ensure you remember to use uppercase for character set strings.
 $txt['lang_character_set'] = 'UTF-8';
@@ -257,10 +257,9 @@ $txt['female'] = 'Weiblich';
 
 $txt['error_invalid_characters_username'] = 'Ungültiges Zeichen im Benutzernamen.';
 
-$txt['welcome_guest'] = 'Willkommen, <strong>%1$s</strong>. Bitte <a href="%2$s">melden Sie sich an</a>.';
+$txt['welcome_guest'] = 'Willkommen, <strong>Gast</strong>. Bitte <a href="{login_url}">melden Sie sich an</a>.';
 
-//$txt['welcome_guest_register'] = 'Willkommen, <strong>%1$s</strong>. Bitte <a href="{login_url}">melden Sie sich an</a> oder <a href="{register_url}">registrieren Sie sich</a>.';
-$txt['welcome_guest_register'] = 'Willkommen, <strong>{forum_name}</strong>. Bitte <a href="{login_url}">melden Sie sich an</a> oder <a href="{register_url}">registrieren Sie sich</a>.';
+$txt['welcome_guest_register'] = 'Willkommen auf <strong>{forum_name}</strong>. Bitte <a href="{login_url}">melden Sie sich an</a> oder <a href="{register_url}">registrieren Sie sich</a>.';
 
 $txt['please_login'] = 'Bitte <a href="{login_url}">melden Sie sich an</a>.';
 $txt['login_or_register'] = 'Bitte <a href="{login_url}">melden Sie sich an</a> oder <a href="{register_url}">registrieren Sie sich</a>.';
