@@ -68,7 +68,6 @@ body {
 	background: #eee;
 	color: #4d4f53;
 	padding-top: 35px;
-	font: 90%/130% Helvetica, Arial, "Nimbus Sans L", sans-serif;
 }
 fieldset {
 	background: transparent;
@@ -95,7 +94,6 @@ input, button, select, textarea, .editor {
 	color: #666;
 }
 select, input {
-	font: 87.5%/130% Helvetica, Arial, "Nimbus Sans L", sans-serif;
 	height: 26px;
 }
 #chrome select {
