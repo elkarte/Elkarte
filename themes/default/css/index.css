@@ -3598,6 +3598,10 @@ a.help .icon {
 	text-align: left;
 }
 
+#pick_boards .submitbutton {
+	width: 100%;
+}
+
 
 /* The search results page.
 /* The search results page. @todo - Duplicated in the .table_grid code? */
