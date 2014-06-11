@@ -89,7 +89,7 @@ function bb2_db_query($query)
 	elseif (strpos($query, 'OPTIMIZE TABLE') !== false)
 	{
 		// This is just intended to waste spammer time, occurs (rand(1,1000) == 1) from banned.inc.php
-		$db->db_optimize_table('log_badbehavior');
+		$db->db_optimize_table('{db_prefix}log_badbehavior');
 
 		return true;
 	}
