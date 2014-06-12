@@ -689,6 +689,15 @@ function template_view_versions()
 									Templates: \'Templates\'
 								}
 							});
+							var oAdminCenter = new elk_AdminIndex({
+								bLoadVersions: true,
+								slatestVersionContainerId: \'ourVersion\',
+								sinstalledVersionContainerId: \'yourVersion\',
+								sVersionOutdatedTemplate: ', JavaScriptEscape('
+									<span class="alert">%currentVersion%</span>
+								'), '
+
+							});
 						// ]]></script>';
 }
 
