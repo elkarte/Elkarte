@@ -596,6 +596,12 @@ function template_view_versions()
 
 	foreach ($context['default_language_versions'] as $language => $files)
 	{
+		echo '
+									<tr>
+										<td colspan=3" class="windowbg2 versionFilePad">
+											<strong>', $language, '</strong>
+										</td>
+									</tr>';
 		foreach ($files as $filename => $version)
 			echo '
 									<tr>
@@ -682,6 +688,15 @@ function template_view_versions()
 									Languages: \'Languages\',
 									Templates: \'Templates\'
 								}
+							});
+							var oAdminCenter = new elk_AdminIndex({
+								bLoadVersions: true,
+								slatestVersionContainerId: \'ourVersion\',
+								sinstalledVersionContainerId: \'yourVersion\',
+								sVersionOutdatedTemplate: ', JavaScriptEscape('
+									<span class="alert">%currentVersion%</span>
+								'), '
+
 							});
 						// ]]></script>';
 }

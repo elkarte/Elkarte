@@ -107,7 +107,7 @@ $txt['whoallow_mailing'] = 'Sending a forum email.';
 $txt['whoallow_maintain'] = 'Performing routine forum maintenance.';
 $txt['whoallow_manageattachments'] = 'Managing the attachments.';
 $txt['whoallow_moderate'] = 'Viewing the <a href="{moderate_url}">Moderation Center</a>.';
-$txt['whoallow_memberlist'] = 'Viewing the <a href="{memberlist_url}">memberlist</a>.';
+$txt['whoallow_memberlist'] = 'Viewing the <a href="{memberlist_url}">member list</a>.';
 $txt['whoallow_optimizetables'] = 'Optimizing the database tables.';
 $txt['whoallow_repairboards'] = 'Repairing the database tables.';
 $txt['whoallow_search'] = '<a href="{search_url}">Searching</a> the forum.';
