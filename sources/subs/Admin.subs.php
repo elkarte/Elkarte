@@ -298,6 +298,9 @@ function getFileVersions(&$versionOptions)
 	$this_dir = dir($lang_dir);
 	while ($path = $this_dir->read())
 	{
+		if ($path == '.' || $path == '..')
+			continue;
+
 		if (is_dir($lang_dir . '/' . $path))
 		{
 			$language = $path;
