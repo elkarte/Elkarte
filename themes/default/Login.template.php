@@ -108,7 +108,7 @@ function template_login()
  */
 function template_kick_guest()
 {
-	global $context, $settings, $scripturl, $modSettings, $txt;
+	global $context, $scripturl, $modSettings, $txt;
 
 	// This isn't that much... just like normal login but with a message at the top.
 	echo '

@@ -52,7 +52,6 @@ class ManageLanguages_Controller extends Action_Controller
 
 		$subActions = array(
 			'edit' => array($this, 'action_edit', 'permission' => 'admin_forum'),
-// 			'add' => array($this, 'action_add', 'permission' => 'admin_forum'),
 			'settings' => array($this, 'action_languageSettings_display', 'permission' => 'admin_forum'),
 			'downloadlang' => array($this, 'action_downloadlang', 'permission' => 'admin_forum'),
 			'editlang' => array($this, 'action_editlang', 'permission' => 'admin_forum'),
@@ -1030,14 +1029,12 @@ class ManageLanguages_Controller extends Action_Controller
 		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
 		$settings_backup_fail = !@is_writable(BOARDDIR . '/Settings_bak.php') || !@copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
 
-		$config_vars = $this->_languageSettings->settings();
-
 		// Saving settings?
 		if (isset($_REQUEST['save']))
 		{
 			checkSession();
 
-			call_integration_hook('integrate_save_language_settings', array(&$config_vars));
+			call_integration_hook('integrate_save_language_settings');
 
 			$this->_languageSettings->save();
 			redirectexit('action=admin;area=languages;sa=settings');

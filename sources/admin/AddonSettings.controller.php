@@ -96,11 +96,9 @@ class AddonSettings_Controller extends Action_Controller
 		{
 			checkSession();
 
-			$save_vars = $config_vars;
+			call_integration_hook('integrate_save_general_mod_settings');
 
-			call_integration_hook('integrate_save_general_mod_settings', array(&$save_vars));
-
-			Settings_Form::save_db($save_vars);
+			Settings_Form::save_db($config_vars);
 
 			redirectexit('action=admin;area=addonsettings;sa=general');
 		}

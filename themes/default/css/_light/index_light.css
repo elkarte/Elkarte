@@ -520,6 +520,7 @@ div.bbc_footnotes .meaction{
 	box-shadow: 1px 1px 2px #e5e5e5;
 	color: #566e4b;
 }
+
 /* Level 1 button hover and focus effects. */
 .linklevel1:hover, .listlevel1:hover .linklevel1,
 .linklevel2:hover, .listlevel2:hover .linklevel2,
