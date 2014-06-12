@@ -33,17 +33,37 @@ class TestLanguageStrings extends UnitTestCase
 		foreach ($files as $file)
 		{
 			$content = file($file);
+			$multiline = false;
+			$full_string = '';
 			foreach ($content as $string)
 			{
-				if (substr($string, 0, 5) == '$txt[')
+				$string = trim($string);
+				// A string begins with $txt['
+				if (substr($string, 0, 6) == '$txt[\'')
 				{
-					preg_match('~\$txt\[\'(.+?)\'\] = \'.*~', $string, $match);
+					$full_string = $string;
+					$multiline = true;
+				}
+				elseif ($multiline)
+					$full_string .= $string;
+
+				// This is the end of the string and not some odd stuff
+				if ((substr($string, -2) == '\';' && substr($string, -3) != '\\\';') || (substr($string, -2) == '";' && substr($string, -3) != '\\";'))
+				{
+					preg_match('~\$txt\[\'(.+?)\'\] = \'(.*)$~', $full_string, $match);
 					if (!empty($match[1]))
 					{
 						$m = preg_replace('~([^\w:])~', '-->$1<--', $match[1]);
 
 						$this->assertTrue($m === $match[1], 'The index of the string \'' . $match[1] . '\' contains invalid characters: \'' . $m . '\'');
 					}
+					if (!empty($match[2]))
+					{
+						$contains_concat = (strpos($match[2], '\' . \'') !== false || strpos($match[2], '" . "') !== false);
+						$this->assertFalse($contains_concat, 'The string \'' . $match[1] . '\' seems to contain some kind of PHP string concatenation, please fix it (or fix the test).');
+					}
+					$full_string = '';
+					$multiline = false;
 				}
 			}
 		}
