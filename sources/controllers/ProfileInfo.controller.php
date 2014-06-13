@@ -222,22 +222,24 @@ class ProfileInfo_Controller extends Action_Controller
 					'img' => '',
 					'filename' => $attachments[$i]['filename'],
 					'downloads' => $attachments[$i]['downloads'],
+					'subject' => $attachments[$i]['subject'],
+					'id' => $attachments[$i]['id'],
 				);
 
 				// Show a thumbnail image as well?
 				if ($attachments[$i]['is_image'] && !empty($modSettings['attachmentShowImages']) && !empty($modSettings['attachmentThumbnails']))
 				{
 					if (!empty($attachments[$i]['id_thumb']))
-						$context['thumbs'][$i]['img'] = '<img src="' . $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id_thumb'] . ';image" title="" alt="" />';
+						$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachments[$i]['id'] . '" src="' . $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id_thumb'] . ';image" title="" alt="" />';
 					else
 					{
-						// no thumbnail available ... use html instead
+						// No thumbnail available ... use html instead
 						if (!empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight']))
 						{
 							if ($attachments[$i]['width'] > $modSettings['attachmentThumbWidth'] || $attachments[$i]['height'] > $modSettings['attachmentThumbHeight'])
-								$context['thumbs'][$i]['img'] = '<img src="' . $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id'] . '" title="" alt="" width="' . $modSettings['attachmentThumbWidth'] . '" height="' . $modSettings['attachmentThumbHeight'] . '" />';
+								$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachments[$i]['id'] . '" src="' . $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id'] . '" title="" alt="" width="' . $modSettings['attachmentThumbWidth'] . '" height="' . $modSettings['attachmentThumbHeight'] . '" />';
 							else
-								$context['thumbs'][$i]['img'] = '<img src="' . $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id'] . '" title="" alt="" width="' . $attachments[$i]['width'] . '" height="' . $attachments[$i]['height'] . '" />';
+								$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachments[$i]['id'] . '" src="' . $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id'] . '" title="" alt="" width="' . $attachments[$i]['width'] . '" height="' . $attachments[$i]['height'] . '" />';
 						}
 					}
 				}
