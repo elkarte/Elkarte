@@ -1410,6 +1410,7 @@ class Scheduled_Task
 
 				require_once(SUBSDIR . '/Boards.subs.php');
 				require_once(SUBSDIR . '/Mentions.subs.php');
+				require_once(SUBSDIR . '/Members.subs.php');
 
 				$user_see_board = memberQuerySeeBoard($member);
 				$limit = 100;
