@@ -2848,9 +2848,12 @@ dl.merge_topic dd {
 	max-height: 40px;
 }
 .attach_title {
-	width: 100%;
 	display: block;
 	margin-bottom: 4px;
+	overflow: hidden;
+	max-width: 100%;
+	text-overflow: ellipsis;
+	white-space: pre;
 }
 /* The basic user info on the left */
 #basicinfo {

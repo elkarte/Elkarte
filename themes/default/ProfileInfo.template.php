@@ -1148,8 +1148,8 @@ function template_profile_block_attachments()
 
 			echo '
 					<td class="profile_attachment">
-						<span class="attach_title">', $picture['filename'], '</span>
-						<a href="', $picture['url'], '">', $picture['img'], '</a>
+						<span class="attach_title">', $picture['subject'], '</span>
+						<a id="link_', $picture['id'], '" href="', $picture['url'], '">', $picture['img'], '</a>
 					</td>';
 
 			if (++$i % $per_line === 0)
