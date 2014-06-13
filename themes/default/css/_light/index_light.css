@@ -771,7 +771,7 @@ div.bbc_footnotes .meaction{
 .linktree {
 	background: #fcfcfc;
 	border-top: 1px solid #ccc;
-	border-right: 2px solid #ccc;
+	border-right: 0.2em solid #ccc;
 	border-bottom: 1px solid #ccc;
 	border-radius: 2px 0 0 2px;
 }
@@ -802,7 +802,7 @@ div.bbc_footnotes .meaction{
 }
 .linktree:hover, .linktree_last {
 	border-top: 1px solid #3d6e32;
-	border-right: 2px solid #3d6e32;
+	border-right: 0.2em solid #3d6e32;
 	border-bottom: 1px solid #3d6e32;
 	background: #5ba048;
 	background-image: linear-gradient(to right, #4b863c, #5ba048);
