@@ -996,7 +996,6 @@ a.bbc_link {
 	margin: -2em 0 0 15.3em;
 }
 /* Reposition Level 2 drop menu as visible on hover. */
-/* @todo - Check Superfish class. I think .sfhover may be deprecated. */
 .listlevel1:hover .menulevel2, .listlevel1.sfhover .menulevel2 {
 	left: 0;
 }
