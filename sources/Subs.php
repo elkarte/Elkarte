@@ -3687,7 +3687,7 @@ function call_integration_include_hook($hook)
  */
 function call_integration_buffer()
 {
-	global $modSettings, $settings;
+	global $modSettings, $settings, $db_show_debug;
 
 	static $path_replacements = array(
 		'BOARDDIR' => BOARDDIR,
