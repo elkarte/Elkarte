@@ -796,8 +796,6 @@ class Admin_Controller extends Action_Controller
 		// Try to get some more memory.
 		setMemoryLimit('128M');
 
-		require_once(SUBSDIR . '/Settings_Search.class.php');
-
 		// Load a lot of language files.
 		$language_files = array(
 			'Help', 'ManageMail', 'ManageSettings', 'ManageCalendar', 'ManageBoards', 'ManagePaid', 'ManagePermissions', 'Search',
