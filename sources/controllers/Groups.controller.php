@@ -36,8 +36,6 @@ class Groups_Controller extends Action_Controller
 	{
 		global $context;
 
-		require_once(SUBSDIR . '/Action.class.php');
-
 		// Little short on the list here
 		$subActions = array(
 			'list' => array($this, 'action_list', 'permission' => 'view_mlist'),
@@ -70,7 +68,6 @@ class Groups_Controller extends Action_Controller
 		// If we can see the moderation center, and this has a mod bar entry, add the mod center bar.
 		if (allowedTo('access_mod_center') || $user_info['mod_cache']['bq'] != '0=1' || $user_info['mod_cache']['gq'] != '0=1' || allowedTo('manage_membergroups'))
 		{
-			require_once(CONTROLLERDIR . '/ModerationCenter.controller.php');
 			$_GET['area'] = (!empty($_REQUEST['sa']) && $_REQUEST['sa'] == 'requests') ? 'groups' : 'viewgroups';
 			$controller = new ModerationCenter_Controller();
 			$controller->prepareModcenter();
@@ -102,9 +99,6 @@ class Groups_Controller extends Action_Controller
 			);
 
 		$base_url = $scripturl . (isset($context['admin_menu_name']) ? '?action=admin;area=membergroups;sa=members' : (isset($context['moderation_menu_name']) ? '?action=moderate;area=viewgroups;sa=members' : '?action=groups;sa=members'));
-
-		// Making a list is not hard with this beauty.
-		require_once(SUBSDIR . '/GenericList.class.php');
 
 		// Use the standard templates for showing this.
 		$listOptions = array(
@@ -543,7 +537,6 @@ class Groups_Controller extends Action_Controller
 		}
 
 		// We're going to want this for making our list.
-		require_once(SUBSDIR . '/GenericList.class.php');
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 
 		// This is all the information required for a group listing.

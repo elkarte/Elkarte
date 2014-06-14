@@ -2,7 +2,6 @@
 
 require_once(TESTDIR . 'simpletest/autorun.php');
 require_once(TESTDIR . '../SSI.php');
-require_once(ADMINDIR . '/ManagePosts.controller.php');
 
 /**
  * TestCase class for manage posts settings

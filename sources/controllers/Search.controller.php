@@ -156,11 +156,11 @@ class Search_Controller extends Action_Controller
 		// If you got back from search;sa=results by using the linktree, you get your original search parameters back.
 		if ($this->_search === null && isset($_REQUEST['params']))
 		{
-			$this->_search = new Search_Class();
+			$this->_search = new Search();
 			$this->_search->searchParamsFromString($_REQUEST['params']);
-		}
 
-		$context['search_params'] = $this->_search->getParams();
+			$context['search_params'] = $this->_search->getParams();
+		}
 
 		if (isset($_REQUEST['search']))
 			$context['search_params']['search'] = un_htmlspecialchars($_REQUEST['search']);
@@ -283,11 +283,9 @@ class Search_Controller extends Action_Controller
 		// Are you allowed?
 		isAllowedTo('search_posts');
 
-		require_once(CONTROLLERDIR . '/Display.controller.php');
 		require_once(SUBSDIR . '/Package.subs.php');
-		require_once(SUBSDIR . '/Search.class.php');
 
-		$this->_search = new Search_Class();
+		$this->_search = new Search();
 
 		$this->_search->setWeights($this->_weight_factors, $this->_weight, $this->_weight_total);
 
@@ -298,6 +296,7 @@ class Search_Controller extends Action_Controller
 			$this->_search->searchParamsFromString($_REQUEST['params']);
 
 		$this->_search->mergeSearchParams($_REQUEST, $recentPercentage, $maxMembersToSearch);
+		$context['compact'] = $this->_search->isCompact();
 
 		// Nothing??
 		if ($this->_search->param('search') === false || $this->_search->param('search') == '')
@@ -449,7 +448,7 @@ class Search_Controller extends Action_Controller
 			}
 
 			// *** Retrieve the results to be shown on the page
-			$participants = addRelevance($context['topics'], $_SESSION['search_cache']['id_search'], (int) $_REQUEST['start'], $modSettings['search_results_per_page']);
+			$participants = $this->_search->addRelevance($context['topics'], $_SESSION['search_cache']['id_search'], (int) $_REQUEST['start'], $modSettings['search_results_per_page']);
 
 			$num_results = $_SESSION['search_cache']['num_results'];
 		}

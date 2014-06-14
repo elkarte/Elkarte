@@ -172,8 +172,6 @@ class PersonalMessage_Controller extends Action_Controller
 	{
 		global $context;
 
-		require_once(SUBSDIR . '/Action.class.php');
-
 		// Finally all the things we know how to do
 		$subActions = array(
 			'manlabels' => array($this, 'action_manlabels', 'permission' => 'pm_read'),
@@ -189,7 +187,7 @@ class PersonalMessage_Controller extends Action_Controller
 			'send' => array($this, 'action_send', 'permission' => 'pm_read'),
 			'send2' => array($this, 'action_send2', 'permission' => 'pm_read'),
 			'settings' => array($this, 'action_settings', 'permission' => 'pm_read'),
-			'showpmdrafts' => array('dir' => CONTROLLERDIR, 'file' => 'Draft.controller.php', 'controller' => 'Draft_Controller', 'function' => 'action_showPMDrafts', 'permission' => 'pm_read'),
+			'showpmdrafts' => array('controller' => 'Draft_Controller', 'function' => 'action_showPMDrafts', 'permission' => 'pm_read'),
 			'inbox' => array($this, 'action_folder', 'permission' => 'pm_read'),
 		);
 
@@ -1370,7 +1368,6 @@ class PersonalMessage_Controller extends Action_Controller
 		}
 
 		// Load up the fields.
-		require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
 		$controller = new ProfileOptions_Controller();
 		$controller->action_pmprefs();
 	}

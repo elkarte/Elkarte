@@ -38,8 +38,6 @@ class PostModeration_Controller extends Action_Controller
 		loadLanguage('ModerationCenter');
 		loadTemplate('ModerationCenter');
 
-		require_once(SUBSDIR . '/Action.class.php');
-
 		// Allowed sub-actions, you know the drill by now!
 		$subActions = array(
 			'approve' => array($this, 'action_approve'),
@@ -318,7 +316,6 @@ class PostModeration_Controller extends Action_Controller
 			}
 		}
 
-		require_once(SUBSDIR . '/GenericList.class.php');
 		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		$listOptions = array(

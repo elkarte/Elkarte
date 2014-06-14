@@ -322,9 +322,6 @@ class CoreFeatures_Controller extends Action_Controller
 		loadLanguage('Help');
 		loadLanguage('ManageSettings');
 
-		// Will need the utility functions from here.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
-
 		$context['sub_template'] = 'show_settings';
 
 		// By default do the basic settings.

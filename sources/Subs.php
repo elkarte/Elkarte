@@ -2780,7 +2780,6 @@ function template_javascript($do_defered = false)
 	{
 		if (!empty($modSettings['minify_css_js']))
 		{
-			require_once(SOURCEDIR . '/SiteCombiner.class.php');
 			$combiner = new Site_Combiner(CACHEDIR, $boardurl . '/cache');
 			$combine_name = $combiner->site_js_combine($context['javascript_files'], $do_defered);
 
@@ -2867,7 +2866,6 @@ function template_css()
 	{
 		if (!empty($modSettings['minify_css_js']))
 		{
-			require_once(SOURCEDIR . '/SiteCombiner.class.php');
 			$combiner = new Site_Combiner(CACHEDIR, $boardurl . '/cache');
 			$combine_name = $combiner->site_css_combine($context['css_files']);
 
@@ -4209,4 +4207,73 @@ function replaceBasicActionUrl($string)
 	}
 
 	return str_replace($find, $replace, $string);
+}
+
+function elk_autoloader($class)
+{
+	if (substr($class, -11) === '_Controller')
+	{
+		$file_name = str_replace('_', '', str_replace('_Controller', '.controller', $class)) . '.php';
+
+		$file_name = str_replace('_', '', $file_name);
+		if (file_exists(CONTROLLERDIR . '/' . $file_name))
+			$file_name = CONTROLLERDIR . '/' . $file_name;
+		elseif (file_exists(ADMINDIR . '/' . $file_name))
+			$file_name = ADMINDIR . '/' . $file_name;
+	}
+	elseif (strpos($class, 'Verification_Controls_') !== false)
+	{
+		$file_name = SUBSDIR . '/VerificationControls.class.php';
+	}
+	elseif (strpos($class, 'Database_') !== false || strpos($class, 'DbSearch_') !== false || strpos($class, 'DbTable_') !== false)
+	{
+		$file_name = '';
+	}
+	elseif (substr($class, -7) === '_Search')
+	{
+		$file_name = SUBSDIR . '/SearchAPI-' . substr($class, 0, -7) . '.class.php';
+	}
+	elseif (substr($class, -8) === '_Display' || substr($class, -8) === '_Payment')
+	{
+		$file_name = SUBSDIR . '/Subscriptions-' . substr($class, 0, -8) . '.class.php';
+	}
+	else
+	{
+		$file_name = str_replace('_', '', $class);
+		if (file_exists(SUBSDIR . '/' . $file_name . '.class.php'))
+			$file_name = SUBSDIR . '/' . $file_name . '.class.php';
+		elseif (file_exists(SOURCEDIR . '/' . $file_name . '.class.php'))
+			$file_name = SOURCEDIR . '/' . $file_name . '.class.php';
+		elseif (file_exists(SOURCEDIR . '/' . $file_name . '.php'))
+			$file_name = SOURCEDIR . '/' . $file_name . '.php';
+		else
+			$file_name = '';
+	}
+	if (!empty($file_name))
+		require_once($file_name);
+}
+
+/**
+ * This function creates a new GenericList from all the passed options.
+ *
+ * @param mixed[] $listOptions associative array of option => value
+ */
+function createList($listOptions)
+{
+	call_integration_hook('integrate_list_' . $listOptions['id'], array($listOptions));
+
+	$list = new Generic_List($listOptions);
+
+	$list->buildList();
+}
+
+/**
+ * This handy function retrieves a Request instance and passes it on.
+ *
+ * - To get hold of a Request, you can use this function or directly Request::instance().
+ * - This is for convenience, it simply delegates to Request::instance().
+ */
+function request()
+{
+	return Request::instance();
 }

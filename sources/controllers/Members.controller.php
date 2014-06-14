@@ -34,8 +34,6 @@ class Members_Controller extends Action_Controller
 	{
 		global $context;
 
-		require_once(SUBSDIR . '/Action.class.php');
-
 		// Little short on the list here
 		$subActions = array(
 			'add' => array($this, 'action_addbuddy', 'permission' => 'profile_identity_own'),
@@ -79,7 +77,6 @@ class Members_Controller extends Action_Controller
 			// Do we want a mention for our newly added buddy?
 			if (!empty($modSettings['mentions_enabled']) && !empty($modSettings['mentions_buddy']))
 			{
-				require_once(CONTROLLERDIR . '/Mentions.controller.php');
 				$mentions = new Mentions_Controller();
 
 				// Set a mention for our buddy.

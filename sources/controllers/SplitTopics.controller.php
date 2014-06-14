@@ -66,7 +66,6 @@ class SplitTopics_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Boards.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
-		require_once(SUBSDIR . '/Action.class.php');
 
 		$subActions = array(
 			'selectTopics' => array($this, 'action_splitSelectTopics', 'permission' => 'split_any'),

@@ -147,7 +147,6 @@ class ManageLanguages_Controller extends Action_Controller
 				),
 			);
 
-			require_once(SUBSDIR . '/GenericList.class.php');
 			createList($listOptions);
 		}
 
@@ -182,7 +181,6 @@ class ManageLanguages_Controller extends Action_Controller
 
 			if ($_POST['def_language'] != $language && $lang_exists)
 			{
-				require_once(SUBSDIR . '/SettingsForm.class.php');
 				Settings_Form::save_file(array('language' => '\'' . $_POST['def_language'] . '\''));
 				$language = $_POST['def_language'];
 			}
@@ -279,7 +277,6 @@ class ManageLanguages_Controller extends Action_Controller
 				'class' => 'smalltext alert',
 			);
 
-		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';
@@ -618,7 +615,6 @@ class ManageLanguages_Controller extends Action_Controller
 		if (!empty($modSettings['cache_enable']))
 			cache_put_data('known_languages', null, !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600);
 
-		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		createToken('admin-dlang');
@@ -764,7 +760,6 @@ class ManageLanguages_Controller extends Action_Controller
 			// Sixth, if we deleted the default language, set us back to english?
 			if ($context['lang_id'] == $language)
 			{
-				require_once(SUBSDIR . '/SettingsForm.class.php');
 				$language = 'english';
 				Settings_Form::save_file(array('language' => '\'' . $language . '\''));
 			}
@@ -1076,9 +1071,6 @@ class ManageLanguages_Controller extends Action_Controller
 	 */
 	private function _initLanguageSettingsForm()
 	{
-		// We'll want to use them someday. That is, right now.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
-
 		// Make it happen!
 		$this->_languageSettings = new Settings_Form();
 

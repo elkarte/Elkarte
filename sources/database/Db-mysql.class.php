@@ -633,6 +633,7 @@ class Database_MySQL implements Database
 			if (!empty($fix_tables))
 			{
 				// subs/Admin.subs.php for updateDbLastError(), subs/Mail.subs.php for sendmail().
+				// @todo this should go somewhere else, not into the db-mysql layer I think
 				require_once(SUBSDIR . '/Admin.subs.php');
 				require_once(SUBSDIR . '/Mail.subs.php');
 

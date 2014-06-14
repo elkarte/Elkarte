@@ -91,7 +91,6 @@ class Profile_Controller extends Action_Controller
 				'areas' => array(
 					'summary' => array(
 						'label' => $txt['summary'],
-						'file' => 'ProfileInfo.controller.php',
 						'controller' => 'ProfileInfo_Controller',
 						'function' => 'action_summary',
 						// From the summary it's possible to activate an account, so we need the token
@@ -104,7 +103,6 @@ class Profile_Controller extends Action_Controller
 					),
 					'statistics' => array(
 						'label' => $txt['statPanel'],
-						'file' => 'ProfileInfo.controller.php',
 						'controller' => 'ProfileInfo_Controller',
 						'function' => 'action_statPanel',
 						'permission' => array(
@@ -114,7 +112,6 @@ class Profile_Controller extends Action_Controller
 					),
 					'showposts' => array(
 						'label' => $txt['showPosts'],
-						'file' => 'ProfileInfo.controller.php',
 						'controller' => 'ProfileInfo_Controller',
 						'function' => 'action_showPosts',
 						'subsections' => array(
@@ -130,7 +127,6 @@ class Profile_Controller extends Action_Controller
 					),
 					'showdrafts' => array(
 						'label' => $txt['drafts_show'],
-						'file' => 'Draft.controller.php',
 						'controller' => 'Draft_Controller',
 						'function' => 'action_showProfileDrafts',
 						'enabled' => !empty($modSettings['drafts_enabled']) && $context['user']['is_owner'],
@@ -141,7 +137,6 @@ class Profile_Controller extends Action_Controller
 					),
 					'showlikes' => array(
 						'label' => $txt['likes_show'],
-						'file' => 'Likes.controller.php',
 						'controller' => 'Likes_Controller',
 						'function' => 'action_showProfileLikes',
 						'enabled' => !empty($modSettings['likes_enabled']) && $context['user']['is_owner'],
@@ -156,7 +151,6 @@ class Profile_Controller extends Action_Controller
 					),
 					'permissions' => array(
 						'label' => $txt['showPermissions'],
-						'file' => 'ProfileInfo.controller.php',
 						'controller' => 'ProfileInfo_Controller',
 						'function' => 'action_showPermissions',
 						'permission' => array(
@@ -166,7 +160,6 @@ class Profile_Controller extends Action_Controller
 					),
 					'history' => array(
 						'label' => $txt['history'],
-						'file' => 'ProfileHistory.controller.php',
 						'controller' => 'ProfileHistory_Controller',
 						'function' => 'action_index',
 						'subsections' => array(
@@ -183,7 +176,6 @@ class Profile_Controller extends Action_Controller
 					'viewwarning' => array(
 						'label' => $txt['profile_view_warnings'],
 						'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && $cur_profile['warning'] && (!empty($modSettings['warning_show']) && ($context['user']['is_owner'] || $modSettings['warning_show'] == 2)),
-						'file' => 'ProfileInfo.controller.php',
 						'controller' => 'ProfileInfo_Controller',
 						'function' => 'action_viewWarning',
 						'permission' => array(
@@ -198,7 +190,6 @@ class Profile_Controller extends Action_Controller
 				'areas' => array(
 					'account' => array(
 						'label' => $txt['account'],
-						'file' => 'ProfileOptions.controller.php',
 						'controller' => 'ProfileOptions_Controller',
 						'function' => 'action_account',
 						'enabled' => $context['user']['is_admin'] || ($cur_profile['id_group'] != 1 && !in_array(1, explode(',', $cur_profile['additional_groups']))),
@@ -212,7 +203,6 @@ class Profile_Controller extends Action_Controller
 					),
 					'forumprofile' => array(
 						'label' => $txt['forumprofile'],
-						'file' => 'ProfileOptions.controller.php',
 						'controller' => 'ProfileOptions_Controller',
 						'function' => 'action_forumProfile',
 						'sc' => 'post',
@@ -224,7 +214,6 @@ class Profile_Controller extends Action_Controller
 					),
 					'theme' => array(
 						'label' => $txt['theme'],
-						'file' => 'ProfileOptions.controller.php',
 						'controller' => 'ProfileOptions_Controller',
 						'function' => 'action_themepick',
 						'sc' => 'post',
@@ -236,7 +225,6 @@ class Profile_Controller extends Action_Controller
 					),
 					'authentication' => array(
 						'label' => $txt['authentication'],
-						'file' => 'ProfileOptions.controller.php',
 						'controller' => 'ProfileOptions_Controller',
 						'function' => 'action_authentication',
 						'enabled' => !empty($modSettings['enableOpenID']) || !empty($cur_profile['openid_uri']),
@@ -251,7 +239,6 @@ class Profile_Controller extends Action_Controller
 					),
 					'notification' => array(
 						'label' => $txt['notifications'],
-						'file' => 'ProfileOptions.controller.php',
 						'controller' => 'ProfileOptions_Controller',
 						'function' => 'action_notification',
 						'sc' => 'post',
@@ -265,7 +252,6 @@ class Profile_Controller extends Action_Controller
 					// @todo at some point decouple it from PMs
 					'contactprefs' => array(
 						'label' => $txt['contactprefs'],
-						'file' => 'ProfileOptions.controller.php',
 						'controller' => 'ProfileOptions_Controller',
 						'function' => 'action_pmprefs',
 						'enabled' => allowedTo(array('profile_extra_own', 'profile_extra_any')),
@@ -278,7 +264,6 @@ class Profile_Controller extends Action_Controller
 					),
 					'ignoreboards' => array(
 						'label' => $txt['ignoreboards'],
-						'file' => 'ProfileOptions.controller.php',
 						'controller' => 'ProfileOptions_Controller',
 						'function' => 'action_ignoreboards',
 						'enabled' => !empty($modSettings['allow_ignore_boards']),
@@ -291,7 +276,6 @@ class Profile_Controller extends Action_Controller
 					),
 					'lists' => array(
 						'label' => $txt['editBuddyIgnoreLists'],
-						'file' => 'ProfileOptions.controller.php',
 						'controller' => 'ProfileOptions_Controller',
 						'function' => 'action_editBuddyIgnoreLists',
 						'enabled' => !empty($modSettings['enable_buddylist']) && $context['user']['is_owner'],
@@ -308,7 +292,6 @@ class Profile_Controller extends Action_Controller
 					),
 					'groupmembership' => array(
 						'label' => $txt['groupmembership'],
-						'file' => 'ProfileOptions.controller.php',
 						'controller' => 'ProfileOptions_Controller',
 						'function' => 'action_groupMembership',
 						'enabled' => !empty($modSettings['show_group_membership']) && $context['user']['is_owner'],
@@ -336,7 +319,6 @@ class Profile_Controller extends Action_Controller
 					'issuewarning' => array(
 						'label' => $txt['profile_issue_warning'],
 						'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && (!$context['user']['is_owner'] || $context['user']['is_admin']),
-						'file' => 'ProfileAccount.controller.php',
 						'controller' => 'ProfileAccount_Controller',
 						'function' => 'action_issuewarning',
 						'token' => 'profile-iw%u',
@@ -356,7 +338,6 @@ class Profile_Controller extends Action_Controller
 					),
 					'subscriptions' => array(
 						'label' => $txt['subscriptions'],
-						'file' => 'ProfileSubscriptions.controller.php',
 						'controller' => 'ProfileSubscriptions_Controller',
 						'function' => 'action_subscriptions',
 						'enabled' => !empty($modSettings['paid_enabled']),
@@ -367,7 +348,6 @@ class Profile_Controller extends Action_Controller
 					),
 					'deleteaccount' => array(
 						'label' => $txt['deleteAccount'],
-						'file' => 'ProfileAccount.controller.php',
 						'controller' => 'ProfileAccount_Controller',
 						'function' => 'action_deleteaccount',
 						'sc' => 'post',
@@ -379,7 +359,6 @@ class Profile_Controller extends Action_Controller
 						),
 					),
 					'activateaccount' => array(
-						'file' => 'ProfileAccount.controller.php',
 						'controller' => 'ProfileAccount_Controller',
 						'function' => 'action_activateaccount',
 						'sc' => 'get',
@@ -563,7 +542,6 @@ class Profile_Controller extends Action_Controller
 			{
 				if (empty($post_errors))
 				{
-					require_once(CONTROLLERDIR . '/ProfileAccount.controller.php');
 					$controller = new ProfileAccount_Controller();
 					$controller->action_activateaccount();
 				}
@@ -572,7 +550,6 @@ class Profile_Controller extends Action_Controller
 			{
 				if (empty($post_errors))
 				{
-					require_once(CONTROLLERDIR . '/ProfileAccount.controller.php');
 					$controller = new ProfileAccount_Controller();
 					$controller->action_deleteaccount2();
 					redirectexit();
@@ -580,7 +557,6 @@ class Profile_Controller extends Action_Controller
 			}
 			elseif ($current_area == 'groupmembership' && empty($post_errors))
 			{
-				require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
 				$controller = new Profileoptions_Controller();
 				$msg = $controller->action_groupMembership2();
 
@@ -590,7 +566,6 @@ class Profile_Controller extends Action_Controller
 			// Authentication changes?
 			elseif ($current_area == 'authentication')
 			{
-				require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
 				$controller = new ProfileOptions_Controller();
 				$controller->action_authentication(true);
 			}

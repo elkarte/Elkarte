@@ -109,7 +109,6 @@ class Maintenance_Controller extends Action_Controller
 				'function' => 'action_hooks',
 			),
 			'attachments' => array(
-				'file' => 'ManageAttachments.controller.php',
 				'controller' => 'ManageAttachments_Controller',
 				'function' => 'action_maintenance',
 			),
@@ -345,8 +344,6 @@ class Maintenance_Controller extends Action_Controller
 	{
 		// Honestly, this should be done in the sub function.
 		validateToken('admin-maint');
-
-		require_once(ADMINDIR . '/RepairBoards.controller.php');
 
 		$controller = new RepairBoards_Controller();
 		$controller->action_repairboards();
@@ -890,8 +887,6 @@ class Maintenance_Controller extends Action_Controller
 
 		checkSession();
 
-		// Start by doing some data checking
-		require_once(SUBSDIR . '/DataValidator.class.php');
 		$validator = new Data_Validator();
 		$validator->sanitation_rules(array('posts' => 'empty', 'type' => 'trim', 'from_email' => 'trim', 'from_name' => 'trim', 'to' => 'trim'));
 		$validator->validation_rules(array('from_email' => 'valid_email', 'from_name' => 'required', 'to' => 'required', 'type' => 'contains[name,email]'));
@@ -966,8 +961,6 @@ class Maintenance_Controller extends Action_Controller
 
 		checkSession();
 		validateToken('admin-maint');
-
-		require_once(SUBSDIR . '/DataValidator.class.php');
 
 		// Start with checking and cleaning what was sent
 		$validator = new Data_Validator();
@@ -1343,7 +1336,6 @@ class Maintenance_Controller extends Action_Controller
 			);
 		}
 
-		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($list_options);
 
 		$context['page_title'] = $txt['maintain_sub_hooks_list'];

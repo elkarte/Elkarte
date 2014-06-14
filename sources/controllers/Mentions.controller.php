@@ -171,7 +171,6 @@ class Mentions_Controller extends Action_Controller
 		is_not_guest();
 
 		require_once(SUBSDIR . '/Mentions.subs.php');
-		require_once(SUBSDIR . '/GenericList.class.php');
 		loadLanguage('Mentions');
 
 		$this->_buildUrl();
@@ -588,7 +587,6 @@ class Mentions_Controller extends Action_Controller
 	 */
 	protected function _isAccessible()
 	{
-		require_once(SUBSDIR . '/DataValidator.class.php');
 		require_once(SUBSDIR . '/Mentions.subs.php');
 
 		$this->_validator = new Data_Validator();
@@ -612,7 +610,6 @@ class Mentions_Controller extends Action_Controller
 	 */
 	protected function _isValid()
 	{
-		require_once(SUBSDIR . '/DataValidator.class.php');
 		$this->_validator = new Data_Validator();
 		$sanitization = array(
 			'type' => 'trim',

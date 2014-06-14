@@ -100,11 +100,8 @@ require_once(SOURCEDIR . '/Logging.php');
 require_once(SOURCEDIR . '/Load.php');
 require_once(SUBSDIR . '/Cache.subs.php');
 require_once(SOURCEDIR . '/Security.php');
-require_once(SOURCEDIR . '/BrowserDetector.class.php');
-require_once(SOURCEDIR . '/ErrorContext.class.php');
-require_once(SUBSDIR . '/Util.class.php');
-require_once(SUBSDIR . '/TemplateLayers.class.php');
-require_once(SOURCEDIR . '/Action.controller.php');
+
+spl_autoload_register('elk_autoloader');
 
 // Clean the request variables.
 cleanRequest();
@@ -189,7 +186,6 @@ if (isset($_REQUEST['ssi_ban']) || (isset($ssi_ban) && $ssi_ban === true))
 // Do we allow guests in here?
 if (empty($ssi_guest_access) && empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && basename($_SERVER['PHP_SELF']) != 'SSI.php')
 {
-	require_once(CONTROLLERDIR . '/Auth.controller.php');
 	$controller = new Auth_Controller();
 	$controller->action_kickguest();
 	obExit(null, true);
@@ -1433,7 +1429,6 @@ function ssi_pollVote()
 		return;
 	}
 
-	require_once(CONTROLLERDIR . '/Poll.controller.php');
 	require_once(SUBSDIR . '/Poll.subs.php');
 	// We have to fake we are in a topic so that we can use the proper controller
 	list ($topic, $board) = topicFromPoll($pollID);

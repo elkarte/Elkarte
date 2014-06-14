@@ -182,7 +182,6 @@ class MessageIndex_Controller extends Action_Controller
 		$context['can_approve_posts'] = allowedTo('approve_posts');
 
 		// Prepare sub-boards for display.
-		require_once(SUBSDIR . '/BoardsList.class.php');
 		$boardIndexOptions = array(
 			'include_categories' => false,
 			'base_level' => $board_info['child_level'] + 1,
@@ -454,7 +453,6 @@ class MessageIndex_Controller extends Action_Controller
 				if (empty($_REQUEST['topics']) || count($_REQUEST['topics']) < 2)
 					redirectexit($redirect_url);
 
-				require_once(CONTROLLERDIR . '/MergeTopics.controller.php');
 				$controller = new MergeTopics_Controller();
 				return $controller->action_mergeExecute($_REQUEST['topics']);
 			}

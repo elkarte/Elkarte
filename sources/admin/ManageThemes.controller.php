@@ -64,7 +64,6 @@ class ManageThemes_Controller extends Action_Controller
 		// Load the important language files...
 		loadLanguage('ManageThemes');
 		loadLanguage('Settings');
-		require_once(SUBSDIR . '/Action.class.php');
 
 		// No guests in here.
 		is_not_guest();
@@ -1165,7 +1164,6 @@ class ManageThemes_Controller extends Action_Controller
 				$theme_info = file_get_contents($theme_dir . '/theme_info.xml');
 
 				// Parse theme-info.xml into an Xml_Array.
-				require_once(SUBSDIR . '/XmlArray.class.php');
 				$theme_info_xml = new Xml_Array($theme_info);
 
 				// @todo Error message of some sort?
@@ -1535,8 +1533,6 @@ class ManageThemes_Controller extends Action_Controller
 			// For PHP files, we check the syntax.
 			if ($is_php)
 			{
-				require_once(SUBSDIR . '/DataValidator.class.php');
-
 				$validator = new Data_Validator();
 				$validator->validation_rules(array(
 					'entire_file' => 'php_syntax'

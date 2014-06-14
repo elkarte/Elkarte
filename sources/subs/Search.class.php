@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -23,7 +23,7 @@ if (!defined('ELK'))
 // This defines two version types for checking the API's are compatible with this version of the software.
 $GLOBALS['search_versions'] = array(
 	// This is the forum version but is repeated due to some people rewriting $forum_version.
-	'forum_version' => 'ElkArte 1.0 Beta 2',
+	'forum_version' => 'ElkArte 1.0 Release Candidate 1',
 
 	// This is the minimum version of ElkArte that an API could have been written for to work.
 	// (strtr to stop accidentally updating version on release)
@@ -33,7 +33,7 @@ $GLOBALS['search_versions'] = array(
 /**
  * Actually do the searches
  */
-class Search_Class
+class Search
 {
 	/**
 	 * This is the minimum version of ElkArte that an API could have been written
@@ -117,17 +117,14 @@ class Search_Class
 		global $modSettings, $search_versions, $txt;
 
 		require_once(SUBSDIR . '/Package.subs.php');
-		require_once(SUBSDIR . '/SearchAPI.class.php');
 
 		// Load up the search API we are going to use.
 		$modSettings['search_index'] = empty($modSettings['search_index']) ? 'standard' : $modSettings['search_index'];
 		if (!file_exists(SUBSDIR . '/SearchAPI-' . ucwords($modSettings['search_index']) . '.class.php'))
 			fatal_lang_error('search_api_missing');
 
-		require_once(SUBSDIR . '/SearchAPI-' . ucwords($modSettings['search_index']) . '.class.php');
-
 		// Create an instance of the search API and check it is valid for this version of the software.
-		$search_class_name = $modSettings['search_index'] . '_search';
+		$search_class_name = ucwords($modSettings['search_index']) . '_Search';
 		$this->_searchAPI = new $search_class_name();
 
 		// An invalid Search API.
@@ -137,7 +134,6 @@ class Search_Class
 			loadLanguage('Errors');
 			log_error(sprintf($txt['search_api_not_compatible'], 'SearchAPI-' . ucwords($modSettings['search_index']) . '.class.php'), 'critical');
 
-			require_once(SUBSDIR . '/SearchAPI-Standard.class.php');
 			$this->_searchAPI = new Standard_Search();
 		}
 
@@ -451,7 +447,7 @@ class Search_Class
 	}
 
 	/**
-	 * Merge search params extracted with Search_Class::searchParamsFromString
+	 * Merge search params extracted with Search::searchParamsFromString
 	 * with those present in the $param array (usually $_REQUEST['params'])
 	 *
 	 * @param mixed[] $params - An array of search parameters
@@ -655,8 +651,6 @@ class Search_Class
 		$this->_search_params['show_complete'] = !empty($this->_search_params['show_complete']) || !empty($params['show_complete']);
 		$this->_search_params['subject_only'] = !empty($this->_search_params['subject_only']) || !empty($params['subject_only']);
 
-		$context['compact'] = !$this->_search_params['show_complete'];
-
 		// Get the sorting parameters right. Default to sort by relevance descending.
 		$sort_columns = array(
 			'relevance',
@@ -698,6 +692,14 @@ class Search_Class
 			else
 				$this->_search_params['search'] = '';
 		}
+	}
+
+	/**
+	 * Tell me, do I want to see the full message or just a piece?
+	 */
+	public function isCompact()
+	{
+		return empty($this->_search_params['show_complete']);
 	}
 
 	/**
@@ -1584,7 +1586,7 @@ class Search_Class
 		static $usedIDs;
 
 		$ignoreRequest = $this->_db_search->search_query($query_identifier, ($this->_db->support_ignore() ? ( '
-			INSERT IGNORE INTO ' . '{db_prefix}log_search_results
+			INSERT IGNORE INTO {db_prefix}log_search_results
 				(' . implode(', ', array_keys($main_query['select'])) . ')') : '') . '
 			SELECT
 				' . implode(',
@@ -1624,6 +1626,7 @@ class Search_Class
 				foreach ($row as $key => $value)
 					$inserts[$row['id_topic']][] = (int) $row[$key];
 			}
+			$this->_db->free_result($ignoreRequest);
 
 			// Now put them in!
 			if (!empty($inserts))
@@ -1643,8 +1646,6 @@ class Search_Class
 		}
 		else
 			$num_results = $this->_db->affected_rows();
-
-		$this->_db->free_result($ignoreRequest);
 
 		return $num_results;
 	}

@@ -65,8 +65,12 @@ class Packages_Controller extends Action_Controller
 			'showoperations' => array($this, 'action_showoperations'),
 			// The following two belong to PackageServers,
 			// for UI's sake moved here at least temporarily
-			'servers' => array('file' => 'PackageServers.controller.php', 'controller' => 'PackageServers_Controller', 'function' => 'action_list'),
-			'upload' => array('file' => 'PackageServers.controller.php', 'controller' => 'PackageServers_Controller', 'function' => 'action_upload'),
+			'servers' => array(
+				'controller' => 'PackageServers_Controller',
+				'function' => 'action_list'),
+			'upload' => array(
+				'controller' => 'PackageServers_Controller',
+				'function' => 'action_upload'),
 		);
 
 		// Set up action/subaction stuff.
@@ -1255,8 +1259,6 @@ class Packages_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context, $forum_version, $settings;
 
-		require_once(SUBSDIR . '/GenericList.class.php');
-
 		$context['page_title'] .= ' - ' . $txt['browse_packages'];
 		$context['forum_version'] = $forum_version;
 		$installed = $context['sub_action'] == 'installed' ? true : false;
@@ -1571,7 +1573,6 @@ class Packages_Controller extends Action_Controller
 
 		if (empty($package_ftp) && !isset($_POST['skip_ftp']))
 		{
-			require_once(SUBSDIR . '/FtpConnection.class.php');
 			$ftp = new Ftp_Connection(null);
 			list ($username, $detect_path, $found_path) = $ftp->detect_path(BOARDDIR);
 

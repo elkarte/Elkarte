@@ -38,9 +38,6 @@ function cleanRequest()
 	// Makes it easier to refer to things this way.
 	$scripturl = $boardurl . '/index.php';
 
-	// We'll need this fairly badly
-	require_once(SOURCEDIR . '/Request.php');
-
 	// Reject magic_quotes_sybase='on'.
 	if (ini_get('magic_quotes_sybase') || strtolower(ini_get('magic_quotes_sybase')) == 'on')
 		die('magic_quotes_sybase=on was detected: your host is using an unsecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.');
@@ -145,7 +142,7 @@ function cleanRequest()
 	$_REQUEST = $_POST + $_GET;
 
 	// Make sure REMOTE_ADDR, other IPs, and the like are parsed
-	$req = request();
+	$req = Request::instance();
 
 	// Parse the $_REQUEST and make sure things like board, topic don't have weird stuff
 	$req->parseRequest();

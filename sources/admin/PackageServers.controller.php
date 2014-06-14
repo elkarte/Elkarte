@@ -192,7 +192,6 @@ class PackageServers_Controller extends Action_Controller
 		@set_time_limit(600);
 
 		// Read packages.xml and parse into Xml_Array. (the true tells it to trim things ;).)
-		require_once(SUBSDIR . '/XmlArray.class.php');
 		$listing = new Xml_Array(fetch_web_data($_GET['package']), true);
 
 		// Errm.... empty file?  Try the URL....
@@ -777,7 +776,6 @@ class PackageServers_Controller extends Action_Controller
 			// Are they connecting to their FTP account already?
 			if (isset($_POST['ftp_username']))
 			{
-				require_once(SUBSDIR . '/FtpConnection.class.php');
 				$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
 
 				if ($ftp->error === false)
@@ -797,7 +795,6 @@ class PackageServers_Controller extends Action_Controller
 				// Maybe we didn't even try yet
 				if (!isset($ftp))
 				{
-					require_once(SUBSDIR . '/FtpConnection.class.php');
 					$ftp = new Ftp_Connection(null);
 				}
 				// ...or we failed

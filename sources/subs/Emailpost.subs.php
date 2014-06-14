@@ -46,7 +46,6 @@ function pbe_email_to_bbc($text, $html)
 	{
 		// Convert the email-HTML to BBC
 		$text = preg_replace(array_keys($tags), array_values($tags), $text);
-		require_once(SUBSDIR . '/Html2BBC.class.php');
 		$bbc_converter = new Html_2_BBC($text);
 		$text = $bbc_converter->get_bbc();
 
@@ -84,7 +83,6 @@ function pbe_email_to_bbc($text, $html)
 		$text = Markdown($text);
 
 		// Convert any resulting HTML created by markup style text in the email to BBC
-		require_once(SUBSDIR . '/Html2BBC.class.php');
 		$bbc_converter = new Html_2_BBC($text, false);
 		$text = $bbc_converter->get_bbc();
 	}
@@ -142,7 +140,6 @@ function pbe_fix_email_body($body, $html = false, $real_name = '', $charset = 'U
 	$body = preg_replace('~(\[quote(.*)?\]\s*(\[br\]\s*)?\[/quote\])~s', '', $body);
 
 	// Reflow and Cleanup this message to something that looks normal-er
-	require_once(SUBSDIR . '/EmailFormat.class.php');
 	$formatter = new Email_Format();
 	$body = $formatter->reflow($body, $html, $real_name, $charset);
 
@@ -951,7 +948,6 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	);
 
 	// Convert this to text (markdown)
-	require_once(SUBSDIR . '/Html2Md.class.php');
 	$mark_down = new Html_2_Md($message);
 	$message = $mark_down->get_markdown();
 

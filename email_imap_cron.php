@@ -156,7 +156,6 @@ class PBE_IMAP
 		if ($emails)
 		{
 			// Initialize Emailpost controller
-			require_once(CONTROLLERDIR . '/Emailpost.controller.php');
 			$controller = new Emailpost_Controller();
 
 			// Make sure we work from the oldest to the newest message

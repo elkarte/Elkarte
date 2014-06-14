@@ -126,8 +126,6 @@ class ModerationCenter_Controller extends Action_Controller
 					'modlog' => array(
 						'label' => $txt['modlog_view'],
 						'enabled' => !empty($modSettings['modlog_enabled']) && $context['can_moderate_boards'],
-						'file' => 'Modlog.controller.php',
-						'dir' => ADMINDIR,
 						'controller' => 'Modlog_Controller',
 						'function' => 'action_log',
 						'icon' => 'transparent.png',
@@ -154,7 +152,6 @@ class ModerationCenter_Controller extends Action_Controller
 					'postmod' => array(
 						'label' => $txt['mc_unapproved_posts'] . (!empty($mod_counts['postmod']) ? ' [' . $mod_counts['postmod'] . ']' : ''),
 						'enabled' => $context['can_moderate_approvals'],
-						'file' => 'PostModeration.controller.php',
 						'controller' => 'PostModeration_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -168,8 +165,6 @@ class ModerationCenter_Controller extends Action_Controller
 					'emailmod' => array(
 						'label' => $txt['mc_emailerror'] . (!empty($mod_counts['emailmod']) ? ' [' . $mod_counts['emailmod'] . ']' : ''),
 						'enabled' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
-						'file' => 'ManageMaillist.controller.php',
-						'dir' => ADMINDIR,
 						'function' => 'UnapprovedEmails',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_mail',
@@ -178,7 +173,6 @@ class ModerationCenter_Controller extends Action_Controller
 					'attachmod' => array(
 						'label' => $txt['mc_unapproved_attachments'] . (!empty($mod_counts['attachments']) ? ' [' . $mod_counts['attachments'] . ']' : ''),
 						'enabled' => $context['can_moderate_approvals'],
-						'file' => 'PostModeration.controller.php',
 						'controller' => 'PostModeration_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -217,7 +211,6 @@ class ModerationCenter_Controller extends Action_Controller
 					),
 					'groups' => array(
 						'label' => $txt['mc_group_requests'] . (!empty($mod_counts['groupreq']) ? ' [' . $mod_counts['groupreq'] . ']' : ''),
-						'file' => 'Groups.controller.php',
 						'controller' => 'Groups_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -227,7 +220,6 @@ class ModerationCenter_Controller extends Action_Controller
 					'members' => array(
 						'enabled' => allowedTo('moderate_forum'),
 						'label' => $txt['mc_member_requests'] . (!empty($mod_counts['memberreq']) ? ' [' . $mod_counts['memberreq'] . ']' : ''),
-						'file' => 'ManageMembers.controller.php',
 						'controller' => 'ManageMembers_Controller',
 						'function' => 'action_approve',
 						'icon' => 'transparent.png',
@@ -236,7 +228,6 @@ class ModerationCenter_Controller extends Action_Controller
 					),
 					'viewgroups' => array(
 						'label' => $txt['mc_view_groups'],
-						'file' => 'Groups.controller.php',
 						'controller' => 'Groups_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -863,7 +854,6 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// What have the other moderators done to this message?
 		require_once(SUBSDIR . '/Modlog.subs.php');
-		require_once(SUBSDIR . '/GenericList.class.php');
 		loadLanguage('Modlog');
 
 		// This is all the information from the moderation log.
@@ -1040,8 +1030,6 @@ class ModerationCenter_Controller extends Action_Controller
 				$approve_query = ' AND 1=0';
 		}
 
-		require_once(SUBSDIR . '/GenericList.class.php');
-
 		// This is all the information required for a watched user listing.
 		$listOptions = array(
 			'id' => 'watch_user_list',
@@ -1195,7 +1183,6 @@ class ModerationCenter_Controller extends Action_Controller
 		// Setup context as always.
 		$context['page_title'] = $txt['mc_warning_log_title'];
 
-		require_once(SUBSDIR . '/GenericList.class.php');
 		require_once(SUBSDIR . '/Moderation.subs.php');
 		loadLanguage('Modlog');
 
@@ -1391,8 +1378,6 @@ class ModerationCenter_Controller extends Action_Controller
 		// Setup context as always.
 		$context['page_title'] = $txt['mc_warning_templates_title'];
 
-		require_once(SUBSDIR . '/GenericList.class.php');
-
 		// This is all the information required for a watched user listing.
 		$listOptions = array(
 			'id' => 'warning_template_list',
@@ -1492,8 +1477,6 @@ class ModerationCenter_Controller extends Action_Controller
 	public function action_viewWarnings()
 	{
 		global $context, $txt;
-
-		require_once(SUBSDIR . '/Action.class.php');
 
 		// Some of this stuff is overseas, so to speak.
 		loadTemplate('ModerationCenter');

@@ -34,12 +34,10 @@ $GLOBALS['search_versions'] = array(
  * Creates a search API and returns the object.
  *
  * @package Search
- * @deprecated since 1.1 - please use Search_Class
+ * @deprecated since 1.1 - please use the Search class
  */
 function findSearchAPI()
 {
-	require_once(SUBSDIR . '/Search.class.php');
-
-	$search = new Search_Class();
+	$search = new Search();
 	return $search->findSearchAPI();
 }

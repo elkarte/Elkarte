@@ -593,7 +593,6 @@ class Register_Controller extends Action_Controller
 				fatal_lang_error('no_access', false);
 
 			// @todo Separate the sprintf?
-			require_once(SUBSDIR . '/DataValidator.class.php');
 			if (!Data_Validator::is_valid($_POST, array('new_email' => 'valid_email|required|max_length[255]'), array('new_email' => 'trim')))
 				fatal_error(sprintf($txt['valid_email_needed'], htmlspecialchars($_POST['new_email'], ENT_COMPAT, 'UTF-8')), false);
 
@@ -855,7 +854,6 @@ class Register_Controller extends Action_Controller
 			require_once(SUBSDIR . '/Members.subs.php');
 
 			// form validation
-			require_once(SUBSDIR . '/DataValidator.class.php');
 			$validator = new Data_Validator();
 			$validator->sanitation_rules(array(
 				'emailaddress' => 'trim',

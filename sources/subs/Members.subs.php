@@ -500,7 +500,6 @@ function registerMember(&$regOptions, $error_context = 'register')
 	$regOptions['username'] = trim(preg_replace('~[\t\n\r \x0B\0\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}]+~u', ' ', $regOptions['username']));
 
 	// Valid emails only
-	require_once(SUBSDIR . '/DataValidator.class.php');
 	if (!Data_Validator::is_valid($regOptions, array('email' => 'valid_email|required|max_length[255]'), array('email' => 'trim')))
 		$reg_errors->addError('bad_email');
 

@@ -30,7 +30,6 @@ $_SERVER['SERVER_SOFTWARE'] = '';
 $_SERVER['SERVER_NAME'] = '';
 
 // Our mail controller
-require_once(CONTROLLERDIR . '/Emailpost.controller.php');
 $controller = new Emailpost_Controller();
 $controller->action_pbe_topic();
 

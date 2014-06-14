@@ -48,9 +48,6 @@ class ManageAvatars_Controller extends Action_Controller
 		// You have to be able to moderate the forum to do this.
 		isAllowedTo('manage_attachments');
 
-		// We're working with them settings here.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
-
 		$subActions = array(
 			'display' => array($this, 'action_avatarSettings_display')
 		);

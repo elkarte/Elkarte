@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.0 Release Candidate 1
  *
  */
 
@@ -60,7 +60,6 @@ class Unread_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Recent.subs.php');
 		require_once(SUBSDIR . '/Boards.subs.php');
-		require_once(SUBSDIR . '/Unread.class.php');
 
 		$this->_action = !isset($_REQUEST['action']) && $_REQUEST['action'] === 'unreadreplies' ? $_REQUEST['action'] : 'unread';
 		$this->_action_unread = $this->_action === 'unread';

@@ -50,9 +50,6 @@ class ManagePermissions_Controller extends Action_Controller
 		loadLanguage('ManagePermissions+ManageMembers');
 		loadTemplate('ManagePermissions');
 
-		// We're working with them settings here.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
-
 		// Format: 'sub-action' => array('function_to_call', 'permission_needed'),
 		$subActions = array(
 			'board' => array(
@@ -298,7 +295,6 @@ class ManagePermissions_Controller extends Action_Controller
 			),
 		);
 
-		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		// The second list shows the post count based groups...if enabled

@@ -196,8 +196,6 @@ class Attachment_Error_Context
 	 */
 	public static function context()
 	{
-		require_once(SOURCEDIR . '/ErrorContext.class.php');
-
 		if (self::$_context === null)
 			self::$_context = new Attachment_Error_Context();
 

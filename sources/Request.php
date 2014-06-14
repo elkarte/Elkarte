@@ -300,14 +300,3 @@ class Request
 		return self::$_req;
 	}
 }
-
-/**
- * This handy function retrieves a Request instance and passes it on.
- *
- * - To get hold of a Request, you can use this function or directly Request::instance().
- * - This is for convenience, it simply delegates to Request::instance().
- */
-function request()
-{
-	return Request::instance();
-}

@@ -373,7 +373,6 @@ function is_not_banned($forceCheck = false)
 		// We don't wanna see you!
 		if (!$user_info['is_guest'])
 		{
-			require_once(CONTROLLERDIR . '/Auth.controller.php');
 			$controller = new Auth_Controller();
 			$controller->action_logout(true, false);
 		}
@@ -453,7 +452,6 @@ function is_not_banned($forceCheck = false)
 		writeLog(true);
 
 		// Log them out
-		require_once(CONTROLLERDIR . '/Auth.controller.php');
 		$controller = new Auth_Controller();
 		$controller->action_logout(true, false);
 
