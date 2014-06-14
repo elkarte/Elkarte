@@ -312,7 +312,6 @@ function displayDebug()
 
 	if ($_SESSION['view_queries'] == 1 && !empty($db_cache))
 	{
-		require_once(SUBSDIR . '/QueryAnalysis.class.php');
 		$query_analysis = new Query_Analysis();
 
 		foreach ($db_cache as $q => $qq)
