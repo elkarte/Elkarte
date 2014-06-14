@@ -4215,7 +4215,7 @@ function elk_autoloader($class)
 	{
 		$file_name = str_replace('_', '', str_replace('_Controller', '.controller', $class)) . '.php';
 
-		$file_name = str_replace('_', '', $class) . '.class.php';
+		$file_name = str_replace('_', '', $file_name);
 		if (file_exists(CONTROLLERDIR . '/' . $file_name))
 			$file_name = CONTROLLERDIR . '/' . $file_name;
 		elseif (file_exists(ADMINDIR . '/' . $file_name))
