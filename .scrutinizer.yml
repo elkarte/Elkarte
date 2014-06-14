@@ -105,6 +105,5 @@ tools:
             controversial_rules: { superglobals: false }
     php_sim:
         min_mass: 30
-        min_lines: 20
         filter:
             excluded_paths: ['attachments/*', 'avatars/*', 'cache/*', 'docs/*', 'packages/*', 'smileys/*', 'tests/*', 'ext/*', 'sources/ext/*', 'install/*']
