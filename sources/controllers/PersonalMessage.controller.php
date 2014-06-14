@@ -187,7 +187,7 @@ class PersonalMessage_Controller extends Action_Controller
 			'send' => array($this, 'action_send', 'permission' => 'pm_read'),
 			'send2' => array($this, 'action_send2', 'permission' => 'pm_read'),
 			'settings' => array($this, 'action_settings', 'permission' => 'pm_read'),
-			'showpmdrafts' => array('dir' => CONTROLLERDIR, 'file' => 'Draft.controller.php', 'controller' => 'Draft_Controller', 'function' => 'action_showPMDrafts', 'permission' => 'pm_read'),
+			'showpmdrafts' => array('controller' => 'Draft_Controller', 'function' => 'action_showPMDrafts', 'permission' => 'pm_read'),
 			'inbox' => array($this, 'action_folder', 'permission' => 'pm_read'),
 		);
 

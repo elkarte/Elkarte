@@ -54,14 +54,12 @@ class ManagePosts_Controller extends Action_Controller
 				$this, 'action_postSettings_display', 'permission' => 'admin_forum'),
 			'bbc' => array(
 				'function' => 'action_index',
-				'file' => 'ManageBBC.controller.php',
 				'controller' => 'ManageBBC_Controller',
 				'permission' => 'admin_forum'),
 			'censor' => array(
 				$this, 'action_censor', 'permission' => 'admin_forum'),
 			'topics' => array(
 				'function' => 'action_index',
-				'file' => 'ManageTopics.controller.php',
 				'controller' => 'ManageTopics_Controller',
 				'permission' => 'admin_forum'),
 		);

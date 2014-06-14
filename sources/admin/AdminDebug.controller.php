@@ -75,7 +75,6 @@ class AdminDebug_Controller extends Action_Controller
 		$layers->add('html');
 		loadTemplate('Admin');
 
-		require_once(SUBSDIR . '/QueryAnalysis.class.php');
 		$query_analysis = new Query_Analysis();
 
 		$context['sub_template'] = 'viewquery';

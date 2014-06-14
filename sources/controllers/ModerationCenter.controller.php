@@ -126,8 +126,6 @@ class ModerationCenter_Controller extends Action_Controller
 					'modlog' => array(
 						'label' => $txt['modlog_view'],
 						'enabled' => !empty($modSettings['modlog_enabled']) && $context['can_moderate_boards'],
-						'file' => 'Modlog.controller.php',
-						'dir' => ADMINDIR,
 						'controller' => 'Modlog_Controller',
 						'function' => 'action_log',
 						'icon' => 'transparent.png',
@@ -154,7 +152,6 @@ class ModerationCenter_Controller extends Action_Controller
 					'postmod' => array(
 						'label' => $txt['mc_unapproved_posts'] . (!empty($mod_counts['postmod']) ? ' [' . $mod_counts['postmod'] . ']' : ''),
 						'enabled' => $context['can_moderate_approvals'],
-						'file' => 'PostModeration.controller.php',
 						'controller' => 'PostModeration_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -168,8 +165,6 @@ class ModerationCenter_Controller extends Action_Controller
 					'emailmod' => array(
 						'label' => $txt['mc_emailerror'] . (!empty($mod_counts['emailmod']) ? ' [' . $mod_counts['emailmod'] . ']' : ''),
 						'enabled' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
-						'file' => 'ManageMaillist.controller.php',
-						'dir' => ADMINDIR,
 						'function' => 'UnapprovedEmails',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_mail',
@@ -178,7 +173,6 @@ class ModerationCenter_Controller extends Action_Controller
 					'attachmod' => array(
 						'label' => $txt['mc_unapproved_attachments'] . (!empty($mod_counts['attachments']) ? ' [' . $mod_counts['attachments'] . ']' : ''),
 						'enabled' => $context['can_moderate_approvals'],
-						'file' => 'PostModeration.controller.php',
 						'controller' => 'PostModeration_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -217,7 +211,6 @@ class ModerationCenter_Controller extends Action_Controller
 					),
 					'groups' => array(
 						'label' => $txt['mc_group_requests'] . (!empty($mod_counts['groupreq']) ? ' [' . $mod_counts['groupreq'] . ']' : ''),
-						'file' => 'Groups.controller.php',
 						'controller' => 'Groups_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -227,7 +220,6 @@ class ModerationCenter_Controller extends Action_Controller
 					'members' => array(
 						'enabled' => allowedTo('moderate_forum'),
 						'label' => $txt['mc_member_requests'] . (!empty($mod_counts['memberreq']) ? ' [' . $mod_counts['memberreq'] . ']' : ''),
-						'file' => 'ManageMembers.controller.php',
 						'controller' => 'ManageMembers_Controller',
 						'function' => 'action_approve',
 						'icon' => 'transparent.png',
@@ -236,7 +228,6 @@ class ModerationCenter_Controller extends Action_Controller
 					),
 					'viewgroups' => array(
 						'label' => $txt['mc_view_groups'],
-						'file' => 'Groups.controller.php',
 						'controller' => 'Groups_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',

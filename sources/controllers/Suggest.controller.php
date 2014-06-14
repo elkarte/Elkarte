@@ -48,7 +48,6 @@ class Suggest_Controller extends Action_Controller
 		// These are all registered types.
 		$searchTypes = array(
 			'member' => array(
-				'file' => SUBSDIR . '/Suggest.class.php',
 				'class' => 'Suggest',
 				'function' => 'member'
 			),

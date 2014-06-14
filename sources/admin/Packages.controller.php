@@ -65,8 +65,12 @@ class Packages_Controller extends Action_Controller
 			'showoperations' => array($this, 'action_showoperations'),
 			// The following two belong to PackageServers,
 			// for UI's sake moved here at least temporarily
-			'servers' => array('file' => 'PackageServers.controller.php', 'controller' => 'PackageServers_Controller', 'function' => 'action_list'),
-			'upload' => array('file' => 'PackageServers.controller.php', 'controller' => 'PackageServers_Controller', 'function' => 'action_upload'),
+			'servers' => array(
+				'controller' => 'PackageServers_Controller',
+				'function' => 'action_list'),
+			'upload' => array(
+				'controller' => 'PackageServers_Controller',
+				'function' => 'action_upload'),
 		);
 
 		// Set up action/subaction stuff.

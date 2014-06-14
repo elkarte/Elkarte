@@ -109,7 +109,6 @@ class Maintenance_Controller extends Action_Controller
 				'function' => 'action_hooks',
 			),
 			'attachments' => array(
-				'file' => 'ManageAttachments.controller.php',
 				'controller' => 'ManageAttachments_Controller',
 				'function' => 'action_maintenance',
 			),
