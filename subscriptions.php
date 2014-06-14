@@ -25,7 +25,7 @@ if (!file_exists(dirname(__FILE__) . '/SSI.php'))
 
 // Need lots of help
 require_once(dirname(__FILE__) . '/SSI.php');
-require_once(ADMINDIR . '/ManagePaid.php');
+require_once(ADMINDIR . '/ManagePaid.controller.php');
 require_once(SUBSDIR . '/Admin.subs.php');
 require_once(SUBSDIR . '/Members.subs.php');
 
