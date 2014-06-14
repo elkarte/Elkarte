@@ -538,7 +538,7 @@ function availableThemes($current_theme, $current_member)
 			$txt['theme_description'] = '';
 		}
 
-		$available_themes[$id_theme]['thumbnail_href'] = $txt['theme_thumbnail_href'];
+		$available_themes[$id_theme]['thumbnail_href'] = str_replace('{images_url}', $settings['images_url'], $txt['theme_thumbnail_href']);
 		$available_themes[$id_theme]['description'] = $txt['theme_description'];
 
 		// Are there any variants?

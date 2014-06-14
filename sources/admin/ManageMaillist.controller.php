@@ -511,13 +511,12 @@ class ManageMaillist_Controller extends Action_Controller
 					$context['bounce_templates'][$k]['body'] = strtr($name['body'], array(
 						'{MEMBER}' => un_htmlspecialchars($temp_email[0]['name']),
 						'{SCRIPTURL}' => $scripturl, '{FORUMNAME}' => $mbname,
-						'{REGARDS}' => $txt['regards_team'],
+						'{REGARDS}' => replaceBasicActionUrl($txt['regards_team']),
 						'{SUBJECT}' => $temp_email[0]['subject'],
 						'{ERROR}' => $fullerrortext,
 						'{FORUMNAME}' => $mbname,
 						'{FORUMNAMESHORT}' => (!empty($modSettings['maillist_sitename']) ? $modSettings['maillist_sitename'] : $mbname),
 						'{EMAILREGARDS}' => (!empty($modSettings['maillist_sitename_regards']) ? $modSettings['maillist_sitename_regards'] : ''),
-						'{REGARDS}' => $txt['regards_team'],
 					));
 				}
 			}
@@ -903,7 +902,7 @@ class ManageMaillist_Controller extends Action_Controller
 		{
 			checkSession();
 
-			call_integration_hook('integrate_save_filter_settings', array(&$config_vars));
+			call_integration_hook('integrate_save_filter_settings');
 
 			// Editing an entry?
 			$editid = (isset($_GET['edit'])) ? (int) $_GET['edit'] : -1;
@@ -1300,7 +1299,7 @@ class ManageMaillist_Controller extends Action_Controller
 		{
 			checkSession();
 
-			call_integration_hook('integrate_save_parser_settings', array(&$config_vars));
+			call_integration_hook('integrate_save_parser_settings');
 
 			// Editing a parser?
 			$editid = isset($_GET['edit']) ? (int) $_GET['edit'] : -1;
@@ -1451,7 +1450,7 @@ class ManageMaillist_Controller extends Action_Controller
 		{
 			checkSession();
 
-			call_integration_hook('integrate_save_maillist_settings', array(&$config_vars));
+			call_integration_hook('integrate_save_maillist_settings');
 
 			$email_error = false;
 			$board_error = false;
@@ -1902,6 +1901,10 @@ class ManageMaillist_Controller extends Action_Controller
 	/**
 	 * Get the number of unapproved emails
 	 *
+	 * @param int $start
+	 * @param int $chunk_size
+	 * @param string $sort
+	 * @param int $id
 	 * - Callback for createList() to list_maillist_unapproved
 	 */
 	protected function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)

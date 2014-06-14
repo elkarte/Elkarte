@@ -513,7 +513,7 @@ function template_quickreply_below()
 				sTitleExpanded: ', JavaScriptEscape($txt['hide']), ',
 				sJumpAnchor: "quickreply",
 				bIsFull: ', !empty($options['use_editor_quick_reply']) ? 'true,
-				sEditorId: ' . $options['use_editor_quick_reply']  : 'false', ',
+				sEditorId: ' . $options['use_editor_quick_reply'] : 'false', ',
 				oThemeOptions: {
 					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
 					sOptionName: \'minmax_preferences\',
@@ -817,7 +817,6 @@ function template_display_attachments($message, $ignoring)
 							<div id="msg_', $message['id'], '_footer" class="attachments"', $ignoring ? ' style="display:none;"' : '', '>';
 
 	$last_approved_state = 1;
-	$attachments_per_line = 4;
 	$i = 0;
 
 	foreach ($message['attachment'] as $attachment)
@@ -839,12 +838,12 @@ function template_display_attachments($message, $ignoring)
 		}
 
 		echo '
-									<div class="floatleft">';
+									<div class="attachment">';
 
 		if ($attachment['is_image'])
 		{
 			echo '
-										<div class="attachments_top">';
+										<div class="attachment_thumb">';
 
 			if ($attachment['thumbnail']['has_thumb'])
 				echo '
@@ -858,7 +857,7 @@ function template_display_attachments($message, $ignoring)
 		}
 
 		echo '
-										<div class="attachments_bot">
+										<div class="attachment_name">
 											<a href="' . $attachment['href'] . '"><img src="' . $settings['images_url'] . '/icons/clip.png" class="centericon" alt="*" />&nbsp;' . $attachment['name'] . '</a> ';
 
 		if (!$attachment['is_approved'] && $context['can_approve'])
@@ -870,11 +869,6 @@ function template_display_attachments($message, $ignoring)
 
 		echo '
 									</div>';
-
-		// Next attachment line ?
-		if (++$i % $attachments_per_line === 0)
-			echo '
-									<hr />';
 	}
 
 	// If we had unapproved attachments clean up.

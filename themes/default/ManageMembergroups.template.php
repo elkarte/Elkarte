@@ -418,7 +418,7 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 		if (empty($deny))
 			echo '
 									<li class="category">
-										<a href="javascript:void(0);" onclick="selectBoards([', implode(', ', $category['child_ids']), '], \'', $form_id, '\'); return false;"><strong>', $category['name'], '</strong></a>
+										<a href="javascript:void(0);" onclick="selectBoards([', implode(', ', $category['child_ids']), '], \'', $form_id, '\', \'boardaccess\'); return false;"><strong>', $category['name'], '</strong></a>
 									<ul>';
 		else
 			echo '
@@ -479,9 +479,9 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 	if (empty($deny))
 		echo '
 								<br />
-								<span class="select_all_box">
+								<div class="select_all_box">
 									<input type="checkbox" id="checkall_check" class="input_check" onclick="invertAll(this, this.form, \'boardaccess\');" /> <label for="checkall_check"><em>', $txt['check_all'], '</em></label>
-								</span>';
+								</div>';
 	else
 		echo '
 								<div class="select_all_box">

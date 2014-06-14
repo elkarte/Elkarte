@@ -463,7 +463,7 @@ function postLikers($start, $items_per_page, $sort, $messageID)
 		$likes[] = array(
 			'real_name' => $row['real_name'],
 			'id_member' => $row['id_member'],
-			'link' =>  '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
+			'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
 		);
 	}
 	$db->free_result($request);

@@ -352,7 +352,7 @@ class ManageNews_Controller extends Action_Controller
 		$context['page_title'] = $txt['admin_newsletters'];
 		$context['sub_template'] = 'email_members_compose';
 		$context['subject'] = !empty($_POST['subject']) ? $_POST['subject'] : htmlspecialchars($context['forum_name'] . ': ' . $txt['subject'], ENT_COMPAT, 'UTF-8');
-		$context['message'] = !empty($_POST['message']) ? $_POST['message'] : htmlspecialchars($txt['message'] . "\n\n" . $txt['regards_team'] . "\n\n" . '{$board_url}', ENT_COMPAT, 'UTF-8');
+		$context['message'] = !empty($_POST['message']) ? $_POST['message'] : htmlspecialchars($txt['message'] . "\n\n" . replaceBasicActionUrl($txt['regards_team']) . "\n\n" . '{$board_url}', ENT_COMPAT, 'UTF-8');
 
 		// Needed for the WYSIWYG editor.
 		require_once(SUBSDIR . '/Editor.subs.php');

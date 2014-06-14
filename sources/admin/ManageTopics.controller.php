@@ -83,7 +83,7 @@ class ManageTopics_Controller extends Action_Controller
 			checkSession();
 
 			// Notify addons and integrations of the settings change.
-			call_integration_hook('integrate_save_topic_settings', array(&$config_vars));
+			call_integration_hook('integrate_save_topic_settings');
 
 			// Save the result!
 			Settings_Form::save_db($config_vars);

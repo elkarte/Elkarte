@@ -1228,7 +1228,7 @@ function template_profile_avatar_select()
 										file = document.getElementById("file"),
 										selavatar = "' . $context['avatar_selected'] . '",
 										avatardir = "' . $modSettings['avatar_url'] . '/",
-										refuse_too_large = ', !empty($modSettings['avatar_action_too_large']) &&  $modSettings['avatar_action_too_large'] == 'option_refuse' ? 'true' : 'false', ',
+										refuse_too_large = ', !empty($modSettings['avatar_action_too_large']) && $modSettings['avatar_action_too_large'] == 'option_refuse' ? 'true' : 'false', ',
 										maxHeight = ', !empty($modSettings['avatar_max_height_external']) ? $modSettings['avatar_max_height_external'] : 0, ',
 										maxWidth = ', !empty($modSettings['avatar_max_width_external']) ? $modSettings['avatar_max_width_external'] : 0, ';
 

@@ -629,7 +629,7 @@ class Admin_Controller extends Action_Controller
 	 */
 	public function action_home()
 	{
-		global $forum_version, $txt, $scripturl, $context, $user_info;
+		global $forum_version, $txt, $scripturl, $context, $user_info, $settings;
 
 		// We need a little help
 		require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -673,7 +673,7 @@ class Admin_Controller extends Action_Controller
 			'help' => '',
 			'description' => '
 				<strong>' . $txt['hello_guest'] . ' ' . $context['user']['name'] . '!</strong>
-				' . sprintf($txt['admin_main_welcome'], $txt['admin_center'], $txt['help'], $txt['help']),
+				' . sprintf($txt['admin_main_welcome'], $txt['admin_center'], $txt['help'], $settings['images_url']),
 		);
 
 		// Load in the admin quick tasks

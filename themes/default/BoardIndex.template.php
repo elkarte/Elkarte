@@ -355,4 +355,6 @@ function template_ic_show_users()
 			echo '
 				<p class="inline membergroups">[' . implode(',&nbsp;', $context['membergroups']) . ']</p>';
 	}
+	echo '
+			</li>';
 }

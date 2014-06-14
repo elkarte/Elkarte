@@ -118,7 +118,7 @@ class Maintenance_Controller extends Action_Controller
 		// Set up the action handeler
 		$action = new Action('manage_maintenance');
 
-		// Yep, sub-action time and call integrate_manage_maintenance as well
+		// Yep, sub-action time and call integrate_sa_manage_maintenance as well
 		$subAction = $action->initialize($subActions, 'routine');
 
 		// Doing something special, does it exist?

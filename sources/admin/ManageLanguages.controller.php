@@ -52,7 +52,6 @@ class ManageLanguages_Controller extends Action_Controller
 
 		$subActions = array(
 			'edit' => array($this, 'action_edit', 'permission' => 'admin_forum'),
-// 			'add' => array($this, 'action_add', 'permission' => 'admin_forum'),
 			'settings' => array($this, 'action_languageSettings_display', 'permission' => 'admin_forum'),
 			'downloadlang' => array($this, 'action_downloadlang', 'permission' => 'admin_forum'),
 			'editlang' => array($this, 'action_editlang', 'permission' => 'admin_forum'),
@@ -630,7 +629,7 @@ class ManageLanguages_Controller extends Action_Controller
 	 */
 	public function action_editlang()
 	{
-		global $settings, $context, $txt, $modSettings, $language;
+		global $settings, $context, $txt, $modSettings, $language, $scripturl;
 
 		require_once(SUBSDIR . '/Language.subs.php');
 		loadLanguage('ManageSettings');
@@ -701,7 +700,19 @@ class ManageLanguages_Controller extends Action_Controller
 			});
 		}
 
+		if ($context['lang_id'] != 'english')
+		{
+			$possiblePackage = findPossiblePackages($context['lang_id']);
+			if ($possiblePackage !== false)
+			{
+				$context['langpack_uninstall_link'] = $scripturl . '?action=admin;area=packages;sa=uninstall;package=' . $possiblePackage[1] . ';pid=' . $possiblePackage[0];
+			}
+		}
+
 		// We no longer wish to speak this language.
+		// @todo - languages have been moved to packages
+		// this may or may not be used in the future, for now it's not used at all
+		// @deprecated since 1.0
 		if (!empty($_POST['delete_main']) && $context['lang_id'] != 'english')
 		{
 			checkSession();
@@ -1020,14 +1031,12 @@ class ManageLanguages_Controller extends Action_Controller
 		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
 		$settings_backup_fail = !@is_writable(BOARDDIR . '/Settings_bak.php') || !@copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
 
-		$config_vars = $this->_languageSettings->settings();
-
 		// Saving settings?
 		if (isset($_REQUEST['save']))
 		{
 			checkSession();
 
-			call_integration_hook('integrate_save_language_settings', array(&$config_vars));
+			call_integration_hook('integrate_save_language_settings');
 
 			$this->_languageSettings->save();
 			redirectexit('action=admin;area=languages;sa=settings');

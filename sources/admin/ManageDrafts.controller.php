@@ -78,10 +78,11 @@ class ManageDrafts_Controller extends Action_Controller
 		{
 			checkSession();
 
-			call_integration_hook('integrate_save_drafts_settings', array(&$config_vars));
+			call_integration_hook('integrate_save_drafts_settings');
 
 			// Protect them from themselves.
 			$_POST['drafts_autosave_frequency'] = $_POST['drafts_autosave_frequency'] < 30 ? 30 : $_POST['drafts_autosave_frequency'];
+
 			Settings_Form::save_db($config_vars);
 			redirectexit('action=admin;area=managedrafts');
 		}

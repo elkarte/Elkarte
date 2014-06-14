@@ -253,14 +253,14 @@ class MoveTopic_Controller extends Action_Controller
 			));
 
 			// Auto remove this MOVED redirection topic in the future?
-			$redirect_expires = !empty($_POST['redirect_expires']) ? ((int) ($_POST['redirect_expires'] * 60) + time()) : 0;
+			$redirect_expires = !empty($_POST['redirect_expires']) ? (int) $_POST['redirect_expires'] : 0;
 
 			// Redirect to the MOVED topic from topic list?
 			$redirect_topic = isset($_POST['redirect_topic']) ? $topic : 0;
 
 			// And remember the last expiry period too.
 			$_SESSION['move_to_topic']['redirect_topic'] = $redirect_topic;
-			$_SESSION['move_to_topic']['redirect_expires'] = (int) $_POST['redirect_expires'];
+			$_SESSION['move_to_topic']['redirect_expires'] = $redirect_expires;
 
 			$msgOptions = array(
 				'subject' => $txt['moved'] . ': ' . $board_info['subject'],
@@ -273,7 +273,7 @@ class MoveTopic_Controller extends Action_Controller
 				'board' => $board,
 				'lock_mode' => 1,
 				'mark_as_read' => true,
-				'redirect_expires' => $redirect_expires,
+				'redirect_expires' => ($redirect_expires * 60) + time(),
 				'redirect_topic' => $redirect_topic,
 			);
 

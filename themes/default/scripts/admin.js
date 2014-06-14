@@ -283,12 +283,13 @@ elk_ViewVersions.prototype.compareVersions = function (sCurrent, sTarget)
 {
 	var aVersions = [],
 		aParts = [],
-		aCompare = new Array(sCurrent, sTarget);
+		aCompare = new Array(sCurrent, sTarget),
+		aDevConvert = {'dev': 0, 'alpha': 1, 'beta': 2, 'rc': 3};
 
 	for (var i = 0; i < 2; i++)
 	{
 		// Clean the version and extract the version parts.
-		var sClean = aCompare[i].toLowerCase().replace(/ /g, '');
+		var sClean = aCompare[i].toLowerCase().replace(/ /g, '').replace(/release candidate/g, 'rc');
 		aParts = sClean.match(/(\d+)(?:\.(\d+|))?(?:\.)?(\d+|)(?:(alpha|beta|rc)(\d+|)(?:\.)?(\d+|))?(?:(dev))?(\d+|)/);
 
 		// No matches?
@@ -300,7 +301,7 @@ elk_ViewVersions.prototype.compareVersions = function (sCurrent, sTarget)
 			aParts[1] > 0 ? parseInt(aParts[1]) : 0,
 			aParts[2] > 0 ? parseInt(aParts[2]) : 0,
 			aParts[3] > 0 ? parseInt(aParts[3]) : 0,
-			typeof(aParts[4]) === 'undefined' ? 'stable' : aParts[4],
+			typeof(aParts[4]) === 'undefined' ? 'stable' : aDevConvert[aParts[4]],
 			aParts[5] > 0 ? parseInt(aParts[5]) : 0,
 			aParts[6] > 0 ? parseInt(aParts[6]) : 0,
 			typeof(aParts[7]) !== 'undefined' ? 'dev' : ''
@@ -338,7 +339,7 @@ elk_ViewVersions.prototype.determineVersions = function ()
 		controllers: '??',
 		database: '??',
 		subs: '??',
-		defaults: '??',
+		'default': '??',
 		Languages: '??',
 		Templates: '??'
 	};
@@ -348,7 +349,7 @@ elk_ViewVersions.prototype.determineVersions = function ()
 		controllers: '??',
 		database: '??',
 		subs: '??',
-		defaults: '??',
+		'default': '??',
 		Languages: '??',
 		Templates: '??'
 	};
@@ -358,7 +359,7 @@ elk_ViewVersions.prototype.determineVersions = function ()
 		controllers: false,
 		database: false,
 		subs: false,
-		defaults: false,
+		'default': false,
 		Languages: false,
 		Templates: false
 	};
@@ -369,12 +370,12 @@ elk_ViewVersions.prototype.determineVersions = function ()
 		'controllers',
 		'database',
 		'subs',
-		'defaults',
+		'default',
 		'Languages',
 		'Templates'
 	];
 
-	var sCurVersionType,
+	var sCurVersionType = '',
 		sinstalledVersion,
 		oSection,
 		oSectionLink;
@@ -406,17 +407,24 @@ elk_ViewVersions.prototype.determineVersions = function ()
 	// for each file in the detailed-version.js
 	for (var sFilename in window.ourVersions)
 	{
+		sCurVersionType = '';
+
 		if (!document.getElementById('our' + sFilename))
 			continue;
 
 		sinstalledVersion = document.getElementById('your' + sFilename).innerHTML;
 
 		for (var sVersionType in oLowVersion)
+		{
 			if (sFilename.substr(0, sVersionType.length) === sVersionType)
 			{
 				sCurVersionType = sVersionType;
 				break;
 			}
+		}
+
+		if (sCurVersionType === '')
+			continue;
 
 		// use compareVersion to determine which version is >< the other
 		if (typeof(sCurVersionType) !== 'undefined')
@@ -470,35 +478,16 @@ elk_ViewVersions.prototype.determineVersions = function ()
 	}
 
 	// Set the column titles based on the files each contain
-	document.getElementById('yoursources').innerHTML = oLowVersion.sources ? oLowVersion.sources : oHighYour.sources;
-	document.getElementById('oursources').innerHTML = oHighCurrent.sources;
-	if (oLowVersion.sources)
-		document.getElementById('yoursources').style.color = 'red';
+	for (var i = 0, n = sSections.length; i < n; i++)
+	{
+		if (sSections[i] == 'Templates')
+			continue;
 
-	document.getElementById('youradmin').innerHTML = oLowVersion.sources ? oLowVersion.sources : oHighYour.sources;
-	document.getElementById('ouradmin').innerHTML = oHighCurrent.sources;
-	if (oLowVersion.sources)
-		document.getElementById('youradmin').style.color = 'red';
-
-	document.getElementById('yourcontrollers').innerHTML = oLowVersion.sources ? oLowVersion.sources : oHighYour.sources;
-	document.getElementById('ourcontrollers').innerHTML = oHighCurrent.sources;
-	if (oLowVersion.sources)
-		document.getElementById('yourcontrollers').style.color = 'red';
-
-	document.getElementById('yourdatabase').innerHTML = oLowVersion.sources ? oLowVersion.sources : oHighYour.sources;
-	document.getElementById('ourdatabase').innerHTML = oHighCurrent.sources;
-	if (oLowVersion.sources)
-		document.getElementById('yourdatabase').style.color = 'red';
-
-	document.getElementById('yoursubs').innerHTML = oLowVersion.sources ? oLowVersion.sources : oHighYour.sources;
-	document.getElementById('oursubs').innerHTML = oHighCurrent.sources;
-	if (oLowVersion.sources)
-		document.getElementById('yoursubs').style.color = 'red';
-
-	document.getElementById('yourdefault').innerHTML = oLowVersion.defaults ? oLowVersion.defaults : oHighYour.defaults;
-	document.getElementById('ourdefault').innerHTML = oHighCurrent.defaults;
-	if (oLowVersion.defaults)
-		document.getElementById('yourdefaults').style.color = 'red';
+		document.getElementById('your' + sSections[i]).innerHTML = oLowVersion[sSections[i]] ? oLowVersion[sSections[i]] : oHighYour[sSections[i]];
+		document.getElementById('our' + sSections[i]).innerHTML = oHighCurrent[sSections[i]];
+		if (oLowVersion[sSections[i]])
+			document.getElementById('your' + sSections[i]).style.color = 'red';
+	}
 
 	// Custom theme in use?
 	if (document.getElementById('Templates'))
@@ -509,11 +498,6 @@ elk_ViewVersions.prototype.determineVersions = function ()
 		if (oLowVersion.Templates)
 			document.getElementById('yourTemplates').style.color = 'red';
 	}
-
-	document.getElementById('yourLanguages').innerHTML = oLowVersion.Languages ? oLowVersion.Languages : oHighYour.Languages;
-	document.getElementById('ourLanguages').innerHTML = oHighCurrent.Languages;
-	if (oLowVersion.Languages)
-		document.getElementById('yourLanguages').style.color = 'red';
 };
 
 /**

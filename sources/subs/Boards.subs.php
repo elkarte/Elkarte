@@ -2054,7 +2054,7 @@ function boardNotifications($start, $items_per_page, $sort, $memID)
 	while ($row = $db->fetch_assoc($request))
 		$notification_boards[] = array(
 			'id' => $row['id_board'],
-			'name' =>  $row['name'],
+			'name' => $row['name'],
 			'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
 			'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0"><strong>' . $row['name'] . '</strong></a>',
 			'new' => $row['board_read'] < $row['id_msg_updated'],
