@@ -142,7 +142,7 @@ class ManagePaid_Controller extends Action_Controller
 		// Some important context stuff
 		$context['page_title'] = $txt['settings'];
 		$context['sub_template'] = 'show_settings';
-		$context['settings_message'] = $txt['paid_note'];
+		$context['settings_message'] = replaceBasicActionUrl($txt['paid_note']);
 		$context[$context['admin_menu_name']]['current_subsection'] = 'settings';
 
 		// Get the final touches in place.
@@ -158,7 +158,7 @@ class ManagePaid_Controller extends Action_Controller
 		{
 			checkSession();
 
-			call_integration_hook('integrate_save_subscription_settings', array(&$config_vars));
+			call_integration_hook('integrate_save_subscription_settings');
 
 			// Check that the entered email addresses are valid
 			if (!empty($_POST['paid_email_to']))

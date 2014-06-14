@@ -177,7 +177,7 @@ function list_integration_hooks_data($start, $per_page, $sort)
 				foreach ($temp_data['function'][$hook_status[$hook][$function]['in_file']] as $func)
 					$enabled = $enabled || strstr($func, ']') !== false;
 
-				if (!$enabled &&  !empty($current_hook))
+				if (!$enabled && !empty($current_hook))
 					$hook_status[$current_hook['hook']][$current_hook['function']]['enabled'] = true;
 			}
 		}

@@ -394,8 +394,8 @@ class MessageIndex_Controller extends Action_Controller
 			$_SESSION['move_to_topic'] = array(
 				'move_to' => $_REQUEST['move_to'],
 				// And remember the last expiry period too.
-				'redirect_topic' => (int) $_REQUEST['redirect_topic'],
-				'redirect_expires' => (int) $_REQUEST['redirect_expires'],
+				'redirect_topic' => !empty($_REQUEST['redirect_topic']) ? (int) $_REQUEST['redirect_topic'] : 0,
+				'redirect_expires' => !empty($_REQUEST['redirect_expires']) ? (int) $_REQUEST['redirect_expires'] : 0,
 			);
 		}
 

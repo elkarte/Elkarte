@@ -1,9 +1,7 @@
 <?php
 // Version: 1.0; ManageSettings
 
-global $scripturl;
-
-$txt['modSettings_desc'] = 'This page allows you to change the settings of features and basic options in your forum.  Please see the <a href="' . $scripturl . '?action=admin;area=theme;sa=list;th=%1$s;%3$s=%2$s">theme settings</a> for more options.  Click the help icons for more information about a setting.';
+$txt['modSettings_desc'] = 'This page allows you to change the settings of features and basic options in your forum.  Please see the <a href="%1$s">theme settings</a> for more options.  Click the help icons for more information about a setting.';
 $txt['security_settings_desc'] = 'This page allows you to set options specifically related to the security and moderation of your forum, including anti-spam options.';
 $txt['modification_settings_desc'] = 'This page contains settings added by any modifications to your forum';
 
@@ -80,6 +78,8 @@ $txt['contact_form_registration'] = 'Show only at registration';
 $txt['contact_form_menu'] = 'Show in the menu';
 $txt['queryless_urls'] = 'Search engine friendly URLs';
 $txt['queryless_urls_note'] = 'Apache/Lighttpd only';
+$txt['queryless_urls_work'] = 'This feature will work on your server.';
+$txt['queryless_urls_notwork'] = 'This feature will not work on your server.';
 $txt['enableReportPM'] = 'Enable reporting of personal messages';
 $txt['antispam_PM'] = 'Personal Message Limits';
 $txt['max_pm_recipients'] = 'Maximum number of recipients allowed in a personal message';
@@ -265,7 +265,7 @@ $txt['setting_warning_show_all'] = 'All Users';
 
 $txt['signature_settings'] = 'Signature Settings';
 $txt['signature_settings_desc'] = 'Use the settings on this page to decide how member signatures should be treated.';
-$txt['signature_settings_warning'] = 'Note that settings are not applied to existing signatures by default.<br /><a class="button_submit" href="' . $scripturl . '?action=admin;area=featuresettings;sa=sig;apply;%2$s=%1$s">Run the process now</a>';
+$txt['signature_settings_warning'] = 'Note that settings are not applied to existing signatures by default.<br /><a class="button_submit" href="%1$s">Run the process now</a>';
 $txt['signature_settings_applied'] = 'The updated rules have been applied to the existing signatures.';
 $txt['signature_enable'] = 'Enable signatures';
 $txt['signature_max_length'] = 'Maximum allowed characters';
@@ -297,7 +297,7 @@ $txt['custom_profile_icon'] = 'Icon';
 $txt['custom_profile_sort'] = 'To change the order of the custom fields, simply drag and drop it to the location you want.';
 
 $txt['custom_profile_type_text'] = 'Text';
-$txt['custom_profile_type_url'] = 'Url';
+$txt['custom_profile_type_url'] = 'URL';
 $txt['custom_profile_type_date'] = 'Date';
 $txt['custom_profile_type_email'] = 'Email';
 $txt['custom_profile_type_color'] = 'Color';

@@ -109,7 +109,7 @@ p, fieldset, form, input, button, select, textarea, .editor {
 /* Collection of pseudo element clearfixes. */
 .category_header:after, .wrapper:after,
 #main_content_section:after, #main_container:after,
-.attachments_bot:after, .editor_wrapper:after {
+.attachment_name:after, .editor_wrapper:after {
 	display: block;
 	clear: both;
 	content: "";
@@ -174,10 +174,10 @@ select::-moz-focus-inner {
 	border: 0;
 	padding: 0;
 }
-/* Apply the font only to these elements, and top align them. */
+/* Apply the font only to these elements */
 input, button, select {
 	padding: 2px 6px;
-	vertical-align: top;
+	vertical-align: middle;
 	font-size: 0.857em;
 	height: 26px;
 }
@@ -193,11 +193,6 @@ input[type="number"] {
 select {
 	padding: 2px;
 }
-/* You may think, ZOMG, but this is trade off to look normal/same on *nix and windows */
-/* If you don't care about *nix, remove this selector and go with the above padding   */
-#firefox select {
-	padding: .25em 2px;
-}
 #chrome select {
 	padding: 2px;
 	height: 26px;
@@ -205,7 +200,9 @@ select {
 select option {
 	padding: 0 4px;
 }
-
+select#cat, select#suggestions, select#file {
+	height: auto;
+}
 /* No borders around checkboxes or radio buttons, and middle aligned. */
 .input_check, .input_radio {
 	border: none;
@@ -786,6 +783,7 @@ a.bbc_link {
 	line-height: 1.286em;
 	padding: 2px;
 	margin-left: 1px;
+	vertical-align: top;
 }
 .top_button img {
 	vertical-align: middle;
@@ -998,7 +996,6 @@ a.bbc_link {
 	margin: -2em 0 0 15.3em;
 }
 /* Reposition Level 2 drop menu as visible on hover. */
-/* @todo - Check Superfish class. I think .sfhover may be deprecated. */
 .listlevel1:hover .menulevel2, .listlevel1.sfhover .menulevel2 {
 	left: 0;
 }
@@ -1193,10 +1190,14 @@ a.bbc_link {
 	padding: 0 0 0 6px;
 }
 .quickbuttons .inline_mod_check {
-	padding: 7px 0;
-	line-height: 1em;
-	float: left;
+    margin: 4px 0 0;
+    padding: 0 4px;
 }
+.inline_mod_check .input_check {
+    height: auto;
+    margin: 0 0 2px;
+}
+
 /* @todo - Save code by amalgamating common button background declarations. */
 .quickbuttons .linklevel1 {
 	float: left;
@@ -2308,10 +2309,12 @@ div.core_posts {
 .attachments {
 	margin: 20px 0 0 0;
 }
-.attachments .floatleft {
-	padding: 0 6px 8px 6px;
+.attachments .attachment {
+	padding: 6px 8px;
+	display: inline-block;
+	min-width: 22%;
 }
-.attachments_top {
+.attachment_thumb {
 	margin: 0 auto;
 	text-align: center;
 }
@@ -2844,9 +2847,12 @@ dl.merge_topic dd {
 	max-height: 40px;
 }
 .attach_title {
-	width: 100%;
 	display: block;
 	margin-bottom: 4px;
+	overflow: hidden;
+	max-width: 100%;
+	text-overflow: ellipsis;
+	white-space: pre;
 }
 /* The basic user info on the left */
 #basicinfo {
@@ -3475,21 +3481,16 @@ div.labels {
 .help {
 	cursor: help;
 }
-
 .help .icon, .hdicon.help {
 	margin: 0;
 	opacity: 0.8;
 	cursor: help;
 }
-
 .help .icon:hover, .hdicon.help:hover {
 	opacity: 1;
 }
-
 a.help .icon {
 	padding: 4px 0 0;
-	position: relative;
-	vertical-align: top;
 }
 
 /* Styles for the tooltips. */
@@ -3588,7 +3589,7 @@ a.help .icon {
 #advanced_search dt {
 	float: left;
 	clear: both;
-	padding: 2px 4px;
+	padding: 5px 4px 0 4px;
 	width: 35%;
 	text-align: right;
 }
@@ -3597,6 +3598,10 @@ a.help .icon {
 	padding: 3px 2px;
 	width: 65%;
 	text-align: left;
+}
+
+#pick_boards .submitbutton {
+	width: 100%;
 }
 
 
@@ -3781,6 +3786,12 @@ dl.no_members {
 	width: 54%;
 	text-align: left;
 }
+.login dl:nth-of-type(2) dt {
+	padding-top: 3px;
+}
+.login dl:nth-of-type(2) dd img {
+	vertical-align: top;
+}
 .login p {
 	text-align: center;
 }
@@ -3804,6 +3815,9 @@ dl.no_members {
 	float: left;
 	margin: 6px 0 0 0;
 	width: 49%;
+}
+.register_form img {
+	vertical-align: middle;
 }
 #confirm_buttons {
 	padding: 12px 0;
@@ -3840,6 +3854,10 @@ dl.no_members {
 }
 #admin_login {
 	padding: 12px;
+}
+#admin_login img {
+	vertical-align: middle;
+	padding: 2px;
 }
 
 /*	$BOXES		*/

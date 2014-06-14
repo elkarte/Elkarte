@@ -132,7 +132,7 @@ class MarkRead_Controller extends Action_Controller
 		{
 			$context['xml_data'] = array(
 				'text' => $txt['topic_alert_none'],
-				'body' => strtr($txt['unread_topics_visit_none'], array('?action=unread;all' => '?action=unread;all' . sprintf($this->_querystring_board_limits, 0) . $this->_querystring_sort_limits)),
+				'body' => str_replace('{unread_all_url}', $scripturl . '?action=unread;all' . sprintf($this->_querystring_board_limits, 0) . $this->_querystring_sort_limits, $txt['unread_topics_visit_none']),
 			);
 		}
 		// No need to do anything, just die

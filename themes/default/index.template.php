@@ -255,8 +255,8 @@ function template_body_above()
 	{
 		echo '
 			<form id="search_form" action="', $scripturl, '?action=search;sa=results" method="post" accept-charset="UTF-8">
-				<label for="search">
-					<input type="text" name="search" value="" class="input_text" placeholder="', $txt['search'], '" />
+				<label for="quicksearch">
+					<input type="text" name="search" id="quicksearch" value="" class="input_text" placeholder="', $txt['search'], '" />
 				</label>';
 
 		// Using the quick search dropdown?
@@ -314,7 +314,7 @@ function template_body_above()
 
 	echo '
 			<div id="logobox">
-				<img id="logo" src="', $context['header_logo_url_html_safe'], '" alt="', $context['forum_name'], '" title="', $context['forum_name'], '" />', empty($settings['site_slogan']) ? '' : '
+				<img id="logo" src="', $context['header_logo_url_html_safe'], '" alt="', $context['forum_name_html_safe'], '" title="', $context['forum_name_html_safe'], '" />', empty($settings['site_slogan']) ? '' : '
 				<div id="siteslogan">' . $settings['site_slogan'] . '</div>', '
 			</div>';
 

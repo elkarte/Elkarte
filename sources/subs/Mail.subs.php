@@ -44,8 +44,6 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 {
 	global $webmaster_email, $context, $modSettings, $txt, $scripturl, $boardurl;
 
-	$db = database();
-
 	// Use sendmail if it's set or if no SMTP server is set.
 	$use_sendmail = empty($modSettings['mail_type']) || $modSettings['smtp_host'] == '';
 
@@ -124,7 +122,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	$headers .= 'X-Mailer: ELK' . $line_break;
 
 	// Using the maillist functions?
-	$maillist = !empty($modSettings['maillist_enabled']) && $from_wrapper !== null &&$message_id !== null && $priority < 4 && empty($modSettings['mail_no_message_id']);
+	$maillist = !empty($modSettings['maillist_enabled']) && $from_wrapper !== null && $message_id !== null && $priority < 4 && empty($modSettings['mail_no_message_id']);
 	if ($maillist)
 	{
 		// Lets try to avoid auto replies
@@ -255,14 +253,8 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 		// Log each email that we sent so they can be replied to
 		if (!empty($sent))
 		{
-			$db->insert('ignore',
-				'{db_prefix}postby_emails',
-				array(
-					'id_email' => 'string', 'time_sent' => 'int', 'email_to' => 'string'
-				),
-				$sent,
-				array('id_email')
-			);
+			require_once(SUBSDIR . '/Maillist.subs.php');
+			log_email($sent);
 		}
 	}
 	else
@@ -655,16 +647,8 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 	// Log each email
 	if (!empty($sent))
 	{
-		$db = database();
-
-		$db->insert('ignore',
-			'{db_prefix}postby_emails',
-			array(
-				'id_email' => 'int', 'time_sent' => 'string', 'email_to' => 'string'
-			),
-			$sent,
-			array('id_email')
-		);
+		require_once(SUBSDIR . '/Maillist.subs.php');
+		log_email($sent);
 	}
 
 	return true;
@@ -784,7 +768,7 @@ function loadEmailTemplate($template, $replacements = array(), $lang = '', $load
 		'THEMEURL' => $settings['theme_url'],
 		'IMAGESURL' => $settings['images_url'],
 		'DEFAULT_THEMEURL' => $settings['default_theme_url'],
-		'REGARDS' => $txt['regards_team'],
+		'REGARDS' => replaceBasicActionUrl($txt['regards_team']),
 	);
 
 	// Split the replacements up into two arrays, for use with str_replace
@@ -1320,6 +1304,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 				$unq_head = md5($scripturl . microtime() . rand()) . '-' . $email['message_id'];
 				$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
 				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
+				$email['body_fail'] = $email['body'];
 				$email['body'] = mail_insert_key($email['body'], $unq_head, $encoded_unq_head, $line_break);
 			}
 			elseif ($email['message_id'] !== null && empty($modSettings['mail_no_message_id']))
@@ -1346,7 +1331,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 
 		// Hopefully it sent?
 		if (!$result)
-			$failed_emails[] = array(time(), $email['to'], $email['body'], $email['subject'], $email['headers'], $email['send_html'], $email['priority'], $email['private'], $email['message_id']);
+			$failed_emails[] = array(time(), $email['to'], $email['body_fail'], $email['subject'], $email['headers'], $email['send_html'], $email['priority'], $email['private'], $email['message_id']);
 	}
 
 	// Clear out the stat cache.

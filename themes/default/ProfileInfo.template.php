@@ -194,7 +194,7 @@ function template_action_showPermissions()
 
 			foreach ($context['no_access_boards'] as $no_access_board)
 				echo '
-						<a href="', $no_access_board['url'], '">', $no_access_board['name'], '</a>', $no_access_board['is_last'] ? '' : ', ';
+						', $no_access_board['name'], $no_access_board['is_last'] ? '' : ', ';
 
 			echo '
 					</div>
@@ -1148,8 +1148,8 @@ function template_profile_block_attachments()
 
 			echo '
 					<td class="profile_attachment">
-						<span class="attach_title">', $picture['filename'], '</span>
-						<a href="', $picture['url'], '">', $picture['img'], '</a>
+						<span class="attach_title">', $picture['subject'], '</span>
+						<a id="link_', $picture['id'], '" href="', $picture['url'], '">', $picture['img'], '</a>
 					</td>';
 
 			if (++$i % $per_line === 0)

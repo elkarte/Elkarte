@@ -209,10 +209,6 @@ class Likes_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		// Clear the templates
-		$template_layers = Template_Layers::getInstance();
-		$template_layers->removeAll();
-
 		// Make room for ajax
 		loadTemplate('Json');
 		$context['sub_template'] = 'send_json';

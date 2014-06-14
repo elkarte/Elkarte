@@ -180,6 +180,8 @@ function preparsecode(&$message, $previewing = false)
 				'~\[_(li|/li|td|tr|/tr)_\]~' => '[$1]',
 				// Images with no real url.
 				'~\[img\]https?://.{0,7}\[/img\]~' => '',
+				// Font tags with multiple fonts (copy&paste in the WYSIWYG by some browsers).
+				'~\[font=\\\'?(.*?)\\\'?(?=\,).*\](.*?(?:\[/font\]))~' => '[font=$1]$2',
 			);
 
 			// Fix up some use of tables without [tr]s, etc. (it has to be done more than once to catch it all.)

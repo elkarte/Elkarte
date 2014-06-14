@@ -1,7 +1,7 @@
 <?php
 // Version: 1.0; index
 
-global $forum_copyright, $forum_version, $webmaster_email, $scripturl, $context, $boardurl;
+global $forum_copyright;
 
 // Locale (strftime, pspell_new) and spelling. (pspell_new, can be left as '' normally.)
 // For more information see:
@@ -173,7 +173,7 @@ $txt['notify'] = 'Notify';
 $txt['unnotify'] = 'Unnotify';
 $txt['notify_request'] = 'Do you want a notification email if someone replies to this topic?';
 // Use numeric entities in the below string.
-$txt['regards_team'] = "Regards,\nThe " . $context['forum_name'] . ' Team.';
+$txt['regards_team'] = "Regards,\nThe {forum_name} Team.";
 $txt['notify_replies'] = 'Notify of replies';
 $txt['move_topic'] = 'Move';
 $txt['move_to'] = 'Move to';
@@ -257,14 +257,13 @@ $txt['female'] = 'Female';
 
 $txt['error_invalid_characters_username'] = 'Invalid character used in user name.';
 
-$txt['welcome_guest'] = 'Welcome, <strong>%1$s</strong>. Please <a href="%2$s">login</a>.';
+$txt['welcome_guest'] = 'Welcome, <strong>Guest</strong>. Please <a href="{login_url}">login</a>.';
 
-//$txt['welcome_guest_register'] = 'Welcome, <strong>%1$s</strong>. Please <a href="' . $scripturl . '?action=login">login</a> or <a href="' . $scripturl . '?action=register">register</a>.';
-$txt['welcome_guest_register'] = 'Welcome to <strong>'. $context['forum_name']. '</strong>. Please <a href="' . $scripturl . '?action=login">login</a> or <a href="' . $scripturl . '?action=register">register</a>.';
+$txt['welcome_guest_register'] = 'Welcome to <strong>{forum_name}</strong>. Please <a href="{login_url}">login</a> or <a href="{register_url}">register</a>.';
 
-$txt['please_login'] = 'Please <a href="' . $scripturl . '?action=login">login</a>.';
-$txt['login_or_register'] = 'Please <a href="' . $scripturl . '?action=login">login</a> or <a href="' . $scripturl . '?action=register">register</a>.';
-$txt['welcome_guest_activate'] = '<br />Did you miss your <a href="' . $scripturl . '?action=activate">activation email</a>?';
+$txt['please_login'] = 'Please <a href="{login_url}">login</a>.';
+$txt['login_or_register'] = 'Please <a href="{login_url}">login</a> or <a href="{register_url}">register</a>.';
+$txt['welcome_guest_activate'] = '<br />Did you miss your <a href="{activate_url}">activation email</a>?';
 // @todo the following to sprintf
 $txt['hello_member'] = 'Hey,';
 // Use numeric entities in the below string.
@@ -444,7 +443,7 @@ $txt['tried_to_repair'] = 'ElkArte has detected and automatically tried to repai
 $txt['database_error_versions'] = '<strong>Note:</strong> Your database version is %1$s.';
 $txt['template_parse_error'] = 'Template Parse Error!';
 $txt['template_parse_error_message'] = 'It seems something has gone sour on the forum with the template system.  This problem should only be temporary, so please come back later and try again.  If you continue to see this message, please contact the administrator.<br /><br />You can also try <a href="javascript:location.reload();">refreshing this page</a>.';
-$txt['template_parse_error_details'] = 'There was a problem loading the <span class="tt"><strong>%1$s</strong></span> template or language file.  Please check the syntax and try again - remember, single quotes (<span class="tt">\'</span>) often have to be escaped with a backslash (<span class="tt">\\</span>).  To see more specific error information from PHP, try <a href="' . $boardurl . '%1$s">accessing the file directly</a>.<br /><br />You may want to try to <a href="javascript:location.reload();">refresh this page</a> or <a href="' . $scripturl . '?theme=1">use the default theme</a>.';
+$txt['template_parse_error_details'] = 'There was a problem loading the <span class="tt"><strong>%1$s</strong></span> template or language file.  Please check the syntax and try again - remember, single quotes (<span class="tt">\'</span>) often have to be escaped with a backslash (<span class="tt">\\</span>).  To see more specific error information from PHP, try <a href="%2$s%1$s">accessing the file directly</a>.<br /><br />You may want to try to <a href="javascript:location.reload();">refresh this page</a> or <a href="%3$s">use the default theme</a>.';
 $txt['template_parse_undefined'] = 'An undefined error occurred during the parsing of this template';
 
 $txt['today'] = 'Today at ';
@@ -552,7 +551,7 @@ $txt['skip_nav'] = 'Skip to main content';
 $txt['go_up'] = 'Go Up';
 $txt['go_down'] = 'Go Down';
 
-$forum_copyright = '<a href="http://www.elkarte.net" title="ElkArte Forum" target="_blank" class="new_win">powered by %1$s</a> | <a href="' . $scripturl . '?action=who;sa=credits" title="Credits" target="_blank" class="new_win">credits</a>';
+$forum_copyright = '<a href="http://www.elkarte.net" title="ElkArte Forum" target="_blank" class="new_win">powered by %1$s</a> | <a href="{credits_url}" title="Credits" target="_blank" class="new_win">credits</a>';
 
 $txt['birthdays'] = 'Birthdays:';
 $txt['events'] = 'Events:';
@@ -590,7 +589,9 @@ $txt['moveTopic4'] = 'Change every message\'s subject';
 $txt['move_topic_unapproved_js'] = 'Warning! This topic has not yet been approved.\\n\\nIt is not recommended that you create a redirection topic unless you intend to approve the post immediately following the move.';
 $txt['movetopic_auto_board'] = '[BOARD]';
 $txt['movetopic_auto_topic'] = '[TOPIC LINK]';
-$txt['movetopic_default'] = 'This topic has been moved to ' . $txt['movetopic_auto_board'] . ".\n\n" . $txt['movetopic_auto_topic'];
+$txt['movetopic_default'] = 'This topic has been moved to [BOARD]
+
+[TOPIC LINK]';
 $txt['movetopic_redirect'] = 'Redirect to the moved topic';
 $txt['movetopic_expires'] = 'Automatically remove the redirection topic';
 
@@ -603,7 +604,9 @@ $txt['split_after_and_this_post'] = 'Split topic after and including this post.'
 $txt['select_split_posts'] = 'Select posts to split.';
 
 $txt['splittopic_notification'] = 'Post a message when the topic is split';
-$txt['splittopic_default'] = 'One or more of the messages of this topic have been moved to ' . $txt['movetopic_auto_board'] . ".\n\n" . $txt['movetopic_auto_topic'];
+$txt['splittopic_default'] = 'One or more of the messages of this topic have been moved to [BOARD]
+
+[TOPIC LINK]';
 $txt['splittopic_move'] = 'Move the new topic to another board';
 
 $txt['new_topic'] = 'New Topic';
@@ -700,7 +703,7 @@ $txt['liked_you'] = 'You';
 $txt['liked_more'] = 'more';
 
 $txt['unread_topics_visit'] = 'Recent Unread Topics';
-$txt['unread_topics_visit_none'] = 'No unread topics found since your last visit. <a href="' . $scripturl . '?action=unread;all" class="linkbutton">Click here to try all unread topics</a>';
+$txt['unread_topics_visit_none'] = 'No unread topics found since your last visit. <a href="{unread_all_url}" class="linkbutton">Click here to try all unread topics</a>';
 $txt['unread_topics_all'] = 'All Unread Topics';
 $txt['unread_replies'] = 'Updated Topics';
 

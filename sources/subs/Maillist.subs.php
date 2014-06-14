@@ -71,7 +71,7 @@ function list_maillist_unapproved($id = 0, $start = 0, $chunk_size = 0, $sort = 
 	{
 		$postemail[$i] = array(
 			'id_email' => $row['id_email'],
-			'error' =>  $txt[$row['error'] . '_short'],
+			'error' => $txt[$row['error'] . '_short'],
 			'error_code' => $row['error'],
 			'key' => $row['data_id'],
 			'subject' => $row['subject'],
@@ -419,7 +419,7 @@ function log_email($sent)
 	$db->insert('ignore',
 		'{db_prefix}postby_emails',
 		array(
-			'id_email' => 'int', 'time_sent' => 'string', 'email_to' => 'string'
+			'id_email' => 'string', 'time_sent' => 'int', 'email_to' => 'string'
 		),
 		$sent,
 		array('id_email')

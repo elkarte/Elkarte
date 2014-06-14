@@ -545,6 +545,7 @@ div.bbc_footnotes .meaction{
 	box-shadow: 1px 1px 2px #e5e5e5;
 	color: #566e4b;
 }
+
 /* Level 1 button hover and focus effects. */
 .linklevel1:hover, .listlevel1:hover .linklevel1,
 .linklevel2:hover, .listlevel2:hover .linklevel2,
@@ -795,7 +796,7 @@ div.bbc_footnotes .meaction{
 .linktree {
 	background: #fcfcfc;
 	border-top: 1px solid #ccc;
-	border-right: 2px solid #ccc;
+	border-right: 0.2em solid #ccc;
 	border-bottom: 1px solid #ccc;
 	border-radius: 2px 0 0 2px;
 }
@@ -826,7 +827,7 @@ div.bbc_footnotes .meaction{
 }
 .linktree:hover, .linktree_last {
 	border-top: 1px solid #3d6e32;
-	border-right: 2px solid #3d6e32;
+	border-right: 0.2em solid #3d6e32;
 	border-bottom: 1px solid #3d6e32;
 	background: #5ba048;
 	background-image: linear-gradient(to right, #4b863c, #5ba048);
@@ -1801,15 +1802,6 @@ div.bbc_footnotes .meaction{
 .floating_error .error_btn:hover {
 	cursor: pointer;
 }
-
-/* alternating window colors */
-.windowbg {
-	background-color: #fcfcfc;
-}
-.windowbg2 {
-	background-color: #efefef;
-}
-
 
 /*	$MEDIA		*/
 /* Experimental media queries.

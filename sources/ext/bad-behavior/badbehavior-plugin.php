@@ -86,6 +86,13 @@ function bb2_db_query($query)
 	// ok they are right its my horror :P
 	if (strpos($query, 'DATE_SUB') !== false)
 		$query = 'DELETE FROM {db_prefix}log_badbehavior WHERE date < ' . (bb2_db_date() - 7 * 86400);
+	elseif (strpos($query, 'OPTIMIZE TABLE') !== false)
+	{
+		// This is just intended to waste spammer time, occurs (rand(1,1000) == 1) from banned.inc.php
+		$db->db_optimize_table('{db_prefix}log_badbehavior');
+
+		return true;
+	}
 	elseif (strpos($query, '@@session.wait_timeout') !== false)
 		return true;
 
@@ -229,8 +236,8 @@ function bb2_read_whitelist()
 	// Build up the whitelist array so badbehavior can use it
 	return array_merge(
 		array('ip' => $whitelist['badbehavior_ip_wl']),
-		array('url' => $whitelist['badbehavior_useragent_wl']),
-		array('useragent' => $whitelist['badbehavior_url_wl'])
+		array('url' => $whitelist['badbehavior_url_wl']),
+		array('useragent' => $whitelist['badbehavior_useragent_wl'])
 	);
 }
 
