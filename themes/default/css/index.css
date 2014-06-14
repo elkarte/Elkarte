@@ -4418,9 +4418,6 @@ dl.no_members {
 		float: none;
 		width: 100%;
 	}
-	.login {
-		width: 100%;
-	}
 	.views_text, .nextlinks {
 		display: none !important;
 	}
