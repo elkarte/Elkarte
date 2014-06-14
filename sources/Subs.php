@@ -4239,11 +4239,13 @@ function elk_autoloader($class)
 	}
 	else
 	{
-		$file_name = str_replace('_', '', $class) . '.class.php';
-		if (file_exists(SUBSDIR . '/' . $file_name))
-			$file_name = SUBSDIR . '/' . $file_name;
-		elseif (file_exists(SOURCEDIR . '/' . $file_name))
-			$file_name = SOURCEDIR . '/' . $file_name;
+		$file_name = str_replace('_', '', $class);
+		if (file_exists(SUBSDIR . '/' . $file_name . '.class.php'))
+			$file_name = SUBSDIR . '/' . $file_name . '.class.php';
+		elseif (file_exists(SOURCEDIR . '/' . $file_name . '.class.php'))
+			$file_name = SOURCEDIR . '/' . $file_name . '.class.php';
+		elseif (file_exists(SOURCEDIR . '/' . $file_name . '.php'))
+			$file_name = SOURCEDIR . '/' . $file_name . '.php';
 		else
 			$file_name = '';
 	}
@@ -4263,4 +4265,15 @@ function createList($listOptions)
 	$list = new Generic_List($listOptions);
 
 	$list->buildList();
+}
+
+/**
+ * This handy function retrieves a Request instance and passes it on.
+ *
+ * - To get hold of a Request, you can use this function or directly Request::instance().
+ * - This is for convenience, it simply delegates to Request::instance().
+ */
+function request()
+{
+	return Request::instance();
 }
