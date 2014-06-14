@@ -14,6 +14,7 @@ class TestHTML2BBC extends UnitTestCase
 	 */
 	function setUp()
 	{
+		require_once(TESTDIR . '../sources/subs/Html2BBC.class.php');
 		$this->bbcTestCases = array(
 			array(
 				'Test bold',

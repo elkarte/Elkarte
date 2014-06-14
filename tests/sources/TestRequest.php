@@ -19,6 +19,7 @@ class TestRequest extends UnitTestCase
 			define('ELK', 'SSI');
 
 		// and include our class. Kinda difficult without it.
+		require_once(TESTDIR . '../sources/Subs.php');
 		require_once(TESTDIR . '../sources/Request.php');
 		require_once(TESTDIR . '../sources/QueryString.php');
 
