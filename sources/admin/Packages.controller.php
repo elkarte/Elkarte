@@ -1284,7 +1284,7 @@ class Packages_Controller extends Action_Controller
 							'style' => 'width: 40px;',
 						),
 						'data' => array(
-							'function' => function ($package_md5) {
+							'function' => function ($package_md5) use ($type) {
 								global $context;
 
 								if (isset($context['available_' . $type . ''][$package_md5]))
@@ -1302,7 +1302,7 @@ class Packages_Controller extends Action_Controller
 							'style' => 'width: 25%;',
 						),
 						'data' => array(
-							'function' => function ($package_md5) {
+							'function' => function ($package_md5) use ($type)  {
 								global $context;
 
 								if (isset($context['available_' . $type . ''][$package_md5]))
@@ -1320,7 +1320,7 @@ class Packages_Controller extends Action_Controller
 							'style' => 'width: 25%;',
 						),
 						'data' => array(
-							'function' => function ($package_md5) {
+							'function' => function ($package_md5) use ($type)  {
 								global $context;
 
 								if (isset($context['available_' . $type . ''][$package_md5]))
@@ -1337,7 +1337,7 @@ class Packages_Controller extends Action_Controller
 							'value' => '',
 						),
 						'data' => array(
-							'function' => function ($package_md5) {
+							'function' => function ($package_md5) use ($type) {
 								global $context, $scripturl, $txt;
 
 								if (!isset($context['available_' . $type . ''][$package_md5]))
