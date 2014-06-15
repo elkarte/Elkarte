@@ -196,7 +196,7 @@ class PBE_IMAP
 		$this->_mailbox = $this->_imap_server .  imap_utf7_encode($this->_mailbox);
 
 		// Connect to the mailbox using the supplied credentials and protocol
-		$this->_inbox = @imap_open($this->_mailbox, $username, $password);
+		$this->_inbox = @imap_open($this->_mailbox, $this->_username, $this->_password);
 	}
 
 	/**
