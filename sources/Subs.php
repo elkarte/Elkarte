@@ -4241,6 +4241,7 @@ function elk_autoloader($class)
 		else
 			$file_name = '';
 	}
+
 	if (!empty($file_name))
 		require_once($file_name);
 }

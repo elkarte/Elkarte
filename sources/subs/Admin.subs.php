@@ -30,7 +30,7 @@ if (!defined('ELK'))
  */
 function getServerVersions($checkFor)
 {
-	global $txt, $_PHPA, $memcached, $modSettings;
+	global $txt, $_PHPA, $modSettings;
 
 	$db = database();
 
@@ -67,10 +67,10 @@ function getServerVersions($checkFor)
 	}
 
 	// If we're using memcache we need the server info.
-	if (empty($memcached) && function_exists('memcache_get') && isset($modSettings['cache_memcached']) && trim($modSettings['cache_memcached']) != '')
+	if (function_exists('memcache_get') && isset($modSettings['cache_memcached']) && trim($modSettings['cache_memcached']) != '')
 	{
 		require_once(SUBSDIR . '/Cache.subs.php');
-		get_memcached_server();
+		$memcached = get_memcached_server();
 	}
 	else
 	{

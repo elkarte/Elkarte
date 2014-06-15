@@ -86,10 +86,12 @@ require_once(SOURCEDIR . '/Subs.php');
 require_once(SOURCEDIR . '/Errors.php');
 require_once(SOURCEDIR . '/Logging.php');
 require_once(SOURCEDIR . '/Load.php');
-require_once(SUBSDIR . '/Cache.subs.php');
 require_once(SOURCEDIR . '/Security.php');
 
 spl_autoload_register('elk_autoloader');
+
+require_once(SUBSDIR . '/Cache.subs.php');
+
 if ($db_show_debug === true)
 {
 	Debug::get()->rusage('start', $rusage_start);
