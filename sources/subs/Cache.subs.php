@@ -32,11 +32,11 @@ if (!defined('ELK'))
  * @param int $level = 1
  * @return string
  *
- * @deprecated since 1.1 - use Cache::get()->quick_get() instead
+ * @deprecated since 1.1 - use Cache::instance()->quick_get() instead
  */
 function cache_quick_get($key, $file, $function, $params, $level = 1)
 {
-	return Cache::get()->quick_get($key, $file, $function, $params, $level);
+	return Cache::instance()->quick_get($key, $file, $function, $params, $level);
 }
 
 /**
@@ -57,11 +57,11 @@ function cache_quick_get($key, $file, $function, $params, $level = 1)
  * @param string|int|mixed[]|null $value
  * @param int $ttl = 120
  *
- * @deprecated since 1.1 - use Cache::get()->put() instead
+ * @deprecated since 1.1 - use Cache::instance()->put() instead
  */
 function cache_put_data($key, $value, $ttl = 120)
 {
-	Cache::get()->put($key, $value, $ttl);
+	Cache::instance()->put($key, $value, $ttl);
 }
 
 /**
@@ -72,11 +72,11 @@ function cache_put_data($key, $value, $ttl = 120)
  * @param string $key
  * @param int $ttl = 120
  *
- * @deprecated since 1.1 - use Cache::get()->get() instead
+ * @deprecated since 1.1 - use Cache::instance()->get() instead
  */
 function cache_get_data($key, $ttl = 120)
 {
-	return Cache::get()->get();
+	return Cache::instance()->get($key, $ttl);
 
 }
 
@@ -98,11 +98,11 @@ if (!function_exists('get_memcached_server'))
  *
  * @param string $type = ''
  *
- * @deprecated since 1.1 - use Cache::get()->clean() instead
+ * @deprecated since 1.1 - use Cache::instance()->clean() instead
  */
 function clean_cache($type = '')
 {
-	Cache::get()->clean();
+	Cache::instance()->clean($type);
 }
 
 /**
@@ -116,7 +116,7 @@ function clean_cache($type = '')
 function cache_get_key($key)
 {
 	global $boardurl, $cache_accelerator;
-	static $key_prefix;
+	static $key_prefix = null;
 
 	// no need to do this every time, slows us down :P
 	if (empty($key_prefix))

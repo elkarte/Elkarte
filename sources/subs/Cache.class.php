@@ -28,15 +28,44 @@ class Cache
 	 */
 	private static $_instance = null;
 
+	/**
+	 * This array represents the caching method we are going to use
+	 * The array consists of the following indexes:
+	 *   - init => a function to run in the constructor (may return true/false/array)
+	 *   - put => the function to store the data
+	 *   - get => the function to retrieve the data
+	 *   - clean => the function to clean the cache
+	 *   - fixkey => (optional) a function to fix the cache key if needed
+	 * @var mixed[]
+	 */
 	private $_method = null;
+
+	/**
+	 * Array of options for the methods (if needed)
+	 * @var mixed[]
+	 */
 	private $_options = array();
+
+	/**
+	 * If the cache is enabled or not.
+	 * Set in __construct based on the global $cache_enable
+	 * @var int
+	 */
 	private $_cache_enable = false;
+
+	/**
+	 * The prefix to append to the cache key
+	 * @var string
+	 */
 	private $_key_prefix = null;
 
+	/**
+	 * Initialize the class, defines the options and the caching method to use
+	 * @var string
+	 */
 	public function __construct()
 	{
-		global $cache_memcached, $db_show_debug;
-		global $cache_accelerator, $cache_enable, $expired;
+		global $cache_accelerator, $cache_enable, $cache_uid, $cache_password;
 
 		$this->_cache_enable = (int) $cache_enable;
 
@@ -44,18 +73,16 @@ class Cache
 		if (!$this->_cache_enable)
 			return;
 
-		$args = func_get_args();
-
-		// Removes $cache_enable
-		array_shift($args);
-		// Removes $cache_accelerator
-		array_shift($args);
-
 		if (empty($cache_accelerator))
 			$cache_accelerator = 'filebased';
 
-		if (!empty($args))
-			$this->_options = $args;
+		if ($cache_accelerator == 'xcache')
+		{
+			$this->_options = array(
+				'cache_uid' => $cache_uid,
+				'cache_password' => $cache_password,
+			);
+		}
 
 		$methods = array(
 			'memcached' => array(
@@ -319,8 +346,6 @@ class Cache
 	 */
 	public function quick_get($key, $file, $function, $params, $level = 1)
 	{
-		global $modSettings;
-
 		call_integration_hook('pre_cache_quick_get', array(&$key, &$file, &$function, &$params, &$level));
 
 		/* Refresh the cache if either:
@@ -476,7 +501,9 @@ class Cache
 		return $this->_key_prefix . (isset($this->_method['fixkey']) ? $this->_method['fixkey']($key) : $key);
 	}
 
-		// no need to do this every time, slows us down :P
+	/**
+	 * Set $_key_prefix to a "unique" value based on timestamp of a file
+	 */
 	protected function _build_prefix()
 	{
 		global $boardurl;
@@ -488,7 +515,7 @@ class Cache
 	 * Find and return the instance of the Cache class if it exists,
 	 * or create it if it doesn't exist
 	 */
-	public static function get()
+	public static function instance()
 	{
 		if (self::$_instance === null)
 			self::$_instance = new Cache();
@@ -500,7 +527,7 @@ class Cache
 /**
  * Get memcache servers.
  *
- * - This function is used by Cache::get() and Cache::put().
+ * - This function is used by Cache::instance() and Cache::put().
  * - It attempts to connect to a random server in the cache_memcached setting.
  * - It recursively calls itself up to $level times.
  *

@@ -364,7 +364,7 @@ class Maintenance_Controller extends Action_Controller
 		validateToken('admin-maint');
 
 		// Just wipe the whole cache directory!
-		Cache::get()->clean();
+		Cache::instance()->clean();
 
 		$context['maintenance_finished'] = $txt['maintain_cache'];
 	}
@@ -1195,7 +1195,7 @@ class Maintenance_Controller extends Action_Controller
 					add_integration_function($_REQUEST['hook'], $function_add, $file);
 
 					// Clean the cache.
-					Cache::get()->clean();
+					Cache::instance()->clean();
 				}
 
 				redirectexit('action=admin;area=maintain;sa=hooks' . $context['filter_url']);
