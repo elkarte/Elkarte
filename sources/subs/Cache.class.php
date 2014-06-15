@@ -481,8 +481,8 @@ class Cache
 		$this->_method['clean']($type, $this->_options);
 
 		// Invalidate cache, to be sure!
-		// ... as long as Load.php can be modified, anyway.
-		@touch(SOURCEDIR . '/Load.php');
+		// ... as long as CACHEDIR/index.php can be modified, anyway.
+		@touch(CACHEDIR . '/index.php');
 
 		// Give addons a way to trigger cache cleaning.
 		call_integration_hook('integrate_clean_cache');
@@ -508,7 +508,7 @@ class Cache
 	{
 		global $boardurl;
 
-		$this->_key_prefix = md5($boardurl . filemtime(SOURCEDIR . '/Load.php')) . '-ELK-';
+		$this->_key_prefix = md5($boardurl . filemtime(CACHEDIR . '/index.php')) . '-ELK-';
 	}
 
 	/**
