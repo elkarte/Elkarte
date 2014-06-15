@@ -674,6 +674,7 @@ class Database_PostgreSQL implements Database
 		if (allowedTo('admin_forum') && $db_show_debug === true)
 		{
 			$context['error_message'] .= '<br /><br />' . nl2br($db_string);
+		}
 
 		// It's already been logged... don't log it again.
 		fatal_error($context['error_message'], false);
