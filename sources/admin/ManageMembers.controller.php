@@ -871,6 +871,8 @@ class ManageMembers_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => function ($rowData) {
+							global $context;
+
 							return standardTime($rowData['' . ($context['current_filter'] == 4 ? 'last_login' : 'date_registered') . '']);
 						},
 					),
