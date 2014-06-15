@@ -121,7 +121,7 @@ class Groups_Controller extends Action_Controller
 						'value' => $txt['name'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function ($rowData) use ($base_url) {
 							global $scripturl;
 
 							// Since the moderator group has no explicit members, no link is needed.
