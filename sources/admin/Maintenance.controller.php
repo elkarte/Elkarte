@@ -360,13 +360,11 @@ class Maintenance_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		require_once(SUBSDIR . '/Cache.subs.php');
-
 		checkSession();
 		validateToken('admin-maint');
 
 		// Just wipe the whole cache directory!
-		clean_cache();
+		Cache::get()->clean();
 
 		$context['maintenance_finished'] = $txt['maintain_cache'];
 	}
@@ -1197,8 +1195,7 @@ class Maintenance_Controller extends Action_Controller
 					add_integration_function($_REQUEST['hook'], $function_add, $file);
 
 					// Clean the cache.
-					require_once(SUBSDIR . '/Cache.subs.php');
-					clean_cache();
+					Cache::get()->clean();
 				}
 
 				redirectexit('action=admin;area=maintain;sa=hooks' . $context['filter_url']);
