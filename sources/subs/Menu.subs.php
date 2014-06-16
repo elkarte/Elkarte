@@ -82,12 +82,12 @@ function createMenu($menuData, $menuOptions = array())
 	$context['menu_data_' . $context['max_menu_id']] = array();
 	$menu_context = &$context['menu_data_' . $context['max_menu_id']];
 
-	// What is the general action of this menu (i.e. $scripturl?action=XXXX.
-	$menu_context['current_action'] = isset($menuOptions['action']) ? $menuOptions['action'] : $context['current_action'];
-
 	// Allow extend *any* menu with a single hook
 	if (!empty($menuOptions['hook']))
-		call_integration_hook('integrate_' . $menuOptions['hook'] . '_areas', array(&$menuData));
+		call_integration_hook('integrate_' . $menuOptions['hook'] . '_areas', array(&$menuData, &$menuOptions));
+
+	// What is the general action of this menu (i.e. $scripturl?action=XXXX.
+	$menu_context['current_action'] = isset($menuOptions['action']) ? $menuOptions['action'] : $context['current_action'];
 
 	// What is the current area selected?
 	if (isset($menuOptions['current_area']) || isset($_REQUEST['area']))
