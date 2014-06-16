@@ -642,16 +642,16 @@ if ($move_im)
 	while ($row = $db->fetch_assoc($request))
 	{
 		if (!empty($row[aim]))
-			$inserts[] = "($row[id_member], -1, 'cust_aim', $row[aim])";
+			$inserts[] = "($row[id_member], -1, 'cust_aim', '" . addslashes($row['aim']) . "')";
 
 		if (!empty($row[icq]))
-			$inserts[] = "($row[id_member], -1, 'cust_icq', $row[icq])";
+			$inserts[] = "($row[id_member], -1, 'cust_icq', '" . addslashes($row['icq']) . "')";
 
 		if (!empty($row[msn]))
-			$inserts[] = "($row[id_member], -1, 'cust_skype', $row[msn])";
+			$inserts[] = "($row[id_member], -1, 'cust_skype', '" . addslashes($row['msn']) . "')";
 
 		if (!empty($row[yim]))
-			$inserts[] = "($row[id_member], -1, 'cust_yim', $row[yim])";
+			$inserts[] = "($row[id_member], -1, 'cust_yim', '" . addslashes($row['yim']) . "')";
 	}
 	$db->free_result($request);
 
