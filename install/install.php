@@ -387,7 +387,7 @@ function action_welcome()
 			$db_missing[] = $db['extension'];
 	}
 
-	if (count($db_missing) === count($db))
+	if (count($db_missing) === count($databases))
 		$incontext['error'] = sprintf($txt['error_db_missing'], implode(', ', $db_missing));
 	elseif (empty($incontext['supported_databases']))
 		$error = empty($notFoundSQLFile) ? 'error_db_missing' : 'error_db_script_missing';
