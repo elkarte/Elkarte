@@ -252,12 +252,10 @@ class ModerationCenter_Controller extends Action_Controller
 		// I don't know where we're going - I don't know where we've been...
 		$menuOptions = array(
 			'action' => 'moderate',
+			'hook' => 'moderation',
 			'disable_url_session_check' => true,
 			'default_include_dir' => CONTROLLERDIR,
 		);
-
-		// Let them modify PM areas easily.
-		call_integration_hook('integrate_moderation_areas', array(&$moderation_areas, &$menuOptions));
 
 		$mod_include_data = createMenu($moderation_areas, $menuOptions);
 		unset($moderation_areas);
