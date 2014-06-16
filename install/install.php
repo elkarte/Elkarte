@@ -2294,24 +2294,20 @@ function template_welcome_message()
 		<script><!-- // --><![CDATA[
 			var oUpgradeCenter = new elk_AdminIndex({
 				bLoadAnnouncements: false,
-
 				bLoadVersions: true,
 				slatestVersionContainerId: \'latestVersion\',
 				sinstalledVersionContainerId: \'version_warning\',
 				sVersionOutdatedTemplate: ', JavaScriptEscape('
-			<div style="float: left; width: 2ex; font-size: 2em; color: red; overflow: hidden;">!!</div>
-			<strong style="text-decoration: underline;">' . $txt['error_warning_notice'] . '</strong><br />
-			<div style="padding-left: 6ex;">
+			<strong style="text-decoration: underline;">' . $txt['error_warning_notice'] . '</strong><p>
 				' . sprintf($txt['error_script_outdated'], '<em id="elkVersion" style="white-space: nowrap;">??</em>', '<em style="white-space: nowrap;">' . CURRENT_VERSION . '</em>') . '
-			</div>
-				'), ',
+				</p>'), ',
 
 				bLoadUpdateNotification: false
 			});
 		// ]]></script>
 	<form action="', $incontext['form_url'], '" method="post">
 		<p>', sprintf($txt['install_welcome_desc'], CURRENT_VERSION), '</p>
-		<div id="version_warning" style="margin: 2ex; padding: 2ex; border: 2px dashed #a92174; color: black; background-color: #fbbbe2; display: none;">',CURRENT_VERSION, '</div>
+		<div id="version_warning" class="warningbox" style="display: none;">',CURRENT_VERSION, '</div>
 		<div id="latestVersion" style="display: none;">???</div>';
 
 	// Show the warnings, or not.
