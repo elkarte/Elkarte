@@ -90,11 +90,11 @@ class ManageAvatars_Controller extends Action_Controller
 		{
 			checkSession();
 
+			call_integration_hook('integrate_save_avatar_settings');
+
 			// Disable if invalid values would result
 			if (isset($_POST['custom_avatar_enabled']) && $_POST['custom_avatar_enabled'] == 1 && (empty($_POST['custom_avatar_dir']) || empty($_POST['custom_avatar_url'])))
 				$_POST['custom_avatar_enabled'] = 0;
-
-			call_integration_hook('integrate_save_avatar_settings');
 
 			Settings_Form::save_db($config_vars);
 			redirectexit('action=admin;area=manageattachments;sa=avatars');

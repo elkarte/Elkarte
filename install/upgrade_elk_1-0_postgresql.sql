@@ -642,23 +642,23 @@ if ($move_im)
 	while ($row = $db->fetch_assoc($request))
 	{
 		if (!empty($row[aim]))
-			$inserts[] = "($row[id_member], -1, 'cust_aim', $row[aim])";
+			$inserts[] = "($row[id_member], 'cust_aim', '" . addslashes($row['aim']) . "')";
 
 		if (!empty($row[icq]))
-			$inserts[] = "($row[id_member], -1, 'cust_icq', $row[icq])";
+			$inserts[] = "($row[id_member], 'cust_icq', '" . addslashes($row['icq']) . "')";
 
 		if (!empty($row[msn]))
-			$inserts[] = "($row[id_member], -1, 'cust_skype', $row[msn])";
+			$inserts[] = "($row[id_member], 'cust_skype', '" . addslashes($row['msn']) . "')";
 
 		if (!empty($row[yim]))
-			$inserts[] = "($row[id_member], -1, 'cust_yim', $row[yim])";
+			$inserts[] = "($row[id_member], 'cust_yim', '" . addslashes($row['yim']) . "')";
 	}
 	$db->free_result($request);
 
 	if (!empty($inserts))
 		upgrade_query("
-			INSERT INTO {$db_prefix}themes
-				(id_member, id_theme, variable, value)
+			INSERT INTO {$db_prefix}custom_fields_data
+				(id_member, variable, value)
 			VALUES
 				" . implode(',', $inserts));
 }

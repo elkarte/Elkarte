@@ -202,13 +202,12 @@ class ManageSecurity_Controller extends Action_Controller
 
 			// Fix the warning setting array!
 			$_POST['warning_settings'] = '1,' . min(100, (int) $_POST['user_limit']) . ',' . min(100, (int) $_POST['warning_decrement']);
-			$save_vars = $config_vars;
-			$save_vars[] = array('text', 'warning_settings');
-			unset($save_vars['rem1'], $save_vars['rem2']);
+			$config_vars[] = array('text', 'warning_settings');
+			unset($config_vars['rem1'], $config_vars['rem2']);
 
-			call_integration_hook('integrate_save_moderation_settings', array(&$save_vars));
+			call_integration_hook('integrate_save_moderation_settings');
 
-			Settings_Form::save_db($save_vars);
+			Settings_Form::save_db($config_vars);
 			redirectexit('action=admin;area=securitysettings;sa=moderation');
 		}
 
@@ -268,15 +267,14 @@ class ManageSecurity_Controller extends Action_Controller
 			if (empty($_POST['posts_require_captcha']) && !empty($_POST['guests_require_captcha']))
 				$_POST['posts_require_captcha'] = -1;
 
-			$save_vars = $config_vars;
-			unset($save_vars['pm1'], $save_vars['pm2'], $save_vars['pm3'], $save_vars['guest_verify']);
+			unset($config_vars['pm1'], $config_vars['pm2'], $config_vars['pm3'], $config_vars['guest_verify']);
 
-			$save_vars[] = array('text', 'pm_spam_settings');
+			$config_vars[] = array('text', 'pm_spam_settings');
 
-			call_integration_hook('integrate_save_spam_settings', array(&$save_vars));
+			call_integration_hook('integrate_save_spam_settings');
 
 			// Now save.
-			Settings_Form::save_db($save_vars);
+			Settings_Form::save_db($config_vars);
 			cache_put_data('verificationQuestionIds', null, 300);
 			redirectexit('action=admin;area=securitysettings;sa=spam');
 		}

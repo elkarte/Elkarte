@@ -96,12 +96,19 @@ input, button, select, textarea, .editor {
 }
 select, input {
 	font: 87.5%/130% Helvetica, Arial, "Nimbus Sans L", sans-serif;
-	height: 26px;
+	height: 24px;
 }
 #chrome select {
 	padding: 2px 2px;
+	height: 24px;
 }
-
+.linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
+.linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
+	line-height: 18px;
+}
+.hdicon:before {
+	margin: 2px 0;
+}
 input:hover, textarea:hover, button:hover, select:hover {
 	border: 1px solid #999;
 }
@@ -1104,6 +1111,23 @@ a.active {
 	background: red;
 }
 
+/* Profile colors */
+.activity_stats li span {
+	border: solid #555;
+	border-width: 1px 1px 1px 1px;
+	border-right: none;
+	border-left: none;
+	background: #eee;
+}
+.activity_stats li .bar {
+	border: 1px solid #ccc;
+	border-bottom: none;
+	background: #fff;
+}
+.activity_stats li .bar div {
+	background: #43a8da;
+}
+
 /*	$HELP		*/
 /* ------------------------------------------------------- */
 
@@ -1114,7 +1138,8 @@ a.active {
 }
 
 a.help .icon {
-	padding: 1px 4px 0 0;
+	padding: 0 4px 2px 0;
+	vertical-align: middle;
 }
 
 /* Styles for the tooltips. */

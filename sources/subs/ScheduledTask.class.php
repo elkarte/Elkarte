@@ -1410,6 +1410,7 @@ class Scheduled_Task
 
 				require_once(SUBSDIR . '/Boards.subs.php');
 				require_once(SUBSDIR . '/Mentions.subs.php');
+				require_once(SUBSDIR . '/Members.subs.php');
 
 				$user_see_board = memberQuerySeeBoard($member);
 				$limit = 100;
@@ -1463,6 +1464,9 @@ class Scheduled_Task
 
 				// And save everything for the next run
 				updateSettings(array('user_access_mentions' => serialize($user_access_mentions)));
+
+				// Count helps keep things correct
+				countUserMentions(true, '', $member);
 
 				// Run this only once for each user, it may be quite heavy, let's split up the load
 				break;

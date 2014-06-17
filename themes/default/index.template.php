@@ -255,8 +255,8 @@ function template_body_above()
 	{
 		echo '
 			<form id="search_form" action="', $scripturl, '?action=search;sa=results" method="post" accept-charset="UTF-8">
-				<label for="search">
-					<input type="text" name="search" value="" class="input_text" placeholder="', $txt['search'], '" />
+				<label for="quicksearch">
+					<input type="text" name="search" id="quicksearch" value="" class="input_text" placeholder="', $txt['search'], '" />
 				</label>';
 
 		// Using the quick search dropdown?

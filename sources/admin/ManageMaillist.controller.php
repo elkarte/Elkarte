@@ -902,7 +902,7 @@ class ManageMaillist_Controller extends Action_Controller
 		{
 			checkSession();
 
-			call_integration_hook('integrate_save_filter_settings', array(&$config_vars));
+			call_integration_hook('integrate_save_filter_settings');
 
 			// Editing an entry?
 			$editid = (isset($_GET['edit'])) ? (int) $_GET['edit'] : -1;
@@ -1299,7 +1299,7 @@ class ManageMaillist_Controller extends Action_Controller
 		{
 			checkSession();
 
-			call_integration_hook('integrate_save_parser_settings', array(&$config_vars));
+			call_integration_hook('integrate_save_parser_settings');
 
 			// Editing a parser?
 			$editid = isset($_GET['edit']) ? (int) $_GET['edit'] : -1;
@@ -1450,7 +1450,7 @@ class ManageMaillist_Controller extends Action_Controller
 		{
 			checkSession();
 
-			call_integration_hook('integrate_save_maillist_settings', array(&$config_vars));
+			call_integration_hook('integrate_save_maillist_settings');
 
 			$email_error = false;
 			$board_error = false;

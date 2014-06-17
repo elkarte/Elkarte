@@ -400,14 +400,12 @@ class Profile_Controller extends Action_Controller
 		// Set a few options for the menu.
 		$menuOptions = array(
 			'disable_url_session_check' => true,
+			'hook' => 'profile',
 			'extra_url_parameters' => array(
 				'u' => $context['id_member'],
 			),
 			'default_include_dir' => CONTROLLERDIR,
 		);
-
-		// Let them modify profile areas easily.
-		call_integration_hook('integrate_profile_areas', array(&$profile_areas, &$menuOptions));
 
 		// Actually create the menu!
 		$profile_include_data = createMenu($profile_areas, $menuOptions);

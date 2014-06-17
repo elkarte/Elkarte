@@ -174,10 +174,10 @@ select::-moz-focus-inner {
 	border: 0;
 	padding: 0;
 }
-/* Apply the font only to these elements, and top align them. */
+/* Apply the font only to these elements */
 input, button, select {
 	padding: 2px 6px;
-	vertical-align: top;
+	vertical-align: middle;
 	font-size: 0.857em;
 	height: 26px;
 }
@@ -783,6 +783,7 @@ a.bbc_link {
 	line-height: 1.286em;
 	padding: 2px;
 	margin-left: 1px;
+	vertical-align: top;
 }
 .top_button img {
 	vertical-align: middle;
@@ -995,7 +996,6 @@ a.bbc_link {
 	margin: -2em 0 0 15.3em;
 }
 /* Reposition Level 2 drop menu as visible on hover. */
-/* @todo - Check Superfish class. I think .sfhover may be deprecated. */
 .listlevel1:hover .menulevel2, .listlevel1.sfhover .menulevel2 {
 	left: 0;
 }
@@ -1122,7 +1122,7 @@ a.bbc_link {
 	left: 100%;
 	top: 50%;
 	margin-top: -1.077em;
-	margin-left: 2px;
+	margin-left: 0.18em;
 	height: 0;
 	width: 0;
 	border: 1.077em solid transparent;
@@ -1190,10 +1190,14 @@ a.bbc_link {
 	padding: 0 0 0 6px;
 }
 .quickbuttons .inline_mod_check {
-	padding: 7px 0;
-	line-height: 1em;
-	float: left;
+    margin: 4px 0 0;
+    padding: 0 4px;
 }
+.inline_mod_check .input_check {
+    height: auto;
+    margin: 0 0 2px;
+}
+
 /* @todo - Save code by amalgamating common button background declarations. */
 .quickbuttons .linklevel1 {
 	float: left;
@@ -2843,9 +2847,12 @@ dl.merge_topic dd {
 	max-height: 40px;
 }
 .attach_title {
-	width: 100%;
 	display: block;
 	margin-bottom: 4px;
+	overflow: hidden;
+	max-width: 100%;
+	text-overflow: ellipsis;
+	white-space: pre;
 }
 /* The basic user info on the left */
 #basicinfo {
@@ -3474,21 +3481,19 @@ div.labels {
 .help {
 	cursor: help;
 }
-
 .help .icon, .hdicon.help {
 	margin: 0;
 	opacity: 0.8;
 	cursor: help;
 }
-
+.hdicon.help:before {
+	margin: 2px 0;
+}
 .help .icon:hover, .hdicon.help:hover {
 	opacity: 1;
 }
-
 a.help .icon {
 	padding: 4px 0 0;
-	position: relative;
-	vertical-align: top;
 }
 
 /* Styles for the tooltips. */
@@ -3587,7 +3592,7 @@ a.help .icon {
 #advanced_search dt {
 	float: left;
 	clear: both;
-	padding: 2px 4px;
+	padding: 5px 4px 0 4px;
 	width: 35%;
 	text-align: right;
 }
@@ -3596,6 +3601,10 @@ a.help .icon {
 	padding: 3px 2px;
 	width: 65%;
 	text-align: left;
+}
+
+#pick_boards .submitbutton {
+	width: 100%;
 }
 
 
@@ -3780,6 +3789,12 @@ dl.no_members {
 	width: 54%;
 	text-align: left;
 }
+.login dl:nth-of-type(2) dt {
+	padding-top: 3px;
+}
+.login dl:nth-of-type(2) dd img {
+	vertical-align: top;
+}
 .login p {
 	text-align: center;
 }
@@ -3803,6 +3818,9 @@ dl.no_members {
 	float: left;
 	margin: 6px 0 0 0;
 	width: 49%;
+}
+.register_form img {
+	vertical-align: middle;
 }
 #confirm_buttons {
 	padding: 12px 0;
@@ -3839,6 +3857,10 @@ dl.no_members {
 }
 #admin_login {
 	padding: 12px;
+}
+#admin_login img {
+	vertical-align: middle;
+	padding: 2px;
 }
 
 /*	$BOXES		*/
@@ -4399,9 +4421,6 @@ dl.no_members {
 		float: none;
 		width: 100%;
 	}
-	.login {
-		width: 100%;
-	}
 	.views_text, .nextlinks {
 		display: none !important;
 	}
@@ -4428,7 +4447,7 @@ dl.no_members {
 		left: -4px;
 	}
 	.listlevel2, .listlevel3 {
-		max-width: 14em !important;
+		max-width: 10em !important;
 	}
 	.menulevel2 {
 		max-width: 11em;

@@ -528,7 +528,7 @@
 					$this.off('.superclick');
 					// clear animation's inline display style
 					$liHasUl.children('ul').attr('style', function(i, style){
-						return style.replace(/display[^;]+;?/g, '');
+						return (typeof style !== 'undefined') ? style.replace(/display[^;]+;?/g, '') : '';
 					});
 					// reset 'current' path classes
 					o.$path.removeClass(o.activeClass + ' ' + c.bcClass).addClass(o.pathClass);

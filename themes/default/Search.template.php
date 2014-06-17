@@ -135,7 +135,7 @@ function template_searchform()
 		if (empty($context['search_params']['topic']))
 		{
 			echo '
-					<fieldset class="content">';
+					<fieldset id="pick_boards" class="content">';
 
 			template_pick_boards('searchform');
 
