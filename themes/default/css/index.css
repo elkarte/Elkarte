@@ -3486,6 +3486,9 @@ div.labels {
 	opacity: 0.8;
 	cursor: help;
 }
+.hdicon.help:before {
+	margin: 2px 0;
+}
 .help .icon:hover, .hdicon.help:hover {
 	opacity: 1;
 }
