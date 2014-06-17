@@ -145,7 +145,9 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 			$is_not = substr($real_type, 0, 4) == 'not_';
 			$type = $is_not ? substr($real_type, 4) : $real_type;
 
-			if (in_array($type, array('id_member', 'id_attach', 'id_msg')))
+			// @todo the !empty($restriction) is a trick to override the checks on $_POST['attach_del'] in Post.controller
+			// In theory it should not be necessary
+			if (in_array($type, array('id_member', 'id_attach', 'id_msg')) && !empty($restriction))
 				$new_condition[] = 'a.' . $type . ($is_not ? ' NOT' : '') . ' IN (' . (is_array($restriction) ? '{array_int:' . $real_type . '}' : '{int:' . $real_type . '}') . ')';
 			elseif ($type == 'attachment_type')
 				$new_condition[] = 'a.attachment_type = {int:' . $real_type . '}';

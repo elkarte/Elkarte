@@ -570,10 +570,7 @@ class Admin_Controller extends Action_Controller
 		// Any files to include for administration?
 		call_integration_include_hook('integrate_admin_include');
 
-		$menuOptions = array('default_include_dir' => ADMINDIR);
-
-		// Let them add Admin areas easily.
-		call_integration_hook('integrate_admin_areas', array(&$admin_areas, &$menuOptions));
+		$menuOptions = array('hook' => 'admin', 'default_include_dir' => ADMINDIR);
 
 		// Actually create the menu!
 		$admin_include_data = createMenu($admin_areas, $menuOptions);
