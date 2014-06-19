@@ -51,7 +51,7 @@ function countUserMentions($all = false, $type = '', $id_member = null)
 	$db->free_result($request);
 
 	// Counts as maintenance! :P
-	if ($all === true && empty($type))
+	if ($all === false && empty($type))
 		updateMemberdata($id_member, array('mentions' => $counts[$id_member]));
 
 	return $counts[$id_member];
