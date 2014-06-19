@@ -338,16 +338,6 @@ class Display_Controller
 		$context['moderators'] = &$board_info['moderators'];
 		$context['link_moderators'] = array();
 
-		if (!empty($board_info['moderators']))
-		{
-			// Add a link for each moderator...
-			foreach ($board_info['moderators'] as $mod)
-				$context['link_moderators'][] = '<a href="' . $scripturl . '?action=profile;u=' . $mod['id'] . '" title="' . $txt['board_moderator'] . '">' . $mod['name'] . '</a>';
-
-			// And show it after the board's name.
-			$context['linktree'][count($context['linktree']) - 2]['extra_after'] = '<span class="board_moderators"> (' . (count($context['link_moderators']) == 1 ? $txt['moderator'] : $txt['moderators']) . ': ' . implode(', ', $context['link_moderators']) . ')</span>';
-		}
-
 		// Information about the current topic...
 		$context['is_locked'] = $topicinfo['locked'];
 		$context['is_sticky'] = $topicinfo['is_sticky'];

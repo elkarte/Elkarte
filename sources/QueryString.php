@@ -218,6 +218,20 @@ function expandIPv6($addr, $strict_check = true)
 		$part[1] = explode(':', $part[1]);
 		$missing = array();
 
+		// Looks like this is an IPv4 address
+		if (strpos($part[1][1], '.') !== false)
+		{
+			$ipoct = explode('.', $part[1][1]);
+			$p1 = dechex($ipoct[0]) . dechex($ipoct[1]);
+			$p2 = dechex($ipoct[2]) . dechex($ipoct[3]);
+
+			$part[1] = array(
+				$part[1][0],
+				$p1,
+				$p2
+			);
+		}
+
 		$limit = count($part[0]) + count($part[1]);
 		for ($i = 0; $i < (8 - $limit); $i++)
 			array_push($missing, '0000');

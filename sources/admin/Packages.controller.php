@@ -1036,6 +1036,8 @@ class Packages_Controller extends Action_Controller
 				$table_log = $table_installer->package_log();
 				if (!empty($old_db_changes))
 					$db_package_log = empty($table_log) ? $old_db_changes : array_merge($old_db_changes, $table_log);
+				else
+					$db_package_log = $table_log;
 
 				// If there are some database changes we might want to remove then filter them out.
 				if (!empty($db_package_log))

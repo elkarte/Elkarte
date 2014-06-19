@@ -789,7 +789,7 @@ class Post_Controller extends Action_Controller
 		elseif (isset($_REQUEST['msg']))
 			$context['page_title'] = $txt['modify_msg'];
 		elseif (isset($_REQUEST['subject'], $context['preview_subject']))
-			$context['page_title'] = $txt['preview'] . ' - ' . strip_tags($context['preview_subject']);
+			$context['page_title'] = $txt['post_reply'];
 		elseif (empty($topic))
 			$context['page_title'] = $txt['start_new_topic'];
 		else

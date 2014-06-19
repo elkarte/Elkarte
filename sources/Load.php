@@ -2702,8 +2702,8 @@ function determineAvatar($profile)
 	// If we're always html resizing, assume it's too large.
 	if ($modSettings['avatar_action_too_large'] == 'option_html_resize' || $modSettings['avatar_action_too_large'] == 'option_js_resize')
 	{
-		$max_avatar_width = !empty($modSettings['avatar_max_width_external']) ? ' width:' . $modSettings['avatar_max_width_external'] . 'px;' : '';
-		$max_avatar_height = !empty($modSettings['avatar_max_height_external']) ? ' height:' . $modSettings['avatar_max_height_external'] . 'px;' : '';
+		$max_avatar_width = !empty($modSettings['avatar_max_width_external']) ? ' max-width:' . $modSettings['avatar_max_width_external'] . 'px;' : '';
+		$max_avatar_height = !empty($modSettings['avatar_max_height_external']) ? ' max-height:' . $modSettings['avatar_max_height_external'] . 'px;' : '';
 	}
 	else
 	{

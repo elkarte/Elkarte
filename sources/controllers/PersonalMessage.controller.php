@@ -2357,13 +2357,11 @@ function messageIndexBar($area)
 	// Set a few options for the menu.
 	$menuOptions = array(
 		'current_area' => $area,
+		'hook' => 'pm',
 		'disable_url_session_check' => true,
 		'counters' => !empty($label_counters) ? $label_counters : 0,
 		'default_include_dir' => CONTROLLERDIR,
 	);
-
-	// Let them modify PM areas easily.
-	call_integration_hook('integrate_pm_areas', array(&$pm_areas, &$menuOptions));
 
 	// Actually create the menu!
 	$pm_include_data = createMenu($pm_areas, $menuOptions);
