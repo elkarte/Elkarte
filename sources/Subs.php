@@ -1195,18 +1195,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			'ftp',
 			'email',
 		);
-
-		// Let addons add new BBC without hassle.
-		call_integration_hook('integrate_bbc_codes', array(&$codes, &$no_autolink_tags));
-
-		// This is mainly for the bbc manager, so it's easy to add tags above.  Custom BBC should be added above this line.
-		if ($message === false)
-		{
-			if (isset($temp_bbc))
-				$bbc_codes = $temp_bbc;
-			return $codes;
-		}
-
 		// So the parser won't skip them.
 		$itemcodes = array(
 			'*' => 'disc',
@@ -1218,6 +1206,18 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			'o' => 'circle',
 			'O' => 'circle',
 		);
+
+		// Let addons add new BBC without hassle.
+		call_integration_hook('integrate_bbc_codes', array(&$codes, &$no_autolink_tags, &$itemcodes));
+
+		// This is mainly for the bbc manager, so it's easy to add tags above.  Custom BBC should be added above this line.
+		if ($message === false)
+		{
+			if (isset($temp_bbc))
+				$bbc_codes = $temp_bbc;
+			return $codes;
+		}
+
 		if (!isset($disabled['li']) && !isset($disabled['list']))
 		{
 			foreach ($itemcodes as $c => $dummy)

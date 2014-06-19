@@ -1111,6 +1111,23 @@ a.active {
 	background: red;
 }
 
+/* Profile colors */
+.activity_stats li span {
+	border: solid #555;
+	border-width: 1px 1px 1px 1px;
+	border-right: none;
+	border-left: none;
+	background: #eee;
+}
+.activity_stats li .bar {
+	border: 1px solid #ccc;
+	border-bottom: none;
+	background: #fff;
+}
+.activity_stats li .bar div {
+	background: #43a8da;
+}
+
 /*	$HELP		*/
 /* ------------------------------------------------------- */
 

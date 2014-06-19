@@ -798,7 +798,6 @@ div.bbc_footnotes .meaction{
 	border-top: 1px solid #ccc;
 	border-right: 0.2em solid #ccc;
 	border-bottom: 1px solid #ccc;
-	border-radius: 2px 0 0 2px;
 }
 .linktree, .linktree_last .linktree * {
 	line-height: 2.154em;

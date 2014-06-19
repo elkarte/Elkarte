@@ -186,7 +186,7 @@ $txt['error_utf8_version'] = 'The current version of your database doesn\'t supp
 $txt['error_valid_email_needed'] = 'You have not entered a valid email address.';
 $txt['error_already_installed'] = 'The installer has detected that you already have ElkArte installed. It is strongly advised that you do <strong>not</strong> try to overwrite an existing installation - continuing with installation <strong>may result in the loss or corruption of existing data</strong>.<br /><br />If you wish to upgrade please visit the <a href="http://www.elkarte.net/" target="_blank" class="new_win">ElkArte Community Website</a> and download the latest <em>upgrade</em> package.<br /><br />If you wish to overwrite your existing installation, including all data, it\'s recommended that you delete the existing database tables and replace Settings.php and try again.';
 $txt['error_warning_notice'] = 'Warning!';
-$txt['error_script_outdated'] = 'This install script is out of date! The current version of ElkArte is %1$s but this install script is for %2$s.<br /><br />
+$txt['error_script_outdated'] = 'This install script is out of date! The current version of ElkArte is %1$s but this install script is for %2$s.<br />
 	It is recommended that you visit the <a href="http://www.elkarte.net/" target="_blank" class="new_win">ElkArte</a> website to ensure you are installing the latest version.';
 $txt['error_db_filename'] = 'You must enter a name for the database file name for SQLite.';
 $txt['error_db_prefix_numeric'] = 'The selected database type does not support the use of numeric prefixes.';
