@@ -2574,7 +2574,7 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('mentions_enabled', '
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('mentions_buddy', '0');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('mentions_dont_notify_rlike', '0');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_enabled', '0');
-INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_logging', '0');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_logging', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_ip_wl', 'a:3:{i:2;s:10:"10.0.0.0/8";i:5;s:13:"172.16.0.0/12";i:6;s:14:"192.168.0.0/16";}');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_ip_wl_desc', 'a:3:{i:2;s:18:"RFC 1918 addresses";i:5;s:18:"RFC 1918 addresses";i:6;s:18:"RFC 1918 addresses";}');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_url_wl', 'a:1:{i:0;s:18:"/subscriptions.php";}');
