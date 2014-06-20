@@ -63,26 +63,15 @@ class Cache
 	 * Initialize the class, defines the options and the caching method to use
 	 * @var string
 	 */
-	public function __construct()
+	public function __construct($enabled, $accelerator, $options)
 	{
-		global $cache_accelerator, $cache_enable, $cache_uid, $cache_password;
-
-		$this->_cache_enable = (int) $cache_enable;
+		$this->_cache_enable = (int) $enabled;
 
 		// If the cache is disabled just go out
 		if (!$this->_cache_enable)
 			return;
 
-		if (empty($cache_accelerator))
-			$cache_accelerator = 'filebased';
-
-		if ($cache_accelerator == 'xcache')
-		{
-			$this->_options = array(
-				'cache_uid' => $cache_uid,
-				'cache_password' => $cache_password,
-			);
-		}
+		$this->_options = $options;
 
 		$methods = array(
 			'memcached' => array(
@@ -310,25 +299,29 @@ class Cache
 		// This will let anyone add new caching methods very easily
 		call_integration_hook('integrate_init_cache', array(&$methods));
 
-		if (isset($methods[$cache_accelerator]))
+		if (empty($accelerator) || !isset($methods[$accelerator]))
+			$accelerator = 'filebased';
+
+		if (isset($methods[$accelerator]))
 		{
-			$init = $methods[$cache_accelerator]['init']($this->_options);
+			$init = $methods[$accelerator]['init']($this->_options);
 
 			// Three can be the results.
 			// true: everything is fine, let's use the method
 			if ($init === true)
-				$this->_method = $methods[$cache_accelerator];
+				$this->_method = $methods[$accelerator];
 			// an array: means the method works and we have settings
 			elseif (is_array($init))
 			{
 				$this->_options = array_merge($this->_options, $init);
-				$this->_method = $methods[$cache_accelerator];
+				$this->_method = $methods[$accelerator];
 			}
 			// false: this is bad, the method failed! Too bad, we can't use it
 			// @todo: test for file based?
 			else
 				$this->_cache_enable = false;
 		}
+
 		$this->_key_prefix = $this->_build_prefix();
 	}
 
@@ -518,7 +511,20 @@ class Cache
 	public static function instance()
 	{
 		if (self::$_instance === null)
-			self::$_instance = new Cache();
+		{
+			global $cache_accelerator, $cache_enable, $cache_uid, $cache_password;
+
+			$options = array();
+			if ($cache_accelerator == 'xcache')
+			{
+				$options = array(
+					'cache_uid' => $cache_uid,
+					'cache_password' => $cache_password,
+				);
+			}
+
+			self::$_instance = new Cache($cache_enable, $cache_accelerator, $options);
+		}
 
 		return self::$_instance;
 	}
