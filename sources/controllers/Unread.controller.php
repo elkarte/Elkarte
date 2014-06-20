@@ -70,7 +70,7 @@ class Unread_Controller extends Action_Controller
 		$context['start'] = (int) $_REQUEST['start'];
 		$context['topics_per_page'] = (int) (empty($modSettings['disableCustomPerPage']) && !empty($options['topics_per_page']) ? $options['topics_per_page'] : $modSettings['defaultMaxTopics']);
 
-		$this->_grabber = new Unread_Class($user_info['id'], $modSettings['postmod_active'], $modSettings['enable_unwatch'], $context['showing_all_topics']);
+		$this->_grabber = new Unread($user_info['id'], $modSettings['postmod_active'], $modSettings['enable_unwatch'], $context['showing_all_topics']);
 
 		if ($this->_action_unread)
 			$context['page_title'] = $context['showing_all_topics'] ? $txt['unread_topics_all'] : $txt['unread_topics_visit'];
@@ -144,7 +144,7 @@ class Unread_Controller extends Action_Controller
 	{
 		global $context, $modSettings, $settings;
 
-		$this->_grabber->setAction(Unread_Class::UNREAD);
+		$this->_grabber->setAction(Unread::UNREAD);
 
 		$this->_grabber->setEarliestMsg($context['showing_all_topics'] ? earliest_msg() : 0);
 
@@ -201,7 +201,7 @@ class Unread_Controller extends Action_Controller
 	{
 		global $scripturl, $context, $modSettings, $settings;
 
-		$this->_grabber->setAction(Unread_Class::UNREADREPLIES);
+		$this->_grabber->setAction(Unread::UNREADREPLIES);
 
 		if ($modSettings['totalMessages'] > 100000)
 			$this->_grabber->createTempTable();

@@ -1370,7 +1370,7 @@ function createSalvageArea()
  */
 function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0, $force = false)
 {
-	global $context, $txt, $time_start, $db_temp_cache, $db_cache;
+	global $context, $txt, $time_start, $db_temp_cache, $db_show_debug;
 
 	// More time, I need more time!
 	@set_time_limit(600);
@@ -1382,8 +1382,8 @@ function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0
 		return;
 
 	// Restore the query cache if interested.
-	if (!empty($db_temp_cache))
-		$db_cache = $db_temp_cache;
+	if ($db_show_debug === true)
+		Debug::get()->on();
 
 	$context['continue_get_data'] = '?action=admin;area=repairboards' . (isset($_GET['fixErrors']) ? ';fixErrors' : '') . ';step=' . $_GET['step'] . ';substep=' . $_GET['substep'] . ';' . $context['session_var'] . '=' . $context['session_id'];
 	$context['page_title'] = $txt['not_done_title'];
@@ -1423,7 +1423,7 @@ function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0
  */
 function findForumErrors($do_fix = false)
 {
-	global $context, $txt, $errorTests, $db_cache, $db_temp_cache;
+	global $context, $txt, $errorTests, $db_show_debug, $db_temp_cache;
 
 	$db = database();
 
@@ -1437,8 +1437,8 @@ function findForumErrors($do_fix = false)
 	$_GET['substep'] = empty($_GET['substep']) ? 0 : (int) $_GET['substep'];
 
 	// Don't allow the cache to get too full.
-	$db_temp_cache = $db_cache;
-	$db_cache = '';
+	if ($db_show_debug === true)
+		Debug::get()->off();
 
 	$context['total_steps'] = count($errorTests);
 
@@ -1594,8 +1594,6 @@ function findForumErrors($do_fix = false)
 
 			// Free the result.
 			$db->free_result($request);
-			// Keep memory down.
-			$db_cache = '';
 
 			// Are we done yet?
 			if (isset($test['substeps']))
@@ -1634,9 +1632,6 @@ function findForumErrors($do_fix = false)
 		// Are we done?
 		pauseRepairProcess($to_fix, $error_type);
 	}
-
-	// Restore the cache.
-	$db_cache = $db_temp_cache;
 
 	return $to_fix;
 }

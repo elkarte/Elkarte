@@ -878,7 +878,8 @@ $txt['badbehavior_blocked'] = '<a href="http://www.bad-behavior.ioerror.us/">Bad
 
 // Debug related - when $db_show_debug is true.
 $txt['debug_templates'] = 'Templates: ';
-$txt['debug_subtemplates'] = 'Sub templates: ';
+$txt['debug_subtemplates'] = 'Sub templates: '; // @deprecated since 1.1
+$txt['debug_sub_templates'] = 'Sub templates: ';
 $txt['debug_language_files'] = 'Language files: ';
 $txt['debug_stylesheets'] = 'Style sheets: ';
 $txt['debug_javascript'] = 'Scripts: ';

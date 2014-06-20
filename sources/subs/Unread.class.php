@@ -23,7 +23,7 @@ if (!defined('ELK'))
 /**
  * Unread posts and replies Controller
  */
-class Unread_Class
+class Unread
 {
 	const UNREAD = 0;
 	const UNREADREPLIES = 1;
@@ -94,7 +94,7 @@ class Unread_Class
 	/**
 	 * The action the user is performing
 	 *
-	 * @param int $action - Unread_Class::UNREAD, Unread_Class::UNREADREPLIES
+	 * @param int $action - Unread::UNREAD, Unread::UNREADREPLIES
 	 */
 	public function setAction($action)
 	{

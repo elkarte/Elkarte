@@ -1850,7 +1850,7 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 	if ($loaded)
 	{
 		if ($db_show_debug === true)
-			$context['debug']['templates'][] = $template_name . ' (' . basename($template_dir) . ')';
+			Debug::get()->add('templates', $template_name . ' (' . basename($template_dir) . ')');
 
 		// If they have specified an initialization function for this template, go ahead and call it now.
 		if (function_exists('template_' . $template_name . '_init'))
@@ -1899,7 +1899,7 @@ function loadSubTemplate($sub_template_name, $fatal = false)
 	global $context, $txt, $db_show_debug;
 
 	if ($db_show_debug === true)
-		$context['debug']['sub_templates'][] = $sub_template_name;
+		Debug::get()->add('sub_templates', $sub_template_name);
 
 	// Figure out what the template function is named.
 	$theme_function = 'template_' . $sub_template_name;
@@ -2094,7 +2094,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 				$this_build[$this_id] = $context[$params['index_name']][$this_id] = array('filename' => $filename, 'options' => $params);
 
 				if ($db_show_debug === true)
-					$context['debug'][$params['debug_index']][] = $params['basename'] . '(' . (!empty($params['local']) ? (!empty($params['url']) ? basename($params['url']) : basename($params['dir'])) : '') . ')';
+					Debug::get()->add($params['debug_index'], $params['basename'] . '(' . (!empty($params['local']) ? (!empty($params['url']) ? basename($params['url']) : basename($params['dir'])) : '') . ')');
 			}
 
 			// Save it so we don't have to build this so often
@@ -2240,7 +2240,7 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 
 	// Keep track of what we're up to soldier.
 	if ($db_show_debug === true)
-		$context['debug']['language_files'][] = $template_name . '.' . $lang . ' (' . $theme_name . ')';
+		Debug::get()->add('language_files', $template_name . '.' . $lang . ' (' . $theme_name . ')');
 
 	// Remember what we have loaded, and in which language.
 	$already_loaded[$template_name] = $lang;

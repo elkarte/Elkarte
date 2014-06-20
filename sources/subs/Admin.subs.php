@@ -238,6 +238,7 @@ function getFileVersions(&$versionOptions)
 	readFileVersions($version_info, $directories, 'template.php');
 
 	// Load up all the files in the default language directory and sort by language.
+	// @todo merge this loop into readFileVersions
 	$this_dir = dir($lang_dir);
 	while ($path = $this_dir->read())
 	{
@@ -264,7 +265,7 @@ function getFileVersions(&$versionOptions)
 						$version_info['default_language_versions'][$language][$name] = $match[1];
 					// It wasn't found, but the file was... show a '??'.
 					else
-						$version_info['default_language_versions'][$language][$name] = $unknown_version;
+						$version_info['default_language_versions'][$language][$name] = '??';
 				}
 			}
 		}

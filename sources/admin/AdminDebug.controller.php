@@ -50,16 +50,17 @@ class AdminDebug_Controller extends Action_Controller
 		global $context, $db_show_debug;
 
 		// We should have debug mode enabled, as well as something to display!
-		if (!isset($db_show_debug) || $db_show_debug !== true || !isset($_SESSION['debug']))
+		if ($db_show_debug !== true || !isset($_SESSION['debug']))
 			fatal_lang_error('no_access', false);
 
 		// Don't allow except for administrators.
 		isAllowedTo('admin_forum');
 
+		$debug = Debug::get();
 		// If we're just hiding/showing, do it now.
 		if (isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'hide')
 		{
-			$_SESSION['view_queries'] = $_SESSION['view_queries'] == 1 ? 0 : 1;
+			$debug->toggleViewQueries();
 
 			if (strpos($_SESSION['old_url'], 'action=viewquery') !== false)
 				redirectexit();
@@ -75,26 +76,15 @@ class AdminDebug_Controller extends Action_Controller
 		$layers->add('html');
 		loadTemplate('Admin');
 
-		$query_analysis = new Query_Analysis();
-
 		$context['sub_template'] = 'viewquery';
-		$context['queries_data'] = array();
-
-		foreach ($_SESSION['debug'] as $q => $query_data)
-		{
-			$context['queries_data'][$q] = $query_analysis->extractInfo($query_data);
-
-			// Explain the query.
-			if ($query_id == $q && $context['queries_data'][$q]['is_select'])
-			{
-				$context['queries_data'][$q]['explain'] = $query_analysis->doExplain();
-			}
-		}
+		$context['queries_data'] = $debug->viewQueries($query_id);
 	}
 
 	/**
 	 * Get admin information from the database.
 	 * Accessed by ?action=viewadminfile.
+	 *
+	 * @todo candidate for removal I think
 	 */
 	public function action_viewadminfile()
 	{
