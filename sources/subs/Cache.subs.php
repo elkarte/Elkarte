@@ -83,7 +83,7 @@ function cache_get_data($key, $ttl = 120)
 /**
  * @deprecated since 1.1 - the function has been moved to Cache.class.php
  */
-if (!function_exists('get_memcached_server'))
+if (!function_exists('get_memcached_server') && defined('SUBSDIR'))
 	require_once(SUBSDIR . '/Cache.class.php');
 
 /**
