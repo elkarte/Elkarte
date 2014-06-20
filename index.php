@@ -24,14 +24,7 @@ $forum_version = 'ElkArte 1.0 RC 2';
 // First things first, but not necessarily in that order.
 define('ELK', 1);
 
-// Shortcut for the browser cache stale
-define('CACHE_STALE', '?10RC1');
-
-if (function_exists('set_magic_quotes_runtime'))
-	@set_magic_quotes_runtime(0);
 error_reporting(E_ALL | E_STRICT);
-$time_start = microtime(true);
-$db_show_debug = false;
 
 // Directional only script time usage for display
 if (function_exists('getrusage'))
@@ -42,7 +35,15 @@ else
 // Turn on output buffering.
 ob_start();
 
-// We don't need no globals.
+if (function_exists('set_magic_quotes_runtime'))
+	@set_magic_quotes_runtime(0);
+$time_start = microtime(true);
+$db_show_debug = false;
+
+// Shortcut for the browser cache stale
+define('CACHE_STALE', '?10RC1');
+
+// We don't need no globals. (a bug in "old" versions of PHP)
 foreach (array('db_character_set', 'cachedir') as $variable)
 	if (isset($GLOBALS[$variable]))
 		unset($GLOBALS[$variable], $GLOBALS[$variable]);
@@ -51,7 +52,7 @@ foreach (array('db_character_set', 'cachedir') as $variable)
 if (file_exists(dirname(__FILE__) . '/install'))
 	header('Location: http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on' ? 's' : '') . '://' . (empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST']) . (strtr(dirname($_SERVER['PHP_SELF']), '\\', '/') == '/' ? '' : strtr(dirname($_SERVER['PHP_SELF']), '\\', '/')) . '/install/install.php');
 
-// Ready to load the site settings.
+// Get the forum's settings for database and file paths.
 require_once(dirname(__FILE__) . '/Settings.php');
 
 // Make sure the paths are correct... at least try to fix them.
