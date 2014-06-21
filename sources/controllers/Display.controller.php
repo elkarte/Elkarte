@@ -76,6 +76,7 @@ class Display_Controller
 		$context['messages_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
 		$template_layers = Template_Layers::getInstance();
 		$template_layers->addEnd('messages_informations');
+		$includeUnapproved = !$modSettings['postmod_active'] || allowedTo('approve_posts');
 
 		// Let's do some work on what to search index.
 		if (count($_GET) > 2)
@@ -96,7 +97,6 @@ class Display_Controller
 			// No use in calculating the next topic if there's only one.
 			if ($board_info['num_topics'] > 1)
 			{
-				$includeUnapproved = (!$modSettings['postmod_active'] || allowedTo('approve_posts'));
 				$includeStickies = !empty($modSettings['enableStickyTopics']);
 				$topic = $_REQUEST['prev_next'] === 'prev' ? previousTopic($topic, $board, $user_info['id'], $includeUnapproved, $includeStickies) : nextTopic($topic, $board, $user_info['id'], $includeUnapproved, $includeStickies);
 				$context['current_topic'] = $topic;
@@ -155,7 +155,6 @@ class Display_Controller
 			$context['real_num_replies'] += $topicinfo['unapproved_posts'] - ($topicinfo['approved'] ? 0 : 1);
 
 		// If this topic has unapproved posts, we need to work out how many posts the user can see, for page indexing.
-		$includeUnapproved = !$modSettings['postmod_active'] || allowedTo('approve_posts');
 		if (!empty($topicinfo['derived_from']))
 		{
 			require_once(SUBSDIR . '/FollowUps.subs.php');
