@@ -37,6 +37,12 @@ abstract class Database_Abstract implements Database
 	protected $_query_count = 0;
 
 	/**
+	 * Yet another way to skip a database error
+	 * @var resource
+	 */
+	protected $_skip_error = false;
+
+	/**
 	 * Private constructor.
 	 */
 	protected function __construct()
@@ -298,5 +304,13 @@ abstract class Database_Abstract implements Database
 	function num_queries()
 	{
 		return $this->_query_count;
+	}
+
+	/**
+	 * Sets the class not to return the error in case of failures.
+	 */
+	public function skip_error()
+	{
+		$this->_skip_error = true;
 	}
 }
