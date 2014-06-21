@@ -138,6 +138,11 @@ interface Database
 	public function error($db_string, $connection = null);
 
 	/**
+	 * Sets the class not to return the error in case of failures.
+	 */
+	public function skip_error();
+
+	/**
 	 * Insert data.
 	 *
 	 * @param string $method - options 'replace', 'ignore', 'insert'
@@ -232,4 +237,11 @@ interface Database
 	 * @param resource|null $connection = null
 	 */
 	public function select_db($dbName = null, $connection = null);
+
+	/**
+	 * Finds out if the connection is still valid.
+	 *
+	 * @param resource|object|null $connection = null
+	 */
+	protected function _validConnection($connection = null);
 }

@@ -25,19 +25,13 @@ if (!defined('DB_TYPE'))
 /**
  * PostgreSQL database class, implements database class to control mysql functions
  */
-class Database_PostgreSQL implements Database
+class Database_PostgreSQL extends Database_Abstract
 {
 	/**
 	 * Holds current instance of the class
 	 * @var Database_PostgreSQL
 	 */
 	private static $_db = null;
-
-	/**
-	 * Current connetcion to the database
-	 * @var resource
-	 */
-	private $_connection = null;
 
 	/**
 	 * Holds last query result
@@ -57,20 +51,6 @@ class Database_PostgreSQL implements Database
 	 * @var boolean
 	 */
 	private $_in_transaction = false;
-
-	/**
-	 * Number of queries run (may include queries from $_SESSION if is a redirect)
-	 * @var resource
-	 */
-	private $_query_count = 0;
-
-	/**
-	 * Private constructor.
-	 */
-	private function __construct()
-	{
-		// Objects should be created through initiate().
-	}
 
 	/**
 	 * Initializes a database connection.
@@ -127,147 +107,6 @@ class Database_PostgreSQL implements Database
 	public function fix_prefix($db_prefix, $db_name)
 	{
 		return $db_prefix;
-	}
-
-	/**
-	 * Callback for preg_replace_callback on the query.
-	 * It allows to replace on the fly a few pre-defined strings, for
-	 * convenience ('query_see_board', 'query_wanna_see_board'), with
-	 * their current values from $user_info.
-	 * In addition, it performs checks and sanitization on the values
-	 * sent to the database.
-	 *
-	 * @param mixed[] $matches
-	 */
-	public function replacement__callback($matches)
-	{
-		global $db_callback, $user_info, $db_prefix;
-
-		list ($values, $connection) = $db_callback;
-
-		// Connection gone?
-		if (!is_resource($connection))
-			display_db_error();
-
-		if ($matches[1] === 'db_prefix')
-			return $db_prefix;
-
-		if ($matches[1] === 'query_see_board')
-			return $user_info['query_see_board'];
-
-		if ($matches[1] === 'query_wanna_see_board')
-			return $user_info['query_wanna_see_board'];
-
-		if (!isset($matches[2]))
-			$this->error_backtrace('Invalid value inserted or no type specified.', '', E_USER_ERROR, __FILE__, __LINE__);
-
-		if (!isset($values[$matches[2]]))
-			$this->error_backtrace('The database value you\'re trying to insert does not exist: ' . htmlspecialchars($matches[2], ENT_COMPAT, 'UTF-8'), '', E_USER_ERROR, __FILE__, __LINE__);
-
-		$replacement = $values[$matches[2]];
-
-		switch ($matches[1])
-		{
-			case 'int':
-				if (!is_numeric($replacement) || (string) $replacement !== (string) (int) $replacement)
-					$this->error_backtrace('Wrong value type sent to the database. Integer expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-				return (string) (int) $replacement;
-			break;
-
-			case 'string':
-			case 'text':
-				return sprintf('\'%1$s\'', pg_escape_string($replacement));
-			break;
-
-			case 'array_int':
-				if (is_array($replacement))
-				{
-					if (empty($replacement))
-						$this->error_backtrace('Database error, given array of integer values is empty. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-
-					foreach ($replacement as $key => $value)
-					{
-						if (!is_numeric($value) || (string) $value !== (string) (int) $value)
-							$this->error_backtrace('Wrong value type sent to the database. Array of integers expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-
-						$replacement[$key] = (string) (int) $value;
-					}
-
-					return implode(', ', $replacement);
-				}
-				else
-					$this->error_backtrace('Wrong value type sent to the database. Array of integers expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-
-			break;
-
-			case 'array_string':
-				if (is_array($replacement))
-				{
-					if (empty($replacement))
-						$this->error_backtrace('Database error, given array of string values is empty. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-
-					foreach ($replacement as $key => $value)
-						$replacement[$key] = sprintf('\'%1$s\'', pg_escape_string($value));
-
-					return implode(', ', $replacement);
-				}
-				else
-					$this->error_backtrace('Wrong value type sent to the database. Array of strings expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-			break;
-
-			case 'date':
-				if (preg_match('~^(\d{4})-([0-1]?\d)-([0-3]?\d)$~', $replacement, $date_matches) === 1)
-					return sprintf('\'%04d-%02d-%02d\'', $date_matches[1], $date_matches[2], $date_matches[3]);
-				else
-					$this->error_backtrace('Wrong value type sent to the database. Date expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-			break;
-
-			case 'float':
-				if (!is_numeric($replacement))
-					$this->error_backtrace('Wrong value type sent to the database. Floating point number expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-				return (string) (float) $replacement;
-			break;
-
-			case 'identifier':
-				return '`' . strtr($replacement, array('`' => '', '.' => '')) . '`';
-			break;
-
-			case 'raw':
-				return $replacement;
-			break;
-
-			default:
-				$this->error_backtrace('Undefined type used in the database query. (' . $matches[1] . ':' . $matches[2] . ')', '', false, __FILE__, __LINE__);
-			break;
-		}
-	}
-
-	/**
-	 * This function works like $this->query(), escapes and quotes a string,
-	 * but it doesn't execute the query.
-	 *
-	 * @param string $db_string
-	 * @param string $db_values
-	 * @param resource|null $connection
-	 */
-	public function quote($db_string, $db_values, $connection = null)
-	{
-		global $db_callback;
-
-		// Only bother if there's something to replace.
-		if (strpos($db_string, '{') !== false)
-		{
-			// This is needed by the callback function.
-			$db_callback = array($db_values, $connection === null ? $this->_connection : $connection);
-
-			// Do the quoting and escaping
-			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', array($this, 'replacement__callback'), $db_string);
-
-			// Clear this global variable.
-			$db_callback = array();
-		}
-
-		return $db_string;
 	}
 
 	/**
@@ -396,9 +235,8 @@ class Database_PostgreSQL implements Database
 				$_SESSION['debug_redirect'] = array();
 			}
 
-			$st = microtime(true);
-
 			// Don't overload it.
+			$st = microtime(true);
 			$db_cache['q'] = $this->_query_count < 50 ? $db_string : '...';
 			$db_cache['f'] = $file;
 			$db_cache['l'] = $line;
@@ -672,9 +510,7 @@ class Database_PostgreSQL implements Database
 			$context['error_message'] .= '<br /><br />' . sprintf($txt['database_error_versions'], $modSettings['elkVersion']);
 
 		if (allowedTo('admin_forum') && $db_show_debug === true)
-		{
 			$context['error_message'] .= '<br /><br />' . nl2br($db_string);
-		}
 
 		// It's already been logged... don't log it again.
 		fatal_error($context['error_message'], false);
@@ -697,9 +533,11 @@ class Database_PostgreSQL implements Database
 
 		$connection = $connection === null ? $this->_connection : $connection;
 
+		// With nothing to insert, simply return.
 		if (empty($data))
 			return;
 
+		// Inserting data as a single row can be done as a single array.
 		if (!is_array($data[array_rand($data)]))
 			$data = array($data);
 
@@ -795,79 +633,6 @@ class Database_PostgreSQL implements Database
 	}
 
 	/**
-	 * This function tries to work out additional error information from a back trace.
-	 *
-	 * @param string $error_message
-	 * @param string $log_message
-	 * @param string|boolean $error_type
-	 * @param string|null $file
-	 * @param integer|null $line
-	 */
-	public function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null)
-	{
-		if (empty($log_message))
-			$log_message = $error_message;
-
-		foreach (debug_backtrace() as $step)
-		{
-			// Found it?
-			if (!method_exists($this, $step['function']) && !in_array(substr($step['function'], 0, 7), array('elk_db_', 'preg_re', 'db_erro', 'call_us')))
-			{
-				$log_message .= '<br />Function: ' . $step['function'];
-				break;
-			}
-
-			if (isset($step['line']))
-			{
-				$file = $step['file'];
-				$line = $step['line'];
-			}
-		}
-
-		// A special case - we want the file and line numbers for debugging.
-		if ($error_type == 'return')
-			return array($file, $line);
-
-		// Is always a critical error.
-		if (function_exists('log_error'))
-			log_error($log_message, 'critical', $file, $line);
-
-		if (function_exists('fatal_error'))
-		{
-			fatal_error($error_message, $error_type);
-
-			// Cannot continue...
-			exit;
-		}
-		elseif ($error_type)
-			trigger_error($error_message . ($line !== null ? '<em>(' . basename($file) . '-' . $line . ')</em>' : ''), $error_type);
-		else
-			trigger_error($error_message . ($line !== null ? '<em>(' . basename($file) . '-' . $line . ')</em>' : ''));
-	}
-
-	/**
-	 * Escape the LIKE wildcards so that they match the character and not the wildcard.
-	 *
-	 * @param string $string
-	 * @param bool $translate_human_wildcards = false, if true, turns human readable wildcards into SQL wildcards.
-	 */
-	public function escape_wildcard_string($string, $translate_human_wildcards = false)
-	{
-		$replacements = array(
-			'%' => '\%',
-			'_' => '\_',
-			'\\' => '\\\\',
-		);
-
-		if ($translate_human_wildcards)
-			$replacements += array(
-				'*' => '%',
-			);
-
-		return strtr($string, $replacements);
-	}
-
-	/**
 	 * Unescape an escaped string!
 	 *
 	 * @param string $string
@@ -908,6 +673,7 @@ class Database_PostgreSQL implements Database
 			$start = 0;
 		}
 
+		$data = '';
 		$tableName = str_replace('{db_prefix}', $db_prefix, $tableName);
 
 		// This will be handy...
@@ -935,8 +701,7 @@ class Database_PostgreSQL implements Database
 		}
 
 		// Start it off with the basic INSERT INTO.
-		$data = '';
-		$insert_msg = $crlf . 'INSERT INTO ' . $tableName . $crlf . "\t" . '(' . implode(', ', $fields) . ')' . $crlf . 'VALUES ' . $crlf . "\t";
+		$insert_msg = 'INSERT INTO ' . $tableName . $crlf . "\t" . '(' . implode(', ', $fields) . ')' . $crlf . 'VALUES ' . $crlf . "\t";
 
 		// Loop through each row.
 		while ($row = $this->fetch_assoc($result))
@@ -1078,7 +843,7 @@ class Database_PostgreSQL implements Database
 	 * This function lists all tables in the database.
 	 * The listing could be filtered according to $filter.
 	 *
-	 * @param boolean $db_name_str string holding the database name, or false, default false
+	 * @param string|false $db_name_str string holding the database name, or false, default false
 	 * @param string|false $filter string to filter by, or false, default false
 	 *
 	 * @return string[] an array of table names. (strings)
@@ -1102,27 +867,6 @@ class Database_PostgreSQL implements Database
 		$this->free_result($request);
 
 		return $tables;
-	}
-
-	/**
-	 * This function optimizes a table.
-	 *
-	 * - reclaims storage occupied by dead tuples. In normal PostgreSQL operation, tuples
-	 * that are deleted or obsoleted by an update are not physically removed from their table;
-	 * they remain present until a VACUUM is done. Therefore it's necessary to do VACUUM periodically,
-	 * especially on frequently-updated tables.
-	 *
-	 * @param string $table - the table to be optimized
-	 *
-	 * @deprecated since 1.1 - the function was moved to DbTable class
-	 *
-	 * @return int how much it was gained
-	 */
-	public function db_optimize_table($table)
-	{
-		$db_table = db_table();
-
-		return $db_table->optimize($table);
 	}
 
 	/**
@@ -1207,10 +951,10 @@ class Database_PostgreSQL implements Database
 	}
 
 	/**
-	 * Get an associative array
+	 * Fetch next result as association.
 	 *
 	 * @param resource $request
-	 * @param int|false $counter
+	 * @param int|false $counter = false
 	 */
 	public function fetch_assoc($request, $counter = false)
 	{
@@ -1268,31 +1012,20 @@ class Database_PostgreSQL implements Database
 	}
 
 	/**
-	 * Retrieve the connection object
-	 *
-	 * @return resource what? The connection
-	 */
-	public function connection()
-	{
-		// find it, find it
-		return $this->_connection;
-	}
-
-	/**
-	 * Return the number of queries executed
-	 *
-	 * @return int
-	 */
-	function num_queries()
-	{
-		return $this->_query_count;
-	}
-
-	/**
 	 * Returns a reference to the existing instance
 	 */
 	public static function db()
 	{
 		return self::$_db;
+	}
+
+	/**
+	 * Finds out if the connection is still valid.
+	 *
+	 * @param resource|null $connection = null
+	 */
+	protected function _validConnection($connection = null)
+	{
+		return is_resource($connection);
 	}
 }
