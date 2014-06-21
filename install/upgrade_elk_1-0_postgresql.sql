@@ -6,18 +6,25 @@
 
 ---# Try to detect where the themes are...
 ---{
-$request = upgrade_query("
+$request = $db->query('', '
 	SELECT variable, value
-	FROM {$db_prefix}themes
-	WHERE variable LIKE 'theme_dir'
-		AND id_theme = 1
-		AND id_member = 0
-	LIMIT 1");
+	FROM {db_prefix}themes
+	WHERE variable LIKE {string:theme_dir}
+		AND id_theme = {int:default}
+		AND id_member = {int:no_member}
+	LIMIT {int:limit}',
+	array(
+	'theme_dir' => 'theme_dir',
+	'default' => 1,
+	'no_member' => 0,
+	'limit' => 1,
+	)
+);
 
 $row = $db->fetch_assoc($request);
 $db->free_result($request);
 
-// Again, the only option is to find a file we know exist, in this case script_elk.js
+// The only option is to find a file we know exists
 $original_theme_dir = $row['value'];
 
 // There are not many options, one is the check for a file ElkArte has and SMF
@@ -47,28 +54,41 @@ if (!empty($possible_theme_dir))
 	// If you arrived here means the template exists and we have a valid directory
 	// Time to update the database.
 
-	upgrade_query("
-		UPDATE {$db_prefix}themes
-		SET value = REPLACE(value, '" . $original_theme_dir . "', '" . $possible_theme_dir . "')
-		WHERE variable LIKE '%_dir'");
+	$db->query('', '
+		UPDATE {db_prefix}themes
+		SET value = REPLACE(value, {string:original}, {string:possible})
+		WHERE variable LIKE {string:param}',
+		array(
+			'original' => $original_theme_dir,
+			'possible' => $possible_theme_dir,
+			'param' => '%_dir',
+		)
+	);
 }
 ---}
 ---#
 
 ---# Try to detect how to reach the theme...
 ---{
-$request = upgrade_query("
+$request = $db->query('', '
 	SELECT variable, value
-	FROM {$db_prefix}themes
-	WHERE variable LIKE 'theme_url'
-		AND id_theme = 1
-		AND id_member = 0
-	LIMIT 1");
+	FROM {db_prefix}themes
+	WHERE variable LIKE {string:theme_url}
+		AND id_theme = {int:default}
+		AND id_member = {int:no_member}
+	LIMIT {int:limit}',
+	array(
+	'theme_url' => 'theme_url',
+	'default' => 1,
+	'no_member' => 0,
+	'limit' => 1,
+	)
+);
 
 $row = $db->fetch_assoc($request);
 $db->free_result($request);
 
-// Again, the only option is to find a file we know exist, in this case script_elk.js
+// Again, the only option is to find a file we know exists, in this case script_elk.js
 if (strpos($row['value'], 'http') !== 0)
 	$original_theme_url = $boardurl . '/' . $row['value'];
 else
@@ -99,10 +119,16 @@ if (!empty($possible_theme_url))
 	// If you arrived here means the template exists and we have a valid directory
 	// Time to update the database.
 
-	upgrade_query("
-		UPDATE {$db_prefix}themes
-		SET value = REPLACE(value, '" . $original_theme_url . "', '" . $possible_theme_url . "')
-		WHERE variable LIKE '%_url'");
+	$db->query('', '
+		UPDATE {db_prefix}themes
+		SET value = REPLACE(value, {string:original}, {string:possible})
+		WHERE variable LIKE {string:param}',
+		array(
+			'original' => $original_theme_url,
+			'possible' => $possible_theme_url,
+			'param' => '%_url',
+		)
+	);
 }
 ---}
 ---#
@@ -147,17 +173,17 @@ $db_table->db_create_table('{db_prefix}member_logins',
 	),
 	array(
 		array(
-			'name' => array('id_login'),
+			'name' => 'id_login',
 			'columns' => array('id_login'),
 			'type' => 'primary'
 		),
 		array(
-			'name' => array('id_member'),
+			'name' => 'id_member',
 			'columns' => array('id_member'),
 			'type' => 'key'
 		),
 		array(
-			'name' => array('time'),
+			'name' => 'time',
 			'columns' => array('time'),
 			'type' => 'key'
 		)
@@ -190,15 +216,21 @@ if (!isset($modSettings['package_make_full_backups']) && isset($modSettings['pac
 ---{
 if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersion'], '1.0') == -1)
 {
-	upgrade_query("
-		UPDATE {$db_prefix}settings
-		SET value = CASE WHEN value = '2' THEN '0' ELSE value END
-		WHERE variable LIKE 'pollMode'");
+	$db->query('', '
+		UPDATE {db_prefix}settings
+		SET value = CASE WHEN value = {int:original} THEN {int:new} ELSE value END
+		WHERE variable LIKE {string:param}',
+		array(
+			'original' => 2,
+			'new' => 0,
+			'param' => 'pollMode',
+		)
+	);
 }
 ---}
 ---#
 
----# Adding new settings ...
+---# Adding new settings to the settings table...
 ---{
 	$db->insert('ignore',
 		'{db_prefix}settings',
@@ -214,10 +246,10 @@ if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersio
 			array('visual_verification_num_chars', '6'),
 			array('enable_unwatch', 0),
 			array('jquery_source', 'local')
-			array('mentions_enabled', '1')
-			array('mentions_buddy', '0')
-			array('mentions_dont_notify_rlike', '0')
-			array('detailed-version.js', 'https://elkarte.github.io/Elkarte/site/detailed-version.js')
+			array('mentions_enabled', '1'),
+			array('mentions_buddy', '0'),
+			array('mentions_dont_notify_rlike', '0'),
+			array('detailed-version.js', 'https://elkarte.github.io/Elkarte/site/detailed-version.js');
 		),
 		array('variable')
 	);
@@ -230,9 +262,9 @@ if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersio
 
 ---# Converting legacy attachments.
 ---{
-$request = upgrade_query("
+$request = $db->query('', '
 	SELECT MAX(id_attach)
-	FROM {$db_prefix}attachments");
+	FROM {db_prefix}attachments');
 list ($step_progress['total']) = $db->fetch_row($request);
 $db->free_result($request);
 
@@ -249,11 +281,17 @@ while (!$is_done)
 {
 	nextSubStep($substep);
 
-	$request = upgrade_query("
+	$request = $db->query('', '
 		SELECT id_attach, id_folder, filename, file_hash
-		FROM {$db_prefix}attachments
-		WHERE file_hash != ''
-		LIMIT $_GET[a], 200");
+		FROM {db_prefix}attachments
+		WHERE file_hash != {string:empty}
+		LIMIT {int:start}, {int:limit}',
+		array(
+			'empty' => '',
+			'start' => $_GET['a'],
+			'limit' => 200,
+		)
+	);
 
 	// Finished?
 	if ($db->num_rows($request) == 0)
@@ -287,7 +325,7 @@ unset($_GET['a']);
 $db_table->db_add_index('{db_prefix}attachments',
 	array(
 		array(
-			'name' => array('id_thumb'),
+			'name' => 'id_thumb',
 			'columns' => array('id_thumb'),
 			'type' => 'key'
 		)
@@ -388,7 +426,7 @@ $db_table->db_add_column('{db_prefix}ban_items',
 		'unsigned' => true,
 		'size' => 255,
 		'default' => 0
-	)
+	),
 	array(),
 	'ignore'
 );
@@ -405,7 +443,7 @@ $db_table->db_change_column('{db_prefix}ban_items',
 		'unsigned' => true,
 		'size' => 255,
 		'default' => 0
-	)
+	),
 	array()
 );
 $db_table->db_change_column('{db_prefix}ban_items',
@@ -416,7 +454,7 @@ $db_table->db_change_column('{db_prefix}ban_items',
 		'unsigned' => true,
 		'size' => 255,
 		'default' => 0
-	)
+	),
 	array()
 );
 $db_table->db_change_column('{db_prefix}ban_items',
@@ -427,7 +465,7 @@ $db_table->db_change_column('{db_prefix}ban_items',
 		'unsigned' => true,
 		'size' => 255,
 		'default' => 0
-	)
+	),
 	array()
 );
 $db_table->db_change_column('{db_prefix}ban_items',
@@ -438,7 +476,7 @@ $db_table->db_change_column('{db_prefix}ban_items',
 		'unsigned' => true,
 		'size' => 255,
 		'default' => 0
-	)
+	),
 	array()
 );
 $db_table->db_change_column('{db_prefix}ban_items',
@@ -449,7 +487,7 @@ $db_table->db_change_column('{db_prefix}ban_items',
 		'unsigned' => true,
 		'size' => 255,
 		'default' => 0
-	)
+	),
 	array()
 );
 $db_table->db_change_column('{db_prefix}ban_items',
@@ -460,7 +498,7 @@ $db_table->db_change_column('{db_prefix}ban_items',
 		'unsigned' => true,
 		'size' => 255,
 		'default' => 0
-	)
+	),
 	array()
 );
 $db_table->db_change_column('{db_prefix}ban_items',
@@ -471,7 +509,7 @@ $db_table->db_change_column('{db_prefix}ban_items',
 		'unsigned' => true,
 		'size' => 255,
 		'default' => 0
-	)
+	),
 	array()
 );
 $db_table->db_change_column('{db_prefix}ban_items',
@@ -482,7 +520,7 @@ $db_table->db_change_column('{db_prefix}ban_items',
 		'unsigned' => true,
 		'size' => 255,
 		'default' => 0
-	)
+	),
 	array()
 );
 ---}
@@ -518,7 +556,7 @@ $db_table->db_change_column('{db_prefix}log_online',
 		'type' => 'varchar',
 		'size' => 64,
 		'default' => ''
-	)
+	),
 	array()
 );
 $db_table->db_change_column('{db_prefix}log_errors',
@@ -528,7 +566,7 @@ $db_table->db_change_column('{db_prefix}log_errors',
 		'type' => 'char',
 		'size' => 64,
 		'default' => '                                                                '
-	)
+	),
 	array()
 );
 $db_table->db_change_column('{db_prefix}sessions',
@@ -537,7 +575,7 @@ $db_table->db_change_column('{db_prefix}sessions',
 		'name' => 'session_id',
 		'type' => 'char',
 		'size' => 64
-	)
+	),
 	array()
 );
 ---}
@@ -579,27 +617,31 @@ $db_table->db_add_column('{db_prefix}topics',
 /******************************************************************************/
 ---# Adding new scheduled tasks
 ---{
-$db->insert('',
+$db->insert('ignore',
 	'{db_prefix}scheduled_tasks',
-	array('next_time' => 'int', 'time_offset' => 'int', 'time_regularity' => 'int', 'time_unit' => 'string', 'disabled' => 'int', 'task' => 'int'),
+	array('next_time' => 'int', 'time_offset' => 'int', 'time_regularity' => 'int', 'time_unit' => 'string', 'disabled' => 'int', 'task' => 'string'),
 	array(
 		array(0, 120, 1, 'd', 0, 'remove_temp_attachments'),
 		array(0, 180, 1, 'd', 0, 'remove_topic_redirect'),
 		array(0, 240, 1, 'd', 0, 'remove_old_drafts'),
 		array(0, 0, 6, 'h', 0, 'remove_old_followups'),
 		array(0, 360, 10, 'm', 0, 'maillist_fetch_IMAP'),
-		array(0, 30, 1, 'h', 0, 'user_access_mentions'),
-		array('task')
-	)
+		array(0, 30, 1, 'h', 0, 'user_access_mentions')
+	),
+	array('task')
 );
 ---}
 ---#
 
 ---# Remove unused scheduled tasks...
 ---{
-upgrade_query("
-	DELETE FROM {$db_prefix}scheduled_tasks
-	WHERE task = 'fetchFiles'");
+$db->query('', '
+	DELETE FROM {db_prefix}scheduled_tasks
+	WHERE task = {string:task}',
+	array(
+		'task' => 'fetchFiles'
+	)
+);
 ---}
 ---#
 
@@ -636,10 +678,15 @@ $db_table->db_add_column('{db_prefix}log_topics',
 	array(),
 	'ignore'
 );
----}
 
-UPDATE {$db_prefix}log_topics
-SET unwatched = 0;
+$db->query('', '
+	UPDATE {db_prefix}log_topics
+	SET unwatched = {int:unwatched}',
+	array(
+		'unwatched' => 0
+	)
+);
+---}
 ---#
 
 /******************************************************************************/
@@ -680,7 +727,7 @@ $db_table->db_change_column('{db_prefix}mail_queue',
 	array(
 		'name' => 'body',
 		'type' => 'mediumtext'
-	)
+	),
 	array()
 );
 ---}
@@ -698,7 +745,7 @@ $db_table->db_change_column('{db_prefix}log_floodcontrol',
 		'type' => 'varchar',
 		'size' => 10,
 		'default' => 'post'
-	)
+	),
 	array()
 );
 ---}
@@ -716,7 +763,7 @@ $db_table->db_change_column('{db_prefix}membergroups',
 		'type' => 'varchar',
 		'size' => 255,
 		'default' => ''
-	)
+	),
 	array()
 );
 ---}
@@ -755,6 +802,12 @@ $db_table->db_create_table('{db_prefix}user_drafts',
 			'type' => 'int',
 			'unsigned' => true,
 			'size' => 10,
+			'default' => 0
+		),
+		array(
+			'name' => 'type',
+			'type' => 'tinyint',
+			'size' => 4,
 			'default' => 0
 		),
 		array(
@@ -814,12 +867,12 @@ $db_table->db_create_table('{db_prefix}user_drafts',
 	),
 	array(
 		array(
-			'name' => array('id_draft'),
+			'name' => 'id_draft',
 			'columns' => array('id_draft'),
 			'type' => 'primary'
 		),
 		array(
-			'name' => array('id_member'),
+			'name' => 'id_member',
 			'columns' => array('id_member', 'id_draft', 'type'),
 			'type' => 'unique'
 		)
@@ -837,15 +890,19 @@ $db_table->db_create_table('{db_prefix}user_drafts',
 if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersion'], '1.0') == -1)
 {
 	// Anyone who can currently post unapproved topics we assume can create drafts as well ...
-	$request = upgrade_query("
+	$request = $db->query('', '
 		SELECT id_group, id_profile, add_deny, permission
-		FROM {$db_prefix}board_permissions
-		WHERE permission = 'post_unapproved_topics'");
+		FROM {db_prefix}board_permissions
+		WHERE permission = {string:permission}',
+		array(
+			'permission' => 'post_unapproved_topics',
+		)
+	);
 	$inserts = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		$inserts[] = "($row[id_group], $row[id_profile], 'post_draft', $row[add_deny])";
-		$inserts[] = "($row[id_group], $row[id_profile], 'post_autosave_draft', $row[add_deny])";
+		$inserts[] = array($row['id_group'], $row['id_profile'], 'post_draft', $row['add_deny']);
+		$inserts[] = array($row['id_group'], $row['id_profile'], 'post_autosave_draft', $row['add_deny']);
 	}
 	$db->free_result($request);
 
@@ -858,15 +915,19 @@ if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersio
 		);
 
 	// Next we find people who can send PMs, and assume they can save pm_drafts as well
-	$request = upgrade_query("
+	$request = $db->query('', '
 		SELECT id_group, add_deny, permission
-		FROM {$db_prefix}permissions
-		WHERE permission = 'pm_send'");
+		FROM {db_prefix}board_permissions
+		WHERE permission = {string:permission}',
+		array(
+			'permission' => 'pm_send',
+		)
+	);
 	$inserts = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		$inserts[] = "($row[id_group], 'pm_draft', $row[add_deny])";
-		$inserts[] = "($row[id_group], 'pm_autosave_draft', $row[add_deny])";
+		$inserts[] = array($row['id_group'], 'pm_draft', $row['add_deny']);
+		$inserts[] = array($row['id_group'], 'pm_autosave_draft', $row['add_deny']);
 	}
 	$db->free_result($request);
 
@@ -908,12 +969,12 @@ $db_table->db_create_table('{db_prefix}custom_fields_data',
 	),
 	array(
 		array(
-			'name' => array('id_member_variable'),
+			'name' => 'id_member_variable',
 			'columns' => array('id_member', 'variable(30)'),
 			'type' => 'primary'
 		),
 		array(
-			'name' => array('id_member'),
+			'name' => 'id_member',
 			'columns' => array('id_member'),
 			'type' => 'key'
 		)
@@ -926,19 +987,27 @@ $db_table->db_create_table('{db_prefix}custom_fields_data',
 
 ---# Move existing custom profile values...
 ---{
-$request = upgrade_query("
-	INSERT INTO {$db_prefix}custom_fields_data
+$db->query('', ,
+	INSERT INTO {db_prefix}custom_fields_data
 		(id_member, variable, value)
 	SELECT id_member, variable, value
-	FROM {$db_prefix}themes
-	WHERE SUBSTRING(variable, 1, 5) = 'cust_'");
+	FROM {db_prefix}themes
+	WHERE SUBSTRING(variable, 1, 5) = {string:cust}',
+	array(
+		'cust' => 'cust_',
+	)
+);
 
 // remove the moved rows from themes
 if ($db->affected_rows() != 0)
 {
-	upgrade_query("
-		DELETE FROM {$db_prefix}themes
-		SUBSTRING(variable,1,5) = 'cust_'");
+	$db->query('', '
+		DELETE FROM {db_prefix}themes
+		SUBSTRING(variable, 1, 5) = {string:cust}',
+		array(
+			'cust' => 'cust_',
+		)
+	);
 }
 ---}
 ---#
@@ -948,7 +1017,7 @@ if ($db->affected_rows() != 0)
 /******************************************************************************/
 ---# Insert new fields
 ---{
-$db->insert('',
+$db->insert('ignore',
 	'{db_prefix}custom_fields',
 	array(
 		'col_name' => 'string',
@@ -960,7 +1029,7 @@ $db->insert('',
 		'mask' => 'string',
 		'show_reg' => 'int',
 		'show_display' => 'int',
-		'show_profile' => 'int',
+		'show_profile' => 'string',
 		'private' => 'int',
 		'active' => 'int',
 		'bbc' => 'int',
@@ -987,7 +1056,6 @@ $db->insert('',
 ---# Move existing values...
 ---{
 // We cannot do this twice
-<<<<<<< HEAD
 $db_table = db_table();
 $members_tbl = $db_table->db_table_structure("{db_prefix}members");
 $move_im = false;
@@ -1003,30 +1071,32 @@ foreach ($members_tbl['columns'] as $members_col)
 
 if ($move_im)
 {
-	$request = upgrade_query("
+	$request = $db->query('', '
 		SELECT id_member, aim, icq, msn, yim
-		FROM {$db_prefix}members");
+		FROM {db_prefix}members',
+		array()
+	);
 	$inserts = array();
 	while ($row = $db->fetch_assoc($request))
 	{
 		if (!empty($row[aim]))
-			$inserts[] = "($row[id_member], 'cust_aim', '" . addslashes($row['aim']) . "')";
+			$inserts[] = array($row['id_member'], 'cust_aim', $row['aim']);
 
 		if (!empty($row[icq]))
-			$inserts[] = "($row[id_member], 'cust_icq', '" . addslashes($row['icq']) . "')";
+			$inserts[] = array($row['id_member'], 'cust_icq', $row['icq']);
 
 		if (!empty($row[msn]))
-			$inserts[] = "($row[id_member], 'cust_skype', '" . addslashes($row['msn']) . "')";
+			$inserts[] = array($row['id_member'], 'cust_skype', $row['msn']);
 
 		if (!empty($row[yim]))
-			$inserts[] = "($row[id_member], 'cust_yim', '" . addslashes($row['yim']) . "')";
+			$inserts[] = array($row['id_member'], 'cust_yim', $row['yim']);
 	}
 	$db->free_result($request);
 
 	if (!empty($inserts))
 		$db->insert('',
 			'{db_prefix}custom_fields_data',
-			arrau('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
+			array('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
 			$inserts,
 			array('id_member', 'variable')
 		);
@@ -1049,14 +1119,18 @@ $db_table->db_remove_column('{db_prefix}members', 'msn');
 if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersion'], '1.0') == -1)
 {
 	// Try find people who probably can use remote avatars.
-	$request = upgrade_query("
+	$request = $db->query('', '
 		SELECT id_group, add_deny, permission
-		FROM {$db_prefix}permissions
-		WHERE permission = 'profile_remote_avatar'");
+		FROM {db_prefix}permissions
+		WHERE permission = {string:permission}',
+		array(
+			'permission' => 'profile_remote_avatar'
+		)
+	);
 	$inserts = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		$inserts[] = "($row[id_group], 'profile_gravatar', $row[add_deny])";
+		$inserts[] = array($row['id_group'], 'profile_gravatar', $row['add_deny']);
 	}
 	$db->free_result($request);
 
@@ -1076,9 +1150,17 @@ if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersio
 /******************************************************************************/
 
 ---# Changing URL to Elk package server...
-UPDATE {$db_prefix}package_servers
-SET url = 'https://github.com/elkarte/addons/tree/master/packages'
-WHERE url = 'http://custom.simplemachines.org/packages/mods';
+---{
+$db->query('', '
+	UPDATE {db_prefix}package_servers
+	SET url = {string:new}
+	WHERE url = {string:where}',
+	array(
+		'new' => 'https://github.com/elkarte/addons/tree/master/packages',
+		'where' => 'http://custom.simplemachines.org/packages/mods',
+	)
+);
+---}
 ---#
 
 /******************************************************************************/
@@ -1106,7 +1188,7 @@ $db_table->db_create_table('{db_prefix}follow_ups',
 	),
 	array(
 		array(
-			'name' => array('follow_up'),
+			'name' => 'follow_up',
 			'columns' => array('follow_up', 'derived_from'),
 			'type' => 'primary'
 		)
@@ -1149,12 +1231,12 @@ $db_table->db_create_table('{db_prefix}antispam_questions',
 	),
 	array(
 		array(
-			'name' => array('id_question'),
+			'name' => 'id_question',
 			'columns' => array('id_question'),
 			'type' => 'primary'
 		),
 		array(
-			'name' => array('language'),
+			'name' => 'language',
 			'columns' => array('language(30)'),
 			'type' => 'key'
 		)
@@ -1169,10 +1251,14 @@ $db_table->db_create_table('{db_prefix}antispam_questions',
 ---{
 global $language;
 
-$request = upgrade_query("
+$request = $db->query('', '
 	SELECT id_comment, recipient_name as answer, body as question
-	FROM {$db_prefix}log_comments
-	WHERE comment_type = 'ver_test'");
+	FROM {db_prefix}log_comments
+	WHERE comment_type = {string:type}',
+	array(
+		'type' => 'ver_test'
+	)
+);
 if ($db->num_rows($request) != 0)
 {
 	$values = array();
@@ -1182,10 +1268,15 @@ if ($db->num_rows($request) != 0)
 	{
 		$inserts[] = array(serialize(array($row['answer'])), $row['question'], $language);
 		// @todo use $id_comments and move the DELETE out of the loop
-		upgrade_query("
-			DELETE FROM {$db_prefix}log_comments
-			WHERE id_comment = " . $row['id_comment'] . "
-			LIMIT 1");
+		$db->query('', '
+			DELETE FROM {db_prefix}log_comments
+			WHERE id_comment = {int:id_comment}
+			LIMIT {int:limit}',
+			array(
+				'id_comment' => $row['id_comment'],
+				'limit' => 1,
+			)
+		);
 	}
 
 	if (!empty($inserts))
@@ -1227,7 +1318,7 @@ $db_table->db_create_table('{db_prefix}postby_emails',
 	),
 	array(
 		array(
-			'name' => array('id_email'),
+			'name' => 'id_email',
 			'columns' => array('id_email'),
 			'type' => 'primary'
 		)
@@ -1297,7 +1388,7 @@ $db_table->db_create_table('{db_prefix}postby_emails_error',
 	),
 	array(
 		array(
-			'name' => array('id_email'),
+			'name' => 'id_email',
 			'columns' => array('id_email'),
 			'type' => 'primary'
 		)
@@ -1351,7 +1442,7 @@ $db_table->db_create_table('{db_prefix}postby_emails_filters',
 	),
 	array(
 		array(
-			'name' => array('id_filter'),
+			'name' => 'id_filter',
 			'columns' => array('id_filter'),
 			'type' => 'primary'
 		)
@@ -1379,9 +1470,13 @@ $db_table->db_add_column('{db_prefix}postby_emails_filters',
 
 ---# Set the default values so the order is set / maintained
 ---{
-upgrade_query("
+$db->query('', '
 	UPDATE {$db_prefix}postby_emails_filters
-	SET filter_order = id_filter");
+	SET filter_order = {string:filter}',
+	array(
+		'filter' => 'id_filter',
+	)
+);
 ---}
 ---#
 
@@ -1418,7 +1513,6 @@ $db_table->db_add_column('{db_prefix}mail_queue',
 	array(
 		'name' => 'message_id',
 		'type' => 'varchar',
-		'size' => 12,
 		'default' => ''
 	),
 	array(),
@@ -1429,7 +1523,7 @@ $db_table->db_add_column('{db_prefix}mail_queue',
 
 ---# Updating board profiles...
 ---{
-$db->insert('',
+$db->insert('ignore',
 	'{db_prefix}board_permissions',
 	array('id_group' => 'int', 'id_profile' => 'int', 'permission' => 'string'),
 	array(
@@ -1479,12 +1573,12 @@ $db_table->db_create_table('{db_prefix}log_likes',
 	),
 	array(
 		array(
-			'name' => array('id_target_member'),
+			'name' => 'id_target_member',
 			'columns' => array('id_target', 'id_member'),
 			'type' => 'primary'
 		),
 		array(
-			'name' => array('log_time'),
+			'name' => 'log_time',
 			'columns' => array('log_time'),
 			'type' => 'key'
 		)
@@ -1523,17 +1617,17 @@ $db_table->db_create_table('{db_prefix}message_likes',
 	),
 	array(
 		array(
-			'name' => array('id_msg_member'),
+			'name' => 'id_msg_member',
 			'columns' => array('id_msg', 'id_member'),
 			'type' => 'primary'
 		),
 		array(
-			'name' => array('id_member'),
+			'name' => 'id_member',
 			'columns' => array('id_member'),
 			'type' => 'key'
 		),
 		array(
-			'name' => array('id_poster'),
+			'name' => 'id_poster',
 			'columns' => array('id_poster'),
 			'type' => 'key'
 		)
@@ -1601,7 +1695,7 @@ $db_table->db_change_column('{db_prefix}members',
 		'unsigned' => true,
 		'size' => 4,
 		'default' => 1
-	)
+	),
 	array()
 );
 ---}
@@ -1665,12 +1759,12 @@ $db_table->db_create_table('{db_prefix}log_mentions',
 	),
 	array(
 		array(
-			'name' => array('id_mention'),
+			'name' => 'id_mention',
 			'columns' => array('id_mention'),
 			'type' => 'primary'
 		),
 		array(
-			'name' => array('id_member_status'),
+			'name' => 'id_member_status',
 			'columns' => array('id_member', 'status'),
 			'type' => 'key'
 		)
@@ -1707,7 +1801,7 @@ $db_table->db_change_column('{db_prefix}members',
 		'type' => 'smallint',
 		'size' => 5,
 		'default' => 1
-	)
+	),
 	array()
 );
 ---}

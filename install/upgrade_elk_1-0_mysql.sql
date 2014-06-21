@@ -6,18 +6,25 @@
 
 ---# Try to detect where the themes are...
 ---{
-$request = upgrade_query("
+$request = $db->query('', '
 	SELECT variable, value
-	FROM {$db_prefix}themes
-	WHERE variable LIKE 'theme_dir'
-		AND id_theme = 1
-		AND id_member = 0
-	LIMIT 1");
+	FROM {db_prefix}themes
+	WHERE variable LIKE {string:theme_dir}
+		AND id_theme = {int:default}
+		AND id_member = {int:no_member}
+	LIMIT {int:limit}',
+	array(
+	'theme_dir' => 'theme_dir',
+	'default' => 1,
+	'no_member' => 0,
+	'limit' => 1,
+	)
+);
 
 $row = $db->fetch_assoc($request);
 $db->free_result($request);
 
-// Again, the only option is to find a file we know exist, in this case script_elk.js
+// The only option is to find a file we know exists
 $original_theme_dir = $row['value'];
 
 // There are not many options, one is the check for a file ElkArte has and SMF
@@ -26,7 +33,6 @@ $original_theme_dir = $row['value'];
 // If the file exists, everything is in the correct place, so go back.
 if (file_exists($original_theme_dir . '/GenericHelpers.template.php'))
 {
-<<<<<<< HEAD
 	$possible_theme_dir = $original_theme_dir;
 }
 else
@@ -48,28 +54,41 @@ if (!empty($possible_theme_dir))
 	// If you arrived here means the template exists and we have a valid directory
 	// Time to update the database.
 
-	upgrade_query("
-		UPDATE {$db_prefix}themes
-		SET value = REPLACE(value, '" . $original_theme_dir . "', '" . $possible_theme_dir . "')
-		WHERE variable LIKE '%_dir'");
+	$db->query('', '
+		UPDATE {db_prefix}themes
+		SET value = REPLACE(value, {string:original}, {string:possible})
+		WHERE variable LIKE {string:param}',
+		array(
+			'original' => $original_theme_dir,
+			'possible' => $possible_theme_dir,
+			'param' => '%_dir',
+		)
+	);
 }
 ---}
 ---#
 
 ---# Try to detect how to reach the theme...
 ---{
-$request = upgrade_query("
+$request = $db->query('', '
 	SELECT variable, value
-	FROM {$db_prefix}themes
-	WHERE variable LIKE 'theme_url'
-		AND id_theme = 1
-		AND id_member = 0
-	LIMIT 1");
+	FROM {db_prefix}themes
+	WHERE variable LIKE {string:theme_url}
+		AND id_theme = {int:default}
+		AND id_member = {int:no_member}
+	LIMIT {int:limit}',
+	array(
+	'theme_url' => 'theme_url',
+	'default' => 1,
+	'no_member' => 0,
+	'limit' => 1,
+	)
+);
 
 $row = $db->fetch_assoc($request);
 $db->free_result($request);
 
-// Again, the only option is to find a file we know exist, in this case script_elk.js
+// Again, the only option is to find a file we know exists, in this case script_elk.js
 if (strpos($row['value'], 'http') !== 0)
 	$original_theme_url = $boardurl . '/' . $row['value'];
 else
@@ -100,10 +119,16 @@ if (!empty($possible_theme_url))
 	// If you arrived here means the template exists and we have a valid directory
 	// Time to update the database.
 
-	upgrade_query("
-		UPDATE {$db_prefix}themes
-		SET value = REPLACE(value, '" . $original_theme_url . "', '" . $possible_theme_url . "')
-		WHERE variable LIKE '%_url'");
+	$db->query('', '
+		UPDATE {db_prefix}themes
+		SET value = REPLACE(value, {string:original}, {string:possible})
+		WHERE variable LIKE {string:param}',
+		array(
+			'original' => $original_theme_url,
+			'possible' => $possible_theme_url,
+			'param' => '%_url',
+		)
+	);
 }
 ---}
 ---#
@@ -191,10 +216,16 @@ if (!isset($modSettings['package_make_full_backups']) && isset($modSettings['pac
 ---{
 if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersion'], '1.0') == -1)
 {
-	upgrade_query("
-		UPDATE {$db_prefix}settings
-		SET value = CASE WHEN value = '2' THEN '0' ELSE value END
-		WHERE variable LIKE 'pollMode'");
+	$db->query('', '
+		UPDATE {db_prefix}settings
+		SET value = CASE WHEN value = {int:original} THEN {int:new} ELSE value END
+		WHERE variable LIKE {string:param}',
+		array(
+			'original' => 2,
+			'new' => 0,
+			'param' => 'pollMode',
+		)
+	);
 }
 ---}
 ---#
@@ -231,9 +262,9 @@ if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersio
 
 ---# Converting legacy attachments.
 ---{
-$request = upgrade_query("
+$request = $db->query('', '
 	SELECT MAX(id_attach)
-	FROM {$db_prefix}attachments");
+	FROM {db_prefix}attachments');
 list ($step_progress['total']) = $db->fetch_row($request);
 $db->free_result($request);
 
@@ -250,11 +281,17 @@ while (!$is_done)
 {
 	nextSubStep($substep);
 
-	$request = upgrade_query("
+	$request = $db->query('', '
 		SELECT id_attach, id_folder, filename, file_hash
-		FROM {$db_prefix}attachments
-		WHERE file_hash != ''
-		LIMIT $_GET[a], 200");
+		FROM {db_prefix}attachments
+		WHERE file_hash != {string:empty}
+		LIMIT {int:start}, {int:limit}',
+		array(
+			'empty' => '',
+			'start' => $_GET['a'],
+			'limit' => 200,
+		)
+	);
 
 	// Finished?
 	if ($db->num_rows($request) == 0)
@@ -598,9 +635,13 @@ $db->insert('ignore',
 
 ---# Remove unused scheduled tasks...
 ---{
-upgrade_query("
-	DELETE FROM {$db_prefix}scheduled_tasks
-	WHERE task = 'fetchFiles'");
+$db->query('', '
+	DELETE FROM {db_prefix}scheduled_tasks
+	WHERE task = {string:task}',
+	array(
+		'task' => 'fetchFiles'
+	)
+);
 ---}
 ---#
 
@@ -637,10 +678,15 @@ $db_table->db_add_column('{db_prefix}log_topics',
 	array(),
 	'ignore'
 );
----}
 
-UPDATE {$db_prefix}log_topics
-SET unwatched = 0;
+$db->query('', '
+	UPDATE {db_prefix}log_topics
+	SET unwatched = {int:unwatched}',
+	array(
+		'unwatched' => 0
+	)
+);
+---}
 ---#
 
 /******************************************************************************/
@@ -844,10 +890,14 @@ $db_table->db_create_table('{db_prefix}user_drafts',
 if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersion'], '1.0') == -1)
 {
 	// Anyone who can currently post unapproved topics we assume can create drafts as well ...
-	$request = upgrade_query("
+	$request = $db->query('', '
 		SELECT id_group, id_profile, add_deny, permission
-		FROM {$db_prefix}board_permissions
-		WHERE permission = 'post_unapproved_topics'");
+		FROM {db_prefix}board_permissions
+		WHERE permission = {string:permission}',
+		array(
+			'permission' => 'post_unapproved_topics',
+		)
+	);
 	$inserts = array();
 	while ($row = $db->fetch_assoc($request))
 	{
@@ -865,10 +915,14 @@ if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersio
 		);
 
 	// Next we find people who can send PMs, and assume they can save pm_drafts as well
-	$request = upgrade_query("
+	$request = $db->query('', '
 		SELECT id_group, add_deny, permission
-		FROM {$db_prefix}permissions
-		WHERE permission = 'pm_send'");
+		FROM {db_prefix}board_permissions
+		WHERE permission = {string:permission}',
+		array(
+			'permission' => 'pm_send',
+		)
+	);
 	$inserts = array();
 	while ($row = $db->fetch_assoc($request))
 	{
@@ -933,19 +987,27 @@ $db_table->db_create_table('{db_prefix}custom_fields_data',
 
 ---# Move existing custom profile values...
 ---{
-$request = upgrade_query("
-	INSERT INTO {$db_prefix}custom_fields_data
+$db->query('', ,
+	INSERT INTO {db_prefix}custom_fields_data
 		(id_member, variable, value)
 	SELECT id_member, variable, value
-	FROM {$db_prefix}themes
-	WHERE SUBSTRING(variable, 1, 5) = 'cust_'");
+	FROM {db_prefix}themes
+	WHERE SUBSTRING(variable, 1, 5) = {string:cust}',
+	array(
+		'cust' => 'cust_',
+	)
+);
 
 // remove the moved rows from themes
 if ($db->affected_rows() != 0)
 {
-	upgrade_query("
-		DELETE FROM {$db_prefix}themes
-		SUBSTRING(variable,1,5) = 'cust_'");
+	$db->query('', '
+		DELETE FROM {db_prefix}themes
+		SUBSTRING(variable, 1, 5) = {string:cust}',
+		array(
+			'cust' => 'cust_',
+		)
+	);
 }
 ---}
 ---#
@@ -1009,9 +1071,11 @@ foreach ($members_tbl['columns'] as $members_col)
 
 if ($move_im)
 {
-	$request = upgrade_query("
+	$request = $db->query('', '
 		SELECT id_member, aim, icq, msn, yim
-		FROM {$db_prefix}members");
+		FROM {db_prefix}members',
+		array()
+	);
 	$inserts = array();
 	while ($row = $db->fetch_assoc($request))
 	{
@@ -1055,10 +1119,14 @@ $db_table->db_remove_column('{db_prefix}members', 'msn');
 if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersion'], '1.0') == -1)
 {
 	// Try find people who probably can use remote avatars.
-	$request = upgrade_query("
+	$request = $db->query('', '
 		SELECT id_group, add_deny, permission
-		FROM {$db_prefix}permissions
-		WHERE permission = 'profile_remote_avatar'");
+		FROM {db_prefix}permissions
+		WHERE permission = {string:permission}',
+		array(
+			'permission' => 'profile_remote_avatar'
+		)
+	);
 	$inserts = array();
 	while ($row = $db->fetch_assoc($request))
 	{
@@ -1082,9 +1150,17 @@ if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersio
 /******************************************************************************/
 
 ---# Changing URL to Elk package server...
-UPDATE {$db_prefix}package_servers
-SET url = 'https://github.com/elkarte/addons/tree/master/packages'
-WHERE url = 'http://custom.simplemachines.org/packages/mods';
+---{
+$db->query('', '
+	UPDATE {db_prefix}package_servers
+	SET url = {string:new}
+	WHERE url = {string:where}',
+	array(
+		'new' => 'https://github.com/elkarte/addons/tree/master/packages',
+		'where' => 'http://custom.simplemachines.org/packages/mods',
+	)
+);
+---}
 ---#
 
 /******************************************************************************/
@@ -1175,10 +1251,14 @@ $db_table->db_create_table('{db_prefix}antispam_questions',
 ---{
 global $language;
 
-$request = upgrade_query("
+$request = $db->query('', '
 	SELECT id_comment, recipient_name as answer, body as question
-	FROM {$db_prefix}log_comments
-	WHERE comment_type = 'ver_test'");
+	FROM {db_prefix}log_comments
+	WHERE comment_type = {string:type}',
+	array(
+		'type' => 'ver_test'
+	)
+);
 if ($db->num_rows($request) != 0)
 {
 	$values = array();
@@ -1188,11 +1268,17 @@ if ($db->num_rows($request) != 0)
 	{
 		$inserts[] = array(serialize(array($row['answer'])), $row['question'], $language);
 		// @todo use $id_comments and move the DELETE out of the loop
-		upgrade_query("
-			DELETE FROM {$db_prefix}log_comments
-			WHERE id_comment = " . $row['id_comment'] . "
-			LIMIT 1");
+		$db->query('', '
+			DELETE FROM {db_prefix}log_comments
+			WHERE id_comment = {int:id_comment}
+			LIMIT {int:limit}',
+			array(
+				'id_comment' => $row['id_comment'],
+				'limit' => 1,
+			)
+		);
 	}
+
 	if (!empty($inserts))
 		$db->insert('',
 			'{db_prefix}antispam_questions',
@@ -1383,8 +1469,15 @@ $db_table->db_add_column('{db_prefix}postby_emails_filters',
 ---#
 
 ---# Set the default values so the order is set / maintained
-UPDATE {$db_prefix}postby_emails_filters
-SET filter_order = 'id_filter';
+---{
+$db->query('', '
+	UPDATE {$db_prefix}postby_emails_filters
+	SET filter_order = {string:filter}',
+	array(
+		'filter' => 'id_filter',
+	)
+);
+---}
 ---#
 
 ---# Adding new columns to log_activity...
@@ -1420,8 +1513,7 @@ $db_table->db_add_column('{db_prefix}mail_queue',
 	array(
 		'name' => 'message_id',
 		'type' => 'varchar',
-		'size' => 12,
-		'default' => 0
+		'default' => ''
 	),
 	array(),
 	'ignore'
