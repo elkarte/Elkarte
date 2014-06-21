@@ -1398,3 +1398,24 @@ function loadAddNewPoll(button, id_board, form_name)
 
 	return false;
 }
+
+/**
+ * Attempt to prevent browsers from auto completing fields when viewing/editing other members profiles
+ * or when register new member
+ */
+function disableAutoComplete()
+{
+	if (document.addEventListener)
+		document.addEventListener("DOMContentLoaded", disableAutoCompleteNow, false);
+}
+
+/**
+ * Once DOMContentLoaded is triggered, find text and password fields in the forms
+ * turn autocomplete off and sempty the value.
+ */
+function disableAutoCompleteNow()
+{
+	$("input[type=text]").attr("autocomplete", "off").val('');
+	$("input[type=email]").attr("autocomplete", "off").val('');
+	$("input[type=password]").attr("autocomplete", "off").val('');
+}
