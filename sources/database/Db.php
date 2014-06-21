@@ -237,11 +237,4 @@ interface Database
 	 * @param resource|null $connection = null
 	 */
 	public function select_db($dbName = null, $connection = null);
-
-	/**
-	 * Finds out if the connection is still valid.
-	 *
-	 * @param resource|object|null $connection = null
-	 */
-	protected function _validConnection($connection = null);
 }

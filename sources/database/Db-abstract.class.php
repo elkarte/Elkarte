@@ -22,7 +22,7 @@ if (!defined('ELK'))
 /**
  * PostgreSQL database class, implements database class to control mysql functions
  */
-class Database_Abstract implements Database
+abstract class Database_Abstract implements Database
 {
 	/**
 	 * Current connetcion to the database
@@ -43,31 +43,6 @@ class Database_Abstract implements Database
 	{
 		// Objects should be created through initiate().
 	}
-
-	/**
-	 * Initializes a database connection.
-	 * It returns the connection, if successful.
-	 *
-	 * @param string $db_server
-	 * @param string $db_name
-	 * @param string $db_user
-	 * @param string $db_passwd
-	 * @param string $db_prefix
-	 * @param mixed[] $db_options
-	 *
-	 * @return resource
-	 */
-	public static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array());
-
-	/**
-	 * Fix the database prefix if necessary.
-	 *
-	 * @param string $db_prefix
-	 * @param string $db_name
-	 *
-	 * @return string
-	 */
-	public function fix_prefix($db_prefix, $db_name);
 
 	/**
 	 * Callback for preg_replace_callback on the query.
@@ -211,110 +186,6 @@ class Database_Abstract implements Database
 	}
 
 	/**
-	 * Do a query.  Takes care of errors too.
-	 * Special queries may need additional replacements to be appropriate
-	 * for PostgreSQL.
-	 *
-	 * @param string $identifier
-	 * @param string $db_string
-	 * @param mixed[] $db_values
-	 * @param resource|null $connection
-	 * @return resource|boolean
-	 */
-	public function query($identifier, $db_string, $db_values = array(), $connection = null);
-
-	/**
-	 * Affected rows from previous operation.
-	 *
-	 * @param resource|null $result
-	 */
-	public function affected_rows($result = null);
-
-	/**
-	 * Last inserted id.
-	 *
-	 * @param string $table
-	 * @param string|null $field = null
-	 * @param resource|null $connection = null
-	 */
-	public function insert_id($table, $field = null, $connection = null);
-
-	/**
-	 * Tracking the current row.
-	 * Fetch a row from the resultset given as parameter.
-	 *
-	 * @param resource $request
-	 * @param integer|bool $counter = false
-	 */
-	public function fetch_row($request, $counter = false);
-
-	/**
-	 * Free the resultset.
-	 *
-	 * @param resource $result
-	 */
-	public function free_result($result);
-
-	/**
-	 * Get the number of rows in the result.
-	 *
-	 * @param resource $result
-	 */
-	public function num_rows($result);
-
-	/**
-	 * Get the number of fields in the resultset.
-	 *
-	 * @param resource $request
-	 */
-	public function num_fields($request);
-
-	/**
-	 * Reset the internal result pointer.
-	 *
-	 * @param boolean $request
-	 * @param integer $counter
-	 */
-	public function data_seek($request, $counter);
-
-	/**
-	 * Do a transaction.
-	 *
-	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
-	 * @param resource|null $connection = null
-	 */
-	public function db_transaction($type = 'commit', $connection = null);
-
-	/**
-	 * Return last error string from the database server
-	 *
-	 * @param resource|null $connection = null
-	 */
-	public function last_error($connection = null);
-
-	/**
-	 * Database error.
-	 * Backtrace, log, try to fix.
-	 *
-	 * @param string $db_string
-	 * @param resource|null $connection = null
-	 */
-	public function error($db_string, $connection = null);
-
-	/**
-	 * Insert data.
-	 *
-	 * @param string $method - options 'replace', 'ignore', 'insert'
-	 * @param string $table
-	 * @param mixed[] $columns
-	 * @param mixed[] $data
-	 * @param mixed[] $keys
-	 * @param bool $disable_trans = false
-	 * @param resource|null $connection = null
-	 */
-	public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null);
-
-	/**
 	 * This function tries to work out additional error information from a back trace.
 	 *
 	 * @param string $error_message
@@ -388,51 +259,6 @@ class Database_Abstract implements Database
 	}
 
 	/**
-	 * Unescape an escaped string!
-	 *
-	 * @param string $string
-	 */
-	public function unescape_string($string);
-
-	/**
-	 * Returns whether the database system supports ignore.
-	 *
-	 * @return false
-	 */
-	public function support_ignore();
-
-	/**
-	 * Gets all the necessary INSERTs for the table named table_name.
-	 * It goes in 250 row segments.
-	 *
-	 * @param string $tableName - the table to create the inserts for.
-	 * @param bool $new_table
-	 *
-	 * @return string the query to insert the data back in, or an empty string if the table was empty.
-	 */
-	public function insert_sql($tableName, $new_table = false);
-
-	/**
-	 * Dumps the schema (CREATE) for a table.
-	 *
-	 * @param string $tableName - the table
-	 *
-	 * @return string - the CREATE statement as string
-	 */
-	public function db_table_sql($tableName);
-
-	/**
-	 * This function lists all tables in the database.
-	 * The listing could be filtered according to $filter.
-	 *
-	 * @param string|false $db_name_str string holding the database name, or false, default false
-	 * @param string|false $filter string to filter by, or false, default false
-	 *
-	 * @return string[] an array of table names. (strings)
-	 */
-	public function db_list_tables($db_name_str = false, $filter = false);
-
-	/**
 	 * This function optimizes a table.
 	 *
 	 * - reclaims storage occupied by dead tuples. In normal PostgreSQL operation, tuples
@@ -454,76 +280,6 @@ class Database_Abstract implements Database
 	}
 
 	/**
-	 * Backup $table to $backup_table.
-	 *
-	 * @param string $table
-	 * @param string $backup_table
-	 */
-	public function db_backup_table($table, $backup_table);
-
-	/**
-	 * Get the server version number.
-	 *
-	 * @return string - the version
-	 */
-	public function db_server_version();
-
-	/**
-	 * Get the name (title) of the database system.
-	 *
-	 * @return string
-	 */
-	public function db_title();
-
-	/**
-	 * Whether the database system is case sensitive.
-	 *
-	 * @return true
-	 */
-	public function db_case_sensitive();
-
-	/**
-	 * Escape string for the database input
-	 *
-	 * @param string $string
-	 */
-	public function escape_string($string);
-
-	/**
-	 * Fetch next result as association.
-	 *
-	 * @param resource $request
-	 * @param int|false $counter = false
-	 */
-	public function fetch_assoc($request, $counter = false);
-
-	/**
-	 * Return server info.
-	 *
-	 * @param resource|null $connection
-	 *
-	 * @return string
-	 */
-	public function db_server_info($connection = null);
-
-	/**
-	 * Return client version.
-	 *
-	 * @return string - the version
-	 */
-	public function db_client_version();
-
-	/**
-	 * Select database.
-	 *
-	 * @param string|null $db_name = null
-	 * @param resource|null $connection = null
-	 *
-	 * @return true
-	 */
-	public function select_db($db_name = null, $connection = null);
-
-	/**
 	 * Retrieve the connection object
 	 *
 	 * @return resource what? The connection
@@ -543,11 +299,4 @@ class Database_Abstract implements Database
 	{
 		return $this->_query_count;
 	}
-
-	/**
-	 * Finds out if the connection is still valid.
-	 *
-	 * @param resource|object|null $connection = null
-	 */
-	protected function _validConnection($connection = null);
 }
