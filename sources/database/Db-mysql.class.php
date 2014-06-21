@@ -244,7 +244,11 @@ class Database_MySQL extends Database_Abstract
 		else
 			$ret = @mysqli_query($connection, $db_string, MYSQLI_USE_RESULT);
 
-		if ($ret === false && empty($db_values['db_error_skip']))
+		// @deprecated since 1.1 - use skip_error method
+		if (!empty($db_values['db_error_skip']))
+			$this->_skip_error = true;
+
+		if ($ret === false && !$this->_skip_error)
 			$ret = $this->error($db_string, $connection);
 
 		// Debugging.
