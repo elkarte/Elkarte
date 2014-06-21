@@ -135,7 +135,7 @@
 						sizeErrorFiles = [];
 
 					numAttachUploaded--;
-					errorMsgs.individualSizeErr = 'Server rejected the file';
+					errorMsgs.individualSizeErr = oTxt.postUploadError;
 					sizeErrorFiles.push(this.fileName);
 					populateErrors({
 						'errorMsgs': errorMsgs,
