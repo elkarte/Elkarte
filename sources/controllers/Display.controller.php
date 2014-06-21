@@ -62,6 +62,7 @@ class Display_Controller
 
 		// And the topic functions
 		require_once(SUBSDIR . '/Topic.subs.php');
+		require_once(SUBSDIR . '/Messages.subs.php');
 
 		// Not only does a prefetch make things slower for the server, but it makes it impossible to know if they read it.
 		if (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch')
@@ -175,7 +176,6 @@ class Display_Controller
 		// When was the last time this topic was replied to?  Should we warn them about it?
 		if (!empty($modSettings['oldTopicDays']))
 		{
-			require_once(SUBSDIR . '/Messages.subs.php');
 			$mgsOptions = basicMessageInfo($topicinfo['id_last_msg'], true);
 			$context['oldTopicError'] = $mgsOptions['poster_time'] + $modSettings['oldTopicDays'] * 86400 < time() && empty($topicinfo['is_sticky']);
 		}
