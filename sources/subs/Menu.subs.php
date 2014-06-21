@@ -184,7 +184,7 @@ function createMenu($menuData, $menuOptions = array())
 
 						// Does this area have its own icon?
 						if (isset($area['icon']))
-							$menu_context['sections'][$section_id]['areas'][$area_id]['icon'] = '<img ' . (isset($area['class']) ? 'class="' . $area['class'] . '" ' : 'style="background: none"') . 'src="' . $context['menu_image_path'] . '/' . $area['icon'] . '" alt="" />&nbsp;&nbsp;';
+							$menu_context['sections'][$section_id]['areas'][$area_id]['icon'] = '<img ' . (isset($area['class']) ? 'class="' . $area['class'] . '" ' : 'style="background: none"') . ' src="' . $context['menu_image_path'] . '/' . $area['icon'] . '" alt="" />&nbsp;&nbsp;';
 						else
 							$menu_context['sections'][$section_id]['areas'][$area_id]['icon'] = '';
 

@@ -1105,7 +1105,7 @@ a.bbc_link {
 .linktree, .linktree_last {
 	position: relative;
 	float: left;
-	margin: -1px 1em -1px -1em;
+	margin: -1px 1px -1px -1px;
 	font-size: 0.929em;
 	line-height: 2.154em;
 	display: block;
@@ -1124,11 +1124,11 @@ a.bbc_link {
 	height: 0;
 	width: 0;
 	border: 35px solid transparent;
-	border-right: none;
-	z-index: 2;
+	z-index: 1;
 }
 .linktree:after, .linktree_last:after {
-	margin-left: 0;
+	margin-left: -1px;
+	z-index: 2;
 }
 .linktree:first-child {
 	padding-left: 20px;
@@ -2470,7 +2470,7 @@ ul.post_options {
 ul.post_options li {
 	float: left;
 	margin: 2px 0;
-	width: 49%;
+	width: 33%;
 }
 #postAdditionalOptionsHeader, #postDraftOptionsHeader {
 	margin: 1em 0 0 0;
