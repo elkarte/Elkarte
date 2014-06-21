@@ -96,7 +96,7 @@ class Modlog_Controller extends Action_Controller
 			'action' => 'lm.action',
 			'time' => 'lm.log_time',
 			'member' => 'mem.real_name',
-			'group' => 'mg.group_name',
+			'position' => 'mg.group_name',
 			'ip' => 'lm.ip',
 		);
 
@@ -114,7 +114,7 @@ class Modlog_Controller extends Action_Controller
 		$searchTypes = array(
 			'action' => array('sql' => 'lm.action', 'label' => $txt['modlog_action']),
 			'member' => array('sql' => 'mem.real_name', 'label' => $txt['modlog_member']),
-			'group' => array('sql' => 'mg.group_name', 'label' => $txt['modlog_position']),
+			'position' => array('sql' => 'mg.group_name', 'label' => $txt['modlog_position']),
 			'ip' => array('sql' => 'lm.ip', 'label' => $txt['modlog_ip'])
 		);
 
