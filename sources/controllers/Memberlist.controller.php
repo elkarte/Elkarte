@@ -442,6 +442,9 @@ class Memberlist_Controller extends Action_Controller
 				}
 			}
 
+			if (empty($fields))
+				redirectexit('action=memberlist');
+
 			$query = $_POST['search'] == '' ? '= {string:blank_string}' : (defined('DB_CASE_SENSITIVE') ? 'LIKE LOWER({string:search})' : 'LIKE {string:search}');
 			$where = implode(' ' . $query . ' OR ', $fields) . ' ' . $query . $condition;
 
