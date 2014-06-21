@@ -54,6 +54,7 @@ class Post_Controller extends Action_Controller
 		global $txt, $scripturl, $topic, $modSettings, $board, $user_info, $context, $options, $language;
 
 		loadLanguage('Post');
+		loadLanguage('Errors');
 		require_once(SOURCEDIR . '/AttachmentErrorContext.class.php');
 
 		// You can't reply with a poll... hacker.
@@ -969,6 +970,7 @@ class Post_Controller extends Action_Controller
 					totalSizeAllowed : ' . JavaScriptEscape($txt['attach_max_total_file_size']) . ',
 					individualSizeAllowed : ' . JavaScriptEscape(sprintf($txt['file_too_big'], comma_format($modSettings['attachmentSizeLimit'], 0))) . ',
 					numOfAttachmentAllowed : ' . JavaScriptEscape(sprintf($txt['attachments_limit_per_post'], $modSettings['attachmentNumPerPostLimit'])) . ',
+					postUploadError : ' . JavaScriptEscape($txt['post_upload_error']) . ',
 				}),
 			});', true);
 		}
