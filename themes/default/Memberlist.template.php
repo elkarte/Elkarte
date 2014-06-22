@@ -155,16 +155,18 @@ function template_memberlist()
 
 			$alternate = !$alternate;
 		}
+
+		echo '
+			</ul>
+		</div>';
 	}
 	// No members?
 	else
 		echo '
-				<li>
-					<div class="standard_row">', $txt['search_no_results'], '</div>
-				</li>';
-
-	echo '
 			</ul>
+		</div>
+		<div class="infobox">
+			', $txt['search_no_results'], '
 		</div>';
 }
 
