@@ -139,8 +139,11 @@ interface Database
 
 	/**
 	 * Sets the class not to return the error in case of failures.
+	 *
+	 * @param null|boolean $set if true the query method will not return any error
+	 *                     if null will restore the last known value of skip_error
 	 */
-	public function skip_error();
+	public function skip_error($set = true);
 
 	/**
 	 * Insert data.
