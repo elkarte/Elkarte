@@ -934,7 +934,10 @@ class Post_Controller extends Action_Controller
 			$context['attachments']['num_allowed'] = empty($modSettings['attachmentNumPerPostLimit']) ? 50 : min($modSettings['attachmentNumPerPostLimit'] - count($context['attachments']['current']), $modSettings['attachmentNumPerPostLimit']);
 			$context['attachments']['can']['post_unapproved'] = allowedTo('post_attachment');
 			$context['attachments']['restrictions'] = array();
-			$context['attachments']['allowed_extensions'] = strtr(strtolower($modSettings['attachmentExtensions']), array(',' => ', '));
+			if (!empty($modSettings['attachmentCheckExtensions']))
+				$context['attachments']['allowed_extensions'] = strtr(strtolower($modSettings['attachmentExtensions']), array(',' => ', '));
+			else
+				$context['attachments']['allowed_extensions'] = '';
 			$context['attachments']['templates'] = array(
 				'add_new' => 'template_add_new_attachments',
 				'existing' => 'template_show_existing_attachments',
