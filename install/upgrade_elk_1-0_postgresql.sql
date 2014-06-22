@@ -238,18 +238,18 @@ if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersio
 			'variable' => 'string',
 			'value' => 'string'
 		),
-		array (
+		array(
 			array('avatar_default', '0'),
 			array('gravatar_rating', 'g'),
 			array('admin_session_lifetime', 10),
 			array('xmlnews_limit', 5),
 			array('visual_verification_num_chars', '6'),
 			array('enable_unwatch', 0),
-			array('jquery_source', 'local')
+			array('jquery_source', 'local'),
 			array('mentions_enabled', '1'),
 			array('mentions_buddy', '0'),
 			array('mentions_dont_notify_rlike', '0'),
-			array('detailed-version.js', 'https://elkarte.github.io/Elkarte/site/detailed-version.js');
+			array('detailed-version.js', 'https://elkarte.github.io/Elkarte/site/detailed-version.js')
 		),
 		array('variable')
 	);
