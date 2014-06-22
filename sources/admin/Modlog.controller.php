@@ -91,18 +91,6 @@ class Modlog_Controller extends Action_Controller
 			deleteLogAction($context['log_type'], $context['hoursdisable'], $_POST['delete']);
 		}
 
-		// Do the column stuff!
-		$sort_types = array(
-			'action' => 'lm.action',
-			'time' => 'lm.log_time',
-			'member' => 'mem.real_name',
-			'position' => 'mg.group_name',
-			'ip' => 'lm.ip',
-		);
-
-		// Setup the direction stuff...
-		$context['order'] = isset($_REQUEST['sort']) && isset($sort_types[$_REQUEST['sort']]) ? $_REQUEST['sort'] : 'time';
-
 		// If we're coming from a search, get the variables.
 		if (!empty($_REQUEST['params']) && empty($_REQUEST['is_search']))
 		{
@@ -110,7 +98,7 @@ class Modlog_Controller extends Action_Controller
 			$search_params = @unserialize($search_params);
 		}
 
-		// This array houses all the valid search types.
+		// This array houses all the valid quick search types.
 		$searchTypes = array(
 			'action' => array('sql' => 'lm.action', 'label' => $txt['modlog_action']),
 			'member' => array('sql' => 'mem.real_name', 'label' => $txt['modlog_member']),
@@ -118,13 +106,16 @@ class Modlog_Controller extends Action_Controller
 			'ip' => array('sql' => 'lm.ip', 'label' => $txt['modlog_ip'])
 		);
 
+		// Setup the allowed search
+		$context['order'] = isset($_REQUEST['sort']) && isset($searchTypes[$_REQUEST['sort']]) ? $_REQUEST['sort'] : 'member';
+
 		if (!isset($search_params['string']) || (!empty($_REQUEST['search']) && $search_params['string'] != $_REQUEST['search']))
 			$search_params_string = empty($_REQUEST['search']) ? '' : $_REQUEST['search'];
 		else
 			$search_params_string = $search_params['string'];
 
 		if (isset($_REQUEST['search_type']) || empty($search_params['type']) || !isset($searchTypes[$search_params['type']]))
-			$search_params_type = isset($_REQUEST['search_type']) && isset($searchTypes[$_REQUEST['search_type']]) ? $_REQUEST['search_type'] : (isset($searchTypes[$context['order']]) ? $context['order'] : 'member');
+			$search_params_type = isset($_REQUEST['search_type']) && isset($searchTypes[$_REQUEST['search_type']]) ? $_REQUEST['search_type'] : $context['order'];
 		else
 			$search_params_type = $search_params['type'];
 
@@ -145,10 +136,16 @@ class Modlog_Controller extends Action_Controller
 		// If they are searching by action, then we must do some manual intervention to search in their language!
 		if ($search_params['type'] == 'action' && !empty($search_params['string']))
 		{
+			// Build a regex which looks for the words
+			$regex = '';
+			$search = explode(' ', $search_params['string']);
+			foreach ($search as $word)
+				$regex .= '(?=[\w\s]*' . $word . ')';
+
 			// For the moment they can only search for ONE action!
 			foreach ($txt as $key => $text)
 			{
-				if (substr($key, 0, 10) == 'modlog_ac_' && strpos($text, $search_params['string']) !== false)
+				if (strpos($key, 'modlog_ac_') === 0 && preg_match('~' . $regex . '~i', $text))
 				{
 					$search_params['string'] = substr($key, 10);
 					break;
@@ -282,7 +279,7 @@ class Modlog_Controller extends Action_Controller
 					'position' => 'below_table_data',
 					'value' => '
 						<div id="quick_log_search">
-							' . $txt['modlog_search'] . ' (' . $txt['modlog_by'] . ': ' . $context['search']['label'] . '):
+							' . $txt['modlog_search'] . ' (' . $txt['modlog_by'] . ': ' . $context['search']['label'] . ')
 							<input type="text" name="search" size="18" value="' . Util::htmlspecialchars($context['search']['string']) . '" class="input_text" />
 							<input type="submit" name="is_search" value="' . $txt['modlog_go'] . '" class="button_submit" />
 							' . ($context['can_delete'] ? '|&nbsp;
