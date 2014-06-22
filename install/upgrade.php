@@ -492,6 +492,8 @@ function loadEssentialData()
 		require_once(SUBSDIR . '/Util.class.php');
 		require_once(SOURCEDIR . '/Subs.php');
 		require_once(SOURCEDIR . '/QueryString.php');
+
+		spl_autoload_register('elk_autoloader');
 		cleanRequest();
 	}
 
@@ -1681,6 +1683,7 @@ function parse_sql($filename)
 
 	$db = database();
 	$db_table = db_table();
+	$db->skip_error();
 
 	// Our custom error handler - does nothing but does stop public errors from XML!
 	if (!function_exists('sql_error_handler'))
