@@ -396,7 +396,7 @@
 							errorMsg = wrapper + params.sizeErrorFiles.join(', ') + ' : ' + params.errorMsgs[err] + '</p>';
 							break;
 						case 'individualServerErr':
-							errorMsg = wrapper + params.serverErrorFiles.join(', ') + ' : ' + params.errorMsgs[err] + '</p>';
+							errorMsg = wrapper + params.errorMsgs[err] + params.serverErrorFiles.join(', ') + '</p>';
 							break;
 						default:
 							errorMsg = wrapper + params.errorMsgs[err] + '</p>';
