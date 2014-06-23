@@ -242,20 +242,20 @@ legend {
 	border-right: 0;
 	border-left: 2px solid #ccc;
 	border-radius: 0 2px 2px 0;
-	padding-right: 30px;
-	padding-left: 0;
+	padding-right: 25px;
+	padding-left: 10px;
 }
 .linktree:before {
 	border-left: 0;
-	border-right: 20px solid #ccc;
+	border-right: 10px solid #ccc;
 }
 .linktree:hover:before, .linktree_last:before {
 	border-left: 0;
-	border-right: 20px solid #3d6e32;
+	border-right: 10px solid #3d6e32;
 }
 .linktree:after {
 	border-left: 0;
-	border-right: 20px solid #fcfcfc;
+	border-right: 10px solid #fcfcfc;
 }
 .linktree:hover, .linktree_last {
 	border-right: 0;
@@ -264,16 +264,13 @@ legend {
 }
 .linktree:hover:after, .linktree_last:after {
 	border-left: 0;
-	border-right: 20px solid #5ba048;
+	border-right: 10px solid #5ba048;
 }
 .linktree_last:hover:after {
 	border-left: 0;
-	border-right: 20px solid #4b863c;
+	border-right: 10px solid #4b863c;
 }
-.linktree:first-child, .linktree_last {
-	padding-left: 0px;
-	padding-right: 30px;
-}
+
 
 /*	$BUTTONS	*/
 /* This section contains code for the quickbuttons (quote, quick edit, etc)

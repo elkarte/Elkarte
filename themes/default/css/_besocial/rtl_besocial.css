@@ -244,6 +244,9 @@ legend {
 	padding-left: 10px;
 	padding-right: 20px;
 }
+.linktree:first-child {
+	padding-right: 10px;
+}
 
 /*	$BOARDICONS	*/
 /* ------------------------------------------------------- */

@@ -181,9 +181,9 @@ class Admin_Controller extends Action_Controller
 							'pmsettings' => array($txt['personal_messages']),
 							'karma' => array($txt['karma'], 'enabled' => in_array('k', $context['admin_features'])),
 							'likes' => array($txt['likes'], 'enabled' => in_array('l', $context['admin_features'])),
+							'mention' => array($txt['mention']),
 							'sig' => array($txt['signature_settings_short']),
 							'profile' => array($txt['custom_profile_shorttitle'], 'enabled' => in_array('cp', $context['admin_features'])),
-							'mention' => array($txt['mention']),
 						),
 					),
 					'serversettings' => array(
