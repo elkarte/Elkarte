@@ -1002,6 +1002,9 @@ function action_databasePopulation()
 		if (empty($current_statement) || (preg_match('~;[\s]*$~s', $line) == 0 && $count != count($sql_lines)))
 			continue;
 
+		$result = eval('return ' . $current_statement);
+
+/*
 		// Does this table already exist?  If so, don't insert more data into it!
 		if (preg_match('~^\s*INSERT INTO ([^\s\n\r]+?)~', $current_statement, $match) != 0 && in_array($match[1], $exists))
 		{
@@ -1038,7 +1041,7 @@ function action_databasePopulation()
 					$incontext['sql_results']['inserts']++;
 			}
 		}
-
+*/
 		$current_statement = '';
 	}
 
