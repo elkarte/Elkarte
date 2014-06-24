@@ -5,128 +5,169 @@
 # Table structure for table `admin_info_files`
 #
 
-CREATE TABLE {$db_prefix}admin_info_files (
-  id_file tinyint(4) unsigned NOT NULL auto_increment,
-  filename varchar(255) NOT NULL default '',
-  path varchar(255) NOT NULL default '',
-  parameters varchar(255) NOT NULL default '',
-  data text NOT NULL,
-  filetype varchar(255) NOT NULL default '',
-  PRIMARY KEY (id_file),
-  KEY filename (filename(30))
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}admin_info_files',
+	array(
+		array('name' => 'id_file',    'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'auto' => true),
+		array('name' => 'filename',   'type' => 'varchar', 'default' => '', 'size' => 255),
+		array('name' => 'path',       'type' => 'varchar', 'default' => '', 'size' => 255),
+		array('name' => 'parameters', 'type' => 'varchar', 'default' => '', 'size' => 255),
+		array('name' => 'data',       'type' => 'text'),
+		array('name' => 'filetype',   'type' => 'varchar', 'default' => '', 'size' => 255),
+	),
+	array(
+		array('name' => 'id_file',  'columns' => array('id_file'), 'type' => 'primary'),
+		array('name' => 'filename', 'columns' => array('filename(30)'), 'type' => 'key'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `antispam_questions`
 #
 
-CREATE TABLE {$db_prefix}antispam_questions (
-  id_question tinyint(4) unsigned NOT NULL auto_increment,
-  question text NOT NULL,
-  answer text NOT NULL,
-  language varchar(50) NOT NULL default '',
-  PRIMARY KEY (id_question),
-  KEY language (language(30))
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}antispam_questions',
+	array(
+		array('name' => 'id_question', 'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'auto' => true),
+		array('name' => 'question',    'type' => 'text'),
+		array('name' => 'answer',      'type' => 'text'),
+		array('name' => 'language',    'type' => 'varchar', 'default' => '', 'size' => 50),
+	),
+	array(
+		array('name' => 'id_question', 'columns' => array('id_question'), 'type' => 'primary'),
+		array('name' => 'language',    'columns' => array('language(30)'), 'type' => 'key'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `approval_queue`
 #
 
-CREATE TABLE {$db_prefix}approval_queue (
-  id_msg int(10) unsigned NOT NULL default '0',
-  id_attach int(10) unsigned NOT NULL default '0',
-  id_event smallint(5) unsigned NOT NULL default '0'
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}approval_queue',
+	array(
+		array('name' => 'id_msg',    'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_attach', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_event',  'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+	),
+	array(),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `attachments`
 #
 
-CREATE TABLE {$db_prefix}attachments (
-  id_attach int(10) unsigned NOT NULL auto_increment,
-  id_thumb int(10) unsigned NOT NULL default '0',
-  id_msg int(10) unsigned NOT NULL default '0',
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  id_folder tinyint(3) NOT NULL default '1',
-  attachment_type tinyint(3) unsigned NOT NULL default '0',
-  filename varchar(255) NOT NULL default '',
-  file_hash varchar(40) NOT NULL default '',
-  fileext varchar(8) NOT NULL default '',
-  size int(10) unsigned NOT NULL default '0',
-  downloads mediumint(8) unsigned NOT NULL default '0',
-  width mediumint(8) unsigned NOT NULL default '0',
-  height mediumint(8) unsigned NOT NULL default '0',
-  mime_type varchar(20) NOT NULL default '',
-  approved tinyint(3) NOT NULL default '1',
-  PRIMARY KEY (id_attach),
-  UNIQUE id_member (id_member, id_attach),
-  KEY id_msg (id_msg),
-  KEY attachment_type (attachment_type),
-  KEY id_thumb (id_thumb)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}attachments',
+	array(
+		array('name' => 'id_attach',       'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true),
+		array('name' => 'id_thumb',        'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_msg',          'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_member',       'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_folder',       'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'attachment_type', 'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'filename',        'type' => 'varchar', 'default' => '', 'size' => 255),
+		array('name' => 'file_hash',       'type' => 'varchar', 'default' => '', 'size' => 40),
+		array('name' => 'fileext',         'type' => 'varchar', 'default' => '', 'size' => 8),
+		array('name' => 'size',            'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'downloads',       'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'width',           'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'height',          'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'mime_type',       'type' => 'varchar', 'default' => '', 'size' => 20),
+		array('name' => 'approved',        'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 1),
+	),
+	array(
+		array('name' => 'id_attach',       'columns' => array('id_attach'), 'type' => 'primary'),
+		array('name' => 'id_member',       'columns' => array('id_member', 'id_attach'), 'type' => 'unique'),
+		array('name' => 'id_msg',          'columns' => array('id_msg'), 'type' => 'key'),
+		array('name' => 'attachment_type', 'columns' => array('attachment_type'), 'type' => 'key'),
+		array('name' => 'id_thumb',        'columns' => array('id_thumb'), 'type' => 'key'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `ban_groups`
 #
 
-CREATE TABLE {$db_prefix}ban_groups (
-  id_ban_group mediumint(8) unsigned NOT NULL auto_increment,
-  name varchar(20) NOT NULL default '',
-  ban_time int(10) unsigned NOT NULL default '0',
-  expire_time int(10) unsigned,
-  cannot_access tinyint(3) unsigned NOT NULL default '0',
-  cannot_register tinyint(3) unsigned NOT NULL default '0',
-  cannot_post tinyint(3) unsigned NOT NULL default '0',
-  cannot_login tinyint(3) unsigned NOT NULL default '0',
-  reason varchar(255) NOT NULL default '',
-  notes text NOT NULL,
-  PRIMARY KEY (id_ban_group)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}ban_groups',
+	array(
+		array('name' => 'id_ban_group',    'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'auto' => true),
+		array('name' => 'name',            'type' => 'varchar', 'default' => '', 'size' => 20),
+		array('name' => 'ban_time',        'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'expire_time',     'type' => 'in', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'cannot_access',   'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'cannot_register', 'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'cannot_post',     'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'cannot_login',    'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'reason',          'type' => 'varchar', 'default' => '', 'size' => 255),
+		array('name' => 'notes',           'type' => 'text'),
+	),
+	array(
+		array('name' => 'id_ban_group', 'columns' => array('id_ban_group'), 'type' => 'primary'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `ban_items`
 #
 
-CREATE TABLE {$db_prefix}ban_items (
-  id_ban mediumint(8) unsigned NOT NULL auto_increment,
-  id_ban_group smallint(5) unsigned NOT NULL default '0',
-  ip_low1 smallint(5) unsigned NOT NULL default '0',
-  ip_high1 smallint(5) unsigned NOT NULL default '0',
-  ip_low2 smallint(5) unsigned NOT NULL default '0',
-  ip_high2 smallint(5) unsigned NOT NULL default '0',
-  ip_low3 smallint(5) unsigned NOT NULL default '0',
-  ip_high3 smallint(5) unsigned NOT NULL default '0',
-  ip_low4 smallint(5) unsigned NOT NULL default '0',
-  ip_high4 smallint(5) unsigned NOT NULL default '0',
-  ip_low5 smallint(5) unsigned NOT NULL default '0',
-  ip_high5 smallint(5) unsigned NOT NULL default '0',
-  ip_low6 smallint(5) unsigned NOT NULL default '0',
-  ip_high6 smallint(5) unsigned NOT NULL default '0',
-  ip_low7 smallint(5) unsigned NOT NULL default '0',
-  ip_high7 smallint(5) unsigned NOT NULL default '0',
-  ip_low8 smallint(5) unsigned NOT NULL default '0',
-  ip_high8 smallint(5) unsigned NOT NULL default '0',
-  hostname varchar(255) NOT NULL default '',
-  email_address varchar(255) NOT NULL default '',
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  hits mediumint(8) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_ban),
-  KEY id_ban_group (id_ban_group)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}ban_items',
+	array(
+		array('name' => 'id_ban',        'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'auto' => true),
+		array('name' => 'id_ban_group',  'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'ip_low1',       'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'ip_high1',      'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'ip_low2',       'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'ip_high2',      'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'ip_low3',       'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'ip_high3',      'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'ip_low4',       'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'ip_high4',      'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'ip_low5',       'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'ip_high5',      'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'ip_low6',       'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'ip_high6',      'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'ip_low7',       'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'ip_high7',      'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'ip_low8',       'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'ip_high8',      'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'hostname',      'type' => 'varchar', 'default' => '', 'size' => 255),
+		array('name' => 'email_address', 'type' => 'varchar', 'default' => '', 'size' => 255),
+		array('name' => 'id_member',     'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'hits',          'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+	),
+	array(
+		array('name' => 'id_ban',       'columns' => array('id_ban'), 'type' => 'primary'),
+		array('name' => 'id_ban_group', 'columns' => array('id_ban_group'), 'type' => 'key'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `board_permissions`
 #
 
-CREATE TABLE {$db_prefix}board_permissions (
-  id_group smallint(5) NOT NULL default '0',
-  id_profile smallint(5) unsigned NOT NULL default '0',
-  permission varchar(30) NOT NULL default '',
-  add_deny tinyint(4) NOT NULL default '1',
-  PRIMARY KEY (id_group, id_profile, permission)
-) ENGINE=MyISAM;
-
+$db_table->db_create_table('{db_prefix}board_permissions',
+	array(
+		array('name' => 'id_group',        'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'auto' => true),
+		array('name' => 'id_profile',  'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'permission',      'type' => 'varchar', 'default' => '', 'size' => 30),
+		array('name' => 'add_deny',     'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'default' => 1),
+		array('name' => 'hits',          'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+	),
+	array(
+		array('name' => 'id_group',       'columns' => array('id_group', 'id_profile', 'permission'), 'type' => 'primary'),
+	),
+	array(),
+	'ignore'
+);
 #
 # Dumping data for table `board_permissions`
 #
