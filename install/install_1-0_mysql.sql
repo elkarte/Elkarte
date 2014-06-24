@@ -156,14 +156,14 @@ $db_table->db_create_table('{db_prefix}ban_items',
 
 $db_table->db_create_table('{db_prefix}board_permissions',
 	array(
-		array('name' => 'id_group',        'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'auto' => true),
-		array('name' => 'id_profile',  'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
-		array('name' => 'permission',      'type' => 'varchar', 'default' => '', 'size' => 30),
-		array('name' => 'add_deny',     'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'default' => 1),
-		array('name' => 'hits',          'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_group',   'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'auto' => true),
+		array('name' => 'id_profile', 'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'permission', 'type' => 'varchar', 'default' => '', 'size' => 30),
+		array('name' => 'add_deny',   'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'default' => 1),
+		array('name' => 'hits',       'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 	),
 	array(
-		array('name' => 'id_group',       'columns' => array('id_group', 'id_profile', 'permission'), 'type' => 'primary'),
+		array('name' => 'id_group', 'columns' => array('id_group', 'id_profile', 'permission'), 'type' => 'primary'),
 	),
 	array(),
 	'ignore'
@@ -542,33 +542,39 @@ $db->insert('ignore',
 # Table structure for table `boards`
 #
 
-CREATE TABLE {$db_prefix}boards (
-  id_board smallint(5) unsigned NOT NULL auto_increment,
-  id_cat tinyint(4) unsigned NOT NULL default '0',
-  child_level tinyint(4) unsigned NOT NULL default '0',
-  id_parent smallint(5) unsigned NOT NULL default '0',
-  board_order smallint(5) NOT NULL default '0',
-  id_last_msg int(10) unsigned NOT NULL default '0',
-  id_msg_updated int(10) unsigned NOT NULL default '0',
-  member_groups varchar(255) NOT NULL default '-1,0',
-  id_profile smallint(5) unsigned NOT NULL default '1',
-  name varchar(255) NOT NULL default '',
-  description text NOT NULL,
-  num_topics mediumint(8) unsigned NOT NULL default '0',
-  num_posts mediumint(8) unsigned NOT NULL default '0',
-  count_posts tinyint(4) NOT NULL default '0',
-  id_theme tinyint(4) unsigned NOT NULL default '0',
-  override_theme tinyint(4) unsigned NOT NULL default '0',
-  unapproved_posts smallint(5) NOT NULL default '0',
-  unapproved_topics smallint(5) NOT NULL default '0',
-  redirect varchar(255) NOT NULL default '',
-  deny_member_groups varchar(255) NOT NULL default '',
-  PRIMARY KEY (id_board),
-  UNIQUE categories (id_cat, id_board),
-  KEY id_parent (id_parent),
-  KEY id_msg_updated (id_msg_updated),
-  KEY member_groups (member_groups(48))
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}boards',
+	array(
+		array('name' => 'id_board',           'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'auto' => true),
+		array('name' => 'id_cat',             'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'default' => 0),
+		array('name' => 'child_level',        'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_parent',          'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'board_order',        'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_last_msg',        'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_msg_updated',     'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'member_groups',      'type' => 'varchar', 'default' => '-1,0', 'size' => 255),
+		array('name' => 'id_profile',         'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 1),
+		array('name' => 'name',               'type' => 'varchar', 'default' => '', 'size' => 255),
+		array('name' => 'description',        'type' => 'text'),
+		array('name' => 'num_topics',         'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'num_posts',          'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'count_posts',        'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_theme',           'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'default' => 0),
+		array('name' => 'override_theme',     'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'default' => 0),
+		array('name' => 'unapproved_posts',   'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'unapproved_topics',  'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'redirect',           'type' => 'varchar', 'default' => '', 'size' => 255),
+		array('name' => 'deny_member_groups', 'type' => 'varchar', 'default' => '', 'size' => 255),
+	),
+	array(
+		array('name' => 'id_board', 'columns' => array('id_board'), 'type' => 'primary'),
+		array('name' => 'categories', 'columns' => array('id_cat', 'id_board'), 'type' => 'unique'),
+		array('name' => 'id_parent', 'columns' => array('id_parent'), 'type' => 'key'),
+		array('name' => 'id_msg_updated', 'columns' => array('id_msg_updated'), 'type' => 'key'),
+		array('name' => 'member_groups', 'columns' => array('member_groups(48)'), 'type' => 'key'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Dumping data for table `boards`
