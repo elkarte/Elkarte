@@ -594,31 +594,43 @@ $db->insert('ignore',
 # Table structure for table `calendar`
 #
 
-CREATE TABLE {$db_prefix}calendar (
-  id_event smallint(5) unsigned NOT NULL auto_increment,
-  start_date date NOT NULL default '0001-01-01',
-  end_date date NOT NULL default '0001-01-01',
-  id_board smallint(5) unsigned NOT NULL default '0',
-  id_topic mediumint(8) unsigned NOT NULL default '0',
-  title varchar(255) NOT NULL default '',
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_event),
-  KEY start_date (start_date),
-  KEY end_date (end_date),
-  KEY topic (id_topic, id_member)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}calendar',
+	array(
+		array('name' => 'id_event',   'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'auto' => true),
+		array('name' => 'start_date', 'type' => 'date', 'default' => '0001-01-01'),
+		array('name' => 'end_date',   'type' => 'date', 'default' => '0001-01-01'),
+		array('name' => 'id_board',   'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_topic',   'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'title',      'type' => 'varchar', 'default' => '', 'size' => 255),
+		array('name' => 'id_member',  'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+	),
+	array(
+		array('name' => 'id_event',   'columns' => array('id_event'), 'type' => 'primary'),
+		array('name' => 'start_date', 'columns' => array('start_date'), 'type' => 'key'),
+		array('name' => 'end_date',   'columns' => array('end_date'), 'type' => 'key'),
+		array('name' => 'topic',      'columns' => array('id_topic', 'id_member'), 'type' => 'key'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `calendar_holidays`
 #
 
-CREATE TABLE {$db_prefix}calendar_holidays (
-  id_holiday smallint(5) unsigned NOT NULL auto_increment,
-  event_date date NOT NULL default '0001-01-01',
-  title varchar(255) NOT NULL default '',
-  PRIMARY KEY (id_holiday),
-  KEY event_date (event_date)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}calendar_holidays',
+	array(
+		array('name' => 'id_holiday',   'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'auto' => true),
+		array('name' => 'event_date', 'type' => 'date', 'default' => '0001-01-01'),
+		array('name' => 'title', 'type' => 'varchar', 'default' => '', 'size' => 255),
+	),
+	array(
+		array('name' => 'id_holiday', 'columns' => array('id_holiday'), 'type' => 'primary'),
+		array('name' => 'event_date', 'columns' => array('event_date'), 'type' => 'key'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Dumping data for table `calendar_holidays`
@@ -753,13 +765,19 @@ $db->insert('ignore',
 # Table structure for table `categories`
 #
 
-CREATE TABLE {$db_prefix}categories (
-  id_cat tinyint(4) unsigned NOT NULL auto_increment,
-  cat_order tinyint(4) NOT NULL default '0',
-  name varchar(255) NOT NULL default '',
-  can_collapse tinyint(1) NOT NULL default '1',
-  PRIMARY KEY (id_cat)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}categories',
+	array(
+		array('name' => 'id_cat',   'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'auto' => true),
+		array('name' => 'cat_order',   'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'default' => 0),
+		array('name' => 'name', 'type' => 'varchar', 'default' => '', 'size' => 255),
+		array('name' => 'can_collapse',   'type' => 'tinyint', 'size' => 1, 'unsigned' => true, 'default' => 0),
+	),
+	array(
+		array('name' => 'id_cat', 'columns' => array('id_cat'), 'type' => 'primary'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Dumping data for table `categories`
@@ -778,40 +796,52 @@ $db->insert('ignore',
 # Table structure for table `collapsed_categories`
 #
 
-CREATE TABLE {$db_prefix}collapsed_categories (
-  id_cat tinyint(4) unsigned NOT NULL default '0',
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_cat, id_member)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}collapsed_categories',
+	array(
+		array('name' => 'id_cat',   'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_member',   'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+	),
+	array(
+		array('name' => 'id_cat', 'columns' => array('id_cat', 'id_member'), 'type' => 'primary'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `custom_fields`
 #
 
-CREATE TABLE {$db_prefix}custom_fields (
-  id_field smallint(5) NOT NULL auto_increment,
-  col_name varchar(12) NOT NULL default '',
-  field_name varchar(40) NOT NULL default '',
-  field_desc varchar(255) NOT NULL default '',
-  field_type varchar(8) NOT NULL default 'text',
-  field_length smallint(5) NOT NULL default '255',
-  field_options text NOT NULL,
-  mask varchar(255) NOT NULL default '',
-  show_reg tinyint(3) NOT NULL default '0',
-  show_display tinyint(3) NOT NULL default '0',
-  show_memberlist tinyint(3) NOT NULL default '0',
-  show_profile varchar(20) NOT NULL default 'forumprofile',
-  private tinyint(3) NOT NULL default '0',
-  active tinyint(3) NOT NULL default '1',
-  bbc tinyint(3) NOT NULL default '0',
-  can_search tinyint(3) NOT NULL default '0',
-  default_value varchar(255) NOT NULL default '',
-  enclose text NOT NULL,
-  placement tinyint(3) NOT NULL default '0',
-  vieworder smallint(5) NOT NULL default '0',
-  PRIMARY KEY (id_field),
-  UNIQUE col_name (col_name)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}custom_fields',
+	array(
+		array('name' => 'id_field',        'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'auto' => true),
+		array('name' => 'col_name',        'type' => 'varchar', 'default' => '', 'size' => 12),
+		array('name' => 'field_name',      'type' => 'varchar', 'default' => '', 'size' => 40),
+		array('name' => 'field_desc',      'type' => 'varchar', 'default' => '', 'size' => 255),
+		array('name' => 'field_type',      'type' => 'varchar', 'default' => 'text', 'size' => 8),
+		array('name' => 'field_length',    'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 255),
+		array('name' => 'field_options',   'type' => 'text'),
+		array('name' => 'mask',            'type' => 'varchar', 'default' => '', 'size' => 255),
+		array('name' => 'show_reg',        'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'show_display',    'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'show_memberlist', 'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'show_profile',    'type' => 'varchar', 'default' => 'forumprofile', 'size' => 20),
+		array('name' => 'private',         'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'active',          'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 1),
+		array('name' => 'bbc',             'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'can_search',      'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'default_value',   'type' => 'varchar', 'default' => '', 'size' => 255),
+		array('name' => 'enclose',         'type' => 'text'),
+		array('name' => 'placement',       'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'vieworder',       'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+	),
+	array(
+		array('name' => 'id_field', 'columns' => array('id_field'), 'type' => 'primary'),
+		array('name' => 'col_name', 'columns' => array('col_name'), 'type' => 'unique'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Dumping data for table `custom_fields`
@@ -842,13 +872,19 @@ $db->insert('ignore',
 # Table structure for table `custom_fields_data`
 #
 
-CREATE TABLE {$db_prefix}custom_fields_data (
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  variable varchar(255) NOT NULL default '',
-  value text NOT NULL,
-  PRIMARY KEY (id_member, variable(30)),
-  KEY id_member (id_member)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}custom_fields_data',
+	array(
+		array('name' => 'id_member',   'type' => 'mediumint', 'size' => 4, 'unsigned' => true, 'default' => 0),
+		array('name' => 'variable', 'type' => 'text'),
+		array('name' => 'can_collapse',   'type' => 'tinyint', 'size' => 1, 'unsigned' => true, 'default' => 0),
+	),
+	array(
+		array('name' => 'id_member', 'columns' => array('id_member', 'variable(30)'), 'type' => 'primary'),
+		array('name' => 'id_member', 'columns' => array('id_member'), 'type' => 'key'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `group_moderators`
