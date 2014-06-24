@@ -150,9 +150,9 @@ class ManageFeatures_Controller extends Action_Controller
 				),
 				'layout' => array(
 				),
-				'karma' => array(
-				),
 				'pmsettings' => array(
+				),
+				'karma' => array(
 				),
 				'likes' => array(
 				),

@@ -603,6 +603,8 @@ class ManageThemes_Controller extends Action_Controller
 			$file_contents = implode("\n", file($settings['theme_dir'] . '/index.template.php'));
 			if (preg_match('~\'theme_variants\'\s*=>(.+?\)),$~sm', $file_contents, $matches))
 				eval('global $settings; $settings[\'theme_variants\'] = ' . $matches[1] . ';');
+
+				call_integration_hook('integrate_init_theme', array($theme, &$settings));
 		}
 
 		// Submitting!
