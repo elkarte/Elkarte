@@ -874,9 +874,9 @@ $db->insert('ignore',
 
 $db_table->db_create_table('{db_prefix}custom_fields_data',
 	array(
-		array('name' => 'id_member',   'type' => 'mediumint', 'size' => 4, 'unsigned' => true, 'default' => 0),
-		array('name' => 'variable', 'type' => 'text'),
-		array('name' => 'can_collapse',   'type' => 'tinyint', 'size' => 1, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_member',    'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'variable',     'type' => 'text'),
+		array('name' => 'can_collapse', 'type' => 'tinyint', 'size' => 1, 'unsigned' => true, 'default' => 0),
 	),
 	array(
 		array('name' => 'id_member', 'columns' => array('id_member', 'variable(30)'), 'type' => 'primary'),
@@ -890,61 +890,84 @@ $db_table->db_create_table('{db_prefix}custom_fields_data',
 # Table structure for table `group_moderators`
 #
 
-CREATE TABLE {$db_prefix}group_moderators (
-  id_group smallint(5) unsigned NOT NULL default '0',
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_group, id_member)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}group_moderators',
+	array(
+		array('name' => 'id_group',  'type' => 'smallint', 'size' => 4, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+	),
+	array(
+		array('name' => 'id_group', 'columns' => array('id_group', 'id_member'), 'type' => 'primary'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `follow_ups`
 #
 
-CREATE TABLE {$db_prefix}follow_ups (
-  follow_up int(10) unsigned NOT NULL default '0',
-  derived_from int(10) unsigned NOT NULL default '0',
-  PRIMARY KEY (follow_up, derived_from)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}follow_ups',
+	array(
+		array('name' => 'follow_up',    'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'derived_from', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+	),
+	array(
+		array('name' => 'id_group', 'columns' => array('follow_up', 'derived_from'), 'type' => 'key'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_actions`
 #
 
-CREATE TABLE {$db_prefix}log_actions (
-  id_action int(10) unsigned NOT NULL auto_increment,
-  id_log tinyint(3) unsigned NOT NULL default '1',
-  log_time int(10) unsigned NOT NULL default '0',
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  ip char(16) NOT NULL default '                ',
-  action varchar(30) NOT NULL default '',
-  id_board smallint(5) unsigned NOT NULL default '0',
-  id_topic mediumint(8) unsigned NOT NULL default '0',
-  id_msg int(10) unsigned NOT NULL default '0',
-  extra text NOT NULL,
-  PRIMARY KEY (id_action),
-  KEY id_log (id_log),
-  KEY log_time (log_time),
-  KEY id_member (id_member),
-  KEY id_board (id_board),
-  KEY id_msg (id_msg)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_actions',
+	array(
+		array('name' => 'id_action', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true),
+		array('name' => 'id_log',    'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 1),
+		array('name' => 'log_time',  'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'ip',        'type' => 'char(16)', 'default' => '                '),
+		array('name' => 'action',    'type' => 'varcha', 'default' => ''),
+		array('name' => 'id_board',  'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_topic',  'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'extra',     'type' => 'text'),
+	),
+	array(
+		array('name' => 'id_action', 'columns' => array('id_action'), 'type' => 'primary'),
+		array('name' => 'id_log',    'columns' => array('id_log'), 'type' => 'key'),
+		array('name' => 'log_time',  'columns' => array('log_time'), 'type' => 'key'),
+		array('name' => 'id_member', 'columns' => array('id_member'), 'type' => 'key'),
+		array('name' => 'id_board',  'columns' => array('id_board'), 'type' => 'key'),
+		array('name' => 'id_msg',    'columns' => array('id_msg'), 'type' => 'key'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_activity`
 #
 
-CREATE TABLE {$db_prefix}log_activity (
-  date date NOT NULL default '0001-01-01',
-  hits mediumint(8) unsigned NOT NULL default '0',
-  topics smallint(5) unsigned NOT NULL default '0',
-  posts smallint(5) unsigned NOT NULL default '0',
-  registers smallint(5) unsigned NOT NULL default '0',
-  most_on smallint(5) unsigned NOT NULL default '0',
-  pm smallint(5) unsigned NOT NULL default '0',
-  email smallint(5) unsigned NOT NULL default '0',
-  PRIMARY KEY (date),
-  KEY most_on (most_on)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_activity',
+	array(
+		array('name' => 'date',      'type' => 'date', 'default' => '0001-01-01'),
+		array('name' => 'hits',      'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'topics',    'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'posts',     'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'registers', 'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'most_on',   'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'pm',        'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'email',     'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+	),
+	array(
+		array('name' => 'date',    'columns' => array('date'), 'type' => 'primary'),
+		array('name' => 'most_on', 'columns' => array('most_on'), 'type' => 'key'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_badbehavior`
