@@ -1854,7 +1854,7 @@ $db->insert('ignore',
 	'subject' => 'string', 'poster_name' => 'string', 'poster_email' => 'string', 'poster_ip' => 'string',
 	'modified_name' => 'string', 'body' => 'string', 'icon' => 'string')
 	array(
-		(1, 1, 1, 1, UNIX_TIMESTAMP(), '{$default_topic_subject}', 'Elkarte', 'info@elkarte.net', '127.0.0.1', '', '{$default_topic_message}', 'xx')
+		(1, 1, 1, 1, time(), '{$default_topic_subject}', 'Elkarte', 'info@elkarte.net', '127.0.0.1', '', '{$default_topic_message}', 'xx')
 	),
 	array('id_msg')
 );
@@ -2302,7 +2302,7 @@ $db->insert('ignore',
 		('censorIgnoreCase', '1'),
 		('mostOnline', '1'),
 		('mostOnlineToday', '1'),
-		('mostDate', UNIX_TIMESTAMP()),
+		('mostDate', time()),
 		('allow_disableAnnounce', '1'),
 		('trackStats', '1'),
 		('userLanguage', '1'),
