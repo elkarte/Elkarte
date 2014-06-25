@@ -1171,36 +1171,56 @@ $db_table->db_create_table('{db_prefix}log_karma',
 # Table structure for table `log_likes`
 #
 
-CREATE TABLE {$db_prefix}log_likes (
-  action char(1) NOT NULL default '0',
-  id_target mediumint(8) unsigned NOT NULL default '0',
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  log_time int(10) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_target, id_member),
-  KEY log_time (log_time)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_likes',
+	array(
+		array('name' => 'action',    'type' => 'char', 'size' => 1, 'default' => '0'),
+		array('name' => 'id_target', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'log_time',  'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'reason',    'type' => 'text'),
+	),
+	array(
+		array('name' => 'target_member', 'columns' => array('id_target', 'id_member'), 'type' => 'primary'),
+		array('name' => 'log_time',      'columns' => array('log_time'), 'type' => 'unique'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_mark_read`
 #
 
-CREATE TABLE {$db_prefix}log_mark_read (
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  id_board smallint(5) unsigned NOT NULL default '0',
-  id_msg int(10) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_member, id_board)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_likes',
+	array(
+		array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_board',  'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_msg',    'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'reason',    'type' => 'text'),
+	),
+	array(
+		array('name' => 'member_id_board', 'columns' => array('id_member', 'id_board'), 'type' => 'primary'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_member_notices`
 #
 
-CREATE TABLE {$db_prefix}log_member_notices (
-  id_notice mediumint(8) unsigned NOT NULL auto_increment,
-  subject varchar(255) NOT NULL default '',
-  body text NOT NULL,
-  PRIMARY KEY (id_notice)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_member_notices',
+	array(
+		array('name' => 'id_notice', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'auto' => true),
+		array('name' => 'subject',   'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'body',      'type' => 'text'),
+	),
+	array(
+		array('name' => 'id_notice', 'columns' => array('id_notice'), 'type' => 'primary'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_mentions`
