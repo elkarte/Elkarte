@@ -1393,57 +1393,87 @@ $db_table->db_create_table('{db_prefix}log_reported_comments',
 # Table structure for table `log_scheduled_tasks`
 #
 
-CREATE TABLE {$db_prefix}log_scheduled_tasks (
-  id_log mediumint(8) NOT NULL auto_increment,
-  id_task smallint(5) NOT NULL default '0',
-  time_run int(10) NOT NULL default '0',
-  time_taken float NOT NULL default '0',
-  PRIMARY KEY (id_log)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_scheduled_tasks',
+	array(
+		array('name' => 'id_log',     'type' => 'mediumint', 'size' => 8, 'auto' => true),
+		array('name' => 'id_task',    'type' => 'smallint', 'size' => 5, 'default' => 0),
+		array('name' => 'time_run',   'type' => 'int', 'size' => 10, 'default' => 0),
+		array('name' => 'time_taken', 'type' => 'float', 'default' => 0),
+	),
+	array(
+		array('name' => 'id_log', 'columns' => array('id_log'), 'type' => 'primary'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_search_messages`
 #
 
-CREATE TABLE {$db_prefix}log_search_messages (
-  id_search tinyint(3) unsigned NOT NULL default '0',
-  id_msg int(10) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_search, id_msg)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_search_messages',
+	array(
+		array('name' => 'id_search', 'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_msg',    'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+	),
+	array(
+		array('name' => 'search_msg', 'columns' => array('id_search', 'id_msg'), 'type' => 'primary'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_search_results`
 #
 
-CREATE TABLE {$db_prefix}log_search_results (
-  id_search tinyint(3) unsigned NOT NULL default '0',
-  id_topic mediumint(8) unsigned NOT NULL default '0',
-  id_msg int(10) unsigned NOT NULL default '0',
-  relevance smallint(5) unsigned NOT NULL default '0',
-  num_matches smallint(5) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_search, id_topic)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_search_results',
+	array(
+		array('name' => 'id_search', 'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_topic',    'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_msg',    'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'relevance',    'type' => 'smallint', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'num_matches',    'type' => 'smallint', 'size' => 10, 'unsigned' => true, 'default' => 0),
+	),
+	array(
+		array('name' => 'id_search_topic', 'columns' => array('id_search', 'id_topic'), 'type' => 'primary'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_search_subjects`
 #
 
-CREATE TABLE {$db_prefix}log_search_subjects (
-  word varchar(20) NOT NULL default '',
-  id_topic mediumint(8) unsigned NOT NULL default '0',
-  PRIMARY KEY (word, id_topic),
-  KEY id_topic (id_topic)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_search_subjects',
+	array(
+		array('name' => 'word',     'type' => 'varchar', 'size' => 20, 'default' => ''),
+		array('name' => 'id_topic', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+	),
+	array(
+		array('name' => 'word_id_topic', 'columns' => array('word', 'id_topic'), 'type' => 'primary'),
+		array('name' => 'id_topic',      'columns' => array('id_topic'), 'type' => 'key'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_search_topics`
 #
 
-CREATE TABLE {$db_prefix}log_search_topics (
-  id_search tinyint(3) unsigned NOT NULL default '0',
-  id_topic mediumint(8) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_search, id_topic)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_search_topics',
+	array(
+		array('name' => 'id_search',     'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_topic', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+	),
+	array(
+		array('name' => 'id_search_topic', 'columns' => array('id_search', 'id_topic'), 'type' => 'primary'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_spider_hits`
