@@ -1083,33 +1083,50 @@ $db_table->db_create_table('{db_prefix}log_digest',
 # Table structure for table `log_errors`
 #
 
-CREATE TABLE {$db_prefix}log_errors (
-  id_error mediumint(8) unsigned NOT NULL auto_increment,
-  log_time int(10) unsigned NOT NULL default '0',
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  ip char(16) NOT NULL default '                ',
-  url text NOT NULL,
-  message text NOT NULL,
-  session char(64) NOT NULL default '                                                                ',
-  error_type char(15) NOT NULL default 'general',
-  file varchar(255) NOT NULL default '',
-  line mediumint(8) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_error),
-  KEY log_time (log_time),
-  KEY id_member (id_member),
-  KEY ip (ip(16))
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_errors',
+	array(
+		array('name' => 'id_error',   'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'auto' => true),
+		array('name' => 'log_time',   'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_member',  'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'ip',         'type' => 'char', 'size' => 16, 'default' => '                '),
+		array('name' => 'url',        'type' => 'text'),
+		array('name' => 'message',    'type' => 'text'),
+		array('name' => 'session',    'type' => 'char', 'size' => 64, 'default' => '                                                                '),
+		array('name' => 'error_type', 'type' => 'char', 'size' => 15, 'default' => 'general'),
+		array('name' => 'file',       'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'line',       'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'counter',    'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'body',       'type' => 'text'),
+	),
+	array(
+		array('name' => 'id_error',  'columns' => array('id_error'), 'type' => 'primary'),
+		array('name' => 'log_time',  'columns' => array('log_time'), 'type' => 'key'),
+		array('name' => 'id_member', 'columns' => array('id_member'), 'type' => 'key'),
+		array('name' => 'ip',        'columns' => array('ip(16)'), 'type' => 'key'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_floodcontrol`
 #
 
-CREATE TABLE {$db_prefix}log_floodcontrol (
-  ip char(16) NOT NULL default '                ',
-  log_time int(10) unsigned NOT NULL default '0',
-  log_type varchar(10) NOT NULL default 'post',
-  PRIMARY KEY (ip(16), log_type(10))
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_floodcontrol',
+	array(
+		array('name' => 'ip',       'type' => 'char', 'size' => 16, 'default' => '                '),
+		array('name' => 'log_time', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'log_type', 'type' => 'varchar', 'size' => 10, 'default' => 'post'),
+		array('name' => 'line',     'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'counter',  'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'body',     'type' => 'text'),
+	),
+	array(
+		array('name' => 'ip_log_time', 'columns' => array('ip(16)', 'log_type(10)'), 'type' => 'primary'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_group_requests`
