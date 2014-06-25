@@ -1003,18 +1003,11 @@ $db_table->db_create_table('{db_prefix}log_badbehavior',
 
 $db_table->db_create_table('{db_prefix}log_banned',
 	array(
-		array('name' => 'id_ban_log',      'type' => 'mediumint', 'size' => 8, 'auto' => true),
+		array('name' => 'id_ban_log',      'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'auto' => true),
 		array('name' => 'id_member',       'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 		array('name' => 'ip',              'type' => 'char', 'size' => 16, 'default' => '                '),
-		array('name' => 'email',           'type' => 'varchar', 'size' => 255),
+		array('name' => 'email',           'type' => 'varchar', 'size' => 255, 'default' => ''),
 		array('name' => 'log_time',        'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
-		array('name' => 'request_uri',     'type' => 'varchar', 'size' => 255),
-		array('name' => 'server_protocol', 'type' => 'varchar', 'size' => 255),
-		array('name' => 'http_headers',    'type' => 'text'),
-		array('name' => 'user_agent',      'type' => 'varchar', 'size' => 255),
-		array('name' => 'request_entity',  'type' => 'varchar', 'size' => 255),
-		array('name' => 'valid',           'type' => 'varchar', 'size' => 255),
-		array('name' => 'session',         'type' => 'char', 'size' => 64),
 	),
 	array(
 		array('name' => 'id_ban_log', 'columns' => array('id_ban_log'), 'type' => 'primary'),
@@ -1045,34 +1038,46 @@ $db_table->db_create_table('{db_prefix}log_boards',
 # Table structure for table `log_comments`
 #
 
-CREATE TABLE {$db_prefix}log_comments (
-  id_comment mediumint(8) unsigned NOT NULL auto_increment,
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  member_name varchar(80) NOT NULL default '',
-  comment_type varchar(8) NOT NULL default 'warning',
-  id_recipient mediumint(8) unsigned NOT NULL default '0',
-  recipient_name varchar(255) NOT NULL default '',
-  log_time int(10) NOT NULL default '0',
-  id_notice mediumint(8) unsigned NOT NULL default '0',
-  counter tinyint(3) NOT NULL default '0',
-  body text NOT NULL,
-  PRIMARY KEY (id_comment),
-  KEY id_recipient (id_recipient),
-  KEY log_time (log_time),
-  KEY comment_type (comment_type(8))
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_comments',
+	array(
+		array('name' => 'id_comment',     'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'auto' => true),
+		array('name' => 'id_member',      'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'member_name',    'type' => 'varchar', 'size' => 80, 'default' => ''),
+		array('name' => 'comment_type',   'type' => 'varchar', 'size' => 8, 'default' => 'warning'),
+		array('name' => 'id_recipient',   'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'recipient_name', 'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'log_time',       'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_notice',      'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'counter',        'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'body',           'type' => 'text'),
+	),
+	array(
+		array('name' => 'id_comment',   'columns' => array('id_comment'), 'type' => 'primary'),
+		array('name' => 'id_recipient', 'columns' => array('id_recipient'), 'type' => 'key'),
+		array('name' => 'log_time',     'columns' => array('log_time'), 'type' => 'key'),
+		array('name' => 'comment_type', 'columns' => array('comment_type(8)'), 'type' => 'key'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_digest`
 #
 
-CREATE TABLE {$db_prefix}log_digest (
-  id_topic mediumint(8) unsigned NOT NULL default '0',
-  id_msg int(10) unsigned NOT NULL default '0',
-  note_type varchar(10) NOT NULL default 'post',
-  daily tinyint(3) unsigned NOT NULL default '0',
-  exclude mediumint(8) unsigned NOT NULL default '0'
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_digest',
+	array(
+		array('name' => 'id_topic',  'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_msg',    'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'note_type', 'type' => 'varchar', 'size' => 10, 'default' => 'post'),
+		array('name' => 'daily',     'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'exclude',   'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+	),
+	array(
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_errors`
