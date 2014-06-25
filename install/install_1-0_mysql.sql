@@ -1238,7 +1238,7 @@ $db_table->db_create_table('{db_prefix}log_mentions',
 	),
 	array(
 		array('name' => 'id_mention',       'columns' => array('id_mention'), 'type' => 'primary'),
-		array('name' => 'id_member_status', 'columns' => array('id_member', 'status'), 'type' => 'primary'),
+		array('name' => 'id_member_status', 'columns' => array('id_member', 'status'), 'type' => 'key'),
 	),
 	array(),
 	'ignore'
@@ -1257,7 +1257,7 @@ $db_table->db_create_table('{db_prefix}log_notify',
 	),
 	array(
 		array('name' => 'member_topic_board', 'columns' => array('id_member', 'id_topic', 'id_board'), 'type' => 'primary'),
-		array('name' => 'id_topic',           'columns' => array('id_topic', 'id_member'), 'type' => 'primary'),
+		array('name' => 'id_topic',           'columns' => array('id_topic', 'id_member'), 'type' => 'key'),
 	),
 	array(),
 	'ignore'
@@ -1267,53 +1267,71 @@ $db_table->db_create_table('{db_prefix}log_notify',
 # Table structure for table `log_online`
 #
 
-CREATE TABLE {$db_prefix}log_online (
-  session varchar(64) NOT NULL default '',
-  log_time int(10) NOT NULL default '0',
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  id_spider smallint(5) unsigned NOT NULL default '0',
-  ip int(10) unsigned NOT NULL default '0',
-  url text NOT NULL,
-  PRIMARY KEY (session),
-  KEY log_time (log_time),
-  KEY id_member (id_member)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_online',
+	array(
+		array('name' => 'session',   'type' => 'varchar', 'size' => 64, 'default' => ''),
+		array('name' => 'log_time',  'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_spider', 'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'ip',        'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'url',       'type' => 'text'),
+	),
+	array(
+		array('name' => 'session',   'columns' => array('session'), 'type' => 'primary'),
+		array('name' => 'id_member', 'columns' => array('id_member'), 'type' => 'key'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_packages`
 #
 
-CREATE TABLE {$db_prefix}log_packages (
-  id_install int(10) NOT NULL auto_increment,
-  filename varchar(255) NOT NULL default '',
-  package_id varchar(255) NOT NULL default '',
-  name varchar(255) NOT NULL default '',
-  version varchar(255) NOT NULL default '',
-  id_member_installed mediumint(8) unsigned NOT NULL default '0',
-  member_installed varchar(255) NOT NULL default '',
-  time_installed int(10) NOT NULL default '0',
-  id_member_removed mediumint(8) unsigned NOT NULL default '0',
-  member_removed varchar(255) NOT NULL default '',
-  time_removed int(10) NOT NULL default '0',
-  install_state tinyint(3) NOT NULL default '1',
-  failed_steps text NOT NULL,
-  themes_installed varchar(255) NOT NULL default '',
-  db_changes text NOT NULL,
-  credits varchar(255) NOT NULL default '',
-  PRIMARY KEY (id_install),
-  KEY filename (filename(15))
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_packages',
+	array(
+		array('name' => 'id_install',          'type' => 'int', 'size' => 10, 'auto' => true),
+		array('name' => 'filename',            'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'package_id',          'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'name',                'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'version',             'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'id_member_installed', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'member_installed',    'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'time_installed',      'type' => 'int', 'size' => 10, 'default' => 0),
+		array('name' => 'id_member_removed',   'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'member_removed',      'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'time_removed',        'type' => 'int', 'size' => 10, 'default' => 0),
+		array('name' => 'install_state',       'type' => 'tinyint', 'size' => 3, 'default' => 1),
+		array('name' => 'failed_steps',        'type' => 'text'),
+		array('name' => 'themes_installed',    'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'db_changes',          'type' => 'text'),
+		array('name' => 'credits',             'type' => 'varchar', 'size' => 255, 'default' => ''),
+	),
+	array(
+		array('name' => 'id_install', 'columns' => array('id_install'), 'type' => 'primary'),
+		array('name' => 'filename',   'columns' => array('filename(15)'), 'type' => 'key'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_polls`
 #
 
-CREATE TABLE {$db_prefix}log_polls (
-  id_poll mediumint(8) unsigned NOT NULL default '0',
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  id_choice tinyint(3) unsigned NOT NULL default '0',
-  KEY id_poll (id_poll, id_member, id_choice)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_polls',
+	array(
+		array('name' => 'id_poll',   'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_choice', 'type' => 'tinyint', 'size' => 3, 'default' => 0),
+	),
+	array(
+		array('name' => 'id_poll',  'columns' => array('id_poll', 'id_member', 'id_choice'), 'type' => 'key'),
+		array('name' => 'filename', 'columns' => array('filename(15)'), 'type' => 'key'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_reported`
