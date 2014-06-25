@@ -2130,7 +2130,7 @@ CREATE TABLE {$db_prefix}scheduled_tasks (
 
 $db->insert('ignore',
 	'{db_prefix}scheduled_tasks',
-	array('id_task' => 'int', 'next_time' => 'int', 'time_offset => 'int', 'time_regularity' => 'int',
+	array('id_task' => 'int', 'next_time' => 'int', 'time_offset' => 'int', 'time_regularity' => 'int',
 	'time_unit' => 'string', 'disabled' => 'int', 'task' => 'string')
 	array(
 		(1, 0, 0, 2, 'h', 0, 'approval_notification'),
@@ -2450,7 +2450,7 @@ CREATE TABLE {$db_prefix}spiders (
 
 $db->insert('ignore',
 	'{db_prefix}spiders',
-	array('id_spider' => 'int', 'spider_name' => 'string', 'user_agent => 'string', 'ip_info' => 'string')
+	array('id_spider' => 'int', 'spider_name' => 'string', 'user_agent' => 'string', 'ip_info' => 'string')
 	array(
 		(1, 'Google', 'googlebot', ''),
 		(2, 'Yahoo!', 'Yahoo! Slurp', ''),
@@ -2527,7 +2527,7 @@ CREATE TABLE {$db_prefix}themes (
 
 $db->insert('ignore',
 	'{db_prefix}themes',
-	array('id_theme' => 'int', 'variable' => 'string', 'value => 'string')
+	array('id_theme' => 'int', 'variable' => 'string', 'value' => 'string')
 	array(
 		(1, 'name', '{$default_theme_name}'),
 		(1, 'theme_url', '{$boardurl}/themes/default'),
@@ -2557,7 +2557,7 @@ $db->insert('ignore',
 
 $db->insert('ignore',
 	'{db_prefix}themes',
-	array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string', 'value => 'string')
+	array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string', 'value' => 'string')
 	array(
 		(-1, 1, 'display_quick_reply', '2'),
 		(-1, 1, 'drafts_autosave_enabled', '1')
