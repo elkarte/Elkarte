@@ -1327,7 +1327,6 @@ $db_table->db_create_table('{db_prefix}log_polls',
 	),
 	array(
 		array('name' => 'id_poll',  'columns' => array('id_poll', 'id_member', 'id_choice'), 'type' => 'key'),
-		array('name' => 'filename', 'columns' => array('filename(15)'), 'type' => 'key'),
 	),
 	array(),
 	'ignore'
@@ -1337,46 +1336,58 @@ $db_table->db_create_table('{db_prefix}log_polls',
 # Table structure for table `log_reported`
 #
 
-CREATE TABLE {$db_prefix}log_reported (
-  id_report mediumint(8) unsigned NOT NULL auto_increment,
-  id_msg int(10) unsigned NOT NULL default '0',
-  id_topic mediumint(8) unsigned NOT NULL default '0',
-  id_board smallint(5) unsigned NOT NULL default '0',
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  membername varchar(255) NOT NULL default '',
-  subject varchar(255) NOT NULL default '',
-  body mediumtext NOT NULL,
-  time_started int(10) NOT NULL default '0',
-  time_updated int(10) NOT NULL default '0',
-  num_reports mediumint(6) NOT NULL default '0',
-  closed tinyint(3) NOT NULL default '0',
-  ignore_all tinyint(3) NOT NULL default '0',
-  PRIMARY KEY (id_report),
-  KEY id_member (id_member),
-  KEY id_topic (id_topic),
-  KEY closed (closed),
-  KEY time_started (time_started),
-  KEY id_msg (id_msg)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_reported',
+	array(
+		array('name' => 'id_report',    'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'auto' => true),
+		array('name' => 'id_msg',       'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_topic',     'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_board',     'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_member',    'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'membername',   'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'subject',      'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'body',         'type' => 'mediumtext'),
+		array('name' => 'time_started', 'type' => 'int', 'size' => 10, 'default' => 0),
+		array('name' => 'time_updated', 'type' => 'int', 'size' => 10, 'default' => 0),
+		array('name' => 'num_reports',  'type' => 'mediumint', 'size' => 6, 'default' => 0),
+		array('name' => 'closed',       'type' => 'tinyint', 'size' => 3, 'default' => 0),
+		array('name' => 'ignore_all',   'type' => 'tinyint', 'size' => 3, 'default' => 0),
+	),
+	array(
+		array('name' => 'id_report',    'columns' => array('id_report'), 'type' => 'primary'),
+		array('name' => 'id_member',    'columns' => array('id_member'), 'type' => 'key'),
+		array('name' => 'id_topic',     'columns' => array('id_topic'), 'type' => 'key'),
+		array('name' => 'closed',       'columns' => array('closed'), 'type' => 'key'),
+		array('name' => 'time_started', 'columns' => array('time_started'), 'type' => 'key'),
+		array('name' => 'id_msg',       'columns' => array('id_msg'), 'type' => 'key'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_reported_comments`
 #
 
-CREATE TABLE {$db_prefix}log_reported_comments (
-  id_comment mediumint(8) unsigned NOT NULL auto_increment,
-  id_report mediumint(8) NOT NULL default '0',
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  membername varchar(255) NOT NULL default '',
-  email_address varchar(255) NOT NULL default '',
-  member_ip varchar(255) NOT NULL default '',
-  comment varchar(255) NOT NULL default '',
-  time_sent int(10) NOT NULL default '0',
-  PRIMARY KEY (id_comment),
-  KEY id_report (id_report),
-  KEY id_member (id_member),
-  KEY time_sent (time_sent)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_reported_comments',
+	array(
+		array('name' => 'id_comment',    'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'auto' => true),
+		array('name' => 'id_report',     'type' => 'mediumint', 'size' => 8, 'default' => 0),
+		array('name' => 'id_member',     'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'membername',    'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'email_address', 'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'member_ip',     'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'comment',       'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'time_sent',     'type' => 'int', 'size' => 10, 'default' => 0),
+	),
+	array(
+		array('name' => 'id_comment', 'columns' => array('id_comment'), 'type' => 'primary'),
+		array('name' => 'id_report',  'columns' => array('id_report'), 'type' => 'key'),
+		array('name' => 'id_member',  'columns' => array('id_member'), 'type' => 'key'),
+		array('name' => 'time_sent',  'columns' => array('time_sent'), 'type' => 'key'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_scheduled_tasks`
