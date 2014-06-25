@@ -1481,16 +1481,16 @@ $db_table->db_create_table('{db_prefix}log_search_topics',
 
 $db_table->db_create_table('{db_prefix}log_spider_hits',
 	array(
-		array('name' => 'id_hit',     'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true),
+		array('name' => 'id_hit',    'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true),
 		array('name' => 'id_spider', 'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
-		array('name' => 'log_time', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
-		array('name' => 'url', 'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'log_time',  'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'url',       'type' => 'varchar', 'size' => 255, 'default' => ''),
 		array('name' => 'processed', 'type' => 'tinyint', 'size' => 3, 'default' => 0),
 	),
 	array(
-		array('name' => 'id_hit', 'columns' => array('id_hit'), 'type' => 'primary'),
+		array('name' => 'id_hit',    'columns' => array('id_hit'), 'type' => 'primary'),
 		array('name' => 'id_spider', 'columns' => array('id_spider'), 'type' => 'key'),
-		array('name' => 'log_time', 'columns' => array('log_time'), 'type' => 'key'),
+		array('name' => 'log_time',  'columns' => array('log_time'), 'type' => 'key'),
 		array('name' => 'processed', 'columns' => array('processed'), 'type' => 'key'),
 	),
 	array(),
@@ -1519,39 +1519,52 @@ $db_table->db_create_table('{db_prefix}log_spider_stats',
 # Table structure for table `log_subscribed`
 #
 
-CREATE TABLE {$db_prefix}log_subscribed (
-  id_sublog int(10) unsigned NOT NULL auto_increment,
-  id_subscribe mediumint(8) unsigned NOT NULL default '0',
-  id_member int(10) NOT NULL default '0',
-  old_id_group smallint(5) NOT NULL default '0',
-  start_time int(10) NOT NULL default '0',
-  end_time int(10) NOT NULL default '0',
-  status tinyint(3) NOT NULL default '0',
-  payments_pending tinyint(3) NOT NULL default '0',
-  pending_details text NOT NULL,
-  reminder_sent tinyint(3) NOT NULL default '0',
-  vendor_ref varchar(255) NOT NULL default '',
-  PRIMARY KEY (id_sublog),
-  UNIQUE KEY id_subscribe (id_subscribe, id_member),
-  KEY end_time (end_time),
-  KEY reminder_sent (reminder_sent),
-  KEY payments_pending (payments_pending),
-  KEY status (status),
-  KEY id_member (id_member)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_subscribed',
+	array(
+		array('name' => 'id_sublog',        'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true),
+		array('name' => 'id_subscribe',     'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_member',        'type' => 'int', 'size' => 10, 'default' => 0),
+		array('name' => 'old_id_group',     'type' => 'smallint', 'size' => 5, 'default' => 0),
+		array('name' => 'start_time',       'type' => 'int', 'size' => 10, 'default' => 0),
+		array('name' => 'end_time',         'type' => 'int', 'size' => 10, 'default' => 0),
+		array('name' => 'status',           'type' => 'tinyint', 'size' => 3, 'default' => 0),
+		array('name' => 'payments_pending', 'type' => 'tinyint', 'size' => 3, 'default' => 0),
+		array('name' => 'pending_details',  'type' => 'text'),
+		array('name' => 'reminder_sent',    'type' => 'tinyint', 'size' => 3, 'default' => 0),
+		array('name' => 'vendor_ref',       'type' => 'varchar', 'size' => 255, 'default' => ''),
+	),
+	array(
+		array('name' => 'id_sublog',        'columns' => array('id_sublog'), 'type' => 'primary'),
+		array('name' => 'id_subscribe',     'columns' => array('id_subscribe', 'id_member'), 'type' => 'unique'),
+		array('name' => 'end_time',         'columns' => array('end_time'), 'type' => 'key'),
+		array('name' => 'reminder_sent',    'columns' => array('reminder_sent'), 'type' => 'key'),
+		array('name' => 'payments_pending', 'columns' => array('payments_pending'), 'type' => 'key'),
+		array('name' => 'status',           'columns' => array('status'), 'type' => 'key'),
+		array('name' => 'id_member',        'columns' => array('id_member'), 'type' => 'key'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_topics`
 #
 
-CREATE TABLE {$db_prefix}log_topics (
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  id_topic mediumint(8) unsigned NOT NULL default '0',
-  id_msg int(10) unsigned NOT NULL default '0',
-  unwatched tinyint(3) NOT NULL default '0',
-  PRIMARY KEY (id_member, id_topic),
-  KEY id_topic (id_topic)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_topics',
+	array(
+		array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_topic', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_msg', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'unwatched', 'type' => 'tinyint', 'size' => 3, 'default' => 0),
+		array('name' => 'stat_date', 'type' => 'date', 'default' => '0001-01-01'),
+	),
+	array(
+		array('name' => 'id_member_topic', 'columns' => array('id_member', 'id_topic'), 'type' => 'primary'),
+		array('name' => 'id_topic', 'columns' => array('id_topic'), 'type' => 'key'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `mail_queue`
