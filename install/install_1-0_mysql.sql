@@ -1226,30 +1226,42 @@ $db_table->db_create_table('{db_prefix}log_member_notices',
 # Table structure for table `log_mentions`
 #
 
-CREATE TABLE {$db_prefix}log_mentions (
-  id_mention int(10) unsigned NOT NULL auto_increment,
-  id_member mediumint(8) unsigned NOT NULL DEFAULT '0',
-  id_msg int(10) unsigned NOT NULL DEFAULT '0',
-  status tinyint(1) NOT NULL DEFAULT '0',
-  id_member_from mediumint(8) unsigned NOT NULL DEFAULT '0',
-  log_time int(10) unsigned NOT NULL DEFAULT '0',
-  mention_type varchar(5) NOT NULL DEFAULT '',
-  PRIMARY KEY (id_mention),
-  KEY id_member (id_member,status)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_mentions',
+	array(
+		array('name' => 'id_mention',     'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true),
+		array('name' => 'id_member',      'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_msg',         'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'status',         'type' => 'tinyint', 'size' => 1, 'default' => 0),
+		array('name' => 'id_member_from', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'log_time',       'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'mention_type',   'type' => 'varchar', 'size' => 5, 'default' => ''),
+	),
+	array(
+		array('name' => 'id_mention',       'columns' => array('id_mention'), 'type' => 'primary'),
+		array('name' => 'id_member_status', 'columns' => array('id_member', 'status'), 'type' => 'primary'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_notify`
 #
 
-CREATE TABLE {$db_prefix}log_notify (
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  id_topic mediumint(8) unsigned NOT NULL default '0',
-  id_board smallint(5) unsigned NOT NULL default '0',
-  sent tinyint(1) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_member, id_topic, id_board),
-  KEY id_topic (id_topic, id_member)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_notify',
+	array(
+		array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_topic',  'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_board',  'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'sent',      'type' => 'tinyint', 'size' => 1, 'unsigned' => true, 'default' => 0),
+	),
+	array(
+		array('name' => 'member_topic_board', 'columns' => array('id_member', 'id_topic', 'id_board'), 'type' => 'primary'),
+		array('name' => 'id_topic',           'columns' => array('id_topic', 'id_member'), 'type' => 'primary'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_online`
