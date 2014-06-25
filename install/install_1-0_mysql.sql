@@ -1720,7 +1720,9 @@ $db_table->db_create_table('{db_prefix}members',
 		array('name' => 'warning',              'columns' => array('warning'), 'type' => 'key'),
 		array('name' => 'total_time_logged_in', 'columns' => array('total_time_logged_in'), 'type' => 'key'),
 		array('name' => 'id_theme',             'columns' => array('id_theme'), 'type' => 'key'),
-	)
+	),
+	array(),
+	'ignore'
 );
 
 #
@@ -1739,7 +1741,9 @@ $db_table->db_create_table('{db_prefix}member_logins',
 		array('name' => 'id_login',  'columns' => array('id_login'), 'type' => 'primary'),
 		array('name' => 'id_member', 'columns' => array('id_member'), 'type' => 'key'),
 		array('name' => 'time',      'columns' => array('time'), 'type' => 'key'),
-	)
+	),
+	array(),
+	'ignore'
 );
 
 #
@@ -1757,7 +1761,9 @@ $db_table->db_create_table('{db_prefix}message_icons',
 	array(
 		array('name' => 'id_icon',  'columns' => array('id_icon'), 'type' => 'primary'),
 		array('name' => 'id_board', 'columns' => array('id_board'), 'type' => 'key'),
-	)
+	),
+	array(),
+	'ignore'
 );
 
 #
@@ -1802,7 +1808,9 @@ $db_table->db_create_table('{db_prefix}message_likes',
 		array('name' => 'id_msg',    'columns' => array('id_msg', 'id_member'), 'type' => 'primary'),
 		array('name' => 'id_member', 'columns' => array('id_member'), 'type' => 'key'),
 		array('name' => 'id_poster', 'columns' => array('id_poster'), 'type' => 'key'),
-	)
+	),
+	array(),
+	'ignore'
 );
 
 #
@@ -1841,7 +1849,9 @@ $db_table->db_create_table('{db_prefix}messages',
 		array('name' => 'id_member_msg', 'columns' => array('id_member', 'approved', 'id_msg'), 'type' => 'key'),
 		array('name' => 'current_topic', 'columns' => array('id_topic', 'id_msg', 'id_member', 'approved'), 'type' => 'key'),
 		array('name' => 'related_ip',    'columns' => array('id_member', 'poster_ip', 'id_msg'), 'type' => 'key'),
-	)
+	),
+	array(),
+	'ignore'
 );
 
 #
@@ -1872,7 +1882,9 @@ $db_table->db_create_table('{db_prefix}moderators',
 	),
 	array(
 		array('name' => 'id_board', 'columns' => array('id_board', 'id_member'), 'type' => 'primary'),
-	)
+	),
+	array(),
+	'ignore'
 );
 
 #
@@ -1891,7 +1903,9 @@ $db_table->db_create_table('{db_prefix}openid_assoc',
 	array(
 		array('name' => 'server_handle', 'columns' => array('server_url(125)', 'handle(125)'), 'type' => 'primary'),
 		array('name' => 'expires',       'columns' => array('expires'), 'type' => 'key'),
-	)
+	),
+	array(),
+	'ignore'
 );
 
 #
@@ -1906,7 +1920,9 @@ $db_table->db_create_table('{db_prefix}package_servers',
 	),
 	array(
 		array('name' => 'id_server', 'columns' => array('id_server'), 'type' => 'primary'),
-	)
+	),
+	array(),
+	'ignore'
 );
 
 #
@@ -1935,7 +1951,9 @@ $db_table->db_create_table('{db_prefix}permission_profiles',
 	),
 	array(
 		array('name' => 'id_profile', 'columns' => array('id_profile'), 'type' => 'primary'),
-	)
+	),
+	array(),
+	'ignore'
 );
 
 #
@@ -1968,7 +1986,9 @@ $db_table->db_create_table('{db_prefix}permissions',
 	),
 	array(
 		array('name' => 'group_permission', 'columns' => array('id_group', 'permission'), 'type' => 'primary'),
-	)
+	),
+	array(),
+	'ignore'
 );
 
 #
@@ -2051,7 +2071,9 @@ $db_table->db_create_table('{db_prefix}personal_messages',
 		array('name' => 'id_member',  'columns' => array('id_member_from', 'deleted_by_sender'), 'type' => 'key'),
 		array('name' => 'msgtime',    'columns' => array('msgtime'), 'type' => 'key'),
 		array('name' => 'id_pm_head', 'columns' => array('id_pm_head'), 'type' => 'key'),
-	)
+	),
+	array(),
+	'ignore'
 );
 
 #
@@ -2071,7 +2093,9 @@ $db_table->db_create_table('{db_prefix}pm_recipients',
 	array(
 		array('name' => 'id_pm_member', 'columns' => array('id_pm', 'id_member'), 'type' => 'primary'),
 		array('name' => 'id_member',    'columns' => array('id_member', 'deleted', 'id_pm'), 'type' => 'unique'),
-	)
+	),
+	array(),
+	'ignore'
 );
 
 #
@@ -2092,7 +2116,9 @@ $db_table->db_create_table('{db_prefix}pm_rules',
 		array('name' => 'id_rule',   'columns' => array('id_rule'), 'type' => 'primary'),
 		array('name' => 'id_member', 'columns' => array('id_member'), 'type' => 'key'),
 		array('name' => 'delete_pm', 'columns' => array('delete_pm'), 'type' => 'key'),
-	)
+	),
+	array(),
+	'ignore'
 );
 
 #
@@ -2116,7 +2142,9 @@ $db_table->db_create_table('{db_prefix}polls',
 	),
 	array(
 		array('name' => 'id_poll', 'columns' => array('id_poll'), 'type' => 'primary'),
-	)
+	),
+	array(),
+	'ignore'
 );
 
 #
@@ -2132,7 +2160,9 @@ $db_table->db_create_table('{db_prefix}poll_choices',
 	),
 	array(
 		array('name' => 'id_poll', 'columns' => array('id_poll', 'id_choice'), 'type' => 'primary'),
-	)
+	),
+	array(),
+	'ignore'
 );
 
 #
@@ -2147,7 +2177,9 @@ $db_table->db_create_table('{db_prefix}postby_emails',
 	),
 	array(
 		array('name' => 'id_email', 'columns' => array('id_email'), 'type' => 'primary'),
-	)
+	),
+	array(),
+	'ignore'
 );
 
 #
@@ -2168,7 +2200,9 @@ $db_table->db_create_table('{db_prefix}postby_emails_error',
 	),
 	array(
 		array('name' => 'id_email', 'columns' => array('id_email'), 'type' => 'primary'),
-	)
+	),
+	array(),
+	'ignore'
 );
 
 #
@@ -2187,7 +2221,9 @@ $db_table->db_create_table('{db_prefix}postby_emails_filters',
 	),
 	array(
 		array('name' => 'id_filter', 'columns' => array('id_filter'), 'type' => 'primary'),
-	)
+	),
+	array(),
+	'ignore'
 );
 
 #
@@ -2209,7 +2245,9 @@ $db_table->db_create_table('{db_prefix}scheduled_tasks',
 		array('name' => 'next_time', 'columns' => array('next_time'), 'type' => 'key'),
 		array('name' => 'disabled',  'columns' => array('disabled'), 'type' => 'key'),
 		array('name' => 'task',      'columns' => array('task'), 'type' => 'unique'),
-	)
+	),
+	array(),
+	'ignore'
 );
 
 #
@@ -2252,7 +2290,9 @@ $db_table->db_create_table('{db_prefix}settings',
 	),
 	array(
 		array('name' => 'variable', 'columns' => array('variable(30)'), 'type' => 'primary'),
-	)
+	),
+	array(),
+	'ignore'
 );
 
 #
@@ -2473,7 +2513,9 @@ $db_table->db_create_table('{db_prefix}sessions',
 	),
 	array(
 		array('name' => 'session_id', 'columns' => array('session_id'), 'type' => 'primary'),
-	)
+	),
+	array(),
+	'ignore'
 );
 
 #
@@ -2492,7 +2534,9 @@ $db_table->db_create_table('{db_prefix}smileys',
 	),
 	array(
 		array('name' => 'id_smiley', 'columns' => array('id_smiley'), 'type' => 'primary'),
-	)
+	),
+	array(),
+	'ignore'
 );
 
 #
@@ -2545,7 +2589,9 @@ $db_table->db_create_table('{db_prefix}spiders',
 	),
 	array(
 		array('name' => 'id_spider', 'columns' => array('id_spider'), 'type' => 'primary'),
-	)
+	),
+	array(),
+	'ignore'
 );
 
 #
@@ -2611,7 +2657,9 @@ CREATE TABLE {$db_prefix}subscriptions(
 	array(
 		array('name' => 'id_subscribe', 'columns' => array('id_subscribe'), 'type' => 'primary'),
 		array('name' => 'active',       'columns' => array('active'), 'type' => 'key'),
-	)
+	),
+	array(),
+	'ignore'
 );
 
 #
@@ -2630,7 +2678,9 @@ $db_table->db_create_table('{db_prefix}themes',
 	array(
 		array('name' => 'id_theme',  'columns' => array('id_theme', 'id_member', 'variable(30)'), 'type' => 'primary'),
 		array('name' => 'id_member', 'columns' => array('id_member'), 'type' => 'key'),
-	)
+	),
+	array(),
+	'ignore'
 );
 
 #
@@ -2715,7 +2765,9 @@ $db_table->db_create_table('{db_prefix}topics',
 		array('name' => 'member_started',      'columns' => array('id_member_started', 'id_board'), 'type' => 'key'),
 		array('name' => 'last_message_sticky', 'columns' => array('id_board', 'is_sticky', 'id_last_msg'), 'type' => 'key'),
 		array('name' => 'board_news',          'columns' => array('id_board', 'id_first_msg'), 'type' => 'key'),
-	)
+	),
+	array(),
+	'ignore'
 );
 
 #
@@ -2758,5 +2810,7 @@ $db_table->db_create_table('{db_prefix}user_drafts',
 	array(
 		array('name' => 'id_draft',  'columns' => array('id_draft'), 'type' => 'primary'),
 		array('name' => 'id_member', 'columns' => array('id_member', 'id_draft'), 'type' => 'unique'),
-	)
+	),
+	array(),
+	'ignore'
 );
