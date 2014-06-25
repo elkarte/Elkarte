@@ -1132,28 +1132,40 @@ $db_table->db_create_table('{db_prefix}log_floodcontrol',
 # Table structure for table `log_group_requests`
 #
 
-CREATE TABLE {$db_prefix}log_group_requests (
-  id_request mediumint(8) unsigned NOT NULL auto_increment,
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  id_group smallint(5) unsigned NOT NULL default '0',
-  time_applied int(10) unsigned NOT NULL default '0',
-  reason text NOT NULL,
-  PRIMARY KEY (id_request),
-  UNIQUE id_member (id_member, id_group)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_group_requests',
+	array(
+		array('name' => 'id_request',   'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'auto' => true),
+		array('name' => 'id_member',    'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_group',     'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'time_applied', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'reason',       'type' => 'text'),
+	),
+	array(
+		array('name' => 'id_request', 'columns' => array('id_request'), 'type' => 'primary'),
+		array('name' => 'id_member',  'columns' => array('id_member', 'id_group'), 'type' => 'unique'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_karma`
 #
 
-CREATE TABLE {$db_prefix}log_karma (
-  id_target mediumint(8) unsigned NOT NULL default '0',
-  id_executor mediumint(8) unsigned NOT NULL default '0',
-  log_time int(10) unsigned NOT NULL default '0',
-  action tinyint(4) NOT NULL default '0',
-  PRIMARY KEY (id_target, id_executor),
-  KEY log_time (log_time)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_karma',
+	array(
+		array('name' => 'id_target',   'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_executor', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'log_time',    'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'action',      'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'default' => 0),
+	),
+	array(
+		array('name' => 'target_executor', 'columns' => array('id_target', 'id_executor'), 'type' => 'primary'),
+		array('name' => 'log_time',        'columns' => array('log_time'), 'type' => 'unique'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_likes`
