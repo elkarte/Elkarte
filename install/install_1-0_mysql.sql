@@ -973,48 +973,73 @@ $db_table->db_create_table('{db_prefix}log_activity',
 # Table structure for table `log_badbehavior`
 #
 
-CREATE TABLE {$db_prefix}log_badbehavior (
-  id int(10) NOT NULL auto_increment,
-  ip char(19) NOT NULL,
-  date int(10) NOT NULL default '0',
-  request_method varchar(255) NOT NULL,
-  request_uri varchar(255) NOT NULL,
-  server_protocol varchar(255) NOT NULL,
-  http_headers text NOT NULL,
-  user_agent varchar(255) NOT NULL,
-  request_entity varchar(255) NOT NULL,
-  valid varchar(255) NOT NULL,
-  id_member mediumint(8) unsigned NOT NULL,
-  session char(64) NOT NULL default '',
-  PRIMARY KEY (id),
-  INDEX ip (ip),
-  INDEX user_agent (user_agent)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_badbehavior',
+	array(
+		array('name' => 'id',              'type' => 'int', 'size' => 10, 'auto' => true),
+		array('name' => 'ip',              'type' => 'char', 'size' => 19),
+		array('name' => 'date',            'type' => 'int', 'size' => 10, 'default' => 0),
+		array('name' => 'request_method',  'type' => 'varchar', 'size' => 255),
+		array('name' => 'request_uri',     'type' => 'varchar', 'size' => 255),
+		array('name' => 'server_protocol', 'type' => 'varchar', 'size' => 255),
+		array('name' => 'http_headers',    'type' => 'text'),
+		array('name' => 'user_agent',      'type' => 'varchar', 'size' => 255),
+		array('name' => 'request_entity',  'type' => 'varchar', 'size' => 255),
+		array('name' => 'valid',           'type' => 'varchar', 'size' => 255),
+		array('name' => 'id_member',       'type' => 'mediumint', 'size' => 8, 'unsigned' => true),
+		array('name' => 'session',         'type' => 'char', 'size' => 64),
+	),
+	array(
+		array('name' => 'id',         'columns' => array('id'), 'type' => 'primary'),
+		array('name' => 'ip',         'columns' => array('ip'), 'type' => 'index'),
+		array('name' => 'user_agent', 'columns' => array('user_agent'), 'type' => 'index'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_banned`
 #
 
-CREATE TABLE {$db_prefix}log_banned (
-  id_ban_log mediumint(8) unsigned NOT NULL auto_increment,
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  ip char(16) NOT NULL default '                ',
-  email varchar(255) NOT NULL default '',
-  log_time int(10) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_ban_log),
-  KEY log_time (log_time)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_banned',
+	array(
+		array('name' => 'id_ban_log',      'type' => 'mediumint', 'size' => 8, 'auto' => true),
+		array('name' => 'id_member',       'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'ip',              'type' => 'char', 'size' => 16, 'default' => '                '),
+		array('name' => 'email',           'type' => 'varchar', 'size' => 255),
+		array('name' => 'log_time',        'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'request_uri',     'type' => 'varchar', 'size' => 255),
+		array('name' => 'server_protocol', 'type' => 'varchar', 'size' => 255),
+		array('name' => 'http_headers',    'type' => 'text'),
+		array('name' => 'user_agent',      'type' => 'varchar', 'size' => 255),
+		array('name' => 'request_entity',  'type' => 'varchar', 'size' => 255),
+		array('name' => 'valid',           'type' => 'varchar', 'size' => 255),
+		array('name' => 'session',         'type' => 'char', 'size' => 64),
+	),
+	array(
+		array('name' => 'id_ban_log', 'columns' => array('id_ban_log'), 'type' => 'primary'),
+		array('name' => 'log_time',   'columns' => array('log_time'), 'type' => 'key'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_boards`
 #
 
-CREATE TABLE {$db_prefix}log_boards (
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  id_board smallint(5) unsigned NOT NULL default '0',
-  id_msg int(10) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_member, id_board)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_boards',
+	array(
+		array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_board',  'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_msg',    'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+	),
+	array(
+		array('name' => 'id_member', 'columns' => array('id_member', 'id_board'), 'type' => 'primary'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_comments`
