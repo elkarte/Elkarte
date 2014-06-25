@@ -1644,109 +1644,121 @@ $db->insert('ignore',
 # Table structure for table `members`
 #
 
-CREATE TABLE {$db_prefix}members (
-  id_member mediumint(8) unsigned NOT NULL auto_increment,
-  member_name varchar(80) NOT NULL default '',
-  date_registered int(10) unsigned NOT NULL default '0',
-  posts mediumint(8) unsigned NOT NULL default '0',
-  id_group smallint(5) unsigned NOT NULL default '0',
-  lngfile varchar(255) NOT NULL default '',
-  last_login int(10) unsigned NOT NULL default '0',
-  real_name varchar(255) NOT NULL default '',
-  personal_messages smallint(5) NOT NULL default '0',
-  mentions smallint(5) NOT NULL default '0',
-  unread_messages smallint(5) NOT NULL default '0',
-  new_pm tinyint(3) unsigned NOT NULL default '0',
-  buddy_list text NOT NULL,
-  pm_ignore_list varchar(255) NOT NULL default '',
-  pm_prefs mediumint(8) NOT NULL default '2',
-  mod_prefs varchar(20) NOT NULL default '',
-  message_labels text NOT NULL,
-  passwd varchar(64) NOT NULL default '',
-  openid_uri text NOT NULL,
-  email_address varchar(255) NOT NULL default '',
-  personal_text varchar(255) NOT NULL default '',
-  gender tinyint(4) unsigned NOT NULL default '0',
-  birthdate date NOT NULL default '0001-01-01',
-  website_title varchar(255) NOT NULL default '',
-  website_url varchar(255) NOT NULL default '',
-  location varchar(255) NOT NULL default '',
-  hide_email tinyint(4) NOT NULL default '0',
-  show_online tinyint(4) NOT NULL default '1',
-  time_format varchar(80) NOT NULL default '',
-  signature text NOT NULL,
-  time_offset float NOT NULL default '0',
-  avatar varchar(255) NOT NULL default '',
-  pm_email_notify tinyint(4) NOT NULL default '0',
-  karma_bad smallint(5) unsigned NOT NULL default '0',
-  karma_good smallint(5) unsigned NOT NULL default '0',
-  likes_given mediumint(5) unsigned NOT NULL default '0',
-  likes_received mediumint(5) unsigned NOT NULL default '0',
-  usertitle varchar(255) NOT NULL default '',
-  notify_announcements tinyint(4) NOT NULL default '1',
-  notify_regularity tinyint(4) NOT NULL default '1',
-  notify_send_body tinyint(4) NOT NULL default '0',
-  notify_types tinyint(4) NOT NULL default '2',
-  member_ip varchar(255) NOT NULL default '',
-  member_ip2 varchar(255) NOT NULL default '',
-  secret_question varchar(255) NOT NULL default '',
-  secret_answer varchar(64) NOT NULL default '',
-  id_theme tinyint(4) unsigned NOT NULL default '0',
-  is_activated tinyint(3) unsigned NOT NULL default '1',
-  validation_code varchar(10) NOT NULL default '',
-  id_msg_last_visit int(10) unsigned NOT NULL default '0',
-  additional_groups varchar(255) NOT NULL default '',
-  smiley_set varchar(48) NOT NULL default '',
-  id_post_group smallint(5) unsigned NOT NULL default '0',
-  total_time_logged_in int(10) unsigned NOT NULL default '0',
-  password_salt varchar(255) NOT NULL default '',
-  ignore_boards text NOT NULL,
-  warning tinyint(4) NOT NULL default '0',
-  passwd_flood varchar(12) NOT NULL default '',
-  receive_from tinyint(4) unsigned NOT NULL default '1',
-  PRIMARY KEY (id_member),
-  KEY member_name (member_name),
-  KEY real_name (real_name),
-  KEY date_registered (date_registered),
-  KEY id_group (id_group),
-  KEY birthdate (birthdate),
-  KEY posts (posts),
-  KEY last_login (last_login),
-  KEY lngfile (lngfile(30)),
-  KEY id_post_group (id_post_group),
-  KEY warning (warning),
-  KEY total_time_logged_in (total_time_logged_in),
-  KEY id_theme (id_theme)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}members',
+	array(
+		array('name' => 'id_member',            'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'auto' => true),
+		array('name' => 'member_name',          'type' => 'varchar', 'size' => 80, 'default' => ''),
+		array('name' => 'date_registered',      'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'posts',                'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_group',             'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'lngfile',              'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'last_login',           'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'real_name',            'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'personal_messages',    'type' => 'smallint', 'size' => 5, 'default' => 0),
+		array('name' => 'mentions',             'type' => 'smallint', 'size' => 5, 'default' => 0),
+		array('name' => 'unread_messages',      'type' => 'smallint', 'size' => 5, 'default' => 0),
+		array('name' => 'new_pm',               'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'buddy_list',           'type' => 'text'),
+		array('name' => 'pm_ignore_list',       'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'pm_prefs',             'type' => 'mediumint', 'size' => 8, 'default' => 2),
+		array('name' => 'mod_prefs',            'type' => 'varchar', 'size' => 20, 'default' => ''),
+		array('name' => 'message_labels',       'type' => 'text'),
+		array('name' => 'passwd',               'type' => 'varchar', 'size' => 64, 'default' => ''),
+		array('name' => 'openid_uri',           'type' => 'text'),
+		array('name' => 'email_address',        'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'personal_text',        'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'gender',               'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'default' => 0),
+		array('name' => 'birthdate',            'type' => 'date', 'default' => '0001-01-01'),
+		array('name' => 'website_title',        'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'website_url',          'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'location',             'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'hide_email',           'type' => 'tinyint', 'size' => 4, 'default' => 0),
+		array('name' => 'show_online',          'type' => 'tinyint', 'size' => 4, 'default' => 1),
+		array('name' => 'time_format',          'type' => 'varchar', 'size' => 80, 'default' => ''),
+		array('name' => 'signature',            'type' => 'text'),
+		array('name' => 'time_offset',          'type' => 'float', 'default' => 0),
+		array('name' => 'avatar',               'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'pm_email_notify',      'type' => 'tinyint', 'size' => 4, 'default' => 0),
+		array('name' => 'karma_bad',            'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'karma_good',           'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'likes_given',          'type' => 'mediumint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'likes_received',       'type' => 'mediumint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'usertitle',            'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'notify_announcements', 'type' => 'tinyint', 'size' => 4, 'default' => 1),
+		array('name' => 'notify_regularity',    'type' => 'tinyint', 'size' => 4, 'default' => 1),
+		array('name' => 'notify_send_body',     'type' => 'tinyint', 'size' => 4, 'default' => 0),
+		array('name' => 'notify_types',         'type' => 'tinyint', 'size' => 4, 'default' => 2),
+		array('name' => 'member_ip',            'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'member_ip2',           'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'secret_question',      'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'secret_answer',        'type' => 'varchar', 'size' => 64, 'default' => ''),
+		array('name' => 'id_theme',             'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'default' => 0),
+		array('name' => 'is_activated',         'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 1),
+		array('name' => 'validation_code',      'type' => 'varchar', 'size' => 10, 'default' => ''),
+		array('name' => 'id_msg_last_visit',    'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'additional_groups',    'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'smiley_set',           'type' => 'varchar', 'size' => 48, 'default' => ''),
+		array('name' => 'id_post_group',        'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'total_time_logged_in', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'password_salt',        'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'ignore_boards',        'type' => 'text'),
+		array('name' => 'warning',              'type' => 'tinyint', 'size' => 4, 'default' => 0),
+		array('name' => 'passwd_flood',         'type' => 'varchar', 'size' => 12, 'default' => ''),
+		array('name' => 'receive_from',         'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'default' => 1),
+	),
+	array(
+		array('name' => 'id_member',            'columns' => array('id_member'), 'type' => 'primary'),
+		array('name' => 'member_name',          'columns' => array('member_name'), 'type' => 'key'),
+		array('name' => 'real_name',            'columns' => array('real_name'), 'type' => 'key'),
+		array('name' => 'date_registered',      'columns' => array('date_registered'), 'type' => 'key'),
+		array('name' => 'id_group',             'columns' => array('id_group'), 'type' => 'key'),
+		array('name' => 'birthdate',            'columns' => array('birthdate'), 'type' => 'key'),
+		array('name' => 'posts',                'columns' => array('posts'), 'type' => 'key'),
+		array('name' => 'last_login',           'columns' => array('last_login'), 'type' => 'key'),
+		array('name' => 'lngfile',              'columns' => array('lngfile(30)'), 'type' => 'key'),
+		array('name' => 'id_post_group',        'columns' => array('id_post_group'), 'type' => 'key'),
+		array('name' => 'warning',              'columns' => array('warning'), 'type' => 'key'),
+		array('name' => 'total_time_logged_in', 'columns' => array('total_time_logged_in'), 'type' => 'key'),
+		array('name' => 'id_theme',             'columns' => array('id_theme'), 'type' => 'key'),
+	)
+);
 
 #
 # Table structure for table `member_logins`
 #
 
-CREATE TABLE {$db_prefix}member_logins (
-  id_login int(10) NOT NULL auto_increment,
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  time int(10) NOT NULL default '0',
-  ip varchar(255) NOT NULL default '0',
-  ip2 varchar(255) NOT NULL default '0',
-  PRIMARY KEY (id_login),
-  KEY id_member (id_member),
-  KEY time (time)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}member_logins',
+	array(
+		array('name' => 'id_login',  'type' => 'int', 'size' => 10, 'auto' => true),
+		array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'time',      'type' => 'int', 'size' => 10, 'default' => 0),
+		array('name' => 'ip',        'type' => 'varchar', 'size' => 255, 'default' => 0),
+		array('name' => 'ip2',       'type' => 'varchar', 'size' => 255, 'default' => 0),
+	),
+	array(
+		array('name' => 'id_login',  'columns' => array('id_login'), 'type' => 'primary'),
+		array('name' => 'id_member', 'columns' => array('id_member'), 'type' => 'key'),
+		array('name' => 'time',      'columns' => array('time'), 'type' => 'key'),
+	)
+);
 
 #
 # Table structure for table `message_icons`
 #
 
-CREATE TABLE {$db_prefix}message_icons (
-  id_icon smallint(5) unsigned NOT NULL auto_increment,
-  title varchar(80) NOT NULL default '',
-  filename varchar(80) NOT NULL default '',
-  id_board smallint(5) unsigned NOT NULL default '0',
-  icon_order smallint(5) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_icon),
-  KEY id_board (id_board)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}message_icons',
+	array(
+		array('name' => 'id_icon',    'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'auto' => true),
+		array('name' => 'title',      'type' => 'varchar', 'size' => 80, 'default' => ''),
+		array('name' => 'filename',   'type' => 'varchar', 'size' => 80, 'default' => ''),
+		array('name' => 'id_board',   'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'icon_order', 'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+	),
+	array(
+		array('name' => 'id_icon',  'columns' => array('id_icon'), 'type' => 'primary'),
+		array('name' => 'id_board', 'columns' => array('id_board'), 'type' => 'key'),
+	)
+);
 
 #
 # Dumping data for table `message_icons`
@@ -1780,49 +1792,57 @@ $db->insert('ignore',
 # Table structure for table `message_likes`
 #
 
-CREATE TABLE {$db_prefix}message_likes (
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  id_msg mediumint(8) unsigned NOT NULL default '0',
-  id_poster mediumint(8) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_msg, id_member),
-  KEY id_member (id_member),
-  KEY id_poster (id_poster)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}message_likes',
+	array(
+		array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_msg',    'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_poster', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+	),
+	array(
+		array('name' => 'id_msg',    'columns' => array('id_msg', 'id_member'), 'type' => 'primary'),
+		array('name' => 'id_member', 'columns' => array('id_member'), 'type' => 'key'),
+		array('name' => 'id_poster', 'columns' => array('id_poster'), 'type' => 'key'),
+	)
+);
 
 #
 # Table structure for table `messages`
 #
 
-CREATE TABLE {$db_prefix}messages (
-  id_msg int(10) unsigned NOT NULL auto_increment,
-  id_topic mediumint(8) unsigned NOT NULL default '0',
-  id_board smallint(5) unsigned NOT NULL default '0',
-  poster_time int(10) unsigned NOT NULL default '0',
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  id_msg_modified int(10) unsigned NOT NULL default '0',
-  subject varchar(255) NOT NULL default '',
-  poster_name varchar(255) NOT NULL default '',
-  poster_email varchar(255) NOT NULL default '',
-  poster_ip varchar(255) NOT NULL default '',
-  smileys_enabled tinyint(4) NOT NULL default '1',
-  modified_time int(10) unsigned NOT NULL default '0',
-  modified_name varchar(255) NOT NULL default '',
-  body text NOT NULL,
-  icon varchar(16) NOT NULL default 'xx',
-  approved tinyint(3) NOT NULL default '1',
-  PRIMARY KEY (id_msg),
-  UNIQUE topic (id_topic, id_msg),
-  UNIQUE id_board (id_board, id_msg),
-  UNIQUE id_member (id_member, id_msg),
-  KEY approved (approved),
-  KEY ip_index (poster_ip(15), id_topic),
-  KEY participation (id_member, id_topic),
-  KEY show_posts (id_member, id_board),
-  KEY id_topic (id_topic),
-  KEY id_member_msg (id_member, approved, id_msg),
-  KEY current_topic (id_topic, id_msg, id_member, approved),
-  KEY related_ip (id_member, poster_ip, id_msg)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}messages',
+	array(
+		array('name' => 'id_msg',          'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true),
+		array('name' => 'id_topic',        'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_board',        'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'poster_time',     'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_member',       'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_msg_modified', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'subject',         'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'poster_name',     'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'poster_email',    'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'poster_ip',       'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'smileys_enabled', 'type' => 'tinyint', 'size' => 4, 'default' => 1),
+		array('name' => 'modified_time',   'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'modified_name',   'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'body',            'type' => 'text'),
+		array('name' => 'icon',            'type' => 'varchar', 'size' => 16, 'default' => 'xx'),
+		array('name' => 'approved',        'type' => 'tinyint', 'size' => 3, 'default' => 1),
+	),
+	array(
+		array('name' => 'id_msg',        'columns' => array('id_msg'), 'type' => 'primary'),
+		array('name' => 'topic',         'columns' => array('id_topic', 'id_msg'), 'type' => 'unique'),
+		array('name' => 'id_board',      'columns' => array('id_board', 'id_msg'), 'type' => 'unique'),
+		array('name' => 'id_member',     'columns' => array('id_member', 'id_msg'), 'type' => 'unique'),
+		array('name' => 'approved',      'columns' => array('approved'), 'type' => 'key'),
+		array('name' => 'ip_index',      'columns' => array('poster_ip(15)', 'id_topic'), 'type' => 'key'),
+		array('name' => 'participation', 'columns' => array('id_member', 'id_topic'), 'type' => 'key'),
+		array('name' => 'show_posts',    'columns' => array('id_member', 'id_board'), 'type' => 'key'),
+		array('name' => 'id_topic',      'columns' => array('id_topic'), 'type' => 'key'),
+		array('name' => 'id_member_msg', 'columns' => array('id_member', 'approved', 'id_msg'), 'type' => 'key'),
+		array('name' => 'current_topic', 'columns' => array('id_topic', 'id_msg', 'id_member', 'approved'), 'type' => 'key'),
+		array('name' => 'related_ip',    'columns' => array('id_member', 'poster_ip', 'id_msg'), 'type' => 'key'),
+	)
+);
 
 #
 # Dumping data for table `messages`
@@ -1845,37 +1865,49 @@ $db->insert('ignore',
 # Table structure for table `moderators`
 #
 
-CREATE TABLE {$db_prefix}moderators (
-  id_board smallint(5) unsigned NOT NULL default '0',
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_board, id_member)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}moderators',
+	array(
+		array('name' => 'id_board',  'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+	),
+	array(
+		array('name' => 'id_board', 'columns' => array('id_board', 'id_member'), 'type' => 'primary'),
+	)
+);
 
 #
 # Table structure for table `openid_assoc`
 #
 
-CREATE TABLE {$db_prefix}openid_assoc (
-  server_url text NOT NULL,
-  handle varchar(255) NOT NULL default '',
-  secret text NOT NULL,
-  issued int(10) NOT NULL default '0',
-  expires int(10) NOT NULL default '0',
-  assoc_type varchar(64) NOT NULL default '',
-  PRIMARY KEY (server_url(125), handle(125)),
-  KEY expires (expires)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}openid_assoc',
+	array(
+		array('name' => 'server_url', 'type' => 'text'),
+		array('name' => 'handle',     'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'secret',     'type' => 'text'),
+		array('name' => 'issued',     'type' => 'int', 'size' => 10, 'default' => 0),
+		array('name' => 'expires',    'type' => 'int', 'size' => 10, 'default' => 0),
+		array('name' => 'assoc_type', 'type' => 'varchar', 'size' => 64, 'default' => ''),
+	),
+	array(
+		array('name' => 'server_handle', 'columns' => array('server_url(125)', 'handle(125)'), 'type' => 'primary'),
+		array('name' => 'expires',       'columns' => array('expires'), 'type' => 'key'),
+	)
+);
 
 #
 # Table structure for table `package_servers`
 #
 
-CREATE TABLE {$db_prefix}package_servers (
-  id_server smallint(5) unsigned NOT NULL auto_increment,
-  name varchar(255) NOT NULL default '',
-  url varchar(255) NOT NULL default '',
-  PRIMARY KEY (id_server)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}package_servers',
+	array(
+		array('name' => 'id_server', 'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'auto' => true),
+		array('name' => 'name',      'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'url',       'type' => 'varchar', 'size' => 255, 'default' => ''),
+	),
+	array(
+		array('name' => 'id_server', 'columns' => array('id_server'), 'type' => 'primary'),
+	)
+);
 
 #
 # Dumping data for table `package_servers`
@@ -1896,11 +1928,15 @@ $db->insert('ignore',
 # Table structure for table `permission_profiles`
 #
 
-CREATE TABLE {$db_prefix}permission_profiles (
-  id_profile smallint(5) NOT NULL auto_increment,
-  profile_name varchar(255) NOT NULL default '',
-  PRIMARY KEY (id_profile)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}permission_profiles',
+	array(
+		array('name' => 'id_profile',   'type' => 'smallint', 'size' => 5, 'auto' => true),
+		array('name' => 'profile_name', 'type' => 'varchar', 'size' => 255, 'default' => ''),
+	),
+	array(
+		array('name' => 'id_profile', 'columns' => array('id_profile'), 'type' => 'primary'),
+	)
+);
 
 #
 # Dumping data for table `permission_profiles`
@@ -1924,12 +1960,16 @@ $db->insert('ignore',
 # Table structure for table `permissions`
 #
 
-CREATE TABLE {$db_prefix}permissions (
-  id_group smallint(5) NOT NULL default '0',
-  permission varchar(30) NOT NULL default '',
-  add_deny tinyint(4) NOT NULL default '1',
-  PRIMARY KEY (id_group, permission)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}permissions',
+	array(
+		array('name' => 'id_group',   'type' => 'smallint', 'size' => 5, 'default' => 0),
+		array('name' => 'permission', 'type' => 'varchar', 'size' => 30, 'default' => ''),
+		array('name' => 'add_deny',   'type' => 'tinyint', 'size' => 4, 'default' => 1),
+	),
+	array(
+		array('name' => 'group_permission', 'columns' => array('id_group', 'permission'), 'type' => 'primary'),
+	)
+);
 
 #
 # Dumping data for table `permissions`
@@ -1995,146 +2035,182 @@ $db->insert('ignore',
 # Table structure for table `personal_messages`
 #
 
-CREATE TABLE {$db_prefix}personal_messages (
-  id_pm int(10) unsigned NOT NULL auto_increment,
-  id_pm_head int(10) unsigned NOT NULL default '0',
-  id_member_from mediumint(8) unsigned NOT NULL default '0',
-  deleted_by_sender tinyint(3) unsigned NOT NULL default '0',
-  from_name varchar(255) NOT NULL default '',
-  msgtime int(10) unsigned NOT NULL default '0',
-  subject varchar(255) NOT NULL default '',
-  body text NOT NULL,
-  PRIMARY KEY (id_pm),
-  KEY id_member (id_member_from, deleted_by_sender),
-  KEY msgtime (msgtime),
-  KEY id_pm_head (id_pm_head)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}personal_messages',
+	array(
+		array('name' => 'id_pm',             'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true),
+		array('name' => 'id_pm_head',        'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_member_from',    'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'deleted_by_sender', 'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'from_name',         'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'msgtime',           'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'subject',           'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'body',              'type' => 'text'),
+	),
+	array(
+		array('name' => 'id_pm',      'columns' => array('id_pm'), 'type' => 'primary'),
+		array('name' => 'id_member',  'columns' => array('id_member_from', 'deleted_by_sender'), 'type' => 'key'),
+		array('name' => 'msgtime',    'columns' => array('msgtime'), 'type' => 'key'),
+		array('name' => 'id_pm_head', 'columns' => array('id_pm_head'), 'type' => 'key'),
+	)
+);
 
 #
 # Table structure for table `pm_recipients`
 #
 
-CREATE TABLE {$db_prefix}pm_recipients (
-  id_pm int(10) unsigned NOT NULL default '0',
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  labels varchar(60) NOT NULL default '-1',
-  bcc tinyint(3) unsigned NOT NULL default '0',
-  is_read tinyint(3) unsigned NOT NULL default '0',
-  is_new tinyint(3) unsigned NOT NULL default '0',
-  deleted tinyint(3) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_pm, id_member),
-  UNIQUE id_member (id_member, deleted, id_pm)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}pm_recipients',
+	array(
+		array('name' => 'id_pm',     'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'labels',    'type' => 'varchar', 'size' => 60, 'default' => -1,
+		array('name' => 'bcc',       'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'is_read',   'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'is_new',    'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'deleted',   'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+	),
+	array(
+		array('name' => 'id_pm_member', 'columns' => array('id_pm', 'id_member'), 'type' => 'primary'),
+		array('name' => 'id_member',    'columns' => array('id_member', 'deleted', 'id_pm'), 'type' => 'unique'),
+	)
+);
 
 #
 # Table structure for table `pm_rules`
 #
 
-CREATE TABLE {$db_prefix}pm_rules (
-  id_rule int(10) unsigned NOT NULL auto_increment,
-  id_member int(10) unsigned NOT NULL default '0',
-  rule_name varchar(60) NOT NULL default '',
-  criteria text NOT NULL,
-  actions text NOT NULL,
-  delete_pm tinyint(3) unsigned NOT NULL default '0',
-  is_or tinyint(3) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_rule),
-  KEY id_member (id_member),
-  KEY delete_pm (delete_pm)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}pm_rules',
+	array(
+		array('name' => 'id_rule',   'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true),
+		array('name' => 'id_member', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'rule_name', 'type' => 'varchar', 'size' => 60, 'default' => ''),
+		array('name' => 'criteria',  'type' => 'text'),
+		array('name' => 'actions',   'type' => 'text'),
+		array('name' => 'delete_pm', 'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'is_or',     'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+	),
+	array(
+		array('name' => 'id_rule',   'columns' => array('id_rule'), 'type' => 'primary'),
+		array('name' => 'id_member', 'columns' => array('id_member'), 'type' => 'key'),
+		array('name' => 'delete_pm', 'columns' => array('delete_pm'), 'type' => 'key'),
+	)
+);
 
 #
 # Table structure for table `polls`
 #
 
-CREATE TABLE {$db_prefix}polls (
-  id_poll mediumint(8) unsigned NOT NULL auto_increment,
-  question varchar(255) NOT NULL default '',
-  voting_locked tinyint(1) NOT NULL default '0',
-  max_votes tinyint(3) unsigned NOT NULL default '1',
-  expire_time int(10) unsigned NOT NULL default '0',
-  hide_results tinyint(3) unsigned NOT NULL default '0',
-  change_vote tinyint(3) unsigned NOT NULL default '0',
-  guest_vote tinyint(3) unsigned NOT NULL default '0',
-  num_guest_voters int(10) unsigned NOT NULL default '0',
-  reset_poll int(10) unsigned NOT NULL default '0',
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  poster_name varchar(255) NOT NULL default '',
-  PRIMARY KEY (id_poll)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}polls',
+	array(
+		array('name' => 'id_poll',          'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'auto' => true),
+		array('name' => 'question',         'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'voting_locked',    'type' => 'tinyint', 'size' => 1, 'default' => 0),
+		array('name' => 'max_votes',        'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 1),
+		array('name' => 'expire_time',      'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'hide_results',     'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'change_vote',      'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'guest_vote',       'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'num_guest_voters', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'reset_poll',       'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_member',        'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'poster_name',      'type' => 'varchar', 'size' => 255, 'default' => ''),
+	),
+	array(
+		array('name' => 'id_poll', 'columns' => array('id_poll'), 'type' => 'primary'),
+	)
+);
 
 #
 # Table structure for table `poll_choices`
 #
 
-CREATE TABLE {$db_prefix}poll_choices (
-  id_poll mediumint(8) unsigned NOT NULL default '0',
-  id_choice tinyint(3) unsigned NOT NULL default '0',
-  label varchar(255) NOT NULL default '',
-  votes smallint(5) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_poll, id_choice)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}poll_choices',
+	array(
+		array('name' => 'id_poll',   'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_choice', 'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'label',     'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'votes',     'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+	),
+	array(
+		array('name' => 'id_poll', 'columns' => array('id_poll', 'id_choice'), 'type' => 'primary'),
+	)
+);
 
 #
 # Table structure for table `postby_emails`
 #
 
-CREATE TABLE {$db_prefix}postby_emails (
-  id_email varchar(50) NOT NULL default '',
-  time_sent int(10) NOT NULL default '0',
-  email_to varchar(50) NOT NULL default '',
-  PRIMARY KEY (id_email)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}postby_emails',
+	array(
+		array('name' => 'id_email',  'type' => 'varchar', 'size' => 50, 'default' => ''),
+		array('name' => 'time_sent', 'type' => 'int', 'size' => 10, 'default' => 0),
+		array('name' => 'email_to',  'type' => 'varchar', 'size' => 50, 'default' => ''),
+	),
+	array(
+		array('name' => 'id_email', 'columns' => array('id_email'), 'type' => 'primary'),
+	)
+);
 
 #
 # Table structure for table `postby_emails_error`
 #
 
-CREATE TABLE {$db_prefix}postby_emails_error (
-  id_email int(10) NOT NULL auto_increment,
-  error varchar(255) NOT NULL default '',
-  data_id varchar(255) NOT NULL default '0',
-  subject varchar(255) NOT NULL default '',
-  id_message int(10) NOT NULL default '0',
-  id_board smallint(5) NOT NULL default '0',
-  email_from varchar(50) NOT NULL default '',
-  message_type char(10) NOT NULL default '',
-  message mediumtext NOT NULL,
-  PRIMARY KEY (id_email)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}postby_emails_error',
+	array(
+		array('name' => 'id_email',     'type' => 'int', 'size' => 10, 'auto' => true),
+		array('name' => 'error',        'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'data_id',      'type' => 'varchar', 'size' => 255, 'default' => 0),
+		array('name' => 'subject',      'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'id_message',   'type' => 'int', 'size' => 10, 'default' => 0),
+		array('name' => 'id_board',     'type' => 'smallint', 'size' => 5, 'default' => 0),
+		array('name' => 'email_from',   'type' => 'varchar', 'size' => 50, 'default' => ''),
+		array('name' => 'message_type', 'type' => 'char', 'size' => 10, 'default' => ''),
+		array('name' => 'message',      'type' => 'mediumtext'),
+	),
+	array(
+		array('name' => 'id_email', 'columns' => array('id_email'), 'type' => 'primary'),
+	)
+);
 
 #
 # Table structure for table `postby_emails_filters`
 #
 
-CREATE TABLE {$db_prefix}postby_emails_filters (
-  id_filter int(10) NOT NULL auto_increment,
-  filter_style char(5) NOT NULL default '',
-  filter_type varchar(255) NOT NULL default '',
-  filter_to varchar(255) NOT NULL default '',
-  filter_from varchar(255) NOT NULL default '',
-  filter_name varchar(255) NOT NULL default '',
-  filter_order int(10) NOT NULL default '0',
-  PRIMARY KEY (id_filter)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}postby_emails_filters',
+	array(
+		array('name' => 'id_filter',    'type' => 'int', 'size' => 10, 'auto' => true),
+		array('name' => 'filter_style', 'type' => 'char', 'size' => 5, 'default' => ''),
+		array('name' => 'filter_type',  'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'filter_to',    'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'filter_from',  'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'filter_name',  'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'filter_order', 'type' => 'int', 'size' => 10, 'default' => 0),
+	),
+	array(
+		array('name' => 'id_filter', 'columns' => array('id_filter'), 'type' => 'primary'),
+	)
+);
 
 #
 # Table structure for table `scheduled_tasks`
 #
 
-CREATE TABLE {$db_prefix}scheduled_tasks (
-  id_task smallint(5) NOT NULL auto_increment,
-  next_time int(10) NOT NULL default '0',
-  time_offset int(10) NOT NULL default '0',
-  time_regularity smallint(5) NOT NULL default '0',
-  time_unit varchar(1) NOT NULL default 'h',
-  disabled tinyint(3) NOT NULL default '0',
-  task varchar(24) NOT NULL default '',
-  PRIMARY KEY (id_task),
-  KEY next_time (next_time),
-  KEY disabled (disabled),
-  UNIQUE task (task)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}scheduled_tasks',
+	array(
+		array('name' => 'id_task',         'type' => 'smallint', 'size' => 5, 'auto' => true),
+		array('name' => 'next_time',       'type' => 'int', 'size' => 10, 'default' => 0),
+		array('name' => 'time_offset',     'type' => 'int', 'size' => 10, 'default' => 0),
+		array('name' => 'time_regularity', 'type' => 'smallint', 'size' => 5, 'default' => 0),
+		array('name' => 'time_unit',       'type' => 'varchar', 'size' => 1, 'default' => 'h'),
+		array('name' => 'disabled',        'type' => 'tinyint', 'size' => 3, 'default' => 0),
+		array('name' => 'task',            'type' => 'varchar', 'size' => 24, 'default' => ''),
+	),
+	array(
+		array('name' => 'id_task',   'columns' => array('id_task'), 'type' => 'primary'),
+		array('name' => 'next_time', 'columns' => array('next_time'), 'type' => 'key'),
+		array('name' => 'disabled',  'columns' => array('disabled'), 'type' => 'key'),
+		array('name' => 'task',      'columns' => array('task'), 'type' => 'unique'),
+	)
+);
 
 #
 # Dumping data for table `scheduled_tasks`
@@ -2169,11 +2245,15 @@ $db->insert('ignore',
 # Table structure for table `settings`
 #
 
-CREATE TABLE {$db_prefix}settings (
-  variable varchar(255) NOT NULL default '',
-  value text NOT NULL,
-  PRIMARY KEY (variable(30))
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}settings',
+	array(
+		array('name' => 'variable', 'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'value',    'type' => 'text'),
+	),
+	array(
+		array('name' => 'variable', 'columns' => array('variable(30)'), 'type' => 'primary'),
+	)
+);
 
 #
 # Dumping data for table `settings`
@@ -2385,27 +2465,35 @@ $db->insert('ignore',
 # Table structure for table `sessions`
 #
 
-CREATE TABLE {$db_prefix}sessions (
-  session_id char(64) NOT NULL,
-  last_update int(10) unsigned NOT NULL,
-  data text NOT NULL,
-  PRIMARY KEY (session_id)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}sessions',
+	array(
+		array('name' => 'session_id',  'type' => 'char', 'size' => 64),
+		array('name' => 'last_update', 'type' => 'int', 'size' => 10, 'unsigned' => true),
+		array('name' => 'data',        'type' => 'text'),
+	),
+	array(
+		array('name' => 'session_id', 'columns' => array('session_id'), 'type' => 'primary'),
+	)
+);
 
 #
 # Table structure for table `smileys`
 #
 
-CREATE TABLE {$db_prefix}smileys (
-  id_smiley smallint(5) unsigned NOT NULL auto_increment,
-  code varchar(30) NOT NULL default '',
-  filename varchar(48) NOT NULL default '',
-  description varchar(80) NOT NULL default '',
-  smiley_row tinyint(4) unsigned NOT NULL default '0',
-  smiley_order smallint(5) unsigned NOT NULL default '0',
-  hidden tinyint(4) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_smiley)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}smileys',
+	array(
+		array('name' => 'id_smiley',    'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'auto' => true),
+		array('name' => 'code',         'type' => 'varchar', 'size' => 30, 'default' => ''),
+		array('name' => 'filename',     'type' => 'varchar', 'size' => 48, 'default' => ''),
+		array('name' => 'description',  'type' => 'varchar', 'size' => 80, 'default' => ''),
+		array('name' => 'smiley_row',   'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'default' => 0),
+		array('name' => 'smiley_order', 'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'hidden',       'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'default' => 0),
+	),
+	array(
+		array('name' => 'id_smiley', 'columns' => array('id_smiley'), 'type' => 'primary'),
+	)
+);
 
 #
 # Dumping data for table `smileys`
@@ -2448,13 +2536,17 @@ $db->insert('ignore',
 # Table structure for table `spiders`
 #
 
-CREATE TABLE {$db_prefix}spiders (
-  id_spider smallint(5) unsigned NOT NULL auto_increment,
-  spider_name varchar(255) NOT NULL default '',
-  user_agent varchar(255) NOT NULL default '',
-  ip_info varchar(255) NOT NULL default '',
-  PRIMARY KEY id_spider(id_spider)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}spiders',
+	array(
+		array('name' => 'id_spider',   'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'auto' => true),
+		array('name' => 'spider_name', 'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'user_agent',  'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'ip_info',     'type' => 'varchar', 'size' => 255, 'default' => ''),
+	),
+	array(
+		array('name' => 'id_spider', 'columns' => array('id_spider'), 'type' => 'primary'),
+	)
+);
 
 #
 # Dumping data for table `spiders`
@@ -2502,21 +2594,25 @@ $db->insert('ignore',
 #
 
 CREATE TABLE {$db_prefix}subscriptions(
-  id_subscribe mediumint(8) unsigned NOT NULL auto_increment,
-  name varchar(60) NOT NULL default '',
-  description varchar(255) NOT NULL default '',
-  cost text NOT NULL,
-  length varchar(6) NOT NULL default '',
-  id_group smallint(5) NOT NULL default '0',
-  add_groups varchar(40) NOT NULL default '',
-  active tinyint(3) NOT NULL default '1',
-  repeatable tinyint(3) NOT NULL default '0',
-  allow_partial tinyint(3) NOT NULL default '0',
-  reminder tinyint(3) NOT NULL default '0',
-  email_complete text NOT NULL,
-  PRIMARY KEY (id_subscribe),
-  KEY active (active)
-) ENGINE=MyISAM;
+	array(
+		array('name' => 'id_subscribe',   'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'auto' => true),
+		array('name' => 'name',           'type' => 'varchar', 'size' => 60, 'default' => ''),
+		array('name' => 'description',    'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'cost',           'type' => 'text'),
+		array('name' => 'length',         'type' => 'varchar', 'size' => 6, 'default' => ''),
+		array('name' => 'id_group',       'type' => 'smallint', 'size' => 5, 'default' => 0),
+		array('name' => 'add_groups',     'type' => 'varchar', 'size' => 40, 'default' => ''),
+		array('name' => 'active',         'type' => 'tinyint', 'size' => 3, 'default' => 1),
+		array('name' => 'repeatable',     'type' => 'tinyint', 'size' => 3, 'default' => 0),
+		array('name' => 'allow_partial',  'type' => 'tinyint', 'size' => 3, 'default' => 0),
+		array('name' => 'reminder',       'type' => 'tinyint', 'size' => 3, 'default' => 0),
+		array('name' => 'email_complete', 'type' => 'text'),
+	),
+	array(
+		array('name' => 'id_subscribe', 'columns' => array('id_subscribe'), 'type' => 'primary'),
+		array('name' => 'active',       'columns' => array('active'), 'type' => 'key'),
+	)
+);
 
 #
 # Table structure for table `themes`
@@ -2524,14 +2620,18 @@ CREATE TABLE {$db_prefix}subscriptions(
 
 # this may look inconsistent, but id_member is *not* unsigned
 
-CREATE TABLE {$db_prefix}themes (
-  id_member mediumint(8) NOT NULL default '0',
-  id_theme tinyint(4) unsigned NOT NULL default '1',
-  variable varchar(255) NOT NULL default '',
-  value text NOT NULL,
-  PRIMARY KEY (id_theme, id_member, variable(30)),
-  KEY id_member (id_member)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}themes',
+	array(
+		array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'default' => 0),
+		array('name' => 'id_theme',  'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'default' => 1),
+		array('name' => 'variable',  'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'value',     'type' => 'text'),
+	),
+	array(
+		array('name' => 'id_theme',  'columns' => array('id_theme', 'id_member', 'variable(30)'), 'type' => 'primary'),
+		array('name' => 'id_member', 'columns' => array('id_member'), 'type' => 'key'),
+	)
+);
 
 #
 # Dumping data for table `themes`
@@ -2583,36 +2683,40 @@ $db->insert('ignore',
 # Table structure for table `topics`
 #
 
-CREATE TABLE {$db_prefix}topics (
-  id_topic mediumint(8) unsigned NOT NULL auto_increment,
-  is_sticky tinyint(4) NOT NULL default '0',
-  id_board smallint(5) unsigned NOT NULL default '0',
-  id_first_msg int(10) unsigned NOT NULL default '0',
-  id_last_msg int(10) unsigned NOT NULL default '0',
-  id_member_started mediumint(8) unsigned NOT NULL default '0',
-  id_member_updated mediumint(8) unsigned NOT NULL default '0',
-  id_poll mediumint(8) unsigned NOT NULL default '0',
-  id_previous_board smallint(5) NOT NULL default '0',
-  id_previous_topic mediumint(8) NOT NULL default '0',
-  num_replies int(10) unsigned NOT NULL default '0',
-  num_views int(10) unsigned NOT NULL default '0',
-  num_likes int(10) unsigned NOT NULL default '0',
-  locked tinyint(4) NOT NULL default '0',
-  redirect_expires int(10) unsigned NOT NULL default '0',
-  id_redirect_topic mediumint(8) unsigned NOT NULL default '0',
-  unapproved_posts smallint(5) NOT NULL default '0',
-  approved tinyint(3) NOT NULL default '1',
-  PRIMARY KEY (id_topic),
-  UNIQUE last_message (id_last_msg, id_board),
-  UNIQUE first_message (id_first_msg, id_board),
-  UNIQUE poll (id_poll, id_topic),
-  KEY is_sticky (is_sticky),
-  KEY approved (approved),
-  KEY id_board (id_board),
-  KEY member_started (id_member_started, id_board),
-  KEY last_message_sticky (id_board, is_sticky, id_last_msg),
-  KEY board_news (id_board, id_first_msg)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}topics',
+	array(
+		array('name' => 'id_topic',          'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'auto' => true),
+		array('name' => 'is_sticky',         'type' => 'tinyint', 'size' => 4, 'default' => 0),
+		array('name' => 'id_board',          'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_first_msg',      'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_last_msg',       'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_member_started', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_member_updated', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_poll',           'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_previous_board', 'type' => 'smallint', 'size' => 5, 'default' => 0),
+		array('name' => 'id_previous_topic', 'type' => 'mediumint', 'size' => 8, 'default' => 0),
+		array('name' => 'num_replies',       'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'num_views',         'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'num_likes',         'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'locked',            'type' => 'tinyint', 'size' => 4, 'default' => 0),
+		array('name' => 'redirect_expires',  'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_redirect_topic', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'unapproved_posts',  'type' => 'smallint', 'size' => 5, 'default' => 0),
+		array('name' => 'approved',          'type' => 'tinyint', 'size' => 3, 'default' => 1),
+	),
+	array(
+		array('name' => 'id_topic',            'columns' => array('id_topic'), 'type' => 'primary'),
+		array('name' => 'last_message',        'columns' => array('id_last_msg', 'id_board'), 'type' => 'unique'),
+		array('name' => 'first_message',       'columns' => array('id_first_msg', 'id_board'), 'type' => 'unique'),
+		array('name' => 'poll',                'columns' => array('id_poll', 'id_topic'), 'type' => 'unique'),
+		array('name' => 'is_sticky',           'columns' => array('is_sticky'), 'type' => 'key'),
+		array('name' => 'approved',            'columns' => array('approved'), 'type' => 'key'),
+		array('name' => 'id_board',            'columns' => array('id_board'), 'type' => 'key'),
+		array('name' => 'member_started',      'columns' => array('id_member_started', 'id_board'), 'type' => 'key'),
+		array('name' => 'last_message_sticky', 'columns' => array('id_board', 'is_sticky', 'id_last_msg'), 'type' => 'key'),
+		array('name' => 'board_news',          'columns' => array('id_board', 'id_first_msg'), 'type' => 'key'),
+	)
+);
 
 #
 # Dumping data for table `topics`
@@ -2634,21 +2738,25 @@ $db->insert('ignore',
 # Table structure for table `user_drafts`
 #
 
-CREATE TABLE {$db_prefix}user_drafts (
-  id_draft int(10) unsigned NOT NULL auto_increment,
-  id_topic mediumint(8) unsigned NOT NULL default '0',
-  id_board smallint(5) unsigned NOT NULL default '0',
-  id_reply int(10) unsigned NOT NULL default '0',
-  type tinyint(4) NOT NULL default '0',
-  poster_time int(10) unsigned NOT NULL default '0',
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  subject varchar(255) NOT NULL default '',
-  smileys_enabled tinyint(4) NOT NULL default '1',
-  body mediumtext NOT NULL,
-  icon varchar(16) NOT NULL default 'xx',
-  locked tinyint(4) NOT NULL default '0',
-  is_sticky tinyint(4) NOT NULL default '0',
-  to_list varchar(255) NOT NULL default '',
-  PRIMARY KEY (id_draft),
-  UNIQUE id_member (id_member, id_draft, type)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}user_drafts',
+	array(
+		array('name' => 'id_draft',        'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true),
+		array('name' => 'id_topic',        'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_board',        'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_reply',        'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'type',            'type' => 'tinyint', 'size' => 4, 'default' => 0),
+		array('name' => 'poster_time',     'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_member',       'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'subject',         'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'smileys_enabled', 'type' => 'tinyint', 'size' => 4, 'default' => 1),
+		array('name' => 'body',            'type' => 'mediumtext'),
+		array('name' => 'icon',            'type' => 'varchar', 'size' => 16, 'default' => 'xx'),
+		array('name' => 'locked',          'type' => 'tinyint', 'size' => 4, 'default' => 0),
+		array('name' => 'is_sticky',       'type' => 'tinyint', 'size' => 4, 'default' => 0),
+		array('name' => 'to_list',         'type' => 'varchar', 'size' => 255, 'default' => ''),
+	),
+	array(
+		array('name' => 'id_draft',  'columns' => array('id_draft'), 'type' => 'primary'),
+		array('name' => 'id_member', 'columns' => array('id_member', 'id_draft'), 'type' => 'unique'),
+	)
+);
