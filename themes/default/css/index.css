@@ -2802,6 +2802,10 @@ dl.merge_topic dd {
 .profileblock {
 	padding: 4px 8px;
 	margin-top: 4px;
+	word-wrap: break-word;
+	-webkit-hyphens: auto;
+	-moz-hyphens: auto;
+	-ms-hyphens: auto;
 }
 .profile_content {
 	overflow: auto;
@@ -2873,6 +2877,10 @@ dl.merge_topic dd {
 	float: right;
 	width: 70%;
 	margin-top: 0;
+	word-wrap: break-word;
+	-webkit-hyphens: auto;
+	-moz-hyphens: auto;
+	-ms-hyphens: auto;
 }
 #basicinfo h4 {
 	overflow: hidden;
