@@ -1465,8 +1465,8 @@ $db_table->db_create_table('{db_prefix}log_search_subjects',
 
 $db_table->db_create_table('{db_prefix}log_search_topics',
 	array(
-		array('name' => 'id_search',     'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
-		array('name' => 'id_topic', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_search', 'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_topic',  'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 	),
 	array(
 		array('name' => 'id_search_topic', 'columns' => array('id_search', 'id_topic'), 'type' => 'primary'),
@@ -1479,29 +1479,41 @@ $db_table->db_create_table('{db_prefix}log_search_topics',
 # Table structure for table `log_spider_hits`
 #
 
-CREATE TABLE {$db_prefix}log_spider_hits (
-  id_hit int(10) unsigned NOT NULL auto_increment,
-  id_spider smallint(5) unsigned NOT NULL default '0',
-  log_time int(10) unsigned NOT NULL default '0',
-  url varchar(255) NOT NULL default '',
-  processed tinyint(3) NOT NULL default '0',
-  PRIMARY KEY (id_hit),
-  KEY id_spider(id_spider),
-  KEY log_time(log_time),
-  KEY processed (processed)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_spider_hits',
+	array(
+		array('name' => 'id_hit',     'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true),
+		array('name' => 'id_spider', 'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'log_time', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'url', 'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'processed', 'type' => 'tinyint', 'size' => 3, 'default' => 0),
+	),
+	array(
+		array('name' => 'id_hit', 'columns' => array('id_hit'), 'type' => 'primary'),
+		array('name' => 'id_spider', 'columns' => array('id_spider'), 'type' => 'key'),
+		array('name' => 'log_time', 'columns' => array('log_time'), 'type' => 'key'),
+		array('name' => 'processed', 'columns' => array('processed'), 'type' => 'key'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_spider_stats`
 #
 
-CREATE TABLE {$db_prefix}log_spider_stats (
-  id_spider smallint(5) unsigned NOT NULL default '0',
-  page_hits smallint(5) unsigned NOT NULL default '0',
-  last_seen int(10) unsigned NOT NULL default '0',
-  stat_date date NOT NULL default '0001-01-01',
-  PRIMARY KEY (stat_date, id_spider)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}log_spider_stats',
+	array(
+		array('name' => 'id_spider', 'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'page_hits', 'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'last_seen', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'stat_date', 'type' => 'date', 'default' => '0001-01-01'),
+	),
+	array(
+		array('name' => 'stat_date_id_spider', 'columns' => array('stat_date', 'id_spider'), 'type' => 'primary'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `log_subscribed`
