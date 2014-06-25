@@ -1561,7 +1561,9 @@ class Scheduled_Task
 						scheduleTaskImmediate('user_access_mentions');
 					}
 				}
+				$db->free_result($request2);
 			}
+			$db->free_result($request);
 
 			return true;
 		}
