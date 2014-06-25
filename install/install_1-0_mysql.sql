@@ -1553,14 +1553,14 @@ $db_table->db_create_table('{db_prefix}log_subscribed',
 $db_table->db_create_table('{db_prefix}log_topics',
 	array(
 		array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
-		array('name' => 'id_topic', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
-		array('name' => 'id_msg', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_topic',  'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_msg',    'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
 		array('name' => 'unwatched', 'type' => 'tinyint', 'size' => 3, 'default' => 0),
 		array('name' => 'stat_date', 'type' => 'date', 'default' => '0001-01-01'),
 	),
 	array(
 		array('name' => 'id_member_topic', 'columns' => array('id_member', 'id_topic'), 'type' => 'primary'),
-		array('name' => 'id_topic', 'columns' => array('id_topic'), 'type' => 'key'),
+		array('name' => 'id_topic',        'columns' => array('id_topic'), 'type' => 'key'),
 	),
 	array(),
 	'ignore'
@@ -1570,40 +1570,52 @@ $db_table->db_create_table('{db_prefix}log_topics',
 # Table structure for table `mail_queue`
 #
 
-CREATE TABLE {$db_prefix}mail_queue (
-  id_mail int(10) unsigned NOT NULL auto_increment,
-  time_sent int(10) NOT NULL default '0',
-  recipient varchar(255) NOT NULL default '',
-  body mediumtext NOT NULL,
-  subject varchar(255) NOT NULL default '',
-  headers text NOT NULL,
-  send_html tinyint(3) NOT NULL default '0',
-  priority tinyint(3) NOT NULL default '1',
-  private tinyint(1) NOT NULL default '0',
-  message_id varchar(12) NOT NULL default '',
-  PRIMARY KEY (id_mail),
-  KEY time_sent (time_sent),
-  KEY mail_priority (priority, id_mail)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}mail_queue',
+	array(
+		array('name' => 'id_mail',    'type' => 'int', 'size' => 8, 'unsigned' => true, 'auto' => true),
+		array('name' => 'time_sent',  'type' => 'int', 'size' => 10, 'default' => 0),
+		array('name' => 'recipient',  'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'body',       'type' => 'mediumtext'),
+		array('name' => 'subject',    'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'headers',    'type' => 'text'),
+		array('name' => 'send_html',  'type' => 'tinyint', 'size' => 3, 'default' => 0),
+		array('name' => 'priority',   'type' => 'tinyint', 'size' => 3, 'default' => 1),
+		array('name' => 'private',    'type' => 'tinyint', 'size' => 1, 'default' => 0),
+		array('name' => 'message_id', 'type' => 'varchar', 'size' => 12, 'default' => ''),
+	),
+	array(
+		array('name' => 'id_mail',       'columns' => array('id_mail'), 'type' => 'primary'),
+		array('name' => 'time_sent',     'columns' => array('time_sent'), 'type' => 'key'),
+		array('name' => 'mail_priority', 'columns' => array('priority', 'id_mail'), 'type' => 'key'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Table structure for table `membergroups`
 #
 
-CREATE TABLE {$db_prefix}membergroups (
-  id_group smallint(5) unsigned NOT NULL auto_increment,
-  group_name varchar(80) NOT NULL default '',
-  description text NOT NULL,
-  online_color varchar(20) NOT NULL default '',
-  min_posts mediumint(9) NOT NULL default '-1',
-  max_messages smallint(5) unsigned NOT NULL default '0',
-  icons varchar(255) NOT NULL default '',
-  group_type tinyint(3) NOT NULL default '0',
-  hidden tinyint(3) NOT NULL default '0',
-  id_parent smallint(5) NOT NULL default '-2',
-  PRIMARY KEY (id_group),
-  KEY min_posts (min_posts)
-) ENGINE=MyISAM;
+$db_table->db_create_table('{db_prefix}membergroups',
+	array(
+		array('name' => 'id_group',     'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'auto' => true),
+		array('name' => 'group_name',   'type' => 'varchar', 'size' => 80, 'default' => ''),
+		array('name' => 'description',  'type' => 'text'),
+		array('name' => 'online_color', 'type' => 'varchar', 'size' => 20, 'default' => ''),
+		array('name' => 'min_posts',    'type' => 'mediumint', 'size' => 9, 'default' => -1),
+		array('name' => 'max_messages', 'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'icons',        'type' => 'varchar', 'size' => 255, 'default' => ''),
+		array('name' => 'group_type',   'type' => 'tinyint', 'size' => 3, 'default' => 0),
+		array('name' => 'hidden',       'type' => 'tinyint', 'size' => 3, 'default' => 0),
+		array('name' => 'id_parent',    'type' => 'smallint', 'size' => 5, 'default' => -2),
+	),
+	array(
+		array('name' => 'id_group',  'columns' => array('id_group'), 'type' => 'primary'),
+		array('name' => 'min_posts', 'columns' => array('min_posts'), 'type' => 'key'),
+	),
+	array(),
+	'ignore'
+);
 
 #
 # Dumping data for table `membergroups`
