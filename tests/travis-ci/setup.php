@@ -19,6 +19,9 @@ Class Elk_Testing_Setup
 
 	public function run_queries()
 	{
+		global $modSettings;
+
+		$modSettings['disableQueryCheck'] = true;
 		$query = '';
 		$db = $this->_db;
 		$db_table = $this->_db_table;
