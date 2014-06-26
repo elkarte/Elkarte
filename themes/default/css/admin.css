@@ -770,10 +770,9 @@ dl.settings dd.large_caption {
 	text-align: center;
 }
 .edit_board {
-	float: left;
-	padding: 8px;
+	padding: 0 8px 8px;
 	background-image: url(../images/icons/modify_small.png);
-	margin-top: 3px;
+	background-repeat: no-repeat;
 	margin-left: 3px;
 }
 .edit_board.nochanges {
@@ -781,9 +780,6 @@ dl.settings dd.large_caption {
 }
 .edit_board.changed {
 	background-image: url(../images/icons/field_invalid.png);
-}
-.rename_profile {
-	float: left;
 }
 .perm_profile_delete {
 	width:5%;
