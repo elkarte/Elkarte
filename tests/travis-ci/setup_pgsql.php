@@ -5,7 +5,7 @@ define('ELK', 1);
 
 require_once(TESTDIR . '/setup.php');
 require_once(BOARDDIR . '/sources/database/Db-postgresql.class.php');
-require_once(BOARDDIR . '/sources/database/DbTable-postgresql.class.php');
+require_once(BOARDDIR . '/sources/database/DbTable-postgresql.php');
 
 class DbTable_PostgreSQL_Install extends DbTable_PostgreSQL
 {
