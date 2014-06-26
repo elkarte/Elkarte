@@ -2080,7 +2080,7 @@ function db_table_install()
 	}
 	elseif (class_exists('DbTable_PostgreSQL'))
 	{
-		class DbTable_PostgreSQL extends DbTable_PostgreSQL
+		class DbTable_PostgreSQL_Install extends DbTable_PostgreSQL
 		{
 			public static $_tbl_inst = null;
 			/**
@@ -2114,7 +2114,7 @@ function db_table_install()
 			public static function db_table($db)
 			{
 				if (is_null(self::$_tbl_inst))
-					self::$_tbl_inst = new DbTable_MySQL_Install($db);
+					self::$_tbl_inst = new DbTable_PostgreSQL_Install($db);
 				return self::$_tbl_inst;
 			}
 		}
