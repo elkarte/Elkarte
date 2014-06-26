@@ -212,7 +212,6 @@ class Test_' . $key . ' extends TestSuite
 	public function prepare()
 	{
 		$this->load_queries(BOARDDIR . '/install/install_1-0.sql');
-		$this->prepare();
 
 		$this->run_queries();
 		$this->prepare_settings();
