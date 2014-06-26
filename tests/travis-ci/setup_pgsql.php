@@ -65,6 +65,8 @@ Class Elk_Testing_psql extends Elk_Testing_Setup
 		$this->_db_table = DbTable_PostgreSQL_Install::db_table($this->_db);
 
 		$this->load_queries(BOARDDIR . '/install/install_1-0_postgresql.sql');
+		$this->run_queries();
+
 		$this->prepare();
 	}
 }

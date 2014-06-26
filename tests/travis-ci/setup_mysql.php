@@ -63,9 +63,6 @@ Class Elk_Testing_mysql extends Elk_Testing_Setup
 		$connection = Database_MySQL::initiate($this->_db_server, $this->_db_name, $this->_db_user, $this->_db_passwd, $this->_db_prefix);
 		$this->_db = Database_MySQL::db();
 		$this->_db_table = DbTable_MySQL_Install::db_table($this->_db);
-
-		$this->load_queries(BOARDDIR . '/install/install_1-0_mysql.sql');
-		$this->prepare();
 	}
 }
 
