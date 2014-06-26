@@ -40,7 +40,7 @@ class DbTable_PostgreSQL extends DbTable
 	 * Array of table names we don't allow to be removed by addons.
 	 * @var array
 	 */
-	private $_reservedTables = null;
+	protected $_reservedTables = null;
 
 	/**
 	 * Keeps a (reverse) log of changes to the table structure, to be undone.
