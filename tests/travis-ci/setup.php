@@ -29,7 +29,7 @@ Class Elk_Testing_Setup
 		{
 			if (substr($part, -1) == ';')
 			{
-				$result = eval('return ' . $query);
+				$result = eval('return ' . $query . $part);
 				if ($result === false)
 					echo 'Query failed: ' . "\n" . $query . "\n" . substr($part, 0, -1) . "\n";
 
