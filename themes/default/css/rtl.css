@@ -1298,3 +1298,16 @@ div.labels {
 		float: none;
 	}
 }
+
+/*	$ADMIN	*/
+/* ------------------------------------------------------- */
+/* There is no admin_rtl.css so I'll stuck them here for the moment */
+#manage_boards ul:nth-child(n+2) {
+	padding-right: 30px;
+	padding-left: 0 !important;
+}
+#manage_boards li .floatleft:before {
+	padding-right: 0 !important;
+	padding-left: 5px;
+	float: right !important;
+}
