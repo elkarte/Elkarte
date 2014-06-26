@@ -5,6 +5,7 @@ define('ELK', 1);
 
 require_once(TESTDIR . '/setup.php');
 require_once(BOARDDIR . '/sources/database/Db-mysql.class.php');
+require_once(BOARDDIR . '/sources/database/DbTable-mysql.class.php');
 
 class DbTable_MySQL_Install extends DbTable_MySQL
 {
