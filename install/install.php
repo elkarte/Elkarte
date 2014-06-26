@@ -2265,6 +2265,7 @@ function action_deleteInstaller()
 		$ftp->chdir($_SESSION['installer_temp_ftp']['path']);
 
 		$ftp->unlink('install.php');
+		$ftp->unlink('install' . DB_SCRIPT_VERSION . '.sql');
 
 		foreach ($databases as $key => $dummy)
 			$ftp->unlink('install_' . DB_SCRIPT_VERSION . '_' . $key . '.sql');
@@ -2276,6 +2277,7 @@ function action_deleteInstaller()
 	else
 	{
 		@unlink(__FILE__);
+		@unlink(dirname(__FILE__) . '/install' . DB_SCRIPT_VERSION . '.sql');
 
 		foreach ($databases as $key => $dummy)
 			@unlink(dirname(__FILE__) . '/install_' . DB_SCRIPT_VERSION . '_' . $key . '.sql');
