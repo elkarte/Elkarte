@@ -20,6 +20,7 @@ Class Elk_Testing_Setup
 	public function run_queries()
 	{
 		$query = '';
+		$db_table = $this->_db_table;
 
 		if (empty($this->_clean_queries_parts))
 			$this->_clean_queries_parts = $this->_queries_parts;
@@ -28,7 +29,7 @@ Class Elk_Testing_Setup
 		{
 			if (substr($part, -1) == ';')
 			{
-				$result = $this->_db->query('', $query . "\n" . substr($part, 0, -1), array('security_override' => true));
+				$result = eval('return ' . $query);
 				if ($result === false)
 					echo 'Query failed: ' . "\n" . $query . "\n" . substr($part, 0, -1) . "\n";
 
