@@ -1310,6 +1310,21 @@ a.help .icon {
 	border-radius: 6px 6px 0 0;
 	border-bottom: none;
 }
+/* styles for Profile>Group Membership */
+.groupmembership {
+	padding: 12px;
+	border-radius: 7px;
+	border: 1px solid #ccc;
+	background-color: #f6f6f6;
+}
+/* alternate table row color */
+.groupmembership .windowbg {
+	background-color: #fcfcfc;
+}
+.groupmembership .windowbg2 {
+	background-color: #f6f6f6;
+}
+
 /*	$MEDIA		*/
 /* Experimental media queries.
 /* ------------------------------------------------------- */

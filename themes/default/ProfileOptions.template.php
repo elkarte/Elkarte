@@ -842,6 +842,7 @@ function template_groupMembership()
 	else
 	{
 		echo '
+			<div class="groupmembership">
 			<table class="table_grid">
 				<thead>
 					<tr class="table_head">
@@ -887,6 +888,7 @@ function template_groupMembership()
 			echo '
 			<div class="submitbutton">
 				<input type="submit" value="', $txt['make_primary'], '" class="button_submit" />
+			</div>
 			</div>';
 
 		// Any groups they can join?
@@ -894,6 +896,7 @@ function template_groupMembership()
 		{
 			echo '
 			<br />
+			<div class="groupmembership">
 			<table class="table_grid">
 				<thead>
 					<tr class="table_head">
@@ -903,7 +906,8 @@ function template_groupMembership()
 						<th scope="col"></th>
 					</tr>
 				</thead>
-				<tbody>';
+				<tbody>
+			</div>';
 
 			$alternate = true;
 			foreach ($context['groups']['available'] as $group)
