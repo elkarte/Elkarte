@@ -2248,7 +2248,7 @@ $db_table->db_create_table('{db_prefix}scheduled_tasks',
 
 $db->insert('ignore',
 	'{db_prefix}scheduled_tasks',
-	array('id_task' => 'int', 'next_time' => 'int', 'time_offset' => 'int', 'time_regularity' => 'int',
+	array('next_time' => 'int', 'time_offset' => 'int', 'time_regularity' => 'int',
 	'time_unit' => 'string', 'disabled' => 'int', 'task' => 'string'),
 	array(
 		array(0, 0, 2, 'h', 0, 'approval_notification'),
