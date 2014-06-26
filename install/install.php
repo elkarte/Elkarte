@@ -921,7 +921,7 @@ function action_databasePopulation()
 	definePaths();
 
 	$db = load_database();
-	$db_table = db_table();
+	$db_table = db_table_install();
 
 	// Before running any of the queries, let's make sure another version isn't already installed.
 	$result = $db->query('', '
@@ -2023,6 +2023,105 @@ function updateDbLastError()
 	// Write out the db_last_error file with the error timestamp
 	file_put_contents(dirname(__FILE__) . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = 0;');
 	return true;
+}
+
+/**
+ * The normal DbTable disallows to delete/create "core" tables
+ */
+function db_table_install()
+{
+	global $db_type;
+
+	$db = load_database();
+
+	require_once(SOURCEDIR . '/database/DbTable.class.php');
+	require_once(SOURCEDIR . '/database/DbTable-' . $db_type . '.php');
+
+	// @todo UGLY!!!
+	// Once the install dir will be kept for install, create a file for that
+	if (class_exists('DbTable_MySQL'))
+	{
+		class DbTable_MySQL_Install extends DbTable_MySQL
+		{
+			public static $_tbl_inst = null;
+			/**
+			* DbTable_MySQL::construct
+			*
+			* @param object $db - A Database_MySQL object
+			*/
+			private function __construct($db)
+			{
+				global $db_prefix;
+
+				// We are doing install, of course we want to do any remove on these
+				$this->_reservedTables = array();
+
+				foreach ($this->_reservedTables as $k => $table_name)
+					$this->_reservedTables[$k] = strtolower($db_prefix . $table_name);
+
+				// let's be sure.
+				$this->_package_log = array();
+
+				// This executes queries and things
+				$this->_db = $db;
+			}
+
+			/**
+			* Static method that allows to retrieve or create an instance of this class.
+			*
+			* @param object $_db - A Database_MySQL object
+			* @return object - A DbTable_MySQL object
+			*/
+			public static function db_table($db)
+			{
+				if (is_null(self::$_tbl_inst))
+					self::$_tbl_inst = new DbTable_MySQL_Install($db);
+				return self::$_tbl_inst;
+			}
+		}
+	}
+	elseif (class_exists('DbTable_PostgreSQL'))
+	{
+		class DbTable_PostgreSQL extends DbTable_PostgreSQL
+		{
+			public static $_tbl_inst = null;
+			/**
+			* DbTable_MySQL::construct
+			*
+			* @param object $db - A Database_MySQL object
+			*/
+			private function __construct($db)
+			{
+				global $db_prefix;
+
+				// We are doing install, of course we want to do any remove on these
+				$this->_reservedTables = array();
+
+				foreach ($this->_reservedTables as $k => $table_name)
+					$this->_reservedTables[$k] = strtolower($db_prefix . $table_name);
+
+				// let's be sure.
+				$this->_package_log = array();
+
+				// This executes queries and things
+				$this->_db = $db;
+			}
+
+			/**
+			* Static method that allows to retrieve or create an instance of this class.
+			*
+			* @param object $_db - A Database_MySQL object
+			* @return object - A DbTable_MySQL object
+			*/
+			public static function db_table($db)
+			{
+				if (is_null(self::$_tbl_inst))
+					self::$_tbl_inst = new DbTable_MySQL_Install($db);
+				return self::$_tbl_inst;
+			}
+		}
+	}
+	return call_user_func(array('DbTable_' . DB_TYPE . '_Install', 'db_table'), $db);
 }
 
 /**
