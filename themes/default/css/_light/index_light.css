@@ -768,15 +768,6 @@ div.bbc_footnotes .meaction{
 	box-shadow: 1px 2px 3px #eee;
 }
 /* Color for linktree items. */
-.linktree {
-	background: #fcfcfc;
-	border-top: 1px solid #ccc;
-	border-right: 1px solid #ccc;
-	border-bottom: 1px solid #ccc;
-}
-.linktree, .linktree_last .linktree * {
-	line-height: 2.154em;
-}
 .linktree a {
 	color: #555;
 }
@@ -786,34 +777,20 @@ div.bbc_footnotes .meaction{
 	color: #fff;
 	text-decoration: none;
 }
-.linktree_last span a {
-	color: #dfdfdf;
-	text-decoration: none;
-}
-.linktree:before {
-	border-left: 10px solid #ccc;
-}
-.linktree:hover:before, .linktree_last:before {
-	border-left: 10px solid #3d6e32;
-}
 .linktree:after {
-	border-left: 10px solid #fcfcfc;
+	box-shadow: 1px -1px 0 1px rgba(204, 204, 204, 0.9);
+	background: #fcfcfc;
 }
 .linktree:hover, .linktree_last {
-	border-top: 1px solid #3d6e32;
-	border-right: 1px solid #3d6e32;
-	border-bottom: 1px solid #3d6e32;
 	background: #5ba048;
-	background-image: linear-gradient(to right, #4b863c, #5ba048);
+	background-image: linear-gradient(0deg, #4b863c, #5ba048);
 }
 .linktree:hover:after, .linktree_last:after {
-	border-left: 10px solid #5ba048;
+	background: #5ba048;
+	background-image: linear-gradient(-45deg, #4b863c, #5ba048);
 }
-.linktree_last:hover {
+.linktree_last:hover, .linktree_last:hover:after {
 	background: #4b863c;
-}
-.linktree_last:hover:after {
-	border-left: 10px solid #4b863c;
 }
 
 /*	$BUTTONS	*/
