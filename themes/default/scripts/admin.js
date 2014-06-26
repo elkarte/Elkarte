@@ -1380,7 +1380,7 @@ function initEditProfileBoards()
 		$('.edit_board').click();
 	});
 
-	$('.edit_board').show().click(function(e) {
+	$('.edit_board').show().on('click.elkarte', function(e) {
 		var $icon = $(this),
 			board_id = $icon.data('boardid'),
 			board_profile = $icon.data('boardprofile'),
@@ -1389,7 +1389,7 @@ function initEditProfileBoards()
 				.attr('name', 'boardprofile[' + board_id + ']')
 				.change(function() {
 					$(this).find('option:selected').each(function() {
-						if ($(this).attr('value') === board_profile)
+						if ($(this).attr('value') == board_profile)
 							$icon.addClass('nochanges').removeClass('changed');
 						else
 							$icon.addClass('changed').removeClass('nochanges');
@@ -1413,6 +1413,11 @@ function initEditProfileBoards()
 			.attr('name', 'save_changes')
 			.attr('value', txt_save)
 		);
+		$icon.off('click.elkarte').click(function(e) {
+			e.preventDefault();
+			if ($(this).hasClass('changed'))
+				$('input[name="save_changes"]').click();
+		});
 	});
 }
 

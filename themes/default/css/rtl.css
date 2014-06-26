@@ -557,11 +557,11 @@ dl.settings img {
 	margin: 0 -2px 0 0;
 }
 .topic_name, .topic_starter {
-	margin: 0 0 0 50px;
+	margin: 0 -50px 0 0;
 }
 .topic_name h4 {
-	padding-right: 30px;
-	padding-left: 0;
+	padding-right: 0;
+	padding-left: 30px;
 }
 .topic_stats {
 	text-align: left;
@@ -570,6 +570,16 @@ dl.settings img {
 .topic_lastpost img {
 	float: left;
 }
+.topic_lastpost .img_last_post {
+	float: left;
+}
+.topicicon:before,
+.sticky_row .topic_info:before, .locked_row .topic_info:before,
+.sticky_row .topic_details:before, .locked_row .topic_details:before,
+.locked_row.sticky_row .topic_info:before {
+	background-image: url(../images/topic/topicicons.png);
+}
+.img_last_post:before {background-position: -18px -162px;}
 .qaction_row {
 	text-align: left;
 }
@@ -1281,4 +1291,17 @@ div.labels {
 	.pagesection div.floatright {
 		float: none;
 	}
+}
+
+/*	$ADMIN	*/
+/* ------------------------------------------------------- */
+/* There is no admin_rtl.css so I'll stuck them here for the moment */
+#manage_boards ul:nth-child(n+2) {
+	padding-right: 30px;
+	padding-left: 0 !important;
+}
+#manage_boards li .floatleft:before {
+	padding-right: 0 !important;
+	padding-left: 5px;
+	float: right !important;
 }

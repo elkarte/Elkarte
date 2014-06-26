@@ -321,7 +321,8 @@ legend {
 }
 /* @todo - Clean this up, once new classes are assigned to old windowbg stuffz. */
 .board_latest {
-	border-left: -1px solid #ccc;
+	border-right: 1px solid #ccc;
+	border-left: 0;
 }
 /* The board description and who-is-viewing stuff. */
 #description_board {
@@ -332,6 +333,16 @@ legend {
 }
 .jump_to_header {
 	box-shadow: -2px 1px rgba(1,1,1,0.07) inset;
+}
+
+.new_some_board:before {
+	background-position: -298px -14px;
+}
+.new_none_board:before {
+	background-position: -370px -14px;
+}
+.new_redirect_board:before {
+	background-position: -440px -14px;
 }
 /* --------------------------------------------------------------------- */
 /* The following are alternative layout orders for the board index rows. */
@@ -435,6 +446,15 @@ legend {
 	border-left: 1px solid #ccc;
 	border-right: 1px solid #bbb;
 	box-shadow: -1px 1px 1px rgba(0,0,0,0.07) inset;
+}
+/* Do one override here for .poster. Still saves code all round. */
+.poster_avatar .linklevel1, .poster_avatar:hover .linklevel1,
+.poster_avatar .linklevel1:focus,
+.name.linklevel1, .name.linklevel1:hover, .name.linklevel1:focus {
+	background: none;
+	border: none;
+	box-shadow: none;
+	color: #4b863c;
 }
 
 .requiredfield {

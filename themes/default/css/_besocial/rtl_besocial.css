@@ -259,6 +259,18 @@ legend {
 	float: right;
 }
 
+/*	$BOARDS		*/
+/* ------------------------------------------------------- */
+.new_some_board:before {
+	background-position: -296px -14px;
+}
+.new_none_board:before {
+	background-position: -368px -14px;
+}
+.new_redirect_board:before {
+	background-position: -440px -14px;
+}
+
 /*	$TOPICS		*/
 /* ------------------------------------------------------- */
 
