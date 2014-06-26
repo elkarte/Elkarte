@@ -581,9 +581,9 @@ $db_table->db_create_table('{db_prefix}boards',
 
 $db->insert('ignore',
 	'{db_prefix}boards',
-	array('id_board' => 'int', 'id_cat' => 'int', 'board_order' => 'int', 'id_last_msg' => 'int', 'id_msg_updated' => 'int',
+	array('id_cat' => 'int', 'board_order' => 'int', 'id_last_msg' => 'int', 'id_msg_updated' => 'int',
 	'name' => 'string', 'description' => 'string', 'num_topics' => 'int', 'num_posts' => 'int', 'member_groups' => 'string'),
-	array(1, 1, 1, 1, 1, '{$default_board_name}', '{$default_board_description}', 1, 1, '-1,0,2'),
+	array(1, 1, 1, 1, '{$default_board_name}', '{$default_board_description}', 1, 1, '-1,0,2'),
 	array('id_board')
 );
 
@@ -784,8 +784,8 @@ $db_table->db_create_table('{db_prefix}categories',
 
 $db->insert('ignore',
 	'{db_prefix}categories',
-	array('id_cat' => 'int', 'cat_order' => 'int', 'name' => 'string', 'can_collapse' => 'int'),
-	array(1, 0, '{$default_category_name}', 1),
+	array('cat_order' => 'int', 'name' => 'string', 'can_collapse' => 'int'),
+	array(0, '{$default_category_name}', 1),
 	array('id_cat')
 );
 
@@ -1615,17 +1615,17 @@ $db_table->db_create_table('{db_prefix}membergroups',
 
 $db->insert('ignore',
 	'{db_prefix}membergroups',
-	array('id_group' => 'int', 'group_name' => 'string', 'description' => 'string', 'online_color' => 'string',
+	array('group_name' => 'string', 'description' => 'string', 'online_color' => 'string',
 	'min_posts' => 'int', 'icons' => 'string', 'group_type' => 'int'),
 	array(
-		array(1, '{$default_administrator_group}', '', '#CD0000', -1, '5#iconadmin.png', 1),
-		array(2, '{$default_global_moderator_group}', '', '#0066FF', -1, '5#icongmod.png', 0),
-		array(3, '{$default_moderator_group}', '', '', -1, '5#iconmod.png', 0),
-		array(4, '{$default_newbie_group}', '', '', 0, '1#icon.png', 0),
-		array(5, '{$default_junior_group}', '', '', 50, '2#icon.png', 0),
-		array(6, '{$default_full_group}', '', '', 100, '3#icon.png', 0),
-		array(7, '{$default_senior_group}', '', '', 250, '4#icon.png', 0),
-		array(8, '{$default_hero_group}', '', '', 500, '5#icon.png', 0)
+		array('{$default_administrator_group}', '', '#CD0000', -1, '5#iconadmin.png', 1),
+		array('{$default_global_moderator_group}', '', '#0066FF', -1, '5#icongmod.png', 0),
+		array('{$default_moderator_group}', '', '', -1, '5#iconmod.png', 0),
+		array('{$default_newbie_group}', '', '', 0, '1#icon.png', 0),
+		array('{$default_junior_group}', '', '', 50, '2#icon.png', 0),
+		array('{$default_full_group}', '', '', 100, '3#icon.png', 0),
+		array('{$default_senior_group}', '', '', 250, '4#icon.png', 0),
+		array('{$default_hero_group}', '', '', 500, '5#icon.png', 0)
 	),
 	array('id_group')
 );
@@ -1852,11 +1852,11 @@ $db_table->db_create_table('{db_prefix}messages',
 
 $db->insert('ignore',
 	'{db_prefix}messages',
-	array('id_msg' => 'int', 'id_msg_modified' => 'int', 'id_topic' => 'int', 'id_board' => 'int', 'poster_time' => 'int',
+	array('id_msg_modified' => 'int', 'id_topic' => 'int', 'id_board' => 'int', 'poster_time' => 'int',
 	'subject' => 'string', 'poster_name' => 'string', 'poster_email' => 'string', 'poster_ip' => 'string',
 	'modified_name' => 'string', 'body' => 'string', 'icon' => 'string'),
 	array(
-		array(1, 1, 1, 1, time(), '{$default_topic_subject}', 'Elkarte', 'info@elkarte.net', '127.0.0.1', '', '{$default_topic_message}', 'xx')
+		array(1, 1, 1, time(), '{$default_topic_subject}', 'Elkarte', 'info@elkarte.net', '127.0.0.1', '', '{$default_topic_message}', 'xx')
 	),
 	array('id_msg')
 );
@@ -1954,12 +1954,12 @@ $db_table->db_create_table('{db_prefix}permission_profiles',
 
 $db->insert('ignore',
 	'{db_prefix}permission_profiles',
-	array('id_profile' => 'int', 'profile_name' => 'string'),
+	array('profile_name' => 'string'),
 	array(
-		array(1, 'default'),
-		array(2, 'no_polls'),
-		array(3, 'reply_only'),
-		array(4, 'read_only')
+		array('default'),
+		array('no_polls'),
+		array('reply_only'),
+		array('read_only')
 	),
 	array('id_group')
 );
@@ -2251,20 +2251,20 @@ $db->insert('ignore',
 	array('id_task' => 'int', 'next_time' => 'int', 'time_offset' => 'int', 'time_regularity' => 'int',
 	'time_unit' => 'string', 'disabled' => 'int', 'task' => 'string'),
 	array(
-		array(1, 0, 0, 2, 'h', 0, 'approval_notification'),
-		array(2, 0, 0, 7, 'd', 0, 'auto_optimize'),
-		array(3, 0, 60, 1, 'd', 0, 'daily_maintenance'),
-		array(4, 0, 0, 1, 'd', 0, 'daily_digest'),
-		array(5, 0, 0, 1, 'w', 0, 'weekly_digest'),
-		array(6, 0, 0, 1, 'd', 1, 'birthdayemails'),
-		array(7, 0, 0, 1, 'w', 0, 'weekly_maintenance'),
-		array(8, 0, 120, 1, 'd', 1, 'paid_subscriptions'),
-		array(9, 0, 120, 1, 'd', 0, 'remove_temp_attachments'),
-		array(10, 0, 180, 1, 'd', 0, 'remove_topic_redirect'),
-		array(11, 0, 240, 1, 'd', 0, 'remove_old_drafts'),
-		array(12, 0, 0, 6, 'h', 0, 'remove_old_followups'),
-		array(13, 0, 360, 10, 'm', 1, 'maillist_fetch_IMAP'),
-		array(14, 0, 30, 1, 'h', 0, 'user_access_mentions')
+		array(0, 0, 2, 'h', 0, 'approval_notification'),
+		array(0, 0, 7, 'd', 0, 'auto_optimize'),
+		array(0, 60, 1, 'd', 0, 'daily_maintenance'),
+		array(0, 0, 1, 'd', 0, 'daily_digest'),
+		array(0, 0, 1, 'w', 0, 'weekly_digest'),
+		array(0, 0, 1, 'd', 1, 'birthdayemails'),
+		array(0, 0, 1, 'w', 0, 'weekly_maintenance'),
+		array(0, 120, 1, 'd', 1, 'paid_subscriptions'),
+		array(0, 120, 1, 'd', 0, 'remove_temp_attachments'),
+		array(0, 180, 1, 'd', 0, 'remove_topic_redirect'),
+		array(0, 240, 1, 'd', 0, 'remove_old_drafts'),
+		array(0, 0, 6, 'h', 0, 'remove_old_followups'),
+		array(0, 360, 10, 'm', 1, 'maillist_fetch_IMAP'),
+		array(0, 30, 1, 'h', 0, 'user_access_mentions')
 	),
 	array('id_task')
 );
@@ -2592,35 +2592,35 @@ $db_table->db_create_table('{db_prefix}spiders',
 
 $db->insert('ignore',
 	'{db_prefix}spiders',
-	array('id_spider' => 'int', 'spider_name' => 'string', 'user_agent' => 'string', 'ip_info' => 'string'),
+	array('spider_name' => 'string', 'user_agent' => 'string', 'ip_info' => 'string'),
 	array(
-		array(1, 'Google', 'googlebot', ''),
-		array(2, 'Yahoo!', 'Yahoo! Slurp', ''),
-		array(3, 'MSN', 'msnbot', ''),
-		array(4, 'Bing', 'bingbot', ''),
-		array(5, 'Google (Mobile)', 'Googlebot-Mobile', ''),
-		array(6, 'Google (Image)', 'Googlebot-Image', ''),
-		array(7, 'Google (AdSense)', 'Mediapartners-Google', ''),
-		array(8, 'Google (Adwords)', 'AdsBot-Google', ''),
-		array(9, 'Yahoo! (Mobile)', 'YahooSeeker/M1A1-R2D2', ''),
-		array(10, 'Yahoo! (Image)', 'Yahoo-MMCrawler', ''),
-		array(11, 'Yahoo! (Blogs)', 'Yahoo-Blogs', ''),
-		array(12, 'Yahoo! (Feeds)', 'YahooFeedSeeker', ''),
-		array(13, 'MSN (Mobile)', 'MSNBOT_Mobile', ''),
-		array(14, 'MSN (Media)', 'msnbot-media', ''),
-		array(15, 'Cuil', 'twiceler', ''),
-		array(16, 'Ask', 'Teoma', ''),
-		array(17, 'Baidu', 'Baiduspider', ''),
-		array(18, 'Gigablast', 'Gigabot', ''),
-		array(19, 'InternetArchive', 'ia_archiver-web.archive.org', ''),
-		array(20, 'Alexa', 'ia_archiver', ''),
-		array(21, 'Omgili', 'omgilibot', ''),
-		array(22, 'EntireWeb', 'Speedy Spider', ''),
-		array(23, 'Yandex', 'YandexBot', ''),
-		array(24, 'Yandex (Images)', 'YandexImages', ''),
-		array(25, 'Yandex (Video)', 'YandexVideo', ''),
-		array(26, 'Yandex (Blogs)', 'YandexBlogs', ''),
-		array(27, 'Yandex (Media)', 'YandexMedia', '')
+		array('Google', 'googlebot', ''),
+		array('Yahoo!', 'Yahoo! Slurp', ''),
+		array('MSN', 'msnbot', ''),
+		array('Bing', 'bingbot', ''),
+		array('Google (Mobile)', 'Googlebot-Mobile', ''),
+		array('Google (Image)', 'Googlebot-Image', ''),
+		array('Google (AdSense)', 'Mediapartners-Google', ''),
+		array('Google (Adwords)', 'AdsBot-Google', ''),
+		array('Yahoo! (Mobile)', 'YahooSeeker/M1A1-R2D2', ''),
+		array('Yahoo! (Image)', 'Yahoo-MMCrawler', ''),
+		array('Yahoo! (Blogs)', 'Yahoo-Blogs', ''),
+		array('Yahoo! (Feeds)', 'YahooFeedSeeker', ''),
+		array('MSN (Mobile)', 'MSNBOT_Mobile', ''),
+		array('MSN (Media)', 'msnbot-media', ''),
+		array('Cuil', 'twiceler', ''),
+		array('Ask', 'Teoma', ''),
+		array('Baidu', 'Baiduspider', ''),
+		array('Gigablast', 'Gigabot', ''),
+		array('InternetArchive', 'ia_archiver-web.archive.org', ''),
+		array('Alexa', 'ia_archiver', ''),
+		array('Omgili', 'omgilibot', ''),
+		array('EntireWeb', 'Speedy Spider', ''),
+		array('Yandex', 'YandexBot', ''),
+		array('Yandex (Images)', 'YandexImages', ''),
+		array('Yandex (Video)', 'YandexVideo', ''),
+		array('Yandex (Blogs)', 'YandexBlogs', ''),
+		array('Yandex (Media)', 'YandexMedia', '')
 	),
 	array('id_spider')
 );
@@ -2768,10 +2768,10 @@ $db_table->db_create_table('{db_prefix}topics',
 
 $db->insert('ignore',
 	'{db_prefix}topics',
-	array('id_topic' => 'int', 'id_board' => 'int', 'id_first_msg' => 'int',
+	array('id_board' => 'int', 'id_first_msg' => 'int',
 	'id_last_msg' => 'int', 'id_member_started' => 'int', 'id_member_updated' => 'int'),
 	array(
-		array(1, 1, 1, 1, 0, 0)
+		array(1, 1, 1, 0, 0)
 	),
 	array('id_topic')
 );
