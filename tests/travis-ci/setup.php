@@ -24,6 +24,7 @@ Class Elk_Testing_Setup
 		$modSettings['disableQueryCheck'] = true;
 		$query = '';
 		$db = $this->_db;
+		$db->skip_error();
 		$db_table = $this->_db_table;
 
 		if (empty($this->_clean_queries_parts))
