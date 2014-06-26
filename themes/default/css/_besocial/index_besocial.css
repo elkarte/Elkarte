@@ -845,22 +845,29 @@ a.active {
 	resize: none;
 }
 
+/*	$LINKTREE	*/
+/* ------------------------------------------------------- */
+/* The navigation list (i.e. linktree) */
 .navigate_section {
-	padding-left: 15px;
 	border: 1px solid #eee;
 	margin: 4px 0 0 0;
 }
-.linktree:before, .linktree:after, .linktree_last:before, .linktree_last:after {
-	border-width: 1.077em 0 1.077em 1.077em;
-	margin-top: -1.077em;
-}
 .linktree, .linktree_last {
-	padding: 0 0.5em 0 1em;
+	padding: 0 1.5em 0 .5em;
+	border: none;
 }
 .linktree:after {
-	border-left: 0.7em solid #eee;
-	margin-right: 4px;
+	width: 0;
+	height: 0;
+	right: 0.1em;
+	transform: scale(1) rotate(0deg);
+	-webkit-transform: scale(1) rotate(0deg);
+	border-top: 1em solid transparent;
+	border-bottom: 1em  solid transparent;
+	border-left: 1em  solid #eee;
 }
+
+
 .board_name>a {
 	color: #43a8da;
 	font-weight: bold;

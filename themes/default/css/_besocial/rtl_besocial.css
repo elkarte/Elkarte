@@ -228,24 +228,18 @@ legend {
 	text-shadow: -1px 1px 2px #fff;
 }
 
-.navigate_section {
-	padding-left: 0;
-	padding-right: 15px;
-}
-.linktree, .linktree_last {
-	padding: 0 1em 0 0.5em;
-}
+/*	$LINKTREE	*/
+/* ------------------------------------------------------- */
 .linktree:after {
-	border-right: 0.7em solid #eee;
-	margin-right: 0;
-	margin-left: 4px;
+	border-left: 1em  solid transparent;
+	border-right: 1em  solid #eee;
+	left: -2em;
 }
 .linktree, .linktree_last {
-	padding-left: 10px;
-	padding-right: 20px;
+    padding: 0 1.5em 0 0.5em;
 }
 .linktree:first-child {
-	padding-right: 10px;
+    padding-left: 0.5em;
 }
 
 /*	$BOARDICONS	*/

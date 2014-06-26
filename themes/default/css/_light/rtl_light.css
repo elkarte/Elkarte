@@ -238,37 +238,14 @@ legend {
 	box-shadow: -1px 2px 3px #eee;
 }
 /* Color for linktree items. */
-.linktree {
-	border-right: 0;
-	border-left: 2px solid #ccc;
-	border-radius: 0 2px 2px 0;
-	padding-right: 25px;
-	padding-left: 10px;
-}
-.linktree:before {
-	border-left: 0;
-	border-right: 10px solid #ccc;
-}
-.linktree:hover:before, .linktree_last:before {
-	border-left: 0;
-	border-right: 10px solid #3d6e32;
-}
 .linktree:after {
-	border-left: 0;
-	border-right: 10px solid #fcfcfc;
+	box-shadow: -1px 1px 0 1px rgba(204, 204, 204, 0.9);
 }
 .linktree:hover, .linktree_last {
-	border-right: 0;
-	border-left: 2px solid #3d6e32;
-	background-image: linear-gradient(to left, #4b863c, #5ba048);
+	background-image: linear-gradient(0deg, #4b863c, #5ba048);
 }
 .linktree:hover:after, .linktree_last:after {
-	border-left: 0;
-	border-right: 10px solid #5ba048;
-}
-.linktree_last:hover:after {
-	border-left: 0;
-	border-right: 10px solid #4b863c;
+	background-image: linear-gradient(-45deg, #4b863c, #5ba048);
 }
 
 

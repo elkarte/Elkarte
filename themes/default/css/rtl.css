@@ -317,31 +317,22 @@ h2 a.collapse {
 /*	$LINKTREE	*/
 /* ------------------------------------------------------- */
 /* The navigation list (i.e. linktree) */
+.navigate_section {
+	padding-left: 1em;
+	padding-right: 0;
+}
 .linktree, .linktree_last {
 	float: right;
-	margin: -1px -1px -1px 1px;
-	padding-left: 10px;
-	padding-right: 20px;
+	padding: 0 2em 0 1.1em;
 }
 
 /* Nifty indicators. */
-.linktree:before, .linktree:after, .linktree_last:before, .linktree_last:after {
-	content: "";
-	position: absolute;
-	display: block;
-	left: auto;
-	right: 100%;
-	margin-right: 2px;
-	margin-left: 0;
-	border-right: 1.077em solid transparent;
-	border-left: none;
-}
 .linktree:after, .linktree_last:after {
-	margin-right: 0;
+	right: auto;
+	left: -1em;
 }
 .linktree:first-child {
-	padding-left: 10px;
-	padding-right: 20px;
+	padding-right: 1em;
 }
 
 /*	$BUTTONS	*/
@@ -691,6 +682,9 @@ dl.settings img {
 #display_jump_to {
 	float: left;
 	padding: 6px 0 5px 5px;
+}
+#display_jump_to input {
+    vertical-align: middle;
 }
 
 /* The send topic section. */
