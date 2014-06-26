@@ -138,7 +138,7 @@ LANGUAGE \'sql\';');
 
 $db->query('', '
 CREATE OR REPLACE FUNCTION TO_DAYS (timestamp) RETURNS integer AS
-  \'SELECT DATE_PART(''DAY'', $1 - ''0001-01-01bc'')::integer AS result\'
+  \'SELECT DATE_PART(\'\'DAY\'\', $1 - \'\'0001-01-01bc\'\')::integer AS result\'
 LANGUAGE \'sql\';');
 
 $db->query('', '
