@@ -344,7 +344,8 @@ legend {
 }
 /* @todo - Clean this up, once new classes are assigned to old windowbg stuffz. */
 .board_latest {
-	border-left: -1px solid #ccc;
+	border-right: 1px solid #ccc;
+	border-left: 0;
 }
 /* The board description and who-is-viewing stuff. */
 #description_board {
@@ -468,6 +469,15 @@ legend {
 	border-left: 1px solid #ccc;
 	border-right: 1px solid #bbb;
 	box-shadow: -1px 1px 1px rgba(0,0,0,0.07) inset;
+}
+/* Do one override here for .poster. Still saves code all round. */
+.poster_avatar .linklevel1, .poster_avatar:hover .linklevel1,
+.poster_avatar .linklevel1:focus,
+.name.linklevel1, .name.linklevel1:hover, .name.linklevel1:focus {
+	background: none;
+	border: none;
+	box-shadow: none;
+	color: #4b863c;
 }
 
 .requiredfield {
