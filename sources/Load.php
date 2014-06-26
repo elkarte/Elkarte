@@ -1541,7 +1541,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		$settings = array_merge($settings, template_init());
 
 	// Call initialization theme integration functions.
-	call_integration_hook('integrate_init_theme');
+	call_integration_hook('integrate_init_theme', array($id_theme, &$settings));
 
 	// Guests may still need a name.
 	if ($context['user']['is_guest'] && empty($context['user']['name']))
@@ -2744,7 +2744,7 @@ function determineAvatar($profile)
 
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img src="' . $gravatar_url . '" alt="" class="avatar" />',
+			'image' => '<img class="avatar" src="' . $gravatar_url . '" style="' . $max_avatar_width . $max_avatar_height . '" alt="" />',
 			'href' => $gravatar_url,
 			'url' => $gravatar_url,
 		);
@@ -2754,7 +2754,7 @@ function determineAvatar($profile)
 	{
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar" src="' . $modSettings['avatar_url'] . '/' . $profile['avatar'] . '" alt="" />',
+			'image' => '<img class="avatar" src="' . $modSettings['avatar_url'] . '/' . $profile['avatar'] . '" style="' . $max_avatar_width . $max_avatar_height . '" alt="" />',
 			'href' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
 			'url' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
 		);
@@ -2769,7 +2769,7 @@ function determineAvatar($profile)
 		// Let's proceed with the default avatar.
 		$avatar = array(
 			'name' => '',
-			'image' => '<img src="' . $settings['images_url'] . '/default_avatar.png" alt="" class="avatar" />',
+			'image' => '<img class="avatar" src="' . $settings['images_url'] . '/default_avatar.png" style="' . $max_avatar_width . $max_avatar_height . '" alt="" />',
 			'href' => $settings['images_url'] . '/default_avatar.png',
 			'url' => 'http://',
 		);

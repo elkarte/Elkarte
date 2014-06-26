@@ -850,6 +850,10 @@ a.active {
 	border: 1px solid #eee;
 	margin: 4px 0 0 0;
 }
+.linktree:before, .linktree:after, .linktree_last:before, .linktree_last:after {
+	border-width: 1.077em 0 1.077em 1.077em;
+	margin-top: -1.077em;
+}
 .linktree, .linktree_last {
 	padding: 0 0.5em 0 1em;
 }

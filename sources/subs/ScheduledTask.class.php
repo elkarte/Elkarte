@@ -1470,7 +1470,7 @@ class Scheduled_Task
 				updateSettings(array('user_access_mentions' => serialize($user_access_mentions)));
 
 				// Count helps keep things correct
-				countUserMentions(true, '', $member);
+				countUserMentions(false, '', $member);
 
 				// Run this only once for each user, it may be quite heavy, let's split up the load
 				break;
@@ -1533,7 +1533,7 @@ class Scheduled_Task
 				$user_see_board = memberQuerySeeBoard($row['id_member']);
 
 				// Find out if this user cannot see something that was supposed to be able to see
-				$request = $db->query('', '
+				$request2 = $db->query('', '
 					SELECT mnt.id_mention
 					FROM {db_prefix}log_mentions as mnt
 						LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = mnt.id_msg)
@@ -1550,7 +1550,7 @@ class Scheduled_Task
 					)
 				);
 				// One row of results is enough: scheduleTaskImmediate!
-				if ($db->num_rows($request) == 1)
+				if ($db->num_rows($request2) == 1)
 				{
 					if (!empty($modSettings['user_access_mentions']))
 						$modSettings['user_access_mentions'] = @unserialize($modSettings['user_access_mentions']);
@@ -1565,7 +1565,9 @@ class Scheduled_Task
 						scheduleTaskImmediate('user_access_mentions');
 					}
 				}
+				$db->free_result($request2);
 			}
+			$db->free_result($request);
 
 			return true;
 		}

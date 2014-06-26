@@ -240,6 +240,13 @@ legend {
 	margin-right: 0;
 	margin-left: 4px;
 }
+.linktree, .linktree_last {
+	padding-left: 10px;
+	padding-right: 20px;
+}
+.linktree:first-child {
+	padding-right: 10px;
+}
 
 /*	$BOARDICONS	*/
 /* ------------------------------------------------------- */
