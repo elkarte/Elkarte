@@ -31,6 +31,7 @@ $databases = array(
 		'version' => '5.0.19',
 		'version_check' => 'return min(mysqli_get_server_info($db_connection), mysqli_get_client_info($db_connection));',
 		'supported' => function_exists('mysqli_connect'),
+		'additional_file' => '',
 		'default_user' => 'mysqli.default_user',
 		'default_password' => 'mysqli.default_password',
 		'default_host' => 'mysqli.default_host',
@@ -52,6 +53,7 @@ $databases = array(
 		'function_check' => 'pg_connect',
 		'version_check' => '$request = pg_query(\'SELECT version()\'); list ($version) = pg_fetch_row($request); list ($pgl, $version) = explode(" ", $version); return $version;',
 		'supported' => function_exists('pg_connect'),
+		'additional_file' => 'install_' . DB_SCRIPT_VERSION . '_postgresq.sql',
 		'utf8_support' => true,
 		'utf8_version' => '8.0',
 		'utf8_version_check' => '$request = pg_query(\'SELECT version()\'); list ($version) = pg_fetch_row($request); list ($pgl, $version) = explode(" ", $version); return $version;',
@@ -369,11 +371,11 @@ function action_welcome()
 	{
 		if ($db['supported'])
 		{
-			if (!file_exists(dirname(__FILE__) . '/install_' . DB_SCRIPT_VERSION . '_' . $key . '.sql'))
+			if (!empty($db['additional_file']) && !file_exists(dirname(__FILE__) . '/' . $db['additional_file']))
 			{
 				$databases[$key]['supported'] = false;
 				$notFoundSQLFile = true;
-				$txt['error_db_script_missing'] = sprintf($txt['error_db_script_missing'], 'install_' . DB_SCRIPT_VERSION . '_' . $key . '.sql');
+				$txt['error_db_script_missing'] = sprintf($txt['error_db_script_missing'], $db['additional_file']);
 			}
 			else
 			{
@@ -976,9 +978,6 @@ function action_databasePopulation()
 	if (!empty($databases[$db_type]['utf8_support']))
 		$replaces[') ENGINE=MyISAM;'] = ') ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;';
 
-	// Read in the SQL.  Turn this on and that off... internationalize... etc.
-	$sql_lines = explode("\n", strtr(implode(' ', file(dirname(__FILE__) . '/install_' . DB_SCRIPT_VERSION . '_' . $db_type . '.sql')), $replaces));
-
 	// Execute the SQL.
 	$current_statement = '';
 	$exists = array();
@@ -990,67 +989,15 @@ function action_databasePopulation()
 		'insert_dups' => 0,
 	);
 
-	foreach ($sql_lines as $count => $line)
+	if (!empty($databases[$db_type]['additional_file']))
 	{
-		// No comments allowed!
-		if (substr(trim($line), 0, 1) != '#')
-			$current_statement .= "\n" . rtrim($line);
-
-		// Is this the end of the query string?
-		if (empty($current_statement) || (preg_match('~;[\s]*$~s', $line) == 0 && $count != count($sql_lines)))
-			continue;
-
-		$result = eval('return ' . $current_statement);
-
-/*
-		// Does this table already exist?  If so, don't insert more data into it!
-		if (preg_match('~^\s*INSERT INTO ([^\s\n\r]+?)~', $current_statement, $match) != 0 && in_array($match[1], $exists))
-		{
-			$incontext['sql_results']['insert_dups']++;
-			$current_statement = '';
-			continue;
-		}
-
-		if ($db->query('', $current_statement, array('security_override' => true, 'db_error_skip' => true), $db_connection) === false)
-		{
-			// Error 1050: Table already exists!
-			// @todo Needs to be made better!
-			if (($db_type != 'mysql' || mysqli_errno($db_connection) === 1050) && preg_match('~^\s*CREATE TABLE ([^\s\n\r]+?)~', $current_statement, $match) == 1)
-			{
-				$exists[] = $match[1];
-				$incontext['sql_results']['table_dups']++;
-			}
-			// Don't error on duplicate indexes (or duplicate operators in PostgreSQL.)
-			elseif (!preg_match('~^\s*CREATE( UNIQUE)? INDEX ([^\n\r]+?)~', $current_statement, $match) && !($db_type == 'postgresql' && preg_match('~^\s*CREATE OPERATOR (^\n\r]+?)~', $current_statement, $match)))
-			{
-				$incontext['failures'][$count] = $db->last_error();
-			}
-		}
-		else
-		{
-			if (preg_match('~^\s*CREATE TABLE ([^\s\n\r]+?)~', $current_statement, $match) == 1)
-				$incontext['sql_results']['tables']++;
-			else
-			{
-				preg_match_all('~\)[,;]~', $current_statement, $matches);
-				if (!empty($matches[0]))
-					$incontext['sql_results']['inserts'] += count($matches[0]);
-				else
-					$incontext['sql_results']['inserts']++;
-			}
-		}
-*/
-		$current_statement = '';
+		$sql_lines = explode("\n", strtr(implode(' ', file(dirname(__FILE__) . '/' . $databases[$db_type]['additional_file'])), $replaces));
+		parse_sqlLines($sql_lines);
 	}
 
-	// Sort out the context for the SQL.
-	foreach ($incontext['sql_results'] as $key => $number)
-	{
-		if ($number == 0)
-			unset($incontext['sql_results'][$key]);
-		else
-			$incontext['sql_results'][$key] = sprintf($txt['db_populate_' . $key], $number);
-	}
+	// Read in the SQL.  Turn this on and that off... internationalize... etc.
+	$sql_lines = explode("\n", strtr(implode(' ', file(dirname(__FILE__) . '/install_' . DB_SCRIPT_VERSION . '.sql')), $replaces));
+	parse_sqlLines($sql_lines);
 
 	// Make sure UTF will be used globally.
 	$db->insert('replace',
@@ -2037,7 +1984,7 @@ function db_table_install()
 
 	// @todo UGLY!!!
 	// Once the install dir will be kept for install, create a file for that
-	if (class_exists('DbTable_MySQL'))
+	if (class_exists('DbTable_MySQL') && !class_exists('DbTable_MySQL_Install'))
 	{
 		class DbTable_MySQL_Install extends DbTable_MySQL
 		{
@@ -2078,7 +2025,7 @@ function db_table_install()
 			}
 		}
 	}
-	elseif (class_exists('DbTable_PostgreSQL'))
+	elseif (class_exists('DbTable_PostgreSQL') && !class_exists('DbTable_PostgreSQL_Install'))
 	{
 		class DbTable_PostgreSQL_Install extends DbTable_PostgreSQL
 		{
@@ -2120,6 +2067,78 @@ function db_table_install()
 		}
 	}
 	return call_user_func(array('DbTable_' . DB_TYPE . '_Install', 'db_table'), $db);
+}
+
+function parse_sqlLines($sql_lines)
+{
+	global $incontext, $txt;
+
+	$db = load_database();
+	$db_table = db_table_install();
+
+	$current_statement = '';
+
+	foreach ($sql_lines as $count => $line)
+	{
+		// No comments allowed!
+		if (substr(trim($line), 0, 1) != '#')
+			$current_statement .= "\n" . rtrim($line);
+
+		// Is this the end of the query string?
+		if (empty($current_statement) || (preg_match('~;[\s]*$~s', $line) == 0 && $count != count($sql_lines)))
+			continue;
+
+		$result = eval('return ' . $current_statement);
+
+/*
+		// Does this table already exist?  If so, don't insert more data into it!
+		if (preg_match('~^\s*INSERT INTO ([^\s\n\r]+?)~', $current_statement, $match) != 0 && in_array($match[1], $exists))
+		{
+			$incontext['sql_results']['insert_dups']++;
+			$current_statement = '';
+			continue;
+		}
+
+		if ($db->query('', $current_statement, array('security_override' => true, 'db_error_skip' => true), $db_connection) === false)
+		{
+			// Error 1050: Table already exists!
+			// @todo Needs to be made better!
+			if (($db_type != 'mysql' || mysqli_errno($db_connection) === 1050) && preg_match('~^\s*CREATE TABLE ([^\s\n\r]+?)~', $current_statement, $match) == 1)
+			{
+				$exists[] = $match[1];
+				$incontext['sql_results']['table_dups']++;
+			}
+			// Don't error on duplicate indexes (or duplicate operators in PostgreSQL.)
+			elseif (!preg_match('~^\s*CREATE( UNIQUE)? INDEX ([^\n\r]+?)~', $current_statement, $match) && !($db_type == 'postgresql' && preg_match('~^\s*CREATE OPERATOR (^\n\r]+?)~', $current_statement, $match)))
+			{
+				$incontext['failures'][$count] = $db->last_error();
+			}
+		}
+		else
+		{
+			if (preg_match('~^\s*CREATE TABLE ([^\s\n\r]+?)~', $current_statement, $match) == 1)
+				$incontext['sql_results']['tables']++;
+			else
+			{
+				preg_match_all('~\)[,;]~', $current_statement, $matches);
+				if (!empty($matches[0]))
+					$incontext['sql_results']['inserts'] += count($matches[0]);
+				else
+					$incontext['sql_results']['inserts']++;
+			}
+		}
+*/
+		$current_statement = '';
+	}
+
+	// Sort out the context for the SQL.
+	foreach ($incontext['sql_results'] as $key => $number)
+	{
+		if ($number == 0)
+			unset($incontext['sql_results'][$key]);
+		else
+			$incontext['sql_results'][$key] = sprintf($txt['db_populate_' . $key], $number);
+	}
 }
 
 /**
