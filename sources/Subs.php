@@ -3363,7 +3363,7 @@ function setupMenuContext()
 
 		$buttons += array(
 			'profile' => array(
-				'title' => (!empty($user_info['avatar']['image']) ? $user_info['avatar']['image'] . ' ' : '') . (!empty($modSettings['displayMemberNames']) ? $user_info['name'] : $txt['account_short']),
+				'title' => (!empty($user_info['avatar']['href']) ? '<img class="avatar" src="' . $user_info['avatar']['href'] . '" alt="" /> ' : '') . (!empty($modSettings['displayMemberNames']) ? $user_info['name'] : $txt['account_short']),
 				'href' => $scripturl . '?action=profile',
 				'data-icon' => '&#xf007;',
 				'show' => $context['allow_edit_profile'],

@@ -210,6 +210,7 @@ class ManageRegistration_Controller extends Action_Controller
 			$context['member_groups'] = array();
 
 		// Basic stuff.
+		addInlineJavascript('disableAutoComplete();', true);
 		$context['sub_template'] = 'admin_register';
 		$context['page_title'] = $txt['registration_center'];
 		createToken('admin-regc');

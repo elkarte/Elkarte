@@ -74,7 +74,7 @@ $(document).ready(function() {
 		$(this).css({'cursor': 'pointer'});
 
 		// Note to addon authors, if you want to enable your own click events to bbc images
-		// you can turn off this namespaced click eveent with $("img").off("click.elk_bbc")
+		// you can turn off this namespaced click event with $("img").off("click.elk_bbc")
 		$(this).on( "click.elk_bbc", function() {
 			var $this = $(this);
 
@@ -84,6 +84,10 @@ $(document).ready(function() {
 				$this.data("bbc_img", {width: $this.css('width'), height: $this.css('height')});
 				$this.css({'width': $this.css('width') === 'auto' ? null : 'auto'});
 				$this.css({'height': $this.css('width') === 'auto' ? null : 'auto'});
+
+				// Overide default css to allow the image to expand fully, add a div to exand in
+				$this.css({'max-width': 'none'});
+				$this.wrap('<div style="overflow: auto"></div>');
 			}
 			else
 			{
@@ -93,6 +97,11 @@ $(document).ready(function() {
 
 				// Remove the data
 				$this.removeData();
+
+				// Remove the div we added to allow the image to overflow expand in
+				$this.unwrap();
+				$this.css({'max-width': '100%'});
+
 			}
 		});
 	});

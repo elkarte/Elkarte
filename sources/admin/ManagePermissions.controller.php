@@ -401,7 +401,7 @@ class ManagePermissions_Controller extends Action_Controller
 						),
 						'data' => array(
 							'sprintf' => array(
-								'format' => '<a href="' . $scripturl . '?action=admin;area=membergroups;sa=edit;group=%1$d' . (isset($_REQUEST['pid']) ? ';pid=' . $_REQUEST['pid'] : '') . '">' . $txt['membergroups_modify'] . '</a>',
+								'format' => '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=%1$d' . (isset($_REQUEST['pid']) ? ';pid=' . $_REQUEST['pid'] : '') . '">' . $txt['membergroups_modify'] . '</a>',
 								'params' => array(
 									'id_group' => false,
 								),

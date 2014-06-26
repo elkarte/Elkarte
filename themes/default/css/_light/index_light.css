@@ -796,7 +796,7 @@ div.bbc_footnotes .meaction{
 .linktree {
 	background: #fcfcfc;
 	border-top: 1px solid #ccc;
-	border-right: 0.2em solid #ccc;
+	border-right: 1px solid #ccc;
 	border-bottom: 1px solid #ccc;
 }
 .linktree, .linktree_last .linktree * {
@@ -805,7 +805,7 @@ div.bbc_footnotes .meaction{
 .linktree a {
 	color: #555;
 }
-.linktree:hover, .linktree>a:hover,
+.linktree:hover a, .linktree>a:hover,
 .linktree_last, .linktree_last>a,
 .linktree_last>a:hover, .linktree_last strong {
 	color: #fff;
@@ -816,29 +816,29 @@ div.bbc_footnotes .meaction{
 	text-decoration: none;
 }
 .linktree:before {
-	border-left: 0.75em solid #ccc;
+	border-left: 10px solid #ccc;
 }
 .linktree:hover:before, .linktree_last:before {
-	border-left: 0.75em solid #3d6e32;
+	border-left: 10px solid #3d6e32;
 }
 .linktree:after {
-	border-left: 0.75em solid #fcfcfc;
+	border-left: 10px solid #fcfcfc;
 }
 .linktree:hover, .linktree_last {
 	border-top: 1px solid #3d6e32;
-	border-right: 0.2em solid #3d6e32;
+	border-right: 1px solid #3d6e32;
 	border-bottom: 1px solid #3d6e32;
 	background: #5ba048;
 	background-image: linear-gradient(to right, #4b863c, #5ba048);
 }
 .linktree:hover:after, .linktree_last:after {
-	border-left: 0.75em solid #5ba048;
+	border-left: 10px solid #5ba048;
 }
 .linktree_last:hover {
 	background: #4b863c;
 }
 .linktree_last:hover:after {
-	border-left: 0.75em solid #4b863c;
+	border-left: 10px solid #4b863c;
 }
 
 /*	$BUTTONS	*/

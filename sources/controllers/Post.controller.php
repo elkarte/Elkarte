@@ -54,6 +54,7 @@ class Post_Controller extends Action_Controller
 		global $txt, $scripturl, $topic, $modSettings, $board, $user_info, $context, $options, $language;
 
 		loadLanguage('Post');
+		loadLanguage('Errors');
 
 		// You can't reply with a poll... hacker.
 		if (isset($_REQUEST['poll']) && !empty($topic) && !isset($_REQUEST['msg']))
@@ -931,7 +932,10 @@ class Post_Controller extends Action_Controller
 			$context['attachments']['num_allowed'] = empty($modSettings['attachmentNumPerPostLimit']) ? 50 : min($modSettings['attachmentNumPerPostLimit'] - count($context['attachments']['current']), $modSettings['attachmentNumPerPostLimit']);
 			$context['attachments']['can']['post_unapproved'] = allowedTo('post_attachment');
 			$context['attachments']['restrictions'] = array();
-			$context['attachments']['allowed_extensions'] = strtr(strtolower($modSettings['attachmentExtensions']), array(',' => ', '));
+			if (!empty($modSettings['attachmentCheckExtensions']))
+				$context['attachments']['allowed_extensions'] = strtr(strtolower($modSettings['attachmentExtensions']), array(',' => ', '));
+			else
+				$context['attachments']['allowed_extensions'] = '';
 			$context['attachments']['templates'] = array(
 				'add_new' => 'template_add_new_attachments',
 				'existing' => 'template_show_existing_attachments',
@@ -967,6 +971,7 @@ class Post_Controller extends Action_Controller
 					totalSizeAllowed : ' . JavaScriptEscape($txt['attach_max_total_file_size']) . ',
 					individualSizeAllowed : ' . JavaScriptEscape(sprintf($txt['file_too_big'], comma_format($modSettings['attachmentSizeLimit'], 0))) . ',
 					numOfAttachmentAllowed : ' . JavaScriptEscape(sprintf($txt['attachments_limit_per_post'], $modSettings['attachmentNumPerPostLimit'])) . ',
+					postUploadError : ' . JavaScriptEscape($txt['post_upload_error']) . ',
 				}),
 			});', true);
 		}
@@ -1018,10 +1023,6 @@ class Post_Controller extends Action_Controller
 
 		// We are now in post2 action
 		$context['current_action'] = 'post2';
-
-		// Previewing? Go back to start.
-		if (isset($_REQUEST['preview']))
-			return $this->action_post();
 
 		// Prevent double submission of this form.
 		checkSubmitOnce('check');
@@ -1103,6 +1104,13 @@ class Post_Controller extends Action_Controller
 			else
 				processAttachments();
 		}
+
+		// Previewing? Go back to start.
+		if (isset($_REQUEST['preview']))
+			return $this->action_post();
+
+		// Prevent double submission of this form.
+		checkSubmitOnce('check');
 
 		// If this isn't a new topic load the topic info that we need.
 		if (!empty($topic))

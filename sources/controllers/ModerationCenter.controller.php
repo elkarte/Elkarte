@@ -1184,16 +1184,6 @@ class ModerationCenter_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Moderation.subs.php');
 		loadLanguage('Modlog');
 
-		// Do the column stuff!
-		$sort_types = array(
-			'member' => 'mem.real_name',
-			'recipient' => 'recipient_name',
-		);
-
-		// Setup the direction stuff...
-		$context['order'] = isset($_REQUEST['sort']) && isset($sort_types[$_REQUEST['sort']]) ? $_REQUEST['sort'] : 'member';
-		$context['url_start'] = '?action=moderate;area=warnings;sa=log;sort='.  $context['order'];
-
 		// If we're coming in from a search, get the variables.
 		if (!empty($_REQUEST['params']) && empty($_REQUEST['is_search']))
 		{
@@ -1206,6 +1196,10 @@ class ModerationCenter_Controller extends Action_Controller
 			'member' => array('sql' => 'mem.real_name', 'label' => $txt['profile_warning_previous_issued']),
 			'recipient' => array('sql' => 'recipient_name', 'label' => $txt['mc_warnings_recipient']),
 		);
+
+		// Setup the allowed quick search type
+		$context['order'] = isset($_REQUEST['sort']) && isset($searchTypes[$_REQUEST['sort']]) ? $_REQUEST['sort'] : 'member';
+		$context['url_start'] = '?action=moderate;area=warnings;sa=log;sort='.  $context['order'];
 
 		if (!isset($search_params['string']) || (!empty($_REQUEST['search']) && $search_params['string'] != $_REQUEST['search']))
 			$search_params_string = empty($_REQUEST['search']) ? '' : $_REQUEST['search'];
@@ -1335,7 +1329,7 @@ class ModerationCenter_Controller extends Action_Controller
 					'position' => 'below_table_data',
 					'value' => '
 						<div id="quick_log_search">
-							' . $txt['modlog_search'] . ' (' . $txt['modlog_by'] . ': ' . $context['search']['label'] . '):
+							' . $txt['modlog_search'] . ' (' . $txt['modlog_by'] . ': ' . $context['search']['label'] . ')
 							<input type="text" name="search" size="18" value="' . Util::htmlspecialchars($context['search']['string']) . '" class="input_text" />
 							<input type="submit" name="is_search" value="' . $txt['modlog_go'] . '" class="button_submit" />
 						</div>',

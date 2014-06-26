@@ -193,7 +193,7 @@ class ManageErrors_Controller extends Action_Controller
 		$context['error_types'] = array();
 		$context['error_types'] = fetchErrorsByType($filter, $sort);
 		$tmp = array_keys($context['error_types']);
-		$sum = end($tmp);
+		$sum = (int) end($tmp);
 
 		$context['error_types']['all'] = array(
 			'label' => $txt['errortype_all'],

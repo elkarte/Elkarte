@@ -319,9 +319,11 @@ h2 a.collapse {
 /* The navigation list (i.e. linktree) */
 .linktree, .linktree_last {
 	float: right;
-	margin: -1px -1em -1px 1em;
-	padding: 0 1.5em 0 0.5em;
+	margin: -1px -1px -1px 1px;
+	padding-left: 10px;
+	padding-right: 20px;
 }
+
 /* Nifty indicators. */
 .linktree:before, .linktree:after, .linktree_last:before, .linktree_last:after {
 	content: "";
@@ -336,6 +338,10 @@ h2 a.collapse {
 }
 .linktree:after, .linktree_last:after {
 	margin-right: 0;
+}
+.linktree:first-child {
+	padding-left: 10px;
+	padding-right: 20px;
 }
 
 /*	$BUTTONS	*/

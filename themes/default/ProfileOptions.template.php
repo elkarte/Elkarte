@@ -767,7 +767,7 @@ function template_action_notification()
 	}
 
 	echo '
-								<option value="3"', $context['member']['notify_types'] == 3 ? ' selected="selected"' : '', '>', $txt['notify_send_type_only_replies' . ($modSettings['maillist_enabled'] ? '_pbe' : '')], '</option>
+								<option value="3"', $context['member']['notify_types'] == 3 ? ' selected="selected"' : '', '>', $txt['notify_send_type_only_replies' . (!empty($modSettings['maillist_enabled']) ? '_pbe' : '')], '</option>
 								<option value="4"', $context['member']['notify_types'] == 4 ? ' selected="selected"' : '', '>', $txt['notify_send_type_nothing'], '</option>
 							</select>
 						</dd>

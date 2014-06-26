@@ -79,7 +79,8 @@ elk_AdminIndex.prototype.showCurrentVersion = function ()
 		oinstalledVersionContainer = document.getElementById(this.opt.sinstalledVersionContainerId),
 		sCurrentVersion = oinstalledVersionContainer.innerHTML,
 		adminIndex = this,
-		elkVersion = '???';
+		elkVersion = '???',
+		verCompare = new elk_ViewVersions();
 
 	$.getJSON('https://api.github.com/repos/elkarte/Elkarte/releases', {format: "json"},
 	function(data, textStatus, jqXHR) {
@@ -94,7 +95,7 @@ elk_AdminIndex.prototype.showCurrentVersion = function ()
 
 			var release = adminIndex.normalizeVersion(elem.tag_name);
 
-			if (!previous.hasOwnProperty('major') || adminIndex.compareVersion(release, previous))
+			if (!previous.hasOwnProperty('major') || verCompare.compareVersions(sCurrentVersion, elem.tag_name.replace('-', '').substring(1)))
 			{
 				// Using a preprelease? Then you may need to know a new one is out!
 				if ((elem.prerelease && adminIndex.current.prerelease) || (!elem.prerelease))
@@ -111,7 +112,7 @@ elk_AdminIndex.prototype.showCurrentVersion = function ()
 		elkVersion = mostRecent.name.replace(/elkarte/i, '').trim();
 
 		oElkVersionContainer.innerHTML = elkVersion;
-		if (sCurrentVersion !== elkVersion)
+		if (verCompare.compareVersions(sCurrentVersion, elkVersion))
 			oinstalledVersionContainer.innerHTML = adminIndex.opt.sVersionOutdatedTemplate.replace('%currentVersion%', sCurrentVersion);
 	});
 };
@@ -154,16 +155,18 @@ elk_AdminIndex.prototype.normalizeVersion = function (sVersion)
 		minor: 0,
 		micro: 0,
 		prerelease: false,
+		status: 0,
 		nano: 0
 	},
-	prerelease = false;
+	prerelease = false,
+	aDevConvert = {'dev': 0, 'alpha': 1, 'beta': 2, 'rc': 3, 'stable': 4};
 
 	for (var i = 0; i < splitVersion.length; i++)
 	{
 		if (splitVersion[i].toLowerCase() === 'elkarte')
 			continue;
 
-		if (splitVersion[i].substring(0, 4).toLowerCase() === 'beta' || splitVersion[i].substring(0, 2).toLowerCase() === 'rc')
+		if (splitVersion[i].substring(0, 3).toLowerCase() === 'dev' || splitVersion[i].substring(0, 5).toLowerCase() === 'alpha' || splitVersion[i].substring(0, 4).toLowerCase() === 'beta' || splitVersion[i].substring(0, 2).toLowerCase() === 'rc')
 		{
 			normalVersion.prerelease = true;
 			prerelease = true;
@@ -173,6 +176,8 @@ elk_AdminIndex.prototype.normalizeVersion = function (sVersion)
 			{
 				var splitPre = splitVersion[i].split('.');
 				normalVersion.nano = parseFloat(splitPre[1]);
+				normalVersion.nano = parseFloat(splitVersion[i].substr(splitVersion[i].indexOf('.') + 1));
+				normalVersion.status = aDevConvert[splitVersion[i].substr(0, splitVersion[i].indexOf('.')).toLowerCase()];
 			}
 		}
 
@@ -290,7 +295,7 @@ elk_ViewVersions.prototype.compareVersions = function (sCurrent, sTarget)
 	{
 		// Clean the version and extract the version parts.
 		var sClean = aCompare[i].toLowerCase().replace(/ /g, '').replace(/release candidate/g, 'rc');
-		aParts = sClean.match(/(\d+)(?:\.(\d+|))?(?:\.)?(\d+|)(?:(alpha|beta|rc)(\d+|)(?:\.)?(\d+|))?(?:(dev))?(\d+|)/);
+		aParts = sClean.match(/(\d+)(?:\.(\d+|))?(?:\.)?(\d+|)(?:(alpha|beta|rc)\.*(\d+|)(?:\.)?(\d+|))?(?:(dev))?(\d+|)/);
 
 		// No matches?
 		if (aParts === null)

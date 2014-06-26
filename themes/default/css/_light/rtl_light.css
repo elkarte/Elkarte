@@ -128,10 +128,13 @@ legend {
 }
 #search_form .input_text {
 	border-radius: 0 2px 2px 0;
-	border-left: none;
+	border-right: 1px solid #ccc;
 }
 #search_form .button_submit {
 	border-radius: 2px 0 0 2px;
+}
+#search_form select {
+	border-style: solid none;
 }
 .forumtitle>a {
 	text-shadow: -1px 1px 0 #fff;
@@ -239,18 +242,20 @@ legend {
 	border-right: 0;
 	border-left: 2px solid #ccc;
 	border-radius: 0 2px 2px 0;
+	padding-right: 25px;
+	padding-left: 10px;
 }
 .linktree:before {
 	border-left: 0;
-	border-right: 0.75em solid #ccc;
+	border-right: 10px solid #ccc;
 }
 .linktree:hover:before, .linktree_last:before {
 	border-left: 0;
-	border-right: 0.75em solid #3d6e32;
+	border-right: 10px solid #3d6e32;
 }
 .linktree:after {
 	border-left: 0;
-	border-right: 0.75em solid #fcfcfc;
+	border-right: 10px solid #fcfcfc;
 }
 .linktree:hover, .linktree_last {
 	border-right: 0;
@@ -259,12 +264,13 @@ legend {
 }
 .linktree:hover:after, .linktree_last:after {
 	border-left: 0;
-	border-right: 0.75em solid #5ba048;
+	border-right: 10px solid #5ba048;
 }
 .linktree_last:hover:after {
 	border-left: 0;
-	border-right: 0.75em solid #4b863c;
+	border-right: 10px solid #4b863c;
 }
+
 
 /*	$BUTTONS	*/
 /* This section contains code for the quickbuttons (quote, quick edit, etc)

@@ -2262,7 +2262,7 @@ function messageIndexBar($area)
 				'send' => array(
 					'label' => $txt['new_message'],
 					'custom_url' => $scripturl . '?action=pm;sa=send',
-					'permission' => allowedTo('pm_send'),
+					'permission' => 'pm_send',
 				),
 				'sent' => array(
 					'label' => $txt['sent_items'],
@@ -2271,7 +2271,7 @@ function messageIndexBar($area)
 				'drafts' => array(
 					'label' => $txt['drafts_show'],
 					'custom_url' => $scripturl . '?action=pm;sa=showpmdrafts',
-					'permission' => allowedTo('pm_draft'),
+					'permission' => 'pm_draft',
 					'enabled' => !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_pm_enabled']),
 				),
 			),
