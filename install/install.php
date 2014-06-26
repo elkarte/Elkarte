@@ -279,8 +279,6 @@ function load_database()
 	if (!defined('ELK'))
 		define('ELK', 1);
 
-	$modSettings['disableQueryCheck'] = true;
-
 	// Connect the database.
 	if (!$db_connection)
 	{
