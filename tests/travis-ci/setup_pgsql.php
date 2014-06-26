@@ -51,7 +51,7 @@ Class Elk_Testing_psql extends Elk_Testing_Setup
 {
 	public function init()
 	{
-		global $db_name, $db_prefix;
+		global $db_name, $db_prefix, $modSettings;
 
 		$this->_boardurl = 'http://127.0.0.1';
 		$this->_db_server = 'localhost';
@@ -64,7 +64,10 @@ Class Elk_Testing_psql extends Elk_Testing_Setup
 		$this->_db = Database_PostgreSQL::db();
 		$this->_db_table = DbTable_PostgreSQL_Install::db_table($this->_db);
 
+		$modSettings['disableQueryCheck'] = true;
 		$this->load_queries(BOARDDIR . '/install/install_1-0_postgresql.sql');
+		$modSettings['disableQueryCheck'] = false;
+
 		$this->run_queries();
 
 		$this->prepare();
