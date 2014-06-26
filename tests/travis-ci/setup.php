@@ -20,6 +20,7 @@ Class Elk_Testing_Setup
 	public function run_queries()
 	{
 		$query = '';
+		$db = $this->_db;
 		$db_table = $this->_db_table;
 
 		if (empty($this->_clean_queries_parts))

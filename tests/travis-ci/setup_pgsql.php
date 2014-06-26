@@ -51,10 +51,12 @@ Class Elk_Testing_psql extends Elk_Testing_Setup
 {
 	public function init()
 	{
+		global $db_name;
+
 		$this->_boardurl = 'http://127.0.0.1';
 		$this->_db_server = 'localhost';
 		$this->_db_type = 'postgresql';
-		$this->_db_name = 'hello_world_test';
+		$db_name = $this->_db_name = 'hello_world_test';
 		$this->_db_user = 'postgres';
 		$this->_db_passwd = '';
 		$this->_db_prefix = 'elkarte_';
