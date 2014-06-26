@@ -356,6 +356,16 @@ legend {
 .jump_to_header {
 	box-shadow: -2px 1px rgba(1,1,1,0.07) inset;
 }
+
+.new_some_board:before {
+	background-position: -298px -14px;
+}
+.new_none_board:before {
+	background-position: -370px -14px;
+}
+.new_redirect_board:before {
+	background-position: -440px -14px;
+}
 /* --------------------------------------------------------------------- */
 /* The following are alternative layout orders for the board index rows. */
 /* They are basic demonstrations only. Extra custom styling can be done.
