@@ -1192,7 +1192,7 @@ $db_table->db_create_table('{db_prefix}log_likes',
 # Table structure for table `log_mark_read`
 #
 
-$db_table->db_create_table('{db_prefix}log_likes',
+$db_table->db_create_table('{db_prefix}log_mark_read',
 	array(
 		array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 		array('name' => 'id_board',  'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),

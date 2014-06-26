@@ -67,7 +67,7 @@ while ($row = $db->fetch_assoc($request))
 
 echo "\n" . 'Test cases run: ' . $global_results['tests_run'][0] . '/' . $global_results['tests_run'][1] . ', Passes: ' . $global_results['passes'] . ', Failures: ' . $global_results['failures'] . ', Exceptions: ' . $global_results['exceptions'] . "\n";
 
-$db_errors = timr(file_get_content(BOARDDIR . '/db_last_error.php'));
+$db_errors = trim(file_get_content(BOARDDIR . '/db_last_error.php'));
 
 if ($db_errors != '')
 {

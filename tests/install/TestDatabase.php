@@ -114,7 +114,7 @@ class TestDatabase extends UnitTestCase
 		foreach ($known_tables as $table)
 		{
 			$exists = in_array($this->db_prefix . $table, $tables);
-			$this->assertTrue($exists, 'The table ' . $table . 'doesn\'t esist');
+			$this->assertTrue($exists, 'The table ' . $table . ' doesn\'t esist');
 		}
 	}
 }
