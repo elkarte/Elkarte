@@ -1732,7 +1732,10 @@ dl.settings label {
 }
 
 #sort_by {
-	margin-bottom: -4px;
+	margin-bottom: -6px;
+}
+#sort_by .input_check {
+	margin-bottom: 0;
 }
 .topic_sorting:hover #sortby, #sortby:hover, #sortby {
 	width: 11em;
