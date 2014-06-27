@@ -906,8 +906,7 @@ function template_groupMembership()
 						<th scope="col"></th>
 					</tr>
 				</thead>
-				<tbody>
-			</div>';
+				<tbody>';
 
 			$alternate = true;
 			foreach ($context['groups']['available'] as $group)
@@ -939,7 +938,8 @@ function template_groupMembership()
 
 			echo '
 				</tbody>
-			</table>';
+			</table>
+			</div>';
 		}
 
 		// Javascript for the selector stuff.
