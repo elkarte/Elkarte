@@ -497,7 +497,7 @@ dl.settings img {
 	padding: 2px 0 0 6px;
 	float: right;
 }
-.board_description, .moderators {
+.board_info .board_description, .board_info .moderators {
 	margin: 0 56px 0 0;
 }
 .board_stats {
@@ -549,15 +549,15 @@ dl.settings img {
 }
 .topic_icons {
 	float: right;
-	padding: 6px 0 0 16px;
+	padding: 6px 0 0;
+	text-align: inherit;
 }
 .fred {
 	left: auto;
-	right: 50%;
 	margin: 0 -2px 0 0;
 }
 .topic_name, .topic_starter {
-	margin: 0 -50px 0 0;
+	margin: 0 50px;
 }
 .topic_name h4 {
 	padding-right: 0;
@@ -583,17 +583,15 @@ dl.settings img {
 .qaction_row {
 	text-align: left;
 }
-.sticky_row .topic_info {
-	background: url(../images/icons/quick_sticky.png) no-repeat 2% 4px;
-}
-.locked_row.sticky_row .topic_info {
-	background: url(../images/icons/quick_sticky_lock.png) no-repeat 2% 4px;
-}
-/* @todo - Extra classes for search results, etc. See if I can clean them up. */
 
-.locked_row .topic_info, .locked_row .topic_details {
-	background: url(../images/icons/quick_lock.png) no-repeat 2% 4px;
+.sticky_row .topic_info:before, .locked_row .topic_info:before,
+.sticky_row .topic_details:before, .locked_row .topic_details:before,
+.locked_row.sticky_row .topic_info:before {
+	float: left;
+	margin-left: 16px;
 }
+
+/* @todo - Extra classes for search results, etc. See if I can clean them up. */
 /* Search results need some help as well */
 /* @todo - Sort markup so this can call above classes. *//*
 .search_results_posts .lockedbg {

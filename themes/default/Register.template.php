@@ -568,6 +568,7 @@ function template_admin_register()
 					</div>';
 
 	echo '
+					<input type="password" name="autofill_honey_pot" style="display:none" />
 					<div class="flow_auto">
 					<dl class="register_form" id="admin_register_form">
 						<dt>
@@ -582,6 +583,7 @@ function template_admin_register()
 							<span class="smalltext">', $txt['admin_register_email_desc'], '</span>
 						</dt>
 						<dd>
+
 							<input type="email" name="email" id="email_input" tabindex="', $context['tabindex']++, '" size="30" class="input_text" />
 						</dd>
 						<dt>

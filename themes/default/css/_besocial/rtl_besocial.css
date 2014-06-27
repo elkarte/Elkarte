@@ -205,11 +205,11 @@ legend {
 /* ------------------------------------------------------- */
 /* our buddies &laquo; &raquo; */
 .small_pagelinks:before {
-	content: '\00BB';
+	content: '\00AB';
 	float: right;
 }
 .small_pagelinks:after {
-	content: '\00AB';
+	content: '\00BB';
 	float: right;
 }
 
