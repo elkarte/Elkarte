@@ -1776,24 +1776,6 @@ div.bbc_footnotes .meaction{
 .floating_error .error_btn:hover {
 	cursor: pointer;
 }
-/* styles for Profile>Group Membership */
-.groupmembership {
-	padding: 12px;
-	border-radius: 3px;
-	border: 1px solid #ddd;
-	background-color: #efefef;
-	box-shadow: 0 -2px 2px rgba(0, 0, 0, 0.1);
-}
-/* alternate table row color */
-.groupmembership .windowbg {
-	background-color: #fafafa;
-}
-/* alternate table row color */
-.groupmembership .windowbg2 {
-	background-color: #efefef;
-}
-
-
 
 /*	$MEDIA		*/
 /* Experimental media queries.
