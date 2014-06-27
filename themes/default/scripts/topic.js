@@ -274,11 +274,10 @@ QuickReply.prototype.quote = function (iMessageId, xDeprecated)
 {
 	ajax_indicator(true);
 
-	// Collapsed on a quote, expand it but don't update the user setting
 	if (this.bCollapsed)
 	{
-		this.bCollapsed = !this.bCollapsed;
-		this.swap(false, false);
+		window.location.href = elk_prepareScriptUrl(this.opt.sScriptUrl) + 'action=post;quote=' + iMessageId + ';topic=' + this.opt.iTopicId + '.' + this.opt.iStart;
+		return false;
 	}
 
 	// Insert the quote
