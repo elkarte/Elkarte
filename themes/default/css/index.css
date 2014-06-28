@@ -1103,7 +1103,7 @@ a.bbc_link {
 #main_content_section .navigate_section {
 	margin: 12px 0 6px 0;
 }
-.linktree, .linktree_last {
+.linktree {
 	position: relative;
 	float: left;
 	font-size: 0.929em;
@@ -1115,10 +1115,10 @@ a.bbc_link {
 }
 
 /* Nifty indicators. */
-.linktree:after, .linktree_last:after {
+.linktree:after {
 	content: "";
 	position: absolute;
-	display: block;
+	display: inline-block;
 	right: -1em;
 	top: 0;
 	width: 2em;
@@ -1129,7 +1129,7 @@ a.bbc_link {
 	-ms-transform: scale(0.7071) rotate(45deg);
 	z-index: 1;
 }
-#ie8 .linktree:after, #ie8 .linktree_last:after {
+#ie8 .linktree:after {
 	border-right: 1px solid #ccc;
 	width: 0;
 	right: 0;
@@ -4105,7 +4105,7 @@ dl.no_members {
 	.wrapper {
 		min-width: 98%;
 	}
-	.linktree, .linktree_last {
+	.linktree {
 		max-width: 95%;
 		white-space: nowrap;
 		text-overflow: ellipsis;
@@ -4522,7 +4522,7 @@ dl.no_members {
 	.postarea, .forumtitle {
 		padding: 2px;
 	}
-	.linktree .board_moderators, .linktree_last .board_moderators {
+	.linktree .board_moderators {
 		display: none;
 	}
 	.statsbar .bar {

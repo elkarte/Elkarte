@@ -852,21 +852,19 @@ a.active {
 	border: 1px solid #eee;
 	margin: 4px 0 0 0;
 }
-.linktree, .linktree_last {
-	padding: 0 1.5em 0 .5em;
+.linktree {
+/* 	padding: 0 1.5em 0 .5em; */
 	border: none;
 }
-.linktree:after {
-	width: 0;
-	height: 0;
-	right: 0.1em;
-	transform: scale(1) rotate(0deg);
-	-webkit-transform: scale(1) rotate(0deg);
-	border-top: 1em solid transparent;
-	border-bottom: 1em  solid transparent;
-	border-left: 1em  solid #eee;
+.linktree:not(:last-child):after {
+	background-image: linear-gradient(45deg, #fff 0%, #fff 50%, #eee 50%, #eee 100%);
+	-webkit-transform: rotate(45deg);
+	-ms-transform: rotate(90deg);
+	transform: rotate(90deg);
+	width: 1.5em;
+	height: 1.5em;
+	top: 0.25em;
 }
-
 
 .board_name>a {
 	color: #43a8da;

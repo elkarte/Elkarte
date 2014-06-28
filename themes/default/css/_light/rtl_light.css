@@ -241,13 +241,6 @@ legend {
 .linktree:after {
 	box-shadow: -2px 2px 0 1px rgba(204, 204, 204, 0.9);
 }
-.linktree:hover, .linktree_last {
-	background-image: linear-gradient(0deg, #4b863c, #5ba048);
-}
-.linktree:hover:after, .linktree_last:after {
-	background-image: linear-gradient(-45deg, #4b863c, #5ba048);
-}
-
 
 /*	$BUTTONS	*/
 /* This section contains code for the quickbuttons (quote, quick edit, etc)

@@ -321,18 +321,19 @@ h2 a.collapse {
 	padding-left: 1em;
 	padding-right: 0;
 }
-.linktree, .linktree_last {
+.linktree {
 	float: right;
 	padding: 0 2em 0 1.1em;
 }
 
 /* Nifty indicators. */
-.linktree:after, .linktree_last:after {
+.linktree:after {
 	right: auto;
 	left: -1em;
 }
 .linktree:first-child {
 	padding-right: 1em;
+	padding-left: 1.1em;
 }
 
 /*	$BUTTONS	*/
