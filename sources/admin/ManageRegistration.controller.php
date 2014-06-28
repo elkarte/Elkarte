@@ -142,7 +142,7 @@ class ManageRegistration_Controller extends Action_Controller
 				'password' => $_POST['password'],
 				'password_check' => $_POST['password'],
 				'check_reserved_name' => true,
-				'check_password_strength' => false,
+				'check_password_strength' => true,
 				'check_email_ban' => false,
 				'send_welcome_email' => isset($_POST['emailPassword']) || empty($_POST['password']),
 				'require' => isset($_POST['emailActivate']) ? 'activation' : 'nothing',
