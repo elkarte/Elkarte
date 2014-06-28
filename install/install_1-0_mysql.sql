@@ -91,22 +91,22 @@ CREATE TABLE {$db_prefix}ban_groups (
 CREATE TABLE {$db_prefix}ban_items (
   id_ban mediumint(8) unsigned NOT NULL auto_increment,
   id_ban_group smallint(5) unsigned NOT NULL default '0',
-  ip_low1 smallint(255) unsigned NOT NULL default '0',
-  ip_high1 smallint(255) unsigned NOT NULL default '0',
-  ip_low2 smallint(255) unsigned NOT NULL default '0',
-  ip_high2 smallint(255) unsigned NOT NULL default '0',
-  ip_low3 smallint(255) unsigned NOT NULL default '0',
-  ip_high3 smallint(255) unsigned NOT NULL default '0',
-  ip_low4 smallint(255) unsigned NOT NULL default '0',
-  ip_high4 smallint(255) unsigned NOT NULL default '0',
-  ip_low5 smallint(255) unsigned NOT NULL default '0',
-  ip_high5 smallint(255) unsigned NOT NULL default '0',
-  ip_low6 smallint(255) unsigned NOT NULL default '0',
-  ip_high6 smallint(255) unsigned NOT NULL default '0',
-  ip_low7 smallint(255) unsigned NOT NULL default '0',
-  ip_high7 smallint(255) unsigned NOT NULL default '0',
-  ip_low8 smallint(255) unsigned NOT NULL default '0',
-  ip_high8 smallint(255) unsigned NOT NULL default '0',
+  ip_low1 smallint(5) unsigned NOT NULL default '0',
+  ip_high1 smallint(5) unsigned NOT NULL default '0',
+  ip_low2 smallint(5) unsigned NOT NULL default '0',
+  ip_high2 smallint(5) unsigned NOT NULL default '0',
+  ip_low3 smallint(5) unsigned NOT NULL default '0',
+  ip_high3 smallint(5) unsigned NOT NULL default '0',
+  ip_low4 smallint(5) unsigned NOT NULL default '0',
+  ip_high4 smallint(5) unsigned NOT NULL default '0',
+  ip_low5 smallint(5) unsigned NOT NULL default '0',
+  ip_high5 smallint(5) unsigned NOT NULL default '0',
+  ip_low6 smallint(5) unsigned NOT NULL default '0',
+  ip_high6 smallint(5) unsigned NOT NULL default '0',
+  ip_low7 smallint(5) unsigned NOT NULL default '0',
+  ip_high7 smallint(5) unsigned NOT NULL default '0',
+  ip_low8 smallint(5) unsigned NOT NULL default '0',
+  ip_high8 smallint(5) unsigned NOT NULL default '0',
   hostname varchar(255) NOT NULL default '',
   email_address varchar(255) NOT NULL default '',
   id_member mediumint(8) unsigned NOT NULL default '0',
@@ -120,7 +120,7 @@ CREATE TABLE {$db_prefix}ban_items (
 #
 
 CREATE TABLE {$db_prefix}board_permissions (
-  id_group smallint(5) NOT NULL default '0',
+  id_group smallint(5) unsigned NOT NULL default '0',
   id_profile smallint(5) unsigned NOT NULL default '0',
   permission varchar(30) NOT NULL default '',
   add_deny tinyint(4) NOT NULL default '1',
@@ -791,8 +791,8 @@ CREATE TABLE {$db_prefix}group_moderators (
 #
 
 CREATE TABLE {$db_prefix}follow_ups (
-  follow_up int(10) NOT NULL default '0',
-  derived_from int(10) NOT NULL default '0',
+  follow_up int(10) unsigned NOT NULL default '0',
+  derived_from int(10) unsigned NOT NULL default '0',
   PRIMARY KEY (follow_up, derived_from)
 ) ENGINE=MyISAM;
 
@@ -909,8 +909,8 @@ CREATE TABLE {$db_prefix}log_comments (
 #
 
 CREATE TABLE {$db_prefix}log_digest (
-  id_topic mediumint(8) unsigned NOT NULL,
-  id_msg int(10) unsigned NOT NULL,
+  id_topic mediumint(8) unsigned NOT NULL default '0',
+  id_msg int(10) unsigned NOT NULL default '0',
   note_type varchar(10) NOT NULL default 'post',
   daily tinyint(3) unsigned NOT NULL default '0',
   exclude mediumint(8) unsigned NOT NULL default '0'
@@ -1015,7 +1015,7 @@ CREATE TABLE {$db_prefix}log_member_notices (
 #
 
 CREATE TABLE {$db_prefix}log_mentions (
-  id_mention int(10) NOT NULL auto_increment,
+  id_mention int(10) unsigned NOT NULL auto_increment,
   id_member mediumint(8) unsigned NOT NULL DEFAULT '0',
   id_msg int(10) unsigned NOT NULL DEFAULT '0',
   status tinyint(1) NOT NULL DEFAULT '0',
@@ -1065,10 +1065,10 @@ CREATE TABLE {$db_prefix}log_packages (
   package_id varchar(255) NOT NULL default '',
   name varchar(255) NOT NULL default '',
   version varchar(255) NOT NULL default '',
-  id_member_installed mediumint(8) NOT NULL default '0',
+  id_member_installed mediumint(8) unsigned NOT NULL default '0',
   member_installed varchar(255) NOT NULL default '',
   time_installed int(10) NOT NULL default '0',
-  id_member_removed mediumint(8) NOT NULL default '0',
+  id_member_removed mediumint(8) unsigned NOT NULL default '0',
   member_removed varchar(255) NOT NULL default '',
   time_removed int(10) NOT NULL default '0',
   install_state tinyint(3) NOT NULL default '1',
@@ -1124,12 +1124,12 @@ CREATE TABLE {$db_prefix}log_reported (
 CREATE TABLE {$db_prefix}log_reported_comments (
   id_comment mediumint(8) unsigned NOT NULL auto_increment,
   id_report mediumint(8) NOT NULL default '0',
-  id_member mediumint(8) unsigned NOT NULL,
+  id_member mediumint(8) unsigned NOT NULL default '0',
   membername varchar(255) NOT NULL default '',
   email_address varchar(255) NOT NULL default '',
   member_ip varchar(255) NOT NULL default '',
   comment varchar(255) NOT NULL default '',
-  time_sent int(10) NOT NULL,
+  time_sent int(10) NOT NULL default '0',
   PRIMARY KEY (id_comment),
   KEY id_report (id_report),
   KEY id_member (id_member),
@@ -1520,7 +1520,7 @@ CREATE TABLE {$db_prefix}openid_assoc (
   secret text NOT NULL,
   issued int(10) NOT NULL default '0',
   expires int(10) NOT NULL default '0',
-  assoc_type varchar(64) NOT NULL,
+  assoc_type varchar(64) NOT NULL default '',
   PRIMARY KEY (server_url(125), handle(125)),
   KEY expires (expires)
 ) ENGINE=MyISAM;
@@ -1671,7 +1671,7 @@ CREATE TABLE {$db_prefix}pm_recipients (
 CREATE TABLE {$db_prefix}pm_rules (
   id_rule int(10) unsigned NOT NULL auto_increment,
   id_member int(10) unsigned NOT NULL default '0',
-  rule_name varchar(60) NOT NULL,
+  rule_name varchar(60) NOT NULL default '',
   criteria text NOT NULL,
   actions text NOT NULL,
   delete_pm tinyint(3) unsigned NOT NULL default '0',
@@ -1718,9 +1718,9 @@ CREATE TABLE {$db_prefix}poll_choices (
 #
 
 CREATE TABLE {$db_prefix}postby_emails (
-  id_email varchar(50) NOT NULL,
+  id_email varchar(50) NOT NULL default '',
   time_sent int(10) NOT NULL default '0',
-  email_to varchar(50) NOT NULL,
+  email_to varchar(50) NOT NULL default '',
   PRIMARY KEY (id_email)
 ) ENGINE=MyISAM;
 
@@ -1784,17 +1784,17 @@ VALUES
 	(1, 0, 0, 2, 'h', 0, 'approval_notification'),
 	(2, 0, 0, 7, 'd', 0, 'auto_optimize'),
 	(3, 0, 60, 1, 'd', 0, 'daily_maintenance'),
-	(5, 0, 0, 1, 'd', 0, 'daily_digest'),
-	(6, 0, 0, 1, 'w', 0, 'weekly_digest'),
-	(7, 0, 0, 1, 'd', 1, 'birthdayemails'),
-	(8, 0, 0, 1, 'w', 0, 'weekly_maintenance'),
-	(9, 0, 120, 1, 'd', 1, 'paid_subscriptions'),
-	(10, 0, 120, 1, 'd', 0, 'remove_temp_attachments'),
-	(11, 0, 180, 1, 'd', 0, 'remove_topic_redirect'),
-	(12, 0, 240, 1, 'd', 0, 'remove_old_drafts'),
-	(13, 0, 0, 6, 'h', 0, 'remove_old_followups'),
-	(14, 0, 360, 10, 'm', 1, 'maillist_fetch_IMAP'),
-	(15, 0, 30, 1, 'h', 0, 'user_access_mentions');
+	(4, 0, 0, 1, 'd', 0, 'daily_digest'),
+	(5, 0, 0, 1, 'w', 0, 'weekly_digest'),
+	(6, 0, 0, 1, 'd', 1, 'birthdayemails'),
+	(7, 0, 0, 1, 'w', 0, 'weekly_maintenance'),
+	(8, 0, 120, 1, 'd', 1, 'paid_subscriptions'),
+	(9, 0, 120, 1, 'd', 0, 'remove_temp_attachments'),
+	(10, 0, 180, 1, 'd', 0, 'remove_topic_redirect'),
+	(11, 0, 240, 1, 'd', 0, 'remove_old_drafts'),
+	(12, 0, 0, 6, 'h', 0, 'remove_old_followups'),
+	(13, 0, 360, 10, 'm', 1, 'maillist_fetch_IMAP'),
+	(14, 0, 30, 1, 'h', 0, 'user_access_mentions');
 
 # --------------------------------------------------------
 
