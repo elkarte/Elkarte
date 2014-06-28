@@ -1030,6 +1030,15 @@ div.labels {
 	margin: 0 25px 0 0;
 }
 
+/* Yes some ugly importants since we don't have specific admin rtl css */
+.settings .help .icon {
+	margin: 1px -25px 0 0 !important;
+    position: absolute !important;
+}
+#admincenter .content .settings {
+    padding: 0 8px 0 0 !important;
+}
+
 /* Styles for the tooltips. */
 .tooltip {
 	left: auto;
