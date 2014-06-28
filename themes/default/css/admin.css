@@ -28,6 +28,9 @@
 #admincenter .content {
 	padding: 12px;
 }
+#admincenter .content .settings {
+	padding: 0 0 0 8px;
+}
 
 /* @todo - A general admin wrapper class. */
 #admin_main_section, div.quick_tasks, #mod_main_section,
@@ -126,7 +129,10 @@ a.help .icon {
 h3 a.help .icon {
 	padding: 0 4px 0 0;
 }
-
+.settings .help .icon {
+	margin: 0 0 0 -20px;
+    position: absolute;
+}
 .table_caption, tr.table_caption td {
 	font-weight: bold;
 }
