@@ -520,6 +520,7 @@ function validatePassword($password, $username, $restrict_in = array())
 	// Perform basic requirements first.
 	if (Util::strlen($password) < (empty($modSettings['password_strength']) ? 4 : 8))
 	{
+		loadLanguage('Errors');
 		$txt['profile_error_password_short'] = sprintf($txt['profile_error_password_short'], empty($modSettings['password_strength']) ? 4 : 8);
 		return 'short';
 	}
