@@ -274,6 +274,7 @@ QuickReply.prototype.quote = function (iMessageId, xDeprecated)
 {
 	ajax_indicator(true);
 
+	// Collapsed on a quote, then simply got to the full post screen
 	if (this.bCollapsed)
 	{
 		window.location.href = elk_prepareScriptUrl(this.opt.sScriptUrl) + 'action=post;quote=' + iMessageId + ';topic=' + this.opt.iTopicId + '.' + this.opt.iStart;
