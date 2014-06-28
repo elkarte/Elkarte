@@ -230,16 +230,9 @@ legend {
 
 /*	$LINKTREE	*/
 /* ------------------------------------------------------- */
-.linktree:after {
-	border-left: 1em  solid transparent;
-	border-right: 1em  solid #eee;
-	left: -2em;
-}
-.linktree, .linktree_last {
-    padding: 0 1.5em 0 0.5em;
-}
-.linktree:first-child {
-    padding-left: 0.5em;
+.linktree:not(:last-child):after {
+	transform: scale(1) rotate(-135deg);
+	-webkit-transform: scale(1) rotate(-135deg);
 }
 
 /*	$BOARDICONS	*/

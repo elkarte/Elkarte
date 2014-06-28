@@ -622,22 +622,25 @@
 		iFadeIndex = 0,
 		$news = $(this).find('li');
 
-		$.extend(settings, options);
-		$news.each(function() {
-			$(this).fadeOut();
-		});
-		$news.eq(0).fadeIn(settings.iFadeSpeed);
-
-		setInterval(function() {
-			$($news[iFadeIndex]).fadeOut(settings.iFadeSpeed, function() {
-				iFadeIndex++;
-
-				if (iFadeIndex == $news.length)
-					iFadeIndex = 0;
-
-				$($news[iFadeIndex]).fadeIn(settings.iFadeSpeed);
+		if ($news.length > 1)
+		{
+			$.extend(settings, options);
+			$news.each(function() {
+				$(this).fadeOut();
 			});
-		}, settings.iFadeSpeed + settings.iFadeDelay);
+			$news.eq(0).fadeIn(settings.iFadeSpeed);
+
+			setInterval(function() {
+				$($news[iFadeIndex]).fadeOut(settings.iFadeSpeed, function() {
+					iFadeIndex++;
+
+					if (iFadeIndex == $news.length)
+						iFadeIndex = 0;
+
+					$($news[iFadeIndex]).fadeIn(settings.iFadeSpeed);
+				});
+			}, settings.iFadeSpeed + settings.iFadeDelay);
+		}
 
 		return this;
 	};

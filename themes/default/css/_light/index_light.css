@@ -772,24 +772,24 @@ div.bbc_footnotes .meaction{
 	color: #555;
 }
 .linktree:hover a, .linktree>a:hover,
-.linktree_last, .linktree_last>a,
-.linktree_last>a:hover, .linktree_last strong {
+.linktree:last-child, .linktree:last-child>a,
+.linktree:last-child>a:hover, .linktree:last-child strong {
 	color: #fff;
 	text-decoration: none;
 }
 .linktree:after {
-	box-shadow: 1px -1px 0 1px rgba(204, 204, 204, 0.9);
+	box-shadow: 2px -2px 0 1px rgba(204, 204, 204, 0.9);
 	background: #fcfcfc;
 }
-.linktree:hover, .linktree_last {
+.linktree:hover, .linktree:last-child {
 	background: #5ba048;
 	background-image: linear-gradient(0deg, #4b863c, #5ba048);
 }
-.linktree:hover:after, .linktree_last:after {
+.linktree:hover:after, .linktree:last-child:after {
 	background: #5ba048;
 	background-image: linear-gradient(-45deg, #4b863c, #5ba048);
 }
-.linktree_last:hover, .linktree_last:hover:after {
+.linktree:last-child:hover, .linktree:last-child:hover:after {
 	background: #4b863c;
 }
 
