@@ -778,7 +778,7 @@ div.bbc_footnotes .meaction{
 	text-decoration: none;
 }
 .linktree:after {
-	box-shadow: 1px -1px 0 1px rgba(204, 204, 204, 0.9);
+	box-shadow: 2px -2px 0 1px rgba(204, 204, 204, 0.9);
 	background: #fcfcfc;
 }
 .linktree:hover, .linktree_last {
