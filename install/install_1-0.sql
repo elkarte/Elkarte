@@ -156,7 +156,7 @@ $db_table->db_create_table('{db_prefix}ban_items',
 
 $db_table->db_create_table('{db_prefix}board_permissions',
 	array(
-		array('name' => 'id_group',   'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_group',   'type' => 'smallint', 'size' => 5, 'default' => 0),
 		array('name' => 'id_profile', 'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
 		array('name' => 'permission', 'type' => 'varchar', 'default' => '', 'size' => 30),
 		array('name' => 'add_deny',   'type' => 'tinyint', 'size' => 4, 'default' => 1),
