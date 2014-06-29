@@ -17,8 +17,7 @@
 
 define('CURRENT_VERSION', '1.0 RC 1');
 define('DB_SCRIPT_VERSION', '1-0');
-
-$GLOBALS['required_php_version'] = '5.2.0';
+define('REQUIRED_PHP_VERSION', '5.2.0');
 
 // Don't have PHP support, do you?
 // ><html dir="ltr"><head><title>Error!</title></head><body>Sorry, this installer requires PHP!<div style="display: none;">
@@ -139,6 +138,9 @@ function initialize_inputs()
 		@set_magic_quotes_runtime(0);
 	error_reporting(E_ALL);
 
+	if (!defined('TMP_BOARDDIR'))
+		define('TMP_BOARDDIR', realpath(dirname(__FILE__) . '/..'));
+
 	// This is the test for support of compression
 	if (isset($_GET['obgz']))
 		return action_testCompression();
@@ -184,10 +186,10 @@ function load_lang_file()
 	$incontext['detected_languages'] = array();
 
 	// Make sure the languages directory actually exists.
-	if (file_exists(dirname(__FILE__) . '/themes/default/languages'))
+	if (file_exists(TMP_BOARDDIR . '/themes/default/languages'))
 	{
 		// Find all the "Install" language files in the directory.
-		$dir = dir(dirname(__FILE__) . '/themes/default/languages');
+		$dir = dir(TMP_BOARDDIR . '/themes/default/languages');
 		while ($entry = $dir->read())
 		{
 			if (is_dir($dir->path . '/' . $entry) && file_exists($dir->path . '/' . $entry . '/Install.' . $entry . '.php'))
@@ -232,7 +234,7 @@ function load_lang_file()
 		$_SESSION['installer_temp_lang'] = $_GET['lang_file'];
 
 	// Make sure it exists, if it doesn't reset it.
-	if (!isset($_SESSION['installer_temp_lang']) || preg_match('~[^\\w_\\-.]~', $_SESSION['installer_temp_lang']) === 1 || !file_exists(dirname(__FILE__) . '/themes/default/languages/' . substr($_SESSION['installer_temp_lang'], 8, strlen($_SESSION['installer_temp_lang']) - 12) . '/' . $_SESSION['installer_temp_lang']))
+	if (!isset($_SESSION['installer_temp_lang']) || preg_match('~[^\\w_\\-.]~', $_SESSION['installer_temp_lang']) === 1 || !file_exists(TMP_BOARDDIR . '/themes/default/languages/' . substr($_SESSION['installer_temp_lang'], 8, strlen($_SESSION['installer_temp_lang']) - 12) . '/' . $_SESSION['installer_temp_lang']))
 	{
 		// Use the first one...
 		list ($_SESSION['installer_temp_lang']) = array_keys($incontext['detected_languages']);
@@ -243,7 +245,7 @@ function load_lang_file()
 	}
 
 	// And now include the actual language file itself.
-	require_once(dirname(__FILE__) . '/themes/default/languages/' . substr($_SESSION['installer_temp_lang'], 8, strlen($_SESSION['installer_temp_lang']) - 12) . '/' . $_SESSION['installer_temp_lang']);
+	require_once(TMP_BOARDDIR . '/themes/default/languages/' . substr($_SESSION['installer_temp_lang'], 8, strlen($_SESSION['installer_temp_lang']) - 12) . '/' . $_SESSION['installer_temp_lang']);
 }
 
 /**
@@ -254,10 +256,10 @@ function load_database()
 	global $db_prefix, $db_connection, $modSettings, $db_type, $db_name, $db_user, $db_persist;
 
 	if (!defined('SOURCEDIR'))
-		define('SOURCEDIR', dirname(__FILE__) . '/sources');
+		define('SOURCEDIR', TMP_BOARDDIR . '/sources');
 
 	// Need this to check whether we need the database password.
-	require(dirname(__FILE__) . '/Settings.php');
+	require(TMP_BOARDDIR . '/Settings.php');
 	if (!defined('ELK'))
 		define('ELK', 1);
 
@@ -323,16 +325,16 @@ function action_welcome()
 		return true;
 
 	// Check the PHP version.
-	if ((!function_exists('version_compare') || version_compare($GLOBALS['required_php_version'], PHP_VERSION, '>')))
+	if (version_compare(REQUIRED_PHP_VERSION, PHP_VERSION, '>'))
 	{
 		$incontext['warning'] = $txt['error_php_too_low'];
 	}
 
 	// See if we think they have already installed it?
-	if (is_readable(dirname(__FILE__) . '/Settings.php'))
+	if (is_readable(TMP_BOARDDIR . '/Settings.php'))
 	{
 		$probably_installed = 0;
-		foreach (file(dirname(__FILE__) . '/Settings.php') as $line)
+		foreach (file(TMP_BOARDDIR . '/Settings.php') as $line)
 		{
 			if (preg_match('~^\$db_passwd\s=\s\'([^\']+)\';$~', $line))
 				$probably_installed++;
@@ -375,7 +377,7 @@ function action_welcome()
 	elseif (!function_exists('session_start'))
 		$error = 'error_session_missing';
 	// Make sure they uploaded all the files.
-	elseif (!file_exists(dirname(__FILE__) . '/index.php'))
+	elseif (!file_exists(TMP_BOARDDIR . '/index.php'))
 		$error = 'error_missing_files';
 	// Very simple check on the session.save_path for Windows.
 	// @todo Move this down later if they don't use database-driven sessions?
@@ -420,7 +422,7 @@ function action_checkFilesWritable()
 
 	// With mod_security installed, we could attempt to fix it with .htaccess.
 	if (function_exists('apache_get_modules') && in_array('mod_security', apache_get_modules()))
-		$writable_files[] = file_exists(dirname(__FILE__) . '/.htaccess') ? '.htaccess' : '.';
+		$writable_files[] = file_exists(TMP_BOARDDIR . '/.htaccess') ? '.htaccess' : '.';
 
 	$failed_files = array();
 
@@ -429,17 +431,17 @@ function action_checkFilesWritable()
 	{
 		foreach ($writable_files as $file)
 		{
-			if (!is_writable(dirname(__FILE__) . '/' . $file))
+			if (!is_writable(TMP_BOARDDIR . '/' . $file))
 			{
-				@chmod(dirname(__FILE__) . '/' . $file, 0755);
+				@chmod(TMP_BOARDDIR . '/' . $file, 0755);
 
 				// Well, 755 hopefully worked... if not, try 777.
-				if (!is_writable(dirname(__FILE__) . '/' . $file) && !@chmod(dirname(__FILE__) . '/' . $file, 0777))
+				if (!is_writable(TMP_BOARDDIR . '/' . $file) && !@chmod(TMP_BOARDDIR . '/' . $file, 0777))
 					$failed_files[] = $file;
 			}
 		}
 		foreach ($extra_files as $file)
-			@chmod(dirname(__FILE__) . (empty($file) ? '' : '/' . $file), 0777);
+			@chmod(TMP_BOARDDIR . (empty($file) ? '' : '/' . $file), 0777);
 	}
 	// Windows is trickier.  Let's try opening for r+...
 	else
@@ -447,16 +449,16 @@ function action_checkFilesWritable()
 		foreach ($writable_files as $file)
 		{
 			// Folders can't be opened for write... but the index.php in them can ;)
-			if (is_dir(dirname(__FILE__) . '/' . $file))
+			if (is_dir(TMP_BOARDDIR . '/' . $file))
 				$file .= '/index.php';
 
 			// Funny enough, chmod actually does do something on windows - it removes the read only attribute.
-			@chmod(dirname(__FILE__) . '/' . $file, 0777);
-			$fp = @fopen(dirname(__FILE__) . '/' . $file, 'r+');
+			@chmod(TMP_BOARDDIR . '/' . $file, 0777);
+			$fp = @fopen(TMP_BOARDDIR . '/' . $file, 'r+');
 
 			// Hmm, okay, try just for write in that case...
 			if (!is_resource($fp))
-				$fp = @fopen(dirname(__FILE__) . '/' . $file, 'w');
+				$fp = @fopen(TMP_BOARDDIR . '/' . $file, 'w');
 
 			if (!is_resource($fp))
 				$failed_files[] = $file;
@@ -464,7 +466,7 @@ function action_checkFilesWritable()
 			@fclose($fp);
 		}
 		foreach ($extra_files as $file)
-			@chmod(dirname(__FILE__) . (empty($file) ? '' : '/' . $file), 0777);
+			@chmod(TMP_BOARDDIR . (empty($file) ? '' : '/' . $file), 0777);
 	}
 
 	$failure = count($failed_files) >= 1;
@@ -524,7 +526,7 @@ function action_checkFilesWritable()
 			elseif ($ftp->error !== false && empty($incontext['ftp_errors']) && !empty($ftp->last_message))
 				$incontext['ftp_errors'][] = $ftp->last_message;
 
-			list ($username, $detect_path, $found_path) = $ftp->detect_path(dirname(__FILE__));
+			list ($username, $detect_path, $found_path) = $ftp->detect_path(TMP_BOARDDIR);
 
 			if (empty($_POST['ftp_path']) && $found_path)
 				$_POST['ftp_path'] = $detect_path;
@@ -557,11 +559,11 @@ function action_checkFilesWritable()
 
 			foreach ($failed_files as $file)
 			{
-				if (!is_writable(dirname(__FILE__) . '/' . $file))
+				if (!is_writable(TMP_BOARDDIR . '/' . $file))
 					$ftp->chmod($file, 0755);
-				if (!is_writable(dirname(__FILE__) . '/' . $file))
+				if (!is_writable(TMP_BOARDDIR . '/' . $file))
 					$ftp->chmod($file, 0777);
-				if (!is_writable(dirname(__FILE__) . '/' . $file))
+				if (!is_writable(TMP_BOARDDIR . '/' . $file))
 				{
 					$failed_files_updated[] = $file;
 					$incontext['ftp_errors'][] = rtrim($ftp->last_message) . ' -> ' . $file . "\n";
@@ -704,10 +706,10 @@ function action_databaseSettings()
 		}
 
 		// Make sure it works.
-		require(dirname(__FILE__) . '/Settings.php');
+		require(TMP_BOARDDIR . '/Settings.php');
 
 		if (!defined('SOURCEDIR'))
-			define('SOURCEDIR', dirname(__FILE__) . '/sources');
+			define('SOURCEDIR', TMP_BOARDDIR . '/sources');
 
 		// Better find the database file!
 		if (!file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.class.php'))
@@ -823,7 +825,7 @@ function action_forumSettings()
 	$host = empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST'];
 
 	// Now, to put what we've learned together... and add a path.
-	$incontext['detected_url'] = 'http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on' ? 's' : '') . '://' . $host . substr($_SERVER['PHP_SELF'], 0, strrpos($_SERVER['PHP_SELF'], '/'));
+	$incontext['detected_url'] = 'http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on' ? 's' : '') . '://' . $host . strtr(substr($_SERVER['PHP_SELF'], 0, strrpos($_SERVER['PHP_SELF'], '/')), array('/install' => ''));
 
 	// Check if the database sessions will even work.
 	$incontext['test_dbsession'] = ini_get('session.auto_start') != 1;
@@ -843,12 +845,12 @@ function action_forumSettings()
 		// Save these variables.
 		$vars = array(
 			'boardurl' => $_POST['boardurl'],
-			'boarddir' => addslashes(dirname(__FILE__)),
-			'sourcedir' => addslashes(dirname(__FILE__)) . '/sources',
-			'cachedir' => addslashes(dirname(__FILE__)) . '/cache',
+			'boarddir' => addslashes(TMP_BOARDDIR),
+			'sourcedir' => addslashes(TMP_BOARDDIR) . '/sources',
+			'cachedir' => addslashes(TMP_BOARDDIR) . '/cache',
 			'mbname' => strtr($_POST['mbname'], array('\"' => '"')),
 			'language' => substr($_SESSION['installer_temp_lang'], 8, -4),
-			'extdir' => addslashes(dirname(__FILE__)) . '/sources/ext',
+			'extdir' => addslashes(TMP_BOARDDIR) . '/sources/ext',
 		);
 
 		// Must save!
@@ -859,7 +861,7 @@ function action_forumSettings()
 		}
 
 		// Make sure it works.
-		require(dirname(__FILE__) . '/Settings.php');
+		require(TMP_BOARDDIR . '/Settings.php');
 
 		// UTF-8 requires a setting to override any language charset.
 		if (!empty($databases[$db_type]['utf8_version_check']) && version_compare($databases[$db_type]['utf8_version'], preg_replace('~\-.+?$~', '', eval($databases[$db_type]['utf8_version_check'])), '>'))
@@ -897,7 +899,7 @@ function action_databasePopulation()
 		return true;
 
 	// Reload settings.
-	require(dirname(__FILE__) . '/Settings.php');
+	require(TMP_BOARDDIR . '/Settings.php');
 	definePaths();
 
 	$db = load_database();
@@ -938,7 +940,7 @@ function action_databasePopulation()
 
 	$replaces = array(
 		'{$db_prefix}' => $db_prefix,
-		'{BOARDDIR}' => $db->escape_string(dirname(__FILE__)),
+		'{BOARDDIR}' => $db->escape_string(TMP_BOARDDIR),
 		'{$boardurl}' => $boardurl,
 		'{$enableCompressedOutput}' => isset($_POST['compress']) ? '1' : '0',
 		'{$databaseSession_enable}' => isset($_POST['dbsession']) ? '1' : '0',
@@ -1081,7 +1083,7 @@ function action_adminAccount()
 	$incontext['continue'] = 1;
 
 	// Need this to check whether we need the database password.
-	require(dirname(__FILE__) . '/Settings.php');
+	require(TMP_BOARDDIR . '/Settings.php');
 	if (!defined('ELK'))
 		define('ELK', 1);
 	definePaths();
@@ -1263,7 +1265,7 @@ function action_deleteInstall()
 	$incontext['sub_template'] = 'delete_install';
 	$incontext['continue'] = 0;
 
-	require(dirname(__FILE__) . '/Settings.php');
+	require(TMP_BOARDDIR . '/Settings.php');
 	if (!defined('ELK'))
 		define('ELK', 1);
 	definePaths();
@@ -1271,9 +1273,9 @@ function action_deleteInstall()
 	$db = load_database();
 
 	if (!defined('SUBSDIR'))
-		define('SUBSDIR', dirname(__FILE__) . '/sources/subs');
+		define('SUBSDIR', TMP_BOARDDIR . '/sources/subs');
 
-	chdir(dirname(__FILE__));
+	chdir(TMP_BOARDDIR);
 
 	require_once(SOURCEDIR . '/Errors.php');
 	require_once(SOURCEDIR . '/Logging.php');
@@ -1874,7 +1876,7 @@ class Ftp_Connection
 function updateSettingsFile($vars)
 {
 	// Modify Settings.php.
-	$settingsArray = file(dirname(__FILE__) . '/Settings.php');
+	$settingsArray = file(TMP_BOARDDIR . '/Settings.php');
 
 	// @todo Do we just want to read the file in clean, and split it this way always?
 	if (count($settingsArray) == 1)
@@ -1883,7 +1885,7 @@ function updateSettingsFile($vars)
 	for ($i = 0, $n = count($settingsArray); $i < $n; $i++)
 	{
 		// Remove the redirect...
-		if (trim($settingsArray[$i]) == 'if (file_exists(dirname(__FILE__) . \'/install.php\'))' && trim($settingsArray[$i + 1]) == '{' && trim($settingsArray[$i + 3]) == '}')
+		if (trim($settingsArray[$i]) == 'if (file_exists(dirname(__FILE__) . \'/install/install.php\'))' && trim($settingsArray[$i + 1]) == '{' && trim($settingsArray[$i + 4]) == '}')
 		{
 			// Get the four lines to nothing.
 			$settingsArray[$i] = '';
@@ -1917,12 +1919,12 @@ function updateSettingsFile($vars)
 	}
 
 	// Blank out the file - done to fix a oddity with some servers.
-	$fp = @fopen(dirname(__FILE__) . '/Settings.php', 'w');
+	$fp = @fopen(TMP_BOARDDIR . '/Settings.php', 'w');
 	if (!$fp)
 		return false;
 	fclose($fp);
 
-	$fp = fopen(dirname(__FILE__) . '/Settings.php', 'r+');
+	$fp = fopen(TMP_BOARDDIR . '/Settings.php', 'r+');
 
 	// Gotta have one of these ;)
 	if (trim($settingsArray[0]) != '<?php')
@@ -1946,7 +1948,7 @@ function updateSettingsFile($vars)
 function updateDbLastError()
 {
 	// Write out the db_last_error file with the error timestamp
-	file_put_contents(dirname(__FILE__) . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = 0;');
+	file_put_contents(TMP_BOARDDIR . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = 0;');
 	return true;
 }
 
@@ -2138,14 +2140,14 @@ function fixModSecurity()
 
 	if (!function_exists('apache_get_modules') || !in_array('mod_security', apache_get_modules()))
 		return true;
-	elseif (file_exists(dirname(__FILE__) . '/.htaccess') && is_writable(dirname(__FILE__) . '/.htaccess'))
+	elseif (file_exists(TMP_BOARDDIR . '/.htaccess') && is_writable(TMP_BOARDDIR . '/.htaccess'))
 	{
-		$current_htaccess = implode('', file(dirname(__FILE__) . '/.htaccess'));
+		$current_htaccess = implode('', file(TMP_BOARDDIR . '/.htaccess'));
 
 		// Only change something if mod_security hasn't been addressed yet.
 		if (strpos($current_htaccess, '<IfModule mod_security.c>') === false)
 		{
-			if ($ht_handle = fopen(dirname(__FILE__) . '/.htaccess', 'a'))
+			if ($ht_handle = fopen(TMP_BOARDDIR . '/.htaccess', 'a'))
 			{
 				fwrite($ht_handle, $htaccess_addition);
 				fclose($ht_handle);
@@ -2157,11 +2159,11 @@ function fixModSecurity()
 		else
 			return true;
 	}
-	elseif (file_exists(dirname(__FILE__) . '/.htaccess'))
-		return strpos(implode('', file(dirname(__FILE__) . '/.htaccess')), '<IfModule mod_security.c>') !== false;
-	elseif (is_writable(dirname(__FILE__)))
+	elseif (file_exists(TMP_BOARDDIR . '/.htaccess'))
+		return strpos(implode('', file(TMP_BOARDDIR . '/.htaccess')), '<IfModule mod_security.c>') !== false;
+	elseif (is_writable(TMP_BOARDDIR))
 	{
-		if ($ht_handle = fopen(dirname(__FILE__) . '/.htaccess', 'w'))
+		if ($ht_handle = fopen(TMP_BOARDDIR . '/.htaccess', 'w'))
 		{
 			fwrite($ht_handle, $htaccess_addition);
 			fclose($ht_handle);
@@ -2179,8 +2181,8 @@ function definePaths()
 	global $boarddir, $cachedir, $extdir, $languagedir, $sourcedir;
 
 	// Make sure the paths are correct... at least try to fix them.
-	if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt'))
-		$boarddir = dirname(__FILE__);
+	if (!file_exists($boarddir) && file_exists(TMP_BOARDDIR . '/agreement.txt'))
+		$boarddir = TMP_BOARDDIR;
 	if (!file_exists($sourcedir . '/SiteDispatcher.class.php') && file_exists($boarddir . '/sources'))
 		$sourcedir = $boarddir . '/sources';
 
@@ -2262,34 +2264,30 @@ function action_testCompression()
  */
 function action_deleteInstaller()
 {
-	global $databases;
+	global $databases, $package_ftp;
+
+	definePaths();
+	define('ELK', 'SSI');
+	require_once(SUBSDIR . '/Package.subs.php');
 
 	if (isset($_SESSION['installer_temp_ftp']))
 	{
-		$ftp = new Ftp_Connection($_SESSION['installer_temp_ftp']['server'], $_SESSION['installer_temp_ftp']['port'], $_SESSION['installer_temp_ftp']['username'], $_SESSION['installer_temp_ftp']['password']);
-		$ftp->chdir($_SESSION['installer_temp_ftp']['path']);
+		$_SESSION['pack_ftp']['root'] = BOARDDIR;
+		$package_ftp = new Ftp_Connection($_SESSION['installer_temp_ftp']['server'], $_SESSION['installer_temp_ftp']['port'], $_SESSION['installer_temp_ftp']['username'], $_SESSION['installer_temp_ftp']['password']);
+		$package_ftp->chdir($_SESSION['installer_temp_ftp']['path']);
+	}
 
-		$ftp->unlink('install.php');
-		$ftp->unlink('install' . DB_SCRIPT_VERSION . '.sql');
+	deltree(dirname(__FILE__));
 
-		foreach ($databases as $key => $dummy)
-			$ftp->unlink('install_' . DB_SCRIPT_VERSION . '_' . $key . '.sql');
-
-		$ftp->close();
+	if (isset($_SESSION['installer_temp_ftp']))
+	{
+		$package_ftp->close();
 
 		unset($_SESSION['installer_temp_ftp']);
 	}
-	else
-	{
-		@unlink(__FILE__);
-		@unlink(dirname(__FILE__) . '/install' . DB_SCRIPT_VERSION . '.sql');
-
-		foreach ($databases as $key => $dummy)
-			@unlink(dirname(__FILE__) . '/install_' . DB_SCRIPT_VERSION . '_' . $key . '.sql');
-	}
 
 	// Now just redirect to a blank.png...
-	header('Location: http://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT']) . dirname($_SERVER['PHP_SELF']) . '/themes/default/images/blank.png');
+	header('Location: http://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT']) . dirname($_SERVER['PHP_SELF']) . '/../themes/default/images/blank.png');
 	exit;
 }
 
@@ -2303,13 +2301,13 @@ function template_install_above()
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="robots" content="noindex" />
 		<title>', $txt['installer'], '</title>
-		<link rel="stylesheet" href="themes/default/css/index.css?10RC1" />
-		<link rel="stylesheet" href="themes/default/css/_light/index_light.css?10RC1" />
-		<link rel="stylesheet" href="themes/default/css/install.css?10RC1" />
-		<script src="themes/default/scripts/script.js"></script>
+		<link rel="stylesheet" href="../themes/default/css/index.css?10RC1" />
+		<link rel="stylesheet" href="../themes/default/css/_light/index_light.css?10RC1" />
+		<link rel="stylesheet" href="../themes/default/css/install.css?10RC1" />
+		<script src="../themes/default/scripts/script.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" id="jquery"></script>
 		<script><!-- // --><![CDATA[
-			window.jQuery || document.write(\'<script src="themes/default/scripts/jquery-1.11.1.min.js"><\/script>\');
+			window.jQuery || document.write(\'<script src="../themes/default/scripts/jquery-1.11.1.min.js"><\/script>\');
 		// ]]></script>
 
 	</head>
@@ -2317,7 +2315,7 @@ function template_install_above()
 		<div id="header">
 			<div class="frame">
 				<h1 class="forumtitle">', $txt['installer'], '</h1>
-				<img id="logo" src="themes/default/images/logo.png" alt="ElkArte Community" title="ElkArte Community" />
+				<img id="logo" src="../themes/default/images/logo.png" alt="ElkArte Community" title="ElkArte Community" />
 			</div>
 		</div>
 		<div id="wrapper" class="wrapper">
@@ -2419,7 +2417,7 @@ function template_welcome_message()
 	global $incontext, $txt;
 
 	echo '
-	<script src="themes/default/scripts/admin.js"></script>
+	<script src="../themes/default/scripts/admin.js"></script>
 		<script><!-- // --><![CDATA[
 			var oUpgradeCenter = new elk_AdminIndex({
 				bLoadAnnouncements: false,

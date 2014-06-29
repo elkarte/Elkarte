@@ -41,7 +41,7 @@ $databases = array(
 
 // General options for the script.
 $timeLimitThreshold = 3;
-$upgrade_path = dirname(__FILE__);
+$upgrade_path = realpath(dirname(__FILE__) . '/..');
 $upgradeurl = $_SERVER['PHP_SELF'];
 
 // Where the images etc are kept.
@@ -83,6 +83,8 @@ if (!empty($_SERVER['argv']) && php_sapi_name() == 'cli' && empty($_SERVER['REMO
 	}
 }
 
+define('TMP_BOARDDIR', $upgrade_path);
+
 // Are we from the client?
 if (php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR']))
 {
@@ -93,15 +95,15 @@ else
 	$command_line = false;
 
 // Load this now just because we can.
-require_once($upgrade_path . '/Settings.php');
+require_once(TMP_BOARDDIR . '/Settings.php');
 
 // Fix for using the current directory as a path.
 if (substr($sourcedir, 0, 1) == '.' && substr($sourcedir, 1, 1) != '.')
-	$sourcedir = dirname(__FILE__) . substr($sourcedir, 1);
+	$sourcedir = TMP_BOARDDIR . substr($sourcedir, 1);
 
 // Make sure the paths are correct... at least try to fix them.
-if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt'))
-	$boarddir = dirname(__FILE__);
+if (!file_exists($boarddir) && file_exists(TMP_BOARDDIR . '/agreement.txt'))
+	$boarddir = TMP_BOARDDIR;
 
 if (!file_exists($sourcedir) && file_exists($boarddir . '/sources'))
 	$sourcedir = $boarddir . '/sources';
@@ -581,7 +583,7 @@ function action_welcomeLogin()
 		return throw_error('The upgrader was unable to find some crucial files.<br /><br />Please make sure you uploaded all of the files included in the package, including the themes, sources, and other directories.');
 
 	// Do they meet the install requirements?
-	if (version_compare(REQUIRED_PHP_VERSION, PHP_VERSION, '>='))
+	if (version_compare(REQUIRED_PHP_VERSION, PHP_VERSION, '>'))
 		return throw_error('Warning!  You do not appear to have a version of PHP installed on your webserver that meets ElkArte\'s minimum installations requirements.<br /><br />Please ask your host to upgrade.');
 
 	if (!db_version_check())
@@ -644,9 +646,9 @@ function action_welcomeLogin()
 	}
 
 	// We're going to check that their board dir setting is right in case they've been moving stuff around.
-	if (strtr(BOARDDIR, array('/' => '', '\\' => '')) != strtr(dirname(__FILE__), array('/' => '', '\\' => '')))
+	if (strtr(BOARDDIR, array('/' => '', '\\' => '')) != strtr(TMP_BOARDDIR, array('/' => '', '\\' => '')))
 		$upcontext['warning'] = '
-			It looks as if your board directory settings <em>might</em> be incorrect. Your board directory is currently set to &quot;' . BOARDDIR . '&quot; but should probably be &quot;' . dirname(__FILE__) . '&quot;. Settings.php currently lists your paths as:<br />
+			It looks as if your board directory settings <em>might</em> be incorrect. Your board directory is currently set to &quot;' . BOARDDIR . '&quot; but should probably be &quot;' . TMP_BOARDDIR . '&quot;. Settings.php currently lists your paths as:<br />
 			<ul>
 				<li>Board Directory: ' . BOARDDIR . '</li>
 				<li>Source Directory: ' . BOARDDIR . '</li>
@@ -1579,7 +1581,7 @@ function changeSettings($config_vars)
 function updateLastError()
 {
 	// Clear out the db_last_error file
-	file_put_contents(dirname(__FILE__) . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = 0;');
+	file_put_contents(TMP_BOARDDIR . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = 0;');
 }
 
 /**
@@ -2703,7 +2705,7 @@ function makeFilesWritable(&$files)
 			elseif ($ftp->error !== false && !isset($upcontext['chmod']['ftp_error']))
 				$upcontext['chmod']['ftp_error'] = $ftp->last_message === null ? '' : $ftp->last_message;
 
-			list ($username, $detect_path, $found_path) = $ftp->detect_path(dirname(__FILE__));
+			list ($username, $detect_path, $found_path) = $ftp->detect_path(TMP_BOARDDIR);
 
 			if ($found_path || !isset($upcontext['chmod']['path']))
 				$upcontext['chmod']['path'] = $detect_path;
