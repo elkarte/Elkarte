@@ -14,7 +14,6 @@ $txt['draft_edit'] = 'Edit draft';
 $txt['draft_load'] = 'Load drafts';
 $txt['draft_hide'] = 'Hide drafts';
 $txt['draft_delete'] = 'Delete draft';
-$txt['draft_saved_on'] = 'Draft last saved';
 $txt['draft_days_ago'] = '%s days ago';
 $txt['draft_retain'] = 'this will be retained for %s more days';
 $txt['draft_remove'] = 'Remove this draft';
