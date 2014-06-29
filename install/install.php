@@ -141,34 +141,18 @@ function initialize_inputs()
 
 	// This is the test for support of compression
 	if (isset($_GET['obgz']))
-	{
-		ob_start('ob_gzhandler');
+		return action_testCompression();
 
-		if (ini_get('session.save_handler') == 'user')
-			@ini_set('session.save_handler', 'files');
-		session_start();
+	// This is really quite simple; if ?delete is on the URL, delete the installer...
+	if (isset($_GET['delete']))
+		return action_deleteInstaller();
 
-		if (!headers_sent())
-			echo '<!DOCTYPE html>
-<html>
-	<head>
-		<title>', htmlspecialchars($_GET['pass_string'], ENT_COMPAT, 'UTF-8'), '</title>
-	</head>
-	<body style="background: #d4d4d4; margin-top: 16%; font-size: 16pt;">
-		<strong>', htmlspecialchars($_GET['pass_string'], ENT_COMPAT, 'UTF-8'), '</strong>
-	</body>
-</html>';
-		exit;
-	}
-	else
-	{
-		ob_start();
+	ob_start();
 
-		if (ini_get('session.save_handler') == 'user')
-			@ini_set('session.save_handler', 'files');
-		if (function_exists('session_start'))
-			@session_start();
-	}
+	if (ini_get('session.save_handler') == 'user')
+		@ini_set('session.save_handler', 'files');
+	if (function_exists('session_start'))
+		@session_start();
 
 	// Reject magic_quotes_sybase='on'.
 	if (ini_get('magic_quotes_sybase') || strtolower(ini_get('magic_quotes_sybase')) == 'on')
@@ -181,10 +165,6 @@ function initialize_inputs()
 	foreach ($_POST as $k => $v)
 		if (strpos($k, 'password') === false)
 			$_POST[$k] = addslashes($v);
-
-	// This is really quite simple; if ?delete is on the URL, delete the installer...
-	if (isset($_GET['delete']))
-		action_deleteInstaller();
 
 	// PHP 5 might cry if we don't do this now.
 	$server_offset = @mktime(0, 0, 0, 1, 1, 1970);
@@ -2249,6 +2229,31 @@ function JavaScriptEscape($string)
 		'<body>' => '<bo\'+\'dy>',
 		'<a href' => '<a hr\'+\'ef',
 	)) . '\'';
+}
+
+/**
+ * Does the test to check whether compression is supported or not.
+ * Called by ?obgz
+ */
+function action_testCompression()
+{
+		ob_start('ob_gzhandler');
+
+		if (ini_get('session.save_handler') == 'user')
+			@ini_set('session.save_handler', 'files');
+		session_start();
+
+		if (!headers_sent())
+			echo '<!DOCTYPE html>
+<html>
+	<head>
+		<title>', htmlspecialchars($_GET['pass_string'], ENT_COMPAT, 'UTF-8'), '</title>
+	</head>
+	<body style="background: #d4d4d4; margin-top: 16%; font-size: 16pt;">
+		<strong>', htmlspecialchars($_GET['pass_string'], ENT_COMPAT, 'UTF-8'), '</strong>
+	</body>
+</html>';
+		exit;
 }
 
 /**
