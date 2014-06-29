@@ -774,6 +774,9 @@ ul.post_options li {
 #poll_options .poll_options dd input {
 	margin-right: 0;
 }
+.shortcuts {
+	float: right;
+}
 
 /*	$MODERATE	*/
 /* ------------------------------------------------------- */
