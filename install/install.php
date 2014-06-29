@@ -940,7 +940,7 @@ function action_databasePopulation()
 
 	$replaces = array(
 		'{$db_prefix}' => $db_prefix,
-		'{BOARDDIR}' => $db->escape_string(TMP_BOARDDIR),
+		'{BOARDDIR}' => TMP_BOARDDIR,
 		'{$boardurl}' => $boardurl,
 		'{$enableCompressedOutput}' => isset($_POST['compress']) ? '1' : '0',
 		'{$databaseSession_enable}' => isset($_POST['dbsession']) ? '1' : '0',
@@ -952,7 +952,7 @@ function action_databasePopulation()
 	foreach ($txt as $key => $value)
 	{
 		if (substr($key, 0, 8) == 'default_')
-			$replaces['{$' . $key . '}'] = $db->escape_string($value);
+			$replaces['{$' . $key . '}'] = addslashes($value);
 	}
 	$replaces['{$default_reserved_names}'] = strtr($replaces['{$default_reserved_names}'], array('\\\\n' => '\\n'));
 
