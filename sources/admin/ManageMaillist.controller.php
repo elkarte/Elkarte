@@ -1907,7 +1907,7 @@ class ManageMaillist_Controller extends Action_Controller
 	 * @param int $id
 	 * - Callback for createList() to list_maillist_unapproved
 	 */
-	protected function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
+	public function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
 	{
 		return list_maillist_unapproved($id, $start, $chunk_size, $sort);
 	}
