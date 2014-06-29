@@ -174,7 +174,7 @@ function create_control_richedit($editorOptions)
 			loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.min.js', 'mentioning.plugin.js'));
 
 		// Our not so concise shortcut line
-		$context['shortcuts_text'] = $txt['shortcuts' . (!empty($context['drafts_save']) ? '_drafts' : '') . (isBrowser('is_firefox') ? '_firefox' : '')];
+		$context['shortcuts_text'] = $txt['shortcuts' . (!empty($context['drafts_save']) || !empty($context['drafts_pm_save']) ? '_drafts' : '') . (isBrowser('is_firefox') ? '_firefox' : '')];
 
 		// Spellcheck?
 		$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && function_exists('pspell_new');

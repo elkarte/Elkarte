@@ -771,6 +771,10 @@ div.bbc_footnotes .meaction{
 .linktree a {
 	color: #555;
 }
+.linktree {
+	border-bottom: 1px solid #ccc;
+	box-shadow: 0 -2px 0 -1px #ccc, 3px -2px 0 -1px #ccc, 3px 1px 0 -1px #ccc;
+}
 .linktree:hover a, .linktree>a:hover,
 .linktree:last-child, .linktree:last-child>a,
 .linktree:last-child>a:hover, .linktree:last-child strong {
@@ -778,7 +782,7 @@ div.bbc_footnotes .meaction{
 	text-decoration: none;
 }
 .linktree:after {
-	box-shadow: 2px -2px 0 1px rgba(204, 204, 204, 0.9);
+	box-shadow: 2px -2px 0 1px rgba(200, 204, 204, 0.9);
 	background: #fcfcfc;
 }
 .linktree:hover, .linktree:last-child {

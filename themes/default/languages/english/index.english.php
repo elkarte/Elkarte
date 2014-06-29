@@ -469,10 +469,6 @@ $txt['poll_question'] = 'Question';
 $txt['poll_question_options'] = 'Question and Options';
 $txt['poll_vote'] = 'Submit Vote';
 $txt['poll_total_voters'] = 'Total Members Voted';
-$txt['shortcuts'] = 'shortcuts: alt+s submit/post, alt+p preview';
-$txt['shortcuts_firefox'] = 'shortcuts: shift+alt+s submit/post, shift+alt+p preview';
-$txt['shortcuts_drafts'] = ', alt+d save draft';
-$txt['shortcuts_drafts_firefox'] = ', shift+alt+d save draft';
 $txt['draft_saved_on'] = 'Draft last saved';
 $txt['poll_results'] = 'View results';
 $txt['poll_lock'] = 'Lock Voting';
@@ -747,8 +743,8 @@ $txt['merge_check'] = 'Merge?';
 $txt['merge_no_poll'] = 'No poll';
 
 $txt['response_prefix'] = 'Re: ';
-$txt['current_icon'] = 'Current Icon';
-$txt['message_icon'] = 'Message Icon';
+$txt['current_icon'] = 'Current icon';
+$txt['message_icon'] = 'Message icon';
 
 $txt['smileys_current'] = 'Current Smiley Set';
 $txt['smileys_none'] = 'No Smileys';

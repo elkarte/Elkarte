@@ -52,7 +52,6 @@ $txt['smiley_package'] = 'Smiley packages';
 $txt['use_avatars'] = 'Use Avatars';
 $txt['add_languages'] = 'Add Language';
 $txt['list_files'] = 'List Files';
-$txt['remove'] = 'Remove';
 $txt['package_type'] = 'Package Type';
 $txt['archiving'] = 'Archiving';
 $txt['extracting'] = 'Extracting';

@@ -241,6 +241,9 @@ legend {
 .linktree:after {
 	box-shadow: -2px 2px 0 1px rgba(204, 204, 204, 0.9);
 }
+.linktree {
+	box-shadow: 0 2px 0 -1px #ccc, -3px 2px 0 -1px #ccc, -3px -1px 0 -1px #ccc;
+}
 
 /*	$BUTTONS	*/
 /* This section contains code for the quickbuttons (quote, quick edit, etc)
@@ -553,6 +556,6 @@ legend {
 		box-shadow: -3px 3px 6px #e5e5e5;
 	}
 	.linktree:after {
-		content: "<";
+		content: "";
 	}
 }

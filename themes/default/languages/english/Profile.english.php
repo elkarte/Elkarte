@@ -206,7 +206,6 @@ $txt['profileEdit'] = 'Modify Profile';
 $txt['account_info'] = 'These are your account settings. This page holds all critical information that identifies you on this forum. For security reasons, you will need to enter your (current) password to make changes to this information.';
 $txt['forumProfile_info'] = 'You can change your personal information on this page. This information will be displayed throughout {forum_name_html_safe}. If you aren\'t comfortable with sharing some information, simply skip it - nothing here is required.';
 $txt['theme_info'] = 'This section allows you to customize the look and layout of the forum.';
-$txt['notifications'] = 'Notifications';
 $txt['notification_info'] = 'This allows you to be notified of replies to posts, newly posted topics, and forum announcements. You can change those settings here, or oversee the topics and boards you are currently receiving notifications for.';
 $txt['groupmembership'] = 'Group Membership';
 $txt['groupMembership_info'] = 'In this section of your profile you can change which groups you belong to.';
