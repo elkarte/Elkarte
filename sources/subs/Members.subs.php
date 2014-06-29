@@ -825,7 +825,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 	$checkName = Util::strtolower($name);
 
 	// Administrators are never restricted ;).
-	if (!allowedTo('moderate_forum') && ((!empty($modSettings['reserveName']) && $is_name) || !empty($modSettings['reserveUser']) && !$is_name))
+	if (!allowedTo('admin_forum') && ((!empty($modSettings['reserveName']) && $is_name) || !empty($modSettings['reserveUser']) && !$is_name))
 	{
 		$reservedNames = explode("\n", $modSettings['reserveNames']);
 		// Case sensitive check?

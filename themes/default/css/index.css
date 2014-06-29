@@ -1098,43 +1098,44 @@ a.bbc_link {
 .navigate_section {
 	overflow: hidden;
 	margin: 3px 0 0 0;
+	padding-right: 1em;
 }
 #main_content_section .navigate_section {
 	margin: 12px 0 6px 0;
 }
-.linktree, .linktree_last {
+.linktree {
 	position: relative;
 	float: left;
-	margin: -1px 0;
 	font-size: 0.929em;
-	line-height: 2.154em;
-	display: block;
-	padding-left: 20px;
-	padding-right: 10px;
+	line-height: 2em;
+	display: inline-block;
+	padding: 0 1.1em 0 2em;
+	border: none;
 }
 
 /* Nifty indicators. */
-.linktree:before, .linktree:after, .linktree_last:before, .linktree_last:after {
+.linktree:after {
 	content: "";
 	position: absolute;
-	display: block;
-	left: 100%;
-	top: 50%;
-	margin-top: -1.081em;
-	margin-left: 0;
-	height: 0;
-	width: 0;
-	border: 1.081em solid transparent;
+	display: inline-block;
+	right: -1em;
+	top: 0;
+	width: 2em;
+	height: 2em;
+	/* Scale the squares diagonal to = the line-height */
+	transform: scale(0.7071) rotate(45deg);
+	-webkit-transform: scale(0.7071) rotate(45deg);
+	-ms-transform: scale(0.7071) rotate(45deg);
 	z-index: 1;
 }
-.linktree:after, .linktree_last:after {
-	margin-left: -1px;
-	z-index: 2;
+#ie8 .linktree:after {
+	border-right: 1px solid #ccc;
+	width: 0;
+	right: 0;
 }
 .linktree:first-child {
-	padding-left: 10px;
+	padding-left: 1em;
 }
-
 
 /*	$BUTTONS	*/
 /* This section contains code for the quickbuttons (quote, quick edit, etc)
@@ -1730,7 +1731,10 @@ dl.settings label {
 }
 
 #sort_by {
-	margin-bottom: -4px;
+	margin-bottom: -6px;
+}
+#sort_by .input_check {
+	margin-bottom: 0;
 }
 .topic_sorting:hover #sortby, #sortby:hover, #sortby {
 	width: 11em;
@@ -2503,11 +2507,12 @@ ul.post_options li {
 	padding: 1em 0;
 }
 .drop_area_fileselect {
-    cursor: pointer;
-    margin-left: -190px;
-    opacity: 0.0001;
-    position: absolute;
-    width: 220px;
+	cursor: pointer;
+	margin-left: -190px;
+	opacity: 0.0001;
+	position: absolute;
+	width: 220px;
+	padding-left: 220px;
 }
 
 #postAttachment >dd.progress_tracker {
@@ -2802,6 +2807,10 @@ dl.merge_topic dd {
 .profileblock {
 	padding: 4px 8px;
 	margin-top: 4px;
+	word-wrap: break-word;
+	-webkit-hyphens: auto;
+	-moz-hyphens: auto;
+	-ms-hyphens: auto;
 }
 .profile_content {
 	overflow: auto;
@@ -2873,6 +2882,10 @@ dl.merge_topic dd {
 	float: right;
 	width: 70%;
 	margin-top: 0;
+	word-wrap: break-word;
+	-webkit-hyphens: auto;
+	-moz-hyphens: auto;
+	-ms-hyphens: auto;
 }
 #basicinfo h4 {
 	overflow: hidden;
@@ -4091,7 +4104,7 @@ dl.no_members {
 	.wrapper {
 		min-width: 98%;
 	}
-	.linktree, .linktree_last {
+	.linktree {
 		max-width: 95%;
 		white-space: nowrap;
 		text-overflow: ellipsis;
@@ -4508,7 +4521,7 @@ dl.no_members {
 	.postarea, .forumtitle {
 		padding: 2px;
 	}
-	.linktree .board_moderators, .linktree_last .board_moderators {
+	.linktree .board_moderators {
 		display: none;
 	}
 	.statsbar .bar {

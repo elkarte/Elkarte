@@ -96,15 +96,15 @@
 .sceditor-inserttable, .sceditor-insertimage, .sceditor-pastetext, .sceditor-insertlink, .sceditor-insertemail {
 	padding: 5px;
 }
-#sceditor-smileycontainer {
-	float:left;
+#sceditor-smileycontainer, .sceditor-more {
+	display: inline-block;
+	vertical-align: middle;
 }
 .sceditor-insertemoticon img, .sceditor-smileyPopup img {
 	cursor: pointer;
 	margin: 6px 4px 4px 4px;
 }
 .sceditor-more {
-	float: left;
 	cursor: pointer;
 	padding: 0 3px !important;
 	margin: 2px 0 0 !important;

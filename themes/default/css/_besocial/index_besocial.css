@@ -845,22 +845,27 @@ a.active {
 	resize: none;
 }
 
+/*	$LINKTREE	*/
+/* ------------------------------------------------------- */
+/* The navigation list (i.e. linktree) */
 .navigate_section {
-	padding-left: 15px;
 	border: 1px solid #eee;
 	margin: 4px 0 0 0;
 }
-.linktree:before, .linktree:after, .linktree_last:before, .linktree_last:after {
-	border-width: 1.077em 0 1.077em 1.077em;
-	margin-top: -1.077em;
+.linktree {
+/* 	padding: 0 1.5em 0 .5em; */
+	border: none;
 }
-.linktree, .linktree_last {
-	padding: 0 0.5em 0 1em;
+.linktree:not(:last-child):after {
+	background-image: linear-gradient(45deg, #fff 0%, #fff 50%, #eee 50%, #eee 100%);
+	-webkit-transform: rotate(45deg);
+	-ms-transform: rotate(90deg);
+	transform: rotate(90deg);
+	width: 1.5em;
+	height: 1.5em;
+	top: 0.25em;
 }
-.linktree:after {
-	border-left: 0.7em solid #eee;
-	margin-right: 4px;
-}
+
 .board_name>a {
 	color: #43a8da;
 	font-weight: bold;

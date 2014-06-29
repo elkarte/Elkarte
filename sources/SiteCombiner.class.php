@@ -438,7 +438,7 @@ class Site_Combiner
 		foreach ($this->_combine_files as $file)
 		{
 			if ($file['minimized'] === false)
-				$post_data .= '&code_url=' . urlencode($file['url'] . '/scripts/' . $file['basename']);
+				$post_data .= '&code_url=' . urlencode($file['url'] . '/scripts/' . $file['basename'] . $this->_archive_stale);
 		}
 
 		return fetch_web_data($this->_url, $this->_post_header . $post_data);
