@@ -53,7 +53,7 @@ $databases = array(
 		'function_check' => 'pg_connect',
 		'version_check' => '$request = pg_query(\'SELECT version()\'); list ($version) = pg_fetch_row($request); list ($pgl, $version) = explode(" ", $version); return $version;',
 		'supported' => function_exists('pg_connect'),
-		'additional_file' => 'install_' . DB_SCRIPT_VERSION . '_postgresq.sql',
+		'additional_file' => 'install_' . DB_SCRIPT_VERSION . '_postgresql.sql',
 		'utf8_support' => true,
 		'utf8_version' => '8.0',
 		'utf8_version_check' => '$request = pg_query(\'SELECT version()\'); list ($version) = pg_fetch_row($request); list ($pgl, $version) = explode(" ", $version); return $version;',
