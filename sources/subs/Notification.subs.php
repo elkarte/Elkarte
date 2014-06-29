@@ -29,6 +29,10 @@ if (!defined('ELK'))
  * @param int[]|int $members_only = array() - are the only ones that will be sent the notification if they have it on.
  * @param mixed[] $pbe = array() - array containing user_info if this is being run as a result of an email posting
  * @uses Post language file
+ *
+ * @todo the support for multiple topics at once is broken.
+ *  If you are thinking about implement it, do note that using GROUP BY in the first query will break
+ *  PostgreSQL support.
  */
 function sendNotifications($topics, $type, $exclude = array(), $members_only = array(), $pbe = array())
 {
@@ -67,7 +71,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = ml.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON(a.attachment_type = {int:attachment_type} AND a.id_msg = t.id_last_msg)
 		WHERE t.id_topic IN ({array_int:topic_list})
-		GROUP BY t.id_topic',
+		LIMIT 1',
 		array(
 			'topic_list' => $topics,
 			'attachment_type' => 0,
