@@ -120,7 +120,7 @@ CREATE TABLE {$db_prefix}ban_items (
 #
 
 CREATE TABLE {$db_prefix}board_permissions (
-  id_group smallint(5) unsigned NOT NULL default '0',
+  id_group smallint(5) NOT NULL default '0',
   id_profile smallint(5) unsigned NOT NULL default '0',
   permission varchar(30) NOT NULL default '',
   add_deny tinyint(4) NOT NULL default '1',
