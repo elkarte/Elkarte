@@ -307,8 +307,6 @@ $txt['is_banned'] = 'Banned';
 $txt['primary'] = 'Primary';
 $txt['additional'] = 'Additional';
 $txt['wild_cards_allowed'] = 'wildcard characters * and ? are allowed';
-$txt['search_for'] = 'Search for';
-$txt['search_match'] = 'Match';
 $txt['member_part_of_these_membergroups'] = 'Member is part of these member groups';
 $txt['membergroups'] = 'Member groups';
 $txt['confirm_delete_members'] = 'Are you sure you want to delete the selected members?';
@@ -697,7 +695,6 @@ $txt['badbehavior_title'] = 'Bad Behavior';
 $txt['mods_cat_modifications_misc'] = 'Miscellaneous';
 $txt['mods_cat_layout'] = 'Layout';
 $txt['karma'] = 'Karma';
-$txt['likes'] = 'Likes';
 $txt['mentions_settings_desc'] = 'Mentioning allow members of your community to be alerted when they are @mentioned in a post, added as a buddy or if one of their posts is liked by another member.';
 $txt['moderation_settings_short'] = 'Moderation';
 $txt['signature_settings_short'] = 'Signatures';
@@ -743,7 +740,6 @@ $txt['themeadmin_edit_title'] = 'Modify Themes';
 $txt['admin_browse_register_new'] = 'Register new member';
 
 $txt['search_engines'] = 'Search Engines';
-$txt['spiders'] = 'Spiders';
 $txt['spider_logs'] = 'Spider Log';
 $txt['spider_stats'] = 'Stats';
 

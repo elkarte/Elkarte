@@ -1117,7 +1117,7 @@ CREATE SEQUENCE {$db_prefix}log_badbehavior_seq;
 
 CREATE TABLE {$db_prefix}log_badbehavior (
   id int default nextval('{$db_prefix}log_badbehavior_seq'),
-  ip char NOT NULL,
+  ip char(19) NOT NULL,
   date int NOT NULL default '0',
   request_method varchar(255) NOT NULL,
   request_uri varchar(255) NOT NULL,
@@ -2112,8 +2112,6 @@ INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'profile_v
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'profile_view_any');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'pm_read');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'pm_send');
-INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'pm_draft');
-INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'pm_autosave_draft');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'calendar_view');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'view_stats');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'who_view');
@@ -2132,8 +2130,8 @@ INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'profile_v
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'profile_view_any');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'pm_read');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'pm_send');
-INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'pm_draft');
-INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'pm_autosave_draft');
+INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'pm_draft');
+INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'pm_autosave_draft');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'calendar_view');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'view_stats');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'who_view');
@@ -2328,7 +2326,7 @@ CREATE TABLE {$db_prefix}postby_emails_filters (
 # Sequence for table `scheduled_tasks`
 #
 
-CREATE SEQUENCE {$db_prefix}scheduled_tasks_seq START WITH 9;
+CREATE SEQUENCE {$db_prefix}scheduled_tasks_seq START WITH 16;
 
 #
 # Table structure for table `scheduled_tasks`
