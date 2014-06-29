@@ -2,7 +2,6 @@
 // Version: 1.0; Post
 
 $txt['post_reply'] = 'Post reply';
-$txt['message_icon'] = 'Message icon';
 $txt['post_in_board'] = 'Post in the board';
 $txt['subject_not_filled'] = 'The subject field was not filled out. It is required.';
 $txt['message_body_not_filled'] = 'The message body was not filled out. It is required.';
@@ -33,10 +32,6 @@ $txt['notifyUnsubscribe'] = 'Unsubscribe to this topic by clicking here';
 $txt['lock_after_post'] = 'Lock after Post';
 $txt['notify_replies'] = 'Notify me of replies.';
 $txt['lock_topic'] = 'Lock this topic.';
-$txt['shortcuts'] = 'shortcuts: alt+s submit/post or alt+p preview';
-$txt['shortcuts_drafts'] = 'shortcuts: alt+s submit/post, alt+p preview or alt+d save draft';
-$txt['shortcuts_firefox'] = 'shortcuts: shift+alt+s submit/post or shift+alt+p preview';
-$txt['shortcuts_drafts_firefox'] = 'shortcuts: shift+alt+s submit/post, shift+alt+p preview or shift+alt+d save draft';
 $txt['option'] = 'Option';
 $txt['reset_votes'] = 'Reset vote count';
 $txt['reset_votes_check'] = 'Check this if you want to reset all vote counts to 0.';
@@ -49,7 +44,6 @@ $txt['cant_upload_type'] = 'You cannot upload that type of file. The only allowe
 $txt['uncheck_unwatchd_attach'] = 'Uncheck the attachments you no longer want attached';
 $txt['restricted_filename'] = 'That is a restricted filename. Please try a different filename.';
 $txt['topic_locked_no_reply'] = 'Warning! This topic is currently/will be locked<br />Only admins and moderators can reply.';
-$txt['awaiting_approval'] = 'Awaiting approval';
 $txt['attachment_requires_approval'] = 'Note that any files attached will not be displayed until approved by a moderator.';
 $txt['error_temp_attachments'] = 'There are attachments found, which you have attached before but not posted. These attachments are now attached to this post. If you do not want to include them in this post, <a href="#postAttachment">you can remove them here</a>.';
 // Use numeric entities in the below string.
