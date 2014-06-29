@@ -51,8 +51,6 @@ $txt['2co_password'] = '2checkout.com Secret Word';
 $txt['2co_password_desc'] = 'Your 2checkout secret word.';
 $txt['2co_password_wrong'] = 'Your 2checkout secret word was not accepted.';
 
-$txt['nochex_email'] = 'Nochex email address';
-$txt['nochex_email_desc'] = 'Email of a merchant account at Nochex. Leave blank if you are not using Nochex';
 $txt['paid_settings_save'] = 'Save';
 
 $txt['paid_note'] = '<strong class="alert">Note:</strong><br />For subscriptions to be automatically updated for your users, you
@@ -143,7 +141,6 @@ $txt['start_date'] = 'Start Date';
 $txt['end_date'] = 'End Date';
 $txt['start_date_and_time'] = 'Start Date and Time';
 $txt['end_date_and_time'] = 'End Date and Time';
-$txt['edit'] = 'EDIT';
 $txt['one_username'] = 'Please enter one username only.';
 $txt['minute'] = 'Minute';
 $txt['error_member_not_found'] = 'The member entered could not be found';
@@ -156,12 +153,6 @@ $txt['paid_confirm_desc'] = 'To continue through to payment please check the det
 $txt['paypal'] = 'PayPal';
 $txt['paid_confirm_paypal'] = 'To pay using <a href="http://www.paypal.com">PayPal</a> please click the button below. You will be directed to the PayPal site for payment.';
 $txt['paid_paypal_order'] = 'Order with PayPal';
-$txt['worldpay'] = 'WorldPay';
-$txt['paid_confirm_worldpay'] = 'To pay using <a href="http://www.worldpay.com">WorldPay</a> please click the button below. You will be directed to the WorldPay site for payment.';
-$txt['paid_worldpay_order'] = 'Order with WorldPay';
-$txt['nochex'] = 'Nochex';
-$txt['paid_confirm_nochex'] = 'To pay using <a href="http://www.nochex.com">Nochex</a> please click the button below. You will be directed to the Nochex site for payment.';
-$txt['paid_nochex_order'] = 'Order with Nochex';
 $txt['authorize'] = 'Authorize.Net';
 $txt['paid_confirm_authorize'] = 'To pay using <a href="http://www.authorize.net">Authorize.Net</a> please click the button below. You will be directed to the Authorize.Net site for payment.';
 $txt['paid_authorize_order'] = 'Order with Authorize.Net';
