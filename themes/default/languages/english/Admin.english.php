@@ -109,9 +109,7 @@ $txt['attachmentdir_size_not_set'] = 'No maximum directory size is currently set
 $txt['attachmentdir_files_not_set'] = 'No directory file limit is currently set';
 $txt['attachment_delete_admin'] = '[attachment deleted by admin]';
 $txt['live'] = 'Latest Software Updates';
-$txt['try_searching'] = 'Don\'t you know where a setting is? Try searching the admin area!';
 $txt['remove_all'] = 'Clear Log';
-$txt['approve_new_members'] = 'Admin must approve all new members';
 $txt['agreement_not_writable'] = 'Warning - agreement.txt is not writable, any changes you make will NOT be saved.';
 
 $txt['version_check_desc'] = 'This shows you the versions of your installation\'s files versus those of the latest version. If any of these files are out of date, you should download and upgrade to the latest version at our <a href="https://github.com/elkarte/Elkarte/wiki/downloads" target="_blank" class="new_win">ElkArte Site</a>.';
@@ -130,12 +128,6 @@ $txt['theme_admin_info'] = 'Install new themes, select themes that are available
 $txt['registration_center'] = 'Registration';
 $txt['member_center_info'] = 'View the member list, search for members, or manage account approvals and activations.';
 
-$txt['viewmembers_name'] = 'Username (display name)';
-$txt['viewmembers_online'] = 'Last Online';
-$txt['viewmembers_today'] = 'Today';
-$txt['viewmembers_day_ago'] = 'day ago';
-$txt['viewmembers_days_ago'] = 'days ago';
-
 $txt['display_name'] = 'Display name';
 $txt['email_address'] = 'Email Address';
 $txt['ip_address'] = 'IP address';
@@ -147,7 +139,6 @@ Referer: %1$s
 User agent: %2$s
 IP: %3$s';
 
-$txt['email_preview_warning'] = 'The preview is not 100% accurate. In order to preserve the functionality of the page only the basic html tags are represented';
 $txt['email_as_html'] = 'Send in HTML format.  (with this you can put normal HTML in the email.)';
 $txt['email_parsed_html'] = 'Add &lt;br /&gt;s and &amp;nbsp;s to this message.';
 $txt['email_variables'] = 'In this message you can use a few &quot;variables&quot;.<a href="{help_emailmembers}" class="help"> Click here for more information</a>.';
@@ -316,7 +307,6 @@ $txt['support_credits_info'] = 'Support links for most common issues, the releva
 $txt['support_title'] = 'Support Information';
 $txt['support_versions_current'] = 'Current version';
 $txt['support_versions_forum'] = 'This version';
-$txt['support_versions_php'] = 'PHP version';
 $txt['support_versions_db'] = '%1$s version';
 $txt['support_versions_server'] = 'Server version';
 $txt['support_versions_gd'] = 'GD version';
