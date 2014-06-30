@@ -1885,7 +1885,7 @@ function updateSettingsFile($vars)
 	for ($i = 0, $n = count($settingsArray); $i < $n; $i++)
 	{
 		// Remove the redirect...
-		if (trim($settingsArray[$i]) == 'if (file_exists(dirname(__FILE__) . \'/install/install.php\'))' && trim($settingsArray[$i + 1]) == '{' && trim($settingsArray[$i + 4]) == '}')
+		if (trim($settingsArray[$i]) == 'if (file_exists(dirname(__FILE__) . \'/install/install.php\'))' && trim($settingsArray[$i + 1]) == '{' && trim($settingsArray[$i + 7]) == '}')
 		{
 			// Get the four lines to nothing.
 			$settingsArray[$i] = '';
