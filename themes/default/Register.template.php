@@ -213,7 +213,7 @@ function template_registration_form()
 			{
 				echo '
 						<dt>
-							<strong', !empty($field['is_error']) ? ' style="color: red;"' : '', '>', $field['name'], ':</strong>
+							<strong', !empty($field['is_error']) ? ' class="error"' : '', '>', $field['name'], ':</strong>
 							<span class="smalltext">', $field['desc'], '</span>
 						</dt>
 						<dd>', preg_replace_callback('~<(input|select|textarea) ~', create_function('$matches', '
@@ -261,7 +261,7 @@ function template_registration_form()
 			{
 				echo '
 						<dt>
-							<strong', !empty($field['is_error']) ? ' style="color: red;"' : '', '>', $field['label'], ':</strong>';
+							<strong', !empty($field['is_error']) ? ' class="error"' : '', '>', $field['label'], ':</strong>';
 
 				// Does it have any subtext to show?
 				if (!empty($field['subtext']))
@@ -339,7 +339,7 @@ function template_registration_form()
 			if ($field['show_reg'] < 2)
 				echo '
 						<dt>
-							<strong', !empty($field['is_error']) ? ' style="color: red;"' : '', '>', $field['name'], ':</strong>
+							<strong', !empty($field['is_error']) ? ' class="error"' : '', '>', $field['name'], ':</strong>
 							<span class="smalltext">', $field['desc'], '</span>
 						</dt>
 						<dd>', $field['input_html'], '</dd>';
@@ -756,7 +756,7 @@ function template_edit_reserved_words()
 					</dd>
 				</dl>
 				<div class="submitbutton" >
-					<input type="submit" value="', $txt['save'], '" name="save_reserved_names" tabindex="', $context['tabindex']++, '" style="margin: 1ex;" class="button_submit" />
+					<input type="submit" value="', $txt['save'], '" name="save_reserved_names" tabindex="', $context['tabindex']++, '" class="button_submit" />
 					<input type="hidden" name="sa" value="reservednames" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['admin-regr_token_var'], '" value="', $context['admin-regr_token'], '" />
@@ -811,7 +811,7 @@ function template_contact_form()
 				</dl>
 				<hr />
 				<div class="submitbutton" >
-					<input type="submit" value="', $txt['sendtopic_send'], '" name="send" tabindex="', $context['tabindex']++, '" style="margin: 1ex;" class="button_submit" />
+					<input type="submit" value="', $txt['sendtopic_send'], '" name="send" tabindex="', $context['tabindex']++, '" class="button_submit" />
 					<input type="hidden" name="sa" value="reservednames" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['contact_token_var'], '" value="', $context['contact_token'], '" />
