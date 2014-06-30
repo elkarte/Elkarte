@@ -727,6 +727,12 @@ dl.settings dd.large_caption {
 .ban_settings {
 	width: 46%;
 }
+.ban_text {
+	min-height: 64px;
+	max-height: 64px;
+	min-width: 50%;
+	max-width: 99%;
+}
 #manage_bans dl {
 	margin-bottom: 1em;
 }
