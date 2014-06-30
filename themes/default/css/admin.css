@@ -582,7 +582,7 @@ dl.settings dd.questions input {
 #manage_boards dl {
 	padding: 8px 6px 0 6px;
 }
-#manage_boards dl textarea, #manage_boards dl table{
+#manage_boards dl textarea, #manage_boards dl table {
 	margin: 0 0 8px 0;
 }
 #manage_boards .post_group, #manage_boards .regular_members {
@@ -846,6 +846,7 @@ dl.themes_list dd {
 }
 #agreement, #reserved {
 	width: 99%;
+	padding: 0 .25em;
 }
 
 /* Styles for the moderation center.
