@@ -965,6 +965,7 @@ class Register_Controller extends Action_Controller
 		else
 		{
 			$context['sub_template'] = 'contact_form';
+			$context['page_title'] = $txt['admin_contact_form'];
 
 			require_once(SUBSDIR . '/VerificationControls.class.php');
 			$verificationOptions = array(
