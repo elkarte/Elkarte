@@ -119,9 +119,12 @@ function template_registration_form()
 			<h2 class="category_header">', $txt['registration_form'], '</h2>
 			<h3 class="category_header">', $txt['required_info'], '</h3>
 			<div class="windowbg2">
+				<input type="password" name="autofill_honey_pot" style="display:none" />
 				<fieldset class="content">
 					<dl class="register_form">
-						<dt><strong><label for="elk_autov_username">', $txt['username'], ':</label></strong></dt>
+						<dt>
+							<strong><label for="elk_autov_username">', $txt['username'], ':</label></strong>
+						</dt>
 						<dd>
 							<input type="text" name="user" id="elk_autov_username" size="30" tabindex="', $context['tabindex']++, '" maxlength="25" value="', isset($context['username']) ? $context['username'] : '', '" class="input_text" placeholder="', $txt['username'], '" required="required" autofocus="autofocus" />
 							<span id="elk_autov_username_div" style="display: none;">
@@ -130,11 +133,15 @@ function template_registration_form()
 								</a>
 							</span>
 						</dd>
-						<dt><strong><label for="elk_autov_reserve1">', $txt['user_email_address'], ':</label></strong></dt>
+						<dt>
+							<strong><label for="elk_autov_reserve1">', $txt['user_email_address'], ':</label></strong>
+						</dt>
 						<dd>
 							<input type="email" name="email" id="elk_autov_reserve1" size="30" tabindex="', $context['tabindex']++, '" value="', isset($context['email']) ? $context['email'] : '', '" class="input_text" placeholder="', $txt['user_email_address'], '" required="required" />
 						</dd>
-						<dt><strong><label for="allow_email">', $txt['allow_user_email'], ':</label></strong></dt>
+						<dt>
+							<strong><label for="allow_email">', $txt['allow_user_email'], ':</label></strong>
+						</dt>
 						<dd>
 							<input type="checkbox" name="allow_email" id="allow_email" tabindex="', $context['tabindex']++, '" class="input_check" />
 						</dd>
