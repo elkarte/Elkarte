@@ -1560,6 +1560,7 @@ dl.settings dt a img {
 }
 dl.settings textarea {
 	width: 85%;
+	padding: 0 0.5em;
 }
 dl.settings label {
 	vertical-align: top;
