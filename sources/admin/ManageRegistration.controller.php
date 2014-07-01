@@ -245,12 +245,13 @@ class ManageRegistration_Controller extends Action_Controller
 			fwrite($fp, str_replace("\r", '', $_POST['agreement']));
 			fclose($fp);
 
-			updateSettings(array('requireAgreement' => !empty($_POST['requireAgreement'])));
+			updateSettings(array('requireAgreement' => !empty($_POST['requireAgreement']), 'checkboxAgreement' => !empty($_POST['checkboxAgreement'])));
 		}
 
 		$context['agreement'] = file_exists(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt') ? htmlspecialchars(file_get_contents(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt'), ENT_COMPAT, 'UTF-8') : '';
 		$context['warning'] = is_writable(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt') ? '' : $txt['agreement_not_writable'];
 		$context['require_agreement'] = !empty($modSettings['requireAgreement']);
+		$context['checkbox_agreement'] = !empty($modSettings['checkboxAgreement']);
 
 		$context['sub_template'] = 'edit_agreement';
 		$context['page_title'] = $txt['registration_agreement'];

@@ -32,6 +32,7 @@ $txt['warning'] = 'Warning!';
 $txt['only_members_can_access'] = 'Only registered members are allowed to access this section.';
 $txt['login_below'] = 'Please login below.';
 $txt['login_below_or_register'] = 'Please login below or <a href="%1$s">register an account</a> with %2$s';
+$txt['checkbox_agreement'] = 'I accept the registration agreement';
 
 // Use numeric entities in the below two strings.
 $txt['may_change_in_profile'] = 'You may change it after you login by going to the profile page, or by visiting this page after you login:';

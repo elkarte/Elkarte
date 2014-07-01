@@ -3849,6 +3849,13 @@ dl.no_members {
 	padding: 4px;
 	width: 32ex;
 }
+#agreement_box {
+	overflow-y: scroll;
+	height: 180px;
+	padding: 8px;
+	text-align: justify;
+	border: 1px solid;
+}
 
 /* Styles for maintenance mode. */
 #maintenance_mode {
