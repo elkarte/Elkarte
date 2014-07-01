@@ -3855,6 +3855,7 @@ dl.no_members {
 	padding: 8px;
 	text-align: justify;
 	border: 1px solid;
+	margin-bottom: 2em;
 }
 
 /* Styles for maintenance mode. */
