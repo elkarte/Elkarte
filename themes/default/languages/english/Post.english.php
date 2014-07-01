@@ -3,8 +3,6 @@
 
 $txt['post_reply'] = 'Post reply';
 $txt['post_in_board'] = 'Post in the board';
-$txt['subject_not_filled'] = 'The subject field was not filled out. It is required.';
-$txt['message_body_not_filled'] = 'The message body was not filled out. It is required.';
 
 // Escape any single quotes in here twice.. 'it\'s' -> 'it\\\'s'.
 $txt['bbc_quote'] = 'Insert Quote';
