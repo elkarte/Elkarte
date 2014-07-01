@@ -277,6 +277,10 @@ class Register_Controller extends Action_Controller
 		if (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 3)
 			fatal_lang_error('registration_disabled', false);
 
+		// If we're using an agreement checkbox, did they check it?
+		if ($_POST['checkbox_agreement'])
+			$_SESSION['registration_agreed'] = true;
+
 		// Things we don't do for people who have already confirmed their OpenID allegances via register.
 		if (!$verifiedOpenID)
 		{

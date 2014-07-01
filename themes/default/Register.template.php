@@ -368,7 +368,7 @@ function template_registration_form()
 						', $context['agreement'], '
 					</div><br /><br />
 					<label for="checkbox_agreement">
-						<input type="checkbox" name="checkbox_agreement" id="checkbox_agreement" value="1" tabindex="', $context['tabindex']++, '" class="input_check" />
+						<input type="checkbox" name="checkbox_agreement" id="checkbox_agreement" value="1"', ($context['registration_passed_agreement'] ? ' checked="checked"' : ''), ' tabindex="', $context['tabindex']++, '" class="input_check" />
 						', $txt['checkbox_agreement'], '
 					</label>
 				</fieldset>
