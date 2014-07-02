@@ -23,57 +23,8 @@ define('REQUIRED_PHP_VERSION', '5.2.0');
 // ><html dir="ltr"><head><title>Error!</title></head><body>Sorry, this installer requires PHP!<div style="display: none;">
 
 // Database info.
-$databases = array(
-	'mysql' => array(
-		'name' => 'MySQL',
-		'extension' => 'MySQL Improved (MySQLi)',
-		'version' => '5.0.19',
-		'version_check' => 'return min(mysqli_get_server_info($db_connection), mysqli_get_client_info($db_connection));',
-		'supported' => function_exists('mysqli_connect'),
-		'additional_file' => '',
-		'default_user' => 'mysqli.default_user',
-		'default_password' => 'mysqli.default_password',
-		'default_host' => 'mysqli.default_host',
-		'default_port' => 'mysqli.default_port',
-		'utf8_support' => true,
-		'utf8_version' => '4.1.0',
-		'utf8_version_check' => 'return mysqli_get_server_info($db_connection);',
-		'alter_support' => true,
-		'validate_prefix' => function (&$value) {
-			$value = preg_replace('~[^A-Za-z0-9_\$]~', '', $value);
-			return true;
-		},
-		'require_db_confirm' => true,
-	),
-	'postgresql' => array(
-		'name' => 'PostgreSQL',
-		'extension' => 'PostgreSQL (PgSQL)',
-		'version' => '8.3',
-		'function_check' => 'pg_connect',
-		'version_check' => '$request = pg_query(\'SELECT version()\'); list ($version) = pg_fetch_row($request); list ($pgl, $version) = explode(" ", $version); return $version;',
-		'supported' => function_exists('pg_connect'),
-		'additional_file' => 'install_' . DB_SCRIPT_VERSION . '_postgresql.sql',
-		'utf8_support' => true,
-		'utf8_version' => '8.0',
-		'utf8_version_check' => '$request = pg_query(\'SELECT version()\'); list ($version) = pg_fetch_row($request); list ($pgl, $version) = explode(" ", $version); return $version;',
-		'validate_prefix' => function (&$value) {
-			global $txt;
-
-			$value = preg_replace('~[^A-Za-z0-9_\$]~', '', $value);
-
-			// Is it reserved?
-			if ($value == 'pg_')
-				return $txt['error_db_prefix_reserved'];
-
-			// Is the prefix numeric?
-			if (preg_match('~^\d~', $value))
-				return $txt['error_db_prefix_numeric'];
-
-			return true;
-		},
-		'require_db_confirm' => true,
-	),
-);
+$databases = array();
+load_possible_databases();
 
 // Initialize everything and load the language files.
 initialize_inputs();
@@ -126,6 +77,20 @@ foreach ($incontext['steps'] as $num => $step)
 
 // Actually do the template stuff.
 installExit();
+
+/**
+ * Grabs all the files with db definitions and loads them.
+ * That's the easy way, in the future we can make it as complex as possible. :P
+ */
+function load_possible_databases()
+{
+	global $databases;
+
+	$files = glob(dirname(__FILE__) . '/Db-check-*.php');
+
+	foreach ($files as $file)
+		require_once($file);
+}
 
 /**
  * Initialization step. Called at each request.
