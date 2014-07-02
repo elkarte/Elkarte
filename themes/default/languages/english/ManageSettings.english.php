@@ -132,8 +132,7 @@ $txt['caching_information'] = 'ElkArte supports caching through the use of accel
 	<li>XCache</li>
 </ul>
 Caching will work best if you have PHP compiled with one of the above optimizers, or have memcache available. If you do not have any optimizer installed file based caching will be used.';
-$txt['detected_no_caching'] = '<strong class="alert">Unable to detect a compatible accelerator on your server.  File based caching can be used instead.</strong>';
-$txt['detected_accelerators'] = '<strong class="success">The following accelerators have been detected: %1$s</strong>';
+$txt['detected_accelerators'] = 'The following accelerators have been detected: <strong class="success">%1$s</strong>';
 
 $txt['cache_enable'] = 'Caching Level';
 $txt['cache_off'] = 'No caching';

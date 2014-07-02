@@ -117,6 +117,7 @@ class Register_Controller extends Action_Controller
 		$context['sub_template'] = $current_step == 1 ? 'registration_agreement' : 'registration_form';
 		$context['page_title'] = $current_step == 1 ? $txt['registration_agreement'] : $txt['registration_form'];
 		loadJavascriptFile('register.js');
+		addInlineJavascript('disableAutoComplete();', true);
 
 		// Add the register chain to the link tree.
 		$context['linktree'][] = array(
@@ -969,6 +970,7 @@ class Register_Controller extends Action_Controller
 		else
 		{
 			$context['sub_template'] = 'contact_form';
+			$context['page_title'] = $txt['admin_contact_form'];
 
 			require_once(SUBSDIR . '/VerificationControls.class.php');
 			$verificationOptions = array(

@@ -53,13 +53,14 @@ class Attachment_Controller extends Action_Controller
 
 	/**
 	 * Function to upload attachements via ajax calls
-	 * Currently called by drag drop attachment functionality
-	 * Pass the form data with session vars
-	 * responds back with errors or file data
+	 *
+	 * - Currently called by drag drop attachment functionality
+	 * - Pass the form data with session vars
+	 * - Responds back with errors or file data
 	 */
 	public function action_ulattach()
 	{
-		global $context, $modSettings;
+		global $context, $modSettings, $txt;
 
 		$resp_data = array();
 		loadLanguage('Errors');

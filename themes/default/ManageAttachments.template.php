@@ -118,7 +118,9 @@ function template_maintenance()
 				<form action="', $scripturl, '?action=admin;area=manageattachments;sa=transfer" method="post" accept-charset="UTF-8">
 					<p class="infobox">', $txt['attachment_transfer_desc'], '</p>
 					<dl class="settings">
-						<dt><label for="from">', $txt['attachment_transfer_from'], '</label></dt>
+						<dt>
+							<label for="from">', $txt['attachment_transfer_from'], '</label>
+						</dt>
 						<dd>
 							<select id="from" name="from">
 								<option value="0">', $txt['attachment_transfer_select'], '</option>';
@@ -130,7 +132,9 @@ function template_maintenance()
 	echo '
 							</select>
 						</dd>
-						<dt><label for="auto">', $txt['attachment_transfer_auto'], '</label></dt>
+						<dt>
+							<label for="auto">', $txt['attachment_transfer_auto'], '</label>
+						</dt>
 						<dd>
 							<select id="auto" name="auto" onchange="transferAttachOptions();">
 								<option value="0">', $txt['attachment_transfer_auto_select'], '</option>
@@ -147,7 +151,9 @@ function template_maintenance()
 	echo '
 							</select>
 						</dd>
-						<dt><label for="to">', $txt['attachment_transfer_to'], '</label></dt>
+						<dt>
+							<label for="to">', $txt['attachment_transfer_to'], '</label>
+						</dt>
 						<dd>
 							<select id="to" name="to" onchange="transferAttachOptions();" >
 								<option value="0">', $txt['attachment_transfer_select'], '</option>';
@@ -163,8 +169,14 @@ function template_maintenance()
 	// If there are directory limits to impose, give the option to enforce it
 	if (!empty($modSettings['attachmentDirFileLimit']))
 		echo '
-						<dt><a href="' . $scripturl . '?action=quickhelp;help=attachment_transfer_empty" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" class="icon" alt="' . $txt['help'] . '" /></a>', $txt['attachment_transfer_empty'], '</a></dt>
-						<dd><input type="checkbox" name="empty_it"', $context['checked'] ? ' checked="checked"' : '', ' /></dd>';
+						<dt>
+							<a href="' . $scripturl . '?action=quickhelp;help=attachment_transfer_empty" onclick="return reqOverlayDiv(this.href);" class="help">
+								<img src="' . $settings['images_url'] . '/helptopics.png" class="icon_fixed" alt="' . $txt['help'] . '" />
+							</a>', $txt['attachment_transfer_empty'], '</a>
+						</dt>
+						<dd>
+							<input type="checkbox" name="empty_it"', $context['checked'] ? ' checked="checked"' : '', ' />
+						</dd>';
 
 	echo '
 					</dl>

@@ -119,9 +119,12 @@ function template_registration_form()
 			<h2 class="category_header">', $txt['registration_form'], '</h2>
 			<h3 class="category_header">', $txt['required_info'], '</h3>
 			<div class="windowbg2">
+				<input type="password" name="autofill_honey_pot" style="display:none" />
 				<fieldset class="content">
 					<dl class="register_form">
-						<dt><strong><label for="elk_autov_username">', $txt['username'], ':</label></strong></dt>
+						<dt>
+							<strong><label for="elk_autov_username">', $txt['username'], ':</label></strong>
+						</dt>
 						<dd>
 							<input type="text" name="user" id="elk_autov_username" size="30" tabindex="', $context['tabindex']++, '" maxlength="25" value="', isset($context['username']) ? $context['username'] : '', '" class="input_text" placeholder="', $txt['username'], '" required="required" autofocus="autofocus" />
 							<span id="elk_autov_username_div" style="display: none;">
@@ -130,11 +133,15 @@ function template_registration_form()
 								</a>
 							</span>
 						</dd>
-						<dt><strong><label for="elk_autov_reserve1">', $txt['user_email_address'], ':</label></strong></dt>
+						<dt>
+							<strong><label for="elk_autov_reserve1">', $txt['user_email_address'], ':</label></strong>
+						</dt>
 						<dd>
 							<input type="email" name="email" id="elk_autov_reserve1" size="30" tabindex="', $context['tabindex']++, '" value="', isset($context['email']) ? $context['email'] : '', '" class="input_text" placeholder="', $txt['user_email_address'], '" required="required" />
 						</dd>
-						<dt><strong><label for="allow_email">', $txt['allow_user_email'], ':</label></strong></dt>
+						<dt>
+							<strong><label for="allow_email">', $txt['allow_user_email'], ':</label></strong>
+						</dt>
 						<dd>
 							<input type="checkbox" name="allow_email" id="allow_email" tabindex="', $context['tabindex']++, '" class="input_check" />
 						</dd>
@@ -206,7 +213,7 @@ function template_registration_form()
 			{
 				echo '
 						<dt>
-							<strong', !empty($field['is_error']) ? ' style="color: red;"' : '', '>', $field['name'], ':</strong>
+							<strong', !empty($field['is_error']) ? ' class="error"' : '', '>', $field['name'], ':</strong>
 							<span class="smalltext">', $field['desc'], '</span>
 						</dt>
 						<dd>', preg_replace_callback('~<(input|select|textarea) ~', create_function('$matches', '
@@ -254,7 +261,7 @@ function template_registration_form()
 			{
 				echo '
 						<dt>
-							<strong', !empty($field['is_error']) ? ' style="color: red;"' : '', '>', $field['label'], ':</strong>';
+							<strong', !empty($field['is_error']) ? ' class="error"' : '', '>', $field['label'], ':</strong>';
 
 				// Does it have any subtext to show?
 				if (!empty($field['subtext']))
@@ -332,7 +339,7 @@ function template_registration_form()
 			if ($field['show_reg'] < 2)
 				echo '
 						<dt>
-							<strong', !empty($field['is_error']) ? ' style="color: red;"' : '', '>', $field['name'], ':</strong>
+							<strong', !empty($field['is_error']) ? ' class="error"' : '', '>', $field['name'], ':</strong>
 							<span class="smalltext">', $field['desc'], '</span>
 						</dt>
 						<dd>', $field['input_html'], '</dd>';
@@ -767,7 +774,7 @@ function template_edit_reserved_words()
 					</dd>
 				</dl>
 				<div class="submitbutton" >
-					<input type="submit" value="', $txt['save'], '" name="save_reserved_names" tabindex="', $context['tabindex']++, '" style="margin: 1ex;" class="button_submit" />
+					<input type="submit" value="', $txt['save'], '" name="save_reserved_names" tabindex="', $context['tabindex']++, '" class="button_submit" />
 					<input type="hidden" name="sa" value="reservednames" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['admin-regr_token_var'], '" value="', $context['admin-regr_token'], '" />
@@ -822,7 +829,7 @@ function template_contact_form()
 				</dl>
 				<hr />
 				<div class="submitbutton" >
-					<input type="submit" value="', $txt['sendtopic_send'], '" name="send" tabindex="', $context['tabindex']++, '" style="margin: 1ex;" class="button_submit" />
+					<input type="submit" value="', $txt['sendtopic_send'], '" name="send" tabindex="', $context['tabindex']++, '" class="button_submit" />
 					<input type="hidden" name="sa" value="reservednames" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['contact_token_var'], '" value="', $context['contact_token'], '" />
