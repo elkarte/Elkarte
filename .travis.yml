@@ -14,6 +14,7 @@ before_script:
   - mv ./Settings.sample.php ./Settings.php
   - mv ./Settings_bak.sample.php ./Settings_bak.php
   - mv ./db_last_error.sample.txt ./db_last_error.txt
+  - rm -rf ./install
   # Packages installation
   - sudo apt-get update
   - sudo apt-get install -y --force-yes apache2 libapache2-mod-php5 php5-mysql php5-sqlite php5-pgsql
