@@ -46,6 +46,7 @@ $txt['admin_maintenance'] = 'Maintenance';
 $txt['admin_image_text'] = 'Show buttons as images instead of text';
 $txt['admin_credits'] = 'Credits';
 $txt['admin_agreement'] = 'Show and require agreement letter when registering';
+$txt['admin_checkbox_agreement'] = 'Show a checkbox for the agreement in registration form instead of a full page';
 $txt['admin_agreement_default'] = 'Default';
 $txt['admin_agreement_select_language'] = 'Language to edit';
 $txt['admin_agreement_select_language_change'] = 'Change';

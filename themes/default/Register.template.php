@@ -359,11 +359,27 @@ function template_registration_form()
 			</div>');
 	}
 
+	if ($context['checkbox_agreement'] && $context['require_agreement'])
+	{
+		echo '
+			<div class="windowbg2">
+				<fieldset class="content">
+					<div id="agreement_box">
+						', $context['agreement'], '
+					</div>
+					<label for="checkbox_agreement">
+						<input type="checkbox" name="checkbox_agreement" id="checkbox_agreement" value="1"', ($context['registration_passed_agreement'] ? ' checked="checked"' : ''), ' tabindex="', $context['tabindex']++, '" class="input_check" />
+						', $txt['checkbox_agreement'], '
+					</label>
+				</fieldset>
+			</div>';
+	}
+
 	echo '
 			<div id="confirm_buttons" class="flow_auto">';
 
 	// Age restriction in effect?
-	if (!$context['require_agreement'] && $context['show_coppa'])
+	if ((!$context['require_agreement'] || $context['checkbox_agreement']) && $context['show_coppa'])
 		echo '
 				<input type="submit" name="accept_agreement" value="', $context['coppa_agree_above'], '" class="right_submit" /><br /><br />
 				<input type="submit" name="accept_agreement_coppa" value="', $context['coppa_agree_below'], '" class="right_submit" />';
@@ -694,6 +710,8 @@ function template_edit_agreement()
 					</p>
 					<p>
 						<label for="requireAgreement"><input type="checkbox" name="requireAgreement" id="requireAgreement"', $context['require_agreement'] ? ' checked="checked"' : '', ' tabindex="', $context['tabindex']++, '" value="1" class="input_check" /> ', $txt['admin_agreement'], '.</label>
+						<br />
+						<label for="checkboxAgreement"><input type="checkbox" name="checkboxAgreement" id="checkboxAgreement"', $context['checkbox_agreement'] ? ' checked="checked"' : '', ' tabindex="', $context['tabindex']++, '" value="1" class="input_check" /> ', $txt['admin_checkbox_agreement'], '.</label>
 					</p>
 					<div class="submitbutton" >
 						<input type="submit" value="', $txt['save'], '" tabindex="', $context['tabindex']++, '" class="button_submit" />
