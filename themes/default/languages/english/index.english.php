@@ -31,11 +31,6 @@ $txt['months_short'] = array(1 => 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul
 $txt['time_am'] = 'am';
 $txt['time_pm'] = 'pm';
 
-$txt['newmessages0'] = 'is new'; //Deprecated
-$txt['newmessages1'] = 'are new'; //Deprecated
-$txt['newmessages3'] = 'New'; //Deprecated
-$txt['newmessages4'] = ','; //Deprecated
-
 // Let's get all the main menu strings in one place.
 $txt['home'] = 'Home';
 $txt['community'] = 'Community';
@@ -182,7 +177,6 @@ $txt['users_active'] = 'Active in past %1$d minutes';
 $txt['personal_messages'] = 'Personal Messages';
 $txt['reply_quote'] = 'Reply with quote';
 $txt['reply'] = 'Reply';
-$txt['reply_noun'] = 'Reply';
 $txt['reply_number'] = 'Reply #%1$s';
 $txt['approve'] = 'Approve';
 $txt['unapprove'] = 'Unapprove';
@@ -193,8 +187,6 @@ $txt['post_awaiting_approval'] = 'Note: This message is awaiting approval by a m
 $txt['there_are_unapproved_topics'] = 'There are %1$s topics and %2$s posts awaiting approval in this board. <a href="%3$s">Click here to view them</a>.';
 $txt['send_message'] = 'Send message';
 
-$txt['msg_alert_you_have'] = 'you have'; //Deprecated
-$txt['msg_alert_messages'] = 'messages'; //Deprecated
 $txt['msg_alert_no_messages'] = 'you don\'t have any message';
 $txt['msg_alert_one_message'] = 'you have <a href="%1$s">1 message</a>';
 $txt['msg_alert_many_message'] = 'you have <a href="%1$s">%2$d messages</a>';
@@ -231,7 +223,6 @@ $txt['topic_started'] = 'Topic started by';
 $txt['title'] = 'Title';
 $txt['post_by'] = 'Post by';
 $txt['memberlist_searchable'] = 'Searchable list of all registered members.';
-$txt['welcome_member'] = 'Please welcome'; //Deprecated
 $txt['welcome_newest_member'] = 'Please welcome %1$s, our newest member.';
 $txt['admin_center'] = 'Administration Center';
 $txt['admin_session_active'] = 'You have an active admin session in place. We recommend to <strong><a class="strong" href="%1$s">end this session</a></strong> once you have finished your administrative tasks.';
@@ -239,7 +230,6 @@ $txt['admin_maintenance_active'] = 'Your forum is currently in maintenance mode,
 $txt['query_command_denied'] = 'The following MySQL errors are occurring, please verify your setup:';
 $txt['query_command_denied_guests'] = 'It seems something has gone sour on the forum with the database. This problem should only be temporary, so please come back later and try again.  If you continue to see this message, please report the following message to the administrator:';
 $txt['query_command_denied_guests_msg'] = 'the command %1$s is denied on the database';
-$txt['last_edit'] = 'Last Edit'; //Deprecated
 $txt['last_edit_by'] = '<span class="lastedit">Last Edit</span>: %1$s by %2$s';
 $txt['notify_deactivate'] = 'Would you like to deactivate notification on this topic?';
 
@@ -249,7 +239,6 @@ $txt['personal_text'] = 'Personal Text';
 $txt['date_registered'] = 'Date Registered';
 
 $txt['recent_view'] = 'View all recent posts.';
-$txt['recent_updated'] = 'is the most recently updated topic';
 $txt['is_recent_updated'] = '%1$s is the most recently updated topic';
 
 $txt['male'] = 'Male';
@@ -259,10 +248,6 @@ $txt['error_invalid_characters_username'] = 'Invalid character used in user name
 
 $txt['welcome_guest'] = 'Welcome, <strong>Guest</strong>. Please <a href="{login_url}">login</a>.';
 
-$txt['welcome_guest_register'] = 'Welcome to <strong>{forum_name}</strong>. Please <a href="{login_url}">login</a> or <a href="{register_url}">register</a>.';
-
-$txt['please_login'] = 'Please <a href="{login_url}">login</a>.';
-$txt['login_or_register'] = 'Please <a href="{login_url}">login</a> or <a href="{register_url}">register</a>.';
 $txt['welcome_guest_activate'] = '<br />Did you miss your <a href="{activate_url}">activation email</a>?';
 // @todo the following to sprintf
 $txt['hello_member'] = 'Hey,';
@@ -349,12 +334,9 @@ $txt['locked_topic'] = 'Locked Topic';
 $txt['normal_topic'] = 'Normal Topic';
 $txt['participation_caption'] = 'Topic you have posted in';
 
-$txt['go_caps'] = 'GO';
-
 $txt['print'] = 'Print';
 $txt['topic_summary'] = 'Topic Summary';
 $txt['not_applicable'] = 'N/A';
-$txt['message_lowercase'] = 'message'; //Deprecated
 $txt['name_in_use'] = 'The name %1$s is already in use by another member.';
 
 $txt['total_members'] = 'Total Members';
@@ -399,10 +381,7 @@ $txt['latest_member'] = 'Latest Member';
 $txt['total_cats'] = 'Total Categories';
 $txt['latest_post'] = 'Latest Post';
 
-$txt['you_have'] = 'You\'ve';
-$txt['click'] = 'Click';
 $txt['here'] = 'here';
-$txt['to_view'] = 'to view them.';
 $txt['you_have_no_msg'] = 'You don\'t have any message...';
 $txt['you_have_one_msg'] = 'You\'ve 1 message...<a href="%1$s">Click here to view it</a>';
 $txt['you_have_many_msgs'] = 'You\'ve %2$d messages...<a href="%1$s">Click here to view them</a>';
@@ -492,8 +471,6 @@ $txt['split'] = 'SPLIT';
 
 $txt['delete'] = 'Delete';
 
-$txt['your_pms'] = 'Your Personal Messages';
-
 $txt['kilobyte'] = 'KB';
 $txt['megabyte'] = 'MB';
 
@@ -528,9 +505,6 @@ $txt['agreement_missing'] = 'You are requiring new users to accept a registratio
 
 $txt['cache_writable'] = 'The cache directory is not writable - this will adversely affect the performance of your forum.';
 
-$txt['page_created'] = 'Page created in '; //Deprecated
-$txt['seconds_with'] = ' seconds with '; //Deprecated
-$txt['queries'] = ' queries.'; //Deprecated
 $txt['page_created_full'] = 'Page created in %1$.3f seconds with %2$d queries.';
 
 $txt['report_to_mod_func'] = 'Use this function to inform the moderators and administrators of an abusive or wrongly posted message.<br /><em>Please note that your email address will be revealed to the moderators if you use this.</em>';
@@ -638,7 +612,6 @@ $txt['mlist_search_name'] = 'Search by name';
 $txt['mlist_search_website'] = 'Search by website';
 $txt['mlist_search_results'] = 'Search results for';
 $txt['mlist_search_by'] = 'Search by %1$s';
-$txt['mlist_menu_view'] = 'View the memberlist';
 
 $txt['attach_downloaded'] = 'downloaded %1$d times';
 $txt['attach_viewed'] = 'viewed %1$d times';
@@ -709,11 +682,6 @@ $txt['who_viewing_topic'] = ' are viewing this topic.';
 $txt['who_viewing_board'] = ' are viewing this board.';
 $txt['who_member'] = 'Member';
 
-// No longer used by default theme, but for backwards compat
-$txt['powered_by_php'] = 'Powered by PHP';
-$txt['powered_by_mysql'] = 'Powered by MySQL';
-$txt['valid_css'] = 'Valid CSS';
-
 // Current footer strings
 $txt['valid_html'] = 'Valid HTML 5';
 $txt['rss'] = 'RSS';
@@ -753,7 +721,6 @@ $txt['smileys_forum_board_default'] = 'Forum/Board Default';
 $txt['search_results'] = 'Search Results';
 $txt['search_no_results'] = 'Sorry, no matches were found';
 
-$txt['totalTimeLogged1'] = 'Total time logged in: '; //Deprecated
 $txt['totalTimeLogged2'] = ' days, ';
 $txt['totalTimeLogged3'] = ' hours and ';
 $txt['totalTimeLogged4'] = ' minutes.';
@@ -782,10 +749,7 @@ $txt['find_no_results'] = 'No results found';
 $txt['find_results'] = 'Results';
 $txt['find_close'] = 'Close';
 
-$txt['unread_since_visit'] = 'Show unread posts since last visit.';
 $txt['show_unread_replies'] = 'Show new replies to your posts.';
-
-$txt['change_color'] = 'Change Color';
 
 $txt['quickmod_delete_selected'] = 'Remove Selected';
 $txt['quickmod_split_selected'] = 'Split Selected';
@@ -808,7 +772,6 @@ $txt['ssi_session_broken'] = 'SSI.php was unable to load a session!  This may ca
 // Escape any single quotes in here twice.. 'it\'s' -> 'it\\\'s'.
 $txt['preview_title'] = 'Preview post';
 $txt['preview_fetch'] = 'Fetching preview...';
-$txt['preview_new'] = 'New message';
 $txt['pm_error_while_submitting'] = 'The following error or errors occurred while sending this personal message:';
 $txt['warning_while_submitting'] = 'Something happened, review it here:';
 $txt['error_while_submitting'] = 'The message has the following error or errors that must be corrected before continuing:';
@@ -835,9 +798,6 @@ $txt['visual_verification_hidden'] = 'Please leave this box empty';
 $txt['visual_verification_description'] = 'Type the letters shown in the picture';
 $txt['visual_verification_sound'] = 'Listen to the letters';
 $txt['visual_verification_request_new'] = 'Request another image';
-
-// Sub menu labels
-$txt['calendar_menu'] = 'View Calendar';
 
 // @todo Send email strings - should move?
 $txt['send_email'] = 'Send email';
