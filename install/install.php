@@ -335,6 +335,12 @@ class Install_Controller
 				$incontext['warning'] = $txt['error_already_installed'];
 		}
 
+		// If there is no Settings.php then we need a new one that only the owner can provide
+		if (!file_exists(TMP_BOARDDIR . '/Settings.php'))
+		{
+			$incontext['warning'] = $txt['error_no_settings'];
+		}
+
 		// Is some database support even compiled in?
 		$incontext['supported_databases'] = array();
 		$db_missing = array();
@@ -393,6 +399,14 @@ class Install_Controller
 
 		$incontext['page_title'] = $txt['ftp_checking_writable'];
 		$incontext['sub_template'] = 'chmod_files';
+
+		// First thing (for convenience' sake) if they are not there yet,
+		// try to rename Settings and Settings_bak
+		foreach (array('Settings.php', 'Settings_bak.php') as $file)
+		{
+			if (!file_exists(TMP_BOARDDIR . '/' . $file))
+				rename (TMP_BOARDDIR. '/' . str_replace('.php', '.sample.php', $file), TMP_BOARDDIR . '/' . $file);
+		}
 
 		$writable_files = array(
 			'attachments',
