@@ -103,7 +103,7 @@ Class Elk_Testing_Setup
 		global $settings, $db_type;
 		global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
 		global $boardurl, $webmaster_email, $cookiename;
-		global $db_server, $db_name, $db_user, $db_prefix, $db_persist, $db_error_send, $db_last_error;
+		global $db_server, $db_name, $db_user, $db_prefix, $db_persist, $db_error_send;
 		global $modSettings, $context, $sc, $user_info, $topic, $board, $txt;
 		global $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd;
 		global $sourcedir, $boarddir;

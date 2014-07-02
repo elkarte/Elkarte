@@ -402,7 +402,7 @@ class Install_Controller
 
 		// First thing (for convenience' sake) if they are not there yet,
 		// try to rename Settings and Settings_bak and db_last_error
-		foreach (array('Settings.php', 'Settings_bak.php', 'db_last_error.php') as $file)
+		foreach (array('Settings.php', 'Settings_bak.php', 'db_last_error.txt') as $file)
 		{
 			if (!file_exists(TMP_BOARDDIR . '/' . $file))
 				rename (TMP_BOARDDIR. '/' . str_replace('.php', '.sample.php', $file), TMP_BOARDDIR . '/' . $file);
@@ -1956,7 +1956,7 @@ function updateSettingsFile($vars)
 function updateDbLastError()
 {
 	// Write out the db_last_error file with the error timestamp
-	file_put_contents(TMP_BOARDDIR . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = 0;');
+	file_put_contents(TMP_BOARDDIR . '/db_last_error.txt', '0');
 	return true;
 }
 

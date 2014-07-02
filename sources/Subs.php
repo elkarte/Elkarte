@@ -4285,3 +4285,17 @@ function request()
 {
 	return Request::instance();
 }
+
+/**
+ * Meant to replace any usage of $db_last_error.
+ * Reads the file db_last_error.txt, if a time() is present returns it,
+ * otherwise returns 0.
+ */
+function db_last_error()
+{
+	$time = trim(file_get_contents(BOARDDIR . '/db_last_error.txt'));
+	if (preg_match('~^\d{10}$~', $time) === 1)
+		return $time;
+	else
+		return 0;
+}

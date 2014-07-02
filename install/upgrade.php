@@ -1581,7 +1581,7 @@ function changeSettings($config_vars)
 function updateLastError()
 {
 	// Clear out the db_last_error file
-	file_put_contents(TMP_BOARDDIR . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = 0;');
+	file_put_contents(TMP_BOARDDIR . '/db_last_error.txt', '0');
 }
 
 /**

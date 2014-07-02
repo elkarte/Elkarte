@@ -397,7 +397,7 @@ class Database_MySQL extends Database_Abstract
 	public function error($db_string, $connection = null)
 	{
 		global $txt, $context, $webmaster_email, $modSettings;
-		global $db_last_error, $db_persist;
+		global $db_persist;
 		global $db_server, $db_user, $db_passwd, $db_name, $db_show_debug, $ssi_db_user, $ssi_db_passwd;
 
 		// Get the file and line numbers.
@@ -446,14 +446,15 @@ class Database_MySQL extends Database_Abstract
 		// Database error auto fixing ;).
 		if (function_exists('cache_get_data') && (!isset($modSettings['autoFixDatabase']) || $modSettings['autoFixDatabase'] == '1'))
 		{
+			$db_last_error = db_last_error();
 			// Force caching on, just for the error checking.
 			$old_cache = isset($modSettings['cache_enable']) ? $modSettings['cache_enable'] : null;
 			$modSettings['cache_enable'] = '1';
 
 			if (($temp = cache_get_data('db_last_error', 600)) !== null)
-				$db_last_error = max(@$db_last_error, $temp);
+				$db_last_error = max($db_last_error, $temp);
 
-			if (@$db_last_error < time() - 3600 * 24 * 3)
+			if ($db_last_error < time() - 3600 * 24 * 3)
 			{
 				// We know there's a problem... but what?  Try to auto detect.
 				if ($query_errno == 1030 && strpos($query_error, ' 127 ') !== false)
