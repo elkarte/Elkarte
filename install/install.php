@@ -401,8 +401,8 @@ class Install_Controller
 		$incontext['sub_template'] = 'chmod_files';
 
 		// First thing (for convenience' sake) if they are not there yet,
-		// try to rename Settings and Settings_bak
-		foreach (array('Settings.php', 'Settings_bak.php') as $file)
+		// try to rename Settings and Settings_bak and db_last_error
+		foreach (array('Settings.php', 'Settings_bak.php', 'db_last_error.php') as $file)
 		{
 			if (!file_exists(TMP_BOARDDIR . '/' . $file))
 				rename (TMP_BOARDDIR. '/' . str_replace('.php', '.sample.php', $file), TMP_BOARDDIR . '/' . $file);
