@@ -329,9 +329,7 @@ $txt['permitgroups_restrict'] = 'Restrictive';
 $txt['permitgroups_standard'] = 'Standard';
 $txt['permitgroups_moderator'] = 'Moderator';
 $txt['permitgroups_maintenance'] = 'Maintenance';
-$txt['permitgroups_inherit'] = 'Inherit';
 
-$txt['confirm_delete_attachments_all'] = 'Are you sure you want to delete all attachments?';
 $txt['confirm_delete_attachments'] = 'Are you sure you want to delete the selected attachments?';
 $txt['attachment_manager_browse_files'] = 'Browse Files';
 $txt['attachment_manager_repair'] = 'Maintain';
@@ -461,7 +459,6 @@ $txt['attachment_transfer_progress'] = 'Please wait. Transfer in progress.';
 
 $txt['avatar_settings'] = 'General avatar settings';
 $txt['avatar_default'] = 'Enable a default avatar for all users without their own avatar';
-$txt['mods_cat_avatars'] = 'Avatars';
 $txt['avatar_directory'] = 'Avatars directory';
 $txt['avatar_url'] = 'Avatars URL';
 $txt['avatar_max_width_external'] = 'Maximum width of external avatar';
