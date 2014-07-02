@@ -534,13 +534,12 @@ class ManageMembers_Controller extends Action_Controller
 							global $txt;
 
 							require_once(SUBSDIR . \'/Members.subs.php\');
+							
 							// Calculate number of days since last online.
 							if (empty($rowData[\'last_login\']))
 								$difference = $txt[\'never\'];
 							else
-							{
 								$difference = htmlTime($rowData[\'last_login\']);
-							}
 
 							// Show it in italics if they\'re not activated...
 							if ($rowData[\'is_activated\'] % 10 != 1)

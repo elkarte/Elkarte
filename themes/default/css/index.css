@@ -2993,18 +2993,21 @@ dl.merge_topic dd {
 	float: left;
 	margin: 0;
 	padding: 0;
-	width: 4.16%;
+	width: 4.166%;
 }
 .activity_stats li span {
 	display: block;
 	text-align: center;
+	font-size: 0.786em;
+	padding-right: 0.5em;
 }
 .activity_stats .last span {
 	border-right: none;
 }
 .activity_stats li .bar {
 	margin: 0 auto;
-	width: 15px;
+	max-width: 15px;
+	width: 50%;
 }
 .activity_stats li .bar span {
 	position: absolute;

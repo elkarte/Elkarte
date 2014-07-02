@@ -17,10 +17,7 @@ $txt['collapse_desc'] = 'Allow users to collapse this category';
 $txt['catModify'] = '(modify)';
 
 $txt['mboards_order_after'] = 'After ';
-$txt['mboards_order_inside'] = 'Inside ';
 $txt['mboards_order_first'] = 'In first place';
-
-$txt['mboards_board_moved'] = 'Successfully moved.';
 $txt['mboards_board_error'] = 'Failed to resolve move location.';
 
 $txt['mboards_new_board'] = 'Add Board';
@@ -28,7 +25,6 @@ $txt['mboards_new_cat_name'] = 'New Category';
 $txt['mboards_add_cat_button'] = 'Add Category';
 $txt['mboards_new_board_name'] = 'New Board';
 
-$txt['mboards_name'] = 'Name';
 $txt['mboards_modify'] = 'modify';
 $txt['mboards_permissions'] = 'permissions';
 // Don't use entities in the below string.
@@ -85,7 +81,6 @@ $txt['mboards_recycle_disabled_delete'] = 'Note: You must select an alternative 
 
 $txt['mboards_settings_desc'] = 'Edit general board and category settings.';
 $txt['groups_manage_boards'] = 'Membergroups allowed to manage boards and categories';
-$txt['mboards_settings_submit'] = 'Save';
 $txt['recycle_enable'] = 'Enable recycling of deleted topics';
 $txt['recycle_board'] = 'Board for recycled topics';
 $txt['recycle_board_unselected_notice'] = 'You have enabled the recycling of topics without specifying a board to place them in.  This feature will not be enabled until you specify a board to place recycled topics into.';
