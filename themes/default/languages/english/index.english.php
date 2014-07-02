@@ -110,7 +110,6 @@ $txt['user_email_address'] = 'Email Address';
 $txt['subject'] = 'Subject';
 $txt['message'] = 'Message';
 $txt['redirects'] = 'Redirects';
-$txt['quick_modify'] = 'Modify Inline';
 
 $txt['choose_pass'] = 'Choose password';
 $txt['verify_pass'] = 'Verify password';
@@ -137,7 +136,6 @@ $txt['page'] = 'Page';
 $txt['prev'] = 'previous';
 $txt['next'] = 'next';
 
-$txt['lock_unlock'] = 'Lock/Unlock Topic';
 $txt['post'] = 'Post';
 $txt['error_occurred'] = 'An Error Has Occurred';
 $txt['send_error_occurred'] = 'An error has occurred, <a href="{href}">please click here to try again</a>.';
@@ -222,7 +220,6 @@ $txt['password_reminder'] = 'Password reminder';
 $txt['topic_started'] = 'Topic started by';
 $txt['title'] = 'Title';
 $txt['post_by'] = 'Post by';
-$txt['memberlist_searchable'] = 'Searchable list of all registered members.';
 $txt['welcome_newest_member'] = 'Please welcome %1$s, our newest member.';
 $txt['admin_center'] = 'Administration Center';
 $txt['admin_session_active'] = 'You have an active admin session in place. We recommend to <strong><a class="strong" href="%1$s">end this session</a></strong> once you have finished your administrative tasks.';
@@ -253,8 +250,6 @@ $txt['welcome_guest_activate'] = '<br />Did you miss your <a href="{activate_url
 $txt['hello_member'] = 'Hey,';
 // Use numeric entities in the below string.
 $txt['hello_guest'] = 'Welcome,';
-$txt['welmsg_hey'] = 'Hey,';
-$txt['welmsg_welcome'] = 'Welcome,';
 $txt['welmsg_please'] = 'Please';
 $txt['select_destination'] = 'Please select a destination';
 
@@ -283,7 +278,6 @@ $txt['icon_angel'] = 'Innocent';
 $txt['moderator'] = 'Moderator';
 $txt['moderators'] = 'Moderators';
 
-$txt['mark_board_read'] = 'Mark Topics as Read for this Board';
 $txt['views'] = 'Views';
 $txt['new'] = 'New';
 $txt['no_redir'] = 'Redirected from %1$s';
@@ -299,7 +293,6 @@ $txt['forgot_your_password'] = 'Forgot your password?';
 $txt['date'] = 'Date';
 // Use numeric entities in the below string.
 $txt['from'] = 'From';
-$txt['check_new_messages'] = 'Check for new messages';
 $txt['to'] = 'To';
 
 $txt['board_topics'] = 'Topics';
@@ -315,8 +308,6 @@ $txt['topic_sent'] = 'Your email has been sent successfully.';
 
 $txt['time_offset'] = 'Time Offset';
 $txt['or'] = 'or';
-
-$txt['no_matches'] = 'Sorry, no matches were found';
 
 $txt['mention'] = 'Mentions';
 $txt['notifications'] = 'Notifications';
@@ -484,7 +475,6 @@ $txt['quote'] = 'Quote';
 $txt['quote_new'] = 'New topic';
 $txt['follow_ups'] = 'Follow-ups';
 $txt['topic_derived_from'] = 'Topic derived from %1$s';
-$txt['fulledit'] = 'Full&nbsp;edit';
 $txt['edit'] = 'Edit';
 $txt['quick_edit'] = 'Quick Edit';
 $txt['post_options'] = 'More...';
@@ -605,7 +595,6 @@ $txt['mail_send_unable'] = 'Unable to send mail to the email address \'%1$s\'';
 
 $txt['mlist_search'] = 'Search For Members';
 $txt['mlist_search_again'] = 'Search again';
-$txt['mlist_search_filter'] = 'Search Options';
 $txt['mlist_search_email'] = 'Search by email address';
 $txt['mlist_search_group'] = 'Search by position';
 $txt['mlist_search_name'] = 'Search by name';
@@ -739,8 +728,6 @@ $txt['approve_many_members_waiting'] = 'There are <a href="%1$s">%2$d members</a
 $txt['notifyboard_turnon'] = 'Do you want a notification email when someone posts a new topic in this board?';
 $txt['notifyboard_turnoff'] = 'Are you sure you do not want to receive new topic notifications for this board?';
 
-$txt['activate_code'] = 'Your activation code is';
-
 $txt['find_members'] = 'Find Members';
 $txt['find_username'] = 'Name, username, or email address';
 $txt['find_buddies'] = 'Show Buddies Only?';
@@ -748,8 +735,6 @@ $txt['find_wildcards'] = 'Allowed Wildcards: *, ?';
 $txt['find_no_results'] = 'No results found';
 $txt['find_results'] = 'Results';
 $txt['find_close'] = 'Close';
-
-$txt['show_unread_replies'] = 'Show new replies to your posts.';
 
 $txt['quickmod_delete_selected'] = 'Remove Selected';
 $txt['quickmod_split_selected'] = 'Split Selected';
