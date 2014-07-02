@@ -204,7 +204,7 @@ $txt['are_sure_remove_topic'] = 'Are you sure you want to remove this topic?';
 $txt['yes'] = 'Yes';
 $txt['no'] = 'No';
 
-$txt['search_end_results'] = 'End of results';
+// @todo this string seems a good candidate for deprecation
 $txt['search_on'] = 'on';
 
 $txt['search'] = 'Search';
@@ -250,7 +250,6 @@ $txt['welcome_guest_activate'] = '<br />Did you miss your <a href="{activate_url
 $txt['hello_member'] = 'Hey,';
 // Use numeric entities in the below string.
 $txt['hello_guest'] = 'Welcome,';
-$txt['welmsg_please'] = 'Please';
 $txt['select_destination'] = 'Please select a destination';
 
 // Escape any single quotes in here twice.. 'it\'s' -> 'it\\\'s'.
@@ -319,8 +318,6 @@ $txt['ban_continue_browse'] = 'You may continue to browse the forum as a guest.'
 
 $txt['mark_as_read'] = 'Mark ALL messages as read';
 
-$txt['hot_topics'] = 'Hot Topic (More than %1$d replies)';
-$txt['very_hot_topics'] = 'Very Hot Topic (More than %1$d replies)';
 $txt['locked_topic'] = 'Locked Topic';
 $txt['normal_topic'] = 'Normal Topic';
 $txt['participation_caption'] = 'Topic you have posted in';
@@ -612,8 +609,6 @@ $txt['more'] = 'more';
 $txt['hostname'] = 'Hostname';
 $txt['you_are_post_banned'] = 'Sorry %1$s, you are banned from posting and sending personal messages on this forum.';
 $txt['ban_reason'] = 'Reason';
-
-$txt['tables_optimized'] = 'Database tables optimized';
 
 $txt['add_poll'] = 'Add poll';
 $txt['poll_options6'] = 'You may only select up to %1$s options.';
