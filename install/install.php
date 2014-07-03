@@ -333,7 +333,23 @@ class Install_Controller
 			}
 
 			if ($probably_installed == 2)
-				$incontext['warning'] = $txt['error_already_installed'];
+				$incontext['warning'] = str_replace('{try_delete}', '
+		<div id="delete_label" style="font-weight: bold; display: none">
+			<label for="delete_self"><input type="checkbox" id="delete_self" onclick="doTheDelete();" class="input_check" /> ' . $txt['delete_installer'] . (!isset($_SESSION['installer_temp_ftp']) ? ' ' . $txt['delete_installer_maybe'] : '') . '</label>
+		<script><!-- // --><![CDATA[
+			function doTheDelete()
+			{
+				var theCheck = document.getElementById ? document.getElementById("delete_self") : document.all.delete_self,
+					tempImage = new Image();
+
+				tempImage.src = "' . $installurl . '?delete=1&ts_" + (new Date().getTime());
+				tempImage.width = 0;
+				theCheck.disabled = true;
+				window.location.href = elk_scripturl;
+			}
+			document.getElementById(\'delete_label\').style.display = \'block\';
+		// ]]></script>
+		</div>', $txt['error_already_installed']);
 		}
 
 		// If there is no Settings.php then we need a new one that only the owner can provide
@@ -2340,6 +2356,7 @@ function template_install_above()
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" id="jquery"></script>
 		<script><!-- // --><![CDATA[
 			window.jQuery || document.write(\'<script src="../themes/default/scripts/jquery-1.11.1.min.js"><\/script>\');
+			var elk_scripturl = ', JavaScriptEscape(str_replace('/install/install.php', '/index.php', $installurl)), ';
 		// ]]></script>
 
 	</head>
@@ -2871,7 +2888,7 @@ function template_delete_install()
 	// Don't show the box if it's like 99% sure it won't work :P.
 	if ($incontext['probably_delete_install'])
 		echo '
-		<div style="margin: 1ex; font-weight: bold;">
+		<div id="delete_label" style="margin: 1ex; font-weight: bold; display: none">
 			<label for="delete_self"><input type="checkbox" id="delete_self" onclick="doTheDelete();" class="input_check" /> ', $txt['delete_installer'], !isset($_SESSION['installer_temp_ftp']) ? ' ' . $txt['delete_installer_maybe'] : '', '</label>
 		</div>
 		<script><!-- // --><![CDATA[
@@ -2884,6 +2901,7 @@ function template_delete_install()
 				tempImage.width = 0;
 				theCheck.disabled = true;
 			}
+			document.getElementById(\'delete_label\').style.display = \'block\';
 		// ]]></script>
 		<br />';
 
