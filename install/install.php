@@ -261,12 +261,13 @@ class Install_Controller
 		// Number,Name,Function,Progress Weight.
 		$this->steps = array(
 			0 => array(1, $txt['install_step_welcome'], 'action_welcome', 0),
-			1 => array(2, $txt['install_step_writable'], 'action_checkFilesWritable', 10),
-			2 => array(3, $txt['install_step_databaseset'], 'action_databaseSettings', 15),
-			3 => array(4, $txt['install_step_forum'], 'action_forumSettings', 40),
-			4 => array(5, $txt['install_step_databasechange'], 'action_databasePopulation', 15),
-			5 => array(6, $txt['install_step_admin'], 'action_adminAccount', 20),
-			6 => array(7, $txt['install_step_delete'], 'action_deleteInstall', 0),
+			1 => array(2, $txt['install_step_exist'], 'action_checkFilesExist', 5),
+			2 => array(3, $txt['install_step_writable'], 'action_checkFilesWritable', 5),
+			3 => array(4, $txt['install_step_databaseset'], 'action_databaseSettings', 15),
+			4 => array(5, $txt['install_step_forum'], 'action_forumSettings', 40),
+			5 => array(6, $txt['install_step_databasechange'], 'action_databasePopulation', 15),
+			6 => array(7, $txt['install_step_admin'], 'action_adminAccount', 20),
+			7 => array(8, $txt['install_step_delete'], 'action_deleteInstall', 0),
 		);
 	}
 
@@ -393,20 +394,58 @@ class Install_Controller
 	/**
 	 * Verify and try to make writable the files and folders that need to be.
 	 */
+	private function action_checkFilesExist()
+	{
+		global $incontext, $txt, $databases, $installurl;
+
+		$incontext['page_title'] = $txt['install_welcome'];
+		$incontext['sub_template'] = 'welcome_message';
+
+		$exist_files = array(
+			'db_last_error.sample.txt' => 'db_last_error.txt',
+			'Settings.sample.php' => 'Settings.php',
+			'Settings_bak.sample.php' => 'Settings_bak.php'
+		);
+		$missing_files = array();
+
+		foreach ($exist_files as $orig => $file)
+		{
+			// First thing (for convenience' sake) if they are not there yet,
+			// try to rename Settings and Settings_bak and db_last_error
+			if (!file_exists(TMP_BOARDDIR . '/' . $file))
+			{
+				// Silenced because the source file may or may not exist
+				@rename (TMP_BOARDDIR. '/' . $orig, TMP_BOARDDIR . '/' . $file);
+
+				// If it still doesn't exist, add it to the missing list
+				if (!file_exists(TMP_BOARDDIR . '/' . $file))
+					$missing_files[$orig] = $file;
+			}
+		}
+
+		if (empty($missing_files))
+			return true;
+
+		$rename_array = array();
+		foreach ($missing_files as $orig => $file)
+			$rename_array[] = '<li>' . $orig . ' => ' . $file . '</li>';
+
+		$incontext['error'] = sprintf($txt['error_settings_do_not_exist'], implode(', ', $missing_files), implode('', $rename_array));
+
+		$incontext['retry'] = 1;
+
+		return false;
+	}
+
+	/**
+	 * Verify and try to make writable the files and folders that need to be.
+	 */
 	private function action_checkFilesWritable()
 	{
 		global $txt, $incontext;
 
 		$incontext['page_title'] = $txt['ftp_checking_writable'];
 		$incontext['sub_template'] = 'chmod_files';
-
-		// First thing (for convenience' sake) if they are not there yet,
-		// try to rename Settings and Settings_bak and db_last_error
-		foreach (array('Settings.php', 'Settings_bak.php', 'db_last_error.txt') as $file)
-		{
-			if (!file_exists(TMP_BOARDDIR . '/' . $file))
-				rename (TMP_BOARDDIR. '/' . str_replace('.php', '.sample.php', $file), TMP_BOARDDIR . '/' . $file);
-		}
 
 		$writable_files = array(
 			'attachments',
@@ -2368,7 +2407,7 @@ function template_install_below()
 {
 	global $incontext, $txt;
 
-	if (!empty($incontext['continue']))
+	if (!empty($incontext['continue']) || !empty($incontext['retry']))
 	{
 		echo '
 								<div class="clear righttext">';
@@ -2376,6 +2415,10 @@ function template_install_below()
 		if (!empty($incontext['continue']))
 			echo '
 									<input type="submit" id="contbutt" name="contbutt" value="', $txt['upgrade_continue'], '" onclick="return submitThisOnce(this);" class="button_submit" />';
+
+		if (!empty($incontext['retry']))
+			echo '
+									<input type="submit" id="contbutt" name="contbutt" value="', $txt['upgrade_retry'], '" onclick="return submitThisOnce(this);" class="button_submit" />';
 		echo '
 								</div>';
 	}

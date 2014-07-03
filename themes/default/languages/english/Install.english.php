@@ -6,6 +6,7 @@ $txt['lang_character_set'] = 'UTF-8';
 $txt['lang_rtl'] = false;
 
 $txt['install_step_welcome'] = 'Welcome';
+$txt['install_step_exist'] = 'Existance Check';
 $txt['install_step_writable'] = 'Writable Check';
 $txt['install_step_forum'] = 'Forum Settings';
 $txt['install_step_databaseset'] = 'Database Settings';
@@ -186,6 +187,7 @@ $txt['error_utf8_version'] = 'The current version of your database doesn\'t supp
 $txt['error_valid_email_needed'] = 'You have not entered a valid email address.';
 $txt['error_already_installed'] = 'The installer has detected that you already have ElkArte installed. It is strongly advised that you do <strong>not</strong> try to overwrite an existing installation - continuing with installation <strong>may result in the loss or corruption of existing data</strong>.<br /><br />If you have just finished to install your forum and want to use it, please delete the install directory from your server.<br /><br />If you wish to upgrade please visit the <a href="http://www.elkarte.net/" target="_blank" class="new_win">ElkArte Community Website</a> and download the latest <em>upgrade</em> package.<br /><br />If you wish to overwrite your existing installation, including all data, it\'s recommended that you delete the existing database tables and replace Settings.php and try again.';
 $txt['error_no_settings'] = 'It looks like Settings.php and/or Settings_bak.php are missing from the default directory of your forum, ElkArte will try to rename the sample files provided with the installation. If this operation fails, please rename Settings.sample.php and Settings_bak.sample.php respectively to Settings.php and Setting_bak.php before running this script.';
+$txt['error_settings_do_not_exist'] = 'Elkarte is not able to find and create the file/s <strong>%1$s</strong>. Please use ftp to go to the directory of your forum and rename the sample files provided with the installation package as follows before running again this script: <ul>%2$s</ul> If any of the files do not exist, create an empty file with the same name.';
 $txt['error_warning_notice'] = 'Warning!';
 $txt['error_script_outdated'] = 'This install script is out of date! The current version of ElkArte is %1$s but this install script is for %2$s.<br />
 	It is recommended that you visit the <a href="http://www.elkarte.net/" target="_blank" class="new_win">ElkArte</a> website to ensure you are installing the latest version.';
@@ -201,6 +203,7 @@ $txt['upgrade_upgrade_utility'] = 'ElkArte Upgrade Utility';
 $txt['upgrade_warning'] = 'Warning!';
 $txt['upgrade_critical_error'] = 'Critical Error!';
 $txt['upgrade_continue'] = 'Continue';
+$txt['upgrade_retry'] = 'Retry';
 $txt['upgrade_skip'] = 'Skip';
 $txt['upgrade_note'] = 'Note!';
 $txt['upgrade_step'] = 'Step';
