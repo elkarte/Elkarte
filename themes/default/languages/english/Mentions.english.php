@@ -32,5 +32,3 @@ $txt['mentions_type_men'] = 'Mentioned';
 $txt['mentions_type_like'] = 'Likes';
 $txt['mentions_type_rlike'] = 'Unlikes';
 $txt['mentions_type_buddy'] = 'Buddy';
-
-$txt['mention_not_accessible'] = 'Sorry, you have been mentioned somewhere you are not allowed to enter...';
