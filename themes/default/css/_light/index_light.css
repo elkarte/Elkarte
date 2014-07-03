@@ -167,6 +167,7 @@ input[disabled].input_text, input[disabled].input_password {
 
 /* Standard horizontal rule.. ([hr], etc.) */
 hr {
+	border-left: 0;
 	border-top: 1px solid #bbb;
 	background: #eee;
 	background-color: #eee;
