@@ -2118,46 +2118,45 @@ function parse_sqlLines($sql_lines)
 		if (empty($current_statement) || (preg_match('~;[\s]*$~s', $line) == 0 && $count != count($sql_lines)))
 			continue;
 
-		$result = eval('return ' . $current_statement);
-
-/*
-		// Does this table already exist?  If so, don't insert more data into it!
-		if (preg_match('~^\s*INSERT INTO ([^\s\n\r]+?)~', $current_statement, $match) != 0 && in_array($match[1], $exists))
+		// Does this table already exist? If so, don't insert more data into it!
+		if (preg_match('~^\s*\$db->insert\(.*(\{db_prefix\}\w+)~s', $current_statement, $match) != 0 && in_array($match[1], $exists))
 		{
 			$incontext['sql_results']['insert_dups']++;
 			$current_statement = '';
 			continue;
 		}
 
-		if ($db->query('', $current_statement, array('security_override' => true, 'db_error_skip' => true), $db_connection) === false)
+		$result = eval('return ' . $current_statement);
+
+		if ($result === false)
 		{
 			// Error 1050: Table already exists!
 			// @todo Needs to be made better!
-			if (($db_type != 'mysql' || mysqli_errno($db_connection) === 1050) && preg_match('~^\s*CREATE TABLE ([^\s\n\r]+?)~', $current_statement, $match) == 1)
+			if (($db_type != 'mysql' || mysqli_errno($db_connection) === 1050) && preg_match('~^\s*\$db_table->db_create_table\(.*(\{db_prefix\}\w+)~s', $current_statement, $match) == 1)
 			{
 				$exists[] = $match[1];
 				$incontext['sql_results']['table_dups']++;
 			}
 			// Don't error on duplicate indexes (or duplicate operators in PostgreSQL.)
-			elseif (!preg_match('~^\s*CREATE( UNIQUE)? INDEX ([^\n\r]+?)~', $current_statement, $match) && !($db_type == 'postgresql' && preg_match('~^\s*CREATE OPERATOR (^\n\r]+?)~', $current_statement, $match)))
+			elseif (!preg_match('~^\s*\$db->query\(.*CREATE( UNIQUE)? INDEX ([^\n\r]+?)~s', $current_statement) && !($db_type == 'postgresql' && preg_match('~^\s*\$db->query\(.*CREATE OPERATOR (^\n\r]+?)~s', $current_statement)))
 			{
 				$incontext['failures'][$count] = $db->last_error();
 			}
 		}
 		else
 		{
-			if (preg_match('~^\s*CREATE TABLE ([^\s\n\r]+?)~', $current_statement, $match) == 1)
+			if (preg_match('~^\s*\$db_table->db_create_table\(.*(\{db_prefix\}\w+)~s', $current_statement, $match) == 1)
 				$incontext['sql_results']['tables']++;
 			else
 			{
-				preg_match_all('~\)[,;]~', $current_statement, $matches);
+				preg_match_all('~^\s*array\(.+\),$~', $current_statement, $matches);
 				if (!empty($matches[0]))
-					$incontext['sql_results']['inserts'] += count($matches[0]);
+					$incontext['sql_results']['inserts'] += (count($matches[0]) - 1);
 				else
 					$incontext['sql_results']['inserts']++;
 			}
 		}
-*/
+
 		$current_statement = '';
 	}
 
