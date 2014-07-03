@@ -9,13 +9,8 @@ $txt['no_name'] = 'You didn\'t fill the name field out. We can\'t let you contin
 $txt['no_email'] = 'You didn\'t fill the email field out. We can\'t let you continue without an email, sorry.';
 $txt['topic_locked'] = 'This topic is locked, you are not allowed to post or modify messages...';
 $txt['no_password'] = 'Password field empty';
-$txt['already_a_user'] = 'The user name you tried to use already exists.';
-$txt['cant_move'] = 'You are not allowed to move topics...';
 $txt['passwords_dont_match'] = 'Passwords aren\'t the same.';
 $txt['register_to_use'] = 'Sorry, you must register before using this feature.';
-$txt['password_invalid_character'] = 'Invalid character used in password.';
-$txt['name_invalid_character'] = 'Invalid character used in name.';
-$txt['email_invalid_character'] = 'Invalid character used in email.';
 $txt['username_reserved'] = 'The user name you tried to use contains the reserved name \'%1$s\'. Please try another user name.';
 $txt['numbers_one_to_nine'] = 'This field only accepts numbers from 0-9';
 $txt['not_a_user'] = 'The user whose profile you are trying to view does not exist.';
@@ -25,7 +20,6 @@ $txt['email_in_use'] = 'That email address (%1$s) is being used by a registered 
 
 $txt['didnt_select_vote'] = 'You didn\'t select a vote option.';
 $txt['poll_error'] = 'Something isn\'t working, sorry: either that poll doesn\'t exist, the poll has been locked, or you tried to vote twice.';
-$txt['members_only'] = 'This option is only available to registered members.';
 $txt['locked_by_admin'] = 'This was locked by an administrator.  You cannot unlock it.';
 $txt['not_enough_posts_karma'] = 'Sorry, you don\'t have enough posts to modify karma - you need at least %1$d.';
 $txt['cant_change_own_karma'] = 'Sorry, you are not permitted to modify your own karma.';
@@ -35,8 +29,6 @@ $txt['feature_no_exists'] = 'Sorry, this feature doesn\'t exist.';
 $txt['couldnt_connect'] = 'Could not connect to server or could not find file';
 $txt['no_board'] = 'The board you specified doesn\'t exist';
 $txt['no_message'] = 'The message is no longer available';
-$txt['cant_split'] = 'You are not allowed to split topics';
-$txt['cant_merge'] = 'You are not allowed to merge topics';
 $txt['no_topic_id'] = 'You specified an invalid topic ID.';
 $txt['split_first_post'] = 'You cannot split a topic at the first post.';
 $txt['topic_one_post'] = 'This topic only contains one message and cannot be split.';
@@ -45,7 +37,6 @@ $txt['selected_all_posts'] = 'Unable to split. You have selected every message.'
 $txt['cant_find_messages'] = 'Unable to find messages';
 $txt['cant_find_user_email'] = 'Unable to find user\'s email address.';
 $txt['cant_insert_topic'] = 'Unable to insert topic';
-$txt['already_a_mod'] = 'You have chosen a user name of an already existing moderator. Please choose another user name';
 $txt['session_timeout'] = 'Your session timed out while posting. Please go back and try again.';
 $txt['session_timeout_file_upload'] = 'Your session timed out while uploading the file. Please try again.';
 $txt['no_files_uploaded'] = 'There are no files to upload.';
@@ -142,7 +133,6 @@ $txt['registration_agreement_missing'] = 'The registration agreement file, agree
 $txt['registration_no_secret_question'] = 'Sorry, there is no secret question set for this member.';
 $txt['poll_range_error'] = 'Sorry, the poll must run for more than 0 days.';
 $txt['delFirstPost'] = 'You are not allowed to delete the first post in a topic.<p>If you want to delete this topic, click on the Remove link, or ask a moderator/administrator to do it for you.</p>';
-$txt['parent_error'] = 'Unable to create board!';
 $txt['login_cookie_error'] = 'You were unable to login.  Please check your cookie settings.';
 $txt['incorrect_answer'] = 'Sorry, but you did not answer your question correctly.  Please click back to try again, or click back twice to use the default method of obtaining your password.';
 $txt['no_mods'] = 'No moderators found!';
@@ -160,8 +150,6 @@ $txt['event_day_missing'] = 'Event day is missing.';
 $txt['event_title_missing'] = 'Event title is missing.';
 $txt['invalid_date'] = 'Invalid date.';
 $txt['no_event_title'] = 'No event title was entered.';
-$txt['missing_event_id'] = 'Missing event ID.';
-$txt['cant_edit_event'] = 'You do not have permission to edit this event.';
 $txt['missing_board_id'] = 'Board ID is missing.';
 $txt['missing_topic_id'] = 'Topic ID is missing.';
 $txt['topic_doesnt_exist'] = 'Topic doesn\'t exist.';
@@ -224,8 +212,6 @@ $txt['search_WaitTime_broken'] = 'Your last search was less than %1$d seconds ag
 $txt['remind_WaitTime_broken'] = 'Your last reminder was less than %1$d seconds ago. Please try again later.';
 $txt['contact_WaitTime_broken'] = 'The last time you tried to use the contact form was less than %1$d seconds ago. Please try again later.';
 
-$txt['email_missing_data'] = 'We need something in both the subject and message boxes.';
-
 $txt['topic_gone'] = 'We tried very hard to find the topic or board you are looking for, but it\'s nowhere to be found. It appears to be either missing or off limits to you.';
 $txt['theme_edit_missing'] = 'We tried very hard to find the file you are trying to edit, but it can\'t be found.';
 
@@ -287,7 +273,6 @@ $txt['smileys_upload_error_name'] = 'All smileys must have the same file name.';
 $txt['smileys_upload_error_illegal'] = 'Illegal Type.';
 
 $txt['search_invalid_weights'] = 'Search weights are not configured properly. At least one weight should be configured to be non-zero. Please report this error to an administrator.';
-$txt['unable_to_create_temporary'] = 'The search function was unable to create temporary tables.  Please try again.';
 
 $txt['package_no_file'] = 'Unable to find package file!';
 $txt['packageget_unable'] = 'Unable to connect to the server.  Please try using <a href="%1$s" target="_blank" class="new_win">this URL</a> instead.';
@@ -430,7 +415,6 @@ $txt['search_api_not_compatible'] = 'The selected search API the forum is using 
 
 // Restore topic/posts
 $txt['cannot_restore_first_post'] = 'You cannot restore the first post in a topic.';
-$txt['parent_topic_missing'] = 'The parent topic of the post you are trying to restore has been deleted.';
 $txt['restored_disabled'] = 'The restoration of topics has been disabled.';
 $txt['restore_not_found'] = 'The following messages could not be restored; the original topic may have been removed: %1$s You will need to move these manually.';
 
