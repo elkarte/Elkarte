@@ -640,7 +640,7 @@ class Display_Controller
 		// Cleanup all the permissions with extra stuff...
 		$context['can_mark_notify'] &= !$context['user']['is_guest'];
 		$context['can_sticky'] &= !empty($modSettings['enableStickyTopics']);
-		$context['calendar_post'] &= !empty($modSettings['cal_enabled']);
+		$context['calendar_post'] &= !empty($modSettings['cal_enabled']) && (allowedTo('modify_any') || ($context['user']['started'] && allowedTo('modify_own')));
 		$context['can_add_poll'] &= !empty($modSettings['pollMode']) && $topicinfo['id_poll'] <= 0;
 		$context['can_remove_poll'] &= !empty($modSettings['pollMode']) && $topicinfo['id_poll'] > 0;
 		$context['can_reply'] &= empty($topicinfo['locked']) || allowedTo('moderate_board');
