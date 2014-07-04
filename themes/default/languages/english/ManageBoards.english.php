@@ -77,7 +77,7 @@ $txt['mboards_order_in_category'] = 'In category';
 $txt['mboards_current_position'] = 'Current Position';
 $txt['no_valid_parent'] = 'Board %1$s does not have a valid parent. Use the \'find and repair errors\' function to fix this.';
 
-$txt['mboards_recycle_disabled_delete'] = 'Note: You must select an alternative recycle bin board or disable recycling before you can delete this board.';
+$txt['mboards_recycle_disabled_delete'] = 'You must select an alternative recycle bin board or disable recycling before you can delete this board.';
 
 $txt['mboards_settings_desc'] = 'Edit general board and category settings.';
 $txt['groups_manage_boards'] = 'Membergroups allowed to manage boards and categories';
