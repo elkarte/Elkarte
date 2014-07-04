@@ -821,19 +821,6 @@ class Scheduled_Task
 		// We just pass through to the daily function - avoid duplication!
 		$is_weekly = true;
 		return $this->daily_digest();
-	}
-
-	/**
-	 * This task retrieved files from the official server.
-	 * This task is no longer used and the method remains only to avoid
-	 * "last minute" problems, it will be removed from 1.1 version
-	 *
-	 * @deprecated since 1.0 - will be removed in 1.1
-	 */
-	public function fetchFiles()
-	{
-		return true;
-	}
 
 	/**
 	 * Schedule birthday emails.

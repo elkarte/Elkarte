@@ -1285,20 +1285,6 @@ function action_deleteUpgrade()
 	// Can we delete the file?
 	$upcontext['can_delete_script'] = is_writable(dirname(__FILE__)) || is_writable(__FILE__);
 
-	// Now is the perfect time to fetch the ELK files.
-	if ($command_line)
-		cli_scheduled_fetchFiles();
-	else
-	{
-		// The variable is usually defined in index.php so lets just use the constant to do it for us.
-		$forum_version = CURRENT_VERSION;
-
-		// Now go get those files!
-		require_once(SUBSDIR . '/ScheduledTask.class.php');
-		$task = new Scheduled_Task();
-		$task->fetchFiles();
-	}
-
 	// Log what we've done.
 	if (empty($user_info['id']))
 		$user_info['id'] = !empty($upcontext['user']['id']) ? $upcontext['user']['id'] : 0;
@@ -1347,68 +1333,6 @@ function action_deleteUpgrade()
 	$_GET['substep'] = 0;
 
 	return false;
-}
-
-/**
- * Just like the built in one, but setup for CLI to not use themes.
- */
-function cli_scheduled_fetchFiles()
-{
-	global $language, $forum_version, $modSettings;
-
-	$db = database();
-
-	if (empty($modSettings['time_format']))
-		$modSettings['time_format'] = '%B %d, %Y, %I:%M:%S %p';
-
-	// What files do we want to get
-	$request = $db->query('', '
-		SELECT id_file, filename, path, parameters
-		FROM {db_prefix}admin_info_files',
-		array(
-		)
-	);
-
-	$js_files = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$js_files[$row['id_file']] = array(
-			'filename' => $row['filename'],
-			'path' => $row['path'],
-			'parameters' => sprintf($row['parameters'], $language, urlencode($modSettings['time_format']), urlencode($forum_version)),
-		);
-	}
-	$db->free_result($request);
-
-	// We're gonna need fetch_web_data() to pull this off.
-	require_once(SUBSDIR . '/Package.subs.php');
-
-	foreach ($js_files as $ID_FILE => $file)
-	{
-		// Create the url
-		$server = empty($file['path']) || substr($file['path'], 0, 7) != 'http://' ? 'http://www.elkarte.net' : '';
-		$url = $server . (!empty($file['path']) ? $file['path'] : $file['path']) . $file['filename'] . (!empty($file['parameters']) ? '?' . $file['parameters'] : '');
-
-		// Get the file
-		$file_data = fetch_web_data($url);
-
-		// If we got an error - give up - the site might be down.
-		if ($file_data === false)
-			return throw_error(sprintf('Could not retrieve the file %1$s.', $url));
-
-		// Save the file to the database.
-		$db->query('substring', '
-			UPDATE {db_prefix}admin_info_files
-			SET data = SUBSTRING({string:file_data}, 1, 65534)
-			WHERE id_file = {int:id_file}',
-			array(
-				'id_file' => $ID_FILE,
-				'file_data' => $file_data,
-			)
-		);
-	}
-
-	return true;
 }
 
 function convertSettingsToTheme()
