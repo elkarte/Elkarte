@@ -357,49 +357,7 @@ class Post_Controller extends Action_Controller
 				$form_subject = Util::substr($form_subject, 0, 100);
 
 			if (isset($_REQUEST['poll']))
-			{
-				$context['poll']['question'] = isset($_REQUEST['question']) ? Util::htmlspecialchars(trim($_REQUEST['question'])) : '';
-
-				$context['poll']['choices'] = array();
-				// @deprecated since 1.1 - backward compatibility with 1.0
-				$context['choices'] &= $context['poll']['choices'];
-				$choice_id = 0;
-
-				$_POST['options'] = empty($_POST['options']) ? array() : htmlspecialchars__recursive($_POST['options']);
-				foreach ($_POST['options'] as $option)
-				{
-					if (trim($option) == '')
-						continue;
-
-					$context['poll']['choices'][] = array(
-						'id' => $choice_id++,
-						'number' => $choice_id,
-						'label' => $option,
-						'is_last' => false
-					);
-				}
-
-				// One empty option for those with js disabled...I know are few... :P
-				$context['poll']['choices'][] = array(
-					'id' => $choice_id++,
-					'number' => $choice_id,
-					'label' => '',
-					'is_last' => false
-				);
-
-				if (count($context['poll']['choices']) < 2)
-				{
-					$context['poll']['choices'][] = array(
-						'id' => $choice_id++,
-						'number' => $choice_id,
-						'label' => '',
-						'is_last' => false
-					);
-				}
-
-				$context['last_choice_id'] = $choice_id;
-				$context['poll']['choices'][count($context['poll']['choices']) - 1]['is_last'] = true;
-			}
+				$this->_preparePollContext();
 
 			// Are you... a guest?
 			if ($user_info['is_guest'])
@@ -2357,5 +2315,55 @@ class Post_Controller extends Action_Controller
 		$context['event']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['event']['month'] == 12 ? 1 : $context['event']['month'] + 1, 0, $context['event']['month'] == 12 ? $context['event']['year'] + 1 : $context['event']['year']));
 
 		$context['event']['board'] = !empty($board) ? $board : $modSettings['cal_defaultboard'];
+	}
+
+	/**
+	 * Loads in context stuff related to polls
+	 */
+	private function _preparePollContext()
+	{
+		global $context;
+
+		$context['poll']['question'] = isset($_REQUEST['question']) ? Util::htmlspecialchars(trim($_REQUEST['question'])) : '';
+
+		$context['poll']['choices'] = array();
+		// @deprecated since 1.1 - backward compatibility with 1.0
+		$context['choices'] &= $context['poll']['choices'];
+		$choice_id = 0;
+
+		$_POST['options'] = empty($_POST['options']) ? array() : htmlspecialchars__recursive($_POST['options']);
+		foreach ($_POST['options'] as $option)
+		{
+			if (trim($option) == '')
+				continue;
+
+			$context['poll']['choices'][] = array(
+				'id' => $choice_id++,
+				'number' => $choice_id,
+				'label' => $option,
+				'is_last' => false
+			);
+		}
+
+		// One empty option for those with js disabled...I know are few... :P
+		$context['poll']['choices'][] = array(
+			'id' => $choice_id++,
+			'number' => $choice_id,
+			'label' => '',
+			'is_last' => false
+		);
+
+		if (count($context['poll']['choices']) < 2)
+		{
+			$context['poll']['choices'][] = array(
+				'id' => $choice_id++,
+				'number' => $choice_id,
+				'label' => '',
+				'is_last' => false
+			);
+		}
+
+		$context['last_choice_id'] = $choice_id;
+		$context['poll']['choices'][count($context['poll']['choices']) - 1]['is_last'] = true;
 	}
 }
