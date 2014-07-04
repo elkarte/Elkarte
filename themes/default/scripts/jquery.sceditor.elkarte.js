@@ -198,6 +198,11 @@
 $.sceditor.command
 	.set('space', {
 	})
+	.set('source', {
+		state: function() {
+			return true;
+		}
+	})
 	.set('spoiler', {
 		exec: function () {
 			this.insert('[spoiler]', '[/spoiler]');

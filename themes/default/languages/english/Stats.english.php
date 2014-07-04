@@ -8,7 +8,6 @@ $txt['general_stats'] = 'General Statistics';
 $txt['top_posters'] = 'Top 10 Posters';
 $txt['top_boards'] = 'Top 10 Boards';
 $txt['forum_history'] = 'Forum History (using forum time offset)';
-$txt['stats_date'] = 'Date (yyyy/mm/dd)';
 $txt['stats_new_topics'] = 'New Topics';
 $txt['stats_new_posts'] = 'New Posts';
 $txt['stats_new_members'] = 'New Members';
@@ -18,9 +17,6 @@ $txt['top_topics_views'] = 'Top 10 Topics (by Views)';
 $txt['yearly_summary'] = 'Yearly Summary';
 $txt['top_starters'] = 'Top Topic Starters';
 $txt['most_time_online'] = 'Most Time Online';
-$txt['best_karma'] = 'Best Karma';
-$txt['worst_karma'] = 'Worst Karma';
-$txt['stats_more_detailed'] = 'more detailed &raquo;';
 
 $txt['average_members'] = 'Average registrations per day';
 $txt['average_posts'] = 'Average posts per day';

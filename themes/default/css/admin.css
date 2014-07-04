@@ -122,7 +122,7 @@ h3.category_header form {
 	margin-top: 0;
 	margin-bottom: 0;
 }
-a.help .icon {
+a.help .icon, a.help .icon_fixed {
 	margin: 0;
 	padding: 3px 4px 0 0;
 }
@@ -582,7 +582,7 @@ dl.settings dd.questions input {
 #manage_boards dl {
 	padding: 8px 6px 0 6px;
 }
-#manage_boards dl textarea, #manage_boards dl table{
+#manage_boards dl textarea, #manage_boards dl table {
 	margin: 0 0 8px 0;
 }
 #manage_boards .post_group, #manage_boards .regular_members {
@@ -727,6 +727,12 @@ dl.settings dd.large_caption {
 .ban_settings {
 	width: 46%;
 }
+.ban_text {
+	min-height: 64px;
+	max-height: 64px;
+	min-width: 50%;
+	max-width: 99%;
+}
 #manage_bans dl {
 	margin-bottom: 1em;
 }
@@ -840,6 +846,7 @@ dl.themes_list dd {
 }
 #agreement, #reserved {
 	width: 99%;
+	padding: 0 .25em;
 }
 
 /* Styles for the moderation center.

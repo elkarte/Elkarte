@@ -532,7 +532,7 @@ function template_modify_board()
 
 	if (!empty($context['board']['is_recycle']))
 		echo '
-					<div class="infobox">', $txt['mboards_redirect_disabled_recycle'], '<br />',$txt['mboards_recycle_disabled_delete'] ,'</div>';
+					<div class="infobox">', $txt['mboards_redirect_disabled_recycle'], '<br />', $txt['mboards_recycle_disabled_delete'] ,'</div>';
 
 	if (empty($context['board']['is_recycle']) && !empty($context['board']['topics']))
 		echo '

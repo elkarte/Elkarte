@@ -87,7 +87,7 @@ table {
 /* Default most elements to zero padding and margin. */
 /* Declare these separately to divs to avoid padding and margin problems. */
 h1, h2, h3, h4, h5, h6, ul, ol, li, dl, dd ,dt,
-p, fieldset, form, input, button, select, textarea, .editor {
+p, fieldset, form, input, button, select, .input_text, textarea, .editor {
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
@@ -158,7 +158,6 @@ input, button, select, textarea, .editor {
 	font: 87.5%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", "Trebuchet MS", Arial, sans-serif;
 }
 /* The following is necessary. */
-/* @todo - Chase down SCEditor colours n stuff. Bleh. :P */
 textarea, .editor {
 	border-radius: 4px;
 	font-size: 1em;
@@ -174,41 +173,34 @@ select::-moz-focus-inner {
 	border: 0;
 	padding: 0;
 }
-/* Apply the font only to these elements */
-input, button, select {
-	padding: 2px 6px;
-	vertical-align: middle;
-	font-size: 0.857em;
-	height: 26px;
-}
-/* Special form elements need to be addressed */
-input[type="file"] {
-	height: auto;
-}
-input[type="number"] {
-	padding: 0 0 0 6px;
-}
 
-/* Selects require browser-specific targeting too, unfortunately. */
-select {
-	padding: 2px;
+/* Declarations for inputs, selects and buttons */
+input, .input_text, button, select {
+	padding: 0 6px;
+	min-height: 2em;
+	max-height: 2em;
+	height: 2em;
+	vertical-align: middle;
 }
-#chrome select {
-	padding: 2px;
-	height: 26px;
+.input_text {
+	font-size: .876em;
 }
 select option {
 	padding: 0 4px;
 }
-select#cat, select#suggestions, select#file {
+/* Special form elements need to be addressed */
+select#cat, select#suggestions, select#file , input[type="file"] {
 	height: auto;
+}
+input[type="number"] {
+	padding: 0 0 0 6px;
 }
 /* No borders around checkboxes or radio buttons, and middle aligned. */
 .input_check, .input_radio {
 	border: none;
 	background: none;
 	vertical-align: middle;
-	margin: 0 2px 4px;
+	margin: 0 2px 2px;
 }
 
 /* Common button styling. */
@@ -222,7 +214,7 @@ select#cat, select#suggestions, select#file {
 /* These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
-	padding: 2px 6px;
+	padding: 0 6px;
 	display: inline-block;
 }
 .left_submit, .linkbutton_left {
@@ -246,8 +238,8 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 }
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
-	line-height: 20px;
 	font-size: 0.857em;
+	line-height: 1.929em;
 }
 
 /* @todo - A common, tag-agnostic class to hold submit buttons, etc. */
@@ -264,8 +256,7 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 
 /* @todo - Test this out some more. */
 .submitbutton .button_submit, .submitbutton .linkbutton, .submitbutton .right_submit {
-	padding: 2px 6px;
-	vertical-align: middle;
+	padding: 0 6px;
 	margin-right: 0.4em;
 	margin-left: 0.4em;
 }
@@ -273,11 +264,9 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 .button_submit.submitgo {
 	margin-bottom: 4px;
 }
-/* IE has its own padding needs for buttons */
-#ie .button_submit, #ie .button_submit, #ie .right_submit, #ie .left_submit, #ie .button_reset,
-#ie8 .button_submit, #ie8 .button_submit, #ie8 .right_submit, #ie8 .left_submit, #ie8 .button_reset,
-#ie9 .button_submit, #ie9 .button_submit, #ie9 .right_submit, #ie9 .left_submit, #ie9 .button_reset {
-	padding: 1px 6px;
+/* IE has its own padding needs */
+#ie select, #ie8 select, #ie9 select {
+	padding: 0 0 0 6px;
 }
 
 /* the new "button" */
@@ -1543,6 +1532,7 @@ dl.settings dd {
 	margin: 0 0 3px 0;
 	padding: 0;
 	width: 55%;
+	min-height: 2em;
 }
 /* I'm a tad leary of these setting new margins, but this line is here to compress     */
 /* listings in fieldset, like a permissions radio listing, from taking up excess space */
@@ -1560,6 +1550,7 @@ dl.settings dt a img {
 }
 dl.settings textarea {
 	width: 85%;
+	padding: 0 0.5em;
 }
 dl.settings label {
 	vertical-align: top;
@@ -2992,18 +2983,21 @@ dl.merge_topic dd {
 	float: left;
 	margin: 0;
 	padding: 0;
-	width: 4.16%;
+	width: 4.166%;
 }
 .activity_stats li span {
 	display: block;
 	text-align: center;
+	font-size: 0.786em;
+	padding-right: 0.5em;
 }
 .activity_stats .last span {
 	border-right: none;
 }
 .activity_stats li .bar {
 	margin: 0 auto;
-	width: 15px;
+	max-width: 15px;
+	width: 50%;
 }
 .activity_stats li .bar span {
 	position: absolute;
@@ -3502,7 +3496,7 @@ div.labels {
 	cursor: help;
 }
 .hdicon.help:before {
-	margin: 2px 0;
+	margin: 2px 0 0;
 }
 .help .icon:hover, .hdicon.help:hover {
 	opacity: 1;
@@ -3849,6 +3843,14 @@ dl.no_members {
 	padding: 4px;
 	width: 32ex;
 }
+#agreement_box {
+	overflow-y: scroll;
+	height: 180px;
+	padding: 8px;
+	text-align: justify;
+	border: 1px solid;
+	margin-bottom: 2em;
+}
 
 /* Styles for maintenance mode. */
 #maintenance_mode {
@@ -3875,7 +3877,7 @@ dl.no_members {
 }
 #admin_login img {
 	vertical-align: middle;
-	padding: 2px;
+	padding: 2px 2px 4px;
 }
 
 /*	$BOXES		*/
@@ -4119,7 +4121,7 @@ dl.no_members {
 		min-width: 20em;
 	}
 	.board_name {
-		margin: 0 0 0 56px;
+		margin: 12px 0 0 56px;
 	}
 	.board_lastposter {
 		display: block;

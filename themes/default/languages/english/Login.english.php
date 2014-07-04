@@ -18,24 +18,16 @@ $txt['no_password'] = 'You didn\'t enter your password.';
 $txt['improper_password'] = 'The supplied password is too long.';
 $txt['incorrect_password'] = 'Password incorrect';
 $txt['openid_not_found'] = 'Supplied OpenID identifier not found.';
-$txt['choose_username'] = 'Choose username';
 $txt['maintain_mode'] = 'Maintenance Mode';
 $txt['registration_successful'] = 'Registration Successful';
-$txt['now_a_member'] = 'Success! You are now a member of the forum.';
-// Use numeric entities in the below string.
-$txt['your_password'] = 'and your password is';
 $txt['valid_email_needed'] = 'Please enter a valid email address, %1$s.';
 $txt['required_info'] = 'Required Information';
-$txt['identification_by_elkarte'] = 'Used to identify you on the forum.';
 $txt['additional_information'] = 'Additional Information';
 $txt['warning'] = 'Warning!';
 $txt['only_members_can_access'] = 'Only registered members are allowed to access this section.';
 $txt['login_below'] = 'Please login below.';
 $txt['login_below_or_register'] = 'Please login below or <a href="%1$s">register an account</a> with %2$s';
-
-// Use numeric entities in the below two strings.
-$txt['may_change_in_profile'] = 'You may change it after you login by going to the profile page, or by visiting this page after you login:';
-$txt['your_username_is'] = 'Your username is: ';
+$txt['checkbox_agreement'] = 'I accept the registration agreement';
 
 $txt['login_hash_error'] = 'Password security has recently been upgraded.<br />Please enter your password again.';
 
@@ -63,11 +55,6 @@ $txt['coppa_need_more_details'] = 'Need more details?';
 
 $txt['awaiting_delete_account'] = 'Your account has been marked for deletion!<br />If you wish to restore your account, please check the &quot;Reactivate my account&quot; box, and login again.';
 $txt['undelete_account'] = 'Reactivate my account';
-
-// Use numeric entities in the below three strings.
-$txt['change_password'] = 'New Password Details';
-$txt['change_password_login'] = 'Your login details at';
-$txt['change_password_new'] = 'have been changed and your password reset. Below are your new login details.';
 
 $txt['in_maintain_mode'] = 'This board is in Maintenance Mode.';
 
