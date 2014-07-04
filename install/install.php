@@ -2107,6 +2107,7 @@ function parse_sqlLines($sql_lines)
 	$db_table = db_table_install();
 
 	$current_statement = '';
+	$exists = array();
 
 	foreach ($sql_lines as $count => $line)
 	{
@@ -2149,7 +2150,7 @@ function parse_sqlLines($sql_lines)
 				$incontext['sql_results']['tables']++;
 			else
 			{
-				preg_match_all('~^\s*array\(.+\),$~', $current_statement, $matches);
+				preg_match_all('~^\s*array\(.+\),$~m', $current_statement, $matches);
 				if (!empty($matches[0]))
 					$incontext['sql_results']['inserts'] += (count($matches[0]) - 1);
 				else

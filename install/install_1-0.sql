@@ -531,7 +531,7 @@ $db->insert('ignore',
 		array(3, 4, 'modify_any'),
 		array(3, 4, 'approve_posts'),
 		array(3, 4, 'post_attachment'),
-		array(3, 4, 'view_attachments')
+		array(3, 4, 'view_attachments'),
 	),
 	array('id_group', 'id_profile', 'permission')
 );
@@ -581,8 +581,7 @@ $db_table->db_create_table('{db_prefix}boards',
 
 $db->insert('ignore',
 	'{db_prefix}boards',
-	array('id_cat' => 'int', 'board_order' => 'int', 'id_last_msg' => 'int', 'id_msg_updated' => 'int',
-	'name' => 'string', 'description' => 'string', 'num_topics' => 'int', 'num_posts' => 'int', 'member_groups' => 'string'),
+	array('id_cat' => 'int', 'board_order' => 'int', 'id_last_msg' => 'int', 'id_msg_updated' => 'int', 'name' => 'string', 'description' => 'string', 'num_topics' => 'int', 'num_posts' => 'int', 'member_groups' => 'string'),
 	array(1, 1, 1, 1, '{$default_board_name}', '{$default_board_description}', 1, 1, '-1,0,2'),
 	array('id_board')
 );
@@ -753,7 +752,7 @@ $db->insert('ignore',
 		array('Labor Day', '2018-09-03'),
 		array('Labor Day', '2019-09-02'),
 		array('Labor Day', '2020-09-07'),
-		array('D-Day', '0004-06-06')
+		array('D-Day', '0004-06-06'),
 	),
 	array('id_holiday')
 );
@@ -848,10 +847,7 @@ $db_table->db_create_table('{db_prefix}custom_fields',
 
 $db->insert('ignore',
 	'{db_prefix}custom_fields',
-	array('col_name' => 'string', 'field_name' => 'string', 'field_desc' => 'string', 'field_type' => 'string',
-	'field_length' => 'int', 'field_options' => 'string', 'mask' => 'string', 'show_reg' => 'int',
-	'show_display' => 'int', 'show_profile' => 'string', 'private' => 'int', 'active' => 'int', 'bbc' => 'int',
-	'can_search' => 'int', 'default_value' => 'string', 'enclose' => 'string', 'placement' => 'string'),
+	array('col_name' => 'string', 'field_name' => 'string', 'field_desc' => 'string', 'field_type' => 'string', 'field_length' => 'int', 'field_options' => 'string', 'mask' => 'string', 'show_reg' => 'int', 'show_display' => 'int', 'show_profile' => 'string', 'private' => 'int', 'active' => 'int', 'bbc' => 'int', 'can_search' => 'int', 'default_value' => 'string', 'enclose' => 'string', 'placement' => 'string'),
 	array(
 		array('cust_aim', 'AOL Instant Messenger', 'This is your AOL Instant Messenger nickname.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="aim" href="aim:goim?screenname={INPUT}&message=Hello!+Are+you+there?" target="_blank" title="AIM - {INPUT}"><img src="{IMAGES_URL}/profile/aim.png" alt="AIM - {INPUT}"></a>', 1),
 		array('cust_icq', 'ICQ', 'This is your ICQ number.', 'text', 12, '', 'regex~[1-9][0-9]{4,9}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="icq" href="http://www.icq.com/whitepages/about_me.php?uin={INPUT}" target="_blank" title="ICQ - {INPUT}"><img src="http://status.icq.com/online.gif?img=5&icq={INPUT}" alt="ICQ - {INPUT}" width="18" height="18"></a>', 1),
@@ -1616,8 +1612,7 @@ $db_table->db_create_table('{db_prefix}membergroups',
 
 $db->insert('ignore',
 	'{db_prefix}membergroups',
-	array('group_name' => 'string', 'description' => 'string', 'online_color' => 'string',
-	'min_posts' => 'int', 'icons' => 'string', 'group_type' => 'int'),
+	array('group_name' => 'string', 'description' => 'string', 'online_color' => 'string', 'min_posts' => 'int', 'icons' => 'string', 'group_type' => 'int'),
 	array(
 		array('{$default_administrator_group}', '', '#CD0000', -1, '5#iconadmin.png', 1),
 		array('{$default_global_moderator_group}', '', '#0066FF', -1, '5#icongmod.png', 0),
@@ -1626,7 +1621,7 @@ $db->insert('ignore',
 		array('{$default_junior_group}', '', '', 50, '2#icon.png', 0),
 		array('{$default_full_group}', '', '', 100, '3#icon.png', 0),
 		array('{$default_senior_group}', '', '', 250, '4#icon.png', 0),
-		array('{$default_hero_group}', '', '', 500, '5#icon.png', 0)
+		array('{$default_hero_group}', '', '', 500, '5#icon.png', 0),
 	),
 	array('id_group')
 );
@@ -1853,11 +1848,9 @@ $db_table->db_create_table('{db_prefix}messages',
 
 $db->insert('ignore',
 	'{db_prefix}messages',
-	array('id_msg_modified' => 'int', 'id_topic' => 'int', 'id_board' => 'int', 'poster_time' => 'int',
-	'subject' => 'string', 'poster_name' => 'string', 'poster_email' => 'string', 'poster_ip' => 'string',
-	'modified_name' => 'string', 'body' => 'string', 'icon' => 'string'),
+	array('id_msg_modified' => 'int', 'id_topic' => 'int', 'id_board' => 'int', 'poster_time' => 'int', 'subject' => 'string', 'poster_name' => 'string', 'poster_email' => 'string', 'poster_ip' => 'string', 'modified_name' => 'string', 'body' => 'string', 'icon' => 'string'),
 	array(
-		array(1, 1, 1, time(), '{$default_topic_subject}', 'Elkarte', 'info@elkarte.net', '127.0.0.1', '', '{$default_topic_message}', 'xx')
+		array(1, 1, 1, time(), '{$default_topic_subject}', 'Elkarte', 'info@elkarte.net', '127.0.0.1', '', '{$default_topic_message}', 'xx'),
 	),
 	array('id_msg')
 );
@@ -1926,7 +1919,7 @@ $db->insert('ignore',
 	'{db_prefix}package_servers',
 	array('name' => 'string', 'url' => 'string'),
 	array(
-		array('ElkArte Third-party Add-ons Site', 'https://github.com/elkarte/addons/tree/master/packages')
+		array('ElkArte Third-party Add-ons Site', 'https://github.com/elkarte/addons/tree/master/packages'),
 	),
 	array('id_server')
 );
@@ -1960,7 +1953,7 @@ $db->insert('ignore',
 		array('default'),
 		array('no_polls'),
 		array('reply_only'),
-		array('read_only')
+		array('read_only'),
 	),
 	array('id_group')
 );
@@ -2037,7 +2030,7 @@ $db->insert('ignore',
 		array(2, 'calendar_post'),
 		array(2, 'calendar_edit_any'),
 		array(2, 'karma_edit'),
-		array(2, 'access_mod_center')
+		array(2, 'access_mod_center'),
 	),
 	array('id_group', 'permission')
 );
@@ -2249,8 +2242,7 @@ $db_table->db_create_table('{db_prefix}scheduled_tasks',
 
 $db->insert('ignore',
 	'{db_prefix}scheduled_tasks',
-	array('next_time' => 'int', 'time_offset' => 'int', 'time_regularity' => 'int',
-	'time_unit' => 'string', 'disabled' => 'int', 'task' => 'string'),
+	array('next_time' => 'int', 'time_offset' => 'int', 'time_regularity' => 'int', 'time_unit' => 'string', 'disabled' => 'int', 'task' => 'string'),
 	array(
 		array(0, 0, 2, 'h', 0, 'approval_notification'),
 		array(0, 0, 7, 'd', 0, 'auto_optimize'),
@@ -2265,7 +2257,7 @@ $db->insert('ignore',
 		array(0, 240, 1, 'd', 0, 'remove_old_drafts'),
 		array(0, 0, 6, 'h', 0, 'remove_old_followups'),
 		array(0, 360, 10, 'm', 1, 'maillist_fetch_IMAP'),
-		array(0, 30, 1, 'h', 0, 'user_access_mentions')
+		array(0, 30, 1, 'h', 0, 'user_access_mentions'),
 	),
 	array('id_task')
 );
@@ -2487,7 +2479,7 @@ $db->insert('ignore',
 		array('badbehavior_ip_wl', 'a:3:{i:2;s:10:"10.0.0.0/8";i:5;s:13:"172.16.0.0/12";i:6;s:14:"192.168.0.0/16";}'),
 		array('badbehavior_ip_wl_desc', 'a:3:{i:2;s:18:"RFC 1918 addresses";i:5;s:18:"RFC 1918 addresses";i:6;s:18:"RFC 1918 addresses";}'),
 		array('badbehavior_url_wl', 'a:1:{i:0;s:18:"/subscriptions.php";}'),
-		array('badbehavior_url_wl_desc', 'a:1:{i:0;s:15:"Payment Gateway";}')
+		array('badbehavior_url_wl_desc', 'a:1:{i:0;s:15:"Payment Gateway";}'),
 	),
 	array('variable')
 );
@@ -2538,8 +2530,7 @@ $db_table->db_create_table('{db_prefix}smileys',
 
 $db->insert('ignore',
 	'{db_prefix}smileys',
-	array('code' => 'string', 'filename' => 'string', 'description' => 'string',
-	'smiley_order' => 'int', 'hidden' => 'int'),
+	array('code' => 'string', 'filename' => 'string', 'description' => 'string', 'smiley_order' => 'int', 'hidden' => 'int'),
 	array(
 		array(':)', 'smiley.gif', '{$default_smiley_smiley}', 0, 0),
 		array(';)', 'wink.gif', '{$default_wink_smiley}', 1, 0),
@@ -2562,7 +2553,7 @@ $db->insert('ignore',
 		array('O0', 'afro.gif', '{$default_afro_smiley}', 18, 1),
 		array(':))', 'laugh.gif', '{$default_laugh_smiley}', 19, 1),
 		array('C:-)', 'police.gif', '{$default_police_smiley}', 20, 1),
-		array('O:)', 'angel.gif', '{$default_angel_smiley}', 21, 1)
+		array('O:)', 'angel.gif', '{$default_angel_smiley}', 21, 1),
 	),
 	array('id_smiley')
 );
@@ -2621,7 +2612,7 @@ $db->insert('ignore',
 		array('Yandex (Images)', 'YandexImages', ''),
 		array('Yandex (Video)', 'YandexVideo', ''),
 		array('Yandex (Blogs)', 'YandexBlogs', ''),
-		array('Yandex (Media)', 'YandexMedia', '')
+		array('Yandex (Media)', 'YandexMedia', ''),
 	),
 	array('id_spider')
 );
@@ -2705,7 +2696,7 @@ $db->insert('ignore',
 		array(1, 'additional_options_collapsable', '1'),
 		array(1, 'use_image_buttons', '1'),
 		array(1, 'enable_news', '1'),
-		array(1, 'forum_width', '90%')
+		array(1, 'forum_width', '90%'),
 	),
 	array('id_theme', 'id_member', 'variable')
 );
@@ -2715,7 +2706,7 @@ $db->insert('ignore',
 	array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string', 'value' => 'string'),
 	array(
 		array(-1, 1, 'display_quick_reply', '2'),
-		array(-1, 1, 'drafts_autosave_enabled', '1')
+		array(-1, 1, 'drafts_autosave_enabled', '1'),
 	),
 	array('id_theme', 'id_member', 'variable')
 );
@@ -2769,10 +2760,9 @@ $db_table->db_create_table('{db_prefix}topics',
 
 $db->insert('ignore',
 	'{db_prefix}topics',
-	array('id_board' => 'int', 'id_first_msg' => 'int',
-	'id_last_msg' => 'int', 'id_member_started' => 'int', 'id_member_updated' => 'int'),
+	array('id_board' => 'int', 'id_first_msg' => 'int', 'id_last_msg' => 'int', 'id_member_started' => 'int', 'id_member_updated' => 'int'),
 	array(
-		array(1, 1, 1, 0, 0)
+		array(1, 1, 1, 0, 0),
 	),
 	array('id_topic')
 );
