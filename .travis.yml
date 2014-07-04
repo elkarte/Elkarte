@@ -11,7 +11,9 @@ env:
 script: php /var/www/tests/travis-ci_testing.php
 
 before_script:
-  - cp ./install/Settings* ./
+  - mv ./Settings.sample.php ./Settings.php
+  - mv ./Settings_bak.sample.php ./Settings_bak.php
+  - mv ./db_last_error.sample.txt ./db_last_error.txt
   # Packages installation
   - sudo apt-get update
   - sudo apt-get install -y --force-yes apache2 libapache2-mod-php5 php5-mysql php5-sqlite php5-pgsql
@@ -26,3 +28,5 @@ before_script:
   - if [[ "$DB" == "mysql" ]]; then mysql -e "create database IF NOT EXISTS hello_world_test;" -uroot; fi
   - if [[ "$DB" == "mysql" ]]; then sudo php /var/www/tests/travis-ci/setup_mysql.php; fi
   - if [[ "$DB" == "postgres" ]]; then sudo php /var/www/tests/travis-ci/setup_pgsql.php; fi
+  # Remove the install dir
+  - sudo rm -rf /var/www/install

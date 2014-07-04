@@ -6,18 +6,25 @@
 
 ---# Try to detect where the themes are...
 ---{
-$request = upgrade_query("
+$request = $db->query('', '
 	SELECT variable, value
-	FROM {$db_prefix}themes
-	WHERE variable LIKE 'theme_dir'
-		AND id_theme = 1
-		AND id_member = 0
-	LIMIT 1");
+	FROM {db_prefix}themes
+	WHERE variable LIKE {string:theme_dir}
+		AND id_theme = {int:default}
+		AND id_member = {int:no_member}
+	LIMIT {int:limit}',
+	array(
+	'theme_dir' => 'theme_dir',
+	'default' => 1,
+	'no_member' => 0,
+	'limit' => 1,
+	)
+);
 
 $row = $db->fetch_assoc($request);
 $db->free_result($request);
 
-// Again, the only option is to find a file we know exist, in this case script_elk.js
+// The only option is to find a file we know exists
 $original_theme_dir = $row['value'];
 
 // There are not many options, one is the check for a file ElkArte has and SMF
@@ -47,28 +54,41 @@ if (!empty($possible_theme_dir))
 	// If you arrived here means the template exists and we have a valid directory
 	// Time to update the database.
 
-	upgrade_query("
-		UPDATE {$db_prefix}themes
-		SET value = REPLACE(value, '" . $original_theme_dir . "', '" . $possible_theme_dir . "')
-		WHERE variable LIKE '%_dir'");
+	$db->query('', '
+		UPDATE {db_prefix}themes
+		SET value = REPLACE(value, {string:original}, {string:possible})
+		WHERE variable LIKE {string:param}',
+		array(
+			'original' => $original_theme_dir,
+			'possible' => $possible_theme_dir,
+			'param' => '%_dir',
+		)
+	);
 }
 ---}
 ---#
 
 ---# Try to detect how to reach the theme...
 ---{
-$request = upgrade_query("
+$request = $db->query('', '
 	SELECT variable, value
-	FROM {$db_prefix}themes
-	WHERE variable LIKE 'theme_url'
-		AND id_theme = 1
-		AND id_member = 0
-	LIMIT 1");
+	FROM {db_prefix}themes
+	WHERE variable LIKE {string:theme_url}
+		AND id_theme = {int:default}
+		AND id_member = {int:no_member}
+	LIMIT {int:limit}',
+	array(
+	'theme_url' => 'theme_url',
+	'default' => 1,
+	'no_member' => 0,
+	'limit' => 1,
+	)
+);
 
 $row = $db->fetch_assoc($request);
 $db->free_result($request);
 
-// Again, the only option is to find a file we know exist, in this case script_elk.js
+// Again, the only option is to find a file we know exists, in this case script_elk.js
 if (strpos($row['value'], 'http') !== 0)
 	$original_theme_url = $boardurl . '/' . $row['value'];
 else
@@ -99,10 +119,16 @@ if (!empty($possible_theme_url))
 	// If you arrived here means the template exists and we have a valid directory
 	// Time to update the database.
 
-	upgrade_query("
-		UPDATE {$db_prefix}themes
-		SET value = REPLACE(value, '" . $original_theme_url . "', '" . $possible_theme_url . "')
-		WHERE variable LIKE '%_url'");
+	$db->query('', '
+		UPDATE {db_prefix}themes
+		SET value = REPLACE(value, {string:original}, {string:possible})
+		WHERE variable LIKE {string:param}',
+		array(
+			'original' => $original_theme_url,
+			'possible' => $possible_theme_url,
+			'param' => '%_url',
+		)
+	);
 }
 ---}
 ---#
@@ -111,29 +137,78 @@ if (!empty($possible_theme_url))
 --- Adding new settings...
 /******************************************************************************/
 
----# Creating login history sequence.
-CREATE SEQUENCE {$db_prefix}member_logins_seq;
----#
-
 ---# Adding login history...
-CREATE TABLE IF NOT EXISTS {$db_prefix}member_logins (
-	id_login int NOT NULL default nextval('{$db_prefix}member_logins_seq'),
-	id_member int NOT NULL,
-	time int NOT NULL,
-	ip varchar(255) NOT NULL default '',
-	ip2 varchar(255) NOT NULL default '',
-	PRIMARY KEY (id_login)
+---{
+$db_table->db_create_table('{db_prefix}member_logins',
+	array(
+		array(
+			'name' => 'id_login',
+			'type' => 'int',
+			'size' => 10,
+			'auto' => true
+		),
+		array(
+			'name' => 'id_member',
+			'type' => 'mediumint',
+			'unsigned' => true,
+			'size' => 8
+		),
+		array(
+			'name' => 'time',
+			'type' => 'int',
+			'size' => 10
+		),
+		array(
+			'name' => 'ip',
+			'type' => 'varchar',
+			'size' => 255,
+			'default' => ''
+		),
+		array(
+			'name' => 'ip2',
+			'type' => 'varchar',
+			'size' => 255,
+			'default' => ''
+		)
+	),
+	array(
+		array(
+			'name' => 'id_login',
+			'columns' => array('id_login'),
+			'type' => 'primary'
+		),
+		array(
+			'name' => 'id_member',
+			'columns' => array('id_member'),
+			'type' => 'key'
+		),
+		array(
+			'name' => 'time',
+			'columns' => array('time'),
+			'type' => 'key'
+		)
+	),
+	array(),
+	'ignore'
 );
+---}
 ---#
 
 ---# Copying the current package backup setting...
 ---{
 if (!isset($modSettings['package_make_full_backups']) && isset($modSettings['package_make_backups']))
-	upgrade_query("
-		INSERT INTO {$db_prefix}settings
-			(variable, value)
-		VALUES
-			('package_make_full_backups', '" . $modSettings['package_make_backups'] . "')");
+	$db->insert('',
+		'{db_prefix}settings',
+		array(
+			'variable' => 'string',
+			'value' => 'string'
+		),
+		array (
+			'package_make_full_backups',
+			$modSettings['package_make_backups']
+		),
+		array('variable')
+	);
 ---}
 ---#
 
@@ -141,59 +216,44 @@ if (!isset($modSettings['package_make_full_backups']) && isset($modSettings['pac
 ---{
 if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersion'], '1.0') == -1)
 {
-	upgrade_query("
-		UPDATE {$db_prefix}settings
-		SET value = CASE WHEN value = '2' THEN '0' ELSE value END
-		WHERE variable LIKE 'pollMode'");
+	$db->query('', '
+		UPDATE {db_prefix}settings
+		SET value = CASE WHEN value = {int:original} THEN {int:new} ELSE value END
+		WHERE variable LIKE {string:param}',
+		array(
+			'original' => 2,
+			'new' => 0,
+			'param' => 'pollMode',
+		)
+	);
 }
 ---}
 ---#
 
----# Adding new settings ...
-INSERT IGNORE INTO {$db_prefix}settings
-	(variable, value)
-VALUES
-	('avatar_default', '0');
-INSERT IGNORE INTO {$db_prefix}settings
-	(variable, value)
-VALUES
-	('gravatar_rating', 'g');
-INSERT IGNORE INTO {$db_prefix}settings
-	(variable, value)
-VALUES
-	('admin_session_lifetime', 10);
-INSERT IGNORE INTO {$db_prefix}settings
-	(variable, value)
-VALUES
-	('xmlnews_limit', 5);
-INSERT IGNORE INTO {$db_prefix}settings
-	(variable, value)
-VALUES
-	('visual_verification_num_chars', '6');
-INSERT IGNORE INTO {$db_prefix}settings
-	(variable, value)
-VALUES
-	('enable_unwatch', 0);
-INSERT IGNORE INTO {$db_prefix}settings
-	(variable, value)
-VALUES
-	('jquery_source', 'local');
-INSERT IGNORE INTO {$db_prefix}settings
-	(variable, value)
-VALUES
-	('mentions_enabled', '1');
-INSERT IGNORE INTO {$db_prefix}settings
-	(variable, value)
-VALUES
-	('mentions_buddy', '0');
-INSERT IGNORE INTO {$db_prefix}settings
-	(variable, value)
-VALUES
-	('mentions_dont_notify_rlike', '0');
-INSERT IGNORE INTO {$db_prefix}settings
-	(variable, value)
-VALUES
-	('detailed-version.js', 'https://elkarte.github.io/Elkarte/site/detailed-version.js');
+---# Adding new settings to the settings table...
+---{
+	$db->insert('ignore',
+		'{db_prefix}settings',
+		array(
+			'variable' => 'string',
+			'value' => 'string'
+		),
+		array(
+			array('avatar_default', '0'),
+			array('gravatar_rating', 'g'),
+			array('admin_session_lifetime', 10),
+			array('xmlnews_limit', 5),
+			array('visual_verification_num_chars', '6'),
+			array('enable_unwatch', 0),
+			array('jquery_source', 'local'),
+			array('mentions_enabled', '1'),
+			array('mentions_buddy', '0'),
+			array('mentions_dont_notify_rlike', '0'),
+			array('detailed-version.js', 'https://elkarte.github.io/Elkarte/site/detailed-version.js')
+		),
+		array('variable')
+	);
+---}
 ---#
 
 /******************************************************************************/
@@ -202,9 +262,9 @@ VALUES
 
 ---# Converting legacy attachments.
 ---{
-$request = upgrade_query("
+$request = $db->query('', '
 	SELECT MAX(id_attach)
-	FROM {$db_prefix}attachments");
+	FROM {db_prefix}attachments');
 list ($step_progress['total']) = $db->fetch_row($request);
 $db->free_result($request);
 
@@ -221,11 +281,17 @@ while (!$is_done)
 {
 	nextSubStep($substep);
 
-	$request = upgrade_query("
+	$request = $db->query('', '
 		SELECT id_attach, id_folder, filename, file_hash
-		FROM {$db_prefix}attachments
-		WHERE file_hash != ''
-		LIMIT $_GET[a], 200");
+		FROM {db_prefix}attachments
+		WHERE file_hash != {string:empty}
+		LIMIT {int:start}, {int:limit}',
+		array(
+			'empty' => '',
+			'start' => $_GET['a'],
+			'limit' => 200,
+		)
+	);
 
 	// Finished?
 	if ($db->num_rows($request) == 0)
@@ -255,7 +321,19 @@ unset($_GET['a']);
 --- Adding new indexes to attachments table.
 /******************************************************************************/
 ---# Adding index on id_thumb...
-CREATE INDEX {$db_prefix}attachments_id_thumb ON {$db_prefix}attachments (id_thumb);
+---{
+$db_table->db_add_index('{db_prefix}attachments',
+	array(
+		array(
+			'name' => 'id_thumb',
+			'columns' => array('id_thumb'),
+			'type' => 'key'
+		)
+	),
+	array(),
+	'ignore'
+);
+---}
 ---#
 
 /******************************************************************************/
@@ -263,53 +341,187 @@ CREATE INDEX {$db_prefix}attachments_id_thumb ON {$db_prefix}attachments (id_thu
 /******************************************************************************/
 
 ---# Adding new columns to ban items...
-ALTER TABLE {$db_prefix}ban_items
-ADD COLUMN ip_low5 smallint NOT NULL DEFAULT '0',
-ADD COLUMN ip_high5 smallint NOT NULL DEFAULT '0',
-ADD COLUMN ip_low6 smallint NOT NULL DEFAULT '0',
-ADD COLUMN ip_high6 smallint NOT NULL DEFAULT '0',
-ADD COLUMN ip_low7 smallint NOT NULL DEFAULT '0',
-ADD COLUMN ip_high7 smallint NOT NULL DEFAULT '0',
-ADD COLUMN ip_low8 smallint NOT NULL DEFAULT '0',
-ADD COLUMN ip_high8 smallint NOT NULL DEFAULT '0';
+---{
+$db_table->db_add_column('{db_prefix}ban_items',
+	array(
+		'name' => 'ip_low5',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+$db_table->db_add_column('{db_prefix}ban_items',
+	array(
+		'name' => 'ip_high5',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+$db_table->db_add_column('{db_prefix}ban_items',
+	array(
+		'name' => 'ip_low6',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+$db_table->db_add_column('{db_prefix}ban_items',
+	array(
+		'name' => 'ip_high6',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+$db_table->db_add_column('{db_prefix}ban_items',
+	array(
+		'name' => 'ip_low7',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+$db_table->db_add_column('{db_prefix}ban_items',
+	array(
+		'name' => 'ip_high7',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+$db_table->db_add_column('{db_prefix}ban_items',
+	array(
+		'name' => 'ip_low8',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+$db_table->db_add_column('{db_prefix}ban_items',
+	array(
+		'name' => 'ip_high8',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+---}
 ---#
 
 ---# Changing existing columns to ban items...
 ---{
-upgrade_query("
-	ALTER TABLE {$db_prefix}ban_items
-	ALTER COLUMN ip_low1 type smallint,
-	ALTER COLUMN ip_high1 type smallint,
-	ALTER COLUMN ip_low2 type smallint,
-	ALTER COLUMN ip_high2 type smallint,
-	ALTER COLUMN ip_low3 type smallint,
-	ALTER COLUMN ip_high3 type smallint,
-	ALTER COLUMN ip_low4 type smallint,
-	ALTER COLUMN ip_high4 type smallint;"
+$db_table->db_change_column('{db_prefix}ban_items',
+	'ip_low1',
+	array(
+		'name' => 'ip_low1',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	),
+	array()
 );
-
-upgrade_query("
-	ALTER TABLE {$db_prefix}ban_items
-	ALTER COLUMN ip_low1 SET DEFAULT '0',
-	ALTER COLUMN ip_high1 SET DEFAULT '0',
-	ALTER COLUMN ip_low2 SET DEFAULT '0',
-	ALTER COLUMN ip_high2 SET DEFAULT '0',
-	ALTER COLUMN ip_low3 SET DEFAULT '0',
-	ALTER COLUMN ip_high3 SET DEFAULT '0',
-	ALTER COLUMN ip_low4 SET DEFAULT '0',
-	ALTER COLUMN ip_high4 SET DEFAULT '0';"
+$db_table->db_change_column('{db_prefix}ban_items',
+	'ip_high1',
+	array(
+		'name' => 'ip_high1',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	),
+	array()
 );
-
-upgrade_query("
-	ALTER TABLE {$db_prefix}ban_items
-	ALTER COLUMN ip_low1 SET NOT NULL,
-	ALTER COLUMN ip_high1 SET NOT NULL,
-	ALTER COLUMN ip_low2 SET NOT NULL,
-	ALTER COLUMN ip_high2 SET NOT NULL,
-	ALTER COLUMN ip_low3 SET NOT NULL,
-	ALTER COLUMN ip_high3 SET NOT NULL,
-	ALTER COLUMN ip_low4 SET NOT NULL,
-	ALTER COLUMN ip_high4 SET NOT NULL;"
+$db_table->db_change_column('{db_prefix}ban_items',
+	'ip_low2',
+	array(
+		'name' => 'ip_low2',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	),
+	array()
+);
+$db_table->db_change_column('{db_prefix}ban_items',
+	'ip_high2',
+	array(
+		'name' => 'ip_high2',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	),
+	array()
+);
+$db_table->db_change_column('{db_prefix}ban_items',
+	'ip_low3',
+	array(
+		'name' => 'ip_low3',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	),
+	array()
+);
+$db_table->db_change_column('{db_prefix}ban_items',
+	'ip_high3',
+	array(
+		'name' => 'ip_high3',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	),
+	array()
+);
+$db_table->db_change_column('{db_prefix}ban_items',
+	'ip_low4',
+	array(
+		'name' => 'ip_low4',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	),
+	array()
+);
+$db_table->db_change_column('{db_prefix}ban_items',
+	'ip_high4',
+	array(
+		'name' => 'ip_high4',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	),
+	array()
 );
 ---}
 ---#
@@ -317,9 +529,19 @@ upgrade_query("
 /******************************************************************************/
 --- Adding support for <credits> tag in package manager
 /******************************************************************************/
----# Adding new columns to log_packages ..
-ALTER TABLE {$db_prefix}log_packages
-ADD COLUMN credits varchar(255) NOT NULL DEFAULT '';
+---# Adding new columns to log_packages...
+---{
+$db_table->db_add_column('{db_prefix}log_packages',
+	array(
+		'name' => 'credits',
+		'type' => 'varchar',
+		'size' => 255,
+		'default' => ''
+	),
+	array(),
+	'ignore'
+);
+---}
 ---#
 
 /******************************************************************************/
@@ -327,45 +549,66 @@ ADD COLUMN credits varchar(255) NOT NULL DEFAULT '';
 /******************************************************************************/
 ---# Altering the session_id columns...
 ---{
-upgrade_query("
-	ALTER TABLE {$db_prefix}log_online
-	ALTER COLUMN session type varchar(64);
-
-	ALTER TABLE {$db_prefix}log_errors
-	ALTER COLUMN session type char(64);
-
-	ALTER TABLE {$db_prefix}sessions
-	ALTER COLUMN session_id type char(64);");
-
-upgrade_query("
-	ALTER TABLE {$db_prefix}log_online
-	ALTER COLUMN session SET DEFAULT '';
-
-	ALTER TABLE {$db_prefix}log_errors
-	ALTER COLUMN session SET default '                                                                ';");
-upgrade_query("
-	ALTER TABLE {$db_prefix}log_online
-	ALTER COLUMN session SET NOT NULL;
-
-	ALTER TABLE {$db_prefix}log_errors
-	ALTER COLUMN session SET NOT NULL;
-
-	ALTER TABLE {$db_prefix}sessions
-	ALTER COLUMN session_id SET NOT NULL;");
+$db_table->db_change_column('{db_prefix}log_online',
+	'session',
+	array(
+		'name' => 'session',
+		'type' => 'varchar',
+		'size' => 64,
+		'default' => ''
+	),
+	array()
+);
+$db_table->db_change_column('{db_prefix}log_errors',
+	'session',
+	array(
+		'name' => 'session',
+		'type' => 'char',
+		'size' => 64,
+		'default' => '                                                                '
+	),
+	array()
+);
+$db_table->db_change_column('{db_prefix}sessions',
+	'session_id',
+	array(
+		'name' => 'session_id',
+		'type' => 'char',
+		'size' => 64
+	),
+	array()
+);
 ---}
 ---#
 
 /******************************************************************************/
 --- Adding support for MOVED topics enhancements
 /******************************************************************************/
----# Adding new columns to topics table
+---# Adding new columns to topics ..
 ---{
-upgrade_query("
-	ALTER TABLE {$db_prefix}topics
-	ADD COLUMN redirect_expires int NOT NULL DEFAULT '0'");
-upgrade_query("
-	ALTER TABLE {$db_prefix}topics
-	ADD COLUMN id_redirect_topic int NOT NULL DEFAULT '0'");
+
+$db_table->db_add_column('{db_prefix}topics',
+	array(
+		'name' => 'redirect_expires',
+		'type' => 'int',
+		'unsigned' => true,
+		'size' => 10,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+$db_table->db_add_column('{db_prefix}topics',
+	array(
+		'name' => 'id_redirect_topic',
+		'type' => 'mediumint',
+		'unsigned' => true,
+		'size' => 8,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
 ---}
 ---#
 
@@ -373,37 +616,32 @@ upgrade_query("
 --- Updating scheduled tasks
 /******************************************************************************/
 ---# Adding new scheduled tasks
-INSERT INTO {$db_prefix}scheduled_tasks
-	(next_time, time_offset, time_regularity, time_unit, disabled, task)
-VALUES
-	(0, 120, 1, 'd', 0, 'remove_temp_attachments');
-INSERT INTO {$db_prefix}scheduled_tasks
-	(next_time, time_offset, time_regularity, time_unit, disabled, task)
-VALUES
-	(0, 180, 1, 'd', 0, 'remove_topic_redirect');
-INSERT INTO {$db_prefix}scheduled_tasks
-	(next_time, time_offset, time_regularity, time_unit, disabled, task)
-VALUES
-	(0, 240, 1, 'd', 0, 'remove_old_drafts');
-INSERT INTO {$db_prefix}scheduled_tasks
-	(next_time, time_offset, time_regularity, time_unit, disabled, task)
-VALUES
-	(0, 0, 6, 'h', 0, 'remove_old_followups');
-INSERT INTO {$db_prefix}scheduled_tasks
-	(next_time, time_offset, time_regularity, time_unit, disabled, task)
-VALUES
-	(0, 360, 10, 'm', 1, 'maillist_fetch_IMAP');
-INSERT INTO {$db_prefix}scheduled_tasks
-	(next_time, time_offset, time_regularity, time_unit, disabled, task)
-VALUES
-	(0, 30, 1, 'h', 0, 'user_access_mentions');
+---{
+$db->insert('ignore',
+	'{db_prefix}scheduled_tasks',
+	array('next_time' => 'int', 'time_offset' => 'int', 'time_regularity' => 'int', 'time_unit' => 'string', 'disabled' => 'int', 'task' => 'string'),
+	array(
+		array(0, 120, 1, 'd', 0, 'remove_temp_attachments'),
+		array(0, 180, 1, 'd', 0, 'remove_topic_redirect'),
+		array(0, 240, 1, 'd', 0, 'remove_old_drafts'),
+		array(0, 0, 6, 'h', 0, 'remove_old_followups'),
+		array(0, 360, 10, 'm', 0, 'maillist_fetch_IMAP'),
+		array(0, 30, 1, 'h', 0, 'user_access_mentions')
+	),
+	array('task')
+);
+---}
 ---#
 
 ---# Remove unused scheduled tasks...
 ---{
-upgrade_query("
-	DELETE FROM {$db_prefix}scheduled_tasks
-	WHERE task = 'fetchFiles'");
+$db->query('', '
+	DELETE FROM {db_prefix}scheduled_tasks
+	WHERE task = {string:task}',
+	array(
+		'task' => 'fetchFiles'
+	)
+);
 ---}
 ---#
 
@@ -412,49 +650,105 @@ upgrade_query("
 /******************************************************************************/
 ---# Adding new columns to boards...
 ---{
-upgrade_query("
-	ALTER TABLE {$db_prefix}boards
-	ADD COLUMN deny_member_groups varchar(255) NOT NULL DEFAULT ''");
+$db_table->db_add_column('{db_prefix}boards',
+	array(
+		'name' => 'deny_member_groups',
+		'type' => 'varchar',
+		'size' => 255,
+		'default' => ''
+	),
+	array(),
+	'ignore'
+);
 ---}
 ---#
 
 /******************************************************************************/
---- Adding support for topic unwatch
+--- Adding support for topic unwatched
 /******************************************************************************/
----# Adding new columns to log_topics...
+---# Adding new columns to boards...
 ---{
-upgrade_query("
-	ALTER TABLE {$db_prefix}log_topics
-	ADD COLUMN unwatched int NOT NULL DEFAULT '0'");
----}
+$db_table->db_add_column('{db_prefix}log_topics',
+	array(
+		'name' => 'unwatched',
+		'type' => 'tinyint',
+		'size' => 3,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
 
-UPDATE {$db_prefix}log_topics
-SET unwatched = 0;
+$db->query('', '
+	UPDATE {db_prefix}log_topics
+	SET unwatched = {int:unwatched}',
+	array(
+		'unwatched' => 0
+	)
+);
+---}
 ---#
 
 /******************************************************************************/
 --- Adding support for custom profile fields on the memberlist and ordering
 /******************************************************************************/
----# Adding new columns to boards...
-ALTER TABLE {$db_prefix}custom_fields
-ADD COLUMN show_memberlist smallint NOT NULL DEFAULT '0',
-ADD COLUMN vieworder smallint NOT NULL default '0';
+---# Adding new columns to custom_fields...
+---{
+$db_table->db_add_column('{db_prefix}custom_fields',
+	array(
+		'name' => 'show_memberlist',
+		'type' => 'tinyint',
+		'size' => 3,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+$db_table->db_add_column('{db_prefix}custom_fields',
+	array(
+		'name' => 'vieworder',
+		'type' => 'smallint',
+		'size' => 5,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+---}
 ---#
 
 /******************************************************************************/
 --- Fixing mail queue for long messages
 /******************************************************************************/
 ---# Altering mail_queue table...
-ALTER TABLE {$db_prefix}mail_queue
-CHANGE body body mediumtext NOT NULL;
+---{
+$db_table->db_change_column('{db_prefix}mail_queue',
+	'body',
+	array(
+		'name' => 'body',
+		'type' => 'mediumtext'
+	),
+	array()
+);
+---}
 ---#
 
 /******************************************************************************/
 --- Fixing floodcontrol for long types
 /******************************************************************************/
 ---# Altering the floodcontrol table...
-ALTER TABLE {$db_prefix}log_floodcontrol
-CHANGE `log_type` `log_type` varchar(10) NOT NULL DEFAULT 'post';
+---{
+$db_table->db_change_column('{db_prefix}log_floodcontrol',
+	'log_type',
+	array(
+		'name' => 'log_type',
+		'type' => 'varchar',
+		'size' => 10,
+		'default' => 'post'
+	),
+	array()
+);
+---}
 ---#
 
 /******************************************************************************/
@@ -462,37 +756,131 @@ CHANGE `log_type` `log_type` varchar(10) NOT NULL DEFAULT 'post';
 /******************************************************************************/
 ---# Altering the membergroup stars to icons
 ---{
-upgrade_query("
-	ALTER TABLE {$db_prefix}membergroups
-	CHANGE COLUMN stars icons varchar(255) NOT NULL DEFAULT ''");
+$db_table->db_change_column('{db_prefix}membergroups',
+	'stars',
+	array(
+		'name' => 'icons',
+		'type' => 'varchar',
+		'size' => 255,
+		'default' => ''
+	),
+	array()
+);
 ---}
 ---#
 
 /******************************************************************************/
 --- Adding support for drafts
 /******************************************************************************/
----# Creating sequence for user_drafts.
-CREATE SEQUENCE {$db_prefix}user_drafts_seq;
----#
-
 ---# Creating draft table
-CREATE TABLE IF NOT EXISTS {$db_prefix}user_drafts (
-	id_draft int default nextval('{$db_prefix}user_drafts_seq'),
-	id_topic int NOT NULL default '0',
-	id_board smallint NOT NULL default '0',
-	id_reply int NOT NULL default '0',
-	type smallint NOT NULL default '0',
-	poster_time int NOT NULL default '0',
-	id_member int NOT NULL default '0',
-	subject varchar(255) NOT NULL default '',
-	smileys_enabled smallint NOT NULL default '1',
-	body text NOT NULL,
-	icon varchar(16) NOT NULL default 'xx',
-	locked smallint NOT NULL default '0',
-	is_sticky smallint NOT NULL default '0',
-	to_list varchar(255) NOT NULL default '',
-	PRIMARY KEY (id_draft)
+---{
+$db_table->db_create_table('{db_prefix}user_drafts',
+	array(
+		array(
+			'name' => 'id_draft',
+			'type' => 'int',
+			'unsigned' => true,
+			'size' => 10,
+			'auto' => true
+		),
+		array(
+			'name' => 'id_topic',
+			'type' => 'mediumint',
+			'unsigned' => true,
+			'size' => 8,
+			'default' => 0
+		),
+		array(
+			'name' => 'id_board',
+			'type' => 'smallint',
+			'unsigned' => true,
+			'size' => 5,
+			'default' => 0
+		),
+		array(
+			'name' => 'id_reply',
+			'type' => 'int',
+			'unsigned' => true,
+			'size' => 10,
+			'default' => 0
+		),
+		array(
+			'name' => 'type',
+			'type' => 'tinyint',
+			'size' => 4,
+			'default' => 0
+		),
+		array(
+			'name' => 'poster_time',
+			'type' => 'int',
+			'unsigned' => true,
+			'size' => 10,
+			'default' => 0
+		),
+		array(
+			'name' => 'id_member',
+			'type' => 'mediumint',
+			'unsigned' => true,
+			'size' => 8,
+			'default' => 0
+		),
+		array(
+			'name' => 'subject',
+			'type' => 'varchar',
+			'size' => 255,
+			'default' => ''
+		),
+		array(
+			'name' => 'smileys_enabled',
+			'type' => 'tinyint',
+			'size' => 4,
+			'default' => 1
+		),
+		array(
+			'name' => 'body',
+			'type' => 'mediumtext'
+		),
+		array(
+			'name' => 'icon',
+			'type' => 'varchar',
+			'size' => 16,
+			'default' => 'xx'
+		),
+		array(
+			'name' => 'locked',
+			'type' => 'tinyint',
+			'size' => 4,
+			'default' => 0
+		),
+		array(
+			'name' => 'is_sticky',
+			'type' => 'tinyint',
+			'size' => 4,
+			'default' => 0
+		),
+		array(
+			'name' => 'to_list',
+			'type' => 'varchar',
+			'size' => 255,
+			'default' => ''
+		)
+	),
+	array(
+		array(
+			'name' => 'id_draft',
+			'columns' => array('id_draft'),
+			'type' => 'primary'
+		),
+		array(
+			'name' => 'id_member',
+			'columns' => array('id_member', 'id_draft', 'type'),
+			'type' => 'unique'
+		)
+	),
+	array(),
+	'ignore'
 );
+---}
 ---#
 
 ---# Adding draft permissions...
@@ -502,44 +890,54 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}user_drafts (
 if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersion'], '1.0') == -1)
 {
 	// Anyone who can currently post unapproved topics we assume can create drafts as well ...
-	$request = upgrade_query("
+	$request = $db->query('', '
 		SELECT id_group, id_profile, add_deny, permission
-		FROM {$db_prefix}board_permissions
-		WHERE permission = 'post_unapproved_topics'");
+		FROM {db_prefix}board_permissions
+		WHERE permission = {string:permission}',
+		array(
+			'permission' => 'post_unapproved_topics',
+		)
+	);
 	$inserts = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		$inserts[] = "($row[id_group], $row[id_profile], 'post_draft', $row[add_deny])";
-		$inserts[] = "($row[id_group], $row[id_profile], 'post_autosave_draft', $row[add_deny])";
+		$inserts[] = array($row['id_group'], $row['id_profile'], 'post_draft', $row['add_deny']);
+		$inserts[] = array($row['id_group'], $row['id_profile'], 'post_autosave_draft', $row['add_deny']);
 	}
 	$db->free_result($request);
 
 	if (!empty($inserts))
-		upgrade_query("
-			INSERT IGNORE INTO {$db_prefix}board_permissions
-				(id_group, id_profile, permission, add_deny)
-			VALUES
-				" . implode(',', $inserts));
+		$db->insert('ignore',
+			'{db_prefix}board_permissions',
+			array('id_group' => 'int', 'id_profile' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
+			$inserts,
+			array('id_group', 'id_profile', 'permission')
+		);
 
 	// Next we find people who can send PMs, and assume they can save pm_drafts as well
-	$request = upgrade_query("
+	$request = $db->query('', '
 		SELECT id_group, add_deny, permission
-		FROM {$db_prefix}permissions
-		WHERE permission = 'pm_send'");
+		FROM {db_prefix}board_permissions
+		WHERE permission = {string:permission}',
+		array(
+			'permission' => 'pm_send',
+		)
+	);
 	$inserts = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		$inserts[] = "($row[id_group], 'pm_draft', $row[add_deny])";
-		$inserts[] = "($row[id_group], 'pm_autosave_draft', $row[add_deny])";
+		$inserts[] = array($row['id_group'], 'pm_draft', $row['add_deny']);
+		$inserts[] = array($row['id_group'], 'pm_autosave_draft', $row['add_deny']);
 	}
 	$db->free_result($request);
 
 	if (!empty($inserts))
-		upgrade_query("
-			INSERT IGNORE INTO {$db_prefix}permissions
-				(id_group, permission, add_deny)
-			VALUES
-				" . implode(',', $inserts));
+		$db->insert('ignore',
+			'{db_prefix}permissions',
+			array('id_group' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
+			$inserts,
+			array('id_group', 'permission')
+		);
 }
 ---}
 ---#
@@ -548,33 +946,68 @@ if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersio
 --- Adding support for custom profile fields data
 /******************************************************************************/
 ---# Creating custom profile fields data table
-CREATE TABLE IF NOT EXISTS {$db_prefix}custom_fields_data (
-	id_member int NOT NULL default '0',
-	variable varchar(255) NOT NULL default '',
-	value text NOT NULL,
-	PRIMARY KEY (id_member, variable)
+---{
+$db_table->db_create_table('{db_prefix}custom_fields_data',
+	array(
+		array(
+			'name' => 'id_member',
+			'type' => 'mediumint',
+			'unsigned' => true,
+			'size' => 8,
+			'default' => 0
+		),
+		array(
+			'name' => 'variable',
+			'type' => 'varchar',
+			'size' => 255,
+			'default' => ''
+		),
+		array(
+			'name' => 'value',
+			'type' => 'text'
+		)
+	),
+	array(
+		array(
+			'name' => 'id_member_variable',
+			'columns' => array('id_member', 'variable(30)'),
+			'type' => 'primary'
+		),
+		array(
+			'name' => 'id_member',
+			'columns' => array('id_member'),
+			'type' => 'key'
+		)
+	),
+	array(),
+	'ignore'
 );
----#
-
----#
-CREATE INDEX {$db_prefix}custom_fields_data_id_member ON {$db_prefix}custom_fields_data (id_member);
+---}
 ---#
 
 ---# Move existing custom profile values...
 ---{
-$request = upgrade_query("
-	INSERT INTO {$db_prefix}custom_fields_data
+$db->query('', ,
+	INSERT INTO {db_prefix}custom_fields_data
 		(id_member, variable, value)
 	SELECT id_member, variable, value
-	FROM {$db_prefix}themes
-	WHERE SUBSTRING(variable, 1, 5) = 'cust_'");
+	FROM {db_prefix}themes
+	WHERE SUBSTRING(variable, 1, 5) = {string:cust}',
+	array(
+		'cust' => 'cust_',
+	)
+);
 
 // remove the moved rows from themes
 if ($db->affected_rows() != 0)
 {
-	upgrade_query("
-		DELETE FROM {$db_prefix}themes
-		SUBSTRING(variable,1,5) = 'cust_'");
+	$db->query('', '
+		DELETE FROM {db_prefix}themes
+		SUBSTRING(variable, 1, 5) = {string:cust}',
+		array(
+			'cust' => 'cust_',
+		)
+	);
 }
 ---}
 ---#
@@ -583,38 +1016,41 @@ if ($db->affected_rows() != 0)
 --- Messenger fields
 /******************************************************************************/
 ---# Insert new fields
-INSERT INTO {$db_prefix}custom_fields
-	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
-VALUES
-	('cust_aim', 'AOL Instant Messenger', 'This is your AOL Instant Messenger nickname.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="aim" href="aim:goim?screenname={INPUT}&message=Hello!+Are+you+there?" target="_blank" title="AIM - {INPUT}"><img src="{IMAGES_URL}/profile/aim.png" alt="AIM - {INPUT}"></a>', 1);
-INSERT INTO {$db_prefix}custom_fields
-	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
-VALUES
-	('cust_icq', 'ICQ', 'This is your ICQ number.', 'text', 12, '', 'regex~[1-9][0-9]{4,9}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="icq" href="http://www.icq.com/whitepages/about_me.php?uin={INPUT}" target="_blank" title="ICQ - {INPUT}"><img src="http://status.icq.com/online.gif?img=5&icq={INPUT}" alt="ICQ - {INPUT}" width="18" height="18"></a>', 1);
-INSERT INTO {$db_prefix}custom_fields
-	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
-VALUES
-	('cust_skye', 'Skype', 'This is your Skype account name', 'text', 32, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a href="skype:{INPUT}?call"><img src="http://mystatus.skype.com/smallicon/{INPUT}" alt="Skype - {INPUT}" title="Skype - {INPUT}" /></a>', 1);
-INSERT INTO {$db_prefix}custom_fields
-	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
-VALUES
-	('cust_fbook', 'Facebook Profile', 'Enter your Facebook username.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target="_blank" href="https://www.facebook.com/{INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/facebook.png" alt="{INPUT}" /></a>', 1);
-INSERT INTO {$db_prefix}custom_fields
-	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
-VALUES
-	('cust_twitt', 'Twitter Profile', 'Enter your Twitter username.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target="_blank" href="https://www.twitter.com/{INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/twitter.png" alt="{INPUT}" /></a>', 1);
-INSERT INTO {$db_prefix}custom_fields
-	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
-VALUES
-	('cust_linked', 'LinkedIn Profile', 'Set your LinkedIn Public profile link. You must set a Custom public url for this to work.', 'text', 255, '', 'nohtml', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target={INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/linkedin.png" alt="LinkedIn profile" /></a>', 1);
-INSERT INTO {$db_prefix}custom_fields
-	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
-VALUES
-	('cust_gplus', 'Google+ Profile', 'This is your Google+ profile url.', 'text', 255, '', 'nohtml', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target="_blank" href="{INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/gplus.png" alt="G+ profile" /></a>', 1);
-INSERT INTO {$db_prefix}custom_fields
-	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
-VALUES
-	('cust_yim', 'Yahoo! Messenger', 'This is your Yahoo! Instant Messenger nickname.', 'text', 50, '', 'email', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="yim" href="http://edit.yahoo.com/config/send_webmesg?.target={INPUT}" target="_blank" title="Yahoo! Messenger - {INPUT}"><img src="http://opi.yahoo.com/online?m=g&t=0&u={INPUT}" alt="Yahoo! Messenger - {INPUT}"></a>', 1);
+---{
+$db->insert('ignore',
+	'{db_prefix}custom_fields',
+	array(
+		'col_name' => 'string',
+		'field_name' => 'string',
+		'field_desc' => 'string',
+		'field_type' => 'string',
+		'field_length' => 'int',
+		'field_options' => 'string',
+		'mask' => 'string',
+		'show_reg' => 'int',
+		'show_display' => 'int',
+		'show_profile' => 'string',
+		'private' => 'int',
+		'active' => 'int',
+		'bbc' => 'int',
+		'can_search' => 'int',
+		'default_value' => 'string',
+		'enclose' => 'string',
+		'placement' => 'int'
+	),
+	array(
+		array('cust_aim', 'AOL Instant Messenger', 'This is your AOL Instant Messenger nickname.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="aim" href="aim:goim?screenname={INPUT}&message=Hello!+Are+you+there?" target="_blank" title="AIM - {INPUT}"><img src="{IMAGES_URL}/profile/aim.png" alt="AIM - {INPUT}"></a>', 1),
+		array('cust_icq', 'ICQ', 'This is your ICQ number.', 'text', 12, '', 'regex~[1-9][0-9]{4,9}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="icq" href="http://www.icq.com/whitepages/about_me.php?uin={INPUT}" target="_blank" title="ICQ - {INPUT}"><img src="http://status.icq.com/online.gif?img=5&icq={INPUT}" alt="ICQ - {INPUT}" width="18" height="18"></a>', 1),
+		array('cust_skye', 'Skype', 'This is your Skype account name', 'text', 32, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a href="skype:{INPUT}?call"><img src="http://mystatus.skype.com/smallicon/{INPUT}" alt="Skype - {INPUT}" title="Skype - {INPUT}" /></a>', 1),
+		array('cust_fbook', 'Facebook Profile', 'Enter your Facebook username.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target="_blank" href="https://www.facebook.com/{INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/facebook.png" alt="{INPUT}" /></a>', 1),
+		array('cust_twitt', 'Twitter Profile', 'Enter your Twitter username.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target="_blank" href="https://www.twitter.com/{INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/twitter.png" alt="{INPUT}" /></a>', 1),
+		array('cust_linked', 'LinkedIn Profile', 'Set your LinkedIn Public profile link. You must set a Custom public url for this to work.', 'text', 255, '', 'nohtml', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target={INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/linkedin.png" alt="LinkedIn profile" /></a>', 1),
+		array('cust_gplus', 'Google+ Profile', 'This is your Google+ profile url.', 'text', 255, '', 'nohtml', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target="_blank" href="{INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/gplus.png" alt="G+ profile" /></a>', 1),
+		array('cust_yim', 'Yahoo! Messenger', 'This is your Yahoo! Instant Messenger nickname.', 'text', 50, '', 'email', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="yim" href="http://edit.yahoo.com/config/send_webmesg?.target={INPUT}" target="_blank" title="Yahoo! Messenger - {INPUT}"><img src="http://opi.yahoo.com/online?m=g&t=0&u={INPUT}" alt="Yahoo! Messenger - {INPUT}"></a>', 1)
+	),
+		array('id_field')
+);
+---}
 ---#
 
 ---# Move existing values...
@@ -635,42 +1071,46 @@ foreach ($members_tbl['columns'] as $members_col)
 
 if ($move_im)
 {
-	$request = upgrade_query("
+	$request = $db->query('', '
 		SELECT id_member, aim, icq, msn, yim
-		FROM {$db_prefix}members");
+		FROM {db_prefix}members',
+		array()
+	);
 	$inserts = array();
 	while ($row = $db->fetch_assoc($request))
 	{
 		if (!empty($row[aim]))
-			$inserts[] = "($row[id_member], 'cust_aim', '" . addslashes($row['aim']) . "')";
+			$inserts[] = array($row['id_member'], 'cust_aim', $row['aim']);
 
 		if (!empty($row[icq]))
-			$inserts[] = "($row[id_member], 'cust_icq', '" . addslashes($row['icq']) . "')";
+			$inserts[] = array($row['id_member'], 'cust_icq', $row['icq']);
 
 		if (!empty($row[msn]))
-			$inserts[] = "($row[id_member], 'cust_skype', '" . addslashes($row['msn']) . "')";
+			$inserts[] = array($row['id_member'], 'cust_skype', $row['msn']);
 
 		if (!empty($row[yim]))
-			$inserts[] = "($row[id_member], 'cust_yim', '" . addslashes($row['yim']) . "')";
+			$inserts[] = array($row['id_member'], 'cust_yim', $row['yim']);
 	}
 	$db->free_result($request);
 
 	if (!empty($inserts))
-		upgrade_query("
-			INSERT INTO {$db_prefix}custom_fields_data
-				(id_member, variable, value)
-			VALUES
-				" . implode(',', $inserts));
+		$db->insert('',
+			'{db_prefix}custom_fields_data',
+			array('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
+			$inserts,
+			array('id_member', 'variable')
+		);
 }
 ---}
 ---#
 
 ---# Drop the old cols
-ALTER TABLE `{$db_prefix}members`
-	DROP `icq`,
-	DROP `aim`,
-	DROP `yim`,
-	DROP `msn`;
+---{
+$db_table->db_remove_column('{db_prefix}members', 'icq');
+$db_table->db_remove_column('{db_prefix}members', 'aim');
+$db_table->db_remove_column('{db_prefix}members', 'yim');
+$db_table->db_remove_column('{db_prefix}members', 'msn');
+---}
 ---#
 
 ---# Adding gravatar permissions...
@@ -679,23 +1119,28 @@ ALTER TABLE `{$db_prefix}members`
 if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersion'], '1.0') == -1)
 {
 	// Try find people who probably can use remote avatars.
-	$request = upgrade_query("
+	$request = $db->query('', '
 		SELECT id_group, add_deny, permission
-		FROM {$db_prefix}permissions
-		WHERE permission = 'profile_remote_avatar'");
+		FROM {db_prefix}permissions
+		WHERE permission = {string:permission}',
+		array(
+			'permission' => 'profile_remote_avatar'
+		)
+	);
 	$inserts = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		$inserts[] = "($row[id_group], 'profile_gravatar', $row[add_deny])";
+		$inserts[] = array($row['id_group'], 'profile_gravatar', $row['add_deny']);
 	}
 	$db->free_result($request);
 
 	if (!empty($inserts))
-		upgrade_query("
-			INSERT IGNORE INTO {$db_prefix}permissions
-				(id_group, permission, add_deny)
-			VALUES
-				" . implode(',', $inserts));
+		$db->insert('ignore',
+			'{db_prefix}permissions',
+			array('id_group' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
+			$inserts,
+			array('id_group', 'permission')
+		);
 }
 ---}
 ---#
@@ -705,9 +1150,17 @@ if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersio
 /******************************************************************************/
 
 ---# Changing URL to Elk package server...
-UPDATE {$db_prefix}package_servers
-SET url = 'https://github.com/elkarte/addons/tree/master/packages'
-WHERE url = 'http://custom.simplemachines.org/packages/mods';
+---{
+$db->query('', '
+	UPDATE {db_prefix}package_servers
+	SET url = {string:new}
+	WHERE url = {string:where}',
+	array(
+		'new' => 'https://github.com/elkarte/addons/tree/master/packages',
+		'where' => 'http://custom.simplemachines.org/packages/mods',
+	)
+);
+---}
 ---#
 
 /******************************************************************************/
@@ -715,63 +1168,124 @@ WHERE url = 'http://custom.simplemachines.org/packages/mods';
 /******************************************************************************/
 
 ---# Creating follow-up table...
-CREATE TABLE IF NOT EXISTS {$db_prefix}follow_ups (
-	follow_up int NOT NULL default '0',
-	derived_from int NOT NULL default '0',
-	PRIMARY KEY (follow_up, derived_from)
+---{
+$db_table->db_create_table('{db_prefix}follow_ups',
+	array(
+		array(
+			'name' => 'follow_up',
+			'type' => 'int',
+			'unsigned' => true,
+			'size' => 10,
+			'default' => 0
+		),
+		array(
+			'name' => 'derived_from',
+			'type' => 'int',
+			'unsigned' => true,
+			'size' => 10,
+			'default' => 0
+		)
+	),
+	array(
+		array(
+			'name' => 'follow_up',
+			'columns' => array('follow_up', 'derived_from'),
+			'type' => 'primary'
+		)
+	),
+	array(),
+	'ignore'
 );
+---}
 ---#
 
 /******************************************************************************/
 --- Updating antispam questions.
 /******************************************************************************/
 
----# Creating sequence for antispam_questions table...
-CREATE SEQUENCE {$db_prefix}antispam_questions_seq;
----#
-
 ---# Creating antispam questions table...
-CREATE TABLE IF NOT EXISTS {$db_prefix}antispam_questions (
-	id_question int default nextval('{$db_prefix}antispam_questions_seq'),
-	question text NOT NULL default '',
-	answer text NOT NULL default '',
-	language varchar(50) NOT NULL default '',
-	PRIMARY KEY (id_question)
+---{
+$db_table->db_create_table('{db_prefix}antispam_questions',
+	array(
+		array(
+			'name' => 'id_question',
+			'type' => 'tinyint',
+			'unsigned' => true,
+			'size' => 4,
+			'auto' => true
+		),
+		array(
+			'name' => 'question',
+			'type' => 'text',
+		),
+		array(
+			'name' => 'answer',
+			'type' => 'text',
+		),
+		array(
+			'name' => 'language',
+			'type' => 'varchar',
+			'size' => 50,
+			'default' => ''
+		)
+	),
+	array(
+		array(
+			'name' => 'id_question',
+			'columns' => array('id_question'),
+			'type' => 'primary'
+		),
+		array(
+			'name' => 'language',
+			'columns' => array('language(30)'),
+			'type' => 'key'
+		)
+	),
+	array(),
+	'ignore'
 );
----#
-
-#
-# Indexes for table `ban_items`
-#
-
----# Creating index for antispam_questions table...
-CREATE INDEX {$db_prefix}antispam_questions_language ON {$db_prefix}antispam_questions (language);
+---}
 ---#
 
 ---# Move existing values...
 ---{
 global $language;
 
-$request = upgrade_query("
+$request = $db->query('', '
 	SELECT id_comment, recipient_name as answer, body as question
-	FROM {$db_prefix}log_comments
-	WHERE comment_type = 'ver_test'");
+	FROM {db_prefix}log_comments
+	WHERE comment_type = {string:type}',
+	array(
+		'type' => 'ver_test'
+	)
+);
 if ($db->num_rows($request) != 0)
 {
 	$values = array();
 	$id_comments = array();
+	$inserts = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		upgrade_query("
-			INSERT INTO {$db_prefix}antispam_questions
-				(answer, question, language)
-			VALUES
-				('" . serialize(array($row['answer'])) . "', '" . $row['question'] . "', '" . $language . "')");
-		upgrade_query("
-			DELETE FROM {$db_prefix}log_comments
-			WHERE id_comment = " . $row['id_comment'] . "
-			LIMIT 1");
+		$inserts[] = array(serialize(array($row['answer'])), $row['question'], $language);
+		// @todo use $id_comments and move the DELETE out of the loop
+		$db->query('', '
+			DELETE FROM {db_prefix}log_comments
+			WHERE id_comment = {int:id_comment}
+			LIMIT {int:limit}',
+			array(
+				'id_comment' => $row['id_comment'],
+				'limit' => 1,
+			)
+		);
 	}
+
+	if (!empty($inserts))
+		$db->insert('',
+			'{db_prefix}antispam_questions',
+			array('answer' => 'string', 'question' => 'string', 'language' => 'string'),
+			$inserts,
+			array('id_question')
+		);
 }
 ---}
 ---#
@@ -780,76 +1294,245 @@ if ($db->num_rows($request) != 0)
 --- Adding support for Maillist
 /******************************************************************************/
 ---# Creating postby_emails table
-CREATE TABLE IF NOT EXISTS {$db_prefix}postby_emails (
-	id_email varchar(50) NOT NULL default '',
-	time_sent int NOT NULL default '0',
-	email_to varchar(50) NOT NULL default '',
-	PRIMARY KEY (id_email)
+---{
+$db_table->db_create_table('{db_prefix}postby_emails',
+	array(
+		array(
+			'name' => 'id_email',
+			'type' => 'varchar',
+			'size' => 50,
+			'default' => ''
+		),
+		array(
+			'name' => 'time_sent',
+			'type' => 'int',
+			'size' => 10,
+			'default' => 0
+		),
+		array(
+			'name' => 'email_to',
+			'type' => 'varchar',
+			'size' => 50,
+			'default' => ''
+		)
+	),
+	array(
+		array(
+			'name' => 'id_email',
+			'columns' => array('id_email'),
+			'type' => 'primary'
+		)
+	),
+	array(),
+	'ignore'
 );
----#
-
----# Sequence for table `postby_emails_error`
-CREATE SEQUENCE {$db_prefix}postby_emails_error_seq;
+---}
 ---#
 
 ---# Creating postby_emails_error table
-CREATE TABLE IF NOT EXISTS {$db_prefix}postby_emails_error (
-	id_email int default nextval('{$db_prefix}postby_emails_error_seq'),
-	error varchar(255) NOT NULL default '',
-	data_id varchar(255) NOT NULL default '0',
-	subject varchar(255) NOT NULL default '',
-	id_message int NOT NULL default '0',
-	id_board smallint NOT NULL default '0',
-	email_from varchar(50) NOT NULL default '',
-	message_type char(10) NOT NULL default '',
-	message mediumtext NOT NULL default '',
-	PRIMARY KEY (id_email)
+---{
+$db_table->db_create_table('{db_prefix}postby_emails_error',
+	array(
+		array(
+			'name' => 'id_email',
+			'type' => 'int',
+			'size' => 10,
+			'auto' => true
+		),
+		array(
+			'name' => 'error',
+			'type' => 'varchar',
+			'size' => 255,
+			'default' => ''
+		),
+		array(
+			'name' => 'data_id',
+			'type' => 'varchar',
+			'size' => 255,
+			'default' => '0'
+		),
+		array(
+			'name' => 'subject',
+			'type' => 'varchar',
+			'size' => 255,
+			'default' => ''
+		),
+		array(
+			'name' => 'id_message',
+			'type' => 'int',
+			'size' => 10,
+			'default' => 0
+		),
+		array(
+			'name' => 'id_board',
+			'type' => 'smallint',
+			'size' => 5,
+			'default' => 0
+		),
+		array(
+			'name' => 'email_from',
+			'type' => 'varchar',
+			'size' => 50,
+			'default' => ''
+		),
+		array(
+			'name' => 'message_type',
+			'type' => 'char',
+			'size' => 10,
+			'default' => ''
+		),
+		array(
+			'name' => 'message',
+			'type' => 'mediumtext'
+		)
+	),
+	array(
+		array(
+			'name' => 'id_email',
+			'columns' => array('id_email'),
+			'type' => 'primary'
+		)
+	),
+	array(),
+	'ignore'
 );
----#
-
----# Sequence for table `postby_emails_filter`
-CREATE SEQUENCE {$db_prefix}postby_emails_filters_seq;
+---}
 ---#
 
 ---# Creating postby_emails_filters table
-CREATE TABLE IF NOT EXISTS {$db_prefix}postby_emails_filters (
-	id_filter int default nextval('{$db_prefix}postby_emails_filters_seq'),
-	filter_style char(5) NOT NULL default '',
-	filter_type varchar(255) NOT NULL default '',
-	filter_to varchar(255) NOT NULL default '',
-	filter_from varchar(255) NOT NULL default '',
-	filter_name varchar(255) NOT NULL default '',
-	PRIMARY KEY (id_filter)
+---{
+$db_table->db_create_table('{db_prefix}postby_emails_filters',
+	array(
+		array(
+			'name' => 'id_filter',
+			'type' => 'int',
+			'size' => 10,
+			'auto' => true
+		),
+		array(
+			'name' => 'filter_style',
+			'type' => 'char',
+			'size' => 5,
+			'default' => ''
+		),
+		array(
+			'name' => 'filter_type',
+			'type' => 'varchar',
+			'size' => 255,
+			'default' => ''
+		),
+		array(
+			'name' => 'filter_to',
+			'type' => 'varchar',
+			'size' => 255,
+			'default' => ''
+		),
+		array(
+			'name' => 'filter_from',
+			'type' => 'varchar',
+			'size' => 255,
+			'default' => ''
+		),
+		array(
+			'name' => 'filter_name',
+			'type' => 'varchar',
+			'size' => 255,
+			'default' => ''
+		)
+	),
+	array(
+		array(
+			'name' => 'id_filter',
+			'columns' => array('id_filter'),
+			'type' => 'primary'
+		)
+	),
+	array(),
+	'ignore'
 );
+---}
 ---#
 
 ---# Adding new columns to postby_emails_filters...
-ALTER TABLE {$db_prefix}postby_emails_filters
-ADD COLUMN filter_order int NOT NULL default '0';
+---{
+$db_table->db_add_column('{db_prefix}postby_emails_filters',
+	array(
+		'name' => 'filter_order',
+		'type' => 'int',
+		'size' => 10,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+---}
 ---#
 
 ---# Set the default values so the order is set / maintained
 ---{
-upgrade_query("
+$db->query('', '
 	UPDATE {$db_prefix}postby_emails_filters
-	SET filter_order = id_filter");
+	SET filter_order = {string:filter}',
+	array(
+		'filter' => 'id_filter',
+	)
+);
 ---}
 ---#
 
 ---# Adding new columns to log_activity...
-ALTER TABLE {$db_prefix}log_activity
-ADD COLUMN pm smallint NOT NULL DEFAULT '0',
-ADD COLUMN email smallint NOT NULL DEFAULT '0';
+---{
+$db_table->db_add_column('{db_prefix}log_activity',
+	array(
+		'name' => 'pm',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 5,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+$db_table->db_add_column('{db_prefix}log_activity',
+	array(
+		'name' => 'email',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 5,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+---}
 ---#
 
 ---# Adding new columns to mail_queue...
-ALTER TABLE {$db_prefix}mail_queue
-ADD COLUMN message_id varchar(12) NOT NULL DEFAULT '';
+---{
+$db_table->db_add_column('{db_prefix}mail_queue',
+	array(
+		'name' => 'message_id',
+		'type' => 'varchar',
+		'default' => ''
+	),
+	array(),
+	'ignore'
+);
+---}
 ---#
 
 ---# Updating board profiles...
-INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 1, 'postby_email');
-INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 2, 'postby_email');
+---{
+$db->insert('ignore',
+	'{db_prefix}board_permissions',
+	array('id_group' => 'int', 'id_profile' => 'int', 'permission' => 'string'),
+	array(
+		array(0, 1, 'postby_email'),
+		array(0, 2, 'postby_email')
+	),
+	array('id_profile', 'id_group')
+);
+---}
 ---#
 
 /******************************************************************************/
@@ -857,42 +1540,145 @@ INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VAL
 /******************************************************************************/
 
 ---# Creating likes log table...
-CREATE TABLE IF NOT EXISTS {$db_prefix}log_likes (
-	action char(1) NOT NULL default '0',
-	id_target int NOT NULL default '0',
-	id_member int NOT NULL default '0',
-	log_time int NOT NULL default '0',
-	PRIMARY KEY (id_target, id_member)
+---{
+$db_table->db_create_table('{db_prefix}log_likes',
+	array(
+		array(
+			'name' => 'action',
+			'type' => 'char',
+			'size' => 1,
+			'default' => '0'
+		),
+		array(
+			'name' => 'id_target',
+			'type' => 'mediumint',
+			'unsigned' => true,
+			'size' => 8,
+			'default' => 0
+		),
+		array(
+			'name' => 'id_member',
+			'type' => 'mediumint',
+			'unsigned' => true,
+			'size' => 8,
+			'default' => 0
+		),
+		array(
+			'name' => 'log_time',
+			'type' => 'int',
+			'unsigned' => true,
+			'size' => 10,
+			'default' => 0
+		)
+	),
+	array(
+		array(
+			'name' => 'id_target_member',
+			'columns' => array('id_target', 'id_member'),
+			'type' => 'primary'
+		),
+		array(
+			'name' => 'log_time',
+			'columns' => array('log_time'),
+			'type' => 'key'
+		)
+	),
+	array(),
+	'ignore'
 );
----#
-
----# Creating likes log index ...
-CREATE INDEX {$db_prefix}log_likes_log_time ON {$db_prefix}log_likes (log_time);
+---}
 ---#
 
 ---# Creating likes message table...
-CREATE TABLE IF NOT EXISTS {$db_prefix}message_likes (
-	id_member int NOT NULL default '0',
-	id_msg int NOT NULL default '0',
-	id_poster int NOT NULL default '0',
-	PRIMARY KEY (id_msg, id_member)
+---{
+$db_table->db_create_table('{db_prefix}message_likes',
+	array(
+		array(
+			'name' => 'id_member',
+			'type' => 'mediumint',
+			'unsigned' => true,
+			'size' => 8,
+			'default' => 0
+		),
+		array(
+			'name' => 'id_msg',
+			'type' => 'int',
+			'unsigned' => true,
+			'size' => 10,
+			'default' => 0
+		),
+		array(
+			'name' => 'id_poster',
+			'type' => 'mediumint',
+			'unsigned' => true,
+			'size' => 8,
+			'default' => 0
+		)
+	),
+	array(
+		array(
+			'name' => 'id_msg_member',
+			'columns' => array('id_msg', 'id_member'),
+			'type' => 'primary'
+		),
+		array(
+			'name' => 'id_member',
+			'columns' => array('id_member'),
+			'type' => 'key'
+		),
+		array(
+			'name' => 'id_poster',
+			'columns' => array('id_poster'),
+			'type' => 'key'
+		)
+	),
+	array(),
+	'ignore'
 );
----#
-
----# Creating message_likes index ...
-CREATE INDEX {$db_prefix}message_likes_id_member ON {$db_prefix}message_likes (id_member);
-CREATE INDEX {$db_prefix}message_likes_id_poster ON {$db_prefix}message_likes (id_poster);
+---}
 ---#
 
 ---# Adding new columns to topics...
-ALTER TABLE {$db_prefix}topics
-ADD COLUMN num_likes int NOT NULL default '0';
+---{
+$db_table->db_add_column('{db_prefix}topics',
+	array(
+		'name' => 'num_likes',
+		'type' => 'int',
+		'unsigned' => true,
+		'size' => 10,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+---}
 ---#
 
 ---# Adding new columns to members...
-ALTER TABLE {$db_prefix}members
-ADD COLUMN likes_given int NOT NULL default '0',
-ADD COLUMN likes_received int NOT NULL default '0';
+---{
+$db_table->db_add_column('{db_prefix}members',
+	array(
+		'name' => 'likes_given',
+		'type' => 'mediumint',
+		'unsigned' => true,
+		'size' => 5,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+$db_table->db_add_column('{db_prefix}members',
+	array(
+		'name' => 'likes_received',
+		'type' => 'mediumint',
+		'unsigned' => true,
+		'size' => 5,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+---}
 ---#
 
 /******************************************************************************/
@@ -900,43 +1686,123 @@ ADD COLUMN likes_received int NOT NULL default '0';
 /******************************************************************************/
 
 ---# Renaming column that stores the PM receiving setting...
-ALTER TABLE {$db_prefix}members
-CHANGE pm_receive_from receive_from tinyint NOT NULL default '1';
+---{
+$db_table->db_change_column('{db_prefix}members',
+	'pm_receive_from',
+	array(
+		'name' => 'receive_from',
+		'type' => 'tinyint',
+		'unsigned' => true,
+		'size' => 4,
+		'default' => 1
+	),
+	array()
+);
+---}
 ---#
 
 /******************************************************************************/
 --- Adding mentions support.
 /******************************************************************************/
 
----# Creating mentions log index ...
-CREATE SEQUENCE {$db_prefix}log_mentions_id_mention_seq;
----#
-
----# Creating mentions log table...
-CREATE TABLE IF NOT EXISTS {$db_prefix}log_mentions (
-	id_mention int default nextval('{$db_prefix}log_mentions_id_mention_seq'),
-	id_member int NOT NULL DEFAULT '0',
-	id_msg int NOT NULL DEFAULT '0',
-	status int NOT NULL DEFAULT '0',
-	id_member_from int NOT NULL DEFAULT '0',
-	log_time int NOT NULL DEFAULT '0',
-	mention_type varchar(5) NOT NULL DEFAULT '',
-	PRIMARY KEY (id_mention)
+---# Creating notifications log table...
+---{
+$db_table->db_create_table('{db_prefix}log_mentions',
+	array(
+		array(
+			'name' => 'id_mention',
+			'type' => 'int',
+			'unsigned' => true,
+			'size' => 10,
+			'auto' => true
+		),
+		array(
+			'name' => 'id_member',
+			'type' => 'mediumint',
+			'unsigned' => true,
+			'size' => 8,
+			'default' => 0
+		),
+		array(
+			'name' => 'id_msg',
+			'type' => 'int',
+			'unsigned' => true,
+			'size' => 10,
+			'default' => 0
+		),
+		array(
+			'name' => 'status',
+			'type' => 'tinyint',
+			'size' => 1,
+			'default' => 0
+		),
+		array(
+			'name' => 'id_member_from',
+			'type' => 'mediumint',
+			'unsigned' => true,
+			'size' => 8,
+			'default' => 0
+		),
+		array(
+			'name' => 'log_time',
+			'type' => 'int',
+			'unsigned' => true,
+			'size' => 10,
+			'default' => 0
+		),
+		array(
+			'name' => 'mention_type',
+			'type' => 'varchar',
+			'size' => 5,
+			'default' => ''
+		)
+	),
+	array(
+		array(
+			'name' => 'id_mention',
+			'columns' => array('id_mention'),
+			'type' => 'primary'
+		),
+		array(
+			'name' => 'id_member_status',
+			'columns' => array('id_member', 'status'),
+			'type' => 'key'
+		)
+	),
+	array(),
+	'ignore'
 );
----#
-
----# Creating mentions log index ...
-CREATE INDEX {$db_prefix}log_mentions_id_member ON {$db_prefix}log_mentions (id_member, status);
+---}
 ---#
 
 ---# Adding new columns to members...
-ALTER TABLE {$db_prefix}members
-ADD COLUMN mentions smallint NOT NULL default '0';
+---{
+$db_table->db_add_column('{db_prefix}members',
+	array(
+		'name' => 'mentions',
+		'type' => 'smallint',
+		'size' => 5,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+---}
 ---#
 
 --- Fixing personal messages column name
 /******************************************************************************/
 ---# Adding new columns to log_packages ..
-ALTER TABLE {$db_prefix}members
-CHANGE `instant_messages` `personal_messages` smallint NOT NULL default 0;
+---{
+$db_table->db_change_column('{db_prefix}members',
+	'instant_messages',
+	array(
+		'name' => 'personal_messages',
+		'type' => 'smallint',
+		'size' => 5,
+		'default' => 1
+	),
+	array()
+);
+---}
 ---#

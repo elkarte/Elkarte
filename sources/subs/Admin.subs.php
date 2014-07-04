@@ -339,11 +339,13 @@ function readFileVersions(&$version_info, $directories, $pattern)
  *
  * @package Admin
  * @param int $time
+ *
+ * @todo seems a duplicate of Logging.php => logLastDatabaseError
  */
 function updateDbLastError($time)
 {
 	// Write out the db_last_error file with the error timestamp
-	file_put_contents(BOARDDIR . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = ' . $time . ';', LOCK_EX);
+	file_put_contents(BOARDDIR . '/db_last_error.txt', $time, LOCK_EX);
 	@touch(BOARDDIR . '/Settings.php');
 }
 

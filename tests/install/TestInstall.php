@@ -19,7 +19,7 @@ class TestInstall extends WebTestCase
 
 	function testWelcome()
 	{
-		$this->get(substr($this->scripturl, 0, -9) . '/install.php');
+		$this->get(substr($this->scripturl, 0, -9) . '/install/install.php');
 		$this->assertTitle('ElkArte Installer');
 		$this->assertText('Welcome to ElkArte. This script will guide you through the process for installing');
 

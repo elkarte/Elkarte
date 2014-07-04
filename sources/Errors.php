@@ -403,7 +403,7 @@ function display_maintenance_message()
 function display_db_error()
 {
 	global $mbname, $modSettings, $maintenance;
-	global $webmaster_email, $db_last_error, $db_error_send;
+	global $webmaster_email, $db_error_send;
 
 	$db = database();
 
@@ -412,6 +412,8 @@ function display_db_error()
 		@ob_end_clean();
 
 	set_fatal_error_headers();
+
+	$db_last_error = db_last_error();
 
 	// For our purposes, we're gonna want this on if at all possible.
 	$modSettings['cache_enable'] = 1;

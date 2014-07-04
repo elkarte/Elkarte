@@ -1714,7 +1714,7 @@ if ($profileCount == 0)
 					(profile_name)
 				VALUES
 					('$row[name]')");
-			$board_updates[$db->insert_id()][] = $row['id_board'];
+			$board_updates[$db->insert_id("{$db_prefix}permission_profiles")][] = $row['id_board'];
 		}
 		// Otherwise, dear god, this is an old school "simple" permission...
 		elseif ($row['permission_mode'] > 1 && $row['permission_mode'] < 5)

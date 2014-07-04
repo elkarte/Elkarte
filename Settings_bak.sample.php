@@ -77,11 +77,6 @@ $db_type = 'mysql';
  */
 $db_server = 'localhost';
 /**
- * The port for the database server
- * @var string
- */
-$db_port = '';
-/**
  * The database name
  * @var string
  */
@@ -180,20 +175,3 @@ $extdir = dirname(__FILE__) . '/sources/ext';
  * @var string
  */
 $languagedir = dirname(__FILE__) . '/themes/default/languages';
-
-########## Error-Catching ##########
-# Note: You shouldn't touch these settings.
-if (file_exists(dirname(__FILE__) . '/db_last_error.php'))
-	include(dirname(__FILE__) . '/db_last_error.php');
-
-if (!isset($db_last_error))
-{
-	// File does not exist so lets try to create it
-	file_put_contents(dirname(__FILE__) . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = 0;');
-	$db_last_error = 0;
-}
-
-if (file_exists(dirname(__FILE__) . '/install.php'))
-{
-	header('Location: http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on' ? 's' : '') . '://' . (empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST']) . (strtr(dirname($_SERVER['PHP_SELF']), '\\', '/') == '/' ? '' : strtr(dirname($_SERVER['PHP_SELF']), '\\', '/')) . '/install.php'); exit;
-}

@@ -1,5 +1,6 @@
 <?php
 require_once(BOARDDIR . '/sources/database/Db.php');
+require_once(BOARDDIR . '/sources/database/Db-abstract.class.php');
 require_once(BOARDDIR . '/sources/Errors.php');
 require_once(BOARDDIR . '/sources/subs/Cache.subs.php');
 require_once(BOARDDIR . '/sources/database/Database.subs.php');
@@ -18,7 +19,13 @@ Class Elk_Testing_Setup
 
 	public function run_queries()
 	{
+		global $modSettings;
+
+		$modSettings['disableQueryCheck'] = true;
 		$query = '';
+		$db = $this->_db;
+		$db->skip_error();
+		$db_table = $this->_db_table;
 
 		if (empty($this->_clean_queries_parts))
 			$this->_clean_queries_parts = $this->_queries_parts;
@@ -27,7 +34,7 @@ Class Elk_Testing_Setup
 		{
 			if (substr($part, -1) == ';')
 			{
-				$result = $this->_db->query('', $query . "\n" . substr($part, 0, -1), array('security_override' => true));
+				$result = eval('return ' . $query . $part);
 				if ($result === false)
 					echo 'Query failed: ' . "\n" . $query . "\n" . substr($part, 0, -1) . "\n";
 
@@ -96,7 +103,7 @@ Class Elk_Testing_Setup
 		global $settings, $db_type;
 		global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
 		global $boardurl, $webmaster_email, $cookiename;
-		global $db_server, $db_name, $db_user, $db_prefix, $db_persist, $db_error_send, $db_last_error;
+		global $db_server, $db_name, $db_user, $db_prefix, $db_persist, $db_error_send;
 		global $modSettings, $context, $sc, $user_info, $topic, $board, $txt;
 		global $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd;
 		global $sourcedir, $boarddir;
@@ -205,6 +212,8 @@ class Test_' . $key . ' extends TestSuite
 
 	public function prepare()
 	{
+		$this->load_queries(BOARDDIR . '/install/install_1-0.sql');
+
 		$this->run_queries();
 		$this->prepare_settings();
 		$this->update();

@@ -171,31 +171,31 @@ function writeLog($force = false)
  *
  * What it does:
  * - Attempts to use the backup file first, to store the last database error
- * - only updates db_last_error.php if the first was successful.
+ * - only updates db_last_error.txt if the first was successful.
  */
 function logLastDatabaseError()
 {
 	// Make a note of the last modified time in case someone does this before us
-	$last_db_error_change = @filemtime(BOARDDIR . '/db_last_error.php');
+	$last_db_error_change = @filemtime(BOARDDIR . '/db_last_error.txt');
 
 	// Save the old file before we do anything
-	$file = BOARDDIR . '/db_last_error.php';
-	$dberror_backup_fail = !@is_writable(BOARDDIR . '/db_last_error_bak.php') || !@copy($file, BOARDDIR . '/db_last_error_bak.php');
-	$dberror_backup_fail = !$dberror_backup_fail ? (!file_exists(BOARDDIR . '/db_last_error_bak.php') || filesize(BOARDDIR . '/db_last_error_bak.php') === 0) : $dberror_backup_fail;
+	$file = BOARDDIR . '/db_last_error.txt';
+	$dberror_backup_fail = !@is_writable(BOARDDIR . '/db_last_error_bak.txt') || !@copy($file, BOARDDIR . '/db_last_error_bak.txt');
+	$dberror_backup_fail = !$dberror_backup_fail ? (!file_exists(BOARDDIR . '/db_last_error_bak.txt') || filesize(BOARDDIR . '/db_last_error_bak.txt') === 0) : $dberror_backup_fail;
 
 	clearstatcache();
-	if (filemtime(BOARDDIR . '/db_last_error.php') === $last_db_error_change)
+	if (filemtime(BOARDDIR . '/db_last_error.txt') === $last_db_error_change)
 	{
 		// Write the change
-		$write_db_change = '<' . '?' . "php\n" . '$db_last_error = ' . time() . ';';
-		$written_bytes = file_put_contents(BOARDDIR . '/db_last_error.php', $write_db_change, LOCK_EX);
+		$write_db_change = time();
+		$written_bytes = file_put_contents(BOARDDIR . '/db_last_error.txt', $write_db_change, LOCK_EX);
 
 		// Survey says ...
 		if ($written_bytes !== strlen($write_db_change) && !$dberror_backup_fail)
 		{
 			// Oops. maybe we have no more disk space left, or some other troubles, troubles...
 			// Copy the file back and run for your life!
-			@copy(BOARDDIR . '/db_last_error_bak.php', BOARDDIR . '/db_last_error.php');
+			@copy(BOARDDIR . '/db_last_error_bak.txt', BOARDDIR . '/db_last_error.txt');
 		}
 		else
 		{

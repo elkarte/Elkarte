@@ -17,62 +17,14 @@
 
 define('CURRENT_VERSION', '1.0 RC 1');
 define('DB_SCRIPT_VERSION', '1-0');
-
-$GLOBALS['required_php_version'] = '5.2.0';
+define('REQUIRED_PHP_VERSION', '5.2.0');
 
 // Don't have PHP support, do you?
 // ><html dir="ltr"><head><title>Error!</title></head><body>Sorry, this installer requires PHP!<div style="display: none;">
 
 // Database info.
-$databases = array(
-	'mysql' => array(
-		'name' => 'MySQL',
-		'extension' => 'MySQL Improved (MySQLi)',
-		'version' => '5.0.19',
-		'version_check' => 'return min(mysqli_get_server_info($db_connection), mysqli_get_client_info($db_connection));',
-		'supported' => function_exists('mysqli_connect'),
-		'default_user' => 'mysqli.default_user',
-		'default_password' => 'mysqli.default_password',
-		'default_host' => 'mysqli.default_host',
-		'default_port' => 'mysqli.default_port',
-		'utf8_support' => true,
-		'utf8_version' => '4.1.0',
-		'utf8_version_check' => 'return mysqli_get_server_info($db_connection);',
-		'alter_support' => true,
-		'validate_prefix' => function (&$value) {
-			$value = preg_replace('~[^A-Za-z0-9_\$]~', '', $value);
-			return true;
-		},
-		'require_db_confirm' => true,
-	),
-	'postgresql' => array(
-		'name' => 'PostgreSQL',
-		'extension' => 'PostgreSQL (PgSQL)',
-		'version' => '8.3',
-		'function_check' => 'pg_connect',
-		'version_check' => '$request = pg_query(\'SELECT version()\'); list ($version) = pg_fetch_row($request); list ($pgl, $version) = explode(" ", $version); return $version;',
-		'supported' => function_exists('pg_connect'),
-		'utf8_support' => true,
-		'utf8_version' => '8.0',
-		'utf8_version_check' => '$request = pg_query(\'SELECT version()\'); list ($version) = pg_fetch_row($request); list ($pgl, $version) = explode(" ", $version); return $version;',
-		'validate_prefix' => function (&$value) {
-			global $txt;
-
-			$value = preg_replace('~[^A-Za-z0-9_\$]~', '', $value);
-
-			// Is it reserved?
-			if ($value == 'pg_')
-				return $txt['error_db_prefix_reserved'];
-
-			// Is the prefix numeric?
-			if (preg_match('~^\d~', $value))
-				return $txt['error_db_prefix_numeric'];
-
-			return true;
-		},
-		'require_db_confirm' => true,
-	),
-);
+$databases = array();
+load_possible_databases();
 
 // Initialize everything and load the language files.
 initialize_inputs();
@@ -84,47 +36,33 @@ $installurl = $_SERVER['PHP_SELF'];
 // This is where home is.
 $oursite = 'http://www.elkarte.net/';
 
-// All the steps in detail.
-// Number,Name,Function,Progress Weight.
-$incontext['steps'] = array(
-	0 => array(1, $txt['install_step_welcome'], 'action_welcome', 0),
-	1 => array(2, $txt['install_step_writable'], 'action_checkFilesWritable', 10),
-	2 => array(3, $txt['install_step_databaseset'], 'action_databaseSettings', 15),
-	3 => array(4, $txt['install_step_forum'], 'action_forumSettings', 40),
-	4 => array(5, $txt['install_step_databasechange'], 'action_databasePopulation', 15),
-	5 => array(6, $txt['install_step_admin'], 'action_adminAccount', 20),
-	6 => array(7, $txt['install_step_delete'], 'action_deleteInstall', 0),
-);
+$action = new Install_Controller();
+
+$incontext['steps'] = $action->steps;
 
 // Default title...
 $incontext['page_title'] = $txt['installer'];
 
 // What step are we on?
-$incontext['current_step'] = isset($_GET['step']) ? (int) $_GET['step'] : 0;
-
-// Loop through all the steps doing each one as required.
-$incontext['overall_percent'] = 0;
-foreach ($incontext['steps'] as $num => $step)
-{
-	if ($num >= $incontext['current_step'])
-	{
-		// The current weight of this step in terms of overall progress.
-		$incontext['step_weight'] = $step[3];
-
-		// Call the step and if it returns false that means pause!
-		if (function_exists($step[2]) && $step[2]() === false)
-			break;
-		elseif (function_exists($step[2]))
-			$incontext['current_step']++;
-
-		// No warnings pass on.
-		$incontext['warning'] = '';
-	}
-	$incontext['overall_percent'] += $step[3];
-}
+$incontext['current_step'] = $action->dispatch(isset($_GET['step']) ? (int) $_GET['step'] : 0);
+$incontext['overall_percent'] = $action->overall_percent;
 
 // Actually do the template stuff.
 installExit();
+
+/**
+ * Grabs all the files with db definitions and loads them.
+ * That's the easy way, in the future we can make it as complex as possible. :P
+ */
+function load_possible_databases()
+{
+	global $databases;
+
+	$files = glob(dirname(__FILE__) . '/Db-check-*.php');
+
+	foreach ($files as $file)
+		require_once($file);
+}
 
 /**
  * Initialization step. Called at each request.
@@ -137,36 +75,23 @@ function initialize_inputs()
 		@set_magic_quotes_runtime(0);
 	error_reporting(E_ALL);
 
+	if (!defined('TMP_BOARDDIR'))
+		define('TMP_BOARDDIR', realpath(dirname(__FILE__) . '/..'));
+
 	// This is the test for support of compression
 	if (isset($_GET['obgz']))
-	{
-		ob_start('ob_gzhandler');
+		return action_testCompression();
 
-		if (ini_get('session.save_handler') == 'user')
-			@ini_set('session.save_handler', 'files');
-		session_start();
+	// This is really quite simple; if ?delete is on the URL, delete the installer...
+	if (isset($_GET['delete']))
+		return action_deleteInstaller();
 
-		if (!headers_sent())
-			echo '<!DOCTYPE html>
-<html>
-	<head>
-		<title>', htmlspecialchars($_GET['pass_string'], ENT_COMPAT, 'UTF-8'), '</title>
-	</head>
-	<body style="background: #d4d4d4; margin-top: 16%; font-size: 16pt;">
-		<strong>', htmlspecialchars($_GET['pass_string'], ENT_COMPAT, 'UTF-8'), '</strong>
-	</body>
-</html>';
-		exit;
-	}
-	else
-	{
-		ob_start();
+	ob_start();
 
-		if (ini_get('session.save_handler') == 'user')
-			@ini_set('session.save_handler', 'files');
-		if (function_exists('session_start'))
-			@session_start();
-	}
+	if (ini_get('session.save_handler') == 'user')
+		@ini_set('session.save_handler', 'files');
+	if (function_exists('session_start'))
+		@session_start();
 
 	// Reject magic_quotes_sybase='on'.
 	if (ini_get('magic_quotes_sybase') || strtolower(ini_get('magic_quotes_sybase')) == 'on')
@@ -179,10 +104,6 @@ function initialize_inputs()
 	foreach ($_POST as $k => $v)
 		if (strpos($k, 'password') === false)
 			$_POST[$k] = addslashes($v);
-
-	// This is really quite simple; if ?delete is on the URL, delete the installer...
-	if (isset($_GET['delete']))
-		action_deleteInstaller();
 
 	// PHP 5 might cry if we don't do this now.
 	$server_offset = @mktime(0, 0, 0, 1, 1, 1970);
@@ -202,10 +123,10 @@ function load_lang_file()
 	$incontext['detected_languages'] = array();
 
 	// Make sure the languages directory actually exists.
-	if (file_exists(dirname(__FILE__) . '/themes/default/languages'))
+	if (file_exists(TMP_BOARDDIR . '/themes/default/languages'))
 	{
 		// Find all the "Install" language files in the directory.
-		$dir = dir(dirname(__FILE__) . '/themes/default/languages');
+		$dir = dir(TMP_BOARDDIR . '/themes/default/languages');
 		while ($entry = $dir->read())
 		{
 			if (is_dir($dir->path . '/' . $entry) && file_exists($dir->path . '/' . $entry . '/Install.' . $entry . '.php'))
@@ -250,7 +171,7 @@ function load_lang_file()
 		$_SESSION['installer_temp_lang'] = $_GET['lang_file'];
 
 	// Make sure it exists, if it doesn't reset it.
-	if (!isset($_SESSION['installer_temp_lang']) || preg_match('~[^\\w_\\-.]~', $_SESSION['installer_temp_lang']) === 1 || !file_exists(dirname(__FILE__) . '/themes/default/languages/' . substr($_SESSION['installer_temp_lang'], 8, strlen($_SESSION['installer_temp_lang']) - 12) . '/' . $_SESSION['installer_temp_lang']))
+	if (!isset($_SESSION['installer_temp_lang']) || preg_match('~[^\\w_\\-.]~', $_SESSION['installer_temp_lang']) === 1 || !file_exists(TMP_BOARDDIR . '/themes/default/languages/' . substr($_SESSION['installer_temp_lang'], 8, strlen($_SESSION['installer_temp_lang']) - 12) . '/' . $_SESSION['installer_temp_lang']))
 	{
 		// Use the first one...
 		list ($_SESSION['installer_temp_lang']) = array_keys($incontext['detected_languages']);
@@ -261,7 +182,7 @@ function load_lang_file()
 	}
 
 	// And now include the actual language file itself.
-	require_once(dirname(__FILE__) . '/themes/default/languages/' . substr($_SESSION['installer_temp_lang'], 8, strlen($_SESSION['installer_temp_lang']) - 12) . '/' . $_SESSION['installer_temp_lang']);
+	require_once(TMP_BOARDDIR . '/themes/default/languages/' . substr($_SESSION['installer_temp_lang'], 8, strlen($_SESSION['installer_temp_lang']) - 12) . '/' . $_SESSION['installer_temp_lang']);
 }
 
 /**
@@ -272,14 +193,12 @@ function load_database()
 	global $db_prefix, $db_connection, $modSettings, $db_type, $db_name, $db_user, $db_persist;
 
 	if (!defined('SOURCEDIR'))
-		define('SOURCEDIR', dirname(__FILE__) . '/sources');
+		define('SOURCEDIR', TMP_BOARDDIR . '/sources');
 
 	// Need this to check whether we need the database password.
-	require(dirname(__FILE__) . '/Settings.php');
+	require(TMP_BOARDDIR . '/Settings.php');
 	if (!defined('ELK'))
 		define('ELK', 1);
-
-	$modSettings['disableQueryCheck'] = true;
 
 	// Connect the database.
 	if (!$db_connection)
@@ -327,470 +246,579 @@ function installExit($fallThrough = false)
 }
 
 /**
- * Welcome screen.
- * It makes a few basic checks for compatibility
- * and informs the user if there are problems.
+ * This does the installation steps
  */
-function action_welcome()
+class Install_Controller
 {
-	global $incontext, $txt, $databases, $installurl;
+	public $steps = array();
+	public $overall_percent = 0;
 
-	$incontext['page_title'] = $txt['install_welcome'];
-	$incontext['sub_template'] = 'welcome_message';
-
-	// Done the submission?
-	if (isset($_POST['contbutt']))
-		return true;
-
-	// Check the PHP version.
-	if ((!function_exists('version_compare') || version_compare($GLOBALS['required_php_version'], PHP_VERSION, '>')))
+	public function __construct()
 	{
-		$incontext['warning'] = $txt['error_php_too_low'];
+		global $txt;
+
+		// All the steps in detail.
+		// Number,Name,Function,Progress Weight.
+		$this->steps = array(
+			0 => array(1, $txt['install_step_welcome'], 'action_welcome', 0),
+			1 => array(2, $txt['install_step_exist'], 'action_checkFilesExist', 5),
+			2 => array(3, $txt['install_step_writable'], 'action_checkFilesWritable', 5),
+			3 => array(4, $txt['install_step_databaseset'], 'action_databaseSettings', 15),
+			4 => array(5, $txt['install_step_forum'], 'action_forumSettings', 40),
+			5 => array(6, $txt['install_step_databasechange'], 'action_databasePopulation', 15),
+			6 => array(7, $txt['install_step_admin'], 'action_adminAccount', 20),
+			7 => array(8, $txt['install_step_delete'], 'action_deleteInstall', 0),
+		);
 	}
 
-	// See if we think they have already installed it?
-	if (is_readable(dirname(__FILE__) . '/Settings.php'))
+	public function dispatch($current_step)
 	{
-		$probably_installed = 0;
-		foreach (file(dirname(__FILE__) . '/Settings.php') as $line)
+		global $incontext;
+
+		// Loop through all the steps doing each one as required.
+		foreach ($this->steps as $num => $step)
 		{
-			if (preg_match('~^\$db_passwd\s=\s\'([^\']+)\';$~', $line))
-				$probably_installed++;
-			if (preg_match('~^\$boardurl\s=\s\'([^\']+)\';~', $line) && !preg_match('~^\$boardurl\s=\s\'http://127\.0\.0\.1/elkarte\';~', $line))
-				$probably_installed++;
+			if ($num >= $current_step)
+			{
+				// The current weight of this step in terms of overall progress.
+				$incontext['step_weight'] = $step[3];
+
+				// Call the step and if it returns false that means pause!
+				if ($this->{$step[2]}() === false)
+					break;
+				else
+					$current_step++;
+
+				// No warnings pass on.
+				$incontext['warning'] = '';
+			}
+			$this->overall_percent += $step[3];
 		}
 
-		if ($probably_installed == 2)
-			$incontext['warning'] = $txt['error_already_installed'];
+		return $current_step;
 	}
 
-	// Is some database support even compiled in?
-	$incontext['supported_databases'] = array();
-	$db_missing = array();
-	foreach ($databases as $key => $db)
+	/**
+	 * Welcome screen.
+	 * It makes a few basic checks for compatibility
+	 * and informs the user if there are problems.
+	 */
+	private function action_welcome()
 	{
-		if ($db['supported'])
+		global $incontext, $txt, $databases, $installurl;
+
+		$incontext['page_title'] = $txt['install_welcome'];
+		$incontext['sub_template'] = 'welcome_message';
+
+		// Done the submission?
+		if (isset($_POST['contbutt']))
+			return true;
+
+		// Check the PHP version.
+		if (version_compare(REQUIRED_PHP_VERSION, PHP_VERSION, '>'))
 		{
-			if (!file_exists(dirname(__FILE__) . '/install_' . DB_SCRIPT_VERSION . '_' . $key . '.sql'))
+			$incontext['warning'] = $txt['error_php_too_low'];
+		}
+
+		// See if we think they have already installed it?
+		if (is_readable(TMP_BOARDDIR . '/Settings.php'))
+		{
+			$probably_installed = 0;
+			foreach (file(TMP_BOARDDIR . '/Settings.php') as $line)
 			{
-				$databases[$key]['supported'] = false;
-				$notFoundSQLFile = true;
-				$txt['error_db_script_missing'] = sprintf($txt['error_db_script_missing'], 'install_' . DB_SCRIPT_VERSION . '_' . $key . '.sql');
+				if (preg_match('~^\$db_passwd\s=\s\'([^\']+)\';$~', $line))
+					$probably_installed++;
+				if (preg_match('~^\$boardurl\s=\s\'([^\']+)\';~', $line) && !preg_match('~^\$boardurl\s=\s\'http://127\.0\.0\.1/elkarte\';~', $line))
+					$probably_installed++;
+			}
+
+			if ($probably_installed == 2)
+				$incontext['warning'] = str_replace('{try_delete}', '
+		<div id="delete_label" style="font-weight: bold; display: none">
+			<label for="delete_self"><input type="checkbox" id="delete_self" onclick="doTheDelete();" class="input_check" /> ' . $txt['delete_installer'] . (!isset($_SESSION['installer_temp_ftp']) ? ' ' . $txt['delete_installer_maybe'] : '') . '</label>
+		<script><!-- // --><![CDATA[
+			function doTheDelete()
+			{
+				var theCheck = document.getElementById ? document.getElementById("delete_self") : document.all.delete_self,
+					tempImage = new Image();
+
+				tempImage.src = "' . $installurl . '?delete=1&ts_" + (new Date().getTime());
+				tempImage.width = 0;
+				theCheck.disabled = true;
+				window.location.href = elk_scripturl;
+			}
+			document.getElementById(\'delete_label\').style.display = \'block\';
+		// ]]></script>
+		</div>', $txt['error_already_installed']);
+		}
+
+		// If there is no Settings.php then we need a new one that only the owner can provide
+		if (!file_exists(TMP_BOARDDIR . '/Settings.php'))
+		{
+			$incontext['warning'] = $txt['error_no_settings'];
+		}
+
+		// Is some database support even compiled in?
+		$incontext['supported_databases'] = array();
+		$db_missing = array();
+		foreach ($databases as $key => $db)
+		{
+			if ($db['supported'])
+			{
+				if (!empty($db['additional_file']) && !file_exists(dirname(__FILE__) . '/' . $db['additional_file']))
+				{
+					$databases[$key]['supported'] = false;
+					$notFoundSQLFile = true;
+					$txt['error_db_script_missing'] = sprintf($txt['error_db_script_missing'], $db['additional_file']);
+				}
+				else
+				{
+					$db_type = $key;
+					$incontext['supported_databases'][] = $db;
+				}
 			}
 			else
-			{
-				$db_type = $key;
-				$incontext['supported_databases'][] = $db;
-			}
+				$db_missing[] = $db['extension'];
 		}
-		else
-			$db_missing[] = $db['extension'];
-	}
 
-	if (count($db_missing) === count($databases))
-		$incontext['error'] = sprintf($txt['error_db_missing'], implode(', ', $db_missing));
-	elseif (empty($incontext['supported_databases']))
-		$error = empty($notFoundSQLFile) ? 'error_db_missing' : 'error_db_script_missing';
-	// How about session support?  Some crazy sysadmin remove it?
-	elseif (!function_exists('session_start'))
-		$error = 'error_session_missing';
-	// Make sure they uploaded all the files.
-	elseif (!file_exists(dirname(__FILE__) . '/index.php'))
-		$error = 'error_missing_files';
-	// Very simple check on the session.save_path for Windows.
-	// @todo Move this down later if they don't use database-driven sessions?
-	elseif (@ini_get('session.save_path') == '/tmp' && substr(__FILE__, 1, 2) == ':\\')
-		$error = 'error_session_save_path';
+		if (count($db_missing) === count($databases))
+			$incontext['error'] = sprintf($txt['error_db_missing'], implode(', ', $db_missing));
+		elseif (empty($incontext['supported_databases']))
+			$error = empty($notFoundSQLFile) ? 'error_db_missing' : 'error_db_script_missing';
+		// How about session support?  Some crazy sysadmin remove it?
+		elseif (!function_exists('session_start'))
+			$error = 'error_session_missing';
+		// Make sure they uploaded all the files.
+		elseif (!file_exists(TMP_BOARDDIR . '/index.php'))
+			$error = 'error_missing_files';
+		// Very simple check on the session.save_path for Windows.
+		// @todo Move this down later if they don't use database-driven sessions?
+		elseif (@ini_get('session.save_path') == '/tmp' && substr(__FILE__, 1, 2) == ':\\')
+			$error = 'error_session_save_path';
 
-	// Since each of the three messages would look the same, anyway...
-	if (isset($error))
-		$incontext['error'] = $txt[$error];
+		// Since each of the three messages would look the same, anyway...
+		if (isset($error))
+			$incontext['error'] = $txt[$error];
 
-	// Mod_security blocks everything that smells funny. Let us handle security.
-	if (!fixModSecurity() && !isset($_GET['overmodsecurity']))
-		$incontext['error'] = $txt['error_mod_security'] . '<br /><br /><a href="' . $installurl . '?overmodsecurity=true">' . $txt['error_message_click'] . '</a> ' . $txt['error_message_bad_try_again'];
-
-	return false;
-}
-
-/**
- * Verify and try to make writable the files and folders that need to be.
- */
-function action_checkFilesWritable()
-{
-	global $txt, $incontext;
-
-	$incontext['page_title'] = $txt['ftp_checking_writable'];
-	$incontext['sub_template'] = 'chmod_files';
-
-	$writable_files = array(
-		'attachments',
-		'avatars',
-		'cache',
-		'packages',
-		'packages/installed.list',
-		'smileys',
-		'themes',
-		'agreement.txt',
-		'Settings.php',
-		'Settings_bak.php'
-	);
-	foreach ($incontext['detected_languages'] as $lang => $temp)
-		$extra_files[] = 'themes/default/languages/' . $lang;
-
-	// With mod_security installed, we could attempt to fix it with .htaccess.
-	if (function_exists('apache_get_modules') && in_array('mod_security', apache_get_modules()))
-		$writable_files[] = file_exists(dirname(__FILE__) . '/.htaccess') ? '.htaccess' : '.';
-
-	$failed_files = array();
-
-	// On linux, it's easy - just use is_writable!
-	if (substr(__FILE__, 1, 2) != ':\\')
-	{
-		foreach ($writable_files as $file)
-		{
-			if (!is_writable(dirname(__FILE__) . '/' . $file))
-			{
-				@chmod(dirname(__FILE__) . '/' . $file, 0755);
-
-				// Well, 755 hopefully worked... if not, try 777.
-				if (!is_writable(dirname(__FILE__) . '/' . $file) && !@chmod(dirname(__FILE__) . '/' . $file, 0777))
-					$failed_files[] = $file;
-			}
-		}
-		foreach ($extra_files as $file)
-			@chmod(dirname(__FILE__) . (empty($file) ? '' : '/' . $file), 0777);
-	}
-	// Windows is trickier.  Let's try opening for r+...
-	else
-	{
-		foreach ($writable_files as $file)
-		{
-			// Folders can't be opened for write... but the index.php in them can ;)
-			if (is_dir(dirname(__FILE__) . '/' . $file))
-				$file .= '/index.php';
-
-			// Funny enough, chmod actually does do something on windows - it removes the read only attribute.
-			@chmod(dirname(__FILE__) . '/' . $file, 0777);
-			$fp = @fopen(dirname(__FILE__) . '/' . $file, 'r+');
-
-			// Hmm, okay, try just for write in that case...
-			if (!is_resource($fp))
-				$fp = @fopen(dirname(__FILE__) . '/' . $file, 'w');
-
-			if (!is_resource($fp))
-				$failed_files[] = $file;
-
-			@fclose($fp);
-		}
-		foreach ($extra_files as $file)
-			@chmod(dirname(__FILE__) . (empty($file) ? '' : '/' . $file), 0777);
-	}
-
-	$failure = count($failed_files) >= 1;
-
-	if (!isset($_SERVER))
-		return !$failure;
-
-	// Put the list into context.
-	$incontext['failed_files'] = $failed_files;
-
-	// It's not going to be possible to use FTP on windows to solve the problem...
-	if ($failure && substr(__FILE__, 1, 2) == ':\\')
-	{
-		$incontext['error'] = $txt['error_windows_chmod'] . '
-					<ul style="margin: 2.5ex; font-family: monospace;">
-						<li>' . implode('</li>
-						<li>', $failed_files) . '</li>
-					</ul>';
+		// Mod_security blocks everything that smells funny. Let us handle security.
+		if (!fixModSecurity() && !isset($_GET['overmodsecurity']))
+			$incontext['error'] = $txt['error_mod_security'] . '<br /><br /><a href="' . $installurl . '?overmodsecurity=true">' . $txt['error_message_click'] . '</a> ' . $txt['error_message_bad_try_again'];
 
 		return false;
 	}
-	// We're going to have to use... FTP!
-	elseif ($failure)
+
+	/**
+	 * Verify and try to make writable the files and folders that need to be.
+	 */
+	private function action_checkFilesExist()
 	{
-		// Load any session data we might have...
-		if (!isset($_POST['ftp_username']) && isset($_SESSION['installer_temp_ftp']))
+		global $incontext, $txt, $databases, $installurl;
+
+		$incontext['page_title'] = $txt['install_welcome'];
+		$incontext['sub_template'] = 'welcome_message';
+
+		$exist_files = array(
+			'db_last_error.sample.txt' => 'db_last_error.txt',
+			'Settings.sample.php' => 'Settings.php',
+			'Settings_bak.sample.php' => 'Settings_bak.php'
+		);
+		$missing_files = array();
+
+		foreach ($exist_files as $orig => $file)
 		{
-			$_POST['ftp_server'] = $_SESSION['installer_temp_ftp']['server'];
-			$_POST['ftp_port'] = $_SESSION['installer_temp_ftp']['port'];
-			$_POST['ftp_username'] = $_SESSION['installer_temp_ftp']['username'];
-			$_POST['ftp_password'] = $_SESSION['installer_temp_ftp']['password'];
-			$_POST['ftp_path'] = $_SESSION['installer_temp_ftp']['path'];
-		}
-
-		$incontext['ftp_errors'] = array();
-
-		if (isset($_POST['ftp_username']))
-		{
-			$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
-
-			if ($ftp->error === false)
+			// First thing (for convenience' sake) if they are not there yet,
+			// try to rename Settings and Settings_bak and db_last_error
+			if (!file_exists(TMP_BOARDDIR . '/' . $file))
 			{
-				// Try it without /home/abc just in case they messed up.
-				if (!$ftp->chdir($_POST['ftp_path']))
-				{
-					$incontext['ftp_errors'][] = $ftp->last_message;
-					$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $_POST['ftp_path']));
-				}
+				// Silenced because the source file may or may not exist
+				@rename (TMP_BOARDDIR. '/' . $orig, TMP_BOARDDIR . '/' . $file);
+
+				// If it still doesn't exist, add it to the missing list
+				if (!file_exists(TMP_BOARDDIR . '/' . $file))
+					$missing_files[$orig] = $file;
 			}
 		}
 
-		if (!isset($ftp) || $ftp->error !== false)
+		if (empty($missing_files))
+			return true;
+
+		$rename_array = array();
+		foreach ($missing_files as $orig => $file)
+			$rename_array[] = '<li>' . $orig . ' => ' . $file . '</li>';
+
+		$incontext['error'] = sprintf($txt['error_settings_do_not_exist'], implode(', ', $missing_files), implode('', $rename_array));
+
+		$incontext['retry'] = 1;
+
+		return false;
+	}
+
+	/**
+	 * Verify and try to make writable the files and folders that need to be.
+	 */
+	private function action_checkFilesWritable()
+	{
+		global $txt, $incontext;
+
+		$incontext['page_title'] = $txt['ftp_checking_writable'];
+		$incontext['sub_template'] = 'chmod_files';
+
+		$writable_files = array(
+			'attachments',
+			'avatars',
+			'cache',
+			'packages',
+			'packages/installed.list',
+			'smileys',
+			'themes',
+			'agreement.txt',
+			'Settings.php',
+			'Settings_bak.php'
+		);
+		foreach ($incontext['detected_languages'] as $lang => $temp)
+			$extra_files[] = 'themes/default/languages/' . $lang;
+
+		// With mod_security installed, we could attempt to fix it with .htaccess.
+		if (function_exists('apache_get_modules') && in_array('mod_security', apache_get_modules()))
+			$writable_files[] = file_exists(TMP_BOARDDIR . '/.htaccess') ? '.htaccess' : '.';
+
+		$failed_files = array();
+
+		// On linux, it's easy - just use is_writable!
+		if (substr(__FILE__, 1, 2) != ':\\')
 		{
-			if (!isset($ftp))
-				$ftp = new Ftp_Connection(null);
-			// Save the error so we can mess with listing...
-			elseif ($ftp->error !== false && empty($incontext['ftp_errors']) && !empty($ftp->last_message))
-				$incontext['ftp_errors'][] = $ftp->last_message;
+			foreach ($writable_files as $file)
+			{
+				if (!is_writable(TMP_BOARDDIR . '/' . $file))
+				{
+					@chmod(TMP_BOARDDIR . '/' . $file, 0755);
 
-			list ($username, $detect_path, $found_path) = $ftp->detect_path(dirname(__FILE__));
+					// Well, 755 hopefully worked... if not, try 777.
+					if (!is_writable(TMP_BOARDDIR . '/' . $file) && !@chmod(TMP_BOARDDIR . '/' . $file, 0777))
+						$failed_files[] = $file;
+				}
+			}
+			foreach ($extra_files as $file)
+				@chmod(TMP_BOARDDIR . (empty($file) ? '' : '/' . $file), 0777);
+		}
+		// Windows is trickier.  Let's try opening for r+...
+		else
+		{
+			foreach ($writable_files as $file)
+			{
+				// Folders can't be opened for write... but the index.php in them can ;)
+				if (is_dir(TMP_BOARDDIR . '/' . $file))
+					$file .= '/index.php';
 
-			if (empty($_POST['ftp_path']) && $found_path)
-				$_POST['ftp_path'] = $detect_path;
+				// Funny enough, chmod actually does do something on windows - it removes the read only attribute.
+				@chmod(TMP_BOARDDIR . '/' . $file, 0777);
+				$fp = @fopen(TMP_BOARDDIR . '/' . $file, 'r+');
 
-			if (!isset($_POST['ftp_username']))
-				$_POST['ftp_username'] = $username;
+				// Hmm, okay, try just for write in that case...
+				if (!is_resource($fp))
+					$fp = @fopen(TMP_BOARDDIR . '/' . $file, 'w');
 
-			// Set the username etc, into context.
-			$incontext['ftp'] = array(
-				'server' => isset($_POST['ftp_server']) ? $_POST['ftp_server'] : 'localhost',
-				'port' => isset($_POST['ftp_port']) ? $_POST['ftp_port'] : '21',
-				'username' => isset($_POST['ftp_username']) ? $_POST['ftp_username'] : '',
-				'path' => isset($_POST['ftp_path']) ? $_POST['ftp_path'] : '/',
-				'path_msg' => !empty($found_path) ? $txt['ftp_path_found_info'] : $txt['ftp_path_info'],
-			);
+				if (!is_resource($fp))
+					$failed_files[] = $file;
+
+				@fclose($fp);
+			}
+			foreach ($extra_files as $file)
+				@chmod(TMP_BOARDDIR . (empty($file) ? '' : '/' . $file), 0777);
+		}
+
+		$failure = count($failed_files) >= 1;
+
+		if (!isset($_SERVER))
+			return !$failure;
+
+		// Put the list into context.
+		$incontext['failed_files'] = $failed_files;
+
+		// It's not going to be possible to use FTP on windows to solve the problem...
+		if ($failure && substr(__FILE__, 1, 2) == ':\\')
+		{
+			$incontext['error'] = $txt['error_windows_chmod'] . '
+						<ul style="margin: 2.5ex; font-family: monospace;">
+							<li>' . implode('</li>
+							<li>', $failed_files) . '</li>
+						</ul>';
 
 			return false;
 		}
-		else
+		// We're going to have to use... FTP!
+		elseif ($failure)
 		{
-			$_SESSION['installer_temp_ftp'] = array(
-				'server' => $_POST['ftp_server'],
-				'port' => $_POST['ftp_port'],
-				'username' => $_POST['ftp_username'],
-				'password' => $_POST['ftp_password'],
-				'path' => $_POST['ftp_path']
-			);
-
-			$failed_files_updated = array();
-
-			foreach ($failed_files as $file)
+			// Load any session data we might have...
+			if (!isset($_POST['ftp_username']) && isset($_SESSION['installer_temp_ftp']))
 			{
-				if (!is_writable(dirname(__FILE__) . '/' . $file))
-					$ftp->chmod($file, 0755);
-				if (!is_writable(dirname(__FILE__) . '/' . $file))
-					$ftp->chmod($file, 0777);
-				if (!is_writable(dirname(__FILE__) . '/' . $file))
+				$_POST['ftp_server'] = $_SESSION['installer_temp_ftp']['server'];
+				$_POST['ftp_port'] = $_SESSION['installer_temp_ftp']['port'];
+				$_POST['ftp_username'] = $_SESSION['installer_temp_ftp']['username'];
+				$_POST['ftp_password'] = $_SESSION['installer_temp_ftp']['password'];
+				$_POST['ftp_path'] = $_SESSION['installer_temp_ftp']['path'];
+			}
+
+			$incontext['ftp_errors'] = array();
+
+			if (isset($_POST['ftp_username']))
+			{
+				$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
+
+				if ($ftp->error === false)
 				{
-					$failed_files_updated[] = $file;
-					$incontext['ftp_errors'][] = rtrim($ftp->last_message) . ' -> ' . $file . "\n";
+					// Try it without /home/abc just in case they messed up.
+					if (!$ftp->chdir($_POST['ftp_path']))
+					{
+						$incontext['ftp_errors'][] = $ftp->last_message;
+						$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $_POST['ftp_path']));
+					}
 				}
 			}
 
-			$ftp->close();
-
-			// Are there any errors left?
-			if (count($failed_files_updated) >= 1)
+			if (!isset($ftp) || $ftp->error !== false)
 			{
-				// Guess there are...
-				$incontext['failed_files'] = $failed_files_updated;
+				if (!isset($ftp))
+					$ftp = new Ftp_Connection(null);
+				// Save the error so we can mess with listing...
+				elseif ($ftp->error !== false && empty($incontext['ftp_errors']) && !empty($ftp->last_message))
+					$incontext['ftp_errors'][] = $ftp->last_message;
+
+				list ($username, $detect_path, $found_path) = $ftp->detect_path(TMP_BOARDDIR);
+
+				if (empty($_POST['ftp_path']) && $found_path)
+					$_POST['ftp_path'] = $detect_path;
+
+				if (!isset($_POST['ftp_username']))
+					$_POST['ftp_username'] = $username;
 
 				// Set the username etc, into context.
-				$incontext['ftp'] = $_SESSION['installer_temp_ftp'] += array(
-					'path_msg' => $txt['ftp_path_info'],
+				$incontext['ftp'] = array(
+					'server' => isset($_POST['ftp_server']) ? $_POST['ftp_server'] : 'localhost',
+					'port' => isset($_POST['ftp_port']) ? $_POST['ftp_port'] : '21',
+					'username' => isset($_POST['ftp_username']) ? $_POST['ftp_username'] : '',
+					'path' => isset($_POST['ftp_path']) ? $_POST['ftp_path'] : '/',
+					'path_msg' => !empty($found_path) ? $txt['ftp_path_found_info'] : $txt['ftp_path_info'],
 				);
 
 				return false;
 			}
-		}
-	}
-
-	return true;
-}
-
-/**
- * Ask for database settings, verify and save them.
- */
-function action_databaseSettings()
-{
-	global $txt, $databases, $incontext, $db_type, $db_connection, $modSettings;
-
-	$incontext['sub_template'] = 'database_settings';
-	$incontext['page_title'] = $txt['db_settings'];
-	$incontext['continue'] = 1;
-
-	// Set up the defaults.
-	$incontext['db']['server'] = 'localhost';
-	$incontext['db']['port'] = '';
-	$incontext['db']['user'] = '';
-	$incontext['db']['name'] = '';
-	$incontext['db']['pass'] = '';
-	$incontext['db']['type'] = '';
-	$incontext['supported_databases'] = array();
-
-	$foundOne = false;
-	foreach ($databases as $key => $db)
-	{
-		// Override with the defaults for this DB if appropriate.
-		if ($db['supported'])
-		{
-			$incontext['supported_databases'][$key] = $db;
-
-			if (!$foundOne)
+			else
 			{
-				if (isset($db['default_host']))
-					$incontext['db']['server'] = ini_get($db['default_host']) or $incontext['db']['server'] = 'localhost';
-				if (isset($db['default_user']))
+				$_SESSION['installer_temp_ftp'] = array(
+					'server' => $_POST['ftp_server'],
+					'port' => $_POST['ftp_port'],
+					'username' => $_POST['ftp_username'],
+					'password' => $_POST['ftp_password'],
+					'path' => $_POST['ftp_path']
+				);
+
+				$failed_files_updated = array();
+
+				foreach ($failed_files as $file)
 				{
-					$incontext['db']['user'] = ini_get($db['default_user']);
-					$incontext['db']['name'] = ini_get($db['default_user']);
+					if (!is_writable(TMP_BOARDDIR . '/' . $file))
+						$ftp->chmod($file, 0755);
+					if (!is_writable(TMP_BOARDDIR . '/' . $file))
+						$ftp->chmod($file, 0777);
+					if (!is_writable(TMP_BOARDDIR . '/' . $file))
+					{
+						$failed_files_updated[] = $file;
+						$incontext['ftp_errors'][] = rtrim($ftp->last_message) . ' -> ' . $file . "\n";
+					}
 				}
-				if (isset($db['default_password']))
-					$incontext['db']['pass'] = ini_get($db['default_password']);
-				if (isset($db['default_port']))
-					$db_port = ini_get($db['default_port']);
 
-				$incontext['db']['type'] = $key;
-				$foundOne = true;
+				$ftp->close();
+
+				// Are there any errors left?
+				if (count($failed_files_updated) >= 1)
+				{
+					// Guess there are...
+					$incontext['failed_files'] = $failed_files_updated;
+
+					// Set the username etc, into context.
+					$incontext['ftp'] = $_SESSION['installer_temp_ftp'] += array(
+						'path_msg' => $txt['ftp_path_info'],
+					);
+
+					return false;
+				}
 			}
 		}
+
+		return true;
 	}
 
-	// Override for repost.
-	if (isset($_POST['db_user']))
+	/**
+	 * Ask for database settings, verify and save them.
+	 */
+	private function action_databaseSettings()
 	{
-		$incontext['db']['user'] = $_POST['db_user'];
-		$incontext['db']['name'] = $_POST['db_name'];
-		$incontext['db']['server'] = $_POST['db_server'];
-		$incontext['db']['port'] = !empty($_POST['db_port']) ? $_POST['db_port'] : '';
-		$incontext['db']['prefix'] = $_POST['db_prefix'];
-	}
-	else
-	{
-		$incontext['db']['prefix'] = 'elkarte_';
-	}
+		global $txt, $databases, $incontext, $db_type, $db_connection, $modSettings;
 
-	// Are we submitting?
-	if (isset($_POST['db_type']))
-	{
-		if (isset($_POST['db_filename']))
+		$incontext['sub_template'] = 'database_settings';
+		$incontext['page_title'] = $txt['db_settings'];
+		$incontext['continue'] = 1;
+
+		// Set up the defaults.
+		$incontext['db']['server'] = 'localhost';
+		$incontext['db']['port'] = '';
+		$incontext['db']['user'] = '';
+		$incontext['db']['name'] = '';
+		$incontext['db']['pass'] = '';
+		$incontext['db']['type'] = '';
+		$incontext['supported_databases'] = array();
+
+		$foundOne = false;
+		foreach ($databases as $key => $db)
 		{
-			// You better enter enter a database name for SQLite.
-			if (trim($_POST['db_filename']) == '')
+			// Override with the defaults for this DB if appropriate.
+			if ($db['supported'])
 			{
-				$incontext['error'] = $txt['error_db_filename'];
+				$incontext['supported_databases'][$key] = $db;
+
+				if (!$foundOne)
+				{
+					if (isset($db['default_host']))
+						$incontext['db']['server'] = ini_get($db['default_host']) or $incontext['db']['server'] = 'localhost';
+					if (isset($db['default_user']))
+					{
+						$incontext['db']['user'] = ini_get($db['default_user']);
+						$incontext['db']['name'] = ini_get($db['default_user']);
+					}
+					if (isset($db['default_password']))
+						$incontext['db']['pass'] = ini_get($db['default_password']);
+					if (isset($db['default_port']))
+						$db_port = ini_get($db['default_port']);
+
+					$incontext['db']['type'] = $key;
+					$foundOne = true;
+				}
+			}
+		}
+
+		// Override for repost.
+		if (isset($_POST['db_user']))
+		{
+			$incontext['db']['user'] = $_POST['db_user'];
+			$incontext['db']['name'] = $_POST['db_name'];
+			$incontext['db']['server'] = $_POST['db_server'];
+			$incontext['db']['port'] = !empty($_POST['db_port']) ? $_POST['db_port'] : '';
+			$incontext['db']['prefix'] = $_POST['db_prefix'];
+		}
+		else
+		{
+			$incontext['db']['prefix'] = 'elkarte_';
+		}
+
+		// Are we submitting?
+		if (isset($_POST['db_type']))
+		{
+			if (isset($_POST['db_filename']))
+			{
+				// You better enter enter a database name for SQLite.
+				if (trim($_POST['db_filename']) == '')
+				{
+					$incontext['error'] = $txt['error_db_filename'];
+					return false;
+				}
+
+				// Duplicate name in the same dir?  Can't do that with SQLite.  Weird things happen.
+				if (file_exists($_POST['db_filename'] . (substr($_POST['db_filename'], -3) != '.db' ? '.db' : '')))
+				{
+					$incontext['error'] = $txt['error_db_filename_exists'];
+					return false;
+				}
+			}
+
+			// What type are they trying?
+			$db_type = preg_replace('~[^A-Za-z0-9]~', '', $_POST['db_type']);
+			$db_prefix = $_POST['db_prefix'];
+
+			// Validate the prefix.
+			$valid_prefix = $databases[$db_type]['validate_prefix']($db_prefix);
+			if ($valid_prefix !== true)
+			{
+				$incontext['error'] = $valid_prefix;
 				return false;
 			}
 
-			// Duplicate name in the same dir?  Can't do that with SQLite.  Weird things happen.
-			if (file_exists($_POST['db_filename'] . (substr($_POST['db_filename'], -3) != '.db' ? '.db' : '')))
-			{
-				$incontext['error'] = $txt['error_db_filename_exists'];
-				return false;
-			}
-		}
-
-		// What type are they trying?
-		$db_type = preg_replace('~[^A-Za-z0-9]~', '', $_POST['db_type']);
-		$db_prefix = $_POST['db_prefix'];
-
-		// Validate the prefix.
-		$valid_prefix = $databases[$db_type]['validate_prefix']($db_prefix);
-		if ($valid_prefix !== true)
-		{
-			$incontext['error'] = $valid_prefix;
-			return false;
-		}
-
-		// Take care of these variables...
-		$vars = array(
-			'db_type' => $db_type,
-			'db_name' => $_POST['db_name'],
-			'db_user' => $_POST['db_user'],
-			'db_passwd' => isset($_POST['db_passwd']) ? $_POST['db_passwd'] : '',
-			'db_server' => $_POST['db_server'],
-			'db_port' => !empty($_POST['db_port']) ? $_POST['db_port'] : '',
-			'db_prefix' => $db_prefix,
-			// The cookiename is special; we want it to be the same if it ever needs to be reinstalled with the same info.
-			'cookiename' => 'ElkArteCookie' . abs(crc32($_POST['db_name'] . preg_replace('~[^A-Za-z0-9_$]~', '', $_POST['db_prefix'])) % 1000),
-		);
-
-		// God I hope it saved!
-		if (!updateSettingsFile($vars) && substr(__FILE__, 1, 2) == ':\\')
-		{
-			$incontext['error'] = $txt['error_windows_chmod'];
-			return false;
-		}
-
-		// Make sure it works.
-		require(dirname(__FILE__) . '/Settings.php');
-
-		if (!defined('SOURCEDIR'))
-			define('SOURCEDIR', dirname(__FILE__) . '/sources');
-
-		// Better find the database file!
-		if (!file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.class.php'))
-		{
-			$incontext['error'] = sprintf($txt['error_db_file'], 'Db-' . $db_type . '.class.php');
-			return false;
-		}
-
-		// Now include it for database functions!
-		define('ELK', 1);
-		$modSettings['disableQueryCheck'] = true;
-
-		require_once(SOURCEDIR . '/database/Database.subs.php');
-
-		// Attempt a connection.
-		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => true, 'port' => $db_port), $db_type);
-		$db = database();
-
-		// No dice?  Let's try adding the prefix they specified, just in case they misread the instructions ;)
-		if ($db_connection == null)
-		{
-			$db_error = $db->last_error();
-
-			$db_connection = elk_db_initiate($db_server, $db_name, $_POST['db_prefix'] . $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => true, 'port' => $db_port), $db_type);
-			if ($db_connection != null)
-			{
-				$db_user = $_POST['db_prefix'] . $db_user;
-				updateSettingsFile(array('db_user' => $db_user));
-			}
-		}
-
-		// Still no connection?  Big fat error message :P.
-		if (!$db_connection)
-		{
-			$incontext['error'] = $txt['error_db_connect'] . '<div style="margin: 2.5ex; font-family: monospace;"><strong>' . $db_error . '</strong></div>';
-			return false;
-		}
-
-		// Do they meet the install requirements?
-		// @todo Old client, new server?
-		if (version_compare($databases[$db_type]['version'], preg_replace('~^\D*|\-.+?$~', '', eval($databases[$db_type]['version_check']))) > 0)
-		{
-			$incontext['error'] = $txt['error_db_too_low'];
-			return false;
-		}
-
-		// Let's try that database on for size... assuming we haven't already lost the opportunity.
-		if ($db_name != '')
-		{
-			$db->query('', "
-				CREATE DATABASE IF NOT EXISTS `$db_name`",
-				array(
-					'security_override' => true,
-					'db_error_skip' => true,
-				),
-				$db_connection
+			// Take care of these variables...
+			$vars = array(
+				'db_type' => $db_type,
+				'db_name' => $_POST['db_name'],
+				'db_user' => $_POST['db_user'],
+				'db_passwd' => isset($_POST['db_passwd']) ? $_POST['db_passwd'] : '',
+				'db_server' => $_POST['db_server'],
+				'db_port' => !empty($_POST['db_port']) ? $_POST['db_port'] : '',
+				'db_prefix' => $db_prefix,
+				// The cookiename is special; we want it to be the same if it ever needs to be reinstalled with the same info.
+				'cookiename' => 'ElkArteCookie' . abs(crc32($_POST['db_name'] . preg_replace('~[^A-Za-z0-9_$]~', '', $_POST['db_prefix'])) % 1000),
 			);
 
-			// Okay, let's try the prefix if it didn't work...
-			if (!$db->select_db($db_name, $db_connection) && $db_name != '')
+			// God I hope it saved!
+			if (!updateSettingsFile($vars) && substr(__FILE__, 1, 2) == ':\\')
+			{
+				$incontext['error'] = $txt['error_windows_chmod'];
+				return false;
+			}
+
+			// Make sure it works.
+			require(TMP_BOARDDIR . '/Settings.php');
+
+			if (!defined('SOURCEDIR'))
+				define('SOURCEDIR', TMP_BOARDDIR . '/sources');
+
+			// Better find the database file!
+			if (!file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.class.php'))
+			{
+				$incontext['error'] = sprintf($txt['error_db_file'], 'Db-' . $db_type . '.class.php');
+				return false;
+			}
+
+			// Now include it for database functions!
+			define('ELK', 1);
+			$modSettings['disableQueryCheck'] = true;
+
+			require_once(SOURCEDIR . '/database/Database.subs.php');
+
+			// Attempt a connection.
+			$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => true, 'port' => $db_port), $db_type);
+			$db = database();
+
+			// No dice?  Let's try adding the prefix they specified, just in case they misread the instructions ;)
+			if ($db_connection == null)
+			{
+				$db_error = $db->last_error();
+
+				$db_connection = elk_db_initiate($db_server, $db_name, $_POST['db_prefix'] . $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => true, 'port' => $db_port), $db_type);
+				if ($db_connection != null)
+				{
+					$db_user = $_POST['db_prefix'] . $db_user;
+					updateSettingsFile(array('db_user' => $db_user));
+				}
+			}
+
+			// Still no connection?  Big fat error message :P.
+			if (!$db_connection)
+			{
+				$incontext['error'] = $txt['error_db_connect'] . '<div style="margin: 2.5ex; font-family: monospace;"><strong>' . $db_error . '</strong></div>';
+				return false;
+			}
+
+			// Do they meet the install requirements?
+			// @todo Old client, new server?
+			if (version_compare($databases[$db_type]['version'], preg_replace('~^\D*|\-.+?$~', '', eval($databases[$db_type]['version_check']))) > 0)
+			{
+				$incontext['error'] = $txt['error_db_too_low'];
+				return false;
+			}
+
+			// Let's try that database on for size... assuming we haven't already lost the opportunity.
+			if ($db_name != '')
 			{
 				$db->query('', "
-					CREATE DATABASE IF NOT EXISTS `$_POST[db_prefix]$db_name`",
+					CREATE DATABASE IF NOT EXISTS `$db_name`",
 					array(
 						'security_override' => true,
 						'db_error_skip' => true,
@@ -798,683 +826,645 @@ function action_databaseSettings()
 					$db_connection
 				);
 
-				if ($db->select_db($_POST['db_prefix'] . $db_name, $db_connection))
+				// Okay, let's try the prefix if it didn't work...
+				if (!$db->select_db($db_name, $db_connection) && $db_name != '')
 				{
-					$db_name = $_POST['db_prefix'] . $db_name;
-					updateSettingsFile(array('db_name' => $db_name));
+					$db->query('', "
+						CREATE DATABASE IF NOT EXISTS `$_POST[db_prefix]$db_name`",
+						array(
+							'security_override' => true,
+							'db_error_skip' => true,
+						),
+						$db_connection
+					);
+
+					if ($db->select_db($_POST['db_prefix'] . $db_name, $db_connection))
+					{
+						$db_name = $_POST['db_prefix'] . $db_name;
+						updateSettingsFile(array('db_name' => $db_name));
+					}
+				}
+
+				// Okay, now let's try to connect...
+				if (!$db->select_db($db_name, $db_connection))
+				{
+					$incontext['error'] = sprintf($txt['error_db_database'], $db_name);
+					return false;
 				}
 			}
 
-			// Okay, now let's try to connect...
-			if (!$db->select_db($db_name, $db_connection))
-			{
-				$incontext['error'] = sprintf($txt['error_db_database'], $db_name);
-				return false;
-			}
+			return true;
 		}
 
-		return true;
-	}
-
-	return false;
-}
-
-/**
- * Basic forum type settings.
- */
-function action_forumSettings()
-{
-	global $txt, $incontext, $databases, $db_type, $db_connection;
-
-	$incontext['sub_template'] = 'forum_settings';
-	$incontext['page_title'] = $txt['install_settings'];
-
-	// Let's see if we got the database type correct.
-	if (isset($_POST['db_type'], $databases[$_POST['db_type']]))
-		$db_type = $_POST['db_type'];
-
-	// Else we'd better be able to get the connection.
-	else
-		load_database();
-
-	$db_type = isset($_POST['db_type']) ? $_POST['db_type'] : $db_type;
-
-	// What host and port are we on?
-	$host = empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST'];
-
-	// Now, to put what we've learned together... and add a path.
-	$incontext['detected_url'] = 'http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on' ? 's' : '') . '://' . $host . substr($_SERVER['PHP_SELF'], 0, strrpos($_SERVER['PHP_SELF'], '/'));
-
-	// Check if the database sessions will even work.
-	$incontext['test_dbsession'] = ini_get('session.auto_start') != 1;
-	$incontext['continue'] = 1;
-
-	// Submitting?
-	if (isset($_POST['boardurl']))
-	{
-		if (substr($_POST['boardurl'], -10) == '/index.php')
-			$_POST['boardurl'] = substr($_POST['boardurl'], 0, -10);
-		elseif (substr($_POST['boardurl'], -1) == '/')
-			$_POST['boardurl'] = substr($_POST['boardurl'], 0, -1);
-
-		if (substr($_POST['boardurl'], 0, 7) != 'http://' && substr($_POST['boardurl'], 0, 7) != 'file://' && substr($_POST['boardurl'], 0, 8) != 'https://')
-			$_POST['boardurl'] = 'http://' . $_POST['boardurl'];
-
-		// Save these variables.
-		$vars = array(
-			'boardurl' => $_POST['boardurl'],
-			'boarddir' => addslashes(dirname(__FILE__)),
-			'sourcedir' => addslashes(dirname(__FILE__)) . '/sources',
-			'cachedir' => addslashes(dirname(__FILE__)) . '/cache',
-			'mbname' => strtr($_POST['mbname'], array('\"' => '"')),
-			'language' => substr($_SESSION['installer_temp_lang'], 8, -4),
-			'extdir' => addslashes(dirname(__FILE__)) . '/sources/ext',
-		);
-
-		// Must save!
-		if (!updateSettingsFile($vars) && substr(__FILE__, 1, 2) == ':\\')
-		{
-			$incontext['error'] = $txt['error_windows_chmod'];
-			return false;
-		}
-
-		// Make sure it works.
-		require(dirname(__FILE__) . '/Settings.php');
-
-		// UTF-8 requires a setting to override any language charset.
-		if (!empty($databases[$db_type]['utf8_version_check']) && version_compare($databases[$db_type]['utf8_version'], preg_replace('~\-.+?$~', '', eval($databases[$db_type]['utf8_version_check'])), '>'))
-		{
-			// our uft-8 check support on the db failed ....
-			$incontext['error'] = sprintf($txt['error_utf8_version'], $databases[$db_type]['utf8_version']);
-			return false;
-		}
-		else
-			// Set our db character_set to utf8
-			updateSettingsFile(array('db_character_set' => 'utf8'));
-
-		// Good, skip on.
-		return true;
-	}
-
-	definePaths();
-
-	return false;
-}
-
-/**
- * Step one. Populate database.
- */
-function action_databasePopulation()
-{
-	global $txt, $db_connection, $databases, $modSettings, $db_type, $db_prefix, $incontext, $db_name, $boardurl;
-
-	$incontext['sub_template'] = 'populate_database';
-	$incontext['page_title'] = $txt['db_populate'];
-	$incontext['continue'] = 1;
-
-	// Already done?
-	if (isset($_POST['pop_done']))
-		return true;
-
-	// Reload settings.
-	require(dirname(__FILE__) . '/Settings.php');
-	definePaths();
-
-	$db = load_database();
-
-	// Before running any of the queries, let's make sure another version isn't already installed.
-	$result = $db->query('', '
-		SELECT variable, value
-		FROM {db_prefix}settings',
-		array(
-			'db_error_skip' => true,
-		)
-	);
-	$modSettings = array();
-	if ($result !== false)
-	{
-		while ($row = $db->fetch_assoc($result))
-			$modSettings[$row['variable']] = $row['value'];
-		$db->free_result($result);
-
-		// Do they match?  If so, this is just a refresh so charge on!
-		if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] != CURRENT_VERSION)
-		{
-			$incontext['error'] = $txt['error_versions_do_not_match'];
-			return false;
-		}
-	}
-	$modSettings['disableQueryCheck'] = true;
-
-	// Since we are UTF8, select it. PostgreSQL requires passing it as a string...
-	$db->query('', '
-		SET NAMES {'. ($db_type == 'postgresql' ? 'string' : 'raw') . ':utf8}',
-		array(
-			'db_error_skip' => true,
-			'utf8' => 'utf8',
-		)
-	);
-
-	$replaces = array(
-		'{$db_prefix}' => $db_prefix,
-		'{BOARDDIR}' => $db->escape_string(dirname(__FILE__)),
-		'{$boardurl}' => $boardurl,
-		'{$enableCompressedOutput}' => isset($_POST['compress']) ? '1' : '0',
-		'{$databaseSession_enable}' => isset($_POST['dbsession']) ? '1' : '0',
-		'{$current_version}' => CURRENT_VERSION,
-		'{$current_time}' => time(),
-		'{$sched_task_offset}' => 82800 + mt_rand(0, 86399),
-	);
-
-	foreach ($txt as $key => $value)
-	{
-		if (substr($key, 0, 8) == 'default_')
-			$replaces['{$' . $key . '}'] = $db->escape_string($value);
-	}
-	$replaces['{$default_reserved_names}'] = strtr($replaces['{$default_reserved_names}'], array('\\\\n' => '\\n'));
-
-	// If the UTF-8 setting was enabled, add it to the table definitions.
-	if (!empty($databases[$db_type]['utf8_support']))
-		$replaces[') ENGINE=MyISAM;'] = ') ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;';
-
-	// Read in the SQL.  Turn this on and that off... internationalize... etc.
-	$sql_lines = explode("\n", strtr(implode(' ', file(dirname(__FILE__) . '/install_' . DB_SCRIPT_VERSION . '_' . $db_type . '.sql')), $replaces));
-
-	// Execute the SQL.
-	$current_statement = '';
-	$exists = array();
-	$incontext['failures'] = array();
-	$incontext['sql_results'] = array(
-		'tables' => 0,
-		'inserts' => 0,
-		'table_dups' => 0,
-		'insert_dups' => 0,
-	);
-
-	foreach ($sql_lines as $count => $line)
-	{
-		// No comments allowed!
-		if (substr(trim($line), 0, 1) != '#')
-			$current_statement .= "\n" . rtrim($line);
-
-		// Is this the end of the query string?
-		if (empty($current_statement) || (preg_match('~;[\s]*$~s', $line) == 0 && $count != count($sql_lines)))
-			continue;
-
-		// Does this table already exist?  If so, don't insert more data into it!
-		if (preg_match('~^\s*INSERT INTO ([^\s\n\r]+?)~', $current_statement, $match) != 0 && in_array($match[1], $exists))
-		{
-			$incontext['sql_results']['insert_dups']++;
-			$current_statement = '';
-			continue;
-		}
-
-		if ($db->query('', $current_statement, array('security_override' => true, 'db_error_skip' => true), $db_connection) === false)
-		{
-			// Error 1050: Table already exists!
-			// @todo Needs to be made better!
-			if (($db_type != 'mysql' || mysqli_errno($db_connection) === 1050) && preg_match('~^\s*CREATE TABLE ([^\s\n\r]+?)~', $current_statement, $match) == 1)
-			{
-				$exists[] = $match[1];
-				$incontext['sql_results']['table_dups']++;
-			}
-			// Don't error on duplicate indexes (or duplicate operators in PostgreSQL.)
-			elseif (!preg_match('~^\s*CREATE( UNIQUE)? INDEX ([^\n\r]+?)~', $current_statement, $match) && !($db_type == 'postgresql' && preg_match('~^\s*CREATE OPERATOR (^\n\r]+?)~', $current_statement, $match)))
-			{
-				$incontext['failures'][$count] = $db->last_error();
-			}
-		}
-		else
-		{
-			if (preg_match('~^\s*CREATE TABLE ([^\s\n\r]+?)~', $current_statement, $match) == 1)
-				$incontext['sql_results']['tables']++;
-			else
-			{
-				preg_match_all('~\)[,;]~', $current_statement, $matches);
-				if (!empty($matches[0]))
-					$incontext['sql_results']['inserts'] += count($matches[0]);
-				else
-					$incontext['sql_results']['inserts']++;
-			}
-		}
-
-		$current_statement = '';
-	}
-
-	// Sort out the context for the SQL.
-	foreach ($incontext['sql_results'] as $key => $number)
-	{
-		if ($number == 0)
-			unset($incontext['sql_results'][$key]);
-		else
-			$incontext['sql_results'][$key] = sprintf($txt['db_populate_' . $key], $number);
-	}
-
-	// Make sure UTF will be used globally.
-	$db->insert('replace',
-		$db_prefix . 'settings',
-		array(
-			'variable' => 'string-255', 'value' => 'string-65534',
-		),
-		array(
-			'global_character_set', 'UTF-8',
-		),
-		array('variable')
-	);
-
-	// Maybe we can auto-detect better cookie settings?
-	preg_match('~^http[s]?://([^\.]+?)([^/]*?)(/.*)?$~', $boardurl, $matches);
-	if (!empty($matches))
-	{
-		// Default = both off.
-		$localCookies = false;
-		$globalCookies = false;
-
-		// Okay... let's see.  Using a subdomain other than www.? (not a perfect check.)
-		if ($matches[2] != '' && (strpos(substr($matches[2], 1), '.') === false || in_array($matches[1], array('forum', 'board', 'community', 'forums', 'support', 'chat', 'help', 'talk', 'boards', 'www'))))
-			$globalCookies = true;
-
-		// If there's a / in the middle of the path, or it starts with ~... we want local.
-		if (isset($matches[3]) && strlen($matches[3]) > 3 && (substr($matches[3], 0, 2) == '/~' || strpos(substr($matches[3], 1), '/') !== false))
-			$localCookies = true;
-
-		if ($globalCookies)
-			$rows[] = array('globalCookies', '1');
-		if ($localCookies)
-			$rows[] = array('localCookies', '1');
-
-		if (!empty($rows))
-		{
-			$db->insert('replace',
-				$db_prefix . 'settings',
-				array('variable' => 'string-255', 'value' => 'string-65534'),
-				$rows,
-				array('variable')
-			);
-		}
-	}
-
-	// As of PHP 5.1, setting a timezone is required.
-	if (!isset($modSettings['default_timezone']))
-	{
-		$server_offset = mktime(0, 0, 0, 1, 1, 1970);
-		$timezone_id = 'Etc/GMT' . ($server_offset > 0 ? '+' : '') . ($server_offset / 3600);
-		if (date_default_timezone_set($timezone_id))
-			$db->insert('',
-				$db_prefix . 'settings',
-				array(
-					'variable' => 'string-255', 'value' => 'string-65534',
-				),
-				array(
-					'default_timezone', $timezone_id,
-				),
-				array('variable')
-			);
-	}
-
-	// Let's optimize those new tables.
-	$tables = $db->db_list_tables($db_name, $db_prefix . '%');
-	$db_table = db_table();
-	foreach ($tables as $table)
-	{
-		if ($db_table->optimize($table) == -1)
-		{
-			$incontext['failures'][-1] = $db->last_error();
-			break;
-		}
-	}
-
-	// Check for the ALTER privilege.
-	if (!empty($databases[$db_type]['alter_support']) && $db->query('', "ALTER TABLE {$db_prefix}boards ORDER BY id_board", array('security_override' => true, 'db_error_skip' => true)) === false)
-	{
-		$incontext['error'] = $txt['error_db_alter_priv'];
 		return false;
 	}
 
-	if (!empty($exists))
+	/**
+	 * Basic forum type settings.
+	 */
+	private function action_forumSettings()
 	{
-		$incontext['page_title'] = $txt['user_refresh_install'];
-		$incontext['was_refresh'] = true;
-	}
+		global $txt, $incontext, $databases, $db_type, $db_connection;
 
-	return false;
-}
+		$incontext['sub_template'] = 'forum_settings';
+		$incontext['page_title'] = $txt['install_settings'];
 
-/**
- * Ask for the administrator login information.
- */
-function action_adminAccount()
-{
-	global $txt, $db_type, $db_connection, $databases, $incontext, $db_prefix, $db_passwd;
+		// Let's see if we got the database type correct.
+		if (isset($_POST['db_type'], $databases[$_POST['db_type']]))
+			$db_type = $_POST['db_type'];
 
-	$incontext['sub_template'] = 'admin_account';
-	$incontext['page_title'] = $txt['user_settings'];
-	$incontext['continue'] = 1;
+		// Else we'd better be able to get the connection.
+		else
+			load_database();
 
-	// Need this to check whether we need the database password.
-	require(dirname(__FILE__) . '/Settings.php');
-	if (!defined('ELK'))
-		define('ELK', 1);
-	definePaths();
+		$db_type = isset($_POST['db_type']) ? $_POST['db_type'] : $db_type;
 
-	// These files may be or may not be already included, better safe than sorry for now
-	require_once(SOURCEDIR . '/Subs.php');
-	require_once(SUBSDIR . '/Util.class.php');
+		// What host and port are we on?
+		$host = empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST'];
 
-	$db = load_database();
+		// Now, to put what we've learned together... and add a path.
+		$incontext['detected_url'] = 'http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on' ? 's' : '') . '://' . $host . strtr(substr($_SERVER['PHP_SELF'], 0, strrpos($_SERVER['PHP_SELF'], '/')), array('/install' => ''));
 
-	if (!isset($_POST['username']))
-		$_POST['username'] = '';
-	if (!isset($_POST['email']))
-		$_POST['email'] = '';
+		// Check if the database sessions will even work.
+		$incontext['test_dbsession'] = ini_get('session.auto_start') != 1;
+		$incontext['continue'] = 1;
 
-	$incontext['username'] = htmlspecialchars(stripslashes($_POST['username']), ENT_COMPAT, 'UTF-8');
-	$incontext['email'] = htmlspecialchars(stripslashes($_POST['email']), ENT_COMPAT, 'UTF-8');
-
-	$incontext['require_db_confirm'] = empty($db_type) || !empty($databases[$db_type]['require_db_confirm']);
-
-	// Only allow create an admin account if they don't have one already.
-	$request = $db->query('', '
-		SELECT id_member
-		FROM {db_prefix}members
-		WHERE id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0
-		LIMIT 1',
-		array(
-			'db_error_skip' => true,
-			'admin_group' => 1,
-		)
-	);
-	// Skip the step if an admin already exists
-	if ($db->num_rows($request) != 0)
-		return true;
-	$db->free_result($request);
-
-	// Trying to create an account?
-	if (isset($_POST['password1']) && !empty($_POST['contbutt']))
-	{
-		// Wrong password?
-		if ($incontext['require_db_confirm'] && $_POST['password3'] != $db_passwd)
+		// Submitting?
+		if (isset($_POST['boardurl']))
 		{
-			$incontext['error'] = $txt['error_db_connect'];
-			return false;
-		}
+			if (substr($_POST['boardurl'], -10) == '/index.php')
+				$_POST['boardurl'] = substr($_POST['boardurl'], 0, -10);
+			elseif (substr($_POST['boardurl'], -1) == '/')
+				$_POST['boardurl'] = substr($_POST['boardurl'], 0, -1);
 
-		// Not matching passwords?
-		if ($_POST['password1'] != $_POST['password2'])
-		{
-			$incontext['error'] = $txt['error_user_settings_again_match'];
-			return false;
-		}
+			if (substr($_POST['boardurl'], 0, 7) != 'http://' && substr($_POST['boardurl'], 0, 7) != 'file://' && substr($_POST['boardurl'], 0, 8) != 'https://')
+				$_POST['boardurl'] = 'http://' . $_POST['boardurl'];
 
-		// No password?
-		if (strlen($_POST['password1']) < 4)
-		{
-			$incontext['error'] = $txt['error_user_settings_no_password'];
-			return false;
-		}
-
-		if (!file_exists(SOURCEDIR . '/Subs.php'))
-		{
-			$incontext['error'] = $txt['error_subs_missing'];
-			return false;
-		}
-
-		// Update the main contact email?
-		if (!empty($_POST['email']) && (empty($webmaster_email) || $webmaster_email == 'noreply@myserver.com'))
-			updateSettingsFile(array('webmaster_email' => $_POST['email']));
-
-		// Work out whether we're going to have dodgy characters and remove them.
-		$invalid_characters = preg_match('~[<>&"\'=\\\]~', $_POST['username']) != 0;
-		$_POST['username'] = preg_replace('~[<>&"\'=\\\]~', '', $_POST['username']);
-
-		$result = $db->query('', '
-			SELECT id_member, password_salt
-			FROM {db_prefix}members
-			WHERE member_name = {string:username} OR email_address = {string:email}
-			LIMIT 1',
-			array(
-				'username' => stripslashes($_POST['username']),
-				'email' => stripslashes($_POST['email']),
-				'db_error_skip' => true,
-			)
-		);
-
-		if ($db->num_rows($result) != 0)
-		{
-			list ($incontext['member_id'], $incontext['member_salt']) = $db->fetch_row($result);
-			$db->free_result($result);
-
-			$incontext['account_existed'] = $txt['error_user_settings_taken'];
-		}
-		elseif ($_POST['username'] == '' || strlen($_POST['username']) > 25)
-		{
-			// Try the previous step again.
-			$incontext['error'] = $_POST['username'] == '' ? $txt['error_username_left_empty'] : $txt['error_username_too_long'];
-			return false;
-		}
-		elseif ($invalid_characters || $_POST['username'] == '_' || $_POST['username'] == '|' || strpos($_POST['username'], '[code') !== false || strpos($_POST['username'], '[/code') !== false)
-		{
-			// Try the previous step again.
-			$incontext['error'] = $txt['error_invalid_characters_username'];
-			return false;
-		}
-		elseif (empty($_POST['email']) || preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', stripslashes($_POST['email'])) === 0 || strlen(stripslashes($_POST['email'])) > 255)
-		{
-			// One step back, this time fill out a proper email address.
-			$incontext['error'] = sprintf($txt['error_valid_email_needed'], $_POST['username']);
-			return false;
-		}
-		elseif ($_POST['username'] != '')
-		{
-			require_once(SUBSDIR . '/Auth.subs.php');
-
-			$incontext['member_salt'] = substr(md5(mt_rand()), 0, 4);
-
-			// Format the username properly.
-			$_POST['username'] = preg_replace('~[\t\n\r\x0B\0\xA0]+~', ' ', $_POST['username']);
-			$ip = isset($_SERVER['REMOTE_ADDR']) ? substr($_SERVER['REMOTE_ADDR'], 0, 255) : '';
-
-			// Get a security hash for this combination
-			$password = stripslashes($_POST['password1']);
-			$incontext['passwd'] = validateLoginPassword($password, '', $_POST['username'], true);
-
-			$request = $db->insert('',
-				$db_prefix . 'members',
-				array(
-					'member_name' => 'string-25', 'real_name' => 'string-25', 'passwd' => 'string', 'email_address' => 'string',
-					'id_group' => 'int', 'posts' => 'int', 'date_registered' => 'int', 'hide_email' => 'int',
-					'password_salt' => 'string', 'lngfile' => 'string', 'personal_text' => 'string', 'avatar' => 'string',
-					'member_ip' => 'string', 'member_ip2' => 'string', 'buddy_list' => 'string', 'pm_ignore_list' => 'string',
-					'message_labels' => 'string', 'website_title' => 'string', 'website_url' => 'string', 'location' => 'string',
-					'signature' => 'string', 'usertitle' => 'string', 'secret_question' => 'string',
-					'additional_groups' => 'string', 'ignore_boards' => 'string', 'openid_uri' => 'string',
-				),
-				array(
-					stripslashes($_POST['username']), stripslashes($_POST['username']), $incontext['passwd'], stripslashes($_POST['email']),
-					1, 0, time(), 0,
-					$incontext['member_salt'], '', '', '',
-					$ip, $ip, '', '',
-					'', '', '', '',
-					'', '', '',
-					'', '', '',
-				),
-				array('id_member')
+			// Save these variables.
+			$vars = array(
+				'boardurl' => $_POST['boardurl'],
+				'boarddir' => addslashes(TMP_BOARDDIR),
+				'sourcedir' => addslashes(TMP_BOARDDIR) . '/sources',
+				'cachedir' => addslashes(TMP_BOARDDIR) . '/cache',
+				'mbname' => strtr($_POST['mbname'], array('\"' => '"')),
+				'language' => substr($_SESSION['installer_temp_lang'], 8, -4),
+				'extdir' => addslashes(TMP_BOARDDIR) . '/sources/ext',
 			);
 
-			// Awww, crud!
-			if ($request === false)
+			// Must save!
+			if (!updateSettingsFile($vars) && substr(__FILE__, 1, 2) == ':\\')
 			{
-				$incontext['error'] = $txt['error_user_settings_query'] . '<br />
-				<div style="margin: 2ex;">' . nl2br(htmlspecialchars($db->last_error($db_connection), ENT_COMPAT, 'UTF-8')) . '</div>';
+				$incontext['error'] = $txt['error_windows_chmod'];
 				return false;
 			}
 
-			$incontext['member_id'] = $db->insert_id("{$db_prefix}members", 'id_member');
+			// Make sure it works.
+			require(TMP_BOARDDIR . '/Settings.php');
+
+			// UTF-8 requires a setting to override any language charset.
+			if (!empty($databases[$db_type]['utf8_version_check']) && version_compare($databases[$db_type]['utf8_version'], preg_replace('~\-.+?$~', '', eval($databases[$db_type]['utf8_version_check'])), '>'))
+			{
+				// our uft-8 check support on the db failed ....
+				$incontext['error'] = sprintf($txt['error_utf8_version'], $databases[$db_type]['utf8_version']);
+				return false;
+			}
+			else
+				// Set our db character_set to utf8
+				updateSettingsFile(array('db_character_set' => 'utf8'));
+
+			// Good, skip on.
+			return true;
 		}
 
-		// If we're here we're good.
-		return true;
+		definePaths();
+
+		return false;
 	}
 
-	return false;
-}
+	/**
+	 * Step one. Populate database.
+	 */
+	private function action_databasePopulation()
+	{
+		global $txt, $db_connection, $databases, $modSettings, $db_type, $db_prefix, $incontext, $db_name, $boardurl;
 
-/**
- * Final step, clean up and a complete message!
- */
-function action_deleteInstall()
-{
-	global $txt, $incontext, $db_character_set;
-	global $current_version, $databases, $forum_version, $modSettings, $user_info, $db_type;
+		$incontext['sub_template'] = 'populate_database';
+		$incontext['page_title'] = $txt['db_populate'];
+		$incontext['continue'] = 1;
 
-	// A few items we will load in from settings and make avaialble.
-	global $boardurl, $db_prefix, $cookiename, $mbname, $language;
+		// Already done?
+		if (isset($_POST['pop_done']))
+			return true;
 
-	$incontext['page_title'] = $txt['congratulations'];
-	$incontext['sub_template'] = 'delete_install';
-	$incontext['continue'] = 0;
+		// Reload settings.
+		require(TMP_BOARDDIR . '/Settings.php');
+		definePaths();
 
-	require(dirname(__FILE__) . '/Settings.php');
-	if (!defined('ELK'))
-		define('ELK', 1);
-	definePaths();
+		$db = load_database();
+		$db_table = db_table_install();
 
-	$db = load_database();
-
-	if (!defined('SUBSDIR'))
-		define('SUBSDIR', dirname(__FILE__) . '/sources/subs');
-
-	chdir(dirname(__FILE__));
-
-	require_once(SOURCEDIR . '/Errors.php');
-	require_once(SOURCEDIR . '/Logging.php');
-	require_once(SOURCEDIR . '/Subs.php');
-	require_once(SOURCEDIR . '/Load.php');
-	require_once(SUBSDIR . '/Cache.subs.php');
-	require_once(SOURCEDIR . '/Security.php');
-	require_once(SUBSDIR . '/Auth.subs.php');
-	require_once(SUBSDIR . '/Util.class.php');
-
-	// Bring a warning over.
-	if (!empty($incontext['account_existed']))
-		$incontext['warning'] = $incontext['account_existed'];
-
-	if (!empty($db_character_set) && !empty($databases[$db_type]['utf8_support']))
-		$db->query('', '
-			SET NAMES {raw:db_character_set}',
+		// Before running any of the queries, let's make sure another version isn't already installed.
+		$result = $db->query('', '
+			SELECT variable, value
+			FROM {db_prefix}settings',
 			array(
-				'db_character_set' => $db_character_set,
 				'db_error_skip' => true,
 			)
 		);
+		$modSettings = array();
+		if ($result !== false)
+		{
+			while ($row = $db->fetch_assoc($result))
+				$modSettings[$row['variable']] = $row['value'];
+			$db->free_result($result);
 
-	// As track stats is by default enabled let's add some activity.
-	$db->insert('ignore',
-		'{db_prefix}log_activity',
-		array('date' => 'date', 'topics' => 'int', 'posts' => 'int', 'registers' => 'int'),
-		array(strftime('%Y-%m-%d', time()), 1, 1, (!empty($incontext['member_id']) ? 1 : 0)),
-		array('date')
-	);
+			// Do they match?  If so, this is just a refresh so charge on!
+			if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] != CURRENT_VERSION)
+			{
+				$incontext['error'] = $txt['error_versions_do_not_match'];
+				return false;
+			}
+		}
+		$modSettings['disableQueryCheck'] = true;
 
-	// We're going to want our lovely $modSettings now.
-	$request = $db->query('', '
-		SELECT variable, value
-		FROM {db_prefix}settings',
-		array(
-			'db_error_skip' => true,
-		)
-	);
-	// Only proceed if we can load the data.
-	if ($request)
-	{
-		while ($row = $db->fetch_row($request))
-			$modSettings[$row[0]] = $row[1];
-		$db->free_result($request);
-	}
-
-	// Automatically log them in ;)
-	if (isset($incontext['member_id']) && isset($incontext['member_salt']))
-		setLoginCookie(3153600 * 60, $incontext['member_id'], hash('sha256', $incontext['passwd'] . $incontext['member_salt']));
-
-	$result = $db->query('', '
-		SELECT value
-		FROM {db_prefix}settings
-		WHERE variable = {string:db_sessions}',
-		array(
-			'db_sessions' => 'databaseSession_enable',
-			'db_error_skip' => true,
-		)
-	);
-	if ($db->num_rows($result) != 0)
-		list ($db_sessions) = $db->fetch_row($result);
-	$db->free_result($result);
-
-	if (empty($db_sessions))
-		$_SESSION['admin_time'] = time();
-	else
-	{
-		$_SERVER['HTTP_USER_AGENT'] = substr($_SERVER['HTTP_USER_AGENT'], 0, 211);
-
-		$db->insert('replace',
-			'{db_prefix}sessions',
+		// Since we are UTF8, select it. PostgreSQL requires passing it as a string...
+		$db->query('', '
+			SET NAMES {'. ($db_type == 'postgresql' ? 'string' : 'raw') . ':utf8}',
 			array(
-				'session_id' => 'string', 'last_update' => 'int', 'data' => 'string',
-			),
-			array(
-				session_id(), time(), 'USER_AGENT|s:' . strlen($_SERVER['HTTP_USER_AGENT']) . ':"' . $_SERVER['HTTP_USER_AGENT'] . '";admin_time|i:' . time() . ';',
-			),
-			array('session_id')
+				'db_error_skip' => true,
+				'utf8' => 'utf8',
+			)
 		);
+
+		$replaces = array(
+			'{$db_prefix}' => $db_prefix,
+			'{BOARDDIR}' => TMP_BOARDDIR,
+			'{$boardurl}' => $boardurl,
+			'{$enableCompressedOutput}' => isset($_POST['compress']) ? '1' : '0',
+			'{$databaseSession_enable}' => isset($_POST['dbsession']) ? '1' : '0',
+			'{$current_version}' => CURRENT_VERSION,
+			'{$current_time}' => time(),
+			'{$sched_task_offset}' => 82800 + mt_rand(0, 86399),
+		);
+
+		foreach ($txt as $key => $value)
+		{
+			if (substr($key, 0, 8) == 'default_')
+				$replaces['{$' . $key . '}'] = addslashes($value);
+		}
+		$replaces['{$default_reserved_names}'] = strtr($replaces['{$default_reserved_names}'], array('\\\\n' => '\\n'));
+
+		// If the UTF-8 setting was enabled, add it to the table definitions.
+		if (!empty($databases[$db_type]['utf8_support']))
+			$replaces[') ENGINE=MyISAM;'] = ') ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;';
+
+		// Execute the SQL.
+		$current_statement = '';
+		$exists = array();
+		$incontext['failures'] = array();
+		$incontext['sql_results'] = array(
+			'tables' => 0,
+			'inserts' => 0,
+			'table_dups' => 0,
+			'insert_dups' => 0,
+		);
+
+		if (!empty($databases[$db_type]['additional_file']))
+		{
+			$sql_lines = explode("\n", strtr(implode(' ', file(dirname(__FILE__) . '/' . $databases[$db_type]['additional_file'])), $replaces));
+			parse_sqlLines($sql_lines);
+		}
+
+		// Read in the SQL.  Turn this on and that off... internationalize... etc.
+		$sql_lines = explode("\n", strtr(implode(' ', file(dirname(__FILE__) . '/install_' . DB_SCRIPT_VERSION . '.sql')), $replaces));
+		parse_sqlLines($sql_lines);
+
+		// Make sure UTF will be used globally.
+		$db->insert('replace',
+			$db_prefix . 'settings',
+			array(
+				'variable' => 'string-255', 'value' => 'string-65534',
+			),
+			array(
+				'global_character_set', 'UTF-8',
+			),
+			array('variable')
+		);
+
+		// Maybe we can auto-detect better cookie settings?
+		preg_match('~^http[s]?://([^\.]+?)([^/]*?)(/.*)?$~', $boardurl, $matches);
+		if (!empty($matches))
+		{
+			// Default = both off.
+			$localCookies = false;
+			$globalCookies = false;
+
+			// Okay... let's see.  Using a subdomain other than www.? (not a perfect check.)
+			if ($matches[2] != '' && (strpos(substr($matches[2], 1), '.') === false || in_array($matches[1], array('forum', 'board', 'community', 'forums', 'support', 'chat', 'help', 'talk', 'boards', 'www'))))
+				$globalCookies = true;
+
+			// If there's a / in the middle of the path, or it starts with ~... we want local.
+			if (isset($matches[3]) && strlen($matches[3]) > 3 && (substr($matches[3], 0, 2) == '/~' || strpos(substr($matches[3], 1), '/') !== false))
+				$localCookies = true;
+
+			if ($globalCookies)
+				$rows[] = array('globalCookies', '1');
+			if ($localCookies)
+				$rows[] = array('localCookies', '1');
+
+			if (!empty($rows))
+			{
+				$db->insert('replace',
+					$db_prefix . 'settings',
+					array('variable' => 'string-255', 'value' => 'string-65534'),
+					$rows,
+					array('variable')
+				);
+			}
+		}
+
+		// As of PHP 5.1, setting a timezone is required.
+		if (!isset($modSettings['default_timezone']))
+		{
+			$server_offset = mktime(0, 0, 0, 1, 1, 1970);
+			$timezone_id = 'Etc/GMT' . ($server_offset > 0 ? '+' : '') . ($server_offset / 3600);
+			if (date_default_timezone_set($timezone_id))
+				$db->insert('',
+					$db_prefix . 'settings',
+					array(
+						'variable' => 'string-255', 'value' => 'string-65534',
+					),
+					array(
+						'default_timezone', $timezone_id,
+					),
+					array('variable')
+				);
+		}
+
+		// Let's optimize those new tables.
+		$tables = $db->db_list_tables($db_name, $db_prefix . '%');
+		$db_table = db_table();
+		foreach ($tables as $table)
+		{
+			if ($db_table->optimize($table) == -1)
+			{
+				$incontext['failures'][-1] = $db->last_error();
+				break;
+			}
+		}
+
+		// Check for the ALTER privilege.
+		if (!empty($databases[$db_type]['alter_support']) && $db->query('', "ALTER TABLE {$db_prefix}boards ORDER BY id_board", array('security_override' => true, 'db_error_skip' => true)) === false)
+		{
+			$incontext['error'] = $txt['error_db_alter_priv'];
+			return false;
+		}
+
+		if (!empty($exists))
+		{
+			$incontext['page_title'] = $txt['user_refresh_install'];
+			$incontext['was_refresh'] = true;
+		}
+
+		return false;
 	}
 
-	require_once(SUBSDIR . '/Members.subs.php');
-	updateMemberStats();
-	require_once(SUBSDIR . '/Messages.subs.php');
-	updateMessageStats();
-	require_once(SUBSDIR . '/Topics.subs.php');
-	updateTopicStats();
-
-	$request = $db->query('', '
-		SELECT id_msg
-		FROM {db_prefix}messages
-		WHERE id_msg = 1
-			AND modified_time = 0
-		LIMIT 1',
-		array(
-			'db_error_skip' => true,
-		)
-	);
-	if ($db->num_rows($request) > 0)
-		updateStats('subject', 1, htmlspecialchars($txt['default_topic_subject']));
-	$db->free_result($request);
-
-	// Now is the perfect time to fetch remote files.
-	require_once(SUBSDIR . '/ScheduledTask.class.php');
-
-	// Sanity check that they loaded earlier!
-	if (isset($modSettings['recycle_board']))
+	/**
+	 * Ask for the administrator login information.
+	 */
+	private function action_adminAccount()
 	{
-		// The variable is usually defined in index.php so lets just use our variable to do it for us.
-		$forum_version = $current_version;
-		// Now go get those files!
-		$task = new Scheduled_Task();
-		$task->fetchFiles();
-		// We've just installed!
-		$user_info['ip'] = $_SERVER['REMOTE_ADDR'];
-		$user_info['id'] = isset($incontext['member_id']) ? $incontext['member_id'] : 0;
-		logAction('install', array('version' => $forum_version), 'admin');
+		global $txt, $db_type, $db_connection, $databases, $incontext, $db_prefix, $db_passwd;
+
+		$incontext['sub_template'] = 'admin_account';
+		$incontext['page_title'] = $txt['user_settings'];
+		$incontext['continue'] = 1;
+
+		// Need this to check whether we need the database password.
+		require(TMP_BOARDDIR . '/Settings.php');
+		if (!defined('ELK'))
+			define('ELK', 1);
+		definePaths();
+
+		// These files may be or may not be already included, better safe than sorry for now
+		require_once(SOURCEDIR . '/Subs.php');
+		require_once(SUBSDIR . '/Util.class.php');
+
+		$db = load_database();
+
+		if (!isset($_POST['username']))
+			$_POST['username'] = '';
+		if (!isset($_POST['email']))
+			$_POST['email'] = '';
+
+		$incontext['username'] = htmlspecialchars(stripslashes($_POST['username']), ENT_COMPAT, 'UTF-8');
+		$incontext['email'] = htmlspecialchars(stripslashes($_POST['email']), ENT_COMPAT, 'UTF-8');
+
+		$incontext['require_db_confirm'] = empty($db_type) || !empty($databases[$db_type]['require_db_confirm']);
+
+		// Only allow create an admin account if they don't have one already.
+		$request = $db->query('', '
+			SELECT id_member
+			FROM {db_prefix}members
+			WHERE id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0
+			LIMIT 1',
+			array(
+				'db_error_skip' => true,
+				'admin_group' => 1,
+			)
+		);
+		// Skip the step if an admin already exists
+		if ($db->num_rows($request) != 0)
+			return true;
+		$db->free_result($request);
+
+		// Trying to create an account?
+		if (isset($_POST['password1']) && !empty($_POST['contbutt']))
+		{
+			// Wrong password?
+			if ($incontext['require_db_confirm'] && $_POST['password3'] != $db_passwd)
+			{
+				$incontext['error'] = $txt['error_db_connect'];
+				return false;
+			}
+
+			// Not matching passwords?
+			if ($_POST['password1'] != $_POST['password2'])
+			{
+				$incontext['error'] = $txt['error_user_settings_again_match'];
+				return false;
+			}
+
+			// No password?
+			if (strlen($_POST['password1']) < 4)
+			{
+				$incontext['error'] = $txt['error_user_settings_no_password'];
+				return false;
+			}
+
+			if (!file_exists(SOURCEDIR . '/Subs.php'))
+			{
+				$incontext['error'] = $txt['error_subs_missing'];
+				return false;
+			}
+
+			// Update the main contact email?
+			if (!empty($_POST['email']) && (empty($webmaster_email) || $webmaster_email == 'noreply@myserver.com'))
+				updateSettingsFile(array('webmaster_email' => $_POST['email']));
+
+			// Work out whether we're going to have dodgy characters and remove them.
+			$invalid_characters = preg_match('~[<>&"\'=\\\]~', $_POST['username']) != 0;
+			$_POST['username'] = preg_replace('~[<>&"\'=\\\]~', '', $_POST['username']);
+
+			$result = $db->query('', '
+				SELECT id_member, password_salt
+				FROM {db_prefix}members
+				WHERE member_name = {string:username} OR email_address = {string:email}
+				LIMIT 1',
+				array(
+					'username' => stripslashes($_POST['username']),
+					'email' => stripslashes($_POST['email']),
+					'db_error_skip' => true,
+				)
+			);
+
+			if ($db->num_rows($result) != 0)
+			{
+				list ($incontext['member_id'], $incontext['member_salt']) = $db->fetch_row($result);
+				$db->free_result($result);
+
+				$incontext['account_existed'] = $txt['error_user_settings_taken'];
+			}
+			elseif ($_POST['username'] == '' || strlen($_POST['username']) > 25)
+			{
+				// Try the previous step again.
+				$incontext['error'] = $_POST['username'] == '' ? $txt['error_username_left_empty'] : $txt['error_username_too_long'];
+				return false;
+			}
+			elseif ($invalid_characters || $_POST['username'] == '_' || $_POST['username'] == '|' || strpos($_POST['username'], '[code') !== false || strpos($_POST['username'], '[/code') !== false)
+			{
+				// Try the previous step again.
+				$incontext['error'] = $txt['error_invalid_characters_username'];
+				return false;
+			}
+			elseif (empty($_POST['email']) || preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', stripslashes($_POST['email'])) === 0 || strlen(stripslashes($_POST['email'])) > 255)
+			{
+				// One step back, this time fill out a proper email address.
+				$incontext['error'] = sprintf($txt['error_valid_email_needed'], $_POST['username']);
+				return false;
+			}
+			elseif ($_POST['username'] != '')
+			{
+				require_once(SUBSDIR . '/Auth.subs.php');
+
+				$incontext['member_salt'] = substr(md5(mt_rand()), 0, 4);
+
+				// Format the username properly.
+				$_POST['username'] = preg_replace('~[\t\n\r\x0B\0\xA0]+~', ' ', $_POST['username']);
+				$ip = isset($_SERVER['REMOTE_ADDR']) ? substr($_SERVER['REMOTE_ADDR'], 0, 255) : '';
+
+				// Get a security hash for this combination
+				$password = stripslashes($_POST['password1']);
+				$incontext['passwd'] = validateLoginPassword($password, '', $_POST['username'], true);
+
+				$request = $db->insert('',
+					$db_prefix . 'members',
+					array(
+						'member_name' => 'string-25', 'real_name' => 'string-25', 'passwd' => 'string', 'email_address' => 'string',
+						'id_group' => 'int', 'posts' => 'int', 'date_registered' => 'int', 'hide_email' => 'int',
+						'password_salt' => 'string', 'lngfile' => 'string', 'personal_text' => 'string', 'avatar' => 'string',
+						'member_ip' => 'string', 'member_ip2' => 'string', 'buddy_list' => 'string', 'pm_ignore_list' => 'string',
+						'message_labels' => 'string', 'website_title' => 'string', 'website_url' => 'string', 'location' => 'string',
+						'signature' => 'string', 'usertitle' => 'string', 'secret_question' => 'string',
+						'additional_groups' => 'string', 'ignore_boards' => 'string', 'openid_uri' => 'string',
+					),
+					array(
+						stripslashes($_POST['username']), stripslashes($_POST['username']), $incontext['passwd'], stripslashes($_POST['email']),
+						1, 0, time(), 0,
+						$incontext['member_salt'], '', '', '',
+						$ip, $ip, '', '',
+						'', '', '', '',
+						'', '', '',
+						'', '', '',
+					),
+					array('id_member')
+				);
+
+				// Awww, crud!
+				if ($request === false)
+				{
+					$incontext['error'] = $txt['error_user_settings_query'] . '<br />
+					<div style="margin: 2ex;">' . nl2br(htmlspecialchars($db->last_error($db_connection), ENT_COMPAT, 'UTF-8')) . '</div>';
+					return false;
+				}
+
+				$incontext['member_id'] = $db->insert_id("{$db_prefix}members", 'id_member');
+			}
+
+			// If we're here we're good.
+			return true;
+		}
+
+		return false;
 	}
 
-	// Check if we need some stupid MySQL fix.
-	$server_version = $db->db_server_info();
-	if ($db_type == 'mysql' && in_array(substr($server_version, 0, 6), array('5.0.50', '5.0.51')))
-		updateSettings(array('db_mysql_group_by_fix' => '1'));
+	/**
+	 * Final step, clean up and a complete message!
+	 */
+	private function action_deleteInstall()
+	{
+		global $txt, $incontext, $db_character_set;
+		global $current_version, $databases, $forum_version, $modSettings, $user_info, $db_type;
 
-	// Some final context for the template.
-	$incontext['dir_still_writable'] = is_writable(dirname(__FILE__)) && substr(__FILE__, 1, 2) != ':\\';
-	$incontext['probably_delete_install'] = isset($_SESSION['installer_temp_ftp']) || is_writable(dirname(__FILE__)) || is_writable(__FILE__);
+		// A few items we will load in from settings and make avaialble.
+		global $boardurl, $db_prefix, $cookiename, $mbname, $language;
 
-	return false;
+		$incontext['page_title'] = $txt['congratulations'];
+		$incontext['sub_template'] = 'delete_install';
+		$incontext['continue'] = 0;
+
+		require(TMP_BOARDDIR . '/Settings.php');
+		if (!defined('ELK'))
+			define('ELK', 1);
+		definePaths();
+
+		$db = load_database();
+
+		if (!defined('SUBSDIR'))
+			define('SUBSDIR', TMP_BOARDDIR . '/sources/subs');
+
+		chdir(TMP_BOARDDIR);
+
+		require_once(SOURCEDIR . '/Errors.php');
+		require_once(SOURCEDIR . '/Logging.php');
+		require_once(SOURCEDIR . '/Subs.php');
+		require_once(SOURCEDIR . '/Load.php');
+		require_once(SUBSDIR . '/Cache.subs.php');
+		require_once(SOURCEDIR . '/Security.php');
+		require_once(SUBSDIR . '/Auth.subs.php');
+		require_once(SUBSDIR . '/Util.class.php');
+
+		// Bring a warning over.
+		if (!empty($incontext['account_existed']))
+			$incontext['warning'] = $incontext['account_existed'];
+
+		if (!empty($db_character_set) && !empty($databases[$db_type]['utf8_support']))
+			$db->query('', '
+				SET NAMES {raw:db_character_set}',
+				array(
+					'db_character_set' => $db_character_set,
+					'db_error_skip' => true,
+				)
+			);
+
+		// As track stats is by default enabled let's add some activity.
+		$db->insert('ignore',
+			'{db_prefix}log_activity',
+			array('date' => 'date', 'topics' => 'int', 'posts' => 'int', 'registers' => 'int'),
+			array(strftime('%Y-%m-%d', time()), 1, 1, (!empty($incontext['member_id']) ? 1 : 0)),
+			array('date')
+		);
+
+		// We're going to want our lovely $modSettings now.
+		$request = $db->query('', '
+			SELECT variable, value
+			FROM {db_prefix}settings',
+			array(
+				'db_error_skip' => true,
+			)
+		);
+		// Only proceed if we can load the data.
+		if ($request)
+		{
+			while ($row = $db->fetch_row($request))
+				$modSettings[$row[0]] = $row[1];
+			$db->free_result($request);
+		}
+
+		// Automatically log them in ;)
+		if (isset($incontext['member_id']) && isset($incontext['member_salt']))
+			setLoginCookie(3153600 * 60, $incontext['member_id'], hash('sha256', $incontext['passwd'] . $incontext['member_salt']));
+
+		$result = $db->query('', '
+			SELECT value
+			FROM {db_prefix}settings
+			WHERE variable = {string:db_sessions}',
+			array(
+				'db_sessions' => 'databaseSession_enable',
+				'db_error_skip' => true,
+			)
+		);
+		if ($db->num_rows($result) != 0)
+			list ($db_sessions) = $db->fetch_row($result);
+		$db->free_result($result);
+
+		if (empty($db_sessions))
+			$_SESSION['admin_time'] = time();
+		else
+		{
+			$_SERVER['HTTP_USER_AGENT'] = substr($_SERVER['HTTP_USER_AGENT'], 0, 211);
+
+			$db->insert('replace',
+				'{db_prefix}sessions',
+				array(
+					'session_id' => 'string', 'last_update' => 'int', 'data' => 'string',
+				),
+				array(
+					session_id(), time(), 'USER_AGENT|s:' . strlen($_SERVER['HTTP_USER_AGENT']) . ':"' . $_SERVER['HTTP_USER_AGENT'] . '";admin_time|i:' . time() . ';',
+				),
+				array('session_id')
+			);
+		}
+
+		require_once(SUBSDIR . '/Members.subs.php');
+		updateMemberStats();
+		require_once(SUBSDIR . '/Messages.subs.php');
+		updateMessageStats();
+		require_once(SUBSDIR . '/Topic.subs.php');
+		updateTopicStats();
+
+		$request = $db->query('', '
+			SELECT id_msg
+			FROM {db_prefix}messages
+			WHERE id_msg = 1
+				AND modified_time = 0
+			LIMIT 1',
+			array(
+				'db_error_skip' => true,
+			)
+		);
+		if ($db->num_rows($request) > 0)
+			updateStats('subject', 1, htmlspecialchars($txt['default_topic_subject']));
+		$db->free_result($request);
+
+		// Now is the perfect time to fetch remote files.
+		require_once(SUBSDIR . '/ScheduledTask.class.php');
+
+		// Sanity check that they loaded earlier!
+		if (isset($modSettings['recycle_board']))
+		{
+			// The variable is usually defined in index.php so lets just use our variable to do it for us.
+			$forum_version = $current_version;
+			// Now go get those files!
+			$task = new Scheduled_Task();
+			$task->fetchFiles();
+			// We've just installed!
+			$user_info['ip'] = $_SERVER['REMOTE_ADDR'];
+			$user_info['id'] = isset($incontext['member_id']) ? $incontext['member_id'] : 0;
+			logAction('install', array('version' => $forum_version), 'admin');
+		}
+
+		// Check if we need some stupid MySQL fix.
+		$server_version = $db->db_server_info();
+		if ($db_type == 'mysql' && in_array(substr($server_version, 0, 6), array('5.0.50', '5.0.51')))
+			updateSettings(array('db_mysql_group_by_fix' => '1'));
+
+		// Some final context for the template.
+		$incontext['dir_still_writable'] = is_writable(dirname(__FILE__)) && substr(__FILE__, 1, 2) != ':\\';
+		$incontext['probably_delete_install'] = isset($_SESSION['installer_temp_ftp']) || is_writable(dirname(__FILE__)) || is_writable(__FILE__);
+
+		return false;
+	}
 }
 
 /**
@@ -1945,7 +1935,7 @@ class Ftp_Connection
 function updateSettingsFile($vars)
 {
 	// Modify Settings.php.
-	$settingsArray = file(dirname(__FILE__) . '/Settings.php');
+	$settingsArray = file(TMP_BOARDDIR . '/Settings.php');
 
 	// @todo Do we just want to read the file in clean, and split it this way always?
 	if (count($settingsArray) == 1)
@@ -1953,17 +1943,6 @@ function updateSettingsFile($vars)
 
 	for ($i = 0, $n = count($settingsArray); $i < $n; $i++)
 	{
-		// Remove the redirect...
-		if (trim($settingsArray[$i]) == 'if (file_exists(dirname(__FILE__) . \'/install.php\'))' && trim($settingsArray[$i + 1]) == '{' && trim($settingsArray[$i + 3]) == '}')
-		{
-			// Get the four lines to nothing.
-			$settingsArray[$i] = '';
-			$settingsArray[++$i] = '';
-			$settingsArray[++$i] = '';
-			$settingsArray[++$i] = '';
-			continue;
-		}
-
 		// Don't trim or bother with it if it's not a variable.
 		if (substr($settingsArray[$i], 0, 1) != '$')
 			continue;
@@ -1988,12 +1967,12 @@ function updateSettingsFile($vars)
 	}
 
 	// Blank out the file - done to fix a oddity with some servers.
-	$fp = @fopen(dirname(__FILE__) . '/Settings.php', 'w');
+	$fp = @fopen(TMP_BOARDDIR . '/Settings.php', 'w');
 	if (!$fp)
 		return false;
 	fclose($fp);
 
-	$fp = fopen(dirname(__FILE__) . '/Settings.php', 'r+');
+	$fp = fopen(TMP_BOARDDIR . '/Settings.php', 'r+');
 
 	// Gotta have one of these ;)
 	if (trim($settingsArray[0]) != '<?php')
@@ -2017,8 +1996,179 @@ function updateSettingsFile($vars)
 function updateDbLastError()
 {
 	// Write out the db_last_error file with the error timestamp
-	file_put_contents(dirname(__FILE__) . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = 0;');
+	file_put_contents(TMP_BOARDDIR . '/db_last_error.txt', '0');
 	return true;
+}
+
+/**
+ * The normal DbTable disallows to delete/create "core" tables
+ */
+function db_table_install()
+{
+	global $db_type;
+
+	$db = load_database();
+
+	require_once(SOURCEDIR . '/database/DbTable.class.php');
+	require_once(SOURCEDIR . '/database/DbTable-' . $db_type . '.php');
+
+	// @todo UGLY!!!
+	// Once the install dir will be kept for install, create a file for that
+	if (class_exists('DbTable_MySQL') && !class_exists('DbTable_MySQL_Install'))
+	{
+		class DbTable_MySQL_Install extends DbTable_MySQL
+		{
+			public static $_tbl_inst = null;
+			/**
+			* DbTable_MySQL::construct
+			*
+			* @param object $db - A Database_MySQL object
+			*/
+			private function __construct($db)
+			{
+				global $db_prefix;
+
+				// We are doing install, of course we want to do any remove on these
+				$this->_reservedTables = array();
+
+				foreach ($this->_reservedTables as $k => $table_name)
+					$this->_reservedTables[$k] = strtolower($db_prefix . $table_name);
+
+				// let's be sure.
+				$this->_package_log = array();
+
+				// This executes queries and things
+				$this->_db = $db;
+			}
+
+			/**
+			* Static method that allows to retrieve or create an instance of this class.
+			*
+			* @param object $_db - A Database_MySQL object
+			* @return object - A DbTable_MySQL object
+			*/
+			public static function db_table($db)
+			{
+				if (is_null(self::$_tbl_inst))
+					self::$_tbl_inst = new DbTable_MySQL_Install($db);
+				return self::$_tbl_inst;
+			}
+		}
+	}
+	elseif (class_exists('DbTable_PostgreSQL') && !class_exists('DbTable_PostgreSQL_Install'))
+	{
+		class DbTable_PostgreSQL_Install extends DbTable_PostgreSQL
+		{
+			public static $_tbl_inst = null;
+			/**
+			* DbTable_MySQL::construct
+			*
+			* @param object $db - A Database_MySQL object
+			*/
+			private function __construct($db)
+			{
+				global $db_prefix;
+
+				// We are doing install, of course we want to do any remove on these
+				$this->_reservedTables = array();
+
+				foreach ($this->_reservedTables as $k => $table_name)
+					$this->_reservedTables[$k] = strtolower($db_prefix . $table_name);
+
+				// let's be sure.
+				$this->_package_log = array();
+
+				// This executes queries and things
+				$this->_db = $db;
+			}
+
+			/**
+			* Static method that allows to retrieve or create an instance of this class.
+			*
+			* @param object $_db - A Database_MySQL object
+			* @return object - A DbTable_MySQL object
+			*/
+			public static function db_table($db)
+			{
+				if (is_null(self::$_tbl_inst))
+					self::$_tbl_inst = new DbTable_PostgreSQL_Install($db);
+				return self::$_tbl_inst;
+			}
+		}
+	}
+	return call_user_func(array('DbTable_' . DB_TYPE . '_Install', 'db_table'), $db);
+}
+
+function parse_sqlLines($sql_lines)
+{
+	global $incontext, $txt;
+
+	$db = load_database();
+	$db_table = db_table_install();
+
+	$current_statement = '';
+	$exists = array();
+
+	foreach ($sql_lines as $count => $line)
+	{
+		// No comments allowed!
+		if (substr(trim($line), 0, 1) != '#')
+			$current_statement .= "\n" . rtrim($line);
+
+		// Is this the end of the query string?
+		if (empty($current_statement) || (preg_match('~;[\s]*$~s', $line) == 0 && $count != count($sql_lines)))
+			continue;
+
+		// Does this table already exist? If so, don't insert more data into it!
+		if (preg_match('~^\s*\$db->insert\(.*(\{db_prefix\}\w+)~s', $current_statement, $match) != 0 && in_array($match[1], $exists))
+		{
+			$incontext['sql_results']['insert_dups']++;
+			$current_statement = '';
+			continue;
+		}
+
+		$result = eval('return ' . $current_statement);
+
+		if ($result === false)
+		{
+			// Error 1050: Table already exists!
+			// @todo Needs to be made better!
+			if (($db_type != 'mysql' || mysqli_errno($db_connection) === 1050) && preg_match('~^\s*\$db_table->db_create_table\(.*(\{db_prefix\}\w+)~s', $current_statement, $match) == 1)
+			{
+				$exists[] = $match[1];
+				$incontext['sql_results']['table_dups']++;
+			}
+			// Don't error on duplicate indexes (or duplicate operators in PostgreSQL.)
+			elseif (!preg_match('~^\s*\$db->query\(.*CREATE( UNIQUE)? INDEX ([^\n\r]+?)~s', $current_statement) && !($db_type == 'postgresql' && preg_match('~^\s*\$db->query\(.*CREATE OPERATOR (^\n\r]+?)~s', $current_statement)))
+			{
+				$incontext['failures'][$count] = $db->last_error();
+			}
+		}
+		else
+		{
+			if (preg_match('~^\s*\$db_table->db_create_table\(.*(\{db_prefix\}\w+)~s', $current_statement, $match) == 1)
+				$incontext['sql_results']['tables']++;
+			else
+			{
+				preg_match_all('~^\s*array\(.+\),$~m', $current_statement, $matches);
+				if (!empty($matches[0]))
+					$incontext['sql_results']['inserts'] += (count($matches[0]) - 1);
+				else
+					$incontext['sql_results']['inserts']++;
+			}
+		}
+
+		$current_statement = '';
+	}
+
+	// Sort out the context for the SQL.
+	foreach ($incontext['sql_results'] as $key => $number)
+	{
+		if ($number == 0)
+			unset($incontext['sql_results'][$key]);
+		else
+			$incontext['sql_results'][$key] = sprintf($txt['db_populate_' . $key], $number);
+	}
 }
 
 /**
@@ -2038,14 +2188,14 @@ function fixModSecurity()
 
 	if (!function_exists('apache_get_modules') || !in_array('mod_security', apache_get_modules()))
 		return true;
-	elseif (file_exists(dirname(__FILE__) . '/.htaccess') && is_writable(dirname(__FILE__) . '/.htaccess'))
+	elseif (file_exists(TMP_BOARDDIR . '/.htaccess') && is_writable(TMP_BOARDDIR . '/.htaccess'))
 	{
-		$current_htaccess = implode('', file(dirname(__FILE__) . '/.htaccess'));
+		$current_htaccess = implode('', file(TMP_BOARDDIR . '/.htaccess'));
 
 		// Only change something if mod_security hasn't been addressed yet.
 		if (strpos($current_htaccess, '<IfModule mod_security.c>') === false)
 		{
-			if ($ht_handle = fopen(dirname(__FILE__) . '/.htaccess', 'a'))
+			if ($ht_handle = fopen(TMP_BOARDDIR . '/.htaccess', 'a'))
 			{
 				fwrite($ht_handle, $htaccess_addition);
 				fclose($ht_handle);
@@ -2057,11 +2207,11 @@ function fixModSecurity()
 		else
 			return true;
 	}
-	elseif (file_exists(dirname(__FILE__) . '/.htaccess'))
-		return strpos(implode('', file(dirname(__FILE__) . '/.htaccess')), '<IfModule mod_security.c>') !== false;
-	elseif (is_writable(dirname(__FILE__)))
+	elseif (file_exists(TMP_BOARDDIR . '/.htaccess'))
+		return strpos(implode('', file(TMP_BOARDDIR . '/.htaccess')), '<IfModule mod_security.c>') !== false;
+	elseif (is_writable(TMP_BOARDDIR))
 	{
-		if ($ht_handle = fopen(dirname(__FILE__) . '/.htaccess', 'w'))
+		if ($ht_handle = fopen(TMP_BOARDDIR . '/.htaccess', 'w'))
 		{
 			fwrite($ht_handle, $htaccess_addition);
 			fclose($ht_handle);
@@ -2079,8 +2229,8 @@ function definePaths()
 	global $boarddir, $cachedir, $extdir, $languagedir, $sourcedir;
 
 	// Make sure the paths are correct... at least try to fix them.
-	if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt'))
-		$boarddir = dirname(__FILE__);
+	if (!file_exists($boarddir) && file_exists(TMP_BOARDDIR . '/agreement.txt'))
+		$boarddir = TMP_BOARDDIR;
 	if (!file_exists($sourcedir . '/SiteDispatcher.class.php') && file_exists($boarddir . '/sources'))
 		$sourcedir = $boarddir . '/sources';
 
@@ -2132,37 +2282,60 @@ function JavaScriptEscape($string)
 }
 
 /**
+ * Does the test to check whether compression is supported or not.
+ * Called by ?obgz
+ */
+function action_testCompression()
+{
+		ob_start('ob_gzhandler');
+
+		if (ini_get('session.save_handler') == 'user')
+			@ini_set('session.save_handler', 'files');
+		session_start();
+
+		if (!headers_sent())
+			echo '<!DOCTYPE html>
+<html>
+	<head>
+		<title>', htmlspecialchars($_GET['pass_string'], ENT_COMPAT, 'UTF-8'), '</title>
+	</head>
+	<body style="background: #d4d4d4; margin-top: 16%; font-size: 16pt;">
+		<strong>', htmlspecialchars($_GET['pass_string'], ENT_COMPAT, 'UTF-8'), '</strong>
+	</body>
+</html>';
+		exit;
+}
+
+/**
  * Delete the installer and its additional files.
  * Called by ?delete
  */
 function action_deleteInstaller()
 {
-	global $databases;
+	global $databases, $package_ftp;
+
+	definePaths();
+	define('ELK', 'SSI');
+	require_once(SUBSDIR . '/Package.subs.php');
 
 	if (isset($_SESSION['installer_temp_ftp']))
 	{
-		$ftp = new Ftp_Connection($_SESSION['installer_temp_ftp']['server'], $_SESSION['installer_temp_ftp']['port'], $_SESSION['installer_temp_ftp']['username'], $_SESSION['installer_temp_ftp']['password']);
-		$ftp->chdir($_SESSION['installer_temp_ftp']['path']);
+		$_SESSION['pack_ftp']['root'] = BOARDDIR;
+		$package_ftp = new Ftp_Connection($_SESSION['installer_temp_ftp']['server'], $_SESSION['installer_temp_ftp']['port'], $_SESSION['installer_temp_ftp']['username'], $_SESSION['installer_temp_ftp']['password']);
+		$package_ftp->chdir($_SESSION['installer_temp_ftp']['path']);
+	}
 
-		$ftp->unlink('install.php');
+	deltree(dirname(__FILE__));
 
-		foreach ($databases as $key => $dummy)
-			$ftp->unlink('install_' . DB_SCRIPT_VERSION . '_' . $key . '.sql');
-
-		$ftp->close();
+	if (isset($_SESSION['installer_temp_ftp']))
+	{
+		$package_ftp->close();
 
 		unset($_SESSION['installer_temp_ftp']);
 	}
-	else
-	{
-		@unlink(__FILE__);
-
-		foreach ($databases as $key => $dummy)
-			@unlink(dirname(__FILE__) . '/install_' . DB_SCRIPT_VERSION . '_' . $key . '.sql');
-	}
 
 	// Now just redirect to a blank.png...
-	header('Location: http://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT']) . dirname($_SERVER['PHP_SELF']) . '/themes/default/images/blank.png');
+	header('Location: http://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT']) . dirname($_SERVER['PHP_SELF']) . '/../themes/default/images/blank.png');
 	exit;
 }
 
@@ -2176,13 +2349,14 @@ function template_install_above()
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="robots" content="noindex" />
 		<title>', $txt['installer'], '</title>
-		<link rel="stylesheet" href="themes/default/css/index.css?10RC1" />
-		<link rel="stylesheet" href="themes/default/css/_light/index_light.css?10RC1" />
-		<link rel="stylesheet" href="themes/default/css/install.css?10RC1" />
-		<script src="themes/default/scripts/script.js"></script>
+		<link rel="stylesheet" href="../themes/default/css/index.css?10RC1" />
+		<link rel="stylesheet" href="../themes/default/css/_light/index_light.css?10RC1" />
+		<link rel="stylesheet" href="../themes/default/css/install.css?10RC1" />
+		<script src="../themes/default/scripts/script.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" id="jquery"></script>
 		<script><!-- // --><![CDATA[
-			window.jQuery || document.write(\'<script src="themes/default/scripts/jquery-1.11.1.min.js"><\/script>\');
+			window.jQuery || document.write(\'<script src="../themes/default/scripts/jquery-1.11.1.min.js"><\/script>\');
+			var elk_scripturl = ', JavaScriptEscape(str_replace('/install/install.php', '/index.php', $installurl)), ';
 		// ]]></script>
 
 	</head>
@@ -2190,7 +2364,7 @@ function template_install_above()
 		<div id="header">
 			<div class="frame">
 				<h1 class="forumtitle">', $txt['installer'], '</h1>
-				<img id="logo" src="themes/default/images/logo.png" alt="ElkArte Community" title="ElkArte Community" />
+				<img id="logo" src="../themes/default/images/logo.png" alt="ElkArte Community" title="ElkArte Community" />
 			</div>
 		</div>
 		<div id="wrapper" class="wrapper">
@@ -2250,7 +2424,7 @@ function template_install_below()
 {
 	global $incontext, $txt;
 
-	if (!empty($incontext['continue']))
+	if (!empty($incontext['continue']) || !empty($incontext['retry']))
 	{
 		echo '
 								<div class="clear righttext">';
@@ -2258,6 +2432,10 @@ function template_install_below()
 		if (!empty($incontext['continue']))
 			echo '
 									<input type="submit" id="contbutt" name="contbutt" value="', $txt['upgrade_continue'], '" onclick="return submitThisOnce(this);" class="button_submit" />';
+
+		if (!empty($incontext['retry']))
+			echo '
+									<input type="submit" id="contbutt" name="contbutt" value="', $txt['upgrade_retry'], '" onclick="return submitThisOnce(this);" class="button_submit" />';
 		echo '
 								</div>';
 	}
@@ -2292,7 +2470,7 @@ function template_welcome_message()
 	global $incontext, $txt;
 
 	echo '
-	<script src="themes/default/scripts/admin.js"></script>
+	<script src="../themes/default/scripts/admin.js"></script>
 		<script><!-- // --><![CDATA[
 			var oUpgradeCenter = new elk_AdminIndex({
 				bLoadAnnouncements: false,
@@ -2710,7 +2888,7 @@ function template_delete_install()
 	// Don't show the box if it's like 99% sure it won't work :P.
 	if ($incontext['probably_delete_install'])
 		echo '
-		<div style="margin: 1ex; font-weight: bold;">
+		<div id="delete_label" style="margin: 1ex; font-weight: bold; display: none">
 			<label for="delete_self"><input type="checkbox" id="delete_self" onclick="doTheDelete();" class="input_check" /> ', $txt['delete_installer'], !isset($_SESSION['installer_temp_ftp']) ? ' ' . $txt['delete_installer_maybe'] : '', '</label>
 		</div>
 		<script><!-- // --><![CDATA[
@@ -2723,6 +2901,7 @@ function template_delete_install()
 				tempImage.width = 0;
 				theCheck.disabled = true;
 			}
+			document.getElementById(\'delete_label\').style.display = \'block\';
 		// ]]></script>
 		<br />';
 

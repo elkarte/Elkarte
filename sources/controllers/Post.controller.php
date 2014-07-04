@@ -1024,9 +1024,6 @@ class Post_Controller extends Action_Controller
 		// We are now in post2 action
 		$context['current_action'] = 'post2';
 
-		// Prevent double submission of this form.
-		checkSubmitOnce('check');
-
 		// No errors as yet.
 		$post_errors = Error_Context::context('post', 1);
 		$attach_errors = Attachment_Error_Context::context();

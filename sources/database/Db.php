@@ -138,6 +138,14 @@ interface Database
 	public function error($db_string, $connection = null);
 
 	/**
+	 * Sets the class not to return the error in case of failures.
+	 *
+	 * @param null|boolean $set if true the query method will not return any error
+	 *                     if null will restore the last known value of skip_error
+	 */
+	public function skip_error($set = true);
+
+	/**
 	 * Insert data.
 	 *
 	 * @param string $method - options 'replace', 'ignore', 'insert'
