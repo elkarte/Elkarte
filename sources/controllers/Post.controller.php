@@ -1997,17 +1997,7 @@ class Post_Controller extends Action_Controller
 					cache_put_data('response_prefix', $context['response_prefix'], 600);
 				}
 
-				$db->query('', '
-					UPDATE {db_prefix}messages
-					SET subject = {string:subject}
-					WHERE id_topic = {int:current_topic}
-						AND id_msg != {int:id_first_msg}',
-					array(
-						'current_topic' => $topic,
-						'id_first_msg' => $row['id_first_msg'],
-						'subject' => $context['response_prefix'] . $_POST['subject'],
-					)
-				);
+				topicSubject(array('id_topic' => $topic, 'id_first_msg' => $row['id_first_msg']), $_POST['subject'], $context['response_prefix'], true);
 			}
 
 			if (!empty($moderationAction))
