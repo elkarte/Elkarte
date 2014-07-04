@@ -1423,64 +1423,7 @@ class Post_Controller extends Action_Controller
 
 		// Make the poll...
 		if (isset($_REQUEST['poll']))
-		{
-			// Make sure that the user has not entered a ridiculous number of options..
-			if (empty($_POST['poll_max_votes']) || $_POST['poll_max_votes'] <= 0)
-				$_POST['poll_max_votes'] = 1;
-			elseif ($_POST['poll_max_votes'] > count($_POST['options']))
-				$_POST['poll_max_votes'] = count($_POST['options']);
-			else
-				$_POST['poll_max_votes'] = (int) $_POST['poll_max_votes'];
-
-			$_POST['poll_expire'] = (int) $_POST['poll_expire'];
-			$_POST['poll_expire'] = $_POST['poll_expire'] > 9999 ? 9999 : ($_POST['poll_expire'] < 0 ? 0 : $_POST['poll_expire']);
-
-			// Just set it to zero if it's not there..
-			if (!isset($_POST['poll_hide']))
-				$_POST['poll_hide'] = 0;
-			else
-				$_POST['poll_hide'] = (int) $_POST['poll_hide'];
-
-			$_POST['poll_change_vote'] = isset($_POST['poll_change_vote']) ? 1 : 0;
-			$_POST['poll_guest_vote'] = isset($_POST['poll_guest_vote']) ? 1 : 0;
-
-			// Make sure guests are actually allowed to vote generally.
-			if ($_POST['poll_guest_vote'])
-			{
-				require_once(SUBSDIR . '/Members.subs.php');
-				$allowedVoteGroups = groupsAllowedTo('poll_vote', $board);
-
-				if (!in_array(-1, $allowedVoteGroups['allowed']))
-					$_POST['poll_guest_vote'] = 0;
-			}
-
-			// If the user tries to set the poll too far in advance, don't let them.
-			if (!empty($_POST['poll_expire']) && $_POST['poll_expire'] < 1)
-				fatal_lang_error('poll_range_error', false);
-			// Don't allow them to select option 2 for hidden results if it's not time limited.
-			elseif (empty($_POST['poll_expire']) && $_POST['poll_hide'] == 2)
-				$_POST['poll_hide'] = 1;
-
-			// Clean up the question and answers.
-			$_POST['question'] = htmlspecialchars($_POST['question'], ENT_COMPAT, 'UTF-8');
-			$_POST['question'] = Util::truncate($_POST['question'], 255);
-			$_POST['question'] = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', $_POST['question']);
-			$_POST['options'] = htmlspecialchars__recursive($_POST['options']);
-
-			// Finally, make the poll.
-			require_once(SUBSDIR . '/Poll.subs.php');
-			$id_poll = createPoll(
-				$_POST['question'],
-				$user_info['id'],
-				$_POST['guestname'],
-				$_POST['poll_max_votes'],
-				$_POST['poll_hide'],
-				$_POST['poll_expire'],
-				$_POST['poll_change_vote'],
-				$_POST['poll_guest_vote'],
-				$_POST['options']
-			);
-		}
+			$id_poll = $this->_createPoll($_POST, $_POST['guestname']);
 		else
 			$id_poll = 0;
 
@@ -2399,5 +2342,78 @@ class Post_Controller extends Action_Controller
 
 		$context['last_choice_id'] = $choice_id;
 		$context['poll']['choices'][count($context['poll']['choices']) - 1]['is_last'] = true;
+	}
+
+	/**
+	 * Creates a poll based on an array (of POST'ed data)
+	 *
+	 * @param mixed[] $options
+	 * @param string $user_name The username of the member that creates the poll
+	 *
+	 * @return int - the id of the newly created poll
+	 */
+	private function _createPoll($options, $user_name)
+	{
+		global $user_info, $board;
+
+		// Make sure that the user has not entered a ridiculous number of options..
+		if (empty($options['poll_max_votes']) || $options['poll_max_votes'] <= 0)
+			$poll_max_votes = 1;
+		elseif ($options['poll_max_votes'] > count($options['options']))
+			$poll_max_votes = count($options['options']);
+		else
+			$poll_max_votes = (int) $options['poll_max_votes'];
+
+		$poll_expire = (int) $options['poll_expire'];
+		$poll_expire = $poll_expire > 9999 ? 9999 : ($poll_expire < 0 ? 0 : $poll_expire);
+
+		// Just set it to zero if it's not there..
+		if (isset($options['poll_hide']))
+			$poll_hide = (int) $options['poll_hide'];
+		else
+			$poll_hide = 0;
+
+		$poll_change_vote = isset($options['poll_change_vote']) ? 1 : 0;
+		$poll_guest_vote = isset($options['poll_guest_vote']) ? 1 : 0;
+
+		// Make sure guests are actually allowed to vote generally.
+		if ($poll_guest_vote)
+		{
+			require_once(SUBSDIR . '/Members.subs.php');
+			$allowedVoteGroups = groupsAllowedTo('poll_vote', $board);
+
+			if (!in_array(-1, $allowedVoteGroups['allowed']))
+				$poll_guest_vote = 0;
+		}
+
+		// If the user tries to set the poll too far in advance, don't let them.
+		if (!empty($poll_expire) && $poll_expire < 1)
+			// @todo this fatal error should not be here
+			fatal_lang_error('poll_range_error', false);
+		// Don't allow them to select option 2 for hidden results if it's not time limited.
+		elseif (empty($poll_expire) && $poll_hide == 2)
+			$poll_hide = 1;
+
+		// Clean up the question and answers.
+		$question = htmlspecialchars($options['question'], ENT_COMPAT, 'UTF-8');
+		$question = Util::truncate($question, 255);
+		$question = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', $question);
+		$poll_options = htmlspecialchars__recursive($options['options']);
+
+		// Finally, make the poll.
+		require_once(SUBSDIR . '/Poll.subs.php');
+		$id_poll = createPoll(
+			$question,
+			$user_info['id'],
+			$user_name,
+			$poll_max_votes,
+			$poll_hide,
+			$poll_expire,
+			$poll_change_vote,
+			$poll_guest_vote,
+			$poll_options
+		);
+
+		return $id_poll;
 	}
 }
