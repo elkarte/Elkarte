@@ -413,9 +413,10 @@ class Post_Controller extends Action_Controller
 			if (isset($_REQUEST['msg']) && !empty($topic))
 			{
 				require_once(SUBSDIR . '/Messages.subs.php');
+				$msg_id = (int) $_REQUEST['msg'];
 
 				// Get the existing message.
-				$message = messageDetails((int) $_REQUEST['msg'], $topic);
+				$message = messageDetails((int) $msg_id, $topic);
 
 				// The message they were trying to edit was most likely deleted.
 				// @todo Change this error message?
@@ -430,7 +431,22 @@ class Post_Controller extends Action_Controller
 				prepareMessageContext($message);
 			}
 			elseif (isset($_REQUEST['last_msg']))
-				list ($form_subject,) = getFormMsgSubject(false, $topic, $first_subject);
+			{
+				// @todo: sort out what kind of combinations are actually possible
+				// Posting a quoted reply?
+				if ((!empty($topic) && !empty($_REQUEST['quote'])) || (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup'])))
+				{
+					$case = 2;
+					$msg_id = !empty($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'];
+				}
+				// Posting a reply without a quote?
+				elseif (!empty($topic) && empty($_REQUEST['quote']))
+					$case = 3;
+				else
+					$case = 4;
+
+				list ($form_subject,) = getFormMsgSubject($case, $topic, $first_subject);
+			}
 
 			// No check is needed, since nothing is really posted.
 			checkSubmitOnce('free');
@@ -438,9 +454,14 @@ class Post_Controller extends Action_Controller
 		// Editing a message...
 		elseif (isset($_REQUEST['msg']) && !empty($topic))
 		{
-			$_REQUEST['msg'] = (int) $_REQUEST['msg'];
+			$msg_id = (int) $_REQUEST['msg'];
 
-			$message = getFormMsgSubject(true, $topic);
+			$message = getFormMsgSubject(1, $topic, '', $msg_id);
+
+			// The message they were trying to edit was most likely deleted.
+			if ($message === false)
+				fatal_lang_error('no_message', false);
+
 			if (!empty($message['errors']))
 				foreach ($errors as $error)
 					$post_errors->addError($error);
@@ -457,7 +478,7 @@ class Post_Controller extends Action_Controller
 			$context['icon'] = $message['message']['icon'];
 
 			// Set the destination.
-			$context['destination'] = 'post2;start=' . $_REQUEST['start'] . ';msg=' . $_REQUEST['msg'] . ';' . $context['session_var'] . '=' . $context['session_id'] . (isset($_REQUEST['poll']) ? ';poll' : '');
+			$context['destination'] = 'post2;start=' . $_REQUEST['start'] . ';msg=' . $msg_id . ';' . $context['session_var'] . '=' . $context['session_id'] . (isset($_REQUEST['poll']) ? ';poll' : '');
 			$context['submit_label'] = $txt['save'];
 		}
 		// Posting...
@@ -476,7 +497,20 @@ class Post_Controller extends Action_Controller
 
 			$context['submit_label'] = $txt['post'];
 
-			list ($form_subject, $form_message) = getFormMsgSubject(false, $topic, $first_subject);
+			// @todo: sort out what kind of combinations are actually possible
+			// Posting a quoted reply?
+			if ((!empty($topic) && !empty($_REQUEST['quote'])) || (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup'])))
+			{
+				$case = 2;
+				$msg_id = !empty($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'];
+			}
+			// Posting a reply without a quote?
+			elseif (!empty($topic) && empty($_REQUEST['quote']))
+				$case = 3;
+			else
+				$case = 4;
+
+			list ($form_subject, $form_message) = getFormMsgSubject($case, $topic, $first_subject);
 		}
 
 		// Check whether this is a really old post being bumped...

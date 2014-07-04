@@ -1544,40 +1544,43 @@ function lastPost()
  * - if editing is true, returns $message|$message[errors], else returns array($subject, $message)
  *
  * @package Posts
- * @param boolean $editing
+ * @param int|bool $editing
  * @param int|null|false $topic
  * @param string $first_subject
+ * @param int $msg_id
+ *
+ * @return false|mixed[]
  */
-function getFormMsgSubject($editing, $topic, $first_subject = '')
+function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 {
 	global $modSettings, $context;
 
 	$db = database();
 
-	if ($editing)
+	switch ($editing)
 	{
-		require_once(SUBSDIR . '/Messages.subs.php');
+		case 1:
+		{
+			require_once(SUBSDIR . '/Messages.subs.php');
 
-		// Get the existing message.
-		$message = messageDetails((int) $_REQUEST['msg'], $topic);
+			// Get the existing message.
+			$message = messageDetails($msg_id, $topic);
 
-		// The message they were trying to edit was most likely deleted.
-		if ($message === false)
-			fatal_lang_error('no_message', false);
+			// The message they were trying to edit was most likely deleted.
+			if ($message === false)
+				return false;
 
-		$errors = checkMessagePermissions($message['message']);
+			$errors = checkMessagePermissions($message['message']);
 
-		prepareMessageContext($message);
+			prepareMessageContext($message);
 
-		if (!empty($errors))
-			$message['errors'] = $errors;
+			if (!empty($errors))
+				$message['errors'] = $errors;
 
-		return $message;
-	}
-	else
-	{
+			return $message;
+		}
 		// Posting a quoted reply?
-		if ((!empty($topic) && !empty($_REQUEST['quote'])) || (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup'])))
+		case 2:
 		{
 			// Make sure they _can_ quote this post, and if so get it.
 			$request = $db->query('', '
@@ -1589,7 +1592,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 					AND m.approved = {int:is_approved}') . '
 				LIMIT 1',
 				array(
-					'id_msg' => !empty($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'],
+					'id_msg' => $msg_id,
 					'is_approved' => 1,
 				)
 			);
@@ -1628,10 +1631,12 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 				$form_message = preg_replace(array('~\n?\[quote.*?\].+?\[/quote\]\n?~is', '~^\n~', '~\[/quote\]~'), '', $form_message);
 
 			// Add a quote string on the front and end.
-			$form_message = '[quote author=' . $mname . ' link=msg=' . (int) $_REQUEST['quote'] . ' date=' . $mdate . ']' . "\n" . rtrim($form_message) . "\n" . '[/quote]';
+			$form_message = '[quote author=' . $mname . ' link=msg=' . (int) $msg_id . ' date=' . $mdate . ']' . "\n" . rtrim($form_message) . "\n" . '[/quote]';
+
+			break;
 		}
 		// Posting a reply without a quote?
-		elseif (!empty($topic) && empty($_REQUEST['quote']))
+		case 3:
 		{
 			// Get the first message's subject.
 			$form_subject = $first_subject;
@@ -1644,15 +1649,19 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 			censorText($form_subject);
 
 			$form_message = '';
+
+			break;
 		}
-		else
+		case 4:
 		{
 			$form_subject = isset($_GET['subject']) ? $_GET['subject'] : '';
 			$form_message = '';
-		}
 
-		return array($form_subject, $form_message);
+			break;
+		}
 	}
+
+	return array($form_subject, $form_message);
 }
 
 /**
