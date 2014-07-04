@@ -20,24 +20,9 @@ define('CURRENT_VERSION', '1.0 RC 1');
 define('CURRENT_LANG_VERSION', '1.0');
 define('REQUIRED_PHP_VERSION', '5.2.0');
 
-$databases = array(
-	'mysql' => array(
-		'name' => 'MySQL',
-		'version' => '5.0.19',
-		'version_check' => 'return min(mysqli_get_server_info($db_connection), mysqli_get_client_info($db_connection));',
-		'utf8_support' => true,
-		'utf8_version' => '4.1.0',
-		'utf8_version_check' => 'return mysqli_get_server_info($db_connection);',
-		'alter_support' => true,
-	),
-	'postgresql' => array(
-		'name' => 'PostgreSQL',
-		'version' => '8.3',
-		'utf8_support' => true,
-		'version_check' => '$version = pg_version(); return $version[\'client\'];',
-		'always_has_db' => true,
-	),
-);
+// Database info.
+$databases = array();
+load_possible_databases();
 
 // General options for the script.
 $timeLimitThreshold = 3;
