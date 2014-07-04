@@ -987,7 +987,7 @@ $db_table->db_create_table('{db_prefix}custom_fields_data',
 
 ---# Move existing custom profile values...
 ---{
-$db->query('', ,
+$db->query('', '
 	INSERT INTO {db_prefix}custom_fields_data
 		(id_member, variable, value)
 	SELECT id_member, variable, value
