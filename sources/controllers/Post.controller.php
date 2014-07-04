@@ -248,21 +248,10 @@ class Post_Controller extends Action_Controller
 
 		if ($context['make_event'])
 		{
-			// They might want to pick a board.
-			if (!isset($context['current_board']))
-				$context['current_board'] = 0;
-
-			// Start loading up the event info.
-			$context['event'] = array();
-			$context['event']['title'] = isset($_REQUEST['evtitle']) ? htmlspecialchars(stripslashes($_REQUEST['evtitle']), ENT_COMPAT, 'UTF-8') : '';
-			$context['event']['id'] = isset($_REQUEST['eventid']) ? (int) $_REQUEST['eventid'] : -1;
-			$context['event']['new'] = $context['event']['id'] == -1;
-
-			// Permissions check!
-			isAllowedTo('calendar_post');
+			$event_id = isset($_REQUEST['eventid']) ? (int) $_REQUEST['eventid'] : -1;
 
 			// Editing an event?  (but NOT previewing!?)
-			if (empty($context['event']['new']) && !isset($_REQUEST['subject']))
+			if ($event_id != -1 && !isset($_REQUEST['subject']))
 			{
 				// If the user doesn't have permission to edit the post in this topic, redirect them.
 				if ((empty($id_member_poster) || $id_member_poster != $user_info['id'] || !allowedTo('modify_own')) && !allowedTo('modify_any'))
@@ -270,67 +259,8 @@ class Post_Controller extends Action_Controller
 					$controller = new Calendar_Controller();
 					return $controller->action_post();
 				}
-
-				// Get the current event information.
-				require_once(SUBSDIR . '/Calendar.subs.php');
-				$event_info = getEventProperties($context['event']['id']);
-
-				// Make sure the user is allowed to edit this event.
-				if ($event_info['member'] != $user_info['id'])
-					isAllowedTo('calendar_edit_any');
-				elseif (!allowedTo('calendar_edit_any'))
-					isAllowedTo('calendar_edit_own');
-
-				$context['event']['month'] = $event_info['month'];
-				$context['event']['day'] = $event_info['day'];
-				$context['event']['year'] = $event_info['year'];
-				$context['event']['title'] = $event_info['title'];
-				$context['event']['span'] = $event_info['span'];
 			}
-			else
-			{
-				// Posting a new event? (or preview...)
-				$today = getdate();
-
-				// You must have a month and year specified!
-				if (!isset($_REQUEST['month']))
-					$_REQUEST['month'] = $today['mon'];
-
-				if (!isset($_REQUEST['year']))
-					$_REQUEST['year'] = $today['year'];
-
-				$context['event']['month'] = (int) $_REQUEST['month'];
-				$context['event']['year'] = (int) $_REQUEST['year'];
-				$context['event']['day'] = isset($_REQUEST['day']) ? $_REQUEST['day'] : ($_REQUEST['month'] == $today['mon'] ? $today['mday'] : 0);
-				$context['event']['span'] = isset($_REQUEST['span']) ? $_REQUEST['span'] : 1;
-
-				// Make sure the year and month are in the valid range.
-				if ($context['event']['month'] < 1 || $context['event']['month'] > 12)
-					fatal_lang_error('invalid_month', false);
-
-				if ($context['event']['year'] < $modSettings['cal_minyear'] || $context['event']['year'] > $modSettings['cal_maxyear'])
-					fatal_lang_error('invalid_year', false);
-
-				// Get a list of boards they can post in.
-				require_once(SUBSDIR . '/Boards.subs.php');
-
-				$boards = boardsAllowedTo('post_new');
-				if (empty($boards))
-					fatal_lang_error('cannot_post_new', 'user');
-
-				// Load a list of boards for this event in the context.
-				$boardListOptions = array(
-					'included_boards' => in_array(0, $boards) ? null : $boards,
-					'not_redirection' => true,
-					'selected_board' => empty($context['current_board']) ? $modSettings['cal_defaultboard'] : $context['current_board'],
-				);
-				$context += getBoardList($boardListOptions);
-			}
-
-			// Find the last day of the month.
-			$context['event']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['event']['month'] == 12 ? 1 : $context['event']['month'] + 1, 0, $context['event']['month'] == 12 ? $context['event']['year'] + 1 : $context['event']['year']));
-
-			$context['event']['board'] = !empty($board) ? $board : $modSettings['cal_defaultboard'];
+			$this->_prepareEventContext($id_member_poster);
 		}
 
 		// See if any new replies have come along.
@@ -2336,5 +2266,96 @@ class Post_Controller extends Action_Controller
 				'link' => '<a href="' . $scripturl . '?action=post;board=' . $draft['id_board'] . ';' . (!empty($draft['id_topic']) ? 'topic='. $draft['id_topic'] .'.0;' : '') . 'id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
 			);
 		}
+	}
+
+	/**
+	 * Loads in context stuff related to the envent
+	 */
+	private function _prepareEventContext($event_id)
+	{
+		global $context, $user_info, $modSettings, $board;
+
+		// They might want to pick a board.
+		if (!isset($context['current_board']))
+			$context['current_board'] = 0;
+
+		// Start loading up the event info.
+		$context['event'] = array();
+		$context['event']['title'] = isset($_REQUEST['evtitle']) ? htmlspecialchars(stripslashes($_REQUEST['evtitle']), ENT_COMPAT, 'UTF-8') : '';
+		$context['event']['id'] = $event_id;
+		$context['event']['new'] = $context['event']['id'] == -1;
+
+		// Permissions check!
+		isAllowedTo('calendar_post');
+
+		// Editing an event?  (but NOT previewing!?)
+		if (empty($context['event']['new']) && !isset($_REQUEST['subject']))
+		{
+			// Get the current event information.
+			require_once(SUBSDIR . '/Calendar.subs.php');
+			$event_info = getEventProperties($context['event']['id']);
+
+			// Make sure the user is allowed to edit this event.
+			if ($event_info['member'] != $user_info['id'])
+				isAllowedTo('calendar_edit_any');
+			elseif (!allowedTo('calendar_edit_any'))
+				isAllowedTo('calendar_edit_own');
+
+			$context['event']['month'] = $event_info['month'];
+			$context['event']['day'] = $event_info['day'];
+			$context['event']['year'] = $event_info['year'];
+			$context['event']['title'] = $event_info['title'];
+			$context['event']['span'] = $event_info['span'];
+		}
+		else
+		{
+			// Posting a new event? (or preview...)
+			$today = getdate();
+
+			// You must have a month and year specified!
+			if (isset($_REQUEST['month']))
+				$context['event']['month'] = (int) $_REQUEST['month'];
+			else
+				$_REQUEST['month'] = $today['mon'];
+
+			if (isset($_REQUEST['year']))
+				$context['event']['year'] = (int) $_REQUEST['year'];
+			else
+				$_REQUEST['year'] = $today['year'];
+
+			if (isset($_REQUEST['day']))
+				$context['event']['day'] = (int) $_REQUEST['day'];
+			else
+				$context['event']['day'] = $_REQUEST['month'] == $today['mon'] ? $today['mday'] : 0;
+
+			$context['event']['span'] = isset($_REQUEST['span']) ? $_REQUEST['span'] : 1;
+
+			// Make sure the year and month are in the valid range.
+			if ($context['event']['month'] < 1 || $context['event']['month'] > 12)
+				fatal_lang_error('invalid_month', false);
+
+			if ($context['event']['year'] < $modSettings['cal_minyear'] || $context['event']['year'] > $modSettings['cal_maxyear'])
+				fatal_lang_error('invalid_year', false);
+
+			// Get a list of boards they can post in.
+			require_once(SUBSDIR . '/Boards.subs.php');
+
+			$boards = boardsAllowedTo('post_new');
+			if (empty($boards))
+				fatal_lang_error('cannot_post_new', 'user');
+
+			// Load a list of boards for this event in the context.
+			$boardListOptions = array(
+				'included_boards' => in_array(0, $boards) ? null : $boards,
+				'not_redirection' => true,
+				'selected_board' => empty($context['current_board']) ? $modSettings['cal_defaultboard'] : $context['current_board'],
+			);
+			$context += getBoardList($boardListOptions);
+		}
+
+		// Find the last day of the month.
+		$context['event']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['event']['month'] == 12 ? 1 : $context['event']['month'] + 1, 0, $context['event']['month'] == 12 ? $context['event']['year'] + 1 : $context['event']['year']));
+
+		$context['event']['board'] = !empty($board) ? $board : $modSettings['cal_defaultboard'];
 	}
 }
