@@ -369,6 +369,25 @@ class Post_Controller extends Action_Controller
 			cache_put_data('response_prefix', $context['response_prefix'], 600);
 		}
 
+		// Are we moving a discussion to its own topic?
+		if (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup']))
+		{
+			$context['original_post'] = isset($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'];
+			$context['show_boards_dropdown'] = true;
+			require_once(SUBSDIR . '/Boards.subs.php');
+			$context += getBoardList(array('not_redirection' => true, 'allowed_to' => 'post_new'));
+			$context['boards_current_disabled'] = false;
+			if (!empty($board))
+			{
+				foreach ($context['categories'] as $id => $values)
+					if (isset($values['boards'][$board]))
+					{
+						$context['categories'][$id]['boards'][$board]['selected'] = true;
+						break;
+					}
+			}
+		}
+
 		// Previewing, modifying, or posting?
 		// Do we have a body, but an error happened.
 		if (isset($_REQUEST['message']) || $post_errors->hasErrors() || $attach_errors->hasErrors())
@@ -573,25 +592,6 @@ class Post_Controller extends Action_Controller
 		// Check whether this is a really old post being bumped...
 		if (!empty($topic) && !empty($modSettings['oldTopicDays']) && $lastPostTime + $modSettings['oldTopicDays'] * 86400 < time() && empty($sticky) && !isset($_REQUEST['subject']))
 			$post_errors->addError(array('old_topic', array($modSettings['oldTopicDays'])), 0);
-
-		// Are we moving a discussion to its own topic?
-		if (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup']))
-		{
-			$context['original_post'] = isset($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'];
-			$context['show_boards_dropdown'] = true;
-			require_once(SUBSDIR . '/Boards.subs.php');
-			$context += getBoardList(array('not_redirection' => true, 'allowed_to' => 'post_new'));
-			$context['boards_current_disabled'] = false;
-			if (!empty($board))
-			{
-				foreach ($context['categories'] as $id => $values)
-					if (isset($values['boards'][$board]))
-					{
-						$context['categories'][$id]['boards'][$board]['selected'] = true;
-						break;
-					}
-			}
-		}
 
 		$context['attachments']['can']['post'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
 		if ($context['attachments']['can']['post'])
