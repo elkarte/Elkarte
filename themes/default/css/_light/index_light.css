@@ -591,6 +591,12 @@ div.bbc_footnotes .meaction{
 	background: #437837;
 	box-shadow: 1px 1px 1px rgba(0,0,0,0.3) inset;
 }
+.linklevel1:hover .pm_indicator {
+	box-shadow: 0 -1px 0 #3d6e32 inset;
+}
+.linklevel1.active:hover .pm_indicator {
+	border-bottom: 1px solid #2d5024;
+}
 /* Top level subsection indicators. */
 /* Comment these out if you don't want them. */
 .subsections:hover .linklevel1:after {
@@ -647,19 +653,22 @@ div.bbc_footnotes .meaction{
 /* just in case someone tries to use this class elsewhere. */
 .pm_indicator, .likes_indicator {
 	position: absolute;
-	top: -1.5em;
-	right: -0.5em;
+	top: -1.45em;
+	right: -0.4em;
 	float: left;
-	padding: 0 0.8em;
+	padding: 0 0.7em;
 	border-radius: 8px 8px 8px 0;
-	box-shadow: 3px 3px 3px rgba(0,0,0,0.25);
+	box-shadow: 2px 2px 3px rgba(0,0,0,0.25), 0 -1px 0 #3d6e32 inset;
 	font-weight: 700;
-	line-height: 1.8em;
+	line-height: 1.7em;
 	font-size: 0.929em;
 	z-index: 2;
 }
 .poster .pm_indicator {
 	font-size: 1em;
+}
+#dropdown_menu_1 .pm_indicator {
+	margin-top: 5px;
 }
 .likes_indicator {
 	font-size: .857em;
