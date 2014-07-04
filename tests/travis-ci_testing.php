@@ -56,6 +56,15 @@ if ($db->num_rows($request) > 0)
 	echo "\n" . 'Errors found:' . "\n";
 while ($row = $db->fetch_assoc($request))
 {
+	// If any of these errors happen is a very bad thing
+	if (in_array($row['error_type'], array('undefined_vars', 'database', 'template', )))
+	{
+		echo '*****************************' . "\n";
+		echo '*       Build failure       *' . "\n";
+		echo '*****************************' . "\n";
+		$final_return++;
+	}
+
 	echo 'Error ' . $row['id_error'] . "\n";
 	echo 'url: ' . $row['url'] . "\n";
 	echo 'message: ' . $row['message'] . "\n";

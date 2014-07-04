@@ -534,6 +534,7 @@ class ManageMembers_Controller extends Action_Controller
 							global $txt;
 
 							require_once(SUBSDIR . '/Members.subs.php');
+
 							// Calculate number of days since last online.
 							if (empty($rowData['last_login']))
 								$difference = $txt['never'];

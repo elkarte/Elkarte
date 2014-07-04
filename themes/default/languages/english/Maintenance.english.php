@@ -83,9 +83,7 @@ $txt['database_numb_tables'] = 'Your database contains %1$d tables.';
 $txt['database_optimize_attempt'] = 'Attempting to optimize your database...';
 $txt['database_optimizing'] = 'Optimizing %1$s... %2$01.2f KB optimized.';
 $txt['database_already_optimized'] = 'All of the tables were already optimized.';
-$txt['database_opimize_unneeded'] = 'It wasn\'t necessary to optimize any tables.';
 $txt['database_optimized'] = ' table(s) optimized.';
-$txt['database_no_id'] = 'has a non-existent member ID';
 
 $txt['apply_filter'] = 'Apply Filter';
 $txt['applying_filter'] = 'Applying Filter';
@@ -160,7 +158,6 @@ $txt['maintain_old_drafts'] = 'Remove old drafts';
 $txt['maintain_old_drafts_days'] = 'Remove all drafts older than %1$s days';
 $txt['maintain_old_drafts_confirm'] = 'Are you really sure you want to delete old drafts now?\\n\\nThis cannot be undone!';
 $txt['maintain_members'] = 'Remove Inactive Members';
-$txt['maintain_members_ungrouped'] = 'Ungrouped Members <span class="smalltext">(Members with no assigned groups)</span>';
 $txt['maintain_members_since'] = 'Remove all members who have not {select_conditions} for {num_days} days.';
 $txt['maintain_members_activated'] = 'activated their account';
 $txt['maintain_members_logged_in'] = 'logged in';
@@ -180,7 +177,6 @@ $txt['convert_proceed'] = 'Proceed';
 
 // Move topics out.
 $txt['move_topics_maintenance'] = 'Move Topics';
-$txt['move_topics_select_board'] = 'Select Board';
 $txt['move_topics_from'] = 'Move topics from';
 $txt['move_topics_to'] = 'to';
 $txt['move_topics_now'] = 'Move now';

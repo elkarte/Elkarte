@@ -26,7 +26,6 @@ $txt['search_visual_verification_desc'] = 'Please enter the code in the image ab
 
 $txt['search_specific_topic'] = 'Searching only posts in the topic';
 
-$txt['mods_cat_search'] = 'Search';
 $txt['groups_search_posts'] = 'Membergroups with access to the search function';
 $txt['search_dropdown'] = 'Enable the Quick Search dropdown';
 $txt['search_results_per_page'] = 'Number of search results per page';
