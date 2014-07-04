@@ -236,7 +236,7 @@ class Post_Controller extends Action_Controller
 			);
 
 			// Make all five poll choices empty.
-			$context['choices'] = array(
+			$context['poll']['choices'] = array(
 				array('id' => 0, 'number' => 1, 'label' => '', 'is_last' => false),
 				array('id' => 1, 'number' => 2, 'label' => '', 'is_last' => false),
 				array('id' => 2, 'number' => 3, 'label' => '', 'is_last' => false),
@@ -430,7 +430,9 @@ class Post_Controller extends Action_Controller
 			{
 				$context['poll']['question'] = isset($_REQUEST['question']) ? Util::htmlspecialchars(trim($_REQUEST['question'])) : '';
 
-				$context['choices'] = array();
+				$context['poll']['choices'] = array();
+				// @deprecated since 1.1 - backward compatibility with 1.0
+				$context['choices'] &= $context['poll']['choices'];
 				$choice_id = 0;
 
 				$_POST['options'] = empty($_POST['options']) ? array() : htmlspecialchars__recursive($_POST['options']);
@@ -439,7 +441,7 @@ class Post_Controller extends Action_Controller
 					if (trim($option) == '')
 						continue;
 
-					$context['choices'][] = array(
+					$context['poll']['choices'][] = array(
 						'id' => $choice_id++,
 						'number' => $choice_id,
 						'label' => $option,
@@ -448,16 +450,16 @@ class Post_Controller extends Action_Controller
 				}
 
 				// One empty option for those with js disabled...I know are few... :P
-				$context['choices'][] = array(
+				$context['poll']['choices'][] = array(
 					'id' => $choice_id++,
 					'number' => $choice_id,
 					'label' => '',
 					'is_last' => false
 				);
 
-				if (count($context['choices']) < 2)
+				if (count($context['poll']['choices']) < 2)
 				{
-					$context['choices'][] = array(
+					$context['poll']['choices'][] = array(
 						'id' => $choice_id++,
 						'number' => $choice_id,
 						'label' => '',
@@ -466,7 +468,7 @@ class Post_Controller extends Action_Controller
 				}
 
 				$context['last_choice_id'] = $choice_id;
-				$context['choices'][count($context['choices']) - 1]['is_last'] = true;
+				$context['poll']['choices'][count($context['poll']['choices']) - 1]['is_last'] = true;
 			}
 
 			// Are you... a guest?

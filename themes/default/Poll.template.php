@@ -53,7 +53,7 @@ function template_poll_edit()
 							<ul class="poll_main">';
 
 	// Loop through all the choices and print them out.
-	foreach ($context['choices'] as $choice)
+	foreach ($context['poll']['choices'] as $choice)
 	{
 		echo '
 								<li>

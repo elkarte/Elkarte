@@ -307,7 +307,9 @@ class Poll_Controller extends Action_Controller
 			if ($context['is_edit'])
 			{
 				$pollOptions = pollOptions($pollinfo['id_poll']);
-				$context['choices'] = array();
+				$context['poll']['choices'] = array();
+				// @deprecated since 1.1 - backward compatibility with 1.0
+				$context['choices'] &= $context['poll']['choices'];
 				foreach ($pollOptions as $option)
 				{
 					// Get the highest id so we can add more without reusing.
@@ -319,7 +321,7 @@ class Poll_Controller extends Action_Controller
 						continue;
 
 					// Add the choice!
-					$context['choices'][$option['id_choice']] = array(
+					$context['poll']['choices'][$option['id_choice']] = array(
 						'id' => $option['id_choice'],
 						'number' => $number++,
 						'votes' => $option['votes'],
@@ -345,10 +347,10 @@ class Poll_Controller extends Action_Controller
 				$label = Util::htmlspecialchars($label);
 				censorText($label);
 
-				if (isset($context['choices'][$id]))
-					$context['choices'][$id]['label'] = $label;
+				if (isset($context['poll']['choices'][$id]))
+					$context['poll']['choices'][$id]['label'] = $label;
 				elseif ($label != '')
-					$context['choices'][] = array(
+					$context['poll']['choices'][] = array(
 						'id' => $last_id++,
 						'number' => $number++,
 						'label' => $label,
@@ -363,7 +365,7 @@ class Poll_Controller extends Action_Controller
 				// Need two?
 				if ($totalPostOptions == 0)
 				{
-					$context['choices'][] = array(
+					$context['poll']['choices'][] = array(
 						'id' => $last_id++,
 						'number' => $number++,
 						'label' => '',
@@ -375,7 +377,7 @@ class Poll_Controller extends Action_Controller
 			}
 
 			// Always show one extra box...
-			$context['choices'][] = array(
+			$context['poll']['choices'][] = array(
 				'id' => $last_id++,
 				'number' => $number++,
 				'label' => '',
@@ -422,14 +424,14 @@ class Poll_Controller extends Action_Controller
 			// Get all the choices - if this is an edit.
 			if ($context['is_edit'])
 			{
-				$context['choices'] = getPollChoices($pollinfo['id_poll']);
+				$context['poll']['choices'] = getPollChoices($pollinfo['id_poll']);
 
-				$last_id = max(array_keys($context['choices'])) + 1;
+				$last_id = max(array_keys($context['poll']['choices'])) + 1;
 
 				// Add an extra choice...
-				$context['choices'][] = array(
+				$context['poll']['choices'][] = array(
 					'id' => $last_id,
-					'number' => $context['choices'][$last_id - 1]['number'] + 1,
+					'number' => $context['poll']['choices'][$last_id - 1]['number'] + 1,
 					'votes' => -1,
 					'label' => '',
 					'is_last' => true
@@ -452,7 +454,7 @@ class Poll_Controller extends Action_Controller
 				);
 
 				// Make all five poll choices empty.
-				$context['choices'] = array(
+				$context['poll']['choices'] = array(
 					array('id' => 0, 'number' => 1, 'votes' => -1, 'label' => '', 'is_last' => false),
 					array('id' => 1, 'number' => 2, 'votes' => -1, 'label' => '', 'is_last' => false),
 					array('id' => 2, 'number' => 3, 'votes' => -1, 'label' => '', 'is_last' => false),
@@ -749,7 +751,7 @@ class Poll_Controller extends Action_Controller
 		$context['can_moderate_poll'] = true;
 
 		// Make all five poll choices empty.
-		$context['choices'] = array(
+		$context['poll']['choices'] = array(
 			array('id' => 0, 'number' => 1, 'label' => '', 'is_last' => false),
 			array('id' => 1, 'number' => 2, 'label' => '', 'is_last' => false),
 			array('id' => 2, 'number' => 3, 'label' => '', 'is_last' => false),
