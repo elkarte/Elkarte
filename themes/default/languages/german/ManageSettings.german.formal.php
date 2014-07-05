@@ -131,8 +131,7 @@ $txt['caching_information'] = 'ElkArte unterstützt das Zwischenspeichern mittel
 	<li>XCache</li>
 </ul>
 Die Zwischenspeicherung funktioniert am Besten, wenn Sie PHP mit einem der obigen Beschleuniger kompiliert haben oder Ihnen memcache zur Verfügung steht. Falls dies nicht der Fall ist, wird dateibasierte Zwischenspeicherung verwendet.';
-$txt['detected_no_caching'] = '<strong class="alert">Konnte auf Ihrem Server keinen unterstützten Beschleuniger finden.  Es wird stattdessen dateibasierte Zwischenspeicherung angewandt.</strong>';
-$txt['detected_accelerators'] = '<strong class="success">Die folgenden Beschleuniger wurden gefunden: %1$s</strong>';
+$txt['detected_accelerators'] = 'Die folgenden Beschleuniger wurden gefunden: <strong class="success">%1$s</strong>';
 
 $txt['cache_enable'] = 'Caching-Stufe'; // translator note: "Zwischenspeicherstufe"? any comments?
 $txt['cache_off'] = 'Kein Caching';

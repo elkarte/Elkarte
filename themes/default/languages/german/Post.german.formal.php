@@ -2,10 +2,7 @@
 // Version: 1.0; Post
 
 $txt['post_reply'] = 'Antwort schreiben';
-$txt['message_icon'] = 'Nachrichtensymbol';
 $txt['post_in_board'] = 'Schreibe ins Forum';
-$txt['subject_not_filled'] = 'Der Betreff wurde nicht ausgefüllt. Er wird benötigt.';
-$txt['message_body_not_filled'] = 'Der Nachrichtentext wurde nicht ausgefüllt. Er wird benötigt.';
 
 // Escape any single quotes in here twice.. 'it\'s' -> 'it\\\'s'.
 $txt['bbc_quote'] = 'Zitat einfügen';
@@ -48,8 +45,7 @@ $txt['allowed_types'] = 'Erlaubte Dateitypen';
 $txt['cant_upload_type'] = 'Sie können Dateien dieses Typs nicht hochladen. Die einzig erlaubten Dateitypen sind %1$s.';
 $txt['uncheck_unwatchd_attach'] = 'Wählen Sie diejenigen Dateien ab, die Sie nicht mehr anhängen möchten';
 $txt['restricted_filename'] = 'Dies ist ein beschränkter Dateiname. Bitte probieren Sie es mit einem anderen Dateinamen.';
-$txt['topic_locked_no_reply'] = 'Hinweis: Dieses Thema ist derzeit/wird in Kürze geschlossen<br />Nur Administratoren und Moderatoren können antworten.';
-$txt['awaiting_approval'] = 'Wartet auf Freischaltung';
+$txt['topic_locked_no_reply'] = 'Warnung! Dieses Thema ist derzeit/wird in Kürze geschlossen<br />Nur Administratoren und Moderatoren können antworten.';
 $txt['attachment_requires_approval'] = 'Beachten Sie, dass alle Dateien erst von einem Moderator freigeschaltet werden müssen, bevor sie sichtbar werden.';
 $txt['error_temp_attachments'] = 'Es wurden Dateien gefunden, die Sie angehängt, aber nicht veröffentlicht haben. Diese Dateien werden nun an diesen Beitrag angehängt. Wenn Sie sie nicht einfügen möchten, <a href="#postAttachment">können Sie sie hier entfernen</a>.';
 // Use numeric entities in the below string.
@@ -66,7 +62,7 @@ $txt['reported_by'] = 'wurde gemeldet von';
 $txt['board_moderate'] = 'in einem von Ihnen moderierten Forum';
 $txt['report_comment'] = 'Der Melder hat folgenden Kommentar beigefügt';
 
-$txt['attach_drop_files'] = 'Ziehen Sie Dateien hierher';
+$txt['attach_drop_files'] = 'Ziehen Sie Dateien hierher oder <a class="drop_area_fileselect_text" href="#">w�hlen Sie sie aus</a>';
 $txt['attach_restrict_attachmentPostLimit'] = 'maximale Gesamtgröße %1$d KiB';
 $txt['attach_restrict_attachmentSizeLimit'] = 'maximale Größe pro Datei %1$d KiB';
 $txt['attach_restrict_attachmentNumPerPostLimit'] = '%1$d pro Beitrag';

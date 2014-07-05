@@ -17,10 +17,7 @@ $txt['collapse_desc'] = 'Erlaubt es Benutzern, diese Kategorie einzuklappen';
 $txt['catModify'] = '(ändern)';
 
 $txt['mboards_order_after'] = 'Nach ';
-$txt['mboards_order_inside'] = 'In ';
 $txt['mboards_order_first'] = 'An erster Stelle';
-
-$txt['mboards_board_moved'] = 'Erfolgreich verschoben.';
 $txt['mboards_board_error'] = 'Fehler beim Auflösen des Verschiebeortes.';
 
 $txt['mboards_new_board'] = 'Forum hinzufügen';
@@ -28,7 +25,6 @@ $txt['mboards_new_cat_name'] = 'Neue Kategorie';
 $txt['mboards_add_cat_button'] = 'Kategorie hinzufügen';
 $txt['mboards_new_board_name'] = 'Neues Forum';
 
-$txt['mboards_name'] = 'Name';
 $txt['mboards_modify'] = 'ändern';
 $txt['mboards_permissions'] = 'Befugnisse';
 // Don't use entities in the below string.
@@ -85,7 +81,6 @@ $txt['mboards_recycle_disabled_delete'] = 'Hinweis: Sie müssen ein anderes Papi
 
 $txt['mboards_settings_desc'] = 'Allgemeine Foren- und Kategorieneinstellungen ändern.';
 $txt['groups_manage_boards'] = 'Benutzergruppen, die Foren und Kategorien verwalten dürfen';
-$txt['mboards_settings_submit'] = 'Speichern';
 $txt['recycle_enable'] = 'Papierkorb für gelöschte Themen aktivieren';
 $txt['recycle_board'] = 'Foren für gelöschte Themen';
 $txt['recycle_board_unselected_notice'] = 'Sie haben die Löschung von Themen in den Papierkorb aktiviert, ohne ein Papierkorbforum festzulegen.  Diese Funktion wird nicht aktiviert, bis Sie dies nachholen.';

@@ -28,6 +28,9 @@
 #admincenter .content {
 	padding: 12px;
 }
+#admincenter .content .settings {
+	padding: 0 0 0 8px;
+}
 
 /* @todo - A general admin wrapper class. */
 #admin_main_section, div.quick_tasks, #mod_main_section,
@@ -119,14 +122,17 @@ h3.category_header form {
 	margin-top: 0;
 	margin-bottom: 0;
 }
-a.help .icon {
+a.help .icon, a.help .icon_fixed {
 	margin: 0;
 	padding: 3px 4px 0 0;
 }
 h3 a.help .icon {
 	padding: 0 4px 0 0;
 }
-
+.settings .help .icon {
+	margin: 0 0 0 -20px;
+    position: absolute;
+}
 .table_caption, tr.table_caption td {
 	font-weight: bold;
 }
@@ -576,7 +582,7 @@ dl.settings dd.questions input {
 #manage_boards dl {
 	padding: 8px 6px 0 6px;
 }
-#manage_boards dl textarea, #manage_boards dl table{
+#manage_boards dl textarea, #manage_boards dl table {
 	margin: 0 0 8px 0;
 }
 #manage_boards .post_group, #manage_boards .regular_members {
@@ -721,6 +727,12 @@ dl.settings dd.large_caption {
 .ban_settings {
 	width: 46%;
 }
+.ban_text {
+	min-height: 64px;
+	max-height: 64px;
+	min-width: 50%;
+	max-width: 99%;
+}
 #manage_bans dl {
 	margin-bottom: 1em;
 }
@@ -770,10 +782,9 @@ dl.settings dd.large_caption {
 	text-align: center;
 }
 .edit_board {
-	float: left;
-	padding: 8px;
+	padding: 0 8px 8px;
 	background-image: url(../images/icons/modify_small.png);
-	margin-top: 3px;
+	background-repeat: no-repeat;
 	margin-left: 3px;
 }
 .edit_board.nochanges {
@@ -781,9 +792,6 @@ dl.settings dd.large_caption {
 }
 .edit_board.changed {
 	background-image: url(../images/icons/field_invalid.png);
-}
-.rename_profile {
-	float: left;
 }
 .perm_profile_delete {
 	width:5%;
@@ -838,6 +846,7 @@ dl.themes_list dd {
 }
 #agreement, #reserved {
 	width: 99%;
+	padding: 0 .25em;
 }
 
 /* Styles for the moderation center.

@@ -4,7 +4,7 @@
 $txt['set_parameters'] = 'Suchparameter einstellen';
 $txt['choose_board'] = 'Wählen Sie ein Forum aus, das Sie durchsuchen möchten, oder suchen Sie überall';
 $txt['all_words'] = 'Nach allen Begriffen suchen'; // translator note: borrowed from phpBB :)
-$txt['any_words'] = 'Nach einem Begriff suchen suchen'; // translator note: borrowed from phpBB :)
+$txt['any_words'] = 'Nach einem Begriff suchen'; // translator note: borrowed from phpBB :)
 $txt['by_user'] = 'Nach Benutzer';
 
 $txt['search_post_age'] = 'Alter des Beitrags';
@@ -26,7 +26,6 @@ $txt['search_visual_verification_desc'] = 'Bitte geben Sie den Code aus obiger G
 
 $txt['search_specific_topic'] = 'Durchsuche nur Beiträge im Thema';
 
-$txt['mods_cat_search'] = 'Suche';
 $txt['groups_search_posts'] = 'Benutzergruppen mit Zugriff auf die Suchfunktion';
 $txt['search_dropdown'] = 'Schnellsuchfeld aktivieren';
 $txt['search_results_per_page'] = 'Anzahl an Suchergebnissen pro Seite';
@@ -151,7 +150,6 @@ $txt['spider_name_desc'] = 'Name, unter dem der Spider angezeigt wird.';
 $txt['spider_agent_desc'] = 'User Agent, der mit diesem Spider verbunden ist.';
 $txt['spider_ip_info_desc'] = 'Kommagetrennte Liste von IP-Adressen, die diesem Spider zugewiesen sind.';
 
-$txt['spider'] = 'Spider';
 $txt['spider_time'] = 'Zeit';
 $txt['spider_viewing'] = ' Betrachtet';
 $txt['spider_logs_empty'] = 'Es gibt derzeit keine Spiderprotokolleinträge.';

@@ -37,28 +37,27 @@ $txt['paid_currency_code'] = 'Währungskürzel';
 $txt['paid_currency_code_desc'] = 'Währungscode, der von Bezahldienstleistern verwendet wird';
 $txt['paid_currency_symbol'] = 'Symbol, das von der Bezahlmethode verwendet wird';
 $txt['paid_currency_symbol_desc'] = 'Verwenden Sie \'%1.2f\', um anzugeben, wohin der Betrag gehört, zum Beispiel $%1.2f, %1.2f DM und so weiter';
+
 $txt['paypal_email'] = 'PayPal-E-Mail-Adresse';
 $txt['paypal_email_desc'] = 'Leer lassen, wenn Sie PayPal nicht verwenden.';
-$txt['worldpay_id'] = 'WorldPay-Installationskennung';
-$txt['worldpay_id_desc'] = 'Die von WorldPay erzeugte Installations-ID. Leer lassen, wenn Sie WorldPay nicht verwenden';
-$txt['worldpay_password'] = 'WorldPay-Callback-Passwort'; // translator note: ? :)
-$txt['worldpay_password_desc'] = 'Stellen Sie sicher, dass, wenn Sie dieses Passwort in WorldPay einstellen, es einmalig und nicht identisch mit Ihrem WorldPay-/Admin-Kontopasswort ist!';
+
 $txt['authorize_id'] = 'Authorize.net-Installationskennung';
-$txt['authorize_id_desc'] = 'Die von Authorize.net erzeugte Installations-ID. Leer lassen, wenn Sie Authorize.net nicht verwenden';
-$txt['authorize_transid'] = 'Authorize.net-Transaktions-ID';
-$txt['2co_id'] = '2co.com-Installationskennung';
-$txt['2co_id_desc'] = 'Die von 2co.com erzeugte Installations-ID. Leer lassen, wenn Sie 2co.com nicht verwenden';
-$txt['2co_password'] = '2co.com - Geheimes Wort';
+$txt['authorize_id_desc'] = 'Die von Authorize.net erzeugte Installationskennung. Lassen Sie dies leer, wenn Sie Authorize.net nicht verwenden';
+$txt['authorize_transid'] = 'Authorize.net-Transaktionskennung';
+
+$txt['2co_id'] = '2checkout.com-Installationskennung';
+$txt['2co_id_desc'] = 'Die von 2checkout.com erzeugte Installationskennung. Lassen Sie dies leer, wenn Sie 2checkout.com nicht verwenden';
+$txt['2co_password'] = '2checkout.com - Geheimes Wort';
 $txt['2co_password_desc'] = 'Ihr geheimes 2checkout-Wort.';
-$txt['nochex_email'] = 'Nochex-E-Mail-Adresse';
-$txt['nochex_email_desc'] = 'E-Mail-Adresse Ihres Verkäuferkontos auf Nochex. Leer lassen, wenn Sie Nochex nicht verwenden';
+$txt['2co_password_wrong'] = 'Ihr geheimes 2checkout-Wort wurde nicht angenommen.';
+
+$txt['paid_settings_save'] = 'Speichern';
 
 $txt['paid_note'] = '<strong class="alert">Hinweis:</strong><br />Damit Abonnements für Ihre Benutzer automatisch verlängert werden
-	können, müssen Sie für jede Ihrer Bezahlmethoden einen Rückkehr-URL einrichten. Für alle Bezahlmethoden sollte dieser URL eingestellt
-	werden auf:<br /><br />
+	können, müssen Sie für jede Ihrer Bezahlmethoden einen Rückkehr-URL einrichten. Für alle Bezahlmethoden sollte dieser URL eingestellt werden auf:<br /><br />
 	&nbsp;&nbsp;&bull;&nbsp;&nbsp;<strong>{board_url}/subscriptions.php</strong><br /><br />
 	Sie können den Link für PayPal direkt ändern, <a href="https://www.paypal.com/us/cgi-bin/webscr?cmd=_profile-ipn-notify" target="_blank">indem Sie hier klicken</a>.<br />
-	Bei den übrigen Anbietern finden Sie diese normalerweise in Ihrem Kundenbereich, meist unter dem Begriff &quot;Callback-URL&quot; oder einem ähnlichen.';
+	Bei den übrigen Anbietern (sofern installiert) finden Sie diese normalerweise in Ihrem Kundenbereich, meist unter dem Begriff &quot;Callback-URL&quot; oder einem ähnlichen.';
 
 // View subscription strings.
 $txt['paid_name'] = 'Name';
@@ -139,7 +138,6 @@ $txt['start_date'] = 'Startdatum';
 $txt['end_date'] = 'Enddatum';
 $txt['start_date_and_time'] = 'Startdatum und -zeit';
 $txt['end_date_and_time'] = 'Enddatum und -zeit';
-$txt['edit'] = 'ÄNDERN';
 $txt['one_username'] = 'Bitte geben Sie nur einen Benutzernamen ein.';
 $txt['minute'] = 'Minute';
 $txt['error_member_not_found'] = 'Das eingegebene Mitglied konnte nicht gefunden werden';
@@ -152,12 +150,6 @@ $txt['paid_confirm_desc'] = 'Um zur Kasse zu gelangen, überprüfen Sie bitte di
 $txt['paypal'] = 'PayPal';
 $txt['paid_confirm_paypal'] = 'Um mit <a href="http://www.paypal.com">PayPal</a> zu bezahlen, betätigen Sie bitte unten stehende Schaltfläche. Sie werden zur Bezahlung auf die PayPal-Website weitergeleitet.';
 $txt['paid_paypal_order'] = 'Mit PayPal bezahlen';
-$txt['worldpay'] = 'WorldPay';
-$txt['paid_confirm_worldpay'] = 'Um mit <a href="http://www.worldpay.com">WorldPay</a> zu bezahlen, betätigen Sie bitte unten stehende Schaltfläche. Sie werden zur Bezahlung auf die WorldPay-Website weitergeleitet.';
-$txt['paid_worldpay_order'] = 'Mit WorldPay bezahlen';
-$txt['nochex'] = 'Nochex';
-$txt['paid_confirm_nochex'] = 'Um mit <a href="http://www.nochex.com">Nochex</a> zu bezahlen, betätigen Sie bitte unten stehende Schaltfläche. Sie werden zur Bezahlung auf die Nochex-Website weitergeleitet.';
-$txt['paid_nochex_order'] = 'Mit Nochex bezahlen';
 $txt['authorize'] = 'Authorize.net';
 $txt['paid_confirm_authorize'] = 'Um mit <a href="http://www.authorize.net">Authorize.net</a> zu bezahlen, betätigen Sie bitte unten stehende Schaltfläche. Sie werden zur Bezahlung auf Authorize.net weitergeleitet.';
 $txt['paid_authorize_order'] = 'Mit Authorize.net bezahlen';
@@ -192,6 +184,7 @@ $txt['paid_make_recurring'] = 'Diese Zahlung wiederholen';
 
 $txt['subscriptions'] = 'Abonnements';
 $txt['subscription'] = 'Abonnement';
+$txt['subscribers'] = 'Abonnenten';
 $txt['paid_subs_desc'] = 'Unten finden Sie eine Liste aller in diesem Forum verfügbaren Abonnements.';
 $txt['paid_subs_none'] = 'Derzeit sind keine bezahlten Abonnements verfügbar.';
 

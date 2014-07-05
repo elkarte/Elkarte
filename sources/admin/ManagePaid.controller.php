@@ -709,7 +709,8 @@ class ManagePaid_Controller extends Action_Controller
 				'modify' => array(
 					'header' => array(
 						'style' => 'width: 10%;',
-						'class' => 'centertext',
+						'class' => 'nowrap',
+						'value' => $txt['edit_subscriber'],
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '

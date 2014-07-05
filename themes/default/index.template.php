@@ -426,12 +426,12 @@ function theme_linktree($default = 'linktree')
 
 	// Each tree item has a URL and name. Some may have extra_before and extra_after.
 	// Added a linktree class to make targeting dividers easy.
-	foreach ($context[$default] as $link_num => $tree)
+	foreach ($context[$default] as $tree)
 	{
 		echo '
-					<li class="linktree', ($link_num == count($context[$default]) - 1) ? '_last' : '', '">';
+					<li class="linktree">';
 
-		// Dividers moved to pseudo-elements in CSS. @todo- rtl.css
+		// Dividers moved to pseudo-elements in CSS.
 		// Show something before the link?
 		if (isset($tree['extra_before']))
 			echo $tree['extra_before'];

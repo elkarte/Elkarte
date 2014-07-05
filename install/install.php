@@ -2343,8 +2343,12 @@ function template_welcome_message()
 					return;
 				}
 
-				setLatestVer.innerHTML = latestVer.innerHTML.replace(\'ElkArte \', \'\');
-				document.getElementById(\'version_warning\').style.display = \'\';
+				if (setLatestVer !== null)
+				{
+					setLatestVer.innerHTML = latestVer.innerHTML.replace(\'ElkArte \', \'\');
+					document.getElementById(\'version_warning\').style.display = \'\';
+				}
+
 				document.getElementById(\'contbutt\').disabled = 0;
 			}
 			addLoadEvent(ourCurrentVersion);
@@ -2468,7 +2472,7 @@ function template_database_settings()
 			<tr>
 				<td style="width: 20%; vertical-align: top;" class="textbox"><label for="db_type_input">', $txt['db_settings_type'], ':</label></td>
 				<td>
-					<select name="db_type" id="db_type_input" onchange="toggleDBInput();">';
+					<select name="db_type" id="db_type_input">';
 
 	foreach ($incontext['supported_databases'] as $key => $db)
 			echo '

@@ -1411,11 +1411,9 @@ function disableAutoComplete()
 
 /**
  * Once DOMContentLoaded is triggered, find text and password fields in the forms
- * turn autocomplete off and sempty the value.
+ * turn autocomplete off and empty the value.
  */
 function disableAutoCompleteNow()
 {
-	$("input[type=text]").attr("autocomplete", "off").val('');
-	$("input[type=email]").attr("autocomplete", "off").val('');
 	$("input[type=password]").attr("autocomplete", "off").val('');
 }

@@ -640,7 +640,7 @@ class Display_Controller
 		// Cleanup all the permissions with extra stuff...
 		$context['can_mark_notify'] &= !$context['user']['is_guest'];
 		$context['can_sticky'] &= !empty($modSettings['enableStickyTopics']);
-		$context['calendar_post'] &= !empty($modSettings['cal_enabled']);
+		$context['calendar_post'] &= !empty($modSettings['cal_enabled']) && (allowedTo('modify_any') || ($context['user']['started'] && allowedTo('modify_own')));
 		$context['can_add_poll'] &= !empty($modSettings['pollMode']) && $topicinfo['id_poll'] <= 0;
 		$context['can_remove_poll'] &= !empty($modSettings['pollMode']) && $topicinfo['id_poll'] > 0;
 		$context['can_reply'] &= empty($topicinfo['locked']) || allowedTo('moderate_board');
@@ -758,7 +758,7 @@ class Display_Controller
 			'notify' => array( 'test' => 'can_mark_notify', 'text' => $context['is_marked_notify'] ? 'unnotify' : 'notify', 'image' => ($context['is_marked_notify'] ? 'un' : '') . 'notify.png', 'lang' => true, 'custom' => 'onclick="return notifyButton(this);"', 'url' => $scripturl . '?action=notify;sa=' . ($context['is_marked_notify'] ? 'off' : 'on') . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
 			'mark_unread' => array('test' => 'can_mark_unread', 'text' => 'mark_unread', 'image' => 'markunread.png', 'lang' => true, 'url' => $scripturl . '?action=markasread;sa=topic;t=' . $context['mark_unread_time'] . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
 			'unwatch' => array('test' => 'can_unwatch', 'text' => ($context['topic_unwatched'] ? '' : 'un') . 'watch', 'image' => ($context['topic_unwatched'] ? '' : 'un') . 'watched.png', 'lang' => true, 'custom' => 'onclick="return unwatchButton(this);"', 'url' => $scripturl . '?action=unwatchtopic;topic=' . $context['current_topic'] . '.' . $context['start'] . ';sa=' . ($context['topic_unwatched'] ? 'off' : 'on') . ';' . $context['session_var'] . '=' . $context['session_id']),
-			'send' => array('test' => 'can_send_topic', 'text' => 'send_topic', 'image' => 'sendtopic.png', 'lang' => true, 'url' => $scripturl . '?action=emailuser;sa=sendtopic;topic=' . $context['current_topic'] . '.0', 'custom' => 'onclick="return sendtopicOverlayDiv(this.href, \'' . $txt['send_topic'] . '\', \'\');"'),
+			'send' => array('test' => 'can_send_topic', 'text' => 'send_topic', 'image' => 'sendtopic.png', 'lang' => true, 'url' => $scripturl . '?action=emailuser;sa=sendtopic;topic=' . $context['current_topic'] . '.0', 'custom' => 'onclick="return sendtopicOverlayDiv(this.href, \'' . $txt['send_topic'] . '\');"'),
 			'print' => array('test' => 'can_print', 'text' => 'print', 'image' => 'print.png', 'lang' => true, 'custom' => 'rel="nofollow"', 'class' => 'new_win', 'url' => $scripturl . '?action=topic;sa=printpage;topic=' . $context['current_topic'] . '.0'),
 		);
 

@@ -45,12 +45,8 @@ $txt['error_permission'] = 'Der Autor hat nicht die nötigen Befugnisse, um in d
 // Maillist page items
 $txt['ml_admin_configuration'] = 'Mailbeitragskonfiguration';
 $txt['ml_configuration_desc'] = 'Dieser Bereich erlaubt es Ihnen, einige Einstellungen rund um das Veröffentlichen von Beiträgen per E-Mail vorzunehmen';
-$txt['ml_email'] = 'Per E-Mail veröffentlichen';
 $txt['ml_emailerror_none'] = 'Es gibt keine fehlgeschlagenen Einträge, die Moderation benötigen';
-$txt['ml_site_settings'] = 'Site-E-Mail-Daten';
-$txt['ml_emailerror'] = 'Fehlgeschlagene E-Mails';
-$txt['ml_emailfilters'] = 'Filter';
-$txt['ml_emailparsers'] = 'Parser';
+$txt['ml_emailerror'] = 'Fehlgeschlagene E-Mails';;
 $txt['ml_emailsettings'] = 'Einstellungen';
 
 // Settings tab
@@ -59,7 +55,6 @@ $txt['pbe_post_enabled'] = 'Veröffentlichen neuer Beiträge per E-Mail erlauben
 $txt['pbe_pm_enabled'] = 'Antworten auf private Nachrichten per E-Mail erlauben';
 $txt['pbe_no_mod_notices'] = 'Moderationshinweise abschalten';
 $txt['pbe_no_mod_notices_desc'] = 'Keine Benachrichtigungen über verschobene, gesperrte, gelöschte, zusammengeführte usw. Themen versenden.  Diese belasten Ihre Mailkapazitäten ohne wirklichen Mehrwert';
-$txt['settings_title'] = 'Auf dieser Seite können Sie auswählen, wie sich die Mailbeitragsfunktion verhalten soll';
 $txt['saved'] = 'Informationen gespeichert';
 
 // General Sending Settings
@@ -139,11 +134,8 @@ $txt['approved'] = 'E-Mail wurde genehmigt und veröffentlicht';
 $txt['error_approved'] = 'Beim Versuch, diese E-Mail zu genehmigen, ist ein Fehler aufgetreten';
 $txt['id'] = '#';
 $txt['error'] = 'Fehler';
-$txt['subject'] = 'Betreff';
-$txt['to'] = 'An:';
 $txt['key'] = 'Schlüssel';
 $txt['message_id'] = 'Nachricht';
-$txt['from'] = 'Von';
 $txt['message_type'] = 'Typ';
 $txt['message_action'] = 'Aktionen';
 $txt['emailerror_title'] = 'Protokoll fehlgeschlagener E-Mails';
@@ -157,10 +149,7 @@ $txt['filter_delete_warning'] = 'Sind Sie sich sicher, dass Sie diesen Filter en
 $txt['parser_delete_warning'] = 'Sind Sie sich sicher, dass Sie diesen Parser entfernen möchten?';
 $txt['bounce'] = 'Abweisen';
 $txt['heading'] = 'Dies ist die Liste fehlgeschlagener Beitrags-E-Mails, von hier aus können Sie auswählen, sie anzusehen, zu genehmigen (falls möglich), zu löschen oder an den Absender zurückzusenden';
-$txt['cant_find'] = 'Die E-Mail-Datei konnte nicht gefunden werden';
-$txt['no_subject'] = 'Kein Betreff';
 $txt['cant_approve'] = 'Der Fehler erlaubt keine Genehmigung (kann nicht automatisch repariert werden)';
-$txt['actions'] = 'Aktionen';
 $txt['email_attachments'] = '[Es gibt %d E-Mail-Anhänge in dieser Nachricht]';
 $txt['email_failure'] = 'Ursache für das Fehlverhalten';
 
@@ -204,8 +193,6 @@ $txt['no_parsers'] = 'Sie haben keine Parser definiert';
 $txt['parsers_title'] = 'In diesem Bereich können Sie E-Mail-Parser hinzufügen, ändern oder entfernen.  Parser suchen nach der angegebenen Zeile und schneiden die Nachricht an dieser Stelle ab, um zu versuchen, die ursprüngliche Nachricht, auf die geantwortet wurde, zu entfernen. Falls ein Parser keinen Text zurückgibt (wenn die Antwort zum Beispiel darunter steht oder in der ursprünglichen Nachricht gemischte Zitate verwendet werden), so wird er übersprungen';
 $txt['option_standard'] = 'Standard';
 $txt['option_regex'] = 'Regulärer Ausdruck';
-$txt['button_edit'] = 'Ändern';
-$txt['button_delete'] = 'Löschen';
 $txt['parser_sort_description'] = 'Parser werden in der angezeigten Reihenfolge ausgeführt, um dies zu ändern, ziehen Sie ein Element an eine andere Stelle in der Liste.';
 
 // Bounce
@@ -237,7 +224,8 @@ $txt['digest_preview'] = "\n     <*> Themenvorschau:\n     ";
 $txt['digest_see_full'] = "\n\n     <*> Betrachten Sie das komplette Thema auf folgender Seite:\n     <*> ";
 $txt['digest_reply_preview'] = "\n     <*> Vorschau der neuesten Antwort:\n     ";
 $txt['digest_unread_reply_link'] = "\n\n     <*> Sie können ungelesene Antworten auf dieses Thema auf folgender Seite ansehen:\n     <*> ";
-$txt['message_attachments'] = '<*> Diese Nachricht enthält %d Verknüpfungen mit Bildern/Dateien.' . "\n" . '<*> Um Sie anzusehen, folgen Sie bitte diesem Verweis: %s';
+$txt['message_attachments'] = '<*> Diese Nachricht enthält %d Verknüpfungen mit Bildern/Dateien.
+<*> Um sie anzusehen, folgen Sie bitte diesem Verweis: %s';
 
 // Help
 $txt['maillist_help'] = 'Für Hilfe bei der Einrichtung dieser Funktionen besuchen Sie bitte den maillist-Bereich im <a href="https://github.com/elkarte/Elkarte/wiki/Maillist-Feature" target="_blank" class="new_win">ElkArte-Wiki</a>';
@@ -245,7 +233,6 @@ $txt['maillist_help'] = 'Für Hilfe bei der Einrichtung dieser Funktionen besuch
 // Email bounce templates
 $txt['ml_bounce_templates_title'] = 'Eigene Abweisungs-E-Mail-Vorlagen';
 $txt['ml_bounce_templates_none'] = 'Es wurden noch keine eigenen Vorlagen erstellt';
-
 $txt['ml_bounce_templates_time'] = 'Erstellungszeitpunkt';
 $txt['ml_bounce_templates_name'] = 'Vorlage';
 $txt['ml_bounce_templates_creator'] = 'Erstellt von';
@@ -255,7 +242,6 @@ $txt['ml_bounce_template_delete'] = 'Ausgewählte löschen';
 $txt['ml_bounce_template_delete_confirm'] = 'Sind Sie sich sicher, dass Sie die ausgewählten Vorlagen löschen möchten?';
 $txt['ml_bounce_subject'] = 'Benachrichtigungsbetreff';
 $txt['ml_bounce_body'] = 'Benachrichtigungstext';
-
 $txt['ml_bounce_template_desc'] = 'Verwenden Sie diese Seite, um die Details der Vorlage festzulegen. Beachten Sie, dass der Betreff der E-Mail nicht Teil der Vorlage ist.';
 $txt['ml_bounce_template_title'] = 'Titel der Vorlage';
 $txt['ml_bounce_template_title_desc'] = 'Der Name, der in der Vorlagenauswahlliste angezeigt wird';
@@ -270,9 +256,30 @@ $txt['ml_bounce'] = 'E-Mail-Vorlagen';
 $txt['ml_bounce_description'] = 'In diesem Bereich können Sie Vorlagen, die für Abweisungsnachrichten verwendet werden, die versandt werden, wenn eine Beitrags-E-Mail abgelehnt wird, hinzufügen und ändern.';
 $txt['ml_bounce_title'] = 'Abgewiesen';
 $txt['ml_bounce_subject'] = 'Ihre E-Mail konnte nicht veröffentlicht werden';
-$txt['ml_bounce_body'] = 'Hallo. Hier meldet sich das Beitragsmailprogramm auf {FORUMNAMESHORT}' . "\n\n" . 'Ich befürchte, dass ich Ihre Nachricht mit dem Titel {SUBJECT} nicht weiterleiten und/oder veröffentlichen konnte.' . "\n\n" . 'Der Fehler, den ich beim Versuch, dies zu tun, verursachte, lautete: {ERROR}' . "\n\n" . 'Dies ist ein dauerhafter Fehler; ich hab\'s aufgegeben. Ich bitte um Verzeihung, dass es nicht geklappt hat.' . "\n\n" . '{EMAILREGARDS}';
-$txt['ml_inform_title'] = 'Benachrichtigung';
+$txt['ml_bounce_body'] = 'Hallo. Hier meldet sich das Beitragsmailprogramm auf {FORUMNAMESHORT}
+
+Ich befürchte, dass ich Ihre Nachricht mit dem Titel {SUBJECT} nicht weiterleiten und/oder veröffentlichen konnte.
+
+Der Fehler, den ich beim Versuch, dies zu tun, verursachte, lautete: {ERROR}
+
+Dies ist ein dauerhafter Fehler; ich hab\'s aufgegeben. Ich bitte um Verzeihung, dass es nicht geklappt hat.
+
+{EMAILREGARDS}';
+$txt['ml_inform_title'] = 'Benachrichtigen';
 $txt['ml_inform_subject'] = 'Es gab ein Problem mit Ihrer E-Mail';
-$txt['ml_inform_body'] = '{MEMBER},' . "\n\n" . 'Die E-Mail, die Sie an {FORUMNAMESHORT} gesendet haben, erzeugte einen Fehler, der zu Verzögerungen bei der Veröffentlichung führte.  Der Fehler lautete: {ERROR}' . "\n\n" . 'Um künftige Verzögerungen bei der Veröffentlichung zu vermeiden, sollten Sie diesen Fehler beheben.' . "\n\n" . '{EMAILREGARDS}';
-$txt['ml_bounce_template_body_default'] = 'Hallo. Hier meldet sich das Beitragsmailprogramm auf {FORUMNAMESHORT}' . "\n\n" . 'Ich befürchte, dass ich Ihre Nachricht mit dem Titel {SUBJECT} nicht weiterleiten und/oder veröffentlichen konnte.' . "\n\n" . 'Der Fehler, den ich beim Versuch, dies zu tun, verursachte, lautete: {ERROR}' . "\n\n" . 'Dies ist ein dauerhafter Fehler; ich hab\'s aufgegeben. Ich bitte um Verzeihung, dass es nicht geklappt hat.' . "\n\n" . '{EMAILREGARDS}';
-$txt['ml_bounce_template_subject_default'] = 'Ein Fehler ist bei der Verarbeitung Ihrer E-Mail aufgetreten';
+$txt['ml_inform_body'] = '{MEMBER},
+
+die E-Mail, die Sie an {FORUMNAMESHORT} gesendet haben, erzeugte einen Fehler, der zu Verzögerungen bei der Veröffentlichung führte.  Der Fehler lautete: {ERROR}
+
+Um künftige Verzögerungen bei der Veröffentlichung zu vermeiden, sollten Sie diesen Fehler beheben.
+
+{EMAILREGARDS}';
+$txt['ml_bounce_template_body_default'] = 'Hallo. Hier meldet sich das Beitragsmailprogramm auf {FORUMNAMESHORT}
+
+Ich befürchte, dass ich Ihre Nachricht mit dem Titel {SUBJECT} nicht weiterleiten und/oder veröffentlichen konnte.
+
+Der Fehler, den ich beim Versuch, dies zu tun, verursachte, lautete: {ERROR}
+
+Dies ist ein dauerhafter Fehler; ich hab\'s aufgegeben. Ich bitte um Verzeihung, dass es nicht geklappt hat.
+
+{EMAILREGARDS}'; // redundant?

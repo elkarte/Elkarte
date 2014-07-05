@@ -206,7 +206,6 @@ $txt['profileEdit'] = 'Profil ändern';
 $txt['account_info'] = 'Dies sind Ihre Kontoeinstellungen. Hier können Sie alle wichtigen Informationen ändern, die Sie im Forum identifizieren. Aus Sicherheitsgründen müssen Sie Ihr (aktuelles) Passwort eingeben, wenn Sie diese Angaben ändern.';
 $txt['forumProfile_info'] = 'Hier können Sie Ihre persönlichen Informationen ändern. Diese Informationen werden überall im Forum {forum_name_html_safe} angezeigt werden. Wenn Sie bestimmte Informationen nicht preisgeben möchten, lassen Sie die entsprechenden Felder einfach leer.';
 $txt['theme_info'] = 'Hier können Sie das Design und Layout des Forums ändern.';
-$txt['notification'] = 'Benachrichtigungen &amp; E-Mail';
 $txt['notification_info'] = 'Dies erlaubt es Ihnen, über Antworten auf Beiträge, neu eröffnete Themen und Forumsankündigungen benacrichtigt zu werden. Hier können Sie die abonnierten Themen und Foren anschauen sowie die entsprechenden Einstellungen ändern.';
 $txt['groupmembership'] = 'Gruppenmitgliedschaft';
 $txt['groupMembership_info'] = 'Hier können Sie Ihre Mitgliedschaft in den verschiedenen Gruppen verwalten.';

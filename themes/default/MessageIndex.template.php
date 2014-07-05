@@ -225,10 +225,10 @@ function template_topic_listing()
 
 			if (!empty($settings['avatars_on_indexes']))
 				echo '
-						<span class="board_avatar"><a href="', $topic['last_post']['member']['href'], '">', $topic['last_post']['member']['avatar']['image'], '</a></span>';
+						<span class="board_avatar"><a href="', $topic['last_post']['member']['href'], '"><img class="avatar" src="', $topic['last_post']['member']['avatar']['href'], '" alt="" /></a></span>';
 
 			echo '
-						<a class="topicicon img_last_post', $context['right_to_left'] ? '_rtl' : '', '" href="', $topic['last_post']['href'], '" title="', $txt['last_post'], '"></a>
+						<a class="topicicon img_last_post', '" href="', $topic['last_post']['href'], '" title="', $txt['last_post'], '"></a>
 						', $topic['last_post']['html_time'], '<br />
 						', $txt['by'], ' ', $topic['last_post']['member']['link'], '
 					</p>

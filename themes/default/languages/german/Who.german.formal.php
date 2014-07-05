@@ -150,14 +150,8 @@ $txt['credits_contrib_list'] = 'Für eine vollständige Liste derer, die zur Ges
 $txt['credits_license'] = 'Lizenz';
 $txt['credits_copyright'] = 'Copyright'; // hm, this is not even valid in Germany...
 $txt['credits_version'] = 'Version';
-// Replace "English" with the name of this language pack in the string below.
-$txt['credits_groups_translation'] = 'Englische Übersetzung';
 $txt['credits_groups_translators'] = 'Übersetzer';
 $txt['credits_translators_message'] = 'Danke für eure Mühen, die es Benutzern auf der ganzen Welt ermöglichen, ElkArte zu verwenden.';
-$txt['credits_groups_consultants'] = 'Beratende Entwickler'; // ?! :)
-$txt['credits_groups_beta'] = 'Betatester';
-$txt['credits_beta_message'] = 'Die wertvollen Wenigen, die unermüdlich Fehler finden, Rückmeldung geben und die Entwickler noch verrückter machen.';
-$txt['credits_groups_founder'] = 'Gründervater von SMF';
 
 // List of people who have made more than a token contribution to this translation. (blank for English)
 $txt['translation_credits'] = array();

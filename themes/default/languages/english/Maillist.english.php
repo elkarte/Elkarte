@@ -45,12 +45,8 @@ $txt['error_permission'] = 'The poster does not have post by email permissions o
 // Maillist page items
 $txt['ml_admin_configuration'] = 'Maillist Configuration';
 $txt['ml_configuration_desc'] = 'This section allows you to set some preferences for all posting by email related activities';
-$txt['ml_email'] = 'Post by Email';
 $txt['ml_emailerror_none'] = 'There are no failed entries requiring moderation';
-$txt['ml_site_settings'] = 'Site Email Details';
 $txt['ml_emailerror'] = 'Failed Emails';
-$txt['ml_emailfilters'] = 'Filters';
-$txt['ml_emailparsers'] = 'Parsers';
 $txt['ml_emailsettings'] = 'Settings';
 
 // Settings tab
@@ -59,7 +55,6 @@ $txt['pbe_post_enabled'] = 'Allow posting to the forum by Email';
 $txt['pbe_pm_enabled'] = 'Allow replying to PMs by Email';
 $txt['pbe_no_mod_notices'] = 'Turn off moderation notices';
 $txt['pbe_no_mod_notices_desc'] = 'Do not send notifications of moved, locked, deleted, merged, etc.  These consume your email quota with no real purpose';
-$txt['settings_title'] = 'From this page you can choose how you want the post by email feature to behave';
 $txt['saved'] = 'Information Saved';
 
 // General Sending Settings
@@ -139,11 +134,8 @@ $txt['approved'] = 'Email was approved and posted';
 $txt['error_approved'] = 'There was an error trying to approve this email';
 $txt['id'] = '#';
 $txt['error'] = 'Error';
-$txt['subject'] = 'Subject';
-$txt['to'] = 'To:';
 $txt['key'] = 'Key';
 $txt['message_id'] = 'Message';
-$txt['from'] = 'From';
 $txt['message_type'] = 'Type';
 $txt['message_action'] = 'Actions';
 $txt['emailerror_title'] = 'Failed Email Log';
@@ -157,10 +149,7 @@ $txt['filter_delete_warning'] = 'Are you sure you want to remove this filter?';
 $txt['parser_delete_warning'] = 'Are you sure you want to remove this parser?';
 $txt['bounce'] = 'Bounce';
 $txt['heading'] = 'This is the failed post by email listing, from here you can choose to view, approve (if possible), delete or bounce back to the sender';
-$txt['cant_find'] = 'The email file could not be found';
-$txt['no_subject'] = 'No Subject';
 $txt['cant_approve'] = 'The error does not allow for the item to be approved (can\'t auto repair)';
-$txt['actions'] = 'Actions';
 $txt['email_attachments'] = '[There are %d email attachments in this message]';
 $txt['email_failure'] = 'Failure Reason';
 
@@ -204,8 +193,6 @@ $txt['no_parsers'] = 'You have not defined any parsers';
 $txt['parsers_title'] = 'From this area you can add, edit or remove email parsers.  Parsers look for the specific line and cut the message at that point in an effort to remove the original replied to message. If a parser results in no text (e.g. a reply below or intermixed in the original message), it will be skipped';
 $txt['option_standard'] = 'Standard';
 $txt['option_regex'] = 'Regular Expression';
-$txt['button_edit'] = 'Edit';
-$txt['button_delete'] = 'Delete';
 $txt['parser_sort_description'] = 'Parsers are executed in the order shown, to change this drag and drop an item to a new location in the list.';
 
 // Bounce
@@ -246,7 +233,6 @@ $txt['maillist_help'] = 'For help in setting up the maillist feature, please vis
 // Email bounce templates
 $txt['ml_bounce_templates_title'] = 'Custom bounce email templates';
 $txt['ml_bounce_templates_none'] = 'No custom bounce templates have been created yet';
-
 $txt['ml_bounce_templates_time'] = 'Time Created';
 $txt['ml_bounce_templates_name'] = 'Template';
 $txt['ml_bounce_templates_creator'] = 'Created By';
@@ -254,9 +240,8 @@ $txt['ml_bounce_template_add'] = 'Add Template';
 $txt['ml_bounce_template_modify'] = 'Edit Template';
 $txt['ml_bounce_template_delete'] = 'Delete Selected';
 $txt['ml_bounce_template_delete_confirm'] = 'Are you sure you want to delete the selected templates?';
-$txt['ml_bounce_subject'] = 'Notification Subject';
 $txt['ml_bounce_body'] = 'Notification Message';
-
+$txt['ml_bounce_template_subject_default'] = 'Notification Subject';
 $txt['ml_bounce_template_desc'] = 'Use this page to fill in the details of the template. Note that the subject for the email is not part of the template.';
 $txt['ml_bounce_template_title'] = 'Template Title';
 $txt['ml_bounce_template_title_desc'] = 'A name for use in the template selection list';
@@ -298,4 +283,3 @@ The error I received while trying was: {ERROR}
 This is a permanent error; I\'ve given up. Sorry it didn\'t work out.
 
 {EMAILREGARDS}'; // redundant?
-$txt['ml_bounce_template_subject_default'] = 'There was an error processing your email';

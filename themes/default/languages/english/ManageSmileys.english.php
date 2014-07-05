@@ -90,7 +90,6 @@ $txt['icons_edit_icon'] = 'Edit message icon';
 $txt['icons_new_icon'] = 'New message icon';
 $txt['icons_location_first_icon'] = 'As first icon';
 $txt['icons_location_after'] = 'After';
-$txt['icons_filename_all_gif'] = 'All files must be &quot;gif&quot; files';
 $txt['icons_filename_all_png'] = 'All files must be &quot;png&quot; files';
 $txt['icons_no_entries'] = 'There are currently no message icons configured.';
 $txt['icons_reordered'] = 'Message Icons successfully reordered';

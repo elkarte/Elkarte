@@ -9,13 +9,8 @@ $txt['no_name'] = 'Sie haben das Namensfeld nicht ausgefüllt. Wir können Sie o
 $txt['no_email'] = 'Sie haben das E-Mail-Feld nicht ausgefüllt. Wir können Sie ohne eine E-Mail-Adresse nicht fortfahren lassen, entschuldigen Sie bitte.';
 $txt['topic_locked'] = 'Dieses Thema ist gesperrt, Sie können keine Beiträge hinzufügen oder ändern...';
 $txt['no_password'] = 'Passwortfeld leer';
-$txt['already_a_user'] = 'Der Benutzername, den Sie zu verwenden versuchten, existiert bereits.';
-$txt['cant_move'] = 'Sie dürfen keine Themen verschieben...';
 $txt['passwords_dont_match'] = 'Die Passwörter stimmen nicht überein.';
 $txt['register_to_use'] = 'Pardon, Sie müssen sich registrieren, bevor Sie Gebrauch von dieser Funktion machen können.';
-$txt['password_invalid_character'] = 'Ungültiges Zeichen im Passwort.';
-$txt['name_invalid_character'] = 'Ungültiges Zeichen im Namen.';
-$txt['email_invalid_character'] = 'Ungültiges Zeichen in der E-Mail-Adresse.';
 $txt['username_reserved'] = 'Der Benutzername, den Sie zu verwenden versuchten, enthält den reservierten Namen \'%1$s\'. Bitte versuchen Sie es mit einem anderen Benutzernamen.';
 $txt['numbers_one_to_nine'] = 'Dieses Feld akzeptiert nur Ziffern von 0 bis 9';
 $txt['not_a_user'] = 'Der Benutzer, dessen Profil Sie anzusehen versuchen, existiert nicht.';
@@ -25,7 +20,6 @@ $txt['email_in_use'] = 'Diese E-Mail-Adresse (%1$s) wird bereits von einem regis
 
 $txt['didnt_select_vote'] = 'Sie haben keine Abstimmungsoption ausgewählt.';
 $txt['poll_error'] = 'Etwas funktioniert nicht, Verzeihung: entweder existiert diese Umfrage nicht, sie ist geschlossen oder Sie haben versucht mehrmals abzustimmen.';
-$txt['members_only'] = 'Diese Option steht nur registrierten Mitgliedern zur Verfügung.';
 $txt['locked_by_admin'] = 'Dies wurde von einem Administrator gesperrt.  Sie können es nicht entsperren.';
 $txt['not_enough_posts_karma'] = 'Verzeihung, Sie haben noch nicht genug Beiträge, um das Karma zu ändern - Sie benötigen mindestens %1$d.';
 $txt['cant_change_own_karma'] = 'Verzeihung, es ist Ihnen nicht gestattet, Ihr eigenes Karma zu ändern.';
@@ -35,8 +29,6 @@ $txt['feature_no_exists'] = 'Pardon, diese Funktion existiert nicht.';
 $txt['couldnt_connect'] = 'Konnte nicht mit dem Server verbinden oder die Datei finden';
 $txt['no_board'] = 'Das von Ihnen angegebene Forum existiert nicht';
 $txt['no_message'] = 'Die Nachricht ist nicht mehr verfügbar';
-$txt['cant_split'] = 'Es ist Ihnen nicht gestattet, Themen aufzuteilen';
-$txt['cant_merge'] = 'Es ist Ihnen nicht gestattet, Themen zusammenzuführen';
 $txt['no_topic_id'] = 'Sie haben eine ungültige Themen-ID angegeben.';
 $txt['split_first_post'] = 'Sie können ein Thema nicht im ersten Beitrag abtrennen.';
 $txt['topic_one_post'] = 'Das Thema enthält nur einen Beitrag und kann nicht aufgeteilt werden.';
@@ -45,7 +37,6 @@ $txt['selected_all_posts'] = 'Konnte nicht aufteilen. Sie haben alle Beiträge a
 $txt['cant_find_messages'] = 'Konnte Nachrichten nicht finden';
 $txt['cant_find_user_email'] = 'Konnte E-Mail-Adresse des Benutzers nicht finden.';
 $txt['cant_insert_topic'] = 'Konnte Thema nicht einfügen';
-$txt['already_a_mod'] = 'Sie haben den Benutzernamen eines bereits vorhandenen Moderators ausgewählt. Bitte wählen Sie einen anderen Benutzernamen aus';
 $txt['session_timeout'] = 'Ihre Sitzung ist während des Verfassens des Beitrags abgelaufen.  Bitte gehen Sie zurück und versuchen Sie es erneut.';
 $txt['session_timeout_file_upload'] = 'Ihre Sitzung lief beim Hochladen der Datei ab. Bitte versuchen Sie es erneut.';
 $txt['no_files_uploaded'] = 'Es stehen keine Dateien zum Hochladen an.';
@@ -142,7 +133,6 @@ $txt['registration_agreement_missing'] = 'Die Nutzungsbedingungsdatei, agreement
 $txt['registration_no_secret_question'] = 'Verzeihung, für dieses Mitglied gibt es keine geheime Frage.';
 $txt['poll_range_error'] = 'Verzeihung, diese Umfrage muss länger als 0 Tage dauern.';
 $txt['delFirstPost'] = 'Sie dürfen den ersten Beitrag in einem Thema nicht löschen.<p>Wenn Sie dieses Thema löschen möchten, so klicken Sie auf "Entfernen" oder bitten Sie einen Moderator/Administrator, das für Sie zu übernehmen.</p>';
-$txt['parent_error'] = 'Konnte Forum nicht erstellen!';
 $txt['login_cookie_error'] = 'Sie konnten sich nicht anmelden.  Bitte überprüfen Sie Ihre Cookieeinstellungen.';
 $txt['incorrect_answer'] = 'Verzeihung, aber Sie haben Ihre Frage nicht korrekt beantwortet.  Bitte klicken Sie auf Zurück, um es erneut zu versuchen, oder klicken Sie zweimal auf Zurück, um die Standardmethode zur Rückgewinnung Ihres Passworts zu verwenden.';
 $txt['no_mods'] = 'Keine Moderatoren gefunden!';
@@ -160,8 +150,6 @@ $txt['event_day_missing'] = 'Tag des Ereignisses fehlt.';
 $txt['event_title_missing'] = 'Titel des Ereignisses fehlt.';
 $txt['invalid_date'] = 'Ungültiges Datum.';
 $txt['no_event_title'] = 'Es wurde kein Ereignistitel eingegeben.';
-$txt['missing_event_id'] = 'Ereignis-ID fehlt.';
-$txt['cant_edit_event'] = 'Sie sind nicht befugt, dieses Ereignis zu ändern.';
 $txt['missing_board_id'] = 'Forums-ID fehlt.';
 $txt['missing_topic_id'] = 'Themen-ID fehlt.';
 $txt['topic_doesnt_exist'] = 'Thema existiert nicht.';
@@ -224,8 +212,6 @@ $txt['search_WaitTime_broken'] = 'Ihre letzte Suche erfolgte vor weniger als %1$
 $txt['remind_WaitTime_broken'] = 'Ihre letzte Erinnerung erfolgte vor weniger als %1$d Sekunden. Bitte versuchen Sie es später erneut.';
 $txt['contact_WaitTime_broken'] = 'Ihr letzter Versuch, das Kontaktformular zu nutzen, fand vor weniger als %1$d Sekunden statt. Bitte versuchen Sie es später erneut.';
 
-$txt['email_missing_data'] = 'Wir brauchen sowohl in der Betreffzeile als auch im Nachrichtenfeld etwas Text.';
-
 $txt['topic_gone'] = 'Wir haben uns sehr viel Mühe gegeben, das Thema oder Forum zu finden, nach dem Sie suchen, aber es wurde nirgends gefunden. Entweder ist es weg oder es wurde Ihrem Zugriff entzogen.';
 $txt['theme_edit_missing'] = 'Wir haben uns sehr angestrengt, die Datei zu finden, die Sie ändern möchten, aber die Suche blieb erfolglos.';
 
@@ -287,7 +273,6 @@ $txt['smileys_upload_error_name'] = 'Alle Smileys müssen denselben Dateinamen t
 $txt['smileys_upload_error_illegal'] = 'Ungültiger Typ.';
 
 $txt['search_invalid_weights'] = 'Die Suchgewichtungen wurden nicht richtig konfiguriert. Mindestens eine Gewichtung sollte nicht 0 sein. Bitte melden Sie diesen Fehler einem Administrator.';
-$txt['unable_to_create_temporary'] = 'Die Suchfunktion konnte keine temporären Tabellen anlegen.  Bitte versuchen Sie es erneut.';
 
 $txt['package_no_file'] = 'Konnte Paketdatei nicht finden!';
 $txt['packageget_unable'] = 'Konnte nicht mit dem Server verbinden.  Bitte versuchen Sie es stattdessen mit <a href="%1$s" target="_blank" class="new_win">diesem URL</a>.';
@@ -430,7 +415,6 @@ $txt['search_api_not_compatible'] = 'Das ausgewählte Such-API, das das Forum ve
 
 // Restore topic/posts
 $txt['cannot_restore_first_post'] = 'Sie können den ersten Beitrag in einem Thema nicht wiederherstellen.';
-$txt['parent_topic_missing'] = 'Das Elternthema des Beitrags, den Sie wiederherzustellen versuchen, wurde gelöscht.';
 $txt['restored_disabled'] = 'Die Wiederherstellung von Themen wurde deaktiviert.';
 $txt['restore_not_found'] = 'Folgende Beiträge konnten nicht wiederhergestellt werden; das ursprüngliche Thema wurde möglicherweise entfernt: %1$s Sie müssen diese Beiträge von Hand verschieben.';
 

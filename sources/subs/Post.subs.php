@@ -1568,6 +1568,8 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 		// Posting a quoted reply?
 		if ((!empty($topic) && !empty($_REQUEST['quote'])) || (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup'])))
 		{
+			$msg_id =  !empty($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'];
+
 			// Make sure they _can_ quote this post, and if so get it.
 			$request = $db->query('', '
 				SELECT m.subject, IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.body
@@ -1578,7 +1580,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 					AND m.approved = {int:is_approved}') . '
 				LIMIT 1',
 				array(
-					'id_msg' => !empty($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'],
+					'id_msg' => $msg_id,
 					'is_approved' => 1,
 				)
 			);
@@ -1615,7 +1617,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 				$form_message = preg_replace(array('~\n?\[quote.*?\].+?\[/quote\]\n?~is', '~^\n~', '~\[/quote\]~'), '', $form_message);
 
 			// Add a quote string on the front and end.
-			$form_message = '[quote author=' . $mname . ' link=topic=' . $topic . '.msg' . (int) $_REQUEST['quote'] . '#msg' . (int) $_REQUEST['quote'] . ' date=' . $mdate . ']' . "\n" . rtrim($form_message) . "\n" . '[/quote]';
+			$form_message = '[quote author=' . $mname . ' link=msg=' . (int) $msg_id . ' date=' . $mdate . ']' . "\n" . rtrim($form_message) . "\n" . '[/quote]';
 		}
 		// Posting a reply without a quote?
 		elseif (!empty($topic) && empty($_REQUEST['quote']))

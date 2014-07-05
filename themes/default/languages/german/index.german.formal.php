@@ -31,11 +31,6 @@ $txt['months_short'] = array(1 => 'Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Ju
 $txt['time_am'] = 'vormittags';
 $txt['time_pm'] = 'nachmittags';
 
-$txt['newmessages0'] = 'ist neu'; //Deprecated
-$txt['newmessages1'] = 'sind neu'; //Deprecated
-$txt['newmessages3'] = 'Neu'; //Deprecated
-$txt['newmessages4'] = ','; //Deprecated
-
 // Let's get all the main menu strings in one place.
 $txt['home'] = 'Startseite';
 $txt['community'] = 'Forum'; // ? :-)
@@ -115,7 +110,6 @@ $txt['user_email_address'] = 'E-Mail-Adresse';
 $txt['subject'] = 'Betreff';
 $txt['message'] = 'Nachricht';
 $txt['redirects'] = 'Weiterleitungen';
-$txt['quick_modify'] = 'Hier ändern';
 
 $txt['choose_pass'] = 'Passwort auswählen';
 $txt['verify_pass'] = 'Passwort bestätigen';
@@ -142,7 +136,6 @@ $txt['page'] = 'Seite';
 $txt['prev'] = 'vorherige';
 $txt['next'] = 'nächste';
 
-$txt['lock_unlock'] = 'Thema sperren/entsperren';
 $txt['post'] = 'Beitrag';
 $txt['error_occurred'] = 'Ein Fehler ist aufgetreten';
 $txt['send_error_occurred'] = 'Ein Fehler ist aufgetreten, <a href="{href}">bitte klicken Sie hier, um es erneut zu versuchen</a>.';
@@ -182,7 +175,6 @@ $txt['users_active'] = 'Aktiv in den letzten %1$d Minuten';
 $txt['personal_messages'] = 'Private Nachrichten';
 $txt['reply_quote'] = 'Mit Zitat antworten';
 $txt['reply'] = 'Antworten';
-$txt['reply_noun'] = 'Antwort';
 $txt['reply_number'] = 'Antwort #%1$s';
 $txt['approve'] = 'Freigeben';
 $txt['unapprove'] = 'Nicht freigeben';
@@ -193,8 +185,6 @@ $txt['post_awaiting_approval'] = 'Hinweis: Dieser Beitrag wartet auf Freischaltu
 $txt['there_are_unapproved_topics'] = '%1$s Themen und %2$s Beiträge warten in diesem Forum auf Freischaltung. <a href="%3$s">Klicken Sie hier, um sie anzusehen</a>.';
 $txt['send_message'] = 'Nachricht senden';
 
-$txt['msg_alert_you_have'] = 'Sie haben'; //Deprecated
-$txt['msg_alert_messages'] = 'Nachrichten'; //Deprecated
 $txt['msg_alert_no_messages'] = 'Sie haben keine Nachrichten';
 $txt['msg_alert_one_message'] = 'Sie haben <a href="%1$s">1 Nachricht</a>';
 $txt['msg_alert_many_message'] = 'Sie haben <a href="%1$s">%2$d Nachrichten</a>';
@@ -214,7 +204,7 @@ $txt['are_sure_remove_topic'] = 'Sind Sie sich sicher, dass Sie dieses Thema lö
 $txt['yes'] = 'Ja';
 $txt['no'] = 'Nein';
 
-$txt['search_end_results'] = 'Keine weiteren Ergebnisse';
+// @todo this string seems a good candidate for deprecation
 $txt['search_on'] = 'am';
 
 $txt['search'] = 'Suchen';
@@ -230,8 +220,6 @@ $txt['password_reminder'] = 'Passworterinnerung';
 $txt['topic_started'] = 'Thema begonnen von';
 $txt['title'] = 'Titel';
 $txt['post_by'] = 'Beitrag von';
-$txt['memberlist_searchable'] = 'Durchsuchbare Liste aller registrierten Mitglieder.';
-$txt['welcome_member'] = 'Bitte begrüßen Sie'; //Deprecated
 $txt['welcome_newest_member'] = 'Bitte heißen Sie %1$s, unser neuestes Mitglied, willkommen.';
 $txt['admin_center'] = 'Administrationszentrum';
 $txt['admin_session_active'] = 'Sie haben eine laufende Adminsitzung. Wir empfehlen <strong><a class="strong" href="%1$s">diese Sitzung zu beenden</a></strong>, wenn Sie mit Ihren administrativen Tätigkeiten fertig sind.';
@@ -239,7 +227,6 @@ $txt['admin_maintenance_active'] = 'Ihr Forum läuft zurzeit im Wartungsmodus, n
 $txt['query_command_denied'] = 'Folgende MySQL-Fehler sind aufgetreten, bitte überprüfen Sie Ihre Konfiguration:';
 $txt['query_command_denied_guests'] = 'Es scheint, als wäre im Forum etwas mit der Datenbank nicht in Ordnung. Dieses Problem sollte nur vorübergehend bestehen, kommen Sie also bitte später wieder und versuchen Sie es erneut.  Wenn Sie diese Nachricht weiterhin zu Gesicht bekommen, melden Sie bitte folgende Nachricht einem Administrator:';
 $txt['query_command_denied_guests_msg'] = 'der Befehl %1$s ist der Datenbank nicht erlaubt';
-$txt['last_edit'] = 'Zuletzt geändert'; //Deprecated
 $txt['last_edit_by'] = '<span class="lastedit">Zuletzt geändert</span>: %1$s von %2$s';
 $txt['notify_deactivate'] = 'Möchten Sie die Benachrichtigungen in diesem Thema deaktivieren?';
 
@@ -249,7 +236,6 @@ $txt['personal_text'] = 'Persönlicher Text';
 $txt['date_registered'] = 'Registrierungsdatum';
 
 $txt['recent_view'] = 'Alle neuen Beiträge anzeigen.';
-$txt['recent_updated'] = 'ist das zuletzt aktualisierte Thema';
 $txt['is_recent_updated'] = '%1$s ist das zuletzt aktualisierte Thema';
 
 $txt['male'] = 'Männlich';
@@ -259,18 +245,11 @@ $txt['error_invalid_characters_username'] = 'Ungültiges Zeichen im Benutzername
 
 $txt['welcome_guest'] = 'Willkommen, <strong>Gast</strong>. Bitte <a href="{login_url}">melden Sie sich an</a>.';
 
-$txt['welcome_guest_register'] = 'Willkommen auf <strong>{forum_name}</strong>. Bitte <a href="{login_url}">melden Sie sich an</a> oder <a href="{register_url}">registrieren Sie sich</a>.';
-
-$txt['please_login'] = 'Bitte <a href="{login_url}">melden Sie sich an</a>.';
-$txt['login_or_register'] = 'Bitte <a href="{login_url}">melden Sie sich an</a> oder <a href="{register_url}">registrieren Sie sich</a>.';
 $txt['welcome_guest_activate'] = '<br />Haben Sie Ihre <a href="{activate_url}">Aktivierungs-E-Mail</a> übersehen?';
 // @todo the following to sprintf
 $txt['hello_member'] = 'Hey,';
 // Use numeric entities in the below string.
 $txt['hello_guest'] = 'Willkommen,';
-$txt['welmsg_hey'] = 'Hey,';
-$txt['welmsg_welcome'] = 'Willkommen,';
-$txt['welmsg_please'] = 'Bitte';
 $txt['select_destination'] = 'Bitte wählen Sie ein Ziel aus';
 
 // Escape any single quotes in here twice.. 'it\'s' -> 'it\\\'s'.
@@ -298,7 +277,6 @@ $txt['icon_angel'] = 'Unschuldig';
 $txt['moderator'] = 'Moderator';
 $txt['moderators'] = 'Moderatoren';
 
-$txt['mark_board_read'] = 'Themen in diesem Forum als gelesen markieren';
 $txt['views'] = 'Ansichten';
 $txt['new'] = 'Neu';
 $txt['no_redir'] = 'Weitergeleitet von %1$s';
@@ -314,7 +292,6 @@ $txt['forgot_your_password'] = 'Passwort vergessen?';
 $txt['date'] = 'Datum';
 // Use numeric entities in the below string.
 $txt['from'] = 'Von';
-$txt['check_new_messages'] = 'Auf neue Nachrichten prüfen';
 $txt['to'] = 'An'; // ... oder "Bis"?!
 
 $txt['board_topics'] = 'Themen';
@@ -331,8 +308,6 @@ $txt['topic_sent'] = 'Ihre E-Mail wurde erfolgreich versandt.';
 $txt['time_offset'] = 'Zeitabweichung';
 $txt['or'] = 'oder';
 
-$txt['no_matches'] = 'Verzeihung, es gab keine Treffer';
-
 $txt['mention'] = 'Erwähnungen';
 $txt['notifications'] = 'Benachrichtigungen';
 
@@ -343,18 +318,13 @@ $txt['ban_continue_browse'] = 'Sie können das Forum als Gast weiterhin benutzen
 
 $txt['mark_as_read'] = 'ALLE Nachrichten als gelesen markieren';
 
-$txt['hot_topics'] = 'Heißes Thema (mehr als %1$d Antworten)';
-$txt['very_hot_topics'] = 'Brandheißes Thema (mehr als %1$d Antworten)';
 $txt['locked_topic'] = 'Geschlossenes Thema';
 $txt['normal_topic'] = 'Normales Thema';
 $txt['participation_caption'] = 'Thema, in dem Sie geschrieben haben';
 
-$txt['go_caps'] = 'LOS';
-
 $txt['print'] = 'Drucken';
 $txt['topic_summary'] = 'Themenzusammenfassung';
 $txt['not_applicable'] = 'n.v.';
-$txt['message_lowercase'] = 'Nachricht'; //Deprecated
 $txt['name_in_use'] = 'Der Name %1$s wird bereits von einem anderen Mitglied verwendet.';
 
 $txt['total_members'] = 'Mitglieder insgesamt';
@@ -400,9 +370,6 @@ $txt['total_cats'] = 'Kategorien insgesamt';
 $txt['latest_post'] = 'Neuester Beitrag';
 
 $txt['you_have'] = 'Sie haben';
-$txt['click'] = 'Klicken Sie';
-$txt['here'] = 'hier';
-$txt['to_view'] = ', um sie anzusehen.';
 $txt['you_have_no_msg'] = 'Sie haben keine Nachrichten...';
 $txt['you_have_one_msg'] = 'Sie haben eine Nachricht...<a href="%1$s">Klicken Sie hier, um sie anzusehen</a>';
 $txt['you_have_many_msgs'] = 'Sie haben %2$d Nachrichten...<a href="%1$s">Klicken Sie hier, um sie anzusehen</a>';
@@ -469,10 +436,6 @@ $txt['poll_question'] = 'Frage';
 $txt['poll_question_options'] = 'Frage und Optionen';
 $txt['poll_vote'] = 'Abstimmen';
 $txt['poll_total_voters'] = 'Teilnehmer insgesamt';
-$txt['shortcuts'] = 'Tastenkürzel: Alt+s absenden/verfassen, Alt+p Vorschau';
-$txt['shortcuts_firefox'] = 'Tastenkürzel: Umschalt+Alt+s absenden/verfassen, Umschalt+Alt+p Vorschau';
-$txt['shortcuts_drafts'] = ', Alt+d Entwurf speichern';
-$txt['shortcuts_drafts_firefox'] = ', Umschalt+Alt+d Entwurf speichern';
 $txt['draft_saved_on'] = 'Entwurf zuletzt gespeichert';
 $txt['poll_results'] = 'Ergebnisse ansehen';
 $txt['poll_lock'] = 'Abstimmung beenden';
@@ -496,8 +459,6 @@ $txt['split'] = 'AUFTEILEN';
 
 $txt['delete'] = 'Löschen';
 
-$txt['your_pms'] = 'Ihre privaten Nachrichten';
-
 $txt['kilobyte'] = 'KB';
 $txt['megabyte'] = 'MB';
 
@@ -511,7 +472,6 @@ $txt['quote'] = 'Zitat';
 $txt['quote_new'] = 'Neues Thema';
 $txt['follow_ups'] = 'Antworten';
 $txt['topic_derived_from'] = 'Thema abgeleitet von %1$s';
-$txt['fulledit'] = 'Kompletter&nbsp;Editor';
 $txt['edit'] = 'Ändern';
 $txt['quick_edit'] = 'Schnell ändern';
 $txt['post_options'] = 'Mehr...';
@@ -532,9 +492,6 @@ $txt['agreement_missing'] = 'Sie haben eingestellt, dass neue Benutzer einer Ver
 
 $txt['cache_writable'] = 'Das Cacheverzeichnis ist nicht beschreibbar - dies wird sich negativ auf die Geschwindigkeit Ihres Forums auswirken.';
 
-$txt['page_created'] = 'Seite erstellt in '; //Deprecated
-$txt['seconds_with'] = ' Sekunden mit '; //Deprecated
-$txt['queries'] = ' Abfragen.'; //Deprecated
 $txt['page_created_full'] = 'Seite erstellt in %1$.3f Sekunden mit %2$d Abfragen.';
 
 $txt['report_to_mod_func'] = 'Verwenden Sie diese Funktion, um Administratoren und Moderatoren über eine feindselige oder sonstwie missbräuchliche Nachricht zu informieren.<br /><em>Bitte beachten Sie, dass Ihre E-Mail-Adresse den Moderatoren angezeigt wird, wenn Sie dies tun.</em>';
@@ -637,8 +594,6 @@ $txt['mlist_search'] = 'Nach Mitgliedern suchen';
 $txt['mlist_search_again'] = 'Erneut suchen';
 $txt['mlist_search_filter'] = 'Suchoptionen';
 $txt['mlist_search_email'] = 'Nach E-Mail-Adresse suchen';
-$txt['mlist_search_group'] = 'Nach Position suchen';
-$txt['mlist_search_name'] = 'Nach Namen suchen';
 $txt['mlist_search_website'] = 'Nach Website suchen';
 $txt['mlist_search_results'] = 'Suchergebnisse für';
 $txt['mlist_search_by'] = 'Nach %1$s suchen';
@@ -654,8 +609,6 @@ $txt['more'] = 'mehr';
 $txt['hostname'] = 'Hostname';
 $txt['you_are_post_banned'] = 'Verzeihung, %1$s, Sie wurden vom Schreiben von Beiträgen und privaten Nachrichten in diesem Forum ausgeschlossen.';
 $txt['ban_reason'] = 'Grund';
-
-$txt['tables_optimized'] = 'Datenbanktabellen optimiert';
 
 $txt['add_poll'] = 'Umfrage hinzufügen';
 $txt['poll_options6'] = 'Sie können höchstens %1$s Optionen auswählen.';
@@ -713,11 +666,6 @@ $txt['who_viewing_topic'] = ' betrachten dieses Thema.';
 $txt['who_viewing_board'] = ' betrachten dieses Forum.';
 $txt['who_member'] = 'Mitglied';
 
-// No longer used by default theme, but for backwards compat
-$txt['powered_by_php'] = 'Angetrieben von PHP';
-$txt['powered_by_mysql'] = 'Angetrieben von MySQL';
-$txt['valid_css'] = 'Gültiges CSS';
-
 // Current footer strings
 $txt['valid_html'] = 'Gültiges HTML 5';
 $txt['rss'] = 'RSS';
@@ -757,7 +705,6 @@ $txt['smileys_forum_board_default'] = 'Forumsstandard';
 $txt['search_results'] = 'Suchergebnisse';
 $txt['search_no_results'] = 'Verzeihung, es wurde nichts gefunden';
 
-$txt['totalTimeLogged1'] = 'Insgesamt angemeldet: '; //Deprecated
 $txt['totalTimeLogged2'] = ' Tage, ';
 $txt['totalTimeLogged3'] = ' Stunden und ';
 $txt['totalTimeLogged4'] = ' Minutes.';
@@ -776,8 +723,6 @@ $txt['approve_many_members_waiting'] = 'Es warten <a href="%1$s">%2$d Mitglieder
 $txt['notifyboard_turnon'] = 'Möchten Sie eine Benachrichtigungsmail erhalten, wenn jemand ein neues Thema in diesem Forum erstellt?';
 $txt['notifyboard_turnoff'] = 'Sind Sie sich sicher, dass Sie keine Benachrichtigungsmails bei neuen Themen in diesem Forum mehr erhalten möchten?';
 
-$txt['activate_code'] = 'Ihr Aktivierungscode lautet';
-
 $txt['find_members'] = 'Mitglieder suchen';
 $txt['find_username'] = 'Name, Benutzername oder E-Mail-Adresse';
 $txt['find_buddies'] = 'Nur Freunde anzeigen?';
@@ -785,11 +730,6 @@ $txt['find_wildcards'] = 'Erlaubte Platzhalter: *, ?';
 $txt['find_no_results'] = 'Nichts gefunden';
 $txt['find_results'] = 'Ergebnisse';
 $txt['find_close'] = 'Schließen';
-
-$txt['unread_since_visit'] = 'Ungelesene Beiträge seit dem letzten Besuch anzeigen.';
-$txt['show_unread_replies'] = 'Neue Antworten auf Ihre Beiträge anzeigen.';
-
-$txt['change_color'] = 'Farbe ändern';
 
 $txt['quickmod_delete_selected'] = 'Ausgewählte löschen';
 $txt['quickmod_split_selected'] = 'Ausgewählte aufteilen';
@@ -812,7 +752,6 @@ $txt['ssi_session_broken'] = 'SSI.php konnte keine Sitzung laden!  Dies könnte 
 // Escape any single quotes in here twice.. 'it\'s' -> 'it\\\'s'.
 $txt['preview_title'] = 'Beitragsvorschau';
 $txt['preview_fetch'] = 'Hole Vorschau...';
-$txt['preview_new'] = 'Neue Nachricht';
 $txt['pm_error_while_submitting'] = 'Folgende Fehler traten beim Versand dieser privaten Nachricht auf:';
 $txt['warning_while_submitting'] = 'Etwas ist geschehen, und zwar:';
 $txt['error_while_submitting'] = 'Die Nachricht hat folgende Fehler, die vor dem Versand korrigiert werden müssen:';
@@ -840,9 +779,6 @@ $txt['visual_verification_description'] = 'Geben Sie die Buchstaben im Bild ein'
 $txt['visual_verification_sound'] = 'Hören Sie den Buchstaben zu';
 $txt['visual_verification_request_new'] = 'Ein anderes Bild anfordern';
 
-// Sub menu labels
-$txt['calendar_menu'] = 'Kalender ansehen';
-
 // @todo Send email strings - should move?
 $txt['send_email'] = 'E-Mail senden';
 $txt['send_email_disclosed'] = 'Beachten Sie, dass dies für den Empfänger sichtbar sein wird.';
@@ -851,8 +787,8 @@ $txt['send_email_subject'] = 'E-Mail-Betreff';
 $txt['ignoring_user'] = 'Sie ignorieren diesen Benutzer.';
 $txt['show_ignore_user_post'] = 'Zeig\' mir den Beitrag.';
 
-$txt['spider'] = 'Spinne'; // ? :-)
-$txt['spiders'] = 'Spinnen'; // ? :-)
+$txt['spider'] = 'Suchmaschine';
+$txt['spiders'] = 'Suchmaschinen';
 $txt['openid'] = 'OpenID';
 
 $txt['downloads'] = 'Downloads';
@@ -895,8 +831,8 @@ $txt['debug_query_which_took'] = 'was %1$s Sekunden dauerte.';
 $txt['debug_query_which_took_at'] = 'which took %1$s seconds at %2$s into request.'; // ??? :-/
 $txt['debug_show_queries'] = '[Abfragen zeigen]';
 $txt['debug_hide_queries'] = '[Abfragen verstecken]';
-$txt['debug_tokens'] = 'Tokens: ';
-$txt['debug_browser'] = 'Browser-ID: ';
+$txt['debug_tokens'] = 'Token: ';
+$txt['debug_browser'] = 'Browserkennung: ';
 $txt['debug_hooks'] = 'Aufgerufene Einschubmethoden: ';
 $txt['debug_system_type'] = 'System: ';
 $txt['debug_server_load'] = 'Serverlast: ';

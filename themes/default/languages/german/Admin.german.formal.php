@@ -46,6 +46,7 @@ $txt['admin_maintenance'] = 'Wartung';
 $txt['admin_image_text'] = 'Schaltflächen als Grafiken statt als Text anzeigen';
 $txt['admin_credits'] = 'Danksagungen';
 $txt['admin_agreement'] = 'Registrierung setzt Annahme der Nutzungsbedingungen voraus';
+$txt['admin_checkbox_agreement'] = 'Einen Auswahlkasten für die Nutzungsbedingungen anstelle einer ganzen Seite im Registrierungsformular anzeigen';
 $txt['admin_agreement_default'] = 'Standard';
 $txt['admin_agreement_select_language'] = 'Zu ändernde Sprache';
 $txt['admin_agreement_select_language_change'] = 'Ändern';
@@ -109,9 +110,7 @@ $txt['attachmentdir_size_not_set'] = 'Derzeit ist keine maximale Verzeichnisgröß
 $txt['attachmentdir_files_not_set'] = 'Derzeit ist keine maximale Dateianzahl pro Verzeichnis festgelegt';
 $txt['attachment_delete_admin'] = '[Anhang durch Admin gelöscht]';
 $txt['live'] = 'Neueste Aktualisierungen';
-$txt['try_searching'] = 'Wissen Sie nicht, wo Sie eine Einstellung finden? Durchsuchen Sie das Adminzentrum!';
 $txt['remove_all'] = 'Protokoll leeren';
-$txt['approve_new_members'] = 'Administrator muss alle neuen Mitglieder freischalten';
 $txt['agreement_not_writable'] = 'Warnung: agreement.txt ist nicht beschreibbar, jegliche vorgenommenen Änderungen werden NICHT gespeichert.';
 
 $txt['version_check_desc'] = 'Dies zeigt Ihnen die Versionen der Dateien Ihrer Installation verglichen mit denen der neuesten Version. Falls irgendeine Ihrer Dateien veraltet ist, sollten Sie die neueste Version von unserer <a href="https://github.com/elkarte/Elkarte/wiki/downloads" target="_blank" class="new_win">ElkArte-Site</a> herunterladen und installieren.';
@@ -130,12 +129,6 @@ $txt['theme_admin_info'] = 'Richten Sie neue Designs ein, wählen Sie aus, welche
 $txt['registration_center'] = 'Registrierung';
 $txt['member_center_info'] = 'Betrachten Sie die Mitgliederliste, suchen Sie nach Mitgliedern oder verwalten Sie Freischaltungen und Aktivierungen.';
 
-$txt['viewmembers_name'] = 'Benutzername (Anzeigename)';
-$txt['viewmembers_online'] = 'Zuletzt online';
-$txt['viewmembers_today'] = 'Heute';
-$txt['viewmembers_day_ago'] = 'Tag her';
-$txt['viewmembers_days_ago'] = 'Tage her';
-
 $txt['display_name'] = 'Anzeigename';
 $txt['email_address'] = 'E-Mail-Adresse';
 $txt['ip_address'] = 'IP-Adresse';
@@ -147,7 +140,6 @@ Referrer: %1$s
 Useragent: %2$s
 IP: %3$s';
 
-$txt['email_preview_warning'] = 'Diese Vorschau ist nicht zu 100 Prozent genau. Um die Funktionalität der Seite nicht zu beeinträchtigen, werden nur grundlegende HTML-Tags ausgewertet';
 $txt['email_as_html'] = 'Im HTML-Format senden.  (hiermit können Sie in der E-Mail normalen HTML-Code verwenden.)';
 $txt['email_parsed_html'] = '&lt;br /&gt;s und &amp;nbsp;s zu dieser Nachricht hinzufügen.';
 $txt['email_variables'] = 'In dieser Nachricht können Sie ein paar &quot;Variablen&quot; verwenden. <a href="{help_emailmembers}" onclick="return reqOverlayDiv(this.href);" class="help">Klicken Sie hier für weitere Informationen</a>.';
@@ -307,8 +299,6 @@ $txt['is_banned'] = 'Gesperrt';
 $txt['primary'] = 'Primär';
 $txt['additional'] = 'Weitere';
 $txt['wild_cards_allowed'] = 'die Platzhalter * und ? sind erlaubt';
-$txt['search_for'] = 'Suche nach';
-$txt['search_match'] = 'Treffer';
 $txt['member_part_of_these_membergroups'] = 'Mitglied ist Teil dieser Benutzergruppen';
 $txt['membergroups'] = 'Benutzergruppen';
 $txt['confirm_delete_members'] = 'Sind Sie sich sicher, dass Sie die ausgewählten Mitglieder löschen möchten?';
@@ -318,7 +308,6 @@ $txt['support_credits_info'] = 'Verweise auf Hilfestellung bei allgemeinen Probl
 $txt['support_title'] = 'Supportinformationen';
 $txt['support_versions_current'] = 'Aktuelle Version';
 $txt['support_versions_forum'] = 'Diese Version';
-$txt['support_versions_php'] = 'PHP-Version';
 $txt['support_versions_db'] = '%1$s-Version';
 $txt['support_versions_server'] = 'Serverversion';
 $txt['support_versions_gd'] = 'GD-Version';
@@ -341,9 +330,7 @@ $txt['permitgroups_restrict'] = 'Restriktiv';
 $txt['permitgroups_standard'] = 'Standard';
 $txt['permitgroups_moderator'] = 'Moderator';
 $txt['permitgroups_maintenance'] = 'Wartung';
-$txt['permitgroups_inherit'] = 'Erben';
 
-$txt['confirm_delete_attachments_all'] = 'Sind Sie sich sicher, dass Sie alle Anhänge löschen möchten?';
 $txt['confirm_delete_attachments'] = 'Sind Sie sich sicher, dass Sie die ausgewählten Anhänge löschen möchten?';
 $txt['attachment_manager_browse_files'] = 'Dateien durchsuchen';
 $txt['attachment_manager_repair'] = 'Wartung';
@@ -473,7 +460,6 @@ $txt['attachment_transfer_progress'] = 'Bitte warten. Die Übertragung läuft.';
 
 $txt['avatar_settings'] = 'Allgemeine Avatareinstellungen';
 $txt['avatar_default'] = 'Standardavatar für alle Benutzer ohne eigenen Avatar verwenden';
-$txt['mods_cat_avatars'] = 'Avatare';
 $txt['avatar_directory'] = 'Avatarverzeichnis';
 $txt['avatar_url'] = 'Avatar-URL';
 $txt['avatar_max_width_external'] = 'Maximale Breite externer Avatare';
@@ -697,7 +683,6 @@ $txt['badbehavior_title'] = 'Bad Behavior';
 $txt['mods_cat_modifications_misc'] = 'Verschiedenes';
 $txt['mods_cat_layout'] = 'Darstellung';
 $txt['karma'] = 'Karma';
-$txt['likes'] = 'Gefällt mir';
 $txt['mentions_settings_desc'] = 'Erwähnungen ermöglichen es Mitgliedern Ihrer Gemeinschaft, alarmiert zu werden, wenn sie in einem Beitrag @erwähnt oder als Freund hinzugefügt werden oder wenn einer ihrer Beiträge einem anderen Mitglied gefällt.';
 $txt['moderation_settings_short'] = 'Moderation';
 $txt['signature_settings_short'] = 'Signaturen';
@@ -743,7 +728,6 @@ $txt['themeadmin_edit_title'] = 'Themen anpassen';
 $txt['admin_browse_register_new'] = 'Neues Mitglied registrieren';
 
 $txt['search_engines'] = 'Suchmaschinen';
-$txt['spiders'] = 'Suchmaschinen'; // well, "Crawler" would be an adequate translation for "Spider" too ... :D I guess the user knows what this is
 $txt['spider_logs'] = 'Suchmaschinenprotokoll';
 $txt['spider_stats'] = 'Statistiken';
 

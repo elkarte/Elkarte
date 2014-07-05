@@ -238,39 +238,12 @@ legend {
 	box-shadow: -1px 2px 3px #eee;
 }
 /* Color for linktree items. */
-.linktree {
-	border-right: 0;
-	border-left: 2px solid #ccc;
-	border-radius: 0 2px 2px 0;
-	padding-right: 25px;
-	padding-left: 10px;
-}
-.linktree:before {
-	border-left: 0;
-	border-right: 10px solid #ccc;
-}
-.linktree:hover:before, .linktree_last:before {
-	border-left: 0;
-	border-right: 10px solid #3d6e32;
-}
 .linktree:after {
-	border-left: 0;
-	border-right: 10px solid #fcfcfc;
+	box-shadow: -2px 2px 0 1px rgba(204, 204, 204, 0.9);
 }
-.linktree:hover, .linktree_last {
-	border-right: 0;
-	border-left: 2px solid #3d6e32;
-	background-image: linear-gradient(to left, #4b863c, #5ba048);
+.linktree {
+	box-shadow: 0 2px 0 -1px #ccc, -3px 2px 0 -1px #ccc, -3px -1px 0 -1px #ccc;
 }
-.linktree:hover:after, .linktree_last:after {
-	border-left: 0;
-	border-right: 10px solid #5ba048;
-}
-.linktree_last:hover:after {
-	border-left: 0;
-	border-right: 10px solid #4b863c;
-}
-
 
 /*	$BUTTONS	*/
 /* This section contains code for the quickbuttons (quote, quick edit, etc)
@@ -311,11 +284,11 @@ legend {
 }
 /* our buddies &laquo; &raquo; */
 .small_pagelinks:before {
-	content: '\00BB';
+	content: '\00AB';
 	float: right;
 }
 .small_pagelinks:after {
-	content: '\00AB';
+	content: '\00BB';
 	float: right;
 }
 
@@ -344,7 +317,8 @@ legend {
 }
 /* @todo - Clean this up, once new classes are assigned to old windowbg stuffz. */
 .board_latest {
-	border-left: -1px solid #ccc;
+	border-right: 1px solid #ccc;
+	border-left: 0;
 }
 /* The board description and who-is-viewing stuff. */
 #description_board {
@@ -355,6 +329,16 @@ legend {
 }
 .jump_to_header {
 	box-shadow: -2px 1px rgba(1,1,1,0.07) inset;
+}
+
+.new_some_board:before {
+	background-position: -298px -14px;
+}
+.new_none_board:before {
+	background-position: -370px -14px;
+}
+.new_redirect_board:before {
+	background-position: -440px -14px;
 }
 /* --------------------------------------------------------------------- */
 /* The following are alternative layout orders for the board index rows. */
@@ -458,6 +442,15 @@ legend {
 	border-left: 1px solid #ccc;
 	border-right: 1px solid #bbb;
 	box-shadow: -1px 1px 1px rgba(0,0,0,0.07) inset;
+}
+/* Do one override here for .poster. Still saves code all round. */
+.poster_avatar .linklevel1, .poster_avatar:hover .linklevel1,
+.poster_avatar .linklevel1:focus,
+.name.linklevel1, .name.linklevel1:hover, .name.linklevel1:focus {
+	background: none;
+	border: none;
+	box-shadow: none;
+	color: #4b863c;
 }
 
 .requiredfield {
@@ -563,6 +556,6 @@ legend {
 		box-shadow: -3px 3px 6px #e5e5e5;
 	}
 	.linktree:after {
-		content: "<";
+		content: "";
 	}
 }

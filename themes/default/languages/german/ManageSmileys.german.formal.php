@@ -90,7 +90,6 @@ $txt['icons_edit_icon'] = 'Nachrichtensymbol ändern';
 $txt['icons_new_icon'] = 'Neues Nachrichtensymbol';
 $txt['icons_location_first_icon'] = 'Als erstes Symbol';
 $txt['icons_location_after'] = 'Nach';
-$txt['icons_filename_all_gif'] = 'Alle Dateien müssen &quot;gif&quot;-Dateien sein';
 $txt['icons_filename_all_png'] = 'Alle Dateien müssen &quot;png&quot;-Dateien sein';
 $txt['icons_no_entries'] = 'Derzeit sind keine Nachrichtensymbole konfiguriert.';
 $txt['icons_reordered'] = 'Nachrichtensymbole erfolgreich neu sortiert';

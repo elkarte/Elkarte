@@ -56,11 +56,9 @@
 /* Styles for the quick search bar */
 #quick_search {
 	font-size: 0.786em;
-	height: 26px;
 }
 #quick_search .input_text, #quick_search select, #quick_search .button_submit {
-	height: 26px;
-	margin: 7px 0 0 4px;
+	margin: 5px 0 0 4px;
 }
 #quick_search .icon {
 	margin: 12px 0 0 4px;

@@ -83,9 +83,7 @@ $txt['database_numb_tables'] = 'Ihre Datenbank enthält %1$d Tabellen.';
 $txt['database_optimize_attempt'] = 'Versuche Ihre Datenbank zu optimieren...';
 $txt['database_optimizing'] = 'Optimizere %1$s... %2$01.2f KiB gespart.';
 $txt['database_already_optimized'] = 'Alle Tabellen wurden bereits optimiert.';
-$txt['database_opimize_unneeded'] = 'Es war nicht notwendig, irgendwelche Tabellen zu optimieren.';
 $txt['database_optimized'] = ' Tabelle(n) optimiert.';
-$txt['database_no_id'] = 'hat eine nicht vorhandene Mitglieds-ID';
 
 $txt['apply_filter'] = 'Filter anwenden';
 $txt['applying_filter'] = 'Wende Filter an';
@@ -160,7 +158,6 @@ $txt['maintain_old_drafts'] = 'Alte Entwürfe entfernen';
 $txt['maintain_old_drafts_days'] = 'Alle Entwürfe entfernen, die älter sind als %1$s Tage';
 $txt['maintain_old_drafts_confirm'] = 'Sind Sie sich wirklich sicher, dass Sie jetzt diese alten Entwürfe entfernen möchten?\\n\\nDies kann nicht rückgängig gemacht werden!';
 $txt['maintain_members'] = 'Inaktive Benutzer entfernen';
-$txt['maintain_members_ungrouped'] = 'Nicht gruppierte Mitglieder <span class="smalltext">(Mitglieder ohne zugewiesene Benutzergruppe)</span>';
 $txt['maintain_members_since'] = 'Alle Mitglieder entfernen, deren letzte {select_conditions} länger als {num_days} Tage zurückliegt.';
 $txt['maintain_members_activated'] = 'Aktivierung';
 $txt['maintain_members_logged_in'] = 'Anmeldung';
@@ -180,7 +177,6 @@ $txt['convert_proceed'] = 'Fortfahren';
 
 // Move topics out.
 $txt['move_topics_maintenance'] = 'Themen verschieben';
-$txt['move_topics_select_board'] = 'Wählen Sie ein Forum aus';
 $txt['move_topics_from'] = 'Verschiebe Themen aus';
 $txt['move_topics_to'] = 'in';
 $txt['move_topics_now'] = 'Jetzt verschieben';

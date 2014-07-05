@@ -18,24 +18,16 @@ $txt['no_password'] = 'Sie haben kein Passwort eingegeben.';
 $txt['improper_password'] = 'Das angegebene Passwort ist zu lang.';
 $txt['incorrect_password'] = 'Passwort falsch';
 $txt['openid_not_found'] = 'Angegebene OpenID nicht gefunden.';
-$txt['choose_username'] = 'Wählen Sie einen Benutzernamen aus';
 $txt['maintain_mode'] = 'Wartungsmodus';
 $txt['registration_successful'] = 'Erfolgreich registriert';
-$txt['now_a_member'] = 'Erfolg! Sie sind nun ein Mitglied dieses Forums.';
-// Use numeric entities in the below string.
-$txt['your_password'] = 'und Ihr Passwort lautet';
 $txt['valid_email_needed'] = 'Bitte geben Sie eine gültige E-Mail-Adresse ein, %1$s.';
 $txt['required_info'] = 'Benötigte Informationen';
-$txt['identification_by_elkarte'] = 'Wird benutzt, um Sie im Forum zu identifizieren.';
 $txt['additional_information'] = 'Weitere Informationen';
 $txt['warning'] = 'Warnung!';
 $txt['only_members_can_access'] = 'Nur registrierte Mitglieder dürfen diesen Bereich einsehen.';
 $txt['login_below'] = 'Bitte melden Sie sich unten an.';
 $txt['login_below_or_register'] = 'Bitte melden Sie sich unten an oder <a href="%1$s">erstellen Sie ein Konto</a> auf %2$s';
-
-// Use numeric entities in the below two strings.
-$txt['may_change_in_profile'] = 'Sie können Änderungen vornehmen, indem Sie Ihr Profil öffnen oder nach der Anmeldung diese Seite besuchen:';
-$txt['your_username_is'] = 'Ihr Benutzername lautet: ';
+$txt['checkbox_agreement'] = 'Ich stimme den Nutzungsbedingungen zu';
 
 $txt['login_hash_error'] = 'Es wurden kürzlich Änderungen an der Passwortsicherheit vorgenommen.<br />Bitte geben Sie Ihr Passwort erneut ein.';
 
@@ -65,11 +57,6 @@ $txt['coppa_need_more_details'] = 'Brauchst du weitere Informationen?';
 
 $txt['awaiting_delete_account'] = 'Ihr Konto wurde zum Löschen vorgemerkt!<br />Sollten Sie Ihr Konto wiederherstellen wollen, wählen Sie bitte &quot;Mein Konto reaktivieren&quot; aus und melden Sie sich erneut an.';
 $txt['undelete_account'] = 'Mein Konto reaktivieren';
-
-// Use numeric entities in the below three strings.
-$txt['change_password'] = 'Neues Passwort'; // ? :)
-$txt['change_password_login'] = 'Ihre Anmeldedaten auf';
-$txt['change_password_new'] = 'wurden geändert und Ihr Passwort wurde zurückgesetzt. Unten finden Sie die neuen Daten.';
 
 $txt['in_maintain_mode'] = 'Dieses Forum befindet sich im Wartungsmodus.';
 

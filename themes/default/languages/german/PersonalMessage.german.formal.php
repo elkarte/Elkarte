@@ -2,7 +2,6 @@
 // Version: 1.0; PersonalMessage
 
 $txt['pm_inbox'] = 'Private Nachrichten - Posteingang';
-$txt['send_message'] = 'Nachricht senden';
 $txt['pm_add'] = 'Hinzufügen';
 $txt['make_bcc'] = 'BCC hinzufügen';
 $txt['pm_to'] = 'An';
@@ -16,7 +15,6 @@ $txt['delete_message'] = 'Nachrichten löschen';
 // Don't translate "PMBOX" in this string.
 $txt['delete_all'] = 'Alle Nachrichten im Postfach löschen';
 $txt['delete_all_confirm'] = 'Sind Sie sich sicher, dass Sie alle Nachrichten löschen möchten?';
-$txt['recipient'] = 'Empfänger';
 
 $txt['delete_selected_confirm'] = 'Sind Sie sich sicher, dass Sie alle ausgewählten privaten Nachrichten löschen möchten?';
 

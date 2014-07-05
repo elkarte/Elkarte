@@ -877,7 +877,7 @@ function purgeMembers($type, $groups, $time_limit)
 		$where_vars['blank_add_groups'] = '';
 	}
 
-	// Select all the members we're about to murder/remove...
+	// Select all the members we're about to remove...
 	$request = $db->query('', '
 		SELECT mem.id_member, IFNULL(m.id_member, 0) AS is_mod
 		FROM {db_prefix}members AS mem

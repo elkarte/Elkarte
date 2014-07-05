@@ -74,6 +74,7 @@ class Register_Controller extends Action_Controller
 
 		// Do we need them to agree to the registration agreement, first?
 		$context['require_agreement'] = !empty($modSettings['requireAgreement']);
+		$context['checkbox_agreement'] = !empty($modSettings['checkboxAgreement']);
 		$context['registration_passed_agreement'] = !empty($_SESSION['registration_agreed']);
 		$context['show_coppa'] = !empty($modSettings['coppaAge']);
 		$context['show_contact_button'] = !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] == 'registration';
@@ -87,7 +88,7 @@ class Register_Controller extends Action_Controller
 		}
 
 		// What step are we at?
-		$current_step = isset($_REQUEST['step']) ? (int) $_REQUEST['step'] : ($context['require_agreement'] ? 1 : 2);
+		$current_step = isset($_REQUEST['step']) ? (int) $_REQUEST['step'] : ($context['require_agreement'] && !$context['checkbox_agreement'] ? 1 : 2);
 
 		// Does this user agree to the registration agreement?
 		if ($current_step == 1 && (isset($_POST['accept_agreement']) || isset($_POST['accept_agreement_coppa'])))
@@ -109,13 +110,14 @@ class Register_Controller extends Action_Controller
 			}
 		}
 		// Make sure they don't squeeze through without agreeing.
-		elseif ($current_step > 1 && $context['require_agreement'] && !$context['registration_passed_agreement'])
+		elseif ($current_step > 1 && $context['require_agreement'] && !$context['checkbox_agreement'] && !$context['registration_passed_agreement'])
 			$current_step = 1;
 
 		// Show the user the right form.
 		$context['sub_template'] = $current_step == 1 ? 'registration_agreement' : 'registration_form';
 		$context['page_title'] = $current_step == 1 ? $txt['registration_agreement'] : $txt['registration_form'];
 		loadJavascriptFile('register.js');
+		addInlineJavascript('disableAutoComplete();', true);
 
 		// Add the register chain to the link tree.
 		$context['linktree'][] = array(
@@ -275,6 +277,10 @@ class Register_Controller extends Action_Controller
 		// You can't register if it's disabled.
 		if (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 3)
 			fatal_lang_error('registration_disabled', false);
+
+		// If we're using an agreement checkbox, did they check it?
+		if (!empty($modSettings['checkboxAgreement']) && !empty($_POST['checkbox_agreement']))
+			$_SESSION['registration_agreed'] = true;
 
 		// Things we don't do for people who have already confirmed their OpenID allegances via register.
 		if (!$verifiedOpenID)
@@ -964,6 +970,7 @@ class Register_Controller extends Action_Controller
 		else
 		{
 			$context['sub_template'] = 'contact_form';
+			$context['page_title'] = $txt['admin_contact_form'];
 
 			require_once(SUBSDIR . '/VerificationControls.class.php');
 			$verificationOptions = array(

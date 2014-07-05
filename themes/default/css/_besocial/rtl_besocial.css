@@ -205,11 +205,11 @@ legend {
 /* ------------------------------------------------------- */
 /* our buddies &laquo; &raquo; */
 .small_pagelinks:before {
-	content: '\00BB';
+	content: '\00AB';
 	float: right;
 }
 .small_pagelinks:after {
-	content: '\00AB';
+	content: '\00BB';
 	float: right;
 }
 
@@ -228,24 +228,11 @@ legend {
 	text-shadow: -1px 1px 2px #fff;
 }
 
-.navigate_section {
-	padding-left: 0;
-	padding-right: 15px;
-}
-.linktree, .linktree_last {
-	padding: 0 1em 0 0.5em;
-}
-.linktree:after {
-	border-right: 0.7em solid #eee;
-	margin-right: 0;
-	margin-left: 4px;
-}
-.linktree, .linktree_last {
-	padding-left: 10px;
-	padding-right: 20px;
-}
-.linktree:first-child {
-	padding-right: 10px;
+/*	$LINKTREE	*/
+/* ------------------------------------------------------- */
+.linktree:not(:last-child):after {
+	transform: scale(1) rotate(-135deg);
+	-webkit-transform: scale(1) rotate(-135deg);
 }
 
 /*	$BOARDICONS	*/
@@ -263,6 +250,18 @@ legend {
 	text-align: right;
 	padding: 1px 0 1px 6px;
 	float: right;
+}
+
+/*	$BOARDS		*/
+/* ------------------------------------------------------- */
+.new_some_board:before {
+	background-position: -296px -14px;
+}
+.new_none_board:before {
+	background-position: -368px -14px;
+}
+.new_redirect_board:before {
+	background-position: -440px -14px;
 }
 
 /*	$TOPICS		*/

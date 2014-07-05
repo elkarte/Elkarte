@@ -5,7 +5,6 @@ $txt['calendar_desc'] = 'Von hier aus können Sie den Kalender umfassend konfigu
 
 // Calendar Settings
 $txt['calendar_settings_desc'] = 'Hier können Sie den Kalender aktivieren und festlegen, welche Einstellungen auf ihn angewandt werden sollen.';
-$txt['save_settings'] = 'Einstellungen speichern';
 $txt['groups_calendar_view'] = 'Benutzergruppen, die den Kalender ansehen dürfen';
 $txt['groups_calendar_post'] = 'Benutzergruppen, die Ereignisse anlegen dürfen';
 $txt['groups_calendar_edit_own'] = 'Benutzergruppen, die ihre eigenen Ereignisse ändern dürfen';

@@ -14,7 +14,6 @@ $txt['draft_edit'] = 'Entwurf ändern';
 $txt['draft_load'] = 'Entwürfe laden';
 $txt['draft_hide'] = 'Entwürfe verstecken';
 $txt['draft_delete'] = 'Entwurf löschen';
-$txt['draft_saved_on'] = 'Entwurf zuletzt gespeichert';
 $txt['draft_days_ago'] = 'vor %s Tagen';
 $txt['draft_retain'] = 'dies wird noch %s Tage behalten';
 $txt['draft_remove'] = 'Diesen Entwurf löschen';
