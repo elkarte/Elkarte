@@ -1157,6 +1157,51 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 }
 
 /**
+ * Get all the details for a given topic and message.
+ * Respects permissions and post moderation
+ *
+ * @param int $topic id of a topic
+ * @param int $msg the id of a message, if empty, t.id_first_msg is used
+ */
+function getTopicInfoByMsg($topic, $msg = null)
+{
+	global $user_info, $modSettings;
+
+	// Nothing to do
+	if (empty($topic))
+		return false;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT
+			t.locked, t.num_replies, t.id_member_started, t.id_first_msg,
+			m.id_msg, m.id_member, m.poster_time, m.subject, m.smileys_enabled, m.body, m.icon,
+			m.modified_time, m.modified_name, m.approved
+		FROM {db_prefix}messages AS m
+			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = {int:current_topic})
+		WHERE m.id_msg = {raw:id_msg}
+			AND m.id_topic = {int:current_topic}' . (allowedTo('modify_any') || allowedTo('approve_posts') ? '' : (!$modSettings['postmod_active'] ? '
+			AND (m.id_member != {int:guest_id} AND m.id_member = {int:current_member})' : '
+			AND (m.approved = {int:is_approved} OR (m.id_member != {int:guest_id} AND m.id_member = {int:current_member}))')),
+		array(
+			'current_member' => $user_info['id'],
+			'current_topic' => $topic,
+			'id_msg' => empty($msg) ? 't.id_first_msg' : $msg,
+			'is_approved' => 1,
+			'guest_id' => 0,
+		)
+	);
+
+	$topic_info = array();
+	if ($request !== false)
+		$topic_info = $db->fetch_assoc($request);
+	$db->free_result($request);
+
+	return $topic_info;
+}
+
+/**
  * So long as you are sure... all old posts will be gone.
  * Used in Maintenance.controller.php to prune old topics.
  * 

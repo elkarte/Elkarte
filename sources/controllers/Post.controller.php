@@ -236,7 +236,7 @@ class Post_Controller extends Action_Controller
 			);
 
 			// Make all five poll choices empty.
-			$context['choices'] = array(
+			$context['poll']['choices'] = array(
 				array('id' => 0, 'number' => 1, 'label' => '', 'is_last' => false),
 				array('id' => 1, 'number' => 2, 'label' => '', 'is_last' => false),
 				array('id' => 2, 'number' => 3, 'label' => '', 'is_last' => false),
@@ -248,21 +248,10 @@ class Post_Controller extends Action_Controller
 
 		if ($context['make_event'])
 		{
-			// They might want to pick a board.
-			if (!isset($context['current_board']))
-				$context['current_board'] = 0;
-
-			// Start loading up the event info.
-			$context['event'] = array();
-			$context['event']['title'] = isset($_REQUEST['evtitle']) ? htmlspecialchars(stripslashes($_REQUEST['evtitle']), ENT_COMPAT, 'UTF-8') : '';
-			$context['event']['id'] = isset($_REQUEST['eventid']) ? (int) $_REQUEST['eventid'] : -1;
-			$context['event']['new'] = $context['event']['id'] == -1;
-
-			// Permissions check!
-			isAllowedTo('calendar_post');
+			$event_id = isset($_REQUEST['eventid']) ? (int) $_REQUEST['eventid'] : -1;
 
 			// Editing an event?  (but NOT previewing!?)
-			if (empty($context['event']['new']) && !isset($_REQUEST['subject']))
+			if ($event_id != -1 && !isset($_REQUEST['subject']))
 			{
 				// If the user doesn't have permission to edit the post in this topic, redirect them.
 				if ((empty($id_member_poster) || $id_member_poster != $user_info['id'] || !allowedTo('modify_own')) && !allowedTo('modify_any'))
@@ -270,67 +259,8 @@ class Post_Controller extends Action_Controller
 					$controller = new Calendar_Controller();
 					return $controller->action_post();
 				}
-
-				// Get the current event information.
-				require_once(SUBSDIR . '/Calendar.subs.php');
-				$event_info = getEventProperties($context['event']['id']);
-
-				// Make sure the user is allowed to edit this event.
-				if ($event_info['member'] != $user_info['id'])
-					isAllowedTo('calendar_edit_any');
-				elseif (!allowedTo('calendar_edit_any'))
-					isAllowedTo('calendar_edit_own');
-
-				$context['event']['month'] = $event_info['month'];
-				$context['event']['day'] = $event_info['day'];
-				$context['event']['year'] = $event_info['year'];
-				$context['event']['title'] = $event_info['title'];
-				$context['event']['span'] = $event_info['span'];
 			}
-			else
-			{
-				// Posting a new event? (or preview...)
-				$today = getdate();
-
-				// You must have a month and year specified!
-				if (!isset($_REQUEST['month']))
-					$_REQUEST['month'] = $today['mon'];
-
-				if (!isset($_REQUEST['year']))
-					$_REQUEST['year'] = $today['year'];
-
-				$context['event']['month'] = (int) $_REQUEST['month'];
-				$context['event']['year'] = (int) $_REQUEST['year'];
-				$context['event']['day'] = isset($_REQUEST['day']) ? $_REQUEST['day'] : ($_REQUEST['month'] == $today['mon'] ? $today['mday'] : 0);
-				$context['event']['span'] = isset($_REQUEST['span']) ? $_REQUEST['span'] : 1;
-
-				// Make sure the year and month are in the valid range.
-				if ($context['event']['month'] < 1 || $context['event']['month'] > 12)
-					fatal_lang_error('invalid_month', false);
-
-				if ($context['event']['year'] < $modSettings['cal_minyear'] || $context['event']['year'] > $modSettings['cal_maxyear'])
-					fatal_lang_error('invalid_year', false);
-
-				// Get a list of boards they can post in.
-				require_once(SUBSDIR . '/Boards.subs.php');
-
-				$boards = boardsAllowedTo('post_new');
-				if (empty($boards))
-					fatal_lang_error('cannot_post_new', 'user');
-
-				// Load a list of boards for this event in the context.
-				$boardListOptions = array(
-					'included_boards' => in_array(0, $boards) ? null : $boards,
-					'not_redirection' => true,
-					'selected_board' => empty($context['current_board']) ? $modSettings['cal_defaultboard'] : $context['current_board'],
-				);
-				$context += getBoardList($boardListOptions);
-			}
-
-			// Find the last day of the month.
-			$context['event']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['event']['month'] == 12 ? 1 : $context['event']['month'] + 1, 0, $context['event']['month'] == 12 ? $context['event']['year'] + 1 : $context['event']['year']));
-
-			$context['event']['board'] = !empty($board) ? $board : $modSettings['cal_defaultboard'];
+			$this->_prepareEventContext($id_member_poster);
 		}
 
 		// See if any new replies have come along.
@@ -367,6 +297,25 @@ class Post_Controller extends Action_Controller
 			}
 
 			cache_put_data('response_prefix', $context['response_prefix'], 600);
+		}
+
+		// Are we moving a discussion to its own topic?
+		if (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup']))
+		{
+			$context['original_post'] = isset($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'];
+			$context['show_boards_dropdown'] = true;
+			require_once(SUBSDIR . '/Boards.subs.php');
+			$context += getBoardList(array('not_redirection' => true, 'allowed_to' => 'post_new'));
+			$context['boards_current_disabled'] = false;
+			if (!empty($board))
+			{
+				foreach ($context['categories'] as $id => $values)
+					if (isset($values['boards'][$board]))
+					{
+						$context['categories'][$id]['boards'][$board]['selected'] = true;
+						break;
+					}
+			}
 		}
 
 		// Previewing, modifying, or posting?
@@ -408,47 +357,7 @@ class Post_Controller extends Action_Controller
 				$form_subject = Util::substr($form_subject, 0, 100);
 
 			if (isset($_REQUEST['poll']))
-			{
-				$context['poll']['question'] = isset($_REQUEST['question']) ? Util::htmlspecialchars(trim($_REQUEST['question'])) : '';
-
-				$context['choices'] = array();
-				$choice_id = 0;
-
-				$_POST['options'] = empty($_POST['options']) ? array() : htmlspecialchars__recursive($_POST['options']);
-				foreach ($_POST['options'] as $option)
-				{
-					if (trim($option) == '')
-						continue;
-
-					$context['choices'][] = array(
-						'id' => $choice_id++,
-						'number' => $choice_id,
-						'label' => $option,
-						'is_last' => false
-					);
-				}
-
-				// One empty option for those with js disabled...I know are few... :P
-				$context['choices'][] = array(
-					'id' => $choice_id++,
-					'number' => $choice_id,
-					'label' => '',
-					'is_last' => false
-				);
-
-				if (count($context['choices']) < 2)
-				{
-					$context['choices'][] = array(
-						'id' => $choice_id++,
-						'number' => $choice_id,
-						'label' => '',
-						'is_last' => false
-					);
-				}
-
-				$context['last_choice_id'] = $choice_id;
-				$context['choices'][count($context['choices']) - 1]['is_last'] = true;
-			}
+				$this->_preparePollContext();
 
 			// Are you... a guest?
 			if ($user_info['is_guest'])
@@ -504,9 +413,10 @@ class Post_Controller extends Action_Controller
 			if (isset($_REQUEST['msg']) && !empty($topic))
 			{
 				require_once(SUBSDIR . '/Messages.subs.php');
+				$msg_id = (int) $_REQUEST['msg'];
 
 				// Get the existing message.
-				$message = messageDetails((int) $_REQUEST['msg'], $topic);
+				$message = messageDetails((int) $msg_id, $topic);
 
 				// The message they were trying to edit was most likely deleted.
 				// @todo Change this error message?
@@ -521,7 +431,22 @@ class Post_Controller extends Action_Controller
 				prepareMessageContext($message);
 			}
 			elseif (isset($_REQUEST['last_msg']))
-				list ($form_subject,) = getFormMsgSubject(false, $topic, $first_subject);
+			{
+				// @todo: sort out what kind of combinations are actually possible
+				// Posting a quoted reply?
+				if ((!empty($topic) && !empty($_REQUEST['quote'])) || (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup'])))
+				{
+					$case = 2;
+					$msg_id = !empty($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'];
+				}
+				// Posting a reply without a quote?
+				elseif (!empty($topic) && empty($_REQUEST['quote']))
+					$case = 3;
+				else
+					$case = 4;
+
+				list ($form_subject,) = getFormMsgSubject($case, $topic, $first_subject);
+			}
 
 			// No check is needed, since nothing is really posted.
 			checkSubmitOnce('free');
@@ -529,9 +454,14 @@ class Post_Controller extends Action_Controller
 		// Editing a message...
 		elseif (isset($_REQUEST['msg']) && !empty($topic))
 		{
-			$_REQUEST['msg'] = (int) $_REQUEST['msg'];
+			$msg_id = (int) $_REQUEST['msg'];
 
-			$message = getFormMsgSubject(true, $topic);
+			$message = getFormMsgSubject(1, $topic, '', $msg_id);
+
+			// The message they were trying to edit was most likely deleted.
+			if ($message === false)
+				fatal_lang_error('no_message', false);
+
 			if (!empty($message['errors']))
 				foreach ($errors as $error)
 					$post_errors->addError($error);
@@ -548,7 +478,7 @@ class Post_Controller extends Action_Controller
 			$context['icon'] = $message['message']['icon'];
 
 			// Set the destination.
-			$context['destination'] = 'post2;start=' . $_REQUEST['start'] . ';msg=' . $_REQUEST['msg'] . ';' . $context['session_var'] . '=' . $context['session_id'] . (isset($_REQUEST['poll']) ? ';poll' : '');
+			$context['destination'] = 'post2;start=' . $_REQUEST['start'] . ';msg=' . $msg_id . ';' . $context['session_var'] . '=' . $context['session_id'] . (isset($_REQUEST['poll']) ? ';poll' : '');
 			$context['submit_label'] = $txt['save'];
 		}
 		// Posting...
@@ -567,31 +497,25 @@ class Post_Controller extends Action_Controller
 
 			$context['submit_label'] = $txt['post'];
 
-			list ($form_subject, $form_message) = getFormMsgSubject(false, $topic, $first_subject);
+			// @todo: sort out what kind of combinations are actually possible
+			// Posting a quoted reply?
+			if ((!empty($topic) && !empty($_REQUEST['quote'])) || (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup'])))
+			{
+				$case = 2;
+				$msg_id = !empty($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'];
+			}
+			// Posting a reply without a quote?
+			elseif (!empty($topic) && empty($_REQUEST['quote']))
+				$case = 3;
+			else
+				$case = 4;
+
+			list ($form_subject, $form_message) = getFormMsgSubject($case, $topic, $first_subject);
 		}
 
 		// Check whether this is a really old post being bumped...
 		if (!empty($topic) && !empty($modSettings['oldTopicDays']) && $lastPostTime + $modSettings['oldTopicDays'] * 86400 < time() && empty($sticky) && !isset($_REQUEST['subject']))
 			$post_errors->addError(array('old_topic', array($modSettings['oldTopicDays'])), 0);
-
-		// Are we moving a discussion to its own topic?
-		if (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup']))
-		{
-			$context['original_post'] = isset($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'];
-			$context['show_boards_dropdown'] = true;
-			require_once(SUBSDIR . '/Boards.subs.php');
-			$context += getBoardList(array('not_redirection' => true, 'allowed_to' => 'post_new'));
-			$context['boards_current_disabled'] = false;
-			if (!empty($board))
-			{
-				foreach ($context['categories'] as $id => $values)
-					if (isset($values['boards'][$board]))
-					{
-						$context['categories'][$id]['boards'][$board]['selected'] = true;
-						break;
-					}
-			}
-		}
 
 		$context['attachments']['can']['post'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
 		if ($context['attachments']['can']['post'])
@@ -1499,64 +1423,7 @@ class Post_Controller extends Action_Controller
 
 		// Make the poll...
 		if (isset($_REQUEST['poll']))
-		{
-			// Make sure that the user has not entered a ridiculous number of options..
-			if (empty($_POST['poll_max_votes']) || $_POST['poll_max_votes'] <= 0)
-				$_POST['poll_max_votes'] = 1;
-			elseif ($_POST['poll_max_votes'] > count($_POST['options']))
-				$_POST['poll_max_votes'] = count($_POST['options']);
-			else
-				$_POST['poll_max_votes'] = (int) $_POST['poll_max_votes'];
-
-			$_POST['poll_expire'] = (int) $_POST['poll_expire'];
-			$_POST['poll_expire'] = $_POST['poll_expire'] > 9999 ? 9999 : ($_POST['poll_expire'] < 0 ? 0 : $_POST['poll_expire']);
-
-			// Just set it to zero if it's not there..
-			if (!isset($_POST['poll_hide']))
-				$_POST['poll_hide'] = 0;
-			else
-				$_POST['poll_hide'] = (int) $_POST['poll_hide'];
-
-			$_POST['poll_change_vote'] = isset($_POST['poll_change_vote']) ? 1 : 0;
-			$_POST['poll_guest_vote'] = isset($_POST['poll_guest_vote']) ? 1 : 0;
-
-			// Make sure guests are actually allowed to vote generally.
-			if ($_POST['poll_guest_vote'])
-			{
-				require_once(SUBSDIR . '/Members.subs.php');
-				$allowedVoteGroups = groupsAllowedTo('poll_vote', $board);
-
-				if (!in_array(-1, $allowedVoteGroups['allowed']))
-					$_POST['poll_guest_vote'] = 0;
-			}
-
-			// If the user tries to set the poll too far in advance, don't let them.
-			if (!empty($_POST['poll_expire']) && $_POST['poll_expire'] < 1)
-				fatal_lang_error('poll_range_error', false);
-			// Don't allow them to select option 2 for hidden results if it's not time limited.
-			elseif (empty($_POST['poll_expire']) && $_POST['poll_hide'] == 2)
-				$_POST['poll_hide'] = 1;
-
-			// Clean up the question and answers.
-			$_POST['question'] = htmlspecialchars($_POST['question'], ENT_COMPAT, 'UTF-8');
-			$_POST['question'] = Util::truncate($_POST['question'], 255);
-			$_POST['question'] = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', $_POST['question']);
-			$_POST['options'] = htmlspecialchars__recursive($_POST['options']);
-
-			// Finally, make the poll.
-			require_once(SUBSDIR . '/Poll.subs.php');
-			$id_poll = createPoll(
-				$_POST['question'],
-				$user_info['id'],
-				$_POST['guestname'],
-				$_POST['poll_max_votes'],
-				$_POST['poll_hide'],
-				$_POST['poll_expire'],
-				$_POST['poll_change_vote'],
-				$_POST['poll_guest_vote'],
-				$_POST['options']
-			);
-		}
+			$id_poll = $this->_createPoll($_POST, $_POST['guestname']);
 		else
 			$id_poll = 0;
 
@@ -1839,7 +1706,7 @@ class Post_Controller extends Action_Controller
 	}
 
 	/**
-	 * Loads a post an inserts it into the current editing text box.
+	 * Loads a post and inserts it into the current editing text box.
 	 * Used to quick edit a post as well as to quote a post and place it in the quick reply box
 	 * Can be used to quick edit just the subject from the topic listing
 	 *
@@ -1851,36 +1718,13 @@ class Post_Controller extends Action_Controller
 	{
 		global $modSettings, $user_info, $context;
 
-		$db = database();
-
 		loadLanguage('Post');
-
-		require_once(SUBSDIR . '/Post.subs.php');
-
-		$moderate_boards = boardsAllowedTo('moderate_board');
 
 		// Where we going if we need to?
 		$context['post_box_name'] = isset($_GET['pb']) ? $_GET['pb'] : '';
 
-		$request = $db->query('', '
-			SELECT IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.body, m.id_topic, m.subject,
-				m.id_board, m.id_member, m.approved
-			FROM {db_prefix}messages AS m
-				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
-				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
-				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-			WHERE m.id_msg = {int:id_msg}' . (isset($_REQUEST['modify']) || (!empty($moderate_boards) && $moderate_boards[0] == 0) ? '' : '
-				AND (t.locked = {int:not_locked}' . (empty($moderate_boards) ? '' : ' OR b.id_board IN ({array_int:moderation_board_list})') . ')') . '
-			LIMIT 1',
-			array(
-				'current_member' => $user_info['id'],
-				'moderation_board_list' => $moderate_boards,
-				'id_msg' => (int) $_REQUEST['quote'],
-				'not_locked' => 0,
-			)
-		);
-		$row = $db->fetch_assoc($request);
-		$db->free_result($request);
+		require_once(SUBSDIR . '/Messages.subs.php');
+		$row = quoteMessageInfo((int) $_REQUEST['quote'], isset($_REQUEST['modify']));
 
 		$context['sub_template'] = 'quotefast';
 		if (!empty($row))
@@ -1950,39 +1794,18 @@ class Post_Controller extends Action_Controller
 		global $modSettings, $board, $topic, $txt;
 		global $user_info, $context, $language;
 
-		$db = database();
-
 		// We have to have a topic!
 		if (empty($topic))
 			obExit(false);
 
 		checkSession('get');
 		require_once(SUBSDIR . '/Post.subs.php');
+		require_once(SUBSDIR . '/Topic.subs.php');
 
-		// Assume the first message if no message ID was given.
-		$request = $db->query('', '
-			SELECT
-				t.locked, t.num_replies, t.id_member_started, t.id_first_msg,
-				m.id_msg, m.id_member, m.poster_time, m.subject, m.smileys_enabled, m.body, m.icon,
-				m.modified_time, m.modified_name, m.approved
-			FROM {db_prefix}messages AS m
-				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = {int:current_topic})
-			WHERE m.id_msg = {raw:id_msg}
-				AND m.id_topic = {int:current_topic}' . (allowedTo('modify_any') || allowedTo('approve_posts') ? '' : (!$modSettings['postmod_active'] ? '
-				AND (m.id_member != {int:guest_id} AND m.id_member = {int:current_member})' : '
-				AND (m.approved = {int:is_approved} OR (m.id_member != {int:guest_id} AND m.id_member = {int:current_member}))')),
-			array(
-				'current_member' => $user_info['id'],
-				'current_topic' => $topic,
-				'id_msg' => empty($_REQUEST['msg']) ? 't.id_first_msg' : (int) $_REQUEST['msg'],
-				'is_approved' => 1,
-				'guest_id' => 0,
-			)
-		);
-		if ($db->num_rows($request) == 0)
+		$row = getTopicInfoByMsg($topic, empty($_REQUEST['msg']) ? 0 : (int) $_REQUEST['msg']);
+
+		if (empty($row))
 			fatal_lang_error('no_board', false);
-		$row = $db->fetch_assoc($request);
-		$db->free_result($request);
 
 		// Change either body or subject requires permissions to modify messages.
 		if (isset($_POST['message']) || isset($_POST['subject']) || isset($_REQUEST['icon']))
@@ -2130,17 +1953,7 @@ class Post_Controller extends Action_Controller
 					cache_put_data('response_prefix', $context['response_prefix'], 600);
 				}
 
-				$db->query('', '
-					UPDATE {db_prefix}messages
-					SET subject = {string:subject}
-					WHERE id_topic = {int:current_topic}
-						AND id_msg != {int:id_first_msg}',
-					array(
-						'current_topic' => $topic,
-						'id_first_msg' => $row['id_first_msg'],
-						'subject' => $context['response_prefix'] . $_POST['subject'],
-					)
-				);
+				topicSubject(array('id_topic' => $topic, 'id_first_msg' => $row['id_first_msg']), $_POST['subject'], $context['response_prefix'], true);
 			}
 
 			if (!empty($moderationAction))
@@ -2334,5 +2147,219 @@ class Post_Controller extends Action_Controller
 				'link' => '<a href="' . $scripturl . '?action=post;board=' . $draft['id_board'] . ';' . (!empty($draft['id_topic']) ? 'topic='. $draft['id_topic'] .'.0;' : '') . 'id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
 			);
 		}
+	}
+
+	/**
+	 * Loads in context stuff related to the envent
+	 */
+	private function _prepareEventContext($event_id)
+	{
+		global $context, $user_info, $modSettings, $board;
+
+		// They might want to pick a board.
+		if (!isset($context['current_board']))
+			$context['current_board'] = 0;
+
+		// Start loading up the event info.
+		$context['event'] = array();
+		$context['event']['title'] = isset($_REQUEST['evtitle']) ? htmlspecialchars(stripslashes($_REQUEST['evtitle']), ENT_COMPAT, 'UTF-8') : '';
+		$context['event']['id'] = $event_id;
+		$context['event']['new'] = $context['event']['id'] == -1;
+
+		// Permissions check!
+		isAllowedTo('calendar_post');
+
+		// Editing an event?  (but NOT previewing!?)
+		if (empty($context['event']['new']) && !isset($_REQUEST['subject']))
+		{
+			// Get the current event information.
+			require_once(SUBSDIR . '/Calendar.subs.php');
+			$event_info = getEventProperties($context['event']['id']);
+
+			// Make sure the user is allowed to edit this event.
+			if ($event_info['member'] != $user_info['id'])
+				isAllowedTo('calendar_edit_any');
+			elseif (!allowedTo('calendar_edit_any'))
+				isAllowedTo('calendar_edit_own');
+
+			$context['event']['month'] = $event_info['month'];
+			$context['event']['day'] = $event_info['day'];
+			$context['event']['year'] = $event_info['year'];
+			$context['event']['title'] = $event_info['title'];
+			$context['event']['span'] = $event_info['span'];
+		}
+		else
+		{
+			// Posting a new event? (or preview...)
+			$today = getdate();
+
+			// You must have a month and year specified!
+			if (isset($_REQUEST['month']))
+				$context['event']['month'] = (int) $_REQUEST['month'];
+			else
+				$_REQUEST['month'] = $today['mon'];
+
+			if (isset($_REQUEST['year']))
+				$context['event']['year'] = (int) $_REQUEST['year'];
+			else
+				$_REQUEST['year'] = $today['year'];
+
+			if (isset($_REQUEST['day']))
+				$context['event']['day'] = (int) $_REQUEST['day'];
+			else
+				$context['event']['day'] = $_REQUEST['month'] == $today['mon'] ? $today['mday'] : 0;
+
+			$context['event']['span'] = isset($_REQUEST['span']) ? $_REQUEST['span'] : 1;
+
+			// Make sure the year and month are in the valid range.
+			if ($context['event']['month'] < 1 || $context['event']['month'] > 12)
+				fatal_lang_error('invalid_month', false);
+
+			if ($context['event']['year'] < $modSettings['cal_minyear'] || $context['event']['year'] > $modSettings['cal_maxyear'])
+				fatal_lang_error('invalid_year', false);
+
+			// Get a list of boards they can post in.
+			require_once(SUBSDIR . '/Boards.subs.php');
+
+			$boards = boardsAllowedTo('post_new');
+			if (empty($boards))
+				fatal_lang_error('cannot_post_new', 'user');
+
+			// Load a list of boards for this event in the context.
+			$boardListOptions = array(
+				'included_boards' => in_array(0, $boards) ? null : $boards,
+				'not_redirection' => true,
+				'selected_board' => empty($context['current_board']) ? $modSettings['cal_defaultboard'] : $context['current_board'],
+			);
+			$context += getBoardList($boardListOptions);
+		}
+
+		// Find the last day of the month.
+		$context['event']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['event']['month'] == 12 ? 1 : $context['event']['month'] + 1, 0, $context['event']['month'] == 12 ? $context['event']['year'] + 1 : $context['event']['year']));
+
+		$context['event']['board'] = !empty($board) ? $board : $modSettings['cal_defaultboard'];
+	}
+
+	/**
+	 * Loads in context stuff related to polls
+	 */
+	private function _preparePollContext()
+	{
+		global $context;
+
+		$context['poll']['question'] = isset($_REQUEST['question']) ? Util::htmlspecialchars(trim($_REQUEST['question'])) : '';
+
+		$context['poll']['choices'] = array();
+		// @deprecated since 1.1 - backward compatibility with 1.0
+		$context['choices'] &= $context['poll']['choices'];
+		$choice_id = 0;
+
+		$_POST['options'] = empty($_POST['options']) ? array() : htmlspecialchars__recursive($_POST['options']);
+		foreach ($_POST['options'] as $option)
+		{
+			if (trim($option) == '')
+				continue;
+
+			$context['poll']['choices'][] = array(
+				'id' => $choice_id++,
+				'number' => $choice_id,
+				'label' => $option,
+				'is_last' => false
+			);
+		}
+
+		// One empty option for those with js disabled...I know are few... :P
+		$context['poll']['choices'][] = array(
+			'id' => $choice_id++,
+			'number' => $choice_id,
+			'label' => '',
+			'is_last' => false
+		);
+
+		if (count($context['poll']['choices']) < 2)
+		{
+			$context['poll']['choices'][] = array(
+				'id' => $choice_id++,
+				'number' => $choice_id,
+				'label' => '',
+				'is_last' => false
+			);
+		}
+
+		$context['last_choice_id'] = $choice_id;
+		$context['poll']['choices'][count($context['poll']['choices']) - 1]['is_last'] = true;
+	}
+
+	/**
+	 * Creates a poll based on an array (of POST'ed data)
+	 *
+	 * @param mixed[] $options
+	 * @param string $user_name The username of the member that creates the poll
+	 *
+	 * @return int - the id of the newly created poll
+	 */
+	private function _createPoll($options, $user_name)
+	{
+		global $user_info, $board;
+
+		// Make sure that the user has not entered a ridiculous number of options..
+		if (empty($options['poll_max_votes']) || $options['poll_max_votes'] <= 0)
+			$poll_max_votes = 1;
+		elseif ($options['poll_max_votes'] > count($options['options']))
+			$poll_max_votes = count($options['options']);
+		else
+			$poll_max_votes = (int) $options['poll_max_votes'];
+
+		$poll_expire = (int) $options['poll_expire'];
+		$poll_expire = $poll_expire > 9999 ? 9999 : ($poll_expire < 0 ? 0 : $poll_expire);
+
+		// Just set it to zero if it's not there..
+		if (isset($options['poll_hide']))
+			$poll_hide = (int) $options['poll_hide'];
+		else
+			$poll_hide = 0;
+
+		$poll_change_vote = isset($options['poll_change_vote']) ? 1 : 0;
+		$poll_guest_vote = isset($options['poll_guest_vote']) ? 1 : 0;
+
+		// Make sure guests are actually allowed to vote generally.
+		if ($poll_guest_vote)
+		{
+			require_once(SUBSDIR . '/Members.subs.php');
+			$allowedVoteGroups = groupsAllowedTo('poll_vote', $board);
+
+			if (!in_array(-1, $allowedVoteGroups['allowed']))
+				$poll_guest_vote = 0;
+		}
+
+		// If the user tries to set the poll too far in advance, don't let them.
+		if (!empty($poll_expire) && $poll_expire < 1)
+			// @todo this fatal error should not be here
+			fatal_lang_error('poll_range_error', false);
+		// Don't allow them to select option 2 for hidden results if it's not time limited.
+		elseif (empty($poll_expire) && $poll_hide == 2)
+			$poll_hide = 1;
+
+		// Clean up the question and answers.
+		$question = htmlspecialchars($options['question'], ENT_COMPAT, 'UTF-8');
+		$question = Util::truncate($question, 255);
+		$question = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', $question);
+		$poll_options = htmlspecialchars__recursive($options['options']);
+
+		// Finally, make the poll.
+		require_once(SUBSDIR . '/Poll.subs.php');
+		$id_poll = createPoll(
+			$question,
+			$user_info['id'],
+			$user_name,
+			$poll_max_votes,
+			$poll_hide,
+			$poll_expire,
+			$poll_change_vote,
+			$poll_guest_vote,
+			$poll_options
+		);
+
+		return $id_poll;
 	}
 }

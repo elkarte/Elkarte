@@ -126,6 +126,51 @@ function basicMessageInfo($id_msg, $override_permissions = false, $detailed = fa
 }
 
 /**
+ * Get some basic info of a certain message, good to create a quote.
+ * Very similar to many other queries, though slightly different.
+ * Uses {query_see_board} and the 'moderate_board' permission
+ *
+ * @param int $id_msg
+ * @todo why it doesn't take into account post moderation?
+ */
+function quoteMessageInfo($id_msg, $modify)
+{
+	global $user_info;
+
+	if (empty($id_msg))
+		return false;
+
+	$db = database();
+
+	require_once(SUBSDIR . '/Post.subs.php');
+
+	$moderate_boards = boardsAllowedTo('moderate_board');
+
+	$request = $db->query('', '
+		SELECT IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.body, m.id_topic, m.subject,
+			m.id_board, m.id_member, m.approved
+		FROM {db_prefix}messages AS m
+			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
+		WHERE m.id_msg = {int:id_msg}' . ($modify || (!empty($moderate_boards) && $moderate_boards[0] == 0) ? '' : '
+			AND (t.locked = {int:not_locked}' . (empty($moderate_boards) ? '' : ' OR b.id_board IN ({array_int:moderation_board_list})') . ')') . '
+		LIMIT 1',
+		array(
+			'current_member' => $user_info['id'],
+			'moderation_board_list' => $moderate_boards,
+			'id_msg' => $id_msg,
+			'not_locked' => 0,
+		)
+	);
+
+	$messageInfo = $db->fetch_assoc($request);
+	$db->free_result($request);
+
+	return $messageInfo;
+}
+
+/**
  * Checks permissions to modify a message.
  * This function will give a fatal error if the current user
  * doesn't have permissions to modify the message.
