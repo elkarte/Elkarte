@@ -200,10 +200,13 @@ legend {
 /* just in case someone tries to use this class elsewhere. */
 .pm_indicator {
 	right: auto;
-	left: -0.5em;
+	left: -0.4em;
 	float: right;
 	border-radius: 8px 8px 0 8px;
-	box-shadow: -3px 3px 3px rgba(0,0,0,0.25);
+	box-shadow: -2px 2px 3px rgba(0,0,0,0.25), 0 -1px 0 #3d6e32 inset;
+}
+#dropdown_menu_1 .pm_indicator {
+	margin-left: 2px;
 }
 /* Admin menu icons. */
 .linklevel2>img {

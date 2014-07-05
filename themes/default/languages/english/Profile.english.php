@@ -32,18 +32,12 @@ $txt['change_profile'] = 'Change profile';
 $txt['preview_signature'] = 'Preview signature';
 $txt['current_signature'] = 'Current signature';
 $txt['signature_preview'] = 'Signature preview';
-$txt['delete_user'] = 'Delete user';
-$txt['current_status'] = 'Current Status:';
 $txt['personal_picture'] = 'Personalized Picture';
 $txt['no_avatar'] = 'No avatar';
 $txt['choose_avatar_gallery'] = 'Choose avatar from gallery';
-$txt['picture_text'] = 'Picture/Text';
-$txt['reset_form'] = 'Reset Form';
 $txt['preferred_language'] = 'Preferred Language';
 $txt['age'] = 'Age';
 $txt['no_pic'] = '(no pic)';
-$txt['latest_posts'] = 'Latest posts of: ';
-$txt['additional_info'] = 'Additional Information';
 $txt['avatar_by_url'] = 'Specify your own avatar by URL. (e.g.: <em>http://www.mypage.com/mypic.png</em>)';
 $txt['my_own_pic'] = 'Specify avatar by URL';
 $txt['gravatar'] = 'Gravatar';
@@ -77,8 +71,6 @@ $txt['secret_question'] = 'Secret Question';
 $txt['secret_desc'] = 'To help retrieve your password, enter a question here with an answer that <strong>only</strong> you know.';
 $txt['secret_desc2'] = 'Choose carefully, you wouldn\'t want someone guessing your answer!';
 $txt['secret_answer'] = 'Answer';
-$txt['secret_ask'] = 'Ask me my question';
-$txt['cant_retrieve'] = 'You can\'t retrieve your password, but you can set a new one by following a link sent to you by email.  You also have the option of setting a new password by answering your secret question.';
 $txt['incorrect_answer'] = 'Sorry, but you did not specify a valid combination of Secret Question and Answer in your profile.  Please click on the back button, and use the default method of obtaining your password.';
 $txt['enter_new_password'] = 'Please enter the answer to your question, and the password you would like to use.  Your password will be changed to the one you select provided you answer the question correctly.';
 $txt['secret_why_blank'] = 'why is this blank?';
@@ -96,7 +88,6 @@ $txt['reminder_continue'] = 'Continue';
 
 $txt['current_theme'] = 'Current Theme';
 $txt['change'] = 'Change Theme';
-$txt['theme_preferences'] = 'Theme preferences';
 $txt['theme_forum_default'] = 'Forum or Board Default';
 $txt['theme_forum_default_desc'] = 'This is the default theme, which means your theme will change along with the administrator\'s settings and the board you are viewing.';
 
@@ -127,12 +118,10 @@ $txt['notify_send_body_pbe'] = 'When sending email notifications, send the full 
 $txt['notify_send_body_pbe_post'] = '<strong>NOT</strong> available with Daily / Weekly summary';
 
 $txt['notifications_topics'] = 'Current Topic Notifications';
-$txt['notifications_topics_list'] = 'You are being notified of replies to the following topics';
 $txt['notifications_topics_none'] = 'You are not currently receiving any notifications from topics.';
 $txt['notifications_topics_howto'] = 'To receive notifications from a specific topic, click the &quot;Notify&quot; button while viewing it.';
 
 $txt['notifications_boards'] = 'Current Board Notifications';
-$txt['notifications_boards_list'] = 'You are being notified of new topics posted in the following boards';
 $txt['notifications_boards_none'] = 'You aren\'t receiving notifications on any boards right now.';
 $txt['notifications_boards_howto'] = 'To request notifications from a specific board, either click the &quot;Notify&quot; button in the index of that board <strong>or</strong> use the checkboxes below to enable select board notifications.';
 $txt['notifications_boards_current'] = 'You are receiving notifications on the boards shown in <strong>BOLD</strong>.  Use the checkboxes to turn these off or add additional boards to your notification list';
@@ -157,7 +146,6 @@ $txt['statPanel_topBoards_memberposts'] = '%1$d posts of the member\'s %2$d post
 $txt['statPanel_topBoardsActivity'] = 'Most Popular Boards By Activity';
 $txt['statPanel_activityTime'] = 'Posting Activity By Time';
 $txt['statPanel_activityTime_posts'] = '%1$d posts (%2$d%%)';
-$txt['statPanel_timeOfDay'] = 'Time of Day';
 
 $txt['deleteAccount_warning'] = 'Warning - These actions are irreversible!';
 $txt['deleteAccount_desc'] = 'From this page you can delete this user\'s account and posts.';
