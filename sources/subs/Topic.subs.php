@@ -1866,11 +1866,13 @@ function topicsDetails($topics)
 }
 
 /**
- * Toggle sticky status for the passed topics.
+ * Toggle sticky status for the passed topics and logs the action.
  *
  * @param int[] $topics
+ * @param bool $log If true the action is logged
+ * @return int Number of topics toggled
  */
-function toggleTopicSticky($topics)
+function toggleTopicSticky($topics, $log = false)
 {
 	$db = database();
 
@@ -1885,7 +1887,37 @@ function toggleTopicSticky($topics)
 		)
 	);
 
-	return $db->affected_rows();
+	$toggled = $db->affected_rows();
+
+	if ($log)
+	{
+		// Get the board IDs and Sticky status
+		$request = $db->query('', '
+			SELECT id_topic, id_board, is_sticky
+			FROM {db_prefix}topics
+			WHERE id_topic IN ({array_int:sticky_topic_ids})
+			LIMIT ' . count($topics),
+			array(
+				'sticky_topic_ids' => $topics,
+			)
+		);
+		$stickyCacheBoards = array();
+		$stickyCacheStatus = array();
+		while ($row = $db->fetch_assoc($request))
+		{
+			$stickyCacheBoards[$row['id_topic']] = $row['id_board'];
+			$stickyCacheStatus[$row['id_topic']] = empty($row['is_sticky']);
+		}
+		$db->free_result($request);
+
+		foreach ($topics as $topic)
+		{
+			logAction($stickyCacheStatus[$topic] ? 'unsticky' : 'sticky', array('topic' => $topic, 'board' => $stickyCacheBoards[$topic]));
+			sendNotifications($topic, 'sticky');
+		}
+	}
+
+	return $toggled;
 }
 
 /**
