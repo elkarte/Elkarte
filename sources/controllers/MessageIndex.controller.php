@@ -551,7 +551,7 @@ class MessageIndex_Controller extends Action_Controller
 
 		// Do all the stickies...
 		if (!empty($stickyCache))
-			toggleTopicSticky($stickyCache);
+			toggleTopicSticky($stickyCache, true);
 
 		// Move sucka! (this is, by the by, probably the most complicated part....)
 		if (!empty($moveCache[0]))
@@ -645,43 +645,7 @@ class MessageIndex_Controller extends Action_Controller
 
 		// Now delete the topics...
 		if (!empty($removeCache))
-		{
-			// They can only delete their own topics. (we wouldn't be here if they couldn't do that..)
-			$result = $db->query('', '
-				SELECT id_topic, id_board
-				FROM {db_prefix}topics
-				WHERE id_topic IN ({array_int:removed_topic_ids})' . (!empty($board) && !allowedTo('remove_any') ? '
-					AND id_member_started = {int:current_member}' : '') . '
-				LIMIT ' . count($removeCache),
-				array(
-					'current_member' => $user_info['id'],
-					'removed_topic_ids' => $removeCache,
-				)
-			);
-
-			$removeCache = array();
-			$removeCacheBoards = array();
-			while ($row = $db->fetch_assoc($result))
-			{
-				$removeCache[] = $row['id_topic'];
-				$removeCacheBoards[$row['id_topic']] = $row['id_board'];
-			}
-			$db->free_result($result);
-
-			// Maybe *none* were their own topics.
-			if (!empty($removeCache))
-			{
-				// Gotta send the notifications *first*!
-				foreach ($removeCache as $topic)
-				{
-					// Only log the topic ID if it's not in the recycle board.
-					logAction('remove', array((empty($modSettings['recycle_enable']) || $modSettings['recycle_board'] != $removeCacheBoards[$topic] ? 'topic' : 'old_topic_id') => $topic, 'board' => $removeCacheBoards[$topic]));
-					sendNotifications($topic, 'remove');
-				}
-
-				removeTopics($removeCache);
-			}
-		}
+			removeTopicsPermissions($removeCache);
 
 		// Approve the topics...
 		if (!empty($approveCache))
