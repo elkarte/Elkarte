@@ -24,26 +24,78 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
+ * Removes the passed id_topic's checking for permissions.
+ * Permissions are NOT checked here because the function is used in a scheduled task
+ *
+ * @param int[]|int $topics The topics to remove (can be an id or an array of ids).
+ */
+function removeTopicsPermissions($topics)
+{
+	global $board, $user_info;
+
+	$db = database();
+
+	// They can only delete their own topics. (we wouldn't be here if they couldn't do that..)
+	$result = $db->query('', '
+		SELECT id_topic, id_board
+		FROM {db_prefix}topics
+		WHERE id_topic IN ({array_int:removed_topic_ids})' . (!empty($board) && !allowedTo('remove_any') ? '
+			AND id_member_started = {int:current_member}' : '') . '
+		LIMIT ' . count($topics),
+		array(
+			'current_member' => $user_info['id'],
+			'removed_topic_ids' => $topics,
+		)
+	);
+
+	$removeCache = array();
+	$removeCacheBoards = array();
+	while ($row = $db->fetch_assoc($result))
+	{
+		$removeCache[] = $row['id_topic'];
+		$removeCacheBoards[$row['id_topic']] = $row['id_board'];
+	}
+	$db->free_result($result);
+
+	// Maybe *none* were their own topics.
+	if (!empty($removeCache))
+		removeTopics($removeCache, true, false, true, $removeCacheBoards);
+}
+
+/**
  * Removes the passed id_topic's.
  * Permissions are NOT checked here because the function is used in a scheduled task
  *
  * @param int[]|int $topics The topics to remove (can be an id or an array of ids).
  * @param bool $decreasePostCount if true users' post count will be reduced
  * @param bool $ignoreRecycling if true topics are not moved to the recycle board (if it exists).
+ * @param bool $log if true logs the action.
+ * @param int[] $removeCacheBoards an array matching topics and boards.
  */
-function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = false)
+function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = false, $log = false, $removeCacheBoards = array())
 {
 	global $modSettings;
-
-	$db = database();
 
 	// Nothing to do?
 	if (empty($topics))
 		return;
 
+	$db = database();
+
 	// Only a single topic.
-	if (is_numeric($topics))
+	if (!is_array($topics))
 		$topics = array($topics);
+
+	if ($log)
+	{
+		// Gotta send the notifications *first*!
+		foreach ($topics as $topic)
+		{
+			// Only log the topic ID if it's not in the recycle board.
+			logAction('remove', array((empty($modSettings['recycle_enable']) || $modSettings['recycle_board'] != $removeCacheBoards[$topic] ? 'topic' : 'old_topic_id') => $topic, 'board' => $removeCacheBoards[$topic]));
+			sendNotifications($topic, 'remove');
+		}
+	}
 
 	// Decrease the post counts for members.
 	if ($decreasePostCount)
