@@ -1,26 +1,5 @@
 #### ATTENTION: You do not need to run or use this file!  The install.php script does everything for you!
-#### Install script for MySQL 4.0.18+
-
-#
-# Table structure for table `admin_info_files`
-#
-
-$db_table->db_create_table('{db_prefix}admin_info_files',
-	array(
-		array('name' => 'id_file',    'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'auto' => true),
-		array('name' => 'filename',   'type' => 'varchar', 'default' => '', 'size' => 255),
-		array('name' => 'path',       'type' => 'varchar', 'default' => '', 'size' => 255),
-		array('name' => 'parameters', 'type' => 'varchar', 'default' => '', 'size' => 255),
-		array('name' => 'data',       'type' => 'text'),
-		array('name' => 'filetype',   'type' => 'varchar', 'default' => '', 'size' => 255),
-	),
-	array(
-		array('name' => 'id_file',  'columns' => array('id_file'), 'type' => 'primary'),
-		array('name' => 'filename', 'columns' => array('filename(30)'), 'type' => 'key'),
-	),
-	array(),
-	'ignore'
-);
+#### Install script
 
 #
 # Table structure for table `antispam_questions`

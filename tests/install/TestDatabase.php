@@ -33,7 +33,6 @@ class TestDatabase extends UnitTestCase
 		$tables = $db->db_list_tables();
 
 		$known_tables = array(
-			'admin_info_files',
 			'antispam_questions',
 			'approval_queue',
 			'attachments',

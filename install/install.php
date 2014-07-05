@@ -1445,9 +1445,7 @@ class Install_Controller
 		{
 			// The variable is usually defined in index.php so lets just use our variable to do it for us.
 			$forum_version = $current_version;
-			// Now go get those files!
-			$task = new Scheduled_Task();
-			$task->fetchFiles();
+
 			// We've just installed!
 			$user_info['ip'] = $_SERVER['REMOTE_ADDR'];
 			$user_info['id'] = isset($incontext['member_id']) ? $incontext['member_id'] : 0;
