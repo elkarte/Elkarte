@@ -453,6 +453,104 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 }
 
 /**
+ * Moves lots of topics to a specific board and checks if the user can move them
+ *
+ * @param int[] $moveCache
+ */
+function moveTopicsPermissions($moveCache)
+{
+	global $board, $user_info;
+
+	$db = database();
+
+	// I know - I just KNOW you're trying to beat the system.  Too bad for you... we CHECK :P.
+	$request = $db->query('', '
+		SELECT t.id_topic, t.id_board, b.count_posts
+		FROM {db_prefix}topics AS t
+			LEFT JOIN {db_prefix}boards AS b ON (t.id_board = b.id_board)
+		WHERE t.id_topic IN ({array_int:move_topic_ids})' . (!empty($board) && !allowedTo('move_any') ? '
+			AND t.id_member_started = {int:current_member}' : '') . '
+		LIMIT ' . count($moveCache[0]),
+		array(
+			'current_member' => $user_info['id'],
+			'move_topic_ids' => $moveCache[0],
+		)
+	);
+	$moveTos = array();
+	$moveCache2 = array();
+	$countPosts = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		$to = $moveCache[1][$row['id_topic']];
+
+		if (empty($to))
+			continue;
+
+		// Does this topic's board count the posts or not?
+		$countPosts[$row['id_topic']] = empty($row['count_posts']);
+
+		if (!isset($moveTos[$to]))
+			$moveTos[$to] = array();
+
+		$moveTos[$to][] = $row['id_topic'];
+
+		// For reporting...
+		$moveCache2[] = array($row['id_topic'], $row['id_board'], $to);
+	}
+	$db->free_result($request);
+
+	$moveCache = $moveCache2;
+
+	// Do the actual moves...
+	foreach ($moveTos as $to => $topics)
+		moveTopics($topics, $to, true);
+
+	// Does the post counts need to be updated?
+	if (!empty($moveTos))
+	{
+		require_once(SUBSDIR . '/Boards.subs.php');
+		$topicRecounts = array();
+		$boards_info = fetchBoardsInfo(array('boards' => array_keys($moveTos)), array('selects' => 'posts'));
+
+		foreach ($boards_info as $row)
+		{
+			$cp = empty($row['count_posts']);
+
+			// Go through all the topics that are being moved to this board.
+			foreach ($moveTos[$row['id_board']] as $topic)
+			{
+				// If both boards have the same value for post counting then no adjustment needs to be made.
+				if ($countPosts[$topic] != $cp)
+				{
+					// If the board being moved to does count the posts then the other one doesn't so add to their post count.
+					$topicRecounts[$topic] = $cp ? 1 : -1;
+				}
+			}
+		}
+
+		if (!empty($topicRecounts))
+		{
+			require_once(SUBSDIR . '/Members.subs.php');
+
+			// Get all the members who have posted in the moved topics.
+			$posters = topicsPosters(array_keys($topicRecounts));
+			foreach ($posters as $id_member => $topics)
+			{
+				$post_adj = 0;
+				foreach ($topics as $id_topic)
+					$post_adj += $topicRecounts[$id_topic];
+
+				// And now update that member's post counts
+				if (!empty($post_adj))
+				{
+					updateMemberData($id_member, array('posts' => 'posts + ' . $post_adj));
+				}
+			}
+		}
+	}
+}
+
+/**
  * Moves one or more topics to a specific board.
  * Determines the source boards for the supplied topics
  * Handles the moving of mark_read data
@@ -461,33 +559,31 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
  *
  * @param int[]|int $topics
  * @param int $toBoard
+ * @param bool $log if true logs the action.
  */
-function moveTopics($topics, $toBoard)
+function moveTopics($topics, $toBoard, $log = false)
 {
 	global $user_info, $modSettings;
 
-	$db = database();
-
-	// Empty array?
-	if (empty($topics))
+	// No topics or no board?
+	if (empty($topics) || empty($toBoard))
 		return;
 
+	$db = database();
+
 	// Only a single topic.
-	if (is_numeric($topics))
+	if (!is_array($topics))
 		$topics = array($topics);
 
 	$fromBoards = array();
-
-	// Destination board empty or equal to 0?
-	if (empty($toBoard))
-		return;
+	$fromCacheBoards = array();
 
 	// Are we moving to the recycle board?
 	$isRecycleDest = !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $toBoard;
 
 	// Determine the source boards...
 	$request = $db->query('', '
-		SELECT id_board, approved, COUNT(*) AS num_topics, SUM(unapproved_posts) AS unapproved_posts,
+		SELECT id_topic, id_board, approved, COUNT(*) AS num_topics, SUM(unapproved_posts) AS unapproved_posts,
 			SUM(num_replies) AS num_replies
 		FROM {db_prefix}topics
 		WHERE id_topic IN ({array_int:topics})
@@ -499,8 +595,10 @@ function moveTopics($topics, $toBoard)
 	// Num of rows = 0 -> no topics found. Num of rows > 1 -> topics are on multiple boards.
 	if ($db->num_rows($request) == 0)
 		return;
+
 	while ($row = $db->fetch_assoc($request))
 	{
+		$fromCacheBoards[$row['id_topic']] = $row['id_board'];
 		if (!isset($fromBoards[$row['id_board']]['num_posts']))
 		{
 			$fromBoards[$row['id_board']] = array(
@@ -765,6 +863,15 @@ function moveTopics($topics, $toBoard)
 	updateSettings(array(
 		'calendar_updated' => time(),
 	));
+
+	if ($log)
+	{
+		foreach ($topics as $topic)
+		{
+			logAction('move', array('topic' => $topic, 'board_from' => $fromCacheBoards[$topic], 'board_to' => $toBoard));
+			sendNotifications($topic, 'move');
+		}
+	}
 }
 
 /**
