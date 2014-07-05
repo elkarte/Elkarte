@@ -821,6 +821,7 @@ class Scheduled_Task
 		// We just pass through to the daily function - avoid duplication!
 		$is_weekly = true;
 		return $this->daily_digest();
+	}
 
 	/**
 	 * Schedule birthday emails.
