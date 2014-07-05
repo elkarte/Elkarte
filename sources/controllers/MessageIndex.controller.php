@@ -551,28 +551,7 @@ class MessageIndex_Controller extends Action_Controller
 
 		// Do all the stickies...
 		if (!empty($stickyCache))
-		{
 			toggleTopicSticky($stickyCache);
-
-			// Get the board IDs and Sticky status
-			$request = $db->query('', '
-				SELECT id_topic, id_board, is_sticky
-				FROM {db_prefix}topics
-				WHERE id_topic IN ({array_int:sticky_topic_ids})
-				LIMIT ' . count($stickyCache),
-				array(
-					'sticky_topic_ids' => $stickyCache,
-				)
-			);
-			$stickyCacheBoards = array();
-			$stickyCacheStatus = array();
-			while ($row = $db->fetch_assoc($request))
-			{
-				$stickyCacheBoards[$row['id_topic']] = $row['id_board'];
-				$stickyCacheStatus[$row['id_topic']] = empty($row['is_sticky']);
-			}
-			$db->free_result($request);
-		}
 
 		// Move sucka! (this is, by the by, probably the most complicated part....)
 		if (!empty($moveCache[0]))
@@ -834,13 +813,6 @@ class MessageIndex_Controller extends Action_Controller
 			sendNotifications($topic, $lockStatus[$topic] ? 'lock' : 'unlock');
 		}
 
-		foreach ($stickyCache as $topic)
-		{
-			logAction($stickyCacheStatus[$topic] ? 'unsticky' : 'sticky', array('topic' => $topic, 'board' => $stickyCacheBoards[$topic]));
-			sendNotifications($topic, 'sticky');
-		}
-
-		require_once(SUBSDIR . '/Topic.subs.php');
 		updateTopicStats();
 		require_once(SUBSDIR . '/Messages.subs.php');
 			updateMessageStats();
