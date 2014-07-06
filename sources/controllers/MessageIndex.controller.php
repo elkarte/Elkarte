@@ -465,79 +465,75 @@ class MessageIndex_Controller extends Action_Controller
 			redirectexit($redirect_url);
 
 		// Validate each action.
-		$real_actions = array();
+		$all_actions = array();
 		foreach ($_REQUEST['actions'] as $topic => $action)
 		{
 			if (in_array($action, $possibleActions))
-				$real_actions[(int) $topic] = $action;
+				$all_actions[(int) $topic] = $action;
 		}
 
-		if (!empty($real_actions))
-		{
-			// Find all topics...
-			$topics_info = topicsDetails(array_keys($real_actions));
-
-			foreach ($topics_info as $row)
-			{
-				if (!empty($board))
-				{
-					if ($row['id_board'] != $board || ($modSettings['postmod_active'] && !$row['approved'] && !allowedTo('approve_posts')))
-						unset($real_actions[$row['id_topic']]);
-				}
-				else
-				{
-					// Don't allow them to act on unapproved posts they can't see...
-					if ($modSettings['postmod_active'] && !$row['approved'] && !in_array(0, $boards_can['approve_posts']) && !in_array($row['id_board'], $boards_can['approve_posts']))
-						unset($real_actions[$row['id_topic']]);
-					// Goodness, this is fun.  We need to validate the action.
-					elseif ($real_actions[$row['id_topic']] == 'sticky' && !in_array(0, $boards_can['make_sticky']) && !in_array($row['id_board'], $boards_can['make_sticky']))
-						unset($real_actions[$row['id_topic']]);
-					elseif ($real_actions[$row['id_topic']] == 'move' && !in_array(0, $boards_can['move_any']) && !in_array($row['id_board'], $boards_can['move_any']) && ($row['id_member_started'] != $user_info['id'] || (!in_array(0, $boards_can['move_own']) && !in_array($row['id_board'], $boards_can['move_own']))))
-						unset($real_actions[$row['id_topic']]);
-					elseif ($real_actions[$row['id_topic']] == 'remove' && !in_array(0, $boards_can['remove_any']) && !in_array($row['id_board'], $boards_can['remove_any']) && ($row['id_member_started'] != $user_info['id'] || (!in_array(0, $boards_can['remove_own']) && !in_array($row['id_board'], $boards_can['remove_own']))))
-						unset($real_actions[$row['id_topic']]);
-					elseif ($real_actions[$row['id_topic']] == 'lock' && !in_array(0, $boards_can['lock_any']) && !in_array($row['id_board'], $boards_can['lock_any']) && ($row['id_member_started'] != $user_info['id'] || $row['locked'] == 1 || (!in_array(0, $boards_can['lock_own']) && !in_array($row['id_board'], $boards_can['lock_own']))))
-						unset($real_actions[$row['id_topic']]);
-				}
-			}
-		}
-
+		$real_actions = array();
 		$stickyCache = array();
 		$moveCache = array(0 => array(), 1 => array());
 		$removeCache = array();
 		$lockCache = array();
 		$markCache = array();
 
-		// Separate the actions.
-		foreach ($real_actions as $topic => $action)
+		if (!empty($all_actions))
 		{
-			$topic = (int) $topic;
+			// Find all topics...
+			$topics_info = topicsDetails(array_keys($all_actions));
 
-			switch ($action)
+			foreach ($topics_info as $row)
 			{
-				case 'markread':
-					$markCache[] = $topic;
-					break;
-				case 'sticky':
-					$stickyCache[] = $topic;
-					break;
-				case 'move':
-					moveTopicConcurrence();
-
-					// $moveCache[0] is the topic, $moveCache[1] is the board to move to.
-					$moveCache[1][$topic] = (int) (isset($_REQUEST['move_tos'][$topic]) ? $_REQUEST['move_tos'][$topic] : $_REQUEST['move_to']);
-
-					if (empty($moveCache[1][$topic]))
+				if (!empty($board))
+				{
+					if ($row['id_board'] != $board || ($modSettings['postmod_active'] && !$row['approved'] && !allowedTo('approve_posts')))
 						continue;
+				}
+				else
+				{
+					// Don't allow them to act on unapproved posts they can't see...
+					if ($modSettings['postmod_active'] && !$row['approved'] && !in_array(0, $boards_can['approve_posts']) && !in_array($row['id_board'], $boards_can['approve_posts']))
+						continue;
+					// Goodness, this is fun.  We need to validate the action.
+					elseif ($all_actions[$row['id_topic']] == 'sticky' && !in_array(0, $boards_can['make_sticky']) && !in_array($row['id_board'], $boards_can['make_sticky']))
+						continue;
+					elseif ($all_actions[$row['id_topic']] == 'move' && !in_array(0, $boards_can['move_any']) && !in_array($row['id_board'], $boards_can['move_any']) && ($row['id_member_started'] != $user_info['id'] || (!in_array(0, $boards_can['move_own']) && !in_array($row['id_board'], $boards_can['move_own']))))
+						continue;
+					elseif ($all_actions[$row['id_topic']] == 'remove' && !in_array(0, $boards_can['remove_any']) && !in_array($row['id_board'], $boards_can['remove_any']) && ($row['id_member_started'] != $user_info['id'] || (!in_array(0, $boards_can['remove_own']) && !in_array($row['id_board'], $boards_can['remove_own']))))
+						continue;
+					elseif ($all_actions[$row['id_topic']] == 'lock' && !in_array(0, $boards_can['lock_any']) && !in_array($row['id_board'], $boards_can['lock_any']) && ($row['id_member_started'] != $user_info['id'] || $row['locked'] == 1 || (!in_array(0, $boards_can['lock_own']) && !in_array($row['id_board'], $boards_can['lock_own']))))
+						continue;
+				}
 
-					$moveCache[0][] = $topic;
-					break;
-				case 'remove':
-					$removeCache[] = $topic;
-					break;
-				case 'lock':
-					$lockCache[] = $topic;
-					break;
+				// Separate the actions.
+				switch ($action)
+				{
+					case 'markread':
+						$markCache[] = $row['id_topic'];
+						break;
+					case 'sticky':
+						$stickyCache[] = $row['id_topic'];
+						break;
+					case 'move':
+						moveTopicConcurrence();
+
+						// $moveCache[0] is the topic, $moveCache[1] is the board to move to.
+						$moveCache[1][$row['id_topic']] = (int) (isset($_REQUEST['move_tos'][$row['id_topic']]) ? $_REQUEST['move_tos'][$row['id_topic']] : $_REQUEST['move_to']);
+
+						if (empty($moveCache[1][$row['id_topic']]))
+							continue;
+
+						$moveCache[0][] = $row['id_topic'];
+						break;
+					case 'remove':
+						$removeCache[] = $row['id_topic'];
+						break;
+					case 'lock':
+						$lockCache[] = $row['id_topic'];
+						break;
+				}
 			}
 		}
 
