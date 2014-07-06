@@ -355,6 +355,8 @@ class TopicsMerge
 		}
 
 		$this->_updateStats($affected_msgs, $id_topic, $target_subject, $enforce_subject);
+
+		return array($id_topic, $target_board);
 	}
 
 	protected function _updateStats($affected_msgs, $id_topic, $target_subject, $enforce_subject)
