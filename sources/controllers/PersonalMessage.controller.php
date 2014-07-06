@@ -544,24 +544,13 @@ class PersonalMessage_Controller extends Action_Controller
 			markMessages($pmsg);
 
 			// Figure out which flavor or 'Re: ' to use
-			if (!isset($context['response_prefix']) && !($context['response_prefix'] = cache_get_data('response_prefix')))
-			{
-				if ($language === $user_info['language'])
-					$context['response_prefix'] = $txt['response_prefix'];
-				else
-				{
-					loadLanguage('index', $language, false);
-					$context['response_prefix'] = $txt['response_prefix'];
-					loadLanguage('index');
-				}
-				cache_put_data('response_prefix', $context['response_prefix'], 600);
-			}
+			$response_prefix = response_prefix();
 
 			$form_subject = $row_quoted['subject'];
 
 			// Add 'Re: ' to it....
-			if ($context['reply'] && trim($context['response_prefix']) != '' && Util::strpos($form_subject, trim($context['response_prefix'])) !== 0)
-				$form_subject = $context['response_prefix'] . $form_subject;
+			if ($context['reply'] && trim($response_prefix) != '' && Util::strpos($form_subject, trim($response_prefix)) !== 0)
+				$form_subject = $response_prefix . $form_subject;
 
 			// If quoting, lets clean up some things and set the quote header for the pm body
 			if (isset($_REQUEST['quote']))

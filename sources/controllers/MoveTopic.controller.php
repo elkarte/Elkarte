@@ -122,7 +122,8 @@ class MoveTopic_Controller extends Action_Controller
 		}
 
 		// We will need this
-		moveTopicConcurrence();
+		if (isset($_GET['current_board']))
+			moveTopicConcurrence((int) $_GET['current_board']);
 
 		// Register this form and get a sequence number in $context.
 		checkSubmitOnce('register');
@@ -156,7 +157,8 @@ class MoveTopic_Controller extends Action_Controller
 
 		// We will need this
 		require_once(SUBSDIR . '/Topic.subs.php');
-		moveTopicConcurrence();
+		if (isset($_GET['current_board']))
+			moveTopicConcurrence((int) $_GET['current_board']);
 
 		// Make sure this form hasn't been submitted before.
 		checkSubmitOnce('check');
@@ -209,23 +211,7 @@ class MoveTopic_Controller extends Action_Controller
 			{
 				$all_messages = isset($_POST['enforce_subject']);
 				if ($all_messages)
-				{
-					// Get a response prefix, but in the forum's default language.
-					if (!isset($context['response_prefix']) && !($context['response_prefix'] = cache_get_data('response_prefix')))
-					{
-						if ($language === $user_info['language'])
-							$context['response_prefix'] = $txt['response_prefix'];
-						else
-						{
-							loadLanguage('index', $language, false);
-							$context['response_prefix'] = $txt['response_prefix'];
-							loadLanguage('index');
-						}
-						cache_put_data('response_prefix', $context['response_prefix'], 600);
-					}
-
-					topicSubject($topic_info, $custom_subject, $context['response_prefix'], $all_messages);
-				}
+					topicSubject($topic_info, $custom_subject, response_prefix(), $all_messages);
 				else
 					topicSubject($topic_info, $custom_subject);
 

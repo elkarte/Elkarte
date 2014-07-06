@@ -178,111 +178,16 @@ class MergeTopics_Controller extends Action_Controller
 		if (empty($topics) || !is_array($topics) || count($topics) == 1)
 			fatal_lang_error('merge_need_more_topics');
 
-		// Make sure every topic is numeric, or some nasty things could be done with the DB.
-		foreach ($topics as $id => $topic)
-			$topics[$id] = (int) $topic;
-
-		// Joy of all joys, make sure they're not pi**ing about with unapproved topics they can't see :P
-		if ($modSettings['postmod_active'])
-			$can_approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
-
-		// Get info about the topics and polls that will be merged.
-		$request = $db->query('', '
-			SELECT
-				t.id_topic, t.id_board, t.id_poll, t.num_views, t.is_sticky, t.approved, t.num_replies, t.unapproved_posts,
-				m1.subject, m1.poster_time AS time_started, IFNULL(mem1.id_member, 0) AS id_member_started, IFNULL(mem1.real_name, m1.poster_name) AS name_started,
-				m2.poster_time AS time_updated, IFNULL(mem2.id_member, 0) AS id_member_updated, IFNULL(mem2.real_name, m2.poster_name) AS name_updated
-			FROM {db_prefix}topics AS t
-				INNER JOIN {db_prefix}messages AS m1 ON (m1.id_msg = t.id_first_msg)
-				INNER JOIN {db_prefix}messages AS m2 ON (m2.id_msg = t.id_last_msg)
-				LEFT JOIN {db_prefix}members AS mem1 ON (mem1.id_member = m1.id_member)
-				LEFT JOIN {db_prefix}members AS mem2 ON (mem2.id_member = m2.id_member)
-			WHERE t.id_topic IN ({array_int:topic_list})
-			ORDER BY t.id_first_msg
-			LIMIT ' . count($topics),
-			array(
-				'topic_list' => $topics,
-			)
-		);
-		if ($db->num_rows($request) < 2)
-			fatal_lang_error('no_topic_id');
-		$num_views = 0;
-		$is_sticky = 0;
-		$boardTotals = array();
-		$topic_data = array();
-		$boards = array();
-		$polls = array();
-		$firstTopic = 0;
-		while ($row = $db->fetch_assoc($request))
-		{
-			// Make a note for the board counts...
-			if (!isset($boardTotals[$row['id_board']]))
-			{
-				$boardTotals[$row['id_board']] = array(
-					'num_posts' => 0,
-					'num_topics' => 0,
-					'unapproved_posts' => 0,
-					'unapproved_topics' => 0
-				);
-			}
-
-			// We can't see unapproved topics here?
-			if ($modSettings['postmod_active'] && !$row['approved'] && $can_approve_boards != array(0) && in_array($row['id_board'], $can_approve_boards))
-				continue;
-			elseif (!$row['approved'])
-				$boardTotals[$row['id_board']]['unapproved_topics']++;
-			else
-				$boardTotals[$row['id_board']]['num_topics']++;
-
-			$boardTotals[$row['id_board']]['unapproved_posts'] += $row['unapproved_posts'];
-			$boardTotals[$row['id_board']]['num_posts'] += $row['num_replies'] + ($row['approved'] ? 1 : 0);
-
-			$topic_data[$row['id_topic']] = array(
-				'id' => $row['id_topic'],
-				'board' => $row['id_board'],
-				'poll' => $row['id_poll'],
-				'num_views' => $row['num_views'],
-				'subject' => $row['subject'],
-				'started' => array(
-					'time' => standardTime($row['time_started']),
-					'html_time' => htmlTime($row['time_started']),
-					'timestamp' => forum_time(true, $row['time_started']),
-					'href' => empty($row['id_member_started']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member_started'],
-					'link' => empty($row['id_member_started']) ? $row['name_started'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member_started'] . '">' . $row['name_started'] . '</a>'
-				),
-				'updated' => array(
-					'time' => standardTime($row['time_updated']),
-					'html_time' => htmlTime($row['time_updated']),
-					'timestamp' => forum_time(true, $row['time_updated']),
-					'href' => empty($row['id_member_updated']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member_updated'],
-					'link' => empty($row['id_member_updated']) ? $row['name_updated'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member_updated'] . '">' . $row['name_updated'] . '</a>'
-				)
-			);
-			$num_views += $row['num_views'];
-			$boards[] = $row['id_board'];
-
-			// If there's no poll, id_poll == 0...
-			if ($row['id_poll'] > 0)
-				$polls[] = $row['id_poll'];
-
-			// Store the id_topic with the lowest id_first_msg.
-			if (empty($firstTopic))
-				$firstTopic = $row['id_topic'];
-
-			$is_sticky = max($is_sticky, $row['is_sticky']);
-		}
-		$db->free_result($request);
+		$merger = new TopicsMerge($topics);
 
 		// If we didn't get any topics then they've been messing with unapproved stuff.
-		if (empty($topic_data))
-			fatal_lang_error('no_topic_id');
-
-		$boards = array_values(array_unique($boards));
+		if ($merger->hasErrors())
+			fatal_lang_error($merger->firstError());
 
 		// The parameters of action_mergeExecute were set, so this must've been an internal call.
 		if (!empty($topics))
 		{
-			isAllowedTo('merge_any', $boards);
+			isAllowedTo('merge_any', $merger->boards);
 			loadTemplate('MergeTopics');
 		}
 
@@ -294,7 +199,7 @@ class MergeTopics_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Boards.subs.php');
 
 		// Make sure they can see all boards....
-		$query_boards = array('boards' => $boards);
+		$query_boards = array('boards' => $merger->boards);
 
 		if (!in_array(0, $merge_boards))
 			$query_boards['boards'] = array_merge($query_boards['boards'], $merge_boards);
@@ -303,50 +208,27 @@ class MergeTopics_Controller extends Action_Controller
 		$boards_info = fetchBoardsInfo($query_boards);
 
 		// This happens when a member is moderator of a board he cannot see
-		foreach ($boards as $board)
+		foreach ($merger->boards as $board)
 			if (!isset($boards_info[$board]))
 				fatal_lang_error('no_board');
 
 		if (empty($_REQUEST['sa']) || $_REQUEST['sa'] == 'options')
 		{
-			if (count($polls) > 1)
-			{
-				$request = $db->query('', '
-					SELECT t.id_topic, t.id_poll, m.subject, p.question
-					FROM {db_prefix}polls AS p
-						INNER JOIN {db_prefix}topics AS t ON (t.id_poll = p.id_poll)
-						INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
-					WHERE p.id_poll IN ({array_int:polls})
-					LIMIT ' . count($polls),
-					array(
-						'polls' => $polls,
-					)
-				);
-				while ($row = $db->fetch_assoc($request))
-					$context['polls'][] = array(
-						'id' => $row['id_poll'],
-						'topic' => array(
-							'id' => $row['id_topic'],
-							'subject' => $row['subject']
-						),
-						'question' => $row['question'],
-						'selected' => $row['id_topic'] == $firstTopic
-					);
-				$db->free_result($request);
-			}
-			if (count($boards) > 1)
+			$context['polls'] = $merger->getPolls();
+
+			if (count($merger->boards) > 1)
 			{
 				foreach ($boards_info as $row)
 					$context['boards'][] = array(
 						'id' => $row['id_board'],
 						'name' => $row['name'],
-						'selected' => $row['id_board'] == $topic_data[$firstTopic]['board']
+						'selected' => $row['id_board'] == $merger->topic_data[$merger->firstTopic]['board']
 					);
 			}
 
-			$context['topics'] = $topic_data;
-			foreach ($topic_data as $id => $topic)
-				$context['topics'][$id]['selected'] = $topic['id'] == $firstTopic;
+			$context['topics'] = $merger->topic_data;
+			foreach ($merger->topic_data as $id => $topic)
+				$context['topics'][$id]['selected'] = $topic['id'] == $merger->firstTopic;
 
 			$context['page_title'] = $txt['merge'];
 			$context['sub_template'] = 'merge_extra_options';
@@ -354,218 +236,23 @@ class MergeTopics_Controller extends Action_Controller
 			return;
 		}
 
-		// Determine target board.
-		$target_board = count($boards) > 1 ? (int) $_REQUEST['board'] : $boards[0];
-		if (!in_array($target_board, $boards))
-			fatal_lang_error('no_board');
+		$result = $merger->doMerge(array(
+			'board' => isset($_REQUEST['board']) ? $_REQUEST['board'] : 0,
+			'poll' => isset($_POST['poll']) ? $_POST['poll'] : 0,
+			'subject' => !empty($_POST['subject']) ? $_POST['subject'] : '',
+			'custom_subject' => isset($_POST['custom_subject']) ? $_POST['custom_subject'] : '',
+			'enforce_subject' => isset($_POST['enforce_subject']) ? $_POST['enforce_subject'] : '',
+			'notifications' => isset($_POST['notifications']) ? $_POST['notifications'] : '',
+		));
 
-		// Determine which poll will survive and which polls won't.
-		$target_poll = count($polls) > 1 ? (int) $_POST['poll'] : (count($polls) == 1 ? $polls[0] : 0);
-		if ($target_poll > 0 && !in_array($target_poll, $polls))
-			fatal_lang_error('no_access', false);
-		$deleted_polls = empty($target_poll) ? $polls : array_diff($polls, array($target_poll));
-
-		// Determine the subject of the newly merged topic - was a custom subject specified?
-		if (empty($_POST['subject']) && isset($_POST['custom_subject']) && $_POST['custom_subject'] != '')
+		if ($merger->hasErrors())
 		{
-			$target_subject = strtr(Util::htmltrim(Util::htmlspecialchars($_POST['custom_subject'])), array("\r" => '', "\n" => '', "\t" => ''));
-
-			// Keep checking the length.
-			if (Util::strlen($target_subject) > 100)
-				$target_subject = Util::substr($target_subject, 0, 100);
-
-			// Nothing left - odd but pick the first topics subject.
-			if ($target_subject == '')
-				$target_subject = $topic_data[$firstTopic]['subject'];
+			$error = $merger->firstError();
+			fatal_lang_error($error[0], $error[1]);
 		}
-		// A subject was selected from the list.
-		elseif (!empty($topic_data[(int) $_POST['subject']]['subject']))
-			$target_subject = $topic_data[(int) $_POST['subject']]['subject'];
-		// Nothing worked? Just take the subject of the first message.
-		else
-			$target_subject = $topic_data[$firstTopic]['subject'];
-
-		// Get the first and last message and the number of messages....
-		$request = $db->query('', '
-			SELECT approved, MIN(id_msg) AS first_msg, MAX(id_msg) AS last_msg, COUNT(*) AS message_count
-			FROM {db_prefix}messages
-			WHERE id_topic IN ({array_int:topics})
-			GROUP BY approved
-			ORDER BY approved DESC',
-			array(
-				'topics' => $topics,
-			)
-		);
-		$topic_approved = 1;
-		$first_msg = 0;
-		while ($row = $db->fetch_assoc($request))
-		{
-			// If this is approved, or is fully unapproved.
-			if ($row['approved'] || !isset($first_msg))
-			{
-				$first_msg = $row['first_msg'];
-				$last_msg = $row['last_msg'];
-				if ($row['approved'])
-				{
-					$num_replies = $row['message_count'] - 1;
-					$num_unapproved = 0;
-				}
-				else
-				{
-					$topic_approved = 0;
-					$num_replies = 0;
-					$num_unapproved = $row['message_count'];
-				}
-			}
-			else
-			{
-				// If this has a lower first_msg then the first post is not approved and hence the number of replies was wrong!
-				if ($first_msg > $row['first_msg'])
-				{
-					$first_msg = $row['first_msg'];
-					$num_replies++;
-					$topic_approved = 0;
-				}
-				$num_unapproved = $row['message_count'];
-			}
-		}
-		$db->free_result($request);
-
-		// Ensure we have a board stat for the target board.
-		if (!isset($boardTotals[$target_board]))
-		{
-			$boardTotals[$target_board] = array(
-				'num_posts' => 0,
-				'num_topics' => 0,
-				'unapproved_posts' => 0,
-				'unapproved_topics' => 0
-			);
-		}
-
-		// Fix the topic count stuff depending on what the new one counts as.
-		if ($topic_approved)
-			$boardTotals[$target_board]['num_topics']--;
-		else
-			$boardTotals[$target_board]['unapproved_topics']--;
-
-		$boardTotals[$target_board]['unapproved_posts'] -= $num_unapproved;
-		$boardTotals[$target_board]['num_posts'] -= $topic_approved ? $num_replies + 1 : $num_replies;
-
-		// Get the member ID of the first and last message.
-		$request = $db->query('', '
-			SELECT id_member
-			FROM {db_prefix}messages
-			WHERE id_msg IN ({int:first_msg}, {int:last_msg})
-			ORDER BY id_msg
-			LIMIT 2',
-			array(
-				'first_msg' => $first_msg,
-				'last_msg' => $last_msg,
-			)
-		);
-		list ($member_started) = $db->fetch_row($request);
-		list ($member_updated) = $db->fetch_row($request);
-
-		// First and last message are the same, so only row was returned.
-		if ($member_updated === null)
-			$member_updated = $member_started;
-
-		$db->free_result($request);
-
-		// Obtain all the message ids we are going to affect.
-		$affected_msgs = messagesInTopics($topics);
-
-		// Assign the first topic ID to be the merged topic.
-		$id_topic = min($topics);
-
-		// Grab the response prefix (like 'Re: ') in the default forum language.
-		if (!isset($context['response_prefix']) && !($context['response_prefix'] = cache_get_data('response_prefix')))
-		{
-			if ($language === $user_info['language'])
-				$context['response_prefix'] = $txt['response_prefix'];
-			else
-			{
-				loadLanguage('index', $language, false);
-				$context['response_prefix'] = $txt['response_prefix'];
-				loadLanguage('index');
-			}
-			cache_put_data('response_prefix', $context['response_prefix'], 600);
-		}
-
-		$enforce_subject = isset($_POST['enforce_subject']) ? Util::htmlspecialchars(trim($_POST['enforce_subject'])) : '';
-
-		// Merge topic notifications.
-		$notifications = isset($_POST['notifications']) && is_array($_POST['notifications']) ? array_intersect($topics, $_POST['notifications']) : array();
-		fixMergedTopics($first_msg, $topics, $id_topic, $target_board, $target_subject, $enforce_subject, $notifications);
-
-		// Asssign the properties of the newly merged topic.
-		$db->query('', '
-			UPDATE {db_prefix}topics
-			SET
-				id_board = {int:id_board},
-				id_member_started = {int:id_member_started},
-				id_member_updated = {int:id_member_updated},
-				id_first_msg = {int:id_first_msg},
-				id_last_msg = {int:id_last_msg},
-				id_poll = {int:id_poll},
-				num_replies = {int:num_replies},
-				unapproved_posts = {int:unapproved_posts},
-				num_views = {int:num_views},
-				is_sticky = {int:is_sticky},
-				approved = {int:approved}
-			WHERE id_topic = {int:id_topic}',
-			array(
-				'id_board' => $target_board,
-				'is_sticky' => $is_sticky,
-				'approved' => $topic_approved,
-				'id_topic' => $id_topic,
-				'id_member_started' => $member_started,
-				'id_member_updated' => $member_updated,
-				'id_first_msg' => $first_msg,
-				'id_last_msg' => $last_msg,
-				'id_poll' => $target_poll,
-				'num_replies' => $num_replies,
-				'unapproved_posts' => $num_unapproved,
-				'num_views' => $num_views,
-			)
-		);
-
-		// Get rid of the redundant polls.
-		if (!empty($deleted_polls))
-		{
-			require_once(SUBSDIR . '/Poll.subs.php');
-			removePoll($deleted_polls);
-		}
-
-		// Cycle through each board...
-		foreach ($boardTotals as $id_board => $stats)
-			decrementBoard($id_board, $stats);
-
-		// Determine the board the final topic resides in
-		$topic_info = getTopicInfo($id_topic);
-		$id_board = $topic_info['id_board'];
-
-		// Update all the statistics.
-		require_once(SUBSDIR . '/Topic.subs.php');
-		updateTopicStats();
-		require_once(SUBSDIR . '/Messages.subs.php');
-		updateSubjectStats($id_topic, $target_subject);
-		updateLastMessages($boards);
-
-		logAction('merge', array('topic' => $id_topic, 'board' => $id_board));
-
-		// Notify people that these topics have been merged?
-		require_once(SUBSDIR . '/Notification.subs.php');
-		sendNotifications($id_topic, 'merge');
-
-		// If there's a search index that needs updating, update it...
-		require_once(SUBSDIR . '/Search.subs.php');
-		$searchAPI = findSearchAPI();
-		if (is_callable(array($searchAPI, 'topicMerge')))
-			$searchAPI->topicMerge($id_topic, $topics, $affected_msgs, empty($enforce_subject) ? null : array($context['response_prefix'], $target_subject));
 
 		// Send them to the all done page.
-		redirectexit('action=mergetopics;sa=done;to=' . $id_topic . ';targetboard=' . $target_board);
+		redirectexit('action=mergetopics;sa=done;to=' . $result[0] . ';targetboard=' . $result[1]);
 	}
 
 	/**

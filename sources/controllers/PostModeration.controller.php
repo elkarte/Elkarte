@@ -483,12 +483,7 @@ class PostModeration_Controller extends Action_Controller
 
 		// If it's the first in a topic then the whole topic gets approved!
 		if ($message_info['id_first_msg'] == $current_msg)
-		{
-			approveTopics($topic, !$message_info['approved']);
-
-			if ($message_info['id_member_started'] != $user_info['id'])
-				logAction(($message_info['approved'] ? 'un' : '') . 'approve_topic', array('topic' => $topic, 'subject' => $message_info['subject'], 'member' => $message_info['id_member_started'], 'board' => $board));
-		}
+			approveTopics($topic, !$message_info['approved'], $message_info['id_member_started'] != $user_info['id']);
 		else
 		{
 			approvePosts($current_msg, !$message_info['approved']);
