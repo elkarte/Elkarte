@@ -2270,18 +2270,52 @@ function approveMessages($messages, $messageDetails, $type = 'replies')
  *
  * @param int[] $topics array of topics ids
  * @param bool $approve = true
+ * @param bool $log if true logs the action.
  */
-function approveTopics($topics, $approve = true)
+function approveTopics($topics, $approve = true, $log = false)
 {
-	$db = database();
-
 	if (!is_array($topics))
 		$topics = array($topics);
 
 	if (empty($topics))
 		return false;
 
+	$db = database();
+
 	$approve_type = $approve ? 0 : 1;
+
+	if ($log)
+	{
+		// We need unapproved topic ids and their authors!
+		$request = $db->query('', '
+			SELECT id_topic, id_member_started
+			FROM {db_prefix}topics
+			WHERE id_topic IN ({array_int:approve_topic_ids})
+				AND approved = {int:approve_type}
+			LIMIT ' . count($topics),
+			array(
+				'approve_topic_ids' => $topics,
+				'approve_type' => $approve_type,
+			)
+		);
+		$approveCache = array();
+		$approveCacheMembers = array();
+		while ($row = $db->fetch_assoc($request))
+		{
+			$approveCache[] = $row['id_topic'];
+			$approveCacheMembers[$row['id_topic']] = $row['id_member_started'];
+		}
+		$db->free_result($request);
+
+		// Any topics to approve?
+		if (!empty($approveCache))
+		{
+			$log_action = ($approve ? '' : 'un') . 'approve_topic';
+			// Time for some logging!
+			foreach ($approveCache as $topic)
+				logAction($log_action, array('topic' => $topic, 'member' => $approveCacheMembers[$topic]));
+		}
+	}
 
 	// Just get the messages to be approved and pass through...
 	$request = $db->query('', '

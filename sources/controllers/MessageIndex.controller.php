@@ -563,39 +563,7 @@ class MessageIndex_Controller extends Action_Controller
 
 		// Approve the topics...
 		if (!empty($approveCache))
-		{
-			// We need unapproved topic ids and their authors!
-			$request = $db->query('', '
-				SELECT id_topic, id_member_started
-				FROM {db_prefix}topics
-				WHERE id_topic IN ({array_int:approve_topic_ids})
-					AND approved = {int:not_approved}
-				LIMIT ' . count($approveCache),
-				array(
-					'approve_topic_ids' => $approveCache,
-					'not_approved' => 0,
-				)
-			);
-			$approveCache = array();
-			$approveCacheMembers = array();
-			while ($row = $db->fetch_assoc($request))
-			{
-				$approveCache[] = $row['id_topic'];
-				$approveCacheMembers[$row['id_topic']] = $row['id_member_started'];
-			}
-			$db->free_result($request);
-
-			// Any topics to approve?
-			if (!empty($approveCache))
-			{
-				// Handle the approval part...
-				approveTopics($approveCache);
-
-				// Time for some logging!
-				foreach ($approveCache as $topic)
-					logAction('approve_topic', array('topic' => $topic, 'member' => $approveCacheMembers[$topic]));
-			}
-		}
+			approveTopics($approveCache, true);
 
 		// And (almost) lastly, lock the topics...
 		if (!empty($lockCache))
