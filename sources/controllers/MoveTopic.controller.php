@@ -122,7 +122,8 @@ class MoveTopic_Controller extends Action_Controller
 		}
 
 		// We will need this
-		moveTopicConcurrence();
+		if (isset($_GET['current_board']))
+			moveTopicConcurrence((int) $_GET['current_board']);
 
 		// Register this form and get a sequence number in $context.
 		checkSubmitOnce('register');
@@ -156,7 +157,8 @@ class MoveTopic_Controller extends Action_Controller
 
 		// We will need this
 		require_once(SUBSDIR . '/Topic.subs.php');
-		moveTopicConcurrence();
+		if (isset($_GET['current_board']))
+			moveTopicConcurrence((int) $_GET['current_board']);
 
 		// Make sure this form hasn't been submitted before.
 		checkSubmitOnce('check');
