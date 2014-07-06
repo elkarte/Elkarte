@@ -773,7 +773,7 @@ class Display_Controller
 	 */
 	public function action_quickmod2()
 	{
-		global $topic, $board, $user_info, $context;
+		global $topic, $board, $user_info, $context, $modSettings;
 
 		// Check the session = get or post.
 		checkSession('request');
@@ -781,7 +781,7 @@ class Display_Controller
 		require_once(SUBSDIR . '/Messages.subs.php');
 
 		if (empty($_REQUEST['msgs']))
-			redirectexit('topic=' . $topic . '.' . $_REQUEST['start']);
+			redirectexit('topic=' . $topic . '.' . (int) $_REQUEST['start']);
 
 		$messages = array();
 		foreach ($_REQUEST['msgs'] as $dummy)
@@ -821,6 +821,7 @@ class Display_Controller
 		// Get the first message in the topic - because you can't delete that!
 		$first_message = $topic_info['id_first_msg'];
 		$last_message = $topic_info['id_last_msg'];
+		$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
 
 		// Delete all the messages we know they can delete. ($messages)
 		foreach ($messages as $message => $info)
@@ -832,14 +833,10 @@ class Display_Controller
 			elseif ($message == $first_message)
 				$topicGone = true;
 
-			removeMessage($message);
-
-			// Log this moderation action ;).
-			if (allowedTo('delete_any') && (!allowedTo('delete_own') || $info[1] != $user_info['id']))
-				logAction('delete', array('topic' => $topic, 'subject' => $info[0], 'member' => $info[1], 'board' => $board));
+			$remover->removeMessage($message);
 		}
 
-		redirectexit(!empty($topicGone) ? 'board=' . $board : 'topic=' . $topic . '.' . $_REQUEST['start']);
+		redirectexit(!empty($topicGone) ? 'board=' . $board : 'topic=' . $topic . '.' . (int) $_REQUEST['start']);
 	}
 
 	/**

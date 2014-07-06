@@ -137,18 +137,8 @@ class RemoveTopic_Controller extends Action_Controller
 			isAllowedTo('delete_any');
 
 		// If the full topic was removed go back to the board.
-		require_once(SUBSDIR . '/Messages.subs.php');
-		$full_topic = removeMessage($_REQUEST['msg']);
-
-		if (allowedTo('delete_any') && (!allowedTo('delete_own') || $topic_info['id_member'] != $user_info['id']))
-		{
-			logAction('delete', array(
-				'topic' => $topic,
-				'subject' => $topic_info['subject'],
-				'member' => $topic_info['id_member'],
-				'board' => $board)
-			);
-		}
+		$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
+		$full_topic = $remover->removeMessage($_REQUEST['msg']);
 
 		// We want to redirect back to recent action.
 		if (isset($_REQUEST['recent']))
@@ -183,7 +173,7 @@ class RemoveTopic_Controller extends Action_Controller
 		// We need this file.
 		require_once(SUBSDIR . '/Topic.subs.php');
 
-		$restorer = new MessagesDelete($modSettings['recycle_board']);
+		$restorer = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
 
 		// Restoring messages?
 		if (!empty($_REQUEST['msgs']))

@@ -158,8 +158,6 @@ class MergeTopics_Controller extends Action_Controller
 	{
 		global $user_info, $txt, $context, $scripturl, $modSettings;
 
-		$db = database();
-
 		// Check the session.
 		checkSession('request');
 

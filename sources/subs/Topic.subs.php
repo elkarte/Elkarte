@@ -2261,12 +2261,10 @@ function removeMessages($messages, $messageDetails, $type = 'replies')
 	}
 	else
 	{
-		require_once(SUBSDIR . '/Messages.subs.php');
+		$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
 		foreach ($messages as $post)
 		{
-			removeMessage($post);
-			logAction('delete', array(
-				(empty($modSettings['recycle_enable']) || $modSettings['recycle_board'] != $messageDetails[$post]['board'] ? 'topic' : 'old_topic_id') => $messageDetails[$post]['topic'], 'subject' => $messageDetails[$post]['subject'], 'member' => $messageDetails[$post]['member'], 'board' => $messageDetails[$post]['board']));
+			$remover->removeMessage($post);
 		}
 	}
 }
