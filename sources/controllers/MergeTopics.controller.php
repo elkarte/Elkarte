@@ -245,6 +245,12 @@ class MergeTopics_Controller extends Action_Controller
 			'notifications' => isset($_POST['notifications']) ? $_POST['notifications'] : '',
 		));
 
+		if ($merger->hasErrors())
+		{
+			$error = $merger->firstError();
+			fatal_lang_error($error[0], $error[1]);
+		}
+
 		// Send them to the all done page.
 		redirectexit('action=mergetopics;sa=done;to=' . $result[0] . ';targetboard=' . $result[1]);
 	}
