@@ -2254,11 +2254,7 @@ function approveMessages($messages, $messageDetails, $type = 'replies')
 {
 	if ($type == 'topics')
 	{
-		approveTopics($messages);
-
-		// and tell the world about it
-		foreach ($messages as $topic)
-			logAction('approve_topic', array('topic' => $topic, 'subject' => $messageDetails[$topic]['subject'], 'member' => $messageDetails[$topic]['member'], 'board' => $messageDetails[$topic]['board']));
+		approveTopics($messages, true, true);
 	}
 	else
 	{
@@ -2280,6 +2276,8 @@ function approveMessages($messages, $messageDetails, $type = 'replies')
  */
 function approveTopics($topics, $approve = true, $log = false)
 {
+	global $board;
+
 	if (!is_array($topics))
 		$topics = array($topics);
 
@@ -2292,10 +2290,13 @@ function approveTopics($topics, $approve = true, $log = false)
 
 	if ($log)
 	{
-		// We need unapproved topic ids and their authors!
+		$log_action = $approve ? 'approve_topic' : 'unapprove_topic';
+
+		// We need unapproved topic ids, their authors and the subjects!
 		$request = $db->query('', '
-			SELECT id_topic, id_member_started
-			FROM {db_prefix}topics
+			SELECT t.id_topic, t.id_member_started, m.subject
+			FROM {db_prefix}topics as t
+				LEFT JOIN {db_prefix}messages AS m ON (t.id_first_msg = m.id_msg)
 			WHERE id_topic IN ({array_int:approve_topic_ids})
 				AND approved = {int:approve_type}
 			LIMIT ' . count($topics),
@@ -2304,23 +2305,11 @@ function approveTopics($topics, $approve = true, $log = false)
 				'approve_type' => $approve_type,
 			)
 		);
-		$approveCache = array();
-		$approveCacheMembers = array();
 		while ($row = $db->fetch_assoc($request))
 		{
-			$approveCache[] = $row['id_topic'];
-			$approveCacheMembers[$row['id_topic']] = $row['id_member_started'];
+			logAction($log_action, array('topic' => $row['id_topic'], 'subject' => $row['subject'], 'member' => $row['id_member_started'], 'board' => $board));
 		}
 		$db->free_result($request);
-
-		// Any topics to approve?
-		if (!empty($approveCache))
-		{
-			$log_action = ($approve ? '' : 'un') . 'approve_topic';
-			// Time for some logging!
-			foreach ($approveCache as $topic)
-				logAction($log_action, array('topic' => $topic, 'member' => $approveCacheMembers[$topic]));
-		}
 	}
 
 	// Just get the messages to be approved and pass through...
