@@ -435,8 +435,6 @@ class MessageIndex_Controller extends Action_Controller
 			$possibleActions[] = 'lock';
 		if (!empty($boards_can['merge_any']))
 			$possibleActions[] = 'merge';
-		if (!empty($boards_can['approve_posts']))
-			$possibleActions[] = 'approve';
 
 		// Two methods: $_REQUEST['actions'] (id_topic => action), and $_REQUEST['topics'] and $_REQUEST['qaction'].
 		// (if action is 'move', $_REQUEST['move_to'] or $_REQUEST['move_tos'][$topic] is used.)
@@ -467,43 +465,39 @@ class MessageIndex_Controller extends Action_Controller
 			redirectexit($redirect_url);
 
 		// Validate each action.
-		$temp = array();
+		$real_actions = array();
 		foreach ($_REQUEST['actions'] as $topic => $action)
 		{
 			if (in_array($action, $possibleActions))
-				$temp[(int) $topic] = $action;
+				$real_actions[(int) $topic] = $action;
 		}
-		$_REQUEST['actions'] = $temp;
 
-		if (!empty($_REQUEST['actions']))
+		if (!empty($real_actions))
 		{
 			// Find all topics...
-			$topics_info = topicsDetails(array_keys($_REQUEST['actions']));
+			$topics_info = topicsDetails(array_keys($real_actions));
 
 			foreach ($topics_info as $row)
 			{
 				if (!empty($board))
 				{
 					if ($row['id_board'] != $board || ($modSettings['postmod_active'] && !$row['approved'] && !allowedTo('approve_posts')))
-						unset($_REQUEST['actions'][$row['id_topic']]);
+						unset($real_actions[$row['id_topic']]);
 				}
 				else
 				{
 					// Don't allow them to act on unapproved posts they can't see...
 					if ($modSettings['postmod_active'] && !$row['approved'] && !in_array(0, $boards_can['approve_posts']) && !in_array($row['id_board'], $boards_can['approve_posts']))
-						unset($_REQUEST['actions'][$row['id_topic']]);
+						unset($real_actions[$row['id_topic']]);
 					// Goodness, this is fun.  We need to validate the action.
-					elseif ($_REQUEST['actions'][$row['id_topic']] == 'sticky' && !in_array(0, $boards_can['make_sticky']) && !in_array($row['id_board'], $boards_can['make_sticky']))
-						unset($_REQUEST['actions'][$row['id_topic']]);
-					elseif ($_REQUEST['actions'][$row['id_topic']] == 'move' && !in_array(0, $boards_can['move_any']) && !in_array($row['id_board'], $boards_can['move_any']) && ($row['id_member_started'] != $user_info['id'] || (!in_array(0, $boards_can['move_own']) && !in_array($row['id_board'], $boards_can['move_own']))))
-						unset($_REQUEST['actions'][$row['id_topic']]);
-					elseif ($_REQUEST['actions'][$row['id_topic']] == 'remove' && !in_array(0, $boards_can['remove_any']) && !in_array($row['id_board'], $boards_can['remove_any']) && ($row['id_member_started'] != $user_info['id'] || (!in_array(0, $boards_can['remove_own']) && !in_array($row['id_board'], $boards_can['remove_own']))))
-						unset($_REQUEST['actions'][$row['id_topic']]);
-					elseif ($_REQUEST['actions'][$row['id_topic']] == 'lock' && !in_array(0, $boards_can['lock_any']) && !in_array($row['id_board'], $boards_can['lock_any']) && ($row['id_member_started'] != $user_info['id'] || $row['locked'] == 1 || (!in_array(0, $boards_can['lock_own']) && !in_array($row['id_board'], $boards_can['lock_own']))))
-						unset($_REQUEST['actions'][$row['id_topic']]);
-					// If the topic is approved then you need permission to approve the posts within.
-					elseif ($_REQUEST['actions'][$row['id_topic']] == 'approve' && (!$row['unapproved_posts'] || (!in_array(0, $boards_can['approve_posts']) && !in_array($row['id_board'], $boards_can['approve_posts']))))
-						unset($_REQUEST['actions'][$row['id_topic']]);
+					elseif ($real_actions[$row['id_topic']] == 'sticky' && !in_array(0, $boards_can['make_sticky']) && !in_array($row['id_board'], $boards_can['make_sticky']))
+						unset($real_actions[$row['id_topic']]);
+					elseif ($real_actions[$row['id_topic']] == 'move' && !in_array(0, $boards_can['move_any']) && !in_array($row['id_board'], $boards_can['move_any']) && ($row['id_member_started'] != $user_info['id'] || (!in_array(0, $boards_can['move_own']) && !in_array($row['id_board'], $boards_can['move_own']))))
+						unset($real_actions[$row['id_topic']]);
+					elseif ($real_actions[$row['id_topic']] == 'remove' && !in_array(0, $boards_can['remove_any']) && !in_array($row['id_board'], $boards_can['remove_any']) && ($row['id_member_started'] != $user_info['id'] || (!in_array(0, $boards_can['remove_own']) && !in_array($row['id_board'], $boards_can['remove_own']))))
+						unset($real_actions[$row['id_topic']]);
+					elseif ($real_actions[$row['id_topic']] == 'lock' && !in_array(0, $boards_can['lock_any']) && !in_array($row['id_board'], $boards_can['lock_any']) && ($row['id_member_started'] != $user_info['id'] || $row['locked'] == 1 || (!in_array(0, $boards_can['lock_own']) && !in_array($row['id_board'], $boards_can['lock_own']))))
+						unset($real_actions[$row['id_topic']]);
 				}
 			}
 		}
@@ -513,35 +507,38 @@ class MessageIndex_Controller extends Action_Controller
 		$removeCache = array();
 		$lockCache = array();
 		$markCache = array();
-		$approveCache = array();
 
 		// Separate the actions.
-		foreach ($_REQUEST['actions'] as $topic => $action)
+		foreach ($real_actions as $topic => $action)
 		{
 			$topic = (int) $topic;
 
-			if ($action == 'markread')
-				$markCache[] = $topic;
-			elseif ($action == 'sticky')
-				$stickyCache[] = $topic;
-			elseif ($action == 'move')
+			switch ($action)
 			{
-				moveTopicConcurrence();
+				case 'markread':
+					$markCache[] = $topic;
+					break;
+				case 'sticky':
+					$stickyCache[] = $topic;
+					break;
+				case 'move':
+					moveTopicConcurrence();
 
-				// $moveCache[0] is the topic, $moveCache[1] is the board to move to.
-				$moveCache[1][$topic] = (int) (isset($_REQUEST['move_tos'][$topic]) ? $_REQUEST['move_tos'][$topic] : $_REQUEST['move_to']);
+					// $moveCache[0] is the topic, $moveCache[1] is the board to move to.
+					$moveCache[1][$topic] = (int) (isset($_REQUEST['move_tos'][$topic]) ? $_REQUEST['move_tos'][$topic] : $_REQUEST['move_to']);
 
-				if (empty($moveCache[1][$topic]))
-					continue;
+					if (empty($moveCache[1][$topic]))
+						continue;
 
-				$moveCache[0][] = $topic;
+					$moveCache[0][] = $topic;
+					break;
+				case 'remove':
+					$removeCache[] = $topic;
+					break;
+				case 'lock':
+					$lockCache[] = $topic;
+					break;
 			}
-			elseif ($action == 'remove')
-				$removeCache[] = $topic;
-			elseif ($action == 'lock')
-				$lockCache[] = $topic;
-			elseif ($action == 'approve')
-				$approveCache[] = $topic;
 		}
 
 		if (empty($board))
@@ -560,10 +557,6 @@ class MessageIndex_Controller extends Action_Controller
 		// Now delete the topics...
 		if (!empty($removeCache))
 			removeTopicsPermissions($removeCache);
-
-		// Approve the topics...
-		if (!empty($approveCache))
-			approveTopics($approveCache, true);
 
 		// And (almost) lastly, lock the topics...
 		if (!empty($lockCache))
