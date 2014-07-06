@@ -236,9 +236,9 @@ class MergeTopics_Controller extends Action_Controller
 			return;
 		}
 
-		$merger->doMerge(array(
-			'board' => $_REQUEST['board'],
-			'poll' => $_POST['poll'],
+		$result = $merger->doMerge(array(
+			'board' => isset($_REQUEST['board']) ? $_REQUEST['board'] : 0,
+			'poll' => isset($_POST['poll']) ? $_POST['poll'] : 0,
 			'subject' => !empty($_POST['subject']) ? $_POST['subject'] : '',
 			'custom_subject' => isset($_POST['custom_subject']) ? $_POST['custom_subject'] : '',
 			'enforce_subject' => isset($_POST['enforce_subject']) ? $_POST['enforce_subject'] : '',
@@ -246,7 +246,7 @@ class MergeTopics_Controller extends Action_Controller
 		));
 
 		// Send them to the all done page.
-		redirectexit('action=mergetopics;sa=done;to=' . $id_topic . ';targetboard=' . $target_board);
+		redirectexit('action=mergetopics;sa=done;to=' . $result[0] . ';targetboard=' . $result[1]);
 	}
 
 	/**
