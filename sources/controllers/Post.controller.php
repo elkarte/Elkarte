@@ -284,21 +284,6 @@ class Post_Controller extends Action_Controller
 			}
 		}
 
-		// Get a response prefix (like 'Re:') in the default forum language.
-		if (!isset($context['response_prefix']) && !($context['response_prefix'] = cache_get_data('response_prefix')))
-		{
-			if ($language === $user_info['language'])
-				$context['response_prefix'] = $txt['response_prefix'];
-			else
-			{
-				loadLanguage('index', $language, false);
-				$context['response_prefix'] = $txt['response_prefix'];
-				loadLanguage('index');
-			}
-
-			cache_put_data('response_prefix', $context['response_prefix'], 600);
-		}
-
 		// Are we moving a discussion to its own topic?
 		if (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup']))
 		{
@@ -1939,21 +1924,7 @@ class Post_Controller extends Action_Controller
 			// Changing the first subject updates other subjects to 'Re: new_subject'.
 			if (isset($_POST['subject']) && isset($_REQUEST['change_all_subjects']) && $row['id_first_msg'] == $row['id_msg'] && !empty($row['num_replies']) && (allowedTo('modify_any') || ($row['id_member_started'] == $user_info['id'] && allowedTo('modify_replies'))))
 			{
-				// Get the proper (default language) response prefix first.
-				if (!isset($context['response_prefix']) && !($context['response_prefix'] = cache_get_data('response_prefix')))
-				{
-					if ($language === $user_info['language'])
-						$context['response_prefix'] = $txt['response_prefix'];
-					else
-					{
-						loadLanguage('index', $language, false);
-						$context['response_prefix'] = $txt['response_prefix'];
-						loadLanguage('index');
-					}
-					cache_put_data('response_prefix', $context['response_prefix'], 600);
-				}
-
-				topicSubject(array('id_topic' => $topic, 'id_first_msg' => $row['id_first_msg']), $_POST['subject'], $context['response_prefix'], true);
+				topicSubject(array('id_topic' => $topic, 'id_first_msg' => $row['id_first_msg']), $_POST['subject'], response_prefix(), true);
 			}
 
 			if (!empty($moderationAction))

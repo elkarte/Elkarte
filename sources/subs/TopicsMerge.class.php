@@ -382,25 +382,11 @@ class TopicsMerge
 		require_once(SUBSDIR . '/Notification.subs.php');
 		sendNotifications($id_topic, 'merge');
 
-		// Grab the response prefix (like 'Re: ') in the default forum language.
-		if (!isset($context['response_prefix']) && !($context['response_prefix'] = cache_get_data('response_prefix')))
-		{
-			if ($language === $user_info['language'])
-				$context['response_prefix'] = $txt['response_prefix'];
-			else
-			{
-				loadLanguage('index', $language, false);
-				$context['response_prefix'] = $txt['response_prefix'];
-				loadLanguage('index');
-			}
-			cache_put_data('response_prefix', $context['response_prefix'], 600);
-		}
-
 		// If there's a search index that needs updating, update it...
 		require_once(SUBSDIR . '/Search.subs.php');
 		$searchAPI = findSearchAPI();
 		if (is_callable(array($searchAPI, 'topicMerge')))
-			$searchAPI->topicMerge($id_topic, $this->_topics, $affected_msgs, empty($enforce_subject) ? null : array($context['response_prefix'], $target_subject));
+			$searchAPI->topicMerge($id_topic, $this->_topics, $affected_msgs, empty($enforce_subject) ? null : array(response_prefix(), $target_subject));
 	}
 
 	protected function _loadTopicDetails()

@@ -3073,7 +3073,7 @@ function fixMergedTopics($first_msg, $topics, $id_topic, $target_board, $target_
 			'topic_list' => $topics,
 			'id_topic' => $id_topic,
 			'target_board' => $target_board,
-			'subject' => $context['response_prefix'] . $target_subject,
+			'subject' => response_prefix() . $target_subject,
 		)
 	);
 
