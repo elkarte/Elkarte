@@ -876,19 +876,26 @@ function moveTopics($topics, $toBoard, $log = false)
 /**
  * Called after a topic is moved to update $board_link and $topic_link to point to new location
  */
-function moveTopicConcurrence()
+function moveTopicConcurrence($move_from = null, $id_board = null, $id_topic = null)
 {
-	global $board, $topic, $scripturl;
+	global $scripturl;
+	// @deprecated since 1.1
+	global $board, $topic;
 
 	$db = database();
 
-	if (isset($_GET['current_board']))
+	// @deprecated since 1.1
+	if ($move_from === null && isset($_GET['current_board']))
 		$move_from = (int) $_GET['current_board'];
+	if ($id_board = null && !empty($board))
+		$id_board = $board;
+	if ($id_topic = null && !empty($topic))
+		$id_topic = $topic;
 
-	if (empty($move_from) || empty($board) || empty($topic))
+	if (empty($move_from) || empty($id_board) || empty($id_topic))
 		return true;
 
-	if ($move_from == $board)
+	if ($move_from == $id_board)
 		return true;
 	else
 	{
@@ -900,14 +907,14 @@ function moveTopicConcurrence()
 			WHERE t.id_topic = {int:topic_id}
 			LIMIT 1',
 			array(
-				'topic_id' => $topic,
+				'topic_id' => $id_topic,
 			)
 		);
 		list ($topic_subject, $board_name) = $db->fetch_row($request);
 		$db->free_result($request);
 
-		$board_link = '<a href="' . $scripturl . '?board=' . $board . '.0">' . $board_name . '</a>';
-		$topic_link = '<a href="' . $scripturl . '?topic=' . $topic . '.0">' . $topic_subject . '</a>';
+		$board_link = '<a href="' . $scripturl . '?board=' . $id_board . '.0">' . $board_name . '</a>';
+		$topic_link = '<a href="' . $scripturl . '?topic=' . $id_topic . '.0">' . $topic_subject . '</a>';
 		fatal_lang_error('topic_already_moved', false, array($topic_link, $board_link));
 	}
 }

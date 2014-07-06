@@ -517,7 +517,8 @@ class MessageIndex_Controller extends Action_Controller
 						$stickyCache[] = $row['id_topic'];
 						break;
 					case 'move':
-						moveTopicConcurrence();
+						if (isset($_GET['current_board']))
+							moveTopicConcurrence((int) $_GET['current_board']);
 
 						// $moveCache[0] is the topic, $moveCache[1] is the board to move to.
 						$moveCache[1][$row['id_topic']] = (int) (isset($_REQUEST['move_tos'][$row['id_topic']]) ? $_REQUEST['move_tos'][$row['id_topic']] : $_REQUEST['move_to']);
