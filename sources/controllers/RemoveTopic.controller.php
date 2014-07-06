@@ -58,7 +58,7 @@ class RemoveTopic_Controller extends Action_Controller
 		if (empty($topic))
 			redirectexit();
 
-		$this->removeDeleteConcurrence();
+		removeDeleteConcurrence();
 
 		$topic_info = getTopicInfo($topic, 'message');
 
@@ -111,7 +111,7 @@ class RemoveTopic_Controller extends Action_Controller
 		if (empty($topic) && isset($_REQUEST['topic']))
 			$topic = (int) $_REQUEST['topic'];
 
-		$this->removeDeleteConcurrence();
+		removeDeleteConcurrence();
 
 		$topic_info = loadMessageDetails(array('t.id_member_started'), array('LEFT JOIN {db_prefix}topics AS t ON (m.id_topic = t.id_topic)'), array('message_list' => $_REQUEST['msg']));
 
@@ -205,29 +205,11 @@ class RemoveTopic_Controller extends Action_Controller
 
 	/**
 	 * Try to determine if the topic has already been deleted by another user.
+	 *
+	 * @deprecated since 1.1
 	 */
 	public function removeDeleteConcurrence()
 	{
-		global $modSettings, $board, $scripturl, $context;
-
-		// No recycle no need to go further
-		if (empty($modSettings['recycle_enable']) || empty($modSettings['recycle_board']))
-			return false;
-
-		// If it's confirmed go on and delete (from recycle)
-		if (isset($_GET['confirm_delete']))
-			return true;
-
-		if (empty($board))
-			return false;
-
-		if ($modSettings['recycle_board'] != $board)
-			return true;
-		elseif (isset($_REQUEST['msg']))
-			$confirm_url = $scripturl . '?action=deletemsg;confirm_delete;topic=' . $context['current_topic'] . '.0;msg=' . $_REQUEST['msg'] . ';' . $context['session_var'] . '=' . $context['session_id'];
-		else
-			$confirm_url = $scripturl . '?action=removetopic2;confirm_delete;topic=' . $context['current_topic'] . '.0;' . $context['session_var'] . '=' . $context['session_id'];
-
-		fatal_lang_error('post_already_deleted', false, array($confirm_url));
+		removeDeleteConcurrence();
 	}
 }
