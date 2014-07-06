@@ -25,7 +25,6 @@ if (!defined('ELK'))
 
 /**
  * Removes the passed id_topic's checking for permissions.
- * Permissions are NOT checked here because the function is used in a scheduled task
  *
  * @param int[]|int $topics The topics to remove (can be an id or an array of ids).
  */
@@ -3256,5 +3255,81 @@ function updateTopicStats($increment = null)
 		$db->free_result($request);
 
 		updateSettings(array('totalTopics' => $row['total_topics'] === null ? 0 : $row['total_topics']));
+	}
+}
+
+/**
+ * Toggles the locked status of the passed id_topic's checking for permissions.
+ * Permissions are NOT checked here because the function is used in a scheduled task
+ *
+ * @param int[]|int $topics The topics to lock (can be an id or an array of ids).
+ * @param bool $log if true logs the action.
+ */
+function toggleTopicsLock($topics, $log = false)
+{
+	global $board, $user_info;
+
+
+	$lockStatus = array();
+
+	// Gotta make sure they CAN lock/unlock these topics...
+	if (!empty($board) && !allowedTo('lock_any'))
+	{
+		// Make sure they started the topic AND it isn't already locked by someone with higher priv's.
+		$result = $db->query('', '
+			SELECT id_topic, locked, id_board
+			FROM {db_prefix}topics
+			WHERE id_topic IN ({array_int:locked_topic_ids})
+				AND id_member_started = {int:current_member}
+				AND locked IN (2, 0)
+			LIMIT ' . count($topics),
+			array(
+				'current_member' => $user_info['id'],
+				'locked_topic_ids' => $topics,
+			)
+		);
+	}
+	else
+	{
+		$result = $db->query('', '
+			SELECT id_topic, locked, id_board
+			FROM {db_prefix}topics
+			WHERE id_topic IN ({array_int:locked_topic_ids})
+			LIMIT ' . count($topics),
+			array(
+				'locked_topic_ids' => $topics,
+			)
+		);
+	}
+
+	$lockCache = array();
+	$lockCacheBoards = array();
+	while ($row = $db->fetch_assoc($result))
+	{
+		$lockCache[] = $row['id_topic'];
+
+		if ($log)
+		{
+			$lockStatus = empty($row['locked']) ? 'lock' : 'unlock';
+
+			logAction($lockStatus, array('topic' => $row['id_topic'], 'board' => $row['id_board']));
+			sendNotifications($row['id_topic'], $lockStatus);
+		}
+	}
+	$db->free_result($result);
+
+	// It could just be that *none* were their own topics...
+	if (!empty($lockCache))
+	{
+		// Alternate the locked value.
+		$db->query('', '
+			UPDATE {db_prefix}topics
+			SET locked = CASE WHEN locked = {int:is_locked} THEN ' . (allowedTo('lock_any') ? '1' : '2') . ' ELSE 0 END
+			WHERE id_topic IN ({array_int:locked_topic_ids})',
+			array(
+				'locked_topic_ids' => $lockCache,
+				'is_locked' => 0,
+			)
+		);
 	}
 }

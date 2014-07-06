@@ -556,70 +556,7 @@ class MessageIndex_Controller extends Action_Controller
 
 		// And (almost) lastly, lock the topics...
 		if (!empty($lockCache))
-		{
-			$lockStatus = array();
-
-			// Gotta make sure they CAN lock/unlock these topics...
-			if (!empty($board) && !allowedTo('lock_any'))
-			{
-				// Make sure they started the topic AND it isn't already locked by someone with higher priv's.
-				$result = $db->query('', '
-					SELECT id_topic, locked, id_board
-					FROM {db_prefix}topics
-					WHERE id_topic IN ({array_int:locked_topic_ids})
-						AND id_member_started = {int:current_member}
-						AND locked IN (2, 0)
-					LIMIT ' . count($lockCache),
-					array(
-						'current_member' => $user_info['id'],
-						'locked_topic_ids' => $lockCache,
-					)
-				);
-				$lockCache = array();
-				$lockCacheBoards = array();
-				while ($row = $db->fetch_assoc($result))
-				{
-					$lockCache[] = $row['id_topic'];
-					$lockCacheBoards[$row['id_topic']] = $row['id_board'];
-					$lockStatus[$row['id_topic']] = empty($row['locked']);
-				}
-				$db->free_result($result);
-			}
-			else
-			{
-				$result = $db->query('', '
-					SELECT id_topic, locked, id_board
-					FROM {db_prefix}topics
-					WHERE id_topic IN ({array_int:locked_topic_ids})
-					LIMIT ' . count($lockCache),
-					array(
-						'locked_topic_ids' => $lockCache,
-					)
-				);
-				$lockCacheBoards = array();
-				while ($row = $db->fetch_assoc($result))
-				{
-					$lockStatus[$row['id_topic']] = empty($row['locked']);
-					$lockCacheBoards[$row['id_topic']] = $row['id_board'];
-				}
-				$db->free_result($result);
-			}
-
-			// It could just be that *none* were their own topics...
-			if (!empty($lockCache))
-			{
-				// Alternate the locked value.
-				$db->query('', '
-					UPDATE {db_prefix}topics
-					SET locked = CASE WHEN locked = {int:is_locked} THEN ' . (allowedTo('lock_any') ? '1' : '2') . ' ELSE 0 END
-					WHERE id_topic IN ({array_int:locked_topic_ids})',
-					array(
-						'locked_topic_ids' => $lockCache,
-						'is_locked' => 0,
-					)
-				);
-			}
-		}
+			toggleTopicsLock($lockCache, true);
 
 		if (!empty($markCache))
 		{
@@ -630,12 +567,6 @@ class MessageIndex_Controller extends Action_Controller
 				$markArray[] = array($user_info['id'], $topic, $modSettings['maxMsgID'], (int) !empty($logged_topics[$topic]));
 
 			markTopicsRead($markArray, true);
-		}
-
-		foreach ($lockCache as $topic)
-		{
-			logAction($lockStatus[$topic] ? 'lock' : 'unlock', array('topic' => $topic, 'board' => $lockCacheBoards[$topic]));
-			sendNotifications($topic, $lockStatus[$topic] ? 'lock' : 'unlock');
 		}
 
 		updateTopicStats();
