@@ -428,10 +428,6 @@ class Database_MySQL implements Database
 	 */
 	public function insert_id($table, $field = null, $connection = null)
 	{
-		global $db_prefix;
-
-		$table = str_replace('{db_prefix}', $db_prefix, $table);
-
 		// MySQL doesn't need the table or field information.
 		return mysqli_insert_id($connection === null ? $this->_connection : $connection);
 	}
