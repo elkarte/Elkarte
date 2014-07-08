@@ -297,13 +297,6 @@ function template_post_page()
 							</div>';
 	}
 
-	// If this message has been edited in the past - display when it was.
-	if (isset($context['last_modified']))
-		echo '
-					<div class="smalltext">
-						', $context['last_modified_text'], '
-					</div>';
-
 	// Show our submit buttons before any more options
 	echo '
 						<div id="post_confirm_buttons" class="submitbutton">

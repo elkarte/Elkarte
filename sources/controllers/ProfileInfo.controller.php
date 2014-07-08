@@ -696,7 +696,7 @@ class ProfileInfo_Controller extends Action_Controller
 			'columns' => array(
 				'filename' => array(
 					'header' => array(
-						'value' => $txt['show_attach_downloads'],
+						'value' => $txt['show_attach_filename'],
 						'class' => 'lefttext',
 						'style' => 'width: 25%;',
 					),

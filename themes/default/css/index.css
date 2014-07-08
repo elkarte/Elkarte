@@ -251,7 +251,7 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 	overflow: auto;
 }
 #post_confirm_buttons {
-	padding: 0;
+	padding: 0 0 1px 0;
 }
 
 /* @todo - Test this out some more. */
@@ -2482,6 +2482,9 @@ ul.post_options li {
 .shortcuts {
 	font-size: 0.857em;
 	float: left;
+}
+.shortcuts .lastedit {
+	text-align: left;
 }
 #mobile .shortcuts {
 	display: none;
