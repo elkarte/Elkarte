@@ -50,7 +50,7 @@ class Display_Controller
 	{
 		global $scripturl, $txt, $modSettings, $context, $settings;
 		global $options, $user_info, $board_info, $topic, $board;
-		global $attachments, $messages_request, $language;
+		global $attachments, $messages_request;
 
 		// What are you gonna display if these are empty?!
 		if (empty($topic))
@@ -367,7 +367,7 @@ class Display_Controller
 		$context['canonical_url'] = $scripturl . '?topic=' . $topic . '.' . $context['start'];
 
 		// For quick reply we need a response prefix in the default forum language.
-		response_prefix();
+		$context['response_prefix'] = response_prefix();
 
 		// If we want to show event information in the topic, prepare the data.
 		if (allowedTo('calendar_view') && !empty($modSettings['cal_showInTopic']) && !empty($modSettings['cal_enabled']))

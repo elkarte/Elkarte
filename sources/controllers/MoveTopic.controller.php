@@ -141,7 +141,7 @@ class MoveTopic_Controller extends Action_Controller
 	 */
 	public function action_movetopic2()
 	{
-		global $txt, $board, $topic, $scripturl, $modSettings, $context, $language, $user_info;
+		global $txt, $board, $topic, $scripturl, $context, $language, $user_info;
 
 		if (empty($topic))
 			fatal_lang_error('no_access', false);
@@ -211,7 +211,7 @@ class MoveTopic_Controller extends Action_Controller
 				if ($all_messages)
 				{
 					// Get a response prefix, but in the forum's default language.
-					response_prefix();
+					$context['response_prefix'] = response_prefix();
 
 					topicSubject($topic_info, $custom_subject, $context['response_prefix'], $all_messages);
 				}

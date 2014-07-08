@@ -493,7 +493,7 @@ class PersonalMessage_Controller extends Action_Controller
 	 */
 	public function action_send()
 	{
-		global $txt, $scripturl, $modSettings, $context, $language, $user_info;
+		global $txt, $scripturl, $modSettings, $context, $user_info;
 
 		// Load in some text and template dependencies
 		loadLanguage('PersonalMessage');
@@ -544,7 +544,7 @@ class PersonalMessage_Controller extends Action_Controller
 			markMessages($pmsg);
 
 			// Figure out which flavor or 'Re: ' to use
-			response_prefix();
+			$context['response_prefix'] = response_prefix();
 
 			$form_subject = $row_quoted['subject'];
 
