@@ -772,9 +772,12 @@ dl.settings dd.large_caption {
 	padding: 0;
 	margin: 0;
 }
-.permission_groups li {
+#manage_boards .permission_groups li {
 	list-style-type: none;
-	margin: 1px;
+	padding-top: 1px;
+}
+#manage_boards ul.permission_groups {
+	margin-bottom: 0;
 }
 .perms {
 	width: 20px;
