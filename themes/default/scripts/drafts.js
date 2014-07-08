@@ -54,7 +54,7 @@ elk_DraftAutoSave.prototype.init = function()
 			return this.instanceRef.draftKeypress();
 		};
 
-		// Prevent autosave when selecting post/save for mouse or keyboard
+		// Prevent autosave when selecting post/save by mouse or keyboard
 		$('#postmodify .button_submit').on('mousedown', this.oDraftHandle.instanceRef, function() {
 			this.bInDraftMode = true;
 		});

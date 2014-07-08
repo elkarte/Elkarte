@@ -236,7 +236,11 @@
 		var oInstance = this,
 			formID = $('#id_draft').closest("form").attr('id');
 
+		// Prevent autosave on post/save selection by mouse or keyboard
 		$('#' + formID + ' .button_submit').on('mousedown', oInstance, function() {
+			oInstance.opts._bInDraftMode = true;
+		});
+		$('#' + formID + ' .button_submit').on('keydown', oInstance, function() {
 			oInstance.opts._bInDraftMode = true;
 		});
 	};
@@ -341,7 +345,11 @@
 		 * editor window since the last save ... activity being any keypress
 		 * in the editor which we assume means they changed it
 		 */
-		base.signalKeypressEvent = function() {
+		base.signalKeypressEvent = function(oEvent) {
+			// Prevent autosave when using the tab key to navigate to the submit buttons
+			if (oEvent.keyCode === 9)
+				oDrafts.opts._bInDraftMode = true;
+
 			oDrafts.opts._bCheckDraft = true;
 		};
 	};
