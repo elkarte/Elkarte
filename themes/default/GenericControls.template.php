@@ -167,9 +167,16 @@ function template_control_richedit_buttons($editor_id)
 
 	$editor_context = &$context['controls']['richedit'][$editor_id];
 
+	echo '
+		<span class="shortcuts">';
+
+	// If this message has been edited in the past - display when it was.
+	if (isset($context['last_modified']))
+		echo '
+			<p class="lastedit">', $context['last_modified_text'], '</p>';
+
 	// Show the helpful shortcut text
 	echo '
-		<span class="shortcuts">
 			', $context['shortcuts_text'], '
 		</span>
 		<input type="submit" value="', isset($editor_context['labels']['post_button']) ? $editor_context['labels']['post_button'] : $txt['post'], '" tabindex="', $context['tabindex']++, '" onclick="return submitThisOnce(this);" accesskey="s" class="button_submit" />';
