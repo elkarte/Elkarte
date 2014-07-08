@@ -87,7 +87,7 @@
 	 * - updates the display to show we are saving
 	 * - loads the form data and makes the ajax request
 	 */
-	elk_Drafts.prototype.draftPMSave = function ()
+	elk_Drafts.prototype.draftPMSave = function()
 	{
 		// No change since the last PM save, or elk is doing its thing
 		if (!this.opts._bCheckDraft || elk_formSubmitted)
@@ -184,12 +184,12 @@
 	 *
 	 * @param {string} sField name of the form elements we are getting
 	 */
-	elk_Drafts.prototype.draftGetRecipient = function (sField)
+	elk_Drafts.prototype.draftGetRecipient = function(sField)
 	{
 		var oRecipient = document.forms.pmFolder.elements[sField],
 			aRecipient = [];
 
-		if (typeof(oRecipient) !== 'undefined')
+		if (typeof (oRecipient) !== 'undefined')
 		{
 			// Just one recipient
 			if ('value' in oRecipient)
@@ -208,7 +208,7 @@
 	/**
 	 * If another auto save came in with one still pending we cancel out
 	 */
-	elk_Drafts.prototype.draftCancel = function () {
+	elk_Drafts.prototype.draftCancel = function() {
 		this.opts._bInDraftMode = false;
 		document.getElementById('throbber').style.display = 'none';
 	};
@@ -216,12 +216,16 @@
 	/**
 	 * Starts the autosave timer for the current instance of the elk_draft object
 	 */
-	elk_Drafts.prototype.startSaver = function () {
+	elk_Drafts.prototype.startSaver = function() {
 		var oInstance = this;
 		if (this.opts.bPM)
-			this.opts._interval_id = setInterval(function(){oInstance.draftPMSave();}, this.opts.iFreq);
+			this.opts._interval_id = setInterval(function() {
+				oInstance.draftPMSave();
+			}, this.opts.iFreq);
 		else
-			this.opts._interval_id = setInterval(function(){oInstance.draftSave();}, this.opts.iFreq);
+			this.opts._interval_id = setInterval(function() {
+				oInstance.draftSave();
+			}, this.opts.iFreq);
 	};
 
 	/**
@@ -232,7 +236,7 @@
 		var oInstance = this,
 			formID = $('#id_draft').closest("form").attr('id');
 
-		$('#' + formID + ' .button_submit').on('mousedown', oInstance, function () {
+		$('#' + formID + ' .button_submit').on('mousedown', oInstance, function() {
 			oInstance.opts._bInDraftMode = true;
 		});
 	};
@@ -313,7 +317,7 @@
 		 * - Turns off the autosave timer when the user moves the focus away
 		 * - Saves the current content before turning off the autosaver
 		 */
-		base.signalBlurEvent = function(e) {
+		base.signalBlurEvent = function() {
 			// If we are not already in a save action, save the draft
 			if (oDrafts.opts._bInDraftMode === true)
 				oDrafts.draftCancel();
