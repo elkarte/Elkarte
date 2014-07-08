@@ -46,7 +46,7 @@ elk_DraftAutoSave.prototype.init = function()
 		this.oDraftHandle.onfocus = function(oEvent) {
 			return this.instanceRef.draftFocus();
 		};
-		this.oDraftHandle.onkeypress = function(oEvent) {
+		this.oDraftHandle.onkeydown = function(oEvent) {
 			// Don't let tabbing to the buttons trigger autosave event
 			if (oEvent.keyCode === 9)
 				this.instanceRef.bInDraftMode = true;

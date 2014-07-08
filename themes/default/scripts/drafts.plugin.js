@@ -345,7 +345,7 @@
 		 * editor window since the last save ... activity being any keypress
 		 * in the editor which we assume means they changed it
 		 */
-		base.signalKeypressEvent = function(oEvent) {
+		base.signalKeydownEvent = function(oEvent) {
 			// Prevent autosave when using the tab key to navigate to the submit buttons
 			if (oEvent.keyCode === 9)
 				oDrafts.opts._bInDraftMode = true;
