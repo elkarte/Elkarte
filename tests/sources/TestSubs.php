@@ -6,7 +6,7 @@ require_once(TESTDIR . '../SSI.php');
  * TestCase class for (ideally) all the functions in the Subs.php file
  * that do not fit in any other test
  */
-class TestSubss extends UnitTestCase
+class TestSubs extends UnitTestCase
 {
 	/**
 	 * prepare what is necessary to use in these tests.
