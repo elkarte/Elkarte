@@ -4351,3 +4351,23 @@ function replaceBasicActionUrl($string)
 
 	return str_replace($find, $replace, $string);
 }
+
+function response_prefix()
+{
+	global $context, $language, $user_info, $txt;
+
+	// Get a response prefix (like 'Re:') in the default forum language.
+	if (!isset($context['response_prefix']) && !($context['response_prefix'] = cache_get_data('response_prefix')))
+	{
+		if ($language === $user_info['language'])
+			$context['response_prefix'] = $txt['response_prefix'];
+		else
+		{
+			loadLanguage('index', $language, false);
+			$context['response_prefix'] = $txt['response_prefix'];
+			loadLanguage('index');
+		}
+
+		cache_put_data('response_prefix', $context['response_prefix'], 600);
+	}
+}

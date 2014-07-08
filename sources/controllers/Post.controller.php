@@ -357,19 +357,7 @@ class Post_Controller extends Action_Controller
 		}
 
 		// Get a response prefix (like 'Re:') in the default forum language.
-		if (!isset($context['response_prefix']) && !($context['response_prefix'] = cache_get_data('response_prefix')))
-		{
-			if ($language === $user_info['language'])
-				$context['response_prefix'] = $txt['response_prefix'];
-			else
-			{
-				loadLanguage('index', $language, false);
-				$context['response_prefix'] = $txt['response_prefix'];
-				loadLanguage('index');
-			}
-
-			cache_put_data('response_prefix', $context['response_prefix'], 600);
-		}
+		response_prefix();
 
 		// Previewing, modifying, or posting?
 		// Do we have a body, but an error happened.
@@ -2123,18 +2111,7 @@ class Post_Controller extends Action_Controller
 			if (isset($_POST['subject']) && isset($_REQUEST['change_all_subjects']) && $row['id_first_msg'] == $row['id_msg'] && !empty($row['num_replies']) && (allowedTo('modify_any') || ($row['id_member_started'] == $user_info['id'] && allowedTo('modify_replies'))))
 			{
 				// Get the proper (default language) response prefix first.
-				if (!isset($context['response_prefix']) && !($context['response_prefix'] = cache_get_data('response_prefix')))
-				{
-					if ($language === $user_info['language'])
-						$context['response_prefix'] = $txt['response_prefix'];
-					else
-					{
-						loadLanguage('index', $language, false);
-						$context['response_prefix'] = $txt['response_prefix'];
-						loadLanguage('index');
-					}
-					cache_put_data('response_prefix', $context['response_prefix'], 600);
-				}
+				response_prefix();
 
 				$db->query('', '
 					UPDATE {db_prefix}messages

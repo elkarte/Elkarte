@@ -211,18 +211,7 @@ class MoveTopic_Controller extends Action_Controller
 				if ($all_messages)
 				{
 					// Get a response prefix, but in the forum's default language.
-					if (!isset($context['response_prefix']) && !($context['response_prefix'] = cache_get_data('response_prefix')))
-					{
-						if ($language === $user_info['language'])
-							$context['response_prefix'] = $txt['response_prefix'];
-						else
-						{
-							loadLanguage('index', $language, false);
-							$context['response_prefix'] = $txt['response_prefix'];
-							loadLanguage('index');
-						}
-						cache_put_data('response_prefix', $context['response_prefix'], 600);
-					}
+					response_prefix();
 
 					topicSubject($topic_info, $custom_subject, $context['response_prefix'], $all_messages);
 				}
