@@ -4176,7 +4176,13 @@ dl.no_members {
 		display: none;
 	}
 	.postarea {
-		margin: 0 0 0 7em;
+		margin: 0 0 0 6em;
+	}
+	.avatar {
+		max-width: 7em;
+	}
+	.poster_avatar a {
+		padding: 0;
 	}
 	.quickbuttons .modified {
 		display: block;
