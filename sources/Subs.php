@@ -4351,3 +4351,25 @@ function replaceBasicActionUrl($string)
 
 	return str_replace($find, $replace, $string);
 }
+
+function response_prefix()
+{
+	global $language, $user_info, $txt;
+	static $response_prefix = null;
+
+	if ($response_prefix === null && !($response_prefix = cache_get_data('response_prefix')))
+	{
+		if ($language === $user_info['language'])
+			$response_prefix = $txt['response_prefix'];
+		else
+		{
+			loadLanguage('index', $language, false);
+			$response_prefix = $txt['response_prefix'];
+			loadLanguage('index');
+		}
+
+		cache_put_data('response_prefix', $response_prefix, 600);
+	}
+
+	return $response_prefix;
+}
