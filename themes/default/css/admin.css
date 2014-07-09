@@ -42,9 +42,6 @@
 	padding: 8px 8px 16px 8px;
 	overflow: auto;
 }
-div.quick_tasks {
-	margin: -8px 0 0 0;
-}
 #admin_form_wrapper div.windowbg, #support_credits div.windowbg,
 #generate_reports_type div.windowbg, #new_group div.windowbg,
 #view_group div.windowbg, #admin_newsletters .windowbg {
@@ -268,8 +265,8 @@ fieldset dl {
 /* The <li>'s could be set to auto overflow instead, but that just clutters things up with scrollbars.
 /* Scrollbars here look worse, take up space, and don't really add anything useful in this context. */
 div.quick_tasks {
-	border-radius: 0 0 7px 7px;
-	border-top: none;
+	margin: -8px 0 0 0;
+	border-radius: 7px;
 	box-shadow: none;
 	padding: 0 0 16px 0;
 }
@@ -772,9 +769,12 @@ dl.settings dd.large_caption {
 	padding: 0;
 	margin: 0;
 }
-.permission_groups li {
+#manage_boards .permission_groups li {
 	list-style-type: none;
-	margin: 1px;
+	padding-top: 1px;
+}
+#manage_boards ul.permission_groups {
+	margin-bottom: 0;
 }
 .perms {
 	width: 20px;
