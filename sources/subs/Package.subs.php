@@ -532,11 +532,12 @@ function getPackageInfo($gzfilename)
 
 	$packageInfo = $packageInfo->path('package-info[0]');
 
-	$package = $packageInfo->to_array();
+	// Convert packageInfo to an array for use
+	$package = htmlspecialchars__recursive($packageInfo->to_array());
 	$package['xml'] = $packageInfo;
 	$package['filename'] = $gzfilename;
-	$package['name'] = Util::htmlspecialchars($package['name']);
 
+	// Set a default type if none was supplied in the package
 	if (!isset($package['type']))
 		$package['type'] = 'modification';
 

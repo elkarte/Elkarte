@@ -206,7 +206,7 @@ class PackageServers_Controller extends Action_Controller
 
 		// Use the package list's name if it exists.
 		if ($listing->exists('list-title'))
-			$name = $listing->fetch('list-title');
+			$name = Util::htmlspecialchars($listing->fetch('list-title'));
 
 		// Pick the correct template.
 		$context['sub_template'] = 'package_list';
@@ -379,7 +379,7 @@ class PackageServers_Controller extends Action_Controller
 							$package['author']['website']['name'] = $default_website;
 
 						if ($thisPackage->exists('website') && $thisPackage->fetch('website') != '')
-							$authorhomepage = $thisPackage->fetch('website');
+							$authorhomepage = Util::htmlspecialchars($thisPackage->fetch('website'));
 						else
 							$authorhomepage = $default_website;
 
