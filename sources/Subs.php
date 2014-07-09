@@ -4352,6 +4352,12 @@ function replaceBasicActionUrl($string)
 	return str_replace($find, $replace, $string);
 }
 
+/**
+ * This function has the only task to retrieve the correct prefix to be used
+ * in responses.
+ *
+ * @return string - The prefix in the default language of the forum
+ */
 function response_prefix()
 {
 	global $language, $user_info, $txt;
