@@ -413,13 +413,14 @@ class ManageSearchEngines_Controller extends Action_Controller
 		loadLanguage('Search');
 		loadTemplate('ManageSearch');
 
-		// Did they want to delete some entries?
-		if (!empty($_POST['delete_entries']) && isset($_POST['older']))
+		// Did they want to delete some or all entries?
+		if ((!empty($_POST['delete_entries']) && isset($_POST['older'])) || !empty($_POST['removeAll']))
 		{
 			checkSession();
 			validateToken('admin-sl');
 
-			$deleteTime = time() - (((int) $_POST['older']) * 24 * 60 * 60);
+			$since = isset($_POST['older']) ? (int) $_POST['older'] : 0;
+			$deleteTime = time() - ($since * 24 * 60 * 60);
 
 			// Delete the entires.
 			require_once(SUBSDIR . '/SearchEngines.subs.php');
