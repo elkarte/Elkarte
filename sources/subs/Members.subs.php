@@ -1232,19 +1232,11 @@ function populateDuplicateMembers(&$members)
 		return false;
 
 	// Fetch all members with this IP address, we'll filter out the current ones in a sec.
-	$request = $db->query('', '
-		SELECT
-			id_member, member_name, email_address, member_ip, member_ip2, is_activated
-		FROM {db_prefix}members
-		WHERE member_ip IN ({array_string:ips})
-			OR member_ip2 IN ({array_string:ips})',
-		array(
-			'ips' => $ips,
-		)
-	);
+	$members = membersByIP($ips, 'exact', true);
+
 	$duplicate_members = array();
 	$duplicate_ids = array();
-	while ($row = $db->fetch_assoc($request))
+	foreach ($members as $row)
 	{
 		//$duplicate_ids[] = $row['id_member'];
 
@@ -1262,7 +1254,6 @@ function populateDuplicateMembers(&$members)
 		if ($row['member_ip'] != $row['member_ip2'] && in_array($row['member_ip2'], $ips))
 			$duplicate_members[$row['member_ip2']][] = $member_context;
 	}
-	$db->free_result($request);
 
 	// Also try to get a list of messages using these ips.
 	$request = $db->query('', '
@@ -1320,6 +1311,71 @@ function populateDuplicateMembers(&$members)
 				$member_track[] = $duplicate_member['id'];
 			}
 		}
+}
+
+/**
+ * Find members with a given IP (first, second, exact or "relaxed")
+ *
+ * @package Members
+ * @param string|string[] $ip1 An IP or an array of IPs
+ * @param string $match (optional, default 'exact') if the match should be exact
+ *                of "relaxed" (using LIKE)
+ * @param bool $ip2 (optional, default false) If the query should check IP2 as well
+ */
+function membersByIP($ip1, $match = 'exact', $ip2 = false)
+{
+	$db = database();
+
+	$ip_params = array('ips' => array());
+	$ip_query = array();
+	foreach (array($ip1, $ip2) as $id => $ip)
+	{
+		if ($ip === false)
+			continue;
+
+		if ($match === 'exact')
+			$ip_params['ips'] = array_merge($ip_params['ips'], (array) $ip);
+		else
+		{
+			$ip = (array) $ip;
+			foreach ($ip as $id_var => $ip_var)
+			{
+				$ip_var = str_replace('*', '%', $ip_var);
+				$ip_query[] = strpos($ip_var, '%') === false ? '= {string:ip_address_' . $id . '_' . $id_var . '}' : 'LIKE {string:ip_address_' . $id . '_' . $id_var . '}';
+				$ip_params['ip_address_' . $id . '_' . $id_var] = $ip_var;
+			}
+		}
+	}
+
+	if ($match === 'exact')
+	{
+		$where = 'member_ip IN ({array_string:ips})';
+		if ($ip2 !== false)
+			$where .= '
+			OR member_ip2 IN ({array_string:ips})';
+	}
+	else
+	{
+		$where = 'member_ip ' . implode(' OR member_ip', $ip_query);
+		if ($ip2 !== false)
+			$where .= '
+			OR member_ip2 ' . implode(' OR member_ip', $ip_query);
+	}
+
+	$request = $db->query('', '
+		SELECT
+			id_member, member_name, email_address, member_ip, member_ip2, is_activated
+		FROM {db_prefix}members
+		WHERE ' . $where,
+		$ip_params
+	);
+
+	$return = array();
+	while ($row = $db->fetch_assoc($request))
+		$return[] = $row;
+	$db->free_result($request);
+
+	return $return;
 }
 
 /**
