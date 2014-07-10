@@ -4208,7 +4208,6 @@ function replaceBasicActionUrl($string)
 	return str_replace($find, $replace, $string);
 }
 
-<<<<<<< HEAD
 function elk_autoloader($class)
 {
 	if (substr($class, -11) === '_Controller')
