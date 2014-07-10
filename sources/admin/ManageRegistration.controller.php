@@ -163,8 +163,8 @@ class ManageRegistration_Controller extends Action_Controller
 				'send_welcome_email' => isset($_POST['emailPassword']),
 				'require' => isset($_POST['emailActivate']) ? 'activation' : 'nothing',
 				'memberGroup' => empty($_POST['group']) || !allowedTo('manage_membergroups') ? 0 : (int) $_POST['group'],
-				'member_ip' => '127.0.0.1',
-				'member_ip2' => '127.0.0.1',
+				'ip' => '127.0.0.1',
+				'ip2' => '127.0.0.1',
 				'auth_method' => 'password',
 			);
 

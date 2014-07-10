@@ -31,8 +31,8 @@ class TestMembers extends UnitTestCase
 			'send_welcome_email' => false,
 			'require' => 'nothing',
 			'memberGroup' => 0,
-			'member_ip' => '127.0.0.2',
-			'member_ip2' => '127.0.0.3',
+			'ip' => '127.0.0.2',
+			'ip2' => '127.0.0.3',
 			'auth_method' => 'password',
 		);
 
