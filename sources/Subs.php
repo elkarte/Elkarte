@@ -4260,7 +4260,7 @@ function elk_autoloader($class)
  */
 function createList($listOptions)
 {
-	call_integration_hook('integrate_list_' . $listOptions['id'], array($listOptions));
+	call_integration_hook('integrate_list_' . $listOptions['id'], array(&$listOptions));
 
 	$list = new Generic_List($listOptions);
 
