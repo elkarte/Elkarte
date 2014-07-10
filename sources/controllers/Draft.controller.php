@@ -294,7 +294,7 @@ class Draft_Controller extends Action_Controller
 
 		// Find this user's drafts
 		$limit = $start . ', ' . $maxIndex;
-		$order = 'ud.id_draft ' . ($reverse ? 'ASC' : 'DESC');
+		$order = 'ud.poster_time ' . ($reverse ? 'ASC' : 'DESC');
 
 		return array($maxIndex, $reverse, $limit, $order);
 	}

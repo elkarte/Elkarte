@@ -3383,7 +3383,6 @@ function setupMenuContext()
 						'href' => $scripturl . '?action=profile;area=theme',
 						'show' => allowedTo(array('profile_extra_any', 'profile_extra_own', 'profile_extra_any')),
 					),
-					// The old "logout" is meh. Not a real word. "Log out" is better.
 					'logout' => array(
 						'title' => $txt['logout'],
 						'href' => $scripturl . '?action=logout',
@@ -3391,8 +3390,8 @@ function setupMenuContext()
 					),
 				),
 			),
-			// @todo - Will look at doing something here, to provide instant access to inbox when using click menus.
-			// @todo - A small pop-up anchor seems like the obvious way to handle it. ;)
+			// @todo Look at doing something here, to provide instant access to inbox when using click menus.
+			// @todo A small pop-up anchor seems like the obvious way to handle it. ;)
 			'pm' => array(
 				'title' => $txt['pm_short'],
 				'counter' => 'unread_messages',
@@ -3412,15 +3411,13 @@ function setupMenuContext()
 					),
 				),
 			),
-
-			'mention' => array(
+			'mentions' => array(
 				'title' => $txt['mention'],
 				'counter' => 'mentions',
 				'href' => $scripturl . '?action=mentions',
 				'data-icon' => '&#xf0f3;',
 				'show' => !$user_info['is_guest'] && !empty($modSettings['mentions_enabled']),
 			),
-
 			// The old language string made no sense, and was too long.
 			// "New posts" is better, because there are probably a pile
 			// of old unread posts, and they wont be reached from this button.
@@ -3430,7 +3427,6 @@ function setupMenuContext()
 				'data-icon' => '&#xf086;',
 				'show' => !$user_info['is_guest'],
 			),
-
 			// The old language string made no sense, and was too long.
 			// "New replies" is better, because there are "updated topics"
 			// that the user has never posted in and doesn't care about.
@@ -3440,9 +3436,6 @@ function setupMenuContext()
 				'data-icon' => '&#xf0e6;',
 				'show' => !$user_info['is_guest'],
 			),
-
-			// "Log out" would be better here.
-			// "Login" is not a word, and sort of runs together into a bleh.
 			'login' => array(
 				'title' => $txt['login'],
 				'href' => $scripturl . '?action=login',
@@ -3543,8 +3536,6 @@ function setupMenuContext()
 
 	if (isset($context['menu_buttons'][$context['current_action']]))
 		$current_action = $context['current_action'];
-// 	elseif ($context['current_action'] == 'search2')
-// 		$current_action = 'search';
 	elseif ($context['current_action'] == 'profile')
 		$current_action = 'pm';
 	elseif ($context['current_action'] == 'theme')
@@ -4268,7 +4259,7 @@ function elk_autoloader($class)
  */
 function createList($listOptions)
 {
-	call_integration_hook('integrate_list_' . $listOptions['id'], array($listOptions));
+	call_integration_hook('integrate_list_' . $listOptions['id'], array(&$listOptions));
 
 	$list = new Generic_List($listOptions);
 
@@ -4298,4 +4289,32 @@ function db_last_error()
 		return $time;
 	else
 		return 0;
+}
+
+/**
+ * This function has the only task to retrieve the correct prefix to be used
+ * in responses.
+ *
+ * @return string - The prefix in the default language of the forum
+ */
+function response_prefix()
+{
+	global $language, $user_info, $txt;
+	static $response_prefix = null;
+
+	if ($response_prefix === null && !($response_prefix = cache_get_data('response_prefix')))
+	{
+		if ($language === $user_info['language'])
+			$response_prefix = $txt['response_prefix'];
+		else
+		{
+			loadLanguage('index', $language, false);
+			$response_prefix = $txt['response_prefix'];
+			loadLanguage('index');
+		}
+
+		cache_put_data('response_prefix', $response_prefix, 600);
+	}
+
+	return $response_prefix;
 }
