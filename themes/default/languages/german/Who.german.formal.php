@@ -154,4 +154,4 @@ $txt['credits_groups_translators'] = 'Übersetzer';
 $txt['credits_translators_message'] = 'Danke für eure Mühen, die es Benutzern auf der ganzen Welt ermöglichen, ElkArte zu verwenden.';
 
 // List of people who have made more than a token contribution to this translation. (blank for English)
-$txt['translation_credits'] = array();
+$txt['translation_credits'] = array('@tux0r'); // Twitt0r!
