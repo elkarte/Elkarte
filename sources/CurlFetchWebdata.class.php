@@ -186,6 +186,7 @@ class Curl_Fetch_Webdata
 			'url' => $url,
 			'code' => $http_code,
 			'error' => $error,
+			'size' => !empty($curl_info['download_content_length']) ? $curl_info['download_content_length'] : 0,
 			'headers' => !empty($this->_headers) ? $this->_headers : false,
 			'body' => $body,
 		);

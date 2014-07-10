@@ -1582,6 +1582,8 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 		// Posting a quoted reply?
 		case 2:
 		{
+			$msg_id =  !empty($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'];
+
 			// Make sure they _can_ quote this post, and if so get it.
 			$request = $db->query('', '
 				SELECT m.subject, IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.body

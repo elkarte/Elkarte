@@ -1405,15 +1405,13 @@ function loadAddNewPoll(button, id_board, form_name)
  */
 function disableAutoComplete()
 {
-	if (document.addEventListener)
-		document.addEventListener("DOMContentLoaded", disableAutoCompleteNow, false);
-}
+	window.onload = function() {
+		// Turn off autocomplete for these elements
+		$("input[type=email], input[type=password], .input_text, .input_clear").attr("autocomplete", "off");
 
-/**
- * Once DOMContentLoaded is triggered, find text and password fields in the forms
- * turn autocomplete off and empty the value.
- */
-function disableAutoCompleteNow()
-{
-	$("input[type=password]").attr("autocomplete", "off").val('');
+		// Chrome will fill out the form even with autocomplete off, so we need to empty the value as well.
+		setTimeout(function() {
+			$("input[type=password], .input_clear").val(" ").val("");
+		}, 1);
+	};
 }

@@ -12,7 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Release Candidate 1
- * 
+ *
  */
 
 /**
@@ -51,9 +51,8 @@ function template_core_features()
 					new_state = !$("#feature_" + cf).attr("checked"),
 					ajax_infobar = document.createElement(\'div\');
 
-				$(ajax_infobar).css({\'position\': \'fixed\', \'top\': \'0\', \'left\': \'0\', \'width\': \'100%\'});
+				$(ajax_infobar).css({\'position\': \'fixed\', \'top\': \'0\', \'left\': \'0\', \'width\': \'100%\', \'z-index\': 10, \'display\': \'none\'});
 				$("body").append(ajax_infobar);
-				$(ajax_infobar).slideUp();
 				$("#feature_" + cf).attr("checked", new_state);
 
 				data = {save: "save", feature_id: cf};
@@ -74,7 +73,6 @@ function template_core_features()
 
 					// The type of data that is getting returned.
 					data: data,
-					beforeSend: ajax_indicator(true)
 				})
 				.done(function(request) {
 					if ($(request).find("errors").find("error").length !== 0)
@@ -93,10 +91,10 @@ function template_core_features()
 						$("#feature_link_" + cf).fadeOut().fadeIn();
 						$(ajax_infobar).attr(\'class\', \'successbox\');
 						var message = new_state ? ' . JavaScriptEscape($txt['core_settings_activation_message']) . ' : ' . JavaScriptEscape($txt['core_settings_deactivation_message']) . ';
-						$(ajax_infobar).html(message.replace(\'{core_feature}\', $(request).find("corefeatures").find("corefeature").text())).slideDown(\'fast\');
+						$(ajax_infobar).html(message.replace(\'{core_feature}\', $(request).find("corefeatures").find("corefeature").text())).slideDown();
 						setTimeout(function() {
 							$(ajax_infobar).slideUp();
-						}, 5000);
+						}, 4000);
 
 						token_name = $(request).find("tokens").find(\'[type="token"]\').text();
 						token_value = $(request).find("tokens").find(\'[type="token_var"]\').text();
@@ -110,10 +108,6 @@ function template_core_features()
 				.fail(function(error) {
 						$(ajax_infobar).html(error).slideDown(\'fast\');
 				})
-				.always(function() {
-					// turn off the indicator
-					ajax_indicator(false);
-				});
 			});
 		});
 	// ]]></script>
