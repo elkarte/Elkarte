@@ -62,7 +62,10 @@ class TestMembers extends UnitTestCase
 
 		// A test with relaxed query
 		$result = membersByIP('127.0.0.*', 'relaxed');
-		$this->assertEqual($this->memberID, $result[0]['id_member']);
+		$mem_id = array();
+		foreach ($result as $mem)
+			$mem_id[] = $mem['id_member'];
+		$this->assertTrue(in_array($this->memberID, $mem_id));
 
 		// An hopefully non existing IP
 		$result = membersByIP('127.0.0.3');
