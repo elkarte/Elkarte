@@ -131,7 +131,11 @@ $txt['mc_warning_template_delete_confirm'] = 'Sind Sie sich sicher, dass Sie die
 $txt['mc_warning_template_desc'] = 'Benutzen Sie diese Seite, um die Details der Vorlage auszufüllen. Beachten Sie, dass der Betreff der Nachricht kein Teil der Vorlage ist. Beachten Sie außerdem, dass, da die Benachrichtigung per PN versandt wird, Sie BBCodes innerhalb der Vorlage nutzen können.  Falls Sie die {MESSAGE}-Variable nutzen, wird diese Vorlage nicht verfügbar sein, wenn Sie eine generische Verwarnung (zum Beispiel eine Verwarnung, die nicht mit einem Beitrag zusammenhängt) aussprechen.';
 $txt['mc_warning_template_title'] = 'Titel der Vorlage';
 $txt['mc_warning_template_body_desc'] = 'Der Inhalt der Benachrichtigung. Beachten Sie, dass Sie folgende Kürzel in dieser Vorlage nutzen können.<ul style="margin-top: 0px;"><li>{MEMBER} - Benutzername.</li><li>{MESSAGE} - Verweis auf beanstandeten Beitrag (falls zutreffend).</li><li>{FORUMNAME} - Name des Forums.</li><li>{SCRIPTURL} - Webadresse des Forums.</li><li>{REGARDS} - Standard-E-Mail-Signatur.</li></ul>';
-$txt['mc_warning_template_body_default'] = '{MEMBER},' . "\n\n" . 'Sie haben aufgrund unpassenden Verhaltens eine Verwarnung erhalten. Bitte stellen Sie diese Aktivitäten ein und halten Sie sich künftig an die Regeln, andernfalls werden wir entsprechende Maßnahmen ergreifen.' . "\n\n" . '{REGARDS}';
+$txt['mc_warning_template_body_default'] = '{MEMBER},
+
+Sie haben aufgrund unpassenden Verhaltens eine Verwarnung erhalten. Bitte stellen Sie diese Aktivitäten ein und halten Sie sich künftig an die Regeln, andernfalls werden wir entsprechende Maßnahmen ergreifen.
+
+{REGARDS}';
 $txt['mc_warning_template_personal'] = 'Persönliche Vorlage';
 $txt['mc_warning_template_personal_desc'] = 'Wenn Sie diese Option auswählen, werden nur Sie diese Vorlage sehen, ändern und benutzen können, andernfalls gilt dies für alle Moderatoren.';
 $txt['mc_warning_template_error_no_title'] = 'Sie müssen den Titel festlegen.';

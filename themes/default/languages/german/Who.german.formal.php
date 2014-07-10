@@ -128,7 +128,7 @@ $txt['who_viewprofile'] = 'Betrachtet <a href="%1$s">%2$s</a>'. ((mb_substr($str
 $txt['who_profile'] = 'Ändert das Profil von <a href="%1$s">%2$s</a>.';
 $txt['who_post'] = 'Erstellt ein neues Thema in in <a href="%1$s">%2$s</a>.';
 $txt['who_poll'] = 'Erstellt eine neue Umfrage in in <a href="%1$s">%2$s</a>.';
-$txt['whotopic_topicbyemail'] = 'Erstellt ein neues Thema (per E-Mail) in <a href="%1$s">%2$s</a>.';
+$txt['who_topicbyemail'] = 'Erstellt ein neues Thema (per E-Mail) in <a href="%1$s">%2$s</a>.';
 
 $txt['whotopic_postbyemail'] = 'Verfasst einen Beitrag (per E-Mail) in <a href="%1$s">%2$s</a>.';
 $txt['who_pm_byemail'] = 'Versendet eine private Nachricht per E-Mail.';
