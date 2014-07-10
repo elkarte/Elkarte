@@ -435,8 +435,6 @@ class MessageIndex_Controller extends Action_Controller
 			$possibleActions[] = 'lock';
 		if (!empty($boards_can['merge_any']))
 			$possibleActions[] = 'merge';
-		if (!empty($boards_can['approve_posts']))
-			$possibleActions[] = 'approve';
 
 		// Two methods: $_REQUEST['actions'] (id_topic => action), and $_REQUEST['topics'] and $_REQUEST['qaction'].
 		// (if action is 'move', $_REQUEST['move_to'] or $_REQUEST['move_tos'][$topic] is used.)
@@ -467,81 +465,77 @@ class MessageIndex_Controller extends Action_Controller
 			redirectexit($redirect_url);
 
 		// Validate each action.
-		$temp = array();
+		$all_actions = array();
 		foreach ($_REQUEST['actions'] as $topic => $action)
 		{
 			if (in_array($action, $possibleActions))
-				$temp[(int) $topic] = $action;
+				$all_actions[(int) $topic] = $action;
 		}
-		$_REQUEST['actions'] = $temp;
 
-		if (!empty($_REQUEST['actions']))
+		$real_actions = array();
+		$stickyCache = array();
+		$moveCache = array(0 => array(), 1 => array());
+		$removeCache = array();
+		$lockCache = array();
+		$markCache = array();
+
+		if (!empty($all_actions))
 		{
 			// Find all topics...
-			$topics_info = topicsDetails(array_keys($_REQUEST['actions']));
+			$topics_info = topicsDetails(array_keys($all_actions));
 
 			foreach ($topics_info as $row)
 			{
 				if (!empty($board))
 				{
 					if ($row['id_board'] != $board || ($modSettings['postmod_active'] && !$row['approved'] && !allowedTo('approve_posts')))
-						unset($_REQUEST['actions'][$row['id_topic']]);
+						continue;
 				}
 				else
 				{
 					// Don't allow them to act on unapproved posts they can't see...
 					if ($modSettings['postmod_active'] && !$row['approved'] && !in_array(0, $boards_can['approve_posts']) && !in_array($row['id_board'], $boards_can['approve_posts']))
-						unset($_REQUEST['actions'][$row['id_topic']]);
+						continue;
 					// Goodness, this is fun.  We need to validate the action.
-					elseif ($_REQUEST['actions'][$row['id_topic']] == 'sticky' && !in_array(0, $boards_can['make_sticky']) && !in_array($row['id_board'], $boards_can['make_sticky']))
-						unset($_REQUEST['actions'][$row['id_topic']]);
-					elseif ($_REQUEST['actions'][$row['id_topic']] == 'move' && !in_array(0, $boards_can['move_any']) && !in_array($row['id_board'], $boards_can['move_any']) && ($row['id_member_started'] != $user_info['id'] || (!in_array(0, $boards_can['move_own']) && !in_array($row['id_board'], $boards_can['move_own']))))
-						unset($_REQUEST['actions'][$row['id_topic']]);
-					elseif ($_REQUEST['actions'][$row['id_topic']] == 'remove' && !in_array(0, $boards_can['remove_any']) && !in_array($row['id_board'], $boards_can['remove_any']) && ($row['id_member_started'] != $user_info['id'] || (!in_array(0, $boards_can['remove_own']) && !in_array($row['id_board'], $boards_can['remove_own']))))
-						unset($_REQUEST['actions'][$row['id_topic']]);
-					elseif ($_REQUEST['actions'][$row['id_topic']] == 'lock' && !in_array(0, $boards_can['lock_any']) && !in_array($row['id_board'], $boards_can['lock_any']) && ($row['id_member_started'] != $user_info['id'] || $row['locked'] == 1 || (!in_array(0, $boards_can['lock_own']) && !in_array($row['id_board'], $boards_can['lock_own']))))
-						unset($_REQUEST['actions'][$row['id_topic']]);
-					// If the topic is approved then you need permission to approve the posts within.
-					elseif ($_REQUEST['actions'][$row['id_topic']] == 'approve' && (!$row['unapproved_posts'] || (!in_array(0, $boards_can['approve_posts']) && !in_array($row['id_board'], $boards_can['approve_posts']))))
-						unset($_REQUEST['actions'][$row['id_topic']]);
+					elseif ($all_actions[$row['id_topic']] == 'sticky' && !in_array(0, $boards_can['make_sticky']) && !in_array($row['id_board'], $boards_can['make_sticky']))
+						continue;
+					elseif ($all_actions[$row['id_topic']] == 'move' && !in_array(0, $boards_can['move_any']) && !in_array($row['id_board'], $boards_can['move_any']) && ($row['id_member_started'] != $user_info['id'] || (!in_array(0, $boards_can['move_own']) && !in_array($row['id_board'], $boards_can['move_own']))))
+						continue;
+					elseif ($all_actions[$row['id_topic']] == 'remove' && !in_array(0, $boards_can['remove_any']) && !in_array($row['id_board'], $boards_can['remove_any']) && ($row['id_member_started'] != $user_info['id'] || (!in_array(0, $boards_can['remove_own']) && !in_array($row['id_board'], $boards_can['remove_own']))))
+						continue;
+					elseif ($all_actions[$row['id_topic']] == 'lock' && !in_array(0, $boards_can['lock_any']) && !in_array($row['id_board'], $boards_can['lock_any']) && ($row['id_member_started'] != $user_info['id'] || $row['locked'] == 1 || (!in_array(0, $boards_can['lock_own']) && !in_array($row['id_board'], $boards_can['lock_own']))))
+						continue;
+				}
+
+				// Separate the actions.
+				switch ($action)
+				{
+					case 'markread':
+						$markCache[] = $row['id_topic'];
+						break;
+					case 'sticky':
+						$stickyCache[] = $row['id_topic'];
+						break;
+					case 'move':
+						if (isset($_GET['current_board']))
+							moveTopicConcurrence((int) $_GET['current_board']);
+
+						// $moveCache[0] is the topic, $moveCache[1] is the board to move to.
+						$moveCache[1][$row['id_topic']] = (int) (isset($_REQUEST['move_tos'][$row['id_topic']]) ? $_REQUEST['move_tos'][$row['id_topic']] : $_REQUEST['move_to']);
+
+						if (empty($moveCache[1][$row['id_topic']]))
+							continue;
+
+						$moveCache[0][] = $row['id_topic'];
+						break;
+					case 'remove':
+						$removeCache[] = $row['id_topic'];
+						break;
+					case 'lock':
+						$lockCache[] = $row['id_topic'];
+						break;
 				}
 			}
-		}
-
-		$stickyCache = array();
-		$moveCache = array(0 => array(), 1 => array());
-		$removeCache = array();
-		$lockCache = array();
-		$markCache = array();
-		$approveCache = array();
-
-		// Separate the actions.
-		foreach ($_REQUEST['actions'] as $topic => $action)
-		{
-			$topic = (int) $topic;
-
-			if ($action == 'markread')
-				$markCache[] = $topic;
-			elseif ($action == 'sticky')
-				$stickyCache[] = $topic;
-			elseif ($action == 'move')
-			{
-				moveTopicConcurrence();
-
-				// $moveCache[0] is the topic, $moveCache[1] is the board to move to.
-				$moveCache[1][$topic] = (int) (isset($_REQUEST['move_tos'][$topic]) ? $_REQUEST['move_tos'][$topic] : $_REQUEST['move_to']);
-
-				if (empty($moveCache[1][$topic]))
-					continue;
-
-				$moveCache[0][] = $topic;
-			}
-			elseif ($action == 'remove')
-				$removeCache[] = $topic;
-			elseif ($action == 'lock')
-				$lockCache[] = $topic;
-			elseif ($action == 'approve')
-				$approveCache[] = $topic;
 		}
 
 		if (empty($board))
@@ -551,261 +545,19 @@ class MessageIndex_Controller extends Action_Controller
 
 		// Do all the stickies...
 		if (!empty($stickyCache))
-		{
-			toggleTopicSticky($stickyCache);
-
-			// Get the board IDs and Sticky status
-			$request = $db->query('', '
-				SELECT id_topic, id_board, is_sticky
-				FROM {db_prefix}topics
-				WHERE id_topic IN ({array_int:sticky_topic_ids})
-				LIMIT ' . count($stickyCache),
-				array(
-					'sticky_topic_ids' => $stickyCache,
-				)
-			);
-			$stickyCacheBoards = array();
-			$stickyCacheStatus = array();
-			while ($row = $db->fetch_assoc($request))
-			{
-				$stickyCacheBoards[$row['id_topic']] = $row['id_board'];
-				$stickyCacheStatus[$row['id_topic']] = empty($row['is_sticky']);
-			}
-			$db->free_result($request);
-		}
+			toggleTopicSticky($stickyCache, true);
 
 		// Move sucka! (this is, by the by, probably the most complicated part....)
 		if (!empty($moveCache[0]))
-		{
-			// I know - I just KNOW you're trying to beat the system.  Too bad for you... we CHECK :P.
-			$request = $db->query('', '
-				SELECT t.id_topic, t.id_board, b.count_posts
-				FROM {db_prefix}topics AS t
-					LEFT JOIN {db_prefix}boards AS b ON (t.id_board = b.id_board)
-				WHERE t.id_topic IN ({array_int:move_topic_ids})' . (!empty($board) && !allowedTo('move_any') ? '
-					AND t.id_member_started = {int:current_member}' : '') . '
-				LIMIT ' . count($moveCache[0]),
-				array(
-					'current_member' => $user_info['id'],
-					'move_topic_ids' => $moveCache[0],
-				)
-			);
-			$moveTos = array();
-			$moveCache2 = array();
-			$countPosts = array();
-			while ($row = $db->fetch_assoc($request))
-			{
-				$to = $moveCache[1][$row['id_topic']];
-
-				if (empty($to))
-					continue;
-
-				// Does this topic's board count the posts or not?
-				$countPosts[$row['id_topic']] = empty($row['count_posts']);
-
-				if (!isset($moveTos[$to]))
-					$moveTos[$to] = array();
-
-				$moveTos[$to][] = $row['id_topic'];
-
-				// For reporting...
-				$moveCache2[] = array($row['id_topic'], $row['id_board'], $to);
-			}
-			$db->free_result($request);
-
-			$moveCache = $moveCache2;
-
-			// Do the actual moves...
-			foreach ($moveTos as $to => $topics)
-				moveTopics($topics, $to);
-
-			// Does the post counts need to be updated?
-			if (!empty($moveTos))
-			{
-				require_once(SUBSDIR . '/Boards.subs.php');
-				$topicRecounts = array();
-				$boards_info = fetchBoardsInfo(array('boards' => array_keys($moveTos)), array('selects' => 'posts'));
-
-				foreach ($boards_info as $row)
-				{
-					$cp = empty($row['count_posts']);
-
-					// Go through all the topics that are being moved to this board.
-					foreach ($moveTos[$row['id_board']] as $topic)
-					{
-						// If both boards have the same value for post counting then no adjustment needs to be made.
-						if ($countPosts[$topic] != $cp)
-						{
-							// If the board being moved to does count the posts then the other one doesn't so add to their post count.
-							$topicRecounts[$topic] = $cp ? 1 : -1;
-						}
-					}
-				}
-
-				if (!empty($topicRecounts))
-				{
-					require_once(SUBSDIR . '/Members.subs.php');
-
-					// Get all the members who have posted in the moved topics.
-					$posters = topicsPosters(array_keys($topicRecounts));
-					foreach ($posters as $id_member => $topics)
-					{
-						$post_adj = 0;
-						foreach ($topics as $id_topic)
-							$post_adj += $topicRecounts[$id_topic];
-
-						// And now update that member's post counts
-						if (!empty($post_adj))
-						{
-							updateMemberData($id_member, array('posts' => 'posts + ' . $post_adj));
-						}
-					}
-				}
-			}
-		}
+			moveTopicsPermissions($moveCache);
 
 		// Now delete the topics...
 		if (!empty($removeCache))
-		{
-			// They can only delete their own topics. (we wouldn't be here if they couldn't do that..)
-			$result = $db->query('', '
-				SELECT id_topic, id_board
-				FROM {db_prefix}topics
-				WHERE id_topic IN ({array_int:removed_topic_ids})' . (!empty($board) && !allowedTo('remove_any') ? '
-					AND id_member_started = {int:current_member}' : '') . '
-				LIMIT ' . count($removeCache),
-				array(
-					'current_member' => $user_info['id'],
-					'removed_topic_ids' => $removeCache,
-				)
-			);
-
-			$removeCache = array();
-			$removeCacheBoards = array();
-			while ($row = $db->fetch_assoc($result))
-			{
-				$removeCache[] = $row['id_topic'];
-				$removeCacheBoards[$row['id_topic']] = $row['id_board'];
-			}
-			$db->free_result($result);
-
-			// Maybe *none* were their own topics.
-			if (!empty($removeCache))
-			{
-				// Gotta send the notifications *first*!
-				foreach ($removeCache as $topic)
-				{
-					// Only log the topic ID if it's not in the recycle board.
-					logAction('remove', array((empty($modSettings['recycle_enable']) || $modSettings['recycle_board'] != $removeCacheBoards[$topic] ? 'topic' : 'old_topic_id') => $topic, 'board' => $removeCacheBoards[$topic]));
-					sendNotifications($topic, 'remove');
-				}
-
-				removeTopics($removeCache);
-			}
-		}
-
-		// Approve the topics...
-		if (!empty($approveCache))
-		{
-			// We need unapproved topic ids and their authors!
-			$request = $db->query('', '
-				SELECT id_topic, id_member_started
-				FROM {db_prefix}topics
-				WHERE id_topic IN ({array_int:approve_topic_ids})
-					AND approved = {int:not_approved}
-				LIMIT ' . count($approveCache),
-				array(
-					'approve_topic_ids' => $approveCache,
-					'not_approved' => 0,
-				)
-			);
-			$approveCache = array();
-			$approveCacheMembers = array();
-			while ($row = $db->fetch_assoc($request))
-			{
-				$approveCache[] = $row['id_topic'];
-				$approveCacheMembers[$row['id_topic']] = $row['id_member_started'];
-			}
-			$db->free_result($request);
-
-			// Any topics to approve?
-			if (!empty($approveCache))
-			{
-				// Handle the approval part...
-				approveTopics($approveCache);
-
-				// Time for some logging!
-				foreach ($approveCache as $topic)
-					logAction('approve_topic', array('topic' => $topic, 'member' => $approveCacheMembers[$topic]));
-			}
-		}
+			removeTopicsPermissions($removeCache);
 
 		// And (almost) lastly, lock the topics...
 		if (!empty($lockCache))
-		{
-			$lockStatus = array();
-
-			// Gotta make sure they CAN lock/unlock these topics...
-			if (!empty($board) && !allowedTo('lock_any'))
-			{
-				// Make sure they started the topic AND it isn't already locked by someone with higher priv's.
-				$result = $db->query('', '
-					SELECT id_topic, locked, id_board
-					FROM {db_prefix}topics
-					WHERE id_topic IN ({array_int:locked_topic_ids})
-						AND id_member_started = {int:current_member}
-						AND locked IN (2, 0)
-					LIMIT ' . count($lockCache),
-					array(
-						'current_member' => $user_info['id'],
-						'locked_topic_ids' => $lockCache,
-					)
-				);
-				$lockCache = array();
-				$lockCacheBoards = array();
-				while ($row = $db->fetch_assoc($result))
-				{
-					$lockCache[] = $row['id_topic'];
-					$lockCacheBoards[$row['id_topic']] = $row['id_board'];
-					$lockStatus[$row['id_topic']] = empty($row['locked']);
-				}
-				$db->free_result($result);
-			}
-			else
-			{
-				$result = $db->query('', '
-					SELECT id_topic, locked, id_board
-					FROM {db_prefix}topics
-					WHERE id_topic IN ({array_int:locked_topic_ids})
-					LIMIT ' . count($lockCache),
-					array(
-						'locked_topic_ids' => $lockCache,
-					)
-				);
-				$lockCacheBoards = array();
-				while ($row = $db->fetch_assoc($result))
-				{
-					$lockStatus[$row['id_topic']] = empty($row['locked']);
-					$lockCacheBoards[$row['id_topic']] = $row['id_board'];
-				}
-				$db->free_result($result);
-			}
-
-			// It could just be that *none* were their own topics...
-			if (!empty($lockCache))
-			{
-				// Alternate the locked value.
-				$db->query('', '
-					UPDATE {db_prefix}topics
-					SET locked = CASE WHEN locked = {int:is_locked} THEN ' . (allowedTo('lock_any') ? '1' : '2') . ' ELSE 0 END
-					WHERE id_topic IN ({array_int:locked_topic_ids})',
-					array(
-						'locked_topic_ids' => $lockCache,
-						'is_locked' => 0,
-					)
-				);
-			}
-		}
+			toggleTopicsLock($lockCache, true);
 
 		if (!empty($markCache))
 		{
@@ -818,29 +570,6 @@ class MessageIndex_Controller extends Action_Controller
 			markTopicsRead($markArray, true);
 		}
 
-		foreach ($moveCache as $topic)
-		{
-			// Didn't actually move anything!
-			if (!isset($topic[0]))
-				break;
-
-			logAction('move', array('topic' => $topic[0], 'board_from' => $topic[1], 'board_to' => $topic[2]));
-			sendNotifications($topic[0], 'move');
-		}
-
-		foreach ($lockCache as $topic)
-		{
-			logAction($lockStatus[$topic] ? 'lock' : 'unlock', array('topic' => $topic, 'board' => $lockCacheBoards[$topic]));
-			sendNotifications($topic, $lockStatus[$topic] ? 'lock' : 'unlock');
-		}
-
-		foreach ($stickyCache as $topic)
-		{
-			logAction($stickyCacheStatus[$topic] ? 'unsticky' : 'sticky', array('topic' => $topic, 'board' => $stickyCacheBoards[$topic]));
-			sendNotifications($topic, 'sticky');
-		}
-
-		require_once(SUBSDIR . '/Topic.subs.php');
 		updateTopicStats();
 		require_once(SUBSDIR . '/Messages.subs.php');
 			updateMessageStats();

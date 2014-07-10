@@ -4302,6 +4302,7 @@ function response_prefix()
 	global $language, $user_info, $txt;
 	static $response_prefix = null;
 
+	// Get a response prefix, but in the forum's default language.
 	if ($response_prefix === null && !($response_prefix = cache_get_data('response_prefix')))
 	{
 		if ($language === $user_info['language'])
@@ -4312,7 +4313,6 @@ function response_prefix()
 			$response_prefix = $txt['response_prefix'];
 			loadLanguage('index');
 		}
-
 		cache_put_data('response_prefix', $response_prefix, 600);
 	}
 

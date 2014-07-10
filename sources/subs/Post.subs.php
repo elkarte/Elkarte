@@ -1603,9 +1603,10 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 			list ($form_subject, $mname, $mdate, $form_message) = $db->fetch_row($request);
 			$db->free_result($request);
 
+			$response_prefix = response_prefix();
 			// Add 'Re: ' to the front of the quoted subject.
-			if (trim($context['response_prefix']) != '' && Util::strpos($form_subject, trim($context['response_prefix'])) !== 0)
-				$form_subject = $context['response_prefix'] . $form_subject;
+			if (trim($response_prefix) != '' && Util::strpos($form_subject, trim($response_prefix)) !== 0)
+				$form_subject = $response_prefix . $form_subject;
 
 			// Censor the message and subject.
 			censorText($form_message);
@@ -1642,10 +1643,11 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 		{
 			// Get the first message's subject.
 			$form_subject = $first_subject;
+			$response_prefix = response_prefix();
 
 			// Add 'Re: ' to the front of the subject.
-			if (trim($context['response_prefix']) != '' && $form_subject != '' && Util::strpos($form_subject, trim($context['response_prefix'])) !== 0)
-				$form_subject = $context['response_prefix'] . $form_subject;
+			if (trim($response_prefix) != '' && $form_subject != '' && Util::strpos($form_subject, trim($response_prefix)) !== 0)
+				$form_subject = $response_prefix . $form_subject;
 
 			// Censor the subject.
 			censorText($form_subject);

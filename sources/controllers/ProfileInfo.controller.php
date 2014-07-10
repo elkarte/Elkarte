@@ -440,23 +440,12 @@ class ProfileInfo_Controller extends Action_Controller
 		{
 			checkSession('get');
 
-			// We need msg info for logging.
-			require_once(SUBSDIR . '/Messages.subs.php');
-			$info = basicMessageInfo((int) $_GET['delete'], true);
-
-			// Trying to remove a message that doesn't exist.
-			if (empty($info))
-				redirectexit('action=profile;u=' . $memID . ';area=showposts;start=' . $_GET['start']);
-
 			// We can be lazy, since removeMessage() will check the permissions for us.
-			removeMessage((int) $_GET['delete']);
-
-			// Add it to the mod log.
-			if (allowedTo('delete_any') && (!allowedTo('delete_own') || $info['id_member'] != $user_info['id']))
-				logAction('delete', array('topic' => $info['id_topic'], 'subject' => $info['subject'], 'member' => $info['id_member'], 'board' => $info['id_board']));
+			$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
+			$remover->removeMessage((int) $_GET['delete'], $decreasePostCount, true);
 
 			// Back to... where we are now ;).
-			redirectexit('action=profile;u=' . $memID . ';area=showposts;start=' . $_GET['start']);
+			redirectexit('action=profile;u=' . $memID . ';area=showposts;start=' . $context['start']);
 		}
 
 		if ($context['is_topics'])

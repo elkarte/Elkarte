@@ -999,11 +999,11 @@ class ModerationCenter_Controller extends Action_Controller
 
 			if (!empty($toDelete))
 			{
-				require_once(SUBSDIR . '/Messages.subs.php');
+				$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
 
 				// If they don't have permission we'll let it error - either way no chance of a security slip here!
 				foreach ($toDelete as $did)
-					removeMessage($did);
+					$remover->removeMessage($did);
 			}
 		}
 
