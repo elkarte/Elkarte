@@ -266,8 +266,6 @@ Controller = (function() {
   Controller.prototype.content = function() {
     if (this.$inputor.is('textarea, input')) {
       return this.$inputor.val();
-    } else if (this.$inputor.is('body')) {
-      return $(this.$inputor.html().replace(/<br[\s\/]*>/, "\n")).text();
     } else {
       return this.$inputor.text();
     }

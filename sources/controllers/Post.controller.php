@@ -51,7 +51,7 @@ class Post_Controller extends Action_Controller
 	 */
 	public function action_post()
 	{
-		global $txt, $scripturl, $topic, $modSettings, $board, $user_info, $context, $options, $language;
+		global $txt, $scripturl, $topic, $modSettings, $board, $user_info, $context, $options;
 
 		loadLanguage('Post');
 		loadLanguage('Errors');
@@ -357,19 +357,7 @@ class Post_Controller extends Action_Controller
 		}
 
 		// Get a response prefix (like 'Re:') in the default forum language.
-		if (!isset($context['response_prefix']) && !($context['response_prefix'] = cache_get_data('response_prefix')))
-		{
-			if ($language === $user_info['language'])
-				$context['response_prefix'] = $txt['response_prefix'];
-			else
-			{
-				loadLanguage('index', $language, false);
-				$context['response_prefix'] = $txt['response_prefix'];
-				loadLanguage('index');
-			}
-
-			cache_put_data('response_prefix', $context['response_prefix'], 600);
-		}
+		$context['response_prefix'] = response_prefix();
 
 		// Previewing, modifying, or posting?
 		// Do we have a body, but an error happened.
@@ -1953,8 +1941,8 @@ class Post_Controller extends Action_Controller
 	 */
 	public function action_jsmodify()
 	{
-		global $modSettings, $board, $topic, $txt;
-		global $user_info, $context, $language;
+		global $modSettings, $board, $topic;
+		global $user_info, $context;
 
 		$db = database();
 
@@ -2123,18 +2111,7 @@ class Post_Controller extends Action_Controller
 			if (isset($_POST['subject']) && isset($_REQUEST['change_all_subjects']) && $row['id_first_msg'] == $row['id_msg'] && !empty($row['num_replies']) && (allowedTo('modify_any') || ($row['id_member_started'] == $user_info['id'] && allowedTo('modify_replies'))))
 			{
 				// Get the proper (default language) response prefix first.
-				if (!isset($context['response_prefix']) && !($context['response_prefix'] = cache_get_data('response_prefix')))
-				{
-					if ($language === $user_info['language'])
-						$context['response_prefix'] = $txt['response_prefix'];
-					else
-					{
-						loadLanguage('index', $language, false);
-						$context['response_prefix'] = $txt['response_prefix'];
-						loadLanguage('index');
-					}
-					cache_put_data('response_prefix', $context['response_prefix'], 600);
-				}
+				$context['response_prefix'] = response_prefix();
 
 				$db->query('', '
 					UPDATE {db_prefix}messages

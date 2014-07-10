@@ -4351,3 +4351,31 @@ function replaceBasicActionUrl($string)
 
 	return str_replace($find, $replace, $string);
 }
+
+/**
+ * This function has the only task to retrieve the correct prefix to be used
+ * in responses.
+ *
+ * @return string - The prefix in the default language of the forum
+ */
+function response_prefix()
+{
+	global $language, $user_info, $txt;
+	static $response_prefix = null;
+
+	if ($response_prefix === null && !($response_prefix = cache_get_data('response_prefix')))
+	{
+		if ($language === $user_info['language'])
+			$response_prefix = $txt['response_prefix'];
+		else
+		{
+			loadLanguage('index', $language, false);
+			$response_prefix = $txt['response_prefix'];
+			loadLanguage('index');
+		}
+
+		cache_put_data('response_prefix', $response_prefix, 600);
+	}
+
+	return $response_prefix;
+}

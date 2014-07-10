@@ -156,7 +156,7 @@ class MergeTopics_Controller extends Action_Controller
 	 */
 	public function action_mergeExecute($topics = array())
 	{
-		global $user_info, $txt, $context, $scripturl, $language, $modSettings;
+		global $user_info, $txt, $context, $scripturl, $modSettings;
 
 		$db = database();
 
@@ -479,18 +479,7 @@ class MergeTopics_Controller extends Action_Controller
 		$id_topic = min($topics);
 
 		// Grab the response prefix (like 'Re: ') in the default forum language.
-		if (!isset($context['response_prefix']) && !($context['response_prefix'] = cache_get_data('response_prefix')))
-		{
-			if ($language === $user_info['language'])
-				$context['response_prefix'] = $txt['response_prefix'];
-			else
-			{
-				loadLanguage('index', $language, false);
-				$context['response_prefix'] = $txt['response_prefix'];
-				loadLanguage('index');
-			}
-			cache_put_data('response_prefix', $context['response_prefix'], 600);
-		}
+		$context['response_prefix'] = response_prefix();
 
 		$enforce_subject = isset($_POST['enforce_subject']) ? Util::htmlspecialchars(trim($_POST['enforce_subject'])) : '';
 

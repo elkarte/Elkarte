@@ -50,9 +50,7 @@ function create_pm_draft($draft, $recipientList)
 	);
 
 	// Return the new id
-	$draft['id_draft'] = $db->insert_id('{db_prefix}user_drafts', 'id_draft');
-
-	return $draft['id_draft'];
+	return $db->insert_id('{db_prefix}user_drafts', 'id_draft');
 }
 
 /**
@@ -136,9 +134,7 @@ function create_post_draft($draft)
 	);
 
 	// Get the id of the new draft
-	$draft['id_draft'] = $db->insert_id('{db_prefix}user_drafts', 'id_draft');
-
-	return $draft['id_draft'];
+	return $db->insert_id('{db_prefix}user_drafts', 'id_draft');
 }
 
 /**
@@ -405,7 +401,6 @@ function getOldDrafts($days)
 			'poster_time_old' => time() - (86400 * $days),
 		)
 	);
-
 	while ($row = $db->fetch_row($request))
 		$drafts[] = (int) $row[0];
 	$db->free_result($request);

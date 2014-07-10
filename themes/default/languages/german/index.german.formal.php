@@ -245,6 +245,7 @@ $txt['error_invalid_characters_username'] = 'Ungültiges Zeichen im Benutzername
 
 $txt['welcome_guest'] = 'Willkommen, <strong>Gast</strong>. Bitte <a href="{login_url}">melden Sie sich an</a>.';
 
+$txt['welcome_guest_register'] = 'Willkommen auf <strong>{forum_name}</strong>. Bitte <a href="{login_url}">melden Sie sich an</a> oder <a href="{register_url}">registrieren Sie sich</a>.';
 $txt['welcome_guest_activate'] = '<br />Haben Sie Ihre <a href="{activate_url}">Aktivierungs-E-Mail</a> übersehen?';
 // @todo the following to sprintf
 $txt['hello_member'] = 'Hey,';

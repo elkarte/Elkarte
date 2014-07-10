@@ -108,7 +108,7 @@ class Draft_Controller extends Action_Controller
 
 		// Find this user's drafts
 		$limit = $start . ', ' . $maxIndex;
-		$order = 'ud.id_draft ' . ($reverse ? 'ASC' : 'DESC');
+		$order = 'ud.poster_time ' . ($reverse ? 'ASC' : 'DESC');
 		$user_drafts = load_user_drafts($memID, 0, false, $order, $limit);
 
 		// Start counting at the number of the first message displayed.
@@ -250,7 +250,7 @@ class Draft_Controller extends Action_Controller
 		}
 
 		// Go get em'
-		$order = 'ud.id_draft ' . ($reverse ? 'ASC' : 'DESC');
+		$order = 'ud.poster_time ' . ($reverse ? 'ASC' : 'DESC');
 		$limit = $start . ', ' . $maxIndex;
 		$user_drafts = load_user_drafts($memID, 1, false, $order, $limit);
 

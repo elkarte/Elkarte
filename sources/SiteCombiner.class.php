@@ -150,6 +150,7 @@ class Site_Combiner
 		foreach ($files as $id => $file)
 		{
 			$load = (!$do_defered && empty($file['options']['defer'])) || ($do_defered && !empty($file['options']['defer']));
+
 			// Get the ones that we would load locally so we can merge them
 			if ($load && (empty($file['options']['local']) || !$this->_addFile($file['options'])))
 				$this->_spares[$id] = $file;
@@ -200,7 +201,6 @@ class Site_Combiner
 			// Get the ones that we would load locally so we can merge them
 			if (empty($file['options']['local']) || !$this->_addFile($file['options']))
 				$this->_spares[$id] = $file;
-
 		}
 
 		// Nothing to do so return
@@ -220,6 +220,9 @@ class Site_Combiner
 			require_once(EXTDIR . '/cssmin.php');
 			$compressor = new CSSmin($this->_cache);
 			$this->_minified_cache = $compressor->run($this->_cache);
+
+			// Combined in any pre minimized to our new minimized string
+			$this->_minified_cache .= "\n" . $this->_min_cache;
 
 			$this->_saveFiles();
 		}
@@ -263,7 +266,7 @@ class Site_Combiner
 				'basename' => $options['basename'],
 				'url' => $options['url'],
 				'filemtime' => filemtime($filename),
-				'minimized' => (bool) strpos($options['basename'], '.min.js') !== false,
+				'minimized' => (bool) strpos($options['basename'], '.min.js') !== false || strpos($options['basename'], '.min.css') !== false,
 			);
 
 			$this->_stales[] = $this->_combine_files[$options['basename']]['filemtime'];
@@ -347,6 +350,7 @@ class Site_Combiner
 			{
 				$tempfile = str_replace(array('../../images', '../images'), $file['url'] . '/images', $tempfile);
 				$tempfile = str_replace(array('../../webfonts', '../webfonts'), $file['url'] . '/webfonts', $tempfile);
+				$tempfile = str_replace(array('../../scripts', '../scripts'), $file['url'] . '/scripts', $tempfile);
 			}
 
 			// Add the file to the correct array for processing

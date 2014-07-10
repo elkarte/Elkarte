@@ -30,9 +30,8 @@ function elk_DraftAutoSave(oOptions)
 
 /**
  * Start our self calling routine
- * @returns {undefined}
  */
-elk_DraftAutoSave.prototype.init = function ()
+elk_DraftAutoSave.prototype.init = function()
 {
 	if (this.opt.iFreq > 0)
 	{
@@ -41,9 +40,27 @@ elk_DraftAutoSave.prototype.init = function ()
 
 		// Set up the text area events
 		this.oDraftHandle.instanceRef = this;
-		this.oDraftHandle.onblur = function (oEvent) {return this.instanceRef.draftBlur();};
-		this.oDraftHandle.onfocus = function (oEvent) {return this.instanceRef.draftFocus();};
-		this.oDraftHandle.onkeypress = function (oEvent) {return this.instanceRef.draftKeypress();};
+		this.oDraftHandle.onblur = function(oEvent) {
+			return this.instanceRef.draftBlur();
+		};
+		this.oDraftHandle.onfocus = function(oEvent) {
+			return this.instanceRef.draftFocus();
+		};
+		this.oDraftHandle.onkeydown = function(oEvent) {
+			// Don't let tabbing to the buttons trigger autosave event
+			if (oEvent.keyCode === 9)
+				this.instanceRef.bInDraftMode = true;
+
+			return this.instanceRef.draftKeypress();
+		};
+
+		// Prevent autosave when selecting post/save by mouse or keyboard
+		$('#postmodify .button_submit').on('mousedown', this.oDraftHandle.instanceRef, function() {
+			this.bInDraftMode = true;
+		});
+		$('#postmodify .button_submit').on('onkeypress', this.oDraftHandle.instanceRef, function() {
+			this.bInDraftMode = true;
+		});
 	}
 };
 
@@ -53,7 +70,11 @@ elk_DraftAutoSave.prototype.init = function ()
  */
 elk_DraftAutoSave.prototype.draftBlur = function()
 {
-	this.draftSave();
+	// Save if we are not already
+	if (this.bInDraftMode !== true)
+		this.draftSave();
+	else
+		this.draftCancel();
 
 	if (this.interval_id !== "")
 		window.clearInterval(this.interval_id);
@@ -83,7 +104,7 @@ elk_DraftAutoSave.prototype.draftKeypress = function()
 /**
  * Makes the ajax call to save this draft in the background
  */
-elk_DraftAutoSave.prototype.draftSave = function ()
+elk_DraftAutoSave.prototype.draftSave = function()
 {
 	// Form submitted or nothing changed since the last save
 	if (elk_formSubmitted || !this.bCheckDraft)
@@ -124,7 +145,7 @@ elk_DraftAutoSave.prototype.draftSave = function ()
  * Callback function of the XMLhttp request for saving the draft message
  * @param {object} XMLDoc
  */
-elk_DraftAutoSave.prototype.onDraftDone = function (XMLDoc)
+elk_DraftAutoSave.prototype.onDraftDone = function(XMLDoc)
 {
 	// If it is not valid then clean up
 	if (!XMLDoc || !XMLDoc.getElementsByTagName('draft')[0])
@@ -145,7 +166,7 @@ elk_DraftAutoSave.prototype.onDraftDone = function (XMLDoc)
 };
 
 // If another auto save came in with one still pending
-elk_DraftAutoSave.prototype.draftCancel = function ()
+elk_DraftAutoSave.prototype.draftCancel = function()
 {
 	this.bInDraftMode = false;
 	document.getElementById('throbber').style.display = 'none';
