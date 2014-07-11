@@ -64,7 +64,9 @@ function template_permission_index()
 						<legend>', $txt['permissions_with_selection'], '</legend>
 						<dl class="settings admin_permissions">
 							<dt>
-								<a class="help" href="', $scripturl, '?action=quickhelp;help=permissions_quickgroups" onclick="return reqOverlayDiv(this.href);"><img class="icon" src="' . $settings['images_url'] . '/helptopics.png" alt="' . $txt['help'] . '" /></a>', $txt['permissions_apply_pre_defined'], ':
+								<a class="help" href="', $scripturl, '?action=quickhelp;help=permissions_quickgroups" onclick="return reqOverlayDiv(this.href);">
+									<img class="icon_fixed" src="' . $settings['images_url'] . '/helptopics.png" alt="' . $txt['help'] . '" />
+								</a>', $txt['permissions_apply_pre_defined'], ':
 							</dt>
 							<dd>
 								<select name="predefined">
