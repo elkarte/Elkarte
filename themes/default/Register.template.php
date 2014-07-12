@@ -171,18 +171,18 @@ function template_registration_form()
 
 	echo '
 					<dl class="register_form" id="password1_group">
-						<dt><strong><label for="elk_autov_pwmain">', ucwords($txt['choose_pass']), ':</label></strong></dt>
+						<dt><strong><label for="elk_autov_pwmain">', $txt['choose_pass'], ':</label></strong></dt>
 						<dd>
-							<input type="password" name="passwrd1" id="elk_autov_pwmain" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', ucwords($txt['choose_pass']), '" required="required" />
+							<input type="password" name="passwrd1" id="elk_autov_pwmain" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['choose_pass'], '" required="required" />
 							<span id="elk_autov_pwmain_div" style="display: none;">
 								<img id="elk_autov_pwmain_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
 							</span>
 						</dd>
 					</dl>
 					<dl class="register_form" id="password2_group">
-						<dt><strong><label for="elk_autov_pwverify">', ucwords($txt['verify_pass']), ':</label></strong></dt>
+						<dt><strong><label for="elk_autov_pwverify">', $txt['verify_pass'], ':</label></strong></dt>
 						<dd>
-							<input type="password" name="passwrd2" id="elk_autov_pwverify" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', ucwords($txt['verify_pass']), '" required="required" />
+							<input type="password" name="passwrd2" id="elk_autov_pwverify" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['verify_pass'], '" required="required" />
 							<span id="elk_autov_pwverify_div" style="display: none;">
 								<img id="elk_autov_pwverify_img" src="', $settings['images_url'], '/icons/field_valid.png" alt="*" />
 							</span>
