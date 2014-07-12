@@ -128,6 +128,7 @@ $txt['theme_admin'] = 'Designeinstellungen';
 $txt['theme_admin_info'] = 'Richten Sie neue Designs ein, wählen Sie aus, welche verfügbar sein sollen, oder setzen Sie sie zurück.';
 $txt['registration_center'] = 'Registrierung';
 $txt['member_center_info'] = 'Betrachten Sie die Mitgliederliste, suchen Sie nach Mitgliedern oder verwalten Sie Freischaltungen und Aktivierungen.';
+$txt['viewmembers_online'] = 'Zuletzt online';
 
 $txt['display_name'] = 'Anzeigename';
 $txt['email_address'] = 'E-Mail-Adresse';
