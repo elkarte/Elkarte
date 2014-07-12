@@ -147,6 +147,13 @@
 				anchorClass: 'sf-with-ul',
 				menuArrowClass: 'sf-arrows'
 			},
+            outerClick = (function() {
+                $(window).load(function() {
+                    $('body').children().on('click.superfish', function() {
+                        $('.sf-js-enabled').superfish('hide', 'true');
+                    });
+                });
+            })(),
 			ios = (function () {
 				var ios = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 				if (ios) {
@@ -376,12 +383,6 @@
 		onIdle: $.noop,
 		onDestroy: $.noop
 	};
-
-	// soon to be deprecated
-	$.fn.extend({
-		hideSuperfishUl: methods.hide,
-		showSuperfishUl: methods.show
-	});
 
 })(jQuery);
 
