@@ -951,13 +951,8 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 					global $context;
 
 					if (!isset($disabled[\'code\']))
-					{
 						$data = str_replace("\t", "<span style=\"white-space: pre;\">\t</span>", $data);
-
-						// Recent Opera bug requiring temporary fix. &nsbp; is needed before </code> to avoid broken selection.
-						if ($context[\'browser\'][\'is_opera\'])
-							$data .= \'&nbsp;\';
-					}'),
+					'),
 				'block_level' => true,
 			),
 			array(
