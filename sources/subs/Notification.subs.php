@@ -570,11 +570,7 @@ function sendApprovalNotifications(&$topicData)
 
 	// Email ahoy
 	require_once(SUBSDIR . '/Mail.subs.php');
-
-	// Maillist format?
-	$maillist = !empty($modSettings['maillist_enabled']) && !empty($modSettings['pbe_post_enabled']);
-	if ($maillist)
-		require_once(SUBSDIR . '/Emailpost.subs.php');
+	require_once(SUBSDIR . '/Emailpost.subs.php');
 
 	$topics = array();
 	$digest_insert = array();
