@@ -22,9 +22,10 @@ table, td {
 code:before {
 	position: absolute;
 	content: 'Code:';
-	top: -1.35em;
+	top: -1.7em;
 	left: 0;
-	font-size: 1em;
+	font-size: 1.2em;
+	text-align: left;
 }
 code {
 	margin-top: 1.5em;
@@ -37,15 +38,7 @@ code {
 	font-size: 0.7em;
 	border-top: 2px solid #bbb;
 	border-bottom: 3px solid #aaa;
-}
-code:before, code {
 	display: block;
-	text-align: left;
-}
-code cite {
-	position: relative;
-	top: -1.6em;
-	padding-left: 3em;
 }
 blockquote {
 	overflow: auto;
@@ -62,6 +55,13 @@ blockquote cite, code cite {
 	font-size: 0.786em;
 	padding: 0 0 4px;
 	display: block;
+}
+code cite {
+	position: relative;
+	top: -1.9em;
+	font-size: 1.3em;
+	margin-left: 2.7em;
+	margin-bottom: -1.5em;
 }
 /* Will correctly colour down to seventh level of nested quotes in editor. Can be extended easily enough. */
 body>blockquote, body>blockquote>blockquote, body>blockquote>blockquote>blockquote>blockquote,
