@@ -447,6 +447,18 @@
 					return false;
 				}
 			},
+			dblclickHandler = function(e) {
+				var $this = $(this),
+					$popUp = $this.siblings(e.data.popUpSelector),
+					target = e.currentTarget.href;
+
+				if ($popUp.length === 1 && target) {
+					if ($popUp.not(':hidden'))
+						$.proxy(out, $this.parent('li'))();
+					window.location = target;
+					return false;
+				}
+			},
 			over = function () {
 				var $this = $(this),
 					o = getOptions($this);
@@ -564,6 +576,7 @@
 					toggleAnchorClass($hasPopUp);
 					toggleTouchAction($this);
 					$this.on('click.superclick', 'a', o, clickHandler);
+					$hasPopUp.on('dblclick.superclick', 'a', o, dblclickHandler);
 
 					$hasPopUp.not('.' + c.bcClass).superclick('hide', true);
 
