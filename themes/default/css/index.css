@@ -3338,7 +3338,7 @@ div.labels {
 #calendar_navigation .buttonlist {
 	padding: 0 6px;
 }
-/* See, I told you there was deranged wombatz here. */
+/* See, I told you there was wombatz here. */
 /*
 			   ,.--""""--.._
 			 ."     .'      `-.
@@ -3497,6 +3497,9 @@ div.labels {
 	margin: 0;
 	opacity: 0.8;
 	cursor: help;
+}
+.hdicon.help {
+	vertical-align: top;
 }
 .hdicon.help:before {
 	margin: 2px 0 0;

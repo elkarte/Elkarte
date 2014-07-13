@@ -149,7 +149,7 @@ $txt['credits_copyright'] = 'Copyright';
 $txt['credits_version'] = 'Version';
 // Replace "English" with the name of this language pack in the string below.
 $txt['credits_groups_translators'] = 'Language Translators';
-$txt['credits_translators_message'] = 'Thank you for your efforts which make it possible for people all around the world to use ElkArte.';
+$txt['credits_translators_message'] = 'Thank you for your efforts which make it possible for people all around the world to use ElkArte.  For a complete list please refer to the offical Transifex <a href="https://www.transifex.com/organization/elkarte/dashboard" target="_blank" class="new_win">list of contributors.</a>';
 
 // List of people who have made more than a token contribution to this translation. (blank for English)
 $txt['translation_credits'] = array();
