@@ -1079,9 +1079,10 @@ class ManageThemes_Controller extends Action_Controller
 			if (function_exists('apache_reset_timeout'))
 				@apache_reset_timeout();
 
-			// Create subdirectories for css and javascript files.
+			// Create subdirectories for css, javascript and font files.
 			mkdir($theme_dir . '/css', 0777);
 			mkdir($theme_dir . '/scripts', 0777);
+			mkdir($theme_dir . '/webfonts', 0777);
 
 			// Copy over the default non-theme files.
 			$to_copy = array('/index.php', '/index.template.php', '/scripts/theme.js');
@@ -1091,9 +1092,10 @@ class ManageThemes_Controller extends Action_Controller
 				@chmod($theme_dir . $file, 0777);
 			}
 
-			// And now the entire css & images directories!
+			// And now the entire css, images and webfonts directories!
 			copytree($settings['default_theme_dir'] . '/css', $theme_dir . '/css');
 			copytree($settings['default_theme_dir'] . '/images', $theme_dir . '/images');
+			copytree($settings['default_theme_dir'] . '/webfonts', $theme_dir . '/webfonts');
 			package_flush_cache();
 
 			$theme_name = $_REQUEST['copy'];
