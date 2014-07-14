@@ -2034,7 +2034,7 @@ function profileSaveAvatarData(&$value)
 	global $modSettings, $profile_vars, $cur_profile, $context;
 
 	$db = database();
-var_dump($_POST);
+
 	$memID = $context['id_member'];
 	if (empty($memID) && !empty($context['password_auth_failed']))
 		return false;
