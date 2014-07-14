@@ -2034,7 +2034,7 @@ function profileSaveAvatarData(&$value)
 	global $modSettings, $profile_vars, $cur_profile, $context;
 
 	$db = database();
-
+var_dump($_POST);
 	$memID = $context['id_member'];
 	if (empty($memID) && !empty($context['password_auth_failed']))
 		return false;
@@ -2046,8 +2046,8 @@ function profileSaveAvatarData(&$value)
 	$id_folder = getAvatarPathID();
 
 	$downloadedExternalAvatar = false;
-	$valid_http = substr($_POST['userpicpersonal'], 0, 7) === 'http://' && strlen($_POST['userpicpersonal']) > 7;
-	$valid_https = substr($_POST['userpicpersonal'], 0, 8) === 'https://' && strlen($_POST['userpicpersonal']) > 8;
+	$valid_http = isset($_POST['userpicpersonal']) && substr($_POST['userpicpersonal'], 0, 7) === 'http://' && strlen($_POST['userpicpersonal']) > 7;
+	$valid_https = isset($_POST['userpicpersonal']) && substr($_POST['userpicpersonal'], 0, 8) === 'https://' && strlen($_POST['userpicpersonal']) > 8;
 	if ($value == 'external' && allowedTo('profile_remote_avatar') && ($valid_http || $valid_https) && !empty($modSettings['avatar_download_external']))
 	{
 		loadLanguage('Post');
