@@ -2806,6 +2806,9 @@ dl.merge_topic dd {
 	-moz-hyphens: auto;
 	-ms-hyphens: auto;
 }
+.profileblock .icon {
+	vertical-align: bottom;
+}
 .profile_content {
 	overflow: auto;
 	padding: 0 8px;
