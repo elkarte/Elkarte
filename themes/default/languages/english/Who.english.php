@@ -151,5 +151,9 @@ $txt['credits_version'] = 'Version';
 $txt['credits_groups_translators'] = 'Language Translators';
 $txt['credits_translators_message'] = 'Thank you for your efforts which make it possible for people all around the world to use ElkArte.  For a complete list please refer to the offical Transifex <a href="https://www.transifex.com/organization/elkarte/dashboard" target="_blank" class="new_win">list of contributors.</a>';
 
+// Overrides the already defined strings to get clean results in the table
+$txt['today'] = '%1$s';
+$txt['yesterday'] = '%1$s';
+
 // List of people who have made more than a token contribution to this translation. (blank for English)
 $txt['translation_credits'] = array();
