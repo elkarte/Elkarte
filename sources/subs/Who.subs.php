@@ -459,6 +459,12 @@ function prepareCreditsData()
 						$txt['credits_contrib_list'],
 					),
 				),
+				array(
+					'title' => $txt['credits_groups_translators'],
+					'members' => array(
+						$txt['credits_translators_message'],
+					),
+				),
 			),
 		),
 	);

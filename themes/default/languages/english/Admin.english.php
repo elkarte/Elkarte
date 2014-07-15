@@ -120,6 +120,7 @@ $txt['lfyi'] = 'You are unable to connect to ElkArte\'s latest news file.';
 
 $txt['manage_calendar'] = 'Calendar';
 $txt['manage_search'] = 'Search';
+$txt['viewmembers_online'] = 'Last Online';
 
 $txt['smileys_manage'] = 'Smileys and Message Icons';
 $txt['smileys_manage_info'] = 'Install new smiley sets, add smileys to existing sets or manage your message icons.';

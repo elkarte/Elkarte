@@ -1537,35 +1537,26 @@ function elkSelectText(oCurElement, bActOnElement)
 	else
 		oCodeArea = oCurElement.parentNode.nextSibling;
 
+	// Did not find it, bail
 	if (typeof(oCodeArea) !== 'object' || oCodeArea === null)
 		return false;
 
-	// Start off with my favourite, internet explorer.
+	// Start off with internet explorer < 9.
 	if ('createTextRange' in document.body)
 	{
 		var oCurRange = document.body.createTextRange();
 		oCurRange.moveToElementText(oCodeArea);
 		oCurRange.select();
 	}
-	// Firefox at el.
+	// All the rest
 	else if (window.getSelection)
 	{
-		var oCurSelection = window.getSelection();
-
-		// Safari is special!
-		if (oCurSelection.setBaseAndExtent)
-		{
-			var oLastChild = oCodeArea.lastChild;
-			oCurSelection.setBaseAndExtent(oCodeArea, 0, oLastChild, 'innerText' in oLastChild ? oLastChild.innerText.length : oLastChild.textContent.length);
-		}
-		else
-		{
-			var curRange = document.createRange();
+		var oCurSelection = window.getSelection(),
+			curRange = document.createRange();
 
 			curRange.selectNodeContents(oCodeArea);
 			oCurSelection.removeAllRanges();
 			oCurSelection.addRange(curRange);
-		}
 	}
 
 	return false;

@@ -151,4 +151,11 @@ $txt['credits_license'] = 'Lizenz';
 $txt['credits_copyright'] = 'Copyright'; // hm, this is not even valid in Germany...
 $txt['credits_version'] = 'Version';
 $txt['credits_groups_translators'] = 'Übersetzer';
-$txt['credits_translators_message'] = 'Danke für eure Mühen, die es Benutzern auf der ganzen Welt ermöglichen, ElkArte zu verwenden.';
+$txt['credits_translators_message'] = 'Danke für eure Mühen, die es Benutzern auf der ganzen Welt ermöglichen, ElkArte zu verwenden.  Für eine vollständige Liste beachten Sie bitte die offizielle Transifex-<a href="https://www.transifex.com/organization/elkarte/dashboard" target="_blank" class="new_win">Liste der Beteiligten.</a>';
+
+// Overrides the already defined strings to get clean results in the table
+$txt['today'] = '%1$s';
+$txt['yesterday'] = '%1$s';
+
+// List of people who have made more than a token contribution to this translation. (blank for English)
+$txt['translation_credits'] = array();

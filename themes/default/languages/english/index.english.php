@@ -147,7 +147,7 @@ $txt['replies'] = 'Replies';
 $txt['last_post'] = 'Last post';
 $txt['first_post'] = 'First post';
 $txt['last_poster'] = 'Last post author';
-//$txt['last_post_message'] = '<strong>Last post</strong> by %1$s<br />in %2$s<br />on %3$s';
+
 // @todo - Clean this up a bit. See notes in template.
 // Just moved a space, so the output looks better when things break to an extra line.
 $txt['last_post_message'] = '<span class="lastpost_link">%2$s </span><span class="board_lastposter">by %1$s</span><span class="board_lasttime"><strong>Last post: </strong>%3$s</span>';
@@ -415,8 +415,8 @@ $txt['template_parse_error_message'] = 'It seems something has gone sour on the 
 $txt['template_parse_error_details'] = 'There was a problem loading the <span class="tt"><strong>%1$s</strong></span> template or language file.  Please check the syntax and try again - remember, single quotes (<span class="tt">\'</span>) often have to be escaped with a backslash (<span class="tt">\\</span>).  To see more specific error information from PHP, try <a href="%2$s%1$s">accessing the file directly</a>.<br /><br />You may want to try to <a href="javascript:location.reload();">refresh this page</a> or <a href="%3$s">use the default theme</a>.';
 $txt['template_parse_undefined'] = 'An undefined error occurred during the parsing of this template';
 
-$txt['today'] = 'Today at ';
-$txt['yesterday'] = 'Yesterday at ';
+$txt['today'] = 'Today at %1$s';
+$txt['yesterday'] = 'Yesterday at %1$s';
 
 // Relative times
 $txt['rt_now'] = 'just now';

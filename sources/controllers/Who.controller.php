@@ -165,7 +165,7 @@ class Who_Controller extends Action_Controller
 				'id' => $row['id_member'],
 				'ip' => allowedTo('moderate_forum') ? $row['ip'] : '',
 				// It is *going* to be today or yesterday, so why keep that information in there?
-				'time' => strtr(standardTime($row['log_time'], true), array($txt['today'] => '', $txt['yesterday'] => '')),
+				'time' => standardTime($row['log_time'], true),
 				'html_time' => htmlTime($row['log_time']),
 				'timestamp' => forum_time(true, $row['log_time']),
 				'query' => $actions,

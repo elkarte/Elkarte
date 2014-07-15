@@ -414,8 +414,8 @@ $txt['template_parse_error_message'] = 'Anscheinend ist etwas mit dem Vorlagensy
 $txt['template_parse_error_details'] = 'Ein Problem ist beim Laden der Vorlage oder Sprachdatei <span class="tt"><strong>%1$s</strong></span> aufgetreten.  Bitte überprüfen Sie die Syntax und versuchen Sie es erneut - denken Sie daran, dass einfache Anführungszeichen (<span class="tt">\'</span>) oft mit einem umgekehrten Schrägstrich (<span class="tt">\\</span>) markiert werden müssen.  Um spezifischere Fehlerinformationen von PHP einzusehen, versuchen Sie <a href="%2$s%1$s">die Datei direkt zu öffnen</a>.<br /><br />Möglicherweise möchten Sie <a href="javascript:location.reload();">diese Seite neu laden</a> oder <a href="%3$s">das Standarddesign verwenden</a>.';
 $txt['template_parse_undefined'] = 'Ein unbekannter Fehler ist bei der Verarbeitung dieser Vorlage aufgetreten';
 
-$txt['today'] = 'Heute um ';
-$txt['yesterday'] = 'Gestern um ';
+$txt['today'] = 'Heute um %1$s';
+$txt['yesterday'] = 'Gestern um %1$s';
 
 // Relative times
 $txt['rt_now'] = 'gerade eben';
