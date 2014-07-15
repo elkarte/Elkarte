@@ -510,7 +510,7 @@ function template_manage_sphinx()
 							<span class="smalltext">', $txt['sphinx_memory_limit_desc'], '</span>
 						</dt>
 						<dd>
-							<input type="text" name="sphinx_indexer_mem" id="sphinx_indexer_mem_input" value="', isset($modSettings['sphinx_indexer_mem']) ? $modSettings['sphinx_indexer_mem'] : '32', '" size="4" /> MB
+							<input type="text" name="sphinx_indexer_mem" id="sphinx_indexer_mem_input" value="', isset($modSettings['sphinx_indexer_mem']) ? $modSettings['sphinx_indexer_mem'] : '128', '" size="4" /> MB
 						</dd>
 						<dt>
 							<label for="sphinx_searchd_server_input"><strong>', $txt['sphinx_searchd_server'], '</strong></label><br />

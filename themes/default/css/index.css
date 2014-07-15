@@ -191,6 +191,7 @@ select option {
 /* Special form elements need to be addressed */
 select#cat, select#suggestions, select#file , input[type="file"] {
 	height: auto;
+	max-height: none;
 }
 input[type="number"] {
 	padding: 0 0 0 6px;
@@ -2805,6 +2806,9 @@ dl.merge_topic dd {
 	-webkit-hyphens: auto;
 	-moz-hyphens: auto;
 	-ms-hyphens: auto;
+}
+.profileblock .icon {
+	vertical-align: bottom;
 }
 .profile_content {
 	overflow: auto;
