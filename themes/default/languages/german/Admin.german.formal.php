@@ -120,6 +120,7 @@ $txt['lfyi'] = 'Sie konnten ElkArtes Neuigkeiten nicht abrufen.';
 
 $txt['manage_calendar'] = 'Kalender';
 $txt['manage_search'] = 'Suchen';
+$txt['viewmembers_online'] = 'Zuletzt online';
 
 $txt['smileys_manage'] = 'Smileys und Nachrichtensymbole';
 $txt['smileys_manage_info'] = 'Installieren Sie neue Smileysätze, fügen Sie neue Smileys zu bestehenden hinzu oder verwalten Sie Ihre Nachrichtensymbole.';
