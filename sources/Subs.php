@@ -573,11 +573,11 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 
 		// Same day of the year, same year.... Today!
 		if ($then['yday'] == $now['yday'] && $then['year'] == $now['year'])
-			return $txt['today'] . standardTime($log_time, $today_fmt, $offset_type);
+			return sprintf($txt['today'], standardTime($log_time, $today_fmt, $offset_type));
 
 		// Day-of-year is one less and same year, or it's the first of the year and that's the last of the year...
 		if ($modSettings['todayMod'] == '2' && (($then['yday'] == $now['yday'] - 1 && $then['year'] == $now['year']) || ($now['yday'] == 0 && $then['year'] == $now['year'] - 1) && $then['mon'] == 12 && $then['mday'] == 31))
-			return $txt['yesterday'] . standardTime($log_time, $today_fmt, $offset_type);
+			return sprintf($txt['yesterday'], standardTime($log_time, $today_fmt, $offset_type));
 	}
 
 	$str = !is_bool($show_today) ? $show_today : $user_info['time_format'];

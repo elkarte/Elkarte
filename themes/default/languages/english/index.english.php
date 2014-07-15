@@ -414,8 +414,8 @@ $txt['template_parse_error_message'] = 'It seems something has gone sour on the 
 $txt['template_parse_error_details'] = 'There was a problem loading the <span class="tt"><strong>%1$s</strong></span> template or language file.  Please check the syntax and try again - remember, single quotes (<span class="tt">\'</span>) often have to be escaped with a backslash (<span class="tt">\\</span>).  To see more specific error information from PHP, try <a href="%2$s%1$s">accessing the file directly</a>.<br /><br />You may want to try to <a href="javascript:location.reload();">refresh this page</a> or <a href="%3$s">use the default theme</a>.';
 $txt['template_parse_undefined'] = 'An undefined error occurred during the parsing of this template';
 
-$txt['today'] = 'Today at ';
-$txt['yesterday'] = 'Yesterday at ';
+$txt['today'] = 'Today at %1$s';
+$txt['yesterday'] = 'Yesterday at %1$s';
 
 // Relative times
 $txt['rt_now'] = 'just now';
