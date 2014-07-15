@@ -222,7 +222,7 @@ index elkarte_index
 
 indexer
 {
-	mem_limit		= ', (empty($modSettings['sphinx_indexer_mem']) ? 32 : (int) $modSettings['sphinx_indexer_mem']), 'M
+	mem_limit		= ', (empty($modSettings['sphinx_indexer_mem']) ? 128 : (int) $modSettings['sphinx_indexer_mem']), 'M
 }
 
 searchd
