@@ -34,7 +34,7 @@ function spellCheck(formName, fieldName, bFull)
 	// Register the name of the editing form for future reference.
 	spell_formname = formName;
 	spell_fieldname = fieldName;
-	spell_full = bFull || true;
+	spell_full = bFull !== 'undefined' ? bFull : (typeof($editor_data) !== 'undefined' ? true : false);
 
 	// This should match a word (most of the time).
 	var regexpWordMatch = /(?:<[^>]+>)|(?:\[[^ ][^\]]*\])|(?:&[^; ]+;)|(?:[^0-9\s\]\[{};:"\\|,<.>\/?`~!@#$%^&*()_+=]+)/g;
