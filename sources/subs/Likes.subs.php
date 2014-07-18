@@ -116,6 +116,10 @@ function prepareLikes($likes)
 			shuffle($likes[$msg_id]['member']);
 			$likes[$msg_id]['member'] = array_slice($likes[$msg_id]['member'], 0, $you_liked ? $limit - 1 : $limit);
 
+			// Trick, member id's below $limit will cause a wrong +x others due to the slice above
+			if ($user_info['id'] <= $limit)
+				$like['count'] += 1;
+
 			// How many others liked this
 			$likes[$msg_id]['member'][] = sprintf('%+d %s', ($like['count'] - $limit), $txt['liked_more']);
 		}
