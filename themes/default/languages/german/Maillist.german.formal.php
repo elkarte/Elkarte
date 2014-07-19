@@ -228,7 +228,7 @@ $txt['message_attachments'] = '<*> Diese Nachricht enthält %d Verknüpfungen mi
 <*> Um sie anzusehen, folgen Sie bitte diesem Verweis: %s';
 
 // Help
-$txt['maillist_help'] = 'Für Hilfe bei der Einrichtung dieser Funktionen besuchen Sie bitte den maillist-Bereich im <a href="https://github.com/elkarte/Elkarte/wiki/Maillist-Feature" target="_blank" class="new_win">ElkArte-Wiki</a>';
+$txt['maillist_help'] = 'Für Hilfe bei der Einrichtung dieser Funktionen besuchen Sie bitte den maillist-Bereich im <a href="https://github.com/elkarte/Elkarte/wiki/Posting-by-Email-Feature" target="_blank" class="new_win">ElkArte-Wiki</a>';
 
 // Email bounce templates
 $txt['ml_bounce_templates_title'] = 'Eigene Abweisungs-E-Mail-Vorlagen';
