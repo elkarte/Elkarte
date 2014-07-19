@@ -163,7 +163,7 @@ class ManageSearch_Controller extends Action_Controller
 				}
 			}
 			updateSettings(array(
-				'additional_search_engines' => !empty($new_engines) ? serialize($new_engines) : null
+				'additional_search_engines' => !empty($new_engines) ? serialize($new_engines) : ''
 			));
 
 			Settings_Form::save_db($config_vars);
