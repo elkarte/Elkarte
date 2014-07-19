@@ -855,3 +855,5 @@ $txt['ok_uppercase'] = 'OK';
 
 // Title of box for warnings that admins should see
 $txt['admin_warning_title'] = 'Warning';
+
+$txt['via'] = 'via';

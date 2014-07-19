@@ -276,8 +276,18 @@ function determineActions($urls, $preferred_prefix = false)
 			if ($actions['action'] == 'profile')
 			{
 				// Whose?  Their own?
-				if (empty($actions['u']))
-					$actions['u'] = $url[1];
+				{
+					if (empty($actions['u']))
+					{
+						require_once(SUBSDIR . '/Profile.subs.php');
+						$memID = currentMemberID();
+
+						if ($memID == $user_info['id'])
+							$actions['u'] = $url[1];
+						else
+							$actions['u'] = $memID;
+					}
+				}
 
 				$data[$k] = $txt['who_hidden'];
 				$profile_ids[(int) $actions['u']][$k] = $actions['action'] == 'profile' ? $txt['who_viewprofile'] : $txt['who_profile'];
