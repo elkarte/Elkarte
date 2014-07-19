@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.0 Release Candidate 2
  *
  */
 
@@ -1793,11 +1793,13 @@ function getMemberByName($name, $flexible = false)
 	$request = $db->query('', '
 		SELECT id_member, id_group
 		FROM {db_prefix}members
-		WHERE real_name = {string:name}' . ($flexible ? '
-			OR member_name = {string:name}' : '') . '
+		WHERE {raw:real_name} LIKE {string:name}' . ($flexible ? '
+			OR {raw:member_name} LIKE {string:name}' : '') . '
 		LIMIT 1',
 		array(
-			'name' => $name,
+			'name' => Util::strtolower($name),
+			'real_name' => defined('DB_CASE_SENSITIVE') ? 'LOWER(real_name)' : 'real_name',
+			'member_name' => defined('DB_CASE_SENSITIVE') ? 'LOWER(member_name)' : 'member_name',
 		)
 	);
 	if ($db->num_rows($request) == 0)
@@ -1827,12 +1829,14 @@ function getMember($search, $buddies = array())
 		FROM {db_prefix}members
 		WHERE {raw:real_name} LIKE {string:search}' . (!empty($buddies) ? '
 			AND id_member IN ({array_int:buddy_list})' : '') . '
-			AND is_activated IN (1, 12)
-		LIMIT ' . (Util::strlen($search) <= 2 ? '100' : '800'),
+			AND is_activated IN ({array_int:activation_status})
+		LIMIT {int:limit}',
 		array(
 			'real_name' => defined('DB_CASE_SENSITIVE') ? 'LOWER(real_name)' : 'real_name',
 			'buddy_list' => $buddies,
-			'search' => $search,
+			'search' => Util::strtolower($search),
+			'activation_status' => array(1, 12),
+			'limit' => Util::strlen($search) <= 2 ? 100 : 800,
 		)
 	);
 	$xml_data = array(

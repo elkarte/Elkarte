@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.0 Release Candidate 2
  *
  */
 
@@ -163,7 +163,7 @@ class ManageSearch_Controller extends Action_Controller
 				}
 			}
 			updateSettings(array(
-				'additional_search_engines' => !empty($new_engines) ? serialize($new_engines) : null
+				'additional_search_engines' => !empty($new_engines) ? serialize($new_engines) : ''
 			));
 
 			Settings_Form::save_db($config_vars);

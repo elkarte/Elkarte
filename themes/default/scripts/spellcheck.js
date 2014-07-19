@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.0 Release Candidate 2
  *
  * This file contains javascript associated with the spellchecking ((pspell)
  */
@@ -34,7 +34,7 @@ function spellCheck(formName, fieldName, bFull)
 	// Register the name of the editing form for future reference.
 	spell_formname = formName;
 	spell_fieldname = fieldName;
-	spell_full = bFull || true;
+	spell_full = bFull !== 'undefined' ? bFull : (typeof($editor_data) !== 'undefined' ? true : false);
 
 	// This should match a word (most of the time).
 	var regexpWordMatch = /(?:<[^>]+>)|(?:\[[^ ][^\]]*\])|(?:&[^; ]+;)|(?:[^0-9\s\]\[{};:"\\|,<.>\/?`~!@#$%^&*()_+=]+)/g;

@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.0 Release Candidate 2
  *
  */
 
@@ -2159,7 +2159,10 @@ function profileSaveAvatarData(&$value)
 			if (!$downloadedExternalAvatar)
 			{
 				if (!is_writable($uploadDir))
+				{
+					loadLanguage('Post');
 					fatal_lang_error('attachments_no_write', 'critical');
+				}
 
 				$new_avatar_name = $uploadDir . '/' . getAttachmentFilename('avatar_tmp_' . $memID, false, null, true);
 				if (!move_uploaded_file($_FILES['attachment']['tmp_name'], $new_avatar_name))

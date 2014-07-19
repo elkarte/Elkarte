@@ -3103,6 +3103,8 @@ dl.merge_topic dd {
 	overflow: auto;
 	margin: 0 0 10px 2px;
 	width: 55%;
+	min-height: 2em;
+	padding-bottom: 1px;
 }
 .centericon {
 	vertical-align: middle;
