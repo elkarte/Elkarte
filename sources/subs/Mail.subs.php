@@ -1321,7 +1321,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 			// Create our unique reply to email header if this message needs one
 			$unq_id = '';
 			$unq_head = '';
-			if (!empty($modSettings['maillist_enabled']) && $email['message_id'] !== nul && strpos($headers, 'List-Id: <') !== false)
+			if (!empty($modSettings['maillist_enabled']) && $email['message_id'] !== null && strpos($email['headers'], 'List-Id: <') !== false)
 			{
 				$unq_head = md5($scripturl . microtime() . rand()) . '-' . $email['message_id'];
 				$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
