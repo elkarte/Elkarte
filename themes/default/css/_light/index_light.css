@@ -1234,6 +1234,7 @@ div.bbc_footnotes .meaction{
 .report_seperator {
 	background: #bbb;
 	border-bottom: 1px solid #eee;
+	max-width: 14em;
 }
 /* @todo - Save code by amalgamating common button background declarations. */
 .poster_online .linklevel1 {
