@@ -258,8 +258,8 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 /* @todo - Test this out some more. */
 .submitbutton .button_submit, .submitbutton .linkbutton, .submitbutton .right_submit {
 	padding: 0 6px;
-	margin-right: 0.4em;
-	margin-left: 0.4em;
+	margin-right: 0.2em;
+	margin-left: 0.2em;
 }
 /* @todo mostly for those go buttons that don't have a form id */
 .button_submit.submitgo {
