@@ -817,12 +817,14 @@ div.bbc_footnotes .meaction{
 /* Styles for the standard button lists.
 /* ------------------------------------------------------- */
 /* @todo - Save code by amalgamating common button background declarations. */
-.buttonlist li a {
+.buttonlist li a.linklevel1 {
 	text-transform: uppercase;
+	box-shadow: 1px 1px 2px #e5e5e5, 0 -1px 0 #e4e4e4 inset;
 }
 /* The active one */
 .buttonlist li a.active {
 	box-shadow: 1px 1px 2px #ccc;
+	box-shadow: 1px 1px 2px #e5e5e5, 0 -1px 0 #3d6e32 inset;
 }
 
 /* The quick buttons. */
