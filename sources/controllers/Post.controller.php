@@ -1583,7 +1583,7 @@ class Post_Controller extends Action_Controller
 						'mime_type' => isset($attachment['type']) ? $attachment['type'] : '',
 						'id_folder' => isset($attachment['id_folder']) ? $attachment['id_folder'] : 0,
 						'approved' => !$modSettings['postmod_active'] || allowedTo('post_attachment'),
-						'errors' => $attachment['errors'],
+						'errors' => array(),
 					);
 
 					if (createAttachment($attachmentOptions))
