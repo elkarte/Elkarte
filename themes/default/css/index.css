@@ -2929,6 +2929,10 @@ dl.merge_topic dd {
 	padding: 0;
 	width: 65%;
 }
+.profileblock_signature dd {
+	width: auto;
+	word-wrap: break-word;
+}
 
 #personal_picture {
 	display: block;
