@@ -182,6 +182,9 @@ input, .input_text, button, select {
 	height: 2em;
 	vertical-align: middle;
 }
+select {
+	padding: 0 6px 0 2px;
+}
 .input_text {
 	font-size: .876em;
 }
@@ -1724,6 +1727,7 @@ dl.settings label {
 
 #sort_by {
 	margin-bottom: -6px;
+	min-height: 2.2em;
 }
 #sort_by .input_check {
 	margin-bottom: 0;
