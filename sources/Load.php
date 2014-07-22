@@ -1205,12 +1205,6 @@ function loadTheme($id_theme = 0, $initialize = true)
 	else
 		$id_theme = $modSettings['theme_guests'];
 
-	global $sp_standalone;
-
-	// Maybe we have a portal specific theme?
-	if (!isset($_GET['action']) && !isset($_GET['board']) && !isset($_GET['topic']) && ($modSettings['sp_portal_mode'] == 1 || !empty($sp_standalone)) && !empty($modSettings['portaltheme']))
-		$id_theme = (int) $modSettings['portaltheme'];
-
 	// Verify the id_theme... no foul play.
 	// Always allow the board specific theme, if they are overriding.
 	if (!empty($board_info['theme']) && $board_info['override_theme'])

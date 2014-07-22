@@ -2368,7 +2368,7 @@ div.core_posts {
 	white-space: nowrap;
 }
 #display_jump_to input {
-	vertical-align: baseline;
+	vertical-align: bottom;
 }
 
 /* The quick reply area. */
