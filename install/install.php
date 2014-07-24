@@ -2042,7 +2042,7 @@ function db_table_install()
 			/**
 			* Static method that allows to retrieve or create an instance of this class.
 			*
-			* @param object $_db - A Database_MySQL object
+			* @param object $db - A Database_MySQL object
 			* @return object - A DbTable_MySQL object
 			*/
 			public static function db_table($db)
@@ -2083,7 +2083,7 @@ function db_table_install()
 			/**
 			* Static method that allows to retrieve or create an instance of this class.
 			*
-			* @param object $_db - A Database_MySQL object
+			* @param object $db - A Database_MySQL object
 			* @return object - A DbTable_MySQL object
 			*/
 			public static function db_table($db)
