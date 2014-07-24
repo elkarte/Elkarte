@@ -54,7 +54,7 @@ class MessagesDelete
 	/**
 	 * Initialize the class! :P
 	 *
-	 * @param int $recycle_board the id the the recycle board (if any)
+	 * @param int|null $recycle_board the id the the recycle board (if any)
 	 */
 	public function __construct($recycle_enabled = false, $recycle_board = null)
 	{

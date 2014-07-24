@@ -91,7 +91,7 @@ class Debug
 	/**
 	 * Adds a new generic debug entry
 	 *
-	 * @param string the kind of debug entry
+	 * @param string $type the kind of debug entry
 	 * @param string|string[] string or array of the entry to show
 	 */
 	public function add($type, $value)
@@ -108,7 +108,7 @@ class Debug
 	/**
 	 * Adds a new cache hits
 	 *
-	 * @param mixed[] contains the relevant cache info, in the form:
+	 * @param mixed[] $value contains the relevant cache info, in the form:
 	 *         d => method: put or get
 	 *         k => cache key
 	 *         t => time taken to get/put the entry
@@ -136,7 +136,7 @@ class Debug
 	/**
 	 * Adds a new database query
 	 *
-	 * @param mixed[] contains the relevant queries info, in the form:
+	 * @param mixed[] $value contains the relevant queries info, in the form:
 	 *         q => the query string (only for the first 50 queries, after that only a "...")
 	 *         f => the file in which the query has been executed
 	 *         l => the line at which the query has been executed
@@ -155,7 +155,7 @@ class Debug
 	/**
 	 * Merges the values passed with the current database entries
 	 *
-	 * @param mixed[] An array of queries info, see the db method for details
+	 * @param mixed[] $value An array of queries info, see the db method for details
 	 */
 	public function merge_db($value)
 	{
@@ -185,7 +185,7 @@ class Debug
 	 *
 	 * @param string $point can be end or start depending on when the function
 	 *               is called
-	 * @param string[]|null value of getrusage or null to let the method call it
+	 * @param string[]|null $rusage value of getrusage or null to let the method call it
 	 */
 	public function rusage($point, $rusage = null)
 	{
@@ -361,7 +361,7 @@ class Debug
 	 * Displays a page with all the queries executed during the "current"
 	 * page load and allows to EXPLAIN them
 	 *
-	 * @param integer the id of the query to EXPLAIN, if -1 no queries are explained
+	 * @param integer $query_id the id of the query to EXPLAIN, if -1 no queries are explained
 	 */
 	public function viewQueries($query_id)
 	{

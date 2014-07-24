@@ -2128,6 +2128,8 @@ class Post_Controller extends Action_Controller
 
 	/**
 	 * Loads in context stuff related to the envent
+	 *
+	 * @param int $event_id The id of the event
 	 */
 	private function _prepareEventContext($event_id)
 	{
