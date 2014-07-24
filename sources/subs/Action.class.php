@@ -169,7 +169,15 @@ class Action
 			if (isset($subAction['controller']))
 			{
 				// an OOP controller, call it over
-				$subAction['controller']->{$subAction['function']}();
+				if (is_object($subAction['controller']))
+					$subAction['controller']->{$subAction['function']}();
+				else
+				{
+					$controller_name = $subAction['controller'];
+					$controller = new $controller_name();
+
+					$controller->{$subAction['function']}();
+				}
 			}
 			elseif (is_array($subAction) && !isset($subAction['function']))
 			{
