@@ -124,11 +124,21 @@ class TopicsMerge
 		$this->_loadTopicDetails();
 	}
 
+	/**
+	 * If errors occured while working
+	 *
+	 * @return bool
+	 */
 	public function hasErrors()
 	{
 		return !empty($this->_errors);
 	}
 
+	/**
+	 * The first error occurred
+	 *
+	 * @return bool|mixed[]
+	 */
 	public function firstError()
 	{
 		if (!empty($this->_errors))
@@ -137,6 +147,11 @@ class TopicsMerge
 			return false;
 	}
 
+	/**
+	 * Returns the polls information if any of the topics has a poll.
+	 *
+	 * @return mixed[]
+	 */
 	public function getPolls()
 	{
 		$polls = array();
@@ -173,6 +188,12 @@ class TopicsMerge
 		return $polls;
 	}
 
+	/**
+	 * Performs the merge operations
+	 *
+	 * @param mixed[] $details
+	 * @return bool|int[]
+	 */
 	public function doMerge($details = array())
 	{
 		// Just to be sure, here we should not have any error around
@@ -359,6 +380,14 @@ class TopicsMerge
 		return array($id_topic, $target_board);
 	}
 
+	/**
+	 * Takes care of updating all the relevant statistics
+	 *
+	 * @param int[] $affected_msgs
+	 * @param int $id_topic
+	 * @param string $target_subject
+	 * @param bool $enforce_subject
+	 */
 	protected function _updateStats($affected_msgs, $id_topic, $target_subject, $enforce_subject)
 	{
 		// Cycle through each board...
@@ -392,6 +421,10 @@ class TopicsMerge
 			$searchAPI->topicMerge($id_topic, $this->_topics, $affected_msgs, empty($enforce_subject) ? null : array($response_prefix, $target_subject));
 	}
 
+	/**
+	 * Grabs all the details of the topics involved in the merge process and loads
+	 * then in $this->topic_data
+	 */
 	protected function _loadTopicDetails()
 	{
 		global $scripturl, $modSettings, $user_info;
