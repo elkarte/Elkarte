@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.0 Release Candidate 2
  *
  */
 
@@ -2128,6 +2128,8 @@ class Post_Controller extends Action_Controller
 
 	/**
 	 * Loads in context stuff related to the envent
+	 *
+	 * @param int $event_id The id of the event
 	 */
 	private function _prepareEventContext($event_id)
 	{

@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.0 Release Candidate 2
  *
  *
  * @todo Update this for the new package manager?
@@ -39,18 +39,23 @@ if (!defined('ELK'))
 
 /**
  * Class to deal with theme administration.
+ *
  * Its tasks include changing theme settings, installing and removing
  * themes, choosing the current theme, and editing themes.
+ *
+ * @package Themes
  */
 class ManageThemes_Controller extends Action_Controller
 {
 	/**
 	 * Subaction handler - manages the action and delegates control to the proper
 	 * sub-action.
-	 * It loads both the Themes and Settings language files.
-	 * Checks the session by GET or POST to verify the sent data.
-	 * Requires the user to not be a guest.
-	 * Accessed via ?action=admin;area=theme.
+	 *
+	 * What it does:
+	 * - It loads both the Themes and Settings language files.
+	 * - Checks the session by GET or POST to verify the sent data.
+	 * - Requires the user to not be a guest.
+	 * - Accessed via ?action=admin;area=theme.
 	 *
 	 * @see Action_Controller::action_index()
 	 */
@@ -156,17 +161,17 @@ class ManageThemes_Controller extends Action_Controller
 		// Theme administration, removal, choice, or installation...
 		// Of all the actions we currently know only this
 		$subActions = array(
-// 			'admin' => 'action_admin',
-// 			'list' => 'action_list',
-// 			'reset' => 'action_options',
-// 			'options' => 'action_options',
-// 			'install' => 'action_install',
+		// 	'admin' => 'action_admin',
+		// 	'list' => 'action_list',
+		// 	'reset' => 'action_options',
+		// 	'options' => 'action_options',
+		// 	'install' => 'action_install',
 			'remove' => 'action_remove_api',
-// 			'pick' => 'action_pick',
-// 			'edit' => 'action_edit',
-// 			'copy' => 'action_copy',
-// 			'themelist' => 'action_themelist',
-// 			'browse' => 'action_browse',
+		// 	'pick' => 'action_pick',
+		// 	'edit' => 'action_edit',
+		// 	'copy' => 'action_copy',
+		// 	'themelist' => 'action_themelist',
+		// 	'browse' => 'action_browse',
 		);
 
 		// Follow the sa or just go to administration.
@@ -186,12 +191,14 @@ class ManageThemes_Controller extends Action_Controller
 	/**
 	 * This function allows administration of themes and their settings,
 	 * as well as global theme settings.
-	 *  - sets the settings theme_allow, theme_guests, and knownThemes.
-	 *  - requires the admin_forum permission.
-	 *  - accessed with ?action=admin;area=theme;sa=admin.
 	 *
-	 *  @uses Themes template
-	 *  @uses Admin language file
+	 * What it does:
+	 * - sets the settings theme_allow, theme_guests, and knownThemes.
+	 * - requires the admin_forum permission.
+	 * - accessed with ?action=admin;area=theme;sa=admin.
+	 *
+	 * @uses Themes template
+	 * @uses Admin language file
 	 */
 	public function action_admin()
 	{
@@ -205,6 +212,7 @@ class ManageThemes_Controller extends Action_Controller
 			checkSession();
 			validateToken('admin-tm');
 
+			// What themes are being made as known to the members
 			if (isset($_POST['options']['known_themes']))
 				foreach ($_POST['options']['known_themes'] as $key => $id)
 					$_POST['options']['known_themes'][$key] = (int) $id;
@@ -343,7 +351,8 @@ class ManageThemes_Controller extends Action_Controller
 
 	/**
 	 * Administrative global settings.
-	 * Accessed by ?action=admin;area=theme;sa=reset;
+	 *
+	 * - Accessed by ?action=admin;area=theme;sa=reset;
 	 *
 	 * @uses sub template set_options, template file Settings
 	 * @uses template file ManageThemes
@@ -364,6 +373,7 @@ class ManageThemes_Controller extends Action_Controller
 			foreach ($guestOptions as $guest_option)
 				$context['themes'][$guest_option['id_theme']]['num_default_options'] = $guest_option['value'];
 
+			// How many options do we have setup for members?
 			$memberOptions = countConfiguredMemberOptions();
 			foreach ($memberOptions as $member_option)
 				$context['themes'][$member_option['id_theme']]['num_members'] = $member_option['value'];
@@ -392,7 +402,7 @@ class ManageThemes_Controller extends Action_Controller
 			if (empty($_POST['default_options']))
 				$_POST['default_options'] = array();
 
-			// Set up the sql query.
+			// Set up the query values.
 			$setValues = array();
 			foreach ($_POST['options'] as $opt => $val)
 				$setValues[] = array($theme, -1, $opt, is_array($val) ? implode(',', $val) : $val);
@@ -414,6 +424,7 @@ class ManageThemes_Controller extends Action_Controller
 				updateThemeOptions($setValues);
 			}
 
+			// Cache the theme settings
 			cache_put_data('theme_settings-' . $theme, null, 90);
 			cache_put_data('theme_settings-1', null, 90);
 
@@ -548,11 +559,13 @@ class ManageThemes_Controller extends Action_Controller
 
 	/**
 	 * Administrative global settings.
-	 * - saves and requests global theme settings. ($settings)
-	 * - loads the Admin language file.
-	 * - calls action_admin() if no theme is specified. (the theme center.)
-	 * - requires admin_forum permission.
-	 * - accessed with ?action=admin;area=theme;sa=list&th=xx.
+	 *
+	 * What it does:
+	 * - Saves and requests global theme settings. ($settings)
+	 * - Loads the Admin language file.
+	 * - Calls action_admin() if no theme is specified. (the theme center.)
+	 * - Requires admin_forum permission.
+	 * - Accessed with ?action=admin;area=theme;sa=list&th=xx.
 	 */
 	public function action_setthemesettings()
 	{
@@ -564,6 +577,7 @@ class ManageThemes_Controller extends Action_Controller
 		if (empty($_GET['th']) && empty($_GET['id']))
 			return $this->action_admin();
 
+		// The theme's ID is needed
 		$theme = isset($_GET['th']) ? (int) $_GET['th'] : (int) $_GET['id'];
 
 		// Validate inputs/user.
@@ -726,9 +740,11 @@ class ManageThemes_Controller extends Action_Controller
 
 	/**
 	 * Remove a theme from the database.
-	 * - removes an installed theme.
-	 * - requires an administrator.
-	 * - accessed with ?action=admin;area=theme;sa=remove.
+	 *
+	 * What it does:
+	 * - Removes an installed theme.
+	 * - Requires an administrator.
+	 * - Accessed with ?action=admin;area=theme;sa=remove.
 	 */
 	public function action_remove()
 	{
@@ -746,16 +762,17 @@ class ManageThemes_Controller extends Action_Controller
 		if ($theme == 1)
 			fatal_lang_error('no_access', false);
 
+		// Its no longer known
 		$known = explode(',', $modSettings['knownThemes']);
 		for ($i = 0, $n = count($known); $i < $n; $i++)
 		{
 			if ($known[$i] == $theme)
 				unset($known[$i]);
 		}
-
-		deleteTheme($theme);
-
 		$known = strtr(implode(',', $known), array(',,' => ','));
+
+		// Remove it as an option everywhere
+		deleteTheme($theme);
 
 		// Fix it if the theme was the overall default theme.
 		if ($modSettings['theme_guests'] == $theme)
@@ -769,9 +786,10 @@ class ManageThemes_Controller extends Action_Controller
 	/**
 	 * Remove a theme from the database in response to an ajax api request
 	 *
-	 * - removes an installed theme.
-	 * - requires an administrator.
-	 * - accessed with ?action=admin;area=theme;sa=remove;api
+	 * What it does:
+	 * - Removes an installed theme.
+	 * - Requires an administrator.
+	 * - Accessed with ?action=admin;area=theme;sa=remove;api
 	 */
 	public function action_remove_api()
 	{
@@ -858,10 +876,13 @@ class ManageThemes_Controller extends Action_Controller
 
 	/**
 	 * Choose a theme from a list.
-	 * allows an user or administrator to pick a new theme with an interface.
-	 * - can edit everyone's (u = 0), guests' (u = -1), or a specific user's.
-	 * - uses the Themes template. (pick sub template.)
-	 * - accessed with ?action=admin;area=theme;sa=pick.
+	 * Allows a user or administrator to pick a new theme with an interface.
+	 *
+	 * What it does:
+	 * - Can edit everyone's (u = 0), guests' (u = -1), or a specific user's.
+	 * - Uses the Themes template. (pick sub template.)
+	 * - Accessed with ?action=admin;area=theme;sa=pick.
+	 *
 	 * @uses Profile language text
 	 * @uses ManageThemes template
 	 * @todo thought so... Might be better to split this file in ManageThemes and Themes,
@@ -1031,11 +1052,14 @@ class ManageThemes_Controller extends Action_Controller
 
 	/**
 	 * Installs new themes, either from a gzip or copy of the default.
-	 * - puts themes in $boardurl/themes.
-	 * - assumes the gzip has a root directory in it. (ie default.)
-	 * Requires admin_forum.
+	 *
+	 * What it does:
+	 * - Puts themes in $boardurl/themes.
+	 * - Assumes the gzip has a root directory in it. (ie default.)
+	 * - Requires admin_forum.
+	 * - Accessed with ?action=admin;area=theme;sa=install.
+	 *
 	 * @uses ManageThemes template
-	 * Accessed with ?action=admin;area=theme;sa=install.
 	 */
 	public function action_install()
 	{
@@ -1048,6 +1072,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		loadTemplate('ManageThemes');
 
+		// Passed an ID, then the install is complete, lets redirect and show them
 		if (isset($_GET['theme_id']))
 		{
 			$_GET['theme_id'] = (int) $_GET['theme_id'];
@@ -1062,6 +1087,7 @@ class ManageThemes_Controller extends Action_Controller
 			return;
 		}
 
+		// How are we going to install this theme, from a dir, zip, copy of default?
 		if ((!empty($_FILES['theme_gz']) && (!isset($_FILES['theme_gz']['error']) || $_FILES['theme_gz']['error'] != 4)) || !empty($_REQUEST['theme_gz']))
 			$method = 'upload';
 		elseif (isset($_REQUEST['theme_dir']) && rtrim(realpath($_REQUEST['theme_dir']), '/\\') != realpath(BOARDDIR . '/themes') && file_exists($_REQUEST['theme_dir']))
@@ -1069,24 +1095,27 @@ class ManageThemes_Controller extends Action_Controller
 		else
 			$method = 'copy';
 
+		// Copy the default theme?
 		if (!empty($_REQUEST['copy']) && $method == 'copy')
 		{
 			// Hopefully the themes directory is writable, or we might have a problem.
 			if (!is_writable(BOARDDIR . '/themes'))
 				fatal_lang_error('theme_install_write_error', 'critical');
 
+			// Make the new directory, standard characters only
 			$theme_dir = BOARDDIR . '/themes/' . preg_replace('~[^A-Za-z0-9_\- ]~', '', $_REQUEST['copy']);
-
 			umask(0);
 			mkdir($theme_dir, 0777);
 
+			// Get some more time if we can
 			@set_time_limit(600);
 			if (function_exists('apache_reset_timeout'))
 				@apache_reset_timeout();
 
-			// Create subdirectories for css and javascript files.
+			// Create the subdirectories for css, javascript and font files.
 			mkdir($theme_dir . '/css', 0777);
 			mkdir($theme_dir . '/scripts', 0777);
+			mkdir($theme_dir . '/webfonts', 0777);
 
 			// Copy over the default non-theme files.
 			$to_copy = array('/index.php', '/index.template.php', '/scripts/theme.js');
@@ -1096,9 +1125,10 @@ class ManageThemes_Controller extends Action_Controller
 				@chmod($theme_dir . $file, 0777);
 			}
 
-			// And now the entire css & images directories!
+			// And now the entire css, images and webfonts directories!
 			copytree($settings['default_theme_dir'] . '/css', $theme_dir . '/css');
 			copytree($settings['default_theme_dir'] . '/images', $theme_dir . '/images');
+			copytree($settings['default_theme_dir'] . '/webfonts', $theme_dir . '/webfonts');
 			package_flush_cache();
 
 			$theme_name = $_REQUEST['copy'];
@@ -1111,6 +1141,7 @@ class ManageThemes_Controller extends Action_Controller
 			// Lets add a theme_info.xml to this theme.
 			write_theme_info($_REQUEST['copy'], $modSettings['elkVersion'], $theme_dir, $theme_values);
 		}
+		// Install from another directory
 		elseif (isset($_REQUEST['theme_dir']) && $method == 'path')
 		{
 			if (!is_dir($_REQUEST['theme_dir']) || !file_exists($_REQUEST['theme_dir'] . '/theme_info.xml'))
@@ -1119,6 +1150,7 @@ class ManageThemes_Controller extends Action_Controller
 			$theme_name = basename($_REQUEST['theme_dir']);
 			$theme_dir = $_REQUEST['theme_dir'];
 		}
+		// Uploaded a zip file to install from
 		elseif ($method == 'upload')
 		{
 			// Hopefully the themes directory is writable, or we might have a problem.
@@ -1240,7 +1272,9 @@ class ManageThemes_Controller extends Action_Controller
 	}
 
 	/**
-	 * Set an option via javascript.
+	 * Set a theme option via javascript.
+	 *
+	 * What it does:
 	 * - sets a theme option without outputting anything.
 	 * - can be used with javascript, via a dummy image... (which doesn't require
 	 *   the page to reload.)
@@ -1337,13 +1371,14 @@ class ManageThemes_Controller extends Action_Controller
 	/**
 	 * Allows choosing, browsing, and editing a themes files.
 	 *
-	 * Its subactions handle several features:
-	 *  - edit_template: display and edit a PHP template file
-	 *  - edit_style: display and edit a CSS file
-	 *  - edit_file: display and edit other files in the theme
+	 * What it does:
+	 * - Its subactions handle several features:
+	 *   - edit_template: display and edit a PHP template file
+	 *   - edit_style: display and edit a CSS file
+	 *   - edit_file: display and edit other files in the theme
+	 * - accessed via ?action=admin;area=theme;sa=edit
 	 *
 	 * @uses the ManageThemes template
-	 * accessed via ?action=admin;area=theme;sa=edit
 	 */
 	public function action_edit()
 	{
@@ -1630,10 +1665,11 @@ class ManageThemes_Controller extends Action_Controller
 
 	/**
 	 * Handles user browsing in theme directories.
-	 * The display will allow to choose a file for editing,
-	 * if it is writable.
 	 *
-	 * ?action=admin;area=theme;sa=browse
+	 * What it does:
+	 * - The display will allow to choose a file for editing,
+	 * if it is writable.
+	 * - accessed with ?action=admin;area=theme;sa=browse
 	 */
 	public function action_browse()
 	{
@@ -1748,6 +1784,7 @@ class ManageThemes_Controller extends Action_Controller
 
 	/**
 	 * Makes a copy of a template file in a new location
+	 * 
 	 * @uses ManageThemes template, copy_template sub-template.
 	 */
 	public function action_copy()

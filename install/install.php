@@ -11,11 +11,11 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.0 Release Candidate 2
  *
  */
 
-define('CURRENT_VERSION', '1.0 RC 1');
+define('CURRENT_VERSION', '1.0 RC 2');
 define('DB_SCRIPT_VERSION', '1-0');
 define('REQUIRED_PHP_VERSION', '5.2.0');
 
@@ -2042,7 +2042,7 @@ function db_table_install()
 			/**
 			* Static method that allows to retrieve or create an instance of this class.
 			*
-			* @param object $_db - A Database_MySQL object
+			* @param object $db - A Database_MySQL object
 			* @return object - A DbTable_MySQL object
 			*/
 			public static function db_table($db)
@@ -2083,7 +2083,7 @@ function db_table_install()
 			/**
 			* Static method that allows to retrieve or create an instance of this class.
 			*
-			* @param object $_db - A Database_MySQL object
+			* @param object $db - A Database_MySQL object
 			* @return object - A DbTable_MySQL object
 			*/
 			public static function db_table($db)

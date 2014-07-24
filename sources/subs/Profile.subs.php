@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.0 Release Candidate 2
  *
  */
 
@@ -2084,8 +2084,8 @@ function profileSaveAvatarData(&$value)
 	$id_folder = getAvatarPathID();
 
 	$downloadedExternalAvatar = false;
-	$valid_http = substr($_POST['userpicpersonal'], 0, 7) === 'http://' && strlen($_POST['userpicpersonal']) > 7;
-	$valid_https = substr($_POST['userpicpersonal'], 0, 8) === 'https://' && strlen($_POST['userpicpersonal']) > 8;
+	$valid_http = isset($_POST['userpicpersonal']) && substr($_POST['userpicpersonal'], 0, 7) === 'http://' && strlen($_POST['userpicpersonal']) > 7;
+	$valid_https = isset($_POST['userpicpersonal']) && substr($_POST['userpicpersonal'], 0, 8) === 'https://' && strlen($_POST['userpicpersonal']) > 8;
 	if ($value == 'external' && allowedTo('profile_remote_avatar') && ($valid_http || $valid_https) && !empty($modSettings['avatar_download_external']))
 	{
 		loadLanguage('Post');
@@ -2197,7 +2197,10 @@ function profileSaveAvatarData(&$value)
 			if (!$downloadedExternalAvatar)
 			{
 				if (!is_writable($uploadDir))
+				{
+					loadLanguage('Post');
 					fatal_lang_error('attachments_no_write', 'critical');
+				}
 
 				$new_avatar_name = $uploadDir . '/' . getAttachmentFilename('avatar_tmp_' . $memID, false, null, true);
 				if (!move_uploaded_file($_FILES['attachment']['tmp_name'], $new_avatar_name))

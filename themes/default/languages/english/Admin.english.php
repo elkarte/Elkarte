@@ -120,6 +120,7 @@ $txt['lfyi'] = 'You are unable to connect to ElkArte\'s latest news file.';
 
 $txt['manage_calendar'] = 'Calendar';
 $txt['manage_search'] = 'Search';
+$txt['viewmembers_online'] = 'Last Online';
 
 $txt['smileys_manage'] = 'Smileys and Message Icons';
 $txt['smileys_manage_info'] = 'Install new smiley sets, add smileys to existing sets or manage your message icons.';
@@ -128,6 +129,7 @@ $txt['theme_admin'] = 'Theme Management';
 $txt['theme_admin_info'] = 'Install new themes, select themes that are available for your users and set or reset theme options.';
 $txt['registration_center'] = 'Registration';
 $txt['member_center_info'] = 'View the member list, search for members, or manage account approvals and activations.';
+$txt['viewmembers_online'] = 'Last Online';
 
 $txt['display_name'] = 'Display name';
 $txt['email_address'] = 'Email Address';

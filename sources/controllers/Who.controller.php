@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.0 Release Candidate 2
  *
  */
 
@@ -165,7 +165,7 @@ class Who_Controller extends Action_Controller
 				'id' => $row['id_member'],
 				'ip' => allowedTo('moderate_forum') ? $row['ip'] : '',
 				// It is *going* to be today or yesterday, so why keep that information in there?
-				'time' => strtr(standardTime($row['log_time'], true), array($txt['today'] => '', $txt['yesterday'] => '')),
+				'time' => standardTime($row['log_time'], true),
 				'html_time' => htmlTime($row['log_time']),
 				'timestamp' => forum_time(true, $row['log_time']),
 				'query' => $actions,

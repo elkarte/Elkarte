@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.0 Release Candidate 2
  *
  */
 
@@ -163,7 +163,7 @@ class ManageSearch_Controller extends Action_Controller
 				}
 			}
 			updateSettings(array(
-				'additional_search_engines' => !empty($new_engines) ? serialize($new_engines) : null
+				'additional_search_engines' => !empty($new_engines) ? serialize($new_engines) : ''
 			));
 
 			Settings_Form::save_db($config_vars);
@@ -521,6 +521,7 @@ class ManageSearch_Controller extends Action_Controller
 	 * Edit settings related to the sphinx or sphinxQL search function.
 	 *
 	 * - Called by ?action=admin;area=managesearch;sa=sphinx.
+	 * - Checks if connection to search daemon is possible
 	 */
 	public function action_managesphinx()
 	{
@@ -557,7 +558,7 @@ class ManageSearch_Controller extends Action_Controller
 			}
 
 			// Try to connect via Sphinx API?
-			if ($modSettings['search_index'] === 'sphinx' || empty($modSettings['search_index']))
+			if (!empty($modSettings['search_index']) && ($modSettings['search_index'] === 'sphinx' || empty($modSettings['search_index'])))
 			{
 				if (@file_exists(SOURCEDIR . '/sphinxapi.php'))
 				{
@@ -585,7 +586,7 @@ class ManageSearch_Controller extends Action_Controller
 			}
 
 			// Try to connect via SphinxQL
-			if ($modSettings['search_index'] === 'sphinxql' || empty($modSettings['search_index']))
+			if (!empty($modSettings['search_index']) && ($modSettings['search_index'] === 'sphinxql' || empty($modSettings['search_index'])))
 			{
 				if (!empty($modSettings['sphinx_searchd_server']) && !empty($modSettings['sphinxql_searchd_port']))
 				{

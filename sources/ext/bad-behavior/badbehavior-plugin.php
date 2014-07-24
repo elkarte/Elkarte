@@ -10,7 +10,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.0 Release Candidate 2
  *
  */
 
@@ -87,12 +87,7 @@ function bb2_db_query($query)
 	if (strpos($query, 'DATE_SUB') !== false)
 		$query = 'DELETE FROM {db_prefix}log_badbehavior WHERE date < ' . (bb2_db_date() - 7 * 86400);
 	elseif (strpos($query, 'OPTIMIZE TABLE') !== false)
-	{
-		// This is just intended to waste spammer time, occurs (rand(1,1000) == 1) from banned.inc.php
-		$db->db_optimize_table('{db_prefix}log_badbehavior');
-
 		return true;
-	}
 	elseif (strpos($query, '@@session.wait_timeout') !== false)
 		return true;
 

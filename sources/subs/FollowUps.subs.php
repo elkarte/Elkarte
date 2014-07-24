@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.0 Release Candidate 2
  *
  */
 
@@ -122,7 +122,7 @@ function unlinkMessages($msg, $topic)
 /**
  * Removes all the follow-ups from the db by topics
  *
- * @param int $topics topic id
+ * @param int|int[] $topics topic id
  */
 function removeFollowUpsByTopic($topics)
 {

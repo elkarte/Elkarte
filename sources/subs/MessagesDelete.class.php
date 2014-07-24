@@ -54,7 +54,7 @@ class MessagesDelete
 	/**
 	 * Initialize the class! :P
 	 *
-	 * @param int $recycle_board the id the the recycle board (if any)
+	 * @param int|null $recycle_board the id the the recycle board (if any)
 	 */
 	public function __construct($recycle_enabled = false, $recycle_board = null)
 	{
@@ -64,6 +64,13 @@ class MessagesDelete
 			$this->_recycle_board = null;
 	}
 
+	/**
+	 * Restores a bunch of messages the recycle bin to the appropriate board.
+	 * If any "first message" is within the array, it is added to the list of
+	 * topics to restore (see MessagesDelete::restoreTopics)
+	 *
+	 * @param int[] $msgs_id Messages to restore
+	 */
 	public function restoreMessages($msgs_id)
 	{
 		$msgs = array();
@@ -200,6 +207,11 @@ class MessagesDelete
 		}
 	}
 
+	/**
+	 * Prepares topics to be restored from the recycle bin to the appropriate board
+	 *
+	 * @param int[] $topics_id Topics to restore
+	 */
 	public function restoreTopics($topics_id)
 	{
 		foreach ($topics_id as $topic)
@@ -210,6 +222,9 @@ class MessagesDelete
 		}
 	}
 
+	/**
+	 * Actually restore the topics previously "collected"
+	 */
 	public function doRestore()
 	{
 		if (empty($this->_topics_to_restore))
@@ -283,6 +298,13 @@ class MessagesDelete
 		$db->free_result($request);
 	}
 
+	/**
+	 * Returns the either the list of messages not found, or the number
+	 *
+	 * @param bool $return_msg If true returns the array of unfound messages,
+	 *                         if false their number
+	 * @return bool|int[]
+	 */
 	public function unfoundRestoreMessages($return_msg = false)
 	{
 		if ($return_msg)
@@ -683,6 +705,14 @@ class MessagesDelete
 		return false;
 	}
 
+	/**
+	 * Performs all the permission checks to see if the current user can
+	 * delete the topic/message he would like to delete
+	 *
+	 * @param mixed[] $row Details on the message
+	 * @param mixed[] $board The the user is in (?)
+	 * @return bool|string
+	 */
 	protected function _checkDeletePermissions($row, $board)
 	{
 		global $user_info, $modSettings;

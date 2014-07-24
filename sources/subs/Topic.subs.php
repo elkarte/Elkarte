@@ -16,7 +16,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.0 Release Candidate 2
  *
  */
 
@@ -874,7 +874,12 @@ function moveTopics($topics, $toBoard, $log = false)
 }
 
 /**
- * Called after a topic is moved to update $board_link and $topic_link to point to new location
+ * Called after a topic is moved to update $board_link and $topic_link to point
+ * to new location
+ *
+ * @param null|int $move_from The board the topic belongs to
+ * @param null|int $id_board The "current" board
+ * @param null|int $id_topic The topic id
  */
 function moveTopicConcurrence($move_from = null, $id_board = null, $id_topic = null)
 {
@@ -1354,7 +1359,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
  * Respects permissions and post moderation
  *
  * @param int $topic id of a topic
- * @param int $msg the id of a message, if empty, t.id_first_msg is used
+ * @param int|null $msg the id of a message, if empty, t.id_first_msg is used
  */
 function getTopicInfoByMsg($topic, $msg = null)
 {

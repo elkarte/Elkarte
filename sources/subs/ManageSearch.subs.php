@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.0 Release Candidate 2
  *
  */
 
@@ -86,7 +86,7 @@ function detectFulltextIndex()
  */
 function createSphinxConfig()
 {
-	global $context, $db_server, $db_name, $db_user, $db_passwd, $db_prefix, $modSettings;
+	global $db_server, $db_name, $db_user, $db_passwd, $db_prefix, $modSettings;
 
 	// Set up to ouput a file to the users browser
 	while (ob_get_level() > 0)
@@ -94,7 +94,7 @@ function createSphinxConfig()
 
 	header('Content-Encoding: none');
 	header('Pragma: ');
-	if (!$context['browser']['is_gecko'])
+	if (!isBrowser('is_gecko'))
 		header('Content-Transfer-Encoding: binary');
 	header('Connection: close');
 	header('Content-Disposition: attachment; filename="sphinx.conf"');
@@ -222,7 +222,7 @@ index elkarte_index
 
 indexer
 {
-	mem_limit		= ', (empty($modSettings['sphinx_indexer_mem']) ? 32 : (int) $modSettings['sphinx_indexer_mem']), 'M
+	mem_limit		= ', (empty($modSettings['sphinx_indexer_mem']) ? 128 : (int) $modSettings['sphinx_indexer_mem']), 'M
 }
 
 searchd

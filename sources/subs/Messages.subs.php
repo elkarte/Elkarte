@@ -16,7 +16,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.0 Release Candidate 2
  *
  */
 
@@ -131,6 +131,7 @@ function basicMessageInfo($id_msg, $override_permissions = false, $detailed = fa
  * Uses {query_see_board} and the 'moderate_board' permission
  *
  * @param int $id_msg
+ * @param bool $modify
  * @todo why it doesn't take into account post moderation?
  */
 function quoteMessageInfo($id_msg, $modify)

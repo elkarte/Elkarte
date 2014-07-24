@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.0 Release Candidate 2
  *
  */
 
@@ -116,16 +116,17 @@ function prepareLikes($likes)
 			shuffle($likes[$msg_id]['member']);
 			$likes[$msg_id]['member'] = array_slice($likes[$msg_id]['member'], 0, $you_liked ? $limit - 1 : $limit);
 
-			// Tag on how many others liked this
+			// Trick, member id's below $limit will cause a wrong +x others due to the slice above
+			if ($user_info['id'] <= $limit)
+				$like['count'] += 1;
+
+			// How many others liked this
 			$likes[$msg_id]['member'][] = sprintf('%+d %s', ($like['count'] - $limit), $txt['liked_more']);
 		}
 
 		// Top billing just for you, the big lights, the grand stage, plus we need that key returned
 		if ($you_liked)
-		{
-			$likes[$msg_id]['member'][$user_info['id']] = $txt['liked_you'];
-			$likes[$msg_id]['member'] = array_reverse($likes[$msg_id]['member'], true);
-		}
+			$likes[$msg_id]['member'] = array($user_info['id'] => $txt['liked_you']) + $likes[$msg_id]['member'];
 	}
 
 	return $likes;

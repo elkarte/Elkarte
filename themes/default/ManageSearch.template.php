@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.0 Release Candidate 2
  *
  */
 
@@ -232,12 +232,12 @@ function template_select_search_method()
 						<input type="checkbox" name="search_force_index" id="search_force_index_check" value="1"', empty($modSettings['search_force_index']) ? '' : ' checked="checked"', ' class="input_check" /><label for="search_force_index_check">', $txt['search_force_index'], '</label><br />
 						<input type="checkbox" name="search_match_words" id="search_match_words_check" value="1"', empty($modSettings['search_match_words']) ? '' : ' checked="checked"', ' class="input_check" /><label for="search_match_words_check">', $txt['search_match_words'], '</label>
 					</fieldset>
-					<div class="submitbutton">
-						<input type="submit" name="save" value="', $txt['search_method_save'], '" class="button_submit" />
-						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						<input type="hidden" name="', $context['admin-msmpost_token_var'], '" value="', $context['admin-msmpost_token'], '" />
-					</div>
 				</div>
+			</div>
+			<div class="submitbutton">
+				<input type="submit" name="save" value="', $txt['search_method_save'], '" class="button_submit" />
+				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+				<input type="hidden" name="', $context['admin-msmpost_token_var'], '" value="', $context['admin-msmpost_token'], '" />
 			</div>
 		</form>
 	</div>
@@ -510,7 +510,7 @@ function template_manage_sphinx()
 							<span class="smalltext">', $txt['sphinx_memory_limit_desc'], '</span>
 						</dt>
 						<dd>
-							<input type="text" name="sphinx_indexer_mem" id="sphinx_indexer_mem_input" value="', isset($modSettings['sphinx_indexer_mem']) ? $modSettings['sphinx_indexer_mem'] : '32', '" size="4" /> MB
+							<input type="text" name="sphinx_indexer_mem" id="sphinx_indexer_mem_input" value="', isset($modSettings['sphinx_indexer_mem']) ? $modSettings['sphinx_indexer_mem'] : '128', '" size="4" /> MB
 						</dd>
 						<dt>
 							<label for="sphinx_searchd_server_input"><strong>', $txt['sphinx_searchd_server'], '</strong></label><br />
