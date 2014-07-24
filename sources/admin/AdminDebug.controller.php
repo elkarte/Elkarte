@@ -84,44 +84,10 @@ class AdminDebug_Controller extends Action_Controller
 	 * Get admin information from the database.
 	 * Accessed by ?action=viewadminfile.
 	 *
-	 * @todo candidate for removal I think
+	 * @deprecated since 1.1 - the action has been removeds
 	 */
 	public function action_viewadminfile()
 	{
-		global $modSettings;
-
-		require_once(SUBSDIR . '/AdminDebug.subs.php');
-
-		// Don't allow non-administrators.
-		isAllowedTo('admin_forum');
-
-		setMemoryLimit('128M');
-
-		if (empty($_REQUEST['filename']) || !is_string($_REQUEST['filename']))
-			fatal_lang_error('no_access', false);
-
-		$file = adminInfoFile($_REQUEST['filename']);
-
-		// @todo Temp
-		// Figure out if sesc is still being used.
-		if (strpos($file['file_data'], ';sesc=') !== false)
-			$file['file_data'] = '
-if (!(\'elkForum_sessionvar\' in window))
-	window.elkForum_sessionvar = \'sesc\';
-' . strtr($file['file_data'], array(';sesc=' => ';\' + window.elkForum_sessionvar + \'='));
-
-		Template_Layers::getInstance()->removeAll();
-
-		// Lets make sure we aren't going to output anything nasty.
-		@ob_end_clean();
-		if (!empty($modSettings['enableCompressedOutput']))
-			ob_start('ob_gzhandler');
-		else
-			ob_start();
-
-		// Make sure they know what type of file we are.
-		header('Content-Type: ' . $file['filetype']);
-		echo $file['file_data'];
-		obExit(false);
+		fatal_lang_error('no_access', false);
 	}
 }
