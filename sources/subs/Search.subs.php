@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.0 Release Candidate 2
  *
  */
 
@@ -23,7 +23,7 @@ if (!defined('ELK'))
 // This defines two version types for checking the API's are compatible with this version of the software.
 $GLOBALS['search_versions'] = array(
 	// This is the forum version but is repeated due to some people rewriting $forum_version.
-	'forum_version' => 'ElkArte 1.0 RC 1',
+	'forum_version' => 'ElkArte 1.0 RC 2',
 
 	// This is the minimum version of ElkArte that an API could have been written for to work.
 	// (strtr to stop accidentally updating version on release)

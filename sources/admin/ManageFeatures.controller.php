@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.0 Release Candidate 2
  *
  */
 
@@ -214,6 +214,9 @@ class ManageFeatures_Controller extends Action_Controller
 
 		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=basic';
 		$context['settings_title'] = $txt['mods_cat_features'];
+
+		// Show / hide custom jquery fields as required
+		addInlineJavascript('showhideJqueryOptions();', true);
 
 		Settings_Form::prepare_db($config_vars);
 	}
@@ -1407,9 +1410,6 @@ class ManageFeatures_Controller extends Action_Controller
 		$disabled_fields = isset($modSettings['disabled_profile_fields']) ? explode(',', $modSettings['disabled_profile_fields']) : array();
 		$reg_fields = isset($modSettings['registration_fields']) ? explode(',', $modSettings['registration_fields']) : array();
 		$can_personal_text = !in_array('personal_text', $disabled_fields) && !in_array('personal_text', $reg_fields);
-
-		// Show / hide custom jquery fields as required
-		addInlineJavascript('showhideJqueryOptions();', true);
 
 		$config_vars = array(
 				// Basic stuff, titles, permissions...

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.0 Release Candidate 2
  *
  */
 
@@ -744,7 +744,7 @@ function template_profile_block_contact()
 						<img src="', $settings['images_url'], '/profile/im_', $context['member']['online']['is_online'] ? 'on.png' : 'off.png', '" alt="" class="icon" />
 					</dt>
 					<dd>
-						<a href="', $scripturl, '?action=pm;sa=send;u=', $context['member']['id'], '">', $txt['send_member_pm'], '</a>
+						<a class="linkbutton" href="', $scripturl, '?action=pm;sa=send;u=', $context['member']['id'], '">', $txt['send_member_pm'], '</a>
 					</dd>';
 	}
 
@@ -753,17 +753,19 @@ function template_profile_block_contact()
 	{
 		$ci_empty = false;
 		echo '
-					<dt><img src="', $settings['images_url'], '/profile/email_sm.png" alt="', $txt['email'], '" /></dt>
+					<dt>
+						<img src="', $settings['images_url'], '/profile/email_sm.png" alt="', $txt['email'], '" />
+					</dt>
 					<dd>';
 
 		// Only show the email address fully if it's not hidden - and we reveal the email.
 		if ($context['member']['show_email'] == 'yes')
 			echo '
-						<a href="', $scripturl, '?action=emailuser;sa=email;uid=', $context['member']['id'], '">', $context['member']['email'], '</a>';
+						<a class="linkbutton" href="', $scripturl, '?action=emailuser;sa=email;uid=', $context['member']['id'], '">', $txt['email'], '</a>';
 		// ... Or if the one looking at the profile is an admin they can see it anyway.
 		elseif ($context['member']['show_email'] == 'yes_permission_override')
 			echo '
-						<em><a href="', $scripturl, '?action=emailuser;sa=email;uid=', $context['member']['id'], '">', $context['member']['email'], '</a></em>';
+						<em><a class="linkbutton" href="', $scripturl, '?action=emailuser;sa=email;uid=', $context['member']['id'], '">', $context['member']['email'], '</a></em>';
 		else
 			echo '
 						<em>', $txt['hidden'], '</em>';

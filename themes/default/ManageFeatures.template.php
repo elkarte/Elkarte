@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.0 Release Candidate 2
  *
  */
 
@@ -121,7 +121,9 @@ function template_edit_profile_field()
 								</select>
 							</dd>
 							<dt>
-								<a id="field_show_enclosed" href="', $scripturl, '?action=quickhelp;help=field_show_enclosed" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a>
+								<a id="field_show_enclosed" href="', $scripturl, '?action=quickhelp;help=field_show_enclosed" onclick="return reqOverlayDiv(this.href);" class="help">
+									<img src="', $settings['images_url'], '/helptopics.png" class="icon_fixed" alt="', $txt['help'], '" />
+								</a>
 								<strong><label for="enclose">', $txt['custom_edit_enclose'], ':</label></strong><br />
 								<span class="smalltext">', $txt['custom_edit_enclose_desc'], '</span>
 							</dt>
@@ -170,7 +172,9 @@ function template_edit_profile_field()
 								<input type="checkbox" name="bbc" id="bbc_dd"', $context['field']['bbc'] ? ' checked="checked"' : '', ' class="input_check" />
 							</dd>
 							<dt id="options_dt">
-								<a href="', $scripturl, '?action=quickhelp;help=customoptions" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a>
+								<a href="', $scripturl, '?action=quickhelp;help=customoptions" onclick="return reqOverlayDiv(this.href);" class="help">
+									<img src="', $settings['images_url'], '/helptopics.png" class="icon_fixed" alt="', $txt['help'], '" />
+								</a>
 								<strong><label for="options_dd">', $txt['custom_edit_options'], ':</label></strong><br />
 								<span class="smalltext">', $txt['custom_edit_options_desc'], '</span>
 							</dt>
@@ -198,7 +202,9 @@ function template_edit_profile_field()
 						<legend>', $txt['custom_edit_advanced'], '</legend>
 						<dl class="settings">
 							<dt id="mask_dt">
-								<a id="custom_mask" href="', $scripturl, '?action=quickhelp;help=custom_mask" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a>
+								<a id="custom_mask" href="', $scripturl, '?action=quickhelp;help=custom_mask" onclick="return reqOverlayDiv(this.href);" class="help">
+									<img src="', $settings['images_url'], '/helptopics.png" class="icon_fixed" alt="', $txt['help'], '" />
+								</a>
 								<strong><label for="mask">', $txt['custom_edit_mask'], ':</label></strong><br />
 								<span class="smalltext">', $txt['custom_edit_mask_desc'], '</span>
 							</dt>

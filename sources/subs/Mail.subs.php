@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.0 Release Candidate 2
  *
  */
 
@@ -46,6 +46,9 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 
 	// Use sendmail if it's set or if no SMTP server is set.
 	$use_sendmail = empty($modSettings['mail_type']) || $modSettings['smtp_host'] == '';
+
+	// Using maillist styles and this message qualifies (priority 3 and below only (4 = digest, 5 = newsletter))
+	$maillist = !empty($modSettings['maillist_enabled']) && $from_wrapper !== null && $message_id !== null && $priority < 4 && empty($modSettings['mail_no_message_id']);
 
 	// Line breaks need to be \r\n only in windows or for SMTP.
 	$line_break = !empty($context['server']['is_windows']) || !$use_sendmail ? "\r\n" : "\n";
@@ -96,6 +99,23 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 		$message = preg_replace('~(' . preg_quote($scripturl, '~') . '(?:[?/][\w\-_%\.,\?&;=#]+)?)~', '<a href="$1">$1</a>', $message);
 	}
 
+	// Requirements (draft) for MLM to Support Basic DMARC Compliance
+	// http://www.dmarc.org/supplemental/mailman-project-mlm-dmarc-reqs.html
+	if ($maillist && $from !== null && $from_wrapper !== null)
+	{
+		// Be sure there is never an email in the from name if using maillist styles
+		$dmarc_from = $from;
+		if (filter_var($dmarc_from, FILTER_VALIDATE_EMAIL))
+			$dmarc_from = str_replace(strstr($dmarc_from, '@'), '', $dmarc_from);
+
+		// Add in the 'via' if desired, helps prevent email clients from learning/replacing legit names/emails
+		if (!empty($modSettings['maillist_sitename']) && empty($modSettings['dmarc_spec_standard']))
+			$from = $dmarc_from . ' ' . $txt['via'] . ' ' . $modSettings['maillist_sitename'];
+		else
+			$from = $dmarc_from;
+	}
+
+	// Take care of from / subject encodings
 	list (, $from_name, $from_encoding) = mimespecialchars(addcslashes($from !== null ? $from : (!empty($modSettings['maillist_sitename']) ? $modSettings['maillist_sitename'] : $context['forum_name']), '<>()\'\\"'), true, $hotmail_fix, $line_break);
 	list (, $subject) = mimespecialchars($subject, true, $hotmail_fix, $line_break);
 	if ($from_encoding !== 'base64')
@@ -105,6 +125,8 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	if ($from_wrapper != null)
 	{
 		$headers = 'From: ' . $from_name . ' <' . $from_wrapper . '>' . $line_break;
+
+		// If they reply where is it going to be sent?
 		$headers .= 'Reply-To: "' . (!empty($modSettings['maillist_sitename']) ? $modSettings['maillist_sitename'] : $context['forum_name']) . '" <' . (!empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'])) . '>' . $line_break;
 		if ($reference !== null)
 			$headers .= 'References: <' . $reference . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>' . $line_break;
@@ -121,8 +143,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	$headers .= 'Date: ' . gmdate('D, d M Y H:i:s') . ' -0000' . $line_break;
 	$headers .= 'X-Mailer: ELK' . $line_break;
 
-	// Using the maillist functions?
-	$maillist = !empty($modSettings['maillist_enabled']) && $from_wrapper !== null && $message_id !== null && $priority < 4 && empty($modSettings['mail_no_message_id']);
+	// If Using the maillist we include a few more headers for compliance
 	if ($maillist)
 	{
 		// Lets try to avoid auto replies
@@ -130,6 +151,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 		$headers .= 'Auto-Submitted: auto-generated' . $line_break;
 
 		// Indicate its a list server to avoid spam tagging and to help client filters
+		// http://www.ietf.org/rfc/rfc2369.txt
 		$headers .= 'List-Id: <' . (!empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'])). '>' . $line_break;
 		$headers .= 'List-Unsubscribe: <' . $boardurl . '/index.php?action=profile;area=notification>' . $line_break;
 		$headers .= 'List-Owner: <mailto:' . (!empty($modSettings['maillist_sitename_help']) ? $modSettings['maillist_sitename_help'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'])) . '> (' . (!empty($modSettings['maillist_sitename']) ? $modSettings['maillist_sitename'] : $context['forum_name']) . ')' . $line_break;
@@ -1296,10 +1318,10 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 
 			$need_break = substr($email['headers'], -1) === "\n" || substr($email['headers'], -1) === "\r" ? false : true;
 
-			// Create our unique reply to email header, priority 3 and below only (4 = digest, 5 = newsletter)
+			// Create our unique reply to email header if this message needs one
 			$unq_id = '';
 			$unq_head = '';
-			if (!empty($modSettings['maillist_enabled']) && $email['message_id'] !== null && $email['priority'] < 4 && empty($modSettings['mail_no_message_id']))
+			if (!empty($modSettings['maillist_enabled']) && $email['message_id'] !== null && strpos($email['headers'], 'List-Id: <') !== false)
 			{
 				$unq_head = md5($scripturl . microtime() . rand()) . '-' . $email['message_id'];
 				$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);

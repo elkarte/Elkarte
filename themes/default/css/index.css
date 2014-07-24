@@ -191,6 +191,7 @@ select option {
 /* Special form elements need to be addressed */
 select#cat, select#suggestions, select#file , input[type="file"] {
 	height: auto;
+	max-height: none;
 }
 input[type="number"] {
 	padding: 0 0 0 6px;
@@ -2806,6 +2807,9 @@ dl.merge_topic dd {
 	-moz-hyphens: auto;
 	-ms-hyphens: auto;
 }
+.profileblock .icon {
+	vertical-align: bottom;
+}
 .profile_content {
 	overflow: auto;
 	padding: 0 8px;
@@ -3099,6 +3103,8 @@ dl.merge_topic dd {
 	overflow: auto;
 	margin: 0 0 10px 2px;
 	width: 55%;
+	min-height: 2em;
+	padding-bottom: 1px;
 }
 .centericon {
 	vertical-align: middle;
@@ -3338,7 +3344,7 @@ div.labels {
 #calendar_navigation .buttonlist {
 	padding: 0 6px;
 }
-/* See, I told you there was deranged wombatz here. */
+/* See, I told you there was wombatz here. */
 /*
 			   ,.--""""--.._
 			 ."     .'      `-.
@@ -3497,6 +3503,9 @@ div.labels {
 	margin: 0;
 	opacity: 0.8;
 	cursor: help;
+}
+.hdicon.help {
+	vertical-align: top;
 }
 .hdicon.help:before {
 	margin: 2px 0 0;

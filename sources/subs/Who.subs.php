@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.0 Release Candidate 2
  *
  */
 
@@ -277,7 +277,15 @@ function determineActions($urls, $preferred_prefix = false)
 			{
 				// Whose?  Their own?
 				if (empty($actions['u']))
-					$actions['u'] = $url[1];
+				{
+					require_once(SUBSDIR . '/Profile.subs.php');
+					$memID = currentMemberID();
+
+					if ($memID == $user_info['id'])
+						$actions['u'] = $url[1];
+					else
+						$actions['u'] = $memID;
+				}
 
 				$data[$k] = $txt['who_hidden'];
 				$profile_ids[(int) $actions['u']][$k] = $actions['action'] == 'profile' ? $txt['who_viewprofile'] : $txt['who_profile'];
@@ -457,6 +465,12 @@ function prepareCreditsData()
 					'title' => $txt['credits_groups_contrib'],
 					'members' => array(
 						$txt['credits_contrib_list'],
+					),
+				),
+				array(
+					'title' => $txt['credits_groups_translators'],
+					'members' => array(
+						$txt['credits_translators_message'],
 					),
 				),
 			),

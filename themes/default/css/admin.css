@@ -401,17 +401,11 @@ div.quick_tasks {
 	padding: 0.2em;
 	margin: 1px;
 }
-.description {
-	max-height: 15em;
+.description, .information {
+	max-height: 16em;
 	overflow: auto;
 	padding-bottom: .5em;
 }
-.information {
-	max-height: 15em;
-	overflow: auto;
-	padding-bottom: .5em;
-}
-
 .packages {
 	border: none !important;
 	list-style: none;
