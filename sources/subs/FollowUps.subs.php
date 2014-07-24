@@ -122,7 +122,7 @@ function unlinkMessages($msg, $topic)
 /**
  * Removes all the follow-ups from the db by topics
  *
- * @param int $topics topic id
+ * @param int|int[] $topics topic id
  */
 function removeFollowUpsByTopic($topics)
 {
