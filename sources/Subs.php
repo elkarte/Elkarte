@@ -4196,6 +4196,11 @@ function replaceBasicActionUrl($string)
 	return str_replace($find, $replace, $string);
 }
 
+/**
+ * Takes care of automatically include the files of the classes
+ *
+ * @param string $class The name of the class
+ */
 function elk_autoloader($class)
 {
 	if (substr($class, -11) === '_Controller')
