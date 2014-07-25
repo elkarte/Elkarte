@@ -1894,7 +1894,7 @@ function setTopicAttribute($topic, $attributes)
  * Retrieve the locked or sticky status of a topic.
  *
  * @param int|int[] $id_topic topic to get the status for
- * @param string|string[] $attribute Basically the column name
+ * @param string|string[] $attributes Basically the column names
  * @return int|int[]
  */
 function topicAttribute($id_topic, $attributes)
@@ -3203,11 +3203,11 @@ function toggleTopicsLock($topics, $log = false)
 {
 	global $board, $user_info;
 
+	$db = database();
 
 	$lockStatus = array();
 	$needs_check = !empty($board) && !allowedTo('lock_any');
 	$lockCache = array();
-	$lockCacheBoards = array();
 
 	$topicAttribute = topicAttribute($topics, array('id_topic', 'locked', 'id_board', 'id_member_started'));
 
@@ -3228,7 +3228,6 @@ function toggleTopicsLock($topics, $log = false)
 			sendNotifications($row['id_topic'], $lockStatus);
 		}
 	}
-	$db->free_result($result);
 
 	// It could just be that *none* were their own topics...
 	if (!empty($lockCache))
