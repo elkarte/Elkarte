@@ -628,17 +628,8 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		$topicOptions['is_approved'] = true;
 	elseif (!empty($topicOptions['id']) && !isset($topicOptions['is_approved']))
 	{
-		$request = $db->query('', '
-			SELECT approved
-			FROM {db_prefix}topics
-			WHERE id_topic = {int:id_topic}
-			LIMIT 1',
-			array(
-				'id_topic' => $topicOptions['id'],
-			)
-		);
-		list ($topicOptions['is_approved']) = $db->fetch_row($request);
-		$db->free_result($request);
+		$is_approved = topicAttribute($topicOptions['id'], array('approved'));
+		$topicOptions['is_approved'] = $is_approved['approved'];
 	}
 
 	// If nothing was filled in as name/email address, try the member table.

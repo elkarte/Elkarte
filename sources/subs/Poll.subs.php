@@ -27,30 +27,16 @@
  */
 function associatedPoll($topicID, $pollID = null)
 {
-	$db = database();
-
+	// Retrieve the poll ID.
 	if ($pollID === null)
 	{
-		// Retrieve the poll ID.
-		$request = $db->query('', '
-			SELECT id_poll
-			FROM {db_prefix}topics
-			WHERE id_topic = {int:current_topic}
-			LIMIT 1',
-			array(
-				'current_topic' => $topicID,
-			)
-		);
-		list ($pollID) = $db->fetch_row($request);
-		$db->free_result($request);
+		$pollID = topicAttribute($topicID, array('id_poll'));
 
-		return $pollID;
+		return $pollID['id_poll'];
 	}
 	else
 	{
-		setTopicAttribute($topicID, array(
-			'id_poll' => $pollID,
-		));
+		setTopicAttribute($topicID, array('id_poll' => $pollID));
 	}
 }
 

@@ -32,29 +32,21 @@ function removeTopicsPermissions($topics)
 {
 	global $board, $user_info;
 
-	$db = database();
-
 	// They can only delete their own topics. (we wouldn't be here if they couldn't do that..)
-	$result = $db->query('', '
-		SELECT id_topic, id_board
-		FROM {db_prefix}topics
-		WHERE id_topic IN ({array_int:removed_topic_ids})' . (!empty($board) && !allowedTo('remove_any') ? '
-			AND id_member_started = {int:current_member}' : '') . '
-		LIMIT ' . count($topics),
-		array(
-			'current_member' => $user_info['id'],
-			'removed_topic_ids' => $topics,
-		)
-	);
+	$possible_remove = topicAttribute($topics, array('id_topic', 'id_board', 'id_member_started'));
 
 	$removeCache = array();
 	$removeCacheBoards = array();
-	while ($row = $db->fetch_assoc($result))
+	$test_owner = !empty($board) && !allowedTo('remove_any');
+	foreach ($possible_remove as $row)
 	{
+		// Skip if we have to test the owner *and* the user is not the owner
+		if ($test_owner && $row['id_member_started'] != $user_info['id'])
+			continue;
+
 		$removeCache[] = $row['id_topic'];
 		$removeCacheBoards[$row['id_topic']] = $row['id_board'];
 	}
-	$db->free_result($result);
 
 	// Maybe *none* were their own topics.
 	if (!empty($removeCache))
@@ -127,23 +119,18 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	// Recycle topics that aren't in the recycle board...
 	if (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 && !$ignoreRecycling)
 	{
-		$request = $db->query('', '
-			SELECT id_topic, id_board, unapproved_posts, approved
-			FROM {db_prefix}topics
-			WHERE id_topic IN ({array_int:topics})
-				AND id_board != {int:recycle_board}
-			LIMIT ' . count($topics),
-			array(
-				'recycle_board' => $modSettings['recycle_board'],
-				'topics' => $topics,
-			)
-		);
-		if ($db->num_rows($request) > 0)
+		$possible_recycle = topicAttribute($topics, array('id_topic', 'id_board', 'unapproved_posts', 'approved'))
+
+		if (!empty($possible_recycle))
 		{
 			// Get topics that will be recycled.
 			$recycleTopics = array();
-			while ($row = $db->fetch_assoc($request))
+			foreach ($possible_recycle as $row)
 			{
+				// If it's already in the recycle board do nothing
+				if ($row['id_board'] == $modSettings['recycle_board'])
+					continue;
+
 				if (function_exists('apache_reset_timeout'))
 					@apache_reset_timeout();
 
@@ -155,7 +142,6 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 					'is_sticky' => 0,
 				));
 			}
-			$db->free_result($request);
 
 			// Mark recycled topics as recycled.
 			$db->query('', '
@@ -191,8 +177,6 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			// Topics that were recycled don't need to be deleted, so subtract them.
 			$topics = array_diff($topics, $recycleTopics);
 		}
-		else
-			$db->free_result($request);
 	}
 
 	// Still topics left to delete?
@@ -261,21 +245,13 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	}
 
 	// Remove polls for these topics.
-	$request = $db->query('', '
-		SELECT id_poll
-		FROM {db_prefix}topics
-		WHERE id_topic IN ({array_int:topics})
-			AND id_poll > {int:no_poll}
-		LIMIT ' . count($topics),
-		array(
-			'no_poll' => 0,
-			'topics' => $topics,
-		)
-	);
+	$possible_polls = topicAttribute($topics, 'id_poll');
 	$polls = array();
-	while ($row = $db->fetch_assoc($request))
-		$polls[] = $row['id_poll'];
-	$db->free_result($request);
+	foreach ($possible_polls as $row)
+	{
+		if (!empty($row['id_poll']))
+			$polls[] = $row['id_poll'];
+	}
 
 	if (!empty($polls))
 	{
@@ -744,23 +720,15 @@ function moveTopics($topics, $toBoard, $log = false)
 			);
 
 		// Get all the current max and mins.
-		$request = $db->query('', '
-			SELECT id_topic, id_first_msg, id_last_msg
-			FROM {db_prefix}topics
-			WHERE id_topic IN ({array_int:topics})',
-			array(
-				'topics' => $topics,
-			)
-		);
+		$topicAttribute = topicAttribute($topics, array('id_topic', 'id_first_msg', 'id_last_msg'));
 		$topicMaxMin = array();
-		while ($row = $db->fetch_assoc($request))
+		foreach ($topicAttribute as $row)
 		{
 			$topicMaxMin[$row['id_topic']] = array(
 				'min' => $row['id_first_msg'],
 				'max' => $row['id_last_msg'],
 			);
 		}
-		$db->free_result($request);
 
 		// Check the MAX and MIN are correct.
 		$request = $db->query('', '
@@ -1871,22 +1839,10 @@ function updateSplitTopics($options, $id_board)
  */
 function topicStatus($topic)
 {
-	$db = database();
-
 	// Find out who started the topic, and the lock status.
-	$request = $db->query('', '
-		SELECT id_member_started, locked
-		FROM {db_prefix}topics
-		WHERE id_topic = {int:current_topic}
-		LIMIT 1',
-		array(
-			'current_topic' => $topic,
-		)
-	);
-	$starter = $db->fetch_row($request);
-	$db->free_result($request);
+	$starter = topicAttribute($topic, array('id_member_started', 'locked'));
 
-	return $starter;
+	return array($starter['id_member_started'], $starter['locked']);
 }
 
 /**
@@ -1945,7 +1901,7 @@ function topicAttribute($id_topic, $attributes)
 {
 	$db = database();
 
-	//@todo maybe add a filer for known attributes... or not
+	// @todo maybe add a filer for known attributes... or not
 // 	$attributes = array(
 // 		'locked' => 'locked',
 // 		'sticky' => 'is_sticky',
@@ -2027,24 +1983,9 @@ function topicUserAttributes($id_topic, $user)
  */
 function topicsDetails($topics)
 {
-	$db = database();
+	$returns = topicAttribute($topics, array('id_topic', 'id_member_started', 'id_board', 'locked', 'approved', 'unapproved_posts'));
 
-	$request = $db->query('', '
-		SELECT id_topic, id_member_started, id_board, locked, approved, unapproved_posts
-		FROM {db_prefix}topics
-		WHERE id_topic IN ({array_int:topic_ids})
-		LIMIT ' . count($topics),
-		array(
-			'topic_ids' => $topics,
-		)
-	);
-
-	$topics = array();
-	while ($row = $db->fetch_assoc($request))
-		$topics[] = $row;
-	$db->free_result($request);
-
-	return $topics;
+	return $returns;
 }
 
 /**
@@ -2074,23 +2015,14 @@ function toggleTopicSticky($topics, $log = false)
 	if ($log)
 	{
 		// Get the board IDs and Sticky status
-		$request = $db->query('', '
-			SELECT id_topic, id_board, is_sticky
-			FROM {db_prefix}topics
-			WHERE id_topic IN ({array_int:sticky_topic_ids})
-			LIMIT ' . count($topics),
-			array(
-				'sticky_topic_ids' => $topics,
-			)
-		);
+		$topicAttributes = topicAttribute($topics, array('id_topic', 'id_board', 'is_sticky'));
 		$stickyCacheBoards = array();
 		$stickyCacheStatus = array();
-		while ($row = $db->fetch_assoc($request))
+		foreach ($topicAttributes as $row)
 		{
 			$stickyCacheBoards[$row['id_topic']] = $row['id_board'];
 			$stickyCacheStatus[$row['id_topic']] = empty($row['is_sticky']);
 		}
-		$db->free_result($request);
 
 		foreach ($topics as $topic)
 		{
@@ -2418,17 +2350,9 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		fatal_lang_error('no_posts_selected', false);
 
 	// Get some board info.
-	$request = $db->query('', '
-		SELECT id_board, approved
-		FROM {db_prefix}topics
-		WHERE id_topic = {int:id_topic}
-		LIMIT 1',
-		array(
-			'id_topic' => $split1_ID_TOPIC,
-		)
-	);
-	list ($id_board, $split1_approved) = $db->fetch_row($request);
-	$db->free_result($request);
+	$topicAttribute = topicAttribute($split1_ID_TOPIC, array('id_board', 'approved'));
+	$id_board = $topicAttribute['id_board'];
+	$split1_approved = $topicAttribute['approved'];
 
 	// Find the new first and last not in the list. (old topic)
 	$request = $db->query('', '
