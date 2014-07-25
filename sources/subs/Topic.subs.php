@@ -1937,37 +1937,44 @@ function setTopicAttribute($topic, $attributes)
 /**
  * Retrieve the locked or sticky status of a topic.
  *
- * @param int $id_topic topic to get the status for
- * @param string $attribute 'locked' or 'sticky'
- * @return integer
+ * @param int|int[] $id_topic topic to get the status for
+ * @param string|string[] $attribute Basically the column name
+ * @return int|int[]
  */
-function topicAttribute($id_topic, $attribute)
+function topicAttribute($id_topic, $attributes)
 {
 	$db = database();
 
-	$attributes = array(
-		'locked' => 'locked',
-		'sticky' => 'is_sticky',
+	//@todo maybe add a filer for known attributes... or not
+// 	$attributes = array(
+// 		'locked' => 'locked',
+// 		'sticky' => 'is_sticky',
+// 	);
+
+	// check the lock status
+	$request = $db->query('', '
+		SELECT {raw:attribute}
+		FROM {db_prefix}topics
+		WHERE id_topic IN ({array_int:current_topic})',
+		array(
+			'current_topic' => (array) $id_topic,
+			'attribute' => implode(',', (array) $attributes),
+		)
 	);
 
-	if (isset($attributes[$attribute]))
+	if (is_array($id_topic))
 	{
-		// check the lock status
-		$request = $db->query('', '
-			SELECT {raw:attribute}
-			FROM {db_prefix}topics
-			WHERE id_topic = {int:current_topic}
-			LIMIT 1',
-			array(
-				'current_topic' => $id_topic,
-				'attribute' => $attributes[$attribute],
-			)
-		);
-		list ($status) = $db->fetch_row($request);
-		$db->free_result($request);
-
-		return $status;
+		$status = array();
+		while ($row = $db->fetch_assoc($request))
+			$status[] = $row;
 	}
+	else
+	{
+		$status = $db->fetch_assoc($request);
+	}
+	$db->free_result($request);
+
+	return $status;
 }
 
 /**
