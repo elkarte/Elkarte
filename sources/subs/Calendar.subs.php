@@ -286,7 +286,7 @@ function canLinkEvent()
 	if (!allowedTo('admin_forum') && !allowedTo('moderate_board'))
 	{
 		// Not admin or a moderator of this board. You better be the owner - or else.
-		$row = topicAttribute($topic, array('id_member_started'))
+		$row = topicAttribute($topic, array('id_member_started'));
 		if (!empty($row))
 		{
 			// Not the owner of the topic.
