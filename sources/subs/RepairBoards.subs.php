@@ -347,8 +347,6 @@ function loadForumTests()
 				GROUP BY t.id_topic, t.id_first_msg, t.id_last_msg, t.approved, mf.approved
 				ORDER BY t.id_topic',
 			'fix_processing' => function ($row) {
-				$db = database();
-
 				$row['firstmsg_approved'] = (int) $row['firstmsg_approved'];
 				$row['myid_first_msg'] = (int) $row['myid_first_msg'];
 				$row['myid_last_msg'] = (int) $row['myid_last_msg'];
@@ -404,8 +402,6 @@ function loadForumTests()
 				GROUP BY t.id_topic, t.num_replies, mf.approved
 				ORDER BY t.id_topic',
 			'fix_processing' => function ($row) {
-				$db = database();
-
 				$row['my_num_replies'] = (int) $row['my_num_replies'];
 
 				// Not really a problem?
@@ -447,8 +443,6 @@ function loadForumTests()
 				HAVING unapproved_posts != COUNT(mu.id_msg)
 				ORDER BY t.id_topic',
 			'fix_processing' => function ($row) {
-				$db = database();
-
 				$row['my_unapproved_posts'] = (int) $row['my_unapproved_posts'];
 
 				setTopicAttribute($row['id_topic'], array(
