@@ -96,9 +96,6 @@ function template_announcement_send()
 		</form>
 	</div>
 	<script><!-- // --><![CDATA[
-		var countdown = 3,
-			txt_message = "', $txt['announce_continue'], '";
-
-		doAutoSubmit();
+		doAutoSubmit(3, ', JavaScriptEscape($txt['announce_continue']), ');
 	// ]]></script>';
 }

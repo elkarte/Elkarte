@@ -549,7 +549,7 @@ function processNextTasks($ts = 0)
 
 		// Do also some timestamp checking,
 		// and do this only if we updated it before.
-		if ((!empty($ts) || $ts == $row['next_time']) && $affected_rows)
+		if ((empty($ts) || $ts == $row['next_time']) && $affected_rows)
 		{
 			ignore_user_abort(true);
 			run_this_task($row['id_task'], $row['task']);

@@ -342,7 +342,7 @@ function htmlspecialchars(thetext)
 	thetext = thetext.replace(/</g, "&lt;");
 	thetext = thetext.replace(/\>/g, "&gt;");
 	thetext = thetext.replace(/\n/g, "<br />");
-	thetext = thetext.replace(/\ \ /g, " &nbsp;");
+	thetext = thetext.replace(/\ \ /g, "&nbsp; ");
 
 	return thetext;
 }
