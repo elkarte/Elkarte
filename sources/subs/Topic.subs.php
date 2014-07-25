@@ -1921,12 +1921,12 @@ function topicStatus($topic)
 
 /**
  * Set attributes for a topic, i.e. locked, sticky.
- * Parameter $attributes is an array with:
- *  - 'locked' => lock_value,
- *  - 'sticky' => sticky_value
+ * Parameter $attributes is an array where the key is the column name of the
+ * attribut to change, and the value is... the new value of the attribute.
  * It sets the new value for the attribute as passed to it.
+ * <b>It is currently limited to integer values only</b>
  *
- * @param int $topic
+ * @param int|int[] $topic
  * @param mixed[] $attributes
  * @todo limited to integer attributes
  */
@@ -1952,12 +1952,12 @@ function setTopicAttribute($topic, $attributes)
 	if (empty($update))
 		return false;
 
-	$attributes['current_topic'] = $topic;
+	$attributes['current_topic'] = (array) $topic;
 
 	$db->query('', '
 		UPDATE {db_prefix}topics
 		SET ' . implode(',', $update) . '
-		WHERE id_topic = {int:current_topic}',
+		WHERE id_topic IN ({array_int:current_topic})',
 		$attributes
 	);
 
