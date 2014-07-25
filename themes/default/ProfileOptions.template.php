@@ -468,14 +468,7 @@ function template_edit_options()
 				', $context['profile_onsubmit_javascript'];
 
 	echo '
-			}';
-
-	// Any totally custom stuff?
-	if (!empty($context['profile_javascript']))
-		echo '
-			', $context['profile_javascript'];
-
-	echo '
+			}
 		// ]]></script>';
 
 	// Any final spellchecking stuff?

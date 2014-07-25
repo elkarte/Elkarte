@@ -88,7 +88,6 @@ function setupProfileContext($fields, $hook = '')
 	// Some default bits.
 	$context['profile_prehtml'] = '';
 	$context['profile_posthtml'] = '';
-	$context['profile_javascript'] = '';
 	$context['profile_onsubmit_javascript'] = '';
 
 	$i = 0;
@@ -126,9 +125,9 @@ function setupProfileContext($fields, $hook = '')
 			if (!empty($cur_field['js_submit']))
 				$context['profile_onsubmit_javascript'] .= $cur_field['js_submit'];
 			if (!empty($cur_field['js']))
-				$context['profile_javascript'] .= $cur_field['js'];
+				addInlineJavascript($cur_field['js']);
 			if (!empty($cur_field['js_load']))
-				loadJavascriptFile ($cur_field['js_load']);
+				loadJavascriptFile($cur_field['js_load']);
 
 			// Any template stuff?
 			if (!empty($cur_field['prehtml']))
