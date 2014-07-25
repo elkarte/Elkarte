@@ -360,21 +360,13 @@ function loadForumTests()
 				$memberStartedID = getMsgMemberID($row['myid_first_msg']);
 				$memberUpdatedID = getMsgMemberID($row['myid_last_msg']);
 
-				$db->query('', '
-					UPDATE {db_prefix}topics
-					SET id_first_msg = {int:myid_first_msg},
-						id_member_started = {int:memberStartedID}, id_last_msg = {int:myid_last_msg},
-						id_member_updated = {int:memberUpdatedID}, approved = {int:firstmsg_approved}
-					WHERE id_topic = {int:topic_id}',
-					array(
-						'myid_first_msg' => $row['myid_first_msg'],
-						'memberStartedID' => $memberStartedID,
-						'myid_last_msg' => $row['myid_last_msg'],
-						'memberUpdatedID' => $memberUpdatedID,
-						'firstmsg_approved' => $row['firstmsg_approved'],
-						'topic_id' => $row['id_topic'],
-					)
-				);
+				setTopicAttribute($row['id_topic'], array(
+					'id_first_msg' => $row['myid_first_msg'],
+					'id_member_started' => $memberStartedID,
+					'id_last_msg' => $row['myid_last_msg'],
+					'id_member_updated' => $memberUpdatedID,
+					'approved' => $row['firstmsg_approved'],
+				));
 			},
 			'message_function' => function ($row) {
 				global $txt, $context;
@@ -420,15 +412,9 @@ function loadForumTests()
 				if ($row['my_num_replies'] == $row['num_replies'])
 					return false;
 
-				$db->query('', '
-					UPDATE {db_prefix}topics
-					SET num_replies = {int:my_num_replies}
-					WHERE id_topic = {int:topic_id}',
-					array(
-						'my_num_replies' => $row['my_num_replies'],
-						'topic_id' => $row['id_topic'],
-					)
-				);
+				setTopicAttribute($row['id_topic'], array(
+					'num_replies' => $row['my_num_replies'],
+				));
 			},
 			'message_function' => function ($row) {
 				global $txt, $context;
@@ -465,15 +451,9 @@ function loadForumTests()
 
 				$row['my_unapproved_posts'] = (int) $row['my_unapproved_posts'];
 
-				$db->query('', '
-					UPDATE {db_prefix}topics
-					SET unapproved_posts = {int:my_unapproved_posts}
-					WHERE id_topic = {int:topic_id}',
-					array(
-						'my_unapproved_posts' => $row['my_unapproved_posts'],
-						'topic_id' => $row['id_topic'],
-					)
-				);
+				setTopicAttribute($row['id_topic'], array(
+					'unapproved_posts' => $row['my_unapproved_posts'],
+				));
 			},
 			'messages' => array('repair_stats_topics_4', 'id_topic', 'unapproved_posts'),
 		),

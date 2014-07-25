@@ -276,15 +276,8 @@ function recountApprovedMessages($start, $increment)
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
-		$db->query('', '
-			UPDATE {db_prefix}topics
-			SET num_replies = {int:num_replies}
-			WHERE id_topic = {int:id_topic}',
-			array(
-				'num_replies' => $row['real_num_replies'],
-				'id_topic' => $row['id_topic'],
-			)
-		);
+		setTopicAttribute($row['id_topic'], array('num_replies' => $row['real_num_replies']));
+
 	$db->free_result($request);
 }
 
@@ -316,15 +309,8 @@ function recountUnapprovedMessages($start, $increment)
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
-		$db->query('', '
-			UPDATE {db_prefix}topics
-			SET unapproved_posts = {int:unapproved_posts}
-			WHERE id_topic = {int:id_topic}',
-			array(
-				'unapproved_posts' => $row['real_unapproved_posts'],
-				'id_topic' => $row['id_topic'],
-			)
-		);
+		setTopicAttribute($row['id_topic'], array('unapproved_posts' => $row['real_unapproved_posts']));
+
 	$db->free_result($request);
 }
 

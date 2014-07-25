@@ -48,15 +48,9 @@ function associatedPoll($topicID, $pollID = null)
 	}
 	else
 	{
-		$db->query('', '
-			UPDATE {db_prefix}topics
-			SET id_poll = {int:poll}
-			WHERE id_topic = {int:current_topic}',
-			array(
-				'current_topic' => $topicID,
-				'poll' => $pollID,
-			)
-		);
+		setTopicAttribute($topicID, array(
+			'id_poll' => $pollID,
+		));
 	}
 }
 
