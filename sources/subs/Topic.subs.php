@@ -3195,9 +3195,8 @@ function updateTopicStats($increment = null)
 
 /**
  * Toggles the locked status of the passed id_topic's checking for permissions.
- * Permissions are NOT checked here because the function is used in a scheduled task
  *
- * @param int[]|int $topics The topics to lock (can be an id or an array of ids).
+ * @param int[] $topics The topics to lock (can be an id or an array of ids).
  * @param bool $log if true logs the action.
  */
 function toggleTopicsLock($topics, $log = false)
@@ -3206,41 +3205,19 @@ function toggleTopicsLock($topics, $log = false)
 
 
 	$lockStatus = array();
-
-	// Gotta make sure they CAN lock/unlock these topics...
-	if (!empty($board) && !allowedTo('lock_any'))
-	{
-		// Make sure they started the topic AND it isn't already locked by someone with higher priv's.
-		$result = $db->query('', '
-			SELECT id_topic, locked, id_board
-			FROM {db_prefix}topics
-			WHERE id_topic IN ({array_int:locked_topic_ids})
-				AND id_member_started = {int:current_member}
-				AND locked IN (2, 0)
-			LIMIT ' . count($topics),
-			array(
-				'current_member' => $user_info['id'],
-				'locked_topic_ids' => $topics,
-			)
-		);
-	}
-	else
-	{
-		$result = $db->query('', '
-			SELECT id_topic, locked, id_board
-			FROM {db_prefix}topics
-			WHERE id_topic IN ({array_int:locked_topic_ids})
-			LIMIT ' . count($topics),
-			array(
-				'locked_topic_ids' => $topics,
-			)
-		);
-	}
-
+	$needs_check = !empty($board) && !allowedTo('lock_any');
 	$lockCache = array();
 	$lockCacheBoards = array();
-	while ($row = $db->fetch_assoc($result))
+
+	$topicAttribute = topicAttribute($topics, array('id_topic', 'locked', 'id_board', 'id_member_started'));
+
+	foreach ($topicAttribute as $row)
 	{
+		// Skip the entry if it needs to be checked and the user is not the owen and
+		// the topic was not locked or locked by someone with more permissions
+		if ($needs_check && ($user_info['id'] != $row['id_member_started'] || !in_array($row['locked'], array(0, 2))))
+			continue;
+
 		$lockCache[] = $row['id_topic'];
 
 		if ($log)
