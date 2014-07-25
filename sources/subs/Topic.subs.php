@@ -1928,33 +1928,40 @@ function topicStatus($topic)
  *
  * @param int $topic
  * @param mixed[] $attributes
+ * @todo limited to integer attributes
  */
 function setTopicAttribute($topic, $attributes)
 {
 	$db = database();
 
-	if (isset($attributes['locked']))
-		// Lock the topic in the database with the new value.
-		$db->query('', '
-			UPDATE {db_prefix}topics
-			SET locked = {int:locked}
-			WHERE id_topic = {int:current_topic}',
-			array(
-				'current_topic' => $topic,
-				'locked' => $attributes['locked'],
-			)
-		);
-	if (isset($attributes['sticky']))
-		// Set the new sticky value.
-		$db->query('', '
-			UPDATE {db_prefix}topics
-			SET is_sticky = {int:is_sticky}
-			WHERE id_topic = {int:current_topic}',
-			array(
-				'current_topic' => $topic,
-				'is_sticky' => empty($attributes['sticky']) ? 0 : 1,
-			)
-		);
+	$update = array();
+	foreach ($attributes as $key => $attr)
+	{
+		// @deprecated since 1.1 - kept for backward compatibility
+		if ($key == 'sticky')
+		{
+			$key = 'is_sticky';
+			$attributes['is_sticky'] = $attr;
+		}
+
+		$attributes[$key] = (int) $attr;
+		$update[] = '
+				' . $key . ' = {int:' . $key . '}';
+	}
+
+	if (empty($update))
+		return false;
+
+	$attributes['current_topic'] = $topic;
+
+	$db->query('', '
+		UPDATE {db_prefix}topics
+		SET ' . implode(',', $update) . '
+		WHERE id_topic = {int:current_topic}',
+		$attributes
+	);
+
+	return $db->affected_rows();
 }
 
 /**
