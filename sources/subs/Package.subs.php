@@ -1702,6 +1702,7 @@ function parse_path($path)
 		'SUBSDIR' => SUBSDIR,
 		'ADMINDIR' => ADMINDIR,
 		'CONTROLLERDIR' => CONTROLLERDIR,
+		'EXTDIR' => EXTDIR,
 		'AVATARSDIR' => $modSettings['avatar_directory'],
 		'THEMEDIR' => $settings['default_theme_dir'],
 		'IMAGESDIR' => $settings['default_theme_dir'] . '/' . basename($settings['default_images_url']),
