@@ -339,10 +339,7 @@ function template_email_members_send()
 	</div>
 
 	<script><!-- // --><![CDATA[
-		var countdown = 2,
-			txt_message = "', $txt['email_continue'], '";
-
-		doAutoSubmit();
+		doAutoSubmit(2, ', JavaScriptEscape($txt['email_continue']), ');
 	// ]]></script>';
 }
 

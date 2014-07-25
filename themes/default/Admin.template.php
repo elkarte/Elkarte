@@ -826,10 +826,7 @@ function template_not_done()
 		</div>
 	</div>
 	<script><!-- // --><![CDATA[
-		var countdown = ', $context['continue_countdown'], ',
-			txt_message = "', $txt['not_done_continue'], '";
-
-		doAutoSubmit();
+		doAutoSubmit(', $context['continue_countdown'], ', ', JavaScriptEscape($txt['not_done_continue']), ');
 	// ]]></script>';
 }
 
@@ -1342,11 +1339,7 @@ function template_repair_boards()
 	{
 		echo '
 	<script><!-- // --><![CDATA[
-		var countdown = 5,
-			txt_message = "', $txt['errors_recount_now'], '",
-			formName = "recount_form";
-
-		doAutoSubmit();
+		doAutoSubmit(5, ', JavaScriptEscape($txt['errors_recount_now']), ', "recount_form");
 	// ]]></script>';
 	}
 }

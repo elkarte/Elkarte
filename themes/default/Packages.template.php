@@ -1258,9 +1258,6 @@ function template_pause_action_permissions()
 	// Just the countdown stuff
 	echo '
 	<script><!-- // --><![CDATA[
-		var countdown = ', $countDown, ',
-			txt_message = "', $txt['not_done_continue'], '";
-
-		doAutoSubmit();
+		doAutoSubmit(', $countDown, ', ', JavaScriptEscape($txt['not_done_continue']), ');
 	// ]]></script>';
 }
