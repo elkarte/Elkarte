@@ -28,6 +28,7 @@ class Compressed_File
 	private $overwrite = false;
 	private $files_to_extract = null;
 	private $data = null;
+	private $header = array();
 
 	/**
 	 * Constructor of the class, assigns properties and do some checks
@@ -72,7 +73,34 @@ class Compressed_File
 	{
 		$this->loadData();
 
-		return $this->read_tgz_file();
+		if ($this->data === false || strlen($this->data) < 10)
+			return false;
+
+		return $this->determineType();
+	}
+
+	protected function determineType()
+	{
+		umask(0);
+		if (!$this->single_file && $this->destination !== null && !file_exists($this->destination))
+			mktree($this->destination, 0777);
+
+		// Unpack the signature so we can see what we have
+		$this->header = unpack('H2a/H2b/Ct/Cf/Vmtime/Cxtra/Cos', substr($this->data, 0, 10));
+		$this->header['filename'] = '';
+		$this->header['comment'] = '';
+
+		// The IDentification number, gzip must be 1f8b
+		if (strtolower($this->header['a'] . $this->header['b']) != '1f8b')
+		{
+			// Okay, this is not a tar.gz, but maybe it's a zip file.
+			if (substr($this->data, 0, 2) === 'PK')
+				return $this->read_zip_data();
+			else
+				return false;
+		}
+		else
+			return $this->read_tgz_file();
 	}
 
 	/**
@@ -120,35 +148,13 @@ class Compressed_File
 	 */
 	protected function read_tgz_data()
 	{
-		if ($this->data === false || strlen($this->data) < 10)
-			return false;
-
-		umask(0);
-		if (!$this->single_file && $this->destination !== null && !file_exists($this->destination))
-			mktree($this->destination, 0777);
-
-		// Unpack the signature so we can see what we have
-		$header = unpack('H2a/H2b/Ct/Cf/Vmtime/Cxtra/Cos', substr($this->data, 0, 10));
-		$header['filename'] = '';
-		$header['comment'] = '';
-
-		// The IDentification number, gzip must be 1f8b
-		if (strtolower($header['a'] . $header['b']) != '1f8b')
-		{
-			// Okay, this is not a tar.gz, but maybe it's a zip file.
-			if (substr($this->data, 0, 2) === 'PK')
-				return $this->read_zip_data();
-			else
-				return false;
-		}
-
 		// Compression method needs to be 8 = deflate!
-		if ($header['t'] != 8)
+		if ($this->header['t'] != 8)
 			return false;
 
 		// Each bit of this byte represents a processing flag as follows
 		// 0 fTEXT, 1 fHCRC, 2 fEXTRA, 3 fNAME, 4 fCOMMENT, 5 fENCRYPT, 6-7 reserved
-		$flags = $header['f'];
+		$flags = $this->header['f'];
 
 		// Start to read any data defined by the flags
 		$offset = 10;
@@ -164,7 +170,7 @@ class Compressed_File
 		if ($flags & 8)
 		{
 			while ($this->data[$offset] != "\0")
-				$header['filename'] .= $this->data[$offset++];
+				$this->header['filename'] .= $this->data[$offset++];
 			$offset++;
 		}
 
@@ -172,7 +178,7 @@ class Compressed_File
 		if ($flags & 16)
 		{
 			while ($this->data[$offset] != "\0")
-				$header['comment'] .= $this->data[$offset++];
+				$this->header['comment'] .= $this->data[$offset++];
 			$offset++;
 		}
 
@@ -238,41 +244,16 @@ class Compressed_File
 			$current['data'] = substr($this->data, ++$offset << 9, $current['size']);
 			$offset += $size;
 
-			// If this is a file, and it doesn't exist.... happy days!
-			if (substr($current['filename'], -1, 1) != '/' && !file_exists($this->destination . '/' . $current['filename']))
-				$write_this = true;
-			// File exists... check if it is newer.
-			elseif (substr($current['filename'], -1, 1) != '/')
-				$write_this = $this->overwrite || filemtime($this->destination . '/' . $current['filename']) < $current['mtime'];
-			// This is a directory, so we're gonna want to create it. (probably...)
-			elseif ($this->destination !== null && !$this->single_file)
-			{
-				// Protect from accidental parent directory writing...
-				$current['filename'] = strtr($current['filename'], array('../' => '', '/..' => ''));
-
-				if (!file_exists($this->destination . '/' . $current['filename']))
-					mktree($this->destination . '/' . $current['filename'], 0777);
-				$write_this = false;
-			}
-			else
-				$write_this = false;
+			$write_this = $this->canWriteThis(&$current);
 
 			if ($write_this && $this->destination !== null)
 			{
+				$dir = null;
 				if (strpos($current['filename'], '/') !== false && !$this->single_file)
-					mktree($this->destination . '/' . dirname($current['filename']), 0777);
+					$dir = $this->destination . '/' . dirname($current['filename']);
 
-				// If we're looking for a specific file, and this is it... ka-bam, baby.
-				if ($this->single_file && ($this->destination == $current['filename'] || $this->destination == '*/' . basename($current['filename'])))
+				if ($this->writeCurrent($current, $dir))
 					return $current['data'];
-				// Oh?  Another file.  Fine.  You don't like this file, do you?  I know how it is.  Yeah... just go away.  No, don't apologize.  I know this file's just not *good enough* for you.
-				elseif ($this->single_file)
-					continue;
-				// Don't really want this?
-				elseif ($this->files_to_extract !== null && !in_array($current['filename'], $this->files_to_extract))
-					continue;
-
-				package_put_contents($this->destination . '/' . $current['filename'], $current['data']);
 			}
 
 			// Not a directory, add it to our results
@@ -295,6 +276,50 @@ class Compressed_File
 			return $return;
 	}
 
+	protected function canWriteThis(&$current)
+	{
+		// If this is a file, and it doesn't exist.... happy days!
+		if (substr($current['filename'], -1, 1) != '/' && !file_exists($this->destination . '/' . $current['filename']))
+			$write_this = true;
+		// File exists... check if it is newer.
+		elseif (substr($current['filename'], -1, 1) != '/')
+			$write_this = $this->overwrite || filemtime($this->destination . '/' . $current['filename']) < $current['mtime'];
+		// This is a directory, so we're gonna want to create it. (probably...)
+		elseif ($this->destination !== null && !$this->single_file)
+		{
+			// Protect from accidental parent directory writing...
+			$current['filename'] = strtr($current['filename'], array('../' => '', '/..' => ''));
+
+			if (!file_exists($this->destination . '/' . $current['filename']))
+				mktree($this->destination . '/' . $current['filename'], 0777);
+			$write_this = false;
+		}
+		else
+			$write_this = false;
+
+		return $write_this;
+	}
+
+	protected function writeCurrent($current, $make_dir = null)
+	{
+		if ($make_dir !== null)
+			mktree($make_dir, 0777);
+
+		// If we're looking for a specific file, and this is it... ka-bam, baby.
+		if ($this->single_file && ($this->destination == $current['filename'] || $this->destination == '*/' . basename($current['filename'])))
+			return true;
+		// Oh?  Another file.  Fine.  You don't like this file, do you?  I know how it is.  Yeah... just go away.  No, don't apologize.  I know this file's just not *good enough* for you.
+		elseif ($this->single_file)
+			return false;
+		// Don't really want this?
+		elseif ($this->files_to_extract !== null && !in_array($current['filename'], $this->files_to_extract))
+			return false;
+
+		package_put_contents($this->destination . '/' . $current['filename'], $current['data']);
+
+		return false;
+	}
+
 	/**
 	 * Extract zip data.
 	 *
@@ -303,10 +328,6 @@ class Compressed_File
 	 */
 	protected function read_zip_data()
 	{
-		umask(0);
-		if (!$this->single_file && $this->destination !== null && !file_exists($this->destination))
-			mktree($this->destination, 0777);
-
 		// Look for the end of directory signature 0x06054b50
 		$data_ecr = explode("\x50\x4b\x05\x06", $this->data);
 		if (!isset($data_ecr[1]))
@@ -348,24 +369,7 @@ class Compressed_File
 				unset($unzipped2);
 			}
 
-			// If this is a file, and it doesn't exist.... happy days!
-			if (substr($current['filename'], -1, 1) != '/' && !file_exists($this->destination . '/' . $current['filename']))
-				$write_this = true;
-			// If the file exists, we may not want to overwrite it.
-			elseif (substr($current['filename'], -1) != '/')
-				$write_this = $this->overwrite;
-			// This is a directory, so we're gonna want to create it. (probably...)
-			elseif ($this->destination !== null && !$this->single_file)
-			{
-				// Protect from accidental parent directory writing...
-				$current['filename'] = strtr($current['filename'], array('../' => '', '/..' => ''));
-
-				if (!file_exists($this->destination . '/' . $current['filename']))
-					mktree($this->destination . '/' . $current['filename'], 0777);
-				$write_this = false;
-			}
-			else
-				$write_this = false;
+			$write_this = $this->canWriteThis(&$current);
 
 			// Get the actual compressed data.
 			$current['data'] = substr($data, 26 + $current['filename_length'] + $current['extrafield_length']);
@@ -377,20 +381,13 @@ class Compressed_File
 			// Okay!  We can write this file, looks good from here...
 			if ($write_this && $this->destination !== null)
 			{
+				$dir = null;
+
 				if ((strpos($current['filename'], '/') !== false && !$this->single_file) || (!$this->single_file && !is_dir($current['dir'])))
-					mktree($current['dir'], 0777);
+					$dir = $current['dir'];
 
-				// If we're looking for a specific file, and this is it... ka-bam, baby.
-				if ($this->single_file && ($this->destination == $current['filename'] || $this->destination == '*/' . basename($current['filename'])))
+				if ($this->writeCurrent($current, $dir))
 					return $current['data'];
-				// Oh?  Another file.  Fine.  You don't like this file, do you?  I know how it is.  Yeah... just go away.  No, don't apologize.  I know this file's just not *good enough* for you.
-				elseif ($this->single_file)
-					continue;
-				// Don't really want this?
-				elseif ($this->files_to_extract !== null && !in_array($current['filename'], $this->files_to_extract))
-					continue;
-
-				package_put_contents($this->destination . '/' . $current['filename'], $current['data']);
 			}
 
 			// Not a directory, add it to our results
