@@ -1,7 +1,8 @@
 <?php
 
 /**
- * This contains functions for handling tar.gz and .zip files
+ * This contains functions for handling "packages" (that includes compressed
+ * archives, ElkArte addons, language packs, themes, smiley packs, etc.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
