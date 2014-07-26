@@ -27,6 +27,7 @@ class Compressed_File
 	private $single_file = false;
 	private $overwrite = false;
 	private $files_to_extract = null;
+	private $data = null;
 
 	/**
 	 * Constructor of the class, assigns properties and do some checks
@@ -69,6 +70,8 @@ class Compressed_File
 	 */
 	public function read()
 	{
+		$this->loadData();
+
 		return $this->read_tgz_file();
 	}
 
@@ -80,7 +83,9 @@ class Compressed_File
 	 */
 	public function read_data($data)
 	{
-		return $this->read_tgz_data($data);
+		$this->data = $data;
+
+		return $this->read_tgz_data();
 	}
 
 	/**
@@ -90,23 +95,18 @@ class Compressed_File
 	 * @package Packages
 	 * @return mixed[]|false
 	 */
-	protected function read_tgz_file()
+	protected function loadData()
 	{
 		// From a web site
 		if (substr($this->gzfilename, 0, 7) == 'http://' || substr($this->gzfilename, 0, 8) == 'https://')
 		{
-			$data = fetch_web_data($this->gzfilename, '', true);
+			$this->data = fetch_web_data($this->gzfilename, '', true);
 		}
 		// Or a file on the system
 		else
 		{
-			$data = @file_get_contents($this->gzfilename);
+			$this->data = @file_get_contents($this->gzfilename);
 		}
-
-		if ($data === false)
-			return false;
-
-		return $this->read_tgz_data($data);
 	}
 
 	/**
@@ -118,8 +118,11 @@ class Compressed_File
 	 * @param string $data
 	 * @return mixed[]|false
 	 */
-	protected function read_tgz_data($data)
+	protected function read_tgz_data()
 	{
+		if ($this->data === false || strlen($this->data) < 10)
+			return false;
+
 		// Make sure we have this loaded.
 		loadLanguage('Packages');
 
@@ -131,12 +134,8 @@ class Compressed_File
 		if (!$this->single_file && $this->destination !== null && !file_exists($this->destination))
 			mktree($this->destination, 0777);
 
-		// No signature?
-		if (strlen($data) < 10)
-			return false;
-
 		// Unpack the signature so we can see what we have
-		$header = unpack('H2a/H2b/Ct/Cf/Vmtime/Cxtra/Cos', substr($data, 0, 10));
+		$header = unpack('H2a/H2b/Ct/Cf/Vmtime/Cxtra/Cos', substr($this->data, 0, 10));
 		$header['filename'] = '';
 		$header['comment'] = '';
 
@@ -144,8 +143,8 @@ class Compressed_File
 		if (strtolower($header['a'] . $header['b']) != '1f8b')
 		{
 			// Okay, this is not a tar.gz, but maybe it's a zip file.
-			if (substr($data, 0, 2) === 'PK')
-				return $this->read_zip_data($data);
+			if (substr($this->data, 0, 2) === 'PK')
+				return $this->read_zip_data($this->data);
 			else
 				return false;
 		}
@@ -164,48 +163,48 @@ class Compressed_File
 		// fEXTRA flag set we simply skip over its entry and the length of its data
 		if ($flags & 4)
 		{
-			$xlen = unpack('vxlen', substr($data, $offset, 2));
+			$xlen = unpack('vxlen', substr($this->data, $offset, 2));
 			$offset += $xlen['xlen'] + 2;
 		}
 
 		// Read the filename, its zero terminated
 		if ($flags & 8)
 		{
-			while ($data[$offset] != "\0")
-				$header['filename'] .= $data[$offset++];
+			while ($this->data[$offset] != "\0")
+				$header['filename'] .= $this->data[$offset++];
 			$offset++;
 		}
 
 		// Read the comment, its also zero terminated
 		if ($flags & 16)
 		{
-			while ($data[$offset] != "\0")
-				$header['comment'] .= $data[$offset++];
+			while ($this->data[$offset] != "\0")
+				$header['comment'] .= $this->data[$offset++];
 			$offset++;
 		}
 
 		// "Read" the header CRC
 		if ($flags & 2)
-			$offset += 2; // $crc16 = unpack('vcrc16', substr($data, $offset, 2));
+			$offset += 2; // $crc16 = unpack('vcrc16', substr($this->data, $offset, 2));
 
 		// We have now arrived at the start of the compressed data,
 		// Its terminated with 4 bytes of CRC and 4 bytes of the original input size
-		$crc = unpack('Vcrc32/Visize', substr($data, strlen($data) - 8, 8));
-		$data = @gzinflate(substr($data, $offset, strlen($data) - 8 - $offset));
+		$crc = unpack('Vcrc32/Visize', substr($this->data, strlen($this->data) - 8, 8));
+		$this->data = @gzinflate(substr($this->data, $offset, strlen($this->data) - 8 - $offset));
 
 		// crc32_compat and crc32 may not return the same results, so we accept either.
-		if ($data === false || ($crc['crc32'] != crc32_compat($data) && $crc['crc32'] != crc32($data)))
+		if ($this->data === false || ($crc['crc32'] != crc32_compat($this->data) && $crc['crc32'] != crc32($this->data)))
 			return false;
 
 		$octdec = array('mode', 'uid', 'gid', 'size', 'mtime', 'checksum', 'type');
-		$blocks = strlen($data) / 512 - 1;
+		$blocks = strlen($this->data) / 512 - 1;
 		$offset = 0;
 		$return = array();
 
 		// We have Un-gziped the data, now lets extract the tar files
 		while ($offset < $blocks)
 		{
-			$header = substr($data, $offset << 9, 512);
+			$header = substr($this->data, $offset << 9, 512);
 			$current = unpack('a100filename/a8mode/a8uid/a8gid/a12size/a12mtime/a8checksum/a1type/a100linkname/a6magic/a2version/a32uname/a32gname/a8devmajor/a8devminor/a155path', $header);
 
 			// Clean the header fields, convert octal ones to decimal
@@ -239,7 +238,7 @@ class Compressed_File
 				break;
 
 			$size = ceil($current['size'] / 512);
-			$current['data'] = substr($data, ++$offset << 9, $current['size']);
+			$current['data'] = substr($this->data, ++$offset << 9, $current['size']);
 			$offset += $size;
 
 			// If this is a file, and it doesn't exist.... happy days!
@@ -303,17 +302,16 @@ class Compressed_File
 	 * Extract zip data.
 	 *
 	 * @package Packages
-	 * @param string $data
 	 * @return mixed[]|false
 	 */
-	protected function read_zip_data($data)
+	protected function read_zip_data()
 	{
 		umask(0);
 		if (!$this->single_file && $this->destination !== null && !file_exists($this->destination))
 			mktree($this->destination, 0777);
 
 		// Look for the end of directory signature 0x06054b50
-		$data_ecr = explode("\x50\x4b\x05\x06", $data);
+		$data_ecr = explode("\x50\x4b\x05\x06", $this->data);
 		if (!isset($data_ecr[1]))
 			return false;
 
@@ -324,7 +322,7 @@ class Compressed_File
 		$zip_info['comment'] = substr($data_ecr[1], 18, $zip_info['comment_length']);
 
 		// Cut file at the central directory file header signature -- 0x02014b50, use unpack if you want any of the data, we don't
-		$file_sections = explode("\x50\x4b\x01\x02", $data);
+		$file_sections = explode("\x50\x4b\x01\x02", $this->data);
 
 		// Cut the result on each local file header -- 0x04034b50 so we have each file in the archive as an element.
 		$file_sections = explode("\x50\x4b\x03\x04", $file_sections[0]);
@@ -335,11 +333,11 @@ class Compressed_File
 			return false;
 
 		// Go though each file in the archive
-		foreach ($file_sections as $data)
+		foreach ($file_sections as $this->data)
 		{
 			// Get all the important file information.
-			$current = unpack('vversion/vgeneral_purpose/vcompress_method/vfile_time/vfile_date/Vcrc/Vcompressed_size/Vsize/vfilename_length/vextrafield_length', $data);
-			$current['filename'] = substr($data, 26, $current['filename_length']);
+			$current = unpack('vversion/vgeneral_purpose/vcompress_method/vfile_time/vfile_date/Vcrc/Vcompressed_size/Vsize/vfilename_length/vextrafield_length', $this->data);
+			$current['filename'] = substr($this->data, 26, $current['filename_length']);
 			$current['dir'] = $this->destination . '/' . dirname($current['filename']);
 
 			// If bit 3 (0x08) of the general-purpose flag is set, then the CRC and file size were not available when the header was written
