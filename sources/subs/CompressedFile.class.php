@@ -137,7 +137,7 @@ class Compressed_File
 		{
 			// Okay, this is not a tar.gz, but maybe it's a zip file.
 			if (substr($this->data, 0, 2) === 'PK')
-				return $this->read_zip_data($this->data);
+				return $this->read_zip_data();
 			else
 				return false;
 		}
