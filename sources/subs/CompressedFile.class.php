@@ -199,6 +199,11 @@ class Compressed_File
 		if ($this->header['t'] != 8)
 			return false;
 
+		if (!function_exists('crc32_compat'))
+		{
+			require_once(SUBSDIR . '/Compat.subs.php');
+		}
+
 		// Each bit of this byte represents a processing flag as follows
 		// 0 fTEXT, 1 fHCRC, 2 fEXTRA, 3 fNAME, 4 fCOMMENT, 5 fENCRYPT, 6-7 reserved
 		$flags = $this->header['f'];

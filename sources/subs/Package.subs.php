@@ -230,7 +230,7 @@ function getPackageInfo($gzfilename)
 {
 	// Extract package-info.xml from downloaded file. (*/ is used because it could be in any directory.)
 	if (preg_match('~^https?://~i', $gzfilename) === 1)
-		$packageInfo = read_tgz_data(fetch_web_data($gzfilename, '', true), '*/package-info.xml', true);
+		$packageInfo = read_tgz_file($gzfilename, '*/package-info.xml', true);
 	else
 	{
 		// It must be in the package directory then
@@ -3055,11 +3055,6 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 	}
 
 	return $data;
-}
-
-if (!function_exists('crc32_compat'))
-{
-	require_once(SUBSDIR . '/Compat.subs.php');
 }
 
 /**
