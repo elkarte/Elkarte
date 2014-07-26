@@ -22,12 +22,53 @@ if (!defined('ELK'))
 
 class Compressed_File
 {
+	/**
+	 * Name (full path or url) of the file to decompress
+	 *
+	 * @var string
+	 */
 	private $gzfilename = '';
+
+	/**
+	 * Destination path
+	 *
+	 * @var string
+	 */
 	private $destination = null;
+
+	/**
+	 * If extract a single file?
+	 *
+	 * @var bool
+	 */
 	private $single_file = false;
+
+	/**
+	 * If the files should be overwritten or not
+	 *
+	 * @var bool
+	 */
 	private $overwrite = false;
+
+	/**
+	 * List of files that you want to extract from the archive
+	 *
+	 * @var string[]
+	 */
 	private $files_to_extract = null;
+
+	/**
+	 * The content of the archive
+	 *
+	 * @var string
+	 */
 	private $data = null;
+
+	/**
+	 * Headers of the archive
+	 *
+	 * @var string[]
+	 */
 	private $header = array();
 
 	/**
@@ -79,6 +120,12 @@ class Compressed_File
 		return $this->determineType();
 	}
 
+	/**
+	 * Finds out what type the file is.
+	 *
+	 * @package Packages
+	 * @return mixed[]|false
+	 */
 	protected function determineType()
 	{
 		umask(0);
@@ -276,6 +323,13 @@ class Compressed_File
 			return $return;
 	}
 
+	/**
+	 * Checks if the file or the directory can/should be written
+	 *
+	 * @package Packages
+	 * @param string[] $current
+	 * @return bool
+	 */
 	protected function canWriteThis(&$current)
 	{
 		// If this is a file, and it doesn't exist.... happy days!
@@ -300,6 +354,14 @@ class Compressed_File
 		return $write_this;
 	}
 
+	/**
+	 * Writes the file or skip if it is not needed
+	 *
+	 * @package Packages
+	 * @param string[] $current
+	 * @param string|null $make_dir directory path to create
+	 * @return bool
+	 */
 	protected function writeCurrent($current, $make_dir = null)
 	{
 		if ($make_dir !== null)
