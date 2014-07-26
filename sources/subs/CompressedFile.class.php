@@ -123,10 +123,6 @@ class Compressed_File
 		if ($this->data === false || strlen($this->data) < 10)
 			return false;
 
-		// This function sorta needs gzinflate!
-		if (!function_exists('gzinflate'))
-			throw new Elk_Exception(array('Packages', 'package_no_zlib'), 'critical');
-
 		umask(0);
 		if (!$this->single_file && $this->destination !== null && !file_exists($this->destination))
 			mktree($this->destination, 0777);
@@ -183,6 +179,10 @@ class Compressed_File
 		// "Read" the header CRC
 		if ($flags & 2)
 			$offset += 2; // $crc16 = unpack('vcrc16', substr($this->data, $offset, 2));
+
+		// This function sorta needs gzinflate!
+		if (!function_exists('gzinflate'))
+			throw new Elk_Exception(array('Packages', 'package_no_zlib'), 'critical');
 
 		// We have now arrived at the start of the compressed data,
 		// Its terminated with 4 bytes of CRC and 4 bytes of the original input size
