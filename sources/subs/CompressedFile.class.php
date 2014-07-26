@@ -429,7 +429,7 @@ class Compressed_File
 			// In this case the CRC and size are instead appended in a 12-byte structure immediately after the compressed data
 			if ($current['general_purpose'] & 0x0008)
 			{
-				$unzipped2 = unpack('Vcrc/Vcompressed_size/Vsize', substr($$data, -12));
+				$unzipped2 = unpack('Vcrc/Vcompressed_size/Vsize', substr($this->data, -12));
 				$current['crc'] = $unzipped2['crc'];
 				$current['compressed_size'] = $unzipped2['compressed_size'];
 				$current['size'] = $unzipped2['size'];
