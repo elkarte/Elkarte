@@ -4253,6 +4253,9 @@ dl.no_members {
 	.topic_name, .topic_starter {
 		margin-right: 18px;
 	}
+	#ic_recentposts, #ps_recentposts, #ps_recenttopics {
+		font-size: 1em;
+	}
 }
 /* This one does 540 and smaller screens at default font size. */
 @media screen and (max-width: 33.750em) {
