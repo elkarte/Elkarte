@@ -62,32 +62,51 @@ class Compressed_File
 	}
 
 	/**
+	 * Reads the content of the file (either from the file system or from the web)
+	 *
+	 * @package Packages
+	 * @return mixed[]|false
+	 */
+	public function read()
+	{
+		return $this->read_tgz_file();
+	}
+
+	/**
+	 * Parses the passed data into an array
+	 *
+	 * @package Packages
+	 * @return mixed[]|false
+	 */
+	public function read_data($data)
+	{
+		return $this->read_tgz_data($data);
+	}
+
+	/**
 	 * Reads a .tar.gz file, filename, in and extracts file(s) from it.
 	 * essentially just a shortcut for read_tgz_data().
 	 *
 	 * @package Packages
-	 * @return string|false
+	 * @return mixed[]|false
 	 */
-	public function read_tgz_file()
+	protected function read_tgz_file()
 	{
 		// From a web site
 		if (substr($this->gzfilename, 0, 7) == 'http://' || substr($this->gzfilename, 0, 8) == 'https://')
 		{
-			$data = fetch_web_data($this->gzfilename);
-
-			if ($data === false)
-				return false;
+			$data = fetch_web_data($this->gzfilename, '', true);
 		}
 		// Or a file on the system
 		else
 		{
 			$data = @file_get_contents($this->gzfilename);
-
-			if ($data === false)
-				return false;
 		}
 
-		return read_tgz_data($data);
+		if ($data === false)
+			return false;
+
+		return $this->read_tgz_data($data);
 	}
 
 	/**
@@ -99,7 +118,7 @@ class Compressed_File
 	 * @param string $data
 	 * @return mixed[]|false
 	 */
-	public function read_tgz_data($data)
+	protected function read_tgz_data($data)
 	{
 		// Make sure we have this loaded.
 		loadLanguage('Packages');
@@ -126,7 +145,7 @@ class Compressed_File
 		{
 			// Okay, this is not a tar.gz, but maybe it's a zip file.
 			if (substr($data, 0, 2) === 'PK')
-				return read_zip_data($data);
+				return $this->read_zip_data($data);
 			else
 				return false;
 		}
@@ -287,7 +306,7 @@ class Compressed_File
 	 * @param string $data
 	 * @return mixed[]|false
 	 */
-	public function read_zip_data($data)
+	protected function read_zip_data($data)
 	{
 		umask(0);
 		if (!$this->single_file && $this->destination !== null && !file_exists($this->destination))

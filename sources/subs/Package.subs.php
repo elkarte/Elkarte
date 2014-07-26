@@ -39,7 +39,7 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
 {
 	$extractor = new Compressed_File($gzfilename, $destination, $single_file, $overwrite, $files_to_extract);
 
-	return $extractor->read_tgz_file();
+	return $extractor->read();
 }
 
 /**
@@ -75,7 +75,7 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
 {
 	$extractor = new Compressed_File('', $destination, $single_file, $overwrite, $files_to_extract);
 
-	return $extractor->read_tgz_data($data);
+	return $extractor->read_data($data);
 }
 
 /**
@@ -96,7 +96,7 @@ function read_zip_data($data, $destination, $single_file = false, $overwrite = f
 {
 	$extractor = new Compressed_File('', $destination, $single_file, $overwrite, $files_to_extract);
 
-	return $extractor->read_zip_data($data);
+	return $extractor->read_data($data);
 }
 
 /**
