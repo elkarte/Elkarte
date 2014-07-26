@@ -39,7 +39,14 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
 {
 	$extractor = new Compressed_File($gzfilename, $destination, $single_file, $overwrite, $files_to_extract);
 
-	return $extractor->read();
+	try
+	{
+		return $extractor->read();
+	}
+	catch (Elk_Exception $e)
+	{
+		$e->fatalLangError();
+	}
 }
 
 /**
@@ -75,7 +82,14 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
 {
 	$extractor = new Compressed_File('', $destination, $single_file, $overwrite, $files_to_extract);
 
-	return $extractor->read_data($data);
+	try
+	{
+		return $extractor->read_data($data);
+	}
+	catch (Elk_Exception $e)
+	{
+		$e->fatalLangError();
+	}
 }
 
 /**
@@ -96,7 +110,14 @@ function read_zip_data($data, $destination, $single_file = false, $overwrite = f
 {
 	$extractor = new Compressed_File('', $destination, $single_file, $overwrite, $files_to_extract);
 
-	return $extractor->read_data($data);
+	try
+	{
+		return $extractor->read_data($data);
+	}
+	catch (Elk_Exception $e)
+	{
+		$e->fatalLangError();
+	}
 }
 
 /**

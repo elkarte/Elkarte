@@ -123,12 +123,9 @@ class Compressed_File
 		if ($this->data === false || strlen($this->data) < 10)
 			return false;
 
-		// Make sure we have this loaded.
-		loadLanguage('Packages');
-
 		// This function sorta needs gzinflate!
 		if (!function_exists('gzinflate'))
-			fatal_lang_error('package_no_zlib', 'critical');
+			throw new Elk_Exception(array('Packages', 'package_no_zlib'), 'critical');
 
 		umask(0);
 		if (!$this->single_file && $this->destination !== null && !file_exists($this->destination))
