@@ -37,9 +37,9 @@ if (!defined('ELK'))
  */
 function read_tgz_file($gzfilename, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
-	require_once(SUBSDIR . '/CompressedFiles.class.php');
+	$extractor = new Compressed_File();
 
-	return read_tgz_file2($data, $destination, $single_file, $overwrite, $files_to_extract);
+	return $extractor->read_tgz_file($data, $destination, $single_file, $overwrite, $files_to_extract);
 }
 
 /**
@@ -73,9 +73,9 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
  */
 function read_tgz_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
-	require_once(SUBSDIR . '/CompressedFiles.class.php');
+	$extractor = new Compressed_File();
 
-	return read_tgz_data2($data, $destination, $single_file, $overwrite, $files_to_extract);
+	return $extractor->read_tgz_data($data, $destination, $single_file, $overwrite, $files_to_extract);
 }
 
 /**
@@ -94,9 +94,9 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
  */
 function read_zip_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
-	require_once(SUBSDIR . '/CompressedFiles.class.php');
+	$extractor = new Compressed_File();
 
-	return read_zip_data2($data, $destination, $single_file, $overwrite, $files_to_extract);
+	return $extractor->read_zip_data($data, $destination, $single_file, $overwrite, $files_to_extract);
 }
 
 /**
