@@ -99,7 +99,7 @@ class Package
 	public function cleanup()
 	{
 		// Trash the cache... which will also check permissions for us!
-		package_flush_cache(true);
+		$this->package_flush_cache(true);
 
 		if (file_exists(BOARDDIR . '/packages/temp'))
 			deltree(BOARDDIR . '/packages/temp');
@@ -124,7 +124,7 @@ class Package
 	 * @package Packages
 	 * @param string $gzfilename
 	 */
-	function getPackageInfo($gzfilename)
+	public function getPackageInfo($gzfilename)
 	{
 		// Extract package-info.xml from downloaded file. (*/ is used because it could be in any directory.)
 		if (preg_match('~^https?://~i', $gzfilename) === 1)
@@ -193,7 +193,7 @@ class Package
 	 * @param string $previous_version = ''
 	 * @return array an array of those changes made.
 	 */
-	function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install', $previous_version = '')
+	protected function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install', $previous_version = '')
 	{
 		global $forum_version, $context, $temp_path, $language;
 
@@ -304,7 +304,7 @@ class Package
 				if ($action->exists('@type') && $action->fetch('@type') == 'inline')
 				{
 					$filename = $temp_path . '$auto_' . $temp_auto++ . (in_array($actionType, array('readme', 'redirect', 'license')) ? '.txt' : ($actionType == 'code' || $actionType == 'database' ? '.php' : '.mod'));
-					package_put_contents($filename, $action->fetch('.'));
+					$this->package_put_contents($filename, $action->fetch('.'));
 					$filename = strtr($filename, array($temp_path => ''));
 				}
 				else
@@ -547,7 +547,7 @@ class Package
 					$failure |= !mktree(dirname($action['destination']), 0777);
 
 				// Create an empty file.
-				package_put_contents($action['destination'], package_get_contents($action['source']), $testing_only);
+				$this->package_put_contents($action['destination'], $this->package_get_contents($action['source']), $testing_only);
 
 				if (!file_exists($action['destination']))
 					$failure = true;
@@ -565,7 +565,7 @@ class Package
 				if (!mktree(dirname($action['destination']), 0755) || !is_writable(dirname($action['destination'])))
 					$failure |= !mktree(dirname($action['destination']), 0777);
 
-				package_put_contents($action['destination'], package_get_contents($action['source']), $testing_only);
+				$this->package_put_contents($action['destination'], $this->package_get_contents($action['source']), $testing_only);
 
 				$failure |= !copy($action['source'], $action['destination']);
 
@@ -576,7 +576,7 @@ class Package
 						if (!mktree(dirname($theme_destination), 0755) || !is_writable(dirname($theme_destination)))
 							$failure |= !mktree(dirname($theme_destination), 0777);
 
-						package_put_contents($theme_destination, package_get_contents($action['source']), $testing_only);
+						$this->package_put_contents($theme_destination, $this->package_get_contents($action['source']), $testing_only);
 
 						$failure |= !copy($action['source'], $theme_destination);
 					}
@@ -609,7 +609,7 @@ class Package
 				// Make sure the file exists before deleting it.
 				if (file_exists($action['filename']))
 				{
-					package_chmod($action['filename']);
+					$this->package_chmod($action['filename']);
 					$failure |= !unlink($action['filename']);
 				}
 				// The file that was supposed to be deleted couldn't be found.
@@ -642,7 +642,7 @@ class Package
 	 * @param string $the_version
 	 * @return highest install value string or false
 	 */
-	function matchHighestPackageVersion($versions, $reset = false, $the_version = '')
+	protected function matchHighestPackageVersion($versions, $reset = false, $the_version = '')
 	{
 		global $forum_version;
 		static $near_version = 0;
@@ -687,7 +687,7 @@ class Package
 	 * @param mixed[] $theme_paths = array()
 	 * @return array an array of those changes made.
 	 */
-	function parseModification($file, $testing = true, $undo = false, $theme_paths = array())
+	protected function parseModification($file, $testing = true, $undo = false, $theme_paths = array())
 	{
 		global $txt, $modSettings;
 
@@ -810,7 +810,7 @@ class Package
 					$working_data = '';
 				// Phew, it exists!  Load 'er up!
 				else
-					$working_data = str_replace("\r", '', package_get_contents($working_file));
+					$working_data = str_replace("\r", '', $this->package_get_contents($working_file));
 
 				$actions[] = array(
 					'type' => 'opened',
@@ -1022,7 +1022,7 @@ class Package
 				// Fix any little helper symbols ;).
 				$working_data = strtr($working_data, array('[$PACK' . 'AGE1$]' => '$', '[$PACK' . 'AGE2$]' => '\\'));
 
-				package_chmod($working_file);
+				$this->package_chmod($working_file);
 
 				if ((file_exists($working_file) && !is_writable($working_file)) || (!file_exists($working_file) && !is_writable(dirname($working_file))))
 					$actions[] = array(
@@ -1043,7 +1043,7 @@ class Package
 				}
 
 				// Always call this, even if in testing, because it won't really be written in testing mode.
-				package_put_contents($working_file, $working_data, $testing);
+				$this->package_put_contents($working_file, $working_data, $testing);
 
 				$actions[] = array(
 					'type' => 'saved',
@@ -1071,7 +1071,7 @@ class Package
 	 * @param mixed[] $theme_paths = array()
 	 * @return array an array of those changes made.
 	 */
-	function parseBoardMod($file, $testing = true, $undo = false, $theme_paths = array())
+	protected function parseBoardMod($file, $testing = true, $undo = false, $theme_paths = array())
 	{
 		global $settings, $modSettings;
 
@@ -1177,7 +1177,7 @@ class Package
 				// Backup the old file.
 				if ($working_file !== null)
 				{
-					package_chmod($working_file);
+					$this->package_chmod($working_file);
 
 					// Don't even dare.
 					if (basename($working_file) == 'Settings_bak.php')
@@ -1197,7 +1197,7 @@ class Package
 							@copy($working_file, $working_file . '~');
 					}
 
-					package_put_contents($working_file, $working_data, $testing);
+					$this->package_put_contents($working_file, $working_data, $testing);
 				}
 
 				if ($working_file !== null)
@@ -1235,7 +1235,7 @@ class Package
 				if (file_exists($working_file))
 				{
 					// Load the new file.
-					$working_data = str_replace("\r", '', package_get_contents($working_file));
+					$working_data = str_replace("\r", '', $this->package_get_contents($working_file));
 
 					$actions[] = array(
 						'type' => 'opened',
@@ -1343,7 +1343,7 @@ class Package
 		// Backup the old file.
 		if ($working_file !== null)
 		{
-			package_chmod($working_file);
+			$this->package_chmod($working_file);
 
 			if (!is_writable($working_file))
 				$actions[] = array(
@@ -1359,7 +1359,7 @@ class Package
 					@copy($working_file, $working_file . '~');
 			}
 
-			package_put_contents($working_file, $working_data, $testing);
+			$this->package_put_contents($working_file, $working_data, $testing);
 		}
 
 		if ($working_file !== null)
@@ -1384,7 +1384,7 @@ class Package
 	 * @param string $filename
 	 * @return string
 	 */
-	function package_get_contents($filename)
+	protected function package_get_contents($filename)
 	{
 		global $package_cache, $modSettings;
 
@@ -1418,7 +1418,7 @@ class Package
 	 * @param bool $testing
 	 * @return int
 	 */
-	function package_put_contents($filename, $data, $testing = false)
+	protected function package_put_contents($filename, $data, $testing = false)
 	{
 		global $package_ftp, $package_cache, $modSettings;
 		static $text_filetypes = array('php', 'txt', '.js', 'css', 'vbs', 'tml', 'htm');
@@ -1442,7 +1442,7 @@ class Package
 		elseif (!file_exists($filename))
 			@touch($filename);
 
-		package_chmod($filename);
+		$this->package_chmod($filename);
 
 		if (!$testing && (strpos($filename, 'packages/') !== false || $package_cache === false))
 		{
@@ -1477,7 +1477,7 @@ class Package
 	 * @package Packages
 	 * @param boolean $trash
 	 */
-	function package_flush_cache($trash = false)
+	protected function package_flush_cache($trash = false)
 	{
 		global $package_ftp, $package_cache;
 		static $text_filetypes = array('php', 'txt', '.js', 'css', 'vbs', 'tml', 'htm');
@@ -1496,7 +1496,7 @@ class Package
 			elseif (!file_exists($filename))
 				@touch($filename);
 
-			$result = package_chmod($filename);
+			$result = $this->package_chmod($filename);
 
 			// If we are not doing our test pass, then lets do a full write check
 			if (!$trash)
@@ -1505,7 +1505,7 @@ class Package
 				$fp = ($result) ? fopen($filename, 'r+') : $result;
 				if (!$fp)
 				{
-					// We should have package_chmod()'d them before, no?!
+					// We should have $this->package_chmod()'d them before, no?!
 					trigger_error('package_flush_cache(): some files are still not writable', E_USER_WARNING);
 					return;
 				}
@@ -1538,7 +1538,7 @@ class Package
 	 * @param bool $track_change = false
 	 * @return boolean True if it worked, false if it didn't
 	 */
-	function package_chmod($filename, $perm_state = 'writable', $track_change = false)
+	protected function package_chmod($filename, $perm_state = 'writable', $track_change = false)
 	{
 		global $package_ftp;
 
@@ -1671,7 +1671,7 @@ class Package
 	 * @package Packages
 	 * @param string $id
 	 */
-	function checkPackageDependency($id)
+	protected function checkPackageDependency($id)
 	{
 		$db = database();
 
@@ -1706,7 +1706,7 @@ class Package
 	 * @param bool $is_upgrade
 	 * @param string $credits_tag
 	 */
-	function addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $db_changes, $is_upgrade, $credits_tag)
+	protected function addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $db_changes, $is_upgrade, $credits_tag)
 	{
 		global $user_info;
 
@@ -1735,7 +1735,7 @@ class Package
 	 * @package Packages
 	 * @param string $remote_url
 	 */
-	function isAuthorizedServer($remote_url)
+	protected function isAuthorizedServer($remote_url)
 	{
 		global $modSettings;
 
@@ -1760,7 +1760,7 @@ class Package
 	 * @package Packages
 	 * @param string $id of package to check
 	 */
-	function isPackageInstalled($id)
+	protected function isPackageInstalled($id)
 	{
 		global $context;
 
@@ -1903,9 +1903,9 @@ class Package
 				else
 				{
 					if ($action['boardmod'])
-						$mod_actions = parseBoardMod(@file_get_contents(BOARDDIR . '/packages/temp/' . $this->base_path . $action['filename']), true, $action['reverse'], $this->theme_paths);
+						$mod_actions = $this->parseBoardMod(@file_get_contents(BOARDDIR . '/packages/temp/' . $this->base_path . $action['filename']), true, $action['reverse'], $this->theme_paths);
 					else
-						$mod_actions = parseModification(@file_get_contents(BOARDDIR . '/packages/temp/' . $this->base_path . $action['filename']), true, $action['reverse'], $this->theme_paths);
+						$mod_actions = $this->parseModification(@file_get_contents(BOARDDIR . '/packages/temp/' . $this->base_path . $action['filename']), true, $action['reverse'], $this->theme_paths);
 
 					if (count($mod_actions) == 1 && isset($mod_actions[0]) && $mod_actions[0]['type'] == 'error' && $mod_actions[0]['filename'] == '-')
 						$mod_actions[0]['filename'] = $action['filename'];
@@ -2100,7 +2100,7 @@ class Package
 				else
 				{
 					// See if this dependency is installed
-					$installed_version = checkPackageDependency($action['id']);
+					$installed_version = $this->checkPackageDependency($action['id']);
 
 					// Do a version level check (if requested) in the most basic way
 					$version_check = (isset($action['version']) ? $installed_version == $action['version'] : true);
@@ -2331,7 +2331,7 @@ class Package
 				throw new Elk_Exception('package_cant_uninstall', false);
 			}
 
-			$this->actions = parsePackageInfo($packageInfo['xml'], true, 'uninstall');
+			$this->actions = $this->parsePackageInfo($packageInfo['xml'], true, 'uninstall');
 
 			// Gadzooks!  There's no uninstaller at all!?
 			if (empty($this->actions))
@@ -2353,7 +2353,7 @@ class Package
 		elseif (isset($this->package_installed['old_version']) && $this->package_installed['old_version'] != $packageInfo['version'])
 		{
 			// Look for an upgrade...
-			$this->actions = parsePackageInfo($packageInfo['xml'], true, 'upgrade', $this->package_installed['old_version']);
+			$this->actions = $this->parsePackageInfo($packageInfo['xml'], true, 'upgrade', $this->package_installed['old_version']);
 
 			// There was no upgrade....
 			if (empty($this->actions))
@@ -2372,6 +2372,6 @@ class Package
 			$context['is_installed'] = true;
 
 		if (!isset($this->package_installed['old_version']) || $context['is_installed'])
-			$this->actions = parsePackageInfo($packageInfo['xml'], true, 'install');
+			$this->actions = $this->parsePackageInfo($packageInfo['xml'], true, 'install');
 	}
 }
