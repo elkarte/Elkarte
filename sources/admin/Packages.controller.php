@@ -203,13 +203,15 @@ class Packages_Controller extends Action_Controller
 		checkSession();
 
 		// If there's no file, what are we installing?
-		if (!isset($_REQUEST['package']) || $_REQUEST['package'] == '')
+		if (!isset($_REQUEST['package']) || trim($_REQUEST['package']) == '')
 			redirectexit('action=admin;area=packages');
-		$context['filename'] = $_REQUEST['package'];
 
-		// If this is an uninstall, we'll have an id.
+		$context['filename'] = preg_replace('~[\.]+~', '.', $_REQUEST['package']);
+
+		// Do we have an existing id, for uninstalls and the like.
 		$context['install_id'] = isset($_REQUEST['pid']) ? (int) $_REQUEST['pid'] : 0;
 
+		// These will be needed
 		require_once(SUBSDIR . '/Package.subs.php');
 		require_once(SUBSDIR . '/Themes.subs.php');
 
@@ -224,24 +226,40 @@ class Packages_Controller extends Action_Controller
 		$context['page_title'] .= ' - ' . ($context['uninstalling'] ? $txt['uninstall'] : $txt['extracting']);
 		$context['sub_template'] = 'extract_package';
 
-		if (!file_exists(BOARDDIR . '/packages/' . $context['filename']))
-			fatal_lang_error('package_no_file', false);
-
 		// Load up the package FTP information?
 		create_chmod_control(array(), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=' . $_REQUEST['sa'] . ';package=' . $_REQUEST['package']));
 
 		// Make sure temp directory exists and is empty!
 		if (file_exists(BOARDDIR . '/packages/temp'))
 			deltree(BOARDDIR . '/packages/temp', false);
-		else
-			mktree(BOARDDIR . '/packages/temp', 0777);
 
-		// Let the unpacker do the work.
+		// Attempt to create the temp directory
+		if (!mktree(BOARDDIR . '/packages/temp', 0755))
+		{
+			deltree(BOARDDIR . '/packages/temp', false);
+			if (!mktree(BOARDDIR . '/packages/temp', 0777))
+			{
+				deltree(BOARDDIR . '/packages/temp', false);
+				create_chmod_control(array(BOARDDIR . '/packages/temp/delme.tmp'), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=' . $_REQUEST['sa'] . ';package=' . $context['filename'], 'crash_on_error' => true));
+
+				deltree(BOARDDIR . '/packages/temp', false);
+				if (!mktree(BOARDDIR . '/packages/temp', 0777))
+					fatal_lang_error('package_cant_download', false);
+			}
+		}
+
+		if (!file_exists(BOARDDIR . '/packages/' . $context['filename']))
+		{
+			deltree(BOARDDIR . '/packages/temp');
+			fatal_lang_error('package_no_file', false);
+		}
+
+		// Extract the files so we can get things like the readme, etc.
 		if (is_file(BOARDDIR . '/packages/' . $context['filename']))
 		{
 			$context['extracted_files'] = read_tgz_file(BOARDDIR . '/packages/' . $context['filename'], BOARDDIR . '/packages/temp');
 
-			if (!file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
+			if ($context['extracted_files'] && !file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
 			{
 				foreach ($context['extracted_files'] as $file)
 				{
@@ -302,7 +320,6 @@ class Packages_Controller extends Action_Controller
 
 		// Get the package info...
 		$packageInfo = getPackageInfo($context['filename']);
-
 		if (!is_array($packageInfo))
 			fatal_lang_error($packageInfo);
 
@@ -323,7 +340,7 @@ class Packages_Controller extends Action_Controller
 		// The mod isn't installed.... unless proven otherwise.
 		$context['is_installed'] = false;
 
-		// Is it actually installed?
+		// See if it is installed?
 		$package_installed = isPackageInstalled($packageInfo['id']);
 
 		// Wait, it's not installed yet!
@@ -334,40 +351,47 @@ class Packages_Controller extends Action_Controller
 			fatal_error('Hacker?', false);
 		}
 		// Uninstalling?
-		elseif ($context['uninstalling'])
+		if ($context['uninstalling'])
 		{
-			$install_log = parsePackageInfo($packageInfo['xml'], false, 'uninstall');
+			$actions = parsePackageInfo($packageInfo['xml'], false, 'uninstall');
 
 			// Gadzooks!  There's no uninstaller at all!?
-			if (empty($install_log))
+			if (empty($actions))
+			{
+				deltree(BOARDDIR . '/packages/temp');
 				fatal_lang_error('package_uninstall_cannot', false);
+			}
 
 			// They can only uninstall from what it was originally installed into.
 			foreach ($theme_paths as $id => $data)
+			{
 				if ($id != 1 && !in_array($id, $package_installed['old_themes']))
 					unset($theme_paths[$id]);
+			}
 		}
 		elseif (isset($package_installed['old_version']) && $package_installed['old_version'] != $packageInfo['version'])
 		{
 			// Look for an upgrade...
-			$install_log = parsePackageInfo($packageInfo['xml'], false, 'upgrade', $package_installed['old_version']);
+			$actions = parsePackageInfo($packageInfo['xml'], false, 'upgrade', $package_installed['old_version']);
 
 			// There was no upgrade....
-			if (empty($install_log))
+			if (empty($actions))
 				$context['is_installed'] = true;
 			else
 			{
-				// Upgrade previous themes only!
+				// Otherwise they can only upgrade themes from the first time around.
 				foreach ($theme_paths as $id => $data)
+				{
 					if ($id != 1 && !in_array($id, $package_installed['old_themes']))
 						unset($theme_paths[$id]);
+				}
 			}
 		}
 		elseif (isset($package_installed['old_version']) && $package_installed['old_version'] == $packageInfo['version'])
 			$context['is_installed'] = true;
 
 		if (!isset($package_installed['old_version']) || $context['is_installed'])
-			$install_log = parsePackageInfo($packageInfo['xml'], false, 'install');
+			$actions = parsePackageInfo($packageInfo['xml'], false, 'install');
 
 		$context['install_finished'] = false;
 
@@ -375,12 +399,12 @@ class Packages_Controller extends Action_Controller
 		$table_installer = db_table();
 
 		// @todo Make a log of any errors that occurred and output them?
-		if (!empty($install_log))
+		if (!empty($actions))
 		{
 			$failed_steps = array();
 			$failed_count = 0;
 
-			foreach ($install_log as $action)
+			foreach ($actions as $action)
 			{
 				$failed_count++;
 				if ($action['type'] == 'modification' && !empty($action['filename']))
