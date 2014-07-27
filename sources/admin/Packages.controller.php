@@ -129,19 +129,6 @@ class Packages_Controller extends Action_Controller
 		// Do we have an existing id, for uninstalls and the like.
 		$context['install_id'] = isset($_REQUEST['pid']) ? (int) $_REQUEST['pid'] : 0;
 
-		// These will be needed
-		require_once(SUBSDIR . '/Package.subs.php');
-		require_once(SUBSDIR . '/Themes.subs.php');
-
-		try
-		{
-			$package = new Package($scripturl . '?action=admin;area=packages;sa=' . $context['sub_action'] . ';package=' . $context['filename'], $context['filename']);
-		}
-		catch (Elk_Exception $e)
-		{
-			$e->fatalLangError();
-		}
-
 		// Change our last link tree item for more information on this Packages area.
 		$context['uninstalling'] = $context['sub_action'] === 'uninstall';
 		$context['linktree'][count($context['linktree']) - 1] = array(
@@ -151,41 +138,53 @@ class Packages_Controller extends Action_Controller
 		$context['page_title'] .= ' - ' . ($context['uninstalling'] ? $txt['package_uninstall_actions'] : $txt['install_actions']);
 		$context['sub_template'] = 'view_package';
 
-		// Get the package info...
-		$packageInfo = $package->getPackageInfo($context['filename']);
-		if (!is_array($packageInfo))
-			fatal_lang_error($packageInfo);
-
-		$packageInfo['filename'] = $context['filename'];
-		$context['package_name'] = isset($packageInfo['name']) ? $packageInfo['name'] : $context['filename'];
-
-		// Set the type of extraction...
-		$context['extract_type'] = isset($packageInfo['type']) ? $packageInfo['type'] : 'modification';
-
 		// The mod isn't installed.... unless proven otherwise.
 		$context['is_installed'] = false;
-
-		$context['database_changes'] = $package->installedPackage($packageInfo);
-
 		$context['actions'] = array();
 		$context['ftp_needed'] = false;
 		$context['has_failure'] = false;
 
-		// No actions found, return so we can display an error
-		if (!$package->hasActions())
-			return;
+		// These will be needed
+		require_once(SUBSDIR . '/Package.subs.php');
+		require_once(SUBSDIR . '/Themes.subs.php');
 
-		// Now prepare things for the template.
-		while ($row = $package->getAction())
+		try
 		{
-			if ($row !== true)
-				$context['actions'][] = $row;
+			$package = new Package($scripturl . '?action=admin;area=packages;sa=' . $context['sub_action'] . ';package=' . $context['filename'], $context['filename']);
+
+			// Get the package info...
+			$packageInfo = $package->getPackageInfo($context['filename']);
+			if (!is_array($packageInfo))
+				fatal_lang_error($packageInfo);
+
+			$packageInfo['filename'] = $context['filename'];
+			$context['package_name'] = isset($packageInfo['name']) ? $packageInfo['name'] : $context['filename'];
+
+			// Set the type of extraction...
+			$context['extract_type'] = isset($packageInfo['type']) ? $packageInfo['type'] : 'modification';
+
+
+			$context['database_changes'] = $package->installedPackage($packageInfo);
+			// No actions found, return so we can display an error
+			if (!$package->hasActions())
+				return;
+
+			// Now prepare things for the template.
+			while ($row = $package->getAction())
+			{
+				if ($row !== true)
+					$context['actions'][] = $row;
+			}
+
+			// Have we got some things which we might want to do "multi-theme"?
+			$context['theme_actions'] = $package->themeFinds();
+
+			$context['ftp_needed'] = $package->cleanup() && !empty($context['package_ftp']);
 		}
-
-		// Have we got some things which we might want to do "multi-theme"?
-		$context['theme_actions'] = $package->themeFinds();
-
-		$context['ftp_needed'] = $package->cleanup() && !empty($context['package_ftp']);
+		catch (Elk_Exception $e)
+		{
+			$e->fatalLangError();
+		}
 
 		$sub_action = $context['sub_action'] . ($context['ftp_needed'] ? '' : '2');
 

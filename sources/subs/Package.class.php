@@ -2327,7 +2327,7 @@ class Package
 			if (!isset($this->package_installed['old_version']) && $context['uninstalling'])
 			{
 				deltree(BOARDDIR . '/packages/temp');
-				fatal_lang_error('package_cant_uninstall', false);
+				throw new Elk_Exception('package_cant_uninstall', false);
 			}
 
 			$this->actions = parsePackageInfo($packageInfo['xml'], true, 'uninstall');
@@ -2336,7 +2336,7 @@ class Package
 			if (empty($this->actions))
 			{
 				deltree(BOARDDIR . '/packages/temp');
-				fatal_lang_error('package_uninstall_cannot', false);
+				throw new Elk_Exception('package_uninstall_cannot', false);
 			}
 
 			// Can't edit the custom themes it's edited if you're unisntalling, they must be removed.
