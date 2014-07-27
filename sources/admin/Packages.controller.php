@@ -146,7 +146,6 @@ class Packages_Controller extends Action_Controller
 
 		// These will be needed
 		require_once(SUBSDIR . '/Package.subs.php');
-		require_once(SUBSDIR . '/Themes.subs.php');
 
 		try
 		{

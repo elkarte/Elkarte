@@ -2318,6 +2318,7 @@ class Package
 		);
 
 		// Load up any custom themes we may want to install into...
+		require_once(SUBSDIR . '/Themes.subs.php');
 		$this->theme_paths = getThemesPathbyID();
 
 		// Uninstalling?
