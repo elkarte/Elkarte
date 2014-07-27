@@ -337,36 +337,19 @@ class TopicsMerge
 		fixMergedTopics($first_msg, $this->_topics, $id_topic, $target_board, $target_subject, $enforce_subject, $notifications);
 
 		// Asssign the properties of the newly merged topic.
-		$this->_db->query('', '
-			UPDATE {db_prefix}topics
-			SET
-				id_board = {int:id_board},
-				id_member_started = {int:id_member_started},
-				id_member_updated = {int:id_member_updated},
-				id_first_msg = {int:id_first_msg},
-				id_last_msg = {int:id_last_msg},
-				id_poll = {int:id_poll},
-				num_replies = {int:num_replies},
-				unapproved_posts = {int:unapproved_posts},
-				num_views = {int:num_views},
-				is_sticky = {int:is_sticky},
-				approved = {int:approved}
-			WHERE id_topic = {int:id_topic}',
-			array(
-				'id_board' => $target_board,
-				'is_sticky' => $this->_is_sticky,
-				'approved' => $topic_approved,
-				'id_topic' => $id_topic,
-				'id_member_started' => $member_started,
-				'id_member_updated' => $member_updated,
-				'id_first_msg' => $first_msg,
-				'id_last_msg' => $last_msg,
-				'id_poll' => $target_poll,
-				'num_replies' => $num_replies,
-				'unapproved_posts' => $num_unapproved,
-				'num_views' => $this->_num_views,
-			)
-		);
+		setTopicAttribute($id_topic, array(
+			'id_board' => $target_board,
+			'is_sticky' => $this->_is_sticky,
+			'approved' => $topic_approved,
+			'id_member_started' => $member_started,
+			'id_member_updated' => $member_updated,
+			'id_first_msg' => $first_msg,
+			'id_last_msg' => $last_msg,
+			'id_poll' => $target_poll,
+			'num_replies' => $num_replies,
+			'unapproved_posts' => $num_unapproved,
+			'num_views' => $this->_num_views,
+		));
 
 		// Get rid of the redundant polls.
 		if (!empty($deleted_polls))

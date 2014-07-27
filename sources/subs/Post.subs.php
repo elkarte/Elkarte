@@ -628,17 +628,8 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		$topicOptions['is_approved'] = true;
 	elseif (!empty($topicOptions['id']) && !isset($topicOptions['is_approved']))
 	{
-		$request = $db->query('', '
-			SELECT approved
-			FROM {db_prefix}topics
-			WHERE id_topic = {int:id_topic}
-			LIMIT 1',
-			array(
-				'id_topic' => $topicOptions['id'],
-			)
-		);
-		list ($topicOptions['is_approved']) = $db->fetch_row($request);
-		$db->free_result($request);
+		$is_approved = topicAttribute($topicOptions['id'], array('approved'));
+		$topicOptions['is_approved'] = $is_approved['approved'];
 	}
 
 	// If nothing was filled in as name/email address, try the member table.
@@ -1018,24 +1009,18 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		$update_parameters
 	);
 
+	$attributes = array();
 	// Lock and or sticky the post.
-	if ($topicOptions['sticky_mode'] !== null || $topicOptions['lock_mode'] !== null || $topicOptions['poll'] !== null)
-	{
-		$db->query('', '
-			UPDATE {db_prefix}topics
-			SET
-				is_sticky = {raw:is_sticky},
-				locked = {raw:locked},
-				id_poll = {raw:id_poll}
-			WHERE id_topic = {int:id_topic}',
-			array(
-				'is_sticky' => $topicOptions['sticky_mode'] === null ? 'is_sticky' : (int) $topicOptions['sticky_mode'],
-				'locked' => $topicOptions['lock_mode'] === null ? 'locked' : (int) $topicOptions['lock_mode'],
-				'id_poll' => $topicOptions['poll'] === null ? 'id_poll' : (int) $topicOptions['poll'],
-				'id_topic' => $topicOptions['id'],
-			)
-		);
-	}
+	if ($topicOptions['sticky_mode'] !== null)
+		$attributes['is_sticky'] = $topicOptions['sticky_mode'];
+	if ($topicOptions['lock_mode'] !== null)
+		$attributes['locked'] = $topicOptions['lock_mode'];
+	if ($topicOptions['poll'] !== null)
+		$attributes['id_poll'] = $topicOptions['poll'];
+
+	// If anything to do, do it.
+	if (!empty($attributes))
+		setTopicAttribute($topicOptions['id'], $attributes);
 
 	// Mark the edited post as read.
 	if (!empty($topicOptions['mark_as_read']) && !$user_info['is_guest'])

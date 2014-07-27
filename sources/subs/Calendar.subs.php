@@ -273,8 +273,6 @@ function canLinkEvent()
 {
 	global $user_info, $topic, $board;
 
-	$db = database();
-
 	// If you can't post, you can't link.
 	isAllowedTo('calendar_post');
 
@@ -288,16 +286,8 @@ function canLinkEvent()
 	if (!allowedTo('admin_forum') && !allowedTo('moderate_board'))
 	{
 		// Not admin or a moderator of this board. You better be the owner - or else.
-		$result = $db->query('', '
-			SELECT id_member_started
-			FROM {db_prefix}topics
-			WHERE id_topic = {int:current_topic}
-			LIMIT 1',
-			array(
-				'current_topic' => $topic,
-			)
-		);
-		if ($row = $db->fetch_assoc($result))
+		$row = topicAttribute($topic, array('id_member_started'));
+		if (!empty($row))
 		{
 			// Not the owner of the topic.
 			if ($row['id_member_started'] != $user_info['id'])
@@ -306,7 +296,6 @@ function canLinkEvent()
 		// Topic/Board doesn't exist.....
 		else
 			fatal_lang_error('calendar_no_topic', 'general');
-		$db->free_result($result);
 	}
 }
 

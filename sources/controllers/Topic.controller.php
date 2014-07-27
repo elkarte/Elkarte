@@ -138,7 +138,7 @@ class Topic_Controller extends Action_Controller
 		$is_sticky = topicAttribute($topic, 'sticky');
 
 		// Toggle the sticky value.
-		setTopicAttribute($topic, array('sticky' => (empty($is_sticky) ? 1 : 0)));
+		setTopicAttribute($topic, array('is_sticky' => (empty($is_sticky) ? 1 : 0)));
 
 		// Log this sticky action - always a moderator thing.
 		logAction(empty($is_sticky) ? 'sticky' : 'unsticky', array('topic' => $topic, 'board' => $board));
