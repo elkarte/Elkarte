@@ -149,7 +149,7 @@ class Packages_Controller extends Action_Controller
 
 		try
 		{
-			$package = new Package($scripturl . '?action=admin;area=packages;sa=' . $context['sub_action'] . ';package=' . $context['filename'], $context['filename']);
+			$package = new Package('', $context['filename'], $scripturl . '?action=admin;area=packages;sa=' . $context['sub_action'] . ';package=' . $context['filename']);
 
 			// Get the package info...
 			$packageInfo = $package->getPackageInfo($context['filename']);

@@ -32,10 +32,10 @@ class Package
 	protected $base_path = '';
 	protected $chmod_files = array();
 
-	public function __construct($destination_url = '', $filename = '')
+	public function __construct($destination_url = '', $filename = '', $inner_dest = '')
 	{
 		// Load up the package FTP information?
-		create_chmod_control();
+		create_chmod_control(array(), array('destination_url' => $destination_url));
 
 		// Make sure temp directory exists and is empty.
 		if (file_exists(BOARDDIR . '/packages/temp'))
@@ -48,7 +48,7 @@ class Package
 			if (!mktree(BOARDDIR . '/packages/temp', 0777))
 			{
 				deltree(BOARDDIR . '/packages/temp', false);
-				create_chmod_control(array(BOARDDIR . '/packages/temp/delme.tmp'), array('destination_url' => $destination_url, 'crash_on_error' => true));
+				create_chmod_control(array(BOARDDIR . '/packages/temp/delme.tmp'), array('destination_url' => $inner_dest, 'crash_on_error' => true));
 
 				deltree(BOARDDIR . '/packages/temp', false);
 				if (!mktree(BOARDDIR . '/packages/temp', 0777))
