@@ -32,7 +32,7 @@ class Package
 	protected $base_path = '';
 	protected $chmod_files = array();
 
-	public function __construct($destination_url = '', $filename)
+	public function __construct($destination_url = '', $filename = '')
 	{
 		// Load up the package FTP information?
 		create_chmod_control();
@@ -642,7 +642,7 @@ class Package
 	 * @param string $the_version
 	 * @return highest install value string or false
 	 */
-	function matchHighestPackageVersion($versions, $reset = false, $the_version)
+	function matchHighestPackageVersion($versions, $reset = false, $the_version = '')
 	{
 		global $forum_version;
 		static $near_version = 0;

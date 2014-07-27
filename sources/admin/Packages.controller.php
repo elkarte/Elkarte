@@ -118,7 +118,7 @@ class Packages_Controller extends Action_Controller
 	 */
 	public function action_install()
 	{
-		global $txt, $context, $scripturl, $settings;
+		global $txt, $context, $scripturl;
 
 		// You have to specify a file!!
 		if (!isset($_REQUEST['package']) || trim($_REQUEST['package']) == '')
@@ -170,7 +170,6 @@ class Packages_Controller extends Action_Controller
 		$context['actions'] = array();
 		$context['ftp_needed'] = false;
 		$context['has_failure'] = false;
-		$chmod_files = array();
 
 		// No actions found, return so we can display an error
 		if (!$package->hasActions())
