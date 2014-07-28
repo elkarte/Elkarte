@@ -569,9 +569,9 @@ class DbTable_PostgreSQL extends DbTable
 			return false;
 
 		// MySQL supports a length argument, postgre no
-		foreach ($index['columns'] as $id => $col)
+		foreach ($index_info['columns'] as $id => $col)
 			if (strpos($col, '(') !== false)
-				$index['columns'][$id] = substr($col, 0, strpos($col, '('));
+				$index_info['columns'][$id] = substr($col, 0, strpos($col, '('));
 
 		$columns = implode(',', $index_info['columns']);
 

@@ -383,6 +383,9 @@ class Mentions_Controller extends Action_Controller
 			$start += $limit;
 		}
 
+		if ($round !== 0)
+			countUserMentions();
+
 		return $mentions;
 	}
 

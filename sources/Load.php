@@ -2074,12 +2074,12 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 				$params['url'] = $settings['theme_url'];
 
 				// Fallback if we are not already in the default theme
-				if ($fallback && ($settings['theme_dir'] !== $settings['default_theme_dir']) && !file_exists($settings['theme_dir'] . $dir . $filename))
+				if ($fallback && ($settings['theme_dir'] !== $settings['default_theme_dir']) && !file_exists($settings['theme_dir'] . $dir . $params['basename']))
 				{
 					// Can't find it in this theme, how about the default?
-					if (file_exists($settings['default_theme_dir'] . $dir . $filename))
+					if (file_exists($settings['default_theme_dir'] . $dir . $params['basename']))
 					{
-						$filename = $settings['default_theme_url'] . $dir . $filename . $cache_staler;
+						$filename = $settings['default_theme_url'] . $dir . $params['basename'] . $cache_staler;
 						$params['dir'] = $settings['default_theme_dir'] . $dir;
 						$params['url'] = $settings['default_theme_url'];
 					}
@@ -2087,7 +2087,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 						$filename = false;
 				}
 				else
-					$filename = $settings['theme_url'] . $dir . $filename . $cache_staler;
+					$filename = $settings['theme_url'] . $dir . $params['basename'] . $cache_staler;
 			}
 
 			// Add it to the array for use in the template
