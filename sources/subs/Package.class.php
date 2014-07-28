@@ -31,6 +31,10 @@ class Package
 	protected $theme_actions = null;
 	protected $base_path = '';
 	protected $chmod_files = array();
+	protected $theme_copies = array();
+	protected $themes_installed = array();
+	protected $failed_count = 0;
+	protected $failed_steps = array();
 
 	public function __construct($destination_url = '', $filename = '', $inner_dest = '')
 	{
@@ -96,7 +100,119 @@ class Package
 			throw new Elk_Exception('no_access', false);
 	}
 
-	public function cleanup()
+	public function cleanup($testing_only = true, $params = array())
+	{
+		if ($testing_only)
+			$this->testCleanup();
+		else
+			$this->installCleanup($params[0]);
+	}
+
+	protected function installCleanup($packageInfo)
+	{
+		global $context;
+
+		// We're gonna be needing the table db functions! ...Sometimes.
+		$table_installer = db_table();
+
+		if (!empty($this->actions))
+		{
+			package_flush_cache();
+
+			// First, ensure this change doesn't get removed by putting a stake in the ground (So to speak).
+			package_put_contents(BOARDDIR . '/packages/installed.list', time());
+
+			// See if this is already installed
+			$is_upgrade = false;
+			$old_db_changes = array();
+			$package_check = isPackageInstalled($packageInfo['id']);
+
+			// Change the installed state as required.
+			if (!empty($package_check['install_state']))
+			{
+				if ($context['uninstalling'])
+					setPackageState($package_check['package_id']);
+				else
+				{
+					// not uninstalling so must be an upgrade
+					$is_upgrade = true;
+					$old_db_changes = empty($package_check['db_changes']) ? array() : $package_check['db_changes'];
+				}
+			}
+
+			// Assuming we're not uninstalling, add the entry.
+			if (!$context['uninstalling'])
+			{
+				// Any db changes from older version?
+				$table_log = $table_installer->package_log();
+				if (!empty($old_db_changes))
+					$db_package_log = empty($table_log) ? $old_db_changes : array_merge($old_db_changes, $table_log);
+				else
+					$db_package_log = $table_log;
+
+				// If there are some database changes we might want to remove then filter them out.
+				if (!empty($db_package_log))
+				{
+					// We're really just checking for entries which are create table AND add columns (etc).
+					$tables = array();
+					usort($db_package_log, array($this, '_sort_table_first'));
+					foreach ($db_package_log as $k => $log)
+					{
+						if ($log[0] == 'remove_table')
+							$tables[] = $log[1];
+						elseif (in_array($log[1], $tables))
+							unset($db_package_log[$k]);
+					}
+
+					$package_installed['db_changes'] = serialize($db_package_log);
+				}
+				else
+					$package_installed['db_changes'] = '';
+
+				// What themes did we actually install?
+				$themes_installed = array_unique($this->themes_installed);
+				$themes_installed = implode(',', $themes_installed);
+
+				// What failed steps?
+				$failed_step_insert = serialize($this->failed_steps);
+
+				// Credits tag?
+				$credits_tag = (empty($credits_tag)) ? '' : serialize($credits_tag);
+
+				// Add to the log packages
+				addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $package_installed['db_changes'], $is_upgrade, $credits_tag);
+			}
+		}
+
+		// If there's database changes - and they want them removed - let's do it last!
+		if (!empty($package_installed['db_changes']) && !empty($_POST['do_db_changes']))
+		{
+			foreach ($package_installed['db_changes'] as $change)
+			{
+				if ($change[0] == 'remove_table' && isset($change[1]))
+					$table_installer->db_drop_table($change[1]);
+				elseif ($change[0] == 'remove_column' && isset($change[2]))
+					$table_installer->db_remove_column($change[1], $change[2]);
+				elseif ($change[0] == 'remove_index' && isset($change[2]))
+					$table_installer->db_remove_index($change[1], $change[2]);
+			}
+		}
+
+		// Clean house... get rid of the evidence ;).
+		if (file_exists(BOARDDIR . '/packages/temp'))
+			deltree(BOARDDIR . '/packages/temp');
+
+		// Log what we just did.
+		logAction($context['uninstalling'] ? 'uninstall_package' : (!empty($is_upgrade) ? 'upgrade_package' : 'install_package'), array('package' => Util::htmlspecialchars($packageInfo['name']), 'version' => Util::htmlspecialchars($packageInfo['version'])), 'admin');
+
+		// Just in case, let's clear the whole cache to avoid anything going up the swanny.
+		clean_cache();
+
+		// Restore file permissions?
+		create_chmod_control(array(), array(), true);
+	}
+
+	protected function testCleanup()
 	{
 		// Trash the cache... which will also check permissions for us!
 		$this->package_flush_cache(true);
@@ -124,7 +240,7 @@ class Package
 	 * @package Packages
 	 * @param string $gzfilename
 	 */
-	public function getPackageInfo($gzfilename)
+	public function getPackageInfo($gzfilename, $custom_themes = null)
 	{
 		// Extract package-info.xml from downloaded file. (*/ is used because it could be in any directory.)
 		if (preg_match('~^https?://~i', $gzfilename) === 1)
@@ -556,8 +672,8 @@ class Package
 			{
 				copytree($action['source'], $action['destination']);
 				// Any other theme folders?
-				if (!empty($context['theme_copies']) && !empty($context['theme_copies'][$action['type']][$action['destination']]))
-					foreach ($context['theme_copies'][$action['type']][$action['destination']] as $theme_destination)
+				if (!empty($this->theme_copies) && !empty($this->theme_copies[$action['type']][$action['destination']]))
+					foreach ($this->theme_copies[$action['type']][$action['destination']] as $theme_destination)
 						copytree($action['source'], $theme_destination);
 			}
 			elseif ($action['type'] == 'require-file')
@@ -570,8 +686,8 @@ class Package
 				$failure |= !copy($action['source'], $action['destination']);
 
 				// Any other theme files?
-				if (!empty($context['theme_copies']) && !empty($context['theme_copies'][$action['type']][$action['destination']]))
-					foreach ($context['theme_copies'][$action['type']][$action['destination']] as $theme_destination)
+				if (!empty($this->theme_copies) && !empty($this->theme_copies[$action['type']][$action['destination']]))
+					foreach ($this->theme_copies[$action['type']][$action['destination']] as $theme_destination)
 					{
 						if (!mktree(dirname($theme_destination), 0755) || !is_writable(dirname($theme_destination)))
 							$failure |= !mktree(dirname($theme_destination), 0777);
@@ -600,8 +716,8 @@ class Package
 				deltree($action['filename']);
 
 				// Any other theme folders?
-				if (!empty($context['theme_copies']) && !empty($context['theme_copies'][$action['type']][$action['filename']]))
-					foreach ($context['theme_copies'][$action['type']][$action['filename']] as $theme_destination)
+				if (!empty($this->theme_copies) && !empty($this->theme_copies[$action['type']][$action['filename']]))
+					foreach ($this->theme_copies[$action['type']][$action['filename']] as $theme_destination)
 						deltree($theme_destination);
 			}
 			elseif ($action['type'] == 'remove-file')
@@ -617,8 +733,8 @@ class Package
 					$failure = true;
 
 				// Any other theme folders?
-				if (!empty($context['theme_copies']) && !empty($context['theme_copies'][$action['type']][$action['filename']]))
-					foreach ($context['theme_copies'][$action['type']][$action['filename']] as $theme_destination)
+				if (!empty($this->theme_copies) && !empty($this->theme_copies[$action['type']][$action['filename']]))
+					foreach ($this->theme_copies[$action['type']][$action['filename']] as $theme_destination)
 						if (file_exists($theme_destination))
 							$failure |= !unlink($theme_destination);
 						else
@@ -1807,37 +1923,203 @@ class Package
 		return $result;
 	}
 
-	public function installedPackage($packageInfo)
+	public function installedPackage($packageInfo, $testing_only = true)
 	{
-		global $txt;
+		global $txt, $context;
 
 		// See if it is installed?
 		$this->package_installed = $this->isPackageInstalled($packageInfo['id']);
-
 		$database_changes = array();
-		if (isset($packageInfo['uninstall']['database']))
-			$database_changes[] = $txt['execute_database_changes'] . ' - ' . $packageInfo['uninstall']['database'];
-		elseif (!empty($this->package_installed['db_changes']))
+
+		if ($testing_only)
 		{
-			foreach ($this->package_installed['db_changes'] as $change)
+			if (isset($packageInfo['uninstall']['database']))
+				$database_changes[] = $txt['execute_database_changes'] . ' - ' . $packageInfo['uninstall']['database'];
+			elseif (!empty($this->package_installed['db_changes']))
 			{
-				if (isset($change[2]) && isset($txt['package_db_' . $change[0]]))
-					$database_changes[] = sprintf($txt['package_db_' . $change[0]], $change[1], $change[2]);
-				elseif (isset($txt['package_db_' . $change[0]]))
-					$database_changes[] = sprintf($txt['package_db_' . $change[0]], $change[1]);
-				else
-					$database_changes[] = $change[0] . '-' . $change[1] . (isset($change[2]) ? '-' . $change[2] : '');
+				foreach ($this->package_installed['db_changes'] as $change)
+				{
+					if (isset($change[2]) && isset($txt['package_db_' . $change[0]]))
+						$database_changes[] = sprintf($txt['package_db_' . $change[0]], $change[1], $change[2]);
+					elseif (isset($txt['package_db_' . $change[0]]))
+						$database_changes[] = sprintf($txt['package_db_' . $change[0]], $change[1]);
+					else
+						$database_changes[] = $change[0] . '-' . $change[1] . (isset($change[2]) ? '-' . $change[2] : '');
+				}
+			}
+		}
+		else
+		{
+			// Wait, it's not installed yet!
+			// @todo Replace with a better error message!
+			if (!isset($this->package_installed['old_version']) && $context['uninstalling'])
+			{
+				deltree(BOARDDIR . '/packages/temp');
+				fatal_error('Hacker?', false);
 			}
 		}
 
-		$this->preapreActions($packageInfo);
+		$this->preapreActions($packageInfo, $testing_only);
 
-		return $database_changes;
+		if ($testing_only)
+			return $database_changes;
+		else
+			return $this->package_installed;
 	}
 
-	public function getAction()
+	protected function loadThemePaths($custom_themes = null)
+	{
+		// Load up any custom themes we may want to install into...
+		if ($custom_themes === null)
+		{
+			require_once(SUBSDIR . '/Themes.subs.php');
+			$this->theme_paths = getThemesPathbyID();
+		}
+		else
+		{
+			// Now load up the paths of the themes that we need to know about.
+			$this->theme_paths = getThemesPathbyID($custom_themes);
+		}
+	}
+
+	public function setThemes($custom_themes, $theme_changes)
+	{
+		$this->themes_installed = array(1);
+
+		// Are there any theme copying that we want to take place?
+		$this->theme_copies = array(
+			'require-file' => array(),
+			'require-dir' => array(),
+		);
+
+		if (!empty($theme_changes))
+		{
+			foreach ($theme_changes as $change)
+			{
+				if (empty($change))
+					continue;
+				$theme_data = unserialize(base64_decode($change));
+				if (empty($theme_data['type']))
+					continue;
+
+				$this->themes_installed[] = $theme_data['id'];
+				$this->theme_copies[$theme_data['type']][$theme_data['orig']][] = $theme_data['future'];
+			}
+		}
+	}
+
+	public function getAction($testing_only = true)
+	{
+		if ($testing_only)
+		{
+			$actions = array();
+			while ($row = $this->getTestActions())
+			{
+				if ($row !== true)
+					$actions[] = $row;
+			}
+			return $actions;
+		}
+		else
+		{
+			$this->getInstallActions($failed_count);
+
+			return $this->failed_steps;
+		}
+	}
+
+	protected function getInstallActions()
+	{
+		foreach ($this->actions as $action)
+		{
+			$this->failed_count++;
+
+			if ($action['type'] == 'modification' && !empty($action['filename']))
+			{
+				if ($action['boardmod'])
+					$mod_actions = parseBoardMod(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), false, $action['reverse'], $theme_paths);
+				else
+					$mod_actions = parseModification(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), false, $action['reverse'], $theme_paths);
+
+				// Any errors worth noting?
+				foreach ($mod_actions as $key => $action)
+				{
+					if ($action['type'] == 'failure')
+						$this->failed_steps[] = array(
+							'file' => $action['filename'],
+							'large_step' => $this->failed_count,
+							'sub_step' => $key,
+							'theme' => 1,
+						);
+
+					// Gather the themes we installed into.
+					if (!empty($action['is_custom']))
+						$this->themes_installed[] = $action['is_custom'];
+				}
+			}
+			elseif ($action['type'] == 'code' && !empty($action['filename']))
+			{
+				// This is just here as reference for what is available.
+				global $txt, $modSettings, $context;
+
+				// Now include the file and be done with it ;).
+				if (file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']))
+					require(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']);
+			}
+			elseif ($action['type'] == 'credits')
+			{
+				// Time to build the billboard
+				$credits_tag = array(
+					'url' => $action['url'],
+					'license' => $action['license'],
+					'copyright' => $action['copyright'],
+					'title' => $action['title'],
+				);
+			}
+			elseif ($action['type'] == 'hook' && isset($action['hook'], $action['function']))
+			{
+				if ($action['reverse'])
+					remove_integration_function($action['hook'], $action['function'], $action['include_file']);
+				else
+					add_integration_function($action['hook'], $action['function'], $action['include_file']);
+			}
+			// Only do the database changes on uninstall if requested.
+			elseif ($action['type'] == 'database' && !empty($action['filename']) && (!$context['uninstalling'] || !empty($_POST['do_db_changes'])))
+			{
+				// These can also be there for database changes.
+				global $txt, $modSettings, $context;
+
+				// Let the file work its magic ;)
+				if (file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']))
+					require(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']);
+			}
+			// Handle a redirect...
+			elseif ($action['type'] == 'redirect' && !empty($action['redirect_url']))
+			{
+				$context['redirect_url'] = $action['redirect_url'];
+				$context['redirect_text'] = !empty($action['filename']) && file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']) ? file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']) : ($context['uninstalling'] ? $txt['package_uninstall_done'] : $txt['package_installed_done']);
+				$context['redirect_timeout'] = $action['redirect_timeout'];
+
+				// Parse out a couple of common urls.
+				$urls = array(
+					'$boardurl' => $boardurl,
+					'$scripturl' => $scripturl,
+					'$session_var' => $context['session_var'],
+					'$session_id' => $context['session_id'],
+				);
+
+				$context['redirect_url'] = strtr($context['redirect_url'], $urls);
+			}
+		}
+	}
+
+	protected function getTestActions()
 	{
 		global $context, $txt;
+
+		// End the iteration
+		if (!isset($this->actions[$this->action_pointer]))
+			return false;
 
 		// Not failed until proven otherwise.
 		$failed = false;
@@ -2307,7 +2589,7 @@ class Package
 		return $this->theme_actions;
 	}
 
-	protected function preapreActions($packageInfo)
+	protected function preapreActions($packageInfo, $testing_only)
 	{
 		global $context;
 
@@ -2317,21 +2599,17 @@ class Package
 			'other_themes' => array(),
 		);
 
-		// Load up any custom themes we may want to install into...
-		require_once(SUBSDIR . '/Themes.subs.php');
-		$this->theme_paths = getThemesPathbyID();
-
 		// Uninstalling?
 		if ($context['uninstalling'])
 		{
 			// Wait, it's not installed yet!
-			if (!isset($this->package_installed['old_version']) && $context['uninstalling'])
+			if ($testing_only && !isset($this->package_installed['old_version']) && $context['uninstalling'])
 			{
 				deltree(BOARDDIR . '/packages/temp');
 				throw new Elk_Exception('package_cant_uninstall', false);
 			}
 
-			$this->actions = $this->parsePackageInfo($packageInfo['xml'], true, 'uninstall');
+			$this->actions = $this->parsePackageInfo($packageInfo['xml'], $testing_only, 'uninstall');
 
 			// Gadzooks!  There's no uninstaller at all!?
 			if (empty($this->actions))
@@ -2341,7 +2619,8 @@ class Package
 			}
 
 			// Can't edit the custom themes it's edited if you're unisntalling, they must be removed.
-			$context['themes_locked'] = true;
+			if ($testing_only)
+				$context['themes_locked'] = true;
 
 			// Only let them uninstall themes it was installed into.
 			foreach ($this->theme_paths as $id => $data)
@@ -2353,7 +2632,7 @@ class Package
 		elseif (isset($this->package_installed['old_version']) && $this->package_installed['old_version'] != $packageInfo['version'])
 		{
 			// Look for an upgrade...
-			$this->actions = $this->parsePackageInfo($packageInfo['xml'], true, 'upgrade', $this->package_installed['old_version']);
+			$this->actions = $this->parsePackageInfo($packageInfo['xml'], $testing_only, 'upgrade', $this->package_installed['old_version']);
 
 			// There was no upgrade....
 			if (empty($this->actions))
@@ -2372,6 +2651,6 @@ class Package
 			$context['is_installed'] = true;
 
 		if (!isset($this->package_installed['old_version']) || $context['is_installed'])
-			$this->actions = $this->parsePackageInfo($packageInfo['xml'], true, 'install');
+			$this->actions = $this->parsePackageInfo($packageInfo['xml'], $testing_only, 'install');
 	}
 }
