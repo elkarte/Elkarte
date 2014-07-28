@@ -672,46 +672,6 @@ function un_htmlspecialchars($string)
 }
 
 /**
- * Shorten a string of text
- *
- * What it does:
- * - shortens a text string so that it is either shorter than length, or that length plus an ellipsis.
- * - optionally attempts to break the string on a word boundary approximately at the allowed length
- * - if using cutword and the resulting length is > len plus buffer then it is truncated to length plus an ellipsis.
- * - respects internationalization characters and entities as one character.
- * - returns the shortened string.
- * - does not account for html tags
- *
- * @param string $text
- * @param int $len
- * @param bool $cutword try to cut at a word boundary
- * @param int $buffer maximum length overflow to allow when cutting on a word boundary
- */
-function shorten_text($text, $len = 384, $cutword = false, $buffer = 12)
-{
-	// If its to long, cut it down to size
-	if (Util::strlen($text) > $len)
-	{
-		// Try to cut on a word boundary
-		if ($cutword)
-		{
-			$text = Util::substr($text, 0, $len);
-			$space_pos = Util::strpos($text, ' ', 0, true);
-
-			// Always one clown in the audience who likes long words or not using the spacebar
-			if (!empty($space_pos) && ($len - $space_pos <= $buffer))
-				$text = Util::substr($text, 0, $space_pos);
-
-			$text = rtrim($text) . ' ...';
-		}
-		else
-			$text = Util::substr($text, 0, $len - 3) . '...';
-	}
-
-	return $text;
-}
-
-/**
  * Calculates all the possible permutations (orders) of an array.
  *
  * What it does:

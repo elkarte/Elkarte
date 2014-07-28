@@ -34,7 +34,7 @@ class Util
 	}
 
 	/**
-	 * Performs an htmlspecialchars on a string, using UTF-8 characterset
+	 * Performs an htmlspecialchars on a string, using UTF-8 character set
 	 * Optionally performs an entity_fix to null any invalid character entities from the string
 	 *
 	 * @param string $string
@@ -183,6 +183,8 @@ class Util
 	/**
 	 * Cuts off a multi-byte string at a certain length
 	 * Optionally performs an entity_fix to null any invalid character entities from the string prior to the length check
+	 * Use this when the number of actual characters (&nbsp; = 6 not 1) must be <= length not the displayable,
+	 * for example db field compliance to avoid overflow
 	 *
 	 * @param string $string
 	 * @param int $length
@@ -201,6 +203,52 @@ class Util
 		$string = $matches[0];
 		while (strlen($string) > $length)
 			$string = preg_replace('~(?:' . $ent_list . '|.)$~u', '', $string);
+
+		return $string;
+	}
+
+	/**
+	 * Shorten a string of text
+	 *
+	 * What it does:
+	 * - shortens a text string to a given visual length
+	 * - considers certain html entities as 1 in length, &amp; &nbsp; etc
+	 * - optionally adds ending ellipsis that honor length or are appended
+	 * - optionally attempts to break the string on a word boundary approximately at the allowed length
+	 * - if using cutword and the resulting length is < len minus buffer then it is truncated to length plus an ellipsis.
+	 * - respects internationalization characters, html spacing and entities as one character.
+	 * - returns the shortened string.
+	 * - does not account for html tags, ie <b>test</b> is 11 characters not 4
+	 *
+	 * @param string $text
+	 * @param int $length
+	 * @param bool $cutword try to cut at a word boundary
+	 * @param |bool $ellipsis characters to add at the end of a cut string
+	 * @param int $buffer maximum length underflow to allow when cutting on a word boundary
+	 */
+	public static function shorten_text($string, $length = 384, $cutword = false, $ellipsis = '...', $exact = true, $buffer = 12)
+	{
+		// Does len include the ellipsis or are the ellipsis appended
+		$ending = !empty($ellipsis) && $exact ? Util::strlen($ellipsis) : 0;
+
+		// If its to long, cut it down to size
+		if (Util::strlen($string) > $length)
+		{
+			// Try to cut on a word boundary
+			if ($cutword)
+			{
+				$string = Util::substr($string, 0, $length - $ending);
+				$space_pos = Util::strpos($string, ' ', 0, true);
+
+				// Always one clown in the audience who likes long words or not using the spacebar
+				if (!empty($space_pos) && ($length - $space_pos <= $buffer))
+					$string = Util::substr($string, 0, $space_pos);
+
+				$string = rtrim($string) . ($ellipsis ? $ellipsis : '');
+			}
+			else
+				$string = Util::substr($string, 0, $length - $ending) . ($ellipsis ? $ellipsis : '');
+		}
 
 		return $string;
 	}

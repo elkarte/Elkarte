@@ -1509,13 +1509,13 @@ function lastPost()
 	censorText($row['body']);
 
 	$row['body'] = strip_tags(strtr(parse_bbc($row['body'], $row['smileys_enabled']), array('<br />' => '&#10;')));
-	$row['body'] = shorten_text($row['body'], !empty($modSettings['lastpost_preview_characters']) ? $modSettings['lastpost_preview_characters'] : 128, true);
+	$row['body'] = Util::shorten_text($row['body'], !empty($modSettings['lastpost_preview_characters']) ? $modSettings['lastpost_preview_characters'] : 128, true);
 
 	// Send the data.
 	return array(
 		'topic' => $row['id_topic'],
 		'subject' => $row['subject'],
-		'short_subject' => shorten_text($row['subject'], $modSettings['subject_length']),
+		'short_subject' => Util::shorten_text($row['subject'], $modSettings['subject_length']),
 		'preview' => $row['body'],
 		'time' => standardTime($row['poster_time']),
 		'html_time' => htmlTime($row['poster_time']),
