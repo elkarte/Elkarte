@@ -982,7 +982,7 @@ function template_show_settings()
 							<input type="password"', $disabled, $javascript, ' name="', $config_var['name'], '[0]" id="', $config_var['name'], '"', ($config_var['size'] ? ' size="' . $config_var['size'] . '"' : ''), ' value="*#fakepass#*" onfocus="this.value = \'\'; this.form.', $config_var['name'], '_confirm.disabled = false;" class="input_password" />
 						</dd>
 						<dt>
-							<a id="setting_', $config_var['name'], '_confirm"></a><span', ($config_var['disabled'] ? ' class="disabled"' : ($config_var['invalid'] ? ' class="error"' : '')), '><label for="', $config_var['name'], '_confirm"><em>' . $txt['admin_confirm_password'] . '</em></label></span>
+							<a id="setting_', $config_var['name'], '_confirm"></a><span', ($config_var['disabled'] ? ' class="disabled"' : ($config_var['invalid'] ? ' class="error"' : '')), '><label for="', $config_var['name'], '_confirm"><em>', $txt['admin_confirm_password'], '</em></label></span>
 						</dt>
 						<dd>
 							<input type="password" disabled="disabled" id="', $config_var['name'], '_confirm" name="', $config_var['name'], '[1]"', ($config_var['size'] ? ' size="' . $config_var['size'] . '"' : ''), ' class="input_password" />';
@@ -1040,9 +1040,9 @@ function template_show_settings()
 				echo ($config_var['invalid']) ? '
 							<img class="icon" src="' . $settings['images_url'] . '/icons/field_invalid.png" />' : '';
 
-				echo isset($config_var['postinput']) ? '
-							' . $config_var['postinput'] : '',
-				'</dd>';
+				echo isset($config_var['postinput']) && $config_var['postinput'] !== '' ? '
+							' . $config_var['postinput'] : '', '
+						</dd>';
 			}
 		}
 		else
