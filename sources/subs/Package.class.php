@@ -2027,7 +2027,7 @@ class Package
 		}
 		else
 		{
-			$this->getInstallActions($failed_count);
+			$this->getInstallActions();
 
 			return $this->failed_steps;
 		}
@@ -2035,6 +2035,8 @@ class Package
 
 	protected function getInstallActions()
 	{
+		global $context, $txt, $boardurl, $scripturl;
+
 		foreach ($this->actions as $action)
 		{
 			$this->failed_count++;
@@ -2042,9 +2044,9 @@ class Package
 			if ($action['type'] == 'modification' && !empty($action['filename']))
 			{
 				if ($action['boardmod'])
-					$mod_actions = $this->parseBoardMod(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), false, $action['reverse'], $theme_paths);
+					$mod_actions = $this->parseBoardMod(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), false, $action['reverse'], $this->theme_paths);
 				else
-					$mod_actions = $this->parseModification(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), false, $action['reverse'], $theme_paths);
+					$mod_actions = $this->parseModification(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), false, $action['reverse'], $this->theme_paths);
 
 				// Any errors worth noting?
 				foreach ($mod_actions as $key => $action)
