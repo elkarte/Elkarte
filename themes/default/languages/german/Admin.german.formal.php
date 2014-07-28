@@ -288,7 +288,7 @@ $txt['censor_case'] = 'Groß- und Kleinschreibung ignorieren.';
 $txt['censor_whole_words'] = 'Nur ganze Wörter prüfen.';
 $txt['censor_allow'] = 'Benutzern die Abschaltung der Wortzensur erlauben.';
 
-$txt['admin_confirm_password'] = '(bestätigen)';
+$txt['admin_confirm_password'] = '(Passwort bestätigen)';
 $txt['admin_incorrect_password'] = 'Falsches Passwort';
 
 $txt['date_format'] = '(JJJJ-MM-TT)';
