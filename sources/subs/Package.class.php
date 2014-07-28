@@ -1551,11 +1551,13 @@ class Package
 		}
 
 		if (isset($package_ftp))
+		{
 			$ftp_file = strtr($filename, array($_SESSION['pack_ftp']['root'] => ''));
 
-		if (!file_exists($filename) && isset($package_ftp))
-			$package_ftp->create_file($ftp_file);
-		elseif (!file_exists($filename))
+			if (!file_exists($filename))
+				$package_ftp->create_file($ftp_file);
+		}
+		if (!file_exists($filename))
 			@touch($filename);
 
 		$this->package_chmod($filename);
@@ -1605,11 +1607,13 @@ class Package
 		foreach ($package_cache as $filename => $data)
 		{
 			if (isset($package_ftp))
+			{
 				$ftp_file = strtr($filename, array($_SESSION['pack_ftp']['root'] => ''));
 
-			if (!file_exists($filename) && isset($package_ftp))
-				$package_ftp->create_file($ftp_file);
-			elseif (!file_exists($filename))
+				if (!file_exists($filename))
+					$package_ftp->create_file($ftp_file);
+			}
+			if (!file_exists($filename))
 				@touch($filename);
 
 			$result = $this->package_chmod($filename);
