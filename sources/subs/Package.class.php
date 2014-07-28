@@ -164,10 +164,10 @@ class Package
 							unset($db_package_log[$k]);
 					}
 
-					$package_installed['db_changes'] = serialize($db_package_log);
+					$this->package_installed['db_changes'] = serialize($db_package_log);
 				}
 				else
-					$package_installed['db_changes'] = '';
+					$this->package_installed['db_changes'] = '';
 
 				// What themes did we actually install?
 				$themes_installed = array_unique($this->themes_installed);
@@ -180,14 +180,14 @@ class Package
 				$credits_tag = (empty($credits_tag)) ? '' : serialize($credits_tag);
 
 				// Add to the log packages
-				$this->addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $package_installed['db_changes'], $is_upgrade, $credits_tag);
+				$this->addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $this->package_installed['db_changes'], $is_upgrade, $credits_tag);
 			}
 		}
 
 		// If there's database changes - and they want them removed - let's do it last!
-		if (!empty($package_installed['db_changes']) && !empty($_POST['do_db_changes']))
+		if (!empty($this->package_installed['db_changes']) && !empty($_POST['do_db_changes']))
 		{
-			foreach ($package_installed['db_changes'] as $change)
+			foreach ($this->package_installed['db_changes'] as $change)
 			{
 				if ($change[0] == 'remove_table' && isset($change[1]))
 					$table_installer->db_drop_table($change[1]);
