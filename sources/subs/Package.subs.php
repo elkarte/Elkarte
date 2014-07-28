@@ -313,7 +313,7 @@ function read_zip_data($data, $destination, $single_file = false, $overwrite = f
 		// In this case the CRC and size are instead appended in a 12-byte structure immediately after the compressed data
 		if ($file_info['general_purpose'] & 0x0008)
 		{
-			$unzipped2 = unpack('Vcrc/Vcompressed_size/Vsize', substr($$data, -12));
+			$unzipped2 = unpack('Vcrc/Vcompressed_size/Vsize', substr($data, -12));
 			$file_info['crc'] = $unzipped2['crc'];
 			$file_info['compressed_size'] = $unzipped2['compressed_size'];
 			$file_info['size'] = $unzipped2['size'];
