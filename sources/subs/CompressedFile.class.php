@@ -147,7 +147,7 @@ class Compressed_File
 				return false;
 		}
 		else
-			return $this->read_tgz_file();
+			return $this->read_tgz_data();
 	}
 
 	/**
@@ -192,6 +192,7 @@ class Compressed_File
 	 * @package Packages
 	 * @param string $data
 	 * @return mixed[]|false
+	 * @throws Elk_Exception
 	 */
 	protected function read_tgz_data()
 	{
@@ -439,7 +440,7 @@ class Compressed_File
 			$write_this = $this->canWriteThis(&$current);
 
 			// Get the actual compressed data.
-			$current['data'] = substr($data, 26 + $current['filename_length'] + $current['extrafield_length']);
+			$current['data'] = substr($this->data, 26 + $current['filename_length'] + $current['extrafield_length']);
 
 			// Only inflate it if we need to ;)
 			if (!empty($current['compress_method']) || ($current['compressed_size'] != $current['size']))
