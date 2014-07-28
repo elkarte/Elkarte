@@ -84,6 +84,76 @@ class Likes_Controller extends Action_Controller
 		$this->action_unlikepost();
 	}
 
+	public function action_likestats_api()
+	{
+		$this->_api = true;
+		$this->action_likestats();
+	}
+
+	public function action_likestats()
+	{
+		global $context, $user_info, $topic, $txt, $modSettings;
+
+		$context['like_post_stats_error'] = '';
+		// if(!isset($modSettings['like_post_enable']) || empty($modSettings['like_post_enable'])) {
+		// 	$context['like_post_stats_error'] = $txt['like_post_no_access'];
+		// }
+
+		// if($user_info['is_guest'] && !LP_isAllowedTo(array('guests_can_view_likes_stats'))) {
+		// 	$context['like_post_stats_error'] = $txt['like_post_no_access'];
+		// }
+		// if(!LP_isAllowedTo(array('can_view_likes_stats'))) {
+		// 	$context['like_post_stats_error'] = $txt['like_post_no_access'];
+		// }
+
+		if ($this->_api && empty($context['like_post_stats_error'])) {
+			$default_action_func = 'LP_messageStats';
+			$subActions = array(
+				'messagestats' => 'LP_messageStats',
+				'topicstats' => 'LP_topicStats',
+				'boardstats' => 'LP_boardStats',
+				'mostlikesreceiveduserstats' => 'LP_mostLikesReceivedUserStats',
+				'mostlikesgivenuserstats' => 'LP_mostLikesGivenUserStats',
+			);
+
+			//wakey wakey, call the func you lazy
+			if (isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) && function_exists($subActions[$_REQUEST['sa']]))
+				return $subActions[$_REQUEST['sa']]();
+
+			// At this point we can just do our default.
+			$default_action_func();
+		} else {
+			loadJavascriptFile('like_posts.js', array('defer' => true));
+			loadtemplate('LikePostsStats');
+			$context['page_title'] = $txt['like_post_stats'];
+			$context['like_posts']['tab_desc'] = $txt['like_posts_stats_desc'];
+
+			// Load up the guns
+			$context['lp_stats_tabs'] = array(
+				'messagestats' => array(
+					'label' => 'Message',
+					'id' => 'messagestats',
+				),
+				'topicstats' => array(
+					'label' => 'Topic',
+					'id' => 'topicstats',
+				),
+				'boardstats' => array(
+					'label' => 'Board',
+					'id' => 'boardstats',
+				),
+				'usergivenstats' => array(
+					'label' => 'Most liked User',
+					'id' => 'mostlikesreceiveduserstats',
+				),
+				'userreceivedstats' => array(
+					'label' => 'Most likes giving user',
+					'id' => 'mostlikesgivenuserstats',
+				),
+			);
+			$context['sub_template'] = 'lp_stats';
+		}
+	}
 	/**
 	 * Likes a post due to its awesomeness
 	 * Permission checks are done in prepare_likes
