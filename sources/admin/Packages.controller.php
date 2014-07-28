@@ -226,56 +226,63 @@ class Packages_Controller extends Action_Controller
 		$context['page_title'] .= ' - ' . ($context['uninstalling'] ? $txt['uninstall'] : $txt['extracting']);
 		$context['sub_template'] = 'extract_package';
 
-		$package = new Package($scripturl . '?action=admin;area=packages;sa=' . $_REQUEST['sa'] . ';package=' . $_REQUEST['package'], $context['filename'], $scripturl . '?action=admin;area=packages;sa=' . $context['sub_action'] . ';package=' . $context['filename']);
-
-		// Get the package info...
-		$packageInfo = $package->getPackageInfo($context['filename']);
-		if (!is_array($packageInfo))
-			fatal_lang_error($packageInfo);
-
-		// Are we installing this into any custom themes?
-		$custom_themes = array(1);
-		$known_themes = explode(',', $modSettings['knownThemes']);
-		if (!empty($_POST['custom_theme']))
+		try
 		{
-			foreach ($_POST['custom_theme'] as $tid)
-				if (in_array($tid, $known_themes))
-					$custom_themes[] = (int) $tid;
+			$package = new Package($scripturl . '?action=admin;area=packages;sa=' . $_REQUEST['sa'] . ';package=' . $_REQUEST['package'], $context['filename'], $scripturl . '?action=admin;area=packages;sa=' . $context['sub_action'] . ';package=' . $context['filename']);
+
+			// Get the package info...
+			$packageInfo = $package->getPackageInfo($context['filename']);
+			if (!is_array($packageInfo))
+				fatal_lang_error($packageInfo);
+
+			// Are we installing this into any custom themes?
+			$custom_themes = array(1);
+			$known_themes = explode(',', $modSettings['knownThemes']);
+			if (!empty($_POST['custom_theme']))
+			{
+				foreach ($_POST['custom_theme'] as $tid)
+					if (in_array($tid, $known_themes))
+						$custom_themes[] = (int) $tid;
+			}
+			$package->setThemes($custom_themes, !empty($_POST['theme_changes']) ? $_POST['theme_changes'] : array());
+
+			$packageInfo['filename'] = $context['filename'];
+
+			// Set the type of extraction...
+			$context['extract_type'] = isset($packageInfo['type']) ? $packageInfo['type'] : 'modification';
+
+			// Create a backup file to roll back to! (but if they do this more than once, don't run it a zillion times.)
+			if (!empty($modSettings['package_make_full_backups']) && (!isset($_SESSION['last_backup_for']) || $_SESSION['last_backup_for'] != $context['filename'] . ($context['uninstalling'] ? '$$' : '$')))
+			{
+				$_SESSION['last_backup_for'] = $context['filename'] . ($context['uninstalling'] ? '$$' : '$');
+
+				// @todo Internationalize this?
+				package_create_backup(($context['uninstalling'] ? 'backup_' : 'before_') . strtok($context['filename'], '.'));
+			}
+
+			// The mod isn't installed.... unless proven otherwise.
+			$context['is_installed'] = false;
+
+			// See if it is installed?
+			$package_installed = $package->installedPackage($packageInfo, false);
+
+			$context['install_finished'] = false;
+
+			// @todo Make a log of any errors that occurred and output them?
+			// @todo have a look at Package.class.php => // Gadzooks!  There's no uninstaller at all!?
+			if (!empty($actions))
+			{
+				$package->getAction(false);
+
+				$context['install_finished'] = true;
+			}
+
+			$package->cleanup(false, array($packageInfo));
 		}
-		$package->setThemes($custom_themes, !empty($_POST['theme_changes']) ? $_POST['theme_changes'] : array());
-
-		$packageInfo['filename'] = $context['filename'];
-
-		// Set the type of extraction...
-		$context['extract_type'] = isset($packageInfo['type']) ? $packageInfo['type'] : 'modification';
-
-		// Create a backup file to roll back to! (but if they do this more than once, don't run it a zillion times.)
-		if (!empty($modSettings['package_make_full_backups']) && (!isset($_SESSION['last_backup_for']) || $_SESSION['last_backup_for'] != $context['filename'] . ($context['uninstalling'] ? '$$' : '$')))
+		catch (Elk_Exception $e)
 		{
-			$_SESSION['last_backup_for'] = $context['filename'] . ($context['uninstalling'] ? '$$' : '$');
-
-			// @todo Internationalize this?
-			package_create_backup(($context['uninstalling'] ? 'backup_' : 'before_') . strtok($context['filename'], '.'));
+			$e->fatalLangError();
 		}
-
-		// The mod isn't installed.... unless proven otherwise.
-		$context['is_installed'] = false;
-
-		// See if it is installed?
-		$package_installed = $package->installedPackage($packageInfo, false);
-
-		$context['install_finished'] = false;
-
-		// @todo Make a log of any errors that occurred and output them?
-		// @todo have a look at Package.class.php => // Gadzooks!  There's no uninstaller at all!?
-		if (!empty($actions))
-		{
-			$package->getAction(false);
-
-			$context['install_finished'] = true;
-		}
-
-		$package->cleanup(false, array($packageInfo));
 	}
 
 	/**

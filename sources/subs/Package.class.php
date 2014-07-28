@@ -117,15 +117,15 @@ class Package
 
 		if (!empty($this->actions))
 		{
-			package_flush_cache();
+			$this->package_flush_cache();
 
 			// First, ensure this change doesn't get removed by putting a stake in the ground (So to speak).
-			package_put_contents(BOARDDIR . '/packages/installed.list', time());
+			$this->package_put_contents(BOARDDIR . '/packages/installed.list', time());
 
 			// See if this is already installed
 			$is_upgrade = false;
 			$old_db_changes = array();
-			$package_check = isPackageInstalled($packageInfo['id']);
+			$package_check = $this->isPackageInstalled($packageInfo['id']);
 
 			// Change the installed state as required.
 			if (!empty($package_check['install_state']))
@@ -180,7 +180,7 @@ class Package
 				$credits_tag = (empty($credits_tag)) ? '' : serialize($credits_tag);
 
 				// Add to the log packages
-				addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $package_installed['db_changes'], $is_upgrade, $credits_tag);
+				$this->addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $package_installed['db_changes'], $is_upgrade, $credits_tag);
 			}
 		}
 
@@ -1955,7 +1955,7 @@ class Package
 			if (!isset($this->package_installed['old_version']) && $context['uninstalling'])
 			{
 				deltree(BOARDDIR . '/packages/temp');
-				fatal_error('Hacker?', false);
+				throw new Elk_Exception('Hacker?', false);
 			}
 		}
 
@@ -2006,6 +2006,7 @@ class Package
 				$this->theme_copies[$theme_data['type']][$theme_data['orig']][] = $theme_data['future'];
 			}
 		}
+		$this->loadThemePaths($custom_themes);
 	}
 
 	public function getAction($testing_only = true)
@@ -2037,9 +2038,9 @@ class Package
 			if ($action['type'] == 'modification' && !empty($action['filename']))
 			{
 				if ($action['boardmod'])
-					$mod_actions = parseBoardMod(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), false, $action['reverse'], $theme_paths);
+					$mod_actions = $this->parseBoardMod(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), false, $action['reverse'], $theme_paths);
 				else
-					$mod_actions = parseModification(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), false, $action['reverse'], $theme_paths);
+					$mod_actions = $this->parseModification(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), false, $action['reverse'], $theme_paths);
 
 				// Any errors worth noting?
 				foreach ($mod_actions as $key => $action)
