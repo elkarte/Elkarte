@@ -1759,7 +1759,7 @@ function sumRecentPosts()
 			'recycle_board' => $modSettings['recycle_board']
 		)
 	);
-	$result = $db->fetch_row($request);
+	list ($result) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $result;
