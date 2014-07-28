@@ -20,6 +20,8 @@ if (!defined('ELK'))
  */
 class Util
 {
+	static protected $_entity_check_reg = '~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~';
+
 	/**
 	 * Converts invalid / disallowed / out of range entities to nulls
 	 *
@@ -67,7 +69,7 @@ class Util
 		$space_chars = '\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}';
 
 		if (empty($modSettings['disableEntityCheck']))
-			$check = preg_replace('~^(?:[ \t\n\r\x0B\x00' . $space_chars . ']|&nbsp;)+|(?:[ \t\n\r\x0B\x00]|&nbsp;)+$~u', '', preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', $string));
+			$check = preg_replace('~^(?:[ \t\n\r\x0B\x00' . $space_chars . ']|&nbsp;)+|(?:[ \t\n\r\x0B\x00]|&nbsp;)+$~u', '', preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $string));
 		else
 			$check = preg_replace('~^(?:[ \t\n\r\x0B\x00' . $space_chars . ']|&nbsp;)+|(?:[ \t\n\r\x0B\x00]|&nbsp;)+$~u', '', $string);
 
@@ -81,24 +83,33 @@ class Util
 	 * @param string $haystack what to search in
 	 * @param string $needle what is being looked for
 	 * @param int $offset where to start, assumed 0
+	 * @param bool $right set to true to mimic strrpos functions
 	 */
-	public static function strpos($haystack, $needle, $offset = 0)
+	public static function strpos($haystack, $needle, $offset = 0, $right = false)
 	{
 		global $modSettings;
 
-		$haystack_check = empty($modSettings['disableEntityCheck']) ? preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', $haystack) : $haystack;
+		$haystack_check = empty($modSettings['disableEntityCheck']) ? preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $haystack) : $haystack;
 		$haystack_arr = preg_split('~(&#' . (empty($modSettings['disableEntityCheck']) ? '\d{1,7}' : '021') . ';|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u', $haystack_check, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+
+		// From the right side, like mb_strrpos instead
+		if ($right)
+		{
+			$haystack_arr = array_reverse($haystack_arr);
+			$count = count($haystack_arr) - 1;
+		}
 
 		// Single character search, lets go
 		if (strlen($needle) === 1)
 		{
 			$result = array_search($needle, array_slice($haystack_arr, $offset));
-			return is_int($result) ? $result + $offset : false;
+			return is_int($result) ? ($right ? $count - ($result + $offset) : $result + $offset) : false;
 		}
 		else
 		{
-			$needle_check = empty($modSettings['disableEntityCheck']) ? preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', $needle) : $needle;
+			$needle_check = empty($modSettings['disableEntityCheck']) ? preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $needle) : $needle;
 			$needle_arr = preg_split('~(&#' . (empty($modSettings['disableEntityCheck']) ? '\d{1,7}' : '021') . ';|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u', $needle_check, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+			$needle_arr = $right ? array_reverse($needle_arr) : $needle_arr;
 			$needle_size = count($needle_arr);
 
 			$result = array_search($needle_arr[0], array_slice($haystack_arr, $offset));
@@ -106,7 +117,7 @@ class Util
 			{
 				$offset += $result;
 				if (array_slice($haystack_arr, $offset, $needle_size) === $needle_arr)
-					return $offset;
+					return $right ? ($count - $offset - $needle_size + 1) : $offset;
 
 				$result = array_search($needle_arr[0], array_slice($haystack_arr, ++$offset));
 			}
@@ -128,7 +139,7 @@ class Util
 		global $modSettings;
 
 		if (empty($modSettings['disableEntityCheck']))
-			$ent_arr = preg_split('~(&#\d{1,7};|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u', preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', $string), -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+			$ent_arr = preg_split('~(&#\d{1,7};|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u', preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $string), -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 		else
 			$ent_arr = preg_split('~(&#021;|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u', $string, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 
@@ -184,14 +195,12 @@ class Util
 		$ent_list = empty($modSettings['disableEntityCheck']) ? '&(#\d{1,7}|quot|amp|lt|gt|nbsp);' : '&(#021|quot|amp|lt|gt|nbsp);';
 
 		if (empty($modSettings['disableEntityCheck']))
-			$string = preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', $string);
-		else
-		{
-			preg_match('~^(' . $ent_list . '|.){' . Util::strlen(substr($string, 0, $length)) . '}~u', $string, $matches);
-			$string = $matches[0];
-			while (strlen($string) > $length)
-				$string = preg_replace('~(?:' . $ent_list . '|.)$~u', '', $string);
-		}
+			$string = preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $string);
+
+		preg_match('~^(' . $ent_list . '|.){' . Util::strlen(substr($string, 0, $length)) . '}~u', $string, $matches);
+		$string = $matches[0];
+		while (strlen($string) > $length)
+			$string = preg_replace('~(?:' . $ent_list . '|.)$~u', '', $string);
 
 		return $string;
 	}
@@ -231,7 +240,10 @@ class Util
 		if (empty($modSettings['disableEntityCheck']))
 		{
 			$ent_list = '&(#\d{1,7}|quot|amp|lt|gt|nbsp);';
-			return strlen(preg_replace('~' . $ent_list . '|.~u', '_', preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', $string)));
+			if (function_exists('mb_strlen'))
+				return mb_strlen(preg_replace('~' . $ent_list . '|.~u', '_', $string), 'UTF-8');
+			else
+				return strlen(preg_replace('~' . $ent_list . '|.~u', '_', preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $string)));
 		}
 		else
 		{
