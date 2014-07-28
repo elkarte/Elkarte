@@ -249,10 +249,9 @@
 
 				// Make the ajax call to the likes system
 				$.ajax({
-					url: elk_scripturl + '?action=likes;sa=likestats;area=test;xml;api=json;',
+					url: elk_scripturl + '?action=likes;sa=likestats;area='+ params.url +';xml;api=json;',
 					type: 'POST',
 					dataType: 'json',
-					// data: values,
 					cache: false
 				}).done(function(resp) {
 					console.log('done');

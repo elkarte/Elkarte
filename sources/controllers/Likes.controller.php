@@ -107,28 +107,28 @@ class Likes_Controller extends Action_Controller
 		// }
 
 		if ($this->_api && empty($context['like_post_stats_error'])) {
-			$default_action_func = 'LP_messageStats';
+			$default_action_func = 'action_messageStats';
+
 			$subActions = array(
-				'messagestats' => 'LP_messageStats',
-				'topicstats' => 'LP_topicStats',
-				'boardstats' => 'LP_boardStats',
-				'mostlikesreceiveduserstats' => 'LP_mostLikesReceivedUserStats',
-				'mostlikesgivenuserstats' => 'LP_mostLikesGivenUserStats',
+				'messagestats' => 'action_messageStats',
+				'topicstats' => 'action_topicStats',
+				'boardstats' => 'action_boardStats',
+				'mostlikesreceiveduserstats' => 'action_mostLikesReceivedUserStats',
+				'mostlikesgivenuserstats' => 'action_mostLikesGivenUserStats',
 			);
 
 			//wakey wakey, call the func you lazy
-			if (isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) && function_exists($subActions[$_REQUEST['sa']]))
-				return $subActions[$_REQUEST['sa']]();
+			if (isset($_REQUEST['area']) && isset($subActions[$_REQUEST['area']]) && function_exists($subActions[$_REQUEST['area']]))
+				return $this->$subActions[$_REQUEST['area']]();
 
 			// At this point we can just do our default.
-			$default_action_func();
+			$this->$default_action_func();
 		} else {
 			loadJavascriptFile('like_posts.js', array('defer' => true));
 			loadtemplate('LikePostsStats');
 			$context['page_title'] = $txt['like_post_stats'];
 			$context['like_posts']['tab_desc'] = $txt['like_posts_stats_desc'];
 
-			// Load up the guns
 			$context['lp_stats_tabs'] = array(
 				'messagestats' => array(
 					'label' => 'Message',
@@ -153,6 +153,20 @@ class Likes_Controller extends Action_Controller
 			);
 			$context['sub_template'] = 'lp_stats';
 		}
+	}
+
+	public function action_messageStats()
+	{
+		require_once(SUBSDIR . '/Likes.subs.php');
+		$data = mostLikedMessage();
+
+		if($data) {
+			$this->_likes_response = array('response' => true, 'data' => $data);
+		} else {
+			// $this->_likes_response = array('response' => false, 'error' => $txt['like_post_error_something_wrong']);
+			$this->_likes_response = array('response' => false, 'error' => 'Something wrong');
+		}
+		$this->likeResponse();
 	}
 	/**
 	 * Likes a post due to its awesomeness
