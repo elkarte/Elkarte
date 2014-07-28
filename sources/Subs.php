@@ -680,6 +680,7 @@ function un_htmlspecialchars($string)
  * - if using cutword and the resulting length is > len plus buffer then it is truncated to length plus an ellipsis.
  * - respects internationalization characters and entities as one character.
  * - returns the shortened string.
+ * - does not account for html tags
  *
  * @param string $text
  * @param int $len
@@ -691,19 +692,17 @@ function shorten_text($text, $len = 384, $cutword = false, $buffer = 12)
 	// If its to long, cut it down to size
 	if (Util::strlen($text) > $len)
 	{
+		// Try to cut on a word boundary
 		if ($cutword)
 		{
-			$text = html_entity_decode($text, ENT_QUOTES, 'UTF-8');
-
-			// Look for len - buffer characters and cut on first word boundary after
-			preg_match('~(.{' . max(1, ($len - $buffer)) . '}.*?)\b~su', $text, $matches);
+			$text = Util::substr($text, 0, $len);
+			$space_pos = Util::strpos($text, ' ', 0, true);
 
 			// Always one clown in the audience who likes long words or not using the spacebar
-			if (Util::strlen($matches[1]) > $len + $buffer)
-				$matches[1] = Util::substr($matches[1], 0, $len);
+			if (!empty($space_pos) && ($len - $space_pos <= $buffer))
+				$text = Util::substr($text, 0, $space_pos);
 
-			$text = rtrim($matches[1]) . ' ...';
-			$text = Util::htmlspecialchars($text);
+			$text = rtrim($text) . ' ...';
 		}
 		else
 			$text = Util::substr($text, 0, $len - 3) . '...';
@@ -4105,7 +4104,7 @@ function fixchar__callback($matches)
  * Strips out invalid html entities, replaces others with html style &#123; codes
  *
  * What it does:
- * - Callback function used of preg_replace_callback in smcFunc $ent_checks,
+ * - Callback function used of preg_replace_callback in various $ent_checks,
  * - for example strpos, strlen, substr etc
  *
  * @param mixed[] $matches array of matches for a preg_match_all
