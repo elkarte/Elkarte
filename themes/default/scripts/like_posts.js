@@ -254,22 +254,17 @@
 					dataType: 'json',
 					cache: false
 				}).done(function(resp) {
-					console.log('done');
-					console.log(resp);
 					// json response from the server says success?
-					// if (resp.result === true) {
-					// 	// Update the page with the new likes information
-					// 	updateUi({
-					// 		'elem': $(e.target),
-					// 		'count': resp.count,
-					// 		'text': resp.text,
-					// 		'title': resp.title,
-					// 		'action': subAction
-					// 	});
-					// }
-					// // Some failure trying to process the request
-					// else
-					// 	handleError(resp);
+					if (resp.result === true) {
+						console.log('done');
+						console.log(JSON.stringify(resp));
+					}
+					// Some failure trying to process the request
+					else {
+						console.log('Some failure trying to process the request');
+						console.log(JSON.stringify(resp));
+						// handleError(resp);
+					}
 				}).fail(function(err, textStatus, errorThrown) {
 					// Some failure sending the request, this generally means some html in
 					// the output from php error or access denied fatal errors etc
@@ -278,33 +273,6 @@
 					console.log('fail');
 					console.log(err, textStatus, errorThrown);
 				});
-
-				// $.ajax({
-				// 	type: "POST",
-				// 	url: smf_scripturl + '?action=likepostsstats',
-				// 	context: document.body,
-				// 	dataType: "json",
-				// 	data: {
-				// 		'area': 'ajaxdata',
-				// 		'sa': params.url
-				// 	},
-				// 	success: function(resp) {
-				// 		if (typeof(resp.error) !== 'undefined' && resp.error !== '') {
-				// 			genericErrorMessage({
-				// 				errorMsg: resp.error
-				// 			});
-				// 		} else if (typeof(resp.data) !== 'undefined' && typeof(resp.data.noDataMessage) !== 'undefined' && resp.data.noDataMessage !== '') {
-				// 			genericErrorMessage({
-				// 				errorMsg: resp.data.noDataMessage
-				// 			});
-				// 		} else if (resp.response) {
-				// 			tabsVisitedCurrentSession[currentUrlFrag] = resp.data;
-				// 			params.uiFunc();
-				// 		} else {
-
-				// 		}
-				// 	}
-				// });
 			},
 
 			showMessageStats = function() {

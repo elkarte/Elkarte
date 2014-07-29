@@ -510,21 +510,22 @@ function mostLikedMessage() {
 	$mostLikedMessage = array();
 
 	$request = $db->query('', '
-		SELECT mem.real_name as member_received_name, lp.id_msg, lp.id_topic, lp.id_board, lp.id_member_received, GROUP_CONCAT(CONVERT(lp.id_member_gave, CHAR(8)) SEPARATOR ",") AS id_member_gave, COUNT(lp.id_msg) AS like_count, m.subject, m.body, m.poster_time, IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type, mem.avatar, mem.posts, m.smileys_enabled
+		SELECT mem.real_name as member_received_name, lp.id_msg, m.id_topic, m.id_board, lp.id_poster, GROUP_CONCAT(CONVERT(lp.id_member, CHAR(8)) SEPARATOR ",") AS id_member_gave, COUNT(lp.id_msg) AS like_count, m.subject, m.body, m.poster_time, IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type, mem.avatar, mem.posts, m.smileys_enabled
 		FROM {db_prefix}message_likes as lp
-		INNER JOIN {db_prefix}members as mem ON (mem.id_member = lp.id_member_received)
+		INNER JOIN {db_prefix}members as mem ON (mem.id_member = lp.id_poster)
 		INNER JOIN {db_prefix}messages as m ON (m.id_msg = lp.id_msg)
 		INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
-		LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = lp.id_member_received)
+		LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = lp.id_poster)
 		WHERE {query_wanna_see_board}
 		GROUP BY lp.id_msg
 		ORDER BY like_count DESC
 		LIMIT 1',
 		array()
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request)) {
+
+	while ($row = $db->fetch_assoc($request)) {
 		censorText($row['body']);
-		$msgString = LP_trimContent($row['body'], ' ', 255);
+		$msgString = trimMessageContent($row['body'], ' ', 255);
 
 		$mostLikedMessage = array(
 			'id_msg' => $row['id_msg'],
@@ -533,12 +534,14 @@ function mostLikedMessage() {
 			'like_count' => $row['like_count'],
 			'subject' => $row['subject'],
 			'body' => parse_bbc($msgString, $row['smileys_enabled'], $row['id_msg']),
-			'poster_time' => timeformat($row['poster_time']),
+			'time' => standardTime($row['poster_time']),
+			'html_time' => htmlTime($row['poster_time']),
+			'timestamp' => forum_time(true, $row['poster_time']),
 			'member_received' => array(
-				'id_member' => $row['id_member_received'],
+				'id_member' => $row['id_poster'],
 				'name' => $row['member_received_name'],
 				'total_posts' => $row['posts'],
-				'href' => $row['member_received_name'] != '' && !empty($row['id_member_received']) ? $scripturl . '?action=profile;u=' . $row['id_member_received'] : '',
+				'href' => $row['member_received_name'] != '' && !empty($row['id_poster']) ? $scripturl . '?action=profile;u=' . $row['id_poster'] : '',
 				'avatar' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) : $settings['default_theme_url'] . '/images/no_avatar.png') : (stristr($row['avatar'], 'http://') ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar']),
 			),
 		);
@@ -563,7 +566,7 @@ function mostLikedMessage() {
 		)
 	);
 
-	while ($row = $smcFunc['db_fetch_assoc']($request)) {
+	while ($row = $db->fetch_assoc($request)) {
 		$mostLikedMessage['member_liked_data'][] = array(
 			'id_member' => $row['id_member'],
 			'real_name' => $row['real_name'],

@@ -161,13 +161,14 @@ class Likes_Controller extends Action_Controller
 		$data = mostLikedMessage();
 
 		if($data) {
-			$this->_likes_response = array('response' => true, 'data' => $data);
+			$this->_likes_response = array('result' => true, 'data' => $data);
 		} else {
 			// $this->_likes_response = array('response' => false, 'error' => $txt['like_post_error_something_wrong']);
-			$this->_likes_response = array('response' => false, 'error' => 'Something wrong');
+			$this->_likes_response = array('result' => false, 'error' => 'Something wrong');
 		}
 		$this->likeResponse();
 	}
+
 	/**
 	 * Likes a post due to its awesomeness
 	 * Permission checks are done in prepare_likes
