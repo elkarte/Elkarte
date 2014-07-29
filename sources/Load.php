@@ -1802,6 +1802,52 @@ function loadEssentialThemeData()
  * - loads a template file with the name template_name from the current, default, or base theme.
  * - detects a wrong default theme directory and tries to work around it.
  * - can be used to only load style sheets by using false as the template name
+ *   loading of style sheets with this function is @deprecated, use loadCSSFile instead
+ * - if $settings['template_dirs'] is empty, it delays the loading of the template
+ *
+ * @uses the requireTemplate() function to actually load the file.
+ * @param string|false $template_name
+ * @param string[]|string $style_sheets any style sheets to load with the template
+ * @param bool $fatal = true if fatal is true, dies with an error message if the template cannot be found
+ *
+ * @return boolean|null
+ */
+function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
+{
+	global $context, $settings;
+	static $delay = array();
+
+	// If we don't know yet the default theme directory, let's wait a bit.
+	if (empty($settings['template_dirs']))
+	{
+		$delay[] = array(
+			$template_name,
+			$style_sheets,
+			$fatal
+		);
+		return;
+	}
+	// If instead we know the default theme directory and we have delayed something, it's time to process
+	elseif (!empty($delay))
+	{
+		foreach ($delay as $val)
+			requireTemplate($val[0], $val[1], $val[2]);
+
+		// Forget about them (load them only once)
+		$delay = array();
+	}
+
+	requireTemplate($template_name, $style_sheets, $fatal);
+}
+
+/**
+ * <b>Internal function! Do not use it, use loadTemplate instead</b>
+ *
+ * What it does:
+ * - loads a template file with the name template_name from the current, default, or base theme.
+ * - detects a wrong default theme directory and tries to work around it.
+ * - can be used to only load style sheets by using false as the template name
+ *   loading of style sheets with this function is @deprecated, use loadCSSFile instead
  *
  * @uses the template_include() function to include the file.
  * @param string|false $template_name
@@ -1810,7 +1856,7 @@ function loadEssentialThemeData()
  *
  * @return boolean|null
  */
-function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
+function requireTemplate($template_name, $style_sheets, $fatal)
 {
 	global $context, $settings, $txt, $scripturl, $db_show_debug;
 	static $default_loaded = false;
