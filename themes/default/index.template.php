@@ -99,6 +99,22 @@ function template_init()
 }
 
 /**
+ * Simplify the use of callbacks in the templates.
+ */
+function call_template_callbacks($id, $array)
+{
+	if (empty($array))
+		return;
+
+	foreach ($array as $callback)
+	{
+		$func = 'template_' . $id . '_' . $callback;
+		if (function_exists($func))
+			$func();
+	}
+}
+
+/**
  * The main sub template above the content.
  */
 function template_html_above()
@@ -214,12 +230,7 @@ function template_body_above()
 	<div id="top_section">
 		<div class="wrapper">';
 
-	foreach ($context['theme_header_callbacks'] as $callback)
-	{
-		$func = 'template_th_' . $callback;
-		if (function_exists($func))
-			$func();
-	}
+	call_template_callbacks('th', $context['theme_header_callbacks']);
 
 	echo '
 		</div>
@@ -247,12 +258,7 @@ function template_body_above()
 	<div id="wrapper" class="wrapper">
 		<div id="upper_section"', empty($context['minmax_preferences']['upshrink']) ? '' : ' style="display: none;" aria-hidden="true"', '>';
 
-	foreach ($context['upper_content_callbacks'] as $callback)
-	{
-		$func = 'template_cw_' . $callback;
-		if (function_exists($func))
-			$func();
-	}
+	call_template_callbacks('cw', $context['upper_content_callbacks']);
 
 	echo '
 		</div>';
@@ -304,6 +310,9 @@ function template_th_login_bar()
 			</div>';
 }
 
+/**
+ * A simple search bar (used in the header)
+ */
 function template_th_search_bar()
 {
 	global $context, $modSettings, $txt, $scripturl;
@@ -360,6 +369,9 @@ function template_th_search_bar()
 			</form>';
 }
 
+/**
+ * The news fader wrapped in a div and with "news" text
+ */
 function template_cw_news_fader()
 {
 	global $settings, $context, $txt;
