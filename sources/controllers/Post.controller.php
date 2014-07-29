@@ -1532,7 +1532,7 @@ class Post_Controller extends Action_Controller
 
 			// Clean up the question and answers.
 			$_POST['question'] = htmlspecialchars($_POST['question'], ENT_COMPAT, 'UTF-8');
-			$_POST['question'] = Util::truncate($_POST['question'], 255);
+			$_POST['question'] = Util::substr($_POST['question'], 0, 255);
 			$_POST['question'] = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', $_POST['question']);
 			$_POST['options'] = htmlspecialchars__recursive($_POST['options']);
 
