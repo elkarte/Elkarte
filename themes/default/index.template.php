@@ -100,6 +100,10 @@ function template_init()
 
 /**
  * Simplify the use of callbacks in the templates.
+ * @param string $id - A prefix for the template functions the final name
+ *                     should look like:
+ *                     template_{$id}_{$array[n]}
+ * @param string[] $array - The array of function suffixes
  */
 function call_template_callbacks($id, $array)
 {
@@ -280,7 +284,7 @@ function template_body_above()
  */
 function template_th_login_bar()
 {
-	global $context, $modSettings, $txt, $scripturl;
+	global $context, $modSettings, $txt, $scripturl, $settings;
 
 		echo '
 			<div id="top_section_notice" class="user">
