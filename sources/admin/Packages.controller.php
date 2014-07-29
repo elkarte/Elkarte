@@ -118,7 +118,7 @@ class Packages_Controller extends Action_Controller
 	 */
 	public function action_install()
 	{
-		global $txt, $context, $scripturl, $settings;
+		global $txt, $context, $scripturl;
 
 		// You have to specify a file!!
 		if (!isset($_REQUEST['package']) || trim($_REQUEST['package']) == '')
@@ -129,34 +129,8 @@ class Packages_Controller extends Action_Controller
 		// Do we have an existing id, for uninstalls and the like.
 		$context['install_id'] = isset($_REQUEST['pid']) ? (int) $_REQUEST['pid'] : 0;
 
-		// These will be needed
-		require_once(SUBSDIR . '/Package.subs.php');
-		require_once(SUBSDIR . '/Themes.subs.php');
-
-		// Load up the package FTP information?
-		create_chmod_control();
-
-		// Make sure temp directory exists and is empty.
-		if (file_exists(BOARDDIR . '/packages/temp'))
-			deltree(BOARDDIR . '/packages/temp', false);
-
-		// Attempt to create the temp directory
-		if (!mktree(BOARDDIR . '/packages/temp', 0755))
-		{
-			deltree(BOARDDIR . '/packages/temp', false);
-			if (!mktree(BOARDDIR . '/packages/temp', 0777))
-			{
-				deltree(BOARDDIR . '/packages/temp', false);
-				create_chmod_control(array(BOARDDIR . '/packages/temp/delme.tmp'), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=' . $_REQUEST['sa'] . ';package=' . $context['filename'], 'crash_on_error' => true));
-
-				deltree(BOARDDIR . '/packages/temp', false);
-				if (!mktree(BOARDDIR . '/packages/temp', 0777))
-					fatal_lang_error('package_cant_download', false);
-			}
-		}
-
 		// Change our last link tree item for more information on this Packages area.
-		$context['uninstalling'] = $_REQUEST['sa'] === 'uninstall';
+		$context['uninstalling'] = $context['sub_action'] === 'uninstall';
 		$context['linktree'][count($context['linktree']) - 1] = array(
 			'url' => $scripturl . '?action=admin;area=packages;sa=browse',
 			'name' => $context['uninstalling'] ? $txt['package_uninstall_actions'] : $txt['install_actions']
@@ -164,575 +138,56 @@ class Packages_Controller extends Action_Controller
 		$context['page_title'] .= ' - ' . ($context['uninstalling'] ? $txt['package_uninstall_actions'] : $txt['install_actions']);
 		$context['sub_template'] = 'view_package';
 
-		if (!file_exists(BOARDDIR . '/packages/' . $context['filename']))
-		{
-			deltree(BOARDDIR . '/packages/temp');
-			fatal_lang_error('package_no_file', false);
-		}
-
-		// Extract the files so we can get things like the readme, etc.
-		if (is_file(BOARDDIR . '/packages/' . $context['filename']))
-		{
-			$context['extracted_files'] = read_tgz_file(BOARDDIR . '/packages/' . $context['filename'], BOARDDIR . '/packages/temp');
-			if ($context['extracted_files'] && !file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
-			{
-				foreach ($context['extracted_files'] as $file)
-				{
-					if (basename($file['filename']) == 'package-info.xml')
-					{
-						$context['base_path'] = dirname($file['filename']) . '/';
-						break;
-					}
-				}
-			}
-
-			if (!isset($context['base_path']))
-				$context['base_path'] = '';
-		}
-		elseif (is_dir(BOARDDIR . '/packages/' . $context['filename']))
-		{
-			copytree(BOARDDIR . '/packages/' . $context['filename'], BOARDDIR . '/packages/temp');
-			$context['extracted_files'] = listtree(BOARDDIR . '/packages/temp');
-			$context['base_path'] = '';
-		}
-		else
-			fatal_lang_error('no_access', false);
-
-		// Load up any custom themes we may want to install into...
-		$theme_paths = getThemesPathbyID();
-
-		// Get the package info...
-		$packageInfo = getPackageInfo($context['filename']);
-		if (!is_array($packageInfo))
-			fatal_lang_error($packageInfo);
-
-		$packageInfo['filename'] = $context['filename'];
-		$context['package_name'] = isset($packageInfo['name']) ? $packageInfo['name'] : $context['filename'];
-
-		// Set the type of extraction...
-		$context['extract_type'] = isset($packageInfo['type']) ? $packageInfo['type'] : 'modification';
-
 		// The mod isn't installed.... unless proven otherwise.
 		$context['is_installed'] = false;
-
-		// See if it is installed?
-		$package_installed = isPackageInstalled($packageInfo['id']);
-
-		$context['database_changes'] = array();
-		if (isset($packageInfo['uninstall']['database']))
-			$context['database_changes'][] = $txt['execute_database_changes'] . ' - ' . $packageInfo['uninstall']['database'];
-		elseif (!empty($package_installed['db_changes']))
-		{
-			foreach ($package_installed['db_changes'] as $change)
-			{
-				if (isset($change[2]) && isset($txt['package_db_' . $change[0]]))
-					$context['database_changes'][] = sprintf($txt['package_db_' . $change[0]], $change[1], $change[2]);
-				elseif (isset($txt['package_db_' . $change[0]]))
-					$context['database_changes'][] = sprintf($txt['package_db_' . $change[0]], $change[1]);
-				else
-					$context['database_changes'][] = $change[0] . '-' . $change[1] . (isset($change[2]) ? '-' . $change[2] : '');
-			}
-		}
-
-		// Uninstalling?
-		if ($context['uninstalling'])
-		{
-			// Wait, it's not installed yet!
-			if (!isset($package_installed['old_version']) && $context['uninstalling'])
-			{
-				deltree(BOARDDIR . '/packages/temp');
-				fatal_lang_error('package_cant_uninstall', false);
-			}
-
-			$actions = parsePackageInfo($packageInfo['xml'], true, 'uninstall');
-
-			// Gadzooks!  There's no uninstaller at all!?
-			if (empty($actions))
-			{
-				deltree(BOARDDIR . '/packages/temp');
-				fatal_lang_error('package_uninstall_cannot', false);
-			}
-
-			// Can't edit the custom themes it's edited if you're unisntalling, they must be removed.
-			$context['themes_locked'] = true;
-
-			// Only let them uninstall themes it was installed into.
-			foreach ($theme_paths as $id => $data)
-			{
-				if ($id != 1 && !in_array($id, $package_installed['old_themes']))
-					unset($theme_paths[$id]);
-			}
-		}
-		elseif (isset($package_installed['old_version']) && $package_installed['old_version'] != $packageInfo['version'])
-		{
-			// Look for an upgrade...
-			$actions = parsePackageInfo($packageInfo['xml'], true, 'upgrade', $package_installed['old_version']);
-
-			// There was no upgrade....
-			if (empty($actions))
-				$context['is_installed'] = true;
-			else
-			{
-				// Otherwise they can only upgrade themes from the first time around.
-				foreach ($theme_paths as $id => $data)
-				{
-					if ($id != 1 && !in_array($id, $package_installed['old_themes']))
-						unset($theme_paths[$id]);
-				}
-			}
-		}
-		elseif (isset($package_installed['old_version']) && $package_installed['old_version'] == $packageInfo['version'])
-			$context['is_installed'] = true;
-
-		if (!isset($package_installed['old_version']) || $context['is_installed'])
-			$actions = parsePackageInfo($packageInfo['xml'], true, 'install');
-
 		$context['actions'] = array();
 		$context['ftp_needed'] = false;
 		$context['has_failure'] = false;
-		$chmod_files = array();
 
-		// No actions found, return so we can display an error
-		if (empty($actions))
-			return;
+		// These will be needed
+		require_once(SUBSDIR . '/Package.subs.php');
 
-		// This will hold data about anything that can be installed in other themes.
-		$themeFinds = array(
-			'candidates' => array(),
-			'other_themes' => array(),
-		);
-
-		// Now prepare things for the template.
-		foreach ($actions as $action)
+		try
 		{
-			// Not failed until proven otherwise.
-			$failed = false;
-			$thisAction = array();
+			$package = new Package('', $context['filename'], $scripturl . '?action=admin;area=packages;sa=' . $context['sub_action'] . ';package=' . $context['filename']);
 
-			if ($action['type'] == 'chmod')
+			// Get the package info...
+			$packageInfo = $package->getPackageInfo($context['filename']);
+			if (!is_array($packageInfo))
+				fatal_lang_error($packageInfo);
+
+			$packageInfo['filename'] = $context['filename'];
+			$context['package_name'] = isset($packageInfo['name']) ? $packageInfo['name'] : $context['filename'];
+
+			// Set the type of extraction...
+			$context['extract_type'] = isset($packageInfo['type']) ? $packageInfo['type'] : 'modification';
+
+
+			$context['database_changes'] = $package->installedPackage($packageInfo, true);
+			// No actions found, return so we can display an error
+			if (!$package->hasActions())
+				return;
+
+			// Now prepare things for the template.
+			while ($row = $package->getAction())
 			{
-				$chmod_files[] = $action['filename'];
-				continue;
-			}
-			elseif ($action['type'] == 'readme' || $action['type'] == 'license')
-			{
-				$type = 'package_' . $action['type'];
-				if (file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']))
-					$context[$type] = htmlspecialchars(trim(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), "\n\r"), ENT_COMPAT, 'UTF-8');
-				elseif (file_exists($action['filename']))
-					$context[$type] = htmlspecialchars(trim(file_get_contents($action['filename']), "\n\r"), ENT_COMPAT, 'UTF-8');
-
-				if (!empty($action['parse_bbc']))
-				{
-					require_once(SUBSDIR . '/Post.subs.php');
-					preparsecode($context[$type]);
-					$context[$type] = parse_bbc($context[$type]);
-				}
-				else
-					$context[$type] = nl2br($context[$type]);
-
-				continue;
-			}
-			// Don't show redirects.
-			elseif ($action['type'] == 'redirect')
-				continue;
-			elseif ($action['type'] == 'error')
-			{
-				$context['has_failure'] = true;
-				if (isset($action['error_msg']) && isset($action['error_var']))
-					$context['failure_details'] = sprintf($txt['package_will_fail_' . $action['error_msg']], $action['error_var']);
-				elseif (isset($action['error_msg']))
-					$context['failure_details'] = isset($txt['package_will_fail_' . $action['error_msg']]) ? $txt['package_will_fail_' . $action['error_msg']] : $action['error_msg'];
-			}
-			elseif ($action['type'] == 'modification')
-			{
-				if (!file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']))
-				{
-					$context['has_failure'] = true;
-					$context['actions'][] = array(
-						'type' => $txt['execute_modification'],
-						'action' => Util::htmlspecialchars(strtr($action['filename'], array(BOARDDIR => '.'))),
-						'description' => $txt['package_action_error'],
-						'failed' => true,
-					);
-				}
-				else
-				{
-					if ($action['boardmod'])
-						$mod_actions = parseBoardMod(@file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), true, $action['reverse'], $theme_paths);
-					else
-						$mod_actions = parseModification(@file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), true, $action['reverse'], $theme_paths);
-
-					if (count($mod_actions) == 1 && isset($mod_actions[0]) && $mod_actions[0]['type'] == 'error' && $mod_actions[0]['filename'] == '-')
-						$mod_actions[0]['filename'] = $action['filename'];
-
-					foreach ($mod_actions as $key => $mod_action)
-					{
-						// Lets get the last section of the file name.
-						if (isset($mod_action['filename']) && substr($mod_action['filename'], -13) != '.template.php')
-							$actual_filename = strtolower(substr(strrchr($mod_action['filename'], '/'), 1) . '||' . $action['filename']);
-						elseif (isset($mod_action['filename']) && preg_match('~([\w]*)/([\w]*)\.template\.php$~', $mod_action['filename'], $matches))
-							$actual_filename = strtolower($matches[1] . '/' . $matches[2] . '.template.php||' . $action['filename']);
-						else
-							$actual_filename = $key;
-
-						if ($mod_action['type'] == 'opened')
-							$failed = false;
-						elseif ($mod_action['type'] == 'failure')
-						{
-							if (empty($mod_action['is_custom']))
-								$context['has_failure'] = true;
-							$failed = true;
-						}
-						elseif ($mod_action['type'] == 'chmod')
-							$chmod_files[] = $mod_action['filename'];
-						elseif ($mod_action['type'] == 'saved')
-						{
-							if (!empty($mod_action['is_custom']))
-							{
-								if (!isset($context['theme_actions'][$mod_action['is_custom']]))
-									$context['theme_actions'][$mod_action['is_custom']] = array(
-										'name' => $theme_paths[$mod_action['is_custom']]['name'],
-										'actions' => array(),
-										'has_failure' => $failed,
-									);
-								else
-									$context['theme_actions'][$mod_action['is_custom']]['has_failure'] |= $failed;
-
-								$context['theme_actions'][$mod_action['is_custom']]['actions'][$actual_filename] = array(
-									'type' => $txt['execute_modification'],
-									'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
-									'description' => $failed ? $txt['package_action_failure'] : $txt['package_action_success'],
-									'failed' => $failed,
-								);
-							}
-							elseif (!isset($context['actions'][$actual_filename]))
-							{
-								$context['actions'][$actual_filename] = array(
-									'type' => $txt['execute_modification'],
-									'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
-									'description' => $failed ? $txt['package_action_failure'] : $txt['package_action_success'],
-									'failed' => $failed,
-								);
-							}
-							else
-							{
-								$context['actions'][$actual_filename]['failed'] |= $failed;
-								$context['actions'][$actual_filename]['description'] = $context['actions'][$actual_filename]['failed'] ? $txt['package_action_failure'] : $txt['package_action_success'];
-							}
-						}
-						elseif ($mod_action['type'] == 'skipping')
-						{
-							$context['actions'][$actual_filename] = array(
-								'type' => $txt['execute_modification'],
-								'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
-								'description' => $txt['package_action_skipping']
-							);
-						}
-						elseif ($mod_action['type'] == 'missing' && empty($mod_action['is_custom']))
-						{
-							$context['has_failure'] = true;
-							$context['actions'][$actual_filename] = array(
-								'type' => $txt['execute_modification'],
-								'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
-								'description' => $txt['package_action_missing'],
-								'failed' => true,
-							);
-						}
-						elseif ($mod_action['type'] == 'error')
-							$context['actions'][$actual_filename] = array(
-								'type' => $txt['execute_modification'],
-								'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
-								'description' => $txt['package_action_error'],
-								'failed' => true,
-							);
-					}
-
-					// We need to loop again just to get the operations down correctly.
-					foreach ($mod_actions as $operation_key => $mod_action)
-					{
-						// Lets get the last section of the file name.
-						if (isset($mod_action['filename']) && substr($mod_action['filename'], -13) != '.template.php')
-							$actual_filename = strtolower(substr(strrchr($mod_action['filename'], '/'), 1) . '||' . $action['filename']);
-						elseif (isset($mod_action['filename']) && preg_match('~([\w]*)/([\w]*)\.template\.php$~', $mod_action['filename'], $matches))
-							$actual_filename = strtolower($matches[1] . '/' . $matches[2] . '.template.php||' . $action['filename']);
-						else
-							$actual_filename = $key;
-
-						// We just need it for actual parse changes.
-						if (!in_array($mod_action['type'], array('error', 'result', 'opened', 'saved', 'end', 'missing', 'skipping', 'chmod')))
-						{
-							if (empty($mod_action['is_custom']))
-								$context['actions'][$actual_filename]['operations'][] = array(
-									'type' => $txt['execute_modification'],
-									'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
-									'description' => $mod_action['failed'] ? $txt['package_action_failure'] : $txt['package_action_success'],
-									'position' => $mod_action['position'],
-									'operation_key' => $operation_key,
-									'filename' => $action['filename'],
-									'is_boardmod' => $action['boardmod'],
-									'failed' => $mod_action['failed'],
-									'ignore_failure' => !empty($mod_action['ignore_failure']),
-								);
-
-							// Themes are under the saved type.
-							if (isset($mod_action['is_custom']) && isset($context['theme_actions'][$mod_action['is_custom']]))
-								$context['theme_actions'][$mod_action['is_custom']]['actions'][$actual_filename]['operations'][] = array(
-									'type' => $txt['execute_modification'],
-									'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
-									'description' => $mod_action['failed'] ? $txt['package_action_failure'] : $txt['package_action_success'],
-									'position' => $mod_action['position'],
-									'operation_key' => $operation_key,
-									'filename' => $action['filename'],
-									'is_boardmod' => $action['boardmod'],
-									'failed' => $mod_action['failed'],
-									'ignore_failure' => !empty($mod_action['ignore_failure']),
-								);
-						}
-					}
-				}
-			}
-			elseif ($action['type'] == 'code')
-			{
-				$thisAction = array(
-					'type' => $txt['execute_code'],
-					'action' => Util::htmlspecialchars($action['filename']),
-				);
-			}
-			elseif ($action['type'] == 'database')
-			{
-				$thisAction = array(
-					'type' => $txt['execute_database_changes'],
-					'action' => Util::htmlspecialchars($action['filename']),
-				);
-			}
-			elseif (in_array($action['type'], array('create-dir', 'create-file')))
-			{
-				$thisAction = array(
-					'type' => $txt['package_create'] . ' ' . ($action['type'] == 'create-dir' ? $txt['package_tree'] : $txt['package_file']),
-					'action' => Util::htmlspecialchars(strtr($action['destination'], array(BOARDDIR => '.')))
-				);
-			}
-			elseif ($action['type'] == 'hook')
-			{
-				$action['description'] = !isset($action['hook'], $action['function']) ? $txt['package_action_failure'] : $txt['package_action_success'];
-
-				if (!isset($action['hook'], $action['function']))
-					$context['has_failure'] = true;
-
-				$thisAction = array(
-					'type' => $action['reverse'] ? $txt['execute_hook_remove'] : $txt['execute_hook_add'],
-					'action' => sprintf($txt['execute_hook_action'], Util::htmlspecialchars($action['hook'])),
-				);
-			}
-			elseif ($action['type'] == 'credits')
-			{
-				$thisAction = array(
-					'type' => $txt['execute_credits_add'],
-					'action' => sprintf($txt['execute_credits_action'], Util::htmlspecialchars($action['title'])),
-				);
-			}
-			elseif ($action['type'] == 'requires')
-			{
-				$installed_version = false;
-				$version_check = true;
-
-				// Package missing required values?
-				if (!isset($action['id']))
-					$context['has_failure'] = true;
-				else
-				{
-					// See if this dependency is installed
-					$installed_version = checkPackageDependency($action['id']);
-
-					// Do a version level check (if requested) in the most basic way
-					$version_check = (isset($action['version']) ? $installed_version == $action['version'] : true);
-				}
-
-				// Set success or failure information
-				$action['description'] = ($installed_version && $version_check) ? $txt['package_action_success'] : $txt['package_action_failure'];
-				$context['has_failure'] = !($installed_version && $version_check);
-				$thisAction = array(
-					'type' => $txt['package_requires'],
-					'action' => $txt['package_check_for'] . ' ' . $action['id'] . (isset($action['version']) ? (' / ' . ($version_check ? $action['version'] : '<span class="error">' . $action['version'] . '</span>')) : ''),
-				);
-			}
-			elseif (in_array($action['type'], array('require-dir', 'require-file')))
-			{
-				// Do this one...
-				$thisAction = array(
-					'type' => $txt['package_extract'] . ' ' . ($action['type'] == 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
-					'action' => Util::htmlspecialchars(strtr($action['destination'], array(BOARDDIR => '.')))
-				);
-
-				// Could this be theme related?
-				if (!empty($action['unparsed_destination']) && preg_match('~^\$(languagedir|languages_dir|imagesdir|themedir|themes_dir)~i', $action['unparsed_destination'], $matches))
-				{
-					// Is the action already stated?
-					$theme_action = !empty($action['theme_action']) && in_array($action['theme_action'], array('no', 'yes', 'auto')) ? $action['theme_action'] : 'auto';
-
-					// If it's not auto do we think we have something we can act upon?
-					if ($theme_action != 'auto' && !in_array($matches[1], array('languagedir', 'languages_dir', 'imagesdir', 'themedir')))
-						$theme_action = '';
-					// ... or if it's auto do we even want to do anything?
-					elseif ($theme_action == 'auto' && $matches[1] != 'imagesdir')
-						$theme_action = '';
-
-					// So, we still want to do something?
-					if ($theme_action != '')
-						$themeFinds['candidates'][] = $action;
-					// Otherwise is this is going into another theme record it.
-					elseif ($matches[1] == 'themes_dir')
-						$themeFinds['other_themes'][] = strtolower(strtr(parse_path($action['unparsed_destination']), array('\\' => '/')) . '/' . basename($action['filename']));
-				}
-			}
-			elseif (in_array($action['type'], array('move-dir', 'move-file')))
-				$thisAction = array(
-					'type' => $txt['package_move'] . ' ' . ($action['type'] == 'move-dir' ? $txt['package_tree'] : $txt['package_file']),
-					'action' => Util::htmlspecialchars(strtr($action['source'], array(BOARDDIR => '.'))) . ' => ' . Util::htmlspecialchars(strtr($action['destination'], array(BOARDDIR => '.')))
-				);
-			elseif (in_array($action['type'], array('remove-dir', 'remove-file')))
-			{
-				$thisAction = array(
-					'type' => $txt['package_delete'] . ' ' . ($action['type'] == 'remove-dir' ? $txt['package_tree'] : $txt['package_file']),
-					'action' => Util::htmlspecialchars(strtr($action['filename'], array(BOARDDIR => '.')))
-				);
-
-				// Could this be theme related?
-				if (!empty($action['unparsed_filename']) && preg_match('~^\$(languagedir|languages_dir|imagesdir|themedir|themes_dir)~i', $action['unparsed_filename'], $matches))
-				{
-					// Is the action already stated?
-					$theme_action = !empty($action['theme_action']) && in_array($action['theme_action'], array('no', 'yes', 'auto')) ? $action['theme_action'] : 'auto';
-					$action['unparsed_destination'] = $action['unparsed_filename'];
-
-					// If it's not auto do we think we have something we can act upon?
-					if ($theme_action != 'auto' && !in_array($matches[1], array('languagedir', 'languages_dir', 'imagesdir', 'themedir')))
-						$theme_action = '';
-					// ... or if it's auto do we even want to do anything?
-					elseif ($theme_action == 'auto' && $matches[1] != 'imagesdir')
-						$theme_action = '';
-
-					// So, we still want to do something?
-					if ($theme_action != '')
-						$themeFinds['candidates'][] = $action;
-					// Otherwise is this is going into another theme record it.
-					elseif ($matches[1] == 'themes_dir')
-						$themeFinds['other_themes'][] = strtolower(strtr(parse_path($action['unparsed_filename']), array('\\' => '/')) . '/' . basename($action['filename']));
-				}
+				if ($row !== true)
+					$context['actions'][] = $row;
 			}
 
-			if (empty($thisAction))
-				continue;
+			// Have we got some things which we might want to do "multi-theme"?
+			$context['theme_actions'] = $package->themeFinds();
 
-			if (isset($action['filename']))
-			{
-				if ($context['uninstalling'])
-					$file = in_array($action['type'], array('remove-dir', 'remove-file')) ? $action['filename'] : BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename'];
-				else
-					$file = BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename'];
-
-				if (!file_exists($file))
-				{
-					$context['has_failure'] = true;
-
-					$thisAction += array(
-						'description' => $txt['package_action_error'],
-						'failed' => true,
-					);
-				}
-			}
-
-			// @todo None given?
-			if (empty($thisAction['description']))
-				$thisAction['description'] = isset($action['description']) ? $action['description'] : '';
-
-			$context['actions'][] = $thisAction;
+			$context['ftp_needed'] = $package->cleanup() && !empty($context['package_ftp']);
+		}
+		catch (Elk_Exception $e)
+		{
+			$e->fatalLangError();
 		}
 
-		// Have we got some things which we might want to do "multi-theme"?
-		if (!empty($themeFinds['candidates']))
-		{
-			foreach ($themeFinds['candidates'] as $action_data)
-			{
-				// Get the part of the file we'll be dealing with.
-				preg_match('~^\$(languagedir|languages_dir|imagesdir|themedir)(\\|/)*(.+)*~i', $action_data['unparsed_destination'], $matches);
+		$sub_action = $context['sub_action'] . ($context['ftp_needed'] ? '' : '2');
 
-				if ($matches[1] == 'imagesdir')
-					$path = '/' . basename($settings['default_images_url']);
-				elseif ($matches[1] == 'languagedir' || $matches[1] == 'languages_dir')
-					$path = '/languages';
-				else
-					$path = '';
-
-				if (!empty($matches[3]))
-					$path .= $matches[3];
-
-				if (!$context['uninstalling'])
-					$path .= '/' . basename($action_data['filename']);
-
-				// Loop through each custom theme to note it's candidacy!
-				foreach ($theme_paths as $id => $theme_data)
-				{
-					if (isset($theme_data['theme_dir']) && $id != 1)
-					{
-						$real_path = $theme_data['theme_dir'] . $path;
-
-						// Confirm that we don't already have this dealt with by another entry.
-						if (!in_array(strtolower(strtr($real_path, array('\\' => '/'))), $themeFinds['other_themes']))
-						{
-							// Check if we will need to chmod this.
-							if (!mktree(dirname($real_path), false))
-							{
-								$temp = dirname($real_path);
-								while (!file_exists($temp) && strlen($temp) > 1)
-									$temp = dirname($temp);
-								$chmod_files[] = $temp;
-							}
-
-							if ($action_data['type'] == 'require-dir' && !is_writable($real_path) && (file_exists($real_path) || !is_writable(dirname($real_path))))
-								$chmod_files[] = $real_path;
-
-							if (!isset($context['theme_actions'][$id]))
-								$context['theme_actions'][$id] = array(
-									'name' => $theme_data['name'],
-									'actions' => array(),
-								);
-
-							if ($context['uninstalling'])
-								$context['theme_actions'][$id]['actions'][] = array(
-									'type' => $txt['package_delete'] . ' ' . ($action_data['type'] == 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
-									'action' => strtr($real_path, array('\\' => '/', BOARDDIR => '.')),
-									'description' => '',
-									'value' => base64_encode(serialize(array('type' => $action_data['type'], 'orig' => $action_data['filename'], 'future' => $real_path, 'id' => $id))),
-									'not_mod' => true,
-								);
-							else
-								$context['theme_actions'][$id]['actions'][] = array(
-									'type' => $txt['package_extract'] . ' ' . ($action_data['type'] == 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
-									'action' => strtr($real_path, array('\\' => '/', BOARDDIR => '.')),
-									'description' => '',
-									'value' => base64_encode(serialize(array('type' => $action_data['type'], 'orig' => $action_data['destination'], 'future' => $real_path, 'id' => $id))),
-									'not_mod' => true,
-								);
-						}
-					}
-				}
-			}
-		}
-
-		// Trash the cache... which will also check permissions for us!
-		package_flush_cache(true);
-
-		if (file_exists(BOARDDIR . '/packages/temp'))
-			deltree(BOARDDIR . '/packages/temp');
-
-		if (!empty($chmod_files))
-		{
-			$ftp_status = create_chmod_control($chmod_files);
-			$context['ftp_needed'] = !empty($ftp_status['files']['notwritable']) && !empty($context['package_ftp']);
-		}
-
-		$context['post_url'] = $scripturl . '?action=admin;area=packages;sa=' . ($context['uninstalling'] ? 'uninstall' : 'install') . ($context['ftp_needed'] ? '' : '2') . ';package=' . $context['filename'] . ';pid=' . $context['install_id'];
+		$context['post_url'] = $scripturl . '?action=admin;area=packages;sa=' . $sub_action . ';package=' . $context['filename'] . ';pid=' . $context['install_id'];
 		checkSubmitOnce('register');
 	}
 
@@ -748,13 +203,15 @@ class Packages_Controller extends Action_Controller
 		checkSession();
 
 		// If there's no file, what are we installing?
-		if (!isset($_REQUEST['package']) || $_REQUEST['package'] == '')
+		if (!isset($_REQUEST['package']) || trim($_REQUEST['package']) == '')
 			redirectexit('action=admin;area=packages');
-		$context['filename'] = $_REQUEST['package'];
 
-		// If this is an uninstall, we'll have an id.
+		$context['filename'] = preg_replace('~[\.]+~', '.', $_REQUEST['package']);
+
+		// Do we have an existing id, for uninstalls and the like.
 		$context['install_id'] = isset($_REQUEST['pid']) ? (int) $_REQUEST['pid'] : 0;
 
+		// These will be needed
 		require_once(SUBSDIR . '/Package.subs.php');
 		require_once(SUBSDIR . '/Themes.subs.php');
 
@@ -769,338 +226,63 @@ class Packages_Controller extends Action_Controller
 		$context['page_title'] .= ' - ' . ($context['uninstalling'] ? $txt['uninstall'] : $txt['extracting']);
 		$context['sub_template'] = 'extract_package';
 
-		if (!file_exists(BOARDDIR . '/packages/' . $context['filename']))
-			fatal_lang_error('package_no_file', false);
-
-		// Load up the package FTP information?
-		create_chmod_control(array(), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=' . $_REQUEST['sa'] . ';package=' . $_REQUEST['package']));
-
-		// Make sure temp directory exists and is empty!
-		if (file_exists(BOARDDIR . '/packages/temp'))
-			deltree(BOARDDIR . '/packages/temp', false);
-		else
-			mktree(BOARDDIR . '/packages/temp', 0777);
-
-		// Let the unpacker do the work.
-		if (is_file(BOARDDIR . '/packages/' . $context['filename']))
+		try
 		{
-			$context['extracted_files'] = read_tgz_file(BOARDDIR . '/packages/' . $context['filename'], BOARDDIR . '/packages/temp');
+			$package = new Package($scripturl . '?action=admin;area=packages;sa=' . $_REQUEST['sa'] . ';package=' . $_REQUEST['package'], $context['filename'], $scripturl . '?action=admin;area=packages;sa=' . $context['sub_action'] . ';package=' . $context['filename']);
 
-			if (!file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
+			// Get the package info...
+			$packageInfo = $package->getPackageInfo($context['filename']);
+			if (!is_array($packageInfo))
+				fatal_lang_error($packageInfo);
+
+			// Are we installing this into any custom themes?
+			$custom_themes = array(1);
+			$known_themes = explode(',', $modSettings['knownThemes']);
+			if (!empty($_POST['custom_theme']))
 			{
-				foreach ($context['extracted_files'] as $file)
-				{
-					if (basename($file['filename']) == 'package-info.xml')
-					{
-						$context['base_path'] = dirname($file['filename']) . '/';
-						break;
-					}
-				}
+				foreach ($_POST['custom_theme'] as $tid)
+					if (in_array($tid, $known_themes))
+						$custom_themes[] = (int) $tid;
+			}
+			$package->setThemes($custom_themes, !empty($_POST['theme_changes']) ? $_POST['theme_changes'] : array());
+
+			$packageInfo['filename'] = $context['filename'];
+
+			// Set the type of extraction...
+			$context['extract_type'] = isset($packageInfo['type']) ? $packageInfo['type'] : 'modification';
+
+			// Create a backup file to roll back to! (but if they do this more than once, don't run it a zillion times.)
+			if (!empty($modSettings['package_make_full_backups']) && (!isset($_SESSION['last_backup_for']) || $_SESSION['last_backup_for'] != $context['filename'] . ($context['uninstalling'] ? '$$' : '$')))
+			{
+				$_SESSION['last_backup_for'] = $context['filename'] . ($context['uninstalling'] ? '$$' : '$');
+
+				// @todo Internationalize this?
+				package_create_backup(($context['uninstalling'] ? 'backup_' : 'before_') . strtok($context['filename'], '.'));
 			}
 
-			if (!isset($context['base_path']))
-				$context['base_path'] = '';
-		}
-		elseif (is_dir(BOARDDIR . '/packages/' . $context['filename']))
-		{
-			copytree(BOARDDIR . '/packages/' . $context['filename'], BOARDDIR . '/packages/temp');
-			$context['extracted_files'] = listtree(BOARDDIR . '/packages/temp');
-			$context['base_path'] = '';
-		}
-		else
-			fatal_lang_error('no_access', false);
+			// The mod isn't installed.... unless proven otherwise.
+			$context['is_installed'] = false;
 
-		// Are we installing this into any custom themes?
-		$custom_themes = array(1);
-		$known_themes = explode(',', $modSettings['knownThemes']);
-		if (!empty($_POST['custom_theme']))
-		{
-			foreach ($_POST['custom_theme'] as $tid)
-				if (in_array($tid, $known_themes))
-					$custom_themes[] = (int) $tid;
-		}
+			// See if it is installed?
+			$package_installed = $package->installedPackage($packageInfo, false);
 
-		// Now load up the paths of the themes that we need to know about.
-		$theme_paths = getThemesPathbyID($custom_themes);
-		$themes_installed = array(1);
+			$context['install_finished'] = false;
 
-		// Are there any theme copying that we want to take place?
-		$context['theme_copies'] = array(
-			'require-file' => array(),
-			'require-dir' => array(),
-		);
-
-		if (!empty($_POST['theme_changes']))
-		{
-			foreach ($_POST['theme_changes'] as $change)
+			// @todo Make a log of any errors that occurred and output them?
+			// @todo have a look at Package.class.php => // Gadzooks!  There's no uninstaller at all!?
+			if (!empty($actions))
 			{
-				if (empty($change))
-					continue;
-				$theme_data = unserialize(base64_decode($change));
-				if (empty($theme_data['type']))
-					continue;
+				$package->getAction(false);
 
-				$themes_installed[] = $theme_data['id'];
-				$context['theme_copies'][$theme_data['type']][$theme_data['orig']][] = $theme_data['future'];
-			}
-		}
-
-		// Get the package info...
-		$packageInfo = getPackageInfo($context['filename']);
-
-		if (!is_array($packageInfo))
-			fatal_lang_error($packageInfo);
-
-		$packageInfo['filename'] = $context['filename'];
-
-		// Set the type of extraction...
-		$context['extract_type'] = isset($packageInfo['type']) ? $packageInfo['type'] : 'modification';
-
-		// Create a backup file to roll back to! (but if they do this more than once, don't run it a zillion times.)
-		if (!empty($modSettings['package_make_full_backups']) && (!isset($_SESSION['last_backup_for']) || $_SESSION['last_backup_for'] != $context['filename'] . ($context['uninstalling'] ? '$$' : '$')))
-		{
-			$_SESSION['last_backup_for'] = $context['filename'] . ($context['uninstalling'] ? '$$' : '$');
-
-			// @todo Internationalize this?
-			package_create_backup(($context['uninstalling'] ? 'backup_' : 'before_') . strtok($context['filename'], '.'));
-		}
-
-		// The mod isn't installed.... unless proven otherwise.
-		$context['is_installed'] = false;
-
-		// Is it actually installed?
-		$package_installed = isPackageInstalled($packageInfo['id']);
-
-		// Wait, it's not installed yet!
-		// @todo Replace with a better error message!
-		if (!isset($package_installed['old_version']) && $context['uninstalling'])
-		{
-			deltree(BOARDDIR . '/packages/temp');
-			fatal_error('Hacker?', false);
-		}
-		// Uninstalling?
-		elseif ($context['uninstalling'])
-		{
-			$install_log = parsePackageInfo($packageInfo['xml'], false, 'uninstall');
-
-			// Gadzooks!  There's no uninstaller at all!?
-			if (empty($install_log))
-				fatal_lang_error('package_uninstall_cannot', false);
-
-			// They can only uninstall from what it was originally installed into.
-			foreach ($theme_paths as $id => $data)
-				if ($id != 1 && !in_array($id, $package_installed['old_themes']))
-					unset($theme_paths[$id]);
-		}
-		elseif (isset($package_installed['old_version']) && $package_installed['old_version'] != $packageInfo['version'])
-		{
-			// Look for an upgrade...
-			$install_log = parsePackageInfo($packageInfo['xml'], false, 'upgrade', $package_installed['old_version']);
-
-			// There was no upgrade....
-			if (empty($install_log))
-				$context['is_installed'] = true;
-			else
-			{
-				// Upgrade previous themes only!
-				foreach ($theme_paths as $id => $data)
-					if ($id != 1 && !in_array($id, $package_installed['old_themes']))
-						unset($theme_paths[$id]);
-			}
-		}
-		elseif (isset($package_installed['old_version']) && $package_installed['old_version'] == $packageInfo['version'])
-			$context['is_installed'] = true;
-
-		if (!isset($package_installed['old_version']) || $context['is_installed'])
-			$install_log = parsePackageInfo($packageInfo['xml'], false, 'install');
-
-		$context['install_finished'] = false;
-
-		// We're gonna be needing the table db functions! ...Sometimes.
-		$table_installer = db_table();
-
-		// @todo Make a log of any errors that occurred and output them?
-		if (!empty($install_log))
-		{
-			$failed_steps = array();
-			$failed_count = 0;
-
-			foreach ($install_log as $action)
-			{
-				$failed_count++;
-				if ($action['type'] == 'modification' && !empty($action['filename']))
-				{
-					if ($action['boardmod'])
-						$mod_actions = parseBoardMod(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), false, $action['reverse'], $theme_paths);
-					else
-						$mod_actions = parseModification(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), false, $action['reverse'], $theme_paths);
-
-					// Any errors worth noting?
-					foreach ($mod_actions as $key => $action)
-					{
-						if ($action['type'] == 'failure')
-							$failed_steps[] = array(
-								'file' => $action['filename'],
-								'large_step' => $failed_count,
-								'sub_step' => $key,
-								'theme' => 1,
-							);
-
-						// Gather the themes we installed into.
-						if (!empty($action['is_custom']))
-							$themes_installed[] = $action['is_custom'];
-					}
-				}
-				elseif ($action['type'] == 'code' && !empty($action['filename']))
-				{
-					// This is just here as reference for what is available.
-					global $txt, $modSettings, $context;
-
-					// Now include the file and be done with it ;).
-					if (file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']))
-						require(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']);
-				}
-				elseif ($action['type'] == 'credits')
-				{
-					// Time to build the billboard
-					$credits_tag = array(
-						'url' => $action['url'],
-						'license' => $action['license'],
-						'copyright' => $action['copyright'],
-						'title' => $action['title'],
-					);
-				}
-				elseif ($action['type'] == 'hook' && isset($action['hook'], $action['function']))
-				{
-					if ($action['reverse'])
-						remove_integration_function($action['hook'], $action['function'], $action['include_file']);
-					else
-						add_integration_function($action['hook'], $action['function'], $action['include_file']);
-				}
-				// Only do the database changes on uninstall if requested.
-				elseif ($action['type'] == 'database' && !empty($action['filename']) && (!$context['uninstalling'] || !empty($_POST['do_db_changes'])))
-				{
-					// These can also be there for database changes.
-					global $txt, $modSettings, $context;
-
-					// Let the file work its magic ;)
-					if (file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']))
-						require(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']);
-				}
-				// Handle a redirect...
-				elseif ($action['type'] == 'redirect' && !empty($action['redirect_url']))
-				{
-					$context['redirect_url'] = $action['redirect_url'];
-					$context['redirect_text'] = !empty($action['filename']) && file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']) ? file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']) : ($context['uninstalling'] ? $txt['package_uninstall_done'] : $txt['package_installed_done']);
-					$context['redirect_timeout'] = $action['redirect_timeout'];
-
-					// Parse out a couple of common urls.
-					$urls = array(
-						'$boardurl' => $boardurl,
-						'$scripturl' => $scripturl,
-						'$session_var' => $context['session_var'],
-						'$session_id' => $context['session_id'],
-					);
-
-					$context['redirect_url'] = strtr($context['redirect_url'], $urls);
-				}
+				$context['install_finished'] = true;
 			}
 
-			package_flush_cache();
-
-			// First, ensure this change doesn't get removed by putting a stake in the ground (So to speak).
-			package_put_contents(BOARDDIR . '/packages/installed.list', time());
-
-			// See if this is already installed
-			$is_upgrade = false;
-			$old_db_changes = array();
-			$package_check = isPackageInstalled($packageInfo['id']);
-
-			// Change the installed state as required.
-			if (!empty($package_check['install_state']))
-			{
-				if ($context['uninstalling'])
-					setPackageState($package_check['package_id']);
-				else
-				{
-					// not uninstalling so must be an upgrade
-					$is_upgrade = true;
-					$old_db_changes = empty($package_check['db_changes']) ? array() : $package_check['db_changes'];
-				}
-			}
-
-			// Assuming we're not uninstalling, add the entry.
-			if (!$context['uninstalling'])
-			{
-				// Any db changes from older version?
-				$table_log = $table_installer->package_log();
-				if (!empty($old_db_changes))
-					$db_package_log = empty($table_log) ? $old_db_changes : array_merge($old_db_changes, $table_log);
-				else
-					$db_package_log = $table_log;
-
-				// If there are some database changes we might want to remove then filter them out.
-				if (!empty($db_package_log))
-				{
-					// We're really just checking for entries which are create table AND add columns (etc).
-					$tables = array();
-					usort($db_package_log, array($this, '_sort_table_first'));
-					foreach ($db_package_log as $k => $log)
-					{
-						if ($log[0] == 'remove_table')
-							$tables[] = $log[1];
-						elseif (in_array($log[1], $tables))
-							unset($db_package_log[$k]);
-					}
-
-					$package_installed['db_changes'] = serialize($db_package_log);
-				}
-				else
-					$package_installed['db_changes'] = '';
-
-				// What themes did we actually install?
-				$themes_installed = array_unique($themes_installed);
-				$themes_installed = implode(',', $themes_installed);
-
-				// What failed steps?
-				$failed_step_insert = serialize($failed_steps);
-
-				// Credits tag?
-				$credits_tag = (empty($credits_tag)) ? '' : serialize($credits_tag);
-
-				// Add to the log packages
-				addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $package_installed['db_changes'], $is_upgrade, $credits_tag);
-			}
-
-			$context['install_finished'] = true;
+			$package->cleanup(false, array($packageInfo));
 		}
-
-		// If there's database changes - and they want them removed - let's do it last!
-		if (!empty($package_installed['db_changes']) && !empty($_POST['do_db_changes']))
+		catch (Elk_Exception $e)
 		{
-			foreach ($package_installed['db_changes'] as $change)
-			{
-				if ($change[0] == 'remove_table' && isset($change[1]))
-					$table_installer->db_drop_table($change[1]);
-				elseif ($change[0] == 'remove_column' && isset($change[2]))
-					$table_installer->db_remove_column($change[1], $change[2]);
-				elseif ($change[0] == 'remove_index' && isset($change[2]))
-					$table_installer->db_remove_index($change[1], $change[2]);
-			}
+			$e->fatalLangError();
 		}
-
-		// Clean house... get rid of the evidence ;).
-		if (file_exists(BOARDDIR . '/packages/temp'))
-			deltree(BOARDDIR . '/packages/temp');
-
-		// Log what we just did.
-		logAction($context['uninstalling'] ? 'uninstall_package' : (!empty($is_upgrade) ? 'upgrade_package' : 'install_package'), array('package' => Util::htmlspecialchars($packageInfo['name']), 'version' => Util::htmlspecialchars($packageInfo['version'])), 'admin');
-
-		// Just in case, let's clear the whole cache to avoid anything going up the swanny.
-		clean_cache();
-
-		// Restore file permissions?
-		create_chmod_control(array(), array(), true);
 	}
 
 	/**

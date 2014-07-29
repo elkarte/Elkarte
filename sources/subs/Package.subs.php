@@ -1,7 +1,8 @@
 <?php
 
 /**
- * This contains functions for handling tar.gz and .zip files
+ * This contains functions for handling "packages" (that includes compressed
+ * archives, ElkArte addons, language packs, themes, smiley packs, etc.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -31,27 +32,21 @@ if (!defined('ELK'))
  * @param bool $overwrite = false
  * @param string[]|null $files_to_extract = null
  * @return string|false
+ *
+ * @deprecated since 1.1
  */
 function read_tgz_file($gzfilename, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
-	// From a web site
-	if (substr($gzfilename, 0, 7) == 'http://' || substr($gzfilename, 0, 8) == 'https://')
+	$extractor = new Compressed_File($gzfilename, $destination, $single_file, $overwrite, $files_to_extract);
+
+	try
 	{
-		$data = fetch_web_data($gzfilename);
-
-		if ($data === false)
-			return false;
+		return $extractor->read();
 	}
-	// Or a file on the system
-	else
+	catch (Elk_Exception $e)
 	{
-		$data = @file_get_contents($gzfilename);
-
-		if ($data === false)
-			return false;
+		$e->fatalLangError();
 	}
-
-	return read_tgz_data($data, $destination, $single_file, $overwrite, $files_to_extract);
 }
 
 /**
@@ -80,185 +75,21 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
  * @param bool $overwrite = false,
  * @param string[]|null $files_to_extract = null
  * @return string|false
+ *
+ * @deprecated since 1.1
  */
 function read_tgz_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
-	// Make sure we have this loaded.
-	loadLanguage('Packages');
+	$extractor = new Compressed_File('', $destination, $single_file, $overwrite, $files_to_extract);
 
-	// This function sorta needs gzinflate!
-	if (!function_exists('gzinflate'))
-		fatal_lang_error('package_no_zlib', 'critical');
-
-	umask(0);
-	if (!$single_file && $destination !== null && !file_exists($destination))
-		mktree($destination, 0777);
-
-	// No signature?
-	if (strlen($data) < 10)
-		return false;
-
-	// Unpack the signature so we can see what we have
-	$header = unpack('H2a/H2b/Ct/Cf/Vmtime/Cxtra/Cos', substr($data, 0, 10));
-	$header['filename'] = '';
-	$header['comment'] = '';
-
-	// The IDentification number, gzip must be 1f8b
-	if (strtolower($header['a'] . $header['b']) != '1f8b')
+	try
 	{
-		// Okay, this is not a tar.gz, but maybe it's a zip file.
-		if (substr($data, 0, 2) === 'PK')
-			return read_zip_data($data, $destination, $single_file, $overwrite, $files_to_extract);
-		else
-			return false;
+		return $extractor->read_data($data);
 	}
-
-	// Compression method needs to be 8 = deflate!
-	if ($header['t'] != 8)
-		return false;
-
-	// Each bit of this byte represents a processing flag as follows
-	// 0 fTEXT, 1 fHCRC, 2 fEXTRA, 3 fNAME, 4 fCOMMENT, 5 fENCRYPT, 6-7 reserved
-	$flags = $header['f'];
-
-	// Start to read any data defined by the flags
-	$offset = 10;
-
-	// fEXTRA flag set we simply skip over its entry and the length of its data
-	if ($flags & 4)
+	catch (Elk_Exception $e)
 	{
-		$xlen = unpack('vxlen', substr($data, $offset, 2));
-		$offset += $xlen['xlen'] + 2;
+		$e->fatalLangError();
 	}
-
-	// Read the filename, its zero terminated
-	if ($flags & 8)
-	{
-		while ($data[$offset] != "\0")
-			$header['filename'] .= $data[$offset++];
-		$offset++;
-	}
-
-	// Read the comment, its also zero terminated
-	if ($flags & 16)
-	{
-		while ($data[$offset] != "\0")
-			$header['comment'] .= $data[$offset++];
-		$offset++;
-	}
-
-	// "Read" the header CRC
-	if ($flags & 2)
-		$offset += 2; // $crc16 = unpack('vcrc16', substr($data, $offset, 2));
-
-	// We have now arrived at the start of the compressed data,
-	// Its terminated with 4 bytes of CRC and 4 bytes of the original input size
-	$crc = unpack('Vcrc32/Visize', substr($data, strlen($data) - 8, 8));
-	$data = @gzinflate(substr($data, $offset, strlen($data) - 8 - $offset));
-
-	// crc32_compat and crc32 may not return the same results, so we accept either.
-	if ($data === false || ($crc['crc32'] != crc32_compat($data) && $crc['crc32'] != crc32($data)))
-		return false;
-
-	$octdec = array('mode', 'uid', 'gid', 'size', 'mtime', 'checksum', 'type');
-	$blocks = strlen($data) / 512 - 1;
-	$offset = 0;
-	$return = array();
-
-	// We have Un-gziped the data, now lets extract the tar files
-	while ($offset < $blocks)
-	{
-		$header = substr($data, $offset << 9, 512);
-		$current = unpack('a100filename/a8mode/a8uid/a8gid/a12size/a12mtime/a8checksum/a1type/a100linkname/a6magic/a2version/a32uname/a32gname/a8devmajor/a8devminor/a155path', $header);
-
-		// Clean the header fields, convert octal ones to decimal
-		foreach ($current as $k => $v)
-		{
-			if (in_array($k, $octdec))
-				$current[$k] = octdec(trim($v));
-			else
-				$current[$k] = trim($v);
-		}
-
-		// Blank record?  This is probably at the end of the file.
-		if (empty($current['filename']))
-		{
-			$offset += 512;
-			continue;
-		}
-
-		// If its a directory, lets make sure it ends in a /
-		if ($current['type'] == 5 && substr($current['filename'], -1) != '/')
-			$current['filename'] .= '/';
-
-		// Build the checksum for this file and make sure it matches
-		$checksum = 256;
-		for ($i = 0; $i < 148; $i++)
-			$checksum += ord($header[$i]);
-		for ($i = 156; $i < 512; $i++)
-			$checksum += ord($header[$i]);
-
-		if ($current['checksum'] != $checksum)
-			break;
-
-		$size = ceil($current['size'] / 512);
-		$current['data'] = substr($data, ++$offset << 9, $current['size']);
-		$offset += $size;
-
-		// Not a directory and doesn't exist already...
-		if (substr($current['filename'], -1, 1) != '/' && !file_exists($destination . '/' . $current['filename']))
-			$write_this = true;
-		// File exists... check if it is newer.
-		elseif (substr($current['filename'], -1, 1) != '/')
-			$write_this = $overwrite || filemtime($destination . '/' . $current['filename']) < $current['mtime'];
-		// Folder... create.
-		elseif ($destination !== null && !$single_file)
-		{
-			// Protect from accidental parent directory writing...
-			$current['filename'] = strtr($current['filename'], array('../' => '', '/..' => ''));
-
-			if (!file_exists($destination . '/' . $current['filename']))
-				mktree($destination . '/' . $current['filename'], 0777);
-			$write_this = false;
-		}
-		else
-			$write_this = false;
-
-		if ($write_this && $destination !== null)
-		{
-			if (strpos($current['filename'], '/') !== false && !$single_file)
-				mktree($destination . '/' . dirname($current['filename']), 0777);
-
-			// Is this the file we're looking for?
-			if ($single_file && ($destination == $current['filename'] || $destination == '*/' . basename($current['filename'])))
-				return $current['data'];
-			// If we're looking for another file, keep going.
-			elseif ($single_file)
-				continue;
-			// Looking for restricted files?
-			elseif ($files_to_extract !== null && !in_array($current['filename'], $files_to_extract))
-				continue;
-
-			package_put_contents($destination . '/' . $current['filename'], $current['data']);
-		}
-
-		if (substr($current['filename'], -1, 1) != '/')
-			$return[] = array(
-				'filename' => $current['filename'],
-				'md5' => md5($current['data']),
-				'preview' => substr($current['data'], 0, 100),
-				'size' => $current['size'],
-				'skipped' => false
-			);
-	}
-
-	if ($destination !== null && !$single_file)
-		package_flush_cache();
-
-	if ($single_file)
-		return false;
-	else
-		return $return;
 }
 
 /**
@@ -272,117 +103,21 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
  * @param bool $single_file
  * @param bool $overwrite
  * @param string[]|null $files_to_extract
+ *
+ * @deprecated since 1.1
  */
 function read_zip_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
-	umask(0);
-	if ($destination !== null && !file_exists($destination) && !$single_file)
-		mktree($destination, 0777);
+	$extractor = new Compressed_File('', $destination, $single_file, $overwrite, $files_to_extract);
 
-	// Look for the end of directory signature 0x06054b50
-	$data_ecr = explode("\x50\x4b\x05\x06", $data);
-	if (!isset($data_ecr[1]))
-		return false;
-
-	$return = array();
-
-	// Get all the basic zip file info since we are here
-	$zip_info = unpack('vdisknum/vdisks/vrecords/vfiles/Vsize/Voffset/vcomment_length', $data_ecr[1]);
-	$zip_info['comment'] = substr($data_ecr[1], 18, $zip_info['comment_length']);
-
-	// Cut file at the central directory file header signature -- 0x02014b50, use unpack if you want any of the data, we don't
-	$file_sections = explode("\x50\x4b\x01\x02", $data);
-
-	// Cut the result on each local file header -- 0x04034b50 so we have each file in the archive as an element.
-	$file_sections = explode("\x50\x4b\x03\x04", $file_sections[0]);
-	array_shift($file_sections);
-
-	// Sections and count from the signature must match or the zip file is bad
-	if (count($file_sections) != $zip_info['files'])
-		return false;
-
-	// Go though each file in the archive
-	foreach ($file_sections as $data)
+	try
 	{
-		// Get all the important file information.
-		$file_info = unpack('vversion/vgeneral_purpose/vcompress_method/vfile_time/vfile_date/Vcrc/Vcompressed_size/Vsize/vfilename_length/vextrafield_length', $data);
-		$file_info['filename'] = substr($data, 26, $file_info['filename_length']);
-		$file_info['dir'] = $destination . '/' . dirname($file_info['filename']);
-
-		// If bit 3 (0x08) of the general-purpose flag is set, then the CRC and file size were not available when the header was written
-		// In this case the CRC and size are instead appended in a 12-byte structure immediately after the compressed data
-		if ($file_info['general_purpose'] & 0x0008)
-		{
-			$unzipped2 = unpack('Vcrc/Vcompressed_size/Vsize', substr($$data, -12));
-			$file_info['crc'] = $unzipped2['crc'];
-			$file_info['compressed_size'] = $unzipped2['compressed_size'];
-			$file_info['size'] = $unzipped2['size'];
-			unset($unzipped2);
-		}
-
-		// If this is a file, and it doesn't exist.... happy days!
-		if (substr($file_info['filename'], -1) != '/' && !file_exists($destination . '/' . $file_info['filename']))
-			$write_this = true;
-		// If the file exists, we may not want to overwrite it.
-		elseif (substr($file_info['filename'], -1) != '/')
-			$write_this = $overwrite;
-		// This is a directory, so we're gonna want to create it. (probably...)
-		elseif ($destination !== null && !$single_file)
-		{
-			// Just a little accident prevention, don't mind me.
-			$file_info['filename'] = strtr($file_info['filename'], array('../' => '', '/..' => ''));
-
-			if (!file_exists($destination . '/' . $file_info['filename']))
-				mktree($destination . '/' . $file_info['filename'], 0777);
-			$write_this = false;
-		}
-		else
-			$write_this = false;
-
-		// Get the actual compressed data.
-		$file_info['data'] = substr($data, 26 + $file_info['filename_length'] + $file_info['extrafield_length']);
-
-		// Only inflate it if we need to ;)
-		if (!empty($file_info['compress_method']) || ($file_info['compressed_size'] != $file_info['size']))
-			$file_info['data'] = gzinflate($file_info['data']);
-
-		// Okay!  We can write this file, looks good from here...
-		if ($write_this && $destination !== null)
-		{
-			if ((strpos($file_info['filename'], '/') !== false && !$single_file) || (!$single_file && !is_dir($file_info['dir'])))
-				mktree($file_info['dir'], 0777);
-
-			// If we're looking for a specific file, and this is it... ka-bam, baby.
-			if ($single_file && ($destination == $file_info['filename'] || $destination == '*/' . basename($file_info['filename'])))
-				return $file_info['data'];
-			// Oh?  Another file.  Fine.  You don't like this file, do you?  I know how it is.  Yeah... just go away.  No, don't apologize.  I know this file's just not *good enough* for you.
-			elseif ($single_file)
-				continue;
-			// Don't really want this?
-			elseif ($files_to_extract !== null && !in_array($file_info['filename'], $files_to_extract))
-				continue;
-
-			package_put_contents($destination . '/' . $file_info['filename'], $file_info['data']);
-		}
-
-		// Not a directory, add it to our results
-		if (substr($file_info['filename'], -1, 1) != '/')
-			$return[] = array(
-				'filename' => $file_info['filename'],
-				'md5' => md5($file_info['data']),
-				'preview' => substr($file_info['data'], 0, 100),
-				'size' => $file_info['size'],
-				'skipped' => false
-			);
+		return $extractor->read_data($data);
 	}
-
-	if ($destination !== null && !$single_file)
-		package_flush_cache();
-
-	if ($single_file)
-		return false;
-	else
-		return $return;
+	catch (Elk_Exception $e)
+	{
+		$e->fatalLangError();
+	}
 }
 
 /**
@@ -495,7 +230,7 @@ function getPackageInfo($gzfilename)
 {
 	// Extract package-info.xml from downloaded file. (*/ is used because it could be in any directory.)
 	if (preg_match('~^https?://~i', $gzfilename) === 1)
-		$packageInfo = read_tgz_data(fetch_web_data($gzfilename, '', true), '*/package-info.xml', true);
+		$packageInfo = read_tgz_file($gzfilename, '*/package-info.xml', true);
 	else
 	{
 		// It must be in the package directory then
@@ -859,202 +594,6 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 	}
 
 	return $return_data;
-}
-
-/**
- * Use FTP functions to work with a package download/install
- *
- * @package Packages
- * @param string $destination_url
- * @param string[]|null $files = none
- * @param bool $return = false
- */
-function packageRequireFTP($destination_url, $files = null, $return = false)
-{
-	global $context, $modSettings, $package_ftp, $txt;
-
-	// Try to make them writable the manual way.
-	if ($files !== null)
-	{
-		foreach ($files as $k => $file)
-		{
-			// If this file doesn't exist, then we actually want to look at the directory, no?
-			if (!file_exists($file))
-				$file = dirname($file);
-
-			// This looks odd, but it's an attempt to work around PHP suExec.
-			if (!@is_writable($file))
-				@chmod($file, 0755);
-			if (!@is_writable($file))
-				@chmod($file, 0777);
-			if (!@is_writable(dirname($file)))
-				@chmod($file, 0755);
-			if (!@is_writable(dirname($file)))
-				@chmod($file, 0777);
-
-			$fp = is_dir($file) ? @opendir($file) : @fopen($file, 'rb');
-			if (@is_writable($file) && $fp)
-			{
-				unset($files[$k]);
-				if (!is_dir($file))
-					fclose($fp);
-				else
-					closedir($fp);
-			}
-		}
-
-		// No FTP required!
-		if (empty($files))
-			return array();
-	}
-
-	// They've opted to not use FTP, and try anyway.
-	if (isset($_SESSION['pack_ftp']) && $_SESSION['pack_ftp'] == false)
-	{
-		if ($files === null)
-			return array();
-
-		foreach ($files as $k => $file)
-		{
-			// This looks odd, but it's an attempt to work around PHP suExec.
-			if (!file_exists($file))
-			{
-				mktree(dirname($file), 0755);
-				@touch($file);
-				@chmod($file, 0755);
-			}
-
-			if (!@is_writable($file))
-				@chmod($file, 0777);
-			if (!@is_writable(dirname($file)))
-				@chmod(dirname($file), 0777);
-
-			if (@is_writable($file))
-				unset($files[$k]);
-		}
-
-		return $files;
-	}
-	elseif (isset($_SESSION['pack_ftp']))
-	{
-		$package_ftp = new Ftp_Connection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
-
-		if ($files === null)
-			return array();
-
-		foreach ($files as $k => $file)
-		{
-			$ftp_file = strtr($file, array($_SESSION['pack_ftp']['root'] => ''));
-
-			// This looks odd, but it's an attempt to work around PHP suExec.
-			if (!file_exists($file))
-			{
-				mktree(dirname($file), 0755);
-				$package_ftp->create_file($ftp_file);
-				$package_ftp->chmod($ftp_file, 0755);
-			}
-
-			// Still not writable, true full permissions
-			if (!@is_writable($file))
-				$package_ftp->chmod($ftp_file, 0777);
-
-			// Directory not writable, try to chmod to 777 then
-			if (!@is_writable(dirname($file)))
-				$package_ftp->chmod(dirname($ftp_file), 0777);
-
-			if (@is_writable($file))
-				unset($files[$k]);
-		}
-
-		return $files;
-	}
-
-	if (isset($_POST['ftp_none']))
-	{
-		$_SESSION['pack_ftp'] = false;
-
-		$files = packageRequireFTP($destination_url, $files, $return);
-		return $files;
-	}
-	elseif (isset($_POST['ftp_username']))
-	{
-		// Attempt to make a new FTP connection
-		$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
-
-		if ($ftp->error === false)
-		{
-			// Common mistake, so let's try to remedy it...
-			if (!$ftp->chdir($_POST['ftp_path']))
-			{
-				$ftp_error = $ftp->last_message;
-				$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $_POST['ftp_path']));
-			}
-		}
-	}
-
-	if (!isset($ftp) || $ftp->error !== false)
-	{
-		if (!isset($ftp))
-		{
-			$ftp = new Ftp_Connection(null);
-		}
-		elseif ($ftp->error !== false && !isset($ftp_error))
-			$ftp_error = $ftp->last_message === null ? '' : $ftp->last_message;
-
-		list ($username, $detect_path, $found_path) = $ftp->detect_path(BOARDDIR);
-
-		if ($found_path)
-			$_POST['ftp_path'] = $detect_path;
-		elseif (!isset($_POST['ftp_path']))
-			$_POST['ftp_path'] = isset($modSettings['package_path']) ? $modSettings['package_path'] : $detect_path;
-
-		if (!isset($_POST['ftp_username']))
-			$_POST['ftp_username'] = $username;
-
-		$context['package_ftp'] = array(
-			'server' => isset($_POST['ftp_server']) ? $_POST['ftp_server'] : (isset($modSettings['package_server']) ? $modSettings['package_server'] : 'localhost'),
-			'port' => isset($_POST['ftp_port']) ? $_POST['ftp_port'] : (isset($modSettings['package_port']) ? $modSettings['package_port'] : '21'),
-			'username' => isset($_POST['ftp_username']) ? $_POST['ftp_username'] : (isset($modSettings['package_username']) ? $modSettings['package_username'] : ''),
-			'path' => $_POST['ftp_path'],
-			'error' => empty($ftp_error) ? null : $ftp_error,
-			'destination' => $destination_url,
-		);
-
-		// If we're returning dump out here.
-		if ($return)
-			return $files;
-
-		$context['page_title'] = $txt['package_ftp_necessary'];
-		$context['sub_template'] = 'ftp_required';
-		obExit();
-	}
-	else
-	{
-		if (!in_array($_POST['ftp_path'], array('', '/')))
-		{
-			$ftp_root = strtr(BOARDDIR, array($_POST['ftp_path'] => ''));
-			if (substr($ftp_root, -1) == '/' && ($_POST['ftp_path'] == '' || $_POST['ftp_path'][0] == '/'))
-				$ftp_root = substr($ftp_root, 0, -1);
-		}
-		else
-			$ftp_root = BOARDDIR;
-
-		$_SESSION['pack_ftp'] = array(
-			'server' => $_POST['ftp_server'],
-			'port' => $_POST['ftp_port'],
-			'username' => $_POST['ftp_username'],
-			'password' => package_crypt($_POST['ftp_password']),
-			'path' => $_POST['ftp_path'],
-			'root' => $ftp_root,
-		);
-
-		if (!isset($modSettings['package_path']) || $modSettings['package_path'] != $_POST['ftp_path'])
-			updateSettings(array('package_path' => $_POST['ftp_path']));
-
-		$files = packageRequireFTP($destination_url, $files, $return);
-	}
-
-	return $files;
 }
 
 /**
@@ -3320,11 +2859,6 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 	}
 
 	return $data;
-}
-
-if (!function_exists('crc32_compat'))
-{
-	require_once(SUBSDIR . '/Compat.subs.php');
 }
 
 /**
