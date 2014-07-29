@@ -258,7 +258,7 @@ function template_body_above()
 	<div id="wrapper" class="wrapper">
 		<div id="upper_section"', empty($context['minmax_preferences']['upshrink']) ? '' : ' style="display: none;" aria-hidden="true"', '>';
 
-	call_template_callbacks('cw', $context['upper_content_callbacks']);
+	call_template_callbacks('uc', $context['upper_content_callbacks']);
 
 	echo '
 		</div>';
@@ -372,7 +372,7 @@ function template_th_search_bar()
 /**
  * The news fader wrapped in a div and with "news" text
  */
-function template_cw_news_fader()
+function template_uc_news_fader()
 {
 	global $settings, $context, $txt;
 
