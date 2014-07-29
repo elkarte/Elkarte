@@ -31,20 +31,21 @@ function template_lp_stats() {
 
 	if(empty($context['like_post_stats_error'])) {
 		echo '
-			<div id="adm_submenus" class="like_post_stats_menu">
-				<ul class="dropmenu">';
-			
-				// Print out all the items in this tab.
-				foreach ($context['lp_stats_tabs'] as $sa => $tab) {
-					echo '
-					<li>
-						<a class="firstlevel" href="" id="', $tab['id'],'"><span class="firstlevel">', $tab['label'], '</span></a>
-					</li>';
-				}
+		<ul class="like_post_stats_menu buttonlist" role="menubar">';
+
+		// Print out all the items in this tab.
+		foreach ($context['lp_stats_tabs'] as $sa => $tab) {
+			echo '
+			<li role="menuitem">
+				<a class="linklevel1 button_strip_markread" href="" id="', $tab['id'],'">
+					', $tab['label'], '
+				</a>
+			</li>';
+		}
 
 		echo '
-				</ul>
-			</div><br class="clear" />';
+		</ul>
+		<br class="clear" />';
 	}
 
 	if(empty($context['like_post_stats_error'])) {

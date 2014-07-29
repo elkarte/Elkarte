@@ -4663,3 +4663,231 @@ dl.no_members {
 		display: none;
 	}
 }
+
+
+
+
+
+
+
+.like_post_stats {
+	position: relative;
+	overflow: visible;
+	width: 100%;
+}
+
+.like_post_stats_data {
+	width: 100%;
+	position: relative;
+	overflow: hidden;
+}
+
+.like_post_stats_data .individual_data {
+	display: none;
+}
+
+#like_post_stats_overlay {
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(255, 255, 255, 0.5);
+	z-index: 100;
+}
+
+#lp_preloader {
+	display: none;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin-top: -50px;
+	margin-left: -50px;
+	width: 100px;
+	height: 100px;
+	z-index: 101;
+	background-image: url(../images/preloader.gif);
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: 100% auto;
+}
+
+.like_post_stats_error {
+	width: 94%;
+	position: relative;
+	overflow: hidden;
+	float: left;
+	color: #000;
+	background-color: #e7eaef;
+	padding: 10px 20px;
+	font-size: 14px;
+}
+
+.like_post_message_data, .like_post_topic_data, .like_post_board_data, .like_post_most_liked_user_data, .like_post_most_likes_given_user_data {
+	width: 94%;
+	position: relative;
+	overflow: hidden;
+	float: left;
+	color: #000;
+	background-color: #e7eaef;
+	padding: 20px 3%;
+}
+
+.like_post_message_data .message_title, .like_post_topic_data .topic_title, .like_post_board_data .board_title {
+	float: left;
+	position: relative;
+	overflow: hidden;
+	width: 100%;
+	font-size: 15px;
+	line-height: normal;
+}
+
+/*Specific to message data tile*/
+.like_post_message_data .poster_avatar, .like_post_most_liked_user_data .poster_avatar, .like_post_most_likes_given_user_data .poster_avatar {
+	float: left;
+	width: 100px;
+	height: 100px;
+	border: 5px solid #fff;
+	border-radius: 10px;
+	box-shadow: 0px 0px 10px 1px #777;
+	margin: 20px 0;
+}
+
+.like_post_message_data .poster_avatar .avatar, .like_post_most_liked_user_data .poster_avatar .avatar, .like_post_most_likes_given_user_data .poster_avatar .avatar {
+	width: 100px;
+	height: 100px;
+	border-radius: 5px;
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+	background-position: center center;
+}
+
+.like_post_message_data .poster_data, .like_post_most_liked_user_data .poster_data, .like_post_most_likes_given_user_data .poster_data {
+	float: left;
+	position: relative;
+	overflow: hidden;
+	margin: 20px 0;
+}
+
+.like_post_message_data .poster_data .poster_details, .like_post_most_liked_user_data .poster_data .poster_details, .like_post_most_likes_given_user_data .poster_data .poster_details {
+	margin: 0 0 5px 20px;
+	float: left;
+	position: relative;
+	width: 100%;
+}
+
+.like_post_message_data .poster_data a.poster_details, .like_post_most_liked_user_data .poster_data a.poster_details, .like_post_most_likes_given_user_data .poster_data a.poster_details {
+	margin: 10px 0 10px 20px;
+}
+
+.like_post_message_data .users_liked {
+	clear: both;
+	position: relative;
+	width: 100%;
+	overflow: hidden;
+}
+
+.like_post_message_data .users_liked .poster_details {
+	text-decoration: none;
+	float: left;
+	position: relative;
+	margin: 0 10px 15px;
+}
+
+.like_post_message_data .users_liked .title {
+	font-size: 15px;
+}
+
+.like_post_message_data .users_liked .poster_details .poster_avatar {
+	width: 50px;
+	height: 50px;
+	border: 3px solid #fff;
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+	background-position: center center;
+	border-radius: 5px;
+	margin: 0;
+}
+
+/*specific to topic data tile*/
+.like_post_topic_data .topic_info {
+	margin: 7px 0 15px;
+	float: left;
+	position: relative;
+	width: 100%;
+	overflow: hidden;
+}
+
+.like_post_topic_data .message_body, .like_post_board_data .message_body, .like_post_most_liked_user_data .message_body, .like_post_most_likes_given_user_data .message_body {
+	width: 100%;
+	background: #FFF;
+	float: left;
+	padding: 30px 10px 5px;
+	margin: 0 0 10px;
+	border: 1px solid #C4C4C4;
+	position: relative;
+}
+
+.like_post_topic_data .message_body .poster_details, .like_post_board_data .message_body .poster_details {
+	text-decoration: none;
+	float: left;
+	position: relative;
+	margin: 5px 10px 15px 0;
+	border: 5px solid #FFF;
+	border-radius: 5px;
+	box-shadow: 0px 0px 4px 2px #C4C4C4;
+}
+
+.like_post_topic_data .message_body .poster_details .poster_avatar, .like_post_board_data .message_body .poster_details .poster_avatar {
+	width: 50px;
+	height: 50px;
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+	background-position: center center;
+	border-radius: 5px;
+	margin: 0;
+}
+
+.like_post_topic_data .message_body .posted_at, .like_post_board_data .message_body .posted_at, .like_post_most_liked_user_data .posted_at, .like_post_most_likes_given_user_data .posted_at {
+	position: absolute;
+	top: 0;
+	left: 0;
+	padding: 3px;
+	border: 1px solid #C4C4C4;
+	border-top: none;
+	border-left: none;
+	background: #C4C4C4;
+	box-shadow: 0px 0px 2px 1px #8D9EC0;
+}
+
+.content_encapsulate {
+	margin: 0 0 10px;
+}
+
+.like_post_topic_data .message_body .read_more, .like_post_board_data .message_body .read_more, .like_post_most_liked_user_data .read_more, .like_post_most_likes_given_user_data .read_more {
+	background: #E0E0E0;
+	padding: 0 3px;
+	margin: 5px 0 0 10px;
+	position: absolute;
+	bottom: 10px;
+	right: 10px;
+}
+
+/*specific to board stats tab*/
+ .like_post_board_data .board_info {
+	margin: 15px 0 0;
+	float: left;
+	position: relative;
+	width: 100%;
+	overflow: hidden;
+}
+
+.like_post_most_liked_user_data .generic_text, .like_post_most_likes_given_user_data .generic_text {
+	margin: 20px 0 30px;
+	float: left;
+	position: relative;
+	width: 100%;
+	font-size: 20px;
+	line-height: normal;
+}

@@ -249,21 +249,25 @@
 
 				// Make the ajax call to the likes system
 				$.ajax({
-					url: elk_scripturl + '?action=likes;sa=likestats;area='+ params.url +';xml;api=json;',
+					url: elk_scripturl + '?action=likes;sa=likestats;area=' + params.url + ';xml;api=json;',
 					type: 'POST',
 					dataType: 'json',
 					cache: false
 				}).done(function(resp) {
-					// json response from the server says success?
-					if (resp.result === true) {
-						console.log('done');
-						console.log(JSON.stringify(resp));
-					}
-					// Some failure trying to process the request
-					else {
-						console.log('Some failure trying to process the request');
-						console.log(JSON.stringify(resp));
-						// handleError(resp);
+
+					if (typeof(resp.error) !== 'undefined' && resp.error !== '') {
+						genericErrorMessage({
+							errorMsg: resp.error
+						});
+					} else if (typeof(resp.data) !== 'undefined' && typeof(resp.data.noDataMessage) !== 'undefined' && resp.data.noDataMessage !== '') {
+						genericErrorMessage({
+							errorMsg: resp.data.noDataMessage
+						});
+					} else if (resp.result === true) {
+						tabsVisitedCurrentSession[currentUrlFrag] = resp.data;
+						params.uiFunc();
+					} else {
+						genericErrorMessage(resp);
 					}
 				}).fail(function(err, textStatus, errorThrown) {
 					// Some failure sending the request, this generally means some html in
@@ -278,7 +282,7 @@
 			showMessageStats = function() {
 				var data = tabsVisitedCurrentSession[currentUrlFrag],
 					htmlContent = '',
-					messageUrl = smf_scripturl + '?topic=' + data.id_topic + '.msg' + data.id_msg;
+					messageUrl = elk_scripturl + '?topic=' + data.id_topic + '.msg' + data.id_msg;
 
 				$('.like_post_message_data').html('');
 				htmlContent += '<a class="message_title" href="' + messageUrl + '">' + txtStrings.topic + ': ' + data.subject + '</a>' + '<span class="display_none">' + data.body + '</span>';
@@ -319,7 +323,7 @@
 			showTopicStats = function() {
 				var data = tabsVisitedCurrentSession[currentUrlFrag],
 					htmlContent = '',
-					topicUrl = smf_scripturl + '?topic=' + data.id_topic;
+					topicUrl = elk_scripturl + '?topic=' + data.id_topic;
 
 				$('.like_post_topic_data').html('');
 				htmlContent += '<a class="topic_title" href="' + topicUrl + '">' + txtStrings.mostPopularTopicHeading1 + ' ' + data.like_count + ' ' + txtStrings.genricHeading1 + '</a>';
@@ -338,7 +342,7 @@
 			showBoardStats = function(response) {
 				var data = tabsVisitedCurrentSession[currentUrlFrag],
 					htmlContent = '',
-					boardUrl = smf_scripturl + '?board=' + data.id_board;
+					boardUrl = elk_scripturl + '?board=' + data.id_board;
 
 				$('.like_post_board_data').html('');
 				htmlContent += '<a class="board_title" href="' + boardUrl + '">' + data.name + ' ' + txtStrings.mostPopularBoardHeading1 + ' ' + data.like_count + ' ' + txtStrings.genricHeading1 + '</a>';
@@ -346,7 +350,7 @@
 				htmlContent += '<p class="board_info" style="margin: 5px 0 20px;">' + txtStrings.mostPopularBoardSubHeading4 + ' ' + data.num_posts + ' ' + txtStrings.mostPopularBoardSubHeading5 + ' ' + data.msgs_liked + ' ' + txtStrings.mostPopularBoardSubHeading6 + '</p>';
 
 				for (var i = 0, len = data.topic_data.length; i < len; i++) {
-					var topicUrl = smf_scripturl + '?topic=' + data.topic_data[i].id_topic;
+					var topicUrl = elk_scripturl + '?topic=' + data.topic_data[i].id_topic;
 
 					htmlContent += '<div class="message_body">' + '<div class="posted_at">' + data.topic_data[i].member.name + ' : ' + txtStrings.postedAt + ' ' + data.topic_data[i].poster_time + '</div> ' + '<a class="poster_details" href="' + data.topic_data[i].member.href + '"><div class="poster_avatar" style="background-image: url(' + encodeURI(data.topic_data[i].member.avatar) + ')"></div></a><div class="content_encapsulate">' + data.topic_data[i].body + '</div><a class="read_more" href="' + topicUrl + '">' + txtStrings.readMore + '</a></div>';
 				}
@@ -364,7 +368,7 @@
 
 				htmlContent += '<p class="generic_text">' + txtStrings.mostPopularUserHeading1 + '</p>';
 				for (var i = 0, len = data.topic_data.length; i < len; i++) {
-					var msgUrl = smf_scripturl + '?topic=' + data.topic_data[i].id_topic + '.msg' + data.topic_data[i].id_msg;
+					var msgUrl = elk_scripturl + '?topic=' + data.topic_data[i].id_topic + '.msg' + data.topic_data[i].id_msg;
 
 					htmlContent += '<div class="message_body">' + '<div class="posted_at">' + txtStrings.postedAt + ' ' + data.topic_data[i].poster_time + ': ' + txtStrings.likesReceived + ' (' + data.topic_data[i].like_count + ')</div><div class="content_encapsulate">' + data.topic_data[i].body + '</div><a class="read_more" href="' + msgUrl + '">' + txtStrings.readMore + '</a></div>';
 				}
@@ -382,7 +386,7 @@
 
 				htmlContent += '<p class="generic_text">' + txtStrings.mostLikeGivenUserHeading1 + '</p>';
 				for (var i = 0, len = data.topic_data.length; i < len; i++) {
-					var msgUrl = smf_scripturl + '?topic=' + data.topic_data[i].id_topic + '.msg' + data.topic_data[i].id_msg;
+					var msgUrl = elk_scripturl + '?topic=' + data.topic_data[i].id_topic + '.msg' + data.topic_data[i].id_msg;
 
 					htmlContent += '<div class="message_body">' + '<div class="posted_at">' + txtStrings.postedAt + ' ' + data.topic_data[i].poster_time + '</div><div class="content_encapsulate">' + data.topic_data[i].body + '</div><a class="read_more" href="' + msgUrl + '">' + txtStrings.readMore + '</a></div>';
 				}
