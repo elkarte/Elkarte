@@ -1897,6 +1897,7 @@ img.new_posts {
 	min-width: 14em;
 	box-sizing: border-box;
 	padding: 0 16px 0 16px;
+	line-height: 1.429em;
 }
 .topic_lastpost .img_last_post {
 	float: right;
@@ -2311,6 +2312,7 @@ div.core_posts {
 }
 .attachments {
 	margin: 20px 0 0 0;
+	clear: both;
 }
 .attachments .attachment {
 	padding: 6px 8px;
