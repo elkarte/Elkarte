@@ -214,95 +214,12 @@ function template_body_above()
 	<div id="top_section">
 		<div class="wrapper">';
 
-	// If the user is logged in, display the time, or a maintenance warning for admins.
-	// @todo - TBH I always intended the time/date to be more or less a place holder for more important things.
-	// The maintenance mode warning for admins is an obvious one, but this could also be used for moderation notifications.
-	// I also assumed this would be an obvious place for sites to put a string of icons to link to their FB, Twitter, etc.
-	// This could still be done via conditional, so that administration and moderation notices were still active when applicable.
 
-	// Show log in form to guests.
-	if (!empty($context['show_login_bar']))
+	foreach ($context['theme_header_callbacks'] as $callback)
 	{
-		echo '
-			<div id="top_section_notice" class="user">
-				<form action="', $scripturl, '?action=login2;quicklogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', '>
-					<div id="password_login">
-						<input type="text" name="user" size="10" class="input_text" placeholder="', $txt['username'], '" />
-						<input type="password" name="passwrd" size="10" class="input_password" placeholder="', $txt['password'], '" />
-						<select name="cookielength">
-							<option value="60">', $txt['one_hour'], '</option>
-							<option value="1440">', $txt['one_day'], '</option>
-							<option value="10080">', $txt['one_week'], '</option>
-							<option value="43200">', $txt['one_month'], '</option>
-							<option value="-1" selected="selected">', $txt['forever'], '</option>
-						</select>
-						<input type="submit" value="', $txt['login'], '" class="button_submit" />
-					</div>
-					<input type="hidden" name="hash_passwrd" value="" />
-					<input type="hidden" name="old_hash_passwrd" value="" />
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />';
-
-		if (!empty($modSettings['enableOpenID']))
-			echo '
-					<a class="button_submit top_button" href="', $scripturl, '?action=login;openid"><img src="' . $settings['images_url'] . '/openid.png" title="' . $txt['openid'] . '" alt="' . $txt['openid'] . '" /></a>';
-		echo '
-				</form>
-			</div>';
-	}
-
-	if ($context['allow_search'])
-	{
-		echo '
-			<form id="search_form" action="', $scripturl, '?action=search;sa=results" method="post" accept-charset="UTF-8">
-				<label for="quicksearch">
-					<input type="text" name="search" id="quicksearch" value="" class="input_text" placeholder="', $txt['search'], '" />
-				</label>';
-
-		// Using the quick search dropdown?
-		if (!empty($modSettings['search_dropdown']))
-		{
-			$selected = !empty($context['current_topic']) ? 'current_topic' : (!empty($context['current_board']) ? 'current_board' : 'all');
-
-			echo '
-				<label for="search_selection">
-				<select name="search_selection" id="search_selection">
-					<option value="all"', ($selected == 'all' ? ' selected="selected"' : ''), '>', $txt['search_entireforum'], ' </option>';
-
-			// Can't limit it to a specific topic if we are not in one
-			if (!empty($context['current_topic']))
-				echo '
-					<option value="topic"', ($selected == 'current_topic' ? ' selected="selected"' : ''), '>', $txt['search_thistopic'], '</option>';
-
-			// Can't limit it to a specific board if we are not in one
-			if (!empty($context['current_board']))
-				echo '
-					<option value="board"', ($selected == 'current_board' ? ' selected="selected"' : ''), '>', $txt['search_thisbrd'], '</option>';
-
-			if (!empty($context['additional_dropdown_search']))
-				foreach ($context['additional_dropdown_search'] as $name => $engine)
-					echo '
-					<option value="', $name, '">', $engine['name'], '</option>';
-
-			echo '
-					<option value="members"', ($selected == 'members' ? ' selected="selected"' : ''), '>', $txt['search_members'], ' </option>
-				</select>
-				</label>';
-		}
-
-		// Search within current topic?
-		if (!empty($context['current_topic']))
-			echo '
-				<input type="hidden" name="', (!empty($modSettings['search_dropdown']) ? 'sd_topic' : 'topic'), '" value="', $context['current_topic'], '" />';
-		// If we're on a certain board, limit it to this board ;).
-		elseif (!empty($context['current_board']))
-			echo '
-				<input type="hidden" name="', (!empty($modSettings['search_dropdown']) ? 'sd_brd[' : 'brd['), $context['current_board'], ']"', ' value="', $context['current_board'], '" />';
-
-		echo '
-				<input type="submit" name="search;sa=results" value="', $txt['search'], '" class="button_submit', (!empty($modSettings['search_dropdown'])) ? ' with_select' : '', '" />
-				<input type="hidden" name="advanced" value="0" />
-			</form>';
+		$func = 'template_th_' . $callback;
+		if (function_exists($func))
+			$func();
 	}
 
 	echo '
@@ -350,6 +267,101 @@ function template_body_above()
 	// The main content should go here. @todo - Skip nav link.
 	echo '
 		<div id="main_content_section"><a id="skipnav"></a>';
+}
+
+/**
+ If the user is logged in, display the time, or a maintenance warning for admins.
+ @todo - TBH I always intended the time/date to be more or less a place holder for more important things.
+ The maintenance mode warning for admins is an obvious one, but this could also be used for moderation notifications.
+ I also assumed this would be an obvious place for sites to put a string of icons to link to their FB, Twitter, etc.
+ This could still be done via conditional, so that administration and moderation notices were still active when applicable.
+ */
+function template_th_login_bar()
+{
+	global $context, $modSettings, $txt, $scripturl;
+
+		echo '
+			<div id="top_section_notice" class="user">
+				<form action="', $scripturl, '?action=login2;quicklogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', '>
+					<div id="password_login">
+						<input type="text" name="user" size="10" class="input_text" placeholder="', $txt['username'], '" />
+						<input type="password" name="passwrd" size="10" class="input_password" placeholder="', $txt['password'], '" />
+						<select name="cookielength">
+							<option value="60">', $txt['one_hour'], '</option>
+							<option value="1440">', $txt['one_day'], '</option>
+							<option value="10080">', $txt['one_week'], '</option>
+							<option value="43200">', $txt['one_month'], '</option>
+							<option value="-1" selected="selected">', $txt['forever'], '</option>
+						</select>
+						<input type="submit" value="', $txt['login'], '" class="button_submit" />
+					</div>
+					<input type="hidden" name="hash_passwrd" value="" />
+					<input type="hidden" name="old_hash_passwrd" value="" />
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />';
+
+		if (!empty($modSettings['enableOpenID']))
+			echo '
+					<a class="button_submit top_button" href="', $scripturl, '?action=login;openid"><img src="' . $settings['images_url'] . '/openid.png" title="' . $txt['openid'] . '" alt="' . $txt['openid'] . '" /></a>';
+		echo '
+				</form>
+			</div>';
+}
+
+function template_th_search_bar()
+{
+	global $context, $modSettings, $txt, $scripturl;
+
+	echo '
+			<form id="search_form" action="', $scripturl, '?action=search;sa=results" method="post" accept-charset="UTF-8">
+				<label for="quicksearch">
+					<input type="text" name="search" id="quicksearch" value="" class="input_text" placeholder="', $txt['search'], '" />
+				</label>';
+
+	// Using the quick search dropdown?
+	if (!empty($modSettings['search_dropdown']))
+	{
+		$selected = !empty($context['current_topic']) ? 'current_topic' : (!empty($context['current_board']) ? 'current_board' : 'all');
+
+		echo '
+				<label for="search_selection">
+				<select name="search_selection" id="search_selection">
+					<option value="all"', ($selected == 'all' ? ' selected="selected"' : ''), '>', $txt['search_entireforum'], ' </option>';
+
+		// Can't limit it to a specific topic if we are not in one
+		if (!empty($context['current_topic']))
+			echo '
+					<option value="topic"', ($selected == 'current_topic' ? ' selected="selected"' : ''), '>', $txt['search_thistopic'], '</option>';
+
+		// Can't limit it to a specific board if we are not in one
+		if (!empty($context['current_board']))
+			echo '
+					<option value="board"', ($selected == 'current_board' ? ' selected="selected"' : ''), '>', $txt['search_thisbrd'], '</option>';
+
+		if (!empty($context['additional_dropdown_search']))
+			foreach ($context['additional_dropdown_search'] as $name => $engine)
+				echo '
+					<option value="', $name, '">', $engine['name'], '</option>';
+
+		echo '
+					<option value="members"', ($selected == 'members' ? ' selected="selected"' : ''), '>', $txt['search_members'], ' </option>
+				</select>
+				</label>';
+	}
+
+	// Search within current topic?
+	if (!empty($context['current_topic']))
+		echo '
+				<input type="hidden" name="', (!empty($modSettings['search_dropdown']) ? 'sd_topic' : 'topic'), '" value="', $context['current_topic'], '" />';
+	// If we're on a certain board, limit it to this board ;).
+	elseif (!empty($context['current_board']))
+		echo '
+				<input type="hidden" name="', (!empty($modSettings['search_dropdown']) ? 'sd_brd[' : 'brd['), $context['current_board'], ']"', ' value="', $context['current_board'], '" />';
+
+	echo '
+				<input type="submit" name="search;sa=results" value="', $txt['search'], '" class="button_submit', (!empty($modSettings['search_dropdown'])) ? ' with_select' : '', '" />
+				<input type="hidden" name="advanced" value="0" />
+			</form>';
 }
 
 /**
