@@ -231,6 +231,9 @@ class Recent_Controller extends Action_Controller
 			)
 		);
 
+		// Provide an easy way for integration to interact with the recent display items
+		call_integration_hook('integrate_recent_message_list', array($messages, &$permissions));
+
 		// Now go through all the permissions, looking for boards they can do it on.
 		foreach ($permissions as $type => $list)
 		{
