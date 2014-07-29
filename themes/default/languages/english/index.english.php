@@ -342,6 +342,7 @@ $txt['logged'] = 'Logged';
 $txt['ip'] = 'IP';
 
 $txt['www'] = 'WWW';
+$txt['link'] = 'Link';
 
 $txt['by'] = 'by'; //Deprecated
 
