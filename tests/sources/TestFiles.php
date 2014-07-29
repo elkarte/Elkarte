@@ -1,7 +1,6 @@
 <?php
 
 require_once(TESTDIR . 'simpletest/autorun.php');
-require_once(TESTDIR . '../SSI.php');
 
 /**
  * TestCase class for file integrity
@@ -30,14 +29,14 @@ class TestFiles extends UnitTestCase
 	function testSyntaxErrors()
 	{
 		$dirs = array(
-			'board' => BOARDDIR . '/*.php',
-			'source' => SOURCEDIR . '/*.php',
-			'controllers' => CONTROLLERDIR . '/*.php',
-			'subs' => SUBSDIR . '/*.php',
-			'admin' => ADMINDIR . '/*.php',
-			'ext' => EXTDIR . '/*.php',
-			'language' => LANGUAGEDIR . '/english/*.php',
-			'defaulttheme' => BOARDDIR . '/themes/default/*.php',
+			'board' => TESTDIR . '/../*.php',
+			'source' => TESTDIR . '/../sources/*.php',
+			'controllers' => TESTDIR . '/../sources/controllers/*.php',
+			'subs' => TESTDIR . '/../sources/subs/*.php',
+			'admin' => TESTDIR . '/../sources/admin/*.php',
+			'ext' => TESTDIR . '/../sources/ext/*.php',
+			'language' => TESTDIR . '/../themes/default/languages/english/*.php',
+			'defaulttheme' => TESTDIR . '/../themes/default/*.php',
 		);
 
 		foreach ($dirs as $dir)
