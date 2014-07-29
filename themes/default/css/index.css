@@ -4676,6 +4676,12 @@ dl.no_members {
 	width: 100%;
 }
 
+.like_post_stats_menu {
+	margin: 10px 0 15px;
+	overflow: hidden;
+	position: relative;
+}
+
 .like_post_stats_data {
 	width: 100%;
 	position: relative;
@@ -4730,8 +4736,7 @@ dl.no_members {
 	overflow: hidden;
 	float: left;
 	color: #000;
-	background-color: #e7eaef;
-	padding: 20px 3%;
+	padding: 10px 2%;
 }
 
 .like_post_message_data .message_title, .like_post_topic_data .topic_title, .like_post_board_data .board_title {
@@ -4797,6 +4802,7 @@ dl.no_members {
 
 .like_post_message_data .users_liked .title {
 	font-size: 15px;
+	margin: 15px 0 15px 15px;
 }
 
 .like_post_message_data .users_liked .poster_details .poster_avatar {

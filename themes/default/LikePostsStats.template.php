@@ -22,12 +22,16 @@ function template_lp_stats() {
 
 	echo '
 	<div class="like_post_stats">
-		<div class="cat_bar">
-			<h3 class="catbg">
-				<span class="ie6_header floatleft">', $txt['like_post_stats'] ,'</span>
+
+		<div class="category_header">
+			<h3 class="floatleft">
+			', $txt['like_post_stats'] ,'
 			</h3>
 		</div>
-		<p class="windowbg description">', $context['like_posts']['tab_desc'] ,'</p>';
+
+		<p class="description">
+			', $context['like_posts']['tab_desc'] ,'
+		</p>';
 
 	if(empty($context['like_post_stats_error'])) {
 		echo '
@@ -44,25 +48,25 @@ function template_lp_stats() {
 		}
 
 		echo '
-		</ul>
-		<br class="clear" />';
+		</ul>';
 	}
 
 	if(empty($context['like_post_stats_error'])) {
 		echo '
-			<div class="cat_bar">
-				<h3 class="catbg" id="like_post_current_tab"></h3>
-			</div>';
-
-		echo '
-			<div class="like_post_stats_data">
-				<div class="individual_data like_post_message_data"></div>
-				<div class="individual_data like_post_topic_data"></div>
-				<div class="individual_data like_post_board_data"></div>
-				<div class="individual_data like_post_most_liked_user_data"></div>
-				<div class="individual_data like_post_most_likes_given_user_data"></div>
-				<div class="individual_data like_post_stats_error"></div>
-			</div>';
+		<div class="forum_category">
+			<h2 class="category_header" id="like_post_current_tab">
+			</h2>
+			<div class="board_row">
+				<div class="like_post_stats_data">
+					<div class="individual_data like_post_message_data"></div>
+					<div class="individual_data like_post_topic_data"></div>
+					<div class="individual_data like_post_board_data"></div>
+					<div class="individual_data like_post_most_liked_user_data"></div>
+					<div class="individual_data like_post_most_likes_given_user_data"></div>
+					<div class="individual_data like_post_stats_error"></div>
+				</div>
+			</div>
+		</div>';
 
 		echo '
 			<div id="like_post_stats_overlay"></div>
