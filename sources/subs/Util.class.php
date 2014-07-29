@@ -91,6 +91,7 @@ class Util
 
 		$haystack_check = empty($modSettings['disableEntityCheck']) ? preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $haystack) : $haystack;
 		$haystack_arr = preg_split('~(&#' . (empty($modSettings['disableEntityCheck']) ? '\d{1,7}' : '021') . ';|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u', $haystack_check, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+		$count = 0;
 
 		// From the right side, like mb_strrpos instead
 		if ($right)
@@ -220,10 +221,11 @@ class Util
 	 * - returns the shortened string.
 	 * - does not account for html tags, ie <b>test</b> is 11 characters not 4
 	 *
-	 * @param string $text
+	 * @param string $string
 	 * @param int $length
 	 * @param bool $cutword try to cut at a word boundary
-	 * @param |bool $ellipsis characters to add at the end of a cut string
+	 * @param string $ellipsis characters to add at the end of a cut string
+	 * @param bool $exact set true to include ellipsis in the allowed lenght, false will append instead
 	 * @param int $buffer maximum length underflow to allow when cutting on a word boundary
 	 */
 	public static function shorten_text($string, $length = 384, $cutword = false, $ellipsis = '...', $exact = true, $buffer = 12)
@@ -258,10 +260,10 @@ class Util
 	 *
 	 * This function is an adaption of the cake php function truncate in utility string.php (MIT)
 	 *
-	 * @param string $text String to truncate.
-	 * @param integer $length Length of returned string
-	 * @param string|bool $ellipsis characters to add at the end of cut string, like ...
-	 * @param boolean $exact If to account for $ellipsis length in returned $length
+	 * @param string $string text to truncate.
+	 * @param integer $length length of returned string
+	 * @param string $ellipsis characters to add at the end of cut string, like ...
+	 * @param boolean $exact If to account for the $ellipsis length in returned string length
 	 *
 	 * @return string Trimmed string.
 	 */
@@ -326,11 +328,12 @@ class Util
 
 		// Our truncated string up to the last space
 		$space_pos = Util::strpos($truncate, ' ', 0, true);
+		$space_pos = empty($space_pos) ? $length : $space_pos;
 		$truncate_check = Util::substr($truncate, 0, $space_pos);
 
 		// Make sure this would not cause a cut in the middle of a tag
-		$lastOpenTag = Util::strpos($truncate_check, '<', 0, true);
-		$lastCloseTag = Util::strpos($truncate_check, '>', 0, true);
+		$lastOpenTag = (int) Util::strpos($truncate_check, '<', 0, true);
+		$lastCloseTag = (int) Util::strpos($truncate_check, '>', 0, true);
 		if ($lastOpenTag > $lastCloseTag)
 		{
 			// Find the last full open tag in our truncated string, its what was being cut
@@ -339,6 +342,7 @@ class Util
 
 			// Set the space to just after the last tag
 			$space_pos = Util::strpos($truncate, $last_tag, 0, true) + strlen($last_tag);
+			$space_pos = empty($space_pos) ? $length : $space_pos;
 		}
 
 		// Look at what we are going to cut off the end of our truncated string
