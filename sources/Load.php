@@ -1445,8 +1445,12 @@ function loadTheme($id_theme = 0, $initialize = true)
 	$context['current_action'] = isset($_REQUEST['action']) ? $_REQUEST['action'] : null;
 	$context['current_subaction'] = isset($_REQUEST['sa']) ? $_REQUEST['sa'] : null;
 	$context['can_register'] = empty($modSettings['registration_method']) || $modSettings['registration_method'] != 3;
-	$context['theme_header_callbacks'] = array();
-	$context['upper_content_callbacks'] = array();
+
+	foreach (array('theme_header', 'upper_content') as $call)
+	{
+		if (!isset($context[$call . '_callbacks']))
+			$context[$call . '_callbacks'] = array();
+	}
 
 	// Set some permission related settings.
 	if ($user_info['is_guest'] && !empty($modSettings['enableVBStyleLogin']))
