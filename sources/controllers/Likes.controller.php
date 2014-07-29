@@ -124,6 +124,7 @@ class Likes_Controller extends Action_Controller
 			// At this point we can just do our default.
 			$this->$default_action_func();
 		} else {
+			loadLanguage('LikePosts');
 			loadJavascriptFile('like_posts.js', array('defer' => true));
 			loadtemplate('LikePostsStats');
 			$context['page_title'] = $txt['like_post_stats'];
