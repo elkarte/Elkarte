@@ -214,7 +214,6 @@ function template_body_above()
 	<div id="top_section">
 		<div class="wrapper">';
 
-
 	foreach ($context['theme_header_callbacks'] as $callback)
 	{
 		$func = 'template_th_' . $callback;
@@ -248,14 +247,11 @@ function template_body_above()
 	<div id="wrapper" class="wrapper">
 		<div id="upper_section"', empty($context['minmax_preferences']['upshrink']) ? '' : ' style="display: none;" aria-hidden="true"', '>';
 
-	// Display either news fader and random news lines (not both). These now run most of the same mark up and CSS. Less complication = happier n00bz. :)
-	if (!empty($settings['enable_news']) && !empty($context['random_news_line']))
+	foreach ($context['upper_content_callbacks'] as $callback)
 	{
-		echo '
-			<div id="news">
-				<h2>', $txt['news'], '</h2>
-				', template_news_fader(), '
-			</div>';
+		$func = 'template_cw_' . $callback;
+		if (function_exists($func))
+			$func();
 	}
 
 	echo '
@@ -362,6 +358,21 @@ function template_th_search_bar()
 				<input type="submit" name="search;sa=results" value="', $txt['search'], '" class="button_submit', (!empty($modSettings['search_dropdown'])) ? ' with_select' : '', '" />
 				<input type="hidden" name="advanced" value="0" />
 			</form>';
+}
+
+function template_cw_news_fader()
+{
+	global $settings, $context, $txt;
+
+	// Display either news fader and random news lines (not both). These now run most of the same mark up and CSS. Less complication = happier n00bz. :)
+	if (!empty($settings['enable_news']) && !empty($context['random_news_line']))
+	{
+		echo '
+			<div id="news">
+				<h2>', $txt['news'], '</h2>
+				', template_news_fader(), '
+			</div>';
+	}
 }
 
 /**

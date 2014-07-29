@@ -2560,7 +2560,10 @@ function setupThemeContext($forceload = false)
 	}
 
 	if (!empty($context['news_lines']))
+	{
 		$context['random_news_line'] = $context['news_lines'][mt_rand(0, count($context['news_lines']) - 1)];
+		$context['upper_content_callbacks'][] = 'news_fader';
+	}
 
 	if (!$user_info['is_guest'])
 	{
