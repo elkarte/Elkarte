@@ -237,7 +237,7 @@ class Likes_Controller extends Action_Controller
 	 */
 	private function prepare_like()
 	{
-		global $modSettings, $user_info;
+		global $modSettings, $user_info, $txt;
 
 		$check = true;
 
@@ -264,6 +264,15 @@ class Likes_Controller extends Action_Controller
 		// Past the post threshold?
 		if (!$user_info['is_admin'] && !empty($modSettings['likeMinPosts']) && $user_info['posts'] < $modSettings['likeMinPosts'])
 			$check = false;
+
+		// If they have exceeded their limits, provide a message for the ajax response
+		if ($check === false && $this->_api)
+		{
+			loadLanguage('Errors');
+			$wait = $modSettings['likeWaitTime'] > 60 ? round($modSettings['likeWaitTime'] / 60, 2) : $modSettings['likeWaitTime'];
+			$error = sprintf($txt['like_wait_time'], $wait, ($modSettings['likeWaitTime'] < 60 ? strtolower($txt['minutes']) : $txt['hours']));
+			$this->_likes_response = array('result' => false, 'data' => $error);
+		}
 
 		return $check;
 	}

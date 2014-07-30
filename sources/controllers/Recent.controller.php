@@ -231,6 +231,9 @@ class Recent_Controller extends Action_Controller
 			)
 		);
 
+		// Provide an easy way for integration to interact with the recent display items
+		call_integration_hook('integrate_recent_message_list', array($messages, &$permissions));
+
 		// Now go through all the permissions, looking for boards they can do it on.
 		foreach ($permissions as $type => $list)
 		{
@@ -935,7 +938,7 @@ class Recent_Controller extends Action_Controller
 			{
 				// Limit them to 128 characters - do this FIRST because it's a lot of wasted censoring otherwise.
 				$row['first_body'] = strip_tags(strtr(parse_bbc($row['first_body'], false, $row['id_first_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
-				$row['first_body'] = shorten_text($row['first_body'], !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128, true);
+				$row['first_body'] = Util::shorten_text($row['first_body'], !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128, true);
 
 				// No reply then they are the same, no need to process it again
 				if ($row['num_replies'] == 0)
@@ -943,7 +946,7 @@ class Recent_Controller extends Action_Controller
 				else
 				{
 					$row['last_body'] = strip_tags(strtr(parse_bbc($row['last_body'], false, $row['id_last_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
-					$row['last_body'] = shorten_text($row['last_body'], !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128, true);
+					$row['last_body'] = Util::shorten_text($row['last_body'], !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128, true);
 				}
 
 				// Censor the subject and message preview.

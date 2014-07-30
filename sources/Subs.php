@@ -672,47 +672,6 @@ function un_htmlspecialchars($string)
 }
 
 /**
- * Shorten a string of text
- *
- * What it does:
- * - shortens a text string so that it is either shorter than length, or that length plus an ellipsis.
- * - optionally attempts to break the string on a word boundary approximately at the allowed length
- * - if using cutword and the resulting length is > len plus buffer then it is truncated to length plus an ellipsis.
- * - respects internationalization characters and entities as one character.
- * - returns the shortened string.
- *
- * @param string $text
- * @param int $len
- * @param bool $cutword try to cut at a word boundary
- * @param int $buffer maximum length overflow to allow when cutting on a word boundary
- */
-function shorten_text($text, $len = 384, $cutword = false, $buffer = 12)
-{
-	// If its to long, cut it down to size
-	if (Util::strlen($text) > $len)
-	{
-		if ($cutword)
-		{
-			$text = html_entity_decode($text, ENT_QUOTES, 'UTF-8');
-
-			// Look for len - buffer characters and cut on first word boundary after
-			preg_match('~(.{' . max(1, ($len - $buffer)) . '}.*?)\b~su', $text, $matches);
-
-			// Always one clown in the audience who likes long words or not using the spacebar
-			if (Util::strlen($matches[1]) > $len + $buffer)
-				$matches[1] = Util::substr($matches[1], 0, $len);
-
-			$text = rtrim($matches[1]) . ' ...';
-			$text = Util::htmlspecialchars($text);
-		}
-		else
-			$text = Util::substr($text, 0, $len - 3) . '...';
-	}
-
-	return $text;
-}
-
-/**
  * Calculates all the possible permutations (orders) of an array.
  *
  * What it does:
@@ -4111,7 +4070,7 @@ function fixchar__callback($matches)
  * Strips out invalid html entities, replaces others with html style &#123; codes
  *
  * What it does:
- * - Callback function used of preg_replace_callback in smcFunc $ent_checks,
+ * - Callback function used of preg_replace_callback in various $ent_checks,
  * - for example strpos, strlen, substr etc
  *
  * @param mixed[] $matches array of matches for a preg_match_all
