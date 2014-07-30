@@ -2235,6 +2235,9 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 	// For each file open it up and write it out!
 	foreach (explode('+', $template_name) as $template)
 	{
+		if ($template === 'index')
+			$fix_arrays = true;
+
 		// Obviously, the current theme is most important to check.
 		$attempts = array(
 			array($settings['theme_dir'], $template, $lang, $settings['theme_url']),
@@ -2292,13 +2295,9 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 			log_error(sprintf($txt['theme_language_error'], $template_name . '.' . $lang, 'template'));
 			break;
 		}
-
-		if ($found && $template_name === 'index')
-			$fix_arrays = true;
-
 	}
 
-	if ($fix_arrays)
+	if ($found && $fix_arrays)
 	{
 		$txt['days'] = array(
 			$txt['sunday'],
