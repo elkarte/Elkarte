@@ -2297,7 +2297,7 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 		}
 	}
 
-	if ($found && $fix_arrays)
+	if ($fix_arrays)
 	{
 		$txt['days'] = array(
 			$txt['sunday'],
