@@ -60,6 +60,12 @@ class Cache
 	private $_key_prefix = null;
 
 	/**
+	 * The cacheing object
+	 * @var object
+	 */
+	private $_cache_obj = null;
+
+	/**
 	 * Initialize the class, defines the options and the caching method to use
 	 * @var string
 	 */
@@ -73,254 +79,17 @@ class Cache
 
 		$this->_options = $options;
 
-		$methods = array(
-			'memcached' => array(
-				'init' => function($options) {
-					if (!function_exists('memcache_get') && !function_exists('memcached_get'))
-						return false;
-
-					$memcached = get_memcached_server();
-
-					if (!$memcached)
-						return false;
-					else
-						return array('memcached' => $memcached);
-				},
-				'put' => function($key, $value, $ttl, $options) {
-					memcache_set($options['memcached'], $key, $value, 0, $ttl);
-				},
-				'get' => function($key, $ttl, $options) {
-					return function_exists('memcache_get') ? memcache_get($options['memcached'], $key) : memcached_get($options['memcached'], $key);
-				},
-				'clean' => function($type, $options) {
-					// Clear it out, really invalidate whats there
-					if (function_exists('memcache_flush'))
-						memcache_flush($options['memcached']);
-					else
-						memcached_flush($options['memcached']);
-				},
-			),
-			'eaccelerator' => array(
-				'init' => function($options) {
-					return function_exists('eaccelerator_put');
-				},
-				'put' => function($key, $value, $ttl, $options) {
-					if (mt_rand(0, 10) == 1)
-						eaccelerator_gc();
-
-					if ($value === null)
-						@eaccelerator_rm($key);
-					else
-						eaccelerator_put($key, $value, $ttl);
-				},
-				'get' => function($key, $ttl, $options) {
-					if (function_exists('eaccelerator_get'))
-						return eaccelerator_get($key);
-				},
-				'clean' => function($type, $options) {
-					// Clean out the already expired items
-					@eaccelerator_clean();
-
-					// Remove all unused scripts and data from shared memory and disk cache,
-					// e.g. all data that isn't used in the current requests.
-					@eaccelerator_clear();
-				},
-			),
-			'mmcache' => array(
-				'init' => function($options) {
-					return function_exists('mmcache_put');
-				},
-				'put' => function($key, $value, $ttl, $options) {
-					if (mt_rand(0, 10) == 1)
-						mmcache_gc();
-
-					if ($value === null)
-						@mmcache_rm($key);
-					else
-					{
-						mmcache_lock($key);
-						mmcache_put($key, $value, $ttl);
-						mmcache_unlock($key);
-					}
-				},
-				'get' => function($key, $ttl, $options) {
-					return mmcache_get($key);
-				},
-				'clean' => function($type, $options) {
-					// Removes all expired keys from shared memory, this is not a complete cache flush :(
-					// @todo there is no clear function, should we try to find all of the keys and delete those? with mmcache_rm
-					mmcache_gc();
-				},
-			),
-			'apc' => array(
-				'init' => function($options) {
-					return function_exists('apc_store');
-				},
-				'put' => function($key, $value, $ttl, $options) {
-					// An extended key is needed to counteract a bug in APC.
-					if ($value === null)
-						apc_delete($key . 'elkarte');
-					else
-						apc_store($key . 'elkarte', $value, $ttl);
-				},
-				'get' => function($key, $ttl, $options) {
-					return apc_fetch($key . 'elkarte');
-				},
-				'clean' => function($type, $options) {
-					// If passed a type, clear that type out
-					if ($type === '' || $type === 'data')
-					{
-						apc_clear_cache('user');
-						apc_clear_cache('system');
-					}
-					elseif ($type === 'user')
-						apc_clear_cache('user');
-				},
-			),
-			'zend' => array(
-				'init' => function($options) {
-					return function_exists('zend_shm_cache_store') || function_exists('output_cache_put');
-				},
-				'put' => function($key, $value, $ttl, $options) {
-					// Zend Platform/ZPS/etc.
-					if (function_exists('zend_shm_cache_store'))
-						zend_shm_cache_store('ELK::' . $key, $value, $ttl);
-					elseif (function_exists('output_cache_put'))
-						output_cache_put($key, $value);
-				},
-				'get' => function($key, $ttl, $options) {
-					// Zend's pricey stuff.
-					if (function_exists('zend_shm_cache_fetch'))
-						return zend_shm_cache_fetch('ELK::' . $key);
-					elseif (function_exists('output_cache_get'))
-						return output_cache_get($key, $ttl);
-				},
-				'clean' => function($type, $options) {
-					if (function_exists('zend_shm_cache_clear'))
-						zend_shm_cache_clear('ELK');
-				},
-			),
-			'xcache' => array(
-				'init' => function($options) {
-					// Xcache may need auth credentials, depending on how its been set up
-					if (!empty($options['cache_uid']) && !empty($options['cache_password']))
-					{
-						$_SERVER['PHP_AUTH_USER'] = $options['cache_uid'];
-						$_SERVER['PHP_AUTH_PW'] = $options['cache_password'];
-					}
-
-					return function_exists('xcache_set') && ini_get('xcache.var_size') > 0;
-				},
-				'put' => function($key, $value, $ttl, $options) {
-					if ($value === null)
-						xcache_unset($key);
-					else
-						xcache_set($key, $value, $ttl);
-				},
-				'get' => function($key, $ttl, $options) {
-					return xcache_get($key);
-				},
-				'clean' => function($type, $options) {
-					// Get the counts so we clear each instance
-					$pcnt = xcache_count(XC_TYPE_PHP);
-					$vcnt = xcache_count(XC_TYPE_VAR);
-
-					// Time to clear the user vars and/or the opcache
-					if ($type === '' || $type === 'user')
-					{
-						for ($i = 0; $i < $vcnt; $i++)
-							xcache_clear_cache(XC_TYPE_VAR, $i);
-					}
-
-					if ($type === '' || $type === 'data')
-					{
-						for ($i = 0; $i < $pcnt; $i++)
-							xcache_clear_cache(XC_TYPE_PHP, $i);
-					}
-				},
-			),
-			'filebased' => array(
-				'init' => function($options) {
-					return @is_dir(CACHEDIR) && @is_writable(CACHEDIR);
-				},
-				'put' => function($key, $value, $ttl, $options) {
-					// Otherwise custom cache?
-					if ($value === null)
-						@unlink(CACHEDIR . '/data_' . $key . '.php');
-					else
-					{
-						$cache_data = '<?php if (!defined(\'ELK\')) die; if (' . (time() + $ttl) . ' < time()) return false; else{return $value = \'' . addcslashes($value, '\\\'') . '\';}';
-
-						// Write out the cache file, check that the cache write was successful; all the data must be written
-						// If it fails due to low diskspace, or other, remove the cache file
-						if (@file_put_contents(CACHEDIR . '/data_' . $key . '.php', $cache_data, LOCK_EX) !== strlen($cache_data))
-							@unlink(CACHEDIR . '/data_' . $key . '.php');
-					}
-				},
-				'get' => function($key, $ttl, $options) {
-					// Otherwise it's ElkArte data!
-					if (file_exists(CACHEDIR . '/data_' . $key . '.php') && filesize(CACHEDIR . '/data_' . $key . '.php') > 10)
-					{
-						// php will cache file_exists et all, we can't 100% depend on its results so proceed with caution
-						$value = @include(CACHEDIR . '/data_' . $key . '.php');
-						if ($value === false)
-						{
-							@unlink(CACHEDIR . '/data_' . $key . '.php');
-							$return = null;
-						}
-						else
-							$return = $value;
-
-						unset($value);
-
-						return $return;
-					}
-				},
-				'clean' => function($type, $options) {
-					// To be complete, we also clear out the cache dir so we get any js/css hive files
-					// Remove the cache files in our disk cache directory
-					$dh = opendir(CACHEDIR);
-					while ($file = readdir($dh))
-					{
-						if ($file != '.' && $file != '..' && $file != 'index.php' && $file != '.htaccess' && (!$type || substr($file, 0, strlen($type)) == $type))
-							@unlink(CACHEDIR . '/' . $file);
-					}
-
-					closedir($dh);
-				},
-				'fixkey' => function($key) {
-					return strtr($key, ':/', '-_');
-				}
-			),
-		);
-
-		// This will let anyone add new caching methods very easily
-		call_integration_hook('integrate_init_cache', array(&$methods));
-
-		if (empty($accelerator) || !isset($methods[$accelerator]))
+		if (empty($accelerator))
 			$accelerator = 'filebased';
 
-		if (isset($methods[$accelerator]))
-		{
-			$init = $methods[$accelerator]['init']($this->_options);
+		$cache_class = ucfirst($accelerator) . '_Cache';
+		$this->_cache_obj = new $cache_class($this->_options);
 
-			// Three can be the results.
-			// true: everything is fine, let's use the method
-			if ($init === true)
-				$this->_method = $methods[$accelerator];
-			// an array: means the method works and we have settings
-			elseif (is_array($init))
-			{
-				$this->_options = array_merge($this->_options, $init);
-				$this->_method = $methods[$accelerator];
-			}
-			// false: this is bad, the method failed! Too bad, we can't use it
-			// @todo: test for file based?
-			else
-				$this->_cache_enable = false;
-		}
+		if ($this->_cache_obj !== null)
+			$this->_cache_enable = $this->_cache_obj->init();
 
-		$this->_key_prefix = $this->_build_prefix();
+		if ($this->_cache_enable)
+			$this->_key_prefix = $this->_build_prefix();
 	}
 
 	/**
@@ -402,7 +171,7 @@ class Cache
 		$key = $this->_key($key);
 		$value = $value === null ? null : serialize($value);
 
-		$this->_method['put']($key, $value, $ttl, $this->_options);
+		$this->_cache_obj->put($key, $value, $ttl);
 
 		call_integration_hook('cache_put_data', array($key, $value, $ttl));
 
@@ -438,7 +207,7 @@ class Cache
 		}
 
 		$key = $this->_key($key);
-		$value = $this->_method['get']($key, $ttl, $this->_options);
+		$value = $this->_cache_obj->get($key, $ttl);
 
 		if ($db_show_debug === true)
 		{
@@ -469,7 +238,7 @@ class Cache
 		if (!$this->_cache_enable)
 			return;
 
-		$this->_method['clean']($type, $this->_options);
+		$this->_cache_obj->clean($type);
 
 		// Invalidate cache, to be sure!
 		// ... as long as CACHEDIR/index.php can be modified, anyway.
@@ -489,7 +258,7 @@ class Cache
 	 */
 	protected function _key($key)
 	{
-		return $this->_key_prefix . (isset($this->_method['fixkey']) ? $this->_method['fixkey']($key) : $key);
+		return $this->_key_prefix . $this->_cache_obj->fixkey($key);
 	}
 
 	/**
