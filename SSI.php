@@ -30,6 +30,7 @@ global $boardurl, $webmaster_email, $cookiename;
 global $db_server, $db_name, $db_user, $db_prefix, $db_persist, $db_error_send;
 global $modSettings, $context, $sc, $user_info, $topic, $board, $txt;
 global $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd;
+global $boarddir, $sourcedir;
 
 // Remember the current configuration so it can be set back.
 $ssi_magic_quotes_runtime = function_exists('get_magic_quotes_gpc') && get_magic_quotes_runtime();
