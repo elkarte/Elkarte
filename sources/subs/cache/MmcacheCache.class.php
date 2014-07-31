@@ -1,13 +1,35 @@
 <?php
+/**
+ * This file contains functions that deal with getting and setting cache values.
+ *
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0 Release Candidate 2
+ *
+ */
 
-class Mmcached_Cache extends Cache_Method_Abstract
+if (!defined('ELK'))
+	die('No access...');
+
+/**
+ * MMCache, also known as Turck MMCache
+ */
+class Mmcache_Cache extends Cache_Method_Abstract
 {
+	/**
+	 * {@inheritdoc }
+	 */
 	public function init()
 	{
 		return function_exists('mmcache_put');
 	}
 
-	public function put$key, $value, $ttl)
+	/**
+	 * {@inheritdoc }
+	 */
+	public function put($key, $value, $ttl = 120)
 	{
 		if (mt_rand(0, 10) == 1)
 			mmcache_gc();
@@ -22,12 +44,15 @@ class Mmcached_Cache extends Cache_Method_Abstract
 		}
 	}
 
-	public function get($key, $ttl)
+	/**
+	 * {@inheritdoc }
+	 */
+	public function get($key, $ttl = 120)
 	{
 		return mmcache_get($key);
 	}
 
-	public function clean($type)
+	public function clean($type = '')
 	{
 		// Removes all expired keys from shared memory, this is not a complete cache flush :(
 		// @todo there is no clear function, should we try to find all of the keys and delete those? with mmcache_rm

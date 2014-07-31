@@ -1,7 +1,32 @@
 <?php
+/**
+ * This file contains functions that deal with getting and setting cache values.
+ *
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0 Release Candidate 2
+ *
+ */
 
+if (!defined('ELK'))
+	die('No access...');
+
+/**
+ * Xcache.
+ *
+ * Xcache may need auth credentials, depending on how its been set up,
+ * these credentials must be passed with the options array during the
+ * initialization of the class in the indexes:
+ *   - cache_uid
+ *   - cache_password
+ */
 class Xcache_Cache extends Cache_Method_Abstract
 {
+	/**
+	 * {@inheritdoc }
+	 */
 	public function init()
 	{
 		// Xcache may need auth credentials, depending on how its been set up
@@ -14,7 +39,10 @@ class Xcache_Cache extends Cache_Method_Abstract
 		return function_exists('xcache_set') && ini_get('xcache.var_size') > 0;
 	}
 
-	public function put($key, $value, $ttl)
+	/**
+	 * {@inheritdoc }
+	 */
+	public function put($key, $value, $ttl = 120)
 	{
 		if ($value === null)
 			xcache_unset($key);
@@ -22,12 +50,18 @@ class Xcache_Cache extends Cache_Method_Abstract
 			xcache_set($key, $value, $ttl);
 	}
 
-	public function get($key, $ttl)
+	/**
+	 * {@inheritdoc }
+	 */
+	public function get($key, $ttl = 120)
 	{
 		return xcache_get($key);
 	}
 
-	public function clean($type)
+	/**
+	 * {@inheritdoc }
+	 */
+	public function clean($type = '')
 	{
 		// Get the counts so we clear each instance
 		$pcnt = xcache_count(XC_TYPE_PHP);

@@ -1,9 +1,29 @@
 <?php
+/**
+ * This file contains functions that deal with getting and setting cache values.
+ *
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0 Release Candidate 2
+ *
+ */
 
+if (!defined('ELK'))
+	die('No access...');
+
+/**
+ * Zend caching engine.
+ * Supports both zend_shm_cache_store and the deprecated output_cache_put
+ */
 class Zend_Cache extends Cache_Method_Abstract
 {
 	private $_shm = false;
 
+	/**
+	 * {@inheritdoc }
+	 */
 	public function init()
 	{
 		$this->_shm = function_exists('zend_shm_cache_store');
@@ -11,7 +31,10 @@ class Zend_Cache extends Cache_Method_Abstract
 		return $this->_shm || function_exists('output_cache_put');
 	}
 
-	public function put($key, $value, $ttl)
+	/**
+	 * {@inheritdoc }
+	 */
+	public function put($key, $value, $ttl = 120)
 	{
 		// Zend Platform/ZPS/etc.
 		if ($this->_shm)
@@ -20,7 +43,10 @@ class Zend_Cache extends Cache_Method_Abstract
 			output_cache_put($key, $value);
 	}
 
-	public function get($key, $ttl)
+	/**
+	 * {@inheritdoc }
+	 */
+	public function get($key, $ttl = 120)
 	{
 		// Zend's pricey stuff.
 		if ($this->_shm)
@@ -29,7 +55,10 @@ class Zend_Cache extends Cache_Method_Abstract
 			return output_cache_get($key, $ttl);
 	}
 
-	public function clean($type)
+	/**
+	 * {@inheritdoc }
+	 */
+	public function clean($type = '')
 	{
 		if ($this->_shm)
 			zend_shm_cache_clear('ELK');

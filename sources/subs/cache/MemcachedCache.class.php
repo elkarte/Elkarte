@@ -1,9 +1,30 @@
 <?php
+/**
+ * This file contains functions that deal with getting and setting cache values.
+ *
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0 Release Candidate 2
+ *
+ */
 
+if (!defined('ELK'))
+	die('No access...');
+
+/**
+ * Memcache and memcached.
+ *
+ * memcache is the first choice, if this is not available then memcached is used
+ */
 class Memcached_Cache extends Cache_Method_Abstract
 {
 	private $_memcache = null;
 
+	/**
+	 * {@inheritdoc }
+	 */
 	public function init()
 	{
 		if (!function_exists('memcache_get') && !function_exists('memcached_get'))
@@ -20,12 +41,18 @@ class Memcached_Cache extends Cache_Method_Abstract
 		return true;
 	}
 
-	public function put($key, $value, $ttl)
+	/**
+	 * {@inheritdoc }
+	 */
+	public function put($key, $value, $ttl = 120)
 	{
 		memcache_set($this->_options['memcached'], $key, $value, 0, $ttl);
 	}
 
-	public function get($key, $ttl)
+	/**
+	 * {@inheritdoc }
+	 */
+	public function get($key, $ttl = 120)
 	{
 		if ($this->_memcache)
 			return memcache_get($this->_options['memcached'], $key);
@@ -33,7 +60,10 @@ class Memcached_Cache extends Cache_Method_Abstract
 			return memcached_get($this->_options['memcached'], $key);
 	}
 
-	public function clean($type)
+	/**
+	 * {@inheritdoc }
+	 */
+	public function clean($type = '')
 	{
 		// Clear it out, really invalidate whats there
 		if ($this->_memcache)

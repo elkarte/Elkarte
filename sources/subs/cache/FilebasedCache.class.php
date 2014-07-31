@@ -1,13 +1,41 @@
 <?php
+/**
+ * This file contains functions that deal with getting and setting cache values.
+ *
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0 Release Candidate 2
+ *
+ */
 
+if (!defined('ELK'))
+	die('No access...');
+
+/**
+ * Filebased caching is the fallback is anything else is available, it simply
+ * uses the filesystem to store queries results in order to try to reduce the
+ * number of queries.
+ * The performance gain may or may not exist depending on many factors.
+ *
+ * It requires the CACHEDIR constant to be defined and pointing to a
+ * writable directory.
+ */
 class Filebased_Cache extends Cache_Method_Abstract
 {
+	/**
+	 * {@inheritdoc }
+	 */
 	public function init()
 	{
 		return @is_dir(CACHEDIR) && @is_writable(CACHEDIR);
 	}
 
-	public function put($key, $value, $ttl)
+	/**
+	 * {@inheritdoc }
+	 */
+	public function put($key, $value, $ttl = 120)
 	{
 		// Otherwise custom cache?
 		if ($value === null)
@@ -23,7 +51,10 @@ class Filebased_Cache extends Cache_Method_Abstract
 		}
 	}
 
-	public function get($key, $ttl)
+	/**
+	 * {@inheritdoc }
+	 */
+	public function get($key, $ttl = 120)
 	{
 		// Otherwise it's ElkArte data!
 		if (file_exists(CACHEDIR . '/data_' . $key . '.php') && filesize(CACHEDIR . '/data_' . $key . '.php') > 10)
@@ -44,7 +75,10 @@ class Filebased_Cache extends Cache_Method_Abstract
 		}
 	}
 
-	public function clean($type)
+	/**
+	 * {@inheritdoc }
+	 */
+	public function clean($type = '')
 	{
 		// To be complete, we also clear out the cache dir so we get any js/css hive files
 		// Remove the cache files in our disk cache directory
@@ -58,6 +92,9 @@ class Filebased_Cache extends Cache_Method_Abstract
 		closedir($dh);
 	}
 
+	/**
+	 * {@inheritdoc }
+	 */
 	public function fixkey($key)
 	{
 		return strtr($key, ':/', '-_');

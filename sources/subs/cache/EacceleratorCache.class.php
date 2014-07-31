@@ -1,13 +1,35 @@
 <?php
+/**
+ * This file contains functions that deal with getting and setting cache values.
+ *
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0 Release Candidate 2
+ *
+ */
 
+if (!defined('ELK'))
+	die('No access...');
+
+/**
+ * eAccelerator
+ */
 class Eaccelerator_Cache extends Cache_Method_Abstract
 {
+	/**
+	 * {@inheritdoc }
+	 */
 	public function init()
 	{
 		return function_exists('eaccelerator_put');
 	}
 
-	public function put($key, $value, $ttl)
+	/**
+	 * {@inheritdoc }
+	 */
+	public function put($key, $value, $ttl = 120)
 	{
 		if (mt_rand(0, 10) == 1)
 			eaccelerator_gc();
@@ -18,13 +40,19 @@ class Eaccelerator_Cache extends Cache_Method_Abstract
 			eaccelerator_put($key, $value, $ttl);
 	}
 
-	public function get($key, $ttl)
+	/**
+	 * {@inheritdoc }
+	 */
+	public function get($key, $ttl = 120)
 	{
 		if (function_exists('eaccelerator_get'))
 			return eaccelerator_get($key);
 	}
 
-	public function clean($type)
+	/**
+	 * {@inheritdoc }
+	 */
+	public function clean($type = '')
 	{
 		// Clean out the already expired items
 		@eaccelerator_clean();
