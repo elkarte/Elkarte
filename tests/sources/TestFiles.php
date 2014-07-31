@@ -25,7 +25,9 @@ class TestFiles extends UnitTestCase
 	}
 
 	/**
-	 * Test that there are no syntax errors
+	 * Test that there are no syntax errors.
+	 *
+	 * @todo use recursive fetching of files
 	 */
 	function testSyntaxErrors()
 	{
@@ -33,7 +35,9 @@ class TestFiles extends UnitTestCase
 			'board' => BOARDDIR . '/*.php',
 			'source' => SOURCEDIR . '/*.php',
 			'controllers' => CONTROLLERDIR . '/*.php',
+			'database' => SOURCEDIR . '/database/*.php',
 			'subs' => SUBSDIR . '/*.php',
+			'cache_methods' => SUBSDIR . '/cache/*.php',
 			'admin' => ADMINDIR . '/*.php',
 			'ext' => EXTDIR . '/*.php',
 			'language' => LANGUAGEDIR . '/english/*.php',
