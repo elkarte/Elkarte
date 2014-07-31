@@ -6,8 +6,7 @@
 
 ## Before You Start
 
-Anyone wishing to contribute to the **[ElkArte](https://github.com/elkarte/Elkarte)** project **MUST** read the [Developer's Certificate of Origin](https://github.com/elkarte/Elkarte/blob/master/DCO.txt) in the repository: 
-By signing off your contributions, you acknowledge that you *can and do license* your submissions under the license of the project. The ElkArte team is prevented from accepting any pull requests from users who have not signed off on thier commits.
+Anyone wishing to contribute to the **[ElkArte](https://github.com/elkarte/Elkarte)** project **MUST** agree to distribute their contributions under the [BSD 3 Clause license](https://github.com/elkarte/Elkarte/blob/master/LICENSE.txt) applied to the project.
 
 ## How to Contribute:
 
@@ -27,8 +26,6 @@ By signing off your contributions, you acknowledge that you *can and do license*
 * Push your changes to your remote
   * ```git push mine new_branch_enhancement_name```
   * **NEVER leave the commit message empty** Please provide a clear, and complete description of your commit!
-  * **Sign-off** on your commits, to acknowledge your submission under the license of the project.
-  * See the [Developer's Certificate of Origin](https://github.com/elkarte/Elkarte/blob/master/DCO.txt) from the top directory.
 * Send in a Pull Request (PR) from your new_branch_enhancement_name branch.
   * Navigate to the ElkArte repository you just pushed to (e.g. https://github.com/your-user-name/elkarte)
   * Click "Pull Request".
