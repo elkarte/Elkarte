@@ -1597,20 +1597,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 			censorText($form_message);
 			censorText($form_subject);
 
-			// But if it's in HTML world, turn them into htmlspecialchar's so they can be edited!
-			if (strpos($form_message, '[html]') !== false)
-			{
-				$parts = preg_split('~(\[/code\]|\[code(?:=[^\]]+)?\])~i', $form_message, -1, PREG_SPLIT_DELIM_CAPTURE);
-				for ($i = 0, $n = count($parts); $i < $n; $i++)
-				{
-					// It goes 0 = outside, 1 = begin tag, 2 = inside, 3 = close tag, repeat.
-					if ($i % 4 == 0)
-						$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~is', 'getFormMsgSubject_br_callback', $parts[$i]);
-				}
-				$form_message = implode('', $parts);
-			}
-
-			$form_message = preg_replace('~<br ?/?' . '>~i', "\n", $form_message);
+			$form_message = un_preparsecode($form_message);
 
 			// Remove any nested quotes, if necessary.
 			if (!empty($modSettings['removeNestedQuotes']))

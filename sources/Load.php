@@ -1445,8 +1445,12 @@ function loadTheme($id_theme = 0, $initialize = true)
 	$context['current_action'] = isset($_REQUEST['action']) ? $_REQUEST['action'] : null;
 	$context['current_subaction'] = isset($_REQUEST['sa']) ? $_REQUEST['sa'] : null;
 	$context['can_register'] = empty($modSettings['registration_method']) || $modSettings['registration_method'] != 3;
-	$context['theme_header_callbacks'] = array();
-	$context['upper_content_callbacks'] = array();
+
+	foreach (array('theme_header', 'upper_content') as $call)
+	{
+		if (!isset($context[$call . '_callbacks']))
+			$context[$call . '_callbacks'] = array();
+	}
 
 	// Set some permission related settings.
 	if ($user_info['is_guest'] && !empty($modSettings['enableVBStyleLogin']))
@@ -2227,9 +2231,13 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 	if (empty($theme_name))
 		$theme_name = 'unknown';
 
+	$fix_arrays = false;
 	// For each file open it up and write it out!
 	foreach (explode('+', $template_name) as $template)
 	{
+		if ($template === 'index')
+			$fix_arrays = true;
+
 		// Obviously, the current theme is most important to check.
 		$attempts = array(
 			array($settings['theme_dir'], $template, $lang, $settings['theme_url']),
@@ -2287,6 +2295,70 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 			log_error(sprintf($txt['theme_language_error'], $template_name . '.' . $lang, 'template'));
 			break;
 		}
+	}
+
+	if ($fix_arrays)
+	{
+		$txt['days'] = array(
+			$txt['sunday'],
+			$txt['monday'],
+			$txt['tuesday'],
+			$txt['wednesday'],
+			$txt['thursday'],
+			$txt['friday'],
+			$txt['saturday'],
+		);
+		$txt['days_short'] = array(
+			$txt['sunday_short'],
+			$txt['monday_short'],
+			$txt['tuesday_short'],
+			$txt['wednesday_short'],
+			$txt['thursday_short'],
+			$txt['friday_short'],
+			$txt['saturday_short'],
+		);
+		$txt['months'] = array(
+			1 => $txt['january'],
+			$txt['february'],
+			$txt['march'],
+			$txt['april'],
+			$txt['may'],
+			$txt['june'],
+			$txt['july'],
+			$txt['august'],
+			$txt['september'],
+			$txt['october'],
+			$txt['november'],
+			$txt['december'],
+		);
+		$txt['months_titles'] = array(
+			1 => $txt['january_titles'],
+			$txt['february_titles'],
+			$txt['march_titles'],
+			$txt['april_titles'],
+			$txt['may_titles'],
+			$txt['june_titles'],
+			$txt['july_titles'],
+			$txt['august_titles'],
+			$txt['september_titles'],
+			$txt['october_titles'],
+			$txt['november_titles'],
+			$txt['december_titles'],
+		);
+		$txt['months_short'] = array(
+			1 => $txt['january_short'],
+			$txt['february_short'],
+			$txt['march_short'],
+			$txt['april_short'],
+			$txt['may_short'],
+			$txt['june_short'],
+			$txt['july_short'],
+			$txt['august_short'],
+			$txt['september_short'],
+			$txt['october_short'],
+			$txt['november_short'],
+			$txt['december_short'],
+		);
 	}
 
 	// Keep track of what we're up to soldier.
