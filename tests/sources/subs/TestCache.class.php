@@ -16,6 +16,7 @@ class TestMembers extends UnitTestCase
 	function setUp()
 	{
 		define('CACHEDIR', TESTDIR . '../cache');
+		define('ELK', '1');
 	}
 
 	/**
