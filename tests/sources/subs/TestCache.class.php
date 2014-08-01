@@ -15,7 +15,7 @@ class TestMembers extends UnitTestCase
 	 */
 	function setUp()
 	{
-		define('CACHEDIR', TESTDIR . '../cache');
+		define('CACHEDIR', TESTDIR . '../../cache');
 	}
 
 	/**
@@ -31,7 +31,8 @@ class TestMembers extends UnitTestCase
 	 */
 	function testFilebasedCache()
 	{
-		$this->_cache_obj = new FilebasedCache(array());
+		require_once(TESTDIR . '../../sources/subs/cache/FilebasedCache.class.php');
+		$this->_cache_obj = new Filebased_Cache(array());
 		$this->doCacheTests(function($key) {
 			return file_exists(CACHEDIR . '/data_' . $key . '.php');
 		});
