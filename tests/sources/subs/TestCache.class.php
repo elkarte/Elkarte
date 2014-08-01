@@ -15,8 +15,10 @@ class TestMembers extends UnitTestCase
 	 */
 	function setUp()
 	{
-		define('CACHEDIR', TESTDIR . '../cache');
 		define('ELK', '1');
+		define('CACHEDIR', TESTDIR . '../cache');
+		require_once(TESTDIR . '../sources/subs/CacheMethodInterface.class.php');
+		require_once(TESTDIR . '../sources/subs/CacheMethodAbstract.class.php');
 	}
 
 	/**
