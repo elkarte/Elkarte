@@ -96,14 +96,14 @@ class Memcached_Cache extends Cache_Method_Abstract
 		// Don't wait too long: yes, we want the server, but we might be able to run the query faster!
 		if (empty($db_persist))
 		{
-			if ($this->_memcache)
+			if (function_exists('memcache_get'))
 				$memcached = memcache_connect($server[0], $port);
 			else
 				$memcached = memcached_connect($server[0], $port);
 		}
 		else
 		{
-			if ($this->_memcache)
+			if (function_exists('memcache_get'))
 				$memcached = memcache_pconnect($server[0], $port);
 			else
 				$memcached = memcached_pconnect($server[0], $port);
