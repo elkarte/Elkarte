@@ -29,18 +29,6 @@ class Cache
 	private static $_instance = null;
 
 	/**
-	 * This array represents the caching method we are going to use
-	 * The array consists of the following indexes:
-	 *   - init => a function to run in the constructor (may return true/false/array)
-	 *   - put => the function to store the data
-	 *   - get => the function to retrieve the data
-	 *   - clean => the function to clean the cache
-	 *   - fixkey => (optional) a function to fix the cache key if needed
-	 * @var mixed[]
-	 */
-	private $_method = null;
-
-	/**
 	 * Array of options for the methods (if needed)
 	 * @var mixed[]
 	 */
@@ -67,7 +55,9 @@ class Cache
 
 	/**
 	 * Initialize the class, defines the options and the caching method to use
-	 * @var string
+	 * @param int $enabled The level of caching
+	 * @param string $accelerator The accelerator used
+	 * @param mixed[] $options Any setting necessary to the caching engine
 	 */
 	public function __construct($enabled, $accelerator, $options)
 	{
