@@ -338,14 +338,6 @@ class ManageServer_Controller extends Action_Controller
 		// Initialize the form
 		$this->_initCacheSettingsForm();
 
-		// Some javascript to enable / disable certain settings if the option is not selected
-		addInlineJavascript('
-			var cache_type = document.getElementById(\'cache_accelerator\');
-
-			createEventListener(cache_type);
-			cache_type.addEventListener("change", toggleCache);
-			toggleCache();', true);
-
 		// Saving again?
 		if (isset($_GET['save']))
 		{
@@ -637,12 +629,12 @@ class ManageServer_Controller extends Action_Controller
 		$detected_names = array();
 		$detected_supported = array();
 
-		foreach ($detected as $value)
+		foreach ($detected as $key => $value)
 		{
 			$detected_names[] = $value['title'];
 
 			if (!empty($value['supported']))
-				$detected_supported[] = $value['title'];
+				$detected_supported[$key] = $value['title'];
 		}
 
 		$txt['caching_information'] = str_replace('{supported_accelerators}', '<li>' . implode('</li><li>', $detected_names) . '</li>', $txt['caching_information']);

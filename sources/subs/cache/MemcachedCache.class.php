@@ -140,7 +140,8 @@ class Memcached_Cache extends Cache_Method_Abstract
 	 */
 	public static function title()
 	{
-		add_integration_function('integrate_modify_cache_settings', 'Memcached_Cache::settings', false);
+		if (self::available())
+			add_integration_function('integrate_modify_cache_settings', 'Memcached_Cache::settings', '', false);
 
 		return 'Memcached';
 	}
@@ -154,6 +155,6 @@ class Memcached_Cache extends Cache_Method_Abstract
 	{
 		global $txt;
 
-		$config_vars[] = array('cache_memcached', $txt['cache_memcached'], 'file', 'text', $txt['cache_memcached'], 'cache_memcached');
+		$config_vars[] = array('cache_memcached', $txt['cache_memcached'], 'file', 'text', $txt['cache_memcached'], 'cache_memcached', 'force_div_id' => 'memcached_cache_memcached');
 	}
 }

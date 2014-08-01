@@ -121,7 +121,8 @@ class Filebased_Cache extends Cache_Method_Abstract
 	 */
 	public static function title()
 	{
-		add_integration_function('integrate_modify_cache_settings', 'Filebased_Cache::settings', false);
+		if (self::available())
+			add_integration_function('integrate_modify_cache_settings', 'Filebased_Cache::settings', '', false);
 
 		return 'File-based caching';
 	}
@@ -135,6 +136,6 @@ class Filebased_Cache extends Cache_Method_Abstract
 	{
 		global $txt;
 
-		$config_vars[] = array('cachedir', $txt['cachedir'], 'file', 'text', 36, 'cache_cachedir');
+		$config_vars[] = array('cachedir', $txt['cachedir'], 'file', 'text', 36, 'cache_cachedir', 'force_div_id' => 'filebased_cachedir');
 	}
 }
