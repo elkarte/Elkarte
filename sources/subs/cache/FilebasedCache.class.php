@@ -99,4 +99,28 @@ class Filebased_Cache extends Cache_Method_Abstract
 	{
 		return strtr($key, ':/', '-_');
 	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function available()
+	{
+		return @is_dir(CACHEDIR) && @is_writable(CACHEDIR);
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function details()
+	{
+		return array('title' => self::title(), 'version' => 'N/A');
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function title()
+	{
+		return 'File-based';
+	}
 }

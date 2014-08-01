@@ -58,4 +58,28 @@ class Mmcache_Cache extends Cache_Method_Abstract
 		// @todo there is no clear function, should we try to find all of the keys and delete those? with mmcache_rm
 		mmcache_gc();
 	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function available()
+	{
+		return defined('MMCACHE_VERSION');
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function details()
+	{
+		return array('title' => self::title(), 'version' => MMCACHE_VERSION);
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function title()
+	{
+		return 'Turck MMCache';
+	}
 }

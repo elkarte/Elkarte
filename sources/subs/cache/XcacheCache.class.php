@@ -80,4 +80,28 @@ class Xcache_Cache extends Cache_Method_Abstract
 				xcache_clear_cache(XC_TYPE_PHP, $i);
 		}
 	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function available()
+	{
+		return function_exists('xcache_set');
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function details()
+	{
+		return array('title' => self::title(), 'version' => XCACHE_VERSION);
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function title()
+	{
+		return 'XCache';
+	}
 }

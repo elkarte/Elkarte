@@ -29,7 +29,7 @@ class Apc_Cache extends Cache_Method_Abstract
 	/**
 	 * {@inheritdoc }
 	 */
-	public function put($key, $value, $ttl)
+	public function put($key, $value, $ttl = 120)
 	{
 		// An extended key is needed to counteract a bug in APC.
 		if ($value === null)
@@ -41,7 +41,7 @@ class Apc_Cache extends Cache_Method_Abstract
 	/**
 	 * {@inheritdoc }
 	 */
-	public function get($key, $ttl)
+	public function get($key, $ttl = 120)
 	{
 		return apc_fetch($key . 'elkarte');
 	}
@@ -49,7 +49,7 @@ class Apc_Cache extends Cache_Method_Abstract
 	/**
 	 * {@inheritdoc }
 	 */
-	public function clean($type)
+	public function clean($type = '')
 	{
 		// If passed a type, clear that type out
 		if ($type === '' || $type === 'data')
@@ -59,5 +59,29 @@ class Apc_Cache extends Cache_Method_Abstract
 		}
 		elseif ($type === 'user')
 			apc_clear_cache('user');
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function available()
+	{
+		return extension_loaded('apc');
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function details()
+	{
+		return array('title' => self::title(), 'version' => phpversion('apc'));
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function title()
+	{
+		return 'Alternative PHP Cache';
 	}
 }

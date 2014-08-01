@@ -61,4 +61,28 @@ class Eaccelerator_Cache extends Cache_Method_Abstract
 		// e.g. all data that isn't used in the current requests.
 		@eaccelerator_clear();
 	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function available()
+	{
+		return defined('EACCELERATOR_VERSION');
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function details()
+	{
+		return array('title' => self::title(), 'version' => EACCELERATOR_VERSION);
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function title()
+	{
+		return 'eAccelerator';
+	}
 }

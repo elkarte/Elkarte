@@ -63,4 +63,28 @@ class Zend_Cache extends Cache_Method_Abstract
 		if ($this->_shm)
 			zend_shm_cache_clear('ELK');
 	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function available()
+	{
+		return function_exists('zend_shm_cache_store') || function_exists('output_cache_put');
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function details()
+	{
+		return array('title' => self::title(), 'version' => zend_version());
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function title()
+	{
+		return 'Zend Platform/Performance Suite';
+	}
 }

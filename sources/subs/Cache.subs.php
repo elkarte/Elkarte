@@ -81,12 +81,6 @@ function cache_get_data($key, $ttl = 120)
 }
 
 /**
- * @deprecated since 1.1 - the function has been moved to Cache.class.php
- */
-if (!function_exists('get_memcached_server') && defined('SUBSDIR'))
-	require_once(SUBSDIR . '/Cache.class.php');
-
-/**
  * Empty out the cache in use as best it can
  *
  * It may only remove the files of a certain type (if the $type parameter is given)
@@ -123,4 +117,35 @@ function cache_get_key($key)
 		$key_prefix = md5($boardurl . filemtime(SOURCEDIR . '/Load.php')) . '-ELK-';
 
 	return $key_prefix . ((empty($cache_accelerator) || $cache_accelerator === 'filebased') ? strtr($key, ':/', '-_') : $key);
+}
+
+function loadCacheEngines($supported_only = true)
+{
+	global $modSettings, $txt;
+
+	$engines = array();
+
+	$classes = glob(SUBSDIR . '/cache/*.php');
+
+	foreach ($classes as $file_path)
+	{
+		$parts = explode('.', basename($file_path));
+		$engine_name = substr($parts[0], 0, -5);
+		$class = $engine_name . '_Cache';
+
+		if (class_exists($class))
+		{
+			if ($supported_only && $class::available())
+				$engines[strtolower($engine_name)] = $class::details();
+			elseif ($supported_only === false)
+			{
+				$engines[strtolower($engine_name)] = array(
+					'title' => $class::title(),
+					'supported' => $class::available()
+				);
+			}
+		}
+	}
+
+	return $engines;
 }
