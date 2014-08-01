@@ -31,8 +31,6 @@ if (!defined('ELK'))
  * @param mixed[] $params parameters sent to the function
  * @param int $level = 1
  * @return string
- *
- * @deprecated since 1.1 - use Cache::instance()->quick_get() instead
  */
 function cache_quick_get($key, $file, $function, $params, $level = 1)
 {
@@ -56,8 +54,6 @@ function cache_quick_get($key, $file, $function, $params, $level = 1)
  * @param string $key
  * @param string|int|mixed[]|null $value
  * @param int $ttl = 120
- *
- * @deprecated since 1.1 - use Cache::instance()->put() instead
  */
 function cache_put_data($key, $value, $ttl = 120)
 {
@@ -71,8 +67,6 @@ function cache_put_data($key, $value, $ttl = 120)
  *
  * @param string $key
  * @param int $ttl = 120
- *
- * @deprecated since 1.1 - use Cache::instance()->get() instead
  */
 function cache_get_data($key, $ttl = 120)
 {
@@ -91,8 +85,6 @@ function cache_get_data($key, $ttl = 120)
  * For cache engines that do not distinguish on types, a full cache flush will be done
  *
  * @param string $type = ''
- *
- * @deprecated since 1.1 - use Cache::instance()->clean() instead
  */
 function clean_cache($type = '')
 {
@@ -104,8 +96,6 @@ function clean_cache($type = '')
  *
  * @param string $key
  * @return string
- *
- * @deprecated since 1.1 - no replacement, it is now a protected method of the Cache class
  */
 function cache_get_key($key)
 {
@@ -119,6 +109,16 @@ function cache_get_key($key)
 	return $key_prefix . ((empty($cache_accelerator) || $cache_accelerator === 'filebased') ? strtr($key, ':/', '-_') : $key);
 }
 
+/**
+ * Finds all the caching engines available and loads some details depending on
+ * parameters.
+ *
+ * @param bool $supported_only If true, for each engine supported by the server
+ *             an array with 'title' and 'version' is returned.
+ *             If false, for each engine available an array with 'title' (string)
+ *             and 'supported' (bool) is returned.
+ * @return mixed[]
+ */
 function loadCacheEngines($supported_only = true)
 {
 	global $modSettings, $txt;
