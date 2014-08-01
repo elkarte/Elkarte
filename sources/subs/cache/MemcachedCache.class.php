@@ -88,7 +88,7 @@ class Memcached_Cache extends Cache_Method_Abstract
 
 		$servers = explode(',', $cache_memcached);
 		$server = explode(':', trim($servers[array_rand($servers)]));
-		$cache = (function_exists('memcache_get')) ? 'memcache' : ((function_exists('memcached_get') ? 'memcached' : ''));
+		$port = empty($server[1]) ? 11211 : $server[1];
 
 		// Don't try more times than we have servers!
 		$level = min(count($servers), $level);
@@ -96,17 +96,17 @@ class Memcached_Cache extends Cache_Method_Abstract
 		// Don't wait too long: yes, we want the server, but we might be able to run the query faster!
 		if (empty($db_persist))
 		{
-			if ($cache === 'memcached')
-				$memcached = memcached_connect($server[0], empty($server[1]) ? 11211 : $server[1]);
-			if ($cache === 'memcache')
-				$memcached = memcache_connect($server[0], empty($server[1]) ? 11211 : $server[1]);
+			if ($this->_memcache)
+				$memcached = memcache_connect($server[0], $port);
+			else
+				$memcached = memcached_connect($server[0], $port);
 		}
 		else
 		{
-			if ($cache === 'memcached')
-				$memcached = memcached_pconnect($server[0], empty($server[1]) ? 11211 : $server[1]);
-			if ($cache === 'memcache')
-				$memcached = memcache_pconnect($server[0], empty($server[1]) ? 11211 : $server[1]);
+			if ($this->_memcache)
+				$memcached = memcache_pconnect($server[0], $port);
+			else
+				$memcached = memcached_pconnect($server[0], $port);
 		}
 
 		if (!$memcached && $level > 0)
