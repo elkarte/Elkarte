@@ -4225,6 +4225,10 @@ function elk_autoloader($class)
 	{
 		$file_name = SUBSDIR . '/SearchAPI-' . substr($class, 0, -7) . '.class.php';
 	}
+	elseif (substr($class, -6) === '_Cache')
+	{
+		$file_name = SUBSDIR . '/cache/' . str_replace('_', '', $class) . '.class.php';
+	}
 	elseif (substr($class, -8) === '_Display' || substr($class, -8) === '_Payment')
 	{
 		$file_name = SUBSDIR . '/Subscriptions-' . substr($class, 0, -8) . '.class.php';
@@ -4241,6 +4245,7 @@ function elk_autoloader($class)
 		else
 			$file_name = '';
 	}
+
 	if (!empty($file_name))
 		require_once($file_name);
 }

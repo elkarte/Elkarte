@@ -158,6 +158,24 @@ class Settings_Form
 							$context['config_vars'][$config_var[0]]['data'][] = array($key, $item);
 					}
 				}
+
+				// Finally allow overrides - and some final cleanups.
+				foreach ($config_var as $k => $v)
+				{
+					if (!is_numeric($k))
+					{
+						if (substr($k, 0, 2) == 'on')
+							$context['config_vars'][$config_var[0]]['javascript'] .= ' ' . $k . '="' . $v . '"';
+						else
+							$context['config_vars'][$config_var[0]][$k] = $v;
+					}
+
+					// See if there are any other labels that might fit?
+					if (isset($txt['setting_' . $config_var[0]]))
+						$context['config_vars'][$config_var[0]]['label'] = $txt['setting_' . $config_var[0]];
+					elseif (isset($txt['groups_' . $config_var[0]]))
+						$context['config_vars'][$config_var[0]]['label'] = $txt['groups_' . $config_var[0]];
+				}
 			}
 		}
 

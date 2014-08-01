@@ -123,14 +123,7 @@ $txt['likeAllowSelf'] = 'Allow members to like their own posts';
 $txt['likeDisplayLimit'] = 'Set the maximum number of "liked by" names to display in the topic view, 0 for no limit, -1 to disable';
 
 $txt['caching_information'] = 'ElkArte supports caching through the use of accelerators. The currently supported accelerators include:
-<ul class="normallist">
-	<li>APC</li>
-	<li>eAccelerator</li>
-	<li>Turck MMCache</li>
-	<li>Memcached</li>
-	<li>Zend Platform/Performance Suite (Not Zend Optimizer)</li>
-	<li>XCache</li>
-</ul>
+<ul class="normallist">{supported_accelerators}</ul>
 Caching will work best if you have PHP compiled with one of the above optimizers, or have memcache available. If you do not have any optimizer installed file based caching will be used.';
 $txt['detected_accelerators'] = 'The following accelerators have been detected: <strong class="success">%1$s</strong>';
 

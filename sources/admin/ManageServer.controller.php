@@ -338,14 +338,6 @@ class ManageServer_Controller extends Action_Controller
 		// Initialize the form
 		$this->_initCacheSettingsForm();
 
-		// Some javascript to enable / disable certain settings if the option is not selected
-		addInlineJavascript('
-			var cache_type = document.getElementById(\'cache_accelerator\');
-
-			createEventListener(cache_type);
-			cache_type.addEventListener("change", toggleCache);
-			toggleCache();', true);
-
 		// Saving again?
 		if (isset($_GET['save']))
 		{
@@ -630,25 +622,25 @@ class ManageServer_Controller extends Action_Controller
 	{
 		global $txt;
 
-		// Detect all available optimizers
-		$detected = array();
-		$detected['filebased'] = $txt['default_cache'];
+		require_once (SUBSDIR . '/Cache.subs.php');
 
-		if (function_exists('eaccelerator_put'))
-			$detected['eaccelerator'] = $txt['eAccelerator_cache'];
-		if (function_exists('mmcache_put'))
-			$detected['mmcache'] = $txt['mmcache_cache'];
-		if (function_exists('apc_store'))
-			$detected['apc'] = $txt['apc_cache'];
-		if (function_exists('output_cache_put') || function_exists('zend_shm_cache_store'))
-			$detected['zend'] = $txt['zend_cache'];
-		if (function_exists('memcache_set') || function_exists('memcached_set'))
-			$detected['memcached'] = $txt['memcached_cache'];
-		if (function_exists('xcache_set'))
-			$detected['xcache'] = $txt['xcache_cache'];
+		// Detect all available optimizers
+		$detected = loadCacheEngines(false);
+		$detected_names = array();
+		$detected_supported = array();
+
+		foreach ($detected as $key => $value)
+		{
+			$detected_names[] = $value['title'];
+
+			if (!empty($value['supported']))
+				$detected_supported[$key] = $value['title'];
+		}
+
+		$txt['caching_information'] = str_replace('{supported_accelerators}', '<li>' . implode('</li><li>', $detected_names) . '</li>', $txt['caching_information']);
 
 		// Set our values to show what, if anything, we found
-		$txt['cache_settings_message'] = sprintf($txt['detected_accelerators'], implode(', ', $detected));
+		$txt['cache_settings_message'] = sprintf($txt['detected_accelerators'], implode(', ', $detected_supported));
 		$cache_level = array($txt['cache_off'], $txt['cache_level1'], $txt['cache_level2'], $txt['cache_level3']);
 
 		// Define the variables we want to edit.
@@ -656,11 +648,7 @@ class ManageServer_Controller extends Action_Controller
 			// Only a few settings, but they are important
 			array('', $txt['cache_settings_message'], '', 'desc'),
 			array('cache_enable', $txt['cache_enable'], 'file', 'select', $cache_level, 'cache_enable'),
-			array('cache_accelerator', $txt['cache_accelerator'], 'file', 'select', $detected),
-			array('cache_uid', $txt['cache_uid'], 'file', 'text', $txt['cache_uid'], 'cache_uid'),
-			array('cache_password', $txt['cache_password'], 'file', 'password', $txt['cache_password'], 'cache_password'),
-			array('cache_memcached', $txt['cache_memcached'], 'file', 'text', $txt['cache_memcached'], 'cache_memcached'),
-			array('cachedir', $txt['cachedir'], 'file', 'text', 36, 'cache_cachedir'),
+			array('cache_accelerator', $txt['cache_accelerator'], 'file', 'select', $detected_supported),
 		);
 
 		// Notify the integration that we're preparing to mess up with cache settings...
