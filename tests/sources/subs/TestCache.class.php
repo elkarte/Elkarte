@@ -46,7 +46,7 @@ class TestMembers extends UnitTestCase
 	 */
 	private function doCacheTests($putAssert = null)
 	{
-		$test_array = array('anindex' => 'avalue');
+		$test_array = serialize(array('anindex' => 'avalue'));
 		$key = 'testcache';
 
 		$this->_cache_obj->put($key, $test_array);
