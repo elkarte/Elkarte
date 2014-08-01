@@ -646,6 +646,7 @@ class ManageServer_Controller extends Action_Controller
 		}
 
 		$txt['caching_information'] = str_replace('{supported_accelerators}', '<li>' . implode('</li><li>', $detected_names) . '</li>', $txt['caching_information']);
+
 		// Set our values to show what, if anything, we found
 		$txt['cache_settings_message'] = sprintf($txt['detected_accelerators'], implode(', ', $detected_supported));
 		$cache_level = array($txt['cache_off'], $txt['cache_level1'], $txt['cache_level2'], $txt['cache_level3']);
@@ -656,10 +657,6 @@ class ManageServer_Controller extends Action_Controller
 			array('', $txt['cache_settings_message'], '', 'desc'),
 			array('cache_enable', $txt['cache_enable'], 'file', 'select', $cache_level, 'cache_enable'),
 			array('cache_accelerator', $txt['cache_accelerator'], 'file', 'select', $detected_supported),
-			array('cache_uid', $txt['cache_uid'], 'file', 'text', $txt['cache_uid'], 'cache_uid'),
-			array('cache_password', $txt['cache_password'], 'file', 'password', $txt['cache_password'], 'cache_password'),
-			array('cache_memcached', $txt['cache_memcached'], 'file', 'text', $txt['cache_memcached'], 'cache_memcached'),
-			array('cachedir', $txt['cachedir'], 'file', 'text', 36, 'cache_cachedir'),
 		);
 
 		// Notify the integration that we're preparing to mess up with cache settings...

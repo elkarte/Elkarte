@@ -986,6 +986,7 @@ function select_in_category(operation, brd_list)
  */
 function toggleCache ()
 {
+	return;
 	var memcache = document.getElementById('cache_memcached'),
 		cachedir = document.getElementById('cachedir'),
 		cacheuid = document.getElementById('cache_uid'),

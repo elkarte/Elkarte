@@ -121,6 +121,20 @@ class Filebased_Cache extends Cache_Method_Abstract
 	 */
 	public static function title()
 	{
-		return 'File-based';
+		add_integration_function('integrate_modify_cache_settings', 'Filebased_Cache::settings', false);
+
+		return 'File-based caching';
+	}
+
+	/**
+	 * Adds the settings to the settings page.
+	 *
+	 * Used by integrate_modify_cache_settings added in the title method
+	 */
+	public static function settings(&$config_vars)
+	{
+		global $txt;
+
+		$config_vars[] = array('cachedir', $txt['cachedir'], 'file', 'text', 36, 'cache_cachedir');
 	}
 }

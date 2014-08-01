@@ -102,6 +102,21 @@ class Xcache_Cache extends Cache_Method_Abstract
 	 */
 	public static function title()
 	{
+		add_integration_function('integrate_modify_cache_settings', 'Xcache_Cache::settings', false);
+
 		return 'XCache';
+	}
+
+	/**
+	 * Adds the settings to the settings page.
+	 *
+	 * Used by integrate_modify_cache_settings added in the title method
+	 */
+	public static function settings(&$config_vars)
+	{
+		global $txt;
+
+		$config_vars[] = array('cache_uid', $txt['cache_uid'], 'file', 'text', $txt['cache_uid'], 'cache_uid');
+		$config_vars[] = array('cache_password', $txt['cache_password'], 'file', 'password', $txt['cache_password'], 'cache_password');
 	}
 }
