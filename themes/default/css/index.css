@@ -4823,10 +4823,11 @@ dl.no_members {
 	position: relative;
 	width: 100%;
 	overflow: hidden;
+	padding: 0;
 }
 
 .like_post_topic_data .message_body, .like_post_board_data .message_body, .like_post_most_liked_user_data .message_body, .like_post_most_likes_given_user_data .message_body {
-	width: 100%;
+	width: 99%;
 	background: #FFF;
 	float: left;
 	padding: 30px 10px 5px;
@@ -4839,7 +4840,7 @@ dl.no_members {
 	text-decoration: none;
 	float: left;
 	position: relative;
-	margin: 5px 10px 15px 0;
+	margin: 10px 10px 10px 0;
 	border: 5px solid #FFF;
 	border-radius: 5px;
 	box-shadow: 0px 0px 4px 2px #C4C4C4;
@@ -4868,7 +4869,7 @@ dl.no_members {
 }
 
 .content_encapsulate {
-	margin: 0 0 10px;
+	margin: 10px 0;
 }
 
 .like_post_topic_data .message_body .read_more, .like_post_board_data .message_body .read_more, .like_post_most_liked_user_data .read_more, .like_post_most_likes_given_user_data .read_more {
@@ -4887,6 +4888,7 @@ dl.no_members {
 	position: relative;
 	width: 100%;
 	overflow: hidden;
+	padding: 0;
 }
 
 .like_post_most_liked_user_data .generic_text, .like_post_most_likes_given_user_data .generic_text {

@@ -94,6 +94,7 @@ class Likes_Controller extends Action_Controller
 	{
 		global $context, $user_info, $topic, $txt, $modSettings;
 
+		require_once(SUBSDIR . '/Likes.subs.php');
 		$context['like_post_stats_error'] = '';
 		// if(!isset($modSettings['like_post_enable']) || empty($modSettings['like_post_enable'])) {
 		// 	$context['like_post_stats_error'] = $txt['like_post_no_access'];
@@ -118,10 +119,9 @@ class Likes_Controller extends Action_Controller
 			);
 
 			//wakey wakey, call the func you lazy
-			if (isset($_REQUEST['area']) && isset($subActions[$_REQUEST['area']]) && function_exists($subActions[$_REQUEST['area']]))
+			if (isset($_REQUEST['area']) && isset($subActions[$_REQUEST['area']]) && method_exists($this, $subActions[$_REQUEST['area']])) {
 				return $this->$subActions[$_REQUEST['area']]();
-
-			// At this point we can just do our default.
+			}
 			$this->$default_action_func();
 		} else {
 			loadLanguage('LikePosts');
@@ -158,14 +158,42 @@ class Likes_Controller extends Action_Controller
 
 	public function action_messageStats()
 	{
-		require_once(SUBSDIR . '/Likes.subs.php');
-		$data = mostLikedMessage();
+		global $txt;
+
+		$data = dbMostLikedMessage();
 
 		if($data) {
 			$this->_likes_response = array('result' => true, 'data' => $data);
 		} else {
-			// $this->_likes_response = array('response' => false, 'error' => $txt['like_post_error_something_wrong']);
-			$this->_likes_response = array('result' => false, 'error' => 'Something wrong');
+			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
+		}
+		$this->likeResponse();
+	}
+
+	public function action_topicStats()
+	{
+		global $txt;
+
+		$data = dbMostLikedTopic();
+
+		if($data) {
+			$this->_likes_response = array('result' => true, 'data' => $data);
+		} else {
+			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
+		}
+		$this->likeResponse();
+	}
+
+	public function action_boardStats()
+	{
+		global $txt;
+
+		$data = dbMostLikedBoard();
+
+		if($data) {
+			$this->_likes_response = array('result' => true, 'data' => $data);
+		} else {
+			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
 		}
 		$this->likeResponse();
 	}

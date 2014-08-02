@@ -174,7 +174,7 @@
 		var currentUrlFrag = null,
 			allowedUrls = {},
 			tabsVisitedCurrentSession = {},
-			defaultHash = 'messagestats',
+			defaultHash = 'boardstats',
 			txtStrings = {},
 
 			init = function(params) {
@@ -245,7 +245,6 @@
 
 			getDataFromServer = function(params) {
 				$('.like_post_stats_error').hide().html('');
-
 
 				// Make the ajax call to the likes system
 				$.ajax({
@@ -332,7 +331,7 @@
 				for (var i = 0, len = data.msg_data.length; i < len; i++) {
 					var msgUrl = topicUrl + '.msg' + data.msg_data[i].id_msg;
 
-					htmlContent += '<div class="message_body">' + '<div class="posted_at">' + data.msg_data[i].member.name + ' : ' + txtStrings.postedAt + ' ' + data.msg_data[i].poster_time + '</div> ' + '<a class="poster_details" href="' + data.msg_data[i].member.href + '"><div class="poster_avatar" style="background-image: url(' + encodeURI(data.msg_data[i].member.avatar) + ')"></div></a><div class="content_encapsulate">' + data.msg_data[i].body + '</div><a class="read_more" href="' + msgUrl + '">' + txtStrings.readMore + '</a>' + '</div>';
+					htmlContent += '<div class="message_body">' + '<div class="posted_at">' + data.msg_data[i].member.name + ' : ' + txtStrings.postedAt + ' ' + data.msg_data[i].html_time + '</div> ' + '<a class="poster_details" href="' + data.msg_data[i].member.href + '"><div class="poster_avatar" style="background-image: url(' + encodeURI(data.msg_data[i].member.avatar) + ')"></div></a><div class="content_encapsulate">' + data.msg_data[i].body + '</div><a class="read_more" href="' + msgUrl + '">' + txtStrings.readMore + '</a>' + '</div>';
 				}
 				$('#like_post_current_tab').text(txtStrings.mostLikedTopic);
 				$('.like_post_topic_data').html(htmlContent).show();
@@ -352,7 +351,7 @@
 				for (var i = 0, len = data.topic_data.length; i < len; i++) {
 					var topicUrl = elk_scripturl + '?topic=' + data.topic_data[i].id_topic;
 
-					htmlContent += '<div class="message_body">' + '<div class="posted_at">' + data.topic_data[i].member.name + ' : ' + txtStrings.postedAt + ' ' + data.topic_data[i].poster_time + '</div> ' + '<a class="poster_details" href="' + data.topic_data[i].member.href + '"><div class="poster_avatar" style="background-image: url(' + encodeURI(data.topic_data[i].member.avatar) + ')"></div></a><div class="content_encapsulate">' + data.topic_data[i].body + '</div><a class="read_more" href="' + topicUrl + '">' + txtStrings.readMore + '</a></div>';
+					htmlContent += '<div class="message_body">' + '<div class="posted_at">' + data.topic_data[i].member.name + ' : ' + txtStrings.postedAt + ' ' + data.topic_data[i].html_time + '</div> ' + '<a class="poster_details" href="' + data.topic_data[i].member.href + '"><div class="poster_avatar" style="background-image: url(' + encodeURI(data.topic_data[i].member.avatar) + ')"></div></a><div class="content_encapsulate">' + data.topic_data[i].body + '</div><a class="read_more" href="' + topicUrl + '">' + txtStrings.readMore + '</a></div>';
 				}
 				$('#like_post_current_tab').text(txtStrings.mostLikedBoard);
 				$('.like_post_board_data').html(htmlContent).show();
