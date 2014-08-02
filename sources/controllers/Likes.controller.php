@@ -156,7 +156,7 @@ class Likes_Controller extends Action_Controller
 		}
 	}
 
-	public function action_messageStats()
+	private function action_messageStats()
 	{
 		global $txt;
 
@@ -170,7 +170,7 @@ class Likes_Controller extends Action_Controller
 		$this->likeResponse();
 	}
 
-	public function action_topicStats()
+	private function action_topicStats()
 	{
 		global $txt;
 
@@ -184,7 +184,7 @@ class Likes_Controller extends Action_Controller
 		$this->likeResponse();
 	}
 
-	public function action_boardStats()
+	private function action_boardStats()
 	{
 		global $txt;
 
@@ -198,6 +198,33 @@ class Likes_Controller extends Action_Controller
 		$this->likeResponse();
 	}
 
+	private function action_mostLikesReceivedUserStats()
+	{
+		global $txt;
+
+		$data = dbMostLikesReceivedUser();
+
+		if($data) {
+			$this->_likes_response = array('result' => true, 'data' => $data);
+		} else {
+			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
+		}
+		$this->likeResponse();
+	}
+
+	private function action_mostLikesGivenUserStats()
+	{
+		global $txt;
+
+		$data = dbMostLikesGivenUser();
+
+		if($data) {
+			$this->_likes_response = array('result' => true, 'data' => $data);
+		} else {
+			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
+		}
+		$this->likeResponse();
+	}
 	/**
 	 * Likes a post due to its awesomeness
 	 * Permission checks are done in prepare_likes

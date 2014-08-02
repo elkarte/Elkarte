@@ -174,7 +174,7 @@
 		var currentUrlFrag = null,
 			allowedUrls = {},
 			tabsVisitedCurrentSession = {},
-			defaultHash = 'boardstats',
+			defaultHash = 'messagestats',
 			txtStrings = {},
 
 			init = function(params) {
@@ -369,7 +369,7 @@
 				for (var i = 0, len = data.topic_data.length; i < len; i++) {
 					var msgUrl = elk_scripturl + '?topic=' + data.topic_data[i].id_topic + '.msg' + data.topic_data[i].id_msg;
 
-					htmlContent += '<div class="message_body">' + '<div class="posted_at">' + txtStrings.postedAt + ' ' + data.topic_data[i].poster_time + ': ' + txtStrings.likesReceived + ' (' + data.topic_data[i].like_count + ')</div><div class="content_encapsulate">' + data.topic_data[i].body + '</div><a class="read_more" href="' + msgUrl + '">' + txtStrings.readMore + '</a></div>';
+					htmlContent += '<div class="message_body">' + '<div class="posted_at">' + txtStrings.postedAt + ' ' + data.topic_data[i].html_time + ': ' + txtStrings.likesReceived + ' (' + data.topic_data[i].like_count + ')</div><div class="content_encapsulate">' + data.topic_data[i].body + '</div><a class="read_more" href="' + msgUrl + '">' + txtStrings.readMore + '</a></div>';
 				}
 				$('#like_post_current_tab').text(txtStrings.mostLikedMember);
 				$('.like_post_most_liked_user_data').html(htmlContent).show();
@@ -387,7 +387,7 @@
 				for (var i = 0, len = data.topic_data.length; i < len; i++) {
 					var msgUrl = elk_scripturl + '?topic=' + data.topic_data[i].id_topic + '.msg' + data.topic_data[i].id_msg;
 
-					htmlContent += '<div class="message_body">' + '<div class="posted_at">' + txtStrings.postedAt + ' ' + data.topic_data[i].poster_time + '</div><div class="content_encapsulate">' + data.topic_data[i].body + '</div><a class="read_more" href="' + msgUrl + '">' + txtStrings.readMore + '</a></div>';
+					htmlContent += '<div class="message_body">' + '<div class="posted_at">' + txtStrings.postedAt + ' ' + data.topic_data[i].html_time + '</div><div class="content_encapsulate">' + data.topic_data[i].body + '</div><a class="read_more" href="' + msgUrl + '">' + txtStrings.readMore + '</a></div>';
 				}
 				$('#like_post_current_tab').text(txtStrings.mostLikeGivingMember);
 				$('.like_post_most_likes_given_user_data').html(htmlContent).show();
