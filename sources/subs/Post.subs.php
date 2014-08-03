@@ -1509,13 +1509,13 @@ function lastPost()
 	censorText($row['body']);
 
 	$row['body'] = strip_tags(strtr(parse_bbc($row['body'], $row['smileys_enabled']), array('<br />' => '&#10;')));
-	$row['body'] = shorten_text($row['body'], !empty($modSettings['lastpost_preview_characters']) ? $modSettings['lastpost_preview_characters'] : 128, true);
+	$row['body'] = Util::shorten_text($row['body'], !empty($modSettings['lastpost_preview_characters']) ? $modSettings['lastpost_preview_characters'] : 128, true);
 
 	// Send the data.
 	return array(
 		'topic' => $row['id_topic'],
 		'subject' => $row['subject'],
-		'short_subject' => shorten_text($row['subject'], $modSettings['subject_length']),
+		'short_subject' => Util::shorten_text($row['subject'], $modSettings['subject_length']),
 		'preview' => $row['body'],
 		'time' => standardTime($row['poster_time']),
 		'html_time' => htmlTime($row['poster_time']),
@@ -1597,20 +1597,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 			censorText($form_message);
 			censorText($form_subject);
 
-			// But if it's in HTML world, turn them into htmlspecialchar's so they can be edited!
-			if (strpos($form_message, '[html]') !== false)
-			{
-				$parts = preg_split('~(\[/code\]|\[code(?:=[^\]]+)?\])~i', $form_message, -1, PREG_SPLIT_DELIM_CAPTURE);
-				for ($i = 0, $n = count($parts); $i < $n; $i++)
-				{
-					// It goes 0 = outside, 1 = begin tag, 2 = inside, 3 = close tag, repeat.
-					if ($i % 4 == 0)
-						$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~is', 'getFormMsgSubject_br_callback', $parts[$i]);
-				}
-				$form_message = implode('', $parts);
-			}
-
-			$form_message = preg_replace('~<br ?/?' . '>~i', "\n", $form_message);
+			$form_message = un_preparsecode($form_message);
 
 			// Remove any nested quotes, if necessary.
 			if (!empty($modSettings['removeNestedQuotes']))

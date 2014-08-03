@@ -1104,6 +1104,7 @@ a.bbc_link {
 	display: inline-block;
 	padding: 0 1.1em 0 2em;
 	border: none;
+	white-space: nowrap;
 }
 
 /* Nifty indicators. */
@@ -1896,6 +1897,7 @@ img.new_posts {
 	min-width: 14em;
 	box-sizing: border-box;
 	padding: 0 16px 0 16px;
+	line-height: 1.429em;
 }
 .topic_lastpost .img_last_post {
 	float: right;
@@ -2310,6 +2312,7 @@ div.core_posts {
 }
 .attachments {
 	margin: 20px 0 0 0;
+	clear: both;
 }
 .attachments .attachment {
 	padding: 6px 8px;
@@ -4252,6 +4255,9 @@ dl.no_members {
 	}
 	.topic_name, .topic_starter {
 		margin-right: 18px;
+	}
+	#ic_recentposts, #ps_recentposts, #ps_recenttopics {
+		font-size: 1em;
 	}
 }
 /* This one does 540 and smaller screens at default font size. */

@@ -564,7 +564,7 @@ class Poll_Controller extends Action_Controller
 
 		// Now we've done all our error checking, let's get the core poll information cleaned... question first.
 		$_POST['question'] = Util::htmlspecialchars($_POST['question']);
-		$_POST['question'] = Util::truncate($_POST['question'], 255);
+		$_POST['question'] = Util::substr($_POST['question'], 0, 255);
 
 		$_POST['poll_hide'] = (int) $_POST['poll_hide'];
 		$_POST['poll_expire'] = isset($_POST['poll_expire']) ? (int) $_POST['poll_expire'] : 0;

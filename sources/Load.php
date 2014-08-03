@@ -1446,10 +1446,17 @@ function loadTheme($id_theme = 0, $initialize = true)
 	$context['current_subaction'] = isset($_REQUEST['sa']) ? $_REQUEST['sa'] : null;
 	$context['can_register'] = empty($modSettings['registration_method']) || $modSettings['registration_method'] != 3;
 
+	foreach (array('theme_header', 'upper_content') as $call)
+	{
+		if (!isset($context[$call . '_callbacks']))
+			$context[$call . '_callbacks'] = array();
+	}
+
 	// Set some permission related settings.
 	if ($user_info['is_guest'] && !empty($modSettings['enableVBStyleLogin']))
 	{
 		$context['show_login_bar'] = true;
+		$context['theme_header_callbacks'][] = 'login_bar';
 		loadJavascriptFile('sha256.js', array('defer' => true));
 	}
 
@@ -1799,6 +1806,52 @@ function loadEssentialThemeData()
  * - loads a template file with the name template_name from the current, default, or base theme.
  * - detects a wrong default theme directory and tries to work around it.
  * - can be used to only load style sheets by using false as the template name
+ *   loading of style sheets with this function is @deprecated, use loadCSSFile instead
+ * - if $settings['template_dirs'] is empty, it delays the loading of the template
+ *
+ * @uses the requireTemplate() function to actually load the file.
+ * @param string|false $template_name
+ * @param string[]|string $style_sheets any style sheets to load with the template
+ * @param bool $fatal = true if fatal is true, dies with an error message if the template cannot be found
+ *
+ * @return boolean|null
+ */
+function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
+{
+	global $context, $settings;
+	static $delay = array();
+
+	// If we don't know yet the default theme directory, let's wait a bit.
+	if (empty($settings['template_dirs']))
+	{
+		$delay[] = array(
+			$template_name,
+			$style_sheets,
+			$fatal
+		);
+		return;
+	}
+	// If instead we know the default theme directory and we have delayed something, it's time to process
+	elseif (!empty($delay))
+	{
+		foreach ($delay as $val)
+			requireTemplate($val[0], $val[1], $val[2]);
+
+		// Forget about them (load them only once)
+		$delay = array();
+	}
+
+	requireTemplate($template_name, $style_sheets, $fatal);
+}
+
+/**
+ * <b>Internal function! Do not use it, use loadTemplate instead</b>
+ *
+ * What it does:
+ * - loads a template file with the name template_name from the current, default, or base theme.
+ * - detects a wrong default theme directory and tries to work around it.
+ * - can be used to only load style sheets by using false as the template name
+ *   loading of style sheets with this function is @deprecated, use loadCSSFile instead
  *
  * @uses the template_include() function to include the file.
  * @param string|false $template_name
@@ -1807,7 +1860,7 @@ function loadEssentialThemeData()
  *
  * @return boolean|null
  */
-function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
+function requireTemplate($template_name, $style_sheets, $fatal)
 {
 	global $context, $settings, $txt, $scripturl, $db_show_debug;
 	static $default_loaded = false;
@@ -2178,9 +2231,13 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 	if (empty($theme_name))
 		$theme_name = 'unknown';
 
+	$fix_arrays = false;
 	// For each file open it up and write it out!
 	foreach (explode('+', $template_name) as $template)
 	{
+		if ($template === 'index')
+			$fix_arrays = true;
+
 		// Obviously, the current theme is most important to check.
 		$attempts = array(
 			array($settings['theme_dir'], $template, $lang, $settings['theme_url']),
@@ -2238,6 +2295,70 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 			log_error(sprintf($txt['theme_language_error'], $template_name . '.' . $lang, 'template'));
 			break;
 		}
+	}
+
+	if ($fix_arrays)
+	{
+		$txt['days'] = array(
+			$txt['sunday'],
+			$txt['monday'],
+			$txt['tuesday'],
+			$txt['wednesday'],
+			$txt['thursday'],
+			$txt['friday'],
+			$txt['saturday'],
+		);
+		$txt['days_short'] = array(
+			$txt['sunday_short'],
+			$txt['monday_short'],
+			$txt['tuesday_short'],
+			$txt['wednesday_short'],
+			$txt['thursday_short'],
+			$txt['friday_short'],
+			$txt['saturday_short'],
+		);
+		$txt['months'] = array(
+			1 => $txt['january'],
+			$txt['february'],
+			$txt['march'],
+			$txt['april'],
+			$txt['may'],
+			$txt['june'],
+			$txt['july'],
+			$txt['august'],
+			$txt['september'],
+			$txt['october'],
+			$txt['november'],
+			$txt['december'],
+		);
+		$txt['months_titles'] = array(
+			1 => $txt['january_titles'],
+			$txt['february_titles'],
+			$txt['march_titles'],
+			$txt['april_titles'],
+			$txt['may_titles'],
+			$txt['june_titles'],
+			$txt['july_titles'],
+			$txt['august_titles'],
+			$txt['september_titles'],
+			$txt['october_titles'],
+			$txt['november_titles'],
+			$txt['december_titles'],
+		);
+		$txt['months_short'] = array(
+			1 => $txt['january_short'],
+			$txt['february_short'],
+			$txt['march_short'],
+			$txt['april_short'],
+			$txt['may_short'],
+			$txt['june_short'],
+			$txt['july_short'],
+			$txt['august_short'],
+			$txt['september_short'],
+			$txt['october_short'],
+			$txt['november_short'],
+			$txt['december_short'],
+		);
 	}
 
 	// Keep track of what we're up to soldier.

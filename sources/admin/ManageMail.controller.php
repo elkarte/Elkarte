@@ -127,7 +127,7 @@ class ManageMail_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							return shorten_text(Util::htmlspecialchars($rowData[\'subject\'], 50));
+							return Util::shorten_text(Util::htmlspecialchars($rowData[\'subject\'], 50));
 						'),
 					),
 					'sort' => array(

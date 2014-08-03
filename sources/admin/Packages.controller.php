@@ -453,7 +453,7 @@ class Packages_Controller extends Action_Controller
 						elseif (isset($mod_action['filename']) && preg_match('~([\w]*)/([\w]*)\.template\.php$~', $mod_action['filename'], $matches))
 							$actual_filename = strtolower($matches[1] . '/' . $matches[2] . '.template.php||' . $action['filename']);
 						else
-							$actual_filename = $key;
+							$actual_filename = $operation_key;
 
 						// We just need it for actual parse changes.
 						if (!in_array($mod_action['type'], array('error', 'result', 'opened', 'saved', 'end', 'missing', 'skipping', 'chmod')))
