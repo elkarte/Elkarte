@@ -707,11 +707,15 @@ class Likes_Controller extends Action_Controller
 
 		$data = dbMostLikedMessage();
 
-		if($data) {
+		if ($data)
+		{
 			$this->_likes_response = array('result' => true, 'data' => $data);
-		} else {
+		}
+		else
+		{
 			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
 		}
+
 		$this->likeResponse();
 	}
 
@@ -725,11 +729,15 @@ class Likes_Controller extends Action_Controller
 
 		$data = dbMostLikedTopic();
 
-		if($data) {
+		if ($data)
+		{
 			$this->_likes_response = array('result' => true, 'data' => $data);
-		} else {
+		}
+		else
+		{
 			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
 		}
+
 		$this->likeResponse();
 	}
 
@@ -743,11 +751,15 @@ class Likes_Controller extends Action_Controller
 
 		$data = dbMostLikedBoard();
 
-		if($data) {
+		if ($data)
+		{
 			$this->_likes_response = array('result' => true, 'data' => $data);
-		} else {
+		}
+		else
+		{
 			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
 		}
+
 		$this->likeResponse();
 	}
 
@@ -761,11 +773,15 @@ class Likes_Controller extends Action_Controller
 
 		$data = dbMostLikesReceivedUser();
 
-		if($data) {
+		if ($data)
+		{
 			$this->_likes_response = array('result' => true, 'data' => $data);
-		} else {
+		}
+		else
+		{
 			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
 		}
+
 		$this->likeResponse();
 	}
 
@@ -779,9 +795,12 @@ class Likes_Controller extends Action_Controller
 
 		$data = dbMostLikesGivenUser();
 
-		if($data) {
+		if ($data)
+		{
 			$this->_likes_response = array('result' => true, 'data' => $data);
-		} else {
+		}
+		else
+		{
 			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
 		}
 		$this->likeResponse();

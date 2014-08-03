@@ -17,7 +17,8 @@
  *
  */
 
-function template_lp_stats() {
+function template_lp_stats()
+{
 	global $context, $txt, $sourcedir, $settings, $user_info, $options, $scripturl;
 
 	echo '
@@ -33,13 +34,14 @@ function template_lp_stats() {
 			', $context['like_posts']['tab_desc'] ,'
 		</p>';
 
-	if(empty($context['like_post_stats_error']))
+	if (empty($context['like_post_stats_error']))
 	{
 		echo '
 		<ul class="like_post_stats_menu buttonlist" role="menubar">';
 
 		// Print out all the items in this tab.
-		foreach ($context['lp_stats_tabs'] as $sa => $tab) {
+		foreach ($context['lp_stats_tabs'] as $sa => $tab)
+		{
 			echo '
 			<li role="menuitem">
 				<a class="linklevel1 button_strip_markread" href="" id="', $tab['id'],'">
@@ -52,7 +54,7 @@ function template_lp_stats() {
 		</ul>';
 	}
 
-	if(empty($context['like_post_stats_error']))
+	if (empty($context['like_post_stats_error']))
 	{
 		echo '
 		<div class="forum_category">
@@ -127,5 +129,3 @@ function template_lp_stats() {
 		}
 	// ]]></script>';
 }
-
-?>
