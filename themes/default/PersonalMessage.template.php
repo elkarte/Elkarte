@@ -1101,7 +1101,7 @@ function template_ask_delete()
 		<div class="windowbg">
 			<div class="content">
 				<p>', $txt['delete_all_confirm'], '</p><br />
-				<strong><a href="', $scripturl, '?action=pm;sa=removeall2;f=', $context['folder'], ';', $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';', $context['session_var'], '=', $context['session_id'], '">', $txt['yes'], '</a> - <a href="javascript:history.go(-1);">', $txt['no'], '</a></strong>
+				<strong><a href="', $scripturl, '?action=pm;sa=removeall2;f=', $context['folder'], ';', $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';', $context['session_var'], '=', $context['session_id'], '">', $txt['yes'], '</a> - <a href="javascript:window.location.assign(document.referrer);">', $txt['no'], '</a></strong>
 			</div>
 		</div>';
 }
