@@ -558,9 +558,9 @@ function dbMostLikedMessage()
 	}
 	$db->free_result($request);
 
-	if (!isset($id_member_gave) || empty($id_member_gave))
+	if (empty($id_member_gave))
 	{
-		return $mostLikedMessage = array(
+		return array(
 			'noDataMessage' => $txt['like_post_error_no_data']
 		);
 	}
@@ -619,9 +619,9 @@ function dbMostLikedTopic()
 	list ($mostLikedTopic['id_topic'], $mostLikedTopic['id_board'], $id_msg, $mostLikedTopic['like_count']) = $db->fetch_row($request);
 	$db->free_result($request);
 
-	if (!isset($id_msg) || empty($id_msg))
+	if (empty($id_msg))
 	{
-		return $mostLikedTopic = array(
+		return array(
 			'noDataMessage' => $txt['like_post_error_no_data']
 		);
 	}
@@ -692,9 +692,9 @@ function dbMostLikedBoard()
 	list ($mostLikedBoard['id_board'], $mostLikedBoard['name'], $mostLikedBoard['num_topics'], $mostLikedBoard['num_posts'], $mostLikedBoard['topics_liked'], $mostLikedBoard['msgs_liked'], $id_topics, $mostLikedBoard['like_count'])= $db->fetch_row($request);
 	$db->free_result($request);
 
-	if (!isset($id_topics) || empty($id_topics))
+	if (empty($id_topics))
 	{
-		return $mostLikedBoard = array(
+		return array(
 			'noDataMessage' => $txt['like_post_error_no_data']
 		);
 	}
@@ -780,9 +780,9 @@ function dbMostLikesReceivedUser()
 	$db->free_result($request);
 
 
-	if (!isset($id_member) || empty($id_member))
+	if (empty($id_member))
 	{
-		return $mostLikedMember = array(
+		return array(
 			'noDataMessage' => $txt['like_post_error_no_data']
 		);
 	}
@@ -866,9 +866,9 @@ function dbMostLikesGivenUser()
 	}
 	$db->free_result($request);
 
-	if (!isset($id_msgs) || empty($id_msgs))
+	if (empty($id_msgs))
 	{
-		return $mostLikeGivingMember = array(
+		return array(
 			'noDataMessage' => $txt['like_post_error_no_data']
 		);
 	}
