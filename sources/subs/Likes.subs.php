@@ -534,7 +534,7 @@ function dbMostLikedMessage()
 	while ($row = $db->fetch_assoc($request))
 	{
 		censorText($row['body']);
-		$msgString = trimMessageContent($row['body'], ' ', 255);
+		$msgString = shorten_text($row['body'], 255, true);
 
 		$mostLikedMessage = array(
 			'id_msg' => $row['id_msg'],
@@ -644,7 +644,7 @@ function dbMostLikedTopic()
 	while ($row = $db->fetch_assoc($request))
 	{
 		censorText($row['body']);
-		$msgString = trimMessageContent($row['body'], ' ', 255);
+		$msgString = shorten_text($row['body'], 255, true);
 
 		$mostLikedTopic['msg_data'][] = array(
 			'id_msg' => $row['id_msg'],
@@ -717,7 +717,7 @@ function dbMostLikedBoard()
 	while ($row = $db->fetch_assoc($request))
 	{
 		censorText($row['body']);
-		$msgString = trimMessageContent($row['body'], ' ', 255);
+		$msgString = shorten_text($row['body'], 255, true);
 
 		$mostLikedBoard['topic_data'][] = array(
 			'id_topic' => $row['id_topic'],
@@ -806,7 +806,7 @@ function dbMostLikesReceivedUser()
 	while ($row = $db->fetch_assoc($request))
 	{
 		censorText($row['body']);
-		$msgString = trimMessageContent($row['body'], ' ', 255);
+		$msgString = shorten_text($row['body'], 255, true);
 
 		$mostLikedMember['topic_data'][] = array(
 			'id_topic' => $row['id_topic'],
@@ -888,7 +888,7 @@ function dbMostLikesGivenUser()
 	while ($row = $db->fetch_assoc($request))
 	{
 		censorText($row['body']);
-		$msgString = trimMessageContent($row['body'], ' ', 255);
+		$msgString = shorten_text($row['body'], 255, true);
 
 		$mostLikeGivingMember['topic_data'][] = array(
 			'id_msg' => $row['id_msg'],
