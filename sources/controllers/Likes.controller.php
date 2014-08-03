@@ -646,20 +646,23 @@ class Likes_Controller extends Action_Controller
 
 		if ($this->_api)
 		{
-			$default_action_func = 'action_messageStats';
-
 			$subActions = array(
-				'messagestats' => 'action_messageStats',
-				'topicstats' => 'action_topicStats',
-				'boardstats' => 'action_boardStats',
-				'mostlikesreceiveduserstats' => 'action_mostLikesReceivedUserStats',
-				'mostlikesgivenuserstats' => 'action_mostLikesGivenUserStats',
+				'messagestats' => array($this, 'action_messageStats'),
+				'topicstats' => array($this, 'action_topicStats'),
+				'boardstats' => array($this, 'action_boardStats'),
+				'mostlikesreceiveduserstats' => array($this, 'action_mostLikesReceivedUserStats'),
+				'mostlikesgivenuserstats' => array($this, 'action_mostLikesGivenUserStats'),
 			);
 
-			//wakey wakey, call the func you lazy
-			if (isset($_REQUEST['area']) && isset($subActions[$_REQUEST['area']]) && method_exists($this, $subActions[$_REQUEST['area']])) return $this->$subActions[$_REQUEST['area']]();
+			// Set up the action controller
+			$action = new Action('likesstats');
 
-			$this->$default_action_func();
+			// Pick the correct sub-action, call integrate_sa_likesstats
+			$subAction = $action->initialize($subActions, 'messagestats');
+			$context['sub_action'] = $subAction;
+
+			// Call the right function for this sub-action.
+			$action->dispatch($subAction);
 		}
 		else
 		{
