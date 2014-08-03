@@ -95,19 +95,14 @@ class Likes_Controller extends Action_Controller
 		global $context, $user_info, $topic, $txt, $modSettings;
 
 		require_once(SUBSDIR . '/Likes.subs.php');
-		$context['like_post_stats_error'] = '';
-		// if(!isset($modSettings['like_post_enable']) || empty($modSettings['like_post_enable'])) {
-		// 	$context['like_post_stats_error'] = $txt['like_post_no_access'];
-		// }
 
-		// if($user_info['is_guest'] && !LP_isAllowedTo(array('guests_can_view_likes_stats'))) {
-		// 	$context['like_post_stats_error'] = $txt['like_post_no_access'];
-		// }
-		// if(!LP_isAllowedTo(array('can_view_likes_stats'))) {
-		// 	$context['like_post_stats_error'] = $txt['like_post_no_access'];
-		// }
+		if (empty($modSettings['likes_enabled']))
+			fatal_lang_error('feature_disabled', true);
 
-		if ($this->_api && empty($context['like_post_stats_error'])) {
+		isAllowedTo('like_posts_stats');
+
+		if ($this->_api)
+		{
 			$default_action_func = 'action_messageStats';
 
 			$subActions = array(
@@ -119,36 +114,39 @@ class Likes_Controller extends Action_Controller
 			);
 
 			//wakey wakey, call the func you lazy
-			if (isset($_REQUEST['area']) && isset($subActions[$_REQUEST['area']]) && method_exists($this, $subActions[$_REQUEST['area']])) {
-				return $this->$subActions[$_REQUEST['area']]();
-			}
+			if (isset($_REQUEST['area']) && isset($subActions[$_REQUEST['area']]) && method_exists($this, $subActions[$_REQUEST['area']])) return $this->$subActions[$_REQUEST['area']]();
+
 			$this->$default_action_func();
-		} else {
+		}
+		else
+		{
+			// Load the required files
 			loadLanguage('LikePosts');
 			loadJavascriptFile('like_posts.js', array('defer' => true));
 			loadtemplate('LikePostsStats');
+
 			$context['page_title'] = $txt['like_post_stats'];
 			$context['like_posts']['tab_desc'] = $txt['like_posts_stats_desc'];
 
 			$context['lp_stats_tabs'] = array(
 				'messagestats' => array(
-					'label' => 'Message',
+					'label' => $txt['like_post_message'],
 					'id' => 'messagestats',
 				),
 				'topicstats' => array(
-					'label' => 'Topic',
+					'label' => $txt['like_post_topic'],
 					'id' => 'topicstats',
 				),
 				'boardstats' => array(
-					'label' => 'Board',
+					'label' => $txt['like_post_board'],
 					'id' => 'boardstats',
 				),
 				'usergivenstats' => array(
-					'label' => 'Most liked User',
+					'label' => $txt['like_post_tab_mlmember'],
 					'id' => 'mostlikesreceiveduserstats',
 				),
 				'userreceivedstats' => array(
-					'label' => 'Most likes giving user',
+					'label' => $txt['like_post_tab_mlgmember'],
 					'id' => 'mostlikesgivenuserstats',
 				),
 			);
