@@ -4,7 +4,6 @@
 global $txt;
 
 // Like posts stats strings
-$txt['like_post_stats'] = 'Like stats';
 $txt['like_posts_stats_desc'] = 'Stats related to like posts';
 $txt['like_post_tab_mlm'] = 'Most liked message';
 $txt['like_post_tab_mlt'] = 'Most liked topic';

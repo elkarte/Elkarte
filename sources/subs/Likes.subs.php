@@ -501,6 +501,9 @@ function messageLikeCount($message)
 	return (int) $total;
 }
 
+/**
+ * Function to get most liked message
+ */
 function dbMostLikedMessage()
 {
 	global $scripturl, $modSettings, $settings, $txt;
@@ -581,6 +584,9 @@ function dbMostLikedMessage()
 	return $mostLikedMessage;
 }
 
+/**
+ * Function to get most liked topic
+ */
 function dbMostLikedTopic()
 {
 	global $scripturl, $modSettings, $settings, $txt;
@@ -645,6 +651,9 @@ function dbMostLikedTopic()
 	return $mostLikedTopic;
 }
 
+/**
+ * Function to get most liked board
+ */
 function dbMostLikedBoard()
 {
 	global $smcFunc, $scripturl, $modSettings, $settings, $txt;
@@ -708,6 +717,9 @@ function dbMostLikedBoard()
 	return $mostLikedBoard;
 }
 
+/**
+ * Function to get most liked user
+ */
 function dbMostLikesReceivedUser()
 {
 	global $smcFunc, $scripturl, $modSettings, $settings, $txt;
@@ -785,6 +797,9 @@ function dbMostLikesReceivedUser()
 	return $mostLikedMember;
 }
 
+/**
+ * Function to get most likes giving user
+ */
 function dbMostLikesGivenUser()
 {
 	global $smcFunc, $scripturl, $modSettings, $settings, $txt;

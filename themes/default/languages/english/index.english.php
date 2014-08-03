@@ -858,3 +858,5 @@ $txt['ok_uppercase'] = 'OK';
 $txt['admin_warning_title'] = 'Warning';
 
 $txt['via'] = 'via';
+
+$txt['like_post_stats'] = 'Like stats';

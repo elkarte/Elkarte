@@ -3438,6 +3438,12 @@ function setupMenuContext()
 				'show' => $user_info['is_guest'] && $context['can_register'],
 			),
 
+			'like_stats' => array(
+				'title' => $txt['like_post_stats'],
+				'href' => $scripturl . '?action=likes;sa=likestats',
+				// 'data-icon' => '&#xf090;',
+				'show' => allowedTo('like_posts_stats'),
+			),
 			'contact' => array(
 				'title' => $txt['contact'],
 				'href' => $scripturl . '?action=contact',

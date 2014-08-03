@@ -90,139 +90,6 @@ class Likes_Controller extends Action_Controller
 		$this->action_likestats();
 	}
 
-	public function action_likestats()
-	{
-		global $context, $user_info, $topic, $txt, $modSettings;
-
-		require_once(SUBSDIR . '/Likes.subs.php');
-
-		if (empty($modSettings['likes_enabled']))
-			fatal_lang_error('feature_disabled', true);
-
-		isAllowedTo('like_posts_stats');
-
-		if ($this->_api)
-		{
-			$default_action_func = 'action_messageStats';
-
-			$subActions = array(
-				'messagestats' => 'action_messageStats',
-				'topicstats' => 'action_topicStats',
-				'boardstats' => 'action_boardStats',
-				'mostlikesreceiveduserstats' => 'action_mostLikesReceivedUserStats',
-				'mostlikesgivenuserstats' => 'action_mostLikesGivenUserStats',
-			);
-
-			//wakey wakey, call the func you lazy
-			if (isset($_REQUEST['area']) && isset($subActions[$_REQUEST['area']]) && method_exists($this, $subActions[$_REQUEST['area']])) return $this->$subActions[$_REQUEST['area']]();
-
-			$this->$default_action_func();
-		}
-		else
-		{
-			// Load the required files
-			loadLanguage('LikePosts');
-			loadJavascriptFile('like_posts.js', array('defer' => true));
-			loadtemplate('LikePostsStats');
-
-			$context['page_title'] = $txt['like_post_stats'];
-			$context['like_posts']['tab_desc'] = $txt['like_posts_stats_desc'];
-
-			$context['lp_stats_tabs'] = array(
-				'messagestats' => array(
-					'label' => $txt['like_post_message'],
-					'id' => 'messagestats',
-				),
-				'topicstats' => array(
-					'label' => $txt['like_post_topic'],
-					'id' => 'topicstats',
-				),
-				'boardstats' => array(
-					'label' => $txt['like_post_board'],
-					'id' => 'boardstats',
-				),
-				'usergivenstats' => array(
-					'label' => $txt['like_post_tab_mlmember'],
-					'id' => 'mostlikesreceiveduserstats',
-				),
-				'userreceivedstats' => array(
-					'label' => $txt['like_post_tab_mlgmember'],
-					'id' => 'mostlikesgivenuserstats',
-				),
-			);
-			$context['sub_template'] = 'lp_stats';
-		}
-	}
-
-	private function action_messageStats()
-	{
-		global $txt;
-
-		$data = dbMostLikedMessage();
-
-		if($data) {
-			$this->_likes_response = array('result' => true, 'data' => $data);
-		} else {
-			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
-		}
-		$this->likeResponse();
-	}
-
-	private function action_topicStats()
-	{
-		global $txt;
-
-		$data = dbMostLikedTopic();
-
-		if($data) {
-			$this->_likes_response = array('result' => true, 'data' => $data);
-		} else {
-			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
-		}
-		$this->likeResponse();
-	}
-
-	private function action_boardStats()
-	{
-		global $txt;
-
-		$data = dbMostLikedBoard();
-
-		if($data) {
-			$this->_likes_response = array('result' => true, 'data' => $data);
-		} else {
-			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
-		}
-		$this->likeResponse();
-	}
-
-	private function action_mostLikesReceivedUserStats()
-	{
-		global $txt;
-
-		$data = dbMostLikesReceivedUser();
-
-		if($data) {
-			$this->_likes_response = array('result' => true, 'data' => $data);
-		} else {
-			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
-		}
-		$this->likeResponse();
-	}
-
-	private function action_mostLikesGivenUserStats()
-	{
-		global $txt;
-
-		$data = dbMostLikesGivenUser();
-
-		if($data) {
-			$this->_likes_response = array('result' => true, 'data' => $data);
-		} else {
-			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
-		}
-		$this->likeResponse();
-	}
 	/**
 	 * Likes a post due to its awesomeness
 	 * Permission checks are done in prepare_likes
@@ -759,5 +626,164 @@ class Likes_Controller extends Action_Controller
 	{
 		// Get a list of this posts likers
 		return postLikers($start, $items_per_page, $sort, $messageID);
+	}
+
+	/**
+	 * Like stats controller function
+	 * Validates whether user is allowed to see stats or not
+	 * Decides which tab data to fetch and shown to user
+	 */
+	public function action_likestats()
+	{
+		global $context, $user_info, $topic, $txt, $modSettings;
+
+		require_once(SUBSDIR . '/Likes.subs.php');
+
+		if (empty($modSettings['likes_enabled']))
+			fatal_lang_error('feature_disabled', true);
+
+		isAllowedTo('like_posts_stats');
+
+		if ($this->_api)
+		{
+			$default_action_func = 'action_messageStats';
+
+			$subActions = array(
+				'messagestats' => 'action_messageStats',
+				'topicstats' => 'action_topicStats',
+				'boardstats' => 'action_boardStats',
+				'mostlikesreceiveduserstats' => 'action_mostLikesReceivedUserStats',
+				'mostlikesgivenuserstats' => 'action_mostLikesGivenUserStats',
+			);
+
+			//wakey wakey, call the func you lazy
+			if (isset($_REQUEST['area']) && isset($subActions[$_REQUEST['area']]) && method_exists($this, $subActions[$_REQUEST['area']])) return $this->$subActions[$_REQUEST['area']]();
+
+			$this->$default_action_func();
+		}
+		else
+		{
+			// Load the required files
+			loadLanguage('LikePosts');
+			loadJavascriptFile('like_posts.js', array('defer' => true));
+			loadtemplate('LikePostsStats');
+
+			$context['page_title'] = $txt['like_post_stats'];
+			$context['like_posts']['tab_desc'] = $txt['like_posts_stats_desc'];
+
+			$context['lp_stats_tabs'] = array(
+				'messagestats' => array(
+					'label' => $txt['like_post_message'],
+					'id' => 'messagestats',
+				),
+				'topicstats' => array(
+					'label' => $txt['like_post_topic'],
+					'id' => 'topicstats',
+				),
+				'boardstats' => array(
+					'label' => $txt['like_post_board'],
+					'id' => 'boardstats',
+				),
+				'usergivenstats' => array(
+					'label' => $txt['like_post_tab_mlmember'],
+					'id' => 'mostlikesreceiveduserstats',
+				),
+				'userreceivedstats' => array(
+					'label' => $txt['like_post_tab_mlgmember'],
+					'id' => 'mostlikesgivenuserstats',
+				),
+			);
+			$context['sub_template'] = 'lp_stats';
+		}
+	}
+
+	/**
+	 * Fetches the most liked message data
+	 * Returns the data via ajax
+	 */
+	private function action_messageStats()
+	{
+		global $txt;
+
+		$data = dbMostLikedMessage();
+
+		if($data) {
+			$this->_likes_response = array('result' => true, 'data' => $data);
+		} else {
+			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
+		}
+		$this->likeResponse();
+	}
+
+	/**
+	 * Fetches the most liked topic data
+	 * Returns the data via ajax
+	 */
+	private function action_topicStats()
+	{
+		global $txt;
+
+		$data = dbMostLikedTopic();
+
+		if($data) {
+			$this->_likes_response = array('result' => true, 'data' => $data);
+		} else {
+			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
+		}
+		$this->likeResponse();
+	}
+
+	/**
+	 * Fetches the most liked board data
+	 * Returns the data via ajax
+	 */
+	private function action_boardStats()
+	{
+		global $txt;
+
+		$data = dbMostLikedBoard();
+
+		if($data) {
+			$this->_likes_response = array('result' => true, 'data' => $data);
+		} else {
+			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
+		}
+		$this->likeResponse();
+	}
+
+	/**
+	 * Fetches the data for the highest likes received user
+	 * Returns the data via ajax
+	 */
+	private function action_mostLikesReceivedUserStats()
+	{
+		global $txt;
+
+		$data = dbMostLikesReceivedUser();
+
+		if($data) {
+			$this->_likes_response = array('result' => true, 'data' => $data);
+		} else {
+			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
+		}
+		$this->likeResponse();
+	}
+
+	/**
+	 * Retrieves the most like giving user
+	 * Returns the data via ajax
+	 */
+	private function action_mostLikesGivenUserStats()
+	{
+		global $txt;
+
+		$data = dbMostLikesGivenUser();
+
+		if($data) {
+			$this->_likes_response = array('result' => true, 'data' => $data);
+		} else {
+			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
+		}
+		$this->likeResponse();
 	}
 }
