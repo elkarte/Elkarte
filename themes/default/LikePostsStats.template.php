@@ -19,7 +19,7 @@
 
 function template_lp_stats()
 {
-	global $context, $txt, $sourcedir, $settings, $user_info, $options, $scripturl;
+	global $context, $txt;
 
 	echo '
 	<div class="like_post_stats">
@@ -40,7 +40,7 @@ function template_lp_stats()
 		<ul class="like_post_stats_menu buttonlist" role="menubar">';
 
 		// Print out all the items in this tab.
-		foreach ($context['lp_stats_tabs'] as $sa => $tab)
+		foreach ($context['lp_stats_tabs'] as $tab)
 		{
 			echo '
 			<li role="menuitem">
