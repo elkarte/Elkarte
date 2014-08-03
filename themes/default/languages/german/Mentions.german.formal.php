@@ -32,3 +32,5 @@ $txt['mentions_type_men'] = 'Erwähnungen';
 $txt['mentions_type_like'] = 'Gefällt mir';
 $txt['mentions_type_rlike'] = 'Gefällt mir nicht mehr';
 $txt['mentions_type_buddy'] = 'Freund';
+
+$txt['mentions_mark_all_read'] = 'Diese Erwähnungen als gelesen markieren';

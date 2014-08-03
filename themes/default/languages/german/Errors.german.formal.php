@@ -183,6 +183,7 @@ $txt['ban_ban_item_empty'] = 'Sperrauslöser nicht gefunden';
 $txt['impossible_insert_new_bangroup'] = 'Ein Fehler ist beim Einfügen der neuen Sperre aufgetreten';
 
 $txt['like_heading_error'] = 'Fehler beim Mögen';
+$txt['like_wait_time'] = 'Verzeihung, Sie können nichts vor Ablauf von %1$s %2$s mögen.';
 $txt['like_unlike_error'] = 'Hoppla, beim Mögen/Nichtmehrmögen des Beitrags ist ein Fehler aufgetreten';
 $txt['cant_like_yourself'] = 'Die eigenen Beiträge zu mögen ... das ist wie über die eigenen Witze zu lachen, wenn sonst niemand da ist ... lol ... Moment, habe ich gerade selbst gelacht?';
 

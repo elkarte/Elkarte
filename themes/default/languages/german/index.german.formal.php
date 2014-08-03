@@ -21,12 +21,60 @@ $txt['lang_capitalize_dates'] = true;
 // Number format.
 $txt['number_format'] = '1.234,00';
 
-$txt['days'] = array('Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Sonnabend');
-$txt['days_short'] = array('So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa');
-// Months must start with 1 => 'January'. (or translated, of course.)
-$txt['months'] = array(1 => 'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember');
-$txt['months_titles'] = array(1 => 'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember');
-$txt['months_short'] = array(1 => 'Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez');
+$txt['sunday'] = 'Sonntag';
+$txt['monday'] = 'Montag';
+$txt['tuesday'] = 'Dienstag';
+$txt['wednesday'] = 'Mittwoch';
+$txt['thursday'] = 'Donnerstag';
+$txt['friday'] = 'Freitag';
+$txt['saturday'] = 'Sonnabend';
+
+$txt['sunday_short'] = 'So';
+$txt['monday_short'] = 'Mo';
+$txt['tuesday_short'] = 'Di';
+$txt['wednesday_short'] = 'Mi';
+$txt['thursday_short'] = 'Do';
+$txt['friday_short'] = 'Fr';
+$txt['saturday_short'] = 'Sa';
+
+$txt['january'] = 'Januar';
+$txt['february'] = 'Februar';
+$txt['march'] = 'März';
+$txt['april'] = 'April';
+$txt['may'] = 'Mai';
+$txt['june'] = 'Juni';
+$txt['july'] = 'Juli';
+$txt['august'] = 'August';
+$txt['september'] = 'September';
+$txt['october'] = 'Oktober';
+$txt['november'] = 'November';
+$txt['december'] = 'Dezember';
+
+$txt['january_titles'] = 'Januar';
+$txt['february_titles'] = 'Februar';
+$txt['march_titles'] = 'März';
+$txt['april_titles'] = 'April';
+$txt['may_titles'] = 'Mai';
+$txt['june_titles'] = 'Juni';
+$txt['july_titles'] = 'Juli';
+$txt['august_titles'] = 'August';
+$txt['september_titles'] = 'September';
+$txt['october_titles'] = 'Oktober';
+$txt['november_titles'] = 'November';
+$txt['december_titles'] = 'Dezember';
+
+$txt['january_short'] = 'Jan';
+$txt['february_short'] = 'Feb';
+$txt['march_short'] = 'Mar';
+$txt['april_short'] = 'Apr';
+$txt['may_short'] = 'May';
+$txt['june_short'] = 'Jun';
+$txt['july_short'] = 'Jul';
+$txt['august_short'] = 'Aug';
+$txt['september_short'] = 'Sep';
+$txt['october_short'] = 'Oct';
+$txt['november_short'] = 'Nov';
+$txt['december_short'] = 'Dec';
 
 $txt['time_am'] = 'vormittags';
 $txt['time_pm'] = 'nachmittags';
@@ -343,6 +391,7 @@ $txt['logged'] = 'Protokolliert';
 $txt['ip'] = 'IP';
 
 $txt['www'] = 'WWW';
+$txt['link'] = 'Verweis';
 
 $txt['by'] = 'von'; //Deprecated // OK :-(
 
