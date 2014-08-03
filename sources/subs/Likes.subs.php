@@ -551,7 +551,7 @@ function dbMostLikedMessage()
 				'name' => $row['member_received_name'],
 				'total_posts' => $row['posts'],
 				'href' => $row['member_received_name'] != '' && !empty($row['id_poster']) ? $scripturl . '?action=profile;u=' . $row['id_poster'] : '',
-				'avatar' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) : $settings['default_theme_url'] . '/images/no_avatar.png') : (stristr($row['avatar'], 'http://') ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar']),
+				'avatar' => determineAvatar($row),
 			),
 		);
 		$id_member_gave = $row['id_member_gave'];
@@ -583,7 +583,7 @@ function dbMostLikedMessage()
 			'id_member' => $row['id_member'],
 			'real_name' => $row['real_name'],
 			'href' => $row['real_name'] != '' && !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
-			'avatar' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) : $settings['default_theme_url'] . '/images/no_avatar.png') : (stristr($row['avatar'], 'http://') ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar']),
+			'avatar' => determineAvatar($row),
 
 		);
 	}
@@ -656,7 +656,7 @@ function dbMostLikedTopic()
 				'id_member' => $row['id_member'],
 				'name' => $row['real_name'],
 				'href' => $row['real_name'] != '' && !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
-				'avatar' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) : $settings['default_theme_url'] . '/images/no_avatar.png') : (stristr($row['avatar'], 'http://') ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar']),
+				'avatar' => determineAvatar($row),
 			),
 		);
 	}
@@ -670,7 +670,7 @@ function dbMostLikedTopic()
  */
 function dbMostLikedBoard()
 {
-	global $smcFunc, $scripturl, $modSettings, $settings, $txt;
+	global $scripturl, $txt;
 
 	$db = database();
 	// Most liked board
@@ -729,7 +729,7 @@ function dbMostLikedBoard()
 				'id_member' => $row['id_member'],
 				'name' => $row['real_name'],
 				'href' => $row['real_name'] != '' && !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
-				'avatar' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) : $settings['default_theme_url'] . '/images/no_avatar.png') : (stristr($row['avatar'], 'http://') ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar']),
+				'avatar' => determineAvatar($row),
 			),
 		);
 	}
@@ -743,7 +743,7 @@ function dbMostLikedBoard()
  */
 function dbMostLikesReceivedUser()
 {
-	global $smcFunc, $scripturl, $modSettings, $settings, $txt;
+	global $scripturl, $txt;
 
 	$db = database();
 	// Most liked board
@@ -771,7 +771,7 @@ function dbMostLikesReceivedUser()
 				'total_posts' => $row['posts'],
 				'date_registered' => $row['date_registered'],
 				'href' => $row['real_name'] != '' && !empty($row['id_poster']) ? $scripturl . '?action=profile;u=' . $row['id_poster'] : '',
-				'avatar' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) : $settings['default_theme_url'] . '/images/no_avatar.png') : (stristr($row['avatar'], 'http://') ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar']),
+				'avatar' => determineAvatar($row),
 			),
 			'like_count' => $row['like_count'],
 		);
@@ -829,7 +829,7 @@ function dbMostLikesReceivedUser()
  */
 function dbMostLikesGivenUser()
 {
-	global $smcFunc, $scripturl, $modSettings, $settings, $txt;
+	global $scripturl, $txt;
 
 	$db = database();
 	// Most liked board
@@ -850,6 +850,7 @@ function dbMostLikesGivenUser()
 	);
 	while ($row = $db->fetch_assoc($request))
 	{
+		$row['avatar'] = determineAvatar($row);
 		$mostLikeGivingMember = array(
 			'member_given' => array(
 				'id_member' => $row['id_member'],
@@ -857,7 +858,7 @@ function dbMostLikesGivenUser()
 				'total_posts' => $row['posts'],
 				'date_registered' => $row['date_registered'],
 				'href' => $row['real_name'] != '' && !empty($row['id_member_gave']) ? $scripturl . '?action=profile;u=' . $row['id_member_gave'] : '',
-				'avatar' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) : $settings['default_theme_url'] . '/images/no_avatar.png') : (stristr($row['avatar'], 'http://') ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar']),
+				'avatar' => $row['avatar'],
 			),
 			'like_count' => $row['like_count'],
 		);
