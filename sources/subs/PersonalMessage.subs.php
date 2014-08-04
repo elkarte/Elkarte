@@ -859,7 +859,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	);
 
 	// Select the right template
-	$email_template = ($maillist ? 'pbe_' : '') . 'new_pm' . (empty($modSettings['disallow_sendBody']) ? '_body' : '') . (!empty($to_names) ? '_tolist' : '');
+	$email_template = ($maillist && empty($modSettings['disallow_sendBody']) ? 'pbe_' : '') . 'new_pm' . (empty($modSettings['disallow_sendBody']) ? '_body' : '') . (!empty($to_names) ? '_tolist' : '');
 
 	foreach ($notifications as $lang => $notification_list)
 	{

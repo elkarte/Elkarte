@@ -222,10 +222,10 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 				// Send only if once is off or it's on and it hasn't been sent.
 				if ($type !== 'reply' || empty($row['notify_regularity']) || empty($row['sent']))
 				{
-					$emaildata = loadEmailTemplate((($maillist && $email_perm && $type === 'reply') ? 'pbe_' : '') . $message_type, $replacements, $needed_language);
+					$emaildata = loadEmailTemplate((($maillist && $email_perm && $type === 'reply' && !empty($row['notify_send_body'])) ? 'pbe_' : '') . $message_type, $replacements, $needed_language);
 
 					// If using the maillist functions, we adjust who this is coming from
-					if ($maillist && $email_perm && $type === 'reply')
+					if ($maillist && $email_perm && $type === 'reply' && !empty($row['notify_send_body']))
 					{
 						// In group mode like google group or yahoo group, the mail is from the poster
 						// Otherwise in maillist mode, it is from the site
@@ -275,7 +275,6 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			'members_only' => is_array($members_only) ? $members_only : array($members_only),
 		)
 	);
-
 	while ($row = $db->fetch_assoc($members))
 	{
 		// Don't do the excluded...
@@ -325,10 +324,10 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		// Send only if once is off or it's on and it hasn't been sent.
 		if ($type != 'reply' || empty($row['notify_regularity']) || empty($row['sent']))
 		{
-			$emaildata = loadEmailTemplate((($maillist && $email_perm && $type === 'reply') ? 'pbe_' : '') . $message_type, $replacements, $needed_language);
+			$emaildata = loadEmailTemplate((($maillist && $email_perm && $type === 'reply' && !empty($row['notify_send_body'])) ? 'pbe_' : '') . $message_type, $replacements, $needed_language);
 
 			// Using the maillist functions? Then adjust the from wrapper
-			if ($maillist && $email_perm && $type === 'reply')
+			if ($maillist && $email_perm && $type === 'reply' && !empty($row['notify_send_body']))
 			{
 				// Set the from name base on group or maillist mode
 				$emailfrom = !empty($modSettings['maillist_group_mode']) ? un_htmlspecialchars($topicData[$row['id_topic']]['name']) : un_htmlspecialchars($modSettings['maillist_sitename']);
@@ -518,11 +517,11 @@ function sendBoardNotifications(&$topicData)
 			if (!empty($emailtype))
 			{
 				$emailtype .= $send_body ? '_body' : '';
-				$emaildata = loadEmailTemplate((($maillist && $email_perm) ? 'pbe_' : '') . $emailtype, $replacements, $langloaded);
+				$emaildata = loadEmailTemplate((($maillist && $email_perm && $send_body) ? 'pbe_' : '') . $emailtype, $replacements, $langloaded);
 				$emailname = (!empty($topicData[$key]['name'])) ? un_htmlspecialchars($topicData[$key]['name']) : null;
 
 				// Maillist style?
-				if ($maillist && $email_perm)
+				if ($maillist && $email_perm && $send_body)
 				{
 					// Add in the from wrapper and trigger sendmail to add in a security key
 					$from_wrapper = !empty($modSettings['maillist_mail_from']) ? $modSettings['maillist_mail_from'] : (empty($modSettings['maillist_sitename_address']) ? $webmaster_email : $modSettings['maillist_sitename_address']);
