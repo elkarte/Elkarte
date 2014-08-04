@@ -658,7 +658,7 @@ class Likes_Controller extends Action_Controller
 			$action = new Action('likesstats');
 
 			// Pick the correct sub-action, call integrate_sa_likesstats
-			$subAction = $action->initialize($subActions, 'messagestats');
+			$subAction = $action->initialize($subActions, 'messagestats', 'area');
 			$context['sub_action'] = $subAction;
 
 			// Call the right function for this sub-action.
@@ -704,7 +704,7 @@ class Likes_Controller extends Action_Controller
 	 * Fetches the most liked message data
 	 * Returns the data via ajax
 	 */
-	private function action_messageStats()
+	public function action_messageStats()
 	{
 		global $txt;
 
@@ -726,7 +726,7 @@ class Likes_Controller extends Action_Controller
 	 * Fetches the most liked topic data
 	 * Returns the data via ajax
 	 */
-	private function action_topicStats()
+	public function action_topicStats()
 	{
 		global $txt;
 
@@ -748,7 +748,7 @@ class Likes_Controller extends Action_Controller
 	 * Fetches the most liked board data
 	 * Returns the data via ajax
 	 */
-	private function action_boardStats()
+	public function action_boardStats()
 	{
 		global $txt;
 
@@ -770,7 +770,7 @@ class Likes_Controller extends Action_Controller
 	 * Fetches the data for the highest likes received user
 	 * Returns the data via ajax
 	 */
-	private function action_mostLikesReceivedUserStats()
+	public function action_mostLikesReceivedUserStats()
 	{
 		global $txt;
 
@@ -792,7 +792,7 @@ class Likes_Controller extends Action_Controller
 	 * Retrieves the most like giving user
 	 * Returns the data via ajax
 	 */
-	private function action_mostLikesGivenUserStats()
+	public function action_mostLikesGivenUserStats()
 	{
 		global $txt;
 

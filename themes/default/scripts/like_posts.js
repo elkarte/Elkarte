@@ -179,26 +179,24 @@
 
 			init = function(params) {
 				txtStrings = $.extend({}, params.txtStrings);
-				if (params.onError === "") {
-					allowedUrls = {
-						'messagestats': {
-							'uiFunc': showMessageStats
-						},
-						'topicstats': {
-							'uiFunc': showTopicStats
-						},
-						'boardstats': {
-							'uiFunc': showBoardStats
-						},
-						'mostlikesreceiveduserstats': {
-							'uiFunc': showMostLikesReceivedUserStats
-						},
-						'mostlikesgivenuserstats': {
-							'uiFunc': showMostLikesGivenUserStats
-						}
-					};
-					checkUrl();
-				}
+				allowedUrls = {
+					'messagestats': {
+						'uiFunc': showMessageStats
+					},
+					'topicstats': {
+						'uiFunc': showTopicStats
+					},
+					'boardstats': {
+						'uiFunc': showBoardStats
+					},
+					'mostlikesreceiveduserstats': {
+						'uiFunc': showMostLikesReceivedUserStats
+					},
+					'mostlikesgivenuserstats': {
+						'uiFunc': showMostLikesGivenUserStats
+					}
+				};
+				checkUrl();
 			},
 
 			showSpinnerOverlay = function() {

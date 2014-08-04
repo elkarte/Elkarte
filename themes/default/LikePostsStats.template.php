@@ -28,8 +28,6 @@ function template_lp_stats()
 			', $context['like_posts']['tab_desc'] ,'
 		</p>';
 
-	if (empty($context['like_post_stats_error']))
-	{
 		echo '
 		<ul class="like_post_stats_menu buttonlist" role="menubar">';
 
@@ -46,10 +44,7 @@ function template_lp_stats()
 
 		echo '
 		</ul>';
-	}
 
-	if (empty($context['like_post_stats_error']))
-	{
 		echo '
 		<div class="forum_category">
 			<h2 class="category_header" id="like_post_current_tab">
@@ -69,18 +64,6 @@ function template_lp_stats()
 		echo '
 			<div id="like_post_stats_overlay"></div>
 			<div id="lp_preloader"></div>';
-	}
-	else
-	{
-		echo '
-		<div id="admincenter">
-			<div class="windowbg2">
-				<span class="topslice"><span></span></span>
-					<div class="content">', $context['like_post_stats_error'] ,'</div>
-				<span class="botslice"><span></span></span>
-			</div>
-		</div>';
-	}
 
 	echo '
 	</div>';
@@ -88,7 +71,6 @@ function template_lp_stats()
 	echo '<script type="text/javascript"><!-- // --><![CDATA[
 		window.onload = function() {
 			likePostStats.prototype.init({
-				onError: ' . JavaScriptEscape($context['like_post_stats_error']) . ',
 				txtStrings: {
 					topic: ' . JavaScriptEscape($txt['like_post_topic']) . ',
 					message: ' . JavaScriptEscape($txt['like_post_message']) . ',

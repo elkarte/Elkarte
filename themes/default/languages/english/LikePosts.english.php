@@ -11,6 +11,7 @@ $txt['like_post_tab_mlb'] = 'Most liked board';
 $txt['like_post_tab_mlmember'] = 'Most Liked Member';
 $txt['like_post_tab_mlgmember'] = 'Most Like Giving user';
 $txt['like_post_generic_heading1'] = 'like(s) so far';
+$txt['like_post_liked_by_others'] = 'Likes received';
 
 // For message
 $txt['like_post_users_who_liked'] = 'users who liked this post';
