@@ -535,6 +535,7 @@ function dbMostLikedMessage()
 	{
 		censorText($row['body']);
 		$msgString = shorten_text($row['body'], 255, true);
+		$avatar = determineAvatar($row):
 
 		$mostLikedMessage = array(
 			'id_msg' => $row['id_msg'],
@@ -551,7 +552,7 @@ function dbMostLikedMessage()
 				'name' => $row['member_received_name'],
 				'total_posts' => $row['posts'],
 				'href' => $row['member_received_name'] != '' && !empty($row['id_poster']) ? $scripturl . '?action=profile;u=' . $row['id_poster'] : '',
-				'avatar' => determineAvatar($row),
+				'avatar' => $avatar['href'],
 			),
 		);
 		$id_member_gave = $row['id_member_gave'];
@@ -579,11 +580,12 @@ function dbMostLikedMessage()
 
 	while ($row = $db->fetch_assoc($request))
 	{
+		$avatar = determineAvatar($row);
 		$mostLikedMessage['member_liked_data'][] = array(
 			'id_member' => $row['id_member'],
 			'real_name' => $row['real_name'],
 			'href' => $row['real_name'] != '' && !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
-			'avatar' => determineAvatar($row),
+			'avatar' => $avatar['href'],
 
 		);
 	}
@@ -645,6 +647,7 @@ function dbMostLikedTopic()
 	{
 		censorText($row['body']);
 		$msgString = shorten_text($row['body'], 255, true);
+		$avatar = determineAvatar($row);
 
 		$mostLikedTopic['msg_data'][] = array(
 			'id_msg' => $row['id_msg'],
@@ -656,7 +659,7 @@ function dbMostLikedTopic()
 				'id_member' => $row['id_member'],
 				'name' => $row['real_name'],
 				'href' => $row['real_name'] != '' && !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
-				'avatar' => determineAvatar($row),
+				'avatar' => $avatar['href'],
 			),
 		);
 	}
@@ -718,6 +721,7 @@ function dbMostLikedBoard()
 	{
 		censorText($row['body']);
 		$msgString = shorten_text($row['body'], 255, true);
+		$avatar = determineAvatar($row);
 
 		$mostLikedBoard['topic_data'][] = array(
 			'id_topic' => $row['id_topic'],
@@ -729,7 +733,7 @@ function dbMostLikedBoard()
 				'id_member' => $row['id_member'],
 				'name' => $row['real_name'],
 				'href' => $row['real_name'] != '' && !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
-				'avatar' => determineAvatar($row),
+				'avatar' => $avatar['href'],
 			),
 		);
 	}
@@ -764,6 +768,7 @@ function dbMostLikesReceivedUser()
 	);
 	while ($row = $db->fetch_assoc($request))
 	{
+		$avatar = determineAvatar($row);
 		$mostLikedMember = array(
 			'member_received' => array(
 				'id_member' => $row['id_poster'],
@@ -771,7 +776,7 @@ function dbMostLikesReceivedUser()
 				'total_posts' => $row['posts'],
 				'date_registered' => $row['date_registered'],
 				'href' => $row['real_name'] != '' && !empty($row['id_poster']) ? $scripturl . '?action=profile;u=' . $row['id_poster'] : '',
-				'avatar' => determineAvatar($row),
+				'avatar' => $avatar['href'],
 			),
 			'like_count' => $row['like_count'],
 		);
@@ -850,7 +855,7 @@ function dbMostLikesGivenUser()
 	);
 	while ($row = $db->fetch_assoc($request))
 	{
-		$row['avatar'] = determineAvatar($row);
+		$avatar = determineAvatar($row);
 		$mostLikeGivingMember = array(
 			'member_given' => array(
 				'id_member' => $row['id_member'],
@@ -858,7 +863,7 @@ function dbMostLikesGivenUser()
 				'total_posts' => $row['posts'],
 				'date_registered' => $row['date_registered'],
 				'href' => $row['real_name'] != '' && !empty($row['id_member_gave']) ? $scripturl . '?action=profile;u=' . $row['id_member_gave'] : '',
-				'avatar' => $row['avatar'],
+				'avatar' => $avatar['href'],
 			),
 			'like_count' => $row['like_count'],
 		);
