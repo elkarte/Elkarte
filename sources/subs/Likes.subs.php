@@ -535,7 +535,7 @@ function dbMostLikedMessage()
 	{
 		censorText($row['body']);
 		$msgString = shorten_text($row['body'], 255, true);
-		$avatar = determineAvatar($row):
+		$avatar = determineAvatar($row);
 
 		$mostLikedMessage = array(
 			'id_msg' => $row['id_msg'],
@@ -551,7 +551,7 @@ function dbMostLikedMessage()
 				'id_member' => $row['id_poster'],
 				'name' => $row['member_received_name'],
 				'total_posts' => $row['posts'],
-				'href' => && !empty($row['id_poster']) ? $scripturl . '?action=profile;u=' . $row['id_poster'] : '',
+				'href' => !empty($row['id_poster']) ? $scripturl . '?action=profile;u=' . $row['id_poster'] : '',
 				'avatar' => $avatar['href'],
 			),
 		);
