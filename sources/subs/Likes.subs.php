@@ -551,7 +551,7 @@ function dbMostLikedMessage()
 				'id_member' => $row['id_poster'],
 				'name' => $row['member_received_name'],
 				'total_posts' => $row['posts'],
-				'href' => $row['member_received_name'] != '' && !empty($row['id_poster']) ? $scripturl . '?action=profile;u=' . $row['id_poster'] : '',
+				'href' => && !empty($row['id_poster']) ? $scripturl . '?action=profile;u=' . $row['id_poster'] : '',
 				'avatar' => $avatar['href'],
 			),
 		);
@@ -584,7 +584,7 @@ function dbMostLikedMessage()
 		$mostLikedMessage['member_liked_data'][] = array(
 			'id_member' => $row['id_member'],
 			'real_name' => $row['real_name'],
-			'href' => $row['real_name'] != '' && !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
+			'href' => !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
 			'avatar' => $avatar['href'],
 
 		);
@@ -658,7 +658,7 @@ function dbMostLikedTopic()
 			'member' => array(
 				'id_member' => $row['id_member'],
 				'name' => $row['real_name'],
-				'href' => $row['real_name'] != '' && !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
+				'href' => !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
 				'avatar' => $avatar['href'],
 			),
 		);
@@ -732,7 +732,7 @@ function dbMostLikedBoard()
 			'member' => array(
 				'id_member' => $row['id_member'],
 				'name' => $row['real_name'],
-				'href' => $row['real_name'] != '' && !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
+				'href' => !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
 				'avatar' => $avatar['href'],
 			),
 		);
@@ -775,7 +775,7 @@ function dbMostLikesReceivedUser()
 				'name' => $row['real_name'],
 				'total_posts' => $row['posts'],
 				'date_registered' => $row['date_registered'],
-				'href' => $row['real_name'] != '' && !empty($row['id_poster']) ? $scripturl . '?action=profile;u=' . $row['id_poster'] : '',
+				'href' => !empty($row['id_poster']) ? $scripturl . '?action=profile;u=' . $row['id_poster'] : '',
 				'avatar' => $avatar['href'],
 			),
 			'like_count' => $row['like_count'],
@@ -862,7 +862,7 @@ function dbMostLikesGivenUser()
 				'name' => $row['real_name'],
 				'total_posts' => $row['posts'],
 				'date_registered' => $row['date_registered'],
-				'href' => $row['real_name'] != '' && !empty($row['id_member_gave']) ? $scripturl . '?action=profile;u=' . $row['id_member_gave'] : '',
+				'href' => !empty($row['id_member_gave']) ? $scripturl . '?action=profile;u=' . $row['id_member_gave'] : '',
 				'avatar' => $avatar['href'],
 			),
 			'like_count' => $row['like_count'],
