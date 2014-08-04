@@ -514,11 +514,11 @@ function dbMostLikedMessage()
 	$mostLikedMessage = array();
 
 	$request = $db->query('', '
-		SELECT mem.real_name as member_received_name, lp.id_msg, m.id_topic, m.id_board,
+		SELECT IFNULL(mem.real_name, m.poster_name) as member_received_name, lp.id_msg, m.id_topic, m.id_board,
 			lp.id_poster, GROUP_CONCAT(CONVERT(lp.id_member, CHAR(8)) SEPARATOR ",") AS id_member_gave,
 			COUNT(lp.id_msg) AS like_count, m.subject, m.body, m.poster_time,
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type, mem.avatar,
-			mem.posts, m.smileys_enabled
+			mem.posts, m.smileys_enabled, mem.email_address
 		FROM {db_prefix}message_likes as lp
 			INNER JOIN {db_prefix}members as mem ON (mem.id_member = lp.id_poster)
 			INNER JOIN {db_prefix}messages as m ON (m.id_msg = lp.id_msg)
@@ -535,6 +535,7 @@ function dbMostLikedMessage()
 	{
 		censorText($row['body']);
 		$msgString = shorten_text($row['body'], 255, true);
+		$avatar = determineAvatar($row);
 
 		$mostLikedMessage = array(
 			'id_msg' => $row['id_msg'],
@@ -550,8 +551,8 @@ function dbMostLikedMessage()
 				'id_member' => $row['id_poster'],
 				'name' => $row['member_received_name'],
 				'total_posts' => $row['posts'],
-				'href' => $row['member_received_name'] != '' && !empty($row['id_poster']) ? $scripturl . '?action=profile;u=' . $row['id_poster'] : '',
-				'avatar' => determineAvatar($row),
+				'href' => !empty($row['id_poster']) ? $scripturl . '?action=profile;u=' . $row['id_poster'] : '',
+				'avatar' => $avatar['href'],
 			),
 		);
 		$id_member_gave = $row['id_member_gave'];
@@ -568,7 +569,7 @@ function dbMostLikedMessage()
 	// Lets fetch info of users who liked the message
 	$request = $db->query('', '
 		SELECT mem.id_member, mem.real_name, IFNULL(a.id_attach, 0) AS id_attach,
-			a.filename, a.attachment_type, mem.avatar
+			a.filename, a.attachment_type, mem.avatar, mem.email_address
 		FROM {db_prefix}members as mem
 		LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member)
 		WHERE mem.id_member IN ({raw:id_member_gave})',
@@ -579,11 +580,12 @@ function dbMostLikedMessage()
 
 	while ($row = $db->fetch_assoc($request))
 	{
+		$avatar = determineAvatar($row);
 		$mostLikedMessage['member_liked_data'][] = array(
 			'id_member' => $row['id_member'],
 			'real_name' => $row['real_name'],
-			'href' => $row['real_name'] != '' && !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
-			'avatar' => determineAvatar($row),
+			'href' => !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
+			'avatar' => $avatar['href'],
 
 		);
 	}
@@ -630,7 +632,7 @@ function dbMostLikedTopic()
 	$request = $db->query('', '
 		SELECT m.id_msg, m.body, m.poster_time, m.smileys_enabled,
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
-			mem.id_member, mem.real_name, mem.avatar
+			mem.id_member, IFNULL(mem.real_name, m.poster_name) as real_name, mem.avatar, mem.email_address
 		FROM {db_prefix}messages as m
 			INNER JOIN {db_prefix}members as mem ON (mem.id_member = m.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member)
@@ -645,6 +647,7 @@ function dbMostLikedTopic()
 	{
 		censorText($row['body']);
 		$msgString = shorten_text($row['body'], 255, true);
+		$avatar = determineAvatar($row);
 
 		$mostLikedTopic['msg_data'][] = array(
 			'id_msg' => $row['id_msg'],
@@ -655,8 +658,8 @@ function dbMostLikedTopic()
 			'member' => array(
 				'id_member' => $row['id_member'],
 				'name' => $row['real_name'],
-				'href' => $row['real_name'] != '' && !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
-				'avatar' => determineAvatar($row),
+				'href' => !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
+				'avatar' => $avatar['href'],
 			),
 		);
 	}
@@ -703,7 +706,7 @@ function dbMostLikedBoard()
 	$request = $db->query('', '
 		SELECT t.id_topic, m.id_msg, m.body, m.poster_time, m.smileys_enabled,
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
-			mem.id_member, mem.real_name, mem.avatar
+			mem.id_member, IFNULL(mem.real_name, m.poster_name) as real_name, mem.avatar, mem.email_address
 		FROM {db_prefix}topics as t
 			INNER JOIN {db_prefix}messages as m ON (m.id_msg = t.id_first_msg)
 			INNER JOIN {db_prefix}members as mem ON (mem.id_member = m.id_member)
@@ -718,6 +721,7 @@ function dbMostLikedBoard()
 	{
 		censorText($row['body']);
 		$msgString = shorten_text($row['body'], 255, true);
+		$avatar = determineAvatar($row);
 
 		$mostLikedBoard['topic_data'][] = array(
 			'id_topic' => $row['id_topic'],
@@ -728,8 +732,8 @@ function dbMostLikedBoard()
 			'member' => array(
 				'id_member' => $row['id_member'],
 				'name' => $row['real_name'],
-				'href' => $row['real_name'] != '' && !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
-				'avatar' => determineAvatar($row),
+				'href' => !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
+				'avatar' => $avatar['href'],
 			),
 		);
 	}
@@ -752,7 +756,7 @@ function dbMostLikesReceivedUser()
 	$request = $db->query('', '
 		SELECT lp.id_poster, COUNT(lp.id_msg) AS like_count,
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
-			mem.real_name, mem.avatar, mem.date_registered, mem.posts
+			IFNULL(mem.real_name, m.poster_name) as real_name, mem.avatar, mem.date_registered, mem.posts, mem.email_address
 		FROM {db_prefix}message_likes as lp
 			INNER JOIN {db_prefix}messages as m ON (m.id_msg = lp.id_msg)
 			INNER JOIN {db_prefix}members as mem ON (mem.id_member = lp.id_member)
@@ -764,14 +768,15 @@ function dbMostLikesReceivedUser()
 	);
 	while ($row = $db->fetch_assoc($request))
 	{
+		$avatar = determineAvatar($row);
 		$mostLikedMember = array(
 			'member_received' => array(
 				'id_member' => $row['id_poster'],
 				'name' => $row['real_name'],
 				'total_posts' => $row['posts'],
 				'date_registered' => $row['date_registered'],
-				'href' => $row['real_name'] != '' && !empty($row['id_poster']) ? $scripturl . '?action=profile;u=' . $row['id_poster'] : '',
-				'avatar' => determineAvatar($row),
+				'href' => !empty($row['id_poster']) ? $scripturl . '?action=profile;u=' . $row['id_poster'] : '',
+				'avatar' => $avatar['href'],
 			),
 			'like_count' => $row['like_count'],
 		);
@@ -838,7 +843,7 @@ function dbMostLikesGivenUser()
 		SELECT lp.id_member, COUNT(lp.id_msg) AS like_count,
 			GROUP_CONCAT(DISTINCT(CONVERT(lp.id_msg, CHAR(8))) ORDER BY m.id_topic DESC SEPARATOR ",") AS id_msgs,
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
-			mem.real_name, mem.avatar, mem.date_registered, mem.posts
+			IFNULL(mem.real_name, m.poster_name) as real_name, mem.avatar, mem.date_registered, mem.posts, mem.email_address
 		FROM {db_prefix}message_likes as lp
 			INNER JOIN {db_prefix}messages as m ON (m.id_msg = lp.id_msg)
 			INNER JOIN {db_prefix}members as mem ON (mem.id_member = lp.id_member)
@@ -850,15 +855,15 @@ function dbMostLikesGivenUser()
 	);
 	while ($row = $db->fetch_assoc($request))
 	{
-		$row['avatar'] = determineAvatar($row);
+		$avatar = determineAvatar($row);
 		$mostLikeGivingMember = array(
 			'member_given' => array(
 				'id_member' => $row['id_member'],
 				'name' => $row['real_name'],
 				'total_posts' => $row['posts'],
 				'date_registered' => $row['date_registered'],
-				'href' => $row['real_name'] != '' && !empty($row['id_member_gave']) ? $scripturl . '?action=profile;u=' . $row['id_member_gave'] : '',
-				'avatar' => $row['avatar'],
+				'href' => !empty($row['id_member_gave']) ? $scripturl . '?action=profile;u=' . $row['id_member_gave'] : '',
+				'avatar' => $avatar['href'],
 			),
 			'like_count' => $row['like_count'],
 		);

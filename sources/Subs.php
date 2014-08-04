@@ -3437,7 +3437,6 @@ function setupMenuContext()
 				'data-icon' => '&#xf090;',
 				'show' => $user_info['is_guest'] && $context['can_register'],
 			),
-
 			'like_stats' => array(
 				'title' => $txt['like_post_stats'],
 				'href' => $scripturl . '?action=likes;sa=likestats',
