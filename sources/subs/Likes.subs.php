@@ -514,7 +514,7 @@ function dbMostLikedMessage()
 	$mostLikedMessage = array();
 
 	$request = $db->query('', '
-		SELECT mem.real_name as member_received_name, lp.id_msg, m.id_topic, m.id_board,
+		SELECT IFNULL(mem.real_name, m.poster_name) as member_received_name, lp.id_msg, m.id_topic, m.id_board,
 			lp.id_poster, GROUP_CONCAT(CONVERT(lp.id_member, CHAR(8)) SEPARATOR ",") AS id_member_gave,
 			COUNT(lp.id_msg) AS like_count, m.subject, m.body, m.poster_time,
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type, mem.avatar,
@@ -632,7 +632,7 @@ function dbMostLikedTopic()
 	$request = $db->query('', '
 		SELECT m.id_msg, m.body, m.poster_time, m.smileys_enabled,
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
-			mem.id_member, mem.real_name, mem.avatar, mem.email_address
+			mem.id_member, IFNULL(mem.real_name, m.poster_name) as real_name, mem.avatar, mem.email_address
 		FROM {db_prefix}messages as m
 			INNER JOIN {db_prefix}members as mem ON (mem.id_member = m.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member)
@@ -706,7 +706,7 @@ function dbMostLikedBoard()
 	$request = $db->query('', '
 		SELECT t.id_topic, m.id_msg, m.body, m.poster_time, m.smileys_enabled,
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
-			mem.id_member, mem.real_name, mem.avatar, mem.email_address
+			mem.id_member, IFNULL(mem.real_name, m.poster_name) as real_name, mem.avatar, mem.email_address
 		FROM {db_prefix}topics as t
 			INNER JOIN {db_prefix}messages as m ON (m.id_msg = t.id_first_msg)
 			INNER JOIN {db_prefix}members as mem ON (mem.id_member = m.id_member)
@@ -756,7 +756,7 @@ function dbMostLikesReceivedUser()
 	$request = $db->query('', '
 		SELECT lp.id_poster, COUNT(lp.id_msg) AS like_count,
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
-			mem.real_name, mem.avatar, mem.date_registered, mem.posts, mem.email_address
+			IFNULL(mem.real_name, m.poster_name) as real_name, mem.avatar, mem.date_registered, mem.posts, mem.email_address
 		FROM {db_prefix}message_likes as lp
 			INNER JOIN {db_prefix}messages as m ON (m.id_msg = lp.id_msg)
 			INNER JOIN {db_prefix}members as mem ON (mem.id_member = lp.id_member)
@@ -843,7 +843,7 @@ function dbMostLikesGivenUser()
 		SELECT lp.id_member, COUNT(lp.id_msg) AS like_count,
 			GROUP_CONCAT(DISTINCT(CONVERT(lp.id_msg, CHAR(8))) ORDER BY m.id_topic DESC SEPARATOR ",") AS id_msgs,
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
-			mem.real_name, mem.avatar, mem.date_registered, mem.posts, mem.email_address
+			IFNULL(mem.real_name, m.poster_name) as real_name, mem.avatar, mem.date_registered, mem.posts, mem.email_address
 		FROM {db_prefix}message_likes as lp
 			INNER JOIN {db_prefix}messages as m ON (m.id_msg = lp.id_msg)
 			INNER JOIN {db_prefix}members as mem ON (mem.id_member = lp.id_member)
