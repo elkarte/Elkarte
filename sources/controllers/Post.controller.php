@@ -1445,7 +1445,7 @@ class Post_Controller extends Action_Controller
 						'mime_type' => isset($attachment['type']) ? $attachment['type'] : '',
 						'id_folder' => isset($attachment['id_folder']) ? $attachment['id_folder'] : 0,
 						'approved' => !$modSettings['postmod_active'] || allowedTo('post_attachment'),
-						'errors' => $attachment['errors'],
+						'errors' => array(),
 					);
 
 					if (createAttachment($attachmentOptions))
@@ -2117,7 +2117,7 @@ class Post_Controller extends Action_Controller
 		// Add them to the context draft array for template display
 		foreach ($user_drafts as $draft)
 		{
-			$short_subject = empty($draft['subject']) ? $txt['drafts_none'] : shorten_text(stripslashes($draft['subject']), !empty($modSettings['draft_subject_length']) ? $modSettings['draft_subject_length'] : 24);
+			$short_subject = empty($draft['subject']) ? $txt['drafts_none'] : Util::shorten_text(stripslashes($draft['subject']), !empty($modSettings['draft_subject_length']) ? $modSettings['draft_subject_length'] : 24);
 			$context['drafts'][] = array(
 				'subject' => censorText($short_subject),
 				'poster_time' => standardTime($draft['poster_time']),
@@ -2321,7 +2321,7 @@ class Post_Controller extends Action_Controller
 
 		// Clean up the question and answers.
 		$question = htmlspecialchars($options['question'], ENT_COMPAT, 'UTF-8');
-		$question = Util::truncate($question, 255);
+		$question = Util::substr($question, 255);
 		$question = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', $question);
 		$poll_options = htmlspecialchars__recursive($options['options']);
 

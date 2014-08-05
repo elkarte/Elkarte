@@ -182,6 +182,9 @@ input, .input_text, button, select {
 	height: 2em;
 	vertical-align: middle;
 }
+select {
+	padding: 0 6px 0 2px;
+}
 .input_text {
 	font-size: .876em;
 }
@@ -258,8 +261,8 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 /* @todo - Test this out some more. */
 .submitbutton .button_submit, .submitbutton .linkbutton, .submitbutton .right_submit {
 	padding: 0 6px;
-	margin-right: 0.4em;
-	margin-left: 0.4em;
+	margin-right: 0.2em;
+	margin-left: 0.2em;
 }
 /* @todo mostly for those go buttons that don't have a form id */
 .button_submit.submitgo {
@@ -1101,6 +1104,7 @@ a.bbc_link {
 	display: inline-block;
 	padding: 0 1.1em 0 2em;
 	border: none;
+	white-space: nowrap;
 }
 
 /* Nifty indicators. */
@@ -1724,6 +1728,7 @@ dl.settings label {
 
 #sort_by {
 	margin-bottom: -6px;
+	min-height: 2.2em;
 }
 #sort_by .input_check {
 	margin-bottom: 0;
@@ -1892,6 +1897,7 @@ img.new_posts {
 	min-width: 14em;
 	box-sizing: border-box;
 	padding: 0 16px 0 16px;
+	line-height: 1.429em;
 }
 .topic_lastpost .img_last_post {
 	float: right;
@@ -2167,7 +2173,7 @@ div.core_posts {
 	text-align: left;
 }
 .poster .listlevel2 {
-	width: 14em;
+	width: 15em;
 }
 .poster .title {
 	white-space: normal;
@@ -2306,6 +2312,7 @@ div.core_posts {
 }
 .attachments {
 	margin: 20px 0 0 0;
+	clear: both;
 }
 .attachments .attachment {
 	padding: 6px 8px;
@@ -2364,7 +2371,7 @@ div.core_posts {
 	white-space: nowrap;
 }
 #display_jump_to input {
-	vertical-align: baseline;
+	vertical-align: bottom;
 }
 
 /* The quick reply area. */
@@ -2928,6 +2935,10 @@ dl.merge_topic dd {
 	margin: 0 0 3px 0;
 	padding: 0;
 	width: 65%;
+}
+.profileblock_signature dd {
+	width: auto;
+	word-wrap: break-word;
 }
 
 #personal_picture {
@@ -4244,6 +4255,9 @@ dl.no_members {
 	}
 	.topic_name, .topic_starter {
 		margin-right: 18px;
+	}
+	#ic_recentposts, #ps_recentposts, #ps_recenttopics {
+		font-size: 1em;
 	}
 }
 /* This one does 540 and smaller screens at default font size. */

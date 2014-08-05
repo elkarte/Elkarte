@@ -144,6 +144,9 @@ class Recent_Class
 	 */
 	public function getRecentPosts($start, $permissions)
 	{
+		// Provide an easy way for integration to interact with the recent display items
+		call_integration_hook('integrate_recent_message_list', array($this->_messages, &$permissions));
+
 		$this->_getRecentPosts($start);
 
 		// Now go through all the permissions, looking for boards they can do it on.

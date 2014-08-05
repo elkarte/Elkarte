@@ -116,9 +116,6 @@ class ManageSearch_Controller extends Action_Controller
 
 		$config_vars = $this->_searchSettings->settings();
 
-		if (!isset($context['settings_post_javascript']))
-			$context['settings_post_javascript'] = '';
-
 		// Perhaps the search method wants to add some settings?
 		require_once(SUBSDIR . '/Search.subs.php');
 		$searchAPI = findSearchAPI();

@@ -826,10 +826,7 @@ function template_not_done()
 		</div>
 	</div>
 	<script><!-- // --><![CDATA[
-		var countdown = ', $context['continue_countdown'], ',
-			txt_message = "', $txt['not_done_continue'], '";
-
-		doAutoSubmit();
+		doAutoSubmit(', $context['continue_countdown'], ', ', JavaScriptEscape($txt['not_done_continue']), ');
 	// ]]></script>';
 }
 
@@ -840,10 +837,7 @@ function template_show_settings()
 {
 	global $context, $txt, $settings, $scripturl;
 
-	if (!empty($context['settings_pre_javascript']))
-		echo '
-	<script><!-- // --><![CDATA[', $context['settings_pre_javascript'], '// ]]></script>';
-
+	// @todo this should be replaced by layers
 	if (!empty($context['settings_insert_above']))
 		echo $context['settings_insert_above'];
 
@@ -967,11 +961,11 @@ function template_show_settings()
 				// Show the [?] button.
 				if ($config_var['help'])
 					echo '
-							<a id="setting_', $config_var['name'], '" href="', $scripturl, '?action=quickhelp;help=', $config_var['help'], '" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a><span', ($config_var['disabled'] ? ' style="color: #777777;"' : ($config_var['invalid'] ? ' class="error"' : '')), '><label for="', $config_var['name'], '">', $config_var['label'], '</label>', $subtext, ($config_var['type'] == 'password' ? '<br /><em>' . $txt['admin_confirm_password'] . '</em>' : ''), '</span>
+							<a id="setting_', $config_var['name'], '" href="', $scripturl, '?action=quickhelp;help=', $config_var['help'], '" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a><span', ($config_var['disabled'] ? ' class="disabled"' : ($config_var['invalid'] ? ' class="error"' : '')), '><label for="', $config_var['name'], '">', $config_var['label'], '</label>', $subtext, '</span>
 						</dt>';
 				else
 					echo '
-							<a id="setting_', $config_var['name'], '"></a> <span', ($config_var['disabled'] ? ' class="disabled"' : ($config_var['invalid'] ? ' class="error"' : '')), '><label for="', $config_var['name'], '">', $config_var['label'], '</label>', $subtext, ($config_var['type'] == 'password' ? '<br /><em>' . $txt['admin_confirm_password'] . '</em>' : ''), '</span>
+							<a id="setting_', $config_var['name'], '"></a> <span', ($config_var['disabled'] ? ' class="disabled"' : ($config_var['invalid'] ? ' class="error"' : '')), '><label for="', $config_var['name'], '">', $config_var['label'], '</label>', $subtext, '</span>
 						</dt>';
 
 				echo '
@@ -985,8 +979,13 @@ function template_show_settings()
 				// Escape (via htmlspecialchars.) the text box.
 				elseif ($config_var['type'] == 'password')
 					echo '
-							<input type="password"', $disabled, $javascript, ' name="', $config_var['name'], '[0]"', ($config_var['size'] ? ' size="' . $config_var['size'] . '"' : ''), ' value="*#fakepass#*" onfocus="this.value = \'\'; this.form.', $config_var['name'], '.disabled = false;" class="input_password" /><br />
-							<input type="password" disabled="disabled" id="', $config_var['name'], '" name="', $config_var['name'], '[1]"', ($config_var['size'] ? ' size="' . $config_var['size'] . '"' : ''), ' class="input_password" />';
+							<input type="password"', $disabled, $javascript, ' name="', $config_var['name'], '[0]" id="', $config_var['name'], '"', ($config_var['size'] ? ' size="' . $config_var['size'] . '"' : ''), ' value="*#fakepass#*" onfocus="this.value = \'\'; this.form.', $config_var['name'], '_confirm.disabled = false;" class="input_password" />
+						</dd>
+						<dt>
+							<a id="setting_', $config_var['name'], '_confirm"></a><span', ($config_var['disabled'] ? ' class="disabled"' : ($config_var['invalid'] ? ' class="error"' : '')), '><label for="', $config_var['name'], '_confirm"><em>', $txt['admin_confirm_password'], '</em></label></span>
+						</dt>
+						<dd>
+							<input type="password" disabled="disabled" id="', $config_var['name'], '_confirm" name="', $config_var['name'], '[1]"', ($config_var['size'] ? ' size="' . $config_var['size'] . '"' : ''), ' class="input_password" />';
 				// Show a selection box.
 				elseif ($config_var['type'] == 'select')
 				{
@@ -1041,9 +1040,9 @@ function template_show_settings()
 				echo ($config_var['invalid']) ? '
 							<img class="icon" src="' . $settings['images_url'] . '/icons/field_invalid.png" />' : '';
 
-				echo isset($config_var['postinput']) ? '
-							' . $config_var['postinput'] : '',
-				'</dd>';
+				echo isset($config_var['postinput']) && $config_var['postinput'] !== '' ? '
+							' . $config_var['postinput'] : '', '
+						</dd>';
 			}
 		}
 		else
@@ -1093,12 +1092,7 @@ function template_show_settings()
 		</form>
 	</div>';
 
-	if (!empty($context['settings_post_javascript']))
-		echo '
-	<script><!-- // --><![CDATA[
-	', $context['settings_post_javascript'], '
-	// ]]></script>';
-
+	// @todo this should be replaced by layers
 	if (!empty($context['settings_insert_below']))
 		echo $context['settings_insert_below'];
 }
@@ -1350,11 +1344,7 @@ function template_repair_boards()
 	{
 		echo '
 	<script><!-- // --><![CDATA[
-		var countdown = 5,
-			txt_message = "', $txt['errors_recount_now'], '",
-			formName = "recount_form";
-
-		doAutoSubmit();
+		doAutoSubmit(5, ', JavaScriptEscape($txt['errors_recount_now']), ', "recount_form");
 	// ]]></script>';
 	}
 }

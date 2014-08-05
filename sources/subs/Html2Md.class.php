@@ -401,10 +401,16 @@ class Html_2_Md
 	 */
 	private function _convert_anchor($node)
 	{
-		$href = htmlentities($node->getAttribute('href'));
+		global $txt;
+
+		$href = htmlentities($node->getAttribute('href'), ENT_COMPAT, 'UTF-8', false);
 		$title = $node->getAttribute('title');
 		$class = $node->getAttribute('class');
 		$value = $this->_get_value($node);
+
+		// Provide a more compact [name] if none is given
+		if ($value == $node->getAttribute('href') || empty($value))
+			$value = empty($title) ? $txt['link'] : $title;
 
 		// Special processing just for our own footnotes
 		if ($class === 'target' || $class === 'footnote_return')
@@ -413,6 +419,11 @@ class Html_2_Md
 			$markdown = '[' . $value . '](' . $href . ' "' . $title . '")';
 		else
 			$markdown = '[' . $value . '](' . $href . ')';
+
+		// Some links can be very long and if we wrap them they break
+		$line_strlen = Util::strlen($markdown);
+		if ($line_strlen > $this->body_width)
+			$this->body_width = $line_strlen;
 
 		return $markdown;
 	}

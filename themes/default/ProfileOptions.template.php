@@ -465,17 +465,10 @@ function template_edit_options()
 	// Any onsubmit javascript?
 	if (!empty($context['profile_onsubmit_javascript']))
 		echo '
-				', $context['profile_javascript'];
+				', $context['profile_onsubmit_javascript'];
 
 	echo '
-			}';
-
-	// Any totally custom stuff?
-	if (!empty($context['profile_javascript']))
-		echo '
-			', $context['profile_javascript'];
-
-	echo '
+			}
 		// ]]></script>';
 
 	// Any final spellchecking stuff?
@@ -1110,7 +1103,6 @@ function template_profile_signature_modify()
 									var maxLength = ', $context['signature_limits']['max_length'], ';
 
 									$(document).ready(function() {
-										calcCharLeft();
 										$("#preview_button").click(function() {
 											return ajax_getSignaturePreview(true);
 										});

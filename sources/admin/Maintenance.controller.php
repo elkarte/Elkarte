@@ -1262,7 +1262,7 @@ class Maintenance_Controller extends Action_Controller
 				'status' => array(
 					'header' => array(
 						'value' => $txt['hooks_field_hook_exists'],
-						'style' => 'width:3%;',
+						'class' => 'nowrap',
 					),
 					'data' => array(
 						'function' => function ($data) {
