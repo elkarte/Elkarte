@@ -30,7 +30,7 @@ if (!defined('ELK'))
  */
 function getServerVersions($checkFor)
 {
-	global $txt, $_PHPA, $modSettings;
+	global $txt, $modSettings;
 
 	$db = database();
 
@@ -74,13 +74,21 @@ function getServerVersions($checkFor)
 			$versions[$name] = $details;
 	}
 
+	// PHP Version
 	if (in_array('php', $checkFor))
-		$versions['php'] = array('title' => 'PHP', 'version' => PHP_VERSION, 'more' => '?action=admin;area=serversettings;sa=phpinfo');
+		$versions['php'] = array('title' => 'PHP', 'version' => PHP_VERSION . ' (' . php_sapi_name() . ')', 'more' => '?action=admin;area=serversettings;sa=phpinfo');
 
+	// Server info
 	if (in_array('server', $checkFor))
 	{
 		$req = request();
 		$versions['server'] = array('title' => $txt['support_versions_server'], 'version' => $req->server_software());
+
+		// Compute some system info, if we can
+		$versions['server_name'] = array('title' => $txt['support_versions'], 'version' => php_uname());
+		$loading = detectServerLoad();
+		if ($loading !== false)
+			$versions['server_load'] = array('title' => $txt['load_balancing_settings'], 'version' => $loading);
 	}
 
 	return $versions;

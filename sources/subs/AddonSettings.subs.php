@@ -145,10 +145,10 @@ function list_integration_hooks_data($start, $per_page, $sort)
 	}
 
 	$sort_types = array(
-		'hook_name' => array('hook', SORT_ASC),
-		'hook_name DESC' => array('hook', SORT_DESC),
-		'function_name' => array('function', SORT_ASC),
-		'function_name DESC' => array('function', SORT_DESC),
+		'hook_name' => array('hook_name', SORT_ASC),
+		'hook_name DESC' => array('hook_name', SORT_DESC),
+		'function_name' => array('function_name', SORT_ASC),
+		'function_name DESC' => array('function_name', SORT_DESC),
 		'file_name' => array('file_name', SORT_ASC),
 		'file_name DESC' => array('file_name', SORT_DESC),
 		'status' => array('status', SORT_ASC),
@@ -203,7 +203,6 @@ function list_integration_hooks_data($start, $per_page, $sort)
 				$enabled = strstr($function, ']') === false;
 				$function = str_replace(']', '', $function);
 				$hook_exists = !empty($hook_status[$hook][$function]['exists']);
-				$sort[] = $$sort_options[0];
 
 				if (strpos($function, '::') !== false)
 				{
@@ -226,6 +225,10 @@ function list_integration_hooks_data($start, $per_page, $sort)
 					'enabled' => $enabled,
 					'can_be_disabled' => !empty($modSettings['handlinghooks_enabled']) && !isset($hook_status[$hook][$function]['enabled']),
 				);
+
+				// Build the array of sort to values
+				$sort_end = end($temp_data);
+				$sort[] = $sort_end[$sort_options[0]];
 			}
 		}
 	}

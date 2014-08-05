@@ -128,12 +128,7 @@ function template_info_center()
 		</h2>
 		<ul id="upshrinkHeaderIC" class="category_boards"', empty($context['minmax_preferences']['info']) ? '' : ' style="display: none;"', '>';
 
-	foreach ($context['info_center_callbacks'] as $callback)
-	{
-		$func = 'template_ic_' . $callback;
-		if (function_exists($func))
-			$func();
-	}
+	call_template_callbacks('ic', $context['info_center_callbacks']);
 
 	echo '
 		</ul>

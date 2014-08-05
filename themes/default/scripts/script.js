@@ -1753,7 +1753,7 @@ function initHighlightSelection(container_id)
 /**
  * Auto submits a paused form, such as a maintenance task
  */
-function doAutoSubmit()
+function doAutoSubmit(countdown, txt_message, formName)
 {
 	var formID = typeof(formName) !== 'undefined' ? formName : "autoSubmit";
 
@@ -1765,5 +1765,5 @@ function doAutoSubmit()
 	document.forms[formID].cont.value = txt_message + ' (' + countdown + ')';
 	countdown--;
 
-	setTimeout(function() {doAutoSubmit();}, 1000);
+	setTimeout(function() {doAutoSubmit(countdown, txt_message, formID);}, 1000);
 }

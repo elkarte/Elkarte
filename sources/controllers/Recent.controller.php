@@ -192,6 +192,7 @@ class Recent_Controller extends Action_Controller
 				'delete_any' => 'can_delete',
 			)
 		);
+
 		$context['posts'] = $this->_grabber->getRecentPosts($start, $permissions);
 
 		$quote_enabled = empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC']));
