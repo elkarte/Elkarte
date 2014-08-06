@@ -446,7 +446,8 @@ div.bbc_footnotes .meaction{
 	line-height: 1.286em;
 	font-weight: 700;
 	font-variant: small-caps;
-	margin-right: 1em;
+	margin: -2px 1em 0 0;
+	height: 1em;
 }
 #news>h2:after {
 	content: "\2026";
