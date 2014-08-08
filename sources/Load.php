@@ -2096,6 +2096,14 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 		if (empty($context[$params['index_name']]))
 			$context[$params['index_name']] = array();
 		$context[$params['index_name']] += $temp;
+
+		if ($db_show_debug === true)
+		{
+			foreach ($temp as $temp_params)
+			{
+				$context['debug'][$params['debug_index']][] = $temp_params['options']['basename'] . '(' . (!empty($temp_params['options']['local']) ? (!empty($temp_params['options']['url']) ? basename($temp_params['options']['url']) : basename($temp_params['options']['dir'])) : '') . ')';
+			}
+		}
 	}
 	else
 	{
@@ -2147,9 +2155,9 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 			if (!empty($filename))
 			{
 				$this_build[$this_id] = $context[$params['index_name']][$this_id] = array('filename' => $filename, 'options' => $params);
-
 				if ($db_show_debug === true)
 					$context['debug'][$params['debug_index']][] = $params['basename'] . '(' . (!empty($params['local']) ? (!empty($params['url']) ? basename($params['url']) : basename($params['dir'])) : '') . ')';
+
 			}
 
 			// Save it so we don't have to build this so often
