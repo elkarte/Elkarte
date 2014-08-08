@@ -107,14 +107,11 @@ function sendXMLDocument(sUrl, sContent, funcCallback)
  * php_unhtmlspecialchars, php_addslashes, removeEntities, easyReplace
  */
 
-// A property we'll be needing for php_to8bit.
-String.prototype.oCharsetConversion = {
-	from: '',
-	to: ''
-};
-
 /**
- * Convert a UTF8 string to an 8 bit representation (like in PHP).
+ * Convert a UTF8 string to an 8 bit representation
+ *
+ * - Simulate php utf8_encode function
+ * - Surrogate handling leveraged from php.js which is licensed under the MIT licenses.
  */
 String.prototype.php_to8bit = function () {
 	var sReturn = '',
@@ -148,7 +145,7 @@ String.prototype.php_to8bit = function () {
 			else
 			{
 				cc = ((cc & 0x3FF) << 10) + (cc2 & 0x3FF) + 0x10000;
-				sUtf8enc = String.fromCharCode((cc >> 18) | 240, ((cc >> 12) & 63) | 128, ((cc >> 6) & 63) | 128, (cc & 63) | 128);
+				sUtf8enc = String.fromCharCode(240 | cc >> 18, (128 | cc >> 12 & 63), (128 | cc >> 6 & 63), (128 | cc & 63));
 			}
 		}
 
