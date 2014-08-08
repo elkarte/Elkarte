@@ -216,7 +216,7 @@ class Database_MySQL implements Database
 			break;
 
 			case 'date':
-				if (preg_match('~^(\d[4])-([0-1]?\d)-([0-3]?\d)$~', $replacement, $date_matches) === 1)
+				if (preg_match('~^(\d{4})-([0-1]?\d)-([0-3]?\d)$~', $replacement, $date_matches) === 1)
 					return sprintf('\'%04d-%02d-%02d\'', $date_matches[1], $date_matches[2], $date_matches[3]);
 				else
 					$this->error_backtrace('Wrong value type sent to the database. Date expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
@@ -495,7 +495,6 @@ class Database_MySQL implements Database
 		if (ord($c[0]) >= 254 && ord($c[0]) <= 255)
 			return false;
 	}
-
 
 	/**
 	 * Affected rows from previous operation.
