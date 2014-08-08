@@ -11,6 +11,9 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
+ * copyright:	2004-2011, GreyWyvern - All rights reserved.
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
  * @version 1.0 Release Candidate 2
  *
  */
@@ -168,6 +171,8 @@ class Database_MySQL implements Database
 
 			case 'string':
 			case 'text':
+				$replacement = $this->_clean_4byte_chars($replacement);
+
 				return sprintf('\'%1$s\'', mysqli_real_escape_string($connection, $replacement));
 			break;
 
@@ -199,7 +204,10 @@ class Database_MySQL implements Database
 						$this->error_backtrace('Database error, given array of string values is empty. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
 
 					foreach ($replacement as $key => $value)
+					{
+						$value = $this->_clean_4byte_chars($value);
 						$replacement[$key] = sprintf('\'%1$s\'', mysqli_real_escape_string($connection, $value));
+					}
 
 					return implode(', ', $replacement);
 				}
@@ -407,6 +415,85 @@ class Database_MySQL implements Database
 			$db_cache[$db_count]['t'] = microtime(true) - $st;
 
 		return $ret;
+	}
+
+	/**
+	 * Checks if the string contains any 4byte chars and if so,
+	 * converts them into HTML entities.
+	 *
+	 * This is necessary because MySQL utf8 doesn't knw how to store such
+	 * characters and would generate an error any time one is used.
+	 * The 4byte chars are used by emoji
+	 *
+	 * @param string $string
+	 * @return string
+	 */
+	private function _clean_4byte_chars($string)
+	{
+		global $modSettings;
+
+		if (!empty($modSettings['using_utf8mb4']))
+			return $string;
+
+		$result = $string;
+		$ord = array_map('ord', str_split($string));
+
+		// If we are in the 4-byte range
+		if (max($ord) >= 240)
+		{
+			// Byte length
+			$length = strlen($string);
+			$result = '';
+
+			// Look for a 4byte marker
+			for ($i = 0; $i < $length; $i++)
+			{
+				// The first byte of a 4-byte character encoding starts with the bytes 0xF0-0xF4 (240 <-> 244)
+				// but look all the way to 247 for safe measure
+				$ord1 = $ord[$i];
+				if ($ord1 >= 240 && $ord1 <= 247)
+				{
+					// Replace it with the corresponding html entity
+					$entity = $this->_uniord(chr($ord[$i]) . chr($ord[$i + 1]) . chr($ord[$i + 2]) . chr($ord[$i + 3]));
+					if ($entity === false)
+						$result .= "\xEF\xBF\xBD";
+					else
+						$result .= '&#x' . dechex($entity) . ';';
+					$i += 3;
+				}
+				else
+					$result .= $string[$i];
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Converts a 4byte char into the corresponding HTML entity code.
+	 *
+	 * This function is derived from:
+	 * http://www.greywyvern.com/code/php/utf8_html.phps
+	 *
+	 * @param string $c
+	 * @return string|false
+	 */
+	private function _uniord($c)
+	{
+		if (ord($c[0]) >= 0 && ord($c[0]) <= 127)
+			return ord($c[0]);
+		if (ord($c[0]) >= 192 && ord($c[0]) <= 223)
+			return (ord($c[0]) - 192) * 64 + (ord($c[1]) - 128);
+		if (ord($c[0]) >= 224 && ord($c[0]) <= 239)
+			return (ord($c[0]) - 224) * 4096 + (ord($c[1]) - 128) * 64 + (ord($c[2]) - 128);
+		if (ord($c[0]) >= 240 && ord($c[0]) <= 247)
+			return (ord($c[0]) - 240) * 262144 + (ord($c[1]) - 128) * 4096 + (ord($c[2]) - 128) * 64 + (ord($c[3]) - 128);
+		if (ord($c[0]) >= 248 && ord($c[0]) <= 251)
+			return (ord($c[0]) - 248) * 16777216 + (ord($c[1]) - 128) * 262144 + (ord($c[2]) - 128) * 4096 + (ord($c[3]) - 128) * 64 + (ord($c[4]) - 128);
+		if (ord($c[0]) >= 252 && ord($c[0]) <= 253)
+			return (ord($c[0]) - 252) * 1073741824 + (ord($c[1]) - 128) * 16777216 + (ord($c[2]) - 128) * 262144 + (ord($c[3]) - 128) * 4096 + (ord($c[4]) - 128) * 64 + (ord($c[5]) - 128);
+		if (ord($c[0]) >= 254 && ord($c[0]) <= 255)
+			return false;
 	}
 
 	/**

@@ -919,7 +919,7 @@ function ignore_toggles(msgids, text)
 function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
 {
 	// Set up our div details
-	var sAjax_indicator = '<div class="centertext"><i class="fa fa-spinner fa-spin" alt="loading"></i></div>',
+	var sAjax_indicator = '<div class="centertext"><i class="fa fa-spinner fa-spin"></i></div>',
 		oPopup_body;
 
 	sIcon = elk_images_url + '/' + (typeof(sIcon) === 'string' ? sIcon : 'helptopics.png');

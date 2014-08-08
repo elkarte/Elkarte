@@ -459,7 +459,7 @@ function template_quickreply_below()
 		if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
 			echo '
 							<div class="draftautosave">
-								<span id="throbber" style="display:none"><i class="fa fa-spinner fa-spin" alt="loading"></i>&nbsp;</span>
+								<span id="throbber" style="display:none"><i class="fa fa-spinner fa-spin"></i>&nbsp;</span>
 								<span id="draft_lastautosave"></span>
 							</div>';
 

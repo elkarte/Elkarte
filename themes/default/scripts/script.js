@@ -107,32 +107,61 @@ function sendXMLDocument(sUrl, sContent, funcCallback)
  * php_unhtmlspecialchars, php_addslashes, removeEntities, easyReplace
  */
 
-// A property we'll be needing for php_to8bit.
-String.prototype.oCharsetConversion = {
-	from: '',
-	to: ''
-};
-
 /**
- * Convert a UTF8 string to an 8 bit representation (like in PHP).
+ * Convert a UTF8 string to an 8 bit representation
+ *
+ * - Simulate php utf8_encode function
+ * - Surrogate handling leveraged from php.js which is licensed under the MIT licenses.
  */
-String.prototype.php_to8bit = function ()
-{
-	var n,
-		sReturn = '';
+String.prototype.php_to8bit = function () {
+	var sReturn = '',
+		iStart = 0,
+		iEnd = 0,
+		iTextLen = this.length;
 
-	for (var i = 0, iTextLen = this.length; i < iTextLen; i++)
+	for (var i = 0; i < iTextLen; i++)
 	{
-		n = this.charCodeAt(i);
-		if (n < 128)
-			sReturn += String.fromCharCode(n);
-		else if (n < 2048)
-			sReturn += String.fromCharCode(192 | n >> 6) + String.fromCharCode(128 | n & 63);
-		else if (n < 65536)
-			sReturn += String.fromCharCode(224 | n >> 12) + String.fromCharCode(128 | n >> 6 & 63) + String.fromCharCode(128 | n & 63);
+		// Character code (UTF 16)
+		var cc = this.charCodeAt(i),
+			sUtf8enc = null;
+
+		// Simple Ascii
+		if (cc < 128)
+			iEnd++;
+		// Simple two Byte
+		else if (cc < 2048)
+			sUtf8enc = String.fromCharCode((192 | cc >> 6), (128 | cc & 63));
+		// Simple three Byte if not a surrogate pair
+		else if ((cc & 0xF800) !== 0xD800)
+			sUtf8enc = String.fromCharCode((224 | cc >> 12), (128 | cc >> 6 & 63), (128 | cc & 63));
 		else
-			sReturn += String.fromCharCode(240 | n >> 18) + String.fromCharCode(128 | n >> 12 & 63) + String.fromCharCode(128 | n >> 6 & 63) + String.fromCharCode(128 | n & 63);
+		{
+			// Character code for the next Byte
+			var cc2 = this.charCodeAt(++i);
+
+			// Valid surrogate pairs must have matched lead and trail
+			if ((cc & 0xFC00) !== 0xD800 || (cc2 & 0xFC00) !== 0xDC00)
+				sUtf8enc = String.fromCharCode((224 | 65533 >> 12), (128 | 65533 >> 6 & 63), (128 | 65533 & 63));
+			else
+			{
+				cc = ((cc & 0x3FF) << 10) + (cc2 & 0x3FF) + 0x10000;
+				sUtf8enc = String.fromCharCode(240 | cc >> 18, (128 | cc >> 12 & 63), (128 | cc >> 6 & 63), (128 | cc & 63));
+			}
+		}
+
+		// Had to encode the character?
+		if (sUtf8enc !== null)
+		{
+			if (iEnd > iStart)
+				sReturn += this.slice(iStart, iEnd);
+
+			sReturn += sUtf8enc;
+			iStart = iEnd = i + 1;
+		}
 	}
+
+	if (iEnd > iStart)
+		sReturn += this.slice(iStart, iTextLen);
 
 	return sReturn;
 };
@@ -273,7 +302,7 @@ function reqWin(desktopURL, alternateWidth, alternateHeight, noScrollbars)
 function reqOverlayDiv(desktopURL, sHeader, sIcon)
 {
 	// Set up our div details
-	var sAjax_indicator = '<div class="centertext"><i class="fa fa-spinner fa-spin fa-2x" alt="loading"></i></div>';
+	var sAjax_indicator = '<div class="centertext"><i class="fa fa-spinner fa-spin fa-2x"></i></div>';
 
 	sIcon = elk_images_url + '/' + (typeof(sIcon) === 'string' ? sIcon : 'helptopics.png');
 	sHeader = typeof(sHeader) === 'string' ? sHeader : help_popup_heading_text;
