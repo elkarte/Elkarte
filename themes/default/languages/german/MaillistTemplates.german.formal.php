@@ -45,37 +45,6 @@ Weiterführende Verweise zu {FORUMNAMESHORT}:
 {EMAILREGARDS}';
 
 /*
-	@additional_params: pbbe_notify_boards_once
-		TOPICSUBJECT: The subject of the topic causing the notification
-		TOPICLINK: A link to the topic.
-		FORUMNAMESHORT: Short or nickname for the forum
-		UNSUBSCRIBELINK: Link to unsubscribe from notifications.
-		BOARDNAME: Name of the board the post was made in
-		EMAILREGARDS: The site name signature
-	@description: A member wants to be notified of the first new post in a topic on a board they have subscribed to
-*/
-$txt['pbe_notify_boards_once_subject'] = '[{FORUMNAMESHORT}] {TOPICSUBJECT}';
-$txt['pbe_notify_boards_once_body'] = 'Ein neues Thema, \'{TOPICSUBJECT}\', wurde in \'{BOARDNAME}\' eröffnet.
-
-Sie können es auf
-    {TOPICLINK}
-lesen.
-
-
-------------------------------------
-Informationen: Es könnten weitere Themen eröffnet worden sein, aber Sie werden keine weiteren Benachrichtigungen hierzu erhalten, bevor Sie nicht einige von ihnen gelesen haben.
-
-Weiterführende Verweise zu {FORUMNAMESHORT}:
-
-<*> Um {FORUMNAMESHORT} im Netz aufzurufen, gehen Sie auf:
-    {FORUMURL}
-
-<*> Sie können das Abonnement hier kündigen:
-    {UNSUBSCRIBELINK}
-
-{EMAILREGARDS}';
-
-/*
 	@additional_params: pbe_notify_boards_body
 		TOPICSUBJECT: The subject of the topic causing the notification
 		TOPICLINK: A link to the topic.
@@ -116,38 +85,6 @@ Weiterführende Verweise zu {FORUMNAMESHORT}:
 {EMAILREGARDS}';
 
 /*
-	@additional_params: pbe_notify_boards
-		TOPICSUBJECT: The subject of the topic causing the notification
-		TOPICLINK: A link to the topic.
-		UNSUBSCRIBELINK: Link to unsubscribe from notifications.
-		FORUMURL: The url to the forum
-		FORUMNAMESHORT: Short or nickname for the forum
-		BOARDNAME: Name of the board the post was made in
-		EMAILREGARDS: The site name signature
-	@description: Notification only of a new topic has been started in a subscribed board
-*/
-$txt['pbe_notify_boards_subject'] = '[{FORUMNAMESHORT}] {TOPICSUBJECT}';
-$txt['pbe_notify_boards_body'] = 'Ein neues Thema, \'{TOPICSUBJECT}\', wurde in \'{BOARDNAME}\' eröffnet.
-
-Sie können es unter
-    {TOPICLINK}
-lesen.
-
-------------------------------------
-Weiterführende Verweise zu {FORUMNAMESHORT}:
-
-<*> Um {FORUMNAMESHORT} im Netz aufzurufen, gehen Sie auf:
-    {FORUMURL}
-
-<*> Hier gelangen Sie zur ersten ungelesenen Nachricht in dieser Diskussion:
-    {TOPICLINKNEW}
-
-<*> Sie können das Abonnement hier kündigen:
-    {UNSUBSCRIBELINK}
-
-{EMAILREGARDS}';
-
-/*
 	@additional_params: pbe_notification_reply_body
 		TOPICSUBJECT: The subject of the topic causing the notification
 		TOPICLINK: A link to the topic.
@@ -178,39 +115,6 @@ Weiterführende Verweise zu {FORUMNAMESHORT}:
 
 <*> Sie können diese Nachricht mit Anhängen und/oder Bildern (falls vorhanden) mittels dieses Links lesen:
     {TOPICLINK}
-
-<*> Hier gelangen Sie zur ersten ungelesenen Nachricht in dieser Diskussion:
-    {TOPICLINKNEW}
-
-<*> Sie können das Abonnement hier kündigen:
-    {UNSUBSCRIBELINK}
-
-{EMAILREGARDS}';
-
-/*
-	@additional_params: pbe_notification_reply_once
-		TOPICSUBJECT: The subject of the topic causing the notification
-		TOPICLINK: A link to the topic.
-		UNSUBSCRIBELINK: Link to unsubscribe from notifications.
-		FORUMURL: The url to the forum
-		FORUMNAMESHORT: Short or nickname for the forum
-		EMAILREGARDS: The site name signature
-	@description: A reply has been made to topic in a subscribed board, notification without body
-*/
-$txt['pbe_notification_reply_once_subject'] = 'AW: [{FORUMNAMESHORT}] {TOPICSUBJECT}';
-$txt['pbe_notification_reply_once_body'] = '{POSTERNAME} hat auf ein von Ihnen beobachtetes Thema geantwortet
-
-Sie können die Antwort mit Anhängen und/oder Bildern (falls vorhanden) mittels dieses Links lesen:
-    {TOPICLINK}
-
-------------------------------------
-Informationen: Es könnte weitere Antworten geben, aber Sie werden keine weiteren Benachrichtigungen hierzu erhalten, bevor Sie sie nicht gelesen haben.
-Sie können auf diese E-Mail antworten und die Antwort direkt im Thema veröffentlichen.
-
-Weiterführende Verweise zu {FORUMNAMESHORT}:
-
-<*> Um {FORUMNAMESHORT} im Netz aufzurufen, gehen Sie auf:
-    {FORUMURL}
 
 <*> Hier gelangen Sie zur ersten ungelesenen Nachricht in dieser Diskussion:
     {TOPICLINKNEW}
