@@ -28,12 +28,6 @@ class Likes_Controller extends Action_Controller
 	protected $_likes_response = array();
 
 	/**
-	 * If this was an ajax request or not
-	 * @var boolean
-	 */
-	protected $_api = false;
-
-	/**
 	 * The id of the message being liked
 	 * @var int
 	 */
@@ -624,6 +618,8 @@ class Likes_Controller extends Action_Controller
 			fatal_lang_error('feature_disabled', true);
 
 		isAllowedTo('like_posts_stats');
+
+		loadLanguage('LikePosts');
 
 		$subActions = array(
 			'messagestats' => array($this, 'action_messageStats'),
