@@ -431,6 +431,7 @@ function likesPostsReceived($start, $items_per_page, $sort, $memberID)
  * @param int $items_per_page
  * @param string $sort
  * @param int $messageID
+ * @param bool $simple
  */
 function postLikers($start, $items_per_page, $sort, $messageID, $simple = true)
 {
@@ -523,7 +524,7 @@ function dbMostLikedMessage()
 	// Most liked Message
 	$mostLikedMessage = array();
 
-	$request = $db->query('group_concat_convert', '
+	$request = $db->query('', '
 		SELECT IFNULL(mem.real_name, m.poster_name) AS member_received_name, lp.id_msg,
 			m.id_topic, m.id_board, m.id_member,
 			lp.like_count AS like_count, m.subject, m.body, m.poster_time,
@@ -596,22 +597,30 @@ function dbMostLikedTopic()
 	// Most liked topic
 	$mostLikedTopic = array();
 	$request = $db->query('group_concat_convert', '
-		SELECT m.id_topic, m.id_board,
-			GROUP_CONCAT(DISTINCT(CONVERT(lp.id_msg, CHAR(8))) SEPARATOR \',\') AS id_msg,
-			COUNT(m.id_topic) AS like_count
+		SELECT m.id_topic, lp.like_count, GROUP_CONCAT(m.id_msg SEPARATOR \',\') AS id_msgs
 		FROM {db_prefix}message_likes AS lp
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
 			INNER JOIN {db_prefix}boards AS b ON (m.id_board = b.id_board)
+			INNER JOIN (
+				SELECT COUNT(m.id_topic) AS like_count, m.id_topic
+				FROM {db_prefix}message_likes AS lp
+					INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
+				GROUP BY m.id_topic
+				ORDER BY like_count DESC
+				LIMIT {int:limit}
+			) AS lp ON (lp.id_topic = m.id_topic)
 		WHERE {query_wanna_see_board}
-		GROUP BY m.id_topic, m.id_board
-		ORDER BY like_count DESC
-		LIMIT 1',
-		array()
+		ORDER BY m.id_msg DESC
+		LIMIT {int:limit2}',
+		array(
+			'limit' => 1,
+			'limit2' => 10
+		)
 	);
-	list ($mostLikedTopic['id_topic'], $mostLikedTopic['id_board'], $id_msg, $mostLikedTopic['like_count']) = $db->fetch_row($request);
+	$mostLikedTopic = $db->fetch_assoc($request);
 	$db->free_result($request);
 
-	if (empty($id_msg))
+	if (empty($mostLikedTopic))
 	{
 		return array(
 			'noDataMessage' => $txt['like_post_error_no_data']
@@ -626,11 +635,12 @@ function dbMostLikedTopic()
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member)
-		WHERE m.id_msg IN ({raw:id_msg})
+		WHERE m.id_msg IN ({array_int:id_msgs})
 		ORDER BY m.id_msg
-		LIMIT 10',
+		LIMIT {int:limit}',
 		array(
-			'id_msg' => $id_msg
+			'id_msgs' => array_map('intval', explode(',', $mostLikedTopic['id_msgs'])),
+			'limit' => 10
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
