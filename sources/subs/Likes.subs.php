@@ -432,7 +432,7 @@ function likesPostsReceived($start, $items_per_page, $sort, $memberID)
  * @param string $sort
  * @param int $messageID
  */
-function postLikers($start, $items_per_page, $sort, $messageID)
+function postLikers($start, $items_per_page, $sort, $messageID, $simple = true)
 {
 	global $scripturl;
 
@@ -446,10 +446,13 @@ function postLikers($start, $items_per_page, $sort, $messageID)
 	$request = $db->query('', '
 		SELECT
 			l.id_member, l.id_msg,
-			m.real_name
+			m.real_name' . ($simple === true ? '' : ',
+			IFNULL(a.id_attach, 0) AS id_attach,
+			a.filename, a.attachment_type, m.avatar, m.email_address') . '
 		FROM {db_prefix}message_likes AS l
-			LEFT JOIN {db_prefix}members AS m ON (m.id_member = l.id_member)
-		WHERE id_msg = {int:id_message}
+			LEFT JOIN {db_prefix}members AS m ON (m.id_member = l.id_member)' . ($simple === true ? '' : '
+			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)') . '
+		WHERE l.id_msg = {int:id_message}
 		ORDER BY {raw:sort}
 		LIMIT {int:start}, {int:per_page}',
 		array(
@@ -461,11 +464,18 @@ function postLikers($start, $items_per_page, $sort, $messageID)
 	);
 	while ($row = $db->fetch_assoc($request))
 	{
-		$likes[] = array(
+		$like = array(
 			'real_name' => $row['real_name'],
 			'id_member' => $row['id_member'],
 			'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
 		);
+		if ($simple !== true)
+		{
+			$avatar = determineAvatar($row);
+			$like['href'] = !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '';
+			$like['avatar'] = $avatar['href'];
+		}
+		$likes[] = $like;
 	}
 	$db->free_result($request);
 
@@ -514,8 +524,8 @@ function dbMostLikedMessage()
 	$mostLikedMessage = array();
 
 	$request = $db->query('group_concat_convert', '
-		SELECT IFNULL(mem.real_name, m.poster_name) AS member_received_name, lp.id_msg, m.id_topic, m.id_board,
-			lp.id_poster, GROUP_CONCAT(CONVERT(lp.id_member, CHAR(8)) SEPARATOR \',\') AS id_member_gave,
+		SELECT IFNULL(mem.real_name, m.poster_name) AS member_received_name, lp.id_msg,
+			m.id_topic, m.id_board, lp.id_poster,
 			COUNT(lp.id_msg) AS like_count, m.subject, m.body, m.poster_time,
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type, mem.avatar,
 			mem.posts, m.smileys_enabled, mem.email_address
@@ -555,41 +565,18 @@ function dbMostLikedMessage()
 				'avatar' => $avatar['href'],
 			),
 		);
-		$id_member_gave = $row['id_member_gave'];
+		$id_msg = $row['id_msg'];
 	}
 	$db->free_result($request);
 
-	if (empty($id_member_gave))
+	if (empty($mostLikedMessage))
 	{
 		return array(
 			'noDataMessage' => $txt['like_post_error_no_data']
 		);
 	}
 
-	// Lets fetch info of users who liked the message
-	$request = $db->query('', '
-		SELECT mem.id_member, mem.real_name, IFNULL(a.id_attach, 0) AS id_attach,
-			a.filename, a.attachment_type, mem.avatar, mem.email_address
-		FROM {db_prefix}members AS mem
-		LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member)
-		WHERE mem.id_member IN ({raw:id_member_gave})',
-		array(
-			'id_member_gave' => $id_member_gave
-		)
-	);
-
-	while ($row = $db->fetch_assoc($request))
-	{
-		$avatar = determineAvatar($row);
-		$mostLikedMessage['member_liked_data'][] = array(
-			'id_member' => $row['id_member'],
-			'real_name' => $row['real_name'],
-			'href' => !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
-			'avatar' => $avatar['href'],
-
-		);
-	}
-	$db->free_result($request);
+	$mostLikedMessage['member_liked_data'] = postLikers(0, 20, 'l.id_member DESC', $id_msg, false);
 
 	return $mostLikedMessage;
 }
