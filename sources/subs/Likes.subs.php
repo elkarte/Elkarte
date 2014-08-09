@@ -525,18 +525,21 @@ function dbMostLikedMessage()
 
 	$request = $db->query('group_concat_convert', '
 		SELECT IFNULL(mem.real_name, m.poster_name) AS member_received_name, lp.id_msg,
-			m.id_topic, m.id_board, lp.id_poster,
-			COUNT(lp.id_msg) AS like_count, m.subject, m.body, m.poster_time,
+			m.id_topic, m.id_board, m.id_member,
+			lp.like_count AS like_count, m.subject, m.body, m.poster_time,
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type, mem.avatar,
 			mem.posts, m.smileys_enabled, mem.email_address
-		FROM {db_prefix}message_likes AS lp
-			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = lp.id_poster)
+		FROM (
+			SELECT COUNT(lp.id_msg) AS like_count, lp.id_msg
+			FROM {db_prefix}message_likes AS lp
+			GROUP BY lp.id_msg
+			ORDER BY like_count DESC
+		) AS lp
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
+			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
-			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = lp.id_poster)
+			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)
 		WHERE {query_wanna_see_board}
-		GROUP BY lp.id_msg, mem.real_name, m.poster_name, m.id_topic, m.id_board, lp.id_poster, m.subject, m.body, m.poster_time, a.id_attach, mem.avatar, mem.posts, m.smileys_enabled, mem.email_address
-		ORDER BY like_count DESC
 		LIMIT 1',
 		array()
 	);
@@ -558,10 +561,10 @@ function dbMostLikedMessage()
 			'html_time' => htmlTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'member_received' => array(
-				'id_member' => $row['id_poster'],
+				'id_member' => $row['id_member'],
 				'name' => $row['member_received_name'],
 				'total_posts' => $row['posts'],
-				'href' => !empty($row['id_poster']) ? $scripturl . '?action=profile;u=' . $row['id_poster'] : '',
+				'href' => !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
 				'avatar' => $avatar['href'],
 			),
 		);
