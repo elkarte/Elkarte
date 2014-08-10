@@ -1940,6 +1940,7 @@ CREATE TABLE {$db_prefix}message_likes (
 	id_member int NOT NULL default '0',
 	id_msg int NOT NULL default '0',
 	id_poster int NOT NULL default '0',
+  like_timestamp int(10) unsigned NOT NULL default '0',
 	PRIMARY KEY (id_msg, id_member)
 );
 
