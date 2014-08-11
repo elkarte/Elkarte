@@ -1218,66 +1218,6 @@ function action_convertToUTF8()
 
 	$upcontext['selected_charset'] = isset($charsets[$_POST['src_charset']]) ? $charsets[$_POST['src_charset']] : 'ISO-8859-1';
 
-// 	// This is for the first screen telling backups is good.
-// 	if (!isset($_POST['proceed']))
-// 	{
-// 		// Use the messages.body column as indicator for the database charset.
-// 		$request = $smcFunc['db_query']('', '
-// 			SHOW FULL COLUMNS
-// 			FROM {db_prefix}messages
-// 			LIKE {string:body_like}',
-// 			array(
-// 				'body_like' => 'body',
-// 			)
-// 		);
-// 		$column_info = $smcFunc['db_fetch_assoc']($request);
-// 		$smcFunc['db_free_result']($request);
-// 
-// 		// A collation looks like latin1_swedish. We only need the character set.
-// 		list($context['database_charset']) = explode('_', $column_info['Collation']);
-// 		$context['database_charset'] = in_array($context['database_charset'], $charsets) ? array_search($context['database_charset'], $charsets) : $context['database_charset'];
-// 
-// 		// No need to convert to UTF-8 if it already is.
-// 		if ($db_character_set === 'utf8' && !empty($modSettings['global_character_set']) && $modSettings['global_character_set'] === 'UTF-8')
-// 			fatal_lang_error('utf8_already_utf8');
-// 
-// 		// Detect whether a fulltext index is set.
-// 		db_extend('search');
-// 		if ($smcFunc['db_search_support']('fulltext'))
-// 		{
-// 			require_once($sourcedir . '/ManageSearch.php');
-// 			detectFulltextIndex();
-// 		}
-// 		// Cannot do conversion if using a fulltext index
-// 		if (!empty($modSettings['search_index']) && $modSettings['search_index'] == 'fulltext' || !empty($context['fulltext_index']))
-// 			fatal_lang_error('utf8_cannot_convert_fulltext');
-// 
-// 		// Grab the character set from the default language file.
-// 		loadLanguage('index', $language, true);
-// 		$context['charset_detected'] = $txt['lang_character_set'];
-// 		$context['charset_about_detected'] = sprintf($txt['utf8_detected_charset'], $language, $context['charset_detected']);
-// 
-// 		// Go back to your own language.
-// 		loadLanguage('index', $user_info['language'], true);
-// 
-// 		// Show a warning if the character set seems not to be supported.
-// 		if (!isset($charsets[strtr(strtolower($context['charset_detected']), array('utf' => 'UTF', 'iso' => 'ISO'))]))
-// 		{
-// 			$context['charset_warning'] = sprintf($txt['utf8_charset_not_supported'], $txt['lang_character_set']);
-// 
-// 			// Default to ISO-8859-1.
-// 			$context['charset_detected'] = 'ISO-8859-1';
-// 		}
-// 
-// 		$context['charset_list'] = array_keys($charsets);
-// 
-// 		$context['page_title'] = $txt['utf8_title'];
-// 		$context['sub_template'] = 'convert_utf8';
-// 
-// 		createToken('admin-maint');
-// 		return;
-// 	}
-
 	// Translation table for the character sets not native for MySQL.
 	$translation_tables = array(
 		'windows-1255' => array(
