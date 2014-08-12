@@ -528,10 +528,10 @@ function availableThemes($current_theme, $current_member)
 		// The thumbnail needs the correct path.
 		$settings['images_url'] = &$theme_data['images_url'];
 
-		if (file_exists($theme_data['theme_dir'] . '/languages/Settings.' . $user_info['language'] . '.php'))
-			include($theme_data['theme_dir'] . '/languages/Settings.' . $user_info['language'] . '.php');
-		elseif (file_exists($theme_data['theme_dir'] . '/languages/Settings.' . $language . '.php'))
-			include($theme_data['theme_dir'] . '/languages/Settings.' . $language . '.php');
+		if (file_exists($theme_data['theme_dir'] . '/languages/' . $user_info['language'] . '/Settings.' . $user_info['language'] . '.php'))
+			include($theme_data['theme_dir'] . '/languages/' . $user_info['language'] . '/Settings.' . $user_info['language'] . '.php');
+		elseif (file_exists($theme_data['theme_dir'] . '/languages/' . $language . '/Settings.' . $language . '.php'))
+			include($theme_data['theme_dir'] . '/languages/' . $language . '/Settings.' . $language . '.php');
 		else
 		{
 			$txt['theme_thumbnail_href'] = $theme_data['images_url'] . '/thumbnail.png';
