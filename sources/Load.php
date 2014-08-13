@@ -1630,15 +1630,15 @@ function loadTheme($id_theme = 0, $initialize = true)
 		);
 	// Default JS variables for use in every theme
 	addJavascriptVar(array(
-		'elk_theme_url' => '"' . $settings['theme_url'] . '"',
-		'elk_default_theme_url' => '"' . $settings['default_theme_url'] . '"',
-		'elk_images_url' => '"' . $settings['images_url'] . '"',
-		'elk_smiley_url' => '"' . $modSettings['smileys_url'] . '"',
-		'elk_scripturl' => '"' . $scripturl . '"',
+		'elk_theme_url' => JavaScriptEscape($settings['theme_url']),
+		'elk_default_theme_url' => JavaScriptEscape($settings['default_theme_url']),
+		'elk_images_url' => JavaScriptEscape($settings['images_url']),
+		'elk_smiley_url' => JavaScriptEscape($modSettings['smileys_url']),
+		'elk_scripturl' => JavaScriptEscape($scripturl),
 		'elk_iso_case_folding' => $context['server']['iso_case_folding'] ? 'true' : 'false',
 		'elk_charset' => '"UTF-8"',
-		'elk_session_id' => '"' . $context['session_id'] . '"',
-		'elk_session_var' => '"' . $context['session_var'] . '"',
+		'elk_session_id' => JavaScriptEscape($context['session_id']),
+		'elk_session_var' => JavaScriptEscape($context['session_var']),
 		'elk_member_id' => $context['user']['id'],
 		'ajax_notification_text' => JavaScriptEscape($txt['ajax_in_progress']),
 		'ajax_notification_cancel_text' => JavaScriptEscape($txt['modify_cancel']),
