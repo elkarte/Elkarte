@@ -1628,13 +1628,14 @@ function loadTheme($id_theme = 0, $initialize = true)
 			'rss' => $scripturl . '?action=.xml;type=rss2;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5),
 			'atom' => $scripturl . '?action=.xml;type=atom;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5)
 		);
+
 	// Default JS variables for use in every theme
 	addJavascriptVar(array(
 		'elk_theme_url' => JavaScriptEscape($settings['theme_url']),
 		'elk_default_theme_url' => JavaScriptEscape($settings['default_theme_url']),
 		'elk_images_url' => JavaScriptEscape($settings['images_url']),
 		'elk_smiley_url' => JavaScriptEscape($modSettings['smileys_url']),
-		'elk_scripturl' => JavaScriptEscape($scripturl),
+		'elk_scripturl' => '\'' . $scripturl . '\'',
 		'elk_iso_case_folding' => $context['server']['iso_case_folding'] ? 'true' : 'false',
 		'elk_charset' => '"UTF-8"',
 		'elk_session_id' => JavaScriptEscape($context['session_id']),

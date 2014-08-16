@@ -2696,11 +2696,11 @@ ul.post_options li {
 #move_topic dl.settings dd {
 	width: 59%;
 }
-.split_topics, .move_topic {
+.move_topic {
 	margin: auto;
 	text-align: left;
 }
-.split_topics fieldset, .move_topic fieldset {
+.move_topic fieldset {
 	padding: 6px;
 }
 
