@@ -261,7 +261,7 @@ class MoveTopic_Controller extends Action_Controller
 				'board' => $board,
 				'lock_mode' => 1,
 				'mark_as_read' => true,
-				'redirect_expires' => ($redirect_expires * 60) + time(),
+				'redirect_expires' => empty($redirect_expires) ? 0 : ($redirect_expires * 60) + time(),
 				'redirect_topic' => $redirect_topic,
 			);
 
