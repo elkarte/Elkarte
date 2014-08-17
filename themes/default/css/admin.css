@@ -89,9 +89,13 @@
 }
 #news_lists .newsarea textarea {
 	width: 100%;
+	padding: 0 2px;
 }
 #news_lists .newspreview {
 	width: 45%;
+}
+td.newspreview {
+	vertical-align: top;
 }
 #news_lists .newspreview div {
 	overflow: auto;
@@ -758,6 +762,7 @@ dl.settings dd.large_caption {
 }
 .perm_classic {
 	margin: 0.2em;
+	width: 49%;
 }
 .permission_groups {
 	padding: 0;
@@ -1163,6 +1168,9 @@ ul.moderation_notes li {
 	}
 	#manage_boards dt {
 		line-height: 1.6em;
+	}
+	.perm_classic {
+		width: 100%;
 	}
 }
 

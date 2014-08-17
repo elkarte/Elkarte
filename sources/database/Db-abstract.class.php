@@ -103,7 +103,9 @@ abstract class Database_Abstract implements Database
 
 			case 'string':
 			case 'text':
-				return sprintf('\'%1$s\'', $this->escape_string($replacement));
+				$replacement = $this->_clean_4byte_chars($replacement);
+
+				return sprintf('\'%1$s\'', mysqli_real_escape_string($connection, $replacement));
 			break;
 
 			case 'array_int':
@@ -134,7 +136,10 @@ abstract class Database_Abstract implements Database
 						$this->error_backtrace('Database error, given array of string values is empty. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
 
 					foreach ($replacement as $key => $value)
-						$replacement[$key] = sprintf('\'%1$s\'', $this->escape_string($value));
+					{
+						$value = $this->_clean_4byte_chars($value);
+						$replacement[$key] = sprintf('\'%1$s\'', mysqli_real_escape_string($connection, $value));
+					}
 
 					return implode(', ', $replacement);
 				}
@@ -175,7 +180,7 @@ abstract class Database_Abstract implements Database
 	 *
 	 * @param string $db_string
 	 * @param mixed[] $db_values
-	 * @param resource|null $connection
+	 * @param resource|null $connection = null
 	 */
 	public function quote($db_string, $db_values, $connection = null)
 	{
