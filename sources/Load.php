@@ -1083,12 +1083,12 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'warning' => $profile['warning'],
 			'warning_status' => !empty($modSettings['warning_mute']) && $modSettings['warning_mute'] <= $profile['warning'] ? 'mute' : (!empty($modSettings['warning_moderate']) && $modSettings['warning_moderate'] <= $profile['warning'] ? 'moderate' : (!empty($modSettings['warning_watch']) && $modSettings['warning_watch'] <= $profile['warning'] ? 'watch' : (''))),
 			'local_time' => standardTime(time() + ($profile['time_offset'] - $user_info['time_offset']) * 3600, false),
+			'custom_fields' => array(),
 		);
 
 	// Are we also loading the members custom fields into context?
 	if ($display_custom_fields && !empty($modSettings['displayFields']))
 	{
-		$memberContext[$user]['custom_fields'] = array();
 		if (!isset($context['display_fields']))
 			$context['display_fields'] = unserialize($modSettings['displayFields']);
 
@@ -1628,17 +1628,18 @@ function loadTheme($id_theme = 0, $initialize = true)
 			'rss' => $scripturl . '?action=.xml;type=rss2;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5),
 			'atom' => $scripturl . '?action=.xml;type=atom;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5)
 		);
+
 	// Default JS variables for use in every theme
 	addJavascriptVar(array(
-		'elk_theme_url' => '"' . $settings['theme_url'] . '"',
-		'elk_default_theme_url' => '"' . $settings['default_theme_url'] . '"',
-		'elk_images_url' => '"' . $settings['images_url'] . '"',
-		'elk_smiley_url' => '"' . $modSettings['smileys_url'] . '"',
-		'elk_scripturl' => '"' . $scripturl . '"',
+		'elk_theme_url' => JavaScriptEscape($settings['theme_url']),
+		'elk_default_theme_url' => JavaScriptEscape($settings['default_theme_url']),
+		'elk_images_url' => JavaScriptEscape($settings['images_url']),
+		'elk_smiley_url' => JavaScriptEscape($modSettings['smileys_url']),
+		'elk_scripturl' => '\'' . $scripturl . '\'',
 		'elk_iso_case_folding' => $context['server']['iso_case_folding'] ? 'true' : 'false',
 		'elk_charset' => '"UTF-8"',
-		'elk_session_id' => '"' . $context['session_id'] . '"',
-		'elk_session_var' => '"' . $context['session_var'] . '"',
+		'elk_session_id' => JavaScriptEscape($context['session_id']),
+		'elk_session_var' => JavaScriptEscape($context['session_var']),
 		'elk_member_id' => $context['user']['id'],
 		'ajax_notification_text' => JavaScriptEscape($txt['ajax_in_progress']),
 		'ajax_notification_cancel_text' => JavaScriptEscape($txt['modify_cancel']),

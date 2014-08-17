@@ -617,7 +617,10 @@ class Mentions_Controller extends Action_Controller
 	 */
 	protected function _markMentionsRead($mention_ids)
 	{
-		foreach ($mentions as $mention)
+		if (empty($mention_ids))
+			return;
+
+		foreach ($mention_ids as $mention)
 		{
 			$this->setData(array(
 				'id_mention' => $mention['id_mention'],

@@ -63,6 +63,7 @@ $txt['cannot_edit_news'] = 'You are not allowed to edit news items on this forum
 $txt['cannot_pm_read'] = 'Sorry, you can\'t read your personal messages.';
 $txt['cannot_pm_send'] = 'You are not allowed to send personal messages.';
 $txt['cannot_karma_edit'] = 'You aren\'t permitted to modify other people\'s karma.';
+$txt['cannot_like_posts'] = 'You are not allowed to like messages in this board.';
 $txt['cannot_lock_any'] = 'You are not allowed to lock just any topic here.';
 $txt['cannot_lock_own'] = 'Apologies, but you cannot lock your own topics here.';
 $txt['cannot_make_sticky'] = 'You don\'t have permission to pin this topic.';

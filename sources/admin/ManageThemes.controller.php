@@ -1643,9 +1643,9 @@ class ManageThemes_Controller extends Action_Controller
 			elseif ($is_css)
 			{
 				addJavascriptVar(array(
-					'previewData' => '',
-					'previewTimeout' => '',
-					'refreshPreviewCache' => '',
+					'previewData' => '\'\'',
+					'previewTimeout' => '\'\'',
+					'refreshPreviewCache' => '\'\'',
 					'editFilename' => JavaScriptEscape($context['edit_filename']),
 					'theme_id' => $settings['theme_id'],
 				));

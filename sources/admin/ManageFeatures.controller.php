@@ -767,7 +767,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=sig';
 		$context['settings_title'] = $txt['signature_settings'];
-		$context['settings_message'] = !empty($settings_applied) ? $txt['signature_settings_applied'] : sprintf($txt['signature_settings_warning'], $scripturl . '?action=admin;area=featuresettings;sa=sig;apply;' . $context['session_id'] . '=' . $context['session_var']);
+		$context['settings_message'] = !empty($settings_applied) ? $txt['signature_settings_applied'] : sprintf($txt['signature_settings_warning'], $scripturl . '?action=admin;area=featuresettings;sa=sig;apply;' . $context['session_var'] . '=' . $context['session_id']);
 
 		Settings_Form::prepare_db($config_vars);
 	}

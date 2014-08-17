@@ -246,7 +246,7 @@ class Likes_Controller extends Action_Controller
 
 		// If you're a guest or simply can't do this, we stop
 		is_not_guest();
-		allowedTo('like_posts');
+		isAllowedTo('like_posts');
 
 		// Load up the helpers
 		require_once(SUBSDIR . '/Likes.subs.php');

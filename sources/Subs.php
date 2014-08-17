@@ -2643,7 +2643,7 @@ function setupThemeContext($forceload = false)
 	$context['common_stats']['boardindex_total_posts'] = sprintf($txt['boardindex_total_posts'], $context['common_stats']['total_posts'], $context['common_stats']['total_topics'], $context['common_stats']['total_members']);
 
 	if (empty($settings['theme_version']))
-		addJavascriptVar(array('elk_scripturl' => $scripturl));
+		addJavascriptVar(array('elk_scripturl' => '\'' . $scripturl . '\''));
 
 	if (!isset($context['page_title']))
 		$context['page_title'] = '';

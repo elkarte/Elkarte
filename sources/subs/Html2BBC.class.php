@@ -385,7 +385,7 @@ class Html_2_BBC
 				break;
 			default:
 				// Don't know you, so just preserve whats there, less the tag
-				$bbc = $this->_parser ? htmlspecialchars_decode($this->doc->saveHTML($node)) : $node->outertext;
+				$bbc = $this->_get_outerHTML($node);
 		}
 
 		// Replace the node with our bbc replacement, or with the node itself if none was found
@@ -847,6 +847,39 @@ class Html_2_BBC
 		}
 		else
 			return $node->innertext;
+	}
+
+	/**
+	 * Gets the outer html of a node
+	 *
+	 * @param object $node
+	 */
+	private function _get_outerHTML($node)
+	{
+		if ($this->_parser)
+		{
+			if (version_compare(PHP_VERSION, '5.3.6') >= 0)
+				return htmlspecialchars_decode($this->doc->saveHTML($node));
+			else
+			{
+				// @todo remove when 5.3.6 min
+				$doc = new DOMDocument();
+				$doc->appendChild($doc->importNode($node, true));
+				$html = $doc->saveHTML();
+
+				// We just want the html of the inserted node, it *may* be wrapped
+				if (preg_match('~<body>(.*)</body>~s', $html, $body))
+					$html = $body[1];
+				elseif (preg_match('~<html>(.*)</html>~s', $html, $body))
+					$html = $body[1];
+
+				// Clean it up
+				$html = rtrim($doc->saveHTML(), "\n");
+				return html_entity_decode(htmlspecialchars_decode($html, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
+			}
+		}
+		else
+			return $node->outertext;
 	}
 
 	/**
