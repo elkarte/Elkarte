@@ -63,6 +63,7 @@ $txt['cannot_edit_news'] = 'Es ist Ihnen nicht erlaubt, Neuigkeiten in diesem Fo
 $txt['cannot_pm_read'] = 'Verzeihung, Sie können keine privaten Nachrichten lesen.';
 $txt['cannot_pm_send'] = 'Sie dürfen keine privaten Nachrichten versenden.';
 $txt['cannot_karma_edit'] = 'Sie sind nicht befugt, das Karma anderer Leute zu ändern.';
+$txt['cannot_like_posts'] = 'Sie sind nicht befugt, Beiträge in diesem Forum zu mögen.';
 $txt['cannot_lock_any'] = 'Sie dürfen hier nicht irgendwelche Themen schließen.';
 $txt['cannot_lock_own'] = 'Entschuldigung, aber Sie können Ihre eigenen Themen hier nicht schließen.';
 $txt['cannot_make_sticky'] = 'Sie sind nicht befugt, dieses Thema anzuheften.';
