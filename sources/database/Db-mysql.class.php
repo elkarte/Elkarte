@@ -1155,7 +1155,9 @@ class Database_MySQL extends Database_Abstract
 	 */
 	public function escape_string($string)
 	{
-		return mysqli_real_escape_string($this->_connection, $string);
+		$string = $this->_clean_4byte_chars($string);
+
+		return sprintf('\'%1$s\'', mysqli_real_escape_string($this->_connection, $string));
 	}
 
 	/**
