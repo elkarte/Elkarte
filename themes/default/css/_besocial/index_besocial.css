@@ -79,9 +79,9 @@ fieldset {
 legend {
 	background: url(../../images/selected_open.png) no-repeat scroll left center transparent;
 	cursor: pointer;
-	padding-left: 20px;
+	padding: 0 0 2px 20px;
 	color: #333;
-	font-size: 1.214em;
+	font-size: 1.071em;
 	margin-left: 15px;
 }
 .collapsed legend {

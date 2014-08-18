@@ -525,7 +525,7 @@ function template_modify_group_classic($type)
 	foreach ($permission_type['columns'] as $column)
 	{
 		echo '
-						<table style="width: 49%;" class="table_grid perm_classic floatleft">';
+						<table class="table_grid perm_classic floatleft">';
 
 		foreach ($column as $permissionGroup)
 		{
@@ -545,7 +545,7 @@ function template_modify_group_classic($type)
 				{
 					echo '
 							<tr class="table_head">
-								<th class="lefttext" colspan="2" style="width: 100%;">
+								<th class="lefttext" colspan="2">
 									<strong class="smalltext">', $permissionGroup['name'], '</strong>
 								</th>';
 
@@ -602,7 +602,7 @@ function template_modify_group_classic($type)
 					if ($permission['has_own_any'])
 					{
 						echo '
-								<td class="lefttext" colspan="4" style="width: 100%;">', $permission['name'], '</td>
+								<td class="lefttext" colspan="4">', $permission['name'], '</td>
 							</tr>
 							<tr class="', $alternate ? 'windowbg' : 'windowbg2', '">';
 
@@ -611,7 +611,7 @@ function template_modify_group_classic($type)
 						{
 							echo '
 								<td></td>
-								<td class="smalltext righttext" style="width: 100%;">', $permission['own']['name'], ':</td>';
+								<td class="smalltext righttext">', $permission['own']['name'], ':</td>';
 
 							if (empty($modSettings['permission_enable_deny']))
 								echo '
@@ -637,7 +637,7 @@ function template_modify_group_classic($type)
 
 						echo '
 								<td></td>
-								<td class="smalltext righttext" style="width: 100%;">', $permission['any']['name'], ':</td>';
+								<td class="smalltext righttext">', $permission['any']['name'], ':</td>';
 
 						if (empty($modSettings['permission_enable_deny']) || $context['group']['id'] == -1)
 							echo '
@@ -662,7 +662,7 @@ function template_modify_group_classic($type)
 					else
 					{
 						echo '
-								<td class="lefttext" style="width: 100%;">', $permission['name'], '</td>';
+								<td class="lefttext">', $permission['name'], '</td>';
 
 						if (empty($modSettings['permission_enable_deny']) || $context['group']['id'] == -1)
 							echo '
@@ -691,7 +691,7 @@ function template_modify_group_classic($type)
 			if (!$permissionGroup['hidden'] && $has_display_content)
 				echo '
 							<tr class="windowbg2">
-								<td colspan="5" style="width: 100%;"><!--separator--></td>
+								<td colspan="5"><!--separator--></td>
 							</tr>';
 		}
 		echo '

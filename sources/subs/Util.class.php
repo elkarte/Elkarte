@@ -30,7 +30,12 @@ class Util
 	public static function entity_fix($string)
 	{
 		$num = $string[0] === 'x' ? hexdec(substr($string, 1)) : (int) $string;
-		return $num < 0x20 || $num > 0x10FFFF || ($num >= 0xD800 && $num <= 0xDFFF) || $num === 0x202E || $num === 0x202D ? '' : '&#' . $num . ';';
+
+		// We don't allow control characters, characters out of range, byte markers, etc
+		if ($num < 0x20 || $num > 0x10FFFF || ($num >= 0xD800 && $num <= 0xDFFF) || $num == 0x202D || $num == 0x202E)
+			return '';
+		else
+			return '&#' . $num . ';';
 	}
 
 	/**
@@ -45,6 +50,9 @@ class Util
 	public static function htmlspecialchars($string, $quote_style = ENT_COMPAT, $charset = 'UTF-8', $double = false)
 	{
 		global $modSettings;
+
+		if (empty($string))
+			return $string;
 
 		if (empty($modSettings['disableEntityCheck']))
 			$check = preg_replace_callback('~(&amp;#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', htmlspecialchars($string, $quote_style, $charset, $double));

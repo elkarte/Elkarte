@@ -81,9 +81,9 @@ fieldset {
 legend {
 	background: url(../../images/selected_open.png) no-repeat scroll left center transparent;
 	cursor: pointer;
-	padding-left: 20px;
+	padding: 0 0 2px 20px;
 	color: #333;
-	font-size: 1.214em;
+	font-size: 1.071em;
 	margin-left: 15px;
 }
 .collapsed legend {
@@ -446,12 +446,13 @@ div.bbc_footnotes .meaction{
 	line-height: 1.286em;
 	font-weight: 700;
 	font-variant: small-caps;
-	margin: 7px -4em 0 12px;
+	margin: -2px 1em 0 0;
+	height: 1em;
 }
 #news>h2:after {
 	content: "\2026";
 }
-#news_line, #elkFadeScroller {
+#news_line, #news {
 	padding: 6px 12px;
 	border: 1px solid #ccc;
 	background: #fff;
@@ -462,7 +463,6 @@ div.bbc_footnotes .meaction{
 	min-height: 60px;
 	overflow: auto;
 	resize: vertical;
-	text-indent: 5em;
 }
 /* Main forum area. */
 /* Box-shadow only on this one. */

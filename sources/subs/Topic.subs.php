@@ -1621,11 +1621,13 @@ function selectMessages($topic, $start, $per_page, $messages = array(), $only_ap
 }
 
 /**
- * Grab some the messages of a topic.
+ * Loads all the messages of a topic
+ * Used when printing or other functions that require a topic listing
  *
  * @param int $topic
+ * @param string $render defaults to print style rendering for parse_bbc
  */
-function topicMessages($topic)
+function topicMessages($topic, $render = 'print')
 {
 	global $modSettings, $user_info;
 
@@ -1657,7 +1659,7 @@ function topicMessages($topic)
 			'time' => standardTime($row['poster_time'], false),
 			'html_time' => htmlTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
-			'body' => parse_bbc($row['body'], 'print'),
+			'body' => parse_bbc($row['body'], $render),
 			'id_msg' => $row['id_msg'],
 		);
 	}
