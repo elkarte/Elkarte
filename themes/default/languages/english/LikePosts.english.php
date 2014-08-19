@@ -48,3 +48,4 @@ $txt['like_post_read_more'] = 'read more...';
 
 // Error msgs
 $txt['like_post_error_no_data'] = 'Sorry, it looks like there is nothing to show yet!';
+$txt['like_post_error_something_wrong'] = 'Sorry, it looks like there is a problem retrieving the data...';

@@ -28,12 +28,6 @@ class Likes_Controller extends Action_Controller
 	protected $_likes_response = array();
 
 	/**
-	 * If this was an ajax request or not
-	 * @var boolean
-	 */
-	protected $_api = false;
-
-	/**
 	 * The id of the message being liked
 	 * @var int
 	 */
@@ -70,8 +64,16 @@ class Likes_Controller extends Action_Controller
 	 */
 	public function action_likepost_api()
 	{
-		$this->_api = true;
-		$this->action_likepost();
+		global $txt;
+
+		// An error if not possible to like.
+		if (!$this->_doLikePost('+', 'like'))
+		{
+			loadLanguage('Errors');
+			$this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
+		}
+
+		$this->likeResponse();
 	}
 
 	/**
@@ -80,14 +82,16 @@ class Likes_Controller extends Action_Controller
 	 */
 	public function action_unlikepost_api()
 	{
-		$this->_api = true;
-		$this->action_unlikepost();
-	}
+		global $txt;
 
-	public function action_likestats_api()
-	{
-		$this->_api = true;
-		$this->action_likestats();
+		// An error if not possible to like.
+		if (!$this->_doLikePost('-', 'rlike'))
+		{
+			loadLanguage('Errors');
+			$this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
+		}
+
+		$this->likeResponse();
 	}
 
 	/**
@@ -98,7 +102,26 @@ class Likes_Controller extends Action_Controller
 	 */
 	public function action_likepost()
 	{
-		global $user_info, $topic, $txt, $modSettings;
+		global $topic;
+
+		$this->_doLikePost('+', 'like');
+
+		redirectexit('topic=' . $topic . '.msg' . $this->_id_liked . '#msg' . $this->_id_liked);
+	}
+
+	/**
+	 * Actually perform the "like" operation.
+	 *
+	 * Fills $_likes_response that can be used by likeResponse() in order to
+	 * return a JSON response
+	 * @param string $sign '+' or '-'
+	 * @param string $type the type of like 'like' or 'rlike'
+	 *
+	 * @return bool
+	 */
+	protected function _doLikePost($sign, $type)
+	{
+		global $user_info, $modSettings;
 
 		$this->_id_liked = !empty($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : 0;
 
@@ -113,7 +136,7 @@ class Likes_Controller extends Action_Controller
 			if ($liked_message)
 			{
 				// Like it
-				$likeResult = likePost($user_info['id'], $liked_message, '+');
+				$likeResult = likePost($user_info['id'], $liked_message, $sign);
 				if ($likeResult === true)
 				{
 					// Lets add in a mention to the member that just had their post liked
@@ -122,27 +145,21 @@ class Likes_Controller extends Action_Controller
 						$mentions = new Mentions_Controller();
 						$mentions->setData(array(
 							'id_member' => $liked_message['id_member'],
-							'type' => 'like',
+							'type' => $type,
 							'id_msg' => $this->_id_liked,
 						));
-						$mentions->action_add();
+
+						// Notifying that likes were removed ?
+						if ($type === 'rlike' && !empty($modSettings['mentions_dont_notify_rlike']))
+							$mentions->action_rlike();
+						else
+							$mentions->action_add();
 					}
 				}
-				elseif ($this->_api)
-					$this->_likes_response = array('result' => false, 'data' => $likeResult);
-			}
-			elseif ($this->_api)
-			{
-				loadLanguage('Errors');
-				$this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
+				return true;
 			}
 		}
-
-		// Back to where we were, in theory
-		if ($this->_api)
-			$this->likeResponse();
-		else
-			redirectexit('topic=' . $topic . '.msg' . $this->_id_liked . '#msg' . $this->_id_liked);
+		return false;
 	}
 
 	/**
@@ -154,52 +171,9 @@ class Likes_Controller extends Action_Controller
 	{
 		global $user_info, $topic, $txt, $modSettings;
 
-		$this->_id_liked = !empty($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : 0;
+		$this->_doLikePost('-', 'rlike');
 
-		// We used to like these
-		require_once(SUBSDIR . '/Likes.subs.php');
-		require_once(SUBSDIR . '/Messages.subs.php');
-
-		// Have to be able to access it to unlike it now
-		if ($this->prepare_like() && canAccessMessage($this->_id_liked))
-		{
-			$liked_message = basicMessageInfo($this->_id_liked, true, true);
-			if ($liked_message)
-			{
-				$likeResult = likePost($user_info['id'], $liked_message, '-');
-				if ($likeResult === true)
-				{
-					// Oh noes, taking the like back, let them know so they can complain
-					if (!empty($modSettings['mentions_enabled']))
-					{
-						$mentions = new Mentions_Controller();
-						$mentions->setData(array(
-							'id_member' => $liked_message['id_member'],
-							'type' => 'rlike',
-							'id_msg' => $this->_id_liked,
-						));
-
-						// Notifying that likes were removed ?
-						if (!empty($modSettings['mentions_dont_notify_rlike']))
-							$mentions->action_rlike();
-						else
-							$mentions->action_add();
-					}
-				}
-				elseif ($this->_api)
-					$this->_likes_response = array('result' => false, 'data' => $likeResult);
-			}
-			elseif ($this->_api)
-			{
-				loadLanguage('Errors');
-				$this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
-			}
-		}
-
-		// Back we go
-		if ($this->_api)
-			$this->likeResponse();
-		elseif (!isset($_REQUEST['profile']))
+		if (!isset($_REQUEST['profile']))
 			redirectexit('topic=' . $topic . '.msg' . $this->_id_liked . '#msg' . $this->_id_liked);
 		else
 			redirectexit('action=profile;area=showlikes;sa=given;u=' .$user_info['id']);
@@ -250,7 +224,7 @@ class Likes_Controller extends Action_Controller
 
 		// If you're a guest or simply can't do this, we stop
 		is_not_guest();
-		allowedTo('like_posts');
+		isAllowedTo('like_posts');
 
 		// Load up the helpers
 		require_once(SUBSDIR . '/Likes.subs.php');
@@ -629,9 +603,49 @@ class Likes_Controller extends Action_Controller
 	}
 
 	/**
-	 * Like stats controller function
-	 * Validates whether user is allowed to see stats or not
-	 * Decides which tab data to fetch and shown to user
+	 * Like stats controller function, used by API calls.
+	 *
+	 * Validates whether user is allowed to see stats or not.
+	 * Decides which tab data to fetch and shown to user.
+	 */
+	public function action_likestats_api()
+	{
+		global $context, $user_info, $topic, $txt, $modSettings;
+
+		require_once(SUBSDIR . '/Likes.subs.php');
+
+		if (empty($modSettings['likes_enabled']))
+			fatal_lang_error('feature_disabled', true);
+
+		isAllowedTo('like_posts_stats');
+
+		loadLanguage('LikePosts');
+
+		$subActions = array(
+			'messagestats' => array($this, 'action_messageStats'),
+			'topicstats' => array($this, 'action_topicStats'),
+			'boardstats' => array($this, 'action_boardStats'),
+			'mostlikesreceiveduserstats' => array($this, 'action_mostLikesReceivedUserStats'),
+			'mostlikesgivenuserstats' => array($this, 'action_mostLikesGivenUserStats'),
+		);
+
+		// Set up the action controller
+		$action = new Action('likesstats');
+
+		// Pick the correct sub-action, call integrate_sa_likesstats
+		$subAction = $action->initialize($subActions, 'messagestats', 'area');
+		$context['sub_action'] = $subAction;
+
+		// Call the right function for this sub-action.
+		$action->dispatch($subAction);
+	}
+
+	/**
+	 * Like stats controller function.
+	 *
+	 * Validates whether user is allowed to see stats or not.
+	 * Presents a general page without data that will be fully loaded
+	 * by API calls.
 	 */
 	public function action_likestats()
 	{
@@ -644,60 +658,37 @@ class Likes_Controller extends Action_Controller
 
 		isAllowedTo('like_posts_stats');
 
-		if ($this->_api)
-		{
-			$subActions = array(
-				'messagestats' => array($this, 'action_messageStats'),
-				'topicstats' => array($this, 'action_topicStats'),
-				'boardstats' => array($this, 'action_boardStats'),
-				'mostlikesreceiveduserstats' => array($this, 'action_mostLikesReceivedUserStats'),
-				'mostlikesgivenuserstats' => array($this, 'action_mostLikesGivenUserStats'),
-			);
+		// Load the required files
+		loadLanguage('LikePosts');
+		loadJavascriptFile('like_posts.js', array('defer' => true));
+		loadtemplate('LikePostsStats');
 
-			// Set up the action controller
-			$action = new Action('likesstats');
+		$context['page_title'] = $txt['like_post_stats'];
+		$context['like_posts']['tab_desc'] = $txt['like_posts_stats_desc'];
 
-			// Pick the correct sub-action, call integrate_sa_likesstats
-			$subAction = $action->initialize($subActions, 'messagestats', 'area');
-			$context['sub_action'] = $subAction;
-
-			// Call the right function for this sub-action.
-			$action->dispatch($subAction);
-		}
-		else
-		{
-			// Load the required files
-			loadLanguage('LikePosts');
-			loadJavascriptFile('like_posts.js', array('defer' => true));
-			loadtemplate('LikePostsStats');
-
-			$context['page_title'] = $txt['like_post_stats'];
-			$context['like_posts']['tab_desc'] = $txt['like_posts_stats_desc'];
-
-			$context['lp_stats_tabs'] = array(
-				'messagestats' => array(
-					'label' => $txt['like_post_message'],
-					'id' => 'messagestats',
-				),
-				'topicstats' => array(
-					'label' => $txt['like_post_topic'],
-					'id' => 'topicstats',
-				),
-				'boardstats' => array(
-					'label' => $txt['like_post_board'],
-					'id' => 'boardstats',
-				),
-				'usergivenstats' => array(
-					'label' => $txt['like_post_tab_mlmember'],
-					'id' => 'mostlikesreceiveduserstats',
-				),
-				'userreceivedstats' => array(
-					'label' => $txt['like_post_tab_mlgmember'],
-					'id' => 'mostlikesgivenuserstats',
-				),
-			);
-			$context['sub_template'] = 'lp_stats';
-		}
+		$context['lp_stats_tabs'] = array(
+			'messagestats' => array(
+				'label' => $txt['like_post_message'],
+				'id' => 'messagestats',
+			),
+			'topicstats' => array(
+				'label' => $txt['like_post_topic'],
+				'id' => 'topicstats',
+			),
+			'boardstats' => array(
+				'label' => $txt['like_post_board'],
+				'id' => 'boardstats',
+			),
+			'usergivenstats' => array(
+				'label' => $txt['like_post_tab_mlmember'],
+				'id' => 'mostlikesreceiveduserstats',
+			),
+			'userreceivedstats' => array(
+				'label' => $txt['like_post_tab_mlgmember'],
+				'id' => 'mostlikesgivenuserstats',
+			),
+		);
+		$context['sub_template'] = 'lp_stats';
 	}
 
 	/**
