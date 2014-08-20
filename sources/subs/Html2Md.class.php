@@ -871,7 +871,7 @@ class Html_2_Md
 					$html = $body[1];
 
 				// Clean it up
-				$html = rtrim($doc->saveHTML(), "\n");
+				$html = rtrim($html, "\n");
 				return html_entity_decode(htmlspecialchars_decode($html, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
 			}
 		}
