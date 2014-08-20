@@ -682,9 +682,8 @@ function dbMostLikedBoard()
 	$request = $db->query('group_concat_convert', '
 		SELECT m.id_board, b.name, b.num_topics, b.num_posts,
 			COUNT(DISTINCT(m.id_topic)) AS topics_liked, COUNT(DISTINCT(lp.id_msg)) AS msgs_liked,
-			SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT(CONVERT(m.id_topic, CHAR(8))) ORDER BY m.id_topic DESC SEPARATOR ","), ",", 10) AS id_topic,
 			COUNT(m.id_board) AS like_count
-		FROM {db_prefix}message_likes AS lp
+		FROM {db_prefix}message_likes as lp
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
 			INNER JOIN {db_prefix}boards AS b ON (m.id_board = b.id_board)
 		WHERE {query_wanna_see_board}
@@ -693,30 +692,34 @@ function dbMostLikedBoard()
 		LIMIT 1',
 		array()
 	);
-	list ($mostLikedBoard['id_board'], $mostLikedBoard['name'], $mostLikedBoard['num_topics'], $mostLikedBoard['num_posts'], $mostLikedBoard['topics_liked'], $mostLikedBoard['msgs_liked'], $id_topics, $mostLikedBoard['like_count'])= $db->fetch_row($request);
+	list ($mostLikedBoard['id_board'], $mostLikedBoard['name'], $mostLikedBoard['num_topics'], $mostLikedBoard['num_posts'], $mostLikedBoard['topics_liked'], $mostLikedBoard['msgs_liked'], $mostLikedBoard['like_count'])= $db->fetch_row($request);
 
 	$db->free_result($request);
 
-	if (empty($id_topics))
+	if (empty($mostLikedBoard['id_board']))
 	{
 		return array(
 			'noDataMessage' => $txt['like_post_error_no_data']
 		);
 	}
 
-	// Lets fetch few topics from this board
+	// Lets fetch few top liked topics from this board
 	$request = $db->query('', '
-		SELECT t.id_topic, m.id_msg, m.body, m.poster_time, m.smileys_enabled,
+		SELECT m.id_topic, m.id_msg, m.body, m.poster_time, m.smileys_enabled,
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
-			mem.id_member, IFNULL(mem.real_name, m.poster_name) as real_name, mem.avatar, mem.email_address
-		FROM {db_prefix}topics as t
-			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
+			mem.id_member, IFNULL(mem.real_name, m.poster_name) as real_name,
+			mem.avatar, mem.email_address, COUNT(lp.id_msg) AS like_count
+		FROM {db_prefix}message_likes AS lp
+			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
+			INNER JOIN {db_prefix}boards AS b ON (m.id_board = b.id_board)
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member)
-		WHERE t.id_topic IN ({raw:id_topics})
-		ORDER BY t.id_topic DESC',
+		WHERE m.id_board = ({int:id_board})
+		GROUP BY lp.id_msg
+		ORDER BY like_count DESC
+		LIMIT 10',
 		array(
-			'id_topics' => $id_topics
+			'id_board' => $mostLikedBoard['id_board']
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
