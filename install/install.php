@@ -2860,7 +2860,7 @@ function template_admin_account()
 		<h2>', $txt['user_settings_database'], '</h2>
 		<p>', $txt['user_settings_database_info'], '</p>
 
-		<div style="margin-bottom: 2ex; padding-', empty($txt['lang_rtl']) ? 'left' : 'right', ': 50px;">
+		<div style="padding-bottom: 2ex; padding-', empty($txt['lang_rtl']) ? 'left' : 'right', ': 50px;">
 			<input type="password" name="password3" size="30" class="input_password" />
 		</div>';
 }

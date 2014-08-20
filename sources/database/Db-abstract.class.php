@@ -175,7 +175,7 @@ abstract class Database_Abstract implements Database
 	 *
 	 * @param string $db_string
 	 * @param mixed[] $db_values
-	 * @param resource|null $connection
+	 * @param resource|null $connection = null
 	 */
 	public function quote($db_string, $db_values, $connection = null)
 	{

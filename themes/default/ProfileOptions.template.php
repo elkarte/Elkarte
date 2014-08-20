@@ -75,13 +75,16 @@ function template_editBuddies()
 				<td>', ($buddy['show_email'] == 'no' ? '' : '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $buddy['id'] . '" rel="nofollow"><img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $buddy['name'] . '" /></a>'), '</td>';
 
 		//  Any custom profile (with icon) fields to show
-		$im = array();
-		foreach ($buddy['custom_fields'] as $key => $cpf)
-			if ($cpf['placement'] == 1)
-				$im[] = $cpf['value'];
+		if (!empty($buddy['custom_fields']))
+		{
+			$im = array();
+			foreach ($buddy['custom_fields'] as $key => $cpf)
+				if ($cpf['placement'] == 1)
+					$im[] = $cpf['value'];
 
-		echo '
+			echo '
 				<td>' . implode(' | ', $im) . '</td>';
+		}
 
 		echo '
 				<td class="righttext">
@@ -465,17 +468,10 @@ function template_edit_options()
 	// Any onsubmit javascript?
 	if (!empty($context['profile_onsubmit_javascript']))
 		echo '
-				', $context['profile_javascript'];
+				', $context['profile_onsubmit_javascript'];
 
 	echo '
-			}';
-
-	// Any totally custom stuff?
-	if (!empty($context['profile_javascript']))
-		echo '
-			', $context['profile_javascript'];
-
-	echo '
+			}
 		// ]]></script>';
 
 	// Any final spellchecking stuff?
@@ -1110,7 +1106,6 @@ function template_profile_signature_modify()
 									var maxLength = ', $context['signature_limits']['max_length'], ';
 
 									$(document).ready(function() {
-										calcCharLeft();
 										$("#preview_button").click(function() {
 											return ajax_getSignaturePreview(true);
 										});

@@ -81,9 +81,9 @@ fieldset {
 legend {
 	background: url(../../images/selected_open.png) no-repeat scroll left center transparent;
 	cursor: pointer;
-	padding-left: 20px;
+	padding: 0 0 2px 20px;
 	color: #333;
-	font-size: 1.214em;
+	font-size: 1.071em;
 	margin-left: 15px;
 }
 .collapsed legend {
@@ -189,7 +189,7 @@ strong {
 .popup_heading {
 	font-weight: 600;
 	-webkit-font-smoothing: antialiased;
-	font-family: "Segoe UI Semibold", "Helvetica Neue Medium", "Helvetica Neue";
+	font-family: "Segoe UI Semibold", "Segoe UI", "Helvetica Neue Medium", "Helvetica Neue";
 }
 
 /* @todo - Test this everywhere. */
@@ -446,12 +446,13 @@ div.bbc_footnotes .meaction{
 	line-height: 1.286em;
 	font-weight: 700;
 	font-variant: small-caps;
-	margin: 7px -4em 0 12px;
+	margin: -2px 1em 0 0;
+	height: 1em;
 }
 #news>h2:after {
 	content: "\2026";
 }
-#news_line, #elkFadeScroller {
+#news_line, #news {
 	padding: 6px 12px;
 	border: 1px solid #ccc;
 	background: #fff;
@@ -462,7 +463,6 @@ div.bbc_footnotes .meaction{
 	min-height: 60px;
 	overflow: auto;
 	resize: vertical;
-	text-indent: 5em;
 }
 /* Main forum area. */
 /* Box-shadow only on this one. */
@@ -842,12 +842,14 @@ div.bbc_footnotes .meaction{
 /* Styles for the standard button lists.
 /* ------------------------------------------------------- */
 /* @todo - Save code by amalgamating common button background declarations. */
-.buttonlist li a {
+.buttonlist li a.linklevel1 {
 	text-transform: uppercase;
+	box-shadow: 1px 1px 2px #e5e5e5, 0 -1px 0 #e4e4e4 inset;
 }
 /* The active one */
 .buttonlist li a.active {
 	box-shadow: 1px 1px 2px #ccc;
+	box-shadow: 1px 1px 2px #e5e5e5, 0 -1px 0 #3d6e32 inset;
 }
 
 /* The quick buttons. */
@@ -1257,6 +1259,7 @@ div.bbc_footnotes .meaction{
 .report_seperator {
 	background: #bbb;
 	border-bottom: 1px solid #eee;
+	max-width: 14em;
 }
 /* @todo - Save code by amalgamating common button background declarations. */
 .poster_online .linklevel1 {

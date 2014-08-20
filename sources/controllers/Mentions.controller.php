@@ -81,6 +81,27 @@ class Mentions_Controller extends Action_Controller
 	protected $_page = 0;
 
 	/**
+	 * Number of items per page
+	 *
+	 * @var int
+	 */
+	protected $_items_per_page = 20;
+
+	/**
+	 * Default sorting column
+	 *
+	 * @var string
+	 */
+	protected $_default_sort = 'log_time';
+
+	/**
+	 * The sorting methods we know
+	 *
+	 * @var string[]
+	 */
+	protected $_known_sorting = array();
+
+	/**
 	 * Determine if we are looking only at unread mentions or any kind of
 	 *
 	 * @var boolean
@@ -123,6 +144,8 @@ class Mentions_Controller extends Action_Controller
 			'deleted' => 2,
 			'unapproved' => 3,
 		);
+
+		$this->_known_sorting = array('id_member_from', 'type', 'log_time');
 
 		call_integration_hook('integrate_add_mention', array(&$this->_known_mentions));
 	}
@@ -178,9 +201,9 @@ class Mentions_Controller extends Action_Controller
 		$list_options = array(
 			'id' => 'list_mentions',
 			'title' => empty($this->_all) ? $txt['my_unread_mentions'] : $txt['my_mentions'],
-			'items_per_page' => 20,
+			'items_per_page' => $this->_items_per_page,
 			'base_href' => $scripturl . '?action=mentions;sa=list' . $this->_url_param,
-			'default_sort_col' => 'log_time',
+			'default_sort_col' => $this->_default_sort,
 			'default_sort_dir' => 'default',
 			'no_items_label' => $this->_all ? $txt['no_mentions_yet'] : $txt['no_new_mentions'],
 			'get_items' => array(
@@ -286,6 +309,10 @@ class Mentions_Controller extends Action_Controller
 					'position' => 'top_of_list',
 					'value' => '<a class="floatright linkbutton" href="' . $scripturl . '?action=mentions' . (!empty($this->_all) ? '' : ';all') . str_replace(';all', '', $this->_url_param) . '">' . (!empty($this->_all) ? $txt['mentions_unread'] : $txt['mentions_all']) . '</a>',
 				),
+				array(
+					'position' => 'bottom_of_list',
+					'value' => '<a class="floatright linkbutton" href="' . $scripturl . '?action=mentions;sa=updatestatus;mark=readall' . str_replace(';all', '', $this->_url_param) . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['mentions_mark_all_read'] . '</a>',
+				),
 			),
 		);
 
@@ -377,6 +404,9 @@ class Mentions_Controller extends Action_Controller
 			// Let's start a bit further into the list
 			$start += $limit;
 		}
+
+		if ($round !== 0)
+			countUserMentions();
 
 		return $mentions;
 	}
@@ -544,7 +574,7 @@ class Mentions_Controller extends Action_Controller
 		checkSession('request');
 
 		$this->setData(array(
-			'id_mention' => $_REQUEST['item'],
+			'id_mention' => isset($_REQUEST['item']) ? $_REQUEST['item'] : 0,
 			'mark' => $_REQUEST['mark'],
 		));
 
@@ -564,10 +594,37 @@ class Mentions_Controller extends Action_Controller
 				case 'delete':
 					changeMentionStatus($this->_validator->id_mention, $this->_known_status['deleted']);
 					break;
+				case 'readall':
+					$mentions = $this->list_loadMentions((int) $this->_page, $this->_items_per_page, $this->_sort, $this->_all, $this->_type);
+					$this->_markMentionsRead($mentions);
+					break;
 			}
 		}
 
 		redirectexit('action=mentions;sa=list' . $this->_url_param);
+	}
+
+	/**
+	 * Marks an array of mentions as read
+	 *
+	 * @param int[] $mention_ids An array of mention ids. Each of them will be
+	 *              validated independently
+	 */
+	protected function _markMentionsRead($mention_ids)
+	{
+		if (empty($mention_ids))
+			return;
+
+		foreach ($mention_ids as $mention)
+		{
+			$this->setData(array(
+				'id_mention' => $mention['id_mention'],
+				'mark' => 'read',
+			));
+
+			if ($this->_isAccessible())
+				changeMentionStatus($this->_validator->id_mention, $this->_known_status['read']);
+		}
 	}
 
 	/**
@@ -576,6 +633,7 @@ class Mentions_Controller extends Action_Controller
 	protected function _buildUrl()
 	{
 		$this->_all = isset($_REQUEST['all']);
+		$this->_sort = isset($_REQUEST['sort']) && in_array($_REQUEST['sort'], $this->_known_sorting) ? $_REQUEST['sort'] : $this->_default_sort;
 		$this->_type = isset($_REQUEST['type']) && isset($this->_known_mentions[$_REQUEST['type']]) ? $_REQUEST['type'] : '';
 		$this->_page = isset($_REQUEST['start']) ? $_REQUEST['start'] : '';
 
@@ -596,7 +654,7 @@ class Mentions_Controller extends Action_Controller
 		);
 		$validation = array(
 			'id_mention' => 'validate_ownmention',
-			'mark' => 'contains[read,unread,delete]',
+			'mark' => 'contains[read,unread,delete,readall]',
 		);
 
 		$this->_validator->sanitation_rules($sanitization);

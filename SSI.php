@@ -24,39 +24,39 @@ if (defined('ELK'))
 
 define('ELK', 'SSI');
 
-// Shortcut for the browser cache stale
-define('CACHE_STALE', '?10RC1');
-
 // We're going to want a few globals... these are all set later.
 global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
 global $boardurl, $webmaster_email, $cookiename;
 global $db_server, $db_name, $db_user, $db_prefix, $db_persist, $db_error_send;
 global $modSettings, $context, $sc, $user_info, $topic, $board, $txt;
 global $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd;
-global $sourcedir, $boarddir;
+global $boarddir, $sourcedir;
 
 // Remember the current configuration so it can be set back.
 $ssi_magic_quotes_runtime = function_exists('get_magic_quotes_gpc') && get_magic_quotes_runtime();
+
+$ssi_error_reporting = error_reporting(E_ALL | E_STRICT);
+
 if (function_exists('set_magic_quotes_runtime'))
 	@set_magic_quotes_runtime(0);
 $time_start = microtime(true);
+$db_show_debug = false;
 
-// Just being safe...
+// Shortcut for the browser cache stale
+define('CACHE_STALE', '?10RC1');
+
+// We don't need no globals. (a bug in "old" versions of PHP)
 foreach (array('db_character_set', 'cachedir') as $variable)
 	if (isset($GLOBALS[$variable]))
-		unset($GLOBALS[$variable]);
+		unset($GLOBALS[$variable], $GLOBALS[$variable]);
 
 // Get the forum's settings for database and file paths.
 require_once(dirname(__FILE__) . '/Settings.php');
 
-// Fix for using the current directory as a path.
-if (substr($sourcedir, 0, 1) == '.' && substr($sourcedir, 1, 1) != '.')
-	$sourcedir = dirname(__FILE__) . substr($sourcedir, 1);
-
 // Make sure the paths are correct... at least try to fix them.
 if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt'))
 	$boarddir = dirname(__FILE__);
-if (!file_exists($sourcedir) && file_exists($boarddir . '/sources'))
+if (!file_exists($sourcedir . '/SiteDispatcher.class.php') && file_exists($boarddir . '/sources'))
 	$sourcedir = $boarddir . '/sources';
 
 // Check that directories which didn't exist in past releases are initialized.
@@ -78,7 +78,19 @@ DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
 DEFINE('SUBSDIR', $sourcedir . '/subs');
 unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir);
 
-$ssi_error_reporting = error_reporting(E_ALL | E_STRICT);
+// Files we cannot live without.
+require_once(SOURCEDIR . '/QueryString.php');
+require_once(SOURCEDIR . '/Session.php');
+require_once(SOURCEDIR . '/Subs.php');
+require_once(SOURCEDIR . '/Errors.php');
+require_once(SOURCEDIR . '/Logging.php');
+require_once(SOURCEDIR . '/Load.php');
+require_once(SOURCEDIR . '/Security.php');
+
+spl_autoload_register('elk_autoloader');
+
+require_once(SUBSDIR . '/Cache.subs.php');
+
 /**
  * Set this to one of three values depending on what you want to happen in the case of a fatal error.
  *  - false: Default, will just load the error sub template and die - not putting any theme layers around it.
@@ -91,41 +103,41 @@ $ssi_on_error_method = false;
 if ($maintenance == 2 && (!isset($ssi_maintenance_off) || $ssi_maintenance_off !== true))
 	die($mmessage);
 
-// Load the important includes.
-require_once(SOURCEDIR . '/QueryString.php');
-require_once(SOURCEDIR . '/Session.php');
-require_once(SOURCEDIR . '/Subs.php');
-require_once(SOURCEDIR . '/Errors.php');
-require_once(SOURCEDIR . '/Logging.php');
-require_once(SOURCEDIR . '/Load.php');
-require_once(SUBSDIR . '/Cache.subs.php');
-require_once(SOURCEDIR . '/Security.php');
+if ($db_show_debug === true)
+{
+	Debug::get()->rusage('start', $rusage_start);
+}
 
-spl_autoload_register('elk_autoloader');
+// Forum in extended maintenance mode? Our trip ends here with a bland message.
+if (!empty($maintenance) && $maintenance == 2)
+	display_maintenance_message();
 
-// Clean the request variables.
+// Clean the request.
 cleanRequest();
 
 // Initiate the database connection and define some database functions to use.
 loadDatabase();
 
-// Load settings from the database.
+// It's time for settings loaded from the database.
 reloadSettings();
 
-// Seed the random generator?
+// Our good ole' contextual array, which will hold everything
+$context = array();
+
+// Seed the random generator.
 elk_seed_generator();
 
 // Check on any hacking attempts.
 if (isset($_REQUEST['GLOBALS']) || isset($_COOKIE['GLOBALS']))
-	die('Hacking attempt...');
+	die('No access...');
 elseif (isset($_REQUEST['ssi_theme']) && (int) $_REQUEST['ssi_theme'] == (int) $ssi_theme)
-	die('Hacking attempt...');
+	die('No access...');
 elseif (isset($_COOKIE['ssi_theme']) && (int) $_COOKIE['ssi_theme'] == (int) $ssi_theme)
-	die('Hacking attempt...');
+	die('No access...');
 elseif (isset($_REQUEST['ssi_layers'], $ssi_layers) && (@get_magic_quotes_gpc() ? stripslashes($_REQUEST['ssi_layers']) : $_REQUEST['ssi_layers']) == $ssi_layers)
-	die('Hacking attempt...');
+	die('No access...');
 if (isset($_REQUEST['context']))
-	die('Hacking attempt...');
+	die('No access...');
 
 // Gzip output? (because it must be boolean and true, this can't be hacked.)
 if (isset($ssi_gzip) && $ssi_gzip === true && ini_get('zlib.output_compression') != '1' && ini_get('output_handler') != 'ob_gzhandler' && version_compare(PHP_VERSION, '4.2.0', '>='))
@@ -467,8 +479,8 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 				'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['poster_name'] . '</a>'
 			),
 			'subject' => $row['subject'],
-			'short_subject' => shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24),
-			'preview' => shorten_text($preview, !empty($modSettings['ssi_preview_length']) ? $modSettings['ssi_preview_length'] : 128),
+			'short_subject' => Util::shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24),
+			'preview' => Util::shorten_text($preview, !empty($modSettings['ssi_preview_length']) ? $modSettings['ssi_preview_length'] : 128),
 			'body' => $row['body'],
 			'time' => standardTime($row['poster_time']),
 			'html_time' => htmlTime($row['poster_time']),
@@ -622,7 +634,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 			'subject' => $row['subject'],
 			'replies' => $row['num_replies'],
 			'views' => $row['num_views'],
-			'short_subject' => shorten_text($row['subject'], 25),
+			'short_subject' => Util::shorten_text($row['subject'], 25),
 			'preview' => $row['body'],
 			'time' => standardTime($row['poster_time']),
 			'html_time' => htmlTime($row['poster_time']),

@@ -302,8 +302,8 @@ class ProfileInfo_Controller extends Action_Controller
 					// Do the code.
 					$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
 					$preview = strip_tags(strtr($row['body'], array('<br />' => '&#10;')));
-					$preview = shorten_text($preview, !empty($modSettings['ssi_preview_length']) ? $modSettings['ssi_preview_length'] : 128);
-					$short_subject = shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24);
+					$preview = Util::shorten_text($preview, !empty($modSettings['ssi_preview_length']) ? $modSettings['ssi_preview_length'] : 128);
+					$short_subject = Util::shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24);
 
 					// And the array...
 					$context['posts'][] = array(
@@ -355,7 +355,7 @@ class ProfileInfo_Controller extends Action_Controller
 					censorText($row['subject']);
 
 					// Do the code.
-					$short_subject = shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24);
+					$short_subject = Util::shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24);
 
 					// And the array...
 					$context['topics'][] = array(

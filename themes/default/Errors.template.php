@@ -33,7 +33,7 @@ function template_fatal_error()
 		</div>
 	</div>
 	<div class="centertext">
-		<a class="linkbutton" href="javascript:history.go(-1)">', $txt['back'], '</a>
+		<a class="linkbutton" href="javascript:window.location.assign(document.referrer);">', $txt['back'], '</a>
 	</div>';
 }
 

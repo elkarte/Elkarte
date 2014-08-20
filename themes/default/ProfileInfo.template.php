@@ -841,7 +841,7 @@ function template_profile_block_other_info()
 			<h3 class="category_header hdicon cat_img_write">
 				', ($context['user']['is_owner']) ? '<a href="' . $scripturl . '?action=profile;area=forumprofile;u=' . $context['member']['id'] . '">' . $txt['profile_more'] . '</a>' : $txt['profile_more'], '
 			</h3>
-			<div class="profileblock">';
+			<div class="profileblock profileblock_signature">';
 
 	// Are there any custom profile fields for the above signature area?
 	if (!empty($context['custom_fields']))

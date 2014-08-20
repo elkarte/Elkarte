@@ -171,7 +171,7 @@ class Settings_Search
 
 			$return = array(
 				'name' => $name,
-				'help' => shorten_text(isset($item[2]) ? strip_tags($helptxt[$item[2]]) : (isset($helptxt[$found]) ? strip_tags($helptxt[$found]) : ''), 255),
+				'help' => Util::shorten_text(isset($item[2]) ? strip_tags($helptxt[$item[2]]) : (isset($helptxt[$found]) ? strip_tags($helptxt[$found]) : ''), 255),
 			);
 		}
 

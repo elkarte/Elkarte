@@ -124,7 +124,7 @@ class ManageMail_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							return Util::strlen($rowData['subject']) > 50 ? sprintf('%1$s...', Util::htmlspecialchars(Util::substr($rowData['subject'], 0, 47))) : Util::htmlspecialchars($rowData['subject']);
+							return Util::shorten_text(Util::htmlspecialchars($rowData['subject'], 50));
 						},
 						// @todo class popped out while merging
 						'class' => 'smalltext',

@@ -30,7 +30,7 @@ if (!defined('ELK'))
  */
 function getServerVersions($checkFor)
 {
-	global $txt, $_PHPA, $memcached, $modSettings;
+	global $txt, $modSettings;
 
 	$db = database();
 
@@ -66,39 +66,29 @@ function getServerVersions($checkFor)
 		}
 	}
 
-	// If we're using memcache we need the server info.
-	if (empty($memcached) && function_exists('memcache_get') && isset($modSettings['cache_memcached']) && trim($modSettings['cache_memcached']) != '')
+	require_once(SUBSDIR . '/Cache.subs.php');
+	$cache_engines = loadCacheEngines();
+	foreach ($cache_engines as $name => $details)
 	{
-		require_once(SUBSDIR . '/Cache.subs.php');
-		get_memcached_server();
-	}
-	else
-	{
-		if (($key = array_search('memcache', $checkFor)) !== false)
-			unset($checkFor[$key]);
+		if (in_array($name, $checkFor))
+			$versions[$name] = $details;
 	}
 
-	// Check to see if we have any accelerators installed...
-	if (in_array('mmcache', $checkFor) && defined('MMCACHE_VERSION'))
-		$versions['mmcache'] = array('title' => 'Turck MMCache', 'version' => MMCACHE_VERSION);
-	if (in_array('eaccelerator', $checkFor) && defined('EACCELERATOR_VERSION'))
-		$versions['eaccelerator'] = array('title' => 'eAccelerator', 'version' => EACCELERATOR_VERSION);
-	if (in_array('phpa', $checkFor) && isset($_PHPA))
-		$versions['phpa'] = array('title' => 'ionCube PHP-Accelerator', 'version' => $_PHPA['VERSION']);
-	if (in_array('apc', $checkFor) && extension_loaded('apc'))
-		$versions['apc'] = array('title' => 'Alternative PHP Cache', 'version' => phpversion('apc'));
-	if (in_array('memcache', $checkFor) && function_exists('memcache_set'))
-		$versions['memcache'] = array('title' => 'Memcached', 'version' => empty($memcached) ? '???' : memcache_get_version($memcached));
-	if (in_array('xcache', $checkFor) && function_exists('xcache_set'))
-		$versions['xcache'] = array('title' => 'XCache', 'version' => XCACHE_VERSION);
-
+	// PHP Version
 	if (in_array('php', $checkFor))
-		$versions['php'] = array('title' => 'PHP', 'version' => PHP_VERSION, 'more' => '?action=admin;area=serversettings;sa=phpinfo');
+		$versions['php'] = array('title' => 'PHP', 'version' => PHP_VERSION . ' (' . php_sapi_name() . ')', 'more' => '?action=admin;area=serversettings;sa=phpinfo');
 
+	// Server info
 	if (in_array('server', $checkFor))
 	{
 		$req = request();
 		$versions['server'] = array('title' => $txt['support_versions_server'], 'version' => $req->server_software());
+
+		// Compute some system info, if we can
+		$versions['server_name'] = array('title' => $txt['support_versions'], 'version' => php_uname());
+		$loading = detectServerLoad();
+		if ($loading !== false)
+			$versions['server_load'] = array('title' => $txt['load_balancing_settings'], 'version' => $loading);
 	}
 
 	return $versions;

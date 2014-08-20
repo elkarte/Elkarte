@@ -38,9 +38,10 @@ function reloadSettings()
 	global $modSettings;
 
 	$db = database();
+	$cache = Cache::instance();
 
 	// Try to load it from the cache first; it'll never get cached if the setting is off.
-	if (($modSettings = cache_get_data('modSettings', 90)) == null)
+	if (($modSettings = $cache->get('modSettings', 90)) == null)
 	{
 		$request = $db->query('', '
 			SELECT variable, value
@@ -68,7 +69,7 @@ function reloadSettings()
 		$modSettings['warning_enable'] = $modSettings['warning_settings'][0];
 
 		if (!empty($modSettings['cache_enable']))
-			cache_put_data('modSettings', $modSettings, 90);
+			$cache->put('modSettings', $modSettings, 90);
 	}
 
 	// Setting the timezone is a requirement for some functions in PHP >= 5.1.
@@ -78,11 +79,11 @@ function reloadSettings()
 	// Check the load averages?
 	if (!empty($modSettings['loadavg_enable']))
 	{
-		if (($modSettings['load_average'] = cache_get_data('loadavg', 90)) == null)
+		if (($modSettings['load_average'] = $cache->get('loadavg', 90)) == null)
 		{
 			$modSettings['load_average'] = detectServerLoad();
 
-			cache_put_data('loadavg', $modSettings['load_average'], 90);
+			$cache->put('loadavg', $modSettings['load_average'], 90);
 		}
 
 		if ($modSettings['load_average'] !== false)
@@ -146,6 +147,7 @@ function loadUserSettings()
 	global $context, $modSettings, $user_settings, $cookiename, $user_info, $language;
 
 	$db = database();
+	$cache = Cache::instance();
 
 	// Check first the integration, then the cookie, and last the session.
 	if (count($integration_ids = call_integration_hook('integrate_verify_user')) > 0)
@@ -190,7 +192,7 @@ function loadUserSettings()
 	if ($id_member != 0)
 	{
 		// Is the member data cached?
-		if (empty($modSettings['cache_enable']) || $modSettings['cache_enable'] < 2 || ($user_settings = cache_get_data('user_settings-' . $id_member, 60)) == null)
+		if (empty($modSettings['cache_enable']) || $modSettings['cache_enable'] < 2 || ($user_settings = $cache->get('user_settings-' . $id_member, 60)) == null)
 		{
 			$request = $db->query('', '
 				SELECT mem.*, IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
@@ -209,7 +211,7 @@ function loadUserSettings()
 			$user_settings['id_member'] = (int) $user_settings['id_member'];
 
 			if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
-				cache_put_data('user_settings-' . $id_member, $user_settings, 60);
+				$cache->put('user_settings-' . $id_member, $user_settings, 60);
 		}
 
 		// Did we find 'im?  If not, junk it.
@@ -243,7 +245,7 @@ function loadUserSettings()
 		// 2. RSS feeds and XMLHTTP requests don't count either.
 		// 3. If it was set within this session, no need to set it again.
 		// 4. New session, yet updated < five hours ago? Maybe cache can help.
-		if (ELK != 'SSI' && !isset($_REQUEST['xml']) && (!isset($_REQUEST['action']) || $_REQUEST['action'] != '.xml') && empty($_SESSION['id_msg_last_visit']) && (empty($modSettings['cache_enable']) || ($_SESSION['id_msg_last_visit'] = cache_get_data('user_last_visit-' . $id_member, 5 * 3600)) === null))
+		if (ELK != 'SSI' && !isset($_REQUEST['xml']) && (!isset($_REQUEST['action']) || $_REQUEST['action'] != '.xml') && empty($_SESSION['id_msg_last_visit']) && (empty($modSettings['cache_enable']) || ($_SESSION['id_msg_last_visit'] = $cache->get('user_last_visit-' . $id_member, 5 * 3600)) === null))
 		{
 			// @todo can this be cached?
 			// Do a quick query to make sure this isn't a mistake.
@@ -260,10 +262,10 @@ function loadUserSettings()
 				$user_settings['last_login'] = time();
 
 				if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
-					cache_put_data('user_settings-' . $id_member, $user_settings, 60);
+					$cache->put('user_settings-' . $id_member, $user_settings, 60);
 
 				if (!empty($modSettings['cache_enable']))
-					cache_put_data('user_last_visit-' . $id_member, $_SESSION['id_msg_last_visit'], 5 * 3600);
+					$cache->put('user_last_visit-' . $id_member, $_SESSION['id_msg_last_visit'], 5 * 3600);
 			}
 		}
 		elseif (empty($_SESSION['id_msg_last_visit']))
@@ -413,6 +415,7 @@ function loadBoard()
 	global $board_info, $board, $topic, $user_info;
 
 	$db = database();
+	$cache = Cache::instance();
 
 	// Assume they are not a moderator.
 	$user_info['is_mod'] = false;
@@ -428,7 +431,7 @@ function loadBoard()
 		$_REQUEST['msg'] = (int) $_REQUEST['msg'];
 
 		// Looking through the message table can be slow, so try using the cache first.
-		if (($topic = cache_get_data('msg_topic-' . $_REQUEST['msg'], 120)) === null)
+		if (($topic = $cache->get('msg_topic-' . $_REQUEST['msg'], 120)) === null)
 		{
 			require_once(SUBSDIR . '/Messages.subs.php');
 			$topic = associatedTopic($_REQUEST['msg']);
@@ -437,7 +440,7 @@ function loadBoard()
 			if ($topic !== false)
 			{
 				// Save save save.
-				cache_put_data('msg_topic-' . $_REQUEST['msg'], $topic, 120);
+				$cache->put('msg_topic-' . $_REQUEST['msg'], $topic, 120);
 			}
 		}
 
@@ -463,9 +466,9 @@ function loadBoard()
 	{
 		// @todo SLOW?
 		if (!empty($topic))
-			$temp = cache_get_data('topic_board-' . $topic, 120);
+			$temp = $cache->get('topic_board-' . $topic, 120);
 		else
-			$temp = cache_get_data('board-' . $board, 120);
+			$temp = $cache->get('board-' . $board, 120);
 
 		if (!empty($temp))
 		{
@@ -582,8 +585,8 @@ function loadBoard()
 			{
 				// @todo SLOW?
 				if (!empty($topic))
-					cache_put_data('topic_board-' . $topic, $board_info, 120);
-				cache_put_data('board-' . $board, $board_info, 120);
+					$cache->put('topic_board-' . $topic, $board_info, 120);
+				$cache->put('board-' . $board, $board_info, 120);
 			}
 		}
 		else
@@ -1082,12 +1085,12 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'warning' => $profile['warning'],
 			'warning_status' => !empty($modSettings['warning_mute']) && $modSettings['warning_mute'] <= $profile['warning'] ? 'mute' : (!empty($modSettings['warning_moderate']) && $modSettings['warning_moderate'] <= $profile['warning'] ? 'moderate' : (!empty($modSettings['warning_watch']) && $modSettings['warning_watch'] <= $profile['warning'] ? 'watch' : (''))),
 			'local_time' => standardTime(time() + ($profile['time_offset'] - $user_info['time_offset']) * 3600, false),
+			'custom_fields' => array(),
 		);
 
 	// Are we also loading the members custom fields into context?
 	if ($display_custom_fields && !empty($modSettings['displayFields']))
 	{
-		$memberContext[$user]['custom_fields'] = array();
 		if (!isset($context['display_fields']))
 			$context['display_fields'] = unserialize($modSettings['displayFields']);
 
@@ -1445,10 +1448,17 @@ function loadTheme($id_theme = 0, $initialize = true)
 	$context['current_subaction'] = isset($_REQUEST['sa']) ? $_REQUEST['sa'] : null;
 	$context['can_register'] = empty($modSettings['registration_method']) || $modSettings['registration_method'] != 3;
 
+	foreach (array('theme_header', 'upper_content') as $call)
+	{
+		if (!isset($context[$call . '_callbacks']))
+			$context[$call . '_callbacks'] = array();
+	}
+
 	// Set some permission related settings.
 	if ($user_info['is_guest'] && !empty($modSettings['enableVBStyleLogin']))
 	{
 		$context['show_login_bar'] = true;
+		$context['theme_header_callbacks'][] = 'login_bar';
 		loadJavascriptFile('sha256.js', array('defer' => true));
 	}
 
@@ -1620,17 +1630,18 @@ function loadTheme($id_theme = 0, $initialize = true)
 			'rss' => $scripturl . '?action=.xml;type=rss2;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5),
 			'atom' => $scripturl . '?action=.xml;type=atom;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5)
 		);
+
 	// Default JS variables for use in every theme
 	addJavascriptVar(array(
-		'elk_theme_url' => '"' . $settings['theme_url'] . '"',
-		'elk_default_theme_url' => '"' . $settings['default_theme_url'] . '"',
-		'elk_images_url' => '"' . $settings['images_url'] . '"',
-		'elk_smiley_url' => '"' . $modSettings['smileys_url'] . '"',
-		'elk_scripturl' => '"' . $scripturl . '"',
+		'elk_theme_url' => JavaScriptEscape($settings['theme_url']),
+		'elk_default_theme_url' => JavaScriptEscape($settings['default_theme_url']),
+		'elk_images_url' => JavaScriptEscape($settings['images_url']),
+		'elk_smiley_url' => JavaScriptEscape($modSettings['smileys_url']),
+		'elk_scripturl' => '\'' . $scripturl . '\'',
 		'elk_iso_case_folding' => $context['server']['iso_case_folding'] ? 'true' : 'false',
 		'elk_charset' => '"UTF-8"',
-		'elk_session_id' => '"' . $context['session_id'] . '"',
-		'elk_session_var' => '"' . $context['session_var'] . '"',
+		'elk_session_id' => JavaScriptEscape($context['session_id']),
+		'elk_session_var' => JavaScriptEscape($context['session_var']),
 		'elk_member_id' => $context['user']['id'],
 		'ajax_notification_text' => JavaScriptEscape($txt['ajax_in_progress']),
 		'ajax_notification_cancel_text' => JavaScriptEscape($txt['modify_cancel']),
@@ -1797,6 +1808,52 @@ function loadEssentialThemeData()
  * - loads a template file with the name template_name from the current, default, or base theme.
  * - detects a wrong default theme directory and tries to work around it.
  * - can be used to only load style sheets by using false as the template name
+ *   loading of style sheets with this function is @deprecated, use loadCSSFile instead
+ * - if $settings['template_dirs'] is empty, it delays the loading of the template
+ *
+ * @uses the requireTemplate() function to actually load the file.
+ * @param string|false $template_name
+ * @param string[]|string $style_sheets any style sheets to load with the template
+ * @param bool $fatal = true if fatal is true, dies with an error message if the template cannot be found
+ *
+ * @return boolean|null
+ */
+function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
+{
+	global $context, $settings;
+	static $delay = array();
+
+	// If we don't know yet the default theme directory, let's wait a bit.
+	if (empty($settings['template_dirs']))
+	{
+		$delay[] = array(
+			$template_name,
+			$style_sheets,
+			$fatal
+		);
+		return;
+	}
+	// If instead we know the default theme directory and we have delayed something, it's time to process
+	elseif (!empty($delay))
+	{
+		foreach ($delay as $val)
+			requireTemplate($val[0], $val[1], $val[2]);
+
+		// Forget about them (load them only once)
+		$delay = array();
+	}
+
+	requireTemplate($template_name, $style_sheets, $fatal);
+}
+
+/**
+ * <b>Internal function! Do not use it, use loadTemplate instead</b>
+ *
+ * What it does:
+ * - loads a template file with the name template_name from the current, default, or base theme.
+ * - detects a wrong default theme directory and tries to work around it.
+ * - can be used to only load style sheets by using false as the template name
+ *   loading of style sheets with this function is @deprecated, use loadCSSFile instead
  *
  * @uses the template_include() function to include the file.
  * @param string|false $template_name
@@ -1805,7 +1862,7 @@ function loadEssentialThemeData()
  *
  * @return boolean|null
  */
-function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
+function requireTemplate($template_name, $style_sheets, $fatal)
 {
 	global $context, $settings, $txt, $scripturl, $db_show_debug;
 	static $default_loaded = false;
@@ -2041,6 +2098,14 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 		if (empty($context[$params['index_name']]))
 			$context[$params['index_name']] = array();
 		$context[$params['index_name']] += $temp;
+
+		if ($db_show_debug === true)
+		{
+			foreach ($temp as $temp_params)
+			{
+				$context['debug'][$params['debug_index']][] = $temp_params['options']['basename'] . '(' . (!empty($temp_params['options']['local']) ? (!empty($temp_params['options']['url']) ? basename($temp_params['options']['url']) : basename($temp_params['options']['dir'])) : '') . ')';
+			}
+		}
 	}
 	else
 	{
@@ -2072,12 +2137,12 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 				$params['url'] = $settings['theme_url'];
 
 				// Fallback if we are not already in the default theme
-				if ($fallback && ($settings['theme_dir'] !== $settings['default_theme_dir']) && !file_exists($settings['theme_dir'] . $dir . $filename))
+				if ($fallback && ($settings['theme_dir'] !== $settings['default_theme_dir']) && !file_exists($settings['theme_dir'] . $dir . $params['basename']))
 				{
 					// Can't find it in this theme, how about the default?
-					if (file_exists($settings['default_theme_dir'] . $dir . $filename))
+					if (file_exists($settings['default_theme_dir'] . $dir . $params['basename']))
 					{
-						$filename = $settings['default_theme_url'] . $dir . $filename . $cache_staler;
+						$filename = $settings['default_theme_url'] . $dir . $params['basename'] . $cache_staler;
 						$params['dir'] = $settings['default_theme_dir'] . $dir;
 						$params['url'] = $settings['default_theme_url'];
 					}
@@ -2085,14 +2150,13 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 						$filename = false;
 				}
 				else
-					$filename = $settings['theme_url'] . $dir . $filename . $cache_staler;
+					$filename = $settings['theme_url'] . $dir . $params['basename'] . $cache_staler;
 			}
 
 			// Add it to the array for use in the template
 			if (!empty($filename))
 			{
 				$this_build[$this_id] = $context[$params['index_name']][$this_id] = array('filename' => $filename, 'options' => $params);
-
 				if ($db_show_debug === true)
 					Debug::get()->add($params['debug_index'], $params['basename'] . '(' . (!empty($params['local']) ? (!empty($params['url']) ? basename($params['url']) : basename($params['dir'])) : '') . ')');
 			}
@@ -2176,9 +2240,13 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 	if (empty($theme_name))
 		$theme_name = 'unknown';
 
+	$fix_arrays = false;
 	// For each file open it up and write it out!
 	foreach (explode('+', $template_name) as $template)
 	{
+		if ($template === 'index')
+			$fix_arrays = true;
+
 		// Obviously, the current theme is most important to check.
 		$attempts = array(
 			array($settings['theme_dir'], $template, $lang, $settings['theme_url']),
@@ -2236,6 +2304,70 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 			log_error(sprintf($txt['theme_language_error'], $template_name . '.' . $lang, 'template'));
 			break;
 		}
+	}
+
+	if ($fix_arrays)
+	{
+		$txt['days'] = array(
+			$txt['sunday'],
+			$txt['monday'],
+			$txt['tuesday'],
+			$txt['wednesday'],
+			$txt['thursday'],
+			$txt['friday'],
+			$txt['saturday'],
+		);
+		$txt['days_short'] = array(
+			$txt['sunday_short'],
+			$txt['monday_short'],
+			$txt['tuesday_short'],
+			$txt['wednesday_short'],
+			$txt['thursday_short'],
+			$txt['friday_short'],
+			$txt['saturday_short'],
+		);
+		$txt['months'] = array(
+			1 => $txt['january'],
+			$txt['february'],
+			$txt['march'],
+			$txt['april'],
+			$txt['may'],
+			$txt['june'],
+			$txt['july'],
+			$txt['august'],
+			$txt['september'],
+			$txt['october'],
+			$txt['november'],
+			$txt['december'],
+		);
+		$txt['months_titles'] = array(
+			1 => $txt['january_titles'],
+			$txt['february_titles'],
+			$txt['march_titles'],
+			$txt['april_titles'],
+			$txt['may_titles'],
+			$txt['june_titles'],
+			$txt['july_titles'],
+			$txt['august_titles'],
+			$txt['september_titles'],
+			$txt['october_titles'],
+			$txt['november_titles'],
+			$txt['december_titles'],
+		);
+		$txt['months_short'] = array(
+			1 => $txt['january_short'],
+			$txt['february_short'],
+			$txt['march_short'],
+			$txt['april_short'],
+			$txt['may_short'],
+			$txt['june_short'],
+			$txt['july_short'],
+			$txt['august_short'],
+			$txt['september_short'],
+			$txt['october_short'],
+			$txt['november_short'],
+			$txt['december_short'],
+		);
 	}
 
 	// Keep track of what we're up to soldier.

@@ -351,8 +351,8 @@ class Html_2_Md
 				$markdown = $this->_get_innerHTML($node);
 				break;
 			default:
-				// Don't know you, so just preserve whats there
-				$markdown = $this->_parser ? htmlspecialchars_decode($this->doc->saveHTML($node)) : $node->outertext;
+				// Don't know you or text, so just preserve whats there
+				$markdown = $this->_get_outerHTML($node);
 		}
 
 		// Replace the node with our markdown replacement, or with the node itself if none was found
@@ -401,10 +401,16 @@ class Html_2_Md
 	 */
 	private function _convert_anchor($node)
 	{
-		$href = htmlentities($node->getAttribute('href'));
+		global $txt;
+
+		$href = htmlentities($node->getAttribute('href'), ENT_COMPAT, 'UTF-8', false);
 		$title = $node->getAttribute('title');
 		$class = $node->getAttribute('class');
 		$value = $this->_get_value($node);
+
+		// Provide a more compact [name] if none is given
+		if ($value == $node->getAttribute('href') || empty($value))
+			$value = empty($title) ? $txt['link'] : $title;
 
 		// Special processing just for our own footnotes
 		if ($class === 'target' || $class === 'footnote_return')
@@ -413,6 +419,11 @@ class Html_2_Md
 			$markdown = '[' . $value . '](' . $href . ' "' . $title . '")';
 		else
 			$markdown = '[' . $value . '](' . $href . ')';
+
+		// Some links can be very long and if we wrap them they break
+		$line_strlen = Util::strlen($markdown);
+		if ($line_strlen > $this->body_width)
+			$this->body_width = $line_strlen;
 
 		return $markdown;
 	}
@@ -833,6 +844,39 @@ class Html_2_Md
 		}
 		else
 			return $node->innertext;
+	}
+
+	/**
+	 * Gets the outer html of a node
+	 *
+	 * @param object $node
+	 */
+	private function _get_outerHTML($node)
+	{
+		if ($this->_parser)
+		{
+			if (version_compare(PHP_VERSION, '5.3.6') >= 0)
+				return htmlspecialchars_decode($this->doc->saveHTML($node));
+			else
+			{
+				// @todo remove when 5.3.6 min
+				$doc = new DOMDocument();
+				$doc->appendChild($doc->importNode($node, true));
+				$html = $doc->saveHTML();
+
+				// We just want the html of the inserted node, it *may* be wrapped
+				if (preg_match('~<body>(.*)</body>~s', $html, $body))
+					$html = $body[1];
+				elseif (preg_match('~<html>(.*)</html>~s', $html, $body))
+					$html = $body[1];
+
+				// Clean it up
+				$html = rtrim($doc->saveHTML(), "\n");
+				return html_entity_decode(htmlspecialchars_decode($html, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
+			}
+		}
+		else
+			return $node->outertext;
 	}
 
 	/**

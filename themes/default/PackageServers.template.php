@@ -118,7 +118,7 @@ function template_package_confirm()
 			<div class="content">
 				<p>', $context['confirm_message'], '</p>
 				<a href="', $context['proceed_href'], '">[ ', $txt['package_confirm_proceed'], ' ]</a>
-				<a href="JavaScript:history.go(-1);">[ ', $txt['package_confirm_go_back'], ' ]</a>
+				<a href="JavaScript:window.location.assign(document.referrer);">[ ', $txt['package_confirm_go_back'], ' ]</a>
 			</div>
 		</div>
 	</div>';

@@ -1548,26 +1548,26 @@ class PersonalMessage_Controller extends Action_Controller
 				'groups' => $js_groups,
 				'labels' => $js_labels,
 				'rules' => $js_rules,
-				'txt_pm_readable_and' => '"' . $txt['pm_readable_and'] . '"',
-				'txt_pm_readable_or' => '"' . $txt['pm_readable_or'] . '"',
-				'txt_pm_readable_member' => '"' . $txt['pm_readable_member'] . '"',
-				'txt_pm_readable_group' => '"' . $txt['pm_readable_group'] . '"',
-				'txt_pm_readable_subject ' => '"' . $txt['pm_readable_subject'] . '"',
-				'txt_pm_readable_body' => '"' . $txt['pm_readable_body'] . '"',
-				'txt_pm_readable_buddy' => '"' . $txt['pm_readable_buddy'] . '"',
-				'txt_pm_readable_label' => '"' . $txt['pm_readable_label'] . '"',
-				'txt_pm_readable_delete' => '"' . $txt['pm_readable_delete'] . '"',
-				'txt_pm_readable_start' => '"' . $txt['pm_readable_start'] . '"',
-				'txt_pm_readable_end' => '"' . $txt['pm_readable_end'] . '"',
-				'txt_pm_readable_then' => '"' . $txt['pm_readable_then'] . '"',
-				'txt_pm_rule_not_defined' => '"' . $txt['pm_rule_not_defined'] . '"',
-				'txt_pm_rule_criteria_pick' => '"' . $txt['pm_rule_criteria_pick'] . '"',
-				'txt_pm_rule_sel_group' => '"' . $txt['pm_rule_sel_group'] . '"',
-				'txt_pm_rule_sel_action' => '"' . $txt['pm_rule_sel_action'] . '"',
-				'txt_pm_rule_label' => '"' . $txt['pm_rule_label'] . '"',
-				'txt_pm_rule_delete' => '"' . $txt['pm_rule_delete'] . '"',
-				'txt_pm_rule_sel_label' => '"' . $txt['pm_rule_sel_label'] . '"'
-			));
+				'txt_pm_readable_and' => $txt['pm_readable_and'],
+				'txt_pm_readable_or' => $txt['pm_readable_or'],
+				'txt_pm_readable_member' => $txt['pm_readable_member'],
+				'txt_pm_readable_group' => $txt['pm_readable_group'],
+				'txt_pm_readable_subject ' => $txt['pm_readable_subject'],
+				'txt_pm_readable_body' => $txt['pm_readable_body'],
+				'txt_pm_readable_buddy' => $txt['pm_readable_buddy'],
+				'txt_pm_readable_label' => $txt['pm_readable_label'],
+				'txt_pm_readable_delete' => $txt['pm_readable_delete'],
+				'txt_pm_readable_start' => $txt['pm_readable_start'],
+				'txt_pm_readable_end' => $txt['pm_readable_end'],
+				'txt_pm_readable_then' => $txt['pm_readable_then'],
+				'txt_pm_rule_not_defined' => $txt['pm_rule_not_defined'],
+				'txt_pm_rule_criteria_pick' => $txt['pm_rule_criteria_pick'],
+				'txt_pm_rule_sel_group' => $txt['pm_rule_sel_group'],
+				'txt_pm_rule_sel_action' => $txt['pm_rule_sel_action'],
+				'txt_pm_rule_label' => $txt['pm_rule_label'],
+				'txt_pm_rule_delete' => $txt['pm_rule_delete'],
+				'txt_pm_rule_sel_label' => $txt['pm_rule_sel_label'],
+			), true);
 
 			// Current rule information...
 			if ($context['rid'])
@@ -2726,7 +2726,7 @@ function prepareDraftsContext($member_id, $id_pm = false)
 	// Add them to the context draft array for template display
 	foreach ($user_drafts as $draft)
 	{
-		$short_subject = empty($draft['subject']) ? $txt['drafts_none'] : shorten_text(stripslashes($draft['subject']), !empty($modSettings['draft_subject_length']) ? $modSettings['draft_subject_length'] : 24);
+		$short_subject = empty($draft['subject']) ? $txt['drafts_none'] : Util::shorten_text(stripslashes($draft['subject']), !empty($modSettings['draft_subject_length']) ? $modSettings['draft_subject_length'] : 24);
 		$context['drafts'][] = array(
 			'subject' => censorText($short_subject),
 			'poster_time' => standardTime($draft['poster_time']),

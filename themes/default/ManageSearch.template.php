@@ -315,10 +315,7 @@ function template_create_index_progress()
 		</form>
 	</div>
 	<script><!-- // --><![CDATA[
-		var countdown = 10,
-			txt_message = "', $txt['search_create_index_continue'], '";
-
-		doAutoSubmit();
+		doAutoSubmit(10, ', JavaScriptEscape($txt['search_create_index_continue']), ');
 	// ]]></script>';
 }
 
