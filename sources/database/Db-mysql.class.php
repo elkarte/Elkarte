@@ -858,7 +858,7 @@ class Database_MySQL implements Database
 		// Here's where the variables are injected to the query.
 		$insertRows = array();
 		foreach ($data as $dataRow)
-			$insertRows[] = $this->quote($insertData, array_combine($indexed_columns, $dataRow), $connection);
+			$insertRows[] = $this->quote($insertData, $this->_array_combine($indexed_columns, $dataRow), $connection);
 
 		// Determine the method of insertion.
 		$queryTitle = $method == 'replace' ? 'REPLACE' : ($method == 'ignore' ? 'INSERT IGNORE' : 'INSERT');
@@ -875,6 +875,32 @@ class Database_MySQL implements Database
 			),
 			$connection
 		);
+	}
+
+	/**
+	 * This function combines the keys and values of the data passed to db::insert.
+	 *
+	 * @param mixed[] $keys
+	 * @param mixed[] $values
+	 * @return mixed[]
+	 */
+	private function _array_combine($keys, $values)
+	{
+		$is_numeric = array_filter(array_keys($values), 'is_numeric');
+		if ($is_numeric)
+			return array_combine($keys, $values);
+		else
+		{
+			$combined = array();
+			foreach ($keys as $key)
+			{
+				if (isset($values[$key]))
+					$combined[$key] = $values[$key];
+			}
+
+			// @todo should throws an E_WARNING if count($combined) != count($keys)
+			return $combined;
+		}
 	}
 
 	/**
