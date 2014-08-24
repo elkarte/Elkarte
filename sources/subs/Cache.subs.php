@@ -149,6 +149,7 @@ function cache_put_data($key, $value, $ttl = 120)
 			}
 			break;
 		case 'apc':
+		case 'apcu':
 			// Alternative PHP Cache, ahoy!
 			if (function_exists('apc_store'))
 			{
@@ -252,7 +253,8 @@ function cache_get_data($key, $ttl = 120)
 				$value = mmcache_get($key);
 			break;
 		case 'apc':
-			// This is the free APC from PECL.
+		case 'apcu':
+			// This is the free APC or APCu from PECL.
 			if (function_exists('apc_fetch'))
 				$value = apc_fetch($key . 'elkarte');
 			break;
@@ -387,6 +389,7 @@ function clean_cache($type = '')
 			}
 			break;
 		case 'apc':
+		case 'apcu':
 			if (function_exists('apc_clear_cache'))
 			{
 				// If passed a type, clear that type out
