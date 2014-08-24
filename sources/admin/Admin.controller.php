@@ -657,6 +657,7 @@ class Admin_Controller extends Action_Controller
 			'apc',
 			'memcache',
 			'xcache',
+			'opcache',
 			'php',
 			'server',
 		);
@@ -728,6 +729,7 @@ class Admin_Controller extends Action_Controller
 			'apc',
 			'memcache',
 			'xcache',
+			'opcache',
 			'php',
 			'server',
 		);
