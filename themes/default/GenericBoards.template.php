@@ -145,8 +145,7 @@ function template_list_boards($boards, $id)
 					</div>
 					<div class="board_latest">
 						<p class="board_stats">
-							', comma_format($board['posts']), ' ', $board['is_redirect'] ? $txt['redirects'] : $txt['posts'], '
-							', $board['is_redirect'] ? '' : '<br /> ' . comma_format($board['topics']) . ' ' . $txt['board_topics'], '
+							', comma_format($board['posts']), ' ', $board['is_redirect'] ? $txt['redirects'] : $txt['posts'], $board['is_redirect'] ? '' : '<br /> ' . comma_format($board['topics']) . ' ' . $txt['board_topics'], '
 						</p>';
 
 		// @todo - Last post message still needs some work. Probably split the language string into three chunks.
