@@ -122,7 +122,7 @@ $txt['likeAllowSelf'] = 'Mitgliedern das Mögen eigener Beiträge erlauben';
 $txt['likeDisplayLimit'] = 'Legt die maximale Anzahl an "gemocht von"-Namen zur Anzeige in der Themenübersicht fest, 0 für keine Begrenzung, -1 zum Deaktivieren';
 
 $txt['caching_information'] = 'ElkArte unterstützt das Zwischenspeichern mittels Beschleunigern. Die derzeit unterstützten Beschleuniger sind:
-<ul class="normallist">
+<ul class="bbc_list">
 	<li>APC</li>
 	<li>eAccelerator</li>
 	<li>Turck MMCache</li>
@@ -149,6 +149,7 @@ $txt['mmcache_cache'] = 'Turck MMCache';
 $txt['memcached_cache'] = 'Memcached';
 $txt['zend_cache'] = 'Zend Platform/Performance Suite';
 $txt['xcache_cache'] = 'XCache';
+$txt['cache_conflict'] = 'Sie verwenden PHPs Opcode-Zwischenspeicherung zusammen mit ElkArtes dateibasierter Zwischenspeicherung.  Um die besten Ergebnisse zu erzielen, sollten Sie ElkArtes Zwischenspeicher (' . CACHEDIR . '/*) mittels der opcache.blacklist_filename-Direktive ausschließen.';
 
 $txt['loadavg_warning'] = '<span class="error">Bitte beachten Sie: unten stehende Einstellungen sollten mit Vorsicht geändert werden. Zu niedrige Werte könnten Ihr Forum <strong>unbenutzbar</strong> machen! Der momentane Lastdurchschnitt ist <strong>%01.2f</strong></span>';
 $txt['loadavg_enable'] = 'Lastausgleich nach Durchschnittswerten aktivieren';
