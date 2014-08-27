@@ -26,12 +26,12 @@ class Message_Index extends List_Abstract
 
 	public function getResults($id_board, $id_member, $indexOptions)
 	{
-		$this->addQueryParam('current_board', $id_board);
-		$this->addQueryParam('current_member', $id_member);
-		$this->addQueryParam('is_approved', 1);
-		$this->addQueryParam('id_member_guest', 0);
+		if ($this->_queryParams['start'] > 0 && $this->_queryParams['limit'] > 0)
+			$this->_use_pre_query = true;
 
-		$query = $this->_generateQueryString($id_member, $indexOptions);
+		$this->_doExtend($id_board, $id_member, $indexOptions);
+
+		$query = $this->_generateQueryString($indexOptions);
 
 		$this->_doQuery($query, $this->_use_pre_query ? '' : 'substring');
 
@@ -43,7 +43,7 @@ class Message_Index extends List_Abstract
 			while ($row = $this->_db->fetch_assoc($this->_listRequest))
 				$topic_ids[] = $row;
 
-			$results = $this->_getTopicsData($topic_ids, $indexOptions);
+			$results = $this->_getTopicsData();
 		}
 		else
 		{
@@ -57,13 +57,33 @@ class Message_Index extends List_Abstract
 		return $results;
 	}
 
-	protected function _generateQueryString($id_member, $indexOptions)
+	protected function _doExtend($id_board, $id_member, $indexOptions)
 	{
-		$ids_query = $this->_queryParams['start'] > 0;
-		$per_page = $this->_queryParams['limit'];
 		$sort_by = $this->getSort();
-		$sort_column = $this->_listOptions['allowed_sortings'][$sort_by];
-		$sort = $this->_fake_ascending ? !$this->getSort(true) : $this->getSort(true);
+
+		$this->addQueryParam('current_board', $id_board);
+		$this->addQueryParam('current_member', $id_member);
+		$this->addQueryParam('is_approved', 1);
+		$this->addQueryParam('id_member_guest', 0);
+
+		if ($this->_use_pre_query)
+		{
+			if ($sort_by === 'last_poster')
+			{
+				$this->extendQuery('', 'INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
+					LEFT JOIN {db_prefix}members AS meml ON (meml.id_member = ml.id_member)');
+			}
+			elseif (in_array($sort_by, array('starter', 'subject')))
+			{
+				$this->extendQuery('', 'INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)');
+
+				if ($sort_by === 'starter')
+					$this->extendQuery('', 'LEFT JOIN {db_prefix}members AS memf ON (memf.id_member = mf.id_member)');
+			}
+			if ($indexOptions['only_approved'])
+				$this->extendQuery('', '', 'AND (t.approved = {int:is_approved}' . ($id_member == 0 ? '' : ' OR t.id_member_started = {int:current_member}') . ')');
+		}
+
 		// If empty, no preview at all
 		if (!empty($indexOptions['previews']))
 		{
@@ -99,25 +119,15 @@ class Message_Index extends List_Abstract
 			foreach ($indexOptions['custom_selects'] as $select)
 				$this->extendQuery($select);
 		}
+	}
 
-		if ($ids_query && $per_page > 0)
+	protected function _generateQueryString($indexOptions)
+	{
+		$sort_column = $this->_listOptions['allowed_sortings'][$this->getSort()];
+		$sort = $this->_fake_ascending ? !$this->getSort(true) : $this->getSort(true);
+
+		if ($this->_use_pre_query)
 		{
-			$this->_use_pre_query = true;
-			if ($sort_by === 'last_poster')
-			{
-				$this->extendQuery('', 'INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
-					LEFT JOIN {db_prefix}members AS meml ON (meml.id_member = ml.id_member)');
-			}
-			elseif (in_array($sort_by, array('starter', 'subject')))
-			{
-				$this->extendQuery('', 'INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)');
-
-				if ($sort_by === 'starter')
-					$this->extendQuery('', 'LEFT JOIN {db_prefix}members AS memf ON (memf.id_member = mf.id_member)');
-			}
-			if ($indexOptions['only_approved'])
-				$this->extendQuery('', '', 'AND (t.approved = {int:is_approved}' . ($id_member == 0 ? '' : ' OR t.id_member_started = {int:current_member}') . ')');
-		
 			return '
 				SELECT t.id_topic
 				FROM {db_prefix}topics AS t
@@ -152,7 +162,7 @@ class Message_Index extends List_Abstract
 		}
 	}
 
-	protected function _getTopicsData($topic_ids, $indexOptions)
+	protected function _getTopicsData()
 	{
 		$this->_doQuery('
 			SELECT
