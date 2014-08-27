@@ -129,8 +129,6 @@ class Message_Index extends List_Abstract
 				if ($sort_by === 'starter')
 					$this->extendQuery('', 'LEFT JOIN {db_prefix}members AS memf ON (memf.id_member = mf.id_member)');
 			}
-			if ($indexOptions['only_approved'])
-				$this->extendQuery('', '', 'AND (t.approved = {int:is_approved}' . ($id_member == 0 ? '' : ' OR t.id_member_started = {int:current_member}') . ')');
 		}
 
 		// If empty, no preview at all

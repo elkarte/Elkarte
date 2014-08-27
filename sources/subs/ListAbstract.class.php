@@ -100,7 +100,7 @@ abstract class List_Abstract implements List_Interface
 	 * Allow to set the sorting order of the list.
 	 *
 	 * @param string $sort - the sorting index
-	 * @param bool $descending - If the sorting is ascending or descending
+	 * @param bool|null $descending - If the sorting is ascending or descending
 	 */
 	public function sortBy($sort, $descending = null)
 	{
@@ -139,7 +139,7 @@ abstract class List_Abstract implements List_Interface
 	 * Adds values as query parameters.
 	 *
 	 * @param string $key - the parameter index
-	 * @param mixed $val - the value the parameter assumes
+	 * @param int|string $val - the value the parameter assumes
 	 */
 	public function addQueryParam($key, $val)
 	{
@@ -175,8 +175,8 @@ abstract class List_Abstract implements List_Interface
 	/**
 	 * Sets the LIMITs of the query
 	 *
-	 * @param int $start - The staring point
-	 * @param int $limit - The number of items to query
+	 * @param int|null $start - The staring point
+	 * @param int|null $limit - The number of items to query
 	 */
 	public function setLimit($start = null, $limit = null)
 	{
