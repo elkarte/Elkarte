@@ -67,6 +67,28 @@ class MessageIndex_Controller extends Action_Controller
 		// How many topics do we have in total?
 		$board_info['total_topics'] = allowedTo('approve_posts') ? $board_info['num_topics'] + $board_info['unapproved_topics'] : $board_info['num_topics'] + $board_info['unapproved_user_topics'];
 
+		// And now, what we're here for: topics!
+		require_once(SUBSDIR . '/MessageIndex.subs.php');
+
+		// Known sort methods.
+		$sort_methods = messageIndexSort();
+
+		$list = new Message_Index(array(
+			'id' => 'messageindex',
+			'items_per_page' => $modSettings['defaultMaxMessages'],
+			'no_items_label' => $txt['topic_alert_none'],
+			'id' => 'messageindex',
+			'allowed_sortings' => $sort_methods,
+			'default_sort_col' => 'last_post',
+			'use_fake_ascending' => true,
+			'totals' => $board_info['total_topics'],
+		));
+
+		if (isset($_REQUEST['sort']))
+			$list->sortBy($_REQUEST['sort'], isset($_REQUEST['desc']));
+
+
+
 		// View all the topics, or just a few?
 		$context['topics_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['topics_per_page']) ? $options['topics_per_page'] : $modSettings['defaultMaxTopics'];
 		$context['messages_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
@@ -94,36 +116,32 @@ class MessageIndex_Controller extends Action_Controller
 			$context['unapproved_posts_message'] = sprintf($txt['there_are_unapproved_topics'], $untopics, $unposts, $scripturl . '?action=moderate;area=postmod;sa=' . ($board_info['unapproved_topics'] ? 'topics' : 'posts') . ';brd=' . $board);
 		}
 
-		// We only know these.
-		if (isset($_REQUEST['sort']) && !in_array($_REQUEST['sort'], array('subject', 'starter', 'last_poster', 'replies', 'views', 'likes', 'first_post', 'last_post')))
-			$_REQUEST['sort'] = 'last_post';
-
 		// Make sure the starting place makes sense and construct the page index.
 		if (isset($_REQUEST['sort']))
-			$sort_string = ';sort=' . $_REQUEST['sort'] . (isset($_REQUEST['desc']) ? ';desc' : '');
+			$sort_string = ';sort=' . $list->getSort() . ($list->getSort(true) ? ';desc' : '');
 		else
 			$sort_string = '';
-		$context['page_index'] = constructPageIndex($scripturl . '?board=' . $board . '.%1$d' . $sort_string, $_REQUEST['start'], $board_info['total_topics'], $maxindex, true);
 
-		$context['start'] = &$_REQUEST['start'];
+		$context['page_index'] = $list->getPagination($scripturl . '?board=' . $board . '.%1$d' . $sort_string, $board_info['total_topics'], true);
+
+		$context['start'] = $list->getStart();
 
 		// Set a canonical URL for this page.
 		$context['canonical_url'] = $scripturl . '?board=' . $board . '.' . $context['start'];
 
 		$context['links'] += array(
-			'prev' => $_REQUEST['start'] >= $context['topics_per_page'] ? $scripturl . '?board=' . $board . '.' . ($_REQUEST['start'] - $context['topics_per_page']) : '',
-			'next' => $_REQUEST['start'] + $context['topics_per_page'] < $board_info['total_topics'] ? $scripturl . '?board=' . $board . '.' . ($_REQUEST['start'] + $context['topics_per_page']) : '',
+			'prev' => $context['start'] >= $context['topics_per_page'] ? $scripturl . '?board=' . $board . '.' . ($context['start'] - $context['topics_per_page']) : '',
+			'next' => $context['start'] + $context['topics_per_page'] < $board_info['total_topics'] ? $scripturl . '?board=' . $board . '.' . ($context['start'] + $context['topics_per_page']) : '',
 		);
 
 		$context['page_info'] = array(
-			'current_page' => $_REQUEST['start'] / $context['topics_per_page'] + 1,
+			'current_page' => $context['start'] / $context['topics_per_page'] + 1,
 			'num_pages' => floor(($board_info['total_topics'] - 1) / $context['topics_per_page']) + 1
 		);
 
 		if (isset($_REQUEST['all']) && !empty($modSettings['enableAllMessages']) && $maxindex > $modSettings['enableAllMessages'])
 		{
-			$maxindex = $modSettings['enableAllMessages'];
-			$_REQUEST['start'] = 0;
+			$list->setLimit(0, 0);
 		}
 
 		// Build a list of the board's moderators.
@@ -199,25 +217,11 @@ class MessageIndex_Controller extends Action_Controller
 			formatViewers($board, 'board');
 		}
 
-		// And now, what we're here for: topics!
-		require_once(SUBSDIR . '/MessageIndex.subs.php');
-
-		// Known sort methods.
-		$sort_methods = messageIndexSort();
-
 		// They didn't pick one, default to by last post descending.
-		if (!isset($_REQUEST['sort']) || !isset($sort_methods[$_REQUEST['sort']]))
-		{
-			$context['sort_by'] = 'last_post';
-			$ascending = isset($_REQUEST['asc']);
-		}
-		// Otherwise default to ascending.
-		else
-		{
-			$context['sort_by'] = $_REQUEST['sort'];
-			$ascending = !isset($_REQUEST['desc']);
-		}
-		$sort_column = $sort_methods[$context['sort_by']];
+		$context['sort_by'] = $list->getSort();
+		$ascending = $list->getSort(true);
+
+// 		$sort_column = $sort_methods[$context['sort_by']];
 
 		$context['sort_direction'] = $ascending ? 'up' : 'down';
 		$context['sort_title'] = $ascending ? $txt['sort_desc'] : $txt['sort_asc'];
@@ -231,18 +235,6 @@ class MessageIndex_Controller extends Action_Controller
 				'sort_dir_img' => $context['sort_by'] == $key ? '<img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" title="' . $context['sort_title'] . '" />' : '',
 			);
 
-		// Calculate the fastest way to get the topics.
-		$start = (int) $_REQUEST['start'];
-		if ($start > ($board_info['total_topics'] - 1) / 2)
-		{
-			$ascending = !$ascending;
-			$fake_ascending = true;
-			$maxindex = $board_info['total_topics'] < $start + $maxindex + 1 ? $board_info['total_topics'] - $start : $maxindex;
-			$start = $board_info['total_topics'] < $start + $maxindex + 1 ? 0 : $board_info['total_topics'] - $start - $maxindex;
-		}
-		else
-			$fake_ascending = false;
-
 		// Setup the default topic icons...
 		$context['icon_sources'] = MessageTopicIcons();
 
@@ -254,14 +246,12 @@ class MessageIndex_Controller extends Action_Controller
 			'only_approved' => $modSettings['postmod_active'] && !allowedTo('approve_posts'),
 			'previews' => !empty($modSettings['message_index_preview']) ? (empty($modSettings['preview_characters']) ? -1 : $modSettings['preview_characters']) : 0,
 			'include_avatars' => !empty($settings['avatars_on_indexes']),
-			'ascending' => $ascending,
-			'fake_ascending' => $fake_ascending
 		);
 
 		// Allow integration to modify / add to the $indexOptions
 		call_integration_hook('integrate_messageindex_topics', array(&$sort_column, &$indexOptions));
 
-		$topics_info = messageIndexTopics($board, $user_info['id'], $start, $maxindex, $context['sort_by'], $sort_column, $indexOptions);
+		$topics_info = $list->getResults($board, $user_info['id'], $indexOptions);
 
 		$context['topics'] = processMessageIndexTopicList($topics_info);
 
@@ -269,8 +259,8 @@ class MessageIndex_Controller extends Action_Controller
 		call_integration_hook('integrate_messageindex_listing', array($topics_info));
 
 		// Fix the sequence of topics if they were retrieved in the wrong order. (for speed reasons...)
-		if ($fake_ascending)
-			$context['topics'] = array_reverse($context['topics'], true);
+// 		if ($fake_ascending)
+// 			$context['topics'] = array_reverse($context['topics'], true);
 
 		$topic_ids = array_keys($context['topics']);
 

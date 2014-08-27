@@ -258,6 +258,7 @@ $txt['error_bad_file'] = 'Sorry, but the file specified could not be opened: %1$
 $txt['error_bad_line'] = 'The line you specified is invalid.';
 $txt['error_draft_not_saved'] = 'There was an error saving the draft';
 $txt['error_name_in_use'] = 'The name %1$s is already in use by another member.';
+$txt['error_list_no_sorting'] = 'There is no sorting options specified for this list.';
 
 $txt['smiley_not_found'] = 'Smiley not found.';
 $txt['smiley_has_no_code'] = 'No code for this smiley was given.';
