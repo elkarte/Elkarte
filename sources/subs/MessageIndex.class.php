@@ -17,19 +17,26 @@ if (!defined('ELK'))
 class Message_Index extends List_Abstract
 {
 	protected $_use_pre_query = false;
+	protected $_id_board = 0;
+	protected $_id_member = 0;
+	protected $_indexOptions = array();
 
-	public function __construct($options)
+	public function __construct($options, $id_board, $id_member, $indexOptions)
 	{
 		$db = database();
 		parent::__construct($db, $options);
+
+		$this->_id_board = $id_board;
+		$this->_id_member = $id_member;
+		$this->_indexOptions = $indexOptions;
 	}
 
-	public function getResults($id_board, $id_member, $indexOptions)
+	public function getResults()
 	{
 		if ($this->_queryParams['start'] > 0 && $this->_queryParams['limit'] > 0)
 			$this->_use_pre_query = true;
 
-		$this->_doExtend($id_board, $id_member, $indexOptions);
+		$this->_doExtend($this->_id_board, $this->_id_member, $this->_indexOptions);
 
 		$query = $this->_generateQueryString($indexOptions);
 

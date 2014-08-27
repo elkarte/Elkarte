@@ -23,7 +23,7 @@ if (!defined('ELK'))
  * Some common methods usable by classes that want to create lists.
  * In some time it will replace GenericList.
  */
-class List_Abstract
+abstract class List_Abstract implements List_Interface
 {
 	protected $_listOptions;
 	protected $_listRequest = null;
@@ -49,46 +49,11 @@ class List_Abstract
 		$this->_init();
 	}
 
-	protected function _validateOptions($options)
+	public abstract function getResults();
+
+	public function getPagination($base_url, $totals, $flexible)
 	{
-		global $modSettings;
-
-		$defaults = array(
-			'id' => 'list_' . md5(rand()),
-			'items_per_page' => $modSettings['defaultMaxMessages'],
-			'no_items_label' => 'no_items', // @todo add a generic txt
-			'no_items_align' => 'center', // @deprecated?
-// 			'default_sort_col' => //@todo use the first column
-			'form' => array(),
-			'list_menu' => array(),
-			'data_check' => null,
-			'start_var_name' => 'start',
-			'use_fake_ascending' => false,
-			'totals' => 0,
-			'allowed_sortings' => array()
-// 			'default_sort_dir' => // @todo pick the default
-// 			'request_vars' // @todo looks like a "private" setting
-// 				'sort'
-// 				'desc'
-// 			'get_items'
-// 				'function'
-// 			'get_count'
-// 				'file'
-// 				'function'
-		);
-
-		assert(isset($options['allowed_sortings']));
-
-		$this->_listOptions = array_merge($defaults, $options);
-	}
-
-	protected function _init()
-	{
-		$this->_queryParams['sort'] = '';
-		$this->sortBy($this->_listOptions['default_sort_col']);
-
-		$this->setLimit(0, $this->_listOptions['items_per_page']);
-		$this->_queryParams['maxindex'] = empty($this->_queryParams['limit']) ? $this->_queryParams['totals'] : $this->_queryParams['limit'];
+		return constructPageIndex($base_url, $this->_queryParams['start'], $totals, empty($this->_queryParams['limit']) ? $totals : $this->_queryParams['limit'], $flexible);
 	}
 
 	public function sortBy($sort, $descending = null)
@@ -119,11 +84,6 @@ class List_Abstract
 		$this->_queryParams[$key] = $val;
 	}
 
-	protected function _validSort($sort)
-	{
-		return !empty($this->_listOptions['allowed_sortings']) && isset($this->_listOptions['allowed_sortings'][$sort]);
-	}
-
 	public function extendQuery($select = '', $join = '', $where = '', $group = '')
 	{
 		foreach (array('select', 'join', 'where', 'group') as $item)
@@ -145,24 +105,43 @@ class List_Abstract
 		}
 	}
 
-// 	public function getResults()//$query, $return = true)
-// 	{
-// // 		if ($return !== true && $this->_fetching)
-// // 			return $this->getNext();
-// 
-// // 		$this->_doQuery($query);
-// 
-// 		$results = array();
-// 
-// 		while ($row = $this->_db->fetch_assoc($this->_listRequest))
-// 			$results[] = $row;
-// 
-// 		return $results;
-// 	}
-
-	public function getPagination($base_url, $totals, $flexible)
+	protected function _validateOptions($options)
 	{
-		return constructPageIndex($base_url, $this->_queryParams['start'], $totals, empty($this->_queryParams['limit']) ? $totals : $this->_queryParams['limit'], $flexible);
+		global $modSettings;
+
+		$defaults = array(
+			'id' => 'list_' . md5(rand()),
+			'items_per_page' => $modSettings['defaultMaxMessages'],
+			'no_items_label' => 'no_items', // @todo add a generic txt
+			'no_items_align' => 'center', // @deprecated?
+// 			'default_sort_col' => //@todo use the first column
+			'form' => array(),
+			'list_menu' => array(),
+			'data_check' => null,
+			'start_var_name' => 'start',
+			'use_fake_ascending' => false,
+			'totals' => 0,
+			'allowed_sortings' => array()
+// 			'default_sort_dir' => // @todo pick the default
+		);
+
+		assert(isset($options['allowed_sortings']));
+
+		$this->_listOptions = array_merge($defaults, $options);
+	}
+
+	protected function _init()
+	{
+		$this->_queryParams['sort'] = '';
+		$this->sortBy($this->_listOptions['default_sort_col']);
+
+		$this->setLimit(0, $this->_listOptions['items_per_page']);
+		$this->_queryParams['maxindex'] = empty($this->_queryParams['limit']) ? $this->_queryParams['totals'] : $this->_queryParams['limit'];
+	}
+
+	protected function _validSort($sort)
+	{
+		return !empty($this->_listOptions['allowed_sortings']) && isset($this->_listOptions['allowed_sortings'][$sort]);
 	}
 
 	protected function _queryString($query)
@@ -224,11 +203,4 @@ class List_Abstract
 			}
 		}
 	}
-
-// 	public function getNext()
-// 	{
-// 		$this->_fetching = true;
-// 
-// 		return $this->_db->fetch_assoc($this->_listRequest);
-// 	}
 }

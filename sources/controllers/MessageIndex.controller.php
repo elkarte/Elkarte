@@ -73,6 +73,19 @@ class MessageIndex_Controller extends Action_Controller
 		// Known sort methods.
 		$sort_methods = messageIndexSort();
 
+		// Set up the query options
+		$indexOptions = array(
+			'include_sticky' => !empty($modSettings['enableStickyTopics']),
+			'only_approved' => $modSettings['postmod_active'] && !allowedTo('approve_posts'),
+			'previews' => !empty($modSettings['message_index_preview']) ? (empty($modSettings['preview_characters']) ? -1 : $modSettings['preview_characters']) : 0,
+			'include_avatars' => !empty($settings['avatars_on_indexes']),
+		);
+		// @deprecated since 1.1 - probably the entire block will be removed unless the hook is known to be used
+		$sort_column = array();
+
+		// Allow integration to modify / add to the $indexOptions
+		call_integration_hook('integrate_messageindex_topics', array(&$sort_column, &$indexOptions));
+
 		$list = new Message_Index(array(
 			'id' => 'messageindex',
 			'items_per_page' => $modSettings['defaultMaxMessages'],
@@ -82,7 +95,7 @@ class MessageIndex_Controller extends Action_Controller
 			'default_sort_col' => 'last_post',
 			'use_fake_ascending' => true,
 			'totals' => $board_info['total_topics'],
-		));
+		), $board, $user_info['id'], $indexOptions);
 
 		if (isset($_REQUEST['sort']))
 			$list->sortBy($_REQUEST['sort'], isset($_REQUEST['desc']));
@@ -240,18 +253,7 @@ class MessageIndex_Controller extends Action_Controller
 
 		$context['topics'] = array();
 
-		// Set up the query options
-		$indexOptions = array(
-			'include_sticky' => !empty($modSettings['enableStickyTopics']),
-			'only_approved' => $modSettings['postmod_active'] && !allowedTo('approve_posts'),
-			'previews' => !empty($modSettings['message_index_preview']) ? (empty($modSettings['preview_characters']) ? -1 : $modSettings['preview_characters']) : 0,
-			'include_avatars' => !empty($settings['avatars_on_indexes']),
-		);
-
-		// Allow integration to modify / add to the $indexOptions
-		call_integration_hook('integrate_messageindex_topics', array(&$sort_column, &$indexOptions));
-
-		$topics_info = $list->getResults($board, $user_info['id'], $indexOptions);
+		$topics_info = $list->getResults();
 
 		$context['topics'] = processMessageIndexTopicList($topics_info);
 
