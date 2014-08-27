@@ -49,13 +49,25 @@ abstract class List_Abstract implements List_Interface
 		$this->_init();
 	}
 
+	/**
+	 * {@inheritdoc }
+	 */
 	public abstract function getResults();
 
+	/**
+	 * {@inheritdoc }
+	 */
 	public function getPagination($base_url, $totals, $flexible)
 	{
 		return constructPageIndex($base_url, $this->_queryParams['start'], $totals, empty($this->_queryParams['limit']) ? $totals : $this->_queryParams['limit'], $flexible);
 	}
 
+	/**
+	 * Allow to set the sorting order of the list.
+	 *
+	 * @param string $sort - the sorting index
+	 * @param bool $descending - If the sorting is ascending or descending
+	 */
 	public function sortBy($sort, $descending = null)
 	{
 		if ($this->_validSort($sort))
@@ -65,6 +77,13 @@ abstract class List_Abstract implements List_Interface
 			$this->_queryParams['sort_desc'] = (bool) $descending;
 	}
 
+	/**
+	 * Returns the current sorting method or the direction.
+	 *
+	 * @param bool $dir - If true returns the sorting direction instead of the
+	 *                    sorting index (default = false)
+	 * @return string|bool
+	 */
 	public function getSort($dir = false)
 	{
 		if ($dir)
@@ -73,17 +92,43 @@ abstract class List_Abstract implements List_Interface
 			return $this->_queryParams['sort'];
 	}
 
+	/**
+	 * Returns the starting position
+	 * @return int
+	 */
 	public function getStart()
 	{
 		return $this->_queryParams['start'];
 	}
 
+	/**
+	 * Adds values as query parameters.
+	 *
+	 * @param string $key - the parameter index
+	 * @param mixed $val - the value the parameter assumes
+	 */
 	public function addQueryParam($key, $val)
 	{
 		// @todo should test if set?
 		$this->_queryParams[$key] = $val;
 	}
 
+	/**
+	 * Allows to extend the query (if supported by the query itself).
+	 * It allows to adds "pieces" of query to arrays that will be later injected
+	 * into the query statement.
+	 *
+	 * In order to be used specific placeholders are required into the query:
+	 *   - {query_extend_select}
+	 *   - {query_extend_join}
+	 *   - {query_extend_where}
+	 *   - {query_extend_group}
+	 *
+	 * @param string $select - String to add to the SELECT statement
+	 * @param string $join - String to add to the JOIN statement
+	 * @param string $where - String to add to the WHERE statement
+	 * @param string $group - String to add to the GROUP statement
+	 */
 	public function extendQuery($select = '', $join = '', $where = '', $group = '')
 	{
 		foreach (array('select', 'join', 'where', 'group') as $item)
@@ -93,6 +138,12 @@ abstract class List_Abstract implements List_Interface
 		}
 	}
 
+	/**
+	 * Sets the LIMITs of the query
+	 *
+	 * @param int $start - The staring point
+	 * @param int $limit - The number of items to query
+	 */
 	public function setLimit($start = null, $limit = null)
 	{
 		if ($start !== null)
@@ -105,6 +156,12 @@ abstract class List_Abstract implements List_Interface
 		}
 	}
 
+	/**
+	 * Validates the options passed to the constructor and ensure default
+	 * values
+	 *
+	 * @param mixed[] $options - the possible options
+	 */
 	protected function _validateOptions($options)
 	{
 		global $modSettings;
@@ -130,6 +187,10 @@ abstract class List_Abstract implements List_Interface
 		$this->_listOptions = array_merge($defaults, $options);
 	}
 
+	/**
+	 * Initialize some of the parameters based on the options passed to the
+	 * constructor.
+	 */
 	protected function _init()
 	{
 		$this->_queryParams['sort'] = '';
@@ -139,11 +200,23 @@ abstract class List_Abstract implements List_Interface
 		$this->_queryParams['maxindex'] = empty($this->_queryParams['limit']) ? $this->_queryParams['totals'] : $this->_queryParams['limit'];
 	}
 
+	/**
+	 * Verifies the sorting method requested is known by the object.
+	 *
+	 * @param string $sort - A sorting index
+	 * @return bool - true if the method is valid, false otherwise
+	 */
 	protected function _validSort($sort)
 	{
 		return !empty($this->_listOptions['allowed_sortings']) && isset($this->_listOptions['allowed_sortings'][$sort]);
 	}
 
+	/**
+	 * Does the replacements necessary in order to extend the query
+	 * See List_Abstract::extendQuery for details.
+	 *
+	 * @param string $query - the query string
+	 */
 	protected function _queryString($query)
 	{
 		// @todo 'group' is probably useless
@@ -169,6 +242,17 @@ abstract class List_Abstract implements List_Interface
 		return $query;
 	}
 
+	/**
+	 * Actually performs the query and loads the request into
+	 * List_Abstract::$_listRequest.
+	 *
+	 * Takes care of adjusting the sorting if fake_ascending is necessary,
+	 * uses List_Abstract::_queryString to allow extending the query.
+	 *
+	 * @param string $query - the query string
+	 * @param string $identifier - the query string
+	 * @return bool - true if the query succeed, false if it fails
+	 */
 	protected function _doQuery($query, $identifier = '')
 	{
 		if ($this->_listRequest !== null)
@@ -182,6 +266,12 @@ abstract class List_Abstract implements List_Interface
 		return $this->_listRequest !== false;
 	}
 
+	/**
+	 * For performances' sake, it may be worth sorting the results of the
+	 * query upside-down in order to simplify the LIMIT job.
+	 * This function determines if it is necessary or not and adjust
+	 * the parameters accordingly.
+	 */
 	protected function _adjustFakeSorting()
 	{
 		// Calculate the fastest way to get the topics.

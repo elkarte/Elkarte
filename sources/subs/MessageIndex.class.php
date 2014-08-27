@@ -21,6 +21,14 @@ class Message_Index extends List_Abstract
 	protected $_id_member = 0;
 	protected $_indexOptions = array();
 
+	/**
+	 * Constructor here it is!
+	 *
+	 * @param mixed[] $options - the possible options
+	 * @param int $id_board - the current board id
+	 * @param int $id_member - the current member id (0 for guests)
+	 * @param mixed[] $indexOptions - some more options
+	 */
 	public function __construct($options, $id_board, $id_member, $indexOptions)
 	{
 		$db = database();
@@ -31,6 +39,9 @@ class Message_Index extends List_Abstract
 		$this->_indexOptions = $indexOptions;
 	}
 
+	/**
+	 * {@inheritdoc }
+	 */
 	public function getResults()
 	{
 		if ($this->_queryParams['start'] > 0 && $this->_queryParams['limit'] > 0)
@@ -38,7 +49,7 @@ class Message_Index extends List_Abstract
 
 		$this->_doExtend($this->_id_board, $this->_id_member, $this->_indexOptions);
 
-		$query = $this->_generateQueryString($indexOptions);
+		$query = $this->_generateQueryString($this->_indexOptions);
 
 		$this->_doQuery($query, $this->_use_pre_query ? '' : 'substring');
 
@@ -64,6 +75,14 @@ class Message_Index extends List_Abstract
 		return $results;
 	}
 
+	/**
+	 * Some options require extension of the base query, here it is where
+	 * these conditions are evaluated and extensions applied if necessary.
+	 *
+	 * @param int $id_board - the current board id
+	 * @param int $id_member - the current member id (0 for guests)
+	 * @param mixed[] $indexOptions - some more options
+	 */
 	protected function _doExtend($id_board, $id_member, $indexOptions)
 	{
 		$sort_by = $this->getSort();
@@ -128,6 +147,14 @@ class Message_Index extends List_Abstract
 		}
 	}
 
+	/**
+	 * Message Index is a strange beast: it may use one or two queries to fetch
+	 * the topics, depending on sorting, pagination, etc.
+	 * This method determines which query should be first run.
+	 *
+	 * @param mixed[] $indexOptions - some more options
+	 * @return string - a query
+	 */
 	protected function _generateQueryString($indexOptions)
 	{
 		$sort_column = $this->_listOptions['allowed_sortings'][$this->getSort()];
@@ -169,6 +196,13 @@ class Message_Index extends List_Abstract
 		}
 	}
 
+	/**
+	 * If the "pre-query" is necessary (see Message_Index::_generateQueryString())
+	 * this method takes care of collecting all the informations expected
+	 * from the class.
+	 *
+	 * @return mixed[]
+	 */
 	protected function _getTopicsData()
 	{
 		$this->_doQuery('

@@ -25,7 +25,19 @@ if (!defined('ELK'))
  */
 interface List_Interface
 {
+	/**
+	 * Meant to return the array with the list of results
+	 */
 	public function getResults();
 
+	/**
+	 * Creates the pagination.
+	 * At the moment a sort of wrapper for constructPageIndex
+	 *
+	 * @param string $base_url - the common part of the url
+	 * @param int $totals - the total number of elements
+	 * @param bool $flexible - equivalent of $flexible_start for constructPageIndex
+	 * @return string
+	 */
 	public function getPagination($base_url, $totals, $flexible);
 }
