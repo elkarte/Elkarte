@@ -16,9 +16,32 @@ if (!defined('ELK'))
 
 class Message_Index extends List_Abstract
 {
+	/**
+	 * If it is necessary to use the pre-query in order to get the results
+	 *
+	 * @var bool
+	 */
 	protected $_use_pre_query = false;
+
+	/**
+	 * ID of the current board.
+	 *
+	 * @var int
+	 */
 	protected $_id_board = 0;
+
+	/**
+	 * ID of the current member
+	 *
+	 * @var int
+	 */
 	protected $_id_member = 0;
+
+	/**
+	 * Options
+	 *
+	 * @var mixed[]
+	 */
 	protected $_indexOptions = array();
 
 	/**

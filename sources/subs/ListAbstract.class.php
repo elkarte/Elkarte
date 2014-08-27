@@ -25,11 +25,45 @@ if (!defined('ELK'))
  */
 abstract class List_Abstract implements List_Interface
 {
+	/**
+	 * Options
+	 * @var mixed[]
+	 */
 	protected $_listOptions;
+
+	/**
+	 * The database request.
+	 * @var bool|object
+	 */
 	protected $_listRequest = null;
+
+	/**
+	 * The database object
+	 *
+	 * @var object
+	 */
 	protected $_db = null;
+
+	/**
+	 * Parameters to be used in the query
+	 *
+	 * @var mixed[]
+	 */
 	protected $_queryParams = array();
-	protected $_fetching = false;
+
+	/**
+	 * Extensions of the query
+	 *
+	 * @var mixed[]
+	 */
+	protected $_queryExtended = array();
+
+	/**
+	 * If the query is sorted upside-down in order to speed the retrieving
+	 * of the results
+	 *
+	 * @var bool
+	 */
 	protected $_fake_ascending = false;
 
 	/**
