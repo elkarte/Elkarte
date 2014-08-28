@@ -290,9 +290,6 @@ abstract class List_Abstract implements List_Interface
 	 */
 	protected function _doQuery($query, $identifier = '')
 	{
-		if (!empty($this->_listOptions['use_fake_ascending']))
-			$this->_adjustFakeSorting();
-
 		$this->_listRequest = $this->_db->query($identifier, $this->_queryString($query), $this->_queryParams);
 
 		return $this->_listRequest !== false;

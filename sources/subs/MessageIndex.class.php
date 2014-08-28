@@ -70,6 +70,9 @@ class Message_Index extends List_Abstract
 	 */
 	public function getResults()
 	{
+		if (!empty($this->_listOptions['use_fake_ascending']))
+			$this->_adjustFakeSorting();
+
 		if ($this->_queryParams['start'] > 0 && $this->_queryParams['limit'] > 0)
 			$this->_use_pre_query = true;
 
@@ -191,6 +194,9 @@ class Message_Index extends List_Abstract
 			$this->_doExtendFetch($id_member, $indexOptions);
 	}
 
+	/**
+	 * If we are using two queries these "extension" should be done "later"
+	 */
 	protected function _doExtendFetch($id_member, $indexOptions)
 	{
 		// If empty, no preview at all
