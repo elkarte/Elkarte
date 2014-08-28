@@ -202,10 +202,12 @@ abstract class List_Abstract implements List_Interface
 
 		$defaults = array(
 			'id' => 'list_' . md5(rand()),
+			'start' => 0,
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => 'no_items', // @todo add a generic txt
 			'no_items_align' => 'center', // @deprecated?
 // 			'default_sort_col' => //@todo use the first column
+			'default_sort_dir' => true,
 			'form' => array(),
 			'list_menu' => array(),
 			'data_check' => null,
@@ -213,7 +215,6 @@ abstract class List_Abstract implements List_Interface
 			'use_fake_ascending' => false,
 			'totals' => 0,
 			'allowed_sortings' => array()
-// 			'default_sort_dir' => // @todo pick the default
 		);
 
 		assert(isset($options['allowed_sortings']));
@@ -228,9 +229,9 @@ abstract class List_Abstract implements List_Interface
 	protected function _init()
 	{
 		$this->_queryParams['sort'] = '';
-		$this->sortBy($this->_listOptions['default_sort_col']);
+		$this->sortBy($this->_listOptions['default_sort_col'], $this->_listOptions['default_sort_dir']);
 
-		$this->setLimit(0, $this->_listOptions['items_per_page']);
+		$this->setLimit($this->_listOptions['start'], $this->_listOptions['items_per_page']);
 		$this->_queryParams['maxindex'] = empty($this->_queryParams['limit']) ? $this->_queryParams['totals'] : $this->_queryParams['limit'];
 	}
 
@@ -289,9 +290,6 @@ abstract class List_Abstract implements List_Interface
 	 */
 	protected function _doQuery($query, $identifier = '')
 	{
-		if ($this->_listRequest !== null)
-			return;
-
 		if (!empty($this->_listOptions['use_fake_ascending']))
 			$this->_adjustFakeSorting();
 

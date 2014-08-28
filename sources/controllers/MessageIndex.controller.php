@@ -70,9 +70,6 @@ class MessageIndex_Controller extends Action_Controller
 		// And now, what we're here for: topics!
 		require_once(SUBSDIR . '/MessageIndex.subs.php');
 
-		// Known sort methods.
-		$sort_methods = messageIndexSort();
-
 		// Set up the query options
 		$indexOptions = array(
 			'include_sticky' => !empty($modSettings['enableStickyTopics']),
@@ -91,16 +88,13 @@ class MessageIndex_Controller extends Action_Controller
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['topic_alert_none'],
 			'id' => 'messageindex',
-			'allowed_sortings' => $sort_methods,
-			'default_sort_col' => 'last_post',
 			'use_fake_ascending' => true,
+			'start' => !empty($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0,
 			'totals' => $board_info['total_topics'],
 		), $board, $user_info['id'], $indexOptions);
 
 		if (isset($_REQUEST['sort']))
 			$list->sortBy($_REQUEST['sort'], isset($_REQUEST['desc']));
-
-
 
 		// View all the topics, or just a few?
 		$context['topics_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['topics_per_page']) ? $options['topics_per_page'] : $modSettings['defaultMaxTopics'];
@@ -232,9 +226,7 @@ class MessageIndex_Controller extends Action_Controller
 
 		// They didn't pick one, default to by last post descending.
 		$context['sort_by'] = $list->getSort();
-		$ascending = $list->getSort(true);
-
-// 		$sort_column = $sort_methods[$context['sort_by']];
+		$ascending = !$list->getSort(true);
 
 		$context['sort_direction'] = $ascending ? 'up' : 'down';
 		$context['sort_title'] = $ascending ? $txt['sort_desc'] : $txt['sort_asc'];
@@ -242,7 +234,7 @@ class MessageIndex_Controller extends Action_Controller
 		// Trick
 		$txt['starter'] = $txt['started_by'];
 
-		foreach ($sort_methods as $key => $val)
+		foreach ($list->getSortKeys() as $key)
 			$context['topics_headers'][$key] = array(
 				'url' => $scripturl . '?board=' . $context['current_board'] . '.' . $context['start'] . ';sort=' . $key . ($context['sort_by'] == $key && $context['sort_direction'] == 'up' ? ';desc' : ''),
 				'sort_dir_img' => $context['sort_by'] == $key ? '<img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" title="' . $context['sort_title'] . '" />' : '',
@@ -259,10 +251,6 @@ class MessageIndex_Controller extends Action_Controller
 
 		// Allow addons to add to the $context['topics']
 		call_integration_hook('integrate_messageindex_listing', array($topics_info));
-
-		// Fix the sequence of topics if they were retrieved in the wrong order. (for speed reasons...)
-// 		if ($fake_ascending)
-// 			$context['topics'] = array_reverse($context['topics'], true);
 
 		$topic_ids = array_keys($context['topics']);
 
