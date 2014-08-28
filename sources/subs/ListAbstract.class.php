@@ -149,9 +149,9 @@ abstract class List_Abstract implements List_Interface
 
 	/**
 	 * Allows to extend the query (if supported by the query itself).
+	 *
 	 * It allows to adds "pieces" of query to arrays that will be later injected
 	 * into the query statement.
-	 *
 	 * In order to be used specific placeholders are required into the query:
 	 *   - {query_extend_select}
 	 *   - {query_extend_join}
@@ -261,6 +261,7 @@ abstract class List_Abstract implements List_Interface
 			'where' => array('pre' => ' ', 'implode' => ' ', 'post' => ' '),
 			'group' => array('pre' => '', 'implode' => ' ', 'post' => '')
 		);
+
 		foreach ($replacements as $statement => $joins)
 		{
 			if (!empty($this->_queryExtended[$statement]))

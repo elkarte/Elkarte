@@ -45,6 +45,13 @@ class Message_Index extends List_Abstract
 	protected $_indexOptions = array();
 
 	/**
+	 * Extensions of the queries
+	 *
+	 * @var mixed[]
+	 */
+	protected $_miQueryExtended = array();
+
+	/**
 	 * Constructor here it is!
 	 *
 	 * @param mixed[] $options - the possible options
@@ -63,6 +70,7 @@ class Message_Index extends List_Abstract
 		$this->_id_board = $id_board;
 		$this->_id_member = $id_member;
 		$this->_indexOptions = $indexOptions;
+		$this->_miQueryExtended = array('topics' => array(), 'data' => array());
 	}
 
 	/**
@@ -94,7 +102,6 @@ class Message_Index extends List_Abstract
 			$this->addQueryParam('topic_list', $topic_ids);
 			$this->addQueryParam('find_set_topics', implode(',', $topic_ids));
 
-			$this->_doExtendFetch($this->_id_member, $this->_indexOptions);
 			$results = $this->_getTopicsData();
 		}
 		else
@@ -107,6 +114,33 @@ class Message_Index extends List_Abstract
 			$results = array_reverse($results, true);
 
 		return $results;
+	}
+
+	/**
+	 * Again, the darn message index is messy because it uses two queries,
+	 * so if we want to be able to extend the "correct" one, we need a way
+	 * to distinguish what goes where.
+	 * {@inheritdoc }
+	 *
+	 * @param string $query - Used to specify which query should be extended:
+	 *                        the one that fetchs the data ('data'), of the
+	 *                        pre-query ('topics')
+	 * @param string $select - String to add to the SELECT statement
+	 * @param string $join - String to add to the JOIN statement
+	 * @param string $where - String to add to the WHERE statement
+	 * @param string $group - String to add to the GROUP statement
+	 */
+	public function extendQuery($query, $select = '', $join = '', $where = '', $group = '')
+	{
+		// If we don't know the query you want to extend, it's better not to risk
+		if (!in_array($query, array('data', 'topics')))
+			return;
+
+		foreach (array('select', 'join', 'where', 'group') as $item)
+		{
+			if (!empty($$item))
+				$this->_miQueryExtended[$query][$item][] = $$item;
+		}
 	}
 
 	/**
@@ -174,60 +208,70 @@ class Message_Index extends List_Abstract
 
 		if ($sort_by === 'last_poster')
 		{
-			$this->extendQuery('', 'INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
+			$this->extendQuery('topics', '', 'INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
 				LEFT JOIN {db_prefix}members AS meml ON (meml.id_member = ml.id_member)');
 		}
 		elseif (in_array($sort_by, array('starter', 'subject')))
 		{
-			$this->extendQuery('', 'INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)');
+			$this->extendQuery('topics', '', 'INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)');
 
 			if ($sort_by === 'starter')
-				$this->extendQuery('', 'LEFT JOIN {db_prefix}members AS memf ON (memf.id_member = mf.id_member)');
+				$this->extendQuery('topics', '', 'LEFT JOIN {db_prefix}members AS memf ON (memf.id_member = mf.id_member)');
 		}
 		if ($indexOptions['only_approved'])
 		{
-			$this->extendQuery('', '', '
+			$this->extendQuery('topics', '', '', '
 				AND (t.approved = {int:is_approved}' . ($id_member == 0 ? '' : ' OR t.id_member_started = {int:current_member}') . ')');
 		}
 
-		if (!$this->_use_pre_query)
-			$this->_doExtendFetch($id_member, $indexOptions);
-	}
-
-	/**
-	 * If we are using two queries these "extension" should be done "later"
-	 */
-	protected function _doExtendFetch($id_member, $indexOptions)
-	{
 		// If empty, no preview at all
 		if (!empty($indexOptions['previews']))
 		{
 			// If -1 means everything
 			if ($indexOptions['previews'] === -1)
-				$this->extendQuery('ml.body AS last_body, mf.body AS first_body');
+				$this->extendQuery('data', 'ml.body AS last_body, mf.body AS first_body');
 			// Default: a SUBSTRING
 			else
-				$this->extendQuery('SUBSTRING(ml.body, 1, ' . ($indexOptions['previews'] + 256) . ') AS last_body, SUBSTRING(mf.body, 1, ' . ($indexOptions['previews'] + 256) . ') AS first_body');
+				$this->extendQuery('data', 'SUBSTRING(ml.body, 1, ' . ($indexOptions['previews'] + 256) . ') AS last_body, SUBSTRING(mf.body, 1, ' . ($indexOptions['previews'] + 256) . ') AS first_body');
 		}
 
 		if ($id_member == 0)
 		{
-			$this->extendQuery('0 AS new_from');
+			$this->extendQuery('data', '0 AS new_from');
 		}
 		else
 		{
-			$this->extendQuery('IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1 AS new_from', '
+			$this->extendQuery('data', 'IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1 AS new_from', '
 				LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
 				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = {int:current_board} AND lmr.id_member = {int:current_member})');
 		}
 		if (!empty($indexOptions['include_avatars']))
 		{
-			$this->extendQuery('meml.avatar, IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type, meml.email_address', 'LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = ml.id_member AND a.id_member != 0)');
+			$this->extendQuery('data', 'meml.avatar, IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type, meml.email_address', 'LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = ml.id_member AND a.id_member != 0)');
 		}
 		if (!empty($indexOptions['custom_selects']))
 		{
 			foreach ($indexOptions['custom_selects'] as $select)
-				$this->extendQuery($select);
+				$this->extendQuery('data', $select);
+		}
+	}
+
+	/**
+	 * Sets Message_Index::$_queryExtended according to the query is going
+	 * to be run (data fething or pre-query).
+	 *
+	 * @param string $type - type of the query: 'data' (if fething data) or
+	 *                       'topics' to address the pre-query or the "single" query
+	 */
+	protected function _extendQuery($type = 'data')
+	{
+		if ($type === 'topics')
+		{
+			$this->_queryExtended = $this->_miQueryExtended['topics'];
+		}
+		else
+		{
+			$this->_queryExtended = array_merge($this->_miQueryExtended['topics'], $this->_miQueryExtended['data']);
 		}
 	}
 
@@ -246,6 +290,7 @@ class Message_Index extends List_Abstract
 
 		if ($this->_use_pre_query)
 		{
+			$this->_extendQuery('topics');
 			return '
 				SELECT t.id_topic
 				FROM {db_prefix}topics AS t
@@ -257,6 +302,7 @@ class Message_Index extends List_Abstract
 		}
 		else
 		{
+			$this->_extendQuery('data');
 			return '
 				SELECT
 					t.id_topic, t.num_replies, t.locked, t.num_views, t.num_likes, t.is_sticky, t.id_poll, t.id_previous_board,
@@ -289,6 +335,7 @@ class Message_Index extends List_Abstract
 	 */
 	protected function _getTopicsData()
 	{
+		$this->_extendQuery('data');
 		$this->_doQuery('
 			SELECT
 				t.id_topic, t.num_replies, t.locked, t.num_views, t.num_likes, t.is_sticky, t.id_poll, t.id_previous_board,
