@@ -154,13 +154,14 @@ class Display_Controller
 		if ($modSettings['postmod_active'] && allowedTo('approve_posts'))
 			$context['real_num_replies'] += $topicinfo['unapproved_posts'] - ($topicinfo['approved'] ? 0 : 1);
 
-		// If this topic has unapproved posts, we need to work out how many posts the user can see, for page indexing.
+		// If this topic was derived from another, set the followup details
 		if (!empty($topicinfo['derived_from']))
 		{
 			require_once(SUBSDIR . '/FollowUps.subs.php');
 			$context['topic_derived_from'] = topicStartedHere($topic, $includeUnapproved);
 		}
 
+		// If this topic has unapproved posts, we need to work out how many posts the user can see, for page indexing.
 		if (!$includeUnapproved && $topicinfo['unapproved_posts'] && !$user_info['is_guest'])
 		{
 			$myUnapprovedPosts = unapprovedPosts($topic, $user_info['id']);
@@ -251,6 +252,8 @@ class Display_Controller
 				'go_prev' => $scripturl . '?topic=' . $topic . '.0;prev_next=prev#new',
 				'go_next' => $scripturl . '?topic=' . $topic . '.0;prev_next=next#new'
 			);
+
+		// Derived from, set the link back
 		if (!empty($context['topic_derived_from']))
 			$context['links']['derived_from'] = $scripturl . '?msg=' . $context['topic_derived_from']['derived_from'];
 
