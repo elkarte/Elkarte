@@ -623,7 +623,7 @@ function dbMostLikedTopic($board = null, $limit = 10)
 		array(
 			'id_board' => $board,
 			'limit' => 1,
-			'limit2' => 10
+			'limit2' => $limit
 		)
 	);
 
