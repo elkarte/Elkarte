@@ -588,16 +588,15 @@ function dbMostLikedMessage()
 /**
  * Function to get most liked topic
  */
-function dbMostLikedTopic()
+function dbMostLikedTopic($board = null, $limit = null)
 {
 	global $scripturl, $modSettings, $settings, $txt;
 
 	$db = database();
 
 	// Most liked topic
-	$mostLikedTopic = array();
 	$request = $db->query('', '
-		SELECT m.id_topic, lp.like_count, ml.id_msg
+		SELECT m.id_topic, lp.like_count, m.id_msg
 		FROM {db_prefix}message_likes AS ml
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = ml.id_msg)
 			INNER JOIN {db_prefix}boards AS b ON (m.id_board = b.id_board)
@@ -605,18 +604,22 @@ function dbMostLikedTopic()
 				SELECT COUNT(m.id_topic) AS like_count, m.id_topic
 				FROM {db_prefix}message_likes AS lp
 					INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
+					INNER JOIN {db_prefix}boards AS b ON (m.id_board = b.id_board)
+				WHERE ' . ($board === null ? '{query_wanna_see_board}' : 'b.id_board = {int:id_board}') . '
 				GROUP BY m.id_topic
 				ORDER BY like_count DESC
-				LIMIT {int:limit}
+				' . ($board === null ? 'LIMIT {int:limit}' : '') . '
 			) AS lp ON (lp.id_topic = m.id_topic)
-		WHERE {query_wanna_see_board}
+		WHERE ' . ($board === null ? '{query_wanna_see_board}' : 'b.id_board = {int:id_board}') . '
 		ORDER BY m.id_msg DESC
 		LIMIT {int:limit2}',
 		array(
+			'id_board' => $board,
 			'limit' => 1,
-			'limit2' => 10
+			'limit2' => $limit === null ? 10 : $limit
 		)
 	);
+
 	$mostLikedTopic = $db->fetch_assoc($request);
 	$msgs = array($mostLikedTopic['id_msg']);
 	while ($row = $db->fetch_assoc($request))
@@ -632,7 +635,7 @@ function dbMostLikedTopic()
 
 	// Lets fetch few messages in the topic
 	$request = $db->query('', '
-		SELECT m.id_msg, m.body, m.poster_time, m.smileys_enabled,
+		SELECT m.id_msg, m.id_topic, m.body, m.poster_time, m.smileys_enabled,
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
 			mem.id_member, IFNULL(mem.real_name, m.poster_name) AS real_name, mem.avatar, mem.email_address
 		FROM {db_prefix}messages AS m
@@ -654,6 +657,7 @@ function dbMostLikedTopic()
 
 		$mostLikedTopic['msg_data'][] = array(
 			'id_msg' => $row['id_msg'],
+			'id_topic' => $row['id_topic'],
 			'body' => parse_bbc($msgString, $row['smileys_enabled'], $row['id_msg']),
 			'time' => standardTime($row['poster_time']),
 			'html_time' => htmlTime($row['poster_time']),
@@ -717,45 +721,8 @@ function dbMostLikedBoard()
 		);
 	}
 
-	// Lets fetch few top liked topics from this board
-	$request = $db->query('', '
-		SELECT m.id_topic, m.id_msg, m.body, m.poster_time, m.smileys_enabled,
-			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
-			mem.id_member, IFNULL(mem.real_name, m.poster_name) as real_name,
-			mem.avatar, mem.email_address, COUNT(lp.id_msg) AS like_count
-		FROM {db_prefix}message_likes AS lp
-			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
-			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member)
-		WHERE m.id_board = ({int:id_board})
-		GROUP BY lp.id_msg
-		ORDER BY like_count DESC
-		LIMIT 10',
-		array(
-			'id_board' => $mostLikedBoard['id_board']
-		)
-	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		censorText($row['body']);
-		$msgString = Util::shorten_text($row['body'], 255, true);
-		$avatar = determineAvatar($row);
-
-		$mostLikedBoard['topic_data'][] = array(
-			'id_topic' => $row['id_topic'],
-			'body' => parse_bbc($msgString, $row['smileys_enabled'], $row['id_msg']),
-			'time' => standardTime($row['poster_time']),
-			'html_time' => htmlTime($row['poster_time']),
-			'timestamp' => forum_time(true, $row['poster_time']),
-			'member' => array(
-				'id_member' => $row['id_member'],
-				'name' => $row['real_name'],
-				'href' => !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
-				'avatar' => $avatar['href'],
-			),
-		);
-	}
-	$db->free_result($request);
+	$mostLikedTopic = dbMostLikedTopic($mostLikedBoard['id_board'], 5);
+	$mostLikedBoard['topic_data'] = $mostLikedTopic['msg_data'];
 
 	return $mostLikedBoard;
 }
