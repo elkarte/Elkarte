@@ -680,11 +680,12 @@ function dbMostLikedBoard()
 	global $scripturl, $txt;
 
 	$db = database();
+
 	// Most liked board
-	$mostLikedBoard = array();
 	$request = $db->query('', '
 		SELECT m.id_board, b.name, b.num_topics, b.num_posts,
-			COUNT(DISTINCT(m.id_topic)) AS topics_liked, COUNT(DISTINCT(lp.id_msg)) AS msgs_liked,
+			COUNT(DISTINCT(m.id_topic)) AS topics_liked,
+			COUNT(DISTINCT(lp.id_msg)) AS msgs_liked,
 			COUNT(m.id_board) AS like_count
 		FROM {db_prefix}message_likes as lp
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
@@ -695,7 +696,7 @@ function dbMostLikedBoard()
 		LIMIT 1',
 		array()
 	);
-	list ($mostLikedBoard['id_board'], $mostLikedBoard['name'], $mostLikedBoard['num_topics'], $mostLikedBoard['num_posts'], $mostLikedBoard['topics_liked'], $mostLikedBoard['msgs_liked'], $mostLikedBoard['like_count'])= $db->fetch_row($request);
+	$mostLikedBoard = $db->fetch_assoc($request);
 
 	$db->free_result($request);
 
@@ -714,7 +715,6 @@ function dbMostLikedBoard()
 			mem.avatar, mem.email_address, COUNT(lp.id_msg) AS like_count
 		FROM {db_prefix}message_likes AS lp
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
-			INNER JOIN {db_prefix}boards AS b ON (m.id_board = b.id_board)
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member)
 		WHERE m.id_board = ({int:id_board})
