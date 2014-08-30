@@ -176,14 +176,6 @@ class Database_PostgreSQL extends Database_Abstract
 			'profile_board_stats' => array(
 				'~COUNT\(\*\) \/ MAX\(b.num_posts\)~' => 'CAST(COUNT(*) AS DECIMAL) / CAST(b.num_posts AS DECIMAL)',
 			),
-			'group_concat' => array(
-				'~GROUP_CONCAT(.*?)AS~' => 'array_to_string(array_agg$1, \',\')',
-			),
-			'group_concat_convert' => array(
-				'~CONVERT\((.*?), .*?\)~' => '$1',
-				'~ SEPARATOR~' => ', ',
-				'~GROUP_CONCAT(.*?)\) AS~' => 'array_to_string(array_agg$1) AS',
-			),
 		);
 
 		if (isset($replacements[$identifier]))

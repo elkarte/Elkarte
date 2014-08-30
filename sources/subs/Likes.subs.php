@@ -596,7 +596,7 @@ function dbMostLikedTopic()
 
 	// Most liked topic
 	$mostLikedTopic = array();
-	$request = $db->query('group_concat_convert', '
+	$request = $db->query('', '
 		SELECT m.id_topic, lp.like_count, ml.id_msg
 		FROM {db_prefix}message_likes AS ml
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = ml.id_msg)
@@ -682,7 +682,7 @@ function dbMostLikedBoard()
 	$db = database();
 	// Most liked board
 	$mostLikedBoard = array();
-	$request = $db->query('group_concat_convert', '
+	$request = $db->query('', '
 		SELECT m.id_board, b.name, b.num_topics, b.num_posts,
 			COUNT(DISTINCT(m.id_topic)) AS topics_liked, COUNT(DISTINCT(lp.id_msg)) AS msgs_liked,
 			COUNT(m.id_board) AS like_count
@@ -853,7 +853,7 @@ function dbMostLikesGivenUser()
 	$db = database();
 
 	$mostLikeGivingMember = array();
-	$request = $db->query('group_concat_convert', '
+	$request = $db->query('', '
 		SELECT lp.id_member, lp.like_count,
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
 			IFNULL(mem.real_name, m.poster_name) AS real_name, mem.avatar, mem.date_registered, mem.posts, mem.email_address
