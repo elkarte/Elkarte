@@ -514,6 +514,8 @@ function messageLikeCount($message)
 
 /**
  * Function to get most liked message
+ *
+ * @package Likes
  */
 function dbMostLikedMessage()
 {
@@ -586,9 +588,14 @@ function dbMostLikedMessage()
 }
 
 /**
- * Function to get most liked topic
+ * Function to get most liked topic.
+ *
+ * @package Likes
+ * @param null|int $board - An optional board id to find most liked topics in.
+ *                          If omitted, {query_wanna_see_board} is used.
+ * @param int $limit - Optional, number of topics to return (default 10).
  */
-function dbMostLikedTopic($board = null, $limit = null)
+function dbMostLikedTopic($board = null, $limit = 10)
 {
 	global $scripturl, $modSettings, $settings, $txt;
 
@@ -616,7 +623,7 @@ function dbMostLikedTopic($board = null, $limit = null)
 		array(
 			'id_board' => $board,
 			'limit' => 1,
-			'limit2' => $limit === null ? 10 : $limit
+			'limit2' => 10
 		)
 	);
 
@@ -677,7 +684,8 @@ function dbMostLikedTopic($board = null, $limit = null)
 
 /**
  * Function to get most liked board
- * @todo: fix postgre
+ *
+ * @package Likes
  */
 function dbMostLikedBoard()
 {
@@ -721,7 +729,7 @@ function dbMostLikedBoard()
 		);
 	}
 
-	$mostLikedTopic = dbMostLikedTopic($mostLikedBoard['id_board'], 5);
+	$mostLikedTopic = dbMostLikedTopic($mostLikedBoard['id_board'], 10);
 	$mostLikedBoard['topic_data'] = $mostLikedTopic['msg_data'];
 
 	return $mostLikedBoard;
@@ -729,6 +737,8 @@ function dbMostLikedBoard()
 
 /**
  * Function to get most liked user
+ *
+ * @package Likes
  */
 function dbMostLikesReceivedUser()
 {
@@ -822,6 +832,8 @@ function dbMostLikesReceivedUser()
 
 /**
  * Function to get most likes giving user
+ *
+ * @package Likes
  */
 function dbMostLikesGivenUser()
 {
