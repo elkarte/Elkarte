@@ -597,7 +597,7 @@ function dbMostLikedTopic()
 	// Most liked topic
 	$mostLikedTopic = array();
 	$request = $db->query('group_concat_convert', '
-		SELECT m.id_topic, lp.like_count, GROUP_CONCAT(m.id_msg SEPARATOR \',\') AS id_msgs
+		SELECT m.id_topic, lp.like_count, ml.id_msg
 		FROM {db_prefix}message_likes AS ml
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = ml.id_msg)
 			INNER JOIN {db_prefix}boards AS b ON (m.id_board = b.id_board)
@@ -618,6 +618,9 @@ function dbMostLikedTopic()
 		)
 	);
 	$mostLikedTopic = $db->fetch_assoc($request);
+	$msgs = array($mostLikedTopic['id_msg']);
+	while ($row = $db->fetch_assoc($request))
+		$msgs[] = $row['id_msg'];
 	$db->free_result($request);
 
 	if (empty($mostLikedTopic))
@@ -639,7 +642,7 @@ function dbMostLikedTopic()
 		ORDER BY m.id_msg
 		LIMIT {int:limit}',
 		array(
-			'id_msgs' => array_map('intval', explode(',', $mostLikedTopic['id_msgs'])),
+			'id_msgs' => $msgs,
 			'limit' => 10
 		)
 	);
