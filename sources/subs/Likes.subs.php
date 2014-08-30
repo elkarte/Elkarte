@@ -598,8 +598,8 @@ function dbMostLikedTopic()
 	$mostLikedTopic = array();
 	$request = $db->query('group_concat_convert', '
 		SELECT m.id_topic, lp.like_count, GROUP_CONCAT(m.id_msg SEPARATOR \',\') AS id_msgs
-		FROM {db_prefix}message_likes AS lp
-			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
+		FROM {db_prefix}message_likes AS ml
+			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = ml.id_msg)
 			INNER JOIN {db_prefix}boards AS b ON (m.id_board = b.id_board)
 			INNER JOIN (
 				SELECT COUNT(m.id_topic) AS like_count, m.id_topic
