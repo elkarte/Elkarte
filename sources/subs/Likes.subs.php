@@ -683,18 +683,28 @@ function dbMostLikedBoard()
 
 	// Most liked board
 	$request = $db->query('', '
-		SELECT m.id_board, b.name, b.num_topics, b.num_posts,
-			COUNT(DISTINCT(m.id_topic)) AS topics_liked,
-			COUNT(DISTINCT(lp.id_msg)) AS msgs_liked,
-			COUNT(m.id_board) AS like_count
-		FROM {db_prefix}message_likes as lp
-			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
-			INNER JOIN {db_prefix}boards AS b ON (m.id_board = b.id_board)
-		WHERE {query_wanna_see_board}
-		GROUP BY m.id_board
-		ORDER BY like_count DESC
-		LIMIT 1',
-		array()
+		SELECT b.id_board, b.name, b.num_topics, b.num_posts,
+			tc.topics_liked,
+			tc.msgs_liked,
+			tc.like_count
+		FROM {db_prefix}boards AS b
+			INNER JOIN (
+				SELECT m.id_board,
+					COUNT(DISTINCT(m.id_topic)) AS topics_liked,
+					COUNT(DISTINCT(lp.id_msg)) AS msgs_liked,
+					COUNT(m.id_board) AS like_count
+				FROM {db_prefix}message_likes AS lp
+					INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
+					INNER JOIN {db_prefix}boards AS b ON (m.id_board = b.id_board)
+				WHERE {query_wanna_see_board}
+				GROUP BY m.id_board
+				ORDER BY like_count DESC
+				LIMIT {int:limit}
+			) AS tc ON (tc.id_board = b.id_board)
+		LIMIT {int:limit}',
+		array(
+			'limit' => 1
+		)
 	);
 	$mostLikedBoard = $db->fetch_assoc($request);
 
