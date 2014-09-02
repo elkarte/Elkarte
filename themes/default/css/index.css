@@ -1298,6 +1298,10 @@ a.bbc_link {
 .follow_ups .listlevel2 {
 	width: 20em;
 }
+.follow_ups .linklevel2 {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
 .quickbuttons .linklevel2 {
 	padding: 0 6px 0 26px;
 	line-height: 2.1em;
